@@ -45,6 +45,7 @@ struct Player {
     dash_cd: f64,
     dash_direction: Point,
     chat_at: f64,
+    service_at: f64,
 }
 impl Player {
     fn new(character: Character, peer: Peer) -> Self {
@@ -68,6 +69,7 @@ impl Player {
             dash_cd: 0.,
             dash_direction: Point::default(),
             chat_at: -99.,
+            service_at: -99.,
         }
     }
     fn snapshot(&self) -> Value {
@@ -335,8 +337,8 @@ impl World {
             ClientMessage::Stop => p.stop(),
             ClientMessage::Move { x, y } if x.is_finite() && y.is_finite() => {
                 p.goal = Some(Point {
-                    x: x.clamp(0.7, 71.3),
-                    y: y.clamp(0.7, 71.3),
+                    x: x.clamp(0.7, self.map.size as f64 - 0.7),
+                    y: y.clamp(0.7, self.map.size as f64 - 0.7),
                 });
                 p.target = None;
                 p.input = Point::default();
@@ -381,6 +383,9 @@ impl World {
                     let _ = p.peer.try_send(json!({"type":"error","text":text}));
                 }
             }
+            ClientMessage::Interact { npc, offer } => {
+                self.interact(session, &npc, offer.as_deref());
+            }
             ClientMessage::Chat { text } => {
                 let text = text.trim();
                 if self.time - p.chat_at < 1. {
@@ -403,6 +408,58 @@ impl World {
             }
             _ => {}
         }
+    }
+    fn interact(&mut self, session: u64, npc_id: &str, offer_id: Option<&str>) {
+        let Some(npc) = self.map.npcs.iter().find(|npc| npc.id == npc_id) else {
+            return;
+        };
+        let p = self.players.get_mut(&session).unwrap();
+        if p.character.hp <= 0. || p.character.point().distance(Point { x: npc.x, y: npc.y }) > 2.8
+        {
+            let _ = p.peer.try_send(
+                json!({"type":"error","text":"Walk closer to speak with this townsperson."}),
+            );
+            return;
+        }
+        p.stop();
+        p.attack = 0.;
+        let mut notice = String::new();
+        if let Some(id) = offer_id {
+            if self.time - p.service_at < 0.5 {
+                return;
+            }
+            p.service_at = self.time;
+            let Some(offer) = npc.offers.iter().find(|offer| offer.id == id) else {
+                return;
+            };
+            if offer.heal > 0. && p.character.hp >= p.character.max_hp() {
+                notice =
+                    "You are already at full health. Save it for after your next adventure!".into();
+            } else if p.character.gold < offer.cost {
+                notice = format!("You need {} gold for this service.", offer.cost);
+            } else {
+                p.character.gold -= offer.cost;
+                if offer.heal > 0. {
+                    p.character.hp = (p.character.hp + offer.heal).min(p.character.max_hp());
+                    notice = "Feeling better? Safe travels!".into();
+                }
+                if offer.gear {
+                    let (armor, weapon) = match p.character.look.class {
+                        Class::Warrior => ("azure", "royal"),
+                        Class::Mage => ("runic", "crystal"),
+                        Class::Assassin => ("moon", "moonfang"),
+                    };
+                    p.character
+                        .look
+                        .equip(armor, weapon)
+                        .expect("valid shop equipment");
+                    notice = "All fitted! Your new equipment is ready for the meadow.".into();
+                }
+            }
+        }
+        let _ = p
+            .peer
+            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold}));
     }
     fn start_attack(&mut self, session: u64) {
         let Some(p) = self.players.get_mut(&session) else {
@@ -676,7 +733,7 @@ impl World {
         let nearest = self
             .players
             .iter()
-            .filter(|(_, p)| p.character.hp > 0.)
+            .filter(|(_, p)| p.character.hp > 0. && !self.map.in_city(p.character.point()))
             .map(|(id, p)| {
                 (
                     *id,
@@ -689,7 +746,7 @@ impl World {
         let target = s.target.and_then(|id| {
             self.players
                 .get(&id)
-                .filter(|p| p.character.hp > 0.)
+                .filter(|p| p.character.hp > 0. && !self.map.in_city(p.character.point()))
                 .map(|p| {
                     (
                         id,
@@ -789,6 +846,11 @@ impl World {
             let direction = point.direction(goal);
             movement = movement.min(point.distance(goal));
             self.map.walk(&mut point, direction, movement, s.r);
+            if self.map.in_city(point) {
+                point = s.point();
+                s.target = None;
+                s.state = "return".into();
+            }
             s.x = point.x;
             s.y = point.y;
             s.dir = if direction.x - direction.y >= 0. {
@@ -809,7 +871,11 @@ impl World {
         let Some(p) = self.players.get_mut(&session) else {
             return;
         };
-        if p.character.hp <= 0. || p.dash > 0. || self.time - p.last_hurt < 0.65 {
+        if p.character.hp <= 0.
+            || self.map.in_city(p.character.point())
+            || p.dash > 0.
+            || self.time - p.last_hurt < 0.65
+        {
             return;
         }
         let value = (damage - p.character.look.stats(p.character.level).1).max(1.);
@@ -941,6 +1007,84 @@ mod tests {
         w.join(id, None, Some(look), tx).unwrap();
         rx
     }
+    #[test]
+    fn npc_services_check_distance_price_health_and_offer_ids() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        w.interact(1, "apothecary", Some("tonic"));
+        assert_eq!(rx.try_recv().unwrap()["type"], "system");
+        assert_eq!(rx.try_recv().unwrap()["type"], "error");
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.x = 42.;
+        c.y = 78.5;
+        c.hp = 40.;
+        c.gold = 7;
+        w.interact(1, "apothecary", Some("tonic"));
+        assert_eq!(w.players[&1].character.hp, 40.);
+        assert_eq!(w.players[&1].character.gold, 7);
+        w.time += 1.;
+        w.players.get_mut(&1).unwrap().character.gold = 8;
+        w.interact(1, "apothecary", Some("unknown"));
+        assert_eq!(w.players[&1].character.gold, 8);
+        w.time += 1.;
+        w.interact(1, "apothecary", Some("tonic"));
+        assert_eq!(w.players[&1].character.hp, 100.);
+        assert_eq!(w.players[&1].character.gold, 0);
+        // Repeated requests cannot bypass the service cooldown.
+        w.players.get_mut(&1).unwrap().character.gold = 8;
+        w.interact(1, "apothecary", Some("tonic"));
+        assert_eq!(w.players[&1].character.gold, 8);
+        w.time += 1.;
+        w.interact(1, "apothecary", Some("tonic"));
+        assert_eq!(w.players[&1].character.hp, 120.);
+        w.time += 1.;
+        w.players.get_mut(&1).unwrap().character.gold = 8;
+        w.interact(1, "apothecary", Some("tonic"));
+        assert_eq!(
+            w.players[&1].character.gold, 8,
+            "full-health shoppers are not charged"
+        );
+        w.players.get_mut(&1).unwrap().character.hp = 0.;
+        w.time += 1.;
+        w.interact(1, "apothecary", Some("tonic"));
+        assert_eq!(w.players[&1].character.hp, 0.);
+    }
+
+    #[test]
+    fn sanctuary_heals_and_armorer_fits_each_class_and_city_is_safe() {
+        for class in [Class::Warrior, Class::Mage, Class::Assassin] {
+            let mut w = world();
+            let _rx = join(&mut w, 1, class);
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.x = 30.;
+            c.y = 78.5;
+            c.hp = 10.;
+            w.interact(1, "healer", Some("blessing"));
+            assert_eq!(w.players[&1].character.hp, class.health());
+            assert_eq!(w.players[&1].character.gold, 0);
+            w.time += 1.;
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.x = 31.;
+            c.y = 88.;
+            w.interact(1, "smith", Some("fitting"));
+            assert!(w.players[&1].character.look.validate().is_ok());
+            assert!(w.players[&1].character.look.stats(1).1 > 0.);
+            w.hurt_player(1, 1000., Point::default());
+            assert_eq!(w.players[&1].character.hp, class.health());
+            // A slime pursuing an adventurer loses its target at the city gate.
+            w.slimes[0].x = 36.;
+            w.slimes[0].y = 71.5;
+            w.slimes[0].target = Some(1);
+            w.slimes[0].state = "chase".into();
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.x = 36.;
+            c.y = 73.;
+            w.update_slime(0);
+            assert!(w.slimes[0].target.is_none());
+            assert!(!w.map.in_city(w.slimes[0].point()));
+        }
+    }
+
     #[test]
     fn movement_is_normalized_and_stale_input_stops() {
         let mut w = world();

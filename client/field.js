@@ -29,7 +29,7 @@
 
   // ---------- the map ----------
   const PATHS = [
-    [[36, 71], [36, 62], [33, 52], [38, 44], [36, 36], [42, 28], [50, 22], [54, 12]],
+    [[36, 79], [36, 71], [36, 62], [33, 52], [38, 44], [36, 36], [42, 28], [50, 22], [54, 12]],
     [[36, 36], [26, 32], [16, 26], [10, 16]],
   ];
   const map = { dirt: new Uint8Array(MAP * MAP), tone: new Float32Array(MAP * MAP) };
@@ -119,6 +119,7 @@
           g.fillStyle = '#f5b82e'; g.beginPath(); g.arc(qx, qy - 6, 1.6, 0, 6.283); g.fill();
         } else if (r() < .015) { const [qx, qy] = inTile(); g.fillStyle = '#fff'; g.beginPath(); g.ellipse(qx, qy - 3, 3, 3.6, 0, 0, 6.283); g.fill(); g.fillStyle = '#e8484e'; g.beginPath(); g.ellipse(qx, qy - 5, 5, 3.4, 0, Math.PI, 0); g.fill(); }
       }
+      City.stoneTile(g, px, py, x, y);
       // earth cliff on the two front edges of the island
       const depth = CLIFF - 34 + hash2(x, y, 9) * 26;
       const face = (dir) => {
@@ -146,6 +147,7 @@
   let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null;
   let hero, slimes, drops, floaters, parts, effects, bolts, marker, cam, shake, keys, pointer, msg, hudT, tAll;
   let mageSpr = null, spriteGeneration = 0;
+  let pendingNpc = null, cityRoute = [], routeTime = 0;
   let remotePlayers = new Map(), onCharacter = () => {}, inputT = 0, lastLook = '';
   const isMage = () => hero?.look?.class === 'mage';
   const isAssassin = () => hero?.look?.class === 'assassin';
@@ -170,12 +172,13 @@
   }
   const xpNeed = lv => Math.round(40 * Math.pow(lv, 1.35));
   function reset() {
+    pendingNpc = null; cityRoute = [];
     hero = newHero(); drops = []; floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
     keys = new Set(); pointer = { down: false, x: 0, y: 0 };
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
   }
-  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: xpNeed(hero.level), level: hero.level, gold: hero.gold, kills: hero.kills, msg }); }
+  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: xpNeed(hero.level), level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', traveling: cityRoute.length > 0 && !pendingNpc }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -189,7 +192,11 @@
   function onKeyDown(e) {
     if (!running || paused || !Online.connected || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '')) return;
     const k = e.key.toLowerCase();
-    if (KEYDIR[k]) { keys.add(k); hero.target = null; hero.goal = null; e.preventDefault(); }
+    if (k === 'e' && !e.repeat && !hero.dead) {
+      e.preventDefault(); const npc = City.npcs.filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
+      if (npc) talkTo(npc); return;
+    }
+    if (KEYDIR[k]) { pendingNpc = null; cityRoute = []; keys.add(k); hero.target = null; hero.goal = null; e.preventDefault(); }
     if (k === ' ' || k === 'j') { e.preventDefault(); if (!e.repeat) swing(); }
     if (k === 'shift' && isAssassin()) { e.preventDefault(); if (!e.repeat) shadowstep(); }
   }
@@ -201,10 +208,40 @@
   }
   function onPointerDown(e) {
     if (!running || paused || !Online.connected || hero.dead) return;
+    pendingNpc = null; cityRoute = [];
+    const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
+    const npc = City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-105 && my<y+12; });
+    if (npc) { talkTo(npc); return; }
     pointer.down = true; cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
     const [wx, wy] = pointerWorld(e); pointer.x = wx; pointer.y = wy;
     const s = pickSlime(wx, wy);
     if (s) { hero.target = s; hero.goal = null; Online.send({ type: 'target', id: s.id }); } else { hero.target = null; hero.goal = { x: wx, y: wy }; Online.send({ type: 'move', x: wx, y: wy }); marker = { x: clamp(wx, .8, MAP - .8), y: clamp(wy, .8, MAP - .8), t: 0 }; }
+  }
+  function talkTo(npc) {
+    keys.clear(); pointer.down = false; hero.target = null; hero.goal = null; cityRoute = [];
+    if (Math.hypot(hero.x-npc.x,hero.y-npc.y) <= 2.5) Online.send({type:'interact',npc:npc.id});
+    else { pendingNpc = { npc, until: tAll + 12 }; cityRoute = routeTo(npc, true); routeTime = 0; }
+  }
+  // A small grid route lets the travel button walk around real map obstacles.
+  function routeTo(goal, approach = false) {
+    const free = (x,y) => x>=1 && y>=1 && x<MAP-1 && y<MAP-1 && objects.every(o => o.width ? Math.abs(x-o.x)>o.width/2+.55 || Math.abs(y-o.y)>o.depth/2+.55 : Math.hypot(x-o.x,y-o.y)>o.r+.55);
+    const start=[Math.round(hero.x),Math.round(hero.y)], key=([x,y])=>y*MAP+x;
+    let end=[Math.round(goal.x),Math.round(goal.y)];
+    if(approach) {
+      const candidates=[];
+      for(let x=Math.floor(goal.x)-2;x<=Math.ceil(goal.x)+2;x++) for(let y=Math.floor(goal.y)-2;y<=Math.ceil(goal.y)+2;y++) {
+        const distance=Math.hypot(x-goal.x,y-goal.y);
+        if(distance<=2 && free(x,y))candidates.push({point:[x,y],score:distance+Math.hypot(x-hero.x,y-hero.y)*.1});
+      }
+      candidates.sort((a,b)=>a.score-b.score);if(!candidates.length)return [];end=candidates[0].point;
+    }
+    const queue=[start], prev=new Map([[key(start),null]]);
+    for(let i=0;i<queue.length;i++) { const p=queue[i]; if(key(p)===key(end))break;
+      for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]) {const q=[p[0]+dx,p[1]+dy];if(free(...q)&&!prev.has(key(q))){prev.set(key(q),p);queue.push(q);}}
+    }
+    if(!prev.has(key(end)))return [];
+    const path=[];for(let p=end;p&&key(p)!==key(start);p=prev.get(key(p)))path.unshift({x:p[0],y:p[1]});
+    return path;
   }
   function onPointerMove(e) { if (pointer.down) { const [wx, wy] = pointerWorld(e); pointer.x = wx; pointer.y = wy; } }
   function onPointerUp() { pointer.down = false; }
@@ -305,6 +342,16 @@
         const [dx, dy] = paused ? [0, 0] : keyboardDirection();
         Online.send({ type: 'input', dx, dy });
         if (!paused && pointer.down && !hero.target) Online.send({ type: 'move', x: pointer.x, y: pointer.y });
+      }
+      if (!paused && pendingNpc) {
+        const {npc,until}=pendingNpc;
+        if(hero.dead || tAll>until) {pendingNpc=null;cityRoute=[];Online.send({type:'stop'});}
+        else if(Math.hypot(hero.x-npc.x,hero.y-npc.y)<=2.5) {pendingNpc=null;cityRoute=[];Online.send({type:'interact',npc:npc.id});}
+      }
+      if(!paused && cityRoute.length) {
+        if(hero.dead)cityRoute=[];
+        else if(Math.hypot(hero.x-cityRoute[0].x,hero.y-cityRoute[0].y)<.32){cityRoute.shift();routeTime=0;}
+        else if(tAll-routeTime>.35){Online.send({type:'move',...cityRoute[0]});routeTime=tAll;}
       }
       interpolate(hero, dt); for (const remote of remotePlayers.values()) interpolate(remote, dt);
       for (const slime of slimes) { interpolate(slime, dt); if (slime.dead) slime.dieT += dt; }
@@ -563,12 +610,14 @@
       g.drawImage(getChunk(chx, chy).c, dx, dy, G.w, G.h);
     }
     g.imageSmoothingEnabled = true;
+    City.drawPlaza(g, w2s);
     // ground decals: splats, target marker, slash, shadows
     for (const e of effects) if (e.kind === 'splat') { const [sx, sy] = w2s(e.x, e.y), a = clamp(1 - (e.t - 3) / 3, 0, 1) * .5; g.fillStyle = e.col; g.globalAlpha = a; g.beginPath(); g.ellipse(sx, sy, 26 * e.s, 12 * e.s, 0, 0, 6.283); g.fill(); g.globalAlpha = 1; }
     if (marker) { const [sx, sy] = w2s(marker.x, marker.y), p = (marker.t * 2) % 1; g.strokeStyle = `rgba(255,236,150,${1 - p * .6})`; g.lineWidth = 3; g.beginPath(); g.ellipse(sx, sy, 10 + p * 12, 5 + p * 6, 0, 0, 6.283); g.stroke(); }
     // build the depth-sorted list of everything standing on the ground
     const list = [], onScreen = (sx, sy, m) => sx > -m && sx < VW + m && sy > -m * 1.6 && sy < VH + m * 1.6;
     for (const o of objects) { const [sx, sy] = w2s(o.x, o.y); if (onScreen(sx, sy, 200)) { list.push({ d: o.x + o.y, o, sx, sy }); if (o.kind === 'tree') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else shadow(g, o.x, o.y, 26, 9, .25); } }
+    for (const n of City.npcs) { const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
     for (const s of slimes) if (!s.dead || (slimeSrc && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, 100)) { shadow(g, s.x, s.y, 28 * s.d.scale * (1 - s.hop * .12), 11 * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 60)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
     { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, .32); list.push({ d: hero.x + hero.y + .001, hero, sx, sy }); }
@@ -580,11 +629,19 @@
     const [hsx, hsy] = w2s(hero.x, hero.y), hd = hero.x + hero.y;
     for (const it of list) {
       if (it.o) {
-        const o = it.o, spr = sprites[o.kind][o.v % 4];
+        const o = it.o;
+        if (!sprites[o.kind]) {
+          const cover=['house','chapel','gate'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
+          City.drawObject(g,o,it.sx,it.sy,cover ? .5 : 1);
+          if(o.kind==='fountain') { for(let i=0;i<7;i++){const phase=(t*.7+i*.17)%1;g.globalAlpha=Math.sin(phase*Math.PI)*.7;g.fillStyle='#e0ffff';g.beginPath();g.ellipse(it.sx+Math.sin(i*4)*45,it.sy-9-phase*24,2,3,0,0,Math.PI*2);g.fill();}g.globalAlpha=1;}
+          continue;
+        }
+        const spr = sprites[o.kind][o.v % 4];
         // trees in front of the hero fade so he never disappears behind a canopy
         const cover = o.kind === 'tree' && it.d > hd && Math.abs(it.sx - hsx) < 80 && it.sy - 190 < hsy && it.sy > hsy - 20;
         if (cover) g.globalAlpha = .45;
         g.drawImage(spr.c, it.sx - spr.ax, it.sy - spr.ay + (o.kind === 'rock' ? 4 : 0), spr.w, spr.h); g.globalAlpha = 1;
+      } else if (it.npc) { City.drawNpc(g,it.npc,it.sx,it.sy,t,Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8);
       } else if (it.s) {
         const s = it.s; g.save(); g.translate(it.sx, it.sy); if (slimeSrc) drawSlimeSprite(g, s, t); else drawSlime(g, s, t);
         if (!s.dead && s.hp < s.maxHp) { const w = 52 * s.d.scale ** .7, y = slimeSrc ? -(s.kind === 'big' ? 36 : 28) * SLIME_K * s.d.scale : -62 * s.d.scale - s.hop * 16; g.fillStyle = 'rgba(20,10,30,.8)'; g.fillRect(-w / 2 - 2, y - 2, w + 4, 8); g.fillStyle = '#ff5a6e'; g.fillRect(-w / 2, y, w * s.hp / s.maxHp, 4); }
@@ -644,12 +701,15 @@
     const [c, g] = canvasOf(144, 144, 1), s = 144 / MAP;
     g.fillStyle = '#3f9b48'; g.fillRect(0, 0, 144, 144);
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = '#c9a26a'; g.fillRect(x * s, y * s, s + .5, s + .5); }
+    g.fillStyle='#d8cbb0'; g.fillRect(WORLD_MAP.city.x0*s,WORLD_MAP.city.y0*s,(WORLD_MAP.city.x1-WORLD_MAP.city.x0)*s,(WORLD_MAP.city.y1-WORLD_MAP.city.y0)*s);
+    g.fillStyle='#68bcc6'; g.beginPath();g.arc(36*s,83*s,3,0,Math.PI*2);g.fill();
     for (const o of objects) { g.fillStyle = o.kind === 'tree' ? '#1f6b3a' : o.kind === 'rock' ? '#8a93a8' : '#2f8a45'; g.beginPath(); g.arc(o.x * s, o.y * s, o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill(); }
     miniBase = c;
   }
   function drawMini() {
     if (!mctx || !miniBase) return;
     const s = mini.width / MAP; mctx.clearRect(0, 0, mini.width, mini.height); mctx.drawImage(miniBase, 0, 0, mini.width, mini.height);
+    for (const n of City.npcs) { mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
     for (const remote of remotePlayers.values()) { mctx.fillStyle = '#b3dfff'; mctx.beginPath(); mctx.arc(remote.x * s, remote.y * s, 2.5, 0, 6.283); mctx.fill(); }
     for (const sl of slimes) if (!sl.dead) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }
     mctx.fillStyle = '#fff'; mctx.strokeStyle = '#1c1428'; mctx.lineWidth = 1.5; mctx.beginPath(); mctx.arc(hero.x * s, hero.y * s, 3.6, 0, 6.283); mctx.fill(); mctx.stroke();
@@ -688,13 +748,18 @@
       Online.start({ look: hero.look,
         onWelcome: packet => applySnapshot(packet.snapshot, true),
         onSnapshot: packet => applySnapshot(packet), onEvent: networkEvent,
-        onDisconnect: () => { keys.clear(); pointer.down = false; hero.moving = false; },
+        onDisconnect: () => { Field.clearInput(); hero.moving = false; },
       });
       running = true; paused = false; last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     },
-    stop() { Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
-    clearInput() { keys?.clear(); if (pointer) pointer.down = false; },
-    setPaused(p) { paused = p; Field.clearInput(); Online.send({ type: 'stop' }); },
+    stop() { City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
+    clearInput() { pendingNpc=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
+    setPaused(p) { paused = p; if(p){pendingNpc=null;cityRoute=[];} Field.clearInput(); Online.send({ type: 'stop' }); },
+    visitCity() {
+      if(paused || !Online.connected || hero.dead)return;
+      Field.clearInput(); pendingNpc=null; hero.target=null; hero.goal=null;
+      cityRoute=routeTo({x:36,y:79});routeTime=0;
+    },
     equip(change) {
       if (!isModular()) return;
       const gear = characterClass().equipment({ ...hero.look, ...change });

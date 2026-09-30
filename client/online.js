@@ -60,13 +60,14 @@
         }
         case 'snapshot': {
           if (!connected) break;
-          status(`Greenmeadow · ${packet.online} online`, true);
           const character = packet.players.find(p => p.id === id);
+          status(`${window.City?.inside(character?.x, character?.y) ? WORLD_MAP.city.name : 'Greenmeadow'} · ${packet.online} online`, true);
           const slot = saved.characters.find(c => c.token === saved.current);
           if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
           callbacks.onSnapshot?.(packet); break;
         }
         case 'event': callbacks.onEvent?.(packet); break;
+        case 'dialogue': window.City?.dialogue(packet); break;
         case 'chat': log(packet.text, packet.name); break;
         case 'system': log(packet.text); break;
         case 'error':
@@ -80,7 +81,7 @@
       clearTimeout(joinTimeout);
       if (!active || currentGeneration !== generation) return;
       clearInterval(heartbeat);
-      connected = false; $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; window.City?.close(); $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay('Connection lost. Reconnecting to your character…');

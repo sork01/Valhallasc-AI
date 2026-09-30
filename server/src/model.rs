@@ -242,6 +242,10 @@ pub enum ClientMessage {
         armor: String,
         weapon: String,
     },
+    Interact {
+        npc: String,
+        offer: Option<String>,
+    },
     Chat {
         text: String,
     },
@@ -255,6 +259,42 @@ pub struct Obstacle {
     pub x: f64,
     pub y: f64,
     pub r: f64,
+    #[serde(default)]
+    pub width: f64,
+    #[serde(default)]
+    pub depth: f64,
+}
+#[derive(Clone, Deserialize, Serialize)]
+pub struct Offer {
+    pub id: String,
+    pub label: String,
+    pub cost: u32,
+    #[serde(default)]
+    pub heal: f64,
+    #[serde(default)]
+    pub gear: bool,
+}
+#[derive(Clone, Deserialize, Serialize)]
+pub struct Npc {
+    pub id: String,
+    pub name: String,
+    pub role: String,
+    pub x: f64,
+    pub y: f64,
+    pub dialogue: String,
+    pub offers: Vec<Offer>,
+}
+#[derive(Clone, Deserialize)]
+pub struct City {
+    pub x0: f64,
+    pub x1: f64,
+    pub y0: f64,
+    pub y1: f64,
+}
+impl City {
+    pub fn contains(&self, point: Point) -> bool {
+        point.x >= self.x0 && point.x <= self.x1 && point.y >= self.y0 && point.y <= self.y1
+    }
 }
 #[derive(Clone, Deserialize)]
 pub struct SlimeSpawn {
@@ -268,6 +308,9 @@ pub struct Map {
     pub spawn: Point,
     pub objects: Vec<Obstacle>,
     pub slimes: Vec<SlimeSpawn>,
+    #[serde(default)]
+    pub npcs: Vec<Npc>,
+    pub city: Option<City>,
 }
 impl Default for Map {
     fn default() -> Self {
@@ -275,9 +318,27 @@ impl Default for Map {
     }
 }
 impl Map {
+    pub fn in_city(&self, point: Point) -> bool {
+        self.city.as_ref().is_some_and(|city| city.contains(point))
+    }
     pub fn collide(&self, p: &mut Point, radius: f64) {
         for _ in 0..2 {
             for o in &self.objects {
+                if o.width > 0. && o.depth > 0. {
+                    // Expanded footprints also prevent dashes through buildings and walls.
+                    let hx = o.width / 2. + radius;
+                    let hy = o.depth / 2. + radius;
+                    let dx = p.x - o.x;
+                    let dy = p.y - o.y;
+                    if dx.abs() < hx && dy.abs() < hy {
+                        if hx - dx.abs() < hy - dy.abs() {
+                            p.x = o.x + if dx < 0. { -hx } else { hx };
+                        } else {
+                            p.y = o.y + if dy < 0. { -hy } else { hy };
+                        }
+                    }
+                    continue;
+                }
                 let d = p.distance(Point { x: o.x, y: o.y });
                 let min = radius + o.r;
                 if d < min {
@@ -310,15 +371,44 @@ mod tests {
     use super::*;
 
     #[test]
+    fn city_footprints_block_walks_and_dashes_but_gate_is_open() {
+        let map = Map::default();
+        let mut point = Point { x: 36., y: 70. };
+        map.walk(&mut point, Point { x: 0., y: 1. }, 8., 0.3);
+        assert!((point.y - 78.).abs() < 1e-6);
+        assert!(map.in_city(point));
+        point = Point { x: 43., y: 80. };
+        map.walk(&mut point, Point { x: 0., y: -1. }, 6., 0.3);
+        assert!(point.y >= 77.9 - 1e-8);
+        point = Point { x: 22., y: 80. };
+        map.walk(&mut point, Point { x: 1., y: 0. }, 4., 0.3);
+        assert!(point.x <= 23.4 + 1e-8);
+        for npc in &map.npcs {
+            let original = Point { x: npc.x, y: npc.y };
+            let mut resolved = original;
+            map.collide(&mut resolved, 0.3);
+            assert!(
+                resolved.distance(original) < 1e-6,
+                "{} stands inside an obstacle",
+                npc.id
+            );
+        }
+    }
+
+    #[test]
     fn collision_blocks_dash_tunnelling_and_resolves_centres() {
         let map = Map {
             size: 72,
             spawn: Point::default(),
             slimes: vec![],
+            npcs: vec![],
+            city: None,
             objects: vec![Obstacle {
                 x: 5.,
                 y: 5.,
                 r: 0.4,
+                width: 0.,
+                depth: 0.,
             }],
         };
         let mut point = Point { x: 3., y: 5. };

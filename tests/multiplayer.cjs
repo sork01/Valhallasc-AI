@@ -48,6 +48,7 @@ async function probe(page, message) {
 function route(map, start, goal) {
   const segmentFree = (a,b) => map.objects.every(o => {
     const dx=b.x-a.x,dy=b.y-a.y;
+    if(o.width) { const steps=Math.ceil(Math.hypot(dx,dy)/.1);for(let i=0;i<=steps;i++){const t=i/(steps||1);if(Math.abs(a.x+dx*t-o.x)<o.width/2+.4&&Math.abs(a.y+dy*t-o.y)<o.depth/2+.4)return false;}return true; }
     const t=Math.max(0,Math.min(1,((o.x-a.x)*dx+(o.y-a.y)*dy)/(dx*dx+dy*dy || 1)));
     return Math.hypot(o.x-a.x-dx*t,o.y-a.y-dy*t)>o.r+.4;
   });
@@ -58,11 +59,11 @@ function route(map, start, goal) {
     const current=queue[i]; if (key(current)===key(end)) break;
     for (const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0],[1,1],[-1,-1],[1,-1],[-1,1]]) {
       const next={x:current.x+dx,y:current.y+dy};
-      if (next.x<1 || next.y<1 || next.x>70 || next.y>70 || previous.has(key(next)) || !segmentFree(current,next)) continue;
+      if (next.x<1 || next.y<1 || next.x>map.size-2 || next.y>map.size-2 || previous.has(key(next)) || !segmentFree(current,next)) continue;
       previous.set(key(next),current);queue.push(next);
     }
   }
-  assert.ok(previous.has(key(end)), 'Combat target is reachable');
+  assert.ok(previous.has(key(end)), 'Destination is reachable through shared collision geometry');
   const points=[]; for(let current=end; current; current=previous.get(key(current))) points.unshift(current);
   const simplified=[];let anchor=start;
   for (let i=0;i<points.length;) {let j=i;while(j+1<points.length && segmentFree(anchor,points[j+1])) j++;simplified.push(points[j]);anchor=points[j];i=j+1;}
@@ -150,7 +151,49 @@ function route(map, start, goal) {
   await warrior.locator('#character-list button').filter({hasText:'TestWarrior'}).click();
   await warrior.waitForFunction(id=>Online.connected&&Online.id===id,warriorId);
   check(await warrior.evaluate(()=>Field.hero.look.warriorWeapon==='royal'),'Saved character picker restores previous gear');
+  console.log('Core multiplayer checks passed; checking city travel and NPC services.');
+  // Walk into the new city through actual inputs; no server state is changed by tests.
+  await warrior.evaluate(()=>Online.send({type:'interact',npc:'healer',offer:'blessing'}));
+  await warrior.waitForFunction(()=>document.getElementById('chat-log').textContent.includes('Walk closer'));passed++;
+  check(await warrior.locator('#npc-dialogue').isHidden(),'Remote NPC interaction cannot open a shop');
+  await warrior.locator('#city-travel').click();
+  await warrior.waitForFunction(()=>Field.hero.y>78.6&&Field.hero.y<80&&Math.abs(Field.hero.x-36)<.4,null,{timeout:40000});
+  check(await warrior.locator('#city-travel').isHidden(),'Travel button walks through the city gate');
+  await warrior.waitForFunction(()=>document.getElementById('network-status').textContent.includes('Alderhaven'));passed++;
+  await warrior.screenshot({path:path.join(root,'test-results/city-square.png')});
+  await warrior.keyboard.press('e');
+  await warrior.locator('#npc-dialogue').waitFor({state:'visible'});
+  check(await warrior.locator('#npc-name').textContent()==='Wren','E talks to nearby town guide');
+  const cityTick=(await (await fetch(url+'health')).json()).tick;await delay(300);
+  check((await (await fetch(url+'health')).json()).tick>cityTick,'NPC conversations keep the shared world running');
+  await warrior.keyboard.press('Escape');check(await warrior.locator('#npc-dialogue').isHidden(),'Escape closes NPC conversation');
+  async function walkTo(page,goal) {
+    const start=await page.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));
+    for(const point of route(map,start,goal)){await page.evaluate(p=>Online.send({type:'move',...p}),point);await page.waitForFunction(p=>Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<.4,point,{timeout:20000});}
+  }
+  async function clickNpc(page,id) {
+    const point=await page.evaluate(id=>{const n=City.npcs.find(n=>n.id===id),[x,y]=Field._debug.w2s(n.x,n.y),r=document.getElementById('fieldcv').getBoundingClientRect();return {x:r.left+x/1600*r.width,y:r.top+(y-60)/900*r.height};},id);
+    await page.mouse.click(point.x,point.y);await page.locator('#npc-dialogue').waitFor({state:'visible'});
+  }
+  await walkTo(warrior,{x:32,y:80});await delay(400);await clickNpc(warrior,'healer');
+  check(await warrior.locator('#npc-name').textContent()==='Sister Elara','Clicking an NPC opens the correct dialogue');
+  const cityGold=await warrior.evaluate(()=>Field.hero.gold);
+  await warrior.locator('[data-offer="blessing"]').click();
+  await warrior.waitForFunction(()=>document.getElementById('npc-notice').textContent.includes('full health'));
+  check(await warrior.evaluate(g=>Field.hero.gold===g,cityGold),'Sanctuary blessing is free and does not charge full-health players');
+  await warrior.locator('#npc-close').click();
+  await walkTo(warrior,{x:33,y:88});await delay(400);
+  await warrior.evaluate(()=>Online.send({type:'equip',armor:'none',weapon:'none'}));
+  await warrior.waitForFunction(()=>Field.hero.look.warriorWeapon==='none');
+  await clickNpc(warrior,'smith');await warrior.locator('[data-offer="fitting"]').click();
+  await warrior.waitForFunction(()=>Field.hero.look.warriorWeapon==='royal'&&Field.hero.look.warriorArmor==='azure');
+  await mage.waitForFunction(id=>Field.remotePlayers.find(p=>p.id===id)?.look.warriorWeapon==='royal',warriorId);passed++;
+  check(await warrior.evaluate(g=>Field.hero.gold===g,cityGold),'Armorer service equips server-owned class gear without charging');
+  await warrior.screenshot({path:path.join(root,'test-results/city-armorer.png')});await warrior.locator('#npc-close').click();
+  await walkTo(warrior,{x:40,y:79});await delay(400);await clickNpc(warrior,'apothecary');
+  check(await warrior.locator('[data-offer="tonic"]').isDisabled(),'Shop shows an unaffordable item without allowing a purchase');
+  await warrior.locator('#npc-close').click();
   for(const page of [warrior,mage,assassin]) check(page.errors.length===0,'No browser runtime errors: '+page.errors.join('; '));
   await warrior.screenshot({path:path.join(root,'test-results/multiplayer-final.png')});
-  console.log(`${passed} multiplayer checks passed (Chromium; three independent browser clients, combat, chat, reload, server restart).`);
+  console.log(`${passed} multiplayer checks passed (Chromium; three independent browser clients, combat, chat, reload, server restart, city travel and NPC shops).`);
 })().catch(error=>{console.error(error);console.error(logs);process.exitCode=1;}).finally(async()=>{await browser?.close();await stopServer();});

@@ -50,6 +50,9 @@ Players open `http://<server-LAN-address>:8080/`. Allow that port in the server'
 - I opens equipment; Esc opens the world menu. These stop your actions, but the shared world continues. Enemies can still hurt you.
 - Enter focuses chat; Enter sends; Esc leaves the chat input. M toggles music.
 - All equipment choices from the prototype are available as starter gear.
+- **Alderhaven** is south of the meadow. Follow the path through the north gate or click **Visit Alderhaven** to walk there automatically.
+- Click a townsperson or press **E** nearby to talk. The sanctuary heals for free; the bakery, apothecary, and inn offer healing services for gold. The armorer fits your best starter equipment for free. Food and tonics are consumed at the counter.
+- Slimes stay outside the city walls. NPC conversations stop your actions while the shared world keeps running.
 - New Character keeps your earlier character in **Esc → Your Characters**.
 
 ## Shared world and saves
@@ -93,17 +96,17 @@ The installed deployment uses `deploy/valhalla.service` under `~/.config/systemd
 ```text
 client/          Browser UI, renderer, sprites, music, connection/reconnect layer
 server/src/      Rust HTTP/WebSocket transport, world simulation, SQLite storage
-world/map.txt    Shared obstacle and slime-spawn geometry exported from Valhalla
+world/map.txt    Shared collision geometry, slime spawns, city layout and NPC services
 scripts/        Local Cargo wrapper and client map sync
 tests/          Browser multiplayer integration test
 deploy/         Compose, Apache and systemd examples
 ```
 
-`world/map.txt` is the source of truth for spawn/collision geometry. After editing it, run `node scripts/sync-world.cjs`, then rebuild Rust (the map is bundled into the binary). Terrain shading and scenery drawing remain in the original renderer.
+`world/map.txt` is the source of truth for spawn/collision geometry. After editing it, run `node scripts/sync-world.cjs`, then rebuild Rust (the map is bundled into the binary). Terrain shading and scenery drawing use the original renderer, with original city artwork in `client/city.js`. Alderhaven takes visual inspiration from [Prontera references](https://www.gameblast.com.br/2015/10/top-10-melhores-cidades-jogos.html): cobblestone plazas, a fountain, timber-framed shops, gardens, and stone gates. Reference images are not shipped as game assets.
 
 On WebSocket connection, send `{"type":"join","version":1,"token":null,"look":{"name":"Freya","class":"mage"}}`. The welcome packet returns an ID, a guest key for a newly created character, and a world snapshot. For resume, send the guest key with `look:null`; saved state takes precedence. Keep keys out of URLs and logs.
 
-Subsequent messages: `input {dx,dy}`, `stop`, `move {x,y}`, `target {id}`, `attack {fx,fy}`, `dash {dx,dy}`, `equip {armor,weapon}`, `chat {text}`, `ping {nonce}`. Direction vectors are normalized on the server. `move` chooses a destination, not a teleport. Unknown command fields are refused. Server messages: `welcome`, `snapshot`, `event`, `chat`, `system`, `pong`, and `error`. See `server/src/model.rs` for the exact types.
+Subsequent messages: `input {dx,dy}`, `stop`, `move {x,y}`, `target {id}`, `attack {fx,fy}`, `dash {dx,dy}`, `equip {armor,weapon}`, `interact {npc,offer?}`, `chat {text}`, `ping {nonce}`. Direction vectors are normalized on the server. `move` chooses a destination, not a teleport. Unknown command fields are refused. Server messages: `welcome`, `snapshot`, `event`, `chat`, `system`, `pong`, `dialogue`, and `error`. See `server/src/model.rs` for the exact types.
 
 The transport uses [Axum WebSockets](https://docs.rs/axum/0.8.9/axum/extract/ws/) and [Tower HTTP static serving](https://docs.rs/tower-http/0.6.11/tower_http/services/struct.ServeDir.html). Cargo.lock pins the resolved versions.
 
@@ -119,10 +122,10 @@ npm run check
 npm test
 ```
 
-The integration test starts its own isolated Rust server/database and uses three independent browser clients. It covers character creation, visible remote players, movement replication, equipment, safe chat, invalid commands/keys, duplicate sessions, combat, loot, page reload, server restart/reconnect, and switching between saved characters. Screenshots and disposable databases are written under gitignored `test-results/`. The existing sibling Playwright installation was used for testing in this workspace via `NODE_PATH`; no runtime dependency on the sibling project is required.
+The integration test starts its own isolated Rust server/database and uses three independent browser clients. It covers character creation, visible remote players, movement replication, equipment, safe chat, invalid commands/keys, duplicate sessions, combat, loot, page reload, server restart/reconnect, and switching between saved characters, walking through the city gate, NPC dialogue, sanctuary healing, armorer fitting, and shop affordability. Screenshots and disposable databases are written under gitignored `test-results/`. The existing sibling Playwright installation was used for testing in this workspace via `NODE_PATH`; no runtime dependency on the sibling project is required.
 
 `node tests/public-smoke.cjs` verifies the actual public HTTPS/WSS deployment with two browser clients. It also checks canonical redirects, private-file protection, chat, movement replication, and saved-character reload. It records only the test character IDs in `test-results/public-smoke-results.json`; remove those specific test characters from SQLite after both clients disconnect.
 
 ## Current scope
 
-This is a playable **single-zone multiplayer foundation**, not a finished large-scale MMORPG. There are no accounts, quests, inventories beyond starter gear, trading, guilds, parties, PvP, multiple zones, distributed world servers, or native executable client packages yet. Everyone receives the zone's snapshots; interest management and load testing are needed before promising large populations. Movement follows direct goals with collision sliding, as in the original; there is no pathfinding around complex obstacles. Browser tests here run on Linux Chromium; Windows and Firefox builds have not been exercised in this environment.
+This is a playable **single-zone multiplayer foundation**, not a finished large-scale MMORPG. There are no accounts, quests, inventories beyond starter gear, trading, guilds, parties, PvP, multiple zones, distributed world servers, or native executable client packages yet. Everyone receives the zone's snapshots; interest management and load testing are needed before promising large populations. Movement follows direct goals with collision sliding, as in the original; ordinary ground clicks do not find paths around complex obstacles. The city travel button follows a small grid route through the shared collision geometry. Browser tests here run on Linux Chromium; Windows and Firefox builds have not been exercised in this environment.

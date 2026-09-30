@@ -1,5 +1,5 @@
 {
-  "size": 72,
+  "size": 96,
   "spawn": {
     "x": 36,
     "y": 60
@@ -592,6 +592,623 @@
       "y": 68.21036077383906,
       "r": 0.3,
       "v": 3
+    },
+    {
+      "kind": "chapel",
+      "x": 29,
+      "y": 76,
+      "r": 0,
+      "v": 0,
+      "width": 3.4,
+      "depth": 3.2,
+      "label": "Sanctuary",
+      "color": "#6b8198"
+    },
+    {
+      "kind": "house",
+      "x": 43,
+      "y": 76,
+      "r": 0,
+      "v": 0,
+      "width": 3.4,
+      "depth": 3.2,
+      "label": "Moonleaf Apothecary",
+      "color": "#b65b65"
+    },
+    {
+      "kind": "house",
+      "x": 29,
+      "y": 88,
+      "r": 0,
+      "v": 0,
+      "width": 3.4,
+      "depth": 3.2,
+      "label": "Ember & Anvil",
+      "color": "#667c91"
+    },
+    {
+      "kind": "house",
+      "x": 43,
+      "y": 88,
+      "r": 0,
+      "v": 0,
+      "width": 3.4,
+      "depth": 3.2,
+      "label": "The Amber Inn",
+      "color": "#b8744e"
+    },
+    {
+      "kind": "fountain",
+      "x": 36,
+      "y": 83,
+      "r": 1.1,
+      "v": 0
+    },
+    {
+      "kind": "lamp",
+      "x": 25,
+      "y": 79,
+      "r": 0.18,
+      "v": 0
+    },
+    {
+      "kind": "lamp",
+      "x": 25,
+      "y": 86,
+      "r": 0.18,
+      "v": 0
+    },
+    {
+      "kind": "lamp",
+      "x": 32,
+      "y": 79,
+      "r": 0.18,
+      "v": 0
+    },
+    {
+      "kind": "lamp",
+      "x": 32,
+      "y": 86,
+      "r": 0.18,
+      "v": 0
+    },
+    {
+      "kind": "lamp",
+      "x": 41,
+      "y": 79,
+      "r": 0.18,
+      "v": 0
+    },
+    {
+      "kind": "lamp",
+      "x": 41,
+      "y": 86,
+      "r": 0.18,
+      "v": 0
+    },
+    {
+      "kind": "lamp",
+      "x": 47,
+      "y": 79,
+      "r": 0.18,
+      "v": 0
+    },
+    {
+      "kind": "lamp",
+      "x": 47,
+      "y": 86,
+      "r": 0.18,
+      "v": 0
+    },
+    {
+      "kind": "tree",
+      "x": 27,
+      "y": 74,
+      "r": 0.42,
+      "v": 3
+    },
+    {
+      "kind": "tree",
+      "x": 27,
+      "y": 91,
+      "r": 0.42,
+      "v": 3
+    },
+    {
+      "kind": "tree",
+      "x": 45,
+      "y": 74,
+      "r": 0.42,
+      "v": 3
+    },
+    {
+      "kind": "tree",
+      "x": 45,
+      "y": 91,
+      "r": 0.42,
+      "v": 3
+    },
+    {
+      "kind": "flowers",
+      "x": 31,
+      "y": 80,
+      "r": 0.55,
+      "v": 0
+    },
+    {
+      "kind": "flowers",
+      "x": 31,
+      "y": 86,
+      "r": 0.55,
+      "v": 0
+    },
+    {
+      "kind": "flowers",
+      "x": 41,
+      "y": 80,
+      "r": 0.55,
+      "v": 0
+    },
+    {
+      "kind": "flowers",
+      "x": 41,
+      "y": 86,
+      "r": 0.55,
+      "v": 0
+    },
+    {
+      "kind": "stall",
+      "x": 28,
+      "y": 83,
+      "r": 0,
+      "v": 0,
+      "width": 1.8,
+      "depth": 1.2,
+      "color": "#c46760",
+      "label": "Sunrise Bakery"
+    },
+    {
+      "kind": "stall",
+      "x": 44,
+      "y": 83,
+      "r": 0,
+      "v": 0,
+      "width": 1.8,
+      "depth": 1.2,
+      "color": "#678c9b",
+      "label": "Market"
+    },
+    {
+      "kind": "bench",
+      "x": 33,
+      "y": 86,
+      "r": 0,
+      "v": 0,
+      "width": 1.5,
+      "depth": 0.45
+    },
+    {
+      "kind": "bench",
+      "x": 39,
+      "y": 86,
+      "r": 0,
+      "v": 0,
+      "width": 1.5,
+      "depth": 0.45
+    },
+    {
+      "kind": "wall",
+      "x": 24,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 24,
+      "y": 74,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 24,
+      "y": 76,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 24,
+      "y": 78,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 24,
+      "y": 80,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 24,
+      "y": 82,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 24,
+      "y": 84,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 24,
+      "y": 86,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 24,
+      "y": 88,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 24,
+      "y": 90,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 24,
+      "y": 92,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 24,
+      "y": 94,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 48,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 48,
+      "y": 74,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 48,
+      "y": 76,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 48,
+      "y": 78,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 48,
+      "y": 80,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 48,
+      "y": 82,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 48,
+      "y": 84,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 48,
+      "y": 86,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 48,
+      "y": 88,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 48,
+      "y": 90,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 48,
+      "y": 92,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 48,
+      "y": 94,
+      "r": 0,
+      "v": 0,
+      "width": 0.6,
+      "depth": 2
+    },
+    {
+      "kind": "wall",
+      "x": 25,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 27,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 29,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 31,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 33,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 39,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 41,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 43,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 45,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 47,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 25,
+      "y": 94,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 27,
+      "y": 94,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 29,
+      "y": 94,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 31,
+      "y": 94,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 33,
+      "y": 94,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 39,
+      "y": 94,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 41,
+      "y": 94,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 43,
+      "y": 94,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 45,
+      "y": 94,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "wall",
+      "x": 47,
+      "y": 94,
+      "r": 0,
+      "v": 0,
+      "width": 2,
+      "depth": 0.6
+    },
+    {
+      "kind": "gate",
+      "x": 33,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 1.1,
+      "depth": 1.1
+    },
+    {
+      "kind": "gate",
+      "x": 39,
+      "y": 72,
+      "r": 0,
+      "v": 0,
+      "width": 1.1,
+      "depth": 1.1
     }
   ],
   "slimes": [
@@ -674,6 +1291,135 @@
       "x": 20.76609588135034,
       "y": 35.910983042791486,
       "kind": "yellow"
+    }
+  ],
+  "city": {
+    "name": "Alderhaven",
+    "x0": 24,
+    "x1": 48,
+    "y0": 72,
+    "y1": 94,
+    "plaza": {
+      "x": 36,
+      "y": 83
+    },
+    "radius": 4.8
+  },
+  "npcs": [
+    {
+      "id": "gatekeeper",
+      "name": "Captain Rowan",
+      "role": "City guard",
+      "x": 34,
+      "y": 74,
+      "color": "#627b9f",
+      "dialogue": "Welcome to Alderhaven! Follow the lanterns to Fountain Square. The meadow lies beyond the north gate; inside these walls you can rest safely.",
+      "offers": []
+    },
+    {
+      "id": "healer",
+      "name": "Sister Elara",
+      "role": "Sanctuary healer",
+      "x": 30,
+      "y": 78.5,
+      "color": "#e7e3da",
+      "dialogue": "A little kindness goes a long way. Rest here, traveler; the sanctuary offers healing to everyone.",
+      "offers": [
+        {
+          "id": "blessing",
+          "label": "Receive a healing blessing",
+          "cost": 0,
+          "heal": 10000
+        }
+      ]
+    },
+    {
+      "id": "apothecary",
+      "name": "Mira Moonleaf",
+      "role": "Apothecary",
+      "x": 42,
+      "y": 78.5,
+      "color": "#9a71aa",
+      "dialogue": "Fresh herbs from Greenmeadow, brewed right here. Drink a tonic at my counter before your next adventure.",
+      "offers": [
+        {
+          "id": "tonic",
+          "label": "Drink a tonic \u00b7 restores 60 HP",
+          "cost": 8,
+          "heal": 60
+        }
+      ]
+    },
+    {
+      "id": "smith",
+      "name": "Bram Emberforge",
+      "role": "Armorer",
+      "x": 31,
+      "y": 88,
+      "color": "#ac7650",
+      "dialogue": "A good fit makes all the difference. I can fit you with our finest class equipment, free of charge. You can also change your gear with I.",
+      "offers": [
+        {
+          "id": "fitting",
+          "label": "Fit my finest class equipment",
+          "cost": 0,
+          "gear": true
+        }
+      ]
+    },
+    {
+      "id": "innkeeper",
+      "name": "Tessa Amber",
+      "role": "Innkeeper",
+      "x": 41,
+      "y": 88,
+      "color": "#76a6a0",
+      "dialogue": "Welcome to the Amber Inn. A warm meal and a quiet rest will have you ready for the road again.",
+      "offers": [
+        {
+          "id": "rest",
+          "label": "Meal & rest \u00b7 fully restores HP",
+          "cost": 5,
+          "heal": 10000
+        }
+      ]
+    },
+    {
+      "id": "baker",
+      "name": "Pip",
+      "role": "Baker",
+      "x": 29,
+      "y": 84.5,
+      "color": "#e8bd78",
+      "dialogue": "Still warm from the oven! Enjoy a honey bun here in the square.",
+      "offers": [
+        {
+          "id": "bun",
+          "label": "Eat a honey bun \u00b7 restores 20 HP",
+          "cost": 3,
+          "heal": 20
+        }
+      ]
+    },
+    {
+      "id": "merchant",
+      "name": "Linden",
+      "role": "Market merchant",
+      "x": 43,
+      "y": 84.5,
+      "color": "#859563",
+      "dialogue": "The best stories come from the meadow. Slimes drop gold when defeated; bring your earnings to the bakery, apothecary, or inn.",
+      "offers": []
+    },
+    {
+      "id": "guide",
+      "name": "Wren",
+      "role": "Town guide",
+      "x": 38,
+      "y": 80,
+      "color": "#cc7d83",
+      "dialogue": "Meet me by the fountain! The sanctuary and apothecary are north of the square, the armorer and inn to the south. Click a person to talk, or press E nearby.",
+      "offers": []
     }
   ]
 }

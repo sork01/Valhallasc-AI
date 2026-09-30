@@ -14,17 +14,17 @@
       back: 'Back', toTitle: 'Back to Title', newChar: 'New Character',
       ccTitle: 'Assemble Your Warband!', forged: 'Forged in Battle!',
       warriorDesc: 'A brave sword-and-shield vanguard. High health, strong melee attacks, and armor ready for the front lines.',
-      warriorHint: 'Click to move or attack · WASD to walk · Space to swing · I for equipment · Esc for menu',
+      warriorHint: 'Click to move or attack · WASD to walk · Space to swing · I for equipment · E to talk · Esc for menu',
       arms: 'Weapons', warriorTip: 'Click the Warrior to swing. Change armor and weapons in the field with I.',
       warriorLoading: 'Calling the Warrior…', warriorError: 'Warrior sprites could not load. Select Warrior again to retry.',
       warriorArmorNames: ['Simple cloth', 'Crimson guard', 'Azure guard'], warriorWeaponNames: ['Empty hands', 'Sword & shield', 'Royal sword & shield'],
       mageDesc: 'A rune caster with powerful ranged spells. Equip robes and staffs to change your look and strength.',
-      mageHint: 'Click to move or cast · WASD to walk · Space to cast · I for equipment · Esc for menu',
+      mageHint: 'Click to move or cast · WASD to walk · Space to cast · I for equipment · E to talk · Esc for menu',
       equipment: 'Equipment (I)', hair: 'Hair', weapon: 'Staff', mageTip: 'Click the Mage to cast. Robes and staffs can be changed in the field with I.',
       mageLoading: 'Summoning the Mage…', mageError: 'Mage sprites could not load. Select Mage again to retry.',
       mageArmorNames: ['Simple cloth', 'Apprentice', 'Runic'], mageWeaponNames: ['Empty hands', 'Ash staff', 'Crystal staff'],
       assassinDesc: 'A swift duelist with twin blades and deadly critical strikes. Shadowstep through danger with Shift.',
-      assassinHint: 'Click to move or attack · WASD to walk · Space to slash · Shift to shadowstep · I for equipment · Esc for menu',
+      assassinHint: 'Click to move or attack · WASD to walk · Space to slash · Shift to shadowstep · I for equipment · E to talk · Esc for menu',
       blades: 'Blades', assassinTip: 'Click the Assassin to slash. Change outfits and blades in the field with I.',
       assassinLoading: 'Calling the Assassin…', assassinError: 'Assassin sprites could not load. Select Assassin again to retry.',
       assassinArmorNames: ['Simple cloth', 'Nightweave', 'Moonveil'], assassinWeaponNames: ['Empty hands', 'Twin daggers', 'Moonfang'],
@@ -402,6 +402,12 @@
     hud.hp.style.width = (s.hp / s.maxHp * 100).toFixed(1) + '%'; hud.hpT.textContent = `${Math.ceil(s.hp)} / ${s.maxHp}`;
     hud.xp.style.width = (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.lv.textContent = ` ${t('lvl')} ${s.level}`;
     hud.gold.textContent = s.gold; hud.kills.textContent = s.kills;
+    const inCity = s.area === 'Alderhaven', title = $('area-title');
+    if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); void title.offsetWidth; title.classList.add('show'); }
+    title.querySelector('b').textContent = inCity ? 'Alderhaven · Fountain Square' : t('areaName');
+    title.querySelector('span').textContent = inCity ? 'Sanctuary · shops · townspeople' : '푸른 초원';
+    $('city-travel').hidden = inCity;
+    $('city-travel').textContent = s.traveling ? 'Walking to Alderhaven…' : 'Visit Alderhaven ↓';
   }
   function noiseBurst(dur, f0, f1, vol, q = 1.2, type = 'bandpass') {
     if (!save.sound) return;
@@ -462,7 +468,7 @@
     const at = $('area-title'); at.classList.remove('show'); void at.offsetWidth; at.classList.add('show');
   }
   function leaveGame() { if (window.Field) Field.stop(); }
-  function setPause(on) { $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); }
+  function setPause(on) { City.close(false); $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); }
   function renderEquipment() {
     const c = save.char, mage = c && currentSprite(c); if (!c || !mage) return;
     mage.set(c); const canvas = $('equipmentcv'); canvas.width = canvas.height = 240;
@@ -472,6 +478,7 @@
     $('hud-portrait').style.backgroundImage = `url(${mage.portrait()})`;
   }
   function openEquipment() {
+    City.close(false);
     if (scene !== 'game' || !modular(save.char)) return;
     $('pause').hidden = true; $('equipment').hidden = false; Field.setPaused(true);
     const gear = spriteClass(save.char).equipment(save.char);
@@ -486,9 +493,11 @@
     if (scene !== 'game') return;
     const closesEquipment = !$('equipment').hidden && e.key.toLowerCase() === 'i';
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '') && e.key !== 'Escape' && !closesEquipment) return;
+    if (City.open && (e.key === 'Escape' || e.key.toLowerCase() === 'i')) { e.preventDefault(); City.close(); return; }
     if (e.key === 'Escape') { e.preventDefault(); if (!$('equipment').hidden) setPause(false); else setPause($('pause').hidden); }
     if (e.key.toLowerCase() === 'i' && !e.repeat) { e.preventDefault(); if ($('equipment').hidden) openEquipment(); else setPause(false); }
   });
+  $('city-travel').addEventListener('click', () => Field.visitCity());
   $('p-characters').addEventListener('click', () => {
     const list = $('character-list'); list.hidden = !list.hidden;
     list.replaceChildren(...Online.characters.map(slot => {

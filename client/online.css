@@ -21,3 +21,17 @@
   .chat input { font-size: 16px; }
   .chat button { min-width: 44px; min-height: 44px; }
 }
+.city-travel { position: absolute; right: 1.4cqw; top: 15cqw; z-index: 20; border: 1px solid #d9c492aa; border-radius: .6cqw; padding: .6cqw 1cqw; color: #ffe6ac; background: #26352fe8; font: 1cqw 'Jua', sans-serif; cursor: pointer; }
+.city-travel:hover { background: #455849; }
+.npc-panel { width: 35cqw; max-height: 44cqw; overflow: auto; padding: 2cqw; color: #eee3cb; }
+.npc-panel h3 { margin: .3cqw 0 1cqw; font: 2.1cqw 'Jua', sans-serif; color: #f1d493; }
+.npc-panel p { font: 1.1cqw/1.6 'Jua', sans-serif; }
+.npc-panel .npc-role { margin: 0; font-size: .9cqw; text-transform: uppercase; letter-spacing: .12em; color: #a7c2ad; }
+.npc-offers { display: grid; gap: .6cqw; }
+.npc-offers .btn { text-align: left; font-size: 1.05cqw; }
+.npc-offers .btn:disabled { opacity: .55; cursor: default; }
+#npc-gold { color: #f1d493; }
+#npc-notice { min-height: 1.6em; color: #b9dfb6; }
+.npc-panel :focus-visible, .city-travel:focus-visible { outline: 3px solid #ffdc87; outline-offset: 3px; }
+@media (pointer: coarse) { .city-travel { min-height: 44px; } .npc-offers .btn, #npc-close { min-height: 44px; } }
+#npc-dialogue { z-index: 45; }
