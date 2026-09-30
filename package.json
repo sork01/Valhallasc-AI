@@ -1,0 +1,12 @@
+{
+  "name": "valhalla-multiplayer-client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "node tests/multiplayer.cjs",
+    "world": "node scripts/sync-world.cjs",
+    "check": "node --check client/field.js && node --check client/game.js && node --check client/online.js"
+  },
+  "devDependencies": { "playwright": "1.62.1" },
+  "engines": { "node": ">=20" }
+}

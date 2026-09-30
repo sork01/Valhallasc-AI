@@ -1,0 +1,192 @@
+{
+  "frame": [
+    160,
+    160
+  ],
+  "anchor": [
+    80,
+    119
+  ],
+  "dirs": [
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "N",
+    "NE",
+    "E",
+    "SE"
+  ],
+  "clips": {
+    "idle": {
+      "row0": 0,
+      "n": 6,
+      "fps": 6
+    },
+    "walk": {
+      "row0": 8,
+      "n": 8,
+      "fps": 12
+    },
+    "attack": {
+      "row0": 16,
+      "n": 8,
+      "fps": 19
+    },
+    "hurt": {
+      "row0": 24,
+      "n": 4,
+      "fps": 16
+    },
+    "die": {
+      "row0": 32,
+      "n": 8,
+      "fps": 8
+    }
+  },
+  "parts": {
+    "body": {
+      "png": "warrior_layered_body.png",
+      "depth": "warrior_layered_body_depth.png"
+    },
+    "armor_crimson": {
+      "png": "warrior_layered_armor_crimson.png",
+      "depth": "warrior_layered_armor_crimson_depth.png"
+    },
+    "armor_azure": {
+      "png": "warrior_layered_armor_azure.png",
+      "depth": "warrior_layered_armor_azure_depth.png"
+    },
+    "weapon_sword": {
+      "png": "warrior_layered_weapon_sword.png",
+      "depth": "warrior_layered_weapon_sword_depth.png"
+    },
+    "weapon_royal": {
+      "png": "warrior_layered_weapon_royal.png",
+      "depth": "warrior_layered_weapon_royal_depth.png"
+    }
+  },
+  "equipment": {
+    "armor": {
+      "none": {
+        "name": "Simple cloth",
+        "part": null,
+        "defense": 0
+      },
+      "crimson": {
+        "name": "Crimson guard",
+        "part": "armor_crimson",
+        "defense": 3
+      },
+      "azure": {
+        "name": "Azure guard",
+        "part": "armor_azure",
+        "defense": 5
+      }
+    },
+    "weapon": {
+      "none": {
+        "name": "Empty hands",
+        "part": null,
+        "attack": 0
+      },
+      "sword": {
+        "name": "Sword & shield",
+        "part": "weapon_sword",
+        "attack": 4
+      },
+      "royal": {
+        "name": "Royal sword & shield",
+        "part": "weapon_royal",
+        "attack": 8
+      }
+    }
+  },
+  "defaultEquipment": {
+    "armor": "crimson",
+    "weapon": "sword"
+  },
+  "sprites": {
+    "warrior_layered_die_se": "c66ae399fc56482d",
+    "warrior_layered_die_e": "e5f62d9197a3c80e",
+    "warrior_layered_die_ne": "9aa0c6cb0af6608c",
+    "warrior_layered_die_n": "bcfb699e6de0c908",
+    "warrior_layered_die_nw": "235cde3ae66c1861",
+    "warrior_layered_die_w": "7ad2d15721cc8c93",
+    "warrior_layered_die_sw": "5f0e599f1eb2d589",
+    "warrior_layered_die_s": "628bba9e52ed1c4d",
+    "warrior_layered_hurt_se": "cfa4fc1ab1384e41",
+    "warrior_layered_hurt_e": "0b3defc2e1715e01",
+    "warrior_layered_hurt_ne": "569d1b9dcb438165",
+    "warrior_layered_hurt_n": "1c4e78925f655338",
+    "warrior_layered_hurt_nw": "e64a98e24d6a18ca",
+    "warrior_layered_hurt_w": "cd890c540abf0af1",
+    "warrior_layered_hurt_sw": "a086e4f4a621b4a8",
+    "warrior_layered_hurt_s": "fc4fad997e0085cd",
+    "warrior_layered_attack_se": "6cbe83d5e21a308e",
+    "warrior_layered_attack_e": "5c54f8a8c87573a0",
+    "warrior_layered_attack_ne": "9ea53e4a53d169ff",
+    "warrior_layered_attack_n": "1dd433e2eeeceb07",
+    "warrior_layered_attack_nw": "8058cb883756977d",
+    "warrior_layered_attack_w": "85b41200fd7acf24",
+    "warrior_layered_attack_sw": "cb27b5b0148cc326",
+    "warrior_layered_attack_s": "a932fccd635d3c14",
+    "warrior_layered_walk_se": "9843b1535caac5ba",
+    "warrior_layered_walk_e": "e23747e3b0f92b1a",
+    "warrior_layered_walk_ne": "f46140d0e31cdf58",
+    "warrior_layered_walk_n": "cb65e565d75f27f3",
+    "warrior_layered_walk_nw": "3b3efb14de495fe8",
+    "warrior_layered_walk_w": "57511db65cd51fc7",
+    "warrior_layered_walk_sw": "85d40325fba0a689",
+    "warrior_layered_walk_s": "1d421741a5ba8f36",
+    "warrior_layered_idle_se": "360ad28167d6b7e5",
+    "warrior_layered_idle_e": "b9e8f6b4f4cd3700",
+    "warrior_layered_idle_ne": "a32e1d6deda5fcb8",
+    "warrior_layered_idle_n": "62e1194697a0155b",
+    "warrior_layered_idle_nw": "da3f2919bd56e27c",
+    "warrior_layered_idle_w": "0119e818cb7cffc3",
+    "warrior_layered_idle_sw": "3d8606795d32211d",
+    "warrior_layered_idle_s": "33ac514a3ca500b0"
+  },
+  "ramps": {
+    "hair": [
+      "#211c2d",
+      "#353044",
+      "#514356",
+      "#766178"
+    ],
+    "brow": [
+      "#231b29",
+      "#342535",
+      "#493745",
+      "#604a5c"
+    ],
+    "skin": [
+      "#b8675b",
+      "#e99a85",
+      "#ffc1a6",
+      "#ffe1c3"
+    ]
+  },
+  "depth": {
+    "encoding": "R*256+G",
+    "offset": 512,
+    "scale": 64,
+    "near": "smaller"
+  },
+  "facing": "S SW W NW N NE E SE; mirrored diagonals and narrowed profiles",
+  "attack": {
+    "duration": 0.42,
+    "impact": 0.21
+  },
+  "editing": "One clip/facing per PixelFlow sprite; body visible, equipment hidden. Export preserves layers. Depth follows original geometry; build --replace discards hand edits.",
+  "style": "Painted Korean chibi reference cutouts; articulated animation",
+  "portrait": [
+    61,
+    28,
+    40,
+    40
+  ],
+  "reference": "tools/warrior_reference.jpg",
+  "animation": "Derived attack/hurt/death; front/rear/diagonal artwork from supplied reference"
+}

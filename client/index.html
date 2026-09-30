@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1230">
+<title>Valhalla Rumble · Multiplayer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230a1230' stroke='%23f5c542' stroke-width='4'/%3E%3Cpath d='M14 22h36l-6 10 6 10H14z' fill='%2359d9ff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Lilita+One&display=swap">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="online.css">
+</head>
+<body>
+<div class="backdrop" aria-hidden="true"></div>
+
+<main id="stage" class="stage" data-scene="splash">
+  <!-- Key art (assets/splash.webp) with light-and-glow overlays; shared by every scene -->
+  <div id="art" class="art" aria-hidden="true"></div>
+  <div class="fx fx-aurora" aria-hidden="true"></div>
+  <div class="fx fx-roots" aria-hidden="true"></div>
+  <div class="fx fx-fire" aria-hidden="true"></div>
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <!-- TITLE SCREEN -->
+  <section id="scene-splash" class="scene" aria-label="Valhalla Rumble title screen">
+    <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
+
+    <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
+    <p class="version">Multiplayer alpha 0.1</p>
+
+    <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
+  </section>
+
+  <!-- CHARACTER CREATION -->
+  <section id="scene-create" class="scene" aria-label="Character creation" hidden>
+    <h2 class="cc-title" data-t="Assemble Your Warband!"><span data-i18n="ccTitle">Assemble Your Warband!</span></h2>
+
+    <aside class="panel cc-classes" aria-label="Class">
+      <p class="ph"><b>[Select Class]</b><span lang="ko">클래스 선택</span></p>
+      <div class="class-list">
+        <button class="class-ico on" id="cls-warrior" type="button" aria-pressed="true" aria-label="Warrior">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <path d="M10 54 L46 12 M54 54 L18 12" stroke="#6a4326" stroke-width="5" stroke-linecap="round"/>
+            <path d="M40 8 q10 2 12 12 q-8 2 -14 -4 z M24 8 q-10 2 -12 12 q8 2 14 -4 z" fill="#d3dcee" stroke="#1c1428" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M18 38 q0 -20 14 -20 q14 0 14 20 v6 h-9 v-8 h-10 v8 h-9 z" fill="#535b77" stroke="#1c1428" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M14 34 q-8 -2 -8 -12 M50 34 q8 -2 8 -12" stroke="#efe6d6" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M22 30 h20" stroke="#f0c040" stroke-width="3"/>
+          </svg></button>
+        <button class="class-ico" id="cls-mage" type="button" aria-pressed="false" aria-label="Mage">
+          <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M24 20 L38 56" stroke="#d6ab79" stroke-width="5" stroke-linecap="round"/><path d="M23 5 L32 16 L25 29 L14 17 Z" fill="#8acfff" stroke="#dfb64e" stroke-width="3"/><path d="M45 10 L47 18 L55 20 L47 22 L45 30 L43 22 L35 20 L43 18 Z" fill="#e6f8ff"/><path d="M16 37 L18 43 L24 45 L18 47 L16 53 L14 47 L8 45 L14 43 Z" fill="#c29ddc"/></svg></button>
+        <button class="class-ico" id="cls-assassin" type="button" aria-pressed="false" aria-label="Assassin">
+          <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M13 8 L30 30 L26 38 L18 31 Z M51 8 L34 30 L38 38 L46 31 Z" fill="#d2daef" stroke="#756992" stroke-width="2"/><path d="M22 34 L39 54 M42 34 L25 54" stroke="#d4667f" stroke-width="5" stroke-linecap="round"/><path d="M16 35 L29 25 M48 35 L35 25" stroke="#b5a3cc" stroke-width="3"/></svg></button>
+        <button class="class-ico locked" type="button" disabled aria-label="Paladin, coming soon">
+          <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 8 L52 16 V34 Q52 50 32 58 Q12 50 12 34 V16 Z" fill="#6b7088" stroke="#8a8fa8" stroke-width="3"/><path d="M32 20 V46 M22 30 H42" stroke="#c9cddc" stroke-width="4" stroke-linecap="round"/></svg>
+          <i class="lock" aria-hidden="true"></i></button>
+      </div>
+    </aside>
+
+    <div class="cc-preview">
+      <canvas id="wcv" aria-label="Warrior preview. Click the axe, mug, head, beard or fish to interact."></canvas>
+      <canvas id="magecv" aria-label="Mage preview. Click to cast a spell." hidden></canvas>
+      <p id="mage-status" class="mage-status" role="status" hidden></p>
+    </div>
+
+    <div class="panel cc-desc">
+      <div class="cc-desc-text">
+        <h3 id="class-name">WARRIOR <span lang="ko">(워리어)</span></h3>
+        <p id="class-desc" data-i18n="warriorDesc">A furious vanguard who thrives on the front lines. High health and crushing melee power.</p>
+      </div>
+      <dl class="stats" id="stats"></dl>
+    </div>
+
+    <aside class="panel cc-custom" id="custom-panel" aria-label="Customize Warrior">
+      <p class="ph"><b id="custom-title">[Customize Warrior]</b><span lang="ko">커스터마이징</span></p>
+      <div id="custom"></div>
+    </aside>
+
+    <button class="btn ghost cc-back" id="back" type="button" data-i18n="back">Back</button>
+    <button class="confirm" id="go" type="button"><b data-i18n="forged">Forged in Battle!</b><span lang="ko">(시작하기)</span></button>
+  </section>
+
+  <!-- THE FIELD: first map (isometric, Field in field.js) -->
+  <section id="scene-game" class="scene" aria-label="Greenmeadow Field" hidden>
+    <canvas id="fieldcv"></canvas>
+    <div class="area-title" id="area-title"><b data-i18n="areaName">Greenmeadow Field</b><span lang="ko">푸른 초원</span></div>
+
+    <div class="hud hud-tl">
+      <div class="hud-portrait" id="hud-portrait"></div>
+      <div class="hud-bars">
+        <p class="hud-name"><b id="hud-name"></b><span id="hud-lv"></span></p>
+        <div class="bar hp"><i id="hp-fill"></i><span id="hp-text"></span></div>
+        <div class="bar xp"><i id="xp-fill"></i></div>
+      </div>
+    </div>
+    <div class="hud hud-tr">
+      <canvas id="minimap" width="144" height="144" aria-label="Minimap"></canvas>
+      <p class="hud-stats"><span id="hud-gold">0</span> <span data-i18n="gold">gold</span> · <span id="hud-kills">0</span> <span data-i18n="slain">slimes</span></p>
+    </div>
+    <p class="hud-hint" data-i18n="fieldHint">Click to move or attack · WASD to walk · Space to swing · Esc for menu</p>
+    <div class="dead-msg" id="dead-msg" hidden><b data-i18n="defeated">Defeated!</b><span data-i18n="defeatedSub">You wake up back at the start…</span></div>
+
+    <div class="pause" id="pause" hidden>
+      <div class="panel pause-panel" role="dialog" aria-modal="true" aria-label="Menu">
+        <h3>World Menu</h3>
+        <p class="world-menu-note">The world keeps running while this menu is open.</p>
+        <button class="btn primary" id="p-resume" type="button" data-i18n="resume">Resume</button>
+        <button class="btn ghost" id="p-equipment" type="button" data-i18n="equipment" hidden>Equipment (I)</button>
+        <button class="btn ghost" id="p-characters" type="button">Your Characters</button>
+        <div id="character-list" class="character-list" hidden></div>
+        <button class="btn ghost" id="p-new" type="button" data-i18n="newChar">New Character</button>
+        <button class="btn ghost" id="p-title" type="button" data-i18n="toTitle">Back to Title</button>
+      </div>
+    </div>
+    <div class="pause" id="equipment" hidden>
+      <div class="panel equipment-panel" role="dialog" aria-modal="true" aria-labelledby="equipment-title">
+        <h3 id="equipment-title" data-i18n="equipment">Equipment (I)</h3>
+        <canvas id="equipmentcv" aria-label="Equipped mage"></canvas>
+        <div id="equipment-controls"></div>
+        <p class="tip" id="equipment-stats"></p>
+        <button class="btn primary" id="equipment-close" type="button" data-i18n="resume">Resume</button>
+      </div>
+    </div>
+  </section>
+
+  <p id="network-status" class="network-status" role="status">Valhalla · Shared world</p>
+  <section id="chat" class="chat" aria-label="World chat" hidden>
+    <div id="chat-log" class="chat-log" role="log" aria-live="polite"></div>
+    <form id="chat-form"><input id="chat-input" type="text" maxlength="240" placeholder="Enter to chat…" aria-label="Chat message" autocomplete="off" disabled><button type="submit">Send</button></form>
+  </section>
+  <div id="connection-overlay" class="connection-overlay" hidden>
+    <section class="panel connection-panel" role="dialog" aria-modal="true" aria-label="World connection">
+      <h3>Greenmeadow awaits</h3><p id="connection-text"></p>
+      <button id="connection-retry" class="btn primary" type="button">Retry now</button>
+      <button id="connection-new" class="btn ghost" type="button">New Character</button>
+      <button id="connection-title" class="btn ghost" type="button">Back to Title</button>
+    </section>
+  </div>
+  <div class="flash" id="flash" aria-hidden="true"></div>
+  <p class="toast" id="toast" role="status" aria-live="polite"></p>
+</main>
+
+<div class="rotate" aria-hidden="true">
+  <div class="rotate-icon">⟳</div>
+  <p>Rotate your device<br>회전하여 플레이하세요</p>
+</div>
+
+<script src="logo.js"></script>
+<script src="music.js"></script>
+<script src="music_field.js"></script>
+<script src="warriorview.js"></script>
+<script src="magesprite.js"></script>
+<script src="assassinsprite.js"></script>
+<script src="warriorsprite.js"></script>
+<script src="world.js"></script>
+<script src="online.js"></script>
+<script src="field.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

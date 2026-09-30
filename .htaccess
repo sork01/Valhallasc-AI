@@ -1,0 +1,11 @@
+# The game is served by Rust; protect the workspace if Apache reaches it directly.
+RedirectMatch 404 /\.git
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+Options -Indexes
+RewriteEngine On
+RewriteRule ^(?:server|world|scripts|tests|deploy|data|target|node_modules|test-results|\.tools)(?:/|$) - [F,L]
+<FilesMatch "\.(?:rs|toml|lock|sqlite(?:-wal|-shm)?|cjs|sh|md|yaml)$">
+  Require all denied
+</FilesMatch>

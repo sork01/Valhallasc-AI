@@ -1,0 +1,17 @@
+services:
+  valhalla:
+    build:
+      context: ..
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      VALHALLA_BIND: "0.0.0.0:8080"
+      VALHALLA_DB: "/app/data/valhalla.sqlite"
+      # For the Apache example, uncomment this exact public origin.
+      # VALHALLA_ORIGIN: "https://gunning.se"
+    volumes:
+      - valhalla-data:/app/data
+    stop_grace_period: 15s
+volumes:
+  valhalla-data:

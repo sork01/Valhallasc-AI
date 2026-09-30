@@ -1,0 +1,12 @@
+.git
+.tools
+.agents
+.codex
+.aws
+target
+data
+node_modules
+test-results
+.env
+AGENTS.md
+CLAUDE.md

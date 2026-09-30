@@ -1,0 +1,262 @@
+{
+  "frame": [
+    160,
+    160
+  ],
+  "anchor": [
+    80,
+    119
+  ],
+  "dirs": [
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "N",
+    "NE",
+    "E",
+    "SE"
+  ],
+  "clips": {
+    "idle": {
+      "row0": 0,
+      "n": 6,
+      "fps": 6
+    },
+    "walk": {
+      "row0": 8,
+      "n": 8,
+      "fps": 12
+    },
+    "attack": {
+      "row0": 16,
+      "n": 8,
+      "fps": 20
+    },
+    "hurt": {
+      "row0": 24,
+      "n": 4,
+      "fps": 10
+    },
+    "die": {
+      "row0": 32,
+      "n": 8,
+      "fps": 8
+    }
+  },
+  "parts": {
+    "body": {
+      "png": "assassin_body.png",
+      "depth": "assassin_body_depth.png"
+    },
+    "armor_shadow": {
+      "png": "assassin_armor_shadow.png",
+      "depth": "assassin_armor_shadow_depth.png"
+    },
+    "armor_moon": {
+      "png": "assassin_armor_moon.png",
+      "depth": "assassin_armor_moon_depth.png"
+    },
+    "weapon_daggers": {
+      "png": "assassin_weapon_daggers.png",
+      "depth": "assassin_weapon_daggers_depth.png"
+    },
+    "weapon_moonfang": {
+      "png": "assassin_weapon_moonfang.png",
+      "depth": "assassin_weapon_moonfang_depth.png"
+    }
+  },
+  "equipment": {
+    "armor": {
+      "none": {
+        "name": "Simple cloth",
+        "part": null,
+        "defense": 0
+      },
+      "shadow": {
+        "name": "Nightweave",
+        "part": "armor_shadow",
+        "defense": 2
+      },
+      "moon": {
+        "name": "Moonveil",
+        "part": "armor_moon",
+        "defense": 4
+      }
+    },
+    "weapon": {
+      "none": {
+        "name": "Empty hands",
+        "part": null,
+        "attack": 0
+      },
+      "daggers": {
+        "name": "Twin daggers",
+        "part": "weapon_daggers",
+        "attack": 4
+      },
+      "moonfang": {
+        "name": "Moonfang blades",
+        "part": "weapon_moonfang",
+        "attack": 8
+      }
+    }
+  },
+  "defaultEquipment": {
+    "armor": "shadow",
+    "weapon": "daggers"
+  },
+  "sprites": {
+    "assassin_die_se": "a9bebcc61c7a05e1",
+    "assassin_die_e": "a951273a69f82ea6",
+    "assassin_die_ne": "c982347834968cba",
+    "assassin_die_n": "a60d332a838250b8",
+    "assassin_die_nw": "00e3935bcb6c0e36",
+    "assassin_die_w": "9933c8bdfd580f61",
+    "assassin_die_sw": "ae5cea633df413a1",
+    "assassin_die_s": "a434357aaaa762e8",
+    "assassin_hurt_se": "b645d81dfbc2164d",
+    "assassin_hurt_e": "60c1c7780782a772",
+    "assassin_hurt_ne": "507852084fdea7a5",
+    "assassin_hurt_n": "19a6072f474cd009",
+    "assassin_hurt_nw": "5dcec464e1d84ada",
+    "assassin_hurt_w": "f62c593108b0619c",
+    "assassin_hurt_sw": "4d4a70650f121da1",
+    "assassin_hurt_s": "7c02e314589e6e2c",
+    "assassin_attack_se": "27b2192fab719096",
+    "assassin_attack_e": "c8ec84f7558aeb23",
+    "assassin_attack_ne": "b3ebc7f240207981",
+    "assassin_attack_n": "e434d588da54b3b5",
+    "assassin_attack_nw": "1b135d3b54984934",
+    "assassin_attack_w": "84e78787916b92cf",
+    "assassin_attack_sw": "cdfd373f9a34d354",
+    "assassin_attack_s": "257bb3677bb48349",
+    "assassin_walk_se": "771ef12676c62c25",
+    "assassin_walk_e": "3f804ff9f22aff3c",
+    "assassin_walk_ne": "6821b3cdf05034bf",
+    "assassin_walk_n": "d6a761b4b6ef660a",
+    "assassin_walk_nw": "49b2af2ebb3f0155",
+    "assassin_walk_w": "de7759ff37e25b25",
+    "assassin_walk_sw": "1cb3e2fbd1290e3a",
+    "assassin_walk_s": "eb53b2c159b245e2",
+    "assassin_idle_se": "568863a17b3e35f5",
+    "assassin_idle_e": "88344e6062bd438b",
+    "assassin_idle_ne": "29f53af9a93dcb68",
+    "assassin_idle_n": "29baad3bca140422",
+    "assassin_idle_nw": "9a5e3d21a7bdee38",
+    "assassin_idle_w": "a8a31858bdf446a9",
+    "assassin_idle_sw": "62ca0e36261d79b9",
+    "assassin_idle_s": "803a74a60197ffb1"
+  },
+  "ramps": {
+    "skin": [
+      "#92595c",
+      "#ce9182",
+      "#f0bfac",
+      "#ffe0ce"
+    ],
+    "hair": [
+      "#151a30",
+      "#293451",
+      "#465278",
+      "#7985ac"
+    ],
+    "brow": [
+      "#171526",
+      "#242037",
+      "#332946",
+      "#443750"
+    ],
+    "cloth": [
+      "#323348",
+      "#57566c",
+      "#868294",
+      "#b2a8b7"
+    ],
+    "pants": [
+      "#232538",
+      "#3b3f59",
+      "#606981",
+      "#8b96aa"
+    ],
+    "night": [
+      "#181e33",
+      "#303a56",
+      "#515b7f",
+      "#7d89af"
+    ],
+    "moon": [
+      "#27223f",
+      "#494066",
+      "#756992",
+      "#b5a3cc"
+    ],
+    "scarf": [
+      "#541b3b",
+      "#913a59",
+      "#d4667f",
+      "#ffaaa6"
+    ],
+    "ribbon": [
+      "#443052",
+      "#876284",
+      "#d5a6bd",
+      "#ffe2e7"
+    ],
+    "leather": [
+      "#201c30",
+      "#39334d",
+      "#5b5270",
+      "#887f9c"
+    ],
+    "silver": [
+      "#3a516d",
+      "#7791b0",
+      "#bdcfe5",
+      "#f2f5ff"
+    ],
+    "rune": [
+      "#413978",
+      "#8974c8",
+      "#cfb5fa",
+      "#fff1ff"
+    ],
+    "iris": [
+      "#2a294c",
+      "#484575",
+      "#7f80bd",
+      "#c2b4f0"
+    ],
+    "white": [
+      "#c0aec4",
+      "#ded2e2",
+      "#f6eef1",
+      "#fffbf6"
+    ],
+    "mouth": [
+      "#5c2d45",
+      "#86506a",
+      "#c88493",
+      "#e9a4ab"
+    ]
+  },
+  "depth": {
+    "encoding": "R*256+G",
+    "offset": 512,
+    "scale": 64,
+    "near": "smaller"
+  },
+  "facing": "Same eight-direction formula and foot anchor as warrior_sprites.txt",
+  "attack": {
+    "duration": 0.4,
+    "impact": 0.2
+  },
+  "editing": "One clip/facing per PixelFlow sprite; body visible, equipment hidden. Export preserves layers. Depth follows original geometry; build --replace discards hand edits.",
+  "style": "2D Korean RPG anime cel illustration",
+  "portrait": [
+    57,
+    15,
+    46,
+    46
+  ]
+}
