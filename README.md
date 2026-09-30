@@ -45,6 +45,7 @@ Players open `http://<server-LAN-address>:8080/`. Allow that port in the server'
 ## Play
 
 - Click ground to walk; click an enemy to chase and keep attacking.
+- Players can walk and Shadowstep through other players, NPCs, and enemies. Enemies stop at least one cell away from living players and move aside when a player enters that space; enemies also avoid stacking with each other.
 - **Ironhide Beetles** roam the outer meadow: 240 HP, 22 base damage, fast horn charges, 32 XP and 10 gold. Their steel shells and bronze horns distinguish them from slimes.
 - **King Slime** has 600 HP, 30 base damage, faster pursuit and charge recovery, and rewards 75 XP and 30 gold. Only one king can be alive at a time. It first appears after a random 5–10 minutes of server uptime, then waits another random 5–10 minutes after each defeat. Its location is randomly chosen from two meadow spawn points, and the world receives an announcement. Dodge its windup or fight together.
 - Leveling requires `round(160 × level^1.35)` XP per level, four times the original threshold (160 XP for level 1). Existing levels and earned XP are preserved.
@@ -127,7 +128,7 @@ npm run check
 npm test
 ```
 
-The integration test starts its own isolated Rust server/database and uses three independent browser clients. It covers character creation, visible remote players, movement replication, equipment, safe chat, invalid commands/keys, duplicate sessions, slime and Ironhide combat, shared kills, XP pacing, loot, page reload, server restart/reconnect, and switching between saved characters, walking through the city gate, NPC dialogue, sanctuary healing, armorer fitting, and shop affordability. Screenshots and disposable databases are written under gitignored `test-results/`. The existing sibling Playwright installation was used for testing in this workspace via `NODE_PATH`; no runtime dependency on the sibling project is required.
+The integration test starts its own isolated Rust server/database and uses three independent browser clients. It covers character creation, visible remote players, movement replication, player pass-through, enemy spacing in server snapshots and rendered combat, equipment, safe chat, invalid commands/keys, duplicate sessions, slime and Ironhide combat, shared kills, XP pacing, loot, page reload, server restart/reconnect, and switching between saved characters, walking through the city gate, NPC dialogue, sanctuary healing, armorer fitting, and shop affordability. Screenshots and disposable databases are written under gitignored `test-results/`. The existing sibling Playwright installation was used for testing in this workspace via `NODE_PATH`; no runtime dependency on the sibling project is required.
 
 `node tests/public-smoke.cjs` verifies the actual public HTTPS/WSS deployment with two browser clients. It also checks canonical redirects, private-file protection, chat, movement replication, and saved-character reload. It records only the test character IDs in `test-results/public-smoke-results.json`; remove those specific test characters from SQLite after both clients disconnect.
 

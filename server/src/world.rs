@@ -7,6 +7,7 @@ use tokio::sync::{mpsc, oneshot, watch};
 pub type Peer = mpsc::Sender<Value>;
 const KING_SPAWN_MIN: f64 = 300.;
 const KING_SPAWN_MAX: f64 = 600.;
+const PLAYER_RADIUS: f64 = 0.3;
 pub enum Command {
     Join {
         session: u64,
@@ -76,7 +77,7 @@ impl Player {
     }
     fn snapshot(&self) -> Value {
         let c = &self.character;
-        json!({"id":c.id,"look":c.look,"x":c.x,"y":c.y,"hp":c.hp,"maxHp":c.max_hp(),"level":c.level,
+        json!({"id":c.id,"look":c.look,"x":c.x,"y":c.y,"r":PLAYER_RADIUS,"hp":c.hp,"maxHp":c.max_hp(),"level":c.level,
             "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"fx":self.face.x,"fy":self.face.y,
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd})
@@ -256,6 +257,25 @@ impl World {
             next_king_spawn: 0.,
         };
         world.next_king_spawn = world.king_spawn_delay();
+        for id in 0..world.slimes.len() {
+            if !world.slimes[id].dead {
+                let bodies = world.actor_bodies(None, Some(id));
+                if let Some(point) = free_actor_position(
+                    &world.map,
+                    world.slimes[id].point(),
+                    world.slimes[id].r,
+                    &bodies,
+                    true,
+                ) {
+                    world.slimes[id].x = point.x;
+                    world.slimes[id].y = point.y;
+                } else {
+                    world.slimes[id].dead = true;
+                    world.slimes[id].die_t = 2.;
+                    world.slimes[id].respawn = TICK;
+                }
+            }
+        }
         world
     }
     fn random(&mut self) -> f64 {
@@ -269,6 +289,52 @@ impl World {
     }
     fn king_spawn_delay(&mut self) -> f64 {
         KING_SPAWN_MIN + self.random() * (KING_SPAWN_MAX - KING_SPAWN_MIN)
+    }
+    fn actor_bodies(&self, player: Option<u64>, enemy: Option<usize>) -> Vec<(Point, f64)> {
+        let player_gap = enemy
+            .map(|id| (1. - self.slimes[id].r).max(PLAYER_RADIUS))
+            .unwrap_or(PLAYER_RADIUS);
+        self.players
+            .iter()
+            .filter(|(id, p)| Some(**id) != player && p.character.hp > 0.)
+            .map(|(_, p)| (p.character.point(), player_gap))
+            .chain(
+                self.slimes
+                    .iter()
+                    .filter(|s| Some(s.id) != enemy && !s.dead)
+                    .map(|s| (s.point(), s.r)),
+            )
+            .collect()
+    }
+    fn separate_enemies(&mut self) {
+        for id in 0..self.slimes.len() {
+            if self.slimes[id].dead {
+                continue;
+            }
+            let bodies = self.actor_bodies(None, Some(id));
+            let enemy = &self.slimes[id];
+            if !actor_blocked(enemy.point(), enemy.r, &bodies) {
+                continue;
+            }
+            let mut candidate = enemy.point();
+            for (other, radius) in &bodies {
+                if same_cell(candidate, *other) || candidate.distance(*other) < enemy.r + radius {
+                    let direction = if candidate.distance(*other) < 1e-8 {
+                        Point { x: 1., y: 0. }
+                    } else {
+                        other.direction(candidate)
+                    };
+                    candidate = Point {
+                        x: other.x + direction.x * (enemy.r + radius + 0.01),
+                        y: other.y + direction.y * (enemy.r + radius + 0.01),
+                    };
+                }
+            }
+            if let Some(point) = free_actor_position(&self.map, candidate, enemy.r, &bodies, true) {
+                self.slimes[id].x = point.x;
+                self.slimes[id].y = point.y;
+            }
+        }
     }
     fn update_king_spawn(&mut self) {
         if self.time < self.next_king_spawn
@@ -286,7 +352,15 @@ impl World {
             return;
         }
         let id = locations[(self.random() * locations.len() as f64) as usize];
-        self.slimes[id] = Slime::new(id, &self.map.slimes[id]);
+        let mut enemy = Slime::new(id, &self.map.slimes[id]);
+        let bodies = self.actor_bodies(None, Some(id));
+        let Some(point) = free_actor_position(&self.map, enemy.point(), enemy.r, &bodies, true)
+        else {
+            return;
+        };
+        enemy.x = point.x;
+        enemy.y = point.y;
+        self.slimes[id] = enemy;
         self.emit(json!({"type":"system","text":"A King Slime has emerged in Greenmeadow!"}));
     }
     fn emit(&self, value: Value) {
@@ -340,12 +414,13 @@ impl World {
             c = saved.clone();
         }
         let mut point = c.point();
-        self.map.collide(&mut point, 0.3);
+        self.map.collide(&mut point, PLAYER_RADIUS);
         c.x = point.x;
         c.y = point.y;
         let id = c.id.clone();
         let name = c.look.name.clone();
         self.players.insert(session, Player::new(c, peer));
+        self.separate_enemies();
         self.emit(json!({"type":"system","text":format!("{name} entered Greenmeadow.")}));
         Ok(json!({"type":"welcome","version":1,"id":id,"token":issued,"snapshot":self.snapshot()}))
     }
@@ -537,6 +612,8 @@ impl World {
         for session in sessions {
             self.update_player(session);
         }
+        // Players pass through actors; enemies yield before their own movement.
+        self.separate_enemies();
         for i in 0..self.slimes.len() {
             self.update_slime(i);
         }
@@ -565,14 +642,16 @@ impl World {
             p.dead_time += TICK;
             p.stop();
             if p.dead_time >= 3.2 {
-                p.character.x = self.map.spawn.x;
-                p.character.y = self.map.spawn.y;
+                let mut point = self.map.spawn;
+                self.map.collide(&mut point, PLAYER_RADIUS);
+                p.character.x = point.x;
+                p.character.y = point.y;
                 p.character.hp = p.character.max_hp();
                 p.dead_time = 0.;
                 p.attack = 0.;
                 p.cooldown = 0.;
                 let id = p.character.id.clone();
-                self.event("respawn", &id, self.map.spawn, 0., false);
+                self.event("respawn", &id, point, 0., false);
             }
             return;
         }
@@ -608,7 +687,7 @@ impl World {
                     auto_attack = true;
                 } else {
                     dir = facing;
-                    travel = distance;
+                    travel = (distance - s.r - p.character.look.class.reach()).max(0.);
                 }
             } else {
                 p.target = None;
@@ -630,10 +709,11 @@ impl World {
             distance = 15. * p.dash.min(TICK);
             p.dash = (p.dash - TICK).max(0.);
         }
-        p.moving = distance > 0. && (dir.x != 0. || dir.y != 0.);
-        if p.moving {
+        p.moving = false;
+        if distance > 0. && (dir.x != 0. || dir.y != 0.) {
             let mut point = p.character.point();
-            self.map.walk(&mut point, dir, distance, 0.3);
+            self.map.walk(&mut point, dir, distance, PLAYER_RADIUS);
+            p.moving = point.distance(p.character.point()) > 1e-8;
             p.character.x = point.x;
             p.character.y = point.y;
             p.walk += TICK * 11.;
@@ -756,6 +836,7 @@ impl World {
     fn update_slime(&mut self, id: usize) {
         let wander = self.random();
         let angle = self.random() * std::f64::consts::TAU;
+        let bodies = self.actor_bodies(None, Some(id));
         let s = &mut self.slimes[id];
         let (windup, cooldown, charge_speed, awareness) = Slime::attack_profile(&s.kind);
         s.hurt_t = (s.hurt_t - TICK).max(0.);
@@ -770,7 +851,14 @@ impl World {
             s.respawn -= TICK;
             if s.respawn <= 0. {
                 let spawn = &self.map.slimes[id];
-                *s = Slime::new(id, spawn);
+                let mut enemy = Slime::new(id, spawn);
+                if let Some(point) =
+                    free_actor_position(&self.map, enemy.point(), enemy.r, &bodies, true)
+                {
+                    enemy.x = point.x;
+                    enemy.y = point.y;
+                    *s = enemy;
+                }
             }
             return;
         }
@@ -903,7 +991,7 @@ impl World {
             let mut point = s.point();
             let direction = point.direction(goal);
             movement = movement.min(point.distance(goal));
-            self.map.walk(&mut point, direction, movement, s.r);
+            walk_with_actors(&self.map, &mut point, direction, movement, s.r, &bodies);
             if self.map.in_city(point) {
                 point = s.point();
                 s.target = None;
@@ -1040,6 +1128,93 @@ impl World {
         }
     }
 }
+fn same_cell(a: Point, b: Point) -> bool {
+    a.x.floor() == b.x.floor() && a.y.floor() == b.y.floor()
+}
+
+fn actor_blocked(point: Point, radius: f64, bodies: &[(Point, f64)]) -> bool {
+    bodies
+        .iter()
+        .any(|(other, r)| same_cell(point, *other) || point.distance(*other) < radius + r - 1e-8)
+}
+
+fn free_actor_position(
+    map: &Map,
+    origin: Point,
+    radius: f64,
+    bodies: &[(Point, f64)],
+    enemy: bool,
+) -> Option<Point> {
+    let clear = |mut point: Point| {
+        map.collide(&mut point, radius);
+        let mut checked = point;
+        map.collide(&mut checked, radius);
+        (point.distance(checked) < 1e-8
+            && !actor_blocked(point, radius, bodies)
+            && (!enemy || !map.in_city(point)))
+        .then_some(point)
+    };
+    if let Some(point) = clear(origin) {
+        return Some(point);
+    }
+    for ring in 1_i32..=16 {
+        let mut candidates = vec![];
+        for dx in -ring..=ring {
+            for dy in -ring..=ring {
+                if dx.abs().max(dy.abs()) == ring {
+                    candidates.push(Point {
+                        x: origin.x.floor() + dx as f64 + 0.5,
+                        y: origin.y.floor() + dy as f64 + 0.5,
+                    });
+                }
+            }
+        }
+        candidates.sort_by(|a, b| origin.distance(*a).total_cmp(&origin.distance(*b)));
+        if let Some(point) = candidates.into_iter().find_map(clear) {
+            return Some(point);
+        }
+    }
+    None
+}
+
+fn walk_with_actors(
+    map: &Map,
+    point: &mut Point,
+    direction: Point,
+    distance: f64,
+    radius: f64,
+    bodies: &[(Point, f64)],
+) {
+    let steps = (distance.abs() / 0.1).ceil().max(1.) as usize;
+    let dx = direction.x * distance / steps as f64;
+    let dy = direction.y * distance / steps as f64;
+    for _ in 0..steps {
+        let previous = *point;
+        // Full motion first; slide along a blocked actor's tile on either axis.
+        for offset in [
+            Point { x: dx, y: dy },
+            Point { x: dx, y: 0. },
+            Point { x: 0., y: dy },
+        ] {
+            let mut next = previous;
+            map.walk(
+                &mut next,
+                normalize(offset.x, offset.y),
+                offset.x.hypot(offset.y),
+                radius,
+            );
+            if !actor_blocked(next, radius, bodies)
+                && bodies
+                    .iter()
+                    .all(|(other, r)| segment_distance(*other, previous, next) >= radius + r - 1e-8)
+            {
+                *point = next;
+                break;
+            }
+        }
+    }
+}
+
 fn segment_distance(p: Point, a: Point, b: Point) -> f64 {
     let dx = b.x - a.x;
     let dy = b.y - a.y;
@@ -1065,6 +1240,274 @@ mod tests {
         w.join(id, None, Some(look), tx).unwrap();
         rx
     }
+    #[test]
+    fn every_class_can_defeat_an_enemy_from_separate_tiles() {
+        for class in [Class::Warrior, Class::Assassin, Class::Mage] {
+            for diagonal in [false, true] {
+                let mut w = world();
+                let _rx = join(&mut w, 1, class);
+                w.map.objects.clear();
+                for s in &mut w.slimes {
+                    s.dead = true;
+                    s.respawn = 1000.;
+                }
+                let start = w.players[&1].character.point();
+                w.slimes[0] = Slime::new(
+                    0,
+                    &SlimeSpawn {
+                        kind: "green".into(),
+                        x: start.x + 3.5,
+                        y: start.y + if diagonal { 3.5 } else { 0. },
+                    },
+                );
+                w.message(1, ClientMessage::Target { id: 0 });
+                for _ in 0..360 {
+                    w.step();
+                    if w.slimes[0].dead {
+                        break;
+                    }
+                    let p = w.players[&1].character.point();
+                    assert!(!same_cell(p, w.slimes[0].point()));
+                    assert!(p.distance(w.slimes[0].point()) >= 1. - 1e-8);
+                }
+                assert!(
+                    w.slimes[0].dead,
+                    "{class:?} combat must work across tile edges"
+                );
+                assert!(w.players[&1].character.hp > 0.);
+                assert_eq!(w.players[&1].character.kills, 1);
+            }
+        }
+    }
+
+    #[test]
+    fn enemies_block_each_other_but_players_can_walk_and_dash_through_actors() {
+        let map = Map {
+            size: 96,
+            spawn: Point::default(),
+            objects: vec![],
+            slimes: vec![],
+            npcs: vec![],
+            city: None,
+        };
+        let blocker = Point { x: 21.9, y: 20.5 };
+        for (start, direction, distance) in [
+            (Point { x: 20.5, y: 20.5 }, Point { x: 1., y: 0. }, 4.),
+            (Point { x: 20.5, y: 19.5 }, normalize(1., 1.), 4.),
+        ] {
+            let mut point = start;
+            walk_with_actors(
+                &map,
+                &mut point,
+                direction,
+                distance,
+                PLAYER_RADIUS,
+                &[(blocker, 0.3)],
+            );
+            assert!(!same_cell(point, blocker));
+            assert!(point.distance(blocker) >= 0.6 - 1e-8);
+            // Even a long enemy charge cannot pass through an occupied tile.
+            if start.y == blocker.y {
+                assert!(point.x < 21.);
+            }
+        }
+        let mut w = world();
+        let _a = join(&mut w, 1, Class::Assassin);
+        let _b = join(&mut w, 2, Class::Warrior);
+        assert!(same_cell(
+            w.players[&1].character.point(),
+            w.players[&2].character.point()
+        ));
+        assert!(
+            w.players[&1]
+                .character
+                .point()
+                .distance(w.players[&2].character.point())
+                < 1e-8
+        );
+        let start = w.players[&1].character.point();
+        w.slimes[0] = Slime::new(
+            0,
+            &SlimeSpawn {
+                kind: "green".into(),
+                x: start.x + 1.5,
+                y: start.y,
+            },
+        );
+        w.slimes[0].state = "windup".into();
+        w.slimes[0].st = 100.;
+        w.message(1, ClientMessage::Dash { dx: 1., dy: 0. });
+        for _ in 0..5 {
+            w.update_player(1);
+        }
+        assert!(w.players[&1].character.x > w.slimes[0].x + 0.5);
+        let goal = w.players[&2].character.point();
+        w.players.get_mut(&1).unwrap().dash = 0.;
+        w.message(
+            1,
+            ClientMessage::Move {
+                x: goal.x,
+                y: goal.y,
+            },
+        );
+        for _ in 0..60 {
+            w.update_player(1);
+        }
+        assert!(same_cell(w.players[&1].character.point(), goal));
+        w.players.get_mut(&1).unwrap().character.x = w.slimes[0].x;
+        w.players.get_mut(&1).unwrap().character.y = w.slimes[0].y;
+        w.separate_enemies();
+        assert!(
+            w.slimes[0]
+                .point()
+                .distance(w.players[&1].character.point())
+                >= 1. - 1e-8
+        );
+        assert!(!same_cell(
+            w.slimes[0].point(),
+            w.players[&1].character.point()
+        ));
+        w.map.objects.clear();
+        let destination = Point {
+            x: start.x + 6.,
+            y: start.y,
+        };
+        w.message(
+            1,
+            ClientMessage::Move {
+                x: destination.x,
+                y: destination.y,
+            },
+        );
+        for _ in 0..60 {
+            w.step();
+            assert!(
+                w.slimes[0]
+                    .point()
+                    .distance(w.players[&1].character.point())
+                    >= 1. - 1e-8
+            );
+            assert!(!same_cell(
+                w.slimes[0].point(),
+                w.players[&1].character.point()
+            ));
+        }
+        assert!(w.players[&1].character.point().distance(destination) < 0.15);
+    }
+
+    #[test]
+    fn enemies_cannot_stack_or_charge_through_players_and_dead_bodies_do_not_block() {
+        let mut w = world();
+        w.map.objects.clear(); // Isolate actor collision from scenery in this lane.
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let player = w.players[&1].character.point();
+        w.slimes[0] = Slime::new(
+            0,
+            &SlimeSpawn {
+                kind: "beetle".into(),
+                x: player.x + 1.,
+                y: player.y,
+            },
+        );
+        w.slimes[0].state = "lunge".into();
+        w.slimes[0].st = 0.3;
+        w.slimes[0].target = Some(1);
+        w.slimes[0].goal = player;
+        for _ in 0..12 {
+            w.update_slime(0);
+            assert!(!same_cell(w.slimes[0].point(), player));
+            assert!(w.slimes[0].point().distance(player) >= 1. - 1e-8);
+        }
+        assert!(
+            w.players[&1].character.hp < 120.,
+            "Charge damage still lands at contact"
+        );
+        let blocked = w.slimes[0].point();
+        w.slimes[1] = Slime::new(
+            1,
+            &SlimeSpawn {
+                kind: "green".into(),
+                x: blocked.x + 2.,
+                y: blocked.y,
+            },
+        );
+        w.slimes[1].state = "wander".into();
+        w.slimes[1].st = 100.;
+        w.slimes[1].goal = blocked;
+        w.slimes[0].state = "windup".into();
+        w.slimes[0].st = 100.;
+        // Put the player out of awareness so this exercises wandering against another enemy.
+        w.players.get_mut(&1).unwrap().character.x = 70.;
+        for _ in 0..100 {
+            w.update_slime(1);
+            assert!(!same_cell(w.slimes[0].point(), w.slimes[1].point()));
+        }
+        w.slimes[0].dead = true;
+        let mut entered = false;
+        for _ in 0..100 {
+            w.update_slime(1);
+            entered |= same_cell(w.slimes[1].point(), blocked);
+        }
+        assert!(entered, "A dead enemy releases its occupied tile");
+    }
+
+    #[test]
+    fn players_can_share_respawn_and_saved_tiles_while_enemies_spawn_clear() {
+        let mut w = world();
+        let _a = join(&mut w, 1, Class::Warrior);
+        let _b = join(&mut w, 2, Class::Mage);
+        let occupied = w.players[&1].character.point();
+        let p = w.players.get_mut(&2).unwrap();
+        p.character.hp = 0.;
+        p.dead_time = 3.2;
+        w.update_player(2);
+        assert!(same_cell(w.players[&2].character.point(), occupied));
+        let enemy_spawn = w.map.slimes[0].clone();
+        w.players.get_mut(&1).unwrap().character.x = enemy_spawn.x;
+        w.players.get_mut(&1).unwrap().character.y = enemy_spawn.y;
+        w.slimes[0].dead = true;
+        w.slimes[0].respawn = TICK;
+        w.update_slime(0);
+        assert!(!w.slimes[0].dead);
+        assert!(!same_cell(
+            w.slimes[0].point(),
+            w.players[&1].character.point()
+        ));
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(3, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        let saved = w.players[&3].character.point();
+        w.leave(3);
+        w.players.get_mut(&2).unwrap().character.x = saved.x;
+        w.players.get_mut(&2).unwrap().character.y = saved.y;
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(4, Some(token), None, tx).unwrap();
+        assert!(same_cell(w.players[&4].character.point(), saved));
+        let locations: Vec<_> = w
+            .map
+            .slimes
+            .iter()
+            .filter(|s| s.kind == "big")
+            .cloned()
+            .collect();
+        for (session, spawn) in [1, 2].into_iter().zip(locations) {
+            w.players.get_mut(&session).unwrap().character.x = spawn.x;
+            w.players.get_mut(&session).unwrap().character.y = spawn.y;
+        }
+        w.time = w.next_king_spawn;
+        w.update_king_spawn();
+        let king = w
+            .slimes
+            .iter()
+            .find(|s| s.kind == "big" && !s.dead)
+            .unwrap();
+        assert!(!actor_blocked(
+            king.point(),
+            king.r,
+            &w.actor_bodies(None, Some(king.id))
+        ));
+    }
+
     #[test]
     fn king_timer_spawns_one_random_location_and_announces_it() {
         let mut w = world();

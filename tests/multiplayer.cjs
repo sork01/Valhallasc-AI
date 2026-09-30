@@ -27,16 +27,48 @@ async function stopServer() {
 async function makePlayer(type, name) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   await context.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
-  const page = await context.newPage(); page.errors = []; page.pickups = [];
+  const page = await context.newPage(); page.errors = []; page.pickups = []; page.actorCollision = null; page.renderCollision = null;
+  await page.exposeFunction('reportRenderedActorCollision', collision => { page.renderCollision ||= collision; });
   page.on('pageerror', error => page.errors.push(error.message));
   page.on('websocket', socket => socket.on('framereceived', ({payload}) => {
     const packet=JSON.parse(payload.toString());
     if(packet.type==='event' && packet.kind==='pickup') page.pickups.push(packet);
+    const snapshot=packet.type==='snapshot'?packet:packet.type==='welcome'?packet.snapshot:null;
+    if(snapshot && !page.actorCollision) {
+      const actors=[...snapshot.players,...snapshot.slimes].filter(actor=>!actor.dead);
+      for(let i=0;i<actors.length;i++) for(let j=i+1;j<actors.length;j++) {
+        const a=actors[i],b=actors[j];
+        if(!a.kind && !b.kind)continue;
+        const gap=a.kind && b.kind?(a.r||.3)+(b.r||.3):1;
+        if((Math.floor(a.x)===Math.floor(b.x)&&Math.floor(a.y)===Math.floor(b.y)) || Math.hypot(a.x-b.x,a.y-b.y)<gap-1e-6) {
+          page.actorCollision={tick:snapshot.tick,a:{id:a.id,x:a.x,y:a.y},b:{id:b.id,x:b.x,y:b.y}};
+        }
+      }
+    }
   }));
   await page.goto(url); await page.locator('#start').click();
   await page.locator('#cls-' + type).click(); await page.locator('#name').fill(name);
   await page.locator('#go').click({timeout:60000});
   await page.waitForFunction(() => Online.connected && !!(Field.warriorSprites || Field.mageSprites || Field.assassinSprites), null, { timeout: 60000 });
+  await page.evaluate(() => {
+    let reported = false;
+    const observe = () => {
+      if (Online.connected && !reported) {
+        const actors = [Field.hero, ...Field.remotePlayers, ...Field.slimes].filter(a => !a.dead);
+        for (let i = 0; i < actors.length; i++) for (let j = i + 1; j < actors.length; j++) {
+          const a = actors[i], b = actors[j];
+          if (!a.kind && !b.kind) continue;
+          const gap = a.kind && b.kind ? (a.r || .3) + (b.r || .3) : 1;
+          if ((Math.floor(a.x) === Math.floor(b.x) && Math.floor(a.y) === Math.floor(b.y)) || Math.hypot(a.x - b.x, a.y - b.y) < gap - 1e-6) {
+            reported = true;
+            window.reportRenderedActorCollision({a:{id:a.id,x:a.x,y:a.y},b:{id:b.id,x:b.x,y:b.y}}).catch(() => {});
+          }
+        }
+      }
+      requestAnimationFrame(observe);
+    };
+    requestAnimationFrame(observe);
+  });
   return page;
 }
 async function probe(page, message) {
@@ -112,6 +144,14 @@ function route(map, start, goal) {
   const moved=await warrior.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));
   check(Math.hypot(moved.x-start.x,moved.y-start.y)>.8 && Math.hypot(moved.x-start.x,moved.y-start.y)<4, 'Server controlled keyboard movement');
   await mage.waitForFunction(({id,x,y})=>{const p=Field.remotePlayers.find(p=>p.id===id);return p && Math.hypot(p.x-x,p.y-y)<.2;},{id:warriorId,...moved});passed++;
+  const blocker=await warrior.evaluate(()=>{const p=Field.remotePlayers.find(p=>p.look.class==='assassin');return {x:p.x,y:p.y};});
+  await warrior.evaluate(p=>Online.send({type:'move',...p}),blocker);
+  await warrior.waitForFunction(p=>Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<.15,blocker,{timeout:10000});
+  await delay(500);
+  check(await warrior.evaluate(p=>Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<.15,blocker),'Players can move into another player without being blocked');
+  await warrior.evaluate(p=>Online.send({type:'move',...p}),moved);
+  await warrior.waitForFunction(p=>Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<.4,moved,{timeout:10000});
+  await warrior.evaluate(()=>Online.send({type:'stop'}));
   await warrior.keyboard.press('Escape');check(await warrior.locator('#pause').isVisible(),'World menu opens');
   const before=await (await fetch(url+'health')).json();await delay(300);const after=await (await fetch(url+'health')).json();check(after.tick>before.tick,'World keeps ticking in menu');
   await warrior.locator('#p-resume').click();await warrior.keyboard.press('i');
@@ -143,9 +183,10 @@ function route(map, start, goal) {
   state.slimes.sort((a,b)=>Math.hypot(a.x-state.start.x,a.y-state.start.y)-Math.hypot(b.x-state.start.x,b.y-state.start.y));
   const target=state.slimes[0];const waypoints=route(map,state.start,target);
   for (const point of waypoints) {
-    if (Math.hypot(point.x-target.x,point.y-target.y)<3) break;
+    if (Math.hypot(point.x-target.x,point.y-target.y)<7) break;
     await mage.evaluate(p=>Online.send({type:'move',...p}),point);
-    await mage.waitForFunction(p=>Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<.5,point,{timeout:20000});
+    await mage.waitForFunction(({point,id})=>{const s=Field.slimes.find(s=>s.id===id);return Math.hypot(Field.hero.x-point.x,Field.hero.y-point.y)<.5 || (s&&!s.dead&&Math.hypot(Field.hero.x-s.x,Field.hero.y-s.y)<6);},{point,id:target.id},{timeout:20000});
+    if(await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return s&&!s.dead&&Math.hypot(Field.hero.x-s.x,Field.hero.y-s.y)<6;},target.id))break;
   }
   await mage.evaluate(id=>Online.send({type:'target',id}),target.id);
   await mage.waitForFunction(id=>Field.slimes.find(s=>s.id===id)?.dead&&Field.hero.kills>0,target.id,{timeout:30000});
@@ -158,9 +199,10 @@ function route(map, start, goal) {
   const pickupStart=mage.pickups.length, mageId=await mage.evaluate(()=>Online.id);
   const beetle=beetleState.enemy;
   for (const point of route(map,beetleState.start,beetle)) {
-    if(Math.hypot(point.x-beetle.x,point.y-beetle.y)<3) break;
+    if(Math.hypot(point.x-beetle.x,point.y-beetle.y)<7) break;
     await mage.evaluate(p=>Online.send({type:'move',...p}),point);
-    await mage.waitForFunction(p=>Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<.5,point,{timeout:20000});
+    await mage.waitForFunction(({point,id})=>{const s=Field.slimes.find(s=>s.id===id);return Math.hypot(Field.hero.x-point.x,Field.hero.y-point.y)<.5 || (s&&!s.dead&&Math.hypot(Field.hero.x-s.x,Field.hero.y-s.y)<6);},{point,id:beetle.id},{timeout:20000});
+    if(await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return s&&!s.dead&&Math.hypot(Field.hero.x-s.x,Field.hero.y-s.y)<6;},beetle.id))break;
   }
   await mage.evaluate(id=>Online.send({type:'target',id}),beetle.id);
   await mage.waitForFunction(id=>{const s=Field.slimes.find(s=>s.id===id);return s&&s.hp<s.maxHp;},beetle.id,{timeout:30000});
@@ -199,7 +241,12 @@ function route(map, start, goal) {
   await warrior.waitForFunction(()=>document.getElementById('chat-log').textContent.includes('Walk closer'));passed++;
   check(await warrior.locator('#npc-dialogue').isHidden(),'Remote NPC interaction cannot open a shop');
   await warrior.locator('#city-travel').click();
-  await warrior.waitForFunction(()=>Field.hero.y>78.6&&Field.hero.y<80&&Math.abs(Field.hero.x-36)<.4,null,{timeout:40000});
+  try {
+    await warrior.waitForFunction(()=>Field.hero.y>78.6&&Field.hero.y<80&&Math.abs(Field.hero.x-36)<.4,null,{timeout:40000});
+  } catch(error) {
+    console.error('City travel stalled:',await warrior.evaluate(()=>({hero:{x:Field.hero.x,y:Field.hero.y},nearby:[...Field.remotePlayers,...Field.slimes].filter(a=>!a.dead&&Math.hypot(a.x-Field.hero.x,a.y-Field.hero.y)<4).map(a=>({id:a.id,x:a.x,y:a.y}))})));
+    throw error;
+  }
   check(await warrior.locator('#city-travel').isHidden(),'Travel button walks through the city gate');
   await warrior.waitForFunction(()=>document.getElementById('network-status').textContent.includes('Alderhaven'));passed++;
   await warrior.screenshot({path:path.join(root,'test-results/city-square.png')});
@@ -236,6 +283,8 @@ function route(map, start, goal) {
   check(await warrior.locator('[data-offer="tonic"]').isDisabled(),'Shop shows an unaffordable item without allowing a purchase');
   await warrior.locator('#npc-close').click();
   for(const page of [warrior,mage,assassin]) check(page.errors.length===0,'No browser runtime errors: '+page.errors.join('; '));
+  for(const page of [warrior,mage,assassin]) check(!page.actorCollision,'Every received authoritative snapshot keeps enemies a cell away from players: '+JSON.stringify(page.actorCollision));
+  for(const page of [warrior,mage,assassin]) check(!page.renderCollision,'Rendered enemies remain a cell away from players during movement and combat: '+JSON.stringify(page.renderCollision));
   await warrior.screenshot({path:path.join(root,'test-results/multiplayer-final.png')});
   console.log(`${passed} multiplayer checks passed (Chromium; three independent browser clients, combat, chat, reload, server restart, city travel and NPC shops).`);
 })().catch(error=>{console.error(error);console.error(logs);process.exitCode=1;}).finally(async()=>{await browser?.close();await stopServer();});

@@ -270,6 +270,21 @@
     Object.assign(actor, packet); actor.nx = packet.x; actor.ny = packet.y;
     if (!snap && Math.hypot(x - packet.x, y - packet.y) < 4) { actor.x = x; actor.y = y; }
   }
+  function keepActorsSeparated() {
+    const enemies = new Set(slimes);
+    const actors = [hero, ...remotePlayers.values(), ...slimes].filter(actor => !actor.dead);
+    for (let i = 0; i < actors.length; i++) for (let j = i + 1; j < actors.length; j++) {
+      const a = actors[i], b = actors[j];
+      if (!enemies.has(a) && !enemies.has(b)) continue;
+      const gap = enemies.has(a) && enemies.has(b) ? (a.r || .3) + (b.r || .3) : 1;
+      if ((Math.floor(a.x) === Math.floor(b.x) && Math.floor(a.y) === Math.floor(b.y)) || Math.hypot(a.x - b.x, a.y - b.y) < gap - 1e-8) {
+        // Interpolation can cross an occupied tile between otherwise valid snapshots.
+        // Restore the complete authoritative positions together to preserve enemy spacing.
+        for (const actor of actors) { actor.x = actor.nx; actor.y = actor.ny; }
+        return;
+      }
+    }
+  }
   function applySnapshot(packet, initial = false) {
     const own = packet.players.find(p => p.id === Online.id); if (!own) return;
     const selectedTarget = hero.target?.id;
@@ -356,6 +371,7 @@
       }
       interpolate(hero, dt); for (const remote of remotePlayers.values()) interpolate(remote, dt);
       for (const slime of slimes) { interpolate(slime, dt); if (slime.dead) slime.dieT += dt; }
+      keepActorsSeparated();
     }
     for (const p of parts) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vz -= p.g * dt; p.z = Math.max(0, p.z + p.vz * dt * 6); }
     parts = parts.filter(p => p.t < p.life);
