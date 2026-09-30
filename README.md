@@ -102,7 +102,7 @@ client/          Browser UI, renderer, sprites, music, connection/reconnect laye
 server/src/      Rust HTTP/WebSocket transport, world simulation, SQLite storage
 world/map.txt    Shared collision geometry, slime spawns, city layout and NPC services
 scripts/        Local Cargo wrapper and client map sync
-tests/          Browser multiplayer integration test
+tests/          Browser, test driver, and MCP integration tests
 deploy/         Compose, Apache and systemd examples
 ```
 
@@ -116,6 +116,55 @@ Subsequent messages: `input {dx,dy}`, `stop`, `move {x,y}`, `target {id}`, `atta
 
 The transport uses [Axum WebSockets](https://docs.rs/axum/0.8.9/axum/extract/ws/) and [Tower HTTP static serving](https://docs.rs/tower-http/0.6.11/tower_http/services/struct.ServeDir.html). Cargo.lock pins the resolved versions.
 
+## Test driver and MCP
+
+The test driver starts a real Rust server on a free loopback port with a fresh SQLite database under `test-results/driver-*`. Bots use the same `/ws` actions as browser players. Combat, movement, NPC services, and rewards are calculated by the server. The driver overrides inherited bind/database settings and has no option to attach to the public world.
+
+Build the server and install the Node 20+ development dependencies first:
+
+```sh
+bash scripts/cargo.sh build --locked
+npm ci
+npm run test:driver
+node scripts/test-driver.cjs list
+node scripts/test-driver.cjs run movement
+node scripts/test-driver.cjs run ironhide
+node scripts/test-driver.cjs run city
+npm run test:scenarios
+```
+
+`movement` checks three classes, overlapping players, authoritative movement, dormant King slots, enemy spacing, and character resume. `ironhide` walks a mage to an actual beetle, defeats it, collects its gold, and checks saved progress. `city` walks into Alderhaven and checks distance restrictions and healer/armorer services. Every observed snapshot is checked for enemy spacing. Each scenario prints JSON with pass/fail checks and an artifact path; failures produce a nonzero exit status. Reports contain the last snapshot and up to 500 recent events. Test guest keys remain in process memory and never appear in reports or tool results.
+
+On this host, Node is at `/home/serveperry/.nvm/versions/node/v20.20.2/bin/node`. Use that absolute executable for the direct `node` commands above, or add its directory to `PATH` for npm scripts. `VALHALLA_BINARY` can select another locally built server binary; bind, database, and client directory remain controlled by the driver.
+
+The MCP wrapper uses the official SDK and stdio. Configure your MCP client to launch an **absolute Node executable** with the **absolute script path** as its argument, for example:
+
+```json
+{
+  "mcpServers": {
+    "valhallasc-testing": {
+      "command": "/home/serveperry/.nvm/versions/node/v20.20.2/bin/node",
+      "args": ["/home/serveperry/webserver/www/Valhallasc/scripts/test-mcp.cjs"]
+    }
+  }
+}
+```
+
+This is a launch example; the enclosing settings format depends on your MCP client. Launch the script directly so stdout contains only MCP messages. The script resolves the repository from its own location and does not depend on the client's working directory.
+
+| Tool | Purpose |
+| --- | --- |
+| `start_world` / `stop_world` | Start/stop a private world; stopping saves an interactive report |
+| `connect_bot` / `disconnect_bot` | Create a class or resume a disconnected bot by name |
+| `send_action` | Send movement, input, stop, target, attack, dash, equipment, NPC interaction, chat, or ping |
+| `inspect_world` | Inspect the latest snapshot or one bot, recent events, and spacing checks |
+| `wait_world` | Wait up to 30 seconds of real simulation time and inspect again |
+| `list_scenarios` / `run_scenario` | Discover/run a named scenario in a fresh world |
+
+For interactive exploration: `start_world`, `connect_bot` with `{"bot":"Mage","class":"mage"}`, then `send_action` with `{"bot":"Mage","action":{"type":"move","x":45,"y":48}}`, `wait_world`, and `inspect_world`. A movement destination is an ordinary server action. The driver supports at most 16 bot identities, validates action schemas, and serializes MCP calls. Stop the interactive world before running a scenario. Allow at least 120 seconds for scenario calls; walking and combat happen in real time. Normal disconnect saves characters, and reusing a bot name resumes the same character and class within that world.
+
+Snapshots refresh while bots are connected; with no connected bots inspection retains the last observed snapshot. Closing MCP stdin or sending SIGINT/SIGTERM disconnects bots and stops the child server. Test databases and reports remain local and gitignored for review. Existing browser tests remain necessary for controls, menus, artwork, and interpolation; run `npm test` separately. No public service restart or deployment is needed for these local tools.
+
 ## Checks
 
 ```sh
@@ -125,6 +174,8 @@ cargo build --locked
 npm ci
 npx playwright install chromium
 npm run check
+npm run test:driver
+npm run test:scenarios
 npm test
 ```
 
