@@ -200,7 +200,7 @@ impl Character {
         self.look.class.health() + (self.level - 1) as f64 * 20.
     }
     pub fn xp_need(&self) -> u32 {
-        (40. * (self.level as f64).powf(1.35)).round() as u32
+        (160. * (self.level as f64).powf(1.35)).round() as u32
     }
     pub fn point(&self) -> Point {
         Point {

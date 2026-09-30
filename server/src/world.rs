@@ -5,6 +5,8 @@ use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
 pub type Peer = mpsc::Sender<Value>;
+const KING_SPAWN_MIN: f64 = 300.;
+const KING_SPAWN_MAX: f64 = 600.;
 pub enum Command {
     Join {
         session: u64,
@@ -112,6 +114,7 @@ struct Slime {
     atk_cd: f64,
     blink: f64,
     seed: f64,
+    windup_time: f64,
     #[serde(skip)]
     target: Option<u64>,
     #[serde(skip)]
@@ -125,8 +128,17 @@ impl Slime {
             "blue" => (80., 10., 2.4, 1.05, 16),
             "pink" => (70., 9., 2.1, 1., 15),
             "yellow" => (90., 11., 2.2, 1.05, 20),
-            "big" => (200., 16., 1.5, 1.75, 45),
+            "big" => (600., 30., 2.2, 1.75, 75),
+            "beetle" => (240., 22., 2.8, 1.3, 32),
             _ => (60., 8., 1.9, 1., 12),
+        }
+    }
+    // Windup, recovery cooldown, charge speed, awareness radius.
+    fn attack_profile(kind: &str) -> (f64, f64, f64, f64) {
+        match kind {
+            "big" => (0.35, 0.85, 8., 7.5),
+            "beetle" => (0.4, 1.1, 7.5, 7.),
+            _ => (0.45, 1.3, 6., 5.5),
         }
     }
     fn new(id: usize, s: &SlimeSpawn) -> Self {
@@ -155,6 +167,7 @@ impl Slime {
             atk_cd: 1.,
             blink: 2.,
             seed: id as f64,
+            windup_time: Self::attack_profile(&s.kind).0,
             target: None,
             goal: Point { x: s.x, y: s.y },
             hit: false,
@@ -207,6 +220,7 @@ pub struct World {
     tick: u64,
     rng: u64,
     next_entity: u64,
+    next_king_spawn: f64,
 }
 impl World {
     pub fn new(store: Store) -> Self {
@@ -215,9 +229,19 @@ impl World {
             .slimes
             .iter()
             .enumerate()
-            .map(|(i, s)| Slime::new(i, s))
+            .map(|(i, s)| {
+                let mut enemy = Slime::new(i, s);
+                if s.kind == "big" {
+                    // Keep stable entity IDs while hiding kings until the world timer fires.
+                    enemy.dead = true;
+                    enemy.hp = 0.;
+                    enemy.state = "waiting".into();
+                    enemy.die_t = 2.;
+                }
+                enemy
+            })
             .collect();
-        Self {
+        let mut world = Self {
             map,
             store,
             players: BTreeMap::new(),
@@ -229,7 +253,10 @@ impl World {
             tick: 0,
             rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
             next_entity: 1,
-        }
+            next_king_spawn: 0.,
+        };
+        world.next_king_spawn = world.king_spawn_delay();
+        world
     }
     fn random(&mut self) -> f64 {
         self.rng = self.rng.wrapping_mul(6364136223846793005).wrapping_add(1);
@@ -239,6 +266,28 @@ impl World {
         let id = self.next_entity;
         self.next_entity += 1;
         id
+    }
+    fn king_spawn_delay(&mut self) -> f64 {
+        KING_SPAWN_MIN + self.random() * (KING_SPAWN_MAX - KING_SPAWN_MIN)
+    }
+    fn update_king_spawn(&mut self) {
+        if self.time < self.next_king_spawn
+            || self.slimes.iter().any(|s| s.kind == "big" && !s.dead)
+        {
+            return;
+        }
+        let locations: Vec<_> = self
+            .slimes
+            .iter()
+            .filter(|s| s.kind == "big")
+            .map(|s| s.id)
+            .collect();
+        if locations.is_empty() {
+            return;
+        }
+        let id = locations[(self.random() * locations.len() as f64) as usize];
+        self.slimes[id] = Slime::new(id, &self.map.slimes[id]);
+        self.emit(json!({"type":"system","text":"A King Slime has emerged in Greenmeadow!"}));
     }
     fn emit(&self, value: Value) {
         for p in self.players.values() {
@@ -483,6 +532,7 @@ impl World {
     pub fn step(&mut self) {
         self.time += TICK;
         self.tick += 1;
+        self.update_king_spawn();
         let sessions: Vec<_> = self.players.keys().copied().collect();
         for session in sessions {
             self.update_player(session);
@@ -658,15 +708,18 @@ impl World {
         let point = s.point();
         let killed = s.hp <= 0.;
         let xp = Slime::stats(&s.kind).4;
-        let big = s.kind == "big";
+        let kind = s.kind.clone();
         if killed {
             s.dead = true;
             s.die_t = 0.;
-            s.respawn = 22.;
+            s.respawn = if kind == "big" { 0. } else { 22. };
             s.state = "dead".into();
         }
         self.event("hit", &actor, point, damage, crit);
         if killed {
+            if kind == "big" {
+                self.next_king_spawn = self.time + self.king_spawn_delay();
+            }
             let p = self.players.get_mut(&session).unwrap();
             p.character.kills += 1;
             p.character.xp += xp;
@@ -683,10 +736,10 @@ impl World {
                 self.event("levelup", &actor, point, levels as f64, false);
             }
             let id = self.entity();
-            let value = if big {
-                18
-            } else {
-                3 + (self.random() * 4.) as u32
+            let value = match kind.as_str() {
+                "big" => 30,
+                "beetle" => 10,
+                _ => 3 + (self.random() * 4.) as u32,
             };
             self.drops.push(Drop {
                 id,
@@ -704,11 +757,16 @@ impl World {
         let wander = self.random();
         let angle = self.random() * std::f64::consts::TAU;
         let s = &mut self.slimes[id];
+        let (windup, cooldown, charge_speed, awareness) = Slime::attack_profile(&s.kind);
         s.hurt_t = (s.hurt_t - TICK).max(0.);
         s.rec_t = (s.rec_t - TICK).max(0.);
         s.land_t = (s.land_t - TICK).max(0.);
         if s.dead {
             s.die_t += TICK;
+            if s.kind == "big" {
+                // Kings use the shared rare-spawn timer, never the ordinary respawn loop.
+                return;
+            }
             s.respawn -= TICK;
             if s.respawn <= 0. {
                 let spawn = &self.map.slimes[id];
@@ -741,7 +799,7 @@ impl World {
                     s.point().distance(p.character.point()),
                 )
             })
-            .filter(|(_, _, d)| *d < 5.5)
+            .filter(|(_, _, d)| *d < awareness)
             .min_by(|a, b| a.2.total_cmp(&b.2));
         let target = s.target.and_then(|id| {
             self.players
@@ -792,7 +850,7 @@ impl World {
                 {
                     if d < 1.15 + s.r && s.atk_cd <= 0. {
                         s.state = "windup".into();
-                        s.st = 0.45;
+                        s.st = windup;
                         s.goal = point;
                     } else {
                         goal = Some(point);
@@ -815,7 +873,7 @@ impl World {
             }
             "lunge" => {
                 goal = Some(s.goal);
-                movement = 6. * TICK;
+                movement = charge_speed * TICK;
                 if let Some((id, _, d)) = target
                     && !s.hit
                     && d < 0.9 + s.r
@@ -825,7 +883,7 @@ impl World {
                 }
                 if s.st <= 0. {
                     s.state = "chase".into();
-                    s.atk_cd = 1.3;
+                    s.atk_cd = cooldown;
                     s.rec_t = 0.22;
                 }
             }
@@ -1008,6 +1066,206 @@ mod tests {
         rx
     }
     #[test]
+    fn king_timer_spawns_one_random_location_and_announces_it() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        assert!((KING_SPAWN_MIN..KING_SPAWN_MAX).contains(&w.next_king_spawn));
+        assert!(
+            w.slimes
+                .iter()
+                .filter(|s| s.kind == "big")
+                .all(|s| s.dead && s.hp == 0. && s.die_t >= 2.)
+        );
+        let deadline = w.next_king_spawn;
+        w.time = deadline - TICK;
+        w.update_king_spawn();
+        assert!(w.slimes.iter().filter(|s| s.kind == "big").all(|s| s.dead));
+        w.time = deadline;
+        w.update_king_spawn();
+        let kings: Vec<_> = w
+            .slimes
+            .iter()
+            .filter(|s| s.kind == "big" && !s.dead)
+            .collect();
+        assert_eq!(kings.len(), 1);
+        assert_eq!(kings[0].hp, 600.);
+        let id = kings[0].id;
+        assert_eq!(kings[0].x, w.map.slimes[id].x);
+        assert_eq!(kings[0].y, w.map.slimes[id].y);
+        assert_eq!(rx.try_recv().unwrap()["type"], "system"); // Join notice.
+        assert!(
+            rx.try_recv().unwrap()["text"]
+                .as_str()
+                .unwrap()
+                .contains("King Slime")
+        );
+        w.time += KING_SPAWN_MAX * 10.;
+        w.update_king_spawn();
+        assert_eq!(
+            w.slimes
+                .iter()
+                .filter(|s| s.kind == "big" && !s.dead)
+                .count(),
+            1
+        );
+        assert!(rx.try_recv().is_err());
+
+        // Both timer length and location vary with the server RNG, deterministically here.
+        let mut locations = std::collections::BTreeSet::new();
+        let mut delays = std::collections::BTreeSet::new();
+        for seed in 1..=32 {
+            let mut w = world();
+            w.rng = seed;
+            let delay = w.king_spawn_delay();
+            assert!((KING_SPAWN_MIN..KING_SPAWN_MAX).contains(&delay));
+            delays.insert(delay.to_bits());
+            w.time = w.next_king_spawn;
+            w.update_king_spawn();
+            locations.insert(
+                w.slimes
+                    .iter()
+                    .find(|s| s.kind == "big" && !s.dead)
+                    .unwrap()
+                    .id,
+            );
+        }
+        assert_eq!(locations.len(), 2);
+        assert!(delays.len() > 1);
+    }
+
+    #[test]
+    fn king_defeat_reschedules_without_fast_respawn_or_duplicate_rewards() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        w.time = w.next_king_spawn;
+        w.update_king_spawn();
+        let id = w
+            .slimes
+            .iter()
+            .find(|s| s.kind == "big" && !s.dead)
+            .unwrap()
+            .id;
+        w.hit_slime(id, 1, 1000., false);
+        let deadline = w.next_king_spawn;
+        assert!((KING_SPAWN_MIN..KING_SPAWN_MAX).contains(&(deadline - w.time)));
+        w.hit_slime(id, 1, 1000., false);
+        assert_eq!(w.next_king_spawn, deadline);
+        assert_eq!(w.players[&1].character.kills, 1);
+        assert_eq!(w.players[&1].character.xp, 75);
+        assert_eq!(w.drops.len(), 1);
+        assert_eq!(w.drops[0].value, 30);
+        for _ in 0..500 {
+            w.time += TICK;
+            w.update_king_spawn();
+            w.update_slime(id);
+        }
+        assert!(
+            w.slimes[id].dead,
+            "Kings must not use the normal 22-second respawn"
+        );
+        w.time = deadline - TICK;
+        w.update_king_spawn();
+        assert!(w.slimes.iter().filter(|s| s.kind == "big").all(|s| s.dead));
+        w.time = deadline;
+        w.update_king_spawn();
+        assert_eq!(
+            w.slimes
+                .iter()
+                .filter(|s| s.kind == "big" && !s.dead)
+                .count(),
+            1
+        );
+        assert_eq!(
+            w.slimes
+                .iter()
+                .find(|s| s.kind == "big" && !s.dead)
+                .unwrap()
+                .hp,
+            600.
+        );
+        assert_eq!(w.players[&1].character.kills, 1);
+    }
+
+    #[test]
+    fn harder_enemies_spawn_clear_and_charge_with_authoritative_damage() {
+        let w = world();
+        assert_eq!(w.slimes.iter().filter(|s| s.kind == "beetle").count(), 5);
+        for s in &w.slimes {
+            let mut point = s.point();
+            w.map.collide(&mut point, s.r);
+            assert!(
+                point.distance(s.point()) < 1e-6,
+                "{} spawn is blocked",
+                s.kind
+            );
+            assert!(!w.map.in_city(s.point()));
+        }
+        for (kind, hp, damage, windup) in [("beetle", 240., 22., 0.4), ("big", 600., 30., 0.35)] {
+            let mut w = world();
+            let _rx = join(&mut w, 1, Class::Warrior);
+            let point = w.players[&1].character.point();
+            // Arrange one enemy nearby; exercise its actual chase, windup and charge AI.
+            w.slimes[0] = Slime::new(
+                0,
+                &SlimeSpawn {
+                    kind: kind.into(),
+                    x: point.x + 1.,
+                    y: point.y,
+                },
+            );
+            w.slimes[0].atk_cd = 0.;
+            w.update_slime(0);
+            assert_eq!(w.slimes[0].max_hp, hp);
+            assert_eq!(w.slimes[0].state, "windup");
+            assert_eq!(w.snapshot()["slimes"][0]["windupTime"], windup);
+            assert_eq!(w.players[&1].character.hp, 120.);
+            for _ in 0..20 {
+                w.time += TICK;
+                w.update_slime(0);
+            }
+            let defense = w.players[&1].character.look.stats(1).1;
+            assert_eq!(w.players[&1].character.hp, 120. - (damage - defense));
+        }
+    }
+
+    #[test]
+    fn slower_leveling_requires_fourteen_green_kills_and_carries_remaining_xp() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        assert_eq!(w.players[&1].character.xp_need(), 160);
+        for _ in 0..13 {
+            w.hit_slime(0, 1, 1000., false);
+            w.slimes[0].respawn = TICK;
+            w.update_slime(0);
+        }
+        assert_eq!(w.players[&1].character.level, 1);
+        assert_eq!(w.players[&1].character.xp, 156);
+        w.hit_slime(0, 1, 1000., false);
+        assert_eq!(w.players[&1].character.level, 2);
+        assert_eq!(w.players[&1].character.xp, 8);
+        assert_eq!(w.players[&1].character.xp_need(), 408);
+        assert_eq!(w.players[&1].character.hp, 140.);
+    }
+
+    #[test]
+    fn beetle_rewards_once_and_respawns_with_full_health() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Mage);
+        let id = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
+        w.hit_slime(id, 1, 1000., false);
+        w.hit_slime(id, 1, 1000., false);
+        assert_eq!(w.players[&1].character.kills, 1);
+        assert_eq!(w.players[&1].character.xp, 32);
+        assert_eq!(w.drops.len(), 1);
+        assert_eq!(w.drops[0].value, 10);
+        w.slimes[id].respawn = TICK;
+        w.update_slime(id);
+        assert!(!w.slimes[id].dead);
+        assert_eq!(w.slimes[id].hp, 240.);
+        assert_eq!(w.slimes[id].kind, "beetle");
+    }
+
+    #[test]
     fn npc_services_check_distance_price_health_and_offer_ids() {
         let mut w = world();
         let mut rx = join(&mut w, 1, Class::Warrior);
@@ -1130,8 +1388,9 @@ mod tests {
         w.start_attack(1);
         w.start_attack(1);
         assert_eq!(w.players[&1].cooldown, 0.55);
+        let health: Vec<_> = w.slimes.iter().map(|s| s.hp).collect();
         w.strike(1);
-        assert!(w.slimes.iter().all(|s| s.hp == s.max_hp));
+        assert_eq!(w.slimes.iter().map(|s| s.hp).collect::<Vec<_>>(), health);
         w.message(
             1,
             ClientMessage::Equip {

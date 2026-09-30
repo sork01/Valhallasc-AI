@@ -165,12 +165,13 @@
     blue: { hp: 80, dmg: 10, speed: 2.4, scale: 1.05, xp: 16, col: ['#a8e4ff', '#4aa8ff', '#2160b8'] },
     pink: { hp: 70, dmg: 9, speed: 2.1, scale: 1, xp: 15, col: ['#ffc4e6', '#ff7bbd', '#c23f86'] },
     yellow: { hp: 90, dmg: 11, speed: 2.2, scale: 1.05, xp: 20, col: ['#fff2a0', '#ffd23f', '#c98a10'] },
-    big: { hp: 200, dmg: 16, speed: 1.5, scale: 1.75, xp: 45, col: ['#c8b5ff', '#8f6bff', '#4a2fb0'] },
+    big: { name: 'King Slime', hp: 600, dmg: 30, speed: 2.2, scale: 1.75, xp: 75, col: ['#c8b5ff', '#8f6bff', '#4a2fb0'] },
+    beetle: { name: 'Ironhide Beetle', hp: 240, dmg: 22, speed: 2.8, scale: 1.3, xp: 32, col: ['#8aafbf', '#58758a', '#324658'] },
   };
   function newHero() {
     return { x: SPAWN.x, y: SPAWN.y, r: .3, hp: 120, maxHp: 120, level: 1, xp: 0, gold: 0, kills: 0, fx: 1, fy: 1, moving: false, walk: 0, atkT: 0, atkCd: 0, atkHit: false, hurtT: 0, lastHurt: -99, dead: false, deadT: 0, target: null, goal: null, vx: 0, vy: 0, roar: 0, dashT: 0, dashCd: 0, dashX: 0, dashY: 0, dashTrail: 0 };
   }
-  const xpNeed = lv => Math.round(40 * Math.pow(lv, 1.35));
+  const xpNeed = lv => Math.round(160 * Math.pow(lv, 1.35));
   function reset() {
     pendingNpc = null; cityRoute = [];
     hero = newHero(); drops = []; floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
@@ -178,7 +179,7 @@
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
   }
-  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: xpNeed(hero.level), level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', traveling: cityRoute.length > 0 && !pendingNpc }); }
+  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: hero.xpNeed ?? xpNeed(hero.level), level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', traveling: cityRoute.length > 0 && !pendingNpc }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -371,7 +372,7 @@
   function drawSlime(g, s, t) {
     const d = s.d, R = 30 * d.scale, hopK = clamp(s.hop / 1.6, 0, 1), air = s.hopV > 0 ? 1 : s.hop > 0 ? .4 : 0;
     let sx = 1, sy = 1;
-    if (s.state === 'windup') { const k = 1 - s.st / .45; sx = 1 + k * .28; sy = 1 - k * .3; }
+    if (s.state === 'windup') { const k = 1 - s.st / (s.windupTime || .45); sx = 1 + k * .28; sy = 1 - k * .3; }
     else if (air) { sx = 1 - hopK * .14; sy = 1 + hopK * .22; }
     else { const b = Math.sin(t * 3 + s.seed) * .04; sx = 1 + b; sy = 1 - b; }
     const w = R * 1.2 * sx, h = R * 1.05 * sy, z = s.hop * 16;
@@ -468,18 +469,26 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let slimeSrc = null;                                      // {meta, img: {kind: Image}}
+  let slimeSrc = null, beetleSrc = null;                    // {meta, img: {kind: Image}}
+  const enemySource = s => s.kind === 'beetle' ? beetleSrc : slimeSrc;
   const SLIME_K = 2.1, DIE_SHOW = 1.7;                      // sprite pixel -> screen px; seconds a dead slime stays on screen
   function loadSlimeSprites(cfg) {
     if (slimeSrc) return;
     fetch(cfg.json).then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = cfg.png.replace('%k', k); })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); slimeSrc = { meta, img }; })).catch(() => { slimeSrc = null; });
   }
+  function loadBeetleSprites() {
+    if (beetleSrc) return;
+    fetch('assets/ironhide.txt').then(r => r.json()).then(meta => new Promise((resolve, reject) => {
+      const img = new Image(); img.onload = () => resolve({ meta, img: { beetle: img } });
+      img.onerror = reject; img.src = 'assets/ironhide.png';
+    })).then(src => { beetleSrc = src; }).catch(() => { beetleSrc = null; });
+  }
   function slimeFrame(s, t) {                               // -> [clip, frame index]; priority: dying, hurt, attack, airborne/landing, idle
-    const C = slimeSrc.meta.clips;
+    const C = enemySource(s).meta.clips;
     if (s.dead) return ['die', Math.min(C.die.n - 1, Math.floor(s.dieT * C.die.fps))];
     if (s.hurtT > 0) return ['hurt', Math.min(C.hurt.n - 1, Math.floor((.4 - s.hurtT) * C.hurt.fps))];
-    if (s.state === 'windup') return ['attack', Math.min(2, Math.floor((1 - s.st / .45) * 3))];
+    if (s.state === 'windup') return ['attack', clamp(Math.floor((1 - s.st / (s.windupTime || .45)) * 3), 0, 2)];
     if (s.state === 'lunge') return ['attack', 3 + Math.min(2, Math.floor((1 - s.st / .3) * 3))];
     if (s.recT > 0) return ['attack', 6 + Math.min(1, Math.floor((1 - s.recT / .22) * 2))];
     if (s.hop > 0 || s.hopV > 0) return ['walk', s.hopV > 0 ? (s.hop < .25 ? 2 : 3) : 4];
@@ -488,11 +497,11 @@
     return ['idle', [0, 1, 2, 1, 0, 5][Math.floor(t * C.idle.fps + s.seed) % 6]];
   }
   function drawSlimeSprite(g, s, t) {
-    const m = slimeSrc.meta, [fw, fh] = m.frame, [ax, ay] = m.anchor, [clip, n] = slimeFrame(s, t), c = m.clips[clip], K = SLIME_K * s.d.scale;
+    const src = enemySource(s), m = src.meta, [fw, fh] = m.frame, [ax, ay] = m.anchor, [clip, n] = slimeFrame(s, t), c = m.clips[clip], K = SLIME_K * s.d.scale;
     g.save();
     if (s.dead) g.globalAlpha = clamp((DIE_SHOW - s.dieT) / .5, 0, 1);
     g.imageSmoothingEnabled = false; g.scale(s.dir < 0 ? -K : K, K);
-    g.drawImage(slimeSrc.img[s.kind], n * fw, c.row * fh, fw, fh, -ax, -ay, fw, fh);
+    g.drawImage(src.img[s.kind], n * fw, c.row * fh, fw, fh, -ax, -ay, fw, fh);
     g.restore();
   }
 
@@ -643,8 +652,13 @@
         g.drawImage(spr.c, it.sx - spr.ax, it.sy - spr.ay + (o.kind === 'rock' ? 4 : 0), spr.w, spr.h); g.globalAlpha = 1;
       } else if (it.npc) { City.drawNpc(g,it.npc,it.sx,it.sy,t,Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8);
       } else if (it.s) {
-        const s = it.s; g.save(); g.translate(it.sx, it.sy); if (slimeSrc) drawSlimeSprite(g, s, t); else drawSlime(g, s, t);
-        if (!s.dead && s.hp < s.maxHp) { const w = 52 * s.d.scale ** .7, y = slimeSrc ? -(s.kind === 'big' ? 36 : 28) * SLIME_K * s.d.scale : -62 * s.d.scale - s.hop * 16; g.fillStyle = 'rgba(20,10,30,.8)'; g.fillRect(-w / 2 - 2, y - 2, w + 4, 8); g.fillStyle = '#ff5a6e'; g.fillRect(-w / 2, y, w * s.hp / s.maxHp, 4); }
+        const s = it.s, src = enemySource(s); g.save(); g.translate(it.sx, it.sy); if (src) drawSlimeSprite(g, s, t); else drawSlime(g, s, t);
+        const barY = src ? -(s.kind === 'big' ? 36 : s.kind === 'beetle' ? 40 : 28) * SLIME_K * s.d.scale : -62 * s.d.scale - s.hop * 16;
+        if (!s.dead && s.hp < s.maxHp) { const w = 52 * s.d.scale ** .7; g.fillStyle = 'rgba(20,10,30,.8)'; g.fillRect(-w / 2 - 2, barY - 2, w + 4, 8); g.fillStyle = '#ff5a6e'; g.fillRect(-w / 2, barY, w * s.hp / s.maxHp, 4); }
+        if (!s.dead && s.d.name && (hero.target === s || Math.hypot(hero.x - s.x, hero.y - s.y) < 7)) {
+          g.font = '16px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = OL; g.fillStyle = '#fff4ca';
+          g.strokeText(s.d.name, 0, barY - 8); g.fillText(s.d.name, 0, barY - 8);
+        }
         if (!s.dead && hero.target === s) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 32 * s.d.scale, 13 * s.d.scale, 0, 0, 6.283); g.stroke(); }
         g.restore();
       } else if (it.drop) {
@@ -739,6 +753,7 @@
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
       if (o.slimeSprites) loadSlimeSprites(o.slimeSprites);
+      loadBeetleSprites();
       if (!Field._bound) {
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize);
@@ -771,6 +786,7 @@
     get mageSprites() { return isMage() ? mageSpr : null; },
     get assassinSprites() { return isAssassin() ? mageSpr : null; },
     get hero() { return hero; }, get slimes() { return slimes; },
+    get beetleSprites() { return beetleSrc; },
     _debug: { get objects() { return objects; }, w2s, s2w },
   };
   window.Field = Field;

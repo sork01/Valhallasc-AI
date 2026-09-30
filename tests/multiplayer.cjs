@@ -27,11 +27,15 @@ async function stopServer() {
 async function makePlayer(type, name) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   await context.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
-  const page = await context.newPage(); page.errors = [];
+  const page = await context.newPage(); page.errors = []; page.pickups = [];
   page.on('pageerror', error => page.errors.push(error.message));
+  page.on('websocket', socket => socket.on('framereceived', ({payload}) => {
+    const packet=JSON.parse(payload.toString());
+    if(packet.type==='event' && packet.kind==='pickup') page.pickups.push(packet);
+  }));
   await page.goto(url); await page.locator('#start').click();
   await page.locator('#cls-' + type).click(); await page.locator('#name').fill(name);
-  await page.locator('#go').click();
+  await page.locator('#go').click({timeout:60000});
   await page.waitForFunction(() => Online.connected && !!(Field.warriorSprites || Field.mageSprites || Field.assassinSprites), null, { timeout: 60000 });
   return page;
 }
@@ -46,14 +50,25 @@ async function probe(page, message) {
 }
 // Find a route through the REAL exported collision geometry, without changing server state.
 function route(map, start, goal) {
-  const segmentFree = (a,b) => map.objects.every(o => {
+  const segmentFree = (a,b,margin=.4) => map.objects.every(o => {
     const dx=b.x-a.x,dy=b.y-a.y;
-    if(o.width) { const steps=Math.ceil(Math.hypot(dx,dy)/.1);for(let i=0;i<=steps;i++){const t=i/(steps||1);if(Math.abs(a.x+dx*t-o.x)<o.width/2+.4&&Math.abs(a.y+dy*t-o.y)<o.depth/2+.4)return false;}return true; }
+    if(o.width) { const steps=Math.ceil(Math.hypot(dx,dy)/.1);for(let i=0;i<=steps;i++){const t=i/(steps||1);if(Math.abs(a.x+dx*t-o.x)<o.width/2+margin&&Math.abs(a.y+dy*t-o.y)<o.depth/2+margin)return false;}return true; }
     const t=Math.max(0,Math.min(1,((o.x-a.x)*dx+(o.y-a.y)*dy)/(dx*dx+dy*dy || 1)));
-    return Math.hypot(o.x-a.x-dx*t,o.y-a.y-dy*t)>o.r+.4;
+    return Math.hypot(o.x-a.x-dx*t,o.y-a.y-dy*t)>o.r+margin;
   });
   const key = p => `${p.x},${p.y}`;
-  const source = { x: Math.round(start.x), y: Math.round(start.y) }, end = { x: Math.round(goal.x), y: Math.round(goal.y) };
+  // An actor's real point can be clear while its rounded grid cell is inside a tree.
+  const nearby = point => {
+    const cells=[];
+    for(let y=Math.floor(point.y)-2;y<=Math.ceil(point.y)+2;y++) for(let x=Math.floor(point.x)-2;x<=Math.ceil(point.x)+2;x++) {
+      const cell={x,y};
+      if(x>=1&&y>=1&&x<=map.size-2&&y<=map.size-2&&segmentFree(cell,cell))cells.push(cell);
+    }
+    return cells.sort((a,b)=>Math.hypot(a.x-point.x,a.y-point.y)-Math.hypot(b.x-point.x,b.y-point.y));
+  };
+  // Match the server's .3 player radius for the connector out of a collision edge.
+  const source=nearby(start).find(cell=>segmentFree(start,cell,.3-1e-6)),end=nearby(goal)[0];
+  assert.ok(source&&end,'Route endpoints have clear approach cells');
   const queue = [source], previous = new Map([[key(source), null]]);
   for (let i=0; i<queue.length; i++) {
     const current=queue[i]; if (key(current)===key(end)) break;
@@ -63,10 +78,10 @@ function route(map, start, goal) {
       previous.set(key(next),current);queue.push(next);
     }
   }
-  assert.ok(previous.has(key(end)), 'Destination is reachable through shared collision geometry');
+  assert.ok(previous.has(key(end)), 'Destination is reachable through shared collision geometry: '+JSON.stringify({start,goal,source,end}));
   const points=[]; for(let current=end; current; current=previous.get(key(current))) points.unshift(current);
   const simplified=[];let anchor=start;
-  for (let i=0;i<points.length;) {let j=i;while(j+1<points.length && segmentFree(anchor,points[j+1])) j++;simplified.push(points[j]);anchor=points[j];i=j+1;}
+  for (let i=0;i<points.length;) {let j=i;while(j+1<points.length && segmentFree(anchor,points[j+1],simplified.length===0?.3-1e-6:.4)) j++;simplified.push(points[j]);anchor=points[j];i=j+1;}
   return simplified;
 }
 (async () => {
@@ -81,6 +96,12 @@ function route(map, start, goal) {
   const warrior = await makePlayer('warrior','TestWarrior');
   const mage = await makePlayer('mage','TestMage');
   const assassin = await makePlayer('assassin','TestAssassin');
+  await warrior.waitForFunction(() => !!Field.beetleSprites);
+  check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='beetle').length===5 && Field.slimes.filter(s=>s.kind==='beetle').every(s=>s.maxHp===240 && s.windupTime===.4)), 'Five tougher beetles arrive from authoritative snapshots');
+  check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='big').every(s=>s.maxHp===600 && s.windupTime===.35)), 'King Slime has stronger health and faster windup');
+  check(await warrior.evaluate(() => {const kings=Field.slimes.filter(s=>s.kind==='big');return kings.length===2 && kings.every(s=>s.dead && s.hp===0 && s.state==='waiting' && s.dieT>=2);}), 'Kings start hidden while waiting for the rare spawn timer');
+  check(await warrior.evaluate(() => Field.hero.xpNeed===160), 'Server sends the quadrupled leveling threshold');
+  check(await warrior.evaluate(() => {const src=Field.beetleSprites;return src.img.beetle.complete && src.img.beetle.naturalWidth===576 && src.img.beetle.naturalHeight===320 && Object.keys(src.meta.clips).length===5;}), 'PixelFlow beetle atlas and all five clips load in browser');
   await warrior.waitForFunction(() => Field.remotePlayers.length === 2 && Field.remotePlayers.every(p => p.sprite), null, { timeout: 60000 });
   check(await warrior.evaluate(() => Field.hero.maxHp===120 && Field.remotePlayers.some(p=>p.look.class==='mage'&&p.maxHp===80) && Field.remotePlayers.some(p=>p.look.class==='assassin'&&p.maxHp===90)), 'Three classes see each other');
   check(await warrior.locator('#connection-overlay').isHidden(), 'Connected overlay is visibly hidden');
@@ -111,7 +132,8 @@ function route(map, start, goal) {
   const version=await probe(mage,{type:'join',version:999,look:{name:'BadVersion'}});check(version.type==='error','Protocol mismatch rejected');
   await warrior.evaluate(()=>Online.send({type:'attack',fx:1,fy:0,damage:99999}));
   await warrior.waitForFunction(()=>document.getElementById('chat-log').textContent.includes('Invalid command.'));passed++;
-  const dashStart=await assassin.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));await assassin.keyboard.press('Shift');await delay(500);
+  const dashStart=await assassin.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));await assassin.keyboard.press('Shift');
+  await assassin.waitForFunction(start=>Math.hypot(Field.hero.x-start.x,Field.hero.y-start.y)>2,dashStart,{timeout:10000});
   const dashEnd=await assassin.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));check(Math.hypot(dashEnd.x-dashStart.x,dashEnd.y-dashStart.y)>2,'Assassin dash works through server');
   await warrior.screenshot({path:path.join(root,'test-results/multiplayer.png')});
   // Fight with real network actions; no direct hero/enemy HP manipulation.
@@ -131,6 +153,26 @@ function route(map, start, goal) {
   const killed=await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return {x:s.x,y:s.y};},target.id);
   await mage.evaluate(p=>Online.send({type:'move',...p}),killed);
   await mage.waitForFunction(()=>Field.hero.gold>0,null,{timeout:15000});
+  // Approach and fight an Ironhide with real movement/target commands and unchanged HP.
+  const beetleState=await mage.evaluate(()=>({start:{x:Field.hero.x,y:Field.hero.y},enemy:Field.slimes.find(s=>s.kind==='beetle'&&s.hx===18&&s.hy===42),kills:Field.hero.kills,xp:Field.hero.xp,gold:Field.hero.gold}));
+  const pickupStart=mage.pickups.length, mageId=await mage.evaluate(()=>Online.id);
+  const beetle=beetleState.enemy;
+  for (const point of route(map,beetleState.start,beetle)) {
+    if(Math.hypot(point.x-beetle.x,point.y-beetle.y)<3) break;
+    await mage.evaluate(p=>Online.send({type:'move',...p}),point);
+    await mage.waitForFunction(p=>Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<.5,point,{timeout:20000});
+  }
+  await mage.evaluate(id=>Online.send({type:'target',id}),beetle.id);
+  await mage.waitForFunction(id=>{const s=Field.slimes.find(s=>s.id===id);return s&&s.hp<s.maxHp;},beetle.id,{timeout:30000});
+  await mage.screenshot({path:path.join(root,'test-results/ironhide-combat.png')});
+  check(await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return Math.hypot(Field.hero.x-s.x,Field.hero.y-s.y)<9;},beetle.id),'Ironhide is visible in real browser combat');
+  await mage.waitForFunction(id=>Field.slimes.find(s=>s.id===id)?.dead,beetle.id,{timeout:30000});
+  await warrior.waitForFunction(id=>Field.slimes.find(s=>s.id===id)?.dead,beetle.id);passed++;
+  check(await mage.evaluate(before=>Field.hero.kills===before.kills+1&&Field.hero.level===1&&Field.hero.xp===before.xp+32&&Field.hero.hp>0,beetleState),'Beetle combat awards XP once and preserves slower leveling');
+  const beetleDrop=await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return {x:s.x,y:s.y};},beetle.id);
+  await mage.evaluate(p=>Online.send({type:'move',...p}),beetleDrop);
+  await mage.waitForFunction(gold=>Field.hero.gold>=gold+10,beetleState.gold,{timeout:15000});
+  check(mage.pickups.slice(pickupStart).some(event=>event.actor===mageId && event.value===10), 'Server awards the beetle gold pickup to its killer');
   const progress=await mage.evaluate(()=>({id:Online.id,gold:Field.hero.gold,kills:Field.hero.kills,xp:Field.hero.xp,level:Field.hero.level}));
   check(progress.kills>0&&progress.gold>0&&(progress.xp>0||progress.level>1),'Server rewards kills, XP, and pickups');
   await mage.reload();await mage.locator('#start').click();

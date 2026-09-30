@@ -44,7 +44,10 @@ Players open `http://<server-LAN-address>:8080/`. Allow that port in the server'
 
 ## Play
 
-- Click ground to walk; click a slime to chase and keep attacking.
+- Click ground to walk; click an enemy to chase and keep attacking.
+- **Ironhide Beetles** roam the outer meadow: 240 HP, 22 base damage, fast horn charges, 32 XP and 10 gold. Their steel shells and bronze horns distinguish them from slimes.
+- **King Slime** has 600 HP, 30 base damage, faster pursuit and charge recovery, and rewards 75 XP and 30 gold. Only one king can be alive at a time. It first appears after a random 5–10 minutes of server uptime, then waits another random 5–10 minutes after each defeat. Its location is randomly chosen from two meadow spawn points, and the world receives an announcement. Dodge its windup or fight together.
+- Leveling requires `round(160 × level^1.35)` XP per level, four times the original threshold (160 XP for level 1). Existing levels and earned XP are preserved.
 - WASD or arrow keys move relative to the screen. Space/J attacks or casts.
 - Shift uses Assassin Shadowstep.
 - I opens equipment; Esc opens the world menu. These stop your actions, but the shared world continues. Enemies can still hurt you.
@@ -104,6 +107,8 @@ deploy/         Compose, Apache and systemd examples
 
 `world/map.txt` is the source of truth for spawn/collision geometry. After editing it, run `node scripts/sync-world.cjs`, then rebuild Rust (the map is bundled into the binary). Terrain shading and scenery drawing use the original renderer, with original city artwork in `client/city.js`. Alderhaven takes visual inspiration from [Prontera references](https://www.gameblast.com.br/2015/10/top-10-melhores-cidades-jogos.html): cobblestone plazas, a fountain, timber-framed shops, gardens, and stone gates. Reference images are not shipped as game assets.
 
+The Ironhide Beetle follows the local makesprites/PixelFlow workflow. Run `python3 scripts/make_ironhide_sprites.py preview` to review all five clips, `build` to create its editable sprite, and `export` to read edits back into `client/assets/ironhide.png` and `ironhide.txt`. **`build --replace` discards beetle hand edits.** The original indexed frames are preserved in `scripts/ironhide_raw.npz`. PixelFlow's saved-sprite quota requires one 34-frame editor sprite; `editorStart` in the metadata records each clip's frame range. Open the sprite ID from the metadata at `/pixelflow/?sprite=<id>`.
+
 On WebSocket connection, send `{"type":"join","version":1,"token":null,"look":{"name":"Freya","class":"mage"}}`. The welcome packet returns an ID, a guest key for a newly created character, and a world snapshot. For resume, send the guest key with `look:null`; saved state takes precedence. Keep keys out of URLs and logs.
 
 Subsequent messages: `input {dx,dy}`, `stop`, `move {x,y}`, `target {id}`, `attack {fx,fy}`, `dash {dx,dy}`, `equip {armor,weapon}`, `interact {npc,offer?}`, `chat {text}`, `ping {nonce}`. Direction vectors are normalized on the server. `move` chooses a destination, not a teleport. Unknown command fields are refused. Server messages: `welcome`, `snapshot`, `event`, `chat`, `system`, `pong`, `dialogue`, and `error`. See `server/src/model.rs` for the exact types.
@@ -122,7 +127,7 @@ npm run check
 npm test
 ```
 
-The integration test starts its own isolated Rust server/database and uses three independent browser clients. It covers character creation, visible remote players, movement replication, equipment, safe chat, invalid commands/keys, duplicate sessions, combat, loot, page reload, server restart/reconnect, and switching between saved characters, walking through the city gate, NPC dialogue, sanctuary healing, armorer fitting, and shop affordability. Screenshots and disposable databases are written under gitignored `test-results/`. The existing sibling Playwright installation was used for testing in this workspace via `NODE_PATH`; no runtime dependency on the sibling project is required.
+The integration test starts its own isolated Rust server/database and uses three independent browser clients. It covers character creation, visible remote players, movement replication, equipment, safe chat, invalid commands/keys, duplicate sessions, slime and Ironhide combat, shared kills, XP pacing, loot, page reload, server restart/reconnect, and switching between saved characters, walking through the city gate, NPC dialogue, sanctuary healing, armorer fitting, and shop affordability. Screenshots and disposable databases are written under gitignored `test-results/`. The existing sibling Playwright installation was used for testing in this workspace via `NODE_PATH`; no runtime dependency on the sibling project is required.
 
 `node tests/public-smoke.cjs` verifies the actual public HTTPS/WSS deployment with two browser clients. It also checks canonical redirects, private-file protection, chat, movement replication, and saved-character reload. It records only the test character IDs in `test-results/public-smoke-results.json`; remove those specific test characters from SQLite after both clients disconnect.
 
