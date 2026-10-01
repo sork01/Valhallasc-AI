@@ -42,6 +42,34 @@
     "sell": 40
   },
   {
+    "id": "ember_core",
+    "name": "Ember Core",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 28
+  },
+  {
+    "id": "magma_fang",
+    "name": "Magma Fang",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 36
+  },
+  {
+    "id": "ash_veil",
+    "name": "Ash Veil",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 48
+  },
+  {
+    "id": "basalt_heart",
+    "name": "Basalt Heart",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 70
+  },
+  {
     "id": "warrior_armor_crimson",
     "name": "Crimson Armor",
     "kind": "armor",

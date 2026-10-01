@@ -32,6 +32,8 @@ function spacingViolation(snapshot) {
   for (let i = 0; i < actors.length; i++) for (let j = i + 1; j < actors.length; j++) {
     const a = actors[i], b = actors[j];
     if (!a.kind && !b.kind) continue;
+    // Zones are separate maps that merely share coordinates.
+    if ((a.zone || 0) !== (b.zone || 0)) continue;
     const distance = Math.hypot(a.x - b.x, a.y - b.y);
     const gap = a.kind && b.kind ? (a.r || .3) + (b.r || .3) : 1;
     if ((Math.floor(a.x) === Math.floor(b.x) && Math.floor(a.y) === Math.floor(b.y)) || distance < gap - 1e-6) {
@@ -45,13 +47,32 @@ class TestWorld extends EventEmitter {
   constructor() {
     super();
     this.bots = new Map();
-    this.snapshot = null;
+    // The server sends each connection only the zone its character is in. Keep each bot's latest view and expose
+    // one merged snapshot (players, enemies, bolts and drops of every zone a bot can see).
+    this.views = new Map();
+    this.merged = null;
     this.events = [];
     this.spacingFailure = null;
     this.snapshotsChecked = 0;
     this.child = null;
     this.stopping = false;
     this.runDir = null;
+  }
+  get snapshot() { return this.merged; }
+  set snapshot(value) { if (value === null) { this.views.clear(); this.merged = null; } else this.merged = value; }
+  merge() {
+    const best = new Map();
+    for (const [bot, view] of this.views) {
+      const identity = this.bots.get(bot);
+      if (!identity || identity.socket?.readyState !== WebSocket.OPEN) continue;
+      const zone = view.players.find(p => p.id === identity.id)?.zone || 0;
+      if (!best.has(zone) || view.tick > best.get(zone).tick) best.set(zone, view);
+    }
+    if (!best.size) return this.merged;
+    const views = [...best.values()], newest = views.reduce((a, b) => b.tick > a.tick ? b : a);
+    const all = key => views.flatMap(v => v[key]);
+    return { ...newest, players: all('players'), slimes: all('slimes'), bolts: all('bolts'), drops: all('drops'),
+      online: Math.max(...views.map(v => v.online)), zonesSeen: [...best.keys()].sort() };
   }
   async start() {
     if (this.child || this.runDir) throw Error('This world has already been started; create a new TestWorld.');
@@ -67,7 +88,9 @@ class TestWorld extends EventEmitter {
     this.snapshot = null;
     const binary = process.env.VALHALLA_BINARY || path.join(root, 'target/debug/valhalla-server');
     const environment = { ...process.env, VALHALLA_BIND: '127.0.0.1:0', VALHALLA_DB: this.db,
-      VALHALLA_CLIENT_DIR: path.join(root, 'client'), RUST_LOG: 'valhalla_server=info' };
+      VALHALLA_CLIENT_DIR: path.join(root, 'client'), RUST_LOG: 'valhalla_server=info',
+      // Test worlds are invulnerable (enemies still fight and enemy levels are still random), so scenarios never fail by dying.
+      VALHALLA_GOD_MODE: process.env.VALHALLA_GOD_MODE ?? '1' };
     // Use the server's normal same-host origin policy for the private port.
     // An empty configured origin rejects real browsers, and an inherited
     // production origin is wrong for a disposable loopback world.
@@ -136,8 +159,11 @@ class TestWorld extends EventEmitter {
     if (snapshot) {
       // A welcome can include a just-joined actor before the next broadcast tick.
       // An older broadcast at that same tick must not erase the new actor.
-      if (!this.snapshot || snapshot.tick > this.snapshot.tick ||
-          (packet.type === 'welcome' && snapshot.tick === this.snapshot.tick)) this.snapshot = snapshot;
+      const earlier = this.views.get(bot);
+      if (!earlier || snapshot.tick > earlier.tick || (packet.type === 'welcome' && snapshot.tick >= earlier.tick)) {
+        this.views.set(bot, snapshot);
+        this.merged = this.merge();
+      }
       this.snapshotsChecked++;
       this.spacingFailure ||= spacingViolation(snapshot);
     } else {

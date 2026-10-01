@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
-const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
+const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
 const client = new Client({ name: 'valhallasc-inventory-ui', version: '1.0.0' });
 let browser, page, started = false, checks = 0;
@@ -14,7 +14,8 @@ async function call(name, args = {}) {
   assert.ok(!result.isError, `${name}: ${JSON.stringify(result.content)}`); return result.structuredContent;
 }
 (async () => {
-  await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe' }));
+  // This suite checks the bag UI around one real kill, not combat difficulty: pin every enemy to its default level.
+  await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe', env: { ...getDefaultEnvironment(), VALHALLA_LEVEL_SPREAD: '0' } }));
   const world = await call('start_world'); started = true;
   browser = await chromium.launch({ headless: true });
   page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
@@ -39,7 +40,9 @@ async function call(name, args = {}) {
   await page.locator('#field-mageArmor').selectOption('apprentice');
   await page.waitForFunction(() => Field.hero.look.mageArmor === 'apprentice');
   await page.locator('#equipment-close').click();
-  const enemy = await page.evaluate(() => Field.slimes.filter(s => !s.dead && s.kind === 'green').sort((a,b) => Math.hypot(a.x-Field.hero.x,a.y-Field.hero.y)-Math.hypot(b.x-Field.hero.x,b.y-Field.hero.y))[0]);
+  // Two green slimes are almost equally near (21.62 and 21.63 units); one stands beside an Ironhide that kills a level-1 mage.
+  // Take the nearest green whose spawn has no Ironhide spawn within 9 units (home points, because the beetles wander) so the kill is the same every run.
+  const enemy = await page.evaluate(() => Field.slimes.filter(s => !s.dead && s.kind === 'green' && !Field.slimes.some(o => o.kind === 'beetle' && Math.hypot(o.hx-s.hx,o.hy-s.hy) < 9)).sort((a,b) => Math.hypot(a.x-Field.hero.x,a.y-Field.hero.y)-Math.hypot(b.x-Field.hero.x,b.y-Field.hero.y))[0]);
   await page.evaluate(id => Online.send({ type: 'target', id }), enemy.id);
   await page.waitForFunction(id => Field.slimes.find(s => s.id === id).dead, enemy.id, { timeout: 30000 });
   await page.evaluate(() => Online.send({ type: 'stop' }));

@@ -6,4 +6,5 @@ const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')
 fs.writeFileSync(path.join(root, 'client/world.js'), "'use strict';\nwindow.WORLD_MAP = " + JSON.stringify(map) + ';\n');
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));
 fs.writeFileSync(path.join(root, 'client/items.js'), "'use strict';\nwindow.WORLD_ITEMS = " + JSON.stringify(items) + ';\n');
-console.log(`Synced ${map.objects.length} obstacles and ${map.slimes.length} spawns. Rebuild Rust after changing the map.`);
+const zones = map.zones || [];
+console.log(`Synced ${map.objects.length} obstacles and ${map.slimes.length} spawns` + zones.map(z => `, plus zone "${z.name}": ${z.objects.length} obstacles and ${z.slimes.length} spawns`).join('') + '. Rebuild Rust after changing the map.');

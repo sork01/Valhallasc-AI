@@ -79,6 +79,7 @@ impl Store {
             equipment: Default::default(),
             bags: vec![],
             attributes: Default::default(),
+            zone: 0,
         };
         c.seed_inventory();
         self.db.execute(
@@ -183,6 +184,23 @@ mod tests {
         .unwrap();
         assert!(s.load(&token).unwrap().unwrap().quests.is_empty());
         assert!(s.load(&token).unwrap().unwrap().equipment.is_empty());
+    }
+    #[test]
+    fn characters_saved_before_zones_resume_in_the_meadow_and_keep_their_zone_after() {
+        let s = Store::open(std::path::Path::new(":memory:")).unwrap();
+        let (mut c, token) = s.create(Look::default(), Point::default()).unwrap();
+        let mut old = serde_json::to_value(&c).unwrap();
+        old.as_object_mut().unwrap().remove("zone");
+        s.db.execute(
+            "UPDATE characters SET state=?1 WHERE id=?2",
+            params![old.to_string(), c.id],
+        )
+        .unwrap();
+        assert_eq!(s.load(&token).unwrap().unwrap().zone, 0);
+        c.zone = 1;
+        let mut s = s;
+        s.save_many(std::iter::once(&c)).unwrap();
+        assert_eq!(s.load(&token).unwrap().unwrap().zone, 1);
     }
     #[test]
     fn unlimited_inventory_migration_preserves_every_item_and_grants_only_needed_bags() {

@@ -406,11 +406,11 @@
     hud.hp.style.width = (s.hp / s.maxHp * 100).toFixed(1) + '%'; hud.hpT.textContent = `${Math.ceil(s.hp)} / ${s.maxHp}`;
     hud.xp.style.width = (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.lv.textContent = ` ${t('lvl')} ${s.level}`;
     hud.gold.textContent = s.gold; hud.kills.textContent = s.kills; $('bag-gold').textContent = `${s.gold} gold`;
-    const inCity = s.area === 'Alderhaven', title = $('area-title');
+    const inCity = s.area === 'Alderhaven', title = $('area-title'), away = s.zone > 0;
     if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); void title.offsetWidth; title.classList.add('show'); }
-    title.querySelector('b').textContent = inCity ? 'Alderhaven · Fountain Square' : t('areaName');
-    title.querySelector('span').textContent = inCity ? 'Sanctuary · shops · townspeople' : '푸른 초원';
-    $('city-travel').hidden = inCity;
+    title.querySelector('b').textContent = away ? s.area : inCity ? 'Alderhaven · Fountain Square' : t('areaName');
+    title.querySelector('span').textContent = away ? (s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : 'Unexplored lands') : inCity ? 'Sanctuary · shops · townspeople' : '푸른 초원';
+    $('city-travel').hidden = inCity || away;
     $('city-travel').textContent = s.traveling ? 'Walking to Alderhaven…' : 'Visit Alderhaven ↓';
   }
   function noiseBurst(dur, f0, f1, vol, q = 1.2, type = 'bandpass') {
@@ -443,6 +443,7 @@
     levelup: () => [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tone([f, f * 2], .4, .07), i * 110)),
     death: () => voice(78, .95, .38),
     respawn: () => tone([392, 587], .5, .06),
+    portal: () => { sweep(180, 720, .5, .09, 'sine'); tone([523, 784, 1047], .5, .05); },
   };
   function onField(name) {
     if (SFX[name]) SFX[name]();

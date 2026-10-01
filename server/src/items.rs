@@ -53,13 +53,21 @@ pub fn material(kind: &str) -> &'static str {
         "yellow" => "golden_gel",
         "beetle" => "ironhide_shell",
         "big" => "royal_jelly",
+        "wisp" => "ember_core",
+        "spider" => "magma_fang",
+        "wraith" => "ash_veil",
+        "golem" => "basalt_heart",
         _ => "slime_gel",
     }
 }
 pub fn equipment_chance(kind: &str) -> f64 {
     match kind {
         "big" => 0.35,
+        "golem" => 0.20,
+        "wraith" => 0.14,
         "beetle" => 0.12,
+        "spider" => 0.10,
+        "wisp" => 0.08,
         "blue" | "pink" | "yellow" => 0.05,
         _ => 0.02,
     }
@@ -384,6 +392,29 @@ mod tests {
         assert_eq!(c.stat_points(), before);
         c.allocate_stat("intellect").unwrap();
         assert_eq!(c.stat_points(), before - 1);
+    }
+    #[test]
+    fn deeper_enemies_drop_gear_more_often_and_each_kind_has_its_own_material() {
+        let chances: Vec<_> = ["green", "beetle", "wisp", "spider", "wraith", "golem"]
+            .iter()
+            .map(|k| equipment_chance(k))
+            .collect();
+        assert!(
+            chances[0] < chances[1]
+                && chances[2] < chances[3]
+                && chances[3] < chances[4]
+                && chances[4] < chances[5]
+        );
+        for (kind, id, sell) in [
+            ("wisp", "ember_core", 28),
+            ("spider", "magma_fang", 36),
+            ("wraith", "ash_veil", 48),
+            ("golem", "basalt_heart", 70),
+        ] {
+            assert_eq!(material(kind), id);
+            let i = item(id).expect("the material exists in the catalog");
+            assert_eq!((i.kind.as_str(), i.sell), ("material", sell));
+        }
     }
     #[test]
     fn loot_rates_and_pool_cover_every_class_and_slot() {

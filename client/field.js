@@ -6,11 +6,16 @@
    Coordinates: world units are tiles (x right-down, y left-down). Screen: sx = (x-y)*TW/2, sy = (x+y)*TH/2.
    API: Field.start({canvas, mini, char, opts, onHud, onEvent}); Field.stop(); Field.setPaused(bool); Field.equip(change). */
 (() => {
-  const TW = 88, TH = 44, MAP = WORLD_MAP.size, CH = 8;          // tile size (px), map size (tiles), chunk size (tiles)
+  const TW = 88, TH = 44, CH = 8;                    // tile size (px), chunk size (tiles)
+  let MAP = WORLD_MAP.size;                           // map size (tiles) of the zone the hero is in
   const VW = 1600, VH = 900;                          // virtual viewport in px; the canvas is scaled to fit
   const SPR = 2;                                      // sprite cache resolution
   const OL = '#1c1428';
-  const SPAWN = WORLD_MAP.spawn;
+  // Zone 0 is Greenmeadow with Alderhaven; the server numbers the rest like WORLD_MAP.zones. Each has its own
+  // size, obstacles, theme (terrain, sky, sprites) and gates. The server decides which zone the hero is in.
+  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, portals: WORLD_MAP.portals || [], paths: null, levels: null },
+    ...(WORLD_MAP.zones || []).map(z => ({ theme: 'ember', paths: null, levels: null, portals: [], ...z }))];
+  let zone = 0, zdef = ZONES[0], SPAWN = WORLD_MAP.spawn;
 
   // ---------- small helpers ----------
   const rngf = seed => () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
@@ -32,17 +37,28 @@
     [[36, 79], [36, 71], [36, 62], [33, 52], [38, 44], [36, 36], [42, 28], [50, 22], [54, 12]],
     [[36, 36], [26, 32], [16, 26], [10, 16]],
   ];
-  const map = { dirt: new Uint8Array(MAP * MAP), tone: new Float32Array(MAP * MAP) };
+  const map = { dirt: new Uint8Array(0), tone: new Float32Array(0) };
   let objects = [];
   function buildMap() {
+    MAP = zdef.size; SPAWN = zdef.spawn;
+    map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
+    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember';
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
       const i = y * MAP + x, cx = x + .5, cy = y + .5;
-      map.tone[i] = vnoise(cx * .16, cy * .16, 1) * .65 + vnoise(cx * .55, cy * .55, 2) * .35;
-      let d = 99; for (const p of PATHS) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
-      d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
+      map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : 2) * .35;
+      let d = 99; for (const p of paths) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
+      if (!ember) d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
       map.dirt[i] = d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0;
     }
-    objects = WORLD_MAP.objects.map(o => ({ ...o }));
+    objects = zdef.objects.map(o => ({ ...o }));
+  }
+  // Switch to another zone: new ground, obstacles and minimap. Everything tied to the old zone's coordinates goes.
+  function setZone(z) {
+    zone = ZONES[z] ? z : 0; zdef = ZONES[zone];
+    buildMap(); chunks.clear();
+    if (mini) buildMini();
+    if (hero) { pendingNpc = null; cityRoute = []; hero.target = null; hero.goal = null; }
+    floaters = []; parts = []; effects = []; bolts = []; drops = []; marker = null; slimes = []; remotePlayers.clear();
   }
 
   // ---------- sprites (drawn once) ----------
@@ -87,7 +103,86 @@
     g.fillStyle = '#6fc07a'; g.beginPath(); g.ellipse(ax - 12, ay - 3, 10, 4, 0, 0, 6.283); g.fill();     // moss
     return { c, ax, ay, w: 90, h: 70 };
   }
-  function buildSprites() { for (let v = 0; v < 4; v++) { sprites.tree[v] = makeTree(v); sprites.bush[v] = makeBush(v); sprites.rock[v] = makeRock(v); } }
+  // Emberfall Crags scenery, drawn once like the meadow's: charred trees, thorn bushes, basalt and obsidian.
+  const emberSprites = { tree: [], bush: [], rock: [], spire: [] };
+  function makeCharTree(v) {
+    const [c, g] = canvasOf(210, 270, SPR), ax = 105, ay = 258, rng = rngf(900 + v * 19);
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    const limb = (x0, y0, x1, y1, w0, w1) => {
+      const n = 12;
+      for (const [col, grow] of [[OL, 5], ['#2a1f24', 0]]) {
+        for (let i = 0; i < n; i++) {
+          const t0 = i / n, t1 = (i + 1) / n, w = lerp(w0, w1, t0) + grow;
+          g.strokeStyle = col; g.lineWidth = w; g.beginPath(); g.moveTo(lerp(x0, x1, t0), lerp(y0, y1, t0)); g.lineTo(lerp(x0, x1, t1), lerp(y0, y1, t1)); g.stroke();
+        }
+      }
+      g.strokeStyle = 'rgba(255,255,255,.12)'; g.lineWidth = Math.max(1.5, w1 * .35); g.beginPath(); g.moveTo(x0 - w0 * .25, y0); g.lineTo(x1 - w1 * .25, y1); g.stroke();
+    };
+    const lean = (v % 2 ? 1 : -1) * (6 + v * 3);
+    limb(ax - 4, ay, ax + lean * .4, ay - 90, 26, 16);
+    limb(ax + lean * .4, ay - 90, ax + lean, ay - 160, 16, 9);
+    const forks = [[-1, 70, 52], [1, 100, 62], [-1, 128, 46], [1, 150, 40]];
+    forks.forEach(([side, h, len], i) => {
+      const bx = ax + lean * (h / 160) * .9, by = ay - h, ex = bx + side * (len + rng() * 14), ey = by - 30 - rng() * 28;
+      limb(bx, by, ex, ey, 9, 3.5);
+      if (i % 2 === 0) limb(ex, ey, ex + side * (14 + rng() * 10), ey - 22, 3.5, 1.8);
+    });
+    limb(ax + lean, ay - 160, ax + lean + 10 + rng() * 8, ay - 200, 9, 3);
+    // glowing scorch marks and drifting embers
+    g.shadowColor = '#ff7a22'; g.shadowBlur = 8;
+    g.strokeStyle = '#ff8a2e'; g.lineWidth = 2.2;
+    for (let i = 0; i < 4; i++) { const y = ay - 20 - i * 24 - rng() * 8; g.beginPath(); g.moveTo(ax - 7 + lean * (ay - y) / 400, y); g.lineTo(ax - 2 + lean * (ay - y) / 400, y - 7); g.lineTo(ax + 4 + lean * (ay - y) / 400, y - 3); g.stroke(); }
+    g.shadowBlur = 0; g.fillStyle = '#ffb347';
+    for (let i = 0; i < 6; i++) { g.beginPath(); g.arc(ax + (rng() - .5) * 90, ay - 80 - rng() * 140, 1.6 + rng() * 1.2, 0, 6.283); g.fill(); }
+    g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(ax, ay - 2, 30, 8, 0, 0, 6.283); g.fill();
+    return { c, ax, ay, w: 210, h: 270 };
+  }
+  function makeEmberBush(v) {
+    const [c, g] = canvasOf(120, 100, SPR), ax = 60, ay = 84, rng = rngf(1300 + v * 7);
+    g.lineCap = 'round';
+    for (let i = 0; i < 9; i++) {
+      const a = -Math.PI / 2 + (i - 4) * .3 + (rng() - .5) * .2, len = 30 + rng() * 22, ex = ax + Math.cos(a) * len, ey = ay - 6 + Math.sin(a) * len * .8;
+      g.strokeStyle = OL; g.lineWidth = 6; g.beginPath(); g.moveTo(ax + (i - 4) * 3, ay); g.quadraticCurveTo(ax + Math.cos(a) * len * .4, ay - len * .5, ex, ey); g.stroke();
+      g.strokeStyle = i % 2 ? '#3a2a30' : '#52383a'; g.lineWidth = 3; g.beginPath(); g.moveTo(ax + (i - 4) * 3, ay); g.quadraticCurveTo(ax + Math.cos(a) * len * .4, ay - len * .5, ex, ey); g.stroke();
+    }
+    g.shadowColor = '#ff7a22'; g.shadowBlur = 8; g.fillStyle = '#ff9a3a'; g.strokeStyle = OL; g.lineWidth = 1.6;
+    for (let i = 0; i < 6; i++) { const a = rng() * 6.283, d = 8 + rng() * 28; g.beginPath(); g.arc(ax + Math.cos(a) * d, ay - 22 + Math.sin(a) * d * .5, 3.4, 0, 6.283); g.fill(); g.stroke(); }
+    g.shadowBlur = 0;
+    return { c, ax, ay, w: 120, h: 100 };
+  }
+  function makeBasalt(v) {
+    const [c, g] = canvasOf(90, 70, SPR), ax = 45, ay = 58, rng = rngf(1700 + v * 13), s = 1 + v * .12;
+    const pts = [[-30, 0], [-34, -14], [-18, -34], [6, -40], [28, -26], [34, -8], [26, 0]].map(([x, y]) => [ax + x * s * (.9 + rng() * .2), ay + y * s * (.9 + rng() * .2)]);
+    g.lineJoin = 'round'; g.strokeStyle = OL; g.lineWidth = 4; g.fillStyle = '#4a4650';
+    g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#6a6672'; g.beginPath(); g.moveTo(pts[1][0] + 3, pts[1][1] + 2); g.lineTo(pts[2][0], pts[2][1] + 2); g.lineTo(pts[3][0], pts[3][1] + 2); g.lineTo(ax, ay - 20); g.closePath(); g.fill();
+    g.fillStyle = '#2f2c35'; g.beginPath(); g.moveTo(pts[4][0], pts[4][1]); g.lineTo(pts[5][0], pts[5][1]); g.lineTo(pts[6][0], pts[6][1]); g.lineTo(ax + 6, ay - 4); g.closePath(); g.fill();
+    g.shadowColor = '#ff7a22'; g.shadowBlur = 6; g.strokeStyle = '#ff8a2e'; g.lineWidth = 2; g.beginPath(); g.moveTo(ax - 14, ay - 28); g.lineTo(ax - 6, ay - 16); g.lineTo(ax - 10, ay - 6); g.moveTo(ax + 10, ay - 22); g.lineTo(ax + 16, ay - 10); g.stroke(); g.shadowBlur = 0;
+    return { c, ax, ay, w: 90, h: 70 };
+  }
+  function makeSpire(v) {
+    const [c, g] = canvasOf(110, 190, SPR), ax = 55, ay = 176, rng = rngf(2100 + v * 17);
+    g.lineJoin = 'round';
+    const shard = (x, w, h, lean, shade) => {
+      const top = [x + lean, ay - h];
+      for (const [dir, col] of [[-1, shade[0]], [1, shade[1]]]) {
+        g.fillStyle = col; g.strokeStyle = OL; g.lineWidth = 3.4; g.beginPath(); g.moveTo(x + dir * w, ay); g.lineTo(x + dir * w * .8, ay - h * .55); g.lineTo(top[0], top[1]); g.lineTo(x, ay - h * .5); g.lineTo(x, ay); g.closePath(); g.fill(); g.stroke();
+      }
+      g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 2; g.beginPath(); g.moveTo(x - w * .55, ay - 6); g.lineTo(top[0] - 1, top[1] + 8); g.stroke();
+    };
+    const dark = ['#2a2036', '#18101f'], mid = ['#3b2d4b', '#241a31'];
+    shard(ax - 22, 15, 80 + v * 6, -6, mid); shard(ax + 22, 14, 70, 8, mid); shard(ax, 24, 140 + v * 9, 4 + (v % 2 ? 6 : -6), dark);
+    g.shadowColor = '#ff7a22'; g.shadowBlur = 10; g.strokeStyle = '#ff8a2e'; g.lineWidth = 2.2; g.beginPath(); g.moveTo(ax - 6, ay - 4); g.lineTo(ax - 2, ay - 26); g.lineTo(ax - 8, ay - 44); g.stroke(); g.shadowBlur = 0;
+    g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(ax, ay - 1, 30, 8, 0, 0, 6.283); g.fill();
+    return { c, ax, ay, w: 110, h: 190 };
+  }
+  function buildSprites() {
+    for (let v = 0; v < 4; v++) {
+      sprites.tree[v] = makeTree(v); sprites.bush[v] = makeBush(v); sprites.rock[v] = makeRock(v);
+      emberSprites.tree[v] = makeCharTree(v); emberSprites.bush[v] = makeEmberBush(v); emberSprites.rock[v] = makeBasalt(v); emberSprites.spire[v] = makeSpire(v);
+    }
+  }
+  const spriteSet = () => zdef.theme === 'ember' ? emberSprites : sprites;
 
   // ---------- ground chunks ----------
   const chunks = new Map(); let chunkScale = 1;
@@ -95,14 +190,23 @@
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
   function renderChunk(cx, cy) {
     const G = chunkGeom(cx, cy), [c, g] = canvasOf(G.w, G.h, chunkScale);
+    const ember = zdef.theme === 'ember';
     for (let ty = 0; ty < CH; ty++) for (let tx = 0; tx < CH; tx++) {
       const x = G.x0 + tx, y = G.y0 + ty; if (x >= MAP || y >= MAP) continue;
       const i = y * MAP + x, px = (x - y) * TW / 2 - G.ox, py = (x + y) * TH / 2 - G.oy, tone = map.tone[i], dirt = map.dirt[i];
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
-      g.fillStyle = dirt ? `hsl(${30 + tone * 8}, ${38 + tone * 8}%, ${48 + tone * 8 + alt}%)` : `hsl(${100 + tone * 16}, ${46 + tone * 12}%, ${36 + tone * 12 + alt}%)`;
+      g.fillStyle = ember ? (dirt ? `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)` : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`)
+        : dirt ? `hsl(${30 + tone * 8}, ${38 + tone * 8}%, ${48 + tone * 8 + alt}%)` : `hsl(${100 + tone * 16}, ${46 + tone * 12}%, ${36 + tone * 12 + alt}%)`;
       g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill();
       const r = rngf(x * 977 + y * 131 + 7), inTile = () => { const a = r() - .5, b = r() - .5; return [px + (a - b) * TW * .4, py + TH / 2 + (a + b) * TH * .4]; };
-      if (dirt) {
+      if (ember) {
+        for (let k = 0; k < 3; k++) { const [qx, qy] = inTile(); g.fillStyle = r() < .6 ? 'rgba(0,0,0,.28)' : 'rgba(200,170,150,.16)'; g.beginPath(); g.ellipse(qx, qy, 1.5 + r() * 3, 1 + r() * 1.4, 0, 0, 6.283); g.fill(); }
+        if (!dirt && r() < .09) {                                                     // a glowing crack in the basalt
+          const [qx, qy] = inTile(), a = r() * 6.283, l = 8 + r() * 9;
+          g.strokeStyle = 'rgba(255,110,30,.75)'; g.lineWidth = 1.8; g.lineCap = 'round'; g.beginPath(); g.moveTo(qx, qy); g.lineTo(qx + Math.cos(a) * l, qy + Math.sin(a) * l * .5); g.lineTo(qx + Math.cos(a + .8) * l * 1.5, qy + Math.sin(a + .8) * l * .75); g.stroke();
+          g.strokeStyle = 'rgba(255,210,100,.6)'; g.lineWidth = .8; g.beginPath(); g.moveTo(qx, qy); g.lineTo(qx + Math.cos(a) * l, qy + Math.sin(a) * l * .5); g.stroke();
+        } else if (r() < .05) { const [qx, qy] = inTile(); g.fillStyle = '#3a363f'; g.strokeStyle = OL; g.lineWidth = 1.4; g.beginPath(); g.ellipse(qx, qy - 2, 4, 3, 0, 0, 6.283); g.fill(); g.stroke(); }
+      } else if (dirt) {
         for (let k = 0; k < 3; k++) { const [qx, qy] = inTile(); g.fillStyle = r() < .5 ? 'rgba(120,80,40,.35)' : 'rgba(255,225,170,.28)'; g.beginPath(); g.ellipse(qx, qy, 2 + r() * 3, 1.2 + r() * 1.5, 0, 0, 6.283); g.fill(); }
       } else {
         g.lineCap = 'round';
@@ -119,15 +223,18 @@
           g.fillStyle = '#f5b82e'; g.beginPath(); g.arc(qx, qy - 6, 1.6, 0, 6.283); g.fill();
         } else if (r() < .015) { const [qx, qy] = inTile(); g.fillStyle = '#fff'; g.beginPath(); g.ellipse(qx, qy - 3, 3, 3.6, 0, 0, 6.283); g.fill(); g.fillStyle = '#e8484e'; g.beginPath(); g.ellipse(qx, qy - 5, 5, 3.4, 0, Math.PI, 0); g.fill(); }
       }
-      City.stoneTile(g, px, py, x, y);
+      if (zone === 0) City.stoneTile(g, px, py, x, y);
       // earth cliff on the two front edges of the island
       const depth = CLIFF - 34 + hash2(x, y, 9) * 26;
       const face = (dir) => {
         const vx = px + dir * TW / 2, vy = py + TH / 2, bx = px, by = py + TH;
-        const gr = g.createLinearGradient(0, vy, 0, vy + depth); gr.addColorStop(0, dir > 0 ? '#7a5433' : '#684528'); gr.addColorStop(1, dir > 0 ? '#3d2a1c' : '#33221a');
+        const gr = g.createLinearGradient(0, vy, 0, vy + depth);
+        if (ember) { gr.addColorStop(0, dir > 0 ? '#4a3430' : '#3c2a28'); gr.addColorStop(1, dir > 0 ? '#1e1416' : '#181012'); }
+        else { gr.addColorStop(0, dir > 0 ? '#7a5433' : '#684528'); gr.addColorStop(1, dir > 0 ? '#3d2a1c' : '#33221a'); }
         g.fillStyle = gr; g.beginPath(); g.moveTo(vx, vy); g.lineTo(bx, by); g.lineTo(bx, by + depth * (.85 + hash2(x + 3, y, 4) * .3)); g.lineTo(vx, vy + depth); g.closePath(); g.fill();
         g.strokeStyle = 'rgba(0,0,0,.18)'; g.lineWidth = 2; for (let k = 1; k < 4; k++) { g.beginPath(); g.moveTo(vx, vy + depth * k / 4); g.lineTo(bx, by + depth * k / 4 * .9); g.stroke(); }
-        g.strokeStyle = '#3f8a3c'; g.lineWidth = 5; g.beginPath(); g.moveTo(vx, vy + 1); g.lineTo(bx, by + 1); g.stroke();
+        g.strokeStyle = ember ? '#8a3a1c' : '#3f8a3c'; g.lineWidth = 5; g.beginPath(); g.moveTo(vx, vy + 1); g.lineTo(bx, by + 1); g.stroke();
+        if (ember) { g.strokeStyle = 'rgba(255,120,40,.55)'; g.lineWidth = 2; g.beginPath(); g.moveTo(vx, vy + 3); g.lineTo(bx, by + 3); g.stroke(); }
         g.strokeStyle = OL; g.lineWidth = 2; g.beginPath(); g.moveTo(vx, vy + depth); g.lineTo(bx, by + depth * .9); g.stroke();
       };
       if (x === MAP - 1) face(1);
@@ -163,14 +270,23 @@
     return { attack: extras.reduce((sum, i) => sum + (i.attack || 0), 0) + (isAssassin() ? 18 : isMage() ? 20 : 22) + hero.level * 4 + (item('weapon', gear.weapon)?.attack || 0), defense: extras.reduce((sum, i) => sum + (i.defense || 0), 0) + (item('armor', gear.armor)?.defense || 0) };
   };
 
+  // Looks only: the server owns health, damage, speed, XP and level. `scale` is the drawn size, `top` the sprite
+  // height above the feet in sprite pixels (where the health bar sits).
   const SLIME = {
-    green: { hp: 60, dmg: 8, speed: 1.9, scale: 1, xp: 12, col: ['#a4f59a', '#4fd25f', '#1f8a3c'] },
-    blue: { hp: 80, dmg: 10, speed: 2.4, scale: 1.05, xp: 16, col: ['#a8e4ff', '#4aa8ff', '#2160b8'] },
-    pink: { hp: 70, dmg: 9, speed: 2.1, scale: 1, xp: 15, col: ['#ffc4e6', '#ff7bbd', '#c23f86'] },
-    yellow: { hp: 90, dmg: 11, speed: 2.2, scale: 1.05, xp: 20, col: ['#fff2a0', '#ffd23f', '#c98a10'] },
+    green: { name: 'Green Slime', hp: 60, dmg: 8, speed: 1.9, scale: 1, xp: 12, col: ['#a4f59a', '#4fd25f', '#1f8a3c'] },
+    blue: { name: 'Blue Slime', hp: 80, dmg: 10, speed: 2.4, scale: 1.05, xp: 16, col: ['#a8e4ff', '#4aa8ff', '#2160b8'] },
+    pink: { name: 'Pink Slime', hp: 70, dmg: 9, speed: 2.1, scale: 1, xp: 15, col: ['#ffc4e6', '#ff7bbd', '#c23f86'] },
+    yellow: { name: 'Golden Slime', hp: 90, dmg: 11, speed: 2.2, scale: 1.05, xp: 20, col: ['#fff2a0', '#ffd23f', '#c98a10'] },
     big: { name: 'King Slime', hp: 600, dmg: 30, speed: 2.2, scale: 1.75, xp: 75, col: ['#c8b5ff', '#8f6bff', '#4a2fb0'] },
     beetle: { name: 'Ironhide Beetle', hp: 240, dmg: 22, speed: 2.8, scale: 1.3, xp: 32, col: ['#8aafbf', '#58758a', '#324658'] },
+    wisp: { name: 'Cinder Wisp', scale: .95, top: 66, col: ['#fff4b8', '#ee6a1c', '#b8331f'] },
+    spider: { name: 'Magma Spider', scale: 1.05, top: 66, col: ['#7d6f80', '#3d3544', '#27222d'] },
+    wraith: { name: 'Ash Wraith', scale: 1, top: 88, col: ['#746b8e', '#383250', '#15121d'] },
+    golem: { name: 'Basalt Golem', scale: 1.2, top: 86, col: ['#9a939a', '#544f58', '#24212a'] },
   };
+  const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem'];
+  // Colour a level label by how it compares with the hero: grey, normal, orange, red.
+  const levelColor = level => { const d = level - (hero?.level || 1); return d >= 5 ? '#ff6b6b' : d >= 3 ? '#ffa65a' : d <= -5 ? '#9fb0a0' : '#fff4ca'; };
   function newHero() {
     return { x: SPAWN.x, y: SPAWN.y, r: .3, hp: 120, maxHp: 120, level: 1, xp: 0, gold: 0, kills: 0, fx: 1, fy: 1, moving: false, walk: 0, atkT: 0, atkCd: 0, atkHit: false, hurtT: 0, lastHurt: -99, dead: false, deadT: 0, target: null, goal: null, vx: 0, vy: 0, roar: 0, dashT: 0, dashCd: 0, dashX: 0, dashY: 0, dashTrail: 0 };
   }
@@ -183,7 +299,7 @@
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
   }
-  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: hero.xpNeed ?? xpNeed(hero.level), level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', traveling: cityRoute.length > 0 && !pendingNpc }); }
+  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: hero.xpNeed ?? xpNeed(hero.level), level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, levels: zdef.levels, traveling: cityRoute.length > 0 && !pendingNpc }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -197,7 +313,7 @@
   function onKeyDown(e) {
     if (e.defaultPrevented || !running || paused || !Online.connected || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '')) return;
     const k = e.key.toLowerCase();
-    if (k === 'f' && !e.repeat && !hero.dead) {
+    if (k === 'f' && !e.repeat && !hero.dead && zone === 0) {
       e.preventDefault(); const npc = City.npcs.filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
       if (npc) talkTo(npc); return;
     }
@@ -215,7 +331,7 @@
     if (!running || paused || !Online.connected || hero.dead) return;
     pendingNpc = null; cityRoute = [];
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
-    const npc = City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-105 && my<y+12; });
+    const npc = zone === 0 && City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-105 && my<y+12; });
     if (npc) { talkTo(npc); return; }
     pointer.down = true; cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
     const [wx, wy] = pointerWorld(e); pointer.x = wx; pointer.y = wy;
@@ -308,14 +424,18 @@
   }
   function applySnapshot(packet, initial = false) {
     const own = packet.players.find(p => p.id === Online.id); if (!own) return;
+    // The server decides the zone (a gate moved us); rebuild the ground and snap everything to the new place.
+    const moved = (own.zone || 0) !== zone;
+    if (moved) setZone(own.zone || 0);
+    const inZone = a => (a.zone || 0) === zone;
     const selectedTarget = hero.target?.id;
     const wasDead = hero.dead;
-    applyActor(hero, own, initial);
+    applyActor(hero, own, initial || moved);
     window.Attributes?.update(own);
     window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || []);
     window.Quests?.update(own.quests || []);
     if (wasDead !== hero.dead) say(hero.dead ? 'death' : 'respawn');
-    if (initial) { cam.x = hero.x; cam.y = hero.y; }
+    if (initial || moved) { cam.x = hero.x; cam.y = hero.y; }
     const signature = JSON.stringify(own.look);
     if (signature !== lastLook) {
       lastLook = signature; onCharacter(own.look);
@@ -326,18 +446,18 @@
       }).catch(() => say('spriteError'));
     }
     const existing = new Map(slimes.map(s => [s.id, s]));
-    slimes = packet.slimes.map(data => {
-      const actor = existing.get(data.id) || { ...data }; applyActor(actor, data, initial);
+    slimes = packet.slimes.filter(inZone).map(data => {
+      const actor = existing.get(data.id) || { ...data }; applyActor(actor, data, initial || moved);
       actor.d = SLIME[data.kind]; return actor;
     });
     hero.target = selectedTarget == null ? null : slimes.find(s => s.id === selectedTarget && !s.dead) || null;
     const present = new Set();
     for (const player of packet.players) {
-      if (player.id === Online.id) continue;
+      if (player.id === Online.id || !inZone(player)) continue;
       present.add(player.id);
       let remote = remotePlayers.get(player.id);
       if (!remote) { remote = { ...player, sprite: null, signature: '' }; remotePlayers.set(player.id, remote); }
-      applyActor(remote, player, initial);
+      applyActor(remote, player, initial || moved);
       const lookKey = JSON.stringify(player.look);
       if (remote.signature !== lookKey) {
         remote.signature = lookKey; const generation = spriteGeneration;
@@ -348,8 +468,8 @@
       }
     }
     for (const id of remotePlayers.keys()) if (!present.has(id)) remotePlayers.delete(id);
-    bolts = packet.bolts.map(b => ({ ...b, col: b.color }));
-    drops = packet.drops;
+    bolts = packet.bolts.filter(inZone).map(b => ({ ...b, col: b.color }));
+    drops = packet.drops.filter(inZone);
     emitHud();
   }
   function networkEvent(event) {
@@ -362,6 +482,7 @@
     if (event.kind === 'miss' || event.kind === 'dodge') floater(event.x, event.y, event.kind === 'miss' ? 'Miss' : 'Dodge', '#e5e5d2', false);
     if (event.kind === 'itemPickup') { floater(event.x, event.y, `+${event.quantity} ${event.name}`, '#64b5ff', false); if(event.actor === Online.id) say('pickup'); }
     if (event.kind === 'pickup') floater(event.x, event.y, '+' + event.value + ' gold', '#ffe066', false);
+    if (event.kind === 'portal') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); burst(event.x, event.y, 20, 14, ['#ffd9a0', '#ff8a3a', '#7ae8c8']); }
     if (event.kind === 'levelup') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); floater(event.x, event.y, 'Level up!', '#ffe066', true); }
     if (event.kind === 'swing') {
       const actor = event.actor === Online.id ? hero : remotePlayers.get(event.actor);
@@ -512,8 +633,8 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let slimeSrc = null, beetleSrc = null;                    // {meta, img: {kind: Image}}
-  const enemySource = s => s.kind === 'beetle' ? beetleSrc : slimeSrc;
+  let slimeSrc = null, beetleSrc = null, cragSrc = null;    // {meta, img: {kind: Image}}
+  const enemySource = s => s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : slimeSrc;
   const SLIME_K = 2.1, DIE_SHOW = 1.7;                      // sprite pixel -> screen px; seconds a dead slime stays on screen
   function loadSlimeSprites(cfg) {
     if (slimeSrc) return;
@@ -526,6 +647,13 @@
       const img = new Image(); img.onload = () => resolve({ meta, img: { beetle: img } });
       img.onerror = reject; img.src = 'assets/ironhide.png';
     })).then(src => { beetleSrc = src; }).catch(() => { beetleSrc = null; });
+  }
+  // Emberfall Crags monsters: one atlas per kind (assets/crags_<kind>.png, scripts/make_crag_sprites.py), the
+  // same five clips and frame meanings as the Ironhide Beetle.
+  function loadCragSprites() {
+    if (cragSrc) return;
+    fetch('assets/crags.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/crags_${k}.png`; })))
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); cragSrc = { meta, img }; })).catch(() => { cragSrc = null; });
   }
   function slimeFrame(s, t) {                               // -> [clip, frame index]; priority: dying, hurt, attack, airborne/landing, idle
     const C = enemySource(s).meta.clips;
@@ -631,7 +759,25 @@
   }
 
   // ---------- render ----------
+  function drawSkyEmber(g, t) {
+    const gr = g.createLinearGradient(0, 0, 0, VH); gr.addColorStop(0, '#150b12'); gr.addColorStop(.55, '#3a1514'); gr.addColorStop(1, '#8a3414');
+    g.fillStyle = gr; g.fillRect(0, 0, VW, VH);
+    const [cx, cy] = camS();
+    for (let i = 0; i < 12; i++) {                       // dark smoke banks drifting below the cliffs
+      const px = ((i * 397 + t * (4 + (i % 4) * 2) - cx * .2) % (VW + 500) + VW + 500) % (VW + 500) - 250, py = (i * 211 % VH) - cy * .1 * ((i % 3) + 1) * .3 + 110 * ((i % 3) - 1) + 500, sc = .9 + (i % 4) * .35;
+      g.fillStyle = 'rgba(20,10,14,.55)';
+      g.beginPath(); g.ellipse(px, py, 150 * sc, 30 * sc, 0, 0, 6.283); g.ellipse(px - 80 * sc, py + 8 * sc, 90 * sc, 24 * sc, 0, 0, 6.283); g.ellipse(px + 84 * sc, py + 10 * sc, 100 * sc, 24 * sc, 0, 0, 6.283); g.fill();
+      g.fillStyle = 'rgba(255,100,30,.10)'; g.beginPath(); g.ellipse(px, py + 20 * sc, 140 * sc, 10 * sc, 0, 0, 6.283); g.fill();
+    }
+    g.fillStyle = '#ffb347';
+    for (let i = 0; i < 34; i++) {                       // embers rising on the heat
+      const x = (i * 83.7 + Math.sin(t * .6 + i) * 24) % VW, y = VH - ((t * (16 + (i % 7) * 7) + i * 131) % VH);
+      g.globalAlpha = .25 + .5 * ((i * 37) % 10) / 10 * Math.min(1, y / 200); g.fillRect(x, y, 2 + (i % 3), 2 + (i % 3));
+    }
+    g.globalAlpha = 1;
+  }
   function drawSky(g, t) {
+    if (zdef.theme === 'ember') return drawSkyEmber(g, t);
     const gr = g.createLinearGradient(0, 0, 0, VH); gr.addColorStop(0, '#5aa0e8'); gr.addColorStop(.6, '#9fd0f5'); gr.addColorStop(1, '#d4ecff');
     g.fillStyle = gr; g.fillRect(0, 0, VW, VH);
     g.fillStyle = 'rgba(255,255,255,.55)';
@@ -648,6 +794,56 @@
     for (let cy = clamp(Math.floor(y0 / CH), 0, n - 1); cy <= clamp(Math.floor(y1 / CH), 0, n - 1); cy++) for (let cx = clamp(Math.floor(x0 / CH), 0, n - 1); cx <= clamp(Math.floor(x1 / CH), 0, n - 1); cx++) out.push([cx, cy]);
     return out.sort((a, b) => (a[0] + a[1]) - (b[0] + b[1]));
   }
+  // Lava rivers are ground decals: a crust, a moving glow, then a hot core. They are also obstacles (kind 'lava').
+  function drawLava(g, t) {
+    const rows = [];
+    for (const o of objects) if (o.kind === 'lava') { const [sx, sy] = w2s(o.x, o.y); if (sx > -140 && sx < VW + 140 && sy > -90 && sy < VH + 90) rows.push([o, sx, sy]); }
+    const ex = o => o.r * TW * .7071, ey = o => o.r * TH * .7071;
+    // Whole-river passes, widest first, so overlapping discs merge into one channel instead of separate beads.
+    const pass = (grow, fill) => { for (const [o, sx, sy] of rows) { g.fillStyle = typeof fill === 'function' ? fill(o) : fill; g.beginPath(); g.ellipse(sx, sy + (grow < 0 ? 1 : 0), ex(o) * grow, ey(o) * grow, 0, 0, 6.283); g.fill(); } };
+    const glow = o => .5 + .5 * Math.sin(t * 1.4 + o.x * .55 + o.y * .4);
+    pass(1.3, '#2a1214');
+    pass(1.08, '#7d1f12');
+    pass(.9, o => `hsl(${10 + glow(o) * 10}, 100%, ${40 + glow(o) * 8}%)`);
+    pass(.68, o => `hsl(${22 + glow(o) * 12}, 100%, ${50 + glow(o) * 8}%)`);
+    pass(.42, o => `hsl(${38 + glow(o) * 10}, 100%, ${60 + glow(o) * 10}%)`);
+    for (const [o, sx, sy] of rows) {                            // bubbles rising off the surface
+      const b = (t * .5 + o.x * .37 + o.y * .21) % 1;
+      if (b < .5) { g.fillStyle = `rgba(255,236,160,${.8 - b * 1.4})`; g.beginPath(); g.arc(sx + Math.sin(o.x * 5) * ex(o) * .4, sy - b * 28, 2.2 + b * 3, 0, 6.283); g.fill(); }
+    }
+  }
+  // A gate: two stone posts, a lintel and a swirling plane between them. The server owns the actual move.
+  function drawPortal(g, p, sx, sy, t) {
+    const dest = ZONES[p.to] || ZONES[0], warm = dest.theme === 'ember';
+    const hue = warm ? 18 : 165, half = 1.5;
+    const post = (u) => {                                    // an iso column centred u world units along x
+      const px = sx + u * TW / 2, py = sy + u * TH / 2, w = 17, h = 112;
+      g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(px, py + 2, 30, 11, 0, 0, 6.283); g.fill();
+      g.lineJoin = 'round'; g.lineWidth = 3; g.strokeStyle = OL;
+      g.fillStyle = warm ? '#4a3b44' : '#8a8f9c'; g.beginPath(); g.moveTo(px - w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = warm ? '#30262f' : '#6a6f7c'; g.beginPath(); g.moveTo(px + w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = warm ? '#6a5663' : '#b9bdc8'; g.beginPath(); g.moveTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.lineTo(px, py - 16 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
+      g.shadowColor = `hsl(${hue}, 100%, 60%)`; g.shadowBlur = 10; g.strokeStyle = `hsl(${hue + 12}, 100%, ${60 + 10 * Math.sin(t * 3 + u)}%)`; g.lineWidth = 2.4;
+      g.beginPath(); g.moveTo(px - 8, py - 30); g.lineTo(px - 8, py - 62); g.lineTo(px - 3, py - 74); g.moveTo(px + 8, py - 30); g.lineTo(px + 8, py - 54); g.stroke(); g.shadowBlur = 0;
+    };
+    post(-half);
+    // the plane: x runs along the gate, z is height; screen = (u*TW/2, u*TH/2 - z)
+    g.save(); g.transform(TW / 2, TH / 2, 0, -1, sx, sy);
+    const grd = g.createRadialGradient(0, 56, 4, 0, 56, 62);
+    grd.addColorStop(0, `hsla(${hue + 30}, 100%, 88%, .95)`); grd.addColorStop(.5, `hsla(${hue}, 100%, 55%, .85)`); grd.addColorStop(1, `hsla(${hue - 10}, 90%, 30%, .55)`);
+    g.fillStyle = grd; g.beginPath(); g.ellipse(0, 56, half - .2, 56, 0, 0, 6.283); g.fill();
+    g.lineCap = 'round';
+    for (let i = 0; i < 4; i++) {                              // swirling rings
+      const a = t * (1.3 + i * .25) + i * 1.7;
+      g.strokeStyle = `hsla(${hue + 20 + i * 10}, 100%, ${72 + i * 6}%, ${.65 - i * .1})`; g.lineWidth = .06;
+      g.beginPath(); g.ellipse(0, 56, (half - .2) * (.25 + i * .22), 56 * (.25 + i * .22), 0, a, a + 3.6); g.stroke();
+    }
+    g.restore();
+    post(half);
+    g.save(); g.shadowColor = `hsl(${hue}, 100%, 60%)`; g.shadowBlur = 8; g.font = '15px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = OL; g.fillStyle = `hsl(${hue + 20}, 100%, 85%)`;
+    const label = dest.levels ? `${dest.name} · Lv ${dest.levels[0]}–${dest.levels[1]}` : dest.name;
+    g.strokeText(label, sx, sy - 142); g.fillText(label, sx, sy - 142); g.restore();
+  }
   function shadow(g, x, y, rx, ry, a = .28) { const [sx, sy] = w2s(x, y); g.fillStyle = `rgba(20,30,10,${a})`; g.beginPath(); g.ellipse(sx, sy, rx, ry, 0, 0, 6.283); g.fill(); }
   function draw(t) {
     const g = ctx, k = dpr * zoom; g.setTransform(k, 0, 0, k, 0, 0);
@@ -662,15 +858,22 @@
       g.drawImage(getChunk(chx, chy).c, dx, dy, G.w, G.h);
     }
     g.imageSmoothingEnabled = true;
-    City.drawPlaza(g, w2s);
+    if (zone === 0) City.drawPlaza(g, w2s);
+    if (zdef.theme === 'ember') drawLava(g, t);
     // ground decals: splats, target marker, slash, shadows
     for (const e of effects) if (e.kind === 'splat') { const [sx, sy] = w2s(e.x, e.y), a = clamp(1 - (e.t - 3) / 3, 0, 1) * .5; g.fillStyle = e.col; g.globalAlpha = a; g.beginPath(); g.ellipse(sx, sy, 26 * e.s, 12 * e.s, 0, 0, 6.283); g.fill(); g.globalAlpha = 1; }
     if (marker) { const [sx, sy] = w2s(marker.x, marker.y), p = (marker.t * 2) % 1; g.strokeStyle = `rgba(255,236,150,${1 - p * .6})`; g.lineWidth = 3; g.beginPath(); g.ellipse(sx, sy, 10 + p * 12, 5 + p * 6, 0, 0, 6.283); g.stroke(); }
     // build the depth-sorted list of everything standing on the ground
     const list = [], onScreen = (sx, sy, m) => sx > -m && sx < VW + m && sy > -m * 1.6 && sy < VH + m * 1.6;
-    for (const o of objects) { const [sx, sy] = w2s(o.x, o.y); if (onScreen(sx, sy, 200)) { list.push({ d: o.x + o.y, o, sx, sy }); if (o.kind === 'tree') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else shadow(g, o.x, o.y, 26, 9, .25); } }
-    for (const n of City.npcs) { const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
-    for (const s of slimes) if (!s.dead || (slimeSrc && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, 100)) { shadow(g, s.x, s.y, 28 * s.d.scale * (1 - s.hop * .12), 11 * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
+    const set = spriteSet();
+    for (const o of objects) {
+      if (o.kind === 'lava' || o.kind === 'post') continue;
+      const [sx, sy] = w2s(o.x, o.y);
+      if (onScreen(sx, sy, 200)) { list.push({ d: o.x + o.y, o, sx, sy }); if (o.kind === 'tree') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind]) shadow(g, o.x, o.y, 26, 9, .25); }
+    }
+    for (const portal of zdef.portals) { const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y, portal, sx, sy }); }
+    if (zone === 0) for (const n of City.npcs) { const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
+    for (const s of slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, 100)) { shadow(g, s.x, s.y, 28 * s.d.scale * (1 - s.hop * .12), 11 * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 60)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
     { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, .32); list.push({ d: hero.x + hero.y + .001, hero, sx, sy }); }
     for (const remote of remotePlayers.values()) {
@@ -682,25 +885,27 @@
     for (const it of list) {
       if (it.o) {
         const o = it.o;
-        if (!sprites[o.kind]) {
+        if (!set[o.kind]) {
           const cover=['house','chapel','gate'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
           City.drawObject(g,o,it.sx,it.sy,cover ? .5 : 1);
           if(o.kind==='fountain') { for(let i=0;i<7;i++){const phase=(t*.7+i*.17)%1;g.globalAlpha=Math.sin(phase*Math.PI)*.7;g.fillStyle='#e0ffff';g.beginPath();g.ellipse(it.sx+Math.sin(i*4)*45,it.sy-9-phase*24,2,3,0,0,Math.PI*2);g.fill();}g.globalAlpha=1;}
           continue;
         }
-        const spr = sprites[o.kind][o.v % 4];
+        const spr = set[o.kind][o.v % 4];
         // trees in front of the hero fade so he never disappears behind a canopy
         const cover = o.kind === 'tree' && it.d > hd && Math.abs(it.sx - hsx) < 80 && it.sy - 190 < hsy && it.sy > hsy - 20;
         if (cover) g.globalAlpha = .45;
         g.drawImage(spr.c, it.sx - spr.ax, it.sy - spr.ay + (o.kind === 'rock' ? 4 : 0), spr.w, spr.h); g.globalAlpha = 1;
+      } else if (it.portal) { drawPortal(g, it.portal, it.sx, it.sy, t);
       } else if (it.npc) { City.drawNpc(g,it.npc,it.sx,it.sy,t,Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8);
       } else if (it.s) {
         const s = it.s, src = enemySource(s); g.save(); g.translate(it.sx, it.sy); if (src) drawSlimeSprite(g, s, t); else drawSlime(g, s, t);
-        const barY = src ? -(s.kind === 'big' ? 36 : s.kind === 'beetle' ? 40 : 28) * SLIME_K * s.d.scale : -62 * s.d.scale - s.hop * 16;
+        const barY = src ? -(s.d.top ?? (s.kind === 'big' ? 36 : s.kind === 'beetle' ? 40 : 28)) * SLIME_K * s.d.scale : -62 * s.d.scale - s.hop * 16;
         if (!s.dead && s.hp < s.maxHp) { const w = 52 * s.d.scale ** .7; g.fillStyle = 'rgba(20,10,30,.8)'; g.fillRect(-w / 2 - 2, barY - 2, w + 4, 8); g.fillStyle = '#ff5a6e'; g.fillRect(-w / 2, barY, w * s.hp / s.maxHp, 4); }
-        if (!s.dead && s.d.name && (hero.target === s || Math.hypot(hero.x - s.x, hero.y - s.y) < 7)) {
-          g.font = '16px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = OL; g.fillStyle = '#fff4ca';
-          g.strokeText(s.d.name, 0, barY - 8); g.fillText(s.d.name, 0, barY - 8);
+        if (!s.dead && (hero.target === s || Math.hypot(hero.x - s.x, hero.y - s.y) < 7)) {
+          const label = `Lv ${s.level ?? '?'} ${s.d.name || s.kind}`;
+          g.font = '16px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = OL; g.fillStyle = levelColor(s.level);
+          g.strokeText(label, 0, barY - 8); g.fillText(label, 0, barY - 8);
         }
         if (!s.dead && hero.target === s) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 32 * s.d.scale, 13 * s.d.scale, 0, 0, 6.283); g.stroke(); }
         g.restore();
@@ -764,18 +969,25 @@
     drawMini();
   }
   function buildMini() {
-    const [c, g] = canvasOf(144, 144, 1), s = 144 / MAP;
-    g.fillStyle = '#3f9b48'; g.fillRect(0, 0, 144, 144);
-    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = '#c9a26a'; g.fillRect(x * s, y * s, s + .5, s + .5); }
-    g.fillStyle='#d8cbb0'; g.fillRect(WORLD_MAP.city.x0*s,WORLD_MAP.city.y0*s,(WORLD_MAP.city.x1-WORLD_MAP.city.x0)*s,(WORLD_MAP.city.y1-WORLD_MAP.city.y0)*s);
-    g.fillStyle='#68bcc6'; g.beginPath();g.arc(36*s,83*s,3,0,Math.PI*2);g.fill();
-    for (const o of objects) { g.fillStyle = o.kind === 'tree' ? '#1f6b3a' : o.kind === 'rock' ? '#8a93a8' : '#2f8a45'; g.beginPath(); g.arc(o.x * s, o.y * s, o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill(); }
+    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember';
+    g.fillStyle = ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
+    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
+    if (zone === 0) {
+      g.fillStyle='#d8cbb0'; g.fillRect(WORLD_MAP.city.x0*k,WORLD_MAP.city.y0*k,(WORLD_MAP.city.x1-WORLD_MAP.city.x0)*k,(WORLD_MAP.city.y1-WORLD_MAP.city.y0)*k);
+      g.fillStyle='#68bcc6'; g.beginPath();g.arc(36*k,83*k,3,0,Math.PI*2);g.fill();
+    }
+    for (const o of objects) {
+      if (o.kind === 'post') continue;
+      g.fillStyle = o.kind === 'lava' ? '#ff6a2a' : o.kind === 'tree' ? (ember ? '#150f13' : '#1f6b3a') : o.kind === 'spire' ? '#4b3b5e' : o.kind === 'rock' ? (ember ? '#6a6672' : '#8a93a8') : (ember ? '#5a3a30' : '#2f8a45');
+      g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
+    }
+    for (const p of zdef.portals) { g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
     miniBase = c;
   }
   function drawMini() {
     if (!mctx || !miniBase) return;
     const s = mini.width / MAP; mctx.clearRect(0, 0, mini.width, mini.height); mctx.drawImage(miniBase, 0, 0, mini.width, mini.height);
-    for (const n of City.npcs) { mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
+    if (zone === 0) for (const n of City.npcs) { mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
     for (const remote of remotePlayers.values()) { mctx.fillStyle = '#b3dfff'; mctx.beginPath(); mctx.arc(remote.x * s, remote.y * s, 2.5, 0, 6.283); mctx.fill(); }
     for (const sl of slimes) if (!sl.dead) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }
     mctx.fillStyle = '#fff'; mctx.strokeStyle = '#1c1428'; mctx.lineWidth = 1.5; mctx.beginPath(); mctx.arc(hero.x * s, hero.y * s, 3.6, 0, 6.283); mctx.fill(); mctx.stroke();
@@ -798,14 +1010,13 @@
   const Field = {
     start(o) {
       cv = o.canvas; ctx = cv.getContext('2d'); mini = o.mini; mctx = mini ? mini.getContext('2d') : null; opts = o.opts; onHud = o.onHud || onHud; onEvent = o.onEvent || onEvent;
-      if (!objects.length) { buildMap(); buildSprites(); }
-      buildMini();
-      reset(); slimes = []; remotePlayers.clear(); lastLook = ''; onCharacter = o.onCharacter || (() => {}); hero.look = { ...(o.char || {}) }; resize();
+      if (!sprites.tree.length) buildSprites();
+      setZone(0); reset(); slimes = []; remotePlayers.clear(); lastLook = ''; onCharacter = o.onCharacter || (() => {}); hero.look = { ...(o.char || {}) }; resize();
       ++spriteGeneration; mageSpr = null; warSpr = null; heroSpr = null;
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
       if (o.slimeSprites) loadSlimeSprites(o.slimeSprites);
-      loadBeetleSprites();
+      loadBeetleSprites(); loadCragSprites();
       if (!Field._bound) {
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize);
@@ -824,11 +1035,13 @@
     setPaused(p) { paused = p; if(p){pendingNpc=null;cityRoute=[];} Field.clearInput(); Online.send({ type: 'stop' }); },
     visitNpc(id) {
       if (paused || !Online.connected || hero.dead) return;
+      if (zone !== 0) { floater(hero.x, hero.y, 'Return to Greenmeadow first', '#ffe066', false); return; }
       const npc = City.npcs.find(n => n.id === id);
       if (npc) talkTo(npc);
     },
     visitCity() {
       if(paused || !Online.connected || hero.dead)return;
+      if (zone !== 0) { floater(hero.x, hero.y, 'Return to Greenmeadow first', '#ffe066', false); return; }
       Field.clearInput(); pendingNpc=null; hero.target=null; hero.goal=null;
       cityRoute=routeTo({x:36,y:79});routeTime=0;
     },
@@ -855,8 +1068,9 @@
     get mageSprites() { return isMage() ? mageSpr : null; },
     get assassinSprites() { return isAssassin() ? mageSpr : null; },
     get hero() { return hero; }, get slimes() { return slimes; },
-    get beetleSprites() { return beetleSrc; },
-    _debug: { get objects() { return objects; }, w2s, s2w, routeTo },
+    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; },
+    get zone() { return zone; }, get zoneName() { return zdef.name; },
+    _debug: { get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll) },
   };
   window.Field = Field;
 })();

@@ -175,7 +175,9 @@ async function call(name, args = {}) {
   await fixture.evaluate(() => { statFixture.dead = false; Attributes.update(statFixture); sent = []; });
   check(await fixture.locator('#bag-tabs .bag-tab[data-locked="false"]').count() === 2, 'An owned expansion pack provides a second bag');
   await fixture.locator('#bag-tabs [data-bag="1"]').click();
-  check(await fixture.locator('#inventory-list .inventory-item').count() === 8, 'Overflow bag displays the remaining stacks');
+  // Every non-bag catalog item is one stack; the 16-cell backpack holds the first 16 and the satchel the rest.
+  const overflow = await fixture.evaluate(() => WORLD_ITEMS.filter(i => i.kind !== 'bag').length - 16);
+  check(overflow > 0 && await fixture.locator('#inventory-list .inventory-item').count() === overflow, `Overflow bag displays the remaining ${overflow} stacks`);
   await fixture.locator('#bag-search').fill('amber');
   check(await fixture.locator('#inventory-list .inventory-item').count() === 1, 'Search finds items across both bags');
   check(await fixture.locator('#inventory-list [data-item="accessory_upgrade"] .item-stack').textContent() === '1', 'Two worn accessory copies leave one bag copy');

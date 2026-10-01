@@ -41,7 +41,9 @@
       });
       b.dataset.action = action; node.append(b);
     } else if (!atNpc && s !== 'completed') {
-      node.append(button(`${s === 'ready' ? 'Return to' : s === 'available' ? 'Get quest from' : 'Visit'} ${npc.name}`, () => {
+      // Quest givers live in Greenmeadow and Alderhaven; from another zone there is nothing to walk to.
+      if (Field.zone > 0) node.append(element('p', `${npc.name} is back in Greenmeadow. Return through the gate first.`, 'quest-history'));
+      else node.append(button(`${s === 'ready' ? 'Return to' : s === 'available' ? 'Get quest from' : 'Visit'} ${npc.name}`, () => {
         close(); Field.visitNpc(quest.npc);
       }));
     }

@@ -8,6 +8,14 @@ pub type Peer = mpsc::Sender<Value>;
 const KING_SPAWN_MIN: f64 = 300.;
 const KING_SPAWN_MAX: f64 = 600.;
 const PLAYER_RADIUS: f64 = 0.3;
+/// Every enemy rolls its level within this distance of its kind's default level.
+pub const LEVEL_SPREAD: i32 = 2;
+/// Health, damage and rewards change by this fraction per level from the default.
+const LEVEL_HP_DAMAGE: f64 = 0.12;
+const LEVEL_REWARD: f64 = 0.15;
+/// A player cannot take another portal for this long after arriving. Arrival points sit outside every gate, so this only
+/// guards against bouncing; it must stay below the walk from an arrival point to its gate (about 0.65 s).
+const PORTAL_DELAY: f64 = 0.5;
 pub enum Command {
     Join {
         session: u64,
@@ -50,6 +58,7 @@ struct Player {
     chat_at: f64,
     service_at: f64,
     bag_notice_at: f64,
+    portal_at: f64,
 }
 impl Player {
     fn new(character: Character, peer: Peer) -> Self {
@@ -75,11 +84,12 @@ impl Player {
             chat_at: -99.,
             service_at: -99.,
             bag_notice_at: -99.,
+            portal_at: -99.,
         }
     }
     fn snapshot(&self) -> Value {
         let c = &self.character;
-        json!({"id":c.id,"look":c.look,"x":c.x,"y":c.y,"r":PLAYER_RADIUS,"hp":c.hp,"maxHp":c.max_hp(),"level":c.level,
+        json!({"id":c.id,"look":c.look,"zone":c.zone,"x":c.x,"y":c.y,"r":PLAYER_RADIUS,"hp":c.hp,"maxHp":c.max_hp(),"level":c.level,
             "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"quests":c.quests,"inventory":c.inventory,"equipment":c.equipment,"bags":c.bags,"bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used(),"fx":self.face.x,"fy":self.face.y,
             "attributes":c.attributes,"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
@@ -97,6 +107,8 @@ impl Player {
 struct Slime {
     id: usize,
     kind: String,
+    zone: usize,
+    level: u32,
     x: f64,
     y: f64,
     hx: f64,
@@ -120,6 +132,12 @@ struct Slime {
     seed: f64,
     windup_time: f64,
     #[serde(skip)]
+    damage: f64,
+    #[serde(skip)]
+    xp: u32,
+    #[serde(skip)]
+    gold: u32,
+    #[serde(skip)]
     target: Option<u64>,
     #[serde(skip)]
     goal: Point,
@@ -127,6 +145,7 @@ struct Slime {
     hit: bool,
 }
 impl Slime {
+    // Health, damage, speed, body scale and XP of a default-level enemy.
     fn stats(kind: &str) -> (f64, f64, f64, f64, u32) {
         match kind {
             "blue" => (80., 10., 2.4, 1.05, 16),
@@ -134,7 +153,37 @@ impl Slime {
             "yellow" => (90., 11., 2.2, 1.05, 20),
             "big" => (600., 30., 2.2, 1.75, 75),
             "beetle" => (240., 22., 2.8, 1.3, 32),
+            "wisp" => (280., 34., 3.4, 0.95, 80),
+            "spider" => (420., 42., 3., 1.2, 120),
+            "wraith" => (520., 52., 2.6, 1.15, 170),
+            "golem" => (1100., 64., 1.9, 1.5, 280),
             _ => (60., 8., 1.9, 1., 12),
+        }
+    }
+    // The level an enemy of this kind has before its random spread is applied.
+    pub fn default_level(kind: &str) -> u32 {
+        match kind {
+            "blue" | "pink" => 3,
+            "yellow" => 4,
+            "beetle" => 5,
+            "big" => 6,
+            "wisp" => 5,
+            "spider" => 7,
+            "wraith" => 8,
+            "golem" => 10,
+            _ => 2,
+        }
+    }
+    // Gold carried by a default-level enemy; ordinary slimes add a small random amount.
+    fn base_gold(kind: &str) -> u32 {
+        match kind {
+            "big" => 30,
+            "beetle" => 10,
+            "wisp" => 18,
+            "spider" => 26,
+            "wraith" => 36,
+            "golem" => 55,
+            _ => 0,
         }
     }
     // Windup, recovery cooldown, charge speed, awareness radius.
@@ -142,14 +191,30 @@ impl Slime {
         match kind {
             "big" => (0.35, 0.85, 8., 7.5),
             "beetle" => (0.4, 1.1, 7.5, 7.),
+            "wisp" => (0.35, 1., 8.5, 7.5),
+            "spider" => (0.4, 1.1, 8., 7.5),
+            "wraith" => (0.5, 1.2, 7.5, 8.),
+            "golem" => (0.6, 1.5, 6., 6.5),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
+    fn level_scale(kind: &str, level: u32, per_level: f64) -> f64 {
+        (1. + per_level * (level as f64 - Self::default_level(kind) as f64)).max(0.2)
+    }
+    #[cfg(test)]
     fn new(id: usize, s: &SlimeSpawn) -> Self {
-        let (hp, _, _, scale, _) = Self::stats(&s.kind);
+        Self::with_level(id, s, Self::default_level(&s.kind))
+    }
+    fn with_level(id: usize, s: &SlimeSpawn, level: u32) -> Self {
+        let (hp, damage, _, scale, xp) = Self::stats(&s.kind);
+        let strength = Self::level_scale(&s.kind, level, LEVEL_HP_DAMAGE);
+        let reward = Self::level_scale(&s.kind, level, LEVEL_REWARD);
+        let hp = (hp * strength).round();
         Self {
             id,
             kind: s.kind.clone(),
+            zone: s.zone,
+            level,
             x: s.x,
             y: s.y,
             hx: s.x,
@@ -172,6 +237,10 @@ impl Slime {
             blink: 2.,
             seed: id as f64,
             windup_time: Self::attack_profile(&s.kind).0,
+            damage: (damage * strength).round(),
+            xp: (xp as f64 * reward).round() as u32,
+            gold: (Self::base_gold(&s.kind) as f64 * Self::level_scale(&s.kind, level, 0.1)).round()
+                as u32,
             target: None,
             goal: Point { x: s.x, y: s.y },
             hit: false,
@@ -188,6 +257,7 @@ impl Slime {
 struct Bolt {
     id: u64,
     owner: u64,
+    zone: usize,
     x: f64,
     y: f64,
     fx: f64,
@@ -203,6 +273,7 @@ struct Bolt {
 struct Drop {
     id: u64,
     owner: String,
+    zone: usize,
     x: f64,
     y: f64,
     z: f64,
@@ -214,7 +285,10 @@ struct Drop {
 }
 
 pub struct World {
-    map: Map,
+    // Zone 0 is Greenmeadow with Alderhaven; later zones come from the map's `zones`.
+    maps: Vec<Map>,
+    // Every zone's enemy spawns in one list, so enemy ids stay stable and global.
+    spawns: Vec<SlimeSpawn>,
     store: Store,
     players: BTreeMap<u64, Player>,
     slimes: Vec<Slime>,
@@ -227,31 +301,36 @@ pub struct World {
     rng: u64,
     next_entity: u64,
     next_king_spawn: f64,
+    level_spread: i32,
+    // Test servers only (VALHALLA_GOD_MODE=1): enemies still fight, but players take no damage.
+    pub god_mode: bool,
 }
 impl World {
+    // Production code reads VALHALLA_LEVEL_SPREAD in main; tests that want real random levels use this.
+    #[cfg(test)]
     pub fn new(store: Store) -> Self {
-        let map = Map::default();
-        let slimes = map
-            .slimes
+        Self::with_level_spread(store, LEVEL_SPREAD)
+    }
+    pub fn with_level_spread(store: Store, level_spread: i32) -> Self {
+        let mut first = Map::default();
+        let extra = std::mem::take(&mut first.zones);
+        let mut maps = vec![first];
+        maps.extend(extra);
+        let spawns: Vec<SlimeSpawn> = maps
             .iter()
             .enumerate()
-            .map(|(i, s)| {
-                let mut enemy = Slime::new(i, s);
-                if s.kind == "big" {
-                    // Keep stable entity IDs while hiding kings until the world timer fires.
-                    enemy.dead = true;
-                    enemy.hp = 0.;
-                    enemy.state = "waiting".into();
-                    enemy.die_t = 2.;
-                }
-                enemy
+            .flat_map(|(zone, map)| {
+                map.slimes
+                    .iter()
+                    .map(move |s| SlimeSpawn { zone, ..s.clone() })
             })
             .collect();
         let mut world = Self {
-            map,
+            maps,
+            spawns,
             store,
             players: BTreeMap::new(),
-            slimes,
+            slimes: vec![],
             bolts: vec![],
             drops: vec![],
             pending_saves: vec![],
@@ -260,13 +339,29 @@ impl World {
             rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
             next_entity: 1,
             next_king_spawn: 0.,
+            level_spread,
+            god_mode: false,
         };
+        for id in 0..world.spawns.len() {
+            let spawn = world.spawns[id].clone();
+            let level = world.roll_level(&spawn.kind);
+            let mut enemy = Slime::with_level(id, &spawn, level);
+            if spawn.kind == "big" {
+                // Keep stable entity IDs while hiding kings until the world timer fires.
+                enemy.dead = true;
+                enemy.hp = 0.;
+                enemy.state = "waiting".into();
+                enemy.die_t = 2.;
+            }
+            world.slimes.push(enemy);
+        }
         world.next_king_spawn = world.king_spawn_delay();
         for id in 0..world.slimes.len() {
             if !world.slimes[id].dead {
-                let bodies = world.actor_bodies(None, Some(id));
+                let zone = world.slimes[id].zone;
+                let bodies = world.actor_bodies(zone, None, Some(id));
                 if let Some(point) = free_actor_position(
-                    &world.map,
+                    &world.maps[zone],
                     world.slimes[id].point(),
                     world.slimes[id].r,
                     &bodies,
@@ -283,6 +378,15 @@ impl World {
         }
         world
     }
+    // A kind's default level, moved by a uniform random whole number within the spread.
+    fn roll_level(&mut self, kind: &str) -> u32 {
+        let default = Slime::default_level(kind) as i32;
+        if self.level_spread <= 0 {
+            return default as u32;
+        }
+        let offset = (self.random() * (2 * self.level_spread + 1) as f64) as i32;
+        (default + offset.min(2 * self.level_spread) - self.level_spread).max(1) as u32
+    }
     fn random(&mut self) -> f64 {
         self.rng = self.rng.wrapping_mul(6364136223846793005).wrapping_add(1);
         (self.rng >> 32) as f64 / 4294967296.
@@ -295,18 +399,25 @@ impl World {
     fn king_spawn_delay(&mut self) -> f64 {
         KING_SPAWN_MIN + self.random() * (KING_SPAWN_MAX - KING_SPAWN_MIN)
     }
-    fn actor_bodies(&self, player: Option<u64>, enemy: Option<usize>) -> Vec<(Point, f64)> {
+    fn actor_bodies(
+        &self,
+        zone: usize,
+        player: Option<u64>,
+        enemy: Option<usize>,
+    ) -> Vec<(Point, f64)> {
         let player_gap = enemy
             .map(|id| (1. - self.slimes[id].r).max(PLAYER_RADIUS))
             .unwrap_or(PLAYER_RADIUS);
         self.players
             .iter()
-            .filter(|(id, p)| Some(**id) != player && p.character.hp > 0.)
+            .filter(|(id, p)| {
+                Some(**id) != player && p.character.hp > 0. && p.character.zone == zone
+            })
             .map(|(_, p)| (p.character.point(), player_gap))
             .chain(
                 self.slimes
                     .iter()
-                    .filter(|s| Some(s.id) != enemy && !s.dead)
+                    .filter(|s| Some(s.id) != enemy && !s.dead && s.zone == zone)
                     .map(|s| (s.point(), s.r)),
             )
             .collect()
@@ -316,7 +427,7 @@ impl World {
             if self.slimes[id].dead {
                 continue;
             }
-            let bodies = self.actor_bodies(None, Some(id));
+            let bodies = self.actor_bodies(self.slimes[id].zone, None, Some(id));
             let enemy = &self.slimes[id];
             if !actor_blocked(enemy.point(), enemy.r, &bodies) {
                 continue;
@@ -335,7 +446,9 @@ impl World {
                     };
                 }
             }
-            if let Some(point) = free_actor_position(&self.map, candidate, enemy.r, &bodies, true) {
+            if let Some(point) =
+                free_actor_position(&self.maps[enemy.zone], candidate, enemy.r, &bodies, true)
+            {
                 self.slimes[id].x = point.x;
                 self.slimes[id].y = point.y;
             }
@@ -357,10 +470,17 @@ impl World {
             return;
         }
         let id = locations[(self.random() * locations.len() as f64) as usize];
-        let mut enemy = Slime::new(id, &self.map.slimes[id]);
-        let bodies = self.actor_bodies(None, Some(id));
-        let Some(point) = free_actor_position(&self.map, enemy.point(), enemy.r, &bodies, true)
-        else {
+        let spawn = self.spawns[id].clone();
+        let level = self.roll_level("big");
+        let mut enemy = Slime::with_level(id, &spawn, level);
+        let bodies = self.actor_bodies(enemy.zone, None, Some(id));
+        let Some(point) = free_actor_position(
+            &self.maps[enemy.zone],
+            enemy.point(),
+            enemy.r,
+            &bodies,
+            true,
+        ) else {
             return;
         };
         enemy.x = point.x;
@@ -373,13 +493,36 @@ impl World {
             let _ = p.peer.try_send(value.clone());
         }
     }
-    fn event(&self, kind: &str, actor: &str, p: Point, value: f64, crit: bool) {
-        self.emit(json!({"type":"event","kind":kind,"actor":actor,"x":p.x,"y":p.y,"value":value,"crit":crit}));
+    // Combat and pickup events carry coordinates, so only players in that zone receive them.
+    fn emit_zone(&self, zone: usize, value: Value) {
+        for p in self.players.values().filter(|p| p.character.zone == zone) {
+            let _ = p.peer.try_send(value.clone());
+        }
     }
-    pub fn snapshot(&self) -> Value {
+    fn zone_of(&self, actor: &str) -> usize {
+        self.players
+            .values()
+            .find(|p| p.character.id == actor)
+            .map_or(0, |p| p.character.zone)
+    }
+    fn event(&self, kind: &str, actor: &str, p: Point, value: f64, crit: bool) {
+        self.emit_zone(self.zone_of(actor), json!({"type":"event","kind":kind,"actor":actor,"x":p.x,"y":p.y,"value":value,"crit":crit}));
+    }
+    // What one client needs: its own zone's players, enemies, bolts and drops. Zones are separate maps, so
+    // nothing about another zone is ever sent to this client.
+    pub fn snapshot_for(&self, zone: usize) -> Value {
         json!({"type":"snapshot","tick":self.tick,"time":self.time,
-        "players":self.players.values().map(Player::snapshot).collect::<Vec<_>>(), "slimes":self.slimes,
-        "bolts":self.bolts,"drops":self.drops,"online":self.players.len()})
+        "players":self.players.values().filter(|p| p.character.zone == zone).map(Player::snapshot).collect::<Vec<_>>(),
+        "slimes":self.slimes.iter().filter(|s| s.zone == zone).collect::<Vec<_>>(),
+        "bolts":self.bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
+        "drops":self.drops.iter().filter(|d| d.zone == zone).collect::<Vec<_>>(),
+        "online":self.players.len()})
+    }
+    // Published to every connection: one complete view per zone. Each connection forwards only the view
+    // that holds its own character; `tick` and `online` also sit at the top for the health route.
+    pub fn snapshot(&self) -> Value {
+        json!({"tick":self.tick,"online":self.players.len(),
+        "zones":(0..self.maps.len()).map(|zone| self.snapshot_for(zone)).collect::<Vec<_>>()})
     }
 
     fn join(
@@ -406,7 +549,7 @@ impl World {
             let mut look = look.ok_or("Create a character first.")?;
             look.name = look.name.trim().into();
             look.validate()?;
-            let (c, token) = self.store.create(look, self.map.spawn).map_err(|e| {
+            let (c, token) = self.store.create(look, self.maps[0].spawn).map_err(|e| {
                 tracing::error!(%e,"character creation failed");
                 "Could not save your character.".to_owned()
             })?;
@@ -418,23 +561,40 @@ impl World {
         if let Some(saved) = self.pending_saves.iter().rev().find(|p| p.id == c.id) {
             c = saved.clone();
         }
+        if c.zone >= self.maps.len() {
+            // A zone that no longer exists sends the character back to the start.
+            c.zone = 0;
+            c.x = self.maps[0].spawn.x;
+            c.y = self.maps[0].spawn.y;
+        }
         let mut point = c.point();
-        self.map.collide(&mut point, PLAYER_RADIUS);
+        self.maps[c.zone].collide(&mut point, PLAYER_RADIUS);
         c.x = point.x;
         c.y = point.y;
         let id = c.id.clone();
         let name = c.look.name.clone();
+        let place = self.zone_name(c.zone).to_owned();
         self.players.insert(session, Player::new(c, peer));
         self.separate_enemies();
-        self.emit(json!({"type":"system","text":format!("{name} entered Greenmeadow.")}));
-        Ok(json!({"type":"welcome","version":1,"id":id,"token":issued,"snapshot":self.snapshot()}))
+        self.emit(json!({"type":"system","text":format!("{name} entered {place}.")}));
+        let zone = self.players[&session].character.zone;
+        Ok(
+            json!({"type":"welcome","version":1,"id":id,"token":issued,"snapshot":self.snapshot_for(zone)}),
+        )
+    }
+    fn zone_name(&self, zone: usize) -> &str {
+        match self.maps[zone].name.as_str() {
+            "" => "Greenmeadow",
+            name => name,
+        }
     }
     fn leave(&mut self, session: u64) {
         if let Some(p) = self.players.remove(&session) {
             let name = p.character.look.name.clone();
+            let place = self.zone_name(p.character.zone).to_owned();
             self.pending_saves.push(p.character);
             self.save();
-            self.emit(json!({"type":"system","text":format!("{name} left Greenmeadow.")}));
+            self.emit(json!({"type":"system","text":format!("{name} left {place}.")}));
         }
     }
     fn save(&mut self) {
@@ -465,14 +625,20 @@ impl World {
             }
             ClientMessage::Stop => p.stop(),
             ClientMessage::Move { x, y } if x.is_finite() && y.is_finite() => {
+                let size = self.maps[p.character.zone].size as f64;
                 p.goal = Some(Point {
-                    x: x.clamp(0.7, self.map.size as f64 - 0.7),
-                    y: y.clamp(0.7, self.map.size as f64 - 0.7),
+                    x: x.clamp(0.7, size - 0.7),
+                    y: y.clamp(0.7, size - 0.7),
                 });
                 p.target = None;
                 p.input = Point::default();
             }
-            ClientMessage::Target { id } if self.slimes.get(id).is_some_and(|s| !s.dead) => {
+            ClientMessage::Target { id }
+                if self
+                    .slimes
+                    .get(id)
+                    .is_some_and(|s| !s.dead && s.zone == p.character.zone) =>
+            {
                 p.target = Some(id);
                 p.goal = None;
                 p.input = Point::default();
@@ -562,10 +728,14 @@ impl World {
         }
     }
     fn interact(&mut self, session: u64, npc_id: &str, offer_id: Option<&str>) {
-        let Some(npc) = self.map.npcs.iter().find(|npc| npc.id == npc_id) else {
+        let p = self.players.get_mut(&session).unwrap();
+        let Some(npc) = self.maps[p.character.zone]
+            .npcs
+            .iter()
+            .find(|npc| npc.id == npc_id)
+        else {
             return;
         };
-        let p = self.players.get_mut(&session).unwrap();
         if p.character.hp <= 0. || p.character.point().distance(Point { x: npc.x, y: npc.y }) > 2.8
         {
             let _ = p.peer.try_send(
@@ -575,7 +745,7 @@ impl World {
         }
         p.stop();
         p.attack = 0.;
-        quest_progress(&mut p.character, &self.map.quests, "talk", npc_id);
+        quest_progress(&mut p.character, &self.maps[0].quests, "talk", npc_id);
         let mut notice = String::new();
         let mut levels = 0;
         let mut quest_changed = false;
@@ -587,8 +757,7 @@ impl World {
                 p.service_at = self.time;
                 if let Some(action) = id.strip_prefix("quest:") {
                     if let Some((action, id)) = action.split_once(':')
-                        && let Some(quest) = self
-                            .map
+                        && let Some(quest) = self.maps[0]
                             .quests
                             .iter()
                             .find(|q| q.id == id && q.npc == npc_id)
@@ -753,8 +922,9 @@ impl World {
             p.dead_time += TICK;
             p.stop();
             if p.dead_time >= 3.2 {
-                let mut point = self.map.spawn;
-                self.map.collide(&mut point, PLAYER_RADIUS);
+                let map = &self.maps[p.character.zone];
+                let mut point = map.spawn;
+                map.collide(&mut point, PLAYER_RADIUS);
                 p.character.x = point.x;
                 p.character.y = point.y;
                 p.character.hp = p.character.max_hp();
@@ -790,7 +960,11 @@ impl World {
             dir = p.input;
             travel = f64::INFINITY;
         } else if let Some(id) = p.target {
-            if let Some(s) = self.slimes.get(id).filter(|s| !s.dead) {
+            if let Some(s) = self
+                .slimes
+                .get(id)
+                .filter(|s| !s.dead && s.zone == p.character.zone)
+            {
                 let distance = p.character.point().distance(s.point());
                 let facing = p.character.point().direction(s.point());
                 if distance - s.r <= p.character.look.class.reach() {
@@ -823,7 +997,7 @@ impl World {
         p.moving = false;
         if distance > 0. && (dir.x != 0. || dir.y != 0.) {
             let mut point = p.character.point();
-            self.map.walk(&mut point, dir, distance, PLAYER_RADIUS);
+            self.maps[p.character.zone].walk(&mut point, dir, distance, PLAYER_RADIUS);
             p.moving = point.distance(p.character.point()) > 1e-8;
             p.character.x = point.x;
             p.character.y = point.y;
@@ -838,10 +1012,64 @@ impl World {
         if auto_attack {
             self.start_attack(session);
         }
+        self.use_portal(session);
+    }
+    // Stepping into a portal disc moves the player; the zone is never client-chosen.
+    fn use_portal(&mut self, session: u64) {
+        let p = &self.players[&session];
+        if p.character.hp <= 0. || self.time - p.portal_at < PORTAL_DELAY {
+            return;
+        }
+        let here = p.character.point();
+        let Some(portal) = self.maps[p.character.zone]
+            .portals
+            .iter()
+            .find(|portal| {
+                here.distance(Point {
+                    x: portal.x,
+                    y: portal.y,
+                }) < portal.r
+            })
+            .cloned()
+        else {
+            return;
+        };
+        if portal.to >= self.maps.len() {
+            return;
+        }
+        let actor = p.character.id.clone();
+        self.event("portal", &actor, here, 0., false);
+        let mut arrival = Point {
+            x: portal.tx,
+            y: portal.ty,
+        };
+        self.maps[portal.to].collide(&mut arrival, PLAYER_RADIUS);
+        let time = self.time;
+        let p = self.players.get_mut(&session).unwrap();
+        p.character.zone = portal.to;
+        p.character.x = arrival.x;
+        p.character.y = arrival.y;
+        p.portal_at = time;
+        p.stop();
+        p.attack = 0.;
+        p.dash = 0.;
+        let name = self.maps[portal.to].name.clone();
+        let text = match self.maps[portal.to].levels {
+            Some([low, high]) => format!(
+                "You step through {} into {name}. Recommended levels {low}–{high}.",
+                portal.name
+            ),
+            None => format!("You step through {} into {name}.", portal.name),
+        };
+        let _ = p.peer.try_send(json!({"type":"system","text":text}));
+        self.separate_enemies();
+        self.event("portal", &actor, arrival, 0., false);
+        self.save();
     }
     fn strike(&mut self, session: u64) {
         let p = &self.players[&session];
         let point = p.character.point();
+        let zone = p.character.zone;
         let face = p.face;
         let class = p.character.look.class;
         let base = p.character.stats().0;
@@ -859,6 +1087,7 @@ impl World {
             self.bolts.push(Bolt {
                 id,
                 owner: session,
+                zone,
                 x: point.x,
                 y: point.y,
                 fx: face.x,
@@ -874,7 +1103,7 @@ impl World {
             .slimes
             .iter()
             .filter(|s| {
-                if s.dead {
+                if s.dead || s.zone != zone {
                     return false;
                 }
                 let d = point.distance(s.point());
@@ -909,7 +1138,9 @@ impl World {
         s.target = Some(session);
         let point = s.point();
         let killed = s.hp <= 0.;
-        let xp = Slime::stats(&s.kind).4;
+        let xp = s.xp;
+        let gold = s.gold;
+        let zone = s.zone;
         let kind = s.kind.clone();
         if killed {
             s.dead = true;
@@ -924,7 +1155,7 @@ impl World {
             }
             let p = self.players.get_mut(&session).unwrap();
             p.character.kills += 1;
-            quest_progress(&mut p.character, &self.map.quests, "kill", &kind);
+            quest_progress(&mut p.character, &self.maps[0].quests, "kill", &kind);
             let levels = p.character.grant_xp(xp);
             self.event("slimeDie", &actor, point, 0., false);
             if levels > 0 {
@@ -932,14 +1163,15 @@ impl World {
                 self.event("levelup", &actor, point, levels as f64, false);
             }
             let id = self.entity();
-            let value = match kind.as_str() {
-                "big" => 30,
-                "beetle" => 10,
-                _ => 3 + (self.random() * 4.) as u32,
+            let value = if gold > 0 {
+                gold
+            } else {
+                3 + (self.random() * 4.) as u32
             };
             self.drops.push(Drop {
                 id,
                 owner: actor.clone(),
+                zone,
                 x: point.x,
                 y: point.y,
                 z: 8.,
@@ -949,19 +1181,20 @@ impl World {
                 t: 0.,
                 col: "#ffe066",
             });
-            self.item_drop(&actor, point, material(&kind), 1);
+            self.item_drop(&actor, zone, point, material(&kind), 1);
             let chance = self.random();
             let choice = self.random();
             if let Some(i) = roll_equipment(&kind, chance, choice) {
-                self.item_drop(&actor, point, &i.id, 1);
+                self.item_drop(&actor, zone, point, &i.id, 1);
             }
         }
     }
-    fn item_drop(&mut self, owner: &str, point: Point, item_id: &str, quantity: u32) {
+    fn item_drop(&mut self, owner: &str, zone: usize, point: Point, item_id: &str, quantity: u32) {
         let id = self.entity();
         self.drops.push(Drop {
             id,
             owner: owner.into(),
+            zone,
             x: point.x,
             y: point.y,
             z: 8.,
@@ -979,7 +1212,15 @@ impl World {
     fn update_slime(&mut self, id: usize) {
         let wander = self.random();
         let angle = self.random() * std::f64::consts::TAU;
-        let bodies = self.actor_bodies(None, Some(id));
+        let zone = self.slimes[id].zone;
+        let bodies = self.actor_bodies(zone, None, Some(id));
+        // A respawning enemy rolls a fresh level; kings come from the shared timer instead.
+        let respawn_level = {
+            let s = &self.slimes[id];
+            (s.dead && s.kind != "big" && s.respawn - TICK <= 0.).then(|| s.kind.clone())
+        }
+        .map(|kind| self.roll_level(&kind));
+        let map = &self.maps[zone];
         let s = &mut self.slimes[id];
         let (windup, cooldown, charge_speed, awareness) = Slime::attack_profile(&s.kind);
         s.hurt_t = (s.hurt_t - TICK).max(0.);
@@ -993,10 +1234,9 @@ impl World {
             }
             s.respawn -= TICK;
             if s.respawn <= 0. {
-                let spawn = &self.map.slimes[id];
-                let mut enemy = Slime::new(id, spawn);
-                if let Some(point) =
-                    free_actor_position(&self.map, enemy.point(), enemy.r, &bodies, true)
+                let spawn = &self.spawns[id];
+                let mut enemy = Slime::with_level(id, spawn, respawn_level.unwrap_or(s.level));
+                if let Some(point) = free_actor_position(map, enemy.point(), enemy.r, &bodies, true)
                 {
                     enemy.x = point.x;
                     enemy.y = point.y;
@@ -1022,7 +1262,9 @@ impl World {
         let nearest = self
             .players
             .iter()
-            .filter(|(_, p)| p.character.hp > 0. && !self.map.in_city(p.character.point()))
+            .filter(|(_, p)| {
+                p.character.hp > 0. && p.character.zone == zone && !map.in_city(p.character.point())
+            })
             .map(|(id, p)| {
                 (
                     *id,
@@ -1035,7 +1277,11 @@ impl World {
         let target = s.target.and_then(|id| {
             self.players
                 .get(&id)
-                .filter(|p| p.character.hp > 0. && !self.map.in_city(p.character.point()))
+                .filter(|p| {
+                    p.character.hp > 0.
+                        && p.character.zone == zone
+                        && !map.in_city(p.character.point())
+                })
                 .map(|p| {
                     (
                         id,
@@ -1053,7 +1299,8 @@ impl World {
             s.target = Some(id);
             s.state = "chase".into();
         }
-        let (_, damage, speed, _, _) = Slime::stats(&s.kind);
+        let speed = Slime::stats(&s.kind).2;
+        let damage = s.damage;
         let mut goal = None;
         let mut movement = speed * TICK;
         let mut hit = None;
@@ -1134,8 +1381,8 @@ impl World {
             let mut point = s.point();
             let direction = point.direction(goal);
             movement = movement.min(point.distance(goal));
-            walk_with_actors(&self.map, &mut point, direction, movement, s.r, &bodies);
-            if self.map.in_city(point) {
+            walk_with_actors(map, &mut point, direction, movement, s.r, &bodies);
+            if map.in_city(point) {
                 point = s.point();
                 s.target = None;
                 s.state = "return".into();
@@ -1160,8 +1407,9 @@ impl World {
         let Some(p) = self.players.get(&session) else {
             return;
         };
-        if p.character.hp <= 0.
-            || self.map.in_city(p.character.point())
+        if self.god_mode
+            || p.character.hp <= 0.
+            || self.maps[p.character.zone].in_city(p.character.point())
             || p.dash > 0.
             || self.time - p.last_hurt < 0.65
         {
@@ -1212,7 +1460,11 @@ impl World {
             let first = self
                 .slimes
                 .iter()
-                .filter(|s| !s.dead && segment_distance(s.point(), start, end) < s.r + 0.22)
+                .filter(|s| {
+                    !s.dead
+                        && s.zone == b.zone
+                        && segment_distance(s.point(), start, end) < s.r + 0.22
+                })
                 .min_by(|a, c| {
                     start
                         .distance(a.point())
@@ -1234,11 +1486,9 @@ impl World {
             if d.t < 0.6 {
                 continue;
             }
-            if let Some((_, p)) = self
-                .players
-                .iter_mut()
-                .find(|(_, p)| p.character.id == d.owner && p.character.hp > 0.)
-            {
+            if let Some((_, p)) = self.players.iter_mut().find(|(_, p)| {
+                p.character.id == d.owner && p.character.hp > 0. && p.character.zone == d.zone
+            }) {
                 let point = Point { x: d.x, y: d.y };
                 let distance = point.distance(p.character.point());
                 if distance < 3. {
@@ -1277,7 +1527,8 @@ impl World {
         }
         for (id, p, value, item_id, quantity) in rewards {
             if let Some(item_id) = item_id {
-                self.emit(
+                self.emit_zone(
+                    self.zone_of(&id),
                     json!({"type":"event","kind":"itemPickup","actor":id,"x":p.x,"y":p.y,
                     "item":item_id,"quantity":quantity,"name":item(&item_id).map(|i| &i.name)}),
                 );
@@ -1463,8 +1714,9 @@ fn segment_distance(p: Point, a: Point, b: Point) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    // Fixed levels keep health, damage and XP exact; level rolls have their own tests.
     fn world() -> World {
-        World::new(Store::open(std::path::Path::new(":memory:")).unwrap())
+        World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)
     }
     fn join(w: &mut World, id: u64, class: Class) -> mpsc::Receiver<Value> {
         let (tx, rx) = mpsc::channel(256);
@@ -1476,7 +1728,7 @@ mod tests {
         rx
     }
     fn quest_interact(w: &mut World, npc: &str, offer: Option<&str>) {
-        let n = w.map.npcs.iter().find(|n| n.id == npc).unwrap();
+        let n = w.maps[0].npcs.iter().find(|n| n.id == npc).unwrap();
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.x = n.x;
         c.y = n.y;
@@ -1569,11 +1821,12 @@ mod tests {
         }
         let actor = c.id.clone();
         let point = c.point();
-        w.item_drop(&actor, point, "headgear_upgrade", 1);
-        w.item_drop(&actor, point, "slime_gel", 2);
+        w.item_drop(&actor, 0, point, "headgear_upgrade", 1);
+        w.item_drop(&actor, 0, point, "slime_gel", 2);
         w.drops.push(Drop {
             id: 99999,
             owner: actor,
+            zone: 0,
             x: point.x,
             y: point.y,
             z: 0.,
@@ -1609,7 +1862,7 @@ mod tests {
         let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
         let token = welcome["token"].as_str().unwrap();
         assert_eq!(
-            w.map
+            w.maps[0]
                 .npcs
                 .iter()
                 .find(|n| n.id == "merchant")
@@ -1687,7 +1940,7 @@ mod tests {
             .dexterity = 70;
         let mut dodges = 0;
         let mut hits = 0;
-        for _ in 0..12 {
+        for _ in 0..60 {
             w.time += 1.;
             let before = w.players[&1].character.hp;
             w.hurt_player(1, 5., Point::default());
@@ -1708,7 +1961,7 @@ mod tests {
         w.rng = 7;
         let id = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
         for _ in 0..300 {
-            w.slimes[id] = Slime::new(id, &w.map.slimes[id]);
+            w.slimes[id] = Slime::new(id, &w.maps[0].slimes[id]);
             w.hit_slime(id, 1, 1000., false);
         }
         for i in ITEMS.iter().filter(|i| i.rarity == "rare") {
@@ -1791,7 +2044,7 @@ mod tests {
         w.hit_slime(beetle, 1, 1000., false);
         assert_eq!(w.players[&1].character.quests[0].counts, vec![0]);
         for _ in 0..6 {
-            w.slimes[0] = Slime::new(0, &w.map.slimes[0]);
+            w.slimes[0] = Slime::new(0, &w.maps[0].slimes[0]);
             w.hit_slime(0, 1, 1000., false);
             w.hit_slime(0, 2, 1000., false); // Dead enemies cannot grant a second credit.
         }
@@ -1803,13 +2056,13 @@ mod tests {
         quest_interact(&mut w, "smith", Some("quest:accept:ironhide_hunt"));
         assert_eq!(w.players[&1].character.quests[1].counts, vec![0]);
         for _ in 0..2 {
-            w.slimes[beetle] = Slime::new(beetle, &w.map.slimes[beetle]);
+            w.slimes[beetle] = Slime::new(beetle, &w.maps[0].slimes[beetle]);
             w.hit_slime(beetle, 1, 1000., false);
         }
         quest_interact(&mut w, "smith", Some("quest:claim:ironhide_hunt"));
         quest_interact(&mut w, "gatekeeper", Some("quest:accept:king_challenge"));
         let king = w.slimes.iter().position(|s| s.kind == "big").unwrap();
-        w.slimes[king] = Slime::new(king, &w.map.slimes[king]);
+        w.slimes[king] = Slime::new(king, &w.maps[0].slimes[king]);
         w.hit_slime(king, 1, 1000., false);
         quest_interact(&mut w, "gatekeeper", Some("quest:claim:king_challenge"));
         assert_eq!(w.players[&1].character.gold, 24 + 35 + 60);
@@ -1825,7 +2078,7 @@ mod tests {
         for _ in 0..6 {
             quest_progress(
                 &mut w.players.get_mut(&1).unwrap().character,
-                &w.map.quests,
+                &w.maps[0].quests,
                 "kill",
                 "green",
             );
@@ -1837,7 +2090,7 @@ mod tests {
         ] {
             quest_progress(
                 &mut w.players.get_mut(&1).unwrap().character,
-                &w.map.quests,
+                &w.maps[0].quests,
                 "kill",
                 target,
             );
@@ -1864,7 +2117,7 @@ mod tests {
             for diagonal in [false, true] {
                 let mut w = world();
                 let _rx = join(&mut w, 1, class);
-                w.map.objects.clear();
+                w.maps[0].objects.clear();
                 for s in &mut w.slimes {
                     s.dead = true;
                     s.respawn = 1000.;
@@ -1874,6 +2127,7 @@ mod tests {
                     0,
                     &SlimeSpawn {
                         kind: "green".into(),
+                        zone: 0,
                         x: start.x + 3.5,
                         y: start.y + if diagonal { 3.5 } else { 0. },
                     },
@@ -1901,6 +2155,7 @@ mod tests {
     #[test]
     fn enemies_block_each_other_but_players_can_walk_and_dash_through_actors() {
         let map = Map {
+            name: String::new(),
             size: 96,
             spawn: Point::default(),
             objects: vec![],
@@ -1908,6 +2163,9 @@ mod tests {
             npcs: vec![],
             quests: vec![],
             city: None,
+            portals: vec![],
+            levels: None,
+            zones: vec![],
         };
         let blocker = Point { x: 21.9, y: 20.5 };
         for (start, direction, distance) in [
@@ -1949,6 +2207,7 @@ mod tests {
             0,
             &SlimeSpawn {
                 kind: "green".into(),
+                zone: 0,
                 x: start.x + 1.5,
                 y: start.y,
             },
@@ -1986,7 +2245,7 @@ mod tests {
             w.slimes[0].point(),
             w.players[&1].character.point()
         ));
-        w.map.objects.clear();
+        w.maps[0].objects.clear();
         let destination = Point {
             x: start.x + 6.,
             y: start.y,
@@ -2017,13 +2276,14 @@ mod tests {
     #[test]
     fn enemies_cannot_stack_or_charge_through_players_and_dead_bodies_do_not_block() {
         let mut w = world();
-        w.map.objects.clear(); // Isolate actor collision from scenery in this lane.
+        w.maps[0].objects.clear(); // Isolate actor collision from scenery in this lane.
         let _rx = join(&mut w, 1, Class::Warrior);
         let player = w.players[&1].character.point();
         w.slimes[0] = Slime::new(
             0,
             &SlimeSpawn {
                 kind: "beetle".into(),
+                zone: 0,
                 x: player.x + 1.,
                 y: player.y,
             },
@@ -2046,6 +2306,7 @@ mod tests {
             1,
             &SlimeSpawn {
                 kind: "green".into(),
+                zone: 0,
                 x: blocked.x + 2.,
                 y: blocked.y,
             },
@@ -2081,7 +2342,7 @@ mod tests {
         p.dead_time = 3.2;
         w.update_player(2);
         assert!(same_cell(w.players[&2].character.point(), occupied));
-        let enemy_spawn = w.map.slimes[0].clone();
+        let enemy_spawn = w.maps[0].slimes[0].clone();
         w.players.get_mut(&1).unwrap().character.x = enemy_spawn.x;
         w.players.get_mut(&1).unwrap().character.y = enemy_spawn.y;
         w.slimes[0].dead = true;
@@ -2102,8 +2363,7 @@ mod tests {
         let (tx, _rx) = mpsc::channel(256);
         w.join(4, Some(token), None, tx).unwrap();
         assert!(same_cell(w.players[&4].character.point(), saved));
-        let locations: Vec<_> = w
-            .map
+        let locations: Vec<_> = w.maps[0]
             .slimes
             .iter()
             .filter(|s| s.kind == "big")
@@ -2123,7 +2383,7 @@ mod tests {
         assert!(!actor_blocked(
             king.point(),
             king.r,
-            &w.actor_bodies(None, Some(king.id))
+            &w.actor_bodies(king.zone, None, Some(king.id))
         ));
     }
 
@@ -2152,8 +2412,8 @@ mod tests {
         assert_eq!(kings.len(), 1);
         assert_eq!(kings[0].hp, 600.);
         let id = kings[0].id;
-        assert_eq!(kings[0].x, w.map.slimes[id].x);
-        assert_eq!(kings[0].y, w.map.slimes[id].y);
+        assert_eq!(kings[0].x, w.maps[0].slimes[id].x);
+        assert_eq!(kings[0].y, w.maps[0].slimes[id].y);
         assert_eq!(rx.try_recv().unwrap()["type"], "system"); // Join notice.
         assert!(
             rx.try_recv().unwrap()["text"]
@@ -2264,13 +2524,13 @@ mod tests {
         assert_eq!(w.slimes.iter().filter(|s| s.kind == "beetle").count(), 5);
         for s in &w.slimes {
             let mut point = s.point();
-            w.map.collide(&mut point, s.r);
+            w.maps[0].collide(&mut point, s.r);
             assert!(
                 point.distance(s.point()) < 1e-6,
                 "{} spawn is blocked",
                 s.kind
             );
-            assert!(!w.map.in_city(s.point()));
+            assert!(!w.maps[0].in_city(s.point()));
         }
         for (kind, hp, damage, windup) in [("beetle", 240., 22., 0.4), ("big", 600., 30., 0.35)] {
             let mut w = world();
@@ -2281,6 +2541,7 @@ mod tests {
                 0,
                 &SlimeSpawn {
                     kind: kind.into(),
+                    zone: 0,
                     x: point.x + 1.,
                     y: point.y,
                 },
@@ -2289,7 +2550,7 @@ mod tests {
             w.update_slime(0);
             assert_eq!(w.slimes[0].max_hp, hp);
             assert_eq!(w.slimes[0].state, "windup");
-            assert_eq!(w.snapshot()["slimes"][0]["windupTime"], windup);
+            assert_eq!(w.snapshot_for(0)["slimes"][0]["windupTime"], windup);
             assert_eq!(w.players[&1].character.hp, 120.);
             for _ in 0..20 {
                 w.time += TICK;
@@ -2297,6 +2558,464 @@ mod tests {
             }
             let defense = w.players[&1].character.look.stats(1).1;
             assert_eq!(w.players[&1].character.hp, 120. - (damage - defense));
+        }
+    }
+
+    #[test]
+    fn god_mode_stops_all_player_damage_and_is_off_by_default() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        assert!(!w.god_mode);
+        w.time += 5.;
+        w.hurt_player(1, 30., Point::default());
+        assert!(w.players[&1].character.hp < 120., "normal worlds hurt");
+        w.god_mode = true;
+        let hp = w.players[&1].character.hp;
+        w.time += 5.;
+        w.hurt_player(1, 500., Point::default());
+        assert_eq!(w.players[&1].character.hp, hp);
+    }
+
+    #[test]
+    fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
+        let w = world();
+        assert_eq!(w.maps.len(), 2);
+        assert_eq!(w.spawns.len(), w.slimes.len());
+        assert_eq!(w.maps[1].name, "Emberfall Crags");
+        assert_eq!(w.maps[1].levels, Some([5, 10]));
+        for kind in ["wisp", "spider", "wraith", "golem"] {
+            assert!(
+                w.slimes.iter().any(|s| s.kind == kind && s.zone == 1),
+                "no {kind} in the Crags"
+            );
+            assert_ne!(
+                Slime::stats(kind),
+                Slime::stats("green"),
+                "{kind} has stats"
+            );
+            assert!(Slime::default_level(kind) >= 5);
+        }
+        assert!(
+            w.slimes
+                .iter()
+                .filter(|s| s.zone == 0)
+                .all(|s| Slime::default_level(&s.kind) <= 6)
+        );
+        for s in &w.slimes {
+            let mut point = s.point();
+            w.maps[s.zone].collide(&mut point, s.r);
+            assert!(
+                point.distance(s.point()) < 1e-6,
+                "{} spawn is blocked",
+                s.kind
+            );
+            assert!(!w.maps[s.zone].in_city(s.point()));
+        }
+        for (zone, map) in w.maps.iter().enumerate() {
+            assert!(!map.portals.is_empty(), "zone {zone} has no portal");
+            for portal in &map.portals {
+                let target = &w.maps[portal.to];
+                let mut arrival = Point {
+                    x: portal.tx,
+                    y: portal.ty,
+                };
+                target.collide(&mut arrival, PLAYER_RADIUS);
+                assert!(
+                    arrival.distance(Point {
+                        x: portal.tx,
+                        y: portal.ty
+                    }) < 1e-6
+                );
+                assert!(
+                    target.portals.iter().all(|back| arrival.distance(Point {
+                        x: back.x,
+                        y: back.y
+                    }) > back.r + 0.5),
+                    "arrival from {} would trigger a portal at once",
+                    portal.id
+                );
+                assert!(
+                    target.portals.iter().any(|back| back.to == zone),
+                    "{} has no way back",
+                    portal.id
+                );
+            }
+        }
+        // No enemy starts near either arrival point.
+        for (zone, map) in w.maps.iter().enumerate() {
+            for portal in &map.portals {
+                for s in w.slimes.iter().filter(|s| s.zone == portal.to) {
+                    assert!(
+                        s.point().distance(Point {
+                            x: portal.tx,
+                            y: portal.ty
+                        }) > 8.,
+                        "{} spawns beside the arrival from zone {zone}",
+                        s.kind
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn enemy_levels_roll_two_either_side_of_each_kinds_default() {
+        let mut w = World::new(Store::open(std::path::Path::new(":memory:")).unwrap());
+        for s in &w.slimes {
+            let default = Slime::default_level(&s.kind);
+            assert!(
+                (default.saturating_sub(2).max(1)..=default + 2).contains(&s.level),
+                "{} level {} is outside {default}±2",
+                s.kind,
+                s.level
+            );
+            let view = w.snapshot_for(s.zone);
+            let listed = view["slimes"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|e| e["id"] == s.id)
+                .unwrap();
+            assert_eq!(listed["level"], s.level);
+            assert_eq!(listed["zone"], s.zone);
+        }
+        for kind in [
+            "green", "blue", "beetle", "big", "wisp", "spider", "wraith", "golem",
+        ] {
+            let default = Slime::default_level(kind) as i32;
+            let mut seen = std::collections::BTreeSet::new();
+            for _ in 0..600 {
+                seen.insert(w.roll_level(kind) as i32);
+            }
+            let expected: std::collections::BTreeSet<_> =
+                ((default - 2).max(1)..=default + 2).collect();
+            assert_eq!(
+                seen, expected,
+                "{kind} should cover its whole spread, never below 1"
+            );
+        }
+        // With no spread every enemy sits exactly on its default.
+        let w = world();
+        assert!(
+            w.slimes
+                .iter()
+                .all(|s| s.level == Slime::default_level(&s.kind))
+        );
+    }
+
+    #[test]
+    fn level_changes_health_damage_xp_and_gold_around_the_default() {
+        let spawn = |kind: &str| SlimeSpawn {
+            kind: kind.into(),
+            x: 10.,
+            y: 10.,
+            zone: 0,
+        };
+        let base = Slime::with_level(0, &spawn("beetle"), 5);
+        assert_eq!(
+            (base.max_hp, base.damage, base.xp, base.gold),
+            (240., 22., 32, 10)
+        );
+        let high = Slime::with_level(0, &spawn("beetle"), 7);
+        assert_eq!(
+            (high.max_hp, high.damage, high.xp, high.gold),
+            (298., 27., 42, 12)
+        );
+        let low = Slime::with_level(0, &spawn("beetle"), 3);
+        assert_eq!(
+            (low.max_hp, low.damage, low.xp, low.gold),
+            (182., 17., 22, 8)
+        );
+        assert_eq!(high.r, base.r, "level never changes body size");
+        // A kill pays the rolled enemy's XP and gold, not the kind's default.
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let id = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
+        w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), 7);
+        w.hit_slime(id, 1, 5000., false);
+        assert_eq!(w.players[&1].character.xp, 42);
+        assert_eq!(w.drops.iter().find(|d| d.item.is_none()).unwrap().value, 12);
+    }
+
+    #[test]
+    fn respawning_enemies_roll_a_fresh_level() {
+        let mut w = World::new(Store::open(std::path::Path::new(":memory:")).unwrap());
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let id = w.slimes.iter().position(|s| s.kind == "spider").unwrap();
+        let mut seen = std::collections::BTreeSet::new();
+        for _ in 0..80 {
+            w.slimes[id].dead = true;
+            w.slimes[id].respawn = TICK;
+            w.update_slime(id);
+            assert!(!w.slimes[id].dead);
+            let level = w.slimes[id].level;
+            assert!((5..=9).contains(&level));
+            let expected = (420. * (1. + 0.12 * (level as f64 - 7.))).round();
+            assert_eq!(w.slimes[id].max_hp, expected);
+            assert_eq!(w.slimes[id].hp, expected);
+            seen.insert(level);
+        }
+        assert!(seen.len() >= 4, "levels barely vary: {seen:?}");
+    }
+
+    #[test]
+    fn portals_move_players_between_zones_save_the_zone_and_never_bounce() {
+        let mut w = world();
+        let (tx, mut rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        let gate = w.maps[0].portals[0].clone();
+        let back = w.maps[1].portals[0].clone();
+        assert_eq!(w.players[&1].character.zone, 0);
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.x = gate.x;
+            c.y = gate.y + 4.;
+        }
+        // A real walk goal north through the gate; the server decides the zone change.
+        w.message(
+            1,
+            ClientMessage::Move {
+                x: gate.x,
+                y: gate.y - 1.,
+            },
+        );
+        for _ in 0..200 {
+            w.time += TICK;
+            w.update_player(1);
+            if w.players[&1].character.zone == 1 {
+                break;
+            }
+        }
+        let c = &w.players[&1].character;
+        assert_eq!(c.zone, 1);
+        assert!(
+            c.point().distance(Point {
+                x: gate.tx,
+                y: gate.ty
+            }) < 1e-6
+        );
+        assert_eq!(w.snapshot_for(1)["players"][0]["zone"], 1);
+        assert!(
+            w.snapshot_for(0)["players"].as_array().unwrap().is_empty(),
+            "players appear only in their own zone's view"
+        );
+        assert_eq!(
+            w.store.load(&token).unwrap().unwrap().zone,
+            1,
+            "the zone saves at once"
+        );
+        let mut texts = vec![];
+        while let Ok(v) = rx.try_recv() {
+            if v["type"] == "system" {
+                texts.push(v["text"].as_str().unwrap().to_owned());
+            }
+        }
+        assert!(
+            texts
+                .iter()
+                .any(|t| t.contains("Emberfall Crags") && t.contains("5–10")),
+            "{texts:?}"
+        );
+        // Standing on the arrival point or inside the way back too soon does nothing.
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.x = back.x;
+            c.y = back.y;
+        }
+        w.update_player(1);
+        assert_eq!(w.players[&1].character.zone, 1, "no instant bounce");
+        w.time += PORTAL_DELAY + 0.1;
+        w.update_player(1);
+        assert_eq!(w.players[&1].character.zone, 0);
+        assert!(
+            w.players[&1].character.point().distance(Point {
+                x: back.tx,
+                y: back.ty
+            }) < 1e-6
+        );
+        // Resuming a saved zone puts the character back where it was.
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        w.players.get_mut(&1).unwrap().character.x = 40.;
+        w.players.get_mut(&1).unwrap().character.y = 80.;
+        w.leave(1);
+        let (tx, _rx2) = mpsc::channel(256);
+        w.join(2, Some(token.clone()), None, tx).unwrap();
+        assert_eq!(w.players[&2].character.zone, 1);
+        assert!(
+            w.players[&2]
+                .character
+                .point()
+                .distance(Point { x: 40., y: 80. })
+                < 1e-6
+        );
+    }
+
+    #[test]
+    fn a_dead_player_cannot_use_a_portal_and_respawns_in_their_own_zone() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Mage);
+        let gate = w.maps[0].portals[0].clone();
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.x = gate.x;
+            p.character.y = gate.y;
+            p.character.hp = 0.;
+        }
+        w.update_player(1);
+        assert_eq!(w.players[&1].character.zone, 0);
+        // Dying in the Crags brings you back at the Crags' own camp, healed.
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.zone = 1;
+            p.character.x = 10.;
+            p.character.y = 10.;
+            p.dead_time = 3.3;
+        }
+        w.update_player(1);
+        let c = &w.players[&1].character;
+        assert_eq!(c.zone, 1);
+        assert_eq!(c.hp, c.max_hp());
+        assert!(c.point().distance(w.maps[1].spawn) < 1.);
+    }
+
+    #[test]
+    fn zones_do_not_share_targets_attacks_events_or_drops() {
+        let mut w = world();
+        let mut rx1 = join(&mut w, 1, Class::Warrior);
+        let (tx2, mut rx2) = mpsc::channel(256);
+        w.join(2, None, Some(Look::default()), tx2).unwrap();
+        let wisp = w.slimes.iter().position(|s| s.kind == "wisp").unwrap();
+        let spot = w.slimes[wisp].point();
+        // A meadow player cannot target, hit or aggravate a Crags enemy standing at the same coordinates.
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.x = spot.x - 0.9;
+            p.character.y = spot.y;
+            p.face = Point { x: 1., y: 0. };
+        }
+        w.message(1, ClientMessage::Target { id: wisp });
+        assert!(
+            w.players[&1].target.is_none(),
+            "other-zone targets are refused"
+        );
+        for _ in 0..20 {
+            w.strike(1);
+        }
+        assert_eq!(w.slimes[wisp].hp, w.slimes[wisp].max_hp);
+        w.slimes[wisp].atk_cd = 0.;
+        w.update_slime(wisp);
+        assert_eq!(w.slimes[wisp].state, "idle", "no chase across zones");
+        // Once the player stands in the Crags the same enemy is a valid target and hurts.
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        w.message(1, ClientMessage::Target { id: wisp });
+        assert_eq!(w.players[&1].target, Some(wisp));
+        for _ in 0..20 {
+            w.strike(1);
+        }
+        assert!(w.slimes[wisp].hp < w.slimes[wisp].max_hp);
+        // Events go only to the zone they happened in.
+        while rx1.try_recv().is_ok() {}
+        while rx2.try_recv().is_ok() {}
+        let actor = w.players[&1].character.id.clone();
+        w.event("hit", &actor, spot, 5., false);
+        assert!(rx1.try_recv().is_ok_and(|v| v["kind"] == "hit"));
+        assert!(
+            rx2.try_recv().is_err(),
+            "a Crags event must not reach the meadow"
+        );
+        // A kill's loot belongs to the Crags: the killer cannot collect it from the meadow.
+        w.hit_slime(wisp, 1, 100_000., false);
+        assert!(w.drops.iter().all(|d| d.zone == 1) && !w.drops.is_empty());
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.zone = 0;
+        c.x = spot.x;
+        c.y = spot.y;
+        for d in &mut w.drops {
+            d.t = 1.;
+        }
+        let gold = w.players[&1].character.gold;
+        w.update_drops();
+        assert_eq!(w.players[&1].character.gold, gold);
+        assert!(!w.drops.is_empty());
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        w.update_drops();
+        assert!(w.players[&1].character.gold > gold);
+    }
+
+    #[test]
+    fn crag_monsters_charge_with_their_own_authoritative_damage_and_rewards() {
+        for (kind, hp, damage, windup, gold, material_id, xp) in [
+            ("wisp", 280., 34., 0.35, 18, "ember_core", 80),
+            ("spider", 420., 42., 0.4, 26, "magma_fang", 120),
+            ("wraith", 520., 52., 0.5, 36, "ash_veil", 170),
+            ("golem", 1100., 64., 0.6, 55, "basalt_heart", 280),
+        ] {
+            let mut w = world();
+            let _rx = join(&mut w, 1, Class::Warrior);
+            let id = w.slimes.iter().position(|s| s.kind == kind).unwrap();
+            {
+                let p = w.players.get_mut(&1).unwrap();
+                p.character.zone = 1;
+                p.character.x = 48.;
+                p.character.y = 86.5;
+                p.character.hp = 1000.;
+            }
+            let point = w.players[&1].character.point();
+            w.slimes[id] = Slime::new(
+                id,
+                &SlimeSpawn {
+                    kind: kind.into(),
+                    x: point.x + 1.,
+                    y: point.y,
+                    zone: 1,
+                },
+            );
+            w.slimes[id].atk_cd = 0.;
+            w.update_slime(id);
+            assert_eq!(w.slimes[id].max_hp, hp, "{kind} health");
+            assert_eq!(w.slimes[id].state, "windup", "{kind} winds up");
+            let view = w.snapshot_for(1);
+            let listed = view["slimes"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|e| e["id"] == id)
+                .unwrap();
+            assert_eq!(listed["windupTime"], windup);
+            for _ in 0..60 {
+                w.time += TICK;
+                w.update_slime(id);
+                if w.players[&1].character.hp < 1000. {
+                    break;
+                }
+            }
+            let defense = w.players[&1].character.look.stats(1).1;
+            assert_eq!(
+                w.players[&1].character.hp,
+                1000. - (damage - defense),
+                "{kind} damage"
+            );
+            // Killing one pays its XP, gold and material in its own zone.
+            w.hit_slime(id, 1, 100_000., false);
+            let c = &w.players[&1].character;
+            assert_eq!(c.kills, 1);
+            let paid: u32 = (1..c.level)
+                .map(|l| (160. * (l as f64).powf(1.35)).round() as u32)
+                .sum::<u32>()
+                + c.xp;
+            assert_eq!(paid, xp, "{kind} xp");
+            assert_eq!(
+                w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
+                gold,
+                "{kind} gold"
+            );
+            assert!(
+                w.drops
+                    .iter()
+                    .any(|d| d.item.as_deref() == Some(material_id)),
+                "{kind} material"
+            );
         }
     }
 
@@ -2421,7 +3140,7 @@ mod tests {
             c.y = 73.;
             w.update_slime(0);
             assert!(w.slimes[0].target.is_none());
-            assert!(!w.map.in_city(w.slimes[0].point()));
+            assert!(!w.maps[0].in_city(w.slimes[0].point()));
         }
     }
 
@@ -2541,8 +3260,14 @@ mod tests {
         w.slimes[1].x = 36.5;
         w.slimes[1].y = 60.;
         w.players.get_mut(&1).unwrap().face = Point { x: 1., y: 0. };
-        w.strike(1);
-        w.update_bolts();
+        // A strike can miss (10% hit chance loss), so fire until one bolt lands.
+        for _ in 0..40 {
+            w.strike(1);
+            w.update_bolts();
+            if w.slimes[0].hp < 60. {
+                break;
+            }
+        }
         assert!(w.slimes[0].hp < 60.);
         assert_eq!(w.slimes[1].hp, 60.);
         assert!(w.bolts.is_empty());

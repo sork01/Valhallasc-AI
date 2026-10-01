@@ -6,8 +6,10 @@ const { route } = require('./route.cjs');
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
-async function walkTo(world, bot, goal) {
-  for (const point of route(map, world.player(bot), goal)) {
+const crags = map.zones[0];
+// `area` is the map of the zone the bot stands in: the meadow by default, or `crags`.
+async function walkTo(world, bot, goal, area = map) {
+  for (const point of route(area, world.player(bot), goal)) {
     await world.action(bot, { type: 'move', ...point });
     await world.waitFor(() => distance(world.player(bot), point) < .4, 20000, `Walk ${bot}`);
   }
@@ -22,6 +24,10 @@ async function talk(w, bot, npcId, offer) {
   await w.action(bot, { type: 'interact', npc: npcId, ...(offer ? { offer } : {}) });
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
+// Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10 };
+// Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
+const totalXp = p => p.xp + Array.from({ length: p.level - 1 }, (_, i) => Math.round(160 * (i + 1) ** 1.35)).reduce((a, b) => a + b, 0);
 const quest = (w, bot, id) => w.player(bot).quests.find(q => q.id === id);
 async function tour(w, bot) {
   await talk(w, bot, 'guide', 'quest:accept:welcome');
@@ -32,8 +38,8 @@ async function tour(w, bot) {
 async function defeat(w, bot, kind) {
   if (w.player(bot).hp < w.player(bot).maxHp * .85) await talk(w, bot, 'healer', 'blessing');
   // Starter gear needs isolated fights; prefer targets away from extra attackers.
-  const risk = enemy => distance(w.player(bot), enemy) + w.snapshot.slimes
-    .filter(s => !s.dead && s.id !== enemy.id && distance(s, enemy) < 9)
+  const risk = enemy => distance(w.player(bot), enemy) + 12 * (enemy.level - DEFAULT_LEVELS[enemy.kind]) + w.snapshot.slimes
+    .filter(s => !s.dead && s.id !== enemy.id && s.zone === enemy.zone && distance(s, enemy) < 9)
     .reduce((sum, s) => sum + (s.kind === 'beetle' ? 200 : 50), 0);
   const enemy = w.snapshot.slimes.filter(s => !s.dead && s.kind === kind)
     .sort((a, b) => risk(a) - risk(b))[0];
@@ -90,10 +96,14 @@ const scenarios = {
     description: 'A mage walks to an Ironhide, defeats it through normal target actions, and collects its loot.',
     async run(w, check) {
       await w.connect({ bot: 'Mage', class: 'mage' });
+      const beetle = () => w.snapshot.slimes.find(s => s.kind === 'beetle' && s.hx === 18 && s.hy === 42);
       const before = { ...w.player('Mage') };
-      const enemy = w.snapshot.slimes.find(s => s.kind === 'beetle' && s.hx === 18 && s.hy === 42);
+      const enemy = beetle();
       assert.ok(enemy && !enemy.dead, 'The meadow Ironhide is alive');
-      check(enemy.maxHp === 240, 'Ironhide has authoritative health');
+      // Every enemy rolls a level within two of its kind's default (Ironhide: 5); health, XP and gold follow it.
+      const level = enemy.level, scale = per => 1 + per * (level - 5);
+      check(level >= 3 && level <= 7, 'Ironhide level is within two of its default');
+      check(enemy.maxHp === Math.round(240 * scale(.12)), 'Ironhide has authoritative, level-scaled health');
       for (const point of route(map, before, enemy)) {
         if (distance(point, enemy) < 7) break;
         await w.action('Mage', { type: 'move', ...point });
@@ -106,12 +116,13 @@ const scenarios = {
       await w.action('Mage', { type: 'target', id: enemy.id });
       await w.waitFor(() => w.snapshot.slimes.find(s => s.id === enemy.id).dead, 30000, 'Defeat Ironhide');
       const after = w.player('Mage');
-      check(after.kills === before.kills + 1 && after.xp === before.xp + 32 && after.hp > 0,
-        'Real combat awards one kill and 32 XP while the mage survives');
+      const xp = Math.round(32 * scale(.15)), gold = Math.round(10 * scale(.1));
+      check(after.kills === before.kills + 1 && after.xp === before.xp + xp && after.hp > 0,
+        `Real combat awards one kill and the level-${level} XP (${xp}) while the mage survives`);
       const defeated = w.snapshot.slimes.find(s => s.id === enemy.id);
       await w.action('Mage', { type: 'move', x: defeated.x, y: defeated.y });
-      await w.waitFor(() => w.player('Mage').gold >= before.gold + 10, 15000, 'Collect Ironhide gold');
-      check(w.events.some(e => e.kind === 'pickup' && e.actor === before.id && e.value === 10), 'Killer receives the 10-gold pickup');
+      await w.waitFor(() => w.player('Mage').gold >= before.gold + gold, 15000, 'Collect Ironhide gold');
+      check(w.events.some(e => e.kind === 'pickup' && e.actor === before.id && e.value === gold), `Killer receives the level-scaled ${gold}-gold pickup`);
       await w.action('Mage', { type: 'stop' });
       const progress = { ...w.player('Mage') };
       await w.disconnect('Mage');
@@ -201,8 +212,8 @@ const scenarios = {
       const before = { ...w.player(bot) };
       await talk(w, bot, 'gatekeeper', 'quest:claim:slime_patrol');
       await w.waitFor(() => quest(w, bot, 'slime_patrol').claimed);
-      check(w.player(bot).gold === before.gold + 24 && w.player(bot).level === 2 && w.player(bot).xp === 32,
-        'Patrol turn-in awards 24 gold, levels the mage, and carries remaining XP');
+      check(w.player(bot).gold === before.gold + 24 && w.player(bot).level === 2 && totalXp(w.player(bot)) === totalXp(before) + 80,
+        'Patrol turn-in awards 24 gold and 80 XP, levels the mage, and carries the remainder');
       await talk(w, bot, 'smith', 'quest:accept:ironhide_hunt');
       await talk(w, bot, 'merchant', 'quest:accept:meadow_bounty');
       await w.waitFor(() => !!quest(w, bot, 'meadow_bounty'));
@@ -225,7 +236,7 @@ const scenarios = {
       const bountyBefore = { ...w.player(bot) };
       await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
       await w.waitFor(() => quest(w, bot, 'meadow_bounty').claimed);
-      check(w.player(bot).gold === bountyBefore.gold + 25 && w.player(bot).xp === bountyBefore.xp + 60,
+      check(w.player(bot).gold === bountyBefore.gold + 25 && totalXp(w.player(bot)) === totalXp(bountyBefore) + 60,
         'Eight real mixed kills pay the promised bounty reward');
       await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
       check(w.player(bot).gold === bountyBefore.gold + 25, 'Repeated bounty claims cannot duplicate rewards');
@@ -308,6 +319,84 @@ const scenarios = {
       check(w.player(bot).attributes.stamina === 0, 'Further training cannot overspend points');
       await w.restart();
       check(w.player(bot).statPoints === 0 && w.player(bot).attributes.intellect === 1 && w.player(bot).attributes.dexterity === 1 && w.player(bot).attributes.accuracy === 1, 'Allocations and remaining points survive a real restart');
+    },
+  },
+  crags: {
+    description: 'Walk through the Emberfall Gate into the level 5-10 Crags, use both gates, fight a leveled Cinder Wisp, and keep the zone across reconnect and restart.',
+    async run(w, check) {
+      const bot = 'Crawler';
+      await w.connect({ bot, class: 'warrior' });
+      const defaults = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10 };
+      const home = w.snapshot.slimes;
+      check(w.player(bot).zone === 0, 'New characters start in Greenmeadow');
+      check(home.length === 21 && home.every(s => s.zone === 0), 'A meadow client receives exactly the 21 meadow enemies and nothing from the Crags');
+      check(home.every(s => Math.abs(s.level - defaults[s.kind]) <= 2 && s.level >= 1), 'Every meadow enemy level is within two of its kind default');
+      // The gate is a real walk: the meadow route ends between its two posts.
+      const gate = map.portals[0];
+      await walkTo(w, bot, { x: gate.x, y: gate.y + 4 });
+      await w.action(bot, { type: 'move', x: gate.x, y: gate.y - 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 1, 15000, 'Step through the Emberfall Gate');
+      await w.action(bot, { type: 'stop' });
+      const arrival = { x: gate.tx, y: gate.ty };
+      check(w.player(bot).zone === 1 && distance(w.player(bot), arrival) < 1, 'The server moves the walker to the Crags arrival camp');
+      const away = w.snapshot.slimes;
+      check(away.length === 26 && away.every(s => s.zone === 1) && new Set(away.map(s => s.kind)).size === 4
+        && ['wisp', 'spider', 'wraith', 'golem'].every(k => away.some(s => s.kind === k)), 'A Crags client receives exactly the 26 Crags monsters, four kinds, and nothing from the meadow');
+      check(away.every(s => Math.abs(s.level - defaults[s.kind]) <= 2 && s.level >= 3) && new Set(away.map(s => s.level - defaults[s.kind])).size >= 3,
+        'Crags levels sit within two of each default and really vary');
+      check(away.filter(s => s.kind === 'wisp').every(s => s.maxHp === Math.round(280 * (1 + .12 * (s.level - 5)))), 'Health follows each rolled level');
+      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.type === 'system' && e.text.includes('Emberfall Crags') && e.text.includes('5-10'.replace('-', '–'))), 'The player is told the recommended levels');
+      // A second character in the meadow shares coordinates but not the world.
+      await w.connect({ bot: 'Meadow', class: 'mage' });
+      check(w.player('Meadow').zone === 0 && w.player(bot).zone === 1, 'Players in different zones are tracked separately');
+      check(w.views.get(bot).players.length === 1 && w.views.get('Meadow').players.length === 1 && w.views.get(bot).slimes.every(s => s.zone === 1) && w.views.get('Meadow').slimes.every(s => s.zone === 0),
+        'Each client is sent only its own zone: no foreign players or enemies');
+      check(JSON.stringify(w.snapshot.zonesSeen) === '[0,1]', 'The merged test view covers both zones while a bot stands in each');
+      await w.disconnect('Meadow');
+      // The way back is checked here, at the camp, before any fighting: after a restart the walk home from the wisps' band would
+      // cross wisp territory, and a level-1 warrior can die on it. Then the gate is taken again.
+      const back = crags.portals[0];
+      await walkTo(w, bot, { x: back.x, y: back.y - 3 }, crags);
+      await w.action(bot, { type: 'move', x: back.x, y: back.y + 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 0, 15000, 'Step through the Meadow Gate');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 0 && distance(w.player(bot), { x: back.tx, y: back.ty }) < 1, 'The Meadow Gate arrives beside the Emberfall Gate');
+      await w.action(bot, { type: 'move', x: gate.x, y: gate.y - 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 1, 15000, 'Step through the Emberfall Gate again');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 1 && distance(w.player(bot), arrival) < 1, 'The gate works again right after arriving, in both directions');
+      // Fight the weakest wisp through normal target actions.
+      // Test worlds are invulnerable, so any wisp will do: take the one guarding the first ford, the nearest on the way north.
+      const ford = { x: crags.paths[0][3][0], y: crags.paths[0][3][1] };
+      const wisp = w.snapshot.slimes.filter(s => s.kind === 'wisp' && !s.dead).sort((a, b) => distance({ x: a.hx, y: a.hy }, ford) - distance({ x: b.hx, y: b.hy }, ford))[0];
+      check(wisp.level >= 3 && wisp.level <= 7 && wisp.zone === 1, `Fighting the level ${wisp.level} Cinder Wisp that guards the first ford`);
+      const before = { ...w.player(bot) };
+      for (const point of route(crags, w.player(bot), wisp)) {
+        const current = () => w.snapshot.slimes.find(s => s.id === wisp.id);
+        if (distance(w.player(bot), current()) < 5.3) break;
+        await w.action(bot, { type: 'move', ...point });
+        await w.waitFor(() => distance(w.player(bot), point) < .5 || distance(w.player(bot), current()) < 5.3, 25000, 'Approach the wisp');
+      }
+      await w.action(bot, { type: 'target', id: wisp.id });
+      await w.waitFor(() => w.snapshot.slimes.find(s => s.id === wisp.id).dead || w.player(bot).hp <= 0, 40000, 'Defeat the wisp');
+      await w.action(bot, { type: 'stop' });
+      const after = w.player(bot);
+      check(after.hp > 0, 'The warrior survives real combat in the Crags');
+      const xp = Math.round(80 * (1 + .15 * (wisp.level - 5))), gold = Math.round(18 * (1 + .1 * (wisp.level - 5)));
+      check(after.kills === before.kills + 1 && after.xp === before.xp + xp, `The kill pays the level-${wisp.level} XP (${xp})`);
+      const corpse = w.snapshot.slimes.find(s => s.id === wisp.id);
+      await w.action(bot, { type: 'move', x: corpse.x, y: corpse.y });
+      await w.waitFor(() => w.player(bot).gold >= before.gold + gold && w.player(bot).inventory.some(i => i.item === 'ember_core'), 15000, 'Collect Crags loot');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).gold === before.gold + gold, `Level-scaled gold (${gold}) and an Ember Core drop are collected`);
+      // The zone is part of the saved character.
+      const where = { ...w.player(bot) };
+      await w.disconnect(bot);
+      await w.connect({ bot });
+      check(w.player(bot).zone === 1 && distance(w.player(bot), where) < 1.2, 'Resume puts the character back in the Crags');
+      await w.restart();
+      check(w.player(bot).zone === 1 && w.player(bot).gold === where.gold, 'The Crags position and loot survive a Rust restart');
     },
   },
   bags: {

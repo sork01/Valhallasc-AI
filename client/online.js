@@ -61,7 +61,8 @@
         case 'snapshot': {
           if (!connected) break;
           const character = packet.players.find(p => p.id === id);
-          status(`${window.City?.inside(character?.x, character?.y) ? WORLD_MAP.city.name : 'Greenmeadow'} · ${packet.online} online`, true);
+          const away = character?.zone > 0 ? WORLD_MAP.zones?.[character.zone - 1]?.name : null;
+          status(`${away || (window.City?.inside(character?.x, character?.y) ? WORLD_MAP.city.name : 'Greenmeadow')} · ${packet.online} online`, true);
           const slot = saved.characters.find(c => c.token === saved.current);
           if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
           callbacks.onSnapshot?.(packet); break;

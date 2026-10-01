@@ -193,6 +193,9 @@ pub struct Character {
     pub bags: Vec<String>,
     #[serde(default)]
     pub attributes: Attributes,
+    /// Index of the zone the character stands in; 0 is Greenmeadow and Alderhaven.
+    #[serde(default)]
+    pub zone: usize,
 }
 /// Permanently trained points. Base class combat values stay unchanged until trained.
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
@@ -460,9 +463,26 @@ pub struct SlimeSpawn {
     pub x: f64,
     pub y: f64,
     pub kind: String,
+    /// Filled in when the zones' spawns are flattened into the world's enemy list.
+    #[serde(skip)]
+    pub zone: usize,
+}
+/// Walking into this disc moves a player to another zone's arrival point.
+#[derive(Clone, Deserialize, Serialize)]
+pub struct Portal {
+    pub id: String,
+    pub name: String,
+    pub x: f64,
+    pub y: f64,
+    pub r: f64,
+    pub to: usize,
+    pub tx: f64,
+    pub ty: f64,
 }
 #[derive(Clone, Deserialize)]
 pub struct Map {
+    #[serde(default)]
+    pub name: String,
     pub size: u32,
     pub spawn: Point,
     pub objects: Vec<Obstacle>,
@@ -472,6 +492,14 @@ pub struct Map {
     #[serde(default)]
     pub quests: Vec<Quest>,
     pub city: Option<City>,
+    #[serde(default)]
+    pub portals: Vec<Portal>,
+    /// Recommended character levels, shown when a portal is used.
+    #[serde(default)]
+    pub levels: Option<[u32; 2]>,
+    /// Further zones; only the top-level map carries them, as zones 1, 2, ...
+    #[serde(default)]
+    pub zones: Vec<Map>,
 }
 impl Default for Map {
     fn default() -> Self {
@@ -559,12 +587,16 @@ mod tests {
     #[test]
     fn collision_blocks_dash_tunnelling_and_resolves_centres() {
         let map = Map {
+            name: String::new(),
             size: 72,
             spawn: Point::default(),
             slimes: vec![],
             npcs: vec![],
             quests: vec![],
             city: None,
+            portals: vec![],
+            levels: None,
+            zones: vec![],
             objects: vec![Obstacle {
                 x: 5.,
                 y: 5.,

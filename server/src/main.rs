@@ -52,7 +52,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
     }
     let store = store::Store::open(std::path::Path::new(&data))?;
-    let world = world::World::new(store);
+    // Each enemy's level is its kind's default plus or minus this many levels (0 pins every enemy to its default).
+    let spread = std::env::var("VALHALLA_LEVEL_SPREAD")
+        .ok()
+        .and_then(|v| v.parse::<i32>().ok())
+        .map_or(world::LEVEL_SPREAD, |v| v.clamp(0, 5));
+    let mut world = world::World::with_level_spread(store, spread);
+    // For automated tests only: players take no damage. Never set on the public service.
+    world.god_mode = std::env::var("VALHALLA_GOD_MODE").is_ok_and(|v| v == "1");
+    if world.god_mode {
+        tracing::warn!("VALHALLA_GOD_MODE is on: players cannot be hurt");
+    }
     let (tx, rx) = mpsc::channel(1024);
     let (snap_tx, snap_rx) = watch::channel(world.snapshot());
     let (shutdown_tx, shutdown_rx) = watch::channel(false);
@@ -119,6 +129,19 @@ async fn health(State(app): State<App>) -> impl IntoResponse {
     axum::Json(
         json!({"status":"ok","version":1,"tick":snapshot["tick"],"online":snapshot["online"],"capacity":MAX_PLAYERS}),
     )
+}
+// One zone's complete snapshot: the one listing this player, else the last zone they were in.
+fn zone_view(snapshot: &Value, id: &str, zone: &mut usize) -> Option<Value> {
+    let zones = snapshot["zones"].as_array()?;
+    let listed = |z: &Value| {
+        z["players"]
+            .as_array()
+            .is_some_and(|players| players.iter().any(|p| p["id"] == id))
+    };
+    if let Some(found) = zones.iter().position(listed) {
+        *zone = found;
+    }
+    zones.get(*zone).cloned()
 }
 fn origin_allowed(headers: &HeaderMap, configured: Option<&str>) -> bool {
     let Some(origin) = headers.get(header::ORIGIN) else {
@@ -209,6 +232,13 @@ async fn connection(mut socket: WebSocket, mut app: App) {
         }
         Err(_) => return,
     };
+    // Which zone's view this connection forwards: wherever its own character is listed.
+    let id = welcome["id"].as_str().unwrap_or_default().to_owned();
+    let mut zone = welcome["snapshot"]["players"]
+        .as_array()
+        .and_then(|players| players.iter().find(|p| p["id"] == id.as_str()))
+        .and_then(|p| p["zone"].as_u64())
+        .unwrap_or(0) as usize;
     if send(&mut socket, &welcome).await {
         let mut last_seen = Instant::now();
         let mut window = Instant::now();
@@ -222,8 +252,9 @@ async fn connection(mut socket: WebSocket, mut app: App) {
                     if !matches!(tokio::time::timeout(Duration::from_secs(2),socket.send(Message::Ping(vec![].into()))).await,Ok(Ok(()))){break;}
                 }
                 changed=app.snapshots.changed()=>{
-                    if changed.is_err(){break;}let snapshot=app.snapshots.borrow_and_update().clone();
-                    if !send(&mut socket,&snapshot).await{break;}
+                    if changed.is_err(){break;}
+                    let view=zone_view(&app.snapshots.borrow_and_update(),&id,&mut zone);
+                    if let Some(view)=view && !send(&mut socket,&view).await{break;}
                 }
                 event=events.recv()=>{
                     let Some(event)=event else {break;};if !send(&mut socket,&event).await{break;}
@@ -253,6 +284,21 @@ async fn connection(mut socket: WebSocket, mut app: App) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn each_connection_forwards_only_the_zone_that_lists_its_character() {
+        let view = |zone: usize, ids: &[&str]| json!({"zone": zone, "players": ids.iter().map(|id| json!({"id": id})).collect::<Vec<_>>()});
+        let snapshot =
+            json!({"tick": 7, "online": 3, "zones": [view(0, &["a", "b"]), view(1, &["c"])]});
+        let mut zone = 0;
+        assert_eq!(zone_view(&snapshot, "c", &mut zone).unwrap()["zone"], 1);
+        assert_eq!(zone, 1);
+        assert_eq!(zone_view(&snapshot, "a", &mut zone).unwrap()["zone"], 0);
+        // A character missing from every view (leaving) keeps the zone it had.
+        zone = 1;
+        assert_eq!(zone_view(&snapshot, "gone", &mut zone).unwrap()["zone"], 1);
+        assert!(zone_view(&json!({"tick": 1}), "a", &mut zone).is_none());
+    }
+
     #[test]
     fn websocket_origin_policy() {
         let mut h = HeaderMap::new();
