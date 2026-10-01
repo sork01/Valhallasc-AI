@@ -30,12 +30,6 @@ const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 const totalXp = p => p.xp + Array.from({ length: p.level - 1 }, (_, i) => Math.round(160 * (i + 1) ** 1.35)).reduce((a, b) => a + b, 0);
 const quest = (w, bot, id) => w.player(bot).quests.find(q => q.id === id);
-async function tour(w, bot) {
-  await talk(w, bot, 'guide', 'quest:accept:welcome');
-  for (const npc of ['healer', 'smith', 'innkeeper']) await talk(w, bot, npc);
-  await talk(w, bot, 'guide', 'quest:claim:welcome');
-  await w.waitFor(() => quest(w, bot, 'welcome')?.claimed);
-}
 async function defeat(w, bot, kind) {
   if (w.player(bot).hp < w.player(bot).maxHp * .85) await talk(w, bot, 'healer', 'blessing');
   // Starter gear needs isolated fights; prefer targets away from extra attackers.
@@ -274,20 +268,22 @@ const scenarios = {
     },
   },
   quest_combat: {
-    description: 'Real slime/Ironhide kills, prerequisite unlocks, level-up, killer-only quest credit, repeatable bounty, and save/resume.',
+    description: 'One real slime fight, then shortcut kills through the real kill path: prerequisite unlocks, level-up, killer-only quest credit, repeatable bounty, and save/resume.',
     async run(w, check) {
       const bot = 'QuestMage';
       await w.connect({ bot, class: 'mage' });
-      await tour(w, bot);
+      // The welcome tour is covered by the quests scenario; here it is only the prerequisite of the patrol.
+      await kit.setupCharacter(w, bot, { finishQuests: ['welcome'] });
       await w.connect({ bot: 'Observer' });
       const locked = await talk(w, bot, 'smith', 'quest:accept:ironhide_hunt');
       check(locked.notice.includes('earlier quest') && !quest(w, bot, 'ironhide_hunt'), 'Ironhide hunt is locked until the slime patrol is turned in');
       await talk(w, bot, 'gatekeeper', 'quest:accept:slime_patrol');
-      for (let i = 1; i <= 6; i++) {
-        await defeat(w, bot, 'green');
-        await w.waitFor(() => quest(w, bot, 'slime_patrol').counts[0] === i);
-      }
-      check(quest(w, bot, 'slime_patrol').counts[0] === 6, 'Six real kills advance the accepted slime patrol');
+      // One enemy is fought for real (movement, targeting, damage); the other five go through the same kill path.
+      await defeat(w, bot, 'green');
+      await w.waitFor(() => quest(w, bot, 'slime_patrol').counts[0] === 1);
+      check((await kit.killEnemies(w, bot, { kind: 'green', max: 5 })).count === 5, 'Five more greens are defeated through the kill path');
+      await w.waitFor(() => quest(w, bot, 'slime_patrol').counts[0] === 6);
+      check(quest(w, bot, 'slime_patrol').counts[0] === 6, 'One real kill and five shortcut kills advance the accepted slime patrol');
       check(w.player('Observer').kills === 0 && !w.player('Observer').quests.length, 'Another player receives no killer quest credit');
       await talk(w, bot, 'smith', 'quest:accept:ironhide_hunt');
       check(!quest(w, bot, 'ironhide_hunt'), 'Completing objectives alone does not unlock the next quest');
@@ -308,17 +304,15 @@ const scenarios = {
       await talk(w, bot, 'merchant', 'quest:accept:meadow_bounty');
       await w.waitFor(() => !!quest(w, bot, 'meadow_bounty'));
       check(quest(w, bot, 'meadow_bounty').counts[0] === 0, 'Bounty excludes kills made before acceptance');
-      await talk(w, bot, 'healer', 'blessing');
-      for (let i = 1; i <= 2; i++) {
-        await defeat(w, bot, 'beetle');
-        await w.waitFor(() => quest(w, bot, 'ironhide_hunt').counts[0] === i && quest(w, bot, 'meadow_bounty').counts[0] === i);
-      }
+      check((await kit.killEnemies(w, bot, { kind: 'beetle', max: 2 })).count === 2, 'Two Ironhides are defeated through the kill path');
+      await w.waitFor(() => quest(w, bot, 'ironhide_hunt').counts[0] === 2 && quest(w, bot, 'meadow_bounty').counts[0] === 2);
       check(quest(w, bot, 'ironhide_hunt').counts[0] === 2 && quest(w, bot, 'slime_patrol').counts[0] === 6,
         'Ironhide kills advance both matching active quests while completed patrol stays unchanged');
-      for (let i = 3; i <= 8; i++) {
-        await defeat(w, bot, 'green');
-        await w.waitFor(() => quest(w, bot, 'meadow_bounty').counts[0] === i);
-      }
+      // Six more for the bounty: only two greens are left alive (respawn takes 22 s), so take the other small slimes too.
+      let rest = 6;
+      for (const kind of ['green', 'blue', 'pink', 'yellow']) if (rest) rest -= (await kit.killEnemies(w, bot, { kind, max: rest })).count;
+      assert.equal(rest, 0, 'Enough slimes are alive for the bounty');
+      await w.waitFor(() => quest(w, bot, 'meadow_bounty').counts[0] === 8);
       await talk(w, bot, 'smith', 'quest:claim:ironhide_hunt');
       await talk(w, bot, 'gatekeeper', 'quest:accept:king_challenge');
       await w.waitFor(() => !!quest(w, bot, 'king_challenge'));
@@ -327,7 +321,7 @@ const scenarios = {
       await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
       await w.waitFor(() => quest(w, bot, 'meadow_bounty').claimed);
       check(w.player(bot).gold === bountyBefore.gold + 25 && totalXp(w.player(bot)) === totalXp(bountyBefore) + 60,
-        'Eight real mixed kills pay the promised bounty reward');
+        'Eight mixed kills pay the promised bounty reward');
       await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
       check(w.player(bot).gold === bountyBefore.gold + 25, 'Repeated bounty claims cannot duplicate rewards');
       await talk(w, bot, 'merchant', 'quest:accept:meadow_bounty');
@@ -382,19 +376,16 @@ const scenarios = {
     },
   },
   stats: {
-    description: 'Earn a level through real quests and combat, train stats, reject overspending, and resume saved allocations.',
+    description: 'Reach level 2 with the set_level shortcut (real XP-to-level is covered by quest_combat), train stats, reject overspending, and resume saved allocations.',
     async run(w, check) {
       const bot = 'StatMage'; await w.connect({ bot, class: 'mage' });
       check(w.player(bot).statPoints === 0 && w.player(bot).hitChance === .9, 'New characters have no free training points and 90% hit chance');
       await w.action(bot, { type: 'allocate_stat', stat: 'intellect' });
       await w.waitFor(() => w.events.some(e => e.type === 'error' && e.text.includes('Level up')));
       check(w.player(bot).attributes.intellect === 0, 'The server rejects spending points before leveling');
-      await tour(w, bot);
-      await talk(w, bot, 'gatekeeper', 'quest:accept:slime_patrol');
-      for (let i = 0; i < 6; i++) await defeat(w, bot, 'green');
-      await talk(w, bot, 'gatekeeper', 'quest:claim:slime_patrol');
+      await kit.setupCharacter(w, bot, { level: 2 });
       await w.waitFor(() => w.player(bot).level === 2 && w.player(bot).statPoints === 3);
-      check(w.player(bot).statPoints === 3, 'A real combat and quest level earns three points');
+      check(w.player(bot).statPoints === 3, 'Level 2 grants three training points');
       const before = { ...w.player(bot) };
       for (const stat of ['intellect', 'dexterity', 'accuracy']) {
         await w.action(bot, { type: 'allocate_stat', stat });
@@ -694,7 +685,8 @@ const scenarios = {
         await w.advance(500);
         return w.events.find(e => !earlier.has(e) && e.bot === 'Diner' && e.type === 'error')?.text || null;
       }
-      await kit.setupCharacter(w, 'Diner', { gold: 100 });
+      // The shop trips are not what this checks, so the character is placed beside each counter.
+      await kit.setupCharacter(w, 'Diner', { gold: 100, teleportTo: { npc: 'baker' } });
       const bun = await kit.talkTo(w, 'Diner', 'baker', 'buy_traveler_stew');
       await w.waitFor(() => owned('traveler_stew') === 1, 3000, 'First stew');
       check(/Bought Traveler/.test(bun.notice) && bun.gold === 88 && me().gold === 88, 'The baker sells Traveler\'s Stew for 12 gold');
@@ -704,6 +696,7 @@ const scenarios = {
       await w.action('Diner', { type: 'interact', npc: 'baker', offer: 'buy_health_potion' });
       await w.advance(600);
       check(owned('health_potion') === 0 && me().gold === 76, 'The baker does not sell potions and charges nothing for the request');
+      await kit.teleport(w, 'Diner', { npc: 'apothecary' });
       await kit.talkTo(w, 'Diner', 'apothecary', 'buy_health_potion');
       await kit.talkTo(w, 'Diner', 'apothecary', 'buy_health_potion');
       await w.waitFor(() => owned('health_potion') === 2, 3000, 'Two potions');
