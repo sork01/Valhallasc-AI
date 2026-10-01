@@ -196,6 +196,9 @@ pub struct Character {
     /// Index of the zone the character stands in; 0 is Greenmeadow and Alderhaven.
     #[serde(default)]
     pub zone: usize,
+    /// Character ids of mutual friends. Both sides list each other; names and levels are looked up when shown.
+    #[serde(default)]
+    pub friends: Vec<String>,
 }
 /// Permanently trained points. Base class combat values stay unchanged until trained.
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
@@ -412,6 +415,10 @@ pub enum ClientMessage {
     Chat {
         text: String,
     },
+    /// Friends and parties (server/src/world/social.rs).
+    Social {
+        command: SocialCommand,
+    },
     Ping {
         nonce: u64,
     },
@@ -420,6 +427,48 @@ pub enum ClientMessage {
         #[serde(default, rename = "ref")]
         reference: Option<u64>,
         command: DebugCommand,
+    },
+}
+
+/// A target is the character id (from the friends list, the online list or an invite), or else a name that
+/// must match exactly one online player.
+#[derive(Debug, Deserialize)]
+#[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
+pub enum SocialCommand {
+    Refresh,
+    Who,
+    FriendRequest {
+        id: Option<String>,
+        name: Option<String>,
+    },
+    FriendAccept {
+        id: String,
+    },
+    FriendDecline {
+        id: String,
+    },
+    FriendRemove {
+        id: String,
+    },
+    PartyInvite {
+        id: Option<String>,
+        name: Option<String>,
+    },
+    PartyAccept {
+        id: String,
+    },
+    PartyDecline {
+        id: String,
+    },
+    PartyLeave,
+    PartyKick {
+        id: String,
+    },
+    PartyPromote {
+        id: String,
+    },
+    PartyChat {
+        text: String,
     },
 }
 

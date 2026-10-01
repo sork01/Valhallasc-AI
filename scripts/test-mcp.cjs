@@ -116,11 +116,13 @@ tool('setup_character', 'Reach a state in one call: level, gold, items [{item,qu
     items: z.array(z.object({ item: z.string(), quantity: z.number().int().min(1).max(9999).optional(), force: z.boolean().optional() }).strict()).max(40).optional(),
     finishQuests: z.array(z.string()).max(10).optional(), teleportTo: kit.targetSchema.optional(), heal: z.boolean().default(true) }),
   ({ bot, ...options }) => kit.setupCharacter(current(), bot, options));
-tool('wait_for_event', 'Wait up to timeout ms for a NEW event: type (event, chat, system, dialogue, error, debug), optional kind (levelup, skill, hit, slimeDie, death, respawn, pickup, portal...) and bot.',
+tool('wait_for_event', 'Wait up to timeout ms for a NEW event: type (event, chat, system, notice, social, who, dialogue, error, debug), optional kind (levelup, skill, hit, slimeDie, death, respawn, pickup, portal...) and bot.',
   z.object({ type: z.string().default('event'), kind: z.string().optional(), bot: bot.optional(), timeout: z.number().int().min(100).max(30000).default(10000) }).strict(),
   options => kit.waitForEvent(current(), options));
 tool('debug_command', 'Escape hatch: send one raw test-server shortcut ({op: set_level|give_xp|set_gold|set_hp|die|reset_stats|reset_cooldowns|set_god_mode|teleport|give_item|take_item|drop_item|quest|kill_enemy|respawn_enemy|summon_king, ...fields}).',
   forBot({ command: kit.debugSchema }), async ({ bot, command }) => summarize(await current().debug(bot, command)));
+tool('social', 'Friends and parties as a player does them. command: {op: friend_request|friend_accept|friend_decline|friend_remove|party_invite|party_accept|party_decline|party_kick|party_promote, bot|id|name} | {op: party_leave} | {op: party_chat, text} | {op: refresh} | {op: who}. Name another connected bot with `bot` (resolved to its character id); friend_request and party_invite also take a player `name`. Returns what the bot was told: notices (ok:false is a refusal), its friends/requests/party now, party chat, and for who the online roster. A party holds 5; requests lapse after 60 s.',
+  forBot({ command: kit.socialSchema }), ({ bot, command }) => current().social(bot, command));
 tool('list_scenarios', 'List reusable real-protocol scenarios.', empty,
   () => ({ scenarios: Object.entries(scenarios).map(([name, s]) => ({ name, description: s.description })) }), true);
 tool('run_scenario', 'Run a named scenario in a fresh private world, stop it, and return checks and a report path. Stop any interactive world first. City travel may take about a minute.',

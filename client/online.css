@@ -279,3 +279,56 @@
 .buff-chip i { position: absolute; z-index: 2; left: 0; right: 0; bottom: .1cqw; font: normal max(9px, .9cqw) 'Jua', sans-serif; text-align: center; color: #fff; text-shadow: 0 1px 2px #000; }
 .buff-chip[data-kind="damage"] { --buff: #ff9a3a; border-color: #ff9a3a; } .buff-chip[data-kind="shield"] { --buff: #59a8ff; border-color: #59a8ff; }
 .buff-chip[data-kind="haste"] { --buff: #ffe45a; border-color: #ffe45a; } .buff-chip[data-kind="dodge"] { --buff: #b9a8ff; border-color: #b9a8ff; } .buff-chip[data-kind="crit"] { --buff: #ff5c7a; border-color: #ff5c7a; }
+
+/* ---- Friends and party ---- */
+.social-open { position: absolute; right: 6.9cqw; bottom: 3.8cqw; z-index: 21; width: 4.8cqw; height: 5.1cqw; border: 2px solid #a88e5e; border-radius: .3cqw; background: linear-gradient(#4b4333, #171c1b); color: #e6cd98; cursor: pointer; box-shadow: 0 .3cqw .8cqw #0009; }
+.social-open svg { width: 75%; height: 75%; margin-top: .6cqw; }
+.social-open kbd { position: absolute; left: .3cqw; top: .2cqw; font: .8cqw 'Jua', sans-serif; }
+.social-open:hover, .social-open[aria-expanded="true"] { filter: brightness(1.2); }
+.social-open:focus-visible, .social-panel :focus-visible, .party-frame :focus-visible, .invite-card :focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }
+#social-panel { z-index: 47; }
+.social-panel { position: static; width: 44cqw; max-height: 46cqw; display: flex; flex-direction: column; gap: .7cqw; padding: 1.4cqw 1.8cqw; color: #eee3cb; font: 1cqw 'Jua', sans-serif; text-align: left; }
+.social-head { display: flex; align-items: center; justify-content: space-between; }
+.social-head h3 { margin: 0; font: 2cqw 'Jua', sans-serif; color: #f1d493; }
+.social-tabs { display: flex; gap: .4cqw; border-bottom: 1px solid #b89b5c80; }
+.social-tabs button { padding: .5cqw 1.2cqw; border: 1px solid transparent; border-bottom: 0; border-radius: .4cqw .4cqw 0 0; background: none; color: #cdbf9d; font: 1.05cqw 'Jua', sans-serif; cursor: pointer; }
+.social-tabs button[aria-selected="true"] { color: #ffe9a8; background: #2b3a52; border-color: #b89b5c80; }
+.social-add { display: flex; gap: .5cqw; }
+.social-add input { min-width: 0; flex: 1; padding: .5cqw .7cqw; border: 1px solid #827252; border-radius: .3cqw; background: #0e142a; color: #fff; font: inherit; }
+.social-add button[hidden] { display: none; }
+.social-notice { min-height: 1.4em; margin: 0; font-size: .9cqw; color: #b9dfb6; }
+.social-notice[data-ok="false"] { color: #ffb7a3; }
+.social-body { overflow: auto; scrollbar-width: thin; display: flex; flex-direction: column; gap: .5cqw; min-height: 14cqw; max-height: 30cqw; }
+.social-title { margin: .3cqw 0 0; font: 1.05cqw 'Jua', sans-serif; color: #f1d493; letter-spacing: .04em; }
+.social-note, .social-empty { margin: .3cqw 0; color: #bcae8f; font-size: .9cqw; list-style: none; }
+.social-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: .35cqw; }
+.social-row { display: flex; align-items: center; gap: .6cqw; padding: .45cqw .7cqw; border: 1px solid #d9c49233; border-radius: .4cqw; background: #142820a8; }
+.social-row[data-online="false"] { opacity: .6; }
+.social-who { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow-wrap: anywhere; }
+.social-who b { color: #ffe6a8; font-weight: normal; }
+.social-who small, .social-tag, .invite-left { font-size: .8cqw; color: #a9b8c8; }
+.social-tag { white-space: nowrap; }
+.social-row .window-tool.danger, .social-body > .window-tool.danger { color: #ffc4b3; }
+.social-body > .window-tool { align-self: flex-start; }
+.member-bar { position: relative; width: 8cqw; height: 1.3cqw; border-radius: .3cqw; background: #16263dcc; overflow: hidden; flex: none; }
+.member-fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(#a6f0b5, #4fb871); }
+.social-row[data-dead="true"] .member-fill { background: #8a4b4b; }
+.member-bar em { position: absolute; inset: 0; display: grid; place-items: center; font: normal .75cqw/1 'Jua', sans-serif; color: #fff; text-shadow: 0 1px 2px #000; }
+.party-frame { position: absolute; left: 1.4cqw; top: 15.2cqw; width: 17cqw; z-index: 20; color: #f1ecda; font: .9cqw 'Jua', sans-serif; }
+.party-head { width: 100%; padding: .35cqw .6cqw; border: 0; border-bottom: 1px solid #b89b5c80; background: linear-gradient(90deg, #182024cc, #18202420); color: #ffd56b; font: inherit; text-align: left; cursor: pointer; text-shadow: 0 1px 3px #000; }
+.party-frame .social-list { gap: .25cqw; margin-top: .3cqw; }
+.party-frame .social-row { padding: .3cqw .5cqw; background: #101a2ccc; flex-wrap: wrap; gap: .2cqw .5cqw; }
+.party-frame .social-who small { display: none; }
+.party-frame .member-bar { width: 100%; height: 1cqw; }
+.social-invites { position: absolute; left: 50%; top: 5cqw; transform: translateX(-50%); z-index: 44; display: flex; flex-direction: column; gap: .6cqw; align-items: center; }
+.invite-card { display: flex; align-items: center; gap: .8cqw; padding: .6cqw 1cqw; border: 1px solid #d9c492aa; border-radius: .6cqw; background: #1f2d29f2; color: #f6ead0; font: 1cqw 'Jua', sans-serif; box-shadow: 0 .4cqw 1.2cqw #0009; }
+.invite-card p { margin: 0; }
+.invite-card .btn { font-size: .9cqw; padding: .3em 1em; }
+.chat-party { color: #9ad9ff; }
+.chat-party b { color: #7fd0ff; }
+.chat-notice { color: #cfe8c8; font-style: italic; }
+.chat-refused { color: #ffb7a3; font-style: italic; }
+@media (pointer: coarse) {
+  .social-open, .social-panel .window-tool, .social-tabs button, .party-head, .invite-card .btn { min-height: 44px; min-width: 44px; }
+  .social-add input { font-size: 16px; min-height: 44px; }
+}

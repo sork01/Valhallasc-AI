@@ -10,6 +10,7 @@ use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
 mod debug;
+mod social;
 
 pub type Peer = mpsc::Sender<Value>;
 const KING_SPAWN_MIN: f64 = 300.;
@@ -350,6 +351,8 @@ pub struct World {
     pub start_level: u32,
     // Test servers only (VALHALLA_TEST_COMMANDS=1): players may send `debug` shortcuts. Never set on the public service.
     pub test_commands: bool,
+    // Friend requests, party invites and parties. Nothing here is persisted except `Character::friends`.
+    social: social::Social,
 }
 impl World {
     // Production code reads VALHALLA_LEVEL_SPREAD in main; tests that want real random levels use this.
@@ -389,6 +392,7 @@ impl World {
             god_mode: false,
             start_level: 1,
             test_commands: false,
+            social: social::Social::default(),
         };
         for id in 0..world.spawns.len() {
             let spawn = world.spawns[id].clone();
@@ -626,7 +630,9 @@ impl World {
         let id = c.id.clone();
         let name = c.look.name.clone();
         let place = self.zone_name(c.zone).to_owned();
+        let friends = c.friends.clone();
         self.players.insert(session, Player::new(c, peer));
+        self.social_joined(&id, &name, &friends);
         self.separate_enemies();
         self.emit(json!({"type":"system","text":format!("{name} entered {place}.")}));
         let zone = self.players[&session].character.zone;
@@ -644,6 +650,7 @@ impl World {
         if let Some(p) = self.players.remove(&session) {
             let name = p.character.look.name.clone();
             let place = self.zone_name(p.character.zone).to_owned();
+            self.social_left(&p.character.id, &name, &p.character.friends);
             self.pending_saves.push(p.character);
             self.save();
             self.emit(json!({"type":"system","text":format!("{name} left {place}.")}));
@@ -777,6 +784,9 @@ impl World {
                 let name = p.character.look.name.clone();
                 let id = p.character.id.clone();
                 self.emit(json!({"type":"chat","name":name,"id":id,"text":text}));
+            }
+            ClientMessage::Social { command } => {
+                self.social(session, command);
             }
             ClientMessage::Ping { nonce } => {
                 let _ = p.peer.try_send(json!({"type":"pong","nonce":nonce}));
@@ -967,6 +977,9 @@ impl World {
             .collect();
         for session in stale {
             self.leave(session);
+        }
+        if self.tick.is_multiple_of(10) {
+            self.update_social();
         }
         if self.tick.is_multiple_of(100) {
             self.save();

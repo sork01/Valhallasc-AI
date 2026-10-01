@@ -1,10 +1,16 @@
-use crate::model::{Character, Look, Point};
+use crate::model::{Character, Class, Look, Point};
 use rusqlite::{Connection, OptionalExtension, params};
 use sha2::{Digest, Sha256};
 use uuid::Uuid;
 
 pub struct Store {
     db: Connection,
+}
+/// What a friends list shows about a character who is offline.
+pub struct Summary {
+    pub name: String,
+    pub class: Class,
+    pub level: u32,
 }
 impl Store {
     pub fn open(path: &std::path::Path) -> Result<Self, Box<dyn std::error::Error>> {
@@ -80,6 +86,7 @@ impl Store {
             bags: vec![],
             attributes: Default::default(),
             zone: 0,
+            friends: vec![],
         };
         c.seed_inventory();
         self.db.execute(
@@ -87,6 +94,43 @@ impl Store {
             params![c.id, hash(&token), serde_json::to_string(&c)?],
         )?;
         Ok((c, token))
+    }
+    pub fn summary(&self, id: &str) -> Option<Summary> {
+        let state: String = self
+            .db
+            .query_row("SELECT state FROM characters WHERE id=?1", [id], |r| {
+                r.get(0)
+            })
+            .optional()
+            .ok()??;
+        let v: serde_json::Value = serde_json::from_str(&state).ok()?;
+        Some(Summary {
+            name: v["look"]["name"].as_str()?.to_owned(),
+            class: serde_json::from_value(v["look"]["class"].clone()).unwrap_or_default(),
+            level: v["level"].as_u64().unwrap_or(1) as u32,
+        })
+    }
+    /// Drops `friend` from an offline character's list. Only the `friends` field is edited in the stored JSON, so a
+    /// legacy save keeps every field (such as a missing `inventory`) that load() migrates.
+    pub fn remove_friend(&self, id: &str, friend: &str) -> Result<(), Box<dyn std::error::Error>> {
+        let state: Option<String> = self
+            .db
+            .query_row("SELECT state FROM characters WHERE id=?1", [id], |r| {
+                r.get(0)
+            })
+            .optional()?;
+        let Some(state) = state else {
+            return Ok(());
+        };
+        let mut v: serde_json::Value = serde_json::from_str(&state)?;
+        if let Some(list) = v.get_mut("friends").and_then(|f| f.as_array_mut()) {
+            list.retain(|f| f.as_str() != Some(friend));
+            self.db.execute(
+                "UPDATE characters SET state=?1 WHERE id=?2",
+                params![v.to_string(), id],
+            )?;
+        }
+        Ok(())
     }
     pub fn save_many<'a>(
         &mut self,
@@ -184,6 +228,31 @@ mod tests {
         .unwrap();
         assert!(s.load(&token).unwrap().unwrap().quests.is_empty());
         assert!(s.load(&token).unwrap().unwrap().equipment.is_empty());
+    }
+    #[test]
+    fn characters_saved_before_friends_resume_with_none_and_keep_friends_after() {
+        let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();
+        let (mut c, token) = s.create(Look::default(), Point::default()).unwrap();
+        let mut old = serde_json::to_value(&c).unwrap();
+        old.as_object_mut().unwrap().remove("friends");
+        s.db.execute(
+            "UPDATE characters SET state=?1 WHERE id=?2",
+            params![old.to_string(), c.id],
+        )
+        .unwrap();
+        assert!(s.load(&token).unwrap().unwrap().friends.is_empty());
+        // Removing a friend from a save that never had the field changes nothing, and stays loadable.
+        s.remove_friend(&c.id, "someone").unwrap();
+        assert!(s.load(&token).unwrap().unwrap().friends.is_empty());
+        c.friends = vec!["a".into(), "b".into()];
+        s.save_many(std::iter::once(&c)).unwrap();
+        assert_eq!(s.load(&token).unwrap().unwrap().friends, ["a", "b"]);
+        s.remove_friend(&c.id, "a").unwrap();
+        assert_eq!(s.load(&token).unwrap().unwrap().friends, ["b"]);
+        s.remove_friend("no-such-character", "b").unwrap();
+        let summary = s.summary(&c.id).unwrap();
+        assert_eq!((summary.name.as_str(), summary.level), ("Adventurer", 1));
+        assert!(s.summary("no-such-character").is_none());
     }
     #[test]
     fn characters_saved_before_zones_resume_in_the_meadow_and_keep_their_zone_after() {

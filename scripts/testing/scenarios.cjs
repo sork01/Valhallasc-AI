@@ -602,6 +602,89 @@ const scenarios = {
     },
   },
 
+  social: {
+    description: 'Friends and parties through real connections: requests by name and by bot, mutual friends that survive a restart, a five-member party that refuses a sixth, leader-only invites, party chat, party health, promote/kick/leave, and a dropped member keeping their seat.',
+    async run(w, check) {
+      const names = ['Ann', 'Bob', 'Cy', 'Dee', 'Eve', 'Fay'];
+      for (const bot of names) await w.connect({ bot, class: 'mage' });
+      const refused = (r, pattern) => r.notices.some(n => !n.ok && pattern.test(n.text));
+      const state = bot => w.socialState(bot);
+
+      // Friends: asking by name reaches the other player, who accepts; both lists change and both are saved.
+      const asked = await w.social('Ann', { op: 'friend_request', name: 'bob' });
+      check(asked.notices.some(n => n.ok && /Friend request sent to Bob/.test(n.text)) && state('Ann').outgoing[0]?.to === 'Bob', 'A friend request by name reaches the named player');
+      check(state('Bob').incoming.some(i => i.kind === 'friend' && i.from === 'Ann'), 'The other player sees the request with its sender');
+      check(refused(await w.social('Ann', { op: 'friend_request', bot: 'Bob' }), /already sent/), 'A second request to the same player is refused');
+      check(refused(await w.social('Ann', { op: 'friend_request', name: 'Ann' }), /yourself/), 'Nobody can befriend themselves');
+      check(refused(await w.social('Ann', { op: 'friend_request', name: 'Nobody' }), /No player named Nobody/), 'An unknown name is refused');
+      await w.social('Bob', { op: 'friend_accept', bot: 'Ann' });
+      check(state('Ann').friends.map(f => f.name).join() === 'Bob' && state('Bob').friends.map(f => f.name).join() === 'Ann', 'Accepting makes both players each other\'s friend');
+      check(state('Ann').incoming.length === 0 && state('Bob').incoming.length === 0, 'The answered request is gone');
+      check(refused(await w.social('Ann', { op: 'friend_request', name: 'Bob' }), /already your friend/), 'A friend cannot be requested again');
+      await w.social('Cy', { op: 'friend_request', bot: 'Ann' });
+      await w.social('Ann', { op: 'friend_decline', bot: 'Cy' });
+      check(state('Ann').friends.length === 1 && state('Cy').outgoing.length === 0, 'Declining a request clears it without a friendship');
+      // Requests both ways at once are an acceptance.
+      await w.social('Dee', { op: 'friend_request', bot: 'Eve' });
+      await w.social('Eve', { op: 'friend_request', bot: 'Dee' });
+      check(state('Dee').friends[0]?.name === 'Eve' && state('Eve').friends[0]?.name === 'Dee', 'Asking someone who already asked you makes you friends');
+      // Online state follows connections, and a dropped friend stays listed.
+      await w.disconnect('Bob');
+      await w.waitFor(() => state('Ann').friends[0]?.online === false, 5000, 'Friend offline');
+      check(state('Ann').friends[0].name === 'Bob', 'An offline friend stays on the list');
+      await w.connect({ bot: 'Bob' });
+      await w.waitFor(() => state('Ann').friends[0]?.online === true && state('Bob').friends[0]?.name === 'Ann', 5000, 'Friend online');
+      check(w.events.some(e => e.bot === 'Ann' && e.type === 'notice' && e.text === 'Bob came online.'), 'A friend is told when another friend comes online');
+
+      // Parties: the leader fills five seats and a sixth is refused.
+      for (const bot of ['Bob', 'Cy', 'Dee', 'Eve']) await w.social('Ann', { op: 'party_invite', bot });
+      check(refused(await w.social('Ann', { op: 'party_invite', bot: 'Fay' }), /already fill the party/), 'Open invitations never promise more than five seats');
+      for (const bot of ['Bob', 'Cy', 'Dee', 'Eve']) await w.social(bot, { op: 'party_accept', bot: 'Ann' });
+      const party = state('Cy').party;
+      check(party.size === 5 && party.leader === 'Ann' && party.max === 5 && ['Ann', 'Bob', 'Cy', 'Dee', 'Eve'].every(n => party.members.some(m => m.name === n)), 'Five players form one party led by the inviter');
+      check(refused(await w.social('Ann', { op: 'party_invite', bot: 'Fay' }), /party is full/), 'A sixth player is refused');
+      check(refused(await w.social('Bob', { op: 'party_invite', bot: 'Fay' }), /Only the party leader/), 'Only the leader invites');
+      check(refused(await w.social('Fay', { op: 'party_accept', bot: 'Ann' }), /no longer pending/), 'A player nobody invited cannot join');
+      // Chat reaches the party only.
+      const said = await w.social('Bob', { op: 'party_chat', text: 'rally at the gate' });
+      await w.waitFor(() => w.events.some(e => e.bot === 'Eve' && e.type === 'chat' && e.channel === 'party' && e.text === 'rally at the gate'), 5000, 'Party chat');
+      check(!w.events.some(e => e.bot === 'Fay' && e.type === 'chat'), 'Party chat is not heard outside the party');
+      check(said.chat.some(c => c.channel === 'party' && c.name === 'Bob'), 'The speaker also sees their party chat');
+      // Health reaches the party within a moment.
+      await w.debug('Cy', { op: 'set_hp', hp: 11 });
+      await w.waitFor(() => w.bots.get('Ann').social.party.members.find(m => m.name === 'Cy')?.hp < 40, 5000, 'Party health');
+      check(w.bots.get('Eve').social.party.members.find(m => m.name === 'Cy').maxHp === 80, 'A member\'s health shows on every member\'s party list');
+      // Leader changes.
+      await w.social('Ann', { op: 'party_promote', bot: 'Bob' });
+      check(state('Dee').party.leader === 'Bob', 'Promoting hands the party to another member');
+      check(refused(await w.social('Ann', { op: 'party_kick', bot: 'Cy' }), /Only the party leader/), 'A former leader cannot remove members');
+      await w.social('Bob', { op: 'party_kick', bot: 'Cy' });
+      check(state('Cy').party === null && state('Bob').party.size === 4, 'The leader removes a member');
+      await w.social('Bob', { op: 'party_invite', bot: 'Fay' });
+      await w.social('Fay', { op: 'party_accept', bot: 'Bob' });
+      check(state('Fay').party.size === 5, 'A seat freed by a removal can be filled');
+      await w.social('Bob', { op: 'party_leave' });
+      check(state('Ann').party.leader === 'Ann' && state('Ann').party.size === 4, 'When the leader leaves the longest-standing member leads');
+      // A dropped connection keeps its seat for a minute.
+      await w.disconnect('Dee');
+      await w.waitFor(() => state('Ann').party.members.find(m => m.name === 'Dee')?.online === false, 5000, 'Member offline');
+      check(state('Ann').party.size === 4, 'A disconnected member keeps their party seat');
+      await w.connect({ bot: 'Dee' });
+      await w.waitFor(() => state('Dee').party?.size === 4 && state('Ann').party.members.find(m => m.name === 'Dee').online, 5000, 'Member back');
+      check(state('Dee').party.leader === 'Ann', 'Reconnecting inside the minute returns to the same party');
+
+      // Friends are saved; parties are not.
+      await w.restart();
+      for (const bot of names) await w.social(bot, { op: 'refresh' });
+      check(state('Ann').friends[0]?.name === 'Bob' && state('Dee').friends[0]?.name === 'Eve', 'Friends survive restarting Rust');
+      check(names.every(bot => state(bot).party === null), 'Parties are transient and end with a restart');
+      const roster = await w.social('Ann', { op: 'who' });
+      check(roster.online.length === 6 && roster.online.find(p => p.name === 'Bob').friend && roster.online.find(p => p.name === 'Ann').self, 'who lists every online player with their relationship to you');
+      await w.social('Ann', { op: 'friend_remove', bot: 'Bob' });
+      check(state('Ann').friends.length === 0 && state('Bob').friends.length === 0, 'Removing a friend removes both sides');
+    },
+  },
+
 };
 
 async function runScenario(name, world = new TestWorld()) {

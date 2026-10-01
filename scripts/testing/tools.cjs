@@ -4,7 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { z } = require('zod');
-const { root, debugSchema } = require('./driver.cjs');
+const { root, debugSchema, socialSchema } = require('./driver.cjs');
 const { route } = require('./route.cjs');
 
 const read = file => JSON.parse(fs.readFileSync(path.join(root, 'world', file), 'utf8'));
@@ -203,4 +203,4 @@ function describe(what = 'overview') {
   }
 }
 
-module.exports = { zones, items, skills, quests, targetSchema, botName, debugSchema, resolve, teleport, walkTo, talkTo, castSkill, killEnemies, setupCharacter, waitForEvent, describe };
+module.exports = { zones, items, skills, quests, targetSchema, botName, debugSchema, socialSchema, resolve, teleport, walkTo, talkTo, castSkill, killEnemies, setupCharacter, waitForEvent, describe };

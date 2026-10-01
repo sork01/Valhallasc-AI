@@ -8,6 +8,25 @@ const { z } = require('zod');
 const root = path.resolve(__dirname, '../..');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const number = z.number().finite();
+// Friends and parties (server/src/world/social.rs). A target is a character id, a player name, or a connected bot's
+// name (`bot`, resolved here to that bot's character id).
+const botRef = z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,15}$/);
+const target = { id: z.string().min(1).max(64).optional(), bot: botRef.optional() };
+const socialSchema = z.discriminatedUnion('op', [
+  z.object({ op: z.literal('refresh') }).strict(),
+  z.object({ op: z.literal('who') }).strict(),
+  z.object({ op: z.literal('friend_request'), ...target, name: z.string().max(40).optional() }).strict(),
+  z.object({ op: z.literal('friend_accept'), ...target }).strict(),
+  z.object({ op: z.literal('friend_decline'), ...target }).strict(),
+  z.object({ op: z.literal('friend_remove'), ...target }).strict(),
+  z.object({ op: z.literal('party_invite'), ...target, name: z.string().max(40).optional() }).strict(),
+  z.object({ op: z.literal('party_accept'), ...target }).strict(),
+  z.object({ op: z.literal('party_decline'), ...target }).strict(),
+  z.object({ op: z.literal('party_leave') }).strict(),
+  z.object({ op: z.literal('party_kick'), ...target }).strict(),
+  z.object({ op: z.literal('party_promote'), ...target }).strict(),
+  z.object({ op: z.literal('party_chat'), text: z.string().min(1).max(240) }).strict(),
+]);
 // The same actions accepted by ClientMessage; no arbitrary state setters or joins.
 const actionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('input'), dx: number.min(-1).max(1), dy: number.min(-1).max(1) }).strict(),
@@ -21,6 +40,7 @@ const actionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('equip'), armor: z.string().max(32).optional(), weapon: z.string().max(32).optional(), slots: z.partialRecord(z.enum(['headgear', 'shoulders', 'chest', 'pants', 'gloves', 'hands', 'necklace', 'accessory1', 'accessory2']), z.string().max(64)).optional() }).strict(),
   z.object({ type: z.literal('interact'), npc: z.string().max(32), offer: z.string().max(32).optional() }).strict(),
   z.object({ type: z.literal('chat'), text: z.string().min(1).max(240) }).strict(),
+  z.object({ type: z.literal('social'), command: socialSchema }).strict(),
   z.object({ type: z.literal('ping'), nonce: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER) }).strict(),
 ]);
 // Test-server shortcuts (server/src/world/debug.rs). The private worlds start Rust with VALHALLA_TEST_COMMANDS=1;
@@ -198,6 +218,15 @@ class TestWorld extends EventEmitter {
       this.snapshotsChecked++;
       this.spacingFailure ||= spacingViolation(snapshot);
     } else {
+      // The latest friends/party state per bot. Party health arrives twice a second, so it never enters the event log.
+      const identity = this.bots.get(bot);
+      if (identity && packet.type === 'social') identity.social = packet;
+      if (identity && packet.type === 'party') {
+        if (identity.social) identity.social = { ...identity.social, party: packet.party };
+        this.emit('change');
+        return;
+      }
+      if (identity && packet.type === 'who') identity.who = packet.players;
       // Never store a welcome packet: it contains a server-issued bearer key.
       this.events.push({ bot, ...packet });
       if (this.events.length > 500) this.events.shift();
@@ -274,6 +303,7 @@ class TestWorld extends EventEmitter {
   async action(bot, action) {
     this.requireRunning();
     action = actionSchema.parse(action);
+    if (action.type === 'social') action = { type: 'social', command: this.resolveSocial(action.command) };
     const player = this.bots.get(bot);
     if (!player || player.socket?.readyState !== WebSocket.OPEN) throw Error(`Bot ${bot} is not connected.`);
     const socket = player.socket;
@@ -289,6 +319,41 @@ class TestWorld extends EventEmitter {
     });
     player.sendQueue = job.catch(() => {});
     return job;
+  }
+  resolveSocial({ bot: other, ...command }) {
+    if (other === undefined) return command;
+    const identity = this.bots.get(other);
+    if (!identity?.id) throw Error(`Unknown bot: ${other}`);
+    if (command.id !== undefined) throw Error('Give either id or bot, not both.');
+    return { ...command, id: identity.id };
+  }
+  // One friends/party command. Resolves with what the bot was told: notices (ok false is a refusal), the state it now
+  // holds (friends, incoming/outgoing requests, party) and, for `who`, the online roster.
+  async social(bot, command) {
+    this.requireRunning();
+    command = socialSchema.parse(command);
+    const identity = this.bots.get(bot);
+    if (!identity) throw Error(`Unknown bot: ${bot}`);
+    const earlier = new Set(this.events);
+    await this.action(bot, { type: 'social', command });
+    // Every command is answered: a notice (success or refusal), or for refresh/who/party_chat the state, roster or chat line.
+    const answers = command.op === 'refresh' ? ['social'] : command.op === 'who' ? ['who'] : command.op === 'party_chat' ? ['notice', 'chat'] : ['notice'];
+    await this.waitFor(() => this.events.find(e => !earlier.has(e) && e.bot === bot && answers.includes(e.type)), 5000, `Social ${command.op}`);
+    // The notice is sent just before the new state; let both land.
+    if (answers.includes('notice')) await delay(150);
+    const fresh = this.events.filter(e => !earlier.has(e) && e.bot === bot);
+    return { bot, op: command.op, notices: fresh.filter(e => e.type === 'notice').map(e => ({ ok: e.ok, text: e.text })),
+      chat: fresh.filter(e => e.type === 'chat').map(e => ({ channel: e.channel || 'world', name: e.name, text: e.text })),
+      state: this.socialState(bot), ...(command.op === 'who' ? { online: identity.who } : {}) };
+  }
+  socialState(bot) {
+    const social = this.bots.get(bot)?.social;
+    if (!social) return null;
+    const { friends, incoming, outgoing, party } = social;
+    return { friends: friends.map(f => ({ name: f.name, id: f.id, online: f.online, level: f.level })),
+      incoming: incoming.map(i => ({ kind: i.kind, from: i.name })), outgoing: outgoing.map(i => ({ kind: i.kind, to: i.name })),
+      party: party && { leader: party.members.find(m => m.id === party.leader)?.name, size: party.members.length, max: party.max,
+        members: party.members.map(m => ({ name: m.name, online: m.online, hp: m.hp, maxHp: m.maxHp })) } };
   }
   // One shortcut command; resolves once the bot's own snapshot shows its effect. Errors the server reports throw.
   async debug(bot, command) {
@@ -357,4 +422,4 @@ class TestWorld extends EventEmitter {
   }
 }
 
-module.exports = { TestWorld, root, actionSchema, botSchema, debugSchema, delay, spacingViolation };
+module.exports = { TestWorld, root, actionSchema, botSchema, debugSchema, socialSchema, delay, spacingViolation };

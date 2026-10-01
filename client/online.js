@@ -14,8 +14,9 @@
     $('network-status').textContent = text;
     $('network-status').dataset.state = ready ? 'online' : 'offline';
   }
-  function log(text, name) {
+  function log(text, name, channel) {
     const line = document.createElement('p');
+    if (channel) line.className = 'chat-' + channel;
     if (name) { const label = document.createElement('b'); label.textContent = name + ': '; line.append(label); }
     line.append(document.createTextNode(text)); $('chat-log').append(line);
     while ($('chat-log').children.length > 80) $('chat-log').firstElementChild.remove();
@@ -53,9 +54,10 @@
             saved.characters.push({ token: packet.token, look: character.look }); persist();
           }
           callbacks.onWelcome?.(packet);
+          window.Social?.reset(); send({ type: 'social', command: { op: 'refresh' } });
           $('connection-overlay').hidden = true; $('chat-input').disabled = false;
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
-          log('Welcome to Greenmeadow. E: character · B/I: bags · K: skills · 1–9, 0, -, =: skillbar · Q: quests · F: talk · Enter: chat.');
+          log('Welcome to Greenmeadow. E: character · B/I: bags · K: skills · 1–9, 0, -, =: skillbar · Q: quests · O: friends · P: party · F: talk · Enter: chat (/p for party).');
           break;
         }
         case 'snapshot': {
@@ -69,8 +71,12 @@
         }
         case 'event': callbacks.onEvent?.(packet); break;
         case 'dialogue': window.City?.dialogue(packet); break;
-        case 'chat': log(packet.text, packet.name); break;
+        case 'chat': log(packet.text, packet.channel === 'party' ? `[Party] ${packet.name}` : packet.name, packet.channel); break;
         case 'system': log(packet.text); break;
+        case 'notice': log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;
+        case 'social': window.Social?.onState(packet); break;
+        case 'party': window.Social?.onParty(packet.party); break;
+        case 'who': window.Social?.onWho(packet.players); break;
         case 'error':
           log(packet.text);
           if (packet.fatal) { fatal = true; connected = false; overlay(packet.text, true); status('Unable to enter world', false); ws.close(); }
@@ -82,7 +88,7 @@
       clearTimeout(joinTimeout);
       if (!active || currentGeneration !== generation) return;
       clearInterval(heartbeat);
-      connected = false; window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); window.Social?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay('Connection lost. Reconnecting to your character…');
@@ -95,7 +101,7 @@
       $('chat').hidden = false; connect();
     },
     stop() {
-      active = false; generation++; connected = false; id = null;
+      active = false; generation++; connected = false; id = null; window.Social?.reset();
       clearTimeout(retryTimer); clearInterval(heartbeat);
       socket?.close(); socket = null;
       $('chat').hidden = true; $('connection-overlay').hidden = true;
@@ -125,7 +131,8 @@
   };
   $('chat-form').addEventListener('submit', event => {
     event.preventDefault(); const input = $('chat-input'), text = input.value.trim();
-    if (text && send({ type: 'chat', text })) input.value = '';
+    if (text.startsWith('/') && window.Social?.command(text)) input.value = '';
+    else if (text && send({ type: 'chat', text })) input.value = '';
     input.blur();
   });
   $('chat-input').addEventListener('focus', () => { window.Field?.clearInput(); send({ type: 'stop' }); });

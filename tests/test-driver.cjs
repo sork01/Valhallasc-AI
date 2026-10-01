@@ -62,7 +62,7 @@ test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and pare
     for (const name of ['start_world', 'stop_world', 'connect_bot', 'disconnect_bot', 'send_action', 'inspect_world', 'wait_world', 'list_scenarios', 'run_scenario']) {
       assert.ok(listed.tools.some(t => t.name === name), `Advertises ${name}`);
     }
-    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['skills', 'movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'stats', 'crags', 'bags', 'shortcuts']);
+    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['skills', 'movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'stats', 'crags', 'bags', 'shortcuts', 'social']);
     const first = await call('start_world');
     url = first.url;
     assert.match(url, /^http:\/\/127\.0\.0\.1:\d+\/$/);
@@ -113,7 +113,7 @@ test('MCP shortcuts: every tool advertised, strict inputs, and server-side effec
   try {
     const names = (await client.listTools()).tools.map(t => t.name);
     for (const name of ['restart_world', 'describe_world', 'set_level', 'give_xp', 'set_gold', 'set_health', 'give_item', 'take_item', 'drop_item', 'teleport', 'walk_to', 'talk_to', 'quest',
-      'cast_skill', 'reset_character', 'kill_enemies', 'respawn_enemy', 'set_god_mode', 'setup_character', 'wait_for_event', 'debug_command']) assert.ok(names.includes(name), `Advertises ${name}`);
+      'cast_skill', 'reset_character', 'kill_enemies', 'respawn_enemy', 'set_god_mode', 'setup_character', 'wait_for_event', 'debug_command', 'social']) assert.ok(names.includes(name), `Advertises ${name}`);
     const catalog = await call('describe_world', { what: 'quests' });
     assert.ok(catalog.quests.length >= 5 && catalog.quests.every(q => q.id && q.objectives.length));
     assert.ok((await call('describe_world', { what: 'skills' })).skills.length >= 30);
@@ -122,7 +122,8 @@ test('MCP shortcuts: every tool advertised, strict inputs, and server-side effec
     assert.equal((await call('inspect_world', { bot: 'Gm', events: 0 })).snapshot.level, 3, 'start_world honours startLevel');
     // Inputs are strict: unknown fields, impossible levels and bad targets never reach the server.
     for (const [name, args] of [['set_level', { bot: 'Gm', level: 0 }], ['set_level', { bot: 'Gm', level: 5, hp: 1 }], ['teleport', { bot: 'Gm', to: { zone: 1, x: 'a', y: 2 } }],
-      ['debug_command', { bot: 'Gm', command: { op: 'nuke' } }], ['give_item', { bot: 'Gm', item: 'x', quantity: 0 }]]) assert.equal((await raw(name, args)).isError, true, `${name} rejects ${JSON.stringify(args)}`);
+      ['debug_command', { bot: 'Gm', command: { op: 'nuke' } }], ['give_item', { bot: 'Gm', item: 'x', quantity: 0 }],
+      ['social', { bot: 'Gm', command: { op: 'party_disband' } }], ['social', { bot: 'Gm', command: { op: 'party_leave', extra: 1 } }], ['social', { bot: 'Gm', command: { op: 'party_chat', text: '' } }]]) assert.equal((await raw(name, args)).isError, true, `${name} rejects ${JSON.stringify(args)}`);
     assert.equal((await raw('give_item', { bot: 'Gm', item: 'no_such_item' })).isError, true, 'Unknown items are server errors');
     assert.equal((await raw('teleport', { bot: 'Gm', to: { npc: 'nobody' } })).isError, true);
     const leveled = await call('set_level', { bot: 'Gm', level: 20 });
