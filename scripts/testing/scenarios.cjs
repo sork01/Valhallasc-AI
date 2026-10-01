@@ -575,15 +575,20 @@ const scenarios = {
       await w.action('Gm', { type: 'move', x: gate.x, y: gate.y });
       await w.waitFor(() => me().zone === 1, 10000, 'Portal');
       check(true, 'Walking into the gate crosses into the Crags');
+      await w.debug('Gm', { op: 'set_level', level: 20 });
+      const need20 = me().xpNeed;
+      check(me().level === 20 && me().xp === 0, 'The character is level 20 with an empty bar before dying');
       await w.debug('Gm', { op: 'die' });
       await w.waitFor(() => me().dead, 3000, 'Defeat');
+      await w.waitFor(() => me().level === 19, 3000, 'Penalty');
+      check(me().xp === me().xpNeed - Math.floor(need20 / 3), 'Dying costs a third of level 20\'s XP and, with an empty bar, takes the character down to level 19');
       await kit.waitForEvent(w, { kind: 'respawn', bot: 'Gm', timeout: 8000 });
       await w.waitFor(() => !me().dead && me().hp === me().maxHp, 3000, 'Respawn heals');
       check(true, 'A defeated character respawns at full health');
       const snapshot = w.summary('Gm'), history = me().quests.map(q => [q.id, q.completions]);
       await w.restart();
-      await w.waitFor(() => w.player('Gm') && w.player('Gm').level === 20, 10000, 'Resume');
-      check(me().level === 20 && me().gold === snapshot.gold && me().zone === snapshot.zone, 'Level, gold and zone survive restarting Rust');
+      await w.waitFor(() => w.player('Gm') && w.player('Gm').level === 19, 10000, 'Resume');
+      check(me().level === 19 && me().xp === snapshot.xp && me().gold === snapshot.gold && me().zone === snapshot.zone, 'Level, gold and zone survive restarting Rust');
       check(JSON.stringify(me().quests.map(q => [q.id, q.completions])) === JSON.stringify(history), 'Finished quests survive restarting Rust');
     },
   },

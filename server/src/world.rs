@@ -79,6 +79,21 @@ struct Player {
     portal_at: f64,
 }
 impl Player {
+    // Called once when hp reaches 0: the XP penalty, then a notice naming what it cost.
+    fn apply_death_penalty(&mut self) {
+        let (lost, levels) = self.character.lose_death_xp();
+        let text = if levels > 0 {
+            format!(
+                "You lost {lost} XP and dropped to level {}.",
+                self.character.level
+            )
+        } else {
+            format!("You lost {lost} XP.")
+        };
+        let _ = self
+            .peer
+            .try_send(json!({"type":"notice","ok":false,"text":text}));
+    }
     fn new(character: Character, peer: Peer) -> Self {
         let potion_cd = character.potion_cooldown_left();
         Self {
@@ -1831,10 +1846,12 @@ impl World {
             p.attack = 0.;
             p.buffs.clear();
             p.stop();
+            p.apply_death_penalty();
         }
         self.event("hurt", &actor, point, value, false);
         if dead {
             self.event("death", &actor, point, 0., false);
+            self.save();
         }
     }
     fn update_bolts(&mut self) {
@@ -4806,12 +4823,60 @@ mod tests {
         assert_eq!(ch(&w).hp, ch(&w).max_hp(), "revives and clamps to max");
         dbg(&mut w, DebugCommand::SetGold { gold: 777 }).unwrap();
         assert_eq!(ch(&w).gold, 777);
+        // Dying at level 20 with an empty bar cost a level.
+        dbg(&mut w, DebugCommand::SetLevel { level: 20 }).unwrap();
         w.players.get_mut(&1).unwrap().character.attributes.strength = 4;
         dbg(&mut w, DebugCommand::ResetStats).unwrap();
         assert_eq!(ch(&w).stat_points(), 57);
         assert!(!w.god_mode);
         dbg(&mut w, DebugCommand::SetGodMode { enabled: true }).unwrap();
         assert!(w.god_mode);
+    }
+
+    #[test]
+    fn dying_costs_a_third_of_the_level_and_can_lower_it() {
+        let (mut w, mut rx) = debug_world();
+        dbg(&mut w, DebugCommand::SetLevel { level: 5 }).unwrap();
+        let need = ch(&w).xp_need();
+        w.players.get_mut(&1).unwrap().character.xp = need / 2;
+        drain(&mut rx);
+        dbg(&mut w, DebugCommand::Die).unwrap();
+        assert_eq!((ch(&w).level, ch(&w).xp), (5, need / 2 - need / 3));
+        let text = drain(&mut rx)
+            .iter()
+            .find(|v| v["type"] == "notice")
+            .map(|v| v["text"].to_string())
+            .unwrap();
+        assert!(text.contains(&format!("{} XP", need / 3)), "{text}");
+
+        // Not enough on the bar: the rest comes out of the previous level.
+        dbg(&mut w, DebugCommand::SetHp { hp: 1e9 }).unwrap();
+        w.players.get_mut(&1).unwrap().character.xp = 10;
+        dbg(&mut w, DebugCommand::Die).unwrap();
+        let c = ch(&w);
+        assert_eq!(c.level, 4);
+        assert_eq!(c.xp, c.xp_need() - (need / 3 - 10));
+        assert!(
+            drain(&mut rx)
+                .iter()
+                .any(|v| v["text"].as_str().is_some_and(|t| t.contains("level 4")))
+        );
+    }
+
+    #[test]
+    fn death_penalty_stops_at_level_one_with_no_xp() {
+        let (mut w, _rx) = debug_world();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.level = 1;
+        c.xp = 20;
+        assert_eq!(c.lose_death_xp(), (53, 0));
+        assert_eq!((c.level, c.xp), (1, 0));
+        c.level = 2;
+        c.xp = 0;
+        let (_, levels) = c.lose_death_xp();
+        assert_eq!(levels, 1);
+        assert_eq!(c.level, 1);
+        assert_eq!(c.xp, c.xp_need() - 136);
     }
 
     // ----- food and potions -----

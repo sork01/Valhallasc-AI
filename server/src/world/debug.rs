@@ -80,7 +80,9 @@ impl World {
                 p.attack = 0.;
                 p.buffs.clear();
                 p.stop();
+                p.apply_death_penalty();
                 self.event("death", &actor, point, 0., false);
+                self.save();
                 json!({"dead":true})
             }
             DebugCommand::ResetStats => {

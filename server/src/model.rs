@@ -290,6 +290,29 @@ impl Character {
             y: self.y,
         }
     }
+    // Dying costs a third of the XP the current level needs. When the bar holds less than that the
+    // difference comes out of the previous level, so a death can lower the level; level 1 stops at 0 XP.
+    // Returns (xp lost, levels lost).
+    pub fn lose_death_xp(&mut self) -> (u32, u32) {
+        let mut owed = self.xp_need() / 3;
+        let lost = owed;
+        let mut levels = 0;
+        while owed > 0 {
+            if self.xp >= owed {
+                self.xp -= owed;
+                break;
+            }
+            owed -= self.xp;
+            if self.level <= 1 {
+                self.xp = 0;
+                break;
+            }
+            self.level -= 1;
+            levels += 1;
+            self.xp = self.xp_need();
+        }
+        (lost, levels)
+    }
     pub fn grant_xp(&mut self, xp: u32) -> u32 {
         self.xp = self.xp.saturating_add(xp);
         let mut levels = 0;
