@@ -75,7 +75,8 @@ const look = page => page.evaluate(() => {
   const click = async (x, y) => {
     const [sx, sy] = await page.evaluate(([x, y]) => Field._debug.w2s(x, y), [x, y]);
     // A click beside an enemy means "attack it", so route steps near one send the plain move message.
-    const crowded = await page.evaluate(([x, y]) => Field.slimes.some(s => !s.dead && Math.hypot(s.x - x, s.y - y) < 2.5), [x, y]);
+    const crowded = await page.evaluate(([x, y]) => Field.slimes.some(s => !s.dead && Math.hypot(s.x - x, s.y - y) < 2.5)
+      || City.npcs.some(n => Math.hypot(n.x - x, n.y - y) < 2.5), [x, y]);
     if (crowded || sx < 60 || sx > 1540 || sy < 60 || sy > 840) { await page.evaluate(([x, y]) => Online.send({ type: 'move', x, y }), [x, y]); return; }
     const box = await page.locator('#fieldcv').boundingBox();
     await page.mouse.click(box.x + sx / 1600 * box.width, box.y + sy / 900 * box.height);
@@ -96,7 +97,7 @@ const look = page => page.evaluate(() => {
   await page.waitForTimeout(800);
   await shot('crags-arrival');
   check(await page.evaluate(() => Field.zone === 1 && Field.zoneName === 'Emberfall Crags'), 'Walking into the gate moves the hero into the Crags');
-  check(await page.locator('#area-title b').textContent() === 'Emberfall Crags' && (await page.locator('#area-title span').textContent()).includes('5–10'), 'The area banner names the zone and its recommended levels');
+  check(await page.locator('#area-title b').textContent() === 'Emberfall Crags' && (await page.locator('#area-title span').textContent()).includes('Cinderwatch Camp'), 'The area banner identifies the Crags quest hub and sanctuary');
   check(await page.locator('#city-travel').isHidden(), 'The Alderhaven travel button is hidden away from the meadow');
   check((await page.locator('#status, .status, [id*=status]').allTextContents()).join(' ').includes('Emberfall Crags') || true, 'Status text updates');
   const crags = await look(page);
@@ -108,11 +109,53 @@ const look = page => page.evaluate(() => {
   const miniPixels = await page.evaluate(() => { const c = document.getElementById('minimap'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let ember = 0; for (let i = 0; i < d.length; i += 4) if (d[i] > 200 && d[i + 1] < 130 && d[i + 2] < 80 && d[i + 3] > 0) ember++; return ember; });
   check(miniPixels > 40, `The minimap shows the lava rivers (${miniPixels} ember pixels)`);
 
-  // Quest givers stay behind in Greenmeadow: the journal says so instead of offering a walk that cannot happen.
+  // The journal routes to local camp NPCs, while explaining where the meadow givers live.
   await page.keyboard.press('q');
-  check(await page.locator('#quest-journal').isVisible() && (await page.locator('#quest-list').textContent()).includes('is back in Greenmeadow') && !(await page.locator('#quest-list').textContent()).includes('Get quest from'), 'The journal explains that quest givers are back in Greenmeadow');
+  check(await page.locator('#quest-journal').isVisible() && (await page.locator('#quest-list [data-quest="welcome"]').textContent()).includes('is back in Greenmeadow'), 'Meadow quests explain that their givers are in Greenmeadow');
+  check(await page.locator('#quest-list [data-quest^="crags_"]').count() === 12, 'All twelve Crags quests appear in the journal');
+  check(await page.locator('#quest-list .quest-card').first().getAttribute('data-quest') === 'crags_welcome', 'Local camp quests sort first');
+  check(await page.locator('#quest-list [data-quest="crags_golems"]').textContent().then(t => t.includes('Locked') && t.includes('Voices in the Ash')), 'Later hunts explain their prerequisite');
+  await page.locator('#quest-list [data-quest="crags_welcome"] button').filter({ hasText: 'Get quest from Captain Sera' }).click();
+  await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
+  check(await page.locator('#npc-name').textContent() === 'Captain Sera', 'Journal travel reaches the camp commander');
+  await page.locator('#npc-quests [data-quest="crags_welcome"] [data-action="accept"]').click();
+  await page.waitForFunction(() => document.querySelector('#npc-quests [data-quest="crags_welcome"]').textContent.includes('In progress'));
+  check(await page.locator('#quest-tracker').textContent().then(t => t.includes('A Foothold in the Ash') && t.includes('Scout Kael')), 'Camp introduction appears in the live tracker');
   await page.keyboard.press('Escape');
   check(await page.locator('#quest-journal').isHidden(), 'The journal closes again');
+  check(await page.evaluate(() => City.npcs.length === 4 && City.npcs.every(n => n.id.startsWith('crags_')) && Quests.marker('crags_scout') === '◆'), 'Only the four camp NPCs and their talk-objective markers are shown');
+  await page.getByRole('button', { name: 'Collapse quest tracker' }).click();
+  await page.waitForTimeout(700);
+  for (const id of ['crags_scout', 'crags_healer', 'crags_supplier']) {
+    // Real canvas clicks on the NPC body exercise picking and obstacle-aware automatic travel.
+    const [sx, sy] = await page.evaluate(id => { const n = City.npcs.find(n => n.id === id); return Field._debug.w2s(n.x, n.y); }, id);
+    const box = await page.locator('#fieldcv').boundingBox();
+    await page.mouse.click(box.x + sx / 1600 * box.width, box.y + (sy - 55) / 900 * box.height);
+    await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 }).catch(async error => {
+      await shot('camp-interaction-stuck');
+      throw Error(`NPC ${id}, click ${sx},${sy}: ${JSON.stringify(await page.evaluate(() => ({ hero: { x: Field.hero.x, y: Field.hero.y, goal: Field.hero.goal }, errors: document.getElementById('npc-notice')?.textContent })))}`, { cause: error });
+    });
+    check(await page.locator('#npc-name').textContent() === await page.evaluate(id => City.npcs.find(n => n.id === id).name, id), `Canvas interaction reaches ${id}`);
+    if (id === 'crags_healer') check((await page.locator('#npc-offers').textContent()).includes('Health Potion'), 'Camp healer offers healing supplies');
+    if (id === 'crags_supplier') check((await page.locator('#npc-offers').textContent()).includes('Stew') && (await page.locator('#npc-offers').textContent()).includes('Satchel'), 'Quartermaster offers food and bags');
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(600);
+  }
+  await page.keyboard.press('f');
+  await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 5000 });
+  check(await page.locator('#npc-name').textContent() === 'Quartermaster Dain', 'F opens the nearest camp NPC');
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('q');
+  const introduction = page.locator('#quest-list [data-quest="crags_welcome"]');
+  check((await introduction.textContent()).includes('Ready to turn in'), 'All three camp conversations complete the introduction');
+  await introduction.locator('button').filter({ hasText: 'Return to Captain Sera' }).click();
+  await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
+  await page.locator('#npc-quests [data-quest="crags_welcome"] [data-action="claim"]').click();
+  await page.waitForFunction(() => document.querySelector('#npc-quests [data-quest="crags_welcome"]').textContent.includes('Completed'));
+  check(await page.evaluate(() => Quests.marker('crags_scout') === '!' && Quests.markerInfo('crags_supplier').repeatable), 'Turn-in unlocks the wisp hunt and blue repeatable camp patrol');
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'Expand quest tracker' }).click();
+  await shot('cinderwatch-camp');
   // Every kind in every clip: the canvas must change from one state to the next and nothing may throw.
   // One hash per monster, from the box it stands in; the sky, lava and gate animate, but the ground there does not.
   const monsterHashes = () => page.evaluate(() => {

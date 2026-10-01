@@ -55,6 +55,7 @@
 .quest-card h4 { margin: 0 0 .25cqw; color: #f1d493; font: 1.3cqw 'Jua', sans-serif; }
 .quest-card p { margin: .4cqw 0; font-size: .95cqw; }
 .quest-state, .quest-history { color: #b7d5b8; font: .85cqw 'Jua', sans-serif; }
+.quest-location { display: block; margin-top: .3cqw; }
 .quest-card .quest-reward { color: #f1d493; }
 .quest-card .btn { margin: .4cqw .4cqw 0 0; font-size: .95cqw; }
 .quest-tracker:focus-visible { outline: 3px solid #ffdc87; outline-offset: 3px; }

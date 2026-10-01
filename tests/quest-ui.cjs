@@ -30,7 +30,7 @@ async function call(name, args = {}) {
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('Speak to Wren')), 'HUD introduces the first quest');
   await page.keyboard.press('q');
   check(await page.locator('#quest-journal').isVisible(), 'Q opens the journal');
-  check(await page.locator('#quest-list .quest-card').count() === 5, 'Five quest cards display');
+  check(await page.locator('#quest-list .quest-card').count() === 17, 'All seventeen quests display across both zones');
   check(await page.locator('#quest-close').evaluate(n => n === document.activeElement), 'Journal takes keyboard focus');
   await page.keyboard.press('Tab');
   check(await page.locator('#quest-list button').first().evaluate(n => n === document.activeElement), 'Tab wraps within the journal');

@@ -751,6 +751,72 @@ const scenarios = {
     },
   },
 
+  crags_quests: {
+    description: 'Cinderwatch Camp: all twelve quests through real NPC offers, zone-local kill credit, prerequisites, rewards, repeatable contracts, healing, supplies and persisted progress.',
+    async run(w, check) {
+      const bot = 'Expedition';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 10, gold: 1000, items: Array.from({ length: 4 }, () => ({ item: 'linen_satchel' })), finishQuests: ['slime_patrol'] });
+      await kit.teleport(w, bot, { npc: 'merchant' });
+      await kit.talkTo(w, bot, 'merchant', 'quest:accept:meadow_bounty');
+      await kit.teleport(w, bot, { npc: 'crags_scout' });
+      await kit.talkTo(w, bot, 'crags_scout', 'quest:accept:crags_wisps');
+      check(!quest(w, bot, 'crags_wisps'), 'The Crags hunt requires the camp introduction');
+      await kit.talkTo(w, bot, 'crags_scout', 'quest:accept:crags_welcome');
+      check(!quest(w, bot, 'crags_welcome'), 'The wrong NPC cannot offer another giver\'s quest');
+      check(kit.describe('quests').quests.filter(q => q.zone === 1).length === 12, 'MCP describes all twelve Crags quests with their zone');
+      for (const q of crags.quests) {
+        await kit.teleport(w, bot, { npc: q.npc });
+        await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
+        await w.waitFor(() => !!quest(w, bot, q.id));
+        check(quest(w, bot, q.id)?.counts.every(n => n === 0), `${q.title}: accepted with fresh objectives`);
+        const early = await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
+        check(/Complete the objectives/.test(early.notice), `${q.title}: premature reward refused`);
+        for (const o of q.objectives) {
+          if (o.kind === 'talk') {
+            await kit.teleport(w, bot, { npc: o.target });
+            await kit.talkTo(w, bot, o.target);
+          } else {
+            for (let i = 0; i < o.count; i++) {
+              const enemy = w.snapshot.slimes.find(s => s.zone === 1 && (o.target === 'any' || s.kind === o.target));
+              if (enemy.dead) await w.debug(bot, { op: 'respawn_enemy', id: enemy.id });
+              await w.debug(bot, { op: 'kill_enemy', id: enemy.id });
+            }
+          }
+        }
+        await w.waitFor(() => quest(w, bot, q.id).counts.every((n, i) => n === q.objectives[i].count));
+        check(quest(w, bot, 'meadow_bounty').counts[0] === 0, `${q.title}: Crags actions leave the meadow bounty unchanged`);
+        await kit.teleport(w, bot, { npc: q.npc });
+        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
+        await w.waitFor(() => quest(w, bot, q.id).claimed);
+        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
+        await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
+        check(w.player(bot).gold === before.gold + q.rewardGold && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
+      }
+      for (const q of crags.quests.filter(q => q.repeatable)) {
+        await kit.teleport(w, bot, { npc: q.npc });
+        await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
+        await w.waitFor(() => !quest(w, bot, q.id).claimed);
+        check(!quest(w, bot, q.id).claimed && quest(w, bot, q.id).completions === 1 && quest(w, bot, q.id).counts.every(n => n === 0), `${q.title}: repeat acceptance resets objectives and retains history`);
+      }
+      await kit.teleport(w, bot, { npc: 'crags_healer' });
+      await w.debug(bot, { op: 'set_hp', hp: 1 });
+      await kit.talkTo(w, bot, 'crags_healer', 'blessing');
+      await w.waitFor(() => w.player(bot).hp === w.player(bot).maxHp);
+      check(w.player(bot).hp === w.player(bot).maxHp, 'The camp healer restores all HP');
+      await kit.talkTo(w, bot, 'crags_healer', 'buy_health_potion');
+      await w.waitFor(() => w.player(bot).inventory.some(i => i.item === 'health_potion'));
+      check(w.player(bot).inventory.some(i => i.item === 'health_potion'), 'The camp sells health potions');
+      await kit.teleport(w, bot, { npc: 'crags_supplier' });
+      await kit.talkTo(w, bot, 'crags_supplier', 'buy_traveler_stew');
+      await w.waitFor(() => w.player(bot).inventory.some(i => i.item === 'traveler_stew'));
+      check(w.player(bot).inventory.some(i => i.item === 'traveler_stew'), 'The quartermaster sells food');
+      const history = JSON.stringify(w.player(bot).quests);
+      await w.restart();
+      check(w.player(bot).zone === 1 && JSON.stringify(w.player(bot).quests) === history, 'Every completion and restarted bounty survives a private server restart');
+    },
+  },
 };
 
 async function runScenario(name, world = new TestWorld()) {

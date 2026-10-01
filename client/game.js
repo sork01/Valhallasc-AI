@@ -422,14 +422,14 @@
     hud.hp.style.width = (s.hp / s.maxHp * 100).toFixed(1) + '%'; hud.hpT.textContent = `${Math.ceil(s.hp)} / ${s.maxHp}`;
     hud.xp.style.width = (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.lv.textContent = ` ${t('lvl')} ${s.level}`;
     hud.gold.textContent = s.gold; hud.kills.textContent = s.kills; $('bag-gold').textContent = `${s.gold} gold`;
-    const inCity = s.area === 'Alderhaven', title = $('area-title'), away = s.zone > 0;
+    const inCity = !!s.hub || s.area === 'Alderhaven', title = $('area-title'), away = s.zone > 0;
     if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); void title.offsetWidth; title.classList.add('show'); }
     title.querySelector('b').textContent = away ? s.area : inCity ? 'Alderhaven · Fountain Square' : t('areaName');
-    title.querySelector('span').textContent = away ? (s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : 'Unexplored lands') : inCity ? 'Sanctuary · shops · townspeople' : '푸른 초원';
+    title.querySelector('span').textContent = away ? (s.hub ? `${s.hub} · Sanctuary · quests · supplies` : s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : 'Unexplored lands') : inCity ? 'Sanctuary · shops · townspeople' : '푸른 초원';
     renderBuffs(s.buffs || []);
     if ((s.zone || 0) !== musicZone) { musicZone = s.zone || 0; syncMusic(); }
-    $('city-travel').hidden = inCity || away;
-    $('city-travel').textContent = s.traveling ? 'Walking to Alderhaven…' : 'Visit Alderhaven ↓';
+    $('city-travel').hidden = inCity;
+    $('city-travel').textContent = s.traveling ? (away ? 'Walking to Cinderwatch…' : 'Walking to Alderhaven…') : (away ? 'Visit Cinderwatch Camp ↓' : 'Visit Alderhaven ↓');
   }
   // ---------- level-up banner, flash and active effects ----------
   const luBanner = $('levelup-banner'), luFlash = $('levelup-flash'), buffBar = $('buff-bar');

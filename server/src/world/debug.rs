@@ -183,7 +183,11 @@ impl World {
                 json!({"dropped":id,"quantity":quantity})
             }
             DebugCommand::Quest { id, action } => {
-                let quests = self.maps[0].quests.clone();
+                let quests: Vec<Quest> = self
+                    .maps
+                    .iter()
+                    .flat_map(|map| map.quests.clone())
+                    .collect();
                 if !quests.iter().any(|q| q.id == id) {
                     return Err(format!("Unknown quest {id}."));
                 }

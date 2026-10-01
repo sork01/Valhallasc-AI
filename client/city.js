@@ -1,9 +1,10 @@
 'use strict';
 // Original canvas artwork, inspired by Prontera's stone plazas and timber houses.
 (() => {
-  const city = WORLD_MAP.city, npcs = WORLD_MAP.npcs || [], cache = new Map();
+  const cache = new Map();
+  const area = () => window.Field?.zone > 0 ? WORLD_MAP.zones[Field.zone - 1] : WORLD_MAP;
   const iso = (x, y, z = 0) => [(x - y) * 44, (x + y) * 22 - z];
-  const inside = (x, y) => city && x >= city.x0 && x <= city.x1 && y >= city.y0 && y <= city.y1;
+  const inside = (x, y) => { const city = area().city; return city && x >= city.x0 && x <= city.x1 && y >= city.y0 && y <= city.y1; };
   function poly(g, points, fill, stroke = '#54483e', line = 2) {
     g.beginPath(); points.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath();
     g.fillStyle = fill; g.fill(); if (stroke) { g.strokeStyle = stroke; g.lineWidth = line; g.lineJoin = 'round'; g.stroke(); }
@@ -22,8 +23,13 @@
     g.font=`${size}px "Jua", sans-serif`; g.textAlign='center'; g.lineWidth=4; g.strokeStyle='#463d36';g.strokeText(value,x,y);g.fillStyle=color;g.fillText(value,x,y);
   }
   function stoneTile(g, px, py, x, y) {
-    const inCity=inside(x+.5,y+.5), road=y>=69 && y<city.y0 && Math.abs(x+.5-36)<1.6;
+    const city = area().city; if (!city) return false;
+    const inCity=inside(x+.5,y+.5), road=!Field.zone && y>=69 && y<city.y0 && Math.abs(x+.5-36)<1.6;
     if (!inCity && !road) return false;
+    if (Field.zone > 0) {
+      poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],`hsl(22, 14%, ${25+(x*17+y*31)%6}%)`,'#51413c',.6);
+      return true;
+    }
     const garden=inCity && Math.abs(x+.5-36)>7 && (y<78 || y>88);
     if(garden) { poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],'#779969',null);return true; }
     const plaza=Math.hypot(x+.5-city.plaza.x,y+.5-city.plaza.y)<city.radius;
@@ -96,6 +102,31 @@
     for(const dx of [-25,25])line(g,[[dx,-66],[dx*1.3,-34],[dx*1.6,-5]],'#cbf3efb0',3);
   }
   function objectArt(g,o) {
+    if(o.kind==='tent') {
+      const w=o.width,d=o.depth,h=110;
+      ellipse(g,8,9,115,35,'#160f1738');
+      const a=iso(-w/2,-d/2),b=iso(w/2,-d/2),c=iso(w/2,d/2),e=iso(-w/2,d/2);
+      const r0=iso(-w/2,0,h),r1=iso(w/2,0,h);
+      poly(g,[a,b,r1,r0],o.color);poly(g,[r0,r1,c,e],o.color);
+      poly(g,[b,c,r1],'#d1b891');
+      poly(g,[iso(w/2,-.42),iso(w/2,.42),iso(w/2,0,78)],'#34272c');
+      line(g,[r0,r1],'#efd3a0',4);
+      for(const t of [-1,1])line(g,[iso(t*w/2,0,h),iso(t*(w/2+.7),d/2+.45)],'#d5bc8e',2);
+      text(g,o.label,0,-145,17);return;
+    }
+    if(o.kind==='campfire') {
+      ellipse(g,0,0,37,17,'#ef88352b');
+      for(let i=0;i<9;i++){const a=i/9*Math.PI*2;ellipse(g,Math.cos(a)*27,Math.sin(a)*12,9,6,'#706572','#2b222b');}
+      line(g,[[-19,-1],[19,-9]],'#6b4330',9);line(g,[[-19,-9],[19,-1]],'#98613d',8);
+      poly(g,[[-19,-7],[-11,-33],[-4,-22],[3,-59],[12,-32],[20,-8]],'#f58635','#aa4d34',2);
+      poly(g,[[-9,-9],[0,-34],[10,-9]],'#ffe6a0',null);return;
+    }
+    if(o.kind==='noticeboard') {
+      line(g,[[-34,0],[-34,-100]],'#72543c',7);line(g,[[34,0],[34,-100]],'#72543c',7);
+      poly(g,[[-56,-116],[56,-116],[56,-54],[-56,-54]],'#624533','#d4b27b',3);
+      for(const x of [-31,0,31])poly(g,[[x-10,-101],[x+11,-99],[x+9,-67],[x-11,-69]],'#e9d3a0',null);
+      text(g,o.label,0,-137,17,'#ffd58d');return;
+    }
     if(o.kind==='house'||o.kind==='chapel')return building(g,o);
     if(o.kind==='fountain')return fountain(g);
     if(o.kind==='wall') {prism(g,o.width,o.depth,39,'#d7d3bc','#afa993','#949c91');for(let i=-1;i<=1;i++){g.save();g.translate(...iso(o.width>o.depth?i*o.width/3:0,o.depth>o.width?i*o.depth/3:0,39));prism(g,.32,.32,12,'#e4dfc9','#c0b8a0','#a9ac9d');g.restore();}return;}
@@ -134,6 +165,7 @@
     text(g,n.name,0,-128,17);text(g,near?'[ F ] Talk':n.role,0,-110,13,near?'#ffdf88':'#e0dfcd');g.restore();
   }
   function drawPlaza(g,w2s) {
+    const city = area().city; if (!city || Field.zone > 0) return;
     const [x,y]=w2s(city.plaza.x,city.plaza.y);
     for(const radius of [city.radius,city.radius-.2,2.3]) {g.beginPath();g.ellipse(x,y,radius*62.225,radius*31.112,0,0,Math.PI*2);g.strokeStyle='#eee2c5';g.lineWidth=radius===2.3?3:6;g.stroke();}
     for(let i=0;i<4;i++){const a=i*Math.PI/2;poly(g,[[x+Math.cos(a)*167,y+Math.sin(a)*83],[x+Math.cos(a+.13)*123,y+Math.sin(a+.13)*61],[x+Math.cos(a)*102,y+Math.sin(a)*51],[x+Math.cos(a-.13)*123,y+Math.sin(a-.13)*61]],'#b0a794',null);}
@@ -168,5 +200,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')];const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={inside,stoneTile,drawObject,drawNpc,drawPlaza,npcs,dialogue,close,refreshInventory() { if(current) Inventory.renderShop(current, $('npc-inventory')); },get open(){return !!current;}};
+  window.City={inside,stoneTile,drawObject,drawNpc,drawPlaza,get npcs(){return area().npcs || [];},dialogue,close,refreshInventory() { if(current) Inventory.renderShop(current, $('npc-inventory')); },get open(){return !!current;}};
 })();

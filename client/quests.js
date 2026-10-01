@@ -1,10 +1,11 @@
 'use strict';
 (() => {
   const $ = id => document.getElementById(id);
-  const definitions = WORLD_MAP.quests || [];
+  const areas = [WORLD_MAP, ...(WORLD_MAP.zones || [])];
+  const definitions = areas.flatMap((area, zone) => (area.quests || []).map(q => ({ ...q, zone })));
   let progress = [], signature = '', tracked = null, previousFocus = null, collapsed = false;
   const state = quest => progress.find(p => p.id === quest.id);
-  const giver = quest => WORLD_MAP.npcs.find(n => n.id === quest.npc);
+  const giver = quest => areas[quest.zone].npcs.find(n => n.id === quest.npc);
   function status(quest) {
     const p = state(quest);
     if (p && !p.claimed) return quest.objectives.every((o, i) => (p.counts[i] || 0) >= o.count) ? 'ready' : 'active';
@@ -30,6 +31,7 @@
     const s = status(quest), npc = giver(quest);
     const node = element('article', '', 'quest-card'); node.dataset.quest = quest.id; node.dataset.repeatable = String(quest.repeatable);
     node.append(element('h4', quest.title), element('span', words[s] + (quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
+    if (!atNpc) node.append(element('small', `${areas[quest.zone].name} · ${areas[quest.zone].city?.name || 'Quest giver'}`, 'quest-location quest-history'));
     node.append(element('p', quest.description), element('p', objectives(quest).join(' · '), 'quest-objectives'));
     node.append(element('p', `Reward: ${quest.rewardXp} XP · ${quest.rewardGold} gold`, 'quest-reward'));
     if (s === 'locked') {
@@ -41,8 +43,9 @@
       });
       b.dataset.action = action; node.append(b);
     } else if (!atNpc && s !== 'completed') {
-      // Quest givers live in Greenmeadow and Alderhaven; from another zone there is nothing to walk to.
-      if (Field.zone > 0) node.append(element('p', `${npc.name} is back in Greenmeadow. Return through the gate first.`, 'quest-history'));
+      if (Field.zone !== quest.zone) node.append(element('p', quest.zone === 0
+        ? `${npc.name} is back in Greenmeadow. Return through the gate first.`
+        : `${npc.name} is in ${areas[quest.zone].name}. Travel through the gate to ${areas[quest.zone].city?.name || 'meet them'}.`, 'quest-history'));
       else node.append(button(`${s === 'ready' ? 'Return to' : s === 'available' ? 'Get quest from' : 'Visit'} ${npc.name}`, () => {
         close(); Field.visitNpc(quest.npc);
       }));
@@ -75,12 +78,12 @@
       list.append(row);
     }
     if (!active.length) {
-      const next = definitions.find(q => status(q) === 'available');
-      if (next) list.append(element('span', next.title, 'tracker-title'), element('small', `Speak to ${giver(next).name} in Alderhaven`, 'tracker-objective'));
-      else list.append(element('small', 'All stories complete. Visit Linden for another bounty.', 'tracker-objective'));
+      const next = definitions.find(q => q.zone === (window.Field?.zone || 0) && status(q) === 'available') || definitions.find(q => status(q) === 'available');
+      if (next) list.append(element('span', next.title, 'tracker-title'), element('small', `Speak to ${giver(next).name} in ${areas[next.zone].city?.name || areas[next.zone].name}`, 'tracker-objective'));
+      else list.append(element('small', 'All stories complete. Visit a quartermaster for another bounty.', 'tracker-objective'));
     }
     tracker.append(list);
-    if (open()) $('quest-list').replaceChildren(...definitions.map(q => card(q, false)));
+    if (open()) $('quest-list').replaceChildren(...[...definitions].sort((a, b) => Number(b.zone === (window.Field?.zone || 0)) - Number(a.zone === (window.Field?.zone || 0))).map(q => card(q, false)));
   }
   function open() { return !$('quest-journal').hidden; }
   function show() {
@@ -105,7 +108,7 @@
   window.Quests = {
     show, close, get open() { return open(); },
     reset() { progress = []; signature = ''; tracked = null; close(false); render(); },
-    update(next) { const key = JSON.stringify(next); if (key === signature) return; progress = next; signature = key; render(); },
+    update(next) { const key = `${Field.zone}:` + JSON.stringify(next); if (key === signature) return; progress = next; signature = key; render(); },
     npc(id, container) { container.replaceChildren(...definitions.filter(q => q.npc === id).map(q => card(q, true))); },
     marker(id) { return this.markerInfo(id).symbol; },
     markerInfo(id) {

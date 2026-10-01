@@ -13,7 +13,7 @@
   const OL = '#1c1428';
   // Zone 0 is Greenmeadow with Alderhaven; the server numbers the rest like WORLD_MAP.zones. Each has its own
   // size, obstacles, theme (terrain, sky, sprites) and gates. The server decides which zone the hero is in.
-  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, portals: WORLD_MAP.portals || [], paths: null, levels: null },
+  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: null, levels: null },
     ...(WORLD_MAP.zones || []).map(z => ({ theme: 'ember', paths: null, levels: null, portals: [], ...z }))];
   let zone = 0, zdef = ZONES[0], SPAWN = WORLD_MAP.spawn;
 
@@ -223,7 +223,7 @@
           g.fillStyle = '#f5b82e'; g.beginPath(); g.arc(qx, qy - 6, 1.6, 0, 6.283); g.fill();
         } else if (r() < .015) { const [qx, qy] = inTile(); g.fillStyle = '#fff'; g.beginPath(); g.ellipse(qx, qy - 3, 3, 3.6, 0, 0, 6.283); g.fill(); g.fillStyle = '#e8484e'; g.beginPath(); g.ellipse(qx, qy - 5, 5, 3.4, 0, Math.PI, 0); g.fill(); }
       }
-      if (zone === 0) City.stoneTile(g, px, py, x, y);
+      City.stoneTile(g, px, py, x, y);
       // earth cliff on the two front edges of the island
       const depth = CLIFF - 34 + hash2(x, y, 9) * 26;
       const face = (dir) => {
@@ -299,7 +299,7 @@
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
   }
-  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: hero.xpNeed ?? xpNeed(hero.level), level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, levels: zdef.levels, buffs: hero.buffs || [], traveling: cityRoute.length > 0 && !pendingNpc }); }
+  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: hero.xpNeed ?? xpNeed(hero.level), level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, hub: City.inside(hero.x, hero.y) ? zdef.city?.name : null, levels: zdef.levels, buffs: hero.buffs || [], traveling: cityRoute.length > 0 && !pendingNpc }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -313,7 +313,7 @@
   function onKeyDown(e) {
     if (e.defaultPrevented || !running || paused || !Online.connected || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '')) return;
     const k = e.key.toLowerCase();
-    if (k === 'f' && !e.repeat && !hero.dead && zone === 0) {
+    if (k === 'f' && !e.repeat && !hero.dead) {
       e.preventDefault(); const npc = City.npcs.filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
       if (npc) talkTo(npc); return;
     }
@@ -331,7 +331,7 @@
     if (!running || paused || !Online.connected || hero.dead) return;
     pendingNpc = null; cityRoute = [];
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
-    const npc = zone === 0 && City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-105 && my<y+12; });
+    const npc = City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-105 && my<y+12; });
     if (npc) { talkTo(npc); return; }
     pointer.down = true; cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
     const [wx, wy] = pointerWorld(e); pointer.x = wx; pointer.y = wy;
@@ -1068,7 +1068,7 @@
       g.drawImage(getChunk(chx, chy).c, dx, dy, G.w, G.h);
     }
     g.imageSmoothingEnabled = true;
-    if (zone === 0) City.drawPlaza(g, w2s);
+    City.drawPlaza(g, w2s);
     if (zdef.theme === 'ember') drawLava(g, t);
     // ground decals: splats, target marker, slash, shadows
     for (const who of [hero, ...remotePlayers.values()]) drawBuffRings(g, who, t);
@@ -1083,7 +1083,7 @@
       if (onScreen(sx, sy, 200)) { list.push({ d: o.x + o.y, o, sx, sy }); if (o.kind === 'tree') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind]) shadow(g, o.x, o.y, 26, 9, .25); }
     }
     for (const portal of zdef.portals) { const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y, portal, sx, sy }); }
-    if (zone === 0) for (const n of City.npcs) { const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
+    for (const n of City.npcs) { const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
     for (const s of slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, 100)) { shadow(g, s.x, s.y, 28 * s.d.scale * (1 - s.hop * .12), 11 * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 60)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
     { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, .32); list.push({ d: hero.x + hero.y + .001, hero, sx, sy }); }
@@ -1097,7 +1097,7 @@
       if (it.o) {
         const o = it.o;
         if (!set[o.kind]) {
-          const cover=['house','chapel','gate'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
+          const cover=['house','chapel','gate','tent'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
           City.drawObject(g,o,it.sx,it.sy,cover ? .5 : 1);
           if(o.kind==='fountain') { for(let i=0;i<7;i++){const phase=(t*.7+i*.17)%1;g.globalAlpha=Math.sin(phase*Math.PI)*.7;g.fillStyle='#e0ffff';g.beginPath();g.ellipse(it.sx+Math.sin(i*4)*45,it.sy-9-phase*24,2,3,0,0,Math.PI*2);g.fill();}g.globalAlpha=1;}
           continue;
@@ -1189,9 +1189,10 @@
     const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember';
     g.fillStyle = ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
-    if (zone === 0) {
-      g.fillStyle='#d8cbb0'; g.fillRect(WORLD_MAP.city.x0*k,WORLD_MAP.city.y0*k,(WORLD_MAP.city.x1-WORLD_MAP.city.x0)*k,(WORLD_MAP.city.y1-WORLD_MAP.city.y0)*k);
-      g.fillStyle='#68bcc6'; g.beginPath();g.arc(36*k,83*k,3,0,Math.PI*2);g.fill();
+    if (zdef.city) {
+      const c = zdef.city;
+      g.fillStyle=ember ? '#88705d' : '#d8cbb0'; g.fillRect(c.x0*k,c.y0*k,(c.x1-c.x0)*k,(c.y1-c.y0)*k);
+      g.fillStyle=ember ? '#ffb65c' : '#68bcc6'; g.beginPath();g.arc(c.plaza.x*k,c.plaza.y*k,3,0,Math.PI*2);g.fill();
     }
     for (const o of objects) {
       if (o.kind === 'post') continue;
@@ -1204,7 +1205,7 @@
   function drawMini() {
     if (!mctx || !miniBase) return;
     const s = mini.width / MAP; mctx.clearRect(0, 0, mini.width, mini.height); mctx.drawImage(miniBase, 0, 0, mini.width, mini.height);
-    if (zone === 0) for (const n of City.npcs) { mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
+    for (const n of City.npcs) { mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
     for (const remote of remotePlayers.values()) { mctx.fillStyle = window.Social?.isPartyMember(remote.id) ? '#7dff9b' : '#b3dfff'; mctx.beginPath(); mctx.arc(remote.x * s, remote.y * s, 2.5, 0, 6.283); mctx.fill(); }
     for (const sl of slimes) if (!sl.dead) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }
     mctx.fillStyle = '#fff'; mctx.strokeStyle = '#1c1428'; mctx.lineWidth = 1.5; mctx.beginPath(); mctx.arc(hero.x * s, hero.y * s, 3.6, 0, 6.283); mctx.fill(); mctx.stroke();
@@ -1252,15 +1253,14 @@
     setPaused(p) { paused = p; if(p){pendingNpc=null;cityRoute=[];} Field.clearInput(); Online.send({ type: 'stop' }); },
     visitNpc(id) {
       if (paused || !Online.connected || hero.dead) return;
-      if (zone !== 0) { floater(hero.x, hero.y, 'Return to Greenmeadow first', '#ffe066', false); return; }
       const npc = City.npcs.find(n => n.id === id);
       if (npc) talkTo(npc);
     },
     visitCity() {
       if(paused || !Online.connected || hero.dead)return;
-      if (zone !== 0) { floater(hero.x, hero.y, 'Return to Greenmeadow first', '#ffe066', false); return; }
+      if (!zdef.city) return;
       Field.clearInput(); pendingNpc=null; hero.target=null; hero.goal=null;
-      cityRoute=routeTo({x:36,y:79});routeTime=0;
+      cityRoute=routeTo(zone === 0 ? {x:36,y:79} : zdef.spawn);routeTime=0;
     },
     equip(change) {
       if (!isModular()) return;

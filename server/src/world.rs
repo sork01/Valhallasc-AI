@@ -825,11 +825,8 @@ impl World {
     }
     fn interact(&mut self, session: u64, npc_id: &str, offer_id: Option<&str>) {
         let p = self.players.get_mut(&session).unwrap();
-        let Some(npc) = self.maps[p.character.zone]
-            .npcs
-            .iter()
-            .find(|npc| npc.id == npc_id)
-        else {
+        let map = &self.maps[p.character.zone];
+        let Some(npc) = map.npcs.iter().find(|npc| npc.id == npc_id) else {
             return;
         };
         if p.character.hp <= 0. || p.character.point().distance(Point { x: npc.x, y: npc.y }) > 2.8
@@ -841,7 +838,7 @@ impl World {
         }
         p.stop();
         p.attack = 0.;
-        quest_progress(&mut p.character, &self.maps[0].quests, "talk", npc_id);
+        quest_progress(&mut p.character, &map.quests, "talk", npc_id);
         let mut notice = String::new();
         let mut levels = 0;
         let mut quest_changed = false;
@@ -853,10 +850,8 @@ impl World {
                 p.service_at = self.time;
                 if let Some(action) = id.strip_prefix("quest:") {
                     if let Some((action, id)) = action.split_once(':')
-                        && let Some(quest) = self.maps[0]
-                            .quests
-                            .iter()
-                            .find(|q| q.id == id && q.npc == npc_id)
+                        && let Some(quest) =
+                            map.quests.iter().find(|q| q.id == id && q.npc == npc_id)
                     {
                         (notice, levels, quest_changed) =
                             quest_action(&mut p.character, quest, action);
@@ -1560,7 +1555,7 @@ impl World {
             }
             let p = self.players.get_mut(&session).unwrap();
             p.character.kills += 1;
-            quest_progress(&mut p.character, &self.maps[0].quests, "kill", &kind);
+            quest_progress(&mut p.character, &self.maps[zone].quests, "kill", &kind);
             let levels = p.character.grant_xp(xp);
             self.event("slimeDie", &actor, point, 0., false);
             if levels > 0 {
@@ -2153,12 +2148,186 @@ mod tests {
         rx
     }
     fn quest_interact(w: &mut World, npc: &str, offer: Option<&str>) {
-        let n = w.maps[0].npcs.iter().find(|n| n.id == npc).unwrap();
+        let zone = w.players[&1].character.zone;
+        let n = w.maps[zone].npcs.iter().find(|n| n.id == npc).unwrap();
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.x = n.x;
         c.y = n.y;
         w.time += 0.6;
         w.interact(1, npc, offer);
+    }
+
+    #[test]
+    fn crags_hub_catalog_is_connected_and_has_twelve_valid_quests() {
+        let w = world();
+        let map = &w.maps[1];
+        assert_eq!(map.npcs.len(), 4);
+        assert_eq!(map.quests.len(), 12);
+        assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 2);
+        let mut ids = std::collections::HashSet::new();
+        let mut npc_ids = std::collections::HashSet::new();
+        for area in &w.maps {
+            for npc in &area.npcs {
+                assert!(npc_ids.insert(&npc.id), "globally unique NPC ids");
+            }
+            for q in &area.quests {
+                assert!(ids.insert(&q.id), "globally unique persistent quest ids");
+                assert!(area.npcs.iter().any(|n| n.id == q.npc));
+                assert!(q.reward_xp > 0 && q.reward_gold > 0 && !q.objectives.is_empty());
+                let mut chain = std::collections::HashSet::new();
+                let mut next = Some(q);
+                while let Some(step) = next {
+                    assert!(chain.insert(&step.id), "quest prerequisites must not cycle");
+                    next = step.requires.as_ref().map(|id| {
+                        area.quests
+                            .iter()
+                            .find(|q| &q.id == id)
+                            .expect("valid prerequisite")
+                    });
+                }
+                for o in &q.objectives {
+                    assert!(o.count > 0);
+                    match o.kind.as_str() {
+                        "talk" => assert!(area.npcs.iter().any(|n| n.id == o.target)),
+                        "kill" => assert!(
+                            o.target == "any"
+                                || o.target == "slime"
+                                || area.slimes.iter().any(|s| s.kind == o.target)
+                        ),
+                        _ => panic!("unsupported objective"),
+                    }
+                }
+            }
+        }
+        for npc in &map.npcs {
+            let point = Point { x: npc.x, y: npc.y };
+            let mut clear = point;
+            map.collide(&mut clear, PLAYER_RADIUS);
+            assert!(
+                point.distance(clear) < 1e-6,
+                "NPC stands on accessible ground"
+            );
+            assert!(map.in_city(point), "NPC is protected by camp sanctuary");
+            assert!(
+                w.slimes
+                    .iter()
+                    .filter(|s| s.zone == 1)
+                    .all(|s| s.point().distance(point) > 8.)
+            );
+        }
+    }
+
+    #[test]
+    fn crags_tour_checks_zone_giver_prerequisites_and_saves_its_reward() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap();
+        w.interact(1, "crags_captain", Some("quest:accept:crags_welcome"));
+        assert!(w.players[&1].character.quests.is_empty(), "wrong zone");
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        quest_interact(&mut w, "crags_scout", Some("quest:accept:crags_wisps"));
+        quest_interact(&mut w, "crags_supplier", Some("quest:accept:crags_welcome"));
+        assert!(
+            w.players[&1].character.quests.is_empty(),
+            "locked or wrong giver"
+        );
+        quest_interact(&mut w, "crags_captain", Some("quest:accept:crags_welcome"));
+        quest_interact(&mut w, "crags_scout", None);
+        quest_interact(&mut w, "crags_healer", None);
+        quest_interact(&mut w, "crags_supplier", None);
+        assert_eq!(w.players[&1].character.quests[0].counts, vec![1, 1, 1]);
+        quest_interact(&mut w, "crags_captain", Some("quest:claim:crags_welcome"));
+        assert_eq!(w.players[&1].character.gold, 40);
+        assert_eq!(
+            w.store.load(token).unwrap().unwrap().quests[0].completions,
+            1
+        );
+        quest_interact(&mut w, "crags_captain", Some("quest:claim:crags_welcome"));
+        assert_eq!(w.players[&1].character.gold, 40, "no duplicate reward");
+        quest_interact(&mut w, "crags_scout", Some("quest:accept:crags_wisps"));
+        assert_eq!(w.players[&1].character.quests[1].counts, vec![0]);
+    }
+
+    #[test]
+    fn crags_kills_credit_only_local_accepted_quests_and_the_killer() {
+        let mut w = world();
+        let _r1 = join(&mut w, 1, Class::Warrior);
+        let _r2 = join(&mut w, 2, Class::Mage);
+        quest_interact(&mut w, "gatekeeper", Some("quest:accept:slime_patrol"));
+        w.players.get_mut(&1).unwrap().character.quests[0].completions = 1;
+        quest_interact(&mut w, "merchant", Some("quest:accept:meadow_bounty"));
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        w.players.get_mut(&2).unwrap().character.zone = 1;
+        quest_interact(&mut w, "crags_captain", Some("quest:accept:crags_welcome"));
+        w.players.get_mut(&1).unwrap().character.quests[2].completions = 1;
+        quest_interact(&mut w, "crags_scout", Some("quest:accept:crags_wisps"));
+        quest_interact(&mut w, "crags_supplier", Some("quest:accept:crags_bounty"));
+        let index = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == 1 && s.kind == "wisp")
+            .unwrap();
+        w.hit_slime(index, 1, 10000., false);
+        let c = &w.players[&1].character;
+        assert_eq!(
+            c.quests[1].counts,
+            vec![0],
+            "meadow bounty excludes Crags kills"
+        );
+        assert_eq!(c.quests[3].counts, vec![1]);
+        assert_eq!(c.quests[4].counts, vec![1]);
+        assert!(w.players[&2].character.quests.is_empty());
+        let index = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == 1 && s.kind == "spider")
+            .unwrap();
+        w.hit_slime(index, 1, 10000., false);
+        assert_eq!(
+            w.players[&1].character.quests[3].counts,
+            vec![1],
+            "kind-specific objective"
+        );
+        assert_eq!(w.players[&1].character.quests[4].counts, vec![2]);
+        w.players.get_mut(&1).unwrap().character.zone = 0;
+        let index = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == 0 && s.kind == "green")
+            .unwrap();
+        w.hit_slime(index, 1, 10000., false);
+        assert_eq!(w.players[&1].character.quests[1].counts, vec![1]);
+        assert_eq!(
+            w.players[&1].character.quests[4].counts,
+            vec![2],
+            "Crags bounty excludes meadow kills"
+        );
+    }
+
+    #[test]
+    fn cinderwatch_sanctuary_heals_and_makes_pursuing_enemies_yield() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        w.players.get_mut(&1).unwrap().character.hp = 10.;
+        quest_interact(&mut w, "crags_healer", Some("blessing"));
+        assert_eq!(w.players[&1].character.hp, 120.);
+        assert_eq!(w.players[&1].character.gold, 0);
+        w.hurt_player(1, 1000., Point::default());
+        assert_eq!(w.players[&1].character.hp, 120., "camp blocks enemy damage");
+        let id = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == 1 && s.kind == "wisp")
+            .unwrap();
+        w.slimes[id].x = 46.;
+        w.slimes[id].y = 75.;
+        w.slimes[id].target = Some(1);
+        w.slimes[id].state = "chase".into();
+        w.update_slime(id);
+        assert!(w.slimes[id].target.is_none(), "camp drops chase targets");
+        assert!(!w.maps[1].in_city(w.slimes[id].point()));
     }
 
     #[test]
@@ -2949,13 +3118,13 @@ mod tests {
         assert_eq!(w.slimes.iter().filter(|s| s.kind == "beetle").count(), 5);
         for s in &w.slimes {
             let mut point = s.point();
-            w.maps[0].collide(&mut point, s.r);
+            w.maps[s.zone].collide(&mut point, s.r);
             assert!(
                 point.distance(s.point()) < 1e-6,
                 "{} spawn is blocked",
                 s.kind
             );
-            assert!(!w.maps[0].in_city(s.point()));
+            assert!(!w.maps[s.zone].in_city(s.point()));
         }
         for (kind, hp, damage, windup) in [("beetle", 240., 22., 0.4), ("big", 600., 30., 0.35)] {
             let mut w = world();
@@ -3382,8 +3551,8 @@ mod tests {
             {
                 let p = w.players.get_mut(&1).unwrap();
                 p.character.zone = 1;
-                p.character.x = 48.;
-                p.character.y = 86.5;
+                p.character.x = w.slimes[id].x - 1.;
+                p.character.y = w.slimes[id].y;
                 p.character.hp = 1000.;
             }
             let point = w.players[&1].character.point();
