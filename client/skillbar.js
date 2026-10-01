@@ -36,6 +36,8 @@
     focus: '<path d="M3 18c5-8 11-11 15-11s10 3 15 11c-5 8-11 11-15 11S8 26 3 18z"/><circle cx="18" cy="18" r="4"/>',
     ring: '<circle cx="18" cy="18" r="6"/><path d="M18 3v6M18 27v6M3 18h6M27 18h6M8 8l4 4M24 24l4 4M28 8l-4 4M12 24l-4 4"/>',
     cuts: '<path d="M5 5l26 26M13 4l19 19M4 13l19 19M28 5L5 28"/>',
+    food: '<path d="M5 17h26c0 8-5 13-13 13S5 25 5 17zM11 13c-2-3 2-4 0-8M18 13c-2-3 2-4 0-8M25 13c-2-3 2-4 0-8"/>',
+    potion: '<path d="M14 4h8M15 4v8L7 27c-1 3 1 5 4 5h14c3 0 5-2 4-5L21 12V4M10 22h16"/>',
   };
   const icon = kind => `<svg viewBox="0 0 36 36" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${icons[kind]}</svg>`;
   let slots = [], skills = [], character = null, className = '', selected = 0, previousFocus = null, layoutLevel = 1, seenLevel = 0;
@@ -173,5 +175,6 @@
       b.querySelector('.skill-cooldown').textContent = cooldown > 0 ? cooldown.toFixed(1) : '';
     }
     $('skills-open').disabled = !Online.connected || Field.hero.dead;
+    window.Quickuse?.update();
   } };
 })();

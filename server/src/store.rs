@@ -87,6 +87,7 @@ impl Store {
             attributes: Default::default(),
             zone: 0,
             friends: vec![],
+            potion_ready: 0,
         };
         c.seed_inventory();
         self.db.execute(

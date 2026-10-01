@@ -9,6 +9,7 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
+mod consumables;
 mod debug;
 mod social;
 
@@ -68,6 +69,10 @@ struct Player {
     dash_hits: Vec<usize>,
     skill_cd: BTreeMap<String, f64>,
     buffs: Vec<Buff>,
+    /// Seconds until any potion can be drunk again.
+    potion_cd: f64,
+    /// Food healing not yet announced to the client.
+    food_shown: f64,
     chat_at: f64,
     service_at: f64,
     bag_notice_at: f64,
@@ -75,6 +80,7 @@ struct Player {
 }
 impl Player {
     fn new(character: Character, peer: Peer) -> Self {
+        let potion_cd = character.potion_cooldown_left();
         Self {
             character,
             peer,
@@ -99,6 +105,8 @@ impl Player {
             dash_hits: vec![],
             skill_cd: BTreeMap::new(),
             buffs: vec![],
+            potion_cd,
+            food_shown: 0.,
             chat_at: -99.,
             service_at: -99.,
             bag_notice_at: -99.,
@@ -112,7 +120,7 @@ impl Player {
             "attributes":c.attributes,"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
-            "skillCd":self.skill_cd,"buffs":self.buffs})
+            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd})
     }
     /// The sum of every active buff of one kind.
     fn buff(&self, kind: BuffKind) -> f64 {
@@ -737,6 +745,9 @@ impl World {
             ClientMessage::Skill { id, fx, fy } if fx.is_finite() && fy.is_finite() => {
                 self.use_skill(session, &id, normalize(fx, fy));
             }
+            ClientMessage::UseItem { item } => {
+                self.use_item(session, &item);
+            }
             ClientMessage::Equip {
                 armor,
                 weapon,
@@ -887,6 +898,22 @@ impl World {
                             }
                             Err(text) => notice = text.into(),
                         }
+                    } else if let Some(sold) = &offer.item {
+                        match item(sold) {
+                            None => notice = "That item is not for sale.".into(),
+                            Some(_) if p.character.gold < offer.cost => {
+                                notice = format!("You need {} gold for this purchase.", offer.cost);
+                            }
+                            Some(i) if !p.character.can_collect(&i.id) => {
+                                notice = "Your bags are full. Make room first.".into();
+                            }
+                            Some(i) => {
+                                p.character.gold -= offer.cost;
+                                p.character.add_item(&i.id, 1);
+                                notice = format!("Bought {}.", i.name);
+                                quest_changed = true;
+                            }
+                        }
                     } else if p.character.gold < offer.cost {
                         notice = format!("You need {} gold for this service.", offer.cost);
                     } else {
@@ -960,6 +987,7 @@ impl World {
         self.update_king_spawn();
         let sessions: Vec<_> = self.players.keys().copied().collect();
         for session in sessions {
+            self.update_food(session);
             self.update_player(session);
         }
         // Players pass through actors; enemies yield before their own movement.
@@ -4784,5 +4812,375 @@ mod tests {
         assert!(!w.god_mode);
         dbg(&mut w, DebugCommand::SetGodMode { enabled: true }).unwrap();
         assert!(w.god_mode);
+    }
+
+    // ----- food and potions -----
+    fn drain(rx: &mut mpsc::Receiver<Value>) -> Vec<Value> {
+        std::iter::from_fn(|| rx.try_recv().ok()).collect()
+    }
+    fn hurt_to(w: &mut World, hp: f64) {
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.hp = hp;
+        // A recent hit keeps natural regeneration out of the arithmetic.
+        p.last_hurt = 1.0e9;
+    }
+    fn hp(w: &World) -> f64 {
+        w.players[&1].character.hp
+    }
+    fn have(w: &World, id: &str) -> u32 {
+        w.players[&1].character.quantity(id)
+    }
+    fn seconds(w: &mut World, s: f64) {
+        for _ in 0..(s / TICK).round() as usize {
+            w.step();
+        }
+    }
+    fn gold(w: &World) -> u32 {
+        w.players[&1].character.gold
+    }
+    fn stock(w: &mut World, id: &str, n: u32) {
+        w.players.get_mut(&1).unwrap().character.add_item(id, n);
+    }
+
+    #[test]
+    fn baker_and_apothecary_sell_food_and_potions_for_gold_in_range_with_room() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        w.players.get_mut(&1).unwrap().character.gold = 100;
+        w.time += 1.;
+        w.interact(1, "baker", Some("buy_traveler_stew"));
+        assert_eq!(have(&w, "traveler_stew"), 0, "too far away to buy");
+        quest_interact(&mut w, "baker", Some("buy_traveler_stew"));
+        quest_interact(&mut w, "baker", Some("buy_traveler_stew"));
+        assert_eq!((have(&w, "traveler_stew"), gold(&w)), (2, 76));
+        quest_interact(&mut w, "baker", Some("buy_health_potion"));
+        assert_eq!(
+            have(&w, "health_potion"),
+            0,
+            "the baker does not sell potions"
+        );
+        quest_interact(&mut w, "apothecary", Some("buy_health_potion"));
+        assert_eq!((have(&w, "health_potion"), gold(&w)), (1, 46));
+        w.players.get_mut(&1).unwrap().character.gold = 29;
+        quest_interact(&mut w, "apothecary", Some("buy_health_potion"));
+        assert_eq!(
+            (have(&w, "health_potion"), gold(&w)),
+            (1, 29),
+            "29 gold is not enough"
+        );
+        for id in ["traveler_stew", "health_potion"] {
+            let it = item(id).unwrap();
+            assert!(
+                it.sell > 0 && it.sell < 12,
+                "{id} sells for less than it costs"
+            );
+        }
+        // A full pack refuses a new kind of item but still takes more of one it already holds.
+        w.players.get_mut(&1).unwrap().character.gold = 100;
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .inventory
+            .retain(|s| s.item != "health_potion");
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        for i in ITEMS.iter().filter(|i| i.kind == "material") {
+            if c.bag_used() >= c.bag_capacity() {
+                break;
+            }
+            c.add_item(&i.id, 1);
+        }
+        for i in ITEMS
+            .iter()
+            .filter(|i| i.rarity == "rare" && i.kind != "material")
+        {
+            if c.bag_used() >= c.bag_capacity() {
+                break;
+            }
+            c.add_item(&i.id, 1);
+        }
+        assert_eq!(c.bag_used(), c.bag_capacity(), "fixture fills the pack");
+        quest_interact(&mut w, "apothecary", Some("buy_health_potion"));
+        assert_eq!(have(&w, "health_potion"), 0, "no room for a new stack");
+        assert_eq!(gold(&w), 100, "nothing is charged without room");
+        quest_interact(&mut w, "baker", Some("buy_traveler_stew"));
+        assert_eq!(
+            (have(&w, "traveler_stew"), gold(&w)),
+            (3, 88),
+            "an existing stack still grows"
+        );
+    }
+
+    #[test]
+    fn a_potion_heals_at_once_shares_one_sixty_second_cooldown_and_is_never_wasted() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        let max = w.players[&1].character.max_hp();
+        stock(&mut w, "health_potion", 3);
+        hurt_to(&mut w, max);
+        w.use_item(1, "health_potion");
+        assert_eq!(have(&w, "health_potion"), 3, "full health keeps the potion");
+        assert!(drain(&mut rx).iter().any(|m| m["type"] == "error"));
+        hurt_to(&mut w, 1.);
+        w.use_item(1, "health_potion");
+        assert_eq!(
+            (hp(&w), have(&w, "health_potion")),
+            (101., 2),
+            "100 HP, immediately"
+        );
+        let seen = drain(&mut rx);
+        let drunk = seen.iter().find(|m| m["kind"] == "consume").unwrap();
+        assert_eq!(
+            (drunk["item"].as_str(), drunk["value"].as_f64()),
+            (Some("health_potion"), Some(100.))
+        );
+        assert!(
+            (w.snapshot_for(0)["players"][0]["potionCd"]
+                .as_f64()
+                .unwrap()
+                - 60.)
+                .abs()
+                < 1e-9
+        );
+        // The cooldown refuses a second potion without spending it.
+        hurt_to(&mut w, 1.);
+        seconds(&mut w, 30.);
+        w.use_item(1, "health_potion");
+        assert_eq!((hp(&w), have(&w, "health_potion")), (1., 2));
+        let text = drain(&mut rx)
+            .iter()
+            .find(|m| m["type"] == "error")
+            .unwrap()["text"]
+            .to_string();
+        assert!(text.contains("30 s"), "{text}");
+        seconds(&mut w, 29.9);
+        w.use_item(1, "health_potion");
+        assert_eq!(have(&w, "health_potion"), 2, "still cooling down at 59.9 s");
+        seconds(&mut w, 0.2);
+        w.use_item(1, "health_potion");
+        assert_eq!(
+            (hp(&w), have(&w, "health_potion")),
+            (101., 1),
+            "ready after 60 s"
+        );
+        // Healing stops at the maximum.
+        hurt_to(&mut w, max - 10.);
+        seconds(&mut w, 60.2);
+        w.use_item(1, "health_potion");
+        assert_eq!((hp(&w), have(&w, "health_potion")), (max, 0));
+        assert_eq!(
+            drain(&mut rx)
+                .iter()
+                .rfind(|m| m["kind"] == "consume")
+                .unwrap()["value"],
+            10.
+        );
+    }
+
+    #[test]
+    fn food_heals_a_hundred_over_eight_seconds_and_only_one_meal_works_at_a_time() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        stock(&mut w, "traveler_stew", 3);
+        hurt_to(&mut w, 1.);
+        w.use_item(1, "traveler_stew");
+        assert_eq!(
+            (hp(&w), have(&w, "traveler_stew")),
+            (1., 2),
+            "nothing arrives at once"
+        );
+        let snap = w.snapshot_for(0);
+        let buff = &snap["players"][0]["buffs"][0];
+        assert_eq!(
+            (
+                buff["id"].as_str(),
+                buff["kind"].as_str(),
+                buff["time"].as_f64()
+            ),
+            (Some("traveler_stew"), Some("regen"), Some(8.))
+        );
+        seconds(&mut w, 4.);
+        assert!(
+            (hp(&w) - 51.).abs() < 1.,
+            "half after four seconds, got {}",
+            hp(&w)
+        );
+        // A second meal is refused and keeps its place in the pack.
+        let mut ticks: Vec<_> = drain(&mut rx)
+            .into_iter()
+            .filter(|m| m["kind"] == "regen")
+            .collect();
+        w.use_item(1, "traveler_stew");
+        assert_eq!(have(&w, "traveler_stew"), 2);
+        assert_eq!(w.players[&1].buffs.len(), 1, "no stacking");
+        let refused = drain(&mut rx);
+        assert!(refused.iter().any(|m| m["type"] == "error"));
+        ticks.extend(refused.into_iter().filter(|m| m["kind"] == "regen"));
+        seconds(&mut w, 4.1);
+        assert!(
+            (hp(&w) - 101.).abs() < 0.01,
+            "exactly 100 in all, got {}",
+            hp(&w)
+        );
+        assert!(w.players[&1].buffs.is_empty());
+        seconds(&mut w, 2.);
+        assert!(
+            (hp(&w) - 101.).abs() < 0.01,
+            "the meal does not keep healing"
+        );
+        // The announced pieces add up to the meal, about once a second.
+        ticks.extend(drain(&mut rx).into_iter().filter(|m| m["kind"] == "regen"));
+        assert!(
+            (7..=9).contains(&ticks.len()),
+            "{} announcements",
+            ticks.len()
+        );
+        let total: f64 = ticks.iter().map(|m| m["value"].as_f64().unwrap()).sum();
+        assert!(
+            (total - 100.).abs() <= ticks.len() as f64 * 0.5,
+            "announced {total}"
+        );
+        // Once it is over another can be eaten.
+        hurt_to(&mut w, 1.);
+        w.use_item(1, "traveler_stew");
+        assert_eq!(have(&w, "traveler_stew"), 1);
+        seconds(&mut w, 8.1);
+        assert!((hp(&w) - 101.).abs() < 0.01);
+    }
+
+    #[test]
+    fn food_stops_at_full_health_and_ends_with_the_player_and_potions_work_during_it() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let max = w.players[&1].character.max_hp();
+        stock(&mut w, "traveler_stew", 2);
+        stock(&mut w, "health_potion", 1);
+        hurt_to(&mut w, max);
+        w.use_item(1, "traveler_stew");
+        assert_eq!(have(&w, "traveler_stew"), 2, "no meal at full health");
+        hurt_to(&mut w, max - 30.);
+        w.use_item(1, "traveler_stew");
+        seconds(&mut w, 8.1);
+        assert_eq!(hp(&w), max, "capped at the maximum");
+        // Food and a potion are different effects and may overlap.
+        hurt_to(&mut w, 1.);
+        w.use_item(1, "traveler_stew");
+        seconds(&mut w, 1.);
+        w.use_item(1, "health_potion");
+        assert!(
+            hp(&w) > 100.,
+            "the potion lands during the meal: {}",
+            hp(&w)
+        );
+        // Dying ends the meal.
+        stock(&mut w, "traveler_stew", 1);
+        w.players.get_mut(&1).unwrap().character.hp = 0.;
+        w.step();
+        assert!(w.players[&1].buffs.is_empty());
+        w.use_item(1, "traveler_stew");
+        assert!(w.players[&1].buffs.is_empty(), "the dead cannot eat");
+        assert_eq!(have(&w, "traveler_stew"), 1);
+    }
+
+    #[test]
+    fn only_owned_usable_items_can_be_used_and_the_pack_is_saved() {
+        let mut w = world();
+        let (tx, mut rx) = mpsc::channel(256);
+        let look = Look {
+            class: Class::Mage,
+            ..Look::default()
+        };
+        let welcome = w.join(1, None, Some(look), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        hurt_to(&mut w, 1.);
+        for id in [
+            "traveler_stew",
+            "health_potion",
+            "slime_gel",
+            "mage_armor_runic",
+            "nonsense",
+            "linen_satchel",
+        ] {
+            w.use_item(1, id);
+        }
+        let errors = drain(&mut rx)
+            .into_iter()
+            .filter(|m| m["type"] == "error")
+            .count();
+        assert_eq!(errors, 6, "every refusal tells the player");
+        assert_eq!(
+            (hp(&w), w.players[&1].buffs.len(), w.players[&1].potion_cd),
+            (1., 0, 0.)
+        );
+        stock(&mut w, "health_potion", 1);
+        w.use_item(1, "health_potion");
+        assert_eq!(have(&w, "health_potion"), 0);
+        assert!(
+            w.players[&1]
+                .character
+                .inventory
+                .iter()
+                .all(|s| s.quantity > 0),
+            "no empty stacks"
+        );
+        let stored = w.store.load(&token).unwrap().unwrap();
+        assert_eq!(
+            stored.quantity("health_potion"),
+            0,
+            "the drunk potion is saved"
+        );
+    }
+
+    #[test]
+    fn the_potion_cooldown_survives_logging_out_and_a_cleared_cooldown_stays_cleared() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        stock(&mut w, "health_potion", 3);
+        hurt_to(&mut w, 1.);
+        w.use_item(1, "health_potion");
+        let ready = w.players[&1].character.potion_ready;
+        assert!(
+            (ready as i64 - unix_now() as i64 - 60).abs() <= 1,
+            "the end is saved as a wall-clock second"
+        );
+        // Leaving and returning cannot skip the wait; the drunk potion and the end time are both saved.
+        w.leave(1);
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, Some(token.clone()), None, tx).unwrap();
+        let left = w.players[&1].potion_cd;
+        assert!(
+            left > 58. && left <= 60.,
+            "still waiting after a relog: {left}"
+        );
+        hurt_to(&mut w, 1.);
+        w.use_item(1, "health_potion");
+        assert_eq!(
+            (hp(&w), have(&w, "health_potion")),
+            (1., 2),
+            "the relog did not reset the cooldown"
+        );
+        // A cooldown that has already passed does not come back.
+        w.leave(1);
+        let mut saved = w.store.load(&token).unwrap().unwrap();
+        saved.potion_ready = unix_now().saturating_sub(5);
+        w.store.save_many(std::iter::once(&saved)).unwrap();
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, Some(token), None, tx).unwrap();
+        assert_eq!(w.players[&1].potion_cd, 0.);
+        // The test shortcut clears both halves, or a relog would bring the wait back.
+        hurt_to(&mut w, 1.);
+        w.use_item(1, "health_potion");
+        assert!(w.players[&1].potion_cd > 0.);
+        w.test_commands = true;
+        w.debug(1, None, DebugCommand::ResetCooldowns);
+        assert_eq!(
+            (
+                w.players[&1].potion_cd,
+                w.players[&1].character.potion_ready
+            ),
+            (0., 0)
+        );
     }
 }

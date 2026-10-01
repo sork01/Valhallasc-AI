@@ -110,23 +110,27 @@
   // ---------- background music (music.js) ----------
   // Browsers only let audio start after a tap or key press, so the score begins on the first one
   // (on the title screen that is the tap that awakens the horn) and then plays on every screen.
-  let music = null, fmusic = null;                       // title/creation theme, field theme
+  let music = null, fmusic = null, cmusic = null, musicZone = 0;   // title/creation theme, meadow theme, Crags theme (zone > 0)
   function ensureMusic() {
     const c = audio(); if (!c || !window.createMusic) return;
     if (!music) { music = window.createMusic(c); c.addEventListener('statechange', ensureMusic); }
     if (!fmusic && window.createFieldMusic) fmusic = window.createFieldMusic(c);
+    if (!cmusic && window.createCragMusic) cmusic = window.createCragMusic(c);
     syncMusic();
   }
   // the field has its own theme; the title and creation screens share the snowy one (one plays at a time, fading over)
   function syncMusic() {
     if (!ac || ac.state !== 'running') return;
-    if (scene === 'game') { if (music && music.running) music.stop(); if (fmusic && !fmusic.running) fmusic.start(); }
-    else { if (fmusic && fmusic.running) fmusic.stop(); if (music && !music.running) music.start(); }
+    // In the game the zone picks the score: Greenmeadow and Alderhaven keep the folk tune, the Crags get their own.
+    const here = scene === 'game' ? (musicZone > 0 && cmusic ? cmusic : fmusic) : null;
+    for (const m of [fmusic, cmusic]) if (m && m !== here && m.running) m.stop();
+    if (scene === 'game') { if (music && music.running) music.stop(); if (here && !here.running) here.start(); }
+    else if (music && !music.running) music.start();
     applyMusicLevel(3);
   }
   function applyMusicLevel(secs = 1.5) {
     if (music) music.setLevel(save.sound ? (scene === 'splash' ? 1 : .55) * taper(save.musicVol) : 0, secs);
-    if (fmusic) fmusic.setLevel(save.sound ? taper(save.musicVol) : 0, secs);
+    for (const m of [fmusic, cmusic]) if (m) m.setLevel(save.sound ? taper(save.musicVol) : 0, secs);
   }
   function unlockAudio() { const c = audio(); if (c) c.resume().then(ensureMusic).catch(() => {}); }
   ['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, unlockAudio, { capture: true }));
@@ -248,7 +252,7 @@
   const wcv = $('wcv');
   const view = new window.WarriorView(wcv, name => onWarrior(name));
   view.reduced = reduced;
-  window.valhalla = { view, get music() { return music; }, get fmusic() { return fmusic; }, get ctx() { return ac; } };   // debug handle (also used by the tests)
+  window.valhalla = { view, get music() { return music; }, get fmusic() { return fmusic; }, get cmusic() { return cmusic; }, get ctx() { return ac; } };   // debug handle (also used by the tests)
   if (view.ok) {
     view.load('assets/warrior.webp', 'assets/warrior_mask.png').then(() => { view.bind(); view.set(cfg); if (scene === 'create' && !modular(cfg)) view.setActive(true); }).catch(() => fallbackWarrior());
   } else fallbackWarrior();
@@ -423,6 +427,7 @@
     title.querySelector('b').textContent = away ? s.area : inCity ? 'Alderhaven · Fountain Square' : t('areaName');
     title.querySelector('span').textContent = away ? (s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : 'Unexplored lands') : inCity ? 'Sanctuary · shops · townspeople' : '푸른 초원';
     renderBuffs(s.buffs || []);
+    if ((s.zone || 0) !== musicZone) { musicZone = s.zone || 0; syncMusic(); }
     $('city-travel').hidden = inCity || away;
     $('city-travel').textContent = s.traveling ? 'Walking to Alderhaven…' : 'Visit Alderhaven ↓';
   }
@@ -449,7 +454,8 @@
     if (buffBar.dataset.key !== key) {
       buffBar.dataset.key = key;
       buffBar.replaceChildren(...list.map(b => {
-        const def = WORLD_SKILLS.find(k => k.id === b.id), chip = el('span', { class: 'buff-chip', 'data-buff': b.id, 'data-kind': b.kind, title: `${def?.name || b.id}: ${def?.description || ''}` }), glyph = el('span', { class: 'skill-icon' });
+        const food = WORLD_ITEMS.find(k => k.id === b.id), def = WORLD_SKILLS.find(k => k.id === b.id) || (food && { name: food.name, icon: 'food', description: `Restores ${food.heal} HP over ${food.duration} s.` });
+        const chip = el('span', { class: 'buff-chip', 'data-buff': b.id, 'data-kind': b.kind, title: `${def?.name || b.id}: ${def?.description || ''}` }), glyph = el('span', { class: 'skill-icon' });
         glyph.innerHTML = Skillbar.icon(def?.icon || 'attack'); chip.append(glyph, el('i')); return chip;
       }));
     }
@@ -482,6 +488,8 @@
     slimeDie: () => { sweep(520, 140, .22, .16, 'triangle'); noiseBurst(.16, 1400, 300, .1); },
     hurt: () => voice(115, .32, .32, false),
     pickup: () => tone([1568], .12, .05),
+    // A potion is a quick gulp that rises; a meal is two soft low notes.
+    consume: ev => { if (ev?.value > 0) { sweep(240, 620, .16, .08, 'triangle'); tone([1175, 1568], .25, .04); } else { tone([330, 440], .18, .05, 'triangle'); } },
     // A rising whoosh, a run up the scale, then a full major chord with sparkles on top.
     levelup: () => {
       sweep(180, 1900, .7, .09, 'sawtooth'); noiseBurst(.8, 300, 7000, .09, .8);

@@ -29,6 +29,15 @@ pub struct Item {
     pub starter: bool,
     #[serde(default, rename = "bagSlots")]
     pub bag_slots: usize,
+    /// Food and potions: hit points restored in total.
+    #[serde(default)]
+    pub heal: f64,
+    /// Food: seconds over which `heal` arrives. Potions heal at once.
+    #[serde(default)]
+    pub duration: f64,
+    /// Potions: seconds before any potion can be drunk again.
+    #[serde(default)]
+    pub cooldown: f64,
 }
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct ItemStack {
@@ -38,6 +47,11 @@ pub struct ItemStack {
 pub static ITEMS: LazyLock<Vec<Item>> = LazyLock::new(|| {
     serde_json::from_str(include_str!("../../world/items.txt")).expect("valid item catalog")
 });
+pub fn unix_now() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.as_secs())
+}
 pub fn item(id: &str) -> Option<&'static Item> {
     ITEMS.iter().find(|i| i.id == id)
 }
@@ -133,6 +147,10 @@ impl Character {
         }
         self.gold -= cost;
         Ok(self.bag_capacity())
+    }
+    /// Seconds left of the potion cooldown, from the saved wall-clock end (never more than an hour).
+    pub fn potion_cooldown_left(&self) -> f64 {
+        self.potion_ready.saturating_sub(unix_now()).min(3600) as f64
     }
     pub fn quantity(&self, id: &str) -> u32 {
         self.inventory

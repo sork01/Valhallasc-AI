@@ -9,7 +9,7 @@
     ['frame', 'Character frame', '.hud-tl'], ['buffs', 'Active effects', '#buff-bar'], ['party', 'Party', '#party-frame'],
     ['map', 'Minimap', '.hud-tr'], ['travel', 'Travel button', '#city-travel'], ['quests', 'Quest tracker', '#quest-tracker'],
     ['character', 'Character button', '#equipment-open'], ['bags', 'Bags button', '#inventory-open'], ['social', 'Social button', '#social-open'],
-    ['skillbar', 'Skillbar', '#skillbar'], ['chat', 'Chat', '#chat'], ['hint', 'Controls hint', '.hud-hint'],
+    ['skillbar', 'Skillbar', '#skillbar'], ['quickuse', 'Food and potion slots', '#quickuse'], ['chat', 'Chat', '#chat'], ['hint', 'Controls hint', '.hud-hint'],
   ];
   const stage = $('stage'), panel = $('settings-panel'), bar = $('layout-bar');
   const els = new Map(ITEMS.map(([id, name, selector]) => [id, document.querySelector(selector)]));

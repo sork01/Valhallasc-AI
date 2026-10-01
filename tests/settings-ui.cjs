@@ -80,14 +80,14 @@ const stageRect = page => rect(page, '#stage');
   await page.locator('#p-resume').click();
 
   // --- Edit UI ---
-  const ids = ['frame', 'buffs', 'party', 'map', 'travel', 'quests', 'character', 'bags', 'social', 'skillbar', 'chat', 'hint'];
+  const ids = ['frame', 'buffs', 'party', 'map', 'travel', 'quests', 'character', 'bags', 'social', 'skillbar', 'quickuse', 'chat', 'hint'];
   const before = {}; for (const id of ids) before[id] = await rect(page, `[data-ui="${id}"]`);
-  check(ids.length === 12, 'Twelve movable pieces');
+  check(ids.length === 13, 'Thirteen movable pieces');
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
   await page.locator('#set-edit-ui').click();
   check(await page.locator('#layout-bar').isVisible() && await page.locator('#settings-panel').isHidden(), 'Edit UI hides the panel and shows its toolbar');
   const handles = await page.locator('.layout-handle').evaluateAll(list => list.map(n => ({ id: n.dataset.id, w: n.getBoundingClientRect().width, h: n.getBoundingClientRect().height, hidden: n.hidden })));
-  check(handles.length === 12 && handles.every(h => !h.hidden && h.w > 10 && h.h > 10), `Every piece, even the empty party frame and tracker, gets a visible handle: ${JSON.stringify(handles.filter(h => h.hidden || h.w <= 10))}`);
+  check(handles.length === 13 && handles.every(h => !h.hidden && h.w > 10 && h.h > 10), `Every piece, even the empty party frame and tracker, gets a visible handle: ${JSON.stringify(handles.filter(h => h.hidden || h.w <= 10))}`);
   for (const id of ids) { const h = await rect(page, `.layout-handle[data-id="${id}"]`), e = await rect(page, `[data-ui="${id}"]`); check(Math.abs(h.l - e.l) < 1.5 && Math.abs(h.t - e.t) < 1.5, `The ${id} handle sits on its piece`); }
   await page.screenshot({ path: path.join(world.artifacts, 'edit-ui.png') });
   await page.evaluate(() => { sent.length = 0; });

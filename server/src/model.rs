@@ -199,6 +199,9 @@ pub struct Character {
     /// Character ids of mutual friends. Both sides list each other; names and levels are looked up when shown.
     #[serde(default)]
     pub friends: Vec<String>,
+    /// Unix second when the potion cooldown ends. Wall-clock, so logging out or a restart cannot skip the wait.
+    #[serde(default)]
+    pub potion_ready: u64,
 }
 /// Permanently trained points. Base class combat values stay unchanged until trained.
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
@@ -399,6 +402,9 @@ pub enum ClientMessage {
         fx: f64,
         fy: f64,
     },
+    UseItem {
+        item: String,
+    },
     Equip {
         armor: Option<String>,
         weapon: Option<String>,
@@ -556,6 +562,9 @@ pub struct Offer {
     pub gear: bool,
     #[serde(default)]
     pub bag: Option<String>,
+    /// An item the offer sells (one per purchase).
+    #[serde(default)]
+    pub item: Option<String>,
 }
 #[derive(Clone, Deserialize, Serialize)]
 pub struct Npc {

@@ -490,7 +490,7 @@ const scenarios = {
     },
   },
   bags: {
-    description: 'Earn expansion-bag gold through real quests and combat, buy a bag from Linden, and verify authoritative capacity and persistence.',
+    description: 'Buy an expansion bag from Linden with granted gold (500 exactly, 499 refused), then fill every cell with given items to verify authoritative capacity, overflow refusal and persistence.',
     async run(w, check) {
       const bot = 'BagMage'; await w.connect({ bot, class: 'mage' });
       check(w.player(bot).bagCapacity === 16 && w.player(bot).bags.length === 0, 'New character starts with a sixteen-slot backpack');
@@ -499,38 +499,33 @@ const scenarios = {
       check(w.player(bot).bags.length === 0, 'Expansion bags cannot be bought remotely');
       const refused = await talk(w, bot, 'merchant', 'satchel');
       check(refused.notice.includes('gold') && w.player(bot).bags.length === 0, 'Insufficient funds do not grant a bag');
-      await tour(w, bot);
-      const count = id => w.player(bot).inventory.find(s => s.item === id)?.quantity || 0;
-      await talk(w, bot, 'gatekeeper', 'quest:accept:slime_patrol');
-      for (let i = 0; w.player(bot).gold + count('slime_gel') * 3 < 500 && i < 75; i++) {
-        while (w.player(bot).statPoints > 0) {
-          const trained = w.player(bot).attributes.intellect;
-          await w.action(bot, { type: 'allocate_stat', stat: 'intellect' });
-          await w.waitFor(() => w.player(bot).attributes.intellect > trained);
-        }
-        await defeat(w, bot, 'green');
-        const corpse = w.snapshot.slimes.filter(s => s.dead && s.kind === 'green').sort((a, b) => distance(w.player(bot), a) - distance(w.player(bot), b))[0];
-        await walkTo(w, bot, corpse);
-        await w.advance(600);
-        if (quest(w, bot, 'slime_patrol').counts[0] === 6 && !quest(w, bot, 'slime_patrol').claimed) {
-          await talk(w, bot, 'gatekeeper', 'quest:claim:slime_patrol');
-          await w.waitFor(() => quest(w, bot, 'slime_patrol').claimed);
-          await talk(w, bot, 'merchant', 'quest:accept:meadow_bounty');
-          await w.waitFor(() => !!quest(w, bot, 'meadow_bounty'));
-        }
-        if (quest(w, bot, 'meadow_bounty')?.counts[0] === 8) {
-          await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
-          await talk(w, bot, 'merchant', 'sell:materials');
-          if (w.player(bot).gold < 500) await talk(w, bot, 'merchant', 'quest:accept:meadow_bounty');
-        }
-      }
-      await talk(w, bot, 'merchant', 'sell:materials');
-      await w.waitFor(() => w.player(bot).gold >= 500);
+      // The 500 gold used to be farmed through quests and combat (about eight minutes); the shortcut grants it, and the purchase is still the real NPC offer.
+      await kit.setupCharacter(w, bot, { gold: 499 });
+      const short = await talk(w, bot, 'merchant', 'satchel');
+      check(short.notice.includes('gold') && w.player(bot).bags.length === 0 && w.player(bot).gold === 499, 'One gold short still does not grant a bag');
+      await kit.setupCharacter(w, bot, { gold: 500 });
       const before = w.player(bot).gold;
       const purchase = await talk(w, bot, 'merchant', 'satchel');
       await w.waitFor(() => w.player(bot).bags.length === 1);
       check(purchase.notice.includes('22 bag slots') && w.player(bot).gold === before - 500, 'Earned gold purchases six additional slots for 500 gold');
       check(w.player(bot).bagCapacity === 22 && w.player(bot).bags[0] === 'linen_satchel', 'Snapshot carries the fitted bag and authoritative capacity');
+      // Fill all 22 cells with distinct items; the 23rd kind has nowhere to go.
+      const kinds = kit.items.filter(i => i.kind !== 'bag');
+      while (w.player(bot).bagUsed < 22) {
+        const have = new Set(w.player(bot).inventory.map(s => s.item));
+        const fresh = kinds.find(i => !have.has(i.id));
+        assert.ok(fresh, 'the catalog has enough kinds to fill the bags');
+        await w.debug(bot, { op: 'give_item', item: fresh.id, quantity: 1 });
+        await w.waitFor(() => w.player(bot).inventory.some(s => s.item === fresh.id), 3000, 'Given item');
+      }
+      check(w.player(bot).bagUsed === 22 && w.player(bot).bagUsed === w.player(bot).bagCapacity, 'Given items fill all 22 cells');
+      const have = new Set(w.player(bot).inventory.map(s => s.item)), overflow = kinds.find(i => !have.has(i.id));
+      await assert.rejects(() => w.debug(bot, { op: 'give_item', item: overflow.id, quantity: 1 }), /Bags are full/);
+      check(true, 'A new kind of item is refused when every cell holds a stack');
+      const stacked = w.player(bot).inventory.find(s => kinds.some(i => i.id === s.item && i.kind === 'material'));
+      await w.debug(bot, { op: 'give_item', item: stacked.item, quantity: 5 });
+      await w.waitFor(() => w.player(bot).inventory.find(s => s.item === stacked.item).quantity === stacked.quantity + 5, 3000, 'Stack grows');
+      check(w.player(bot).bagUsed === 22, 'More of a carried item still stacks into its cell');
       await w.restart();
       check(w.player(bot).bagCapacity === 22 && w.player(bot).bags[0] === 'linen_satchel' && w.player(bot).gold === before - 500, 'Bag ownership and payment survive restarting Rust');
     },
@@ -682,6 +677,79 @@ const scenarios = {
       check(roster.online.length === 6 && roster.online.find(p => p.name === 'Bob').friend && roster.online.find(p => p.name === 'Ann').self, 'who lists every online player with their relationship to you');
       await w.social('Ann', { op: 'friend_remove', bot: 'Bob' });
       check(state('Ann').friends.length === 0 && state('Bob').friends.length === 0, 'Removing a friend removes both sides');
+    },
+  },
+
+  consumables: {
+    description: 'Food and potions through the real server: buying from the baker and the apothecary, a 100 HP meal over eight seconds that never stacks, an instant potion with one 60 second cooldown, refusals that keep the item, and the pack surviving a restart.',
+    async run(w, check) {
+      await w.connect({ bot: 'Diner', class: 'warrior' });
+      const me = () => w.player('Diner');
+      const owned = id => me().inventory.find(s => s.item === id)?.quantity || 0;
+      const regen = () => me().buffs.find(b => b.kind === 'regen');
+      // Send use_item and report what the server said back (null when it simply took effect).
+      async function use(item) {
+        const earlier = new Set(w.events);
+        await w.action('Diner', { type: 'use_item', item });
+        await w.advance(500);
+        return w.events.find(e => !earlier.has(e) && e.bot === 'Diner' && e.type === 'error')?.text || null;
+      }
+      await kit.setupCharacter(w, 'Diner', { gold: 100 });
+      const bun = await kit.talkTo(w, 'Diner', 'baker', 'buy_traveler_stew');
+      await w.waitFor(() => owned('traveler_stew') === 1, 3000, 'First stew');
+      check(/Bought Traveler/.test(bun.notice) && bun.gold === 88 && me().gold === 88, 'The baker sells Traveler\'s Stew for 12 gold');
+      await kit.talkTo(w, 'Diner', 'baker', 'buy_traveler_stew');
+      await w.waitFor(() => owned('traveler_stew') === 2, 3000, 'Second stew');
+      await w.advance(550);
+      await w.action('Diner', { type: 'interact', npc: 'baker', offer: 'buy_health_potion' });
+      await w.advance(600);
+      check(owned('health_potion') === 0 && me().gold === 76, 'The baker does not sell potions and charges nothing for the request');
+      await kit.talkTo(w, 'Diner', 'apothecary', 'buy_health_potion');
+      await kit.talkTo(w, 'Diner', 'apothecary', 'buy_health_potion');
+      await w.waitFor(() => owned('health_potion') === 2, 3000, 'Two potions');
+      check(me().gold === 16, 'The apothecary sells Health Potions for 30 gold each');
+      const poor = await kit.talkTo(w, 'Diner', 'apothecary', 'buy_health_potion');
+      check(/need 30 gold/.test(poor.notice) && owned('health_potion') === 2 && me().gold === 16, 'Without 30 gold nothing is sold');
+
+      // Nothing is wasted: full health, and things that are not food or potions.
+      check(/full health/.test(await use('health_potion')) && owned('health_potion') === 2, 'A potion is refused at full health and kept');
+      check(/cannot be used/.test(await use('slime_gel')) && /cannot be used/.test(await use('no_such_item')), 'Only food and potions can be used');
+
+      // The potion heals at once and starts the one cooldown.
+      await w.debug('Diner', { op: 'set_hp', hp: 1 });
+      await w.waitFor(() => me().hp <= 3, 3000, 'Hurt');
+      check(await use('health_potion') === null, 'A potion is accepted when hurt');
+      await w.waitFor(() => owned('health_potion') === 1, 3000, 'Potion spent');
+      check(me().hp >= 100 && me().hp <= 106, `The potion heals about 100 at once (${me().hp})`);
+      check(me().potionCd > 55 && me().potionCd <= 60, `A 60 second cooldown starts (${me().potionCd})`);
+      await w.debug('Diner', { op: 'set_hp', hp: 1 });
+      await w.waitFor(() => me().hp <= 3, 3000, 'Hurt again');
+      check(/recovering/.test(await use('health_potion')) && owned('health_potion') === 1 && me().hp < 30, 'A second potion waits for the cooldown and is kept');
+      await w.debug('Diner', { op: 'reset_cooldowns' });
+      check(await use('health_potion') === null && me().hp >= 100, 'Once the cooldown is cleared the next potion works');
+
+      // The meal heals over eight seconds and does not stack; a potion may overlap it.
+      await w.debug('Diner', { op: 'set_hp', hp: 1 });
+      await w.waitFor(() => me().hp <= 3, 3000, 'Hurt for a meal');
+      const ate = Date.now();
+      check(await use('traveler_stew') === null, 'A meal is accepted when hurt');
+      check(owned('traveler_stew') === 1 && regen()?.id === 'traveler_stew' && regen().time === 8, 'The stew is spent and a regen effect lasting eight seconds appears');
+      check(me().hp < 40, `Nothing arrives at once (${me().hp})`);
+      check(/still eating/.test(await use('traveler_stew')) && owned('traveler_stew') === 1 && me().buffs.filter(b => b.kind === 'regen').length === 1, 'A second meal is refused, kept, and does not stack');
+      await w.waitFor(() => !regen(), 12000, 'Meal ends');
+      const took = (Date.now() - ate) / 1000;
+      check(took > 7 && took < 10.5, `The meal lasts about eight seconds (${took.toFixed(1)})`);
+      check(me().hp >= 98, `All 100 HP arrived, with natural regeneration on top at most (${me().hp})`);
+      await w.debug('Diner', { op: 'set_hp', hp: 1e9 });
+      await w.waitFor(() => me().hp === me().maxHp, 3000, 'Full health');
+      check(/full health/.test(await use('traveler_stew')) && owned('traveler_stew') === 1 && !regen(), 'Once the meal is over, a new one is judged on health and kept at full health');
+
+      // Persistence: the pack and purse survive a restart.
+      const stew = owned('traveler_stew'), gold = me().gold;
+      await w.restart();
+      await w.waitFor(() => w.player('Diner') && w.player('Diner').inventory.some(s => s.item === 'traveler_stew'), 10000, 'Resume');
+      check(owned('traveler_stew') === stew && owned('health_potion') === 0 && me().gold === gold, 'Food, spent potions and gold persist across a restart');
+      check(me().potionCd > 20 && me().potionCd <= 60 && me().buffs.length === 0, `The potion cooldown survives a restart but a meal does not (${me().potionCd})`);
     },
   },
 

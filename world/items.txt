@@ -290,5 +290,23 @@
     "rarity": "common",
     "sell": 0,
     "bagSlots": 6
+  },
+  {
+    "id": "traveler_stew",
+    "name": "Traveler's Stew",
+    "kind": "food",
+    "rarity": "common",
+    "sell": 3,
+    "heal": 100,
+    "duration": 8
+  },
+  {
+    "id": "health_potion",
+    "name": "Health Potion",
+    "kind": "potion",
+    "rarity": "common",
+    "sell": 8,
+    "heal": 100,
+    "cooldown": 60
   }
 ]

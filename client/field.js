@@ -494,6 +494,12 @@
     if (event.kind === 'pickup') floater(event.x, event.y, '+' + event.value + ' gold', '#ffe066', false);
     if (event.kind === 'portal') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); burst(event.x, event.y, 20, 14, ['#ffd9a0', '#ff8a3a', '#7ae8c8']); }
     if (event.kind === 'levelup') levelUpFx(event);
+    // Food and potions: a potion lands at once with a ring and its number; a meal shows its share every second.
+    if (event.kind === 'consume') {
+      spark(event.x, event.y, 14, ['#9dffb4', '#d8ffe0', '#f0d9a0'], 10, 1, .9);
+      if (event.value > 0) { effects.push({ kind: 'skAura', x: event.x, y: event.y, core: '#d9ffe0', glow: '#3fd36a', col: '#3fd36a', a: 0, t: 0, life: 1 }); floater(event.x, event.y, '+' + event.value, '#7dff9a', true); }
+    }
+    if (event.kind === 'regen') { floater(event.x, event.y, '+' + event.value, '#7dff9a', false); spark(event.x, event.y, 4, ['#9dffb4', '#d8ffe0'], 6, .6, .6); }
     if (event.kind === 'swing') {
       const actor = event.actor === Online.id ? hero : remotePlayers.get(event.actor);
       if (actor) effects.push({ kind: actor.look.class === 'assassin' ? 'dualSlash' : 'slash', x: event.x, y: event.y, a: Math.atan2(actor.fy, actor.fx), t: -.12 });
@@ -511,7 +517,7 @@
     throwingknives: ['#ffffff', '#b8c6d8'], evasion: ['#e9e4ff', '#8a78d6'], lunge: ['#f4e0ff', '#a050ff'], flurry: ['#ffffff', '#c9b2ff'], shadowveil: ['#e0d8ff', '#6a50c8'],
     cycloneblades: ['#f4ecff', '#b38cff'], assassinate: ['#ffe0e0', '#ff3b5c'], deadlyfocus: ['#fff0c8', '#ffb23a'], knifering: ['#fdf0ff', '#d89cff'], thousandcuts: ['#ffffff', '#ff5ca8'],
   };
-  const BUFF_COL = { damage: '#ff9a3a', shield: '#59a8ff', haste: '#ffe45a', dodge: '#b9a8ff', crit: '#ff5c7a' };
+  const BUFF_COL = { damage: '#ff9a3a', shield: '#59a8ff', haste: '#ffe45a', dodge: '#b9a8ff', crit: '#ff5c7a', regen: '#58d68d' };
   let shakeT = 0, shakeMag = 0;
   function kick(mag, dur) { if (reducedMotion()) return; shakeMag = Math.max(shakeT > 0 ? shakeMag : 0, mag); shakeT = Math.max(shakeT, dur); }
   function spark(x, y, n, cols, up, spread, life) {
@@ -1271,6 +1277,12 @@
       return false;
     },
     get canAct() { return running && !paused && Online.connected && !hero.dead; },
+    // The server checks ownership, health, the meal and the potion cooldown; this only sends the request.
+    useItem(id) {
+      if (!running || !Online.connected || hero.dead) return false;
+      return Online.send({ type: 'use_item', item: id });
+    },
+    floatHero(text, color = '#ffe066') { if (running && !hero.dead) floater(hero.x, hero.y, text, color, false); },
     equipSlot(slot, item) {
       if (!running || !Online.connected || hero.dead) return false;
       return Online.send({ type: 'equip', slots: { [slot]: item } });

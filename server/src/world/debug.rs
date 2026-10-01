@@ -93,6 +93,8 @@ impl World {
                 p.skill_cd.clear();
                 p.cooldown = 0.;
                 p.dash_cd = 0.;
+                p.potion_cd = 0.;
+                p.character.potion_ready = 0;
                 json!({"cleared":true})
             }
             DebugCommand::SetGodMode { enabled } => {

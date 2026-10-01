@@ -1379,13 +1379,19 @@
       "x": 42,
       "y": 78.5,
       "color": "#9a71aa",
-      "dialogue": "Fresh herbs from Greenmeadow, brewed right here. Drink a tonic at my counter before your next adventure.",
+      "dialogue": "Fresh herbs from Greenmeadow, brewed right here. Drink a tonic at my counter before your next adventure, or carry a Health Potion: it heals 100 HP at once, then needs 60 seconds to recover.",
       "offers": [
         {
           "id": "tonic",
           "label": "Drink a tonic \u00b7 restores 60 HP",
           "cost": 8,
           "heal": 60
+        },
+        {
+          "id": "buy_health_potion",
+          "label": "Buy Health Potion \u00b7 100 HP instantly",
+          "cost": 30,
+          "item": "health_potion"
         }
       ]
     },
@@ -1431,13 +1437,19 @@
       "x": 29,
       "y": 84.5,
       "color": "#e8bd78",
-      "dialogue": "Still warm from the oven! Enjoy a honey bun here in the square.",
+      "dialogue": "Still warm from the oven! Enjoy a honey bun here in the square, or take a pot of my Traveler's Stew for the road. It heals 100 HP over 8 seconds, and only one meal can work at a time.",
       "offers": [
         {
           "id": "bun",
           "label": "Eat a honey bun \u00b7 restores 20 HP",
           "cost": 3,
           "heal": 20
+        },
+        {
+          "id": "buy_traveler_stew",
+          "label": "Buy Traveler's Stew \u00b7 100 HP over 8 s",
+          "cost": 12,
+          "item": "traveler_stew"
         }
       ]
     },

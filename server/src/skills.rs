@@ -10,6 +10,8 @@ pub enum BuffKind {
     Haste,
     Dodge,
     Crit,
+    /// Food: `amount` hit points per second while it lasts.
+    Regen,
 }
 
 #[derive(Clone, Debug, Deserialize)]

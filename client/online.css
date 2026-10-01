@@ -365,3 +365,14 @@
 .stage.ui-editing [data-ui][hidden] { display: block !important; }
 .stage.ui-editing #party-frame:empty, .stage.ui-editing #quest-tracker:empty { min-height: 3cqw; }
 .stage.ui-editing #buff-bar:empty { min-width: 8cqw; min-height: 3.4cqw; }
+
+/* Food and potion quick slots, left of the skillbar's row, below the chat. */
+.quickuse { position: absolute; bottom: 3.8cqw; left: 1.4cqw; z-index: 21; display: flex; gap: .35cqw; padding: .6cqw; border: 1px solid #c9ad73; border-radius: 1cqw; background: linear-gradient(#25334df0, #0c1428f5); box-shadow: 0 .4cqw 1.5cqw #0008; }
+.quick-slot[data-item=""] { border-color: #8f9aa975; background: #0d1a2c; color: #65748b; }
+.quick-slot[data-item]:not([data-item=""]) { border-color: #cfb179; background: radial-gradient(ellipse at 50% 35%, #4a586e, #15243d 80%); color: #ffe1a0; }
+.quick-slot[data-kind="food"]:not([data-item=""]) { color: #f2c27b; }
+.quick-slot[data-kind="potion"]:not([data-item=""]) { color: #ff8aa0; }
+.quick-count { position: absolute; z-index: 3; right: .3cqw; top: .2cqw; font: max(10px, .9cqw) 'Jua', sans-serif; color: #fff; text-shadow: 0 1px 2px #000; }
+.buff-chip[data-kind="regen"] { --buff: #58d68d; border-color: #58d68d; }
+.stage.ui-editing #quickuse:empty { min-width: 8cqw; min-height: 5cqw; }
+@media (pointer: coarse) { .quick-slot { min-width: 44px; min-height: 44px; } }
