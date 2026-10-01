@@ -94,6 +94,7 @@
         <div class="bar xp"><i id="xp-fill"></i></div>
       </div>
     </div>
+    <div id="buff-bar" class="buff-bar" role="group" aria-label="Active effects"></div>
     <div class="hud hud-tr">
       <canvas id="minimap" width="144" height="144" aria-label="Minimap"></canvas>
       <p class="hud-stats"><span id="hud-gold">0</span> <span data-i18n="gold">gold</span> · <span id="hud-kills">0</span> <span data-i18n="slain">slimes</span></p>
@@ -139,7 +140,15 @@
         <button class="btn ghost" id="p-title" type="button" data-i18n="toTitle">Back to Title</button>
       </div>
     </div>
-    <div id="skillbar" class="skillbar" role="group" aria-label="Skillbar, keys 1 to 9">
+    <div id="levelup-flash" class="levelup-flash" aria-hidden="true"></div>
+    <div id="levelup-banner" class="levelup" role="status" aria-live="assertive" hidden>
+      <div class="lu-rays" aria-hidden="true"></div>
+      <b class="lu-title">LEVEL UP!</b>
+      <span class="lu-level" id="lu-level"></span>
+      <div class="lu-skills" id="lu-skills"></div>
+      <small class="lu-hint" id="lu-hint"></small>
+    </div>
+    <div id="skillbar" class="skillbar" role="group" aria-label="Skillbar, keys 1 to 9, 0, minus and equals">
       <div id="skillbar-slots" class="skillbar-slots"></div>
       <button id="skills-open" class="skills-open" type="button">Skills <kbd>K</kbd></button>
     </div>
@@ -230,6 +239,7 @@
 <script src="warriorsprite.js"></script>
 <script src="world.js"></script>
 <script src="items.js"></script>
+<script src="skills.js"></script>
 <script src="inventory.js"></script>
 <script src="attributes.js"></script>
 <script src="online.js"></script>

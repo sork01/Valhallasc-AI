@@ -1,5 +1,6 @@
 mod items;
 mod model;
+mod skills;
 mod store;
 mod world;
 
@@ -62,6 +63,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     world.god_mode = std::env::var("VALHALLA_GOD_MODE").is_ok_and(|v| v == "1");
     if world.god_mode {
         tracing::warn!("VALHALLA_GOD_MODE is on: players cannot be hurt");
+    }
+    // For automated tests only: new characters start at this level (1-40), so skills can be driven for real.
+    world.start_level = std::env::var("VALHALLA_START_LEVEL")
+        .ok()
+        .and_then(|v| v.parse::<u32>().ok())
+        .map_or(1, |v| v.clamp(1, 40));
+    if world.start_level > 1 {
+        tracing::warn!(
+            "VALHALLA_START_LEVEL={} is on: new characters start above level 1",
+            world.start_level
+        );
     }
     let (tx, rx) = mpsc::channel(1024);
     let (snap_tx, snap_rx) = watch::channel(world.snapshot());

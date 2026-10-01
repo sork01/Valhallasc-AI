@@ -391,6 +391,11 @@ pub enum ClientMessage {
         dx: f64,
         dy: f64,
     },
+    Skill {
+        id: String,
+        fx: f64,
+        fy: f64,
+    },
     Equip {
         armor: Option<String>,
         weapon: Option<String>,

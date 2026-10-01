@@ -58,7 +58,88 @@ async function defeat(w, bot, kind) {
   assert.ok(w.player(bot).hp > 0, 'The bot survives real combat');
 }
 
+// Walk to within `range` of a living enemy of one kind and return it (the bot attacks nothing on the way).
+async function approach(w, bot, kind, range) {
+  const risk = enemy => distance(w.player(bot), enemy) + 12 * (enemy.level - DEFAULT_LEVELS[enemy.kind]);
+  const enemy = w.snapshot.slimes.filter(s => !s.dead && s.kind === kind && !s.zone).sort((a, b) => risk(a) - risk(b))[0];
+  assert.ok(enemy, `A living ${kind} is available`);
+  const current = () => w.snapshot.slimes.find(s => s.id === enemy.id);
+  for (const point of route(map, w.player(bot), enemy)) {
+    if (distance(w.player(bot), current()) < range) break;
+    await w.action(bot, { type: 'move', ...point });
+    await w.waitFor(() => distance(w.player(bot), point) < .5 || distance(w.player(bot), current()) < range, 20000, `Approach ${kind}`);
+  }
+  await w.action(bot, { type: 'stop' });
+  return current;
+}
+const aimAt = (w, bot, enemy) => { const p = w.player(bot), d = Math.hypot(enemy.x - p.x, enemy.y - p.y) || 1; return { fx: (enemy.x - p.x) / d, fy: (enemy.y - p.y) / d }; };
+// A skill is cast through the same message the browser sends; the server alone decides what it does.
+async function cast(w, bot, id, enemy) {
+  const aim = enemy ? aimAt(w, bot, enemy) : { fx: 1, fy: 0 };
+  await w.action(bot, { type: 'skill', id, ...aim });
+}
+const lost = (before, after) => !after || after.dead || after.hp < before.hp;
+
 const scenarios = {
+  skills: {
+    description: 'Learned skills at level 20: real casts per class, server cooldowns, buffs, projectiles, dashes and rejected requests.',
+    startLevel: 20,
+    async run(w, check) {
+      await w.connect({ bot: 'Skillful', class: 'warrior' });
+      await w.connect({ bot: 'Sage', class: 'mage' });
+      await w.connect({ bot: 'Shade', class: 'assassin' });
+      check(['Skillful', 'Sage', 'Shade'].every(b => w.player(b).level === 20), 'Test characters start at the configured level');
+      const errors = bot => w.events.filter(e => e.bot === bot && e.type === 'error').map(e => e.text);
+      await cast(w, 'Skillful', 'twinbolt');
+      await w.waitFor(() => errors('Skillful').length > 0, 5000, 'Class error');
+      check(errors('Skillful').at(-1) === 'That skill is not available to your class.', 'A warrior cannot cast a mage skill');
+      await cast(w, 'Skillful', 'nonsense');
+      await w.advance(300);
+      check(Object.keys(w.player('Skillful').skillCd).length === 0, 'Rejected requests spend no cooldown');
+      // Warrior: area damage, cooldown, buffs.
+      const front = await approach(w, 'Skillful', 'green', 1.5);
+      const before = { ...front() };
+      await cast(w, 'Skillful', 'whirlwind', front());
+      await w.waitFor(() => w.player('Skillful').skillCd.whirlwind > 0, 5000, 'Whirlwind cooldown');
+      check(lost(before, front()), 'Whirlwind damages an enemy beside the warrior');
+      const cd = w.player('Skillful').skillCd.whirlwind;
+      check(cd > 4 && cd <= 6, 'The server starts the skill at its listed cooldown (' + cd.toFixed(2) + 's)');
+      await w.advance(600);
+      await cast(w, 'Skillful', 'whirlwind', front());
+      await w.advance(300);
+      check(w.player('Skillful').skillCd.whirlwind < cd - .5, 'A cast on cooldown is ignored instead of restarting it');
+      await cast(w, 'Skillful', 'battlecry');
+      await cast(w, 'Skillful', 'shieldwall');
+      await w.waitFor(() => w.player('Skillful').buffs.length === 2, 5000, 'Buffs');
+      const buffs = Object.fromEntries(w.player('Skillful').buffs.map(b => [b.id, b]));
+      check(buffs.battlecry.kind === 'damage' && buffs.shieldwall.kind === 'shield' && buffs.battlecry.left > 8 && buffs.battlecry.time === 10, 'Buffs appear in the snapshot with their remaining time');
+      // Mage: a projectile that explodes, lightning, and blink.
+      const target = await approach(w, 'Sage', 'green', 4);
+      const mageBefore = { ...target() };
+      await cast(w, 'Sage', 'fireball', target());
+      const flying = await w.waitFor(() => w.snapshot.bolts.find(b => b.size === 20 && b.color === '#ff8a3a'), 5000, 'Fireball bolt');
+      check(flying.owner !== undefined, 'Fireball is a large orange projectile in the snapshot');
+      await w.waitFor(() => lost(mageBefore, target()), 8000, 'Fireball impact');
+      check(lost(mageBefore, target()), 'The fireball reaches and damages its target');
+      const start = { x: w.player('Sage').x, y: w.player('Sage').y };
+      await cast(w, 'Sage', 'blink');
+      await w.waitFor(() => w.player('Sage').dashT > 0 || Math.hypot(w.player('Sage').x - start.x, w.player('Sage').y - start.y) > 2, 3000, 'Blink');
+      await w.advance(500);
+      check(Math.hypot(w.player('Sage').x - start.x, w.player('Sage').y - start.y) > 2.5, 'Blink moves the mage in one jump');
+      // Assassin: a ring of knives, a damaging dash.
+      await cast(w, 'Shade', 'knifering');
+      await w.waitFor(() => w.snapshot.bolts.filter(b => b.color === '#f3d8ff').length >= 12, 5000, 'Knife ring');
+      check(w.snapshot.bolts.filter(b => b.color === '#f3d8ff').length === 12, 'Knife Ring throws twelve knives');
+      await cast(w, 'Shade', 'evasion');
+      await w.waitFor(() => w.player('Shade').buffs.some(b => b.id === 'evasion'), 5000, 'Evasion');
+      const from = { x: w.player('Shade').x, y: w.player('Shade').y };
+      await cast(w, 'Shade', 'lunge');
+      await w.advance(500);
+      check(Math.hypot(w.player('Shade').x - from.x, w.player('Shade').y - from.y) > 2, 'Lunge carries the assassin forward');
+      const events = w.events.filter(e => e.bot === 'Skillful' && e.kind === 'skill').map(e => e.skill);
+      check(events.includes('whirlwind') && events.includes('battlecry'), 'Every cast is announced to the zone with its skill id');
+    },
+  },
   movement: {
     description: 'Three classes share spawn, walk through another player, and preserve enemy spacing.',
     async run(w, check) {
@@ -210,10 +291,18 @@ const scenarios = {
       await talk(w, bot, 'smith', 'quest:accept:ironhide_hunt');
       check(!quest(w, bot, 'ironhide_hunt'), 'Completing objectives alone does not unlock the next quest');
       const before = { ...w.player(bot) };
+      await cast(w, bot, 'twinbolt');
+      await w.waitFor(() => w.events.some(e => e.bot === bot && e.type === 'error' && e.text === 'Twin Bolt unlocks at level 2.'), 5000, 'Locked skill');
+      check(Object.keys(w.player(bot).skillCd).length === 0, 'A skill above the mage level is refused with its unlock level and costs nothing');
       await talk(w, bot, 'gatekeeper', 'quest:claim:slime_patrol');
       await w.waitFor(() => quest(w, bot, 'slime_patrol').claimed);
       check(w.player(bot).gold === before.gold + 24 && w.player(bot).level === 2 && totalXp(w.player(bot)) === totalXp(before) + 80,
         'Patrol turn-in awards 24 gold and 80 XP, levels the mage, and carries the remainder');
+      const levelUp = w.events.find(e => e.bot === bot && e.kind === 'levelup' && e.actor === w.player(bot).id && e.level === 2);
+      check(levelUp && JSON.stringify(levelUp.unlocked) === '["twinbolt"]', 'The level-up event carries the new level and names the skill it unlocks');
+      await cast(w, bot, 'twinbolt');
+      await w.waitFor(() => w.player(bot).skillCd.twinbolt > 0, 5000, 'Twin Bolt cooldown');
+      check(w.snapshot.bolts.length >= 2 || w.events.some(e => e.bot === bot && e.kind === 'skill' && e.skill === 'twinbolt'), 'The newly unlocked Twin Bolt casts for real');
       await talk(w, bot, 'smith', 'quest:accept:ironhide_hunt');
       await talk(w, bot, 'merchant', 'quest:accept:meadow_bounty');
       await w.waitFor(() => !!quest(w, bot, 'meadow_bounty'));
@@ -455,6 +544,7 @@ async function runScenario(name, world = new TestWorld()) {
   const check = (condition, message) => { assert.ok(condition, message); checks.push(message); };
   let result;
   try {
+    if (scenarios[name].startLevel) world.startLevel = scenarios[name].startLevel;
     await world.start();
     await scenarios[name].run(world, check);
     check(!world.spacingFailure, 'Every observed snapshot preserves enemy spacing');

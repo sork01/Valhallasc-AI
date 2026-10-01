@@ -410,8 +410,38 @@
     if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); void title.offsetWidth; title.classList.add('show'); }
     title.querySelector('b').textContent = away ? s.area : inCity ? 'Alderhaven · Fountain Square' : t('areaName');
     title.querySelector('span').textContent = away ? (s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : 'Unexplored lands') : inCity ? 'Sanctuary · shops · townspeople' : '푸른 초원';
+    renderBuffs(s.buffs || []);
     $('city-travel').hidden = inCity || away;
     $('city-travel').textContent = s.traveling ? 'Walking to Alderhaven…' : 'Visit Alderhaven ↓';
+  }
+  // ---------- level-up banner, flash and active effects ----------
+  const luBanner = $('levelup-banner'), luFlash = $('levelup-flash'), buffBar = $('buff-bar');
+  let luTimer = 0;
+  function restart(node, cls) { node.classList.remove(cls); void node.offsetWidth; node.classList.add(cls); }
+  function levelBanner(ev) {
+    if (!ev?.level) return;
+    const learned = (ev.unlocked || []).map(id => WORLD_SKILLS.find(k => k.id === id)).filter(Boolean);
+    $('lu-level').textContent = `Level ${ev.level}`;
+    $('lu-skills').replaceChildren(...learned.map(k => {
+      const row = el('div', { class: 'lu-skill' }), glyph = el('span', { class: 'skill-icon' }); glyph.innerHTML = Skillbar.icon(k.icon);
+      row.append(glyph, el('b', { text: `New skill: ${k.name}` }), el('small', { text: k.description })); return row;
+    }));
+    $('lu-hint').textContent = learned.length ? 'Press K to arrange your skills' : 'Fully healed · spend stat points in Character (E)';
+    luBanner.hidden = false; restart(luBanner, 'show'); restart(luFlash, 'show');
+    restart($('hud-lv'), 'lv-pop'); restart(document.querySelector('.bar.xp'), 'xp-flash');
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    clearTimeout(luTimer); luTimer = setTimeout(() => { luBanner.hidden = true; luBanner.classList.remove('show'); luFlash.classList.remove('show'); }, calm ? 3200 : 5200);
+  }
+  function renderBuffs(list) {
+    const key = list.map(b => b.id).join();
+    if (buffBar.dataset.key !== key) {
+      buffBar.dataset.key = key;
+      buffBar.replaceChildren(...list.map(b => {
+        const def = WORLD_SKILLS.find(k => k.id === b.id), chip = el('span', { class: 'buff-chip', 'data-buff': b.id, 'data-kind': b.kind, title: `${def?.name || b.id}: ${def?.description || ''}` }), glyph = el('span', { class: 'skill-icon' });
+        glyph.innerHTML = Skillbar.icon(def?.icon || 'attack'); chip.append(glyph, el('i')); return chip;
+      }));
+    }
+    for (const chip of buffBar.children) { const b = list.find(x => x.id === chip.dataset.buff); if (b) { chip.querySelector('i').textContent = Math.ceil(b.left); chip.style.setProperty('--left', Math.max(0, Math.min(1, b.left / b.time))); } }
   }
   function noiseBurst(dur, f0, f1, vol, q = 1.2, type = 'bandpass') {
     if (!save.sound) return;
@@ -440,13 +470,31 @@
     slimeDie: () => { sweep(520, 140, .22, .16, 'triangle'); noiseBurst(.16, 1400, 300, .1); },
     hurt: () => voice(115, .32, .32, false),
     pickup: () => tone([1568], .12, .05),
-    levelup: () => [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tone([f, f * 2], .4, .07), i * 110)),
+    // A rising whoosh, a run up the scale, then a full major chord with sparkles on top.
+    levelup: () => {
+      sweep(180, 1900, .7, .09, 'sawtooth'); noiseBurst(.8, 300, 7000, .09, .8);
+      [523, 659, 784, 1047, 1319, 1568, 2093].forEach((f, i) => setTimeout(() => tone([f, f * 2], .55, .06, 'triangle'), 120 + i * 85));
+      setTimeout(() => { tone([523, 659, 784, 1047, 1319], 2, .05, 'triangle'); tone([262, 392], 2, .06, 'sine'); }, 780);
+      for (let i = 0; i < 9; i++) setTimeout(() => tone([2093 + Math.random() * 2093], .3, .025), 900 + i * 110 + Math.random() * 60);
+    },
+    skill: ev => {
+      const def = WORLD_SKILLS.find(k => k.id === ev?.skill), kind = def?.effect.effect;
+      if (kind === 'nova') { sweep(220, 55, .45, .26, 'sawtooth'); noiseBurst(.4, 1200, 200, .18); }
+      else if (kind === 'cone' || kind === 'strike') { noiseBurst(.22, 700, 3200, .16, 1.4); sweep(900, 300, .15, .06, 'triangle'); }
+      else if (kind === 'volley') SFX.cast();
+      else if (kind === 'dash') { noiseBurst(.25, 300, 3600, .15, 1); if (def.effect.mult === 0) sweep(1400, 200, .2, .08); }
+      else if (kind === 'chain') { noiseBurst(.35, 3000, 6000, .16, 3); sweep(1800, 400, .3, .05, 'square'); }
+      else if (kind === 'meteor') { sweep(1400, 180, .38, .1, 'sawtooth'); setTimeout(() => { sweep(160, 40, .6, .35); noiseBurst(.5, 900, 120, .25); }, 380); }
+      else if (kind === 'buff') tone([523, 784, 1047], .6, .05, 'triangle');
+      else if (kind === 'heal') { tone([659, 880, 1319], .8, .05, 'sine'); tone([1760, 2637], .5, .03); }
+    },
     death: () => voice(78, .95, .38),
     respawn: () => tone([392, 587], .5, .06),
     portal: () => { sweep(180, 720, .5, .09, 'sine'); tone([523, 784, 1047], .5, .05); },
   };
-  function onField(name) {
-    if (SFX[name]) SFX[name]();
+  function onField(name, data) {
+    if (SFX[name]) SFX[name](data);
+    if (name === 'levelup') levelBanner(data);
     if (name === 'spriteError') showToast(t((save.char?.class || 'mage') + 'Error'));
     if (name === 'death') $('dead-msg').hidden = false;
     if (name === 'respawn') $('dead-msg').hidden = true;

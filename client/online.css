@@ -74,7 +74,7 @@
 
 .skillbar { position: absolute; bottom: 3.8cqw; left: 50%; transform: translateX(-50%); z-index: 21; display: flex; align-items: stretch; gap: .6cqw; padding: .6cqw; border: 1px solid #c9ad73; border-radius: 1cqw; background: linear-gradient(#25334df0, #0c1428f5); box-shadow: 0 .4cqw 1.5cqw #0008; }
 .skillbar-slots { display: flex; justify-content: center; gap: .35cqw; }
-.skill-slot { position: relative; width: clamp(36px, 4.4cqw, 68px); height: clamp(42px, 5.1cqw, 78px); flex: none; overflow: hidden; border: 1px solid #8f9aa975; border-radius: .45cqw; background: #0d1a2c; color: #a7b7ca; cursor: pointer; font-family: 'Jua', sans-serif; padding: .25cqw; }
+.skill-slot { position: relative; width: clamp(34px, 3.9cqw, 64px); height: clamp(42px, 4.7cqw, 74px); flex: none; overflow: hidden; border: 1px solid #8f9aa975; border-radius: .45cqw; background: #0d1a2c; color: #a7b7ca; cursor: pointer; font-family: 'Jua', sans-serif; padding: .25cqw; }
 .skill-slot[data-skill]:not([data-skill=""]) { border-color: #cfb179; background: radial-gradient(ellipse at 50% 35%, #4a586e, #15243d 80%); color: #ffe1a0; }
 .skill-slot kbd { position: absolute; left: .35cqw; top: .2cqw; font: max(10px, .85cqw) 'Jua', sans-serif; z-index: 2; color: #f0e5d2; }
 .skill-icon { display: block; }
@@ -93,11 +93,14 @@
 .skills-panel h3 { font: 2.1cqw 'Lilita One', sans-serif; color: #f1d493; margin: .4cqw 0 1cqw; }
 .skills-panel p { font: 1cqw/1.5 'Jua', sans-serif; }
 .skills-panel .npc-role { font-size: .8cqw; color: #a9bdd9; letter-spacing: .12em; text-transform: uppercase; margin: 0; }
-.skill-library { display: flex; justify-content: center; gap: 1cqw; margin: 1.2cqw 0; }
-.skill-card { display: grid; grid-template-columns: 4cqw 1fr; gap: .4cqw .8cqw; align-items: center; max-width: 24cqw; padding: 1cqw; border: 1px solid #cfb179; border-radius: .65cqw; background: linear-gradient(130deg, #34445e, #152239); color: #ffe1a0; cursor: pointer; text-align: left; }
+.skill-library { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7cqw; margin: 1.2cqw 0; max-height: 27cqw; overflow: auto; padding: .3cqw; }
+.skill-card { position: relative; display: grid; grid-template-columns: 3.4cqw 1fr; gap: .2cqw .8cqw; align-items: center; padding: .7cqw .9cqw; border: 1px solid #cfb179; border-radius: .65cqw; background: linear-gradient(130deg, #34445e, #152239); color: #ffe1a0; cursor: pointer; text-align: left; }
 .skill-card .skill-icon { grid-row: 1 / 3; }
+.skill-card.locked { cursor: default; filter: grayscale(.9) brightness(.65); border-style: dashed; border-color: #8f9aa9; color: #aab3c2; }
+.skill-level { position: absolute; right: .6cqw; top: .3cqw; font: normal max(9px, .75cqw) 'Jua', sans-serif; color: #ffd98a; }
+.skill-card.locked .skill-level { color: #c9d3e2; }
 .skill-card b { font: 1.15cqw 'Jua', sans-serif; }
-.skill-card small { font: .9cqw/1.4 'Jua', sans-serif; color: #c0ccdf; }
+.skill-card small { font: .85cqw/1.35 'Jua', sans-serif; color: #c0ccdf; }
 .skill-editor-actions { display: flex; justify-content: center; gap: 1cqw; margin: 1cqw 0; }
 .skills-panel .btn { font-size: 1cqw; }
 .skill-slot[aria-pressed="true"] { outline: 2px solid #ffe4a3; outline-offset: 2px; box-shadow: 0 0 1cqw #e2b46155; }
@@ -107,7 +110,8 @@
 @media (max-width: 850px) {
   .skills-panel { position: relative; width: 80cqw; max-height: 48cqw; }
   .skills-panel p, .skills-panel .btn { font-size: 11px; }
-  .skill-card { max-width: 34cqw; }
+  .skill-card { max-width: none; }
+  .skill-library { grid-template-columns: 1fr; max-height: 30cqw; }
   .skill-card b { font-size: 12px; }
   .skill-card small { font-size: 10px; }
 }
@@ -223,3 +227,55 @@
 .attribute-derived { margin: .6cqw 0 .25cqw; color: #c6d9d7; font: .75cqw/1.4 Arial, sans-serif; }
 .attribute-help { display: block; color: #a99b7d; font: .65cqw Arial, sans-serif; }
 @media (pointer: coarse) { .attribute-add, .tracker-toggle, .tracker-journal { min-width: 44px; min-height: 44px; } }
+
+/* ---- level-up spectacle ---- */
+.levelup { position: absolute; left: 0; right: 0; top: 9.5cqw; z-index: 60; display: flex; flex-direction: column; align-items: center; text-align: center; pointer-events: none; }
+.levelup[hidden] { display: none; }
+.lu-rays { position: absolute; left: 50%; top: -9cqw; width: 44cqw; height: 44cqw; margin-left: -22cqw; border-radius: 50%; opacity: 0;
+  background: repeating-conic-gradient(rgba(255, 226, 120, .6) 0 5deg, transparent 5deg 15deg); -webkit-mask-image: radial-gradient(circle, #000 5%, transparent 68%); mask-image: radial-gradient(circle, #000 5%, transparent 68%); }
+.lu-title { position: relative; font: 400 8.4cqw/1 'Lilita One', 'Jua', Impact, sans-serif; letter-spacing: .06em; color: transparent; opacity: 0;
+  background: linear-gradient(100deg, #fff6c8 0%, #ffd24a 30%, #fffbe6 46%, #ffb21f 62%, #ff8a14 100%) 0 0 / 220% 100%; -webkit-background-clip: text; background-clip: text;
+  filter: drop-shadow(0 .35cqw 0 #7a3d00) drop-shadow(0 0 1.6cqw #ffb400) drop-shadow(0 0 4cqw #ff8a00aa); }
+.lu-level { position: relative; margin-top: .4cqw; padding: .3cqw 2.4cqw; border-radius: 999px; opacity: 0; font: 3.4cqw 'Lilita One', 'Jua', sans-serif; color: #fff; text-shadow: 0 0 1cqw #ffe066, 0 .2cqw 0 #6b3a00;
+  background: linear-gradient(#3b2a78e6, #1a1348e6); border: .25cqw solid #ffe066; box-shadow: 0 0 2cqw #ffb40088; }
+.lu-skills { position: relative; display: flex; flex-direction: column; gap: .5cqw; margin-top: 1cqw; }
+.lu-skill { display: grid; grid-template-columns: 3.6cqw auto; column-gap: 1cqw; align-items: center; justify-items: start; padding: .6cqw 2cqw .6cqw 1cqw; border-radius: 1cqw; text-align: left; opacity: 0;
+  background: linear-gradient(110deg, #1c2d52f0, #0b1530f0); border: .2cqw solid #7fe9ff; box-shadow: 0 0 1.6cqw #7fe9ff66; color: #e8fbff; }
+.lu-skill .skill-icon { grid-row: 1 / 3; width: 3.6cqw; color: #7fe9ff; }
+.lu-skill b { font: 1.7cqw 'Lilita One', 'Jua', sans-serif; color: #c9f6ff; }
+.lu-skill small { font: 1.05cqw 'Jua', sans-serif; color: #b5c8e0; }
+.lu-hint { position: relative; margin-top: .8cqw; padding: .3cqw 1.4cqw; border-radius: 999px; font: 1.2cqw 'Jua', sans-serif; color: #ffeebb; background: #0b1530c0; opacity: 0; }
+.levelup.show .lu-rays { animation: lu-rays 5.2s ease-out both, lu-spin 9s linear infinite; }
+.levelup.show .lu-title { animation: lu-pop .85s cubic-bezier(.18, 1.5, .3, 1) .05s both, lu-shine 1.8s linear .9s 2, lu-out .6s ease-in 4.4s forwards; }
+.levelup.show .lu-level { animation: lu-rise .6s cubic-bezier(.2, 1.4, .3, 1) .5s both, lu-out .6s ease-in 4.4s forwards; }
+.levelup.show .lu-skill { animation: lu-slide .6s cubic-bezier(.2, 1.3, .3, 1) .95s both, lu-out .6s ease-in 4.4s forwards; }
+.levelup.show .lu-hint { animation: lu-rise .5s ease-out 1.3s both, lu-out .6s ease-in 4.4s forwards; }
+.levelup-flash { position: absolute; inset: 0; z-index: 59; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 58%, #fffbe4f2 0%, #ffe48ccc 30%, #ffc43355 60%, transparent 85%); }
+.levelup-flash.show { animation: lu-flash 1s ease-out both; }
+.hud-name span.lv-pop { display: inline-block; transform-origin: left center; animation: lv-pop 1.4s cubic-bezier(.2, 1.6, .3, 1); }
+.bar.xp.xp-flash { animation: xp-flash 1.4s ease-out; }
+@keyframes lu-pop { 0% { opacity: 0; transform: scale(.2) rotate(-6deg); } 55% { opacity: 1; transform: scale(1.22) rotate(1.5deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+@keyframes lu-shine { to { background-position: -220% 0; } }
+@keyframes lu-rise { from { opacity: 0; transform: translateY(1.4cqw) scale(.8); } to { opacity: 1; transform: none; } }
+@keyframes lu-slide { from { opacity: 0; transform: translateX(-4cqw) scale(.9); } to { opacity: 1; transform: none; } }
+@keyframes lu-out { to { opacity: 0; transform: translateY(-1.2cqw); } }
+@keyframes lu-rays { 0% { opacity: 0; transform: scale(.3); } 12% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.15); } }
+@keyframes lu-spin { to { rotate: 360deg; } }
+@keyframes lu-flash { 0% { opacity: 0; } 10% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes lv-pop { 0% { transform: scale(1); color: #fff; } 25% { transform: scale(1.7); color: #fff7c2; text-shadow: 0 0 1cqw #ffd24a; } 100% { transform: scale(1); } }
+@keyframes xp-flash { 0%, 40% { box-shadow: 0 0 1.6cqw 4px #ffe066, inset 0 0 1cqw #fff; } 100% { box-shadow: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .levelup-flash { display: none; }
+  .levelup.show .lu-rays { animation: none; opacity: .5; }
+  .levelup.show .lu-title, .levelup.show .lu-level, .levelup.show .lu-skill, .levelup.show .lu-hint { animation: lu-rise .3s ease-out both; }
+}
+@media (max-width: 900px) { .lu-title { font-size: 9.6cqw; } .lu-skill b { font-size: 2.2cqw; } .lu-skill small, .lu-hint { font-size: 1.5cqw; } }
+
+/* ---- active effects ---- */
+.buff-bar { position: absolute; left: 1.4cqw; top: 10.8cqw; z-index: 20; display: flex; gap: .5cqw; pointer-events: none; }
+.buff-chip { --left: 1; position: relative; width: 3.6cqw; height: 3.6cqw; border-radius: .6cqw; border: .2cqw solid #cfb179; background: #0d1a2cd9; color: #ffe1a0; box-shadow: 0 0 1cqw var(--buff, #0006); }
+.buff-chip::after { content: ''; position: absolute; inset: 0; border-radius: .4cqw; background: #080e22a8; transform: scaleY(calc(1 - var(--left))); transform-origin: top; }
+.buff-chip .skill-icon { position: absolute; inset: 14% 14% 24%; z-index: 1; }
+.buff-chip i { position: absolute; z-index: 2; left: 0; right: 0; bottom: .1cqw; font: normal max(9px, .9cqw) 'Jua', sans-serif; text-align: center; color: #fff; text-shadow: 0 1px 2px #000; }
+.buff-chip[data-kind="damage"] { --buff: #ff9a3a; border-color: #ff9a3a; } .buff-chip[data-kind="shield"] { --buff: #59a8ff; border-color: #59a8ff; }
+.buff-chip[data-kind="haste"] { --buff: #ffe45a; border-color: #ffe45a; } .buff-chip[data-kind="dodge"] { --buff: #b9a8ff; border-color: #b9a8ff; } .buff-chip[data-kind="crit"] { --buff: #ff5c7a; border-color: #ff5c7a; }

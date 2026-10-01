@@ -55,7 +55,7 @@
           callbacks.onWelcome?.(packet);
           $('connection-overlay').hidden = true; $('chat-input').disabled = false;
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
-          log('Welcome to Greenmeadow. E: character · B/I: bags · K: skills · 1–9: skillbar · Q: quests · F: talk · Enter: chat.');
+          log('Welcome to Greenmeadow. E: character · B/I: bags · K: skills · 1–9, 0, -, =: skillbar · Q: quests · F: talk · Enter: chat.');
           break;
         }
         case 'snapshot': {
@@ -113,9 +113,11 @@
       slot.bagLayout = [...layout]; persist();
     },
     get skillSlots() { return saved.characters.find(c => c.token === saved.current)?.skillSlots || null; },
-    saveSkillSlots(slots) {
+    // The level the layout was last saved at: skills unlocked above it are placed into free slots.
+    get skillLevel() { return saved.characters.find(c => c.token === saved.current)?.skillLevel; },
+    saveSkillSlots(slots, level) {
       const slot = saved.characters.find(c => c.token === saved.current); if (!slot) return;
-      slot.skillSlots = [...slots]; persist();
+      slot.skillSlots = [...slots]; if (level) slot.skillLevel = level; persist();
     },
     get characters() { return saved.characters.map(c => ({ ...c, look: { ...c.look } })); },
     get connected() { return connected; },

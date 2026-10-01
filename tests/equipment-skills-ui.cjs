@@ -21,7 +21,7 @@ async function call(name, args = {}) {
   await page.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
   await page.goto(world.url); await page.locator('#start').click();
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('SkillMage'); await page.locator('#go').click({ timeout: 60000 });
-  await page.waitForFunction(() => Online.connected && !!Field.mageSprites && document.querySelectorAll('#skillbar-slots button').length === 9, null, { timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.mageSprites && document.querySelectorAll('#skillbar-slots button').length === 12, null, { timeout: 60000 });
   await page.keyboard.press('e');
   check(await page.locator('#equipment').isVisible(), 'E opens equipment');
   const labels = await page.locator('#equipped-slots label').allTextContents();
@@ -66,7 +66,7 @@ async function call(name, args = {}) {
   await page.keyboard.press('Escape');
   await page.evaluate(() => {
     window.actions = [];
-    const original = Online.send; Online.send = message => { if (['attack', 'dash'].includes(message.type)) actions.push(message.type); return original(message); };
+    const original = Online.send; Online.send = message => { if (['attack', 'dash', 'skill'].includes(message.type)) actions.push(message.type); return original(message); };
   });
   await page.keyboard.press('1');
   await page.waitForFunction(() => Field.hero.atkCd > 0);
@@ -78,7 +78,11 @@ async function call(name, args = {}) {
   check(await page.evaluate(() => actions.filter(a => a === 'attack').length === 2), 'Key and click both send normal attacks');
   await page.keyboard.press('k');
   check(await page.locator('#skills-panel').isVisible(), 'K opens skill assignment');
-  check(await page.locator('#skill-library .skill-card').count() === 1, 'Mage library includes its supported attack');
+  check(await page.locator('#skill-library .skill-card:not(.locked)').count() === 1, 'A level-1 mage can use only its attack');
+  const locked = await page.locator('#skill-library .skill-card.locked small').allTextContents();
+  check(locked.length === 10 && locked.every((text, i) => text.startsWith(`Unlocks at level ${(i + 1) * 2}.`)), 'Ten more skills are listed, locked, one per even level up to 20');
+  await page.locator('#skill-library .skill-card.locked').first().click({ force: true });
+  check(await page.locator('#skill-editor-slots [data-slot="1"]').getAttribute('data-skill') === 'attack' && await page.locator('#skill-editor-slots [data-skill="twinbolt"]').count() === 0, 'Clicking a locked skill assigns nothing');
   const before = await page.evaluate(() => actions.length);
   await page.keyboard.press('9');
   await page.locator('#skill-library [data-skill="attack"]').click();
@@ -95,6 +99,8 @@ async function call(name, args = {}) {
   await page.waitForFunction(() => Field.hero.atkCd === 0);
   await page.keyboard.press('9'); await page.waitForFunction(() => Field.hero.atkCd > 0);
   check(await page.evaluate(n => actions.length === n + 1, before), 'Custom slot 9 activates its skill');
+  await page.keyboard.press('2'); await page.keyboard.press('='); await page.waitForTimeout(150);
+  check(await page.evaluate(n => actions.length === n + 1, before), 'Empty slots, including the new slot 12, send nothing');
   await page.locator('#chat-input').focus();
   await page.keyboard.type('9ek');
   check(await page.locator('#chat-input').inputValue() === '9ek', 'Skill and panel keys remain text while chatting');
@@ -111,7 +117,7 @@ async function call(name, args = {}) {
   await page.keyboard.press('2'); await page.waitForFunction(() => Field.hero.dashCd > 0);
   check(await page.locator('#skillbar-slots [data-slot="2"]').isDisabled(), 'Assassin slot 2 triggers authoritative Shadowstep cooldown');
   await page.keyboard.press('k');
-  check(await page.locator('#skill-library .skill-card').count() === 2, 'Assassin can assign attack and Shadowstep');
+  check(await page.locator('#skill-library .skill-card:not(.locked)').count() === 2 && await page.locator('#skill-library .skill-card.locked').count() === 10, 'Assassin can assign attack and Shadowstep and sees its ten locked skills');
   await page.locator('#skill-reset').click();
   check(await page.locator('#skill-editor-slots [data-slot="1"]').getAttribute('data-skill') === 'attack', 'Reset restores default skills');
   await page.keyboard.press('e');
@@ -122,7 +128,7 @@ async function call(name, args = {}) {
   check(await page.locator('#skillbar-slots [data-slot="3"]').getAttribute('data-skill') === 'attack', 'Character switching restores its saved layout');
   await page.setViewportSize({ width: 800, height: 500 });
   const bounds = await page.locator('#skillbar').boundingBox();
-  check(bounds.x >= 0 && bounds.x + bounds.width <= 800, 'Nine-slot bar fits a small landscape viewport');
+  check(bounds.x >= 0 && bounds.x + bounds.width <= 800, 'Twelve-slot bar fits a small landscape viewport');
   check(errors.length === 0, `No runtime errors: ${errors.join('; ')}`);
 
   const fixture = await browser.newPage({ viewport: { width: 1440, height: 900 }, bypassCSP: true });

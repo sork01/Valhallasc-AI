@@ -17,6 +17,7 @@ const actionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('target'), id: z.number().int().nonnegative() }).strict(),
   z.object({ type: z.literal('attack'), fx: number, fy: number }).strict(),
   z.object({ type: z.literal('dash'), dx: number.min(-1).max(1), dy: number.min(-1).max(1) }).strict(),
+  z.object({ type: z.literal('skill'), id: z.string().regex(/^[a-z]{3,20}$/), fx: number, fy: number }).strict(),
   z.object({ type: z.literal('equip'), armor: z.string().max(32).optional(), weapon: z.string().max(32).optional(), slots: z.partialRecord(z.enum(['headgear', 'shoulders', 'chest', 'pants', 'gloves', 'hands', 'necklace', 'accessory1', 'accessory2']), z.string().max(64)).optional() }).strict(),
   z.object({ type: z.literal('interact'), npc: z.string().max(32), offer: z.string().max(32).optional() }).strict(),
   z.object({ type: z.literal('chat'), text: z.string().min(1).max(240) }).strict(),
@@ -91,6 +92,8 @@ class TestWorld extends EventEmitter {
       VALHALLA_CLIENT_DIR: path.join(root, 'client'), RUST_LOG: 'valhalla_server=info',
       // Test worlds are invulnerable (enemies still fight and enemy levels are still random), so scenarios never fail by dying.
       VALHALLA_GOD_MODE: process.env.VALHALLA_GOD_MODE ?? '1' };
+    // Optional: new characters start at this level (test servers only), so learned skills can be driven for real.
+    if (this.startLevel || process.env.VALHALLA_START_LEVEL) environment.VALHALLA_START_LEVEL = String(this.startLevel || process.env.VALHALLA_START_LEVEL);
     // Use the server's normal same-host origin policy for the private port.
     // An empty configured origin rejects real browsers, and an inherited
     // production origin is wrong for a disposable loopback world.

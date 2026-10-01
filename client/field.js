@@ -299,7 +299,7 @@
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
   }
-  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: hero.xpNeed ?? xpNeed(hero.level), level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, levels: zdef.levels, traveling: cityRoute.length > 0 && !pendingNpc }); }
+  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: hero.xpNeed ?? xpNeed(hero.level), level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, levels: zdef.levels, buffs: hero.buffs || [], traveling: cityRoute.length > 0 && !pendingNpc }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -394,11 +394,19 @@
     const wx = (x + y) / 2, wy = (y - x) / 2, n = Math.hypot(wx, wy) || 1;
     return [wx / n, wy / n];
   }
-  function swing() {
+  // The aim direction: at the selected enemy, else toward the pointer, else the way the hero already faces.
+  function aim() {
     let fx = hero.fx, fy = hero.fy;
     const point = hero.target && !hero.target.dead ? hero.target : pointer;
     if (point.x || point.y) { const dx = point.x - hero.x, dy = point.y - hero.y, n = Math.hypot(dx, dy); if (n > .3) { fx = dx / n; fy = dy / n; } }
-    Online.send({ type: 'attack', fx, fy });
+    return [fx, fy];
+  }
+  function swing() { const [fx, fy] = aim(); Online.send({ type: 'attack', fx, fy }); }
+  // Learned skills: the server checks level, cooldown and life; the client only names the skill and its aim.
+  function castSkill(def) {
+    let [fx, fy] = aim();
+    if (def.effect.effect === 'dash') { const [dx, dy] = keyboardDirection(); if (dx || dy) { fx = dx; fy = dy; } }
+    Online.send({ type: 'skill', id: def.id, fx, fy });
   }
   function shadowstep() { const [dx, dy] = keyboardDirection(); Online.send({ type: 'dash', dx, dy }); }
   const classSprite = look => look.class === 'mage' ? MageSprite : look.class === 'assassin' ? AssassinSprite : WarriorSprite;
@@ -473,9 +481,11 @@
     emitHud();
   }
   function networkEvent(event) {
-    if (event.actor === Online.id && !['death', 'respawn'].includes(event.kind)) say(event.crit && event.kind === 'hit' ? 'crit' : event.kind);
+    if (event.actor === Online.id && !['death', 'respawn'].includes(event.kind)) say(event.crit && event.kind === 'hit' ? 'crit' : event.kind, event);
+    if (event.kind === 'skill') skillFx(event);
     if (event.kind === 'hit') {
-      floater(event.x, event.y, String(event.value), event.crit ? '#ffe066' : '#fff4e0', event.crit);
+      // A little scatter keeps the numbers of a many-hit skill readable.
+      floater(event.x + (Math.random() - .5) * .6, event.y + (Math.random() - .5) * .6, String(event.value), event.crit ? '#ffe066' : '#fff4e0', event.crit);
       burst(event.x, event.y, 12, 7, ['#fff4e0', '#cfb5fa']);
     }
     if (event.kind === 'hurt') floater(event.x, event.y, '-' + event.value, '#ff8b9b', false);
@@ -483,11 +493,203 @@
     if (event.kind === 'itemPickup') { floater(event.x, event.y, `+${event.quantity} ${event.name}`, '#64b5ff', false); if(event.actor === Online.id) say('pickup'); }
     if (event.kind === 'pickup') floater(event.x, event.y, '+' + event.value + ' gold', '#ffe066', false);
     if (event.kind === 'portal') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); burst(event.x, event.y, 20, 14, ['#ffd9a0', '#ff8a3a', '#7ae8c8']); }
-    if (event.kind === 'levelup') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); floater(event.x, event.y, 'Level up!', '#ffe066', true); }
+    if (event.kind === 'levelup') levelUpFx(event);
     if (event.kind === 'swing') {
       const actor = event.actor === Online.id ? hero : remotePlayers.get(event.actor);
       if (actor) effects.push({ kind: actor.look.class === 'assassin' ? 'dualSlash' : 'slash', x: event.x, y: event.y, a: Math.atan2(actor.fy, actor.fx), t: -.12 });
     }
+  }
+  // ---------- skill effects and the level-up spectacle ----------
+  const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const SKILL_BY_ID = Object.fromEntries(WORLD_SKILLS.map(s => [s.id, s]));
+  // [bright core, glow] per skill.
+  const SKILL_COL = {
+    cleave: ['#fff1c2', '#ffb84a'], battlecry: ['#ffe6a0', '#ff7a2e'], shieldwall: ['#d6ecff', '#4a9bff'], whirlwind: ['#e8f6ff', '#6fc7ff'], charge: ['#ffe0b0', '#ff9a3a'],
+    groundslam: ['#ffe9c0', '#d9822b'], secondwind: ['#d9ffe0', '#3fd36a'], berserk: ['#ffd0c0', '#ff3b2e'], earthshatter: ['#ffe2b0', '#c9701f'], titanswrath: ['#fff6c8', '#ffb400'],
+    twinbolt: ['#f0e4ff', '#a57bff'], arcaneward: ['#e0f0ff', '#7a9bff'], fireball: ['#fff3c0', '#ff6a1a'], barrage: ['#e0f8ff', '#46c8ff'], blink: ['#f6e8ff', '#b46bff'],
+    chainlightning: ['#f4fdff', '#6fe0ff'], meteor: ['#fff0c0', '#ff4a12'], lifedrain: ['#ffd6f0', '#d0286e'], arcanestorm: ['#f2e6ff', '#8f5bff'], starfall: ['#fffbe0', '#ffd84a'],
+    throwingknives: ['#ffffff', '#b8c6d8'], evasion: ['#e9e4ff', '#8a78d6'], lunge: ['#f4e0ff', '#a050ff'], flurry: ['#ffffff', '#c9b2ff'], shadowveil: ['#e0d8ff', '#6a50c8'],
+    cycloneblades: ['#f4ecff', '#b38cff'], assassinate: ['#ffe0e0', '#ff3b5c'], deadlyfocus: ['#fff0c8', '#ffb23a'], knifering: ['#fdf0ff', '#d89cff'], thousandcuts: ['#ffffff', '#ff5ca8'],
+  };
+  const BUFF_COL = { damage: '#ff9a3a', shield: '#59a8ff', haste: '#ffe45a', dodge: '#b9a8ff', crit: '#ff5c7a' };
+  let shakeT = 0, shakeMag = 0;
+  function kick(mag, dur) { if (reducedMotion()) return; shakeMag = Math.max(shakeT > 0 ? shakeMag : 0, mag); shakeT = Math.max(shakeT, dur); }
+  function spark(x, y, n, cols, up, spread, life) {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * 6.283, s = Math.random() * spread;
+      parts.push({ x, y, z: Math.random() * 16, vx: Math.cos(a) * s, vy: Math.sin(a) * s, vz: up * (.5 + Math.random()), life: life * (.6 + Math.random() * .6), t: 0,
+        col: cols[Math.floor(Math.random() * cols.length)], size: 2 + Math.random() * 3.5, g: 4 });
+    }
+  }
+  function jagged(from, to) {
+    const out = [from], n = 7, dx = to.x - from.x, dy = to.y - from.y, len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len;
+    for (let i = 1; i < n; i++) { const k = i / n, o = (Math.random() - .5) * .9; out.push({ x: from.x + dx * k + nx * o, y: from.y + dy * k + ny * o }); }
+    out.push(to); return out;
+  }
+  function skillFx(ev) {
+    const def = SKILL_BY_ID[ev.skill]; if (!def) return;
+    const [core, glow] = SKILL_COL[ev.skill] || ['#ffffff', '#9fd0ff'], kind = def.effect.effect, own = ev.actor === Online.id, a = Math.atan2(ev.fy, ev.fx);
+    const base = { x: ev.x, y: ev.y, core, glow, a, t: 0 }, pts = (ev.points || []).map(([x, y]) => ({ x, y }));
+    if (kind === 'cone') { effects.push({ ...base, kind: 'skCone', r: def.effect.reach, life: .42 }); spark(ev.x + ev.fx * 1.2, ev.y + ev.fy * 1.2, 16, [core, glow], 5, 3, .5); if (own) kick(5, .18); }
+    else if (kind === 'nova') {
+      const r = ev.value, style = ['whirlwind', 'cycloneblades', 'arcanestorm'].includes(ev.skill) ? 'spiral' : ['groundslam', 'earthshatter', 'titanswrath'].includes(ev.skill) ? 'cracks' : '';
+      const nova = { ...base, kind: 'skNova', r, style, life: (ev.skill === 'starfall' ? 1.5 : .5) + r * .05 };
+      if (style === 'cracks') nova.cracks = Array.from({ length: 9 + Math.round(r) }, (_, i) => ({ a: i * 6.283 / (9 + Math.round(r)) + (Math.random() - .5) * .3, len: .75 + Math.random() * .3, zig: Array.from({ length: 8 }, (_, j) => [(j + 1) / 8, (Math.random() - .5) * .22]) }));
+      if (ev.skill === 'starfall') nova.stars = Array.from({ length: 18 }, () => { const an = Math.random() * 6.283, d = Math.sqrt(Math.random()) * r * .9; return { x: ev.x + Math.cos(an) * d, y: ev.y + Math.sin(an) * d, delay: Math.random() * .8 }; });
+      effects.push(nova);
+      spark(ev.x, ev.y, 14 + Math.round(r * 5), [core, glow], 6, 2 + r * .9, .6 + r * .05);
+      if (r >= 4 && ev.skill !== 'starfall') effects.push({ ...base, kind: 'skNova', r: r * .65, life: .5 + r * .05, t: -.12 });
+      if (own) kick(Math.min(16, 4 + r * 1.6), .15 + r * .06);
+    } else if (kind === 'volley') { effects.push({ ...base, kind: 'skFlash', life: .22 }); spark(ev.x, ev.y, 8, [core, glow], 3, 2, .4); if (ev.value >= 8) effects.push({ ...base, kind: 'skNova', r: 1.6, life: .4 }); }
+    else if (kind === 'dash') {
+      const dist = ev.value, end = { x: ev.x + ev.fx * dist, y: ev.y + ev.fy * dist };
+      if (def.effect.mult === 0) {
+        effects.push({ ...base, kind: 'skBeam', life: .5 }); effects.push({ ...base, kind: 'skBeam', x: end.x, y: end.y, life: .5, t: -def.effect.time });
+        spark(ev.x, ev.y, 18, [core, glow], 9, 1.5, .8); spark(end.x, end.y, 18, [core, glow], 9, 1.5, .8);
+      } else { effects.push({ ...base, kind: 'skDash', ex: end.x, ey: end.y, life: .5 }); spark(ev.x, ev.y, 12, [core, glow, '#c8b090'], 3, 3, .5); if (own) kick(4, .2); }
+    } else if (kind === 'strike') {
+      if (ev.skill === 'lifedrain') for (const p of pts) effects.push({ ...base, kind: 'skChain', path: jagged(p, { x: ev.x, y: ev.y }), life: .5 });
+      else pts.forEach((p, i) => effects.push({ ...base, kind: 'skCut', x: p.x, y: p.y, big: pts.length === 1, ang: Math.random() * 3.14, life: .3, t: -i * (pts.length > 4 ? .035 : .06) }));
+      if (own && pts.length === 1) kick(6, .2);
+    } else if (kind === 'chain') {
+      let from = { x: ev.x, y: ev.y };
+      pts.forEach((p, i) => { effects.push({ ...base, kind: 'skChain', path: jagged(from, p), life: .45, t: -i * .06 }); from = p; });
+    } else if (kind === 'meteor') {
+      const c = pts[0] || { x: ev.x + ev.fx * 4, y: ev.y + ev.fy * 4 };
+      effects.push({ ...base, kind: 'skMeteor', x: c.x, y: c.y, r: ev.value, life: 1.1 });
+      setTimeout(() => { spark(c.x, c.y, 40, [core, glow, '#ffe27a'], 10, 4, 1); if (own) kick(14, .5); }, 380);
+    } else if (kind === 'buff') {
+      const col = BUFF_COL[def.effect.kind] || glow; effects.push({ ...base, kind: 'skAura', col, life: 1 }); spark(ev.x, ev.y, 22, [core, col], 12, 1.2, 1); floater(ev.x, ev.y, def.name, col, false);
+    } else if (kind === 'heal') { effects.push({ ...base, kind: 'skAura', col: glow, life: 1 }); spark(ev.x, ev.y, 26, [core, glow], 12, 1.2, 1.1); }
+    if (ev.heal > 0) { floater(ev.x, ev.y, '+' + ev.heal, '#7dff9a', true); if (kind !== 'heal') spark(ev.x, ev.y, 12, ['#9dffb4', '#d8ffe0'], 10, 1, .9); }
+  }
+  // A grand level-up: a pillar of light, rays, rings and a fountain of sparks on everyone's screen; the player's own
+  // client adds a screen shake, and game.js adds the flash, fanfare and banner.
+  function levelUpFx(ev) {
+    const own = ev.actor === Online.id, golds = ['#ffe066', '#fff4c0', '#ffffff', '#ffb347', '#7fe9ff'];
+    effects.push({ kind: 'luPillar', x: ev.x, y: ev.y, t: 0, life: 2.4 });
+    effects.push({ kind: 'luRays', x: ev.x, y: ev.y, t: 0, life: 1.8 });
+    ['#ffe066', '#ffffff', '#7fe9ff', '#ffb347'].forEach((col, i) => effects.push({ kind: 'ring', x: ev.x, y: ev.y, col, t: -i * .16, life: 1.2 + i * .1, grow: 1 + i * .35 }));
+    spark(ev.x, ev.y, 90, golds, 24, 1.4, 2); spark(ev.x, ev.y, 50, golds, 8, 4.5, 1.5);
+    floater(ev.x, ev.y, 'LEVEL UP!', '#ffe066', true);
+    floaters.push({ x: ev.x, y: ev.y, z: 78, text: `Level ${ev.level}`, color: '#ffffff', big: true, t: 0 });
+    if (own) kick(13, .8);
+  }
+  function drawLevelFx(g, e) {
+    const [sx, sy] = w2s(e.x, e.y), p = e.t / e.life;
+    g.save(); g.globalCompositeOperation = 'lighter';
+    if (e.kind === 'luPillar') {
+      const rise = Math.min(1, e.t / .22), top = 1000 * rise, fade = p < .55 ? 1 : 1 - (p - .55) / .45, flick = .92 + .08 * Math.sin(e.t * 38), w = 84 * (1 - p * .35) * flick;
+      const gr = g.createLinearGradient(0, sy - top, 0, sy); gr.addColorStop(0, 'rgba(255,214,90,0)'); gr.addColorStop(.5, 'rgba(255,230,140,.5)'); gr.addColorStop(1, 'rgba(255,255,255,.95)');
+      g.globalAlpha = fade; g.fillStyle = gr; g.fillRect(sx - w / 2, sy - top, w, top);
+      g.fillStyle = 'rgba(255,255,255,.75)'; g.fillRect(sx - w * .16, sy - top, w * .32, top);
+      const gl = g.createRadialGradient(sx, sy, 4, sx, sy, 150); gl.addColorStop(0, 'rgba(255,240,170,.85)'); gl.addColorStop(1, 'rgba(255,200,60,0)');
+      g.fillStyle = gl; g.beginPath(); g.ellipse(sx, sy, 150, 75, 0, 0, 6.283); g.fill();
+    } else if (e.kind === 'luRays') {
+      const fade = 1 - p, n = 16, r = 120 + 700 * Math.min(1, e.t / .5), spin = e.t * .9;
+      g.translate(sx, sy - 46); g.scale(1, .62); g.globalAlpha = fade * .55;
+      for (let i = 0; i < n; i++) {
+        const ang = spin + i * 6.283 / n, wid = .07 + (i % 2) * .05;
+        const gr = g.createLinearGradient(0, 0, Math.cos(ang) * r, Math.sin(ang) * r); gr.addColorStop(0, 'rgba(255,240,170,.9)'); gr.addColorStop(1, 'rgba(255,200,60,0)');
+        g.fillStyle = gr; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(ang - wid) * r, Math.sin(ang - wid) * r); g.lineTo(Math.cos(ang + wid) * r, Math.sin(ang + wid) * r); g.closePath(); g.fill();
+      }
+    }
+    g.restore();
+  }
+  // Strokes are drawn as [width, colour, alpha, additive]: a dark outline keeps them readable on bright grass, additive
+  // glow gives the light, and an opaque core carries the colour.
+  const OUTLINE = '#1e0c32';
+  function layers(g, list, fade, shrink, draw) {
+    for (const [w, col, al, add] of list) { g.globalCompositeOperation = add ? 'lighter' : 'source-over'; g.globalAlpha = al * fade; g.strokeStyle = col; g.lineWidth = w * (1 - shrink); draw(); g.stroke(); }
+    g.globalCompositeOperation = 'source-over';
+  }
+  function drawSkillFx(g, e) {
+    if (e.t < 0) return;
+    const p = e.t / e.life, fade = 1 - p, [sx, sy] = w2s(e.x, e.y), U = 62.2, V = 31.1;       // pixels per world unit along the ellipse's axes
+    g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+    if (e.kind === 'skNova') {
+      const k = 1 - Math.pow(1 - Math.min(1, p * 1.6), 3), rx = U * e.r * k, ry = V * e.r * k, style = e.style;
+      g.globalAlpha = fade * .3; g.fillStyle = e.glow; g.beginPath(); g.ellipse(sx, sy, rx, ry, 0, 0, 6.283); g.fill();
+      const gr = g.createRadialGradient(sx, sy, 2, sx, sy, Math.max(4, rx)); gr.addColorStop(0, e.glow + '00'); gr.addColorStop(.7, e.glow + '44'); gr.addColorStop(1, e.glow + 'aa');
+      g.globalCompositeOperation = 'lighter'; g.globalAlpha = fade; g.fillStyle = gr; g.beginPath(); g.ellipse(sx, sy, rx, ry, 0, 0, 6.283); g.fill(); g.globalCompositeOperation = 'source-over';
+      const ring = () => { g.beginPath(); g.ellipse(sx, sy, rx, ry, 0, 0, 6.283); };
+      layers(g, [[22, OUTLINE, .3, 0], [16, e.glow, .5, 1], [8, e.core, .95, 0], [3, '#ffffff', 1, 0]], fade, p * .5, ring);
+      if (style === 'spiral') {       // whirling arms: whirlwind, cyclone blades, arcane storm
+        for (let arm = 0; arm < 4; arm++) layers(g, [[10, OUTLINE, .3, 0], [6, e.core, .9, 0], [2.5, '#ffffff', 1, 0]], fade, 0, () => {
+          g.beginPath(); const a0 = e.t * 11 + arm * 1.571;
+          for (let i = 0; i <= 14; i++) { const an = a0 + i * .09, f = k * (.35 + i * .045); i ? g.lineTo(sx + Math.cos(an) * rx * f, sy + Math.sin(an) * ry * f) : g.moveTo(sx + Math.cos(an) * rx * f, sy + Math.sin(an) * ry * f); }
+        });
+      } else if (style === 'cracks') {   // the ground splits: groundslam, earthshatter, titan's wrath
+        layers(g, [[9, '#2a1408', .8, 0], [4, e.glow, .95, 1], [1.8, '#ffffff', 1, 0]], Math.min(1, fade * 1.6), 0, () => {
+          g.beginPath(); for (const c of e.cracks) { const len = Math.min(1, k * 1.1) * c.len; let px = sx, py = sy; g.moveTo(px, py); for (const [f, o] of c.zig) { if (f > len) break; const an = c.a + o; px = sx + Math.cos(an) * rx * f, py = sy + Math.sin(an) * ry * f; g.lineTo(px, py); } }
+        });
+      } else {
+        g.globalAlpha = fade * .7; g.strokeStyle = e.core; g.lineWidth = 2;
+        for (let i = 0; i < 18; i++) { const an = i * 6.283 / 18 + e.a, r0 = .55 * k, r1 = k * 1.08; g.beginPath(); g.moveTo(sx + Math.cos(an) * rx * r0, sy + Math.sin(an) * ry * r0); g.lineTo(sx + Math.cos(an) * rx * r1, sy + Math.sin(an) * ry * r1); g.stroke(); }
+      }
+      if (e.stars) for (const st of e.stars) {         // starfall: stars drop across the whole area
+        const q = (e.t - st.delay) / .3; if (q < 0 || q > 1.6) continue;
+        const [qx, qy] = w2s(st.x, st.y), fall = Math.min(1, q);
+        if (q <= 1) { const hx = qx + 140 * (1 - fall), hy = qy - 420 * (1 - fall) - 4; layers(g, [[12, OUTLINE, .3, 0], [8, e.glow, .6, 1], [3.5, '#ffffff', 1, 0]], 1, 0, () => { g.beginPath(); g.moveTo(hx + 70, hy - 210); g.lineTo(hx, hy); }); g.fillStyle = '#ffffff'; g.globalAlpha = 1; g.beginPath(); g.arc(hx, hy, 7, 0, 6.283); g.fill(); }
+        else { const f2 = 1 - (q - 1) / .6; g.globalAlpha = f2; g.fillStyle = e.core; g.beginPath(); g.ellipse(qx, qy, 36 * (2 - f2), 17 * (2 - f2), 0, 0, 6.283); g.fill(); g.globalCompositeOperation = 'lighter'; g.fillStyle = e.glow; g.beginPath(); g.ellipse(qx, qy, 52 * (2 - f2), 24 * (2 - f2), 0, 0, 6.283); g.fill(); g.globalCompositeOperation = 'source-over'; }
+      }
+    } else if (e.kind === 'skCone') {
+      const sweep = Math.min(1, p * 2.2), a0 = e.a - 1.9, a1 = a0 + 3.8 * sweep;
+      for (const [rr, list] of [[1, [[34, OUTLINE, .3, 0], [24, e.glow, .5, 1], [12, e.core, .95, 0], [4, '#ffffff', 1, 0]]], [.7, [[16, OUTLINE, .25, 0], [8, e.glow, .6, 1], [3, '#ffffff', .9, 0]]]]) layers(g, list, fade, p * .5, () => {
+        g.beginPath(); for (let i = 0; i <= 18; i++) { const an = a0 + (a1 - a0) * i / 18, [qx, qy] = w2s(e.x + Math.cos(an) * e.r * rr, e.y + Math.sin(an) * e.r * rr, 26); i ? g.lineTo(qx, qy) : g.moveTo(qx, qy); }
+      });
+    } else if (e.kind === 'skFlash') {
+      const gr = g.createRadialGradient(sx, sy - 40, 1, sx, sy - 40, 54); gr.addColorStop(0, e.core); gr.addColorStop(.4, e.glow + 'cc'); gr.addColorStop(1, e.glow + '00');
+      g.globalAlpha = fade; g.fillStyle = gr; g.beginPath(); g.arc(sx, sy - 40, 54, 0, 6.283); g.fill();
+    } else if (e.kind === 'skBeam') {
+      const rise = Math.min(1, p * 4), w = 56 * (1 - p), top = 360 * rise, gr = g.createLinearGradient(0, sy - top, 0, sy); gr.addColorStop(0, e.glow + '00'); gr.addColorStop(.6, e.glow + 'cc'); gr.addColorStop(1, e.core);
+      g.globalAlpha = fade; g.fillStyle = gr; g.fillRect(sx - w / 2, sy - top, w, top);
+      g.fillStyle = '#ffffff'; g.globalAlpha = fade * .8; g.fillRect(sx - w * .12, sy - top * .8, w * .24, top * .8);
+      g.strokeStyle = e.core; g.lineWidth = 4; g.globalAlpha = fade; g.beginPath(); g.ellipse(sx, sy, 20 + p * 70, 10 + p * 35, 0, 0, 6.283); g.stroke();
+    } else if (e.kind === 'skDash') {
+      const [ex, ey] = w2s(e.ex, e.ey, 24), [bx, by] = w2s(e.x, e.y, 24), head = Math.min(1, p * 5), tx = bx + (ex - bx) * head, ty = by + (ey - by) * head;
+      layers(g, [[30, OUTLINE, .25, 0], [24, e.glow, .5, 1], [11, e.core, .95, 0], [4, '#ffffff', 1, 0]], fade, p * .6, () => { g.beginPath(); g.moveTo(bx, by); g.lineTo(tx, ty); });
+      layers(g, [[3, '#ffffff', .8, 0]], fade, 0, () => { g.beginPath(); for (let i = -2; i <= 2; i++) { if (!i) continue; g.moveTo(bx, by + i * 10); g.lineTo(bx + (tx - bx) * .8, by + (ty - by) * .8 + i * 10); } });
+    } else if (e.kind === 'skCut') {
+      const k = Math.min(1, p * 3), len = e.big ? 84 : 52, [cx, cy] = w2s(e.x, e.y, 30), c = Math.cos(e.ang), s2 = Math.sin(e.ang);
+      layers(g, [[e.big ? 18 : 12, OUTLINE, .35, 0], [e.big ? 12 : 8, e.glow, .7, 1], [e.big ? 6 : 4, '#ffffff', 1, 0]], fade, 0, () => { g.beginPath(); g.moveTo(cx - c * len * (1 - k * .2), cy - s2 * len * (1 - k * .2)); g.lineTo(cx + c * len * k, cy + s2 * len * k); });
+      if (e.big) layers(g, [[10, OUTLINE, .3, 0], [6, e.core, 1, 0], [3, '#ffffff', 1, 0]], fade, 0, () => { g.beginPath(); g.moveTo(cx - s2 * len * k, cy + c * len * k); g.lineTo(cx + s2 * len * k, cy - c * len * k); });
+    } else if (e.kind === 'skChain') {
+      const pts = e.path.map(q => w2s(q.x, q.y, 28)), flick = Math.floor(e.t * 40) % 2 ? .75 : 1;
+      layers(g, [[20, OUTLINE, .3, 0], [14, e.glow, .5, 1], [6, e.core, .95, 0], [2.5, '#ffffff', 1, 0]], fade * flick, 0, () => { g.beginPath(); pts.forEach(([qx, qy], i) => i ? g.lineTo(qx, qy) : g.moveTo(qx, qy)); });
+      const [hx, hy] = pts[pts.length - 1]; g.globalAlpha = fade; g.fillStyle = e.core; g.beginPath(); g.arc(hx, hy, 12 * fade + 3, 0, 6.283); g.fill(); g.fillStyle = '#ffffff'; g.beginPath(); g.arc(hx, hy, 5 * fade + 1, 0, 6.283); g.fill();
+    } else if (e.kind === 'skMeteor') {
+      const fall = Math.min(1, e.t / .38), x0 = sx + 260, y0 = sy - 700;
+      if (e.t < .38) {
+        const mx = x0 + (sx - x0) * fall, my = y0 + (sy - y0) * fall;
+        layers(g, [[44, OUTLINE, .25, 0], [34, e.glow, .5, 1], [18, e.core, .95, 0]], 1, 0, () => { g.beginPath(); g.moveTo(mx + 140 * (1 - fall) + 40, my - 150 * (1 - fall) - 60); g.lineTo(mx, my); });
+        g.globalAlpha = 1; g.fillStyle = e.glow; g.beginPath(); g.arc(mx, my, 32, 0, 6.283); g.fill(); g.fillStyle = e.core; g.beginPath(); g.arc(mx, my, 24, 0, 6.283); g.fill(); g.fillStyle = '#ffffff'; g.beginPath(); g.arc(mx, my, 14, 0, 6.283); g.fill();
+        layers(g, [[6, OUTLINE, .3 * fall, 0], [3, e.glow, .8 * fall, 1]], 1, 0, () => { g.beginPath(); g.ellipse(sx, sy, U * e.r, V * e.r, 0, 0, 6.283); });      // the warning circle
+      } else {
+        const q = (e.t - .38) / (e.life - .38), k = 1 - Math.pow(1 - Math.min(1, q * 1.8), 3), rx = U * e.r * k, ry = V * e.r * k, f = 1 - q;
+        g.globalAlpha = f * .35; g.fillStyle = '#2a1408'; g.beginPath(); g.ellipse(sx, sy, rx * 1.05, ry * 1.05, 0, 0, 6.283); g.fill();
+        const gr = g.createRadialGradient(sx, sy, 4, sx, sy, Math.max(6, rx)); gr.addColorStop(0, '#ffffff'); gr.addColorStop(.35, e.core); gr.addColorStop(.75, e.glow + 'aa'); gr.addColorStop(1, e.glow + '00');
+        g.globalAlpha = f; g.fillStyle = gr; g.beginPath(); g.ellipse(sx, sy, rx, ry, 0, 0, 6.283); g.fill();
+        layers(g, [[14 * f + 3, OUTLINE, .3, 0], [8 * f + 1, e.core, 1, 0]], f, 0, () => { g.beginPath(); g.ellipse(sx, sy, rx * 1.1, ry * 1.1, 0, 0, 6.283); });
+        const col = g.createLinearGradient(0, sy - 280 * k, 0, sy); col.addColorStop(0, e.glow + '00'); col.addColorStop(1, e.core); g.globalCompositeOperation = 'lighter'; g.globalAlpha = f * .8; g.fillStyle = col; g.fillRect(sx - 44 * f - 8, sy - 280 * k, 88 * f + 16, 280 * k);
+      }
+    } else if (e.kind === 'skAura') {
+      const rise = 1 - Math.pow(1 - Math.min(1, p * 1.5), 2);
+      for (let i = 0; i < 3; i++) { const q = clamp(p * 1.4 - i * .18, 0, 1); if (q <= 0 || q >= 1) continue; layers(g, [[8 * (1 - q) + 3, OUTLINE, .3, 0], [5 * (1 - q) + 1, i ? e.core : e.col, .95, 0]], 1 - q, 0, () => { g.beginPath(); g.ellipse(sx, sy - q * 110, 38 + q * 14, 18 + q * 7, 0, 0, 6.283); }); }
+      const gr = g.createLinearGradient(0, sy - 140 * rise, 0, sy); gr.addColorStop(0, e.col + '00'); gr.addColorStop(1, e.col + '99'); g.globalCompositeOperation = 'lighter'; g.globalAlpha = fade; g.fillStyle = gr; g.fillRect(sx - 36, sy - 140 * rise, 72, 140 * rise);
+    }
+    g.restore();
+  }
+  // A glowing ring at the feet of anyone with an active buff, flickering when it is about to end.
+  function drawBuffRings(g, who, t) {
+    if (!who.buffs?.length || who.dead) return;
+    const [sx, sy] = w2s(who.x, who.y);
+    who.buffs.forEach((b, i) => {
+      const col = BUFF_COL[b.kind] || '#ffffff', pulse = .55 + .25 * Math.sin(t * 4 + i * 1.7), ending = b.left < 1.5 && Math.floor(t * 8) % 2;
+      g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = ending ? .2 : pulse * .75; g.strokeStyle = col; g.lineWidth = 3;
+      g.beginPath(); g.ellipse(sx, sy, 34 + i * 8, 16 + i * 4, 0, 0, 6.283); g.stroke();
+      g.globalAlpha = (ending ? .08 : .2) * pulse; g.fillStyle = col; g.fill(); g.restore();
+    });
   }
   function interpolate(actor, dt) {
     if (Number.isFinite(actor.nx)) { const k = Math.min(1, dt * 14); actor.x += (actor.nx - actor.x) * k; actor.y += (actor.ny - actor.y) * k; }
@@ -524,10 +726,12 @@
     for (const p of parts) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vz -= p.g * dt; p.z = Math.max(0, p.z + p.vz * dt * 6); }
     parts = parts.filter(p => p.t < p.life);
     for (const f of floaters) { f.t += dt; f.z += dt * 46; } floaters = floaters.filter(f => f.t < 1.1);
-    for (const e of effects) e.t += dt; effects = effects.filter(e => e.t < (e.kind === 'ring' ? .9 : .32));
+    for (const e of effects) e.t += dt; effects = effects.filter(e => e.t < (e.life ?? (e.kind === 'ring' ? .9 : .32)));
     if (marker) { marker.t += dt; if (marker.t > 1.2) marker = null; }
     const k = 1 - Math.pow(.0006, dt); cam.x += (hero.x - cam.x) * k; cam.y += (hero.y - cam.y) * k;
-    shakeX = shakeY = 0;
+    if (shakeT > 0) { shakeT -= dt; const k = shakeMag * Math.min(1, shakeT / .25); shakeX = (Math.random() - .5) * 2 * k; shakeY = (Math.random() - .5) * 2 * k; }
+    else { shakeX = shakeY = 0; shakeMag = 0; }
+    for (const b of bolts) if (b.size >= 14 && Math.random() < .9) parts.push({ x: b.x, y: b.y, z: 40, vx: (Math.random() - .5), vy: (Math.random() - .5), vz: 1 + Math.random() * 3, life: .35, t: 0, col: b.col, size: 3 + Math.random() * 4, g: 4 });
   }
 
   // ---------- drawing the actors ----------
@@ -861,6 +1065,7 @@
     if (zone === 0) City.drawPlaza(g, w2s);
     if (zdef.theme === 'ember') drawLava(g, t);
     // ground decals: splats, target marker, slash, shadows
+    for (const who of [hero, ...remotePlayers.values()]) drawBuffRings(g, who, t);
     for (const e of effects) if (e.kind === 'splat') { const [sx, sy] = w2s(e.x, e.y), a = clamp(1 - (e.t - 3) / 3, 0, 1) * .5; g.fillStyle = e.col; g.globalAlpha = a; g.beginPath(); g.ellipse(sx, sy, 26 * e.s, 12 * e.s, 0, 0, 6.283); g.fill(); g.globalAlpha = 1; }
     if (marker) { const [sx, sy] = w2s(marker.x, marker.y), p = (marker.t * 2) % 1; g.strokeStyle = `rgba(255,236,150,${1 - p * .6})`; g.lineWidth = 3; g.beginPath(); g.ellipse(sx, sy, 10 + p * 12, 5 + p * 6, 0, 0, 6.283); g.stroke(); }
     // build the depth-sorted list of everything standing on the ground
@@ -956,13 +1161,19 @@
       g.save(); g.globalAlpha = Math.max(0, .35 * (1 - e.t / .32)); g.imageSmoothingEnabled = false;
       g.drawImage(mageSpr.frame('walk', e.dir, e.frame), sx - ax * 1.3, sy - ay * 1.3, 160 * 1.3, 160 * 1.3); g.restore();
     } else if (e.kind === 'ring') {
-      const p = e.t / .9, [sx, sy] = w2s(e.x, e.y); g.strokeStyle = `rgba(255,224,102,${1 - p})`; g.lineWidth = 6 * (1 - p) + 1; g.beginPath(); g.ellipse(sx, sy, 30 + p * 120, 14 + p * 56, 0, 0, 6.283); g.stroke();
+      if (e.t < 0) continue;
+      const p = e.t / (e.life ?? .9), [sx, sy] = w2s(e.x, e.y), m = e.grow || 1;
+      if (e.col) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = 1 - p; g.strokeStyle = e.col; } else g.strokeStyle = `rgba(255,224,102,${1 - p})`;
+      g.lineWidth = 6 * (1 - p) + 1; g.beginPath(); g.ellipse(sx, sy, 30 + p * 120 * m, 14 + p * 56 * m, 0, 0, 6.283); g.stroke(); if (e.col) g.restore();
     }
+    for (const e of effects) if (e.kind === 'luPillar' || e.kind === 'luRays') drawLevelFx(g, e); else if (e.kind.startsWith('sk')) drawSkillFx(g, e);
     for (const b of bolts) {
       const [sx, sy] = w2s(b.x, b.y, 42), [tx, ty] = w2s(b.x - b.fx * .45, b.y - b.fy * .45, 42);
-      g.save(); g.strokeStyle = b.col; g.lineWidth = 9; g.lineCap = 'round'; g.globalAlpha = .65;
+      const w = b.size || 9;
+      g.save(); g.strokeStyle = b.col; g.lineWidth = w; g.lineCap = 'round'; g.globalAlpha = .65;
       g.beginPath(); g.moveTo(tx, ty); g.lineTo(sx, sy); g.stroke();
-      g.globalAlpha = 1; g.fillStyle = '#f3fcff'; g.beginPath(); g.arc(sx, sy, 5, 0, Math.PI * 2); g.fill(); g.restore();
+      if (w >= 14) { g.globalAlpha = .35; g.fillStyle = b.col; g.beginPath(); g.arc(sx, sy, w * 1.2, 0, Math.PI * 2); g.fill(); }
+      g.globalAlpha = 1; g.fillStyle = '#f3fcff'; g.beginPath(); g.arc(sx, sy, Math.max(3, w * .55), 0, Math.PI * 2); g.fill(); g.restore();
     }
     for (const p of parts) { const [sx, sy] = w2s(p.x, p.y, p.z); g.globalAlpha = 1 - p.t / p.life; g.fillStyle = p.col; g.beginPath(); g.arc(sx, sy, p.size, 0, 6.283); g.fill(); } g.globalAlpha = 1;
     for (const f of floaters) { const [sx, sy] = w2s(f.x, f.y, f.z + 30); g.globalAlpha = clamp(1.4 - f.t * 1.3, 0, 1); g.font = `${f.big ? 34 : 24}px "Lilita One", "Jua", Impact, sans-serif`; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = 'rgba(20,10,30,.9)'; g.strokeText(f.text, sx, sy); g.fillStyle = f.color; g.fillText(f.text, sx, sy); } g.globalAlpha = 1;
@@ -1055,6 +1266,8 @@
       if (!running || paused || !Online.connected || hero.dead) return false;
       if (id === 'attack' && hero.atkCd <= 0 && hero.dashT <= 0) { swing(); return true; }
       if (id === 'shadowstep' && isAssassin() && hero.dashCd <= 0) { shadowstep(); return true; }
+      const def = SKILL_BY_ID[id];
+      if (def && def.class === hero.look.class && hero.level >= def.level && !(hero.skillCd?.[id] > 0) && hero.dashT <= 0) { castSkill(def); return true; }
       return false;
     },
     get canAct() { return running && !paused && Online.connected && !hero.dead; },
@@ -1070,7 +1283,7 @@
     get hero() { return hero; }, get slimes() { return slimes; },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; },
-    _debug: { get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll) },
+    _debug: { get effects() { return effects; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll) },
   };
   window.Field = Field;
 })();

@@ -1,4 +1,9 @@
-use crate::{items::*, model::*, store::Store};
+use crate::{
+    items::*,
+    model::*,
+    skills::{self, BuffKind, Effect},
+    store::Store,
+};
 use serde::Serialize;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
@@ -55,6 +60,11 @@ struct Player {
     dash: f64,
     dash_cd: f64,
     dash_direction: Point,
+    dash_speed: f64,
+    dash_mult: f64,
+    dash_hits: Vec<usize>,
+    skill_cd: BTreeMap<String, f64>,
+    buffs: Vec<Buff>,
     chat_at: f64,
     service_at: f64,
     bag_notice_at: f64,
@@ -81,6 +91,11 @@ impl Player {
             dash: 0.,
             dash_cd: 0.,
             dash_direction: Point::default(),
+            dash_speed: 15.,
+            dash_mult: 0.,
+            dash_hits: vec![],
+            skill_cd: BTreeMap::new(),
+            buffs: vec![],
             chat_at: -99.,
             service_at: -99.,
             bag_notice_at: -99.,
@@ -93,7 +108,16 @@ impl Player {
             "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"quests":c.quests,"inventory":c.inventory,"equipment":c.equipment,"bags":c.bags,"bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used(),"fx":self.face.x,"fy":self.face.y,
             "attributes":c.attributes,"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
-            "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd})
+            "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
+            "skillCd":self.skill_cd,"buffs":self.buffs})
+    }
+    /// The sum of every active buff of one kind.
+    fn buff(&self, kind: BuffKind) -> f64 {
+        self.buffs
+            .iter()
+            .filter(|b| b.kind == kind)
+            .map(|b| b.amount)
+            .sum()
     }
     fn stop(&mut self) {
         self.input = Point::default();
@@ -102,6 +126,15 @@ impl Player {
     }
 }
 
+#[derive(Clone, Serialize)]
+struct Buff {
+    id: String,
+    kind: BuffKind,
+    #[serde(skip)]
+    amount: f64,
+    left: f64,
+    time: f64,
+}
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Slime {
@@ -263,11 +296,18 @@ struct Bolt {
     fx: f64,
     fy: f64,
     t: f64,
-    color: &'static str,
+    color: String,
+    size: f64,
     #[serde(skip)]
     damage: f64,
     #[serde(skip)]
     crit: bool,
+    #[serde(skip)]
+    pierce: bool,
+    #[serde(skip)]
+    blast: f64,
+    #[serde(skip)]
+    hits: Vec<usize>,
 }
 #[derive(Clone, Serialize)]
 struct Drop {
@@ -304,6 +344,8 @@ pub struct World {
     level_spread: i32,
     // Test servers only (VALHALLA_GOD_MODE=1): enemies still fight, but players take no damage.
     pub god_mode: bool,
+    // Test servers only (VALHALLA_START_LEVEL): new characters begin at this level; loaded ones are untouched.
+    pub start_level: u32,
 }
 impl World {
     // Production code reads VALHALLA_LEVEL_SPREAD in main; tests that want real random levels use this.
@@ -341,6 +383,7 @@ impl World {
             next_king_spawn: 0.,
             level_spread,
             god_mode: false,
+            start_level: 1,
         };
         for id in 0..world.spawns.len() {
             let spawn = world.spawns[id].clone();
@@ -549,10 +592,14 @@ impl World {
             let mut look = look.ok_or("Create a character first.")?;
             look.name = look.name.trim().into();
             look.validate()?;
-            let (c, token) = self.store.create(look, self.maps[0].spawn).map_err(|e| {
+            let (mut c, token) = self.store.create(look, self.maps[0].spawn).map_err(|e| {
                 tracing::error!(%e,"character creation failed");
                 "Could not save your character.".to_owned()
             })?;
+            if self.start_level > 1 {
+                c.level = self.start_level;
+                c.hp = c.max_hp();
+            }
             (c, Some(token))
         };
         if self.players.values().any(|p| p.character.id == c.id) {
@@ -665,6 +712,8 @@ impl World {
                 };
                 p.face = p.dash_direction;
                 p.dash = 0.18;
+                p.dash_speed = 15.;
+                p.dash_mult = 0.;
                 p.dash_cd = 1.2 * p.character.cooldown_multiplier();
                 p.attack = 0.;
                 p.hurt = 0.;
@@ -672,6 +721,9 @@ impl World {
                 let id = p.character.id.clone();
                 let point = p.character.point();
                 self.event("shadowstep", &id, point, 0., false);
+            }
+            ClientMessage::Skill { id, fx, fy } if fx.is_finite() && fy.is_finite() => {
+                self.use_skill(session, &id, normalize(fx, fy));
             }
             ClientMessage::Equip {
                 armor,
@@ -859,7 +911,7 @@ impl World {
         let actor = p.character.id.clone();
         let point = p.character.point();
         if levels > 0 {
-            self.event("levelup", &actor, point, levels as f64, false);
+            self.level_up_event(&actor, point, levels);
         }
         if quest_changed {
             self.save();
@@ -874,7 +926,7 @@ impl World {
         }
         p.attack = 0.0001;
         p.hit = false;
-        p.cooldown = p.character.attack_cooldown();
+        p.cooldown = p.character.attack_cooldown() / (1. + p.buff(BuffKind::Haste));
         let kind = if p.character.look.class == Class::Mage {
             "cast"
         } else {
@@ -917,6 +969,14 @@ impl World {
         p.cooldown = (p.cooldown - TICK).max(0.);
         p.hurt = (p.hurt - TICK).max(0.);
         p.dash_cd = (p.dash_cd - TICK).max(0.);
+        p.skill_cd.retain(|_, left| {
+            *left -= TICK;
+            *left > 0.
+        });
+        p.buffs.retain_mut(|b| {
+            b.left -= TICK;
+            b.left > 0.
+        });
         if p.character.hp <= 0. {
             p.moving = false;
             p.dead_time += TICK;
@@ -986,13 +1046,17 @@ impl World {
                 dir = p.character.point().direction(goal);
             }
         }
-        let mut distance =
-            (p.character.look.class.speed() * TICK * if p.attack > 0. { 0.25 } else { 1. })
-                .min(travel);
+        let mut distance = (p.character.look.class.speed()
+            * (1. + p.buff(BuffKind::Haste))
+            * TICK
+            * if p.attack > 0. { 0.25 } else { 1. })
+        .min(travel);
+        let mut dash_sweep = false;
         if p.dash > 0. {
             dir = p.dash_direction;
-            distance = 15. * p.dash.min(TICK);
+            distance = p.dash_speed * p.dash.min(TICK);
             p.dash = (p.dash - TICK).max(0.);
+            dash_sweep = p.dash_mult > 0.;
         }
         p.moving = false;
         if distance > 0. && (dir.x != 0. || dir.y != 0.) {
@@ -1005,6 +1069,9 @@ impl World {
             if p.attack <= 0. {
                 p.face = dir;
             }
+        }
+        if dash_sweep {
+            self.dash_sweep(session);
         }
         if strike {
             self.strike(session);
@@ -1066,15 +1133,11 @@ impl World {
         self.event("portal", &actor, arrival, 0., false);
         self.save();
     }
-    fn strike(&mut self, session: u64) {
+    /// One attack roll: the server alone decides misses, crits and damage (buffs included).
+    fn roll_damage(&mut self, session: u64, mult: f64) -> (f64, bool) {
         let p = &self.players[&session];
-        let point = p.character.point();
-        let zone = p.character.zone;
-        let face = p.face;
-        let class = p.character.look.class;
-        let base = p.character.stats().0;
-        let reach = class.reach();
-        let crit_chance = p.character.crit_chance();
+        let base = p.character.stats().0 * (1. + p.buff(BuffKind::Damage)) * mult;
+        let crit_chance = (p.character.crit_chance() + p.buff(BuffKind::Crit)).min(1.);
         let hit_chance = p.character.hit_chance();
         let crit = self.random() < crit_chance;
         let damage = if self.random() < hit_chance {
@@ -1082,6 +1145,16 @@ impl World {
         } else {
             0.
         };
+        (damage, crit)
+    }
+    fn strike(&mut self, session: u64) {
+        let p = &self.players[&session];
+        let point = p.character.point();
+        let zone = p.character.zone;
+        let face = p.face;
+        let class = p.character.look.class;
+        let reach = class.reach();
+        let (damage, crit) = self.roll_damage(session, 1.);
         if class == Class::Mage {
             let id = self.entity();
             self.bolts.push(Bolt {
@@ -1093,9 +1166,13 @@ impl World {
                 fx: face.x,
                 fy: face.y,
                 t: 0.,
-                color: "#c5a5ff",
+                color: "#c5a5ff".into(),
+                size: 9.,
                 damage,
                 crit,
+                pierce: false,
+                blast: 0.,
+                hits: vec![],
             });
             return;
         }
@@ -1116,23 +1193,287 @@ impl World {
             self.hit_slime(id, session, damage, crit);
         }
     }
-    fn hit_slime(&mut self, id: usize, session: u64, damage: f64, crit: bool) {
-        let Some(p) = self.players.get(&session) else {
+    /// Announces a level gain to the zone, with the new level and the skills it unlocks.
+    fn level_up_event(&self, actor: &str, point: Point, levels: u32) {
+        let Some(p) = self.players.values().find(|p| p.character.id == actor) else {
             return;
         };
-        if p.character.hp <= 0. {
+        let level = p.character.level;
+        let unlocked =
+            skills::unlocked(p.character.look.class, level.saturating_sub(levels), level);
+        self.emit_zone(
+            p.character.zone,
+            json!({"type":"event","kind":"levelup","actor":actor,"x":point.x,"y":point.y,"value":levels as f64,"crit":false,"level":level,"unlocked":unlocked}),
+        );
+    }
+    /// Enemies in the player's zone within `radius` of `at` (measured to the enemy's edge), nearest first.
+    fn enemies_near(&self, zone: usize, at: Point, radius: f64, skip: &[usize]) -> Vec<usize> {
+        let mut found: Vec<_> = self
+            .slimes
+            .iter()
+            .filter(|s| {
+                !s.dead
+                    && s.zone == zone
+                    && !skip.contains(&s.id)
+                    && at.distance(s.point()) - s.r < radius
+            })
+            .map(|s| (at.distance(s.point()), s.id))
+            .collect();
+        found.sort_by(|a, b| a.0.total_cmp(&b.0));
+        found.into_iter().map(|(_, id)| id).collect()
+    }
+    /// Skills are validated and resolved here; the client only names one and an aim direction.
+    fn use_skill(&mut self, session: u64, id: &str, aim: Point) {
+        let Some(p) = self.players.get_mut(&session) else {
             return;
+        };
+        let class = p.character.look.class;
+        let Some(skill) = skills::find(class, id) else {
+            let _ = p.peer.try_send(
+                json!({"type":"error","text":"That skill is not available to your class."}),
+            );
+            return;
+        };
+        if p.character.level < skill.level {
+            let text = format!("{} unlocks at level {}.", skill.name, skill.level);
+            let _ = p.peer.try_send(json!({"type":"error","text":text}));
+            return;
+        }
+        if p.character.hp <= 0. || p.dash > 0. || p.skill_cd.contains_key(id) {
+            return;
+        }
+        if aim.x != 0. || aim.y != 0. {
+            p.face = aim;
+        }
+        let face = p.face;
+        let origin = p.character.point();
+        let zone = p.character.zone;
+        let actor = p.character.id.clone();
+        let target = p.target;
+        let melee = !matches!(skill.effect, Effect::Buff { .. } | Effect::Heal { .. });
+        // Single-target skills fizzle without spending their cooldown.
+        let single = match &skill.effect {
+            Effect::Strike { range, .. } | Effect::Chain { range, .. } => Some(*range),
+            _ => None,
+        };
+        if let Some(range) = single
+            && self.enemies_near(zone, origin, range, &[]).is_empty()
+        {
+            let p = &self.players[&session];
+            let _ = p
+                .peer
+                .try_send(json!({"type":"error","text":"No enemy in range."}));
+            return;
+        }
+        let p = self.players.get_mut(&session).unwrap();
+        p.skill_cd.insert(
+            id.to_string(),
+            skill.cooldown * p.character.cooldown_multiplier(),
+        );
+        if melee && !matches!(skill.effect, Effect::Dash { mult, .. } if mult == 0.) {
+            p.attack = 0.0001;
+            p.hit = true;
+            p.cooldown = p.cooldown.max(0.35);
+        }
+        let mut dealt = 0.;
+        let mut points: Vec<[f64; 2]> = vec![];
+        let mut healed = 0.;
+        let mut value = 0.;
+        match &skill.effect {
+            Effect::Cone { reach, dot, mult } => {
+                value = *reach;
+                let hit: Vec<_> = self
+                    .enemies_near(zone, origin, *reach, &[])
+                    .into_iter()
+                    .filter(|&i| {
+                        let s = &self.slimes[i];
+                        let d = origin.distance(s.point());
+                        let facing = origin.direction(s.point());
+                        d < 0.6 || facing.x * face.x + facing.y * face.y > *dot
+                    })
+                    .collect();
+                for i in hit {
+                    let (damage, crit) = self.roll_damage(session, *mult);
+                    dealt += self.hit_slime(i, session, damage, crit);
+                }
+            }
+            Effect::Nova { radius, mult } => {
+                value = *radius;
+                for i in self.enemies_near(zone, origin, *radius, &[]) {
+                    let (damage, crit) = self.roll_damage(session, *mult);
+                    dealt += self.hit_slime(i, session, damage, crit);
+                }
+            }
+            Effect::Volley {
+                count,
+                spread,
+                mult,
+                pierce,
+                blast,
+                color,
+                size,
+            } => {
+                let base = face.y.atan2(face.x);
+                let ring = *spread >= std::f64::consts::TAU - 0.01;
+                for n in 0..*count {
+                    let offset = if ring {
+                        n as f64 * std::f64::consts::TAU / *count as f64
+                    } else if *count > 1 {
+                        -spread / 2. + n as f64 * spread / (*count - 1) as f64
+                    } else {
+                        0.
+                    };
+                    let angle = base + offset;
+                    let (damage, crit) = self.roll_damage(session, *mult);
+                    let bolt_id = self.entity();
+                    self.bolts.push(Bolt {
+                        id: bolt_id,
+                        owner: session,
+                        zone,
+                        x: origin.x,
+                        y: origin.y,
+                        fx: angle.cos(),
+                        fy: angle.sin(),
+                        t: 0.,
+                        color: color.clone(),
+                        size: *size,
+                        damage,
+                        crit,
+                        pierce: *pierce,
+                        blast: *blast,
+                        hits: vec![],
+                    });
+                }
+                value = *count as f64;
+            }
+            Effect::Dash { speed, time, mult } => {
+                let p = self.players.get_mut(&session).unwrap();
+                p.dash_direction = face;
+                p.dash = *time;
+                p.dash_speed = *speed;
+                p.dash_mult = *mult;
+                p.dash_hits.clear();
+                p.attack = 0.;
+                p.hurt = 0.;
+                p.stop();
+                value = speed * time;
+            }
+            Effect::Strike { hits, mult, range } => {
+                value = *hits as f64;
+                for _ in 0..*hits {
+                    let Some(&i) = self.enemies_near(zone, origin, *range, &[]).first() else {
+                        break;
+                    };
+                    points.push([self.slimes[i].x, self.slimes[i].y]);
+                    let (damage, crit) = self.roll_damage(session, *mult);
+                    dealt += self.hit_slime(i, session, damage, crit);
+                }
+            }
+            Effect::Chain {
+                targets,
+                mult,
+                range,
+            } => {
+                let mut from = origin;
+                let mut hit = vec![];
+                for n in 0..*targets {
+                    let reach = if n == 0 { *range } else { 4.5 };
+                    let Some(&i) = self.enemies_near(zone, from, reach, &hit).first() else {
+                        break;
+                    };
+                    hit.push(i);
+                    from = self.slimes[i].point();
+                    points.push([from.x, from.y]);
+                    let (damage, crit) = self.roll_damage(session, *mult);
+                    dealt += self.hit_slime(i, session, damage, crit);
+                }
+            }
+            Effect::Meteor {
+                range,
+                radius,
+                mult,
+            } => {
+                let aimed = target
+                    .and_then(|i| self.slimes.get(i))
+                    .filter(|s| !s.dead && s.zone == zone && origin.distance(s.point()) <= *range)
+                    .map(|s| s.point());
+                let mut center = aimed.unwrap_or(Point {
+                    x: origin.x + face.x * range * 0.75,
+                    y: origin.y + face.y * range * 0.75,
+                });
+                self.maps[zone].collide(&mut center, 0.1);
+                points.push([center.x, center.y]);
+                value = *radius;
+                for i in self.enemies_near(zone, center, *radius, &[]) {
+                    let (damage, crit) = self.roll_damage(session, *mult);
+                    dealt += self.hit_slime(i, session, damage, crit);
+                }
+            }
+            Effect::Buff { kind, amount, time } => {
+                let p = self.players.get_mut(&session).unwrap();
+                p.buffs.retain(|b| b.id != id);
+                p.buffs.push(Buff {
+                    id: id.to_string(),
+                    kind: *kind,
+                    amount: *amount,
+                    left: *time,
+                    time: *time,
+                });
+                value = *time;
+            }
+            Effect::Heal { fraction } => {
+                let p = self.players.get_mut(&session).unwrap();
+                let before = p.character.hp;
+                p.character.hp =
+                    (before + p.character.max_hp() * fraction).min(p.character.max_hp());
+                healed = (p.character.hp - before).round();
+            }
+        }
+        if skill.lifesteal > 0. && dealt > 0. {
+            let p = self.players.get_mut(&session).unwrap();
+            let before = p.character.hp;
+            p.character.hp = (before + dealt * skill.lifesteal).min(p.character.max_hp());
+            healed = (p.character.hp - before).round();
+        }
+        let origin = self.players[&session].character.point();
+        self.emit_zone(
+            zone,
+            json!({"type":"event","kind":"skill","skill":id,"actor":actor,"x":origin.x,"y":origin.y,
+                "fx":face.x,"fy":face.y,"value":value,"crit":false,"points":points,"heal":healed}),
+        );
+    }
+    /// Enemies a damaging dash passes through, each hit once.
+    fn dash_sweep(&mut self, session: u64) {
+        let p = &self.players[&session];
+        let (point, zone, mult) = (p.character.point(), p.character.zone, p.dash_mult);
+        let skip = p.dash_hits.clone();
+        for i in self.enemies_near(zone, point, 0.9, &skip) {
+            let (damage, crit) = self.roll_damage(session, mult);
+            self.hit_slime(i, session, damage, crit);
+            if let Some(p) = self.players.get_mut(&session) {
+                p.dash_hits.push(i);
+            }
+        }
+    }
+    /// Returns the health the enemy actually lost.
+    fn hit_slime(&mut self, id: usize, session: u64, damage: f64, crit: bool) -> f64 {
+        let Some(p) = self.players.get(&session) else {
+            return 0.;
+        };
+        if p.character.hp <= 0. {
+            return 0.;
         }
         let actor = p.character.id.clone();
         let s = &mut self.slimes[id];
         if s.dead {
-            return;
+            return 0.;
         }
         if damage <= 0. {
             let point = s.point();
             self.event("miss", &actor, point, 0., false);
-            return;
+            return 0.;
         }
+        let dealt = damage.min(s.hp);
         s.hp = (s.hp - damage).max(0.);
         s.hurt_t = 0.4;
         s.target = Some(session);
@@ -1160,7 +1501,7 @@ impl World {
             self.event("slimeDie", &actor, point, 0., false);
             if levels > 0 {
                 let point = self.players[&session].character.point();
-                self.event("levelup", &actor, point, levels as f64, false);
+                self.level_up_event(&actor, point, levels);
             }
             let id = self.entity();
             let value = if gold > 0 {
@@ -1188,6 +1529,7 @@ impl World {
                 self.item_drop(&actor, zone, point, &i.id, 1);
             }
         }
+        dealt
     }
     fn item_drop(&mut self, owner: &str, zone: usize, point: Point, item_id: &str, quantity: u32) {
         let id = self.entity();
@@ -1415,7 +1757,7 @@ impl World {
         {
             return;
         }
-        let dodge_chance = p.character.dodge_chance();
+        let dodge_chance = (p.character.dodge_chance() + p.buff(BuffKind::Dodge)).min(0.95);
         let actor = p.character.id.clone();
         let point = p.character.point();
         if dodge_chance > 0. && self.random() < dodge_chance {
@@ -1424,7 +1766,11 @@ impl World {
             return;
         }
         let p = self.players.get_mut(&session).unwrap();
-        let value = (damage - p.character.stats().1).max(1.);
+        let shield = p.buff(BuffKind::Shield).min(0.8);
+        let mut value = (damage - p.character.stats().1).max(1.);
+        if shield > 0. {
+            value = (value * (1. - shield)).round().max(1.);
+        }
         p.character.hp = (p.character.hp - value).max(0.);
         p.last_hurt = self.time;
         p.hurt = 0.25;
@@ -1434,6 +1780,7 @@ impl World {
         if dead {
             p.dead_time = 0.;
             p.attack = 0.;
+            p.buffs.clear();
             p.stop();
         }
         self.event("hurt", &actor, point, value, false);
@@ -1457,23 +1804,35 @@ impl World {
             b.y += b.fy * 12. * TICK;
             b.t += TICK;
             let end = Point { x: b.x, y: b.y };
-            let first = self
+            let mut hit: Vec<_> = self
                 .slimes
                 .iter()
                 .filter(|s| {
                     !s.dead
                         && s.zone == b.zone
+                        && !b.hits.contains(&s.id)
                         && segment_distance(s.point(), start, end) < s.r + 0.22
                 })
-                .min_by(|a, c| {
-                    start
-                        .distance(a.point())
-                        .total_cmp(&start.distance(c.point()))
-                })
-                .map(|s| s.id);
-            if let Some(id) = first {
-                self.hit_slime(id, b.owner, b.damage, b.crit);
-                b.t = 1.;
+                .map(|s| (start.distance(s.point()), s.id))
+                .collect();
+            hit.sort_by(|a, c| a.0.total_cmp(&c.0));
+            if !b.pierce {
+                hit.truncate(1);
+            }
+            for (_, id) in hit {
+                b.hits.push(id);
+                if b.blast > 0. {
+                    // The explosion centres on the first enemy touched and hits everything near it.
+                    let center = self.slimes[id].point();
+                    for near in self.enemies_near(b.zone, center, b.blast, &[]) {
+                        self.hit_slime(near, b.owner, b.damage, b.crit);
+                    }
+                } else {
+                    self.hit_slime(id, b.owner, b.damage, b.crit);
+                }
+                if !b.pierce {
+                    b.t = 1.;
+                }
             }
         }
         bolts.retain(|b| b.t < 0.65);
@@ -3342,5 +3701,405 @@ mod tests {
         assert_eq!(w.players[&2].character.quantity("slime_gel"), 0);
         w.update_drops();
         assert_eq!(w.players[&1].character.gold, value);
+    }
+
+    // ---- skills ----
+    /// Parks every enemy far away with huge health so a test places only the ones it needs.
+    fn arena(w: &mut World, level: u32) -> Point {
+        for (i, s) in w.slimes.iter_mut().enumerate() {
+            s.x = 85. + (i % 8) as f64 * 1.5;
+            s.y = 5. + (i / 8) as f64 * 1.5;
+            s.hp = 1.0e6;
+        }
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.level = level;
+        p.character.attributes.accuracy = 20;
+        p.face = Point { x: 1., y: 0. };
+        p.character.point()
+    }
+    fn put(w: &mut World, i: usize, at: Point, dx: f64, dy: f64) {
+        w.slimes[i].x = at.x + dx;
+        w.slimes[i].y = at.y + dy;
+        w.slimes[i].hp = 1.0e6;
+    }
+    fn hp_lost(w: &World, i: usize) -> bool {
+        w.slimes[i].hp < 1.0e6
+    }
+    fn skill(w: &mut World, id: &str) {
+        w.use_skill(1, id, Point { x: 1., y: 0. });
+    }
+    fn events(rx: &mut mpsc::Receiver<Value>, kind: &str) -> Vec<Value> {
+        let mut found = vec![];
+        while let Ok(v) = rx.try_recv() {
+            if v["type"] == "event" && v["kind"] == kind {
+                found.push(v);
+            }
+        }
+        found
+    }
+    #[test]
+    fn skills_unlock_by_level_and_a_locked_skill_costs_nothing() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        let at = arena(&mut w, 1);
+        put(&mut w, 0, at, 1., 0.);
+        while rx.try_recv().is_ok() {}
+        skill(&mut w, "cleave");
+        let error = rx.try_recv().unwrap();
+        assert_eq!(error["text"], "Cleave unlocks at level 2.");
+        assert!(!hp_lost(&w, 0) && w.players[&1].skill_cd.is_empty());
+        w.use_skill(1, "twinbolt", Point { x: 1., y: 0. });
+        assert_eq!(rx.try_recv().unwrap()["type"], "error");
+        w.players.get_mut(&1).unwrap().character.level = 2;
+        skill(&mut w, "cleave");
+        assert!(hp_lost(&w, 0));
+        let left = w.players[&1].skill_cd["cleave"];
+        assert!((left - 3. * w.players[&1].character.cooldown_multiplier()).abs() < 1e-9);
+        assert_eq!(w.snapshot_for(0)["players"][0]["skillCd"]["cleave"], left);
+        // On cooldown: a second cast changes nothing.
+        let hp = w.slimes[0].hp;
+        skill(&mut w, "cleave");
+        assert_eq!(w.slimes[0].hp, hp);
+        for _ in 0..61 {
+            w.update_player(1);
+        }
+        assert!(w.players[&1].skill_cd.is_empty());
+    }
+    #[test]
+    fn a_dead_player_and_a_dashing_player_cannot_cast() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let at = arena(&mut w, 20);
+        put(&mut w, 0, at, 1., 0.);
+        w.players.get_mut(&1).unwrap().character.hp = 0.;
+        skill(&mut w, "whirlwind");
+        assert!(!hp_lost(&w, 0));
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.hp = 50.;
+        p.dash = 0.1;
+        skill(&mut w, "whirlwind");
+        assert!(!hp_lost(&w, 0) && w.players[&1].skill_cd.is_empty());
+    }
+    #[test]
+    fn cone_hits_the_front_arc_and_nova_hits_everything_in_radius_only() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let at = arena(&mut w, 20);
+        put(&mut w, 0, at, 1.2, 0.);
+        put(&mut w, 1, at, 0., 1.2);
+        put(&mut w, 2, at, -1.5, 0.);
+        put(&mut w, 3, at, 4., 0.);
+        skill(&mut w, "cleave");
+        assert!(hp_lost(&w, 0) && hp_lost(&w, 1));
+        assert!(!hp_lost(&w, 2) && !hp_lost(&w, 3));
+        skill(&mut w, "whirlwind");
+        assert!(hp_lost(&w, 2) && !hp_lost(&w, 3));
+        skill(&mut w, "earthshatter");
+        assert!(hp_lost(&w, 3));
+    }
+    #[test]
+    fn skill_kills_grant_the_xp_and_a_level_up_names_the_skills_it_unlocks() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Mage);
+        let at = arena(&mut w, 1);
+        let need = w.players[&1].character.xp_need();
+        w.players.get_mut(&1).unwrap().character.xp = need - 1;
+        put(&mut w, 0, at, 1., 0.);
+        w.slimes[0].hp = 1.;
+        w.hit_slime(0, 1, 5., false);
+        let ups = events(&mut rx, "levelup");
+        assert_eq!(ups.len(), 1);
+        assert_eq!(ups[0]["level"], 2);
+        assert_eq!(ups[0]["unlocked"], json!(["twinbolt"]));
+        assert_eq!(ups[0]["value"], 1.);
+        // A multi-level jump lists every skill passed.
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.level = 7;
+        let id = w.players[&1].character.id.clone();
+        w.level_up_event(&id, at, 4);
+        let ups = events(&mut rx, "levelup");
+        assert_eq!(
+            ups.last().unwrap()["unlocked"],
+            json!(["arcaneward", "fireball"])
+        );
+    }
+    #[test]
+    fn buffs_scale_damage_cut_incoming_damage_expire_and_clear_on_death() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        arena(&mut w, 20);
+        w.players.get_mut(&1).unwrap().character.attributes.accuracy = 20;
+        let plain: f64 = (0..200).map(|_| w.roll_damage(1, 1.).0).sum();
+        skill(&mut w, "battlecry");
+        assert_eq!(
+            w.snapshot_for(0)["players"][0]["buffs"][0]["id"],
+            "battlecry"
+        );
+        let buffed: f64 = (0..200).map(|_| w.roll_damage(1, 1.).0).sum();
+        assert!(buffed > plain * 1.2, "{buffed} vs {plain}");
+        // Incoming damage: 40 against the starting defence, with and without the wall.
+        let hp = |w: &mut World, shield: bool| {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.hp = p.character.max_hp();
+            p.last_hurt = -99.;
+            p.buffs.clear();
+            if shield {
+                p.skill_cd.clear();
+                skill(w, "shieldwall");
+            }
+            let before = w.players[&1].character.hp;
+            w.hurt_player(1, 40., Point::default());
+            before - w.players[&1].character.hp
+        };
+        let open = hp(&mut w, false);
+        let walled = hp(&mut w, true);
+        assert!(
+            walled > 0. && (walled - (open * 0.5).round()).abs() <= 1.,
+            "{walled} vs {open}"
+        );
+        for _ in 0..121 {
+            w.update_player(1);
+        }
+        assert!(w.players[&1].buffs.is_empty());
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        skill(&mut w, "berserk");
+        assert_eq!(w.players[&1].buff(BuffKind::Haste), 0.4);
+        w.players.get_mut(&1).unwrap().last_hurt = -99.;
+        w.hurt_player(1, 1.0e6, Point::default());
+        assert!(w.players[&1].buffs.is_empty());
+    }
+    #[test]
+    fn evasion_and_deadly_focus_raise_dodge_and_crit() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Assassin);
+        arena(&mut w, 20);
+        let base_dodge = w.players[&1].character.dodge_chance();
+        skill(&mut w, "evasion");
+        skill(&mut w, "deadlyfocus");
+        let p = &w.players[&1];
+        assert_eq!(p.buff(BuffKind::Dodge), 0.5);
+        assert_eq!(p.buff(BuffKind::Crit), 0.4);
+        assert!(base_dodge + p.buff(BuffKind::Dodge) <= 0.95 + base_dodge);
+        // Recasting refreshes rather than stacks.
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        skill(&mut w, "evasion");
+        assert_eq!(w.players[&1].buff(BuffKind::Dodge), 0.5);
+    }
+    #[test]
+    fn healing_is_capped_and_lifesteal_returns_a_share_of_damage_dealt() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        let at = arena(&mut w, 20);
+        let max = w.players[&1].character.max_hp();
+        w.players.get_mut(&1).unwrap().character.hp = 10.;
+        skill(&mut w, "secondwind");
+        assert_eq!(w.players[&1].character.hp, 10. + (max * 0.4).min(max - 10.));
+        w.players.get_mut(&1).unwrap().character.hp = max - 1.;
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        skill(&mut w, "secondwind");
+        assert_eq!(w.players[&1].character.hp, max);
+        let beat = events(&mut rx, "skill");
+        assert_eq!(beat.last().unwrap()["heal"], 1.);
+        put(&mut w, 0, at, 1., 0.);
+        w.players.get_mut(&1).unwrap().character.hp = 5.;
+        skill(&mut w, "titanswrath");
+        let dealt = 1.0e6 - w.slimes[0].hp;
+        assert!(dealt > 0.);
+        assert!((w.players[&1].character.hp - (5. + dealt * 0.25).min(max)).abs() < 1.);
+    }
+    #[test]
+    fn dashes_hit_each_enemy_once_and_blink_only_moves() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Assassin);
+        let at = arena(&mut w, 20);
+        put(&mut w, 0, at, 2., 0.);
+        w.use_skill(1, "lunge", Point { x: 1., y: 0. });
+        let mut hits = 0;
+        let mut last = 1.0e6;
+        for _ in 0..8 {
+            w.update_player(1);
+            if w.slimes[0].hp < last {
+                hits += 1;
+                last = w.slimes[0].hp;
+            }
+        }
+        assert_eq!(hits, 1, "one dash strikes an enemy once");
+        assert!(
+            w.players[&1].character.x > at.x + 1.5,
+            "the lunge moved the player"
+        );
+        assert_eq!(w.players[&1].dash, 0.);
+        let _b = join(&mut w, 2, Class::Mage);
+        let (m, start) = (2, w.players[&2].character.point());
+        w.players.get_mut(&2).unwrap().character.level = 10;
+        w.use_skill(m, "blink", Point { x: 1., y: 0. });
+        for _ in 0..4 {
+            w.update_player(2);
+        }
+        let moved = w.players[&2].character.x - start.x;
+        assert!(moved > 3., "blink travels {moved}");
+        assert_eq!(w.players[&2].dash_mult, 0.);
+        assert!(w.players[&2].attack == 0., "blink plays no attack");
+    }
+    #[test]
+    fn volleys_fire_the_right_bolts_and_fireball_explodes_on_neighbours() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Mage);
+        let at = arena(&mut w, 20);
+        skill(&mut w, "twinbolt");
+        assert_eq!(w.bolts.len(), 2);
+        assert!((w.bolts[0].fy + w.bolts[1].fy).abs() < 1e-9 && w.bolts[0].fy != 0.);
+        w.bolts.clear();
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        skill(&mut w, "barrage");
+        assert_eq!(w.bolts.len(), 5);
+        w.bolts.clear();
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        put(&mut w, 0, at, 3., 0.);
+        put(&mut w, 1, at, 3., 1.5);
+        put(&mut w, 2, at, 3., 6.);
+        skill(&mut w, "fireball");
+        for _ in 0..20 {
+            w.update_bolts();
+        }
+        assert!(
+            hp_lost(&w, 0) && hp_lost(&w, 1),
+            "the blast hits the neighbour"
+        );
+        assert!(!hp_lost(&w, 2));
+        assert!(w.bolts.is_empty());
+    }
+    #[test]
+    fn knife_ring_goes_every_direction_and_each_knife_hits_alone() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Assassin);
+        let at = arena(&mut w, 20);
+        skill(&mut w, "knifering");
+        assert_eq!(w.bolts.len(), 12);
+        let sum: (f64, f64) = w
+            .bolts
+            .iter()
+            .fold((0., 0.), |a, b| (a.0 + b.fx, a.1 + b.fy));
+        assert!(
+            sum.0.abs() < 1e-6 && sum.1.abs() < 1e-6,
+            "evenly spread: {sum:?}"
+        );
+        put(&mut w, 0, at, 0., -3.);
+        for _ in 0..20 {
+            w.update_bolts();
+        }
+        assert!(hp_lost(&w, 0));
+        assert!(w.slimes[0].hp > 1.0e6 - 1000., "only one knife reached it");
+    }
+    #[test]
+    fn strike_skills_need_an_enemy_and_flurry_lands_every_hit() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Assassin);
+        let at = arena(&mut w, 20);
+        while rx.try_recv().is_ok() {}
+        skill(&mut w, "flurry");
+        assert_eq!(rx.try_recv().unwrap()["text"], "No enemy in range.");
+        assert!(w.players[&1].skill_cd.is_empty(), "a fizzled cast is free");
+        put(&mut w, 0, at, 1.5, 0.);
+        skill(&mut w, "flurry");
+        assert!(hp_lost(&w, 0));
+        assert!(w.players[&1].skill_cd.contains_key("flurry"));
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        let mut rx2 = {
+            let (tx, rx) = mpsc::channel(256);
+            w.players.get_mut(&1).unwrap().peer = tx;
+            rx
+        };
+        skill(&mut w, "flurry");
+        let mut count = 0;
+        let mut skill_points = 0;
+        while let Ok(v) = rx2.try_recv() {
+            if v["kind"] == "hit" || v["kind"] == "miss" {
+                count += 1;
+            }
+            if v["kind"] == "skill" {
+                skill_points = v["points"].as_array().unwrap().len();
+            }
+        }
+        assert_eq!(count, 4);
+        assert_eq!(skill_points, 4);
+    }
+    #[test]
+    fn chain_lightning_jumps_to_distinct_enemies_and_meteor_lands_on_the_target() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Mage);
+        let at = arena(&mut w, 20);
+        for n in 0..6 {
+            put(&mut w, n, at, 2. + n as f64 * 2., 0.);
+        }
+        skill(&mut w, "chainlightning");
+        let lost = (0..6).filter(|&n| hp_lost(&w, n)).count();
+        assert_eq!(lost, 5, "five targets, never the same one twice");
+        let cast = events(&mut rx, "skill");
+        assert_eq!(cast.last().unwrap()["points"].as_array().unwrap().len(), 5);
+        // Meteor: centred on the selected enemy, hitting its neighbours but not distant ones.
+        for n in 0..6 {
+            put(&mut w, n, at, 40., 0.);
+        }
+        put(&mut w, 0, at, 4., 3.);
+        put(&mut w, 1, at, 5., 3.);
+        put(&mut w, 2, at, 4., -3.);
+        w.players.get_mut(&1).unwrap().target = Some(0);
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        skill(&mut w, "meteor");
+        assert!(hp_lost(&w, 0) && hp_lost(&w, 1) && !hp_lost(&w, 2));
+        // With no target it lands on the ground ahead.
+        for n in 0..6 {
+            put(&mut w, n, at, 40., 0.);
+        }
+        put(&mut w, 3, at, 4.5, 0.);
+        w.players.get_mut(&1).unwrap().target = None;
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        skill(&mut w, "meteor");
+        assert!(hp_lost(&w, 3));
+    }
+    #[test]
+    fn skills_are_zone_local_and_use_only_the_players_own_class_table() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let at = arena(&mut w, 20);
+        put(&mut w, 0, at, 1., 0.);
+        w.slimes[0].zone = 1;
+        skill(&mut w, "whirlwind");
+        assert!(!hp_lost(&w, 0), "enemies in another zone are untouched");
+        w.use_skill(1, "meteor", Point { x: 1., y: 0. });
+        assert!(
+            w.players[&1].skill_cd.contains_key("whirlwind")
+                && !w.players[&1].skill_cd.contains_key("meteor")
+        );
+    }
+    #[test]
+    fn start_level_applies_only_to_new_characters_and_defaults_to_one() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        assert_eq!(w.players[&1].character.level, 1);
+        let token = welcome["token"].as_str().unwrap().to_string();
+        w.leave(1);
+        w.start_level = 9;
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, Some(token), None, tx).unwrap();
+        assert_eq!(
+            w.players[&1].character.level, 1,
+            "a saved character is not boosted"
+        );
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(
+            2,
+            None,
+            Some(Look {
+                name: "Other".into(),
+                ..Look::default()
+            }),
+            tx,
+        )
+        .unwrap();
+        let c = &w.players[&2].character;
+        assert_eq!((c.level, c.hp), (9, c.max_hp()));
     }
 }
