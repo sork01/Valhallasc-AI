@@ -75,6 +75,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             world.start_level
         );
     }
+    // For automated tests only: players may send `debug` shortcuts (levels, items, teleports...). Never set on the public service.
+    world.test_commands = std::env::var("VALHALLA_TEST_COMMANDS").is_ok_and(|v| v == "1");
+    if world.test_commands {
+        tracing::warn!("VALHALLA_TEST_COMMANDS is on: players may use debug shortcuts");
+    }
     let (tx, rx) = mpsc::channel(1024);
     let (snap_tx, snap_rx) = watch::channel(world.snapshot());
     let (shutdown_tx, shutdown_rx) = watch::channel(false);

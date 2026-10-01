@@ -93,6 +93,7 @@ An abrupt process/machine failure can lose the last five seconds of progress. Sl
 | `VALHALLA_START_LEVEL` | `1` | New characters begin at this level (1–40) so tests can drive learned skills for real; saved characters are untouched. For automated tests only: never set it on the public service. |
 | `VALHALLA_GOD_MODE` | unset | `1` makes players take no damage (enemies still fight, levels still roll). For automated tests only: the MCP driver's private worlds and the browser suites set it; never set it on the public service. |
 | `VALHALLA_LEVEL_SPREAD` | `2` | Each enemy's level is its kind's default ± this many levels (0 pins every enemy to its default, maximum 5). Browser suites that exercise controls rather than combat set it to 0. |
+| `VALHALLA_TEST_COMMANDS` | unset | `1` lets players send `debug` shortcut messages (set level, give items, teleport, finish quests, kill enemies...). For automated tests only: the MCP driver's private worlds set it; never set it on the public service, which otherwise answers every `debug` message with an error. |
 | `RUST_LOG` | `valhalla_server=info` | Logging filter |
 
 `GET /health` reports status, protocol version, tick, online players, and connection capacity. `/ws` is the game connection. All other HTTP routes serve **only `client/`**, never server source or character data. Opening `client/index.html` directly or serving just static files does not start multiplayer.
@@ -128,7 +129,7 @@ The Ironhide Beetle follows the local makesprites/PixelFlow workflow. Run `pytho
 
 On WebSocket connection, send `{"type":"join","version":1,"token":null,"look":{"name":"Freya","class":"mage"}}`. The welcome packet returns an ID, a guest key for a newly created character, and a world snapshot. For resume, send the guest key with `look:null`; saved state takes precedence. Keep keys out of URLs and logs.
 
-Subsequent messages: `input {dx,dy}`, `stop`, `move {x,y}`, `target {id}`, `attack {fx,fy}`, `dash {dx,dy}`, `skill {id,fx,fy}`, `equip {armor,weapon}`, `allocate_stat {stat}`, `interact {npc,offer?}`, `chat {text}`, `ping {nonce}`. Direction vectors are normalized on the server. `move` chooses a destination, not a teleport. Quest acceptance and reward collection use `interact` with `offer:"quest:accept:<id>"` or `offer:"quest:claim:<id>"`. The server validates the giver, distance, living player, prerequisite completions, and recorded objectives. Player snapshots and dialogue packets include the character’s `quests` progress. Unknown command fields are refused. Server messages: `welcome`, `snapshot`, `event`, `chat`, `system`, `pong`, `dialogue`, and `error`. See `server/src/model.rs` for the exact types.
+Subsequent messages: `input {dx,dy}`, `stop`, `move {x,y}`, `target {id}`, `attack {fx,fy}`, `dash {dx,dy}`, `skill {id,fx,fy}`, `equip {armor,weapon}`, `allocate_stat {stat}`, `interact {npc,offer?}`, `chat {text}`, `ping {nonce}`, and (test servers only) `debug {ref?,command:{op,...}}`; see Test shortcuts below. Direction vectors are normalized on the server. `move` chooses a destination, not a teleport. Quest acceptance and reward collection use `interact` with `offer:"quest:accept:<id>"` or `offer:"quest:claim:<id>"`. The server validates the giver, distance, living player, prerequisite completions, and recorded objectives. Player snapshots and dialogue packets include the character’s `quests` progress. Unknown command fields are refused. Server messages: `welcome`, `snapshot`, `event`, `chat`, `system`, `pong`, `dialogue`, `debug` (the reply to a test shortcut), and `error`. See `server/src/model.rs` for the exact types.
 
 The transport uses [Axum WebSockets](https://docs.rs/axum/0.8.9/axum/extract/ws/) and [Tower HTTP static serving](https://docs.rs/tower-http/0.6.11/tower_http/services/struct.ServeDir.html). Cargo.lock pins the resolved versions.
 
@@ -156,7 +157,7 @@ npm run test:scenarios
 
 On this host, Node is at `/home/serveperry/.nvm/versions/node/v20.20.2/bin/node`. Use that absolute executable for the direct `node` commands above, or add its directory to `PATH` for npm scripts. `VALHALLA_BINARY` can select another locally built server binary; bind, database, and client directory remain controlled by the driver.
 
-On this host, the MCP is registered in `~/.codex/config.toml` as `valhallasc-testing`, with a 20-second startup timeout and a 180-second tool timeout. Restart Codex after registration to load its nine tools. To register this checkout or verify an installation again:
+On this host, the MCP is registered in `~/.codex/config.toml` as `valhallasc-testing`, with a 20-second startup timeout and a 180-second tool timeout. Restart Codex after registration to load its tools (the list is read from the server, so new tools need no re-registration). To register this checkout or verify an installation again:
 
 ```sh
 bash scripts/cargo.sh build --locked
@@ -188,10 +189,24 @@ This is a launch example; the enclosing settings format depends on your MCP clie
 | `inspect_world` | Inspect the latest snapshot or one bot, recent events, and spacing checks |
 | `wait_world` | Wait up to 30 seconds of real simulation time and inspect again |
 | `list_scenarios` / `run_scenario` | Discover/run a named scenario in a fresh world |
+| `describe_world` | Zones, NPCs and offers, portals, quests, items, skills and enemy kinds with default levels, so no world file needs reading |
+| `set_level` / `give_xp` / `set_gold` / `set_health` | Level a bot (1-100; 20 unlocks every skill) with the real level-up event, grant XP through the normal rules, set gold, set or restore hp or defeat the bot |
+| `give_item` / `take_item` / `drop_item` | Add items (bags are fitted, capacity is honoured unless `force`), remove spare copies (worn ones stay), or drop loot at the bot's feet |
+| `teleport` / `walk_to` / `talk_to` | Jump to `{x,y,zone}`, `{npc}`, `{portal}`, `{enemy}`, `{spawn}` or `{bot}`; walk there like a player along a collision-aware route; use an NPC offer, walking into range first |
+| `quest` | `accept`, `complete`, `claim`, `finish` (prerequisites, accept, complete and claim in one go) or `reset` any quest |
+| `cast_skill` | Cast a class skill, optionally at `nearest`/an enemy/a point, raising the level to unlock it and clearing cooldowns first; reports whether it went off, cooldown, buffs and which enemies lost hp |
+| `kill_enemies` / `respawn_enemy` | Defeat enemies through the real kill path (XP, quest credit, gold and loot), revive one, or call the King now |
+| `reset_character` / `set_god_mode` | Clear cooldowns, refund stat points, toggle invulnerability mid-test |
+| `setup_character` | Reach a state in one call: level, gold, items, finished quests, then a teleport target |
+| `wait_for_event` / `restart_world` / `debug_command` | Wait for a new event, restart only the private server (to check persistence), or send a raw shortcut |
 
 For interactive exploration: `start_world`, `connect_bot` with `{"bot":"Mage","class":"mage"}`, then `send_action` with `{"bot":"Mage","action":{"type":"move","x":45,"y":48}}`, `wait_world`, and `inspect_world`. A movement destination is an ordinary server action. The driver supports at most 16 bot identities, validates action schemas, and serializes MCP calls. Stop the interactive world before running a scenario. Allow at least 180 seconds for scenario calls; walking and combat happen in real time. Normal disconnect saves characters, and reusing a bot name resumes the same character and class within that world.
 
 Snapshots refresh while bots are connected; with no connected bots inspection retains the last observed snapshot. Closing MCP stdin or sending SIGINT/SIGTERM disconnects bots and stops the child server. Test databases and reports remain local and gitignored for review. The default `npm test` runs driver/MCP integration checks, all MCP scenarios, then the focused quest, inventory, and equipment/skillbar Chromium UI passes. The quest UI pass checks journal controls, focus, cards, markers, travel buttons, partial progress display, and loaded artwork. The inventory UI pass checks actual browser combat/pickup, equipment ownership, vendor selling and reload, plus isolated display fixtures for rare cross-class gear and blue repeatable markers. The equipment/bags/skillbar pass checks the nine slots, item tooltips, drag-to-equip and unequip, bag tabs, sorting, search, saved cell positions, authoritative skill cooldowns, keyboard and click activation, assignment and dragging, per-character layout persistence, chat input, and small viewport fit. The original three-player browser regression suite remains available as `npm run test:browser:full` when controls or rendering need broader coverage. No public service restart or deployment is needed for these local tools.
+
+### Test shortcuts
+
+Private worlds start Rust with `VALHALLA_TEST_COMMANDS=1`, so a bot may send `{"type":"debug","ref":1,"command":{"op":"set_level","level":20}}`. The server answers `{"type":"debug","ref":1,"ok":true,"tick":...,"result":{...}}` or `ok:false` with an error; any server without the variable answers every `debug` message with `ok:false` and changes nothing. The shortcut skips only the time it would take to reach a state: rewards, level-up events and skill unlocks, quest rules, loot, bag capacity, saves and zone filtering still run in the server (`server/src/world/debug.rs`). Operations: `set_level`, `give_xp`, `set_gold`, `set_hp`, `die`, `reset_stats`, `reset_cooldowns`, `set_god_mode`, `teleport`, `give_item`, `take_item`, `drop_item`, `quest` (accept, complete, claim, finish, reset), `kill_enemy`, `respawn_enemy` and `summon_king`. `TestWorld.debug(bot, command)` sends one and resolves once the bot's own snapshot shows the effect. `start_world` accepts `startLevel`, `godMode` and `levelSpread` (0 pins enemy levels). Delayed effects (a meteor landing, projectiles in flight) need a longer `settleMs` on `cast_skill`. The `shortcuts` scenario exercises the lot against a real server.
 
 ## Checks
 

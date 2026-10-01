@@ -415,6 +415,75 @@ pub enum ClientMessage {
     Ping {
         nonce: u64,
     },
+    /// Test-server shortcuts (VALHALLA_TEST_COMMANDS=1); every other server refuses them.
+    Debug {
+        #[serde(default, rename = "ref")]
+        reference: Option<u64>,
+        command: DebugCommand,
+    },
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
+pub enum DebugCommand {
+    SetLevel {
+        level: u32,
+    },
+    GiveXp {
+        amount: u32,
+    },
+    SetGold {
+        gold: u32,
+    },
+    SetHp {
+        hp: f64,
+    },
+    Die,
+    ResetStats,
+    ResetCooldowns,
+    SetGodMode {
+        enabled: bool,
+    },
+    Teleport {
+        zone: usize,
+        x: f64,
+        y: f64,
+    },
+    GiveItem {
+        item: String,
+        quantity: u32,
+        #[serde(default)]
+        force: bool,
+    },
+    TakeItem {
+        item: String,
+        quantity: u32,
+    },
+    DropItem {
+        item: String,
+        quantity: u32,
+    },
+    Quest {
+        id: String,
+        action: QuestDebug,
+    },
+    KillEnemy {
+        id: usize,
+    },
+    RespawnEnemy {
+        id: usize,
+    },
+    SummonKing,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum QuestDebug {
+    Accept,
+    Complete,
+    Claim,
+    Finish,
+    Reset,
 }
 
 #[derive(Clone, Deserialize)]

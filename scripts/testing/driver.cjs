@@ -23,6 +23,27 @@ const actionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('chat'), text: z.string().min(1).max(240) }).strict(),
   z.object({ type: z.literal('ping'), nonce: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER) }).strict(),
 ]);
+// Test-server shortcuts (server/src/world/debug.rs). The private worlds start Rust with VALHALLA_TEST_COMMANDS=1;
+// the public service never does, and it refuses these messages.
+const questAction = z.enum(['accept', 'complete', 'claim', 'finish', 'reset']);
+const debugSchema = z.discriminatedUnion('op', [
+  z.object({ op: z.literal('set_level'), level: z.number().int().min(1).max(100) }).strict(),
+  z.object({ op: z.literal('give_xp'), amount: z.number().int().min(0).max(4294967295) }).strict(),
+  z.object({ op: z.literal('set_gold'), gold: z.number().int().min(0).max(4294967295) }).strict(),
+  z.object({ op: z.literal('set_hp'), hp: number.positive() }).strict(),
+  z.object({ op: z.literal('die') }).strict(),
+  z.object({ op: z.literal('reset_stats') }).strict(),
+  z.object({ op: z.literal('reset_cooldowns') }).strict(),
+  z.object({ op: z.literal('set_god_mode'), enabled: z.boolean() }).strict(),
+  z.object({ op: z.literal('teleport'), zone: z.number().int().min(0), x: number, y: number }).strict(),
+  z.object({ op: z.literal('give_item'), item: z.string().max(64), quantity: z.number().int().min(1).max(9999).default(1), force: z.boolean().default(false) }).strict(),
+  z.object({ op: z.literal('take_item'), item: z.string().max(64), quantity: z.number().int().min(1).max(9999).default(1) }).strict(),
+  z.object({ op: z.literal('drop_item'), item: z.string().max(64), quantity: z.number().int().min(1).max(9999).default(1) }).strict(),
+  z.object({ op: z.literal('quest'), id: z.string().max(40), action: questAction }).strict(),
+  z.object({ op: z.literal('kill_enemy'), id: z.number().int().nonnegative() }).strict(),
+  z.object({ op: z.literal('respawn_enemy'), id: z.number().int().nonnegative() }).strict(),
+  z.object({ op: z.literal('summon_king') }).strict(),
+]);
 const botSchema = z.object({
   bot: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,15}$/),
   class: z.enum(['warrior', 'mage', 'assassin']).default('warrior'),
@@ -58,6 +79,10 @@ class TestWorld extends EventEmitter {
     this.child = null;
     this.stopping = false;
     this.runDir = null;
+    this.debugRef = 0;
+    // Optional per-world overrides, applied at every (re)launch: godMode true/false, levelSpread 0-5.
+    this.godMode = undefined;
+    this.levelSpread = undefined;
   }
   get snapshot() { return this.merged; }
   set snapshot(value) { if (value === null) { this.views.clear(); this.merged = null; } else this.merged = value; }
@@ -91,7 +116,10 @@ class TestWorld extends EventEmitter {
     const environment = { ...process.env, VALHALLA_BIND: '127.0.0.1:0', VALHALLA_DB: this.db,
       VALHALLA_CLIENT_DIR: path.join(root, 'client'), RUST_LOG: 'valhalla_server=info',
       // Test worlds are invulnerable (enemies still fight and enemy levels are still random), so scenarios never fail by dying.
-      VALHALLA_GOD_MODE: process.env.VALHALLA_GOD_MODE ?? '1' };
+      VALHALLA_GOD_MODE: this.godMode === undefined ? process.env.VALHALLA_GOD_MODE ?? '1' : this.godMode ? '1' : '0',
+      // Lets bots send `debug` shortcuts (levels, items, teleports, quests); see debug() below.
+      VALHALLA_TEST_COMMANDS: '1' };
+    if (this.levelSpread !== undefined) environment.VALHALLA_LEVEL_SPREAD = String(this.levelSpread);
     // Optional: new characters start at this level (test servers only), so learned skills can be driven for real.
     if (this.startLevel || process.env.VALHALLA_START_LEVEL) environment.VALHALLA_START_LEVEL = String(this.startLevel || process.env.VALHALLA_START_LEVEL);
     // Use the server's normal same-host origin policy for the private port.
@@ -262,6 +290,36 @@ class TestWorld extends EventEmitter {
     player.sendQueue = job.catch(() => {});
     return job;
   }
+  // One shortcut command; resolves once the bot's own snapshot shows its effect. Errors the server reports throw.
+  async debug(bot, command) {
+    this.requireRunning();
+    command = debugSchema.parse(command);
+    const player = this.bots.get(bot);
+    if (!player || player.socket?.readyState !== WebSocket.OPEN) throw Error(`Bot ${bot} is not connected.`);
+    const socket = player.socket, ref = ++this.debugRef;
+    const job = (player.sendQueue || Promise.resolve()).then(async () => {
+      const remaining = 25 - (Date.now() - (player.sentAt || 0));
+      if (remaining > 0) await delay(remaining);
+      this.requireRunning();
+      if (player.socket !== socket || socket.readyState !== WebSocket.OPEN) throw Error(`Bot ${bot} disconnected before the command was sent.`);
+      player.sentAt = Date.now();
+      socket.send(JSON.stringify({ type: 'debug', ref, command }));
+      const reply = await this.waitFor(() => this.events.find(e => e.bot === bot && e.type === 'debug' && e.ref === ref), 5000, `Debug ${command.op}`);
+      if (!reply.ok) throw Error(reply.error);
+      // The change is in the next broadcast; wait for the bot's view to pass the reply's tick.
+      await this.waitFor(() => (this.views.get(bot)?.tick ?? 0) > reply.tick, 3000, `Snapshot after ${command.op}`);
+      return { bot, op: command.op, result: reply.result, player: this.summary(bot) };
+    });
+    player.sendQueue = job.catch(() => {});
+    return job;
+  }
+  // The fields a test usually wants from a player, without the bulky inventory and look.
+  summary(bot) {
+    const p = this.player(bot);
+    if (!p) return null;
+    const { id, zone = 0, x, y, hp, maxHp, level, xp, xpNeed, gold, kills, statPoints, dead, skillCd, buffs, bagCapacity, bagUsed } = p;
+    return { id, zone, x, y, hp, maxHp, level, xp, xpNeed, gold, kills, statPoints, dead, skillCd, buffs, bagCapacity, bagUsed };
+  }
   inspect({ bot, events = 20 } = {}) {
     this.requireRunning();
     return { ...this.info(), snapshot: bot ? this.player(bot) : this.snapshot,
@@ -299,4 +357,4 @@ class TestWorld extends EventEmitter {
   }
 }
 
-module.exports = { TestWorld, root, actionSchema, botSchema, delay, spacingViolation };
+module.exports = { TestWorld, root, actionSchema, botSchema, debugSchema, delay, spacingViolation };

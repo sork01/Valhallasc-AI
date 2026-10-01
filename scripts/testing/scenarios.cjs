@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { TestWorld, root } = require('./driver.cjs');
 const { route } = require('./route.cjs');
+const kit = require('./tools.cjs');
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
@@ -532,6 +533,72 @@ const scenarios = {
       check(w.player(bot).bagCapacity === 22 && w.player(bot).bags[0] === 'linen_satchel', 'Snapshot carries the fitted bag and authoritative capacity');
       await w.restart();
       check(w.player(bot).bagCapacity === 22 && w.player(bot).bags[0] === 'linen_satchel' && w.player(bot).gold === before - 500, 'Bag ownership and payment survive restarting Rust');
+    },
+  },
+
+  shortcuts: {
+    description: 'Test-server shortcuts through the real server: level 20, gold, items, finished quests, teleport, skill casts, bulk kills, pickup, trade, a portal walk, death and respawn, and persistence across a restart.',
+    async run(w, check) {
+      await w.connect({ bot: 'Gm', class: 'warrior' });
+      check(w.player('Gm').level === 1 && w.player('Gm').gold === 0, 'A new character starts at level 1 with no gold');
+      const finished = ['slime_patrol', 'ironhide_hunt', 'king_challenge'];
+      const rewardGold = kit.quests.filter(q => finished.includes(q.id)).reduce((sum, q) => sum + q.rewardGold, 0);
+      const setup = await kit.setupCharacter(w, 'Gm', { level: 20, gold: 1000, items: [{ item: 'slime_gel', quantity: 12 }], finishQuests: ['king_challenge'], teleportTo: { spawn: 1 } });
+      const me = () => w.player('Gm');
+      check(me().level === 20 && me().hp === me().maxHp && setup.player.statPoints === 57, 'set_level reaches level 20 at full health with 57 stat points');
+      const up = await kit.waitForEvent(w, { kind: 'levelup', bot: 'Gm' }, new Set());
+      check(up.level === 20 && up.unlocked.length === 10, 'The level-up event names the ten skills it unlocks');
+      check(me().gold === 1000 + rewardGold && finished.every(id => quest(w, 'Gm', id)?.claimed), 'Finishing a quest walks its prerequisites and pays every reward once');
+      check(me().quests.find(q => q.id === 'king_challenge').completions === 1, 'A finished one-time quest records one completion');
+      check(me().zone === 1 && me().inventory.find(i => i.item === 'slime_gel').quantity === 12, 'The character stands in the Crags and holds the given items');
+      await kit.castSkill(w, 'Gm', { skill: 'battlecry' }).then(r => check(r.cast && r.buffs.some(b => b.id === 'battlecry') && r.cooldownLeft > 20, 'cast_skill casts a skill and reports its buff and cooldown'));
+      const again = await kit.castSkill(w, 'Gm', { skill: 'battlecry', settleMs: 300 });
+      check(!again.cast && again.cooldownLeft > 19, 'A repeated cast is ignored while the skill is on cooldown');
+      const reset = await kit.castSkill(w, 'Gm', { skill: 'battlecry', resetCooldown: true, settleMs: 300 });
+      check(reset.cast, 'resetCooldown allows an immediate second cast');
+      await w.connect({ bot: 'Rookie', class: 'mage' });
+      const locked = await kit.castSkill(w, 'Rookie', { skill: 'meteor', unlock: false, settleMs: 300 });
+      check(!locked.cast && locked.refused.some(t => /unlocks at level 14/.test(t)), 'The server refuses a skill above the level when unlock is off');
+      const unlocked = await kit.castSkill(w, 'Rookie', { skill: 'meteor', settleMs: 300 });
+      check(unlocked.cast && unlocked.raisedLevel && w.player('Rookie').level === 14, 'unlock raises the level to the skill requirement and casts it');
+      const xpBefore = totalXp(me()), kills = me().kills;
+      const slain = await kit.killEnemies(w, 'Gm', { kind: 'wisp', max: 3 });
+      check(slain.count === 3 && me().kills === kills + 3 && totalXp(me()) > xpBefore, 'kill_enemies defeats enemies through the real kill path with XP');
+      check(slain.dropsOnGround >= 3 && w.snapshot.drops.some(d => d.owner === me().id && d.item === 'ember_core'), 'The kills drop loot owned by the killer');
+      const dead = slain.killed[0].id;
+      await w.waitFor(() => w.snapshot.slimes.find(s => s.id === dead).dead, 2000, 'Wisp stays dead');
+      await w.debug('Gm', { op: 'respawn_enemy', id: dead });
+      await w.waitFor(() => !w.snapshot.slimes.find(s => s.id === dead).dead, 3000, 'Wisp respawns');
+      check(true, 'respawn_enemy brings a dead enemy back immediately');
+      await w.debug('Gm', { op: 'drop_item', item: 'royal_jelly', quantity: 2 });
+      await w.waitFor(() => me().inventory.some(i => i.item === 'royal_jelly' && i.quantity === 2), 6000, 'Pickup');
+      check(true, 'drop_item places loot at the feet that the owner picks up');
+      await assert.rejects(() => w.debug('Gm', { op: 'take_item', item: 'warrior_weapon_sword', quantity: 1 }), /spare|worn/, 'a worn copy stays');
+      check(true, 'take_item refuses a worn copy');
+      await assert.rejects(() => w.debug('Gm', { op: 'give_item', item: 'no_such_item', quantity: 1 }), /Unknown item/);
+      check(true, 'An unknown item is rejected');
+      await kit.teleport(w, 'Gm', { npc: 'merchant' });
+      check(me().zone === 0 && Math.hypot(me().x - kit.zones[0].npcs.find(n => n.id === 'merchant').x, me().y - kit.zones[0].npcs.find(n => n.id === 'merchant').y) < 2.5, 'teleport to an NPC lands in talking range, across zones');
+      const goldBefore = me().gold;
+      const sale = await kit.talkTo(w, 'Gm', 'merchant', 'sell:materials');
+      await w.waitFor(() => me().gold > goldBefore, 5000, 'Sale');
+      check(/sold/.test(sale.notice) && !me().inventory.some(i => i.item === 'slime_gel'), 'talk_to sells materials to the merchant');
+      await kit.teleport(w, 'Gm', { portal: 'emberfall_gate' });
+      const gate = kit.zones[0].portals.find(p => p.id === 'emberfall_gate');
+      check(me().zone === 0 && Math.hypot(me().x - gate.x, me().y - gate.y) > gate.r, 'teleport to a portal stops short of the gate');
+      await w.action('Gm', { type: 'move', x: gate.x, y: gate.y });
+      await w.waitFor(() => me().zone === 1, 10000, 'Portal');
+      check(true, 'Walking into the gate crosses into the Crags');
+      await w.debug('Gm', { op: 'die' });
+      await w.waitFor(() => me().dead, 3000, 'Defeat');
+      await kit.waitForEvent(w, { kind: 'respawn', bot: 'Gm', timeout: 8000 });
+      await w.waitFor(() => !me().dead && me().hp === me().maxHp, 3000, 'Respawn heals');
+      check(true, 'A defeated character respawns at full health');
+      const snapshot = w.summary('Gm'), history = me().quests.map(q => [q.id, q.completions]);
+      await w.restart();
+      await w.waitFor(() => w.player('Gm') && w.player('Gm').level === 20, 10000, 'Resume');
+      check(me().level === 20 && me().gold === snapshot.gold && me().zone === snapshot.zone, 'Level, gold and zone survive restarting Rust');
+      check(JSON.stringify(me().quests.map(q => [q.id, q.completions])) === JSON.stringify(history), 'Finished quests survive restarting Rust');
     },
   },
 

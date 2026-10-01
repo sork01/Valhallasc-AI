@@ -9,6 +9,8 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
+mod debug;
+
 pub type Peer = mpsc::Sender<Value>;
 const KING_SPAWN_MIN: f64 = 300.;
 const KING_SPAWN_MAX: f64 = 600.;
@@ -346,6 +348,8 @@ pub struct World {
     pub god_mode: bool,
     // Test servers only (VALHALLA_START_LEVEL): new characters begin at this level; loaded ones are untouched.
     pub start_level: u32,
+    // Test servers only (VALHALLA_TEST_COMMANDS=1): players may send `debug` shortcuts. Never set on the public service.
+    pub test_commands: bool,
 }
 impl World {
     // Production code reads VALHALLA_LEVEL_SPREAD in main; tests that want real random levels use this.
@@ -384,6 +388,7 @@ impl World {
             level_spread,
             god_mode: false,
             start_level: 1,
+            test_commands: false,
         };
         for id in 0..world.spawns.len() {
             let spawn = world.spawns[id].clone();
@@ -775,6 +780,9 @@ impl World {
             }
             ClientMessage::Ping { nonce } => {
                 let _ = p.peer.try_send(json!({"type":"pong","nonce":nonce}));
+            }
+            ClientMessage::Debug { reference, command } => {
+                self.debug(session, reference, command);
             }
             _ => {}
         }
@@ -4101,5 +4109,667 @@ mod tests {
         .unwrap();
         let c = &w.players[&2].character;
         assert_eq!((c.level, c.hp), (9, c.max_hp()));
+    }
+
+    fn debug_world() -> (World, mpsc::Receiver<Value>) {
+        let mut w = world();
+        w.test_commands = true;
+        let rx = join(&mut w, 1, Class::Warrior);
+        (w, rx)
+    }
+    fn dbg(w: &mut World, command: DebugCommand) -> Result<Value, String> {
+        w.run_debug(1, command)
+    }
+    fn ch(w: &World) -> &Character {
+        &w.players[&1].character
+    }
+    fn packets(rx: &mut mpsc::Receiver<Value>, kind: &str) -> Vec<Value> {
+        let mut found = vec![];
+        while let Ok(v) = rx.try_recv() {
+            if v["type"] == kind {
+                found.push(v);
+            }
+        }
+        found
+    }
+
+    #[test]
+    fn debug_commands_are_refused_unless_the_server_enables_them() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        assert!(!w.test_commands, "off by default");
+        w.message(
+            1,
+            serde_json::from_str(
+                r#"{"type":"debug","ref":7,"command":{"op":"set_level","level":20}}"#,
+            )
+            .unwrap(),
+        );
+        assert_eq!(ch(&w).level, 1);
+        let reply = packets(&mut rx, "debug").pop().unwrap();
+        assert_eq!(
+            (reply["ok"].clone(), reply["ref"].clone()),
+            (json!(false), json!(7))
+        );
+        w.test_commands = true;
+        w.message(
+            1,
+            serde_json::from_str(
+                r#"{"type":"debug","ref":8,"command":{"op":"set_level","level":20}}"#,
+            )
+            .unwrap(),
+        );
+        assert_eq!(ch(&w).level, 20);
+        let reply = packets(&mut rx, "debug").pop().unwrap();
+        assert_eq!(
+            (reply["ok"].clone(), reply["ref"].clone()),
+            (json!(true), json!(8))
+        );
+        // Unknown operations and fields never parse.
+        assert!(
+            serde_json::from_str::<ClientMessage>(
+                r#"{"type":"debug","command":{"op":"set_level","level":2,"hp":9}}"#
+            )
+            .is_err()
+        );
+        assert!(
+            serde_json::from_str::<ClientMessage>(r#"{"type":"debug","command":{"op":"nuke"}}"#)
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn set_level_restores_health_announces_unlocks_and_lowering_resets_trained_stats() {
+        let (mut w, mut rx) = debug_world();
+        let result = dbg(&mut w, DebugCommand::SetLevel { level: 20 }).unwrap();
+        let c = ch(&w);
+        assert_eq!((c.level, c.xp, c.hp), (20, 0, c.max_hp()));
+        assert_eq!(result["unlocked"].as_array().unwrap().len(), 10);
+        let up = packets(&mut rx, "event")
+            .into_iter()
+            .find(|e| e["kind"] == "levelup")
+            .unwrap();
+        assert_eq!(up["level"], 20);
+        w.players.get_mut(&1).unwrap().character.attributes.strength = 5;
+        dbg(&mut w, DebugCommand::SetLevel { level: 3 }).unwrap();
+        assert_eq!(ch(&w).attributes, Attributes::default());
+        assert_eq!(ch(&w).stat_points(), 6);
+        assert!(dbg(&mut w, DebugCommand::SetLevel { level: 0 }).is_err());
+        assert!(dbg(&mut w, DebugCommand::SetLevel { level: 101 }).is_err());
+        dbg(&mut w, DebugCommand::GiveXp { amount: 1_000 }).unwrap();
+        assert!(ch(&w).level > 3, "xp still levels through grant_xp");
+    }
+
+    #[test]
+    fn teleport_collides_changes_zone_and_survives_a_save() {
+        let mut w = world();
+        w.test_commands = true;
+        let (tx, _rx) = mpsc::channel(256);
+        let token = w.join(1, None, Some(Look::default()), tx).unwrap()["token"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        let near = w.maps[1].spawn;
+        let result = dbg(
+            &mut w,
+            DebugCommand::Teleport {
+                zone: 1,
+                x: near.x,
+                y: near.y,
+            },
+        )
+        .unwrap();
+        assert_eq!(result["zone"], 1);
+        assert_eq!(ch(&w).zone, 1);
+        // An obstacle centre is pushed out, a far coordinate is clamped inside the map.
+        let o = w.maps[0].objects[0].clone();
+        dbg(
+            &mut w,
+            DebugCommand::Teleport {
+                zone: 0,
+                x: o.x,
+                y: o.y,
+            },
+        )
+        .unwrap();
+        let mut again = ch(&w).point();
+        w.maps[0].collide(&mut again, PLAYER_RADIUS);
+        assert!(again.distance(ch(&w).point()) < 1e-6);
+        dbg(
+            &mut w,
+            DebugCommand::Teleport {
+                zone: 0,
+                x: 9_999.,
+                y: -9_999.,
+            },
+        )
+        .unwrap();
+        let size = w.maps[0].size as f64;
+        assert!(ch(&w).x <= size - 0.7 && ch(&w).y >= 0.7);
+        assert!(
+            dbg(
+                &mut w,
+                DebugCommand::Teleport {
+                    zone: 99,
+                    x: 5.,
+                    y: 5.
+                }
+            )
+            .is_err()
+        );
+        assert!(
+            dbg(
+                &mut w,
+                DebugCommand::Teleport {
+                    zone: 0,
+                    x: f64::NAN,
+                    y: 1.
+                }
+            )
+            .is_err()
+        );
+        dbg(
+            &mut w,
+            DebugCommand::Teleport {
+                zone: 1,
+                x: near.x,
+                y: near.y,
+            },
+        )
+        .unwrap();
+        w.leave(1);
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, Some(token), None, tx).unwrap();
+        assert_eq!(ch(&w).zone, 1, "teleport saves the character");
+    }
+
+    #[test]
+    fn give_and_take_items_respect_capacity_equipment_and_bags() {
+        let (mut w, _rx) = debug_world();
+        dbg(
+            &mut w,
+            DebugCommand::GiveItem {
+                item: "slime_gel".into(),
+                quantity: 30,
+                force: false,
+            },
+        )
+        .unwrap();
+        assert_eq!(ch(&w).quantity("slime_gel"), 30);
+        assert!(
+            dbg(
+                &mut w,
+                DebugCommand::GiveItem {
+                    item: "nope".into(),
+                    quantity: 1,
+                    force: false
+                }
+            )
+            .is_err()
+        );
+        assert!(
+            dbg(
+                &mut w,
+                DebugCommand::GiveItem {
+                    item: "slime_gel".into(),
+                    quantity: 0,
+                    force: false
+                }
+            )
+            .is_err()
+        );
+        // Fill every cell: more distinct items than the 16-cell backpack exist, so the last ones are refused.
+        let all: Vec<String> = ITEMS
+            .iter()
+            .filter(|i| i.kind != "bag")
+            .map(|i| i.id.clone())
+            .collect();
+        for id in &all {
+            let _ = dbg(
+                &mut w,
+                DebugCommand::GiveItem {
+                    item: id.clone(),
+                    quantity: 1,
+                    force: false,
+                },
+            );
+        }
+        assert_eq!(
+            ch(&w).bag_used(),
+            ch(&w).bag_capacity(),
+            "bags fill to capacity and stop"
+        );
+        let missing = all
+            .iter()
+            .find(|id| ch(&w).quantity(id) == 0)
+            .unwrap()
+            .clone();
+        assert!(
+            dbg(
+                &mut w,
+                DebugCommand::GiveItem {
+                    item: missing.clone(),
+                    quantity: 1,
+                    force: false
+                }
+            )
+            .is_err()
+        );
+        // A fitted bag is a bag, not a stack, adds its cells even when the pack is full, and stops at four.
+        dbg(
+            &mut w,
+            DebugCommand::GiveItem {
+                item: "linen_satchel".into(),
+                quantity: 1,
+                force: false,
+            },
+        )
+        .unwrap();
+        assert_eq!(ch(&w).bag_capacity(), 22);
+        dbg(
+            &mut w,
+            DebugCommand::GiveItem {
+                item: missing.clone(),
+                quantity: 1,
+                force: false,
+            },
+        )
+        .unwrap();
+        for _ in 0..3 {
+            dbg(
+                &mut w,
+                DebugCommand::GiveItem {
+                    item: "linen_satchel".into(),
+                    quantity: 1,
+                    force: false,
+                },
+            )
+            .unwrap();
+        }
+        assert_eq!(ch(&w).bag_capacity(), 16 + 4 * 6);
+        assert!(
+            dbg(
+                &mut w,
+                DebugCommand::GiveItem {
+                    item: "linen_satchel".into(),
+                    quantity: 1,
+                    force: false
+                }
+            )
+            .is_err()
+        );
+        // Force ignores capacity: with every cell used, a stack of a new item still lands.
+        let stuffed = ITEMS
+            .iter()
+            .find(|i| i.kind == "material")
+            .unwrap()
+            .id
+            .clone();
+        dbg(
+            &mut w,
+            DebugCommand::GiveItem {
+                item: stuffed.clone(),
+                quantity: 5,
+                force: true,
+            },
+        )
+        .unwrap();
+        assert!(ch(&w).quantity(&stuffed) >= 5);
+        // A bag cannot be taken while its cells hold items.
+        for id in &all {
+            let _ = dbg(
+                &mut w,
+                DebugCommand::GiveItem {
+                    item: id.clone(),
+                    quantity: 1,
+                    force: true,
+                },
+            );
+        }
+        dbg(
+            &mut w,
+            DebugCommand::TakeItem {
+                item: "linen_satchel".into(),
+                quantity: 1,
+            },
+        )
+        .ok();
+        assert!(ch(&w).bag_used() <= ch(&w).bag_capacity());
+        // Worn copies cannot be taken; spare ones can.
+        let worn = ch(&w).look.warrior_weapon.clone();
+        let worn_id = equipment(Class::Warrior, "weapon", &worn)
+            .unwrap()
+            .id
+            .clone();
+        let owned = ch(&w).quantity(&worn_id);
+        assert!(
+            dbg(
+                &mut w,
+                DebugCommand::TakeItem {
+                    item: worn_id.clone(),
+                    quantity: owned
+                }
+            )
+            .is_err(),
+            "the worn copy stays"
+        );
+        dbg(
+            &mut w,
+            DebugCommand::TakeItem {
+                item: worn_id.clone(),
+                quantity: owned - 1,
+            },
+        )
+        .unwrap();
+        assert_eq!(ch(&w).quantity(&worn_id), 1);
+        let gel = ch(&w).quantity("slime_gel");
+        dbg(
+            &mut w,
+            DebugCommand::TakeItem {
+                item: "slime_gel".into(),
+                quantity: gel,
+            },
+        )
+        .unwrap();
+        assert_eq!(ch(&w).quantity("slime_gel"), 0);
+        assert!(ch(&w).inventory.iter().all(|s| s.quantity > 0));
+    }
+
+    #[test]
+    fn dropped_items_are_collected_through_the_ordinary_pickup() {
+        let (mut w, _rx) = debug_world();
+        dbg(
+            &mut w,
+            DebugCommand::DropItem {
+                item: "royal_jelly".into(),
+                quantity: 2,
+            },
+        )
+        .unwrap();
+        assert_eq!(w.drops.len(), 1);
+        for _ in 0..60 {
+            w.step();
+        }
+        assert_eq!(ch(&w).quantity("royal_jelly"), 2);
+    }
+
+    #[test]
+    fn finishing_a_quest_walks_its_prerequisites_and_pays_each_reward_once() {
+        let (mut w, _rx) = debug_world();
+        let chain: Vec<_> = w.maps[0]
+            .quests
+            .iter()
+            .map(|q| (q.id.clone(), q.requires.clone()))
+            .collect();
+        let (deep, _) = chain.iter().find(|(_, r)| r.is_some()).unwrap().clone();
+        let result = dbg(
+            &mut w,
+            DebugCommand::Quest {
+                id: deep.clone(),
+                action: QuestDebug::Finish,
+            },
+        )
+        .unwrap();
+        let claimed: Vec<_> = result["claimed"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_str().unwrap().to_owned())
+            .collect();
+        assert!(
+            claimed.len() >= 2 && claimed.last() == Some(&deep),
+            "prerequisites first, then the quest"
+        );
+        let reward_gold: u32 = w.maps[0]
+            .quests
+            .iter()
+            .filter(|q| claimed.contains(&q.id))
+            .map(|q| q.reward_gold)
+            .sum();
+        assert_eq!(ch(&w).gold, reward_gold);
+        for id in &claimed {
+            let q = ch(&w).quests.iter().find(|q| &q.id == id).unwrap();
+            assert!(q.claimed && q.completions == 1);
+        }
+        // Finishing a one-time quest twice pays nothing more.
+        dbg(
+            &mut w,
+            DebugCommand::Quest {
+                id: deep.clone(),
+                action: QuestDebug::Finish,
+            },
+        )
+        .unwrap();
+        assert_eq!(ch(&w).gold, reward_gold);
+        // A repeatable quest pays again on every finish.
+        let repeat = w.maps[0]
+            .quests
+            .iter()
+            .find(|q| q.repeatable)
+            .unwrap()
+            .id
+            .clone();
+        dbg(
+            &mut w,
+            DebugCommand::Quest {
+                id: repeat.clone(),
+                action: QuestDebug::Finish,
+            },
+        )
+        .unwrap();
+        let once = ch(&w)
+            .quests
+            .iter()
+            .find(|q| q.id == repeat)
+            .unwrap()
+            .completions;
+        dbg(
+            &mut w,
+            DebugCommand::Quest {
+                id: repeat.clone(),
+                action: QuestDebug::Finish,
+            },
+        )
+        .unwrap();
+        assert_eq!(
+            ch(&w)
+                .quests
+                .iter()
+                .find(|q| q.id == repeat)
+                .unwrap()
+                .completions,
+            once + 1
+        );
+        dbg(
+            &mut w,
+            DebugCommand::Quest {
+                id: repeat.clone(),
+                action: QuestDebug::Reset,
+            },
+        )
+        .unwrap();
+        assert!(ch(&w).quests.iter().all(|q| q.id != repeat));
+        assert!(
+            dbg(
+                &mut w,
+                DebugCommand::Quest {
+                    id: "nope".into(),
+                    action: QuestDebug::Finish
+                }
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn quest_steps_follow_the_real_rules_one_at_a_time() {
+        let (mut w, _rx) = debug_world();
+        let (id, needs) = w.maps[0]
+            .quests
+            .iter()
+            .find(|q| q.requires.is_some())
+            .map(|q| (q.id.clone(), q.requires.clone().unwrap()))
+            .unwrap();
+        assert!(
+            dbg(
+                &mut w,
+                DebugCommand::Quest {
+                    id: id.clone(),
+                    action: QuestDebug::Accept
+                }
+            )
+            .is_err(),
+            "accept still needs the prerequisite"
+        );
+        dbg(
+            &mut w,
+            DebugCommand::Quest {
+                id: needs.clone(),
+                action: QuestDebug::Accept,
+            },
+        )
+        .unwrap();
+        assert!(
+            dbg(
+                &mut w,
+                DebugCommand::Quest {
+                    id: needs.clone(),
+                    action: QuestDebug::Claim
+                }
+            )
+            .is_err(),
+            "claim needs filled objectives"
+        );
+        dbg(
+            &mut w,
+            DebugCommand::Quest {
+                id: needs.clone(),
+                action: QuestDebug::Complete,
+            },
+        )
+        .unwrap();
+        let q = ch(&w).quests.iter().find(|q| q.id == needs).unwrap();
+        assert!(!q.claimed);
+        dbg(
+            &mut w,
+            DebugCommand::Quest {
+                id: needs.clone(),
+                action: QuestDebug::Claim,
+            },
+        )
+        .unwrap();
+        dbg(
+            &mut w,
+            DebugCommand::Quest {
+                id: id.clone(),
+                action: QuestDebug::Accept,
+            },
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn kill_enemy_uses_the_real_kill_path_for_xp_quests_and_loot() {
+        let (mut w, _rx) = debug_world();
+        let target = w.slimes.iter().find(|s| s.kind == "green").unwrap().id;
+        let zone = w.slimes[target].zone;
+        let at = w.slimes[target].point();
+        dbg(
+            &mut w,
+            DebugCommand::Teleport {
+                zone,
+                x: at.x + 3.,
+                y: at.y,
+            },
+        )
+        .unwrap();
+        let bounty = w.maps[0]
+            .quests
+            .iter()
+            .find(|q| q.objectives.iter().any(|o| o.kind == "kill"))
+            .unwrap()
+            .id
+            .clone();
+        dbg(
+            &mut w,
+            DebugCommand::Quest {
+                id: bounty.clone(),
+                action: QuestDebug::Accept,
+            },
+        )
+        .ok();
+        let (xp, kills) = (ch(&w).xp, ch(&w).kills);
+        dbg(&mut w, DebugCommand::KillEnemy { id: target }).unwrap();
+        assert!(w.slimes[target].dead);
+        assert_eq!(ch(&w).kills, kills + 1);
+        assert!(ch(&w).xp > xp);
+        assert!(
+            w.drops
+                .iter()
+                .any(|d| d.item.as_deref() == Some("slime_gel")),
+            "material drops for the killer"
+        );
+        assert!(
+            dbg(&mut w, DebugCommand::KillEnemy { id: target }).is_err(),
+            "already dead"
+        );
+        assert!(dbg(&mut w, DebugCommand::KillEnemy { id: 99_999 }).is_err());
+        let far = w.slimes.iter().find(|s| s.zone == 1).unwrap().id;
+        assert!(
+            dbg(&mut w, DebugCommand::KillEnemy { id: far }).is_err(),
+            "other zones are out of reach"
+        );
+        dbg(&mut w, DebugCommand::RespawnEnemy { id: target }).unwrap();
+        w.step();
+        assert!(!w.slimes[target].dead);
+        assert!(
+            dbg(&mut w, DebugCommand::RespawnEnemy { id: target }).is_err(),
+            "alive already"
+        );
+    }
+
+    #[test]
+    fn king_can_be_summoned_once_and_never_respawned_by_id() {
+        let (mut w, _rx) = debug_world();
+        let king = w.slimes.iter().find(|s| s.kind == "big").unwrap().id;
+        assert!(dbg(&mut w, DebugCommand::RespawnEnemy { id: king }).is_err());
+        dbg(&mut w, DebugCommand::SummonKing).unwrap();
+        w.step();
+        assert_eq!(
+            w.slimes
+                .iter()
+                .filter(|s| s.kind == "big" && !s.dead)
+                .count(),
+            1
+        );
+        assert!(dbg(&mut w, DebugCommand::SummonKing).is_err());
+    }
+
+    #[test]
+    fn die_hp_cooldowns_stats_and_god_mode_shortcuts() {
+        let (mut w, _rx) = debug_world();
+        dbg(&mut w, DebugCommand::SetLevel { level: 20 }).unwrap();
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .skill_cd
+            .insert("whirlwind".into(), 9.);
+        w.players.get_mut(&1).unwrap().cooldown = 5.;
+        dbg(&mut w, DebugCommand::ResetCooldowns).unwrap();
+        assert!(w.players[&1].skill_cd.is_empty() && w.players[&1].cooldown == 0.);
+        dbg(&mut w, DebugCommand::Die).unwrap();
+        assert!(ch(&w).hp <= 0.);
+        assert!(dbg(&mut w, DebugCommand::Die).is_err());
+        assert!(dbg(&mut w, DebugCommand::SetHp { hp: 0. }).is_err());
+        dbg(&mut w, DebugCommand::SetHp { hp: 1e9 }).unwrap();
+        assert_eq!(ch(&w).hp, ch(&w).max_hp(), "revives and clamps to max");
+        dbg(&mut w, DebugCommand::SetGold { gold: 777 }).unwrap();
+        assert_eq!(ch(&w).gold, 777);
+        w.players.get_mut(&1).unwrap().character.attributes.strength = 4;
+        dbg(&mut w, DebugCommand::ResetStats).unwrap();
+        assert_eq!(ch(&w).stat_points(), 57);
+        assert!(!w.god_mode);
+        dbg(&mut w, DebugCommand::SetGodMode { enabled: true }).unwrap();
+        assert!(w.god_mode);
     }
 }

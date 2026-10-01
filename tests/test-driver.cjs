@@ -62,7 +62,7 @@ test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and pare
     for (const name of ['start_world', 'stop_world', 'connect_bot', 'disconnect_bot', 'send_action', 'inspect_world', 'wait_world', 'list_scenarios', 'run_scenario']) {
       assert.ok(listed.tools.some(t => t.name === name), `Advertises ${name}`);
     }
-    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['skills', 'movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'stats', 'crags', 'bags']);
+    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['skills', 'movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'stats', 'crags', 'bags', 'shortcuts']);
     const first = await call('start_world');
     url = first.url;
     assert.match(url, /^http:\/\/127\.0\.0\.1:\d+\/$/);
@@ -99,4 +99,74 @@ test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and pare
     }
     assert.equal(alive, false, 'MCP parent disconnect stops the private Rust server');
   }
+});
+
+test('MCP shortcuts: every tool advertised, strict inputs, and server-side effects through the real transport', { timeout: 60000 }, async () => {
+  const client = new Client({ name: 'valhallasc-shortcuts', version: '1.0.0' });
+  await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe' }));
+  const raw = async (name, args = {}) => client.callTool({ name, arguments: args });
+  const call = async (name, args = {}) => {
+    const result = await raw(name, args);
+    assert.ok(!result.isError, `${name}: ${JSON.stringify(result.content)}`);
+    return result.structuredContent;
+  };
+  try {
+    const names = (await client.listTools()).tools.map(t => t.name);
+    for (const name of ['restart_world', 'describe_world', 'set_level', 'give_xp', 'set_gold', 'set_health', 'give_item', 'take_item', 'drop_item', 'teleport', 'walk_to', 'talk_to', 'quest',
+      'cast_skill', 'reset_character', 'kill_enemies', 'respawn_enemy', 'set_god_mode', 'setup_character', 'wait_for_event', 'debug_command']) assert.ok(names.includes(name), `Advertises ${name}`);
+    const catalog = await call('describe_world', { what: 'quests' });
+    assert.ok(catalog.quests.length >= 5 && catalog.quests.every(q => q.id && q.objectives.length));
+    assert.ok((await call('describe_world', { what: 'skills' })).skills.length >= 30);
+    await call('start_world', { startLevel: 3, levelSpread: 0, godMode: false });
+    await call('connect_bot', { bot: 'Gm', class: 'assassin' });
+    assert.equal((await call('inspect_world', { bot: 'Gm', events: 0 })).snapshot.level, 3, 'start_world honours startLevel');
+    // Inputs are strict: unknown fields, impossible levels and bad targets never reach the server.
+    for (const [name, args] of [['set_level', { bot: 'Gm', level: 0 }], ['set_level', { bot: 'Gm', level: 5, hp: 1 }], ['teleport', { bot: 'Gm', to: { zone: 1, x: 'a', y: 2 } }],
+      ['debug_command', { bot: 'Gm', command: { op: 'nuke' } }], ['give_item', { bot: 'Gm', item: 'x', quantity: 0 }]]) assert.equal((await raw(name, args)).isError, true, `${name} rejects ${JSON.stringify(args)}`);
+    assert.equal((await raw('give_item', { bot: 'Gm', item: 'no_such_item' })).isError, true, 'Unknown items are server errors');
+    assert.equal((await raw('teleport', { bot: 'Gm', to: { npc: 'nobody' } })).isError, true);
+    const leveled = await call('set_level', { bot: 'Gm', level: 20 });
+    assert.equal(leveled.player.level, 20);
+    assert.equal(leveled.unlocked.length, 9, 'Levels 4-20 unlock nine skills; the level-2 skill was already known at level 3');
+    const hurt = await call('set_health', { bot: 'Gm', hp: 5 });
+    assert.ok(hurt.player.hp >= 5 && hurt.player.hp < 10, 'hp is set (natural regeneration adds a few tenths before the snapshot)');
+    assert.equal((await call('set_health', { bot: 'Gm', hp: 1e9 })).player.hp, leveled.player.maxHp);
+    await call('give_xp', { bot: 'Gm', amount: 100000 });
+    assert.ok((await call('inspect_world', { bot: 'Gm', events: 0 })).snapshot.level > 20);
+    await call('set_gold', { bot: 'Gm', gold: 123 });
+    await call('give_item', { bot: 'Gm', item: 'linen_satchel' });
+    const stacked = await call('give_item', { bot: 'Gm', item: 'ember_core', quantity: 4 });
+    assert.equal(stacked.owned, 4);
+    assert.equal(stacked.bagCapacity, 22);
+    assert.equal((await call('take_item', { bot: 'Gm', item: 'ember_core', quantity: 4 })).owned, 0);
+    const finished = await call('quest', { bot: 'Gm', id: 'king_challenge', action: 'finish' });
+    assert.deepEqual(finished.claimed, ['slime_patrol', 'ironhide_hunt', 'king_challenge']);
+    assert.equal((await call('quest', { bot: 'Gm', id: 'meadow_bounty', action: 'complete' })).quest.counts[0], 8);
+    const moved = await call('teleport', { bot: 'Gm', to: { spawn: 1 } });
+    assert.equal(moved.player.zone, 1);
+    assert.equal(moved.player.x, 48);
+    const cast = await call('cast_skill', { bot: 'Gm', skill: 'evasion' });
+    assert.equal(cast.cast, true);
+    assert.ok(cast.buffs.some(b => b.id === 'evasion'));
+    assert.equal((await call('cast_skill', { bot: 'Gm', skill: 'twinbolt' }).catch(e => ({ error: e.message }))).error?.includes('not a assassin skill'), true);
+    assert.equal((await call('reset_character', { bot: 'Gm' })).player.skillCd.evasion, undefined);
+    const slain = await call('kill_enemies', { bot: 'Gm', kind: 'wisp', max: 2 });
+    assert.equal(slain.count, 2);
+    assert.ok(slain.xpGained > 0 || slain.levelsGained > 0);
+    // God mode is off in this world, so the bot can be defeated for real and then respawns.
+    await call('set_health', { bot: 'Gm', defeat: true });
+    assert.equal((await call('inspect_world', { bot: 'Gm', events: 0 })).snapshot.dead, true);
+    const respawn = await call('wait_for_event', { type: 'event', kind: 'respawn', bot: 'Gm', timeout: 8000 });
+    assert.equal(respawn.received, true);
+    assert.equal((await call('set_god_mode', { bot: 'Gm', enabled: true })).godMode, true);
+    const setup = await call('setup_character', { bot: 'Gm', level: 7, gold: 50, items: [{ item: 'slime_gel', quantity: 3 }], teleportTo: { npc: 'healer' } });
+    assert.equal(setup.player.level, 7);
+    assert.equal(setup.player.zone, 0);
+    assert.ok(setup.steps.includes('teleport'));
+    const talked = await call('talk_to', { bot: 'Gm', npc: 'healer' });
+    assert.ok(talked.offers.length > 0);
+    await call('restart_world');
+    assert.equal((await call('inspect_world', { bot: 'Gm', events: 0 })).snapshot.level, 7);
+    await call('stop_world');
+  } finally { await client.close(); }
 });
