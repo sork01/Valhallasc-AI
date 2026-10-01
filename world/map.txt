@@ -1434,19 +1434,13 @@
       "x": 43,
       "y": 84.5,
       "color": "#859563",
-      "dialogue": "Bring me Slime Gel, Ironhide Shells, Royal Jelly, or spare equipment from the meadow. I buy loot from every class. Your equipped items are protected. Need more space? I sell satchels and traveler packs. Four bags can be carried alongside your backpack; a larger pack upgrades your smallest bag when all four slots are filled.",
+      "dialogue": "Bring me meadow materials or spare equipment. I buy loot from every class and protect equipped items. I sell six-slot Linen Satchels for 500 gold each. Carry up to four beside your backpack.",
       "offers": [
         {
           "id": "satchel",
-          "label": "Buy Adventurer Satchel \u00b7 8 extra bag slots",
-          "cost": 24,
-          "bag": "adventurer_satchel"
-        },
-        {
-          "id": "pack",
-          "label": "Buy Traveler Pack \u00b7 16 extra bag slots",
-          "cost": 60,
-          "bag": "traveler_pack"
+          "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+          "cost": 500,
+          "bag": "linen_satchel"
         }
       ],
       "buys": true

@@ -191,10 +191,86 @@ pub struct Character {
     pub equipment: std::collections::BTreeMap<String, String>,
     #[serde(default)]
     pub bags: Vec<String>,
+    #[serde(default)]
+    pub attributes: Attributes,
+}
+/// Permanently trained points. Base class combat values stay unchanged until trained.
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
+#[serde(default)]
+pub struct Attributes {
+    pub strength: u32,
+    pub agility: u32,
+    pub intellect: u32,
+    pub stamina: u32,
+    pub dexterity: u32,
+    pub accuracy: u32,
 }
 impl Character {
     pub fn max_hp(&self) -> f64 {
-        self.look.class.health() + (self.level - 1) as f64 * 20.
+        self.look.class.health()
+            + self.level.saturating_sub(1) as f64 * 20.
+            + self.attributes.stamina as f64 * 8.
+    }
+    pub fn stat_points(&self) -> u32 {
+        let a = &self.attributes;
+        self.level
+            .saturating_sub(1)
+            .saturating_mul(3)
+            .saturating_sub(
+                a.strength
+                    .saturating_add(a.agility)
+                    .saturating_add(a.intellect)
+                    .saturating_add(a.stamina)
+                    .saturating_add(a.dexterity)
+                    .saturating_add(a.accuracy),
+            )
+    }
+    pub fn allocate_stat(&mut self, stat: &str) -> Result<(), &'static str> {
+        if self.hp <= 0. {
+            return Err("You cannot train stats while defeated.");
+        }
+        if self.stat_points() == 0 {
+            return Err("Level up to earn more stat points.");
+        }
+        if (stat == "accuracy" && self.attributes.accuracy >= 20)
+            || (stat == "dexterity" && self.attributes.dexterity >= 70)
+        {
+            return Err("That stat has reached its maximum. Choose another stat.");
+        }
+        let value = match stat {
+            "strength" => &mut self.attributes.strength,
+            "agility" => &mut self.attributes.agility,
+            "intellect" => &mut self.attributes.intellect,
+            "stamina" => &mut self.attributes.stamina,
+            "dexterity" => &mut self.attributes.dexterity,
+            "accuracy" => &mut self.attributes.accuracy,
+            _ => return Err("Unknown stat."),
+        };
+        *value += 1;
+        if stat == "stamina" {
+            self.hp = (self.hp + 8.).min(self.max_hp());
+        }
+        Ok(())
+    }
+    pub fn crit_chance(&self) -> f64 {
+        ((if self.look.class == Class::Assassin {
+            0.28
+        } else {
+            0.14
+        }) + self.attributes.agility as f64 * 0.005)
+            .min(0.60)
+    }
+    pub fn cooldown_multiplier(&self) -> f64 {
+        1. - (self.attributes.intellect as f64 * 0.01).min(0.30)
+    }
+    pub fn dodge_chance(&self) -> f64 {
+        (self.attributes.dexterity as f64 * 0.005).min(0.35)
+    }
+    pub fn hit_chance(&self) -> f64 {
+        (0.90 + self.attributes.accuracy as f64 * 0.005).min(1.)
+    }
+    pub fn attack_cooldown(&self) -> f64 {
+        (self.look.class.cooldown() * self.cooldown_multiplier()).max(self.look.class.duration())
     }
     pub fn xp_need(&self) -> u32 {
         (160. * (self.level as f64).powf(1.35)).round() as u32
@@ -317,6 +393,9 @@ pub enum ClientMessage {
         weapon: Option<String>,
         #[serde(default)]
         slots: std::collections::BTreeMap<String, String>,
+    },
+    AllocateStat {
+        stat: String,
     },
     Interact {
         npc: String,

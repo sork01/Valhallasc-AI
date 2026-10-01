@@ -155,6 +155,7 @@
   const characterClass = () => isMage() ? MageSprite : isAssassin() ? AssassinSprite : WarriorSprite;
   const mageGear = () => MageSprite.equipment(hero.look);
   const equipmentStats = () => {
+    if (Number.isFinite(hero.attack) && Number.isFinite(hero.defense)) return { attack: hero.attack, defense: hero.defense };
     if (!isModular()) return { attack: 22 + hero.level * 4, defense: 0 };
     const C = characterClass(), gear = C.equipment(hero.look);
     const item = (kind, variant) => WORLD_ITEMS.find(i => i.class === hero.look.class && i.kind === kind && i.variant === variant);
@@ -310,6 +311,7 @@
     const selectedTarget = hero.target?.id;
     const wasDead = hero.dead;
     applyActor(hero, own, initial);
+    window.Attributes?.update(own);
     window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || []);
     window.Quests?.update(own.quests || []);
     if (wasDead !== hero.dead) say(hero.dead ? 'death' : 'respawn');
@@ -357,6 +359,7 @@
       burst(event.x, event.y, 12, 7, ['#fff4e0', '#cfb5fa']);
     }
     if (event.kind === 'hurt') floater(event.x, event.y, '-' + event.value, '#ff8b9b', false);
+    if (event.kind === 'miss' || event.kind === 'dodge') floater(event.x, event.y, event.kind === 'miss' ? 'Miss' : 'Dodge', '#e5e5d2', false);
     if (event.kind === 'itemPickup') { floater(event.x, event.y, `+${event.quantity} ${event.name}`, '#64b5ff', false); if(event.actor === Online.id) say('pickup'); }
     if (event.kind === 'pickup') floater(event.x, event.y, '+' + event.value + ' gold', '#ffe066', false);
     if (event.kind === 'levelup') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); floater(event.x, event.y, 'Level up!', '#ffe066', true); }

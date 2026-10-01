@@ -254,5 +254,13 @@
     "rarity": "common",
     "sell": 0,
     "bagSlots": 16
+  },
+  {
+    "id": "linen_satchel",
+    "name": "Linen Satchel",
+    "kind": "bag",
+    "rarity": "common",
+    "sell": 0,
+    "bagSlots": 6
   }
 ]

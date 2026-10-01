@@ -120,7 +120,7 @@ impl Character {
                 })
                 .min_by_key(|(_, size)| *size)
                 .map(|(n, _)| n)
-                .ok_or("All four bag slots are filled. Choose a larger bag to upgrade.")?;
+                .ok_or("All four expansion bag slots are filled.")?;
             self.bags[index] = id.into();
         }
         self.gold -= cost;
@@ -261,6 +261,26 @@ impl Character {
     }
     pub fn stats(&self) -> (f64, f64) {
         let (mut attack, mut defense) = self.look.stats(self.level);
+        let a = &self.attributes;
+        attack += a.strength as f64
+            * if self.look.class == Class::Warrior {
+                2.
+            } else {
+                0.5
+            }
+            + a.agility as f64
+                * if self.look.class == Class::Assassin {
+                    2.
+                } else {
+                    0.5
+                }
+            + a.intellect as f64
+                * if self.look.class == Class::Mage {
+                    2.
+                } else {
+                    0.5
+                };
+        defense += a.strength as f64 * 0.2;
         for id in self.equipment.values() {
             if let Some(i) = item(id) {
                 attack += i.attack;
@@ -304,6 +324,66 @@ mod tests {
             .create(Look::default(), Point::default())
             .unwrap()
             .0
+    }
+    #[test]
+    fn every_attribute_has_a_combat_effect_and_classes_have_specialties() {
+        for class in [Class::Warrior, Class::Mage, Class::Assassin] {
+            let mut c = character();
+            c.look.class = class;
+            c.grant_xp(568);
+            let attack = c.stats().0;
+            let defense = c.stats().1;
+            let hp = c.max_hp();
+            for stat in [
+                "strength",
+                "agility",
+                "intellect",
+                "stamina",
+                "dexterity",
+                "accuracy",
+            ] {
+                c.allocate_stat(stat).unwrap();
+            }
+            assert_eq!(c.stat_points(), 0);
+            assert_eq!(c.stats().0, attack + 3.);
+            assert_eq!(c.stats().1, defense + 0.2);
+            assert_eq!(c.max_hp(), hp + 8.);
+            assert_eq!(c.hp, c.max_hp());
+            assert!(c.dodge_chance() > 0. && c.hit_chance() > 0.90);
+            assert!(c.attack_cooldown() < class.cooldown());
+            assert!(c.crit_chance() > if class == Class::Assassin { 0.28 } else { 0.14 });
+            assert!(c.allocate_stat("stamina").is_err());
+        }
+    }
+    #[test]
+    fn trained_chances_are_capped_and_dead_players_cannot_train() {
+        let mut c = character();
+        c.grant_xp(160);
+        c.hp = 0.;
+        assert!(c.allocate_stat("stamina").is_err());
+        assert_eq!(c.attributes.stamina, 0);
+        c.attributes.accuracy = 200;
+        c.attributes.dexterity = 200;
+        c.attributes.agility = 200;
+        c.attributes.intellect = 200;
+        assert_eq!(c.hit_chance(), 1.);
+        assert_eq!(c.dodge_chance(), 0.35);
+        assert_eq!(c.crit_chance(), 0.60);
+        assert_eq!(c.cooldown_multiplier(), 0.70);
+        assert!(c.attack_cooldown() >= c.look.class.duration());
+    }
+    #[test]
+    fn capped_attributes_cannot_consume_more_points() {
+        let mut c = character();
+        c.level = 100;
+        c.attributes.accuracy = 20;
+        c.attributes.dexterity = 70;
+        let before = c.stat_points();
+        assert!(c.allocate_stat("accuracy").is_err());
+        assert!(c.allocate_stat("dexterity").is_err());
+        assert_eq!(c.stat_points(), before);
+        c.allocate_stat("intellect").unwrap();
+        assert_eq!(c.stat_points(), before - 1);
     }
     #[test]
     fn loot_rates_and_pool_cover_every_class_and_slot() {

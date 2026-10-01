@@ -51,6 +51,13 @@ async function call(name, args = {}) {
   check(await page.locator('#npc-quests [data-quest="welcome"]').textContent().then(t => t.includes('In progress')), 'NPC card reflects accepted state');
   await page.locator('#npc-close').click();
   await page.waitForFunction(() => document.getElementById('quest-tracker').textContent.includes('Speak to Sister Elara: 0/1'));
+  check(await page.locator('.tracker-quest[data-quest="welcome"] .tracker-objective').count() === 3, 'Tracker gives each objective its own indented line');
+  const trackerBounds = await page.locator('#quest-tracker').boundingBox();
+  check(trackerBounds.x > 720, 'Objective tracker sits on the right side of the world');
+  await page.getByRole('button', { name: 'Collapse quest tracker' }).click();
+  check(await page.locator('.tracker-list').isHidden(), 'Quest tracker collapses without opening the journal');
+  await page.getByRole('button', { name: 'Expand quest tracker' }).click();
+  check(await page.locator('.tracker-list').isVisible(), 'Collapsed tracker can be expanded');
   check(await page.evaluate(() => Quests.marker('healer') === '◆'), 'NPC quest objective marker is active');
   await page.keyboard.press('q');
   const welcome = page.locator('#quest-list [data-quest="welcome"]');
@@ -63,6 +70,21 @@ async function call(name, args = {}) {
   await page.waitForFunction(() => document.querySelector('#quest-list [data-quest="welcome"]').textContent.includes('Speak to Sister Elara: 1/1'));
   check(await welcome.textContent().then(t => t.includes('Speak to Bram: 0/1')), 'Journal displays authoritative partial progress');
   await page.screenshot({ path: path.join(world.artifacts, 'quest-progress.png') });
+  await page.keyboard.press('Escape');
+  check(await page.locator('.tracker-objective.complete').count() === 1, 'Completed objectives are visibly marked in green');
+  // Display-only ledger fixture checks multiple objectives without forging combat.
+  const fixture = await browser.newPage({ viewport: { width: 1440, height: 900 }, bypassCSP: true });
+  await fixture.goto(new URL('health', world.url).href);
+  await fixture.setContent('<main id="stage" class="stage" data-scene="game"><section id="quest-tracker" class="quest-tracker"></section><div id="quest-journal" hidden><div id="quest-list"></div><button id="quest-close"></button></div><div id="pause" hidden></div><div id="equipment" hidden></div></main>');
+  await fixture.addStyleTag({ path: path.join(root, 'client/style.css') });
+  await fixture.addStyleTag({ path: path.join(root, 'client/online.css') });
+  await fixture.addScriptTag({ path: path.join(root, 'client/world.js') });
+  await fixture.evaluate(() => { window.Online = { connected: true }; window.Field = { hero: { dead: false }, setPaused: () => {} }; window.City = { open: false }; });
+  await fixture.addScriptTag({ path: path.join(root, 'client/quests.js') });
+  await fixture.evaluate(() => Quests.update([{ id: 'welcome', counts: [1, 0, 0], claimed: false, completions: 0 }, { id: 'slime_patrol', counts: [2], claimed: false, completions: 0 }, { id: 'meadow_bounty', counts: [8], claimed: false, completions: 0 }]));
+  check(await fixture.locator('.tracker-quest').count() === 3, 'Tracker displays all active quests together');
+  check(await fixture.locator('.tracker-quest[data-quest="meadow_bounty"] .complete').textContent().then(t => t.includes('Return to Linden')), 'Completed quests display their turn-in destination');
+  await fixture.screenshot({ path: path.join(world.artifacts, 'quest-tracker.png') });
   check(await page.evaluate(() => !!Field.warriorSprites.source.parts.body && Field.beetleSprites.img.beetle.complete), 'Character and enemy artwork load');
   check(errors.length === 0, `No browser runtime errors: ${errors.join('; ')}`);
   console.log(`${checks} focused quest UI checks passed; screenshots: ${world.artifacts}`);

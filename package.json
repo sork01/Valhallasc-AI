@@ -8,7 +8,7 @@
     "test:scenarios": "node scripts/test-via-mcp.cjs run all",
     "test:mcp": "node scripts/test-mcp.cjs",
     "world": "node scripts/sync-world.cjs",
-    "check": "node --check client/city.js && node --check client/field.js && node --check client/game.js && node --check client/quests.js && node --check client/inventory.js && node --check client/items.js && node --check client/online.js && node --check client/skillbar.js",
+    "check": "node --check client/attributes.js && node --check client/city.js && node --check client/field.js && node --check client/game.js && node --check client/quests.js && node --check client/inventory.js && node --check client/items.js && node --check client/online.js && node --check client/skillbar.js",
     "test:ui": "node tests/quest-ui.cjs && node tests/inventory-ui.cjs && node tests/equipment-skills-ui.cjs",
     "test:browser:full": "node tests/multiplayer.cjs"
   },

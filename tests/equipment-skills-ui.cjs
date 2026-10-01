@@ -29,6 +29,9 @@ async function call(name, args = {}) {
   check(await page.locator('[data-slot="chest"] b').textContent() === 'Apprentice Robes', 'Existing armor fills Chest');
   check(await page.locator('[data-slot="hands"] b').textContent() === 'Ash Staff', 'Existing weapon fills Hands');
   check(await page.locator('#field-headgear option').count() === 1, 'Unowned headgear is unavailable');
+  check(await page.locator('#character-attributes .attribute-row').count() === 6, 'Character window displays all six trainable stats');
+  check(await page.locator('#character-attributes .attribute-add:disabled').count() === 6, 'Level one cannot spend points it has not earned');
+  check(await page.locator('#character-attributes').textContent().then(t => t.includes('Hit 90%') && t.includes('Dodge 0%')), 'Character window displays authoritative hit and dodge');
   check(await page.locator('#inventory-list .bag-cell').count() === 16, 'Backpack displays sixteen cells');
   check(await page.locator('#inventory-list .inventory-item').count() === 0, 'Equipped copies do not occupy bag cells');
   await page.locator('[data-slot="hands"] .gear-icon').dragTo(page.locator('#inventory-list [data-position="7"]'));
@@ -154,6 +157,22 @@ async function call(name, args = {}) {
     document.getElementById('character-subtitle').textContent = 'Moonleaf · Level 6 Mage';
     document.getElementById('equipment-stats').textContent = 'Attack: 60 · Defense: 16';
   });
+  await fixture.addScriptTag({ path: path.join(root, 'client/attributes.js') });
+  await fixture.evaluate(() => {
+    window.Online.send = action => { sent.push(action); return true; };
+    window.statFixture = { id: 'display-only', look: { class: 'mage' }, level: 3, attributes: { strength: 0, agility: 0, intellect: 0, stamina: 0, dexterity: 0, accuracy: 0 }, statPoints: 6, dead: false, hitChance: .9, dodgeChance: 0, critChance: .14, attackCooldown: .7 };
+    Attributes.update(statFixture);
+  });
+  check(await fixture.locator('[data-stat="intellect"] b').textContent() === 'Intellect 0 ★', 'Mage specialty is marked and each stat explains its benefit');
+  check(await fixture.locator('.attribute-add:enabled').count() === 6, 'Earned points enable all six stat choices');
+  await fixture.getByRole('button', { name: 'Increase Dexterity' }).click();
+  check(await fixture.evaluate(() => sent.at(-1).type === 'allocate_stat' && sent.at(-1).stat === 'dexterity'), 'Training sends only the requested stat to the server');
+  check(await fixture.locator('[data-stat="dexterity"] b').textContent() === 'Dexterity 0', 'UI waits for the authoritative allocation');
+  await fixture.evaluate(() => { statFixture.attributes.dexterity = 1; statFixture.statPoints = 5; statFixture.dodgeChance = .005; Attributes.update(statFixture); });
+  check(await fixture.locator('#character-attributes').textContent().then(t => t.includes('Dexterity 1') && t.includes('5 points available') && t.includes('Dodge 0.5%')), 'Confirmed training updates point balance and dodge');
+  await fixture.evaluate(() => { statFixture.dead = true; Attributes.update(statFixture); });
+  check(await fixture.locator('.attribute-add:disabled').count() === 6, 'Dead characters cannot train');
+  await fixture.evaluate(() => { statFixture.dead = false; Attributes.update(statFixture); sent = []; });
   check(await fixture.locator('#bag-tabs .bag-tab[data-locked="false"]').count() === 2, 'An owned expansion pack provides a second bag');
   await fixture.locator('#bag-tabs [data-bag="1"]').click();
   check(await fixture.locator('#inventory-list .inventory-item').count() === 8, 'Overflow bag displays the remaining stacks');
@@ -174,6 +193,7 @@ async function call(name, args = {}) {
     const cv = document.getElementById('equipmentcv'); cv.width = 320; cv.height = 420;
     const g = cv.getContext('2d'); g.translate(160, 365); sprite.draw(g, { fx: 1, fy: 1, walk: 0 }, 0, 2.8);
   }, world.url);
+  check(await fixture.locator('.equipment-workspace').evaluate(n => n.scrollHeight <= n.clientHeight + 2), 'Character art, gear and stats fit without clipping the window header');
   await fixture.screenshot({ path: path.join(world.artifacts, 'character-full-bags.png') });
   await fixture.setViewportSize({ width: 800, height: 500 });
   const windows = await fixture.locator('.equipment-workspace').boundingBox();

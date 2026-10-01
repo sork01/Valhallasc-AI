@@ -280,6 +280,36 @@ const scenarios = {
       check(count('slime_gel') === 0 && w.player(bot).gold === sale.gold, 'Sale and item removal survive restart');
     },
   },
+  stats: {
+    description: 'Earn a level through real quests and combat, train stats, reject overspending, and resume saved allocations.',
+    async run(w, check) {
+      const bot = 'StatMage'; await w.connect({ bot, class: 'mage' });
+      check(w.player(bot).statPoints === 0 && w.player(bot).hitChance === .9, 'New characters have no free training points and 90% hit chance');
+      await w.action(bot, { type: 'allocate_stat', stat: 'intellect' });
+      await w.waitFor(() => w.events.some(e => e.type === 'error' && e.text.includes('Level up')));
+      check(w.player(bot).attributes.intellect === 0, 'The server rejects spending points before leveling');
+      await tour(w, bot);
+      await talk(w, bot, 'gatekeeper', 'quest:accept:slime_patrol');
+      for (let i = 0; i < 6; i++) await defeat(w, bot, 'green');
+      await talk(w, bot, 'gatekeeper', 'quest:claim:slime_patrol');
+      await w.waitFor(() => w.player(bot).level === 2 && w.player(bot).statPoints === 3);
+      check(w.player(bot).statPoints === 3, 'A real combat and quest level earns three points');
+      const before = { ...w.player(bot) };
+      for (const stat of ['intellect', 'dexterity', 'accuracy']) {
+        await w.action(bot, { type: 'allocate_stat', stat });
+        await w.waitFor(() => w.player(bot).attributes[stat] === 1);
+      }
+      const trained = w.player(bot);
+      check(trained.attack === before.attack + 2 && trained.attackCooldown < before.attackCooldown, 'Mage intellect improves damage and recovery');
+      check(trained.dodgeChance === .005 && trained.hitChance === .905, 'Dexterity and Accuracy change authoritative dodge and hit chances');
+      check(trained.statPoints === 0, 'All three training points are consumed');
+      await w.action(bot, { type: 'allocate_stat', stat: 'stamina' });
+      await w.advance(150);
+      check(w.player(bot).attributes.stamina === 0, 'Further training cannot overspend points');
+      await w.restart();
+      check(w.player(bot).statPoints === 0 && w.player(bot).attributes.intellect === 1 && w.player(bot).attributes.dexterity === 1 && w.player(bot).attributes.accuracy === 1, 'Allocations and remaining points survive a real restart');
+    },
+  },
   bags: {
     description: 'Earn expansion-bag gold through real quests and combat, buy a bag from Linden, and verify authoritative capacity and persistence.',
     async run(w, check) {
@@ -292,21 +322,38 @@ const scenarios = {
       check(refused.notice.includes('gold') && w.player(bot).bags.length === 0, 'Insufficient funds do not grant a bag');
       await tour(w, bot);
       const count = id => w.player(bot).inventory.find(s => s.item === id)?.quantity || 0;
-      for (let i = 0; w.player(bot).gold + count('slime_gel') * 3 < 24 && i < 4; i++) {
+      await talk(w, bot, 'gatekeeper', 'quest:accept:slime_patrol');
+      for (let i = 0; w.player(bot).gold + count('slime_gel') * 3 < 500 && i < 75; i++) {
+        while (w.player(bot).statPoints > 0) {
+          const trained = w.player(bot).attributes.intellect;
+          await w.action(bot, { type: 'allocate_stat', stat: 'intellect' });
+          await w.waitFor(() => w.player(bot).attributes.intellect > trained);
+        }
         await defeat(w, bot, 'green');
         const corpse = w.snapshot.slimes.filter(s => s.dead && s.kind === 'green').sort((a, b) => distance(w.player(bot), a) - distance(w.player(bot), b))[0];
         await walkTo(w, bot, corpse);
         await w.advance(600);
+        if (quest(w, bot, 'slime_patrol').counts[0] === 6 && !quest(w, bot, 'slime_patrol').claimed) {
+          await talk(w, bot, 'gatekeeper', 'quest:claim:slime_patrol');
+          await w.waitFor(() => quest(w, bot, 'slime_patrol').claimed);
+          await talk(w, bot, 'merchant', 'quest:accept:meadow_bounty');
+          await w.waitFor(() => !!quest(w, bot, 'meadow_bounty'));
+        }
+        if (quest(w, bot, 'meadow_bounty')?.counts[0] === 8) {
+          await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
+          await talk(w, bot, 'merchant', 'sell:materials');
+          if (w.player(bot).gold < 500) await talk(w, bot, 'merchant', 'quest:accept:meadow_bounty');
+        }
       }
       await talk(w, bot, 'merchant', 'sell:materials');
-      await w.waitFor(() => w.player(bot).gold >= 24);
+      await w.waitFor(() => w.player(bot).gold >= 500);
       const before = w.player(bot).gold;
       const purchase = await talk(w, bot, 'merchant', 'satchel');
       await w.waitFor(() => w.player(bot).bags.length === 1);
-      check(purchase.notice.includes('24 bag slots') && w.player(bot).gold === before - 24, 'Earned gold purchases eight additional slots');
-      check(w.player(bot).bagCapacity === 24 && w.player(bot).bags[0] === 'adventurer_satchel', 'Snapshot carries the fitted bag and authoritative capacity');
+      check(purchase.notice.includes('22 bag slots') && w.player(bot).gold === before - 500, 'Earned gold purchases six additional slots for 500 gold');
+      check(w.player(bot).bagCapacity === 22 && w.player(bot).bags[0] === 'linen_satchel', 'Snapshot carries the fitted bag and authoritative capacity');
       await w.restart();
-      check(w.player(bot).bagCapacity === 24 && w.player(bot).bags[0] === 'adventurer_satchel' && w.player(bot).gold === before - 24, 'Bag ownership and payment survive restarting Rust');
+      check(w.player(bot).bagCapacity === 22 && w.player(bot).bags[0] === 'linen_satchel' && w.player(bot).gold === before - 500, 'Bag ownership and payment survive restarting Rust');
     },
   },
 

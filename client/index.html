@@ -101,7 +101,7 @@
     <button id="equipment-open" class="inventory-open" type="button">Character · E</button>
     <button id="inventory-open" class="bags-open" type="button" aria-label="Open bags (B or I)"><svg viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"><path d="M18 20c0-17 28-17 28 0M12 21h40l3 31H9z"/><path d="M10 32h44M25 26v12h14V26" stroke-width="3"/></svg><kbd>B</kbd></button>
     <button id="city-travel" class="city-travel" type="button">Visit Alderhaven ↓</button>
-    <button id="quest-tracker" class="quest-tracker" type="button" aria-label="Open quest journal"></button>
+    <section id="quest-tracker" class="quest-tracker" aria-label="Quest objectives"></section>
     <p class="hud-hint" data-i18n="fieldHint">Click to move or attack · WASD to walk · Space to swing · Esc for menu</p>
     <div class="dead-msg" id="dead-msg" hidden><b data-i18n="defeated">Defeated!</b><span data-i18n="defeatedSub">You wake up back at the start…</span></div>
 
@@ -175,6 +175,7 @@
           </div>
           <p class="character-instructions">Drag gear onto a slot · Right-click a slot to unequip</p>
           <p id="equipment-stats" class="character-stats"></p>
+          <section id="character-attributes" class="character-attributes" aria-label="Train character stats"></section>
         </section>
         <section class="rpg-window bag-window">
           <header class="rpg-titlebar">
@@ -192,7 +193,7 @@
           <div id="inventory-list" class="bag-grid" role="group" aria-label="Bag slots"></div>
           <div id="bag-details" class="bag-details" aria-live="polite"></div>
           <footer class="bag-footer"><span id="bag-capacity"></span><span id="bag-gold" class="bag-gold"></span></footer>
-          <p class="bag-instructions">Right-click gear to equip · Drag to move · Buy larger bags from Linden</p>
+          <p class="bag-instructions">Right-click gear to equip · Drag to move · Six-slot bags: 500 gold at Linden</p>
         </section>
       </div>
     </div>
@@ -230,6 +231,7 @@
 <script src="world.js"></script>
 <script src="items.js"></script>
 <script src="inventory.js"></script>
+<script src="attributes.js"></script>
 <script src="online.js"></script>
 <script src="city.js"></script>
 <script src="quests.js"></script>

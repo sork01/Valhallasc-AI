@@ -81,6 +81,7 @@ impl Player {
         let c = &self.character;
         json!({"id":c.id,"look":c.look,"x":c.x,"y":c.y,"r":PLAYER_RADIUS,"hp":c.hp,"maxHp":c.max_hp(),"level":c.level,
             "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"quests":c.quests,"inventory":c.inventory,"equipment":c.equipment,"bags":c.bags,"bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used(),"fx":self.face.x,"fy":self.face.y,
+            "attributes":c.attributes,"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd})
     }
@@ -498,7 +499,7 @@ impl World {
                 };
                 p.face = p.dash_direction;
                 p.dash = 0.18;
-                p.dash_cd = 1.2;
+                p.dash_cd = 1.2 * p.character.cooldown_multiplier();
                 p.attack = 0.;
                 p.hurt = 0.;
                 p.stop();
@@ -528,6 +529,12 @@ impl World {
                     self.save();
                 }
             }
+            ClientMessage::AllocateStat { stat } => match p.character.allocate_stat(&stat) {
+                Ok(()) => self.save(),
+                Err(text) => {
+                    let _ = p.peer.try_send(json!({"type":"error","text":text}));
+                }
+            },
             ClientMessage::Interact { npc, offer } => {
                 self.interact(session, &npc, offer.as_deref());
             }
@@ -698,7 +705,7 @@ impl World {
         }
         p.attack = 0.0001;
         p.hit = false;
-        p.cooldown = p.character.look.class.cooldown();
+        p.cooldown = p.character.attack_cooldown();
         let kind = if p.character.look.class == Class::Mage {
             "cast"
         } else {
@@ -839,8 +846,14 @@ impl World {
         let class = p.character.look.class;
         let base = p.character.stats().0;
         let reach = class.reach();
-        let crit = self.random() < if class == Class::Assassin { 0.28 } else { 0.14 };
-        let damage = (base * (0.8 + self.random() * 0.4) * if crit { 2. } else { 1. }).round();
+        let crit_chance = p.character.crit_chance();
+        let hit_chance = p.character.hit_chance();
+        let crit = self.random() < crit_chance;
+        let damage = if self.random() < hit_chance {
+            (base * (0.8 + self.random() * 0.4) * if crit { 2. } else { 1. }).round()
+        } else {
+            0.
+        };
         if class == Class::Mage {
             let id = self.entity();
             self.bolts.push(Bolt {
@@ -884,6 +897,11 @@ impl World {
         let actor = p.character.id.clone();
         let s = &mut self.slimes[id];
         if s.dead {
+            return;
+        }
+        if damage <= 0. {
+            let point = s.point();
+            self.event("miss", &actor, point, 0., false);
             return;
         }
         s.hp = (s.hp - damage).max(0.);
@@ -1139,7 +1157,7 @@ impl World {
         }
     }
     fn hurt_player(&mut self, session: u64, damage: f64, _from: Point) {
-        let Some(p) = self.players.get_mut(&session) else {
+        let Some(p) = self.players.get(&session) else {
             return;
         };
         if p.character.hp <= 0.
@@ -1149,6 +1167,15 @@ impl World {
         {
             return;
         }
+        let dodge_chance = p.character.dodge_chance();
+        let actor = p.character.id.clone();
+        let point = p.character.point();
+        if dodge_chance > 0. && self.random() < dodge_chance {
+            self.players.get_mut(&session).unwrap().last_hurt = self.time;
+            self.event("dodge", &actor, point, 0., false);
+            return;
+        }
+        let p = self.players.get_mut(&session).unwrap();
         let value = (damage - p.character.stats().1).max(1.);
         p.character.hp = (p.character.hp - value).max(0.);
         p.last_hurt = self.time;
@@ -1224,7 +1251,7 @@ impl World {
                             if !p.character.can_collect(id) {
                                 if self.time - p.bag_notice_at >= 5. {
                                     p.bag_notice_at = self.time;
-                                    let _ = p.peer.try_send(json!({"type":"system","text":"Your bags are full. Sell loot or buy a larger bag from Linden. This item stays on the ground until it expires."}));
+                                    let _ = p.peer.try_send(json!({"type":"system","text":"Your bags are full. Sell loot or fit an extra six-slot bag from Linden. This item stays on the ground until it expires."}));
                                 }
                                 continue;
                             }
@@ -1581,23 +1608,96 @@ mod tests {
         let (tx, _rx) = mpsc::channel(256);
         let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
         let token = welcome["token"].as_str().unwrap();
-        w.players.get_mut(&1).unwrap().character.gold = 100;
+        assert_eq!(
+            w.map
+                .npcs
+                .iter()
+                .find(|n| n.id == "merchant")
+                .unwrap()
+                .offers
+                .len(),
+            1
+        );
+        w.players.get_mut(&1).unwrap().character.gold = 1100;
         w.interact(1, "merchant", Some("satchel"));
         assert!(w.players[&1].character.bags.is_empty());
         quest_interact(&mut w, "merchant", Some("satchel"));
-        assert_eq!(w.players[&1].character.gold, 76);
+        assert_eq!(w.players[&1].character.gold, 600);
+        assert_eq!(w.players[&1].character.bag_capacity(), 22);
         assert_eq!(
             w.store.load(token).unwrap().unwrap().bags,
-            vec!["adventurer_satchel"]
+            vec!["linen_satchel"]
         );
         w.interact(1, "merchant", Some("satchel"));
         assert_eq!(w.players[&1].character.bags.len(), 1);
         quest_interact(&mut w, "merchant", Some("pack"));
-        assert_eq!(w.players[&1].character.bag_capacity(), 40);
-        assert_eq!(w.players[&1].character.gold, 16);
+        assert_eq!(w.players[&1].character.bag_capacity(), 22);
+        assert_eq!(w.players[&1].character.gold, 600);
         quest_interact(&mut w, "merchant", Some("satchel"));
         assert_eq!(w.players[&1].character.bags.len(), 2);
-        assert_eq!(w.players[&1].character.gold, 16);
+        assert_eq!(w.players[&1].character.gold, 100);
+        quest_interact(&mut w, "merchant", Some("satchel"));
+        assert_eq!(w.players[&1].character.bags.len(), 2);
+        assert_eq!(w.players[&1].character.gold, 100);
+    }
+    #[test]
+    fn stat_training_is_authoritative_and_saves_immediately() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap();
+        w.message(
+            1,
+            ClientMessage::AllocateStat {
+                stat: "strength".into(),
+            },
+        );
+        assert_eq!(w.players[&1].character.attributes.strength, 0);
+        w.players.get_mut(&1).unwrap().character.grant_xp(160);
+        for stat in ["fake", "strength", "stamina", "accuracy", "dexterity"] {
+            w.message(1, ClientMessage::AllocateStat { stat: stat.into() });
+        }
+        let c = &w.players[&1].character;
+        assert_eq!(c.stat_points(), 0);
+        assert_eq!(c.attributes.strength, 1);
+        assert_eq!(c.attributes.dexterity, 0);
+        assert_eq!(c.max_hp(), 148.);
+        let saved = w.store.load(token).unwrap().unwrap();
+        assert_eq!(saved.attributes, c.attributes);
+        assert_eq!(saved.stat_points(), 0);
+        let snapshot = w.players[&1].snapshot();
+        assert_eq!(snapshot["statPoints"], 0);
+        assert_eq!(snapshot["hitChance"], c.hit_chance());
+        assert_eq!(snapshot["attack"], c.stats().0);
+    }
+    #[test]
+    fn misses_do_not_damage_or_reward_and_dexterity_avoids_real_damage() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let before = w.slimes[0].hp;
+        w.hit_slime(0, 1, 0., true);
+        assert_eq!(w.slimes[0].hp, before);
+        assert_eq!(w.players[&1].character.kills, 0);
+        assert_eq!(w.players[&1].character.xp, 0);
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .attributes
+            .dexterity = 70;
+        let mut dodges = 0;
+        let mut hits = 0;
+        for _ in 0..12 {
+            w.time += 1.;
+            let before = w.players[&1].character.hp;
+            w.hurt_player(1, 5., Point::default());
+            if w.players[&1].character.hp == before {
+                dodges += 1;
+            } else {
+                hits += 1;
+            }
+        }
+        assert!(dodges > 0 && hits > 0);
     }
     #[test]
     fn mob_drops_include_all_class_upgrades_and_collected_items_save() {

@@ -78,6 +78,7 @@ impl Store {
             inventory: vec![],
             equipment: Default::default(),
             bags: vec![],
+            attributes: Default::default(),
         };
         c.seed_inventory();
         self.db.execute(
@@ -146,6 +147,28 @@ mod tests {
         assert_ne!(stored, token);
     }
 
+    #[test]
+    fn old_characters_receive_points_for_existing_levels_once() {
+        let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();
+        let (mut c, token) = s.create(Look::default(), Point::default()).unwrap();
+        c.grant_xp(568);
+        let mut old = serde_json::to_value(&c).unwrap();
+        old.as_object_mut().unwrap().remove("attributes");
+        s.db.execute(
+            "UPDATE characters SET state=?1 WHERE id=?2",
+            params![old.to_string(), c.id],
+        )
+        .unwrap();
+        let mut restored = s.load(&token).unwrap().unwrap();
+        assert_eq!(restored.stat_points(), 6);
+        restored.allocate_stat("dexterity").unwrap();
+        restored.allocate_stat("accuracy").unwrap();
+        s.save_many(std::iter::once(&restored)).unwrap();
+        let resumed = s.load(&token).unwrap().unwrap();
+        assert_eq!(resumed.stat_points(), 4);
+        assert_eq!(resumed.attributes.dexterity, 1);
+        assert_eq!(resumed.attributes.accuracy, 1);
+    }
     #[test]
     fn existing_characters_without_quests_still_resume() {
         let s = Store::open(std::path::Path::new(":memory:")).unwrap();

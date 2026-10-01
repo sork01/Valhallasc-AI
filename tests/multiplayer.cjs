@@ -161,6 +161,13 @@ const { route } = require('../scripts/testing/route.cjs');
   const killed=await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return {x:s.x,y:s.y};},target.id);
   await mage.evaluate(p=>Online.send({type:'move',...p}),killed);
   await mage.waitForFunction(()=>Field.hero.gold>0,null,{timeout:15000});
+  // Recover through the real town service before the long journey to Ironhide.
+  await walkTo(mage, map.npcs.find(n => n.id === 'healer'));
+  await mage.evaluate(() => Online.send({ type: 'interact', npc: 'healer', offer: 'blessing' }));
+  await mage.waitForFunction(() => Field.hero.hp === Field.hero.maxHp);
+  await mage.locator('#npc-dialogue').waitFor({ state: 'visible' });
+  await mage.locator('#npc-close').click();
+  await walkTo(mage, { x: 7, y: 64 });
   // Approach and fight an Ironhide with real movement/target commands and unchanged HP.
   const beetleState=await mage.evaluate(()=>({start:{x:Field.hero.x,y:Field.hero.y},enemy:Field.slimes.find(s=>s.kind==='beetle'&&s.hx===18&&s.hy===42),kills:Field.hero.kills,xp:Field.hero.xp,gold:Field.hero.gold}));
   const pickupStart=mage.pickups.length, mageId=await mage.evaluate(()=>Online.id);

@@ -2,7 +2,7 @@
 (() => {
   const $ = id => document.getElementById(id);
   const definitions = WORLD_MAP.quests || [];
-  let progress = [], signature = '', tracked = null, previousFocus = null;
+  let progress = [], signature = '', tracked = null, previousFocus = null, collapsed = false;
   const state = quest => progress.find(p => p.id === quest.id);
   const giver = quest => WORLD_MAP.npcs.find(n => n.id === quest.npc);
   function status(quest) {
@@ -52,16 +52,32 @@
     return node;
   }
   function render() {
-    const selected = definitions.find(q => q.id === tracked && ['ready', 'active'].includes(status(q)))
-      || definitions.find(q => status(q) === 'ready') || definitions.find(q => status(q) === 'active')
-      || definitions.find(q => status(q) === 'available');
+    const active = definitions.filter(q => ['ready', 'active'].includes(status(q)));
+    active.sort((a, b) => Number(b.id === tracked) - Number(a.id === tracked) || Number(status(b) === 'ready') - Number(status(a) === 'ready'));
     const tracker = $('quest-tracker');
-    tracker.replaceChildren(element('b', 'Quest Journal · Q'));
-    if (selected) {
-      tracker.append(element('span', selected.title));
-      tracker.append(element('small', status(selected) === 'ready' ? `Return to ${giver(selected).name} for your reward`
-        : status(selected) === 'available' ? `Speak to ${giver(selected).name} in Alderhaven` : objectives(selected).join(' · ')));
-    } else tracker.append(element('small', 'All stories complete. Visit Linden for another bounty.'));
+    const header = element('div', '', 'tracker-heading');
+    const journal = button(`Quests (${active.length}) · Q`, show); journal.className = 'tracker-journal';
+    const toggle = button(collapsed ? '+' : '−', () => { collapsed = !collapsed; render(); $('quest-tracker').querySelector('.tracker-toggle').focus(); }); toggle.className = 'tracker-toggle';
+    toggle.setAttribute('aria-label', collapsed ? 'Expand quest tracker' : 'Collapse quest tracker'); toggle.setAttribute('aria-expanded', String(!collapsed));
+    header.append(journal, toggle); tracker.replaceChildren(header);
+    const list = element('div', '', 'tracker-list'); list.hidden = collapsed;
+    for (const quest of active) {
+      const row = element('div', '', 'tracker-quest'); row.dataset.quest = quest.id;
+      const title = button(quest.title, () => { tracked = quest.id; show(); }); title.className = 'tracker-title';
+      row.append(title);
+      if (status(quest) === 'ready') row.append(element('small', `✓ Return to ${giver(quest).name} for your reward`, 'tracker-objective complete'));
+      else quest.objectives.forEach((o, i) => {
+        const count = Math.min(state(quest)?.counts[i] || 0, o.count), done = count >= o.count;
+        row.append(element('small', `${done ? '✓' : '•'} ${o.label}: ${count}/${o.count}`, `tracker-objective${done ? ' complete' : ''}`));
+      });
+      list.append(row);
+    }
+    if (!active.length) {
+      const next = definitions.find(q => status(q) === 'available');
+      if (next) list.append(element('span', next.title, 'tracker-title'), element('small', `Speak to ${giver(next).name} in Alderhaven`, 'tracker-objective'));
+      else list.append(element('small', 'All stories complete. Visit Linden for another bounty.', 'tracker-objective'));
+    }
+    tracker.append(list);
     if (open()) $('quest-list').replaceChildren(...definitions.map(q => card(q, false)));
   }
   function open() { return !$('quest-journal').hidden; }
@@ -75,7 +91,7 @@
     $('quest-journal').hidden = true;
     if (resume) { Field.setPaused(false); previousFocus?.focus?.({ preventScroll: true }); }
   }
-  $('quest-tracker').addEventListener('click', show);
+  $('quest-tracker').addEventListener('click', event => { if (!event.target.closest('button')) show(); });
   $('quest-close').addEventListener('click', () => close());
   $('quest-journal').addEventListener('keydown', event => {
     if (event.key !== 'Tab') return;

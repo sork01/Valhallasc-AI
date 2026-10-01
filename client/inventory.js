@@ -167,7 +167,7 @@
     if ($('bag-tabs')) {
       $('bag-tabs').replaceChildren(...Array.from({ length: 5 }, (_, index) => {
         const bag = pages[index], used = bag ? layout.slice(bag.start, bag.start + bag.size).filter(Boolean).length : 0;
-        const b = button('', () => { if (!bag) { $('bag-details').replaceChildren(node('b', 'Empty bag slot', 'item-name'), node('p', 'Buy an 8-slot satchel (24 gold) or a 16-slot pack (60 gold) from Linden in Alderhaven.', 'bag-empty-note')); return; } activeBag = index; search = ''; $('bag-search').value = ''; render(container); }, 'bag-tab');
+        const b = button('', () => { if (!bag) { $('bag-details').replaceChildren(node('b', 'Empty bag slot', 'item-name'), node('p', 'Buy a six-slot Linen Satchel for 500 gold from Linden in Alderhaven.', 'bag-empty-note')); return; } activeBag = index; search = ''; $('bag-search').value = ''; render(container); }, 'bag-tab');
         b.innerHTML = icon(null, 'bag'); b.append(node('span', bag ? `${used}/${bag.size}` : '+')); b.dataset.bag = index; b.dataset.locked = String(!bag);
         b.setAttribute('aria-label', bag ? `${bag.name}, ${used} of ${bag.size} slots` : `Empty expansion bag slot ${index}`); b.setAttribute('aria-pressed', String(index === activeBag));
         if (bag) dropTarget(b, data => { const empty = layout.slice(bag.start, bag.start + bag.size).indexOf(null); if (empty >= 0) { search = ''; $('bag-search').value = ''; activeBag = index; moveToBag(data, bag.start + empty); } });

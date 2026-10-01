@@ -12,6 +12,7 @@ const number = z.number().finite();
 const actionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('input'), dx: number.min(-1).max(1), dy: number.min(-1).max(1) }).strict(),
   z.object({ type: z.literal('stop') }).strict(),
+  z.object({ type: z.literal('allocate_stat'), stat: z.enum(['strength', 'agility', 'intellect', 'stamina', 'dexterity', 'accuracy']) }).strict(),
   z.object({ type: z.literal('move'), x: number, y: number }).strict(),
   z.object({ type: z.literal('target'), id: z.number().int().nonnegative() }).strict(),
   z.object({ type: z.literal('attack'), fx: number, fy: number }).strict(),

@@ -480,7 +480,8 @@
     const g = canvas.getContext('2d'); g.translate(160, 365); mage.draw(g, { fx: 1, fy: 1, walk: 0 }, 0, 2.8);
     const stats = Field.equipmentStats;
     $('character-subtitle').textContent = `${c.name} · Level ${Field.hero.level} ${c.class[0].toUpperCase() + c.class.slice(1)}`;
-    $('equipment-stats').textContent = `${t('attack')}: ${stats.attack} · ${t('defense')}: ${stats.defense}`;
+    $('equipment-stats').textContent = `${t('attack')}: ${Number(stats.attack.toFixed(1))} · ${t('defense')}: ${Number(stats.defense.toFixed(1))}`;
+    window.Attributes?.render();
     $('hud-portrait').style.backgroundImage = `url(${mage.portrait()})`;
     Inventory.render(document.getElementById('inventory-list'));
     Inventory.renderEquipped(document.getElementById('equipped-slots'));
@@ -540,6 +541,7 @@
   $('bags-close').addEventListener('click', () => setPause(false));
   $('bag-character').addEventListener('click', () => openEquipment(document.querySelector('.equipment-workspace').dataset.view === 'bags' ? 'both' : 'bags'));
   addEventListener('inventory-change', () => { if (!$('equipment').hidden) renderEquipment(); });
+  addEventListener('character-stats-change', () => { if (!$('equipment').hidden) renderEquipment(); });
   $('equipment').addEventListener('keydown', event => {
     if (event.key !== 'Tab') return;
     const nodes = [...$('equipment').querySelectorAll('button:not(:disabled), select:not(:disabled), input:not(:disabled)')];
