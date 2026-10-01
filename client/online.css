@@ -35,3 +35,19 @@
 .npc-panel :focus-visible, .city-travel:focus-visible { outline: 3px solid #ffdc87; outline-offset: 3px; }
 @media (pointer: coarse) { .city-travel { min-height: 44px; } .npc-offers .btn, #npc-close { min-height: 44px; } }
 #npc-dialogue { z-index: 45; }
+.quest-tracker { position: absolute; left: 1.4cqw; top: 9cqw; width: 23cqw; z-index: 20; padding: .8cqw 1cqw; border: 1px solid #d9c49299; border-radius: .6cqw; color: #f7e9c9; background: #172c28ed; text-align: left; font: 1cqw/1.5 'Jua', sans-serif; cursor: pointer; }
+.quest-tracker b, .quest-tracker span, .quest-tracker small { display: block; }
+.quest-tracker b { color: #f1d493; font-size: .85cqw; }
+.quest-tracker small { color: #c2d9c4; font-size: .85cqw; }
+.quest-tracker:hover { background: #304b3c; }
+#quest-journal { z-index: 46; }
+.quest-panel { width: 46cqw; max-height: 44cqw; }
+#quest-list { max-height: 28cqw; overflow: auto; scrollbar-width: thin; }
+.quest-card { padding: 1cqw; margin: .8cqw 0; border: 1px solid #d9c49255; border-radius: .6cqw; background: #142820bb; }
+.quest-card h4 { margin: 0 0 .25cqw; color: #f1d493; font: 1.3cqw 'Jua', sans-serif; }
+.quest-card p { margin: .4cqw 0; font-size: .95cqw; }
+.quest-state, .quest-history { color: #b7d5b8; font: .85cqw 'Jua', sans-serif; }
+.quest-card .quest-reward { color: #f1d493; }
+.quest-card .btn { margin: .4cqw .4cqw 0 0; font-size: .95cqw; }
+.quest-tracker:focus-visible { outline: 3px solid #ffdc87; outline-offset: 3px; }
+@media (pointer: coarse) { .quest-tracker, .quest-card .btn, #quest-close { min-height: 44px; } }

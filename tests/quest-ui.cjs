@@ -1,0 +1,73 @@
+// Browser-only checks: controls, focus, displayed quest state, route buttons, art.
+// Quest rules, combat, rewards and persistence are exercised through MCP scenarios.
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const { chromium } = require('playwright');
+const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
+const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
+const root = path.resolve(__dirname, '..');
+const client = new Client({ name: 'valhallasc-ui-check', version: '1.0.0' });
+let browser, started = false, checks = 0;
+const check = (condition, message) => { assert.ok(condition, message); checks++; };
+async function call(name, args = {}) {
+  const result = await client.callTool({ name, arguments: args });
+  assert.ok(!result.isError, `${name}: ${JSON.stringify(result.content)}`);
+  return result.structuredContent;
+}
+(async () => {
+  const transport = new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe' });
+  await client.connect(transport);
+  const world = await call('start_world'); started = true;
+  browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
+  await page.goto(world.url); await page.locator('#start').click();
+  await page.locator('#cls-warrior').click(); await page.locator('#name').fill('QuestUI');
+  await page.locator('#go').click({ timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.beetleSprites, null, { timeout: 60000 });
+  check(await page.locator('#quest-tracker').textContent().then(t => t.includes('Speak to Wren')), 'HUD introduces the first quest');
+  await page.keyboard.press('q');
+  check(await page.locator('#quest-journal').isVisible(), 'Q opens the journal');
+  check(await page.locator('#quest-list .quest-card').count() === 5, 'Five quest cards display');
+  check(await page.locator('#quest-close').evaluate(n => n === document.activeElement), 'Journal takes keyboard focus');
+  await page.keyboard.press('Tab');
+  check(await page.locator('#quest-list button').first().evaluate(n => n === document.activeElement), 'Tab wraps within the journal');
+  await page.keyboard.press('Shift+Tab');
+  check(await page.locator('#quest-close').evaluate(n => n === document.activeElement), 'Shift+Tab wraps within the journal');
+  check(await page.locator('#quest-list [data-quest="king_challenge"]').textContent().then(t => t.includes('Locked') && t.includes('Shells of Steel')), 'Locked cards explain their prerequisite');
+  await page.screenshot({ path: path.join(world.artifacts, 'quest-journal.png') });
+  await page.keyboard.press('Escape');
+  check(await page.locator('#quest-journal').isHidden(), 'Escape closes the journal');
+  await page.locator('#quest-tracker').click();
+  check(await page.locator('#quest-journal').isVisible(), 'HUD button opens the journal');
+  await page.locator('#quest-list [data-quest="welcome"] button').filter({ hasText: 'Get quest from Wren' }).click();
+  await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 60000 });
+  check(await page.locator('#npc-name').textContent() === 'Wren', 'Journal travel button reaches and opens the giver');
+  check(await page.locator('#quest-journal').isHidden(), 'Travel closes the journal');
+  await page.locator('#npc-quests [data-quest="welcome"] [data-action="accept"]').click();
+  await page.waitForFunction(() => document.getElementById('npc-notice').textContent.includes('Quest accepted'));
+  check(await page.locator('#npc-quests [data-quest="welcome"]').textContent().then(t => t.includes('In progress')), 'NPC card reflects accepted state');
+  await page.locator('#npc-close').click();
+  await page.waitForFunction(() => document.getElementById('quest-tracker').textContent.includes('Speak to Sister Elara: 0/1'));
+  check(await page.evaluate(() => Quests.marker('healer') === '◆'), 'NPC quest objective marker is active');
+  await page.keyboard.press('q');
+  const welcome = page.locator('#quest-list [data-quest="welcome"]');
+  await welcome.locator('button').filter({ hasText: 'Track quest', exact: true }).click();
+  check(await welcome.locator('button').filter({ hasText: 'Tracking', exact: true }).isVisible(), 'Track button shows the selection');
+  await page.keyboard.press('Escape');
+  await page.evaluate(() => Field.visitNpc('healer'));
+  await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
+  await page.keyboard.press('Escape'); await page.keyboard.press('q');
+  await page.waitForFunction(() => document.querySelector('#quest-list [data-quest="welcome"]').textContent.includes('Speak to Sister Elara: 1/1'));
+  check(await welcome.textContent().then(t => t.includes('Speak to Bram: 0/1')), 'Journal displays authoritative partial progress');
+  await page.screenshot({ path: path.join(world.artifacts, 'quest-progress.png') });
+  check(await page.evaluate(() => !!Field.warriorSprites.source.parts.body && Field.beetleSprites.img.beetle.complete), 'Character and enemy artwork load');
+  check(errors.length === 0, `No browser runtime errors: ${errors.join('; ')}`);
+  console.log(`${checks} focused quest UI checks passed; screenshots: ${world.artifacts}`);
+})().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
+  await browser?.close();
+  if (started) await call('stop_world').catch(() => {});
+  await client.close();
+});

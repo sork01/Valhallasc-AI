@@ -55,6 +55,7 @@ Players open `http://<server-LAN-address>:8080/`. Allow that port in the server'
 - Enter focuses chat; Enter sends; Esc leaves the chat input. M toggles music.
 - All equipment choices from the prototype are available as starter gear.
 - **Alderhaven** is south of the meadow. Follow the path through the north gate or click **Visit Alderhaven** to walk there automatically.
+- **Q** opens the quest journal. Wren offers a town introduction; Captain Rowan offers a six-slime patrol, which unlocks Bram’s two-Ironhide hunt and Linden’s repeatable eight-enemy bounty. Bram’s quest unlocks Rowan’s King Slime challenge. Accept at the giver, complete the objectives, and return for XP and gold. Quest progress and completed rewards are saved with your character. The journal can walk you to a giver; gold markers show available quests (`!`) and ready turn-ins (`?`). Only kills after acceptance count, and the finishing blow earns credit.
 - Click a townsperson or press **E** nearby to talk. The sanctuary heals for free; the bakery, apothecary, and inn offer healing services for gold. The armorer fits your best starter equipment for free. Food and tonics are consumed at the counter.
 - Slimes stay outside the city walls. NPC conversations stop your actions while the shared world keeps running.
 - New Character keeps your earlier character in **Esc → Your Characters**.
@@ -65,7 +66,7 @@ The Rust server owns movement speed, map collision, AI, melee range/facing, atta
 
 The simulation runs at 20 ticks per second and sends snapshots at 10 per second. Clients interpolate positions, draw the original layered sprites, and display everyone on the minimap. Text chat is world-wide. Commands have payload/rate limits, inactive directional input expires, slow connections are dropped, and WebSocket origins are checked. The server allows up to 128 simultaneous connections; this is a guardrail, **not a tested MMO capacity claim**.
 
-Characters are stored in `data/valhalla.sqlite` with SQLite WAL transactions. Saves run every five seconds, on disconnect, and at graceful shutdown. The browser retains a server-issued guest character key. Only the key hash is stored in SQLite; the name is not a credential. Reloading or reconnecting resumes the same character, including position, class, appearance, equipment, HP, level, XP, gold, and kill count. Reconnect happens automatically after a network/server interruption.
+Characters are stored in `data/valhalla.sqlite` with SQLite WAL transactions. Saves run every five seconds, on disconnect, and at graceful shutdown. The browser retains a server-issued guest character key. Only the key hash is stored in SQLite; the name is not a credential. Reloading or reconnecting resumes the same character, including position, class, appearance, equipment, HP, level, XP, gold, kill count, and quests. Reconnect happens automatically after a network/server interruption.
 
 Keep the browser's site data and the database. Clearing site data loses access to guest characters; these are not SSO accounts and there is no account recovery or cross-device login yet. HTTP is appropriate for local development; put public deployments behind HTTPS so character keys travel over WSS. Different server URLs have separate character-key collections.
 
@@ -106,13 +107,13 @@ tests/          Browser, test driver, and MCP integration tests
 deploy/         Compose, Apache and systemd examples
 ```
 
-`world/map.txt` is the source of truth for spawn/collision geometry. After editing it, run `node scripts/sync-world.cjs`, then rebuild Rust (the map is bundled into the binary). Terrain shading and scenery drawing use the original renderer, with original city artwork in `client/city.js`. Alderhaven takes visual inspiration from [Prontera references](https://www.gameblast.com.br/2015/10/top-10-melhores-cidades-jogos.html): cobblestone plazas, a fountain, timber-framed shops, gardens, and stone gates. Reference images are not shipped as game assets.
+`world/map.txt` is the source of truth for spawn/collision geometry, NPCs, and quest definitions. After editing it, run `node scripts/sync-world.cjs`, then rebuild Rust (the map is bundled into the binary). Terrain shading and scenery drawing use the original renderer, with original city artwork in `client/city.js`. Alderhaven takes visual inspiration from [Prontera references](https://www.gameblast.com.br/2015/10/top-10-melhores-cidades-jogos.html): cobblestone plazas, a fountain, timber-framed shops, gardens, and stone gates. Reference images are not shipped as game assets.
 
 The Ironhide Beetle follows the local makesprites/PixelFlow workflow. Run `python3 scripts/make_ironhide_sprites.py preview` to review all five clips, `build` to create its editable sprite, and `export` to read edits back into `client/assets/ironhide.png` and `ironhide.txt`. **`build --replace` discards beetle hand edits.** The original indexed frames are preserved in `scripts/ironhide_raw.npz`. PixelFlow's saved-sprite quota requires one 34-frame editor sprite; `editorStart` in the metadata records each clip's frame range. Open the sprite ID from the metadata at `/pixelflow/?sprite=<id>`.
 
 On WebSocket connection, send `{"type":"join","version":1,"token":null,"look":{"name":"Freya","class":"mage"}}`. The welcome packet returns an ID, a guest key for a newly created character, and a world snapshot. For resume, send the guest key with `look:null`; saved state takes precedence. Keep keys out of URLs and logs.
 
-Subsequent messages: `input {dx,dy}`, `stop`, `move {x,y}`, `target {id}`, `attack {fx,fy}`, `dash {dx,dy}`, `equip {armor,weapon}`, `interact {npc,offer?}`, `chat {text}`, `ping {nonce}`. Direction vectors are normalized on the server. `move` chooses a destination, not a teleport. Unknown command fields are refused. Server messages: `welcome`, `snapshot`, `event`, `chat`, `system`, `pong`, `dialogue`, and `error`. See `server/src/model.rs` for the exact types.
+Subsequent messages: `input {dx,dy}`, `stop`, `move {x,y}`, `target {id}`, `attack {fx,fy}`, `dash {dx,dy}`, `equip {armor,weapon}`, `interact {npc,offer?}`, `chat {text}`, `ping {nonce}`. Direction vectors are normalized on the server. `move` chooses a destination, not a teleport. Quest acceptance and reward collection use `interact` with `offer:"quest:accept:<id>"` or `offer:"quest:claim:<id>"`. The server validates the giver, distance, living player, prerequisite completions, and recorded objectives. Player snapshots and dialogue packets include the character’s `quests` progress. Unknown command fields are refused. Server messages: `welcome`, `snapshot`, `event`, `chat`, `system`, `pong`, `dialogue`, and `error`. See `server/src/model.rs` for the exact types.
 
 The transport uses [Axum WebSockets](https://docs.rs/axum/0.8.9/axum/extract/ws/) and [Tower HTTP static serving](https://docs.rs/tower-http/0.6.11/tower_http/services/struct.ServeDir.html). Cargo.lock pins the resolved versions.
 
@@ -130,12 +131,23 @@ node scripts/test-driver.cjs list
 node scripts/test-driver.cjs run movement
 node scripts/test-driver.cjs run ironhide
 node scripts/test-driver.cjs run city
+node scripts/test-via-mcp.cjs run quests
+node scripts/test-via-mcp.cjs run quest_combat
 npm run test:scenarios
 ```
 
-`movement` checks three classes, overlapping players, authoritative movement, dormant King slots, enemy spacing, and character resume. `ironhide` walks a mage to an actual beetle, defeats it, collects its gold, and checks saved progress. `city` walks into Alderhaven and checks distance restrictions and healer/armorer services. Every observed snapshot is checked for enemy spacing. Each scenario prints JSON with pass/fail checks and an artifact path; failures produce a nonzero exit status. Reports contain the last snapshot and up to 500 recent events. Test guest keys remain in process memory and never appear in reports or tool results.
+`npm run test:scenarios` runs every scenario through a real MCP SDK connection and the `run_scenario` tool. Use `node scripts/test-via-mcp.cjs --registered run all` to verify the launch configuration installed in Codex. `movement` checks three classes, overlapping players, authoritative movement, dormant King slots, enemy spacing, and character resume. `ironhide` walks a mage to an actual beetle, defeats it, collects its gold, and checks saved progress. `city` walks into Alderhaven and checks distance restrictions and healer/armorer services. `quests` covers the town introduction, partial progress, NPC/range checks, reward replay protection, and restarting the actual Rust process. `quest_combat` earns the patrol, Ironhide hunt, and repeatable bounty through real combat, checks progression and level-up, accepts the King challenge, resets the bounty, and verifies saved history after restart. King Slime defeat and the randomized timer also have Rust tests; the MCP scenario does not wait 5–10 minutes for a king spawn. Every observed snapshot is checked for enemy spacing. Each scenario prints JSON with pass/fail checks and an artifact path; failures produce a nonzero exit status. Reports contain the last snapshot and up to 500 recent events. Test guest keys remain in process memory and never appear in reports or tool results.
 
 On this host, Node is at `/home/serveperry/.nvm/versions/node/v20.20.2/bin/node`. Use that absolute executable for the direct `node` commands above, or add its directory to `PATH` for npm scripts. `VALHALLA_BINARY` can select another locally built server binary; bind, database, and client directory remain controlled by the driver.
+
+On this host, the MCP is registered in `~/.codex/config.toml` as `valhallasc-testing`, with a 20-second startup timeout and a 180-second tool timeout. Restart Codex after registration to load its nine tools. To register this checkout or verify an installation again:
+
+```sh
+bash scripts/cargo.sh build --locked
+python3 scripts/setup-test-mcp.py --verify
+```
+
+The setup command checks dependencies, backs up the existing Codex configuration, preserves other settings, registers absolute launch paths, and runs the private driver/MCP integration checks. It requires permission to write user-level Codex settings and open a private test port. Once connected, ask the agent to “Use valhallasc-testing to run the movement, Ironhide, and city scenarios.”
 
 The MCP wrapper uses the official SDK and stdio. Configure your MCP client to launch an **absolute Node executable** with the **absolute script path** as its argument, for example:
 
@@ -161,9 +173,9 @@ This is a launch example; the enclosing settings format depends on your MCP clie
 | `wait_world` | Wait up to 30 seconds of real simulation time and inspect again |
 | `list_scenarios` / `run_scenario` | Discover/run a named scenario in a fresh world |
 
-For interactive exploration: `start_world`, `connect_bot` with `{"bot":"Mage","class":"mage"}`, then `send_action` with `{"bot":"Mage","action":{"type":"move","x":45,"y":48}}`, `wait_world`, and `inspect_world`. A movement destination is an ordinary server action. The driver supports at most 16 bot identities, validates action schemas, and serializes MCP calls. Stop the interactive world before running a scenario. Allow at least 120 seconds for scenario calls; walking and combat happen in real time. Normal disconnect saves characters, and reusing a bot name resumes the same character and class within that world.
+For interactive exploration: `start_world`, `connect_bot` with `{"bot":"Mage","class":"mage"}`, then `send_action` with `{"bot":"Mage","action":{"type":"move","x":45,"y":48}}`, `wait_world`, and `inspect_world`. A movement destination is an ordinary server action. The driver supports at most 16 bot identities, validates action schemas, and serializes MCP calls. Stop the interactive world before running a scenario. Allow at least 180 seconds for scenario calls; walking and combat happen in real time. Normal disconnect saves characters, and reusing a bot name resumes the same character and class within that world.
 
-Snapshots refresh while bots are connected; with no connected bots inspection retains the last observed snapshot. Closing MCP stdin or sending SIGINT/SIGTERM disconnects bots and stops the child server. Test databases and reports remain local and gitignored for review. Existing browser tests remain necessary for controls, menus, artwork, and interpolation; run `npm test` separately. No public service restart or deployment is needed for these local tools.
+Snapshots refresh while bots are connected; with no connected bots inspection retains the last observed snapshot. Closing MCP stdin or sending SIGINT/SIGTERM disconnects bots and stops the child server. Test databases and reports remain local and gitignored for review. The default `npm test` runs driver/MCP integration checks, all MCP scenarios, then one focused Chromium UI pass. The UI pass checks journal controls, focus, cards, markers, travel buttons, partial progress display, and loaded artwork with one character; it does not repeat combat/reward/save scenarios. The original three-player browser regression suite remains available as `npm run test:browser:full` when controls or rendering need broader coverage. No public service restart or deployment is needed for these local tools.
 
 ## Checks
 
@@ -174,15 +186,13 @@ cargo build --locked
 npm ci
 npx playwright install chromium
 npm run check
-npm run test:driver
-npm run test:scenarios
 npm test
 ```
 
-The integration test starts its own isolated Rust server/database and uses three independent browser clients. It covers character creation, visible remote players, movement replication, player pass-through, enemy spacing in server snapshots and rendered combat, equipment, safe chat, invalid commands/keys, duplicate sessions, slime and Ironhide combat, shared kills, XP pacing, loot, page reload, server restart/reconnect, and switching between saved characters, walking through the city gate, NPC dialogue, sanctuary healing, armorer fitting, and shop affordability. Screenshots and disposable databases are written under gitignored `test-results/`. The existing sibling Playwright installation was used for testing in this workspace via `NODE_PATH`; no runtime dependency on the sibling project is required.
+The optional full browser regression suite (`npm run test:browser:full`) starts its own isolated Rust server/database and uses three independent browser clients. It covers character creation, visible remote players, movement replication, player pass-through, enemy spacing in server snapshots and rendered combat, equipment, safe chat, invalid commands/keys, duplicate sessions, slime and Ironhide combat, shared kills, XP pacing, loot, page reload, server restart/reconnect, and switching between saved characters, walking through the city gate, NPC dialogue, sanctuary healing, armorer fitting, and shop affordability. Screenshots and disposable databases are written under gitignored `test-results/`. The existing sibling Playwright installation was used for testing in this workspace via `NODE_PATH`; no runtime dependency on the sibling project is required.
 
 `node tests/public-smoke.cjs` verifies the actual public HTTPS/WSS deployment with two browser clients. It also checks canonical redirects, private-file protection, chat, movement replication, and saved-character reload. It records only the test character IDs in `test-results/public-smoke-results.json`; remove those specific test characters from SQLite after both clients disconnect.
 
 ## Current scope
 
-This is a playable **single-zone multiplayer foundation**, not a finished large-scale MMORPG. There are no accounts, quests, inventories beyond starter gear, trading, guilds, parties, PvP, multiple zones, distributed world servers, or native executable client packages yet. Everyone receives the zone's snapshots; interest management and load testing are needed before promising large populations. Movement follows direct goals with collision sliding, as in the original; ordinary ground clicks do not find paths around complex obstacles. The city travel button follows a small grid route through the shared collision geometry. Browser tests here run on Linux Chromium; Windows and Firefox builds have not been exercised in this environment.
+This is a playable **single-zone multiplayer foundation**, not a finished large-scale MMORPG. There are no accounts, inventories beyond starter gear, trading, guilds, parties, PvP, multiple zones, distributed world servers, or native executable client packages yet. Everyone receives the zone's snapshots; interest management and load testing are needed before promising large populations. Movement follows direct goals with collision sliding, as in the original; ordinary ground clicks do not find paths around complex obstacles. The city travel button follows a small grid route through the shared collision geometry. Browser tests here run on Linux Chromium; Windows and Firefox builds have not been exercised in this environment.

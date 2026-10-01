@@ -50,6 +50,7 @@ impl Store {
             xp: 0,
             gold: 0,
             kills: 0,
+            quests: vec![],
         };
         self.db.execute(
             "INSERT INTO characters(id,token_hash,state) VALUES(?1,?2,?3)",
@@ -86,15 +87,36 @@ mod tests {
         c.gold = 81;
         c.level = 3;
         c.look.equip("azure", "royal").unwrap();
+        c.quests.push(crate::model::QuestProgress {
+            id: "welcome".into(),
+            counts: vec![1, 0, 1],
+            claimed: false,
+            completions: 0,
+        });
         s.save_many(std::iter::once(&c)).unwrap();
         let restored = s.load(&token).unwrap().unwrap();
         assert_eq!(restored.gold, 81);
         assert_eq!(restored.look.warrior_weapon, "royal");
+        assert_eq!(restored.quests[0].counts, vec![1, 0, 1]);
         assert!(s.load(&"a".repeat(64)).unwrap().is_none());
         assert!(s.load("anything").unwrap().is_none());
         let stored: String =
             s.db.query_row("SELECT token_hash FROM characters", [], |r| r.get(0))
                 .unwrap();
         assert_ne!(stored, token);
+    }
+
+    #[test]
+    fn existing_characters_without_quests_still_resume() {
+        let s = Store::open(std::path::Path::new(":memory:")).unwrap();
+        let (c, token) = s.create(Look::default(), Point::default()).unwrap();
+        let mut old = serde_json::to_value(&c).unwrap();
+        old.as_object_mut().unwrap().remove("quests");
+        s.db.execute(
+            "UPDATE characters SET state=?1 WHERE id=?2",
+            params![old.to_string(), c.id],
+        )
+        .unwrap();
+        assert!(s.load(&token).unwrap().unwrap().quests.is_empty());
     }
 }

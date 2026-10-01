@@ -1338,7 +1338,7 @@
       "x": 34,
       "y": 74,
       "color": "#627b9f",
-      "dialogue": "Welcome to Alderhaven! Follow the lanterns to Fountain Square. The meadow lies beyond the north gate; inside these walls you can rest safely.",
+      "dialogue": "Alderhaven needs brave adventurers to keep the meadow paths clear. Start with the slimes, then speak to Bram about the Ironhides. Rest inside our walls whenever you need it.",
       "offers": []
     },
     {
@@ -1443,8 +1443,112 @@
       "x": 38,
       "y": 80,
       "color": "#cc7d83",
-      "dialogue": "Meet me by the fountain! The sanctuary and apothecary are north of the square, the armorer and inn to the south. Click a person to talk, or press E nearby.",
+      "dialogue": "Welcome, adventurer! I have a little introduction to Alderhaven for you. Captain Rowan has work at the north gate, too. Open your quest journal with Q to follow your adventures.",
       "offers": []
+    }
+  ],
+  "quests": [
+    {
+      "id": "welcome",
+      "title": "A Home in Alderhaven",
+      "npc": "guide",
+      "description": "Wren wants you to meet the people who keep adventurers on their feet. Speak to Sister Elara, Bram, and Tessa, then return to the fountain.",
+      "objectives": [
+        {
+          "kind": "talk",
+          "target": "healer",
+          "label": "Speak to Sister Elara",
+          "count": 1
+        },
+        {
+          "kind": "talk",
+          "target": "smith",
+          "label": "Speak to Bram",
+          "count": 1
+        },
+        {
+          "kind": "talk",
+          "target": "innkeeper",
+          "label": "Speak to Tessa",
+          "count": 1
+        }
+      ],
+      "rewardXp": 40,
+      "rewardGold": 12,
+      "requires": null,
+      "repeatable": false
+    },
+    {
+      "id": "slime_patrol",
+      "title": "Trouble at the Gate",
+      "npc": "gatekeeper",
+      "description": "Slimes are spilling onto the meadow paths. Defeat six ordinary slimes of any color, then report to Captain Rowan at the north gate.",
+      "objectives": [
+        {
+          "kind": "kill",
+          "target": "slime",
+          "label": "Defeat ordinary slimes",
+          "count": 6
+        }
+      ],
+      "rewardXp": 80,
+      "rewardGold": 24,
+      "requires": null,
+      "repeatable": false
+    },
+    {
+      "id": "ironhide_hunt",
+      "title": "Shells of Steel",
+      "npc": "smith",
+      "description": "Ironhide Beetles are making the outer meadow dangerous. Defeat two of these charging beasts and report back to Bram.",
+      "objectives": [
+        {
+          "kind": "kill",
+          "target": "beetle",
+          "label": "Defeat Ironhide Beetles",
+          "count": 2
+        }
+      ],
+      "rewardXp": 120,
+      "rewardGold": 35,
+      "requires": "slime_patrol",
+      "repeatable": false
+    },
+    {
+      "id": "king_challenge",
+      "title": "A Crown for the Meadow",
+      "npc": "gatekeeper",
+      "description": "A King Slime sometimes emerges in Greenmeadow. Watch for the world announcement, land the finishing blow, and bring Rowan news of its defeat.",
+      "objectives": [
+        {
+          "kind": "kill",
+          "target": "big",
+          "label": "Defeat a King Slime",
+          "count": 1
+        }
+      ],
+      "rewardXp": 200,
+      "rewardGold": 60,
+      "requires": "ironhide_hunt",
+      "repeatable": false
+    },
+    {
+      "id": "meadow_bounty",
+      "title": "Keep the Paths Clear",
+      "npc": "merchant",
+      "description": "Linden pays reliable adventurers to keep trade routes open. Defeat eight meadow enemies of any kind and return to the market. This bounty can be taken again.",
+      "objectives": [
+        {
+          "kind": "kill",
+          "target": "any",
+          "label": "Defeat meadow enemies",
+          "count": 8
+        }
+      ],
+      "rewardXp": 60,
+      "rewardGold": 25,
+      "requires": "slime_patrol",
+      "repeatable": true
     }
   ]
 }

@@ -47,7 +47,7 @@ test('private driver: isolated storage, normal actions, resume, credentials, and
 
 test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and parent disconnect', { timeout: 30000 }, async () => {
   const transport = new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root,
-    env: { ...process.env, VALHALLA_BIND: '0.0.0.0:8080', VALHALLA_DB: '/tmp/mcp-must-not-use.sqlite' }, stderr: 'pipe' });
+    env: { VALHALLA_BIND: '0.0.0.0:8080', VALHALLA_DB: '/tmp/mcp-must-not-use.sqlite', VALHALLA_ORIGIN: 'https://production.invalid' }, stderr: 'pipe' });
   const client = new Client({ name: 'valhallasc-test', version: '1.0.0' });
   let url;
   const call = async (name, args = {}) => {
@@ -61,7 +61,7 @@ test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and pare
     for (const name of ['start_world', 'stop_world', 'connect_bot', 'disconnect_bot', 'send_action', 'inspect_world', 'wait_world', 'list_scenarios', 'run_scenario']) {
       assert.ok(listed.tools.some(t => t.name === name), `Advertises ${name}`);
     }
-    assert.equal((await call('list_scenarios')).scenarios.length, 3);
+    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['movement', 'ironhide', 'city', 'quests', 'quest_combat']);
     const first = await call('start_world');
     url = first.url;
     assert.match(url, /^http:\/\/127\.0\.0\.1:\d+\/$/);

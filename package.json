@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "test": "node tests/multiplayer.cjs",
+    "test": "npm run test:driver && npm run test:scenarios && npm run test:ui",
     "test:driver": "node --test tests/test-driver.cjs",
-    "test:scenarios": "node scripts/test-driver.cjs run all",
+    "test:scenarios": "node scripts/test-via-mcp.cjs run all",
     "test:mcp": "node scripts/test-mcp.cjs",
     "world": "node scripts/sync-world.cjs",
-    "check": "node --check client/city.js && node --check client/field.js && node --check client/game.js && node --check client/online.js"
+    "check": "node --check client/city.js && node --check client/field.js && node --check client/game.js && node --check client/quests.js && node --check client/online.js",
+    "test:ui": "node tests/quest-ui.cjs",
+    "test:browser:full": "node tests/multiplayer.cjs"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "1.31.0",

@@ -57,11 +57,23 @@ class TestWorld extends EventEmitter {
     fs.mkdirSync(path.join(root, 'test-results'), { recursive: true });
     this.runDir = fs.mkdtempSync(path.join(root, 'test-results/driver-'));
     this.db = path.join(this.runDir, 'test.sqlite');
+    return this.launch();
+  }
+  async launch() {
+    this.stopping = false;
+    this.stopPromise = null;
+    this.url = null;
+    this.snapshot = null;
     const binary = process.env.VALHALLA_BINARY || path.join(root, 'target/debug/valhalla-server');
+    const environment = { ...process.env, VALHALLA_BIND: '127.0.0.1:0', VALHALLA_DB: this.db,
+      VALHALLA_CLIENT_DIR: path.join(root, 'client'), RUST_LOG: 'valhalla_server=info' };
+    // Use the server's normal same-host origin policy for the private port.
+    // An empty configured origin rejects real browsers, and an inherited
+    // production origin is wrong for a disposable loopback world.
+    delete environment.VALHALLA_ORIGIN;
     this.child = spawn(binary, [], {
       cwd: root,
-      env: { ...process.env, VALHALLA_BIND: '127.0.0.1:0', VALHALLA_DB: this.db,
-        VALHALLA_CLIENT_DIR: path.join(root, 'client'), VALHALLA_ORIGIN: '', RUST_LOG: 'valhalla_server=info' },
+      env: environment,
       stdio: ['ignore', 'pipe', 'pipe'],
     });
     this.failure = null;
@@ -73,7 +85,9 @@ class TestWorld extends EventEmitter {
       resolve();
     }));
     this.child.stdout.on('data', data => {
-      startup = (startup + data.toString()).slice(-8192);
+      // MCP clients inherit fewer environment variables than a shell. Rust's
+      // tracing output can consequently contain ANSI around address=...
+      startup = (startup + data.toString()).replace(/\x1b\[[0-9;]*m/g, '').slice(-8192);
       const match = startup.match(/address=(127\.0\.0\.1:\d+)/);
       if (match) this.url = `http://${match[1]}/`;
       this.emit('change');
@@ -89,6 +103,14 @@ class TestWorld extends EventEmitter {
       await this.stop();
       throw error;
     }
+  }
+  async restart() {
+    this.requireRunning();
+    const connected = [...this.bots].filter(([, p]) => p.socket?.readyState === WebSocket.OPEN).map(([bot]) => bot);
+    await this.stop();
+    await this.launch();
+    for (const bot of connected) await this.connect({ bot });
+    return this.info();
   }
   info() {
     return { running: !!this.child && !this.stopping && !this.failure, url: this.url, database: this.db, artifacts: this.runDir,
@@ -134,7 +156,7 @@ class TestWorld extends EventEmitter {
       player = { class: playerClass, token: null, id: null, socket: null };
       this.bots.set(bot, player);
     }
-    const ws = new WebSocket(this.url.replace(/^http/, 'ws') + 'ws');
+    const ws = new WebSocket(this.url.replace(/^http/, 'ws') + 'ws', { origin: new URL(this.url).origin });
     player.socket = ws;
     player.connectionError = null;
     let welcomed = false;

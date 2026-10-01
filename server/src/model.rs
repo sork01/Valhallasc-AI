@@ -194,6 +194,8 @@ pub struct Character {
     pub xp: u32,
     pub gold: u32,
     pub kills: u32,
+    #[serde(default)]
+    pub quests: Vec<QuestProgress>,
 }
 impl Character {
     pub fn max_hp(&self) -> f64 {
@@ -206,6 +208,83 @@ impl Character {
         Point {
             x: self.x,
             y: self.y,
+        }
+    }
+    pub fn grant_xp(&mut self, xp: u32) -> u32 {
+        self.xp = self.xp.saturating_add(xp);
+        let mut levels = 0;
+        while self.xp >= self.xp_need() && self.level < 1000 {
+            self.xp -= self.xp_need();
+            self.level += 1;
+            self.hp = self.max_hp();
+            levels += 1;
+        }
+        levels
+    }
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct QuestProgress {
+    pub id: String,
+    pub counts: Vec<u32>,
+    pub claimed: bool,
+    pub completions: u32,
+}
+
+#[derive(Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Quest {
+    pub id: String,
+    pub title: String,
+    pub npc: String,
+    pub requires: Option<String>,
+    pub repeatable: bool,
+    pub reward_xp: u32,
+    pub reward_gold: u32,
+    pub objectives: Vec<QuestObjective>,
+}
+#[derive(Clone, Deserialize)]
+pub struct QuestObjective {
+    pub kind: String,
+    pub target: String,
+    pub count: u32,
+}
+impl Quest {
+    pub fn unlocked(&self, character: &Character) -> bool {
+        self.requires.as_ref().is_none_or(|id| {
+            character
+                .quests
+                .iter()
+                .any(|q| &q.id == id && q.completions > 0)
+        })
+    }
+    pub fn ready(&self, progress: &QuestProgress) -> bool {
+        !progress.claimed
+            && self
+                .objectives
+                .iter()
+                .enumerate()
+                .all(|(i, o)| progress.counts.get(i).copied().unwrap_or(0) >= o.count)
+    }
+}
+
+pub fn quest_progress(character: &mut Character, quests: &[Quest], kind: &str, target: &str) {
+    for progress in character.quests.iter_mut().filter(|q| !q.claimed) {
+        let Some(quest) = quests.iter().find(|q| q.id == progress.id) else {
+            continue;
+        };
+        for (i, objective) in quest.objectives.iter().enumerate() {
+            let matches = objective.target == target
+                || objective.target == "any"
+                || (objective.target == "slime"
+                    && ["green", "blue", "pink", "yellow"].contains(&target));
+            if objective.kind == kind
+                && matches
+                && let Some(count) = progress.counts.get_mut(i)
+            {
+                *count = count.saturating_add(1).min(objective.count);
+            }
         }
     }
 }
@@ -310,6 +389,8 @@ pub struct Map {
     pub slimes: Vec<SlimeSpawn>,
     #[serde(default)]
     pub npcs: Vec<Npc>,
+    #[serde(default)]
+    pub quests: Vec<Quest>,
     pub city: Option<City>,
 }
 impl Default for Map {
@@ -402,6 +483,7 @@ mod tests {
             spawn: Point::default(),
             slimes: vec![],
             npcs: vec![],
+            quests: vec![],
             city: None,
             objects: vec![Obstacle {
                 x: 5.,

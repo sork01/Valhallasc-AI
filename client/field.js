@@ -174,6 +174,7 @@
   const xpNeed = lv => Math.round(160 * Math.pow(lv, 1.35));
   function reset() {
     pendingNpc = null; cityRoute = [];
+    window.Quests?.reset();
     hero = newHero(); drops = []; floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
     keys = new Set(); pointer = { down: false, x: 0, y: 0 };
     cam = { x: hero.x, y: hero.y };
@@ -221,7 +222,7 @@
   function talkTo(npc) {
     keys.clear(); pointer.down = false; hero.target = null; hero.goal = null; cityRoute = [];
     if (Math.hypot(hero.x-npc.x,hero.y-npc.y) <= 2.5) Online.send({type:'interact',npc:npc.id});
-    else { pendingNpc = { npc, until: tAll + 12 }; cityRoute = routeTo(npc, true); routeTime = 0; }
+    else { cityRoute = routeTo(npc, true); pendingNpc = { npc, until: tAll + Math.max(20, cityRoute.length * .6) }; routeTime = 0; }
   }
   // A small grid route lets the travel button walk around real map obstacles.
   function routeTo(goal, approach = false) {
@@ -290,6 +291,7 @@
     const selectedTarget = hero.target?.id;
     const wasDead = hero.dead;
     applyActor(hero, own, initial);
+    window.Quests?.update(own.quests || []);
     if (wasDead !== hero.dead) say(hero.dead ? 'death' : 'respawn');
     if (initial) { cam.x = hero.x; cam.y = hero.y; }
     const signature = JSON.stringify(own.look);
@@ -783,9 +785,14 @@
       });
       running = true; paused = false; last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     },
-    stop() { City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
+    stop() { window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
     clearInput() { pendingNpc=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
     setPaused(p) { paused = p; if(p){pendingNpc=null;cityRoute=[];} Field.clearInput(); Online.send({ type: 'stop' }); },
+    visitNpc(id) {
+      if (paused || !Online.connected || hero.dead) return;
+      const npc = City.npcs.find(n => n.id === id);
+      if (npc) talkTo(npc);
+    },
     visitCity() {
       if(paused || !Online.connected || hero.dead)return;
       Field.clearInput(); pendingNpc=null; hero.target=null; hero.goal=null;

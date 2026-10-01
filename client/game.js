@@ -468,7 +468,7 @@
     const at = $('area-title'); at.classList.remove('show'); void at.offsetWidth; at.classList.add('show');
   }
   function leaveGame() { if (window.Field) Field.stop(); }
-  function setPause(on) { City.close(false); $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); }
+  function setPause(on) { window.Quests?.close(false); City.close(false); $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); }
   function renderEquipment() {
     const c = save.char, mage = c && currentSprite(c); if (!c || !mage) return;
     mage.set(c); const canvas = $('equipmentcv'); canvas.width = canvas.height = 240;
@@ -493,6 +493,11 @@
     if (scene !== 'game') return;
     const closesEquipment = !$('equipment').hidden && e.key.toLowerCase() === 'i';
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '') && e.key !== 'Escape' && !closesEquipment) return;
+    if (window.Quests?.open) {
+      if (['Escape', 'q', 'Q', 'i', 'I'].includes(e.key)) { e.preventDefault(); Quests.close(); }
+      return;
+    }
+    if (e.key.toLowerCase() === 'q' && !e.repeat) { e.preventDefault(); window.Quests?.show(); return; }
     if (City.open && (e.key === 'Escape' || e.key.toLowerCase() === 'i')) { e.preventDefault(); City.close(); return; }
     if (e.key === 'Escape') { e.preventDefault(); if (!$('equipment').hidden) setPause(false); else setPause($('pause').hidden); }
     if (e.key.toLowerCase() === 'i' && !e.repeat) { e.preventDefault(); if ($('equipment').hidden) openEquipment(); else setPause(false); }

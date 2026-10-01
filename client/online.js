@@ -55,7 +55,7 @@
           callbacks.onWelcome?.(packet);
           $('connection-overlay').hidden = true; $('chat-input').disabled = false;
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
-          log('Welcome to Greenmeadow. Enter to chat · Esc for menu.');
+          log('Welcome to Greenmeadow. Q opens quests · Visit Alderhaven to find work · Enter to chat.');
           break;
         }
         case 'snapshot': {
@@ -81,7 +81,7 @@
       clearTimeout(joinTimeout);
       if (!active || currentGeneration !== generation) return;
       clearInterval(heartbeat);
-      connected = false; window.City?.close(); $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; window.Quests?.close(false); window.City?.close(); $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay('Connection lost. Reconnecting to your character…');

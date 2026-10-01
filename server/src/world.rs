@@ -78,7 +78,7 @@ impl Player {
     fn snapshot(&self) -> Value {
         let c = &self.character;
         json!({"id":c.id,"look":c.look,"x":c.x,"y":c.y,"r":PLAYER_RADIUS,"hp":c.hp,"maxHp":c.max_hp(),"level":c.level,
-            "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"fx":self.face.x,"fy":self.face.y,
+            "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"quests":c.quests,"fx":self.face.x,"fy":self.face.y,
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd})
     }
@@ -547,43 +547,71 @@ impl World {
         }
         p.stop();
         p.attack = 0.;
+        quest_progress(&mut p.character, &self.map.quests, "talk", npc_id);
         let mut notice = String::new();
+        let mut levels = 0;
+        let mut quest_changed = false;
         if let Some(id) = offer_id {
             if self.time - p.service_at < 0.5 {
-                return;
-            }
-            p.service_at = self.time;
-            let Some(offer) = npc.offers.iter().find(|offer| offer.id == id) else {
-                return;
-            };
-            if offer.heal > 0. && p.character.hp >= p.character.max_hp() {
-                notice =
-                    "You are already at full health. Save it for after your next adventure!".into();
-            } else if p.character.gold < offer.cost {
-                notice = format!("You need {} gold for this service.", offer.cost);
+                // Reply so a pending client button is never left disabled.
+                notice = "Please wait a moment before trying again.".into();
             } else {
-                p.character.gold -= offer.cost;
-                if offer.heal > 0. {
-                    p.character.hp = (p.character.hp + offer.heal).min(p.character.max_hp());
-                    notice = "Feeling better? Safe travels!".into();
-                }
-                if offer.gear {
-                    let (armor, weapon) = match p.character.look.class {
-                        Class::Warrior => ("azure", "royal"),
-                        Class::Mage => ("runic", "crystal"),
-                        Class::Assassin => ("moon", "moonfang"),
+                p.service_at = self.time;
+                if let Some(action) = id.strip_prefix("quest:") {
+                    if let Some((action, id)) = action.split_once(':')
+                        && let Some(quest) = self
+                            .map
+                            .quests
+                            .iter()
+                            .find(|q| q.id == id && q.npc == npc_id)
+                    {
+                        (notice, levels, quest_changed) =
+                            quest_action(&mut p.character, quest, action);
+                    }
+                } else {
+                    let Some(offer) = npc.offers.iter().find(|offer| offer.id == id) else {
+                        return;
                     };
-                    p.character
-                        .look
-                        .equip(armor, weapon)
-                        .expect("valid shop equipment");
-                    notice = "All fitted! Your new equipment is ready for the meadow.".into();
+                    if offer.heal > 0. && p.character.hp >= p.character.max_hp() {
+                        notice =
+                    "You are already at full health. Save it for after your next adventure!".into();
+                    } else if p.character.gold < offer.cost {
+                        notice = format!("You need {} gold for this service.", offer.cost);
+                    } else {
+                        p.character.gold -= offer.cost;
+                        if offer.heal > 0. {
+                            p.character.hp =
+                                (p.character.hp + offer.heal).min(p.character.max_hp());
+                            notice = "Feeling better? Safe travels!".into();
+                        }
+                        if offer.gear {
+                            let (armor, weapon) = match p.character.look.class {
+                                Class::Warrior => ("azure", "royal"),
+                                Class::Mage => ("runic", "crystal"),
+                                Class::Assassin => ("moon", "moonfang"),
+                            };
+                            p.character
+                                .look
+                                .equip(armor, weapon)
+                                .expect("valid shop equipment");
+                            notice =
+                                "All fitted! Your new equipment is ready for the meadow.".into();
+                        }
+                    }
                 }
             }
         }
         let _ = p
             .peer
-            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold}));
+            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"quests":p.character.quests}));
+        let actor = p.character.id.clone();
+        let point = p.character.point();
+        if levels > 0 {
+            self.event("levelup", &actor, point, levels as f64, false);
+        }
+        if quest_changed {
+            self.save();
+        }
     }
     fn start_attack(&mut self, session: u64) {
         let Some(p) = self.players.get_mut(&session) else {
@@ -802,14 +830,8 @@ impl World {
             }
             let p = self.players.get_mut(&session).unwrap();
             p.character.kills += 1;
-            p.character.xp += xp;
-            let mut levels = 0;
-            while p.character.xp >= p.character.xp_need() && p.character.level < 1000 {
-                p.character.xp -= p.character.xp_need();
-                p.character.level += 1;
-                p.character.hp = p.character.max_hp();
-                levels += 1;
-            }
+            quest_progress(&mut p.character, &self.map.quests, "kill", &kind);
+            let levels = p.character.grant_xp(xp);
             self.event("slimeDie", &actor, point, 0., false);
             if levels > 0 {
                 let point = self.players[&session].character.point();
@@ -1215,6 +1237,62 @@ fn walk_with_actors(
     }
 }
 
+// Only called after the NPC's range, living-player and cooldown checks.
+fn quest_action(character: &mut Character, quest: &Quest, action: &str) -> (String, u32, bool) {
+    let refused = |text: &str| (text.to_owned(), 0, false);
+    if !quest.unlocked(character) {
+        return refused("Finish the earlier quest first.");
+    }
+    let prior = character.quests.iter().position(|q| q.id == quest.id);
+    match action {
+        "accept" => {
+            if prior.is_some_and(|i| !character.quests[i].claimed || !quest.repeatable) {
+                return refused("You have already taken this quest.");
+            }
+            let progress = QuestProgress {
+                id: quest.id.clone(),
+                counts: vec![0; quest.objectives.len()],
+                claimed: false,
+                completions: prior.map_or(0, |i| character.quests[i].completions),
+            };
+            if let Some(i) = prior {
+                character.quests[i] = progress;
+            } else {
+                character.quests.push(progress);
+            }
+            (
+                format!(
+                    "Quest accepted: {}. Follow it in your journal (Q).",
+                    quest.title
+                ),
+                0,
+                true,
+            )
+        }
+        "claim" => {
+            let Some(i) = prior else {
+                return refused("Accept this quest before collecting its reward.");
+            };
+            if !quest.ready(&character.quests[i]) {
+                return refused("Complete the objectives before collecting your reward.");
+            }
+            character.quests[i].claimed = true;
+            character.quests[i].completions = character.quests[i].completions.saturating_add(1);
+            character.gold = character.gold.saturating_add(quest.reward_gold);
+            let levels = character.grant_xp(quest.reward_xp);
+            (
+                format!(
+                    "Quest complete: {}! +{} XP and +{} gold.",
+                    quest.title, quest.reward_xp, quest.reward_gold
+                ),
+                levels,
+                true,
+            )
+        }
+        _ => refused("Unknown quest action."),
+    }
+}
+
 fn segment_distance(p: Point, a: Point, b: Point) -> f64 {
     let dx = b.x - a.x;
     let dy = b.y - a.y;
@@ -1240,6 +1318,133 @@ mod tests {
         w.join(id, None, Some(look), tx).unwrap();
         rx
     }
+    fn quest_interact(w: &mut World, npc: &str, offer: Option<&str>) {
+        let n = w.map.npcs.iter().find(|n| n.id == npc).unwrap();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.x = n.x;
+        c.y = n.y;
+        w.time += 0.6;
+        w.interact(1, npc, offer);
+    }
+
+    #[test]
+    fn town_quest_checks_range_life_giver_objectives_and_single_reward() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        w.interact(1, "guide", Some("quest:accept:welcome"));
+        assert!(w.players[&1].character.quests.is_empty());
+        quest_interact(&mut w, "gatekeeper", Some("quest:accept:welcome"));
+        assert!(w.players[&1].character.quests.is_empty());
+        w.players.get_mut(&1).unwrap().character.hp = 0.;
+        quest_interact(&mut w, "guide", Some("quest:accept:welcome"));
+        assert!(w.players[&1].character.quests.is_empty());
+        w.players.get_mut(&1).unwrap().character.hp = 40.;
+        quest_interact(&mut w, "healer", None); // Earlier conversations do not count.
+        quest_interact(&mut w, "guide", Some("quest:accept:welcome"));
+        assert_eq!(w.players[&1].character.quests[0].counts, vec![0, 0, 0]);
+        quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
+        assert_eq!(w.players[&1].character.gold, 0);
+        quest_interact(&mut w, "healer", None);
+        quest_interact(&mut w, "healer", None);
+        quest_interact(&mut w, "guide", Some("quest:accept:welcome"));
+        assert_eq!(w.players[&1].character.quests[0].counts, vec![1, 0, 0]);
+        quest_interact(&mut w, "smith", None);
+        quest_interact(&mut w, "innkeeper", None);
+        quest_interact(&mut w, "innkeeper", Some("quest:claim:welcome"));
+        assert_eq!(w.players[&1].character.gold, 0);
+        w.players.get_mut(&1).unwrap().character.xp = 150;
+        quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
+        let c = &w.players[&1].character;
+        assert_eq!((c.level, c.xp, c.gold), (2, 30, 12));
+        assert_eq!(c.hp, c.max_hp());
+        assert!(c.quests[0].claimed);
+        quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
+        quest_interact(&mut w, "guide", Some("quest:accept:welcome"));
+        assert_eq!(w.players[&1].character.gold, 12);
+        assert_eq!(w.players[&1].character.quests[0].completions, 1);
+    }
+
+    #[test]
+    fn combat_quests_credit_only_accepted_matching_killer_and_unlock_on_turn_in() {
+        let mut w = world();
+        let _rx1 = join(&mut w, 1, Class::Warrior);
+        let _rx2 = join(&mut w, 2, Class::Mage);
+        quest_interact(&mut w, "smith", Some("quest:accept:ironhide_hunt"));
+        assert!(w.players[&1].character.quests.is_empty());
+        w.hit_slime(0, 1, 1000., false);
+        quest_interact(&mut w, "gatekeeper", Some("quest:accept:slime_patrol"));
+        assert_eq!(w.players[&1].character.quests[0].counts, vec![0]);
+        let beetle = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
+        w.hit_slime(beetle, 1, 1000., false);
+        assert_eq!(w.players[&1].character.quests[0].counts, vec![0]);
+        for _ in 0..6 {
+            w.slimes[0] = Slime::new(0, &w.map.slimes[0]);
+            w.hit_slime(0, 1, 1000., false);
+            w.hit_slime(0, 2, 1000., false); // Dead enemies cannot grant a second credit.
+        }
+        assert_eq!(w.players[&1].character.quests[0].counts, vec![6]);
+        assert!(w.players[&2].character.quests.is_empty());
+        quest_interact(&mut w, "smith", Some("quest:accept:ironhide_hunt"));
+        assert_eq!(w.players[&1].character.quests.len(), 1);
+        quest_interact(&mut w, "gatekeeper", Some("quest:claim:slime_patrol"));
+        quest_interact(&mut w, "smith", Some("quest:accept:ironhide_hunt"));
+        assert_eq!(w.players[&1].character.quests[1].counts, vec![0]);
+        for _ in 0..2 {
+            w.slimes[beetle] = Slime::new(beetle, &w.map.slimes[beetle]);
+            w.hit_slime(beetle, 1, 1000., false);
+        }
+        quest_interact(&mut w, "smith", Some("quest:claim:ironhide_hunt"));
+        quest_interact(&mut w, "gatekeeper", Some("quest:accept:king_challenge"));
+        let king = w.slimes.iter().position(|s| s.kind == "big").unwrap();
+        w.slimes[king] = Slime::new(king, &w.map.slimes[king]);
+        w.hit_slime(king, 1, 1000., false);
+        quest_interact(&mut w, "gatekeeper", Some("quest:claim:king_challenge"));
+        assert_eq!(w.players[&1].character.gold, 24 + 35 + 60);
+    }
+
+    #[test]
+    fn repeatable_bounty_resets_and_claims_survive_restart() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        quest_interact(&mut w, "gatekeeper", Some("quest:accept:slime_patrol"));
+        for _ in 0..6 {
+            quest_progress(
+                &mut w.players.get_mut(&1).unwrap().character,
+                &w.map.quests,
+                "kill",
+                "green",
+            );
+        }
+        quest_interact(&mut w, "gatekeeper", Some("quest:claim:slime_patrol"));
+        quest_interact(&mut w, "merchant", Some("quest:accept:meadow_bounty"));
+        for target in [
+            "green", "blue", "pink", "yellow", "beetle", "big", "green", "green",
+        ] {
+            quest_progress(
+                &mut w.players.get_mut(&1).unwrap().character,
+                &w.map.quests,
+                "kill",
+                target,
+            );
+        }
+        quest_interact(&mut w, "merchant", Some("quest:claim:meadow_bounty"));
+        let saved = w.store.load(&token).unwrap().unwrap(); // Claim saves immediately.
+        assert_eq!(saved.gold, 49);
+        assert_eq!(saved.quests[1].completions, 1);
+        w.players.get_mut(&1).unwrap().character = saved;
+        quest_interact(&mut w, "merchant", Some("quest:claim:meadow_bounty"));
+        assert_eq!(w.players[&1].character.gold, 49);
+        quest_interact(&mut w, "merchant", Some("quest:accept:meadow_bounty"));
+        let saved = w.store.load(&token).unwrap().unwrap();
+        assert_eq!(saved.quests[1].counts, vec![0]);
+        assert!(!saved.quests[1].claimed);
+        assert_eq!(saved.quests[1].completions, 1);
+        quest_interact(&mut w, "merchant", Some("quest:claim:meadow_bounty"));
+        assert_eq!(w.players[&1].character.gold, 49);
+    }
+
     #[test]
     fn every_class_can_defeat_an_enemy_from_separate_tiles() {
         for class in [Class::Warrior, Class::Assassin, Class::Mage] {
@@ -1288,6 +1493,7 @@ mod tests {
             objects: vec![],
             slimes: vec![],
             npcs: vec![],
+            quests: vec![],
             city: None,
         };
         let blocker = Point { x: 21.9, y: 20.5 };

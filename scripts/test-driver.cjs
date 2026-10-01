@@ -11,7 +11,7 @@ process.once('SIGINT', shutdown);
 process.once('SIGTERM', shutdown);
 (async () => {
   const [command = 'list', name = 'all', ...extra] = process.argv.slice(2);
-  if (extra.length || !['list', 'run'].includes(command)) throw Error('Usage: node scripts/test-driver.cjs list | run <movement|ironhide|city|all>');
+  if (extra.length || !['list', 'run'].includes(command)) throw Error('Usage: node scripts/test-driver.cjs list | run <movement|ironhide|city|quests|quest_combat|all>');
   if (command === 'list') {
     console.log(JSON.stringify(Object.entries(scenarios).map(([name, s]) => ({ name, description: s.description })), null, 2));
     return;

@@ -99,9 +99,19 @@
       <p class="hud-stats"><span id="hud-gold">0</span> <span data-i18n="gold">gold</span> · <span id="hud-kills">0</span> <span data-i18n="slain">slimes</span></p>
     </div>
     <button id="city-travel" class="city-travel" type="button">Visit Alderhaven ↓</button>
+    <button id="quest-tracker" class="quest-tracker" type="button" aria-label="Open quest journal"></button>
     <p class="hud-hint" data-i18n="fieldHint">Click to move or attack · WASD to walk · Space to swing · Esc for menu</p>
     <div class="dead-msg" id="dead-msg" hidden><b data-i18n="defeated">Defeated!</b><span data-i18n="defeatedSub">You wake up back at the start…</span></div>
 
+    <div class="pause" id="quest-journal" hidden>
+      <section class="panel npc-panel quest-panel" role="dialog" aria-modal="true" aria-labelledby="quest-title">
+        <p class="npc-role">Alderhaven &amp; Greenmeadow</p>
+        <h3 id="quest-title">Quest Journal</h3>
+        <p>Accept quests in town. Only objectives completed after accepting count; the finishing blow earns kill credit.</p>
+        <div id="quest-list"></div>
+        <button class="btn primary" id="quest-close" type="button">Back to adventure</button>
+      </section>
+    </div>
     <div class="pause" id="npc-dialogue" hidden>
       <section class="panel npc-panel" role="dialog" aria-modal="true" aria-labelledby="npc-name" aria-describedby="npc-text">
         <p id="npc-role" class="npc-role"></p>
@@ -109,6 +119,7 @@
         <p id="npc-text"></p>
         <p id="npc-gold"></p>
         <div id="npc-offers" class="npc-offers"></div>
+        <div id="npc-quests"></div>
         <p id="npc-notice" role="status" aria-live="polite"></p>
         <button class="btn primary" id="npc-close" type="button">Back to the square</button>
       </section>
@@ -168,6 +179,7 @@
 <script src="world.js"></script>
 <script src="online.js"></script>
 <script src="city.js"></script>
+<script src="quests.js"></script>
 <script src="field.js"></script>
 <script src="game.js"></script>
 </body>
