@@ -2,9 +2,11 @@
 (() => {
   // ---------- tiny persistent state ----------
   const KEY = 'valhallasc.save.v1';
-  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : 'en', sound: true, char: null, draft: null };
+  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : 'en', sound: true, musicVol: 1, sfxVol: 1, ui: {}, char: null, draft: null };
   let save = { ...defaults };
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
+  const vol = v => Number.isFinite(+v) ? Math.max(0, Math.min(1, +v)) : 1;
+  save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol);
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) { /* ignore */ } };
 
   // ---------- text ----------
@@ -95,6 +97,16 @@
     return ac;
   }
 
+  // Every effect plays through one gain node so the Settings slider can scale them together. The slider is
+  // squared (a perceptual taper), so 100% is exactly the loudness the game always had.
+  const taper = v => v * v;
+  let sfxGain = null;
+  function sfxOut(c) {
+    if (!sfxGain || sfxGain.context !== c) { sfxGain = c.createGain(); sfxGain.connect(c.destination); }
+    sfxGain.gain.value = taper(save.sfxVol);
+    return sfxGain;
+  }
+
   // ---------- background music (music.js) ----------
   // Browsers only let audio start after a tap or key press, so the score begins on the first one
   // (on the title screen that is the tap that awakens the horn) and then plays on every screen.
@@ -113,8 +125,8 @@
     applyMusicLevel(3);
   }
   function applyMusicLevel(secs = 1.5) {
-    if (music) music.setLevel(save.sound ? (scene === 'splash' ? 1 : .55) : 0, secs);
-    if (fmusic) fmusic.setLevel(save.sound ? 1 : 0, secs);
+    if (music) music.setLevel(save.sound ? (scene === 'splash' ? 1 : .55) * taper(save.musicVol) : 0, secs);
+    if (fmusic) fmusic.setLevel(save.sound ? taper(save.musicVol) : 0, secs);
   }
   function unlockAudio() { const c = audio(); if (c) c.resume().then(ensureMusic).catch(() => {}); }
   ['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, unlockAudio, { capture: true }));
@@ -125,7 +137,7 @@
   addEventListener('keydown', e => {                      // M = mute / unmute all sound
     if (e.key !== 'm' && e.key !== 'M') return;
     if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
-    save.sound = !save.sound; persist(); applyMusicLevel(.6); showToast(save.sound ? t('soundOn') : t('soundOff'));
+    save.sound = !save.sound; persist(); applyMusicLevel(.6); dispatchEvent(new Event('prefs-change')); showToast(save.sound ? t('soundOn') : t('soundOff'));
   });
   function blip(freq = 660, dur = .08, vol = .05) {
     if (!save.sound) return;
@@ -133,7 +145,7 @@
     const o = c.createOscillator(), g = c.createGain(), now = c.currentTime;
     o.type = 'triangle'; o.frequency.value = freq;
     g.gain.setValueAtTime(vol, now); g.gain.exponentialRampToValueAtTime(.0001, now + dur);
-    o.connect(g).connect(c.destination); o.start(now); o.stop(now + dur + .02);
+    o.connect(g).connect(sfxOut(c)); o.start(now); o.stop(now + dur + .02);
   }
   function horn() {
     if (!save.sound) return;
@@ -161,7 +173,7 @@
     const d = c.createDelay(1); d.delayTime.value = .32;
     const fb = c.createGain(); fb.gain.value = .35;
     lp.connect(out); lp.connect(d); d.connect(fb).connect(d); d.connect(out);
-    out.connect(c.destination);
+    out.connect(sfxOut(c));
   }
 
   function el(tag, props = {}, ...kids) {
@@ -182,13 +194,13 @@
     o.frequency.setValueAtTime(f0, now); o.frequency.linearRampToValueAtTime(f0 * 1.5, now + dur * .14); o.frequency.exponentialRampToValueAtTime(f0 * .85, now + dur);
     g.gain.setValueAtTime(.0001, now); g.gain.exponentialRampToValueAtTime(vol, now + Math.min(.05, dur * .2)); g.gain.exponentialRampToValueAtTime(.0001, now + dur);
     for (const fr of [700, 1150, 2600]) { const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = fr; bp.Q.value = 5; o.connect(bp); bp.connect(g); }
-    g.connect(c.destination); o.start(now); o.stop(now + dur + .05);
+    g.connect(sfxOut(c)); o.start(now); o.stop(now + dur + .05);
     if (!breath) return;
     const buf = c.createBuffer(1, Math.floor(c.sampleRate * .3), c.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
     const n = c.createBufferSource(), hp = c.createBiquadFilter(), ng = c.createGain();
     n.buffer = buf; hp.type = 'highpass'; hp.frequency.value = 1500; ng.gain.value = .18 * vol;
-    n.connect(hp).connect(ng).connect(c.destination); n.start(now);
+    n.connect(hp).connect(ng).connect(sfxOut(c)); n.start(now);
   }
   const shout = () => voice(140, .85, .55);
   const grunt = () => voice(105, .3, .4, false);
@@ -201,7 +213,7 @@
       const o = c.createOscillator(), g = c.createGain();
       o.type = type; o.frequency.value = fr;
       g.gain.setValueAtTime(vol, now); g.gain.exponentialRampToValueAtTime(.0001, now + dur);
-      o.connect(g).connect(c.destination); o.start(now); o.stop(now + dur + .05);
+      o.connect(g).connect(sfxOut(c)); o.start(now); o.stop(now + dur + .05);
     }
   }
   const clang = () => tone([520, 1310, 2210, 3080], 1.1, .12);
@@ -451,7 +463,7 @@
     const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
     s.buffer = buf; f.type = type; f.Q.value = q; f.frequency.setValueAtTime(f0, now); f.frequency.exponentialRampToValueAtTime(f1, now + dur);
     g.gain.setValueAtTime(vol, now); g.gain.exponentialRampToValueAtTime(.0001, now + dur);
-    s.connect(f); f.connect(g); g.connect(c.destination); s.start(now);
+    s.connect(f); f.connect(g); g.connect(sfxOut(c)); s.start(now);
   }
   function sweep(f0, f1, dur, vol, type = 'sine') {
     if (!save.sound) return;
@@ -459,7 +471,7 @@
     const now = c.currentTime, o = c.createOscillator(), g = c.createGain();
     o.type = type; o.frequency.setValueAtTime(f0, now); o.frequency.exponentialRampToValueAtTime(f1, now + dur);
     g.gain.setValueAtTime(vol, now); g.gain.exponentialRampToValueAtTime(.0001, now + dur);
-    o.connect(g).connect(c.destination); o.start(now); o.stop(now + dur + .02);
+    o.connect(g).connect(sfxOut(c)); o.start(now); o.stop(now + dur + .02);
   }
   const SFX = {
     shadowstep: () => noiseBurst(.16, 900, 3200, .065),
@@ -518,11 +530,12 @@
         if (!$('equipment').hidden) renderEquipment();
       },
       slimeSprites: { png: 'assets/slimes_%k.png', json: 'assets/slimes.txt' } });
+    window.Settings?.refresh();
     const at = $('area-title'); at.classList.remove('show'); void at.offsetWidth; at.classList.add('show');
   }
-  function leaveGame() { if (window.Field) Field.stop(); }
+  function leaveGame() { window.Settings?.close(false); if (window.Field) Field.stop(); }
   let equipmentFocus = null;
-  function setPause(on) { window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Inventory.hideTooltip(); const wasEquipment = !$('equipment').hidden; $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); else if (wasEquipment && equipmentFocus?.isConnected && !equipmentFocus.closest('[hidden]')) equipmentFocus.focus({ preventScroll: true }); }
+  function setPause(on) { window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Inventory.hideTooltip(); const wasEquipment = !$('equipment').hidden; $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); else if (wasEquipment && equipmentFocus?.isConnected && !equipmentFocus.closest('[hidden]')) equipmentFocus.focus({ preventScroll: true }); }
   function renderEquipment() {
     const c = save.char, mage = c && currentSprite(c); if (!c || !mage) return;
     mage.set(c); const canvas = $('equipmentcv'); canvas.width = 320; canvas.height = 420;
@@ -555,7 +568,7 @@
     const key = e.key.toLowerCase(), gearKey = key === 'e' || key === 'i' || key === 'b';
     const closesEquipment = !$('equipment').hidden && gearKey && e.target?.tagName === 'SELECT';
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '') && key !== 'escape' && !closesEquipment) return;
-    if (window.Skillbar?.open) return;
+    if (window.Skillbar?.open || window.Settings?.active) return;
     if (window.Quests?.open) {
       if (gearKey || key === 'k') { e.preventDefault(); Quests.close(false); if (gearKey) openEquipment(key === 'e' ? 'both' : 'bags'); else Skillbar.show(); }
       else if (key === 'escape' || key === 'q') { e.preventDefault(); Quests.close(); }
@@ -751,6 +764,21 @@
     // reduced motion: keep it still, no canvas loop
     cv.remove();
   }
+  // Preferences shared with settings.js (volumes and the HUD layout); it never touches localStorage itself.
+  window.Prefs = {
+    get music() { return save.musicVol; }, get sfx() { return save.sfxVol; }, get sound() { return save.sound; },
+    get layout() { return save.ui && typeof save.ui === 'object' ? save.ui : {}; },
+    set(patch) {
+      if ('musicVol' in patch) save.musicVol = vol(patch.musicVol);
+      if ('sfxVol' in patch) save.sfxVol = vol(patch.sfxVol);
+      if ('sound' in patch) save.sound = !!patch.sound;
+      if ('ui' in patch) save.ui = patch.ui;
+      persist(); applyMusicLevel(.4);
+      if (sfxGain) sfxGain.gain.value = taper(save.sfxVol);
+      dispatchEvent(new Event('prefs-change'));
+    },
+    preview() { SFX.hit(); },
+  };
   ensureMusic();
   show('splash');
 })();

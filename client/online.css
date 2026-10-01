@@ -332,3 +332,36 @@
   .social-open, .social-panel .window-tool, .social-tabs button, .party-head, .invite-card .btn { min-height: 44px; min-width: 44px; }
   .social-add input { font-size: 16px; min-height: 44px; }
 }
+
+/* ---------- settings panel and Edit UI ---------- */
+#settings-panel { z-index: 40; }
+.settings-panel { text-align: left; min-width: 34cqw; }
+.settings-panel h3 { text-align: center; }
+.setting-row { display: grid; grid-template-columns: 11cqw 1fr 4cqw; align-items: center; gap: 1cqw; font-size: clamp(13px, 1.5cqw, 24px); }
+.setting-row output { text-align: right; color: var(--gold); font-variant-numeric: tabular-nums; }
+.setting-row input[type="range"] { width: 100%; min-width: 0; accent-color: var(--gold); cursor: pointer; }
+.setting-check { display: flex; align-items: center; gap: .8cqw; font-size: clamp(13px, 1.5cqw, 24px); cursor: pointer; }
+.setting-check input { width: 1.6cqw; height: 1.6cqw; min-width: 16px; min-height: 16px; accent-color: var(--gold); }
+.setting-check kbd { font: .9em 'Jua', sans-serif; color: #aab9cc; }
+.settings-panel .world-menu-note { margin: 0; }
+.settings-panel :focus-visible { outline: 3px solid #ffdc87; outline-offset: 3px; }
+@media (pointer: coarse) { .setting-row input[type="range"] { min-height: 44px; } .setting-check { min-height: 44px; } }
+
+.layout-bar { position: absolute; left: 50%; top: 3.2cqw; transform: translateX(-50%); z-index: 52; display: flex; align-items: center; gap: 1cqw; padding: .6cqw 1.2cqw; max-width: 96cqw; border: .2cqw solid #f5c542; border-radius: 1cqw; background: #0b1230f2; color: #f1ecda; font: 1.05cqw 'Jua', sans-serif; box-shadow: 0 .4cqw 1.6cqw #000a; }
+.layout-bar b { color: var(--gold); font-size: 1.3cqw; white-space: nowrap; }
+.layout-bar span { flex: 1; min-width: 0; color: #cdd7ea; }
+.layout-bar .btn { font-size: clamp(12px, 1.2cqw, 20px); padding: .35em 1.1em; white-space: nowrap; }
+.layout-bar :focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }
+@media (pointer: coarse) { .layout-bar .btn { min-height: 44px; } }
+
+.layout-layer { position: absolute; inset: 0; z-index: 50; background: #04081844; touch-action: none; cursor: default; }
+.layout-handle { position: absolute; box-sizing: border-box; border: .2cqw dashed #ffd866; border-radius: .5cqw; background: #f5c54226; cursor: grab; touch-action: none; min-width: 20px; min-height: 20px; }
+.layout-handle span { position: absolute; left: -.2cqw; bottom: 100%; margin-bottom: .15cqw; padding: .1cqw .5cqw; border-radius: .4cqw; background: #f5c542; color: #2a1a00; font: .85cqw 'Jua', sans-serif; white-space: nowrap; pointer-events: none; }
+.layout-handle:hover, .layout-handle.selected { background: #f5c54255; border-style: solid; }
+.layout-handle.dragging { cursor: grabbing; background: #f5c54273; }
+.layout-handle:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+@media (pointer: coarse) { .layout-handle span { font-size: max(11px, .85cqw); } }
+/* Pieces that are normally hidden or empty still need something to grab while arranging. */
+.stage.ui-editing [data-ui][hidden] { display: block !important; }
+.stage.ui-editing #party-frame:empty, .stage.ui-editing #quest-tracker:empty { min-height: 3cqw; }
+.stage.ui-editing #buff-bar:empty { min-width: 8cqw; min-height: 3.4cqw; }

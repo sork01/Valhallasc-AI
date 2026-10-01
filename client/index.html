@@ -157,11 +157,23 @@
         <p class="world-menu-note">The world keeps running while this menu is open.</p>
         <button class="btn primary" id="p-resume" type="button" data-i18n="resume">Resume</button>
         <button class="btn ghost" id="p-equipment" type="button" hidden>Equipment &amp; Inventory (E)</button>
+        <button class="btn ghost" id="p-settings" type="button">Settings</button>
         <button class="btn ghost" id="p-characters" type="button">Your Characters</button>
         <div id="character-list" class="character-list" hidden></div>
         <button class="btn ghost" id="p-new" type="button" data-i18n="newChar">New Character</button>
         <button class="btn ghost" id="p-title" type="button" data-i18n="toTitle">Back to Title</button>
       </div>
+    </div>
+    <div class="pause" id="settings-panel" hidden>
+      <section class="panel pause-panel settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <h3 id="settings-title">Settings</h3>
+        <label class="setting-row" for="set-music"><span>Music</span><input id="set-music" type="range" min="0" max="100" step="1"><output id="set-music-out" for="set-music"></output></label>
+        <label class="setting-row" for="set-sfx"><span>Sound effects</span><input id="set-sfx" type="range" min="0" max="100" step="1"><output id="set-sfx-out" for="set-sfx"></output></label>
+        <label class="setting-check"><input id="set-sound" type="checkbox"> Sound on <kbd>M</kbd></label>
+        <button class="btn ghost" id="set-edit-ui" type="button">Edit UI</button>
+        <p class="world-menu-note">Edit UI lets you drag the skillbar, quest tracker, chat and the other panels where you want them.</p>
+        <button class="btn primary" id="set-back" type="button">Back to menu</button>
+      </section>
     </div>
     <div id="levelup-flash" class="levelup-flash" aria-hidden="true"></div>
     <div id="levelup-banner" class="levelup" role="status" aria-live="assertive" hidden>
@@ -236,6 +248,12 @@
     <div id="chat-log" class="chat-log" role="log" aria-live="polite"></div>
     <form id="chat-form"><input id="chat-input" type="text" maxlength="240" placeholder="Enter to chat…" aria-label="Chat message" autocomplete="off" disabled><button type="submit">Send</button></form>
   </section>
+  <div id="layout-bar" class="layout-bar" role="toolbar" aria-label="Edit UI" hidden>
+    <b>Edit UI</b>
+    <span>Drag the highlighted pieces · arrow keys nudge (Shift: bigger) · Esc to finish</span>
+    <button id="layout-reset" class="btn ghost" type="button">Reset layout</button>
+    <button id="layout-done" class="btn primary" type="button">Done</button>
+  </div>
   <div id="connection-overlay" class="connection-overlay" hidden>
     <section class="panel connection-panel" role="dialog" aria-modal="true" aria-label="World connection">
       <h3>Greenmeadow awaits</h3><p id="connection-text"></p>
@@ -272,5 +290,6 @@
 <script src="field.js"></script>
 <script src="skillbar.js"></script>
 <script src="game.js"></script>
+<script src="settings.js"></script>
 </body>
 </html>
