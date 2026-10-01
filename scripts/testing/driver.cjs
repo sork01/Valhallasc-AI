@@ -16,7 +16,7 @@ const actionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('target'), id: z.number().int().nonnegative() }).strict(),
   z.object({ type: z.literal('attack'), fx: number, fy: number }).strict(),
   z.object({ type: z.literal('dash'), dx: number.min(-1).max(1), dy: number.min(-1).max(1) }).strict(),
-  z.object({ type: z.literal('equip'), armor: z.string().max(32), weapon: z.string().max(32) }).strict(),
+  z.object({ type: z.literal('equip'), armor: z.string().max(32).optional(), weapon: z.string().max(32).optional(), slots: z.partialRecord(z.enum(['headgear', 'shoulders', 'chest', 'pants', 'gloves', 'hands', 'necklace', 'accessory1', 'accessory2']), z.string().max(64)).optional() }).strict(),
   z.object({ type: z.literal('interact'), npc: z.string().max(32), offer: z.string().max(32).optional() }).strict(),
   z.object({ type: z.literal('chat'), text: z.string().min(1).max(240) }).strict(),
   z.object({ type: z.literal('ping'), nonce: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER) }).strict(),

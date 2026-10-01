@@ -130,8 +130,8 @@
     ellipse(g,-6,-77,2,2.8,'#443c39');ellipse(g,6,-77,2,2.8,'#443c39');line(g,[[-4,-66],[0,-64],[4,-66]],'#a86b5d',1.5);
     if(n.id==='gatekeeper'){poly(g,[[-19,-91],[-12,-105],[12,-105],[20,-91]],'#a4b5c0');line(g,[[29,-8],[29,-107]],'#7a6954',3);poly(g,[[25,-108],[29,-123],[33,-108]],'#d6d9ce');}
     if(n.id==='baker'){ellipse(g,-9,-103,10,9,'#f6ecd2');ellipse(g,8,-103,12,10,'#f6ecd2');g.fillStyle='#f6ecd2';g.fillRect(-17,-103,34,12);}
-    const mark=window.Quests?.marker(n.id);if(mark)text(g,mark,0,-154,25,'#ffdf88');
-    text(g,n.name,0,-128,17);text(g,near?'[ E ] Talk':n.role,0,-110,13,near?'#ffdf88':'#e0dfcd');g.restore();
+    const mark=window.Quests?.markerInfo(n.id);if(mark?.symbol)text(g,mark.symbol,0,-154,25,mark.color);
+    text(g,n.name,0,-128,17);text(g,near?'[ F ] Talk':n.role,0,-110,13,near?'#ffdf88':'#e0dfcd');g.restore();
   }
   function drawPlaza(g,w2s) {
     const [x,y]=w2s(city.plaza.x,city.plaza.y);
@@ -142,20 +142,25 @@
   const $=id=>document.getElementById(id);
   function dialogue(packet) {
     if(!Online.connected || Field.hero.dead)return;
+    window.Inventory?.hideTooltip();
+    window.Skillbar?.close(false);
+    if($('equipment')) $('equipment').hidden=true; if($('pause')) $('pause').hidden=true;
     window.Quests?.close(false);
     previousFocus=current?previousFocus:document.activeElement;current=packet.npc;
     Field.setPaused(true);$('npc-dialogue').hidden=false;
     $('npc-name').textContent=current.name;$('npc-role').textContent=current.role;
     $('npc-text').textContent=current.dialogue;$('npc-notice').textContent=packet.notice;
     $('npc-gold').textContent=`Your purse: ${packet.gold} gold`;
+    window.Inventory?.update(packet.inventory || [], packet.look, packet.equipment || {}, packet.bags || []);
     window.Quests?.update(packet.quests || []);
     window.Quests?.npc(current.id, $('npc-quests'));
     $('npc-offers').replaceChildren(...current.offers.map(offer=>{
       const b=document.createElement('button');b.type='button';b.className='btn ghost';b.dataset.offer=offer.id;
       b.textContent=offer.label+(offer.cost?` · ${offer.cost} gold`:' · free');
-      b.disabled=packet.gold<offer.cost;
+      b.disabled=packet.gold<offer.cost || (offer.bag && (packet.bags || []).length >= 4 && !(packet.bags || []).some(id => WORLD_ITEMS.find(i => i.id === id)?.bagSlots < WORLD_ITEMS.find(i => i.id === offer.bag)?.bagSlots));
       b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:current.id,offer:offer.id})) b.disabled=true;});return b;
     }));
+    window.Inventory?.renderShop(current, $('npc-inventory'));
     $('npc-close').focus({preventScroll:true});
   }
   function close(resume=true) {if(!current)return;current=null;$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
@@ -163,5 +168,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')];const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={inside,stoneTile,drawObject,drawNpc,drawPlaza,npcs,dialogue,close,get open(){return !!current;}};
+  window.City={inside,stoneTile,drawObject,drawNpc,drawPlaza,npcs,dialogue,close,refreshInventory() { if(current) Inventory.renderShop(current, $('npc-inventory')); },get open(){return !!current;}};
 })();

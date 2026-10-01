@@ -22,7 +22,8 @@ test('private driver: isolated storage, normal actions, resume, credentials, and
     assert.throws(() => actionSchema.parse({ type: 'join', token }));
     assert.throws(() => actionSchema.parse({ type: 'move', x: Infinity, y: 1 }));
     await w.action('Tester', { type: 'equip', armor: 'runic', weapon: 'crystal' });
-    await w.waitFor(() => w.player('Tester').look.mageWeapon === 'crystal');
+    await w.waitFor(() => w.events.some(e => e.type === 'error' && e.text.includes('must own')));
+    assert.equal(w.player('Tester').look.mageWeapon, 'ash');
     await w.action('Tester', { type: 'ping', nonce: 42 });
     await w.waitFor(() => w.events.some(e => e.type === 'pong' && e.nonce === 42));
     await Promise.all(Array.from({ length: 90 }, (_, i) => w.action('Tester', { type: 'ping', nonce: 100 + i })));
@@ -38,7 +39,7 @@ test('private driver: isolated storage, normal actions, resume, credentials, and
     await w.connect({ bot: 'Tester' });
     assert.equal(w.player('Tester').id, id);
     assert.equal(w.player('Tester').look.class, 'mage');
-    assert.equal(w.player('Tester').look.mageWeapon, 'crystal');
+    assert.equal(w.player('Tester').look.mageWeapon, 'ash');
     await assert.rejects(w.connect({ bot: 'Tester' }), /already connected/);
   } finally { await w.stop(); }
   await assert.rejects(fetch(w.url + 'health', { signal: AbortSignal.timeout(1000) }));
@@ -61,7 +62,7 @@ test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and pare
     for (const name of ['start_world', 'stop_world', 'connect_bot', 'disconnect_bot', 'send_action', 'inspect_world', 'wait_world', 'list_scenarios', 'run_scenario']) {
       assert.ok(listed.tools.some(t => t.name === name), `Advertises ${name}`);
     }
-    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['movement', 'ironhide', 'city', 'quests', 'quest_combat']);
+    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'bags']);
     const first = await call('start_world');
     url = first.url;
     assert.match(url, /^http:\/\/127\.0\.0\.1:\d+\/$/);
@@ -70,6 +71,11 @@ test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and pare
     const rejected = await client.callTool({ name: 'send_action', arguments: { bot: 'McpMage', action: { type: 'move', x: 5, y: 5, hp: 999 } } });
     assert.equal(rejected.isError, true);
     await call('send_action', { bot: 'McpMage', action: { type: 'equip', armor: 'runic', weapon: 'crystal' } });
+    await call('send_action', { bot: 'McpMage', action: { type: 'equip', slots: { hands: 'none' } } });
+    await call('wait_world', { milliseconds: 100 });
+    const slotsResult = await call('inspect_world', { bot: 'McpMage', events: 0 });
+    assert.equal(slotsResult.snapshot.look.mageWeapon, 'none');
+    await call('send_action', { bot: 'McpMage', action: { type: 'equip', slots: { hands: 'mage_weapon_ash' } } });
     const parallel = await Promise.all([call('inspect_world', { bot: 'McpMage', events: 0 }), call('wait_world', { milliseconds: 100 })]);
     assert.equal(parallel[0].snapshot.look.class, 'mage');
     assert.ok(parallel[1].snapshot.tick >= 0);

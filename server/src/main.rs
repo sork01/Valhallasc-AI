@@ -1,3 +1,4 @@
+mod items;
 mod model;
 mod store;
 mod world;

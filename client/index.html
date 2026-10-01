@@ -98,6 +98,8 @@
       <canvas id="minimap" width="144" height="144" aria-label="Minimap"></canvas>
       <p class="hud-stats"><span id="hud-gold">0</span> <span data-i18n="gold">gold</span> · <span id="hud-kills">0</span> <span data-i18n="slain">slimes</span></p>
     </div>
+    <button id="equipment-open" class="inventory-open" type="button">Character · E</button>
+    <button id="inventory-open" class="bags-open" type="button" aria-label="Open bags (B or I)"><svg viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"><path d="M18 20c0-17 28-17 28 0M12 21h40l3 31H9z"/><path d="M10 32h44M25 26v12h14V26" stroke-width="3"/></svg><kbd>B</kbd></button>
     <button id="city-travel" class="city-travel" type="button">Visit Alderhaven ↓</button>
     <button id="quest-tracker" class="quest-tracker" type="button" aria-label="Open quest journal"></button>
     <p class="hud-hint" data-i18n="fieldHint">Click to move or attack · WASD to walk · Space to swing · Esc for menu</p>
@@ -120,6 +122,7 @@
         <p id="npc-gold"></p>
         <div id="npc-offers" class="npc-offers"></div>
         <div id="npc-quests"></div>
+        <div id="npc-inventory"></div>
         <p id="npc-notice" role="status" aria-live="polite"></p>
         <button class="btn primary" id="npc-close" type="button">Back to the square</button>
       </section>
@@ -129,20 +132,68 @@
         <h3>World Menu</h3>
         <p class="world-menu-note">The world keeps running while this menu is open.</p>
         <button class="btn primary" id="p-resume" type="button" data-i18n="resume">Resume</button>
-        <button class="btn ghost" id="p-equipment" type="button" data-i18n="equipment" hidden>Equipment (I)</button>
+        <button class="btn ghost" id="p-equipment" type="button" hidden>Equipment &amp; Inventory (E)</button>
         <button class="btn ghost" id="p-characters" type="button">Your Characters</button>
         <div id="character-list" class="character-list" hidden></div>
         <button class="btn ghost" id="p-new" type="button" data-i18n="newChar">New Character</button>
         <button class="btn ghost" id="p-title" type="button" data-i18n="toTitle">Back to Title</button>
       </div>
     </div>
+    <div id="skillbar" class="skillbar" role="group" aria-label="Skillbar, keys 1 to 9">
+      <div id="skillbar-slots" class="skillbar-slots"></div>
+      <button id="skills-open" class="skills-open" type="button">Skills <kbd>K</kbd></button>
+    </div>
+    <div class="pause" id="skills-panel" hidden>
+      <section class="panel skills-panel" role="dialog" aria-modal="true" aria-labelledby="skills-title" aria-describedby="skills-help">
+        <p class="npc-role">Your abilities</p>
+        <h3 id="skills-title">Skills &amp; Skillbar</h3>
+        <p id="skills-help">Select a numbered slot, then choose a skill. You can also drag skills onto the bar or drag slots to swap them.</p>
+        <div id="skill-library" class="skill-library"></div>
+        <p id="skill-selection" role="status" aria-live="polite"></p>
+        <div id="skill-editor-slots" class="skillbar-slots"></div>
+        <div class="skill-editor-actions">
+          <button id="skill-clear" class="btn ghost" type="button">Clear slot</button>
+          <button id="skill-reset" class="btn ghost" type="button">Reset layout</button>
+        </div>
+        <p class="world-menu-note">The world keeps running while you arrange skills.</p>
+        <button id="skills-close" class="btn primary" type="button">Back to adventure</button>
+      </section>
+    </div>
     <div class="pause" id="equipment" hidden>
-      <div class="panel equipment-panel" role="dialog" aria-modal="true" aria-labelledby="equipment-title">
-        <h3 id="equipment-title" data-i18n="equipment">Equipment (I)</h3>
-        <canvas id="equipmentcv" aria-label="Equipped mage"></canvas>
-        <div id="equipment-controls"></div>
-        <p class="tip" id="equipment-stats"></p>
-        <button class="btn primary" id="equipment-close" type="button" data-i18n="resume">Resume</button>
+      <div class="equipment-workspace" role="dialog" aria-modal="true" aria-labelledby="equipment-title" data-view="both">
+        <section class="rpg-window character-window">
+          <header class="rpg-titlebar">
+            <span class="window-emblem" aria-hidden="true">♜</span>
+            <h3 id="equipment-title">Character</h3>
+            <button class="window-close" id="equipment-close" type="button" aria-label="Close equipment and bags">×</button>
+          </header>
+          <p id="character-subtitle" class="character-subtitle"></p>
+          <div class="paper-doll">
+            <div class="portrait-plinth" aria-hidden="true"></div>
+            <canvas id="equipmentcv" aria-label="Equipped character"></canvas>
+            <div id="equipped-slots"></div>
+          </div>
+          <p class="character-instructions">Drag gear onto a slot · Right-click a slot to unequip</p>
+          <p id="equipment-stats" class="character-stats"></p>
+        </section>
+        <section class="rpg-window bag-window">
+          <header class="rpg-titlebar">
+            <span class="window-emblem" aria-hidden="true"><svg viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"><path d="M18 20c0-17 28-17 28 0M12 21h40l3 31H9z"/><path d="M10 32h44M25 26v12h14V26" stroke-width="3"/></svg></span>
+            <h3 id="bag-title">Backpack</h3>
+            <button id="bag-character" class="window-tool" type="button">Character</button>
+            <button class="window-close" id="bags-close" type="button" aria-label="Close bags">×</button>
+          </header>
+          <div id="bag-tabs" class="bag-tabs" role="group" aria-label="Choose bag"></div>
+          <div class="bag-toolbar">
+            <input id="bag-search" type="search" maxlength="60" placeholder="Search bags…" aria-label="Search bags" autocomplete="off">
+            <button id="bag-sort" class="window-tool" type="button">Sort</button>
+            <button id="bag-expand" class="window-tool" type="button">Buy Bags</button>
+          </div>
+          <div id="inventory-list" class="bag-grid" role="group" aria-label="Bag slots"></div>
+          <div id="bag-details" class="bag-details" aria-live="polite"></div>
+          <footer class="bag-footer"><span id="bag-capacity"></span><span id="bag-gold" class="bag-gold"></span></footer>
+          <p class="bag-instructions">Right-click gear to equip · Drag to move · Buy larger bags from Linden</p>
+        </section>
       </div>
     </div>
   </section>
@@ -177,10 +228,13 @@
 <script src="assassinsprite.js"></script>
 <script src="warriorsprite.js"></script>
 <script src="world.js"></script>
+<script src="items.js"></script>
+<script src="inventory.js"></script>
 <script src="online.js"></script>
 <script src="city.js"></script>
 <script src="quests.js"></script>
 <script src="field.js"></script>
+<script src="skillbar.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

@@ -14,18 +14,18 @@
       back: 'Back', toTitle: 'Back to Title', newChar: 'New Character',
       ccTitle: 'Assemble Your Warband!', forged: 'Forged in Battle!',
       warriorDesc: 'A brave sword-and-shield vanguard. High health, strong melee attacks, and armor ready for the front lines.',
-      warriorHint: 'Click to move or attack · WASD to walk · Space to swing · I for equipment · E to talk · Esc for menu',
-      arms: 'Weapons', warriorTip: 'Click the Warrior to swing. Change armor and weapons in the field with I.',
+      warriorHint: 'Click to move or attack · WASD to walk · Space to swing · 1–9 skills · E character · B bags · F talk · Esc for menu',
+      arms: 'Weapons', warriorTip: 'Click the Warrior to swing. Change armor and weapons in the field with E.',
       warriorLoading: 'Calling the Warrior…', warriorError: 'Warrior sprites could not load. Select Warrior again to retry.',
       warriorArmorNames: ['Simple cloth', 'Crimson guard', 'Azure guard'], warriorWeaponNames: ['Empty hands', 'Sword & shield', 'Royal sword & shield'],
       mageDesc: 'A rune caster with powerful ranged spells. Equip robes and staffs to change your look and strength.',
-      mageHint: 'Click to move or cast · WASD to walk · Space to cast · I for equipment · E to talk · Esc for menu',
-      equipment: 'Equipment (I)', hair: 'Hair', weapon: 'Staff', mageTip: 'Click the Mage to cast. Robes and staffs can be changed in the field with I.',
+      mageHint: 'Click to move or cast · WASD to walk · Space to cast · 1–9 skills · E character · B bags · F talk · Esc for menu',
+      equipment: 'Character (E)', hair: 'Hair', weapon: 'Staff', mageTip: 'Click the Mage to cast. Robes and staffs can be changed in the field with E.',
       mageLoading: 'Summoning the Mage…', mageError: 'Mage sprites could not load. Select Mage again to retry.',
       mageArmorNames: ['Simple cloth', 'Apprentice', 'Runic'], mageWeaponNames: ['Empty hands', 'Ash staff', 'Crystal staff'],
       assassinDesc: 'A swift duelist with twin blades and deadly critical strikes. Shadowstep through danger with Shift.',
-      assassinHint: 'Click to move or attack · WASD to walk · Space to slash · Shift to shadowstep · I for equipment · E to talk · Esc for menu',
-      blades: 'Blades', assassinTip: 'Click the Assassin to slash. Change outfits and blades in the field with I.',
+      assassinHint: 'Click to move or attack · WASD to walk · Space to slash · Shift to shadowstep · 1–9 skills · E character · B bags · F talk · Esc for menu',
+      blades: 'Blades', assassinTip: 'Click the Assassin to slash. Change outfits and blades in the field with E.',
       assassinLoading: 'Calling the Assassin…', assassinError: 'Assassin sprites could not load. Select Assassin again to retry.',
       assassinArmorNames: ['Simple cloth', 'Nightweave', 'Moonveil'], assassinWeaponNames: ['Empty hands', 'Twin daggers', 'Moonfang'],
       areaName: 'Greenmeadow Field', gold: 'gold', slain: 'enemies', paused: 'Paused', resume: 'Resume',
@@ -41,18 +41,18 @@
       back: '뒤로', toTitle: '타이틀로', newChar: '새 캐릭터',
       ccTitle: '워밴드를 결성하라!', forged: '전투로 단련되어!',
       warriorDesc: '검과 방패를 든 용감한 선봉장. 높은 체력과 강력한 근접 공격으로 최전선을 지킵니다.',
-      warriorHint: '클릭: 이동·공격 · WASD: 걷기 · 스페이스: 베기 · I: 장비 · Esc: 메뉴',
-      arms: '무기', warriorTip: '워리어를 눌러 검을 휘두르세요. 필드에서 I 키로 갑옷과 무기를 바꿀 수 있습니다.',
+      warriorHint: '클릭: 이동·공격 · WASD: 걷기 · 스페이스: 베기 · E: 장비 · F: 대화 · 1–9: 스킬 · Esc: 메뉴',
+      arms: '무기', warriorTip: '워리어를 눌러 검을 휘두르세요. 필드에서 E 키로 갑옷과 무기를 바꿀 수 있습니다.',
       warriorLoading: '워리어 소환 중…', warriorError: '워리어를 불러오지 못했습니다. 다시 선택해 주세요.',
       warriorArmorNames: ['기본 옷', '진홍 갑옷', '청람 갑옷'], warriorWeaponNames: ['맨손', '검과 방패', '왕실 검과 방패'],
       mageDesc: '강력한 원거리 주문을 사용하는 마법사. 로브와 지팡이를 바꾸면 외형과 능력이 달라집니다.',
-      mageHint: '클릭: 이동·시전 · WASD: 걷기 · 스페이스: 시전 · I: 장비 · Esc: 메뉴',
-      equipment: '장비 (I)', hair: '머리', weapon: '지팡이', mageTip: '마법사를 눌러 주문을 시전하세요. 필드에서 I 키로 장비를 바꿀 수 있습니다.',
+      mageHint: '클릭: 이동·시전 · WASD: 걷기 · 스페이스: 시전 · E: 장비 · F: 대화 · 1–9: 스킬 · Esc: 메뉴',
+      equipment: '장비 (E)', hair: '머리', weapon: '지팡이', mageTip: '마법사를 눌러 주문을 시전하세요. 필드에서 E 키로 장비를 바꿀 수 있습니다.',
       mageLoading: '마법사 소환 중…', mageError: '마법사를 불러오지 못했습니다. 다시 선택해 주세요.',
       mageArmorNames: ['기본 옷', '견습 로브', '룬 로브'], mageWeaponNames: ['맨손', '나무 지팡이', '수정 지팡이'],
       assassinDesc: '쌍검과 치명타를 사용하는 민첩한 암살자. Shift 키로 위험을 뚫고 질주하세요.',
-      assassinHint: '클릭: 이동·공격 · WASD: 걷기 · 스페이스: 베기 · Shift: 그림자 질주 · I: 장비 · Esc: 메뉴',
-      blades: '쌍검', assassinTip: '암살자를 눌러 베기를 시전하세요. 필드에서 I 키로 장비를 바꿀 수 있습니다.',
+      assassinHint: '클릭: 이동·공격 · WASD: 걷기 · 스페이스: 베기 · Shift: 그림자 질주 · E: 장비 · F: 대화 · 1–9: 스킬 · Esc: 메뉴',
+      blades: '쌍검', assassinTip: '암살자를 눌러 베기를 시전하세요. 필드에서 E 키로 장비를 바꿀 수 있습니다.',
       assassinLoading: '암살자 소환 중…', assassinError: '암살자를 불러오지 못했습니다. 다시 선택해 주세요.',
       assassinArmorNames: ['기본 옷', '밤의 의복', '달의 장막'], assassinWeaponNames: ['맨손', '쌍단검', '달송곳니'],
       areaName: '푸른 초원', gold: '골드', slain: '적', paused: '일시정지', resume: '계속하기',
@@ -321,7 +321,11 @@
     const names = t(type + (armor ? 'ArmorNames' : 'WeaponNames'));
     const label = t(armor ? 'armor' : type === 'warrior' ? 'arms' : assassin ? 'blades' : 'weapon');
     const select = el('select', { class: 'gear-pick', 'aria-label': label, id: (inField ? 'field-' : 'create-') + key });
-    values.forEach((v, i) => select.append(el('option', { value: v, text: names[i] })));
+    values.forEach((v, i) => {
+      const item = WORLD_ITEMS.find(item => item.class === type && item.kind === (armor ? 'armor' : 'weapon') && item.variant === v);
+      if (inField ? v === 'none' || Inventory.quantity(item?.id) > 0 : item?.starter) select.append(el('option', { value: v, text: names[i] }));
+    });
+    if (![...select.options].some(o => o.value === selected)) { selected = [...select.options].find(o => o.value !== 'none')?.value || 'none'; change(selected); }
     select.value = selected; select.addEventListener('change', () => change(select.value));
     return row(label, select);
   }
@@ -401,7 +405,7 @@
   function onHud(s) {
     hud.hp.style.width = (s.hp / s.maxHp * 100).toFixed(1) + '%'; hud.hpT.textContent = `${Math.ceil(s.hp)} / ${s.maxHp}`;
     hud.xp.style.width = (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.lv.textContent = ` ${t('lvl')} ${s.level}`;
-    hud.gold.textContent = s.gold; hud.kills.textContent = s.kills;
+    hud.gold.textContent = s.gold; hud.kills.textContent = s.kills; $('bag-gold').textContent = `${s.gold} gold`;
     const inCity = s.area === 'Alderhaven', title = $('area-title');
     if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); void title.offsetWidth; title.classList.add('show'); }
     title.querySelector('b').textContent = inCity ? 'Alderhaven · Fountain Square' : t('areaName');
@@ -468,39 +472,55 @@
     const at = $('area-title'); at.classList.remove('show'); void at.offsetWidth; at.classList.add('show');
   }
   function leaveGame() { if (window.Field) Field.stop(); }
-  function setPause(on) { window.Quests?.close(false); City.close(false); $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); }
+  let equipmentFocus = null;
+  function setPause(on) { window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Inventory.hideTooltip(); const wasEquipment = !$('equipment').hidden; $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); else if (wasEquipment && equipmentFocus?.isConnected && !equipmentFocus.closest('[hidden]')) equipmentFocus.focus({ preventScroll: true }); }
   function renderEquipment() {
     const c = save.char, mage = c && currentSprite(c); if (!c || !mage) return;
-    mage.set(c); const canvas = $('equipmentcv'); canvas.width = canvas.height = 240;
-    const g = canvas.getContext('2d'); g.translate(120, 200); mage.draw(g, { fx: 1, fy: 1, walk: 0 }, 0, 1.8);
+    mage.set(c); const canvas = $('equipmentcv'); canvas.width = 320; canvas.height = 420;
+    const g = canvas.getContext('2d'); g.translate(160, 365); mage.draw(g, { fx: 1, fy: 1, walk: 0 }, 0, 2.8);
     const stats = Field.equipmentStats;
+    $('character-subtitle').textContent = `${c.name} · Level ${Field.hero.level} ${c.class[0].toUpperCase() + c.class.slice(1)}`;
     $('equipment-stats').textContent = `${t('attack')}: ${stats.attack} · ${t('defense')}: ${stats.defense}`;
     $('hud-portrait').style.backgroundImage = `url(${mage.portrait()})`;
+    Inventory.render(document.getElementById('inventory-list'));
+    Inventory.renderEquipped(document.getElementById('equipped-slots'));
   }
-  function openEquipment() {
+  function openEquipment(view = 'both') {
+    window.Skillbar?.close(false);
+    window.Quests?.close(false);
     City.close(false);
-    if (scene !== 'game' || !modular(save.char)) return;
+    if (scene !== 'game' || !Online.connected || Field.hero.dead || !modular(save.char)) return;
+    if ($('equipment').hidden) equipmentFocus = document.activeElement;
+    const workspace = document.querySelector('.equipment-workspace');
+    workspace.dataset.view = view; workspace.setAttribute('aria-labelledby', view === 'bags' ? 'bag-title' : 'equipment-title');
     $('pause').hidden = true; $('equipment').hidden = false; Field.setPaused(true);
-    const gear = spriteClass(save.char).equipment(save.char);
     $('equipmentcv').setAttribute('aria-label', 'Equipped ' + save.char.class);
-    $('equipment-controls').replaceChildren(...equipmentKeys(save.char).map(key => gearSelect(key, key.endsWith('Armor') ? gear.armor : gear.weapon, value => {
-      save.char[key] = value; persist(); Field.equip(save.char); renderEquipment(); blip(760);
-    }, true)));
+    Inventory.renderEquipped($('equipped-slots'));
     ensureMage(save.char.class).then(renderEquipment).catch(() => showToast(t(save.char.class + 'Error')));
-    $('field-' + save.char.class + 'Armor').focus({ preventScroll: true });
+    if (view === 'bags') $('bag-sort').focus({ preventScroll: true });
+    else $('field-' + save.char.class + 'Armor')?.focus({ preventScroll: true });
   }
   addEventListener('keydown', e => {
-    if (scene !== 'game') return;
-    const closesEquipment = !$('equipment').hidden && e.key.toLowerCase() === 'i';
-    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '') && e.key !== 'Escape' && !closesEquipment) return;
+    if (scene !== 'game' || e.defaultPrevented || e.repeat) return;
+    const key = e.key.toLowerCase(), gearKey = key === 'e' || key === 'i' || key === 'b';
+    const closesEquipment = !$('equipment').hidden && gearKey && e.target?.tagName === 'SELECT';
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '') && key !== 'escape' && !closesEquipment) return;
+    if (window.Skillbar?.open) return;
     if (window.Quests?.open) {
-      if (['Escape', 'q', 'Q', 'i', 'I'].includes(e.key)) { e.preventDefault(); Quests.close(); }
+      if (gearKey || key === 'k') { e.preventDefault(); Quests.close(false); if (gearKey) openEquipment(key === 'e' ? 'both' : 'bags'); else Skillbar.show(); }
+      else if (key === 'escape' || key === 'q') { e.preventDefault(); Quests.close(); }
       return;
     }
-    if (e.key.toLowerCase() === 'q' && !e.repeat) { e.preventDefault(); window.Quests?.show(); return; }
-    if (City.open && (e.key === 'Escape' || e.key.toLowerCase() === 'i')) { e.preventDefault(); City.close(); return; }
-    if (e.key === 'Escape') { e.preventDefault(); if (!$('equipment').hidden) setPause(false); else setPause($('pause').hidden); }
-    if (e.key.toLowerCase() === 'i' && !e.repeat) { e.preventDefault(); if ($('equipment').hidden) openEquipment(); else setPause(false); }
+    if (key === 'q') { e.preventDefault(); window.Quests?.show(); return; }
+    if (City.open && key === 'escape') { e.preventDefault(); City.close(); return; }
+    if (key === 'escape') { e.preventDefault(); if (!$('equipment').hidden) setPause(false); else setPause($('pause').hidden); }
+    if (gearKey) {
+      e.preventDefault();
+      const view = key === 'e' ? 'both' : 'bags';
+      if ($('equipment').hidden) openEquipment(view);
+      else if (document.querySelector('.equipment-workspace').dataset.view !== view) openEquipment(view);
+      else setPause(false);
+    }
   });
   $('city-travel').addEventListener('click', () => Field.visitCity());
   $('p-characters').addEventListener('click', () => {
@@ -513,7 +533,20 @@
     }));
     if (!list.children.length) list.textContent = 'Your character will appear here after connecting.';
   });
-  $('p-equipment').addEventListener('click', openEquipment);
+  $('p-equipment').addEventListener('click', () => openEquipment());
+  $('equipment-open').addEventListener('click', () => openEquipment());
+  $('inventory-open').addEventListener('click', () => openEquipment('bags'));
+  $('bag-expand').addEventListener('click', () => { setPause(false); Field.visitNpc('merchant'); });
+  $('bags-close').addEventListener('click', () => setPause(false));
+  $('bag-character').addEventListener('click', () => openEquipment(document.querySelector('.equipment-workspace').dataset.view === 'bags' ? 'both' : 'bags'));
+  addEventListener('inventory-change', () => { if (!$('equipment').hidden) renderEquipment(); });
+  $('equipment').addEventListener('keydown', event => {
+    if (event.key !== 'Tab') return;
+    const nodes = [...$('equipment').querySelectorAll('button:not(:disabled), select:not(:disabled), input:not(:disabled)')];
+    const visible = nodes.filter(n => n.getClientRects().length > 0), first = visible[0], last = visible.at(-1);
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  });
   $('equipment-close').addEventListener('click', () => setPause(false));
   $('p-resume').addEventListener('click', () => setPause(false));
   $('p-title').addEventListener('click', () => show('splash'));

@@ -165,19 +165,8 @@ impl Look {
                 self.assassin_weapon.as_str(),
             ),
         };
-        let defense = match armor {
-            "crimson" => 3.,
-            "azure" | "runic" => 5.,
-            "apprentice" | "shadow" => 2.,
-            "moon" => 4.,
-            _ => 0.,
-        };
-        let bonus = match weapon {
-            "sword" | "ash" | "daggers" => 4.,
-            "royal" | "moonfang" => 8.,
-            "crystal" => 9.,
-            _ => 0.,
-        };
+        let defense = crate::items::equipment(self.class, "armor", armor).map_or(0., |i| i.defense);
+        let bonus = crate::items::equipment(self.class, "weapon", weapon).map_or(0., |i| i.attack);
         (base + level as f64 * 4. + bonus, defense)
     }
 }
@@ -196,6 +185,12 @@ pub struct Character {
     pub kills: u32,
     #[serde(default)]
     pub quests: Vec<QuestProgress>,
+    #[serde(default)]
+    pub inventory: Vec<crate::items::ItemStack>,
+    #[serde(default)]
+    pub equipment: std::collections::BTreeMap<String, String>,
+    #[serde(default)]
+    pub bags: Vec<String>,
 }
 impl Character {
     pub fn max_hp(&self) -> f64 {
@@ -318,8 +313,10 @@ pub enum ClientMessage {
         dy: f64,
     },
     Equip {
-        armor: String,
-        weapon: String,
+        armor: Option<String>,
+        weapon: Option<String>,
+        #[serde(default)]
+        slots: std::collections::BTreeMap<String, String>,
     },
     Interact {
         npc: String,
@@ -352,6 +349,8 @@ pub struct Offer {
     pub heal: f64,
     #[serde(default)]
     pub gear: bool,
+    #[serde(default)]
+    pub bag: Option<String>,
 }
 #[derive(Clone, Deserialize, Serialize)]
 pub struct Npc {
@@ -362,6 +361,8 @@ pub struct Npc {
     pub y: f64,
     pub dialogue: String,
     pub offers: Vec<Offer>,
+    #[serde(default)]
+    pub buys: bool,
 }
 #[derive(Clone, Deserialize)]
 pub struct City {

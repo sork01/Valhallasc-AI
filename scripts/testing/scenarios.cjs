@@ -30,9 +30,13 @@ async function tour(w, bot) {
   await w.waitFor(() => quest(w, bot, 'welcome')?.claimed);
 }
 async function defeat(w, bot, kind) {
-  if (w.player(bot).hp < 35) await talk(w, bot, 'healer', 'blessing');
+  if (w.player(bot).hp < w.player(bot).maxHp * .85) await talk(w, bot, 'healer', 'blessing');
+  // Starter gear needs isolated fights; prefer targets away from extra attackers.
+  const risk = enemy => distance(w.player(bot), enemy) + w.snapshot.slimes
+    .filter(s => !s.dead && s.id !== enemy.id && distance(s, enemy) < 9)
+    .reduce((sum, s) => sum + (s.kind === 'beetle' ? 200 : 50), 0);
   const enemy = w.snapshot.slimes.filter(s => !s.dead && s.kind === kind)
-    .sort((a, b) => distance(w.player(bot), a) - distance(w.player(bot), b))[0];
+    .sort((a, b) => risk(a) - risk(b))[0];
   assert.ok(enemy, `A living ${kind} is available`);
   const kills = w.player(bot).kills;
   for (const point of route(map, w.player(bot), enemy)) {
@@ -86,8 +90,6 @@ const scenarios = {
     description: 'A mage walks to an Ironhide, defeats it through normal target actions, and collects its loot.',
     async run(w, check) {
       await w.connect({ bot: 'Mage', class: 'mage' });
-      await w.action('Mage', { type: 'equip', armor: 'runic', weapon: 'crystal' });
-      await w.waitFor(() => w.player('Mage').look.mageWeapon === 'crystal');
       const before = { ...w.player('Mage') };
       const enemy = w.snapshot.slimes.find(s => s.kind === 'beetle' && s.hx === 18 && s.hy === 42);
       assert.ok(enemy && !enemy.dead, 'The meadow Ironhide is alive');
@@ -134,8 +136,8 @@ const scenarios = {
       await w.action('Warrior', { type: 'equip', armor: 'none', weapon: 'none' });
       await w.waitFor(() => w.player('Warrior').look.warriorWeapon === 'none');
       await w.action('Warrior', { type: 'interact', npc: 'smith', offer: 'fitting' });
-      await w.waitFor(() => w.player('Warrior').look.warriorWeapon === 'royal' && w.player('Warrior').look.warriorArmor === 'azure');
-      check(w.player('Warrior').gold === gold, 'Armorer fits server-owned equipment for free');
+      await w.waitFor(() => w.player('Warrior').look.warriorWeapon === 'sword' && w.player('Warrior').look.warriorArmor === 'crimson');
+      check(w.player('Warrior').gold === gold, 'Armorer replaces starter gear for free');
     },
   },
   quests: {
@@ -183,7 +185,6 @@ const scenarios = {
     async run(w, check) {
       const bot = 'QuestMage';
       await w.connect({ bot, class: 'mage' });
-      await w.action(bot, { type: 'equip', armor: 'runic', weapon: 'crystal' });
       await tour(w, bot);
       await w.connect({ bot: 'Observer' });
       const locked = await talk(w, bot, 'smith', 'quest:accept:ironhide_hunt');
@@ -239,6 +240,76 @@ const scenarios = {
         'Reset bounty and history survive a real server restart');
     },
   },
+  inventory: {
+    description: 'Real mob loot, owned equipment, remote sale refusal, vendor sales, replay protection, and inventory persistence.',
+    async run(w, check) {
+      const bot = 'LootMage';
+      await w.connect({ bot, class: 'mage' });
+      const count = id => w.player(bot).inventory.find(s => s.item === id)?.quantity || 0;
+      check(count('mage_armor_apprentice') === 1 && count('mage_weapon_ash') === 1, 'Starter items are server-issued');
+      await w.action(bot, { type: 'equip', armor: 'runic', weapon: 'crystal' });
+      await w.waitFor(() => w.events.some(e => e.type === 'error' && e.text.includes('must own')));
+      check(w.player(bot).look.mageWeapon === 'ash', 'Unowned upgrades cannot be equipped');
+      await defeat(w, bot, 'green');
+      const corpse = w.snapshot.slimes.filter(s => s.dead && s.kind === 'green').sort((a, b) => distance(w.player(bot), a) - distance(w.player(bot), b))[0];
+      const gold = w.player(bot).gold;
+      await walkTo(w, bot, corpse);
+      await w.waitFor(() => count('slime_gel') === 1);
+      check(w.events.some(e => e.kind === 'itemPickup' && e.actor === w.player(bot).id && e.item === 'slime_gel'), 'Real combat creates a collectible material drop');
+      await w.waitFor(() => w.player(bot).gold > gold);
+      check(w.player(bot).gold > gold, 'Gold drops remain alongside material drops');
+      await w.action(bot, { type: 'interact', npc: 'merchant', offer: 'sell:slime_gel:1' });
+      await w.waitFor(() => w.events.some(e => e.type === 'error' && e.text.includes('Walk closer')));
+      check(count('slime_gel') === 1, 'Remote sales cannot consume inventory');
+      const inventory = JSON.stringify(w.player(bot).inventory);
+      await w.restart();
+      check(JSON.stringify(w.player(bot).inventory) === inventory, 'Loot survives restarting the private Rust server');
+      const before = w.player(bot).gold;
+      const sale = await talk(w, bot, 'merchant', 'sell:slime_gel:1');
+      await w.waitFor(() => count('slime_gel') === 0);
+      check(sale.gold === before + 3, 'Vendor consumes one material and pays its catalog value');
+      const replay = await talk(w, bot, 'merchant', 'sell:slime_gel:1');
+      check(replay.gold === sale.gold && replay.notice.includes('items you own'), 'Replaying a sale cannot duplicate gold');
+      await w.action(bot, { type: 'equip', weapon: 'none' });
+      await w.waitFor(() => w.player(bot).look.mageWeapon === 'none');
+      await talk(w, bot, 'smith', 'fitting');
+      await w.waitFor(() => w.player(bot).look.mageWeapon === 'ash');
+      const worthless = await talk(w, bot, 'smith', 'sell:mage_weapon_ash:1');
+      check(worthless.notice.includes('Starter gear cannot be sold') && worthless.gold === sale.gold, 'Free starter replacement cannot generate sale income');
+      await w.restart();
+      check(count('slime_gel') === 0 && w.player(bot).gold === sale.gold, 'Sale and item removal survive restart');
+    },
+  },
+  bags: {
+    description: 'Earn expansion-bag gold through real quests and combat, buy a bag from Linden, and verify authoritative capacity and persistence.',
+    async run(w, check) {
+      const bot = 'BagMage'; await w.connect({ bot, class: 'mage' });
+      check(w.player(bot).bagCapacity === 16 && w.player(bot).bags.length === 0, 'New character starts with a sixteen-slot backpack');
+      await w.action(bot, { type: 'interact', npc: 'merchant', offer: 'satchel' });
+      await w.waitFor(() => w.events.some(e => e.type === 'error' && e.text.includes('Walk closer')));
+      check(w.player(bot).bags.length === 0, 'Expansion bags cannot be bought remotely');
+      const refused = await talk(w, bot, 'merchant', 'satchel');
+      check(refused.notice.includes('gold') && w.player(bot).bags.length === 0, 'Insufficient funds do not grant a bag');
+      await tour(w, bot);
+      const count = id => w.player(bot).inventory.find(s => s.item === id)?.quantity || 0;
+      for (let i = 0; w.player(bot).gold + count('slime_gel') * 3 < 24 && i < 4; i++) {
+        await defeat(w, bot, 'green');
+        const corpse = w.snapshot.slimes.filter(s => s.dead && s.kind === 'green').sort((a, b) => distance(w.player(bot), a) - distance(w.player(bot), b))[0];
+        await walkTo(w, bot, corpse);
+        await w.advance(600);
+      }
+      await talk(w, bot, 'merchant', 'sell:materials');
+      await w.waitFor(() => w.player(bot).gold >= 24);
+      const before = w.player(bot).gold;
+      const purchase = await talk(w, bot, 'merchant', 'satchel');
+      await w.waitFor(() => w.player(bot).bags.length === 1);
+      check(purchase.notice.includes('24 bag slots') && w.player(bot).gold === before - 24, 'Earned gold purchases eight additional slots');
+      check(w.player(bot).bagCapacity === 24 && w.player(bot).bags[0] === 'adventurer_satchel', 'Snapshot carries the fitted bag and authoritative capacity');
+      await w.restart();
+      check(w.player(bot).bagCapacity === 24 && w.player(bot).bags[0] === 'adventurer_satchel' && w.player(bot).gold === before - 24, 'Bag ownership and payment survive restarting Rust');
+    },
+  },
+
 };
 
 async function runScenario(name, world = new TestWorld()) {

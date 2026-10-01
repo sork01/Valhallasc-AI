@@ -55,7 +55,7 @@
           callbacks.onWelcome?.(packet);
           $('connection-overlay').hidden = true; $('chat-input').disabled = false;
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
-          log('Welcome to Greenmeadow. Q opens quests · Visit Alderhaven to find work · Enter to chat.');
+          log('Welcome to Greenmeadow. E: character · B/I: bags · K: skills · 1–9: skillbar · Q: quests · F: talk · Enter: chat.');
           break;
         }
         case 'snapshot': {
@@ -81,7 +81,7 @@
       clearTimeout(joinTimeout);
       if (!active || currentGeneration !== generation) return;
       clearInterval(heartbeat);
-      connected = false; window.Quests?.close(false); window.City?.close(); $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay('Connection lost. Reconnecting to your character…');
@@ -106,6 +106,16 @@
       saved.current = token; persist(); return { ...slot.look };
     },
     get currentToken() { return saved.current; },
+    get bagLayout() { return saved.characters.find(c => c.token === saved.current)?.bagLayout || null; },
+    saveBagLayout(layout) {
+      const slot = saved.characters.find(c => c.token === saved.current); if (!slot) return;
+      slot.bagLayout = [...layout]; persist();
+    },
+    get skillSlots() { return saved.characters.find(c => c.token === saved.current)?.skillSlots || null; },
+    saveSkillSlots(slots) {
+      const slot = saved.characters.find(c => c.token === saved.current); if (!slot) return;
+      slot.skillSlots = [...slots]; persist();
+    },
     get characters() { return saved.characters.map(c => ({ ...c, look: { ...c.look } })); },
     get connected() { return connected; },
     get id() { return id; }, send,

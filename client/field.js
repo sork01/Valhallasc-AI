@@ -157,7 +157,9 @@
   const equipmentStats = () => {
     if (!isModular()) return { attack: 22 + hero.level * 4, defense: 0 };
     const C = characterClass(), gear = C.equipment(hero.look);
-    return { attack: (isAssassin() ? 18 : isMage() ? 20 : 22) + hero.level * 4 + C.WEAPON[gear.weapon].attack, defense: C.ARMOR[gear.armor].defense };
+    const item = (kind, variant) => WORLD_ITEMS.find(i => i.class === hero.look.class && i.kind === kind && i.variant === variant);
+    const extras = Object.values(hero.equipment || {}).map(id => WORLD_ITEMS.find(i => i.id === id)).filter(Boolean);
+    return { attack: extras.reduce((sum, i) => sum + (i.attack || 0), 0) + (isAssassin() ? 18 : isMage() ? 20 : 22) + hero.level * 4 + (item('weapon', gear.weapon)?.attack || 0), defense: extras.reduce((sum, i) => sum + (i.defense || 0), 0) + (item('armor', gear.armor)?.defense || 0) };
   };
 
   const SLIME = {
@@ -192,15 +194,15 @@
   // ---------- input ----------
   const KEYDIR = { w: [0, -1], arrowup: [0, -1], s: [0, 1], arrowdown: [0, 1], a: [-1, 0], arrowleft: [-1, 0], d: [1, 0], arrowright: [1, 0] };
   function onKeyDown(e) {
-    if (!running || paused || !Online.connected || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '')) return;
+    if (e.defaultPrevented || !running || paused || !Online.connected || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '')) return;
     const k = e.key.toLowerCase();
-    if (k === 'e' && !e.repeat && !hero.dead) {
+    if (k === 'f' && !e.repeat && !hero.dead) {
       e.preventDefault(); const npc = City.npcs.filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
       if (npc) talkTo(npc); return;
     }
     if (KEYDIR[k]) { pendingNpc = null; cityRoute = []; keys.add(k); hero.target = null; hero.goal = null; e.preventDefault(); }
-    if (k === ' ' || k === 'j') { e.preventDefault(); if (!e.repeat) swing(); }
-    if (k === 'shift' && isAssassin()) { e.preventDefault(); if (!e.repeat) shadowstep(); }
+    if ((k === ' ' && e.target?.tagName !== 'BUTTON') || k === 'j') { e.preventDefault(); if (!e.repeat) Field.useSkill('attack'); }
+    if (k === 'shift' && isAssassin()) { e.preventDefault(); if (!e.repeat) Field.useSkill('shadowstep'); }
   }
   function onKeyUp(e) { keys.delete(e.key.toLowerCase()); }
   function pickSlime(wx, wy) {
@@ -225,24 +227,41 @@
     else { cityRoute = routeTo(npc, true); pendingNpc = { npc, until: tAll + Math.max(20, cityRoute.length * .6) }; routeTime = 0; }
   }
   // A small grid route lets the travel button walk around real map obstacles.
-  function routeTo(goal, approach = false) {
+  function routeTo(goal, approach = false, origin = hero) {
     const free = (x,y) => x>=1 && y>=1 && x<MAP-1 && y<MAP-1 && objects.every(o => o.width ? Math.abs(x-o.x)>o.width/2+.55 || Math.abs(y-o.y)>o.depth/2+.55 : Math.hypot(x-o.x,y-o.y)>o.r+.55);
-    const start=[Math.round(hero.x),Math.round(hero.y)], key=([x,y])=>y*MAP+x;
+    const segmentFree = (a, b) => {
+      const steps = Math.max(1, Math.ceil(Math.hypot(a.x-b.x,a.y-b.y) / .1));
+      for (let i=0;i<=steps;i++) {
+        const x=a.x+(b.x-a.x)*i/steps, y=a.y+(b.y-a.y)*i/steps;
+        if(objects.some(o => o.width ? Math.abs(x-o.x)<o.width/2+.3-1e-6 && Math.abs(y-o.y)<o.depth/2+.3-1e-6 : Math.hypot(x-o.x,y-o.y)<o.r+.3-1e-6)) return false;
+      }
+      return true;
+    };
+    // Loot can leave a player against a tree, with its rounded cell blocked.
+    // Connect the real position to a nearby clear cell before searching the grid.
+    const sources=[];
+    for(let x=Math.floor(origin.x)-3;x<=Math.ceil(origin.x)+3;x++) for(let y=Math.floor(origin.y)-3;y<=Math.ceil(origin.y)+3;y++) {
+      if(free(x,y) && segmentFree(origin,{x,y})) sources.push([x,y]);
+    }
+    sources.sort((a,b)=>Math.hypot(a[0]-origin.x,a[1]-origin.y)-Math.hypot(b[0]-origin.x,b[1]-origin.y));
+    if(!sources.length)return [];
+    const start=sources[0], key=([x,y])=>y*MAP+x;
     let end=[Math.round(goal.x),Math.round(goal.y)];
     if(approach) {
       const candidates=[];
       for(let x=Math.floor(goal.x)-2;x<=Math.ceil(goal.x)+2;x++) for(let y=Math.floor(goal.y)-2;y<=Math.ceil(goal.y)+2;y++) {
         const distance=Math.hypot(x-goal.x,y-goal.y);
-        if(distance<=2 && free(x,y))candidates.push({point:[x,y],score:distance+Math.hypot(x-hero.x,y-hero.y)*.1});
+        if(distance<=2 && free(x,y))candidates.push({point:[x,y],score:distance+Math.hypot(x-origin.x,y-origin.y)*.1});
       }
       candidates.sort((a,b)=>a.score-b.score);if(!candidates.length)return [];end=candidates[0].point;
     }
     const queue=[start], prev=new Map([[key(start),null]]);
     for(let i=0;i<queue.length;i++) { const p=queue[i]; if(key(p)===key(end))break;
-      for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]) {const q=[p[0]+dx,p[1]+dy];if(free(...q)&&!prev.has(key(q))){prev.set(key(q),p);queue.push(q);}}
+      for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]) {const q=[p[0]+dx,p[1]+dy];if(free(...q)&&!prev.has(key(q))&&segmentFree({x:p[0],y:p[1]},{x:q[0],y:q[1]})){prev.set(key(q),p);queue.push(q);}}
     }
     if(!prev.has(key(end)))return [];
     const path=[];for(let p=end;p&&key(p)!==key(start);p=prev.get(key(p)))path.unshift({x:p[0],y:p[1]});
+    if(Math.hypot(start[0]-origin.x,start[1]-origin.y)>.32)path.unshift({x:start[0],y:start[1]});
     return path;
   }
   function onPointerMove(e) { if (pointer.down) { const [wx, wy] = pointerWorld(e); pointer.x = wx; pointer.y = wy; } }
@@ -291,6 +310,7 @@
     const selectedTarget = hero.target?.id;
     const wasDead = hero.dead;
     applyActor(hero, own, initial);
+    window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || []);
     window.Quests?.update(own.quests || []);
     if (wasDead !== hero.dead) say(hero.dead ? 'death' : 'respawn');
     if (initial) { cam.x = hero.x; cam.y = hero.y; }
@@ -337,6 +357,7 @@
       burst(event.x, event.y, 12, 7, ['#fff4e0', '#cfb5fa']);
     }
     if (event.kind === 'hurt') floater(event.x, event.y, '-' + event.value, '#ff8b9b', false);
+    if (event.kind === 'itemPickup') { floater(event.x, event.y, `+${event.quantity} ${event.name}`, '#64b5ff', false); if(event.actor === Online.id) say('pickup'); }
     if (event.kind === 'pickup') floater(event.x, event.y, '+' + event.value + ' gold', '#ffe066', false);
     if (event.kind === 'levelup') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); floater(event.x, event.y, 'Level up!', '#ffe066', true); }
     if (event.kind === 'swing') {
@@ -353,6 +374,7 @@
   }
   function update(dt) {
     tAll += dt;
+    window.Skillbar?.update();
     if (Online.connected) {
       inputT -= dt;
       if (inputT <= 0) {
@@ -680,7 +702,16 @@
         if (!s.dead && hero.target === s) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 32 * s.d.scale, 13 * s.d.scale, 0, 0, 6.283); g.stroke(); }
         g.restore();
       } else if (it.drop) {
-        const d = it.drop; g.save(); g.translate(it.sx, it.sy - d.z); g.fillStyle = d.col; g.strokeStyle = OL; g.lineWidth = 2.4; g.beginPath(); g.moveTo(0, -9); g.bezierCurveTo(8, -1, 8, 6, 0, 6); g.bezierCurveTo(-8, 6, -8, -1, 0, -9); g.fill(); g.stroke(); g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(-2.4, -1, 1.8, 0, 6.283); g.fill(); g.restore();
+        const d = it.drop, item = WORLD_ITEMS.find(i => i.id === d.item);
+        g.save(); g.translate(it.sx + (d.item ? 12 : -8), it.sy - d.z); g.fillStyle = d.col; g.strokeStyle = OL; g.lineWidth = 2.4;
+        if (item?.rarity === 'rare') { g.shadowColor = d.col; g.shadowBlur = 12; }
+        g.beginPath();
+        if (d.item) { g.moveTo(0,-12); g.lineTo(10,-2); g.lineTo(0,8); g.lineTo(-10,-2); g.closePath(); }
+        else { g.moveTo(0, -9); g.bezierCurveTo(8, -1, 8, 6, 0, 6); g.bezierCurveTo(-8, 6, -8, -1, 0, -9); }
+        g.fill(); g.stroke(); g.shadowBlur = 0;
+        if (item?.class) { g.fillStyle = '#112b49'; g.font = 'bold 12px sans-serif'; g.textAlign = 'center'; g.fillText(item.kind === 'weapon' ? '⚔' : '◆', 0, 3); }
+        else { g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(-2.4, -1, 1.8, 0, 6.283); g.fill(); }
+        g.restore();
       } else if (it.remote) {
         const remote = it.remote; g.save(); g.translate(it.sx, it.sy);
         if (remote.sprite) remote.sprite.draw(g, remote, t);
@@ -785,7 +816,7 @@
       });
       running = true; paused = false; last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     },
-    stop() { window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
+    stop() { window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
     clearInput() { pendingNpc=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
     setPaused(p) { paused = p; if(p){pendingNpc=null;cityRoute=[];} Field.clearInput(); Online.send({ type: 'stop' }); },
     visitNpc(id) {
@@ -800,8 +831,20 @@
     },
     equip(change) {
       if (!isModular()) return;
-      const gear = characterClass().equipment({ ...hero.look, ...change });
-      Online.send({ type: 'equip', armor: gear.armor, weapon: gear.weapon });
+      const prefix = hero.look.class;
+      const armor = change[prefix + 'Armor'], weapon = change[prefix + 'Weapon'];
+      Online.send({ type: 'equip', ...(armor !== undefined ? { armor } : {}), ...(weapon !== undefined ? { weapon } : {}) });
+    },
+    useSkill(id) {
+      if (!running || paused || !Online.connected || hero.dead) return false;
+      if (id === 'attack' && hero.atkCd <= 0 && hero.dashT <= 0) { swing(); return true; }
+      if (id === 'shadowstep' && isAssassin() && hero.dashCd <= 0) { shadowstep(); return true; }
+      return false;
+    },
+    get canAct() { return running && !paused && Online.connected && !hero.dead; },
+    equipSlot(slot, item) {
+      if (!running || !Online.connected || hero.dead) return false;
+      return Online.send({ type: 'equip', slots: { [slot]: item } });
     },
     get remotePlayers() { return [...remotePlayers.values()]; },
     get equipmentStats() { return equipmentStats(); },
@@ -810,7 +853,7 @@
     get assassinSprites() { return isAssassin() ? mageSpr : null; },
     get hero() { return hero; }, get slimes() { return slimes; },
     get beetleSprites() { return beetleSrc; },
-    _debug: { get objects() { return objects; }, w2s, s2w },
+    _debug: { get objects() { return objects; }, w2s, s2w, routeTo },
   };
   window.Field = Field;
 })();

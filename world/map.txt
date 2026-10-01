@@ -1382,15 +1382,16 @@
       "x": 31,
       "y": 88,
       "color": "#ac7650",
-      "dialogue": "A good fit makes all the difference. I can fit you with our finest class equipment, free of charge. You can also change your gear with I.",
+      "dialogue": "I can replace and fit basic starter gear for free. Hunt enemies for rare upgrades, and bring me spare equipment or materials to sell. Open your inventory with I.",
       "offers": [
         {
           "id": "fitting",
-          "label": "Fit my finest class equipment",
+          "label": "Replace and fit starter gear",
           "cost": 0,
           "gear": true
         }
-      ]
+      ],
+      "buys": true
     },
     {
       "id": "innkeeper",
@@ -1433,8 +1434,22 @@
       "x": 43,
       "y": 84.5,
       "color": "#859563",
-      "dialogue": "The best stories come from the meadow. Slimes drop gold when defeated; bring your earnings to the bakery, apothecary, or inn.",
-      "offers": []
+      "dialogue": "Bring me Slime Gel, Ironhide Shells, Royal Jelly, or spare equipment from the meadow. I buy loot from every class. Your equipped items are protected. Need more space? I sell satchels and traveler packs. Four bags can be carried alongside your backpack; a larger pack upgrades your smallest bag when all four slots are filled.",
+      "offers": [
+        {
+          "id": "satchel",
+          "label": "Buy Adventurer Satchel \u00b7 8 extra bag slots",
+          "cost": 24,
+          "bag": "adventurer_satchel"
+        },
+        {
+          "id": "pack",
+          "label": "Buy Traveler Pack \u00b7 16 extra bag slots",
+          "cost": 60,
+          "bag": "traveler_pack"
+        }
+      ],
+      "buys": true
     },
     {
       "id": "guide",

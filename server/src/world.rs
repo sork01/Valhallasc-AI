@@ -1,4 +1,4 @@
-use crate::{model::*, store::Store};
+use crate::{items::*, model::*, store::Store};
 use serde::Serialize;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
@@ -49,6 +49,7 @@ struct Player {
     dash_direction: Point,
     chat_at: f64,
     service_at: f64,
+    bag_notice_at: f64,
 }
 impl Player {
     fn new(character: Character, peer: Peer) -> Self {
@@ -73,12 +74,13 @@ impl Player {
             dash_direction: Point::default(),
             chat_at: -99.,
             service_at: -99.,
+            bag_notice_at: -99.,
         }
     }
     fn snapshot(&self) -> Value {
         let c = &self.character;
         json!({"id":c.id,"look":c.look,"x":c.x,"y":c.y,"r":PLAYER_RADIUS,"hp":c.hp,"maxHp":c.max_hp(),"level":c.level,
-            "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"quests":c.quests,"fx":self.face.x,"fy":self.face.y,
+            "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"quests":c.quests,"inventory":c.inventory,"equipment":c.equipment,"bags":c.bags,"bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used(),"fx":self.face.x,"fy":self.face.y,
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd})
     }
@@ -204,6 +206,8 @@ struct Drop {
     y: f64,
     z: f64,
     value: u32,
+    item: Option<String>,
+    quantity: u32,
     t: f64,
     col: &'static str,
 }
@@ -502,9 +506,26 @@ impl World {
                 let point = p.character.point();
                 self.event("shadowstep", &id, point, 0., false);
             }
-            ClientMessage::Equip { armor, weapon } => {
-                if let Err(text) = p.character.look.equip(&armor, &weapon) {
+            ClientMessage::Equip {
+                armor,
+                weapon,
+                slots,
+            } => {
+                p.stop();
+                p.attack = 0.;
+                let mut next = p.character.clone();
+                let (current_armor, current_weapon) = next.gear();
+                let armor = armor.unwrap_or_else(|| current_armor.into());
+                let weapon = weapon.unwrap_or_else(|| current_weapon.into());
+                let result = next
+                    .look
+                    .equip(&armor, &weapon)
+                    .and_then(|()| next.equip_slots(&slots));
+                if let Err(text) = result {
                     let _ = p.peer.try_send(json!({"type":"error","text":text}));
+                } else if next.look != p.character.look || next.equipment != p.character.equipment {
+                    p.character = next;
+                    self.save();
                 }
             }
             ClientMessage::Interact { npc, offer } => {
@@ -568,6 +589,43 @@ impl World {
                         (notice, levels, quest_changed) =
                             quest_action(&mut p.character, quest, action);
                     }
+                } else if let Some(sale) = id.strip_prefix("sell:") {
+                    if !npc.buys {
+                        notice = "This townsperson does not buy items.".into();
+                    } else {
+                        let mut next = p.character.clone();
+                        let result = if sale == "materials" {
+                            let stacks = next.inventory.clone();
+                            let mut total = Ok(0_u32);
+                            for stack in stacks {
+                                if item(&stack.item).is_some_and(|i| i.kind == "material") {
+                                    match next.sell_item(&stack.item, stack.quantity) {
+                                        Ok(value) => total = total.map(|sum| sum + value),
+                                        Err(text) => {
+                                            total = Err(text);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            total
+                        } else if let Some((id, quantity)) = sale.rsplit_once(':') {
+                            quantity
+                                .parse::<u32>()
+                                .map_err(|_| "Invalid sale quantity.")
+                                .and_then(|quantity| next.sell_item(id, quantity))
+                        } else {
+                            Err("Invalid sale.")
+                        };
+                        match result {
+                            Ok(value) => {
+                                p.character = next;
+                                quest_changed = true;
+                                notice = format!("Items sold for {value} gold.");
+                            }
+                            Err(text) => notice = text.into(),
+                        }
+                    }
                 } else {
                     let Some(offer) = npc.offers.iter().find(|offer| offer.id == id) else {
                         return;
@@ -575,9 +633,18 @@ impl World {
                     if offer.heal > 0. && p.character.hp >= p.character.max_hp() {
                         notice =
                     "You are already at full health. Save it for after your next adventure!".into();
+                    } else if let Some(bag) = &offer.bag {
+                        match p.character.purchase_bag(bag, offer.cost) {
+                            Ok(capacity) => {
+                                notice = format!("Bag fitted! You now have {capacity} bag slots.");
+                                quest_changed = true;
+                            }
+                            Err(text) => notice = text.into(),
+                        }
                     } else if p.character.gold < offer.cost {
                         notice = format!("You need {} gold for this service.", offer.cost);
                     } else {
+                        quest_changed = true;
                         p.character.gold -= offer.cost;
                         if offer.heal > 0. {
                             p.character.hp =
@@ -586,16 +653,25 @@ impl World {
                         }
                         if offer.gear {
                             let (armor, weapon) = match p.character.look.class {
-                                Class::Warrior => ("azure", "royal"),
-                                Class::Mage => ("runic", "crystal"),
-                                Class::Assassin => ("moon", "moonfang"),
+                                Class::Warrior => ("crimson", "sword"),
+                                Class::Mage => ("apprentice", "ash"),
+                                Class::Assassin => ("shadow", "daggers"),
                             };
-                            p.character
-                                .look
-                                .equip(armor, weapon)
-                                .expect("valid shop equipment");
-                            notice =
-                                "All fitted! Your new equipment is ready for the meadow.".into();
+                            let mut fitted = p.character.clone();
+                            for (kind, variant) in [("armor", armor), ("weapon", weapon)] {
+                                let i = equipment(p.character.look.class, kind, variant).unwrap();
+                                if fitted.quantity(&i.id) == 0 {
+                                    fitted.add_item(&i.id, 1);
+                                }
+                            }
+                            match fitted.equip_owned(armor, weapon) {
+                                Ok(()) => {
+                                    p.character = fitted;
+                                    notice = "Starter gear fitted! Hunt enemies for rare upgrades."
+                                        .into();
+                                }
+                                Err(text) => notice = text.into(),
+                            }
                         }
                     }
                 }
@@ -603,7 +679,7 @@ impl World {
         }
         let _ = p
             .peer
-            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"quests":p.character.quests}));
+            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         let actor = p.character.id.clone();
         let point = p.character.point();
         if levels > 0 {
@@ -761,7 +837,7 @@ impl World {
         let point = p.character.point();
         let face = p.face;
         let class = p.character.look.class;
-        let base = p.character.look.stats(p.character.level).0;
+        let base = p.character.stats().0;
         let reach = class.reach();
         let crit = self.random() < if class == Class::Assassin { 0.28 } else { 0.14 };
         let damage = (base * (0.8 + self.random() * 0.4) * if crit { 2. } else { 1. }).round();
@@ -845,15 +921,42 @@ impl World {
             };
             self.drops.push(Drop {
                 id,
-                owner: actor,
+                owner: actor.clone(),
                 x: point.x,
                 y: point.y,
                 z: 8.,
                 value,
+                item: None,
+                quantity: 0,
                 t: 0.,
                 col: "#ffe066",
             });
+            self.item_drop(&actor, point, material(&kind), 1);
+            let chance = self.random();
+            let choice = self.random();
+            if let Some(i) = roll_equipment(&kind, chance, choice) {
+                self.item_drop(&actor, point, &i.id, 1);
+            }
         }
+    }
+    fn item_drop(&mut self, owner: &str, point: Point, item_id: &str, quantity: u32) {
+        let id = self.entity();
+        self.drops.push(Drop {
+            id,
+            owner: owner.into(),
+            x: point.x,
+            y: point.y,
+            z: 8.,
+            value: 0,
+            item: Some(item_id.into()),
+            quantity,
+            t: 0.,
+            col: if item(item_id).is_some_and(|i| i.rarity == "rare") {
+                "#64b5ff"
+            } else {
+                "#b9dcad"
+            },
+        });
     }
     fn update_slime(&mut self, id: usize) {
         let wander = self.random();
@@ -1046,7 +1149,7 @@ impl World {
         {
             return;
         }
-        let value = (damage - p.character.look.stats(p.character.level).1).max(1.);
+        let value = (damage - p.character.stats().1).max(1.);
         p.character.hp = (p.character.hp - value).max(0.);
         p.last_hurt = self.time;
         p.hurt = 0.25;
@@ -1117,16 +1220,43 @@ impl World {
                     d.x += dir.x * travel;
                     d.y += dir.y * travel;
                     if distance < 0.5 {
-                        p.character.gold += d.value;
-                        rewards.push((d.owner.clone(), p.character.point(), d.value));
+                        if let Some(id) = &d.item {
+                            if !p.character.can_collect(id) {
+                                if self.time - p.bag_notice_at >= 5. {
+                                    p.bag_notice_at = self.time;
+                                    let _ = p.peer.try_send(json!({"type":"system","text":"Your bags are full. Sell loot or buy a larger bag from Linden. This item stays on the ground until it expires."}));
+                                }
+                                continue;
+                            }
+                            p.character.add_item(id, d.quantity);
+                        } else {
+                            p.character.gold = p.character.gold.saturating_add(d.value);
+                        }
+                        rewards.push((
+                            d.owner.clone(),
+                            p.character.point(),
+                            d.value,
+                            d.item.clone(),
+                            d.quantity,
+                        ));
                         d.t = 61.;
                     }
                 }
             }
         }
         self.drops.retain(|d| d.t < 60.);
-        for (id, p, value) in rewards {
-            self.event("pickup", &id, p, value as f64, false);
+        if !rewards.is_empty() {
+            self.save();
+        }
+        for (id, p, value, item_id, quantity) in rewards {
+            if let Some(item_id) = item_id {
+                self.emit(
+                    json!({"type":"event","kind":"itemPickup","actor":id,"x":p.x,"y":p.y,
+                    "item":item_id,"quantity":quantity,"name":item(&item_id).map(|i| &i.name)}),
+                );
+            } else {
+                self.event("pickup", &id, p, value as f64, false);
+            }
         }
     }
     pub async fn run(
@@ -1325,6 +1455,189 @@ mod tests {
         c.y = n.y;
         w.time += 0.6;
         w.interact(1, npc, offer);
+    }
+
+    #[test]
+    fn sales_check_vendor_range_life_quantity_cooldown_and_save_immediately() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap();
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .add_item("slime_gel", 3);
+        w.interact(1, "merchant", Some("sell:slime_gel:3"));
+        assert_eq!(w.players[&1].character.gold, 0);
+        quest_interact(&mut w, "guide", Some("sell:slime_gel:3"));
+        assert_eq!(w.players[&1].character.gold, 0);
+        w.players.get_mut(&1).unwrap().character.hp = 0.;
+        quest_interact(&mut w, "merchant", Some("sell:slime_gel:3"));
+        assert_eq!(w.players[&1].character.gold, 0);
+        w.players.get_mut(&1).unwrap().character.hp = 120.;
+        quest_interact(&mut w, "merchant", Some("sell:slime_gel:4"));
+        quest_interact(&mut w, "merchant", Some("sell:slime_gel:0"));
+        quest_interact(&mut w, "merchant", Some("sell:unknown:1"));
+        assert_eq!(w.players[&1].character.quantity("slime_gel"), 3);
+        quest_interact(&mut w, "merchant", Some("sell:slime_gel:1"));
+        w.interact(1, "merchant", Some("sell:slime_gel:1"));
+        assert_eq!(w.players[&1].character.gold, 3);
+        let saved = w.store.load(token).unwrap().unwrap();
+        assert_eq!(saved.gold, 3);
+        assert_eq!(saved.quantity("slime_gel"), 2);
+        quest_interact(&mut w, "smith", Some("sell:materials"));
+        assert_eq!(w.players[&1].character.gold, 9);
+        quest_interact(&mut w, "smith", Some("sell:materials"));
+        assert_eq!(w.players[&1].character.gold, 9);
+    }
+
+    #[test]
+    fn slot_requests_save_immediately_and_invalid_batches_leave_all_gear_unchanged() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap();
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .add_item("headgear_upgrade", 1);
+        w.message(
+            1,
+            ClientMessage::Equip {
+                armor: None,
+                weapon: None,
+                slots: [("headgear".into(), "headgear_upgrade".into())].into(),
+            },
+        );
+        let saved = w.store.load(token).unwrap().unwrap();
+        assert_eq!(
+            saved.equipment.get("headgear").map(String::as_str),
+            Some("headgear_upgrade")
+        );
+        assert_eq!(saved.stats(), (30., 5.));
+        w.message(
+            1,
+            ClientMessage::Equip {
+                armor: Some("none".into()),
+                weapon: None,
+                slots: [("necklace".into(), "necklace_upgrade".into())].into(),
+            },
+        );
+        assert_eq!(w.players[&1].character.look.warrior_armor, "crimson");
+        assert_eq!(w.store.load(token).unwrap().unwrap().stats(), (30., 5.));
+    }
+    #[test]
+    fn full_bags_leave_new_loot_on_ground_but_collect_stacks_and_gold() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        for i in ITEMS
+            .iter()
+            .filter(|i| i.kind != "bag" && !(i.class == Some(Class::Warrior) && i.starter))
+            .take(16)
+        {
+            c.add_item(&i.id, 1);
+        }
+        let actor = c.id.clone();
+        let point = c.point();
+        w.item_drop(&actor, point, "headgear_upgrade", 1);
+        w.item_drop(&actor, point, "slime_gel", 2);
+        w.drops.push(Drop {
+            id: 99999,
+            owner: actor,
+            x: point.x,
+            y: point.y,
+            z: 0.,
+            value: 7,
+            item: None,
+            quantity: 0,
+            t: 1.,
+            col: "#ffe066",
+        });
+        for drop in &mut w.drops {
+            drop.t = 1.;
+        }
+        w.update_drops();
+        assert_eq!(w.players[&1].character.quantity("headgear_upgrade"), 0);
+        assert_eq!(w.players[&1].character.quantity("slime_gel"), 3);
+        assert_eq!(w.players[&1].character.gold, 7);
+        assert_eq!(w.drops.len(), 1);
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .sell_item("blue_gel", 1)
+            .unwrap();
+        w.update_drops();
+        assert_eq!(w.players[&1].character.quantity("headgear_upgrade"), 1);
+        assert_eq!(w.players[&1].character.bag_used(), 16);
+        assert!(w.drops.is_empty());
+    }
+    #[test]
+    fn bag_vendor_checks_range_funds_cooldown_and_saves_purchases() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap();
+        w.players.get_mut(&1).unwrap().character.gold = 100;
+        w.interact(1, "merchant", Some("satchel"));
+        assert!(w.players[&1].character.bags.is_empty());
+        quest_interact(&mut w, "merchant", Some("satchel"));
+        assert_eq!(w.players[&1].character.gold, 76);
+        assert_eq!(
+            w.store.load(token).unwrap().unwrap().bags,
+            vec!["adventurer_satchel"]
+        );
+        w.interact(1, "merchant", Some("satchel"));
+        assert_eq!(w.players[&1].character.bags.len(), 1);
+        quest_interact(&mut w, "merchant", Some("pack"));
+        assert_eq!(w.players[&1].character.bag_capacity(), 40);
+        assert_eq!(w.players[&1].character.gold, 16);
+        quest_interact(&mut w, "merchant", Some("satchel"));
+        assert_eq!(w.players[&1].character.bags.len(), 2);
+        assert_eq!(w.players[&1].character.gold, 16);
+    }
+    #[test]
+    fn mob_drops_include_all_class_upgrades_and_collected_items_save() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(4096);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap();
+        w.rng = 7;
+        let id = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
+        for _ in 0..300 {
+            w.slimes[id] = Slime::new(id, &w.map.slimes[id]);
+            w.hit_slime(id, 1, 1000., false);
+        }
+        for i in ITEMS.iter().filter(|i| i.rarity == "rare") {
+            assert!(
+                w.drops
+                    .iter()
+                    .any(|d| d.item.as_deref() == Some(i.id.as_str())),
+                "{} never dropped",
+                i.id
+            );
+        }
+        let point = w.slimes[id].point();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.x = point.x;
+        c.y = point.y;
+        for d in &mut w.drops {
+            d.t = 1.;
+        }
+        w.update_drops();
+        let saved = w.store.load(token).unwrap().unwrap();
+        assert_eq!(saved.quantity("ironhide_shell"), 300);
+        for i in ITEMS.iter().filter(|i| i.rarity == "rare") {
+            assert!(saved.quantity(&i.id) > 0);
+        }
+        assert_eq!(
+            saved.look.warrior_weapon, "sword",
+            "Loot never auto-equips gear"
+        );
+        assert!(w.drops.is_empty());
     }
 
     #[test]
@@ -1801,7 +2114,17 @@ mod tests {
         assert_eq!(w.next_king_spawn, deadline);
         assert_eq!(w.players[&1].character.kills, 1);
         assert_eq!(w.players[&1].character.xp, 75);
-        assert_eq!(w.drops.len(), 1);
+        assert_eq!(w.drops.iter().filter(|d| d.item.is_none()).count(), 1);
+        assert_eq!(
+            w.drops
+                .iter()
+                .filter(|d| d
+                    .item
+                    .as_deref()
+                    .is_some_and(|id| item(id).unwrap().kind == "material"))
+                .count(),
+            1
+        );
         assert_eq!(w.drops[0].value, 30);
         for _ in 0..500 {
             w.time += TICK;
@@ -1905,7 +2228,17 @@ mod tests {
         w.hit_slime(id, 1, 1000., false);
         assert_eq!(w.players[&1].character.kills, 1);
         assert_eq!(w.players[&1].character.xp, 32);
-        assert_eq!(w.drops.len(), 1);
+        assert_eq!(w.drops.iter().filter(|d| d.item.is_none()).count(), 1);
+        assert_eq!(
+            w.drops
+                .iter()
+                .filter(|d| d
+                    .item
+                    .as_deref()
+                    .is_some_and(|id| item(id).unwrap().kind == "material"))
+                .count(),
+            1
+        );
         assert_eq!(w.drops[0].value, 10);
         w.slimes[id].respawn = TICK;
         w.update_slime(id);
@@ -2023,7 +2356,17 @@ mod tests {
         assert!(w.slimes[0].dead);
         assert_eq!(w.players[&1].character.kills, 1);
         assert_eq!(w.players[&2].character.kills, 0);
-        assert_eq!(w.drops.len(), 1);
+        assert_eq!(w.drops.iter().filter(|d| d.item.is_none()).count(), 1);
+        assert_eq!(
+            w.drops
+                .iter()
+                .filter(|d| d
+                    .item
+                    .as_deref()
+                    .is_some_and(|id| item(id).unwrap().kind == "material"))
+                .count(),
+            1
+        );
         assert_eq!(w.players[&1].character.xp, 12);
         w.slimes[0].respawn = TICK;
         w.step();
@@ -2043,16 +2386,38 @@ mod tests {
         w.message(
             1,
             ClientMessage::Equip {
-                armor: "azure".into(),
-                weapon: "royal".into(),
+                slots: Default::default(),
+                armor: Some("azure".into()),
+                weapon: Some("royal".into()),
+            },
+        );
+        assert_eq!(w.players[&1].character.look.stats(1), (30., 3.));
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.add_item("warrior_armor_azure", 1);
+        c.add_item("warrior_weapon_royal", 1);
+        w.message(
+            1,
+            ClientMessage::Equip {
+                slots: Default::default(),
+                armor: Some("azure".into()),
+                weapon: None,
+            },
+        );
+        w.message(
+            1,
+            ClientMessage::Equip {
+                slots: Default::default(),
+                armor: None,
+                weapon: Some("royal".into()),
             },
         );
         assert_eq!(w.players[&1].character.look.stats(1), (34., 5.));
         w.message(
             1,
             ClientMessage::Equip {
-                armor: "godmode".into(),
-                weapon: "royal".into(),
+                slots: Default::default(),
+                armor: Some("godmode".into()),
+                weapon: Some("royal".into()),
             },
         );
         assert_eq!(w.players[&1].character.look.warrior_armor, "azure");
@@ -2118,13 +2483,25 @@ mod tests {
             x: w.drops[0].x,
             y: w.drops[0].y,
         };
-        w.drops[0].t = 1.;
+        for d in &mut w.drops {
+            d.t = 1.;
+        }
         let other = &mut w.players.get_mut(&2).unwrap().character;
         other.x = point.x;
         other.y = point.y;
         w.update_drops();
         assert_eq!(w.players[&2].character.gold, 0);
-        assert_eq!(w.drops.len(), 1);
+        assert_eq!(w.drops.iter().filter(|d| d.item.is_none()).count(), 1);
+        assert_eq!(
+            w.drops
+                .iter()
+                .filter(|d| d
+                    .item
+                    .as_deref()
+                    .is_some_and(|id| item(id).unwrap().kind == "material"))
+                .count(),
+            1
+        );
         let owner = &mut w.players.get_mut(&1).unwrap().character;
         owner.x = point.x;
         owner.y = point.y;
@@ -2136,6 +2513,8 @@ mod tests {
         w.update_drops();
         assert_eq!(w.players[&1].character.gold, value);
         assert!(w.drops.is_empty());
+        assert_eq!(w.players[&1].character.quantity("slime_gel"), 1);
+        assert_eq!(w.players[&2].character.quantity("slime_gel"), 0);
         w.update_drops();
         assert_eq!(w.players[&1].character.gold, value);
     }

@@ -28,7 +28,7 @@
   }
   function card(quest, atNpc) {
     const s = status(quest), npc = giver(quest);
-    const node = element('article', '', 'quest-card'); node.dataset.quest = quest.id;
+    const node = element('article', '', 'quest-card'); node.dataset.quest = quest.id; node.dataset.repeatable = String(quest.repeatable);
     node.append(element('h4', quest.title), element('span', words[s] + (quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
     node.append(element('p', quest.description), element('p', objectives(quest).join(' · '), 'quest-objectives'));
     node.append(element('p', `Reward: ${quest.rewardXp} XP · ${quest.rewardGold} gold`, 'quest-reward'));
@@ -66,7 +66,7 @@
   }
   function open() { return !$('quest-journal').hidden; }
   function show() {
-    if (!Online.connected || Field.hero.dead || City.open || !$('pause').hidden || !$('equipment').hidden) return;
+    if (window.Skillbar?.open || !Online.connected || Field.hero.dead || City.open || !$('pause').hidden || !$('equipment').hidden) return;
     previousFocus = document.activeElement;
     Field.setPaused(true); $('quest-journal').hidden = false; render(); $('quest-close').focus();
   }
@@ -89,11 +89,15 @@
     reset() { progress = []; signature = ''; tracked = null; close(false); render(); },
     update(next) { const key = JSON.stringify(next); if (key === signature) return; progress = next; signature = key; render(); },
     npc(id, container) { container.replaceChildren(...definitions.filter(q => q.npc === id).map(q => card(q, true))); },
-    marker(id) {
-      if (definitions.some(q => q.npc === id && status(q) === 'ready')) return '?';
-      if (definitions.some(q => q.npc === id && status(q) === 'available')) return '!';
-      if (definitions.some(q => status(q) === 'active' && q.objectives.some((o, i) => o.kind === 'talk' && o.target === id && !(state(q)?.counts[i] >= o.count)))) return '◆';
-      return '';
+    marker(id) { return this.markerInfo(id).symbol; },
+    markerInfo(id) {
+      for (const s of ['ready', 'available']) {
+        const quest = definitions.find(q => q.npc === id && status(q) === s && !q.repeatable)
+          || definitions.find(q => q.npc === id && status(q) === s);
+        if (quest) return { symbol: s === 'ready' ? '?' : '!', color: quest.repeatable ? '#64b5ff' : '#ffdf88', repeatable: quest.repeatable };
+      }
+      if (definitions.some(q => status(q) === 'active' && q.objectives.some((o, i) => o.kind === 'talk' && o.target === id && !(state(q)?.counts[i] >= o.count)))) return { symbol: '◆', color: '#ffdf88' };
+      return { symbol: '', color: '#ffdf88' };
     },
   };
   render();

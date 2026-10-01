@@ -30,17 +30,41 @@ impl Store {
             )
             .optional()?;
         state
-            .map(|s| serde_json::from_str(&s).map_err(Into::into))
+            .map(|s| {
+                let value: serde_json::Value = serde_json::from_str(&s)?;
+                let legacy = value.get("inventory").is_none();
+                let legacy_bags = value.get("bags").is_none();
+                let mut character: Character = serde_json::from_value(value)?;
+                if legacy {
+                    character.seed_inventory();
+                }
+                if legacy_bags {
+                    while character.bag_used() > character.bag_capacity()
+                        && character.bags.len() < 4
+                    {
+                        character.bags.push("traveler_pack".into());
+                    }
+                }
+                Ok(character)
+            })
             .transpose()
     }
     pub fn create(
         &self,
-        look: Look,
+        mut look: Look,
         spawn: Point,
     ) -> Result<(Character, String), Box<dyn std::error::Error>> {
         // A bearer key resumes a guest character, not an account/password login.
         let token = format!("{}{}", Uuid::new_v4().simple(), Uuid::new_v4().simple());
-        let c = Character {
+        // Appearance is client-selected; starter equipment and ownership are server-issued.
+        let defaults = Look::default();
+        look.warrior_armor = defaults.warrior_armor;
+        look.warrior_weapon = defaults.warrior_weapon;
+        look.mage_armor = defaults.mage_armor;
+        look.mage_weapon = defaults.mage_weapon;
+        look.assassin_armor = defaults.assassin_armor;
+        look.assassin_weapon = defaults.assassin_weapon;
+        let mut c = Character {
             id: Uuid::new_v4().to_string(),
             hp: look.class.health(),
             look,
@@ -51,7 +75,11 @@ impl Store {
             gold: 0,
             kills: 0,
             quests: vec![],
+            inventory: vec![],
+            equipment: Default::default(),
+            bags: vec![],
         };
+        c.seed_inventory();
         self.db.execute(
             "INSERT INTO characters(id,token_hash,state) VALUES(?1,?2,?3)",
             params![c.id, hash(&token), serde_json::to_string(&c)?],
@@ -87,6 +115,14 @@ mod tests {
         c.gold = 81;
         c.level = 3;
         c.look.equip("azure", "royal").unwrap();
+        c.add_item("warrior_armor_azure", 1);
+        c.add_item("warrior_weapon_royal", 1);
+        c.add_item("mage_weapon_crystal", 2);
+        c.add_item("slime_gel", 7);
+        c.purchase_bag("adventurer_satchel", 24).unwrap();
+        c.add_item("necklace_upgrade", 1);
+        c.equip_slots(&[("necklace".into(), "necklace_upgrade".into())].into())
+            .unwrap();
         c.quests.push(crate::model::QuestProgress {
             id: "welcome".into(),
             counts: vec![1, 0, 1],
@@ -95,9 +131,13 @@ mod tests {
         });
         s.save_many(std::iter::once(&c)).unwrap();
         let restored = s.load(&token).unwrap().unwrap();
-        assert_eq!(restored.gold, 81);
+        assert_eq!(restored.gold, 57);
         assert_eq!(restored.look.warrior_weapon, "royal");
         assert_eq!(restored.quests[0].counts, vec![1, 0, 1]);
+        assert_eq!(restored.inventory, c.inventory);
+        assert_eq!(restored.equipment, c.equipment);
+        assert_eq!(restored.bags, c.bags);
+        assert_eq!(restored.stats(), c.stats());
         assert!(s.load(&"a".repeat(64)).unwrap().is_none());
         assert!(s.load("anything").unwrap().is_none());
         let stored: String =
@@ -112,11 +152,68 @@ mod tests {
         let (c, token) = s.create(Look::default(), Point::default()).unwrap();
         let mut old = serde_json::to_value(&c).unwrap();
         old.as_object_mut().unwrap().remove("quests");
+        old.as_object_mut().unwrap().remove("equipment");
         s.db.execute(
             "UPDATE characters SET state=?1 WHERE id=?2",
             params![old.to_string(), c.id],
         )
         .unwrap();
         assert!(s.load(&token).unwrap().unwrap().quests.is_empty());
+        assert!(s.load(&token).unwrap().unwrap().equipment.is_empty());
+    }
+    #[test]
+    fn unlimited_inventory_migration_preserves_every_item_and_grants_only_needed_bags() {
+        let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();
+        let (mut c, token) = s.create(Look::default(), Point::default()).unwrap();
+        for i in crate::items::ITEMS.iter().filter(|i| i.kind != "bag") {
+            c.add_item(&i.id, 1);
+        }
+        let mut old = serde_json::to_value(&c).unwrap();
+        old.as_object_mut().unwrap().remove("bags");
+        s.db.execute(
+            "UPDATE characters SET state=?1 WHERE id=?2",
+            params![old.to_string(), c.id],
+        )
+        .unwrap();
+        let restored = s.load(&token).unwrap().unwrap();
+        assert_eq!(restored.inventory, c.inventory);
+        assert_eq!(restored.bags, vec!["traveler_pack"]);
+        assert!(restored.bag_used() <= restored.bag_capacity());
+        s.save_many(std::iter::once(&restored)).unwrap();
+        assert_eq!(s.load(&token).unwrap().unwrap().bags, restored.bags);
+    }
+
+    #[test]
+    fn legacy_gear_is_migrated_once_and_new_characters_cannot_request_upgrades() {
+        let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();
+        let look = Look {
+            warrior_armor: "azure".into(),
+            warrior_weapon: "royal".into(),
+            ..Look::default()
+        };
+        let (mut c, token) = s.create(look, Point::default()).unwrap();
+        assert_eq!(c.look.warrior_weapon, "sword");
+        assert_eq!(c.quantity("warrior_weapon_royal"), 0);
+        c.look.equip("azure", "royal").unwrap();
+        let mut old = serde_json::to_value(&c).unwrap();
+        old.as_object_mut().unwrap().remove("inventory");
+        s.db.execute(
+            "UPDATE characters SET state=?1 WHERE id=?2",
+            params![old.to_string(), c.id],
+        )
+        .unwrap();
+        let mut restored = s.load(&token).unwrap().unwrap();
+        assert_eq!(restored.quantity("warrior_weapon_royal"), 1);
+        assert_eq!(restored.quantity("warrior_armor_azure"), 1);
+        restored.equip_owned("crimson", "sword").unwrap();
+        restored.sell_item("warrior_weapon_royal", 1).unwrap();
+        s.save_many(std::iter::once(&restored)).unwrap();
+        assert_eq!(
+            s.load(&token)
+                .unwrap()
+                .unwrap()
+                .quantity("warrior_weapon_royal"),
+            0
+        );
     }
 }
