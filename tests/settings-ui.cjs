@@ -23,7 +23,7 @@ const stageRect = page => rect(page, '#stage');
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
-  // Record what is wired straight into the speakers: music's compressor and exactly one effects bus.
+  // Record what is wired straight into the speakers: the music players' outputs and exactly one effects bus.
   await page.addInitScript(() => {
     window.__dest = new Set(); const connect = AudioNode.prototype.connect;
     AudioNode.prototype.connect = function (to, ...rest) { if (to instanceof AudioDestinationNode) window.__dest.add(this); return connect.call(this, to, ...rest); };
@@ -53,12 +53,12 @@ const stageRect = page => rect(page, '#stage');
   check((await stored(page)).musicVol === .5, 'The music level is saved on this device');
   await page.locator('#set-sfx').fill('50');
   await page.evaluate(() => Prefs.preview());
-  const bus = await page.evaluate(() => [...__dest].map(n => ({ type: n.constructor.name, gain: n.gain?.value })));
+  const bus = await page.evaluate(() => [...__dest].filter(n => ![valhalla.music, valhalla.fmusic, valhalla.cmusic].some(m => m?.output === n)).map(n => ({ type: n.constructor.name, gain: n.gain?.value })));
   const gains = bus.filter(n => n.type === 'GainNode');
   check(gains.length === 1 && Math.abs(gains[0].gain - .25) < 1e-6, `Every effect goes through one bus at 0.25 (${JSON.stringify(bus)})`);
   check((await stored(page)).sfxVol === .5, 'The effects level is saved');
   await page.locator('#set-sfx').fill('0'); await page.evaluate(() => Prefs.preview());
-  check(await page.evaluate(() => [...__dest].find(n => n instanceof GainNode).gain.value) === 0, 'Effects at 0% are silent');
+  check(await page.evaluate(() => [...__dest].find(n => n instanceof GainNode && ![valhalla.music, valhalla.fmusic, valhalla.cmusic].some(m => m?.output === n)).gain.value) === 0, 'Effects at 0% are silent');
   await page.locator('#set-sfx').fill('100');
   await page.locator('#set-sound').uncheck();
   check(await page.evaluate(() => levels.at(-1) === 0), 'Turning sound off silences the music whatever the slider says');
