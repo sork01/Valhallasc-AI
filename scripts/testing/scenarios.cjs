@@ -255,16 +255,16 @@ const scenarios = {
       check(!quest(w, bot, 'welcome').claimed && w.player(bot).gold === 0, 'All three objectives are counted but the wrong NPC cannot pay the reward');
       const reward = await talk(w, bot, 'guide', 'quest:claim:welcome');
       await w.waitFor(() => quest(w, bot, 'welcome').claimed);
-      check(reward.gold === 12 && w.player(bot).xp === 40, 'Turn-in awards exactly 12 gold and 40 XP');
+      check(reward.gold === 12 && w.player(bot).xp === 50, 'Turn-in awards exactly 12 gold and 50 XP');
       await talk(w, bot, 'guide', 'quest:claim:welcome');
       await talk(w, bot, 'guide', 'quest:accept:welcome');
       check(w.player(bot).gold === 12 && quest(w, bot, 'welcome').completions === 1, 'One-time rewards cannot be replayed or reaccepted');
       const database = w.db;
       await w.restart();
-      check(w.db === database && w.player(bot).id === id && quest(w, bot, 'welcome').claimed && w.player(bot).gold === 12 && w.player(bot).xp === 40,
+      check(w.db === database && w.player(bot).id === id && quest(w, bot, 'welcome').claimed && w.player(bot).gold === 12 && w.player(bot).xp === 50,
         'Quest completion and rewards survive restarting the actual Rust process');
       await talk(w, bot, 'guide', 'quest:claim:welcome');
-      check(w.player(bot).gold === 12 && w.player(bot).xp === 40, 'Replaying a claim after restart grants nothing');
+      check(w.player(bot).gold === 12 && w.player(bot).xp === 50, 'Replaying a claim after restart grants nothing');
     },
   },
   quest_combat: {
@@ -293,8 +293,8 @@ const scenarios = {
       check(Object.keys(w.player(bot).skillCd).length === 0, 'A skill above the mage level is refused with its unlock level and costs nothing');
       await talk(w, bot, 'gatekeeper', 'quest:claim:slime_patrol');
       await w.waitFor(() => quest(w, bot, 'slime_patrol').claimed);
-      check(w.player(bot).gold === before.gold + 24 && w.player(bot).level === 2 && totalXp(w.player(bot)) === totalXp(before) + 80,
-        'Patrol turn-in awards 24 gold and 80 XP, levels the mage, and carries the remainder');
+      check(w.player(bot).gold === before.gold + 24 && w.player(bot).level === 2 && totalXp(w.player(bot)) === totalXp(before) + 100,
+        'Patrol turn-in awards 24 gold and 100 XP, levels the mage, and carries the remainder');
       const levelUp = w.events.find(e => e.bot === bot && e.kind === 'levelup' && e.actor === w.player(bot).id && e.level === 2);
       check(levelUp && JSON.stringify(levelUp.unlocked) === '["twinbolt"]', 'The level-up event carries the new level and names the skill it unlocks');
       await cast(w, bot, 'twinbolt');
@@ -320,7 +320,7 @@ const scenarios = {
       const bountyBefore = { ...w.player(bot) };
       await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
       await w.waitFor(() => quest(w, bot, 'meadow_bounty').claimed);
-      check(w.player(bot).gold === bountyBefore.gold + 25 && totalXp(w.player(bot)) === totalXp(bountyBefore) + 60,
+      check(w.player(bot).gold === bountyBefore.gold + 25 && totalXp(w.player(bot)) === totalXp(bountyBefore) + 76,
         'Eight mixed kills pay the promised bounty reward');
       await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
       check(w.player(bot).gold === bountyBefore.gold + 25, 'Repeated bounty claims cannot duplicate rewards');

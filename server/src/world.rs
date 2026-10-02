@@ -2622,7 +2622,7 @@ mod tests {
         w.players.get_mut(&1).unwrap().character.xp = 150;
         quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
         let c = &w.players[&1].character;
-        assert_eq!((c.level, c.xp, c.gold), (2, 30, 12));
+        assert_eq!((c.level, c.xp, c.gold), (2, 40, 12));
         assert_eq!(c.hp, c.max_hp());
         assert!(c.quests[0].claimed);
         quest_interact(&mut w, "guide", Some("quest:claim:welcome"));

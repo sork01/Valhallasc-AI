@@ -1508,7 +1508,7 @@
           "count": 1
         }
       ],
-      "rewardXp": 40,
+      "rewardXp": 50,
       "rewardGold": 12,
       "requires": null,
       "repeatable": false
@@ -1526,7 +1526,7 @@
           "count": 6
         }
       ],
-      "rewardXp": 80,
+      "rewardXp": 100,
       "rewardGold": 24,
       "requires": null,
       "repeatable": false
@@ -1544,7 +1544,7 @@
           "count": 2
         }
       ],
-      "rewardXp": 120,
+      "rewardXp": 150,
       "rewardGold": 35,
       "requires": "slime_patrol",
       "repeatable": false
@@ -1562,7 +1562,7 @@
           "count": 1
         }
       ],
-      "rewardXp": 200,
+      "rewardXp": 250,
       "rewardGold": 60,
       "requires": "ironhide_hunt",
       "repeatable": false
@@ -1580,7 +1580,7 @@
           "count": 8
         }
       ],
-      "rewardXp": 60,
+      "rewardXp": 76,
       "rewardGold": 25,
       "requires": "slime_patrol",
       "repeatable": true
@@ -4586,7 +4586,7 @@
               "count": 1
             }
           ],
-          "rewardXp": 180,
+          "rewardXp": 226,
           "rewardGold": 40,
           "requires": null,
           "repeatable": false
@@ -4604,7 +4604,7 @@
               "count": 4
             }
           ],
-          "rewardXp": 240,
+          "rewardXp": 300,
           "rewardGold": 65,
           "requires": "crags_welcome",
           "repeatable": false
@@ -4622,7 +4622,7 @@
               "count": 8
             }
           ],
-          "rewardXp": 360,
+          "rewardXp": 450,
           "rewardGold": 90,
           "requires": "crags_wisps",
           "repeatable": false
@@ -4640,7 +4640,7 @@
               "count": 4
             }
           ],
-          "rewardXp": 400,
+          "rewardXp": 500,
           "rewardGold": 100,
           "requires": "crags_wisps",
           "repeatable": false
@@ -4658,7 +4658,7 @@
               "count": 7
             }
           ],
-          "rewardXp": 560,
+          "rewardXp": 700,
           "rewardGold": 130,
           "requires": "crags_spiders",
           "repeatable": false
@@ -4676,7 +4676,7 @@
               "count": 3
             }
           ],
-          "rewardXp": 520,
+          "rewardXp": 650,
           "rewardGold": 120,
           "requires": "crags_spiders",
           "repeatable": false
@@ -4694,7 +4694,7 @@
               "count": 6
             }
           ],
-          "rewardXp": 720,
+          "rewardXp": 900,
           "rewardGold": 165,
           "requires": "crags_wraiths",
           "repeatable": false
@@ -4712,7 +4712,7 @@
               "count": 2
             }
           ],
-          "rewardXp": 700,
+          "rewardXp": 876,
           "rewardGold": 160,
           "requires": "crags_wraiths",
           "repeatable": false
@@ -4730,7 +4730,7 @@
               "count": 4
             }
           ],
-          "rewardXp": 950,
+          "rewardXp": 1188,
           "rewardGold": 210,
           "requires": "crags_golems",
           "repeatable": false
@@ -4766,7 +4766,7 @@
               "count": 2
             }
           ],
-          "rewardXp": 1100,
+          "rewardXp": 1376,
           "rewardGold": 250,
           "requires": "crags_golems",
           "repeatable": false
@@ -4784,7 +4784,7 @@
               "count": 10
             }
           ],
-          "rewardXp": 300,
+          "rewardXp": 376,
           "rewardGold": 100,
           "requires": "crags_welcome",
           "repeatable": true
@@ -4808,7 +4808,7 @@
               "count": 3
             }
           ],
-          "rewardXp": 340,
+          "rewardXp": 426,
           "rewardGold": 110,
           "requires": "crags_spiders",
           "repeatable": true
