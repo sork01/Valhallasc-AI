@@ -114,7 +114,48 @@
     setLevel(level) { heroLevel = level; },
     reset() { progress = []; signature = ''; tracked = null; close(false); render(); },
     update(next) { const key = `${Field.zone}:` + JSON.stringify(next); if (key === signature) return; progress = next; signature = key; render(); },
-    npc(id, container) { container.replaceChildren(...definitions.filter(q => q.npc === id).map(q => card(q, true))); },
+    // What an NPC's conversation lists, in World of Warcraft order: turn-ins, new quests, then quests still in progress.
+    // Locked and finished quests are hidden, as they are there.
+    offered(id) {
+      const rank = { ready: 0, available: 1, active: 2 };
+      return definitions.filter(q => q.npc === id && status(q) in rank)
+        .sort((a, b) => rank[status(a)] - rank[status(b)] || Number(a.repeatable) - Number(b.repeatable));
+    },
+    npc(id, container, pick) {
+      container.replaceChildren(...this.offered(id).map(q => {
+        const s = status(q), gap = q.level - heroLevel;
+        const row = element('button', '', 'gossip-row'); row.type = 'button'; row.dataset.quest = q.id; row.dataset.status = s;
+        if (q.repeatable) row.dataset.repeatable = 'true';
+        const tag = element('span', `Lv ${q.level}`, 'gossip-tag'); tag.dataset.level = String(q.level);
+        if (gap >= 5) tag.style.color = '#a31515'; else if (gap >= 3) tag.style.color = '#b8560f'; else if (gap <= -5) tag.style.color = '#6f6a58';
+        const icon = element('span', s === 'available' ? '!' : '?', 'gossip-icon'); icon.setAttribute('aria-hidden', 'true');
+        row.append(icon, element('span', q.title, 'gossip-label'), tag);
+        row.setAttribute('aria-label', `${q.title}, ${words[s]}`);
+        row.addEventListener('click', () => pick(q));
+        return row;
+      }));
+    },
+    // The quest page of a conversation: story, objectives, reward, then the accept / complete button.
+    detail(quest, container, back) {
+      const s = status(quest);
+      const node = element('article', '', 'quest-card quest-detail'); node.dataset.quest = quest.id; node.dataset.status = s;
+      node.append(element('h4', quest.title), element('span', words[s] + (quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
+      node.append(element('p', quest.description));
+      node.append(element('h5', 'Objectives'), element('p', objectives(quest).join('\n'), 'quest-objectives'));
+      node.append(element('h5', 'Rewards'), element('p', `${quest.rewardXp} experience · ${quest.rewardGold} gold`, 'quest-reward'));
+      const actions = element('div', '', 'quest-actions');
+      if (['available', 'ready'].includes(s)) {
+        const action = s === 'ready' ? 'claim' : 'accept';
+        const b = element('button', s === 'ready' ? 'Complete Quest' : state(quest)?.completions ? 'Take bounty again' : 'Accept', 'gossip-button primary'); b.type = 'button';
+        b.dataset.action = action;
+        b.addEventListener('click', () => { if (Online.send({ type: 'interact', npc: quest.npc, offer: `quest:${action}:${quest.id}` })) b.disabled = true; });
+        actions.append(b);
+      }
+      const decline = element('button', s === 'available' ? 'Decline' : 'Back', 'gossip-button'); decline.type = 'button'; decline.dataset.action = 'decline';
+      decline.addEventListener('click', back); actions.append(decline);
+      node.append(actions);
+      container.replaceChildren(node);
+    },
     marker(id) { return this.markerInfo(id).symbol; },
     markerInfo(id) {
       for (const s of ['ready', 'available']) {

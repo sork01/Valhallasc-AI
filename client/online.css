@@ -35,6 +35,48 @@
 .npc-panel :focus-visible, .city-travel:focus-visible { outline: 3px solid #ffdc87; outline-offset: 3px; }
 @media (pointer: coarse) { .city-travel { min-height: 44px; } .npc-offers .btn, #npc-close { min-height: 44px; } }
 #npc-dialogue { z-index: 45; }
+/* NPC conversation: a parchment window like World of Warcraft's gossip frame. Quests first, then services. */
+.gossip-window { position: static; display: flex; flex-direction: column; width: min(max(31cqw, 320px), 96cqw); max-height: min(46cqw, 94cqh); padding: 0; overflow: hidden; border: .3cqw solid #5a4a30; border-radius: .7cqw; background: #261e15; color: #2b1b08; box-shadow: 0 .6cqw 2cqw #000a, inset 0 0 0 1px #b99d5c55; }
+.gossip-titlebar { position: relative; display: flex; align-items: center; justify-content: center; min-height: 2.8cqw; padding: .3cqw 3cqw; background: linear-gradient(#4b4436, #2a261f 55%, #1e1c18); border-bottom: 2px solid #7e6b43; }
+.npc-panel .gossip-titlebar h3 { margin: 0; font: bold max(14px, 1.45cqw) Georgia, 'Palatino Linotype', serif; color: #f0d59b; text-shadow: 0 2px 2px #000; text-align: center; }
+.gossip-titlebar .window-close { position: absolute; right: .5cqw; top: 50%; transform: translateY(-50%); }
+.gossip-parchment { flex: 1 1 auto; min-height: 0; margin: .6cqw .6cqw 0; padding: 1.2cqw 1.4cqw; overflow: auto; scrollbar-width: thin; scrollbar-color: #8a6a35 #c9a766; border: 2px solid #4a3b22; background: radial-gradient(ellipse at 30% 20%, #e3c88f, #d2b074 60%, #bf9a58); box-shadow: inset 0 0 2cqw #6b4a1c88; }
+.npc-panel .gossip-parchment p { margin: 0 0 .9cqw; font: max(13px, 1.25cqw)/1.45 Georgia, 'Palatino Linotype', serif; color: #2b1b08; }
+.npc-panel .gossip-parchment .npc-role { margin-bottom: .5cqw; font-size: max(11px, .85cqw); color: #6b4f24; }
+.npc-panel .gossip-parchment #npc-notice { min-height: 1.45em; margin: .6cqw 0 0; font-weight: bold; color: #2d5a1e; }
+.gossip-list { display: flex; flex-direction: column; gap: .15cqw; }
+.gossip-list:not(:empty) + .gossip-list:not(:empty) { margin-top: .9cqw; }
+.gossip-row { display: grid; grid-template-columns: 1.9cqw minmax(0, 1fr) auto; align-items: center; gap: .6cqw; width: 100%; padding: .3cqw .5cqw; border: 0; border-radius: .25cqw; background: none; color: #2b1b08; font: max(13px, 1.2cqw)/1.3 Georgia, 'Palatino Linotype', serif; text-align: left; cursor: pointer; }
+.gossip-row:hover:not(:disabled), .gossip-row:focus-visible { background: linear-gradient(90deg, #9fc92f, #b7dd4f 70%, #c3e56a); outline: none; }
+.gossip-row:disabled { opacity: .5; cursor: default; }
+.gossip-icon { display: grid; place-items: center; width: 1.9cqw; height: 1.9cqw; font: bold max(18px, 2cqw)/1 Georgia, serif; color: #f6c90e; text-shadow: -1px -1px 0 #3b2a00, 1px -1px 0 #3b2a00, -1px 1px 0 #3b2a00, 1px 1px 0 #3b2a00, 0 0 4px #7a5a00; }
+.gossip-row[data-status="active"] .gossip-icon { color: #9a9a92; text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333; }
+.gossip-row[data-repeatable="true"]:not([data-status="active"]) .gossip-icon { color: #5db2ff; text-shadow: -1px -1px 0 #08284a, 1px -1px 0 #08284a, -1px 1px 0 #08284a, 1px 1px 0 #08284a; }
+.gossip-glyph svg { display: block; width: 100%; height: 100%; }
+.gossip-tag { font-size: max(11px, .9cqw); color: #5b4420; white-space: nowrap; }
+.gossip-parchment .quest-detail { padding: 0; margin: 0; border: 0; background: none; }
+.gossip-parchment .quest-detail h4 { margin: 0 0 .2cqw; font: bold max(16px, 1.7cqw) Georgia, serif; color: #3a1f05; }
+.gossip-parchment .quest-detail h5 { margin: .9cqw 0 .2cqw; font: bold max(13px, 1.2cqw) Georgia, serif; color: #3a1f05; }
+.gossip-parchment .quest-detail .quest-state { display: block; margin-bottom: .7cqw; font: italic max(12px, 1cqw) Georgia, serif; color: #6b4f24; }
+.gossip-parchment .quest-detail p { white-space: pre-line; }
+.gossip-parchment .quest-detail .quest-reward { color: #3a1f05; }
+.quest-actions { display: flex; gap: .6cqw; margin-top: 1cqw; }
+.gossip-footer { display: flex; align-items: center; gap: .6cqw; padding: .6cqw .8cqw; background: linear-gradient(#2a261f, #1a1814); }
+#npc-gold { margin: 0 auto 0 0; font: max(12px, 1cqw) Georgia, serif; color: #f1d493; }
+.gossip-button, .gossip-parchment .btn { padding: .4cqw 1.3cqw; border: 1px solid #d9b25a; border-radius: .25cqw; background: linear-gradient(#a8301f, #5e1209); color: #ffe9a8; font: bold max(12px, 1.05cqw) Georgia, serif; text-shadow: 0 1px 1px #000; cursor: pointer; }
+.gossip-button:hover:not(:disabled), .gossip-parchment .btn:hover:not(:disabled) { background: linear-gradient(#c43a26, #7a1a0d); }
+.gossip-button:disabled, .gossip-parchment .btn:disabled { opacity: .5; cursor: default; }
+.gossip-button.primary { background: linear-gradient(#b9921f, #6b4d08); }
+.gossip-button.primary:hover:not(:disabled) { background: linear-gradient(#d4aa2a, #86610d); }
+.gossip-window :focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }
+.gossip-parchment .gossip-row:focus-visible { outline: 2px solid #3a5a08; outline-offset: -2px; }
+#npc-inventory h4 { margin: 0 0 .3cqw; font: bold max(14px, 1.3cqw) Georgia, serif; color: #3a1f05; }
+.gossip-parchment .inventory-item { background: #3b230a1f; border-color: #7a5c2b; }
+.gossip-parchment .inventory-item b { color: #2b1b08; font-family: Georgia, serif; }
+.gossip-parchment .inventory-item small { color: #5b4420; font-family: Georgia, serif; }
+.gossip-parchment .inventory-item[data-rarity="rare"] b { color: #1b5ea8; }
+.gossip-parchment .shop-item-icon { background: #2a1a0acc; border-color: #5a4a30; }
+@media (pointer: coarse) { .gossip-row { min-height: 44px; } .gossip-button, .gossip-parchment .btn, .gossip-titlebar .window-close { min-height: 44px; min-width: 44px; } }
 .quest-tracker { position: absolute; right: 1.4cqw; top: 22cqw; width: 23cqw; z-index: 20; color: #f7e9c9; text-align: left; font: 1cqw/1.45 Arial, sans-serif; text-shadow: 0 1px 3px #000, 1px 0 2px #000; }
 .tracker-heading { display: flex; align-items: center; border-bottom: 1px solid #b89b5c80; background: linear-gradient(90deg, #182024cc, #18202420); }
 .tracker-journal, .tracker-toggle, .tracker-title { border: 0; padding: .45cqw .5cqw; background: none; color: #ffd56b; text-align: left; cursor: pointer; font: inherit; text-shadow: inherit; }

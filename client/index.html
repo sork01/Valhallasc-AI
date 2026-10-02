@@ -160,16 +160,24 @@
       </section>
     </div>
     <div class="pause" id="npc-dialogue" hidden>
-      <section class="panel npc-panel" role="dialog" aria-modal="true" aria-labelledby="npc-name" aria-describedby="npc-text">
-        <p id="npc-role" class="npc-role"></p>
-        <h3 id="npc-name"></h3>
-        <p id="npc-text"></p>
-        <p id="npc-gold"></p>
-        <div id="npc-offers" class="npc-offers"></div>
-        <div id="npc-quests"></div>
-        <div id="npc-inventory"></div>
-        <p id="npc-notice" role="status" aria-live="polite"></p>
-        <button class="btn primary" id="npc-close" type="button">Back to the square</button>
+      <section class="panel npc-panel gossip-window" role="dialog" aria-modal="true" aria-labelledby="npc-name" aria-describedby="npc-text">
+        <header class="gossip-titlebar">
+          <h3 id="npc-name"></h3>
+          <button class="window-close" id="npc-x" type="button" aria-label="Close conversation">×</button>
+        </header>
+        <div class="gossip-parchment">
+          <p id="npc-role" class="npc-role"></p>
+          <p id="npc-text"></p>
+          <div id="npc-quests" class="gossip-list"></div>
+          <div id="npc-offers" class="npc-offers gossip-list"></div>
+          <div id="npc-inventory"></div>
+          <p id="npc-notice" role="status" aria-live="polite"></p>
+        </div>
+        <footer class="gossip-footer">
+          <span id="npc-gold"></span>
+          <button class="gossip-button" id="npc-back" type="button" hidden>Back</button>
+          <button class="gossip-button goodbye" id="npc-close" type="button">Goodbye</button>
+        </footer>
       </section>
     </div>
     <div class="pause" id="social-panel" hidden>

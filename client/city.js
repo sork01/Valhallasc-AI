@@ -170,35 +170,75 @@
     for(const radius of [city.radius,city.radius-.2,2.3]) {g.beginPath();g.ellipse(x,y,radius*62.225,radius*31.112,0,0,Math.PI*2);g.strokeStyle='#eee2c5';g.lineWidth=radius===2.3?3:6;g.stroke();}
     for(let i=0;i<4;i++){const a=i*Math.PI/2;poly(g,[[x+Math.cos(a)*167,y+Math.sin(a)*83],[x+Math.cos(a+.13)*123,y+Math.sin(a+.13)*61],[x+Math.cos(a)*102,y+Math.sin(a)*51],[x+Math.cos(a-.13)*123,y+Math.sin(a-.13)*61]],'#b0a794',null);}
   }
-  let current=null,previousFocus=null;
+  let current=null,previousFocus=null,view={kind:'gossip'},lastPacket=null;
   const $=id=>document.getElementById(id);
+  // Fixed markup, never player text: small glyphs for the kinds of service an NPC offers.
+  const ICONS={
+    vendor:'<svg viewBox="0 0 24 24"><path d="M6 9h12l1.5 11h-15z" fill="#8a5a2b" stroke="#3b2410" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 9V7a3 3 0 0 1 6 0v2" fill="none" stroke="#3b2410" stroke-width="1.5"/></svg>',
+    heal:'<svg viewBox="0 0 24 24"><path d="M12 21C5 15.5 3 12 3 8.5A4.5 4.5 0 0 1 12 6.6 4.5 4.5 0 0 1 21 8.5C21 12 19 15.5 12 21z" fill="#c23b32" stroke="#4a1410" stroke-width="1.5" stroke-linejoin="round"/></svg>',
+    gear:'<svg viewBox="0 0 24 24"><path d="M12 2.5 20 6v6c0 5-3.4 8.2-8 9.5C7.4 20.2 4 17 4 12V6z" fill="#7b8a96" stroke="#27323a" stroke-width="1.5" stroke-linejoin="round"/></svg>',
+    coin:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="#e8b92f" stroke="#6b4a08" stroke-width="1.5"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="#a87a10" stroke-width="1.5"/></svg>',
+  };
+  const iconFor=offer=>offer.heal?'heal':offer.gear?'gear':(offer.item||offer.bag)?'vendor':'coin';
+  function row(icon,label,tag){
+    const b=document.createElement('button');b.type='button';b.className='gossip-row';
+    const i=document.createElement('span');i.className='gossip-icon gossip-glyph';i.setAttribute('aria-hidden','true');i.innerHTML=ICONS[icon];
+    const l=document.createElement('span');l.className='gossip-label';l.textContent=label;
+    const t=document.createElement('span');t.className='gossip-tag';t.textContent=tag||'';
+    b.append(i,l,t);return b;
+  }
+  function show(next,focus){view=next;render(focus);}
+  function render(focus) {
+    const packet=lastPacket,npc=current,gossip=view.kind==='gossip';
+    $('npc-name').textContent=npc.name;$('npc-role').textContent=npc.role;
+    $('npc-text').textContent=npc.dialogue;$('npc-text').hidden=!gossip;$('npc-role').hidden=!gossip;
+    $('npc-notice').textContent=packet.notice;
+    $('npc-gold').textContent=`Your purse: ${packet.gold} gold`;
+    $('npc-back').hidden=view.kind!=='sell';
+    // Quests come first, then whatever the NPC sells or does.
+    if(view.kind==='quest'){
+      const quest=window.Quests.offered(npc.id).find(q=>q.id===view.id);
+      if(quest)window.Quests.detail(quest,$('npc-quests'),()=>show({kind:'gossip'},`[data-quest="${view.id}"]`));
+      else {view={kind:'gossip'};}
+    }
+    if(view.kind==='gossip')window.Quests?.npc(npc.id,$('npc-quests'),q=>show({kind:'quest',id:q.id},'[data-action="decline"]'));
+    else if(view.kind==='sell')$('npc-quests').replaceChildren();
+    const offers=[];
+    if(view.kind==='gossip'){
+      if(npc.buys){const b=row('vendor','I have something to sell.');b.dataset.view='sell';b.addEventListener('click',()=>show({kind:'sell'},'#npc-back'));offers.push(b);}
+      for(const offer of npc.offers){
+        const b=row(iconFor(offer),offer.label,offer.cost?`${offer.cost} gold`:'Free');b.dataset.offer=offer.id;
+        b.disabled=packet.gold<offer.cost || (offer.bag && (packet.bags || []).length >= 4 && !(packet.bags || []).some(id => WORLD_ITEMS.find(i => i.id === id)?.bagSlots < WORLD_ITEMS.find(i => i.id === offer.bag)?.bagSlots));
+        b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:offer.id})) b.disabled=true;});offers.push(b);
+      }
+    }
+    $('npc-offers').replaceChildren(...offers);
+    $('npc-inventory').replaceChildren();
+    if(view.kind==='sell')window.Inventory?.renderShop(npc,$('npc-inventory'));
+    const target=focus&&$('npc-dialogue').querySelector(focus);
+    (target&&!target.hidden?target:$('npc-close')).focus({preventScroll:true});
+  }
   function dialogue(packet) {
     if(!Online.connected || Field.hero.dead)return;
     window.Inventory?.hideTooltip();
     window.Skillbar?.close(false);
     if($('equipment')) $('equipment').hidden=true; if($('pause')) $('pause').hidden=true;
     window.Quests?.close(false);
+    const same=current?.id===packet.npc.id;
     previousFocus=current?previousFocus:document.activeElement;current=packet.npc;
+    // Selling keeps its list open between sales; every other reply (accepting, a purchase) returns to the greeting.
+    if(!same||view.kind!=='sell')view={kind:'gossip'};
     Field.setPaused(true);$('npc-dialogue').hidden=false;
-    $('npc-name').textContent=current.name;$('npc-role').textContent=current.role;
-    $('npc-text').textContent=current.dialogue;$('npc-notice').textContent=packet.notice;
-    $('npc-gold').textContent=`Your purse: ${packet.gold} gold`;
     window.Inventory?.update(packet.inventory || [], packet.look, packet.equipment || {}, packet.bags || []);
     window.Quests?.update(packet.quests || []);
-    window.Quests?.npc(current.id, $('npc-quests'));
-    $('npc-offers').replaceChildren(...current.offers.map(offer=>{
-      const b=document.createElement('button');b.type='button';b.className='btn ghost';b.dataset.offer=offer.id;
-      b.textContent=offer.label+(offer.cost?` · ${offer.cost} gold`:' · free');
-      b.disabled=packet.gold<offer.cost || (offer.bag && (packet.bags || []).length >= 4 && !(packet.bags || []).some(id => WORLD_ITEMS.find(i => i.id === id)?.bagSlots < WORLD_ITEMS.find(i => i.id === offer.bag)?.bagSlots));
-      b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:current.id,offer:offer.id})) b.disabled=true;});return b;
-    }));
-    window.Inventory?.renderShop(current, $('npc-inventory'));
-    $('npc-close').focus({preventScroll:true});
+    lastPacket=packet;render();
   }
-  function close(resume=true) {if(!current)return;current=null;$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
+  function close(resume=true) {if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
   $('npc-close').addEventListener('click',()=>close());
+  $('npc-x').addEventListener('click',()=>close());
+  $('npc-back').addEventListener('click',()=>show({kind:'gossip'},'[data-view="sell"]'));
   $('npc-dialogue').addEventListener('keydown',event=>{
-    if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')];const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
+    if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={inside,stoneTile,drawObject,drawNpc,drawPlaza,get npcs(){return area().npcs || [];},dialogue,close,refreshInventory() { if(current) Inventory.renderShop(current, $('npc-inventory')); },get open(){return !!current;}};
+  window.City={inside,stoneTile,drawObject,drawNpc,drawPlaza,get npcs(){return area().npcs || [];},dialogue,close,refreshInventory() { if(current&&view.kind==='sell') Inventory.renderShop(current, $('npc-inventory')); },get open(){return !!current;}};
 })();

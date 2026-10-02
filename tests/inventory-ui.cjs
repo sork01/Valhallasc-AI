@@ -60,6 +60,8 @@ async function call(name, args = {}) {
   check(await page.evaluate(() => Field.hero.look.mageWeapon === 'ash'), 'Loot and gear resume after page reload');
   await page.evaluate(() => Field.visitNpc('merchant'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 60000 });
+  check(await page.locator('#npc-offers [data-offer="satchel"]').isVisible() && await page.locator('#npc-inventory [data-item]').count() === 0, 'The merchant greets with services and keeps the sell list closed');
+  await page.locator('#npc-offers [data-view="sell"]').click();
   check(await page.locator('#npc-inventory [data-item="slime_gel"] [data-sell="one"]').isVisible(), 'Merchant presents sell controls for owned loot');
   check(await page.locator('#npc-inventory [data-item="mage_weapon_ash"]').count() === 0, 'Starter gear is excluded from sales');
   await page.waitForTimeout(600);
@@ -76,7 +78,7 @@ async function call(name, args = {}) {
 
   // Display-only fixtures use the real UI modules without a game connection.
   const fixture = await browser.newPage({ viewport: { width:1440, height:900 } });
-  await fixture.setContent('<div id="inventory-list"></div><div id="bag-details"></div><div id="npc-inventory"></div><button id="quest-tracker"></button><div id="quest-journal" hidden><div id="quest-list"></div><button id="quest-close"></button></div><div id="npc-dialogue" hidden><button id="npc-close"></button></div><canvas id="cv" width="300" height="350"></canvas>');
+  await fixture.setContent('<div id="inventory-list"></div><div id="bag-details"></div><div id="npc-inventory"></div><button id="quest-tracker"></button><div id="quest-journal" hidden><div id="quest-list"></div><button id="quest-close"></button></div><div id="npc-dialogue" hidden><button id="npc-x"></button><button id="npc-back"></button><button id="npc-close"></button></div><canvas id="cv" width="300" height="350"></canvas>');
   await fixture.addStyleTag({ path:path.join(root, 'client/online.css') });
   await fixture.addScriptTag({ path:path.join(root, 'client/world.js') });
   await fixture.addScriptTag({ path:path.join(root, 'client/items.js') });
