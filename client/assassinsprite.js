@@ -2,6 +2,7 @@
 (() => {
   // Shares only the equipment compositor; artwork and animation are separate.
   class AssassinSprite extends MageSprite {}
+  AssassinSprite.TIERS = ['shadow', 'moon'];
   AssassinSprite.METADATA = 'assets/assassin_sprites.txt';
   AssassinSprite.HAIR = ['#465278', '#9eaccf', '#624357', '#334c4a', '#b5616d', '#d4b88b'];
   AssassinSprite.SKIN = ['#f0bfac', '#ffe0c5', '#cc927b', '#9c695a'];

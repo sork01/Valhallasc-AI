@@ -29,6 +29,9 @@
     for (const part of Object.keys(meta.parts)) {
       const frame = part === 'body' ? solid(ax - 3, ay - 14, 6, 14, row => row < 4 ? hair : skin, 1000)
         : part.startsWith('armor_') ? solid(ax - 3, ay - 9, 6, 6, () => colour(part), 500)
+        : part.startsWith('head_') ? solid(ax - 3, ay - 17, 6, 3, () => colour(part), 480)
+        : part.startsWith('shoulders_') ? solid(ax - 5, ay - 12, 10, 2, () => colour(part), 470)
+        : part.startsWith('gloves_') ? solid(ax - 5, ay - 7, 10, 2, () => colour(part), 460)
         : solid(ax + 3, ay - 15, 2, 12, () => colour(part), 400);
       parts[part] = new Proxy({}, { get: () => frame });   // the same still figure for every clip, direction and frame
     }
@@ -66,10 +69,14 @@
     armor: Object.hasOwn(ARMOR, look?.mageArmor) ? look.mageArmor : 'apprentice',
     weapon: Object.hasOwn(WEAPON, look?.mageWeapon) ? look.mageWeapon : 'ash',
   });
+  // Head, shoulder and glove pieces are worn per class: the look names a tier (or 'none'), and a class only
+  // accepts its own tier names (MageSprite.TIERS). A part the atlas does not have is simply not drawn.
+  const SLOT_ORDER = ['armor', 'shoulders', 'gloves', 'head', 'weapon'];
+  const pieces = (C, look) => Object.fromEntries(['head', 'shoulders', 'gloves'].map(slot => [slot, (C.TIERS || []).includes(look?.[slot]) ? look[slot] : 'none']));
   class MageSprite {
     constructor(source, look = {}) { this.source = source; this.meta = source.meta; this.cache = new Map(); this.set(look); }
     set(look) {
-      this.look = { ...look }; this.equipment = this.constructor.equipment(look); this.cache.clear();
+      this.look = { ...look }; this.equipment = { ...pieces(this.constructor, look), ...this.constructor.equipment(look) }; this.cache.clear();
       this.tint = new Map();
       const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
       const lum = c => c[0] * .299 + c[1] * .587 + c[2] * .114;
@@ -90,8 +97,7 @@
       const [fw, fh] = this.meta.frame, canvas = document.createElement('canvas'); canvas.width = fw; canvas.height = fh;
       const g = canvas.getContext('2d'), out = g.createImageData(fw, fh), nearest = new Uint16Array(fw * fh); nearest.fill(65535);
       const chosen = ['body'];
-      if (this.equipment.armor !== 'none') chosen.push('armor_' + this.equipment.armor);
-      if (this.equipment.weapon !== 'none') chosen.push('weapon_' + this.equipment.weapon);
+      for (const slot of SLOT_ORDER) if (this.equipment[slot] && this.equipment[slot] !== 'none' && this.source.parts[slot + '_' + this.equipment[slot]]) chosen.push(slot + '_' + this.equipment[slot]);
       for (const part of chosen) {
         const f = this.source.parts[part][key];
         for (let y = 0; y < f.h; y++) for (let x = 0; x < f.w; x++) {
@@ -132,7 +138,7 @@
     }
   }
   MageSprite.HAIR = HAIR; MageSprite.SKIN = SKIN; MageSprite.ARMOR = ARMOR; MageSprite.WEAPON = WEAPON;
-  MageSprite.equipment = equipment;
+  MageSprite.equipment = equipment; MageSprite.TIERS = ['apprentice', 'runic'];
   MageSprite.METADATA = 'assets/mage_sprites.txt';
   window.MageSprite = MageSprite;
 })();

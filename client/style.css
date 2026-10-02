@@ -114,14 +114,14 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 .ph b { display: block; font-family: var(--display); font-weight: 400; font-size: 1.55cqw; color: var(--gold); }
 .ph span { display: block; font-size: 1.15cqw; opacity: .85; }
 
-.cc-classes { left: 2cqw; top: 9.5cqw; width: 12.4cqw; }
-.class-list { display: flex; flex-direction: column; align-items: center; gap: 1cqw; }
+.cc-classes { left: 2cqw; top: 9cqw; width: 12.4cqw; }
+.class-list { display: flex; flex-direction: column; align-items: center; gap: .7cqw; }
 .class-ico { position: relative; width: 8cqw; height: 8cqw; padding: 0; border-radius: 50%; cursor: pointer; border: .3cqw solid #3a4570; background: radial-gradient(circle at 50% 35%, #26346e, #0d1538); }
 .class-ico svg { width: 68%; height: 68%; }
 .class-ico.on { border-color: var(--gold); box-shadow: 0 0 1.6cqw rgba(245, 197, 66, .7), inset 0 0 1cqw rgba(245, 197, 66, .3); transform: scale(1.06); }
 .class-ico.locked { cursor: not-allowed; filter: grayscale(1) brightness(.6); }
 .class-ico:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
-.cc-classes .class-ico { width: 6.4cqw; height: 6.4cqw; }
+.cc-classes .class-ico { width: 5cqw; height: 5cqw; }   /* six buttons (five classes and a locked one) must clear the Back button */
 .lock { position: absolute; right: -.3cqw; bottom: -.3cqw; width: 2.6cqw; height: 2.6cqw; border-radius: 50%; background: #1c2340; border: .2cqw solid #aab0c8; }
 .lock::before { content: ""; position: absolute; left: 50%; top: 14%; width: 34%; height: 34%; transform: translateX(-50%); border: .2cqw solid #d5d9ea; border-bottom: 0; border-radius: 999px 999px 0 0; }
 .lock::after { content: ""; position: absolute; left: 50%; top: 44%; width: 46%; height: 34%; transform: translateX(-50%); background: #d5d9ea; border-radius: .2cqw; }

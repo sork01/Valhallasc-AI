@@ -898,6 +898,45 @@ const scenarios = {
       check(front().dead, 'The mace and holy light together defeat an enemy without any help');
     },
   },
+  hunter: {
+    description: 'The Hunter, a ranged class with layered gear: it starts in Scout gear with its head, shoulder and glove pieces unworn in the bag, wearing the pieces changes the look and taking them off clears it, another class\'s piece is refused, and arrows (Power Shot and the plain shot) damage a real enemy from beyond melee range.',
+    startLevel: 20,
+    async run(w, check) {
+      await w.connect({ bot: 'Hana', class: 'hunter' });
+      const hana = () => w.player('Hana');
+      check(hana().look.class === 'hunter' && hana().level === 20 && hana().maxHp === 95 + 19 * 20, 'The hunter joins as a level-20 hunter with 95 base health');
+      check(hana().look.hunterArmor === 'scout' && hana().look.hunterWeapon === 'shortbow', 'It starts in the Scout\u2019s Jerkin with a Hunter\u2019s Shortbow');
+      check(hana().look.head === 'none' && hana().look.shoulders === 'none' && hana().look.gloves === 'none', 'The head, shoulder and glove layers start off');
+      const pieces = ['hunter_headgear_scout', 'hunter_shoulders_scout', 'hunter_gloves_scout'];
+      check(pieces.every(id => hana().inventory.some(s => s.item === id)), 'The three starter pieces are in the bag, unworn');
+      const learned = skillCatalog.filter(k => k.class === 'hunter').map(k => k.level);
+      check(learned.length === 10 && learned.join() === '2,4,6,8,10,12,14,16,18,20', 'A hunter learns one skill at every even level up to 20');
+      await w.action('Hana', { type: 'equip', slots: { headgear: pieces[0], shoulders: pieces[1], gloves: pieces[2] } });
+      await w.waitFor(() => hana().look.head === 'scout' && hana().look.shoulders === 'scout' && hana().look.gloves === 'scout', 5000, 'Pieces worn');
+      check(true, 'Wearing the three pieces switches on the head, shoulder and glove layers');
+      await w.debug('Hana', { op: 'give_item', item: 'mage_headgear_runic', quantity: 1 });
+      const errors = () => w.events.filter(e => e.bot === 'Hana' && e.type === 'error').length;
+      const before = errors();
+      await w.action('Hana', { type: 'equip', slots: { headgear: 'mage_headgear_runic' } });
+      await w.waitFor(() => errors() > before, 5000, 'Another class\u2019s piece is refused');
+      check(hana().look.head === 'scout', 'Another class\u2019s piece is refused and the layer stays');
+      await w.action('Hana', { type: 'equip', slots: { headgear: 'none', gloves: 'none' } });
+      await w.waitFor(() => hana().look.head === 'none' && hana().look.gloves === 'none', 5000, 'Pieces removed');
+      check(hana().look.shoulders === 'scout', 'Taking pieces off clears only their layers');
+      await w.restart();
+      check(hana().look.shoulders === 'scout' && hana().look.head === 'none', 'The worn layers survive a server restart');
+      // Arrows: the plain shot and Power Shot reach an enemy from beyond any melee reach.
+      const front = await approach(w, 'Hana', 'green', 6.5);
+      const start = { ...front() };
+      check(distance(hana(), start) > 3, 'The hunter stands well outside sword range');
+      await cast(w, 'Hana', 'powershot', front());
+      await w.waitFor(() => lost(start, front()), 8000, 'Power Shot');
+      check(lost(start, front()), 'Power Shot damages an enemy from a distance');
+      await w.action('Hana', { type: 'target', id: start.id });
+      await w.waitFor(() => !front() || front().dead, 40000, 'The hunter defeats it with arrows');
+      check(front().dead, 'Arrows alone defeat an enemy');
+    },
+  },
 };
 
 async function runScenario(name, world = new TestWorld()) {

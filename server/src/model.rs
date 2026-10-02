@@ -36,14 +36,30 @@ pub enum Class {
     Mage,
     Assassin,
     Priest,
+    Hunter,
 }
 impl Class {
+    /// The two visual sets of a class's shoulders, gloves and head layers. The Priest has none yet.
+    pub fn tiers(self) -> &'static [&'static str] {
+        match self {
+            Self::Warrior => &["crimson", "azure"],
+            Self::Mage => &["apprentice", "runic"],
+            Self::Assassin => &["shadow", "moon"],
+            Self::Priest => &[],
+            Self::Hunter => &["scout", "warden"],
+        }
+    }
+    /// Classes that loose a projectile instead of hitting everything within reach.
+    pub fn ranged(self) -> bool {
+        matches!(self, Self::Mage | Self::Hunter)
+    }
     pub fn health(self) -> f64 {
         match self {
             Self::Warrior => 120.,
             Self::Mage => 80.,
             Self::Assassin => 90.,
             Self::Priest => 100.,
+            Self::Hunter => 95.,
         }
     }
     pub fn speed(self) -> f64 {
@@ -52,6 +68,7 @@ impl Class {
             Self::Mage => 5.6,
             Self::Assassin => 6.6,
             Self::Priest => 5.4,
+            Self::Hunter => 6.,
         }
     }
     pub fn reach(self) -> f64 {
@@ -60,6 +77,7 @@ impl Class {
             Self::Mage => 5.5,
             Self::Assassin => 1.1,
             Self::Priest => 1.5,
+            Self::Hunter => 7.,
         }
     }
     pub fn duration(self) -> f64 {
@@ -68,6 +86,7 @@ impl Class {
             Self::Mage => 0.56,
             Self::Assassin => 0.4,
             Self::Priest => 0.4,
+            Self::Hunter => 0.4,
         }
     }
     pub fn impact(self) -> f64 {
@@ -76,6 +95,7 @@ impl Class {
             Self::Mage => 0.28,
             Self::Assassin => 0.2,
             Self::Priest => 0.2,
+            Self::Hunter => 0.2,
         }
     }
     pub fn cooldown(self) -> f64 {
@@ -84,6 +104,7 @@ impl Class {
             Self::Mage => 0.7,
             Self::Assassin => 0.46,
             Self::Priest => 0.62,
+            Self::Hunter => 0.58,
         }
     }
 }
@@ -103,6 +124,13 @@ pub struct Look {
     pub assassin_weapon: String,
     pub priest_armor: String,
     pub priest_weapon: String,
+    pub hunter_armor: String,
+    pub hunter_weapon: String,
+    /// Worn head, shoulder and glove pieces of the character's own class (a variant name, or "none"). They come from
+    /// the headgear, shoulders and gloves equipment slots and only change how the character looks.
+    pub head: String,
+    pub shoulders: String,
+    pub gloves: String,
 }
 impl Default for Look {
     fn default() -> Self {
@@ -119,6 +147,11 @@ impl Default for Look {
             assassin_weapon: "daggers".into(),
             priest_armor: "pilgrim".into(),
             priest_weapon: "mace".into(),
+            hunter_armor: "scout".into(),
+            hunter_weapon: "shortbow".into(),
+            head: "none".into(),
+            shoulders: "none".into(),
+            gloves: "none".into(),
         }
     }
 }
@@ -139,6 +172,15 @@ impl Look {
             || !["none", "daggers", "moonfang"].contains(&self.assassin_weapon.as_str())
             || !["none", "pilgrim", "dawn"].contains(&self.priest_armor.as_str())
             || !["none", "mace", "sunmace"].contains(&self.priest_weapon.as_str())
+            || !["none", "scout", "warden"].contains(&self.hunter_armor.as_str())
+            || !["none", "shortbow", "wardenbow"].contains(&self.hunter_weapon.as_str())
+        {
+            return Err("Invalid equipment.");
+        }
+        let tiers = self.class.tiers();
+        if [&self.head, &self.shoulders, &self.gloves]
+            .iter()
+            .any(|piece| piece.as_str() != "none" && !tiers.contains(&piece.as_str()))
         {
             return Err("Invalid equipment.");
         }
@@ -163,6 +205,10 @@ impl Look {
                 next.priest_armor = armor.into();
                 next.priest_weapon = weapon.into();
             }
+            Class::Hunter => {
+                next.hunter_armor = armor.into();
+                next.hunter_weapon = weapon.into();
+            }
         }
         next.validate()?;
         *self = next;
@@ -182,6 +228,7 @@ impl Look {
                 self.assassin_weapon.as_str(),
             ),
             Class::Priest => (20., self.priest_armor.as_str(), self.priest_weapon.as_str()),
+            Class::Hunter => (19., self.hunter_armor.as_str(), self.hunter_weapon.as_str()),
         };
         let defense = crate::items::equipment(self.class, "armor", armor).map_or(0., |i| i.defense);
         let bonus = crate::items::equipment(self.class, "weapon", weapon).map_or(0., |i| i.attack);

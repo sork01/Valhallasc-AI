@@ -2,6 +2,7 @@
 (() => {
   // Painted reference artwork; shared depth compositor, independent assets.
   class WarriorSprite extends MageSprite {}
+  WarriorSprite.TIERS = ['crimson', 'azure'];
   WarriorSprite.METADATA = 'assets/warrior_layered_sprites.txt';
   WarriorSprite.HAIR = ['#514356', '#8b514a', '#d0ae75', '#3b5573', '#835b91', '#c1becb'];
   WarriorSprite.SKIN = ['#ffc1a6', '#ffe1c3', '#dba084', '#a87563'];

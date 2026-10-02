@@ -4,6 +4,16 @@
   const SLOTS = 12, KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='];
   const icons = {
     attack: '<path d="m9 27 17-17 5-2-2 5-17 17M7 21l10 10M6 31l5-5"/>',
+    arrow: '<path d="M6 30 29 7M29 7h-8m8 0v8M6 30l-1-6m1 6 6 1M9 27l-2-5m6 8-1-6"/>',
+    powershot: '<path d="M4 18h26m0 0-6-5m6 5-6 5M4 18l-2-5m2 5-2 5M9 18l-2-4m2 4-2 4"/><circle cx="30" cy="18" r="4"/>',
+    multishot: '<path d="M5 28 28 8M5 18h24M5 8l23 20M28 8h-6m6 0v6M29 18l-6-4m6 4-6 4M28 28h-6m6 0v-6"/>',
+    rollaway: '<path d="M26 10a10 10 0 1 0 2 13M26 4v7h-7M6 33h6M8 28h5"/>',
+    piercing: '<path d="M3 18h30m0 0-7-6m7 6-7 6M12 10v16M20 12v12"/>',
+    mark: '<circle cx="18" cy="18" r="10"/><path d="M18 3v9M18 24v9M3 18h9M24 18h9"/><circle cx="18" cy="18" r="2"/>',
+    explosive: '<path d="m18 4 3 8 8-3-4 7 7 3-8 3 3 8-8-4-5 6-1-8-8-1 6-5-4-8 8 2z"/>',
+    rapidfire: '<path d="M4 12h20m0 0-5-4m5 4-5 4M4 20h26m0 0-5-4m5 4-5 4M4 28h16m0 0-4-3m4 3-4 3"/>',
+    rain: '<path d="M8 4l-3 12m10-12-3 12m10-12-3 12m10-12-3 12M6 20l-2 5m2-5 2 4m5-7-2 5m2-5 2 4M20 20l-2 5m2-5 2 4m5-7-2 5m2-5 2 4M6 32h24"/>',
+    eagle: '<path d="M3 20c6-2 10-8 15-9 5 1 9 7 15 9-6 0-10 2-15 8-5-6-9-8-15-8zM18 16v6"/>',
     cast: '<path d="m17 30 6-17M20 5l2 4 5 1-4 3v5l-4-3-4 1 2-5-2-4zM8 10v5m-2-2h4M29 24v5m-2-2h4"/>',
     shadowstep: '<path d="m23 6-6 10h9L15 31l3-12H9zM4 9h7M2 16h5M4 24h6"/>',
     cleave: '<path d="M5 27c9 1 20-6 26-19M9 31c9 1 20-6 26-19M12 9l4 5M7 14l5 3"/>',
@@ -58,9 +68,9 @@
   // Every skill the class can ever learn, in unlock order; `level` says when it becomes usable.
   function available() {
     const cls = Field.hero.look?.class || 'warrior';
-    return [{ id: 'attack', name: cls === 'mage' ? 'Arcane Bolt' : cls === 'assassin' ? 'Twin Slash' : cls === 'priest' ? 'Mace Strike' : 'Sword Strike', level: 1,
-      icon: cls === 'mage' ? 'cast' : 'attack', cooldown: cls === 'mage' ? .7 : cls === 'assassin' ? .46 : cls === 'priest' ? .62 : .55,
-      description: cls === 'mage' ? 'Cast a bolt at your target or in your aim direction.' : 'Strike enemies within reach in your aim direction.' },
+    return [{ id: 'attack', name: cls === 'mage' ? 'Arcane Bolt' : cls === 'assassin' ? 'Twin Slash' : cls === 'priest' ? 'Mace Strike' : cls === 'hunter' ? 'Arrow Shot' : 'Sword Strike', level: 1,
+      icon: cls === 'mage' ? 'cast' : cls === 'hunter' ? 'arrow' : 'attack', cooldown: cls === 'mage' ? .7 : cls === 'assassin' ? .46 : cls === 'priest' ? .62 : cls === 'hunter' ? .58 : .55,
+      description: cls === 'mage' ? 'Cast a bolt at your target or in your aim direction.' : cls === 'hunter' ? 'Loose an arrow at your target or in your aim direction.' : 'Strike enemies within reach in your aim direction.' },
     ...(cls === 'assassin' ? [{ id: 'shadowstep', name: 'Shadowstep', icon: 'shadowstep', cooldown: 1.2, level: 1,
       description: 'Dash in your movement direction, or forward while standing still.' }] : []),
     ...WORLD_SKILLS.filter(s => s.class === cls).sort((a, b) => a.level - b.level)];

@@ -34,28 +34,43 @@ async function enter(stub, cls, name) {
   return page;
 }
 // Visible pixels of the idle frame under the current equipment, and a fingerprint of them.
-const figure = (page, cls, armor, weapon) => page.evaluate(([cls, armor, weapon]) => {
-  const sprite = valhalla[cls], look = { ...sprite.look, [cls + 'Armor']: armor, [cls + 'Weapon']: weapon };
+const figure = (page, cls, armor, weapon, extras = {}) => page.evaluate(([cls, armor, weapon, extras]) => {
+  const sprite = valhalla[cls], look = { ...sprite.look, head: 'none', shoulders: 'none', gloves: 'none', ...extras, [cls + 'Armor']: armor, [cls + 'Weapon']: weapon };
   sprite.set(look);
   const canvas = sprite.frame('idle', 0, 0), data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
   let visible = 0, hash = 0;
   for (let i = 0; i < data.length; i += 4) if (data[i + 3]) { visible++; hash = (hash * 31 + data[i] * 3 + data[i + 1] * 5 + data[i + 2] * 7 + i) >>> 0; }
   return { visible, hash, width: canvas.width };
-}, [cls, armor, weapon]);
+}, [cls, armor, weapon, extras]);
 
 (async () => {
   const dir = fs.mkdtempSync(path.join(root, 'test-results/sprites-'));
   await startServer(path.join(dir, 'test.sqlite'));
   browser = await chromium.launch({ headless: true });
   try {
-    for (const cls of ['warrior', 'mage', 'assassin', 'priest']) {
+    for (const cls of ['warrior', 'mage', 'assassin', 'priest', 'hunter']) {
       const page = await enter(false, cls, 'Real' + cls);
       check(await page.evaluate(() => window.__valhallaTestSprites === undefined), `${cls}: the stub is off`);
-      const gear = await page.evaluate(cls => { const C = { warrior: WarriorSprite, mage: MageSprite, assassin: AssassinSprite, priest: PriestSprite }[cls]; return { armor: Object.keys(C.ARMOR).filter(k => k !== 'none'), weapon: Object.keys(C.WEAPON).filter(k => k !== 'none') }; }, cls);
+      const gear = await page.evaluate(cls => { const C = { warrior: WarriorSprite, mage: MageSprite, assassin: AssassinSprite, priest: PriestSprite, hunter: HunterSprite }[cls]; return { armor: Object.keys(C.ARMOR).filter(k => k !== 'none'), weapon: Object.keys(C.WEAPON).filter(k => k !== 'none'), tiers: C.TIERS }; }, cls);
       const naked = await figure(page, cls, 'none', 'none'), dressed = await figure(page, cls, gear.armor[0], gear.weapon[0]), other = await figure(page, cls, gear.armor[1], gear.weapon[1]);
       check(naked.visible > 1500, `${cls}: the real body is a full figure (${naked.visible} visible pixels)`);
       check(dressed.visible > naked.visible && dressed.hash !== naked.hash, `${cls}: armour and a weapon add to the figure`);
       check(other.hash !== dressed.hash, `${cls}: the other armour and weapon look different`);
+      // Shoulders, gloves and head are their own layers: each tier of each adds to the figure, differs from the
+      // other tier, and goes away again with 'none'. The Priest has none yet and must ignore them.
+      for (const slot of ['head', 'shoulders', 'gloves']) {
+        if (!gear.tiers.length) { check((await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: 'crimson' })).hash === dressed.hash, `${cls}: no ${slot} layer, so a ${slot} piece changes nothing`); continue; }
+        const worn = [];
+        for (const tier of gear.tiers) worn.push(await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: tier }));
+        check(worn.every(w => w.hash !== dressed.hash && w.visible > 0), `${cls}: each ${slot} tier is drawn`);
+        check(worn[0].hash !== worn[1].hash, `${cls}: the two ${slot} tiers look different`);
+        check((await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: 'none' })).hash === dressed.hash, `${cls}: ${slot} 'none' removes the layer`);
+        check((await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: 'azure_not_a_tier' })).hash === dressed.hash, `${cls}: an unknown ${slot} tier is ignored`);
+      }
+      if (gear.tiers.length) {
+        const all = await figure(page, cls, gear.armor[0], gear.weapon[0], { head: gear.tiers[0], shoulders: gear.tiers[0], gloves: gear.tiers[0] });
+        check(all.hash !== dressed.hash && all.visible > dressed.visible, `${cls}: head, shoulders and gloves worn together make a bigger figure`);
+      }
       check(await page.evaluate(cls => valhalla[cls].portrait().length > 2000, cls), `${cls}: the portrait renders`);
       if (cls === 'mage') {
         const sizes = await page.evaluate(() => ({

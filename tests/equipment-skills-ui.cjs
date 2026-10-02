@@ -38,12 +38,12 @@ async function call(name, args = {}) {
   check(JSON.stringify(labels) === JSON.stringify(['HEADGEAR', 'SHOULDERS', 'CHEST', 'PANTS', 'GLOVES', 'HANDS', 'NECKLACE', 'ACCESSORY 1', 'ACCESSORY 2']), 'All nine requested equipment slots appear');
   check(await page.locator('[data-slot="chest"] b').textContent() === 'Apprentice Robes', 'Existing armor fills Chest');
   check(await page.locator('[data-slot="hands"] b').textContent() === 'Ash Staff', 'Existing weapon fills Hands');
-  check(await page.locator('#field-headgear option').count() === 1, 'Unowned headgear is unavailable');
+  check(await page.locator('#field-headgear option').count() === 2 && await page.locator('#field-headgear option').nth(1).textContent() === "Apprentice's Hat", 'Headgear offers None and the starter piece the mage owns; unowned gear is unavailable');
   check(await page.locator('#character-attributes .attribute-row').count() === 6, 'Character window displays all six trainable stats');
   check(await page.locator('#character-attributes .attribute-add:disabled').count() === 6, 'Level one cannot spend points it has not earned');
   check(await page.locator('#character-attributes').textContent().then(t => t.includes('Hit 90%') && t.includes('Dodge 0%')), 'Character window displays authoritative hit and dodge');
   check(await page.locator('#inventory-list .bag-cell').count() === 16, 'Backpack displays sixteen cells');
-  check(await page.locator('#inventory-list .inventory-item').count() === 0, 'Equipped copies do not occupy bag cells');
+  check(await page.locator('#inventory-list .inventory-item').count() === 3, 'Equipped copies do not occupy bag cells; only the three unworn starter pieces do');
   await page.locator('[data-slot="hands"] .gear-icon').dragTo(page.locator('#inventory-list [data-position="7"]'));
   await page.waitForFunction(() => Field.hero.look.mageWeapon === 'none' && document.querySelector('#inventory-list [data-item="mage_weapon_ash"]')?.dataset.position === '7');
   check(await page.locator('[data-slot="hands"] b').textContent() === 'Empty slot', 'Dragging worn gear into a bag unequips it through the server');
@@ -66,7 +66,7 @@ async function call(name, args = {}) {
   await page.waitForFunction(() => Field.hero.look.mageWeapon === 'ash');
   await page.locator('#inventory-list [data-item="mage_armor_apprentice"] button').dragTo(page.locator('[data-slot="chest"]'));
   await page.waitForFunction(() => Field.hero.look.mageArmor === 'apprentice');
-  check(await page.locator('#inventory-list .inventory-item').count() === 0, 'Right-click and dragging onto a gear slot equip actual owned items');
+  check(await page.locator('#inventory-list .inventory-item').count() === 3, 'Right-click and dragging onto a gear slot equip actual owned items; only the unworn starter pieces stay in the bag');
   await page.screenshot({ path: path.join(world.artifacts, 'equipment-nine-slots.png') });
   await page.keyboard.press('e');
   check(await page.locator('#equipment').isHidden(), 'E closes equipment even from a selector');
@@ -148,6 +148,33 @@ async function call(name, args = {}) {
   await page.keyboard.press('k');
   check(await page.locator('#skill-library .skill-card:not(.locked)').count() === 1 && await page.locator('#skill-library .skill-card.locked').count() === 10, 'The priest starts with its attack and sees ten locked skills');
   check(await page.locator('#skill-library .skill-card.locked').first().textContent().then(t => /Mend/.test(t) && /2/.test(t)), 'The first skill to earn is Mend, at level 2');
+  await page.keyboard.press('Escape');
+  // The Hunter: a fifth class with a bow, an arrow attack and ten skills, whose head, shoulder and glove pieces are worn
+  // from the equipment panel and show on the figure (the stub figure still changes pixels for each).
+  await page.keyboard.press('Escape'); await page.locator('#p-new').click();
+  await page.locator('#cls-hunter').click();
+  check(await page.locator('#class-name').textContent() === 'HUNTER (사냥꾼)' && await page.locator('#cls-hunter').getAttribute('aria-pressed') === 'true', 'The creation screen offers the Hunter');
+  check(await page.locator('#create-hunterArmor option').count() === 1 && await page.locator('#create-hunterWeapon option').count() === 1, 'A new hunter can only start in its starter jerkin and shortbow');
+  await page.locator('#name').fill('SkillHunter'); await page.locator('#go').click({ timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.hunterSprites && document.querySelector('#skillbar-slots [data-slot="1"]')?.dataset.skill === 'attack', null, { timeout: 60000 });
+  check(await page.evaluate(() => Field.hero.look.class === 'hunter' && Field.hero.maxHp === 95 && Field.hero.look.hunterWeapon === 'shortbow' && Field.hero.look.head === 'none'), 'The server made a level-1 hunter with 95 health, a shortbow and no head, shoulder or glove pieces');
+  check(await page.locator('#skillbar-slots [data-slot="1"]').getAttribute('aria-label').then(t => /Arrow Shot/.test(t || '')), 'The hunter\u2019s basic attack is Arrow Shot');
+  await page.keyboard.press('k');
+  check(await page.locator('#skill-library .skill-card:not(.locked)').count() === 1 && await page.locator('#skill-library .skill-card.locked').count() === 10, 'The hunter starts with its attack and sees ten locked skills');
+  check(await page.locator('#skill-library .skill-card.locked').first().textContent().then(t => /Power Shot/.test(t) && /2/.test(t)), 'The first skill to earn is Power Shot, at level 2');
+  await page.keyboard.press('Escape'); await page.keyboard.press('e');
+  const layerFigure = () => page.evaluate(() => { const c = Field.hunterSprites.frame('idle', 0, 0), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let h = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3]) h = (h * 31 + d[i] * 3 + d[i + 1] * 5 + d[i + 2] * 7 + i) >>> 0; return h; });
+  let figureHash = await layerFigure();
+  for (const [slot, field, key] of [['headgear', 'hunter_headgear_scout', 'head'], ['shoulders', 'hunter_shoulders_scout', 'shoulders'], ['gloves', 'hunter_gloves_scout', 'gloves']]) {
+    check(await page.locator('#field-' + slot + ' option').count() === 2, `The ${slot} slot offers the starter piece and None`);
+    await page.locator('#field-' + slot).selectOption(field);
+    await page.waitForFunction(key => Field.hero.look[key] === 'scout' && Field.hunterSprites.equipment[key] === 'scout', key, { timeout: 8000 });
+    const next = await layerFigure();
+    check(next !== figureHash, `Wearing the ${slot} piece changes the hunter's figure`); figureHash = next;
+  }
+  await page.locator('#field-headgear').selectOption('none');
+  await page.waitForFunction(() => Field.hero.look.head === 'none' && Field.hunterSprites.equipment.head === 'none', null, { timeout: 8000 });
+  check(await layerFigure() !== figureHash, 'Taking the headgear off removes its layer');
   await page.keyboard.press('Escape');
   // Healing effects: a healed party member gets a number and a glow, and a Mend cast draws on each person it reached.
   const fx = await page.evaluate(() => {

@@ -2,6 +2,7 @@
 (() => {
   // The Assassin\u2019s style as a healer: shares only the equipment compositor; artwork and animation are separate.
   class PriestSprite extends MageSprite {}
+  PriestSprite.TIERS = [];
   PriestSprite.METADATA = 'assets/priest_sprites.txt';
   PriestSprite.HAIR = ['#e3d6b0', '#9eaccf', '#b5616d', '#624357', '#334c4a', '#465278'];
   PriestSprite.SKIN = ['#f0bfac', '#ffe0c5', '#cc927b', '#9c695a'];

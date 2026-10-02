@@ -2,7 +2,7 @@
 (() => {
   let character = null, signature = '', pending = false;
   const names = ['strength', 'agility', 'intellect', 'stamina', 'dexterity', 'accuracy'];
-  const primary = { warrior: 'strength', assassin: 'agility', mage: 'intellect', priest: 'intellect' };
+  const primary = { warrior: 'strength', assassin: 'agility', mage: 'intellect', priest: 'intellect', hunter: 'agility' };
   const node = (tag, text, cls) => { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; };
   const percent = n => `${Number(((n || 0) * 100).toFixed(1))}%`;
   function render() {

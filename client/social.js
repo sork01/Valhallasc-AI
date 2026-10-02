@@ -8,7 +8,7 @@
   let state = empty(), roster = [], tab = 'friends', previousFocus = null;
   // Invites carry seconds left; remember when each lapses on this machine's clock.
   const lapse = new Map();
-  const CLASSES = { warrior: 'Warrior', mage: 'Mage', assassin: 'Assassin', priest: 'Priest' };
+  const CLASSES = { warrior: 'Warrior', mage: 'Mage', assassin: 'Assassin', priest: 'Priest', hunter: 'Hunter' };
 
   function el(tag, text, className) {
     const node = document.createElement(tag);

@@ -43,6 +43,8 @@ pub enum Identity {
 }
 /// Characters one account may hold.
 pub const MAX_ACCOUNT_CHARACTERS: usize = 5;
+// A Join carries a whole Look and is sent once per connection, so boxing it would only add noise.
+#[allow(clippy::large_enum_variant)]
 pub enum Command {
     Join {
         session: u64,
@@ -1002,6 +1004,7 @@ impl World {
                                 Class::Mage => ("apprentice", "ash"),
                                 Class::Assassin => ("shadow", "daggers"),
                                 Class::Priest => ("pilgrim", "mace"),
+                                Class::Hunter => ("scout", "shortbow"),
                             };
                             let mut fitted = p.character.clone();
                             for (kind, variant) in [("armor", armor), ("weapon", weapon)] {
@@ -1045,7 +1048,7 @@ impl World {
         p.attack = 0.0001;
         p.hit = false;
         p.cooldown = p.character.attack_cooldown() / (1. + p.buff(BuffKind::Haste));
-        let kind = if p.character.look.class == Class::Mage {
+        let kind = if p.character.look.class.ranged() {
             "cast"
         } else {
             "swing"
@@ -1279,8 +1282,13 @@ impl World {
         let class = p.character.look.class;
         let reach = class.reach();
         let (damage, crit) = self.roll_damage(session, 1.);
-        if class == Class::Mage {
+        if class.ranged() {
             let id = self.entity();
+            let (color, size) = if class == Class::Hunter {
+                ("#e8c27a", 6.)
+            } else {
+                ("#c5a5ff", 9.)
+            };
             self.bolts.push(Bolt {
                 id,
                 owner: session,
@@ -1290,8 +1298,8 @@ impl World {
                 fx: face.x,
                 fy: face.y,
                 t: 0.,
-                color: "#c5a5ff".into(),
-                size: 9.,
+                color: color.into(),
+                size,
                 damage,
                 crit,
                 pierce: false,
@@ -2582,10 +2590,11 @@ mod tests {
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Warrior);
         let c = &mut w.players.get_mut(&1).unwrap().character;
+        let room = 16 - c.bag_used();
         for i in ITEMS
             .iter()
             .filter(|i| i.kind != "bag" && !(i.class == Some(Class::Warrior) && i.starter))
-            .take(16)
+            .take(room)
         {
             c.add_item(&i.id, 1);
         }
@@ -2730,7 +2739,8 @@ mod tests {
         let token = welcome["token"].as_str().unwrap();
         w.rng = 7;
         let id = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
-        let kills = 1000;
+        // Enough kills that every rare item in the pool, however many there are, shows up many times over.
+        let kills = ITEMS.iter().filter(|i| i.rarity == "rare").count() as u32 * 90;
         for _ in 0..kills {
             w.slimes[id] = Slime::new(id, &w.maps[0].slimes[id]);
             w.hit_slime(id, 1, 1000., false);
@@ -2748,6 +2758,8 @@ mod tests {
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.x = point.x;
         c.y = point.y;
+        // Four satchels: the rare pool no longer fits the 16-cell backpack.
+        c.bags = vec!["linen_satchel".to_string(); 4];
         for d in &mut w.drops {
             d.t = 1.;
         }
@@ -4900,7 +4912,7 @@ mod tests {
                 DebugCommand::GiveItem {
                     item: id.clone(),
                     quantity: 1,
-                    force: true,
+                    force: false,
                 },
             );
         }

@@ -130,7 +130,13 @@ mod tests {
 
     #[test]
     fn every_class_learns_one_skill_at_each_even_level_up_to_twenty() {
-        for class in [Class::Warrior, Class::Mage, Class::Assassin, Class::Priest] {
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
             let mut levels: Vec<_> = SKILLS
                 .iter()
                 .filter(|s| s.class == class)

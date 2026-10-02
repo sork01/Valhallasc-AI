@@ -259,8 +259,9 @@
   const isMage = () => hero?.look?.class === 'mage';
   const isAssassin = () => hero?.look?.class === 'assassin';
   const isPriest = () => hero?.look?.class === 'priest';
-  const isModular = () => ['warrior', 'mage', 'assassin', 'priest'].includes(hero?.look?.class || 'warrior');
-  const characterClass = () => isMage() ? MageSprite : isAssassin() ? AssassinSprite : isPriest() ? PriestSprite : WarriorSprite;
+  const isHunter = () => hero?.look?.class === 'hunter';
+  const isModular = () => ['warrior', 'mage', 'assassin', 'priest', 'hunter'].includes(hero?.look?.class || 'warrior');
+  const characterClass = () => isMage() ? MageSprite : isAssassin() ? AssassinSprite : isPriest() ? PriestSprite : isHunter() ? HunterSprite : WarriorSprite;
   const mageGear = () => MageSprite.equipment(hero.look);
   const equipmentStats = () => {
     if (Number.isFinite(hero.attack) && Number.isFinite(hero.defense)) return { attack: hero.attack, defense: hero.defense };
@@ -268,7 +269,7 @@
     const C = characterClass(), gear = C.equipment(hero.look);
     const item = (kind, variant) => WORLD_ITEMS.find(i => i.class === hero.look.class && i.kind === kind && i.variant === variant);
     const extras = Object.values(hero.equipment || {}).map(id => WORLD_ITEMS.find(i => i.id === id)).filter(Boolean);
-    return { attack: extras.reduce((sum, i) => sum + (i.attack || 0), 0) + (isAssassin() ? 18 : isMage() || isPriest() ? 20 : 22) + hero.level * 4 + (item('weapon', gear.weapon)?.attack || 0), defense: extras.reduce((sum, i) => sum + (i.defense || 0), 0) + (item('armor', gear.armor)?.defense || 0) };
+    return { attack: extras.reduce((sum, i) => sum + (i.attack || 0), 0) + (isAssassin() ? 18 : isHunter() ? 19 : isMage() || isPriest() ? 20 : 22) + hero.level * 4 + (item('weapon', gear.weapon)?.attack || 0), defense: extras.reduce((sum, i) => sum + (i.defense || 0), 0) + (item('armor', gear.armor)?.defense || 0) };
   };
 
   // Looks only: the server owns health, damage, speed, XP and level. `scale` is the drawn size, `top` the sprite
@@ -409,7 +410,7 @@
     Online.send({ type: 'skill', id: def.id, fx, fy });
   }
   function shadowstep() { const [dx, dy] = keyboardDirection(); Online.send({ type: 'dash', dx, dy }); }
-  const classSprite = look => look.class === 'mage' ? MageSprite : look.class === 'assassin' ? AssassinSprite : look.class === 'priest' ? PriestSprite : WarriorSprite;
+  const classSprite = look => look.class === 'mage' ? MageSprite : look.class === 'assassin' ? AssassinSprite : look.class === 'priest' ? PriestSprite : look.class === 'hunter' ? HunterSprite : WarriorSprite;
   function applyActor(actor, packet, snap = false) {
     const x = actor.x, y = actor.y;
     Object.assign(actor, packet); actor.nx = packet.x; actor.ny = packet.y;
@@ -1313,10 +1314,11 @@
     },
     get remotePlayers() { return [...remotePlayers.values()]; },
     get equipmentStats() { return equipmentStats(); },
-    get warriorSprites() { return !isMage() && !isAssassin() && !isPriest() ? mageSpr : null; },
+    get warriorSprites() { return !isMage() && !isAssassin() && !isPriest() && !isHunter() ? mageSpr : null; },
     get mageSprites() { return isMage() ? mageSpr : null; },
     get assassinSprites() { return isAssassin() ? mageSpr : null; },
     get priestSprites() { return isPriest() ? mageSpr : null; },
+    get hunterSprites() { return isHunter() ? mageSpr : null; },
     get hero() { return hero; }, get slimes() { return slimes; },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; },

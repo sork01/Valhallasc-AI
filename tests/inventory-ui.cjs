@@ -29,7 +29,7 @@ async function call(name, args = {}) {
   check(await page.evaluate(() => Field._debug.routeTo(WORLD_MAP.npcs.find(n => n.id === 'merchant'), true, {x:39.30887275762825,y:59.41608127806563}).length > 0), 'Town travel routes from a loot position beside a tree');
   await page.keyboard.press('e');
   check(await page.locator('#equipment').isVisible(), 'E opens character and bags');
-  check(await page.locator('#inventory-list .inventory-item').count() === 0 && await page.locator('#inventory-list .bag-cell').count() === 16, 'Equipped starter gear leaves sixteen empty backpack cells');
+  check(await page.locator('#inventory-list .inventory-item').count() === 3 && await page.locator('#inventory-list .bag-cell').count() === 16, 'Equipped starter gear leaves sixteen backpack cells holding only the three unworn starter pieces');
   check(await page.locator('#field-mageWeapon option').count() === 2, 'Equipment selector offers only none and owned gear');
   await page.locator('#field-mageArmor').selectOption('none'); await page.locator('#field-mageWeapon').selectOption('none');
   await page.waitForFunction(() => Field.hero.look.mageArmor === 'none' && Field.hero.look.mageWeapon === 'none');

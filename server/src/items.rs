@@ -179,7 +179,8 @@ impl Character {
         let (armor, weapon) = self.gear();
         extras
             + u32::from(
-                i.variant.as_deref() == Some(if i.kind == "armor" { armor } else { weapon }),
+                matches!(i.kind.as_str(), "armor" | "weapon")
+                    && i.variant.as_deref() == Some(if i.kind == "armor" { armor } else { weapon }),
             )
     }
     pub fn gear(&self) -> (&str, &str) {
@@ -188,6 +189,7 @@ impl Character {
             Class::Mage => (&self.look.mage_armor, &self.look.mage_weapon),
             Class::Assassin => (&self.look.assassin_armor, &self.look.assassin_weapon),
             Class::Priest => (&self.look.priest_armor, &self.look.priest_weapon),
+            Class::Hunter => (&self.look.hunter_armor, &self.look.hunter_weapon),
         }
     }
     pub fn seed_inventory(&mut self) {
@@ -198,8 +200,9 @@ impl Character {
             .filter(|i| {
                 i.class == Some(class)
                     && (i.starter
-                        || i.variant.as_deref()
-                            == Some(if i.kind == "armor" { armor } else { weapon }))
+                        || (matches!(i.kind.as_str(), "armor" | "weapon")
+                            && i.variant.as_deref()
+                                == Some(if i.kind == "armor" { armor } else { weapon })))
             })
             .map(|i| i.id.clone())
             .collect();
@@ -208,6 +211,38 @@ impl Character {
                 self.add_item(&id, 1);
             }
         }
+    }
+    /// Gives a character the starter pieces of their class that they do not own yet (new catalog entries reach
+    /// existing saves this way). Starter gear cannot be sold, so a missing one was never granted. Pieces that would
+    /// overfill the bags wait for the next load.
+    pub fn grant_missing_starters(&mut self) {
+        let class = self.look.class;
+        let ids: Vec<_> = ITEMS
+            .iter()
+            .filter(|i| i.starter && i.class == Some(class))
+            .map(|i| i.id.clone())
+            .collect();
+        for id in ids {
+            if self.quantity(&id) == 0 && self.bag_used() < self.bag_capacity() {
+                self.add_item(&id, 1);
+            }
+        }
+    }
+    /// Makes the look's head, shoulder and glove layers match the class pieces worn in the headgear, shoulders and
+    /// gloves slots (anything else worn there only adds stats).
+    pub fn sync_look(&mut self) {
+        let worn = |slot: &str| {
+            self.equipment
+                .get(slot)
+                .and_then(|id| item(id))
+                .filter(|i| i.class == Some(self.look.class))
+                .and_then(|i| i.variant.clone())
+                .unwrap_or_else(|| "none".into())
+        };
+        let (head, shoulders, gloves) = (worn("headgear"), worn("shoulders"), worn("gloves"));
+        self.look.head = head;
+        self.look.shoulders = shoulders;
+        self.look.gloves = gloves;
     }
     pub fn equip_owned(&mut self, armor: &str, weapon: &str) -> Result<(), &'static str> {
         if self.hp <= 0. {
@@ -272,6 +307,7 @@ impl Character {
                 next.equipment.remove(slot);
             }
         }
+        next.sync_look();
         for i in ITEMS.iter() {
             if next.equipped_count(i) > next.quantity(&i.id) {
                 if i.kind == "armor" || i.kind == "weapon" {
@@ -296,7 +332,7 @@ impl Character {
                 0.5
             }
             + a.agility as f64
-                * if self.look.class == Class::Assassin {
+                * if matches!(self.look.class, Class::Assassin | Class::Hunter) {
                     2.
                 } else {
                     0.5
@@ -354,7 +390,13 @@ mod tests {
     }
     #[test]
     fn every_attribute_has_a_combat_effect_and_classes_have_specialties() {
-        for class in [Class::Warrior, Class::Mage, Class::Assassin, Class::Priest] {
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
             let mut c = character();
             c.look.class = class;
             c.grant_xp(300);
@@ -439,7 +481,13 @@ mod tests {
     fn loot_rates_and_pool_cover_every_class_and_slot() {
         for kind in ["green", "blue", "pink", "yellow", "beetle", "big"] {
             assert!(roll_equipment(kind, equipment_chance(kind), 0.).is_none());
-            for class in [Class::Warrior, Class::Mage, Class::Assassin, Class::Priest] {
+            for class in [
+                Class::Warrior,
+                Class::Mage,
+                Class::Assassin,
+                Class::Priest,
+                Class::Hunter,
+            ] {
                 for slot in ["armor", "weapon"] {
                     let pool_size = ITEMS.iter().filter(|i| i.rarity == "rare").count();
                     assert!((0..pool_size).any(|n| {
@@ -489,10 +537,12 @@ mod tests {
     #[test]
     fn finite_bags_allow_stacking_and_gear_swaps_but_refuse_overflow() {
         let mut c = character();
+        // The character already carries its unworn starter pieces; fill what is left of the 16 cells.
+        let room = 16 - c.bag_used();
         for i in ITEMS
             .iter()
             .filter(|i| i.kind != "bag" && !(i.class == Some(Class::Warrior) && i.starter))
-            .take(16)
+            .take(room)
         {
             c.add_item(&i.id, 1);
         }
@@ -591,5 +641,108 @@ mod tests {
         assert_eq!(c.stats(), (27., 3.));
         c.hp = 0.;
         assert!(c.equip_slots(&request(&[("headgear", "none")])).is_err());
+    }
+    fn slots(pairs: &[(&str, &str)]) -> std::collections::BTreeMap<String, String> {
+        pairs
+            .iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect()
+    }
+    #[test]
+    fn class_pieces_in_the_extra_slots_change_the_look_and_other_classes_pieces_are_refused() {
+        let mut c = character();
+        let worn = |c: &Character| {
+            (
+                c.look.head.clone(),
+                c.look.shoulders.clone(),
+                c.look.gloves.clone(),
+            )
+        };
+        assert_eq!(worn(&c), ("none".into(), "none".into(), "none".into()));
+        // Starter pieces are issued unworn, so the layers start off.
+        for id in [
+            "warrior_headgear_crimson",
+            "warrior_shoulders_crimson",
+            "warrior_gloves_crimson",
+        ] {
+            assert_eq!(c.quantity(id), 1, "{id}");
+        }
+        let defense = c.stats().1;
+        c.equip_slots(&slots(&[
+            ("headgear", "warrior_headgear_crimson"),
+            ("shoulders", "warrior_shoulders_crimson"),
+            ("gloves", "warrior_gloves_crimson"),
+        ]))
+        .unwrap();
+        assert_eq!(
+            worn(&c),
+            ("crimson".into(), "crimson".into(), "crimson".into())
+        );
+        assert!(c.look.validate().is_ok());
+        assert!(c.stats().1 > defense, "the pieces add their defense");
+        // A generic upgrade in a slot only adds stats; the layer goes away.
+        c.add_item("headgear_upgrade", 1);
+        c.equip_slots(&slots(&[("headgear", "headgear_upgrade")]))
+            .unwrap();
+        assert_eq!(c.look.head, "none");
+        c.equip_slots(&slots(&[("headgear", "warrior_headgear_crimson")]))
+            .unwrap();
+        assert_eq!(c.look.head, "crimson");
+        c.equip_slots(&slots(&[("headgear", "none")])).unwrap();
+        assert_eq!(c.look.head, "none");
+        // Another class's piece cannot be worn, even when owned.
+        c.add_item("mage_headgear_runic", 1);
+        assert!(
+            c.equip_slots(&slots(&[("headgear", "mage_headgear_runic")]))
+                .is_err()
+        );
+        assert_eq!(c.look.head, "none");
+        // The look itself only takes the class's own tier names.
+        let mut look = c.look.clone();
+        look.head = "runic".into();
+        assert!(look.validate().is_err());
+        look.head = "azure".into();
+        assert!(look.validate().is_ok());
+        look.class = Class::Priest;
+        assert!(
+            look.validate().is_err(),
+            "the Priest has no layered pieces yet"
+        );
+    }
+    #[test]
+    fn hunter_starts_in_scout_gear_and_existing_saves_receive_new_starter_pieces() {
+        let mut h = character();
+        h.look.class = Class::Hunter;
+        h.inventory.clear();
+        h.seed_inventory();
+        assert_eq!(h.gear(), ("scout", "shortbow"));
+        for id in [
+            "hunter_armor_scout",
+            "hunter_weapon_shortbow",
+            "hunter_headgear_scout",
+            "hunter_shoulders_scout",
+            "hunter_gloves_scout",
+        ] {
+            assert_eq!(h.quantity(id), 1, "{id}");
+        }
+        // Worn armor and weapon are not bag cells; the three pieces are.
+        assert_eq!(h.bag_used(), 3);
+        assert!(h.look.class.ranged());
+        // An older save without the new pieces gets them on load, one each.
+        h.inventory
+            .retain(|s| !s.item.contains("hunter_headgear") && !s.item.contains("hunter_gloves"));
+        h.grant_missing_starters();
+        h.grant_missing_starters();
+        assert_eq!(h.quantity("hunter_headgear_scout"), 1);
+        assert_eq!(h.quantity("hunter_gloves_scout"), 1);
+        h.equip_slots(&slots(&[
+            ("headgear", "hunter_headgear_scout"),
+            ("gloves", "hunter_gloves_scout"),
+        ]))
+        .unwrap();
+        assert_eq!(
+            (h.look.head.as_str(), h.look.gloves.as_str()),
+            ("scout", "scout")
+        );
     }
 }

@@ -68,7 +68,7 @@ const debugSchema = z.discriminatedUnion('op', [
 ]);
 const botSchema = z.object({
   bot: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,15}$/),
-  class: z.enum(['warrior', 'mage', 'assassin', 'priest']).default('warrior'),
+  class: z.enum(['warrior', 'mage', 'assassin', 'priest', 'hunter']).default('warrior'),
 }).strict();
 
 function spacingViolation(snapshot) {

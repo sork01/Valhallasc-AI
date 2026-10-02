@@ -101,6 +101,11 @@ impl Store {
         look.assassin_weapon = defaults.assassin_weapon;
         look.priest_armor = defaults.priest_armor;
         look.priest_weapon = defaults.priest_weapon;
+        look.hunter_armor = defaults.hunter_armor;
+        look.hunter_weapon = defaults.hunter_weapon;
+        look.head = defaults.head;
+        look.shoulders = defaults.shoulders;
+        look.gloves = defaults.gloves;
         let mut c = Character {
             id: Uuid::new_v4().to_string(),
             hp: look.class.health(),
@@ -383,6 +388,9 @@ fn decode(state: &str) -> Result<Character, Box<dyn std::error::Error>> {
             character.bags.push("traveler_pack".into());
         }
     }
+    // Catalog growth (new starter pieces) and the look layers reach existing saves here.
+    character.grant_missing_starters();
+    character.sync_look();
     Ok(character)
 }
 fn hash(token: &str) -> String {
