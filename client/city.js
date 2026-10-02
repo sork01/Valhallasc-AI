@@ -148,6 +148,13 @@
     if(!sprite){const c=document.createElement('canvas');c.width=720;c.height=940;const cg=c.getContext('2d');cg.scale(2,2);cg.translate(180,400);objectArt(cg,o);sprite=c;cache.set(key,c);}
     g.save();g.globalAlpha=fade;g.drawImage(sprite,sx-180,sy-400,360,470);g.restore();
   }
+  // Distance from the feet to the top of each NPC's head gear (the guard's banner, the baker's hat), so the nameplate sits just above it.
+  const headTop=n=>n.id==='gatekeeper'?125:n.id==='baker'?114:101;
+  // World of Warcraft nameplate: yellow name over a <Role> line, both in a heavy black outline, with the quest mark above them.
+  function plate(g,value,y,size,color) {
+    g.font=`${size}px "Jua", sans-serif`;g.textAlign='center';g.lineJoin='round';g.lineWidth=size>14?5:3;g.strokeStyle='#000';
+    g.strokeText(value,0,y);g.fillStyle=color;g.fillText(value,0,y);
+  }
   function drawNpc(g,n,sx,sy,t,near) {
     g.save();g.translate(sx,sy);const bob=Math.sin(t*2+n.x)*1.2;
     ellipse(g,0,1,21,9,'#233d3833');
@@ -161,8 +168,10 @@
     ellipse(g,-6,-77,2,2.8,'#443c39');ellipse(g,6,-77,2,2.8,'#443c39');line(g,[[-4,-66],[0,-64],[4,-66]],'#a86b5d',1.5);
     if(n.id==='gatekeeper'){poly(g,[[-19,-91],[-12,-105],[12,-105],[20,-91]],'#a4b5c0');line(g,[[29,-8],[29,-107]],'#7a6954',3);poly(g,[[25,-108],[29,-123],[33,-108]],'#d6d9ce');}
     if(n.id==='baker'){ellipse(g,-9,-103,10,9,'#f6ecd2');ellipse(g,8,-103,12,10,'#f6ecd2');g.fillStyle='#f6ecd2';g.fillRect(-17,-103,34,12);}
-    const mark=window.Quests?.markerInfo(n.id);if(mark?.symbol)text(g,mark.symbol,0,-154,25,mark.color);
-    text(g,n.name,0,-128,17);text(g,near?'[ F ] Talk':n.role,0,-110,13,near?'#ffdf88':'#e0dfcd');g.restore();
+    const top=headTop(n),roleY=-(top+5),nameY=roleY-17;
+    plate(g,`<${n.role}>`,roleY,13,'#f3e1a0');plate(g,n.name,nameY,18,'#ffd100');
+    const mark=window.Quests?.markerInfo(n.id);if(mark?.symbol)plate(g,mark.symbol,nameY-15,28,mark.color);
+    g.translate(0,-bob);if(near)plate(g,'[ F ] Talk',30,13,'#ffdf88');g.restore();
   }
   function drawPlaza(g,w2s) {
     const city = area().city; if (!city || Field.zone > 0) return;
@@ -240,5 +249,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={inside,stoneTile,drawObject,drawNpc,drawPlaza,get npcs(){return area().npcs || [];},dialogue,close,refreshInventory() { if(current&&view.kind==='sell') Inventory.renderShop(current, $('npc-inventory')); },get open(){return !!current;}};
+  window.City={nameplateTop:n=>headTop(n)+24,inside,stoneTile,drawObject,drawNpc,drawPlaza,get npcs(){return area().npcs || [];},dialogue,close,refreshInventory() { if(current&&view.kind==='sell') Inventory.renderShop(current, $('npc-inventory')); },get open(){return !!current;}};
 })();

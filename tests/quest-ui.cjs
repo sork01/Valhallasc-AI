@@ -28,6 +28,15 @@ async function call(name, args = {}) {
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.beetleSprites, null, { timeout: 60000 });
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('Speak to Wren')), 'HUD introduces the first quest');
+  // The name above an NPC's head is part of the click target, as in World of Warcraft.
+  const plate = await page.evaluate(() => { const n = City.npcs.find(n => n.id === 'guide'); const [x, y] = Field._debug.w2s(n.x, n.y); return { x, y: y - City.nameplateTop(n) + 8 }; });
+  const canvas = await page.locator('#fieldcv').boundingBox();
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: path.join(world.artifacts, 'npc-nameplates.png') });
+  await page.mouse.click(canvas.x + plate.x / 1600 * canvas.width, canvas.y + plate.y / 900 * canvas.height);
+  await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 60000 });
+  check(await page.locator('#npc-name').textContent() === 'Wren', 'Clicking the nameplate talks to the NPC');
+  await page.keyboard.press('Escape');
   await page.keyboard.press('q');
   check(await page.locator('#quest-journal').isVisible(), 'Q opens the journal');
   check(await page.locator('#quest-list .quest-card').count() === 17, 'All seventeen quests display across both zones');

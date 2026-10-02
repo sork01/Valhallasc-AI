@@ -330,7 +330,7 @@
     if (!running || paused || !Online.connected || hero.dead) return;
     pendingNpc = null; cityRoute = [];
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
-    const npc = City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-105 && my<y+12; });
+    const npc = City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-City.nameplateTop(n) && my<y+12; });
     if (npc) { talkTo(npc); return; }
     pointer.down = true; cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
     const [wx, wy] = pointerWorld(e); pointer.x = wx; pointer.y = wy;
