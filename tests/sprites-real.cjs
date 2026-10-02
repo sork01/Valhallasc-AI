@@ -81,6 +81,7 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
       const fNaked = await f('none', 'none'), fDressed = await f(gear.armor[0], gear.weapon[0]), fOther = await f(gear.armor[1], gear.weapon[1]);
       check(fNaked.visible > 1500, `${cls} (female): the real body is a full figure (${fNaked.visible} visible pixels)`);
       check(fNaked.hash !== naked.hash && fDressed.hash !== dressed.hash && fOther.hash !== other.hash, `${cls} (female): a different body from the male one, bare and dressed`);
+      if (cls === 'mage' || cls === 'priest') check(fNaked.visible > naked.visible, `${cls}: the man has short hair and the woman long hair (${naked.visible} against ${fNaked.visible} visible pixels bare)`);
       check(fDressed.visible > fNaked.visible && fDressed.hash !== fNaked.hash && fOther.hash !== fDressed.hash, `${cls} (female): armour and weapons add to the figure and differ from each other`);
       for (const slot of ['head', 'shoulders', 'gloves']) {
         if (!gear.tiers.length) continue;

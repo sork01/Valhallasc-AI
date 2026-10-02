@@ -280,10 +280,14 @@ def render_frame(clip, facing, k):
                 body.poly([H(ex - 1.5, ey + 1.7), H(ex + 1.5, ey + 1.7), H(ex + 1.7, ey - 1.7), H(ex - 1.7, ey - 1.7)], COLOR['iris'][1], hd - 5.5, False)
                 body.poly([H(ex - 1.5, ey - .3), H(ex + 1.5, ey - .3), H(ex + 1.5, ey - 1.7), H(ex - 1.5, ey - 1.7)], COLOR['iris'][2], hd - 5.52, False)
                 body.poly([H(ex - .6, ey + .9), H(ex + .6, ey + .9), H(ex + .6, ey - .9), H(ex - .6, ey - .9)], 1, hd - 5.55, False)
-                body.poly([H(ex - 2.4, ey + 1.1), H(ex, ey + 2.5), H(ex + 2.4, ey + 1.2), H(ex + 2.5, ey + .4), H(ex, ey + 1.6), H(ex - 2.3, ey + .3)], 1, hd - 5.6, False)
+                lid = 1. if cc.FEMALE else .72
+                body.poly([H(ex - 2.4, ey + 1.1), H(ex, ey + 1.6 + .9 * lid), H(ex + 2.4, ey + 1.2), H(ex + 2.5, ey + .4), H(ex, ey + 1.6), H(ex - 2.3, ey + .3)], 1, hd - 5.6, False)
                 body.poly([H(ex - 1.1, ey + 1.2), H(ex - .1, ey + 1.2), H(ex - .1, ey + .2), H(ex - 1.1, ey + .2)], COLOR['white'][3], hd - 5.7, False)
                 body.poly([H(ex + .5, ey - .9), H(ex + 1.2, ey - .9), H(ex + 1.2, ey - 1.4), H(ex + .5, ey - 1.4)], COLOR['white'][3], hd - 5.7, False)
-            body.poly([H(ex - 2, 2.4), H(ex, 3), H(ex + 2, 2.4), H(ex + 2, 2), H(ex, 2.6), H(ex - 2, 2)], COLOR['brow'][1], hd - 5.8, False)
+            if cc.FEMALE:
+                body.poly([H(ex - 2, 2.4), H(ex, 3), H(ex + 2, 2.4), H(ex + 2, 2), H(ex, 2.6), H(ex - 2, 2)], COLOR['brow'][1], hd - 5.8, False)
+            else:      # a heavier, straighter brow
+                body.poly([H(ex - 2.6, 2.2), H(ex, 3.6), H(ex + 2.6, 2.8), H(ex + 2.6, 1.6), H(ex, 2.4), H(ex - 2.6, 1.0)], COLOR['brow'][0], hd - 5.8, False)
             body.poly([H(ex - 1.8, -4.5), H(ex + 1.8, -4.5), H(ex + 1.8, -5.5), H(ex - 1.8, -5.5)], COLOR['mouth'][3], hd - 5.3, False)
         nx = side * 5
         body.poly([H(nx - .3, -4.4), H(nx + .4, -5.3), H(nx + 1, -4.6)], COLOR['skin'][1], hd - 5.5, False)
@@ -297,8 +301,13 @@ def render_frame(clip, facing, k):
         for sx in (-1, 1):
             if abs(side) > .85 and sx * side < 0:
                 continue
-            body.poly([H(sx * q[0], q[1]) for q in [(11, 6), (12, -4), (11.4, -13), (8.4, -16), (8, -8), (8.6, 0), (9.6, 4)]], COLOR['hair'][2], hd - 6.2)
-            body.poly([H(sx * q[0], q[1]) for q in [(11.6, 2), (12, -4), (11.4, -13), (10, -14), (10.4, -5)]], COLOR['hair'][1], hd - 6.25, False)
+            if cc.FEMALE:
+                body.poly([H(sx * q[0], q[1]) for q in [(11, 6), (12, -4), (11.4, -13), (8.4, -16), (8, -8), (8.6, 0), (9.6, 4)]], COLOR['hair'][2], hd - 6.2)
+                body.poly([H(sx * q[0], q[1]) for q in [(11.6, 2), (12, -4), (11.4, -13), (10, -14), (10.4, -5)]], COLOR['hair'][1], hd - 6.25, False)
+            else:      # sideburns
+                body.poly([H(sx * q[0], q[1]) for q in [(10.6, 5), (11.4, -3.6), (9.6, -5.6), (9, 0)]], COLOR['hair'][2], hd - 6.2)
+        if front >= -.4:      # a short pale-gold goatee
+            body.poly([H(*q) for q in [(-2.8, -9), (2.8, -9), (1.6, -12.4), (0, -13.4), (-1.6, -12.4)]], COLOR['hair'][1], hd - 5.65, False)
     if front >= -.4:
         body.poly([H(*q) for q in [(-10.8, 5.6), (-6, 8.4), (0, 9.4), (6, 8.4), (10.8, 5.6), (10.8, 4.2), (6, 7), (0, 8), (-6, 7), (-10.8, 4.2)]], COLOR['gold'][2], hd - 6.4)
         gx = side * 7.5
@@ -309,13 +318,13 @@ def render_frame(clip, facing, k):
     if cc.FEMALE:      # to the hips, with a wavy flared end
         body.plate([xf(q) for q in [(-7, -5.6, 83), (7, -5.6, 83), (9.6, -7, 66), (10.4 + sw, -8.6, 44), (8 + sw * 1.3, -9.8, 32), (4 + sw * 1.4, -9.2, 36),
                                    (.4 + sw * 1.5, -9.8, 30), (-3.6 + sw * 1.4, -9.2, 36), (-8.2 + sw * 1.3, -9.8, 31), (-9.4 + sw, -8.6, 44), (-9.6, -7, 66)]], 'hair', 1)
-    else:
-        body.plate([xf(q) for q in [(-7, -5.6, 83), (7, -5.6, 83), (9.4, -7, 66), (8.4 + sw, -8.4, 50), (4.6 + sw * 1.3, -9, 42),
-                                   (.6 + sw * 1.4, -8.8, 47), (-3.4 + sw * 1.3, -9, 41), (-7.6 + sw, -8.6, 49), (-9.4, -7, 66)]], 'hair', 1)
-    body.plate([xf(q) for q in [(-5, -6.1, 80), (5, -6.1, 80), (6.6, -7.2, 64), (5 + sw, -8.2, 49), (1 + sw * 1.3, -8.4, 45),
-                               (-4 + sw, -8.2, 48), (-6.6, -7.2, 64)]], 'hair', 2)
-    for sx in (-1, 1):
-        body.plate([xf(q) for q in [(sx * 9.2, -5.4, 80), (sx * 9.8, -8.4, 70), (sx * 9, -8.8 + sw, 52), (sx * 9.4, -5.6, 58)]], 'hair', 2 if sx > 0 else 1, True)
+    else:      # a man: hair to the nape, no fall of hair down the back
+        body.plate([xf(q) for q in [(-6.4, -5.6, 83), (6.4, -5.6, 83), (7.6, -7, 76), (4 + sw * .5, -8, 72), (-4 + sw * .5, -8, 72), (-7.6, -7, 76)]], 'hair', 1)
+    if cc.FEMALE:
+        body.plate([xf(q) for q in [(-5, -6.1, 80), (5, -6.1, 80), (6.6, -7.2, 64), (5 + sw, -8.2, 49), (1 + sw * 1.3, -8.4, 45),
+                                   (-4 + sw, -8.2, 48), (-6.6, -7.2, 64)]], 'hair', 2)
+        for sx in (-1, 1):
+            body.plate([xf(q) for q in [(sx * 9.2, -5.4, 80), (sx * 9.8, -8.4, 70), (sx * 9, -8.8 + sw, 52), (sx * 9.4, -5.6, 58)]], 'hair', 2 if sx > 0 else 1, True)
     body.plate([xf(q) for q in [(-8.4, -6.6, 62), (8.4, -6.6, 62), (8.4, -6.7, 59.2), (-8.4, -6.7, 59.2)]], 'stole', 2)
 
     for key, mat in [('armor_pilgrim', 'robe'), ('armor_dawn', 'dawn')]:
