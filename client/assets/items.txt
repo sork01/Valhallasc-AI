@@ -1,0 +1,234 @@
+{
+ "size": 48,
+ "cols": 10,
+ "rows": 6,
+ "at": {
+  "warrior_headgear_crimson": [
+   0,
+   0
+  ],
+  "warrior_headgear_azure": [
+   1,
+   0
+  ],
+  "mage_headgear_apprentice": [
+   2,
+   0
+  ],
+  "mage_headgear_runic": [
+   3,
+   0
+  ],
+  "assassin_headgear_shadow": [
+   4,
+   0
+  ],
+  "assassin_headgear_moon": [
+   5,
+   0
+  ],
+  "hunter_headgear_scout": [
+   6,
+   0
+  ],
+  "hunter_headgear_warden": [
+   7,
+   0
+  ],
+  "headgear_upgrade": [
+   8,
+   0
+  ],
+  "warrior_shoulders_crimson": [
+   9,
+   0
+  ],
+  "warrior_shoulders_azure": [
+   0,
+   1
+  ],
+  "mage_shoulders_apprentice": [
+   1,
+   1
+  ],
+  "mage_shoulders_runic": [
+   2,
+   1
+  ],
+  "assassin_shoulders_shadow": [
+   3,
+   1
+  ],
+  "assassin_shoulders_moon": [
+   4,
+   1
+  ],
+  "hunter_shoulders_scout": [
+   5,
+   1
+  ],
+  "hunter_shoulders_warden": [
+   6,
+   1
+  ],
+  "shoulders_upgrade": [
+   7,
+   1
+  ],
+  "warrior_gloves_crimson": [
+   8,
+   1
+  ],
+  "warrior_gloves_azure": [
+   9,
+   1
+  ],
+  "mage_gloves_apprentice": [
+   0,
+   2
+  ],
+  "mage_gloves_runic": [
+   1,
+   2
+  ],
+  "assassin_gloves_shadow": [
+   2,
+   2
+  ],
+  "assassin_gloves_moon": [
+   3,
+   2
+  ],
+  "hunter_gloves_scout": [
+   4,
+   2
+  ],
+  "hunter_gloves_warden": [
+   5,
+   2
+  ],
+  "gloves_upgrade": [
+   6,
+   2
+  ],
+  "warrior_armor_crimson": [
+   7,
+   2
+  ],
+  "warrior_armor_azure": [
+   8,
+   2
+  ],
+  "mage_armor_apprentice": [
+   9,
+   2
+  ],
+  "mage_armor_runic": [
+   0,
+   3
+  ],
+  "assassin_armor_shadow": [
+   1,
+   3
+  ],
+  "assassin_armor_moon": [
+   2,
+   3
+  ],
+  "priest_armor_pilgrim": [
+   3,
+   3
+  ],
+  "priest_armor_dawn": [
+   4,
+   3
+  ],
+  "hunter_armor_scout": [
+   5,
+   3
+  ],
+  "hunter_armor_warden": [
+   6,
+   3
+  ],
+  "warrior_weapon_sword": [
+   7,
+   3
+  ],
+  "warrior_weapon_royal": [
+   8,
+   3
+  ],
+  "mage_weapon_ash": [
+   9,
+   3
+  ],
+  "mage_weapon_crystal": [
+   0,
+   4
+  ],
+  "assassin_weapon_daggers": [
+   1,
+   4
+  ],
+  "assassin_weapon_moonfang": [
+   2,
+   4
+  ],
+  "priest_weapon_mace": [
+   3,
+   4
+  ],
+  "priest_weapon_sunmace": [
+   4,
+   4
+  ],
+  "hunter_weapon_shortbow": [
+   5,
+   4
+  ],
+  "hunter_weapon_wardenbow": [
+   6,
+   4
+  ],
+  "priest_headgear_pilgrim": [
+   7,
+   4
+  ],
+  "priest_headgear_dawn": [
+   8,
+   4
+  ],
+  "priest_shoulders_pilgrim": [
+   9,
+   4
+  ],
+  "priest_shoulders_dawn": [
+   0,
+   5
+  ],
+  "priest_gloves_pilgrim": [
+   1,
+   5
+  ],
+  "priest_gloves_dawn": [
+   2,
+   5
+  ],
+  "pants_upgrade": [
+   3,
+   5
+  ],
+  "necklace_upgrade": [
+   4,
+   5
+  ],
+  "accessory_upgrade": [
+   5,
+   5
+  ]
+ },
+ "sprite": "523055641b34819b",
+ "light": "top left",
+ "editing": "one PixelFlow sprite, one frame per item in `at` order; build --replace discards edits"
+}

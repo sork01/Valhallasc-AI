@@ -57,6 +57,54 @@
       "png": "priest_f_armor_dawn.png",
       "depth": "priest_f_armor_dawn_depth.png"
     },
+    "pants_wayfarer": {
+      "png": "priest_f_pants_wayfarer.png",
+      "depth": "priest_f_pants_wayfarer_depth.png"
+    },
+    "shoulders_pilgrim": {
+      "png": "priest_f_shoulders_pilgrim.png",
+      "depth": "priest_f_shoulders_pilgrim_depth.png"
+    },
+    "shoulders_dawn": {
+      "png": "priest_f_shoulders_dawn.png",
+      "depth": "priest_f_shoulders_dawn_depth.png"
+    },
+    "shoulders_ironhide": {
+      "png": "priest_f_shoulders_ironhide.png",
+      "depth": "priest_f_shoulders_ironhide_depth.png"
+    },
+    "gloves_pilgrim": {
+      "png": "priest_f_gloves_pilgrim.png",
+      "depth": "priest_f_gloves_pilgrim_depth.png"
+    },
+    "gloves_dawn": {
+      "png": "priest_f_gloves_dawn.png",
+      "depth": "priest_f_gloves_dawn_depth.png"
+    },
+    "gloves_duelist": {
+      "png": "priest_f_gloves_duelist.png",
+      "depth": "priest_f_gloves_duelist_depth.png"
+    },
+    "head_pilgrim": {
+      "png": "priest_f_head_pilgrim.png",
+      "depth": "priest_f_head_pilgrim_depth.png"
+    },
+    "head_dawn": {
+      "png": "priest_f_head_dawn.png",
+      "depth": "priest_f_head_dawn_depth.png"
+    },
+    "head_ironhide": {
+      "png": "priest_f_head_ironhide.png",
+      "depth": "priest_f_head_ironhide_depth.png"
+    },
+    "necklace_moonstone": {
+      "png": "priest_f_necklace_moonstone.png",
+      "depth": "priest_f_necklace_moonstone_depth.png"
+    },
+    "accessory_amber": {
+      "png": "priest_f_accessory_amber.png",
+      "depth": "priest_f_accessory_amber_depth.png"
+    },
     "weapon_mace": {
       "png": "priest_f_weapon_mace.png",
       "depth": "priest_f_weapon_mace_depth.png"
@@ -71,40 +119,121 @@
     "armor": {
       "none": {
         "name": "Simple cloth",
-        "part": null,
         "defense": 0
       },
       "pilgrim": {
         "name": "Pilgrim robes",
-        "part": "armor_pilgrim",
         "defense": 3
       },
       "dawn": {
         "name": "Dawnweave vestments",
-        "part": "armor_dawn",
         "defense": 5
+      }
+    },
+    "shoulders": {
+      "none": {
+        "name": "Bare shoulders",
+        "defense": 0
+      },
+      "pilgrim": {
+        "name": "Pilgrim's Mantle",
+        "defense": 1
+      },
+      "dawn": {
+        "name": "Sunray Pauldrons",
+        "defense": 2
+      },
+      "ironhide": {
+        "name": "Ironhide Pauldrons",
+        "defense": 2
+      }
+    },
+    "gloves": {
+      "none": {
+        "name": "Bare hands",
+        "defense": 0
+      },
+      "pilgrim": {
+        "name": "Pilgrim's Mitts",
+        "defense": 1
+      },
+      "dawn": {
+        "name": "Dawnweave Gloves",
+        "defense": 2
+      },
+      "duelist": {
+        "name": "Duelist Gloves",
+        "defense": 1
+      }
+    },
+    "head": {
+      "none": {
+        "name": "Bare head",
+        "defense": 0
+      },
+      "pilgrim": {
+        "name": "Pilgrim's Hood",
+        "defense": 1
+      },
+      "dawn": {
+        "name": "Sunburst Diadem",
+        "defense": 2
+      },
+      "ironhide": {
+        "name": "Ironhide Helm",
+        "defense": 2
       }
     },
     "weapon": {
       "none": {
         "name": "Empty hands",
-        "part": null,
         "attack": 0
       },
       "mace": {
         "name": "Oak mace",
-        "part": "weapon_mace",
         "attack": 4
       },
       "sunmace": {
         "name": "Sunbreaker mace",
-        "part": "weapon_sunmace",
         "attack": 8
+      }
+    },
+    "pants": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "wayfarer": {
+        "name": "Wayfarer Pants",
+        "defense": 2
+      }
+    },
+    "necklace": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "moonstone": {
+        "name": "Moonstone Necklace",
+        "defense": 0
+      }
+    },
+    "accessory": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "amber": {
+        "name": "Amber Ring",
+        "defense": 0
       }
     }
   },
   "defaultEquipment": {
     "armor": "pilgrim",
+    "shoulders": "none",
+    "gloves": "none",
+    "head": "none",
     "weapon": "mace"
   },
   "sprites": {},
@@ -204,6 +333,54 @@
       "#86506a",
       "#c88493",
       "#e9a4ab"
+    ],
+    "ironhide": [
+      "#3b2511",
+      "#6f4721",
+      "#a97530",
+      "#dda961"
+    ],
+    "ironsteel": [
+      "#3b4759",
+      "#6b7b93",
+      "#afbed4",
+      "#eff5fe"
+    ],
+    "ironbrass": [
+      "#6f4b13",
+      "#b1811f",
+      "#e9b941",
+      "#fff1a1"
+    ],
+    "dueltan": [
+      "#3c2a1f",
+      "#5d4030",
+      "#876148",
+      "#b98d6a"
+    ],
+    "duelcream": [
+      "#8d7d66",
+      "#c7b79b",
+      "#ebdfc3",
+      "#fffaea"
+    ],
+    "wayfarer": [
+      "#3a2a1e",
+      "#5c4330",
+      "#84634a",
+      "#ad8a69"
+    ],
+    "moonstone": [
+      "#5b5b83",
+      "#9b9bc5",
+      "#d5d5f3",
+      "#fdfdfe"
+    ],
+    "amberstone": [
+      "#6b2b09",
+      "#b9591b",
+      "#f19b2d",
+      "#ffe181"
     ]
   },
   "depth": {
@@ -213,16 +390,16 @@
     "near": "smaller"
   },
   "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
+  "style": "2D Korean RPG anime cel illustration",
+  "editing": "Female set: generated from code by export --local, with no PixelFlow copies. Re-run the class script with --female to change it.",
   "attack": {
     "duration": 0.4,
     "impact": 0.2
   },
-  "style": "2D Korean RPG anime cel illustration",
   "portrait": [
     57,
     19,
     46,
     46
-  ],
-  "editing": "Female set: generated from code by export --local, with no PixelFlow copies. Re-run make_priest_sprites.py with --female to change it."
+  ]
 }

@@ -12,12 +12,15 @@ mage sprites, prefix mage_256_, are a different set and are never touched). 160x
 import math
 
 import cel_common as cc
+import generic_gear as gg
 from cel_common import V, unit, rig
 
-SLOTS = {'armor': ('apprentice', 'runic'), 'shoulders': ('apprentice', 'runic'), 'gloves': ('apprentice', 'runic'),
-         'head': ('apprentice', 'runic'), 'weapon': ('ash', 'crystal')}
+SLOTS = {'armor': ('apprentice', 'runic'), 'shoulders': ('apprentice', 'runic', 'ironhide'), 'gloves': ('apprentice', 'runic', 'duelist'),
+         'head': ('apprentice', 'runic', 'ironhide'), 'weapon': ('ash', 'crystal'),
+         'pants': ('wayfarer',), 'necklace': ('moonstone',), 'accessory': ('amber',)}
 MATS = {
     **cc.FACE_MATS,
+    **gg.GEAR_MATS,
     'hair': ['#4a2a68', '#7a52a0', '#ac78c4', '#dcb4ec'],
     'cloth': ['#3a3860', '#605e90', '#9a98c8', '#d4d2f0'],
     'pants': ['#1c2038', '#30365a', '#4e5a86', '#7a88b4'],
@@ -298,6 +301,7 @@ def render_frame(clip, facing, k):
         for ang in (0, math.pi / 2):
             d, n = across * math.cos(ang) + u * math.sin(ang), -across * math.sin(ang) + u * math.cos(ang)
             ink.plate([c + d * size * 1.9, c + n * .9, c - d * size * 1.9, c - n * .9], glow, 3, True)
+    gg.draw(inks, R, xf, joints, head)
     flash = clip in ('hurt', 'die') and k == 0
     return {part: ink.resolve(flash) for part, ink in inks.items()}
 
@@ -305,12 +309,14 @@ def render_frame(clip, facing, k):
 NAKED = {slot: 'none' for slot in SLOTS}
 APPRENTICE = {'armor': 'apprentice', 'shoulders': 'apprentice', 'gloves': 'apprentice', 'head': 'apprentice', 'weapon': 'ash'}
 RUNIC = {'armor': 'runic', 'shoulders': 'runic', 'gloves': 'runic', 'head': 'runic', 'weapon': 'crystal'}
+GENERIC = {'armor': 'apprentice', 'shoulders': 'ironhide', 'gloves': 'duelist', 'head': 'ironhide', 'pants': 'wayfarer',
+           'necklace': 'moonstone', 'accessory': 'amber', 'weapon': 'ash'}
 SHEET = cc.Sheet(
     'mage', files='mage', pixel='mage_cel_', mats=MATS, clips=CLIPS, slots=SLOTS, gear=GEAR, render=render_frame,
-    revision=cc.revision_of([open(__file__).read()]),
+    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read()]),
     default_equip={'armor': 'apprentice', 'shoulders': 'none', 'gloves': 'none', 'head': 'none', 'weapon': 'ash'},
     meta={'attack': {'duration': .56, 'impact': .28}, 'portrait': [57, 15, 46, 46]},
-    combos=[('naked', NAKED), ('apprentice', APPRENTICE), ('runic', RUNIC)])
+    combos=[('naked', NAKED), ('apprentice', APPRENTICE), ('runic', RUNIC), ('generic', GENERIC)])
 
 if __name__ == '__main__':
     SHEET.cli()

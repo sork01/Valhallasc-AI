@@ -12,12 +12,15 @@ DISCARDS WARRIOR HAND EDITS. Files keep the old warrior_layered_ names so the ga
 import math
 
 import cel_common as cc
+import generic_gear as gg
 from cel_common import V, unit, rig
 
-SLOTS = {'armor': ('crimson', 'azure'), 'shoulders': ('crimson', 'azure'), 'gloves': ('crimson', 'azure'),
-         'head': ('crimson', 'azure'), 'weapon': ('sword', 'royal')}
+SLOTS = {'armor': ('crimson', 'azure'), 'shoulders': ('crimson', 'azure', 'ironhide'), 'gloves': ('crimson', 'azure', 'duelist'),
+         'head': ('crimson', 'azure', 'ironhide'), 'weapon': ('sword', 'royal'),
+         'pants': ('wayfarer',), 'necklace': ('moonstone',), 'accessory': ('amber',)}
 MATS = {
     **cc.FACE_MATS,
+    **gg.GEAR_MATS,
     'hair': ['#3a2420', '#6e4336', '#a77a56', '#d6ae82'],      # the player's hair colour recolours it
     'cloth': ['#3a3a4c', '#5c5c72', '#8c8ca4', '#c0c0d4'],
     'pants': ['#2a2a38', '#44445a', '#68688a', '#9696b8'],
@@ -288,6 +291,7 @@ def render_frame(clip, facing, k):
         ink.plate(disc(centre + shield_n * 1.4, a1, a2, 6.8, 6.8), 'azure' if royal else 'crimson', 2, True)
         ink.plate(disc(centre + shield_n * 2.2, a1, a2, 2.4, 2.4, 8), 'gold' if not royal else 'glow', 3, True)
         ink.plate([centre + shield_n * 1.8 + a2 * 6, centre + shield_n * 1.8 + a1 * .9, centre + shield_n * 1.8 - a2 * 6, centre + shield_n * 1.8 - a1 * .9], 'gold', 3, True)
+    gg.draw(inks, R, xf, joints, head)
     flash = clip in ('hurt', 'die') and k == 0
     return {part: ink.resolve(flash) for part, ink in inks.items()}
 
@@ -299,12 +303,14 @@ def np_cross(a, b):
 NAKED = {slot: 'none' for slot in SLOTS}
 CRIMSON = {'armor': 'crimson', 'shoulders': 'crimson', 'gloves': 'crimson', 'head': 'crimson', 'weapon': 'sword'}
 AZURE = {'armor': 'azure', 'shoulders': 'azure', 'gloves': 'azure', 'head': 'azure', 'weapon': 'royal'}
+GENERIC = {'armor': 'crimson', 'shoulders': 'ironhide', 'gloves': 'duelist', 'head': 'ironhide', 'pants': 'wayfarer',
+           'necklace': 'moonstone', 'accessory': 'amber', 'weapon': 'sword'}
 SHEET = cc.Sheet(
     'warrior', files='warrior_layered', pixel='warrior_cel_', mats=MATS, clips=CLIPS, slots=SLOTS, gear=GEAR, render=render_frame,
-    revision=cc.revision_of([open(__file__).read()]),
+    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read()]),
     default_equip={'armor': 'crimson', 'shoulders': 'none', 'gloves': 'none', 'head': 'none', 'weapon': 'sword'},
     meta={'attack': {'duration': .42, 'impact': .21}, 'portrait': [57, 15, 46, 46]},
-    combos=[('naked', NAKED), ('crimson', CRIMSON), ('azure', AZURE)])
+    combos=[('naked', NAKED), ('crimson', CRIMSON), ('azure', AZURE), ('generic', GENERIC)])
 
 if __name__ == '__main__':
     SHEET.cli()

@@ -57,6 +57,10 @@
       "png": "assassin_f_armor_moon.png",
       "depth": "assassin_f_armor_moon_depth.png"
     },
+    "pants_wayfarer": {
+      "png": "assassin_f_pants_wayfarer.png",
+      "depth": "assassin_f_pants_wayfarer_depth.png"
+    },
     "shoulders_shadow": {
       "png": "assassin_f_shoulders_shadow.png",
       "depth": "assassin_f_shoulders_shadow_depth.png"
@@ -64,6 +68,10 @@
     "shoulders_moon": {
       "png": "assassin_f_shoulders_moon.png",
       "depth": "assassin_f_shoulders_moon_depth.png"
+    },
+    "shoulders_ironhide": {
+      "png": "assassin_f_shoulders_ironhide.png",
+      "depth": "assassin_f_shoulders_ironhide_depth.png"
     },
     "gloves_shadow": {
       "png": "assassin_f_gloves_shadow.png",
@@ -73,6 +81,10 @@
       "png": "assassin_f_gloves_moon.png",
       "depth": "assassin_f_gloves_moon_depth.png"
     },
+    "gloves_duelist": {
+      "png": "assassin_f_gloves_duelist.png",
+      "depth": "assassin_f_gloves_duelist_depth.png"
+    },
     "head_shadow": {
       "png": "assassin_f_head_shadow.png",
       "depth": "assassin_f_head_shadow_depth.png"
@@ -80,6 +92,18 @@
     "head_moon": {
       "png": "assassin_f_head_moon.png",
       "depth": "assassin_f_head_moon_depth.png"
+    },
+    "head_ironhide": {
+      "png": "assassin_f_head_ironhide.png",
+      "depth": "assassin_f_head_ironhide_depth.png"
+    },
+    "necklace_moonstone": {
+      "png": "assassin_f_necklace_moonstone.png",
+      "depth": "assassin_f_necklace_moonstone_depth.png"
+    },
+    "accessory_amber": {
+      "png": "assassin_f_accessory_amber.png",
+      "depth": "assassin_f_accessory_amber_depth.png"
     },
     "weapon_daggers": {
       "png": "assassin_weapon_daggers.png",
@@ -118,6 +142,10 @@
       "moon": {
         "name": "Moonveil Crescents",
         "defense": 2
+      },
+      "ironhide": {
+        "name": "Ironhide Pauldrons",
+        "defense": 2
       }
     },
     "gloves": {
@@ -132,6 +160,10 @@
       "moon": {
         "name": "Moonveil Gauntlets",
         "defense": 2
+      },
+      "duelist": {
+        "name": "Duelist Gloves",
+        "defense": 1
       }
     },
     "head": {
@@ -145,6 +177,10 @@
       },
       "moon": {
         "name": "Moonveil Circlet",
+        "defense": 2
+      },
+      "ironhide": {
+        "name": "Ironhide Helm",
         "defense": 2
       }
     },
@@ -160,6 +196,36 @@
       "moonfang": {
         "name": "Moonfang blades",
         "attack": 8
+      }
+    },
+    "pants": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "wayfarer": {
+        "name": "Wayfarer Pants",
+        "defense": 2
+      }
+    },
+    "necklace": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "moonstone": {
+        "name": "Moonstone Necklace",
+        "defense": 0
+      }
+    },
+    "accessory": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "amber": {
+        "name": "Amber Ring",
+        "defense": 0
       }
     }
   },
@@ -261,6 +327,54 @@
       "#86506a",
       "#c88493",
       "#e9a4ab"
+    ],
+    "ironhide": [
+      "#3b2511",
+      "#6f4721",
+      "#a97530",
+      "#dda961"
+    ],
+    "ironsteel": [
+      "#3b4759",
+      "#6b7b93",
+      "#afbed4",
+      "#eff5fe"
+    ],
+    "ironbrass": [
+      "#6f4b13",
+      "#b1811f",
+      "#e9b941",
+      "#fff1a1"
+    ],
+    "dueltan": [
+      "#3c2a1f",
+      "#5d4030",
+      "#876148",
+      "#b98d6a"
+    ],
+    "duelcream": [
+      "#8d7d66",
+      "#c7b79b",
+      "#ebdfc3",
+      "#fffaea"
+    ],
+    "wayfarer": [
+      "#3a2a1e",
+      "#5c4330",
+      "#84634a",
+      "#ad8a69"
+    ],
+    "moonstone": [
+      "#5b5b83",
+      "#9b9bc5",
+      "#d5d5f3",
+      "#fdfdfe"
+    ],
+    "amberstone": [
+      "#6b2b09",
+      "#b9591b",
+      "#f19b2d",
+      "#ffe181"
     ]
   },
   "depth": {

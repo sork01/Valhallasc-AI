@@ -57,6 +57,54 @@
       "png": "priest_armor_dawn.png",
       "depth": "priest_armor_dawn_depth.png"
     },
+    "pants_wayfarer": {
+      "png": "priest_pants_wayfarer.png",
+      "depth": "priest_pants_wayfarer_depth.png"
+    },
+    "shoulders_pilgrim": {
+      "png": "priest_shoulders_pilgrim.png",
+      "depth": "priest_shoulders_pilgrim_depth.png"
+    },
+    "shoulders_dawn": {
+      "png": "priest_shoulders_dawn.png",
+      "depth": "priest_shoulders_dawn_depth.png"
+    },
+    "shoulders_ironhide": {
+      "png": "priest_shoulders_ironhide.png",
+      "depth": "priest_shoulders_ironhide_depth.png"
+    },
+    "gloves_pilgrim": {
+      "png": "priest_gloves_pilgrim.png",
+      "depth": "priest_gloves_pilgrim_depth.png"
+    },
+    "gloves_dawn": {
+      "png": "priest_gloves_dawn.png",
+      "depth": "priest_gloves_dawn_depth.png"
+    },
+    "gloves_duelist": {
+      "png": "priest_gloves_duelist.png",
+      "depth": "priest_gloves_duelist_depth.png"
+    },
+    "head_pilgrim": {
+      "png": "priest_head_pilgrim.png",
+      "depth": "priest_head_pilgrim_depth.png"
+    },
+    "head_dawn": {
+      "png": "priest_head_dawn.png",
+      "depth": "priest_head_dawn_depth.png"
+    },
+    "head_ironhide": {
+      "png": "priest_head_ironhide.png",
+      "depth": "priest_head_ironhide_depth.png"
+    },
+    "necklace_moonstone": {
+      "png": "priest_necklace_moonstone.png",
+      "depth": "priest_necklace_moonstone_depth.png"
+    },
+    "accessory_amber": {
+      "png": "priest_accessory_amber.png",
+      "depth": "priest_accessory_amber_depth.png"
+    },
     "weapon_mace": {
       "png": "priest_weapon_mace.png",
       "depth": "priest_weapon_mace_depth.png"
@@ -71,83 +119,324 @@
     "armor": {
       "none": {
         "name": "Simple cloth",
-        "part": null,
         "defense": 0
       },
       "pilgrim": {
         "name": "Pilgrim robes",
-        "part": "armor_pilgrim",
         "defense": 3
       },
       "dawn": {
         "name": "Dawnweave vestments",
-        "part": "armor_dawn",
         "defense": 5
+      }
+    },
+    "shoulders": {
+      "none": {
+        "name": "Bare shoulders",
+        "defense": 0
+      },
+      "pilgrim": {
+        "name": "Pilgrim's Mantle",
+        "defense": 1
+      },
+      "dawn": {
+        "name": "Sunray Pauldrons",
+        "defense": 2
+      },
+      "ironhide": {
+        "name": "Ironhide Pauldrons",
+        "defense": 2
+      }
+    },
+    "gloves": {
+      "none": {
+        "name": "Bare hands",
+        "defense": 0
+      },
+      "pilgrim": {
+        "name": "Pilgrim's Mitts",
+        "defense": 1
+      },
+      "dawn": {
+        "name": "Dawnweave Gloves",
+        "defense": 2
+      },
+      "duelist": {
+        "name": "Duelist Gloves",
+        "defense": 1
+      }
+    },
+    "head": {
+      "none": {
+        "name": "Bare head",
+        "defense": 0
+      },
+      "pilgrim": {
+        "name": "Pilgrim's Hood",
+        "defense": 1
+      },
+      "dawn": {
+        "name": "Sunburst Diadem",
+        "defense": 2
+      },
+      "ironhide": {
+        "name": "Ironhide Helm",
+        "defense": 2
       }
     },
     "weapon": {
       "none": {
         "name": "Empty hands",
-        "part": null,
         "attack": 0
       },
       "mace": {
         "name": "Oak mace",
-        "part": "weapon_mace",
         "attack": 4
       },
       "sunmace": {
         "name": "Sunbreaker mace",
-        "part": "weapon_sunmace",
         "attack": 8
+      }
+    },
+    "pants": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "wayfarer": {
+        "name": "Wayfarer Pants",
+        "defense": 2
+      }
+    },
+    "necklace": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "moonstone": {
+        "name": "Moonstone Necklace",
+        "defense": 0
+      }
+    },
+    "accessory": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "amber": {
+        "name": "Amber Ring",
+        "defense": 0
       }
     }
   },
   "defaultEquipment": {
     "armor": "pilgrim",
+    "shoulders": "none",
+    "gloves": "none",
+    "head": "none",
     "weapon": "mace"
   },
   "sprites": {
-    "priest_idle_s": "a97598f808969a98",
-    "priest_idle_sw": "17e6402c50ceee20",
-    "priest_idle_w": "dc846f987e9d98cf",
-    "priest_idle_nw": "57348e577232a57b",
-    "priest_idle_n": "1acd6e2da9f9e70a",
-    "priest_idle_ne": "52d54f0df958ed57",
-    "priest_idle_e": "09ed68ace4af1e83",
-    "priest_idle_se": "42d6e35f59973de4",
-    "priest_walk_s": "8602ca2b401cad89",
-    "priest_walk_sw": "cc8eb158465ea705",
-    "priest_walk_w": "5f33a29f3c7b50d5",
-    "priest_walk_nw": "e64b0f306630d922",
-    "priest_walk_n": "2e5968cef965e193",
-    "priest_walk_ne": "8a9aa6bc052bd4fd",
-    "priest_walk_e": "625e99792bf735f9",
-    "priest_walk_se": "724898e4853fc56d",
-    "priest_attack_s": "8baf984a63eea6ad",
-    "priest_attack_sw": "861e5daeb896ffa1",
-    "priest_attack_w": "8150c842231d6c37",
-    "priest_attack_nw": "578b7c38ce6b1aa9",
-    "priest_attack_n": "67e62c671702e0ce",
-    "priest_attack_ne": "a841c12f19aa2af1",
-    "priest_attack_e": "ac4a75b0347913f9",
-    "priest_attack_se": "a8c21b8f169b4134",
-    "priest_hurt_s": "678501e26825fb42",
-    "priest_hurt_sw": "2bfc91d494831222",
-    "priest_hurt_w": "2d0e46566c1734e8",
-    "priest_hurt_nw": "51a47965d6fe35df",
-    "priest_hurt_n": "41813b743914f319",
-    "priest_hurt_ne": "1fbfe94cddee296e",
-    "priest_hurt_e": "c5f47b1d4d509ae5",
-    "priest_hurt_se": "320aa4aeaecf69ad",
-    "priest_die_s": "5ecfc322b77c71bf",
-    "priest_die_sw": "2146ff510ac6a46a",
-    "priest_die_w": "4c692e0e34dbd431",
-    "priest_die_nw": "833d2aa74bc69439",
-    "priest_die_n": "5fbf716154ab58da",
-    "priest_die_ne": "64151eee16da647f",
-    "priest_die_e": "6b41f12e4c271d38",
-    "priest_die_se": "d35ffacbaf9b37a9"
+    "priest_idle_s_pilgrim": "b60bb272796f1cad",
+    "priest_idle_s_dawn": "1c8e517a7cc1ab22",
+    "priest_idle_s_arms": "de80b8889e9e9037",
+    "priest_idle_s_generic": "bf578c72827abee0",
+    "priest_idle_s_trinkets": "54c40d9bcc317976",
+    "priest_idle_sw_pilgrim": "2d402c83c78af010",
+    "priest_idle_sw_dawn": "efe5032d064b3ae0",
+    "priest_idle_sw_arms": "1c80da995dbc508b",
+    "priest_idle_sw_generic": "71ea85755a84e0be",
+    "priest_idle_sw_trinkets": "312904b120d51dd1",
+    "priest_idle_w_pilgrim": "cd9222683f7c0caa",
+    "priest_idle_w_dawn": "88fd80a0318ee147",
+    "priest_idle_w_arms": "b64ec8209d869fe4",
+    "priest_idle_w_generic": "1695d62d8276b56f",
+    "priest_idle_w_trinkets": "46a154a2cf5d8ea2",
+    "priest_idle_nw_pilgrim": "3632172e907861b6",
+    "priest_idle_nw_dawn": "c284f576b5ccc631",
+    "priest_idle_nw_arms": "1fb72bc39c7339bc",
+    "priest_idle_nw_generic": "84efd3a4f028db32",
+    "priest_idle_nw_trinkets": "c6714a7a94297e96",
+    "priest_idle_n_pilgrim": "6286d3a8997fd56e",
+    "priest_idle_n_dawn": "e452bdad273bde10",
+    "priest_idle_n_arms": "7838e06f4ebd78bf",
+    "priest_idle_n_generic": "44752ccaf2733af8",
+    "priest_idle_n_trinkets": "96bcaf7276849c56",
+    "priest_idle_ne_pilgrim": "4244ce719b4ada17",
+    "priest_idle_ne_dawn": "d1829be1956379f6",
+    "priest_idle_ne_arms": "81fd4b9b49b21f6d",
+    "priest_idle_ne_generic": "d5350249b992b716",
+    "priest_idle_ne_trinkets": "b33d6378cee4d083",
+    "priest_idle_e_pilgrim": "601f811aac1b550e",
+    "priest_idle_e_dawn": "48fb50060d2a24f5",
+    "priest_idle_e_arms": "31aa409efaec3b3b",
+    "priest_idle_e_generic": "3df5b08dd50bc049",
+    "priest_idle_e_trinkets": "2921781f91cd3500",
+    "priest_idle_se_pilgrim": "73fe8cda820c71fc",
+    "priest_idle_se_dawn": "e629d96e2d55696e",
+    "priest_idle_se_arms": "8e2cc1a29285def2",
+    "priest_idle_se_generic": "03cec28f956b2832",
+    "priest_idle_se_trinkets": "c7c5b55ddc1b8d29",
+    "priest_walk_s_pilgrim": "0ab35caa0cab5101",
+    "priest_walk_s_dawn": "8d7c90cfd223f919",
+    "priest_walk_s_arms": "ec5b2c22631099bf",
+    "priest_walk_s_generic": "da3e4c7b767ad5ef",
+    "priest_walk_s_trinkets": "caa915ae542a9a9b",
+    "priest_walk_sw_pilgrim": "35716d88df445198",
+    "priest_walk_sw_dawn": "d3bfe07a847b7e9e",
+    "priest_walk_sw_arms": "fca1fc4933193f7d",
+    "priest_walk_sw_generic": "b3f6250ec0acbd89",
+    "priest_walk_sw_trinkets": "6af085829edd0ac2",
+    "priest_walk_w_pilgrim": "efa37882f7c90f93",
+    "priest_walk_w_dawn": "521cccda3aa813dc",
+    "priest_walk_w_arms": "fc5a7a603ea63297",
+    "priest_walk_w_generic": "0bf03c9c3b2ef8a6",
+    "priest_walk_w_trinkets": "59a753d1ad86ba70",
+    "priest_walk_nw_pilgrim": "9351ec0a46a741f9",
+    "priest_walk_nw_dawn": "8f247a8eef72038b",
+    "priest_walk_nw_arms": "811a6b36c7047cee",
+    "priest_walk_nw_generic": "89de5790e148c07b",
+    "priest_walk_nw_trinkets": "f02578a84a60c6f9",
+    "priest_walk_n_pilgrim": "8de276e90aec6a81",
+    "priest_walk_n_dawn": "65c4e268c162aa6f",
+    "priest_walk_n_arms": "bafa5e4cb3b9d063",
+    "priest_walk_n_generic": "6df8abbc7f9c30af",
+    "priest_walk_n_trinkets": "69dd0108e33cc8d9",
+    "priest_walk_ne_pilgrim": "f9a03be229896636",
+    "priest_walk_ne_dawn": "61a26efaa74f1ea9",
+    "priest_walk_ne_arms": "ba2949bff52072e5",
+    "priest_walk_ne_generic": "e6ffd430098ba4eb",
+    "priest_walk_ne_trinkets": "ff7728c52dbe0f3e",
+    "priest_walk_e_pilgrim": "666298f2a97c7280",
+    "priest_walk_e_dawn": "c4b8b27dccc81252",
+    "priest_walk_e_arms": "3e548c1d25ab3bfd",
+    "priest_walk_e_generic": "af7b83da91f71b7d",
+    "priest_walk_e_trinkets": "83e1626636fed563",
+    "priest_walk_se_pilgrim": "570daac29db62128",
+    "priest_walk_se_dawn": "63fc4aadfce94f41",
+    "priest_walk_se_arms": "0442dc19a12acc8e",
+    "priest_walk_se_generic": "cc8638fed73aad08",
+    "priest_walk_se_trinkets": "7d0b5006a6208bfd",
+    "priest_attack_s_pilgrim": "b4c6a8936646f678",
+    "priest_attack_s_dawn": "726bbefb0666ff1c",
+    "priest_attack_s_arms": "9fd262c6301c7f20",
+    "priest_attack_s_generic": "3eb49c164c97a191",
+    "priest_attack_s_trinkets": "88d58366b0f76c9c",
+    "priest_attack_sw_pilgrim": "e684fb00cc693a73",
+    "priest_attack_sw_dawn": "5665f242691dc4e6",
+    "priest_attack_sw_arms": "bb87d45f2f92097c",
+    "priest_attack_sw_generic": "0c53efe634c99c43",
+    "priest_attack_sw_trinkets": "3795b5503b42bf5a",
+    "priest_attack_w_pilgrim": "b7ff434d9e7715b7",
+    "priest_attack_w_dawn": "38d24150708592c0",
+    "priest_attack_w_arms": "818ac2e0141cbeb3",
+    "priest_attack_w_generic": "1b09936b33abdf5e",
+    "priest_attack_w_trinkets": "23d2fa7475c0cbe8",
+    "priest_attack_nw_pilgrim": "8d98757ee462de77",
+    "priest_attack_nw_dawn": "5abe3df133f7ad9c",
+    "priest_attack_nw_arms": "e5998b0e3e623251",
+    "priest_attack_nw_generic": "d31dd6d73d3c50d2",
+    "priest_attack_nw_trinkets": "6b83b1797f7d8da6",
+    "priest_attack_n_pilgrim": "4ddfd1bcc1598189",
+    "priest_attack_n_dawn": "eaf33a3e0da189f1",
+    "priest_attack_n_arms": "6e59f7ab3f7c2a65",
+    "priest_attack_n_generic": "a50a0894333410df",
+    "priest_attack_n_trinkets": "24eb1ccd755605b9",
+    "priest_attack_ne_pilgrim": "7d0b9f90db080c03",
+    "priest_attack_ne_dawn": "af14d2317751923d",
+    "priest_attack_ne_arms": "e4eb2e16cb20c68e",
+    "priest_attack_ne_generic": "3b5a8c2b6b17597d",
+    "priest_attack_ne_trinkets": "2720c91e737bdc45",
+    "priest_attack_e_pilgrim": "13dd3972e541b11d",
+    "priest_attack_e_dawn": "125c7ecddae544e8",
+    "priest_attack_e_arms": "d59e86755e62489e",
+    "priest_attack_e_generic": "bdebd218adcd38c5",
+    "priest_attack_e_trinkets": "1df974ffe2612c34",
+    "priest_attack_se_pilgrim": "4f8d25bb3aabd9c4",
+    "priest_attack_se_dawn": "368464e04b758fde",
+    "priest_attack_se_arms": "afbede8c3f440293",
+    "priest_attack_se_generic": "edbaf6ba7c488175",
+    "priest_attack_se_trinkets": "60d5fb9727aeb25a",
+    "priest_hurt_s_pilgrim": "fca235e150bbd9b9",
+    "priest_hurt_s_dawn": "9e7888353ebd9dbd",
+    "priest_hurt_s_arms": "0701abc71f3cde02",
+    "priest_hurt_s_generic": "63b4329db60c0d5c",
+    "priest_hurt_s_trinkets": "ea477c029ea12d0a",
+    "priest_hurt_sw_pilgrim": "5db3f4946c804859",
+    "priest_hurt_sw_dawn": "38a964ffae3fd9a1",
+    "priest_hurt_sw_arms": "67594589d9734ea5",
+    "priest_hurt_sw_generic": "8962f248d0f346f3",
+    "priest_hurt_sw_trinkets": "75a9657ed30851c8",
+    "priest_hurt_w_pilgrim": "e4759a92b51ac0a5",
+    "priest_hurt_w_dawn": "2b8bc80d42c1338f",
+    "priest_hurt_w_arms": "25024b48482874a4",
+    "priest_hurt_w_generic": "545cd94a54cc2f2f",
+    "priest_hurt_w_trinkets": "5b7786462216ff7f",
+    "priest_hurt_nw_pilgrim": "09e582a7e849966e",
+    "priest_hurt_nw_dawn": "4c3cdc7e268f524f",
+    "priest_hurt_nw_arms": "5c6c0e32d5d02339",
+    "priest_hurt_nw_generic": "f8423968c70a0f1f",
+    "priest_hurt_nw_trinkets": "ceba64c744e87153",
+    "priest_hurt_n_pilgrim": "573b64ae754beb5c",
+    "priest_hurt_n_dawn": "87e56b278a58025b",
+    "priest_hurt_n_arms": "3bdd833c2cd8135c",
+    "priest_hurt_n_generic": "fab36e21ef0bfa90",
+    "priest_hurt_n_trinkets": "fe10ea16aa9f9db6",
+    "priest_hurt_ne_pilgrim": "13ea03ed3ee96151",
+    "priest_hurt_ne_dawn": "030ad3ba2a27c43b",
+    "priest_hurt_ne_arms": "083416e35fc198fd",
+    "priest_hurt_ne_generic": "367bbc67d682d62e",
+    "priest_hurt_ne_trinkets": "47076d6e3c927295",
+    "priest_hurt_e_pilgrim": "6ba73dc4b16ae454",
+    "priest_hurt_e_dawn": "65a37598c5a943ad",
+    "priest_hurt_e_arms": "23d6aff4744dbf3e",
+    "priest_hurt_e_generic": "2452e4573d96e51b",
+    "priest_hurt_e_trinkets": "c66ce7c026bbec63",
+    "priest_hurt_se_pilgrim": "bf6ae3e0ad89cef4",
+    "priest_hurt_se_dawn": "bcb36228e255e6dc",
+    "priest_hurt_se_arms": "d987ab61688d965a",
+    "priest_hurt_se_generic": "59e3238efdb4ee1b",
+    "priest_hurt_se_trinkets": "491465047e1564f3",
+    "priest_die_s_pilgrim": "55941b31849bc1dd",
+    "priest_die_s_dawn": "5e3fdfcf8407425a",
+    "priest_die_s_arms": "a4581766df3f91e7",
+    "priest_die_s_generic": "ae1f6a50160a9831",
+    "priest_die_s_trinkets": "c3fcf8468476ace2",
+    "priest_die_sw_pilgrim": "ebab80baf80d31c5",
+    "priest_die_sw_dawn": "ef4be32ca3616758",
+    "priest_die_sw_arms": "1e575aca00004596",
+    "priest_die_sw_generic": "03a7a2ec819e889e",
+    "priest_die_sw_trinkets": "7a6cead0c01629f0",
+    "priest_die_w_pilgrim": "f3f6771ed344c3dc",
+    "priest_die_w_dawn": "1490d545f5f8b1a1",
+    "priest_die_w_arms": "328e2f8d76c17665",
+    "priest_die_w_generic": "36e6b1e9588ab835",
+    "priest_die_w_trinkets": "771bc797d8eca626",
+    "priest_die_nw_pilgrim": "9aeeb8f4ee96be9f",
+    "priest_die_nw_dawn": "3252408bc4cd3a2d",
+    "priest_die_nw_arms": "7679ffa141cdb42c",
+    "priest_die_nw_generic": "d80d9c8053eed068",
+    "priest_die_nw_trinkets": "e3feed0ea3e0e4cf",
+    "priest_die_n_pilgrim": "5b849d045086f1c2",
+    "priest_die_n_dawn": "014c1819cbded5c2",
+    "priest_die_n_arms": "c3a72e779e298435",
+    "priest_die_n_generic": "9d47a3b94ad356cb",
+    "priest_die_n_trinkets": "0ea66ac19326c861",
+    "priest_die_ne_pilgrim": "e8aac4b8513f163a",
+    "priest_die_ne_dawn": "771c8e85e2873093",
+    "priest_die_ne_arms": "034fed82239b0058",
+    "priest_die_ne_generic": "8b5c24fedafa133f",
+    "priest_die_ne_trinkets": "eda0cf330a73e0fe",
+    "priest_die_e_pilgrim": "469ef0bea0d80f49",
+    "priest_die_e_dawn": "00a34c321220a4ab",
+    "priest_die_e_arms": "192ba5fd424ca11a",
+    "priest_die_e_generic": "8914fae0a66b6bd3",
+    "priest_die_e_trinkets": "056382a16cce2c52",
+    "priest_die_se_pilgrim": "1fd09d1a8a379ffa",
+    "priest_die_se_dawn": "e979d11fcfeb49e1",
+    "priest_die_se_arms": "bc151c12af2fa19d",
+    "priest_die_se_generic": "c03963fa84d27087",
+    "priest_die_se_trinkets": "479d3faea80e4c90"
   },
   "ramps": {
     "skin": [
@@ -245,6 +534,54 @@
       "#86506a",
       "#c88493",
       "#e9a4ab"
+    ],
+    "ironhide": [
+      "#3b2511",
+      "#6f4721",
+      "#a97530",
+      "#dda961"
+    ],
+    "ironsteel": [
+      "#3b4759",
+      "#6b7b93",
+      "#afbed4",
+      "#eff5fe"
+    ],
+    "ironbrass": [
+      "#6f4b13",
+      "#b1811f",
+      "#e9b941",
+      "#fff1a1"
+    ],
+    "dueltan": [
+      "#3c2a1f",
+      "#5d4030",
+      "#876148",
+      "#b98d6a"
+    ],
+    "duelcream": [
+      "#8d7d66",
+      "#c7b79b",
+      "#ebdfc3",
+      "#fffaea"
+    ],
+    "wayfarer": [
+      "#3a2a1e",
+      "#5c4330",
+      "#84634a",
+      "#ad8a69"
+    ],
+    "moonstone": [
+      "#5b5b83",
+      "#9b9bc5",
+      "#d5d5f3",
+      "#fdfdfe"
+    ],
+    "amberstone": [
+      "#6b2b09",
+      "#b9591b",
+      "#f19b2d",
+      "#ffe181"
     ]
   },
   "depth": {
@@ -254,16 +591,16 @@
     "near": "smaller"
   },
   "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
+  "style": "2D Korean RPG anime cel illustration",
+  "editing": "Three PixelFlow sprites per clip and facing (priest_<clip>_<facing>_pilgrim|dawn|arms|generic|trinkets). ref_body layers are read-only context. build --replace discards edits.",
   "attack": {
     "duration": 0.4,
     "impact": 0.2
   },
-  "style": "2D Korean RPG anime cel illustration",
   "portrait": [
     57,
     19,
     46,
     46
-  ],
-  "editing": "One PixelFlow sprite per clip and facing (priest_<clip>_<facing>), body visible, equipment hidden. build --replace discards edits."
+  ]
 }

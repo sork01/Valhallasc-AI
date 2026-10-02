@@ -57,6 +57,10 @@
       "png": "warrior_layered_armor_azure.png",
       "depth": "warrior_layered_armor_azure_depth.png"
     },
+    "pants_wayfarer": {
+      "png": "warrior_layered_pants_wayfarer.png",
+      "depth": "warrior_layered_pants_wayfarer_depth.png"
+    },
     "shoulders_crimson": {
       "png": "warrior_layered_shoulders_crimson.png",
       "depth": "warrior_layered_shoulders_crimson_depth.png"
@@ -64,6 +68,10 @@
     "shoulders_azure": {
       "png": "warrior_layered_shoulders_azure.png",
       "depth": "warrior_layered_shoulders_azure_depth.png"
+    },
+    "shoulders_ironhide": {
+      "png": "warrior_layered_shoulders_ironhide.png",
+      "depth": "warrior_layered_shoulders_ironhide_depth.png"
     },
     "gloves_crimson": {
       "png": "warrior_layered_gloves_crimson.png",
@@ -73,6 +81,10 @@
       "png": "warrior_layered_gloves_azure.png",
       "depth": "warrior_layered_gloves_azure_depth.png"
     },
+    "gloves_duelist": {
+      "png": "warrior_layered_gloves_duelist.png",
+      "depth": "warrior_layered_gloves_duelist_depth.png"
+    },
     "head_crimson": {
       "png": "warrior_layered_head_crimson.png",
       "depth": "warrior_layered_head_crimson_depth.png"
@@ -80,6 +92,18 @@
     "head_azure": {
       "png": "warrior_layered_head_azure.png",
       "depth": "warrior_layered_head_azure_depth.png"
+    },
+    "head_ironhide": {
+      "png": "warrior_layered_head_ironhide.png",
+      "depth": "warrior_layered_head_ironhide_depth.png"
+    },
+    "necklace_moonstone": {
+      "png": "warrior_layered_necklace_moonstone.png",
+      "depth": "warrior_layered_necklace_moonstone_depth.png"
+    },
+    "accessory_amber": {
+      "png": "warrior_layered_accessory_amber.png",
+      "depth": "warrior_layered_accessory_amber_depth.png"
     },
     "weapon_sword": {
       "png": "warrior_layered_weapon_sword.png",
@@ -90,6 +114,7 @@
       "depth": "warrior_layered_weapon_royal_depth.png"
     }
   },
+  "gender": "male",
   "equipment": {
     "armor": {
       "none": {
@@ -117,6 +142,10 @@
       "azure": {
         "name": "Azure Winged Pauldrons",
         "defense": 3
+      },
+      "ironhide": {
+        "name": "Ironhide Pauldrons",
+        "defense": 2
       }
     },
     "gloves": {
@@ -131,6 +160,10 @@
       "azure": {
         "name": "Azure Gauntlets",
         "defense": 2
+      },
+      "duelist": {
+        "name": "Duelist Gloves",
+        "defense": 1
       }
     },
     "head": {
@@ -145,6 +178,10 @@
       "azure": {
         "name": "Azure Winged Helm",
         "defense": 3
+      },
+      "ironhide": {
+        "name": "Ironhide Helm",
+        "defense": 2
       }
     },
     "weapon": {
@@ -160,6 +197,36 @@
         "name": "Royal sword & shield",
         "attack": 8
       }
+    },
+    "pants": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "wayfarer": {
+        "name": "Wayfarer Pants",
+        "defense": 2
+      }
+    },
+    "necklace": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "moonstone": {
+        "name": "Moonstone Necklace",
+        "defense": 0
+      }
+    },
+    "accessory": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "amber": {
+        "name": "Amber Ring",
+        "defense": 0
+      }
     }
   },
   "defaultEquipment": {
@@ -170,126 +237,206 @@
     "weapon": "sword"
   },
   "sprites": {
-    "warrior_cel_idle_s_crimson": "712363e00237b458",
-    "warrior_cel_idle_s_azure": "aa3807154a81616a",
-    "warrior_cel_idle_s_arms": "987c00297b5827c8",
-    "warrior_cel_idle_sw_crimson": "5437485825e5d6d3",
-    "warrior_cel_idle_sw_azure": "d96ee5fd03c71a13",
-    "warrior_cel_idle_sw_arms": "dfbe788662056de9",
-    "warrior_cel_idle_w_crimson": "ad3c1bb2a57ba1ab",
-    "warrior_cel_idle_w_azure": "023f6d518c55eab9",
-    "warrior_cel_idle_w_arms": "b03ed04fe10e2a51",
-    "warrior_cel_idle_nw_crimson": "81eec2a67fddced2",
-    "warrior_cel_idle_nw_azure": "bac7417e9eb74365",
-    "warrior_cel_idle_nw_arms": "fe67f50cb899873b",
-    "warrior_cel_idle_n_crimson": "405ea8616588a9e1",
-    "warrior_cel_idle_n_azure": "f71e6fe2bf46aa0c",
-    "warrior_cel_idle_n_arms": "7f0c484beb9ea6f2",
-    "warrior_cel_idle_ne_crimson": "163c553af4164ed5",
-    "warrior_cel_idle_ne_azure": "baafc686cc0b2099",
-    "warrior_cel_idle_ne_arms": "888b9bd073a51792",
-    "warrior_cel_idle_e_crimson": "e98db908f72ec6b5",
-    "warrior_cel_idle_e_azure": "f27a82395d056869",
-    "warrior_cel_idle_e_arms": "217e06aed64004d8",
-    "warrior_cel_idle_se_crimson": "76215fe70f76c523",
-    "warrior_cel_idle_se_azure": "cfa878863e489cd6",
-    "warrior_cel_idle_se_arms": "0f5857190f80ed19",
-    "warrior_cel_walk_s_crimson": "e1316e31e1b5bf5a",
-    "warrior_cel_walk_s_azure": "ddeaa6ca13b56294",
-    "warrior_cel_walk_s_arms": "998b974d0f87a67a",
-    "warrior_cel_walk_sw_crimson": "222fbc2aa5850e3b",
-    "warrior_cel_walk_sw_azure": "e568fe07ac22aa7c",
-    "warrior_cel_walk_sw_arms": "77200eb531ee1cc0",
-    "warrior_cel_walk_w_crimson": "29c27664d3939e39",
-    "warrior_cel_walk_w_azure": "f11d3e2ca77fe1ff",
-    "warrior_cel_walk_w_arms": "6809583f07930cc8",
-    "warrior_cel_walk_nw_crimson": "0a944e07c524bea6",
-    "warrior_cel_walk_nw_azure": "3921bbb59d2b963d",
-    "warrior_cel_walk_nw_arms": "40b348507cb5195d",
-    "warrior_cel_walk_n_crimson": "bf628b68d9917680",
-    "warrior_cel_walk_n_azure": "2ac6c0241ed2730e",
-    "warrior_cel_walk_n_arms": "5d567ea2d658b40c",
-    "warrior_cel_walk_ne_crimson": "0e1e4e262d05ed1a",
-    "warrior_cel_walk_ne_azure": "f9a283693f873145",
-    "warrior_cel_walk_ne_arms": "17a2de974f008aff",
-    "warrior_cel_walk_e_crimson": "35f1d51ac4660bf2",
-    "warrior_cel_walk_e_azure": "784029d3fce61fef",
-    "warrior_cel_walk_e_arms": "087c6c8fce831f14",
-    "warrior_cel_walk_se_crimson": "6680ac10e8b67aa2",
-    "warrior_cel_walk_se_azure": "8e8a18f03385452d",
-    "warrior_cel_walk_se_arms": "dcaa3fcb0ab925f0",
-    "warrior_cel_attack_s_crimson": "52d2ce6df5fd4a08",
-    "warrior_cel_attack_s_azure": "8ad6022dc8dcdf34",
-    "warrior_cel_attack_s_arms": "6a6c1d011bf1c5a6",
-    "warrior_cel_attack_sw_crimson": "6daa62104cbd333d",
-    "warrior_cel_attack_sw_azure": "73f6e771bedc2d3f",
-    "warrior_cel_attack_sw_arms": "ef4783f0ceefdfe4",
-    "warrior_cel_attack_w_crimson": "86b89e9ee82bf191",
-    "warrior_cel_attack_w_azure": "a500f24cc8e65f17",
-    "warrior_cel_attack_w_arms": "9241b97d9d8a0d13",
-    "warrior_cel_attack_nw_crimson": "bb9e919ae6b7885c",
-    "warrior_cel_attack_nw_azure": "927409f64441c8cc",
-    "warrior_cel_attack_nw_arms": "6cc8ce35d2a2c326",
-    "warrior_cel_attack_n_crimson": "c84777527883d573",
-    "warrior_cel_attack_n_azure": "67b86dfc023202ac",
-    "warrior_cel_attack_n_arms": "2e3ff2599cc093ef",
-    "warrior_cel_attack_ne_crimson": "4fbf47397d90a988",
-    "warrior_cel_attack_ne_azure": "a72f169f2908ad55",
-    "warrior_cel_attack_ne_arms": "5c7b6858d286a212",
-    "warrior_cel_attack_e_crimson": "d917b15476daf714",
-    "warrior_cel_attack_e_azure": "8439e204d40fc09c",
-    "warrior_cel_attack_e_arms": "77cbd68704c23027",
-    "warrior_cel_attack_se_crimson": "ee7925f3e5c0c285",
-    "warrior_cel_attack_se_azure": "86610bcfe51c1963",
-    "warrior_cel_attack_se_arms": "c665be993ce1d472",
-    "warrior_cel_hurt_s_crimson": "4793304692a691e7",
-    "warrior_cel_hurt_s_azure": "dd046bc602ff51dc",
-    "warrior_cel_hurt_s_arms": "4eaa0ca64bc5a6db",
-    "warrior_cel_hurt_sw_crimson": "af96e198adbd1c88",
-    "warrior_cel_hurt_sw_azure": "77540058e499b72a",
-    "warrior_cel_hurt_sw_arms": "1075ff50d66a5eb3",
-    "warrior_cel_hurt_w_crimson": "169ffcf79cf90bce",
-    "warrior_cel_hurt_w_azure": "a62ac5ee22874448",
-    "warrior_cel_hurt_w_arms": "5223730af58ed351",
-    "warrior_cel_hurt_nw_crimson": "2b353412b0ae295c",
-    "warrior_cel_hurt_nw_azure": "cc7c7e25d65008cc",
-    "warrior_cel_hurt_nw_arms": "8463972fa8cf1c19",
-    "warrior_cel_hurt_n_crimson": "4a9fb0ff14ffd9e1",
-    "warrior_cel_hurt_n_azure": "6ecdb9957e91bd58",
-    "warrior_cel_hurt_n_arms": "cf0d548912f86458",
-    "warrior_cel_hurt_ne_crimson": "b5609365e2a8baa8",
-    "warrior_cel_hurt_ne_azure": "b58705c7832d4b59",
-    "warrior_cel_hurt_ne_arms": "80424912da9935ab",
-    "warrior_cel_hurt_e_crimson": "d224e110c4a0d13b",
-    "warrior_cel_hurt_e_azure": "f77aaa3f2407dbfa",
-    "warrior_cel_hurt_e_arms": "ba35bd47b11bfda0",
-    "warrior_cel_hurt_se_crimson": "da3590d9f3dd1595",
-    "warrior_cel_hurt_se_azure": "f64d7eff88508660",
-    "warrior_cel_hurt_se_arms": "df7963d945e0665a",
-    "warrior_cel_die_s_crimson": "48d7b167ff383d36",
-    "warrior_cel_die_s_azure": "48114a53195b5d18",
-    "warrior_cel_die_s_arms": "ec2ef4068399d4ce",
-    "warrior_cel_die_sw_crimson": "03aea24364ad7042",
-    "warrior_cel_die_sw_azure": "815c4e3cc3d4b98b",
-    "warrior_cel_die_sw_arms": "2a863bb85b121f69",
-    "warrior_cel_die_w_crimson": "fcd746aaf9c020e6",
-    "warrior_cel_die_w_azure": "75cad0c0d59cfcc6",
-    "warrior_cel_die_w_arms": "7f34f0b3ecd207d4",
-    "warrior_cel_die_nw_crimson": "fd228e39ac0135b1",
-    "warrior_cel_die_nw_azure": "2673417ad25d10ef",
-    "warrior_cel_die_nw_arms": "1ca839f89a8ab703",
-    "warrior_cel_die_n_crimson": "2181aa6a7efce1ed",
-    "warrior_cel_die_n_azure": "ba21aa927f3c0b98",
-    "warrior_cel_die_n_arms": "d532abe253f2eac9",
-    "warrior_cel_die_ne_crimson": "a7d90c19058e9d69",
-    "warrior_cel_die_ne_azure": "aafb6a71f118a68f",
-    "warrior_cel_die_ne_arms": "33a68da85720f0ac",
-    "warrior_cel_die_e_crimson": "8b540127006136b6",
-    "warrior_cel_die_e_azure": "f454271d15745c33",
-    "warrior_cel_die_e_arms": "0267e780ec22f17d",
-    "warrior_cel_die_se_crimson": "21a4cc1824d3262c",
-    "warrior_cel_die_se_azure": "bd910e583aa4d83d",
-    "warrior_cel_die_se_arms": "5af60d18f499ebef"
+    "warrior_cel_idle_s_crimson": "e7262e1a7b870ef3",
+    "warrior_cel_idle_s_azure": "e4e96b51f8a74b55",
+    "warrior_cel_idle_s_arms": "e945c65e807d8385",
+    "warrior_cel_idle_s_generic": "3a7c848279ea869b",
+    "warrior_cel_idle_s_trinkets": "2337012b49d8398d",
+    "warrior_cel_idle_sw_crimson": "572ed662d867a417",
+    "warrior_cel_idle_sw_azure": "43751ba554a0ba2f",
+    "warrior_cel_idle_sw_arms": "3da1be6bd7f4871d",
+    "warrior_cel_idle_sw_generic": "95831cb7a4742d2f",
+    "warrior_cel_idle_sw_trinkets": "5c2279d06944b6aa",
+    "warrior_cel_idle_w_crimson": "5dc1d1e6284f905b",
+    "warrior_cel_idle_w_azure": "6effd63a002fe460",
+    "warrior_cel_idle_w_arms": "db8455abe333d000",
+    "warrior_cel_idle_w_generic": "ad35f2bd8c829717",
+    "warrior_cel_idle_w_trinkets": "a035527d1afe02a1",
+    "warrior_cel_idle_nw_crimson": "2a987944b9ce6bbc",
+    "warrior_cel_idle_nw_azure": "89eea1c0d8affa80",
+    "warrior_cel_idle_nw_arms": "5ceee51212ea2903",
+    "warrior_cel_idle_nw_generic": "156ec733bc9bfcfc",
+    "warrior_cel_idle_nw_trinkets": "59b168d54efe1b9c",
+    "warrior_cel_idle_n_crimson": "fe9bd116ee1bf4ed",
+    "warrior_cel_idle_n_azure": "1fea5e27df7b149d",
+    "warrior_cel_idle_n_arms": "a630988e664b995b",
+    "warrior_cel_idle_n_generic": "42c4a69b2dbb793f",
+    "warrior_cel_idle_n_trinkets": "700afbac5b0ab69e",
+    "warrior_cel_idle_ne_crimson": "b7944ac72c3804ef",
+    "warrior_cel_idle_ne_azure": "e1e071eee1237302",
+    "warrior_cel_idle_ne_arms": "49ed98acce410797",
+    "warrior_cel_idle_ne_generic": "44fd0bc82314bd93",
+    "warrior_cel_idle_ne_trinkets": "715922e6c2df7741",
+    "warrior_cel_idle_e_crimson": "626fd1b62229d563",
+    "warrior_cel_idle_e_azure": "3be341fabe747d09",
+    "warrior_cel_idle_e_arms": "2ea77e81fdd96109",
+    "warrior_cel_idle_e_generic": "f239297f7b42e7e8",
+    "warrior_cel_idle_e_trinkets": "322d9f44e17329e6",
+    "warrior_cel_idle_se_crimson": "4f3fb7b1a3b25acb",
+    "warrior_cel_idle_se_azure": "135738d01c735863",
+    "warrior_cel_idle_se_arms": "97355cb20bf7796e",
+    "warrior_cel_idle_se_generic": "f13275c0e0916339",
+    "warrior_cel_idle_se_trinkets": "d19fb980a18eece6",
+    "warrior_cel_walk_s_crimson": "af6ba6ee5beb83af",
+    "warrior_cel_walk_s_azure": "977f556ccd692bef",
+    "warrior_cel_walk_s_arms": "54f1d7fadb14bc0f",
+    "warrior_cel_walk_s_generic": "2204cfa002cbbd7a",
+    "warrior_cel_walk_s_trinkets": "ac9eee3c6601caa4",
+    "warrior_cel_walk_sw_crimson": "2d10ff905fc2ca44",
+    "warrior_cel_walk_sw_azure": "14b4e6dc28cee4e1",
+    "warrior_cel_walk_sw_arms": "6162a1f3076dd9d7",
+    "warrior_cel_walk_sw_generic": "cef807d7d45355d5",
+    "warrior_cel_walk_sw_trinkets": "b8b7507efa97bdfa",
+    "warrior_cel_walk_w_crimson": "d27d7d05e0929d12",
+    "warrior_cel_walk_w_azure": "f8d2d6f426a9f112",
+    "warrior_cel_walk_w_arms": "455eca54dd6f639a",
+    "warrior_cel_walk_w_generic": "d1b1be2575138e89",
+    "warrior_cel_walk_w_trinkets": "ac91ea8ef967d97d",
+    "warrior_cel_walk_nw_crimson": "03d49c4a251866fa",
+    "warrior_cel_walk_nw_azure": "bf55df00594ac7ba",
+    "warrior_cel_walk_nw_arms": "765e81ede5a4e0e4",
+    "warrior_cel_walk_nw_generic": "85bf29fbd05b8af3",
+    "warrior_cel_walk_nw_trinkets": "28e2495829aa1332",
+    "warrior_cel_walk_n_crimson": "9dd7e6e08c079cd2",
+    "warrior_cel_walk_n_azure": "a60a2a35a45009de",
+    "warrior_cel_walk_n_arms": "be343fe08531f330",
+    "warrior_cel_walk_n_generic": "1cac20ab8256df6d",
+    "warrior_cel_walk_n_trinkets": "44d4bc8b2f3f8876",
+    "warrior_cel_walk_ne_crimson": "8492dae3e71a5546",
+    "warrior_cel_walk_ne_azure": "5072baaf520b76af",
+    "warrior_cel_walk_ne_arms": "fecde5a8b5aff43b",
+    "warrior_cel_walk_ne_generic": "62e1f236d2a84ef9",
+    "warrior_cel_walk_ne_trinkets": "248c426513cd10c3",
+    "warrior_cel_walk_e_crimson": "ca2ed91b810921b7",
+    "warrior_cel_walk_e_azure": "b2fc9c15fd1eae14",
+    "warrior_cel_walk_e_arms": "81f35465ad604980",
+    "warrior_cel_walk_e_generic": "1fe26c68d7c7da72",
+    "warrior_cel_walk_e_trinkets": "2984b5721d84560a",
+    "warrior_cel_walk_se_crimson": "34315623be3e3506",
+    "warrior_cel_walk_se_azure": "7ba5797b64d02679",
+    "warrior_cel_walk_se_arms": "7e83f4c23774d04d",
+    "warrior_cel_walk_se_generic": "105baf28f865e305",
+    "warrior_cel_walk_se_trinkets": "34c88f9fdc874fea",
+    "warrior_cel_attack_s_crimson": "ab1983cf50477dbf",
+    "warrior_cel_attack_s_azure": "bda73badb1aeea64",
+    "warrior_cel_attack_s_arms": "799e158311e2ffeb",
+    "warrior_cel_attack_s_generic": "8f1ec4c2ff1776da",
+    "warrior_cel_attack_s_trinkets": "9ce4dc9b472427c8",
+    "warrior_cel_attack_sw_crimson": "f210ee7b36718d27",
+    "warrior_cel_attack_sw_azure": "67312b8a7d9444c4",
+    "warrior_cel_attack_sw_arms": "d549083ee8d2a446",
+    "warrior_cel_attack_sw_generic": "60051df86257b2d5",
+    "warrior_cel_attack_sw_trinkets": "539188b73737e319",
+    "warrior_cel_attack_w_crimson": "70ce0194bc818228",
+    "warrior_cel_attack_w_azure": "c845332b35b4734b",
+    "warrior_cel_attack_w_arms": "2783c6c5fd5dfa3a",
+    "warrior_cel_attack_w_generic": "93dc89dd1a0a801d",
+    "warrior_cel_attack_w_trinkets": "6b168fd5069af7ca",
+    "warrior_cel_attack_nw_crimson": "1df2391c8d9573b1",
+    "warrior_cel_attack_nw_azure": "c9bd418e2ab688b1",
+    "warrior_cel_attack_nw_arms": "66d0ddc85fad8fc7",
+    "warrior_cel_attack_nw_generic": "5c52d88048a0feb4",
+    "warrior_cel_attack_nw_trinkets": "8b9482a854a18a34",
+    "warrior_cel_attack_n_crimson": "5264fbce9426cf2c",
+    "warrior_cel_attack_n_azure": "e8a5014966101684",
+    "warrior_cel_attack_n_arms": "8e7e518e6d3575a7",
+    "warrior_cel_attack_n_generic": "38e321f8b935a04b",
+    "warrior_cel_attack_n_trinkets": "754455561a300d14",
+    "warrior_cel_attack_ne_crimson": "aecdb0c307ea0e20",
+    "warrior_cel_attack_ne_azure": "2a97e66558b0e92a",
+    "warrior_cel_attack_ne_arms": "40b96ff8dd8cd0c0",
+    "warrior_cel_attack_ne_generic": "e176e00c6d40fde2",
+    "warrior_cel_attack_ne_trinkets": "9fcc90376834ad06",
+    "warrior_cel_attack_e_crimson": "8926e4e84a984029",
+    "warrior_cel_attack_e_azure": "398ed106339ed219",
+    "warrior_cel_attack_e_arms": "f168477952049572",
+    "warrior_cel_attack_e_generic": "543b5f0aaa575a2e",
+    "warrior_cel_attack_e_trinkets": "7c747908ab11b1cf",
+    "warrior_cel_attack_se_crimson": "ea4f9a39b37ec359",
+    "warrior_cel_attack_se_azure": "b6285d43f3199d05",
+    "warrior_cel_attack_se_arms": "8498f907c4e84001",
+    "warrior_cel_attack_se_generic": "3a321e276199e823",
+    "warrior_cel_attack_se_trinkets": "6d14155a0b489a90",
+    "warrior_cel_hurt_s_crimson": "adffe6d982c07a58",
+    "warrior_cel_hurt_s_azure": "b19b4bd7d9c4a09e",
+    "warrior_cel_hurt_s_arms": "f67775a560e953a5",
+    "warrior_cel_hurt_s_generic": "49c010e6532fd452",
+    "warrior_cel_hurt_s_trinkets": "4af0eec493c75d61",
+    "warrior_cel_hurt_sw_crimson": "320252d43c3de308",
+    "warrior_cel_hurt_sw_azure": "32569e951f4525b1",
+    "warrior_cel_hurt_sw_arms": "8bfe9a3520bfe772",
+    "warrior_cel_hurt_sw_generic": "e037df37641044e0",
+    "warrior_cel_hurt_sw_trinkets": "6621ab2ed0edc7f6",
+    "warrior_cel_hurt_w_crimson": "dcf1a9767230e0b1",
+    "warrior_cel_hurt_w_azure": "502f8bd10b313614",
+    "warrior_cel_hurt_w_arms": "dc0f2b4f98c9a309",
+    "warrior_cel_hurt_w_generic": "5f60293ad1cae245",
+    "warrior_cel_hurt_w_trinkets": "818f15bd661b27b0",
+    "warrior_cel_hurt_nw_crimson": "15f793f3a922cdda",
+    "warrior_cel_hurt_nw_azure": "fd3ff60a89871da3",
+    "warrior_cel_hurt_nw_arms": "ff30bff3af3f9f3f",
+    "warrior_cel_hurt_nw_generic": "668d3ed2ce2a743b",
+    "warrior_cel_hurt_nw_trinkets": "7453683185e32686",
+    "warrior_cel_hurt_n_crimson": "e7d830f4c9798fb2",
+    "warrior_cel_hurt_n_azure": "462da27e5f6a359e",
+    "warrior_cel_hurt_n_arms": "6fae182ae50d5dfd",
+    "warrior_cel_hurt_n_generic": "93cb5735b2750426",
+    "warrior_cel_hurt_n_trinkets": "63438165a44d5bca",
+    "warrior_cel_hurt_ne_crimson": "931d2db916ec94fd",
+    "warrior_cel_hurt_ne_azure": "a0f0e2b543936302",
+    "warrior_cel_hurt_ne_arms": "281d86071563cb2f",
+    "warrior_cel_hurt_ne_generic": "67a6acc2774f9a70",
+    "warrior_cel_hurt_ne_trinkets": "fffcad0291d7b4bc",
+    "warrior_cel_hurt_e_crimson": "3c5609f7557f73ec",
+    "warrior_cel_hurt_e_azure": "608a34e59a6ff366",
+    "warrior_cel_hurt_e_arms": "ad8d60a9679b8403",
+    "warrior_cel_hurt_e_generic": "35c10aa260fcfa5a",
+    "warrior_cel_hurt_e_trinkets": "b74b3ef7ef554703",
+    "warrior_cel_hurt_se_crimson": "6f70c600ad48358b",
+    "warrior_cel_hurt_se_azure": "8aea89c0eb69960c",
+    "warrior_cel_hurt_se_arms": "37711ebb966c528b",
+    "warrior_cel_hurt_se_generic": "d5fb71a6f2092823",
+    "warrior_cel_hurt_se_trinkets": "6ef458eb898e2ad8",
+    "warrior_cel_die_s_crimson": "221a30424bab2735",
+    "warrior_cel_die_s_azure": "f19c38bd80ba9f80",
+    "warrior_cel_die_s_arms": "9a857d5148efd87d",
+    "warrior_cel_die_s_generic": "bfe20bb8c653cfb6",
+    "warrior_cel_die_s_trinkets": "3807f67f420fd2fc",
+    "warrior_cel_die_sw_crimson": "8ad79c1f3ed73f92",
+    "warrior_cel_die_sw_azure": "92a93f756c8086cd",
+    "warrior_cel_die_sw_arms": "a0b2618cb85d9bc9",
+    "warrior_cel_die_sw_generic": "881621d4f00eefcd",
+    "warrior_cel_die_sw_trinkets": "e2a476592e0e7410",
+    "warrior_cel_die_w_crimson": "334ee35192e0353d",
+    "warrior_cel_die_w_azure": "da5d6fc77e0be45e",
+    "warrior_cel_die_w_arms": "14b9da51529bc1db",
+    "warrior_cel_die_w_generic": "12a66e33530ed4b4",
+    "warrior_cel_die_w_trinkets": "94111405c3a50831",
+    "warrior_cel_die_nw_crimson": "bec5f426a02b9cf1",
+    "warrior_cel_die_nw_azure": "6588a29db6a6a0f2",
+    "warrior_cel_die_nw_arms": "a5cecc5b8e39c527",
+    "warrior_cel_die_nw_generic": "2264f31dbefa60d1",
+    "warrior_cel_die_nw_trinkets": "3bafbc2ae01501e1",
+    "warrior_cel_die_n_crimson": "c842b78d1878053b",
+    "warrior_cel_die_n_azure": "4c7b128578adc4e6",
+    "warrior_cel_die_n_arms": "8f963a655d4a9079",
+    "warrior_cel_die_n_generic": "99df042949d7212f",
+    "warrior_cel_die_n_trinkets": "bbd75fcc64ae05dd",
+    "warrior_cel_die_ne_crimson": "c7f758d639dcfcb2",
+    "warrior_cel_die_ne_azure": "b5e4cdd0ed5fa70d",
+    "warrior_cel_die_ne_arms": "1fc3897af8fb191e",
+    "warrior_cel_die_ne_generic": "63d305e9e9b2a9fd",
+    "warrior_cel_die_ne_trinkets": "923176fbd983a60d",
+    "warrior_cel_die_e_crimson": "88859c8ac8d99a24",
+    "warrior_cel_die_e_azure": "e3953f804b97a547",
+    "warrior_cel_die_e_arms": "2d4536ede4319e1f",
+    "warrior_cel_die_e_generic": "24052ec1b0f5c512",
+    "warrior_cel_die_e_trinkets": "106cdc30a0b1bb24",
+    "warrior_cel_die_se_crimson": "afd26f84cee36b9d",
+    "warrior_cel_die_se_azure": "cc14bf16338dd6d9",
+    "warrior_cel_die_se_arms": "c6bdd309abfb285a",
+    "warrior_cel_die_se_generic": "0fbf8fbad1fb4568",
+    "warrior_cel_die_se_trinkets": "636dddc3ea3c4757"
   },
   "ramps": {
     "skin": [
@@ -315,6 +462,54 @@
       "#86506a",
       "#c88493",
       "#e9a4ab"
+    ],
+    "ironhide": [
+      "#3b2511",
+      "#6f4721",
+      "#a97530",
+      "#dda961"
+    ],
+    "ironsteel": [
+      "#3b4759",
+      "#6b7b93",
+      "#afbed4",
+      "#eff5fe"
+    ],
+    "ironbrass": [
+      "#6f4b13",
+      "#b1811f",
+      "#e9b941",
+      "#fff1a1"
+    ],
+    "dueltan": [
+      "#3c2a1f",
+      "#5d4030",
+      "#876148",
+      "#b98d6a"
+    ],
+    "duelcream": [
+      "#8d7d66",
+      "#c7b79b",
+      "#ebdfc3",
+      "#fffaea"
+    ],
+    "wayfarer": [
+      "#3a2a1e",
+      "#5c4330",
+      "#84634a",
+      "#ad8a69"
+    ],
+    "moonstone": [
+      "#5b5b83",
+      "#9b9bc5",
+      "#d5d5f3",
+      "#fdfdfe"
+    ],
+    "amberstone": [
+      "#6b2b09",
+      "#b9591b",
+      "#f19b2d",
+      "#ffe181"
     ],
     "hair": [
       "#3a2420",
@@ -397,7 +592,7 @@
   },
   "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
   "style": "2D Korean RPG anime cel illustration",
-  "editing": "Three PixelFlow sprites per clip and facing (warrior_cel_<clip>_<facing>_crimson|azure|arms). ref_body layers are read-only context. build --replace discards edits.",
+  "editing": "Three PixelFlow sprites per clip and facing (warrior_cel_<clip>_<facing>_crimson|azure|arms|generic|trinkets). ref_body layers are read-only context. build --replace discards edits.",
   "attack": {
     "duration": 0.42,
     "impact": 0.21

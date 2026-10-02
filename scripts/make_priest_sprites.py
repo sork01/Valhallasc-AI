@@ -2,29 +2,25 @@
 """Priest: the Assassin's 2D anime cel style on the same 3D joint rig, dressed as a healer.
 
 usage: make_priest_sprites.py preview [clip|all] [directory]   contact sheets (scratch), rows = facings
-       make_priest_sprites.py build [--replace]                 render every frame, create the editable PixelFlow sprites priest_<clip>_<facing>
+       make_priest_sprites.py build [--replace]                 render every frame, create the editable PixelFlow sprites priest_<clip>_<facing>_<pilgrim|dawn|arms|generic|trinkets>
        make_priest_sprites.py export [--local]                  PixelFlow (edits kept) -> client/assets/priest_*.png + priest_sprites.txt
+       add --female to any command for the woman's body (priest_f_*, scripts/priest_f_raw/)
 
-Five independent layers (body, two robes, two maces); equipment is never baked into the body. 160x160 frames,
-feet at (80,119), eight facings, the same clips and frame counts as the Assassin (idle 6, walk 8, attack 8,
-hurt 4, die 8), so MageSprite composites it unchanged. The rig (ik2, rotations, facing formula) comes from the
-original project's tools/make_warrior_sprites.py, imported read-only from ../Valhalla/tools (set VALHALLA_TOOLS
-to move it). Frames are cached as scripts/priest_raw/*.npz (gitignored, regenerated in a few minutes).
-PixelFlow: one sprite per clip and facing (5 layers x 160x160 x 8 frames = the 1,048,576-cell limit), body visible,
-equipment layers hidden. build refuses existing names; build --replace DISCARDS PRIEST HAND EDITS. export reads the
-sprites back (colour edits survive; depth comes from the cache; added pixels take the nearest original depth).
-export --local skips PixelFlow and writes the atlas from the cache.
+Seventeen independent layers, never baked together: the body, five equipment slots in two sets (armor, shoulders, gloves,
+head, weapon: pilgrim/dawn, mace/sunmace) and the six class-independent pieces of generic_gear.py (Ironhide Helm and
+Pauldrons, Duelist Gloves, Wayfarer Pants, Moonstone Necklace, Amber Ring). Pilgrim: a cream hood, a rope-and-crimson mantle,
+wrapped mitts. Dawn: a gold sunburst diadem, sunray pauldrons, white-and-gold gloves. 160x160 frames, feet at (80,119), eight
+facings, the same clips and frame counts as the Assassin (idle 6, walk 8, attack 8, hurt 4, die 8), so MageSprite composites
+it unchanged. The rig (ik2, rotations, facing formula) comes from the original project's tools/make_warrior_sprites.py,
+imported read-only from ../Valhalla/tools (set VALHALLA_TOOLS to move it). Frames are cached as scripts/priest_raw/*.npz
+(gitignored). The pipeline (cache, preview, PixelFlow build, atlas export) is cel_common.Sheet, as for the other classes.
+build refuses existing names; build --replace DISCARDS PRIEST HAND EDITS. export reads the sprites back (colour edits survive;
+depth comes from the cache; added pixels take the nearest original depth). export --local skips PixelFlow.
 """
-import argparse
-import hashlib
-import inspect
-import json
 import math
 import os
 from pathlib import Path
 import sys
-
-import time
 
 import numpy as np
 from PIL import Image, ImageDraw
@@ -34,17 +30,17 @@ ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / 'client' / 'assets'
 sys.path.insert(0, os.environ.get('VALHALLA_TOOLS', str(ROOT.parent / 'Valhalla' / 'tools')))
 import make_warrior_sprites as rig  # noqa: E402
-import cel_common as cc  # noqa: E402  (only for the `--female` switch and the shared torso outline)
-
-# `--female` draws the woman's body into its own files: priest_f_*.png, priest_f_sprites.txt, scripts/priest_f_raw/.
-NAME = 'priest_f' if cc.FEMALE else 'priest'
+import cel_common as cc  # noqa: E402  (the `--female` switch, the torso outline and the Sheet pipeline)
+import generic_gear as gg  # noqa: E402
 
 V, unit = rig.V, rig.unit
 FW = FH = 160
-CACHE = Path(__file__).resolve().parent / f'{NAME}_raw'
 AX, AY, SS, PX = 80, 119, 2, 1.03
 DIRS = rig.DIRS
-PARTS = ['body', 'armor_pilgrim', 'armor_dawn', 'weapon_mace', 'weapon_sunmace']
+SLOTS = {'armor': ('pilgrim', 'dawn'), 'shoulders': ('pilgrim', 'dawn', 'ironhide'), 'gloves': ('pilgrim', 'dawn', 'duelist'),
+         'head': ('pilgrim', 'dawn', 'ironhide'), 'weapon': ('mace', 'sunmace'),
+         'pants': ('wayfarer',), 'necklace': ('moonstone',), 'accessory': ('amber',)}
+PARTS = ['body'] + [f'{slot}_{v}' for slot in cc.SLOT_ORDER for v in SLOTS.get(slot, ())]
 MATS = {
     'skin': ['#92595c', '#ce9182', '#f0bfac', '#ffe0ce'],
     'hair': ['#8a6a3a', '#c9a45c', '#ecd290', '#fff4c8'],      # long pale-gold hair (the client recolours by ramp)
@@ -62,10 +58,9 @@ MATS = {
     'iris': ['#2a5a8c', '#4a8cc4', '#8cc8f0', '#d8f2ff'],
     'white': ['#c0aec4', '#ded2e2', '#f6eef1', '#fffbf6'],
     'mouth': ['#5c2d45', '#86506a', '#c88493', '#e9a4ab'],
+    **gg.GEAR_MATS,      # appended last, so every existing palette index keeps its value
 }
-PALETTE = ['#00000000', '#18182a', '#ffffff'] + [c for r in MATS.values() for c in r]
-assert len(PALETTE) == len(set(PALETTE)) and len(PALETTE) <= 255
-COLOR = {name: [3 + 4 * i + k for k in range(4)] for i, name in enumerate(MATS)}
+PALETTE, COLOR = cc.palette_of(MATS)
 DEFAULT = dict(root=(0, 0, 0), lean=1, twist=0, roll=0, sway=0, eyes='open', light=1.0,
                handL=(-9, 12, 58), handR=(12, 7, 46),
                footL=(-5, 0, 4), footR=(5, 0, 4),
@@ -125,18 +120,25 @@ def die(k):
 
 CLIPS = {'idle': (6, 6, idle), 'walk': (12, 8, walk), 'attack': (20, 8, attack),
          'hurt': (10, 4, hurt), 'die': (8, 8, die)}
-ARMOR_ITEMS = {'none': {'name': 'Simple cloth', 'part': None, 'defense': 0},
-               'pilgrim': {'name': 'Pilgrim robes', 'part': 'armor_pilgrim', 'defense': 3},
-               'dawn': {'name': 'Dawnweave vestments', 'part': 'armor_dawn', 'defense': 5}}
-WEAPON_ITEMS = {'none': {'name': 'Empty hands', 'part': None, 'attack': 0},
-                'mace': {'name': 'Oak mace', 'part': 'weapon_mace', 'attack': 4},
-                'sunmace': {'name': 'Sunbreaker mace', 'part': 'weapon_sunmace', 'attack': 8}}
+GEAR = {
+    'armor': {'none': {'name': 'Simple cloth', 'defense': 0},
+              'pilgrim': {'name': 'Pilgrim robes', 'defense': 3}, 'dawn': {'name': 'Dawnweave vestments', 'defense': 5}},
+    'shoulders': {'none': {'name': 'Bare shoulders', 'defense': 0},
+                  'pilgrim': {'name': "Pilgrim's Mantle", 'defense': 1}, 'dawn': {'name': 'Sunray Pauldrons', 'defense': 2}},
+    'gloves': {'none': {'name': 'Bare hands', 'defense': 0},
+               'pilgrim': {'name': "Pilgrim's Mitts", 'defense': 1}, 'dawn': {'name': 'Dawnweave Gloves', 'defense': 2}},
+    'head': {'none': {'name': 'Bare head', 'defense': 0},
+             'pilgrim': {'name': "Pilgrim's Hood", 'defense': 1}, 'dawn': {'name': 'Sunburst Diadem', 'defense': 2}},
+    'weapon': {'none': {'name': 'Empty hands', 'attack': 0},
+               'mace': {'name': 'Oak mace', 'attack': 4}, 'sunmace': {'name': 'Sunbreaker mace', 'attack': 8}},
+}
 
 
 class Ink:
     """Flat cel polygons with a depth gradient along projected limbs (the Assassin's renderer)."""
     def __init__(self, psi):
         self.turn = rig.rotz(psi)
+        self.color = COLOR
         self.index = np.zeros((FH * SS, FW * SS), np.uint8)
         self.z = np.full(self.index.shape, np.inf, np.float32)
 
@@ -199,6 +201,73 @@ class Ink:
         if flash:
             idx[(idx > 0) & (idx != 1)] = 2
         return idx, z
+
+
+def priest_pieces(inks, R, joints, H, hd, front, side):
+    """Head, shoulder and glove pieces of both sets. Pilgrim: cream cloth, crimson and rope. Dawn: gold and white."""
+    backview = front < -.4
+    ink = inks['head_pilgrim']
+    # A cloth hood round the face (closed over the back of the head from behind) with a gold-trimmed opening and a crimson cord.
+    outer = [(-12.8, -9), (-13.6, 6), (-10.6, 16.4), (-4, 22), (0, 23.2), (4, 22), (10.6, 16.4), (13.6, 6), (12.8, -9)]
+    inner = [(9.9, -6), (9.7, 4.6), (6.9, 9.8), (0, 11), (-6.9, 9.8), (-9.7, 4.6), (-9.9, -6)]
+    back = [(-12.4, -3), (-13.6, 6), (-10.6, 16.4), (-4, 22), (0, 23.2), (4, 22), (10.6, 16.4), (13.6, 6), (12.4, -3), (9, -11.5), (0, -13.4), (-9, -11.5)]
+    ink.poly([H(*q) for q in (back if backview else outer + inner)], COLOR['robe'][2], hd - (11 if backview else 7))
+    ink.poly([H(*q) for q in [(13.6, 6), (10.6, 16.4), (4, 22), (0, 23.2), (2, 17), (7.5, 12.6), (11.4, 4), (12.4, -3 if backview else -9)]], COLOR['robe'][1], hd - 7.05 - (4 if backview else 0), False)
+    ink.poly([H(*q) for q in [(-13.6, 6), (-10.6, 16.4), (-4, 22), (0, 23.2), (-2, 19), (-8, 14), (-11, 6)]], COLOR['robe'][3], hd - 7.04 - (4 if backview else 0), False)
+    if not backview:
+        ink.poly([H(*q) for q in [(-10.3, -6), (-10.2, 4.6), (-7.2, 10.2), (0, 11.5), (7.2, 10.2), (10.2, 4.6), (10.3, -6),
+                                  (9.7, -6), (9.7, 4.6), (6.9, 9.8), (0, 11), (-6.9, 9.8), (-9.7, 4.6), (-9.7, -6)]], COLOR['gold'][2], hd - 7.3, False)
+        for sx in (-1, 1):
+            ink.poly([H(sx * 11.6, -6), H(sx * 12.8, -9), H(sx * 13.4, -14), H(sx * 12, -15.4), H(sx * 10.6, -13)], COLOR['stole'][2 if sx > 0 else 1], hd - 7.4)
+    ink = inks['head_dawn']
+    # A gold diadem above the circlet: seven pointed rays of rising height round a sun gem.
+    xs = [-10.4, -7, -3.5, 0, 3.5, 7, 10.4]
+    tops = [11.8, 15.6, 18.2, 21, 18.2, 15.6, 11.8]
+    ink.poly([H(*q) for q in [(-11.2, 8.2), (-11.2, 11.6)] + [pt for x, t in zip(xs, tops) for pt in ((x - 1.7, 11.8), (x, t), (x + 1.7, 11.8))] + [(11.2, 11.6), (11.2, 8.2), (0, 10.4)]], COLOR['gold'][2], hd - 7)
+    ink.poly([H(*q) for q in [(-11.2, 8.2), (-11.2, 11.6), (-8.7, 11.8), (-8.7, 9)]] + [], COLOR['gold'][3], hd - 7.05, False)
+    ink.poly([H(*q) for q in [(11.2, 8.2), (11.2, 11.6), (8.5, 11.8), (6, 10.2), (0, 10.4)]], COLOR['gold'][1], hd - 7.05, False)
+    if not backview:
+        gx = side * 5
+        ink.poly([H(gx, 18.4), H(gx + 2.8, 14.6), H(gx, 10.9), H(gx - 2.8, 14.6)], COLOR['glow'][1], hd - 7.4)
+        ink.poly([H(gx, 17), H(gx + 1.5, 14.6), H(gx, 12.2), H(gx - 1.5, 14.6)], COLOR['glow'][3], hd - 7.45, False)
+    for sx in (-1, 1):      # two white ribbons tipped in crimson fall behind the ears
+        ink.poly([H(sx * 10.6, 9.4), H(sx * 12.2, 9.4), H(sx * 14.4, -6), H(sx * 13.8, -12), H(sx * 11.4, -6)], COLOR['dawn'][2 if sx > 0 else 1], hd - 7.1)
+        ink.poly([H(sx * 14.1, -8), H(sx * 13.8, -12), H(sx * 12.6, -13.6), H(sx * 12.8, -8.6)], COLOR['stole'][2], hd - 7.15, False)
+    for tier in ('pilgrim', 'dawn'):
+        ink = inks['shoulders_' + tier]
+        for key in 'LR':
+            j = joints[key]
+            sh = j['shoulder']
+            sx = -1 if key == 'L' else 1
+            out, upv = R @ V(sx, 0, 0), R @ V(0, 0, 1)
+            if tier == 'pilgrim':
+                # A cream mantle with a crimson hem, held by a gold clasp at the collarbone.
+                ink.bone(sh - out * .6 + upv * 2.8, sh + out * 5.6 - upv * 1.6, 5.2, 4.7, 'robe', -1.0, 2)
+                ink.bone(sh + out * 2.8 + upv * .6, sh + out * 7.6 - upv * 3.8, 4.5, 3.8, 'robe', -1.15, 1)
+                ink.bone(sh + out * 3.4 - upv * 3.2, sh + out * 7.4 - upv * 5.2, 1.5, 1.3, 'stole', -1.3, 2)
+                ink.bone(sh - out * .2 + upv * 4.6, sh + out * 3.6 + upv * 2.4, 1.1, 1.0, 'gold', -1.5, 3)
+            else:
+                # A gold dome with a fan of sun rays and a white feathered edge.
+                ink.bone(sh - out * .6 + upv * 2.6, sh + out * 5.8 - upv * 1.4, 5.0, 4.5, 'gold', -1.0, 2)
+                ink.bone(sh + out * 2.6 + upv * .6, sh + out * 7.4 - upv * 3.8, 4.2, 3.6, 'dawn', -1.15, 2)
+                for k_, (a_, b_, h_) in enumerate(((.2, 1.6, 8.6), (2.2, 3.4, 10.4), (4.2, 5.2, 8.2))):
+                    ink.plate([sh + out * a_ + upv * 3.4, sh + out * (a_ + b_) / 2 + upv * (3.4 + h_), sh + out * (b_ + 1.4) + upv * 3.6], 'glow', 2 + (k_ == 1))
+                ink.bone(sh + out * 1.4 + upv * 4.2, sh + out * 4.2 + upv * 3, 1.0, 1.0, 'gold', -1.5, 3)
+    for tier in ('pilgrim', 'dawn'):
+        ink = inks['gloves_' + tier]
+        for key in 'LR':
+            j = joints[key]
+            el, hand = j['elbow'], j['hand']
+            if tier == 'pilgrim':      # cream mitts bound at the wrist with leather
+                ink.bone(hand + (el - hand) * .46, hand + (el - hand) * .06, 2.8, 2.5, 'robe', -.8)
+                ink.bone(hand + (el - hand) * .26, hand + (el - hand) * .18, 3.2, 3.2, 'leather', -.95, 2)
+                ink.bone(hand + (el - hand) * .5, hand + (el - hand) * .42, 3.1, 3.1, 'leather', -.95, 2)
+                ink.bone(hand - R @ V(0, 0, 1), hand + R @ V(0, 0, 1.9), 2.5, 2.2, 'robe', -.9)
+            else:                      # white gloves, a gold flared cuff and a sun gem on the back of the hand
+                ink.bone(hand + (el - hand) * .5, hand + (el - hand) * .06, 2.8, 2.5, 'dawn', -.8)
+                ink.bone(hand + (el - hand) * .54, hand + (el - hand) * .36, 3.7, 3.2, 'gold', -.95, 2)
+                ink.bone(hand - R @ V(0, 0, 1), hand + R @ V(0, 0, 1.9), 2.5, 2.2, 'dawn', -.9)
+                ink.bone(hand + R @ V(0, 1.4, .4), hand + R @ V(0, 1.7, .8), 1.1, 1.1, 'glow', -1.2, 3)
 
 
 def render_frame(clip, facing, k):
@@ -390,6 +459,8 @@ def render_frame(clip, facing, k):
                     inner = 7.2 if width > 9.5 else 7.9
                     ink.poly([ring(width, a), ring(width, b), ring(inner, b), ring(inner, a)], color(a), hd - 7.5 - push, False)
 
+    priest_pieces(inks, R, joints, H, hd, front, side)
+    gg.draw(inks, R, xf, joints, dict(H=H, hd=hd, front=front, side=side))
     for key, sun in [('weapon_mace', False), ('weapon_sunmace', True)]:
         ink = inks[key]
         hand = joints['R']['hand']
@@ -430,194 +501,18 @@ def render_frame(clip, facing, k):
     return {part: ink.resolve(flash) for part, ink in inks.items()}
 
 
-REVISION = hashlib.sha256((json.dumps([MATS, DEFAULT, PX, SS]) + ''.join(
-    inspect.getsource(f) for f in (Ink, render_frame, idle, walk, attack, hurt, die))).encode()
-    + Path(rig.__file__).read_bytes()).hexdigest()
 
-
-def read_frame(clip, facing, k):
-    path = CACHE / f'{clip}_{facing}_{k}.npz'
-    valid = False
-    if path.exists():
-        with np.load(path) as saved:
-            valid = 'revision' in saved and str(saved['revision']) == REVISION
-    if not valid:
-        CACHE.mkdir(exist_ok=True)
-        parts = render_frame(clip, facing, k)
-        np.savez_compressed(path, revision=REVISION,
-                            **{f'{n}_index': d[0] for n, d in parts.items()},
-                            **{f'{n}_depth': d[1].astype(np.float32) for n, d in parts.items()})
-    with np.load(path) as saved:
-        return {name: (saved[f'{name}_index'], saved[f'{name}_depth']) for name in PARTS}
-
-
-def composite(parts, armor, weapon):
-    best = np.full((FH, FW), np.inf)
-    out = np.zeros((FH, FW), np.uint8)
-    for part in ['body'] + ([f'armor_{armor}'] if armor != 'none' else []) + ([f'weapon_{weapon}'] if weapon != 'none' else []):
-        idx, depth = parts[part]
-        take = (idx > 0) & (depth <= best)
-        out[take], best[take] = idx[take], depth[take]
-    return out
-
-
-PAL = np.array([[int(c[j:j + 2], 16) for j in (1, 3, 5)] + [0 if i == 0 else 255] for i, c in enumerate(PALETTE)], np.uint8)
-rgba = lambda idx: Image.fromarray(PAL[idx], 'RGBA')
-COMBOS = [('none', 'none'), ('pilgrim', 'mace'), ('dawn', 'sunmace')]
-
-
-def preview(clips, out):
-    out.mkdir(parents=True, exist_ok=True)
-    for clip in clips:
-        n = CLIPS[clip][1]
-        for armor, weapon in COMBOS:
-            sheet = Image.new('RGBA', (FW * n, FH * 8), '#487048')
-            for di, facing in enumerate(DIRS):
-                for k in range(n):
-                    parts = read_frame(clip, facing, k)
-                    for part, (idx, z) in parts.items():
-                        if (idx[0] > 0).any() or (idx[-1] > 0).any() or (idx[:, 0] > 0).any() or (idx[:, -1] > 0).any():
-                            raise ValueError(f'clipped {clip}/{facing}/{k}/{part}')
-                    sheet.alpha_composite(rgba(composite(parts, armor, weapon)), (k * FW, di * FH))
-                    ImageDraw.Draw(sheet).text((k * FW + 3, di * FH + 3), f'{facing} {k}', fill='white')
-            sheet.resize((sheet.width * 2, sheet.height * 2), Image.Resampling.NEAREST).save(out / f'{NAME}_{clip}_{armor}.png')
-        print('preview', clip, 'eight facings; no clipped parts', flush=True)
-    compare = Image.new('RGBA', (FW * 6, FH), '#487048')
-    compare.alpha_composite(Image.open(ASSETS / 'assassin_body.png').crop((0, 0, FW, FH)), (0, 0))
-    for j, (a, b) in enumerate(COMBOS, 1):
-        compare.alpha_composite(rgba(composite(read_frame('idle', 'S', 0), a, b)), (j * FW, 0))
-        compare.alpha_composite(rgba(composite(read_frame('idle', 'SE', 2), a, b)), ((j + 3 if j < 3 else 0) * FW, 0)) if j < 3 else None
-    compare.resize((compare.width * 3, compare.height * 3), Image.Resampling.NEAREST).save(out / f'{NAME}_comparison.png')
-
-
-def pixel_name(clip, facing):
-    return f'{NAME.replace("_f", "f")}_{clip}_{facing.lower()}'
-
-
-def pixel_api():
-    sys.path.insert(0, os.path.expanduser('~/.claude/skills/makesprites'))
-    import pf
-    original = pf.api
-    def retry(*args, **kwargs):
-        for attempt in range(25):
-            result = original(*args, **kwargs)
-            if not any(e.get('code') == 'rate_limited' for e in result.get('errors', [])):
-                return result
-            time.sleep(5)
-        raise RuntimeError('PixelFlow request limit did not clear')
-    pf.api = retry
-    return pf
-
-
-def pixel_ids(pf):
-    manifest = CACHE / 'editor_ids.txt'
-    ids = json.loads(manifest.read_text()) if manifest.exists() else {}
-    ids.update(pf.ids(NAME.replace('_f', 'f') + '_'))
-    return ids
-
-
-def build(replace=False):
-    pf = pixel_api()
-    existing = pf.ids(NAME.replace('_f', 'f') + '_')
-    if existing and not replace:
-        raise SystemExit('priest sprites already exist; use export to keep edits, or build --replace to discard them.')
-    for sid in existing.values():
-        response = pf.api('delete', {'sprite_id': sid})
-        assert response.get('ok') or any(e.get('code') == 'not_found' for e in response.get('errors', [])), response
-    created, ids = [], {}
-    try:
-        for clip, (fps, n, _) in CLIPS.items():
-            assert FW * FH * len(PARTS) * n <= 1048576
-            for facing in DIRS:
-                name = pixel_name(clip, facing)
-                sid = pf.create(name, FW, FH, n, PALETTE, fps=fps, layers=len(PARTS),
-                                layer_ops=[{'op': 'set_layer', 'layer': i, 'name': part, 'visible': part == 'body'}
-                                           for i, part in enumerate(PARTS)])
-                created.append(sid); ids[name] = sid
-                for k in range(n):
-                    parts = read_frame(clip, facing, k)
-                    result = pf.api('draw', {'sprite_id': sid, 'frame': k, 'ops': [
-                        {'op': 'grid', 'rows': parts[part][0].astype(int).tolist(), 'x': 0, 'y': 0, 'layer': li}
-                        for li, part in enumerate(PARTS)]})
-                    assert result.get('ok'), result
-                    time.sleep(.12)
-                print(name, sid, flush=True)
-    except BaseException:
-        for sid in created:
-            pf.api('delete', {'sprite_id': sid})
-        raise
-    CACHE.mkdir(exist_ok=True)
-    (CACHE / 'editor_ids.txt').write_text(json.dumps(ids, indent=2) + '\n')
-
-
-def export(local=False):
-    pf = None if local else pixel_api()
-    ids = {} if local else pixel_ids(pf)
-    meta_clips = {clip: {'row0': ci * 8, 'n': n, 'fps': fps} for ci, (clip, (fps, n, _)) in enumerate(CLIPS.items())}
-    size = (FW * 8, FH * 8 * len(CLIPS))
-    atlases = {part: Image.new('RGBA', size) for part in PARTS}
-    depths = {part: Image.new('RGB', size, (255, 255, 0)) for part in PARTS}
-    for clip, (_, n, _) in CLIPS.items():
-        for di, facing in enumerate(DIRS):
-            edited = None
-            if not local:
-                sp, frames = pf.load(ids[pixel_name(clip, facing)])
-                assert (sp['width'], sp['height']) == (FW, FH) and len(frames) == n
-                assert [layer['name'] for layer in sp['layers']] == PARTS
-                edited = (sp['palette'], frames)
-            for k in range(n):
-                raw = read_frame(clip, facing, k)
-                x, y = k * FW, (meta_clips[clip]['row0'] + di) * FH
-                for li, part in enumerate(PARTS):
-                    depth = raw[part][1].copy()
-                    if edited:
-                        idx = edited[1][k][li]
-                        picture = Image.fromarray(pf.to_rgba(idx, edited[0]), 'RGBA')
-                        added = (idx > 0) & ~np.isfinite(depth)
-                        if added.any():
-                            nearest = ndi.distance_transform_edt(~np.isfinite(depth), return_distances=False, return_indices=True)
-                            depth[added] = depth[tuple(nearest)][added]
-                    else:
-                        idx = raw[part][0]
-                        picture = rgba(idx)
-                    opaque = idx > 0
-                    encoded = np.full((FH, FW), 65535, np.uint16)
-                    encoded[opaque] = np.clip(np.round((depth[opaque] + 512) * 64), 0, 65534).astype(np.uint16)
-                    rgb = np.zeros((FH, FW, 3), np.uint8)
-                    rgb[..., 0], rgb[..., 1] = encoded >> 8, encoded & 255
-                    atlases[part].paste(picture, (x, y))
-                    depths[part].paste(Image.fromarray(rgb, 'RGB'), (x, y))
-        print('export', clip, flush=True)
-    for part in PARTS:
-        atlases[part].save(ASSETS / f'{NAME}_{part}.png', optimize=True)
-        depths[part].save(ASSETS / f'{NAME}_{part}_depth.png', optimize=True)
-    meta = {'frame': [FW, FH], 'anchor': [AX, AY], 'dirs': DIRS, 'clips': meta_clips,
-            'parts': {part: {'png': f'{NAME}_{part}.png', 'depth': f'{NAME}_{part}_depth.png'} for part in PARTS},
-            'gender': 'female' if cc.FEMALE else 'male',
-            'equipment': {'armor': ARMOR_ITEMS, 'weapon': WEAPON_ITEMS},
-            'defaultEquipment': {'armor': 'pilgrim', 'weapon': 'mace'},
-            'sprites': ids, 'ramps': MATS,
-            'depth': {'encoding': 'R*256+G', 'offset': 512, 'scale': 64, 'near': 'smaller'},
-            'facing': 'Same eight-direction formula and foot anchor as assassin_sprites.txt',
-            'attack': {'duration': .4, 'impact': .2},
-            'style': '2D Korean RPG anime cel illustration', 'portrait': [57, 19, 46, 46],
-            'editing': ('Female set: generated from code by export --local, with no PixelFlow copies. Re-run make_priest_sprites.py with --female to change it.' if cc.FEMALE else
-                        'One PixelFlow sprite per clip and facing (priest_<clip>_<facing>), body visible, equipment hidden. build --replace discards edits.')}
-    (ASSETS / f'{NAME}_sprites.txt').write_text(json.dumps(meta, indent=2) + '\n')
-    print('exported five parts and five depth maps', size, flush=True)
-
+NAKED = {slot: 'none' for slot in SLOTS}
+PILGRIM = {'armor': 'pilgrim', 'shoulders': 'pilgrim', 'gloves': 'pilgrim', 'head': 'pilgrim', 'weapon': 'mace'}
+DAWN = {'armor': 'dawn', 'shoulders': 'dawn', 'gloves': 'dawn', 'head': 'dawn', 'weapon': 'sunmace'}
+GENERIC = {'armor': 'pilgrim', 'shoulders': 'ironhide', 'gloves': 'duelist', 'head': 'ironhide', 'pants': 'wayfarer',
+           'necklace': 'moonstone', 'accessory': 'amber', 'weapon': 'mace'}
+SHEET = cc.Sheet(
+    'priest', files='priest', pixel='priest_', mats=MATS, clips=CLIPS, slots=SLOTS, gear=GEAR, render=render_frame,
+    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read()]),
+    default_equip={'armor': 'pilgrim', 'shoulders': 'none', 'gloves': 'none', 'head': 'none', 'weapon': 'mace'},
+    meta={'attack': {'duration': .4, 'impact': .2}, 'portrait': [57, 19, 46, 46]},
+    combos=[('naked', NAKED), ('pilgrim', PILGRIM), ('dawn', DAWN), ('generic', GENERIC)])
 
 if __name__ == '__main__':
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('command', choices=['preview', 'build', 'export'])
-    ap.add_argument('clip', nargs='?', default='all', choices=['all'] + list(CLIPS))
-    ap.add_argument('directory', nargs='?', default=f'/tmp/valhalla-{NAME}-preview')
-    ap.add_argument('--replace', action='store_true')
-    ap.add_argument('--local', action='store_true')
-    args = ap.parse_args()
-    if args.command == 'preview':
-        preview(list(CLIPS) if args.clip == 'all' else [args.clip], Path(args.directory))
-    elif args.command == 'build':
-        build(args.replace)
-    else:
-        export(args.local)
+    SHEET.cli()

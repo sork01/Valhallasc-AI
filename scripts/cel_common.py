@@ -42,7 +42,7 @@ FW = FH = 160
 AX, AY, SS, PX = 80, 119, 2, 1.03
 DIRS = rig.DIRS
 HIP, SHOULDER = 37, 66
-SLOT_ORDER = ['armor', 'shoulders', 'gloves', 'head', 'weapon']
+SLOT_ORDER = ['armor', 'pants', 'shoulders', 'gloves', 'head', 'necklace', 'accessory', 'weapon']
 # Shared by every class so faces stay on one drawing; a class overrides 'iris'.
 FACE_MATS = {
     'skin': ['#92595c', '#ce9182', '#f0bfac', '#ffe0ce'],
@@ -276,6 +276,7 @@ def revision_of(sheet_sources, *objects):
         h.update(text.encode())
     for obj in objects:
         h.update((obj if isinstance(obj, str) else inspect.getsource(obj)).encode())
+    h.update(b'female' if FEMALE else b'male')      # a male and a female frame must never be taken for each other
     h.update(Path(__file__).read_bytes())
     h.update(Path(rig.__file__).read_bytes())
     return h.hexdigest()
@@ -292,14 +293,27 @@ class Sheet:
         self.palette, self.color = palette_of(mats)
         # `legacy` parts already exist as atlas files (an older class art we keep): never redrawn, never in PixelFlow.
         self.legacy = list(legacy)
-        self.all_parts = ['body'] + [f'{slot}_{v}' for slot in SLOT_ORDER for v in slots[slot]]
+        self.all_parts = ['body'] + [f'{slot}_{v}' for slot in SLOT_ORDER for v in slots.get(slot, ())]
         self.parts = [part for part in self.all_parts if part not in self.legacy]
         tier_parts = lambda t: [f'{slot}_{t}' for slot in ('armor', 'shoulders', 'gloves', 'head') if f'{slot}_{t}' in self.parts]
         t1, t2 = slots['armor']
         weapons = [f'weapon_{v}' for v in slots['weapon'] if f'weapon_{v}' in self.parts]
         ref = lambda: ['ref_body'] if 'body' in self.parts else []
         self.groups = groups or {t1: (['body'] if 'body' in self.parts else []) + tier_parts(t1), t2: ref() + tier_parts(t2), 'arms': ref() + weapons}
+        if groups is None:
+            # Class-independent gear (generic_gear.py) rides in extra sprites: at most five layers fit one sprite.
+            extra = [part for part in self.parts if part not in sum(self.groups.values(), []) and part != 'body']
+            for group_name, chunk in zip(('generic', 'trinkets'), (extra[:4], extra[4:8])):
+                if chunk:
+                    self.groups[group_name] = ref() + chunk
         self.groups = {g: layers for g, layers in self.groups.items() if any(not l.startswith('ref_') for l in layers)}
+        # the items.txt names of the class-independent pieces, so every class's metadata lists them
+        import generic_gear as gg
+        self.gear = {slot: dict(names) for slot, names in gear.items()}
+        for generic_slot, generic_variant in gg.VARIANTS.items():      # (not `name`/`slot`: `name` is still needed for the cache path below)
+            if f'{generic_slot}_{generic_variant}' in self.all_parts:
+                piece, defense = gg.NAMES[generic_slot]
+                self.gear.setdefault(generic_slot, {'none': {'name': 'Nothing', 'defense': 0}})[generic_variant] = {'name': piece, 'defense': defense}
         self.cache = Path(__file__).resolve().parent / f'{name}_raw'
         self.revision, self.meta, self.default_equip, self.combos = revision, meta, default_equip, combos
         self.pal = np.array([[int(c[j:j + 2], 16) for j in (1, 3, 5)] + [0 if i == 0 else 255] for i, c in enumerate(self.palette)], np.uint8)

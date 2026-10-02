@@ -14,15 +14,17 @@ forehead band with trailing cloth. Moon: silver crescent pauldrons, lavender gau
 import math
 
 import cel_common as cc
+import generic_gear as gg
 from cel_common import V, unit, rig
 import make_assassin_sprites as old   # ../Valhalla/tools, read-only: the existing artwork's poses and palette
 
-SLOTS = {'armor': ('shadow', 'moon'), 'shoulders': ('shadow', 'moon'), 'gloves': ('shadow', 'moon'),
-         'head': ('shadow', 'moon'), 'weapon': ('daggers', 'moonfang')}
+SLOTS = {'armor': ('shadow', 'moon'), 'shoulders': ('shadow', 'moon', 'ironhide'), 'gloves': ('shadow', 'moon', 'duelist'),
+         'head': ('shadow', 'moon', 'ironhide'), 'weapon': ('daggers', 'moonfang'),
+         'pants': ('wayfarer',), 'necklace': ('moonstone',), 'accessory': ('amber',)}
 LEGACY = ['body', 'armor_shadow', 'armor_moon', 'weapon_daggers', 'weapon_moonfang']
 if cc.FEMALE:      # the woman's body and outfits are drawn here; her blades are the existing assassin_weapon_* atlases
     LEGACY = ['weapon_daggers', 'weapon_moonfang']
-MATS = dict(old.MATS)
+MATS = {**old.MATS, **gg.GEAR_MATS}
 PALETTE, COLOR = cc.palette_of(MATS)
 DEFAULT, CLIPS = old.DEFAULT, old.CLIPS
 GEAR = {
@@ -167,6 +169,7 @@ def render_frame(clip, facing, k):
                 ink.poly([H(*q) for q in [(-.8, 8.6), (0, 10.6), (.8, 8.6), (0, 7.4)]], COLOR['rune'][3], hd - 7.45, False)
             for sy in (-1, 1):
                 ink.plate([xf(q) for q in [(sy * .8, -6.2, 86), (sy * 4, -6.2, 86), (sy * 9 + sw * 1.6, -10.6, 74), (sy * 11 + sw * 2.2, -13.4, 54), (sy * 6 + sw * 2, -12.4, 58), (sy * 3.4 + sw * 1.4, -8.8, 74)]], 'ribbon', 2)
+    gg.draw(inks, R, xf, joints, head)
     flash = clip in ('hurt', 'die') and k == 0
     return {part: ink.resolve(flash) for part, ink in inks.items()}
 
@@ -174,15 +177,22 @@ def render_frame(clip, facing, k):
 NAKED = {slot: 'none' for slot in SLOTS}
 SHADOW = {'armor': 'shadow', 'shoulders': 'shadow', 'gloves': 'shadow', 'head': 'shadow', 'weapon': 'daggers'}
 MOON = {'armor': 'moon', 'shoulders': 'moon', 'gloves': 'moon', 'head': 'moon', 'weapon': 'moonfang'}
+GENERIC = {'armor': 'shadow', 'shoulders': 'ironhide', 'gloves': 'duelist', 'head': 'ironhide', 'pants': 'wayfarer',
+           'necklace': 'moonstone', 'accessory': 'amber', 'weapon': 'daggers'}
 SHEET = cc.Sheet(
     'assassin', files='assassin', pixel='assassin_cel_', mats=MATS, clips=CLIPS, slots=SLOTS, gear=GEAR, render=render_frame,
-    revision=cc.revision_of([open(__file__).read()]), legacy=LEGACY, legacy_files='assassin',
+    revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read()]), legacy=LEGACY, legacy_files='assassin',
+    # Explicit groups, so the class-independent layers are listed here (Sheet only adds them when it picks the groups itself).
     groups=({'shadow': ['body', 'armor_shadow', 'shoulders_shadow', 'gloves_shadow', 'head_shadow'],
-             'moon': ['ref_body', 'armor_moon', 'shoulders_moon', 'gloves_moon', 'head_moon']} if cc.FEMALE else
-            {'shadow': ['shoulders_shadow', 'gloves_shadow', 'head_shadow'], 'moon': ['shoulders_moon', 'gloves_moon', 'head_moon']}),
+             'moon': ['ref_body', 'armor_moon', 'shoulders_moon', 'gloves_moon', 'head_moon'],
+             'generic': ['ref_body', 'head_ironhide', 'shoulders_ironhide', 'gloves_duelist', 'pants_wayfarer'],
+             'trinkets': ['ref_body', 'necklace_moonstone', 'accessory_amber']} if cc.FEMALE else
+            {'shadow': ['shoulders_shadow', 'gloves_shadow', 'head_shadow'], 'moon': ['shoulders_moon', 'gloves_moon', 'head_moon'],
+             'generic': ['head_ironhide', 'shoulders_ironhide', 'gloves_duelist', 'pants_wayfarer'],
+             'trinkets': ['necklace_moonstone', 'accessory_amber']}),
     default_equip={'armor': 'shadow', 'shoulders': 'none', 'gloves': 'none', 'head': 'none', 'weapon': 'daggers'},
     meta={'attack': {'duration': .4, 'impact': .2}, 'portrait': [57, 15, 46, 46]},
-    combos=[('naked', NAKED), ('shadow', SHADOW), ('moon', MOON)])
+    combos=[('naked', NAKED), ('shadow', SHADOW), ('moon', MOON), ('generic', GENERIC)])
 
 if __name__ == '__main__':
     SHEET.cli()

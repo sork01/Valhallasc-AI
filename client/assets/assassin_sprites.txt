@@ -57,6 +57,10 @@
       "png": "assassin_armor_moon.png",
       "depth": "assassin_armor_moon_depth.png"
     },
+    "pants_wayfarer": {
+      "png": "assassin_pants_wayfarer.png",
+      "depth": "assassin_pants_wayfarer_depth.png"
+    },
     "shoulders_shadow": {
       "png": "assassin_shoulders_shadow.png",
       "depth": "assassin_shoulders_shadow_depth.png"
@@ -64,6 +68,10 @@
     "shoulders_moon": {
       "png": "assassin_shoulders_moon.png",
       "depth": "assassin_shoulders_moon_depth.png"
+    },
+    "shoulders_ironhide": {
+      "png": "assassin_shoulders_ironhide.png",
+      "depth": "assassin_shoulders_ironhide_depth.png"
     },
     "gloves_shadow": {
       "png": "assassin_gloves_shadow.png",
@@ -73,6 +81,10 @@
       "png": "assassin_gloves_moon.png",
       "depth": "assassin_gloves_moon_depth.png"
     },
+    "gloves_duelist": {
+      "png": "assassin_gloves_duelist.png",
+      "depth": "assassin_gloves_duelist_depth.png"
+    },
     "head_shadow": {
       "png": "assassin_head_shadow.png",
       "depth": "assassin_head_shadow_depth.png"
@@ -80,6 +92,18 @@
     "head_moon": {
       "png": "assassin_head_moon.png",
       "depth": "assassin_head_moon_depth.png"
+    },
+    "head_ironhide": {
+      "png": "assassin_head_ironhide.png",
+      "depth": "assassin_head_ironhide_depth.png"
+    },
+    "necklace_moonstone": {
+      "png": "assassin_necklace_moonstone.png",
+      "depth": "assassin_necklace_moonstone_depth.png"
+    },
+    "accessory_amber": {
+      "png": "assassin_accessory_amber.png",
+      "depth": "assassin_accessory_amber_depth.png"
     },
     "weapon_daggers": {
       "png": "assassin_weapon_daggers.png",
@@ -90,6 +114,7 @@
       "depth": "assassin_weapon_moonfang_depth.png"
     }
   },
+  "gender": "male",
   "equipment": {
     "armor": {
       "none": {
@@ -117,6 +142,10 @@
       "moon": {
         "name": "Moonveil Crescents",
         "defense": 2
+      },
+      "ironhide": {
+        "name": "Ironhide Pauldrons",
+        "defense": 2
       }
     },
     "gloves": {
@@ -131,6 +160,10 @@
       "moon": {
         "name": "Moonveil Gauntlets",
         "defense": 2
+      },
+      "duelist": {
+        "name": "Duelist Gloves",
+        "defense": 1
       }
     },
     "head": {
@@ -144,6 +177,10 @@
       },
       "moon": {
         "name": "Moonveil Circlet",
+        "defense": 2
+      },
+      "ironhide": {
+        "name": "Ironhide Helm",
         "defense": 2
       }
     },
@@ -160,6 +197,36 @@
         "name": "Moonfang blades",
         "attack": 8
       }
+    },
+    "pants": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "wayfarer": {
+        "name": "Wayfarer Pants",
+        "defense": 2
+      }
+    },
+    "necklace": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "moonstone": {
+        "name": "Moonstone Necklace",
+        "defense": 0
+      }
+    },
+    "accessory": {
+      "none": {
+        "name": "Nothing",
+        "defense": 0
+      },
+      "amber": {
+        "name": "Amber Ring",
+        "defense": 0
+      }
     }
   },
   "defaultEquipment": {
@@ -170,86 +237,166 @@
     "weapon": "daggers"
   },
   "sprites": {
-    "assassin_cel_idle_s_shadow": "48e603ddd2780c3c",
-    "assassin_cel_idle_s_moon": "93787bf96a02de1e",
-    "assassin_cel_idle_sw_shadow": "28534fd097b90c55",
-    "assassin_cel_idle_sw_moon": "ccd527b8b1101aad",
-    "assassin_cel_idle_w_shadow": "bb4291e4c13ab99a",
-    "assassin_cel_idle_w_moon": "e5347c36e8cb441c",
-    "assassin_cel_idle_nw_shadow": "e84c278bf49d118d",
-    "assassin_cel_idle_nw_moon": "50c27451173a4063",
-    "assassin_cel_idle_n_shadow": "97e89865c17a7b2e",
-    "assassin_cel_idle_n_moon": "acf821c488bd1e7e",
-    "assassin_cel_idle_ne_shadow": "c1e0668c383fe5b0",
-    "assassin_cel_idle_ne_moon": "7f9357ca9650b12b",
-    "assassin_cel_idle_e_shadow": "997364fc5cddf834",
-    "assassin_cel_idle_e_moon": "265505f53536b66f",
-    "assassin_cel_idle_se_shadow": "4067b22e14bdc670",
-    "assassin_cel_idle_se_moon": "1e08f89c9dcd0e98",
-    "assassin_cel_walk_s_shadow": "1da427198f30471e",
-    "assassin_cel_walk_s_moon": "47a28525f410f0f4",
-    "assassin_cel_walk_sw_shadow": "9c01a28f63d55a09",
-    "assassin_cel_walk_sw_moon": "c024e84d6fe95df9",
-    "assassin_cel_walk_w_shadow": "d64552549e98f934",
-    "assassin_cel_walk_w_moon": "d4ade2eedb9cc7e1",
-    "assassin_cel_walk_nw_shadow": "88ccdf0fc7594e67",
-    "assassin_cel_walk_nw_moon": "b68fb6aed00bf012",
-    "assassin_cel_walk_n_shadow": "b596a3f9305f6319",
-    "assassin_cel_walk_n_moon": "5104d17941918c20",
-    "assassin_cel_walk_ne_shadow": "334c0ade0006b4c2",
-    "assassin_cel_walk_ne_moon": "b9977e6d38453315",
-    "assassin_cel_walk_e_shadow": "880002d9c0168137",
-    "assassin_cel_walk_e_moon": "3898d4f2eceed2dd",
-    "assassin_cel_walk_se_shadow": "2160e6a70a93106a",
-    "assassin_cel_walk_se_moon": "c5d84458d9ad57ef",
-    "assassin_cel_attack_s_shadow": "bb3480baba6c7ea4",
-    "assassin_cel_attack_s_moon": "837a6bd6f0e34fcd",
-    "assassin_cel_attack_sw_shadow": "6a85bfb5bbee065c",
-    "assassin_cel_attack_sw_moon": "2839879fa3200f46",
-    "assassin_cel_attack_w_shadow": "b9f58f64d924656a",
-    "assassin_cel_attack_w_moon": "4ee4b7bf640006a4",
-    "assassin_cel_attack_nw_shadow": "58551f6c2fba8366",
-    "assassin_cel_attack_nw_moon": "7ef4bce20224cafc",
-    "assassin_cel_attack_n_shadow": "ae550a2595debe54",
-    "assassin_cel_attack_n_moon": "256a3bb8ca47ec47",
-    "assassin_cel_attack_ne_shadow": "cf71a4cf0efabfcb",
-    "assassin_cel_attack_ne_moon": "dad4b4f4d870e337",
-    "assassin_cel_attack_e_shadow": "d1f94b997f739199",
-    "assassin_cel_attack_e_moon": "365341159da61c42",
-    "assassin_cel_attack_se_shadow": "c109c7a453c63282",
-    "assassin_cel_attack_se_moon": "66b77902d835bf9d",
-    "assassin_cel_hurt_s_shadow": "4caa50093091773a",
-    "assassin_cel_hurt_s_moon": "e81c832ce7ff4a27",
-    "assassin_cel_hurt_sw_shadow": "afdf07ba00dbf16a",
-    "assassin_cel_hurt_sw_moon": "656a96ff20db544a",
-    "assassin_cel_hurt_w_shadow": "7de26887556aecab",
-    "assassin_cel_hurt_w_moon": "ecbf17e6b67d3b62",
-    "assassin_cel_hurt_nw_shadow": "52eac8411e8c4a5f",
-    "assassin_cel_hurt_nw_moon": "bfd24e778dafd36c",
-    "assassin_cel_hurt_n_shadow": "2350cbd49a273a67",
-    "assassin_cel_hurt_n_moon": "cf09c0cfb212026c",
-    "assassin_cel_hurt_ne_shadow": "8834aa5f0184a93d",
-    "assassin_cel_hurt_ne_moon": "939081173cd5732d",
-    "assassin_cel_hurt_e_shadow": "287f1ba5ac26de88",
-    "assassin_cel_hurt_e_moon": "987fd51aebbdc733",
-    "assassin_cel_hurt_se_shadow": "8e6cd94ef3f3350b",
-    "assassin_cel_hurt_se_moon": "86b1ae298fda875c",
-    "assassin_cel_die_s_shadow": "cd3e7ad4ef403ec4",
-    "assassin_cel_die_s_moon": "def42944b606488a",
-    "assassin_cel_die_sw_shadow": "3fda36f9923147ae",
-    "assassin_cel_die_sw_moon": "5578308941d25ef4",
-    "assassin_cel_die_w_shadow": "baef938ec7faf271",
-    "assassin_cel_die_w_moon": "bfc5b7d9d485633b",
-    "assassin_cel_die_nw_shadow": "1054394a9d09337e",
-    "assassin_cel_die_nw_moon": "488f3a9061086eb9",
-    "assassin_cel_die_n_shadow": "4967bb4be7b83d84",
-    "assassin_cel_die_n_moon": "3b5a40b9fdeec2c3",
-    "assassin_cel_die_ne_shadow": "ab35f786d46a104a",
-    "assassin_cel_die_ne_moon": "93d7c84f47d18461",
-    "assassin_cel_die_e_shadow": "f52fe39caa36dd2c",
-    "assassin_cel_die_e_moon": "518d6b4e35712084",
-    "assassin_cel_die_se_shadow": "ecb029a379ef557d",
-    "assassin_cel_die_se_moon": "d527e7bf36ed4f1d"
+    "assassin_cel_idle_s_shadow": "0c5f0b85f82e4b36",
+    "assassin_cel_idle_s_moon": "5875989d99ed6760",
+    "assassin_cel_idle_s_generic": "28a34a493aa3fdab",
+    "assassin_cel_idle_s_trinkets": "fd2f5e246b0a6802",
+    "assassin_cel_idle_sw_shadow": "68bdea75c7626b4a",
+    "assassin_cel_idle_sw_moon": "89ca31386e69cbbc",
+    "assassin_cel_idle_sw_generic": "f9df14139e554350",
+    "assassin_cel_idle_sw_trinkets": "7628062c08ed2712",
+    "assassin_cel_idle_w_shadow": "52d553e6cc1d6565",
+    "assassin_cel_idle_w_moon": "ec47ef0c04d8336b",
+    "assassin_cel_idle_w_generic": "73249cbd8892331a",
+    "assassin_cel_idle_w_trinkets": "17b8bd1093c2a4ff",
+    "assassin_cel_idle_nw_shadow": "3891e33d5f2b86aa",
+    "assassin_cel_idle_nw_moon": "3b59c41aca2580c1",
+    "assassin_cel_idle_nw_generic": "0dfabbd82e12a03e",
+    "assassin_cel_idle_nw_trinkets": "c7acf8530229b474",
+    "assassin_cel_idle_n_shadow": "af2980738babfcc0",
+    "assassin_cel_idle_n_moon": "2842fd09588d0520",
+    "assassin_cel_idle_n_generic": "f726c7be2b1d6a1a",
+    "assassin_cel_idle_n_trinkets": "cd192e69ab5758fb",
+    "assassin_cel_idle_ne_shadow": "eba2c3326f3ddf2a",
+    "assassin_cel_idle_ne_moon": "c984ef1bc9729eb0",
+    "assassin_cel_idle_ne_generic": "e86d02ecbfaebdcb",
+    "assassin_cel_idle_ne_trinkets": "cff9fb5b69088cdd",
+    "assassin_cel_idle_e_shadow": "ed2d011d98ac3859",
+    "assassin_cel_idle_e_moon": "ae1dc00cf286fce9",
+    "assassin_cel_idle_e_generic": "7207e54aa153df2c",
+    "assassin_cel_idle_e_trinkets": "671e372b7febf352",
+    "assassin_cel_idle_se_shadow": "37ef2dd8ab64a351",
+    "assassin_cel_idle_se_moon": "eef14fa4a0a9ad03",
+    "assassin_cel_idle_se_generic": "17de942f8d763618",
+    "assassin_cel_idle_se_trinkets": "ee2c8340bbf75693",
+    "assassin_cel_walk_s_shadow": "e85b058586ecbfb7",
+    "assassin_cel_walk_s_moon": "1d22a86d92232b5a",
+    "assassin_cel_walk_s_generic": "a9cbf9a1820c89c9",
+    "assassin_cel_walk_s_trinkets": "72805d2c5de960cd",
+    "assassin_cel_walk_sw_shadow": "84fd35283a85b90b",
+    "assassin_cel_walk_sw_moon": "835b7dfad9ed396a",
+    "assassin_cel_walk_sw_generic": "18e66f1dd4aac0f0",
+    "assassin_cel_walk_sw_trinkets": "e7284dfb5b662740",
+    "assassin_cel_walk_w_shadow": "2784c5753f405d3d",
+    "assassin_cel_walk_w_moon": "7f70233aa867c312",
+    "assassin_cel_walk_w_generic": "b1f51bc371e67005",
+    "assassin_cel_walk_w_trinkets": "8f1263d6db5dc677",
+    "assassin_cel_walk_nw_shadow": "3c068a203a6e9fbf",
+    "assassin_cel_walk_nw_moon": "e7c67d5f16290f4d",
+    "assassin_cel_walk_nw_generic": "c3014858a28942aa",
+    "assassin_cel_walk_nw_trinkets": "0dbf61f59ba2c69e",
+    "assassin_cel_walk_n_shadow": "14efc83a19d67e1d",
+    "assassin_cel_walk_n_moon": "181c5149b06ee286",
+    "assassin_cel_walk_n_generic": "90a5acd2c221881c",
+    "assassin_cel_walk_n_trinkets": "b9aaa781b81d2d57",
+    "assassin_cel_walk_ne_shadow": "ec0f303fb5f6704c",
+    "assassin_cel_walk_ne_moon": "075b29b2b100e26b",
+    "assassin_cel_walk_ne_generic": "ddaa309361d294b4",
+    "assassin_cel_walk_ne_trinkets": "f9b5a08997198402",
+    "assassin_cel_walk_e_shadow": "842b43ee6ce85af6",
+    "assassin_cel_walk_e_moon": "f1238654a5c8db84",
+    "assassin_cel_walk_e_generic": "7e08557e476de4c5",
+    "assassin_cel_walk_e_trinkets": "f97da6a8f16d3fc5",
+    "assassin_cel_walk_se_shadow": "2c220f94b5df6f7d",
+    "assassin_cel_walk_se_moon": "d1c3f0401f63df82",
+    "assassin_cel_walk_se_generic": "1a0ae6d162a71f24",
+    "assassin_cel_walk_se_trinkets": "9507146250c72015",
+    "assassin_cel_attack_s_shadow": "b0ddf0f0ceebaf09",
+    "assassin_cel_attack_s_moon": "1d3d1b9941214e5e",
+    "assassin_cel_attack_s_generic": "4dec0148845bff46",
+    "assassin_cel_attack_s_trinkets": "8fa3ec074a04f73a",
+    "assassin_cel_attack_sw_shadow": "f7c399ef087a20c7",
+    "assassin_cel_attack_sw_moon": "9ab8554168a79b7a",
+    "assassin_cel_attack_sw_generic": "dc376b60bf9d238d",
+    "assassin_cel_attack_sw_trinkets": "1e112c6d3f5ced24",
+    "assassin_cel_attack_w_shadow": "6d7edfae4b2c2a79",
+    "assassin_cel_attack_w_moon": "89053f85743a51ef",
+    "assassin_cel_attack_w_generic": "0134ee482429d579",
+    "assassin_cel_attack_w_trinkets": "973e3e0dc2183dda",
+    "assassin_cel_attack_nw_shadow": "151893f834a3a9d5",
+    "assassin_cel_attack_nw_moon": "8c1d525777b7d97f",
+    "assassin_cel_attack_nw_generic": "1ceab611874aca30",
+    "assassin_cel_attack_nw_trinkets": "4f70efa744372db1",
+    "assassin_cel_attack_n_shadow": "504416cbb12a81be",
+    "assassin_cel_attack_n_moon": "7e0f7d999ad74d76",
+    "assassin_cel_attack_n_generic": "e8692b35b1a85f3b",
+    "assassin_cel_attack_n_trinkets": "fe3cc62f4813188a",
+    "assassin_cel_attack_ne_shadow": "0001a635cd93c143",
+    "assassin_cel_attack_ne_moon": "557bc813d3cc316b",
+    "assassin_cel_attack_ne_generic": "bda7039f7a050310",
+    "assassin_cel_attack_ne_trinkets": "11b710397ad86a71",
+    "assassin_cel_attack_e_shadow": "78edaa1998607d15",
+    "assassin_cel_attack_e_moon": "1d17a23944348228",
+    "assassin_cel_attack_e_generic": "7ede7b9234bbd189",
+    "assassin_cel_attack_e_trinkets": "48e960b862441626",
+    "assassin_cel_attack_se_shadow": "9d6db445c595e70e",
+    "assassin_cel_attack_se_moon": "4b7ed30d8db2dfda",
+    "assassin_cel_attack_se_generic": "1926af8d0208f7ee",
+    "assassin_cel_attack_se_trinkets": "78a31c5545e241aa",
+    "assassin_cel_hurt_s_shadow": "40ba292779a57276",
+    "assassin_cel_hurt_s_moon": "118aabc00a32db78",
+    "assassin_cel_hurt_s_generic": "03aa82f4707d9e56",
+    "assassin_cel_hurt_s_trinkets": "2e130fe5f4592e42",
+    "assassin_cel_hurt_sw_shadow": "18a169a6dbbd2367",
+    "assassin_cel_hurt_sw_moon": "e3b06d1f466e8d9e",
+    "assassin_cel_hurt_sw_generic": "50323505e52cdb22",
+    "assassin_cel_hurt_sw_trinkets": "74f545cb164ef4d9",
+    "assassin_cel_hurt_w_shadow": "944d825edd7cd766",
+    "assassin_cel_hurt_w_moon": "aebb0b5773b37a51",
+    "assassin_cel_hurt_w_generic": "54422542f4383ed6",
+    "assassin_cel_hurt_w_trinkets": "5cd34b3d2087f6de",
+    "assassin_cel_hurt_nw_shadow": "264935fa847eef23",
+    "assassin_cel_hurt_nw_moon": "95367eafa786d49d",
+    "assassin_cel_hurt_nw_generic": "1a00ffe46fe30596",
+    "assassin_cel_hurt_nw_trinkets": "952af36fd8622846",
+    "assassin_cel_hurt_n_shadow": "2787fd7d5c7d6f47",
+    "assassin_cel_hurt_n_moon": "5f7b4f77a28dd13e",
+    "assassin_cel_hurt_n_generic": "e46e8b33582cf398",
+    "assassin_cel_hurt_n_trinkets": "e80fab61474c9a88",
+    "assassin_cel_hurt_ne_shadow": "08d1906b007309bd",
+    "assassin_cel_hurt_ne_moon": "270b59aeeb5f33df",
+    "assassin_cel_hurt_ne_generic": "cf618f717164d147",
+    "assassin_cel_hurt_ne_trinkets": "74c76ee732732d1e",
+    "assassin_cel_hurt_e_shadow": "060fc9384286ffba",
+    "assassin_cel_hurt_e_moon": "43fcdf1f3f4f9d45",
+    "assassin_cel_hurt_e_generic": "33ad15608e2088a3",
+    "assassin_cel_hurt_e_trinkets": "db294302d647ae7d",
+    "assassin_cel_hurt_se_shadow": "ebef30cc61881415",
+    "assassin_cel_hurt_se_moon": "a7ab92818bfc167a",
+    "assassin_cel_hurt_se_generic": "06299a2b6c7e100a",
+    "assassin_cel_hurt_se_trinkets": "aa4d2d4fa907f593",
+    "assassin_cel_die_s_shadow": "526b039ee4e0809e",
+    "assassin_cel_die_s_moon": "8188881b0c0943b1",
+    "assassin_cel_die_s_generic": "f6acf657debf3a6d",
+    "assassin_cel_die_s_trinkets": "50ee774caabe2559",
+    "assassin_cel_die_sw_shadow": "ac359db212f7da05",
+    "assassin_cel_die_sw_moon": "776b204f566a3d00",
+    "assassin_cel_die_sw_generic": "66ccf510907f016a",
+    "assassin_cel_die_sw_trinkets": "88736119a4675481",
+    "assassin_cel_die_w_shadow": "4691417397ae0e37",
+    "assassin_cel_die_w_moon": "1dcfe5b028fdbfa1",
+    "assassin_cel_die_w_generic": "a203daaab9afe13a",
+    "assassin_cel_die_w_trinkets": "d4b85f28d279eb0c",
+    "assassin_cel_die_nw_shadow": "ed8a9a64cb518c17",
+    "assassin_cel_die_nw_moon": "d5547e9a3a718424",
+    "assassin_cel_die_nw_generic": "95102896fdda4105",
+    "assassin_cel_die_nw_trinkets": "9b7e64871e498081",
+    "assassin_cel_die_n_shadow": "b3051d8319d17f91",
+    "assassin_cel_die_n_moon": "68c8cc5de492531d",
+    "assassin_cel_die_n_generic": "375d7fe1cc0ebf6a",
+    "assassin_cel_die_n_trinkets": "1e66d0496091f6d1",
+    "assassin_cel_die_ne_shadow": "3dab3db72d31e246",
+    "assassin_cel_die_ne_moon": "3ed611cdc1f03737",
+    "assassin_cel_die_ne_generic": "19454ec1bdcef239",
+    "assassin_cel_die_ne_trinkets": "606fd41c0672f066",
+    "assassin_cel_die_e_shadow": "989ae51d5fb223f9",
+    "assassin_cel_die_e_moon": "df048e2ccee5dc79",
+    "assassin_cel_die_e_generic": "b7075c54a385744f",
+    "assassin_cel_die_e_trinkets": "e578fee1935fac26",
+    "assassin_cel_die_se_shadow": "5e25862bbbc8adfd",
+    "assassin_cel_die_se_moon": "2cddce0ab252bd51",
+    "assassin_cel_die_se_generic": "ac0f667d4c589df6",
+    "assassin_cel_die_se_trinkets": "442bb513d3b94556"
   },
   "ramps": {
     "skin": [
@@ -341,6 +488,54 @@
       "#86506a",
       "#c88493",
       "#e9a4ab"
+    ],
+    "ironhide": [
+      "#3b2511",
+      "#6f4721",
+      "#a97530",
+      "#dda961"
+    ],
+    "ironsteel": [
+      "#3b4759",
+      "#6b7b93",
+      "#afbed4",
+      "#eff5fe"
+    ],
+    "ironbrass": [
+      "#6f4b13",
+      "#b1811f",
+      "#e9b941",
+      "#fff1a1"
+    ],
+    "dueltan": [
+      "#3c2a1f",
+      "#5d4030",
+      "#876148",
+      "#b98d6a"
+    ],
+    "duelcream": [
+      "#8d7d66",
+      "#c7b79b",
+      "#ebdfc3",
+      "#fffaea"
+    ],
+    "wayfarer": [
+      "#3a2a1e",
+      "#5c4330",
+      "#84634a",
+      "#ad8a69"
+    ],
+    "moonstone": [
+      "#5b5b83",
+      "#9b9bc5",
+      "#d5d5f3",
+      "#fdfdfe"
+    ],
+    "amberstone": [
+      "#6b2b09",
+      "#b9591b",
+      "#f19b2d",
+      "#ffe181"
     ]
   },
   "depth": {
@@ -351,7 +546,7 @@
   },
   "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
   "style": "2D Korean RPG anime cel illustration",
-  "editing": "Three PixelFlow sprites per clip and facing (assassin_cel_<clip>_<facing>_shadow|moon). ref_body layers are read-only context. build --replace discards edits.",
+  "editing": "Three PixelFlow sprites per clip and facing (assassin_cel_<clip>_<facing>_shadow|moon|generic|trinkets). ref_body layers are read-only context. build --replace discards edits.",
   "attack": {
     "duration": 0.4,
     "impact": 0.2
