@@ -43,36 +43,37 @@ DIRS = rig.DIRS
 PARTS = ['body', 'armor_pilgrim', 'armor_dawn', 'weapon_mace', 'weapon_sunmace']
 MATS = {
     'skin': ['#92595c', '#ce9182', '#f0bfac', '#ffe0ce'],
-    'hair': ['#151a30', '#293451', '#465278', '#7985ac'],
-    'brow': ['#171526', '#242037', '#332946', '#443750'],
+    'hair': ['#8a6a3a', '#c9a45c', '#ecd290', '#fff4c8'],      # long pale-gold hair (the client recolours by ramp)
+    'brow': ['#6a4c28', '#7e5e34', '#a98650', '#c0985a'],
     'cloth': ['#4a4048', '#76686f', '#a99a9c', '#d8c9c0'],
     'pants': ['#2a2a40', '#43476a', '#68729a', '#97a2c4'],
-    'robe': ['#7a7490', '#aaa3bf', '#dcd6e8', '#fffaf4'],       # ivory robe, lavender in shadow
-    'dawn': ['#a08a8e', '#d4bdb4', '#fbeadb', '#fffefc'],      # warm white vestments
+    'robe': ['#8c7a6e', '#c4b09c', '#ebdcc2', '#fff8e6'],       # warm ivory robe, parchment in shadow
+    'dawn': ['#7f90ae', '#bccbe2', '#eef3fb', '#fdfeff'],      # cool white vestments, blue in shadow
     'gold': ['#6e4a12', '#b0801f', '#e8b840', '#fff0a0'],
-    'stole': ['#4a2a6e', '#7a4aa6', '#b585d8', '#e6c4ff'],     # violet stole, the Assassin's scarf recoloured
+    'stole': ['#5a1424', '#8f2438', '#c8465a', '#f28a94'],     # crimson tabard and tassel
     'leather': ['#2a2030', '#463a50', '#6a5a70', '#98889e'],
     'wood': ['#3a2420', '#6e4336', '#a77a56', '#d6ae82'],
     'silver': ['#3a516d', '#7791b0', '#bdcfe5', '#f2f5ff'],
     'glow': ['#d79a1a', '#ffc94a', '#ffe99a', '#fffbe0'],
-    'iris': ['#6a4a1c', '#a7762c', '#e0b050', '#fff0b0'],
+    'iris': ['#2a5a8c', '#4a8cc4', '#8cc8f0', '#d8f2ff'],
     'white': ['#c0aec4', '#ded2e2', '#f6eef1', '#fffbf6'],
     'mouth': ['#5c2d45', '#86506a', '#c88493', '#e9a4ab'],
 }
 PALETTE = ['#00000000', '#18182a', '#ffffff'] + [c for r in MATS.values() for c in r]
 assert len(PALETTE) == len(set(PALETTE)) and len(PALETTE) <= 255
 COLOR = {name: [3 + 4 * i + k for k in range(4)] for i, name in enumerate(MATS)}
-DEFAULT = dict(root=(0, 0, 0), lean=4, twist=0, roll=0, sway=0, eyes='open',
-               handL=(-13, 6, 50), handR=(13, 3, 48),
+DEFAULT = dict(root=(0, 0, 0), lean=1, twist=0, roll=0, sway=0, eyes='open', light=1.0,
+               handL=(-9, 12, 58), handR=(12, 7, 46),
                footL=(-5, 0, 4), footR=(5, 0, 4),
-               mace=(.1, .3, 1), ground=False, dropped=False)
+               mace=(0, .06, 1), ground=False, dropped=False)
 HIP, SHOULDER = 37, 66
 
 
 def idle(k):
+    # Upright and calm: the mace held like a sceptre, the free palm raised with a small holy light that pulses.
     a = k / 6 * math.tau
-    return dict(root=(0, 0, -.35 * math.sin(a)), sway=math.sin(a),
-                handL=(-13, 6, 50 + .5 * math.sin(a)), eyes='closed' if k == 4 else 'open')
+    return dict(root=(0, 0, -.3 * math.sin(a)), sway=math.sin(a), light=.85 + .3 * math.sin(a),
+                handL=(-9, 12, 58 + .8 * math.sin(a)), eyes='closed' if k == 4 else 'open')
 
 
 def walk(k):
@@ -80,37 +81,38 @@ def walk(k):
     a = q * math.tau
     def foot(s, t):
         t %= 1
-        return (s * 5, 9 - t * 36 if t < .5 else -9 + (t - .5) * 36,
-                4 + (6 * math.sin((t - .5) * math.tau) if t >= .5 else 0))
-    return dict(lean=15, roll=2 * math.sin(a), twist=5 * math.sin(a),
-                root=(0, 0, -.65 * math.cos(a * 2)), sway=3 * math.sin(a),
-                handL=(-14, -4 - math.sin(a) * 3, 53), handR=(14, -5 + math.sin(a) * 3, 52),
-                mace=(.1, .3 - .25 * math.sin(a), 1),
+        return (s * 4, 8 - t * 32 if t < .5 else -8 + (t - .5) * 32,
+                4 + (5 * math.sin((t - .5) * math.tau) if t >= .5 else 0))
+    return dict(lean=5, roll=1.5 * math.sin(a), twist=3 * math.sin(a),
+                root=(0, 0, -.5 * math.cos(a * 2)), sway=3.5 * math.sin(a), light=1 + .2 * math.sin(a * 2),
+                handL=(-10, 10 - math.sin(a) * 2, 56), handR=(12, 7 + math.sin(a) * 2, 46),
+                mace=(0, .08 + .08 * math.sin(a), 1),
                 footL=foot(-1, q), footR=foot(1, q + .5))
 
 
 def attack(k):
-    # Raise the mace, bring it down in front on frame 4 (the impact), the free hand blessing forward.
-    lean = [6, -4, -8, 8, 20, 17, 10, 5][k]
-    twist = [-4, -16, -26, -4, 22, 26, 10, 0][k]
-    right = [(13, 3, 48), (15, -6, 64), (16, -10, 74), (12, 12, 68), (9, 24, 52), (9, 22, 42), (11, 13, 44), (13, 3, 48)][k]
-    mace = [(.1, .3, 1), (.1, -.3, 1), (.1, -.8, .8), (.05, .5, .85), (0, 1, -.1), (0, .85, -.55), (.1, .5, .5), (.1, .3, 1)][k]
-    left = [(-13, 6, 50), (-12, 12, 62), (-10, 18, 70), (-8, 20, 66), (-8, 22, 60), (-10, 16, 54), (-12, 9, 51), (-13, 6, 50)][k]
+    # The light gathers on the free hand while the mace goes up, then the mace comes down and the light is thrown forward.
+    lean = [2, -4, -8, 6, 18, 15, 8, 3][k]
+    twist = [-2, -14, -24, -4, 20, 24, 10, 0][k]
+    right = [(12, 7, 46), (15, -2, 62), (16, -8, 74), (12, 12, 68), (9, 24, 52), (9, 22, 42), (11, 13, 44), (12, 7, 46)][k]
+    mace = [(0, .06, 1), (.1, -.3, 1), (.1, -.8, .8), (.05, .5, .85), (0, 1, -.1), (0, .85, -.55), (.1, .5, .5), (0, .06, 1)][k]
+    left = [(-9, 12, 58), (-10, 13, 64), (-9, 15, 70), (-7, 20, 66), (-6, 26, 58), (-8, 20, 54), (-9, 14, 56), (-9, 12, 58)][k]
+    light = [1, 1.5, 2, 1.3, .6, 0, 0, .6][k]
     f = [0, -.3, -.5, .5, 1, .65, .25, 0][k]
-    return dict(lean=lean, twist=twist, root=(0, max(0, f) * 2, -.6),
+    return dict(lean=lean, twist=twist, root=(0, max(0, f) * 2, -.6), light=light,
                 handL=left, handR=right, mace=mace, sway=-3 * f,
                 footL=(-6, 4 * max(0, f), 4), footR=(6, -5 * max(0, f), 4))
 
 
 def hurt(k):
     f = [.25, 1, .4, 0][k]
-    return dict(lean=-14 * f, root=(0, -2 * f, 0), twist=9 * f,
-                handL=(-16, 5, 55), handR=(15, 5, 52), eyes='closed' if k < 3 else 'open', sway=-2 * f)
+    return dict(lean=-12 * f, root=(0, -2 * f, 0), twist=8 * f, light=0 if k in (1, 2) else .5,
+                handL=(-15, 5, 55), handR=(15, 5, 52), eyes='closed' if k < 3 else 'open', sway=-2 * f)
 
 
 def die(k):
     return dict(lean=[-5, -23, -43, -66, -85, -90, -90, -90][k],
-                root=(0, 8 if k >= 3 else 0, 0), eyes='closed',
+                root=(0, 8 if k >= 3 else 0, 0), eyes='closed', light=0,
                 handL=(-17, 1, 50), handR=(17, 1, 49),
                 footL=(-5, 9 if k >= 3 else 0, 10 if k >= 3 else 4),
                 footR=(5, 9 if k >= 3 else 0, 10 if k >= 3 else 4),
@@ -166,10 +168,10 @@ class Ink:
         cur[take] = dep[take]
         self.index[y0:y1, x0:x1][take] = idx[take]
 
-    def plate(self, points, mat, tone=2, detail=False):
+    def plate(self, points, mat, tone=2, detail=False, push=0):
         proj = [self.project(p) for p in points]
         xy = [p[0] for p in proj]
-        self.poly(xy, COLOR[mat][tone], np.mean([p[1] for p in proj]) - .01, not detail)
+        self.poly(xy, COLOR[mat][tone], np.mean([p[1] for p in proj]) - .01 + push, not detail)
 
     def bone(self, a, b, r1, r2, mat, zpush=0, tone=2):
         pa, za = self.project(a)
@@ -204,7 +206,7 @@ def render_frame(clip, facing, k):
     joints = {}
     for sx, key in ((-1, 'L'), (1, 'R')):
         s = V(sx * 8, 0, SHOULDER)
-        elbow, hand = rig.ik2(s, V(*p['hand' + key]), 13.5, 13.5, unit(V(sx, -.2, -.3)))
+        elbow, hand = rig.ik2(s, V(*p['hand' + key]), 13.5, 13.5, unit(V(sx * .3, -.45, -1)))
         hip = xf((sx * 4.2, 0, HIP))
         knee, ankle = rig.ik2(hip, V(*p['foot' + key]), 17, 17, unit(V(sx * .1, 1, .1)))
         joints[key] = {'shoulder': xf(s), 'elbow': xf(elbow), 'hand': xf(hand),
@@ -219,15 +221,15 @@ def render_frame(clip, facing, k):
     inks = {part: Ink(psi) for part in PARTS}
     body = inks['body']
 
-    def torso(ink, mat, halfwidth, y, bottom=38, top=67):
+    def torso(ink, mat, halfwidth, y, bottom=38, top=67, push=0):
         for sy in (-1, 1):
             pts = [(-halfwidth, sy * y, top), (halfwidth, sy * y, top),
                    (halfwidth * .72, sy * y, 49), (halfwidth * .84, sy * y, bottom),
                    (-halfwidth * .84, sy * y, bottom), (-halfwidth * .72, sy * y, 49)]
-            ink.plate([xf(q) for q in pts], mat, 2 if sy == 1 else 1)
+            ink.plate([xf(q) for q in pts], mat, 2 if sy == 1 else 1, push=push)
         for sx in (-1, 1):
             ink.plate([xf(q) for q in [(sx * halfwidth, -y, top), (sx * halfwidth, y, top),
-                      (sx * halfwidth * .84, y, bottom), (sx * halfwidth * .84, -y, bottom)]], mat, 1)
+                      (sx * halfwidth * .84, y, bottom), (sx * halfwidth * .84, -y, bottom)]], mat, 1, push=push)
 
     torso(body, 'cloth', 7.8, 3.5)
     body.bone(xf((0, 0, 68)), xf((0, 0, 77)), 2.2, 2.1, 'skin')
@@ -240,62 +242,95 @@ def render_frame(clip, facing, k):
         body.bone(j['elbow'], j['hand'], 2, 1.6, 'skin')
         body.bone(j['hand'] - R @ V(0, 0, 1), j['hand'] + R @ V(0, 0, 1.8), 2.2, 1.8, 'skin', -.2)
 
-    # Face and hair are the Assassin's: oriented to the head's projected axis, almond eyes, angular fringe.
+    # The holy light in the free palm: a four-point star that pulses in idle and gathers before an attack.
+    if p['light'] > .05:
+        lc, ld = body.project(joints['L']['hand'] + V(0, 0, 6.5))
+        for r, inner, tone, outline, push in ((4.6, .34, 1, True, 6), (3.4, .38, 2, False, 6.2), (1.7, .55, 3, False, 6.4)):
+            r *= p['light']
+            star = [lc + V(math.sin(i * math.pi / 4), math.cos(i * math.pi / 4)) * r * (1 if i % 2 == 0 else inner * 1.6) for i in range(8)]
+            body.poly(star, COLOR['glow'][tone], ld - push, outline)
+
+    # A soft round face with big sky-blue eyes, a centre-parted fringe, long pale-gold hair and a gold sun circlet.
     hc, hd = body.project(xf((0, 0, 87)))
     up = unit(body.project(xf((0, 0, 96)))[0] - hc)
     right = V(-up[1], up[0])
     H = lambda x, y: hc + right * x + up * y
     front = -math.cos(psi + rig.rad(p['twist']))
     side = -math.sin(psi + rig.rad(p['twist']))
-    skin_shape = [(-8, 7), (-9.5, 1), (-8.4, -5), (-4.3, -10), (0, -11.3), (4.3, -10), (8.4, -5), (9.5, 1), (8, 7), (0, 10)]
+    skin_shape = [(-8.4, 7), (-9.8, 0), (-8.6, -6), (-4.8, -10.2), (0, -11), (4.8, -10.2), (8.6, -6), (9.8, 0), (8.4, 7), (0, 10)]
     body.poly([H(*q) for q in skin_shape], COLOR['skin'][2], hd - 4)
-    body.poly([H(*q) for q in [(4, 6), (8, 6), (9, 0), (7, -6), (0, -11), (3, -4)]], COLOR['skin'][1], hd - 4.05, False)
+    body.poly([H(*q) for q in [(4.5, 6), (8.4, 6), (9.7, 0), (7.6, -6), (0, -10.8), (3.5, -4)]], COLOR['skin'][1], hd - 4.05, False)
     if front < -.4:
-        body.poly([H(*q) for q in [(-9, 8), (-10, 0), (-8, -8), (-4, -10), (5, -9), (9, -5), (10, 4), (6, 12), (-3, 13)]], COLOR['hair'][1], hd - 5)
+        body.poly([H(*q) for q in [(-10, 9), (-11.4, 0), (-10, -9), (-5, -13), (5, -13), (10, -9), (11.4, 0), (10, 9), (5, 14), (-5, 14)]], COLOR['hair'][2], hd - 5)
+        body.poly([H(*q) for q in [(0, 1), (5, 4), (10, 4), (11.4, 0), (10, -9), (5, -13), (0, -12), (1, -5)]], COLOR['hair'][1], hd - 5.05, False)
+        body.poly([H(*q) for q in [(-8, 11), (-3, 13.6), (4, 13.2), (7.5, 10.5), (2, 11.6), (-4, 11)]], COLOR['hair'][3], hd - 5.1, False)
+        body.poly([H(*q) for q in [(-5, 3), (-2, 5), (-3, -6), (-6, -9)]], COLOR['hair'][3], hd - 5.12, False)
     else:
         for sx in (-1, 1):
             if abs(side) > .85 and sx * side < 0:
                 continue
-            ex = sx * 4 * max(.28, front) + side * 3.3
-            ey = -1.3
+            ex = sx * 4.2 * max(.28, front) + side * 3.4
+            ey = -2.6
             if p['eyes'] == 'closed':
-                body.poly([H(ex - 2.3, ey), H(ex, ey - .6), H(ex + 2.3, ey + .5)], 1, hd - 5.8)
+                body.poly([H(ex - 2.3, ey + .7), H(ex, ey - .5), H(ex + 2.3, ey + .7), H(ex, ey + .1)], 1, hd - 5.8)
             else:
-                body.poly([H(ex - 2.6, ey + .6), H(ex - 1.2, ey + 2), H(ex + 2.4, ey + 1.1),
-                           H(ex + 2, ey - 1.8), H(ex - .4, ey - 2)], COLOR['white'][2], hd - 5.3)
-                body.poly([H(ex - .5, ey + 1.5), H(ex + 1.2, ey + 1), H(ex + 1.1, ey - 1.6), H(ex - .6, ey - 1.6)], COLOR['iris'][2], hd - 5.5, False)
-                body.poly([H(ex - .1, ey + .8), H(ex + .5, ey + .8), H(ex + .5, ey - 1.2), H(ex - .1, ey - 1.2)], 1, hd - 5.55, False)
-                body.poly([H(ex - 2.9, ey + 1.6), H(ex - 1, ey + 2.5), H(ex + 2.6, ey + 1.6), H(ex + 2.3, ey + .8)], 1, hd - 5.6, False)
-                body.poly([H(ex - .7, ey + .7), H(ex + .1, ey + .7), H(ex + .1, ey + 1.4), H(ex - .7, ey + 1.4)], COLOR['white'][3], hd - 5.7, False)
-            body.poly([H(ex - 2.1, 3), H(ex + 2, 3.3), H(ex + 1.7, 3.8), H(ex - 1.9, 3.5)], COLOR['brow'][0], hd - 5.8, False)
+                body.poly([H(ex - 2, ey + 1.5), H(ex, ey + 2.2), H(ex + 2, ey + 1.5), H(ex + 2.2, ey - .5),
+                           H(ex + 1, ey - 2), H(ex - 1, ey - 2), H(ex - 2.2, ey - .5)], COLOR['white'][2], hd - 5.3)
+                body.poly([H(ex - 1.5, ey + 1.7), H(ex + 1.5, ey + 1.7), H(ex + 1.7, ey - 1.7), H(ex - 1.7, ey - 1.7)], COLOR['iris'][1], hd - 5.5, False)
+                body.poly([H(ex - 1.5, ey - .3), H(ex + 1.5, ey - .3), H(ex + 1.5, ey - 1.7), H(ex - 1.5, ey - 1.7)], COLOR['iris'][2], hd - 5.52, False)
+                body.poly([H(ex - .6, ey + .9), H(ex + .6, ey + .9), H(ex + .6, ey - .9), H(ex - .6, ey - .9)], 1, hd - 5.55, False)
+                body.poly([H(ex - 2.4, ey + 1.1), H(ex, ey + 2.5), H(ex + 2.4, ey + 1.2), H(ex + 2.5, ey + .4), H(ex, ey + 1.6), H(ex - 2.3, ey + .3)], 1, hd - 5.6, False)
+                body.poly([H(ex - 1.1, ey + 1.2), H(ex - .1, ey + 1.2), H(ex - .1, ey + .2), H(ex - 1.1, ey + .2)], COLOR['white'][3], hd - 5.7, False)
+                body.poly([H(ex + .5, ey - .9), H(ex + 1.2, ey - .9), H(ex + 1.2, ey - 1.4), H(ex + .5, ey - 1.4)], COLOR['white'][3], hd - 5.7, False)
+            body.poly([H(ex - 2, 2.4), H(ex, 3), H(ex + 2, 2.4), H(ex + 2, 2), H(ex, 2.6), H(ex - 2, 2)], COLOR['brow'][1], hd - 5.8, False)
+            body.poly([H(ex - 1.8, -4.5), H(ex + 1.8, -4.5), H(ex + 1.8, -5.5), H(ex - 1.8, -5.5)], COLOR['mouth'][3], hd - 5.3, False)
         nx = side * 5
-        body.poly([H(nx, -3.7), H(nx + .6, -5), H(nx + 1.5, -4.3)], COLOR['skin'][1], hd - 5.5, False)
-        body.poly([H(nx - 1, -7.4), H(nx + 1.2, -7.3), H(nx + .6, -7.8)], COLOR['mouth'][1], hd - 5.6, False)
-    crown = [(-10, 2), (-11, 8), (-8, 12), (-9, 15), (-3, 13), (1, 16), (3, 13),
-             (8, 14), (8, 11), (11, 8), (10, 2), (8, -3), (6, 2), (4, -1), (1, 6), (-2, 1), (-5, 6), (-8, -2)]
-    body.poly([H(*q) for q in crown], COLOR['hair'][1], hd - 6)
-    for wedge in [[(-8, 10), (-2, 12), (-4, 6), (-8, 3)], [(-1, 12), (3, 13), (6, 7), (2, 7)], [(6, 11), (9, 8), (8, 3)]]:
-        body.poly([H(*q) for q in wedge], COLOR['hair'][2], hd - 6.1, False)
-    body.poly([H(*q) for q in [(-6, 11), (-2, 12), (-3, 10), (-6, 8)]], COLOR['hair'][3], hd - 6.2, False)
-    body.plate([xf(q) for q in [(-3, -5, 79), (2, -5, 79), (4 + p['sway'], -8, 65),
-                               (1 + p['sway'] * 1.5, -10, 59), (-1 + p['sway'], -9, 65)]], 'hair', 1)
+        body.poly([H(nx - .3, -4.4), H(nx + .4, -5.3), H(nx + 1, -4.6)], COLOR['skin'][1], hd - 5.5, False)
+        body.poly([H(nx - 1.2, -7.3), H(nx, -7.9), H(nx + 1.2, -7.3), H(nx, -7.1)], COLOR['mouth'][1], hd - 5.6, False)
+        # Fringe parted in the middle, with long locks framing the cheeks.
+        fringe = [(-10.8, -1), (-11.4, 7), (-8.8, 13), (0, 15.4), (8.8, 13), (11.4, 7), (10.8, -1), (9.2, 2.6), (6.6, 4.4),
+                  (3.2, 6.4), (.4, 9.6), (-.8, 7.4), (-4, 4.8), (-7, 4), (-9.2, 1.8)]
+        body.poly([H(*q) for q in fringe], COLOR['hair'][2], hd - 6)
+        body.poly([H(*q) for q in [(1, 9.6), (3.2, 6.4), (6.6, 4.4), (9.2, 2.6), (10.8, -1), (11.4, 7), (8.8, 13), (4, 14.6)]], COLOR['hair'][1], hd - 6.05, False)
+        body.poly([H(*q) for q in [(-8.4, 11), (-3, 13.8), (3, 13.9), (7, 12), (2, 12.2), (-3, 12)]], COLOR['hair'][3], hd - 6.1, False)
+        for sx in (-1, 1):
+            if abs(side) > .85 and sx * side < 0:
+                continue
+            body.poly([H(sx * q[0], q[1]) for q in [(11, 6), (12, -4), (11.4, -13), (8.4, -16), (8, -8), (8.6, 0), (9.6, 4)]], COLOR['hair'][2], hd - 6.2)
+            body.poly([H(sx * q[0], q[1]) for q in [(11.6, 2), (12, -4), (11.4, -13), (10, -14), (10.4, -5)]], COLOR['hair'][1], hd - 6.25, False)
+    if front >= -.4:
+        body.poly([H(*q) for q in [(-10.8, 5.6), (-6, 8.4), (0, 9.4), (6, 8.4), (10.8, 5.6), (10.8, 4.2), (6, 7), (0, 8), (-6, 7), (-10.8, 4.2)]], COLOR['gold'][2], hd - 6.4)
+        gx = side * 7.5
+        body.poly([H(gx, 11.2), H(gx + 2.1, 8.8), H(gx, 6.6), H(gx - 2.1, 8.8)], COLOR['glow'][2], hd - 6.5)
+        body.poly([H(gx, 9.8), H(gx + .8, 8.8), H(gx, 7.8), H(gx - .8, 8.8)], COLOR['glow'][3], hd - 6.55, False)
+    # Long hair falls behind the shoulders (seen from the back and sides) tied with a crimson ribbon.
+    sw = p['sway']
+    body.plate([xf(q) for q in [(-7, -5.6, 83), (7, -5.6, 83), (9.4, -7, 66), (8.4 + sw, -8.4, 50), (4.6 + sw * 1.3, -9, 42),
+                               (.6 + sw * 1.4, -8.8, 47), (-3.4 + sw * 1.3, -9, 41), (-7.6 + sw, -8.6, 49), (-9.4, -7, 66)]], 'hair', 1)
+    body.plate([xf(q) for q in [(-5, -6.1, 80), (5, -6.1, 80), (6.6, -7.2, 64), (5 + sw, -8.2, 49), (1 + sw * 1.3, -8.4, 45),
+                               (-4 + sw, -8.2, 48), (-6.6, -7.2, 64)]], 'hair', 2)
+    for sx in (-1, 1):
+        body.plate([xf(q) for q in [(sx * 9.2, -5.4, 80), (sx * 9.8, -8.4, 70), (sx * 9, -8.8 + sw, 52), (sx * 9.4, -5.6, 58)]], 'hair', 2 if sx > 0 else 1, True)
+    body.plate([xf(q) for q in [(-8.4, -6.6, 62), (8.4, -6.6, 62), (8.4, -6.7, 59.2), (-8.4, -6.7, 59.2)]], 'stole', 2)
 
     for key, mat in [('armor_pilgrim', 'robe'), ('armor_dawn', 'dawn')]:
         ink = inks[key]
         dawn = mat == 'dawn'
-        torso(ink, mat, 8.6, 4.3, 34, 69)
+        torso(ink, mat, 8.6, 4.3, 34, 69, -1.5)
         # Long robe: a skirt that flares to a hem above the boots, swaying with the body.
         hem, wide, deep, sway = 15, 12, 8.4, p['sway'] * .8
+        if p['ground']:
+            wide, deep = 9.6, 6.6
         for sy in (-1, 1):
             xy = [(-8.2, sy * 4.5, 38), (8.2, sy * 4.5, 38), (wide + sway, sy * deep, hem), (-wide + sway, sy * deep, hem)]
-            ink.plate([xf(q) for q in xy], mat, 3 if sy == 1 else 2)
+            ink.plate([xf(q) for q in xy], mat, 3 if sy == 1 else 2, push=-3)
         for sx in (-1, 1):
             ink.plate([xf(q) for q in [(sx * 8.2, -4.5, 38), (sx * 8.2, 4.5, 38),
-                      (sx * wide + sway, deep, hem), (sx * wide + sway, -deep, hem)]], mat, 2)
+                      (sx * wide + sway, deep, hem), (sx * wide + sway, -deep, hem)]], mat, 2, push=-3)
         # Gold hem band, front and back.
         for sy in (-1, 1):
             ink.plate([xf(q) for q in [(-wide + sway, sy * deep, hem + 3.2), (wide + sway, sy * deep, hem + 3.2),
-                                      (wide + sway, sy * deep, hem), (-wide + sway, sy * deep, hem)]], 'gold', 2 if sy == 1 else 1, True)
+                                      (wide + sway, sy * deep, hem), (-wide + sway, sy * deep, hem)]], 'gold', 2 if sy == 1 else 1, True, push=-3.6)
         # Belt cord.
         ink.plate([xf(q) for q in [(-8.6, 4.8, 42), (8.6, 4.8, 42), (8.4, 4.8, 39), (-8.4, 4.8, 39)]], 'leather', 2)
         ink.plate([xf(q) for q in [(-1.2, 5, 39), (1.2, 5, 39), (2, 5.3, 29), (-.4, 5.3, 28)]], 'gold', 2)
@@ -307,26 +342,35 @@ def render_frame(clip, facing, k):
             ink.bone(j['hand'] - (j['hand'] - j['elbow']) * .2, j['hand'], 3.8, 3.4, 'gold', -.9)
             ink.bone(j['knee'] + (j['ankle'] - j['knee']) * .25, j['ankle'], 3.1, 2.5, 'leather', -.8)
             ink.bone(j['ankle'] + V(0, -1, -1), j['ankle'] + V(0, 4.5, -2), 2.5, 2.5, 'leather', -.8)
-        # Mantle over the shoulders and a violet stole down the front (the Assassin's scarf, kept).
+        # Mantle over the shoulders, a standing fan collar behind the head, a crimson tabard front and back, a sun medallion.
         ink.plate([xf(q) for q in [(-9.5, 4.9, 71), (9.5, 4.9, 71), (11, 5.2, 60), (0, 5.5, 55), (-11, 5.2, 60)]], mat, 1)
         ink.plate([xf(q) for q in [(-9.5, -4.9, 71), (9.5, -4.9, 71), (11, -5.2, 60), (0, -5.5, 55), (-11, -5.2, 60)]], mat, 1)
+        ink.plate([xf(q) for q in [(-8.6, -6.9, 70), (-13, -7, 86), (-6.5, -7.1, 91), (0, -7.2, 93), (6.5, -7.1, 91), (13, -7, 86), (8.6, -6.9, 70)]], mat, 2)
+        ink.plate([xf(q) for q in [(-13, -7.1, 86), (-6.5, -7.2, 91), (0, -7.3, 93), (6.5, -7.2, 91), (13, -7.1, 86), (12.2, -7.1, 84.6), (6.4, -7.2, 89.6), (0, -7.3, 91.4), (-6.4, -7.2, 89.6), (-12.2, -7.1, 84.6)]], 'gold', 2, True)
         ink.plate([xf(q) for q in [(-4.2, 5.6, 75), (4.2, 5.6, 75), (3.2, 5.7, 70), (0, 5.9, 66), (-3.2, 5.7, 70)]], 'gold', 2)
-        stole = [(-3.2, 5.7, 73), (3.2, 5.7, 73), (3.6 + sway * .4, 5.9 + 1.2, 38), (3.8 + sway * .6, deep + .4, hem - 3),
-                 (-3.8 + sway * .6, deep + .4, hem - 3), (-3.6 + sway * .4, 5.9 + 1.2, 38)]
-        ink.plate([xf(q) for q in stole], 'stole', 2)
-        for sx in (-1, 1):
-            ink.plate([xf(q) for q in [(sx * 3.2, 5.8, 73), (sx * 2.5, 5.8, 73), (sx * 2.9 + sway * .4, 6.8, 38), (sx * 3.6 + sway * .6, deep + .5, hem - 3)]], 'gold', 2, True)
-        # Sun emblem on the chest: a small gold cross over the stole.
-        ink.plate([xf(q) for q in [(-.8, 6, 66), (.8, 6, 66), (.8, 6, 52), (-.8, 6, 52)]], 'gold', 3, True)
-        ink.plate([xf(q) for q in [(-3.8, 6, 61.5), (3.8, 6, 61.5), (3.8, 6, 59.2), (-3.8, 6, 59.2)]], 'gold', 3, True)
+        for sy, bulge in ((1, 1.2), (-1, 0)):
+            tab = [(-3.8, sy * (5.7 + bulge * .2), 72), (3.8, sy * (5.7 + bulge * .2), 72), (4.6 + sway * .4, sy * (5.9 + bulge), 38),
+                   (5.2 + sway * .6, sy * (deep + .4), hem - 3), (0 + sway * .6, sy * (deep + .5), hem - 6.5),
+                   (-5.2 + sway * .6, sy * (deep + .4), hem - 3), (-4.6 + sway * .4, sy * (5.9 + bulge), 38)]
+            ink.plate([xf(q) for q in tab], 'stole', 2 if sy == 1 else 1)
+            for sx in (-1, 1):
+                ink.plate([xf(q) for q in [(sx * 3.8, sy * 5.8, 72), (sx * 3.1, sy * 5.8, 72), (sx * 3.9 + sway * .4, sy * 6.8, 38), (sx * 4.6 + sway * .6, sy * (deep + .5), hem - 3)]], 'gold', 2, True)
+        # Sun medallion on the chest: a gold disc with a white-gold core and four rays.
+        for i in range(4):
+            ang = i * math.pi / 2
+            c, s_ = math.cos(ang), math.sin(ang)
+            ink.plate([xf((-1.1 * s_ + 3.4 * c, 6.15, 62 + 1.1 * c + 3.4 * s_)), xf((1.1 * s_ + 3.4 * c, 6.15, 62 - 1.1 * c + 3.4 * s_)),
+                       xf((5.6 * c, 6.15, 62 + 5.6 * s_))], 'gold', 3, True)
+        ink.plate([xf((3.6 * math.cos(i / 8 * math.tau), 6.2, 62 + 3.6 * math.sin(i / 8 * math.tau))) for i in range(8)], 'gold', 2)
+        ink.plate([xf((1.9 * math.cos(i / 8 * math.tau), 6.25, 62 + 1.9 * math.sin(i / 8 * math.tau))) for i in range(8)], 'glow', 3, True)
         if dawn:
             for sx in (-1, 1):
                 j = joints['L' if sx < 0 else 'R']
                 ink.bone(j['shoulder'], j['shoulder'] + R @ V(sx * 3, 0, -3), 3.4, 2.2, 'gold', -1.1)
             # A thin halo floating above the head.
-            ring = lambda r, t: H(r * math.cos(t), 19 + r * .5 * math.sin(t))
+            ring = lambda r, t: H(r * math.cos(t), 24 + r * .5 * math.sin(t))
             steps = 24
-            for width, color, push in ((10.0, lambda a: 1, 0), (9.2, lambda a: COLOR['glow'][2 if math.sin(a) > 0 else 1], .1)):
+            for width, color, push in ((10.0, lambda a: 1, 0), (9.2, lambda a: COLOR['glow'][3 if math.sin(a) > 0 else 2], .1)):
                 for i in range(steps):
                     a, b = i / steps * math.tau, (i + 1) / steps * math.tau
                     inner = 7.2 if width > 9.5 else 7.9
@@ -343,7 +387,7 @@ def render_frame(clip, facing, k):
             across = unit(V(u[1], -u[0], 0))
         # The mace is gripped near its butt, so most of it stands out beyond the fist.
         butt = hand - u * 5
-        neck = hand + u * (19 if sun else 16)
+        neck = hand + u * (21 if sun else 19)
         ink.bone(butt, neck, 1.5, 1.5, 'gold' if sun else 'wood', -.1, 2)
         ink.bone(hand - u * 1.5, hand + u * 2.5, 1.7, 1.7, 'leather', -.12)
         c = neck + u * 4
@@ -359,6 +403,9 @@ def render_frame(clip, facing, k):
         for sgn in (-1, 1):
             ink.plate([c + across * sgn * rr * .9 + u * 1.4, c + across * sgn * (rr + 2.2), c + across * sgn * rr * .9 - u * 1.4], 'gold' if sun else 'silver', 1)
         ink.plate([c + u * rr * 1.1 - across * 1, c + u * (rr + 2.8), c + u * rr * 1.1 + across * 1], 'gold' if sun else 'silver', 2)
+        tail = V(0, 0, -9) + across * p['sway'] * .3
+        ink.plate([neck + across * 1.3, neck - across * 1.3, neck + tail], 'stole', 2)
+        ink.plate([neck + tail + across * .9, neck + tail - across * .9, neck + tail * 1.25], 'gold', 2)
         if sun:
             for t in (0, 1, 2, 3):
                 ang = t * math.pi / 2 + math.pi / 4
@@ -538,7 +585,7 @@ def export(local=False):
             'depth': {'encoding': 'R*256+G', 'offset': 512, 'scale': 64, 'near': 'smaller'},
             'facing': 'Same eight-direction formula and foot anchor as assassin_sprites.txt',
             'attack': {'duration': .4, 'impact': .2},
-            'style': '2D Korean RPG anime cel illustration', 'portrait': [57, 15, 46, 46],
+            'style': '2D Korean RPG anime cel illustration', 'portrait': [57, 19, 46, 46],
             'editing': 'One PixelFlow sprite per clip and facing (priest_<clip>_<facing>), body visible, equipment hidden. build --replace discards edits.'}
     (ASSETS / 'priest_sprites.txt').write_text(json.dumps(meta, indent=2) + '\n')
     print('exported five parts and five depth maps', size, flush=True)

@@ -107,46 +107,46 @@
     "weapon": "mace"
   },
   "sprites": {
-    "priest_idle_s": "3e949e23bc6ce9ae",
-    "priest_idle_sw": "32f61ce40b7bd49e",
-    "priest_idle_w": "1c02e06265f9619b",
-    "priest_idle_nw": "e77e32d3cfc6f98d",
-    "priest_idle_n": "a0c9c348b6bc4c17",
-    "priest_idle_ne": "e9aad952629007b9",
-    "priest_idle_e": "bd0e81f06daae3a7",
-    "priest_idle_se": "faaa3a37756ab478",
-    "priest_walk_s": "499f1b0e78575ad6",
-    "priest_walk_sw": "7d20b6b53f8fea46",
-    "priest_walk_w": "0d4d26606c7d8a3c",
-    "priest_walk_nw": "d69158817266a069",
-    "priest_walk_n": "115b2b6ab941d216",
-    "priest_walk_ne": "d930eda211b7c012",
-    "priest_walk_e": "47a11e1dcd2d2ff8",
-    "priest_walk_se": "bc78fd4e6bab53a9",
-    "priest_attack_s": "b5fa22087b5f9479",
-    "priest_attack_sw": "7c4adfdc31db9205",
-    "priest_attack_w": "a4aa28b97bde536e",
-    "priest_attack_nw": "5326441e96792d1a",
-    "priest_attack_n": "837317d454cfa9b5",
-    "priest_attack_ne": "1b52e74f410e4fb0",
-    "priest_attack_e": "b77f4801081f3532",
-    "priest_attack_se": "0b6e2996ee69a8e6",
-    "priest_hurt_s": "4e9fcd160210b766",
-    "priest_hurt_sw": "ce8b5ed9746118d2",
-    "priest_hurt_w": "4b0ccb114c08919c",
-    "priest_hurt_nw": "71576eb0bf493d99",
-    "priest_hurt_n": "e2fdcc368bd8ff8c",
-    "priest_hurt_ne": "e66786aef5e4280b",
-    "priest_hurt_e": "e9240f4a1a52d412",
-    "priest_hurt_se": "3001ff72bc52f75d",
-    "priest_die_s": "72f33b0d7ed51e59",
-    "priest_die_sw": "1d576fdcf7866db5",
-    "priest_die_w": "364f51354fef9ade",
-    "priest_die_nw": "24e7cf357e09f70c",
-    "priest_die_n": "647fcf6e530da906",
-    "priest_die_ne": "0f1fa235f6ea38bd",
-    "priest_die_e": "65abf029fea2946b",
-    "priest_die_se": "3581c7fc75d7844f"
+    "priest_idle_s": "bcd28b85f1606697",
+    "priest_idle_sw": "96435bed57d805d8",
+    "priest_idle_w": "f4f74c612b5624cc",
+    "priest_idle_nw": "6062448334e9ff9a",
+    "priest_idle_n": "0c3945c64d11ae78",
+    "priest_idle_ne": "32199e0c91395f12",
+    "priest_idle_e": "f696e5452883e520",
+    "priest_idle_se": "28e48c9963af406a",
+    "priest_walk_s": "0c8895af8410256c",
+    "priest_walk_sw": "3b365d713f8432fa",
+    "priest_walk_w": "8a4c8b857a30677c",
+    "priest_walk_nw": "690e4a0d0cb9390d",
+    "priest_walk_n": "136256fffd1cf794",
+    "priest_walk_ne": "59fb2dc1f603ddbf",
+    "priest_walk_e": "c69ad9468459a589",
+    "priest_walk_se": "c04f7d29030bc84b",
+    "priest_attack_s": "650925530d07c753",
+    "priest_attack_sw": "3138d95bbcbb45d4",
+    "priest_attack_w": "cb5a5c943bb432c0",
+    "priest_attack_nw": "0337189d4962a556",
+    "priest_attack_n": "e36044159e24cbb2",
+    "priest_attack_ne": "283efc94901f3f39",
+    "priest_attack_e": "25dfe7a197bfcba1",
+    "priest_attack_se": "7957b56ed9a461f0",
+    "priest_hurt_s": "f8ff451af3481ca2",
+    "priest_hurt_sw": "734b3acfb9babeae",
+    "priest_hurt_w": "67e678d93a003c2a",
+    "priest_hurt_nw": "cd3063ca5d7d1224",
+    "priest_hurt_n": "228b369a59afd89c",
+    "priest_hurt_ne": "5f2d5cd6b6c9395c",
+    "priest_hurt_e": "b3b81faf9d776f41",
+    "priest_hurt_se": "d82b87777392527a",
+    "priest_die_s": "562db863dc96e0b4",
+    "priest_die_sw": "ad07afcf4b2995a0",
+    "priest_die_w": "cc3815a527837530",
+    "priest_die_nw": "5eb736007756bce2",
+    "priest_die_n": "22203aa32fda3aa9",
+    "priest_die_ne": "19f49f0d0b0fd278",
+    "priest_die_e": "f277e14fafa1552b",
+    "priest_die_se": "613dac7bc773b1f2"
   },
   "ramps": {
     "skin": [
@@ -156,16 +156,16 @@
       "#ffe0ce"
     ],
     "hair": [
-      "#151a30",
-      "#293451",
-      "#465278",
-      "#7985ac"
+      "#8a6a3a",
+      "#c9a45c",
+      "#ecd290",
+      "#fff4c8"
     ],
     "brow": [
-      "#171526",
-      "#242037",
-      "#332946",
-      "#443750"
+      "#6a4c28",
+      "#7e5e34",
+      "#a98650",
+      "#c0985a"
     ],
     "cloth": [
       "#4a4048",
@@ -180,16 +180,16 @@
       "#97a2c4"
     ],
     "robe": [
-      "#7a7490",
-      "#aaa3bf",
-      "#dcd6e8",
-      "#fffaf4"
+      "#8c7a6e",
+      "#c4b09c",
+      "#ebdcc2",
+      "#fff8e6"
     ],
     "dawn": [
-      "#a08a8e",
-      "#d4bdb4",
-      "#fbeadb",
-      "#fffefc"
+      "#7f90ae",
+      "#bccbe2",
+      "#eef3fb",
+      "#fdfeff"
     ],
     "gold": [
       "#6e4a12",
@@ -198,10 +198,10 @@
       "#fff0a0"
     ],
     "stole": [
-      "#4a2a6e",
-      "#7a4aa6",
-      "#b585d8",
-      "#e6c4ff"
+      "#5a1424",
+      "#8f2438",
+      "#c8465a",
+      "#f28a94"
     ],
     "leather": [
       "#2a2030",
@@ -228,10 +228,10 @@
       "#fffbe0"
     ],
     "iris": [
-      "#6a4a1c",
-      "#a7762c",
-      "#e0b050",
-      "#fff0b0"
+      "#2a5a8c",
+      "#4a8cc4",
+      "#8cc8f0",
+      "#d8f2ff"
     ],
     "white": [
       "#c0aec4",
