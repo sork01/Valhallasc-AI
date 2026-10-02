@@ -37,6 +37,8 @@ async function call(name, args = {}) {
   await page.keyboard.press('Shift+Tab');
   check(await page.locator('#quest-close').evaluate(n => n === document.activeElement), 'Shift+Tab wraps within the journal');
   check(await page.locator('#quest-list [data-quest="king_challenge"]').textContent().then(t => t.includes('Locked') && t.includes('Shells of Steel')), 'Locked cards explain their prerequisite');
+  check(await page.locator('#quest-list [data-quest="king_challenge"] .quest-level').textContent() === 'Recommended level 5'
+    && await page.locator('#quest-list [data-quest="welcome"] .quest-level').textContent() === 'Recommended level 1', 'Every journal card shows its recommended level');
   await page.screenshot({ path: path.join(world.artifacts, 'quest-journal.png') });
   await page.keyboard.press('Escape');
   check(await page.locator('#quest-journal').isHidden(), 'Escape closes the journal');

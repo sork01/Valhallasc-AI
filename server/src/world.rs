@@ -2181,6 +2181,15 @@ mod tests {
                 assert!(ids.insert(&q.id), "globally unique persistent quest ids");
                 assert!(area.npcs.iter().any(|n| n.id == q.npc));
                 assert!(q.reward_xp > 0 && q.reward_gold > 0 && !q.objectives.is_empty());
+                let need = (160. * (q.level as f64).powf(1.35)).round();
+                assert!(q.level >= 1, "{} needs a recommended level", q.id);
+                assert_eq!(
+                    q.reward_xp,
+                    (need as u32 + 5) / 10,
+                    "{} pays a tenth of level {}'s XP",
+                    q.id,
+                    q.level
+                );
                 let mut chain = std::collections::HashSet::new();
                 let mut next = Some(q);
                 while let Some(step) = next {
@@ -2622,7 +2631,7 @@ mod tests {
         w.players.get_mut(&1).unwrap().character.xp = 150;
         quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
         let c = &w.players[&1].character;
-        assert_eq!((c.level, c.xp, c.gold), (2, 40, 12));
+        assert_eq!((c.level, c.xp, c.gold), (2, 6, 12));
         assert_eq!(c.hp, c.max_hp());
         assert!(c.quests[0].claimed);
         quest_interact(&mut w, "guide", Some("quest:claim:welcome"));

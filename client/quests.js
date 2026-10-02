@@ -3,7 +3,7 @@
   const $ = id => document.getElementById(id);
   const areas = [WORLD_MAP, ...(WORLD_MAP.zones || [])];
   const definitions = areas.flatMap((area, zone) => (area.quests || []).map(q => ({ ...q, zone })));
-  let progress = [], signature = '', tracked = null, previousFocus = null, collapsed = false;
+  let heroLevel = 1, progress = [], signature = '', tracked = null, previousFocus = null, collapsed = false;
   const state = quest => progress.find(p => p.id === quest.id);
   const giver = quest => areas[quest.zone].npcs.find(n => n.id === quest.npc);
   function status(quest) {
@@ -32,6 +32,10 @@
     const node = element('article', '', 'quest-card'); node.dataset.quest = quest.id; node.dataset.repeatable = String(quest.repeatable);
     node.append(element('h4', quest.title), element('span', words[s] + (quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
     if (!atNpc) node.append(element('small', `${areas[quest.zone].name} · ${areas[quest.zone].city?.name || 'Quest giver'}`, 'quest-location quest-history'));
+    const gap = quest.level - (heroLevel);
+    const rec = element('p', `Recommended level ${quest.level}`, 'quest-level'); rec.dataset.level = String(quest.level);
+    if (gap >= 5) rec.style.color = '#ff6b6b'; else if (gap >= 3) rec.style.color = '#ffa65a'; else if (gap <= -5) rec.style.color = '#9fb0a0';
+    node.append(rec);
     node.append(element('p', quest.description), element('p', objectives(quest).join(' · '), 'quest-objectives'));
     node.append(element('p', `Reward: ${quest.rewardXp} XP · ${quest.rewardGold} gold`, 'quest-reward'));
     if (s === 'locked') {
@@ -107,6 +111,7 @@
   });
   window.Quests = {
     show, close, get open() { return open(); },
+    setLevel(level) { heroLevel = level; },
     reset() { progress = []; signature = ''; tracked = null; close(false); render(); },
     update(next) { const key = `${Field.zone}:` + JSON.stringify(next); if (key === signature) return; progress = next; signature = key; render(); },
     npc(id, container) { container.replaceChildren(...definitions.filter(q => q.npc === id).map(q => card(q, true))); },

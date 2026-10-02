@@ -343,6 +343,10 @@ pub struct Quest {
     pub npc: String,
     pub requires: Option<String>,
     pub repeatable: bool,
+    /// Recommended character level; the XP reward is a tenth of what that level needs. Clients read it
+    /// from client/world.js and a world test checks the reward, so the server itself never uses it.
+    #[cfg_attr(not(test), allow(dead_code))]
+    pub level: u32,
     pub reward_xp: u32,
     pub reward_gold: u32,
     pub objectives: Vec<QuestObjective>,

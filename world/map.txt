@@ -1508,7 +1508,8 @@
           "count": 1
         }
       ],
-      "rewardXp": 50,
+      "level": 1,
+      "rewardXp": 16,
       "rewardGold": 12,
       "requires": null,
       "repeatable": false
@@ -1526,7 +1527,8 @@
           "count": 6
         }
       ],
-      "rewardXp": 100,
+      "level": 2,
+      "rewardXp": 41,
       "rewardGold": 24,
       "requires": null,
       "repeatable": false
@@ -1544,7 +1546,8 @@
           "count": 2
         }
       ],
-      "rewardXp": 150,
+      "level": 4,
+      "rewardXp": 104,
       "rewardGold": 35,
       "requires": "slime_patrol",
       "repeatable": false
@@ -1562,7 +1565,8 @@
           "count": 1
         }
       ],
-      "rewardXp": 250,
+      "level": 5,
+      "rewardXp": 141,
       "rewardGold": 60,
       "requires": "ironhide_hunt",
       "repeatable": false
@@ -1580,7 +1584,8 @@
           "count": 8
         }
       ],
-      "rewardXp": 76,
+      "level": 3,
+      "rewardXp": 71,
       "rewardGold": 25,
       "requires": "slime_patrol",
       "repeatable": true
@@ -4586,7 +4591,8 @@
               "count": 1
             }
           ],
-          "rewardXp": 226,
+          "level": 5,
+          "rewardXp": 141,
           "rewardGold": 40,
           "requires": null,
           "repeatable": false
@@ -4604,7 +4610,8 @@
               "count": 4
             }
           ],
-          "rewardXp": 300,
+          "level": 5,
+          "rewardXp": 141,
           "rewardGold": 65,
           "requires": "crags_welcome",
           "repeatable": false
@@ -4622,7 +4629,8 @@
               "count": 8
             }
           ],
-          "rewardXp": 450,
+          "level": 6,
+          "rewardXp": 180,
           "rewardGold": 90,
           "requires": "crags_wisps",
           "repeatable": false
@@ -4640,7 +4648,8 @@
               "count": 4
             }
           ],
-          "rewardXp": 500,
+          "level": 6,
+          "rewardXp": 180,
           "rewardGold": 100,
           "requires": "crags_wisps",
           "repeatable": false
@@ -4658,7 +4667,8 @@
               "count": 7
             }
           ],
-          "rewardXp": 700,
+          "level": 7,
+          "rewardXp": 221,
           "rewardGold": 130,
           "requires": "crags_spiders",
           "repeatable": false
@@ -4676,7 +4686,8 @@
               "count": 3
             }
           ],
-          "rewardXp": 650,
+          "level": 7,
+          "rewardXp": 221,
           "rewardGold": 120,
           "requires": "crags_spiders",
           "repeatable": false
@@ -4694,7 +4705,8 @@
               "count": 6
             }
           ],
-          "rewardXp": 900,
+          "level": 8,
+          "rewardXp": 265,
           "rewardGold": 165,
           "requires": "crags_wraiths",
           "repeatable": false
@@ -4712,7 +4724,8 @@
               "count": 2
             }
           ],
-          "rewardXp": 876,
+          "level": 9,
+          "rewardXp": 311,
           "rewardGold": 160,
           "requires": "crags_wraiths",
           "repeatable": false
@@ -4730,7 +4743,8 @@
               "count": 4
             }
           ],
-          "rewardXp": 1188,
+          "level": 10,
+          "rewardXp": 358,
           "rewardGold": 210,
           "requires": "crags_golems",
           "repeatable": false
@@ -4766,7 +4780,8 @@
               "count": 2
             }
           ],
-          "rewardXp": 1376,
+          "level": 10,
+          "rewardXp": 358,
           "rewardGold": 250,
           "requires": "crags_golems",
           "repeatable": false
@@ -4784,7 +4799,8 @@
               "count": 10
             }
           ],
-          "rewardXp": 376,
+          "level": 6,
+          "rewardXp": 180,
           "rewardGold": 100,
           "requires": "crags_welcome",
           "repeatable": true
@@ -4808,7 +4824,8 @@
               "count": 3
             }
           ],
-          "rewardXp": 426,
+          "level": 7,
+          "rewardXp": 221,
           "rewardGold": 110,
           "requires": "crags_spiders",
           "repeatable": true

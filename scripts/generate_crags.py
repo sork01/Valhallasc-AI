@@ -56,51 +56,52 @@ def quest_hub():
     def kill(kind, count, label):
         return dict(kind='kill', target=kind, label=label, count=count)
 
-    def quest(id, title, npc, description, objectives, xp, gold, requires=None, repeatable=False):
+    def quest(id, title, npc, description, objectives, level, gold, requires=None, repeatable=False):
+        # Recommended level; the XP reward is 10% of what that level needs (server test enforces it).
         return dict(id='crags_' + id, title=title, npc='crags_' + npc, description=description,
-                    objectives=objectives, rewardXp=xp, rewardGold=gold,
+                    objectives=objectives, level=level, rewardXp=(round(160 * level ** 1.35) + 5) // 10, rewardGold=gold,
                     requires='crags_' + requires if requires else None, repeatable=repeatable)
 
     quests = [
         quest('welcome', 'A Foothold in the Ash', 'captain',
               'Meet Scout Kael, Sister Iona and Quartermaster Dain in Cinderwatch Camp, then report to Captain Sera.',
               [dict(kind='talk', target='crags_' + id, label='Speak to ' + name, count=1)
-               for id, name in [('scout', 'Scout Kael'), ('healer', 'Sister Iona'), ('supplier', 'Quartermaster Dain')]], 226, 40),
+               for id, name in [('scout', 'Scout Kael'), ('healer', 'Sister Iona'), ('supplier', 'Quartermaster Dain')]], 5, 40),
         quest('wisps', 'Lights Along the Ford', 'scout',
               'Cross the first lava ford and defeat four Cinder Wisps in the southern lowlands. Return to Kael.',
-              [kill('wisp', 4, 'Defeat Cinder Wisps')], 300, 65, 'welcome'),
+              [kill('wisp', 4, 'Defeat Cinder Wisps')], 5, 65, 'welcome'),
         quest('wisp_sweep', 'Quench the Cinders', 'scout',
               'Kael needs a thorough sweep of the lowlands. Defeat eight Cinder Wisps and return to camp.',
-              [kill('wisp', 8, 'Defeat Cinder Wisps')], 450, 90, 'wisps'),
+              [kill('wisp', 8, 'Defeat Cinder Wisps')], 6, 90, 'wisps'),
         quest('spiders', 'Silk Across the Trail', 'scout',
               'Beyond the second lava ford, Magma Spiders ambush supply runners. Defeat four and report to Kael.',
-              [kill('spider', 4, 'Defeat Magma Spiders')], 500, 100, 'wisps'),
+              [kill('spider', 4, 'Defeat Magma Spiders')], 6, 100, 'wisps'),
         quest('spider_sweep', 'Break the Brood', 'captain',
               'Clear seven Magma Spiders from the middle crags so the expedition can move its stores north.',
-              [kill('spider', 7, 'Defeat Magma Spiders')], 700, 130, 'spiders'),
+              [kill('spider', 7, 'Defeat Magma Spiders')], 7, 130, 'spiders'),
         quest('wraiths', 'Voices in the Ash', 'healer',
               'Ash Wraiths wander beyond the third ford. Lay three to rest and bring Iona news of their release.',
-              [kill('wraith', 3, 'Defeat Ash Wraiths')], 650, 120, 'spiders'),
+              [kill('wraith', 3, 'Defeat Ash Wraiths')], 7, 120, 'spiders'),
         quest('wraith_sweep', 'A Quiet Mountain', 'healer',
               'Silence six Ash Wraiths in the upper crags, then return to Sister Iona for her thanks.',
-              [kill('wraith', 6, 'Defeat Ash Wraiths')], 900, 165, 'wraiths'),
+              [kill('wraith', 6, 'Defeat Ash Wraiths')], 8, 165, 'wraiths'),
         quest('golems', 'Stone Sentinels', 'captain',
               'Basalt Golems guard the heights beyond the fourth ford. Defeat two and report to Captain Sera.',
-              [kill('golem', 2, 'Defeat Basalt Golems')], 876, 160, 'wraiths'),
+              [kill('golem', 2, 'Defeat Basalt Golems')], 9, 160, 'wraiths'),
         quest('golem_sweep', 'Crack the Basalt', 'supplier',
               'Dain cannot establish an upper supply post while the stone guardians remain. Defeat four Basalt Golems.',
-              [kill('golem', 4, 'Defeat Basalt Golems')], 1188, 210, 'golems'),
+              [kill('golem', 4, 'Defeat Basalt Golems')], 10, 210, 'golems'),
         quest('expedition', 'Emberfall Vanguard', 'captain',
               'Prove you can secure the entire expedition route: defeat two of every Crags enemy and report to Sera.',
               [kill(kind, 2, 'Defeat ' + label) for kind, label in
                [('wisp', 'Cinder Wisps'), ('spider', 'Magma Spiders'), ('wraith', 'Ash Wraiths'), ('golem', 'Basalt Golems')]],
-              1376, 250, 'golems'),
+              10, 250, 'golems'),
         quest('bounty', 'Cinderwatch Patrol', 'supplier',
               'Defeat ten enemies anywhere in Emberfall Crags and return to Dain. This camp patrol can be repeated.',
-              [kill('any', 10, 'Defeat Crags enemies')], 376, 100, 'welcome', True),
+              [kill('any', 10, 'Defeat Crags enemies')], 6, 100, 'welcome', True),
         quest('supply_route', 'Keep the Ash Road Open', 'supplier',
               'Clear three Cinder Wisps and three Magma Spiders for the next supply run. Dain offers this contract again after each turn-in.',
-              [kill('wisp', 3, 'Defeat Cinder Wisps'), kill('spider', 3, 'Defeat Magma Spiders')], 426, 110, 'spiders', True),
+              [kill('wisp', 3, 'Defeat Cinder Wisps'), kill('spider', 3, 'Defeat Magma Spiders')], 7, 110, 'spiders', True),
     ]
     objects = [
         dict(kind='tent', x=38, y=80, r=1.5, width=3, depth=2.4, color='#b76348', label='Command'),
