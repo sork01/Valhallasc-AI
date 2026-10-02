@@ -27,8 +27,8 @@ async function call(name, args = {}) {
   // The scene's fade must not leave a stacking context behind, or the chat (outside the scene) paints over every pane.
   // Reduced motion hides this, so replay the real fade with motion on.
   await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.evaluate(() => { const s = document.getElementById('scene-game'); s.hidden = true; void s.offsetWidth; s.hidden = false; });
-  await page.waitForTimeout(900);
+  check(await page.evaluate(() => { const s = document.getElementById('scene-game'); s.hidden = true; void s.offsetWidth; s.hidden = false; return s.getAnimations().length > 0; }), 'The scene fade replays with motion on');
+  await page.waitForFunction(() => document.getElementById('scene-game').getAnimations().every(a => a.playState === 'finished'), null, { timeout: 10000 });
   check(await page.evaluate(() => {
     const c = document.getElementById('chat').getBoundingClientRect(), top = document.elementFromPoint(c.left + c.width / 2, c.top + c.height / 2);
     return !!top && !!top.closest('#equipment');

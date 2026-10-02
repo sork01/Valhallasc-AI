@@ -22,6 +22,9 @@ pub const LEVEL_SPREAD: i32 = 2;
 /// Health, damage and rewards change by this fraction per level from the default.
 const LEVEL_HP_DAMAGE: f64 = 0.12;
 const LEVEL_REWARD: f64 = 0.15;
+/// Fights ran too fast, so every hit a player lands and every hit a player takes is cut to this share.
+const DAMAGE_DEALT_SCALE: f64 = 0.25;
+const DAMAGE_TAKEN_SCALE: f64 = 0.25;
 /// A player cannot take another portal for this long after arriving. Arrival points sit outside every gate, so this only
 /// guards against bouncing; it must stay below the walk from an arrival point to its gate (about 0.65 s).
 const PORTAL_DELAY: f64 = 0.5;
@@ -1200,7 +1203,9 @@ impl World {
         let hit_chance = p.character.hit_chance();
         let crit = self.random() < crit_chance;
         let damage = if self.random() < hit_chance {
-            (base * (0.8 + self.random() * 0.4) * if crit { 2. } else { 1. }).round()
+            (base * DAMAGE_DEALT_SCALE * (0.8 + self.random() * 0.4) * if crit { 2. } else { 1. })
+                .round()
+                .max(1.)
         } else {
             0.
         };
@@ -1826,7 +1831,9 @@ impl World {
         }
         let p = self.players.get_mut(&session).unwrap();
         let shield = p.buff(BuffKind::Shield).min(0.8);
-        let mut value = (damage - p.character.stats().1).max(1.);
+        let mut value = ((damage - p.character.stats().1).max(1.) * DAMAGE_TAKEN_SCALE)
+            .round()
+            .max(1.);
         if shield > 0. {
             value = (value * (1. - shield)).round().max(1.);
         }
@@ -3151,7 +3158,8 @@ mod tests {
                 w.update_slime(0);
             }
             let defense = w.players[&1].character.look.stats(1).1;
-            assert_eq!(w.players[&1].character.hp, 120. - (damage - defense));
+            let taken = ((damage - defense) * DAMAGE_TAKEN_SCALE).round().max(1.);
+            assert_eq!(w.players[&1].character.hp, 120. - taken);
         }
     }
 
@@ -3585,11 +3593,8 @@ mod tests {
                 }
             }
             let defense = w.players[&1].character.look.stats(1).1;
-            assert_eq!(
-                w.players[&1].character.hp,
-                1000. - (damage - defense),
-                "{kind} damage"
-            );
+            let taken = ((damage - defense) * DAMAGE_TAKEN_SCALE).round().max(1.);
+            assert_eq!(w.players[&1].character.hp, 1000. - taken, "{kind} damage");
             // Killing one pays its XP, gold and material in its own zone.
             w.hit_slime(id, 1, 100_000., false);
             let c = &w.players[&1].character;
