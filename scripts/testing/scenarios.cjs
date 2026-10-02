@@ -28,7 +28,11 @@ async function talk(w, bot, npcId, offer) {
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
 const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10 };
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
-const totalXp = p => p.xp + Array.from({ length: p.level - 1 }, (_, i) => 40 * (i + 1) ** 2 + 360 * (i + 1)).reduce((a, b) => a + b, 0);
+// XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
+const levelXp = JSON.parse(fs.readFileSync(path.join(root, 'world/levels.txt'), 'utf8'));
+const enemyXp = level => 45 + 5 * level;
+const totalXp = p => p.xp + levelXp.slice(0, p.level - 1).reduce((a, b) => a + b, 0);
+const skillCatalog = JSON.parse(fs.readFileSync(path.join(root, 'world/skills.txt'), 'utf8'));
 const quest = (w, bot, id) => w.player(bot).quests.find(q => q.id === id);
 async function defeat(w, bot, kind) {
   if (w.player(bot).hp < w.player(bot).maxHp * .85) await talk(w, bot, 'healer', 'blessing');
@@ -143,7 +147,7 @@ const scenarios = {
       }
       await w.waitFor(() => w.snapshot.players.length === 3);
       check(w.snapshot.players.length === 3, 'Three classes are online');
-      check(w.player('Warrior').xpNeed === 400, 'Authoritative level threshold');
+      check(w.player('Warrior').xpNeed === 100, 'Authoritative level threshold');
       const kings = w.snapshot.slimes.filter(s => s.kind === 'big');
       check(kings.length === 2 && kings.every(s => s.dead && s.state === 'waiting'), 'King slots start dormant');
       const original = { ...w.player('Warrior') };
@@ -192,7 +196,7 @@ const scenarios = {
       await w.action('Mage', { type: 'target', id: enemy.id });
       await w.waitFor(() => w.snapshot.slimes.find(s => s.id === enemy.id).dead, 30000, 'Defeat Ironhide');
       const after = w.player('Mage');
-      const xp = Math.round(32 * scale(.15)), gold = Math.round(10 * scale(.1));
+      const xp = enemyXp(enemy.level), gold = Math.round(10 * scale(.1));
       check(after.kills === before.kills + 1 && after.xp === before.xp + xp && after.hp > 0,
         `Real combat awards one kill and the level-${level} XP (${xp}) while the mage survives`);
       const defeated = w.snapshot.slimes.find(s => s.id === enemy.id);
@@ -255,16 +259,16 @@ const scenarios = {
       check(!quest(w, bot, 'welcome').claimed && w.player(bot).gold === 0, 'All three objectives are counted but the wrong NPC cannot pay the reward');
       const reward = await talk(w, bot, 'guide', 'quest:claim:welcome');
       await w.waitFor(() => quest(w, bot, 'welcome').claimed);
-      check(reward.gold === 12 && w.player(bot).xp === 40, 'Turn-in awards exactly 12 gold and 40 XP');
+      check(reward.gold === 12 && w.player(bot).xp === 10, 'Turn-in awards exactly 12 gold and 10 XP');
       await talk(w, bot, 'guide', 'quest:claim:welcome');
       await talk(w, bot, 'guide', 'quest:accept:welcome');
       check(w.player(bot).gold === 12 && quest(w, bot, 'welcome').completions === 1, 'One-time rewards cannot be replayed or reaccepted');
       const database = w.db;
       await w.restart();
-      check(w.db === database && w.player(bot).id === id && quest(w, bot, 'welcome').claimed && w.player(bot).gold === 12 && w.player(bot).xp === 40,
+      check(w.db === database && w.player(bot).id === id && quest(w, bot, 'welcome').claimed && w.player(bot).gold === 12 && w.player(bot).xp === 10,
         'Quest completion and rewards survive restarting the actual Rust process');
       await talk(w, bot, 'guide', 'quest:claim:welcome');
-      check(w.player(bot).gold === 12 && w.player(bot).xp === 40, 'Replaying a claim after restart grants nothing');
+      check(w.player(bot).gold === 12 && w.player(bot).xp === 10, 'Replaying a claim after restart grants nothing');
     },
   },
   quest_combat: {
@@ -275,6 +279,10 @@ const scenarios = {
       // The welcome tour is covered by the quests scenario; here it is only the prerequisite of the patrol.
       await kit.setupCharacter(w, bot, { finishQuests: ['welcome'] });
       await w.connect({ bot: 'Observer' });
+      // Level 1 here; the kills below pay enough XP to pass level 2, so the locked-skill refusal is checked first.
+      await cast(w, bot, 'twinbolt');
+      await w.waitFor(() => w.events.some(e => e.bot === bot && e.type === 'error' && e.text === 'Twin Bolt unlocks at level 2.'), 5000, 'Locked skill');
+      check(Object.keys(w.player(bot).skillCd).length === 0, 'A skill above the mage level is refused with its unlock level and costs nothing');
       const locked = await talk(w, bot, 'smith', 'quest:accept:ironhide_hunt');
       check(locked.notice.includes('earlier quest') && !quest(w, bot, 'ironhide_hunt'), 'Ironhide hunt is locked until the slime patrol is turned in');
       await talk(w, bot, 'gatekeeper', 'quest:accept:slime_patrol');
@@ -287,22 +295,21 @@ const scenarios = {
       check(w.player('Observer').kills === 0 && !w.player('Observer').quests.length, 'Another player receives no killer quest credit');
       await talk(w, bot, 'smith', 'quest:accept:ironhide_hunt');
       check(!quest(w, bot, 'ironhide_hunt'), 'Completing objectives alone does not unlock the next quest');
-      // The patrol pays 88 XP, so top the bar up to leave exactly 10 XP over after the level-up.
-      await w.debug(bot, { op: 'give_xp', amount: w.player(bot).xpNeed - 88 - w.player(bot).xp + 10 });
-      check(w.player(bot).level === 1, 'The top-up stops just short of level 2');
-      const before = { ...w.player(bot) };
-      await cast(w, bot, 'twinbolt');
-      await w.waitFor(() => w.events.some(e => e.bot === bot && e.type === 'error' && e.text === 'Twin Bolt unlocks at level 2.'), 5000, 'Locked skill');
-      check(Object.keys(w.player(bot).skillCd).length === 0, 'A skill above the mage level is refused with its unlock level and costs nothing');
+      // Kill XP depends on the rolled enemy levels, so the mage is level 2 or 3 here. The patrol pays 20 XP: top the
+      // bar up so that turning it in crosses exactly one level and leaves 10 XP over.
+      await w.debug(bot, { op: 'give_xp', amount: w.player(bot).xpNeed - 20 - w.player(bot).xp + 10 });
+      const before = { ...w.player(bot) }, next = before.level + 1;
+      check(before.level >= 2 && before.xp === before.xpNeed - 10, 'The top-up stops just short of the next level');
       await talk(w, bot, 'gatekeeper', 'quest:claim:slime_patrol');
       await w.waitFor(() => quest(w, bot, 'slime_patrol').claimed);
-      check(w.player(bot).gold === before.gold + 24 && w.player(bot).level === 2 && totalXp(w.player(bot)) === totalXp(before) + 88,
-        'Patrol turn-in awards 24 gold and 88 XP, levels the mage, and carries the remainder');
-      const levelUp = w.events.find(e => e.bot === bot && e.kind === 'levelup' && e.actor === w.player(bot).id && e.level === 2);
-      check(levelUp && JSON.stringify(levelUp.unlocked) === '["twinbolt"]', 'The level-up event carries the new level and names the skill it unlocks');
+      check(w.player(bot).gold === before.gold + 24 && w.player(bot).level === next && w.player(bot).xp === 10 && totalXp(w.player(bot)) === totalXp(before) + 20,
+        'Patrol turn-in awards 24 gold and 20 XP, levels the mage, and carries the remainder');
+      const unlocks = skillCatalog.filter(k => k.class === 'mage' && k.level === next).map(k => k.id);
+      const levelUp = w.events.find(e => e.bot === bot && e.kind === 'levelup' && e.actor === w.player(bot).id && e.level === next);
+      check(levelUp && JSON.stringify(levelUp.unlocked) === JSON.stringify(unlocks), 'The level-up event carries the new level and names the skill it unlocks');
       await cast(w, bot, 'twinbolt');
       await w.waitFor(() => w.player(bot).skillCd.twinbolt > 0, 5000, 'Twin Bolt cooldown');
-      check(w.snapshot.bolts.length >= 2 || w.events.some(e => e.bot === bot && e.kind === 'skill' && e.skill === 'twinbolt'), 'The newly unlocked Twin Bolt casts for real');
+      check(w.snapshot.bolts.length >= 2 || w.events.some(e => e.bot === bot && e.kind === 'skill' && e.skill === 'twinbolt'), 'Twin Bolt casts for real once unlocked');
       await talk(w, bot, 'smith', 'quest:accept:ironhide_hunt');
       await talk(w, bot, 'merchant', 'quest:accept:meadow_bounty');
       await w.waitFor(() => !!quest(w, bot, 'meadow_bounty'));
@@ -323,7 +330,7 @@ const scenarios = {
       const bountyBefore = { ...w.player(bot) };
       await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
       await w.waitFor(() => quest(w, bot, 'meadow_bounty').claimed);
-      check(w.player(bot).gold === bountyBefore.gold + 25 && totalXp(w.player(bot)) === totalXp(bountyBefore) + 144,
+      check(w.player(bot).gold === bountyBefore.gold + 25 && totalXp(w.player(bot)) === totalXp(bountyBefore) + 40,
         'Eight mixed kills pay the promised bounty reward');
       await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
       check(w.player(bot).gold === bountyBefore.gold + 25, 'Repeated bounty claims cannot duplicate rewards');
@@ -353,7 +360,10 @@ const scenarios = {
       const gold = w.player(bot).gold;
       await walkTo(w, bot, corpse);
       await w.waitFor(() => count('slime_gel') === 1);
-      check(w.events.some(e => e.kind === 'itemPickup' && e.actor === w.player(bot).id && e.item === 'slime_gel'), 'Real combat creates a collectible material drop');
+      // The snapshot with the new stack and the pickup event are separate messages, so wait for the event too.
+      const pickedUp = () => w.events.some(e => e.kind === 'itemPickup' && e.actor === w.player(bot).id && e.item === 'slime_gel');
+      await w.waitFor(pickedUp, 5000, 'Pickup event');
+      check(pickedUp(), 'Real combat creates a collectible material drop');
       await w.waitFor(() => w.player(bot).gold > gold);
       check(w.player(bot).gold > gold, 'Gold drops remain alongside material drops');
       await w.action(bot, { type: 'interact', npc: 'merchant', offer: 'sell:slime_gel:1' });
@@ -467,7 +477,7 @@ const scenarios = {
       await w.action(bot, { type: 'stop' });
       const after = w.player(bot);
       check(after.hp > 0, 'The warrior survives real combat in the Crags');
-      const xp = Math.round(80 * (1 + .15 * (wisp.level - 5))), gold = Math.round(18 * (1 + .1 * (wisp.level - 5)));
+      const xp = enemyXp(wisp.level), gold = Math.round(18 * (1 + .1 * (wisp.level - 5)));
       check(after.kills === before.kills + 1 && after.xp === before.xp + xp, `The kill pays the level-${wisp.level} XP (${xp})`);
       const corpse = w.snapshot.slimes.find(s => s.id === wisp.id);
       await w.action(bot, { type: 'move', x: corpse.x, y: corpse.y });

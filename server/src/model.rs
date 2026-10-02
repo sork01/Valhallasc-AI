@@ -214,6 +214,29 @@ pub struct Attributes {
     pub dexterity: u32,
     pub accuracy: u32,
 }
+/// XP to go from level L to L+1, for levels 1..=98, from world/levels.txt.
+static LEVEL_XP: std::sync::LazyLock<Vec<u32>> = std::sync::LazyLock::new(|| {
+    serde_json::from_str(include_str!("../../world/levels.txt")).expect("valid level table")
+});
+/// XP a character needs to go from `level` to the next. Past the end of the table each level adds what the last
+/// one did, so nothing breaks above 98.
+pub fn xp_to_level(level: u32) -> u32 {
+    let table = &*LEVEL_XP;
+    let level = level.max(1) as usize;
+    match table.get(level - 1) {
+        Some(need) => *need,
+        None => {
+            let last = table.len();
+            let step = table[last - 1] - table[last - 2];
+            table[last - 1] + step * (level - last) as u32
+        }
+    }
+}
+/// XP an enemy of `level` pays: 45 + 5 per level, so a same-level kill is half a level at level 1 and a fraction of a
+/// percent at level 98.
+pub fn enemy_xp(level: u32) -> u32 {
+    45 + 5 * level.max(1)
+}
 impl Character {
     pub fn max_hp(&self) -> f64 {
         self.look.class.health()
@@ -282,8 +305,7 @@ impl Character {
         (self.look.class.cooldown() * self.cooldown_multiplier()).max(self.look.class.duration())
     }
     pub fn xp_need(&self) -> u32 {
-        let level = self.level as u64;
-        (40 * level * level + 360 * level) as u32
+        xp_to_level(self.level)
     }
     pub fn point(&self) -> Point {
         Point {
@@ -718,6 +740,25 @@ impl Map {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn level_table_drives_xp_and_enemies_pay_forty_five_plus_five_per_level() {
+        assert_eq!(
+            [1, 2, 3, 4, 10, 25, 98].map(xp_to_level),
+            [100, 200, 400, 600, 2100, 9600, 118300]
+        );
+        assert!(
+            (1..98).all(|l| xp_to_level(l + 1) > xp_to_level(l)),
+            "the table only grows"
+        );
+        assert_eq!(
+            xp_to_level(99),
+            118300 + 2300,
+            "levels past the table keep the last step"
+        );
+        assert_eq!(xp_to_level(0), 100);
+        assert_eq!([1, 2, 5, 10, 98].map(enemy_xp), [50, 55, 70, 95, 535]);
+    }
 
     #[test]
     fn city_footprints_block_walks_and_dashes_but_gate_is_open() {

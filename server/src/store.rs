@@ -197,7 +197,7 @@ mod tests {
     fn old_characters_receive_points_for_existing_levels_once() {
         let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();
         let (mut c, token) = s.create(Look::default(), Point::default()).unwrap();
-        c.grant_xp(1280);
+        c.grant_xp(300);
         let mut old = serde_json::to_value(&c).unwrap();
         old.as_object_mut().unwrap().remove("attributes");
         s.db.execute(

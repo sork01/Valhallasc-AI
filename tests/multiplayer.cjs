@@ -101,7 +101,7 @@ const { route } = require('../scripts/testing/route.cjs');
   check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='beetle').length===5 && Field.slimes.filter(s=>s.kind==='beetle').every(s=>s.level===5 && s.maxHp===240 && s.windupTime===.4)), 'Five tougher beetles arrive from authoritative snapshots, each at its default level 5 (the suite pins VALHALLA_LEVEL_SPREAD=0)');
   check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='big').every(s=>s.level===6 && s.maxHp===600 && s.windupTime===.35)), 'King Slime has stronger health and faster windup');
   check(await warrior.evaluate(() => {const kings=Field.slimes.filter(s=>s.kind==='big');return kings.length===2 && kings.every(s=>s.dead && s.hp===0 && s.state==='waiting' && s.dieT>=2);}), 'Kings start hidden while waiting for the rare spawn timer');
-  check(await warrior.evaluate(() => Field.hero.xpNeed===400), 'Server sends the leveling threshold 40L² + 360L');
+  check(await warrior.evaluate(() => Field.hero.xpNeed===100), 'Server sends the level table threshold');
   check(await warrior.evaluate(() => {const src=Field.beetleSprites;return src.img.beetle.complete && src.img.beetle.naturalWidth===576 && src.img.beetle.naturalHeight===320 && Object.keys(src.meta.clips).length===5;}), 'PixelFlow beetle atlas and all five clips load in browser');
   await warrior.waitForFunction(() => Field.remotePlayers.length === 2 && Field.remotePlayers.every(p => p.sprite), null, { timeout: 60000 });
   check(await warrior.evaluate(() => Field.hero.maxHp===120 && Field.remotePlayers.some(p=>p.look.class==='mage'&&p.maxHp===80) && Field.remotePlayers.some(p=>p.look.class==='assassin'&&p.maxHp===90)), 'Three classes see each other');
@@ -170,7 +170,7 @@ const { route } = require('../scripts/testing/route.cjs');
   await mage.locator('#npc-close').click();
   await walkTo(mage, { x: 7, y: 64 });
   // Approach and fight an Ironhide with real movement/target commands and unchanged HP.
-  const beetleState=await mage.evaluate(()=>({start:{x:Field.hero.x,y:Field.hero.y},enemy:Field.slimes.find(s=>s.kind==='beetle'&&s.hx===18&&s.hy===42),kills:Field.hero.kills,xp:Field.hero.xp,gold:Field.hero.gold}));
+  const beetleState=await mage.evaluate(()=>({start:{x:Field.hero.x,y:Field.hero.y},enemy:Field.slimes.find(s=>s.kind==='beetle'&&s.hx===18&&s.hy===42),kills:Field.hero.kills,xp:Field.hero.xp,level:Field.hero.level,xpNeed:Field.hero.xpNeed,gold:Field.hero.gold}));
   const pickupStart=mage.pickups.length, mageId=await mage.evaluate(()=>Online.id);
   const beetle=beetleState.enemy;
   for (const point of route(map,beetleState.start,beetle)) {
@@ -185,7 +185,7 @@ const { route } = require('../scripts/testing/route.cjs');
   check(await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return Math.hypot(Field.hero.x-s.x,Field.hero.y-s.y)<9;},beetle.id),'Ironhide is visible in real browser combat');
   await mage.waitForFunction(id=>Field.slimes.find(s=>s.id===id)?.dead,beetle.id,{timeout:30000});
   await warrior.waitForFunction(id=>Field.slimes.find(s=>s.id===id)?.dead,beetle.id);passed++;
-  check(await mage.evaluate(before=>Field.hero.kills===before.kills+1&&Field.hero.level===1&&Field.hero.xp===before.xp+Math.round(32*(1+.15*(before.enemy.level-5)))&&Field.hero.hp>0,beetleState),'Beetle combat awards its level-scaled XP once and preserves slower leveling');
+  check(await mage.evaluate(before=>Field.hero.kills===before.kills+1&&(()=>{const total=before.xp+45+5*before.enemy.level;return before.level===Field.hero.level&&Field.hero.xp===total||Field.hero.level===before.level+1&&Field.hero.xp===total-before.xpNeed;})()&&Field.hero.hp>0,beetleState),'Beetle combat awards 45 + 5 per enemy level once, carrying any overflow into the next level');
   const beetleDrop=await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return {x:s.x,y:s.y};},beetle.id);
   await mage.evaluate(p=>Online.send({type:'move',...p}),beetleDrop);
   const beetleGold=Math.round(10*(1+.1*(beetle.level-5)));

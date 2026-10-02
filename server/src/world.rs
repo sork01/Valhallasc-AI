@@ -19,9 +19,9 @@ const KING_SPAWN_MAX: f64 = 600.;
 const PLAYER_RADIUS: f64 = 0.3;
 /// Every enemy rolls its level within this distance of its kind's default level.
 pub const LEVEL_SPREAD: i32 = 2;
-/// Health, damage and rewards change by this fraction per level from the default.
+/// Health and damage change by this fraction per level from the default; gold changes by 10%. XP does not scale
+/// this way: an enemy pays `enemy_xp(level)`, set by its own level alone.
 const LEVEL_HP_DAMAGE: f64 = 0.12;
-const LEVEL_REWARD: f64 = 0.15;
 /// Fights ran too fast, so every hit a player lands and every hit a player takes is cut to this share.
 const DAMAGE_DEALT_SCALE: f64 = 0.25;
 const DAMAGE_TAKEN_SCALE: f64 = 0.25;
@@ -207,19 +207,19 @@ struct Slime {
     hit: bool,
 }
 impl Slime {
-    // Health, damage, speed, body scale and XP of a default-level enemy.
-    fn stats(kind: &str) -> (f64, f64, f64, f64, u32) {
+    // Health, damage, speed and body scale of a default-level enemy.
+    fn stats(kind: &str) -> (f64, f64, f64, f64) {
         match kind {
-            "blue" => (80., 10., 2.4, 1.05, 16),
-            "pink" => (70., 9., 2.1, 1., 15),
-            "yellow" => (90., 11., 2.2, 1.05, 20),
-            "big" => (600., 30., 2.2, 1.75, 75),
-            "beetle" => (240., 22., 2.8, 1.3, 32),
-            "wisp" => (280., 34., 3.4, 0.95, 80),
-            "spider" => (420., 42., 3., 1.2, 120),
-            "wraith" => (520., 52., 2.6, 1.15, 170),
-            "golem" => (1100., 64., 1.9, 1.5, 280),
-            _ => (60., 8., 1.9, 1., 12),
+            "blue" => (80., 10., 2.4, 1.05),
+            "pink" => (70., 9., 2.1, 1.),
+            "yellow" => (90., 11., 2.2, 1.05),
+            "big" => (600., 30., 2.2, 1.75),
+            "beetle" => (240., 22., 2.8, 1.3),
+            "wisp" => (280., 34., 3.4, 0.95),
+            "spider" => (420., 42., 3., 1.2),
+            "wraith" => (520., 52., 2.6, 1.15),
+            "golem" => (1100., 64., 1.9, 1.5),
+            _ => (60., 8., 1.9, 1.),
         }
     }
     // The level an enemy of this kind has before its random spread is applied.
@@ -268,9 +268,8 @@ impl Slime {
         Self::with_level(id, s, Self::default_level(&s.kind))
     }
     fn with_level(id: usize, s: &SlimeSpawn, level: u32) -> Self {
-        let (hp, damage, _, scale, xp) = Self::stats(&s.kind);
+        let (hp, damage, _, scale) = Self::stats(&s.kind);
         let strength = Self::level_scale(&s.kind, level, LEVEL_HP_DAMAGE);
-        let reward = Self::level_scale(&s.kind, level, LEVEL_REWARD);
         let hp = (hp * strength).round();
         Self {
             id,
@@ -300,7 +299,7 @@ impl Slime {
             seed: id as f64,
             windup_time: Self::attack_profile(&s.kind).0,
             damage: (damage * strength).round(),
-            xp: (xp as f64 * reward).round() as u32,
+            xp: enemy_xp(level),
             gold: (Self::base_gold(&s.kind) as f64 * Self::level_scale(&s.kind, level, 0.1)).round()
                 as u32,
             target: None,
@@ -2181,7 +2180,7 @@ mod tests {
                 assert!(ids.insert(&q.id), "globally unique persistent quest ids");
                 assert!(area.npcs.iter().any(|n| n.id == q.npc));
                 assert!(q.reward_xp > 0 && q.reward_gold > 0 && !q.objectives.is_empty());
-                let need = 40 * q.level * q.level + 360 * q.level;
+                let need = xp_to_level(q.level);
                 assert!(q.level >= 1, "{} needs a recommended level", q.id);
                 assert_eq!(
                     q.reward_xp,
@@ -2516,7 +2515,7 @@ mod tests {
             },
         );
         assert_eq!(w.players[&1].character.attributes.strength, 0);
-        w.players.get_mut(&1).unwrap().character.grant_xp(400);
+        w.players.get_mut(&1).unwrap().character.grant_xp(100);
         for stat in ["fake", "strength", "stamina", "accuracy", "dexterity"] {
             w.message(1, ClientMessage::AllocateStat { stat: stat.into() });
         }
@@ -2628,10 +2627,10 @@ mod tests {
         quest_interact(&mut w, "innkeeper", None);
         quest_interact(&mut w, "innkeeper", Some("quest:claim:welcome"));
         assert_eq!(w.players[&1].character.gold, 0);
-        w.players.get_mut(&1).unwrap().character.xp = 380;
+        w.players.get_mut(&1).unwrap().character.xp = 95;
         quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
         let c = &w.players[&1].character;
-        assert_eq!((c.level, c.xp, c.gold), (2, 20, 12));
+        assert_eq!((c.level, c.xp, c.gold), (2, 5, 12));
         assert_eq!(c.hp, c.max_hp());
         assert!(c.quests[0].claimed);
         quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
@@ -3325,17 +3324,17 @@ mod tests {
         let base = Slime::with_level(0, &spawn("beetle"), 5);
         assert_eq!(
             (base.max_hp, base.damage, base.xp, base.gold),
-            (240., 22., 32, 10)
+            (240., 22., 70, 10)
         );
         let high = Slime::with_level(0, &spawn("beetle"), 7);
         assert_eq!(
             (high.max_hp, high.damage, high.xp, high.gold),
-            (298., 27., 42, 12)
+            (298., 27., 80, 12)
         );
         let low = Slime::with_level(0, &spawn("beetle"), 3);
         assert_eq!(
             (low.max_hp, low.damage, low.xp, low.gold),
-            (182., 17., 22, 8)
+            (182., 17., 60, 8)
         );
         assert_eq!(high.r, base.r, "level never changes body size");
         // A kill pays the rolled enemy's XP and gold, not the kind's default.
@@ -3344,7 +3343,7 @@ mod tests {
         let id = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
         w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), 7);
         w.hit_slime(id, 1, 5000., false);
-        assert_eq!(w.players[&1].character.xp, 42);
+        assert_eq!(w.players[&1].character.xp, 80);
         assert_eq!(w.drops.iter().find(|d| d.item.is_none()).unwrap().value, 12);
     }
 
@@ -3557,10 +3556,10 @@ mod tests {
     #[test]
     fn crag_monsters_charge_with_their_own_authoritative_damage_and_rewards() {
         for (kind, hp, damage, windup, gold, material_id, xp) in [
-            ("wisp", 280., 34., 0.35, 18, "ember_core", 80),
-            ("spider", 420., 42., 0.4, 26, "magma_fang", 120),
-            ("wraith", 520., 52., 0.5, 36, "ash_veil", 170),
-            ("golem", 1100., 64., 0.6, 55, "basalt_heart", 280),
+            ("wisp", 280., 34., 0.35, 18, "ember_core", 70),
+            ("spider", 420., 42., 0.4, 26, "magma_fang", 80),
+            ("wraith", 520., 52., 0.5, 36, "ash_veil", 85),
+            ("golem", 1100., 64., 0.6, 55, "basalt_heart", 95),
         ] {
             let mut w = world();
             let _rx = join(&mut w, 1, Class::Warrior);
@@ -3608,7 +3607,7 @@ mod tests {
             w.hit_slime(id, 1, 100_000., false);
             let c = &w.players[&1].character;
             assert_eq!(c.kills, 1);
-            let paid: u32 = (1..c.level).map(|l| 40 * l * l + 360 * l).sum::<u32>() + c.xp;
+            let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
             assert_eq!(paid, xp, "{kind} xp");
             assert_eq!(
                 w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
@@ -3625,21 +3624,22 @@ mod tests {
     }
 
     #[test]
-    fn leveling_follows_the_quadratic_curve_and_carries_remaining_xp() {
+    fn leveling_follows_the_level_table_and_carries_remaining_xp() {
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Warrior);
-        assert_eq!(w.players[&1].character.xp_need(), 400);
-        for _ in 0..33 {
-            w.hit_slime(0, 1, 1000., false);
-            w.slimes[0].respawn = TICK;
-            w.update_slime(0);
-        }
+        assert_eq!(w.players[&1].character.xp_need(), 100);
+        w.hit_slime(0, 1, 1000., false);
+        w.slimes[0].respawn = TICK;
+        w.update_slime(0);
         assert_eq!(w.players[&1].character.level, 1);
-        assert_eq!(w.players[&1].character.xp, 396);
+        assert_eq!(
+            w.players[&1].character.xp, 55,
+            "a level-2 green pays 45 + 5 x 2"
+        );
         w.hit_slime(0, 1, 1000., false);
         assert_eq!(w.players[&1].character.level, 2);
-        assert_eq!(w.players[&1].character.xp, 8);
-        assert_eq!(w.players[&1].character.xp_need(), 880);
+        assert_eq!(w.players[&1].character.xp, 10);
+        assert_eq!(w.players[&1].character.xp_need(), 200);
         assert_eq!(w.players[&1].character.hp, 140.);
     }
 
@@ -3651,7 +3651,7 @@ mod tests {
         w.hit_slime(id, 1, 1000., false);
         w.hit_slime(id, 1, 1000., false);
         assert_eq!(w.players[&1].character.kills, 1);
-        assert_eq!(w.players[&1].character.xp, 32);
+        assert_eq!(w.players[&1].character.xp, 70);
         assert_eq!(w.drops.iter().filter(|d| d.item.is_none()).count(), 1);
         assert_eq!(
             w.drops
@@ -3791,7 +3791,7 @@ mod tests {
                 .count(),
             1
         );
-        assert_eq!(w.players[&1].character.xp, 12);
+        assert_eq!(w.players[&1].character.xp, 55);
         w.slimes[0].respawn = TICK;
         w.step();
         assert!(!w.slimes[0].dead);
@@ -5049,14 +5049,14 @@ mod tests {
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.level = 1;
         c.xp = 20;
-        assert_eq!(c.lose_death_xp(), (133, 0));
+        assert_eq!(c.lose_death_xp(), (33, 0));
         assert_eq!((c.level, c.xp), (1, 0));
         c.level = 2;
         c.xp = 0;
         let (_, levels) = c.lose_death_xp();
         assert_eq!(levels, 1);
         assert_eq!(c.level, 1);
-        assert_eq!(c.xp, c.xp_need() - 293);
+        assert_eq!(c.xp, c.xp_need() - 66);
     }
 
     // ----- food and potions -----

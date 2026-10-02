@@ -1509,7 +1509,7 @@
         }
       ],
       "level": 1,
-      "rewardXp": 40,
+      "rewardXp": 10,
       "rewardGold": 12,
       "requires": null,
       "repeatable": false
@@ -1528,7 +1528,7 @@
         }
       ],
       "level": 2,
-      "rewardXp": 88,
+      "rewardXp": 20,
       "rewardGold": 24,
       "requires": null,
       "repeatable": false
@@ -1547,7 +1547,7 @@
         }
       ],
       "level": 4,
-      "rewardXp": 208,
+      "rewardXp": 60,
       "rewardGold": 35,
       "requires": "slime_patrol",
       "repeatable": false
@@ -1566,7 +1566,7 @@
         }
       ],
       "level": 5,
-      "rewardXp": 280,
+      "rewardXp": 80,
       "rewardGold": 60,
       "requires": "ironhide_hunt",
       "repeatable": false
@@ -1585,7 +1585,7 @@
         }
       ],
       "level": 3,
-      "rewardXp": 144,
+      "rewardXp": 40,
       "rewardGold": 25,
       "requires": "slime_patrol",
       "repeatable": true
@@ -4592,7 +4592,7 @@
             }
           ],
           "level": 5,
-          "rewardXp": 280,
+          "rewardXp": 80,
           "rewardGold": 40,
           "requires": null,
           "repeatable": false
@@ -4611,7 +4611,7 @@
             }
           ],
           "level": 5,
-          "rewardXp": 280,
+          "rewardXp": 80,
           "rewardGold": 65,
           "requires": "crags_welcome",
           "repeatable": false
@@ -4630,7 +4630,7 @@
             }
           ],
           "level": 6,
-          "rewardXp": 360,
+          "rewardXp": 100,
           "rewardGold": 90,
           "requires": "crags_wisps",
           "repeatable": false
@@ -4649,7 +4649,7 @@
             }
           ],
           "level": 6,
-          "rewardXp": 360,
+          "rewardXp": 100,
           "rewardGold": 100,
           "requires": "crags_wisps",
           "repeatable": false
@@ -4668,7 +4668,7 @@
             }
           ],
           "level": 7,
-          "rewardXp": 448,
+          "rewardXp": 130,
           "rewardGold": 130,
           "requires": "crags_spiders",
           "repeatable": false
@@ -4687,7 +4687,7 @@
             }
           ],
           "level": 7,
-          "rewardXp": 448,
+          "rewardXp": 130,
           "rewardGold": 120,
           "requires": "crags_spiders",
           "repeatable": false
@@ -4706,7 +4706,7 @@
             }
           ],
           "level": 8,
-          "rewardXp": 544,
+          "rewardXp": 150,
           "rewardGold": 165,
           "requires": "crags_wraiths",
           "repeatable": false
@@ -4725,7 +4725,7 @@
             }
           ],
           "level": 9,
-          "rewardXp": 648,
+          "rewardXp": 180,
           "rewardGold": 160,
           "requires": "crags_wraiths",
           "repeatable": false
@@ -4744,7 +4744,7 @@
             }
           ],
           "level": 10,
-          "rewardXp": 760,
+          "rewardXp": 210,
           "rewardGold": 210,
           "requires": "crags_golems",
           "repeatable": false
@@ -4781,7 +4781,7 @@
             }
           ],
           "level": 10,
-          "rewardXp": 760,
+          "rewardXp": 210,
           "rewardGold": 250,
           "requires": "crags_golems",
           "repeatable": false
@@ -4800,7 +4800,7 @@
             }
           ],
           "level": 6,
-          "rewardXp": 360,
+          "rewardXp": 100,
           "rewardGold": 100,
           "requires": "crags_welcome",
           "repeatable": true
@@ -4825,7 +4825,7 @@
             }
           ],
           "level": 7,
-          "rewardXp": 448,
+          "rewardXp": 130,
           "rewardGold": 110,
           "requires": "crags_spiders",
           "repeatable": true
