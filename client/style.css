@@ -28,7 +28,7 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 #art, #fx { position: absolute; inset: 0; width: 100%; height: 100%; }
 #art { background: url(assets/splash.webp) center / 100% 100%; }
 #fx { pointer-events: none; }
-.scene { position: absolute; inset: 0; animation: sceneIn .6s ease both; }
+.scene { position: absolute; inset: 0; animation: sceneIn .6s ease backwards; }
 @keyframes sceneIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* Behind the creation screen the illustration is dimmed and blurred */

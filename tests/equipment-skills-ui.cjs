@@ -24,6 +24,16 @@ async function call(name, args = {}) {
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites && document.querySelectorAll('#skillbar-slots button').length === 12, null, { timeout: 60000 });
   await page.keyboard.press('e');
   check(await page.locator('#equipment').isVisible(), 'E opens equipment');
+  // The scene's fade must not leave a stacking context behind, or the chat (outside the scene) paints over every pane.
+  // Reduced motion hides this, so replay the real fade with motion on.
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.evaluate(() => { const s = document.getElementById('scene-game'); s.hidden = true; void s.offsetWidth; s.hidden = false; });
+  await page.waitForTimeout(900);
+  check(await page.evaluate(() => {
+    const c = document.getElementById('chat').getBoundingClientRect(), top = document.elementFromPoint(c.left + c.width / 2, c.top + c.height / 2);
+    return !!top && !!top.closest('#equipment');
+  }), 'Equipment pane paints above the chat');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   const labels = await page.locator('#equipped-slots label').allTextContents();
   check(JSON.stringify(labels) === JSON.stringify(['HEADGEAR', 'SHOULDERS', 'CHEST', 'PANTS', 'GLOVES', 'HANDS', 'NECKLACE', 'ACCESSORY 1', 'ACCESSORY 2']), 'All nine requested equipment slots appear');
   check(await page.locator('[data-slot="chest"] b').textContent() === 'Apprentice Robes', 'Existing armor fills Chest');
