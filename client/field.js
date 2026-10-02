@@ -1148,7 +1148,7 @@
       } else if (it.drop) {
         const d = it.drop, item = WORLD_ITEMS.find(i => i.id === d.item);
         g.save(); g.translate(it.sx + (d.item ? 12 : -8), it.sy - d.z); g.fillStyle = d.col; g.strokeStyle = OL; g.lineWidth = 2.4;
-        if (item?.rarity === 'rare') { g.shadowColor = d.col; g.shadowBlur = 12; }
+        if (item && item.rarity !== 'common') { g.shadowColor = d.col; g.shadowBlur = 12; }
         g.beginPath();
         if (d.item) { g.moveTo(0,-12); g.lineTo(10,-2); g.lineTo(0,8); g.lineTo(-10,-2); g.closePath(); }
         else { g.moveTo(0, -9); g.bezierCurveTo(8, -1, 8, 6, 0, 6); g.bezierCurveTo(-8, 6, -8, -1, 0, -9); }

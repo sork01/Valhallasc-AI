@@ -74,25 +74,56 @@ pub fn material(kind: &str) -> &'static str {
         _ => "slime_gel",
     }
 }
-pub fn equipment_chance(kind: &str) -> f64 {
-    match kind {
-        "big" => 0.35,
-        "golem" => 0.20,
-        "wraith" => 0.14,
-        "beetle" => 0.12,
-        "spider" => 0.10,
-        "wisp" => 0.08,
-        "blue" | "pink" | "yellow" => 0.05,
-        _ => 0.02,
+/// Rarity tiers, lowest first. The catalog colours them gray, green, blue, purple and orange.
+pub const RARITIES: [&str; 5] = ["common", "uncommon", "rare", "epic", "legendary"];
+/// Elites (special enemies) roll every tier this many times as often, and are the only source of legendary gear.
+pub const ELITE_DROP_MULTIPLIER: f64 = 5.;
+/// Chance per ordinary kill that one piece of this tier drops. Common gear never drops (it is starter gear).
+pub fn base_drop_chance(rarity: &str) -> f64 {
+    match rarity {
+        "uncommon" => 0.015,
+        "rare" => 0.0003,
+        "epic" => 0.0001,
+        "legendary" => 0.0001,
+        _ => 0.,
     }
 }
-pub fn roll_equipment(kind: &str, chance: f64, choice: f64) -> Option<&'static Item> {
-    if chance >= equipment_chance(kind) {
-        return None;
+/// Colour of the drop marker on the ground; the client CSS uses the same five.
+pub fn rarity_color(rarity: &str) -> &'static str {
+    match rarity {
+        "uncommon" => "#4ad66d",
+        "rare" => "#4aa3ff",
+        "epic" => "#b45cff",
+        "legendary" => "#ff9a2e",
+        _ => "#c4c4c4",
     }
+}
+pub fn is_elite(kind: &str) -> bool {
+    kind == "big"
+}
+/// Which tier, if any, a kill drops. `roll` is uniform in [0, 1): the bands start with the rarest tier, so one roll
+/// gives at most one piece. Legendary exists only for elites.
+pub fn roll_rarity(kind: &str, roll: f64) -> Option<&'static str> {
+    let elite = is_elite(kind);
+    let multiplier = if elite { ELITE_DROP_MULTIPLIER } else { 1. };
+    let mut edge = 0.;
+    for rarity in RARITIES.iter().rev() {
+        if *rarity == "legendary" && !elite {
+            continue;
+        }
+        edge += base_drop_chance(rarity) * multiplier;
+        if roll < edge {
+            return Some(rarity);
+        }
+    }
+    None
+}
+/// A random piece of gear of the rolled tier; an empty tier drops nothing.
+pub fn roll_equipment(kind: &str, chance: f64, choice: f64) -> Option<&'static Item> {
+    let rarity = roll_rarity(kind, chance)?;
     let pool: Vec<_> = ITEMS
         .iter()
-        .filter(|i| i.rarity == "rare" && i.kind != "material")
+        .filter(|i| i.rarity == rarity && i.kind != "material")
         .collect();
     pool.get((choice * pool.len() as f64) as usize).copied()
 }
@@ -464,18 +495,19 @@ mod tests {
         c.allocate_stat("intellect").unwrap();
         assert_eq!(c.stat_points(), before - 1);
     }
+    // One roll value that lands inside a tier's band, found by walking the same bands roll_rarity uses.
+    fn roll_for(kind: &str, rarity: &str) -> f64 {
+        let mut x = 0.;
+        while x < 1. {
+            if roll_rarity(kind, x) == Some(rarity) {
+                return x;
+            }
+            x += 0.000001;
+        }
+        panic!("{kind} never rolls {rarity}");
+    }
     #[test]
-    fn deeper_enemies_drop_gear_more_often_and_each_kind_has_its_own_material() {
-        let chances: Vec<_> = ["green", "beetle", "wisp", "spider", "wraith", "golem"]
-            .iter()
-            .map(|k| equipment_chance(k))
-            .collect();
-        assert!(
-            chances[0] < chances[1]
-                && chances[2] < chances[3]
-                && chances[3] < chances[4]
-                && chances[4] < chances[5]
-        );
+    fn each_kind_has_its_own_material() {
         for (kind, id, sell) in [
             ("wisp", "ember_core", 28),
             ("spider", "magma_fang", 36),
@@ -488,28 +520,114 @@ mod tests {
         }
     }
     #[test]
-    fn loot_rates_and_pool_cover_every_class_and_slot() {
-        for kind in ["green", "blue", "pink", "yellow", "beetle", "big"] {
-            assert!(roll_equipment(kind, equipment_chance(kind), 0.).is_none());
-            for class in [
-                Class::Warrior,
-                Class::Mage,
-                Class::Assassin,
-                Class::Priest,
-                Class::Hunter,
-            ] {
-                for slot in ["armor", "weapon"] {
-                    let pool_size = ITEMS.iter().filter(|i| i.rarity == "rare").count();
-                    assert!((0..pool_size).any(|n| {
-                        roll_equipment(kind, 0., (n as f64 + 0.5) / pool_size as f64)
-                            .is_some_and(|i| i.class == Some(class) && i.kind == slot)
-                    }));
-                }
+    fn every_item_has_a_known_rarity_and_starters_are_common() {
+        for i in ITEMS.iter() {
+            assert!(
+                RARITIES.contains(&i.rarity.as_str()),
+                "{} has rarity {}",
+                i.id,
+                i.rarity
+            );
+            if i.starter || i.kind == "material" {
+                assert_eq!(i.rarity, "common", "{}", i.id);
             }
         }
-        assert!(equipment_chance("big") > equipment_chance("beetle"));
-        assert!(equipment_chance("beetle") > equipment_chance("blue"));
-        assert!(equipment_chance("blue") > equipment_chance("green"));
+    }
+    #[test]
+    fn rarer_tiers_drop_less_often_and_only_elites_drop_legendary() {
+        let rates: Vec<_> = ["uncommon", "rare", "epic"]
+            .iter()
+            .map(|r| base_drop_chance(r))
+            .collect();
+        assert!(rates[0] >= 0.01 && rates[0] <= 0.02, "green is 1-2%");
+        assert!(rates[0] > rates[1] && rates[1] > rates[2]);
+        assert_eq!(base_drop_chance("common"), 0.);
+        // The user's WoW-style ranges for ordinary mobs.
+        assert!((0.0001..=0.0005).contains(&rates[1]), "blue is 0.01-0.05%");
+        assert!(
+            (0.00001..=0.0002).contains(&rates[2]),
+            "purple is 0.001-0.02%"
+        );
+        for kind in ["green", "blue", "beetle", "wisp", "golem"] {
+            assert!(!is_elite(kind));
+            assert_ne!(roll_rarity(kind, 0.), Some("legendary"));
+            // Sweep the whole range: an ordinary mob never produces orange.
+            for n in 0..2000 {
+                assert_ne!(
+                    roll_rarity(kind, n as f64 / 2000. * 0.05),
+                    Some("legendary")
+                );
+            }
+        }
+        assert!(is_elite("big"));
+        assert_eq!(roll_rarity("big", 0.), Some("legendary"));
+        assert_eq!(roll_rarity("green", 0.9), None);
+        assert_eq!(roll_rarity("big", 0.9), None);
+    }
+    #[test]
+    fn elites_roll_every_tier_five_times_as_often() {
+        // The width of a tier's band is its chance. Elites: band = 5x the ordinary width.
+        let width = |kind: &str, rarity: &str| {
+            let step = 0.000001;
+            (0..100_000)
+                .filter(|n| roll_rarity(kind, *n as f64 * step) == Some(rarity))
+                .count() as f64
+                * step
+        };
+        for rarity in ["uncommon", "rare", "epic"] {
+            let ordinary = width("green", rarity);
+            let elite = width("big", rarity);
+            assert!(
+                (elite / ordinary - ELITE_DROP_MULTIPLIER).abs() < 0.05,
+                "{rarity}: ordinary {ordinary}, elite {elite}"
+            );
+        }
+        assert_eq!(ELITE_DROP_MULTIPLIER, 5.);
+    }
+    #[test]
+    fn a_rolled_tier_drops_gear_of_exactly_that_tier() {
+        for (kind, rarity) in [
+            ("green", "uncommon"),
+            ("green", "rare"),
+            ("green", "epic"),
+            ("big", "uncommon"),
+            ("big", "rare"),
+            ("big", "epic"),
+        ] {
+            let roll = roll_for(kind, rarity);
+            let pool = ITEMS
+                .iter()
+                .filter(|i| i.rarity == rarity && i.kind != "material")
+                .count();
+            assert!(pool > 0, "{rarity} has gear");
+            for n in 0..pool {
+                let i = roll_equipment(kind, roll, (n as f64 + 0.5) / pool as f64).unwrap();
+                assert_eq!(i.rarity, rarity);
+            }
+        }
+        // An empty tier drops nothing (no legendary gear exists yet, or the roll would panic on an empty pool).
+        let roll = roll_for("big", "legendary");
+        let pool = ITEMS.iter().filter(|i| i.rarity == "legendary").count();
+        assert_eq!(roll_equipment("big", roll, 0.).is_some(), pool > 0);
+    }
+    #[test]
+    fn the_gear_pools_cover_every_class_and_slot_between_them() {
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
+            for kind in ["armor", "weapon", "headgear", "shoulders", "gloves"] {
+                assert!(
+                    ITEMS
+                        .iter()
+                        .any(|i| i.rarity != "common" && i.class == Some(class) && i.kind == kind),
+                    "{class:?} {kind} has a dropping piece"
+                );
+            }
+        }
     }
     #[test]
     fn ownership_class_and_equipped_copy_are_enforced() {

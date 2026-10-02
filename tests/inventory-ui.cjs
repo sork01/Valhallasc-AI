@@ -107,13 +107,25 @@ async function call(name, args = {}) {
   });
   for (const script of ['inventory.js', 'quests.js', 'city.js']) await fixture.addScriptTag({ path:path.join(root, 'client', script) });
   await fixture.evaluate(() => {
-    Inventory.update([{item:'mage_weapon_crystal',quantity:1},{item:'warrior_weapon_royal',quantity:1},{item:'mage_armor_runic',quantity:2},{item:'slime_gel',quantity:3}], { class:'mage', mageArmor:'runic', mageWeapon:'ash' });
+    Inventory.update([{item:'mage_weapon_crystal',quantity:1},{item:'warrior_weapon_royal',quantity:1},{item:'mage_armor_runic',quantity:2},{item:'headgear_upgrade',quantity:1},{item:'slime_gel',quantity:3}], { class:'mage', mageArmor:'runic', mageWeapon:'ash' });
     Inventory.render(document.getElementById('inventory-list'));
     Inventory.renderShop(WORLD_MAP.npcs.find(n => n.id === 'merchant'), document.getElementById('npc-inventory'));
   });
   const rare = fixture.locator('#inventory-list [data-item="mage_weapon_crystal"]');
-  check(await rare.textContent().then(t => t.includes('+9 attack') && t.includes('Rare')), 'Rare equipment displays its stat bonus and rarity');
-  check(await rare.locator('b').evaluate(n => getComputedStyle(n).color === 'rgb(100, 181, 255)'), 'Rare item name renders blue');
+  check(await rare.textContent().then(t => t.includes('+9 attack') && t.includes('Epic')), 'Epic equipment displays its stat bonus and rarity');
+  check(await rare.locator('b').evaluate(n => getComputedStyle(n).color === 'rgb(180, 92, 255)'), 'Epic item name renders purple');
+  const tierColors = await fixture.evaluate(() => {
+    const out = {};
+    for (const [id, tier] of [['slime_gel', 'common'], ['headgear_upgrade', 'uncommon'], ['mage_armor_runic', 'rare'], ['mage_weapon_crystal', 'epic']]) {
+      const cell = document.querySelector(`#inventory-list [data-item="${id}"]`);
+      out[tier] = [cell.dataset.rarity, getComputedStyle(cell.querySelector('b')).color];
+    }
+    // No catalog item is legendary yet, so paint the CSS rule on a stand-in cell.
+    const fake = document.createElement('div'); fake.className = 'inventory-item'; fake.dataset.rarity = 'legendary'; fake.innerHTML = '<b>x</b>';
+    document.getElementById('inventory-list').append(fake); out.legendary = ['legendary', getComputedStyle(fake.querySelector('b')).color]; fake.remove();
+    return out;
+  });
+  check(JSON.stringify(tierColors) === JSON.stringify({ common: ['common', 'rgb(196, 196, 196)'], uncommon: ['uncommon', 'rgb(74, 214, 109)'], rare: ['rare', 'rgb(100, 181, 255)'], epic: ['epic', 'rgb(180, 92, 255)'], legendary: ['legendary', 'rgb(255, 154, 46)'] }), 'Gray, green, blue, purple and orange name colours for the five tiers: ' + JSON.stringify(tierColors));
   await fixture.locator('#inventory-list [data-item="warrior_weapon_royal"] button').click();
   check(await fixture.locator('#bag-details [data-action="equip"]').count() === 0, 'Cross-class gear cannot be equipped in UI');
   check(await fixture.locator('#inventory-list [data-item="warrior_weapon_royal"]').textContent().then(t => t.includes('warrior')), 'Cross-class gear explains its class restriction');

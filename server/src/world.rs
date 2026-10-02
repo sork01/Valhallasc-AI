@@ -1778,11 +1778,7 @@ impl World {
             item: Some(item_id.into()),
             quantity,
             t: 0.,
-            col: if item(item_id).is_some_and(|i| i.rarity == "rare") {
-                "#64b5ff"
-            } else {
-                "#b9dcad"
-            },
+            col: rarity_color(item(item_id).map_or("common", |i| i.rarity.as_str())),
         });
     }
     fn update_slime(&mut self, id: usize) {
@@ -2739,15 +2735,18 @@ mod tests {
         let (tx, _rx) = mpsc::channel(4096);
         let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
         let token = welcome["token"].as_str().unwrap();
-        w.rng = 7;
         let id = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
-        // Enough kills that every rare item in the pool, however many there are, shows up many times over.
-        let kills = ITEMS.iter().filter(|i| i.rarity == "rare").count() as u32 * 90;
-        for _ in 0..kills {
-            w.slimes[id] = Slime::new(id, &w.maps[0].slimes[id]);
-            w.hit_slime(id, 1, 1000., false);
+        let point = w.slimes[id].point();
+        let gear: Vec<_> = ITEMS.iter().filter(|i| i.rarity != "common").collect();
+        // Real kills drop the material; gear is rolled so rarely that the pieces are dropped through the same
+        // item_drop path the roll uses (the roll itself is covered in items.rs).
+        w.slimes[id] = Slime::new(id, &w.maps[0].slimes[id]);
+        w.hit_slime(id, 1, 1000., false);
+        let owner = w.players[&1].character.id.clone();
+        for i in &gear {
+            w.item_drop(&owner, 0, point, &i.id, 1);
         }
-        for i in ITEMS.iter().filter(|i| i.rarity == "rare") {
+        for i in &gear {
             assert!(
                 w.drops
                     .iter()
@@ -2756,19 +2755,18 @@ mod tests {
                 i.id
             );
         }
-        let point = w.slimes[id].point();
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.x = point.x;
         c.y = point.y;
-        // Four satchels: the rare pool no longer fits the 16-cell backpack.
+        // Four satchels: the whole gear pool no longer fits the 16-cell backpack.
         c.bags = vec!["linen_satchel".to_string(); 4];
         for d in &mut w.drops {
             d.t = 1.;
         }
         w.update_drops();
         let saved = w.store.load(token).unwrap().unwrap();
-        assert_eq!(saved.quantity("ironhide_shell"), kills);
-        for i in ITEMS.iter().filter(|i| i.rarity == "rare") {
+        assert_eq!(saved.quantity("ironhide_shell"), 1);
+        for i in &gear {
             assert!(saved.quantity(&i.id) > 0);
         }
         assert_eq!(
@@ -5559,7 +5557,7 @@ mod tests {
         }
         for i in ITEMS
             .iter()
-            .filter(|i| i.rarity == "rare" && i.kind != "material")
+            .filter(|i| i.rarity != "common" && i.kind != "material")
         {
             if c.bag_used() >= c.bag_capacity() {
                 break;

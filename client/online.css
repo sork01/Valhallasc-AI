@@ -74,7 +74,11 @@
 .gossip-parchment .inventory-item { background: #3b230a1f; border-color: #7a5c2b; }
 .gossip-parchment .inventory-item b { color: #2b1b08; font-family: Georgia, serif; }
 .gossip-parchment .inventory-item small { color: #5b4420; font-family: Georgia, serif; }
+.gossip-parchment .inventory-item[data-rarity="common"] b { color: #555555; }
+.gossip-parchment .inventory-item[data-rarity="uncommon"] b { color: #14782e; }
 .gossip-parchment .inventory-item[data-rarity="rare"] b { color: #1b5ea8; }
+.gossip-parchment .inventory-item[data-rarity="epic"] b { color: #6a24ad; }
+.gossip-parchment .inventory-item[data-rarity="legendary"] b { color: #a35300; }
 .gossip-parchment .shop-item-icon { background: #2a1a0acc; border-color: #5a4a30; }
 @media (pointer: coarse) { .gossip-row { min-height: 44px; } .gossip-button, .gossip-parchment .btn, .gossip-titlebar .window-close { min-height: 44px; min-width: 44px; } }
 .quest-tracker { position: absolute; right: 1.4cqw; top: 22cqw; width: 23cqw; z-index: 20; color: #f7e9c9; text-align: left; font: 1cqw/1.45 Arial, sans-serif; text-shadow: 0 1px 3px #000, 1px 0 2px #000; }
@@ -109,8 +113,15 @@
 .inventory-item { padding: .7cqw; margin: .5cqw 0; border: 1px solid #a0b2b950; border-radius: .5cqw; background: #142338; text-align: left; }
 .inventory-item b, .inventory-item small { display: block; font: 1cqw/1.5 'Jua', sans-serif; }
 .inventory-item small { color: #c4cbd3; font-size: .85cqw; }
+.inventory-item[data-rarity="uncommon"] { border-color: #4ad66d90; }
 .inventory-item[data-rarity="rare"] { border-color: #64b5ff90; }
+.inventory-item[data-rarity="epic"] { border-color: #b45cff90; }
+.inventory-item[data-rarity="legendary"] { border-color: #ff9a2e90; }
+.inventory-item[data-rarity="common"] b { color: #c4c4c4; }
+.inventory-item[data-rarity="uncommon"] b { color: #4ad66d; }
 .inventory-item[data-rarity="rare"] b { color: #64b5ff; }
+.inventory-item[data-rarity="epic"] b { color: #b45cff; }
+.inventory-item[data-rarity="legendary"] b { color: #ff9a2e; }
 .inventory-item .btn, #npc-inventory > .btn { margin: .4cqw .4cqw 0 0; font-size: .9cqw; }
 .inventory-open:focus-visible, .equipment-workspace :focus-visible { outline: 3px solid #ffdc87; outline-offset: 3px; }
 @media (pointer: coarse) { .inventory-open, .inventory-item .btn { min-height: 44px; } }
@@ -210,10 +221,17 @@
 .bag-cell-empty::after { content: ''; position: absolute; inset: 20%; border: 1px solid #56533d1a; border-radius: 3px; transform: rotate(45deg); }
 .item-stack { position: absolute; bottom: .25cqw; right: .35cqw; color: #fff1d4; font: 1cqw/1 'Jua', sans-serif; text-shadow: -1px -1px 1px black, 1px 1px 1px black; }
 .item-tile[aria-pressed="true"] { outline: 2px solid #efdb96; outline-offset: -4px; }
-.inventory-item[data-rarity="rare"] .item-tile, .equipped-slot[data-rarity="rare"] .gear-icon { border-color: #64b5ff; box-shadow: inset 0 0 .7cqw #377cca36, 0 0 .3cqw #4e99dc33; }
+.inventory-item[data-rarity="uncommon"] .item-tile, .equipped-slot[data-rarity="uncommon"] .gear-icon { border-color: #4ad66d; box-shadow: inset 0 0 .7cqw #2fae5236, 0 0 .3cqw #2fae5233; }
+.inventory-item[data-rarity="rare"] .item-tile, .equipped-slot[data-rarity="rare"] .gear-icon { border-color: #64b5ff; box-shadow: inset 0 0 .7cqw #377cca36, 0 0 .3cqw #377cca33; }
+.inventory-item[data-rarity="epic"] .item-tile, .equipped-slot[data-rarity="epic"] .gear-icon { border-color: #b45cff; box-shadow: inset 0 0 .7cqw #8a3fd636, 0 0 .3cqw #8a3fd633; }
+.inventory-item[data-rarity="legendary"] .item-tile, .equipped-slot[data-rarity="legendary"] .gear-icon { border-color: #ff9a2e; box-shadow: inset 0 0 .7cqw #e07a1036, 0 0 .3cqw #e07a1033; }
 .bag-details { margin-top: .75cqw; min-height: 6.2cqw; padding: .7cqw; border: 1px solid #675b4044; background: #080c0e80; text-align: left; }
 .bag-details .item-name { display: block; color: #f0e5cd; font: 1cqw 'Jua', sans-serif; }
+.bag-details .item-name[data-rarity="common"] { color: #c4c4c4; }
+.bag-details .item-name[data-rarity="uncommon"] { color: #4ad66d; }
 .bag-details .item-name[data-rarity="rare"] { color: #64b5ff; }
+.bag-details .item-name[data-rarity="epic"] { color: #b45cff; }
+.bag-details .item-name[data-rarity="legendary"] { color: #ff9a2e; }
 .bag-details small { display: block; color: #baa98c; font: .75cqw/1.5 'Jua', sans-serif; }
 .bag-details p { margin: .4cqw 0; }
 .item-action { margin: .5cqw .4cqw 0 0; }
@@ -226,7 +244,11 @@
 .bags-open kbd { position: absolute; left: .3cqw; top: .2cqw; font: .8cqw 'Jua', sans-serif; }
 .item-tooltip { position: fixed; z-index: 1000; width: max-content; max-width: min(310px, 50vw); padding: 12px 15px; border: 1px solid #aa9870; border-radius: 4px; background: #090d13f5; color: #e8dfcd; box-shadow: 0 5px 22px #000b; pointer-events: none; font: 13px/1.5 'Jua', sans-serif; }
 .item-tooltip b { display: block; font-size: 16px; color: #eee5d4; }
+.item-tooltip[data-rarity="common"] b { color: #c4c4c4; }
+.item-tooltip[data-rarity="uncommon"] b { color: #4ad66d; }
 .item-tooltip[data-rarity="rare"] b { color: #64b5ff; }
+.item-tooltip[data-rarity="epic"] b { color: #b45cff; }
+.item-tooltip[data-rarity="legendary"] b { color: #ff9a2e; }
 .item-tooltip small { display: block; font-size: 12px; color: #b9baa9; }
 .item-tooltip p { margin: 6px 0; }
 .item-tooltip .item-comparison { color: #9ecf9c; }
