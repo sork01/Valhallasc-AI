@@ -253,6 +253,7 @@
 .item-tooltip p { margin: 6px 0; }
 .item-tooltip .item-comparison { color: #9ecf9c; }
 .item-restriction { color: #e0877d; }
+.item-level { color: #d8c88f; }
 .drop-ready { outline: 2px solid #f0d480 !important; outline-offset: 1px; box-shadow: inset 0 0 1cqw #d5c17a55 !important; }
 .shop-item { display: flow-root; background: #151a1d; border-color: #71664c; }
 .shop-item-icon { float: left; width: 3.5cqw; height: 3.5cqw; margin: .3cqw .8cqw .3cqw 0; padding: .2cqw; border: 1px solid #a88e5e; background: #1c2522; }

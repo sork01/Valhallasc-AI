@@ -843,7 +843,8 @@ impl World {
                 let result = next
                     .look
                     .equip(&armor, &weapon)
-                    .and_then(|()| next.equip_slots(&slots));
+                    .and_then(|()| next.equip_slots(&slots))
+                    .and_then(|()| next.check_required_levels(&p.character));
                 if let Err(text) = result {
                     let _ = p.peer.try_send(json!({"type":"error","text":text}));
                 } else if next.look != p.character.look || next.equipment != p.character.equipment {
@@ -1717,6 +1718,7 @@ impl World {
         let gold = s.gold;
         let zone = s.zone;
         let kind = s.kind.clone();
+        let level = s.level;
         if killed {
             s.dead = true;
             s.die_t = 0.;
@@ -1759,7 +1761,7 @@ impl World {
             self.item_drop(&actor, zone, point, material(&kind), 1);
             let chance = self.random();
             let choice = self.random();
-            if let Some(i) = roll_equipment(&kind, chance, choice) {
+            if let Some(i) = roll_equipment(&kind, level, chance, choice) {
                 self.item_drop(&actor, zone, point, &i.id, 1);
             }
         }
@@ -2553,11 +2555,9 @@ mod tests {
         let (tx, _rx) = mpsc::channel(256);
         let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
         let token = welcome["token"].as_str().unwrap();
-        w.players
-            .get_mut(&1)
-            .unwrap()
-            .character
-            .add_item("headgear_upgrade", 1);
+        let hero = &mut w.players.get_mut(&1).unwrap().character;
+        hero.level = 15; // the Ironhide Helm needs level 15
+        hero.add_item("headgear_upgrade", 1);
         w.message(
             1,
             ClientMessage::Equip {
@@ -2571,7 +2571,12 @@ mod tests {
             saved.equipment.get("headgear").map(String::as_str),
             Some("headgear_upgrade")
         );
-        assert_eq!(saved.stats(), (30., 5.));
+        let helm = item("headgear_upgrade").unwrap();
+        let expected: (f64, f64) = (22. + 60. + 4. + helm.attack, 3. + helm.defense);
+        assert!(
+            (saved.stats().0 - expected.0).abs() < 1e-9
+                && (saved.stats().1 - expected.1).abs() < 1e-9
+        );
         w.message(
             1,
             ClientMessage::Equip {
@@ -2581,7 +2586,7 @@ mod tests {
             },
         );
         assert_eq!(w.players[&1].character.look.warrior_armor, "crimson");
-        assert_eq!(w.store.load(token).unwrap().unwrap().stats(), (30., 5.));
+        assert_eq!(w.store.load(token).unwrap().unwrap().stats(), saved.stats());
     }
     #[test]
     fn full_bags_leave_new_loot_on_ground_but_collect_stacks_and_gold() {
@@ -2737,7 +2742,14 @@ mod tests {
         let token = welcome["token"].as_str().unwrap();
         let id = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
         let point = w.slimes[id].point();
-        let gear: Vec<_> = ITEMS.iter().filter(|i| i.rarity != "common").collect();
+        // One piece in fifteen of the non-starter gear (the catalog holds hundreds): enough to span every class, slot,
+        // level and tier, and few enough to fit the bags below.
+        let gear: Vec<_> = ITEMS
+            .iter()
+            .filter(|i| is_gear(i) && !i.starter)
+            .step_by(15)
+            .collect();
+        assert!(gear.len() > 20 && gear.len() <= 34);
         // Real kills drop the material; gear is rolled so rarely that the pieces are dropped through the same
         // item_drop path the roll uses (the roll itself is covered in items.rs).
         w.slimes[id] = Slime::new(id, &w.maps[0].slimes[id]);
@@ -3982,50 +3994,64 @@ mod tests {
         let health: Vec<_> = w.slimes.iter().map(|s| s.hp).collect();
         w.strike(1);
         assert_eq!(w.slimes.iter().map(|s| s.hp).collect::<Vec<_>>(), health);
-        w.message(
-            1,
-            ClientMessage::Equip {
-                slots: Default::default(),
-                armor: Some("azure".into()),
-                weapon: Some("royal".into()),
-            },
-        );
         assert_eq!(w.players[&1].character.look.stats(1), (30., 3.));
         let c = &mut w.players.get_mut(&1).unwrap().character;
-        c.add_item("warrior_armor_azure", 1);
-        c.add_item("warrior_weapon_royal", 1);
-        w.message(
-            1,
-            ClientMessage::Equip {
-                slots: Default::default(),
-                armor: Some("azure".into()),
-                weapon: None,
-            },
+        c.add_item("warrior_armor_azure_l10_purple", 1);
+        c.add_item("warrior_weapon_royal_l10_purple", 1);
+        // The purple level 10 armor and sword need level 10: owned but refused at level 1, worn at 20.
+        let azure_armor = || ClientMessage::Equip {
+            slots: Default::default(),
+            armor: Some("azure_l10_purple".into()),
+            weapon: None,
+        };
+        w.message(1, azure_armor());
+        assert_eq!(w.players[&1].character.look.warrior_armor, "crimson");
+        w.players.get_mut(&1).unwrap().character.level = 20;
+        let (azure, royal) = (
+            item("warrior_armor_azure_l10_purple").unwrap(),
+            item("warrior_weapon_royal_l10_purple").unwrap(),
         );
+        w.message(1, azure_armor());
         w.message(
             1,
             ClientMessage::Equip {
                 slots: Default::default(),
                 armor: None,
-                weapon: Some("royal".into()),
+                weapon: Some("royal_l10_purple".into()),
             },
         );
-        assert_eq!(w.players[&1].character.look.stats(1), (34., 5.));
+        assert_eq!(
+            w.players[&1].character.look.stats(20),
+            (
+                22. + 80. + royal.attack + azure.attack,
+                azure.defense + royal.defense
+            )
+        );
         w.message(
             1,
             ClientMessage::Equip {
                 slots: Default::default(),
                 armor: Some("godmode".into()),
-                weapon: Some("royal".into()),
+                weapon: Some("royal_l10_purple".into()),
             },
         );
-        assert_eq!(w.players[&1].character.look.warrior_armor, "azure");
+        assert_eq!(
+            w.players[&1].character.look.warrior_armor,
+            "azure_l10_purple"
+        );
         w.hurt_player(1, 1000., Point::default());
         assert_eq!(w.players[&1].character.hp, 0.);
         w.players.get_mut(&1).unwrap().dead_time = 3.2;
         w.step();
-        assert_eq!(w.players[&1].character.hp, 120.);
-        assert_eq!(w.players[&1].character.look.warrior_weapon, "royal");
+        assert_eq!(
+            w.players[&1].character.hp,
+            w.players[&1].character.max_hp(),
+            "level 20 respawns at full health"
+        );
+        assert_eq!(
+            w.players[&1].character.look.warrior_weapon,
+            "royal_l10_purple"
+        );
     }
     #[test]
     fn projectile_hits_nearest_and_dash_is_class_limited() {

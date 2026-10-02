@@ -18,6 +18,10 @@ pub struct Item {
     pub name: String,
     pub kind: String,
     pub rarity: String,
+    /// Character level needed to wear the piece (1, 5, 10, 15 or 20 for gear). Wearing it earlier is refused, and
+    /// a piece worn above the character's level (a level lost to a death) adds nothing until the level is back.
+    #[serde(default = "first_level", rename = "requiredLevel")]
+    pub required_level: u32,
     pub sell: u32,
     #[serde(default)]
     pub attack: f64,
@@ -25,6 +29,9 @@ pub struct Item {
     pub defense: f64,
     pub class: Option<Class>,
     pub variant: Option<String>,
+    /// The drawn piece this one is a recolouring of (its `variant` names the recolouring itself). Unset for the
+    /// original pieces. The client paints the base art with the `tint` the catalog carries.
+    pub art: Option<String>,
     #[serde(default)]
     pub starter: bool,
     #[serde(default, rename = "bagSlots")]
@@ -39,6 +46,9 @@ pub struct Item {
     #[serde(default)]
     pub cooldown: f64,
 }
+fn first_level() -> u32 {
+    1
+}
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct ItemStack {
     pub item: String,
@@ -52,8 +62,29 @@ pub fn unix_now() -> u64 {
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |d| d.as_secs())
 }
+static INDEX: LazyLock<std::collections::HashMap<&'static str, &'static Item>> =
+    LazyLock::new(|| ITEMS.iter().map(|i| (i.id.as_str(), i)).collect());
 pub fn item(id: &str) -> Option<&'static Item> {
-    ITEMS.iter().find(|i| i.id == id)
+    INDEX.get(id).copied()
+}
+/// Kinds that are worn (everything in the catalog that is not a material, bag, food or potion).
+pub const GEAR_KINDS: [&str; 8] = [
+    "armor",
+    "weapon",
+    "headgear",
+    "shoulders",
+    "gloves",
+    "pants",
+    "necklace",
+    "accessory",
+];
+pub fn is_gear(i: &Item) -> bool {
+    GEAR_KINDS.contains(&i.kind.as_str())
+}
+/// The highest required level an enemy of this level can drop: its own level rounded up to the next gear step, plus
+/// one more step, so an early enemy rewards what the next zone is about and the last zones reach level 20.
+pub fn max_drop_level(enemy_level: u32) -> u32 {
+    enemy_level.div_ceil(5) * 5 + 5
 }
 pub fn equipment(class: Class, kind: &str, variant: &str) -> Option<&'static Item> {
     ITEMS
@@ -78,9 +109,11 @@ pub fn material(kind: &str) -> &'static str {
 pub const RARITIES: [&str; 5] = ["common", "uncommon", "rare", "epic", "legendary"];
 /// Elites (special enemies) roll every tier this many times as often, and are the only source of legendary gear.
 pub const ELITE_DROP_MULTIPLIER: f64 = 5.;
-/// Chance per ordinary kill that one piece of this tier drops. Common gear never drops (it is starter gear).
+/// Chance per ordinary kill that one piece of this tier drops. Gray gear drops too (it is mostly for selling);
+/// the starter pieces never do.
 pub fn base_drop_chance(rarity: &str) -> f64 {
     match rarity {
+        "common" => 0.02,
         "uncommon" => 0.015,
         "rare" => 0.0003,
         "epic" => 0.0001,
@@ -118,12 +151,14 @@ pub fn roll_rarity(kind: &str, roll: f64) -> Option<&'static str> {
     }
     None
 }
-/// A random piece of gear of the rolled tier; an empty tier drops nothing.
-pub fn roll_equipment(kind: &str, chance: f64, choice: f64) -> Option<&'static Item> {
+/// A random piece of gear of the rolled tier that an enemy of this level can drop (see `max_drop_level`); starter
+/// pieces never drop, and an empty tier drops nothing.
+pub fn roll_equipment(kind: &str, level: u32, chance: f64, choice: f64) -> Option<&'static Item> {
     let rarity = roll_rarity(kind, chance)?;
+    let limit = max_drop_level(level);
     let pool: Vec<_> = ITEMS
         .iter()
-        .filter(|i| i.rarity == rarity && i.kind != "material")
+        .filter(|i| i.rarity == rarity && is_gear(i) && !i.starter && i.required_level <= limit)
         .collect();
     pool.get((choice * pool.len() as f64) as usize).copied()
 }
@@ -214,6 +249,30 @@ impl Character {
                     && i.variant.as_deref() == Some(if i.kind == "armor" { armor } else { weapon }),
             )
     }
+    /// Every worn piece: the extra slots plus the class armor and weapon.
+    fn worn_items(&self) -> Vec<&'static Item> {
+        let (armor, weapon) = self.gear();
+        let class = self.look.class;
+        self.equipment
+            .values()
+            .filter_map(|id| item(id))
+            .chain(equipment(class, "armor", armor))
+            .chain(equipment(class, "weapon", weapon))
+            .collect()
+    }
+    /// Refuses a change that puts on a piece above this character's level. Pieces already worn in `before` are not
+    /// asked again, so an old save keeps what it wore and an unrelated swap is never blocked by it.
+    pub fn check_required_levels(&self, before: &Character) -> Result<(), &'static str> {
+        let already: Vec<_> = before.worn_items().iter().map(|i| i.id.as_str()).collect();
+        if self
+            .worn_items()
+            .iter()
+            .any(|i| i.required_level > self.level && !already.contains(&i.id.as_str()))
+        {
+            return Err("You are not a high enough level to wear that.");
+        }
+        Ok(())
+    }
     pub fn gear(&self) -> (&str, &str) {
         match self.look.class {
             Class::Warrior => (&self.look.warrior_armor, &self.look.warrior_weapon),
@@ -299,6 +358,7 @@ impl Character {
         }
         let mut next = self.clone();
         next.look.equip(armor, weapon)?;
+        next.check_required_levels(self)?;
         if next.bag_used() > next.bag_capacity() {
             return Err("Your bags are full. Make room before unequipping gear.");
         }
@@ -349,6 +409,7 @@ impl Character {
             }
         }
         next.sync_look();
+        next.check_required_levels(self)?;
         for i in ITEMS.iter() {
             if next.equipped_count(i) > next.quantity(&i.id) {
                 if i.kind == "armor" || i.kind == "weapon" {
@@ -386,7 +447,7 @@ impl Character {
                 };
         defense += a.strength as f64 * 0.2;
         for id in self.equipment.values() {
-            if let Some(i) = item(id) {
+            if let Some(i) = item(id).filter(|i| i.required_level <= self.level) {
                 attack += i.attack;
                 defense += i.defense;
             }
@@ -541,7 +602,10 @@ mod tests {
             .collect();
         assert!(rates[0] >= 0.01 && rates[0] <= 0.02, "green is 1-2%");
         assert!(rates[0] > rates[1] && rates[1] > rates[2]);
-        assert_eq!(base_drop_chance("common"), 0.);
+        assert!(
+            base_drop_chance("common") > rates[0],
+            "gray drops most often, and is mostly for selling"
+        );
         // The user's WoW-style ranges for ordinary mobs.
         assert!((0.0001..=0.0005).contains(&rates[1]), "blue is 0.01-0.05%");
         assert!(
@@ -587,6 +651,7 @@ mod tests {
     #[test]
     fn a_rolled_tier_drops_gear_of_exactly_that_tier() {
         for (kind, rarity) in [
+            ("green", "common"),
             ("green", "uncommon"),
             ("green", "rare"),
             ("green", "epic"),
@@ -597,18 +662,133 @@ mod tests {
             let roll = roll_for(kind, rarity);
             let pool = ITEMS
                 .iter()
-                .filter(|i| i.rarity == rarity && i.kind != "material")
+                .filter(|i| i.rarity == rarity && is_gear(i) && !i.starter)
                 .count();
             assert!(pool > 0, "{rarity} has gear");
+            // Level 12 enemies can drop every required level (the limit is 20).
             for n in 0..pool {
-                let i = roll_equipment(kind, roll, (n as f64 + 0.5) / pool as f64).unwrap();
+                let i = roll_equipment(kind, 12, roll, (n as f64 + 0.5) / pool as f64).unwrap();
                 assert_eq!(i.rarity, rarity);
+                assert!(!i.starter);
             }
         }
         // An empty tier drops nothing (no legendary gear exists yet, or the roll would panic on an empty pool).
         let roll = roll_for("big", "legendary");
         let pool = ITEMS.iter().filter(|i| i.rarity == "legendary").count();
-        assert_eq!(roll_equipment("big", roll, 0.).is_some(), pool > 0);
+        assert_eq!(roll_equipment("big", 6, roll, 0.).is_some(), pool > 0);
+    }
+    #[test]
+    fn enemies_drop_gear_up_to_one_step_above_their_zone() {
+        assert_eq!(
+            [1, 5, 6, 10, 11, 12].map(max_drop_level),
+            [10, 10, 15, 15, 20, 20]
+        );
+        for (level, limit) in [(2, 10), (6, 15), (12, 20)] {
+            let roll = roll_for("green", "uncommon");
+            let pool = ITEMS
+                .iter()
+                .filter(|i| {
+                    i.rarity == "uncommon" && is_gear(i) && !i.starter && i.required_level <= limit
+                })
+                .count();
+            let mut top = 0;
+            for n in 0..pool {
+                let i =
+                    roll_equipment("green", level, roll, (n as f64 + 0.5) / pool as f64).unwrap();
+                assert!(
+                    i.required_level <= limit,
+                    "{} for a level {level} enemy",
+                    i.id
+                );
+                top = top.max(i.required_level);
+            }
+            assert_eq!(top, limit, "the top step is reachable");
+        }
+    }
+    #[test]
+    fn every_level_has_gray_green_blue_and_purple_every_other_step() {
+        let has = |class: Option<Class>, kind: &str, level: u32, rarity: &str| {
+            ITEMS.iter().any(|i| {
+                i.class == class
+                    && i.kind == kind
+                    && i.required_level == level
+                    && i.rarity == rarity
+            })
+        };
+        let classes = [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ];
+        for level in [1, 5, 10, 15, 20] {
+            for rarity in ["common", "uncommon", "rare", "epic"] {
+                let purple_level = matches!(level, 10 | 20);
+                for class in classes {
+                    for kind in ["armor", "headgear", "shoulders", "gloves", "weapon"] {
+                        assert_eq!(
+                            has(Some(class), kind, level, rarity),
+                            rarity != "epic" || purple_level,
+                            "{class:?} {kind} level {level} {rarity}"
+                        );
+                    }
+                }
+                for kind in ["pants", "necklace", "accessory"] {
+                    assert_eq!(
+                        has(None, kind, level, rarity),
+                        rarity != "epic" || purple_level,
+                        "shared {kind} level {level} {rarity}"
+                    );
+                }
+            }
+        }
+    }
+    #[test]
+    fn recoloured_pieces_name_a_real_base_piece_and_every_variant_is_unique() {
+        let mut seen = std::collections::BTreeSet::new();
+        for i in ITEMS.iter().filter(|i| is_gear(i)) {
+            let variant = i.variant.as_deref().unwrap();
+            assert!(
+                seen.insert((i.kind.clone(), variant)),
+                "{} repeats a variant",
+                i.id
+            );
+            if let Some(art) = &i.art {
+                let base = ITEMS
+                    .iter()
+                    .find(|b| {
+                        b.kind == i.kind && b.class == i.class && b.variant.as_deref() == Some(art)
+                    })
+                    .unwrap_or_else(|| panic!("{} recolours {art}, which does not exist", i.id));
+                assert!(base.art.is_none(), "{} recolours a recolouring", i.id);
+            }
+        }
+    }
+    #[test]
+    fn a_recoloured_piece_is_worn_and_shown_but_only_by_its_own_class() {
+        let mut c = character();
+        c.level = 20;
+        c.add_item("warrior_armor_azure_l5_green", 1);
+        c.add_item("mage_armor_runic_l5_green", 1);
+        c.equip_slots(&slots(&[("chest", "warrior_armor_azure_l5_green")]))
+            .unwrap();
+        assert_eq!(c.look.warrior_armor, "azure_l5_green");
+        assert!(c.look.validate().is_ok());
+        assert!(
+            c.equip_slots(&slots(&[("chest", "mage_armor_runic_l5_green")]))
+                .is_err()
+        );
+        c.look.mage_armor = "azure_l5_green".into();
+        assert!(
+            c.look.validate().is_err(),
+            "another class's field only takes that class's pieces"
+        );
+        c.look.mage_armor = "apprentice".into();
+        c.look.pants = "wayfarer_l10_blue".into();
+        assert!(c.look.validate().is_ok(), "shared pants fit every class");
+        c.look.head = "not_a_piece".into();
+        assert!(c.look.validate().is_err());
     }
     #[test]
     fn the_gear_pools_cover_every_class_and_slot_between_them() {
@@ -632,17 +812,18 @@ mod tests {
     #[test]
     fn ownership_class_and_equipped_copy_are_enforced() {
         let mut c = character();
+        c.level = 20;
         assert!(c.equip_owned("azure", "royal").is_err());
         c.add_item("mage_weapon_crystal", 1);
         assert!(c.equip_owned("crimson", "crystal").is_err());
         c.add_item("warrior_weapon_royal", 2);
         c.equip_owned("crimson", "royal").unwrap();
         assert!(c.sell_item("warrior_weapon_royal", 2).is_err());
-        assert_eq!(c.sell_item("warrior_weapon_royal", 1).unwrap(), 30);
+        assert_eq!(c.sell_item("warrior_weapon_royal", 1).unwrap(), 25);
         assert_eq!(c.quantity("warrior_weapon_royal"), 1);
         assert!(c.sell_item("warrior_weapon_royal", 1).is_err());
-        assert_eq!(c.sell_item("mage_weapon_crystal", 1).unwrap(), 30);
-        assert_eq!(c.gold, 60);
+        assert_eq!(c.sell_item("mage_weapon_crystal", 1).unwrap(), 25);
+        assert_eq!(c.gold, 50);
         c.add_item("slime_gel", 3);
         assert!(c.sell_item("slime_gel", 0).is_err());
         assert!(c.sell_item("slime_gel", 4).is_err());
@@ -652,6 +833,159 @@ mod tests {
         assert!(c.sell_item("warrior_weapon_sword", 1).is_err());
         c.hp = 0.;
         assert!(c.equip_owned("crimson", "royal").is_err());
+    }
+    #[test]
+    fn gear_levels_come_in_steps_of_five_and_use_every_step() {
+        let mut used = std::collections::BTreeSet::new();
+        for i in ITEMS.iter() {
+            if matches!(i.kind.as_str(), "material" | "bag" | "food" | "potion") {
+                assert_eq!(i.required_level, 1, "{} is not gear", i.id);
+                continue;
+            }
+            assert!(
+                [1, 5, 10, 15, 20].contains(&i.required_level),
+                "{} needs level {}",
+                i.id,
+                i.required_level
+            );
+            if i.starter {
+                assert_eq!(i.required_level, 1, "starter gear is wearable at once");
+            }
+            used.insert(i.required_level);
+        }
+        assert_eq!(used.into_iter().collect::<Vec<_>>(), [1, 5, 10, 15, 20]);
+    }
+    #[test]
+    fn gear_above_your_level_cannot_be_put_on_and_adds_nothing() {
+        let mut c = character();
+        c.add_item("warrior_weapon_sword_l15_blue", 1);
+        c.add_item("necklace_upgrade", 1);
+        let royal = item("warrior_weapon_sword_l15_blue").unwrap();
+        assert_eq!((royal.required_level, c.level), (15, 1));
+        assert!(c.equip_owned("crimson", "sword_l15_blue").is_err());
+        assert!(
+            c.equip_slots(&slots(&[("hands", "warrior_weapon_sword_l15_blue")]))
+                .is_err()
+        );
+        assert!(
+            c.equip_slots(&slots(&[("necklace", "necklace_upgrade")]))
+                .is_err()
+        );
+        assert_eq!(c.gear().1, "sword", "a refused change wears nothing");
+        let base = c.stats();
+        c.level = 15;
+        let base15 = c.stats();
+        c.equip_slots(&slots(&[("hands", "warrior_weapon_sword_l15_blue")]))
+            .unwrap();
+        assert_eq!(
+            c.stats().0,
+            base15.0 - 4. + royal.attack,
+            "sword out, royal in"
+        );
+        assert_eq!(
+            c.stats().1,
+            base15.1 + royal.defense,
+            "the secondary stat counts"
+        );
+        assert!(
+            c.equip_slots(&slots(&[("necklace", "necklace_upgrade")]))
+                .is_err(),
+            "level 20"
+        );
+        // A level lost to a death switches the piece off without taking it away.
+        c.level = 1;
+        assert_eq!(c.gear().1, "sword_l15_blue");
+        assert_eq!(
+            c.stats(),
+            (base.0 - 4., base.1),
+            "the sword is off and the Royal Sword is dormant"
+        );
+        // ... and what is already worn never blocks an unrelated change.
+        c.add_item("warrior_headgear_crimson", 1);
+        c.equip_slots(&slots(&[("headgear", "warrior_headgear_crimson")]))
+            .unwrap();
+        c.level = 5;
+        c.add_item("warrior_headgear_azure", 1);
+        c.equip_slots(&slots(&[("headgear", "warrior_headgear_azure")]))
+            .unwrap();
+        assert_eq!(c.gear().1, "sword_l15_blue");
+    }
+    // The catalog's budget, as the stat ladder states it: base x level factor x tier. White carries one stat; green
+    // adds the other on top of an unchanged base; blue is 17.5% over green, purple 17.5% over blue.
+    #[test]
+    fn stats_follow_the_level_and_rarity_ladder() {
+        let factor = |level: u32| -> f64 {
+            match level {
+                1 => 1.,
+                5 => 1.6,
+                10 => 2.4,
+                15 => 3.2,
+                _ => 4.,
+            }
+        };
+        let tier = |rarity: &str| -> f64 {
+            match rarity {
+                "common" => 1.,
+                "uncommon" => 1.25,
+                "rare" => 1.25 * 1.175,
+                "epic" => 1.25 * 1.175 * 1.175,
+                _ => 1.25 * 1.175 * 1.175 * 1.175,
+            }
+        };
+        assert!((tier("rare") / tier("uncommon") - 1.175).abs() < 1e-9);
+        assert!((tier("epic") / tier("rare") - 1.175).abs() < 1e-9);
+        assert!((1.15..=1.2).contains(&(tier("rare") / tier("uncommon"))));
+        assert!(
+            (1.30..=1.40).contains(&(tier("epic") / tier("uncommon"))),
+            "purple vs green"
+        );
+        for i in ITEMS.iter().filter(|i| i.attack > 0. || i.defense > 0.) {
+            let base = match i.kind.as_str() {
+                "weapon" => 4.,
+                "armor" if matches!(i.class, Some(Class::Mage | Class::Assassin)) => 2.,
+                "armor" => 3.,
+                "necklace" => 2.,
+                "accessory" => 1.5,
+                _ => 1.,
+            };
+            let total = i.attack + i.defense;
+            let expected = base * factor(i.required_level) * tier(&i.rarity);
+            assert!(
+                (total - expected).abs() <= 0.1 + 1e-9,
+                "{}: {total} against {expected}",
+                i.id
+            );
+            let (primary, secondary) =
+                if matches!(i.kind.as_str(), "weapon" | "necklace" | "accessory") {
+                    (i.attack, i.defense)
+                } else {
+                    (i.defense, i.attack)
+                };
+            if i.rarity == "common" {
+                assert_eq!(
+                    secondary, 0.,
+                    "{} is white: base armor or damage only",
+                    i.id
+                );
+            } else {
+                assert!(
+                    secondary > 0.,
+                    "{} is green or better: it carries a secondary stat",
+                    i.id
+                );
+                // Green keeps exactly the white base of its level; each tier above scales both stats.
+                assert!(
+                    (primary
+                        - base * factor(i.required_level) * tier(&i.rarity) / tier("uncommon"))
+                    .abs()
+                        <= 0.1 + 1e-9,
+                    "{} keeps the base of white gear of its level, scaled by its tier",
+                    i.id
+                );
+            }
+        }
+        // A step up in rarity never beats a step up of five levels, and a higher level always beats a lower one.
+        assert!(factor(5) / factor(1) > 1.175 && factor(20) / factor(15) > 1.175);
     }
     #[test]
     fn oversized_sales_leave_inventory_and_gold_unchanged() {
@@ -680,6 +1014,7 @@ mod tests {
         assert!(!c.can_collect("headgear_upgrade"));
         assert!(c.equip_owned("none", "none").is_err());
         assert_eq!(c.gear(), ("crimson", "sword"));
+        c.level = 15;
         c.equip_slots(&[("hands".into(), "warrior_weapon_royal".into())].into())
             .unwrap();
         assert_eq!(c.bag_used(), 16);
@@ -719,6 +1054,7 @@ mod tests {
     #[test]
     fn nine_slots_validate_ownership_kind_class_and_accessory_copies_atomically() {
         let mut c = character();
+        c.level = 20;
         let request = |pairs: &[(&str, &str)]| {
             pairs
                 .iter()
@@ -757,16 +1093,40 @@ mod tests {
             ("accessory2", "accessory_upgrade"),
         ]))
         .unwrap();
-        assert_eq!(c.stats(), (32., 7.));
+        let (head, ring) = (
+            item("headgear_upgrade").unwrap(),
+            item("accessory_upgrade").unwrap(),
+        );
+        let (attack, defense) = c.stats();
+        assert!((attack - (22. + 80. + 4. + head.attack + 2. * ring.attack)).abs() < 1e-9);
+        assert!((defense - (3. + head.defense + 2. * ring.defense)).abs() < 1e-9);
         assert!(c.sell_item("accessory_upgrade", 2).is_err());
-        assert_eq!(c.sell_item("accessory_upgrade", 1).unwrap(), 25);
+        assert_eq!(c.sell_item("accessory_upgrade", 1).unwrap(), ring.sell);
         assert!(c.sell_item("accessory_upgrade", 1).is_err());
         c.equip_slots(&request(&[("accessory1", "none")])).unwrap();
         c.sell_item("accessory_upgrade", 1).unwrap();
-        assert_eq!(c.stats(), (31., 6.));
+        let close = |got: (f64, f64), want: (f64, f64)| {
+            assert!(
+                (got.0 - want.0).abs() < 1e-9 && (got.1 - want.1).abs() < 1e-9,
+                "{got:?} vs {want:?}"
+            );
+        };
+        close(
+            c.stats(),
+            (
+                106. + head.attack + ring.attack,
+                3. + head.defense + ring.defense,
+            ),
+        );
         c.equip_slots(&request(&[("chest", "none"), ("hands", "none")]))
             .unwrap();
-        assert_eq!(c.stats(), (27., 3.));
+        close(
+            c.stats(),
+            (
+                102. + head.attack + ring.attack,
+                head.defense + ring.defense,
+            ),
+        );
         c.hp = 0.;
         assert!(c.equip_slots(&request(&[("headgear", "none")])).is_err());
     }
@@ -809,6 +1169,7 @@ mod tests {
         assert!(c.look.validate().is_ok());
         assert!(c.stats().1 > defense, "the pieces add their defense");
         // A class-independent piece shows the shared art named by its variant, whatever the class.
+        c.level = 15;
         c.add_item("headgear_upgrade", 1);
         c.equip_slots(&slots(&[("headgear", "headgear_upgrade")]))
             .unwrap();
@@ -845,6 +1206,7 @@ mod tests {
     #[test]
     fn class_independent_pieces_show_on_every_class_and_have_their_own_layers() {
         let mut c = character();
+        c.level = 20;
         for id in [
             "headgear_upgrade",
             "shoulders_upgrade",

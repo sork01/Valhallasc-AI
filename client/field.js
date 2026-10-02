@@ -267,9 +267,10 @@
     if (Number.isFinite(hero.attack) && Number.isFinite(hero.defense)) return { attack: hero.attack, defense: hero.defense };
     if (!isModular()) return { attack: 22 + hero.level * 4, defense: 0 };
     const C = characterClass(), gear = C.equipment(hero.look);
+    const usable = i => i && (i.requiredLevel || 1) <= hero.level;   // gear above the hero's level adds nothing
     const item = (kind, variant) => WORLD_ITEMS.find(i => i.class === hero.look.class && i.kind === kind && i.variant === variant);
-    const extras = Object.values(hero.equipment || {}).map(id => WORLD_ITEMS.find(i => i.id === id)).filter(Boolean);
-    return { attack: extras.reduce((sum, i) => sum + (i.attack || 0), 0) + (isAssassin() ? 18 : isHunter() ? 19 : isMage() || isPriest() ? 20 : 22) + hero.level * 4 + (item('weapon', gear.weapon)?.attack || 0), defense: extras.reduce((sum, i) => sum + (i.defense || 0), 0) + (item('armor', gear.armor)?.defense || 0) };
+    const worn = [...Object.values(hero.equipment || {}).map(id => WORLD_ITEMS.find(i => i.id === id)), item('armor', gear.armor), item('weapon', gear.weapon)].filter(usable);
+    return { attack: worn.reduce((sum, i) => sum + (i.attack || 0), 0) + (isAssassin() ? 18 : isHunter() ? 19 : isMage() || isPriest() ? 20 : 22) + hero.level * 4, defense: worn.reduce((sum, i) => sum + (i.defense || 0), 0) };
   };
 
   // Looks only: the server owns health, damage, speed, XP and level. `scale` is the drawn size, `top` the sprite

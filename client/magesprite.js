@@ -79,9 +79,33 @@
     };
     return { meta, parts, ensure };
   }
+  // The catalog names every worn piece by a unique variant. An original piece is drawn as itself; a recolouring (items
+  // with `art` and `tint`, built by scripts/gear_levels.py) is its base drawing painted with the tint, which uses the
+  // terms of the CSS filters the inventory icon gets: hue-rotate degrees, saturate, brightness.
+  const KIND = { armor: 'armor', weapon: 'weapon', head: 'headgear', shoulders: 'shoulders', gloves: 'gloves', pants: 'pants', necklace: 'necklace', accessory: 'accessory' };
+  let catalog = null, catalogSize = -1;
+  const gearIndex = () => {
+    const items = window.WORLD_ITEMS || [];
+    if (!catalog || catalogSize !== items.length) { catalog = new Map(items.filter(i => i.variant).map(i => [`${i.kind}|${i.variant}`, i])); catalogSize = items.length; }
+    return catalog;
+  };
+  const hasGear = (table, kind, variant) => Object.hasOwn(table, variant) || gearIndex().has(`${kind}|${variant}`);
+  const resolve = (slot, variant) => {
+    const i = variant && variant !== 'none' ? gearIndex().get(`${KIND[slot]}|${variant}`) : null;
+    return { art: i?.art || variant, tint: i?.tint || null };
+  };
+  const clamp = v => v < 0 ? 0 : v > 255 ? 255 : v;
+  // The CSS filter matrices (hue-rotate, then saturate, then brightness), clamped after each step like the filter is.
+  function tintMatrix({ hue = 0, saturate = 1, brightness = 1 }) {
+    const c = Math.cos(hue * Math.PI / 180), n = Math.sin(hue * Math.PI / 180);
+    const H = [[.213 + c * .787 - n * .213, .715 - c * .715 - n * .715, .072 - c * .072 + n * .928], [.213 - c * .213 + n * .143, .715 + c * .285 + n * .14, .072 - c * .072 - n * .283], [.213 - c * .213 - n * .787, .715 - c * .715 + n * .715, .072 + c * .928 + n * .072]];
+    const S = [[.213 + .787 * saturate, .715 - .715 * saturate, .072 - .072 * saturate], [.213 - .213 * saturate, .715 + .285 * saturate, .072 - .072 * saturate], [.213 - .213 * saturate, .715 - .715 * saturate, .072 + .928 * saturate]];
+    const apply = (M, v) => M.map(row => clamp(row[0] * v[0] + row[1] * v[1] + row[2] * v[2]));
+    return (r, g, b) => apply([[brightness, 0, 0], [0, brightness, 0], [0, 0, brightness]], apply(S, apply(H, [r, g, b]))).map(Math.round);
+  }
   const equipment = look => ({
-    armor: Object.hasOwn(ARMOR, look?.mageArmor) ? look.mageArmor : 'apprentice',
-    weapon: Object.hasOwn(WEAPON, look?.mageWeapon) ? look.mageWeapon : 'ash',
+    armor: hasGear(ARMOR, 'armor', look?.mageArmor) ? look.mageArmor : 'apprentice',
+    weapon: hasGear(WEAPON, 'weapon', look?.mageWeapon) ? look.mageWeapon : 'ash',
   });
   // Head, shoulder and glove pieces are worn per class: the look names a tier (or 'none'), and a class only
   // accepts its own tier names (MageSprite.TIERS). A part the atlas does not have is simply not drawn.
@@ -90,12 +114,20 @@
   const CLASS_SLOTS = ['head', 'shoulders', 'gloves'];
   const pieces = (C, look) => Object.fromEntries(Object.entries(GENERIC).map(([slot, generic]) => {
     const allowed = CLASS_SLOTS.includes(slot) ? [...(C.TIERS || []), generic] : [generic];
-    return [slot, allowed.includes(look?.[slot]) ? look[slot] : 'none'];
+    return [slot, allowed.includes(resolve(slot, look?.[slot]).art) ? look[slot] : 'none'];
   }));
   class MageSprite {
     constructor(source, look = {}) { this.source = source; this.meta = source.meta; this.cache = new Map(); this.set(look); }
     set(look) {
-      this.look = { ...look }; this.equipment = { ...pieces(this.constructor, look), ...this.constructor.equipment(look) }; this.cache.clear();
+      this.look = { ...look }; this.cache.clear();
+      // `worn` holds the catalog variants; `equipment` the drawings they use; `partTint` the recolouring of each drawn part.
+      this.worn = { ...pieces(this.constructor, look), ...this.constructor.equipment(look) };
+      this.equipment = {}; this.partTint = new Map(); this.tintLut = new Map();
+      for (const slot of SLOT_ORDER) {
+        const { art, tint } = resolve(slot, this.worn[slot]);
+        this.equipment[slot] = art;
+        if (tint && art !== 'none') { const key = `${slot}_${art}`; this.partTint.set(key, tint); if (!this.tintLut.has(key)) this.tintLut.set(key, { paint: tintMatrix(tint), colours: new Map() }); }
+      }
       for (const slot of SLOT_ORDER) {      // a layer still being decoded appears (and the frames are rebuilt) as soon as it arrives
         const part = slot + '_' + this.equipment[slot];
         if (this.equipment[slot] !== 'none' && !this.source.parts[part]) this.source.ensure?.(part).then(() => { if (this.source.parts[part]) this.cache.clear(); });
@@ -127,8 +159,14 @@
           const pixel = y * f.w + x, src = pixel * 4, dst = (f.y + y) * fw + f.x + x;
           if (!f.pixels[src + 3] || f.z[pixel] > nearest[dst]) continue;
           nearest[dst] = f.z[pixel];
-          const tint = part === 'body' && this.tint.get(f.pixels[src] * 65536 + f.pixels[src + 1] * 256 + f.pixels[src + 2]);
-          out.data.set(tint ? [...tint, 255] : f.pixels.subarray(src, src + 4), dst * 4);
+          const packed = f.pixels[src] * 65536 + f.pixels[src + 1] * 256 + f.pixels[src + 2];
+          const tint = part === 'body' && this.tint.get(packed);
+          const lut = this.tintLut.get(part);
+          if (lut) {   // a recoloured piece: every colour is painted once and remembered
+            let painted = lut.colours.get(packed);
+            if (!painted) { painted = [...lut.paint(f.pixels[src], f.pixels[src + 1], f.pixels[src + 2]), 255]; lut.colours.set(packed, painted); }
+            out.data.set(painted, dst * 4);
+          } else out.data.set(tint ? [...tint, 255] : f.pixels.subarray(src, src + 4), dst * 4);
         }
       }
       g.putImageData(out, 0, 0);
@@ -160,7 +198,7 @@
       return new this(await sources.get(url), look);
     }
   }
-  MageSprite.GENERIC = GENERIC;
+  MageSprite.GENERIC = GENERIC; MageSprite.hasGear = hasGear; MageSprite.resolveGear = resolve; MageSprite.tintMatrix = tintMatrix;
   MageSprite.HAIR = HAIR; MageSprite.SKIN = SKIN; MageSprite.ARMOR = ARMOR; MageSprite.WEAPON = WEAPON;
   MageSprite.equipment = equipment; MageSprite.TIERS = ['apprentice', 'runic'];
   MageSprite.METADATA = 'assets/mage_sprites.txt';

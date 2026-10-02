@@ -9,8 +9,8 @@
   PriestSprite.ARMOR = { none: { name: 'Simple cloth', defense: 0 }, pilgrim: { name: 'Pilgrim robes', defense: 3 }, dawn: { name: 'Dawnweave vestments', defense: 5 } };
   PriestSprite.WEAPON = { none: { name: 'Empty hands', attack: 0 }, mace: { name: 'Oak mace', attack: 4 }, sunmace: { name: 'Sunbreaker mace', attack: 8 } };
   PriestSprite.equipment = look => ({
-    armor: Object.hasOwn(PriestSprite.ARMOR, look?.priestArmor) ? look.priestArmor : 'pilgrim',
-    weapon: Object.hasOwn(PriestSprite.WEAPON, look?.priestWeapon) ? look.priestWeapon : 'mace',
+    armor: MageSprite.hasGear(PriestSprite.ARMOR, 'armor', look?.priestArmor) ? look.priestArmor : 'pilgrim',
+    weapon: MageSprite.hasGear(PriestSprite.WEAPON, 'weapon', look?.priestWeapon) ? look.priestWeapon : 'mace',
   });
   MageSprite.female(PriestSprite, 'assets/priest_f_sprites.txt');
   window.PriestSprite = PriestSprite;

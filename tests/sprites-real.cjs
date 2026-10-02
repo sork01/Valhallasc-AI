@@ -90,6 +90,22 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
       check((await figure(page, cls, gear.armor[0], gear.weapon[0], { pants: 'ironhide' })).hash === dressed.hash && (await figure(page, cls, gear.armor[0], gear.weapon[0], { necklace: 'amber' })).hash === dressed.hash, `${cls}: pants and necklace ignore names they do not know`);
       const everything = await figure(page, cls, gear.armor[0], gear.weapon[0], generic);
       check(everything.visible > dressed.visible && everything.hash !== dressed.hash, `${cls}: all six generic pieces worn together make a bigger figure`);
+      // Recoloured pieces (the catalog's `art` + `tint`): drawn as their base drawing, same silhouette, different colours,
+      // and every set of the same drawing looks different from every other.
+      const recoloured = await page.evaluate(cls => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && ['armor', 'weapon', 'headgear', 'pants'].includes(i.kind)).map(i => [i.kind, i.variant, i.art]), cls);
+      const baseOf = new Map(), byArt = new Map();
+      const wear = (kind, v) => kind === 'armor' ? figure(page, cls, v, gear.weapon[0]) : kind === 'weapon' ? figure(page, cls, gear.armor[0], v) : figure(page, cls, gear.armor[0], gear.weapon[0], { [kind === 'headgear' ? 'head' : kind]: v });
+      let recolourOk = 0, silhouetteOk = 0;
+      for (const [kind, variant, art] of recoloured) {
+        const key = kind + '|' + art; if (!baseOf.has(key)) baseOf.set(key, await wear(kind, art));
+        const w = await wear(kind, variant), base = baseOf.get(key);
+        recolourOk += w.hash !== base.hash; silhouetteOk += w.visible === base.visible;
+        byArt.set(key, (byArt.get(key) || new Set()).add(w.hash));
+      }
+      check(recoloured.length >= 60 && recolourOk === recoloured.length, `${cls}: all ${recoloured.length} recoloured armor, weapon, helm and pants pieces draw in colours of their own (${recolourOk})`);
+      check(silhouetteOk === recoloured.length, `${cls}: a recolouring keeps the drawing's silhouette (${silhouetteOk}/${recoloured.length})`);
+      const perArt = recoloured.reduce((m, [k, , art]) => m.set(k + '|' + art, (m.get(k + '|' + art) || 0) + 1), new Map());
+      check([...byArt].every(([key, hashes]) => hashes.size === perArt.get(key)), `${cls}: no two sets of one drawing share their colours`);
       check(await page.evaluate(cls => valhalla[cls].portrait().length > 2000, cls), `${cls}: the portrait renders`);
       // The female set: its own atlases, the same equipment, a body that is not the male one.
       const f = (armor, weapon, extras) => figure(page, cls, armor, weapon, extras, true);

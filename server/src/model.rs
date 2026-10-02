@@ -48,16 +48,6 @@ pub enum Class {
     Hunter,
 }
 impl Class {
-    /// The two visual sets of a class's shoulders, gloves and head layers.
-    pub fn tiers(self) -> &'static [&'static str] {
-        match self {
-            Self::Warrior => &["crimson", "azure"],
-            Self::Mage => &["apprentice", "runic"],
-            Self::Assassin => &["shadow", "moon"],
-            Self::Priest => &["pilgrim", "dawn"],
-            Self::Hunter => &["scout", "warden"],
-        }
-    }
     /// Classes that loose a projectile instead of hitting everything within reach.
     pub fn ranged(self) -> bool {
         matches!(self, Self::Mage | Self::Hunter)
@@ -150,12 +140,6 @@ pub struct Look {
     pub accessory: String,
 }
 /// Variant names of the class-independent pieces, per look field. Keep in step with scripts/generic_gear.py.
-pub const GENERIC_HEAD: &str = "ironhide";
-pub const GENERIC_SHOULDERS: &str = "ironhide";
-pub const GENERIC_GLOVES: &str = "duelist";
-pub const GENERIC_PANTS: &str = "wayfarer";
-pub const GENERIC_NECKLACE: &str = "moonstone";
-pub const GENERIC_ACCESSORY: &str = "amber";
 impl Default for Look {
     fn default() -> Self {
         Self {
@@ -206,30 +190,36 @@ impl Look {
         if self.hair_color > 5 || self.skin > 3 {
             return Err("Invalid appearance.");
         }
-        if !["none", "crimson", "azure"].contains(&self.warrior_armor.as_str())
-            || !["none", "sword", "royal"].contains(&self.warrior_weapon.as_str())
-            || !["none", "apprentice", "runic"].contains(&self.mage_armor.as_str())
-            || !["none", "ash", "crystal"].contains(&self.mage_weapon.as_str())
-            || !["none", "shadow", "moon"].contains(&self.assassin_armor.as_str())
-            || !["none", "daggers", "moonfang"].contains(&self.assassin_weapon.as_str())
-            || !["none", "pilgrim", "dawn"].contains(&self.priest_armor.as_str())
-            || !["none", "mace", "sunmace"].contains(&self.priest_weapon.as_str())
-            || !["none", "scout", "warden"].contains(&self.hunter_armor.as_str())
-            || !["none", "shortbow", "wardenbow"].contains(&self.hunter_weapon.as_str())
-        {
-            return Err("Invalid equipment.");
-        }
-        let tiers = self.class.tiers();
-        let worn = |piece: &String, generic: &str| {
-            piece == "none" || piece == generic || tiers.contains(&piece.as_str())
+        // Every worn name must be a piece in the catalog: the class's own armor and weapon for each class, the class's
+        // own (or a class-independent) head, shoulders and gloves, and class-independent pants, necklace and ring.
+        let known = |class: Option<Class>, kind: &str, piece: &String| {
+            piece == "none"
+                || crate::items::ITEMS.iter().any(|i| {
+                    i.kind == kind
+                        && i.variant.as_deref() == Some(piece.as_str())
+                        && (i.class == class
+                            || (class.is_some()
+                                && i.class.is_none()
+                                && kind != "armor"
+                                && kind != "weapon"))
+                })
         };
-        let only = |piece: &String, generic: &str| piece == "none" || piece == generic;
-        if !worn(&self.head, GENERIC_HEAD)
-            || !worn(&self.shoulders, GENERIC_SHOULDERS)
-            || !worn(&self.gloves, GENERIC_GLOVES)
-            || !only(&self.pants, GENERIC_PANTS)
-            || !only(&self.necklace, GENERIC_NECKLACE)
-            || !only(&self.accessory, GENERIC_ACCESSORY)
+        let own = Some(self.class);
+        let class_gear = [
+            (Class::Warrior, &self.warrior_armor, &self.warrior_weapon),
+            (Class::Mage, &self.mage_armor, &self.mage_weapon),
+            (Class::Assassin, &self.assassin_armor, &self.assassin_weapon),
+            (Class::Priest, &self.priest_armor, &self.priest_weapon),
+            (Class::Hunter, &self.hunter_armor, &self.hunter_weapon),
+        ];
+        if class_gear.iter().any(|(class, armor, weapon)| {
+            !known(Some(*class), "armor", armor) || !known(Some(*class), "weapon", weapon)
+        }) || !known(own, "headgear", &self.head)
+            || !known(own, "shoulders", &self.shoulders)
+            || !known(own, "gloves", &self.gloves)
+            || !known(None, "pants", &self.pants)
+            || !known(None, "necklace", &self.necklace)
+            || !known(None, "accessory", &self.accessory)
         {
             return Err("Invalid equipment.");
         }
@@ -279,9 +269,19 @@ impl Look {
             Class::Priest => (20., self.priest_armor.as_str(), self.priest_weapon.as_str()),
             Class::Hunter => (19., self.hunter_armor.as_str(), self.hunter_weapon.as_str()),
         };
-        let defense = crate::items::equipment(self.class, "armor", armor).map_or(0., |i| i.defense);
-        let bonus = crate::items::equipment(self.class, "weapon", weapon).map_or(0., |i| i.attack);
-        (base + level as f64 * 4. + bonus, defense)
+        // A piece above the character's level adds nothing (see Item::required_level).
+        let worn = |kind, variant| {
+            crate::items::equipment(self.class, kind, variant).filter(|i| i.required_level <= level)
+        };
+        let defense = worn("armor", armor).map_or(0., |i| i.defense);
+        let bonus = worn("weapon", weapon).map_or(0., |i| i.attack);
+        // Gear that carries both stats (green and better) brings its secondary one too.
+        let attack_extra = worn("armor", armor).map_or(0., |i| i.attack);
+        let defense_extra = worn("weapon", weapon).map_or(0., |i| i.defense);
+        (
+            base + level as f64 * 4. + bonus + attack_extra,
+            defense + defense_extra,
+        )
     }
 }
 

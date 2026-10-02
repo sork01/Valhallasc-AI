@@ -17,7 +17,12 @@
   const effect = i => i.kind === 'food' ? `Restores ${i.heal} HP over ${i.duration} s · one meal at a time` : `Restores ${i.heal} HP at once · ${i.cooldown} s cooldown shared by all potions`;
   const useItem = i => consumable(i) && canEquip() && bagQuantity(i.id) > 0 && Field.useItem(i.id);
   const activate = i => consumable(i) ? useItem(i) : equip(i);
-  const stats = i => [i.attack ? `+${i.attack} attack` : '', i.defense ? `${i.defense} defense` : ''].filter(Boolean).join(' · ');
+  const num = n => Number(n.toFixed(1));
+  const stats = i => [i.attack ? `+${num(i.attack)} attack` : '', i.defense ? `${num(i.defense)} defense` : ''].filter(Boolean).join(' · ');
+  const heroLevel = () => Field.hero?.level || 1;
+  const levelOf = i => i?.requiredLevel || 1;
+  const tooLow = i => !!i && levelOf(i) > heroLevel();   // gear above the hero's level cannot be put on (the server refuses it too)
+  const levelNote = i => tooLow(i) ? `Requires level ${levelOf(i)} (you are level ${heroLevel()})` : `Requires level ${levelOf(i)}`;
   const itemAtSlot = slot => ['chest', 'hands'].includes(slot) ? WORLD_ITEMS.find(i => i.kind === slotKind(slot) && i.class === look?.class && look[i.class + (slot === 'chest' ? 'Armor' : 'Weapon')] === i.variant) : definition(gearSlots[slot]);
   const canEquip = () => Online.connected && !Field.hero?.dead;
   function node(tag, text = '', cls) { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; }
@@ -45,10 +50,13 @@
   const rarityName = i => RARITY_NAMES[i?.rarity] || 'Common';
   function icon(i, emptyKind) {
     const kind = i?.kind || emptyKind;
-    const cell = i && window.ITEM_ICONS?.at[i.id];   // equipment has its own pixel icon (assets/items.png); everything else keeps the glyph
+    // A recoloured piece (art + tint in the catalog) shows its base piece's icon through the same colour filter the worn art gets.
+    const base = i?.art ? WORLD_ITEMS.find(o => o.kind === i.kind && o.class === i.class && o.variant === i.art) : null;
+    const cell = i && window.ITEM_ICONS?.at[i.id] || (base && window.ITEM_ICONS?.at[base.id]);   // equipment has its own pixel icon (assets/items.png); everything else keeps the glyph
     if (cell) {
-      const { cols, rows } = ITEM_ICONS;
-      return `<span class="item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-size:${cols * 100}% ${rows * 100}%;background-position:${cell[0] / (cols - 1) * 100}% ${cell[1] / (rows - 1) * 100}%"></span>`;
+      const { cols, rows } = ITEM_ICONS, t = i.tint;
+      const tint = t ? `hue-rotate(${t.hue}deg) saturate(${t.saturate}) brightness(${t.brightness}) ` : '';
+      return `<span class="item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-size:${cols * 100}% ${rows * 100}%;background-position:${cell[0] / (cols - 1) * 100}% ${cell[1] / (rows - 1) * 100}%${t ? `;filter:${tint}drop-shadow(1px 2px 1px #000b)` : ''}"></span>`;
     }
     const glyph = kind === 'weapon' && i?.class === 'mage' ? 'staff' : kind === 'weapon' && i?.class === 'assassin' ? 'daggers' : kind === 'weapon' && i?.class === 'priest' ? 'mace' : kind === 'weapon' && i?.class === 'hunter' ? 'bow' : i?.id === 'ironhide_shell' ? 'shell' : kind;
     const palette = { slime_gel: '#88c675', blue_gel: '#6ca6ec', pink_gel: '#dd88b1', golden_gel: '#edc561', royal_jelly: '#bd84e2', traveler_stew: '#c98a4b', health_potion: '#e0476b' };
@@ -56,7 +64,7 @@
     return `<svg viewBox="0 0 64 64" aria-hidden="true" style="color:${color}" stroke="#15151a" stroke-width="2" stroke-linejoin="round">${art[glyph] || art.accessory}</svg>`;
   }
   function summary(i, count = quantity(i.id)) {
-    return `${i.name} ×${count} · ${i.rarity === 'common' ? '' : rarityName(i) + ' · '}${i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind === 'food' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · ${stats(i)}`} · ${i.starter ? 'Starter gear · cannot be sold' : `sells for ${i.sell} gold each`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
+    return `${i.name} ×${count} · ${i.rarity === 'common' ? '' : rarityName(i) + ' · '}${i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind === 'food' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · level ${levelOf(i)} · ${stats(i)}`} · ${i.starter ? 'Starter gear · cannot be sold' : `sells for ${i.sell} gold each`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
   }
   function tooltip() {
     let t = $('item-tooltip'); if (!t) { t = node('div', '', 'item-tooltip'); t.id = 'item-tooltip'; t.role = 'tooltip'; t.hidden = true; document.body.append(t); } return t;
@@ -68,10 +76,11 @@
     if (consumable(i)) t.append(node('p', effect(i)));
     else if (i.kind !== 'material') t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(i)}`));
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
+    if (compatible(i) && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
     if (compatible(i) && !slot) {
       const target = slots.find(([s]) => slotKind(s) === i.kind)?.[0], current = target && itemAtSlot(target);
       if (current && current.id !== i.id) {
-        const attack = (i.attack || 0) - (current.attack || 0), defense = (i.defense || 0) - (current.defense || 0);
+        const attack = num((i.attack || 0) - (current.attack || 0)), defense = num((i.defense || 0) - (current.defense || 0));
         t.append(node('p', `Compared with ${current.name}: ${attack >= 0 ? '+' : ''}${attack} attack · ${defense >= 0 ? '+' : ''}${defense} defense`, 'item-comparison'));
       }
     }
@@ -89,7 +98,7 @@
     anchor.addEventListener('pointerleave', hideTooltip); anchor.addEventListener('blur', hideTooltip);
   }
   function equip(i, slot) {
-    if (!compatible(i) || !canEquip() || bagQuantity(i.id) < 1) return false;
+    if (!compatible(i) || !canEquip() || bagQuantity(i.id) < 1 || tooLow(i)) return false;
     const targets = slots.filter(([s]) => slotKind(s) === i.kind).map(([s]) => s);
     slot ||= targets.find(s => !itemAtSlot(s)) || targets.find(s => itemAtSlot(s)?.id !== i.id) || targets[0];
     if (!slot || slotKind(slot) !== i.kind) return false;
@@ -148,8 +157,9 @@
     if (compatible(i)) {
       const targets = slots.filter(([s]) => slotKind(s) === i.kind && itemAtSlot(s)?.id !== i.id);
       for (const [slot, label] of targets) {
-        const b = button(i.kind === 'accessory' ? `Equip · ${label}` : 'Equip', () => equip(i, slot), 'item-action'); b.dataset.action = 'equip'; b.disabled = !canEquip(); container.append(b);
+        const b = button(i.kind === 'accessory' ? `Equip · ${label}` : 'Equip', () => equip(i, slot), 'item-action'); b.dataset.action = 'equip'; b.disabled = !canEquip() || tooLow(i); container.append(b);
       }
+      if (levelOf(i) > 1) container.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'bag-empty-note'));
     } else if (consumable(i)) {
       const b = button('Use', () => useItem(i), 'item-action'); b.dataset.action = 'use'; b.disabled = !canEquip(); container.append(b);
       container.append(node('p', effect(i), 'bag-empty-note'));

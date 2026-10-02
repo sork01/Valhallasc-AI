@@ -9,8 +9,8 @@
   HunterSprite.ARMOR = { none: { name: 'Simple cloth', defense: 0 }, scout: { name: 'Scout\u2019s Jerkin', defense: 3 }, warden: { name: 'Wildwarden Coat', defense: 5 } };
   HunterSprite.WEAPON = { none: { name: 'Empty hands', attack: 0 }, shortbow: { name: 'Hunter\u2019s Shortbow', attack: 4 }, wardenbow: { name: 'Wildwarden Longbow', attack: 8 } };
   HunterSprite.equipment = look => ({
-    armor: Object.hasOwn(HunterSprite.ARMOR, look?.hunterArmor) ? look.hunterArmor : 'scout',
-    weapon: Object.hasOwn(HunterSprite.WEAPON, look?.hunterWeapon) ? look.hunterWeapon : 'shortbow',
+    armor: MageSprite.hasGear(HunterSprite.ARMOR, 'armor', look?.hunterArmor) ? look.hunterArmor : 'scout',
+    weapon: MageSprite.hasGear(HunterSprite.WEAPON, 'weapon', look?.hunterWeapon) ? look.hunterWeapon : 'shortbow',
   });
   MageSprite.female(HunterSprite, 'assets/hunter_f_sprites.txt');
   window.HunterSprite = HunterSprite;

@@ -9,8 +9,8 @@
   AssassinSprite.ARMOR = { none: { name: 'Simple cloth', defense: 0 }, shadow: { name: 'Nightweave', defense: 2 }, moon: { name: 'Moonveil', defense: 4 } };
   AssassinSprite.WEAPON = { none: { name: 'Empty hands', attack: 0 }, daggers: { name: 'Twin daggers', attack: 4 }, moonfang: { name: 'Moonfang blades', attack: 8 } };
   AssassinSprite.equipment = look => ({
-    armor: Object.hasOwn(AssassinSprite.ARMOR, look?.assassinArmor) ? look.assassinArmor : 'shadow',
-    weapon: Object.hasOwn(AssassinSprite.WEAPON, look?.assassinWeapon) ? look.assassinWeapon : 'daggers',
+    armor: MageSprite.hasGear(AssassinSprite.ARMOR, 'armor', look?.assassinArmor) ? look.assassinArmor : 'shadow',
+    weapon: MageSprite.hasGear(AssassinSprite.WEAPON, 'weapon', look?.assassinWeapon) ? look.assassinWeapon : 'daggers',
   });
   MageSprite.female(AssassinSprite, 'assets/assassin_f_sprites.txt');
   window.AssassinSprite = AssassinSprite;

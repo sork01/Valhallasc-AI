@@ -33,7 +33,11 @@ async function call(name, args = {}) {
   check(await page.locator('#field-mageWeapon option').count() === 2, 'Equipment selector offers only none and owned gear');
   // Equipment icons: every piece of gear has its own pixel icon (assets/items.png), no two alike, and the bag/gear slots draw them.
   const icons = await page.evaluate(async () => {
-    const gear = WORLD_ITEMS.filter(i => !['material', 'bag', 'food', 'potion'].includes(i.kind));
+    const at0 = ITEM_ICONS.at;
+    const all = WORLD_ITEMS.filter(i => !['material', 'bag', 'food', 'potion'].includes(i.kind));
+    // Original pieces have their own icon; a recolouring (art + tint) has none and shows its base piece through a colour filter.
+    const gear = all.filter(i => !i.art), recoloured = all.filter(i => i.art);
+    const badRecolour = recoloured.filter(i => !i.tint || !WORLD_ITEMS.some(o => o.kind === i.kind && o.class === i.class && o.variant === i.art && at0[o.id])).map(i => i.id);
     const img = new Image(); img.src = 'assets/items.png'; await img.decode();
     const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(img, 0, 0);
     const { size, at } = ITEM_ICONS, seen = new Map(), missing = [], blank = [];
@@ -44,9 +48,10 @@ async function call(name, args = {}) {
       if (opaque < 150) blank.push(i.id);
       const key = Array.from(px).join(','); seen.set(key, (seen.get(key) || []).concat(i.id));
     }
-    return { gear: gear.length, missing, blank, twins: [...seen.values()].filter(v => v.length > 1) };
+    return { gear: gear.length, recoloured: recoloured.length, badRecolour, missing, blank, twins: [...seen.values()].filter(v => v.length > 1) };
   });
-  check(icons.gear >= 50 && icons.missing.length === 0, `Every equipment item has an icon (missing: ${icons.missing})`);
+  check(icons.gear >= 50 && icons.missing.length === 0, `Every original equipment item has an icon (missing: ${icons.missing})`);
+  check(icons.recoloured >= 400 && icons.badRecolour.length === 0, `Every recoloured piece has a tint and a base piece with an icon (${icons.recoloured} pieces; bad: ${icons.badRecolour.slice(0, 5)})`);
   check(icons.blank.length === 0 && icons.twins.length === 0, `No icon is blank or a copy of another (blank ${icons.blank}; twins ${JSON.stringify(icons.twins)})`);
   check(await page.locator('#inventory-list [data-item="mage_headgear_apprentice"] .item-art').evaluate(n => getComputedStyle(n).backgroundImage.includes('items.png') && n.getBoundingClientRect().width > 20), 'Bag tiles draw the item\'s own pixel icon');
   check(await page.locator('[data-slot="hands"] .item-art').count() === 1 && await page.locator('[data-slot="hands"] .item-art').getAttribute('data-icon') === 'mage_weapon_ash', 'The Hands slot shows the equipped staff icon');
@@ -102,21 +107,21 @@ async function call(name, args = {}) {
   await fixture.addScriptTag({ path:path.join(root, 'client/world.js') });
   await fixture.addScriptTag({ path:path.join(root, 'client/items.js') });
   await fixture.evaluate(() => {
-    window.sent = []; window.Field = { equip: change => sent.push(change), equipSlot: (slot, item) => { sent.push({ slot, item }); return true; }, setPaused() {} };
+    window.sent = []; window.Field = { hero: { level: 20 }, equip: change => sent.push(change), equipSlot: (slot, item) => { sent.push({ slot, item }); return true; }, setPaused() {} };
     window.Online = { connected:true, send: message => { sent.push(message); return true; } };
   });
   for (const script of ['inventory.js', 'quests.js', 'city.js']) await fixture.addScriptTag({ path:path.join(root, 'client', script) });
   await fixture.evaluate(() => {
-    Inventory.update([{item:'mage_weapon_crystal',quantity:1},{item:'warrior_weapon_royal',quantity:1},{item:'mage_armor_runic',quantity:2},{item:'headgear_upgrade',quantity:1},{item:'slime_gel',quantity:3}], { class:'mage', mageArmor:'runic', mageWeapon:'ash' });
+    Inventory.update([{item:'mage_weapon_crystal_l10_purple',quantity:1},{item:'warrior_weapon_royal',quantity:1},{item:'mage_armor_runic',quantity:2},{item:'headgear_upgrade',quantity:1},{item:'pants_upgrade',quantity:1},{item:'mage_armor_apprentice_l5_blue',quantity:1},{item:'slime_gel',quantity:3}], { class:'mage', mageArmor:'runic', mageWeapon:'ash' });
     Inventory.render(document.getElementById('inventory-list'));
     Inventory.renderShop(WORLD_MAP.npcs.find(n => n.id === 'merchant'), document.getElementById('npc-inventory'));
   });
-  const rare = fixture.locator('#inventory-list [data-item="mage_weapon_crystal"]');
-  check(await rare.textContent().then(t => t.includes('+9 attack') && t.includes('Epic')), 'Epic equipment displays its stat bonus and rarity');
+  const rare = fixture.locator('#inventory-list [data-item="mage_weapon_crystal_l10_purple"]');
+  check(await rare.textContent().then(t => t.includes('+13.3 attack') && t.includes('Epic') && t.includes('level 10')), 'Epic equipment displays its stat bonus and rarity');
   check(await rare.locator('b').evaluate(n => getComputedStyle(n).color === 'rgb(180, 92, 255)'), 'Epic item name renders purple');
   const tierColors = await fixture.evaluate(() => {
     const out = {};
-    for (const [id, tier] of [['slime_gel', 'common'], ['headgear_upgrade', 'uncommon'], ['mage_armor_runic', 'rare'], ['mage_weapon_crystal', 'epic']]) {
+    for (const [id, tier] of [['slime_gel', 'common'], ['pants_upgrade', 'uncommon'], ['mage_armor_apprentice_l5_blue', 'rare'], ['mage_weapon_crystal_l10_purple', 'epic']]) {
       const cell = document.querySelector(`#inventory-list [data-item="${id}"]`);
       out[tier] = [cell.dataset.rarity, getComputedStyle(cell.querySelector('b')).color];
     }
@@ -130,7 +135,19 @@ async function call(name, args = {}) {
   check(await fixture.locator('#bag-details [data-action="equip"]').count() === 0, 'Cross-class gear cannot be equipped in UI');
   check(await fixture.locator('#inventory-list [data-item="warrior_weapon_royal"]').textContent().then(t => t.includes('warrior')), 'Cross-class gear explains its class restriction');
   await rare.locator('button').click({ button: 'right' });
-  check(await fixture.evaluate(() => JSON.stringify(sent[0]) === '{"slot":"hands","item":"mage_weapon_crystal"}'), 'Equip button requests only the selected slot');
+  check(await fixture.evaluate(() => JSON.stringify(sent[0]) === '{"slot":"hands","item":"mage_weapon_crystal_l10_purple"}'), 'Equip button requests only the selected slot');
+  // Required levels: a piece above the hero's level shows a red requirement, offers no usable Equip button and sends nothing.
+  await fixture.evaluate(() => { sent.length = 0; Field.hero.level = 5; Inventory.render(document.getElementById('inventory-list')); document.querySelector('#inventory-list [data-item="mage_weapon_crystal_l10_purple"] button').click(); });
+  check(await fixture.locator('#bag-details [data-action="equip"]').isDisabled(), 'Equip is disabled for a level 10 piece at level 5');
+  check(await fixture.locator('#bag-details .item-restriction').textContent().then(t => t.includes('Requires level 10') && t.includes('you are level 5')), 'The details panel names the missing level in the restriction colour');
+  await rare.locator('button').click({ button: 'right' });
+  check(await fixture.evaluate(() => sent.length === 0), 'Right-clicking a piece above your level sends no equip request');
+  await rare.hover();
+  check(await fixture.locator('#item-tooltip .item-restriction').textContent().then(t => t.includes('Requires level 10')), 'The tooltip shows the level requirement in red');
+  await fixture.evaluate(() => { Field.hero.level = 10; Inventory.render(document.getElementById('inventory-list')); document.querySelector('#inventory-list [data-item="mage_weapon_crystal_l10_purple"] button').click(); });
+  check(await fixture.locator('#bag-details [data-action="equip"]').isEnabled(), 'Equip is enabled once the hero reaches level 10');
+  await fixture.evaluate(() => { Field.hero.level = 20; Inventory.render(document.getElementById('inventory-list')); sent.length = 0; });
+  await rare.locator('button').click({ button: 'right' });
   check(await fixture.locator('#npc-inventory [data-item="warrior_weapon_royal"] button').count() === 1, 'Cross-class gear can be sold');
   check(await fixture.locator('#npc-inventory [data-item="mage_armor_runic"] button').count() === 1, 'Sale controls reserve one equipped copy');
   check(await fixture.locator('#npc-inventory [data-sell="materials"]').textContent().then(t => t.includes('9 gold')), 'Bulk sale displays the total material value');

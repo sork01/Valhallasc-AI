@@ -426,7 +426,7 @@ mod tests {
         let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();
         let (mut c, token) = s.create(Look::default(), Point { x: 36., y: 60. }).unwrap();
         c.gold = 81;
-        c.level = 3;
+        c.level = 20;
         c.look.equip("azure", "royal").unwrap();
         c.add_item("warrior_armor_azure", 1);
         c.add_item("warrior_weapon_royal", 1);
@@ -547,7 +547,12 @@ mod tests {
     fn unlimited_inventory_migration_preserves_every_item_and_grants_only_needed_bags() {
         let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();
         let (mut c, token) = s.create(Look::default(), Point::default()).unwrap();
-        for i in crate::items::ITEMS.iter().filter(|i| i.kind != "bag") {
+        // One item in eight of the catalog (it holds hundreds of pieces): still more than the backpack holds.
+        for i in crate::items::ITEMS
+            .iter()
+            .filter(|i| i.kind != "bag")
+            .step_by(8)
+        {
             c.add_item(&i.id, 1);
         }
         let mut old = serde_json::to_value(&c).unwrap();
