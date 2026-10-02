@@ -410,7 +410,7 @@
     Online.send({ type: 'skill', id: def.id, fx, fy });
   }
   function shadowstep() { const [dx, dy] = keyboardDirection(); Online.send({ type: 'dash', dx, dy }); }
-  const classSprite = look => look.class === 'mage' ? MageSprite : look.class === 'assassin' ? AssassinSprite : look.class === 'priest' ? PriestSprite : look.class === 'hunter' ? HunterSprite : WarriorSprite;
+  const classSprite = look => (look.class === 'mage' ? MageSprite : look.class === 'assassin' ? AssassinSprite : look.class === 'priest' ? PriestSprite : look.class === 'hunter' ? HunterSprite : WarriorSprite).variant(look);
   function applyActor(actor, packet, snap = false) {
     const x = actor.x, y = actor.y;
     Object.assign(actor, packet); actor.nx = packet.x; actor.ny = packet.y;

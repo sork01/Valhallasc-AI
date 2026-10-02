@@ -140,5 +140,11 @@
   MageSprite.HAIR = HAIR; MageSprite.SKIN = SKIN; MageSprite.ARMOR = ARMOR; MageSprite.WEAPON = WEAPON;
   MageSprite.equipment = equipment; MageSprite.TIERS = ['apprentice', 'runic'];
   MageSprite.METADATA = 'assets/mage_sprites.txt';
+  // Every class has a second atlas set for a female character. `Base.Female` is the same class reading
+  // `<class>_f_sprites.txt`, and `Base.variant(look)` picks the one that matches look.gender, so the usual check
+  // "is this sprite the right class for this look?" (constructor === class) notices a change of gender as well.
+  MageSprite.female = (Base, url) => { const Female = class extends Base {}; Female.METADATA = url; Base.Female = Female; return Female; };
+  MageSprite.variant = function (look) { return look?.gender === 'female' && Object.hasOwn(this, 'Female') ? this.Female : this; };
+  MageSprite.female(MageSprite, 'assets/mage_f_sprites.txt');
   window.MageSprite = MageSprite;
 })();

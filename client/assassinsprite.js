@@ -12,5 +12,6 @@
     armor: Object.hasOwn(AssassinSprite.ARMOR, look?.assassinArmor) ? look.assassinArmor : 'shadow',
     weapon: Object.hasOwn(AssassinSprite.WEAPON, look?.assassinWeapon) ? look.assassinWeapon : 'daggers',
   });
+  MageSprite.female(AssassinSprite, 'assets/assassin_f_sprites.txt');
   window.AssassinSprite = AssassinSprite;
 })();

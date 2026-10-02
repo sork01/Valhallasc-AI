@@ -12,5 +12,6 @@
     armor: Object.hasOwn(HunterSprite.ARMOR, look?.hunterArmor) ? look.hunterArmor : 'scout',
     weapon: Object.hasOwn(HunterSprite.WEAPON, look?.hunterWeapon) ? look.hunterWeapon : 'shortbow',
   });
+  MageSprite.female(HunterSprite, 'assets/hunter_f_sprites.txt');
   window.HunterSprite = HunterSprite;
 })();

@@ -28,6 +28,15 @@ pub fn normalize(x: f64, y: f64) -> Point {
     }
 }
 
+/// Body type of the character's sprites. Every class has both; it changes only how the character looks.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Gender {
+    #[default]
+    Male,
+    Female,
+}
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Class {
@@ -114,6 +123,7 @@ impl Class {
 pub struct Look {
     pub name: String,
     pub class: Class,
+    pub gender: Gender,
     pub hair_color: u8,
     pub skin: u8,
     pub warrior_armor: String,
@@ -137,6 +147,7 @@ impl Default for Look {
         Self {
             name: "Adventurer".into(),
             class: Class::Warrior,
+            gender: Gender::Male,
             hair_color: 0,
             skin: 0,
             warrior_armor: "crimson".into(),
@@ -819,6 +830,27 @@ impl Map {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn gender_defaults_to_male_round_trips_and_rejects_unknown_values() {
+        assert_eq!(Look::default().gender, Gender::Male);
+        // A look saved before genders existed has no field and stays male.
+        let old: Look = serde_json::from_str(r#"{"name":"Ragna","class":"mage"}"#).unwrap();
+        assert_eq!(old.gender, Gender::Male);
+        for class in ["warrior", "mage", "assassin", "priest", "hunter"] {
+            let text = format!(r#"{{"name":"Freya","class":"{class}","gender":"female"}}"#);
+            let look: Look = serde_json::from_str(&text).unwrap();
+            assert_eq!(look.gender, Gender::Female, "{class}");
+            assert!(look.validate().is_ok(), "{class}");
+            let sent = serde_json::to_value(&look).unwrap();
+            assert_eq!(
+                sent["gender"], "female",
+                "other players see it as lowercase text"
+            );
+        }
+        assert!(serde_json::from_str::<Look>(r#"{"gender":"other"}"#).is_err());
+        assert!(serde_json::from_str::<Look>(r#"{"gender":2}"#).is_err());
+    }
 
     #[test]
     fn level_table_drives_xp_and_enemies_pay_forty_five_plus_five_per_level() {

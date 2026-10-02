@@ -69,6 +69,7 @@ const debugSchema = z.discriminatedUnion('op', [
 const botSchema = z.object({
   bot: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,15}$/),
   class: z.enum(['warrior', 'mage', 'assassin', 'priest', 'hunter']).default('warrior'),
+  gender: z.enum(['male', 'female']).default('male'),
 }).strict();
 
 function spacingViolation(snapshot) {
@@ -237,12 +238,12 @@ class TestWorld extends EventEmitter {
   }
   async connect(options) {
     this.requireRunning();
-    const { bot, class: playerClass } = botSchema.parse(options);
+    const { bot, class: playerClass, gender } = botSchema.parse(options);
     let player = this.bots.get(bot);
     if (player?.socket && player.socket.readyState !== WebSocket.CLOSED) throw Error(`Bot ${bot} is already connected or disconnecting.`);
     if (!player && this.bots.size >= 16) throw Error('A test world supports at most 16 bot identities.');
     if (!player) {
-      player = { class: playerClass, token: null, id: null, socket: null };
+      player = { class: playerClass, gender, token: null, id: null, socket: null };
       this.bots.set(bot, player);
     }
     const ws = new WebSocket(this.url.replace(/^http/, 'ws') + 'ws', { origin: new URL(this.url).origin });
@@ -251,7 +252,7 @@ class TestWorld extends EventEmitter {
     let welcomed = false;
     ws.on('error', () => { player.connectionError = `WebSocket connection failed for ${bot}.`; });
     ws.on('open', () => ws.send(JSON.stringify({ type: 'join', version: 1, token: player.token,
-      look: player.token ? undefined : { name: bot.length >= 2 ? bot : bot + 'x', class: player.class } })));
+      look: player.token ? undefined : { name: bot.length >= 2 ? bot : bot + 'x', class: player.class, gender: player.gender } })));
     ws.on('message', data => {
       let packet;
       try { packet = JSON.parse(data.toString()); } catch { player.connectionError = 'Invalid server packet.'; ws.close(); return; }

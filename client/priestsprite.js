@@ -12,5 +12,6 @@
     armor: Object.hasOwn(PriestSprite.ARMOR, look?.priestArmor) ? look.priestArmor : 'pilgrim',
     weapon: Object.hasOwn(PriestSprite.WEAPON, look?.priestWeapon) ? look.priestWeapon : 'mace',
   });
+  MageSprite.female(PriestSprite, 'assets/priest_f_sprites.txt');
   window.PriestSprite = PriestSprite;
 })();

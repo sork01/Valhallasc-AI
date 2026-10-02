@@ -22,7 +22,7 @@
       warriorArmorNames: ['Simple cloth', 'Crimson guard', 'Azure guard'], warriorWeaponNames: ['Empty hands', 'Sword & shield', 'Royal sword & shield'],
       mageDesc: 'A rune caster with powerful ranged spells. Equip robes and staffs to change your look and strength.',
       mageHint: 'Click to move or cast · WASD to walk · Space to cast · 1–9 skills · E character · B bags · F talk · Esc for menu',
-      equipment: 'Character (E)', hair: 'Hair', weapon: 'Staff', mageTip: 'Click the Mage to cast. Robes and staffs can be changed in the field with E.',
+      equipment: 'Character (E)', gender: 'Body', male: 'Male', female: 'Female', hair: 'Hair', weapon: 'Staff', mageTip: 'Click the Mage to cast. Robes and staffs can be changed in the field with E.',
       mageLoading: 'Summoning the Mage…', mageError: 'Mage sprites could not load. Select Mage again to retry.',
       mageArmorNames: ['Simple cloth', 'Apprentice', 'Runic'], mageWeaponNames: ['Empty hands', 'Ash staff', 'Crystal staff'],
       assassinDesc: 'A swift duelist with twin blades and deadly critical strikes. Shadowstep through danger with Shift.',
@@ -59,7 +59,7 @@
       warriorArmorNames: ['기본 옷', '진홍 갑옷', '청람 갑옷'], warriorWeaponNames: ['맨손', '검과 방패', '왕실 검과 방패'],
       mageDesc: '강력한 원거리 주문을 사용하는 마법사. 로브와 지팡이를 바꾸면 외형과 능력이 달라집니다.',
       mageHint: '클릭: 이동·시전 · WASD: 걷기 · 스페이스: 시전 · E: 장비 · F: 대화 · 1–9: 스킬 · Esc: 메뉴',
-      equipment: '장비 (E)', hair: '머리', weapon: '지팡이', mageTip: '마법사를 눌러 주문을 시전하세요. 필드에서 E 키로 장비를 바꿀 수 있습니다.',
+      equipment: '장비 (E)', gender: '체형', male: '남성', female: '여성', hair: '머리', weapon: '지팡이', mageTip: '마법사를 눌러 주문을 시전하세요. 필드에서 E 키로 장비를 바꿀 수 있습니다.',
       mageLoading: '마법사 소환 중…', mageError: '마법사를 불러오지 못했습니다. 다시 선택해 주세요.',
       mageArmorNames: ['기본 옷', '견습 로브', '룬 로브'], mageWeaponNames: ['맨손', '나무 지팡이', '수정 지팡이'],
       assassinDesc: '쌍검과 치명타를 사용하는 민첩한 암살자. Shift 키로 위험을 뚫고 질주하세요.',
@@ -247,11 +247,11 @@
   // ---------- character creation ----------
   const OPT = window.WARRIOR_OPTS;
   const modular = c => ['warrior', 'mage', 'assassin', 'priest', 'hunter'].includes(c?.class);
-  const spriteClass = c => c?.class === 'warrior' ? WarriorSprite : c?.class === 'assassin' ? AssassinSprite : c?.class === 'priest' ? PriestSprite : c?.class === 'hunter' ? HunterSprite : MageSprite;
+  const spriteClass = c => (c?.class === 'warrior' ? WarriorSprite : c?.class === 'assassin' ? AssassinSprite : c?.class === 'priest' ? PriestSprite : c?.class === 'hunter' ? HunterSprite : MageSprite).variant(c);
   const equipmentKeys = c => [c.class + 'Armor', c.class + 'Weapon'];
   const NAMES = ['Bjorn', 'Ragna', 'Thora', 'Ulfar', 'Freya', 'Gunnar', 'Sunwoo', 'Haneul', 'Minjae', 'Dolgi', 'Eirik', 'Seoyun', 'Astrid', 'Jihoon'];
   const randName = () => NAMES[Math.floor(Math.random() * NAMES.length)];
-  const defaultCfg = () => ({ name: randName(), class: 'warrior', hairColor: 0, skin: 0, armor: 0, rune: 0, warriorArmor: 'crimson', warriorWeapon: 'sword', mageArmor: 'apprentice', mageWeapon: 'ash', assassinArmor: 'shadow', assassinWeapon: 'daggers', priestArmor: 'pilgrim', priestWeapon: 'mace', hunterArmor: 'scout', hunterWeapon: 'shortbow' });
+  const defaultCfg = () => ({ name: randName(), class: 'warrior', gender: 'male', hairColor: 0, skin: 0, armor: 0, rune: 0, warriorArmor: 'crimson', warriorWeapon: 'sword', mageArmor: 'apprentice', mageWeapon: 'ash', assassinArmor: 'shadow', assassinWeapon: 'daggers', priestArmor: 'pilgrim', priestWeapon: 'mace', hunterArmor: 'scout', hunterWeapon: 'shortbow' });
   const idx = (v, n) => { v = Math.floor(+v); return v >= 0 && v < n ? v : 0; };
   let cfg = defaultCfg();
   const load = c => {
@@ -260,6 +260,7 @@
     cfg.hairColor = idx(cfg.hairColor, OPT.hairColors.length); cfg.skin = idx(cfg.skin, OPT.skinColors.length);
     cfg.armor = idx(cfg.armor, OPT.armors); cfg.rune = idx(cfg.rune, OPT.runeHues.length);
     cfg.class = ['mage', 'assassin', 'priest', 'hunter'].includes(cfg.class) ? cfg.class : 'warrior';
+    cfg.gender = cfg.gender === 'female' ? 'female' : 'male';
     if (modular(cfg)) { cfg.hairColor = idx(cfg.hairColor, spriteClass(cfg).HAIR.length); cfg.skin = idx(cfg.skin, spriteClass(cfg).SKIN.length); }
     const warriorGear = WarriorSprite.equipment(cfg); cfg.warriorArmor = warriorGear.armor; cfg.warriorWeapon = warriorGear.weapon;
     const gear = MageSprite.equipment(cfg); cfg.mageArmor = gear.armor; cfg.mageWeapon = gear.weapon;
@@ -286,25 +287,28 @@
     img.hidden = modular(cfg);
   }
 
-  const spriteViews = { warrior: null, mage: null, assassin: null, priest: null, hunter: null }, spritePromises = {};
+  // One sprite per class and body type: spriteViews.mage is the male Mage, spriteViews.mageF the female one.
+  const spriteViews = { warrior: null, mage: null, assassin: null, priest: null, hunter: null, warriorF: null, mageF: null, assassinF: null, priestF: null, hunterF: null }, spritePromises = {};
   let mageRaf = 0, castStart = -10;
-  const currentSprite = c => spriteViews[c.class];
+  const viewKey = c => c.class + (c.gender === 'female' ? 'F' : '');
+  const currentSprite = c => spriteViews[viewKey(c)];
   const magecv = $('magecv'); magecv.width = 300; magecv.height = 394;
-  async function ensureMage(type = cfg.class) {
-    if (spriteViews[type]) return spriteViews[type];
-    if (spritePromises[type]) return spritePromises[type];
-    const look = scene === 'game' && save.char?.class === type ? save.char : cfg;
-    $('mage-status').textContent = t(type + 'Loading'); $('mage-status').hidden = cfg.class !== type;
-    spritePromises[type] = spriteClass({ class: type }).load(look).then(sprite => {
-      spriteViews[type] = sprite;
-      if (cfg.class === type) { sprite.set(scene === 'game' && save.char?.class === type ? save.char : cfg); $('mage-status').hidden = true; }
-      if (scene === 'create' && cfg.class === type) { $('go').disabled = false; paintMage(performance.now()); }
+  async function ensureMage(type = cfg.class, gender = cfg.gender) {
+    const key = viewKey({ class: type, gender }), here = () => viewKey(cfg) === key, playing = () => scene === 'game' && !!save.char && viewKey(save.char) === key;
+    if (spriteViews[key]) return spriteViews[key];
+    if (spritePromises[key]) return spritePromises[key];
+    const look = playing() ? save.char : cfg;
+    $('mage-status').textContent = t(type + 'Loading'); $('mage-status').hidden = !here();
+    spritePromises[key] = spriteClass({ class: type, gender }).load(look).then(sprite => {
+      spriteViews[key] = sprite;
+      if (here()) { sprite.set(playing() ? save.char : cfg); $('mage-status').hidden = true; }
+      if (scene === 'create' && here()) { $('go').disabled = false; paintMage(performance.now()); }
       return sprite;
     }).catch(error => {
-      if (cfg.class === type) { $('mage-status').textContent = t(type + 'Error'); $('mage-status').hidden = false; }
+      if (here()) { $('mage-status').textContent = t(type + 'Error'); $('mage-status').hidden = false; }
       throw error;
-    }).finally(() => { spritePromises[type] = null; });
-    return spritePromises[type];
+    }).finally(() => { spritePromises[key] = null; });
+    return spritePromises[key];
   }
   function paintMage(now) {
     const mage = currentSprite(cfg);
@@ -334,6 +338,7 @@
   Object.defineProperty(window.valhalla, 'assassin', { get: () => spriteViews.assassin });
   Object.defineProperty(window.valhalla, 'priest', { get: () => spriteViews.priest });
   Object.defineProperty(window.valhalla, 'hunter', { get: () => spriteViews.hunter });
+  Object.defineProperty(window.valhalla, 'sprites', { get: () => spriteViews });
 
   function onWarrior(name) {
     switch (name) {
@@ -378,6 +383,15 @@
     const dice = el('button', { class: 'arrow', type: 'button', 'aria-label': t('random'), text: '↻' });
     dice.addEventListener('click', () => { cfg.name = randName(); input.value = cfg.name; saveDraft(); blip(700); });
     custom.append(row(t('name'), input, dice));
+    if (modular(cfg)) {      // every class comes in a male and a female body; the choice is part of the look, fixed once the character is made
+      const seg = el('div', { class: 'seg', role: 'group', 'aria-label': t('gender') });
+      for (const g of ['male', 'female']) {
+        const b = el('button', { class: 'segb', type: 'button', id: 'gender-' + g, 'data-gender': g, 'aria-pressed': String(cfg.gender === g), text: t(g) });
+        b.addEventListener('click', () => { if (cfg.gender === g) return; cfg.gender = g; buildControls(); refresh(); updateClass(); castPreview(); blip(760); });
+        seg.append(b);
+      }
+      custom.append(row(t('gender'), seg));
+    }
     const sw = (k, list, labelKey) => { const d = el('div', { class: 'swatches' }); list.forEach((c, i) => d.append(opt(k, i, 'sw', `${t(labelKey)} ${i + 1}`, c))); return d; };
     const isModular = modular(cfg), C = spriteClass(cfg);
     custom.append(row(t(isModular ? 'hair' : 'hairBeard'), sw('hairColor', isModular ? C.HAIR : OPT.hairSwatch, isModular ? 'hair' : 'hairBeard')));
@@ -413,7 +427,7 @@
     cancelAnimationFrame(mageRaf);
     if (view.ok) view.setActive(scene === 'create' && !isModular);
     $('go').disabled = isModular && !currentSprite(cfg);
-    if (isModular) { ensureMage(cfg.class).catch(() => {}); if (scene === 'create') animateMage(performance.now()); }
+    if (isModular) { ensureMage(cfg.class, cfg.gender).catch(() => {}); if (scene === 'create') animateMage(performance.now()); }
     const values = cfg.class === 'assassin' ? [68, 80, 38, 95] : cfg.class === 'priest' ? [75, 55, 50, 70] : cfg.class === 'hunter' ? [70, 85, 40, 85] : cfg.class === 'mage' ? [60, 90, 35, 55] : [92, 88, 60, 34];
     $('stats').replaceChildren(...['health', 'attack', 'defense', 'speed'].flatMap((k, j) => [
       el('dt', { text: t(k) }), (() => { const d = el('dd'), i = el('i'); i.style.setProperty('--v', values[j] + '%'); d.append(i); return d; })()]));
@@ -549,7 +563,7 @@
     const c = save.char || cfg, p = $('hud-portrait');
     if (modular(c)) {
       p.style.backgroundImage = ''; p.style.backgroundSize = 'cover'; p.style.backgroundPosition = 'center';
-      ensureMage(c.class).then(sprite => { if (scene === 'game' && save.char?.class === c.class) { sprite.set(save.char); p.style.backgroundImage = `url(${sprite.portrait()})`; } }).catch(() => showToast(t(c.class + 'Error')));
+      ensureMage(c.class, c.gender).then(sprite => { if (scene === 'game' && save.char && viewKey(save.char) === viewKey(c)) { sprite.set(save.char); p.style.backgroundImage = `url(${sprite.portrait()})`; } }).catch(() => showToast(t(c.class + 'Error')));
     } else if (view.ok && view.loaded) {
       view.set(c); p.style.backgroundImage = `url(${view.snapshot()})`; p.style.backgroundSize = '200% auto'; p.style.backgroundPosition = '57% 26%';
     } else { p.style.backgroundImage = 'url(assets/warrior.webp)'; p.style.backgroundSize = '250% auto'; p.style.backgroundPosition = '57% 8%'; }
@@ -593,7 +607,7 @@
     $('pause').hidden = true; $('equipment').hidden = false; Field.setPaused(true);
     $('equipmentcv').setAttribute('aria-label', 'Equipped ' + save.char.class);
     Inventory.renderEquipped($('equipped-slots'));
-    ensureMage(save.char.class).then(renderEquipment).catch(() => showToast(t(save.char.class + 'Error')));
+    ensureMage(save.char.class, save.char.gender).then(renderEquipment).catch(() => showToast(t(save.char.class + 'Error')));
     if (view === 'bags') $('bag-sort').focus({ preventScroll: true });
     else $('field-' + save.char.class + 'Armor')?.focus({ preventScroll: true });
   }

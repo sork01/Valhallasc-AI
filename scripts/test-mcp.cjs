@@ -49,7 +49,7 @@ tool('stop_world', 'Disconnect bots and gracefully stop the private server. Test
   world = null;
   return result;
 });
-tool('connect_bot', 'Create a bot with a class. Reusing a disconnected bot name resumes its character; its original class is retained. Keys stay internal.', botSchema,
+tool('connect_bot', 'Create a bot with a class and a body (male or female). Reusing a disconnected bot name resumes its character; its original class and body are retained. Keys stay internal.', botSchema,
   args => current().connect(args));
 tool('disconnect_bot', 'Disconnect a bot and save its character for resume within this test world.', z.object({ bot: botSchema.shape.bot }).strict(),
   ({ bot }) => current().disconnect(bot));

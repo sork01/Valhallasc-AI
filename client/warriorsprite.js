@@ -12,5 +12,6 @@
     armor: Object.hasOwn(WarriorSprite.ARMOR, look?.warriorArmor) ? look.warriorArmor : 'crimson',
     weapon: Object.hasOwn(WarriorSprite.WEAPON, look?.warriorWeapon) ? look.warriorWeapon : 'sword',
   });
+  MageSprite.female(WarriorSprite, 'assets/warrior_layered_f_sprites.txt');
   window.WarriorSprite = WarriorSprite;
 })();

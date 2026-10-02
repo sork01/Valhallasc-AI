@@ -33,15 +33,19 @@ async function enter(stub, cls, name) {
   await page.waitForFunction(cls => Online.connected && !!valhalla[cls] && !!Field.beetleSprites && !!Field.cragSprites, cls, { timeout: 90000 });
   return page;
 }
-// Visible pixels of the idle frame under the current equipment, and a fingerprint of them.
-const figure = (page, cls, armor, weapon, extras = {}) => page.evaluate(([cls, armor, weapon, extras]) => {
-  const sprite = valhalla[cls], look = { ...sprite.look, head: 'none', shoulders: 'none', gloves: 'none', ...extras, [cls + 'Armor']: armor, [cls + 'Weapon']: weapon };
+// Visible pixels of the idle frame under the current equipment, and a fingerprint of them. `female` loads and uses the
+// class's female atlases (the same equipment names, a separate set of files).
+const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.evaluate(async ([cls, armor, weapon, extras, female]) => {
+  const C = { warrior: WarriorSprite, mage: MageSprite, assassin: AssassinSprite, priest: PriestSprite, hunter: HunterSprite }[cls];
+  window.femaleSprites = window.femaleSprites || {};
+  const sprite = female ? (window.femaleSprites[cls] = window.femaleSprites[cls] || await C.Female.load({ ...valhalla[cls].look, gender: 'female' })) : valhalla[cls];
+  const look = { ...sprite.look, head: 'none', shoulders: 'none', gloves: 'none', ...extras, [cls + 'Armor']: armor, [cls + 'Weapon']: weapon };
   sprite.set(look);
   const canvas = sprite.frame('idle', 0, 0), data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
   let visible = 0, hash = 0;
   for (let i = 0; i < data.length; i += 4) if (data[i + 3]) { visible++; hash = (hash * 31 + data[i] * 3 + data[i + 1] * 5 + data[i + 2] * 7 + i) >>> 0; }
   return { visible, hash, width: canvas.width };
-}, [cls, armor, weapon, extras]);
+}, [cls, armor, weapon, extras, female]);
 
 (async () => {
   const dir = fs.mkdtempSync(path.join(root, 'test-results/sprites-'));
@@ -72,6 +76,22 @@ const figure = (page, cls, armor, weapon, extras = {}) => page.evaluate(([cls, a
         check(all.hash !== dressed.hash && all.visible > dressed.visible, `${cls}: head, shoulders and gloves worn together make a bigger figure`);
       }
       check(await page.evaluate(cls => valhalla[cls].portrait().length > 2000, cls), `${cls}: the portrait renders`);
+      // The female set: its own atlases, the same equipment, a body that is not the male one.
+      const f = (armor, weapon, extras) => figure(page, cls, armor, weapon, extras, true);
+      const fNaked = await f('none', 'none'), fDressed = await f(gear.armor[0], gear.weapon[0]), fOther = await f(gear.armor[1], gear.weapon[1]);
+      check(fNaked.visible > 1500, `${cls} (female): the real body is a full figure (${fNaked.visible} visible pixels)`);
+      check(fNaked.hash !== naked.hash && fDressed.hash !== dressed.hash && fOther.hash !== other.hash, `${cls} (female): a different body from the male one, bare and dressed`);
+      check(fDressed.visible > fNaked.visible && fDressed.hash !== fNaked.hash && fOther.hash !== fDressed.hash, `${cls} (female): armour and weapons add to the figure and differ from each other`);
+      for (const slot of ['head', 'shoulders', 'gloves']) {
+        if (!gear.tiers.length) continue;
+        const worn = [];
+        for (const tier of gear.tiers) worn.push(await f(gear.armor[0], gear.weapon[0], { [slot]: tier }));
+        check(worn.every(w => w.hash !== fDressed.hash && w.visible > 0) && worn[0].hash !== worn[1].hash, `${cls} (female): each ${slot} tier is drawn and they differ`);
+        check((await f(gear.armor[0], gear.weapon[0], { [slot]: 'none' })).hash === fDressed.hash, `${cls} (female): ${slot} 'none' removes the layer`);
+      }
+      check(await page.evaluate(cls => { const s = femaleSprites[cls]; return s.meta.gender === 'female' && s.portrait().length > 2000 && ['idle', 'walk', 'attack', 'hurt', 'die'].every(c => s.frame(c, 5, 0).width > 0); }, cls), `${cls} (female): metadata, portrait and every clip render`);
+      // Animation: the walk and the attack are different pictures from standing still, in the female set too.
+      check(await page.evaluate(cls => { const hash = (clip, i) => { const c = femaleSprites[cls].frame(clip, 3, i), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let h = 0; for (let k = 3; k < d.length; k += 4) h = (h * 31 + d[k - 3] + d[k - 2] * 3) >>> 0; return h; }; return new Set([hash('idle', 0), hash('walk', 2), hash('attack', 4), hash('die', 7)]).size === 4; }, cls), `${cls} (female): idle, walk, attack and die are four different pictures`);
       if (cls === 'mage') {
         const sizes = await page.evaluate(() => ({
           beetle: [Field.beetleSprites.img.beetle.naturalWidth, Field.beetleSprites.img.beetle.naturalHeight],

@@ -401,6 +401,24 @@ fn hash(token: &str) -> String {
 mod tests {
     use super::*;
     #[test]
+    fn gender_is_kept_through_create_save_and_load() {
+        let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();
+        let look = Look {
+            class: Class::Hunter,
+            gender: crate::model::Gender::Female,
+            ..Look::default()
+        };
+        let (mut c, token) = s.create(look, Point::default()).unwrap();
+        assert_eq!(c.look.gender, crate::model::Gender::Female);
+        c.gold = 5;
+        s.save_many([&c].into_iter()).unwrap();
+        let loaded = s.load(&token).unwrap().unwrap();
+        assert_eq!(loaded.look.gender, crate::model::Gender::Female);
+        assert_eq!(loaded.look.class, Class::Hunter);
+        let (plain, _) = s.create(Look::default(), Point::default()).unwrap();
+        assert_eq!(plain.look.gender, crate::model::Gender::Male);
+    }
+    #[test]
     fn persistence_and_invalid_keys() {
         let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();
         let (mut c, token) = s.create(Look::default(), Point { x: 36., y: 60. }).unwrap();

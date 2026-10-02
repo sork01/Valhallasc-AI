@@ -840,6 +840,36 @@ const scenarios = {
       check(w.player(bot).zone === 1 && JSON.stringify(w.player(bot).quests) === history, 'Every completion and restarted bounty survives a private server restart');
     },
   },
+  gender: {
+    description: 'Every class in a male and a female body: the choice is stored by the server, shown to the other players in their snapshots, kept through a restart and resume, and an unknown value is refused.',
+    startLevel: 1,
+    async run(w, check) {
+      const classes = ['warrior', 'mage', 'assassin', 'priest', 'hunter'];
+      for (const cls of classes) {
+        await w.connect({ bot: 'F' + cls, class: cls, gender: 'female' });
+        await w.connect({ bot: 'M' + cls, class: cls });
+      }
+      await w.waitFor(() => classes.every(cls => w.player('F' + cls) && w.player('M' + cls)), 20000, 'All ten characters join');
+      check(classes.every(cls => w.player('F' + cls).look.gender === 'female' && w.player('F' + cls).look.class === cls), 'Each class can be created as a woman, and the server says so');
+      check(classes.every(cls => w.player('M' + cls).look.gender === 'male'), 'Leaving the choice alone gives a man');
+      const seen = w.snapshot.players;
+      check(classes.every(cls => seen.find(p => p.look.name === 'F' + cls)?.look.gender === 'female' && seen.find(p => p.look.name === 'M' + cls)?.look.gender === 'male'), 'Every player\u2019s snapshot carries the others\u2019 body type');
+      check(classes.every(cls => w.player('F' + cls).look[cls + 'Armor'] === w.player('M' + cls).look[cls + 'Armor'] && w.player('F' + cls).maxHp === w.player('M' + cls).maxHp), 'Starter gear and health do not depend on the body');
+      await w.restart();
+      await w.waitFor(() => classes.every(cls => w.player('F' + cls)?.look.gender === 'female' && w.player('M' + cls)?.look.gender === 'male'), 20000, 'Characters resume');
+      check(classes.every(cls => w.player('F' + cls).look.class === cls && w.player('M' + cls).look.class === cls), 'Both bodies survive a server restart and resume');
+      // A look with an unknown body type is refused outright, not stored as male.
+      const refused = await new Promise(resolve => {
+        const ws = new (require('ws'))(w.url.replace(/^http/, 'ws') + 'ws', { origin: new URL(w.url).origin });
+        let outcome = 'silent';
+        ws.on('open', () => ws.send(JSON.stringify({ type: 'join', version: 1, token: null, look: { name: 'Odd', class: 'mage', gender: 'other' } })));
+        ws.on('message', data => { const packet = JSON.parse(data.toString()); if (packet.type === 'welcome') outcome = 'welcome'; });
+        ws.on('close', () => resolve(outcome));
+        setTimeout(() => { ws.close(); resolve(outcome); }, 3000);
+      });
+      check(refused !== 'welcome', 'A join with an unknown body type is not welcomed');
+    },
+  },
   priest: {
     description: 'The Priest, a healer that also fights alone: Mend and Prayer heal party members and nobody else, a heal with nobody hurt fizzles for free, Blessing and Holy Nova reach the party in range, and Smite damages a real enemy.',
     startLevel: 20,
