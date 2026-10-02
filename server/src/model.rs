@@ -282,7 +282,8 @@ impl Character {
         (self.look.class.cooldown() * self.cooldown_multiplier()).max(self.look.class.duration())
     }
     pub fn xp_need(&self) -> u32 {
-        (160. * (self.level as f64).powf(1.35)).round() as u32
+        let level = self.level as u64;
+        (40 * level * level + 360 * level) as u32
     }
     pub fn point(&self) -> Point {
         Point {

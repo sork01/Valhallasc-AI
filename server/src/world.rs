@@ -2181,11 +2181,11 @@ mod tests {
                 assert!(ids.insert(&q.id), "globally unique persistent quest ids");
                 assert!(area.npcs.iter().any(|n| n.id == q.npc));
                 assert!(q.reward_xp > 0 && q.reward_gold > 0 && !q.objectives.is_empty());
-                let need = (160. * (q.level as f64).powf(1.35)).round();
+                let need = 40 * q.level * q.level + 360 * q.level;
                 assert!(q.level >= 1, "{} needs a recommended level", q.id);
                 assert_eq!(
                     q.reward_xp,
-                    (need as u32 + 5) / 10,
+                    need / 10,
                     "{} pays a tenth of level {}'s XP",
                     q.id,
                     q.level
@@ -2516,7 +2516,7 @@ mod tests {
             },
         );
         assert_eq!(w.players[&1].character.attributes.strength, 0);
-        w.players.get_mut(&1).unwrap().character.grant_xp(160);
+        w.players.get_mut(&1).unwrap().character.grant_xp(400);
         for stat in ["fake", "strength", "stamina", "accuracy", "dexterity"] {
             w.message(1, ClientMessage::AllocateStat { stat: stat.into() });
         }
@@ -2628,10 +2628,10 @@ mod tests {
         quest_interact(&mut w, "innkeeper", None);
         quest_interact(&mut w, "innkeeper", Some("quest:claim:welcome"));
         assert_eq!(w.players[&1].character.gold, 0);
-        w.players.get_mut(&1).unwrap().character.xp = 150;
+        w.players.get_mut(&1).unwrap().character.xp = 380;
         quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
         let c = &w.players[&1].character;
-        assert_eq!((c.level, c.xp, c.gold), (2, 6, 12));
+        assert_eq!((c.level, c.xp, c.gold), (2, 20, 12));
         assert_eq!(c.hp, c.max_hp());
         assert!(c.quests[0].claimed);
         quest_interact(&mut w, "guide", Some("quest:claim:welcome"));
@@ -3608,10 +3608,7 @@ mod tests {
             w.hit_slime(id, 1, 100_000., false);
             let c = &w.players[&1].character;
             assert_eq!(c.kills, 1);
-            let paid: u32 = (1..c.level)
-                .map(|l| (160. * (l as f64).powf(1.35)).round() as u32)
-                .sum::<u32>()
-                + c.xp;
+            let paid: u32 = (1..c.level).map(|l| 40 * l * l + 360 * l).sum::<u32>() + c.xp;
             assert_eq!(paid, xp, "{kind} xp");
             assert_eq!(
                 w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
@@ -3628,21 +3625,21 @@ mod tests {
     }
 
     #[test]
-    fn slower_leveling_requires_fourteen_green_kills_and_carries_remaining_xp() {
+    fn leveling_follows_the_quadratic_curve_and_carries_remaining_xp() {
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Warrior);
-        assert_eq!(w.players[&1].character.xp_need(), 160);
-        for _ in 0..13 {
+        assert_eq!(w.players[&1].character.xp_need(), 400);
+        for _ in 0..33 {
             w.hit_slime(0, 1, 1000., false);
             w.slimes[0].respawn = TICK;
             w.update_slime(0);
         }
         assert_eq!(w.players[&1].character.level, 1);
-        assert_eq!(w.players[&1].character.xp, 156);
+        assert_eq!(w.players[&1].character.xp, 396);
         w.hit_slime(0, 1, 1000., false);
         assert_eq!(w.players[&1].character.level, 2);
         assert_eq!(w.players[&1].character.xp, 8);
-        assert_eq!(w.players[&1].character.xp_need(), 408);
+        assert_eq!(w.players[&1].character.xp_need(), 880);
         assert_eq!(w.players[&1].character.hp, 140.);
     }
 
@@ -4437,7 +4434,7 @@ mod tests {
         assert_eq!(ch(&w).stat_points(), 6);
         assert!(dbg(&mut w, DebugCommand::SetLevel { level: 0 }).is_err());
         assert!(dbg(&mut w, DebugCommand::SetLevel { level: 101 }).is_err());
-        dbg(&mut w, DebugCommand::GiveXp { amount: 1_000 }).unwrap();
+        dbg(&mut w, DebugCommand::GiveXp { amount: 2_000 }).unwrap();
         assert!(ch(&w).level > 3, "xp still levels through grant_xp");
     }
 
@@ -5052,14 +5049,14 @@ mod tests {
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.level = 1;
         c.xp = 20;
-        assert_eq!(c.lose_death_xp(), (53, 0));
+        assert_eq!(c.lose_death_xp(), (133, 0));
         assert_eq!((c.level, c.xp), (1, 0));
         c.level = 2;
         c.xp = 0;
         let (_, levels) = c.lose_death_xp();
         assert_eq!(levels, 1);
         assert_eq!(c.level, 1);
-        assert_eq!(c.xp, c.xp_need() - 136);
+        assert_eq!(c.xp, c.xp_need() - 293);
     }
 
     // ----- food and potions -----

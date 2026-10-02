@@ -356,7 +356,7 @@ mod tests {
         for class in [Class::Warrior, Class::Mage, Class::Assassin] {
             let mut c = character();
             c.look.class = class;
-            c.grant_xp(568);
+            c.grant_xp(1280);
             let attack = c.stats().0;
             let defense = c.stats().1;
             let hp = c.max_hp();
@@ -384,7 +384,7 @@ mod tests {
     #[test]
     fn trained_chances_are_capped_and_dead_players_cannot_train() {
         let mut c = character();
-        c.grant_xp(160);
+        c.grant_xp(400);
         c.hp = 0.;
         assert!(c.allocate_stat("stamina").is_err());
         assert_eq!(c.attributes.stamina, 0);

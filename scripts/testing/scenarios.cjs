@@ -28,7 +28,7 @@ async function talk(w, bot, npcId, offer) {
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
 const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10 };
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
-const totalXp = p => p.xp + Array.from({ length: p.level - 1 }, (_, i) => Math.round(160 * (i + 1) ** 1.35)).reduce((a, b) => a + b, 0);
+const totalXp = p => p.xp + Array.from({ length: p.level - 1 }, (_, i) => 40 * (i + 1) ** 2 + 360 * (i + 1)).reduce((a, b) => a + b, 0);
 const quest = (w, bot, id) => w.player(bot).quests.find(q => q.id === id);
 async function defeat(w, bot, kind) {
   if (w.player(bot).hp < w.player(bot).maxHp * .85) await talk(w, bot, 'healer', 'blessing');
@@ -143,7 +143,7 @@ const scenarios = {
       }
       await w.waitFor(() => w.snapshot.players.length === 3);
       check(w.snapshot.players.length === 3, 'Three classes are online');
-      check(w.player('Warrior').xpNeed === 160, 'Authoritative level threshold');
+      check(w.player('Warrior').xpNeed === 400, 'Authoritative level threshold');
       const kings = w.snapshot.slimes.filter(s => s.kind === 'big');
       check(kings.length === 2 && kings.every(s => s.dead && s.state === 'waiting'), 'King slots start dormant');
       const original = { ...w.player('Warrior') };
@@ -255,16 +255,16 @@ const scenarios = {
       check(!quest(w, bot, 'welcome').claimed && w.player(bot).gold === 0, 'All three objectives are counted but the wrong NPC cannot pay the reward');
       const reward = await talk(w, bot, 'guide', 'quest:claim:welcome');
       await w.waitFor(() => quest(w, bot, 'welcome').claimed);
-      check(reward.gold === 12 && w.player(bot).xp === 16, 'Turn-in awards exactly 12 gold and 16 XP');
+      check(reward.gold === 12 && w.player(bot).xp === 40, 'Turn-in awards exactly 12 gold and 40 XP');
       await talk(w, bot, 'guide', 'quest:claim:welcome');
       await talk(w, bot, 'guide', 'quest:accept:welcome');
       check(w.player(bot).gold === 12 && quest(w, bot, 'welcome').completions === 1, 'One-time rewards cannot be replayed or reaccepted');
       const database = w.db;
       await w.restart();
-      check(w.db === database && w.player(bot).id === id && quest(w, bot, 'welcome').claimed && w.player(bot).gold === 12 && w.player(bot).xp === 16,
+      check(w.db === database && w.player(bot).id === id && quest(w, bot, 'welcome').claimed && w.player(bot).gold === 12 && w.player(bot).xp === 40,
         'Quest completion and rewards survive restarting the actual Rust process');
       await talk(w, bot, 'guide', 'quest:claim:welcome');
-      check(w.player(bot).gold === 12 && w.player(bot).xp === 16, 'Replaying a claim after restart grants nothing');
+      check(w.player(bot).gold === 12 && w.player(bot).xp === 40, 'Replaying a claim after restart grants nothing');
     },
   },
   quest_combat: {
@@ -287,8 +287,8 @@ const scenarios = {
       check(w.player('Observer').kills === 0 && !w.player('Observer').quests.length, 'Another player receives no killer quest credit');
       await talk(w, bot, 'smith', 'quest:accept:ironhide_hunt');
       check(!quest(w, bot, 'ironhide_hunt'), 'Completing objectives alone does not unlock the next quest');
-      // The patrol pays 41 XP, so top the bar up to leave exactly 10 XP over after the level-up.
-      await w.debug(bot, { op: 'give_xp', amount: w.player(bot).xpNeed - 41 - w.player(bot).xp + 10 });
+      // The patrol pays 88 XP, so top the bar up to leave exactly 10 XP over after the level-up.
+      await w.debug(bot, { op: 'give_xp', amount: w.player(bot).xpNeed - 88 - w.player(bot).xp + 10 });
       check(w.player(bot).level === 1, 'The top-up stops just short of level 2');
       const before = { ...w.player(bot) };
       await cast(w, bot, 'twinbolt');
@@ -296,8 +296,8 @@ const scenarios = {
       check(Object.keys(w.player(bot).skillCd).length === 0, 'A skill above the mage level is refused with its unlock level and costs nothing');
       await talk(w, bot, 'gatekeeper', 'quest:claim:slime_patrol');
       await w.waitFor(() => quest(w, bot, 'slime_patrol').claimed);
-      check(w.player(bot).gold === before.gold + 24 && w.player(bot).level === 2 && totalXp(w.player(bot)) === totalXp(before) + 41,
-        'Patrol turn-in awards 24 gold and 41 XP, levels the mage, and carries the remainder');
+      check(w.player(bot).gold === before.gold + 24 && w.player(bot).level === 2 && totalXp(w.player(bot)) === totalXp(before) + 88,
+        'Patrol turn-in awards 24 gold and 88 XP, levels the mage, and carries the remainder');
       const levelUp = w.events.find(e => e.bot === bot && e.kind === 'levelup' && e.actor === w.player(bot).id && e.level === 2);
       check(levelUp && JSON.stringify(levelUp.unlocked) === '["twinbolt"]', 'The level-up event carries the new level and names the skill it unlocks');
       await cast(w, bot, 'twinbolt');
@@ -323,7 +323,7 @@ const scenarios = {
       const bountyBefore = { ...w.player(bot) };
       await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
       await w.waitFor(() => quest(w, bot, 'meadow_bounty').claimed);
-      check(w.player(bot).gold === bountyBefore.gold + 25 && totalXp(w.player(bot)) === totalXp(bountyBefore) + 71,
+      check(w.player(bot).gold === bountyBefore.gold + 25 && totalXp(w.player(bot)) === totalXp(bountyBefore) + 144,
         'Eight mixed kills pay the promised bounty reward');
       await talk(w, bot, 'merchant', 'quest:claim:meadow_bounty');
       check(w.player(bot).gold === bountyBefore.gold + 25, 'Repeated bounty claims cannot duplicate rewards');

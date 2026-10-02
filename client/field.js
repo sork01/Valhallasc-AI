@@ -290,7 +290,7 @@
   function newHero() {
     return { x: SPAWN.x, y: SPAWN.y, r: .3, hp: 120, maxHp: 120, level: 1, xp: 0, gold: 0, kills: 0, fx: 1, fy: 1, moving: false, walk: 0, atkT: 0, atkCd: 0, atkHit: false, hurtT: 0, lastHurt: -99, dead: false, deadT: 0, target: null, goal: null, vx: 0, vy: 0, roar: 0, dashT: 0, dashCd: 0, dashX: 0, dashY: 0, dashTrail: 0 };
   }
-  const xpNeed = lv => Math.round(160 * Math.pow(lv, 1.35));
+  const xpNeed = lv => 40 * lv * lv + 360 * lv;
   function reset() {
     pendingNpc = null; cityRoute = [];
     window.Quests?.reset();

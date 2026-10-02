@@ -59,7 +59,7 @@ def quest_hub():
     def quest(id, title, npc, description, objectives, level, gold, requires=None, repeatable=False):
         # Recommended level; the XP reward is 10% of what that level needs (server test enforces it).
         return dict(id='crags_' + id, title=title, npc='crags_' + npc, description=description,
-                    objectives=objectives, level=level, rewardXp=(round(160 * level ** 1.35) + 5) // 10, rewardGold=gold,
+                    objectives=objectives, level=level, rewardXp=(40 * level ** 2 + 360 * level) // 10, rewardGold=gold,
                     requires='crags_' + requires if requires else None, repeatable=repeatable)
 
     quests = [

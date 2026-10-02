@@ -101,7 +101,7 @@ const { route } = require('../scripts/testing/route.cjs');
   check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='beetle').length===5 && Field.slimes.filter(s=>s.kind==='beetle').every(s=>s.level===5 && s.maxHp===240 && s.windupTime===.4)), 'Five tougher beetles arrive from authoritative snapshots, each at its default level 5 (the suite pins VALHALLA_LEVEL_SPREAD=0)');
   check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='big').every(s=>s.level===6 && s.maxHp===600 && s.windupTime===.35)), 'King Slime has stronger health and faster windup');
   check(await warrior.evaluate(() => {const kings=Field.slimes.filter(s=>s.kind==='big');return kings.length===2 && kings.every(s=>s.dead && s.hp===0 && s.state==='waiting' && s.dieT>=2);}), 'Kings start hidden while waiting for the rare spawn timer');
-  check(await warrior.evaluate(() => Field.hero.xpNeed===160), 'Server sends the quadrupled leveling threshold');
+  check(await warrior.evaluate(() => Field.hero.xpNeed===400), 'Server sends the leveling threshold 40L² + 360L');
   check(await warrior.evaluate(() => {const src=Field.beetleSprites;return src.img.beetle.complete && src.img.beetle.naturalWidth===576 && src.img.beetle.naturalHeight===320 && Object.keys(src.meta.clips).length===5;}), 'PixelFlow beetle atlas and all five clips load in browser');
   await warrior.waitForFunction(() => Field.remotePlayers.length === 2 && Field.remotePlayers.every(p => p.sprite), null, { timeout: 60000 });
   check(await warrior.evaluate(() => Field.hero.maxHp===120 && Field.remotePlayers.some(p=>p.look.class==='mage'&&p.maxHp===80) && Field.remotePlayers.some(p=>p.look.class==='assassin'&&p.maxHp===90)), 'Three classes see each other');
