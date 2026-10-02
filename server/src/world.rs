@@ -28,11 +28,25 @@ const DAMAGE_TAKEN_SCALE: f64 = 0.25;
 /// A player cannot take another portal for this long after arriving. Arrival points sit outside every gate, so this only
 /// guards against bouncing; it must stay below the walk from an arrival point to its gate (about 0.65 s).
 const PORTAL_DELAY: f64 = 0.5;
+/// Who is joining: an anonymous guest (a server-issued key, or a look for a new character) or a logged-in account
+/// (a character it owns, or a look for a new one). The account id comes from a checked login session.
+pub enum Identity {
+    Guest {
+        token: Option<String>,
+        look: Option<Look>,
+    },
+    Account {
+        id: String,
+        character: Option<String>,
+        look: Option<Look>,
+    },
+}
+/// Characters one account may hold.
+pub const MAX_ACCOUNT_CHARACTERS: usize = 5;
 pub enum Command {
     Join {
         session: u64,
-        token: Option<String>,
-        look: Option<Look>,
+        identity: Identity,
         peer: Peer,
         reply: oneshot::Sender<Result<Value, String>>,
     },
@@ -602,6 +616,7 @@ impl World {
         "zones":(0..self.maps.len()).map(|zone| self.snapshot_for(zone)).collect::<Vec<_>>()})
     }
 
+    #[cfg(test)]
     fn join(
         &mut self,
         session: u64,
@@ -609,32 +624,69 @@ impl World {
         look: Option<Look>,
         peer: Peer,
     ) -> Result<Value, String> {
+        self.join_as(session, Identity::Guest { token, look }, peer)
+    }
+    fn join_as(&mut self, session: u64, identity: Identity, peer: Peer) -> Result<Value, String> {
         if self.players.len() >= MAX_PLAYERS {
             return Err("This world is full. Try again later.".into());
         }
-        let (mut c, issued) = if let Some(token) = token {
-            let c = self
-                .store
-                .load(&token)
-                .map_err(|e| {
-                    tracing::error!(%e,"character load failed");
-                    "Character storage is unavailable.".to_owned()
-                })?
-                .ok_or("This character key is invalid. Choose New Character to start again.")?;
-            (c, None)
-        } else {
-            let mut look = look.ok_or("Create a character first.")?;
-            look.name = look.name.trim().into();
-            look.validate()?;
-            let (mut c, token) = self.store.create(look, self.maps[0].spawn).map_err(|e| {
-                tracing::error!(%e,"character creation failed");
-                "Could not save your character.".to_owned()
-            })?;
-            if self.start_level > 1 {
-                c.level = self.start_level;
-                c.hp = c.max_hp();
+        let storage = |e: Box<dyn std::error::Error>| {
+            tracing::error!(%e,"character storage failed");
+            "Character storage is unavailable.".to_owned()
+        };
+        let (mut c, issued) = match identity {
+            Identity::Guest {
+                token: Some(token), ..
+            } => {
+                let c =
+                    self.store.load(&token).map_err(storage)?.ok_or(
+                        "This character key is invalid. Choose New Character to start again.",
+                    )?;
+                (c, None)
             }
-            (c, Some(token))
+            Identity::Account {
+                id,
+                character: Some(character),
+                ..
+            } => {
+                let c = self
+                    .store
+                    .load_for_account(&id, &character)
+                    .map_err(storage)?
+                    .ok_or("That character is not on your account. Pick one from your list.")?;
+                (c, None)
+            }
+            Identity::Account {
+                id,
+                character: None,
+                look,
+            } => {
+                let mut look = look.ok_or("Create a character first.")?;
+                look.name = look.name.trim().into();
+                look.validate()?;
+                if self.store.account_character_count(&id).map_err(storage)?
+                    >= MAX_ACCOUNT_CHARACTERS
+                {
+                    return Err(format!(
+                        "Your account already has {MAX_ACCOUNT_CHARACTERS} characters. Delete one first."
+                    ));
+                }
+                let (c, _) = self
+                    .store
+                    .create_for(Some(&id), look, self.maps[0].spawn)
+                    .map_err(storage)?;
+                (self.with_start_level(c), None)
+            }
+            Identity::Guest { token: None, look } => {
+                let mut look = look.ok_or("Create a character first.")?;
+                look.name = look.name.trim().into();
+                look.validate()?;
+                let (c, token) = self
+                    .store
+                    .create(look, self.maps[0].spawn)
+                    .map_err(storage)?;
+                (self.with_start_level(c), Some(token))
+            }
         };
         if self.players.values().any(|p| p.character.id == c.id) {
             return Err("This character is already online in another window.".into());
@@ -664,6 +716,14 @@ impl World {
         Ok(
             json!({"type":"welcome","version":1,"id":id,"token":issued,"snapshot":self.snapshot_for(zone)}),
         )
+    }
+    /// Test servers may start new characters above level 1 (VALHALLA_START_LEVEL).
+    fn with_start_level(&self, mut c: Character) -> Character {
+        if self.start_level > 1 {
+            c.level = self.start_level;
+            c.hp = c.max_hp();
+        }
+        c
     }
     fn zone_name(&self, zone: usize) -> &str {
         match self.maps[zone].name.as_str() {
@@ -1974,7 +2034,7 @@ impl World {
             tokio::select! {
                 _=interval.tick()=>{ self.step(); if self.tick.is_multiple_of(2) {snapshots.send_replace(self.snapshot());} }
                 command=commands.recv()=>match command {
-                    Some(Command::Join{session,token,look,peer,reply})=>{let _=reply.send(self.join(session,token,look,peer));}
+                    Some(Command::Join{session,identity,peer,reply})=>{let _=reply.send(self.join_as(session,identity,peer));}
                     Some(Command::Message{session,message})=>self.message(session,message),
                     Some(Command::Leave{session})=>self.leave(session),
                     Some(Command::Shutdown{reply})=>{self.save();let _=reply.send(());break;}
@@ -3904,6 +3964,83 @@ mod tests {
     }
 
     #[test]
+    fn account_characters_are_owned_resumed_and_capped_and_leave_no_key() {
+        let mut w = world();
+        let ann = w.store.sso_account("Ann").unwrap();
+        let bob = w.store.sso_account("Bob").unwrap();
+        let join_account =
+            |w: &mut World, session, who: &str, character: Option<String>, look: Option<Look>| {
+                let (tx, rx) = mpsc::channel(256);
+                let result = w.join_as(
+                    session,
+                    Identity::Account {
+                        id: who.to_owned(),
+                        character,
+                        look,
+                    },
+                    tx,
+                );
+                (result, rx)
+            };
+        let look = |name: &str| Look {
+            name: name.into(),
+            ..Look::default()
+        };
+        let (welcome, _rx) = join_account(&mut w, 1, &ann.id, None, Some(look("Annie")));
+        let welcome = welcome.unwrap();
+        assert!(
+            welcome["token"].is_null(),
+            "an account character is never issued a key"
+        );
+        let id = welcome["id"].as_str().unwrap().to_owned();
+        assert_eq!(w.store.account_characters(&ann.id).unwrap().len(), 1);
+        w.players.get_mut(&1).unwrap().character.gold = 77;
+        w.leave(1);
+        // Resumes by id for its own account, with what it earned...
+        let (welcome, _rx) = join_account(&mut w, 2, &ann.id, Some(id.clone()), None);
+        welcome.unwrap();
+        assert_eq!(w.players[&2].character.gold, 77);
+        // ...once at a time...
+        let (again, _rx2) = join_account(&mut w, 3, &ann.id, Some(id.clone()), None);
+        assert!(again.unwrap_err().contains("already online"));
+        w.leave(2);
+        // ...and never for another account, nor through the guest key path.
+        let (stolen, _rx3) = join_account(&mut w, 4, &bob.id, Some(id.clone()), None);
+        assert!(stolen.unwrap_err().contains("not on your account"));
+        let (tx, _rx4) = mpsc::channel(256);
+        assert!(w.join(5, Some("a".repeat(64)), None, tx).is_err());
+        // A new character needs a valid look and room under the cap.
+        let (nameless, _rx5) = join_account(&mut w, 6, &ann.id, None, None);
+        assert!(nameless.unwrap_err().contains("Create a character"));
+        for n in 1..MAX_ACCOUNT_CHARACTERS {
+            let (made, _rx) = join_account(
+                &mut w,
+                10 + n as u64,
+                &ann.id,
+                None,
+                Some(look(&format!("Alt{n}"))),
+            );
+            made.unwrap();
+            w.leave(10 + n as u64);
+        }
+        assert_eq!(
+            w.store.account_characters(&ann.id).unwrap().len(),
+            MAX_ACCOUNT_CHARACTERS
+        );
+        let (full, _rx6) = join_account(&mut w, 30, &ann.id, None, Some(look("TooMany")));
+        assert!(full.unwrap_err().contains("already has"));
+        assert_eq!(
+            w.store.account_characters(&ann.id).unwrap().len(),
+            MAX_ACCOUNT_CHARACTERS
+        );
+        // Guests are unaffected: they still get a key and no owner.
+        let (tx, _rx7) = mpsc::channel(256);
+        let guest = w.join(40, None, Some(Look::default()), tx).unwrap();
+        assert!(guest["token"].is_string());
+        assert_eq!(w.store.account_characters(&bob.id).unwrap().len(), 0);
+    }
+
+    #[test]
     fn only_the_living_killer_collects_a_drop() {
         let mut w = world();
         let _a = join(&mut w, 1, Class::Mage);
@@ -4964,6 +5101,174 @@ mod tests {
             dbg(&mut w, DebugCommand::RespawnEnemy { id: target }).is_err(),
             "alive already"
         );
+    }
+
+    #[test]
+    fn spawn_enemy_puts_a_fighting_enemy_where_asked_in_the_players_zone() {
+        let (mut w, _rx) = debug_world();
+        let here = w.players[&1].character.point();
+        let spot = Point {
+            x: here.x + 4.,
+            y: here.y,
+        };
+        let spawned = dbg(
+            &mut w,
+            DebugCommand::SpawnEnemy {
+                kind: "yellow".into(),
+                x: spot.x,
+                y: spot.y,
+                level: Some(9),
+            },
+        )
+        .unwrap();
+        let id = spawned["id"].as_u64().unwrap() as usize;
+        let e = &w.slimes[id];
+        assert_eq!(
+            (e.kind.as_str(), e.level, e.dead, e.zone),
+            ("yellow", 9, false, w.players[&1].character.zone)
+        );
+        assert!(
+            e.point().distance(spot) < 1.5,
+            "lands on the spot or the nearest free ground"
+        );
+        assert_eq!(
+            e.hp,
+            Slime::with_level(
+                id,
+                &SlimeSpawn {
+                    x: 0.,
+                    y: 0.,
+                    kind: "yellow".into(),
+                    zone: 0
+                },
+                9
+            )
+            .hp
+        );
+        assert!((spawned["x"].as_f64().unwrap() - e.x).abs() < 1e-9);
+        assert!(
+            w.players[&1].character.point().distance(e.point()) >= 1.,
+            "never on top of the player"
+        );
+        // The default level is the kind's own, with no random spread.
+        let again = dbg(
+            &mut w,
+            DebugCommand::SpawnEnemy {
+                kind: "yellow".into(),
+                x: spot.x,
+                y: spot.y + 3.,
+                level: None,
+            },
+        )
+        .unwrap();
+        assert_eq!(again["level"], Slime::default_level("yellow"));
+        // It is an ordinary enemy: the real kill path pays out.
+        let (xp, kills) = (ch(&w).xp, ch(&w).kills);
+        dbg(
+            &mut w,
+            DebugCommand::KillEnemy {
+                id: again["id"].as_u64().unwrap() as usize,
+            },
+        )
+        .unwrap();
+        assert_eq!(ch(&w).kills, kills + 1);
+        assert!(ch(&w).xp > xp);
+        // A dead slot is reused before a living enemy is moved.
+        let dead = w
+            .slimes
+            .iter()
+            .find(|s| s.dead && s.kind == "yellow")
+            .unwrap()
+            .id;
+        let reuse = dbg(
+            &mut w,
+            DebugCommand::SpawnEnemy {
+                kind: "yellow".into(),
+                x: spot.x,
+                y: spot.y + 3.,
+                level: None,
+            },
+        )
+        .unwrap();
+        assert_eq!(reuse["id"], dead);
+    }
+
+    #[test]
+    fn spawn_enemy_refuses_kings_unknown_kinds_bad_levels_and_numbers() {
+        let (mut w, _rx) = debug_world();
+        let bad = |kind: &str, x: f64, level: Option<u32>| DebugCommand::SpawnEnemy {
+            kind: kind.into(),
+            x,
+            y: 40.,
+            level,
+        };
+        assert!(
+            dbg(&mut w, bad("big", 40., None))
+                .unwrap_err()
+                .contains("summon_king")
+        );
+        assert!(
+            dbg(&mut w, bad("dragon", 40., None))
+                .unwrap_err()
+                .contains("No enemy of that kind")
+        );
+        assert!(dbg(&mut w, bad("green", f64::NAN, None)).is_err());
+        assert!(dbg(&mut w, bad("green", f64::INFINITY, None)).is_err());
+        assert!(dbg(&mut w, bad("green", 40., Some(0))).is_err());
+        assert!(dbg(&mut w, bad("green", 40., Some(101))).is_err());
+        // Disabled servers refuse it like every other shortcut.
+        w.test_commands = false;
+        let (tx, mut rx) = mpsc::channel(8);
+        w.players.get_mut(&1).unwrap().peer = tx;
+        w.debug(1, Some(7), bad("green", 40., None));
+        assert_eq!(rx.try_recv().unwrap()["ok"], false);
+    }
+
+    #[test]
+    fn a_spawned_enemy_never_lands_in_the_city_or_inside_an_obstacle() {
+        let (mut w, _rx) = debug_world();
+        let city = w.maps[0]
+            .city
+            .as_ref()
+            .expect("the meadow has a city")
+            .clone();
+        let centre = Point {
+            x: (city.x0 + city.x1) / 2.,
+            y: (city.y0 + city.y1) / 2.,
+        };
+        let spawned = dbg(
+            &mut w,
+            DebugCommand::SpawnEnemy {
+                kind: "green".into(),
+                x: centre.x,
+                y: centre.y,
+                level: None,
+            },
+        )
+        .unwrap();
+        let at = Point {
+            x: spawned["x"].as_f64().unwrap(),
+            y: spawned["y"].as_f64().unwrap(),
+        };
+        assert!(!w.maps[0].in_city(at), "enemies stay out of the sanctuary");
+        let (ox, oy) = (w.maps[0].objects[0].x, w.maps[0].objects[0].y);
+        let inside = dbg(
+            &mut w,
+            DebugCommand::SpawnEnemy {
+                kind: "green".into(),
+                x: ox,
+                y: oy,
+                level: None,
+            },
+        )
+        .unwrap();
+        let mut moved = Point {
+            x: inside["x"].as_f64().unwrap(),
+            y: inside["y"].as_f64().unwrap(),
+        };
+        let before = moved;
+        w.maps[0].collide(&mut moved, 0.3);
+        assert!(moved.distance(before) < 1e-6, "not inside a tree or a wall");
     }
 
     #[test]

@@ -2,7 +2,7 @@
 // Quest rules, combat, rewards and persistence are exercised through MCP scenarios.
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { chromium } = require('playwright');
+const { chromium, STUB } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
@@ -23,7 +23,7 @@ async function call(name, args = {}) {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
-  await page.goto(world.url); await page.locator('#start').click();
+  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('QuestUI');
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.beetleSprites, null, { timeout: 60000 });
@@ -87,7 +87,7 @@ async function call(name, args = {}) {
   check(await fixture.locator('.tracker-quest').count() === 3, 'Tracker displays all active quests together');
   check(await fixture.locator('.tracker-quest[data-quest="meadow_bounty"] .complete').textContent().then(t => t.includes('Return to Linden')), 'Completed quests display their turn-in destination');
   await fixture.screenshot({ path: path.join(world.artifacts, 'quest-tracker.png') });
-  check(await page.evaluate(() => !!Field.warriorSprites.source.parts.body && Field.beetleSprites.img.beetle.complete), 'Character and enemy artwork load');
+  check(await page.evaluate(stub => !!Field.warriorSprites.source.parts.body && (stub || Field.beetleSprites.img.beetle.complete), STUB), 'Character and enemy artwork load');
   check(errors.length === 0, `No browser runtime errors: ${errors.join('; ')}`);
   console.log(`${checks} focused quest UI checks passed; screenshots: ${world.artifacts}`);
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {

@@ -845,13 +845,29 @@
   let slimeSrc = null, beetleSrc = null, cragSrc = null;    // {meta, img: {kind: Image}}
   const enemySource = s => s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : slimeSrc;
   const SLIME_K = 2.1, DIE_SHOW = 1.7;                      // sprite pixel -> screen px; seconds a dead slime stays on screen
+  // Test mode (window.__valhallaTestSprites): one small coloured block per enemy kind instead of the atlas PNGs. The clip
+  // table is the real one's shape (same names, frame counts and rates), so every animation state still finds its frame.
+  const stubEnemies = (kinds, colours) => {
+    const clips = { idle: { fps: 6, n: 6, row: 0 }, walk: { fps: 10, n: 8, row: 1 }, attack: { fps: 12, n: 8, row: 2 }, hurt: { fps: 10, n: 4, row: 3 }, die: { fps: 8, n: 8, row: 4 } };
+    const meta = { frame: [12, 12], anchor: [6, 11], kinds, clips }, img = {};
+    for (const k of kinds) {
+      const c = document.createElement('canvas'); c.width = 8 * 12; c.height = 5 * 12; const g = c.getContext('2d');
+      g.fillStyle = colours[k] || '#c33';
+      for (let row = 0; row < 5; row++) for (let n = 0; n < 8; n++) g.fillRect(n * 12 + 2, row * 12 + 3, 8, 8);
+      img[k] = c;
+    }
+    return { meta, img };
+  };
+  const stubOn = () => window.__valhallaTestSprites === true;
   function loadSlimeSprites(cfg) {
     if (slimeSrc) return;
+    if (stubOn()) { slimeSrc = stubEnemies(['green', 'blue', 'pink', 'yellow', 'big'], { green: '#4c4', blue: '#48f', pink: '#f6a', yellow: '#ee3', big: '#a5f' }); return; }
     fetch(cfg.json).then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = cfg.png.replace('%k', k); })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); slimeSrc = { meta, img }; })).catch(() => { slimeSrc = null; });
   }
   function loadBeetleSprites() {
     if (beetleSrc) return;
+    if (stubOn()) { beetleSrc = stubEnemies(['beetle'], { beetle: '#963' }); return; }
     fetch('assets/ironhide.txt').then(r => r.json()).then(meta => new Promise((resolve, reject) => {
       const img = new Image(); img.onload = () => resolve({ meta, img: { beetle: img } });
       img.onerror = reject; img.src = 'assets/ironhide.png';
@@ -861,6 +877,7 @@
   // same five clips and frame meanings as the Ironhide Beetle.
   function loadCragSprites() {
     if (cragSrc) return;
+    if (stubOn()) { cragSrc = stubEnemies(['wisp', 'spider', 'wraith', 'golem'], { wisp: '#6ef', spider: '#555', wraith: '#a6f', golem: '#e83' }); return; }
     fetch('assets/crags.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/crags_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); cragSrc = { meta, img }; })).catch(() => { cragSrc = null; });
   }

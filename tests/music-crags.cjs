@@ -96,7 +96,7 @@ async function measure(page) {
   const game = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
   const errors = []; game.on('pageerror', e => errors.push(e.message));
   await game.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: true, char: null, draft: null })); });
-  await game.goto(world.url); await game.locator('#start').click();
+  await game.goto(world.url); await game.locator('#start').click(); await game.locator('#login-guest').click();
   await game.locator('#name').fill('Bard'); await game.locator('#go').click({ timeout: 60000 });
   await game.waitForFunction(() => Online.connected && !!valhalla.fmusic?.running, null, { timeout: 60000 });
   check(await game.evaluate(() => !valhalla.cmusic.running), 'In Greenmeadow the Crags score is silent and the meadow tune plays');

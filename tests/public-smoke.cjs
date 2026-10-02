@@ -17,7 +17,7 @@ async function player(type, name) {
   page.on('pageerror', error => page.errors.push(error.message));
   page.on('websocket', socket => page.sockets.push(socket.url()));
   await page.goto(url);
-  await page.locator('#start').click(); await page.locator('#cls-' + type).click();
+  await page.locator('#start').click(); await page.locator('#login-guest').click(); await page.locator('#cls-' + type).click();
   await page.locator('#name').fill(name); await page.locator('#go').click();
   await page.waitForFunction(() => Online.connected && !!(Field.warriorSprites || Field.mageSprites), null, { timeout: 60000 });
   result.ids.push(await page.evaluate(() => Online.id));
@@ -52,7 +52,7 @@ async function player(type, name) {
     const remote = Field.remotePlayers.find(p => p.id === id);
     return remote && Math.hypot(remote.x - x, remote.y - y) < .3;
   }, { id: result.ids[0], ...moved }); result.checks++;
-  await warrior.reload(); await warrior.locator('#start').click();
+  await warrior.reload(); await warrior.locator('#start').click(); await warrior.locator('#login-guest').click();
   await warrior.waitForFunction(id => Online.connected && Online.id === id, result.ids[0], { timeout: 20000 }); result.checks++;
   check(warrior.errors.length === 0 && mage.errors.length === 0, 'No client runtime errors: ' + warrior.errors.concat(mage.errors).join('; '));
   await warrior.screenshot({ path: path.join(root, 'test-results/public-client.png') });

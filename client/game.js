@@ -75,7 +75,7 @@
   // ---------- helpers ----------
   const $ = id => document.getElementById(id);
   const stage = $('stage');
-  const scenes = { splash: $('scene-splash'), create: $('scene-create'), game: $('scene-game') };
+  const scenes = { splash: $('scene-splash'), login: $('scene-login'), chars: $('scene-chars'), create: $('scene-create'), game: $('scene-game') };
   let scene = 'splash';
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -86,6 +86,7 @@
     if (name === 'create') enterCreate(); else leaveCreate();
     if (name === 'game') enterGame(); else leaveGame();
     if (name === 'splash') $('start').focus({ preventScroll: true });
+    if (name === 'login') Account.enter(); else if (name === 'chars') Account.enterChars();
     syncMusic();
   }
 
@@ -594,12 +595,14 @@
     }
   });
   $('city-travel').addEventListener('click', () => Field.visitCity());
-  $('p-characters').addEventListener('click', () => {
+  $('p-characters').addEventListener('click', async () => {
     const list = $('character-list'); list.hidden = !list.hidden;
+    if (list.hidden) return;
+    await Online.refreshCharacters();
     list.replaceChildren(...Online.characters.map(slot => {
       const button = document.createElement('button'); button.type = 'button'; button.className = 'btn ghost';
       button.textContent = `${slot.look.name} · ${slot.look.class}`;
-      button.addEventListener('click', () => { if (slot.token === Online.currentToken) { setPause(false); list.hidden = true; return; } const look = Online.select(slot.token); leaveGame(); save.char = look; persist(); enterGame(); list.hidden = true; });
+      button.addEventListener('click', () => { if (slot.key === Online.currentKey) { setPause(false); list.hidden = true; return; } const look = Online.select(slot.key); leaveGame(); save.char = look; persist(); enterGame(); list.hidden = true; });
       return button;
     }));
     if (!list.children.length) list.textContent = 'Your character will appear here after connecting.';
@@ -622,7 +625,9 @@
   $('equipment-close').addEventListener('click', () => setPause(false));
   $('p-resume').addEventListener('click', () => setPause(false));
   $('p-title').addEventListener('click', () => show('splash'));
-  $('p-new').addEventListener('click', () => { load(save.char || cfg); save.draft = { ...cfg }; persist(); show('create'); });
+  $('p-new').addEventListener('click', () => {
+    if (Online.mode === 'account' && Online.account && Online.characters.length >= Online.account.max) { showToast(`Your account already has ${Online.account.max} characters. Delete one first.`); return; }
+    load(save.char || cfg); save.draft = { ...cfg }; persist(); show('create'); });
 
   // ---------- awaken the horn ----------
   let starting = false;
@@ -634,9 +639,24 @@
     f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
     if (!reduced) { stage.classList.add('shake'); setTimeout(() => stage.classList.remove('shake'), 520); }
     burst = 1;
-    setTimeout(() => { show(save.char ? 'game' : 'create'); starting = false; }, reduced ? 100 : 900);
+    setTimeout(() => { show('login'); starting = false; }, reduced ? 100 : 900);
   }
   $('start').addEventListener('click', awaken);
+
+  // ---------- sign-in (account.js): guest, game account or gunning.se SSO ----------
+  // save.char always belongs to the current mode. A guest's look is set aside while an account plays, and comes back after.
+  function setMode(mode) {
+    if (mode === 'account' && save.mode !== 'account') { save.guestChar = save.char; save.char = null; save.mode = 'account'; persist(); }
+    else if (mode === 'guest' && save.mode === 'account') { save.char = save.guestChar || null; delete save.guestChar; save.mode = 'guest'; persist(); }
+    if (mode === 'account') Online.useAccount(); else Online.useGuest();
+  }
+  Account.init({
+    show,
+    guest() { setMode('guest'); show(save.char ? 'game' : 'create'); },
+    account() { setMode('account'); },
+    play(look) { save.char = { ...look }; save.draft = null; persist(); show('game'); },
+    create() { load(save.char || cfg); save.draft = { ...cfg }; persist(); Online.newCharacter(); show('create'); },
+  });
 
   // ---------- effects: snow, embers, twinkling stars ----------
   const cv = $('fx'), ctx = cv.getContext('2d');

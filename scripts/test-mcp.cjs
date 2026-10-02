@@ -104,6 +104,10 @@ tool('reset_character', 'Clear skill/attack cooldowns and/or refund trained stat
 tool('kill_enemies', 'Defeat living enemies in the bot\'s zone through the real kill path (XP, quest credit, gold and loot go to this bot). Filter by ids, kind (green, blue, pink, yellow, beetle, big, wisp, spider, wraith, golem) or radius; nearest first, at most max.',
   forBot({ ids: z.array(z.number().int().min(0)).max(100).optional(), kind: z.string().optional(), radius: z.number().positive().optional(), max: z.number().int().min(1).max(100).default(50) }),
   ({ bot, ...options }) => kit.killEnemies(current(), bot, options));
+tool('spawn_enemy', 'Put an enemy exactly where a test needs it: kind (green, blue, pink, yellow, beetle, wisp, spider, wraith, golem), optional level (default: the kind\'s own, no spread), and either x/y or, by default, `distance` (3) east of the bot. Uses a free slot of that kind (a dead one first), on the nearest free ground in the bot\'s zone; it fights, drops and respawns like any other. Returns its id.',
+  forBot({ kind: z.enum(['green', 'blue', 'pink', 'yellow', 'beetle', 'wisp', 'spider', 'wraith', 'golem']), level: z.number().int().min(1).max(100).optional(),
+    x: z.number().finite().optional(), y: z.number().finite().optional(), distance: z.number().min(1.5).max(20).default(3) }),
+  ({ bot, ...options }) => kit.spawnEnemy(current(), bot, options));
 tool('respawn_enemy', 'Bring a dead enemy back next tick (id), or call the King Slime now (king:true) instead of waiting 5-10 minutes.',
   z.object({ bot, id: z.number().int().min(0).optional(), king: z.boolean().optional() }).strict(), async ({ bot, id, king }) => {
     if ((id === undefined) === !king) throw Error('Give exactly one of id or king:true.');
@@ -119,7 +123,7 @@ tool('setup_character', 'Reach a state in one call: level, gold, items [{item,qu
 tool('wait_for_event', 'Wait up to timeout ms for a NEW event: type (event, chat, system, notice, social, who, dialogue, error, debug), optional kind (levelup, skill, hit, slimeDie, death, respawn, pickup, portal...) and bot.',
   z.object({ type: z.string().default('event'), kind: z.string().optional(), bot: bot.optional(), timeout: z.number().int().min(100).max(30000).default(10000) }).strict(),
   options => kit.waitForEvent(current(), options));
-tool('debug_command', 'Escape hatch: send one raw test-server shortcut ({op: set_level|give_xp|set_gold|set_hp|die|reset_stats|reset_cooldowns|set_god_mode|teleport|give_item|take_item|drop_item|quest|kill_enemy|respawn_enemy|summon_king, ...fields}).',
+tool('debug_command', 'Escape hatch: send one raw test-server shortcut ({op: set_level|give_xp|set_gold|set_hp|die|reset_stats|reset_cooldowns|set_god_mode|teleport|give_item|take_item|drop_item|quest|kill_enemy|respawn_enemy|spawn_enemy|summon_king, ...fields}).',
   forBot({ command: kit.debugSchema }), async ({ bot, command }) => summarize(await current().debug(bot, command)));
 tool('social', 'Friends and parties as a player does them. command: {op: friend_request|friend_accept|friend_decline|friend_remove|party_invite|party_accept|party_decline|party_kick|party_promote, bot|id|name} | {op: party_leave} | {op: party_chat, text} | {op: refresh} | {op: who}. Name another connected bot with `bot` (resolved to its character id); friend_request and party_invite also take a player `name`. Returns what the bot was told: notices (ok:false is a refusal), its friends/requests/party now, party chat, and for who the online roster. A party holds 5; requests lapse after 60 s.',
   forBot({ command: kit.socialSchema }), ({ bot, command }) => current().social(bot, command));

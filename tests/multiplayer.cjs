@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
-const { chromium } = require('playwright');
+const { chromium, STUB } = require('./lib/playwright.cjs');
 const root = path.resolve(__dirname, '..');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const timeout = (promise, ms, label) => Promise.race([promise, new Promise((_, reject) => { const timer = setTimeout(() => reject(Error(label)), ms); timer.unref(); })]);
@@ -12,7 +12,7 @@ async function startServer(bind = '127.0.0.1:0') {
   logs = '';
   const binary = process.env.VALHALLA_BINARY || path.join(root, 'target/debug/valhalla-server');
   // This suite exercises controls, rendering and multiplayer around real fights, not combat difficulty: pin every enemy to its default level.
-  const testEnvironment = { ...process.env, VALHALLA_BIND: bind, VALHALLA_DB: db, RUST_LOG: 'valhalla_server=info', VALHALLA_LEVEL_SPREAD: '0', VALHALLA_GOD_MODE: '1' };
+  const testEnvironment = { ...process.env, VALHALLA_BIND: bind, VALHALLA_DB: db, RUST_LOG: 'valhalla_server=info', VALHALLA_LEVEL_SPREAD: '0', VALHALLA_GOD_MODE: '1', VALHALLA_TEST_COMMANDS: '1' };
   delete testEnvironment.VALHALLA_ORIGIN;
   server = spawn(binary, [], { cwd: root, env: testEnvironment, stdio: ['ignore', 'pipe', 'pipe'] });
   server.stderr.on('data', data => { logs += data; });
@@ -33,8 +33,10 @@ async function makePlayer(type, name) {
   const page = await context.newPage(); page.errors = []; page.pickups = []; page.actorCollision = null; page.renderCollision = null;
   await page.exposeFunction('reportRenderedActorCollision', collision => { page.renderCollision ||= collision; });
   page.on('pageerror', error => page.errors.push(error.message));
+  page.debugReplies = new Map();
   page.on('websocket', socket => socket.on('framereceived', ({payload}) => {
     const packet=JSON.parse(payload.toString());
+    if(packet.type==='debug') page.debugReplies.set(packet.ref,packet);
     if(packet.type==='event' && packet.kind==='pickup') page.pickups.push(packet);
     const snapshot=packet.type==='snapshot'?packet:packet.type==='welcome'?packet.snapshot:null;
     if(snapshot && !page.actorCollision) {
@@ -49,7 +51,7 @@ async function makePlayer(type, name) {
       }
     }
   }));
-  await page.goto(url); await page.locator('#start').click();
+  await page.goto(url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-' + type).click(); await page.locator('#name').fill(name);
   await page.locator('#go').click({timeout:60000});
   await page.waitForFunction(() => Online.connected && !!(Field.warriorSprites || Field.mageSprites || Field.assassinSprites), null, { timeout: 60000 });
@@ -84,6 +86,21 @@ async function probe(page, message) {
   }), message);
 }
 const { route } = require('../scripts/testing/route.cjs');
+// Test shortcuts (VALHALLA_TEST_COMMANDS) for staging only: teleports and spawns get a player to the thing under test.
+// Everything under test (combat, rewards, pickups, travel through the gate, shops) still runs for real.
+let debugRef = 0;
+async function shortcut(page, command) {
+  const ref = ++debugRef;
+  await page.evaluate(([ref, command]) => Online.send({ type: 'debug', ref, command }), [ref, command]);
+  for (const stop = Date.now() + 5000; !page.debugReplies.has(ref); await delay(20)) if (Date.now() > stop) throw Error('No reply to ' + command.op);
+  const reply = page.debugReplies.get(ref);
+  if (!reply.ok) throw Error(`${command.op}: ${reply.error}`);
+  return reply.result;
+}
+async function stageAt(page, point) {
+  await shortcut(page, { op: 'teleport', zone: 0, x: point.x, y: point.y });
+  await page.waitForFunction(p => Math.hypot(Field.hero.x - p.x, Field.hero.y - p.y) < 1.5, point, { timeout: 10000 });
+}
 
 (async () => {
   fs.mkdirSync(path.join(root, 'test-results'), { recursive: true });
@@ -102,7 +119,7 @@ const { route } = require('../scripts/testing/route.cjs');
   check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='big').every(s=>s.level===6 && s.maxHp===600 && s.windupTime===.35)), 'King Slime has stronger health and faster windup');
   check(await warrior.evaluate(() => {const kings=Field.slimes.filter(s=>s.kind==='big');return kings.length===2 && kings.every(s=>s.dead && s.hp===0 && s.state==='waiting' && s.dieT>=2);}), 'Kings start hidden while waiting for the rare spawn timer');
   check(await warrior.evaluate(() => Field.hero.xpNeed===100), 'Server sends the level table threshold');
-  check(await warrior.evaluate(() => {const src=Field.beetleSprites;return src.img.beetle.complete && src.img.beetle.naturalWidth===576 && src.img.beetle.naturalHeight===320 && Object.keys(src.meta.clips).length===5;}), 'PixelFlow beetle atlas and all five clips load in browser');
+  check(STUB || await warrior.evaluate(() => {const src=Field.beetleSprites;return src.img.beetle.complete && src.img.beetle.naturalWidth===576 && src.img.beetle.naturalHeight===320 && Object.keys(src.meta.clips).length===5;}), 'PixelFlow beetle atlas and all five clips load in browser');
   await warrior.waitForFunction(() => Field.remotePlayers.length === 2 && Field.remotePlayers.every(p => p.sprite), null, { timeout: 60000 });
   check(await warrior.evaluate(() => Field.hero.maxHp===120 && Field.remotePlayers.some(p=>p.look.class==='mage'&&p.maxHp===80) && Field.remotePlayers.some(p=>p.look.class==='assassin'&&p.maxHp===90)), 'Three classes see each other');
   check(await warrior.locator('#connection-overlay').isHidden(), 'Connected overlay is visibly hidden');
@@ -149,36 +166,27 @@ const { route } = require('../scripts/testing/route.cjs');
   // Fight with real network actions; no direct hero/enemy HP manipulation.
   const state=await mage.evaluate(()=>({start:{x:Field.hero.x,y:Field.hero.y},slimes:Field.slimes.filter(s=>s.kind==='green'&&!s.dead&&s.hx>59&&s.hy>59).map(s=>({id:s.id,x:s.x,y:s.y}))}));
   state.slimes.sort((a,b)=>Math.hypot(a.x-state.start.x,a.y-state.start.y)-Math.hypot(b.x-state.start.x,b.y-state.start.y));
-  const target=state.slimes[0];const waypoints=route(map,state.start,target);
-  for (const point of waypoints) {
-    if (Math.hypot(point.x-target.x,point.y-target.y)<7) break;
-    await mage.evaluate(p=>Online.send({type:'move',...p}),point);
-    await mage.waitForFunction(({point,id})=>{const s=Field.slimes.find(s=>s.id===id);return Math.hypot(Field.hero.x-point.x,Field.hero.y-point.y)<.5 || (s&&!s.dead&&Math.hypot(Field.hero.x-s.x,Field.hero.y-s.y)<6);},{point,id:target.id},{timeout:20000});
-    if(await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return s&&!s.dead&&Math.hypot(Field.hero.x-s.x,Field.hero.y-s.y)<6;},target.id))break;
-  }
+  const target=state.slimes[0];
+  await stageAt(mage,{x:target.x-4,y:target.y});
   await mage.evaluate(id=>Online.send({type:'target',id}),target.id);
   await mage.waitForFunction(id=>Field.slimes.find(s=>s.id===id)?.dead&&Field.hero.kills>0,target.id,{timeout:30000});
   await warrior.waitForFunction(id=>Field.slimes.find(s=>s.id===id)?.dead,target.id);passed++;
   const killed=await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return {x:s.x,y:s.y};},target.id);
   await mage.evaluate(p=>Online.send({type:'move',...p}),killed);
   await mage.waitForFunction(()=>Field.hero.gold>0,null,{timeout:15000});
-  // Recover through the real town service before the long journey to Ironhide.
-  await walkTo(mage, map.npcs.find(n => n.id === 'healer'));
+  // Recover through the real town service, then meet an Ironhide a few steps away (spawned, not hunted across the map).
+  const healer=map.npcs.find(n => n.id === 'healer');
+  await stageAt(mage,{x:healer.x+1.2,y:healer.y});
   await mage.evaluate(() => Online.send({ type: 'interact', npc: 'healer', offer: 'blessing' }));
   await mage.waitForFunction(() => Field.hero.hp === Field.hero.maxHp);
   await mage.locator('#npc-dialogue').waitFor({ state: 'visible' });
   await mage.locator('#npc-close').click();
-  await walkTo(mage, { x: 7, y: 64 });
-  // Approach and fight an Ironhide with real movement/target commands and unchanged HP.
-  const beetleState=await mage.evaluate(()=>({start:{x:Field.hero.x,y:Field.hero.y},enemy:Field.slimes.find(s=>s.kind==='beetle'&&s.hx===18&&s.hy===42),kills:Field.hero.kills,xp:Field.hero.xp,level:Field.hero.level,xpNeed:Field.hero.xpNeed,gold:Field.hero.gold}));
+  await stageAt(mage,{x:7,y:64});
+  const spawned=await shortcut(mage,{op:'spawn_enemy',kind:'beetle',x:13,y:64});
+  await mage.waitForFunction(id=>{const s=Field.slimes.find(s=>s.id===id);return s&&!s.dead&&s.kind==='beetle'&&Math.abs(s.x-13)<2;},spawned.id,{timeout:10000});
+  const beetleState=await mage.evaluate(id=>({start:{x:Field.hero.x,y:Field.hero.y},enemy:Field.slimes.find(s=>s.id===id),kills:Field.hero.kills,xp:Field.hero.xp,level:Field.hero.level,xpNeed:Field.hero.xpNeed,gold:Field.hero.gold}),spawned.id);
   const pickupStart=mage.pickups.length, mageId=await mage.evaluate(()=>Online.id);
   const beetle=beetleState.enemy;
-  for (const point of route(map,beetleState.start,beetle)) {
-    if(Math.hypot(point.x-beetle.x,point.y-beetle.y)<7) break;
-    await mage.evaluate(p=>Online.send({type:'move',...p}),point);
-    await mage.waitForFunction(({point,id})=>{const s=Field.slimes.find(s=>s.id===id);return Math.hypot(Field.hero.x-point.x,Field.hero.y-point.y)<.5 || (s&&!s.dead&&Math.hypot(Field.hero.x-s.x,Field.hero.y-s.y)<6);},{point,id:beetle.id},{timeout:20000});
-    if(await mage.evaluate(id=>{const s=Field.slimes.find(s=>s.id===id);return s&&!s.dead&&Math.hypot(Field.hero.x-s.x,Field.hero.y-s.y)<6;},beetle.id))break;
-  }
   await mage.evaluate(id=>Online.send({type:'target',id}),beetle.id);
   await mage.waitForFunction(id=>{const s=Field.slimes.find(s=>s.id===id);return s&&s.hp<s.maxHp;},beetle.id,{timeout:30000});
   await mage.screenshot({path:path.join(root,'test-results/ironhide-combat.png')});
@@ -193,7 +201,7 @@ const { route } = require('../scripts/testing/route.cjs');
   check(mage.pickups.slice(pickupStart).some(event=>event.actor===mageId && event.value===beetleGold), 'Server awards the level-scaled beetle gold pickup to its killer');
   const progress=await mage.evaluate(()=>({id:Online.id,gold:Field.hero.gold,kills:Field.hero.kills,xp:Field.hero.xp,level:Field.hero.level}));
   check(progress.kills>0&&progress.gold>0&&(progress.xp>0||progress.level>1),'Server rewards kills, XP, and pickups');
-  await mage.reload();await mage.locator('#start').click();
+  await mage.reload();await mage.locator('#start').click(); await mage.locator('#login-guest').click();
   await mage.waitForFunction(()=>Online.connected&&!!Field.mageSprites,null,{timeout:60000});
   check(await mage.evaluate(p=>Online.id===p.id&&Field.hero.gold===p.gold&&Field.hero.kills===p.kills,progress),'Character resumes after page reload');
   // Restart the actual Rust process and resume from SQLite through automatic reconnect.

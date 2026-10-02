@@ -32,7 +32,7 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 @keyframes sceneIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* Behind the creation screen the illustration is dimmed and blurred */
-.stage[data-scene="create"] #art { filter: blur(9px) brightness(.5) saturate(1.1); transform: scale(1.04); }
+.stage[data-scene="create"] #art, .stage[data-scene="login"] #art, .stage[data-scene="chars"] #art { filter: blur(9px) brightness(.5) saturate(1.1); transform: scale(1.04); }
 .stage[data-scene="game"] #art { visibility: hidden; }
 .stage:not([data-scene="splash"]) .fx, .stage[data-scene="game"] #fx { display: none; }
 

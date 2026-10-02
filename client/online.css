@@ -377,3 +377,25 @@
 .buff-chip[data-kind="regen"] { --buff: #58d68d; border-color: #58d68d; }
 .stage.ui-editing #quickuse:empty { min-width: 8cqw; min-height: 5cqw; }
 @media (pointer: coarse) { .quick-slot { min-width: 44px; min-height: 44px; } }
+
+/* sign-in and account character scenes */
+.login-wrap { background: rgba(4, 8, 24, .35); }
+.login-panel { min-width: 30cqw; max-width: 36cqw; gap: .7cqw; padding: 2cqw 3cqw; }
+.login-panel h3 { font-size: 2.4cqw; }
+.login-panel .btn { font-size: clamp(13px, 1.3cqw, 22px); }
+.login-form { display: grid; gap: .6cqw; text-align: left; }
+.login-form label { display: grid; gap: .2cqw; font-size: clamp(12px, 1.1cqw, 18px); color: #f5df9b; }
+.login-form input { font: inherit; font-size: max(16px, 1.2cqw); padding: .45em .7em; border-radius: .6em; border: .15cqw solid rgba(245, 197, 66, .55); background: rgba(4, 10, 30, .85); color: #fff; }
+.login-form input:focus-visible { outline: 3px solid var(--cyan); outline-offset: 1px; }
+.login-row { display: flex; gap: .6cqw; justify-content: center; flex-wrap: wrap; }
+.login-account { display: grid; gap: .5cqw; font-size: clamp(12px, 1.2cqw, 20px); }
+.login-account p, .login-who { margin: 0; }
+.login-msg { min-height: 1.4em; margin: 0; font-size: clamp(12px, 1.05cqw, 18px); color: #ffd0a0; }
+.login-msg[data-state="ok"] { color: #b8f5b0; }
+.chars-list { max-height: 22cqw; }
+.char-row { display: flex; gap: .5cqw; align-items: stretch; }
+.char-row .char-play { flex: 1; text-align: left; }
+.char-row .char-del { flex: 0 0 auto; padding-inline: 1em; }
+.login-wrap [hidden] { display: none !important; }
+@media (pointer: coarse) { .login-panel .btn, .login-form input { min-height: 44px; } }
+@media (max-width: 760px) { .login-panel { min-width: 80cqw; max-width: 90cqw; padding: 3cqw; } .login-panel h3 { font-size: 20px; } }

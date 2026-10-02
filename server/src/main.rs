@@ -1,4 +1,5 @@
 #![recursion_limit = "256"]
+mod auth;
 mod items;
 mod model;
 mod skills;
@@ -26,7 +27,7 @@ use std::{
 };
 use tokio::sync::{Semaphore, mpsc, oneshot, watch};
 use tower_http::{services::ServeDir, set_header::SetResponseHeaderLayer};
-use world::Command;
+use world::{Command, Identity};
 
 #[derive(Clone)]
 struct App {
@@ -36,6 +37,7 @@ struct App {
     slots: Arc<Semaphore>,
     sessions: Arc<AtomicU64>,
     allowed_origin: Option<String>,
+    store: store::Store,
 }
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -54,6 +56,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
     }
     let store = store::Store::open(std::path::Path::new(&data))?;
+    let accounts = store.clone();
     // Each enemy's level is its kind's default plus or minus this many levels (0 pins every enemy to its default).
     let spread = std::env::var("VALHALLA_LEVEL_SPREAD")
         .ok()
@@ -91,6 +94,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         slots: Arc::new(Semaphore::new(MAX_PLAYERS)),
         sessions: Arc::new(AtomicU64::new(1)),
         allowed_origin: std::env::var("VALHALLA_ORIGIN").ok(),
+        store: accounts.clone(),
     };
     const CSP: &str = concat!(
         "default-src 'self'; script-src 'self'; ",
@@ -100,6 +104,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     let router = Router::new()
         .route("/health", get(health))
+        .nest_service(
+            "/api",
+            auth::router(accounts, app.allowed_origin.clone(), app.snapshots.clone()),
+        )
         .route("/ws", any(upgrade))
         .fallback_service(ServeDir::new(client))
         .layer(SetResponseHeaderLayer::overriding(
@@ -118,15 +126,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = tokio::net::TcpListener::bind(&bind).await?;
     let world_task = tokio::spawn(world.run(rx, snap_tx));
     tracing::info!(address=%listener.local_addr()?,"Valhalla multiplayer server ready");
-    axum::serve(listener, router)
-        .with_graceful_shutdown(async move {
-            shutdown_signal().await;
-            shutdown_tx.send_replace(true);
-            let (reply, done) = oneshot::channel();
-            let _ = tx.send(Command::Shutdown { reply }).await;
-            let _ = done.await;
-        })
-        .await?;
+    axum::serve(
+        listener,
+        router.into_make_service_with_connect_info::<std::net::SocketAddr>(),
+    )
+    .with_graceful_shutdown(async move {
+        shutdown_signal().await;
+        shutdown_tx.send_replace(true);
+        let (reply, done) = oneshot::channel();
+        let _ = tx.send(Command::Shutdown { reply }).await;
+        let _ = done.await;
+    })
+    .await?;
     world_task.await?;
     Ok(())
 }
@@ -161,7 +172,7 @@ fn zone_view(snapshot: &Value, id: &str, zone: &mut usize) -> Option<Value> {
     }
     zones.get(*zone).cloned()
 }
-fn origin_allowed(headers: &HeaderMap, configured: Option<&str>) -> bool {
+pub(crate) fn origin_allowed(headers: &HeaderMap, configured: Option<&str>) -> bool {
     let Some(origin) = headers.get(header::ORIGIN) else {
         return true;
     };
@@ -205,14 +216,47 @@ async fn send(socket: &mut WebSocket, value: &Value) -> bool {
 }
 async fn connection(mut socket: WebSocket, mut app: App) {
     let first = tokio::time::timeout(Duration::from_secs(8), socket.recv()).await;
-    let (token, look) = match first {
+    let identity = match first {
         Ok(Some(Ok(Message::Text(text)))) => {
             match serde_json::from_str::<ClientMessage>(&text) {
                 Ok(ClientMessage::Join {
                     version: 1,
                     token,
                     look,
-                }) => (token, look),
+                    session: None,
+                    character: None,
+                }) => Identity::Guest { token, look },
+                Ok(ClientMessage::Join {
+                    version: 1,
+                    token: None,
+                    look,
+                    session: Some(session),
+                    character,
+                }) => {
+                    let store = app.store.clone();
+                    let found = tokio::task::spawn_blocking(move || {
+                        store.session_account(&session).map_err(|e| e.to_string())
+                    })
+                    .await
+                    .map_err(|e| e.to_string())
+                    .and_then(|r| r);
+                    match found {
+                        Ok(Some(account)) => Identity::Account {
+                            id: account.id,
+                            character,
+                            look,
+                        },
+                        Ok(None) => {
+                            send(&mut socket,&json!({"type":"error","fatal":true,"code":"auth","text":"Your login expired. Please sign in again."})).await;
+                            return;
+                        }
+                        Err(e) => {
+                            tracing::error!(%e,"session check failed");
+                            send(&mut socket,&json!({"type":"error","fatal":true,"text":"Account storage is unavailable."})).await;
+                            return;
+                        }
+                    }
+                }
                 _ => {
                     send(&mut socket,&json!({"type":"error","fatal":true,"text":"Join with protocol version 1."})).await;
                     return;
@@ -228,8 +272,7 @@ async fn connection(mut socket: WebSocket, mut app: App) {
         .commands
         .send(Command::Join {
             session,
-            token,
-            look,
+            identity,
             peer,
             reply,
         })

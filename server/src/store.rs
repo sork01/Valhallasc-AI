@@ -1,10 +1,14 @@
 use crate::model::{Character, Class, Look, Point};
 use rusqlite::{Connection, OptionalExtension, params};
 use sha2::{Digest, Sha256};
+use std::sync::{Arc, Mutex, MutexGuard};
 use uuid::Uuid;
 
+/// One SQLite connection shared by the world loop (saves) and the account API (logins), so an in-memory database in
+/// tests sees both. Every call holds the lock only for its own statements.
+#[derive(Clone)]
 pub struct Store {
-    db: Connection,
+    db: Arc<Mutex<Connection>>,
 }
 /// What a friends list shows about a character who is offline.
 pub struct Summary {
@@ -21,47 +25,72 @@ impl Store {
         db.busy_timeout(std::time::Duration::from_secs(2))?;
         db.execute_batch("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;
             CREATE TABLE IF NOT EXISTS characters (id TEXT PRIMARY KEY, token_hash TEXT UNIQUE NOT NULL, state TEXT NOT NULL);")?;
-        Ok(Self { db })
+        // Characters saved before accounts existed have no owner.
+        let owned = db
+            .prepare("PRAGMA table_info(characters)")?
+            .query_map([], |r| r.get::<_, String>(1))?
+            .any(|name| name.is_ok_and(|n| n == "account_id"));
+        if !owned {
+            db.execute_batch("ALTER TABLE characters ADD COLUMN account_id TEXT;")?;
+        }
+        db.execute_batch(
+            "CREATE INDEX IF NOT EXISTS characters_account ON characters(account_id);
+            CREATE TABLE IF NOT EXISTS accounts (id TEXT PRIMARY KEY, kind TEXT NOT NULL, username TEXT NOT NULL,
+                display TEXT NOT NULL, pw_hash TEXT, created INTEGER NOT NULL, UNIQUE(kind, username));
+            CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, account_id TEXT NOT NULL, expires INTEGER NOT NULL);",
+        )?;
+        Ok(Self {
+            db: Arc::new(Mutex::new(db)),
+        })
+    }
+    pub(crate) fn conn(&self) -> MutexGuard<'_, Connection> {
+        self.db.lock().unwrap_or_else(|e| e.into_inner())
     }
     pub fn load(&self, token: &str) -> Result<Option<Character>, Box<dyn std::error::Error>> {
         if token.len() != 64 || !token.bytes().all(|b| b.is_ascii_hexdigit()) {
             return Ok(None);
         }
         let state: Option<String> = self
-            .db
+            .conn()
             .query_row(
-                "SELECT state FROM characters WHERE token_hash=?1",
+                "SELECT state FROM characters WHERE token_hash=?1 AND account_id IS NULL",
                 [hash(token)],
                 |r| r.get(0),
             )
             .optional()?;
-        state
-            .map(|s| {
-                let value: serde_json::Value = serde_json::from_str(&s)?;
-                let legacy = value.get("inventory").is_none();
-                let legacy_bags = value.get("bags").is_none();
-                let mut character: Character = serde_json::from_value(value)?;
-                if legacy {
-                    character.seed_inventory();
-                }
-                if legacy_bags {
-                    while character.bag_used() > character.bag_capacity()
-                        && character.bags.len() < 4
-                    {
-                        character.bags.push("traveler_pack".into());
-                    }
-                }
-                Ok(character)
-            })
-            .transpose()
+        state.map(|s| decode(&s)).transpose()
+    }
+    /// A character owned by `account`. An account's characters have no resumable key; its login session is the credential.
+    pub fn load_for_account(
+        &self,
+        account: &str,
+        character: &str,
+    ) -> Result<Option<Character>, Box<dyn std::error::Error>> {
+        let state: Option<String> = self
+            .conn()
+            .query_row(
+                "SELECT state FROM characters WHERE id=?1 AND account_id=?2",
+                [character, account],
+                |r| r.get(0),
+            )
+            .optional()?;
+        state.map(|s| decode(&s)).transpose()
     }
     pub fn create(
         &self,
+        look: Look,
+        spawn: Point,
+    ) -> Result<(Character, String), Box<dyn std::error::Error>> {
+        self.create_for(None, look, spawn)
+    }
+    /// With `account` the character belongs to that account and the returned key is never issued to anyone.
+    pub fn create_for(
+        &self,
+        account: Option<&str>,
         mut look: Look,
         spawn: Point,
     ) -> Result<(Character, String), Box<dyn std::error::Error>> {
-        // A bearer key resumes a guest character, not an account/password login.
-        let token = format!("{}{}", Uuid::new_v4().simple(), Uuid::new_v4().simple());
+        let token = random_key();
         // Appearance is client-selected; starter equipment and ownership are server-issued.
         let defaults = Look::default();
         look.warrior_armor = defaults.warrior_armor;
@@ -90,15 +119,15 @@ impl Store {
             potion_ready: 0,
         };
         c.seed_inventory();
-        self.db.execute(
-            "INSERT INTO characters(id,token_hash,state) VALUES(?1,?2,?3)",
-            params![c.id, hash(&token), serde_json::to_string(&c)?],
+        self.conn().execute(
+            "INSERT INTO characters(id,token_hash,state,account_id) VALUES(?1,?2,?3,?4)",
+            params![c.id, hash(&token), serde_json::to_string(&c)?, account],
         )?;
         Ok((c, token))
     }
     pub fn summary(&self, id: &str) -> Option<Summary> {
         let state: String = self
-            .db
+            .conn()
             .query_row("SELECT state FROM characters WHERE id=?1", [id], |r| {
                 r.get(0)
             })
@@ -115,7 +144,7 @@ impl Store {
     /// legacy save keeps every field (such as a missing `inventory`) that load() migrates.
     pub fn remove_friend(&self, id: &str, friend: &str) -> Result<(), Box<dyn std::error::Error>> {
         let state: Option<String> = self
-            .db
+            .conn()
             .query_row("SELECT state FROM characters WHERE id=?1", [id], |r| {
                 r.get(0)
             })
@@ -126,7 +155,7 @@ impl Store {
         let mut v: serde_json::Value = serde_json::from_str(&state)?;
         if let Some(list) = v.get_mut("friends").and_then(|f| f.as_array_mut()) {
             list.retain(|f| f.as_str() != Some(friend));
-            self.db.execute(
+            self.conn().execute(
                 "UPDATE characters SET state=?1 WHERE id=?2",
                 params![v.to_string(), id],
             )?;
@@ -137,7 +166,8 @@ impl Store {
         &mut self,
         characters: impl Iterator<Item = &'a Character>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let tx = self.db.transaction()?;
+        let mut db = self.conn();
+        let tx = db.transaction()?;
         for c in characters {
             tx.execute(
                 "UPDATE characters SET state=?1 WHERE id=?2",
@@ -147,6 +177,211 @@ impl Store {
         tx.commit()?;
         Ok(())
     }
+
+    // ---------- accounts ----------
+    /// A new game account. `Ok(None)` when the name is taken (names compare without case).
+    pub fn create_account(
+        &self,
+        username: &str,
+        pw_hash: &str,
+    ) -> Result<Option<Account>, Box<dyn std::error::Error>> {
+        let id = Uuid::new_v4().to_string();
+        let inserted = self.conn().execute(
+            "INSERT OR IGNORE INTO accounts(id,kind,username,display,pw_hash,created) VALUES(?1,'game',?2,?3,?4,?5)",
+            params![id, username.to_lowercase(), username, pw_hash, unix_now()],
+        )?;
+        Ok((inserted == 1).then(|| Account {
+            id,
+            kind: AccountKind::Game,
+            name: username.to_owned(),
+        }))
+    }
+    /// A game account and its password hash, for checking a login.
+    pub fn game_account(
+        &self,
+        username: &str,
+    ) -> Result<Option<(Account, String)>, Box<dyn std::error::Error>> {
+        Ok(self
+            .conn()
+            .query_row(
+                "SELECT id,display,pw_hash FROM accounts WHERE kind='game' AND username=?1",
+                [username.to_lowercase()],
+                |r| {
+                    Ok((
+                        Account {
+                            id: r.get(0)?,
+                            kind: AccountKind::Game,
+                            name: r.get(1)?,
+                        },
+                        r.get::<_, Option<String>>(2)?.unwrap_or_default(),
+                    ))
+                },
+            )
+            .optional()?)
+    }
+    /// The account for a site SSO user, created on first use. It has no password here.
+    pub fn sso_account(&self, username: &str) -> Result<Account, Box<dyn std::error::Error>> {
+        let conn = self.conn();
+        conn.execute(
+            "INSERT OR IGNORE INTO accounts(id,kind,username,display,pw_hash,created) VALUES(?1,'sso',?2,?3,NULL,?4)",
+            params![Uuid::new_v4().to_string(), username.to_lowercase(), username, unix_now()],
+        )?;
+        Ok(conn.query_row(
+            "SELECT id,display FROM accounts WHERE kind='sso' AND username=?1",
+            [username.to_lowercase()],
+            |r| {
+                Ok(Account {
+                    id: r.get(0)?,
+                    kind: AccountKind::Sso,
+                    name: r.get(1)?,
+                })
+            },
+        )?)
+    }
+    /// Issues a login session; only its hash is stored.
+    pub fn new_session(&self, account: &str) -> Result<String, Box<dyn std::error::Error>> {
+        let token = random_key();
+        let conn = self.conn();
+        conn.execute("DELETE FROM sessions WHERE expires<?1", [unix_now()])?;
+        conn.execute(
+            "INSERT INTO sessions(token_hash,account_id,expires) VALUES(?1,?2,?3)",
+            params![hash(&token), account, unix_now() + SESSION_SECS],
+        )?;
+        Ok(token)
+    }
+    /// The account behind a live session. Using a session more than a day old renews it for another 30 days.
+    pub fn session_account(
+        &self,
+        token: &str,
+    ) -> Result<Option<Account>, Box<dyn std::error::Error>> {
+        if token.len() != 64 || !token.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return Ok(None);
+        }
+        let conn = self.conn();
+        let now = unix_now();
+        let found = conn
+            .query_row(
+                "SELECT a.id,a.kind,a.display,s.expires FROM sessions s JOIN accounts a ON a.id=s.account_id
+                 WHERE s.token_hash=?1 AND s.expires>?2",
+                params![hash(token), now],
+                |r| {
+                    Ok((
+                        Account {
+                            id: r.get(0)?,
+                            kind: if r.get::<_, String>(1)? == "sso" {
+                                AccountKind::Sso
+                            } else {
+                                AccountKind::Game
+                            },
+                            name: r.get(2)?,
+                        },
+                        r.get::<_, i64>(3)?,
+                    ))
+                },
+            )
+            .optional()?;
+        let Some((account, expires)) = found else {
+            return Ok(None);
+        };
+        if expires < now + SESSION_SECS - 86_400 {
+            conn.execute(
+                "UPDATE sessions SET expires=?1 WHERE token_hash=?2",
+                params![now + SESSION_SECS, hash(token)],
+            )?;
+        }
+        Ok(Some(account))
+    }
+    pub fn end_session(&self, token: &str) -> Result<(), Box<dyn std::error::Error>> {
+        self.conn()
+            .execute("DELETE FROM sessions WHERE token_hash=?1", [hash(token)])?;
+        Ok(())
+    }
+    /// An account's characters, oldest first, as the character picker shows them.
+    pub fn account_characters(
+        &self,
+        account: &str,
+    ) -> Result<Vec<CharacterEntry>, Box<dyn std::error::Error>> {
+        let conn = self.conn();
+        let mut query =
+            conn.prepare("SELECT id,state FROM characters WHERE account_id=?1 ORDER BY rowid")?;
+        let rows = query.query_map([account], |r| {
+            Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?))
+        })?;
+        let mut list = vec![];
+        for row in rows {
+            let (id, state) = row?;
+            let v: serde_json::Value = serde_json::from_str(&state)?;
+            list.push(CharacterEntry {
+                id,
+                look: v["look"].clone(),
+                level: v["level"].as_u64().unwrap_or(1) as u32,
+            });
+        }
+        Ok(list)
+    }
+    pub fn account_character_count(
+        &self,
+        account: &str,
+    ) -> Result<usize, Box<dyn std::error::Error>> {
+        Ok(self.conn().query_row(
+            "SELECT COUNT(*) FROM characters WHERE account_id=?1",
+            [account],
+            |r| r.get::<_, i64>(0),
+        )? as usize)
+    }
+    /// Permanently deletes one of the account's characters. False when it isn't theirs.
+    pub fn delete_account_character(
+        &self,
+        account: &str,
+        character: &str,
+    ) -> Result<bool, Box<dyn std::error::Error>> {
+        Ok(self.conn().execute(
+            "DELETE FROM characters WHERE id=?1 AND account_id=?2",
+            [character, account],
+        )? == 1)
+    }
+}
+/// A login session lasts 30 days from its last use.
+const SESSION_SECS: i64 = 30 * 86_400;
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AccountKind {
+    Game,
+    Sso,
+}
+#[derive(Clone, Debug)]
+pub struct Account {
+    pub id: String,
+    pub kind: AccountKind,
+    pub name: String,
+}
+pub struct CharacterEntry {
+    pub id: String,
+    pub look: serde_json::Value,
+    pub level: u32,
+}
+pub(crate) fn unix_now() -> i64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.as_secs() as i64)
+}
+fn random_key() -> String {
+    format!("{}{}", Uuid::new_v4().simple(), Uuid::new_v4().simple())
+}
+/// Reads a stored character, migrating saves from before inventory and bags existed.
+fn decode(state: &str) -> Result<Character, Box<dyn std::error::Error>> {
+    let value: serde_json::Value = serde_json::from_str(state)?;
+    let legacy = value.get("inventory").is_none();
+    let legacy_bags = value.get("bags").is_none();
+    let mut character: Character = serde_json::from_value(value)?;
+    if legacy {
+        character.seed_inventory();
+    }
+    if legacy_bags {
+        while character.bag_used() > character.bag_capacity() && character.bags.len() < 4 {
+            character.bags.push("traveler_pack".into());
+        }
+    }
+    Ok(character)
 }
 fn hash(token: &str) -> String {
     format!("{:x}", Sha256::digest(token.as_bytes()))
@@ -187,9 +422,10 @@ mod tests {
         assert_eq!(restored.stats(), c.stats());
         assert!(s.load(&"a".repeat(64)).unwrap().is_none());
         assert!(s.load("anything").unwrap().is_none());
-        let stored: String =
-            s.db.query_row("SELECT token_hash FROM characters", [], |r| r.get(0))
-                .unwrap();
+        let stored: String = s
+            .conn()
+            .query_row("SELECT token_hash FROM characters", [], |r| r.get(0))
+            .unwrap();
         assert_ne!(stored, token);
     }
 
@@ -200,11 +436,12 @@ mod tests {
         c.grant_xp(300);
         let mut old = serde_json::to_value(&c).unwrap();
         old.as_object_mut().unwrap().remove("attributes");
-        s.db.execute(
-            "UPDATE characters SET state=?1 WHERE id=?2",
-            params![old.to_string(), c.id],
-        )
-        .unwrap();
+        s.conn()
+            .execute(
+                "UPDATE characters SET state=?1 WHERE id=?2",
+                params![old.to_string(), c.id],
+            )
+            .unwrap();
         let mut restored = s.load(&token).unwrap().unwrap();
         assert_eq!(restored.stat_points(), 6);
         restored.allocate_stat("dexterity").unwrap();
@@ -222,11 +459,12 @@ mod tests {
         let mut old = serde_json::to_value(&c).unwrap();
         old.as_object_mut().unwrap().remove("quests");
         old.as_object_mut().unwrap().remove("equipment");
-        s.db.execute(
-            "UPDATE characters SET state=?1 WHERE id=?2",
-            params![old.to_string(), c.id],
-        )
-        .unwrap();
+        s.conn()
+            .execute(
+                "UPDATE characters SET state=?1 WHERE id=?2",
+                params![old.to_string(), c.id],
+            )
+            .unwrap();
         assert!(s.load(&token).unwrap().unwrap().quests.is_empty());
         assert!(s.load(&token).unwrap().unwrap().equipment.is_empty());
     }
@@ -236,11 +474,12 @@ mod tests {
         let (mut c, token) = s.create(Look::default(), Point::default()).unwrap();
         let mut old = serde_json::to_value(&c).unwrap();
         old.as_object_mut().unwrap().remove("friends");
-        s.db.execute(
-            "UPDATE characters SET state=?1 WHERE id=?2",
-            params![old.to_string(), c.id],
-        )
-        .unwrap();
+        s.conn()
+            .execute(
+                "UPDATE characters SET state=?1 WHERE id=?2",
+                params![old.to_string(), c.id],
+            )
+            .unwrap();
         assert!(s.load(&token).unwrap().unwrap().friends.is_empty());
         // Removing a friend from a save that never had the field changes nothing, and stays loadable.
         s.remove_friend(&c.id, "someone").unwrap();
@@ -261,11 +500,12 @@ mod tests {
         let (mut c, token) = s.create(Look::default(), Point::default()).unwrap();
         let mut old = serde_json::to_value(&c).unwrap();
         old.as_object_mut().unwrap().remove("zone");
-        s.db.execute(
-            "UPDATE characters SET state=?1 WHERE id=?2",
-            params![old.to_string(), c.id],
-        )
-        .unwrap();
+        s.conn()
+            .execute(
+                "UPDATE characters SET state=?1 WHERE id=?2",
+                params![old.to_string(), c.id],
+            )
+            .unwrap();
         assert_eq!(s.load(&token).unwrap().unwrap().zone, 0);
         c.zone = 1;
         let mut s = s;
@@ -281,11 +521,12 @@ mod tests {
         }
         let mut old = serde_json::to_value(&c).unwrap();
         old.as_object_mut().unwrap().remove("bags");
-        s.db.execute(
-            "UPDATE characters SET state=?1 WHERE id=?2",
-            params![old.to_string(), c.id],
-        )
-        .unwrap();
+        s.conn()
+            .execute(
+                "UPDATE characters SET state=?1 WHERE id=?2",
+                params![old.to_string(), c.id],
+            )
+            .unwrap();
         let restored = s.load(&token).unwrap().unwrap();
         assert_eq!(restored.inventory, c.inventory);
         assert_eq!(restored.bags, vec!["traveler_pack"]);
@@ -308,11 +549,12 @@ mod tests {
         c.look.equip("azure", "royal").unwrap();
         let mut old = serde_json::to_value(&c).unwrap();
         old.as_object_mut().unwrap().remove("inventory");
-        s.db.execute(
-            "UPDATE characters SET state=?1 WHERE id=?2",
-            params![old.to_string(), c.id],
-        )
-        .unwrap();
+        s.conn()
+            .execute(
+                "UPDATE characters SET state=?1 WHERE id=?2",
+                params![old.to_string(), c.id],
+            )
+            .unwrap();
         let mut restored = s.load(&token).unwrap().unwrap();
         assert_eq!(restored.quantity("warrior_weapon_royal"), 1);
         assert_eq!(restored.quantity("warrior_armor_azure"), 1);

@@ -244,6 +244,46 @@ impl World {
                 enemy.respawn = TICK;
                 json!({"id":id,"respawning":true})
             }
+            DebugCommand::SpawnEnemy { kind, x, y, level } => {
+                if kind == "big" {
+                    return Err("Kings come from the shared timer; use summon_king.".into());
+                }
+                if !x.is_finite() || !y.is_finite() {
+                    return Err("x and y must be numbers.".into());
+                }
+                let level = level.unwrap_or_else(|| Slime::default_level(&kind));
+                if !(1..=MAX_DEBUG_LEVEL).contains(&level) {
+                    return Err(format!("Level must be 1-{MAX_DEBUG_LEVEL}."));
+                }
+                // Enemies are a fixed set of slots; a spawn moves one of the kind's slots here, so every ordinary rule applies.
+                // After it dies it comes back at its own spawn point, not here.
+                let id = self
+                    .slimes
+                    .iter()
+                    .filter(|s| s.kind == kind)
+                    .min_by_key(|s| (!s.dead, s.id))
+                    .map(|s| s.id)
+                    .ok_or("No enemy of that kind exists. Kinds: green, blue, pink, yellow, beetle, wisp, spider, wraith, golem.")?;
+                let zone = self.players[&session].character.zone;
+                let mut enemy = Slime::with_level(
+                    id,
+                    &SlimeSpawn {
+                        x,
+                        y,
+                        kind: kind.clone(),
+                        zone,
+                    },
+                    level,
+                );
+                let bodies = self.actor_bodies(zone, None, Some(id));
+                let ground =
+                    free_actor_position(&self.maps[zone], enemy.point(), enemy.r, &bodies, true)
+                        .ok_or("There is no free ground near that spot.")?;
+                (enemy.x, enemy.y, enemy.hx, enemy.hy, enemy.goal) =
+                    (ground.x, ground.y, ground.x, ground.y, ground);
+                self.slimes[id] = enemy;
+                json!({"id":id,"kind":kind,"level":level,"zone":zone,"x":ground.x,"y":ground.y})
+            }
             DebugCommand::SummonKing => {
                 if self.slimes.iter().any(|s| s.kind == "big" && !s.dead) {
                     return Err("A King Slime is already alive.".into());

@@ -569,6 +569,16 @@ const scenarios = {
       await w.debug('Gm', { op: 'respawn_enemy', id: dead });
       await w.waitFor(() => !w.snapshot.slimes.find(s => s.id === dead).dead, 3000, 'Wisp respawns');
       check(true, 'respawn_enemy brings a dead enemy back immediately');
+      // spawn_enemy puts an enemy where the test needs it, in the bot's zone, at a chosen level.
+      const spawned = await kit.spawnEnemy(w, 'Gm', { kind: 'golem', level: 12, distance: 4 });
+      const golem = () => w.snapshot.slimes.find(s => s.id === spawned.enemy.id);
+      check(golem() && !golem().dead && golem().kind === 'golem' && golem().level === 12 && golem().zone === me().zone, 'spawn_enemy places a living golem at level 12 in the bot\'s zone');
+      check(Math.hypot(golem().x - me().x, golem().y - me().y) >= 1 && Math.hypot(golem().x - me().x, golem().y - me().y) < 8, 'spawn_enemy puts it a few steps from the bot, never on top of it');
+      await assert.rejects(() => kit.spawnEnemy(w, 'Gm', { kind: 'big' }), /Invalid|kind/i, 'kings are not spawnable');
+      check(true, 'spawn_enemy refuses kings and unknown kinds');
+      const spawnKills = me().kills;
+      await kit.killEnemies(w, 'Gm', { ids: [spawned.enemy.id] });
+      check(me().kills === spawnKills + 1 && golem().dead, 'A spawned enemy dies through the real kill path');
       await w.debug('Gm', { op: 'drop_item', item: 'royal_jelly', quantity: 2 });
       await w.waitFor(() => me().inventory.some(i => i.item === 'royal_jelly' && i.quantity === 2), 6000, 'Pickup');
       check(true, 'drop_item places loot at the feet that the owner picks up');

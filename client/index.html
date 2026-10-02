@@ -33,6 +33,47 @@
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
 
+  <!-- SIGN IN: guest, game account, or gunning.se SSO -->
+  <section id="scene-login" class="scene" aria-label="Sign in" hidden>
+    <div class="pause login-wrap">
+      <div class="panel pause-panel login-panel" role="group" aria-labelledby="login-title">
+        <h3 id="login-title">Enter Valhalla</h3>
+        <div id="login-account" class="login-account" hidden>
+          <p>Signed in as <b id="login-name"></b> <span id="login-kind"></span></p>
+          <button class="btn primary" id="login-continue" type="button">Continue</button>
+          <button class="btn ghost" id="login-logout" type="button">Log out</button>
+        </div>
+        <form id="login-form" class="login-form" autocomplete="on">
+          <label>Username<input id="login-user" type="text" name="username" maxlength="30" autocomplete="username" spellcheck="false" autocapitalize="off"></label>
+          <label>Password<input id="login-pass" type="password" name="password" maxlength="128" autocomplete="current-password"></label>
+          <div class="login-row">
+            <button class="btn primary" id="login-submit" type="submit">Log in</button>
+            <button class="btn ghost" id="login-register" type="button">Create account</button>
+          </div>
+        </form>
+        <button class="btn ghost" id="login-sso" type="button">Sign in with gunning.se</button>
+        <button class="btn ghost" id="login-guest" type="button">Play as guest</button>
+        <p id="login-msg" class="login-msg" role="status" aria-live="polite"></p>
+        <p class="world-menu-note">Accounts keep their characters on the server. A guest character is saved on the server too, but only this browser holds its key.</p>
+        <button class="btn ghost" id="login-back" type="button" data-i18n="back">Back</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCOUNT CHARACTERS -->
+  <section id="scene-chars" class="scene" aria-label="Your characters" hidden>
+    <div class="pause login-wrap">
+      <div class="panel pause-panel login-panel" role="group" aria-labelledby="chars-title">
+        <h3 id="chars-title">Your characters</h3>
+        <p id="chars-who" class="login-who"></p>
+        <div id="chars-list" class="character-list chars-list"></div>
+        <button class="btn primary" id="chars-new" type="button">New character</button>
+        <p id="chars-msg" class="login-msg" role="status" aria-live="polite"></p>
+        <button class="btn ghost" id="chars-back" type="button">Back</button>
+      </div>
+    </div>
+  </section>
+
   <!-- CHARACTER CREATION -->
   <section id="scene-create" class="scene" aria-label="Character creation" hidden>
     <h2 class="cc-title" data-t="Assemble Your Warband!"><span data-i18n="ccTitle">Assemble Your Warband!</span></h2>
@@ -286,6 +327,7 @@
 <script src="inventory.js"></script>
 <script src="attributes.js"></script>
 <script src="online.js"></script>
+<script src="account.js"></script>
 <script src="social.js"></script>
 <script src="city.js"></script>
 <script src="quests.js"></script>

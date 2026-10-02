@@ -13,10 +13,32 @@
     const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(img, 0, 0);
     return g.getImageData(0, 0, c.width, c.height);
   };
+  // Test mode (window.__valhallaTestSprites, set only by the automated tests): every class gets one tiny static figure
+  // built in code, so a page loads without decoding the multi-megapixel atlases. Only the small metadata file is read,
+  // so ramps, equipment names and clip counts stay the real ones. Each skin/hair/armour/weapon choice still changes pixels.
+  const colour = text => { let h = 0; for (const ch of text) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return [64 + (h & 127), 64 + ((h >> 7) & 127), 64 + ((h >> 14) & 127)]; };
+  const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+  function stubSource(meta) {
+    const [ax, ay] = meta.anchor, solid = (x, y, w, h, rows, z) => {
+      const pixels = new Uint8ClampedArray(w * h * 4), depth = new Uint16Array(w * h).fill(z);
+      for (let i = 0; i < w * h; i++) pixels.set([...rows(Math.floor(i / w)), 255], i * 4);
+      return { x, y, w, h, pixels, z: depth };
+    };
+    const hair = rgb(meta.ramps.hair[2]), skin = rgb(meta.ramps.skin[2]);
+    const parts = {};
+    for (const part of Object.keys(meta.parts)) {
+      const frame = part === 'body' ? solid(ax - 3, ay - 14, 6, 14, row => row < 4 ? hair : skin, 1000)
+        : part.startsWith('armor_') ? solid(ax - 3, ay - 9, 6, 6, () => colour(part), 500)
+        : solid(ax + 3, ay - 15, 2, 12, () => colour(part), 400);
+      parts[part] = new Proxy({}, { get: () => frame });   // the same still figure for every clip, direction and frame
+    }
+    return { meta, parts };
+  }
   async function loadSource(url) {
     const response = await fetch(url);
     if (!response.ok) throw new Error('Character sprite metadata could not be loaded');
     const meta = await response.json(), [fw, fh] = meta.frame, parts = {};
+    if (window.__valhallaTestSprites === true) return stubSource(meta);
     // Retain only occupied rectangles; release the large decoded atlases.
     for (const [part, files] of Object.entries(meta.parts)) {
       const [color, depth] = await Promise.all([imageData('assets/' + files.png), imageData('assets/' + files.depth)]);

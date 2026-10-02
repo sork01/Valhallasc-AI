@@ -74,6 +74,15 @@ async function teleport(world, bot, target) {
   return world.debug(bot, { op: 'teleport', ...spot });
 }
 
+// Puts an enemy next to a bot (distance units east of it) or at x/y in the bot's zone. Returns its id and where it landed.
+async function spawnEnemy(world, bot, { kind, level, x, y, distance = 3 }) {
+  const here = world.player(bot);
+  if (!here) throw Error(`Bot ${bot} is not in the world.`);
+  const at = x === undefined || y === undefined ? { x: here.x + distance, y: here.y } : { x, y };
+  const reply = await world.debug(bot, { op: 'spawn_enemy', kind, ...at, ...(level ? { level } : {}) });
+  return { bot, enemy: reply.result, player: reply.player };
+}
+
 // Walks like a player: ordinary move actions along a route through the real collision geometry.
 async function walkTo(world, bot, target, timeoutMs = 60000) {
   const spot = resolve(world, bot, target);
@@ -203,4 +212,4 @@ function describe(what = 'overview') {
   }
 }
 
-module.exports = { zones, items, skills, quests, targetSchema, botName, debugSchema, socialSchema, resolve, teleport, walkTo, talkTo, castSkill, killEnemies, setupCharacter, waitForEvent, describe };
+module.exports = { zones, items, skills, quests, targetSchema, botName, debugSchema, socialSchema, resolve, teleport, spawnEnemy, walkTo, talkTo, castSkill, killEnemies, setupCharacter, waitForEvent, describe };

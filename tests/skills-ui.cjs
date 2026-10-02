@@ -2,7 +2,7 @@
 // switch) casts through the real bar; the level-up fixture is display-only: it feeds the client the event the server sends.
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { chromium } = require('playwright');
+const { chromium, STUB } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
@@ -21,7 +21,7 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'blink'
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => { if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
-  await page.goto(world.url); await page.locator('#start').click();
+  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('Archmage'); await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites && Field.hero.level === 20 && document.querySelectorAll('#skillbar-slots button').length === 12, null, { timeout: 60000 });
   await page.evaluate(() => {

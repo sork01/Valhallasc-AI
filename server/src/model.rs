@@ -426,6 +426,11 @@ pub enum ClientMessage {
         version: u32,
         token: Option<String>,
         look: Option<Look>,
+        /// A login session from /api (an account join). `character` picks one the account owns; without it `look` makes a new one.
+        #[serde(default)]
+        session: Option<String>,
+        #[serde(default)]
+        character: Option<String>,
     },
     Input {
         dx: f64,
@@ -577,6 +582,15 @@ pub enum DebugCommand {
     },
     RespawnEnemy {
         id: usize,
+    },
+    /// Puts an enemy of this kind at (x, y) in the player's zone, on the nearest free ground. It reuses a dead enemy of
+    /// that kind when there is one (else the first living one), at `level` (default: the kind's own level, no random spread).
+    SpawnEnemy {
+        kind: String,
+        x: f64,
+        y: f64,
+        #[serde(default)]
+        level: Option<u32>,
     },
     SummonKing,
 }

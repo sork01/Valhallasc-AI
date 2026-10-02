@@ -3,7 +3,7 @@
 // gate with real canvas clicks and asserts what the player sees.
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { chromium } = require('playwright');
+const { chromium, STUB } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
@@ -56,7 +56,7 @@ const look = page => page.evaluate(() => {
     server.onMessage(message => ws.send(typeof message === 'string' ? restage(message) : message));
   });
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
-  await page.goto(world.url); await page.locator('#start').click();
+  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('ZoneUI');
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.beetleSprites && !!Field.cragSprites, null, { timeout: 60000 });
@@ -65,7 +65,7 @@ const look = page => page.evaluate(() => {
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, portals: z.portals.length, enemies: z.slimes?.length })));
   check(zones.length === 2 && zones[1].name === 'Emberfall Crags' && zones[1].theme === 'ember', 'The client knows both zones');
-  check(await page.evaluate(() => { const m = Field.cragSprites.meta; return m.kinds.join() === 'wisp,spider,wraith,golem' && m.kinds.every(k => Field.cragSprites.img[k].naturalWidth === 768 && Field.cragSprites.img[k].naturalHeight === 480); }), 'All four monster atlases load at their documented size');
+  check(await page.evaluate(stub => { const m = Field.cragSprites.meta; return m.kinds.join() === 'wisp,spider,wraith,golem' && (stub || m.kinds.every(k => Field.cragSprites.img[k].naturalWidth === 768 && Field.cragSprites.img[k].naturalHeight === 480)); }, STUB), 'All four monster atlases load at their documented size');
   check(await page.evaluate(() => Field.zone === 0 && document.getElementById('area-title').textContent.includes('Greenmeadow')), 'The hero starts in Greenmeadow');
   const meadow = await look(page);
   check(meadow.g > meadow.r && meadow.g > meadow.b, `The meadow is green (${meadow.r | 0},${meadow.g | 0},${meadow.b | 0})`);
@@ -85,6 +85,21 @@ const look = page => page.evaluate(() => {
   // Wait until the hero is near a point; `zone` is the zone the walk happens in (a gate may change it mid-walk).
   const reach = (x, y, within = .6, zone = 0) => page.waitForFunction(([x, y, within, zone]) => Field.zone !== zone || Math.hypot(Field.hero.x - x, Field.hero.y - y) < within, [x, y, within, zone], { timeout: 30000 })
     .catch(async error => { await page.screenshot({ path: path.join(world.artifacts, 'stuck.png') }); throw Error(`Never reached ${x},${y}; hero ${JSON.stringify(await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y, hp: Field.hero.hp, goal: Field.hero.goal, dead: Field.hero.dead, zone: Field.zone })))}`, { cause: error }); });
+  // Staging only: a test shortcut (this server runs with test commands) puts the hero near what is under test, instead of
+  // a long walk across the map. The gate crossings, the NPC clicks and the last steps of each approach stay real.
+  const stageAt = async (zone, x, y) => {
+    await page.evaluate(([zone, x, y]) => Online.send({ type: 'debug', ref: 1, command: { op: 'teleport', zone, x, y } }), [zone, x, y]);
+    await page.waitForFunction(([zone, x, y]) => Field.zone === zone && Math.hypot(Field.hero.x - x, Field.hero.y - y) < 2, [zone, x, y], { timeout: 10000 });
+    // The camera eases toward the hero. A click aimed from a world position while it still slides lands somewhere else,
+    // so wait until the hero's screen position stops changing.
+    let last = null;
+    for (let i = 0; i < 40; i++) {
+      const now = await page.evaluate(() => Field._debug.w2s(Field.hero.x, Field.hero.y));
+      if (last && Math.hypot(now[0] - last[0], now[1] - last[1]) < 1) break;
+      last = now; await page.waitForTimeout(80);
+    }
+  };
+  await stageAt(0, gate.x, gate.y + 8);
   for (const step of await page.evaluate(([x, y]) => Field._debug.routeTo({ x, y }), [gate.x, gate.y + 4])) {
     await click(step.x, step.y); await reach(step.x, step.y, 1.3);
   }
@@ -172,7 +187,7 @@ const look = page => page.evaluate(() => {
     stage = { state, dieT };
     await page.waitForFunction(([state]) => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000 && s.state === state).length === 4, [state], { timeout: 10000 });
     await page.evaluate(() => { Field.hero.target = Field.slimes.find(s => s.id === 1002) || null; });
-    await page.waitForTimeout(450);
+    await page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));   // the new state has been drawn
     check(await page.evaluate(() => Field.slimes.every(s => s.zone === 1) && Field.remotePlayers.length === 0), `A monster and a player from another zone in the ${state} packet are not shown`);
     // The clip and frame the renderer picks for each monster, for this state.
     const frames = await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000).map(s => Field._debug.enemyFrame(s)));
@@ -184,7 +199,8 @@ const look = page => page.evaluate(() => {
     if (state === 'idle' || state === 'lunge') await shot('bestiary-' + state);
   }
   stage = null;
-  check(seen.every((hashes, i) => i === 0 || hashes.every((h, kind) => h !== seen[i - 1][kind])), `All four monsters draw something new in each state: idle, windup, lunge, hurt, early and late dying frames, then gone (${seen.length} states)`);
+  // Needs the real animation frames; the stub is one still picture. `npm run test:art` runs this suite on the real art.
+  check(STUB || seen.every((hashes, i) => i === 0 || hashes.every((h, kind) => h !== seen[i - 1][kind])), `All four monsters draw something new in each state: idle, windup, lunge, hurt, early and late dying frames, then gone (${seen.length} states)`);
   await page.waitForFunction(() => Field.slimes.every(s => s.id < 1000), null, { timeout: 10000 });
   await page.evaluate(() => { Field.hero.target = null; });
 
@@ -194,7 +210,11 @@ const look = page => page.evaluate(() => {
   check(route.length > 30, `The client can route across the Crags through the first ford (${route.length} steps)`);
   const nearest = () => page.evaluate(() => Math.min(...Field.slimes.filter(s => !s.dead).map(s => Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y))));
   let lavaSeen = 0;
-  for (const step of route) {
+  // Start from the step where the first wisp spawn is about 20 units away, so the last stretch (and the lava on it) is still walked for real.
+  const wisps = await page.evaluate(() => Field._debug.zones[1].slimes.filter(s => s.kind === 'wisp').map(s => [s.x, s.y]));
+  const first = Math.max(0, route.findIndex(step => wisps.some(([x, y]) => Math.hypot(step.x - x, step.y - y) < 20)));
+  await stageAt(1, route[first].x, route[first].y);
+  for (const step of route.slice(first)) {
     if (await nearest() < 11) break;
     await click(step.x, step.y); await reach(step.x, step.y, 1.3, 1);
     lavaSeen = Math.max(lavaSeen, (await look(page)).lava);
@@ -210,6 +230,7 @@ const look = page => page.evaluate(() => {
   await page.evaluate(() => { Field.hero.target = null; });
   // Back out through the Meadow Gate by clicking.
   const back = await page.evaluate(() => Field._debug.zones[1].portals[0]);
+  await stageAt(1, back.x, back.y - 7);
   for (const step of await page.evaluate(([x, y]) => Field._debug.routeTo({ x, y }), [back.x, back.y - 3])) { await click(step.x, step.y); await reach(step.x, step.y, 1.3, 1); }
   await page.waitForTimeout(900);
   await shot('gate-crags');

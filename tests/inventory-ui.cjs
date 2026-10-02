@@ -2,7 +2,7 @@
 // vendor sales and reload. Separate display fixtures cover rare gear and markers.
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { chromium } = require('playwright');
+const { chromium, STUB } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
@@ -21,7 +21,7 @@ async function call(name, args = {}) {
   page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.addInitScript(() => { if(!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
-  await page.goto(world.url); await page.locator('#start').click();
+  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-mage').click(); await page.locator('#name').fill('InventoryUI');
   check(await page.locator('#create-mageWeapon option').count() === 1, 'Character creation offers starter gear');
   await page.locator('#go').click({ timeout: 60000 });
@@ -55,7 +55,7 @@ async function call(name, args = {}) {
   await page.locator('#inventory-list [data-item="slime_gel"] button').click();
   check(await page.locator('#bag-details [data-action="equip"]').count() === 0, 'Materials have no equip action');
   await page.screenshot({ path: path.join(world.artifacts, 'inventory-real-loot.png') });
-  await page.reload(); await page.locator('#start').click();
+  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.waitForFunction(() => Online.connected && Inventory.quantity('slime_gel') === 1, null, { timeout: 60000 });
   check(await page.evaluate(() => Field.hero.look.mageWeapon === 'ash'), 'Loot and gear resume after page reload');
   await page.evaluate(() => Field.visitNpc('merchant'));

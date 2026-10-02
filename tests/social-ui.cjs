@@ -2,7 +2,7 @@
 // escaping. The rules (limits, leadership, persistence) are exercised through the social MCP scenario and Rust tests.
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { chromium } = require('playwright');
+const { chromium, STUB } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
@@ -24,7 +24,7 @@ async function call(name, args = {}) {
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
     page.on('pageerror', error => errors.push(`${name}: ${error.message}`));
     await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
-    await page.goto(world.url); await page.locator('#start').click();
+    await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
     await page.locator('#cls-' + cls).click(); await page.locator('#name').fill(name);
     await page.locator('#go').click({ timeout: 60000 });
     await page.waitForFunction(() => Online.connected && Field.hero && Field.hero.hp > 0, null, { timeout: 60000 });
