@@ -929,9 +929,14 @@ const scenarios = {
       const front = await approach(w, 'Hana', 'green', 6.5);
       const start = { ...front() };
       check(distance(hana(), start) > 3, 'The hunter stands well outside sword range');
-      await cast(w, 'Hana', 'powershot', front());
-      await w.waitFor(() => lost(start, front()), 8000, 'Power Shot');
-      check(lost(start, front()), 'Power Shot damages an enemy from a distance');
+      // An arrow can miss a slime that wanders off its line, so the shot is retried (re-aimed) once its cooldown ends.
+      let struck = false;
+      for (let attempt = 0; attempt < 4 && !struck; attempt++) {
+        await w.waitFor(() => !hana().skillCd.powershot, 6000, 'Power Shot ready');
+        await cast(w, 'Hana', 'powershot', front());
+        struck = await w.waitFor(() => lost(start, front()), 3000, 'Power Shot').then(() => true, () => false);
+      }
+      check(struck && lost(start, front()), 'Power Shot damages an enemy from a distance');
       await w.action('Hana', { type: 'target', id: start.id });
       await w.waitFor(() => !front() || front().dead, 40000, 'The hunter defeats it with arrows');
       check(front().dead, 'Arrows alone defeat an enemy');
