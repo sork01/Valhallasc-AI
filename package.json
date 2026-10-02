@@ -9,8 +9,8 @@
     "test:mcp": "node scripts/test-mcp.cjs",
     "world": "node scripts/sync-world.cjs",
     "check": "node --check client/attributes.js && node --check client/city.js && node --check client/field.js && node --check client/game.js && node --check client/quests.js && node --check client/inventory.js && node --check client/items.js && node --check client/skills.js && node --check client/online.js && node --check client/magesprite.js && node --check client/priestsprite.js && node --check client/huntersprite.js && node --check client/warriorsprite.js && node --check client/assassinsprite.js && node --check client/account.js && node --check client/skillbar.js && node --check client/social.js && node --check client/settings.js",
-    "test:ui": "node tests/account-ui.cjs && node tests/quest-ui.cjs && node tests/inventory-ui.cjs && node tests/equipment-skills-ui.cjs && node tests/gender-ui.cjs && node tests/skills-ui.cjs && node tests/zones-ui.cjs && node tests/social-ui.cjs && node tests/settings-ui.cjs && node tests/consumables-ui.cjs && node tests/sprites-real.cjs",
-    "test:art": "node tests/sprites-real.cjs && REAL_SPRITES=1 node tests/zones-ui.cjs",
+    "test:ui": "node tests/account-ui.cjs && node tests/quest-ui.cjs && node tests/inventory-ui.cjs && node tests/equipment-skills-ui.cjs && node tests/gender-ui.cjs && node tests/skills-ui.cjs && node tests/zones-ui.cjs && node tests/rimeveil-ui.cjs && node tests/social-ui.cjs && node tests/settings-ui.cjs && node tests/consumables-ui.cjs && node tests/sprites-real.cjs",
+    "test:art": "node tests/sprites-real.cjs && REAL_SPRITES=1 node tests/zones-ui.cjs && REAL_SPRITES=1 node tests/rimeveil-ui.cjs",
     "test:browser:full": "node tests/multiplayer.cjs"
   },
   "devDependencies": {

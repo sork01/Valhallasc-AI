@@ -8,6 +8,7 @@ const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8')
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
 const crags = map.zones[0];
+const rime = map.zones[1];
 // `area` is the map of the zone the bot stands in: the meadow by default, or `crags`.
 async function walkTo(world, bot, goal, area = map) {
   for (const point of route(area, world.player(bot), goal)) {
@@ -26,7 +27,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15 };
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
 const levelXp = JSON.parse(fs.readFileSync(path.join(root, 'world/levels.txt'), 'utf8'));
@@ -838,6 +839,160 @@ const scenarios = {
       const history = JSON.stringify(w.player(bot).quests);
       await w.restart();
       check(w.player(bot).zone === 1 && JSON.stringify(w.player(bot).quests) === history, 'Every completion and restarted bounty survives a private server restart');
+    },
+  },
+  rimeveil: {
+    description: 'Walk through the Rimeveil Gate at the top of the Crags into the level 10-15 glacier, walk the whole ice spiral to the summit through all four ring gaps, fight a leveled Rime Crab, use both gates, and keep the zone across reconnect and restart.',
+    async run(w, check) {
+      const bot = 'Glacier';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 12 });
+      const up = crags.portals.find(p => p.id === 'rimeveil_gate');
+      check(up && up.to === 2 && crags.portals[0].id === 'meadow_gate', 'The Crags have a north gate to zone 2 after their meadow gate');
+      // Staging only: stand a few steps below the gate; the crossing itself is a real walk between its two posts.
+      await kit.teleport(w, bot, { zone: 1, x: up.x, y: up.y + 8 });
+      await walkTo(w, bot, { x: up.x, y: up.y + 4 }, crags);
+      check(w.player(bot).zone === 1, 'Still in the Crags in front of the gate');
+      await w.action(bot, { type: 'move', x: up.x, y: up.y - 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 2, 15000, 'Step through the Rimeveil Gate');
+      await w.action(bot, { type: 'stop' });
+      const arrival = { x: up.tx, y: up.ty };
+      check(w.player(bot).zone === 2 && distance(w.player(bot), arrival) < 1, 'The server moves the walker to Rimeward Camp');
+      const glacier = w.snapshot.slimes;
+      check(glacier.length === 27 && glacier.every(s => s.zone === 2) && new Set(glacier.map(s => s.kind)).size === 4
+        && ['crab', 'wolf', 'yeti', 'wyrm'].every(k => glacier.some(s => s.kind === k)), 'A glacier client receives exactly the 27 glacier monsters, four kinds, and nothing from the other zones');
+      check(glacier.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2 && s.level >= 8) && new Set(glacier.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'Glacier levels sit within two of each default (10-15) and really vary');
+      const hp = { crab: 900, wolf: 1000, yeti: 1900, wyrm: 2200 };
+      check(glacier.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
+      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.type === 'system' && e.text.includes('Rimeveil Glacier') && e.text.includes('10–15')), 'The player is told the recommended levels');
+      // A second character in the Crags shares nothing with the glacier.
+      await w.connect({ bot: 'Cragger', class: 'mage' });
+      await kit.teleport(w, 'Cragger', { zone: 1, x: 48, y: 80 });
+      check(w.player('Cragger').zone === 1 && w.player(bot).zone === 2, 'Players in the Crags and on the glacier are tracked separately');
+      check(w.views.get(bot).slimes.every(s => s.zone === 2) && w.views.get('Cragger').slimes.every(s => s.zone === 1) && w.views.get(bot).players.length === 1,
+        'Each client is sent only its own zone');
+      check(JSON.stringify(w.snapshot.zonesSeen) === '[1,2]', 'The merged test view covers the two zones while a bot stands in each');
+      await w.disconnect('Cragger');
+      // The ice spiral: its route runs through all four ring gaps, and the walk to the summit really works.
+      const center = { x: 64, y: 52 }, gaps = [{ x: 64, y: 100 }, { x: 64, y: 15 }, { x: 64, y: 78 }, { x: 64, y: 37 }];
+      const path = route(rime, w.player(bot), center), from = { x: w.player(bot).x, y: w.player(bot).y };
+      // The route is a few long straight legs, so measure how close each gap lies to a leg rather than to a waypoint.
+      const legDistance = (g, a, b) => { const dx = b.x - a.x, dy = b.y - a.y, t = Math.max(0, Math.min(1, ((g.x - a.x) * dx + (g.y - a.y) * dy) / (dx * dx + dy * dy || 1))); return Math.hypot(g.x - a.x - dx * t, g.y - a.y - dy * t); };
+      check(gaps.every(g => path.some((p, i) => legDistance(g, i ? path[i - 1] : from, p) < 4.3)), 'The only route to the summit passes through the gaps of all four rings');
+      let length = distance(w.player(bot), path[0]);
+      path.forEach((p, i) => { if (i) length += distance(path[i - 1], p); });
+      check(length > 3.5 * distance(w.player(bot), center), `The way in is a spiral: ${Math.round(length)} units of walking for ${Math.round(distance(w.player(bot), center))} units of distance`);
+      for (const point of path) {
+        await w.action(bot, { type: 'move', ...point });
+        await w.waitFor(() => distance(w.player(bot), point) < .5, 30000, `Walk the spiral to ${Math.round(point.x)},${Math.round(point.y)}`);
+      }
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 2 && distance(w.player(bot), center) < 1.5, 'The bot reaches the summit bowl on foot');
+      // Way back to the Crags: teleport to camp (staging), then a real walk through the Crags Gate and through the new gate again.
+      const back = rime.portals[0];
+      await kit.teleport(w, bot, { zone: 2, x: arrival.x, y: arrival.y });
+      await w.action(bot, { type: 'move', x: back.x, y: back.y + 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 1, 15000, 'Step through the Crags Gate');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 1 && distance(w.player(bot), { x: back.tx, y: back.ty }) < 1, 'The Crags Gate arrives beside the Rimeveil Gate');
+      await w.action(bot, { type: 'move', x: up.x, y: up.y - 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 2, 15000, 'Step through the Rimeveil Gate again');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 2 && distance(w.player(bot), arrival) < 1, 'The gate works again right after arriving, in both directions');
+      // Fight a Rime Crab through normal target actions; test worlds are invulnerable.
+      const crab = w.snapshot.slimes.filter(s => s.kind === 'crab' && !s.dead).sort((a, b) => distance(a, arrival) - distance(b, arrival))[0];
+      await kit.teleport(w, bot, { enemy: crab.id });
+      const before = { ...w.player(bot) };
+      await w.action(bot, { type: 'target', id: crab.id });
+      await w.waitFor(() => w.snapshot.slimes.find(s => s.id === crab.id).dead, 90000, 'Defeat the crab');
+      await w.action(bot, { type: 'stop' });
+      const xp = enemyXp(crab.level), gold = Math.round(60 * (1 + .1 * (crab.level - 10)));
+      check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + xp, `The kill pays the level-${crab.level} XP (${xp})`);
+      const corpse = w.snapshot.slimes.find(s => s.id === crab.id);
+      await w.action(bot, { type: 'move', x: corpse.x, y: corpse.y });
+      await w.waitFor(() => w.player(bot).gold >= before.gold + gold && w.player(bot).inventory.some(i => i.item === 'rime_shell'), 15000, 'Collect glacier loot');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).gold === before.gold + gold, `Level-scaled gold (${gold}) and a Rime Shell drop are collected`);
+      const where = { ...w.player(bot) };
+      await w.disconnect(bot);
+      await w.connect({ bot });
+      check(w.player(bot).zone === 2 && distance(w.player(bot), where) < 1.2, 'Resume puts the character back on the glacier');
+      await w.restart();
+      check(w.player(bot).zone === 2 && w.player(bot).gold === where.gold, 'The glacier position and loot survive a Rust restart');
+    },
+  },
+  rime_quests: {
+    description: 'Rimeward Camp: all thirteen quests through real NPC offers, zone-local kill credit, prerequisites, rewards, repeatable contracts, healing, supplies and persisted progress.',
+    async run(w, check) {
+      const bot = 'Vanguard';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 15, gold: 1000, items: Array.from({ length: 4 }, () => ({ item: 'linen_satchel' })), finishQuests: ['slime_patrol', 'crags_welcome'] });
+      await kit.teleport(w, bot, { npc: 'crags_supplier' });
+      await kit.talkTo(w, bot, 'crags_supplier', 'quest:accept:crags_bounty');
+      check(!!quest(w, bot, 'crags_bounty'), 'The Crags patrol is accepted before the glacier quests start');
+      await kit.teleport(w, bot, { npc: 'rime_tracker' });
+      await kit.talkTo(w, bot, 'rime_tracker', 'quest:accept:rime_crabs');
+      check(!quest(w, bot, 'rime_crabs'), 'The glacier hunt requires the camp introduction');
+      await kit.talkTo(w, bot, 'rime_tracker', 'quest:accept:rime_welcome');
+      check(!quest(w, bot, 'rime_welcome'), 'The wrong NPC cannot offer another giver\'s quest');
+      check(kit.describe('quests').quests.filter(q => q.zone === 2).length === 13 && rime.quests.length >= 10, 'MCP describes all thirteen glacier quests with their zone');
+      for (const q of rime.quests) {
+        await kit.teleport(w, bot, { npc: q.npc });
+        await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
+        await w.waitFor(() => !!quest(w, bot, q.id));
+        check(quest(w, bot, q.id)?.counts.every(n => n === 0), `${q.title}: accepted with fresh objectives`);
+        const early = await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
+        check(/Complete the objectives/.test(early.notice), `${q.title}: premature reward refused`);
+        for (const o of q.objectives) {
+          if (o.kind === 'talk') {
+            await kit.teleport(w, bot, { npc: o.target });
+            await kit.talkTo(w, bot, o.target);
+          } else {
+            for (let i = 0; i < o.count; i++) {
+              const enemy = w.snapshot.slimes.find(s => s.zone === 2 && (o.target === 'any' || s.kind === o.target));
+              if (enemy.dead) await w.debug(bot, { op: 'respawn_enemy', id: enemy.id });
+              await w.debug(bot, { op: 'kill_enemy', id: enemy.id });
+            }
+          }
+        }
+        await w.waitFor(() => quest(w, bot, q.id).counts.every((n, i) => n === q.objectives[i].count));
+        check(quest(w, bot, 'crags_bounty').counts[0] === 0, `${q.title}: glacier actions leave the Crags patrol unchanged`);
+        await kit.teleport(w, bot, { npc: q.npc });
+        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
+        await w.waitFor(() => quest(w, bot, q.id).claimed);
+        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
+        await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
+        check(w.player(bot).gold === before.gold + q.rewardGold && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
+      }
+      for (const q of rime.quests.filter(q => q.repeatable)) {
+        await kit.teleport(w, bot, { npc: q.npc });
+        await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
+        await w.waitFor(() => !quest(w, bot, q.id).claimed);
+        check(!quest(w, bot, q.id).claimed && quest(w, bot, q.id).completions === 1 && quest(w, bot, q.id).counts.every(n => n === 0), `${q.title}: repeat acceptance resets objectives and retains history`);
+      }
+      await kit.teleport(w, bot, { npc: 'rime_healer' });
+      await w.debug(bot, { op: 'set_hp', hp: 1 });
+      await kit.talkTo(w, bot, 'rime_healer', 'blessing');
+      await w.waitFor(() => w.player(bot).hp === w.player(bot).maxHp);
+      check(w.player(bot).hp === w.player(bot).maxHp, 'The camp healer restores all HP');
+      await kit.talkTo(w, bot, 'rime_healer', 'buy_health_potion');
+      await w.waitFor(() => w.player(bot).inventory.some(i => i.item === 'health_potion'));
+      check(w.player(bot).inventory.some(i => i.item === 'health_potion'), 'The camp sells health potions');
+      await kit.teleport(w, bot, { npc: 'rime_trader' });
+      await kit.talkTo(w, bot, 'rime_trader', 'buy_traveler_stew');
+      await w.waitFor(() => w.player(bot).inventory.some(i => i.item === 'traveler_stew'));
+      check(w.player(bot).inventory.some(i => i.item === 'traveler_stew'), 'The trader sells food');
+      // Glacier loot sells at the trader (materials from the four new kinds).
+      await w.debug(bot, { op: 'give_item', item: 'wyrm_scale', quantity: 2 });
+      const gold = w.player(bot).gold;
+      await kit.talkTo(w, bot, 'rime_trader', 'sell:materials');
+      await w.waitFor(() => w.player(bot).gold > gold);
+      check(w.player(bot).gold >= gold + 280, 'The trader buys Wyrm Scales at their catalog price');
+      const history = JSON.stringify(w.player(bot).quests);
+      await w.restart();
+      check(w.player(bot).zone === 2 && JSON.stringify(w.player(bot).quests) === history, 'Every completion and restarted bounty survives a private server restart');
     },
   },
   gender: {

@@ -241,7 +241,7 @@ def main():
     rng = random.Random(20261001)
     # Remove anything an earlier run added to the meadow.
     meadow['objects'] = [o for o in meadow['objects'] if o['kind'] != 'post']
-    meadow.pop('zones', None)
+    later_zones = meadow.pop('zones', [])[1:]       # zones 2+ (Rimeveil Glacier) belong to their own generators
     meadow.pop('portals', None)
     meadow['name'] = 'Greenmeadow'
     # Blue slimes that stood in front of the gate move to the nearest clear spot.
@@ -270,12 +270,14 @@ def main():
     missing = reachable(zone)
     if missing:
         raise SystemExit(f'unreachable from the arrival point: {missing}')
-    meadow['zones'] = [zone]
+    meadow['zones'] = [zone] + later_zones
     PATH.write_text(json.dumps(meadow, indent=2) + '\n')
     kinds = {}
     for s in zone['slimes']:
         kinds[s['kind']] = kinds.get(s['kind'], 0) + 1
     print(f"Wrote zone 1 {zone['name']}: {len(zone['objects'])} objects, spawns {kinds}. Now run node scripts/sync-world.cjs")
+    if later_zones:
+        print('Zones 2+ were kept, but the Crags lost their north gate: run python3 scripts/generate_rimeveil.py again.')
 
 
 if __name__ == '__main__':

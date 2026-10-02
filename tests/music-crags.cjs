@@ -1,5 +1,5 @@
-// The three scores are mp3 files played by music_player.js: they must load and decode with the expected length, play
-// audibly, and in a real game the zone must pick the score (meadow tune in Greenmeadow, Ashfall Run in the Crags).
+// The four scores are mp3 files played by music_player.js: they must load and decode with the expected length, play
+// audibly, and in a real game the zone must pick the score (meadow tune in Greenmeadow, Ashfall Run in the Crags, Rimeveil Spiral on the glacier).
 // Not in npm run test:ui (the user does not want music tested there); run it by hand when the music changes.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -18,6 +18,7 @@ const SONGS = [
   { id: 'title', make: 'createMusic', seconds: 84.71, name: 'Snowbound Hearth' },
   { id: 'meadow', make: 'createFieldMusic', seconds: 43.64, name: 'Greenmeadow Wander' },
   { id: 'crags', make: 'createCragMusic', seconds: 54.86, name: 'Ashfall Run' },
+  { id: 'rime', make: 'createRimeMusic', seconds: 76.8, name: 'Rimeveil Spiral' },
 ];
 (async () => {
   browser = await chromium.launch({ headless: true });
@@ -53,7 +54,7 @@ const SONGS = [
   await game.locator('#login-guest').click();
   await game.locator('#name').fill('Bard'); await game.locator('#go').click({ timeout: 60000 });
   await game.waitForFunction(() => Online.connected && !!valhalla.fmusic?.running, null, { timeout: 60000 });
-  check(await game.evaluate(() => !valhalla.cmusic.running && !valhalla.music.running), 'In Greenmeadow only the meadow tune is running');
+  check(await game.evaluate(() => !valhalla.cmusic.running && !valhalla.rmusic.running && !valhalla.music.running), 'In Greenmeadow only the meadow tune is running');
   await game.waitForFunction(() => valhalla.fmusic.loaded, null, { timeout: 30000 });
   check(true, 'The meadow mp3 loaded in the game');
   await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 1, x: 48, y: 86.5 } }));
@@ -66,8 +67,22 @@ const SONGS = [
   await game.evaluate(() => Prefs.set({ sound: false }));
   check(await game.evaluate(() => levels.at(-1) === 0), 'Sound off silences it');
   await game.evaluate(() => Prefs.set({ sound: true, musicVol: 1 }));
+  // The glacier has its own score: Rimeveil Spiral replaces Ashfall Run, the slider covers it, and the Crags get theirs back.
+  await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 2, x: 64, y: 118.5 } }));
+  await game.waitForFunction(() => Field.zone === 2 && valhalla.rmusic.running && !valhalla.cmusic.running && !valhalla.fmusic.running, null, { timeout: 10000 });
+  await game.waitForFunction(() => valhalla.rmusic.loaded, null, { timeout: 30000 });
+  check(true, 'Crossing onto the glacier swaps Ashfall Run for Rimeveil Spiral, and it loads');
+  await game.evaluate(() => { window.rlevels = []; const set = valhalla.rmusic.setLevel; valhalla.rmusic.setLevel = (v, s) => { rlevels.push(v); return set.call(valhalla.rmusic, v, s); }; });
+  await game.evaluate(() => Prefs.set({ musicVol: .5 }));
+  check(await game.evaluate(() => rlevels.length > 0 && Math.abs(rlevels.at(-1) - .25) < 1e-9), 'The music slider covers the glacier score too (50% = 0.25 gain)');
+  await game.evaluate(() => Prefs.set({ sound: false }));
+  check(await game.evaluate(() => rlevels.at(-1) === 0), 'Sound off silences the glacier score');
+  await game.evaluate(() => Prefs.set({ sound: true, musicVol: 1 }));
+  await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 1, x: 48, y: 86.5 } }));
+  await game.waitForFunction(() => Field.zone === 1 && valhalla.cmusic.running && !valhalla.rmusic.running, null, { timeout: 10000 });
+  check(true, 'Back in the Crags Ashfall Run returns');
   await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 0, x: 36, y: 60 } }));
-  await game.waitForFunction(() => Field.zone === 0 && valhalla.fmusic.running && !valhalla.cmusic.running, null, { timeout: 10000 });
+  await game.waitForFunction(() => Field.zone === 0 && valhalla.fmusic.running && !valhalla.cmusic.running && !valhalla.rmusic.running, null, { timeout: 10000 });
   check(true, 'Walking back out returns the meadow tune');
   check(errors.length === 0, `No browser runtime errors: ${errors.join('; ')}`);
   console.log(`${checks} music checks passed`);

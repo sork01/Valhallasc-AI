@@ -70,6 +70,34 @@
     "sell": 70
   },
   {
+    "id": "rime_shell",
+    "name": "Rime Shell",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 80
+  },
+  {
+    "id": "frost_pelt",
+    "name": "Frost Pelt",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 95
+  },
+  {
+    "id": "yeti_horn",
+    "name": "Yeti Horn",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 115
+  },
+  {
+    "id": "wyrm_scale",
+    "name": "Wyrm Scale",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 140
+  },
+  {
     "id": "warrior_armor_crimson",
     "name": "Crimson Armor",
     "kind": "armor",

@@ -235,6 +235,10 @@ impl Slime {
             "spider" => (420., 42., 3., 1.2),
             "wraith" => (520., 52., 2.6, 1.15),
             "golem" => (1100., 64., 1.9, 1.5),
+            "crab" => (900., 60., 2.8, 1.1),
+            "wolf" => (1000., 72., 3.6, 1.2),
+            "yeti" => (1900., 88., 2.2, 1.6),
+            "wyrm" => (2200., 100., 2.8, 1.5),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -249,6 +253,10 @@ impl Slime {
             "spider" => 7,
             "wraith" => 8,
             "golem" => 10,
+            "crab" => 10,
+            "wolf" => 12,
+            "yeti" => 13,
+            "wyrm" => 15,
             _ => 2,
         }
     }
@@ -261,6 +269,10 @@ impl Slime {
             "spider" => 26,
             "wraith" => 36,
             "golem" => 55,
+            "crab" => 60,
+            "wolf" => 78,
+            "yeti" => 105,
+            "wyrm" => 150,
             _ => 0,
         }
     }
@@ -273,6 +285,10 @@ impl Slime {
             "spider" => (0.4, 1.1, 8., 7.5),
             "wraith" => (0.5, 1.2, 7.5, 8.),
             "golem" => (0.6, 1.5, 6., 6.5),
+            "crab" => (0.4, 1., 8., 7.),
+            "wolf" => (0.3, 0.9, 9.5, 9.),
+            "yeti" => (0.7, 1.6, 6.5, 7.),
+            "wyrm" => (0.5, 1.2, 8.5, 8.5),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -2514,6 +2530,621 @@ mod tests {
         assert!(!w.maps[1].in_city(w.slimes[id].point()));
     }
 
+    // ---- Rimeveil Glacier (zone 2, levels 10-15) ----
+    const GLACIER_CENTER: Point = Point { x: 64., y: 52. };
+    const GLACIER_RINGS: [f64; 4] = [48., 37., 26., 15.];
+
+    fn free_for_player(map: &Map, p: Point) -> bool {
+        let mut q = p;
+        map.collide(&mut q, PLAYER_RADIUS);
+        q.distance(p) < 1e-6
+    }
+
+    // Breadth-first walk over free ground, half a unit per step; the steps it takes to reach every free cell.
+    fn walk_steps(map: &Map, start: Point) -> std::collections::HashMap<(i32, i32), u32> {
+        let cell = |p: Point| ((p.x / 0.5) as i32, (p.y / 0.5) as i32);
+        let centre = |c: (i32, i32)| Point {
+            x: (c.0 as f64 + 0.5) * 0.5,
+            y: (c.1 as f64 + 0.5) * 0.5,
+        };
+        let limit = (map.size as f64 / 0.5) as i32;
+        let mut seen = std::collections::HashMap::new();
+        let mut queue = std::collections::VecDeque::new();
+        seen.insert(cell(start), 0);
+        queue.push_back(cell(start));
+        while let Some(c) = queue.pop_front() {
+            let d = seen[&c];
+            for (dx, dy) in [(1, 0), (-1, 0), (0, 1), (0, -1)] {
+                let n = (c.0 + dx, c.1 + dy);
+                if n.0 < 0 || n.1 < 0 || n.0 >= limit || n.1 >= limit || seen.contains_key(&n) {
+                    continue;
+                }
+                if free_for_player(map, centre(n)) {
+                    seen.insert(n, d + 1);
+                    queue.push_back(n);
+                }
+            }
+        }
+        seen
+    }
+
+    #[test]
+    fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
+        let w = world();
+        assert_eq!(w.maps.len(), 3);
+        let map = &w.maps[2];
+        assert_eq!(map.name, "Rimeveil Glacier");
+        assert_eq!(map.levels, Some([10, 15]));
+        assert_eq!(map.size, 128);
+        let mut counts = std::collections::BTreeMap::new();
+        for s in w.slimes.iter().filter(|s| s.zone == 2) {
+            *counts.entry(s.kind.as_str()).or_insert(0) += 1;
+            assert!(
+                (10..=15).contains(&Slime::default_level(&s.kind)),
+                "{} default level",
+                s.kind
+            );
+        }
+        assert_eq!(
+            counts,
+            std::collections::BTreeMap::from([("crab", 9), ("wolf", 8), ("wyrm", 4), ("yeti", 6)])
+        );
+        // Enemy ids of the older zones are unchanged: the new zone's enemies come last.
+        let first = w.slimes.iter().position(|s| s.zone == 2).unwrap();
+        assert!(w.slimes[..first].iter().all(|s| s.zone < 2) && first == 47);
+        // Each kind keeps to its own ring: crabs on the outer shelf, wyrms in the summit bowl.
+        let band = |kind: &str| {
+            let radii: Vec<f64> = w
+                .slimes
+                .iter()
+                .filter(|s| s.zone == 2 && s.kind == kind)
+                .map(|s| s.point().distance(GLACIER_CENTER))
+                .collect();
+            (
+                radii.iter().cloned().fold(f64::MAX, f64::min),
+                radii.iter().cloned().fold(0., f64::max),
+            )
+        };
+        let (lo, hi) = band("crab");
+        assert!(
+            lo > GLACIER_RINGS[1] && hi < GLACIER_RINGS[0],
+            "crabs {lo}-{hi}"
+        );
+        let (lo, hi) = band("wolf");
+        assert!(
+            lo > GLACIER_RINGS[2] && hi < GLACIER_RINGS[1],
+            "wolves {lo}-{hi}"
+        );
+        let (lo, hi) = band("yeti");
+        assert!(
+            lo > GLACIER_RINGS[3] && hi < GLACIER_RINGS[2],
+            "yetis {lo}-{hi}"
+        );
+        let (_, hi) = band("wyrm");
+        assert!(hi < GLACIER_RINGS[3], "wyrms stay in the bowl: {hi}");
+        // The Crags gate to the glacier and the way back.
+        let up = w.maps[1]
+            .portals
+            .iter()
+            .find(|p| p.id == "rimeveil_gate")
+            .expect("the Crags have a north gate");
+        assert_eq!(up.to, 2);
+        assert_eq!(
+            w.maps[1].portals[0].id, "meadow_gate",
+            "the meadow gate stays first"
+        );
+        let back = &map.portals[0];
+        assert_eq!((back.id.as_str(), back.to), ("crags_gate", 1));
+        assert_eq!((back.tx, back.ty), (up.x + 0., up.y + 4.5));
+    }
+
+    #[test]
+    fn rimeveil_walls_form_a_spiral_with_one_gap_per_ring_and_every_actor_can_be_reached() {
+        let w = world();
+        let map = &w.maps[2];
+        // One gap in each ring, on the south, north, south and north side in turn.
+        for (k, radius) in GLACIER_RINGS.iter().enumerate() {
+            let open: Vec<f64> = (0..720)
+                .map(|i| i as f64 * 0.5 - 180.)
+                .filter(|deg| {
+                    let a = deg.to_radians();
+                    free_for_player(
+                        map,
+                        Point {
+                            x: GLACIER_CENTER.x + radius * a.cos(),
+                            y: GLACIER_CENTER.y + radius * a.sin(),
+                        },
+                    )
+                })
+                .collect();
+            assert!(!open.is_empty(), "ring {k} is sealed");
+            let want = if k % 2 == 0 { 90. } else { -90. };
+            // Open angles are one run round `want` (no wrap-around because the gaps sit at +-90).
+            // A gap is about 6 units wide, so it spans fewer degrees on the big rings than on the small ones.
+            let tolerance = (5.0_f64 / radius).asin().to_degrees();
+            assert!(
+                open.iter().all(|d| (d - want).abs() < tolerance),
+                "ring {k} has more than one opening: {:?}",
+                (open.first(), open.last())
+            );
+        }
+        // Everything stands on ground a player can reach from the arrival point.
+        let start = Point {
+            x: map.spawn.x,
+            y: map.spawn.y,
+        };
+        let steps = walk_steps(map, start);
+        let reach = |p: Point| {
+            steps
+                .get(&((p.x / 0.5) as i32, (p.y / 0.5) as i32))
+                .copied()
+        };
+        for s in w.slimes.iter().filter(|s| s.zone == 2) {
+            assert!(
+                reach(s.point()).is_some(),
+                "{} at {},{} is walled off",
+                s.kind,
+                s.x,
+                s.y
+            );
+        }
+        for n in &map.npcs {
+            assert!(
+                reach(Point { x: n.x, y: n.y }).is_some(),
+                "{} is walled off",
+                n.id
+            );
+        }
+        let gate = &map.portals[0];
+        assert!(
+            reach(Point {
+                x: gate.x,
+                y: gate.y - 2.
+            })
+            .is_some()
+        );
+        // The summit is the end of the spiral: the walk is far longer than the straight line.
+        let walk = reach(GLACIER_CENTER).expect("the summit is reachable") as f64 * 0.5;
+        let straight = start.distance(GLACIER_CENTER);
+        assert!(
+            walk > 3.5 * straight && walk < 700.,
+            "walk {walk} units against a straight line of {straight}"
+        );
+        // Every gap is a real choke point: the path to the summit passes through all four.
+        assert!(
+            reach(Point { x: 64., y: 100. }).is_some()
+                && reach(Point { x: 64., y: 15. }).is_some()
+                && reach(Point { x: 64., y: 78. }).is_some()
+                && reach(Point { x: 64., y: 37. }).is_some()
+        );
+    }
+
+    #[test]
+    fn rimeveil_monsters_have_their_own_stats_levels_rewards_and_materials() {
+        for (kind, level, hp, damage, windup, gold, material_id) in [
+            ("crab", 10, 900., 60., 0.4, 60, "rime_shell"),
+            ("wolf", 12, 1000., 72., 0.3, 78, "frost_pelt"),
+            ("yeti", 13, 1900., 88., 0.7, 105, "yeti_horn"),
+            ("wyrm", 15, 2200., 100., 0.5, 150, "wyrm_scale"),
+        ] {
+            assert_eq!(Slime::default_level(kind), level);
+            assert_ne!(
+                Slime::stats(kind),
+                Slime::stats("green"),
+                "{kind} has stats"
+            );
+            assert_eq!(Slime::attack_profile(kind).0, windup);
+            assert_eq!(crate::items::material(kind), material_id);
+            let spawn = || SlimeSpawn {
+                kind: kind.into(),
+                x: 64.,
+                y: 60.,
+                zone: 2,
+            };
+            // Default level: the table values; two levels up: +24% health and damage, +20% gold, XP by level.
+            let base = Slime::with_level(0, &spawn(), level);
+            assert_eq!((base.max_hp, base.damage, base.gold), (hp, damage, gold));
+            assert_eq!(base.xp, enemy_xp(level));
+            let up = Slime::with_level(0, &spawn(), level + 2);
+            assert_eq!(up.max_hp, (hp * 1.24_f64).round());
+            assert_eq!(up.damage, (damage * 1.24_f64).round());
+            assert_eq!(up.gold, (gold as f64 * 1.2).round() as u32);
+            assert_eq!(up.xp, enemy_xp(level + 2));
+        }
+    }
+
+    #[test]
+    fn a_kill_in_rimeveil_pays_its_rolled_level_and_drops_its_material_in_that_zone() {
+        for (kind, material_id) in [
+            ("crab", "rime_shell"),
+            ("wolf", "frost_pelt"),
+            ("yeti", "yeti_horn"),
+            ("wyrm", "wyrm_scale"),
+        ] {
+            let mut w = world();
+            let _rx = join(&mut w, 1, Class::Warrior);
+            w.players.get_mut(&1).unwrap().character.zone = 2;
+            let id = w
+                .slimes
+                .iter()
+                .position(|s| s.zone == 2 && s.kind == kind)
+                .unwrap();
+            let level = Slime::default_level(kind) + 1;
+            w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), level);
+            let (xp, gold) = (w.slimes[id].xp, w.slimes[id].gold);
+            w.hit_slime(id, 1, 1_000_000., false);
+            let c = &w.players[&1].character;
+            let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
+            assert_eq!(paid, xp, "{kind} xp");
+            assert_eq!(
+                w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
+                gold
+            );
+            assert!(
+                w.drops
+                    .iter()
+                    .any(|d| d.item.as_deref() == Some(material_id)),
+                "{kind} material"
+            );
+            assert!(w.drops.iter().all(|d| d.zone == 2));
+        }
+    }
+
+    #[test]
+    fn rimeward_camp_has_five_npcs_and_thirteen_valid_quests_levelled_ten_to_fifteen() {
+        let w = world();
+        let map = &w.maps[2];
+        assert_eq!(
+            map.city.as_ref().map(|c| (c.x0, c.x1, c.y0, c.y1)),
+            Some((52., 76., 108., 121.))
+        );
+        assert_eq!(map.npcs.len(), 5);
+        assert_eq!(map.quests.len(), 13);
+        assert!(
+            map.quests.len() >= 10,
+            "a questhub needs at least ten quests"
+        );
+        assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 2);
+        let mut roots = 0;
+        for q in &map.quests {
+            assert!(q.id.starts_with("rime_") && q.npc.starts_with("rime_"));
+            assert!((10..=15).contains(&q.level), "{} level {}", q.id, q.level);
+            assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
+            assert!(q.reward_gold >= 200);
+            roots += q.requires.is_none() as usize;
+            if let Some(id) = &q.requires {
+                let prereq = map
+                    .quests
+                    .iter()
+                    .find(|p| &p.id == id)
+                    .expect("prerequisite is in the camp");
+                assert!(prereq.level <= q.level, "{} unlocks upward", q.id);
+            }
+            for o in &q.objectives {
+                match o.kind.as_str() {
+                    "talk" => assert!(map.npcs.iter().any(|n| n.id == o.target)),
+                    "kill" => {
+                        assert!(o.target == "any" || map.slimes.iter().any(|s| s.kind == o.target))
+                    }
+                    other => panic!("objective {other}"),
+                }
+            }
+        }
+        assert_eq!(roots, 1, "one introduction unlocks everything");
+        // Every kind has at least one hunt, the last one needs all four, and the levels climb.
+        for kind in ["crab", "wolf", "yeti", "wyrm"] {
+            assert!(
+                map.quests
+                    .iter()
+                    .any(|q| q.objectives.iter().any(|o| o.target == kind)),
+                "no {kind} hunt"
+            );
+        }
+        let vanguard = map.quests.iter().find(|q| q.id == "rime_vanguard").unwrap();
+        assert_eq!(vanguard.objectives.len(), 4);
+        // The hub itself: NPCs on free ground inside the sanctuary, no enemy within eight units.
+        for npc in &map.npcs {
+            let point = Point { x: npc.x, y: npc.y };
+            assert!(
+                free_for_player(map, point),
+                "{} stands on free ground",
+                npc.id
+            );
+            assert!(map.in_city(point));
+            assert!(
+                w.slimes
+                    .iter()
+                    .filter(|s| s.zone == 2)
+                    .all(|s| s.point().distance(point) > 8.)
+            );
+        }
+        assert!(
+            map.in_city(map.spawn),
+            "the arrival point is inside the sanctuary"
+        );
+    }
+
+    #[test]
+    fn the_rimeward_tour_checks_giver_zone_prerequisites_and_pays_each_reward_once() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap();
+        // Out of zone the giver is not reachable.
+        w.interact(1, "rime_warden", Some("quest:accept:rime_welcome"));
+        assert!(w.players[&1].character.quests.is_empty());
+        w.players.get_mut(&1).unwrap().character.zone = 2;
+        quest_interact(&mut w, "rime_tracker", Some("quest:accept:rime_crabs"));
+        quest_interact(&mut w, "rime_trader", Some("quest:accept:rime_welcome"));
+        assert!(
+            w.players[&1].character.quests.is_empty(),
+            "locked or wrong giver"
+        );
+        quest_interact(&mut w, "rime_warden", Some("quest:accept:rime_welcome"));
+        for npc in [
+            "rime_tracker",
+            "rime_healer",
+            "rime_trader",
+            "rime_loremaster",
+        ] {
+            quest_interact(&mut w, npc, None);
+        }
+        assert_eq!(w.players[&1].character.quests[0].counts, vec![1, 1, 1, 1]);
+        quest_interact(&mut w, "rime_warden", Some("quest:claim:rime_welcome"));
+        let (xp, gold) = (xp_to_level(10) / 10, 200);
+        let c = &w.players[&1].character;
+        assert_eq!(c.gold, gold);
+        let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
+        assert_eq!(paid, xp);
+        assert_eq!(
+            w.store.load(token).unwrap().unwrap().quests[0].completions,
+            1
+        );
+        quest_interact(&mut w, "rime_warden", Some("quest:claim:rime_welcome"));
+        assert_eq!(w.players[&1].character.gold, gold, "no duplicate reward");
+        quest_interact(&mut w, "rime_tracker", Some("quest:accept:rime_crabs"));
+        assert_eq!(w.players[&1].character.quests[1].counts, vec![0]);
+    }
+
+    #[test]
+    fn rimeveil_kills_credit_only_rimeveil_quests_and_the_killer() {
+        let mut w = world();
+        let _r1 = join(&mut w, 1, Class::Warrior);
+        let _r2 = join(&mut w, 2, Class::Mage);
+        for id in [1, 2] {
+            w.players.get_mut(&id).unwrap().character.zone = 2;
+        }
+        quest_interact(&mut w, "rime_warden", Some("quest:accept:rime_welcome"));
+        w.players.get_mut(&1).unwrap().character.quests[0].completions = 1;
+        quest_interact(&mut w, "rime_tracker", Some("quest:accept:rime_crabs"));
+        quest_interact(&mut w, "rime_trader", Some("quest:accept:rime_bounty"));
+        let kill = |w: &mut World, zone: usize, kind: &str| {
+            let i = w
+                .slimes
+                .iter()
+                .position(|s| s.zone == zone && s.kind == kind)
+                .unwrap();
+            w.hit_slime(i, 1, 1_000_000., false);
+        };
+        kill(&mut w, 2, "crab");
+        let counts = |w: &World| {
+            w.players[&1]
+                .character
+                .quests
+                .iter()
+                .map(|q| (q.id.clone(), q.counts.clone()))
+                .collect::<Vec<_>>()
+        };
+        let find = |w: &World, id: &str| counts(w).into_iter().find(|(q, _)| q == id).unwrap().1;
+        assert_eq!(find(&w, "rime_crabs"), vec![1]);
+        assert_eq!(find(&w, "rime_bounty"), vec![1]);
+        assert!(
+            w.players[&2].character.quests.is_empty(),
+            "only the killer is credited"
+        );
+        kill(&mut w, 2, "wolf");
+        assert_eq!(find(&w, "rime_crabs"), vec![1], "kind-specific");
+        assert_eq!(find(&w, "rime_bounty"), vec![2]);
+        // A Crags kill counts for nothing here, and a glacier kill nothing for the Crags.
+        kill(&mut w, 1, "golem");
+        assert_eq!(
+            find(&w, "rime_bounty"),
+            vec![2],
+            "Crags enemies do not count"
+        );
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        quest_interact(&mut w, "crags_captain", Some("quest:accept:crags_welcome"));
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .quests
+            .last_mut()
+            .unwrap()
+            .completions = 1;
+        quest_interact(&mut w, "crags_supplier", Some("quest:accept:crags_bounty"));
+        let before = find(&w, "crags_bounty");
+        kill(&mut w, 2, "yeti");
+        assert_eq!(
+            find(&w, "crags_bounty"),
+            before,
+            "glacier enemies do not count for the Crags"
+        );
+    }
+
+    #[test]
+    fn the_crags_north_gate_leads_to_rimeveil_saves_the_zone_and_the_way_back_works() {
+        let mut w = world();
+        let (tx, mut rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        let up = w.maps[1]
+            .portals
+            .iter()
+            .find(|p| p.id == "rimeveil_gate")
+            .unwrap()
+            .clone();
+        let back = w.maps[2].portals[0].clone();
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.zone = 1;
+            c.x = up.x;
+            c.y = up.y + 4.;
+        }
+        w.message(
+            1,
+            ClientMessage::Move {
+                x: up.x,
+                y: up.y - 1.,
+            },
+        );
+        for _ in 0..200 {
+            w.time += TICK;
+            w.update_player(1);
+            if w.players[&1].character.zone == 2 {
+                break;
+            }
+        }
+        let c = &w.players[&1].character;
+        assert_eq!(c.zone, 2);
+        assert!(c.point().distance(Point { x: up.tx, y: up.ty }) < 1e-6);
+        assert_eq!(
+            w.store.load(&token).unwrap().unwrap().zone,
+            2,
+            "the zone saves at once"
+        );
+        assert_eq!(w.snapshot_for(2)["players"][0]["zone"], 2);
+        assert!(w.snapshot_for(1)["players"].as_array().unwrap().is_empty());
+        let mut texts = vec![];
+        while let Ok(v) = rx.try_recv() {
+            if v["type"] == "system" {
+                texts.push(v["text"].as_str().unwrap().to_owned());
+            }
+        }
+        assert!(
+            texts
+                .iter()
+                .any(|t| t.contains("Rimeveil Glacier") && t.contains("10–15")),
+            "{texts:?}"
+        );
+        // No instant bounce on the arrival point; then the way back lands at the Crags' north gate.
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.x = back.x;
+            c.y = back.y;
+        }
+        w.update_player(1);
+        assert_eq!(w.players[&1].character.zone, 2);
+        w.time += PORTAL_DELAY + 0.1;
+        w.update_player(1);
+        assert_eq!(w.players[&1].character.zone, 1);
+        assert!(
+            w.players[&1].character.point().distance(Point {
+                x: back.tx,
+                y: back.ty
+            }) < 1e-6
+        );
+        // A dead player cannot cross, and dying in Rimeveil respawns at Rimeward Camp.
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.zone = 2;
+            p.character.x = 10.;
+            p.character.y = 10.;
+            p.character.hp = 0.;
+            p.dead_time = 3.3;
+        }
+        w.update_player(1);
+        let c = &w.players[&1].character;
+        assert_eq!(c.zone, 2);
+        assert_eq!(c.hp, c.max_hp());
+        assert!(c.point().distance(w.maps[2].spawn) < 1.);
+    }
+
+    #[test]
+    fn rimeveil_is_isolated_from_the_other_zones_and_its_camp_is_a_sanctuary() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let _rx2 = join(&mut w, 2, Class::Mage);
+        w.players.get_mut(&1).unwrap().character.zone = 2;
+        w.players.get_mut(&2).unwrap().character.zone = 1;
+        let snapshot = w.snapshot();
+        assert_eq!(snapshot["zones"].as_array().unwrap().len(), 3);
+        for (zone, count) in [(0, 21), (1, 26), (2, 27)] {
+            let view = w.snapshot_for(zone);
+            assert_eq!(
+                view["slimes"].as_array().unwrap().len(),
+                count,
+                "zone {zone} enemies"
+            );
+            assert!(
+                view["slimes"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .all(|s| s["zone"] == zone)
+            );
+        }
+        // A Crags player cannot target or provoke a glacier enemy standing at the same coordinates.
+        let crab = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == 2 && s.kind == "crab")
+            .unwrap();
+        let spot = w.slimes[crab].point();
+        {
+            let c = &mut w.players.get_mut(&2).unwrap().character;
+            c.x = spot.x;
+            c.y = spot.y + 1.;
+        }
+        w.message(2, ClientMessage::Target { id: crab });
+        assert_ne!(w.players[&2].target, Some(crab));
+        w.slimes[crab].atk_cd = 0.;
+        w.update_slime(crab);
+        assert_eq!(w.slimes[crab].state, "idle", "no chase across zones");
+        // The camp heals, blocks damage and makes a pursuing enemy let go.
+        w.players.get_mut(&1).unwrap().character.hp = 10.;
+        quest_interact(&mut w, "rime_healer", Some("blessing"));
+        let c = &w.players[&1].character;
+        assert_eq!(c.hp, c.max_hp());
+        w.hurt_player(1, 1000., Point::default());
+        assert_eq!(
+            w.players[&1].character.hp,
+            w.players[&1].character.max_hp(),
+            "camp blocks enemy damage"
+        );
+        w.slimes[crab].x = 64.;
+        w.slimes[crab].y = 107.;
+        w.slimes[crab].target = Some(1);
+        w.slimes[crab].state = "chase".into();
+        w.update_slime(crab);
+        assert!(w.slimes[crab].target.is_none(), "camp drops chase targets");
+        assert!(!w.maps[2].in_city(w.slimes[crab].point()));
+    }
+
+    #[test]
+    fn rimeveil_enemies_reroll_a_fresh_level_on_respawn() {
+        let mut w = World::new(Store::open(std::path::Path::new(":memory:")).unwrap());
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let id = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == 2 && s.kind == "wolf")
+            .unwrap();
+        let mut seen = std::collections::BTreeSet::new();
+        for _ in 0..80 {
+            w.slimes[id].dead = true;
+            w.slimes[id].respawn = TICK;
+            w.update_slime(id);
+            assert!(!w.slimes[id].dead);
+            let level = w.slimes[id].level;
+            assert!((10..=14).contains(&level));
+            let expected = (1000. * (1. + 0.12 * (level as f64 - 12.))).round();
+            assert_eq!((w.slimes[id].max_hp, w.slimes[id].hp), (expected, expected));
+            seen.insert(level);
+        }
+        assert!(seen.len() >= 4, "levels barely vary: {seen:?}");
+    }
+
     #[test]
     fn sales_check_vendor_range_life_quantity_cooldown_and_save_immediately() {
         let mut w = world();
@@ -3375,7 +4006,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(w.maps.len(), 2);
+        assert_eq!(w.maps.len(), 3);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));

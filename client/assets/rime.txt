@@ -1,0 +1,54 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "crab",
+    "wolf",
+    "yeti",
+    "wyrm"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 6,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 12,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 8,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "crab": "5896e2afc6153db4",
+    "wolf": "9743bd64bd1aeba6",
+    "yeti": "d5f25e1b4791a39f",
+    "wyrm": "ed0a6d52316af108"
+  }
+}
