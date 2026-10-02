@@ -57,6 +57,30 @@
       "png": "assassin_armor_moon.png",
       "depth": "assassin_armor_moon_depth.png"
     },
+    "shoulders_shadow": {
+      "png": "assassin_shoulders_shadow.png",
+      "depth": "assassin_shoulders_shadow_depth.png"
+    },
+    "shoulders_moon": {
+      "png": "assassin_shoulders_moon.png",
+      "depth": "assassin_shoulders_moon_depth.png"
+    },
+    "gloves_shadow": {
+      "png": "assassin_gloves_shadow.png",
+      "depth": "assassin_gloves_shadow_depth.png"
+    },
+    "gloves_moon": {
+      "png": "assassin_gloves_moon.png",
+      "depth": "assassin_gloves_moon_depth.png"
+    },
+    "head_shadow": {
+      "png": "assassin_head_shadow.png",
+      "depth": "assassin_head_shadow_depth.png"
+    },
+    "head_moon": {
+      "png": "assassin_head_moon.png",
+      "depth": "assassin_head_moon_depth.png"
+    },
     "weapon_daggers": {
       "png": "assassin_weapon_daggers.png",
       "depth": "assassin_weapon_daggers_depth.png"
@@ -70,83 +94,162 @@
     "armor": {
       "none": {
         "name": "Simple cloth",
-        "part": null,
         "defense": 0
       },
       "shadow": {
         "name": "Nightweave",
-        "part": "armor_shadow",
         "defense": 2
       },
       "moon": {
         "name": "Moonveil",
-        "part": "armor_moon",
         "defense": 4
+      }
+    },
+    "shoulders": {
+      "none": {
+        "name": "Bare shoulders",
+        "defense": 0
+      },
+      "shadow": {
+        "name": "Nightweave Spaulders",
+        "defense": 1
+      },
+      "moon": {
+        "name": "Moonveil Crescents",
+        "defense": 2
+      }
+    },
+    "gloves": {
+      "none": {
+        "name": "Bare hands",
+        "defense": 0
+      },
+      "shadow": {
+        "name": "Nightweave Claws",
+        "defense": 1
+      },
+      "moon": {
+        "name": "Moonveil Gauntlets",
+        "defense": 2
+      }
+    },
+    "head": {
+      "none": {
+        "name": "Bare head",
+        "defense": 0
+      },
+      "shadow": {
+        "name": "Shadow Brow Band",
+        "defense": 1
+      },
+      "moon": {
+        "name": "Moonveil Circlet",
+        "defense": 2
       }
     },
     "weapon": {
       "none": {
         "name": "Empty hands",
-        "part": null,
         "attack": 0
       },
       "daggers": {
         "name": "Twin daggers",
-        "part": "weapon_daggers",
         "attack": 4
       },
       "moonfang": {
         "name": "Moonfang blades",
-        "part": "weapon_moonfang",
         "attack": 8
       }
     }
   },
   "defaultEquipment": {
     "armor": "shadow",
+    "shoulders": "none",
+    "gloves": "none",
+    "head": "none",
     "weapon": "daggers"
   },
   "sprites": {
-    "assassin_die_se": "a9bebcc61c7a05e1",
-    "assassin_die_e": "a951273a69f82ea6",
-    "assassin_die_ne": "c982347834968cba",
-    "assassin_die_n": "a60d332a838250b8",
-    "assassin_die_nw": "00e3935bcb6c0e36",
-    "assassin_die_w": "9933c8bdfd580f61",
-    "assassin_die_sw": "ae5cea633df413a1",
-    "assassin_die_s": "a434357aaaa762e8",
-    "assassin_hurt_se": "b645d81dfbc2164d",
-    "assassin_hurt_e": "60c1c7780782a772",
-    "assassin_hurt_ne": "507852084fdea7a5",
-    "assassin_hurt_n": "19a6072f474cd009",
-    "assassin_hurt_nw": "5dcec464e1d84ada",
-    "assassin_hurt_w": "f62c593108b0619c",
-    "assassin_hurt_sw": "4d4a70650f121da1",
-    "assassin_hurt_s": "7c02e314589e6e2c",
-    "assassin_attack_se": "27b2192fab719096",
-    "assassin_attack_e": "c8ec84f7558aeb23",
-    "assassin_attack_ne": "b3ebc7f240207981",
-    "assassin_attack_n": "e434d588da54b3b5",
-    "assassin_attack_nw": "1b135d3b54984934",
-    "assassin_attack_w": "84e78787916b92cf",
-    "assassin_attack_sw": "cdfd373f9a34d354",
-    "assassin_attack_s": "257bb3677bb48349",
-    "assassin_walk_se": "771ef12676c62c25",
-    "assassin_walk_e": "3f804ff9f22aff3c",
-    "assassin_walk_ne": "6821b3cdf05034bf",
-    "assassin_walk_n": "d6a761b4b6ef660a",
-    "assassin_walk_nw": "49b2af2ebb3f0155",
-    "assassin_walk_w": "de7759ff37e25b25",
-    "assassin_walk_sw": "1cb3e2fbd1290e3a",
-    "assassin_walk_s": "eb53b2c159b245e2",
-    "assassin_idle_se": "568863a17b3e35f5",
-    "assassin_idle_e": "88344e6062bd438b",
-    "assassin_idle_ne": "29f53af9a93dcb68",
-    "assassin_idle_n": "29baad3bca140422",
-    "assassin_idle_nw": "9a5e3d21a7bdee38",
-    "assassin_idle_w": "a8a31858bdf446a9",
-    "assassin_idle_sw": "62ca0e36261d79b9",
-    "assassin_idle_s": "803a74a60197ffb1"
+    "assassin_cel_idle_s_shadow": "48e603ddd2780c3c",
+    "assassin_cel_idle_s_moon": "93787bf96a02de1e",
+    "assassin_cel_idle_sw_shadow": "28534fd097b90c55",
+    "assassin_cel_idle_sw_moon": "ccd527b8b1101aad",
+    "assassin_cel_idle_w_shadow": "bb4291e4c13ab99a",
+    "assassin_cel_idle_w_moon": "e5347c36e8cb441c",
+    "assassin_cel_idle_nw_shadow": "e84c278bf49d118d",
+    "assassin_cel_idle_nw_moon": "50c27451173a4063",
+    "assassin_cel_idle_n_shadow": "97e89865c17a7b2e",
+    "assassin_cel_idle_n_moon": "acf821c488bd1e7e",
+    "assassin_cel_idle_ne_shadow": "c1e0668c383fe5b0",
+    "assassin_cel_idle_ne_moon": "7f9357ca9650b12b",
+    "assassin_cel_idle_e_shadow": "997364fc5cddf834",
+    "assassin_cel_idle_e_moon": "265505f53536b66f",
+    "assassin_cel_idle_se_shadow": "4067b22e14bdc670",
+    "assassin_cel_idle_se_moon": "1e08f89c9dcd0e98",
+    "assassin_cel_walk_s_shadow": "1da427198f30471e",
+    "assassin_cel_walk_s_moon": "47a28525f410f0f4",
+    "assassin_cel_walk_sw_shadow": "9c01a28f63d55a09",
+    "assassin_cel_walk_sw_moon": "c024e84d6fe95df9",
+    "assassin_cel_walk_w_shadow": "d64552549e98f934",
+    "assassin_cel_walk_w_moon": "d4ade2eedb9cc7e1",
+    "assassin_cel_walk_nw_shadow": "88ccdf0fc7594e67",
+    "assassin_cel_walk_nw_moon": "b68fb6aed00bf012",
+    "assassin_cel_walk_n_shadow": "b596a3f9305f6319",
+    "assassin_cel_walk_n_moon": "5104d17941918c20",
+    "assassin_cel_walk_ne_shadow": "334c0ade0006b4c2",
+    "assassin_cel_walk_ne_moon": "b9977e6d38453315",
+    "assassin_cel_walk_e_shadow": "880002d9c0168137",
+    "assassin_cel_walk_e_moon": "3898d4f2eceed2dd",
+    "assassin_cel_walk_se_shadow": "2160e6a70a93106a",
+    "assassin_cel_walk_se_moon": "c5d84458d9ad57ef",
+    "assassin_cel_attack_s_shadow": "bb3480baba6c7ea4",
+    "assassin_cel_attack_s_moon": "837a6bd6f0e34fcd",
+    "assassin_cel_attack_sw_shadow": "6a85bfb5bbee065c",
+    "assassin_cel_attack_sw_moon": "2839879fa3200f46",
+    "assassin_cel_attack_w_shadow": "b9f58f64d924656a",
+    "assassin_cel_attack_w_moon": "4ee4b7bf640006a4",
+    "assassin_cel_attack_nw_shadow": "58551f6c2fba8366",
+    "assassin_cel_attack_nw_moon": "7ef4bce20224cafc",
+    "assassin_cel_attack_n_shadow": "ae550a2595debe54",
+    "assassin_cel_attack_n_moon": "256a3bb8ca47ec47",
+    "assassin_cel_attack_ne_shadow": "cf71a4cf0efabfcb",
+    "assassin_cel_attack_ne_moon": "dad4b4f4d870e337",
+    "assassin_cel_attack_e_shadow": "d1f94b997f739199",
+    "assassin_cel_attack_e_moon": "365341159da61c42",
+    "assassin_cel_attack_se_shadow": "c109c7a453c63282",
+    "assassin_cel_attack_se_moon": "66b77902d835bf9d",
+    "assassin_cel_hurt_s_shadow": "4caa50093091773a",
+    "assassin_cel_hurt_s_moon": "e81c832ce7ff4a27",
+    "assassin_cel_hurt_sw_shadow": "afdf07ba00dbf16a",
+    "assassin_cel_hurt_sw_moon": "656a96ff20db544a",
+    "assassin_cel_hurt_w_shadow": "7de26887556aecab",
+    "assassin_cel_hurt_w_moon": "ecbf17e6b67d3b62",
+    "assassin_cel_hurt_nw_shadow": "52eac8411e8c4a5f",
+    "assassin_cel_hurt_nw_moon": "bfd24e778dafd36c",
+    "assassin_cel_hurt_n_shadow": "2350cbd49a273a67",
+    "assassin_cel_hurt_n_moon": "cf09c0cfb212026c",
+    "assassin_cel_hurt_ne_shadow": "8834aa5f0184a93d",
+    "assassin_cel_hurt_ne_moon": "939081173cd5732d",
+    "assassin_cel_hurt_e_shadow": "287f1ba5ac26de88",
+    "assassin_cel_hurt_e_moon": "987fd51aebbdc733",
+    "assassin_cel_hurt_se_shadow": "8e6cd94ef3f3350b",
+    "assassin_cel_hurt_se_moon": "86b1ae298fda875c",
+    "assassin_cel_die_s_shadow": "cd3e7ad4ef403ec4",
+    "assassin_cel_die_s_moon": "def42944b606488a",
+    "assassin_cel_die_sw_shadow": "3fda36f9923147ae",
+    "assassin_cel_die_sw_moon": "5578308941d25ef4",
+    "assassin_cel_die_w_shadow": "baef938ec7faf271",
+    "assassin_cel_die_w_moon": "bfc5b7d9d485633b",
+    "assassin_cel_die_nw_shadow": "1054394a9d09337e",
+    "assassin_cel_die_nw_moon": "488f3a9061086eb9",
+    "assassin_cel_die_n_shadow": "4967bb4be7b83d84",
+    "assassin_cel_die_n_moon": "3b5a40b9fdeec2c3",
+    "assassin_cel_die_ne_shadow": "ab35f786d46a104a",
+    "assassin_cel_die_ne_moon": "93d7c84f47d18461",
+    "assassin_cel_die_e_shadow": "f52fe39caa36dd2c",
+    "assassin_cel_die_e_moon": "518d6b4e35712084",
+    "assassin_cel_die_se_shadow": "ecb029a379ef557d",
+    "assassin_cel_die_se_moon": "d527e7bf36ed4f1d"
   },
   "ramps": {
     "skin": [
@@ -246,13 +349,13 @@
     "scale": 64,
     "near": "smaller"
   },
-  "facing": "Same eight-direction formula and foot anchor as warrior_sprites.txt",
+  "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
+  "style": "2D Korean RPG anime cel illustration",
+  "editing": "Three PixelFlow sprites per clip and facing (assassin_cel_<clip>_<facing>_shadow|moon). ref_body layers are read-only context. build --replace discards edits.",
   "attack": {
     "duration": 0.4,
     "impact": 0.2
   },
-  "editing": "One clip/facing per PixelFlow sprite; body visible, equipment hidden. Export preserves layers. Depth follows original geometry; build --replace discards hand edits.",
-  "style": "2D Korean RPG anime cel illustration",
   "portrait": [
     57,
     15,

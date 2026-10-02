@@ -17,4 +17,4 @@ __pycache__/
 AGENTS.md
 CLAUDE.md
 
-/scripts/priest_raw/
+/scripts/*_raw/

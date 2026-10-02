@@ -1,11 +1,11 @@
 {
   "frame": [
-    256,
-    256
+    160,
+    160
   ],
   "anchor": [
-    128,
-    206
+    80,
+    119
   ],
   "dirs": [
     "S",
@@ -26,12 +26,12 @@
     "walk": {
       "row0": 8,
       "n": 8,
-      "fps": 10
+      "fps": 12
     },
     "attack": {
       "row0": 16,
       "n": 8,
-      "fps": 12
+      "fps": 20
     },
     "hurt": {
       "row0": 24,
@@ -57,6 +57,30 @@
       "png": "mage_armor_runic.png",
       "depth": "mage_armor_runic_depth.png"
     },
+    "shoulders_apprentice": {
+      "png": "mage_shoulders_apprentice.png",
+      "depth": "mage_shoulders_apprentice_depth.png"
+    },
+    "shoulders_runic": {
+      "png": "mage_shoulders_runic.png",
+      "depth": "mage_shoulders_runic_depth.png"
+    },
+    "gloves_apprentice": {
+      "png": "mage_gloves_apprentice.png",
+      "depth": "mage_gloves_apprentice_depth.png"
+    },
+    "gloves_runic": {
+      "png": "mage_gloves_runic.png",
+      "depth": "mage_gloves_runic_depth.png"
+    },
+    "head_apprentice": {
+      "png": "mage_head_apprentice.png",
+      "depth": "mage_head_apprentice_depth.png"
+    },
+    "head_runic": {
+      "png": "mage_head_runic.png",
+      "depth": "mage_head_runic_depth.png"
+    },
     "weapon_ash": {
       "png": "mage_weapon_ash.png",
       "depth": "mage_weapon_ash_depth.png"
@@ -70,208 +94,299 @@
     "armor": {
       "none": {
         "name": "Simple cloth",
-        "part": null,
         "defense": 0
       },
       "apprentice": {
         "name": "Apprentice robes",
-        "part": "armor_apprentice",
         "defense": 2
       },
       "runic": {
         "name": "Runic vestments",
-        "part": "armor_runic",
         "defense": 5
+      }
+    },
+    "shoulders": {
+      "none": {
+        "name": "Bare shoulders",
+        "defense": 0
+      },
+      "apprentice": {
+        "name": "Apprentice's Capelet",
+        "defense": 1
+      },
+      "runic": {
+        "name": "Runic Pauldrons",
+        "defense": 2
+      }
+    },
+    "gloves": {
+      "none": {
+        "name": "Bare hands",
+        "defense": 0
+      },
+      "apprentice": {
+        "name": "Apprentice's Gloves",
+        "defense": 1
+      },
+      "runic": {
+        "name": "Runic Gloves",
+        "defense": 2
+      }
+    },
+    "head": {
+      "none": {
+        "name": "Bare head",
+        "defense": 0
+      },
+      "apprentice": {
+        "name": "Apprentice's Hat",
+        "defense": 1
+      },
+      "runic": {
+        "name": "Runic Archmage Hat",
+        "defense": 2
       }
     },
     "weapon": {
       "none": {
         "name": "Empty hands",
-        "part": null,
         "attack": 0
       },
       "ash": {
         "name": "Ash staff",
-        "part": "weapon_ash",
         "attack": 4
       },
       "crystal": {
         "name": "Crystal staff",
-        "part": "weapon_crystal",
         "attack": 9
       }
     }
   },
   "defaultEquipment": {
     "armor": "apprentice",
+    "shoulders": "none",
+    "gloves": "none",
+    "head": "none",
     "weapon": "ash"
   },
   "sprites": {
-    "mage_256_idle_s_0": "c044d08c45cc4e12",
-    "mage_256_idle_s_1": "5b8c487ecc31f28e",
-    "mage_256_idle_sw_0": "4cf790f5d851909a",
-    "mage_256_idle_sw_1": "45a6e1ab72b1039b",
-    "mage_256_idle_w_0": "bc5206178cf7fa5b",
-    "mage_256_idle_w_1": "d8a298fc10f57ca0",
-    "mage_256_idle_nw_0": "069f51b0d0312389",
-    "mage_256_idle_nw_1": "7e055d65c092a72d",
-    "mage_256_idle_n_0": "a460a0f665177f85",
-    "mage_256_idle_n_1": "7d4ebe8cd15c9acf",
-    "mage_256_idle_ne_0": "830db7866381f9d5",
-    "mage_256_idle_ne_1": "ebf0029400a0932a",
-    "mage_256_idle_e_0": "84e56d1513150599",
-    "mage_256_idle_e_1": "1646b4260614bae2",
-    "mage_256_idle_se_0": "c34906664556e651",
-    "mage_256_idle_se_1": "ff6a63d83625e032",
-    "mage_256_walk_s_0": "9e4491518bedf796",
-    "mage_256_walk_s_1": "4590a2d1b0d89b64",
-    "mage_256_walk_s_2": "247c1aaf7d7e1942",
-    "mage_256_walk_sw_0": "d58c1ed3c83cdba3",
-    "mage_256_walk_sw_1": "5fc98ce144ba86bd",
-    "mage_256_walk_sw_2": "f7362589ef5f45c6",
-    "mage_256_walk_w_0": "98e748ff8d8a199a",
-    "mage_256_walk_w_1": "2e04f6bccbcec574",
-    "mage_256_walk_w_2": "4c801f4195bfa682",
-    "mage_256_walk_nw_0": "f29baa0945865cbd",
-    "mage_256_walk_nw_1": "0e3bcf9b5801d689",
-    "mage_256_walk_nw_2": "0d09402c67722db6",
-    "mage_256_walk_n_0": "cc1d20946c3a2311",
-    "mage_256_walk_n_1": "f520b8bff32feb78",
-    "mage_256_walk_n_2": "547ca6b34b3e56e5",
-    "mage_256_walk_ne_0": "a69a649312729188",
-    "mage_256_walk_ne_1": "070dbf1183c41cb4",
-    "mage_256_walk_ne_2": "1f9c10bd55d10493",
-    "mage_256_walk_e_0": "4851598aed154e62",
-    "mage_256_walk_e_1": "2591d74470d075e7",
-    "mage_256_walk_e_2": "d1bb3f5ce0d65a8f",
-    "mage_256_walk_se_0": "6d4245460c19d95e",
-    "mage_256_walk_se_1": "8cd95fa2a24de044",
-    "mage_256_walk_se_2": "673a506ec3e4b0db",
-    "mage_256_attack_s_0": "a7994eec8200b67d",
-    "mage_256_attack_s_1": "dc1749f574e098a3",
-    "mage_256_attack_s_2": "4e7d2bbe68170d25",
-    "mage_256_attack_sw_0": "a3abf3093d928979",
-    "mage_256_attack_sw_1": "c4e156eed0d2d7f2",
-    "mage_256_attack_sw_2": "3dbd63af3420cd14",
-    "mage_256_attack_w_0": "09918f3ac3679342",
-    "mage_256_attack_w_1": "e01d999f67ed0001",
-    "mage_256_attack_w_2": "87b939bcedc8749b",
-    "mage_256_attack_nw_0": "63c7ae5fc740a744",
-    "mage_256_attack_nw_1": "bd6c6622520493d3",
-    "mage_256_attack_nw_2": "8053467799515dac",
-    "mage_256_attack_n_0": "a2d38de47365ea8e",
-    "mage_256_attack_n_1": "778f8d68c8128fff",
-    "mage_256_attack_n_2": "dd0fcec538588a70",
-    "mage_256_attack_ne_0": "7c9b3b7b967bff1e",
-    "mage_256_attack_ne_1": "cb2f55ef19ad0f2d",
-    "mage_256_attack_ne_2": "a3ff9aa96477f894",
-    "mage_256_attack_e_0": "8135d50958701652",
-    "mage_256_attack_e_1": "cdbbb68f05f8f7dc",
-    "mage_256_attack_e_2": "85e71eb85817e8d8",
-    "mage_256_attack_se_0": "ef4d1a9acc236534",
-    "mage_256_attack_se_1": "3837601393e4e46a",
-    "mage_256_attack_se_2": "758d6be12d9b97ff",
-    "mage_256_hurt_s": "18c0892cc8a0e3f6",
-    "mage_256_hurt_sw": "9d7927196927ff3c",
-    "mage_256_hurt_w": "09c9a6d2b75354b6",
-    "mage_256_hurt_nw": "00e52f76b231a1db",
-    "mage_256_hurt_n": "426bf13a43b78719",
-    "mage_256_hurt_ne": "0bbdb561cb29eb52",
-    "mage_256_hurt_e": "8fad3608739c8a13",
-    "mage_256_hurt_se": "85a35bdb9bde64c2",
-    "mage_256_hurt_crystal_a": "76eafd3d7564ed2b",
-    "mage_256_hurt_crystal_b": "e09adf3c6e9fca1e",
-    "mage_256_die_s_0": "220aab05ab24852c",
-    "mage_256_die_s_1": "ea9a99bc494d61a6",
-    "mage_256_die_s_2": "07c6d6dd55cd9f82",
-    "mage_256_die_sw_0": "ad6f8168122faeed",
-    "mage_256_die_sw_1": "cc9da5ba107b1044",
-    "mage_256_die_sw_2": "9332bcd26b980fa6",
-    "mage_256_die_w_0": "c76ef17daf42ddc9",
-    "mage_256_die_w_1": "0c2bd7da2a82a303",
-    "mage_256_die_w_2": "b85335345e993f90",
-    "mage_256_die_nw_0": "f24c50cf00e97040",
-    "mage_256_die_nw_1": "a78a21cb39db68e9",
-    "mage_256_die_nw_2": "e05ec622c26965f6",
-    "mage_256_die_n_0": "db4489bdf29cc8e8",
-    "mage_256_die_n_1": "c397ffb5855b4d1e",
-    "mage_256_die_n_2": "533d65f76249f987",
-    "mage_256_die_ne_0": "beddc8caefc8af67",
-    "mage_256_die_ne_1": "d21a48e4342d1d00",
-    "mage_256_die_ne_2": "22c41295d999560e",
-    "mage_256_die_e_0": "46a00aacca47c595",
-    "mage_256_die_e_1": "9f494db39acae197",
-    "mage_256_die_e_2": "beaf785f09d0551b",
-    "mage_256_die_se_0": "7786e3ef6109d579",
-    "mage_256_die_se_1": "f4603d0a75bbcbcc",
-    "mage_256_die_se_2": "4797775d33b63826"
+    "mage_cel_idle_s_apprentice": "136d51d0f17cb0f9",
+    "mage_cel_idle_s_runic": "61f5a1225f734b0f",
+    "mage_cel_idle_s_arms": "e4067b3b675bc47f",
+    "mage_cel_idle_sw_apprentice": "c0dbe2c93d88c3be",
+    "mage_cel_idle_sw_runic": "e0fc30ce473ca9a7",
+    "mage_cel_idle_sw_arms": "c6cc40cf53024172",
+    "mage_cel_idle_w_apprentice": "3c44a0ed29a78932",
+    "mage_cel_idle_w_runic": "6b23189f6565fa0d",
+    "mage_cel_idle_w_arms": "064c6d6e325d4e4a",
+    "mage_cel_idle_nw_apprentice": "5b032b1eed5e43f4",
+    "mage_cel_idle_nw_runic": "0aca947bfe1ed327",
+    "mage_cel_idle_nw_arms": "f96c9b36a4518de9",
+    "mage_cel_idle_n_apprentice": "5f5906a975d43475",
+    "mage_cel_idle_n_runic": "225c21cd18165fb5",
+    "mage_cel_idle_n_arms": "c531ce93e64aecf5",
+    "mage_cel_idle_ne_apprentice": "779d3ce7651aef00",
+    "mage_cel_idle_ne_runic": "28c2d80b9d567c58",
+    "mage_cel_idle_ne_arms": "f9dd5e275ea77a7b",
+    "mage_cel_idle_e_apprentice": "6a0b4d1907b8546e",
+    "mage_cel_idle_e_runic": "e01ed9fcc4276472",
+    "mage_cel_idle_e_arms": "6d91179383050773",
+    "mage_cel_idle_se_apprentice": "dd4f0dedd928a388",
+    "mage_cel_idle_se_runic": "654bff0233205cc7",
+    "mage_cel_idle_se_arms": "16d3a471477d05e7",
+    "mage_cel_walk_s_apprentice": "d21d0c7fb47c54f8",
+    "mage_cel_walk_s_runic": "70ccb10aa712276a",
+    "mage_cel_walk_s_arms": "cbefca74dcd157af",
+    "mage_cel_walk_sw_apprentice": "d546400affc92105",
+    "mage_cel_walk_sw_runic": "0f11a74122383eed",
+    "mage_cel_walk_sw_arms": "19c47e1b0ff65615",
+    "mage_cel_walk_w_apprentice": "ab28d527eb63be20",
+    "mage_cel_walk_w_runic": "a52ac621fb719e8f",
+    "mage_cel_walk_w_arms": "c0eccca9ec636547",
+    "mage_cel_walk_nw_apprentice": "4b6ef88ab98d7d07",
+    "mage_cel_walk_nw_runic": "d3722bce2bafd1da",
+    "mage_cel_walk_nw_arms": "0ad033bb891f65c9",
+    "mage_cel_walk_n_apprentice": "982615dbeff023eb",
+    "mage_cel_walk_n_runic": "72739f4dcc1dfebf",
+    "mage_cel_walk_n_arms": "4061ad949c406793",
+    "mage_cel_walk_ne_apprentice": "de43e5fc4c3903eb",
+    "mage_cel_walk_ne_runic": "b22b153bde3b0e78",
+    "mage_cel_walk_ne_arms": "7e67a6155c2f064a",
+    "mage_cel_walk_e_apprentice": "9f7ab93322b7c0b2",
+    "mage_cel_walk_e_runic": "bd56970f79f2ec25",
+    "mage_cel_walk_e_arms": "90f9faf07edb5743",
+    "mage_cel_walk_se_apprentice": "57c10932bb2fdcd4",
+    "mage_cel_walk_se_runic": "2a418f99d63d177b",
+    "mage_cel_walk_se_arms": "c8b1b0569a8f3667",
+    "mage_cel_attack_s_apprentice": "c74ed415b212acb3",
+    "mage_cel_attack_s_runic": "3cf162e5154f0c1c",
+    "mage_cel_attack_s_arms": "5499c05d40b00fda",
+    "mage_cel_attack_sw_apprentice": "c044ec2408bfb8cc",
+    "mage_cel_attack_sw_runic": "3489fd7ce21823e9",
+    "mage_cel_attack_sw_arms": "f94a6026445b87aa",
+    "mage_cel_attack_w_apprentice": "7b48ea5e7f6c1caa",
+    "mage_cel_attack_w_runic": "1c52e46bfe9e0dcf",
+    "mage_cel_attack_w_arms": "81ee1a1ec5e6de5d",
+    "mage_cel_attack_nw_apprentice": "d0fd7be095b88a2e",
+    "mage_cel_attack_nw_runic": "d8c3d16b10476deb",
+    "mage_cel_attack_nw_arms": "c547aa5a05b20c12",
+    "mage_cel_attack_n_apprentice": "d70238fb02ac6bcb",
+    "mage_cel_attack_n_runic": "eae9a484cc1102d8",
+    "mage_cel_attack_n_arms": "f223799a92c722af",
+    "mage_cel_attack_ne_apprentice": "6ec74c58e8075292",
+    "mage_cel_attack_ne_runic": "9ef0a2deb38be19e",
+    "mage_cel_attack_ne_arms": "aa9e2b78b2f9d8ec",
+    "mage_cel_attack_e_apprentice": "d36a70d3192fe740",
+    "mage_cel_attack_e_runic": "191aaca018b32b90",
+    "mage_cel_attack_e_arms": "30281b6f16e3bc51",
+    "mage_cel_attack_se_apprentice": "c4be1d81d9ff7204",
+    "mage_cel_attack_se_runic": "5de241d275488f89",
+    "mage_cel_attack_se_arms": "204ab849808546b7",
+    "mage_cel_hurt_s_apprentice": "bc3adddbf0cd9d4a",
+    "mage_cel_hurt_s_runic": "73a650de7e87f80e",
+    "mage_cel_hurt_s_arms": "a4d43e7c621914fd",
+    "mage_cel_hurt_sw_apprentice": "609d2393032cd924",
+    "mage_cel_hurt_sw_runic": "a91e002adc47e587",
+    "mage_cel_hurt_sw_arms": "113d8eeea091f7dc",
+    "mage_cel_hurt_w_apprentice": "701b00f35fcba303",
+    "mage_cel_hurt_w_runic": "21b2c26d2be4da6b",
+    "mage_cel_hurt_w_arms": "86fe27a8518b04c0",
+    "mage_cel_hurt_nw_apprentice": "fcf142d69a83a65e",
+    "mage_cel_hurt_nw_runic": "83c4cd488e53a426",
+    "mage_cel_hurt_nw_arms": "10c9854410de9328",
+    "mage_cel_hurt_n_apprentice": "c0a49e20c59d019c",
+    "mage_cel_hurt_n_runic": "d46da498145eac45",
+    "mage_cel_hurt_n_arms": "a9421a64a32d83d6",
+    "mage_cel_hurt_ne_apprentice": "dd1aec3195123007",
+    "mage_cel_hurt_ne_runic": "ed76b17ab4cdc0f3",
+    "mage_cel_hurt_ne_arms": "d23d21c1902b01b2",
+    "mage_cel_hurt_e_apprentice": "66e94550db3906cf",
+    "mage_cel_hurt_e_runic": "6e238baaccc47144",
+    "mage_cel_hurt_e_arms": "67dc97c861eeb032",
+    "mage_cel_hurt_se_apprentice": "b593b5117db27ea9",
+    "mage_cel_hurt_se_runic": "6c9d74305dfd6bf8",
+    "mage_cel_hurt_se_arms": "b558a66b9650afe5",
+    "mage_cel_die_s_apprentice": "2d1ad80fa89fe9cc",
+    "mage_cel_die_s_runic": "a0fdca6599ef7ff6",
+    "mage_cel_die_s_arms": "9efe6072227197e6",
+    "mage_cel_die_sw_apprentice": "a8e56906917902fc",
+    "mage_cel_die_sw_runic": "ff81ba829b3e1c76",
+    "mage_cel_die_sw_arms": "5875c4ef4d1c7079",
+    "mage_cel_die_w_apprentice": "752711abbe2a7daf",
+    "mage_cel_die_w_runic": "ceff5d8653ae1bd1",
+    "mage_cel_die_w_arms": "4ce09c890fb5d3b5",
+    "mage_cel_die_nw_apprentice": "a33c1fd1c827e1ec",
+    "mage_cel_die_nw_runic": "c18248e5b7cebfc3",
+    "mage_cel_die_nw_arms": "ae3752520c3abd65",
+    "mage_cel_die_n_apprentice": "f3543fac7b146d0c",
+    "mage_cel_die_n_runic": "807da5ffcbf8c80f",
+    "mage_cel_die_n_arms": "183dcc104f1da131",
+    "mage_cel_die_ne_apprentice": "b262b4d97a7c068d",
+    "mage_cel_die_ne_runic": "4934e3db0ec6a228",
+    "mage_cel_die_ne_arms": "2f9711abe0ba3fab",
+    "mage_cel_die_e_apprentice": "01547301b4643103",
+    "mage_cel_die_e_runic": "650b489e83e5ade1",
+    "mage_cel_die_e_arms": "4e8eb0fa36742679",
+    "mage_cel_die_se_apprentice": "1371a68098445afa",
+    "mage_cel_die_se_runic": "25fcff7b80cc9c6c",
+    "mage_cel_die_se_arms": "4fdcd13e7f9bea32"
   },
   "ramps": {
-    "hair": [
-      "#362044",
-      "#69417d",
-      "#ac78c4",
-      "#935dac",
-      "#bc8dd2",
-      "#cba0df",
-      "#d8b1e9",
-      "#e4c5f0"
+    "skin": [
+      "#92595c",
+      "#ce9182",
+      "#f0bfac",
+      "#ffe0ce"
     ],
     "brow": [
-      "#382039",
-      "#5d303f",
-      "#825052",
-      "#a86661"
+      "#1d1218",
+      "#2e1c1e",
+      "#40282a",
+      "#553836"
     ],
-    "skin": [
-      "#b46569",
-      "#e49888",
-      "#ffceb0",
-      "#f6b399",
-      "#ffe0c2",
-      "#fff0d6"
+    "white": [
+      "#a6b6b0",
+      "#d4e0da",
+      "#f2f7f2",
+      "#fffcf6"
     ],
-    "violet": [
-      "#382344",
-      "#694679",
-      "#9470a5",
-      "#c8a4db"
+    "mouth": [
+      "#5c2d45",
+      "#86506a",
+      "#c88493",
+      "#e9a4ab"
     ],
-    "teal": [
-      "#183d47",
-      "#326a77",
-      "#58a4af",
-      "#a0dbd6"
+    "hair": [
+      "#4a2a68",
+      "#7a52a0",
+      "#ac78c4",
+      "#dcb4ec"
+    ],
+    "cloth": [
+      "#3a3860",
+      "#605e90",
+      "#9a98c8",
+      "#d4d2f0"
+    ],
+    "pants": [
+      "#1c2038",
+      "#30365a",
+      "#4e5a86",
+      "#7a88b4"
+    ],
+    "azure": [
+      "#1c3a78",
+      "#2e62b8",
+      "#5a9af0",
+      "#a8d0ff"
+    ],
+    "indigo": [
+      "#241848",
+      "#44307e",
+      "#6e52b8",
+      "#a88cf0"
     ],
     "gold": [
-      "#654020",
-      "#b08442",
-      "#e8c175",
-      "#ffe9b2"
+      "#6e4a12",
+      "#b0801f",
+      "#e8b840",
+      "#fff0a0"
+    ],
+    "ivory": [
+      "#9a8a7a",
+      "#c9bca8",
+      "#f0e6d0",
+      "#fffcf0"
+    ],
+    "umber": [
+      "#2a1a16",
+      "#47291f",
+      "#6e4331",
+      "#9a6a4c"
     ],
     "wood": [
-      "#352126",
-      "#684135",
-      "#aa7050",
-      "#d7a67c"
+      "#3a2218",
+      "#6b4128",
+      "#a8703f",
+      "#dca66a"
     ],
     "silver": [
-      "#324153",
-      "#647e95",
-      "#a7c2d8",
-      "#e0eff8"
-    ],
-    "amber": [
-      "#944329",
-      "#d78537",
-      "#ffd478",
-      "#fff4c5"
+      "#35485e",
+      "#6e87a3",
+      "#b4c9de",
+      "#f0f6ff"
     ],
     "rune": [
-      "#4367a0",
-      "#6ca7dd",
-      "#a6e5f2",
-      "#f1fcff"
+      "#2a40a0",
+      "#4a8af0",
+      "#90d8ff",
+      "#f0ffff"
+    ],
+    "iris": [
+      "#2a2a78",
+      "#4a4ad0",
+      "#8aa0ff",
+      "#e0ecff"
     ]
   },
   "depth": {
@@ -280,2467 +395,17 @@
     "scale": 64,
     "near": "smaller"
   },
-  "facing": "S SW W NW N NE E SE; west views mirror the painted east views",
+  "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
+  "style": "2D Korean RPG anime cel illustration",
+  "editing": "Three PixelFlow sprites per clip and facing (mage_cel_<clip>_<facing>_apprentice|runic|arms). ref_body layers are read-only context. build --replace discards edits.",
   "attack": {
     "duration": 0.56,
     "impact": 0.28
   },
-  "editorFrameChunks": {
-    "idle": [
-      {
-        "nameSuffix": "_0",
-        "first": 0,
-        "count": 3
-      },
-      {
-        "nameSuffix": "_1",
-        "first": 3,
-        "count": 3
-      }
-    ],
-    "walk": [
-      {
-        "nameSuffix": "_0",
-        "first": 0,
-        "count": 3
-      },
-      {
-        "nameSuffix": "_1",
-        "first": 3,
-        "count": 3
-      },
-      {
-        "nameSuffix": "_2",
-        "first": 6,
-        "count": 2
-      }
-    ],
-    "attack": [
-      {
-        "nameSuffix": "_0",
-        "first": 0,
-        "count": 3
-      },
-      {
-        "nameSuffix": "_1",
-        "first": 3,
-        "count": 3
-      },
-      {
-        "nameSuffix": "_2",
-        "first": 6,
-        "count": 2
-      }
-    ],
-    "die": [
-      {
-        "nameSuffix": "_0",
-        "first": 0,
-        "count": 3
-      },
-      {
-        "nameSuffix": "_1",
-        "first": 3,
-        "count": 3
-      },
-      {
-        "nameSuffix": "_2",
-        "first": 6,
-        "count": 2
-      }
-    ]
-  },
-  "editorLayout": {
-    "mage_256_idle_s_0": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 0
-        },
-        {
-          "facing": "S",
-          "frame": 1
-        },
-        {
-          "facing": "S",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_idle_s_1": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 3
-        },
-        {
-          "facing": "S",
-          "frame": 4
-        },
-        {
-          "facing": "S",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_idle_sw_0": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SW",
-          "frame": 0
-        },
-        {
-          "facing": "SW",
-          "frame": 1
-        },
-        {
-          "facing": "SW",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_idle_sw_1": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SW",
-          "frame": 3
-        },
-        {
-          "facing": "SW",
-          "frame": 4
-        },
-        {
-          "facing": "SW",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_idle_w_0": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "W",
-          "frame": 0
-        },
-        {
-          "facing": "W",
-          "frame": 1
-        },
-        {
-          "facing": "W",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_idle_w_1": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "W",
-          "frame": 3
-        },
-        {
-          "facing": "W",
-          "frame": 4
-        },
-        {
-          "facing": "W",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_idle_nw_0": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NW",
-          "frame": 0
-        },
-        {
-          "facing": "NW",
-          "frame": 1
-        },
-        {
-          "facing": "NW",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_idle_nw_1": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NW",
-          "frame": 3
-        },
-        {
-          "facing": "NW",
-          "frame": 4
-        },
-        {
-          "facing": "NW",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_idle_n_0": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 0
-        },
-        {
-          "facing": "N",
-          "frame": 1
-        },
-        {
-          "facing": "N",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_idle_n_1": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 3
-        },
-        {
-          "facing": "N",
-          "frame": 4
-        },
-        {
-          "facing": "N",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_idle_ne_0": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NE",
-          "frame": 0
-        },
-        {
-          "facing": "NE",
-          "frame": 1
-        },
-        {
-          "facing": "NE",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_idle_ne_1": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NE",
-          "frame": 3
-        },
-        {
-          "facing": "NE",
-          "frame": 4
-        },
-        {
-          "facing": "NE",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_idle_e_0": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "E",
-          "frame": 0
-        },
-        {
-          "facing": "E",
-          "frame": 1
-        },
-        {
-          "facing": "E",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_idle_e_1": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "E",
-          "frame": 3
-        },
-        {
-          "facing": "E",
-          "frame": 4
-        },
-        {
-          "facing": "E",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_idle_se_0": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SE",
-          "frame": 0
-        },
-        {
-          "facing": "SE",
-          "frame": 1
-        },
-        {
-          "facing": "SE",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_idle_se_1": {
-      "clip": "idle",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SE",
-          "frame": 3
-        },
-        {
-          "facing": "SE",
-          "frame": 4
-        },
-        {
-          "facing": "SE",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_walk_s_0": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 0
-        },
-        {
-          "facing": "S",
-          "frame": 1
-        },
-        {
-          "facing": "S",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_walk_s_1": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 3
-        },
-        {
-          "facing": "S",
-          "frame": 4
-        },
-        {
-          "facing": "S",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_walk_s_2": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 6
-        },
-        {
-          "facing": "S",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_walk_sw_0": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SW",
-          "frame": 0
-        },
-        {
-          "facing": "SW",
-          "frame": 1
-        },
-        {
-          "facing": "SW",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_walk_sw_1": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SW",
-          "frame": 3
-        },
-        {
-          "facing": "SW",
-          "frame": 4
-        },
-        {
-          "facing": "SW",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_walk_sw_2": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SW",
-          "frame": 6
-        },
-        {
-          "facing": "SW",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_walk_w_0": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "W",
-          "frame": 0
-        },
-        {
-          "facing": "W",
-          "frame": 1
-        },
-        {
-          "facing": "W",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_walk_w_1": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "W",
-          "frame": 3
-        },
-        {
-          "facing": "W",
-          "frame": 4
-        },
-        {
-          "facing": "W",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_walk_w_2": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "W",
-          "frame": 6
-        },
-        {
-          "facing": "W",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_walk_nw_0": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NW",
-          "frame": 0
-        },
-        {
-          "facing": "NW",
-          "frame": 1
-        },
-        {
-          "facing": "NW",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_walk_nw_1": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NW",
-          "frame": 3
-        },
-        {
-          "facing": "NW",
-          "frame": 4
-        },
-        {
-          "facing": "NW",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_walk_nw_2": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NW",
-          "frame": 6
-        },
-        {
-          "facing": "NW",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_walk_n_0": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 0
-        },
-        {
-          "facing": "N",
-          "frame": 1
-        },
-        {
-          "facing": "N",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_walk_n_1": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 3
-        },
-        {
-          "facing": "N",
-          "frame": 4
-        },
-        {
-          "facing": "N",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_walk_n_2": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 6
-        },
-        {
-          "facing": "N",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_walk_ne_0": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NE",
-          "frame": 0
-        },
-        {
-          "facing": "NE",
-          "frame": 1
-        },
-        {
-          "facing": "NE",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_walk_ne_1": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NE",
-          "frame": 3
-        },
-        {
-          "facing": "NE",
-          "frame": 4
-        },
-        {
-          "facing": "NE",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_walk_ne_2": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NE",
-          "frame": 6
-        },
-        {
-          "facing": "NE",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_walk_e_0": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "E",
-          "frame": 0
-        },
-        {
-          "facing": "E",
-          "frame": 1
-        },
-        {
-          "facing": "E",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_walk_e_1": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "E",
-          "frame": 3
-        },
-        {
-          "facing": "E",
-          "frame": 4
-        },
-        {
-          "facing": "E",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_walk_e_2": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "E",
-          "frame": 6
-        },
-        {
-          "facing": "E",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_walk_se_0": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SE",
-          "frame": 0
-        },
-        {
-          "facing": "SE",
-          "frame": 1
-        },
-        {
-          "facing": "SE",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_walk_se_1": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SE",
-          "frame": 3
-        },
-        {
-          "facing": "SE",
-          "frame": 4
-        },
-        {
-          "facing": "SE",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_walk_se_2": {
-      "clip": "walk",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SE",
-          "frame": 6
-        },
-        {
-          "facing": "SE",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_attack_s_0": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 0
-        },
-        {
-          "facing": "S",
-          "frame": 1
-        },
-        {
-          "facing": "S",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_attack_s_1": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 3
-        },
-        {
-          "facing": "S",
-          "frame": 4
-        },
-        {
-          "facing": "S",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_attack_s_2": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 6
-        },
-        {
-          "facing": "S",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_attack_sw_0": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SW",
-          "frame": 0
-        },
-        {
-          "facing": "SW",
-          "frame": 1
-        },
-        {
-          "facing": "SW",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_attack_sw_1": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SW",
-          "frame": 3
-        },
-        {
-          "facing": "SW",
-          "frame": 4
-        },
-        {
-          "facing": "SW",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_attack_sw_2": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SW",
-          "frame": 6
-        },
-        {
-          "facing": "SW",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_attack_w_0": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "W",
-          "frame": 0
-        },
-        {
-          "facing": "W",
-          "frame": 1
-        },
-        {
-          "facing": "W",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_attack_w_1": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "W",
-          "frame": 3
-        },
-        {
-          "facing": "W",
-          "frame": 4
-        },
-        {
-          "facing": "W",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_attack_w_2": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "W",
-          "frame": 6
-        },
-        {
-          "facing": "W",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_attack_nw_0": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NW",
-          "frame": 0
-        },
-        {
-          "facing": "NW",
-          "frame": 1
-        },
-        {
-          "facing": "NW",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_attack_nw_1": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NW",
-          "frame": 3
-        },
-        {
-          "facing": "NW",
-          "frame": 4
-        },
-        {
-          "facing": "NW",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_attack_nw_2": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NW",
-          "frame": 6
-        },
-        {
-          "facing": "NW",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_attack_n_0": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 0
-        },
-        {
-          "facing": "N",
-          "frame": 1
-        },
-        {
-          "facing": "N",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_attack_n_1": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 3
-        },
-        {
-          "facing": "N",
-          "frame": 4
-        },
-        {
-          "facing": "N",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_attack_n_2": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 6
-        },
-        {
-          "facing": "N",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_attack_ne_0": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NE",
-          "frame": 0
-        },
-        {
-          "facing": "NE",
-          "frame": 1
-        },
-        {
-          "facing": "NE",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_attack_ne_1": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NE",
-          "frame": 3
-        },
-        {
-          "facing": "NE",
-          "frame": 4
-        },
-        {
-          "facing": "NE",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_attack_ne_2": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NE",
-          "frame": 6
-        },
-        {
-          "facing": "NE",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_attack_e_0": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "E",
-          "frame": 0
-        },
-        {
-          "facing": "E",
-          "frame": 1
-        },
-        {
-          "facing": "E",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_attack_e_1": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "E",
-          "frame": 3
-        },
-        {
-          "facing": "E",
-          "frame": 4
-        },
-        {
-          "facing": "E",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_attack_e_2": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "E",
-          "frame": 6
-        },
-        {
-          "facing": "E",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_attack_se_0": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SE",
-          "frame": 0
-        },
-        {
-          "facing": "SE",
-          "frame": 1
-        },
-        {
-          "facing": "SE",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_attack_se_1": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SE",
-          "frame": 3
-        },
-        {
-          "facing": "SE",
-          "frame": 4
-        },
-        {
-          "facing": "SE",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_attack_se_2": {
-      "clip": "attack",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SE",
-          "frame": 6
-        },
-        {
-          "facing": "SE",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_hurt_s": {
-      "clip": "hurt",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 0
-        },
-        {
-          "facing": "S",
-          "frame": 1
-        },
-        {
-          "facing": "S",
-          "frame": 2
-        },
-        {
-          "facing": "S",
-          "frame": 3
-        }
-      ]
-    },
-    "mage_256_hurt_sw": {
-      "clip": "hurt",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash"
-      ],
-      "frames": [
-        {
-          "facing": "SW",
-          "frame": 0
-        },
-        {
-          "facing": "SW",
-          "frame": 1
-        },
-        {
-          "facing": "SW",
-          "frame": 2
-        },
-        {
-          "facing": "SW",
-          "frame": 3
-        }
-      ]
-    },
-    "mage_256_hurt_w": {
-      "clip": "hurt",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash"
-      ],
-      "frames": [
-        {
-          "facing": "W",
-          "frame": 0
-        },
-        {
-          "facing": "W",
-          "frame": 1
-        },
-        {
-          "facing": "W",
-          "frame": 2
-        },
-        {
-          "facing": "W",
-          "frame": 3
-        }
-      ]
-    },
-    "mage_256_hurt_nw": {
-      "clip": "hurt",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash"
-      ],
-      "frames": [
-        {
-          "facing": "NW",
-          "frame": 0
-        },
-        {
-          "facing": "NW",
-          "frame": 1
-        },
-        {
-          "facing": "NW",
-          "frame": 2
-        },
-        {
-          "facing": "NW",
-          "frame": 3
-        }
-      ]
-    },
-    "mage_256_hurt_n": {
-      "clip": "hurt",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 0
-        },
-        {
-          "facing": "N",
-          "frame": 1
-        },
-        {
-          "facing": "N",
-          "frame": 2
-        },
-        {
-          "facing": "N",
-          "frame": 3
-        }
-      ]
-    },
-    "mage_256_hurt_ne": {
-      "clip": "hurt",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash"
-      ],
-      "frames": [
-        {
-          "facing": "NE",
-          "frame": 0
-        },
-        {
-          "facing": "NE",
-          "frame": 1
-        },
-        {
-          "facing": "NE",
-          "frame": 2
-        },
-        {
-          "facing": "NE",
-          "frame": 3
-        }
-      ]
-    },
-    "mage_256_hurt_e": {
-      "clip": "hurt",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash"
-      ],
-      "frames": [
-        {
-          "facing": "E",
-          "frame": 0
-        },
-        {
-          "facing": "E",
-          "frame": 1
-        },
-        {
-          "facing": "E",
-          "frame": 2
-        },
-        {
-          "facing": "E",
-          "frame": 3
-        }
-      ]
-    },
-    "mage_256_hurt_se": {
-      "clip": "hurt",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash"
-      ],
-      "frames": [
-        {
-          "facing": "SE",
-          "frame": 0
-        },
-        {
-          "facing": "SE",
-          "frame": 1
-        },
-        {
-          "facing": "SE",
-          "frame": 2
-        },
-        {
-          "facing": "SE",
-          "frame": 3
-        }
-      ]
-    },
-    "mage_256_hurt_crystal_a": {
-      "clip": "hurt",
-      "parts": [
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 0
-        },
-        {
-          "facing": "S",
-          "frame": 1
-        },
-        {
-          "facing": "S",
-          "frame": 2
-        },
-        {
-          "facing": "S",
-          "frame": 3
-        },
-        {
-          "facing": "SW",
-          "frame": 0
-        },
-        {
-          "facing": "SW",
-          "frame": 1
-        },
-        {
-          "facing": "SW",
-          "frame": 2
-        },
-        {
-          "facing": "SW",
-          "frame": 3
-        },
-        {
-          "facing": "W",
-          "frame": 0
-        },
-        {
-          "facing": "W",
-          "frame": 1
-        },
-        {
-          "facing": "W",
-          "frame": 2
-        },
-        {
-          "facing": "W",
-          "frame": 3
-        },
-        {
-          "facing": "NW",
-          "frame": 0
-        },
-        {
-          "facing": "NW",
-          "frame": 1
-        },
-        {
-          "facing": "NW",
-          "frame": 2
-        },
-        {
-          "facing": "NW",
-          "frame": 3
-        }
-      ]
-    },
-    "mage_256_hurt_crystal_b": {
-      "clip": "hurt",
-      "parts": [
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 0
-        },
-        {
-          "facing": "N",
-          "frame": 1
-        },
-        {
-          "facing": "N",
-          "frame": 2
-        },
-        {
-          "facing": "N",
-          "frame": 3
-        },
-        {
-          "facing": "NE",
-          "frame": 0
-        },
-        {
-          "facing": "NE",
-          "frame": 1
-        },
-        {
-          "facing": "NE",
-          "frame": 2
-        },
-        {
-          "facing": "NE",
-          "frame": 3
-        },
-        {
-          "facing": "E",
-          "frame": 0
-        },
-        {
-          "facing": "E",
-          "frame": 1
-        },
-        {
-          "facing": "E",
-          "frame": 2
-        },
-        {
-          "facing": "E",
-          "frame": 3
-        },
-        {
-          "facing": "SE",
-          "frame": 0
-        },
-        {
-          "facing": "SE",
-          "frame": 1
-        },
-        {
-          "facing": "SE",
-          "frame": 2
-        },
-        {
-          "facing": "SE",
-          "frame": 3
-        }
-      ]
-    },
-    "mage_256_die_s_0": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 0
-        },
-        {
-          "facing": "S",
-          "frame": 1
-        },
-        {
-          "facing": "S",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_die_s_1": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 3
-        },
-        {
-          "facing": "S",
-          "frame": 4
-        },
-        {
-          "facing": "S",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_die_s_2": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "S",
-          "frame": 6
-        },
-        {
-          "facing": "S",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_die_sw_0": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SW",
-          "frame": 0
-        },
-        {
-          "facing": "SW",
-          "frame": 1
-        },
-        {
-          "facing": "SW",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_die_sw_1": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SW",
-          "frame": 3
-        },
-        {
-          "facing": "SW",
-          "frame": 4
-        },
-        {
-          "facing": "SW",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_die_sw_2": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SW",
-          "frame": 6
-        },
-        {
-          "facing": "SW",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_die_w_0": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "W",
-          "frame": 0
-        },
-        {
-          "facing": "W",
-          "frame": 1
-        },
-        {
-          "facing": "W",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_die_w_1": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "W",
-          "frame": 3
-        },
-        {
-          "facing": "W",
-          "frame": 4
-        },
-        {
-          "facing": "W",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_die_w_2": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "W",
-          "frame": 6
-        },
-        {
-          "facing": "W",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_die_nw_0": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NW",
-          "frame": 0
-        },
-        {
-          "facing": "NW",
-          "frame": 1
-        },
-        {
-          "facing": "NW",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_die_nw_1": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NW",
-          "frame": 3
-        },
-        {
-          "facing": "NW",
-          "frame": 4
-        },
-        {
-          "facing": "NW",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_die_nw_2": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NW",
-          "frame": 6
-        },
-        {
-          "facing": "NW",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_die_n_0": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 0
-        },
-        {
-          "facing": "N",
-          "frame": 1
-        },
-        {
-          "facing": "N",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_die_n_1": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 3
-        },
-        {
-          "facing": "N",
-          "frame": 4
-        },
-        {
-          "facing": "N",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_die_n_2": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "N",
-          "frame": 6
-        },
-        {
-          "facing": "N",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_die_ne_0": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NE",
-          "frame": 0
-        },
-        {
-          "facing": "NE",
-          "frame": 1
-        },
-        {
-          "facing": "NE",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_die_ne_1": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NE",
-          "frame": 3
-        },
-        {
-          "facing": "NE",
-          "frame": 4
-        },
-        {
-          "facing": "NE",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_die_ne_2": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "NE",
-          "frame": 6
-        },
-        {
-          "facing": "NE",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_die_e_0": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "E",
-          "frame": 0
-        },
-        {
-          "facing": "E",
-          "frame": 1
-        },
-        {
-          "facing": "E",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_die_e_1": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "E",
-          "frame": 3
-        },
-        {
-          "facing": "E",
-          "frame": 4
-        },
-        {
-          "facing": "E",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_die_e_2": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "E",
-          "frame": 6
-        },
-        {
-          "facing": "E",
-          "frame": 7
-        }
-      ]
-    },
-    "mage_256_die_se_0": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SE",
-          "frame": 0
-        },
-        {
-          "facing": "SE",
-          "frame": 1
-        },
-        {
-          "facing": "SE",
-          "frame": 2
-        }
-      ]
-    },
-    "mage_256_die_se_1": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SE",
-          "frame": 3
-        },
-        {
-          "facing": "SE",
-          "frame": 4
-        },
-        {
-          "facing": "SE",
-          "frame": 5
-        }
-      ]
-    },
-    "mage_256_die_se_2": {
-      "clip": "die",
-      "parts": [
-        "body",
-        "armor_apprentice",
-        "armor_runic",
-        "weapon_ash",
-        "weapon_crystal"
-      ],
-      "frames": [
-        {
-          "facing": "SE",
-          "frame": 6
-        },
-        {
-          "facing": "SE",
-          "frame": 7
-        }
-      ]
-    }
-  },
-  "editing": "Each clip/facing is split into consecutive frame groups to fit PixelFlow; body visible, equipment hidden. Export preserves layers and original depths. Build --replace discards edits only for the current editor prefix.",
-  "displayScale": 0.625,
   "portrait": [
-    95,
-    51,
-    68,
-    68
-  ],
-  "style": "Reference-painted lavender-haired Korean chibi Mage; articulated pixel art",
-  "reference": "tools/mage_reference.jpg",
-  "turnaround": "tools/mage_turnaround.png",
-  "animation": "Supplied front artwork; generated matching side/rear views; derived articulated idle/walk/cast/hurt/death",
-  "editorPrefix": "mage_256",
-  "legacyEditorArchive": "tools/mage_legacy_editor.txt.gz",
-  "legacyEditorSprites": "The 40 old Mage editor entries were archived, including edits, and replaced to fit the 200-sprite account quota"
+    57,
+    15,
+    46,
+    46
+  ]
 }

@@ -31,12 +31,12 @@
     "attack": {
       "row0": 16,
       "n": 8,
-      "fps": 19
+      "fps": 20
     },
     "hurt": {
       "row0": 24,
       "n": 4,
-      "fps": 16
+      "fps": 10
     },
     "die": {
       "row0": 32,
@@ -57,6 +57,30 @@
       "png": "warrior_layered_armor_azure.png",
       "depth": "warrior_layered_armor_azure_depth.png"
     },
+    "shoulders_crimson": {
+      "png": "warrior_layered_shoulders_crimson.png",
+      "depth": "warrior_layered_shoulders_crimson_depth.png"
+    },
+    "shoulders_azure": {
+      "png": "warrior_layered_shoulders_azure.png",
+      "depth": "warrior_layered_shoulders_azure_depth.png"
+    },
+    "gloves_crimson": {
+      "png": "warrior_layered_gloves_crimson.png",
+      "depth": "warrior_layered_gloves_crimson_depth.png"
+    },
+    "gloves_azure": {
+      "png": "warrior_layered_gloves_azure.png",
+      "depth": "warrior_layered_gloves_azure_depth.png"
+    },
+    "head_crimson": {
+      "png": "warrior_layered_head_crimson.png",
+      "depth": "warrior_layered_head_crimson_depth.png"
+    },
+    "head_azure": {
+      "png": "warrior_layered_head_azure.png",
+      "depth": "warrior_layered_head_azure_depth.png"
+    },
     "weapon_sword": {
       "png": "warrior_layered_weapon_sword.png",
       "depth": "warrior_layered_weapon_sword_depth.png"
@@ -70,102 +94,299 @@
     "armor": {
       "none": {
         "name": "Simple cloth",
-        "part": null,
         "defense": 0
       },
       "crimson": {
         "name": "Crimson guard",
-        "part": "armor_crimson",
         "defense": 3
       },
       "azure": {
         "name": "Azure guard",
-        "part": "armor_azure",
         "defense": 5
+      }
+    },
+    "shoulders": {
+      "none": {
+        "name": "Bare shoulders",
+        "defense": 0
+      },
+      "crimson": {
+        "name": "Crimson Pauldrons",
+        "defense": 2
+      },
+      "azure": {
+        "name": "Azure Winged Pauldrons",
+        "defense": 3
+      }
+    },
+    "gloves": {
+      "none": {
+        "name": "Bare hands",
+        "defense": 0
+      },
+      "crimson": {
+        "name": "Crimson Gauntlets",
+        "defense": 1
+      },
+      "azure": {
+        "name": "Azure Gauntlets",
+        "defense": 2
+      }
+    },
+    "head": {
+      "none": {
+        "name": "Bare head",
+        "defense": 0
+      },
+      "crimson": {
+        "name": "Crimson Plumed Helm",
+        "defense": 2
+      },
+      "azure": {
+        "name": "Azure Winged Helm",
+        "defense": 3
       }
     },
     "weapon": {
       "none": {
         "name": "Empty hands",
-        "part": null,
         "attack": 0
       },
       "sword": {
         "name": "Sword & shield",
-        "part": "weapon_sword",
         "attack": 4
       },
       "royal": {
         "name": "Royal sword & shield",
-        "part": "weapon_royal",
         "attack": 8
       }
     }
   },
   "defaultEquipment": {
     "armor": "crimson",
+    "shoulders": "none",
+    "gloves": "none",
+    "head": "none",
     "weapon": "sword"
   },
   "sprites": {
-    "warrior_layered_die_se": "c66ae399fc56482d",
-    "warrior_layered_die_e": "e5f62d9197a3c80e",
-    "warrior_layered_die_ne": "9aa0c6cb0af6608c",
-    "warrior_layered_die_n": "bcfb699e6de0c908",
-    "warrior_layered_die_nw": "235cde3ae66c1861",
-    "warrior_layered_die_w": "7ad2d15721cc8c93",
-    "warrior_layered_die_sw": "5f0e599f1eb2d589",
-    "warrior_layered_die_s": "628bba9e52ed1c4d",
-    "warrior_layered_hurt_se": "cfa4fc1ab1384e41",
-    "warrior_layered_hurt_e": "0b3defc2e1715e01",
-    "warrior_layered_hurt_ne": "569d1b9dcb438165",
-    "warrior_layered_hurt_n": "1c4e78925f655338",
-    "warrior_layered_hurt_nw": "e64a98e24d6a18ca",
-    "warrior_layered_hurt_w": "cd890c540abf0af1",
-    "warrior_layered_hurt_sw": "a086e4f4a621b4a8",
-    "warrior_layered_hurt_s": "fc4fad997e0085cd",
-    "warrior_layered_attack_se": "6cbe83d5e21a308e",
-    "warrior_layered_attack_e": "5c54f8a8c87573a0",
-    "warrior_layered_attack_ne": "9ea53e4a53d169ff",
-    "warrior_layered_attack_n": "1dd433e2eeeceb07",
-    "warrior_layered_attack_nw": "8058cb883756977d",
-    "warrior_layered_attack_w": "85b41200fd7acf24",
-    "warrior_layered_attack_sw": "cb27b5b0148cc326",
-    "warrior_layered_attack_s": "a932fccd635d3c14",
-    "warrior_layered_walk_se": "9843b1535caac5ba",
-    "warrior_layered_walk_e": "e23747e3b0f92b1a",
-    "warrior_layered_walk_ne": "f46140d0e31cdf58",
-    "warrior_layered_walk_n": "cb65e565d75f27f3",
-    "warrior_layered_walk_nw": "3b3efb14de495fe8",
-    "warrior_layered_walk_w": "57511db65cd51fc7",
-    "warrior_layered_walk_sw": "85d40325fba0a689",
-    "warrior_layered_walk_s": "1d421741a5ba8f36",
-    "warrior_layered_idle_se": "360ad28167d6b7e5",
-    "warrior_layered_idle_e": "b9e8f6b4f4cd3700",
-    "warrior_layered_idle_ne": "a32e1d6deda5fcb8",
-    "warrior_layered_idle_n": "62e1194697a0155b",
-    "warrior_layered_idle_nw": "da3f2919bd56e27c",
-    "warrior_layered_idle_w": "0119e818cb7cffc3",
-    "warrior_layered_idle_sw": "3d8606795d32211d",
-    "warrior_layered_idle_s": "33ac514a3ca500b0"
+    "warrior_cel_idle_s_crimson": "712363e00237b458",
+    "warrior_cel_idle_s_azure": "aa3807154a81616a",
+    "warrior_cel_idle_s_arms": "987c00297b5827c8",
+    "warrior_cel_idle_sw_crimson": "5437485825e5d6d3",
+    "warrior_cel_idle_sw_azure": "d96ee5fd03c71a13",
+    "warrior_cel_idle_sw_arms": "dfbe788662056de9",
+    "warrior_cel_idle_w_crimson": "ad3c1bb2a57ba1ab",
+    "warrior_cel_idle_w_azure": "023f6d518c55eab9",
+    "warrior_cel_idle_w_arms": "b03ed04fe10e2a51",
+    "warrior_cel_idle_nw_crimson": "81eec2a67fddced2",
+    "warrior_cel_idle_nw_azure": "bac7417e9eb74365",
+    "warrior_cel_idle_nw_arms": "fe67f50cb899873b",
+    "warrior_cel_idle_n_crimson": "405ea8616588a9e1",
+    "warrior_cel_idle_n_azure": "f71e6fe2bf46aa0c",
+    "warrior_cel_idle_n_arms": "7f0c484beb9ea6f2",
+    "warrior_cel_idle_ne_crimson": "163c553af4164ed5",
+    "warrior_cel_idle_ne_azure": "baafc686cc0b2099",
+    "warrior_cel_idle_ne_arms": "888b9bd073a51792",
+    "warrior_cel_idle_e_crimson": "e98db908f72ec6b5",
+    "warrior_cel_idle_e_azure": "f27a82395d056869",
+    "warrior_cel_idle_e_arms": "217e06aed64004d8",
+    "warrior_cel_idle_se_crimson": "76215fe70f76c523",
+    "warrior_cel_idle_se_azure": "cfa878863e489cd6",
+    "warrior_cel_idle_se_arms": "0f5857190f80ed19",
+    "warrior_cel_walk_s_crimson": "e1316e31e1b5bf5a",
+    "warrior_cel_walk_s_azure": "ddeaa6ca13b56294",
+    "warrior_cel_walk_s_arms": "998b974d0f87a67a",
+    "warrior_cel_walk_sw_crimson": "222fbc2aa5850e3b",
+    "warrior_cel_walk_sw_azure": "e568fe07ac22aa7c",
+    "warrior_cel_walk_sw_arms": "77200eb531ee1cc0",
+    "warrior_cel_walk_w_crimson": "29c27664d3939e39",
+    "warrior_cel_walk_w_azure": "f11d3e2ca77fe1ff",
+    "warrior_cel_walk_w_arms": "6809583f07930cc8",
+    "warrior_cel_walk_nw_crimson": "0a944e07c524bea6",
+    "warrior_cel_walk_nw_azure": "3921bbb59d2b963d",
+    "warrior_cel_walk_nw_arms": "40b348507cb5195d",
+    "warrior_cel_walk_n_crimson": "bf628b68d9917680",
+    "warrior_cel_walk_n_azure": "2ac6c0241ed2730e",
+    "warrior_cel_walk_n_arms": "5d567ea2d658b40c",
+    "warrior_cel_walk_ne_crimson": "0e1e4e262d05ed1a",
+    "warrior_cel_walk_ne_azure": "f9a283693f873145",
+    "warrior_cel_walk_ne_arms": "17a2de974f008aff",
+    "warrior_cel_walk_e_crimson": "35f1d51ac4660bf2",
+    "warrior_cel_walk_e_azure": "784029d3fce61fef",
+    "warrior_cel_walk_e_arms": "087c6c8fce831f14",
+    "warrior_cel_walk_se_crimson": "6680ac10e8b67aa2",
+    "warrior_cel_walk_se_azure": "8e8a18f03385452d",
+    "warrior_cel_walk_se_arms": "dcaa3fcb0ab925f0",
+    "warrior_cel_attack_s_crimson": "52d2ce6df5fd4a08",
+    "warrior_cel_attack_s_azure": "8ad6022dc8dcdf34",
+    "warrior_cel_attack_s_arms": "6a6c1d011bf1c5a6",
+    "warrior_cel_attack_sw_crimson": "6daa62104cbd333d",
+    "warrior_cel_attack_sw_azure": "73f6e771bedc2d3f",
+    "warrior_cel_attack_sw_arms": "ef4783f0ceefdfe4",
+    "warrior_cel_attack_w_crimson": "86b89e9ee82bf191",
+    "warrior_cel_attack_w_azure": "a500f24cc8e65f17",
+    "warrior_cel_attack_w_arms": "9241b97d9d8a0d13",
+    "warrior_cel_attack_nw_crimson": "bb9e919ae6b7885c",
+    "warrior_cel_attack_nw_azure": "927409f64441c8cc",
+    "warrior_cel_attack_nw_arms": "6cc8ce35d2a2c326",
+    "warrior_cel_attack_n_crimson": "c84777527883d573",
+    "warrior_cel_attack_n_azure": "67b86dfc023202ac",
+    "warrior_cel_attack_n_arms": "2e3ff2599cc093ef",
+    "warrior_cel_attack_ne_crimson": "4fbf47397d90a988",
+    "warrior_cel_attack_ne_azure": "a72f169f2908ad55",
+    "warrior_cel_attack_ne_arms": "5c7b6858d286a212",
+    "warrior_cel_attack_e_crimson": "d917b15476daf714",
+    "warrior_cel_attack_e_azure": "8439e204d40fc09c",
+    "warrior_cel_attack_e_arms": "77cbd68704c23027",
+    "warrior_cel_attack_se_crimson": "ee7925f3e5c0c285",
+    "warrior_cel_attack_se_azure": "86610bcfe51c1963",
+    "warrior_cel_attack_se_arms": "c665be993ce1d472",
+    "warrior_cel_hurt_s_crimson": "4793304692a691e7",
+    "warrior_cel_hurt_s_azure": "dd046bc602ff51dc",
+    "warrior_cel_hurt_s_arms": "4eaa0ca64bc5a6db",
+    "warrior_cel_hurt_sw_crimson": "af96e198adbd1c88",
+    "warrior_cel_hurt_sw_azure": "77540058e499b72a",
+    "warrior_cel_hurt_sw_arms": "1075ff50d66a5eb3",
+    "warrior_cel_hurt_w_crimson": "169ffcf79cf90bce",
+    "warrior_cel_hurt_w_azure": "a62ac5ee22874448",
+    "warrior_cel_hurt_w_arms": "5223730af58ed351",
+    "warrior_cel_hurt_nw_crimson": "2b353412b0ae295c",
+    "warrior_cel_hurt_nw_azure": "cc7c7e25d65008cc",
+    "warrior_cel_hurt_nw_arms": "8463972fa8cf1c19",
+    "warrior_cel_hurt_n_crimson": "4a9fb0ff14ffd9e1",
+    "warrior_cel_hurt_n_azure": "6ecdb9957e91bd58",
+    "warrior_cel_hurt_n_arms": "cf0d548912f86458",
+    "warrior_cel_hurt_ne_crimson": "b5609365e2a8baa8",
+    "warrior_cel_hurt_ne_azure": "b58705c7832d4b59",
+    "warrior_cel_hurt_ne_arms": "80424912da9935ab",
+    "warrior_cel_hurt_e_crimson": "d224e110c4a0d13b",
+    "warrior_cel_hurt_e_azure": "f77aaa3f2407dbfa",
+    "warrior_cel_hurt_e_arms": "ba35bd47b11bfda0",
+    "warrior_cel_hurt_se_crimson": "da3590d9f3dd1595",
+    "warrior_cel_hurt_se_azure": "f64d7eff88508660",
+    "warrior_cel_hurt_se_arms": "df7963d945e0665a",
+    "warrior_cel_die_s_crimson": "48d7b167ff383d36",
+    "warrior_cel_die_s_azure": "48114a53195b5d18",
+    "warrior_cel_die_s_arms": "ec2ef4068399d4ce",
+    "warrior_cel_die_sw_crimson": "03aea24364ad7042",
+    "warrior_cel_die_sw_azure": "815c4e3cc3d4b98b",
+    "warrior_cel_die_sw_arms": "2a863bb85b121f69",
+    "warrior_cel_die_w_crimson": "fcd746aaf9c020e6",
+    "warrior_cel_die_w_azure": "75cad0c0d59cfcc6",
+    "warrior_cel_die_w_arms": "7f34f0b3ecd207d4",
+    "warrior_cel_die_nw_crimson": "fd228e39ac0135b1",
+    "warrior_cel_die_nw_azure": "2673417ad25d10ef",
+    "warrior_cel_die_nw_arms": "1ca839f89a8ab703",
+    "warrior_cel_die_n_crimson": "2181aa6a7efce1ed",
+    "warrior_cel_die_n_azure": "ba21aa927f3c0b98",
+    "warrior_cel_die_n_arms": "d532abe253f2eac9",
+    "warrior_cel_die_ne_crimson": "a7d90c19058e9d69",
+    "warrior_cel_die_ne_azure": "aafb6a71f118a68f",
+    "warrior_cel_die_ne_arms": "33a68da85720f0ac",
+    "warrior_cel_die_e_crimson": "8b540127006136b6",
+    "warrior_cel_die_e_azure": "f454271d15745c33",
+    "warrior_cel_die_e_arms": "0267e780ec22f17d",
+    "warrior_cel_die_se_crimson": "21a4cc1824d3262c",
+    "warrior_cel_die_se_azure": "bd910e583aa4d83d",
+    "warrior_cel_die_se_arms": "5af60d18f499ebef"
   },
   "ramps": {
-    "hair": [
-      "#211c2d",
-      "#353044",
-      "#514356",
-      "#766178"
+    "skin": [
+      "#92595c",
+      "#ce9182",
+      "#f0bfac",
+      "#ffe0ce"
     ],
     "brow": [
-      "#231b29",
-      "#342535",
-      "#493745",
-      "#604a5c"
+      "#1d1218",
+      "#2e1c1e",
+      "#40282a",
+      "#553836"
     ],
-    "skin": [
-      "#b8675b",
-      "#e99a85",
-      "#ffc1a6",
-      "#ffe1c3"
+    "white": [
+      "#a6b6b0",
+      "#d4e0da",
+      "#f2f7f2",
+      "#fffcf6"
+    ],
+    "mouth": [
+      "#5c2d45",
+      "#86506a",
+      "#c88493",
+      "#e9a4ab"
+    ],
+    "hair": [
+      "#3a2420",
+      "#6e4336",
+      "#a77a56",
+      "#d6ae82"
+    ],
+    "cloth": [
+      "#3a3a4c",
+      "#5c5c72",
+      "#8c8ca4",
+      "#c0c0d4"
+    ],
+    "pants": [
+      "#2a2a38",
+      "#44445a",
+      "#68688a",
+      "#9696b8"
+    ],
+    "crimson": [
+      "#5a0f1c",
+      "#9a1f30",
+      "#d83c4a",
+      "#ff8a8a"
+    ],
+    "azure": [
+      "#0f2a5a",
+      "#1f4f9a",
+      "#3c82d8",
+      "#8ac4ff"
+    ],
+    "steel": [
+      "#3a4658",
+      "#6a7a92",
+      "#aebdd2",
+      "#eef4ff"
+    ],
+    "gold": [
+      "#6e4a12",
+      "#b0801f",
+      "#e8b840",
+      "#fff0a0"
+    ],
+    "leather": [
+      "#2a1a16",
+      "#47291f",
+      "#6e4331",
+      "#9a6a4c"
+    ],
+    "plume": [
+      "#7a1230",
+      "#c22850",
+      "#f05a7a",
+      "#ffc0c8"
+    ],
+    "wing": [
+      "#8a9ab0",
+      "#c4d0e0",
+      "#f0f5ff",
+      "#ffffee"
+    ],
+    "glow": [
+      "#0f8a96",
+      "#2fd0d8",
+      "#8af0ee",
+      "#e4ffff"
+    ],
+    "iris": [
+      "#6a3410",
+      "#b0641c",
+      "#e8a040",
+      "#fff0b0"
     ]
   },
   "depth": {
@@ -174,19 +395,17 @@
     "scale": 64,
     "near": "smaller"
   },
-  "facing": "S SW W NW N NE E SE; mirrored diagonals and narrowed profiles",
+  "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
+  "style": "2D Korean RPG anime cel illustration",
+  "editing": "Three PixelFlow sprites per clip and facing (warrior_cel_<clip>_<facing>_crimson|azure|arms). ref_body layers are read-only context. build --replace discards edits.",
   "attack": {
     "duration": 0.42,
     "impact": 0.21
   },
-  "editing": "One clip/facing per PixelFlow sprite; body visible, equipment hidden. Export preserves layers. Depth follows original geometry; build --replace discards hand edits.",
-  "style": "Painted Korean chibi reference cutouts; articulated animation",
   "portrait": [
-    61,
-    28,
-    40,
-    40
-  ],
-  "reference": "tools/warrior_reference.jpg",
-  "animation": "Derived attack/hurt/death; front/rear/diagonal artwork from supplied reference"
+    57,
+    15,
+    46,
+    46
+  ]
 }

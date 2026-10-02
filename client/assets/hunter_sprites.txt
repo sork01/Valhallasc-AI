@@ -1,0 +1,429 @@
+{
+  "frame": [
+    160,
+    160
+  ],
+  "anchor": [
+    80,
+    119
+  ],
+  "dirs": [
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "N",
+    "NE",
+    "E",
+    "SE"
+  ],
+  "clips": {
+    "idle": {
+      "row0": 0,
+      "n": 6,
+      "fps": 6
+    },
+    "walk": {
+      "row0": 8,
+      "n": 8,
+      "fps": 12
+    },
+    "attack": {
+      "row0": 16,
+      "n": 8,
+      "fps": 20
+    },
+    "hurt": {
+      "row0": 24,
+      "n": 4,
+      "fps": 10
+    },
+    "die": {
+      "row0": 32,
+      "n": 8,
+      "fps": 8
+    }
+  },
+  "parts": {
+    "body": {
+      "png": "hunter_body.png",
+      "depth": "hunter_body_depth.png"
+    },
+    "armor_scout": {
+      "png": "hunter_armor_scout.png",
+      "depth": "hunter_armor_scout_depth.png"
+    },
+    "armor_warden": {
+      "png": "hunter_armor_warden.png",
+      "depth": "hunter_armor_warden_depth.png"
+    },
+    "shoulders_scout": {
+      "png": "hunter_shoulders_scout.png",
+      "depth": "hunter_shoulders_scout_depth.png"
+    },
+    "shoulders_warden": {
+      "png": "hunter_shoulders_warden.png",
+      "depth": "hunter_shoulders_warden_depth.png"
+    },
+    "gloves_scout": {
+      "png": "hunter_gloves_scout.png",
+      "depth": "hunter_gloves_scout_depth.png"
+    },
+    "gloves_warden": {
+      "png": "hunter_gloves_warden.png",
+      "depth": "hunter_gloves_warden_depth.png"
+    },
+    "head_scout": {
+      "png": "hunter_head_scout.png",
+      "depth": "hunter_head_scout_depth.png"
+    },
+    "head_warden": {
+      "png": "hunter_head_warden.png",
+      "depth": "hunter_head_warden_depth.png"
+    },
+    "weapon_shortbow": {
+      "png": "hunter_weapon_shortbow.png",
+      "depth": "hunter_weapon_shortbow_depth.png"
+    },
+    "weapon_wardenbow": {
+      "png": "hunter_weapon_wardenbow.png",
+      "depth": "hunter_weapon_wardenbow_depth.png"
+    }
+  },
+  "equipment": {
+    "armor": {
+      "none": {
+        "name": "Simple cloth",
+        "defense": 0
+      },
+      "scout": {
+        "name": "Scout's Jerkin",
+        "defense": 3
+      },
+      "warden": {
+        "name": "Wildwarden Coat",
+        "defense": 5
+      }
+    },
+    "shoulders": {
+      "none": {
+        "name": "Bare shoulders",
+        "defense": 0
+      },
+      "scout": {
+        "name": "Scout's Mantle",
+        "defense": 1
+      },
+      "warden": {
+        "name": "Wildwarden Pauldrons",
+        "defense": 2
+      }
+    },
+    "gloves": {
+      "none": {
+        "name": "Bare hands",
+        "defense": 0
+      },
+      "scout": {
+        "name": "Scout's Bracers",
+        "defense": 1
+      },
+      "warden": {
+        "name": "Wildwarden Gauntlets",
+        "defense": 2
+      }
+    },
+    "head": {
+      "none": {
+        "name": "Bare head",
+        "defense": 0
+      },
+      "scout": {
+        "name": "Feathered Headband",
+        "defense": 1
+      },
+      "warden": {
+        "name": "Wolfhood",
+        "defense": 2
+      }
+    },
+    "weapon": {
+      "none": {
+        "name": "Empty hands",
+        "attack": 0
+      },
+      "shortbow": {
+        "name": "Hunter's Shortbow",
+        "attack": 4
+      },
+      "wardenbow": {
+        "name": "Wildwarden Longbow",
+        "attack": 8
+      }
+    }
+  },
+  "defaultEquipment": {
+    "armor": "scout",
+    "shoulders": "none",
+    "gloves": "none",
+    "head": "none",
+    "weapon": "shortbow"
+  },
+  "sprites": {
+    "hunter_idle_s_scout": "2db7d0428258724b",
+    "hunter_idle_s_warden": "f3afc6e19ec4b288",
+    "hunter_idle_s_arms": "19f317a8b6d8b469",
+    "hunter_idle_sw_scout": "cdb4a7189bc6ba8c",
+    "hunter_idle_sw_warden": "398b489ea62f9aeb",
+    "hunter_idle_sw_arms": "ad8a88d47b6ba798",
+    "hunter_idle_w_scout": "8389655e0f3a6d4e",
+    "hunter_idle_w_warden": "ce8aae209ef79db0",
+    "hunter_idle_w_arms": "343aa228362d637b",
+    "hunter_idle_nw_scout": "a36ca464036aa93f",
+    "hunter_idle_nw_warden": "127c18f906642f3e",
+    "hunter_idle_nw_arms": "631761d11a3e390c",
+    "hunter_idle_n_scout": "32e9bf18a1790801",
+    "hunter_idle_n_warden": "689a4003c3520730",
+    "hunter_idle_n_arms": "faf9a718de6da2ab",
+    "hunter_idle_ne_scout": "837e99fd3036b592",
+    "hunter_idle_ne_warden": "1d9d0b2e45277456",
+    "hunter_idle_ne_arms": "50503f1e5cebdd41",
+    "hunter_idle_e_scout": "0c67a8ed622aa25b",
+    "hunter_idle_e_warden": "60a529392428ad10",
+    "hunter_idle_e_arms": "bd2c3ed75d617a0e",
+    "hunter_idle_se_scout": "3f08313528a41e61",
+    "hunter_idle_se_warden": "3486802bf16cc1eb",
+    "hunter_idle_se_arms": "45356b69b0b77bce",
+    "hunter_walk_s_scout": "97b314b4af1cd79e",
+    "hunter_walk_s_warden": "6104d8d27296ee9a",
+    "hunter_walk_s_arms": "f3d217853e01dac4",
+    "hunter_walk_sw_scout": "aebb44f89f4463d1",
+    "hunter_walk_sw_warden": "0d5819c697807a6c",
+    "hunter_walk_sw_arms": "6608908e5bf44edb",
+    "hunter_walk_w_scout": "0715956277fbc16c",
+    "hunter_walk_w_warden": "7830c5a9a089f42b",
+    "hunter_walk_w_arms": "faea97d48c29cc71",
+    "hunter_walk_nw_scout": "1faf1d02fa3936e8",
+    "hunter_walk_nw_warden": "c2b66b0a751d877b",
+    "hunter_walk_nw_arms": "e3e5f8e7a194afba",
+    "hunter_walk_n_scout": "957a626c9803fb52",
+    "hunter_walk_n_warden": "251e238e6bac706a",
+    "hunter_walk_n_arms": "b4f4cd76fb3a8f75",
+    "hunter_walk_ne_scout": "cdc9cb432d9b98ca",
+    "hunter_walk_ne_warden": "3020724b25dbe43f",
+    "hunter_walk_ne_arms": "e0a67e551e787054",
+    "hunter_walk_e_scout": "0b0128b00eab21e1",
+    "hunter_walk_e_warden": "365044dc19841834",
+    "hunter_walk_e_arms": "97a7a40e93ce4cca",
+    "hunter_walk_se_scout": "6f872e8e664a6e94",
+    "hunter_walk_se_warden": "29e841022e65291a",
+    "hunter_walk_se_arms": "94cc53f3be0f372d",
+    "hunter_attack_s_scout": "da30d7424cdfd637",
+    "hunter_attack_s_warden": "7bfeed2b6fe83baa",
+    "hunter_attack_s_arms": "acf4f8091e50bb5b",
+    "hunter_attack_sw_scout": "1cf8f3acec778b72",
+    "hunter_attack_sw_warden": "74459cd3ee887e2e",
+    "hunter_attack_sw_arms": "44c81d5a181e714d",
+    "hunter_attack_w_scout": "7f7e6bb538e67efd",
+    "hunter_attack_w_warden": "60b6eabf0d43b9a8",
+    "hunter_attack_w_arms": "4b89016bb175d79d",
+    "hunter_attack_nw_scout": "a3dba0f609106cb1",
+    "hunter_attack_nw_warden": "6de8b530b02f55f0",
+    "hunter_attack_nw_arms": "6eae95c71db6ff2f",
+    "hunter_attack_n_scout": "221b581b9ac2673a",
+    "hunter_attack_n_warden": "24f4168a50818349",
+    "hunter_attack_n_arms": "1e20f29008b80fb0",
+    "hunter_attack_ne_scout": "bb86d8b16f7248ae",
+    "hunter_attack_ne_warden": "24f7b824040537e1",
+    "hunter_attack_ne_arms": "514d7e24636415b8",
+    "hunter_attack_e_scout": "13e63ab55738cf11",
+    "hunter_attack_e_warden": "f0deebf04e81afdd",
+    "hunter_attack_e_arms": "565375882a1a9143",
+    "hunter_attack_se_scout": "48221b948a9411ba",
+    "hunter_attack_se_warden": "5213637f21255074",
+    "hunter_attack_se_arms": "feb15ba9ecbc5421",
+    "hunter_hurt_s_scout": "2418cfe5192041a5",
+    "hunter_hurt_s_warden": "5f48bcd057221eb9",
+    "hunter_hurt_s_arms": "888c159c70a8e08e",
+    "hunter_hurt_sw_scout": "b60e15778dafa077",
+    "hunter_hurt_sw_warden": "364c8cc20f6798f4",
+    "hunter_hurt_sw_arms": "4805e3ac0adf3054",
+    "hunter_hurt_w_scout": "fee99c54f8635504",
+    "hunter_hurt_w_warden": "872d43578269910d",
+    "hunter_hurt_w_arms": "8a4b31080e68f174",
+    "hunter_hurt_nw_scout": "e7acf239be19922c",
+    "hunter_hurt_nw_warden": "cc95a61995b3ada2",
+    "hunter_hurt_nw_arms": "108856c9380a61f0",
+    "hunter_hurt_n_scout": "316d2ae855e07118",
+    "hunter_hurt_n_warden": "3740d1c56f26b307",
+    "hunter_hurt_n_arms": "3e6dc3fef71c17a2",
+    "hunter_hurt_ne_scout": "7a061ac3b124b5af",
+    "hunter_hurt_ne_warden": "eb80e4d624ee5e98",
+    "hunter_hurt_ne_arms": "e30e9a88dd793627",
+    "hunter_hurt_e_scout": "b1a4491d641499b3",
+    "hunter_hurt_e_warden": "4a060c85fa5bd64a",
+    "hunter_hurt_e_arms": "63412759d2d27626",
+    "hunter_hurt_se_scout": "db2737db4fbb8d29",
+    "hunter_hurt_se_warden": "d22fd6c56f6a6f02",
+    "hunter_hurt_se_arms": "ab8a788218101e90",
+    "hunter_die_s_scout": "e11690213d4d59d9",
+    "hunter_die_s_warden": "e41e45ae3cb6b772",
+    "hunter_die_s_arms": "c942a1f430f6d9c6",
+    "hunter_die_sw_scout": "99b84478735966e9",
+    "hunter_die_sw_warden": "66c4d347afd96189",
+    "hunter_die_sw_arms": "ef2a40aee025dd97",
+    "hunter_die_w_scout": "c41cedccfcb248aa",
+    "hunter_die_w_warden": "bd0066fb94532faa",
+    "hunter_die_w_arms": "9ad8bee7fd00d777",
+    "hunter_die_nw_scout": "86720e29ef9ae2ad",
+    "hunter_die_nw_warden": "f741b3bb38848c99",
+    "hunter_die_nw_arms": "b71df18e2e5d53e1",
+    "hunter_die_n_scout": "73c77a5197867038",
+    "hunter_die_n_warden": "5e92bb70178352c7",
+    "hunter_die_n_arms": "f2e76ad35845b999",
+    "hunter_die_ne_scout": "bf4bd0c1dd6d4352",
+    "hunter_die_ne_warden": "ecddef2510ebcb5b",
+    "hunter_die_ne_arms": "830c265a78c6ab64",
+    "hunter_die_e_scout": "5b02bc70f1804285",
+    "hunter_die_e_warden": "e8b7f26f5d446252",
+    "hunter_die_e_arms": "79b8fd4fb62087fd",
+    "hunter_die_se_scout": "b8b8639fdc4f6cfa",
+    "hunter_die_se_warden": "31dc88f37901a001",
+    "hunter_die_se_arms": "535772029120c53d"
+  },
+  "ramps": {
+    "skin": [
+      "#92595c",
+      "#ce9182",
+      "#f0bfac",
+      "#ffe0ce"
+    ],
+    "brow": [
+      "#1d1218",
+      "#2e1c1e",
+      "#40282a",
+      "#553836"
+    ],
+    "white": [
+      "#a6b6b0",
+      "#d4e0da",
+      "#f2f7f2",
+      "#fffcf6"
+    ],
+    "mouth": [
+      "#5c2d45",
+      "#86506a",
+      "#c88493",
+      "#e9a4ab"
+    ],
+    "hair": [
+      "#3a1f1c",
+      "#6b3a2a",
+      "#a8643e",
+      "#e0a070"
+    ],
+    "cloth": [
+      "#4c5a50",
+      "#7e9186",
+      "#bccabd",
+      "#e8f0e0"
+    ],
+    "pants": [
+      "#3a2f2a",
+      "#5a4a40",
+      "#80695a",
+      "#a88f7a"
+    ],
+    "green": [
+      "#1f4a2c",
+      "#2f7a3f",
+      "#58b04e",
+      "#a6e07a"
+    ],
+    "moss": [
+      "#3a4a1c",
+      "#667a2c",
+      "#98b248",
+      "#cfe27a"
+    ],
+    "emerald": [
+      "#0f3a40",
+      "#1b6a68",
+      "#2fa593",
+      "#7ae6c8"
+    ],
+    "tan": [
+      "#4a2e1a",
+      "#7a4e2c",
+      "#b87e48",
+      "#e8b878"
+    ],
+    "umber": [
+      "#2a1a16",
+      "#47291f",
+      "#6e4331",
+      "#9a6a4c"
+    ],
+    "copper": [
+      "#6a3414",
+      "#b05a22",
+      "#e89040",
+      "#ffd078"
+    ],
+    "silver": [
+      "#35485e",
+      "#6e87a3",
+      "#b4c9de",
+      "#f0f6ff"
+    ],
+    "fur": [
+      "#8a8aa0",
+      "#bcc0d4",
+      "#e6e9f4",
+      "#fdfdff"
+    ],
+    "wood": [
+      "#3a2218",
+      "#6b4128",
+      "#a8703f",
+      "#dca66a"
+    ],
+    "glow": [
+      "#0f8a96",
+      "#2fd0d8",
+      "#8af0ee",
+      "#e4ffff"
+    ],
+    "feather": [
+      "#8a1f2a",
+      "#d2394a",
+      "#ff7a70",
+      "#ffc4a8"
+    ],
+    "iris": [
+      "#1f5a3c",
+      "#2f9a5c",
+      "#74d27a",
+      "#d4ffb8"
+    ]
+  },
+  "depth": {
+    "encoding": "R*256+G",
+    "offset": 512,
+    "scale": 64,
+    "near": "smaller"
+  },
+  "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
+  "style": "2D Korean RPG anime cel illustration",
+  "editing": "Three PixelFlow sprites per clip and facing (hunter_<clip>_<facing>_scout|warden|arms). ref_body layers are read-only context. build --replace discards edits.",
+  "attack": {
+    "duration": 0.4,
+    "impact": 0.2
+  },
+  "portrait": [
+    57,
+    15,
+    46,
+    46
+  ]
+}
