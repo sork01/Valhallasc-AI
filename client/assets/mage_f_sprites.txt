@@ -1,0 +1,291 @@
+{
+  "frame": [
+    160,
+    160
+  ],
+  "anchor": [
+    80,
+    119
+  ],
+  "dirs": [
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "N",
+    "NE",
+    "E",
+    "SE"
+  ],
+  "clips": {
+    "idle": {
+      "row0": 0,
+      "n": 6,
+      "fps": 6
+    },
+    "walk": {
+      "row0": 8,
+      "n": 8,
+      "fps": 12
+    },
+    "attack": {
+      "row0": 16,
+      "n": 8,
+      "fps": 20
+    },
+    "hurt": {
+      "row0": 24,
+      "n": 4,
+      "fps": 10
+    },
+    "die": {
+      "row0": 32,
+      "n": 8,
+      "fps": 8
+    }
+  },
+  "parts": {
+    "body": {
+      "png": "mage_f_body.png",
+      "depth": "mage_f_body_depth.png"
+    },
+    "armor_apprentice": {
+      "png": "mage_f_armor_apprentice.png",
+      "depth": "mage_f_armor_apprentice_depth.png"
+    },
+    "armor_runic": {
+      "png": "mage_f_armor_runic.png",
+      "depth": "mage_f_armor_runic_depth.png"
+    },
+    "shoulders_apprentice": {
+      "png": "mage_f_shoulders_apprentice.png",
+      "depth": "mage_f_shoulders_apprentice_depth.png"
+    },
+    "shoulders_runic": {
+      "png": "mage_f_shoulders_runic.png",
+      "depth": "mage_f_shoulders_runic_depth.png"
+    },
+    "gloves_apprentice": {
+      "png": "mage_f_gloves_apprentice.png",
+      "depth": "mage_f_gloves_apprentice_depth.png"
+    },
+    "gloves_runic": {
+      "png": "mage_f_gloves_runic.png",
+      "depth": "mage_f_gloves_runic_depth.png"
+    },
+    "head_apprentice": {
+      "png": "mage_f_head_apprentice.png",
+      "depth": "mage_f_head_apprentice_depth.png"
+    },
+    "head_runic": {
+      "png": "mage_f_head_runic.png",
+      "depth": "mage_f_head_runic_depth.png"
+    },
+    "weapon_ash": {
+      "png": "mage_f_weapon_ash.png",
+      "depth": "mage_f_weapon_ash_depth.png"
+    },
+    "weapon_crystal": {
+      "png": "mage_f_weapon_crystal.png",
+      "depth": "mage_f_weapon_crystal_depth.png"
+    }
+  },
+  "gender": "female",
+  "equipment": {
+    "armor": {
+      "none": {
+        "name": "Simple cloth",
+        "defense": 0
+      },
+      "apprentice": {
+        "name": "Apprentice robes",
+        "defense": 2
+      },
+      "runic": {
+        "name": "Runic vestments",
+        "defense": 5
+      }
+    },
+    "shoulders": {
+      "none": {
+        "name": "Bare shoulders",
+        "defense": 0
+      },
+      "apprentice": {
+        "name": "Apprentice's Capelet",
+        "defense": 1
+      },
+      "runic": {
+        "name": "Runic Pauldrons",
+        "defense": 2
+      }
+    },
+    "gloves": {
+      "none": {
+        "name": "Bare hands",
+        "defense": 0
+      },
+      "apprentice": {
+        "name": "Apprentice's Gloves",
+        "defense": 1
+      },
+      "runic": {
+        "name": "Runic Gloves",
+        "defense": 2
+      }
+    },
+    "head": {
+      "none": {
+        "name": "Bare head",
+        "defense": 0
+      },
+      "apprentice": {
+        "name": "Apprentice's Hat",
+        "defense": 1
+      },
+      "runic": {
+        "name": "Runic Archmage Hat",
+        "defense": 2
+      }
+    },
+    "weapon": {
+      "none": {
+        "name": "Empty hands",
+        "attack": 0
+      },
+      "ash": {
+        "name": "Ash staff",
+        "attack": 4
+      },
+      "crystal": {
+        "name": "Crystal staff",
+        "attack": 9
+      }
+    }
+  },
+  "defaultEquipment": {
+    "armor": "apprentice",
+    "shoulders": "none",
+    "gloves": "none",
+    "head": "none",
+    "weapon": "ash"
+  },
+  "sprites": {},
+  "ramps": {
+    "skin": [
+      "#92595c",
+      "#ce9182",
+      "#f0bfac",
+      "#ffe0ce"
+    ],
+    "brow": [
+      "#1d1218",
+      "#2e1c1e",
+      "#40282a",
+      "#553836"
+    ],
+    "white": [
+      "#a6b6b0",
+      "#d4e0da",
+      "#f2f7f2",
+      "#fffcf6"
+    ],
+    "mouth": [
+      "#5c2d45",
+      "#86506a",
+      "#c88493",
+      "#e9a4ab"
+    ],
+    "hair": [
+      "#4a2a68",
+      "#7a52a0",
+      "#ac78c4",
+      "#dcb4ec"
+    ],
+    "cloth": [
+      "#3a3860",
+      "#605e90",
+      "#9a98c8",
+      "#d4d2f0"
+    ],
+    "pants": [
+      "#1c2038",
+      "#30365a",
+      "#4e5a86",
+      "#7a88b4"
+    ],
+    "azure": [
+      "#1c3a78",
+      "#2e62b8",
+      "#5a9af0",
+      "#a8d0ff"
+    ],
+    "indigo": [
+      "#241848",
+      "#44307e",
+      "#6e52b8",
+      "#a88cf0"
+    ],
+    "gold": [
+      "#6e4a12",
+      "#b0801f",
+      "#e8b840",
+      "#fff0a0"
+    ],
+    "ivory": [
+      "#9a8a7a",
+      "#c9bca8",
+      "#f0e6d0",
+      "#fffcf0"
+    ],
+    "umber": [
+      "#2a1a16",
+      "#47291f",
+      "#6e4331",
+      "#9a6a4c"
+    ],
+    "wood": [
+      "#3a2218",
+      "#6b4128",
+      "#a8703f",
+      "#dca66a"
+    ],
+    "silver": [
+      "#35485e",
+      "#6e87a3",
+      "#b4c9de",
+      "#f0f6ff"
+    ],
+    "rune": [
+      "#2a40a0",
+      "#4a8af0",
+      "#90d8ff",
+      "#f0ffff"
+    ],
+    "iris": [
+      "#2a2a78",
+      "#4a4ad0",
+      "#8aa0ff",
+      "#e0ecff"
+    ]
+  },
+  "depth": {
+    "encoding": "R*256+G",
+    "offset": 512,
+    "scale": 64,
+    "near": "smaller"
+  },
+  "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
+  "style": "2D Korean RPG anime cel illustration",
+  "editing": "Female set: generated from code by export --local, with no PixelFlow copies. Re-run the class script with --female to change it.",
+  "attack": {
+    "duration": 0.56,
+    "impact": 0.28
+  },
+  "portrait": [
+    57,
+    15,
+    46,
+    46
+  ]
+}

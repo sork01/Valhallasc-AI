@@ -1,0 +1,309 @@
+{
+  "frame": [
+    160,
+    160
+  ],
+  "anchor": [
+    80,
+    119
+  ],
+  "dirs": [
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "N",
+    "NE",
+    "E",
+    "SE"
+  ],
+  "clips": {
+    "idle": {
+      "row0": 0,
+      "n": 6,
+      "fps": 6
+    },
+    "walk": {
+      "row0": 8,
+      "n": 8,
+      "fps": 12
+    },
+    "attack": {
+      "row0": 16,
+      "n": 8,
+      "fps": 20
+    },
+    "hurt": {
+      "row0": 24,
+      "n": 4,
+      "fps": 10
+    },
+    "die": {
+      "row0": 32,
+      "n": 8,
+      "fps": 8
+    }
+  },
+  "parts": {
+    "body": {
+      "png": "hunter_f_body.png",
+      "depth": "hunter_f_body_depth.png"
+    },
+    "armor_scout": {
+      "png": "hunter_f_armor_scout.png",
+      "depth": "hunter_f_armor_scout_depth.png"
+    },
+    "armor_warden": {
+      "png": "hunter_f_armor_warden.png",
+      "depth": "hunter_f_armor_warden_depth.png"
+    },
+    "shoulders_scout": {
+      "png": "hunter_f_shoulders_scout.png",
+      "depth": "hunter_f_shoulders_scout_depth.png"
+    },
+    "shoulders_warden": {
+      "png": "hunter_f_shoulders_warden.png",
+      "depth": "hunter_f_shoulders_warden_depth.png"
+    },
+    "gloves_scout": {
+      "png": "hunter_f_gloves_scout.png",
+      "depth": "hunter_f_gloves_scout_depth.png"
+    },
+    "gloves_warden": {
+      "png": "hunter_f_gloves_warden.png",
+      "depth": "hunter_f_gloves_warden_depth.png"
+    },
+    "head_scout": {
+      "png": "hunter_f_head_scout.png",
+      "depth": "hunter_f_head_scout_depth.png"
+    },
+    "head_warden": {
+      "png": "hunter_f_head_warden.png",
+      "depth": "hunter_f_head_warden_depth.png"
+    },
+    "weapon_shortbow": {
+      "png": "hunter_f_weapon_shortbow.png",
+      "depth": "hunter_f_weapon_shortbow_depth.png"
+    },
+    "weapon_wardenbow": {
+      "png": "hunter_f_weapon_wardenbow.png",
+      "depth": "hunter_f_weapon_wardenbow_depth.png"
+    }
+  },
+  "gender": "female",
+  "equipment": {
+    "armor": {
+      "none": {
+        "name": "Simple cloth",
+        "defense": 0
+      },
+      "scout": {
+        "name": "Scout's Jerkin",
+        "defense": 3
+      },
+      "warden": {
+        "name": "Wildwarden Coat",
+        "defense": 5
+      }
+    },
+    "shoulders": {
+      "none": {
+        "name": "Bare shoulders",
+        "defense": 0
+      },
+      "scout": {
+        "name": "Scout's Mantle",
+        "defense": 1
+      },
+      "warden": {
+        "name": "Wildwarden Pauldrons",
+        "defense": 2
+      }
+    },
+    "gloves": {
+      "none": {
+        "name": "Bare hands",
+        "defense": 0
+      },
+      "scout": {
+        "name": "Scout's Bracers",
+        "defense": 1
+      },
+      "warden": {
+        "name": "Wildwarden Gauntlets",
+        "defense": 2
+      }
+    },
+    "head": {
+      "none": {
+        "name": "Bare head",
+        "defense": 0
+      },
+      "scout": {
+        "name": "Feathered Headband",
+        "defense": 1
+      },
+      "warden": {
+        "name": "Wolfhood",
+        "defense": 2
+      }
+    },
+    "weapon": {
+      "none": {
+        "name": "Empty hands",
+        "attack": 0
+      },
+      "shortbow": {
+        "name": "Hunter's Shortbow",
+        "attack": 4
+      },
+      "wardenbow": {
+        "name": "Wildwarden Longbow",
+        "attack": 8
+      }
+    }
+  },
+  "defaultEquipment": {
+    "armor": "scout",
+    "shoulders": "none",
+    "gloves": "none",
+    "head": "none",
+    "weapon": "shortbow"
+  },
+  "sprites": {},
+  "ramps": {
+    "skin": [
+      "#92595c",
+      "#ce9182",
+      "#f0bfac",
+      "#ffe0ce"
+    ],
+    "brow": [
+      "#1d1218",
+      "#2e1c1e",
+      "#40282a",
+      "#553836"
+    ],
+    "white": [
+      "#a6b6b0",
+      "#d4e0da",
+      "#f2f7f2",
+      "#fffcf6"
+    ],
+    "mouth": [
+      "#5c2d45",
+      "#86506a",
+      "#c88493",
+      "#e9a4ab"
+    ],
+    "hair": [
+      "#3a1f1c",
+      "#6b3a2a",
+      "#a8643e",
+      "#e0a070"
+    ],
+    "cloth": [
+      "#4c5a50",
+      "#7e9186",
+      "#bccabd",
+      "#e8f0e0"
+    ],
+    "pants": [
+      "#3a2f2a",
+      "#5a4a40",
+      "#80695a",
+      "#a88f7a"
+    ],
+    "green": [
+      "#1f4a2c",
+      "#2f7a3f",
+      "#58b04e",
+      "#a6e07a"
+    ],
+    "moss": [
+      "#3a4a1c",
+      "#667a2c",
+      "#98b248",
+      "#cfe27a"
+    ],
+    "emerald": [
+      "#0f3a40",
+      "#1b6a68",
+      "#2fa593",
+      "#7ae6c8"
+    ],
+    "tan": [
+      "#4a2e1a",
+      "#7a4e2c",
+      "#b87e48",
+      "#e8b878"
+    ],
+    "umber": [
+      "#2a1a16",
+      "#47291f",
+      "#6e4331",
+      "#9a6a4c"
+    ],
+    "copper": [
+      "#6a3414",
+      "#b05a22",
+      "#e89040",
+      "#ffd078"
+    ],
+    "silver": [
+      "#35485e",
+      "#6e87a3",
+      "#b4c9de",
+      "#f0f6ff"
+    ],
+    "fur": [
+      "#8a8aa0",
+      "#bcc0d4",
+      "#e6e9f4",
+      "#fdfdff"
+    ],
+    "wood": [
+      "#3a2218",
+      "#6b4128",
+      "#a8703f",
+      "#dca66a"
+    ],
+    "glow": [
+      "#0f8a96",
+      "#2fd0d8",
+      "#8af0ee",
+      "#e4ffff"
+    ],
+    "feather": [
+      "#8a1f2a",
+      "#d2394a",
+      "#ff7a70",
+      "#ffc4a8"
+    ],
+    "iris": [
+      "#1f5a3c",
+      "#2f9a5c",
+      "#74d27a",
+      "#d4ffb8"
+    ]
+  },
+  "depth": {
+    "encoding": "R*256+G",
+    "offset": 512,
+    "scale": 64,
+    "near": "smaller"
+  },
+  "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
+  "style": "2D Korean RPG anime cel illustration",
+  "editing": "Female set: generated from code by export --local, with no PixelFlow copies. Re-run the class script with --female to change it.",
+  "attack": {
+    "duration": 0.4,
+    "impact": 0.2
+  },
+  "portrait": [
+    57,
+    15,
+    46,
+    46
+  ]
+}

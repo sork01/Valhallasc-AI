@@ -1,0 +1,291 @@
+{
+  "frame": [
+    160,
+    160
+  ],
+  "anchor": [
+    80,
+    119
+  ],
+  "dirs": [
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "N",
+    "NE",
+    "E",
+    "SE"
+  ],
+  "clips": {
+    "idle": {
+      "row0": 0,
+      "n": 6,
+      "fps": 6
+    },
+    "walk": {
+      "row0": 8,
+      "n": 8,
+      "fps": 12
+    },
+    "attack": {
+      "row0": 16,
+      "n": 8,
+      "fps": 20
+    },
+    "hurt": {
+      "row0": 24,
+      "n": 4,
+      "fps": 10
+    },
+    "die": {
+      "row0": 32,
+      "n": 8,
+      "fps": 8
+    }
+  },
+  "parts": {
+    "body": {
+      "png": "warrior_layered_f_body.png",
+      "depth": "warrior_layered_f_body_depth.png"
+    },
+    "armor_crimson": {
+      "png": "warrior_layered_f_armor_crimson.png",
+      "depth": "warrior_layered_f_armor_crimson_depth.png"
+    },
+    "armor_azure": {
+      "png": "warrior_layered_f_armor_azure.png",
+      "depth": "warrior_layered_f_armor_azure_depth.png"
+    },
+    "shoulders_crimson": {
+      "png": "warrior_layered_f_shoulders_crimson.png",
+      "depth": "warrior_layered_f_shoulders_crimson_depth.png"
+    },
+    "shoulders_azure": {
+      "png": "warrior_layered_f_shoulders_azure.png",
+      "depth": "warrior_layered_f_shoulders_azure_depth.png"
+    },
+    "gloves_crimson": {
+      "png": "warrior_layered_f_gloves_crimson.png",
+      "depth": "warrior_layered_f_gloves_crimson_depth.png"
+    },
+    "gloves_azure": {
+      "png": "warrior_layered_f_gloves_azure.png",
+      "depth": "warrior_layered_f_gloves_azure_depth.png"
+    },
+    "head_crimson": {
+      "png": "warrior_layered_f_head_crimson.png",
+      "depth": "warrior_layered_f_head_crimson_depth.png"
+    },
+    "head_azure": {
+      "png": "warrior_layered_f_head_azure.png",
+      "depth": "warrior_layered_f_head_azure_depth.png"
+    },
+    "weapon_sword": {
+      "png": "warrior_layered_f_weapon_sword.png",
+      "depth": "warrior_layered_f_weapon_sword_depth.png"
+    },
+    "weapon_royal": {
+      "png": "warrior_layered_f_weapon_royal.png",
+      "depth": "warrior_layered_f_weapon_royal_depth.png"
+    }
+  },
+  "gender": "female",
+  "equipment": {
+    "armor": {
+      "none": {
+        "name": "Simple cloth",
+        "defense": 0
+      },
+      "crimson": {
+        "name": "Crimson guard",
+        "defense": 3
+      },
+      "azure": {
+        "name": "Azure guard",
+        "defense": 5
+      }
+    },
+    "shoulders": {
+      "none": {
+        "name": "Bare shoulders",
+        "defense": 0
+      },
+      "crimson": {
+        "name": "Crimson Pauldrons",
+        "defense": 2
+      },
+      "azure": {
+        "name": "Azure Winged Pauldrons",
+        "defense": 3
+      }
+    },
+    "gloves": {
+      "none": {
+        "name": "Bare hands",
+        "defense": 0
+      },
+      "crimson": {
+        "name": "Crimson Gauntlets",
+        "defense": 1
+      },
+      "azure": {
+        "name": "Azure Gauntlets",
+        "defense": 2
+      }
+    },
+    "head": {
+      "none": {
+        "name": "Bare head",
+        "defense": 0
+      },
+      "crimson": {
+        "name": "Crimson Plumed Helm",
+        "defense": 2
+      },
+      "azure": {
+        "name": "Azure Winged Helm",
+        "defense": 3
+      }
+    },
+    "weapon": {
+      "none": {
+        "name": "Empty hands",
+        "attack": 0
+      },
+      "sword": {
+        "name": "Sword & shield",
+        "attack": 4
+      },
+      "royal": {
+        "name": "Royal sword & shield",
+        "attack": 8
+      }
+    }
+  },
+  "defaultEquipment": {
+    "armor": "crimson",
+    "shoulders": "none",
+    "gloves": "none",
+    "head": "none",
+    "weapon": "sword"
+  },
+  "sprites": {},
+  "ramps": {
+    "skin": [
+      "#92595c",
+      "#ce9182",
+      "#f0bfac",
+      "#ffe0ce"
+    ],
+    "brow": [
+      "#1d1218",
+      "#2e1c1e",
+      "#40282a",
+      "#553836"
+    ],
+    "white": [
+      "#a6b6b0",
+      "#d4e0da",
+      "#f2f7f2",
+      "#fffcf6"
+    ],
+    "mouth": [
+      "#5c2d45",
+      "#86506a",
+      "#c88493",
+      "#e9a4ab"
+    ],
+    "hair": [
+      "#3a2420",
+      "#6e4336",
+      "#a77a56",
+      "#d6ae82"
+    ],
+    "cloth": [
+      "#3a3a4c",
+      "#5c5c72",
+      "#8c8ca4",
+      "#c0c0d4"
+    ],
+    "pants": [
+      "#2a2a38",
+      "#44445a",
+      "#68688a",
+      "#9696b8"
+    ],
+    "crimson": [
+      "#5a0f1c",
+      "#9a1f30",
+      "#d83c4a",
+      "#ff8a8a"
+    ],
+    "azure": [
+      "#0f2a5a",
+      "#1f4f9a",
+      "#3c82d8",
+      "#8ac4ff"
+    ],
+    "steel": [
+      "#3a4658",
+      "#6a7a92",
+      "#aebdd2",
+      "#eef4ff"
+    ],
+    "gold": [
+      "#6e4a12",
+      "#b0801f",
+      "#e8b840",
+      "#fff0a0"
+    ],
+    "leather": [
+      "#2a1a16",
+      "#47291f",
+      "#6e4331",
+      "#9a6a4c"
+    ],
+    "plume": [
+      "#7a1230",
+      "#c22850",
+      "#f05a7a",
+      "#ffc0c8"
+    ],
+    "wing": [
+      "#8a9ab0",
+      "#c4d0e0",
+      "#f0f5ff",
+      "#ffffee"
+    ],
+    "glow": [
+      "#0f8a96",
+      "#2fd0d8",
+      "#8af0ee",
+      "#e4ffff"
+    ],
+    "iris": [
+      "#6a3410",
+      "#b0641c",
+      "#e8a040",
+      "#fff0b0"
+    ]
+  },
+  "depth": {
+    "encoding": "R*256+G",
+    "offset": 512,
+    "scale": 64,
+    "near": "smaller"
+  },
+  "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
+  "style": "2D Korean RPG anime cel illustration",
+  "editing": "Female set: generated from code by export --local, with no PixelFlow copies. Re-run the class script with --female to change it.",
+  "attack": {
+    "duration": 0.42,
+    "impact": 0.21
+  },
+  "portrait": [
+    57,
+    15,
+    46,
+    46
+  ]
+}

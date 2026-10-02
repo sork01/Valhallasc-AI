@@ -117,7 +117,13 @@ def render_frame(clip, facing, k):
     H, hd, front, side = head['H'], head['hd'], head['front'], head['side']
     sw = p['sway']
     # Long hair: a back sheet to the waist, blunt bangs with two long face-framing locks, a glossy ring highlight.
-    body.plate([xf(q) for q in [(-6.5, -5, 84), (6.5, -5, 84), (9 + sw * .6, -8.6, 60), (8 + sw, -9.6, 40), (0 + sw * 1.2, -10.4, 36), (-8 + sw, -9.6, 40), (-9 + sw * .6, -8.6, 60)]], 'hair', 1)
+    if cc.FEMALE:
+        # Longer still, to the hips with curled, flared ends, and a lock down each side of the face.
+        body.plate([xf(q) for q in [(-6.5, -5, 84), (6.5, -5, 84), (10 + sw * .6, -8.8, 60), (10.8 + sw, -10, 38), (8 + sw * 1.4, -11.2, 25), (3 + sw * 1.6, -10.6, 30), (-3 + sw * 1.6, -11, 24), (-8 + sw * 1.4, -11.2, 27), (-10.8 + sw, -10, 38), (-10 + sw * .6, -8.8, 60)]], 'hair', 1)
+        for sx_ in (-1, 1):
+            body.plate([xf(q) for q in [(sx_ * 9.4, -1.2, 86), (sx_ * 11.4, -1.2, 80), (sx_ * 11.4, .8, 62), (sx_ * 9.6, .6, 58), (sx_ * 8.6, -.4, 74)]], 'hair', 2 if sx_ > 0 else 1, True)
+    else:
+        body.plate([xf(q) for q in [(-6.5, -5, 84), (6.5, -5, 84), (9 + sw * .6, -8.6, 60), (8 + sw, -9.6, 40), (0 + sw * 1.2, -10.4, 36), (-8 + sw, -9.6, 40), (-9 + sw * .6, -8.6, 60)]], 'hair', 1)
     body.plate([xf(q) for q in [(-3, -5.4, 82), (3, -5.4, 82), (4.4 + sw * .8, -9.6, 58), (3 + sw * 1.2, -10.2, 42), (-1 + sw, -10, 50)]], 'hair', 2, True)
     if not cc.face(body, head, p):
         body.poly([H(*q) for q in [(-9.5, 8), (-10.5, 0), (-8.5, -8), (-4, -10.5), (5, -9.5), (9.5, -5), (10.5, 4), (6.5, 13), (-3, 14)]], COLOR['hair'][2], hd - 5)

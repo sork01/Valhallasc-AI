@@ -32,12 +32,16 @@ from scipy import ndimage as ndi
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / 'client' / 'assets'
-CACHE = Path(__file__).resolve().parent / 'priest_raw'
 sys.path.insert(0, os.environ.get('VALHALLA_TOOLS', str(ROOT.parent / 'Valhalla' / 'tools')))
 import make_warrior_sprites as rig  # noqa: E402
+import cel_common as cc  # noqa: E402  (only for the `--female` switch and the shared torso outline)
+
+# `--female` draws the woman's body into its own files: priest_f_*.png, priest_f_sprites.txt, scripts/priest_f_raw/.
+NAME = 'priest_f' if cc.FEMALE else 'priest'
 
 V, unit = rig.V, rig.unit
 FW = FH = 160
+CACHE = Path(__file__).resolve().parent / f'{NAME}_raw'
 AX, AY, SS, PX = 80, 119, 2, 1.03
 DIRS = rig.DIRS
 PARTS = ['body', 'armor_pilgrim', 'armor_dawn', 'weapon_mace', 'weapon_sunmace']
@@ -205,9 +209,9 @@ def render_frame(clip, facing, k):
     xf = lambda a: pivot + R @ (V(*a) - pivot) + shift
     joints = {}
     for sx, key in ((-1, 'L'), (1, 'R')):
-        s = V(sx * 8, 0, SHOULDER)
+        s = V(sx * cc.SHOULDER_X, 0, SHOULDER)
         elbow, hand = rig.ik2(s, V(*p['hand' + key]), 13.5, 13.5, unit(V(sx * .3, -.45, -1)))
-        hip = xf((sx * 4.2, 0, HIP))
+        hip = xf((sx * cc.HIP_X, 0, HIP))
         knee, ankle = rig.ik2(hip, V(*p['foot' + key]), 17, 17, unit(V(sx * .1, 1, .1)))
         joints[key] = {'shoulder': xf(s), 'elbow': xf(elbow), 'hand': xf(hand),
                        'hip': hip, 'knee': knee, 'ankle': ankle}
@@ -222,25 +226,20 @@ def render_frame(clip, facing, k):
     body = inks['body']
 
     def torso(ink, mat, halfwidth, y, bottom=38, top=67, push=0):
-        for sy in (-1, 1):
-            pts = [(-halfwidth, sy * y, top), (halfwidth, sy * y, top),
-                   (halfwidth * .72, sy * y, 49), (halfwidth * .84, sy * y, bottom),
-                   (-halfwidth * .84, sy * y, bottom), (-halfwidth * .72, sy * y, 49)]
-            ink.plate([xf(q) for q in pts], mat, 2 if sy == 1 else 1, push=push)
-        for sx in (-1, 1):
-            ink.plate([xf(q) for q in [(sx * halfwidth, -y, top), (sx * halfwidth, y, top),
-                      (sx * halfwidth * .84, y, bottom), (sx * halfwidth * .84, -y, bottom)]], mat, 1, push=push)
+        for points, tone in cc.torso_panels(halfwidth, y, bottom, top):
+            ink.plate([xf(q) for q in points], mat, tone, push=push)
 
     torso(body, 'cloth', 7.8, 3.5)
-    body.bone(xf((0, 0, 68)), xf((0, 0, 77)), 2.2, 2.1, 'skin')
+    lw = .92 if cc.FEMALE else 1.      # slimmer limbs
+    body.bone(xf((0, 0, 68)), xf((0, 0, 77)), 2.2 * lw, 2.1 * lw, 'skin')
     for sx, key in ((-1, 'L'), (1, 'R')):
         j = joints[key]
-        body.bone(j['hip'], j['knee'], 3.3, 2.9, 'pants')
-        body.bone(j['knee'], j['ankle'], 2.7, 1.9, 'pants')
-        body.bone(j['ankle'] + V(0, -1, -1.5), j['ankle'] + V(0, 4, -2), 2, 2.1, 'skin')
-        body.bone(j['shoulder'], j['elbow'], 2.6, 2.1, 'skin')
-        body.bone(j['elbow'], j['hand'], 2, 1.6, 'skin')
-        body.bone(j['hand'] - R @ V(0, 0, 1), j['hand'] + R @ V(0, 0, 1.8), 2.2, 1.8, 'skin', -.2)
+        body.bone(j['hip'], j['knee'], 3.3 * lw, 2.9 * lw, 'pants')
+        body.bone(j['knee'], j['ankle'], 2.7 * lw, 1.9 * lw, 'pants')
+        body.bone(j['ankle'] + V(0, -1, -1.5), j['ankle'] + V(0, 4, -2), 2 * lw, 2.1 * lw, 'skin')
+        body.bone(j['shoulder'], j['elbow'], 2.6 * lw, 2.1 * lw, 'skin')
+        body.bone(j['elbow'], j['hand'], 2 * lw, 1.6 * lw, 'skin')
+        body.bone(j['hand'] - R @ V(0, 0, 1), j['hand'] + R @ V(0, 0, 1.8), 2.2 * lw, 1.8 * lw, 'skin', -.2)
 
     # The holy light in the free palm: a four-point star that pulses in idle and gathers before an attack.
     if p['light'] > .05:
@@ -258,6 +257,8 @@ def render_frame(clip, facing, k):
     front = -math.cos(psi + rig.rad(p['twist']))
     side = -math.sin(psi + rig.rad(p['twist']))
     skin_shape = [(-8.4, 7), (-9.8, 0), (-8.6, -6), (-4.8, -10.2), (0, -11), (4.8, -10.2), (8.6, -6), (9.8, 0), (8.4, 7), (0, 10)]
+    if cc.FEMALE:      # a slightly narrower jaw and a softer chin
+        skin_shape = [(-8.2, 7), (-9.3, 0), (-8, -6), (-4, -10), (0, -11.6), (4, -10), (8, -6), (9.3, 0), (8.2, 7), (0, 10)]
     body.poly([H(*q) for q in skin_shape], COLOR['skin'][2], hd - 4)
     body.poly([H(*q) for q in [(4.5, 6), (8.4, 6), (9.7, 0), (7.6, -6), (0, -10.8), (3.5, -4)]], COLOR['skin'][1], hd - 4.05, False)
     if front < -.4:
@@ -305,8 +306,12 @@ def render_frame(clip, facing, k):
         body.poly([H(gx, 9.8), H(gx + .8, 8.8), H(gx, 7.8), H(gx - .8, 8.8)], COLOR['glow'][3], hd - 6.55, False)
     # Long hair falls behind the shoulders (seen from the back and sides) tied with a crimson ribbon.
     sw = p['sway']
-    body.plate([xf(q) for q in [(-7, -5.6, 83), (7, -5.6, 83), (9.4, -7, 66), (8.4 + sw, -8.4, 50), (4.6 + sw * 1.3, -9, 42),
-                               (.6 + sw * 1.4, -8.8, 47), (-3.4 + sw * 1.3, -9, 41), (-7.6 + sw, -8.6, 49), (-9.4, -7, 66)]], 'hair', 1)
+    if cc.FEMALE:      # to the hips, with a wavy flared end
+        body.plate([xf(q) for q in [(-7, -5.6, 83), (7, -5.6, 83), (9.6, -7, 66), (10.4 + sw, -8.6, 44), (8 + sw * 1.3, -9.8, 32), (4 + sw * 1.4, -9.2, 36),
+                                   (.4 + sw * 1.5, -9.8, 30), (-3.6 + sw * 1.4, -9.2, 36), (-8.2 + sw * 1.3, -9.8, 31), (-9.4 + sw, -8.6, 44), (-9.6, -7, 66)]], 'hair', 1)
+    else:
+        body.plate([xf(q) for q in [(-7, -5.6, 83), (7, -5.6, 83), (9.4, -7, 66), (8.4 + sw, -8.4, 50), (4.6 + sw * 1.3, -9, 42),
+                                   (.6 + sw * 1.4, -8.8, 47), (-3.4 + sw * 1.3, -9, 41), (-7.6 + sw, -8.6, 49), (-9.4, -7, 66)]], 'hair', 1)
     body.plate([xf(q) for q in [(-5, -6.1, 80), (5, -6.1, 80), (6.6, -7.2, 64), (5 + sw, -8.2, 49), (1 + sw * 1.3, -8.4, 45),
                                (-4 + sw, -8.2, 48), (-6.6, -7.2, 64)]], 'hair', 2)
     for sx in (-1, 1):
@@ -466,18 +471,18 @@ def preview(clips, out):
                             raise ValueError(f'clipped {clip}/{facing}/{k}/{part}')
                     sheet.alpha_composite(rgba(composite(parts, armor, weapon)), (k * FW, di * FH))
                     ImageDraw.Draw(sheet).text((k * FW + 3, di * FH + 3), f'{facing} {k}', fill='white')
-            sheet.resize((sheet.width * 2, sheet.height * 2), Image.Resampling.NEAREST).save(out / f'priest_{clip}_{armor}.png')
+            sheet.resize((sheet.width * 2, sheet.height * 2), Image.Resampling.NEAREST).save(out / f'{NAME}_{clip}_{armor}.png')
         print('preview', clip, 'eight facings; no clipped parts', flush=True)
     compare = Image.new('RGBA', (FW * 6, FH), '#487048')
     compare.alpha_composite(Image.open(ASSETS / 'assassin_body.png').crop((0, 0, FW, FH)), (0, 0))
     for j, (a, b) in enumerate(COMBOS, 1):
         compare.alpha_composite(rgba(composite(read_frame('idle', 'S', 0), a, b)), (j * FW, 0))
         compare.alpha_composite(rgba(composite(read_frame('idle', 'SE', 2), a, b)), ((j + 3 if j < 3 else 0) * FW, 0)) if j < 3 else None
-    compare.resize((compare.width * 3, compare.height * 3), Image.Resampling.NEAREST).save(out / 'priest_comparison.png')
+    compare.resize((compare.width * 3, compare.height * 3), Image.Resampling.NEAREST).save(out / f'{NAME}_comparison.png')
 
 
 def pixel_name(clip, facing):
-    return f'priest_{clip}_{facing.lower()}'
+    return f'{NAME.replace("_f", "f")}_{clip}_{facing.lower()}'
 
 
 def pixel_api():
@@ -498,13 +503,13 @@ def pixel_api():
 def pixel_ids(pf):
     manifest = CACHE / 'editor_ids.txt'
     ids = json.loads(manifest.read_text()) if manifest.exists() else {}
-    ids.update(pf.ids('priest_'))
+    ids.update(pf.ids(NAME.replace('_f', 'f') + '_'))
     return ids
 
 
 def build(replace=False):
     pf = pixel_api()
-    existing = pf.ids('priest_')
+    existing = pf.ids(NAME.replace('_f', 'f') + '_')
     if existing and not replace:
         raise SystemExit('priest sprites already exist; use export to keep edits, or build --replace to discard them.')
     for sid in existing.values():
@@ -575,10 +580,11 @@ def export(local=False):
                     depths[part].paste(Image.fromarray(rgb, 'RGB'), (x, y))
         print('export', clip, flush=True)
     for part in PARTS:
-        atlases[part].save(ASSETS / f'priest_{part}.png', optimize=True)
-        depths[part].save(ASSETS / f'priest_{part}_depth.png', optimize=True)
+        atlases[part].save(ASSETS / f'{NAME}_{part}.png', optimize=True)
+        depths[part].save(ASSETS / f'{NAME}_{part}_depth.png', optimize=True)
     meta = {'frame': [FW, FH], 'anchor': [AX, AY], 'dirs': DIRS, 'clips': meta_clips,
-            'parts': {part: {'png': f'priest_{part}.png', 'depth': f'priest_{part}_depth.png'} for part in PARTS},
+            'parts': {part: {'png': f'{NAME}_{part}.png', 'depth': f'{NAME}_{part}_depth.png'} for part in PARTS},
+            'gender': 'female' if cc.FEMALE else 'male',
             'equipment': {'armor': ARMOR_ITEMS, 'weapon': WEAPON_ITEMS},
             'defaultEquipment': {'armor': 'pilgrim', 'weapon': 'mace'},
             'sprites': ids, 'ramps': MATS,
@@ -586,8 +592,9 @@ def export(local=False):
             'facing': 'Same eight-direction formula and foot anchor as assassin_sprites.txt',
             'attack': {'duration': .4, 'impact': .2},
             'style': '2D Korean RPG anime cel illustration', 'portrait': [57, 19, 46, 46],
-            'editing': 'One PixelFlow sprite per clip and facing (priest_<clip>_<facing>), body visible, equipment hidden. build --replace discards edits.'}
-    (ASSETS / 'priest_sprites.txt').write_text(json.dumps(meta, indent=2) + '\n')
+            'editing': ('Female set: generated from code by export --local, with no PixelFlow copies. Re-run make_priest_sprites.py with --female to change it.' if cc.FEMALE else
+                        'One PixelFlow sprite per clip and facing (priest_<clip>_<facing>), body visible, equipment hidden. build --replace discards edits.')}
+    (ASSETS / f'{NAME}_sprites.txt').write_text(json.dumps(meta, indent=2) + '\n')
     print('exported five parts and five depth maps', size, flush=True)
 
 
@@ -595,7 +602,7 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('command', choices=['preview', 'build', 'export'])
     ap.add_argument('clip', nargs='?', default='all', choices=['all'] + list(CLIPS))
-    ap.add_argument('directory', nargs='?', default='/tmp/valhalla-priest-preview')
+    ap.add_argument('directory', nargs='?', default=f'/tmp/valhalla-{NAME}-preview')
     ap.add_argument('--replace', action='store_true')
     ap.add_argument('--local', action='store_true')
     args = ap.parse_args()

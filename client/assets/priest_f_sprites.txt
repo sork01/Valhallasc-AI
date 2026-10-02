@@ -1,0 +1,228 @@
+{
+  "frame": [
+    160,
+    160
+  ],
+  "anchor": [
+    80,
+    119
+  ],
+  "dirs": [
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "N",
+    "NE",
+    "E",
+    "SE"
+  ],
+  "clips": {
+    "idle": {
+      "row0": 0,
+      "n": 6,
+      "fps": 6
+    },
+    "walk": {
+      "row0": 8,
+      "n": 8,
+      "fps": 12
+    },
+    "attack": {
+      "row0": 16,
+      "n": 8,
+      "fps": 20
+    },
+    "hurt": {
+      "row0": 24,
+      "n": 4,
+      "fps": 10
+    },
+    "die": {
+      "row0": 32,
+      "n": 8,
+      "fps": 8
+    }
+  },
+  "parts": {
+    "body": {
+      "png": "priest_f_body.png",
+      "depth": "priest_f_body_depth.png"
+    },
+    "armor_pilgrim": {
+      "png": "priest_f_armor_pilgrim.png",
+      "depth": "priest_f_armor_pilgrim_depth.png"
+    },
+    "armor_dawn": {
+      "png": "priest_f_armor_dawn.png",
+      "depth": "priest_f_armor_dawn_depth.png"
+    },
+    "weapon_mace": {
+      "png": "priest_f_weapon_mace.png",
+      "depth": "priest_f_weapon_mace_depth.png"
+    },
+    "weapon_sunmace": {
+      "png": "priest_f_weapon_sunmace.png",
+      "depth": "priest_f_weapon_sunmace_depth.png"
+    }
+  },
+  "gender": "female",
+  "equipment": {
+    "armor": {
+      "none": {
+        "name": "Simple cloth",
+        "part": null,
+        "defense": 0
+      },
+      "pilgrim": {
+        "name": "Pilgrim robes",
+        "part": "armor_pilgrim",
+        "defense": 3
+      },
+      "dawn": {
+        "name": "Dawnweave vestments",
+        "part": "armor_dawn",
+        "defense": 5
+      }
+    },
+    "weapon": {
+      "none": {
+        "name": "Empty hands",
+        "part": null,
+        "attack": 0
+      },
+      "mace": {
+        "name": "Oak mace",
+        "part": "weapon_mace",
+        "attack": 4
+      },
+      "sunmace": {
+        "name": "Sunbreaker mace",
+        "part": "weapon_sunmace",
+        "attack": 8
+      }
+    }
+  },
+  "defaultEquipment": {
+    "armor": "pilgrim",
+    "weapon": "mace"
+  },
+  "sprites": {},
+  "ramps": {
+    "skin": [
+      "#92595c",
+      "#ce9182",
+      "#f0bfac",
+      "#ffe0ce"
+    ],
+    "hair": [
+      "#8a6a3a",
+      "#c9a45c",
+      "#ecd290",
+      "#fff4c8"
+    ],
+    "brow": [
+      "#6a4c28",
+      "#7e5e34",
+      "#a98650",
+      "#c0985a"
+    ],
+    "cloth": [
+      "#4a4048",
+      "#76686f",
+      "#a99a9c",
+      "#d8c9c0"
+    ],
+    "pants": [
+      "#2a2a40",
+      "#43476a",
+      "#68729a",
+      "#97a2c4"
+    ],
+    "robe": [
+      "#8c7a6e",
+      "#c4b09c",
+      "#ebdcc2",
+      "#fff8e6"
+    ],
+    "dawn": [
+      "#7f90ae",
+      "#bccbe2",
+      "#eef3fb",
+      "#fdfeff"
+    ],
+    "gold": [
+      "#6e4a12",
+      "#b0801f",
+      "#e8b840",
+      "#fff0a0"
+    ],
+    "stole": [
+      "#5a1424",
+      "#8f2438",
+      "#c8465a",
+      "#f28a94"
+    ],
+    "leather": [
+      "#2a2030",
+      "#463a50",
+      "#6a5a70",
+      "#98889e"
+    ],
+    "wood": [
+      "#3a2420",
+      "#6e4336",
+      "#a77a56",
+      "#d6ae82"
+    ],
+    "silver": [
+      "#3a516d",
+      "#7791b0",
+      "#bdcfe5",
+      "#f2f5ff"
+    ],
+    "glow": [
+      "#d79a1a",
+      "#ffc94a",
+      "#ffe99a",
+      "#fffbe0"
+    ],
+    "iris": [
+      "#2a5a8c",
+      "#4a8cc4",
+      "#8cc8f0",
+      "#d8f2ff"
+    ],
+    "white": [
+      "#c0aec4",
+      "#ded2e2",
+      "#f6eef1",
+      "#fffbf6"
+    ],
+    "mouth": [
+      "#5c2d45",
+      "#86506a",
+      "#c88493",
+      "#e9a4ab"
+    ]
+  },
+  "depth": {
+    "encoding": "R*256+G",
+    "offset": 512,
+    "scale": 64,
+    "near": "smaller"
+  },
+  "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
+  "attack": {
+    "duration": 0.4,
+    "impact": 0.2
+  },
+  "style": "2D Korean RPG anime cel illustration",
+  "portrait": [
+    57,
+    19,
+    46,
+    46
+  ],
+  "editing": "Female set: generated from code by export --local, with no PixelFlow copies. Re-run make_priest_sprites.py with --female to change it."
+}

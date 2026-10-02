@@ -20,6 +20,8 @@ import make_assassin_sprites as old   # ../Valhalla/tools, read-only: the existi
 SLOTS = {'armor': ('shadow', 'moon'), 'shoulders': ('shadow', 'moon'), 'gloves': ('shadow', 'moon'),
          'head': ('shadow', 'moon'), 'weapon': ('daggers', 'moonfang')}
 LEGACY = ['body', 'armor_shadow', 'armor_moon', 'weapon_daggers', 'weapon_moonfang']
+if cc.FEMALE:      # the woman's body and outfits are drawn here; her blades are the existing assassin_weapon_* atlases
+    LEGACY = ['weapon_daggers', 'weapon_moonfang']
 MATS = dict(old.MATS)
 PALETTE, COLOR = cc.palette_of(MATS)
 DEFAULT, CLIPS = old.DEFAULT, old.CLIPS
@@ -37,11 +39,60 @@ GEAR = {
 }
 
 
+def female_layers(inks, p, psi, R, xf, joints):
+    """The woman's body and both outfits, after the original body/outfit drawing in ../Valhalla/tools/make_assassin_sprites.py
+    on the shared female body: an hourglass torso, long sleek hair, the same angular fringe and the same garments."""
+    torso = lambda ink, mat, *a: cc.torso(ink, xf, mat, *a)
+    body = inks['body']
+    cc.base_body(body, xf, joints, R)
+    head = cc.head_frame(body, xf, psi, p, turn=1.0)
+    H, hd, front = head['H'], head['hd'], head['front']
+    sw = p['sway']
+    # Long straight hair to the hips (the back sheet), then the legacy angular crown and fringe wedges.
+    body.plate([xf(q) for q in [(-6, -5, 84), (6, -5, 84), (9 + sw * .8, -8.4, 62), (9.6 + sw * 1.4, -10, 40), (6 + sw * 2, -11, 27), (1 + sw * 2.2, -10.6, 33), (-4 + sw * 2, -11, 26), (-9.4 + sw * 1.4, -10, 40), (-9 + sw * .8, -8.4, 62)]], 'hair', 1)
+    body.plate([xf(q) for q in [(-2.4, -5.4, 82), (2.8, -5.4, 82), (4 + sw, -9.6, 60), (3 + sw * 1.8, -10.8, 40), (0 + sw * 2, -10.4, 44), (-2 + sw, -9.6, 60)]], 'hair', 2, True)
+    if not cc.face(body, head, p):
+        body.poly([H(*q) for q in [(-9, 8), (-10, 0), (-8, -8), (-4, -10), (5, -9), (9, -5), (10, 4), (6, 12), (-3, 13)]], COLOR['hair'][1], hd - 5)
+    crown = [(-10, 2), (-11, 8), (-8, 12), (-9, 15), (-3, 13), (1, 16), (3, 13),
+             (8, 14), (8, 11), (11, 8), (10, 2), (8, -3), (6, 2), (4, -1), (1, 6), (-2, 1), (-5, 6), (-8, -2)]
+    body.poly([H(*q) for q in crown], COLOR['hair'][1], hd - 6)
+    for wedge in [[(-8, 10), (-2, 12), (-4, 6), (-8, 3)], [(-1, 12), (3, 13), (6, 7), (2, 7)], [(6, 11), (9, 8), (8, 3)]]:
+        body.poly([H(*q) for q in wedge], COLOR['hair'][2], hd - 6.1, False)
+    body.poly([H(*q) for q in [(-6, 11), (-2, 12), (-3, 10), (-6, 8)]], COLOR['hair'][3], hd - 6.2, False)
+    for sx_ in (-1, 1):
+        body.plate([xf(q) for q in [(sx_ * 9.4, -1.2, 86), (sx_ * 11.2, -1.2, 80), (sx_ * 11, .8, 64), (sx_ * 9.2, .6, 62), (sx_ * 8.6, -.4, 74)]], 'hair', 2 if sx_ > 0 else 1, True)
+
+    for key, mat, scarf in [('armor_shadow', 'night', 'scarf'), ('armor_moon', 'moon', 'ribbon')]:
+        ink = inks[key]
+        torso(ink, mat, 8.6, 4.3, 36, 69)
+        ink.plate([xf(q) for q in [(-8, 4.5, 66), (1, 4.5, 67), (7, 4.5, 43), (-1, 4.5, 40)]], mat, 1)
+        ink.plate([xf(q) for q in [(-7, 4.7, 66), (-6, 4.7, 66), (3, 4.7, 44), (2, 4.7, 44)]], 'silver', 1, True)
+        ink.plate([xf(q) for q in [(-8, 4.8, 43), (8, 4.8, 43), (8, 4.8, 39), (-8, 4.8, 39)]], 'leather', 1)
+        for sx, name in ((-1, 'L'), (1, 'R')):
+            j = joints[name]
+            ink.bone(j['shoulder'], j['elbow'], 3.6, 2.8, mat, -.8)
+            ink.bone(j['elbow'] + (j['hand'] - j['elbow']) * .45, j['elbow'] + (j['hand'] - j['elbow']) * .82, 2.9, 2.3, 'leather', -.6)
+            ink.bone(j['knee'] + (j['ankle'] - j['knee']) * .2, j['ankle'], 3.1, 2.5, 'leather', -.8)
+            ink.bone(j['ankle'] + V(0, -1, -1), j['ankle'] + V(0, 4.5, -2), 2.5, 2.5, 'leather', -.8)
+            if mat == 'moon':
+                ink.plate([xf(q) for q in [(sx * 6, -4, 40), (sx * 10, -4, 40), (sx * (14 + sw), -7, 23), (sx * 9, -5, 18), (sx * 6, -4, 31)]], mat, 2)
+                ink.bone(j['shoulder'], j['shoulder'] + R @ V(sx * 3, 0, -3), 3.1, 2, 'silver', -1)
+        ink.plate([xf(q) for q in [(-5, 4.8, 76), (5, 4.8, 76), (6, 4.8, 70), (0, 5, 67), (-6, 4.8, 70)]], scarf, 2)
+        for sx, length in [(-1, 18), (1, 24)]:
+            wind = sw * 1.4
+            ink.plate([xf(q) for q in [(sx * 3, -5, 74), (sx * 7, -5, 74), (sx * 13 + wind, -12, 66), (sx * length + wind, -19, 57),
+                      (sx * (length - 7) + wind, -18, 56), (sx * 10 + wind, -12, 62)]], scarf, 2)
+        if mat == 'moon':
+            ink.plate([xf(q) for q in [(-1.8, 4.9, 54), (0, 5, 58), (1.8, 4.9, 54), (0, 5, 50)]], 'rune', 2)
+
+
 def render_frame(clip, facing, k):
     p = {**DEFAULT, **CLIPS[clip][2](k)}
     psi = rig.psi_for(facing)
     R, xf, joints = cc.skeleton(p)
     inks = {part: cc.Ink(psi, COLOR) for part in SHEET.parts}
+    if cc.FEMALE:
+        female_layers(inks, p, psi, R, xf, joints)
     head = cc.head_frame(inks['head_shadow'], xf, psi, p, turn=1.0)
     H, hd, front = head['H'], head['hd'], head['front']
     sw = p['sway']
@@ -125,8 +176,10 @@ SHADOW = {'armor': 'shadow', 'shoulders': 'shadow', 'gloves': 'shadow', 'head': 
 MOON = {'armor': 'moon', 'shoulders': 'moon', 'gloves': 'moon', 'head': 'moon', 'weapon': 'moonfang'}
 SHEET = cc.Sheet(
     'assassin', files='assassin', pixel='assassin_cel_', mats=MATS, clips=CLIPS, slots=SLOTS, gear=GEAR, render=render_frame,
-    revision=cc.revision_of([open(__file__).read()]), legacy=LEGACY,
-    groups={'shadow': ['shoulders_shadow', 'gloves_shadow', 'head_shadow'], 'moon': ['shoulders_moon', 'gloves_moon', 'head_moon']},
+    revision=cc.revision_of([open(__file__).read()]), legacy=LEGACY, legacy_files='assassin',
+    groups=({'shadow': ['body', 'armor_shadow', 'shoulders_shadow', 'gloves_shadow', 'head_shadow'],
+             'moon': ['ref_body', 'armor_moon', 'shoulders_moon', 'gloves_moon', 'head_moon']} if cc.FEMALE else
+            {'shadow': ['shoulders_shadow', 'gloves_shadow', 'head_shadow'], 'moon': ['shoulders_moon', 'gloves_moon', 'head_moon']}),
     default_equip={'armor': 'shadow', 'shoulders': 'none', 'gloves': 'none', 'head': 'none', 'weapon': 'daggers'},
     meta={'attack': {'duration': .4, 'impact': .2}, 'portrait': [57, 15, 46, 46]},
     combos=[('naked', NAKED), ('shadow', SHADOW), ('moon', MOON)])

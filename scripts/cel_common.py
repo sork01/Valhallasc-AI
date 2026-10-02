@@ -30,6 +30,13 @@ ASSETS = ROOT / 'client' / 'assets'
 sys.path.insert(0, os.environ.get('VALHALLA_TOOLS', str(ROOT.parent / 'Valhalla' / 'tools')))
 import make_warrior_sprites as rig  # noqa: E402
 
+# `--female` (anywhere on the command line) draws the female body for every class script: its own atlas files
+# (<class>_f_*), frame cache (<class>_f_raw) and metadata (<class>_f_sprites.txt). Male output is unchanged.
+FEMALE = '--female' in sys.argv
+if FEMALE:
+    sys.argv.remove('--female')
+SHOULDER_X, HIP_X = (7.2, 4.7) if FEMALE else (8, 4.2)
+
 V, unit = rig.V, rig.unit
 FW = FH = 160
 AX, AY, SS, PX = 80, 119, 2, 1.03
@@ -147,9 +154,9 @@ def skeleton(p, arm=13.5, leg=17):
     xf = lambda a: pivot + R @ (V(*a) - pivot) + shift
     joints = {}
     for sx, key in ((-1, 'L'), (1, 'R')):
-        s = V(sx * 8, 0, SHOULDER)
+        s = V(sx * SHOULDER_X, 0, SHOULDER)
         elbow, hand = rig.ik2(s, V(*p['hand' + key]), arm, arm, unit(V(sx, -.2, -.3)))
-        hip = xf((sx * 4.2, 0, HIP))
+        hip = xf((sx * HIP_X, 0, HIP))
         knee, ankle = rig.ik2(hip, V(*p['foot' + key]), leg, leg, unit(V(sx * .1, 1, .1)))
         joints[key] = {'shoulder': xf(s), 'elbow': xf(elbow), 'hand': xf(hand),
                        'hip': hip, 'knee': knee, 'ankle': ankle}
@@ -163,20 +170,40 @@ def skeleton(p, arm=13.5, leg=17):
     return R, xf, joints
 
 
-def torso(ink, xf, mat, halfwidth, y, bottom=38, top=67):
+def torso_panels(halfwidth, y, bottom=38, top=67):
+    """The torso's front, back and side panels as (points, tone), in body-local coordinates. Male: a straight
+    block that tucks in a little at the waist. Female: narrower shoulders, a fuller chest, a small waist at 42% of
+    the way up, and hips back out to nearly the full width."""
+    panels = []
+    if not FEMALE:
+        for sy in (-1, 1):
+            panels.append(([(-halfwidth, sy * y, top), (halfwidth, sy * y, top),
+                            (halfwidth * .72, sy * y, 49), (halfwidth * .84, sy * y, bottom),
+                            (-halfwidth * .84, sy * y, bottom), (-halfwidth * .72, sy * y, 49)], 2 if sy == 1 else 1))
+        for sx in (-1, 1):
+            panels.append(([(sx * halfwidth, -y, top), (sx * halfwidth, y, top),
+                            (sx * halfwidth * .84, y, bottom), (sx * halfwidth * .84, -y, bottom)], 1))
+        return panels
+    at = lambda f: bottom + (top - bottom) * f
+    prof = [(halfwidth * .84, top, 1.), (halfwidth * .9, at(.78), 1.1), (halfwidth * .56, at(.42), .88),
+            (halfwidth * 1.0, at(.1), 1.06), (halfwidth * 1.0, bottom, 1.06)]
     for sy in (-1, 1):
-        pts = [(-halfwidth, sy * y, top), (halfwidth, sy * y, top),
-               (halfwidth * .72, sy * y, 49), (halfwidth * .84, sy * y, bottom),
-               (-halfwidth * .84, sy * y, bottom), (-halfwidth * .72, sy * y, 49)]
-        ink.plate([xf(q) for q in pts], mat, 2 if sy == 1 else 1)
+        panels.append(([(w, sy * y * d, z) for w, z, d in prof] + [(-w, sy * y * d, z) for w, z, d in reversed(prof)], 2 if sy == 1 else 1))
     for sx in (-1, 1):
-        ink.plate([xf(q) for q in [(sx * halfwidth, -y, top), (sx * halfwidth, y, top),
-                  (sx * halfwidth * .84, y, bottom), (sx * halfwidth * .84, -y, bottom)]], mat, 1)
+        panels.append(([(sx * w, -y * d, z) for w, z, d in prof] + [(sx * w, y * d, z) for w, z, d in reversed(prof)], 1))
+    return panels
+
+
+def torso(ink, xf, mat, halfwidth, y, bottom=38, top=67):
+    for points, tone in torso_panels(halfwidth, y, bottom, top):
+        ink.plate([xf(q) for q in points], mat, tone)
 
 
 def base_body(ink, xf, joints, R, w=1., cloth='cloth', pants='pants', torso_width=7.8, torso_depth=3.5):
     """The naked layer: undershirt torso, neck, trousered legs, bare arms and feet. w scales limb thickness."""
     torso(ink, xf, cloth, torso_width, torso_depth)
+    if FEMALE:
+        w *= .92
     ink.bone(xf((0, 0, 68)), xf((0, 0, 77)), 2.2 * w, 2.1 * w, 'skin')
     for key in 'LR':
         j = joints[key]
@@ -203,6 +230,9 @@ def face(ink, head, p, paint=None, back_hair=None, lashes=1.):
     H, hd, front, side = head['H'], head['hd'], head['front'], head['side']
     C = ink.color
     skin_shape = [(-8, 7), (-9.5, 1), (-8.4, -5), (-4.3, -10), (0, -11.3), (4.3, -10), (8.4, -5), (9.5, 1), (8, 7), (0, 10)]
+    if FEMALE:      # a softer, narrower jaw and a pointed chin
+        skin_shape = [(-8, 7), (-9.2, 1), (-7.8, -5), (-3.6, -9.8), (0, -11.8), (3.6, -9.8), (7.8, -5), (9.2, 1), (8, 7), (0, 10)]
+        lashes *= 1.45
     ink.poly([H(*q) for q in skin_shape], C['skin'][2], hd - 4)
     ink.poly([H(*q) for q in [(4, 6), (8, 6), (9, 0), (7, -6), (0, -11), (3, -4)]], C['skin'][1], hd - 4.05, False)
     if front < -.4:
@@ -222,13 +252,21 @@ def face(ink, head, p, paint=None, back_hair=None, lashes=1.):
             ink.poly([H(ex - .2, ey + .9), H(ex + .6, ey + .9), H(ex + .6, ey - 1.3), H(ex - .2, ey - 1.3)], 1, hd - 5.55, False)
             ink.poly([H(lo - .3 * sx, ey + 1.4), H(ex - 1 * sx, ey + 2.7 * lashes), H(hi + .8 * sx, ey + 2.3 * lashes), H(hi, ey + 1.1)], 1, hd - 5.6, False)
             ink.poly([H(ex - .8, ey + .8), H(ex + .1, ey + .8), H(ex + .1, ey + 1.6), H(ex - .8, ey + 1.6)], C['white'][3], hd - 5.7, False)
-        ink.poly([H(ex - 2.1, 3.4), H(ex + 2.2, 3.9), H(ex + 1.8, 4.5), H(ex - 1.9, 4.0)], C['brow'][0], hd - 5.8, False)
+        if FEMALE and p['eyes'] != 'closed':
+            hi = ex + 2.7 * sx
+            ink.poly([H(hi, ey + 1.1), H(hi + 1.7 * sx, ey + 2.5), H(hi + .4 * sx, ey + .3)], 1, hd - 5.62, False)
+        if FEMALE:
+            ink.poly([H(ex - 2.0, 3.7), H(ex + 2.1, 4.4), H(ex + 1.9, 4.8), H(ex - 1.8, 4.1)], C['brow'][1], hd - 5.8, False)
+        else:
+            ink.poly([H(ex - 2.1, 3.4), H(ex + 2.2, 3.9), H(ex + 1.8, 4.5), H(ex - 1.9, 4.0)], C['brow'][0], hd - 5.8, False)
         if paint:
             for dy in (0, 1.1):
                 ink.poly([H(ex - 1.8 * sx, -4.0 - dy), H(ex + 1.9 * sx, -4.4 - dy), H(ex + 1.8 * sx, -5.0 - dy), H(ex - 1.7 * sx, -4.6 - dy)], C[paint[0]][paint[1]], hd - 5.65, False)
     nx = side * 5
     ink.poly([H(nx, -3.7), H(nx + .6, -5), H(nx + 1.5, -4.3)], C['skin'][1], hd - 5.5, False)
     ink.poly([H(nx - 1.1, -7.5), H(nx + 1.4, -7.4), H(nx + .7, -8)], C['mouth'][1], hd - 5.6, False)
+    if FEMALE:      # fuller lower lip
+        ink.poly([H(nx - .9, -7.9), H(nx + 1.2, -7.8), H(nx + .2, -8.8)], C['mouth'][2], hd - 5.65, False)
     return True
 
 
@@ -245,7 +283,10 @@ def revision_of(sheet_sources, *objects):
 
 class Sheet:
     """One class's atlas: frame cache, compositing, contact sheets, PixelFlow build and atlas export."""
-    def __init__(self, name, *, files, pixel, mats, clips, slots, gear, render, revision, meta, default_equip, combos, legacy=(), groups=None):
+    def __init__(self, name, *, files, pixel, mats, clips, slots, gear, render, revision, meta, default_equip, combos, legacy=(), legacy_files=None, groups=None):
+        self.legacy_files = legacy_files or files                      # where legacy parts live (a female sheet shares the male blades)
+        if FEMALE:
+            name, files, pixel = name + '_f', files + '_f', pixel[:-1] + 'f_'
         self.name, self.files, self.pixel = name, files, pixel          # files: asset prefix; pixel: sprite name prefix
         self.mats, self.clips, self.slots, self.gear, self.render = mats, clips, slots, gear, render
         self.palette, self.color = palette_of(mats)
@@ -286,8 +327,8 @@ class Sheet:
         if not hasattr(self, '_legacy'):
             self._legacy = {}
         if part not in self._legacy:
-            colour = np.asarray(Image.open(ASSETS / f'{self.files}_{part}.png').convert('RGBA'))
-            depth = np.asarray(Image.open(ASSETS / f'{self.files}_{part}_depth.png').convert('RGB')).astype(np.int32)
+            colour = np.asarray(Image.open(ASSETS / f'{self.legacy_files}_{part}.png').convert('RGBA'))
+            depth = np.asarray(Image.open(ASSETS / f'{self.legacy_files}_{part}_depth.png').convert('RGB')).astype(np.int32)
             self._legacy[part] = (colour, depth)
         colour, depth = self._legacy[part]
         y = (self.clips_row0[clip] + DIRS.index(facing)) * FH
@@ -443,14 +484,17 @@ class Sheet:
             atlases[part].save(ASSETS / f'{self.files}_{part}.png', optimize=True)
             depths[part].save(ASSETS / f'{self.files}_{part}_depth.png', optimize=True)
         meta = {'frame': [FW, FH], 'anchor': [AX, AY], 'dirs': DIRS, 'clips': meta_clips,
-                'parts': {part: {'png': f'{self.files}_{part}.png', 'depth': f'{self.files}_{part}_depth.png'} for part in self.all_parts},
+                'parts': {part: {'png': f'{self.legacy_files if part in self.legacy else self.files}_{part}.png',
+                                 'depth': f'{self.legacy_files if part in self.legacy else self.files}_{part}_depth.png'} for part in self.all_parts},
+                'gender': 'female' if FEMALE else 'male',
                 'equipment': self.gear, 'defaultEquipment': self.default_equip,
                 'sprites': ids, 'ramps': self.mats,
                 'depth': {'encoding': 'R*256+G', 'offset': 512, 'scale': 64, 'near': 'smaller'},
                 'facing': 'Same eight-direction formula and foot anchor as assassin_sprites.txt',
                 'style': '2D Korean RPG anime cel illustration',
-                'editing': f'Three PixelFlow sprites per clip and facing ({self.pixel}<clip>_<facing>_{"|".join(self.groups)}). '
-                           'ref_body layers are read-only context. build --replace discards edits.',
+                'editing': ('Female set: generated from code by export --local, with no PixelFlow copies. Re-run the class script with --female to change it.' if FEMALE else
+                            f'Three PixelFlow sprites per clip and facing ({self.pixel}<clip>_<facing>_{"|".join(self.groups)}). '
+                            'ref_body layers are read-only context. build --replace discards edits.'),
                 **self.meta}
         (ASSETS / f'{self.files}_sprites.txt').write_text(json.dumps(meta, indent=2) + '\n')
         print('exported', len(self.parts), 'parts and depth maps', size, flush=True)

@@ -1,0 +1,285 @@
+{
+  "frame": [
+    160,
+    160
+  ],
+  "anchor": [
+    80,
+    119
+  ],
+  "dirs": [
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "N",
+    "NE",
+    "E",
+    "SE"
+  ],
+  "clips": {
+    "idle": {
+      "row0": 0,
+      "n": 6,
+      "fps": 6
+    },
+    "walk": {
+      "row0": 8,
+      "n": 8,
+      "fps": 12
+    },
+    "attack": {
+      "row0": 16,
+      "n": 8,
+      "fps": 20
+    },
+    "hurt": {
+      "row0": 24,
+      "n": 4,
+      "fps": 10
+    },
+    "die": {
+      "row0": 32,
+      "n": 8,
+      "fps": 8
+    }
+  },
+  "parts": {
+    "body": {
+      "png": "assassin_f_body.png",
+      "depth": "assassin_f_body_depth.png"
+    },
+    "armor_shadow": {
+      "png": "assassin_f_armor_shadow.png",
+      "depth": "assassin_f_armor_shadow_depth.png"
+    },
+    "armor_moon": {
+      "png": "assassin_f_armor_moon.png",
+      "depth": "assassin_f_armor_moon_depth.png"
+    },
+    "shoulders_shadow": {
+      "png": "assassin_f_shoulders_shadow.png",
+      "depth": "assassin_f_shoulders_shadow_depth.png"
+    },
+    "shoulders_moon": {
+      "png": "assassin_f_shoulders_moon.png",
+      "depth": "assassin_f_shoulders_moon_depth.png"
+    },
+    "gloves_shadow": {
+      "png": "assassin_f_gloves_shadow.png",
+      "depth": "assassin_f_gloves_shadow_depth.png"
+    },
+    "gloves_moon": {
+      "png": "assassin_f_gloves_moon.png",
+      "depth": "assassin_f_gloves_moon_depth.png"
+    },
+    "head_shadow": {
+      "png": "assassin_f_head_shadow.png",
+      "depth": "assassin_f_head_shadow_depth.png"
+    },
+    "head_moon": {
+      "png": "assassin_f_head_moon.png",
+      "depth": "assassin_f_head_moon_depth.png"
+    },
+    "weapon_daggers": {
+      "png": "assassin_weapon_daggers.png",
+      "depth": "assassin_weapon_daggers_depth.png"
+    },
+    "weapon_moonfang": {
+      "png": "assassin_weapon_moonfang.png",
+      "depth": "assassin_weapon_moonfang_depth.png"
+    }
+  },
+  "gender": "female",
+  "equipment": {
+    "armor": {
+      "none": {
+        "name": "Simple cloth",
+        "defense": 0
+      },
+      "shadow": {
+        "name": "Nightweave",
+        "defense": 2
+      },
+      "moon": {
+        "name": "Moonveil",
+        "defense": 4
+      }
+    },
+    "shoulders": {
+      "none": {
+        "name": "Bare shoulders",
+        "defense": 0
+      },
+      "shadow": {
+        "name": "Nightweave Spaulders",
+        "defense": 1
+      },
+      "moon": {
+        "name": "Moonveil Crescents",
+        "defense": 2
+      }
+    },
+    "gloves": {
+      "none": {
+        "name": "Bare hands",
+        "defense": 0
+      },
+      "shadow": {
+        "name": "Nightweave Claws",
+        "defense": 1
+      },
+      "moon": {
+        "name": "Moonveil Gauntlets",
+        "defense": 2
+      }
+    },
+    "head": {
+      "none": {
+        "name": "Bare head",
+        "defense": 0
+      },
+      "shadow": {
+        "name": "Shadow Brow Band",
+        "defense": 1
+      },
+      "moon": {
+        "name": "Moonveil Circlet",
+        "defense": 2
+      }
+    },
+    "weapon": {
+      "none": {
+        "name": "Empty hands",
+        "attack": 0
+      },
+      "daggers": {
+        "name": "Twin daggers",
+        "attack": 4
+      },
+      "moonfang": {
+        "name": "Moonfang blades",
+        "attack": 8
+      }
+    }
+  },
+  "defaultEquipment": {
+    "armor": "shadow",
+    "shoulders": "none",
+    "gloves": "none",
+    "head": "none",
+    "weapon": "daggers"
+  },
+  "sprites": {},
+  "ramps": {
+    "skin": [
+      "#92595c",
+      "#ce9182",
+      "#f0bfac",
+      "#ffe0ce"
+    ],
+    "hair": [
+      "#151a30",
+      "#293451",
+      "#465278",
+      "#7985ac"
+    ],
+    "brow": [
+      "#171526",
+      "#242037",
+      "#332946",
+      "#443750"
+    ],
+    "cloth": [
+      "#323348",
+      "#57566c",
+      "#868294",
+      "#b2a8b7"
+    ],
+    "pants": [
+      "#232538",
+      "#3b3f59",
+      "#606981",
+      "#8b96aa"
+    ],
+    "night": [
+      "#181e33",
+      "#303a56",
+      "#515b7f",
+      "#7d89af"
+    ],
+    "moon": [
+      "#27223f",
+      "#494066",
+      "#756992",
+      "#b5a3cc"
+    ],
+    "scarf": [
+      "#541b3b",
+      "#913a59",
+      "#d4667f",
+      "#ffaaa6"
+    ],
+    "ribbon": [
+      "#443052",
+      "#876284",
+      "#d5a6bd",
+      "#ffe2e7"
+    ],
+    "leather": [
+      "#201c30",
+      "#39334d",
+      "#5b5270",
+      "#887f9c"
+    ],
+    "silver": [
+      "#3a516d",
+      "#7791b0",
+      "#bdcfe5",
+      "#f2f5ff"
+    ],
+    "rune": [
+      "#413978",
+      "#8974c8",
+      "#cfb5fa",
+      "#fff1ff"
+    ],
+    "iris": [
+      "#2a294c",
+      "#484575",
+      "#7f80bd",
+      "#c2b4f0"
+    ],
+    "white": [
+      "#c0aec4",
+      "#ded2e2",
+      "#f6eef1",
+      "#fffbf6"
+    ],
+    "mouth": [
+      "#5c2d45",
+      "#86506a",
+      "#c88493",
+      "#e9a4ab"
+    ]
+  },
+  "depth": {
+    "encoding": "R*256+G",
+    "offset": 512,
+    "scale": 64,
+    "near": "smaller"
+  },
+  "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
+  "style": "2D Korean RPG anime cel illustration",
+  "editing": "Female set: generated from code by export --local, with no PixelFlow copies. Re-run the class script with --female to change it.",
+  "attack": {
+    "duration": 0.4,
+    "impact": 0.2
+  },
+  "portrait": [
+    57,
+    15,
+    46,
+    46
+  ]
+}

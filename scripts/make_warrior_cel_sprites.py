@@ -112,27 +112,46 @@ def render_frame(clip, facing, k):
     inks = {part: cc.Ink(psi, COLOR) for part in SHEET.parts}
     body = inks['body']
     torso = lambda ink, mat, *a: cc.torso(ink, xf, mat, *a)
-    cc.base_body(body, xf, joints, R, w=BULK, torso_width=8.8, torso_depth=4)
+    cc.base_body(body, xf, joints, R, w=1.05 if cc.FEMALE else BULK, torso_width=8.8, torso_depth=4)
     head = cc.head_frame(body, xf, psi, p, turn=.5)
     H, hd, front, side = head['H'], head['hd'], head['front'], head['side']
     sw = p['sway']
     # Short spiky hair: a swept fringe of three sharp locks, bristling crown, a short tail at the nape.
-    body.plate([xf(q) for q in [(-4, -5, 80), (4, -5, 80), (5 + sw, -8, 70), (0 + sw * 1.3, -9, 66), (-5 + sw, -8, 70)]], 'hair', 1)
+    if cc.FEMALE:
+        # A long braid down the back (a swaying plait with a ribbon at the end) and a short pair of face-framing locks.
+        body.plate([xf(q) for q in [(-3, -5.4, 86), (3, -5.4, 86), (5.2 + sw * 1.2, -9.4, 64), (4 + sw * 2.4, -10.8, 42), (0 + sw * 2.8, -10.8, 31), (-3.4 + sw * 2.2, -10.4, 42), (-4.6 + sw, -8.8, 66)]], 'hair', 1)
+        for z_ in (72, 60, 48):
+            body.plate([xf(q) for q in [(-3.4 + sw * (86 - z_) * .06, -9.6 - (86 - z_) * .02, z_ + 1.2), (3.4 + sw * (86 - z_) * .06, -9.6 - (86 - z_) * .02, z_ + 1.2), (2.4 + sw * (86 - z_) * .06, -10 - (86 - z_) * .02, z_ - 1.4), (-2.4 + sw * (86 - z_) * .06, -10 - (86 - z_) * .02, z_ - 1.4)]], 'hair', 2, True)
+        body.bone(xf((-1.4 + sw * 2.8, -10.8, 32)), xf((1.4 + sw * 2.8, -10.8, 32)), 1.1, 1.1, 'plume', -.4)
+        for sx_ in (-1, 1):
+            body.plate([xf(q) for q in [(sx_ * 9.4, -1.2, 86), (sx_ * 11, -1.2, 80), (sx_ * 10.6, .8, 69), (sx_ * 9, .6, 68), (sx_ * 8.6, -.4, 76)]], 'hair', 2 if sx_ > 0 else 1, True)
+    else:
+        body.plate([xf(q) for q in [(-4, -5, 80), (4, -5, 80), (5 + sw, -8, 70), (0 + sw * 1.3, -9, 66), (-5 + sw, -8, 70)]], 'hair', 1)
     if not cc.face(body, head, p, lashes=.8):
         body.poly([H(*q) for q in [(-9.5, 8), (-10.5, 0), (-8.5, -8), (-4, -10.5), (5, -9.5), (9.5, -5), (10.5, 4), (6.5, 13), (-3, 14)]], COLOR['hair'][2], hd - 5)
     crown = [(-10.4, -4), (-11.6, 5), (-10.4, 10), (-7.6, 15), (-5.6, 14), (-3, 21), (-.4, 15.6), (2.6, 22), (4, 15.6), (8, 19), (8.4, 13), (11.6, 11), (10.8, 4), (10.4, -4),
              (8.4, 0), (7.6, 4.6), (4.6, 7.6), (1.4, 4.6), (-.8, 7), (-4, 4.6), (-7.2, 6.4), (-8.4, 1)]
+    if cc.FEMALE:      # a softly swept fringe instead of the spikes
+        crown = [(-10.5, -6), (-11.5, 6), (-9.5, 13), (-4, 17.4), (1, 18.8), (6, 17), (10, 13), (11.5, 6), (10.5, -6),
+                 (8.6, -2), (7, 3.5), (3, 6.8), (-1, 4.4), (-5, 6.2), (-8, 3), (-9, -2)]
     body.poly([H(*q) for q in crown], COLOR['hair'][1], hd - 6)
-    body.poly([H(*q) for q in [(-10, 10), (-7.6, 14.4), (-5.4, 13.6), (-3, 19.8), (-1, 14.6), (-6, 9)]], COLOR['hair'][2], hd - 6.1, False)
-    body.poly([H(*q) for q in [(2.6, 20.4), (3.8, 15), (7.6, 17.6), (8, 13), (5, 11)]], COLOR['hair'][2], hd - 6.1, False)
-    body.poly([H(*q) for q in [(-4, 13), (-2, 16), (0, 13), (-1.6, 11.6)]], COLOR['hair'][3], hd - 6.2, False)
-    # Heavy brows sit above the shared eyes.
+    if cc.FEMALE:
+        body.poly([H(*q) for q in [(-9, 12), (-3, 16.4), (4, 17), (9.6, 12), (9, 9), (3, 12.6), (-3, 12.4), (-8.5, 8.4)]], COLOR['hair'][2], hd - 6.1, False)
+        body.poly([H(*q) for q in [(-5, 14.6), (0, 17), (4, 16), (0, 14), (-4, 12.8)]], COLOR['hair'][3], hd - 6.2, False)
+    else:
+        body.poly([H(*q) for q in [(-10, 10), (-7.6, 14.4), (-5.4, 13.6), (-3, 19.8), (-1, 14.6), (-6, 9)]], COLOR['hair'][2], hd - 6.1, False)
+        body.poly([H(*q) for q in [(2.6, 20.4), (3.8, 15), (7.6, 17.6), (8, 13), (5, 11)]], COLOR['hair'][2], hd - 6.1, False)
+        body.poly([H(*q) for q in [(-4, 13), (-2, 16), (0, 13), (-1.6, 11.6)]], COLOR['hair'][3], hd - 6.2, False)
+    # Heavy brows sit above the shared eyes (a lighter, arched pair on the woman).
     if front > -.4:
         for sx in (-1, 1):
             ex = sx * 4 * max(.28, front) + side * 3.3
             if abs(side) > .85 and sx * side < 0:
                 continue
-            body.poly([H(ex - 2.8, 3.2), H(ex + 2.8, 4.6), H(ex + 2.2, 5.8), H(ex - 2.6, 4.4)], COLOR['brow'][0], hd - 5.9, False)
+            if cc.FEMALE:
+                body.poly([H(ex - 2.6, 3.6), H(ex + 2.6, 4.8), H(ex + 2.2, 5.4), H(ex - 2.4, 4.2)], COLOR['brow'][1], hd - 5.9, False)
+            else:
+                body.poly([H(ex - 2.8, 3.2), H(ex + 2.8, 4.6), H(ex + 2.2, 5.8), H(ex - 2.6, 4.4)], COLOR['brow'][0], hd - 5.9, False)
 
     cuff = lambda j, f: j['hand'] + (j['elbow'] - j['hand']) * f
     for tier in ('crimson', 'azure'):

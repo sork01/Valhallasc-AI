@@ -156,8 +156,15 @@ def render_frame(clip, facing, k):
     body.poly([H(*q) for q in [(1, 6.4), (3, 6.4), (7, 3.6), (9.5, -5), (8, -1.5), (5, 2.6)]], COLOR['hair'][2], hd - 6.1, False)
     # High ponytail on a coral ribbon, swinging with the body.
     sw = p['sway']
-    body.plate([xf(q) for q in [(-2.4, -6, 91), (2.4, -6, 91), (7 + sw * 1.2, -11, 70), (3 + sw * 2, -12, 54), (-1 + sw * 1.4, -10.5, 63), (-4 + sw, -9, 74)]], 'hair', 1)
-    body.plate([xf(q) for q in [(-.8, -6.4, 90), (1.6, -6.4, 90), (4.6 + sw * 1.2, -11.3, 70), (2 + sw * 1.8, -11.6, 60), (.4 + sw, -9.8, 72)]], 'hair', 2, True)
+    if cc.FEMALE:
+        # Longer and fuller: the tail reaches the waist, and two locks frame the face down to the shoulders.
+        body.plate([xf(q) for q in [(-3, -6, 91), (3, -6, 91), (8.6 + sw * 1.2, -11.6, 70), (5 + sw * 2.2, -13, 46), (0 + sw * 2.6, -12, 33), (-3.4 + sw * 1.8, -11.6, 46), (-5.4 + sw, -9.4, 72)]], 'hair', 1)
+        body.plate([xf(q) for q in [(-1.2, -6.4, 90), (2, -6.4, 90), (5.6 + sw * 1.2, -11.8, 70), (2.6 + sw * 2.2, -12.6, 48), (.2 + sw * 2.4, -11.8, 38), (-1.2 + sw * 1.6, -11, 56)]], 'hair', 2, True)
+        for sx_ in (-1, 1):
+            body.plate([xf(q) for q in [(sx_ * 9.4, -1.2, 86), (sx_ * 11.2, -1.2, 80), (sx_ * 11, .8, 66), (sx_ * 9.2, .6, 64), (sx_ * 8.6, -.4, 74)]], 'hair', 2 if sx_ > 0 else 1, True)
+    else:
+        body.plate([xf(q) for q in [(-2.4, -6, 91), (2.4, -6, 91), (7 + sw * 1.2, -11, 70), (3 + sw * 2, -12, 54), (-1 + sw * 1.4, -10.5, 63), (-4 + sw, -9, 74)]], 'hair', 1)
+        body.plate([xf(q) for q in [(-.8, -6.4, 90), (1.6, -6.4, 90), (4.6 + sw * 1.2, -11.3, 70), (2 + sw * 1.8, -11.6, 60), (.4 + sw, -9.8, 72)]], 'hair', 2, True)
     body.bone(xf((-1.8, -6.2, 90.5)), xf((1.8, -6.2, 90.5)), 1.1, 1.1, 'feather', -.4)
 
     def cape(ink, mat, lining, longer, trim):
