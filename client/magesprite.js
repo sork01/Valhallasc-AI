@@ -32,38 +32,52 @@
         : part.startsWith('head_') ? solid(ax - 3, ay - 17, 6, 3, () => colour(part), 480)
         : part.startsWith('shoulders_') ? solid(ax - 5, ay - 12, 10, 2, () => colour(part), 470)
         : part.startsWith('gloves_') ? solid(ax - 5, ay - 7, 10, 2, () => colour(part), 460)
+        : part.startsWith('pants_') ? solid(ax - 4, ay - 8, 8, 4, () => colour(part), 520)
+        : part.startsWith('necklace_') ? solid(ax - 2, ay - 12, 4, 1, () => colour(part), 450)
+        : part.startsWith('accessory_') ? solid(ax - 6, ay - 7, 2, 1, () => colour(part), 440)
         : solid(ax + 3, ay - 15, 2, 12, () => colour(part), 400);
       parts[part] = new Proxy({}, { get: () => frame });   // the same still figure for every clip, direction and frame
     }
-    return { meta, parts };
+    return { meta, parts, ensure: () => Promise.resolve() };
+  }
+  // The class-independent pieces (scripts/generic_gear.py) are rarely worn, so their atlases are decoded only when a
+  // look asks for them: `source.ensure(part)` starts the load once and resolves when the frames are in `source.parts`.
+  const GENERIC = { head: 'ironhide', shoulders: 'ironhide', gloves: 'duelist', pants: 'wayfarer', necklace: 'moonstone', accessory: 'amber' };
+  const LAZY = new Set(Object.entries(GENERIC).map(([slot, variant]) => `${slot}_${variant}`));
+  // Retain only occupied rectangles; release the large decoded atlases.
+  async function decodePart(meta, files) {
+    const [fw, fh] = meta.frame;
+    const [color, depth] = await Promise.all([imageData('assets/' + files.png), imageData('assets/' + files.depth)]);
+    const frames = {};
+    for (const [clip, C] of Object.entries(meta.clips)) for (let dir = 0; dir < 8; dir++) for (let i = 0; i < C.n; i++) {
+      const bx = i * fw, by = (C.row0 + dir) * fh;
+      let x0 = fw, y0 = fh, x1 = -1, y1 = -1;
+      for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+        if (!color.data[((by + y) * color.width + bx + x) * 4 + 3]) continue;
+        x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+      }
+      const width = Math.max(0, x1 - x0 + 1), height = Math.max(0, y1 - y0 + 1);
+      const pixels = new Uint8ClampedArray(width * height * 4), z = new Uint16Array(width * height);
+      for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+        const src = ((by + y0 + y) * color.width + bx + x0 + x) * 4, dst = (y * width + x) * 4;
+        pixels.set(color.data.subarray(src, src + 4), dst); z[dst / 4] = depth.data[src] * 256 + depth.data[src + 1];
+      }
+      frames[`${clip}/${dir}/${i}`] = { x: x0, y: y0, w: width, h: height, pixels, z };
+    }
+    return frames;
   }
   async function loadSource(url) {
     const response = await fetch(url);
     if (!response.ok) throw new Error('Character sprite metadata could not be loaded');
-    const meta = await response.json(), [fw, fh] = meta.frame, parts = {};
+    const meta = await response.json(), parts = {}, loading = new Map();
     if (window.__valhallaTestSprites === true) return stubSource(meta);
-    // Retain only occupied rectangles; release the large decoded atlases.
-    for (const [part, files] of Object.entries(meta.parts)) {
-      const [color, depth] = await Promise.all([imageData('assets/' + files.png), imageData('assets/' + files.depth)]);
-      const frames = {};
-      for (const [clip, C] of Object.entries(meta.clips)) for (let dir = 0; dir < 8; dir++) for (let i = 0; i < C.n; i++) {
-        const bx = i * fw, by = (C.row0 + dir) * fh;
-        let x0 = fw, y0 = fh, x1 = -1, y1 = -1;
-        for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
-          if (!color.data[((by + y) * color.width + bx + x) * 4 + 3]) continue;
-          x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
-        }
-        const width = Math.max(0, x1 - x0 + 1), height = Math.max(0, y1 - y0 + 1);
-        const pixels = new Uint8ClampedArray(width * height * 4), z = new Uint16Array(width * height);
-        for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
-          const src = ((by + y0 + y) * color.width + bx + x0 + x) * 4, dst = (y * width + x) * 4;
-          pixels.set(color.data.subarray(src, src + 4), dst); z[dst / 4] = depth.data[src] * 256 + depth.data[src + 1];
-        }
-        frames[`${clip}/${dir}/${i}`] = { x: x0, y: y0, w: width, h: height, pixels, z };
-      }
-      parts[part] = frames;
-    }
-    return { meta, parts };
+    for (const [part, files] of Object.entries(meta.parts)) if (!LAZY.has(part)) parts[part] = await decodePart(meta, files);
+    const ensure = part => {
+      if (parts[part] || !meta.parts[part]) return Promise.resolve();
+      if (!loading.has(part)) loading.set(part, decodePart(meta, meta.parts[part]).then(frames => { parts[part] = frames; }, error => { console.warn('Equipment art could not be loaded', part, error); }));
+      return loading.get(part);
+    };
+    return { meta, parts, ensure };
   }
   const equipment = look => ({
     armor: Object.hasOwn(ARMOR, look?.mageArmor) ? look.mageArmor : 'apprentice',
@@ -71,12 +85,21 @@
   });
   // Head, shoulder and glove pieces are worn per class: the look names a tier (or 'none'), and a class only
   // accepts its own tier names (MageSprite.TIERS). A part the atlas does not have is simply not drawn.
-  const SLOT_ORDER = ['armor', 'shoulders', 'gloves', 'head', 'weapon'];
-  const pieces = (C, look) => Object.fromEntries(['head', 'shoulders', 'gloves'].map(slot => [slot, (C.TIERS || []).includes(look?.[slot]) ? look[slot] : 'none']));
+  const SLOT_ORDER = ['armor', 'pants', 'shoulders', 'gloves', 'head', 'necklace', 'accessory', 'weapon'];
+  // A head, shoulder or glove piece is the class's own tier or the shared generic piece; pants, necklace and ring are generic only.
+  const CLASS_SLOTS = ['head', 'shoulders', 'gloves'];
+  const pieces = (C, look) => Object.fromEntries(Object.entries(GENERIC).map(([slot, generic]) => {
+    const allowed = CLASS_SLOTS.includes(slot) ? [...(C.TIERS || []), generic] : [generic];
+    return [slot, allowed.includes(look?.[slot]) ? look[slot] : 'none'];
+  }));
   class MageSprite {
     constructor(source, look = {}) { this.source = source; this.meta = source.meta; this.cache = new Map(); this.set(look); }
     set(look) {
       this.look = { ...look }; this.equipment = { ...pieces(this.constructor, look), ...this.constructor.equipment(look) }; this.cache.clear();
+      for (const slot of SLOT_ORDER) {      // a layer still being decoded appears (and the frames are rebuilt) as soon as it arrives
+        const part = slot + '_' + this.equipment[slot];
+        if (this.equipment[slot] !== 'none' && !this.source.parts[part]) this.source.ensure?.(part).then(() => { if (this.source.parts[part]) this.cache.clear(); });
+      }
       this.tint = new Map();
       const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
       const lum = c => c[0] * .299 + c[1] * .587 + c[2] * .114;
@@ -137,6 +160,7 @@
       return new this(await sources.get(url), look);
     }
   }
+  MageSprite.GENERIC = GENERIC;
   MageSprite.HAIR = HAIR; MageSprite.SKIN = SKIN; MageSprite.ARMOR = ARMOR; MageSprite.WEAPON = WEAPON;
   MageSprite.equipment = equipment; MageSprite.TIERS = ['apprentice', 'runic'];
   MageSprite.METADATA = 'assets/mage_sprites.txt';

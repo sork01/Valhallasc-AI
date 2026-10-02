@@ -106,6 +106,9 @@ impl Store {
         look.head = defaults.head;
         look.shoulders = defaults.shoulders;
         look.gloves = defaults.gloves;
+        look.pants = defaults.pants;
+        look.necklace = defaults.necklace;
+        look.accessory = defaults.accessory;
         let mut c = Character {
             id: Uuid::new_v4().to_string(),
             hp: look.class.health(),

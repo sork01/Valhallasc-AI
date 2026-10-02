@@ -2,7 +2,7 @@
 (() => {
   // A golden-haired healer in ivory and crimson robes: shares only the equipment compositor; artwork and animation are the Priest\u2019s own.
   class PriestSprite extends MageSprite {}
-  PriestSprite.TIERS = [];
+  PriestSprite.TIERS = ['pilgrim', 'dawn'];
   PriestSprite.METADATA = 'assets/priest_sprites.txt';
   PriestSprite.HAIR = ['#ecd290', '#9eaccf', '#b5616d', '#624357', '#334c4a', '#465278'];
   PriestSprite.SKIN = ['#f0bfac', '#ffe0c5', '#cc927b', '#9c695a'];

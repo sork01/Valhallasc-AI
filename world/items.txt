@@ -268,7 +268,8 @@
     "rarity": "rare",
     "sell": 25,
     "attack": 0,
-    "defense": 2
+    "defense": 2,
+    "variant": "ironhide"
   },
   {
     "id": "shoulders_upgrade",
@@ -277,7 +278,8 @@
     "rarity": "rare",
     "sell": 25,
     "attack": 0,
-    "defense": 2
+    "defense": 2,
+    "variant": "ironhide"
   },
   {
     "id": "pants_upgrade",
@@ -286,7 +288,8 @@
     "rarity": "rare",
     "sell": 25,
     "attack": 0,
-    "defense": 2
+    "defense": 2,
+    "variant": "wayfarer"
   },
   {
     "id": "gloves_upgrade",
@@ -295,7 +298,8 @@
     "rarity": "rare",
     "sell": 25,
     "attack": 1,
-    "defense": 1
+    "defense": 1,
+    "variant": "duelist"
   },
   {
     "id": "necklace_upgrade",
@@ -304,7 +308,8 @@
     "rarity": "rare",
     "sell": 25,
     "attack": 2,
-    "defense": 0
+    "defense": 0,
+    "variant": "moonstone"
   },
   {
     "id": "accessory_upgrade",
@@ -313,7 +318,8 @@
     "rarity": "rare",
     "sell": 25,
     "attack": 1,
-    "defense": 1
+    "defense": 1,
+    "variant": "amber"
   },
   {
     "id": "adventurer_satchel",
@@ -689,6 +695,78 @@
     "sell": 25,
     "class": "hunter",
     "variant": "warden",
+    "attack": 0,
+    "defense": 2,
+    "starter": false
+  },
+  {
+    "id": "priest_headgear_pilgrim",
+    "name": "Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "common",
+    "sell": 0,
+    "class": "priest",
+    "variant": "pilgrim",
+    "attack": 0,
+    "defense": 1,
+    "starter": true
+  },
+  {
+    "id": "priest_headgear_dawn",
+    "name": "Sunburst Diadem",
+    "kind": "headgear",
+    "rarity": "rare",
+    "sell": 25,
+    "class": "priest",
+    "variant": "dawn",
+    "attack": 0,
+    "defense": 2,
+    "starter": false
+  },
+  {
+    "id": "priest_shoulders_pilgrim",
+    "name": "Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "common",
+    "sell": 0,
+    "class": "priest",
+    "variant": "pilgrim",
+    "attack": 0,
+    "defense": 1,
+    "starter": true
+  },
+  {
+    "id": "priest_shoulders_dawn",
+    "name": "Sunray Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "sell": 25,
+    "class": "priest",
+    "variant": "dawn",
+    "attack": 0,
+    "defense": 2,
+    "starter": false
+  },
+  {
+    "id": "priest_gloves_pilgrim",
+    "name": "Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "common",
+    "sell": 0,
+    "class": "priest",
+    "variant": "pilgrim",
+    "attack": 0,
+    "defense": 1,
+    "starter": true
+  },
+  {
+    "id": "priest_gloves_dawn",
+    "name": "Dawnweave Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "sell": 25,
+    "class": "priest",
+    "variant": "dawn",
     "attack": 0,
     "defense": 2,
     "starter": false

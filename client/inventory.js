@@ -43,6 +43,11 @@
   };
   function icon(i, emptyKind) {
     const kind = i?.kind || emptyKind;
+    const cell = i && window.ITEM_ICONS?.at[i.id];   // equipment has its own pixel icon (assets/items.png); everything else keeps the glyph
+    if (cell) {
+      const { cols, rows } = ITEM_ICONS;
+      return `<span class="item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-size:${cols * 100}% ${rows * 100}%;background-position:${cell[0] / (cols - 1) * 100}% ${cell[1] / (rows - 1) * 100}%"></span>`;
+    }
     const glyph = kind === 'weapon' && i?.class === 'mage' ? 'staff' : kind === 'weapon' && i?.class === 'assassin' ? 'daggers' : kind === 'weapon' && i?.class === 'priest' ? 'mace' : kind === 'weapon' && i?.class === 'hunter' ? 'bow' : i?.id === 'ironhide_shell' ? 'shell' : kind;
     const palette = { slime_gel: '#88c675', blue_gel: '#6ca6ec', pink_gel: '#dd88b1', golden_gel: '#edc561', royal_jelly: '#bd84e2', traveler_stew: '#c98a4b', health_potion: '#e0476b' };
     const color = palette[i?.id] || (i?.variant === 'crimson' ? '#c16b67' : i?.rarity === 'rare' ? '#86acd5' : '#ab8e68');

@@ -39,8 +39,11 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
   const C = { warrior: WarriorSprite, mage: MageSprite, assassin: AssassinSprite, priest: PriestSprite, hunter: HunterSprite }[cls];
   window.femaleSprites = window.femaleSprites || {};
   const sprite = female ? (window.femaleSprites[cls] = window.femaleSprites[cls] || await C.Female.load({ ...valhalla[cls].look, gender: 'female' })) : valhalla[cls];
-  const look = { ...sprite.look, head: 'none', shoulders: 'none', gloves: 'none', ...extras, [cls + 'Armor']: armor, [cls + 'Weapon']: weapon };
+  const look = { ...sprite.look, head: 'none', shoulders: 'none', gloves: 'none', pants: 'none', necklace: 'none', accessory: 'none', ...extras, [cls + 'Armor']: armor, [cls + 'Weapon']: weapon };
   sprite.set(look);
+  // The class-independent layers are decoded on demand: wait for whatever this look wears, then rebuild the frames.
+  await Promise.all(Object.entries(sprite.equipment).map(([slot, v]) => v !== 'none' && sprite.source.ensure(slot + '_' + v)));
+  sprite.cache.clear();
   const canvas = sprite.frame('idle', 0, 0), data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
   let visible = 0, hash = 0;
   for (let i = 0; i < data.length; i += 4) if (data[i + 3]) { visible++; hash = (hash * 31 + data[i] * 3 + data[i + 1] * 5 + data[i + 2] * 7 + i) >>> 0; }
@@ -61,7 +64,7 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
       check(dressed.visible > naked.visible && dressed.hash !== naked.hash, `${cls}: armour and a weapon add to the figure`);
       check(other.hash !== dressed.hash, `${cls}: the other armour and weapon look different`);
       // Shoulders, gloves and head are their own layers: each tier of each adds to the figure, differs from the
-      // other tier, and goes away again with 'none'. The Priest has none yet and must ignore them.
+      // other tier, and goes away again with 'none'.
       for (const slot of ['head', 'shoulders', 'gloves']) {
         if (!gear.tiers.length) { check((await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: 'crimson' })).hash === dressed.hash, `${cls}: no ${slot} layer, so a ${slot} piece changes nothing`); continue; }
         const worn = [];
@@ -75,6 +78,18 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
         const all = await figure(page, cls, gear.armor[0], gear.weapon[0], { head: gear.tiers[0], shoulders: gear.tiers[0], gloves: gear.tiers[0] });
         check(all.hash !== dressed.hash && all.visible > dressed.visible, `${cls}: head, shoulders and gloves worn together make a bigger figure`);
       }
+      // The class-independent pieces (Ironhide Helm and Pauldrons, Duelist Gloves, Wayfarer Pants, Moonstone Necklace, Amber Ring):
+      // the same art on every class, each its own layer, each adds to the figure, 'none' removes it, and a slot ignores a name it does not know.
+      const generic = await page.evaluate(() => MageSprite.GENERIC), genericWorn = {};
+      for (const [slot, variant] of Object.entries(generic)) {
+        genericWorn[slot] = await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: variant });
+        check(genericWorn[slot].hash !== dressed.hash && genericWorn[slot].visible > 0, `${cls}: the generic ${slot} piece (${variant}) is drawn`);
+        check((await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: 'none' })).hash === dressed.hash, `${cls}: generic ${slot} 'none' removes the layer`);
+      }
+      check(new Set(Object.values(genericWorn).map(w => w.hash)).size === Object.keys(generic).length, `${cls}: the six generic pieces are six different pictures`);
+      check((await figure(page, cls, gear.armor[0], gear.weapon[0], { pants: 'ironhide' })).hash === dressed.hash && (await figure(page, cls, gear.armor[0], gear.weapon[0], { necklace: 'amber' })).hash === dressed.hash, `${cls}: pants and necklace ignore names they do not know`);
+      const everything = await figure(page, cls, gear.armor[0], gear.weapon[0], generic);
+      check(everything.visible > dressed.visible && everything.hash !== dressed.hash, `${cls}: all six generic pieces worn together make a bigger figure`);
       check(await page.evaluate(cls => valhalla[cls].portrait().length > 2000, cls), `${cls}: the portrait renders`);
       // The female set: its own atlases, the same equipment, a body that is not the male one.
       const f = (armor, weapon, extras) => figure(page, cls, armor, weapon, extras, true);
@@ -89,6 +104,10 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
         for (const tier of gear.tiers) worn.push(await f(gear.armor[0], gear.weapon[0], { [slot]: tier }));
         check(worn.every(w => w.hash !== fDressed.hash && w.visible > 0) && worn[0].hash !== worn[1].hash, `${cls} (female): each ${slot} tier is drawn and they differ`);
         check((await f(gear.armor[0], gear.weapon[0], { [slot]: 'none' })).hash === fDressed.hash, `${cls} (female): ${slot} 'none' removes the layer`);
+      }
+      for (const [slot, variant] of Object.entries(generic)) {
+        const w = await f(gear.armor[0], gear.weapon[0], { [slot]: variant });
+        check(w.hash !== fDressed.hash && w.visible > 0 && (await f(gear.armor[0], gear.weapon[0], { [slot]: 'none' })).hash === fDressed.hash, `${cls} (female): the generic ${slot} piece is drawn and 'none' removes it`);
       }
       check(await page.evaluate(cls => { const s = femaleSprites[cls]; return s.meta.gender === 'female' && s.portrait().length > 2000 && ['idle', 'walk', 'attack', 'hurt', 'die'].every(c => s.frame(c, 5, 0).width > 0); }, cls), `${cls} (female): metadata, portrait and every clip render`);
       // Animation: the walk and the attack are different pictures from standing still, in the female set too.

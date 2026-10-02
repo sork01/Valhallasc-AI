@@ -149,6 +149,18 @@ async function call(name, args = {}) {
   check(await page.locator('#skill-library .skill-card:not(.locked)').count() === 1 && await page.locator('#skill-library .skill-card.locked').count() === 10, 'The priest starts with its attack and sees ten locked skills');
   check(await page.locator('#skill-library .skill-card.locked').first().textContent().then(t => /Mend/.test(t) && /2/.test(t)), 'The first skill to earn is Mend, at level 2');
   await page.keyboard.press('Escape');
+  // The Priest wears pilgrim and dawn head, shoulder and glove pieces like every other class (it used to have none).
+  await page.keyboard.press('e');
+  const priestFigure = () => page.evaluate(() => { const c = Field.priestSprites.frame('idle', 0, 0), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let h = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3]) h = (h * 31 + d[i] * 3 + d[i + 1] * 5 + d[i + 2] * 7 + i) >>> 0; return h; });
+  let priestHash = await priestFigure();
+  for (const [slot, field, key] of [['headgear', 'priest_headgear_pilgrim', 'head'], ['shoulders', 'priest_shoulders_pilgrim', 'shoulders'], ['gloves', 'priest_gloves_pilgrim', 'gloves']]) {
+    check(await page.locator('#field-' + slot + ' option').count() === 2, `The priest's ${slot} slot offers the starter piece and None`);
+    await page.locator('#field-' + slot).selectOption(field);
+    await page.waitForFunction(key => Field.hero.look[key] === 'pilgrim' && Field.priestSprites.equipment[key] === 'pilgrim', key, { timeout: 8000 });
+    const next = await priestFigure();
+    check(next !== priestHash, `Wearing the priest's ${slot} piece changes the figure`); priestHash = next;
+  }
+  await page.keyboard.press('Escape');
   // The Hunter: a fifth class with a bow, an arrow attack and ten skills, whose head, shoulder and glove pieces are worn
   // from the equipment panel and show on the figure (the stub figure still changes pixels for each).
   await page.keyboard.press('Escape'); await page.locator('#p-new').click();

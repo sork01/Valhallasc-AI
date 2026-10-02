@@ -665,6 +665,7 @@ impl World {
             } => {
                 let mut look = look.ok_or("Create a character first.")?;
                 look.name = look.name.trim().into();
+                look.clear_worn();
                 look.validate()?;
                 if self.store.account_character_count(&id).map_err(storage)?
                     >= MAX_ACCOUNT_CHARACTERS
@@ -682,6 +683,7 @@ impl World {
             Identity::Guest { token: None, look } => {
                 let mut look = look.ok_or("Create a character first.")?;
                 look.name = look.name.trim().into();
+                look.clear_worn();
                 look.validate()?;
                 let (c, token) = self
                     .store

@@ -31,6 +31,25 @@ async function call(name, args = {}) {
   check(await page.locator('#equipment').isVisible(), 'E opens character and bags');
   check(await page.locator('#inventory-list .inventory-item').count() === 3 && await page.locator('#inventory-list .bag-cell').count() === 16, 'Equipped starter gear leaves sixteen backpack cells holding only the three unworn starter pieces');
   check(await page.locator('#field-mageWeapon option').count() === 2, 'Equipment selector offers only none and owned gear');
+  // Equipment icons: every piece of gear has its own pixel icon (assets/items.png), no two alike, and the bag/gear slots draw them.
+  const icons = await page.evaluate(async () => {
+    const gear = WORLD_ITEMS.filter(i => !['material', 'bag', 'food', 'potion'].includes(i.kind));
+    const img = new Image(); img.src = 'assets/items.png'; await img.decode();
+    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(img, 0, 0);
+    const { size, at } = ITEM_ICONS, seen = new Map(), missing = [], blank = [];
+    for (const i of gear) {
+      const cell = at[i.id]; if (!cell) { missing.push(i.id); continue; }
+      const px = g.getImageData(cell[0] * size, cell[1] * size, size, size).data;
+      let opaque = 0; for (let k = 3; k < px.length; k += 4) opaque += px[k] > 0;
+      if (opaque < 150) blank.push(i.id);
+      const key = Array.from(px).join(','); seen.set(key, (seen.get(key) || []).concat(i.id));
+    }
+    return { gear: gear.length, missing, blank, twins: [...seen.values()].filter(v => v.length > 1) };
+  });
+  check(icons.gear >= 50 && icons.missing.length === 0, `Every equipment item has an icon (missing: ${icons.missing})`);
+  check(icons.blank.length === 0 && icons.twins.length === 0, `No icon is blank or a copy of another (blank ${icons.blank}; twins ${JSON.stringify(icons.twins)})`);
+  check(await page.locator('#inventory-list [data-item="mage_headgear_apprentice"] .item-art').evaluate(n => getComputedStyle(n).backgroundImage.includes('items.png') && n.getBoundingClientRect().width > 20), 'Bag tiles draw the item\'s own pixel icon');
+  check(await page.locator('[data-slot="hands"] .item-art').count() === 1 && await page.locator('[data-slot="hands"] .item-art').getAttribute('data-icon') === 'mage_weapon_ash', 'The Hands slot shows the equipped staff icon');
   await page.locator('#field-mageArmor').selectOption('none'); await page.locator('#field-mageWeapon').selectOption('none');
   await page.waitForFunction(() => Field.hero.look.mageArmor === 'none' && Field.hero.look.mageWeapon === 'none');
   check(await page.evaluate(() => Field.equipmentStats.defense === 0 && Field.equipmentStats.attack === 24), 'Rapid slot changes preserve both requests');

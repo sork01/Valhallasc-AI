@@ -228,21 +228,31 @@ impl Character {
             }
         }
     }
-    /// Makes the look's head, shoulder and glove layers match the class pieces worn in the headgear, shoulders and
-    /// gloves slots (anything else worn there only adds stats).
+    /// Makes the look's worn-piece layers match the headgear, shoulders, gloves, pants, necklace and accessory slots. A
+    /// piece of the character's own class shows its class art; a class-independent piece (class null in items.txt) shows
+    /// the shared art named by its variant. Anything else worn there only adds stats.
     pub fn sync_look(&mut self) {
         let worn = |slot: &str| {
             self.equipment
                 .get(slot)
                 .and_then(|id| item(id))
-                .filter(|i| i.class == Some(self.look.class))
+                .filter(|i| i.class.is_none_or(|class| class == self.look.class))
                 .and_then(|i| i.variant.clone())
                 .unwrap_or_else(|| "none".into())
         };
+        let accessory = ["accessory1", "accessory2"]
+            .iter()
+            .map(|slot| worn(slot))
+            .find(|variant| variant != "none")
+            .unwrap_or_else(|| "none".into());
         let (head, shoulders, gloves) = (worn("headgear"), worn("shoulders"), worn("gloves"));
+        let (pants, necklace) = (worn("pants"), worn("necklace"));
         self.look.head = head;
         self.look.shoulders = shoulders;
         self.look.gloves = gloves;
+        self.look.pants = pants;
+        self.look.necklace = necklace;
+        self.look.accessory = accessory;
     }
     pub fn equip_owned(&mut self, armor: &str, weapon: &str) -> Result<(), &'static str> {
         if self.hp <= 0. {
@@ -680,11 +690,12 @@ mod tests {
         );
         assert!(c.look.validate().is_ok());
         assert!(c.stats().1 > defense, "the pieces add their defense");
-        // A generic upgrade in a slot only adds stats; the layer goes away.
+        // A class-independent piece shows the shared art named by its variant, whatever the class.
         c.add_item("headgear_upgrade", 1);
         c.equip_slots(&slots(&[("headgear", "headgear_upgrade")]))
             .unwrap();
-        assert_eq!(c.look.head, "none");
+        assert_eq!(c.look.head, "ironhide");
+        assert!(c.look.validate().is_ok());
         c.equip_slots(&slots(&[("headgear", "warrior_headgear_crimson")]))
             .unwrap();
         assert_eq!(c.look.head, "crimson");
@@ -706,8 +717,122 @@ mod tests {
         look.class = Class::Priest;
         assert!(
             look.validate().is_err(),
-            "the Priest has no layered pieces yet"
+            "the Priest wears pilgrim and dawn pieces, not a Warrior's azure helm"
         );
+        look.head = "dawn".into();
+        look.shoulders = "none".into();
+        look.gloves = "none".into();
+        assert!(look.validate().is_ok());
+    }
+    #[test]
+    fn class_independent_pieces_show_on_every_class_and_have_their_own_layers() {
+        let mut c = character();
+        for id in [
+            "headgear_upgrade",
+            "shoulders_upgrade",
+            "gloves_upgrade",
+            "pants_upgrade",
+            "necklace_upgrade",
+            "accessory_upgrade",
+        ] {
+            c.add_item(id, 1);
+        }
+        c.equip_slots(&slots(&[
+            ("headgear", "headgear_upgrade"),
+            ("shoulders", "shoulders_upgrade"),
+            ("gloves", "gloves_upgrade"),
+            ("pants", "pants_upgrade"),
+            ("necklace", "necklace_upgrade"),
+            ("accessory2", "accessory_upgrade"),
+        ]))
+        .unwrap();
+        let worn = |c: &Character| {
+            [
+                c.look.head.as_str(),
+                c.look.shoulders.as_str(),
+                c.look.gloves.as_str(),
+                c.look.pants.as_str(),
+                c.look.necklace.as_str(),
+                c.look.accessory.as_str(),
+            ]
+            .join(" ")
+        };
+        assert_eq!(
+            worn(&c),
+            "ironhide ironhide duelist wayfarer moonstone amber"
+        );
+        assert!(c.look.validate().is_ok());
+        // The ring shows from either accessory slot, and unequipping clears each layer.
+        c.equip_slots(&slots(&[
+            ("accessory2", "none"),
+            ("accessory1", "accessory_upgrade"),
+        ]))
+        .unwrap();
+        assert_eq!(c.look.accessory, "amber");
+        c.equip_slots(&slots(&[
+            ("accessory1", "none"),
+            ("pants", "none"),
+            ("necklace", "none"),
+        ]))
+        .unwrap();
+        assert_eq!(worn(&c), "ironhide ironhide duelist none none none");
+        // The same pieces validate on every class; unknown names do not.
+        for class in [Class::Mage, Class::Assassin, Class::Priest, Class::Hunter] {
+            let mut look = c.look.clone();
+            look.class = class;
+            assert!(look.validate().is_ok(), "{class:?}");
+        }
+        let mut look = c.look.clone();
+        look.pants = "ironhide".into();
+        assert!(look.validate().is_err());
+        look.pants = "none".into();
+        look.necklace = "amber".into();
+        assert!(look.validate().is_err());
+    }
+    #[test]
+    fn a_new_characters_draft_look_carries_nothing_worn() {
+        // The creation form reuses the previous character's look, so a Hunter's scout hood would otherwise get a new
+        // Mage refused with "Invalid equipment".
+        let mut look = character().look;
+        look.class = Class::Mage;
+        look.head = "scout".into();
+        look.pants = "wayfarer".into();
+        assert!(look.validate().is_err());
+        look.clear_worn();
+        assert!(look.validate().is_ok());
+        assert_eq!((look.head.as_str(), look.pants.as_str()), ("none", "none"));
+    }
+    #[test]
+    fn priest_starts_with_pilgrim_pieces_and_wears_them() {
+        let mut p = character();
+        p.look.class = Class::Priest;
+        p.inventory.clear();
+        p.seed_inventory();
+        for id in [
+            "priest_armor_pilgrim",
+            "priest_weapon_mace",
+            "priest_headgear_pilgrim",
+            "priest_shoulders_pilgrim",
+            "priest_gloves_pilgrim",
+        ] {
+            assert_eq!(p.quantity(id), 1, "{id}");
+        }
+        assert_eq!(p.bag_used(), 3);
+        p.equip_slots(&slots(&[
+            ("headgear", "priest_headgear_pilgrim"),
+            ("shoulders", "priest_shoulders_pilgrim"),
+            ("gloves", "priest_gloves_pilgrim"),
+        ]))
+        .unwrap();
+        assert_eq!(
+            (
+                p.look.head.as_str(),
+                p.look.shoulders.as_str(),
+                p.look.gloves.as_str()
+            ),
+            ("pilgrim", "pilgrim", "pilgrim")
+        );
+        assert!(p.look.validate().is_ok());
     }
     #[test]
     fn hunter_starts_in_scout_gear_and_existing_saves_receive_new_starter_pieces() {

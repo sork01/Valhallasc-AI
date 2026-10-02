@@ -48,13 +48,13 @@ pub enum Class {
     Hunter,
 }
 impl Class {
-    /// The two visual sets of a class's shoulders, gloves and head layers. The Priest has none yet.
+    /// The two visual sets of a class's shoulders, gloves and head layers.
     pub fn tiers(self) -> &'static [&'static str] {
         match self {
             Self::Warrior => &["crimson", "azure"],
             Self::Mage => &["apprentice", "runic"],
             Self::Assassin => &["shadow", "moon"],
-            Self::Priest => &[],
+            Self::Priest => &["pilgrim", "dawn"],
             Self::Hunter => &["scout", "warden"],
         }
     }
@@ -141,7 +141,21 @@ pub struct Look {
     pub head: String,
     pub shoulders: String,
     pub gloves: String,
+    /// Worn class-independent pieces (Ironhide Helm and Pauldrons, Duelist Gloves, Wayfarer Pants, Moonstone Necklace,
+    /// Amber Ring): their `variant` in items.txt, or "none". The same art is drawn on every class. A generic helm,
+    /// pauldrons or gloves occupy `head`, `shoulders` and `gloves` (they replace a class piece); the rest have layers of
+    /// their own.
+    pub pants: String,
+    pub necklace: String,
+    pub accessory: String,
 }
+/// Variant names of the class-independent pieces, per look field. Keep in step with scripts/generic_gear.py.
+pub const GENERIC_HEAD: &str = "ironhide";
+pub const GENERIC_SHOULDERS: &str = "ironhide";
+pub const GENERIC_GLOVES: &str = "duelist";
+pub const GENERIC_PANTS: &str = "wayfarer";
+pub const GENERIC_NECKLACE: &str = "moonstone";
+pub const GENERIC_ACCESSORY: &str = "amber";
 impl Default for Look {
     fn default() -> Self {
         Self {
@@ -163,10 +177,27 @@ impl Default for Look {
             head: "none".into(),
             shoulders: "none".into(),
             gloves: "none".into(),
+            pants: "none".into(),
+            necklace: "none".into(),
+            accessory: "none".into(),
         }
     }
 }
 impl Look {
+    /// A new character starts with nothing worn: worn pieces come from the equipment slots, never from the client's
+    /// draft (which still carries the previous character's hood, helm or gloves).
+    pub fn clear_worn(&mut self) {
+        for piece in [
+            &mut self.head,
+            &mut self.shoulders,
+            &mut self.gloves,
+            &mut self.pants,
+            &mut self.necklace,
+            &mut self.accessory,
+        ] {
+            *piece = "none".into();
+        }
+    }
     pub fn validate(&self) -> Result<(), &'static str> {
         let len = self.name.trim().chars().count();
         if !(2..=16).contains(&len) || self.name.chars().any(char::is_control) {
@@ -189,9 +220,16 @@ impl Look {
             return Err("Invalid equipment.");
         }
         let tiers = self.class.tiers();
-        if [&self.head, &self.shoulders, &self.gloves]
-            .iter()
-            .any(|piece| piece.as_str() != "none" && !tiers.contains(&piece.as_str()))
+        let worn = |piece: &String, generic: &str| {
+            piece == "none" || piece == generic || tiers.contains(&piece.as_str())
+        };
+        let only = |piece: &String, generic: &str| piece == "none" || piece == generic;
+        if !worn(&self.head, GENERIC_HEAD)
+            || !worn(&self.shoulders, GENERIC_SHOULDERS)
+            || !worn(&self.gloves, GENERIC_GLOVES)
+            || !only(&self.pants, GENERIC_PANTS)
+            || !only(&self.necklace, GENERIC_NECKLACE)
+            || !only(&self.accessory, GENERIC_ACCESSORY)
         {
             return Err("Invalid equipment.");
         }
