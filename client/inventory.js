@@ -29,6 +29,7 @@
     pants: '<path d="M17 10h30l-2 44H33l-1-26-1 26H19z" fill="currentColor"/><path d="M17 16h30M25 25l-2 21m16-21 2 21" stroke="#e7d1a6" stroke-width="3"/>',
     gloves: '<path d="m14 44-5-15 6-4 5 9V12h6v17h3V8h6v21h3V12h6v20l3-8 6 2-5 18-6 9H20z" fill="currentColor"/><path d="M21 44h22" stroke="#ebd2a1" stroke-width="4"/>',
     weapon: '<path d="m13 49 32-38 10-3-2 11-34 34z" fill="#dce5ef"/><path d="m17 34 14 13M11 53l10-12" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><path d="m30 29 14-16" stroke="#fcf6ce" stroke-width="2"/>',
+    mace: '<path d="m18 56 18-28" stroke="#b78a4e" stroke-width="6"/><circle cx="42" cy="19" r="11" fill="currentColor"/><path d="M42 4v30M27 19h30" stroke="#ecf3ff" stroke-width="3"/>',
     staff: '<path d="m20 56 16-36" stroke="#b78a4e" stroke-width="6"/><path d="m34 6 12 12-9 14-12-12z" fill="currentColor"/><path d="m34 10 2 14 7-6" fill="#ecf3ff"/>',
     daggers: '<path d="m9 49 16-31 11-6-3 12-18 31m14-6 16-31 11-6-3 12-18 31" fill="#dce5ef"/><path d="m10 38 14 6m10-6 14 6M9 53l8-13m12 13 8-13" stroke="currentColor" stroke-width="4"/>',
     necklace: '<path d="M13 12c0 31 38 31 38 0" fill="none" stroke="#d8b96a" stroke-width="5"/><path d="m32 30 10 10-10 14-10-14z" fill="currentColor"/><path d="m32 33 2 13 5-6" fill="#e6f6ff"/>',
@@ -41,7 +42,7 @@
   };
   function icon(i, emptyKind) {
     const kind = i?.kind || emptyKind;
-    const glyph = kind === 'weapon' && i?.class === 'mage' ? 'staff' : kind === 'weapon' && i?.class === 'assassin' ? 'daggers' : i?.id === 'ironhide_shell' ? 'shell' : kind;
+    const glyph = kind === 'weapon' && i?.class === 'mage' ? 'staff' : kind === 'weapon' && i?.class === 'assassin' ? 'daggers' : kind === 'weapon' && i?.class === 'priest' ? 'mace' : i?.id === 'ironhide_shell' ? 'shell' : kind;
     const palette = { slime_gel: '#88c675', blue_gel: '#6ca6ec', pink_gel: '#dd88b1', golden_gel: '#edc561', royal_jelly: '#bd84e2', traveler_stew: '#c98a4b', health_potion: '#e0476b' };
     const color = palette[i?.id] || (i?.variant === 'crimson' ? '#c16b67' : i?.rarity === 'rare' ? '#86acd5' : '#ab8e68');
     return `<svg viewBox="0 0 64 64" aria-hidden="true" style="color:${color}" stroke="#15151a" stroke-width="2" stroke-linejoin="round">${art[glyph] || art.accessory}</svg>`;

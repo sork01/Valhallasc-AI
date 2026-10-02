@@ -38,6 +38,16 @@
     cuts: '<path d="M5 5l26 26M13 4l19 19M4 13l19 19M28 5L5 28"/>',
     food: '<path d="M5 17h26c0 8-5 13-13 13S5 25 5 17zM11 13c-2-3 2-4 0-8M18 13c-2-3 2-4 0-8M25 13c-2-3 2-4 0-8"/>',
     potion: '<path d="M14 4h8M15 4v8L7 27c-1 3 1 5 4 5h14c3 0 5-2 4-5L21 12V4M10 22h16"/>',
+    mend: '<circle cx="18" cy="18" r="13"/><path d="M18 9v18M9 18h18"/>',
+    smite: '<circle cx="18" cy="27" r="5"/><path d="M18 3v14M12 9l6 8 6-8M7 27H3M33 27h-4"/>',
+    wardlight: '<path d="M18 4l11 4v9c0 8-5 13-11 15C12 30 7 25 7 17V8z"/><path d="M18 11v12M12 17h12"/>',
+    prayer: '<path d="M18 31V16M18 16c-4-2-7-6-7-11 4 1 7 4 7 11zM18 16c4-2 7-6 7-11-4 1-7 4-7 11zM9 24c3 0 6 1 9 3M27 24c-3 0-6 1-9 3"/>',
+    holynova: '<circle cx="18" cy="18" r="11"/><path d="M18 8v20M8 18h20M11 11l14 14M25 11L11 25"/>',
+    blessing: '<path d="M18 4l4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z"/>',
+    guardian: '<path d="M18 30V10M18 10c-3-5-9-6-14-3 2 8 8 11 14 9M18 10c3-5 9-6 14-3-2 8-8 11-14 9"/>',
+    searing: '<circle cx="18" cy="18" r="6"/><path d="M18 2v6M18 28v6M2 18h6M28 18h6M7 7l4 4M25 25l4 4M29 7l-4 4M11 25l-4 4"/>',
+    hymn: '<path d="M14 27V8l14-3v19M14 27a4 4 0 1 1-4-4 4 4 0 0 1 4 4zM28 24a4 4 0 1 1-4-4 4 4 0 0 1 4 4z"/>',
+    wrath: '<path d="M10 3l4 14M18 3v18M26 3l-4 14M6 28h24M10 24h16"/>',
   };
   const icon = kind => `<svg viewBox="0 0 36 36" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${icons[kind]}</svg>`;
   let slots = [], skills = [], character = null, className = '', selected = 0, previousFocus = null, layoutLevel = 1, seenLevel = 0;
@@ -48,8 +58,8 @@
   // Every skill the class can ever learn, in unlock order; `level` says when it becomes usable.
   function available() {
     const cls = Field.hero.look?.class || 'warrior';
-    return [{ id: 'attack', name: cls === 'mage' ? 'Arcane Bolt' : cls === 'assassin' ? 'Twin Slash' : 'Sword Strike', level: 1,
-      icon: cls === 'mage' ? 'cast' : 'attack', cooldown: cls === 'mage' ? .7 : cls === 'assassin' ? .46 : .55,
+    return [{ id: 'attack', name: cls === 'mage' ? 'Arcane Bolt' : cls === 'assassin' ? 'Twin Slash' : cls === 'priest' ? 'Mace Strike' : 'Sword Strike', level: 1,
+      icon: cls === 'mage' ? 'cast' : 'attack', cooldown: cls === 'mage' ? .7 : cls === 'assassin' ? .46 : cls === 'priest' ? .62 : .55,
       description: cls === 'mage' ? 'Cast a bolt at your target or in your aim direction.' : 'Strike enemies within reach in your aim direction.' },
     ...(cls === 'assassin' ? [{ id: 'shadowstep', name: 'Shadowstep', icon: 'shadowstep', cooldown: 1.2, level: 1,
       description: 'Dash in your movement direction, or forward while standing still.' }] : []),

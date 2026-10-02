@@ -258,8 +258,9 @@
   let remotePlayers = new Map(), onCharacter = () => {}, inputT = 0, lastLook = '';
   const isMage = () => hero?.look?.class === 'mage';
   const isAssassin = () => hero?.look?.class === 'assassin';
-  const isModular = () => ['warrior', 'mage', 'assassin'].includes(hero?.look?.class || 'warrior');
-  const characterClass = () => isMage() ? MageSprite : isAssassin() ? AssassinSprite : WarriorSprite;
+  const isPriest = () => hero?.look?.class === 'priest';
+  const isModular = () => ['warrior', 'mage', 'assassin', 'priest'].includes(hero?.look?.class || 'warrior');
+  const characterClass = () => isMage() ? MageSprite : isAssassin() ? AssassinSprite : isPriest() ? PriestSprite : WarriorSprite;
   const mageGear = () => MageSprite.equipment(hero.look);
   const equipmentStats = () => {
     if (Number.isFinite(hero.attack) && Number.isFinite(hero.defense)) return { attack: hero.attack, defense: hero.defense };
@@ -267,7 +268,7 @@
     const C = characterClass(), gear = C.equipment(hero.look);
     const item = (kind, variant) => WORLD_ITEMS.find(i => i.class === hero.look.class && i.kind === kind && i.variant === variant);
     const extras = Object.values(hero.equipment || {}).map(id => WORLD_ITEMS.find(i => i.id === id)).filter(Boolean);
-    return { attack: extras.reduce((sum, i) => sum + (i.attack || 0), 0) + (isAssassin() ? 18 : isMage() ? 20 : 22) + hero.level * 4 + (item('weapon', gear.weapon)?.attack || 0), defense: extras.reduce((sum, i) => sum + (i.defense || 0), 0) + (item('armor', gear.armor)?.defense || 0) };
+    return { attack: extras.reduce((sum, i) => sum + (i.attack || 0), 0) + (isAssassin() ? 18 : isMage() || isPriest() ? 20 : 22) + hero.level * 4 + (item('weapon', gear.weapon)?.attack || 0), defense: extras.reduce((sum, i) => sum + (i.defense || 0), 0) + (item('armor', gear.armor)?.defense || 0) };
   };
 
   // Looks only: the server owns health, damage, speed, XP and level. `scale` is the drawn size, `top` the sprite
@@ -408,7 +409,7 @@
     Online.send({ type: 'skill', id: def.id, fx, fy });
   }
   function shadowstep() { const [dx, dy] = keyboardDirection(); Online.send({ type: 'dash', dx, dy }); }
-  const classSprite = look => look.class === 'mage' ? MageSprite : look.class === 'assassin' ? AssassinSprite : WarriorSprite;
+  const classSprite = look => look.class === 'mage' ? MageSprite : look.class === 'assassin' ? AssassinSprite : look.class === 'priest' ? PriestSprite : WarriorSprite;
   function applyActor(actor, packet, snap = false) {
     const x = actor.x, y = actor.y;
     Object.assign(actor, packet); actor.nx = packet.x; actor.ny = packet.y;
@@ -498,6 +499,8 @@
       spark(event.x, event.y, 14, ['#9dffb4', '#d8ffe0', '#f0d9a0'], 10, 1, .9);
       if (event.value > 0) { effects.push({ kind: 'skAura', x: event.x, y: event.y, core: '#d9ffe0', glow: '#3fd36a', col: '#3fd36a', a: 0, t: 0, life: 1 }); floater(event.x, event.y, '+' + event.value, '#7dff9a', true); }
     }
+    // A party member healed by a priest: their own number and glow, whoever cast it.
+    if (event.kind === 'healed' && event.value > 0) floater(event.x, event.y, '+' + event.value, '#7dff9a', true);
     if (event.kind === 'regen') { floater(event.x, event.y, '+' + event.value, '#7dff9a', false); spark(event.x, event.y, 4, ['#9dffb4', '#d8ffe0'], 6, .6, .6); }
     if (event.kind === 'swing') {
       const actor = event.actor === Online.id ? hero : remotePlayers.get(event.actor);
@@ -515,6 +518,8 @@
     chainlightning: ['#f4fdff', '#6fe0ff'], meteor: ['#fff0c0', '#ff4a12'], lifedrain: ['#ffd6f0', '#d0286e'], arcanestorm: ['#f2e6ff', '#8f5bff'], starfall: ['#fffbe0', '#ffd84a'],
     throwingknives: ['#ffffff', '#b8c6d8'], evasion: ['#e9e4ff', '#8a78d6'], lunge: ['#f4e0ff', '#a050ff'], flurry: ['#ffffff', '#c9b2ff'], shadowveil: ['#e0d8ff', '#6a50c8'],
     cycloneblades: ['#f4ecff', '#b38cff'], assassinate: ['#ffe0e0', '#ff3b5c'], deadlyfocus: ['#fff0c8', '#ffb23a'], knifering: ['#fdf0ff', '#d89cff'], thousandcuts: ['#ffffff', '#ff5ca8'],
+    mend: ['#f2fff0', '#58e08a'], smite: ['#ffffff', '#ffd95a'], wardoflight: ['#fffbe8', '#ffd46a'], prayer: ['#f4fff2', '#6fe6a0'], holynova: ['#ffffff', '#ffe27a'],
+    blessing: ['#fff4d0', '#ffb84a'], guardianlight: ['#f0fff6', '#3fd88a'], searinglight: ['#ffffff', '#ffb02e'], divinehymn: ['#f6fff4', '#7dffb0'], heavenswrath: ['#ffffff', '#ffd23a'],
   };
   const BUFF_COL = { damage: '#ff9a3a', shield: '#59a8ff', haste: '#ffe45a', dodge: '#b9a8ff', crit: '#ff5c7a', regen: '#58d68d' };
   let shakeT = 0, shakeMag = 0;
@@ -566,6 +571,9 @@
     } else if (kind === 'buff') {
       const col = BUFF_COL[def.effect.kind] || glow; effects.push({ ...base, kind: 'skAura', col, life: 1 }); spark(ev.x, ev.y, 22, [core, col], 12, 1.2, 1); floater(ev.x, ev.y, def.name, col, false);
     } else if (kind === 'heal') { effects.push({ ...base, kind: 'skAura', col: glow, life: 1 }); spark(ev.x, ev.y, 26, [core, glow], 12, 1.2, 1.1); }
+    else if (kind === 'mend') { effects.push({ ...base, kind: 'skFlash', life: .22 }); spark(ev.x, ev.y, 8, [core, glow], 6, .8, .6); }
+    // Whoever else the skill reached (healed or blessed party members) gets their own glow and sparks.
+    if (kind === 'mend' || kind === 'buff' || def.pulse) for (const p of pts) { effects.push({ ...base, kind: 'skAura', x: p.x, y: p.y, col: BUFF_COL[def.effect.kind] || glow, life: 1 }); spark(p.x, p.y, 16, [core, glow], 10, 1, .9); }
     if (ev.heal > 0) { floater(ev.x, ev.y, '+' + ev.heal, '#7dff9a', true); if (kind !== 'heal') spark(ev.x, ev.y, 12, ['#9dffb4', '#d8ffe0'], 10, 1, .9); }
   }
   // A grand level-up: a pillar of light, rays, rings and a fountain of sparks on everyone's screen; the player's own
@@ -1305,9 +1313,10 @@
     },
     get remotePlayers() { return [...remotePlayers.values()]; },
     get equipmentStats() { return equipmentStats(); },
-    get warriorSprites() { return !isMage() && !isAssassin() ? mageSpr : null; },
+    get warriorSprites() { return !isMage() && !isAssassin() && !isPriest() ? mageSpr : null; },
     get mageSprites() { return isMage() ? mageSpr : null; },
     get assassinSprites() { return isAssassin() ? mageSpr : null; },
+    get priestSprites() { return isPriest() ? mageSpr : null; },
     get hero() { return hero; }, get slimes() { return slimes; },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; },

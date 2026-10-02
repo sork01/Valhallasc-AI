@@ -225,7 +225,10 @@ async fn connection(mut socket: WebSocket, mut app: App) {
                     look,
                     session: None,
                     character: None,
-                }) => Identity::Guest { token, look },
+                }) => Identity::Guest {
+                    token,
+                    look: look.map(|l| *l),
+                },
                 Ok(ClientMessage::Join {
                     version: 1,
                     token: None,
@@ -244,7 +247,7 @@ async fn connection(mut socket: WebSocket, mut app: App) {
                         Ok(Some(account)) => Identity::Account {
                             id: account.id,
                             character,
-                            look,
+                            look: look.map(|l| *l),
                         },
                         Ok(None) => {
                             send(&mut socket,&json!({"type":"error","fatal":true,"code":"auth","text":"Your login expired. Please sign in again."})).await;

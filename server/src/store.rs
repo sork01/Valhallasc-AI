@@ -99,6 +99,8 @@ impl Store {
         look.mage_weapon = defaults.mage_weapon;
         look.assassin_armor = defaults.assassin_armor;
         look.assassin_weapon = defaults.assassin_weapon;
+        look.priest_armor = defaults.priest_armor;
+        look.priest_weapon = defaults.priest_weapon;
         let mut c = Character {
             id: Uuid::new_v4().to_string(),
             hp: look.class.health(),
@@ -529,8 +531,12 @@ mod tests {
             .unwrap();
         let restored = s.load(&token).unwrap().unwrap();
         assert_eq!(restored.inventory, c.inventory);
-        assert_eq!(restored.bags, vec!["traveler_pack"]);
+        // Every item fits, with no bag to spare: dropping the last one would overflow.
+        assert!(!restored.bags.is_empty() && restored.bags.iter().all(|b| b == "traveler_pack"));
         assert!(restored.bag_used() <= restored.bag_capacity());
+        let mut fewer = restored.clone();
+        fewer.bags.pop();
+        assert!(fewer.bag_used() > fewer.bag_capacity());
         s.save_many(std::iter::once(&restored)).unwrap();
         assert_eq!(s.load(&token).unwrap().unwrap().bags, restored.bags);
     }

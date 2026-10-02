@@ -30,6 +30,11 @@
       blades: 'Blades', assassinTip: 'Click the Assassin to slash. Change outfits and blades in the field with E.',
       assassinLoading: 'Calling the Assassin…', assassinError: 'Assassin sprites could not load. Select Assassin again to retry.',
       assassinArmorNames: ['Simple cloth', 'Nightweave', 'Moonveil'], assassinWeaponNames: ['Empty hands', 'Twin daggers', 'Moonfang'],
+      priestDesc: 'A hooded healer in the Assassin\u2019s sleek style. Mend and ward your party, then smite what is left standing with a mace and holy light.',
+      priestHint: 'Click to move or attack · WASD to walk · Space to strike · 1–9 skills (Mend heals your most wounded ally) · E character · B bags · F talk · Esc for menu',
+      maces: 'Mace', priestTip: 'Click the Priest to strike. Change robes and maces in the field with E.',
+      priestLoading: 'Calling the Priest…', priestError: 'Priest sprites could not load. Select Priest again to retry.',
+      priestArmorNames: ['Simple cloth', 'Pilgrim robes', 'Dawnweave'], priestWeaponNames: ['Empty hands', 'Oak mace', 'Sunbreaker'],
       areaName: 'Greenmeadow Field', gold: 'gold', slain: 'enemies', paused: 'Paused', resume: 'Resume',
       fieldHint: 'Click to move or attack · WASD to walk · Space to swing · Esc for menu',
       defeated: 'Defeated!', defeatedSub: 'You wake up back at the start…', lvl: 'Lv',
@@ -57,6 +62,11 @@
       blades: '쌍검', assassinTip: '암살자를 눌러 베기를 시전하세요. 필드에서 E 키로 장비를 바꿀 수 있습니다.',
       assassinLoading: '암살자 소환 중…', assassinError: '암살자를 불러오지 못했습니다. 다시 선택해 주세요.',
       assassinArmorNames: ['기본 옷', '밤의 의복', '달의 장막'], assassinWeaponNames: ['맨손', '쌍단검', '달송곳니'],
+      priestDesc: '암살자의 날렵한 스타일을 입은 치유 사제. 파티를 치유하고 보호하며, 철퇴와 성스러운 빛으로 적을 응징합니다.',
+      priestHint: '클릭: 이동·공격 · WASD: 걷기 · 스페이스: 타격 · E: 장비 · F: 대화 · 1–9: 스킬 (첫 스킬은 치유) · Esc: 메뉴',
+      maces: '철퇴', priestTip: '사제를 눌러 철퇴를 휘두르세요. 필드에서 E 키로 장비를 바꿀 수 있습니다.',
+      priestLoading: '사제 소환 중…', priestError: '사제를 불러오지 못했습니다. 다시 선택해 주세요.',
+      priestArmorNames: ['기본 옷', '순례자의 로브', '새벽의 제복'], priestWeaponNames: ['맨손', '참나무 철퇴', '태양 파쇄자'],
       areaName: '푸른 초원', gold: '골드', slain: '적', paused: '일시정지', resume: '계속하기',
       fieldHint: '클릭: 이동·공격 · WASD: 걷기 · 스페이스: 휘두르기 · Esc: 메뉴',
       defeated: '쓰러졌다!', defeatedSub: '시작 지점에서 깨어납니다…', lvl: 'Lv',
@@ -226,12 +236,12 @@
 
   // ---------- character creation ----------
   const OPT = window.WARRIOR_OPTS;
-  const modular = c => ['warrior', 'mage', 'assassin'].includes(c?.class);
-  const spriteClass = c => c?.class === 'warrior' ? WarriorSprite : c?.class === 'assassin' ? AssassinSprite : MageSprite;
+  const modular = c => ['warrior', 'mage', 'assassin', 'priest'].includes(c?.class);
+  const spriteClass = c => c?.class === 'warrior' ? WarriorSprite : c?.class === 'assassin' ? AssassinSprite : c?.class === 'priest' ? PriestSprite : MageSprite;
   const equipmentKeys = c => [c.class + 'Armor', c.class + 'Weapon'];
   const NAMES = ['Bjorn', 'Ragna', 'Thora', 'Ulfar', 'Freya', 'Gunnar', 'Sunwoo', 'Haneul', 'Minjae', 'Dolgi', 'Eirik', 'Seoyun', 'Astrid', 'Jihoon'];
   const randName = () => NAMES[Math.floor(Math.random() * NAMES.length)];
-  const defaultCfg = () => ({ name: randName(), class: 'warrior', hairColor: 0, skin: 0, armor: 0, rune: 0, warriorArmor: 'crimson', warriorWeapon: 'sword', mageArmor: 'apprentice', mageWeapon: 'ash', assassinArmor: 'shadow', assassinWeapon: 'daggers' });
+  const defaultCfg = () => ({ name: randName(), class: 'warrior', hairColor: 0, skin: 0, armor: 0, rune: 0, warriorArmor: 'crimson', warriorWeapon: 'sword', mageArmor: 'apprentice', mageWeapon: 'ash', assassinArmor: 'shadow', assassinWeapon: 'daggers', priestArmor: 'pilgrim', priestWeapon: 'mace' });
   const idx = (v, n) => { v = Math.floor(+v); return v >= 0 && v < n ? v : 0; };
   let cfg = defaultCfg();
   const load = c => {
@@ -239,11 +249,12 @@
     cfg.name = String(cfg.name || '').slice(0, 16);
     cfg.hairColor = idx(cfg.hairColor, OPT.hairColors.length); cfg.skin = idx(cfg.skin, OPT.skinColors.length);
     cfg.armor = idx(cfg.armor, OPT.armors); cfg.rune = idx(cfg.rune, OPT.runeHues.length);
-    cfg.class = ['mage', 'assassin'].includes(cfg.class) ? cfg.class : 'warrior';
+    cfg.class = ['mage', 'assassin', 'priest'].includes(cfg.class) ? cfg.class : 'warrior';
     if (modular(cfg)) { cfg.hairColor = idx(cfg.hairColor, spriteClass(cfg).HAIR.length); cfg.skin = idx(cfg.skin, spriteClass(cfg).SKIN.length); }
     const warriorGear = WarriorSprite.equipment(cfg); cfg.warriorArmor = warriorGear.armor; cfg.warriorWeapon = warriorGear.weapon;
     const gear = MageSprite.equipment(cfg); cfg.mageArmor = gear.armor; cfg.mageWeapon = gear.weapon;
     const assassinGear = AssassinSprite.equipment(cfg); cfg.assassinArmor = assassinGear.armor; cfg.assassinWeapon = assassinGear.weapon;
+    const priestGear = PriestSprite.equipment(cfg); cfg.priestArmor = priestGear.armor; cfg.priestWeapon = priestGear.weapon;
   };
   load(save.draft);
   if (save.char) { const draft = cfg; load(save.char); save.char = { ...cfg }; cfg = draft; persist(); }
@@ -264,7 +275,7 @@
     img.hidden = modular(cfg);
   }
 
-  const spriteViews = { warrior: null, mage: null, assassin: null }, spritePromises = {};
+  const spriteViews = { warrior: null, mage: null, assassin: null, priest: null }, spritePromises = {};
   let mageRaf = 0, castStart = -10;
   const currentSprite = c => spriteViews[c.class];
   const magecv = $('magecv'); magecv.width = 300; magecv.height = 394;
@@ -310,6 +321,7 @@
   Object.defineProperty(window.valhalla, 'warrior', { get: () => spriteViews.warrior });
   Object.defineProperty(window.valhalla, 'mage', { get: () => spriteViews.mage });
   Object.defineProperty(window.valhalla, 'assassin', { get: () => spriteViews.assassin });
+  Object.defineProperty(window.valhalla, 'priest', { get: () => spriteViews.priest });
 
   function onWarrior(name) {
     switch (name) {
@@ -333,10 +345,10 @@
     return b;
   };
   function gearSelect(key, selected, change, inField = false) {
-    const armor = key.endsWith('Armor'), assassin = key.startsWith('assassin'), type = key.startsWith('warrior') ? 'warrior' : assassin ? 'assassin' : 'mage';
+    const armor = key.endsWith('Armor'), type = ['warrior', 'assassin', 'priest'].find(c => key.startsWith(c)) || 'mage';
     const C = spriteClass({ class: type }), values = Object.keys(armor ? C.ARMOR : C.WEAPON);
     const names = t(type + (armor ? 'ArmorNames' : 'WeaponNames'));
-    const label = t(armor ? 'armor' : type === 'warrior' ? 'arms' : assassin ? 'blades' : 'weapon');
+    const label = t(armor ? 'armor' : { warrior: 'arms', assassin: 'blades', priest: 'maces' }[type] || 'weapon');
     const select = el('select', { class: 'gear-pick', 'aria-label': label, id: (inField ? 'field-' : 'create-') + key });
     values.forEach((v, i) => {
       const item = WORLD_ITEMS.find(item => item.class === type && item.kind === (armor ? 'armor' : 'weapon') && item.variant === v);
@@ -380,17 +392,17 @@
   }
   function updateClass() {
     const isModular = modular(cfg), name = cfg.class[0].toUpperCase() + cfg.class.slice(1);
-    $('class-name').textContent = { warrior: 'WARRIOR (워리어)', mage: 'MAGE (마법사)', assassin: 'ASSASSIN (암살자)' }[cfg.class];
+    $('class-name').textContent = { warrior: 'WARRIOR (워리어)', mage: 'MAGE (마법사)', assassin: 'ASSASSIN (암살자)', priest: 'PRIEST (사제)' }[cfg.class];
     $('class-desc').dataset.i18n = cfg.class + 'Desc'; $('class-desc').textContent = t($('class-desc').dataset.i18n);
     $('custom-title').textContent = `[Customize ${name}]`; $('custom-panel').setAttribute('aria-label', 'Customize ' + name);
-    for (const name of ['warrior', 'mage', 'assassin']) { const b = $('cls-' + name); b.classList.toggle('on', name === cfg.class); b.setAttribute('aria-pressed', String(name === cfg.class)); }
+    for (const name of ['warrior', 'mage', 'assassin', 'priest']) { const b = $('cls-' + name); b.classList.toggle('on', name === cfg.class); b.setAttribute('aria-pressed', String(name === cfg.class)); }
     document.querySelector('#wcv, .wfallback').hidden = isModular; magecv.hidden = !isModular; $('mage-status').hidden = !isModular || !!currentSprite(cfg);
-    magecv.setAttribute('aria-label', cfg.class === 'warrior' ? 'Warrior preview. Click to swing the sword.' : cfg.class === 'assassin' ? 'Assassin preview. Click to slash.' : 'Mage preview. Click to cast a spell.');
+    magecv.setAttribute('aria-label', cfg.class === 'warrior' ? 'Warrior preview. Click to swing the sword.' : cfg.class === 'assassin' ? 'Assassin preview. Click to slash.' : cfg.class === 'priest' ? 'Priest preview. Click to strike with the mace.' : 'Mage preview. Click to cast a spell.');
     cancelAnimationFrame(mageRaf);
     if (view.ok) view.setActive(scene === 'create' && !isModular);
     $('go').disabled = isModular && !currentSprite(cfg);
     if (isModular) { ensureMage(cfg.class).catch(() => {}); if (scene === 'create') animateMage(performance.now()); }
-    const values = cfg.class === 'assassin' ? [68, 80, 38, 95] : cfg.class === 'mage' ? [60, 90, 35, 55] : [92, 88, 60, 34];
+    const values = cfg.class === 'assassin' ? [68, 80, 38, 95] : cfg.class === 'priest' ? [75, 55, 50, 70] : cfg.class === 'mage' ? [60, 90, 35, 55] : [92, 88, 60, 34];
     $('stats').replaceChildren(...['health', 'attack', 'defense', 'speed'].flatMap((k, j) => [
       el('dt', { text: t(k) }), (() => { const d = el('dd'), i = el('i'); i.style.setProperty('--v', values[j] + '%'); d.append(i); return d; })()]));
   }
@@ -404,7 +416,7 @@
     $('cls-' + cfg.class).focus({ preventScroll: true });
   }
   function leaveCreate() { clearTimeout(introTimer); cancelAnimationFrame(mageRaf); if (view.ok) view.setActive(false); }
-  for (const name of ['warrior', 'mage', 'assassin']) $('cls-' + name).addEventListener('click', () => {
+  for (const name of ['warrior', 'mage', 'assassin', 'priest']) $('cls-' + name).addEventListener('click', () => {
     if (cfg.class !== name) { cfg.class = name; if (modular(cfg)) cfg.skin = idx(cfg.skin, spriteClass(cfg).SKIN.length); buildControls(); refresh(); }
     updateClass(); if (modular(cfg)) castPreview(); else if (view.ok) view.play('attack');
   });
@@ -507,8 +519,9 @@
       else if (kind === 'chain') { noiseBurst(.35, 3000, 6000, .16, 3); sweep(1800, 400, .3, .05, 'square'); }
       else if (kind === 'meteor') { sweep(1400, 180, .38, .1, 'sawtooth'); setTimeout(() => { sweep(160, 40, .6, .35); noiseBurst(.5, 900, 120, .25); }, 380); }
       else if (kind === 'buff') tone([523, 784, 1047], .6, .05, 'triangle');
-      else if (kind === 'heal') { tone([659, 880, 1319], .8, .05, 'sine'); tone([1760, 2637], .5, .03); }
+      else if (kind === 'heal' || kind === 'mend') { tone([659, 880, 1319], .8, .05, 'sine'); tone([1760, 2637], .5, .03); }
     },
+    healed: () => { tone([880, 1319, 1760], .5, .04, 'sine'); },
     death: () => voice(78, .95, .38),
     respawn: () => tone([392, 587], .5, .06),
     portal: () => { sweep(180, 720, .5, .09, 'sine'); tone([523, 784, 1047], .5, .05); },

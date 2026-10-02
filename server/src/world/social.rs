@@ -72,6 +72,17 @@ impl World {
         self.online(a)
             .is_some_and(|p| p.character.friends.iter().any(|f| f == b))
     }
+    /// Character ids of everyone in `id`'s party, `id` included; just `id` when not in one.
+    pub(super) fn party_mates(&self, id: &str) -> Vec<String> {
+        match self.party_index(id) {
+            Some(i) => self.social.parties[i]
+                .members
+                .iter()
+                .map(|m| m.id.clone())
+                .collect(),
+            None => vec![id.to_string()],
+        }
+    }
     fn party_index(&self, id: &str) -> Option<usize> {
         self.social
             .parties
@@ -1518,5 +1529,162 @@ mod tests {
         );
         assert!(parse(r#"{"type":"social","command":{"op":"party_disband"}}"#).is_err());
         assert!(parse(r#"{"type":"social","command":{"op":"friend_accept"}}"#).is_err());
+    }
+
+    fn priest(w: &mut World, session: u64, name: &str, level: u32) -> Player {
+        let (tx, rx) = mpsc::channel(512);
+        let look = Look {
+            name: name.into(),
+            class: Class::Priest,
+            ..Look::default()
+        };
+        let welcome = w.join(session, None, Some(look), tx).unwrap();
+        w.players.get_mut(&session).unwrap().character.level = level;
+        Player {
+            session,
+            id: welcome["id"].as_str().unwrap().into(),
+            token: welcome["token"].as_str().unwrap().into(),
+            rx,
+            seen: vec![],
+            cursor: 0,
+        }
+    }
+    fn team(w: &mut World, leader: &Player, others: &[&Player]) {
+        for other in others {
+            say(w, leader, invite_by_id(other));
+            say(w, other, accept_party(leader));
+        }
+    }
+    fn hp(w: &World, who: &Player) -> f64 {
+        w.players[&who.session].character.hp
+    }
+    fn set_hp(w: &mut World, who: &Player, hp: f64) {
+        w.players.get_mut(&who.session).unwrap().character.hp = hp;
+    }
+
+    #[test]
+    fn a_priest_mends_the_most_wounded_party_member_in_range_and_never_a_stranger() {
+        let mut w = world();
+        let mut pia = priest(&mut w, 1, "Pia", 10);
+        let mut ann = add(&mut w, 2, "Ann");
+        let bob = add(&mut w, 3, "Bob");
+        let stranger = add(&mut w, 4, "Sam");
+        team(&mut w, &pia, &[&ann, &bob]);
+        let pia_full = w.players[&1].character.max_hp();
+        set_hp(&mut w, &pia, pia_full);
+        set_hp(&mut w, &ann, 20.);
+        set_hp(&mut w, &bob, 60.);
+        set_hp(&mut w, &stranger, 10.);
+        heard(&mut pia);
+        heard(&mut ann);
+        w.use_skill(1, "mend", Point::default());
+        // One target: the most wounded fraction. The stranger is not in the party, so is never healed.
+        assert!(hp(&w, &ann) > 60., "{}", hp(&w, &ann));
+        assert_eq!(hp(&w, &bob), 60.);
+        assert_eq!(hp(&w, &stranger), 10.);
+        let told: Vec<_> = heard(&mut ann)
+            .into_iter()
+            .filter(|v| v["kind"] == "healed")
+            .collect();
+        assert_eq!(told.len(), 1);
+        assert_eq!(told[0]["actor"], ann.id);
+        assert_eq!(told[0]["from"], pia.id);
+        assert!(told[0]["value"].as_f64().unwrap() > 40.);
+        assert!(w.players[&1].skill_cd.contains_key("mend"));
+        // The cap is the target's maximum health.
+        let full = w.players[&2].character.max_hp();
+        set_hp(&mut w, &ann, full - 1.);
+        set_hp(&mut w, &bob, full);
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        w.use_skill(1, "mend", Point::default());
+        assert_eq!(hp(&w, &ann), full);
+        // A party member out of range is skipped, and with nobody hurt in range the skill fizzles for free.
+        set_hp(&mut w, &ann, full);
+        set_hp(&mut w, &bob, 30.);
+        w.players.get_mut(&3).unwrap().character.x += 40.;
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        heard(&mut pia);
+        w.use_skill(1, "mend", Point::default());
+        assert_eq!(hp(&w, &bob), 30.);
+        assert!(!w.players[&1].skill_cd.contains_key("mend"));
+        assert!(
+            heard(&mut pia)
+                .iter()
+                .any(|v| v["type"] == "error" && v["text"] == "Nobody nearby needs healing.")
+        );
+    }
+
+    #[test]
+    fn a_priest_alone_heals_themself_and_a_prayer_reaches_up_to_five() {
+        let mut w = world();
+        let pia = priest(&mut w, 1, "Pia", 10);
+        set_hp(&mut w, &pia, 40.);
+        w.use_skill(1, "mend", Point::default());
+        assert!(hp(&w, &pia) > 40.);
+        let mut members = vec![];
+        for n in 0..5u64 {
+            members.push(add(&mut w, 10 + n, &format!("Mate{n}")));
+        }
+        let refs: Vec<&Player> = members.iter().take(4).collect();
+        team(&mut w, &pia, &refs);
+        for m in &members[..4] {
+            set_hp(&mut w, m, 30.);
+        }
+        set_hp(&mut w, &pia, 30.);
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        w.use_skill(1, "prayer", Point::default());
+        for m in &members[..4] {
+            assert!(hp(&w, m) > 30., "a prayer heals every wounded member");
+        }
+        assert!(hp(&w, &pia) > 30.);
+        // The fifth mate never joined the party (it holds the priest and four), so a prayer leaves them hurt.
+        set_hp(&mut w, &members[4], 30.);
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        w.use_skill(1, "prayer", Point::default());
+        assert_eq!(hp(&w, &members[4]), 30.);
+    }
+
+    #[test]
+    fn priest_blessings_and_pulses_reach_party_members_in_range_only() {
+        let mut w = world();
+        let pia = priest(&mut w, 1, "Pia", 20);
+        let ann = add(&mut w, 2, "Ann");
+        let far = add(&mut w, 3, "Far");
+        let stranger = add(&mut w, 4, "Sam");
+        team(&mut w, &pia, &[&ann, &far]);
+        w.players.get_mut(&3).unwrap().character.x += 30.;
+        w.use_skill(1, "blessing", Point::default());
+        let blessed = |w: &World, s: u64| w.players[&s].buff(BuffKind::Damage);
+        assert_eq!(blessed(&w, 1), 0.3);
+        assert_eq!(blessed(&w, 2), 0.3);
+        assert_eq!(blessed(&w, 3), 0.);
+        assert_eq!(blessed(&w, 4), 0.);
+        // Holy Nova heals the party in range even with no enemy to hit; a stranger gets nothing.
+        for who in [&pia, &ann, &stranger] {
+            set_hp(&mut w, who, 25.);
+        }
+        w.use_skill(1, "holynova", Point::default());
+        assert!(hp(&w, &pia) > 25. && hp(&w, &ann) > 25.);
+        assert_eq!(hp(&w, &stranger), 25.);
+        // A dead party member is never healed.
+        set_hp(&mut w, &ann, 0.);
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        w.use_skill(1, "heavenswrath", Point::default());
+        assert_eq!(hp(&w, &ann), 0.);
+    }
+
+    #[test]
+    fn a_priest_fights_alone_with_a_mace_and_smite() {
+        let mut w = world();
+        let pia = priest(&mut w, 1, "Pia", 4);
+        let c = &w.players[&pia.session].character;
+        assert_eq!(c.look.class, Class::Priest);
+        assert_eq!(
+            (c.look.priest_armor.as_str(), c.look.priest_weapon.as_str()),
+            ("pilgrim", "mace")
+        );
+        assert_eq!(c.max_hp(), 100. + 3. * 20.);
+        assert_eq!(c.stats().0, 20. + 4. * 4. + 4.);
+        assert!(Class::Priest.reach() > Class::Assassin.reach());
     }
 }

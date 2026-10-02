@@ -187,6 +187,7 @@ impl Character {
             Class::Warrior => (&self.look.warrior_armor, &self.look.warrior_weapon),
             Class::Mage => (&self.look.mage_armor, &self.look.mage_weapon),
             Class::Assassin => (&self.look.assassin_armor, &self.look.assassin_weapon),
+            Class::Priest => (&self.look.priest_armor, &self.look.priest_weapon),
         }
     }
     pub fn seed_inventory(&mut self) {
@@ -301,7 +302,7 @@ impl Character {
                     0.5
                 }
             + a.intellect as f64
-                * if self.look.class == Class::Mage {
+                * if matches!(self.look.class, Class::Mage | Class::Priest) {
                     2.
                 } else {
                     0.5
@@ -353,7 +354,7 @@ mod tests {
     }
     #[test]
     fn every_attribute_has_a_combat_effect_and_classes_have_specialties() {
-        for class in [Class::Warrior, Class::Mage, Class::Assassin] {
+        for class in [Class::Warrior, Class::Mage, Class::Assassin, Class::Priest] {
             let mut c = character();
             c.look.class = class;
             c.grant_xp(300);
@@ -438,7 +439,7 @@ mod tests {
     fn loot_rates_and_pool_cover_every_class_and_slot() {
         for kind in ["green", "blue", "pink", "yellow", "beetle", "big"] {
             assert!(roll_equipment(kind, equipment_chance(kind), 0.).is_none());
-            for class in [Class::Warrior, Class::Mage, Class::Assassin] {
+            for class in [Class::Warrior, Class::Mage, Class::Assassin, Class::Priest] {
                 for slot in ["armor", "weapon"] {
                     let pool_size = ITEMS.iter().filter(|i| i.rarity == "rare").count();
                     assert!((0..pool_size).any(|n| {

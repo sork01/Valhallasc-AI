@@ -62,14 +62,32 @@ pub enum Effect {
         radius: f64,
         mult: f64,
     },
+    /// With a `range`, party members that close get the buff too.
     Buff {
         kind: BuffKind,
         amount: f64,
         time: f64,
+        #[serde(default)]
+        range: f64,
     },
     Heal {
         fraction: f64,
     },
+    /// Heals up to `targets` wounded party members (you included) within `range`, the most hurt first,
+    /// for `mult` times your attack power.
+    Mend {
+        mult: f64,
+        range: f64,
+        targets: u32,
+    },
+}
+
+/// After any effect: every living party member (you included) within `range` is healed for `mult` times
+/// your attack power.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Pulse {
+    pub mult: f64,
+    pub range: f64,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -81,6 +99,8 @@ pub struct Skill {
     pub cooldown: f64,
     #[serde(default)]
     pub lifesteal: f64,
+    #[serde(default)]
+    pub pulse: Option<Pulse>,
     pub effect: Effect,
 }
 
@@ -110,7 +130,7 @@ mod tests {
 
     #[test]
     fn every_class_learns_one_skill_at_each_even_level_up_to_twenty() {
-        for class in [Class::Warrior, Class::Mage, Class::Assassin] {
+        for class in [Class::Warrior, Class::Mage, Class::Assassin, Class::Priest] {
             let mut levels: Vec<_> = SKILLS
                 .iter()
                 .filter(|s| s.class == class)
@@ -147,6 +167,15 @@ mod tests {
                     assert!(*amount > 0. && *amount <= 0.8 && *time > 0., "{}", s.id)
                 }
                 Effect::Heal { fraction } => assert!((0. ..=1.).contains(fraction), "{}", s.id),
+                Effect::Mend {
+                    mult,
+                    range,
+                    targets,
+                } => assert!(
+                    *mult > 0. && *range > 0. && (1..=5).contains(targets),
+                    "{}",
+                    s.id
+                ),
                 _ => {}
             }
         }

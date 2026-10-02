@@ -16,3 +16,5 @@ __pycache__/
 /.session-notes/
 AGENTS.md
 CLAUDE.md
+
+/scripts/priest_raw/

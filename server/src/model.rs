@@ -35,6 +35,7 @@ pub enum Class {
     Warrior,
     Mage,
     Assassin,
+    Priest,
 }
 impl Class {
     pub fn health(self) -> f64 {
@@ -42,6 +43,7 @@ impl Class {
             Self::Warrior => 120.,
             Self::Mage => 80.,
             Self::Assassin => 90.,
+            Self::Priest => 100.,
         }
     }
     pub fn speed(self) -> f64 {
@@ -49,6 +51,7 @@ impl Class {
             Self::Warrior => 5.2,
             Self::Mage => 5.6,
             Self::Assassin => 6.6,
+            Self::Priest => 5.4,
         }
     }
     pub fn reach(self) -> f64 {
@@ -56,6 +59,7 @@ impl Class {
             Self::Warrior => 1.35,
             Self::Mage => 5.5,
             Self::Assassin => 1.1,
+            Self::Priest => 1.5,
         }
     }
     pub fn duration(self) -> f64 {
@@ -63,6 +67,7 @@ impl Class {
             Self::Warrior => 0.42,
             Self::Mage => 0.56,
             Self::Assassin => 0.4,
+            Self::Priest => 0.4,
         }
     }
     pub fn impact(self) -> f64 {
@@ -70,6 +75,7 @@ impl Class {
             Self::Warrior => 0.21,
             Self::Mage => 0.28,
             Self::Assassin => 0.2,
+            Self::Priest => 0.2,
         }
     }
     pub fn cooldown(self) -> f64 {
@@ -77,6 +83,7 @@ impl Class {
             Self::Warrior => 0.55,
             Self::Mage => 0.7,
             Self::Assassin => 0.46,
+            Self::Priest => 0.62,
         }
     }
 }
@@ -94,6 +101,8 @@ pub struct Look {
     pub mage_weapon: String,
     pub assassin_armor: String,
     pub assassin_weapon: String,
+    pub priest_armor: String,
+    pub priest_weapon: String,
 }
 impl Default for Look {
     fn default() -> Self {
@@ -108,6 +117,8 @@ impl Default for Look {
             mage_weapon: "ash".into(),
             assassin_armor: "shadow".into(),
             assassin_weapon: "daggers".into(),
+            priest_armor: "pilgrim".into(),
+            priest_weapon: "mace".into(),
         }
     }
 }
@@ -126,6 +137,8 @@ impl Look {
             || !["none", "ash", "crystal"].contains(&self.mage_weapon.as_str())
             || !["none", "shadow", "moon"].contains(&self.assassin_armor.as_str())
             || !["none", "daggers", "moonfang"].contains(&self.assassin_weapon.as_str())
+            || !["none", "pilgrim", "dawn"].contains(&self.priest_armor.as_str())
+            || !["none", "mace", "sunmace"].contains(&self.priest_weapon.as_str())
         {
             return Err("Invalid equipment.");
         }
@@ -146,6 +159,10 @@ impl Look {
                 next.assassin_armor = armor.into();
                 next.assassin_weapon = weapon.into();
             }
+            Class::Priest => {
+                next.priest_armor = armor.into();
+                next.priest_weapon = weapon.into();
+            }
         }
         next.validate()?;
         *self = next;
@@ -164,6 +181,7 @@ impl Look {
                 self.assassin_armor.as_str(),
                 self.assassin_weapon.as_str(),
             ),
+            Class::Priest => (20., self.priest_armor.as_str(), self.priest_weapon.as_str()),
         };
         let defense = crate::items::equipment(self.class, "armor", armor).map_or(0., |i| i.defense);
         let bonus = crate::items::equipment(self.class, "weapon", weapon).map_or(0., |i| i.attack);
@@ -425,7 +443,7 @@ pub enum ClientMessage {
     Join {
         version: u32,
         token: Option<String>,
-        look: Option<Look>,
+        look: Option<Box<Look>>,
         /// A login session from /api (an account join). `character` picks one the account owns; without it `look` makes a new one.
         #[serde(default)]
         session: Option<String>,

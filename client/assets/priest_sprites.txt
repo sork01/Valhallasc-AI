@@ -1,0 +1,268 @@
+{
+  "frame": [
+    160,
+    160
+  ],
+  "anchor": [
+    80,
+    119
+  ],
+  "dirs": [
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "N",
+    "NE",
+    "E",
+    "SE"
+  ],
+  "clips": {
+    "idle": {
+      "row0": 0,
+      "n": 6,
+      "fps": 6
+    },
+    "walk": {
+      "row0": 8,
+      "n": 8,
+      "fps": 12
+    },
+    "attack": {
+      "row0": 16,
+      "n": 8,
+      "fps": 20
+    },
+    "hurt": {
+      "row0": 24,
+      "n": 4,
+      "fps": 10
+    },
+    "die": {
+      "row0": 32,
+      "n": 8,
+      "fps": 8
+    }
+  },
+  "parts": {
+    "body": {
+      "png": "priest_body.png",
+      "depth": "priest_body_depth.png"
+    },
+    "armor_pilgrim": {
+      "png": "priest_armor_pilgrim.png",
+      "depth": "priest_armor_pilgrim_depth.png"
+    },
+    "armor_dawn": {
+      "png": "priest_armor_dawn.png",
+      "depth": "priest_armor_dawn_depth.png"
+    },
+    "weapon_mace": {
+      "png": "priest_weapon_mace.png",
+      "depth": "priest_weapon_mace_depth.png"
+    },
+    "weapon_sunmace": {
+      "png": "priest_weapon_sunmace.png",
+      "depth": "priest_weapon_sunmace_depth.png"
+    }
+  },
+  "equipment": {
+    "armor": {
+      "none": {
+        "name": "Simple cloth",
+        "part": null,
+        "defense": 0
+      },
+      "pilgrim": {
+        "name": "Pilgrim robes",
+        "part": "armor_pilgrim",
+        "defense": 3
+      },
+      "dawn": {
+        "name": "Dawnweave vestments",
+        "part": "armor_dawn",
+        "defense": 5
+      }
+    },
+    "weapon": {
+      "none": {
+        "name": "Empty hands",
+        "part": null,
+        "attack": 0
+      },
+      "mace": {
+        "name": "Oak mace",
+        "part": "weapon_mace",
+        "attack": 4
+      },
+      "sunmace": {
+        "name": "Sunbreaker mace",
+        "part": "weapon_sunmace",
+        "attack": 8
+      }
+    }
+  },
+  "defaultEquipment": {
+    "armor": "pilgrim",
+    "weapon": "mace"
+  },
+  "sprites": {
+    "priest_idle_s": "3e949e23bc6ce9ae",
+    "priest_idle_sw": "32f61ce40b7bd49e",
+    "priest_idle_w": "1c02e06265f9619b",
+    "priest_idle_nw": "e77e32d3cfc6f98d",
+    "priest_idle_n": "a0c9c348b6bc4c17",
+    "priest_idle_ne": "e9aad952629007b9",
+    "priest_idle_e": "bd0e81f06daae3a7",
+    "priest_idle_se": "faaa3a37756ab478",
+    "priest_walk_s": "499f1b0e78575ad6",
+    "priest_walk_sw": "7d20b6b53f8fea46",
+    "priest_walk_w": "0d4d26606c7d8a3c",
+    "priest_walk_nw": "d69158817266a069",
+    "priest_walk_n": "115b2b6ab941d216",
+    "priest_walk_ne": "d930eda211b7c012",
+    "priest_walk_e": "47a11e1dcd2d2ff8",
+    "priest_walk_se": "bc78fd4e6bab53a9",
+    "priest_attack_s": "b5fa22087b5f9479",
+    "priest_attack_sw": "7c4adfdc31db9205",
+    "priest_attack_w": "a4aa28b97bde536e",
+    "priest_attack_nw": "5326441e96792d1a",
+    "priest_attack_n": "837317d454cfa9b5",
+    "priest_attack_ne": "1b52e74f410e4fb0",
+    "priest_attack_e": "b77f4801081f3532",
+    "priest_attack_se": "0b6e2996ee69a8e6",
+    "priest_hurt_s": "4e9fcd160210b766",
+    "priest_hurt_sw": "ce8b5ed9746118d2",
+    "priest_hurt_w": "4b0ccb114c08919c",
+    "priest_hurt_nw": "71576eb0bf493d99",
+    "priest_hurt_n": "e2fdcc368bd8ff8c",
+    "priest_hurt_ne": "e66786aef5e4280b",
+    "priest_hurt_e": "e9240f4a1a52d412",
+    "priest_hurt_se": "3001ff72bc52f75d",
+    "priest_die_s": "72f33b0d7ed51e59",
+    "priest_die_sw": "1d576fdcf7866db5",
+    "priest_die_w": "364f51354fef9ade",
+    "priest_die_nw": "24e7cf357e09f70c",
+    "priest_die_n": "647fcf6e530da906",
+    "priest_die_ne": "0f1fa235f6ea38bd",
+    "priest_die_e": "65abf029fea2946b",
+    "priest_die_se": "3581c7fc75d7844f"
+  },
+  "ramps": {
+    "skin": [
+      "#92595c",
+      "#ce9182",
+      "#f0bfac",
+      "#ffe0ce"
+    ],
+    "hair": [
+      "#151a30",
+      "#293451",
+      "#465278",
+      "#7985ac"
+    ],
+    "brow": [
+      "#171526",
+      "#242037",
+      "#332946",
+      "#443750"
+    ],
+    "cloth": [
+      "#4a4048",
+      "#76686f",
+      "#a99a9c",
+      "#d8c9c0"
+    ],
+    "pants": [
+      "#2a2a40",
+      "#43476a",
+      "#68729a",
+      "#97a2c4"
+    ],
+    "robe": [
+      "#7a7490",
+      "#aaa3bf",
+      "#dcd6e8",
+      "#fffaf4"
+    ],
+    "dawn": [
+      "#a08a8e",
+      "#d4bdb4",
+      "#fbeadb",
+      "#fffefc"
+    ],
+    "gold": [
+      "#6e4a12",
+      "#b0801f",
+      "#e8b840",
+      "#fff0a0"
+    ],
+    "stole": [
+      "#4a2a6e",
+      "#7a4aa6",
+      "#b585d8",
+      "#e6c4ff"
+    ],
+    "leather": [
+      "#2a2030",
+      "#463a50",
+      "#6a5a70",
+      "#98889e"
+    ],
+    "wood": [
+      "#3a2420",
+      "#6e4336",
+      "#a77a56",
+      "#d6ae82"
+    ],
+    "silver": [
+      "#3a516d",
+      "#7791b0",
+      "#bdcfe5",
+      "#f2f5ff"
+    ],
+    "glow": [
+      "#d79a1a",
+      "#ffc94a",
+      "#ffe99a",
+      "#fffbe0"
+    ],
+    "iris": [
+      "#6a4a1c",
+      "#a7762c",
+      "#e0b050",
+      "#fff0b0"
+    ],
+    "white": [
+      "#c0aec4",
+      "#ded2e2",
+      "#f6eef1",
+      "#fffbf6"
+    ],
+    "mouth": [
+      "#5c2d45",
+      "#86506a",
+      "#c88493",
+      "#e9a4ab"
+    ]
+  },
+  "depth": {
+    "encoding": "R*256+G",
+    "offset": 512,
+    "scale": 64,
+    "near": "smaller"
+  },
+  "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
+  "attack": {
+    "duration": 0.4,
+    "impact": 0.2
+  },
+  "style": "2D Korean RPG anime cel illustration",
+  "portrait": [
+    57,
+    15,
+    46,
+    46
+  ],
+  "editing": "One PixelFlow sprite per clip and facing (priest_<clip>_<facing>), body visible, equipment hidden. build --replace discards edits."
+}

@@ -48,10 +48,10 @@ const figure = (page, cls, armor, weapon) => page.evaluate(([cls, armor, weapon]
   await startServer(path.join(dir, 'test.sqlite'));
   browser = await chromium.launch({ headless: true });
   try {
-    for (const cls of ['warrior', 'mage', 'assassin']) {
+    for (const cls of ['warrior', 'mage', 'assassin', 'priest']) {
       const page = await enter(false, cls, 'Real' + cls);
       check(await page.evaluate(() => window.__valhallaTestSprites === undefined), `${cls}: the stub is off`);
-      const gear = await page.evaluate(cls => { const C = { warrior: WarriorSprite, mage: MageSprite, assassin: AssassinSprite }[cls]; return { armor: Object.keys(C.ARMOR).filter(k => k !== 'none'), weapon: Object.keys(C.WEAPON).filter(k => k !== 'none') }; }, cls);
+      const gear = await page.evaluate(cls => { const C = { warrior: WarriorSprite, mage: MageSprite, assassin: AssassinSprite, priest: PriestSprite }[cls]; return { armor: Object.keys(C.ARMOR).filter(k => k !== 'none'), weapon: Object.keys(C.WEAPON).filter(k => k !== 'none') }; }, cls);
       const naked = await figure(page, cls, 'none', 'none'), dressed = await figure(page, cls, gear.armor[0], gear.weapon[0]), other = await figure(page, cls, gear.armor[1], gear.weapon[1]);
       check(naked.visible > 1500, `${cls}: the real body is a full figure (${naked.visible} visible pixels)`);
       check(dressed.visible > naked.visible && dressed.hash !== naked.hash, `${cls}: armour and a weapon add to the figure`);

@@ -214,6 +214,54 @@
     "starter": false
   },
   {
+    "id": "priest_armor_pilgrim",
+    "name": "Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "common",
+    "sell": 0,
+    "class": "priest",
+    "variant": "pilgrim",
+    "attack": 0,
+    "defense": 3,
+    "starter": true
+  },
+  {
+    "id": "priest_armor_dawn",
+    "name": "Dawnweave Vestments",
+    "kind": "armor",
+    "rarity": "rare",
+    "sell": 30,
+    "class": "priest",
+    "variant": "dawn",
+    "attack": 0,
+    "defense": 5,
+    "starter": false
+  },
+  {
+    "id": "priest_weapon_mace",
+    "name": "Oak Mace",
+    "kind": "weapon",
+    "rarity": "common",
+    "sell": 0,
+    "class": "priest",
+    "variant": "mace",
+    "attack": 4,
+    "defense": 0,
+    "starter": true
+  },
+  {
+    "id": "priest_weapon_sunmace",
+    "name": "Sunbreaker Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "sell": 30,
+    "class": "priest",
+    "variant": "sunmace",
+    "attack": 8,
+    "defense": 0,
+    "starter": false
+  },
+  {
     "id": "headgear_upgrade",
     "name": "Ironhide Helm",
     "kind": "headgear",

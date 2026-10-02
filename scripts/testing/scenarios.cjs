@@ -840,6 +840,64 @@ const scenarios = {
       check(w.player(bot).zone === 1 && JSON.stringify(w.player(bot).quests) === history, 'Every completion and restarted bounty survives a private server restart');
     },
   },
+  priest: {
+    description: 'The Priest, a healer that also fights alone: Mend and Prayer heal party members and nobody else, a heal with nobody hurt fizzles for free, Blessing and Holy Nova reach the party in range, and Smite damages a real enemy.',
+    startLevel: 20,
+    async run(w, check) {
+      await w.connect({ bot: 'Pia', class: 'priest' });
+      await w.connect({ bot: 'Tank', class: 'warrior' });
+      await w.connect({ bot: 'Sam', class: 'mage' });
+      const pia = () => w.player('Pia'), hp = bot => w.player(bot).hp;
+      check(pia().look.class === 'priest' && pia().level === 20 && pia().maxHp === 100 + 19 * 20, 'The priest joins as a level-20 priest with 100 base health');
+      check(pia().look.priestArmor === 'pilgrim' && pia().look.priestWeapon === 'mace', 'It starts in Pilgrim robes with an Oak mace');
+      const learned = skillCatalog.filter(k => k.class === 'priest').map(k => k.level);
+      check(learned.length === 10 && learned.join() === '2,4,6,8,10,12,14,16,18,20', 'A priest learns one skill at every even level up to 20');
+      await w.social('Pia', { op: 'party_invite', bot: 'Tank' });
+      await w.social('Tank', { op: 'party_accept', bot: 'Pia' });
+      check(w.socialState('Pia').party?.size === 2, 'The priest and the warrior form a party');
+      const errors = () => w.events.filter(e => e.bot === 'Pia' && e.type === 'error').map(e => e.text);
+      // Nobody is hurt: the heal is refused and costs no cooldown.
+      await cast(w, 'Pia', 'mend');
+      await w.waitFor(() => errors().includes('Nobody nearby needs healing.'), 5000, 'Nobody to heal');
+      check(!pia().skillCd.mend, 'A heal with nobody hurt spends no cooldown');
+      // The party member is hurt, and so is a stranger: only the party member is healed.
+      await w.debug('Tank', { op: 'set_hp', hp: 60 });
+      await w.debug('Sam', { op: 'set_hp', hp: 30 });
+      await w.advance(300);
+      await cast(w, 'Pia', 'mend');
+      const told = await w.waitFor(() => w.events.find(e => e.bot === 'Tank' && e.kind === 'healed'), 5000, 'Healed event');
+      check(told.actor === w.player('Tank').id && told.value > 60 && told.from === pia().id, 'The healed player is told how much, and by whom');
+      await w.waitFor(() => hp('Tank') > 100, 5000, 'Mend lands in the snapshot');
+      check(hp('Tank') > 100, 'Mend heals the wounded party member (' + Math.round(hp('Tank')) + ')');
+      check(Math.abs(hp('Sam') - 30) < 2, 'A stranger in the party\'s range is never healed');
+      check(pia().skillCd.mend > 3 && pia().skillCd.mend <= 3.5, 'Mend starts its listed cooldown');
+      // A prayer heals every wounded party member, the priest included.
+      await w.debug('Tank', { op: 'set_hp', hp: 40 });
+      await w.debug('Pia', { op: 'set_hp', hp: 40 });
+      await w.advance(300);
+      await cast(w, 'Pia', 'prayer');
+      await w.waitFor(() => hp('Tank') > 100 && hp('Pia') > 100, 5000, 'Prayer of Healing');
+      check(hp('Tank') > 100 && hp('Pia') > 100, 'Prayer of Healing heals the whole party');
+      // A blessing and a nova reach the party, never the stranger.
+      await cast(w, 'Pia', 'blessing');
+      await w.waitFor(() => w.player('Tank').buffs.some(b => b.id === 'blessing'), 5000, 'Blessing');
+      check(pia().buffs.some(b => b.id === 'blessing') && !w.player('Sam').buffs.some(b => b.id === 'blessing'), 'Blessing of Might buffs the priest and the party, not a stranger');
+      await w.debug('Tank', { op: 'set_hp', hp: 50 });
+      await w.advance(300);
+      await cast(w, 'Pia', 'holynova');
+      await w.waitFor(() => hp('Tank') > 100, 5000, 'Holy Nova heal');
+      check(hp('Tank') > 100, 'Holy Nova heals the party while it burns enemies');
+      // Alone on the field the priest fights: Smite and the mace.
+      const front = await approach(w, 'Pia', 'green', 4);
+      const before = { ...front() };
+      await cast(w, 'Pia', 'smite', front());
+      await w.waitFor(() => lost(before, front()), 8000, 'Smite');
+      check(lost(before, front()), 'Smite damages the nearest enemy');
+      await w.action('Pia', { type: 'target', id: before.id });
+      await w.waitFor(() => !front() || front().dead, 40000, 'The priest defeats it with the mace');
+      check(front().dead, 'The mace and holy light together defeat an enemy without any help');
+    },
+  },
 };
 
 async function runScenario(name, world = new TestWorld()) {

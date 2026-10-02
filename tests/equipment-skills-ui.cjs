@@ -136,6 +136,27 @@ async function call(name, args = {}) {
   await page.locator('#character-list button').filter({ hasText: 'SkillMage' }).click();
   await page.waitForFunction(() => Online.connected && Field.hero.look.class === 'mage' && document.querySelector('#skillbar-slots [data-slot="9"]')?.dataset.skill === 'attack', null, { timeout: 60000 });
   check(await page.locator('#skillbar-slots [data-slot="3"]').getAttribute('data-skill') === 'attack', 'Character switching restores its saved layout');
+  // The Priest: a fourth class with its own button, a mace attack, and a bar of healing skills that unlock from level 2.
+  await page.keyboard.press('Escape'); await page.locator('#p-new').click();
+  await page.locator('#cls-priest').click();
+  check(await page.locator('#class-name').textContent() === 'PRIEST (사제)' && await page.locator('#cls-priest').getAttribute('aria-pressed') === 'true', 'The creation screen offers the Priest');
+  check(await page.locator('#create-priestArmor option').count() === 1 && await page.locator('#create-priestWeapon option').count() === 1, 'A new priest can only start in its starter robes and mace');
+  await page.locator('#name').fill('SkillPriest'); await page.locator('#go').click({ timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.priestSprites && document.querySelector('#skillbar-slots [data-slot="1"]')?.dataset.skill === 'attack', null, { timeout: 60000 });
+  check(await page.evaluate(() => Field.hero.look.class === 'priest' && Field.hero.maxHp === 100 && Field.hero.look.priestWeapon === 'mace'), 'The server made a level-1 priest with 100 health and the Oak mace');
+  check(await page.locator('#skillbar-slots [data-slot="1"]').getAttribute('aria-label').then(t => /Mace Strike/.test(t || '')) , 'The priest\'s basic attack is Mace Strike');
+  await page.keyboard.press('k');
+  check(await page.locator('#skill-library .skill-card:not(.locked)').count() === 1 && await page.locator('#skill-library .skill-card.locked').count() === 10, 'The priest starts with its attack and sees ten locked skills');
+  check(await page.locator('#skill-library .skill-card.locked').first().textContent().then(t => /Mend/.test(t) && /2/.test(t)), 'The first skill to earn is Mend, at level 2');
+  await page.keyboard.press('Escape');
+  // Healing effects: a healed party member gets a number and a glow, and a Mend cast draws on each person it reached.
+  const fx = await page.evaluate(() => {
+    const me = Field.hero, count = () => Field._debug.effects.filter(e => e.kind === 'skAura').length, before = count();
+    Field._debug.event({ type: 'event', kind: 'healed', actor: 'someone', from: Online.id, x: me.x + 1, y: me.y, value: 77, crit: false });
+    Field._debug.event({ type: 'event', kind: 'skill', skill: 'mend', actor: Online.id, x: me.x, y: me.y, fx: 1, fy: 0, value: 0, points: [[me.x + 1, me.y], [me.x - 1, me.y]], heal: 0 });
+    return count() - before;
+  });
+  check(fx >= 2, 'A Mend cast draws a glow on every person it healed (' + fx + ')');
   await page.setViewportSize({ width: 800, height: 500 });
   const bounds = await page.locator('#skillbar').boundingBox();
   check(bounds.x >= 0 && bounds.x + bounds.width <= 800, 'Twelve-slot bar fits a small landscape viewport');
@@ -191,9 +212,9 @@ async function call(name, args = {}) {
   await fixture.evaluate(() => { statFixture.dead = false; Attributes.update(statFixture); sent = []; });
   check(await fixture.locator('#bag-tabs .bag-tab[data-locked="false"]').count() === 2, 'An owned expansion pack provides a second bag');
   await fixture.locator('#bag-tabs [data-bag="1"]').click();
-  // Every non-bag catalog item is one stack; the 16-cell backpack holds the first 16 and the satchel the rest.
-  const overflow = await fixture.evaluate(() => WORLD_ITEMS.filter(i => i.kind !== 'bag').length - 16);
-  check(overflow > 0 && await fixture.locator('#inventory-list .inventory-item').count() === overflow, `Overflow bag displays the remaining ${overflow} stacks`);
+  // Every non-bag catalog item is one stack; the 16-cell backpack holds the first 16 and the second bag (16 cells) the next ones.
+  const overflow = await fixture.evaluate(() => Math.min(16, WORLD_ITEMS.filter(i => i.kind !== 'bag').length - 16));
+  check(overflow > 0 && await fixture.locator('#inventory-list .inventory-item').count() === overflow, `Overflow bag displays the next ${overflow} stacks`);
   await fixture.locator('#bag-search').fill('amber');
   check(await fixture.locator('#inventory-list .inventory-item').count() === 1, 'Search finds items across both bags');
   check(await fixture.locator('#inventory-list [data-item="accessory_upgrade"] .item-stack').textContent() === '1', 'Two worn accessory copies leave one bag copy');

@@ -1001,6 +1001,7 @@ impl World {
                                 Class::Warrior => ("crimson", "sword"),
                                 Class::Mage => ("apprentice", "ash"),
                                 Class::Assassin => ("shadow", "daggers"),
+                                Class::Priest => ("pilgrim", "mace"),
                             };
                             let mut fitted = p.character.clone();
                             for (kind, variant) in [("armor", armor), ("weapon", weapon)] {
@@ -1373,7 +1374,10 @@ impl World {
         let zone = p.character.zone;
         let actor = p.character.id.clone();
         let target = p.target;
-        let melee = !matches!(skill.effect, Effect::Buff { .. } | Effect::Heal { .. });
+        let melee = !matches!(
+            skill.effect,
+            Effect::Buff { .. } | Effect::Heal { .. } | Effect::Mend { .. }
+        );
         // Single-target skills fizzle without spending their cooldown.
         let single = match &skill.effect {
             Effect::Strike { range, .. } | Effect::Chain { range, .. } => Some(*range),
@@ -1386,6 +1390,15 @@ impl World {
             let _ = p
                 .peer
                 .try_send(json!({"type":"error","text":"No enemy in range."}));
+            return;
+        }
+        if let Effect::Mend { range, .. } = &skill.effect
+            && self.wounded_allies(session, *range).is_empty()
+        {
+            let p = &self.players[&session];
+            let _ = p
+                .peer
+                .try_send(json!({"type":"error","text":"Nobody nearby needs healing."}));
             return;
         }
         let p = self.players.get_mut(&session).unwrap();
@@ -1532,17 +1545,42 @@ impl World {
                     dealt += self.hit_slime(i, session, damage, crit);
                 }
             }
-            Effect::Buff { kind, amount, time } => {
-                let p = self.players.get_mut(&session).unwrap();
-                p.buffs.retain(|b| b.id != id);
-                p.buffs.push(Buff {
-                    id: id.to_string(),
-                    kind: *kind,
-                    amount: *amount,
-                    left: *time,
-                    time: *time,
-                });
+            Effect::Buff {
+                kind,
+                amount,
+                time,
+                range,
+            } => {
+                let sessions = if *range > 0. {
+                    self.allies_near(session, *range)
+                } else {
+                    vec![session]
+                };
+                for target in sessions {
+                    let p = self.players.get_mut(&target).unwrap();
+                    p.buffs.retain(|b| b.id != id);
+                    p.buffs.push(Buff {
+                        id: id.to_string(),
+                        kind: *kind,
+                        amount: *amount,
+                        left: *time,
+                        time: *time,
+                    });
+                    if target != session {
+                        let at = p.character.point();
+                        points.push([at.x, at.y]);
+                    }
+                }
                 value = *time;
+            }
+            Effect::Mend {
+                mult,
+                range,
+                targets,
+            } => {
+                let mut wounded = self.wounded_allies(session, *range);
+                wounded.truncate(*targets as usize);
+                points = self.heal_players(session, &wounded, *mult);
             }
             Effect::Heal { fraction } => {
                 let p = self.players.get_mut(&session).unwrap();
@@ -1551,6 +1589,10 @@ impl World {
                     (before + p.character.max_hp() * fraction).min(p.character.max_hp());
                 healed = (p.character.hp - before).round();
             }
+        }
+        if let Some(pulse) = &skill.pulse {
+            let wounded = self.wounded_allies(session, pulse.range);
+            points.extend(self.heal_players(session, &wounded, pulse.mult));
         }
         if skill.lifesteal > 0. && dealt > 0. {
             let p = self.players.get_mut(&session).unwrap();
@@ -1564,6 +1606,65 @@ impl World {
             json!({"type":"event","kind":"skill","skill":id,"actor":actor,"x":origin.x,"y":origin.y,
                 "fx":face.x,"fy":face.y,"value":value,"crit":false,"points":points,"heal":healed}),
         );
+    }
+    /// Sessions of the living party members (the caster included) in the caster's zone within `range`.
+    fn allies_near(&self, session: u64, range: f64) -> Vec<u64> {
+        let me = &self.players[&session];
+        let (zone, at) = (me.character.zone, me.character.point());
+        let mates = self.party_mates(&me.character.id);
+        let mut found: Vec<u64> = self
+            .players
+            .iter()
+            .filter(|(s, p)| {
+                p.character.hp > 0.
+                    && (**s == session
+                        || (mates.contains(&p.character.id)
+                            && p.character.zone == zone
+                            && at.distance(p.character.point()) <= range))
+            })
+            .map(|(s, _)| *s)
+            .collect();
+        found.sort_unstable();
+        found
+    }
+    /// Allies in range who are missing health, the most hurt (lowest fraction) first.
+    fn wounded_allies(&self, session: u64, range: f64) -> Vec<u64> {
+        let mut found: Vec<(f64, u64)> = self
+            .allies_near(session, range)
+            .into_iter()
+            .filter_map(|s| {
+                let c = &self.players[&s].character;
+                (c.hp < c.max_hp()).then(|| (c.hp / c.max_hp(), s))
+            })
+            .collect();
+        found.sort_by(|a, b| a.0.total_cmp(&b.0).then(a.1.cmp(&b.1)));
+        found.into_iter().map(|(_, s)| s).collect()
+    }
+    /// Heals each session for `mult` times the caster's attack power and announces it with a `healed` event.
+    /// Returns the healed players' positions for the skill's visual effect.
+    fn heal_players(&mut self, caster: u64, sessions: &[u64], mult: f64) -> Vec<[f64; 2]> {
+        let amount = (self.players[&caster].character.stats().0 * mult).round();
+        let from = self.players[&caster].character.id.clone();
+        let mut points = vec![];
+        for s in sessions {
+            let Some(p) = self.players.get_mut(s) else {
+                continue;
+            };
+            let before = p.character.hp;
+            p.character.hp = (before + amount).min(p.character.max_hp());
+            let (gained, at, id, zone) = (
+                (p.character.hp - before).round(),
+                p.character.point(),
+                p.character.id.clone(),
+                p.character.zone,
+            );
+            points.push([at.x, at.y]);
+            self.emit_zone(
+                zone,
+                json!({"type":"event","kind":"healed","actor":id,"from":from,"x":at.x,"y":at.y,"value":gained,"crit":false}),
+            );
+        }
+        points
     }
     /// Enemies a damaging dash passes through, each hit once.
     fn dash_sweep(&mut self, session: u64) {
@@ -2629,7 +2730,8 @@ mod tests {
         let token = welcome["token"].as_str().unwrap();
         w.rng = 7;
         let id = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
-        for _ in 0..300 {
+        let kills = 1000;
+        for _ in 0..kills {
             w.slimes[id] = Slime::new(id, &w.maps[0].slimes[id]);
             w.hit_slime(id, 1, 1000., false);
         }
@@ -2651,7 +2753,7 @@ mod tests {
         }
         w.update_drops();
         let saved = w.store.load(token).unwrap().unwrap();
-        assert_eq!(saved.quantity("ironhide_shell"), 300);
+        assert_eq!(saved.quantity("ironhide_shell"), kills);
         for i in ITEMS.iter().filter(|i| i.rarity == "rare") {
             assert!(saved.quantity(&i.id) > 0);
         }
@@ -3354,7 +3456,8 @@ mod tests {
         ] {
             let default = Slime::default_level(kind) as i32;
             let mut seen = std::collections::BTreeSet::new();
-            for _ in 0..600 {
+            let kills = 1000;
+            for _ in 0..kills {
                 seen.insert(w.roll_level(kind) as i32);
             }
             let expected: std::collections::BTreeSet<_> =
