@@ -111,9 +111,7 @@ async function stageAt(page, point) {
   const map=JSON.parse(fs.readFileSync(path.join(root,'world/map.txt'),'utf8'));
   check(fs.readFileSync(path.join(root,'client/world.js'),'utf8').includes(JSON.stringify(map)), 'Map is identical on client and server');
   browser = await chromium.launch({ headless: true });
-  const warrior = await makePlayer('warrior','TestWarrior');
-  const mage = await makePlayer('mage','TestMage');
-  const assassin = await makePlayer('assassin','TestAssassin');
+  const [warrior, mage, assassin] = await Promise.all([makePlayer('warrior','TestWarrior'), makePlayer('mage','TestMage'), makePlayer('assassin','TestAssassin')]);
   await warrior.waitForFunction(() => !!Field.beetleSprites);
   check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='beetle').length===5 && Field.slimes.filter(s=>s.kind==='beetle').every(s=>s.level===5 && s.maxHp===240 && s.windupTime===.4)), 'Five tougher beetles arrive from authoritative snapshots, each at its default level 5 (the suite pins VALHALLA_LEVEL_SPREAD=0)');
   check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='big').every(s=>s.level===6 && s.maxHp===600 && s.windupTime===.35)), 'King Slime has stronger health and faster windup');
@@ -163,6 +161,62 @@ async function stageAt(page, point) {
   await assassin.waitForFunction(start=>Math.hypot(Field.hero.x-start.x,Field.hero.y-start.y)>2,dashStart,{timeout:10000});
   const dashEnd=await assassin.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));check(Math.hypot(dashEnd.x-dashStart.x,dashEnd.y-dashStart.y)>2,'Assassin dash works through server');
   await warrior.screenshot({path:path.join(root,'test-results/multiplayer.png')});
+  // The warrior's city and shop section is independent of the mage's fight, so the two run at the same time.
+  const cityBlock = async () => {
+    if (await warrior.locator('#pause').isVisible()) await warrior.keyboard.press('Escape');
+    // Walk into the new city through actual inputs; no server state is changed by tests.
+    await warrior.evaluate(()=>Online.send({type:'interact',npc:'healer',offer:'blessing'}));
+    await warrior.waitForFunction(()=>document.getElementById('chat-log').textContent.includes('Walk closer'));passed++;
+    check(await warrior.locator('#npc-dialogue').isHidden(),'Remote NPC interaction cannot open a shop');
+    // Staged near the gate, so the walk through it (what is under test) is short.
+    await stageAt(warrior,{x:36,y:69});
+    await warrior.locator('#city-travel').click();
+    try {
+      await warrior.waitForFunction(()=>Field.hero.y>78.6&&Field.hero.y<80&&Math.abs(Field.hero.x-36)<.4,null,{timeout:40000});
+    } catch(error) {
+      console.error('City travel stalled:',await warrior.evaluate(()=>({hero:{x:Field.hero.x,y:Field.hero.y},nearby:[...Field.remotePlayers,...Field.slimes].filter(a=>!a.dead&&Math.hypot(a.x-Field.hero.x,a.y-Field.hero.y)<4).map(a=>({id:a.id,x:a.x,y:a.y}))})));
+      throw error;
+    }
+    check(await warrior.locator('#city-travel').isHidden(),'Travel button walks through the city gate');
+    await warrior.waitForFunction(()=>document.getElementById('network-status').textContent.includes('Alderhaven'));passed++;
+    await warrior.screenshot({path:path.join(root,'test-results/city-square.png')});
+    await warrior.keyboard.press('f');
+    await warrior.locator('#npc-dialogue').waitFor({state:'visible'});
+    check(await warrior.locator('#npc-name').textContent()==='Wren','F talks to nearby town guide');
+    const cityTick=(await (await fetch(url+'health')).json()).tick;await delay(300);
+    check((await (await fetch(url+'health')).json()).tick>cityTick,'NPC conversations keep the shared world running');
+    await warrior.keyboard.press('Escape');check(await warrior.locator('#npc-dialogue').isHidden(),'Escape closes NPC conversation');
+    async function walkTo(page,goal) {
+      const start=await page.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));
+      for(const point of route(map,start,goal)){await page.evaluate(p=>Online.send({type:'move',...p}),point);await page.waitForFunction(p=>Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<.4,point,{timeout:20000});}
+    }
+    async function clickNpc(page,id) {
+      const point=await page.evaluate(id=>{const n=City.npcs.find(n=>n.id===id),[x,y]=Field._debug.w2s(n.x,n.y),r=document.getElementById('fieldcv').getBoundingClientRect();return {x:r.left+x/1600*r.width,y:r.top+(y-60)/900*r.height};},id);
+      await page.mouse.click(point.x,point.y);await page.locator('#npc-dialogue').waitFor({state:'visible'});
+    }
+    await walkTo(warrior,{x:32,y:80});await delay(400);await clickNpc(warrior,'healer');
+    check(await warrior.locator('#npc-name').textContent()==='Sister Elara','Clicking an NPC opens the correct dialogue');
+    const cityGold=await warrior.evaluate(()=>Field.hero.gold);
+    await warrior.locator('[data-offer="blessing"]').click();
+    await warrior.waitForFunction(()=>document.getElementById('npc-notice').textContent.includes('full health'));
+    check(await warrior.evaluate(g=>Field.hero.gold===g,cityGold),'Sanctuary blessing is free and does not charge full-health players');
+    await warrior.locator('#npc-close').click();
+    await walkTo(warrior,{x:33,y:88});await delay(400);
+    await warrior.evaluate(()=>Online.send({type:'equip',armor:'none',weapon:'none'}));
+    await warrior.waitForFunction(()=>Field.hero.look.warriorWeapon==='none');
+    await clickNpc(warrior,'smith');await warrior.locator('[data-offer="fitting"]').click();
+    await warrior.waitForFunction(()=>Field.hero.look.warriorWeapon==='sword'&&Field.hero.look.warriorArmor==='crimson');
+    await mage.waitForFunction(id=>Field.remotePlayers.find(p=>p.id===id)?.look.warriorWeapon==='sword',warriorId);passed++;
+    check(await warrior.evaluate(g=>Field.hero.gold===g,cityGold),'Armorer service equips server-owned class gear without charging');
+    await warrior.screenshot({path:path.join(root,'test-results/city-armorer.png')});await warrior.locator('#npc-close').click();
+    await walkTo(warrior,{x:40,y:79});await delay(400);await clickNpc(warrior,'apothecary');
+    check(await warrior.locator('[data-offer="tonic"]').isDisabled(),'Shop shows an unaffordable item without allowing a purchase');
+    await warrior.locator('#npc-close').click();
+  };
+  const city = cityBlock(); city.catch(() => {});   // an early failure is reported where it is awaited
+  // The fighter starts at level 20 (a shortcut for staging only: every rule, reward and save still runs), as a veteran would.
+  await shortcut(mage,{op:'set_level',level:20});
+  await mage.waitForFunction(()=>Field.hero.level===20,null,{timeout:10000});
   // Fight with real network actions; no direct hero/enemy HP manipulation.
   const state=await mage.evaluate(()=>({start:{x:Field.hero.x,y:Field.hero.y},slimes:Field.slimes.filter(s=>s.kind==='green'&&!s.dead&&s.hx>59&&s.hy>59).map(s=>({id:s.id,x:s.x,y:s.y}))}));
   state.slimes.sort((a,b)=>Math.hypot(a.x-state.start.x,a.y-state.start.y)-Math.hypot(b.x-state.start.x,b.y-state.start.y));
@@ -182,7 +236,7 @@ async function stageAt(page, point) {
   await mage.locator('#npc-dialogue').waitFor({ state: 'visible' });
   await mage.locator('#npc-close').click();
   await stageAt(mage,{x:7,y:64});
-  const spawned=await shortcut(mage,{op:'spawn_enemy',kind:'beetle',x:13,y:64});
+  const spawned=await shortcut(mage,{op:'spawn_enemy',kind:'beetle',x:13,y:64,level:1});
   await mage.waitForFunction(id=>{const s=Field.slimes.find(s=>s.id===id);return s&&!s.dead&&s.kind==='beetle'&&Math.abs(s.x-13)<2;},spawned.id,{timeout:10000});
   const beetleState=await mage.evaluate(id=>({start:{x:Field.hero.x,y:Field.hero.y},enemy:Field.slimes.find(s=>s.id===id),kills:Field.hero.kills,xp:Field.hero.xp,level:Field.hero.level,xpNeed:Field.hero.xpNeed,gold:Field.hero.gold}),spawned.id);
   const pickupStart=mage.pickups.length, mageId=await mage.evaluate(()=>Online.id);
@@ -198,12 +252,13 @@ async function stageAt(page, point) {
   await mage.evaluate(p=>Online.send({type:'move',...p}),beetleDrop);
   const beetleGold=Math.round(10*(1+.1*(beetle.level-5)));
   await mage.waitForFunction(({gold,value})=>Field.hero.gold>=gold+value,{gold:beetleState.gold,value:beetleGold},{timeout:15000});
-  check(mage.pickups.slice(pickupStart).some(event=>event.actor===mageId && event.value===beetleGold), 'Server awards the level-scaled beetle gold pickup to its killer');
+  check(mage.pickups.slice(pickupStart).some(event=>event.actor===mageId && event.value===beetleGold), 'Server awards the level-scaled beetle gold pickup to its killer; wanted '+beetleGold+' for '+mageId+', saw '+JSON.stringify(mage.pickups.slice(pickupStart)));
   const progress=await mage.evaluate(()=>({id:Online.id,gold:Field.hero.gold,kills:Field.hero.kills,xp:Field.hero.xp,level:Field.hero.level}));
   check(progress.kills>0&&progress.gold>0&&(progress.xp>0||progress.level>1),'Server rewards kills, XP, and pickups');
   await mage.reload();await mage.locator('#start').click(); await mage.locator('#login-guest').click();
   await mage.waitForFunction(()=>Online.connected&&!!Field.mageSprites,null,{timeout:60000});
   check(await mage.evaluate(p=>Online.id===p.id&&Field.hero.gold===p.gold&&Field.hero.kills===p.kills,progress),'Character resumes after page reload');
+  await city;
   // Restart the actual Rust process and resume from SQLite through automatic reconnect.
   const bind=new URL(url).host;await stopServer();
   await warrior.waitForFunction(()=>!Online.connected);
@@ -219,53 +274,7 @@ async function stageAt(page, point) {
   await warrior.locator('#character-list button').filter({hasText:'TestWarrior'}).click();
   await warrior.waitForFunction(id=>Online.connected&&Online.id===id,warriorId);
   check(await warrior.evaluate(()=>Field.hero.look.warriorWeapon==='sword'),'Saved character picker restores previous gear');
-  console.log('Core multiplayer checks passed; checking city travel and NPC services.');
-  // Walk into the new city through actual inputs; no server state is changed by tests.
-  await warrior.evaluate(()=>Online.send({type:'interact',npc:'healer',offer:'blessing'}));
-  await warrior.waitForFunction(()=>document.getElementById('chat-log').textContent.includes('Walk closer'));passed++;
-  check(await warrior.locator('#npc-dialogue').isHidden(),'Remote NPC interaction cannot open a shop');
-  await warrior.locator('#city-travel').click();
-  try {
-    await warrior.waitForFunction(()=>Field.hero.y>78.6&&Field.hero.y<80&&Math.abs(Field.hero.x-36)<.4,null,{timeout:40000});
-  } catch(error) {
-    console.error('City travel stalled:',await warrior.evaluate(()=>({hero:{x:Field.hero.x,y:Field.hero.y},nearby:[...Field.remotePlayers,...Field.slimes].filter(a=>!a.dead&&Math.hypot(a.x-Field.hero.x,a.y-Field.hero.y)<4).map(a=>({id:a.id,x:a.x,y:a.y}))})));
-    throw error;
-  }
-  check(await warrior.locator('#city-travel').isHidden(),'Travel button walks through the city gate');
-  await warrior.waitForFunction(()=>document.getElementById('network-status').textContent.includes('Alderhaven'));passed++;
-  await warrior.screenshot({path:path.join(root,'test-results/city-square.png')});
-  await warrior.keyboard.press('f');
-  await warrior.locator('#npc-dialogue').waitFor({state:'visible'});
-  check(await warrior.locator('#npc-name').textContent()==='Wren','F talks to nearby town guide');
-  const cityTick=(await (await fetch(url+'health')).json()).tick;await delay(300);
-  check((await (await fetch(url+'health')).json()).tick>cityTick,'NPC conversations keep the shared world running');
-  await warrior.keyboard.press('Escape');check(await warrior.locator('#npc-dialogue').isHidden(),'Escape closes NPC conversation');
-  async function walkTo(page,goal) {
-    const start=await page.evaluate(()=>({x:Field.hero.x,y:Field.hero.y}));
-    for(const point of route(map,start,goal)){await page.evaluate(p=>Online.send({type:'move',...p}),point);await page.waitForFunction(p=>Math.hypot(Field.hero.x-p.x,Field.hero.y-p.y)<.4,point,{timeout:20000});}
-  }
-  async function clickNpc(page,id) {
-    const point=await page.evaluate(id=>{const n=City.npcs.find(n=>n.id===id),[x,y]=Field._debug.w2s(n.x,n.y),r=document.getElementById('fieldcv').getBoundingClientRect();return {x:r.left+x/1600*r.width,y:r.top+(y-60)/900*r.height};},id);
-    await page.mouse.click(point.x,point.y);await page.locator('#npc-dialogue').waitFor({state:'visible'});
-  }
-  await walkTo(warrior,{x:32,y:80});await delay(400);await clickNpc(warrior,'healer');
-  check(await warrior.locator('#npc-name').textContent()==='Sister Elara','Clicking an NPC opens the correct dialogue');
-  const cityGold=await warrior.evaluate(()=>Field.hero.gold);
-  await warrior.locator('[data-offer="blessing"]').click();
-  await warrior.waitForFunction(()=>document.getElementById('npc-notice').textContent.includes('full health'));
-  check(await warrior.evaluate(g=>Field.hero.gold===g,cityGold),'Sanctuary blessing is free and does not charge full-health players');
-  await warrior.locator('#npc-close').click();
-  await walkTo(warrior,{x:33,y:88});await delay(400);
-  await warrior.evaluate(()=>Online.send({type:'equip',armor:'none',weapon:'none'}));
-  await warrior.waitForFunction(()=>Field.hero.look.warriorWeapon==='none');
-  await clickNpc(warrior,'smith');await warrior.locator('[data-offer="fitting"]').click();
-  await warrior.waitForFunction(()=>Field.hero.look.warriorWeapon==='sword'&&Field.hero.look.warriorArmor==='crimson');
-  await mage.waitForFunction(id=>Field.remotePlayers.find(p=>p.id===id)?.look.warriorWeapon==='sword',warriorId);passed++;
-  check(await warrior.evaluate(g=>Field.hero.gold===g,cityGold),'Armorer service equips server-owned class gear without charging');
-  await warrior.screenshot({path:path.join(root,'test-results/city-armorer.png')});await warrior.locator('#npc-close').click();
-  await walkTo(warrior,{x:40,y:79});await delay(400);await clickNpc(warrior,'apothecary');
-  check(await warrior.locator('[data-offer="tonic"]').isDisabled(),'Shop shows an unaffordable item without allowing a purchase');
-  await warrior.locator('#npc-close').click();
+  console.log('Core multiplayer checks passed.');
   for(const page of [warrior,mage,assassin]) check(page.errors.length===0,'No browser runtime errors: '+page.errors.join('; '));
   for(const page of [warrior,mage,assassin]) check(!page.actorCollision,'Every received authoritative snapshot keeps enemies a cell away from players: '+JSON.stringify(page.actorCollision));
   for(const page of [warrior,mage,assassin]) check(!page.renderCollision,'Rendered enemies remain a cell away from players during movement and combat: '+JSON.stringify(page.renderCollision));
