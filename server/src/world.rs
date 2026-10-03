@@ -14,6 +14,7 @@ mod debug;
 mod instances;
 mod mercs;
 mod partyxp;
+mod pursuit;
 mod ranged;
 #[cfg(test)]
 mod resource_tests;
@@ -115,6 +116,8 @@ struct Player {
     god: bool,
     /// Set on a hired mercenary: the character id of the player who hired it (see world/mercs.rs).
     merc: Option<String>,
+    /// The particular group objective this fighter was hired for; Meeting Stone hires have no quest contract.
+    merc_quest: Option<String>,
 }
 impl Player {
     // Called once when hp reaches 0: the XP penalty, then a notice naming what it cost.
@@ -176,6 +179,7 @@ impl Player {
             portal_at: -99.,
             god: false,
             merc: None,
+            merc_quest: None,
         }
     }
     fn snapshot(&self) -> Value {
@@ -556,6 +560,7 @@ pub struct World {
     enemy_bolts: Vec<ranged::EnemyBolt>,
     // The private copies of every dungeon (world/instances.rs).
     instances: Vec<instances::Instance>,
+    pursuit: pursuit::Pursuit,
     drops: Vec<Drop>,
     // Party loot rolls in progress (world/rolls.rs).
     rolls: Vec<rolls::Roll>,
@@ -612,6 +617,7 @@ impl World {
             bolts: vec![],
             enemy_bolts: vec![],
             instances,
+            pursuit: pursuit::Pursuit::default(),
             drops: vec![],
             rolls: vec![],
             loot_turns: BTreeMap::new(),
@@ -1198,7 +1204,6 @@ impl World {
         let mut notice = String::new();
         let mut levels = 0;
         let mut quest_changed = false;
-        let mut contract_over = false;
         if let Some(id) = offer_id {
             if self.time - p.service_at < 0.5 {
                 // Reply so a pending client button is never left disabled.
@@ -1212,8 +1217,6 @@ impl World {
                     {
                         (notice, levels, quest_changed) =
                             quest_action(&mut p.character, quest, action);
-                        // A claimed group quest ends the mercenaries' contract.
-                        contract_over = quest.group && action == "claim" && quest_changed;
                     }
                 } else if let Some(sale) = id.strip_prefix("sell:") {
                     if !npc.buys {
@@ -1342,9 +1345,6 @@ impl World {
             .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         let actor = p.character.id.clone();
         let point = p.character.point();
-        if contract_over {
-            let _ = self.dismiss_mercenaries(session);
-        }
         if levels > 0 {
             self.level_up_event(&actor, point, levels);
         }
@@ -1385,6 +1385,7 @@ impl World {
         }
         // Players pass through actors; enemies yield before their own movement.
         self.separate_enemies();
+        self.pursuit.retain(&self.players);
         for i in 0..self.slimes.len() {
             if !self.zone_idle(self.slimes[i].zone) {
                 self.update_slime(i);
@@ -2258,6 +2259,7 @@ impl World {
         let wander = self.random();
         let angle = self.random() * std::f64::consts::TAU;
         let zone = self.slimes[id].zone;
+        let dungeon = self.instance_at(zone).map(|i| i.template);
         let bodies = self.actor_bodies(zone, None, Some(id));
         // A respawning enemy rolls a fresh level; kings come from the shared timer instead.
         let respawn_level = {
@@ -2327,7 +2329,7 @@ impl World {
                     s.point().distance(p.character.point()),
                 )
             })
-            .filter(|(_, _, d)| *d < awareness)
+            .filter(|(_, _, d)| *d < awareness || (dungeon.is_some() && s.target.is_some()))
             .min_by(|a, b| a.2.total_cmp(&b.2));
         let target = s.target.and_then(|id| {
             self.players
@@ -2346,7 +2348,9 @@ impl World {
                     )
                 })
         });
-        let target = target.filter(|(_, _, d)| *d < 9.).or(nearest);
+        let target = target
+            .filter(|(_, _, d)| dungeon.is_some() || *d < 9.)
+            .or(nearest);
         if s.state != "return"
             && s.state != "windup"
             && s.state != "lunge"
@@ -2385,11 +2389,17 @@ impl World {
                 }
             }
             "chase" => {
-                if let Some((_, point, d)) =
-                    target.filter(|_| s.point().distance(Point { x: s.hx, y: s.hy }) < 14.)
-                {
+                if let Some((_, point, d)) = target.filter(|_| {
+                    dungeon.is_some() || s.point().distance(Point { x: s.hx, y: s.hy }) < 14.
+                }) {
+                    let attack_reach = ranged
+                        .as_ref()
+                        .map_or(1.15 + s.r + if slam > 0. { 0.9 } else { 0. }, |r| r.range);
+                    let visible = dungeon.is_none()
+                        || d > attack_reach
+                        || pursuit::clear_line(map, s.point(), point, s.r);
                     let shoots = ranged.as_ref().is_some_and(|r| {
-                        d > Slime::melee_inside(&s.kind) + s.r && d < r.range * 3.
+                        visible && d > Slime::melee_inside(&s.kind) + s.r && d < r.range * 3.
                     });
                     if let (true, Some(r)) = (shoots, ranged.as_ref()) {
                         if d <= r.range && s.atk_cd <= 0. {
@@ -2410,7 +2420,10 @@ impl World {
                             });
                             movement *= 0.8;
                         }
-                    } else if d < 1.15 + s.r + if slam > 0. { 0.9 } else { 0. } && s.atk_cd <= 0. {
+                    } else if visible
+                        && d < 1.15 + s.r + if slam > 0. { 0.9 } else { 0. }
+                        && s.atk_cd <= 0.
+                    {
                         s.state = "windup".into();
                         s.st = windup;
                         s.goal = point;
@@ -2505,7 +2518,17 @@ impl World {
             }
             _ => {}
         }
-        if let Some(goal) = goal {
+        if let Some(mut goal) = goal {
+            if let Some(template) = dungeon
+                && s.state == "chase"
+                && let Some((session, point, _)) = target
+                && goal.distance(point) < 1e-8
+                && let Some(waypoint) = self
+                    .pursuit
+                    .toward(map, template, s, session, point, self.time)
+            {
+                goal = waypoint;
+            }
             let mut point = s.point();
             let direction = point.direction(goal);
             movement = movement.min(point.distance(goal));
@@ -3524,7 +3547,7 @@ mod tests {
     }
 
     #[test]
-    fn mercenaries_leave_with_their_hirer_when_the_party_breaks_and_when_the_group_quest_is_claimed()
+    fn mercenaries_leave_with_their_hirer_when_the_party_breaks_and_when_the_group_objective_is_ready()
      {
         let mut w = world();
         let mut rx = join(&mut w, 1, Class::Warrior);
@@ -3546,7 +3569,7 @@ mod tests {
         w.leave_party(&owner);
         w.step();
         assert!(mercs_of(&w).is_empty());
-        // Claiming the group quest does too. (A claimed quest is replaced by a fresh character state.)
+        // Completing the objective does too, before returning to claim the reward.
         w.players
             .get_mut(&1)
             .unwrap()
@@ -3563,6 +3586,14 @@ mod tests {
             .find(|q| q.id == "crags_cinderlord")
             .unwrap()
             .counts = vec![1];
+        w.step();
+        assert!(
+            mercs_of(&w).is_empty(),
+            "completion ended the contract before claim"
+        );
+        let purse = w.players[&1].character.gold;
+        assert!(hire(&mut w, &mut rx, 1, "crags_captain", "mage").contains("already complete"));
+        assert_eq!(w.players[&1].character.gold, purse);
         w.time += 0.6;
         w.interact(1, "crags_captain", Some("quest:claim:crags_cinderlord"));
         drain(&mut rx);
@@ -3573,7 +3604,7 @@ mod tests {
                 .iter()
                 .any(|q| q.id == "crags_cinderlord" && q.claimed)
         );
-        assert!(mercs_of(&w).is_empty(), "the claim ended the contract");
+        assert!(mercs_of(&w).is_empty());
         // And the hirer leaving the world takes them along.
         w.players
             .get_mut(&1)

@@ -1579,7 +1579,7 @@ const scenarios = {
     },
   },
   mercenaries: {
-    description: 'The two elite-quest givers rent mercenaries for 250 gold each: only with the quest taken, up to the players it wants, joining the party and the world, their kills paying the hirer, and the contract ending on claim.',
+    description: 'The two elite-quest givers rent mercenaries for 250 gold each: only with an unfinished quest taken, up to the players it wants, joining the party and the world, their kills paying the hirer, and the contract ending when its objective is complete.',
     startLevel: 20, godMode: true, levelSpread: 0,
     async run(w, check) {
       const bot = 'Hirer', mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name));
@@ -1625,11 +1625,16 @@ const scenarios = {
       await w.debug(bot, { op: 'kill_enemy', id: elite.id });
       await w.waitFor(() => quest(w, bot, 'fen_gloomroot').counts[0] === 1);
       check(w.player(bot).kills === 1, 'The hirer is credited with the kill');
+      await w.waitFor(() => mercs().length === 0);
+      check(!quest(w, bot, 'fen_gloomroot').claimed, 'The completed objective dismisses every hired mercenary before turn-in');
       await kit.teleport(w, bot, { npc: 'fen_reeve' });
+      const completedPurse = w.player(bot).gold;
+      reply = await kit.talkTo(w, bot, 'fen_reeve', 'merc_priest');
+      check(/already complete/.test(reply.notice) && !mercs().length && w.player(bot).gold === completedPurse, 'Completed objectives cannot hire replacements or charge gold');
       await kit.talkTo(w, bot, 'fen_reeve', 'quest:claim:fen_gloomroot');
       await w.waitFor(() => quest(w, bot, 'fen_gloomroot').claimed);
       await w.waitFor(() => mercs().length === 0);
-      check(w.player(bot).inventory.some(s => s.item === 'accessory_amber_l20_blue'), 'Claiming the quest pays the ring and ends every contract');
+      check(w.player(bot).inventory.some(s => s.item === 'accessory_amber_l20_blue'), 'The completed quest still pays its ring');
       check(w.snapshot.online === 1, 'Mercenaries never count as players online');
     },
   },
@@ -1920,6 +1925,54 @@ const scenarios = {
       check(w.player(bot).gold === 40, 'One-leg return charges exactly 20 gold');
       await w.disconnect(bot); await w.connect({ bot });
       check(w.player(bot).gold === 40 && w.player(bot).zone === 1 && w.player(bot).travelStops.length === 3, 'Arrival and discoveries survive logout');
+    },
+  },
+
+
+  instance_pursuit: {
+    description: 'Instance enemies keep chasing beyond range and home leash through dungeon corridors; Meeting Stone mercenaries depart on clear after final boss rolls are created.',
+    startLevel: 20, godMode: true, levelSpread: 0,
+    async run(w, check) {
+      const bot = 'Runner', anchor = 'Anchor', vault = map.zones[4];
+      const view = () => w.views.get(bot), mercs = () => view().players.filter(p => /^Merc /.test(p.look.name));
+      await w.connect({ bot, class: 'warrior' });
+      await w.connect({ bot: anchor, class: 'mage' });
+      await w.social(bot, { op: 'party_invite', bot: anchor });
+      await w.social(anchor, { op: 'party_accept', bot });
+      await kit.teleport(w, bot, { zone: 5, ...vault.spawn });
+      await kit.teleport(w, anchor, { zone: 5, x: vault.spawn.x + 1, y: vault.spawn.y });
+      await kit.teleport(w, anchor, { zone: 5, x: 57, y: 104 });
+      const staged = await kit.spawnEnemy(w, bot, { kind: 'thrall', distance: 4 });
+      const id = staged.enemy.id, enemy = () => view().slimes.find(s => s.id === id);
+      await w.waitFor(() => ['chase','windup','lunge'].includes(enemy().state), 5000, 'The staged enemy aggroes normally');
+      const from = { x: enemy().x, y: enemy().y };
+      // The anchor keeps this private copy selected while the runner goes to the first room.
+      await kit.teleport(w, bot, { zone: 5, x: 57, y: 104 });
+      check(distance(from, w.player(bot)) > 30, 'The target is beyond the old awareness and chase range');
+      await w.advance(1000);
+      check(enemy().state !== 'return', 'The enemy pursues instead of dropping aggro');
+      await w.waitFor(() => distance(enemy(), from) > 15, 30000, 'The enemy passes its old home leash');
+      check(enemy().state !== 'return', 'Passing the home leash does not reset an instance enemy');
+      await w.waitFor(() => distance(enemy(), w.player(bot)) < 4, 30000, 'The enemy follows through the entry corridors into the room');
+      check(!enemy().dead && distance(enemy(), from) > 25, 'The living enemy reaches the distant hero through the dungeon');
+      await w.debug(bot, { op: 'kill_enemy', id });
+      // Hire a fighter for this run; completed unrelated objectives do not end Stone contracts.
+      await kit.setupCharacter(w, bot, { gold: 1000, finishQuests: ['crags_cinderlord'], teleportTo: { npc: 'city_meetingstone' } });
+      await kit.talkTo(w, bot, 'city_meetingstone', 'merc_priest');
+      await kit.teleport(w, bot, { zone: 5, ...vault.spawn });
+      await w.waitFor(() => mercs().length === 1, 5000, 'The hired mercenary follows into the copy');
+      check(mercs().length === 1, 'An unrelated completed objective leaves the instance contract active');
+      const boss = view().slimes.find(s => s.kind === 'gatewarden');
+      await w.debug(bot, { op: 'kill_enemy', id: boss.id });
+      check(!view().instance.cleared && mercs().length === 1, 'An earlier boss does not dismiss instance mercenaries');
+      const king = (await kit.spawnEnemy(w, bot, { kind: 'hollowking', distance: 4 })).enemy;
+      const earlier = new Set(w.events);
+      await w.debug(bot, { op: 'kill_enemy', id: king.id });
+      await w.waitFor(() => view().instance.cleared && !mercs().length, 5000, 'Clearance dismisses the hired fighter');
+      check(view().instance.cleared && !mercs().length, 'The final boss clears the instance and its mercenary departs');
+      const starts = w.events.filter(e => !earlier.has(e) && e.bot === bot && e.type === 'roll' && e.op === 'start' && /_l20_vault$/.test(e.item));
+      check(starts.length === 2, 'Both final boss loot rolls are created before departure');
+      check(w.player(bot).kills === 3, 'The runner retains all three kill credits');
     },
   },
 

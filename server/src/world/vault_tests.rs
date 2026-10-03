@@ -1386,3 +1386,283 @@ fn the_door_asks_for_level_twenty_for_every_hero_even_in_a_party_with_one_inside
     step_on_the_stairs(&mut w, 1);
     assert_eq!(zone_of(&w, 1), VAULT, "level 20 follows into the same copy");
 }
+
+#[test]
+fn instance_pursuit_keeps_every_kind_aggroed_across_the_winding_dungeon() {
+    let mut w = world();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    w.god_mode = true;
+    let start = w.slimes[first(&w, VAULT, "thrall")].point();
+    let end = w.slimes[first(&w, VAULT, "hollowking")].point();
+    place(&mut w, 1, VAULT, end);
+    for s in &mut w.slimes {
+        s.dead = true;
+        s.respawn = 1e9;
+    }
+    for kind in [
+        "thrall",
+        "archer",
+        "acolyte",
+        "gatewarden",
+        "choir",
+        "colossus",
+        "hollowking",
+    ] {
+        let id = first(&w, VAULT, kind);
+        let s = &mut w.slimes[id];
+        s.dead = false;
+        s.x = start.x;
+        s.y = start.y;
+        s.hx = start.x;
+        s.hy = start.y;
+        s.target = Some(1);
+        s.state = "chase".into();
+        let reach = Slime::ranged(kind).map_or(3., |r| r.range + 0.5);
+        for _ in 0..12000 {
+            w.time += TICK;
+            w.update_slime(id);
+            let s = &w.slimes[id];
+            assert_eq!(s.target, Some(1), "{kind} dropped its target");
+            assert_ne!(s.state, "return", "{kind} leashed home");
+            let mut collision = s.point();
+            w.maps[VAULT].collide(&mut collision, s.r);
+            assert!(
+                collision.distance(s.point()) < 1e-6,
+                "{kind} crossed a wall"
+            );
+            if s.point().distance(end) < reach {
+                break;
+            }
+        }
+        assert!(
+            w.slimes[id].point().distance(end) < reach,
+            "{kind} stopped at {:?}, target {end:?}",
+            w.slimes[id].point()
+        );
+        w.slimes[id].dead = true;
+    }
+}
+
+#[test]
+fn instance_pursuit_retargets_after_death_but_never_crosses_private_copies() {
+    let mut w = world();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    let _rx2 = join(&mut w, 2, Class::Mage);
+    let id = first(&w, VAULT, "thrall");
+    let end = w.slimes[first(&w, VAULT, "hollowking")].point();
+    place(&mut w, 1, VAULT, end);
+    place(&mut w, 2, VAULT, end);
+    w.players.get_mut(&1).unwrap().character.hp = 0.;
+    w.slimes[id].target = Some(1);
+    w.slimes[id].state = "chase".into();
+    w.update_slime(id);
+    assert_eq!(
+        w.slimes[id].target,
+        Some(2),
+        "the living ally is pursued beyond awareness range"
+    );
+    place(&mut w, 2, 6, end);
+    w.update_slime(id);
+    assert_eq!(w.slimes[id].target, None);
+    assert_eq!(w.slimes[id].state, "return");
+}
+
+#[test]
+fn outdoor_enemies_still_drop_aggro_at_their_normal_leash() {
+    let mut w = world();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    let id = first(&w, 0, "green");
+    let home = w.slimes[id].point();
+    place(
+        &mut w,
+        1,
+        0,
+        Point {
+            x: home.x + 12.,
+            y: home.y,
+        },
+    );
+    w.slimes[id].target = Some(1);
+    w.slimes[id].state = "chase".into();
+    w.update_slime(id);
+    assert_eq!(w.slimes[id].target, None);
+    assert_eq!(w.slimes[id].state, "return");
+}
+
+#[test]
+fn a_cleared_instance_dismisses_its_mercenaries_after_the_final_kills_loot_is_created() {
+    let mut w = world();
+    let mut rx = join(&mut w, 1, Class::Warrior);
+    let _rx2 = join(&mut w, 2, Class::Warrior);
+    w.god_mode = true;
+    let stone = w.maps[SKALD]
+        .npcs
+        .iter()
+        .find(|n| n.id == "city_meetingstone")
+        .unwrap()
+        .clone();
+    for session in [1, 2] {
+        place(
+            &mut w,
+            session,
+            SKALD,
+            Point {
+                x: stone.x,
+                y: stone.y + 1.,
+            },
+        );
+        w.players.get_mut(&session).unwrap().character.gold = 1000;
+        w.time += 0.6;
+        w.interact(session, "city_meetingstone", Some("merc_priest"));
+        take_the_stairs(&mut w, session);
+        w.update_mercenaries();
+    }
+    assert_eq!(zone_of(&w, 1), VAULT);
+    assert_eq!(zone_of(&w, 2), 6);
+    let owner = w.players[&1].character.id.clone();
+    let merc = *w
+        .players
+        .iter()
+        .find(|(_, p)| p.merc.as_ref() == Some(&owner))
+        .unwrap()
+        .0;
+    // A completed unrelated quest must not end a Meeting Stone contract.
+    w.players
+        .get_mut(&1)
+        .unwrap()
+        .character
+        .quests
+        .push(QuestProgress {
+            id: "crags_cinderlord".into(),
+            counts: vec![1],
+            ..Default::default()
+        });
+    w.update_mercenaries();
+    assert!(w.players.contains_key(&merc));
+    let boss = first(&w, VAULT, "gatewarden");
+    let at = w.slimes[boss].point();
+    place(
+        &mut w,
+        1,
+        VAULT,
+        Point {
+            x: at.x - 2.,
+            y: at.y,
+        },
+    );
+    place(
+        &mut w,
+        merc,
+        VAULT,
+        Point {
+            x: at.x - 3.,
+            y: at.y,
+        },
+    );
+    w.slimes[boss].hp = 1.;
+    w.hit_slime(boss, merc, 100., false);
+    w.update_mercenaries();
+    assert!(
+        w.players.contains_key(&merc),
+        "an earlier boss does not clear the instance"
+    );
+    let king = first(&w, VAULT, "hollowking");
+    let at = w.slimes[king].point();
+    place(
+        &mut w,
+        1,
+        VAULT,
+        Point {
+            x: at.x - 2.,
+            y: at.y,
+        },
+    );
+    place(
+        &mut w,
+        merc,
+        VAULT,
+        Point {
+            x: at.x - 3.,
+            y: at.y,
+        },
+    );
+    drain(&mut rx);
+    w.slimes[king].hp = 1.;
+    w.hit_slime(king, merc, 100., false);
+    assert!(w.instance_cleared(VAULT));
+    assert_eq!(w.players[&1].character.kills, 2);
+    let starts = drain(&mut rx)
+        .into_iter()
+        .filter(|v| {
+            v["type"] == "roll"
+                && v["op"] == "start"
+                && v["item"]
+                    .as_str()
+                    .is_some_and(|s| s.ends_with("_l20_vault"))
+        })
+        .count();
+    assert_eq!(
+        starts, 2,
+        "final loot rolls exist before mercenary dismissal"
+    );
+    // A dead mercenary departs too; the other private party remains hired.
+    w.players.get_mut(&merc).unwrap().character.hp = 0.;
+    w.update_mercenaries();
+    assert!(!w.players.contains_key(&merc));
+    assert_eq!(mercs_of(&w).len(), 1);
+    assert_eq!(mercs_of(&w)[0].character.zone, 6);
+    assert_eq!(w.party_mates(&owner).len(), 1);
+}
+
+#[test]
+fn instance_pursuit_routes_a_ranged_enemy_around_a_close_wall_before_shooting() {
+    let mut w = world();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    w.god_mode = true;
+    let id = first(&w, VAULT, "archer");
+    let radius = w.slimes[id].r;
+    // A connected room split by a short wall: the player is in bow range, but the path goes around the end.
+    let mut wall = w.maps[VAULT].objects[0].clone();
+    wall.x = 40.;
+    wall.y = 40.;
+    wall.width = 1.;
+    wall.depth = 8.;
+    w.maps[VAULT].objects = vec![wall];
+    let start = Point { x: 38.5, y: 40. };
+    let end = Point { x: 41.5, y: 40. };
+    place(&mut w, 1, VAULT, end);
+    for s in &mut w.slimes {
+        s.dead = true;
+        s.respawn = 1e9;
+    }
+    let s = &mut w.slimes[id];
+    s.dead = false;
+    s.x = start.x;
+    s.y = start.y;
+    s.target = Some(1);
+    s.state = "chase".into();
+    assert!(!pursuit::clear_line(&w.maps[VAULT], start, end, radius));
+    w.update_slime(id);
+    assert_eq!(
+        w.slimes[id].state, "chase",
+        "a close target behind a wall requires pursuit, not a volley into the wall"
+    );
+    for _ in 0..6000 {
+        w.time += TICK;
+        w.update_slime(id);
+        assert_eq!(w.slimes[id].target, Some(1));
+        if w.slimes[id].state == "windup" {
+            break;
+        }
+    }
+    assert_eq!(
+        w.slimes[id].state, "windup",
+        "the archer follows connected floor until it can shoot"
+    );
+    assert!(pursuit::clear_line(
+        &w.maps[VAULT],
+        w.slimes[id].point(),
+        end,
+        radius
+    ));
+}

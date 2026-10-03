@@ -4,7 +4,7 @@
 //! whose input is decided here instead of by a socket: it joins its hirer's party, follows them, helps whatever they or
 //! their party are fighting, uses its class's skills sensibly, drinks a potion when hurt, and is never saved.
 //! Whatever a mercenary earns belongs to its hirer (see `World::credit_session`).
-//! It leaves when its hirer logs out or leaves the party, when the hirer claims a group quest, or when sent away.
+//! It leaves when its hired objective is ready, its instance is cleared, its hirer logs out/leaves the party, or it is sent away.
 use super::*;
 
 /// Gold for one mercenary, whatever its class.
@@ -128,7 +128,14 @@ impl World {
             .find(|q| {
                 q.group && q.npc == npc_id && c.quests.iter().any(|g| g.id == q.id && !g.claimed)
             })
-            .map(|q| (q.recommended_players as usize, q.title.clone()));
+            .map(|q| {
+                (
+                    q.recommended_players as usize,
+                    q.title.clone(),
+                    q.id.clone(),
+                    q.ready(c.quests.iter().find(|g| g.id == q.id).unwrap()),
+                )
+            });
         let open = self.maps[c.zone]
             .npcs
             .iter()
@@ -138,9 +145,14 @@ impl World {
                     o.open && o.merc.as_deref() == Some(class_title(class).to_lowercase().as_str())
                 })
             });
-        let (wanted, title) = match quest {
-            Some(found) => found,
-            None if open => (social::PARTY_MAX, "The Meeting Stone".to_owned()),
+        let (wanted, title, contract) = match quest {
+            Some((_, _, _, true)) => {
+                return Err(
+                    "This objective is already complete. Your mercenaries' work is done.".into(),
+                );
+            }
+            Some((wanted, title, id, false)) => (wanted, title, Some(id)),
+            None if open => (social::PARTY_MAX, "The Meeting Stone".to_owned(), None),
             None => {
                 return Err(
                     "Take this elite quest first; I hire out fighters for the job itself.".into(),
@@ -184,6 +196,7 @@ impl World {
         let (tx, _rx) = mpsc::channel(1);
         let mut merc = Player::new(character, tx);
         merc.merc = Some(owner);
+        merc.merc_quest = contract;
         self.players.insert(merc_session, merc);
         self.players.get_mut(&session).unwrap().character.gold -= MERC_COST;
         Ok(format!(
@@ -231,6 +244,38 @@ impl World {
                 self.remove_mercenary(session);
                 continue;
             };
+            let p = &self.players[&session];
+            let hirer = &self.players[&owner].character;
+            let objective_done = p.merc_quest.as_ref().is_some_and(|id| {
+                hirer
+                    .quests
+                    .iter()
+                    .find(|g| &g.id == id)
+                    .is_none_or(|progress| {
+                        progress.claimed
+                            || self
+                                .maps
+                                .iter()
+                                .flat_map(|m| &m.quests)
+                                .find(|q| &q.id == id)
+                                .is_none_or(|q| q.ready(progress))
+                    })
+            });
+            let cleared =
+                self.instance_cleared(p.character.zone) || self.instance_cleared(hirer.zone);
+            if objective_done || cleared {
+                let name = p.character.look.name.clone();
+                let reason = if cleared {
+                    "the instance is cleared"
+                } else {
+                    "the objective is complete"
+                };
+                let _ = self.players[&owner].peer.try_send(
+                    json!({"type":"system","text":format!("{name} departs: {reason}." )}),
+                );
+                self.remove_mercenary(session);
+                continue;
+            }
             let mate_ids = self.party_mates(&owner_id);
             let merc_id = self.players[&session].character.id.clone();
             if !mate_ids.contains(&merc_id) {
