@@ -51,6 +51,12 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   check(zones[2].portals.join() === 'crags_gate>1,fen_gate>3,city_gate>4' && zones[4].portals.join() === 'glacier_gate>2', 'The glacier summit has a second gate to the city, which has the gate back');
   check(zones[4].houses >= 100 && zones[4].roads >= 15 && ['rampart', 'tower', 'grandfountain', 'meetingstone'].every(k => zones[4].kinds.includes(k)), `The city has ${zones[4].houses} signed houses, ${zones[4].roads} road shapes, a wall, towers, the fountain and the stone`);
   check(zones[4].npcs >= 40 && zones[4].walkers >= 12, `${zones[4].npcs} townspeople, ${zones[4].walkers} of them walkers`);
+  // A house's sprite is drawn into a box; the roof reaches (w+d)/2*44 px to each side and the front corner (w+d)/2*22 px below the origin.
+  const clipped = await page.evaluate(() => WORLD_MAP.zones.concat([WORLD_MAP]).flatMap(z => z.objects || []).filter(o => o.kind === 'house' || o.kind === 'chapel').filter(o => {
+    const [bw, bh, ox, oy] = City.spriteBox(o), span = o.width + o.depth;
+    return ox < (span + 1.3) * 22 || bw - ox < (span + 1.3) * 22 || bh - oy < span * 11 + 6 || oy < 330;
+  }).map(o => `${o.width}x${o.depth}`));
+  check(clipped.length === 0, `Every house and chapel sprite box holds the whole building (clipped: ${[...new Set(clipped)].join(', ') || 'none'})`);
 
   const click = async (x, y) => {
     const [sx, sy] = await page.evaluate(([x, y]) => Field._debug.w2s(x, y), [x, y]);

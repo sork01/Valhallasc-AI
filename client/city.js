@@ -156,11 +156,17 @@
   }
   // Extra kinds from cityart.js: art[kind] = { box: [w, h, originX, originY] in logical px (default 360x470 at 180,400), draw(g, o, kit), animate?(g, o, sx, sy, t) }.
   const art={};
+  // A house's sprite box grows with its footprint: the roof reaches (w+d)/2*44 px to each side and the front corner (w+d)/2*22 px below the origin, so a fixed box clipped the stoop, the pots and the sides.
+  function spriteBox(o) {
+    if(o.kind!=='house'&&o.kind!=='chapel')return [360,470,180,400];
+    const span=(o.width||0)+(o.depth||0), hw=Math.max(180,Math.ceil((span+1.3)*22)+16), below=Math.max(70,Math.ceil(span*11)+36);
+    return [hw*2,400+below,hw,400];
+  }
   const kit={iso,poly,line,ellipse,prism,text};
   function drawObject(g,o,sx,sy,fade=1) {
     const def=art[o.kind], live=o.sign==='live'&&!!o.label;
     const key=o.kind+'|'+o.width+'|'+o.depth+'|'+o.color+'|'+(live?'':o.label)+'|'+(o.v||0)+'|'+(o.big?1:0);let sprite=cache.get(key);
-    const [bw,bh,ox,oy]=def?.box||[360,470,180,400];
+    const [bw,bh,ox,oy]=def?.box||spriteBox(o);
     if(!sprite){const c=document.createElement('canvas');c.width=bw*2;c.height=bh*2;const cg=c.getContext('2d');cg.scale(2,2);cg.translate(ox,oy);if(def)def.draw(cg,o,kit);else objectArt(cg,o,live);sprite=c;cache.set(key,c);}
     g.save();g.globalAlpha=fade;g.drawImage(sprite,sx-ox,sy-oy,bw,bh);
     if(live)signBoard(g,o,sx,sy);
@@ -343,5 +349,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={nameplateTop:n=>headTop(n)+24,inside,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},dialogue,close,refreshInventory() { if(current&&view.kind==='sell') Inventory.renderShop(current, $('npc-inventory')); },get open(){return !!current;}};
+  window.City={nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},dialogue,close,refreshInventory() { if(current&&view.kind==='sell') Inventory.renderShop(current, $('npc-inventory')); },get open(){return !!current;}};
 })();
