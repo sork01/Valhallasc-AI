@@ -357,7 +357,8 @@ def main():
         PATH.write_text(json.dumps(meadow, indent=2) + '\n')
         print(f'Updated Rimeward Camp: {len(npcs)} NPCs, {len(quests)} quests. Terrain and enemy spawns preserved. Now run node scripts/sync-world.cjs')
         return
-    meadow['zones'] = [z for z in meadow['zones'] if z['name'] != NAME]
+    later = meadow['zones'][2:]       # zones after the glacier (Gloamfen) survive a rebuild; re-run generate_gloamfen.py for its gate
+    meadow['zones'] = [z for z in meadow['zones'][:2] if z['name'] != NAME]
     moved = add_crags_gate(meadow, random.Random(20261003))   # its own stream: it only draws numbers on the first run
     zone = build(random.Random(20261004))
     missing = unreachable(zone, ARRIVAL, glacier_targets(zone))
@@ -365,6 +366,7 @@ def main():
         raise SystemExit(f'unreachable from the arrival point: {missing}')
     meadow['zones'].append(zone)
     assert len(meadow['zones']) == 2, 'Rimeveil must be zone 2'
+    meadow['zones'] += later
     PATH.write_text(json.dumps(meadow, indent=2) + '\n')
     kinds = {}
     for s in zone['slimes']:

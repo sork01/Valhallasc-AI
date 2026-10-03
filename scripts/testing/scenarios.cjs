@@ -9,6 +9,7 @@ const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
 const crags = map.zones[0];
 const rime = map.zones[1];
+const fen = map.zones[2];
 // `area` is the map of the zone the bot stands in: the meadow by default, or `crags`.
 async function walkTo(world, bot, goal, area = map) {
   for (const point of route(area, world.player(bot), goal)) {
@@ -27,7 +28,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20 };
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
 const levelXp = JSON.parse(fs.readFileSync(path.join(root, 'world/levels.txt'), 'utf8'));
@@ -993,6 +994,165 @@ const scenarios = {
       const history = JSON.stringify(w.player(bot).quests);
       await w.restart();
       check(w.player(bot).zone === 2 && JSON.stringify(w.player(bot).quests) === history, 'Every completion and restarted bounty survives a private server restart');
+    },
+  },
+  gloamfen: {
+    description: 'Walk through the summit gate at the heart of Rimeveil into the level 15-20 fen, walk the whole C round the lake (three ridge gaps and the causeway) to the hydra island, fight a leveled Fen Toad, use both gates, and keep the zone across reconnect and restart.',
+    async run(w, check) {
+      const bot = 'Fenwalker';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 17 });
+      const up = rime.portals.find(p => p.id === 'fen_gate');
+      check(up && up.to === 3 && rime.portals[0].id === 'crags_gate', 'The Rimeveil summit has a gate to zone 3 after its Crags gate');
+      // Staging only: stand a few steps below the gate; the crossing itself is a real walk between its two posts.
+      await kit.teleport(w, bot, { zone: 2, x: up.x, y: up.y + 8 });
+      await walkTo(w, bot, { x: up.x, y: up.y + 4 }, rime);
+      check(w.player(bot).zone === 2, 'Still on the glacier in front of the gate');
+      await w.action(bot, { type: 'move', x: up.x, y: up.y - 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 3, 15000, 'Step through the Summit gate into Gloamfen');
+      await w.action(bot, { type: 'stop' });
+      const arrival = { x: up.tx, y: up.ty };
+      check(w.player(bot).zone === 3 && distance(w.player(bot), arrival) < 1, 'The server moves the walker into Lanternmere');
+      const bogs = w.snapshot.slimes;
+      check(bogs.length === 31 && bogs.every(s => s.zone === 3) && new Set(bogs.map(s => s.kind)).size === 4
+        && ['toad', 'croc', 'knight', 'hydra'].every(k => bogs.some(s => s.kind === k)), 'A fen client receives exactly the 31 fen monsters, four kinds, and nothing from the other zones');
+      check(bogs.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2 && s.level >= 13) && new Set(bogs.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'Fen levels sit within two of each default (15-20) and really vary');
+      const hp = { toad: 2000, croc: 2800, knight: 3400, hydra: 5200 };
+      check(bogs.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
+      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.type === 'system' && e.text.includes('Gloamfen') && e.text.includes('15–20')), 'The player is told the recommended levels');
+      // A second character on the glacier shares nothing with the fen.
+      await w.connect({ bot: 'Icewalker', class: 'mage' });
+      await kit.teleport(w, 'Icewalker', { zone: 2, x: 64, y: 110 });
+      check(w.player('Icewalker').zone === 2 && w.player(bot).zone === 3, 'Players on the glacier and in the fen are tracked separately');
+      check(w.views.get(bot).slimes.every(s => s.zone === 3) && w.views.get('Icewalker').slimes.every(s => s.zone === 2) && w.views.get(bot).players.length === 1,
+        'Each client is sent only its own zone');
+      check(JSON.stringify(w.snapshot.zonesSeen) === '[2,3]', 'The merged test view covers the two zones while a bot stands in each');
+      await w.disconnect('Icewalker');
+      // The C round the lake: the shortest route to the island passes the three ridge gaps and then the causeway mouth.
+      const island = { x: 66, y: 76 }, gaps = [{ x: 18, y: 37 }, { x: 40, y: 93 }, { x: 92, y: 113 }, { x: 88.5, y: 76 }];
+      const from = { x: w.player(bot).x, y: w.player(bot).y }, path = route(fen, from, island);
+      const legDistance = (g, a, b) => { const dx = b.x - a.x, dy = b.y - a.y, t = Math.max(0, Math.min(1, ((g.x - a.x) * dx + (g.y - a.y) * dy) / (dx * dx + dy * dy || 1))); return Math.hypot(g.x - a.x - dx * t, g.y - a.y - dy * t); };
+      check(gaps.every(g => path.some((p, i) => legDistance(g, i ? path[i - 1] : from, p) < 4.3)), 'The only route to the island passes all three ridge gaps and the causeway mouth');
+      const order = gaps.map(g => path.reduce((best, p, i) => legDistance(g, i ? path[i - 1] : from, p) < legDistance(g, best.a, best.b) ? { a: i ? path[i - 1] : from, b: p, i } : best, { a: from, b: path[0], i: 0 }).i);
+      check(order.every((v, i) => !i || v >= order[i - 1]), 'They come in order: west gap, south gap, east gap, causeway');
+      let length = distance(from, path[0]);
+      path.forEach((p, i) => { if (i) length += distance(path[i - 1], p); });
+      check(length > 2.2 * distance(from, island), `The way in goes round the lake: ${Math.round(length)} units of walking for ${Math.round(distance(from, island))} units of distance`);
+      for (const point of path) {
+        await w.action(bot, { type: 'move', ...point });
+        await w.waitFor(() => distance(w.player(bot), point) < .5, 40000, `Walk the fen to ${Math.round(point.x)},${Math.round(point.y)}`);
+      }
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 3 && distance(w.player(bot), island) < 1.5, 'The bot reaches the hydra island on foot');
+      // Way back: teleport to town (staging), then a real walk through the Summit gate and through the new gate again.
+      const back = fen.portals[0];
+      await kit.teleport(w, bot, { zone: 3, x: arrival.x, y: arrival.y });
+      await w.action(bot, { type: 'move', x: back.x, y: back.y - 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 2, 15000, 'Step through the Summit gate');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 2 && distance(w.player(bot), { x: back.tx, y: back.ty }) < 1, 'The Summit gate arrives beside the Gloamfen gate');
+      await w.action(bot, { type: 'move', x: up.x, y: up.y - 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 3, 15000, 'Step through the fen gate again');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 3 && distance(w.player(bot), arrival) < 1, 'The gate works again right after arriving, in both directions');
+      // Fight a Fen Toad through normal target actions; test worlds are invulnerable.
+      // Stand west of a west-bank toad, on its own side of the thicket ridge and the lake (the default spot would be east of it).
+      const toad = w.snapshot.slimes.filter(s => s.kind === 'toad' && !s.dead && s.x < 40 && s.y > 45 && s.y < 85).sort((a, b) => distance(a, arrival) - distance(b, arrival))[0];
+      await kit.teleport(w, bot, { zone: 3, x: toad.x - 3, y: toad.y });
+      const before = { ...w.player(bot) };
+      await w.action(bot, { type: 'target', id: toad.id });
+      await w.waitFor(() => w.snapshot.slimes.find(s => s.id === toad.id).dead, 120000, 'Defeat the toad');
+      await w.action(bot, { type: 'stop' });
+      const xp = enemyXp(toad.level), gold = Math.round(165 * (1 + .1 * (toad.level - 15)));
+      check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + xp, `The kill pays the level-${toad.level} XP (${xp})`);
+      const corpse = w.snapshot.slimes.find(s => s.id === toad.id);
+      await w.action(bot, { type: 'move', x: corpse.x, y: corpse.y });
+      await w.waitFor(() => w.player(bot).gold >= before.gold + gold && w.player(bot).inventory.some(i => i.item === 'toad_gland'), 15000, 'Collect fen loot');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).gold === before.gold + gold, `Level-scaled gold (${gold}) and a Fen Toad Gland drop are collected`);
+      const where = { ...w.player(bot) };
+      await w.disconnect(bot);
+      await w.connect({ bot });
+      check(w.player(bot).zone === 3 && distance(w.player(bot), where) < 1.2, 'Resume puts the character back in the fen');
+      await w.restart();
+      check(w.player(bot).zone === 3 && w.player(bot).gold === where.gold, 'The fen position and loot survive a Rust restart');
+    },
+  },
+  fen_quests: {
+    description: 'Lanternmere: all sixteen quests through real NPC offers, zone-local kill credit, prerequisites, rewards, repeatable contracts, healing, supplies and persisted progress.',
+    async run(w, check) {
+      const bot = 'Reeveguest';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 20, gold: 1000, items: Array.from({ length: 4 }, () => ({ item: 'linen_satchel' })), finishQuests: ['slime_patrol', 'crags_welcome', 'rime_welcome'] });
+      await kit.teleport(w, bot, { npc: 'crags_supplier' });
+      await kit.talkTo(w, bot, 'crags_supplier', 'quest:accept:crags_bounty');
+      await kit.teleport(w, bot, { npc: 'rime_trader' });
+      await kit.talkTo(w, bot, 'rime_trader', 'quest:accept:rime_bounty');
+      await w.waitFor(() => quest(w, bot, 'crags_bounty') && quest(w, bot, 'rime_bounty'), 5000, 'Both older patrols appear');
+      check(!!quest(w, bot, 'crags_bounty') && !!quest(w, bot, 'rime_bounty'), 'The Crags and glacier patrols are accepted before the fen quests start');
+      await kit.teleport(w, bot, { npc: 'fen_ranger' });
+      await kit.talkTo(w, bot, 'fen_ranger', 'quest:accept:fen_toads');
+      check(!quest(w, bot, 'fen_toads'), 'The fen hunt requires the town introduction');
+      await kit.talkTo(w, bot, 'fen_ranger', 'quest:accept:fen_welcome');
+      check(!quest(w, bot, 'fen_welcome'), 'The wrong NPC cannot offer another giver\'s quest');
+      check(kit.describe('quests').quests.filter(q => q.zone === 3).length === 16 && fen.quests.length >= 10, 'MCP describes all sixteen fen quests with their zone');
+      for (const q of fen.quests) {
+        await kit.teleport(w, bot, { npc: q.npc });
+        await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
+        await w.waitFor(() => !!quest(w, bot, q.id));
+        check(quest(w, bot, q.id)?.counts.every(n => n === 0), `${q.title}: accepted with fresh objectives`);
+        const early = await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
+        check(/Complete the objectives/.test(early.notice), `${q.title}: premature reward refused`);
+        for (const o of q.objectives) {
+          if (o.kind === 'talk') {
+            await kit.teleport(w, bot, { npc: o.target });
+            await kit.talkTo(w, bot, o.target);
+          } else {
+            for (let i = 0; i < o.count; i++) {
+              const enemy = w.snapshot.slimes.find(s => s.zone === 3 && (o.target === 'any' || s.kind === o.target));
+              if (enemy.dead) await w.debug(bot, { op: 'respawn_enemy', id: enemy.id });
+              await w.debug(bot, { op: 'kill_enemy', id: enemy.id });
+            }
+          }
+        }
+        await w.waitFor(() => quest(w, bot, q.id).counts.every((n, i) => n === q.objectives[i].count));
+        check(quest(w, bot, 'crags_bounty').counts[0] === 0 && quest(w, bot, 'rime_bounty').counts[0] === 0, `${q.title}: fen actions leave the older patrols unchanged`);
+        await kit.teleport(w, bot, { npc: q.npc });
+        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
+        await w.waitFor(() => quest(w, bot, q.id).claimed);
+        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + q.rewardXp, `${q.title}: exact XP and gold reward`);
+        await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
+        check(w.player(bot).gold === before.gold + q.rewardGold && quest(w, bot, q.id).completions === 1, `${q.title}: duplicate turn-in pays nothing`);
+      }
+      for (const q of fen.quests.filter(q => q.repeatable)) {
+        await kit.teleport(w, bot, { npc: q.npc });
+        await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
+        await w.waitFor(() => !quest(w, bot, q.id).claimed);
+        check(!quest(w, bot, q.id).claimed && quest(w, bot, q.id).completions === 1 && quest(w, bot, q.id).counts.every(n => n === 0), `${q.title}: repeat acceptance resets objectives and retains history`);
+      }
+      await kit.teleport(w, bot, { npc: 'fen_healer' });
+      await w.debug(bot, { op: 'set_hp', hp: 1 });
+      await kit.talkTo(w, bot, 'fen_healer', 'blessing');
+      await w.waitFor(() => w.player(bot).hp === w.player(bot).maxHp);
+      check(w.player(bot).hp === w.player(bot).maxHp, 'The town healer restores all HP');
+      await kit.talkTo(w, bot, 'fen_healer', 'buy_health_potion');
+      await w.waitFor(() => w.player(bot).inventory.some(i => i.item === 'health_potion'));
+      check(w.player(bot).inventory.some(i => i.item === 'health_potion'), 'The town sells health potions');
+      await kit.teleport(w, bot, { npc: 'fen_trader' });
+      await kit.talkTo(w, bot, 'fen_trader', 'buy_traveler_stew');
+      await w.waitFor(() => w.player(bot).inventory.some(i => i.item === 'traveler_stew'));
+      check(w.player(bot).inventory.some(i => i.item === 'traveler_stew'), 'The trader sells food');
+      // Fen loot sells at the trader (materials from the four new kinds).
+      await w.debug(bot, { op: 'give_item', item: 'hydra_fang', quantity: 2 });
+      const gold = w.player(bot).gold;
+      await kit.talkTo(w, bot, 'fen_trader', 'sell:materials');
+      await w.waitFor(() => w.player(bot).gold > gold);
+      check(w.player(bot).gold >= gold + 460, 'The trader buys Hydra Fangs at their catalog price');
+      const history = JSON.stringify(w.player(bot).quests);
+      await w.restart();
+      check(w.player(bot).zone === 3 && JSON.stringify(w.player(bot).quests) === history, 'Every completion and restarted bounty survives a private server restart');
     },
   },
   gender: {

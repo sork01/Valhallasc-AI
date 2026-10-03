@@ -106,6 +106,10 @@ pub fn material(kind: &str) -> &'static str {
         "wolf" => "frost_pelt",
         "yeti" => "yeti_horn",
         "wyrm" => "wyrm_scale",
+        "toad" => "toad_gland",
+        "croc" => "croc_hide",
+        "knight" => "drowned_gauntlet",
+        "hydra" => "hydra_fang",
         _ => "slime_gel",
     }
 }
@@ -582,6 +586,10 @@ mod tests {
             ("wolf", "frost_pelt", 95),
             ("yeti", "yeti_horn", 115),
             ("wyrm", "wyrm_scale", 140),
+            ("toad", "toad_gland", 150),
+            ("croc", "croc_hide", 170),
+            ("knight", "drowned_gauntlet", 195),
+            ("hydra", "hydra_fang", 230),
         ] {
             assert_eq!(material(kind), id);
             let i = item(id).expect("the material exists in the catalog");

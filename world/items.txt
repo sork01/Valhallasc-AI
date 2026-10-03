@@ -98,6 +98,34 @@
     "sell": 140
   },
   {
+    "id": "toad_gland",
+    "name": "Fen Toad Gland",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 150
+  },
+  {
+    "id": "croc_hide",
+    "name": "Mire Crocodile Hide",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 170
+  },
+  {
+    "id": "drowned_gauntlet",
+    "name": "Drowned Gauntlet",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 195
+  },
+  {
+    "id": "hydra_fang",
+    "name": "Hydra Fang",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 230
+  },
+  {
     "id": "warrior_armor_crimson",
     "name": "Crimson Armor",
     "kind": "armor",

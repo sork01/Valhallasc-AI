@@ -239,6 +239,10 @@ impl Slime {
             "wolf" => (1000., 72., 3.6, 1.2),
             "yeti" => (1900., 88., 2.2, 1.6),
             "wyrm" => (2200., 100., 2.8, 1.5),
+            "toad" => (2000., 92., 3., 1.3),
+            "croc" => (2800., 112., 3.2, 1.5),
+            "knight" => (3400., 130., 2.4, 1.4),
+            "hydra" => (5200., 150., 2.2, 1.8),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -257,6 +261,10 @@ impl Slime {
             "wolf" => 12,
             "yeti" => 13,
             "wyrm" => 15,
+            "toad" => 15,
+            "croc" => 17,
+            "knight" => 18,
+            "hydra" => 20,
             _ => 2,
         }
     }
@@ -273,6 +281,10 @@ impl Slime {
             "wolf" => 78,
             "yeti" => 105,
             "wyrm" => 150,
+            "toad" => 165,
+            "croc" => 205,
+            "knight" => 245,
+            "hydra" => 360,
             _ => 0,
         }
     }
@@ -289,6 +301,10 @@ impl Slime {
             "wolf" => (0.3, 0.9, 9.5, 9.),
             "yeti" => (0.7, 1.6, 6.5, 7.),
             "wyrm" => (0.5, 1.2, 8.5, 8.5),
+            "toad" => (0.45, 1., 8.5, 7.),
+            "croc" => (0.35, 1.1, 10., 8.5),
+            "knight" => (0.6, 1.4, 6.5, 7.5),
+            "hydra" => (0.55, 1.3, 7.5, 9.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -2571,7 +2587,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(w.maps.len(), 3);
+        assert_eq!(w.maps.len(), 4);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -3068,7 +3084,7 @@ mod tests {
         w.players.get_mut(&1).unwrap().character.zone = 2;
         w.players.get_mut(&2).unwrap().character.zone = 1;
         let snapshot = w.snapshot();
-        assert_eq!(snapshot["zones"].as_array().unwrap().len(), 3);
+        assert_eq!(snapshot["zones"].as_array().unwrap().len(), 4);
         for (zone, count) in [(0, 21), (1, 26), (2, 27)] {
             let view = w.snapshot_for(zone);
             assert_eq!(
@@ -3139,6 +3155,626 @@ mod tests {
             let level = w.slimes[id].level;
             assert!((10..=14).contains(&level));
             let expected = (1000. * (1. + 0.12 * (level as f64 - 12.))).round();
+            assert_eq!((w.slimes[id].max_hp, w.slimes[id].hp), (expected, expected));
+            seen.insert(level);
+        }
+        assert!(seen.len() >= 4, "levels barely vary: {seen:?}");
+    }
+
+    // ---- Gloamfen (zone 3, levels 15-20) ----
+    const FEN_LAKE: Point = Point { x: 66., y: 76. };
+    const FEN_GAPS: [(f64, f64); 3] = [(18., 37.), (40., 93.), (92., 113.)];
+    const FEN_MOUTH: (f64, f64) = (88.5, 76.);
+
+    // The same breadth-first walk with extra wall discs, used to close one choke point at a time.
+    fn walk_steps_sealed(
+        map: &Map,
+        start: Point,
+        seals: &[(f64, f64, f64)],
+    ) -> std::collections::HashMap<(i32, i32), u32> {
+        let mut sealed = map.clone();
+        for &(x, y, r) in seals {
+            sealed.objects.push(crate::model::Obstacle {
+                x,
+                y,
+                r,
+                width: 0.,
+                depth: 0.,
+            });
+        }
+        walk_steps(&sealed, start)
+    }
+
+    #[test]
+    fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
+        let w = world();
+        assert_eq!(w.maps.len(), 4);
+        let map = &w.maps[3];
+        assert_eq!(map.name, "Gloamfen");
+        assert_eq!(map.levels, Some([15, 20]));
+        assert_eq!(map.size, 128);
+        let mut counts = std::collections::BTreeMap::new();
+        for s in w.slimes.iter().filter(|s| s.zone == 3) {
+            *counts.entry(s.kind.as_str()).or_insert(0) += 1;
+            assert!(
+                (15..=20).contains(&Slime::default_level(&s.kind)),
+                "{} default level",
+                s.kind
+            );
+        }
+        assert_eq!(
+            counts,
+            std::collections::BTreeMap::from([
+                ("croc", 9),
+                ("hydra", 4),
+                ("knight", 8),
+                ("toad", 10)
+            ])
+        );
+        // The new zone's enemies come last, so every older enemy id is unchanged.
+        let first = w.slimes.iter().position(|s| s.zone == 3).unwrap();
+        assert!(w.slimes[..first].iter().all(|s| s.zone < 3) && first == 74);
+        // The summit gate in the glacier and the way back (the glacier's first portal stays the Crags gate).
+        let up = w.maps[2]
+            .portals
+            .iter()
+            .find(|p| p.id == "fen_gate")
+            .expect("the summit has a gate");
+        assert_eq!(up.to, 3);
+        assert_eq!(w.maps[2].portals[0].id, "crags_gate");
+        let back = &map.portals[0];
+        assert_eq!((back.id.as_str(), back.to), ("summit_gate", 2));
+        assert_eq!((back.tx, back.ty), (up.x, up.y + 4.5));
+        assert_eq!((up.tx, up.ty), (map.spawn.x, map.spawn.y));
+        // No glacier enemy was left beside the new arrival point.
+        assert!(
+            w.slimes
+                .iter()
+                .filter(|s| s.zone == 2)
+                .all(|s| s.point().distance(Point {
+                    x: back.tx,
+                    y: back.ty
+                }) > 8.)
+        );
+    }
+
+    #[test]
+    fn gloamfen_is_a_c_shaped_route_round_the_lake_with_a_choke_point_before_every_band() {
+        let w = world();
+        let map = &w.maps[3];
+        let start = Point {
+            x: map.spawn.x,
+            y: map.spawn.y,
+        };
+        let reachable = |seals: &[(f64, f64, f64)]| {
+            let steps = walk_steps_sealed(map, start, seals);
+            move |p: Point| {
+                steps
+                    .get(&((p.x / 0.5) as i32, (p.y / 0.5) as i32))
+                    .copied()
+            }
+        };
+        let open_kinds = |reach: &dyn Fn(Point) -> Option<u32>| {
+            let mut kinds = std::collections::BTreeSet::new();
+            for s in w.slimes.iter().filter(|s| s.zone == 3) {
+                if reach(s.point()).is_some() {
+                    kinds.insert(s.kind.clone());
+                }
+            }
+            kinds.into_iter().collect::<Vec<_>>()
+        };
+        // Closing each choke in turn cuts off exactly the bands beyond it, so the order is forced.
+        let seal = |x: f64, y: f64, r: f64| (x, y, r);
+        let closed = [
+            (vec![seal(FEN_GAPS[0].0, FEN_GAPS[0].1, 4.8)], vec![]),
+            (vec![seal(FEN_GAPS[1].0, FEN_GAPS[1].1, 4.8)], vec!["toad"]),
+            (
+                vec![seal(FEN_GAPS[2].0, FEN_GAPS[2].1, 4.8)],
+                vec!["croc", "toad"],
+            ),
+            (
+                vec![seal(FEN_MOUTH.0, FEN_MOUTH.1, 3.)],
+                vec!["croc", "knight", "toad"],
+            ),
+        ];
+        for (seals, want) in &closed {
+            let reach = reachable(seals);
+            assert_eq!(&open_kinds(&reach), want, "sealing {seals:?}");
+            // The town is always reachable: the walls only cut the fen.
+            for n in &map.npcs {
+                assert!(reach(Point { x: n.x, y: n.y }).is_some(), "{}", n.id);
+            }
+        }
+        // Nothing is walled off when every gap is open, and the lake itself is not walkable.
+        let reach = reachable(&[]);
+        assert_eq!(open_kinds(&reach), vec!["croc", "hydra", "knight", "toad"]);
+        for n in &map.npcs {
+            assert!(reach(Point { x: n.x, y: n.y }).is_some());
+        }
+        let gate = &map.portals[0];
+        assert!(
+            reach(Point {
+                x: gate.x,
+                y: gate.y + 2.
+            })
+            .is_some()
+        );
+        assert!(
+            !free_for_player(map, Point { x: 50., y: 76. }),
+            "the mere is water"
+        );
+        assert!(!free_for_player(map, Point { x: 66., y: 62. }));
+        assert!(free_for_player(map, FEN_LAKE), "the island is dry");
+        assert!(
+            reach(Point { x: 80., y: 76. }).is_some(),
+            "the causeway can be walked"
+        );
+        // Each band keeps to its own side of the lake.
+        let stand = |kind: &str| -> Vec<Point> {
+            w.slimes
+                .iter()
+                .filter(|s| s.zone == 3 && s.kind == kind)
+                .map(|s| s.point())
+                .collect()
+        };
+        assert!(
+            stand("toad")
+                .iter()
+                .all(|p| p.y > 38. && p.y < 92. && p.x < 66.),
+            "toads on the west bank"
+        );
+        assert!(
+            stand("croc").iter().all(|p| p.y > 95. && p.x < 92.),
+            "crocodiles on the south shore"
+        );
+        assert!(
+            stand("knight").iter().all(|p| p.x > 92. && p.y > 38.),
+            "knights on the east bank"
+        );
+        assert!(
+            stand("hydra").iter().all(|p| p.distance(FEN_LAKE) < 9.8),
+            "hydras on the island"
+        );
+        // The walk to the island is far longer than the straight line: a real tour round the lake.
+        let steps = walk_steps(map, start);
+        let walk = *steps
+            .get(&((FEN_LAKE.x / 0.5) as i32, (FEN_LAKE.y / 0.5) as i32))
+            .expect("the island is reachable") as f64
+            * 0.5;
+        assert!(
+            walk > 2.2 * start.distance(FEN_LAKE) && walk < 900.,
+            "walk {walk}"
+        );
+    }
+
+    #[test]
+    fn gloamfen_monsters_have_their_own_stats_levels_rewards_and_materials() {
+        for (kind, level, hp, damage, windup, gold, material_id) in [
+            ("toad", 15, 2000., 92., 0.45, 165, "toad_gland"),
+            ("croc", 17, 2800., 112., 0.35, 205, "croc_hide"),
+            ("knight", 18, 3400., 130., 0.6, 245, "drowned_gauntlet"),
+            ("hydra", 20, 5200., 150., 0.55, 360, "hydra_fang"),
+        ] {
+            assert_eq!(Slime::default_level(kind), level);
+            assert_ne!(
+                Slime::stats(kind),
+                Slime::stats("green"),
+                "{kind} has stats"
+            );
+            assert_eq!(Slime::attack_profile(kind).0, windup);
+            assert_eq!(crate::items::material(kind), material_id);
+            let spawn = || SlimeSpawn {
+                kind: kind.into(),
+                x: 64.,
+                y: 60.,
+                zone: 3,
+            };
+            let base = Slime::with_level(0, &spawn(), level);
+            assert_eq!((base.max_hp, base.damage, base.gold), (hp, damage, gold));
+            assert_eq!(base.xp, enemy_xp(level));
+            let up = Slime::with_level(0, &spawn(), level + 2);
+            assert_eq!(up.max_hp, (hp * 1.24_f64).round());
+            assert_eq!(up.damage, (damage * 1.24_f64).round());
+            assert_eq!(up.gold, (gold as f64 * 1.2).round() as u32);
+            assert_eq!(up.xp, enemy_xp(level + 2));
+        }
+    }
+
+    #[test]
+    fn a_kill_in_gloamfen_pays_its_rolled_level_and_drops_its_material_in_that_zone() {
+        for (kind, material_id) in [
+            ("toad", "toad_gland"),
+            ("croc", "croc_hide"),
+            ("knight", "drowned_gauntlet"),
+            ("hydra", "hydra_fang"),
+        ] {
+            let mut w = world();
+            let _rx = join(&mut w, 1, Class::Warrior);
+            w.players.get_mut(&1).unwrap().character.zone = 3;
+            let id = w
+                .slimes
+                .iter()
+                .position(|s| s.zone == 3 && s.kind == kind)
+                .unwrap();
+            let level = Slime::default_level(kind) + 1;
+            w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), level);
+            let (xp, gold) = (w.slimes[id].xp, w.slimes[id].gold);
+            w.hit_slime(id, 1, 1_000_000., false);
+            let c = &w.players[&1].character;
+            let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
+            assert_eq!(paid, xp, "{kind} xp");
+            assert_eq!(
+                w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
+                gold
+            );
+            assert!(
+                w.drops
+                    .iter()
+                    .any(|d| d.item.as_deref() == Some(material_id)),
+                "{kind} material"
+            );
+            assert!(w.drops.iter().all(|d| d.zone == 3));
+        }
+    }
+
+    #[test]
+    fn lanternmere_has_seven_npcs_and_sixteen_valid_quests_levelled_fifteen_to_twenty() {
+        let w = world();
+        let map = &w.maps[3];
+        assert_eq!(
+            map.city.as_ref().map(|c| (c.x0, c.x1, c.y0, c.y1)),
+            Some((40., 88., 6., 31.))
+        );
+        assert_eq!(map.npcs.len(), 7);
+        assert_eq!(map.quests.len(), 16);
+        assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 3);
+        let mut roots = 0;
+        for q in &map.quests {
+            assert!(q.id.starts_with("fen_") && q.npc.starts_with("fen_"));
+            assert!((15..=20).contains(&q.level), "{} level {}", q.id, q.level);
+            assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
+            assert!(q.reward_gold >= 300);
+            roots += q.requires.is_none() as usize;
+            if let Some(id) = &q.requires {
+                let prereq = map
+                    .quests
+                    .iter()
+                    .find(|p| &p.id == id)
+                    .expect("prerequisite is in the town");
+                assert!(prereq.level <= q.level, "{} unlocks upward", q.id);
+            }
+            assert!(map.npcs.iter().any(|n| n.id == q.npc), "{} giver", q.id);
+            for o in &q.objectives {
+                match o.kind.as_str() {
+                    "talk" => assert!(map.npcs.iter().any(|n| n.id == o.target)),
+                    "kill" => {
+                        assert!(o.target == "any" || map.slimes.iter().any(|s| s.kind == o.target))
+                    }
+                    other => panic!("objective {other}"),
+                }
+            }
+        }
+        assert_eq!(roots, 1, "one introduction unlocks everything");
+        for kind in ["toad", "croc", "knight", "hydra"] {
+            assert!(
+                map.quests
+                    .iter()
+                    .any(|q| q.objectives.iter().any(|o| o.target == kind)),
+                "no {kind} hunt"
+            );
+        }
+        let vanguard = map.quests.iter().find(|q| q.id == "fen_vanguard").unwrap();
+        assert_eq!(vanguard.objectives.len(), 4);
+        let welcome = map.quests.iter().find(|q| q.id == "fen_welcome").unwrap();
+        assert_eq!(welcome.objectives.len(), 6, "meet everyone else in town");
+        // The town: NPCs on free ground inside the sanctuary, no enemy within eight units, buildings in the way of nobody.
+        for npc in &map.npcs {
+            let point = Point { x: npc.x, y: npc.y };
+            assert!(
+                free_for_player(map, point),
+                "{} stands on free ground",
+                npc.id
+            );
+            assert!(map.in_city(point), "{} is inside the town", npc.id);
+            assert!(
+                w.slimes
+                    .iter()
+                    .filter(|s| s.zone == 3)
+                    .all(|s| s.point().distance(point) > 8.)
+            );
+        }
+        assert!(
+            map.in_city(map.spawn),
+            "the arrival point is inside the sanctuary"
+        );
+        assert!(
+            map.objects.iter().filter(|o| o.width > 0.).count() >= 8,
+            "houses, stalls and benches"
+        );
+    }
+
+    #[test]
+    fn the_lanternmere_tour_checks_giver_zone_prerequisites_and_pays_each_reward_once() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap();
+        // Out of zone the giver is not reachable.
+        w.interact(1, "fen_reeve", Some("quest:accept:fen_welcome"));
+        assert!(w.players[&1].character.quests.is_empty());
+        w.players.get_mut(&1).unwrap().character.zone = 3;
+        quest_interact(&mut w, "fen_ranger", Some("quest:accept:fen_toads"));
+        quest_interact(&mut w, "fen_trader", Some("quest:accept:fen_welcome"));
+        assert!(
+            w.players[&1].character.quests.is_empty(),
+            "locked or wrong giver"
+        );
+        quest_interact(&mut w, "fen_reeve", Some("quest:accept:fen_welcome"));
+        for npc in [
+            "fen_lamplighter",
+            "fen_healer",
+            "fen_trader",
+            "fen_ranger",
+            "fen_scholar",
+            "fen_ferryman",
+        ] {
+            quest_interact(&mut w, npc, None);
+        }
+        assert_eq!(
+            w.players[&1].character.quests[0].counts,
+            vec![1, 1, 1, 1, 1, 1]
+        );
+        quest_interact(&mut w, "fen_reeve", Some("quest:claim:fen_welcome"));
+        let (xp, gold) = (xp_to_level(15) / 10, 300);
+        let c = &w.players[&1].character;
+        assert_eq!(c.gold, gold);
+        let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
+        assert_eq!(paid, xp);
+        assert_eq!(
+            w.store.load(token).unwrap().unwrap().quests[0].completions,
+            1
+        );
+        quest_interact(&mut w, "fen_reeve", Some("quest:claim:fen_welcome"));
+        assert_eq!(w.players[&1].character.gold, gold, "no duplicate reward");
+        quest_interact(&mut w, "fen_ranger", Some("quest:accept:fen_toads"));
+        assert_eq!(w.players[&1].character.quests[1].counts, vec![0]);
+    }
+
+    #[test]
+    fn gloamfen_kills_credit_only_gloamfen_quests_and_the_killer() {
+        let mut w = world();
+        let _r1 = join(&mut w, 1, Class::Warrior);
+        let _r2 = join(&mut w, 2, Class::Mage);
+        for id in [1, 2] {
+            w.players.get_mut(&id).unwrap().character.zone = 3;
+        }
+        quest_interact(&mut w, "fen_reeve", Some("quest:accept:fen_welcome"));
+        w.players.get_mut(&1).unwrap().character.quests[0].completions = 1;
+        quest_interact(&mut w, "fen_ranger", Some("quest:accept:fen_toads"));
+        quest_interact(&mut w, "fen_trader", Some("quest:accept:fen_bounty"));
+        let kill = |w: &mut World, zone: usize, kind: &str| {
+            let i = w
+                .slimes
+                .iter()
+                .position(|s| s.zone == zone && s.kind == kind)
+                .unwrap();
+            w.hit_slime(i, 1, 1_000_000., false);
+        };
+        let find = |w: &World, id: &str| {
+            w.players[&1]
+                .character
+                .quests
+                .iter()
+                .find(|q| q.id == id)
+                .unwrap()
+                .counts
+                .clone()
+        };
+        kill(&mut w, 3, "toad");
+        assert_eq!(find(&w, "fen_toads"), vec![1]);
+        assert_eq!(find(&w, "fen_bounty"), vec![1]);
+        assert!(
+            w.players[&2].character.quests.is_empty(),
+            "only the killer is credited"
+        );
+        kill(&mut w, 3, "hydra");
+        assert_eq!(find(&w, "fen_toads"), vec![1], "kind-specific");
+        assert_eq!(find(&w, "fen_bounty"), vec![2]);
+        kill(&mut w, 2, "wyrm");
+        assert_eq!(
+            find(&w, "fen_bounty"),
+            vec![2],
+            "glacier enemies do not count in the fen"
+        );
+        // And a fen kill counts for nothing at the glacier camp.
+        w.players.get_mut(&1).unwrap().character.zone = 2;
+        quest_interact(&mut w, "rime_warden", Some("quest:accept:rime_welcome"));
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .quests
+            .last_mut()
+            .unwrap()
+            .completions = 1;
+        quest_interact(&mut w, "rime_trader", Some("quest:accept:rime_bounty"));
+        let before = find(&w, "rime_bounty");
+        kill(&mut w, 3, "knight");
+        assert_eq!(
+            find(&w, "rime_bounty"),
+            before,
+            "fen enemies do not count at the glacier"
+        );
+    }
+
+    #[test]
+    fn the_summit_gate_leads_to_gloamfen_saves_the_zone_and_the_way_back_works() {
+        let mut w = world();
+        let (tx, mut rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        let up = w.maps[2]
+            .portals
+            .iter()
+            .find(|p| p.id == "fen_gate")
+            .unwrap()
+            .clone();
+        let back = w.maps[3].portals[0].clone();
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.zone = 2;
+            c.x = up.x;
+            c.y = up.y + 4.;
+        }
+        w.message(
+            1,
+            ClientMessage::Move {
+                x: up.x,
+                y: up.y - 1.,
+            },
+        );
+        for _ in 0..200 {
+            w.time += TICK;
+            w.update_player(1);
+            if w.players[&1].character.zone == 3 {
+                break;
+            }
+        }
+        let c = &w.players[&1].character;
+        assert_eq!(c.zone, 3);
+        assert!(c.point().distance(Point { x: up.tx, y: up.ty }) < 1e-6);
+        assert_eq!(
+            w.store.load(&token).unwrap().unwrap().zone,
+            3,
+            "the zone saves at once"
+        );
+        assert_eq!(w.snapshot_for(3)["players"][0]["zone"], 3);
+        assert!(w.snapshot_for(2)["players"].as_array().unwrap().is_empty());
+        let mut texts = vec![];
+        while let Ok(v) = rx.try_recv() {
+            if v["type"] == "system" {
+                texts.push(v["text"].as_str().unwrap().to_owned());
+            }
+        }
+        assert!(
+            texts
+                .iter()
+                .any(|t| t.contains("Gloamfen") && t.contains("15–20")),
+            "{texts:?}"
+        );
+        // No instant bounce on the arrival point; then the way back lands at the glacier summit gate.
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.x = back.x;
+            c.y = back.y;
+        }
+        w.update_player(1);
+        assert_eq!(w.players[&1].character.zone, 3);
+        w.time += PORTAL_DELAY + 0.1;
+        w.update_player(1);
+        assert_eq!(w.players[&1].character.zone, 2);
+        assert!(
+            w.players[&1].character.point().distance(Point {
+                x: back.tx,
+                y: back.ty
+            }) < 1e-6
+        );
+        // Dying in Gloamfen respawns in Lanternmere.
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.zone = 3;
+            p.character.x = 10.;
+            p.character.y = 60.;
+            p.character.hp = 0.;
+            p.dead_time = 3.3;
+        }
+        w.update_player(1);
+        let c = &w.players[&1].character;
+        assert_eq!(c.zone, 3);
+        assert_eq!(c.hp, c.max_hp());
+        assert!(c.point().distance(w.maps[3].spawn) < 1.);
+    }
+
+    #[test]
+    fn gloamfen_is_isolated_from_the_other_zones_and_lanternmere_is_a_sanctuary() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let _rx2 = join(&mut w, 2, Class::Mage);
+        w.players.get_mut(&1).unwrap().character.zone = 3;
+        w.players.get_mut(&2).unwrap().character.zone = 2;
+        for (zone, count) in [(0, 21), (1, 26), (2, 27), (3, 31)] {
+            let view = w.snapshot_for(zone);
+            assert_eq!(
+                view["slimes"].as_array().unwrap().len(),
+                count,
+                "zone {zone} enemies"
+            );
+            assert!(
+                view["slimes"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .all(|s| s["zone"] == zone)
+            );
+        }
+        // A glacier player cannot target or provoke a toad standing at the same coordinates.
+        let toad = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == 3 && s.kind == "toad")
+            .unwrap();
+        let spot = w.slimes[toad].point();
+        {
+            let c = &mut w.players.get_mut(&2).unwrap().character;
+            c.x = spot.x;
+            c.y = spot.y + 1.;
+        }
+        w.message(2, ClientMessage::Target { id: toad });
+        assert_ne!(w.players[&2].target, Some(toad));
+        w.slimes[toad].atk_cd = 0.;
+        w.update_slime(toad);
+        assert_eq!(w.slimes[toad].state, "idle", "no chase across zones");
+        // The town heals, blocks damage and makes a pursuing enemy let go.
+        w.players.get_mut(&1).unwrap().character.hp = 10.;
+        quest_interact(&mut w, "fen_healer", Some("blessing"));
+        let c = &w.players[&1].character;
+        assert_eq!(c.hp, c.max_hp());
+        w.hurt_player(1, 1000., Point::default());
+        assert_eq!(
+            w.players[&1].character.hp,
+            w.players[&1].character.max_hp(),
+            "the town blocks enemy damage"
+        );
+        w.slimes[toad].x = 64.;
+        w.slimes[toad].y = 35.;
+        w.slimes[toad].target = Some(1);
+        w.slimes[toad].state = "chase".into();
+        w.update_slime(toad);
+        assert!(
+            w.slimes[toad].target.is_none(),
+            "the town drops chase targets"
+        );
+        assert!(!w.maps[3].in_city(w.slimes[toad].point()));
+    }
+
+    #[test]
+    fn gloamfen_enemies_reroll_a_fresh_level_on_respawn() {
+        let mut w = World::new(Store::open(std::path::Path::new(":memory:")).unwrap());
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let id = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == 3 && s.kind == "croc")
+            .unwrap();
+        let mut seen = std::collections::BTreeSet::new();
+        for _ in 0..80 {
+            w.slimes[id].dead = true;
+            w.slimes[id].respawn = TICK;
+            w.update_slime(id);
+            assert!(!w.slimes[id].dead);
+            let level = w.slimes[id].level;
+            assert!((15..=19).contains(&level));
+            let expected = (2800. * (1. + 0.12 * (level as f64 - 17.))).round();
             assert_eq!((w.slimes[id].max_hp, w.slimes[id].hp), (expected, expected));
             seen.insert(level);
         }
@@ -4006,7 +4642,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(w.maps.len(), 3);
+        assert_eq!(w.maps.len(), 4);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));
