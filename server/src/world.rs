@@ -2191,7 +2191,7 @@ impl World {
             self.gold_drop(&credit_id, zone, point, value);
             self.loot_drop(&credit_id, zone, point, material(&kind));
             if is_boss(&kind) {
-                self.boss_loot(&kind, zone, point, &contributors);
+                self.boss_loot(&credit_id, &kind, zone, point);
             }
             if !self.maps[zone].final_boss.is_empty() && self.maps[zone].final_boss == kind {
                 self.clear_instance(zone, point);
@@ -2204,38 +2204,13 @@ impl World {
         }
         dealt
     }
-    /// A boss pays every hero who fought it (the hirer for a mercenary) one blue piece per slot pool, fitted to their
-    /// class, so nobody has to win a roll. Pieces fall around the body, each owned by the hero it is for.
-    fn boss_loot(
-        &mut self,
-        kind: &str,
-        zone: usize,
-        point: Point,
-        contributors: &std::collections::BTreeSet<String>,
-    ) {
-        let heroes: Vec<(String, Class)> = self
-            .players
-            .values()
-            .filter(|p| {
-                p.merc.is_none()
-                    && p.character.zone == zone
-                    && contributors.contains(&p.character.id)
-            })
-            .map(|p| (p.character.id.clone(), p.character.look.class))
-            .collect();
-        for (n, (owner, class)) in heroes.into_iter().enumerate() {
-            for (m, slots) in boss_slots(kind).iter().enumerate() {
-                let choice = self.random();
-                let Some(piece) = boss_piece(slots, class, choice) else {
-                    continue;
-                };
-                let angle = (n * 2 + m) as f64 * 1.1;
-                let mut at = Point {
-                    x: point.x + angle.cos() * 1.2,
-                    y: point.y + angle.sin() * 1.2,
-                };
-                self.maps[zone].collide(&mut at, 0.1);
-                self.item_drop(&owner, zone, at, &piece.id, 1);
+    /// One random piece across all classes per boss slot pool. Party members roll just as for world gear;
+    /// alone, the credited hero (the hirer for a mercenary kill) owns it.
+    fn boss_loot(&mut self, owner: &str, kind: &str, zone: usize, point: Point) {
+        for slots in boss_slots(kind) {
+            let choice = self.random();
+            if let Some(piece) = boss_piece(slots, choice) {
+                self.loot_drop(owner, zone, point, &piece.id);
             }
         }
     }

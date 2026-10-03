@@ -21,6 +21,9 @@ test('private driver: isolated storage, normal actions, resume, credentials, and
     await assert.rejects(w.action('Tester', { type: 'set_hp', hp: 999 }));
     assert.throws(() => actionSchema.parse({ type: 'join', token }));
     assert.throws(() => actionSchema.parse({ type: 'move', x: Infinity, y: 1 }));
+    assert.throws(() => actionSchema.parse({ type: 'roll', id: 0, choice: 'win' }));
+    await w.action('Tester', { type: 'roll', id: 0, choice: 'greed' });
+    await w.waitFor(() => w.events.some(e => e.type === 'error' && e.text === 'That roll is already over.'));
     await w.action('Tester', { type: 'equip', armor: 'runic', weapon: 'crystal' });
     await w.waitFor(() => w.events.some(e => e.type === 'error' && e.text.includes('must own')));
     assert.equal(w.player('Tester').look.mageWeapon, 'ash');

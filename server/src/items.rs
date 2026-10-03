@@ -182,12 +182,11 @@ pub fn is_elite(kind: &str) -> bool {
 pub fn is_vault_enemy(kind: &str) -> bool {
     matches!(kind, "thrall" | "archer" | "acolyte") || is_boss(kind)
 }
-/// The four bosses of the Undervault (the dungeon under Skaldholm). Each pays every contributor a guaranteed blue piece.
+/// The four bosses of the Undervault (the dungeon under Skaldholm). Each drops guaranteed blue gear.
 pub fn is_boss(kind: &str) -> bool {
     matches!(kind, "gatewarden" | "choir" | "colossus" | "hollowking")
 }
-/// The slot pools a boss drops from: one blue piece per pool, for each player who fought it. Pieces are level 20 and
-/// fit the player's class (pants, rings and necklaces fit everyone).
+/// The slot pools a boss drops from: one shared blue level-20 piece per pool, chosen across all classes.
 pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
     match kind {
         "gatewarden" => &[&["headgear", "shoulders"]],
@@ -207,9 +206,9 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
         _ => &[],
     }
 }
-/// A piece of Undervault gear (a 15% stronger recolour of the level-20 blue set) of one of `slots` that `class` can wear.
+/// A piece of Undervault gear (a 15% stronger recolour of the level-20 blue set) of one of `slots`, across all classes.
 /// `choice` is uniform in [0, 1).
-pub fn boss_piece(slots: &[&str], class: Class, choice: f64) -> Option<&'static Item> {
+pub fn boss_piece(slots: &[&str], choice: f64) -> Option<&'static Item> {
     let pool: Vec<_> = ITEMS
         .iter()
         .filter(|i| {
@@ -217,7 +216,6 @@ pub fn boss_piece(slots: &[&str], class: Class, choice: f64) -> Option<&'static 
                 && i.required_level == 20
                 && i.source.as_deref() == Some("undervault")
                 && slots.contains(&i.kind.as_str())
-                && i.class.is_none_or(|c| c == class)
         })
         .collect();
     pool.get((choice * pool.len() as f64) as usize).copied()
@@ -1162,22 +1160,21 @@ mod tests {
                 }
             }
         }
-        for class in [
-            Class::Warrior,
-            Class::Mage,
-            Class::Assassin,
-            Class::Priest,
-            Class::Hunter,
-        ] {
-            for kind in ["gatewarden", "choir", "colossus", "hollowking"] {
-                for slots in boss_slots(kind) {
-                    assert!(
-                        boss_piece(slots, class, 0.5).is_some(),
-                        "{kind} has a {class:?} piece in {slots:?}"
-                    );
+        let mut possible = std::collections::BTreeSet::new();
+        for kind in ["gatewarden", "choir", "colossus", "hollowking"] {
+            for slots in boss_slots(kind) {
+                for n in 0..1000 {
+                    let piece = boss_piece(slots, n as f64 / 1000.).expect("a boss piece");
+                    assert!(slots.contains(&piece.kind.as_str()));
+                    possible.insert(piece.id.as_str());
                 }
             }
         }
+        assert_eq!(
+            possible,
+            vault.iter().map(|i| i.id.as_str()).collect(),
+            "every class's boss gear can drop"
+        );
     }
     #[test]
     fn stats_follow_the_level_and_rarity_ladder() {

@@ -1751,7 +1751,7 @@ const scenarios = {
     },
   },
   undervault: {
-    description: 'The dungeon under Skaldholm: the stairs beside the Meeting Stone refuse level 19 and take level 20 in; the Stone hires a full party that follows in; every group gets a private copy (an unrelated hero sees none of it); archers shoot real missiles; each boss drops a blue Undervault piece to the hero; the exit portal opens only when the last boss falls and returns to Skaldholm; the dungeon resets when empty; a hero who logs out inside wakes at the stairs.',
+    description: 'The dungeon under Skaldholm: the stairs beside the Meeting Stone refuse level 19 and take level 20 in; the Stone hires a full party that follows in; every group gets a private copy (an unrelated hero sees none of it); archers shoot real missiles; each boss drops random cross-class Undervault gear shared through party rolls; the exit portal opens only when the last boss falls and returns to Skaldholm; the dungeon resets when empty; a hero who logs out inside wakes at the stairs.',
     startLevel: 20, godMode: true, levelSpread: 0,
     async run(w, check) {
       const vault = map.zones[4], stairs = city.portals.find(p => p.id === 'undervault_stairs'), exit = vault.portals.find(p => p.after_clear), ret = { x: vault.portals[0].tx, y: vault.portals[0].ty };
@@ -1807,31 +1807,46 @@ const scenarios = {
       await kit.teleport(w, bot, { zone: 5, x: archer.x - 7, y: archer.y });
       await w.waitFor(() => (view(bot).ebolts || []).some(b => b.kind === 'archer'), 20000, 'An arrow is in the air');
       check((view(bot).ebolts || []).every(b => b.zone === 5 && typeof b.speed === 'number'), 'Missiles are in the snapshot with their speed, labelled zone 5');
-      // The exit is shut until the last boss falls; each boss pays the hero a blue Undervault piece.
+      // Replace the hired party with two real heroes so we can answer the shared boss rolls.
+      await kit.teleport(w, bot, { zone: 4, x: 100, y: 128 });
+      await kit.talkTo(w, bot, 'city_meetingstone', 'merc_dismiss');
+      await w.connect({ bot: rival, class: 'mage' });
+      await kit.setupCharacter(w, rival, { level: 20 });
+      await w.social(bot, { op: 'party_invite', bot: rival });
+      await w.social(rival, { op: 'party_accept', bot });
+      await kit.teleport(w, bot, { zone: 5, x: vault.spawn.x, y: vault.spawn.y });
+      await kit.teleport(w, rival, { zone: 5, x: vault.spawn.x + 2, y: vault.spawn.y });
       await kit.teleport(w, bot, { zone: 5, x: exit.x, y: exit.y });
       await w.advance(2000);
       check(w.player(bot).zone === 5, 'Standing on the closed exit does nothing');
-      const bag = () => w.player(bot).inventory.filter(s => /_l20_vault$/.test(s.item)).length;
-      for (const kind of ['gatewarden', 'choir', 'colossus']) {
-        const boss = view(bot).slimes.find(s => s.kind === kind);
+      const bag = b => w.player(b).inventory.filter(s => /_l20_vault$/.test(s.item)).reduce((n, s) => n + s.quantity, 0);
+      for (const kind of ['gatewarden', 'choir', 'colossus', 'hollowking']) {
+        const boss = view(bot).slimes.find(s => s.kind === kind), count = kind === 'hollowking' ? 2 : 1;
         await kit.teleport(w, bot, { zone: 5, x: boss.x - 3, y: boss.y });
-        const before = bag();
+        await kit.teleport(w, rival, { zone: 5, x: boss.x - 4, y: boss.y });
+        const before = bag(bot) + bag(rival), earlier = new Set(w.events);
         await w.debug(bot, { op: 'kill_enemy', id: boss.id });
-        await kit.teleport(w, bot, { zone: 5, x: boss.x, y: boss.y });          // the pieces fall round the body; a hero collects within three tiles
-        await w.waitFor(() => bag() > before, 15000, `${kind} pays a piece`);
-        check(bag() === before + 1 && view(bot).instance.cleared === false, `${kind} drops one Undervault piece into the hero's bag and does not open the exit`);
+        const starts = b => w.events.filter(e => !earlier.has(e) && e.bot === b && e.type === 'roll' && e.op === 'start' && /_l20_vault$/.test(e.item));
+        await w.waitFor(() => starts(bot).length === count && starts(rival).length === count, 5000, `${kind} starts shared boss rolls`);
+        check(starts(bot).length === count && starts(rival).every(e => starts(bot).some(r => r.id === e.id && r.item === e.item)), `${kind} drops ${count} shared piece(s), both party members roll on the same items`);
+        const winner = kind === 'hollowking' ? bot : rival, passer = winner === bot ? rival : bot;
+        for (const roll of starts(winner)) {
+          const piece = kit.items.find(i => i.id === roll.item);
+          check(piece.rarity === 'rare' && piece.source === 'undervault' && piece.requiredLevel === 20, 'Boss gear is blue, level 20 and from the Undervault');
+          check(roll.need === (!piece.class || piece.class === (winner === bot ? 'warrior' : 'mage')), 'Need is available only when the random boss piece fits the member');
+          await w.action(passer, { type: 'roll', id: roll.id, choice: 'pass' });
+          await w.action(winner, { type: 'roll', id: roll.id, choice: roll.need ? 'need' : 'greed' });
+        }
+        await kit.teleport(w, winner, { zone: 5, x: boss.x, y: boss.y });
+        await w.waitFor(() => bag(bot) + bag(rival) === before + count, 15000, `${kind}'s winner collects the shared loot`);
+        check(bag(bot) + bag(rival) === before + count, `${kind} awards each piece once, with no personal copies`);
+        if (kind !== 'hollowking') check(view(bot).instance.cleared === false, `${kind} does not open the exit`);
       }
-      const king = view(bot).slimes.find(s => s.kind === 'hollowking'), before = bag();
-      await kit.teleport(w, bot, { zone: 5, x: king.x - 3, y: king.y });
-      await w.debug(bot, { op: 'kill_enemy', id: king.id });
-      await kit.teleport(w, bot, { zone: 5, x: king.x, y: king.y });
-      await w.waitFor(() => bag() >= before + 2, 15000, 'The king pays two pieces');
-      check(bag() === before + 2, 'The Hollow King drops two pieces');
-      check(w.player(bot).inventory.filter(s => /_l20_vault$/.test(s.item)).every(s => { const i = kit.items.find(x => x.id === s.item); return i.rarity === 'rare' && i.source === 'undervault' && i.requiredLevel === 20 && (!i.class || i.class === 'warrior'); }), 'Every piece is blue, level 20, from the Undervault and fits a Warrior');
       await w.waitFor(() => view(bot).instance.cleared === true, 5000, 'The dungeon is cleared');
       await kit.teleport(w, bot, { zone: 5, x: exit.x, y: exit.y });
       await w.waitFor(() => w.player(bot).zone === 4, 15000, 'The portal carries the hero out');
       check(distance(w.player(bot), { x: exit.tx, y: exit.ty }) < 1.5, 'The opened portal leads out beside the stairs in Skaldholm');
+      await w.disconnect(rival);
       // Empty, the dungeon is whole again; one who logs out inside wakes at the stairs.
       await w.action(bot, { type: 'move', x: stairs.x, y: stairs.y });
       await w.waitFor(() => w.player(bot).zone === 5, 20000, 'Down again');

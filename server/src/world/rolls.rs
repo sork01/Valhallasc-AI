@@ -9,8 +9,7 @@
 //! A hired mercenary is a party member like any other: it takes a share of the gold, a turn in the round robin and
 //! a roll on gear (it needs a piece its class can wear at its level that beats what it wears, otherwise it greeds). It has no bags, so
 //! whatever it wins is forfeited: hiring fighters never makes the hirer's loot bigger than playing with friends.
-//! A hero with nobody to share with keeps the old rule, so everything drops for them. Boss gear (`boss_loot`) stays
-//! personal on purpose: every hero who fought gets a piece fitted to their class.
+//! A hero with nobody to share with keeps everything. Random boss gear uses these same sharing and rolling rules.
 use super::*;
 
 /// Seconds a roll waits for the votes before the silent members count as passing.

@@ -708,32 +708,28 @@ fn the_meeting_stone_hires_fighters_for_any_party_of_up_to_five_with_no_quest_an
     assert!(mercs_of(&w).is_empty());
 }
 
-/// Three heroes of different classes plus a mercenary fight for `kind`'s kill; returns the blue pieces each was given.
-fn kill_with_party(w: &mut World, kind: &str) -> (usize, Vec<(u64, Vec<String>)>) {
+/// Three nearby party members and a fourth in another private copy; only heroes 1 and 2 hit the boss.
+fn kill_with_party(w: &mut World, kind: &str) -> Vec<mpsc::Receiver<Value>> {
     let boss = first(w, VAULT, kind);
-    let rxs: Vec<_> = [
-        (1u64, Class::Warrior),
-        (2, Class::Mage),
-        (3, Class::Priest),
-        (4, Class::Hunter),
-    ]
-    .iter()
-    .map(|(s, c)| join(w, *s, *c))
-    .collect();
-    for s in 1..=3u64 {
-        let id = w.players[&1].character.id.clone();
-        if s > 1 {
-            w.party_add_mercenary(&id, &w.players[&s].character.clone())
-                .unwrap();
-        }
+    let rxs: Vec<_> = [Class::Warrior, Class::Mage, Class::Priest, Class::Hunter]
+        .iter()
+        .enumerate()
+        .map(|(n, c)| join(w, n as u64 + 1, *c))
+        .collect();
+    take_the_stairs(w, 1);
+    take_the_stairs(w, 4);
+    assert_ne!(zone_of(w, 4), VAULT);
+    let leader = w.players[&1].character.id.clone();
+    for s in 2..=4 {
+        w.party_add_mercenary(&leader, &w.players[&s].character.clone())
+            .unwrap();
+    }
+    for s in 2..=3 {
         take_the_stairs(w, s);
         assert_eq!(zone_of(w, s), VAULT);
     }
     let at = w.slimes[boss].point();
-    for s in 1..=4u64 {
-        w.players.get_mut(&s).unwrap().character.level = 20;
-    }
-    for s in 1..=3u64 {
+    for s in 1..=3 {
         place(
             w,
             s,
@@ -744,31 +740,15 @@ fn kill_with_party(w: &mut World, kind: &str) -> (usize, Vec<(u64, Vec<String>)>
             },
         );
     }
-    // Hero 3 never touches it; heroes 1 and 2 do; hero 4 is somewhere else entirely.
     w.slimes[boss].hp = 100.;
     w.hit_slime(boss, 2, 10., false);
     w.hit_slime(boss, 1, 1_000_000., false);
     assert!(w.slimes[boss].dead);
-    drop(rxs);
-    let got = (1..=4u64)
-        .map(|s| {
-            let id = w.players[&s].character.id.clone();
-            (
-                s,
-                w.drops
-                    .iter()
-                    .filter(|d| d.owner == id)
-                    .filter_map(|d| d.item.clone())
-                    .filter(|i| item(i).is_some_and(|i| i.rarity == "rare"))
-                    .collect(),
-            )
-        })
-        .collect();
-    (boss, got)
+    rxs
 }
 
 #[test]
-fn every_boss_pays_each_hero_who_fought_it_a_blue_level_twenty_piece_for_their_own_class() {
+fn every_boss_drops_shared_random_gear_and_every_nearby_party_member_rolls_once_per_piece() {
     for (kind, pieces) in [
         ("gatewarden", 1),
         ("choir", 1),
@@ -777,68 +757,127 @@ fn every_boss_pays_each_hero_who_fought_it_a_blue_level_twenty_piece_for_their_o
     ] {
         let mut w = world();
         w.rng = 3;
-        let (_, got) = kill_with_party(&mut w, kind);
-        for (session, items) in &got {
-            let class = w.players[session].character.look.class;
-            if *session == 1 || *session == 2 {
+        let mut rxs = kill_with_party(&mut w, kind);
+        let starts: Vec<Vec<Value>> = rxs
+            .iter_mut()
+            .map(|rx| {
+                drain(rx)
+                    .into_iter()
+                    .filter(|v| {
+                        v["type"] == "roll"
+                            && v["op"] == "start"
+                            && v["item"]
+                                .as_str()
+                                .and_then(item)
+                                .is_some_and(|i| i.source.as_deref() == Some("undervault"))
+                    })
+                    .collect()
+            })
+            .collect();
+        assert_eq!(
+            starts[0].len(),
+            pieces,
+            "{kind}: one roll per pool, regardless of contributors"
+        );
+        assert_eq!(starts[1].len(), pieces);
+        assert_eq!(
+            starts[2].len(),
+            pieces,
+            "a nearby party member need not hit the boss"
+        );
+        assert!(
+            starts[3].is_empty(),
+            "a member in another private copy cannot roll"
+        );
+        assert!(
+            w.drops.iter().all(|d| d
+                .item
+                .as_deref()
+                .and_then(item)
+                .is_none_or(|i| i.source.as_deref() != Some("undervault"))),
+            "boss pieces wait for their rolls"
+        );
+        for (n, start) in starts[0].iter().enumerate() {
+            let id = start["id"].as_u64().unwrap();
+            let piece = item(start["item"].as_str().unwrap()).unwrap();
+            assert_eq!((piece.rarity.as_str(), piece.required_level), ("rare", 20));
+            assert!(boss_slots(kind)[n].contains(&piece.kind.as_str()));
+            let blue = item(&piece.id.replace("_l20_vault", "_l20_blue")).unwrap();
+            assert!(
+                (piece.attack - blue.attack * 1.15).abs() < 0.06
+                    && (piece.defense - blue.defense * 1.15).abs() < 0.06
+            );
+            assert!(
+                piece.name != blue.name && piece.art == blue.art && piece.variant != blue.variant
+            );
+            for s in 1..=3 {
+                assert_eq!(starts[s - 1][n]["id"], id);
                 assert_eq!(
-                    items.len(),
-                    pieces,
-                    "{kind}: hero {session} gets {pieces} blue piece(s): {items:?}"
+                    starts[s - 1][n]["need"],
+                    rolls::can_need(&w.players[&(s as u64)].character, piece)
                 );
-                for id in items {
-                    let i = item(id).unwrap();
-                    assert_eq!((i.rarity.as_str(), i.required_level), ("rare", 20), "{id}");
-                    assert_eq!(
-                        i.source.as_deref(),
-                        Some("undervault"),
-                        "{id} is Undervault gear"
-                    );
-                    // It is the blue piece recoloured, 15% stronger, under a name of its own.
-                    let blue =
-                        item(&id.replace("_l20_vault", "_l20_blue")).expect("its blue original");
-                    assert!(
-                        (i.attack - blue.attack * 1.15).abs() < 0.06
-                            && (i.defense - blue.defense * 1.15).abs() < 0.06,
-                        "{id}"
-                    );
-                    assert!(
-                        i.name != blue.name && i.art == blue.art && i.variant != blue.variant,
-                        "{id}: renamed and recoloured"
-                    );
-                    assert!(i.class.is_none_or(|c| c == class), "{id} fits a {class:?}");
-                    assert!(
-                        boss_slots(kind)
-                            .iter()
-                            .flat_map(|s| s.iter())
-                            .any(|slot| *slot == i.kind),
-                        "{kind} drops {}",
-                        i.kind
-                    );
-                }
-            } else {
-                assert!(
-                    items.is_empty(),
-                    "{kind}: hero {session} fought nothing: {items:?}"
-                );
+                let choice = if s != 3 {
+                    RollChoice::Pass
+                } else if starts[2][n]["need"] == true {
+                    RollChoice::Need
+                } else {
+                    RollChoice::Greed
+                };
+                w.roll_vote(s as u64, id, choice);
             }
         }
-        // The final boss's first pool is always the chest piece.
-        if kind == "hollowking" {
-            let (_, items) = &got[0];
-            assert!(item(&items[0]).unwrap().kind == "armor", "{items:?}");
-        }
-        // Boss XP is twelve ordinary kills' worth.
+        w.update_rolls();
+        let drops: Vec<_> = w
+            .drops
+            .iter()
+            .filter(|d| {
+                d.item
+                    .as_deref()
+                    .and_then(item)
+                    .is_some_and(|i| i.source.as_deref() == Some("undervault"))
+            })
+            .collect();
+        assert_eq!(
+            drops.len(),
+            pieces,
+            "one award per piece, no personal copies"
+        );
+        assert!(
+            drops
+                .iter()
+                .all(|d| d.owner == w.players[&3].character.id && d.quantity == 1)
+        );
         let boss = &w.slimes[first(&w, VAULT, kind)];
         assert_eq!(boss.xp, enemy_xp(boss.level) * 12);
-        assert!(boss.xp >= 1200);
     }
 }
 
 #[test]
-fn a_mercenarys_blow_on_a_boss_earns_its_hirer_the_blue_piece_and_the_mercenary_none() {
+fn solo_boss_loot_can_be_for_another_class_and_never_needs_a_roll() {
     let mut w = world();
     let _rx = join(&mut w, 1, Class::Warrior);
+    take_the_stairs(&mut w, 1);
+    let owner = w.players[&1].character.id.clone();
+    let at = w.slimes[first(&w, VAULT, "hollowking")].point();
+    for _ in 0..20 {
+        w.boss_loot(&owner, "hollowking", VAULT, at);
+    }
+    assert!(w.rolls.is_empty());
+    assert_eq!(w.drops.len(), 40, "two pieces per king kill");
+    assert!(w.drops.iter().all(|d| d.owner == owner && d.quantity == 1));
+    assert!(
+        w.drops
+            .iter()
+            .filter_map(|d| d.item.as_deref().and_then(item))
+            .any(|i| i.class.is_some_and(|c| c != Class::Warrior)),
+        "solo drops are not fitted to the killer's class"
+    );
+}
+
+#[test]
+fn a_mercenarys_boss_kill_starts_one_shared_roll_with_the_hirer() {
+    let mut w = world();
+    let mut rx = join(&mut w, 1, Class::Warrior);
     {
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.level = 20;
@@ -889,21 +928,32 @@ fn a_mercenarys_blow_on_a_boss_earns_its_hirer_the_blue_piece_and_the_mercenary_
     w.slimes[boss].hp = 50.;
     w.hit_slime(boss, merc, 1_000_000., false);
     assert!(w.slimes[boss].dead);
-    let hirer = w.players[&1].character.id.clone();
-    let mine: Vec<_> = w
-        .drops
-        .iter()
-        .filter(|d| {
-            d.owner == hirer
-                && d.item
-                    .as_deref()
+    let starts: Vec<_> = drain(&mut rx)
+        .into_iter()
+        .filter(|v| {
+            v["type"] == "roll"
+                && v["op"] == "start"
+                && v["item"]
+                    .as_str()
                     .and_then(item)
-                    .is_some_and(|i| i.rarity == "rare")
+                    .is_some_and(|i| i.source.as_deref() == Some("undervault"))
         })
         .collect();
-    assert_eq!(mine.len(), 1, "the hirer is paid");
-    let merc_id = w.players[&merc].character.id.clone();
-    assert!(w.drops.iter().all(|d| d.owner != merc_id));
+    assert_eq!(
+        starts.len(),
+        1,
+        "the hirer and fighter share one boss piece"
+    );
+    w.roll_vote(1, starts[0]["id"].as_u64().unwrap(), RollChoice::Pass);
+    w.update_rolls();
+    assert!(
+        w.drops.iter().all(|d| d
+            .item
+            .as_deref()
+            .and_then(item)
+            .is_none_or(|i| i.source.as_deref() != Some("undervault"))),
+        "the mercenary wins and keeps the piece"
+    );
 }
 
 #[test]
