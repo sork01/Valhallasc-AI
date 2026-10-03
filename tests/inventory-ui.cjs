@@ -159,7 +159,7 @@ async function call(name, args = {}) {
   check(await fixture.evaluate(() => {
     const g = document.getElementById('cv').getContext('2d'), original = g.fillText, labels=[];
     g.fillText = function(text, ...args) { labels.push({text,color:this.fillStyle}); original.call(this,text,...args); };
-    City.drawNpc(g,WORLD_MAP.npcs.find(n => n.id === 'merchant'),150,250,0,false);
+    City.drawNpc(g,{ ...WORLD_MAP.npcs.find(n => n.id === 'merchant'), key: true },150,250,0,false);   // key: a giver with work always shows its plate (City.npcs sets it)
     return labels.some(l => l.text === '?' && l.color === '#64b5ff');
   }), 'NPC artwork draws the repeatable marker with blue paint');
   await fixture.screenshot({ path:path.join(world.artifacts,'inventory-rare-display.png') });

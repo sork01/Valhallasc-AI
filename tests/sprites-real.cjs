@@ -141,8 +141,8 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
           crags: Object.fromEntries(Field.cragSprites.meta.kinds.map(k => [k, [Field.cragSprites.img[k].naturalWidth, Field.cragSprites.img[k].naturalHeight]])),
         }));
         check(sizes.beetle.join() === '576,320', 'the Ironhide atlas is 576x320');
-        check(Object.values(sizes.crags).length === 4 && Object.values(sizes.crags).every(s => s.join() === '768,480'), 'all four Crags monster atlases are 768x480');
-        check(await page.evaluate(() => Field.slimes.length > 0 && Field.cragSprites.meta.kinds.join() === 'wisp,spider,wraith,golem'), 'the world lists its monsters');
+        check(Object.values(sizes.crags).length === 5 && Object.values(sizes.crags).every(s => s.join() === '768,480'), 'all five Crags monster atlases are 768x480');
+        check(await page.evaluate(() => Field.slimes.length > 0 && Field.cragSprites.meta.kinds.join() === 'wisp,spider,wraith,golem,cinderlord'), 'the world lists its monsters');
       }
       check(page.errors.length === 0, `${cls}: no page errors ${page.errors.join('; ')}`);
       await page.context().close();

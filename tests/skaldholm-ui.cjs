@@ -193,7 +193,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   // The journal: eleven city quests, local ones first; the first conversation at the gate captain through a real canvas click.
   await stageAt(4, 80, 128);
   await page.keyboard.press('q');
-  check(await page.locator('#quest-journal').isVisible() && await page.locator('#quest-list [data-quest^="city_"]').count() === 11 && await page.locator('#quest-list [data-quest^="fen_"]').count() === 16, 'The journal lists the eleven city quests beside the others');
+  check(await page.locator('#quest-journal').isVisible() && await page.locator('#quest-list [data-quest^="city_"]').count() === 12 && await page.locator('#quest-list [data-quest^="fen_"]').count() === 18, 'The journal lists the twelve city quests beside the others (each includes its progression quest)');
   check(await page.locator('#quest-list .quest-card').first().getAttribute('data-quest') === 'city_welcome', 'Local city quests sort first');
   check(await page.locator('#quest-list [data-quest="city_seals"]').textContent().then(t => t.includes('Locked') && t.includes('The Great Gate Opens')), 'The letters explain their prerequisite');
   check(await page.locator('#quest-list [data-quest="city_gel"]').textContent().then(t => t.includes('Bring Slime Gel: 0/8') && t.includes('Recommended level 12')), 'A hand-in quest lists what to bring');

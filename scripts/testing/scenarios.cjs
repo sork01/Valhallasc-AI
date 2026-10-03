@@ -852,12 +852,12 @@ const scenarios = {
       await w.waitFor(() => w.player(bot).hp === w.player(bot).maxHp);
       check(w.player(bot).hp === w.player(bot).maxHp, 'The camp healer restores all HP');
       await kit.talkTo(w, bot, 'crags_healer', 'buy_health_potion');
-      await w.waitFor(() => w.player(bot).inventory.some(i => i.item === 'health_potion'));
-      check(w.player(bot).inventory.some(i => i.item === 'health_potion'), 'The camp sells health potions');
+      await w.waitFor(() => w.player(bot).inventory.some(i => i.item.startsWith('health_potion')));
+      check(w.player(bot).inventory.some(i => i.item.startsWith('health_potion')), 'The camp sells health potions');
       await kit.teleport(w, bot, { npc: 'crags_supplier' });
       await kit.talkTo(w, bot, 'crags_supplier', 'buy_traveler_stew');
-      await w.waitFor(() => w.player(bot).inventory.some(i => i.item === 'traveler_stew'));
-      check(w.player(bot).inventory.some(i => i.item === 'traveler_stew'), 'The quartermaster sells food');
+      await w.waitFor(() => w.player(bot).inventory.some(i => i.item.startsWith('traveler_stew')));
+      check(w.player(bot).inventory.some(i => i.item.startsWith('traveler_stew')), 'The quartermaster sells food');
       const history = JSON.stringify(w.player(bot).quests);
       await w.restart();
       check(w.player(bot).zone === 1 && JSON.stringify(w.player(bot).quests) === history, 'Every completion and restarted bounty survives a private server restart');
@@ -897,7 +897,8 @@ const scenarios = {
       check(JSON.stringify(w.snapshot.zonesSeen) === '[1,2]', 'The merged test view covers the two zones while a bot stands in each');
       await w.disconnect('Cragger');
       // The ice spiral: its route runs through all four ring gaps, and the walk to the summit really works.
-      const center = { x: 64, y: 52 }, gaps = [{ x: 64, y: 100 }, { x: 64, y: 15 }, { x: 64, y: 78 }, { x: 64, y: 37 }];
+      // The bowl's centre holds the gate to Gloamfen (64,50), so the walk ends just short of it.
+      const center = { x: 64, y: 46 }, gaps = [{ x: 64, y: 100 }, { x: 64, y: 15 }, { x: 64, y: 78 }, { x: 64, y: 37 }];
       const path = route(rime, w.player(bot), center), from = { x: w.player(bot).x, y: w.player(bot).y };
       // The route is a few long straight legs, so measure how close each gap lies to a leg rather than to a waypoint.
       const legDistance = (g, a, b) => { const dx = b.x - a.x, dy = b.y - a.y, t = Math.max(0, Math.min(1, ((g.x - a.x) * dx + (g.y - a.y) * dy) / (dx * dx + dy * dy || 1))); return Math.hypot(g.x - a.x - dx * t, g.y - a.y - dy * t); };
@@ -1001,12 +1002,12 @@ const scenarios = {
       await w.waitFor(() => w.player(bot).hp === w.player(bot).maxHp);
       check(w.player(bot).hp === w.player(bot).maxHp, 'The camp healer restores all HP');
       await kit.talkTo(w, bot, 'rime_healer', 'buy_health_potion');
-      await w.waitFor(() => w.player(bot).inventory.some(i => i.item === 'health_potion'));
-      check(w.player(bot).inventory.some(i => i.item === 'health_potion'), 'The camp sells health potions');
+      await w.waitFor(() => w.player(bot).inventory.some(i => i.item.startsWith('health_potion')));
+      check(w.player(bot).inventory.some(i => i.item.startsWith('health_potion')), 'The camp sells health potions');
       await kit.teleport(w, bot, { npc: 'rime_trader' });
       await kit.talkTo(w, bot, 'rime_trader', 'buy_traveler_stew');
-      await w.waitFor(() => w.player(bot).inventory.some(i => i.item === 'traveler_stew'));
-      check(w.player(bot).inventory.some(i => i.item === 'traveler_stew'), 'The trader sells food');
+      await w.waitFor(() => w.player(bot).inventory.some(i => i.item.startsWith('traveler_stew')));
+      check(w.player(bot).inventory.some(i => i.item.startsWith('traveler_stew')), 'The trader sells food');
       // Glacier loot sells at the trader (materials from the four new kinds).
       await w.debug(bot, { op: 'give_item', item: 'wyrm_scale', quantity: 2 });
       const gold = w.player(bot).gold;
@@ -1313,12 +1314,12 @@ const scenarios = {
       await w.waitFor(() => w.player(bot).hp === w.player(bot).maxHp);
       check(w.player(bot).hp === w.player(bot).maxHp, 'The town healer restores all HP');
       await kit.talkTo(w, bot, 'fen_healer', 'buy_health_potion');
-      await w.waitFor(() => w.player(bot).inventory.some(i => i.item === 'health_potion'));
-      check(w.player(bot).inventory.some(i => i.item === 'health_potion'), 'The town sells health potions');
+      await w.waitFor(() => w.player(bot).inventory.some(i => i.item.startsWith('health_potion')));
+      check(w.player(bot).inventory.some(i => i.item.startsWith('health_potion')), 'The town sells health potions');
       await kit.teleport(w, bot, { npc: 'fen_trader' });
       await kit.talkTo(w, bot, 'fen_trader', 'buy_traveler_stew');
-      await w.waitFor(() => w.player(bot).inventory.some(i => i.item === 'traveler_stew'));
-      check(w.player(bot).inventory.some(i => i.item === 'traveler_stew'), 'The trader sells food');
+      await w.waitFor(() => w.player(bot).inventory.some(i => i.item.startsWith('traveler_stew')));
+      check(w.player(bot).inventory.some(i => i.item.startsWith('traveler_stew')), 'The trader sells food');
       // Fen loot sells at the trader (materials from the four new kinds).
       await w.debug(bot, { op: 'give_item', item: 'hydra_fang', quantity: 2 });
       const gold = w.player(bot).gold;
@@ -1686,18 +1687,20 @@ const scenarios = {
       const mage = () => w.player('Mana');
       await cast(w, 'Mana', 'twinbolt');
       await w.waitFor(() => mage().skillCd.twinbolt > 0);
-      check(mage().resource === mage().maxResource - skillCatalog.find(s => s.id === 'twinbolt').cost, 'A valid mage cast spends its catalog mana cost exactly');
+      // A mage in combat trickles 1.5% of the pool a second, so the spend is exact only to within a moment of that.
+      const trickle = () => mage().maxResource * 0.03;
+      check(Math.abs(mage().resource - (mage().maxResource - skillCatalog.find(s => s.id === 'twinbolt').cost)) <= trickle(), 'A valid mage cast spends its catalog mana cost (plus at most the in-combat trickle)');
       await w.debug('Mana', { op: 'set_resource', amount: 0 });
       await cast(w, 'Mana', 'starfall');
       await w.waitFor(() => w.events.some(e => e.bot === 'Mana' && e.type === 'error' && /Not enough mana/.test(e.text)));
-      check(!mage().skillCd.starfall && mage().resource === 0, 'An exhausted cast produces no cooldown or resource change');
+      check(!mage().skillCd.starfall && mage().resource <= trickle(), 'An exhausted cast produces no cooldown or resource spend');
       await w.action('Mana', { type: 'attack', fx: 1, fy: 0 });
       await w.waitFor(() => mage().atkCd > 0);
-      check(mage().resource === 0, 'Basic attacks remain free when mana is empty');
+      check(mage().resource <= trickle(), 'Basic attacks remain free when mana is empty');
       await w.advance(1000);
-      check(mage().resource === 0, 'Mana does not regenerate while fighting');
+      check(mage().resource > 0 && mage().resource <= trickle() * 1.5, 'Mana only trickles while fighting (1.5% of the pool a second)');
       await w.action('Mana', { type: 'stop' });
-      await w.waitFor(() => mage().resource > 0, 6500, 'Out-of-combat mana recovery');
+      await w.waitFor(() => !mage().inCombat && mage().resource > mage().maxResource * 0.04, 9000, 'Out-of-combat mana recovery');
       check(!mage().inCombat, 'Mana recovers after the combat grace period');
       for (const bot of ['Energy','Arrows']) {
         await w.debug(bot, { op: 'set_resource', amount: 0 });
@@ -1705,16 +1708,19 @@ const scenarios = {
         await w.advance(700);
         check(w.player(bot).resource > 5 && w.player(bot).inCombat, `${bot} recovers energy even in combat`);
       }
-      await kit.setupCharacter(w, 'Mana', { gold: 100, teleportTo: { npc: 'apothecary' } });
+      // The apothecary sells the best tier the buyer's level allows: a level-20 mage gets the 110-gold, 300-mana Superior potion.
+      const potion = kit.items.find(i => i.id === 'mana_potion_l20');
+      await kit.setupCharacter(w, 'Mana', { gold: 200, teleportTo: { npc: 'apothecary' } });
       await kit.talkTo(w, 'Mana', 'apothecary', 'buy_mana_potion');
-      await w.waitFor(() => mage().gold === 70 && mage().inventory.some(i => i.item === 'mana_potion'), 3000, 'Mana potion purchase snapshot');
-      check(mage().gold === 70 && mage().inventory.some(i => i.item === 'mana_potion'), 'An ordinary merchant purchase supplies a mana potion for 30 gold');
+      await w.waitFor(() => mage().gold === 200 - potion.price && mage().inventory.some(i => i.item === potion.id), 3000, 'Mana potion purchase snapshot');
+      check(mage().gold === 90 && mage().inventory.some(i => i.item === 'mana_potion_l20'), 'An ordinary merchant purchase supplies the level-20 mana potion for 110 gold');
       await w.debug('Mana', { op: 'give_item', item: 'health_potion', quantity: 1 });
       await w.debug('Mana', { op: 'set_resource', amount: 0 });
       await w.action('Mana', { type: 'attack', fx: 1, fy: 0 });
-      await w.action('Mana', { type: 'use_item', item: 'mana_potion' });
+      await w.action('Mana', { type: 'use_item', item: potion.id });
       await w.waitFor(() => mage().potionCd > 0);
-      check(mage().resource >= 100 && mage().resource < 103 && mage().hp === mage().maxHp && w.events.some(e => e.bot === 'Mana' && e.kind === 'consume' && e.mana === 100), 'A mana potion restores 100 mana even at full health');
+      const restored = Math.min(potion.mana, mage().maxResource);
+      check(mage().resource >= restored - 3 && mage().resource <= mage().maxResource && mage().hp === mage().maxHp && w.events.some(e => e.bot === 'Mana' && e.kind === 'consume' && Math.abs(e.mana - restored) <= 3), 'A mana potion restores its mana (up to the pool) even at full health');
       await w.debug('Mana', { op: 'set_hp', hp: 1 });
       await w.action('Mana', { type: 'use_item', item: 'health_potion' });
       await w.advance(200);
