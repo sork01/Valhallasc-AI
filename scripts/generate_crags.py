@@ -15,6 +15,8 @@ import math
 from pathlib import Path
 import random
 
+import progression_quests
+
 ROOT = Path(__file__).resolve().parents[1]
 PATH = ROOT / 'world/map.txt'
 LEVEL_XP = json.loads((ROOT / 'world/levels.txt').read_text())  # XP to next level; a quest pays a tenth
@@ -104,6 +106,7 @@ def quest_hub():
               'Clear three Cinder Wisps and three Magma Spiders for the next supply run. Dain offers this contract again after each turn-in.',
               [kill('wisp', 3, 'Defeat Cinder Wisps'), kill('spider', 3, 'Defeat Magma Spiders')], 7, 110, 'spiders', True),
     ]
+    quests += progression_quests.for_zone('Emberfall Crags')
     objects = [
         dict(kind='tent', x=38, y=80, r=1.5, width=3, depth=2.4, color='#b76348', label='Command'),
         dict(kind='tent', x=54, y=78, r=1.5, width=3, depth=2.4, color='#817597', label='Infirmary'),

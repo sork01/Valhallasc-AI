@@ -1163,6 +1163,11 @@ impl World {
             p.character.hp = (p.character.hp + 3. * TICK).min(p.character.max_hp());
         }
         p.character.explore(self.maps[p.character.zone].size);
+        for title in sync_progression(&mut p.character, &self.maps) {
+            let _ = p.peer.try_send(json!({"type":"system","text":format!(
+                "A new quest has found you: {title}. Follow it in your journal (Q)."
+            )}));
+        }
         // Hand-in quests follow the bag, so the journal counts what the player carries right now.
         for i in 0..p.character.quests.len() {
             if p.character.quests[i].claimed {
@@ -2297,6 +2302,9 @@ fn quest_action(character: &mut Character, quest: &Quest, action: &str) -> (Stri
     if !quest.unlocked(character) {
         return refused("Finish the earlier quest first.");
     }
+    if action == "accept" && quest.auto_level.is_some() {
+        return refused("This quest finds you by itself when you are ready for it.");
+    }
     let prior = character.quests.iter().position(|q| q.id == quest.id);
     match action {
         "accept" => {
@@ -2388,11 +2396,123 @@ mod tests {
     }
 
     #[test]
+    fn progression_quests_come_every_five_levels_and_each_names_the_zone_it_leads_to() {
+        let w = world();
+        let mut found: Vec<(u32, usize)> = Vec::new();
+        for (zone, area) in w.maps.iter().enumerate() {
+            for q in area.quests.iter().filter(|q| q.auto_level.is_some()) {
+                assert_eq!(
+                    q.auto_level,
+                    Some(q.level),
+                    "{} arrives at its own level",
+                    q.id
+                );
+                assert!(q.requires.is_none() && !q.repeatable, "{}", q.id);
+                assert_eq!(q.objectives.len(), 1, "{}", q.id);
+                assert_eq!(q.objectives[0].kind, "reach");
+                assert_eq!(q.objectives[0].target, area.name, "{} leads here", q.id);
+                assert!(
+                    area.npcs.iter().any(|n| n.id == q.npc),
+                    "{} is handed in here",
+                    q.id
+                );
+                found.push((q.level, zone));
+            }
+        }
+        found.sort();
+        assert_eq!(found, vec![(5, 1), (10, 2), (15, 3), (20, 4)]);
+    }
+
+    #[test]
+    fn a_progression_quest_arrives_at_its_level_completes_on_arrival_and_pays_at_the_captain() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        let quests = |w: &World| w.players[&1].character.quests.clone();
+        w.step();
+        assert!(quests(&w).is_empty(), "nothing before level 5");
+        w.players.get_mut(&1).unwrap().character.level = 4;
+        w.step();
+        assert!(quests(&w).is_empty(), "level 4 is still too early");
+        // The captain cannot hand it out early either, even if a client asks.
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        quest_interact(&mut w, "crags_captain", Some("quest:accept:crags_onward"));
+        assert!(quests(&w).is_empty(), "it is never offered");
+        w.players.get_mut(&1).unwrap().character.zone = 0;
+        while rx.try_recv().is_ok() {}
+
+        w.players.get_mut(&1).unwrap().character.level = 5;
+        w.step();
+        let q = quests(&w);
+        assert_eq!(
+            (q.len(), q[0].id.as_str(), q[0].counts.clone()),
+            (1, "crags_onward", vec![0])
+        );
+        let mut told = false;
+        while let Ok(m) = rx.try_recv() {
+            told |= m["type"] == "system"
+                && m["text"].as_str().unwrap().contains("Onward to the Crags");
+        }
+        assert!(told, "the player is told a quest has found them");
+        w.step();
+        assert_eq!(quests(&w).len(), 1, "it is granted once");
+
+        // Not done in the meadow, so the captain refuses the reward.
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        quest_interact(&mut w, "crags_captain", Some("quest:claim:crags_onward"));
+        assert!(!quests(&w)[0].claimed, "claimed only after it was reached");
+        w.players.get_mut(&1).unwrap().character.zone = 0;
+        // Standing in the Crags completes it, and the captain pays out.
+        let (xp, gold) = {
+            let c = &w.players[&1].character;
+            (c.xp, c.gold)
+        };
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        w.step();
+        assert_eq!(quests(&w)[0].counts, vec![1]);
+        quest_interact(&mut w, "crags_captain", Some("quest:claim:crags_onward"));
+        let c = &w.players[&1].character;
+        assert!(c.quests[0].claimed && c.quests[0].completions == 1);
+        assert_eq!(c.gold, gold + 100);
+        assert_eq!(c.xp, xp + xp_to_level(5) / 10);
+    }
+
+    #[test]
+    fn a_character_who_already_explored_the_zone_has_reached_it() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Mage);
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.level = 20;
+            c.explored = vec![0, 0, 0b100, 0];
+        }
+        w.step();
+        let c = &w.players[&1].character;
+        let ids: Vec<(&str, u32)> = c
+            .quests
+            .iter()
+            .map(|q| (q.id.as_str(), q.counts[0]))
+            .collect();
+        assert_eq!(
+            ids,
+            vec![
+                ("crags_onward", 0),
+                ("rime_onward", 1),
+                ("fen_onward", 0),
+                ("city_onward", 0)
+            ],
+            "only the glacier was visited before; the others still need the trip"
+        );
+        // Taking the quest off the ledger is not a thing: a second step adds nothing.
+        w.step();
+        assert_eq!(w.players[&1].character.quests.len(), 4);
+    }
+
+    #[test]
     fn crags_hub_catalog_is_connected_and_has_twelve_valid_quests() {
         let w = world();
         let map = &w.maps[1];
         assert_eq!(map.npcs.len(), 4);
-        assert_eq!(map.quests.len(), 12);
+        assert_eq!(map.quests.len(), 13);
         assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 2);
         let mut ids = std::collections::HashSet::new();
         let mut npc_ids = std::collections::HashSet::new();
@@ -2439,6 +2559,7 @@ mod tests {
                                 || area.slimes.iter().any(|s| s.kind == o.target)
                         ),
                         "bring" => assert!(item(&o.target).is_some_and(|i| i.kind == "material")),
+                        "reach" => assert!(w.maps.iter().any(|m| m.name == o.target)),
                         _ => panic!("unsupported objective"),
                     }
                 }
@@ -2844,7 +2965,7 @@ mod tests {
             Some((52., 76., 108., 121.))
         );
         assert_eq!(map.npcs.len(), 5);
-        assert_eq!(map.quests.len(), 13);
+        assert_eq!(map.quests.len(), 14);
         assert!(
             map.quests.len() >= 10,
             "a questhub needs at least ten quests"
@@ -2856,7 +2977,7 @@ mod tests {
             assert!((10..=15).contains(&q.level), "{} level {}", q.id, q.level);
             assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
             assert!(q.reward_gold >= 200);
-            roots += q.requires.is_none() as usize;
+            roots += (q.requires.is_none() && q.auto_level.is_none()) as usize;
             if let Some(id) = &q.requires {
                 let prereq = map
                     .quests
@@ -2871,6 +2992,7 @@ mod tests {
                     "kill" => {
                         assert!(o.target == "any" || map.slimes.iter().any(|s| s.kind == o.target))
                     }
+                    "reach" => assert!(w.maps.iter().any(|m| m.name == o.target)),
                     other => panic!("objective {other}"),
                 }
             }
@@ -3455,7 +3577,7 @@ mod tests {
             Some((40., 88., 6., 31.))
         );
         assert_eq!(map.npcs.len(), 7);
-        assert_eq!(map.quests.len(), 16);
+        assert_eq!(map.quests.len(), 17);
         assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 3);
         let mut roots = 0;
         for q in &map.quests {
@@ -3463,7 +3585,7 @@ mod tests {
             assert!((15..=20).contains(&q.level), "{} level {}", q.id, q.level);
             assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
             assert!(q.reward_gold >= 300);
-            roots += q.requires.is_none() as usize;
+            roots += (q.requires.is_none() && q.auto_level.is_none()) as usize;
             if let Some(id) = &q.requires {
                 let prereq = map
                     .quests
@@ -3479,6 +3601,7 @@ mod tests {
                     "kill" => {
                         assert!(o.target == "any" || map.slimes.iter().any(|s| s.kind == o.target))
                     }
+                    "reach" => assert!(w.maps.iter().any(|m| m.name == o.target)),
                     other => panic!("objective {other}"),
                 }
             }
@@ -4102,7 +4225,7 @@ mod tests {
     fn skaldholm_has_eleven_valid_quests_mostly_errands_between_the_maps() {
         let w = world();
         let map = &w.maps[CITY];
-        assert_eq!(map.quests.len(), 11);
+        assert_eq!(map.quests.len(), 12);
         assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 1);
         let all_npcs: Vec<(usize, &Npc)> = w
             .maps
@@ -4116,7 +4239,7 @@ mod tests {
             assert!((11..=20).contains(&q.level), "{} level {}", q.id, q.level);
             assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
             assert!(q.reward_gold >= 250, "{}", q.id);
-            roots += q.requires.is_none() as usize;
+            roots += (q.requires.is_none() && q.auto_level.is_none()) as usize;
             if let Some(id) = &q.requires {
                 let prereq = map
                     .quests
@@ -4144,6 +4267,7 @@ mod tests {
                             .unwrap_or_else(|| panic!("{} asks for {}", q.id, o.target));
                         assert_eq!(wanted.kind, "material", "{}", q.id);
                     }
+                    "reach" => assert!(w.maps.iter().any(|m| m.name == o.target)),
                     other => panic!("{} has a {other} objective", q.id),
                 }
             }
@@ -4482,7 +4606,8 @@ mod tests {
         }
         let c = &w.players[&1].character;
         for q in &w.maps[CITY].quests {
-            if !q.repeatable {
+            // A progression quest finds the player by itself and is handed in on arrival, not in this chain.
+            if !q.repeatable && q.auto_level.is_none() {
                 let p = c
                     .quests
                     .iter()
@@ -4494,7 +4619,7 @@ mod tests {
         let gold: u32 = w.maps[CITY]
             .quests
             .iter()
-            .filter(|q| !q.repeatable)
+            .filter(|q| !q.repeatable && q.auto_level.is_none())
             .map(|q| q.reward_gold)
             .sum();
         assert_eq!(c.gold, gold, "every reward paid once");
@@ -4508,7 +4633,7 @@ mod tests {
         let xp: u32 = w.maps[CITY]
             .quests
             .iter()
-            .filter(|q| !q.repeatable)
+            .filter(|q| !q.repeatable && q.auto_level.is_none())
             .map(|q| q.reward_xp)
             .sum();
         let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;

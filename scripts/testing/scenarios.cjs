@@ -808,8 +808,8 @@ const scenarios = {
       check(!quest(w, bot, 'crags_wisps'), 'The Crags hunt requires the camp introduction');
       await kit.talkTo(w, bot, 'crags_scout', 'quest:accept:crags_welcome');
       check(!quest(w, bot, 'crags_welcome'), 'The wrong NPC cannot offer another giver\'s quest');
-      check(kit.describe('quests').quests.filter(q => q.zone === 1).length === 12, 'MCP describes all twelve Crags quests with their zone');
-      for (const q of crags.quests) {
+      check(kit.describe('quests').quests.filter(q => q.zone === 1).length === 13, 'MCP describes all thirteen Crags quests with their zone');
+      for (const q of crags.quests.filter(q => !q.autoLevel)) {
         await kit.teleport(w, bot, { npc: q.npc });
         await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
         await w.waitFor(() => !!quest(w, bot, q.id));
@@ -950,14 +950,15 @@ const scenarios = {
       await kit.setupCharacter(w, bot, { level: 15, gold: 1000, items: Array.from({ length: 4 }, () => ({ item: 'linen_satchel' })), finishQuests: ['slime_patrol', 'crags_welcome'] });
       await kit.teleport(w, bot, { npc: 'crags_supplier' });
       await kit.talkTo(w, bot, 'crags_supplier', 'quest:accept:crags_bounty');
+      await w.waitFor(() => !!quest(w, bot, 'crags_bounty'), 5000, 'The Crags patrol appears');
       check(!!quest(w, bot, 'crags_bounty'), 'The Crags patrol is accepted before the glacier quests start');
       await kit.teleport(w, bot, { npc: 'rime_tracker' });
       await kit.talkTo(w, bot, 'rime_tracker', 'quest:accept:rime_crabs');
       check(!quest(w, bot, 'rime_crabs'), 'The glacier hunt requires the camp introduction');
       await kit.talkTo(w, bot, 'rime_tracker', 'quest:accept:rime_welcome');
       check(!quest(w, bot, 'rime_welcome'), 'The wrong NPC cannot offer another giver\'s quest');
-      check(kit.describe('quests').quests.filter(q => q.zone === 2).length === 13 && rime.quests.length >= 10, 'MCP describes all thirteen glacier quests with their zone');
-      for (const q of rime.quests) {
+      check(kit.describe('quests').quests.filter(q => q.zone === 2).length === 14 && rime.quests.length >= 10, 'MCP describes all fourteen glacier quests with their zone');
+      for (const q of rime.quests.filter(q => !q.autoLevel)) {
         await kit.teleport(w, bot, { npc: q.npc });
         await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
         await w.waitFor(() => !!quest(w, bot, q.id));
@@ -1181,7 +1182,7 @@ const scenarios = {
       await w.connect({ bot, class: 'warrior' });
       await kit.setupCharacter(w, bot, { level: 20, gold: 0, items: Array.from({ length: 4 }, () => ({ item: 'linen_satchel' })) });
       const q = id => quest(w, bot, id), bag = item => (w.player(bot).inventory.find(i => i.item === item) || {}).quantity || 0;
-      check(kit.describe('quests').quests.filter(x => x.zone === 4).length === 11, 'MCP describes all eleven city quests with their zone');
+      check(kit.describe('quests').quests.filter(x => x.zone === 4).length === 12, 'MCP describes all twelve city quests with their zone');
       await kit.teleport(w, bot, { npc: 'city_herald' });
       await kit.talkTo(w, bot, 'city_herald', 'quest:accept:city_seals');
       check(!q('city_seals'), 'The errands need the introduction first');
@@ -1190,7 +1191,7 @@ const scenarios = {
       check(!q('city_gel'), 'Another giver cannot hand out a quest, and a locked one is refused');
       // Materials already in the bag count the moment a hand-in quest is accepted, and selling them takes progress back.
       await w.debug(bot, { op: 'give_item', item: 'slime_gel', quantity: 3 });
-      for (const x of city.quests) {
+      for (const x of city.quests.filter(x => !x.autoLevel)) {
         await kit.teleport(w, bot, { npc: x.npc });
         if (x.requires && !(q(x.requires)?.claimed)) throw Error(`Order: ${x.id} needs ${x.requires}`);
         await kit.talkTo(w, bot, x.npc, `quest:accept:${x.id}`);
@@ -1268,8 +1269,8 @@ const scenarios = {
       check(!quest(w, bot, 'fen_toads'), 'The fen hunt requires the town introduction');
       await kit.talkTo(w, bot, 'fen_ranger', 'quest:accept:fen_welcome');
       check(!quest(w, bot, 'fen_welcome'), 'The wrong NPC cannot offer another giver\'s quest');
-      check(kit.describe('quests').quests.filter(q => q.zone === 3).length === 16 && fen.quests.length >= 10, 'MCP describes all sixteen fen quests with their zone');
-      for (const q of fen.quests) {
+      check(kit.describe('quests').quests.filter(q => q.zone === 3).length === 17 && fen.quests.length >= 10, 'MCP describes all seventeen fen quests with their zone');
+      for (const q of fen.quests.filter(q => !q.autoLevel)) {
         await kit.teleport(w, bot, { npc: q.npc });
         await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
         await w.waitFor(() => !!quest(w, bot, q.id));
@@ -1457,6 +1458,46 @@ const scenarios = {
       await w.action('Hana', { type: 'target', id: start.id });
       await w.waitFor(() => !front() || front().dead, 40000, 'The hunter defeats it with arrows');
       check(front().dead, 'Arrows alone defeat an enemy');
+    },
+  },
+  progression_quests: {
+    description: 'Progression quests: one arrives by itself every five levels, is never offered at a giver, completes on arrival in the next zone, pays at that zone\'s captain and survives a restart.',
+    async run(w, check) {
+      const bot = 'Pathfinder', ids = ['crags_onward', 'rime_onward', 'fen_onward', 'city_onward'];
+      await w.connect({ bot, class: 'warrior' });
+      check(!w.player(bot).quests.length, 'A new character has no progression quest');
+      await kit.setupCharacter(w, bot, { level: 4 });
+      await w.advance(300);
+      check(!quest(w, bot, 'crags_onward'), 'Level 4 is too early');
+      await kit.setupCharacter(w, bot, { level: 5 });
+      await w.waitFor(() => !!quest(w, bot, 'crags_onward'), 5000, 'The level-5 quest arrives');
+      check(JSON.stringify(quest(w, bot, 'crags_onward').counts) === '[0]' && !quest(w, bot, 'rime_onward'), 'Level 5 brings only the Crags quest, with the trip still to make');
+      check(w.events.some(e => e.type === 'system' && e.bot === bot && e.text.includes('Onward to the Crags')), 'The player is told a quest has found them');
+      // Handing it in before the trip is refused, and nobody can hand it out.
+      await kit.teleport(w, bot, { npc: 'crags_captain' });
+      await w.waitFor(() => quest(w, bot, 'crags_onward').counts[0] === 1, 5000, 'Standing in the Crags completes it');
+      await kit.teleport(w, bot, { npc: 'gatekeeper' });
+      check(w.player(bot).zone === 0, 'The bot is back in the meadow');
+      await w.waitFor(() => quest(w, bot, 'crags_onward').counts[0] === 1, 5000, 'Progress is kept after leaving');
+      await kit.teleport(w, bot, { npc: 'crags_captain' });
+      const before = totalXp(w.player(bot)), gold = w.player(bot).gold;
+      const reply = await kit.talkTo(w, bot, 'crags_captain', 'quest:claim:crags_onward');
+      await w.waitFor(() => quest(w, bot, 'crags_onward').claimed, 5000, 'The captain pays');
+      check(reply.notice.includes('Quest complete') && w.player(bot).gold === gold + 100 && totalXp(w.player(bot)) === before + levelXp[4] / 10, 'The captain pays 100 gold and a tenth of level 5\'s XP');
+      const refused = await kit.talkTo(w, bot, 'crags_captain', 'quest:accept:rime_onward');
+      check(!quest(w, bot, 'rime_onward') && refused.notice !== undefined, 'A progression quest of another level cannot be taken at a giver');
+      const id = w.player(bot).id;
+      await w.restart();
+      check(w.player(bot).id === id && quest(w, bot, 'crags_onward').claimed && quest(w, bot, 'crags_onward').completions === 1, 'The finished quest survives restarting the Rust process');
+      await kit.talkTo(w, bot, 'crags_captain', 'quest:claim:crags_onward');
+      check(w.player(bot).gold === gold + 100, 'It cannot be paid twice');
+      // Levels 10, 15 and 20 each bring the next one, aimed at the next zone.
+      for (const [level, quests] of [[10, 2], [15, 3], [20, 4]]) {
+        await kit.setupCharacter(w, bot, { level });
+        await w.waitFor(() => quest(w, bot, ids[quests - 1]), 5000, `The level-${level} quest arrives`);
+        check(w.player(bot).quests.filter(q => ids.includes(q.id)).length === quests, `Level ${level} has brought ${quests} progression quests in all`);
+      }
+      check(JSON.stringify(quest(w, bot, 'city_onward').counts) === '[0]' && JSON.stringify(quest(w, bot, 'fen_onward').counts) === '[0]', 'The later quests still wait for the trip');
     },
   },
 };

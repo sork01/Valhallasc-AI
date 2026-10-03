@@ -130,7 +130,7 @@ const look = page => page.evaluate(() => {
   // The journal routes to local camp NPCs, while explaining where the meadow givers live.
   await page.keyboard.press('q');
   check(await page.locator('#quest-journal').isVisible() && (await page.locator('#quest-list [data-quest="welcome"]').textContent()).includes('is back in Greenmeadow'), 'Meadow quests explain that their givers are in Greenmeadow');
-  check(await page.locator('#quest-list [data-quest^="crags_"]').count() === 12, 'All twelve Crags quests appear in the journal');
+  check(await page.locator('#quest-list [data-quest^="crags_"]').count() === 13, 'All thirteen Crags quests appear in the journal');
   check(await page.locator('#quest-list .quest-card').first().getAttribute('data-quest') === 'crags_welcome', 'Local camp quests sort first');
   check(await page.locator('#quest-list [data-quest="crags_golems"]').textContent().then(t => t.includes('Locked') && t.includes('Voices in the Ash')), 'Later hunts explain their prerequisite');
   await page.locator('#quest-list [data-quest="crags_welcome"] button').filter({ hasText: 'Get quest from Captain Sera' }).click();

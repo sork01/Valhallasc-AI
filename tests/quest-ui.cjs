@@ -39,7 +39,7 @@ async function call(name, args = {}) {
   await page.keyboard.press('Escape');
   await page.keyboard.press('q');
   check(await page.locator('#quest-journal').isVisible(), 'Q opens the journal');
-  check(await page.locator('#quest-list .quest-card').count() === 17, 'All seventeen quests display across both zones');
+  check(await page.locator('#quest-list .quest-card').count() === await page.evaluate(() => [WORLD_MAP, ...WORLD_MAP.zones].reduce((n, a) => n + a.quests.length, 0)), 'Every quest of every zone displays in the journal');
   check(await page.locator('#quest-close').evaluate(n => n === document.activeElement), 'Journal takes keyboard focus');
   await page.keyboard.press('Tab');
   check(await page.locator('#quest-list button').first().evaluate(n => n === document.activeElement), 'Tab wraps within the journal');

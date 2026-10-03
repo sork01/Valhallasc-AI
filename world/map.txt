@@ -4847,6 +4847,26 @@
           "rewardGold": 110,
           "requires": "crags_spiders",
           "repeatable": true
+        },
+        {
+          "id": "crags_onward",
+          "title": "Onward to the Crags",
+          "npc": "crags_captain",
+          "description": "You have outgrown the meadow. Captain Rowan is sending you north: leave Alderhaven by the Emberfall Gate at the end of the north road, cross into the Emberfall Crags and report to Captain Sera at Cinderwatch Camp.",
+          "objectives": [
+            {
+              "kind": "reach",
+              "target": "Emberfall Crags",
+              "label": "Travel to the Emberfall Crags",
+              "count": 1
+            }
+          ],
+          "level": 5,
+          "rewardXp": 80,
+          "rewardGold": 100,
+          "requires": null,
+          "repeatable": false,
+          "autoLevel": 5
         }
       ],
       "city": {
@@ -10858,6 +10878,26 @@
           "rewardGold": 280,
           "requires": "rime_crabs",
           "repeatable": true
+        },
+        {
+          "id": "rime_onward",
+          "title": "Up the Frozen Stair",
+          "npc": "rime_warden",
+          "description": "The Crags have little left to teach you. Past the last lava ford a gate leads up onto the Rimeveil Glacier: climb it, find Rimeward Camp and report to Warden Halvard.",
+          "objectives": [
+            {
+              "kind": "reach",
+              "target": "Rimeveil Glacier",
+              "label": "Travel to the Rimeveil Glacier",
+              "count": 1
+            }
+          ],
+          "level": 10,
+          "rewardXp": 210,
+          "rewardGold": 200,
+          "requires": null,
+          "repeatable": false,
+          "autoLevel": 10
         }
       ],
       "city": {
@@ -16633,6 +16673,26 @@
           "rewardGold": 650,
           "requires": "fen_knights",
           "repeatable": true
+        },
+        {
+          "id": "fen_onward",
+          "title": "Lights in the Gloam",
+          "npc": "fen_reeve",
+          "description": "Something has started to glow at the heart of the glacier. Cross the summit bowl to the fen gate, step down into Gloamfen and report to Reeve Osric in Lanternmere.",
+          "objectives": [
+            {
+              "kind": "reach",
+              "target": "Gloamfen",
+              "label": "Travel to Gloamfen",
+              "count": 1
+            }
+          ],
+          "level": 15,
+          "rewardXp": 410,
+          "rewardGold": 300,
+          "requires": null,
+          "repeatable": false,
+          "autoLevel": 15
         }
       ],
       "city": {
@@ -25217,6 +25277,26 @@
           "rewardGold": 540,
           "requires": "city_welcome",
           "repeatable": true
+        },
+        {
+          "id": "city_onward",
+          "title": "The Capital Awaits",
+          "npc": "city_captain",
+          "description": "You are ready for the greatest city in the north. Take the city gate beside the Rimeveil summit and walk the long road into Skaldholm, then report to Captain Ingrid Stormwatch at the Great Gate.",
+          "objectives": [
+            {
+              "kind": "reach",
+              "target": "Skaldholm",
+              "label": "Travel to Skaldholm",
+              "count": 1
+            }
+          ],
+          "level": 20,
+          "rewardXp": 650,
+          "rewardGold": 400,
+          "requires": null,
+          "repeatable": false,
+          "autoLevel": 20
         }
       ],
       "city": {

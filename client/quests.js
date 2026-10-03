@@ -10,10 +10,11 @@
     const p = state(quest);
     if (p && !p.claimed) return quest.objectives.every((o, i) => (p.counts[i] || 0) >= o.count) ? 'ready' : 'active';
     if (p?.claimed && !quest.repeatable) return 'completed';
+    if (quest.autoLevel) return 'upcoming'; // a progression quest is accepted by the server, never offered
     if (quest.requires && !(state({ id: quest.requires })?.completions > 0)) return 'locked';
     return 'available';
   }
-  const words = { ready: 'Ready to turn in', active: 'In progress', completed: 'Completed', locked: 'Locked', available: 'Available' };
+  const words = { ready: 'Ready to turn in', active: 'In progress', completed: 'Completed', locked: 'Locked', upcoming: 'Comes at a later level', available: 'Available' };
   function element(tag, text, className) {
     const node = document.createElement(tag); node.textContent = text;
     if (className) node.className = className;
@@ -38,7 +39,9 @@
     node.append(rec);
     node.append(element('p', quest.description), element('p', objectives(quest).join(' · '), 'quest-objectives'));
     node.append(element('p', `Reward: ${quest.rewardXp} XP · ${quest.rewardGold} gold`, 'quest-reward'));
-    if (s === 'locked') {
+    if (s === 'upcoming') {
+      node.append(element('p', `This quest finds you by itself at level ${quest.autoLevel}.`, 'quest-history'));
+    } else if (s === 'locked') {
       node.append(element('p', `Complete “${definitions.find(q => q.id === quest.requires)?.title}” first.`));
     } else if (atNpc && ['available', 'ready'].includes(s)) {
       const action = s === 'ready' ? 'claim' : 'accept';
@@ -46,11 +49,11 @@
         if (Online.send({ type: 'interact', npc: quest.npc, offer: `quest:${action}:${quest.id}` })) b.disabled = true;
       });
       b.dataset.action = action; node.append(b);
-    } else if (!atNpc && s !== 'completed') {
+    } else if (!atNpc && !['completed', 'upcoming'].includes(s)) {
       if (Field.zone !== quest.zone) node.append(element('p', quest.zone === 0
         ? `${npc.name} is back in Greenmeadow. Return through the gate first.`
         : `${npc.name} is in ${areas[quest.zone].name}. Travel through the gate to ${areas[quest.zone].city?.name || 'meet them'}.`, 'quest-history'));
-      else node.append(button(`${s === 'ready' ? 'Return to' : s === 'available' ? 'Get quest from' : 'Visit'} ${npc.name}`, () => {
+      else node.append(button(`${s === 'ready' ? (quest.autoLevel ? 'Report to' : 'Return to') : s === 'available' ? 'Get quest from' : 'Visit'} ${npc.name}`, () => {
         close(); Field.visitNpc(quest.npc);
       }));
     }
@@ -74,7 +77,7 @@
       const row = element('div', '', 'tracker-quest'); row.dataset.quest = quest.id;
       const title = button(quest.title, () => { tracked = quest.id; show(); }); title.className = 'tracker-title';
       row.append(title);
-      if (status(quest) === 'ready') row.append(element('small', `✓ Return to ${giver(quest).name} for your reward`, 'tracker-objective complete'));
+      if (status(quest) === 'ready') row.append(element('small', `✓ ${quest.autoLevel ? 'Report to' : 'Return to'} ${giver(quest).name} for your reward`, 'tracker-objective complete'));
       else quest.objectives.forEach((o, i) => {
         const count = Math.min(state(quest)?.counts[i] || 0, o.count), done = count >= o.count;
         row.append(element('small', `${done ? '✓' : '•'} ${o.label}: ${count}/${o.count}`, `tracker-objective${done ? ' complete' : ''}`));

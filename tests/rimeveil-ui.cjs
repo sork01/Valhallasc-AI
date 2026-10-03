@@ -125,7 +125,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   // The journal: thirteen glacier quests, local ones first, the first camp conversation through real clicks.
   await page.keyboard.press('q');
   check(await page.locator('#quest-journal').isVisible() && (await page.locator('#quest-list [data-quest="welcome"]').textContent()).includes('is back in Greenmeadow'), 'Meadow quests explain that their givers are in Greenmeadow');
-  check(await page.locator('#quest-list [data-quest^="rime_"]').count() === 13 && await page.locator('#quest-list [data-quest^="crags_"]').count() === 12, 'The journal lists all thirteen glacier quests beside the twelve Crags quests');
+  check(await page.locator('#quest-list [data-quest^="rime_"]').count() === 14 && await page.locator('#quest-list [data-quest^="crags_"]').count() === 13, 'The journal lists all fourteen glacier quests beside the thirteen Crags quests');
   check(await page.locator('#quest-list .quest-card').first().getAttribute('data-quest') === 'rime_welcome', 'Local camp quests sort first');
   check(await page.locator('#quest-list [data-quest="rime_yetis"]').textContent().then(t => t.includes('Locked') && t.includes('Howls in the Whiteout')), 'Later hunts explain their prerequisite');
   check(await page.locator('#quest-list [data-quest="rime_wyrm_hunt"]').textContent().then(t => t.includes('Recommended level 15')), 'The journal shows each quest\'s recommended level');

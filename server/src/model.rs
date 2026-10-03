@@ -506,6 +506,10 @@ pub struct Quest {
     pub reward_xp: u32,
     pub reward_gold: u32,
     pub objectives: Vec<QuestObjective>,
+    /// A progression quest: it is accepted for the character by itself once they reach this level, so
+    /// nobody has to be found to take it. The giver is still where it is handed in.
+    #[serde(default)]
+    pub auto_level: Option<u32>,
 }
 #[derive(Clone, Deserialize)]
 pub struct QuestObjective {
@@ -564,6 +568,58 @@ impl Quest {
                 .enumerate()
                 .all(|(i, o)| progress.counts.get(i).copied().unwrap_or(0) >= o.count)
     }
+}
+
+/// Accepts every progression quest the character has reached the level for and marks "reach" objectives
+/// done for the zone they stand in or have already explored. Returns the titles of the quests that
+/// just arrived. Cheap enough for every tick: it only walks the quest list.
+pub fn sync_progression(character: &mut Character, maps: &[Map]) -> Vec<String> {
+    let mut arrived = Vec::new();
+    for quest in maps.iter().flat_map(|m| &m.quests) {
+        if quest
+            .auto_level
+            .is_some_and(|level| character.level >= level)
+            && !character.quests.iter().any(|q| q.id == quest.id)
+        {
+            character.quests.push(QuestProgress {
+                id: quest.id.clone(),
+                counts: vec![0; quest.objectives.len()],
+                claimed: false,
+                completions: 0,
+            });
+            arrived.push(quest.title.clone());
+        }
+    }
+    let here = character.zone;
+    for i in 0..character.quests.len() {
+        if character.quests[i].claimed {
+            continue;
+        }
+        let Some(quest) = maps
+            .iter()
+            .flat_map(|m| &m.quests)
+            .find(|q| q.id == character.quests[i].id)
+        else {
+            continue;
+        };
+        for (n, objective) in quest.objectives.iter().enumerate() {
+            if objective.kind != "reach" {
+                continue;
+            }
+            let Some(zone) = maps.iter().position(|m| m.name == objective.target) else {
+                continue;
+            };
+            let been = zone == here || character.explored.get(zone).is_some_and(|&seen| seen != 0);
+            let counts = &mut character.quests[i].counts;
+            if counts.len() <= n {
+                counts.resize(n + 1, 0);
+            }
+            if been {
+                counts[n] = objective.count;
+            }
+        }
+    }
+    arrived
 }
 
 pub fn quest_progress(character: &mut Character, quests: &[Quest], kind: &str, target: &str) {

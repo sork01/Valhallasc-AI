@@ -19,6 +19,8 @@ import math
 from pathlib import Path
 import random
 
+import progression_quests
+
 ROOT = Path(__file__).resolve().parents[1]
 PATH = ROOT / 'world/map.txt'
 LEVEL_XP = json.loads((ROOT / 'world/levels.txt').read_text())  # XP to next level; a quest pays a tenth
@@ -121,6 +123,7 @@ def quest_hub():
               'Clear three Rime Crabs and three Frostfang Wolves for the next sledge. Skadi offers this contract again after each turn-in.',
               [kill('crab', 3, 'Defeat Rime Crabs'), kill('wolf', 3, 'Defeat Frostfang Wolves')], 12, 280, 'crabs', True),
     ]
+    quests += progression_quests.for_zone('Rimeveil Glacier')
     objects = [
         dict(kind='tent', x=54, y=112, r=1.5, width=3, depth=2.4, color='#4f7fa8', label='Command'),
         dict(kind='tent', x=70, y=110, r=1.5, width=3, depth=2.4, color='#7a6fa3', label='Infirmary'),

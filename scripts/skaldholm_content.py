@@ -6,6 +6,8 @@ generator puts down; the generator checks that every one of them is reachable an
 import json
 from pathlib import Path
 
+import progression_quests
+
 ROOT = Path(__file__).resolve().parents[1]
 LEVEL_XP = json.loads((ROOT / 'world/levels.txt').read_text())  # XP to next level; a quest pays a tenth
 P = 'city_'
@@ -262,4 +264,4 @@ def quests():
         quest('order', 'The Guild’s Standing Order', 'guildmaster',
               'The guild always needs Magma Fangs and Rime Shells for its export crates. Bring three of each; Tobias will pay again every time you do. Repeatable.',
               [bring('magma_fang', 3, 'Magma Fangs'), bring('rime_shell', 3, 'Rime Shells')], 14, 540, 'welcome', True),
-    ]
+    ] + progression_quests.for_zone('Skaldholm')

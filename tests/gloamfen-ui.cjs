@@ -126,7 +126,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   // The journal: sixteen fen quests, local ones first, the first town conversation through real clicks.
   await page.keyboard.press('q');
   check(await page.locator('#quest-journal').isVisible() && (await page.locator('#quest-list [data-quest="welcome"]').textContent()).includes('is back in Greenmeadow'), 'Meadow quests explain that their givers are in Greenmeadow');
-  check(await page.locator('#quest-list [data-quest^="fen_"]').count() === 16 && await page.locator('#quest-list [data-quest^="rime_"]').count() === 13 && await page.locator('#quest-list [data-quest^="crags_"]').count() === 12, 'The journal lists all sixteen fen quests beside the thirteen glacier and twelve Crags quests');
+  check(await page.locator('#quest-list [data-quest^="fen_"]').count() === 17 && await page.locator('#quest-list [data-quest^="rime_"]').count() === 14 && await page.locator('#quest-list [data-quest^="crags_"]').count() === 13, 'The journal lists all seventeen fen quests beside the fourteen glacier and thirteen Crags quests');
   check(await page.locator('#quest-list .quest-card').first().getAttribute('data-quest') === 'fen_welcome', 'Local town quests sort first');
   check(await page.locator('#quest-list [data-quest="fen_crocs"]').textContent().then(t => t.includes('Locked') && t.includes('The Choir in the Reeds')), 'Later hunts explain their prerequisite');
   check(await page.locator('#quest-list [data-quest="fen_hydra_hunt"]').textContent().then(t => t.includes('Recommended level 20')), 'The journal shows each quest\'s recommended level');

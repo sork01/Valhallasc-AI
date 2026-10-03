@@ -22,6 +22,8 @@ import math
 from pathlib import Path
 import random
 
+import progression_quests
+
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -158,6 +160,7 @@ def quest_hub():
               [kill('knight', 4, 'Defeat Drowned Knights'), kill('hydra', 1, 'Defeat a Mire Hydra')], 19, 650, 'knights', True),
     ]
     house = lambda x, y, color, label: dict(kind='house', x=x, y=y, r=0, v=0, width=3.4, depth=3.2, color=color, label=label)
+    quests += progression_quests.for_zone('Gloamfen')
     objects = [
         dict(kind='chapel', x=50, y=13, r=0, v=0, width=3.4, depth=3.2, color='#5f7f78', label='Lantern Hall'),
         house(78, 13, '#7a5a8c', "Reeve's House"),
