@@ -18555,17 +18555,6 @@
         },
         {
           "kind": "bench",
-          "x": 103.82,
-          "y": 121.82,
-          "r": 0,
-          "v": 0,
-          "width": 1.5,
-          "depth": 0.45,
-          "color": "",
-          "label": ""
-        },
-        {
-          "kind": "bench",
           "x": 96.18,
           "y": 121.82,
           "r": 0,
@@ -18596,6 +18585,41 @@
           "depth": 0.45,
           "color": "",
           "label": ""
+        },
+        {
+          "kind": "post",
+          "x": 102.3,
+          "y": 121.6,
+          "r": 0.45,
+          "v": 0
+        },
+        {
+          "kind": "post",
+          "x": 106.5,
+          "y": 121.6,
+          "r": 0.45,
+          "v": 0
+        },
+        {
+          "kind": "post",
+          "x": 104.4,
+          "y": 119.7,
+          "r": 0.45,
+          "v": 0
+        },
+        {
+          "kind": "post",
+          "x": 102.5,
+          "y": 123.6,
+          "r": 0.45,
+          "v": 0
+        },
+        {
+          "kind": "post",
+          "x": 106.3,
+          "y": 123.6,
+          "r": 0.45,
+          "v": 0
         },
         {
           "kind": "lamp",
@@ -23292,13 +23316,6 @@
         },
         {
           "kind": "bush",
-          "x": 107.4,
-          "y": 123.0,
-          "r": 0.3,
-          "v": 3
-        },
-        {
-          "kind": "bush",
           "x": 106.0,
           "y": 112.6,
           "r": 0.3,
@@ -23726,17 +23743,17 @@
               "heal": 10000
             },
             {
-              "id": "buy_health_potion",
-              "label": "Buy Health Potion \u00b7 100 HP instantly",
-              "cost": 30,
-              "item": "health_potion",
-              "tiered": true
-            },
-            {
               "id": "buy_mana_potion",
               "label": "Buy Mana Potion \u00b7 100 mana instantly",
               "cost": 30,
               "item": "mana_potion",
+              "tiered": true
+            },
+            {
+              "id": "buy_health_potion",
+              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "cost": 30,
+              "item": "health_potion",
               "tiered": true
             }
           ],
@@ -23788,10 +23805,10 @@
           "id": "city_stonewarden",
           "name": "Stonewarden Magnus Hale",
           "role": "Keeper of the Meeting Stone",
-          "x": 97.6,
-          "y": 121.6,
+          "x": 97.0,
+          "y": 123.4,
           "color": "#5a7a9a",
-          "dialogue": "The Meeting Stone has stood here since before the walls. Wanderers who part at the Great Gate find each other again beside it. Gather your friends at the stone, and mind the runes \u2014 they are only as bright as the last gift they were given.",
+          "dialogue": "The Meeting Stone has stood here since before the walls. Wanderers who part at the Great Gate find each other again beside it. Gather your friends at the stone \u2014 and if you have too few, speak to the Stone itself: it will call fighters to your side for a fee. Mind the stairs beside it. They lead down to the Undervault, where the first Skalds sealed what they could not kill. Take five, and take a healer.",
           "offers": [],
           "buys": false,
           "look": {
@@ -23800,6 +23817,60 @@
             "style": "short",
             "beard": "#e8e8e8"
           }
+        },
+        {
+          "id": "city_meetingstone",
+          "name": "The Meeting Stone",
+          "role": "Gather your party",
+          "x": 101.7,
+          "y": 119.7,
+          "color": "#59d9ff",
+          "dialogue": "The runes brighten as you near. A voice that is not a voice offers you company: fighters of every calling answer the Stone for 250 gold apiece, and fight at your side until you dismiss them, leave your party or log out. A party holds five. The stairs beside the Stone lead down to the Undervault, a dungeon made for five heroes of level 20.",
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
+          "buys": false,
+          "art": "stone"
         },
         {
           "id": "city_gate_guard_w",
@@ -25470,6 +25541,4693 @@
           "to": 2,
           "tx": 73.0,
           "ty": 52.0
+        },
+        {
+          "id": "undervault_stairs",
+          "name": "the Stairs to the Undervault",
+          "x": 104.4,
+          "y": 122.0,
+          "r": 1.1,
+          "to": 5,
+          "tx": 15.0,
+          "ty": 111.0,
+          "look": "stairs_down"
+        }
+      ]
+    },
+    {
+      "name": "The Undervault",
+      "theme": "vault",
+      "tagline": "Beneath the Meeting Stone: a vault of bones, four wardens and a king",
+      "size": 128,
+      "levels": [
+        20,
+        20
+      ],
+      "players": 5,
+      "min_level": 20,
+      "copies": 4,
+      "final_boss": "hollowking",
+      "spawn": {
+        "x": 15.0,
+        "y": 111.0
+      },
+      "paths": [],
+      "rooms": [
+        [
+          6,
+          100,
+          32,
+          122
+        ],
+        [
+          32,
+          108,
+          48,
+          114
+        ],
+        [
+          48,
+          94,
+          80,
+          124
+        ],
+        [
+          80,
+          107,
+          90,
+          113
+        ],
+        [
+          90,
+          90,
+          122,
+          124
+        ],
+        [
+          102,
+          66,
+          110,
+          90
+        ],
+        [
+          80,
+          44,
+          122,
+          66
+        ],
+        [
+          60,
+          52,
+          80,
+          58
+        ],
+        [
+          22,
+          36,
+          60,
+          72
+        ],
+        [
+          38,
+          22,
+          46,
+          36
+        ],
+        [
+          8,
+          4,
+          58,
+          22
+        ],
+        [
+          58,
+          10,
+          68,
+          16
+        ],
+        [
+          68,
+          4,
+          100,
+          36
+        ],
+        [
+          100,
+          16,
+          106,
+          22
+        ],
+        [
+          106,
+          4,
+          124,
+          40
+        ]
+      ],
+      "objects": [
+        {
+          "kind": "vaultwall",
+          "x": 9.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 13.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 17.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 21.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 25.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 29.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 33.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 37.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 41.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 45.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 49.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 53.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 57.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 68.89,
+          "y": 3.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 72.67,
+          "y": 3.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 76.44,
+          "y": 3.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 80.22,
+          "y": 3.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 84.0,
+          "y": 3.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 87.78,
+          "y": 3.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 91.56,
+          "y": 3.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 95.33,
+          "y": 3.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 99.11,
+          "y": 3.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 107.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 111.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 115.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 119.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 123.0,
+          "y": 3.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 7.5,
+          "y": 5.9,
+          "r": 1.9,
+          "width": 1,
+          "depth": 3.8,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 7.5,
+          "y": 9.7,
+          "r": 1.9,
+          "width": 1,
+          "depth": 3.8,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 7.5,
+          "y": 13.5,
+          "r": 1.9,
+          "width": 1,
+          "depth": 3.8,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 7.5,
+          "y": 17.3,
+          "r": 1.9,
+          "width": 1,
+          "depth": 3.8,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 7.5,
+          "y": 21.1,
+          "r": 1.9,
+          "width": 1,
+          "depth": 3.8,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 58.5,
+          "y": 5.5,
+          "r": 1.5,
+          "width": 1,
+          "depth": 3.0,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 58.5,
+          "y": 8.5,
+          "r": 1.5,
+          "width": 1,
+          "depth": 3.0,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 67.5,
+          "y": 5.5,
+          "r": 1.5,
+          "width": 1,
+          "depth": 3.0,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 67.5,
+          "y": 8.5,
+          "r": 1.5,
+          "width": 1,
+          "depth": 3.0,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 100.5,
+          "y": 6.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 100.5,
+          "y": 10.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 100.5,
+          "y": 14.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 105.5,
+          "y": 6.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 105.5,
+          "y": 10.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 105.5,
+          "y": 14.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 124.5,
+          "y": 5.85,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 124.5,
+          "y": 9.55,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 124.5,
+          "y": 13.25,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 124.5,
+          "y": 16.95,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 124.5,
+          "y": 20.65,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 124.5,
+          "y": 24.35,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 124.5,
+          "y": 28.05,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 124.5,
+          "y": 31.75,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 124.5,
+          "y": 35.45,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 124.5,
+          "y": 39.15,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 61.0,
+          "y": 9.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 65.0,
+          "y": 9.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 103.0,
+          "y": 15.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 59.67,
+          "y": 16.5,
+          "r": 1.67,
+          "width": 3.33,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 63.0,
+          "y": 16.5,
+          "r": 1.67,
+          "width": 3.33,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 66.33,
+          "y": 16.5,
+          "r": 1.67,
+          "width": 3.33,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 58.5,
+          "y": 18.5,
+          "r": 1.5,
+          "width": 1,
+          "depth": 3.0,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 58.5,
+          "y": 21.5,
+          "r": 1.5,
+          "width": 1,
+          "depth": 3.0,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 67.5,
+          "y": 19.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 67.5,
+          "y": 23.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 67.5,
+          "y": 27.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 67.5,
+          "y": 31.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 67.5,
+          "y": 35.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 9.88,
+          "y": 22.5,
+          "r": 1.88,
+          "width": 3.75,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 13.62,
+          "y": 22.5,
+          "r": 1.88,
+          "width": 3.75,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 17.38,
+          "y": 22.5,
+          "r": 1.88,
+          "width": 3.75,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 21.12,
+          "y": 22.5,
+          "r": 1.88,
+          "width": 3.75,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 24.88,
+          "y": 22.5,
+          "r": 1.88,
+          "width": 3.75,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 28.62,
+          "y": 22.5,
+          "r": 1.88,
+          "width": 3.75,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 32.38,
+          "y": 22.5,
+          "r": 1.88,
+          "width": 3.75,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 36.12,
+          "y": 22.5,
+          "r": 1.88,
+          "width": 3.75,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 48.0,
+          "y": 22.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 52.0,
+          "y": 22.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 56.0,
+          "y": 22.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 101.5,
+          "y": 22.5,
+          "r": 1.5,
+          "width": 3.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 104.5,
+          "y": 22.5,
+          "r": 1.5,
+          "width": 3.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 37.5,
+          "y": 24.62,
+          "r": 1.62,
+          "width": 1,
+          "depth": 3.25,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 37.5,
+          "y": 27.88,
+          "r": 1.62,
+          "width": 1,
+          "depth": 3.25,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 37.5,
+          "y": 31.12,
+          "r": 1.62,
+          "width": 1,
+          "depth": 3.25,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 37.5,
+          "y": 34.38,
+          "r": 1.62,
+          "width": 1,
+          "depth": 3.25,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 46.5,
+          "y": 24.62,
+          "r": 1.62,
+          "width": 1,
+          "depth": 3.25,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 46.5,
+          "y": 27.88,
+          "r": 1.62,
+          "width": 1,
+          "depth": 3.25,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 46.5,
+          "y": 31.12,
+          "r": 1.62,
+          "width": 1,
+          "depth": 3.25,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 46.5,
+          "y": 34.38,
+          "r": 1.62,
+          "width": 1,
+          "depth": 3.25,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 100.5,
+          "y": 24.75,
+          "r": 1.75,
+          "width": 1,
+          "depth": 3.5,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 100.5,
+          "y": 28.25,
+          "r": 1.75,
+          "width": 1,
+          "depth": 3.5,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 100.5,
+          "y": 31.75,
+          "r": 1.75,
+          "width": 1,
+          "depth": 3.5,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 100.5,
+          "y": 35.25,
+          "r": 1.75,
+          "width": 1,
+          "depth": 3.5,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 105.5,
+          "y": 24.8,
+          "r": 1.8,
+          "width": 1,
+          "depth": 3.6,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 105.5,
+          "y": 28.4,
+          "r": 1.8,
+          "width": 1,
+          "depth": 3.6,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 105.5,
+          "y": 32.0,
+          "r": 1.8,
+          "width": 1,
+          "depth": 3.6,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 105.5,
+          "y": 35.6,
+          "r": 1.8,
+          "width": 1,
+          "depth": 3.6,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 105.5,
+          "y": 39.2,
+          "r": 1.8,
+          "width": 1,
+          "depth": 3.6,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 23.0,
+          "y": 35.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 27.0,
+          "y": 35.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 31.0,
+          "y": 35.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 35.0,
+          "y": 35.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 48.75,
+          "y": 35.5,
+          "r": 1.75,
+          "width": 3.5,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 52.25,
+          "y": 35.5,
+          "r": 1.75,
+          "width": 3.5,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 55.75,
+          "y": 35.5,
+          "r": 1.75,
+          "width": 3.5,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 59.25,
+          "y": 35.5,
+          "r": 1.75,
+          "width": 3.5,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 21.5,
+          "y": 37.85,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 21.5,
+          "y": 41.55,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 21.5,
+          "y": 45.25,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 21.5,
+          "y": 48.95,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 21.5,
+          "y": 52.65,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 21.5,
+          "y": 56.35,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 21.5,
+          "y": 60.05,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 21.5,
+          "y": 63.75,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 21.5,
+          "y": 67.45,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 21.5,
+          "y": 71.15,
+          "r": 1.85,
+          "width": 1,
+          "depth": 3.7,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 60.5,
+          "y": 38.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 60.5,
+          "y": 42.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 60.5,
+          "y": 46.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 60.5,
+          "y": 50.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 70.0,
+          "y": 36.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 74.0,
+          "y": 36.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 78.0,
+          "y": 36.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 82.0,
+          "y": 36.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 86.0,
+          "y": 36.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 90.0,
+          "y": 36.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 94.0,
+          "y": 36.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 98.0,
+          "y": 36.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 107.8,
+          "y": 40.5,
+          "r": 1.8,
+          "width": 3.6,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 111.4,
+          "y": 40.5,
+          "r": 1.8,
+          "width": 3.6,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 115.0,
+          "y": 40.5,
+          "r": 1.8,
+          "width": 3.6,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 118.6,
+          "y": 40.5,
+          "r": 1.8,
+          "width": 3.6,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.2,
+          "y": 40.5,
+          "r": 1.8,
+          "width": 3.6,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 81.0,
+          "y": 43.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 85.0,
+          "y": 43.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 89.0,
+          "y": 43.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 93.0,
+          "y": 43.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 97.0,
+          "y": 43.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 101.0,
+          "y": 43.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 105.0,
+          "y": 43.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 109.0,
+          "y": 43.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 113.0,
+          "y": 43.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 117.0,
+          "y": 43.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 121.0,
+          "y": 43.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 79.5,
+          "y": 46.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 79.5,
+          "y": 50.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 45.92,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 49.75,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 53.58,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 57.42,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 61.25,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 65.08,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 62.8,
+          "y": 51.5,
+          "r": 1.8,
+          "width": 3.6,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 66.4,
+          "y": 51.5,
+          "r": 1.8,
+          "width": 3.6,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 70.0,
+          "y": 51.5,
+          "r": 1.8,
+          "width": 3.6,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 73.6,
+          "y": 51.5,
+          "r": 1.8,
+          "width": 3.6,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 77.2,
+          "y": 51.5,
+          "r": 1.8,
+          "width": 3.6,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 62.0,
+          "y": 58.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 66.0,
+          "y": 58.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 70.0,
+          "y": 58.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 74.0,
+          "y": 58.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 78.0,
+          "y": 58.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 60.5,
+          "y": 60.75,
+          "r": 1.75,
+          "width": 1,
+          "depth": 3.5,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 60.5,
+          "y": 64.25,
+          "r": 1.75,
+          "width": 1,
+          "depth": 3.5,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 60.5,
+          "y": 67.75,
+          "r": 1.75,
+          "width": 1,
+          "depth": 3.5,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 60.5,
+          "y": 71.25,
+          "r": 1.75,
+          "width": 1,
+          "depth": 3.5,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 79.5,
+          "y": 61.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 79.5,
+          "y": 65.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 81.83,
+          "y": 66.5,
+          "r": 1.83,
+          "width": 3.67,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 85.5,
+          "y": 66.5,
+          "r": 1.83,
+          "width": 3.67,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 89.17,
+          "y": 66.5,
+          "r": 1.83,
+          "width": 3.67,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 92.83,
+          "y": 66.5,
+          "r": 1.83,
+          "width": 3.67,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 96.5,
+          "y": 66.5,
+          "r": 1.83,
+          "width": 3.67,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 100.17,
+          "y": 66.5,
+          "r": 1.83,
+          "width": 3.67,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 112.0,
+          "y": 66.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 116.0,
+          "y": 66.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 120.0,
+          "y": 66.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 101.5,
+          "y": 68.92,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 101.5,
+          "y": 72.75,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 101.5,
+          "y": 76.58,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 101.5,
+          "y": 80.42,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 101.5,
+          "y": 84.25,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 101.5,
+          "y": 88.08,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 110.5,
+          "y": 68.92,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 110.5,
+          "y": 72.75,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 110.5,
+          "y": 76.58,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 110.5,
+          "y": 80.42,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 110.5,
+          "y": 84.25,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 110.5,
+          "y": 88.08,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 23.9,
+          "y": 72.5,
+          "r": 1.9,
+          "width": 3.8,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 27.7,
+          "y": 72.5,
+          "r": 1.9,
+          "width": 3.8,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 31.5,
+          "y": 72.5,
+          "r": 1.9,
+          "width": 3.8,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 35.3,
+          "y": 72.5,
+          "r": 1.9,
+          "width": 3.8,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 39.1,
+          "y": 72.5,
+          "r": 1.9,
+          "width": 3.8,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 42.9,
+          "y": 72.5,
+          "r": 1.9,
+          "width": 3.8,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 46.7,
+          "y": 72.5,
+          "r": 1.9,
+          "width": 3.8,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 50.5,
+          "y": 72.5,
+          "r": 1.9,
+          "width": 3.8,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 54.3,
+          "y": 72.5,
+          "r": 1.9,
+          "width": 3.8,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 58.1,
+          "y": 72.5,
+          "r": 1.9,
+          "width": 3.8,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 91.0,
+          "y": 89.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 95.0,
+          "y": 89.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 99.0,
+          "y": 89.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 113.0,
+          "y": 89.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 117.0,
+          "y": 89.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 121.0,
+          "y": 89.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 89.5,
+          "y": 91.7,
+          "r": 1.7,
+          "width": 1,
+          "depth": 3.4,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 89.5,
+          "y": 95.1,
+          "r": 1.7,
+          "width": 1,
+          "depth": 3.4,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 89.5,
+          "y": 98.5,
+          "r": 1.7,
+          "width": 1,
+          "depth": 3.4,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 89.5,
+          "y": 101.9,
+          "r": 1.7,
+          "width": 1,
+          "depth": 3.4,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 89.5,
+          "y": 105.3,
+          "r": 1.7,
+          "width": 1,
+          "depth": 3.4,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 91.94,
+          "r": 1.94,
+          "width": 1,
+          "depth": 3.89,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 95.83,
+          "r": 1.94,
+          "width": 1,
+          "depth": 3.89,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 99.72,
+          "r": 1.94,
+          "width": 1,
+          "depth": 3.89,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 103.61,
+          "r": 1.94,
+          "width": 1,
+          "depth": 3.89,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 107.5,
+          "r": 1.94,
+          "width": 1,
+          "depth": 3.89,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 111.39,
+          "r": 1.94,
+          "width": 1,
+          "depth": 3.89,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 115.28,
+          "r": 1.94,
+          "width": 1,
+          "depth": 3.89,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 119.17,
+          "r": 1.94,
+          "width": 1,
+          "depth": 3.89,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 122.5,
+          "y": 123.06,
+          "r": 1.94,
+          "width": 1,
+          "depth": 3.89,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 48.89,
+          "y": 93.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 52.67,
+          "y": 93.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 56.44,
+          "y": 93.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 60.22,
+          "y": 93.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 64.0,
+          "y": 93.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 67.78,
+          "y": 93.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 71.56,
+          "y": 93.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 75.33,
+          "y": 93.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 79.11,
+          "y": 93.5,
+          "r": 1.89,
+          "width": 3.78,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 47.5,
+          "y": 95.75,
+          "r": 1.75,
+          "width": 1,
+          "depth": 3.5,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 47.5,
+          "y": 99.25,
+          "r": 1.75,
+          "width": 1,
+          "depth": 3.5,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 47.5,
+          "y": 102.75,
+          "r": 1.75,
+          "width": 1,
+          "depth": 3.5,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 47.5,
+          "y": 106.25,
+          "r": 1.75,
+          "width": 1,
+          "depth": 3.5,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 80.5,
+          "y": 95.62,
+          "r": 1.62,
+          "width": 1,
+          "depth": 3.25,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 80.5,
+          "y": 98.88,
+          "r": 1.62,
+          "width": 1,
+          "depth": 3.25,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 80.5,
+          "y": 102.12,
+          "r": 1.62,
+          "width": 1,
+          "depth": 3.25,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 80.5,
+          "y": 105.38,
+          "r": 1.62,
+          "width": 1,
+          "depth": 3.25,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 7.0,
+          "y": 99.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 11.0,
+          "y": 99.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 15.0,
+          "y": 99.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 19.0,
+          "y": 99.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 23.0,
+          "y": 99.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 27.0,
+          "y": 99.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 31.0,
+          "y": 99.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 5.5,
+          "y": 101.92,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 5.5,
+          "y": 105.75,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 5.5,
+          "y": 109.58,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 5.5,
+          "y": 113.42,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 5.5,
+          "y": 117.25,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 5.5,
+          "y": 121.08,
+          "r": 1.92,
+          "width": 1,
+          "depth": 3.83,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 32.5,
+          "y": 102.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 32.5,
+          "y": 106.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 83.0,
+          "y": 106.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 87.0,
+          "y": 106.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 34.75,
+          "y": 107.5,
+          "r": 1.75,
+          "width": 3.5,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 38.25,
+          "y": 107.5,
+          "r": 1.75,
+          "width": 3.5,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 41.75,
+          "y": 107.5,
+          "r": 1.75,
+          "width": 3.5,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 45.25,
+          "y": 107.5,
+          "r": 1.75,
+          "width": 3.5,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 81.67,
+          "y": 113.5,
+          "r": 1.67,
+          "width": 3.33,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 85.0,
+          "y": 113.5,
+          "r": 1.67,
+          "width": 3.33,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 88.33,
+          "y": 113.5,
+          "r": 1.67,
+          "width": 3.33,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 34.0,
+          "y": 114.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 38.0,
+          "y": 114.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 42.0,
+          "y": 114.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 46.0,
+          "y": 114.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 80.5,
+          "y": 115.83,
+          "r": 1.83,
+          "width": 1,
+          "depth": 3.67,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 80.5,
+          "y": 119.5,
+          "r": 1.83,
+          "width": 1,
+          "depth": 3.67,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 80.5,
+          "y": 123.17,
+          "r": 1.83,
+          "width": 1,
+          "depth": 3.67,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 89.5,
+          "y": 115.83,
+          "r": 1.83,
+          "width": 1,
+          "depth": 3.67,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 89.5,
+          "y": 119.5,
+          "r": 1.83,
+          "width": 1,
+          "depth": 3.67,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 89.5,
+          "y": 123.17,
+          "r": 1.83,
+          "width": 1,
+          "depth": 3.67,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 32.5,
+          "y": 117.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 32.5,
+          "y": 121.0,
+          "r": 2.0,
+          "width": 1,
+          "depth": 4.0,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 47.5,
+          "y": 116.67,
+          "r": 1.67,
+          "width": 1,
+          "depth": 3.33,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 47.5,
+          "y": 120.0,
+          "r": 1.67,
+          "width": 1,
+          "depth": 3.33,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 47.5,
+          "y": 123.33,
+          "r": 1.67,
+          "width": 1,
+          "depth": 3.33,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 7.86,
+          "y": 122.5,
+          "r": 1.86,
+          "width": 3.71,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 11.57,
+          "y": 122.5,
+          "r": 1.86,
+          "width": 3.71,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 15.29,
+          "y": 122.5,
+          "r": 1.86,
+          "width": 3.71,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 19.0,
+          "y": 122.5,
+          "r": 1.86,
+          "width": 3.71,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 22.71,
+          "y": 122.5,
+          "r": 1.86,
+          "width": 3.71,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 26.43,
+          "y": 122.5,
+          "r": 1.86,
+          "width": 3.71,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 30.14,
+          "y": 122.5,
+          "r": 1.86,
+          "width": 3.71,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 50.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 54.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 58.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 62.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 66.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 70.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 74.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 78.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 92.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 3
+        },
+        {
+          "kind": "vaultwall",
+          "x": 96.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 100.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 104.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 108.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 2
+        },
+        {
+          "kind": "vaultwall",
+          "x": 112.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "vaultwall",
+          "x": 116.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 1
+        },
+        {
+          "kind": "vaultwall",
+          "x": 120.0,
+          "y": 124.5,
+          "r": 2.0,
+          "width": 4.0,
+          "depth": 1,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 51.5,
+          "y": 97.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 51.5,
+          "y": 121.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 65.5,
+          "y": 97.0,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 72.5,
+          "y": 97.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 72.5,
+          "y": 121.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 77.0,
+          "y": 97.5,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 77.0,
+          "y": 104.5,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 51.0,
+          "y": 118.5,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 77.0,
+          "y": 118.5,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 93.5,
+          "y": 93.0,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 93.5,
+          "y": 121.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 100.5,
+          "y": 93.0,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 100.5,
+          "y": 121.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 107.5,
+          "y": 93.0,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 107.5,
+          "y": 121.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 114.5,
+          "y": 93.0,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 114.5,
+          "y": 121.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 119.0,
+          "y": 93.5,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 93.0,
+          "y": 100.5,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 119.0,
+          "y": 100.5,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 93.0,
+          "y": 107.5,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 119.0,
+          "y": 107.5,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 93.0,
+          "y": 114.5,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 119.0,
+          "y": 114.5,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 83.5,
+          "y": 47.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 83.5,
+          "y": 63.0,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 90.5,
+          "y": 47.0,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 90.5,
+          "y": 63.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 97.5,
+          "y": 47.0,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 97.5,
+          "y": 63.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 104.5,
+          "y": 63.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 111.5,
+          "y": 47.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 111.5,
+          "y": 63.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 118.5,
+          "y": 47.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 25.5,
+          "y": 39.0,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 25.5,
+          "y": 69.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 32.5,
+          "y": 39.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 32.5,
+          "y": 69.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 39.5,
+          "y": 39.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 39.5,
+          "y": 69.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 46.5,
+          "y": 39.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 46.5,
+          "y": 69.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 53.5,
+          "y": 39.0,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 53.5,
+          "y": 69.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 57.0,
+          "y": 39.5,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 25.0,
+          "y": 46.5,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 57.0,
+          "y": 46.5,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 25.0,
+          "y": 60.5,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 57.0,
+          "y": 60.5,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 57.0,
+          "y": 67.5,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 11.5,
+          "y": 7.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 11.5,
+          "y": 19.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 18.5,
+          "y": 7.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 18.5,
+          "y": 19.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 25.5,
+          "y": 7.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 25.5,
+          "y": 19.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 32.5,
+          "y": 7.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 32.5,
+          "y": 19.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 39.5,
+          "y": 7.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 39.5,
+          "y": 19.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 46.5,
+          "y": 19.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 53.5,
+          "y": 19.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 71.5,
+          "y": 7.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 78.5,
+          "y": 7.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 78.5,
+          "y": 33.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 85.5,
+          "y": 7.0,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 85.5,
+          "y": 33.0,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 92.5,
+          "y": 7.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 92.5,
+          "y": 33.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 97.0,
+          "y": 7.5,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 71.0,
+          "y": 14.5,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 97.0,
+          "y": 14.5,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 71.0,
+          "y": 21.5,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 97.0,
+          "y": 21.5,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 97.0,
+          "y": 28.5,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 109.5,
+          "y": 7.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 109.5,
+          "y": 37.0,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 116.5,
+          "y": 7.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 116.5,
+          "y": 37.0,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 121.0,
+          "y": 7.5,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 109.0,
+          "y": 14.5,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 121.0,
+          "y": 14.5,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 109.0,
+          "y": 21.5,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 121.0,
+          "y": 21.5,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 109.0,
+          "y": 28.5,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 121.0,
+          "y": 28.5,
+          "r": 0.7,
+          "v": 0
+        },
+        {
+          "kind": "pillar",
+          "x": 121.0,
+          "y": 35.5,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 73.39,
+          "y": 117.36,
+          "r": 0.9,
+          "v": 1
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 62.4,
+          "y": 103.67,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 69.44,
+          "y": 117.74,
+          "r": 0.9,
+          "v": 2
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 74.72,
+          "y": 101.46,
+          "r": 0.9,
+          "v": 1
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 70.03,
+          "y": 100.12,
+          "r": 0.9,
+          "v": 3
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 101.27,
+          "y": 59.46,
+          "r": 0.9,
+          "v": 3
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 107.56,
+          "y": 56.12,
+          "r": 0.9,
+          "v": 2
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 85.64,
+          "y": 59.83,
+          "r": 0.9,
+          "v": 2
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 108.05,
+          "y": 60.48,
+          "r": 0.9,
+          "v": 1
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 96.49,
+          "y": 59.56,
+          "r": 0.9,
+          "v": 3
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 114.55,
+          "y": 49.9,
+          "r": 0.9,
+          "v": 2
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 111.04,
+          "y": 53.78,
+          "r": 0.9,
+          "v": 1
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 34.81,
+          "y": 65.47,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 43.85,
+          "y": 49.22,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 47.52,
+          "y": 45.96,
+          "r": 0.9,
+          "v": 2
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 42.7,
+          "y": 41.43,
+          "r": 0.9,
+          "v": 3
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 51.15,
+          "y": 56.65,
+          "r": 0.9,
+          "v": 3
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 52.24,
+          "y": 63.87,
+          "r": 0.9,
+          "v": 3
+        },
+        {
+          "kind": "sarcophagus",
+          "x": 42.56,
+          "y": 45.54,
+          "r": 0.9,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 23.17,
+          "y": 9.98,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 41.28,
+          "y": 11.24,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "pillar",
+          "x": 42.81,
+          "y": 14.49,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 22.68,
+          "y": 16.21,
+          "r": 0.7,
+          "v": 1
+        },
+        {
+          "kind": "pillar",
+          "x": 49.83,
+          "y": 16.8,
+          "r": 0.7,
+          "v": 2
+        },
+        {
+          "kind": "pillar",
+          "x": 38.09,
+          "y": 10.01,
+          "r": 0.7,
+          "v": 3
+        },
+        {
+          "kind": "brazier",
+          "x": 76.22,
+          "y": 16.26,
+          "r": 0.5,
+          "v": 1
+        },
+        {
+          "kind": "brazier",
+          "x": 74.03,
+          "y": 19.71,
+          "r": 0.5,
+          "v": 1
+        },
+        {
+          "kind": "brazier",
+          "x": 80.2,
+          "y": 11.41,
+          "r": 0.5,
+          "v": 2
+        },
+        {
+          "kind": "brazier",
+          "x": 94.52,
+          "y": 9.57,
+          "r": 0.5,
+          "v": 0
+        },
+        {
+          "kind": "brazier",
+          "x": 108.57,
+          "y": 115.76,
+          "r": 0.5,
+          "v": 1
+        },
+        {
+          "kind": "brazier",
+          "x": 100.42,
+          "y": 98.21,
+          "r": 0.5,
+          "v": 2
+        },
+        {
+          "kind": "brazier",
+          "x": 95.67,
+          "y": 111.68,
+          "r": 0.5,
+          "v": 1
+        },
+        {
+          "kind": "brazier",
+          "x": 112.77,
+          "y": 34.71,
+          "r": 0.5,
+          "v": 0
+        },
+        {
+          "kind": "brazier",
+          "x": 118.76,
+          "y": 33.06,
+          "r": 0.5,
+          "v": 3
+        },
+        {
+          "kind": "brazier",
+          "x": 111.07,
+          "y": 32.46,
+          "r": 0.5,
+          "v": 2
+        },
+        {
+          "kind": "brazier",
+          "x": 111.15,
+          "y": 25.38,
+          "r": 0.5,
+          "v": 1
+        },
+        {
+          "kind": "brazier",
+          "x": 11.0,
+          "y": 107.6,
+          "r": 0.5,
+          "v": 2
+        },
+        {
+          "kind": "brazier",
+          "x": 11.0,
+          "y": 114.4,
+          "r": 0.5,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 30.18,
+          "y": 102.92,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 107.35,
+          "y": 83.38,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 119.98,
+          "y": 30.33,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 111.28,
+          "y": 100.78,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 96.0,
+          "y": 106.99,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 50.05,
+          "y": 104.55,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 105.36,
+          "y": 116.2,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 109.05,
+          "y": 64.12,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 52.28,
+          "y": 58.1,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 114.82,
+          "y": 6.98,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 115.27,
+          "y": 33.75,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 39.74,
+          "y": 28.37,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 105.8,
+          "y": 82.93,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 99.65,
+          "y": 57.18,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 65.88,
+          "y": 114.25,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 37.18,
+          "y": 111.87,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 116.42,
+          "y": 119.85,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 105.64,
+          "y": 76.93,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 69.47,
+          "y": 119.56,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 118.39,
+          "y": 35.35,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 106.64,
+          "y": 77.78,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 104.46,
+          "y": 112.99,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 113.28,
+          "y": 8.02,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 114.87,
+          "y": 37.95,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 70.35,
+          "y": 113.09,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 39.76,
+          "y": 110.91,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 37.26,
+          "y": 109.73,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 116.66,
+          "y": 18.37,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 36.43,
+          "y": 18.98,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 120.88,
+          "y": 18.87,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 119.05,
+          "y": 18.91,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 39.69,
+          "y": 8.98,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 53.75,
+          "y": 116.28,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 74.91,
+          "y": 56.39,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 73.51,
+          "y": 54.69,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 92.28,
+          "y": 62.65,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 102.12,
+          "y": 95.9,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 103.03,
+          "y": 98.02,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 17.91,
+          "y": 115.01,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 38.47,
+          "y": 111.2,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 46.89,
+          "y": 49.49,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 20.46,
+          "y": 120.2,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 34.45,
+          "y": 68.6,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 103.69,
+          "y": 83.5,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 102.06,
+          "y": 103.64,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 68.2,
+          "y": 97.52,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 105.4,
+          "y": 59.01,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 69.74,
+          "y": 102.39,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 122.04,
+          "y": 29.87,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 43.12,
+          "y": 53.82,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 23.85,
+          "y": 47.69,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 9.5,
+          "y": 103.44,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 42.43,
+          "y": 28.17,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 105.2,
+          "y": 114.08,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "bones",
+          "x": 55.24,
+          "y": 63.12,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 22.65,
+          "y": 14.18,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 85.78,
+          "y": 55.52,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "bones",
+          "x": 89.19,
+          "y": 60.82,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 77.14,
+          "y": 107.46,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "bones",
+          "x": 44.55,
+          "y": 20.13,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "bones",
+          "x": 64.97,
+          "y": 104.91,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 11.0,
+          "y": 100.5,
+          "r": 0.2,
+          "v": 0
+        },
+        {
+          "kind": "torch",
+          "x": 11.0,
+          "y": 121.5,
+          "r": 0.2,
+          "v": 0
+        },
+        {
+          "kind": "torch",
+          "x": 20.0,
+          "y": 100.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 20.0,
+          "y": 121.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 53.0,
+          "y": 94.5,
+          "r": 0.2,
+          "v": 2
+        },
+        {
+          "kind": "torch",
+          "x": 53.0,
+          "y": 123.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 62.0,
+          "y": 94.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 71.0,
+          "y": 94.5,
+          "r": 0.2,
+          "v": 2
+        },
+        {
+          "kind": "torch",
+          "x": 71.0,
+          "y": 123.5,
+          "r": 0.2,
+          "v": 0
+        },
+        {
+          "kind": "torch",
+          "x": 95.0,
+          "y": 90.5,
+          "r": 0.2,
+          "v": 0
+        },
+        {
+          "kind": "torch",
+          "x": 95.0,
+          "y": 123.5,
+          "r": 0.2,
+          "v": 1
+        },
+        {
+          "kind": "torch",
+          "x": 104.0,
+          "y": 123.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 113.0,
+          "y": 90.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 113.0,
+          "y": 123.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 85.0,
+          "y": 44.5,
+          "r": 0.2,
+          "v": 1
+        },
+        {
+          "kind": "torch",
+          "x": 85.0,
+          "y": 65.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 94.0,
+          "y": 44.5,
+          "r": 0.2,
+          "v": 1
+        },
+        {
+          "kind": "torch",
+          "x": 94.0,
+          "y": 65.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 103.0,
+          "y": 44.5,
+          "r": 0.2,
+          "v": 2
+        },
+        {
+          "kind": "torch",
+          "x": 112.0,
+          "y": 44.5,
+          "r": 0.2,
+          "v": 1
+        },
+        {
+          "kind": "torch",
+          "x": 112.0,
+          "y": 65.5,
+          "r": 0.2,
+          "v": 2
+        },
+        {
+          "kind": "torch",
+          "x": 27.0,
+          "y": 36.5,
+          "r": 0.2,
+          "v": 1
+        },
+        {
+          "kind": "torch",
+          "x": 27.0,
+          "y": 71.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 36.0,
+          "y": 36.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 36.0,
+          "y": 71.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 45.0,
+          "y": 71.5,
+          "r": 0.2,
+          "v": 2
+        },
+        {
+          "kind": "torch",
+          "x": 54.0,
+          "y": 36.5,
+          "r": 0.2,
+          "v": 1
+        },
+        {
+          "kind": "torch",
+          "x": 54.0,
+          "y": 71.5,
+          "r": 0.2,
+          "v": 1
+        },
+        {
+          "kind": "torch",
+          "x": 13.0,
+          "y": 4.5,
+          "r": 0.2,
+          "v": 1
+        },
+        {
+          "kind": "torch",
+          "x": 13.0,
+          "y": 21.5,
+          "r": 0.2,
+          "v": 0
+        },
+        {
+          "kind": "torch",
+          "x": 22.0,
+          "y": 4.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 22.0,
+          "y": 21.5,
+          "r": 0.2,
+          "v": 2
+        },
+        {
+          "kind": "torch",
+          "x": 31.0,
+          "y": 4.5,
+          "r": 0.2,
+          "v": 2
+        },
+        {
+          "kind": "torch",
+          "x": 31.0,
+          "y": 21.5,
+          "r": 0.2,
+          "v": 2
+        },
+        {
+          "kind": "torch",
+          "x": 40.0,
+          "y": 4.5,
+          "r": 0.2,
+          "v": 2
+        },
+        {
+          "kind": "torch",
+          "x": 49.0,
+          "y": 4.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 49.0,
+          "y": 21.5,
+          "r": 0.2,
+          "v": 1
+        },
+        {
+          "kind": "torch",
+          "x": 73.0,
+          "y": 4.5,
+          "r": 0.2,
+          "v": 1
+        },
+        {
+          "kind": "torch",
+          "x": 73.0,
+          "y": 35.5,
+          "r": 0.2,
+          "v": 0
+        },
+        {
+          "kind": "torch",
+          "x": 82.0,
+          "y": 4.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 82.0,
+          "y": 35.5,
+          "r": 0.2,
+          "v": 2
+        },
+        {
+          "kind": "torch",
+          "x": 91.0,
+          "y": 4.5,
+          "r": 0.2,
+          "v": 0
+        },
+        {
+          "kind": "torch",
+          "x": 91.0,
+          "y": 35.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 111.0,
+          "y": 4.5,
+          "r": 0.2,
+          "v": 3
+        },
+        {
+          "kind": "torch",
+          "x": 111.0,
+          "y": 39.5,
+          "r": 0.2,
+          "v": 0
+        },
+        {
+          "kind": "torch",
+          "x": 6.5,
+          "y": 105,
+          "r": 0.2,
+          "v": 2
+        },
+        {
+          "kind": "torch",
+          "x": 6.5,
+          "y": 117,
+          "r": 0.2,
+          "v": 2
+        }
+      ],
+      "slimes": [
+        {
+          "x": 55.2,
+          "y": 99.8,
+          "kind": "thrall"
+        },
+        {
+          "x": 58.8,
+          "y": 99.8,
+          "kind": "thrall"
+        },
+        {
+          "x": 57,
+          "y": 102.6,
+          "kind": "thrall"
+        },
+        {
+          "x": 54.2,
+          "y": 105.2,
+          "kind": "archer"
+        },
+        {
+          "x": 70.2,
+          "y": 106.8,
+          "kind": "thrall"
+        },
+        {
+          "x": 73.8,
+          "y": 106.8,
+          "kind": "thrall"
+        },
+        {
+          "x": 72,
+          "y": 109.6,
+          "kind": "thrall"
+        },
+        {
+          "x": 74.8,
+          "y": 112.2,
+          "kind": "archer"
+        },
+        {
+          "x": 58.2,
+          "y": 115.8,
+          "kind": "thrall"
+        },
+        {
+          "x": 61.8,
+          "y": 115.8,
+          "kind": "thrall"
+        },
+        {
+          "x": 57.8,
+          "y": 120.4,
+          "kind": "archer"
+        },
+        {
+          "x": 62.2,
+          "y": 120.4,
+          "kind": "archer"
+        },
+        {
+          "x": 90,
+          "y": 57,
+          "kind": "thrall"
+        },
+        {
+          "x": 93.2,
+          "y": 55.6,
+          "kind": "thrall"
+        },
+        {
+          "x": 88.2,
+          "y": 52.6,
+          "kind": "acolyte"
+        },
+        {
+          "x": 91.8,
+          "y": 52,
+          "kind": "acolyte"
+        },
+        {
+          "x": 102.2,
+          "y": 53.8,
+          "kind": "thrall"
+        },
+        {
+          "x": 100.8,
+          "y": 50.2,
+          "kind": "archer"
+        },
+        {
+          "x": 107.2,
+          "y": 50.2,
+          "kind": "archer"
+        },
+        {
+          "x": 104,
+          "y": 48.4,
+          "kind": "acolyte"
+        },
+        {
+          "x": 114,
+          "y": 58,
+          "kind": "thrall"
+        },
+        {
+          "x": 116.6,
+          "y": 60.2,
+          "kind": "thrall"
+        },
+        {
+          "x": 118.4,
+          "y": 56.4,
+          "kind": "archer"
+        },
+        {
+          "x": 116.4,
+          "y": 54.8,
+          "kind": "acolyte"
+        },
+        {
+          "x": 70,
+          "y": 54,
+          "kind": "thrall"
+        },
+        {
+          "x": 70,
+          "y": 56,
+          "kind": "thrall"
+        },
+        {
+          "x": 44.2,
+          "y": 61,
+          "kind": "acolyte"
+        },
+        {
+          "x": 47.8,
+          "y": 61,
+          "kind": "acolyte"
+        },
+        {
+          "x": 46,
+          "y": 58.4,
+          "kind": "archer"
+        },
+        {
+          "x": 17.8,
+          "y": 12,
+          "kind": "thrall"
+        },
+        {
+          "x": 17.8,
+          "y": 15.2,
+          "kind": "thrall"
+        },
+        {
+          "x": 14.4,
+          "y": 12.8,
+          "kind": "archer"
+        },
+        {
+          "x": 14.4,
+          "y": 15.2,
+          "kind": "acolyte"
+        },
+        {
+          "x": 30,
+          "y": 16,
+          "kind": "thrall"
+        },
+        {
+          "x": 33.2,
+          "y": 14.6,
+          "kind": "thrall"
+        },
+        {
+          "x": 28.2,
+          "y": 11.6,
+          "kind": "acolyte"
+        },
+        {
+          "x": 31.8,
+          "y": 11,
+          "kind": "archer"
+        },
+        {
+          "x": 47.6,
+          "y": 11,
+          "kind": "thrall"
+        },
+        {
+          "x": 50.8,
+          "y": 11.4,
+          "kind": "thrall"
+        },
+        {
+          "x": 46.2,
+          "y": 7.4,
+          "kind": "archer"
+        },
+        {
+          "x": 51.8,
+          "y": 7.4,
+          "kind": "acolyte"
+        },
+        {
+          "x": 63,
+          "y": 12,
+          "kind": "thrall"
+        },
+        {
+          "x": 63,
+          "y": 14,
+          "kind": "thrall"
+        },
+        {
+          "x": 76,
+          "y": 26.4,
+          "kind": "thrall"
+        },
+        {
+          "x": 78.6,
+          "y": 28.8,
+          "kind": "thrall"
+        },
+        {
+          "x": 73.8,
+          "y": 30.6,
+          "kind": "archer"
+        },
+        {
+          "x": 112.0,
+          "y": 104.0,
+          "kind": "gatewarden"
+        },
+        {
+          "x": 30.0,
+          "y": 54.0,
+          "kind": "choir"
+        },
+        {
+          "x": 88.0,
+          "y": 20.0,
+          "kind": "colossus"
+        },
+        {
+          "x": 116.0,
+          "y": 15.0,
+          "kind": "hollowking"
+        }
+      ],
+      "portals": [
+        {
+          "id": "undervault_stairs_up",
+          "name": "the Stairs Up",
+          "x": 9.6,
+          "y": 111.0,
+          "r": 1.15,
+          "to": 4,
+          "tx": 104.2,
+          "ty": 125.4,
+          "look": "stairs_up"
+        },
+        {
+          "id": "undervault_exit",
+          "name": "the Way Out",
+          "x": 115.0,
+          "y": 29.0,
+          "r": 1.3,
+          "to": 4,
+          "tx": 104.2,
+          "ty": 125.4,
+          "after_clear": true,
+          "look": "exit"
         }
       ]
     }

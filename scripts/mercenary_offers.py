@@ -7,6 +7,8 @@ BLURB = {'warrior': 'holds the line', 'mage': 'casts from range', 'assassin': 's
          'priest': 'heals the party', 'hunter': 'shoots from range'}
 
 
-def offers():
-    hire = [dict(id='merc_' + c, label=f'Hire a {c.capitalize()} mercenary · {BLURB[c]}', cost=COST, merc=c) for c in CLASSES]
+def offers(open_=False):
+    """`open_`: the Meeting Stone's offers, which need no quest (any party of up to five may rent fighters)."""
+    hire = [dict(id='merc_' + c, label=f'Hire a {c.capitalize()} mercenary · {BLURB[c]}', cost=COST, merc=c, **(dict(open=True) if open_ else {}))
+            for c in CLASSES]
     return hire + [dict(id='merc_dismiss', label='Send my mercenaries away', cost=0, merc='dismiss')]

@@ -531,16 +531,21 @@ impl Character {
         xp_to_level(self.level)
     }
     /// Marks the map cell under the character as seen; true when it was new.
+    #[cfg(test)]
     pub fn explore(&mut self, size: u32) -> bool {
+        self.explore_in(self.zone, size)
+    }
+    /// The same for zone `zone` (a private dungeon copy marks its template's fog).
+    pub fn explore_in(&mut self, zone: usize, size: u32) -> bool {
         let cell = |v: f64| {
             ((v / size as f64 * FOG_GRID as f64).floor().max(0.) as usize).min(FOG_GRID - 1)
         };
         let bit = 1u16 << (cell(self.y) * FOG_GRID + cell(self.x));
-        if self.explored.len() <= self.zone {
-            self.explored.resize(self.zone + 1, 0);
+        if self.explored.len() <= zone {
+            self.explored.resize(zone + 1, 0);
         }
-        let fresh = self.explored[self.zone] & bit == 0;
-        self.explored[self.zone] |= bit;
+        let fresh = self.explored[zone] & bit == 0;
+        self.explored[zone] |= bit;
         fresh
     }
     pub fn point(&self) -> Point {
@@ -979,6 +984,9 @@ pub struct Offer {
     /// A mercenary the offer rents: a class name, or "dismiss" to send them all away (see world/mercs.rs).
     #[serde(default)]
     pub merc: Option<String>,
+    /// A mercenary offer that needs no quest: it only asks for gold and a free seat in a party of five (the Meeting Stone).
+    #[serde(default)]
+    pub open: bool,
     /// Sells the best tier of the item's family for the buyer's level, at that tier's price (potions and food).
     #[serde(default)]
     pub tiered: bool,
@@ -1074,6 +1082,9 @@ pub struct Portal {
     pub to: usize,
     pub tx: f64,
     pub ty: f64,
+    /// Only usable once the instance it stands in has been cleared (its final boss is down).
+    #[serde(default)]
+    pub after_clear: bool,
 }
 #[derive(Clone, Deserialize)]
 pub struct Map {
@@ -1096,6 +1107,22 @@ pub struct Map {
     /// Further zones; only the top-level map carries them, as zones 1, 2, ...
     #[serde(default)]
     pub zones: Vec<Map>,
+    /// A dungeon: how many private copies of this zone exist (0 for an ordinary shared zone). The zone itself is
+    /// the first copy and the world appends the rest, each with `template` set (see world/instances.rs).
+    #[serde(default)]
+    pub copies: u32,
+    /// The enemy kind whose death clears the dungeon and opens its `after_clear` portals.
+    #[serde(default)]
+    pub final_boss: String,
+    /// A dungeon's recommended party size (shown when its door is used).
+    #[serde(default)]
+    pub players: u32,
+    /// The character level a dungeon's door asks for; a lower level cannot step in (0: anyone may).
+    #[serde(default)]
+    pub min_level: u32,
+    /// Set by the world on the extra copies of a dungeon: the zone they copy.
+    #[serde(skip)]
+    pub template: Option<usize>,
 }
 impl Default for Map {
     fn default() -> Self {
@@ -1233,6 +1260,11 @@ mod tests {
             portals: vec![],
             levels: None,
             zones: vec![],
+            copies: 0,
+            final_boss: String::new(),
+            players: 0,
+            min_level: 0,
+            template: None,
             objects: vec![Obstacle {
                 x: 5.,
                 y: 5.,

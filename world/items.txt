@@ -9269,5 +9269,592 @@
     "attack": 20.0,
     "defense": 4.0,
     "starter": false
+  },
+  {
+    "id": "crypt_bone",
+    "name": "Crypt Bone",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 90
+  },
+  {
+    "id": "bone_fletching",
+    "name": "Bone Fletching",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 95
+  },
+  {
+    "id": "hollow_ash",
+    "name": "Hollow Ash",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 105
+  },
+  {
+    "id": "wardens_signet",
+    "name": "Gatewarden's Signet",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 600
+  },
+  {
+    "id": "hollow_chime",
+    "name": "Hollow Chime",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 700
+  },
+  {
+    "id": "runed_keystone",
+    "name": "Runed Keystone",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 800
+  },
+  {
+    "id": "crown_shard",
+    "name": "Shard of the Hollow Crown",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "warrior_armor_crimson_l20_vault",
+    "name": "Hollowsteel Cuirass",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "warrior",
+    "variant": "crimson_l20_vault",
+    "art": "crimson",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "source": "undervault"
+  },
+  {
+    "id": "warrior_headgear_crimson_l20_vault",
+    "name": "Hollowsteel Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "warrior",
+    "variant": "crimson_l20_vault",
+    "art": "crimson",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l20_vault",
+    "name": "Hollowsteel Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "warrior",
+    "variant": "crimson_l20_vault",
+    "art": "crimson",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "warrior_gloves_crimson_l20_vault",
+    "name": "Hollowsteel Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "warrior",
+    "variant": "crimson_l20_vault",
+    "art": "crimson",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "warrior_weapon_sword_l20_vault",
+    "name": "Verdigris Greatsword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "warrior",
+    "variant": "sword_l20_vault",
+    "art": "sword",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 21.6,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "mage_armor_apprentice_l20_vault",
+    "name": "Wardweaver Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "mage",
+    "variant": "apprentice_l20_vault",
+    "art": "apprentice",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 10.8,
+    "source": "undervault"
+  },
+  {
+    "id": "mage_headgear_apprentice_l20_vault",
+    "name": "Wardweaver's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "mage",
+    "variant": "apprentice_l20_vault",
+    "art": "apprentice",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l20_vault",
+    "name": "Wardweaver's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "mage",
+    "variant": "apprentice_l20_vault",
+    "art": "apprentice",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "mage_gloves_apprentice_l20_vault",
+    "name": "Wardweaver's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "mage",
+    "variant": "apprentice_l20_vault",
+    "art": "apprentice",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "mage_weapon_ash_l20_vault",
+    "name": "Wraithwood Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "mage",
+    "variant": "ash_l20_vault",
+    "art": "ash",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 21.6,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "assassin_armor_shadow_l20_vault",
+    "name": "Gravewalker Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "assassin",
+    "variant": "shadow_l20_vault",
+    "art": "shadow",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 10.8,
+    "source": "undervault"
+  },
+  {
+    "id": "assassin_headgear_shadow_l20_vault",
+    "name": "Gravewalker Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "assassin",
+    "variant": "shadow_l20_vault",
+    "art": "shadow",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l20_vault",
+    "name": "Gravewalker Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "assassin",
+    "variant": "shadow_l20_vault",
+    "art": "shadow",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "assassin_gloves_shadow_l20_vault",
+    "name": "Gravewalker Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "assassin",
+    "variant": "shadow_l20_vault",
+    "art": "shadow",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "assassin_weapon_daggers_l20_vault",
+    "name": "Boneglass Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "assassin",
+    "variant": "daggers_l20_vault",
+    "art": "daggers",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 21.6,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "priest_armor_pilgrim_l20_vault",
+    "name": "Choirbound Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "priest",
+    "variant": "pilgrim_l20_vault",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "source": "undervault"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l20_vault",
+    "name": "Choirbound Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "priest",
+    "variant": "pilgrim_l20_vault",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l20_vault",
+    "name": "Choirbound Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "priest",
+    "variant": "pilgrim_l20_vault",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l20_vault",
+    "name": "Choirbound Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "priest",
+    "variant": "pilgrim_l20_vault",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "priest_weapon_mace_l20_vault",
+    "name": "Choirbound Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "priest",
+    "variant": "mace_l20_vault",
+    "art": "mace",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 21.6,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "hunter_armor_scout_l20_vault",
+    "name": "Boneshot Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "hunter",
+    "variant": "scout_l20_vault",
+    "art": "scout",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "source": "undervault"
+  },
+  {
+    "id": "hunter_headgear_scout_l20_vault",
+    "name": "Boneshot Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "hunter",
+    "variant": "scout_l20_vault",
+    "art": "scout",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "hunter_shoulders_scout_l20_vault",
+    "name": "Boneshot Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "hunter",
+    "variant": "scout_l20_vault",
+    "art": "scout",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "hunter_gloves_scout_l20_vault",
+    "name": "Boneshot Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "hunter",
+    "variant": "scout_l20_vault",
+    "art": "scout",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l20_vault",
+    "name": "Boneshot Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "class": "hunter",
+    "variant": "shortbow_l20_vault",
+    "art": "shortbow",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 21.6,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "pants_wayfarer_l20_vault",
+    "name": "Vaultwalker Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "variant": "wayfarer_l20_vault",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 1.4,
+    "defense": 5.4,
+    "source": "undervault"
+  },
+  {
+    "id": "accessory_amber_l20_vault",
+    "name": "Verdigris Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "variant": "amber_l20_vault",
+    "art": "amber",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 8.2,
+    "defense": 2.1,
+    "source": "undervault"
   }
 ]

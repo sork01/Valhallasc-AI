@@ -8,15 +8,16 @@
   const NS = 'http://www.w3.org/2000/svg';
   const STAGE = { w: 100, h: 62 };
   // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm.
-  const LAYOUT = [{ x: 4, y: 38, s: 17 }, { x: 27, y: 22, s: 17 }, { x: 49, y: 5, s: 22 }, { x: 76, y: 3, s: 22 }, { x: 70, y: 33, s: 27 }];
-  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a' };
-  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c' };
-  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a' };
+  const LAYOUT = [{ x: 4, y: 38, s: 17 }, { x: 27, y: 22, s: 17 }, { x: 49, y: 5, s: 22 }, { x: 76, y: 3, s: 22 }, { x: 70, y: 33, s: 27 }, { x: 45, y: 40, s: 20 }];
+  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', vault: '#07080e' };
+  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', vault: '#3a3f55' };
+  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', vault: '#59d9ff' };
   const BLURB = {
     meadow: 'Green pastures round the walled town of Alderhaven.',
     ember: 'Lava fords and ash-grey crags above Cinderwatch Camp.',
     frost: 'Four rings of ice that spiral up to a summit bowl.',
     fen: 'A dusk fen round a dark lake, lit by the lanterns of Lanternmere.',
+    vault: 'A dungeon of bones and torchlight under the Meeting Stone, for a party of five.',
   };
   // Base level and a dot colour for every enemy kind (the level matches Slime::default_level in server/src/world.rs;
   // the test compares the two).
@@ -28,6 +29,9 @@
     crab: ['Rime Crab', 10, '#6fb3dc'], wolf: ['Frostfang Wolf', 12, '#9fb4c8'], yeti: ['Glacier Yeti', 13, '#e4eef8'], wyrm: ['Rime Wyrm', 15, '#6bc6e8'],
     gloomroot: ['Gloomroot Colossus (Elite · 5 players)', 20, '#4fe0c8'],
     toad: ['Fen Toad', 15, '#8bc34a'], croc: ['Mire Crocodile', 17, '#a9c45a'], knight: ['Drowned Knight', 18, '#8fc0a8'], hydra: ['Mire Hydra', 20, '#c4e8b0'],
+    thrall: ['Vault Thrall', 19, '#d8d2bc'], archer: ['Bone Archer (ranged)', 19, '#e6dfc4'], acolyte: ['Hollow Acolyte (ranged)', 20, '#b46bff'],
+    gatewarden: ['Hrolf Bonegate (Boss)', 20, '#ffd24a'], choir: ['Valka, the Hollow Choir (Boss)', 20, '#7be0ff'],
+    colossus: ['Ironwake, the Vault Colossus (Boss)', 21, '#ff9a3a'], hollowking: ['Haldor, the Hollow King (Boss)', 21, '#9cff8f'],
   };
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const kindInfo = kind => KINDS[kind] || [kind, 1, '#ff6b8a'];
@@ -74,6 +78,12 @@
       case 'spire': return fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e';
       case 'rock': return fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8';
       case 'rampart': return '#6f7078';
+      case 'vaultwall': return '#5d6482';
+      case 'pillar': return '#a3abc0';
+      case 'brazier': return '#ff9a3a';
+      case 'torch': return '#ffcf6a';
+      case 'sarcophagus': return '#6a7088';
+      case 'bones': return '#d6cfb6';
       case 'tower': return '#3f6a8a';
       case 'stall': return '#e0a040';
       case 'house': case 'chapel': return o.color || '#a08060';
@@ -93,6 +103,7 @@
     g.lineCap = g.lineJoin = 'round'; g.strokeStyle = g.fillStyle = DIRT[z.theme]; g.lineWidth = 2.8 * k;
     for (const p of z.paths || []) { g.beginPath(); p.forEach(([x, y], i) => i ? g.lineTo(x * k, y * k) : g.moveTo(x * k, y * k)); g.stroke(); }
     if (z.theme === 'meadow') { g.beginPath(); g.arc(36 * k, 36 * k, 3.5 * k, 0, 6.283); g.fill(); }
+    for (const [x0, y0, x1, y1] of z.rooms || []) { g.fillStyle = '#2f3347'; g.fillRect(x0 * k, y0 * k, (x1 - x0) * k, (y1 - y0) * k); }   // a dungeon's floor
     const PAVE = { 1: '#b6a98c', 2: '#ece2c8', 3: '#b8765a' };
     for (const r of z.roads || []) {
       g.fillStyle = g.strokeStyle = PAVE[r.t] || '#b6a98c';
@@ -119,7 +130,7 @@
   function copy(canvas, source) { canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height); canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height); }
 
   // ---------- world view ----------
-  const rangeText = z => z.range ? `Lv ${z.range[0]}–${z.range[1]}` : 'Safe city';
+  const rangeText = z => z.range ? (z.range[0] === z.range[1] ? `Lv ${z.range[0]}` : `Lv ${z.range[0]}–${z.range[1]}`) + (z.players ? ` · ${z.players} players` : '') : 'Safe city';
   const edgePoint = (a, b) => {                                     // where the road from a's centre to b's centre leaves a's square
     const ax = a.x + a.s / 2, ay = a.y + a.s / 2, dx = b.x + b.s / 2 - ax, dy = b.y + b.s / 2 - ay, t = (a.s / 2 + .6) / Math.max(Math.abs(dx), Math.abs(dy));
     return [ax + dx * t, ay + dy * t];
@@ -214,7 +225,7 @@
     const box = $('wm-side'); box.replaceChildren();
     box.append(el('h4', z.name, 'wm-side-name'), el('p', z.tagline || BLURB[z.theme] || '', 'wm-side-blurb'));
     const facts = el('ul', '', 'wm-facts');
-    facts.append(el('li', z.range ? `Recommended levels ${z.range[0]}–${z.range[1]}` : 'No enemies inside the walls'));
+    facts.append(el('li', z.range ? (z.players ? `Dungeon for ${z.players} players of level ${z.range[0]}` : `Recommended levels ${z.range[0]}–${z.range[1]}`) : 'No enemies inside the walls'));
     facts.append(el('li', `Charted ${charted(current)} of ${CELLS} places`, 'wm-charted'));
     if (z.city && known(current, z.city.plaza.x, z.city.plaza.y)) facts.append(el('li', `${z.city.name}: sanctuary, ${(z.quests || []).length} quest${(z.quests || []).length === 1 ? '' : 's'}`));
     box.append(facts);

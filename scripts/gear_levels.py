@@ -127,8 +127,47 @@ def main():
                 add(out, bases, cls, kind, level, rarity)
         for kind in SHARED_KINDS:
             add(out, bases, None, kind, level, rarity)
+    out.extend(vault_pieces(out))
     ITEMS.write_text(json.dumps(out, indent=2, ensure_ascii=False) + '\n')
     print(len(out), 'items,', len(SETS), 'sets')
+
+
+# The Undervault's own gear: a recolour of every level-20 blue piece the dungeon's bosses can drop (see items::boss_slots),
+# 15% stronger, never part of the ordinary drop pool (`source` marks it; only the bosses hand it out).
+VAULT_BONUS = 1.15
+VAULT_SLOTS = ('armor', 'headgear', 'shoulders', 'gloves', 'weapon', 'pants', 'accessory')
+VAULT_TINT = {'hue': 150, 'saturate': 1.3, 'brightness': 1.2}
+# The recolour is a different piece, so it has its own name (the verdigris-green look, the vault's bones and wardens).
+VAULT_NAMES = {
+    'warrior_armor': 'Hollowsteel Cuirass', 'warrior_headgear': 'Hollowsteel Plumed Helm', 'warrior_shoulders': 'Hollowsteel Pauldrons',
+    'warrior_gloves': 'Hollowsteel Gauntlets', 'warrior_weapon': 'Verdigris Greatsword',
+    'mage_armor': 'Wardweaver Robes', 'mage_headgear': "Wardweaver's Hat", 'mage_shoulders': "Wardweaver's Capelet",
+    'mage_gloves': "Wardweaver's Gloves", 'mage_weapon': 'Wraithwood Staff',
+    'assassin_armor': 'Gravewalker Armor', 'assassin_headgear': 'Gravewalker Brow Band', 'assassin_shoulders': 'Gravewalker Spaulders',
+    'assassin_gloves': 'Gravewalker Claws', 'assassin_weapon': 'Boneglass Daggers',
+    'priest_armor': 'Choirbound Robes', 'priest_headgear': "Choirbound Hood", 'priest_shoulders': 'Choirbound Mantle',
+    'priest_gloves': 'Choirbound Mitts', 'priest_weapon': 'Choirbound Mace',
+    'hunter_armor': 'Boneshot Jerkin', 'hunter_headgear': 'Boneshot Headband', 'hunter_shoulders': 'Boneshot Mantle',
+    'hunter_gloves': 'Boneshot Bracers', 'hunter_weapon': 'Boneshot Shortbow',
+    'pants': 'Vaultwalker Pants', 'accessory': 'Verdigris Ring',
+}
+
+
+def vault_pieces(out):
+    pieces = []
+    for i in out:
+        if i.get('rarity') == 'rare' and i.get('requiredLevel') == 20 and i['id'].endswith('_l20_blue') and i['kind'] in VAULT_SLOTS:
+            v = dict(i)
+            v['id'] = i['id'][:-len('_l20_blue')] + '_l20_vault'
+            v['name'] = VAULT_NAMES[f"{i['class']}_{i['kind']}" if i.get('class') else i['kind']]
+            v['variant'] = i['variant'][:-len('_l20_blue')] + '_l20_vault'
+            v['tint'] = dict(VAULT_TINT)
+            v['attack'] = round(i['attack'] * VAULT_BONUS, 1)
+            v['defense'] = round(i['defense'] * VAULT_BONUS, 1)
+            v['sell'] = round(i['sell'] * VAULT_BONUS)
+            v['source'] = 'undervault'
+            pieces.append(ordered(v))
+    return pieces
 
 
 def add(out, bases, cls, kind, level, rarity):
@@ -156,5 +195,14 @@ def add(out, bases, cls, kind, level, rarity):
     out.append(finish(i, level, rarity))
 
 
+def vault_only():
+    """Regenerates just the Undervault pieces in the existing catalog (leaves every other item untouched, byte for byte)."""
+    items = [i for i in json.loads(ITEMS.read_text()) if i.get('source') != 'undervault']
+    items.extend(vault_pieces(items))
+    ITEMS.write_text(json.dumps(items, indent=2, ensure_ascii=False))
+    print(len(items), 'items')
+
+
 if __name__ == '__main__':
-    main()
+    import sys
+    vault_only() if '--vault-only' in sys.argv else main()

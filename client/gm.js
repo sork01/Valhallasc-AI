@@ -75,7 +75,7 @@
   };
 
   function help() {
-    say('Game master commands:');
+    say('Game master commands (/gmcommands shows this list):');
     for (const [name, [usage, text]] of Object.entries(COMMANDS)) say(`/${name}${usage ? ' ' + usage : ''} — ${text}`);
   }
   function brief(op, result) {
@@ -102,7 +102,7 @@
     command(text) {
       if (!window.Online?.gm) return false;
       const [word, ...args] = text.trim().split(/\s+/), name = word.slice(1).toLowerCase();
-      if (name === 'gm' || name === 'gmhelp') { help(); return true; }
+      if (name === 'gm' || name === 'gmhelp' || name === 'gmcommands') { help(); return true; }
       const entry = Object.hasOwn(COMMANDS, name) ? COMMANDS[name] : null;
       if (!entry) return false;
       const built = entry[2](args);

@@ -42,15 +42,16 @@
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn;
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
-    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city';
+    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault';
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
       const i = y * MAP + x, cx = x + .5, cy = y + .5;
-      map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : 2) * .35;
+      map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : vault ? 51 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : vault ? 52 : 2) * .35;
       let d = 99; for (const p of paths) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
-      if (!ember && !frost && !fen && !city) d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
+      if (!ember && !frost && !fen && !city && !vault) d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
       map.dirt[i] = d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0;
     }
     if (city) paintRoads(zdef.roads);
+    if (vault) paintRooms(zdef.rooms);
     objects = zdef.objects.map(o => ({ ...o }));
   }
   // Skaldholm's ground: the zone lists its streets (type 1 cobbles), plazas and squares (2 marble, 3 brick) as rectangles, discs and rings.
@@ -66,13 +67,19 @@
       }
     }
   }
+  // The Undervault's floor: the zone lists its rooms and corridors as rectangles; everything else is solid rock, left black.
+  function paintRooms(rooms) {
+    map.dirt.fill(0);
+    for (const [x0, y0, x1, y1] of rooms || []) for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) map.dirt[y * MAP + x] = 1;
+  }
   // Switch to another zone: new ground, obstacles and minimap. Everything tied to the old zone's coordinates goes.
   function setZone(z) {
     zone = ZONES[z] ? z : 0; zdef = ZONES[zone];
     buildMap(); chunks.clear();
     if (mini) buildMini();
     if (hero) { pendingNpc = null; cityRoute = []; hero.target = null; hero.goal = null; }
-    floaters = []; parts = []; effects = []; bolts = []; drops = []; marker = null; slimes = []; remotePlayers.clear(); bubbles.clear();
+    floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; marker = null; slimes = []; remotePlayers.clear(); bubbles.clear();
+    instanceCleared = false; clearedAt = -99;
   }
 
   // ---------- sprites (drawn once) ----------
@@ -393,19 +400,32 @@
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
   function renderChunk(cx, cy) {
     const G = chunkGeom(cx, cy), [c, g] = canvasOf(G.w, G.h, chunkScale);
-    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city';
+    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault';
+    const arenas = vault ? (zdef.slimes || []).filter(m => BOSS_KINDS.includes(m.kind)) : [];
     for (let ty = 0; ty < CH; ty++) for (let tx = 0; tx < CH; tx++) {
       const x = G.x0 + tx, y = G.y0 + ty; if (x >= MAP || y >= MAP) continue;
       const i = y * MAP + x, px = (x - y) * TW / 2 - G.ox, py = (x + y) * TH / 2 - G.oy, tone = map.tone[i], dirt = map.dirt[i];
+      if (vault && !dirt) continue;                                                  // solid rock: stays black
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
-      g.fillStyle = city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
+      g.fillStyle = vault ? `hsl(${226 + tone * 10}, ${9 + tone * 5}%, ${19 + tone * 7 + alt * .7}%)` : city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
         : fen ? (dirt ? `hsl(${30 + tone * 6}, ${30 + tone * 6}%, ${27 + tone * 6 + alt}%)` : `hsl(${92 + tone * 16}, ${26 + tone * 12}%, ${21 + tone * 9 + alt * .8}%)`)
         : frost ? (dirt ? `hsl(${208 + tone * 8}, ${26 + tone * 8}%, ${66 + tone * 6 + alt}%)` : `hsl(${200 + tone * 12}, ${44 + tone * 10}%, ${84 + tone * 8 + alt * .6}%)`)
         : ember ? (dirt ? `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)` : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`)
         : dirt ? `hsl(${30 + tone * 8}, ${38 + tone * 8}%, ${48 + tone * 8 + alt}%)` : `hsl(${100 + tone * 16}, ${46 + tone * 12}%, ${36 + tone * 12 + alt}%)`;
       g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill();
       const r = rngf(x * 977 + y * 131 + 7), inTile = () => { const a = r() - .5, b = r() - .5; return [px + (a - b) * TW * .4, py + TH / 2 + (a + b) * TH * .4]; };
-      if (city) {
+      if (vault) {
+        g.strokeStyle = 'rgba(4,5,12,.55)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(px - TW / 2, py + TH / 2); g.lineTo(px, py); g.lineTo(px + TW / 2, py + TH / 2); g.stroke();   // flagstone seams on the two back edges
+        g.strokeStyle = 'rgba(150,160,200,.07)'; g.beginPath(); g.moveTo(px - TW / 2, py + TH / 2 + 1.2); g.lineTo(px, py + TH + 1.2); g.lineTo(px + TW / 2, py + TH / 2 + 1.2); g.stroke();
+        if (r() < .3) { const [qx, qy] = inTile(); g.strokeStyle = 'rgba(6,7,14,.7)'; g.lineWidth = 1.3; g.lineCap = 'round'; const a = r() * 6.283, l = 6 + r() * 9; g.beginPath(); g.moveTo(qx, qy); g.lineTo(qx + Math.cos(a) * l, qy + Math.sin(a) * l * .5); g.lineTo(qx + Math.cos(a + .9) * l * 1.4, qy + Math.sin(a + .9) * l * .7); g.stroke(); }
+        if (r() < .12) { const [qx, qy] = inTile(); g.fillStyle = 'rgba(56,90,68,.3)'; g.beginPath(); g.ellipse(qx, qy, 5 + r() * 9, 2 + r() * 4, 0, 0, 6.283); g.fill(); }
+        else if (r() < .04) { const [qx, qy] = inTile(); g.fillStyle = 'rgba(30,60,80,.55)'; g.beginPath(); g.ellipse(qx, qy, 7 + r() * 6, 3 + r() * 2, 0, 0, 6.283); g.fill(); g.fillStyle = 'rgba(150,200,230,.3)'; g.fillRect(qx - 3, qy - 1, 5, 1); }
+        for (const m of arenas) {                                                    // runes inlaid in rings round each boss
+          const d = Math.hypot(x + .5 - m.x, y + .5 - m.y), ringA = Math.abs(d - 6.4) < .52, ringB = Math.abs(d - 3.2) < .5;
+          if (ringA || ringB) { g.fillStyle = 'rgba(90,150,220,.17)'; g.beginPath(); g.moveTo(px, py); g.lineTo(px + TW / 2, py + TH / 2); g.lineTo(px, py + TH); g.lineTo(px - TW / 2, py + TH / 2); g.closePath(); g.fill();
+            g.strokeStyle = 'rgba(120,210,255,.45)'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(px - 8, py + TH / 2 + 2); g.lineTo(px, py + TH / 2 - 5); g.lineTo(px + 8, py + TH / 2 + 2); g.moveTo(px, py + TH / 2 - 5); g.lineTo(px, py + TH / 2 + 8); g.stroke(); }
+        }
+      } else if (city) {
         const at = (u, v) => [px + (u - v) * TW / 2, py + (u + v) * TH / 2];
         if (dirt === 1) {                                                              // cobbles: a 3x3 of rounded stones
           for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) {
@@ -488,7 +508,7 @@
           g.fillStyle = '#f5b82e'; g.beginPath(); g.arc(qx, qy - 6, 1.6, 0, 6.283); g.fill();
         } else if (r() < .015) { const [qx, qy] = inTile(); g.fillStyle = '#fff'; g.beginPath(); g.ellipse(qx, qy - 3, 3, 3.6, 0, 0, 6.283); g.fill(); g.fillStyle = '#e8484e'; g.beginPath(); g.ellipse(qx, qy - 5, 5, 3.4, 0, Math.PI, 0); g.fill(); }
       }
-      City.stoneTile(g, px, py, x, y);
+      if (!vault) City.stoneTile(g, px, py, x, y);
       // earth cliff on the two front edges of the island
       const depth = CLIFF - 34 + hash2(x, y, 9) * 26;
       const face = (dir) => {
@@ -505,8 +525,8 @@
         if (ember) { g.strokeStyle = 'rgba(255,120,40,.55)'; g.lineWidth = 2; g.beginPath(); g.moveTo(vx, vy + 3); g.lineTo(bx, by + 3); g.stroke(); }
         g.strokeStyle = OL; g.lineWidth = 2; g.beginPath(); g.moveTo(vx, vy + depth); g.lineTo(bx, by + depth * .9); g.stroke();
       };
-      if (x === MAP - 1) face(1);
-      if (y === MAP - 1) face(-1);
+      if (!vault && x === MAP - 1) face(1);
+      if (!vault && y === MAP - 1) face(-1);
     }
     return { c, G };
   }
@@ -521,6 +541,7 @@
   let cv, ctx, mini, mctx, opts, onHud = () => {}, onEvent = () => {};
   let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null;
   let hero, slimes, drops, floaters, parts, effects, bolts, marker, cam, shake, keys, pointer, msg, hudT, tAll;
+  let ebolts = [], instanceCleared = false, clearedAt = -99;   // missiles shot by ranged enemies; the dungeon's exit opens when its last boss falls
   let mageSpr = null, spriteGeneration = 0;
   let pendingNpc = null, cityRoute = [], routeTime = 0;
   // Speech bubbles over characters that just chatted: id -> {text, until, lines}.
@@ -567,8 +588,16 @@
     knight: { name: 'Drowned Knight', scale: 1.15, top: 87, col: ['#cde8d4', '#6a8d7a', '#2d403c'] },
     hydra: { name: 'Mire Hydra', scale: 1.3, top: 70, col: ['#b0d6a0', '#4b7a74', '#233040'] },
     gloomroot: { name: 'Gloomroot Colossus', elite: true, scale: 1.8, top: 85, col: ['#8affd8', '#57412a', '#12100c'] },
+    thrall: { name: 'Vault Thrall', scale: .95, top: 72, col: ['#d8d2bc', '#8a8470', '#2c2a34'] },
+    archer: { name: 'Bone Archer', scale: .95, top: 76, col: ['#e6dfc4', '#9a9278', '#35303c'] },
+    acolyte: { name: 'Hollow Acolyte', scale: .95, top: 79, col: ['#c9a8ff', '#6a3fb0', '#1f1236'] },
+    gatewarden: { name: 'Hrolf Bonegate', elite: true, boss: true, scale: 1.35, top: 84, col: ['#e2dcc6', '#7a8aa4', '#2a2c3c'] },
+    choir: { name: 'Valka, the Hollow Choir', elite: true, boss: true, scale: 1.35, top: 87, col: ['#bdeaff', '#4a78c0', '#161c3a'] },
+    colossus: { name: 'Ironwake, the Vault Colossus', elite: true, boss: true, scale: 1.4, top: 89, col: ['#9fe8ff', '#5a6074', '#20222e'] },
+    hollowking: { name: 'Haldor, the Hollow King', elite: true, boss: true, scale: 1.4, top: 85, col: ['#c8ffc0', '#4a6a52', '#101a14'] },
   };
   const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
+  const VAULT_KINDS = ['thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking'], BOSS_KINDS = VAULT_KINDS.slice(3);
   // Colour a level label by how it compares with the hero: grey, normal, orange, red.
   const levelColor = level => { const d = level - (hero?.level || 1); return d >= 5 ? '#ff6b6b' : d >= 3 ? '#ffa65a' : d <= -5 ? '#9fb0a0' : '#fff4ca'; };
   function newHero() {
@@ -582,7 +611,7 @@
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
   }
-  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: zdef.city?.name, tagline: zdef.tagline, hub: City.inside(hero.x, hero.y) ? zdef.city?.name : null, levels: zdef.levels, buffs: hero.buffs || [], traveling: cityRoute.length > 0 && !pendingNpc }); }
+  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: zdef.city?.name, tagline: zdef.tagline, hub: City.inside(hero.x, hero.y) ? zdef.city?.name : null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], traveling: cityRoute.length > 0 && !pendingNpc }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -779,6 +808,8 @@
     }
     for (const id of remotePlayers.keys()) if (!present.has(id)) remotePlayers.delete(id);
     bolts = packet.bolts.filter(inZone).map(b => ({ ...b, col: b.color }));
+    ebolts = (packet.ebolts || []).filter(inZone).map(b => { const old = ebolts.find(o => o.id === b.id); return old && Math.hypot(old.x - b.x, old.y - b.y) < 2.5 ? Object.assign(old, b, { x: old.x + (b.x - old.x) * .5, y: old.y + (b.y - old.y) * .5 }) : { ...b }; });
+    if (packet.instance) { if (packet.instance.cleared && !instanceCleared) { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); } instanceCleared = !!packet.instance.cleared; }
     drops = packet.drops.filter(inZone);
     emitHud();
   }
@@ -796,6 +827,8 @@
     if (event.kind === 'pickup') floater(event.x, event.y, '+' + event.value + ' gold', '#ffe066', false);
     if (event.kind === 'portal') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); burst(event.x, event.y, 20, 14, ['#ffd9a0', '#ff8a3a', '#7ae8c8']); }
     if (event.kind === 'levelup') levelUpFx(event);
+    if (event.kind === 'slam') { effects.push({ kind: 'slam', x: event.x, y: event.y, r: event.value, t: 0, life: .7 }); burst(event.x, event.y, 6, 26, ['#e8dcc0', '#a9a08a', '#ffb060'], 5, 10); kick(event.value > 4 ? 14 : 9, .45); }
+    if (event.kind === 'cleared') { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); burst(event.x, event.y, 20, 40, ['#d4ffc8', '#9cff8f', '#ffffff'], 6, 4); effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0, life: 1.6, grow: 2.4, col: '#9cff8f' }); }
     // Food and potions: a potion lands at once with a ring and its number; a meal shows its share every second.
     if (event.kind === 'consume') {
       spark(event.x, event.y, 14, ['#9dffb4', '#d8ffe0', '#f0d9a0'], 10, 1, .9);
@@ -1051,6 +1084,7 @@
     const k = 1 - Math.pow(.0006, dt); cam.x += (hero.x - cam.x) * k; cam.y += (hero.y - cam.y) * k;
     if (shakeT > 0) { shakeT -= dt; const k = shakeMag * Math.min(1, shakeT / .25); shakeX = (Math.random() - .5) * 2 * k; shakeY = (Math.random() - .5) * 2 * k; }
     else { shakeX = shakeY = 0; shakeMag = 0; }
+    for (const b of ebolts) { b.x += b.fx * b.speed * dt; b.y += b.fy * b.speed * dt; if (b.size >= .8 && Math.random() < .5) parts.push({ x: b.x, y: b.y, z: 38, vx: (Math.random() - .5) * .6, vy: (Math.random() - .5) * .6, vz: .6, life: .28, t: 0, col: b.color, size: 2 + Math.random() * 2.4, g: 1 }); }
     for (const b of bolts) if (b.size >= 14 && Math.random() < .9) parts.push({ x: b.x, y: b.y, z: 40, vx: (Math.random() - .5), vy: (Math.random() - .5), vz: 1 + Math.random() * 3, life: .35, t: 0, col: b.col, size: 3 + Math.random() * 4, g: 4 });
   }
 
@@ -1188,8 +1222,8 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null;    // {meta, img: {kind: Image}}
-  const enemySource = s => s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : slimeSrc;
+  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, vaultSrc = null;    // {meta, img: {kind: Image}}
+  const enemySource = s => s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : VAULT_KINDS.includes(s.kind) ? vaultSrc : slimeSrc;
   const SLIME_K = 2.1, DIE_SHOW = 1.7;                      // sprite pixel -> screen px; seconds a dead slime stays on screen
   // Test mode (window.__valhallaTestSprites): one small coloured block per enemy kind instead of the atlas PNGs. The clip
   // table is the real one's shape (same names, frame counts and rates), so every animation state still finds its frame.
@@ -1233,6 +1267,14 @@
     if (stubOn()) { fenSrc = stubEnemies(FEN_KINDS, { toad: '#7c4', croc: '#5a3', knight: '#8ca', hydra: '#a6c', gloomroot: '#4fa' }); return; }
     fetch('assets/fen.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/fen_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); fenSrc = { meta, img }; })).catch(() => { fenSrc = null; });
+  }
+  // Undervault monsters: assets/vault_<kind>.png (scripts/make_vault_sprites.py), the same clips again. Until an atlas loads
+  // (or when none exists) enemySource is null and the procedural slime body is drawn.
+  function loadVaultSprites() {
+    if (vaultSrc) return;
+    if (stubOn()) { vaultSrc = stubEnemies(VAULT_KINDS, { thrall: '#cba', archer: '#dc8', acolyte: '#a7f', gatewarden: '#fd8', choir: '#8df', colossus: '#9cf', hollowking: '#9f8' }); return; }
+    fetch('assets/vault.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/vault_${k}.png`; })))
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); vaultSrc = { meta, img }; })).catch(() => { vaultSrc = null; });
   }
   // Rimeveil Glacier monsters: assets/rime_<kind>.png (scripts/make_rime_sprites.py), the same clips as the Crags.
   function loadRimeSprites() {
@@ -1477,6 +1519,7 @@
     g.globalAlpha = 1;
   }
   function drawSky(g, t) {
+    if (zdef.theme === 'vault') { g.fillStyle = '#03040a'; g.fillRect(0, 0, VW, VH); return; }
     if (zdef.theme === 'ember') return drawSkyEmber(g, t);
     if (zdef.theme === 'frost') return drawSkyFrost(g, t);
     if (zdef.theme === 'fen') return drawSkyFen(g, t);
@@ -1517,6 +1560,9 @@
   }
   // A gate: two stone posts, a lintel and a swirling plane between them. The server owns the actual move.
   function drawPortal(g, p, sx, sy, t) {
+    if (p.look === 'stairs_down') { const d = ZONES[p.to]; return VaultArt.stairsDown(g, sx, sy, t, d?.min_level ? `Stairs to ${d.name} · Lv ${d.min_level}+` : 'Stairs down'); }
+    if (p.look === 'stairs_up') return VaultArt.stairsUp(g, sx, sy, t);
+    if (p.look === 'exit') return VaultArt.exitPortal(g, sx, sy, t, t - clearedAt);
     const dest = ZONES[p.to] || ZONES[0], warm = dest.theme === 'ember', cold = dest.theme === 'frost', bog = dest.theme === 'fen', gold = dest.theme === 'city';
     const hue = warm ? 18 : cold ? 195 : bog ? 88 : gold ? 44 : 165, half = 1.5;
     const post = (u) => {                                    // an iso column centred u world units along x
@@ -1576,7 +1622,7 @@
       const [sx, sy] = w2s(o.x, o.y);
       if (onScreen(sx, sy, 200)) { list.push({ d: o.x + o.y, o, sx, sy }); if (o.kind === 'tree') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind]) shadow(g, o.x, o.y, 26, 9, .25); }
     }
-    for (const portal of zdef.portals) { const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y, portal, sx, sy }); }
+    for (const portal of zdef.portals) { if (portal.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y + (portal.look ? .3 : 0), portal, sx, sy }); }
     for (const n of City.npcs) { const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
     for (const s of slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, 100)) { shadow(g, s.x, s.y, 28 * s.d.scale * (1 - s.hop * .12), 11 * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 60)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
@@ -1591,7 +1637,7 @@
       if (it.o) {
         const o = it.o;
         if (!set[o.kind]) {
-          const cover=['house','chapel','gate','tent','tower','rampart','meetingstone','grandfountain'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
+          const cover=['house','chapel','gate','tent','tower','rampart','meetingstone','grandfountain','vaultwall','pillar'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
           City.drawObject(g,o,it.sx,it.sy,cover ? .5 : 1);
           City.animateObject(g,o,it.sx,it.sy,t);
           if(o.kind==='fountain') { for(let i=0;i<7;i++){const phase=(t*.7+i*.17)%1;g.globalAlpha=Math.sin(phase*Math.PI)*.7;g.fillStyle='#e0ffff';g.beginPath();g.ellipse(it.sx+Math.sin(i*4)*45,it.sy-9-phase*24,2,3,0,0,Math.PI*2);g.fill();}g.globalAlpha=1;}
@@ -1686,12 +1732,68 @@
       if (w >= 14) { g.globalAlpha = .35; g.fillStyle = b.col; g.beginPath(); g.arc(sx, sy, w * 1.2, 0, Math.PI * 2); g.fill(); }
       g.globalAlpha = 1; g.fillStyle = '#f3fcff'; g.beginPath(); g.arc(sx, sy, Math.max(3, w * .55), 0, Math.PI * 2); g.fill(); g.restore();
     }
+    for (const e of effects) if (e.kind === 'slam') {                  // a boss's ground-pound: a ring racing out to the edge of its reach, over a flash of dust
+      const p = e.t / e.life, [sx, sy] = w2s(e.x, e.y), R = Math.max(.2, p) * e.r;
+      g.save(); g.globalAlpha = (1 - p) * .9; g.strokeStyle = '#ffd9a0'; g.lineWidth = 7 * (1 - p) + 2; g.beginPath(); g.ellipse(sx, sy, R * 62.225, R * 31.112, 0, 0, 6.283); g.stroke();
+      g.globalAlpha = (1 - p) * .25; g.fillStyle = '#e8d0a0'; g.beginPath(); g.ellipse(sx, sy, R * 62.225, R * 31.112, 0, 0, 6.283); g.fill(); g.restore();
+    }
+    for (const b of ebolts) {                                          // missiles of ranged enemies: an arrow is a thin shaft, a spell a glowing orb with a tail
+      const [sx, sy] = w2s(b.x, b.y, 38), [tx, ty] = w2s(b.x - b.fx * (b.kind === 'archer' ? .9 : .55), b.y - b.fy * (b.kind === 'archer' ? .9 : .55), 38);
+      g.save(); g.lineCap = 'round';
+      if (b.kind === 'archer') { g.strokeStyle = '#2a2018'; g.lineWidth = 5; g.beginPath(); g.moveTo(tx, ty); g.lineTo(sx, sy); g.stroke(); g.strokeStyle = b.color; g.lineWidth = 2.6; g.stroke(); g.fillStyle = '#e8e8f0'; g.beginPath(); g.arc(sx, sy, 3.2, 0, 6.283); g.fill(); }
+      else {
+        const R = 8 + b.size * 6;
+        g.globalCompositeOperation = 'lighter'; g.strokeStyle = b.color; g.globalAlpha = .55; g.lineWidth = R * 1.1; g.beginPath(); g.moveTo(tx, ty); g.lineTo(sx, sy); g.stroke();
+        const gr = g.createRadialGradient(sx, sy, 1, sx, sy, R * 2); gr.addColorStop(0, '#ffffff'); gr.addColorStop(.3, b.color); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.globalAlpha = .95; g.fillStyle = gr; g.beginPath(); g.arc(sx, sy, R * 2, 0, 6.283); g.fill();
+      }
+      g.restore();
+    }
     for (const p of parts) { const [sx, sy] = w2s(p.x, p.y, p.z); g.globalAlpha = 1 - p.t / p.life; g.fillStyle = p.col; g.beginPath(); g.arc(sx, sy, p.size, 0, 6.283); g.fill(); } g.globalAlpha = 1;
     for (const f of floaters) { const [sx, sy] = w2s(f.x, f.y, f.z + 30); g.globalAlpha = clamp(1.4 - f.t * 1.3, 0, 1); g.font = `${f.big ? 34 : 24}px "Lilita One", "Jua", Impact, sans-serif`; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = 'rgba(20,10,30,.9)'; g.strokeText(f.text, sx, sy); g.fillStyle = f.color; g.fillText(f.text, sx, sy); } g.globalAlpha = 1;
     if (zdef.theme === 'frost') drawSnowfall(g, t);
     if (zdef.theme === 'fen') drawFireflies(g, t);
     if (zdef.theme === 'city') drawBlossom(g, t);
+    if (zdef.theme === 'vault') { drawDarkness(g, t); drawBossBar(g); }
     drawMini();
+  }
+  // ---------- the Undervault's darkness and its boss bar ----------
+  // The vault has no sky: a dark veil covers the screen and every light cuts a pool out of it (the hero, torches, braziers, the
+  // stairs and the exit, missiles in flight).
+  let darkCv = null, darkG = null;
+  function drawDarkness(g, t) {
+    if (!darkCv) { darkCv = document.createElement('canvas'); darkCv.width = VW; darkCv.height = VH; darkG = darkCv.getContext('2d'); }
+    const d = darkG; d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, VW, VH); d.fillStyle = 'rgba(3,4,10,.84)'; d.fillRect(0, 0, VW, VH);
+    d.globalCompositeOperation = 'destination-out';
+    const pool = (x, y, r, a) => {
+      if (x < -r || x > VW + r || y < -r || y > VH + r) return;
+      const gr = d.createRadialGradient(x, y, r * .06, x, y, r); gr.addColorStop(0, `rgba(0,0,0,${a})`); gr.addColorStop(.5, `rgba(0,0,0,${a * .62})`); gr.addColorStop(1, 'rgba(0,0,0,0)');
+      d.fillStyle = gr; d.beginPath(); d.ellipse(x, y, r, r * .6, 0, 0, 6.283); d.fill();
+    };
+    const [hx, hy] = w2s(hero.x, hero.y); pool(hx, hy - 36, 540, .97);
+    for (const o of objects) {
+      if (o.kind !== 'brazier' && o.kind !== 'torch') continue;
+      const [sx, sy] = w2s(o.x, o.y), fl = .9 + .1 * Math.sin(t * 7 + o.x * 3);
+      pool(sx, sy - 56, (o.kind === 'brazier' ? 320 : 230) * fl, .9);
+    }
+    for (const p of zdef.portals) { if (p.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(p.x, p.y); pool(sx, sy - 30, p.look === 'exit' ? 340 : 300, .95); }
+    for (const s of slimes) { if (s.dead) continue; const [sx, sy] = w2s(s.x, s.y); pool(sx, sy - 40, s.d?.boss ? 330 : 170, s.d?.boss ? .92 : .8); }   // enemies are always seen, wherever they stand
+    for (const b of ebolts) { const [sx, sy] = w2s(b.x, b.y, 38); pool(sx, sy, 120 + b.size * 60, .75); }
+    for (const b of bolts) { const [sx, sy] = w2s(b.x, b.y, 42); pool(sx, sy, 110, .6); }
+    for (const e of effects) if (e.kind === 'slam') { const [sx, sy] = w2s(e.x, e.y); pool(sx, sy, 200 + e.r * 40, .7 * (1 - e.t / e.life)); }
+    g.drawImage(darkCv, 0, 0, VW, VH);
+  }
+  // A boss in sight shows its name and health across the top of the screen.
+  function drawBossBar(g) {
+    let boss = null, best = 1e9;
+    for (const s of slimes) if (s.d?.boss && !s.dead) { const d = Math.hypot(s.x - hero.x, s.y - hero.y); if ((d < 16 || s.state === 'chase' || s.state === 'windup' || s.state === 'lunge') && d < best) { best = d; boss = s; } }
+    if (!boss) return;
+    const w = 520, x = (VW - w) / 2, y = 128, f = clamp(boss.hp / boss.maxHp, 0, 1);
+    g.save(); g.textAlign = 'center'; g.font = '20px "Jua", sans-serif'; g.lineWidth = 4; g.strokeStyle = 'rgba(8,6,16,.95)'; g.fillStyle = '#ffe2a0';
+    const label = `${boss.d.name} · Lv ${boss.level ?? '?'}`; g.strokeText(label, VW / 2, y); g.fillText(label, VW / 2, y);
+    g.fillStyle = 'rgba(12,8,20,.85)'; g.fillRect(x - 3, y + 6, w + 6, 18); g.fillStyle = '#5a1020'; g.fillRect(x, y + 9, w, 12); g.fillStyle = f > .3 ? '#d8344a' : '#ff7a3a'; g.fillRect(x, y + 9, w * f, 12);
+    g.fillStyle = 'rgba(255,255,255,.28)'; g.fillRect(x, y + 9, w * f, 3); g.strokeStyle = '#c8a45a'; g.lineWidth = 2; g.strokeRect(x - 3, y + 6, w + 6, 18);
+    g.fillStyle = '#fff4ca'; g.font = '13px "Jua", sans-serif'; g.fillText(`${Math.ceil(boss.hp).toLocaleString('en')} / ${Math.round(boss.maxHp).toLocaleString('en')}`, VW / 2, y + 20);
+    g.restore();
   }
   // ---------- fog of war ----------
   // Every zone is FOG x FOG cells; the server (Character::explore) marks the cell the hero stands in and sends the masks
@@ -1740,9 +1842,9 @@
     g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(mask, 0, 0, w, h); g.restore();
   }
   function buildMini() {
-    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city';
-    g.fillStyle = city ? '#5f9b4a' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
-    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
+    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault';
+    g.fillStyle = vault ? '#07080e' : city ? '#5f9b4a' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
+    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
     if (zdef.city && !city) {
       const c = zdef.city;
       g.fillStyle=fen ? '#6a5238' : frost ? '#8fa6bd' : ember ? '#88705d' : '#d8cbb0'; g.fillRect(c.x0*k,c.y0*k,(c.x1-c.x0)*k,(c.y1-c.y0)*k);
@@ -1750,6 +1852,7 @@
     }
     for (const o of objects) {
       if (o.kind === 'post') continue;
+      if (vault) { if (o.kind === 'brazier') { g.fillStyle = '#ff9a3a'; g.fillRect(o.x * k - 1, o.y * k - 1, 2, 2); } continue; }
       if (city && o.width) {                                                          // buildings and walls as footprints
         g.fillStyle = o.kind === 'rampart' ? '#6f7078' : o.kind === 'tower' ? '#3f6a8a' : o.kind === 'stall' ? '#e0a040' : o.kind === 'house' || o.kind === 'chapel' ? o.color : '#8a7a62';
         g.fillRect((o.x - o.width / 2) * k, (o.y - o.depth / 2) * k, Math.max(1, o.width * k), Math.max(1, o.depth * k)); continue;
@@ -1758,7 +1861,7 @@
       g.fillStyle = o.kind === 'lava' ? '#ff6a2a' : o.kind === 'ice' ? '#4f93c8' : o.kind === 'water' ? '#244f5c' : o.kind === 'thicket' ? '#6a2f58' : o.kind === 'tree' ? (fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a') : o.kind === 'spire' ? (fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e') : o.kind === 'rock' ? (fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8') : (fen ? '#3f6a35' : frost ? '#3a7a70' : ember ? '#5a3a30' : '#2f8a45');
       g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'water' ? 1.6 : o.kind === 'ice' || o.kind === 'thicket' ? 1.7 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
     }
-    for (const p of zdef.portals) { g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
+    for (const p of zdef.portals) { if (p.after_clear && !instanceCleared) continue; g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
     miniBase = c;
   }
   function drawMini() {
@@ -1796,7 +1899,7 @@
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
       if (o.slimeSprites) loadSlimeSprites(o.slimeSprites);
-      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites();
+      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadVaultSprites();
       if (!Field._bound) {
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize);
@@ -1868,9 +1971,9 @@
     get hunterSprites() { return isHunter() ? mageSpr : null; },
     get hero() { return hero; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
-    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; },
+    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get vaultSprites() { return vaultSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; },
-    _debug: { get effects() { return effects; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll) },
+    _debug: { get effects() { return effects; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll) },
   };
   window.Field = Field;
 })();

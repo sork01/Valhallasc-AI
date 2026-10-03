@@ -70,7 +70,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
 
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, size: z.size, levels: z.levels, portals: z.portals.map(p => p.id + '>' + p.to), ice: z.objects.filter(o => o.kind === 'ice').length })));
-  check(zones.length === 5 && zones[2].name === 'Rimeveil Glacier' && zones[2].theme === 'frost' && zones[2].size === 128 && zones[2].levels.join() === '10,15', 'The client knows the glacier: name, frost theme, 128 tiles, levels 10-15');
+  check(zones.length === 6 && zones[2].name === 'Rimeveil Glacier' && zones[2].theme === 'frost' && zones[2].size === 128 && zones[2].levels.join() === '10,15', 'The client knows the glacier: name, frost theme, 128 tiles, levels 10-15');
   check(zones[1].portals.join() === 'meadow_gate>0,rimeveil_gate>2' && zones[2].portals[0] === 'crags_gate>1', 'The Crags have a second gate to the glacier, which has the gate back (and now a summit gate onward)');
   check(zones[2].ice > 400, `The glacier walls are ${zones[2].ice} ice blocks`);
   check(await page.evaluate(stub => { const m = Field.rimeSprites.meta; return m.kinds.join() === 'crab,wolf,yeti,wyrm' && (stub || m.kinds.every(k => Field.rimeSprites.img[k].naturalWidth === 768 && Field.rimeSprites.img[k].naturalHeight === 480)); }, STUB), 'The four glacier monster atlases are loaded (768x480 on the real art)');

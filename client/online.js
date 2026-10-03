@@ -213,8 +213,9 @@
     event.stopPropagation(); if (event.key === 'Escape') { event.preventDefault(); event.currentTarget.blur(); }
   });
   addEventListener('keydown', event => {
-    if (event.key === 'Enter' && active && connected && !/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(event.target.tagName)) {
-      event.preventDefault(); $('chat-input').focus();
+    // A button left focused by a mouse click must not swallow Enter (it would re-press the button instead of opening the chat box).
+    if (event.key === 'Enter' && active && connected && !event.target.isContentEditable && !/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)) {
+      event.preventDefault(); document.activeElement?.blur?.(); $('chat-input').focus();
     }
   });
   addEventListener('blur', () => { window.Field?.clearInput(); send({ type: 'stop' }); });

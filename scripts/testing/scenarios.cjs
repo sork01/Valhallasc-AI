@@ -29,7 +29,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21 };
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
 const levelXp = JSON.parse(fs.readFileSync(path.join(root, 'world/levels.txt'), 'utf8'));
@@ -1748,6 +1748,100 @@ const scenarios = {
       check(mage().resource >= 37 && mage().resource < 60, 'Mana survives private server restart without refilling');
       check(mage().potionCd > 30, 'The shared potion cooldown also survives restart');
       check(w.player('Rage').resource === 0 && w.player('Energy').resource === 100, 'Rage resets to zero and energy starts full on resume');
+    },
+  },
+  undervault: {
+    description: 'The dungeon under Skaldholm: the stairs beside the Meeting Stone refuse level 19 and take level 20 in; the Stone hires a full party that follows in; every group gets a private copy (an unrelated hero sees none of it); archers shoot real missiles; each boss drops a blue Undervault piece to the hero; the exit portal opens only when the last boss falls and returns to Skaldholm; the dungeon resets when empty; a hero who logs out inside wakes at the stairs.',
+    startLevel: 20, godMode: true, levelSpread: 0,
+    async run(w, check) {
+      const vault = map.zones[4], stairs = city.portals.find(p => p.id === 'undervault_stairs'), exit = vault.portals.find(p => p.after_clear), ret = { x: vault.portals[0].tx, y: vault.portals[0].ty };
+      const bot = 'Delver', rival = 'Rival', mercs = () => w.views.get(bot).players.filter(p => /^Merc /.test(p.look.name)), view = b => w.views.get(b);
+      await w.connect({ bot, class: 'warrior' });
+      check(vault.name === 'The Undervault' && vault.copies === 4 && vault.min_level === 20 && vault.final_boss === 'hollowking' && vault.players === 5, 'Zone 5 is a level-20 five-player dungeon with four private copies');
+      check(stairs && stairs.to === 5 && city.portals[0].id === 'glacier_gate' && vault.portals[0].to === 4 && exit.to === 4, 'The stairs beside the Meeting Stone lead down; the dungeon has stairs up and a closed exit');
+      const kinds = vault.slimes.reduce((c, s) => ({ ...c, [s.kind]: (c[s.kind] || 0) + 1 }), {});
+      check(JSON.stringify(kinds) === JSON.stringify({ thrall: 25, archer: 12, acolyte: 9, gatewarden: 1, choir: 1, colossus: 1, hollowking: 1 }), 'Fifty enemies: 25 thralls, 12 archers, 9 acolytes and the four bosses');
+      // Level 19 is turned away at the door.
+      await kit.setupCharacter(w, bot, { level: 19, gold: 3000 });
+      await kit.teleport(w, bot, { zone: 4, x: ret.x, y: ret.y });
+      let earlier = new Set(w.events);
+      await w.action(bot, { type: 'move', x: stairs.x, y: stairs.y });
+      const refusal = await w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'error' && /level 20/.test(e.text)), 20000, 'The door refuses level 19');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 4 && /level 19/.test(refusal.text), 'A level-19 hero is told to come back at level 20 and stays in Skaldholm');
+      await kit.teleport(w, bot, { zone: 4, x: 100, y: 128 });       // off the stairs: at level 20 the door would take them in at once
+      await kit.setupCharacter(w, bot, { level: 20 });
+      await w.debug(bot, { op: 'set_gold', gold: 3000 });
+      for (let i = 0; i < 3; i++) await w.debug(bot, { op: 'give_item', item: 'linen_satchel', quantity: 1 });   // room for five pieces
+      // The Meeting Stone hires a full party for 250 gold each, with no quest.
+      let reply = await kit.talkTo(w, bot, 'city_meetingstone', 'merc_priest');
+      await w.waitFor(() => w.player(bot).gold === 2750, 5000, 'The 250 gold is paid');
+      check(/Merc Priest joins your party/.test(reply.notice) && w.player(bot).gold === 2750, 'The Stone hires a Priest for 250 gold with no quest');
+      for (const c of ['warrior', 'mage', 'hunter']) await kit.talkTo(w, bot, 'city_meetingstone', 'merc_' + c);
+      await w.waitFor(() => mercs().length === 4, 10000, 'Four mercenaries');
+      reply = await kit.talkTo(w, bot, 'city_meetingstone', 'merc_assassin');
+      check(/already has 5/.test(reply.notice) && mercs().length === 4, 'A party of five is full');
+      // Walk down the stairs with real moves; the mercenaries follow into the same copy.
+      await kit.teleport(w, bot, { zone: 4, x: ret.x, y: ret.y });
+      await w.action(bot, { type: 'move', x: stairs.x, y: stairs.y });
+      await w.waitFor(() => w.player(bot).zone === 5, 20000, 'Down the stairs');
+      await w.action(bot, { type: 'stop' });
+      check(distance(w.player(bot), vault.spawn) < 1.5, 'The stairs set the hero down at the dungeon\'s start');
+      await w.waitFor(() => mercs().length === 4 && mercs().every(m => m.zone === 5 && distance(m, w.player(bot)) < 12), 15000, 'The party arrives together');
+      check(view(bot).slimes.length === 50 && view(bot).slimes.every(s => s.zone === 5) && view(bot).instance.cleared === false, 'The client is sent the fifty enemies of its own copy, labelled zone 5, not yet cleared');
+      check(w.snapshot.online === 1, 'Mercenaries never count as players online');
+      // A stranger gets a copy of their own and sees nothing of ours.
+      await w.connect({ bot: rival, class: 'mage' });
+      await kit.setupCharacter(w, rival, { level: 20 });
+      await kit.teleport(w, rival, { zone: 5, x: vault.spawn.x, y: vault.spawn.y });
+      await w.waitFor(() => view(rival).players.some(p => p.id === w.bots.get(rival).id && p.zone === 5), 10000, 'The stranger is in the dungeon');
+      check(view(rival).players.length === 1 && !view(rival).players.some(p => p.id === w.bots.get(bot).id), 'A second group gets another copy: they never see each other (the merged snapshot keeps one view per zone, so each bot is read through its own)');
+      const thrall = view(bot).slimes.find(s => s.kind === 'thrall');
+      await w.debug(bot, { op: 'kill_enemy', id: thrall.id });
+      await w.waitFor(() => view(bot).slimes.find(s => s.id === thrall.id).dead, 5000, 'Our thrall dies');
+      const mirror = view(rival).slimes.find(s => s.kind === 'thrall');
+      check(mirror && mirror.id !== thrall.id && !mirror.dead && mirror.hp === mirror.maxHp, 'Its twin in the other copy (another enemy id) is untouched');
+      await w.disconnect(rival);
+      // A real archer shoots real missiles at the hero.
+      const archer = view(bot).slimes.filter(s => s.kind === 'archer' && !s.dead)[0];
+      await kit.teleport(w, bot, { zone: 5, x: archer.x - 7, y: archer.y });
+      await w.waitFor(() => (view(bot).ebolts || []).some(b => b.kind === 'archer'), 20000, 'An arrow is in the air');
+      check((view(bot).ebolts || []).every(b => b.zone === 5 && typeof b.speed === 'number'), 'Missiles are in the snapshot with their speed, labelled zone 5');
+      // The exit is shut until the last boss falls; each boss pays the hero a blue Undervault piece.
+      await kit.teleport(w, bot, { zone: 5, x: exit.x, y: exit.y });
+      await w.advance(2000);
+      check(w.player(bot).zone === 5, 'Standing on the closed exit does nothing');
+      const bag = () => w.player(bot).inventory.filter(s => /_l20_vault$/.test(s.item)).length;
+      for (const kind of ['gatewarden', 'choir', 'colossus']) {
+        const boss = view(bot).slimes.find(s => s.kind === kind);
+        await kit.teleport(w, bot, { zone: 5, x: boss.x - 3, y: boss.y });
+        const before = bag();
+        await w.debug(bot, { op: 'kill_enemy', id: boss.id });
+        await kit.teleport(w, bot, { zone: 5, x: boss.x, y: boss.y });          // the pieces fall round the body; a hero collects within three tiles
+        await w.waitFor(() => bag() > before, 15000, `${kind} pays a piece`);
+        check(bag() === before + 1 && view(bot).instance.cleared === false, `${kind} drops one Undervault piece into the hero's bag and does not open the exit`);
+      }
+      const king = view(bot).slimes.find(s => s.kind === 'hollowking'), before = bag();
+      await kit.teleport(w, bot, { zone: 5, x: king.x - 3, y: king.y });
+      await w.debug(bot, { op: 'kill_enemy', id: king.id });
+      await kit.teleport(w, bot, { zone: 5, x: king.x, y: king.y });
+      await w.waitFor(() => bag() >= before + 2, 15000, 'The king pays two pieces');
+      check(bag() === before + 2, 'The Hollow King drops two pieces');
+      check(w.player(bot).inventory.filter(s => /_l20_vault$/.test(s.item)).every(s => { const i = kit.items.find(x => x.id === s.item); return i.rarity === 'rare' && i.source === 'undervault' && i.requiredLevel === 20 && (!i.class || i.class === 'warrior'); }), 'Every piece is blue, level 20, from the Undervault and fits a Warrior');
+      await w.waitFor(() => view(bot).instance.cleared === true, 5000, 'The dungeon is cleared');
+      await kit.teleport(w, bot, { zone: 5, x: exit.x, y: exit.y });
+      await w.waitFor(() => w.player(bot).zone === 4, 15000, 'The portal carries the hero out');
+      check(distance(w.player(bot), { x: exit.tx, y: exit.ty }) < 1.5, 'The opened portal leads out beside the stairs in Skaldholm');
+      // Empty, the dungeon is whole again; one who logs out inside wakes at the stairs.
+      await w.action(bot, { type: 'move', x: stairs.x, y: stairs.y });
+      await w.waitFor(() => w.player(bot).zone === 5, 20000, 'Down again');
+      await w.action(bot, { type: 'stop' });
+      check(view(bot).slimes.length === 50 && view(bot).slimes.every(s => !s.dead) && view(bot).instance.cleared === false, 'Back in: every enemy alive again and the exit shut');
+      await w.disconnect(bot);
+      await w.connect({ bot });
+      check(w.player(bot).zone === 4 && distance(w.player(bot), { x: ret.x, y: ret.y }) < 3, 'A hero who logged out inside wakes at the stairs in Skaldholm');
+      await w.restart();
+      check(w.player(bot).zone === 4, 'The city position survives a Rust restart');
     },
   },
 };

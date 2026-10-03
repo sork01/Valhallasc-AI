@@ -79,6 +79,14 @@ async function type(page, text) {
     await type(sork, '/gm');
     await sork.waitForFunction(() => /Game master commands/.test(document.getElementById('chat-log').textContent), null, { timeout: 5000 });
     check((await chatLog(sork)).includes('/tp'), '/gm lists the commands');
+    const listed = async word => { await sork.evaluate(() => { document.getElementById('chat-log').textContent = ''; }); await type(sork, word); await sork.waitForFunction(() => /Game master commands/.test(document.getElementById('chat-log').textContent), null, { timeout: 5000 }); return chatLog(sork); };
+    check((await listed('/gmcommands')).includes('/tp'), '/gmcommands lists the commands too');
+    // Enter opens the chat box even when a button kept the focus after a mouse click
+    await sork.evaluate(() => document.getElementById('chat-input').blur());
+    await sork.locator('#chat-form button').focus();
+    await sork.keyboard.press('Enter');
+    check(await sork.evaluate(() => document.activeElement?.id === 'chat-input'), 'Enter puts the cursor in the chat box even after a button was focused');
+    await sork.keyboard.press('Escape');
     await type(sork, '/give');
     await sork.waitForFunction(() => /Name an item/.test(document.getElementById('chat-log').textContent), null, { timeout: 5000 });
     check(true, 'a malformed command is explained, not sent');

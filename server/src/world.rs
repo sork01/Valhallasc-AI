@@ -11,11 +11,15 @@ use tokio::sync::{mpsc, oneshot, watch};
 
 mod consumables;
 mod debug;
+mod instances;
 mod mercs;
+mod ranged;
 #[cfg(test)]
 mod resource_tests;
 mod resources;
 mod social;
+#[cfg(test)]
+mod vault_tests;
 
 pub type Peer = mpsc::Sender<Value>;
 const KING_SPAWN_MIN: f64 = 300.;
@@ -205,6 +209,15 @@ struct Buff {
     left: f64,
     time: f64,
 }
+/// How a ranged kind shoots (see `Slime::ranged`).
+struct Ranged {
+    range: f64,
+    speed: f64,
+    color: &'static str,
+    size: f64,
+    shots: u32,
+    spread: f64,
+}
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Slime {
@@ -247,6 +260,9 @@ struct Slime {
     goal: Point,
     #[serde(skip)]
     hit: bool,
+    /// The attack in progress is a shot (or a volley), not a blow.
+    #[serde(skip)]
+    volley: bool,
     /// Character IDs, so reconnecting does not lose participation. Cleared on evade/respawn.
     #[serde(skip)]
     contributors: std::collections::BTreeSet<String>,
@@ -276,6 +292,15 @@ impl Slime {
             "hydra" => (5200., 150., 2.2, 1.8),
             // Five level-20 heroes with a healer who must triage: two hits fell a non-tank, so no party without a healer gets through.
             "gloomroot" => (90000., 1500., 2.3, 2.1),
+            // The Undervault, tuned for five level-20 heroes with a healer. Trash packs of three or four; the
+            // bosses are fights of one to two minutes each (see the vault_* simulations in the tests).
+            "thrall" => (6500., 380., 2.6, 1.15),
+            "archer" => (4200., 300., 2.4, 1.1),
+            "acolyte" => (4600., 320., 2.3, 1.1),
+            "gatewarden" => (80000., 1000., 2.4, 1.9),
+            "choir" => (100000., 600., 2.3, 1.6),
+            "colossus" => (110000., 1300., 1.9, 2.3),
+            "hollowking" => (130000., 900., 2.6, 2.1),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -300,6 +325,9 @@ impl Slime {
             "knight" => 18,
             "hydra" => 20,
             "gloomroot" => 20,
+            "thrall" | "archer" => 19,
+            "acolyte" | "gatewarden" | "choir" => 20,
+            "colossus" | "hollowking" => 21,
             _ => 2,
         }
     }
@@ -322,6 +350,13 @@ impl Slime {
             "knight" => 245,
             "hydra" => 360,
             "gloomroot" => 1200,
+            "thrall" => 280,
+            "archer" => 290,
+            "acolyte" => 320,
+            "gatewarden" => 1500,
+            "choir" => 1800,
+            "colossus" => 2200,
+            "hollowking" => 3500,
             _ => 0,
         }
     }
@@ -344,8 +379,68 @@ impl Slime {
             "knight" => (0.6, 1.4, 6.5, 7.5),
             "hydra" => (0.55, 1.3, 7.5, 9.),
             "gloomroot" => (0.85, 1.5, 7.5, 8.5),
+            "thrall" => (0.45, 1.2, 7.5, 8.),
+            "archer" => (0.6, 1.8, 0., 11.),
+            "acolyte" => (0.7, 2.2, 0., 11.),
+            "gatewarden" => (0.9, 1.8, 7., 9.),
+            "choir" => (0.8, 2.6, 0., 13.),
+            "colossus" => (1., 2.2, 6., 9.),
+            "hollowking" => (0.8, 1.7, 8., 14.),
             _ => (0.45, 1.3, 6., 5.5),
         }
+    }
+    /// Kinds that shoot instead of striking: how far, how fast the missile flies, its colour and size, and how many
+    /// fly at once (spread across `spread` radians). The shot is released when the windup ends, so a hero who walks
+    /// out of the line in that moment is missed.
+    fn ranged(kind: &str) -> Option<Ranged> {
+        let (range, speed, color, size, shots, spread) = match kind {
+            "archer" => (10., 14., "#f1e2b0", 0.5, 1, 0.),
+            "acolyte" => (10., 9., "#b46bff", 0.8, 1, 0.),
+            "choir" => (11., 9., "#7be0ff", 0.9, 3, 0.34),
+            "hollowking" => (12., 10., "#9cff8f", 1.0, 5, 0.24),
+            _ => return None,
+        };
+        Some(Ranged {
+            range,
+            speed,
+            color,
+            size,
+            shots,
+            spread,
+        })
+    }
+    /// A ranged kind that also fights toe to toe: it shoots only from farther than this.
+    fn melee_inside(kind: &str) -> f64 {
+        if kind == "hollowking" { 4.5 } else { 0. }
+    }
+    /// Radius of the ground-pound a kind does instead of a single blow (0: an ordinary strike). It lands when the
+    /// windup ends, on everyone inside, so the wind-up is the warning.
+    fn slam_radius(kind: &str) -> f64 {
+        match kind {
+            "gatewarden" => 3.6,
+            "colossus" => 4.,
+            "hollowking" => 3.2,
+            _ => 0.,
+        }
+    }
+    /// What fraction of its blow a ground-pound deals to each hero in the ring (it hits everyone at once).
+    fn slam_factor(kind: &str) -> f64 {
+        match kind {
+            "gatewarden" => 0.45,
+            "colossus" => 0.4,
+            _ => 0.5,
+        }
+    }
+    /// Dungeon enemies keep one level (the Undervault is tuned for exactly level 20 heroes).
+    fn fixed_level(kind: &str) -> bool {
+        matches!(
+            kind,
+            "thrall" | "archer" | "acolyte" | "gatewarden" | "choir" | "colossus" | "hollowking"
+        )
+    }
+    /// Bosses pay a multiple of an ordinary kill's XP.
+    fn xp_multiplier(kind: &str) -> u32 {
+        if is_boss(kind) { 12 } else { 1 }
     }
     fn level_scale(kind: &str, level: u32, per_level: f64) -> f64 {
         (1. + per_level * (level as f64 - Self::default_level(kind) as f64)).max(0.2)
@@ -387,12 +482,13 @@ impl Slime {
             seed: id as f64,
             windup_time: Self::attack_profile(&s.kind).0,
             damage: (damage * strength).round(),
-            xp: enemy_xp(level),
+            xp: enemy_xp(level) * Self::xp_multiplier(&s.kind),
             gold: (Self::base_gold(&s.kind) as f64 * Self::level_scale(&s.kind, level, 0.1)).round()
                 as u32,
             target: None,
             goal: Point { x: s.x, y: s.y },
             hit: false,
+            volley: false,
             contributors: Default::default(),
         }
     }
@@ -453,6 +549,10 @@ pub struct World {
     players: BTreeMap<u64, Player>,
     slimes: Vec<Slime>,
     bolts: Vec<Bolt>,
+    // Missiles shot by ranged enemies (world/ranged.rs).
+    enemy_bolts: Vec<ranged::EnemyBolt>,
+    // The private copies of every dungeon (world/instances.rs).
+    instances: Vec<instances::Instance>,
     drops: Vec<Drop>,
     // Failed disconnect writes are retried by the next periodic transaction.
     pending_saves: Vec<Character>,
@@ -486,6 +586,7 @@ impl World {
         let extra = std::mem::take(&mut first.zones);
         let mut maps = vec![first];
         maps.extend(extra);
+        let instances = Self::make_instances(&mut maps);
         let spawns: Vec<SlimeSpawn> = maps
             .iter()
             .enumerate()
@@ -502,6 +603,8 @@ impl World {
             players: BTreeMap::new(),
             slimes: vec![],
             bolts: vec![],
+            enemy_bolts: vec![],
+            instances,
             drops: vec![],
             pending_saves: vec![],
             time: 0.,
@@ -518,45 +621,55 @@ impl World {
             social: social::Social::default(),
         };
         for id in 0..world.spawns.len() {
-            let spawn = world.spawns[id].clone();
-            let level = world.roll_level(&spawn.kind);
-            let mut enemy = Slime::with_level(id, &spawn, level);
-            if spawn.kind == "big" {
-                // Keep stable entity IDs while hiding kings until the world timer fires.
-                enemy.dead = true;
-                enemy.hp = 0.;
-                enemy.state = "waiting".into();
-                enemy.die_t = 2.;
-            }
+            let enemy = world.fresh_enemy(id);
             world.slimes.push(enemy);
         }
         world.next_king_spawn = world.king_spawn_delay();
         for id in 0..world.slimes.len() {
-            if !world.slimes[id].dead {
-                let zone = world.slimes[id].zone;
-                let bodies = world.actor_bodies(zone, None, Some(id));
-                if let Some(point) = free_actor_position(
-                    &world.maps[zone],
-                    world.slimes[id].point(),
-                    world.slimes[id].r,
-                    &bodies,
-                    true,
-                ) {
-                    world.slimes[id].x = point.x;
-                    world.slimes[id].y = point.y;
-                } else {
-                    world.slimes[id].dead = true;
-                    world.slimes[id].die_t = 2.;
-                    world.slimes[id].respawn = TICK;
-                }
-            }
+            world.place_enemy(id);
         }
         world
+    }
+    /// A new enemy for spawn `id`, at full health and a freshly rolled level (kings start hidden until the world timer).
+    fn fresh_enemy(&mut self, id: usize) -> Slime {
+        let spawn = self.spawns[id].clone();
+        let level = self.roll_level(&spawn.kind);
+        let mut enemy = Slime::with_level(id, &spawn, level);
+        if spawn.kind == "big" {
+            // Keep stable entity IDs while hiding kings until the world timer fires.
+            enemy.dead = true;
+            enemy.hp = 0.;
+            enemy.state = "waiting".into();
+            enemy.die_t = 2.;
+        }
+        enemy
+    }
+    /// Moves a living enemy off whatever it overlaps; one that finds no room starts dead and respawns at once.
+    fn place_enemy(&mut self, id: usize) {
+        if self.slimes[id].dead {
+            return;
+        }
+        let zone = self.slimes[id].zone;
+        let bodies = self.actor_bodies(zone, None, Some(id));
+        if let Some(point) = free_actor_position(
+            &self.maps[zone],
+            self.slimes[id].point(),
+            self.slimes[id].r,
+            &bodies,
+            true,
+        ) {
+            self.slimes[id].x = point.x;
+            self.slimes[id].y = point.y;
+        } else {
+            self.slimes[id].dead = true;
+            self.slimes[id].die_t = 2.;
+            self.slimes[id].respawn = TICK;
+        }
     }
     // A kind's default level, moved by a uniform random whole number within the spread.
     fn roll_level(&mut self, kind: &str) -> u32 {
         let default = Slime::default_level(kind) as i32;
-        if self.level_spread <= 0 {
+        if self.level_spread <= 0 || Slime::fixed_level(kind) {
             return default as u32;
         }
         let offset = (self.random() * (2 * self.level_spread + 1) as f64) as i32;
@@ -599,7 +712,7 @@ impl World {
     }
     fn separate_enemies(&mut self) {
         for id in 0..self.slimes.len() {
-            if self.slimes[id].dead {
+            if self.slimes[id].dead || self.zone_idle(self.slimes[id].zone) {
                 continue;
             }
             let bodies = self.actor_bodies(self.slimes[id].zone, None, Some(id));
@@ -694,12 +807,26 @@ impl World {
     // What one client needs: its own zone's players, enemies, bolts and drops. Zones are separate maps, so
     // nothing about another zone is ever sent to this client.
     pub fn snapshot_for(&self, zone: usize) -> Value {
-        json!({"type":"snapshot","tick":self.tick,"time":self.time,
+        let idle = self.zone_idle(zone);
+        let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,
         "players":self.players.values().filter(|p| p.character.zone == zone).map(Player::snapshot).collect::<Vec<_>>(),
-        "slimes":self.slimes.iter().filter(|s| s.zone == zone).collect::<Vec<_>>(),
+        "slimes":self.slimes.iter().filter(|s| s.zone == zone && !idle).collect::<Vec<_>>(),
         "bolts":self.bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
+        "ebolts":self.enemy_bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
         "drops":self.drops.iter().filter(|d| d.zone == zone).collect::<Vec<_>>(),
-        "online":self.humans_online()})
+        "online":self.humans_online()});
+        if let Some(instance) = self.instance_at(zone) {
+            view["instance"] = json!({"cleared":instance.cleared});
+            // A private copy is told it is the template zone, so a client has one dungeon whatever copy it stands in.
+            if instance.template != zone {
+                for key in ["players", "slimes", "bolts", "ebolts", "drops"] {
+                    for item in view[key].as_array_mut().into_iter().flatten() {
+                        item["zone"] = json!(instance.template);
+                    }
+                }
+            }
+        }
+        view
     }
     // Published to every connection: one complete view per zone. Each connection forwards only the view
     // that holds its own character; `tick` and `online` also sit at the top for the health route.
@@ -810,6 +937,12 @@ impl World {
             c.zone = 0;
             c.x = self.maps[0].spawn.x;
             c.y = self.maps[0].spawn.y;
+        }
+        // A dungeon copy is gone once nobody is in it: a hero who logged out inside wakes at its door.
+        if self.is_instance(c.zone)
+            && let Some(door) = self.maps[c.zone].portals.iter().find(|p| !p.after_clear)
+        {
+            (c.zone, c.x, c.y) = (door.to, door.tx, door.ty);
         }
         let mut point = c.point();
         self.maps[c.zone].collide(&mut point, PLAYER_RADIUS);
@@ -1214,6 +1347,7 @@ impl World {
         self.time += TICK;
         self.tick += 1;
         self.update_king_spawn();
+        self.update_instances();
         self.update_mercenaries();
         let sessions: Vec<_> = self.players.keys().copied().collect();
         for session in sessions {
@@ -1223,9 +1357,12 @@ impl World {
         // Players pass through actors; enemies yield before their own movement.
         self.separate_enemies();
         for i in 0..self.slimes.len() {
-            self.update_slime(i);
+            if !self.zone_idle(self.slimes[i].zone) {
+                self.update_slime(i);
+            }
         }
         self.update_bolts();
+        self.update_enemy_bolts();
         self.update_drops();
         let stale: Vec<_> = self
             .players
@@ -1281,7 +1418,13 @@ impl World {
         if self.time - p.last_hurt > 5. {
             p.character.hp = (p.character.hp + 3. * TICK).min(p.character.max_hp());
         }
-        p.character.explore(self.maps[p.character.zone].size);
+        let public = self
+            .instances
+            .iter()
+            .find(|i| i.zone == p.character.zone)
+            .map_or(p.character.zone, |i| i.template);
+        p.character
+            .explore_in(public, self.maps[p.character.zone].size);
         for title in sync_progression(&mut p.character, &self.maps) {
             let _ = p.peer.try_send(json!({"type":"system","text":format!(
                 "A new quest has found you: {title}. Follow it in your journal (Q)."
@@ -1391,14 +1534,16 @@ impl World {
             return;
         }
         let here = p.character.point();
-        let Some(portal) = self.maps[p.character.zone]
+        let cleared = self.instance_cleared(p.character.zone);
+        let Some(mut portal) = self.maps[p.character.zone]
             .portals
             .iter()
             .find(|portal| {
-                here.distance(Point {
-                    x: portal.x,
-                    y: portal.y,
-                }) < portal.r
+                (!portal.after_clear || cleared)
+                    && here.distance(Point {
+                        x: portal.x,
+                        y: portal.y,
+                    }) < portal.r
             })
             .cloned()
         else {
@@ -1407,6 +1552,34 @@ impl World {
         if portal.to >= self.maps.len() {
             return;
         }
+        // A dungeon's door asks for its level, whoever you are with.
+        let need = self.maps[portal.to].min_level;
+        if p.character.level < need {
+            let text = format!(
+                "{} is for heroes of level {need} and above. You are level {}.",
+                self.maps[portal.to].name, p.character.level
+            );
+            let p = self.players.get_mut(&session).unwrap();
+            p.portal_at = self.time;
+            let _ = p.peer.try_send(json!({"type":"error","text":text}));
+            return;
+        }
+        // A dungeon's door leads to a private copy: the party's own, or a free one.
+        if self.maps[portal.to].copies > 0 {
+            match self.instance_for(session, portal.to) {
+                Ok(copy) => portal.to = copy,
+                Err(text) => {
+                    let p = self.players.get_mut(&session).unwrap();
+                    p.portal_at = self.time;
+                    let _ = p.peer.try_send(json!({"type":"error","text":text}));
+                    return;
+                }
+            }
+        }
+        if self.is_instance(portal.to) {
+            self.enter_instance(portal.to);
+        }
+        let p = &self.players[&session];
         let actor = p.character.id.clone();
         self.event("portal", &actor, here, 0., false);
         let mut arrival = Point {
@@ -1424,7 +1597,17 @@ impl World {
         p.attack = 0.;
         p.dash = 0.;
         let name = self.maps[portal.to].name.clone();
+        let party = self.maps[portal.to].players;
         let text = match self.maps[portal.to].levels {
+            Some([low, high]) if party > 0 => format!(
+                "You step through {} into {name}, a dungeon of your own. Recommended level {}, {party} players.",
+                portal.name,
+                if low == high {
+                    low.to_string()
+                } else {
+                    format!("{low}–{high}")
+                }
+            ),
             Some([low, high]) => format!(
                 "You step through {} into {name}. Recommended levels {low}–{high}.",
                 portal.name
@@ -1933,7 +2116,9 @@ impl World {
         if killed {
             s.dead = true;
             s.die_t = 0.;
+            // Nothing in a dungeon comes back until the dungeon itself resets.
             s.respawn = match kind.as_str() {
+                _ if self.instances.iter().any(|i| i.zone == zone) => 1e9,
                 "big" => 0.,
                 "cinderlord" => 180.,
                 "gloomroot" => 300.,
@@ -2007,6 +2192,12 @@ impl World {
                 col: "#ffe066",
             });
             self.item_drop(&credit_id, zone, point, material(&kind), 1);
+            if is_boss(&kind) {
+                self.boss_loot(&kind, zone, point, &contributors);
+            }
+            if !self.maps[zone].final_boss.is_empty() && self.maps[zone].final_boss == kind {
+                self.clear_instance(zone, point);
+            }
             let chance = self.random();
             let choice = self.random();
             if let Some(i) = roll_equipment(&kind, level, chance, choice) {
@@ -2014,6 +2205,41 @@ impl World {
             }
         }
         dealt
+    }
+    /// A boss pays every hero who fought it (the hirer for a mercenary) one blue piece per slot pool, fitted to their
+    /// class, so nobody has to win a roll. Pieces fall around the body, each owned by the hero it is for.
+    fn boss_loot(
+        &mut self,
+        kind: &str,
+        zone: usize,
+        point: Point,
+        contributors: &std::collections::BTreeSet<String>,
+    ) {
+        let heroes: Vec<(String, Class)> = self
+            .players
+            .values()
+            .filter(|p| {
+                p.merc.is_none()
+                    && p.character.zone == zone
+                    && contributors.contains(&p.character.id)
+            })
+            .map(|p| (p.character.id.clone(), p.character.look.class))
+            .collect();
+        for (n, (owner, class)) in heroes.into_iter().enumerate() {
+            for (m, slots) in boss_slots(kind).iter().enumerate() {
+                let choice = self.random();
+                let Some(piece) = boss_piece(slots, class, choice) else {
+                    continue;
+                };
+                let angle = (n * 2 + m) as f64 * 1.1;
+                let mut at = Point {
+                    x: point.x + angle.cos() * 1.2,
+                    y: point.y + angle.sin() * 1.2,
+                };
+                self.maps[zone].collide(&mut at, 0.1);
+                self.item_drop(&owner, zone, at, &piece.id, 1);
+            }
+        }
     }
     fn item_drop(&mut self, owner: &str, zone: usize, point: Point, item_id: &str, quantity: u32) {
         let id = self.entity();
@@ -2126,6 +2352,12 @@ impl World {
         let mut goal = None;
         let mut movement = speed * TICK;
         let mut hit = None;
+        // Set when the windup of a ranged attack ends: where to shoot. A ground-pound lists everyone it lands on.
+        let mut fire = None;
+        let mut slammed: Vec<u64> = vec![];
+        let mut slam_now = false;
+        let ranged = Slime::ranged(&s.kind);
+        let slam = Slime::slam_radius(&s.kind);
         match s.state.as_str() {
             "idle" if s.st <= 0. => {
                 s.goal = Point {
@@ -2148,10 +2380,31 @@ impl World {
                 if let Some((_, point, d)) =
                     target.filter(|_| s.point().distance(Point { x: s.hx, y: s.hy }) < 14.)
                 {
-                    if d < 1.15 + s.r && s.atk_cd <= 0. {
+                    let shoots = ranged.as_ref().is_some_and(|r| {
+                        d > Slime::melee_inside(&s.kind) + s.r && d < r.range * 3.
+                    });
+                    if let (true, Some(r)) = (shoots, ranged.as_ref()) {
+                        if d <= r.range && s.atk_cd <= 0. {
+                            s.state = "windup".into();
+                            s.st = windup;
+                            s.goal = point;
+                            s.volley = true;
+                        } else if d > r.range * 0.85 {
+                            goal = Some(point);
+                        } else if d < r.range * 0.35 && !is_elite(&s.kind) {
+                            // Too close for comfort: back away from the hero while the shot recovers.
+                            let away = point.direction(s.point());
+                            goal = Some(Point {
+                                x: s.x + away.x * 3.,
+                                y: s.y + away.y * 3.,
+                            });
+                            movement *= 0.8;
+                        }
+                    } else if d < 1.15 + s.r + if slam > 0. { 0.9 } else { 0. } && s.atk_cd <= 0. {
                         s.state = "windup".into();
                         s.st = windup;
                         s.goal = point;
+                        s.volley = false;
                     } else {
                         goal = Some(point);
                     }
@@ -2170,6 +2423,41 @@ impl World {
                     if let Some((_, point, _)) = target {
                         s.goal = point;
                     }
+                }
+            }
+            "lunge" if s.volley => {
+                // A shot: stand still, release once.
+                if !s.hit {
+                    s.hit = true;
+                    fire = Some(s.goal);
+                }
+                if s.st <= 0. {
+                    s.state = "chase".into();
+                    s.atk_cd = cooldown;
+                    s.rec_t = 0.22;
+                }
+            }
+            "lunge" if slam > 0. => {
+                // A ground-pound: everyone inside the radius is hit at the instant the windup ends.
+                if !s.hit {
+                    s.hit = true;
+                    slam_now = true;
+                    let centre = s.point();
+                    slammed = self
+                        .players
+                        .iter()
+                        .filter(|(_, p)| {
+                            p.character.hp > 0.
+                                && p.character.zone == zone
+                                && p.character.point().distance(centre) <= slam + PLAYER_RADIUS
+                        })
+                        .map(|(id, _)| *id)
+                        .collect();
+                }
+                if s.st <= 0. {
+                    s.state = "chase".into();
+                    s.atk_cd = cooldown;
+                    s.rec_t = 0.22;
                 }
             }
             "lunge" => {
@@ -2194,7 +2482,9 @@ impl World {
                 if s.point().distance(home) < 0.4 {
                     s.state = "idle".into();
                     s.st = 1.;
-                    s.hp = if matches!(s.kind.as_str(), "cinderlord" | "gloomroot") {
+                    s.hp = if matches!(s.kind.as_str(), "cinderlord" | "gloomroot")
+                        || is_boss(&s.kind)
+                    {
                         s.max_hp
                     } else {
                         (s.hp + s.max_hp * 0.5).min(s.max_hp)
@@ -2230,6 +2520,25 @@ impl World {
         let (kind, level) = (s.kind.clone(), s.level);
         if let Some(session) = hit {
             self.hurt_player_by(session, damage, point, &kind, level);
+        }
+        if slam_now {
+            // The ring is announced to the zone once, on the tick the pound lands.
+            self.emit_zone(
+                zone,
+                json!({"type":"event","kind":"slam","actor":"","x":point.x,"y":point.y,"value":slam,"crit":false}),
+            );
+        }
+        for session in slammed {
+            self.hurt_player_by(
+                session,
+                damage * Slime::slam_factor(&kind),
+                point,
+                &kind,
+                level,
+            );
+        }
+        if let (Some(aim), Some(r)) = (fire, ranged) {
+            self.fire_enemy_bolts(id, aim, &r);
         }
     }
     #[cfg(test)]
@@ -2626,6 +2935,10 @@ mod tests {
     // Fixed levels keep health, damage and XP exact; level rolls have their own tests.
     fn world() -> World {
         World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)
+    }
+    // The zones a client knows: the file's zones, not the extra private copies of a dungeon.
+    fn zone_count(w: &World) -> usize {
+        w.maps.iter().filter(|m| m.template.is_none()).count()
     }
     fn join(w: &mut World, id: u64, class: Class) -> mpsc::Receiver<Value> {
         let (tx, rx) = mpsc::channel(256);
@@ -4015,7 +4328,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(w.maps.len(), 5);
+        assert_eq!(zone_count(&w), 6);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -4513,7 +4826,7 @@ mod tests {
         w.players.get_mut(&1).unwrap().character.zone = 2;
         w.players.get_mut(&2).unwrap().character.zone = 1;
         let snapshot = w.snapshot();
-        assert_eq!(snapshot["zones"].as_array().unwrap().len(), 5);
+        assert_eq!(snapshot["zones"].as_array().unwrap().len(), w.maps.len());
         for (zone, count) in [(0, 21), (1, 27), (2, 27)] {
             let view = w.snapshot_for(zone);
             assert_eq!(
@@ -4617,7 +4930,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(w.maps.len(), 5);
+        assert_eq!(zone_count(&w), 6);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -5207,7 +5520,11 @@ mod tests {
     fn skaldholm_is_a_big_enemy_free_city_with_a_hundred_houses_a_wall_and_a_gate_pair() {
         let w = world();
         let map = &w.maps[CITY];
-        assert_eq!(w.maps.len(), 5, "Skaldholm is the fifth map");
+        assert_eq!(
+            zone_count(&w),
+            6,
+            "Skaldholm is the fifth map; the Undervault the sixth"
+        );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
         assert_eq!(map.size % 8, 0, "whole ground chunks");
@@ -6483,6 +6800,11 @@ mod tests {
             portals: vec![],
             levels: None,
             zones: vec![],
+            copies: 0,
+            final_boss: String::new(),
+            players: 0,
+            min_level: 0,
+            template: None,
         };
         let blocker = Point { x: 21.9, y: 20.5 };
         for (start, direction, distance) in [
@@ -6897,7 +7219,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(w.maps.len(), 5);
+        assert_eq!(zone_count(&w), 6);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));
@@ -6953,7 +7275,10 @@ mod tests {
                     portal.id
                 );
                 assert!(
-                    target.portals.iter().any(|back| back.to == zone),
+                    target
+                        .portals
+                        .iter()
+                        .any(|back| back.to == w.public_zone(zone)),
                     "{} has no way back",
                     portal.id
                 );
@@ -6987,6 +7312,15 @@ mod tests {
                 s.kind,
                 s.level
             );
+            // A dungeon's enemies never roll (they stay at their level) and a view of an unused copy lists none.
+            if w.is_instance(s.zone) {
+                assert_eq!(
+                    s.level, default,
+                    "{} keeps its level inside a dungeon",
+                    s.kind
+                );
+                continue;
+            }
             let view = w.snapshot_for(s.zone);
             let listed = view["slimes"]
                 .as_array()
@@ -9705,7 +10039,7 @@ mod tests {
         w.join(1, None, Some(Look::default()), tx).unwrap();
         w.test_commands = true;
         w.debug(1, None, DebugCommand::ExploreAll);
-        assert_eq!(w.players[&1].character.explored, vec![511; w.maps.len()]);
+        assert_eq!(w.players[&1].character.explored, vec![511; zone_count(&w)]);
         w.test_commands = false;
         w.players.get_mut(&1).unwrap().character.explored.clear();
         w.debug(1, None, DebugCommand::ExploreAll);

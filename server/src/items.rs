@@ -53,6 +53,9 @@ pub struct Item {
     /// level allows, at its `price`.
     #[serde(default)]
     pub family: Option<String>,
+    /// Gear that only one source hands out (`undervault`: the dungeon's bosses). It is never part of the ordinary drop pool.
+    #[serde(default)]
+    pub source: Option<String>,
     #[serde(default)]
     pub price: u32,
 }
@@ -128,6 +131,13 @@ pub fn material(kind: &str) -> &'static str {
         "knight" => "drowned_gauntlet",
         "hydra" => "hydra_fang",
         "gloomroot" => "gloomroot_heartwood",
+        "thrall" => "crypt_bone",
+        "archer" => "bone_fletching",
+        "acolyte" => "hollow_ash",
+        "gatewarden" => "wardens_signet",
+        "choir" => "hollow_chime",
+        "colossus" => "runed_keystone",
+        "hollowking" => "crown_shard",
         _ => "slime_gel",
     }
 }
@@ -166,7 +176,47 @@ pub fn rarity_color(rarity: &str) -> &'static str {
     }
 }
 pub fn is_elite(kind: &str) -> bool {
-    matches!(kind, "big" | "cinderlord" | "gloomroot")
+    matches!(kind, "big" | "cinderlord" | "gloomroot") || is_boss(kind)
+}
+/// The four bosses of the Undervault (the dungeon under Skaldholm). Each pays every contributor a guaranteed blue piece.
+pub fn is_boss(kind: &str) -> bool {
+    matches!(kind, "gatewarden" | "choir" | "colossus" | "hollowking")
+}
+/// The slot pools a boss drops from: one blue piece per pool, for each player who fought it. Pieces are level 20 and
+/// fit the player's class (pants, rings and necklaces fit everyone).
+pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
+    match kind {
+        "gatewarden" => &[&["headgear", "shoulders"]],
+        "choir" => &[&["gloves", "pants"]],
+        "colossus" => &[&["weapon", "accessory"]],
+        "hollowking" => &[
+            &["armor"],
+            &[
+                "weapon",
+                "headgear",
+                "shoulders",
+                "gloves",
+                "pants",
+                "accessory",
+            ],
+        ],
+        _ => &[],
+    }
+}
+/// A piece of Undervault gear (a 15% stronger recolour of the level-20 blue set) of one of `slots` that `class` can wear.
+/// `choice` is uniform in [0, 1).
+pub fn boss_piece(slots: &[&str], class: Class, choice: f64) -> Option<&'static Item> {
+    let pool: Vec<_> = ITEMS
+        .iter()
+        .filter(|i| {
+            i.rarity == "rare"
+                && i.required_level == 20
+                && i.source.as_deref() == Some("undervault")
+                && slots.contains(&i.kind.as_str())
+                && i.class.is_none_or(|c| c == class)
+        })
+        .collect();
+    pool.get((choice * pool.len() as f64) as usize).copied()
 }
 /// Which tier, if any, a kill drops. `roll` is uniform in [0, 1): the bands start with the rarest tier, so one roll
 /// gives at most one piece. Legendary exists only for elites.
@@ -192,7 +242,13 @@ pub fn roll_equipment(kind: &str, level: u32, chance: f64, choice: f64) -> Optio
     let limit = max_drop_level(level);
     let pool: Vec<_> = ITEMS
         .iter()
-        .filter(|i| i.rarity == rarity && is_gear(i) && !i.starter && i.required_level <= limit)
+        .filter(|i| {
+            i.rarity == rarity
+                && is_gear(i)
+                && !i.starter
+                && i.source.is_none()
+                && i.required_level <= limit
+        })
         .collect();
     pool.get((choice * pool.len() as f64) as usize).copied()
 }
@@ -638,6 +694,13 @@ mod tests {
             ("knight", "drowned_gauntlet", 195),
             ("hydra", "hydra_fang", 230),
             ("gloomroot", "gloomroot_heartwood", 420),
+            ("thrall", "crypt_bone", 90),
+            ("archer", "bone_fletching", 95),
+            ("acolyte", "hollow_ash", 105),
+            ("gatewarden", "wardens_signet", 600),
+            ("choir", "hollow_chime", 700),
+            ("colossus", "runed_keystone", 800),
+            ("hollowking", "crown_shard", 1200),
         ] {
             assert_eq!(material(kind), id);
             let i = item(id).expect("the material exists in the catalog");
@@ -1054,6 +1117,44 @@ mod tests {
     // The catalog's budget, as the stat ladder states it: base x level factor x tier. White carries one stat; green
     // adds the other on top of an unchanged base; blue is 17.5% over green, purple 17.5% over blue.
     #[test]
+    fn undervault_gear_comes_only_from_the_bosses_never_from_the_ordinary_drop_roll() {
+        let vault: Vec<_> = ITEMS
+            .iter()
+            .filter(|i| i.source.as_deref() == Some("undervault"))
+            .collect();
+        assert_eq!(
+            vault.len(),
+            27,
+            "every level-20 blue piece the bosses can drop"
+        );
+        for kind in ["green", "big", "hydra", "gloomroot", "hollowking", "thrall"] {
+            for n in 0..4000 {
+                let choice = n as f64 / 4000.;
+                for tier in [0.00005, 0.0001, 0.0004, 0.002] {
+                    if let Some(i) = roll_equipment(kind, 20, tier, choice) {
+                        assert!(i.source.is_none(), "{kind} dropped {}", i.id);
+                    }
+                }
+            }
+        }
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
+            for kind in ["gatewarden", "choir", "colossus", "hollowking"] {
+                for slots in boss_slots(kind) {
+                    assert!(
+                        boss_piece(slots, class, 0.5).is_some(),
+                        "{kind} has a {class:?} piece in {slots:?}"
+                    );
+                }
+            }
+        }
+    }
+    #[test]
     fn stats_follow_the_level_and_rarity_ladder() {
         let factor = |level: u32| -> f64 {
             match level {
@@ -1094,9 +1195,15 @@ mod tests {
                 _ => 1.,
             };
             let total = i.attack + i.defense;
-            let expected = base * factor(i.required_level) * tier(&i.rarity);
+            // Undervault gear is its blue set recoloured and made 15% stronger.
+            let bonus = if i.source.as_deref() == Some("undervault") {
+                1.15
+            } else {
+                1.
+            };
+            let expected = base * factor(i.required_level) * tier(&i.rarity) * bonus;
             assert!(
-                (total - expected).abs() <= 0.1 + 1e-9,
+                (total - expected).abs() <= if bonus > 1. { 0.2 } else { 0.1 } + 1e-9,
                 "{}: {total} against {expected}",
                 i.id
             );
@@ -1121,9 +1228,10 @@ mod tests {
                 // Green keeps exactly the white base of its level; each tier above scales both stats.
                 assert!(
                     (primary
-                        - base * factor(i.required_level) * tier(&i.rarity) / tier("uncommon"))
-                    .abs()
-                        <= 0.1 + 1e-9,
+                        - base * factor(i.required_level) * tier(&i.rarity) / tier("uncommon")
+                            * bonus)
+                        .abs()
+                        <= 0.2 + 1e-9,
                     "{} keeps the base of white gear of its level, scaled by its tier",
                     i.id
                 );

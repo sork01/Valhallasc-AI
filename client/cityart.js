@@ -191,7 +191,6 @@
       glow(g, '#59d9ff', 12, () => stoneRunes(g, '#7fe6ff', 3, .85));
       g.fillStyle = 'rgba(120,150,110,.5)'; g.beginPath(); g.ellipse(-22, -8, 14, 6, 0, 0, Math.PI * 2); g.fill();   // moss at the foot
       g.restore();
-      text(g, 'Meeting Stone', 0, -300, 17, '#a9ecff');
     },
     animate(g, o, sx, sy, t) {
       g.save(); g.translate(sx, sy - 20);

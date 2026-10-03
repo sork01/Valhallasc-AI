@@ -25,6 +25,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import generate_gloamfen as fen                   # noqa: E402  (flood fill helpers and the summit constants)
 import skaldholm_content as content               # noqa: E402
+import undervault_layout as uv                    # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 PATH = ROOT / 'world/map.txt'
@@ -260,12 +261,18 @@ def build_landmarks(b, places):
     mx, my = 100.0, 118.0
     b.add(obj('meetingstone', mx, my, 1.7), force=True)
     for i in range(4):
+        if i == 0:
+            continue                                     # the south-east bench makes way for the stairs down to the Undervault
         a = i * math.pi / 2 + math.pi / 4
         b.add(building('bench', mx + 5.4 * math.cos(a), my + 5.4 * math.sin(a), 1.5, .45, '', ''), force=True)
+    sx, sy = uv.STAIRS_DOWN
+    for px, py in [(sx - 2.1, sy - .4), (sx + 2.1, sy - .4), (sx, sy - 2.3), (sx - 1.9, sy + 1.6), (sx + 1.9, sy + 1.6)]:   # the stairwell: posts round three sides and the two lantern pillars of the way in (the art is drawn with the portal; you step on from the south)
+        b.add(obj('post', px, py, .45), force=True)
     for i in range(4):
         a = i * math.pi / 2
         b.add(obj('lamp', mx + 6.9 * math.cos(a), my + 6.9 * math.sin(a), .18), force=True)
-    places['stonewarden'] = (mx - 2.4, my + 3.6)
+    places['stonewarden'] = (mx - 3.0, my + 5.4)
+    places['meetingstone'] = (mx + 1.7, my + 1.7)              # the Stone itself speaks (it hires fighters): straight below it on screen, so a click on the monolith reaches it
     # Markets: stalls on the north edge of the Trade Road, fronts toward the road
     stalls_w = [('Spices', '#c46760', 24), ('Cloth', '#678c9b', 30), ('Pottery', '#c4a060', 36), ('Fruit', '#7aa060', 42),
                 ('Boots', '#8a6a4a', 49), ('Cheese', '#e0c060', 55)]
@@ -588,7 +595,9 @@ def build(rng):
     zone = {'name': NAME, 'theme': 'city', 'tagline': 'A walled city of a hundred hearths beyond the glacier', 'size': SIZE, 'spawn': {'x': ARRIVAL[0], 'y': ARRIVAL[1]}, 'paths': [],
             'roads': roads, 'objects': b.objects, 'slimes': [], 'npcs': people, 'quests': content.quests(), 'city': dict(CITY),
             'portals': [{'id': 'glacier_gate', 'name': 'the Glacier Gate', 'x': RETURN_GATE[0], 'y': RETURN_GATE[1], 'r': 1.1,
-                         'to': 2, 'tx': 0.0, 'ty': 0.0}]}
+                         'to': 2, 'tx': 0.0, 'ty': 0.0},
+                        {'id': 'undervault_stairs', 'name': 'the Stairs to the Undervault', 'x': uv.STAIRS_DOWN[0], 'y': uv.STAIRS_DOWN[1], 'r': 1.1,
+                         'to': 5, 'tx': uv.ARRIVAL[0], 'ty': uv.ARRIVAL[1], 'look': 'stairs_down'}]}
     return zone, dict(houses=len(houses), trees=trees, filled=filled)
 
 
@@ -602,7 +611,7 @@ def check_zone(zone):
         if not seen[int(n['y'] / .5), int(n['x'] / .5)]:
             missing.append(n['id'])
     for name, (x, y) in [('return gate', (RETURN_GATE[0], RETURN_GATE[1] - 2)), ('plaza', (FOUNTAIN[0] + 9.7, FOUNTAIN[1])),
-                         ('stone court', (100, 123)), ('orchard', (123, 28)), ('garden', (27.4, 34))]:
+                         ('stone court', (100, 123)), ('stairs', (uv.STAIRS_DOWN[0], uv.STAIRS_DOWN[1] + 1.6)), ('stairs return', uv.STAIRS_RETURN), ('orchard', (123, 28)), ('garden', (27.4, 34))]:
         if not seen[int(y / .5), int(x / .5)]:
             missing.append(name)
     soft = fen.obstacle_grid(zone, .5, margin=.35)
@@ -623,6 +632,7 @@ def main():
     meadow = json.loads(raw)
     assert json.dumps(meadow, indent=2) + '\n' == raw, 'map.txt is not in the canonical 2-space JSON layout'
     assert len(meadow['zones']) >= 3 and meadow['zones'][2]['name'] == 'Gloamfen', 'Gloamfen must be zone 3: run generate_gloamfen.py first'
+    later = meadow['zones'][4:]                       # zone 5+ (the Undervault) belongs to its own generator
     meadow['zones'] = [z for z in meadow['zones'][:3] if z['name'] != NAME]
     (gx, gy), moved = add_city_gate(meadow, random.Random(20261007))     # its own stream: it only draws numbers on the first run
     zone, stats = build(random.Random(20261008))
@@ -632,6 +642,7 @@ def main():
         raise SystemExit(f'unreachable: {missing}; blocked walker routes: {bad_routes}')
     meadow['zones'].append(zone)
     assert len(meadow['zones']) == 4, 'Skaldholm must be zone 4'
+    meadow['zones'] += later
     PATH.write_text(json.dumps(meadow, indent=2) + '\n')
     kinds = {}
     for o in zone['objects']:

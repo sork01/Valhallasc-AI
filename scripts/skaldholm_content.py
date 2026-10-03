@@ -6,6 +6,7 @@ generator puts down; the generator checks that every one of them is reachable an
 import json
 from pathlib import Path
 
+import mercenary_offers
 import progression_quests
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,8 +36,10 @@ def look(skin='#edc5a1', hair='#755841', style='short', hat=None, apron=None, be
     return out
 
 
-def person(id, name, role, x, y, color, dialogue, offers=None, buys=False, look_=None, route=None, speed=0.0, pause=0.0, phase=0.0):
+def person(id, name, role, x, y, color, dialogue, offers=None, buys=False, look_=None, route=None, speed=0.0, pause=0.0, phase=0.0, art=None):
     n = dict(id=P + id, name=name, role=role, x=x, y=y, color=color, dialogue=dialogue, offers=offers or [], buys=buys)
+    if art:
+        n['art'] = art
     if look_:
         n['look'] = look_
     if route:
@@ -79,8 +82,11 @@ def key_people():
                'The archive holds every map, tally and tall tale the city has ever received. What it lacks is the fen: nobody has ever brought back more than a rumour, a gauntlet and a headache.',
                look_=look('#edc5a1', '#cfcfcf', 'bald', None, None, '#cfcfcf')),
         person('stonewarden', 'Stonewarden Magnus Hale', 'Keeper of the Meeting Stone', 96.0, 125.5, '#5a7a9a',
-               'The Meeting Stone has stood here since before the walls. Wanderers who part at the Great Gate find each other again beside it. Gather your friends at the stone, and mind the runes — they are only as bright as the last gift they were given.',
+               'The Meeting Stone has stood here since before the walls. Wanderers who part at the Great Gate find each other again beside it. Gather your friends at the stone — and if you have too few, speak to the Stone itself: it will call fighters to your side for a fee. Mind the stairs beside it. They lead down to the Undervault, where the first Skalds sealed what they could not kill. Take five, and take a healer.',
                look_=look('#e0b48e', '#e8e8e8', 'short', None, None, '#e8e8e8')),
+        person('meetingstone', 'The Meeting Stone', 'Gather your party', 101.7, 119.7, '#59d9ff',
+               'The runes brighten as you near. A voice that is not a voice offers you company: fighters of every calling answer the Stone for 250 gold apiece, and fight at your side until you dismiss them, leave your party or log out. A party holds five. The stairs beside the Stone lead down to the Undervault, a dungeon made for five heroes of level 20.',
+               mercenary_offers.offers(open_=True), art='stone'),
     ]
 
 

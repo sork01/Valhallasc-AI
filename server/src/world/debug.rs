@@ -38,6 +38,17 @@ impl World {
         session: u64,
         command: DebugCommand,
     ) -> Result<Value, String> {
+        // A teleport to a dungeon lands in a copy of it (the party's own, else a free one) and wakes that copy.
+        let command = match command {
+            DebugCommand::Teleport { zone, x, y }
+                if self.maps.get(zone).is_some_and(|m| m.copies > 0) =>
+            {
+                let copy = self.instance_for(session, zone)?;
+                self.enter_instance(copy);
+                DebugCommand::Teleport { zone: copy, x, y }
+            }
+            other => other,
+        };
         let p = self.players.get_mut(&session).ok_or("Unknown session.")?;
         let actor = p.character.id.clone();
         let point = p.character.point();
@@ -109,7 +120,8 @@ impl World {
                 json!({"statPoints":c.stat_points()})
             }
             DebugCommand::ExploreAll => {
-                p.character.explored = vec![(1 << (FOG_GRID * FOG_GRID)) - 1; self.maps.len()];
+                let zones = self.maps.iter().filter(|m| m.template.is_none()).count();
+                p.character.explored = vec![(1 << (FOG_GRID * FOG_GRID)) - 1; zones];
                 json!({"explored":p.character.explored})
             }
             DebugCommand::ResetCooldowns => {
@@ -150,7 +162,8 @@ impl World {
                 p.attack = 0.;
                 p.dash = 0.;
                 self.separate_enemies();
-                json!({"zone":zone,"x":arrival.x,"y":arrival.y})
+                let public = self.public_zone(zone);
+                json!({"zone":public,"x":arrival.x,"y":arrival.y})
             }
             DebugCommand::Teleport { zone, x, y } => {
                 if zone >= self.maps.len() {
@@ -170,7 +183,8 @@ impl World {
                 p.attack = 0.;
                 p.dash = 0.;
                 self.separate_enemies();
-                json!({"zone":zone,"x":arrival.x,"y":arrival.y})
+                let public = self.public_zone(zone);
+                json!({"zone":public,"x":arrival.x,"y":arrival.y})
             }
             DebugCommand::GiveItem {
                 item: id,
@@ -312,7 +326,7 @@ impl World {
                     .filter(|s| s.kind == kind)
                     .min_by_key(|s| (!s.dead, s.id))
                     .map(|s| s.id)
-                    .ok_or("No enemy of that kind exists. Kinds: green, blue, pink, yellow, beetle, wisp, spider, wraith, golem, cinderlord, crab, wolf, yeti, wyrm, toad, croc, knight, hydra, gloomroot.")?;
+                    .ok_or("No enemy of that kind exists. Kinds: green, blue, pink, yellow, beetle, wisp, spider, wraith, golem, cinderlord, crab, wolf, yeti, wyrm, toad, croc, knight, hydra, gloomroot, thrall, archer, acolyte, gatewarden, choir, colossus, hollowking.")?;
                 let zone = self.players[&session].character.zone;
                 let mut enemy = Slime::with_level(
                     id,

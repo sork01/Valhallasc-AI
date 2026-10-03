@@ -121,20 +121,37 @@ impl World {
         let class = class_named(class).ok_or("There is no such fighter for hire.")?;
         let p = self.players.get(&session).ok_or("Unknown session.")?;
         let c = &p.character;
+        // A group-quest giver rents fighters for that quest; the Meeting Stone rents them to anyone, for any party of up to five.
         let quest = self.maps[c.zone]
             .quests
             .iter()
             .find(|q| {
                 q.group && q.npc == npc_id && c.quests.iter().any(|g| g.id == q.id && !g.claimed)
             })
-            .ok_or("Take this elite quest first; I hire out fighters for the job itself.")?;
-        let wanted = quest.recommended_players as usize;
+            .map(|q| (q.recommended_players as usize, q.title.clone()));
+        let open = self.maps[c.zone]
+            .npcs
+            .iter()
+            .find(|n| n.id == npc_id)
+            .is_some_and(|n| {
+                n.offers.iter().any(|o| {
+                    o.open && o.merc.as_deref() == Some(class_title(class).to_lowercase().as_str())
+                })
+            });
+        let (wanted, title) = match quest {
+            Some(found) => found,
+            None if open => (social::PARTY_MAX, "The Meeting Stone".to_owned()),
+            None => {
+                return Err(
+                    "Take this elite quest first; I hire out fighters for the job itself.".into(),
+                );
+            }
+        };
         let owner = c.id.clone();
         let party = self.party_mates(&owner).len();
         if party >= wanted {
             return Err(format!(
-                "{} wants {wanted} fighters and your party already has {party}.",
-                quest.title
+                "{title} wants {wanted} fighters and your party already has {party}."
             ));
         }
         if c.gold < MERC_COST {
