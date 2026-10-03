@@ -108,7 +108,7 @@ impl World {
         let Some(p) = self.players.get(&session) else {
             return;
         };
-        let _ = p.peer.try_send(json!({"type":"dialogue","npc":npc_json,"notice":notice,"gold":p.character.gold,"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+        let _ = p.peer.try_send(json!({"type":"dialogue","npc":npc_json,"notice":notice,"gold":p.character.gold,"level":p.character.level,"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         self.save();
     }
 
@@ -280,14 +280,31 @@ impl World {
                     .map(|s| s.id)
             });
         let class = self.players[&session].character.look.class;
-        // Keep the party alive first: a potion when low, then the class's healing and buffs.
+        // Keep the party alive first: one potion at a time (they share a cooldown), health before mana.
         {
             let p = &self.players[&session];
-            if p.character.hp < p.character.max_hp() * 0.45
-                && p.potion_cd <= 0.
-                && p.character.quantity("health_potion") > 0
+            let c = &p.character;
+            let best = |wanted: &dyn Fn(&Item) -> bool| {
+                c.inventory
+                    .iter()
+                    .filter_map(|s| item(&s.item))
+                    .filter(|i| i.kind == "potion" && wanted(i) && i.required_level <= c.level)
+                    .max_by(|a, b| (a.heal + a.mana).total_cmp(&(b.heal + b.mana)))
+                    .map(|i| i.id.clone())
+            };
+            let drink = if p.potion_cd > 0. {
+                None
+            } else if c.hp < c.max_hp() * 0.45 {
+                best(&|i| i.heal > 0.)
+            } else if c.look.class.resource_type() == "mana"
+                && c.resource() < c.max_resource() * 0.25
             {
-                self.use_item(session, "health_potion");
+                best(&|i| i.mana > 0.)
+            } else {
+                None
+            };
+            if let Some(id) = drink {
+                self.use_item(session, &id);
             }
         }
         let hurt = |hp: f64, max: f64, fraction: f64| hp < max * fraction;

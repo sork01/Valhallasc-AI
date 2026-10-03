@@ -37,7 +37,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   // kind in a chosen state, so every clip can be drawn without a level-1 hero meeting them. The server is untouched.
   let stage = null;
   const kinds = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
-  const levels = { toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20 }, health = { toad: 2000, croc: 2800, knight: 3400, hydra: 5200, gloomroot: 20000 }, windup = { toad: .45, croc: .35, knight: .6, hydra: .55, gloomroot: .85 };
+  const levels = { toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20 }, health = { toad: 2000, croc: 2800, knight: 3400, hydra: 5200, gloomroot: 90000 }, windup = { toad: .45, croc: .35, knight: .6, hydra: .55, gloomroot: .85 };
   const restage = text => {
     let packet; try { packet = JSON.parse(text); } catch { return text; }
     const snap = packet.type === 'welcome' ? packet.snapshot : packet.type === 'snapshot' ? packet : null, me = snap?.players[0];

@@ -33,7 +33,10 @@ impl World {
         let amount = match p.character.look.class.resource_type() {
             "energy" => 10. * TICK,
             "rage" if p.combat_left <= 0. => -5. * TICK,
-            "mana" if p.combat_left <= 0. => p.character.max_resource() * 0.05 * TICK,
+            // Out of combat mana returns quickly; in a fight a trickle keeps a healer going (a mend every few seconds).
+            "mana" => {
+                p.character.max_resource() * if p.combat_left <= 0. { 0.05 } else { 0.015 } * TICK
+            }
             _ => 0.,
         };
         p.character.change_resource(amount);

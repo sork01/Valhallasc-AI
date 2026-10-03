@@ -1039,7 +1039,7 @@ const scenarios = {
       check(bogs.length === 32 && bogs.every(s => s.zone === 3) && new Set(bogs.map(s => s.kind)).size === 5
         && ['toad', 'croc', 'knight', 'hydra', 'gloomroot'].every(k => bogs.some(s => s.kind === k)), 'A fen client receives exactly the 32 fen monsters, five kinds, and nothing from the other zones');
       check(bogs.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2 && s.level >= 13) && new Set(bogs.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'Fen levels sit within two of each default (15-20) and really vary');
-      const hp = { toad: 2000, croc: 2800, knight: 3400, hydra: 5200, gloomroot: 20000 };
+      const hp = { toad: 2000, croc: 2800, knight: 3400, hydra: 5200, gloomroot: 90000 };
       check(bogs.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
       check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
       check(w.events.some(e => e.type === 'system' && e.text.includes('Gloamfen') && e.text.includes('15–20')), 'The player is told the recommended levels');
@@ -1540,7 +1540,7 @@ const scenarios = {
       check(q.group === true && q.recommendedPlayers === 5 && q.level === 20 && q.rewardItem === reward, 'The quest is a shared five-player level-20 quest with a guaranteed item');
       check(kit.items.find(i => i.id === reward).rarity === 'rare' && !kit.items.find(i => i.id === reward).class, 'The reward is a blue piece every class can wear');
       const elite = w.snapshot.slimes.find(s => s.kind === 'gloomroot');
-      check(elite.elite && elite.level === 20 && elite.maxHp === 20000 && elite.zone === 3, 'Exactly the level-20 elite is present in Gloamfen with authoritative 20000 HP');
+      check(elite.elite && elite.level === 20 && elite.maxHp === 90000 && elite.zone === 3, 'Exactly the level-20 elite is present in Gloamfen with authoritative 90000 HP');
       const place = [[-3, -3], [3, -3], [-3, 3], [3, 3], [0, 5]];
       for (const [i, bot] of bots.entries()) await kit.teleport(w, bot, { zone: 3, x: elite.x + place[i][0], y: elite.y + place[i][1] });
       for (const bot of bots) await w.action(bot, { type: 'target', id: elite.id });

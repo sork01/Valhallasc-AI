@@ -272,8 +272,8 @@ impl Slime {
             "croc" => (2800., 112., 3.2, 1.5),
             "knight" => (3400., 130., 2.4, 1.4),
             "hydra" => (5200., 150., 2.2, 1.8),
-            // Five level-20 heroes with a healer who must triage: three hits fell a non-tank, so no party without one gets through.
-            "gloomroot" => (20000., 900., 2.3, 2.1),
+            // Five level-20 heroes with a healer who must triage: two hits fell a non-tank, so no party without a healer gets through.
+            "gloomroot" => (90000., 1500., 2.3, 2.1),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -1090,16 +1090,32 @@ impl World {
                             Err(text) => notice = text.into(),
                         }
                     } else if let Some(sold) = &offer.item {
-                        match item(sold) {
+                        // A tiered offer sells the best tier of the line for the buyer's level, at that tier's price.
+                        let level = p.character.level;
+                        let stock = item(sold).map(|base| {
+                            if offer.tiered {
+                                base.family
+                                    .as_deref()
+                                    .and_then(|f| best_tier(f, level))
+                                    .unwrap_or(base)
+                            } else {
+                                base
+                            }
+                        });
+                        let cost = match stock {
+                            Some(i) if offer.tiered => i.price,
+                            _ => offer.cost,
+                        };
+                        match stock {
                             None => notice = "That item is not for sale.".into(),
-                            Some(_) if p.character.gold < offer.cost => {
-                                notice = format!("You need {} gold for this purchase.", offer.cost);
+                            Some(_) if p.character.gold < cost => {
+                                notice = format!("You need {cost} gold for this purchase.");
                             }
                             Some(i) if !p.character.can_collect(&i.id) => {
                                 notice = "Your bags are full. Make room first.".into();
                             }
                             Some(i) => {
-                                p.character.gold -= offer.cost;
+                                p.character.gold -= cost;
                                 p.character.add_item(&i.id, 1);
                                 notice = format!("Bought {}.", i.name);
                                 quest_changed = true;
@@ -1145,7 +1161,7 @@ impl World {
         }
         let _ = p
             .peer
-            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         let actor = p.character.id.clone();
         let point = p.character.point();
         if contract_over {
@@ -3475,6 +3491,11 @@ mod tests {
                 w.slimes[id].hp, w.slimes[id].max_hp, w.time
             );
             if wins {
+                assert!(
+                    w.time >= 120.,
+                    "the fight lasts at least two minutes: {:.0} s",
+                    w.time
+                );
                 assert!(deaths <= 3, "and lose at most three: {deaths}");
                 assert_eq!(
                     w.players[&1]
@@ -3489,6 +3510,94 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn a_tiered_vendor_sells_the_best_tier_for_the_buyers_level_and_a_potion_needs_its_level() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Mage);
+        let buy = |w: &mut World, rx: &mut mpsc::Receiver<Value>, level: u32, gold: u32| {
+            {
+                let c = &mut w.players.get_mut(&1).unwrap().character;
+                c.level = level;
+                c.gold = gold;
+            }
+            quest_interact(w, "apothecary", Some("buy_health_potion"));
+            dialogue_notice(rx)
+        };
+        // Level 1: the original potion for 30 gold.
+        let text = buy(&mut w, &mut rx, 1, 100);
+        assert_eq!(text, "Bought Health Potion.");
+        assert_eq!(w.players[&1].character.gold, 70);
+        // Level 10 and 20: the stronger tiers at their own prices.
+        let text = buy(&mut w, &mut rx, 10, 100);
+        assert_eq!(text, "Bought Greater Health Potion.");
+        assert_eq!(w.players[&1].character.gold, 40);
+        let text = buy(&mut w, &mut rx, 20, 100);
+        assert!(text.contains("need 110 gold"), "{text}");
+        let text = buy(&mut w, &mut rx, 20, 300);
+        assert_eq!(text, "Bought Superior Health Potion.");
+        assert_eq!(w.players[&1].character.gold, 190);
+        assert_eq!(w.players[&1].character.quantity("health_potion_l20"), 1);
+        // Stew and mana follow the same rule.
+        w.players.get_mut(&1).unwrap().character.gold = 500;
+        quest_interact(&mut w, "baker", Some("buy_traveler_stew"));
+        assert!(dialogue_notice(&mut rx).contains("Ranger's Feast"));
+        quest_interact(&mut w, "apothecary", Some("buy_mana_potion"));
+        assert!(dialogue_notice(&mut rx).contains("Superior Mana Potion"));
+        // A potion cannot be used below its level, and is not spent.
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.level = 5;
+            c.hp = 1.;
+        }
+        w.use_item(1, "health_potion_l20");
+        let c = &w.players[&1].character;
+        assert_eq!((c.hp, c.quantity("health_potion_l20")), (1., 1));
+        w.players.get_mut(&1).unwrap().character.level = 20;
+        w.players.get_mut(&1).unwrap().character.hp = 1.;
+        w.use_item(1, "health_potion_l20");
+        let c = &w.players[&1].character;
+        assert_eq!(c.quantity("health_potion_l20"), 0);
+        assert!(c.hp >= 350.);
+    }
+
+    #[test]
+    fn a_mercenary_drinks_its_mana_potion_when_low_and_a_health_potion_when_hurt() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.level = 20;
+            c.gold = 600;
+            c.zone = 1;
+        }
+        for s in w.slimes.iter_mut() {
+            s.dead = true;
+            s.respawn = 10000.;
+        }
+        at_giver(&mut w, 1, "crags_captain");
+        w.time += 0.6;
+        w.interact(1, "crags_captain", Some("quest:accept:crags_cinderlord"));
+        drain(&mut rx);
+        assert!(hire(&mut w, &mut rx, 1, "crags_captain", "mage").contains("joins"));
+        let merc = *w.players.iter().find(|(_, p)| p.merc.is_some()).unwrap().0;
+        w.players.get_mut(&merc).unwrap().character.resource = Some(10.);
+        w.step();
+        let p = &w.players[&merc];
+        assert_eq!(
+            p.character.quantity("mana_potion_l20"),
+            2,
+            "it drank a mana potion"
+        );
+        assert!(p.character.resource() > 250.);
+        // The potions share a cooldown, so a wound right after waits.
+        w.players.get_mut(&merc).unwrap().character.hp = 5.;
+        w.step();
+        assert_eq!(w.players[&merc].character.quantity("health_potion_l20"), 3);
+        w.players.get_mut(&merc).unwrap().potion_cd = 0.;
+        w.step();
+        assert_eq!(w.players[&merc].character.quantity("health_potion_l20"), 2);
     }
 
     #[test]
@@ -4615,8 +4724,8 @@ mod tests {
             (
                 "gloomroot",
                 20,
-                20000.,
-                900.,
+                90000.,
+                1500.,
                 0.85,
                 1200,
                 "gloomroot_heartwood",

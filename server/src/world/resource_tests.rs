@@ -64,28 +64,33 @@ fn energy_recovers_in_combat_caps_at_one_hundred_and_stops_when_dead() {
     }
 }
 #[test]
-fn mana_waits_for_combat_to_end_including_enemy_aggro_without_damage() {
+fn mana_trickles_in_combat_including_enemy_aggro_without_damage_and_returns_quickly_after() {
     let (mut w, _) = setup(Class::Mage);
     let p = w.players.get_mut(&1).unwrap();
     p.character.resource = Some(0.);
     p.combat_left = 5.;
-    for _ in 0..99 {
+    // A mage has 100 mana at level 1: 1.5% a second in combat is 0.075 a tick.
+    let gain = |w: &mut World| {
+        let before = resource(w);
         w.update_resource(1);
-    }
-    assert_eq!(resource(&w), 0.);
+        resource(w) - before
+    };
+    assert!((gain(&mut w) - 0.075).abs() < 1e-9);
     let s = &mut w.slimes[0];
     s.dead = false;
     s.target = Some(1);
     s.state = "chase".into();
-    for _ in 0..200 {
-        w.update_resource(1);
-    }
-    assert_eq!(resource(&w), 0.);
+    w.players.get_mut(&1).unwrap().combat_left = 0.;
+    // An enemy chasing the mage is combat even with no damage dealt: still the trickle.
+    assert!((gain(&mut w) - 0.075).abs() < 1e-9);
+    assert_eq!(w.players[&1].combat_left, 5.);
     w.slimes[0].dead = true;
-    for _ in 0..121 {
+    for _ in 0..102 {
         w.update_resource(1);
     }
-    assert!((resource(&w) - 5.5).abs() < 0.3);
+    assert_eq!(w.players[&1].combat_left, 0.);
+    // Out of combat it is 5% a second: 0.25 a tick.
+    assert!((gain(&mut w) - 0.25).abs() < 1e-9);
 }
 #[test]
 fn mana_grows_with_level_and_intellect_and_legacy_saves_start_full() {
@@ -196,7 +201,8 @@ fn food_restores_mana_at_full_health_and_potions_share_cooldown_without_wasting_
         w.update_food(1);
         w.update_player(1);
     }
-    assert!((resource(&w) - 50.).abs() < 1e-8);
+    // The meal gives 50 mana over 4 s, plus the 1.5% a second trickle of a mage in combat.
+    assert!((resource(&w) - 56.).abs() < 0.5, "{}", resource(&w));
     w.use_item(1, "mana_potion");
     assert_eq!(resource(&w), 100.);
     assert_eq!(w.players[&1].character.quantity("mana_potion"), 1);
@@ -264,5 +270,6 @@ fn healing_a_fighting_party_member_puts_the_priest_in_combat() {
     assert_eq!(w.players[&1].combat_left, 5.);
     w.players.get_mut(&1).unwrap().character.resource = Some(0.);
     w.update_resource(1);
-    assert_eq!(resource(&w), 0.);
+    // Still in combat: only the trickle, not the out-of-combat rate.
+    assert!((resource(&w) - 0.075).abs() < 1e-9);
 }

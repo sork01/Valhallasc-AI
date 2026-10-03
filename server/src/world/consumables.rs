@@ -18,6 +18,10 @@ impl World {
         if p.character.hp <= 0. {
             return refuse(p, "You cannot use items while defeated.");
         }
+        if p.character.level < it.required_level {
+            let text = format!("{} needs level {}.", it.name, it.required_level);
+            return refuse(p, &text);
+        }
         if p.character.quantity(id) == 0 {
             return refuse(p, "You do not have that item.");
         }

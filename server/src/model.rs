@@ -373,7 +373,15 @@ impl Character {
             gm: false,
         };
         c.seed_inventory();
-        c.add_item("health_potion", 3);
+        // The best potions the mercenary's level allows: health for everyone, mana for casters.
+        if let Some(i) = crate::items::best_tier("health_potion", level) {
+            c.add_item(&i.id, 3);
+        }
+        if class.resource_type() == "mana"
+            && let Some(i) = crate::items::best_tier("mana_potion", level)
+        {
+            c.add_item(&i.id, 3);
+        }
         let points = level.saturating_sub(1) * 3;
         let stamina = points / 4;
         let main = points - stamina;
@@ -971,6 +979,9 @@ pub struct Offer {
     /// A mercenary the offer rents: a class name, or "dismiss" to send them all away (see world/mercs.rs).
     #[serde(default)]
     pub merc: Option<String>,
+    /// Sells the best tier of the item's family for the buyer's level, at that tier's price (potions and food).
+    #[serde(default)]
+    pub tiered: bool,
 }
 #[derive(Clone, Deserialize, Serialize)]
 pub struct Npc {

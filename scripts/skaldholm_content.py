@@ -13,9 +13,9 @@ LEVEL_XP = json.loads((ROOT / 'world/levels.txt').read_text())  # XP to next lev
 P = 'city_'
 
 HEALER_OFFERS = [dict(id='blessing', label='Receive a healing blessing', cost=0, heal=10000),
-                 dict(id='buy_mana_potion', label='Buy Mana Potion · 100 mana instantly', cost=30, item='mana_potion'),
-                 dict(id='buy_health_potion', label='Buy Health Potion · 100 HP instantly', cost=30, item='health_potion')]
-GUILD_OFFERS = [dict(id='buy_traveler_stew', label="Buy Traveler's Stew · 100 HP and mana over 8 s", cost=12, item='traveler_stew'),
+                 dict(id='buy_mana_potion', label='Buy Mana Potion · 100 mana instantly', cost=30, item='mana_potion', tiered=True),
+                 dict(id='buy_health_potion', label='Buy Health Potion · 100 HP instantly', cost=30, item='health_potion', tiered=True)]
+GUILD_OFFERS = [dict(id='buy_traveler_stew', label="Buy Traveler's Stew · 100 HP and mana over 8 s", cost=12, item='traveler_stew', tiered=True),
                 dict(id='satchel', label='Buy Linen Satchel · 6 extra bag slots', cost=500, bag='linen_satchel')]
 SMITH_OFFERS = [dict(id='fitting', label='Replace and fit starter gear', cost=0, gear=True)]
 INN_OFFERS = [dict(id='rest', label='Meal & rest · fully restores HP', cost=5, heal=10000)]

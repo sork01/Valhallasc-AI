@@ -301,9 +301,17 @@
     const offers=[];
     if(view.kind==='gossip'){
       if(npc.buys){const b=row('vendor','I have something to sell.');b.dataset.view='sell';b.addEventListener('click',()=>show({kind:'sell'},'#npc-back'));offers.push(b);}
+      // A tiered offer (potions and food) sells the best tier of its line for the player's level, so it shows that tier.
+      const tierFor=offer=>{
+        const base=WORLD_ITEMS.find(i=>i.id===offer.item);
+        if(!offer.tiered||!base?.family)return null;
+        return WORLD_ITEMS.filter(i=>i.family===base.family&&(i.requiredLevel||1)<=(packet.level||1)).sort((a,b)=>(b.requiredLevel||1)-(a.requiredLevel||1))[0]||base;
+      };
       for(const offer of npc.offers){
-        const b=row(iconFor(offer),offer.label,offer.cost?`${offer.cost} gold`:'Free');b.dataset.offer=offer.id;
-        b.disabled=packet.gold<offer.cost || (offer.bag && (packet.bags || []).length >= 4 && !(packet.bags || []).some(id => WORLD_ITEMS.find(i => i.id === id)?.bagSlots < WORLD_ITEMS.find(i => i.id === offer.bag)?.bagSlots));
+        const tier=tierFor(offer),cost=tier?tier.price:offer.cost;
+        const b=row(iconFor(offer),tier?`Buy ${tier.name} · ${window.Inventory.effect(tier)}`:offer.label,cost?`${cost} gold`:'Free');b.dataset.offer=offer.id;
+        if(tier)b.dataset.tier=tier.id;
+        b.disabled=packet.gold<cost || (offer.bag && (packet.bags || []).length >= 4 && !(packet.bags || []).some(id => WORLD_ITEMS.find(i => i.id === id)?.bagSlots < WORLD_ITEMS.find(i => i.id === offer.bag)?.bagSlots));
         b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:offer.id})) b.disabled=true;});offers.push(b);
       }
     }

@@ -4,7 +4,7 @@
 (() => {
   const $ = id => document.getElementById(id);
   const KINDS = [{ kind: 'food', key: 'z', name: 'Food', empty: 'No food · buy Traveler\'s Stew from Pip in Alderhaven' }, { kind: 'potion', key: 'x', name: 'Potion', empty: 'No potion · buy Health Potions from Mira Moonleaf in Alderhaven' }, { kind: 'mana', key: 'c', name: 'Mana', empty: 'No mana potion · buy from a potion merchant' }];
-  const best = kind => WORLD_ITEMS.filter(i => (kind === 'mana' ? i.kind === 'potion' && i.mana > 0 : i.kind === kind && (kind !== 'potion' || i.heal > 0)) && Inventory.quantity(i.id) > 0).sort((a, b) => kind === 'mana' ? b.mana - a.mana : (b.heal || 0) - (a.heal || 0))[0];
+  const best = kind => WORLD_ITEMS.filter(i => (kind === 'mana' ? i.kind === 'potion' && i.mana > 0 : i.kind === kind && (kind !== 'potion' || i.heal > 0)) && Inventory.quantity(i.id) > 0 && (i.requiredLevel || 1) <= (Field.hero.level || 1)).sort((a, b) => kind === 'mana' ? b.mana - a.mana : (b.heal || 0) - (a.heal || 0))[0];
   const node = (tag, text, cls) => { const n = document.createElement(tag); if (text) n.textContent = text; if (cls) n.className = cls; return n; };
   const slots = new Map();
   function use(kind) {

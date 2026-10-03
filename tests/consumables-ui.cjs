@@ -44,7 +44,7 @@ const overlap = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
   // --- buying: the baker sells food, the apothecary potions ---
   await page.evaluate(() => Field.visitNpc('baker'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 60000 });
-  check(await page.locator('#npc-offers [data-offer="buy_traveler_stew"]').textContent().then(t => t.includes('100 HP and mana over 8 s') && t.includes('12 gold')), 'The baker lists Traveler\'s Stew with its effect and price');
+  check(await page.locator('#npc-offers [data-offer="buy_traveler_stew"]').textContent().then(t => t.includes('Restores 100 HP and 100 mana over 8 s') && t.includes('12 gold')), 'The baker lists Traveler\'s Stew with its effect and price');
   check(await page.locator('#npc-offers [data-offer="buy_health_potion"]').count() === 0, 'The baker does not list potions');
   await page.waitForTimeout(600);
   await page.locator('#npc-offers [data-offer="buy_traveler_stew"]').click();
@@ -57,7 +57,7 @@ const overlap = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
   await page.locator('#npc-close').click();
   await page.evaluate(() => Field.visitNpc('apothecary'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 60000 });
-  check(await page.locator('#npc-offers [data-offer="buy_health_potion"]').textContent().then(t => t.includes('100 HP instantly') && t.includes('30 gold')), 'The apothecary lists Health Potion');
+  check(await page.locator('#npc-offers [data-offer="buy_health_potion"]').textContent().then(t => t.includes('Restores 100 HP at once') && t.includes('30 gold')), 'The apothecary lists Health Potion');
   await page.waitForTimeout(600);
   await page.locator('#npc-offers [data-offer="buy_health_potion"]').click();
   await page.waitForFunction(() => Inventory.quantity('health_potion') === 1 && Field.hero.gold === 46);
@@ -131,6 +131,21 @@ const overlap = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
   // --- nothing owned: the press is answered, not ignored ---
   await page.keyboard.press('z');
   check(await slot('food').getAttribute('data-item') === '' && await slot('potion').getAttribute('data-item') === 'health_potion', 'The food slot empties when the food is gone; the spare potion stays');
+  // --- tiers: at level 20 the same offers sell the level-20 potion and stew, and the bag colours them blue ---
+  await page.evaluate(() => { Online.send({ type: 'debug', ref: 901, command: { op: 'set_level', level: 20 } }); Online.send({ type: 'debug', ref: 902, command: { op: 'set_gold', gold: 500 } }); });
+  await page.waitForFunction(() => Field.hero.level === 20 && Field.hero.gold === 500, null, { timeout: 10000 });
+  await page.evaluate(() => Field.visitNpc('apothecary'));
+  await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 60000 });
+  check(await page.locator('#npc-offers [data-offer="buy_health_potion"]').textContent().then(t => t.includes('Superior Health Potion') && t.includes('Restores 350 HP at once') && t.includes('110 gold')), 'At level 20 the apothecary sells the Superior Health Potion for 110 gold');
+  check(await page.locator('#npc-offers [data-offer="buy_mana_potion"]').textContent().then(t => t.includes('Superior Mana Potion') && t.includes('300 mana') && t.includes('110 gold')), 'and the Superior Mana Potion');
+  await page.waitForTimeout(600);
+  await page.locator('#npc-offers [data-offer="buy_health_potion"]').click();
+  await page.waitForFunction(() => Inventory.quantity('health_potion_l20') === 1 && Field.hero.gold === 390);
+  check(await page.evaluate(() => WORLD_ITEMS.find(i => i.id === 'health_potion_l20').rarity === 'rare' && Inventory.effect(WORLD_ITEMS.find(i => i.id === 'health_potion_l20')).includes('needs level 20')), 'The tier is blue and says what level it needs');
+  await page.locator('#npc-close').click();
+  // The quick slot picks the strongest potion the hero may use: the level-20 one over the plain one.
+  await page.waitForFunction(() => document.querySelector('#quickuse [data-kind="potion"]')?.dataset.item === 'health_potion_l20', null, { timeout: 10000 });
+  check(true, 'The potion quick slot holds the level-20 potion');
   check(errors.length === 0, `No browser runtime errors: ${errors.join('; ')}`);
   console.log(`${checks} food and potion UI checks passed; screenshots: ${world.artifacts}`);
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {

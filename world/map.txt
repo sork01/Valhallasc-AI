@@ -1391,13 +1391,15 @@
           "id": "buy_health_potion",
           "label": "Buy Health Potion \u00b7 100 HP instantly",
           "cost": 30,
-          "item": "health_potion"
+          "item": "health_potion",
+          "tiered": true
         },
         {
           "id": "buy_mana_potion",
           "label": "Buy Mana Potion \u00b7 100 mana instantly",
           "cost": 30,
-          "item": "mana_potion"
+          "item": "mana_potion",
+          "tiered": true
         }
       ]
     },
@@ -1455,7 +1457,8 @@
           "id": "buy_traveler_stew",
           "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
           "cost": 12,
-          "item": "traveler_stew"
+          "item": "traveler_stew",
+          "tiered": true
         }
       ]
     },
@@ -4601,13 +4604,15 @@
               "id": "buy_mana_potion",
               "label": "Buy Mana Potion \u00b7 100 mana instantly",
               "cost": 30,
-              "item": "mana_potion"
+              "item": "mana_potion",
+              "tiered": true
             },
             {
               "id": "buy_health_potion",
               "label": "Buy Health Potion \u00b7 100 HP instantly",
               "cost": 30,
-              "item": "health_potion"
+              "item": "health_potion",
+              "tiered": true
             }
           ],
           "buys": false
@@ -4625,7 +4630,8 @@
               "id": "buy_traveler_stew",
               "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
               "cost": 12,
-              "item": "traveler_stew"
+              "item": "traveler_stew",
+              "tiered": true
             },
             {
               "id": "satchel",
@@ -10618,13 +10624,15 @@
               "id": "buy_health_potion",
               "label": "Buy Health Potion \u00b7 100 HP instantly",
               "cost": 30,
-              "item": "health_potion"
+              "item": "health_potion",
+              "tiered": true
             },
             {
               "id": "buy_mana_potion",
               "label": "Buy Mana Potion \u00b7 100 mana instantly",
               "cost": 30,
-              "item": "mana_potion"
+              "item": "mana_potion",
+              "tiered": true
             }
           ],
           "buys": false
@@ -10642,7 +10650,8 @@
               "id": "buy_traveler_stew",
               "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
               "cost": 12,
-              "item": "traveler_stew"
+              "item": "traveler_stew",
+              "tiered": true
             },
             {
               "id": "satchel",
@@ -16330,13 +16339,15 @@
               "id": "buy_mana_potion",
               "label": "Buy Mana Potion \u00b7 100 mana instantly",
               "cost": 30,
-              "item": "mana_potion"
+              "item": "mana_potion",
+              "tiered": true
             },
             {
               "id": "buy_health_potion",
               "label": "Buy Health Potion \u00b7 100 HP instantly",
               "cost": 30,
-              "item": "health_potion"
+              "item": "health_potion",
+              "tiered": true
             }
           ],
           "buys": false
@@ -16354,7 +16365,8 @@
               "id": "buy_traveler_stew",
               "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
               "cost": 12,
-              "item": "traveler_stew"
+              "item": "traveler_stew",
+              "tiered": true
             },
             {
               "id": "satchel",
@@ -23677,7 +23689,8 @@
               "id": "buy_traveler_stew",
               "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
               "cost": 12,
-              "item": "traveler_stew"
+              "item": "traveler_stew",
+              "tiered": true
             },
             {
               "id": "satchel",
@@ -23716,13 +23729,15 @@
               "id": "buy_health_potion",
               "label": "Buy Health Potion \u00b7 100 HP instantly",
               "cost": 30,
-              "item": "health_potion"
+              "item": "health_potion",
+              "tiered": true
             },
             {
               "id": "buy_mana_potion",
               "label": "Buy Mana Potion \u00b7 100 mana instantly",
               "cost": 30,
-              "item": "mana_potion"
+              "item": "mana_potion",
+              "tiered": true
             }
           ],
           "buys": false,

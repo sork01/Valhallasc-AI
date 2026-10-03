@@ -48,6 +48,13 @@ pub struct Item {
     /// Potions: seconds before any potion can be drunk again.
     #[serde(default)]
     pub cooldown: f64,
+    /// Potions and food come in tiers, one every ten levels (scripts/consumable_tiers.py); this names the line they
+    /// belong to (`health_potion`, `mana_potion`, `traveler_stew`). A tiered vendor offer sells the best tier the buyer's
+    /// level allows, at its `price`.
+    #[serde(default)]
+    pub family: Option<String>,
+    #[serde(default)]
+    pub price: u32,
 }
 fn first_level() -> u32 {
     1
@@ -88,6 +95,13 @@ pub fn is_gear(i: &Item) -> bool {
 /// one more step, so an early enemy rewards what the next zone is about and the last zones reach level 20.
 pub fn max_drop_level(enemy_level: u32) -> u32 {
     enemy_level.div_ceil(5) * 5 + 5
+}
+/// The best tier of a potion or food line that a character of `level` may use.
+pub fn best_tier(family: &str, level: u32) -> Option<&'static Item> {
+    ITEMS
+        .iter()
+        .filter(|i| i.family.as_deref() == Some(family) && i.required_level <= level)
+        .max_by_key(|i| i.required_level)
 }
 pub fn equipment(class: Class, kind: &str, variant: &str) -> Option<&'static Item> {
     ITEMS
@@ -649,6 +663,59 @@ mod tests {
         }
     }
     #[test]
+    fn potions_and_food_have_a_stronger_tier_every_ten_levels() {
+        for family in ["health_potion", "mana_potion", "traveler_stew"] {
+            let tiers: Vec<_> = ITEMS
+                .iter()
+                .filter(|i| i.family.as_deref() == Some(family))
+                .collect();
+            assert_eq!(tiers.len(), 10, "{family}");
+            let levels: Vec<u32> = tiers.iter().map(|i| i.required_level).collect();
+            assert_eq!(levels, [1, 10, 20, 30, 40, 50, 60, 70, 80, 90], "{family}");
+            for pair in tiers.windows(2) {
+                let (a, b) = (pair[0], pair[1]);
+                assert!(
+                    b.heal >= a.heal && b.mana >= a.mana,
+                    "{} is no weaker",
+                    b.id
+                );
+                assert!(b.heal + b.mana > a.heal + a.mana, "{} is stronger", b.id);
+                assert!(b.price > a.price && b.sell > a.sell, "{} costs more", b.id);
+                assert_eq!((a.kind.as_str(), a.cooldown), (b.kind.as_str(), b.cooldown));
+            }
+            assert_eq!(tiers[0].id, family, "the first tier keeps its old id");
+            assert_eq!(tiers[2].rarity, "rare", "{family}: level 20 is a blue tier");
+            for i in &tiers {
+                assert!(i.price > 0 && (i.heal > 0. || i.mana > 0.), "{}", i.id);
+                assert_eq!(i.required_level == 1, i.id == family);
+            }
+        }
+        assert_eq!(best_tier("health_potion", 1).unwrap().id, "health_potion");
+        assert_eq!(best_tier("health_potion", 9).unwrap().id, "health_potion");
+        assert_eq!(
+            best_tier("health_potion", 10).unwrap().id,
+            "health_potion_l10"
+        );
+        assert_eq!(best_tier("mana_potion", 25).unwrap().id, "mana_potion_l20");
+        assert_eq!(
+            best_tier("traveler_stew", 100).unwrap().id,
+            "traveler_stew_l90"
+        );
+        assert!(best_tier("not_a_family", 20).is_none());
+        // A mana-using mercenary of level 20 carries the level-20 potions of both lines.
+        let merc = Character::mercenary(Class::Priest, 20, "Merc Priest");
+        assert_eq!(merc.quantity("health_potion_l20"), 3);
+        assert_eq!(merc.quantity("mana_potion_l20"), 3);
+        let warrior = Character::mercenary(Class::Warrior, 20, "Merc Warrior");
+        assert_eq!(
+            (
+                warrior.quantity("health_potion_l20"),
+                warrior.quantity("mana_potion_l20")
+            ),
+            (3, 0)
+        );
+    }
+    #[test]
     fn every_item_has_a_known_rarity_and_starters_are_common() {
         for i in ITEMS.iter() {
             assert!(
@@ -742,7 +809,10 @@ mod tests {
         }
         // An empty tier drops nothing (no legendary gear exists yet, or the roll would panic on an empty pool).
         let roll = roll_for("big", "legendary");
-        let pool = ITEMS.iter().filter(|i| i.rarity == "legendary").count();
+        let pool = ITEMS
+            .iter()
+            .filter(|i| i.rarity == "legendary" && is_gear(i))
+            .count();
         assert_eq!(roll_equipment("big", 6, roll, 0.).is_some(), pool > 0);
     }
     #[test]
@@ -907,7 +977,10 @@ mod tests {
         let mut used = std::collections::BTreeSet::new();
         for i in ITEMS.iter() {
             if matches!(i.kind.as_str(), "material" | "bag" | "food" | "potion") {
-                assert_eq!(i.required_level, 1, "{} is not gear", i.id);
+                // Potions and food come in a tier every ten levels; everything else non-gear needs none.
+                let tier =
+                    i.family.is_some() && (i.required_level == 1 || i.required_level % 10 == 0);
+                assert!(tier || i.required_level == 1, "{} is not gear", i.id);
                 continue;
             }
             assert!(
