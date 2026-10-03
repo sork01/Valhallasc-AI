@@ -127,6 +127,7 @@ impl Store {
             zone: 0,
             friends: vec![],
             potion_ready: 0,
+            explored: vec![],
         };
         c.seed_inventory();
         self.conn().execute(
@@ -607,6 +608,26 @@ mod tests {
                 .unwrap()
                 .quantity("warrior_weapon_royal"),
             0
+        );
+    }
+    #[test]
+    fn characters_saved_before_fog_resume_unexplored_and_keep_what_they_uncover() {
+        let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();
+        let (mut c, token) = s.create(Look::default(), Point::default()).unwrap();
+        let mut old = serde_json::to_value(&c).unwrap();
+        old.as_object_mut().unwrap().remove("explored");
+        s.conn()
+            .execute(
+                "UPDATE characters SET state=?1 WHERE id=?2",
+                params![old.to_string(), c.id],
+            )
+            .unwrap();
+        assert!(s.load(&token).unwrap().unwrap().explored.is_empty());
+        c.explored = vec![0b101, 0, 1 << 8];
+        s.save_many(std::iter::once(&c)).unwrap();
+        assert_eq!(
+            s.load(&token).unwrap().unwrap().explored,
+            [0b101, 0, 1 << 8]
         );
     }
 }

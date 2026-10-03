@@ -91,6 +91,10 @@ impl World {
                 c.hp = c.hp.min(c.max_hp());
                 json!({"statPoints":c.stat_points()})
             }
+            DebugCommand::ExploreAll => {
+                p.character.explored = vec![(1 << (FOG_GRID * FOG_GRID)) - 1; self.maps.len()];
+                json!({"explored":p.character.explored})
+            }
             DebugCommand::ResetCooldowns => {
                 p.skill_cd.clear();
                 p.cooldown = 0.;

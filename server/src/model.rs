@@ -316,7 +316,13 @@ pub struct Character {
     /// Unix second when the potion cooldown ends. Wall-clock, so logging out or a restart cannot skip the wait.
     #[serde(default)]
     pub potion_ready: u64,
+    /// Fog of war: for each zone (indexed by zone number) a bitmask of the `FOG_GRID` x `FOG_GRID` map cells the
+    /// character has stood in, bit `row * FOG_GRID + column`. The maps show only these cells.
+    #[serde(default)]
+    pub explored: Vec<u16>,
 }
+/// Every zone is cut into this many cells a side for the fog of war: nine spots to uncover per map.
+pub const FOG_GRID: usize = 3;
 /// Permanently trained points. Base class combat values stay unchanged until trained.
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
 #[serde(default)]
@@ -420,6 +426,19 @@ impl Character {
     }
     pub fn xp_need(&self) -> u32 {
         xp_to_level(self.level)
+    }
+    /// Marks the map cell under the character as seen; true when it was new.
+    pub fn explore(&mut self, size: u32) -> bool {
+        let cell = |v: f64| {
+            ((v / size as f64 * FOG_GRID as f64).floor().max(0.) as usize).min(FOG_GRID - 1)
+        };
+        let bit = 1u16 << (cell(self.y) * FOG_GRID + cell(self.x));
+        if self.explored.len() <= self.zone {
+            self.explored.resize(self.zone + 1, 0);
+        }
+        let fresh = self.explored[self.zone] & bit == 0;
+        self.explored[self.zone] |= bit;
+        fresh
     }
     pub fn point(&self) -> Point {
         Point {
@@ -699,6 +718,8 @@ pub enum DebugCommand {
     Die,
     ResetStats,
     ResetCooldowns,
+    /// Uncovers every cell of every zone, so tests of the maps and the ground need not walk them all.
+    ExploreAll,
     SetGodMode {
         enabled: bool,
     },
@@ -1046,5 +1067,32 @@ mod tests {
         map.collide(&mut point, 0.3);
         assert_eq!(point.x, 0.7);
         assert_eq!(point.y, 71.3);
+    }
+    #[test]
+    fn explore_marks_the_cell_under_the_character_and_clamps_the_edges() {
+        let mut c = crate::store::Store::open(std::path::Path::new(":memory:"))
+            .unwrap()
+            .create(Look::default(), Point::default())
+            .unwrap()
+            .0;
+        assert!(c.explored.is_empty());
+        (c.x, c.y) = (0., 0.);
+        assert!(c.explore(96));
+        assert!(!c.explore(96), "the same cell twice is not new");
+        (c.x, c.y) = (96., 96.);
+        assert!(c.explore(96), "the far edge belongs to the last cell");
+        (c.x, c.y) = (-3., 500.);
+        assert!(
+            c.explore(96),
+            "a point outside is clamped to the nearest cell"
+        );
+        assert_eq!(c.explored, [1 | (1 << 8) | (1 << 6)]);
+        // A 160-wide city has the same nine cells, each bigger.
+        c.zone = 4;
+        (c.x, c.y) = (80., 80.);
+        c.explore(160);
+        assert_eq!(c.explored.len(), 5);
+        assert_eq!(c.explored[4], 1 << 4);
+        assert_eq!(c.explored[1], 0);
     }
 }

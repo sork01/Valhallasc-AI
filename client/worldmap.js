@@ -29,6 +29,13 @@
   };
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const kindInfo = kind => KINDS[kind] || [kind, 1, '#ff6b8a'];
+  // Fog of war: the server saves which of a zone's 3x3 cells the character has stood in (Field.explored, one bitmask per
+  // zone). Nothing from an unvisited cell is shown: not its ground, gates, camp, enemies or people.
+  const CELLS = 9;
+  const maskOf = i => { const e = window.Field?.explored; return e ? (e[i] || 0) : (1 << CELLS) - 1; };
+  const visited = i => maskOf(i) !== 0;
+  const charted = i => { let n = 0; for (let b = maskOf(i); b; b >>= 1) n += b & 1; return n; };
+  const known = (i, x, y) => window.Field.fog.seen(i, x, y);
   function el(tag, text, className) {
     const node = document.createElement(tag);
     if (text !== undefined && text !== null) node.textContent = text;
@@ -36,7 +43,7 @@
     return node;
   }
 
-  let zones = null, tiles = [], view = 'world', current = 0, previousFocus = null, highlight = null, timer = 0, tickTimer = 0;
+  let zones = null, tiles = [], roadRefs = [], fogSignature = '', view = 'world', current = 0, previousFocus = null, highlight = null, timer = 0, tickTimer = 0;
   const cache = new Map();
 
   function load() {
@@ -117,13 +124,15 @@
   };
   function svgNode(tag, attrs) { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); return n; }
   function buildWorld() {
-    const stage = $('wm-world'); stage.replaceChildren(); tiles = [];
+    const stage = $('wm-world'); stage.replaceChildren(); tiles = []; roadRefs = [];
     const roads = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, class: 'wm-roads', 'aria-hidden': 'true' });
     const seen = new Set();
     zones.forEach((z, i) => z.portals.forEach(p => {
       const pair = [i, p.to].sort().join('-'); if (seen.has(pair) || !zones[p.to]) return; seen.add(pair);
       const a = z.place, b = zones[p.to].place, [x1, y1] = edgePoint(a, b), [x2, y2] = edgePoint(b, a);
       const road = svgNode('g', { 'data-road': pair });
+      const back = zones[p.to].portals.find(q => q.to === i);
+      roadRefs.push({ node: road, shown: () => known(i, p.x, p.y) || (back && known(p.to, back.x, back.y)) });
       road.append(svgNode('title', {}), svgNode('line', { x1, y1, x2, y2, class: 'wm-road-under' }), svgNode('line', { x1, y1, x2, y2, class: 'wm-road' }),
         svgNode('circle', { cx: x1, cy: y1, r: .9, class: 'wm-gate-dot' }), svgNode('circle', { cx: x2, cy: y2, r: .9, class: 'wm-gate-dot' }));
       road.firstChild.textContent = `${p.name[0].toUpperCase()}${p.name.slice(1)} joins ${z.name} and ${zones[p.to].name}`;
@@ -135,13 +144,28 @@
       Object.assign(tile.style, { left: `${x / STAGE.w * 100}%`, top: `${y / STAGE.h * 100}%`, width: `${s / STAGE.w * 100}%`, height: `${s / STAGE.h * 100}%` });
       tile.setAttribute('aria-label', `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}. Open its map`);
       const canvas = el('canvas'); canvas.width = canvas.height = 220; copy(canvas, paint(i, 220));
+      const fog = el('canvas', '', 'wm-tile-fog'); fog.width = fog.height = 220; fog.setAttribute('aria-hidden', 'true');
       const label = el('span', '', 'wm-tile-label'); label.append(el('b', z.name), el('small', rangeText(z)));
       const you = el('i', '', 'wm-you'); you.hidden = true; you.title = 'You are here';
-      tile.append(canvas, label, you);
+      tile.append(canvas, fog, label, you);
       tile.addEventListener('click', () => zoomTo(i, tile));
       stage.append(tile); tiles.push(tile);
     });
     stage.append(el('div', 'Valhalla', 'wm-sheet-title'));
+    refreshFog();
+  }
+  // Repaint everything the fog touches on the world sheet. Cheap, and only runs when the saved masks change.
+  function refreshFog() {
+    fogSignature = JSON.stringify(window.Field.explored);
+    roadRefs.forEach(r => r.node.setAttribute('visibility', r.shown() ? 'visible' : 'hidden'));
+    zones.forEach((z, i) => {
+      const tile = tiles[i], g = tile.querySelector('.wm-tile-fog').getContext('2d'), unseen = !visited(i);
+      g.clearRect(0, 0, 220, 220); window.Field.fog.paint(g, 220, 220, i);
+      tile.disabled = unseen; tile.dataset.fog = unseen ? 'full' : 'partial';
+      tile.querySelector('b').textContent = unseen ? 'Unexplored' : z.name;
+      tile.querySelector('small').textContent = unseen ? 'Not yet visited' : `${rangeText(z)} · ${charted(i)}/${CELLS} charted`;
+      tile.setAttribute('aria-label', unseen ? 'Unexplored zone' : `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}, ${charted(i)} of ${CELLS} places charted. Open its map`);
+    });
   }
 
   // ---------- zone view ----------
@@ -149,6 +173,7 @@
     const canvas = $('wm-dots'), g = canvas.getContext('2d'), k = canvas.width / z.size;
     g.clearRect(0, 0, canvas.width, canvas.height);
     for (const s of z.slimes || []) {
+      if (!known(current, s.x, s.y)) continue;
       const [, , col] = kindInfo(s.kind), dim = highlight && highlight !== s.kind;
       g.globalAlpha = dim ? .18 : 1; g.fillStyle = col; g.strokeStyle = '#10141c'; g.lineWidth = highlight === s.kind ? 3 : 1.5;
       g.beginPath(); g.arc(s.x * k, s.y * k, (highlight === s.kind ? 1.3 : .95) * k, 0, 6.283); g.fill(); g.stroke();
@@ -159,20 +184,23 @@
   function renderZone(index) {
     const z = zones[index]; current = index;
     copy($('wm-ground'), paint(index, 768)); highlight = null; drawDots(z);
+    const fg = $('wm-fog').getContext('2d'); fg.clearRect(0, 0, 768, 768); window.Field.fog.paint(fg, 768, 768, index);
     const markers = $('wm-markers'); markers.replaceChildren();
     for (const p of z.portals) {
-      const dest = zones[p.to]; if (!dest) continue;
+      const dest = zones[p.to]; if (!dest || !known(index, p.x, p.y)) continue;
       const gate = el('button', '', 'wm-gate'); gate.type = 'button'; gate.dataset.portal = p.id; gate.dataset.to = String(p.to); gate.style.setProperty('--glow', PORTAL[dest.theme]);
       Object.assign(gate.style, pos(z, p.x, p.y));
       gate.classList.toggle('low', p.y / z.size > .85); gate.classList.toggle('right', p.x / z.size > .72); gate.classList.toggle('high', p.y / z.size < .08);
-      const near = z.portals.find(o => o !== p && Math.hypot(o.x - p.x, o.y - p.y) < z.size * .14);   // close gates put their labels on opposite sides
+      const near = z.portals.find(o => o !== p && known(index, o.x, o.y) && Math.hypot(o.x - p.x, o.y - p.y) < z.size * .14);   // close gates put their labels on opposite sides
       if (near) gate.classList.add(p.x < near.x ? 'west' : 'east');
-      gate.append(el('span', `to ${dest.name}`, 'wm-gate-label'));
-      gate.setAttribute('aria-label', `${p.name}, leads to ${dest.name}. Open its map`);
+      const away = visited(p.to);
+      gate.append(el('span', away ? `to ${dest.name}` : 'to unexplored lands', 'wm-gate-label'));
+      gate.setAttribute('aria-label', away ? `${p.name}, leads to ${dest.name}. Open its map` : `${p.name}, leads to unexplored lands`);
+      if (!away) { gate.disabled = true; gate.dataset.unexplored = 'true'; }
       gate.addEventListener('click', () => { highlight = null; renderZone(p.to); setView('zone'); });
       markers.append(gate);
     }
-    if (z.city) {
+    if (z.city && known(index, z.city.plaza.x, z.city.plaza.y)) {
       const hub = el('span', z.city.name === z.name ? 'City centre' : z.city.name, 'wm-hub'); hub.dataset.hub = 'true';
       Object.assign(hub.style, pos(z, z.city.plaza.x, z.city.plaza.y)); markers.append(hub);
     }
@@ -185,9 +213,10 @@
     box.append(el('h4', z.name, 'wm-side-name'), el('p', z.tagline || BLURB[z.theme] || '', 'wm-side-blurb'));
     const facts = el('ul', '', 'wm-facts');
     facts.append(el('li', z.range ? `Recommended levels ${z.range[0]}–${z.range[1]}` : 'No enemies inside the walls'));
-    if (z.city) facts.append(el('li', `${z.city.name}: sanctuary, ${(z.quests || []).length} quest${(z.quests || []).length === 1 ? '' : 's'}`));
+    facts.append(el('li', `Charted ${charted(current)} of ${CELLS} places`, 'wm-charted'));
+    if (z.city && known(current, z.city.plaza.x, z.city.plaza.y)) facts.append(el('li', `${z.city.name}: sanctuary, ${(z.quests || []).length} quest${(z.quests || []).length === 1 ? '' : 's'}`));
     box.append(facts);
-    const counts = new Map(); for (const s of z.slimes || []) counts.set(s.kind, (counts.get(s.kind) || 0) + 1);
+    const counts = new Map(); for (const s of (z.slimes || []).filter(s => known(current, s.x, s.y))) counts.set(s.kind, (counts.get(s.kind) || 0) + 1);
     if (counts.size) {
       box.append(el('h5', 'Enemies', 'wm-side-title'));
       const list = el('ul', '', 'wm-kinds');
@@ -201,11 +230,12 @@
       });
       box.append(list);
     }
-    if (z.portals.length) {
+    const seenGates = z.portals.filter(p => zones[p.to] && known(current, p.x, p.y));
+    if (seenGates.length) {
       box.append(el('h5', 'Gates', 'wm-side-title'));
       const list = el('ul', '', 'wm-gates');
-      z.portals.forEach(p => {
-        if (!zones[p.to]) return; const row = el('li'), b = el('button', `${p.name[0].toUpperCase()}${p.name.slice(1)} → ${zones[p.to].name}`, 'window-tool'); b.type = 'button'; b.dataset.to = String(p.to);
+      seenGates.forEach(p => {
+        const row = el('li'), b = el('button', `${p.name[0].toUpperCase()}${p.name.slice(1)} → ${visited(p.to) ? zones[p.to].name : 'unexplored lands'}`, 'window-tool'); b.type = 'button'; b.dataset.to = String(p.to); b.disabled = !visited(p.to);
         b.addEventListener('click', () => { renderZone(p.to); setView('zone'); }); row.append(b); list.append(row);
       });
       box.append(list);
@@ -216,6 +246,7 @@
   function tick() {
     if (!open()) return;
     if (window.Field?.hero?.dead || !window.Online?.connected) { close(); return; }
+    if (JSON.stringify(window.Field.explored) !== fogSignature) { refreshFog(); if (view === 'zone') renderZone(current); }
     const hero = window.Field.hero, here = window.Field.zone || 0;
     zones.forEach((z, i) => {
       const you = tiles[i]?.querySelector('.wm-you'); if (!you) return;
@@ -225,7 +256,7 @@
     const z = zones[current], me = $('wm-markers').querySelector('.wm-me');
     me.hidden = here !== current; if (!me.hidden) Object.assign(me.style, pos(z, hero.x, hero.y));
     const party = $('wm-markers').querySelector('.wm-party');
-    const mates = here === current ? (window.Field.remotePlayers || []).filter(r => window.Social?.isPartyMember(r.id)) : [];
+    const mates = here === current ? (window.Field.remotePlayers || []).filter(r => window.Social?.isPartyMember(r.id) && known(here, r.x, r.y)) : [];
     party.replaceChildren(...mates.map(r => { const m = el('i', '', 'wm-mate'); m.title = r.name || 'Party member'; Object.assign(m.style, pos(z, r.x, r.y)); return m; }));
     $('wm-here').textContent = here === current ? 'You are here' : `You are in ${zones[here].name}`;
   }
@@ -239,6 +270,7 @@
     tick();
   }
   function zoomTo(index, tile) {
+    if (!visited(index)) return;
     clearTimeout(timer); renderZone(index);
     const world = $('wm-world');
     if (reduced() || !tile) { world.style.transition = world.style.transform = world.style.opacity = ''; setView('zone'); return; }
@@ -273,7 +305,7 @@
   }
   function show() {
     if (!canShow()) return false;
-    load(); if (!tiles.length) buildWorld();
+    load(); if (!tiles.length) buildWorld(); else if (JSON.stringify(window.Field.explored) !== fogSignature) refreshFog();
     previousFocus = document.activeElement;
     window.Field.setPaused(true); $('worldmap').hidden = false; setView('world');
     const here = window.Field.zone || 0; (tiles[here] || tiles[0]).focus({ preventScroll: true });

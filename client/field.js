@@ -571,7 +571,7 @@
   }
   function reset() {
     pendingNpc = null; cityRoute = [];
-    window.Quests?.reset(); window.WorldMap?.reset();
+    window.Quests?.reset(); window.WorldMap?.reset(); explored = [];
     hero = newHero(); drops = []; floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
     keys = new Set(); pointer = { down: false, x: 0, y: 0 };
     cam = { x: hero.x, y: hero.y };
@@ -727,6 +727,7 @@
   const serverNow = () => clock.ok ? clock.t + (performance.now() - clock.at) / 1000 : performance.now() / 1000;
   function applySnapshot(packet, initial = false) {
     const own = packet.players.find(p => p.id === Online.id); if (!own) return;
+    explored = Array.isArray(own.explored) ? own.explored : null;
     if (typeof packet.time === 'number') { clock.t = packet.time; clock.at = performance.now(); clock.ok = true; }
     // The server decides the zone (a gate moved us); rebuild the ground and snap everything to the new place.
     const moved = (own.zone || 0) !== zone;
@@ -1645,6 +1646,29 @@
     if (zdef.theme === 'city') drawBlossom(g, t);
     drawMini();
   }
+  // ---------- fog of war ----------
+  // Every zone is FOG x FOG cells; the server (Character::explore) marks the cell the hero stands in and sends the masks
+  // with each snapshot (bit row * FOG + column, one mask per zone). The minimap and the world map show only those cells.
+  // `explored` is null when a server sends no masks, which means no fog; [] until the first snapshot means all fog.
+  const FOG = 3, fogMasks = new Map();
+  let explored = [];
+  const fogCell = (zi, x, y) => { const f = v => Math.min(FOG - 1, Math.max(0, Math.floor(v / ZONES[zi].size * FOG))); return f(y) * FOG + f(x); };
+  const seen = (zi, x, y) => !explored || (((explored[zi] || 0) >> fogCell(zi, x, y)) & 1) === 1;
+  // Draws the fog of zone `zi` over the w x h area of g. The mask is a small image (12 pixels a cell) stretched with
+  // smoothing, so each cell edge fades over a few pixels instead of cutting.
+  function paintFog(g, w, h, zi) {
+    if (!explored) return;
+    const bits = explored[zi] || 0; let mask = fogMasks.get(bits);
+    if (!mask) {
+      const N = FOG * 12, [c, mg] = canvasOf(N, N, 1), img = mg.createImageData(N, N);
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+        const i = (y * N + x) * 4, cell = Math.floor(y / 12) * FOG + Math.floor(x / 12);
+        img.data[i] = 12; img.data[i + 1] = 18; img.data[i + 2] = 30; img.data[i + 3] = (bits >> cell) & 1 ? 0 : 252;
+      }
+      mg.putImageData(img, 0, 0); mask = c; fogMasks.set(bits, mask);
+    }
+    g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(mask, 0, 0, w, h); g.restore();
+  }
   function buildMini() {
     const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city';
     g.fillStyle = city ? '#5f9b4a' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
@@ -1670,9 +1694,11 @@
   function drawMini() {
     if (!mctx || !miniBase) return;
     const s = mini.width / MAP; mctx.clearRect(0, 0, mini.width, mini.height); mctx.drawImage(miniBase, 0, 0, mini.width, mini.height);
-    for (const n of City.npcs) { mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
-    for (const remote of remotePlayers.values()) { mctx.fillStyle = window.Social?.isPartyMember(remote.id) ? '#7dff9b' : '#b3dfff'; mctx.beginPath(); mctx.arc(remote.x * s, remote.y * s, 2.5, 0, 6.283); mctx.fill(); }
-    for (const sl of slimes) if (!sl.dead) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }
+    paintFog(mctx, mini.width, mini.height, zone);
+    for (const n of City.npcs) { if (!seen(zone, n.x, n.y)) continue; mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
+    for (const remote of remotePlayers.values()) {
+      if (!seen(zone, remote.x, remote.y)) continue; mctx.fillStyle = window.Social?.isPartyMember(remote.id) ? '#7dff9b' : '#b3dfff'; mctx.beginPath(); mctx.arc(remote.x * s, remote.y * s, 2.5, 0, 6.283); mctx.fill(); }
+    for (const sl of slimes) if (!sl.dead && seen(zone, sl.x, sl.y)) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }
     mctx.fillStyle = '#fff'; mctx.strokeStyle = '#1c1428'; mctx.lineWidth = 1.5; mctx.beginPath(); mctx.arc(hero.x * s, hero.y * s, 3.6, 0, 6.283); mctx.fill(); mctx.stroke();
   }
 
@@ -1761,6 +1787,7 @@
     get priestSprites() { return isPriest() ? mageSpr : null; },
     get hunterSprites() { return isHunter() ? mageSpr : null; },
     get hero() { return hero; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
+    get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; },
     _debug: { get effects() { return effects; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll) },

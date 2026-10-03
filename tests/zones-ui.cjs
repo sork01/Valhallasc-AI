@@ -60,6 +60,9 @@ const look = page => page.evaluate(() => {
   await page.locator('#cls-warrior').click(); await page.locator('#name').fill('ZoneUI');
   await page.locator('#go').click({ timeout: 60000 });
   await page.waitForFunction(() => Online.connected && !!Field.warriorSprites && !!Field.beetleSprites && !!Field.cragSprites, null, { timeout: 60000 });
+  // The maps are fogged until a cell is visited; these checks read the whole minimap, so uncover it all first.
+  await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'explore_all' } }));
+  await page.waitForFunction(() => Field.explored?.length >= 5 && Field.explored.every(m => m === 511), null, { timeout: 10000 });
   const shot = name => page.screenshot({ path: path.join(world.artifacts, name + '.png') });
 
   // The map data the client uses comes from the same file the server loads.

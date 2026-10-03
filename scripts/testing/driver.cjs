@@ -55,6 +55,7 @@ const debugSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('die') }).strict(),
   z.object({ op: z.literal('reset_stats') }).strict(),
   z.object({ op: z.literal('reset_cooldowns') }).strict(),
+  z.object({ op: z.literal('explore_all') }).strict(),
   z.object({ op: z.literal('set_god_mode'), enabled: z.boolean() }).strict(),
   z.object({ op: z.literal('teleport'), zone: z.number().int().min(0), x: number, y: number }).strict(),
   z.object({ op: z.literal('give_item'), item: z.string().max(64), quantity: z.number().int().min(1).max(9999).default(1), force: z.boolean().default(false) }).strict(),

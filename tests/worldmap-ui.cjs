@@ -65,23 +65,60 @@ async function call(name, args = {}) {
   check(await visible('#worldmap'), 'The globe opens it');
   await page.keyboard.press('Escape');
 
-  // --- the world view ---
+  // --- fog of war: a new character has seen one cell of one zone ---
+  const stand = async (zone, x, y) => {
+    await page.evaluate(([zone, x, y]) => Online.send({ type: 'debug', ref: 1, command: { op: 'teleport', zone, x, y } }), [zone, x, y]);
+    await page.waitForFunction(([zone, x, y]) => Field.zone === zone && Math.hypot(Field.hero.x - x, Field.hero.y - y) < 3 && (Field.explored[zone] & (1 << (Math.min(2, Math.floor(y / Field._debug.zones[zone].size * 3)) * 3 + Math.min(2, Math.floor(x / Field._debug.zones[zone].size * 3))))) !== 0, [zone, x, y], { timeout: 15000 });
+  };
+  const miniPx = (x, y) => page.evaluate(([x, y]) => Array.from(document.getElementById('minimap').getContext('2d').getImageData(x, y, 1, 1).data), [x, y]);
+  check(await page.evaluate(() => JSON.stringify(Field.explored)) === '[16]', `A new character has uncovered only the middle cell of Greenmeadow (${await page.evaluate(() => JSON.stringify(Field.explored))})`);
+  const dark = px => px[0] < 40 && px[1] < 50 && px[2] < 70;
+  check(dark(await miniPx(8, 8)) && dark(await miniPx(136, 136)) && dark(await miniPx(72, 8)) && !dark(await miniPx(72, 72)) && !dark(await miniPx(60, 80)), 'The minimap is fogged except the middle cell');
+  const hidden = await page.evaluate(() => { let fogged = 0, drawn = 0; const g = document.getElementById('minimap').getContext('2d'); for (const s of Field.slimes) { if (s.dead || Field.fog.seen(0, s.x, s.y)) continue; fogged++; const d = g.getImageData(Math.round(s.x * 1.5), Math.round(s.y * 1.5), 1, 1).data; if (d[0] > 200 && d[1] < 140 && d[2] > 100) drawn++; } return { fogged, drawn }; });
+  check(hidden.fogged > 0 && hidden.drawn === 0, `No enemy dot shows in the fog (${hidden.fogged} slimes are in fogged cells)`);
   await press('m');
-  const tiles = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => { const r = t.getBoundingClientRect(), g = t.querySelector('canvas').getContext('2d').getImageData(0, 0, 220, 220).data; let sum = 0, dist = new Set(); for (let i = 0; i < g.length; i += 4 * 97) { sum += g[i + 1]; dist.add((g[i] >> 4) + ',' + (g[i + 1] >> 4) + ',' + (g[i + 2] >> 4)); } return { zone: t.dataset.zone, name: t.querySelector('b').textContent, lv: t.querySelector('small').textContent, left: r.left, top: r.top, right: r.right, bottom: r.bottom, colours: dist.size, green: sum, theme: t.dataset.theme }; }));
+  const first = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => ({ name: t.querySelector('b').textContent, small: t.querySelector('small').textContent, disabled: t.disabled, fog: t.dataset.fog })));
+  check(first[0].name === 'Greenmeadow' && /^Lv 2–5 · 1\/9 charted$/.test(first[0].small) && first.slice(1).every(t => t.name === 'Unexplored' && t.disabled && t.fog === 'full' && t.small === 'Not yet visited'), `Only Greenmeadow is known; the other four tiles read Unexplored (${first.map(t => t.name)})`);
+  check(await page.evaluate(() => [...document.querySelectorAll('.wm-roads [data-road]')].every(r => r.getAttribute('visibility') === 'hidden')), 'No road is drawn to a gate nobody has seen');
+  const tilePx = (zone, fx, fy) => page.evaluate(([zone, fx, fy]) => { const c = document.querySelector(`.wm-tile[data-zone="${zone}"] .wm-tile-fog`); return c.getContext('2d').getImageData(Math.round(fx * 219), Math.round(fy * 219), 1, 1).data[3]; }, [zone, fx, fy]);
+  check(await tilePx(0, .5, .5) === 0 && await tilePx(0, .5, .5) < await tilePx(0, .1, .1) && await tilePx(0, .1, .1) > 200 && await tilePx(1, .5, .5) > 200, 'On the tiles the visited cell is clear and the rest is fog');
   const stage = await page.evaluate(() => { const r = document.getElementById('wm-world').getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; });
-  check(tiles.length === data.zones.length && tiles.map(t => t.name).join() === data.zones.map(z => z.name).join(), `One tile per zone: ${tiles.map(t => t.name).join(', ')}`);
-  check(tiles.every(t => t.left >= stage.left && t.right <= stage.right && t.top >= stage.top && t.bottom <= stage.bottom), 'Every tile is inside the world sheet');
+  const tiles = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => { const r = t.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; }));
+  check(tiles.length === data.zones.length && tiles.every(t => t.left >= stage.left && t.right <= stage.right && t.top >= stage.top && t.bottom <= stage.bottom), 'Every tile is inside the world sheet');
   check(tiles.every((a, i) => tiles.every((b, j) => i >= j || a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top)), 'No two tiles overlap');
-  check(tiles.every(t => t.colours >= 6), `Every tile shows drawn ground, not a blank (${tiles.map(t => t.colours).join('/')} colours)`);
-  check(tiles[2].lv === 'Lv 10–15' && tiles[3].lv === 'Lv 15–20' && tiles[1].lv === 'Lv 5–10' && tiles[4].lv === 'Safe city' && /^Lv 2/.test(tiles[0].lv), `Levels on the tiles: ${tiles.map(t => t.lv).join(' | ')}`);
-  const roads = await page.evaluate(() => [...document.querySelectorAll('.wm-roads [data-road]')].map(r => r.dataset.road).sort());
-  check(roads.join() === '0-1,1-2,2-3,2-4', `The gate roads join Meadow-Crags-Glacier and Glacier to the Fen and the city (${roads})`);
   const you = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => { const y = t.querySelector('.wm-you'), r = t.getBoundingClientRect(), p = y.getBoundingClientRect(); return { shown: !y.hidden, x: (p.left + p.width / 2 - r.left) / r.width, y: (p.top + p.height / 2 - r.top) / r.height }; }));
   const spawn = await page.evaluate(() => ({ x: Field.hero.x / 96, y: Field.hero.y / 96 }));
-  check(you.map(y => y.shown).join() === 'true,false,false,false,false' && Math.abs(you[0].x - spawn.x) < .02 && Math.abs(you[0].y - spawn.y) < .02, `The marker is on Greenmeadow where the hero stands (${you[0].x.toFixed(2)},${you[0].y.toFixed(2)} vs ${spawn.x.toFixed(2)},${spawn.y.toFixed(2)})`);
+  check(you.map(y => y.shown).join() === 'true,false,false,false,false' && Math.abs(you[0].x - spawn.x) < .02 && Math.abs(you[0].y - spawn.y) < .02, 'The marker is on Greenmeadow where the hero stands');
   check(await page.evaluate(() => document.activeElement.classList.contains('wm-tile') && document.activeElement.dataset.zone === '0'), 'Focus starts on the tile of the zone you are in');
   const panel = await page.locator('.wm-panel').boundingBox();
   check(panel.x >= 0 && panel.y >= 0 && panel.x + panel.width <= 1440 && panel.y + panel.height <= 900, `The panel fits the window (${panel.width | 0}x${panel.height | 0})`);
+
+  await page.locator('.wm-tile[data-zone="3"]').click({ force: true, timeout: 1000 }).catch(() => {});
+  check(await page.evaluate(() => WorldMap.view === 'world'), 'An unexplored tile does not open');
+  // The meadow's own map: fog everywhere but the middle cell; nothing from the fog is listed or drawn.
+  await page.locator('.wm-tile[data-zone="0"]').click();
+  check(await visible('#wm-zone') && await page.locator('.wm-gate').count() === 0 && await page.locator('.wm-hub').count() === 0, 'In the meadow, the unseen gate and Alderhaven are not marked');
+  const fogs = await page.evaluate(() => { const g = document.getElementById('wm-fog').getContext('2d'), a = (x, y) => g.getImageData(x, y, 1, 1).data[3]; return { mid: a(384, 384), corner: a(20, 20), north: a(384, 60), south: a(384, 700) }; });
+  check(fogs.mid === 0 && fogs.corner > 200 && fogs.north > 200 && fogs.south > 200, `The zone map is clear in the visited cell only (${JSON.stringify(fogs)})`);
+  const dotsOut = await page.evaluate(() => { const g = document.getElementById('wm-dots').getContext('2d').getImageData(0, 0, 768, 768).data; let inside = 0, outside = 0; for (let y = 0; y < 768; y++) for (let x = 0; x < 768; x++) if (g[(y * 768 + x) * 4 + 3] > 0) { if (x >= 244 && x < 524 && y >= 244 && y < 524) inside++; else outside++; } return { inside, outside }; });
+  check(dotsOut.inside > 0 && dotsOut.outside === 0, `Enemy dots are drawn only inside the visited cell (${dotsOut.inside} in, ${dotsOut.outside} out)`);
+  const meadowSide = await page.locator('#wm-side').textContent();
+  const inCell = await page.evaluate(() => WORLD_MAP.slimes.filter(s => Field.fog.seen(0, s.x, s.y)).length);
+  check(/Charted 1 of 9 places/.test(meadowSide) && !/Alderhaven: sanctuary/.test(meadowSide) && !/Gates/.test(meadowSide), 'The side panel counts one of nine places and omits the unseen town and gates');
+  check((await page.locator('.wm-kind small').allTextContents()).reduce((n, t) => n + Number(t.split('·')[1] || 0), 0) <= inCell && inCell > 0, `Only the ${inCell} enemies in the visited cell are listed`);
+  await shot('map-fog-meadow');
+  await press('Escape'); await press('Escape');
+
+  // --- visiting the other zones uncovers one cell each, and the glacier two ---
+  await stand(1, 48, 86); await stand(2, 64, 118); await stand(2, 64, 52); await stand(3, 64, 9); await stand(4, 80, 150);
+  await press('m');
+  const all = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => ({ name: t.querySelector('b').textContent, small: t.querySelector('small').textContent, disabled: t.disabled })));
+  check(all.map(t => t.name).join() === data.zones.map(z => z.name).join() && all.every(t => !t.disabled), `Every visited zone is named again: ${all.map(t => t.name).join(', ')}`);
+  check(/^Lv 5–10 · 1\/9/.test(all[1].small) && /^Lv 10–15 · 2\/9/.test(all[2].small) && /^Lv 15–20 · 1\/9/.test(all[3].small) && /^Safe city · 1\/9/.test(all[4].small) && /^Lv 2–5 · 1\/9/.test(all[0].small), `Levels and charted counts on the tiles: ${all.map(t => t.small).join(' | ')}`);
+  const roads = await page.evaluate(() => [...document.querySelectorAll('.wm-roads [data-road]')].filter(r => r.getAttribute('visibility') === 'visible').map(r => r.dataset.road).sort());
+  check(roads.join() === '0-1,1-2,2-3,2-4', `Roads appear once either end's gate has been seen (${roads})`);
+  check(await page.evaluate(() => [...document.querySelectorAll('.wm-tile canvas:not(.wm-tile-fog)')].every(c => { const g = c.getContext('2d').getImageData(0, 0, 220, 220).data; const set = new Set(); for (let i = 0; i < g.length; i += 4 * 97) set.add((g[i] >> 4) + ',' + (g[i + 1] >> 4) + ',' + (g[i + 2] >> 4)); return set.size >= 6; })), 'Every tile carries drawn ground under its fog');
+  await shot('map-world');
 
   // --- zooming into a zone ---
   await page.locator('.wm-tile[data-zone="2"]').click();
@@ -89,30 +126,37 @@ async function call(name, args = {}) {
   check(await page.locator('#wm-title').textContent() === 'World Map › Rimeveil Glacier' && await visible('#wm-back'), 'The title names the zone and a Back to world button appears');
   const ground = await page.evaluate(() => { const g = document.getElementById('wm-ground').getContext('2d').getImageData(0, 0, 768, 768).data; let r = 0, b = 0, n = 0; for (let i = 0; i < g.length; i += 4 * 61) { r += g[i]; b += g[i + 2]; n++; } return { r: r / n, b: b / n }; });
   check(ground.b > 140 && ground.r > 100, `The glacier ground is pale and cold (${ground.r | 0},${ground.b | 0})`);
+  const gl = await page.evaluate(() => { const g = document.getElementById('wm-fog').getContext('2d'), a = (x, y) => g.getImageData(x, y, 1, 1).data[3]; return { south: a(384, 700), centre: a(384, 384), north: a(384, 40), west: a(40, 384) }; });
+  check(gl.south === 0 && gl.centre === 0 && gl.north > 200 && gl.west > 200, `Two glacier cells are clear, the north and west are fog (${JSON.stringify(gl)})`);
   await shot('map-glacier');
-  check(await page.evaluate(() => { const l = [...document.querySelectorAll('.wm-gate-label')].map(e => e.getBoundingClientRect()); return l.every((a, i) => l.every((b, j) => i >= j || a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top)); }), 'The three gate labels do not cover one another');
   const gates = await page.evaluate(() => [...document.querySelectorAll('.wm-gate')].map(g => ({ id: g.dataset.portal, to: g.dataset.to, label: g.textContent, x: g.style.left, y: g.style.top })));
   check(gates.map(g => g.id).join() === 'crags_gate,fen_gate,city_gate' && gates.map(g => g.label).join() === 'to Emberfall Crags,to Gloamfen,to Skaldholm', `Its three gates are marked and say where they lead (${gates.map(g => g.label)})`);
   const gp = await page.evaluate(() => Field._debug.zones[2].portals.map(p => [p.x / 128 * 100, p.y / 128 * 100]));
   check(gates.every((g, i) => Math.abs(parseFloat(g.x) - gp[i][0]) < .01 && Math.abs(parseFloat(g.y) - gp[i][1]) < .01), 'Each gate sits at the real portal position');
+  check(await page.evaluate(() => { const l = [...document.querySelectorAll('.wm-gate-label')].map(e => e.getBoundingClientRect()); return l.every((a, i) => l.every((b, j) => i >= j || a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top)); }), 'The three gate labels do not cover one another');
   check(await page.evaluate(() => { const r = document.querySelector('.wm-stage').getBoundingClientRect(), p = document.querySelector('.wm-panel').getBoundingClientRect(); return r.width === r.height && r.right <= p.right && r.bottom <= p.bottom; }), 'The zone map is square and inside the panel');
-  const hub = await page.locator('.wm-hub').textContent();
-  check(hub === 'Rimeward Camp', `The camp is labelled (${hub})`);
-  const side = await page.evaluate(() => ({ kinds: [...document.querySelectorAll('.wm-kind')].map(b => b.textContent), text: document.getElementById('wm-side').textContent }));
-  check(side.kinds.length === 4 && /Rime Crab.*Lv 10 · 9/.test(side.kinds[0]) && /Frostfang Wolf.*Lv 12 · 8/.test(side.kinds[1]) && /Glacier Yeti.*Lv 13 · 6/.test(side.kinds[2]) && /Rime Wyrm.*Lv 15 · 4/.test(side.kinds[3]), `The side panel counts the four bands (${side.kinds.join(' | ')})`);
-  check(/Recommended levels 10–15/.test(side.text) && /13 quests/.test(side.text), 'It gives the level range and the quest count');
-  // Hovering a kind lights only its dots.
+  check(await page.locator('.wm-hub').textContent() === 'Rimeward Camp', 'The camp is labelled');
+  const expectKinds = await page.evaluate(() => { const n = {}; for (const s of Field._debug.zones[2].slimes) if (Field.fog.seen(2, s.x, s.y)) n[s.kind] = (n[s.kind] || 0) + 1; return n; });
+  const listed = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('.wm-kind')].map(b => [b.dataset.kind, Number(b.querySelector('small').textContent.split('·')[1])])));
+  check(JSON.stringify(listed) === JSON.stringify(expectKinds) && Object.keys(listed).length >= 1, `The legend counts only enemies in uncovered cells (${JSON.stringify(listed)})`);
+  const side = await page.locator('#wm-side').textContent();
+  check(/Recommended levels 10–15/.test(side) && /13 quests/.test(side) && /Charted 2 of 9 places/.test(side), 'It gives the level range, the quest count and how much is charted');
   const dots = () => page.evaluate(() => { const g = document.getElementById('wm-dots').getContext('2d').getImageData(0, 0, 768, 768).data; let a = 0; for (let i = 3; i < g.length; i += 4) if (g[i] > 200) a++; return a; });
-  const all = await dots(); await page.locator('.wm-kind[data-kind="wyrm"]').hover(); const wyrm = await dots();
-  check(all > 0 && wyrm > 0 && wyrm < all, `Hovering Rime Wyrm brightens its dots only (${wyrm} of ${all} opaque pixels)`);
-  await page.mouse.move(5, 5); check(await dots() === all, 'Moving away restores them');
+  const kind = Object.keys(listed)[0], total = Object.values(listed).reduce((a, b) => a + b, 0);
+  const lit = await dots(); await page.locator(`.wm-kind[data-kind="${kind}"]`).hover(); const one = await dots();
+  if (Object.keys(listed).length > 1) check(lit > 0 && one > 0 && one < lit, `Hovering a kind brightens its dots only (${one} of ${lit} opaque pixels, ${total} enemies)`);
+  await page.mouse.move(5, 5); check(await dots() === lit, 'Moving away restores them');
   // Through a gate, straight to the next zone's map.
   await page.locator('.wm-gate[data-portal="fen_gate"]').click();
   check(await page.locator('#wm-title').textContent() === 'World Map › Gloamfen' && await page.locator('.wm-hub').textContent() === 'Lanternmere', 'Pressing a gate opens the zone beyond it');
-  await page.locator('.wm-gates button[data-to="2"]').click();
-  check(await page.locator('#wm-title').textContent() === 'World Map › Rimeveil Glacier', 'The Gates list navigates too');
-  // The player marker: not here, then here after a teleport.
-  check(await page.locator('.wm-me').isHidden() && /You are in Greenmeadow/.test(await page.locator('#wm-here').textContent()), 'In another zone the map says where you are instead');
+  check(await page.locator('.wm-gate').count() === 1 && await page.locator('.wm-gate').textContent() === 'to Rimeveil Glacier', 'Gloamfen shows its summit gate, which stands in the cell the hero visited');
+  await page.locator('.wm-me').waitFor({ state: 'hidden' });
+  await page.locator('#wm-back').click(); await page.locator('.wm-tile[data-zone="2"]').click();
+  await page.locator('.wm-gates button[data-to="1"]').click();
+  check(await page.locator('#wm-title').textContent() === 'World Map › Emberfall Crags', 'The Gates list navigates too');
+  check(await page.locator('.wm-gate[data-portal="rimeveil_gate"]').count() === 0 && await page.locator('.wm-gate[data-portal="meadow_gate"]').count() === 1, 'The Crags show the meadow gate they came through and not the unseen north gate');
+  await page.locator('.wm-gate[data-portal="meadow_gate"]').isDisabled().then(d => check(d === false, 'A gate to a visited zone can be pressed'));
+  check(await page.locator('.wm-me').isHidden() && /You are in Skaldholm/.test(await page.locator('#wm-here').textContent()), 'In another zone the map says where you are instead');
   // --- stepping back ---
   await press('Escape');
   check(await visible('#worldmap') && await visible('#wm-world') && await page.locator('#wm-zone').isHidden(), 'Esc from a zone goes back to the world, not out of the map');
@@ -124,15 +168,19 @@ async function call(name, args = {}) {
   await press('Escape');
   check(!await visible('#worldmap'), 'Esc from the world closes the map');
 
-  // --- the hero's marker follows ---
+  // --- the hero's marker follows, and the map uncovers new ground while it is open ---
+  await press('m');
+  check(/1\/9 charted/.test(await page.locator('.wm-tile[data-zone="3"] small').textContent()), 'Gloamfen starts with one place charted');
   await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'teleport', zone: 3, x: 90, y: 40 } }));
   await page.waitForFunction(() => Field.zone === 3 && Math.hypot(Field.hero.x - 90, Field.hero.y - 40) < 2, null, { timeout: 15000 });
-  await press('m');
-  check(await page.evaluate(() => document.activeElement.dataset.zone === '3'), 'Opened in Gloamfen, focus starts on its tile');
+  await page.waitForFunction(() => /2\/9 charted/.test(document.querySelector('.wm-tile[data-zone="3"] small').textContent), null, { timeout: 3000 });
+  check(true, 'Standing in a new cell uncovers it on the open map within a moment');
   const here = await page.evaluate(() => [...document.querySelectorAll('.wm-you')].map(y => !y.hidden).join());
   check(here === 'false,false,false,true,false', `The marker moved to the Gloamfen tile (${here})`);
   await page.locator('.wm-tile[data-zone="3"]').click();
   await page.waitForFunction(() => { const m = document.querySelector('.wm-me'); return m && !m.hidden; });
+  const fogNow = await page.evaluate(() => { const g = document.getElementById('wm-fog').getContext('2d'); return g.getImageData(Math.round(90 / 128 * 768), Math.round(40 / 128 * 768), 1, 1).data[3]; });
+  check(fogNow === 0, 'The new cell is clear on the zone map');
   const me = await page.evaluate(() => { const s = document.querySelector('.wm-stage').getBoundingClientRect(), m = document.querySelector('.wm-me i').getBoundingClientRect(); return { x: (m.left + m.width / 2 - s.left) / s.width, y: (m.top + m.height / 2 - s.top) / s.height, hx: Field.hero.x / 128, hy: Field.hero.y / 128 }; });
   check(Math.abs(me.x - me.hx) < .01 && Math.abs(me.y - me.hy) < .01, `"You" stands at the hero's place on the zone map (${me.x.toFixed(3)},${me.y.toFixed(3)} vs ${me.hx.toFixed(3)},${me.hy.toFixed(3)})`);
   await shot('map-gloamfen');

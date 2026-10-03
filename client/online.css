@@ -488,6 +488,7 @@
 .wm-tile:hover, .wm-tile:focus-visible { transform: scale(1.04); box-shadow: 0 0 1.6cqw #ffdc87aa, 0 .4cqw 1.2cqw #000a; z-index: 2; }
 .wm-tile:focus-visible, .wm-gate:focus-visible, .wm-kind:focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }
 .wm-tile canvas { display: block; width: 100%; height: 100%; }
+.wm-tile .wm-tile-fog { position: absolute; inset: 0; }
 .wm-tile-label { position: absolute; left: 0; right: 0; bottom: 0; padding: 1.6cqw .5cqw .4cqw; text-align: center; background: linear-gradient(transparent, #000c); text-shadow: 0 1px 2px #000; }
 .wm-tile-label b { display: block; font: 400 1.2cqw var(--display); }
 .wm-tile-label small { font: .85cqw 'Jua', sans-serif; color: #ffe9a8; }
@@ -500,7 +501,11 @@
 @keyframes wmIn { from { opacity: 0; transform: scale(.96); } }
 .wm-stage { position: relative; height: 100%; aspect-ratio: 1; flex: none; background: #000; }
 .wm-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-#wm-dots { pointer-events: none; }
+#wm-dots, #wm-fog { pointer-events: none; }
+.wm-tile-fog { position: absolute; inset: 0; pointer-events: none; }
+.wm-tile:disabled { cursor: not-allowed; filter: saturate(.6); }
+.wm-gate:disabled { cursor: not-allowed; opacity: .75; }
+.wm-kind:disabled, .wm-panel .window-tool:disabled { opacity: .6; cursor: not-allowed; }
 .wm-markers { position: absolute; inset: 0; }
 .wm-gate { position: absolute; width: 2.4cqw; height: 2.4cqw; padding: 0; transform: translate(-50%, -50%); border: .25cqw solid var(--glow); border-radius: 50%; background: radial-gradient(#fff, var(--glow) 55%, transparent 75%); box-shadow: 0 0 1.2cqw var(--glow); cursor: pointer; }
 .wm-gate-label { position: absolute; left: 50%; top: 100%; margin-top: .25cqw; padding: .15cqw .6cqw; transform: translateX(-50%); white-space: nowrap; border-radius: .3cqw; background: #10141cdd; color: #fff4ca; font: .9cqw 'Jua', sans-serif; pointer-events: none; }

@@ -154,7 +154,7 @@ impl Player {
             "attributes":c.attributes,"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
-            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd})
+            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored})
     }
     /// The sum of every active buff of one kind.
     fn buff(&self, kind: BuffKind) -> f64 {
@@ -1162,6 +1162,7 @@ impl World {
         if self.time - p.last_hurt > 5. {
             p.character.hp = (p.character.hp + 3. * TICK).min(p.character.max_hp());
         }
+        p.character.explore(self.maps[p.character.zone].size);
         // Hand-in quests follow the bag, so the journal counts what the player carries right now.
         for i in 0..p.character.quests.len() {
             if p.character.quests[i].claimed {
@@ -8016,5 +8017,77 @@ mod tests {
             ),
             (0., 0)
         );
+    }
+    #[test]
+    fn standing_in_a_cell_uncovers_it_and_the_fog_is_saved_per_zone() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        w.step();
+        // The meadow is 96 wide, so the spawn (36, 60) is the middle cell of the middle row: bit 4.
+        assert_eq!(w.players[&1].character.explored, [1 << 4]);
+        assert_eq!(w.players[&1].snapshot()["explored"], json!([1 << 4]));
+        // Walking within the cell adds nothing; stepping into the next one adds exactly one.
+        w.players.get_mut(&1).unwrap().character.x = 40.;
+        w.step();
+        assert_eq!(w.players[&1].character.explored, [1 << 4]);
+        w.players.get_mut(&1).unwrap().character.x = 70.;
+        w.step();
+        assert_eq!(w.players[&1].character.explored, [(1 << 4) | (1 << 5)]);
+        // Another zone has its own mask, and the first stays as it was.
+        w.test_commands = true;
+        w.debug(
+            1,
+            None,
+            DebugCommand::Teleport {
+                zone: 1,
+                x: 48.,
+                y: 86.,
+            },
+        );
+        w.step();
+        assert_eq!(
+            w.players[&1].character.explored,
+            [(1 << 4) | (1 << 5), 1 << 7]
+        );
+        // It survives logging out and back in.
+        w.leave(1);
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, Some(token), None, tx).unwrap();
+        assert_eq!(
+            w.players[&1].character.explored,
+            [(1 << 4) | (1 << 5), 1 << 7]
+        );
+    }
+
+    #[test]
+    fn the_test_shortcut_uncovers_every_cell_of_every_zone() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, None, Some(Look::default()), tx).unwrap();
+        w.test_commands = true;
+        w.debug(1, None, DebugCommand::ExploreAll);
+        assert_eq!(w.players[&1].character.explored, vec![511; w.maps.len()]);
+        w.test_commands = false;
+        w.players.get_mut(&1).unwrap().character.explored.clear();
+        w.debug(1, None, DebugCommand::ExploreAll);
+        assert!(
+            w.players[&1].character.explored.is_empty(),
+            "the public service refuses it"
+        );
+    }
+
+    #[test]
+    fn the_dead_uncover_nothing() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, None, Some(Look::default()), tx).unwrap();
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.hp = 0.;
+        p.character.x = 80.;
+        p.character.y = 10.;
+        w.step();
+        assert_eq!(w.players[&1].character.explored, Vec::<u16>::new());
     }
 }
