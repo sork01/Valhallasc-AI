@@ -6,8 +6,10 @@
 //! * green, blue, purple and orange gear is rolled for: need (only for a piece your class can wear at your level),
 //!   greed or pass, 1-100 with need beating greed, thirty seconds to answer, nobody who stays silent can win.
 //!
-//! Only real players count: a mercenary has no vote and takes no share. A hero with nobody to share with (alone, or
-//! alone with hired fighters) keeps the old rule, so everything drops for them. Boss gear (`boss_loot`) stays
+//! A hired mercenary is a party member like any other: it takes a share of the gold, a turn in the round robin and
+//! a roll on gear (it needs a piece its class can wear at its level that beats what it wears, otherwise it greeds). It has no bags, so
+//! whatever it wins is forfeited: hiring fighters never makes the hirer's loot bigger than playing with friends.
+//! A hero with nobody to share with keeps the old rule, so everything drops for them. Boss gear (`boss_loot`) stays
 //! personal on purpose: every hero who fought gets a piece fitted to their class.
 use super::*;
 
@@ -37,7 +39,7 @@ pub fn can_need(c: &Character, i: &Item) -> bool {
 }
 
 impl World {
-    /// The real players who share a drop of `owner` at `point` in `zone`, sorted by character id. Just `owner` when
+    /// The party members (hired fighters included) who share a drop of `owner` at `point` in `zone`, sorted by character id. Just `owner` when
     /// there is nobody to share with.
     fn loot_group(&self, owner: &str, zone: usize, point: Point) -> Vec<String> {
         let mut group: Vec<String> = self
@@ -45,8 +47,7 @@ impl World {
             .into_iter()
             .filter(|id| {
                 self.players.values().any(|p| {
-                    p.merc.is_none()
-                        && p.character.id == *id
+                    p.character.id == *id
                         && p.character.zone == zone
                         && p.character.point().distance(point) <= SHARE_RANGE
                 })
@@ -57,6 +58,12 @@ impl World {
             return vec![owner.to_owned()];
         }
         group
+    }
+    /// Whether this character id is a hired mercenary (it collects nothing: its share is forfeited).
+    fn merc_id(&self, id: &str) -> bool {
+        self.players
+            .values()
+            .any(|p| p.merc.is_some() && p.character.id == id)
     }
     /// The next member in line. The turn is kept per group (keyed by its first member), so two parties never
     /// disturb each other's order.
@@ -77,7 +84,7 @@ impl World {
             shares[at] += 1;
         }
         for (who, share) in group.iter().zip(shares) {
-            if share == 0 {
+            if share == 0 || self.merc_id(who) {
                 continue;
             }
             let id = self.entity();
@@ -105,20 +112,29 @@ impl World {
         let rarity = item(item_id).map_or("common", |i| i.rarity.as_str());
         if !rollable(rarity) {
             let who = self.next_in_line(&group);
+            if self.merc_id(&who) {
+                return;
+            }
             return self.item_drop(&who, zone, point, item_id, 1);
         }
         let id = self.entity();
-        let can_need: Vec<bool> = group
+        // (member, may need it, is a mercenary)
+        let members: Vec<(String, bool, bool)> = group
             .iter()
             .map(|g| {
-                self.players
-                    .values()
-                    .find(|p| p.character.id == *g)
-                    .zip(item(item_id))
-                    .is_some_and(|(p, i)| can_need(&p.character, i))
+                let found = self.players.values().find(|p| p.character.id == *g);
+                let merc = found.is_some_and(|p| p.merc.is_some());
+                // A person needs what their class can wear; a mercenary only a piece that beats what it wears.
+                let need = found.zip(item(item_id)).is_some_and(|(p, i)| {
+                    can_need(&p.character, i) && (!merc || p.character.is_upgrade(i))
+                });
+                (g.clone(), need, merc)
             })
             .collect();
-        for (who, need) in group.iter().zip(can_need) {
+        for (who, need, merc) in &members {
+            if *merc {
+                continue;
+            }
             if let Some(p) = self.players.values().find(|p| p.character.id == *who) {
                 let _ = p
                     .peer
@@ -133,7 +149,18 @@ impl World {
             at: point,
             owner: owner.into(),
             expires: self.time + ROLL_SECONDS,
-            votes: group.into_iter().map(|g| (g, None)).collect(),
+            // A mercenary answers at once: Need for a piece of its class that beats what it wears, else Greed.
+            votes: members
+                .into_iter()
+                .map(|(who, need, merc)| {
+                    let vote = merc.then_some(if need {
+                        RollChoice::Need
+                    } else {
+                        RollChoice::Greed
+                    });
+                    (who, vote)
+                })
+                .collect(),
         });
     }
     pub(super) fn roll_vote(&mut self, session: u64, id: u64, choice: RollChoice) {
@@ -255,6 +282,12 @@ impl World {
                 }
             }
         };
+        let keeps = self.merc_id(&recipient);
+        let text = if keeps {
+            format!("{text} (A mercenary has no bags, so it keeps the piece.)")
+        } else {
+            text
+        };
         for (who, ..) in &rolled {
             if let Some(p) = self.players.values().find(|p| p.character.id == *who) {
                 let _ = p
@@ -263,7 +296,9 @@ impl World {
                 let _ = p.peer.try_send(json!({"type":"system","text":text}));
             }
         }
-        self.item_drop(&recipient, roll.zone, roll.at, &roll.item, 1);
+        if !keeps {
+            self.item_drop(&recipient, roll.zone, roll.at, &roll.item, 1);
+        }
     }
 }
 
@@ -490,39 +525,164 @@ mod tests {
         assert_eq!(owned_by(&w, &who[0].1).len(), 1);
     }
 
-    #[test]
-    fn mercenaries_neither_roll_nor_share() {
-        let mut w = world();
-        let mut who = party(&mut w, &["Ann", "Bob"]);
-        // Hire a fighter into Ann's party through the real path.
+    /// Hires a level-20 priest into `owner`'s party, standing beside them.
+    fn hire_priest(w: &mut World, owner: &str, session: u64) {
         let mut merc = Character::mercenary(Class::Priest, 20, "Merc Priest");
         merc.zone = 0;
-        merc.x = w.players[&1].character.x;
-        merc.y = w.players[&1].character.y;
-        w.party_add_mercenary(&who[0].1, &merc).unwrap();
+        merc.x = w.players[&session].character.x;
+        merc.y = w.players[&session].character.y;
+        w.party_add_mercenary(owner, &merc).unwrap();
         let (tx, _rx) = mpsc::channel(1);
         let mut hired = Player::new(merc, tx);
-        hired.merc = Some(who[0].1.clone());
+        hired.merc = Some(owner.to_owned());
         w.players.insert(7_000_000, hired);
+    }
+
+    #[test]
+    fn mercenaries_take_a_share_of_gold_and_a_turn_but_keep_nothing_for_the_hirer() {
+        let mut w = world();
+        let who = party(&mut w, &["Ann", "Bob"]);
+        hire_priest(&mut w, &who[0].1, 1);
         let at = spot(&w);
+        // Three ways: the fighter's 4 coins are its pay and go nowhere.
         w.gold_drop(&who[0].1, 0, at, 12);
-        let total: u32 = w.drops.iter().map(|d| d.value).sum();
-        assert_eq!(total, 12);
+        let humans: u32 = w.drops.iter().map(|d| d.value).sum();
+        assert_eq!(
+            humans, 8,
+            "each human gets a third, the mercenary's third is gone"
+        );
         assert!(
             w.drops
                 .iter()
                 .all(|d| d.owner == who[0].1 || d.owner == who[1].1)
         );
+        // Round robin: of six gray drops, two fall to the mercenary and are lost.
+        w.drops.clear();
+        for _ in 0..6 {
+            w.loot_drop(&who[0].1, 0, at, "slime_gel");
+        }
+        assert_eq!(w.drops.len(), 4);
+    }
+
+    /// A green piece of this kind that only the given class can use.
+    fn green_piece(class: Class, kind: &str) -> &'static Item {
+        ITEMS
+            .iter()
+            .find(|i| {
+                i.rarity == "uncommon"
+                    && i.kind == kind
+                    && !i.starter
+                    && i.source.is_none()
+                    && i.class == Some(class)
+                    && i.required_level <= 20
+            })
+            .expect("a green piece")
+    }
+
+    #[test]
+    fn a_mercenary_needs_only_a_piece_of_its_class_that_beats_what_it_wears() {
+        let mut w = world();
+        let who = party(&mut w, &["Ann", "Bob"]);
+        hire_priest(&mut w, &who[0].1, 1);
+        let at = spot(&w);
+        let vote_of = |w: &World| {
+            *w.rolls
+                .last()
+                .unwrap()
+                .votes
+                .iter()
+                .find(|(id, _)| w.merc_id(id))
+                .unwrap()
+                .1
+        };
+        // Its own class, an empty slot: Need.
+        let helm = green_piece(Class::Priest, "headgear");
+        w.loot_drop(&who[0].1, 0, at, &helm.id);
+        assert_eq!(vote_of(&w), Some(RollChoice::Need));
+        // Another class's piece: Greed.
+        let other = green_piece(Class::Warrior, "headgear");
+        w.loot_drop(&who[0].1, 0, at, &other.id);
+        assert_eq!(vote_of(&w), Some(RollChoice::Greed));
+        // Once it wears that very helm, another copy is no upgrade: Greed.
+        w.players
+            .get_mut(&7_000_000)
+            .unwrap()
+            .character
+            .equipment
+            .insert("headgear".into(), helm.id.clone());
+        w.loot_drop(&who[0].1, 0, at, &helm.id);
+        assert_eq!(vote_of(&w), Some(RollChoice::Greed));
+        // Its class armor and weapon are compared with the worn class pieces too.
+        let c = &w.players[&7_000_000].character;
+        assert!(!c.is_upgrade(equipment(Class::Priest, "armor", c.gear().0).unwrap()));
+    }
+
+    #[test]
+    fn a_hirer_alone_with_a_mercenary_shares_too() {
+        let mut w = world();
+        let who = party(&mut w, &["Ann"]);
+        hire_priest(&mut w, &who[0].1, 1);
+        let at = spot(&w);
+        w.gold_drop(&who[0].1, 0, at, 10);
+        assert_eq!(
+            owned_by(&w, &who[0].1)[0].value,
+            5,
+            "half goes to the fighter"
+        );
+    }
+
+    #[test]
+    fn mercenaries_roll_on_their_own_and_a_winning_one_keeps_the_piece() {
+        let mut w = world();
+        let mut who = party(&mut w, &["Ann", "Bob"]);
+        hire_priest(&mut w, &who[0].1, 1);
+        let at = spot(&w);
+        // A warrior piece: the priest cannot need it, so it greeds at once.
         let piece = green_for(Class::Warrior);
         w.loot_drop(&who[0].1, 0, at, &piece.id);
-        let h = heard(&mut who[0].2);
-        let id = roll_id(&h);
+        let id = roll_id(&heard(&mut who[0].2));
+        assert_eq!(w.rolls[0].votes.len(), 3, "two humans and the fighter");
         assert_eq!(
-            w.rolls[0].votes.len(),
-            2,
-            "two humans vote, the fighter does not"
+            w.rolls[0].votes.values().filter(|v| v.is_some()).count(),
+            1,
+            "only the mercenary has answered"
         );
-        let _ = id;
+        // Both humans pass: the mercenary's Greed wins and nobody gets the piece.
+        vote(&mut w, &who[0], id, RollChoice::Pass);
+        vote(&mut w, &who[1], id, RollChoice::Pass);
+        w.update_rolls();
+        assert!(w.rolls.is_empty());
+        assert!(w.drops.is_empty(), "a mercenary has no bags");
+        let text = heard(&mut who[1].2)
+            .into_iter()
+            .find(|v| v["type"] == "system" && v["text"].as_str().unwrap().starts_with("Roll for"))
+            .unwrap()["text"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        assert!(
+            text.contains("Merc Priest wins it") && text.contains("keeps the piece"),
+            "{text}"
+        );
+        // A human who greeds loses to nobody here: the mercenary's roll competes fairly, so over many rolls both win.
+        let (mut human, mut merc) = (0, 0);
+        for _ in 0..40 {
+            w.drops.clear();
+            w.loot_drop(&who[0].1, 0, at, &piece.id);
+            let id = w.rolls[0].id;
+            vote(&mut w, &who[0], id, RollChoice::Greed);
+            vote(&mut w, &who[1], id, RollChoice::Pass);
+            w.update_rolls();
+            if w.drops.is_empty() {
+                merc += 1
+            } else {
+                human += 1
+            }
+        }
+        assert!(
+            human > 5 && merc > 5,
+            "an even contest: human {human}, mercenary {merc}"
+        );
     }
 
     #[test]

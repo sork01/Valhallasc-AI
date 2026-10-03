@@ -343,6 +343,27 @@ impl Character {
                     && i.variant.as_deref() == Some(if i.kind == "armor" { armor } else { weapon }),
             )
     }
+    /// Whether `i` beats what this character wears in its slot (attack plus defense; an empty slot loses to any
+    /// stat, and for rings the weaker of the two counts). Mercenaries use it to decide whether to need a piece.
+    pub fn is_upgrade(&self, i: &Item) -> bool {
+        let score = |x: &Item| x.attack + x.defense;
+        let worn = |slot: &str| {
+            self.equipment
+                .get(slot)
+                .and_then(|id| item(id))
+                .map_or(0., score)
+        };
+        let current = match i.kind.as_str() {
+            "armor" | "weapon" => {
+                let (armor, weapon) = self.gear();
+                let variant = if i.kind == "armor" { armor } else { weapon };
+                equipment(self.look.class, &i.kind, variant).map_or(0., score)
+            }
+            "accessory" => worn("accessory1").min(worn("accessory2")),
+            slot => worn(slot),
+        };
+        score(i) > current
+    }
     /// Every worn piece: the extra slots plus the class armor and weapon.
     fn worn_items(&self) -> Vec<&'static Item> {
         let (armor, weapon) = self.gear();
