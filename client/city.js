@@ -274,7 +274,7 @@
     gear:'<svg viewBox="0 0 24 24"><path d="M12 2.5 20 6v6c0 5-3.4 8.2-8 9.5C7.4 20.2 4 17 4 12V6z" fill="#7b8a96" stroke="#27323a" stroke-width="1.5" stroke-linejoin="round"/></svg>',
     coin:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="#e8b92f" stroke="#6b4a08" stroke-width="1.5"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="#a87a10" stroke-width="1.5"/></svg>',
   };
-  const iconFor=offer=>offer.heal?'heal':offer.gear?'gear':(offer.item||offer.bag)?'vendor':'coin';
+  const iconFor=offer=>offer.heal?'heal':(offer.gear||offer.merc)?'gear':(offer.item||offer.bag)?'vendor':'coin';
   function row(icon,label,tag){
     const b=document.createElement('button');b.type='button';b.className='gossip-row';
     const i=document.createElement('span');i.className='gossip-icon gossip-glyph';i.setAttribute('aria-hidden','true');i.innerHTML=ICONS[icon];

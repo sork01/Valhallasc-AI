@@ -1577,6 +1577,61 @@ const scenarios = {
       check(bots.every(bot => quest(w, bot, qid).claimed && w.player(bot).equipment.accessory1 === reward), 'All five completions and worn rings survive a private server restart');
     },
   },
+  mercenaries: {
+    description: 'The two elite-quest givers rent mercenaries for 250 gold each: only with the quest taken, up to the players it wants, joining the party and the world, their kills paying the hirer, and the contract ending on claim.',
+    startLevel: 20, godMode: true, levelSpread: 0,
+    async run(w, check) {
+      const bot = 'Hirer', mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name));
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { gold: 3000 });
+      await w.debug(bot, { op: 'set_gold', gold: 3000 });
+      // Two-player quest in the Crags: one mercenary of any class.
+      await kit.teleport(w, bot, { npc: 'crags_captain' });
+      let reply = await kit.talkTo(w, bot, 'crags_captain', 'merc_mage');
+      check(/Take this elite quest first/.test(reply.notice) && !mercs().length, 'No mercenary without the quest');
+      check(reply.offers.includes('merc_priest') && reply.offers.includes('merc_dismiss'), 'The captain offers every class and a dismissal');
+      await kit.talkTo(w, bot, 'crags_captain', 'quest:accept:crags_cinderlord');
+      await w.waitFor(() => !!quest(w, bot, 'crags_cinderlord'));
+      reply = await kit.talkTo(w, bot, 'crags_captain', 'merc_priest');
+      await w.waitFor(() => mercs().length === 1);
+      check(/Merc Priest joins your party/.test(reply.notice) && w.player(bot).gold === 2750, 'A Priest is hired for 250 gold');
+      check(mercs()[0].look.class === 'priest' && mercs()[0].level === 20, 'The mercenary is a level-20 Priest in the world');
+      reply = await kit.talkTo(w, bot, 'crags_captain', 'merc_warrior');
+      check(/wants 2 fighters/.test(reply.notice) && mercs().length === 1 && w.player(bot).gold === 2750, 'A two-player quest hires only one');
+      await kit.talkTo(w, bot, 'crags_captain', 'merc_dismiss');
+      await w.waitFor(() => mercs().length === 0);
+      check(true, 'Sending them away removes the mercenary');
+      // Five-player quest in Gloamfen: pick four.
+      await w.debug(bot, { op: 'quest', id: 'fen_hydra', action: 'finish' });
+      await kit.teleport(w, bot, { zone: 3, x: 64, y: 12 });
+      await kit.teleport(w, bot, { npc: 'fen_reeve' });
+      await kit.talkTo(w, bot, 'fen_reeve', 'quest:accept:fen_gloomroot');
+      await w.waitFor(() => !!quest(w, bot, 'fen_gloomroot'));
+      const purse = w.player(bot).gold;
+      for (const c of ['priest', 'mage', 'hunter', 'warrior']) await kit.talkTo(w, bot, 'fen_reeve', 'merc_' + c);
+      await w.waitFor(() => mercs().length === 4);
+      check(mercs().map(m => m.look.class).sort().join() === 'hunter,mage,priest,warrior' && w.player(bot).gold === purse - 1000, 'Four chosen classes are hired for 1000 gold');
+      reply = await kit.talkTo(w, bot, 'fen_reeve', 'merc_priest');
+      check(/already has 5/.test(reply.notice) && mercs().length === 4, 'A fifth seat is refused: the party is full');
+      // They follow into the arena and the kill is the hirer's.
+      const elite = w.snapshot.slimes.find(s => s.kind === 'gloomroot');
+      await kit.teleport(w, bot, { zone: 3, x: elite.x - 4, y: elite.y });
+      await w.waitFor(() => mercs().every(m => Math.hypot(m.x - w.player(bot).x, m.y - w.player(bot).y) < 8), 15000, 'The mercenaries follow the hirer');
+      check(true, 'The mercenaries keep to the hirer across the fen');
+      await w.action(bot, { type: 'target', id: elite.id });
+      await w.waitFor(() => w.snapshot.slimes.find(s => s.id === elite.id).hp < elite.maxHp, 20000, 'The party hurts the Colossus');
+      check(w.events.some(e => e.type === 'event' && e.kind === 'hit' && mercs().some(m => m.id === e.actor)), 'A mercenary personally damages the Colossus');
+      await w.debug(bot, { op: 'kill_enemy', id: elite.id });
+      await w.waitFor(() => quest(w, bot, 'fen_gloomroot').counts[0] === 1);
+      check(w.player(bot).kills === 1, 'The hirer is credited with the kill');
+      await kit.teleport(w, bot, { npc: 'fen_reeve' });
+      await kit.talkTo(w, bot, 'fen_reeve', 'quest:claim:fen_gloomroot');
+      await w.waitFor(() => quest(w, bot, 'fen_gloomroot').claimed);
+      await w.waitFor(() => mercs().length === 0);
+      check(w.player(bot).inventory.some(s => s.item === 'accessory_amber_l20_blue'), 'Claiming the quest pays the ring and ends every contract');
+      check(w.snapshot.online === 1, 'Mercenaries never count as players online');
+    },
+  },
   progression_quests: {
     description: 'Progression quests: one arrives by itself every five levels, is never offered at a giver, completes on arrival in the next zone, pays at that zone\'s captain and survives a restart.',
     async run(w, check) {

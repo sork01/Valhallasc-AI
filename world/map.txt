@@ -4530,8 +4530,45 @@
           "x": 44,
           "y": 82,
           "color": "#b66c50",
-          "dialogue": "Welcome to Cinderwatch Camp. Meet our crew, then push north through the lava fords. Wisps haunt the lowlands; spiders, wraiths and golems guard the higher crags. Return here to report your victories.",
-          "offers": [],
+          "dialogue": "Welcome to Cinderwatch Camp. Meet our crew, then push north through the lava fords. Wisps haunt the lowlands; spiders, wraiths and golems guard the higher crags. Return here to report your victories. No partner for the Cinderlord? Once you have taken that quest I can hire you a sword-arm of any class for 250 gold, who will fight beside you in your party until the job is done.",
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false
         },
         {
@@ -4561,16 +4598,16 @@
               "heal": 10000
             },
             {
-              "id": "buy_health_potion",
-              "label": "Buy Health Potion \u00b7 100 HP instantly",
-              "cost": 30,
-              "item": "health_potion"
-            },
-            {
               "id": "buy_mana_potion",
               "label": "Buy Mana Potion \u00b7 100 mana instantly",
               "cost": 30,
               "item": "mana_potion"
+            },
+            {
+              "id": "buy_health_potion",
+              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "cost": 30,
+              "item": "health_potion"
             }
           ],
           "buys": false
@@ -16222,8 +16259,45 @@
           "x": 78,
           "y": 16.5,
           "color": "#7a6aa8",
-          "dialogue": "Lanternmere keeps its lanterns lit all night, and every night the dark fen takes a few more. Toads on the west bank, crocodiles along the south shore, drowned knights among the ruins in the east, and something with many heads out on the island. Speak to everyone in town, then report to me.",
-          "offers": [],
+          "dialogue": "Lanternmere keeps its lanterns lit all night, and every night the dark fen takes a few more. Toads on the west bank, crocodiles along the south shore, drowned knights among the ruins in the east, and something with many heads out on the island. Speak to everyone in town, then report to me. The Gloomroot in the south-east corner takes five. Once you have taken that quest I can hire you the fighters you lack: choose any classes, 250 gold each, and they join your party until the job is done.",
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
           "buys": false
         },
         {

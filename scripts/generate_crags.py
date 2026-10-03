@@ -15,6 +15,7 @@ import math
 from pathlib import Path
 import random
 
+import mercenary_offers as mo
 import progression_quests
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,7 +45,9 @@ def quest_hub():
 
     npcs = [
         npc('crags_captain', 'Captain Sera', 'Cinderwatch commander', 44, 82, '#b66c50',
-            'Welcome to Cinderwatch Camp. Meet our crew, then push north through the lava fords. Wisps haunt the lowlands; spiders, wraiths and golems guard the higher crags. Return here to report your victories.'),
+            'Welcome to Cinderwatch Camp. Meet our crew, then push north through the lava fords. Wisps haunt the lowlands; spiders, wraiths and golems guard the higher crags. Return here to report your victories. '
+            'No partner for the Cinderlord? Once you have taken that quest I can hire you a sword-arm of any class for 250 gold, who will fight beside you in your party until the job is done.',
+            mo.offers()),
         npc('crags_scout', 'Scout Kael', 'Trail scout', 51, 78.5, '#79916d',
             'Follow the winding ash trail through each ford. I need help clearing Cinder Wisps and Magma Spiders before our supply runners can pass.'),
         npc('crags_healer', 'Sister Iona', 'Camp healer', 53, 84, '#c8b9d3',

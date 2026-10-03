@@ -22,6 +22,7 @@ import math
 from pathlib import Path
 import random
 
+import mercenary_offers as mo
 import progression_quests
 
 import numpy as np
@@ -75,7 +76,9 @@ def quest_hub():
 
     npcs = [
         npc('reeve', 'Reeve Osric', 'Town reeve', 78, 16.5, '#7a6aa8',
-            'Lanternmere keeps its lanterns lit all night, and every night the dark fen takes a few more. Toads on the west bank, crocodiles along the south shore, drowned knights among the ruins in the east, and something with many heads out on the island. Speak to everyone in town, then report to me.'),
+            'Lanternmere keeps its lanterns lit all night, and every night the dark fen takes a few more. Toads on the west bank, crocodiles along the south shore, drowned knights among the ruins in the east, and something with many heads out on the island. Speak to everyone in town, then report to me. '
+            'The Gloomroot in the south-east corner takes five. Once you have taken that quest I can hire you the fighters you lack: choose any classes, 250 gold each, and they join your party until the job is done.',
+            mo.offers()),
         npc('lamplighter', 'Lamplighter Wren', 'Keeper of the lanterns', 75.5, 22.8, '#c89a4a',
             'I trim one hundred and twelve wicks a night. The toads sing the fog in, and fog puts the flames out. Thin the choir and the boardwalk stays bright.'),
         npc('healer', 'Sister Maren', 'Lantern Hall healer', 50, 16.8, '#e4e0d4',

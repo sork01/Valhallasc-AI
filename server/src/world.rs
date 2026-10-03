@@ -11,6 +11,7 @@ use tokio::sync::{mpsc, oneshot, watch};
 
 mod consumables;
 mod debug;
+mod mercs;
 #[cfg(test)]
 mod resource_tests;
 mod resources;
@@ -104,6 +105,8 @@ struct Player {
     portal_at: f64,
     /// Personal god mode of a game master (the debug command `set_god_mode`): no damage for this player only.
     god: bool,
+    /// Set on a hired mercenary: the character id of the player who hired it (see world/mercs.rs).
+    merc: Option<String>,
 }
 impl Player {
     // Called once when hp reaches 0: the XP penalty, then a notice naming what it cost.
@@ -163,6 +166,7 @@ impl Player {
             bag_notice_at: -99.,
             portal_at: -99.,
             god: false,
+            merc: None,
         }
     }
     fn snapshot(&self) -> Value {
@@ -268,8 +272,8 @@ impl Slime {
             "croc" => (2800., 112., 3.2, 1.5),
             "knight" => (3400., 130., 2.4, 1.4),
             "hydra" => (5200., 150., 2.2, 1.8),
-            // Five level-20 heroes, with skills, healing and a tank, rather than any solo or duo pull.
-            "gloomroot" => (20000., 300., 2.3, 2.1),
+            // Five level-20 heroes with a healer who must triage: three hits fell a non-tank, so no party without one gets through.
+            "gloomroot" => (20000., 900., 2.3, 2.1),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -452,6 +456,8 @@ pub struct World {
     rng: u64,
     next_entity: u64,
     next_king_spawn: f64,
+    /// Counter for mercenary sessions.
+    merc_seq: u64,
     level_spread: i32,
     // Test servers only (VALHALLA_GOD_MODE=1): enemies still fight, but players take no damage.
     pub god_mode: bool,
@@ -496,6 +502,7 @@ impl World {
             rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
             next_entity: 1,
             next_king_spawn: 0.,
+            merc_seq: 0,
             level_spread,
             god_mode: false,
             start_level: 1,
@@ -676,12 +683,12 @@ impl World {
         "slimes":self.slimes.iter().filter(|s| s.zone == zone).collect::<Vec<_>>(),
         "bolts":self.bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
         "drops":self.drops.iter().filter(|d| d.zone == zone).collect::<Vec<_>>(),
-        "online":self.players.len()})
+        "online":self.humans_online()})
     }
     // Published to every connection: one complete view per zone. Each connection forwards only the view
     // that holds its own character; `tick` and `online` also sit at the top for the health route.
     pub fn snapshot(&self) -> Value {
-        json!({"tick":self.tick,"online":self.players.len(),
+        json!({"tick":self.tick,"online":self.humans_online(),
         "zones":(0..self.maps.len()).map(|zone| self.snapshot_for(zone)).collect::<Vec<_>>()})
     }
 
@@ -696,7 +703,7 @@ impl World {
         self.join_as(session, Identity::Guest { token, look }, peer)
     }
     fn join_as(&mut self, session: u64, identity: Identity, peer: Peer) -> Result<Value, String> {
-        if self.players.len() >= MAX_PLAYERS {
+        if self.humans_online() >= MAX_PLAYERS {
             return Err("This world is full. Try again later.".into());
         }
         let storage = |e: Box<dyn std::error::Error>| {
@@ -820,6 +827,10 @@ impl World {
         }
     }
     fn leave(&mut self, session: u64) {
+        if self.is_merc(session) {
+            return self.remove_mercenary(session);
+        }
+        let _ = self.dismiss_mercenaries(session);
         if let Some(p) = self.players.remove(&session) {
             let name = p.character.look.name.clone();
             let place = self.zone_name(p.character.zone).to_owned();
@@ -832,9 +843,12 @@ impl World {
     fn save(&mut self) {
         // Pending versions precede live versions; an online character always wins.
         match self.store.save_many(
-            self.pending_saves
-                .iter()
-                .chain(self.players.values().map(|p| &p.character)),
+            self.pending_saves.iter().chain(
+                self.players
+                    .values()
+                    .filter(|p| p.merc.is_none())
+                    .map(|p| &p.character),
+            ),
         ) {
             Ok(()) => self.pending_saves.clear(),
             Err(e) => tracing::error!(%e,"save failed; retrying on next save tick"),
@@ -982,6 +996,9 @@ impl World {
         }
     }
     fn interact(&mut self, session: u64, npc_id: &str, offer_id: Option<&str>) {
+        if let Some(what) = offer_id.and_then(|id| self.merc_offer(session, npc_id, id)) {
+            return self.merc_interact(session, npc_id, &what);
+        }
         let p = self.players.get_mut(&session).unwrap();
         let map = &self.maps[p.character.zone];
         let Some(npc) = map.npcs.iter().find(|npc| npc.id == npc_id) else {
@@ -1003,6 +1020,7 @@ impl World {
         let mut notice = String::new();
         let mut levels = 0;
         let mut quest_changed = false;
+        let mut contract_over = false;
         if let Some(id) = offer_id {
             if self.time - p.service_at < 0.5 {
                 // Reply so a pending client button is never left disabled.
@@ -1016,6 +1034,8 @@ impl World {
                     {
                         (notice, levels, quest_changed) =
                             quest_action(&mut p.character, quest, action);
+                        // A claimed group quest ends the mercenaries' contract.
+                        contract_over = quest.group && action == "claim" && quest_changed;
                     }
                 } else if let Some(sale) = id.strip_prefix("sell:") {
                     if !npc.buys {
@@ -1128,6 +1148,9 @@ impl World {
             .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         let actor = p.character.id.clone();
         let point = p.character.point();
+        if contract_over {
+            let _ = self.dismiss_mercenaries(session);
+        }
         if levels > 0 {
             self.level_up_event(&actor, point, levels);
         }
@@ -1159,6 +1182,7 @@ impl World {
         self.time += TICK;
         self.tick += 1;
         self.update_king_spawn();
+        self.update_mercenaries();
         let sessions: Vec<_> = self.players.keys().copied().collect();
         for session in sessions {
             self.update_food(session);
@@ -1174,7 +1198,7 @@ impl World {
         let stale: Vec<_> = self
             .players
             .iter()
-            .filter(|(_, p)| p.peer.is_closed() || p.peer.capacity() == 0)
+            .filter(|(_, p)| p.merc.is_none() && (p.peer.is_closed() || p.peer.capacity() == 0))
             .map(|(id, _)| *id)
             .collect();
         for session in stale {
@@ -1832,6 +1856,12 @@ impl World {
             return 0.;
         }
         let actor = p.character.id.clone();
+        // A mercenary's kills, loot and quest progress are its hirer's.
+        let credit = self.credit_session(session);
+        let credit_id = self
+            .players
+            .get(&credit)
+            .map_or_else(|| actor.clone(), |c| c.character.id.clone());
         let s = &mut self.slimes[id];
         if s.dead || s.zone != p.character.zone {
             return 0.;
@@ -1849,6 +1879,7 @@ impl World {
         }
         if is_elite(&s.kind) {
             s.contributors.insert(actor.clone());
+            s.contributors.insert(credit_id.clone());
         }
         s.hp = (s.hp - damage).max(0.);
         s.hurt_t = 0.4;
@@ -1878,7 +1909,8 @@ impl World {
             if is_elite(&kind) {
                 for (&other, player) in &mut self.players {
                     let c = &mut player.character;
-                    if other != session
+                    if other != credit
+                        && other != session
                         && c.hp > 0.
                         && c.zone == zone
                         && c.point().distance(point) <= 12.
@@ -1893,14 +1925,14 @@ impl World {
             if kind == "big" {
                 self.next_king_spawn = self.time + self.king_spawn_delay();
             }
-            let p = self.players.get_mut(&session).unwrap();
+            let p = self.players.get_mut(&credit).unwrap();
             p.character.kills += 1;
             quest_progress(&mut p.character, &self.maps[zone].quests, "kill", &kind);
             let levels = p.character.grant_xp(xp);
-            self.event("slimeDie", &actor, point, 0., false);
+            self.event("slimeDie", &credit_id, point, 0., false);
             if levels > 0 {
-                let point = self.players[&session].character.point();
-                self.level_up_event(&actor, point, levels);
+                let point = self.players[&credit].character.point();
+                self.level_up_event(&credit_id, point, levels);
             }
             let id = self.entity();
             let value = if gold > 0 {
@@ -1910,7 +1942,7 @@ impl World {
             };
             self.drops.push(Drop {
                 id,
-                owner: actor.clone(),
+                owner: credit_id.clone(),
                 zone,
                 x: point.x,
                 y: point.y,
@@ -1921,11 +1953,11 @@ impl World {
                 t: 0.,
                 col: "#ffe066",
             });
-            self.item_drop(&actor, zone, point, material(&kind), 1);
+            self.item_drop(&credit_id, zone, point, material(&kind), 1);
             let chance = self.random();
             let choice = self.random();
             if let Some(i) = roll_equipment(&kind, level, chance, choice) {
-                self.item_drop(&actor, zone, point, &i.id, 1);
+                self.item_drop(&credit_id, zone, point, &i.id, 1);
             }
         }
         dealt
@@ -2756,9 +2788,9 @@ mod tests {
     }
 
     #[test]
-    fn gloomroot_takes_five_trained_level_twenty_warriors_and_beats_four() {
-        // Warriors only (no healer, one potion each), so a real group with a priest has margin; the point is the shape:
-        // one to four cannot finish it, five can. Seeded, deterministic.
+    fn gloomroot_beats_any_party_of_trained_level_twenty_warriors_without_a_healer() {
+        // Warriors only (no healer, one potion each): the Colossus hits too hard to trade blows with, so a party needs a
+        // healer (or a hired Priest). One to five all fall without finishing it. Seeded, deterministic.
         for count in [1usize, 2, 3, 4, 5] {
             let mut w = world();
             w.rng = 7;
@@ -2824,22 +2856,12 @@ mod tests {
                     break;
                 }
             }
-            assert_eq!(
-                w.slimes[id].dead,
-                count == 5,
-                "{count} player(s): enemy HP {} of {}, {deaths} deaths, time {:.0}",
-                w.slimes[id].hp,
-                w.slimes[id].max_hp,
-                w.time
+            assert!(
+                !w.slimes[id].dead,
+                "{count} warrior(s) without a healer must not win: enemy HP {} of {}, time {:.0}",
+                w.slimes[id].hp, w.slimes[id].max_hp, w.time
             );
-            if count == 5 {
-                assert!(deaths <= 3, "a trained five lose at most three: {deaths}");
-            } else {
-                assert!(
-                    deaths >= count,
-                    "{count} player(s) all fall at least once: {deaths}"
-                );
-            }
+            assert!(deaths >= 1, "{count} player(s): somebody falls: {deaths}");
         }
     }
 
@@ -2912,6 +2934,561 @@ mod tests {
         w.update_slime(id);
         assert!(w.slimes[id].contributors.is_empty());
         assert_eq!(w.slimes[id].hp, w.slimes[id].max_hp);
+    }
+
+    fn dialogue_notice(rx: &mut mpsc::Receiver<Value>) -> String {
+        std::iter::from_fn(|| rx.try_recv().ok())
+            .filter(|v| v["type"] == "dialogue")
+            .last()
+            .map_or_else(String::new, |v| {
+                v["notice"].as_str().unwrap_or("").to_owned()
+            })
+    }
+    fn mercs_of(w: &World) -> Vec<&Player> {
+        w.players.values().filter(|p| p.merc.is_some()).collect()
+    }
+    fn at_giver(w: &mut World, zone: usize, npc: &str) {
+        let n = w.maps[zone].npcs.iter().find(|n| n.id == npc).unwrap();
+        let here = n.position_at(w.time);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.zone = zone;
+        c.x = here.x;
+        c.y = here.y;
+    }
+    fn hire(
+        w: &mut World,
+        rx: &mut mpsc::Receiver<Value>,
+        zone: usize,
+        npc: &str,
+        class: &str,
+    ) -> String {
+        at_giver(w, zone, npc);
+        w.time += 0.6;
+        w.interact(1, npc, Some(&format!("merc_{class}")));
+        dialogue_notice(rx)
+    }
+
+    #[test]
+    fn a_giver_hires_mercenaries_only_for_the_active_group_quest_against_gold_and_party_room() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        w.players.get_mut(&1).unwrap().character.level = 10;
+        // No quest taken yet.
+        let text = hire(&mut w, &mut rx, 1, "crags_captain", "mage");
+        assert!(text.contains("Take this elite quest first"), "{text}");
+        assert!(mercs_of(&w).is_empty());
+        at_giver(&mut w, 1, "crags_captain");
+        w.time += 0.6;
+        w.interact(1, "crags_captain", Some("quest:accept:crags_cinderlord"));
+        drain(&mut rx);
+        // Too poor.
+        let text = hire(&mut w, &mut rx, 1, "crags_captain", "mage");
+        assert!(text.contains("250 gold"), "{text}");
+        w.players.get_mut(&1).unwrap().character.gold = 600;
+        let text = hire(&mut w, &mut rx, 1, "crags_captain", "mage");
+        assert!(text.contains("Merc Mage joins your party"), "{text}");
+        let merc = mercs_of(&w)[0];
+        assert_eq!(
+            (
+                merc.character.look.class,
+                merc.character.level,
+                merc.character.look.name.as_str()
+            ),
+            (Class::Mage, 10, "Merc Mage")
+        );
+        assert!(merc.character.hp > 0. && merc.character.attributes.intellect > 0);
+        assert_eq!(w.players[&1].character.gold, 350);
+        let owner = w.players[&1].character.id.clone();
+        assert_eq!(
+            w.party_mates(&owner).len(),
+            2,
+            "the mercenary is in the party"
+        );
+        // A two-player quest is full at two.
+        let text = hire(&mut w, &mut rx, 1, "crags_captain", "warrior");
+        assert!(text.contains("wants 2 fighters"), "{text}");
+        assert_eq!((w.players[&1].character.gold, mercs_of(&w).len()), (350, 1));
+        // The mercenary is not a player: not counted online, not in the who list, not saved.
+        assert_eq!(w.snapshot()["online"], 1);
+        let merc_id = mercs_of(&w)[0].character.id.clone();
+        w.save();
+        assert!(w.store.summary(&merc_id).is_none());
+        // Dismissal ends the party and the contract.
+        w.time += 0.6;
+        w.interact(1, "crags_captain", Some("merc_dismiss"));
+        assert!(dialogue_notice(&mut rx).contains("ended"));
+        assert!(mercs_of(&w).is_empty());
+        assert_eq!(w.party_mates(&owner).len(), 1);
+        // Another giver's offers do nothing for this quest.
+        let text = hire(&mut w, &mut rx, 1, "crags_scout", "mage");
+        assert!(text.is_empty() || !text.contains("joins"), "{text}");
+    }
+
+    #[test]
+    fn the_five_player_quest_lets_you_pick_the_four_classes_and_fills_only_the_empty_seats() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.level = 20;
+            c.gold = 2000;
+            c.quests.push(QuestProgress {
+                id: "fen_hydra".into(),
+                claimed: true,
+                completions: 1,
+                ..Default::default()
+            });
+        }
+        at_giver(&mut w, 3, "fen_reeve");
+        w.time += 0.6;
+        w.interact(1, "fen_reeve", Some("quest:accept:fen_gloomroot"));
+        drain(&mut rx);
+        for class in ["priest", "mage", "hunter", "warrior"] {
+            let text = hire(&mut w, &mut rx, 3, "fen_reeve", class);
+            assert!(text.contains("joins your party"), "{class}: {text}");
+        }
+        let mut classes: Vec<_> = mercs_of(&w)
+            .iter()
+            .map(|p| p.character.look.class)
+            .collect();
+        classes.sort_by_key(|c| format!("{c:?}"));
+        assert_eq!(
+            classes,
+            vec![Class::Hunter, Class::Mage, Class::Priest, Class::Warrior]
+        );
+        assert_eq!(w.players[&1].character.gold, 1000);
+        let text = hire(&mut w, &mut rx, 3, "fen_reeve", "priest");
+        assert!(text.contains("wants 5 fighters"), "{text}");
+        // Two of one class get distinct names.
+        w.time += 0.6;
+        w.interact(1, "fen_reeve", Some("merc_dismiss"));
+        drain(&mut rx);
+        hire(&mut w, &mut rx, 3, "fen_reeve", "warrior");
+        hire(&mut w, &mut rx, 3, "fen_reeve", "warrior");
+        let mut names: Vec<_> = mercs_of(&w)
+            .iter()
+            .map(|p| p.character.look.name.clone())
+            .collect();
+        names.sort();
+        assert_eq!(names, vec!["Merc Warrior", "Merc Warrior 2"]);
+    }
+
+    #[test]
+    fn a_hirer_with_a_party_rents_only_the_remaining_seats() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        let _rx2 = join(&mut w, 2, Class::Mage);
+        let _rx3 = join(&mut w, 3, Class::Priest);
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.level = 20;
+            c.gold = 2000;
+            c.quests.push(QuestProgress {
+                id: "fen_hydra".into(),
+                claimed: true,
+                completions: 1,
+                ..Default::default()
+            });
+        }
+        // Players 1, 2 and 3 form a party of three.
+        let ids: Vec<String> = (1..=3)
+            .map(|s| w.players[&s].character.id.clone())
+            .collect();
+        let first = w.players[&1].character.clone();
+        w.party_add_mercenary(&ids[0], &w.players[&2].character.clone())
+            .unwrap();
+        w.party_add_mercenary(&ids[0], &w.players[&3].character.clone())
+            .unwrap();
+        assert_eq!(w.party_mates(&first.id).len(), 3);
+        at_giver(&mut w, 3, "fen_reeve");
+        w.time += 0.6;
+        w.interact(1, "fen_reeve", Some("quest:accept:fen_gloomroot"));
+        drain(&mut rx);
+        assert!(hire(&mut w, &mut rx, 3, "fen_reeve", "hunter").contains("joins"));
+        assert!(hire(&mut w, &mut rx, 3, "fen_reeve", "mage").contains("joins"));
+        let text = hire(&mut w, &mut rx, 3, "fen_reeve", "priest");
+        assert!(text.contains("already has 5"), "{text}");
+        assert_eq!(mercs_of(&w).len(), 2);
+        assert_eq!(w.players[&1].character.gold, 1500);
+    }
+
+    #[test]
+    fn mercenaries_leave_with_their_hirer_when_the_party_breaks_and_when_the_group_quest_is_claimed()
+     {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.level = 10;
+            c.gold = 2000;
+        }
+        let owner = w.players[&1].character.id.clone();
+        let start = |w: &mut World, rx: &mut mpsc::Receiver<Value>| {
+            at_giver(w, 1, "crags_captain");
+            w.time += 0.6;
+            w.interact(1, "crags_captain", Some("quest:accept:crags_cinderlord"));
+            drain(rx);
+            assert!(hire(w, rx, 1, "crags_captain", "priest").contains("joins"));
+        };
+        start(&mut w, &mut rx);
+        // Leaving the party ends the contract on the next tick.
+        w.leave_party(&owner);
+        w.step();
+        assert!(mercs_of(&w).is_empty());
+        // Claiming the group quest does too. (A claimed quest is replaced by a fresh character state.)
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .quests
+            .retain(|q| q.id != "crags_cinderlord");
+        start(&mut w, &mut rx);
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .quests
+            .iter_mut()
+            .find(|q| q.id == "crags_cinderlord")
+            .unwrap()
+            .counts = vec![1];
+        w.time += 0.6;
+        w.interact(1, "crags_captain", Some("quest:claim:crags_cinderlord"));
+        drain(&mut rx);
+        assert!(
+            w.players[&1]
+                .character
+                .quests
+                .iter()
+                .any(|q| q.id == "crags_cinderlord" && q.claimed)
+        );
+        assert!(mercs_of(&w).is_empty(), "the claim ended the contract");
+        // And the hirer leaving the world takes them along.
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .quests
+            .retain(|q| q.id != "crags_cinderlord");
+        start(&mut w, &mut rx);
+        w.leave(1);
+        assert!(mercs_of(&w).is_empty() && w.players.is_empty());
+        assert_eq!(w.party_mates(&owner).len(), 1);
+    }
+
+    #[test]
+    fn a_mercenary_follows_fights_the_hirers_target_and_everything_it_earns_is_the_hirers() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.level = 10;
+            c.gold = 600;
+        }
+        for s in w.slimes.iter_mut() {
+            s.dead = true;
+            s.respawn = 10000.;
+        }
+        assert!(
+            hire(&mut w, &mut rx, 1, "crags_captain", "warrior").contains("Take this elite quest")
+        );
+        at_giver(&mut w, 1, "crags_captain");
+        w.time += 0.6;
+        w.interact(1, "crags_captain", Some("quest:accept:crags_cinderlord"));
+        drain(&mut rx);
+        assert!(hire(&mut w, &mut rx, 1, "crags_captain", "warrior").contains("joins"));
+        let merc = *w.players.iter().find(|(_, p)| p.merc.is_some()).unwrap().0;
+        // It keeps to its hirer: walk the hirer away and the mercenary catches up.
+        let far = {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.x += 12.;
+            c.point()
+        };
+        for _ in 0..200 {
+            w.step();
+        }
+        let d = w.players[&merc].character.point().distance(far);
+        assert!(d < 4., "the mercenary follows: {d}");
+        // Taking the hirer through a gate carries it along.
+        w.players.get_mut(&1).unwrap().character.zone = 0;
+        w.players.get_mut(&1).unwrap().character.x = 36.;
+        w.players.get_mut(&1).unwrap().character.y = 60.;
+        w.step();
+        assert_eq!(w.players[&merc].character.zone, 0);
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        w.players.get_mut(&1).unwrap().character.x = 44.;
+        w.players.get_mut(&1).unwrap().character.y = 80.;
+        w.step();
+        // A wisp attacks the hirer: the mercenary fights it even though the hirer chose no target.
+        let wisp = w.slimes.iter().position(|s| s.kind == "wisp").unwrap();
+        {
+            let p = w.players[&1].character.point();
+            let s = &mut w.slimes[wisp];
+            s.dead = false;
+            s.hp = 1_000_000.;
+            s.max_hp = 1_000_000.;
+            s.x = p.x + 3.;
+            s.y = p.y;
+            s.zone = 1;
+            s.target = Some(1);
+        }
+        let before = w.slimes[wisp].hp;
+        for _ in 0..100 {
+            w.step();
+            w.slimes[wisp].target = Some(1);
+        }
+        assert!(
+            w.slimes[wisp].hp < before,
+            "the mercenary attacked the wisp"
+        );
+        assert_eq!(w.players[&merc].target, Some(wisp));
+        // Its kill pays the hirer: XP, a kill, the quest credit and the loot owner.
+        let owner = w.players[&1].character.id.clone();
+        let xp = (w.players[&1].character.level, w.players[&1].character.xp);
+        w.slimes[wisp].hp = 1.;
+        w.hit_slime(wisp, merc, 1000., false);
+        assert!(w.slimes[wisp].dead);
+        let hirer = &w.players[&1].character;
+        assert_eq!(hirer.kills, 1);
+        assert!((hirer.level, hirer.xp) > xp, "the hirer got the XP");
+        assert_eq!(w.players[&merc].character.kills, 0);
+        assert!(w.drops.iter().all(|d| d.owner == owner));
+        assert!(!w.drops.is_empty());
+    }
+
+    #[test]
+    fn a_priest_mercenary_mends_a_wounded_hirer_and_attackers_choose_among_mercenaries_too() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.level = 20;
+            c.gold = 600;
+            c.zone = 1;
+        }
+        for s in w.slimes.iter_mut() {
+            s.dead = true;
+            s.respawn = 10000.;
+        }
+        at_giver(&mut w, 1, "crags_captain");
+        w.time += 0.6;
+        w.interact(1, "crags_captain", Some("quest:accept:crags_cinderlord"));
+        drain(&mut rx);
+        assert!(hire(&mut w, &mut rx, 1, "crags_captain", "priest").contains("joins"));
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.hp = p.character.max_hp() * 0.3;
+            p.last_hurt = 1.0e9;
+        }
+        let low = w.players[&1].character.hp;
+        for _ in 0..60 {
+            w.step();
+            w.players.get_mut(&1).unwrap().last_hurt = 1.0e9;
+        }
+        let now = w.players[&1].character.hp;
+        // Natural regeneration is off (recent hurt); only a mend can have raised it.
+        assert!(
+            now > low + 10.,
+            "the priest mended the hirer: {low} -> {now}"
+        );
+    }
+
+    #[test]
+    fn a_hired_party_beats_the_cinderlord_where_a_lone_hero_cannot() {
+        // The hirer plays like the other balance tests; the single mercenary is the server's own AI.
+        for (hired, expect_win) in [(false, false), (true, true)] {
+            let mut w = world();
+            w.rng = 11;
+            let mut receivers = [join(&mut w, 1, Class::Warrior)];
+            let id = w
+                .slimes
+                .iter()
+                .position(|s| s.kind == "cinderlord")
+                .unwrap();
+            let point = w.slimes[id].point();
+            for s in w.slimes.iter_mut().filter(|s| s.id != id) {
+                s.dead = true;
+                s.respawn = 10000.;
+            }
+            {
+                let c = &mut w.players.get_mut(&1).unwrap().character;
+                c.zone = 1;
+                c.x = point.x - 2.;
+                c.y = point.y;
+                c.level = 10;
+                c.gold = 500;
+                c.hp = c.max_hp();
+                c.attributes.strength = 20;
+                c.attributes.accuracy = 7;
+                c.add_item("health_potion", 1);
+            }
+            at_giver(&mut w, 1, "crags_captain");
+            w.time += 0.6;
+            w.interact(1, "crags_captain", Some("quest:accept:crags_cinderlord"));
+            if hired {
+                w.time += 0.6;
+                w.interact(1, "crags_captain", Some("merc_warrior"));
+                assert_eq!(mercs_of(&w).len(), 1);
+            }
+            {
+                let c = &mut w.players.get_mut(&1).unwrap().character;
+                c.x = point.x - 2.;
+                c.y = point.y;
+            }
+            for p in w.players.values_mut().filter(|p| p.merc.is_some()) {
+                p.character.x = point.x + 2.;
+                p.character.y = point.y;
+            }
+            w.message(1, ClientMessage::Target { id });
+            for _ in 0..(150. / TICK) as usize {
+                if w.players[&1].character.hp > 0. {
+                    let aim = w.players[&1]
+                        .character
+                        .point()
+                        .direction(w.slimes[id].point());
+                    for skill in ["battlecry", "shieldwall", "cleave", "whirlwind"] {
+                        w.use_skill(1, skill, aim);
+                    }
+                    let c = &w.players[&1].character;
+                    if c.hp <= c.max_hp() - 100. {
+                        w.use_item(1, "health_potion");
+                    }
+                }
+                w.step();
+                for rx in receivers.iter_mut() {
+                    while rx.try_recv().is_ok() {}
+                }
+                if w.slimes[id].dead || w.players.is_empty() {
+                    break;
+                }
+            }
+            assert_eq!(
+                w.slimes[id].dead, expect_win,
+                "hired {hired}: enemy HP {} of {}",
+                w.slimes[id].hp, w.slimes[id].max_hp
+            );
+            if expect_win {
+                assert_eq!(
+                    w.players[&1]
+                        .character
+                        .quests
+                        .iter()
+                        .find(|q| q.id == "crags_cinderlord")
+                        .unwrap()
+                        .counts,
+                    vec![1],
+                    "the hirer gets the quest credit"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_hirer_with_four_mercenaries_takes_the_gloomroot_and_one_with_two_does_not() {
+        // The hirer is a trained level-20 warrior; the four seats are the server's AI: a warrior, a priest, a mage and a hunter.
+        for (classes, wins) in [
+            (vec!["warrior", "priest", "mage", "hunter"], true),
+            (vec!["warrior", "priest"], false),
+        ] {
+            let mut w = world();
+            w.rng = 5;
+            let mut receivers = [join(&mut w, 1, Class::Warrior)];
+            let id = w.slimes.iter().position(|s| s.kind == "gloomroot").unwrap();
+            let point = w.slimes[id].point();
+            for s in w.slimes.iter_mut().filter(|s| s.id != id) {
+                s.dead = true;
+                s.respawn = 10000.;
+            }
+            {
+                let c = &mut w.players.get_mut(&1).unwrap().character;
+                c.level = 20;
+                c.gold = 5000;
+                c.attributes.strength = 40;
+                c.attributes.stamina = 10;
+                c.attributes.accuracy = 7;
+                c.add_item("health_potion", 1);
+                c.quests.push(QuestProgress {
+                    id: "fen_hydra".into(),
+                    claimed: true,
+                    completions: 1,
+                    ..Default::default()
+                });
+            }
+            at_giver(&mut w, 3, "fen_reeve");
+            w.time += 0.6;
+            w.interact(1, "fen_reeve", Some("quest:accept:fen_gloomroot"));
+            for class in &classes {
+                w.time += 0.6;
+                w.interact(1, "fen_reeve", Some(&format!("merc_{class}")));
+            }
+            assert_eq!(mercs_of(&w).len(), classes.len());
+            {
+                let c = &mut w.players.get_mut(&1).unwrap().character;
+                c.x = point.x - 3.;
+                c.y = point.y;
+                c.hp = c.max_hp();
+            }
+            for (i, p) in w
+                .players
+                .values_mut()
+                .filter(|p| p.merc.is_some())
+                .enumerate()
+            {
+                p.character.x = point.x + 2. + i as f64;
+                p.character.y = point.y + 2.;
+            }
+            w.message(1, ClientMessage::Target { id });
+            let mut deaths = 0;
+            for _ in 0..(300. / TICK) as usize {
+                if w.players[&1].character.hp > 0. {
+                    let aim = w.players[&1]
+                        .character
+                        .point()
+                        .direction(w.slimes[id].point());
+                    for skill in [
+                        "battlecry",
+                        "shieldwall",
+                        "cleave",
+                        "whirlwind",
+                        "charge",
+                        "groundslam",
+                    ] {
+                        w.use_skill(1, skill, aim);
+                    }
+                    let c = &w.players[&1].character;
+                    if c.hp <= c.max_hp() - 100. {
+                        w.use_item(1, "health_potion");
+                    }
+                }
+                w.step();
+                for rx in receivers.iter_mut() {
+                    while rx.try_recv().is_ok() {}
+                }
+                deaths = deaths.max(w.players.values().filter(|p| p.character.hp <= 0.).count());
+                if w.slimes[id].dead {
+                    break;
+                }
+            }
+            assert_eq!(
+                w.slimes[id].dead, wins,
+                "{classes:?}: enemy HP {} of {}, {deaths} deaths, time {:.0}",
+                w.slimes[id].hp, w.slimes[id].max_hp, w.time
+            );
+            if wins {
+                assert!(deaths <= 3, "and lose at most three: {deaths}");
+                assert_eq!(
+                    w.players[&1]
+                        .character
+                        .quests
+                        .iter()
+                        .find(|q| q.id == "fen_gloomroot")
+                        .unwrap()
+                        .counts,
+                    vec![1],
+                    "the hirer is credited, whoever landed the blow"
+                );
+            }
+        }
     }
 
     #[test]
@@ -4039,7 +4616,7 @@ mod tests {
                 "gloomroot",
                 20,
                 20000.,
-                300.,
+                900.,
                 0.85,
                 1200,
                 "gloomroot_heartwood",

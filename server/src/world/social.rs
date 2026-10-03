@@ -115,6 +115,7 @@ impl World {
             }
             return self
                 .online(id)
+                .filter(|p| p.merc.is_none())
                 .map(|p| p.character.id.clone())
                 .ok_or_else(|| "That player is not online.".into());
         }
@@ -123,10 +124,11 @@ impl World {
             return Err("Name a player or choose one from the list.".into());
         };
         let wanted = name.to_lowercase();
-        let mut found = self
-            .players
-            .values()
-            .filter(|p| p.character.id != me && p.character.look.name.to_lowercase() == wanted);
+        let mut found = self.players.values().filter(|p| {
+            p.merc.is_none()
+                && p.character.id != me
+                && p.character.look.name.to_lowercase() == wanted
+        });
         match (found.next(), found.next()) {
             (Some(p), None) => Ok(p.character.id.clone()),
             (Some(_), Some(_)) => Err(format!(
@@ -396,6 +398,7 @@ impl World {
         let mut players: Vec<Value> = self
             .players
             .values()
+            .filter(|p| p.merc.is_none())
             .map(|p| {
                 let c = &p.character;
                 json!({"id":c.id,"name":c.look.name,"class":c.look.class,"level":c.level,"place":self.zone_name(c.zone),
@@ -675,7 +678,7 @@ impl World {
         Ok(())
     }
     /// Removes one member. A party of one disbands; a leaving leader hands over to the longest-standing member.
-    fn leave_party(&mut self, id: &str) {
+    pub(super) fn leave_party(&mut self, id: &str) {
         let Some(i) = self.party_index(id) else {
             return;
         };
@@ -706,6 +709,41 @@ impl World {
         }
         let ids: Vec<&str> = touched.iter().map(String::as_str).collect();
         self.push_social(&ids);
+    }
+    /// Seats a hired mercenary in `owner`'s party (making one with them when they have none).
+    pub(super) fn party_add_mercenary(
+        &mut self,
+        owner: &str,
+        merc: &Character,
+    ) -> Result<(), String> {
+        let member = |id: &str, c: &Character| Member {
+            id: id.to_owned(),
+            name: c.look.name.clone(),
+            class: c.look.class,
+            level: c.level,
+        };
+        let merc_member = member(&merc.id, merc);
+        let index = match self.party_index(owner) {
+            Some(i) => {
+                if self.social.parties[i].members.len() >= PARTY_MAX {
+                    return Err(format!("Your party is full ({PARTY_MAX}/{PARTY_MAX})."));
+                }
+                self.social.parties[i].members.push(merc_member);
+                i
+            }
+            None => {
+                let Some(me) = self.online(owner).map(|p| member(owner, &p.character)) else {
+                    return Err("You are not online.".into());
+                };
+                self.social.parties.push(Party {
+                    leader: owner.to_owned(),
+                    members: vec![me, merc_member],
+                });
+                self.social.parties.len() - 1
+            }
+        };
+        self.push_party_members(index);
+        Ok(())
     }
     fn party_member_of(&self, me: &str, target: &str) -> Result<usize, String> {
         let i = self.party_index(me).ok_or("You are not in a party.")?;
@@ -738,6 +776,9 @@ impl World {
     }
     fn party_promote(&mut self, me: &str, target: &str) -> Result<(), String> {
         let i = self.party_member_of(me, target)?;
+        if self.online(target).is_some_and(|p| p.merc.is_some()) {
+            return Err("A mercenary cannot lead a party.".into());
+        }
         self.social.parties[i].leader = target.to_owned();
         let name = self.name_of(target);
         for m in self.social.parties[i].members.clone() {

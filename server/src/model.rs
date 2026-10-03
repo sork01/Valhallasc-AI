@@ -341,6 +341,53 @@ pub struct Character {
     #[serde(default)]
     pub gm: bool,
 }
+impl Character {
+    /// A hired mercenary: this class and level with the class's starter gear and a few potions, every stat point in the
+    /// class's main stat (a quarter in stamina). It is never saved and has no account.
+    pub fn mercenary(class: Class, level: u32, name: &str) -> Self {
+        let look = Look {
+            name: name.into(),
+            class,
+            ..Look::default()
+        };
+        let mut c = Character {
+            id: uuid::Uuid::new_v4().to_string(),
+            hp: class.health(),
+            resource: None,
+            look,
+            x: 0.,
+            y: 0.,
+            level,
+            xp: 0,
+            gold: 0,
+            kills: 0,
+            quests: vec![],
+            inventory: vec![],
+            equipment: Default::default(),
+            bags: vec![],
+            attributes: Attributes::default(),
+            zone: 0,
+            friends: vec![],
+            potion_ready: 0,
+            explored: vec![],
+            gm: false,
+        };
+        c.seed_inventory();
+        c.add_item("health_potion", 3);
+        let points = level.saturating_sub(1) * 3;
+        let stamina = points / 4;
+        let main = points - stamina;
+        c.attributes.stamina = stamina;
+        match class {
+            Class::Warrior => c.attributes.strength = main,
+            Class::Mage | Class::Priest => c.attributes.intellect = main,
+            Class::Assassin | Class::Hunter => c.attributes.agility = main,
+        }
+        c.hp = c.max_hp();
+        c.reset_resource();
+        c
+    }
+}
 /// Every zone is cut into this many cells a side for the fog of war: nine spots to uncover per map.
 pub const FOG_GRID: usize = 3;
 /// Permanently trained points. Base class combat values stay unchanged until trained.
@@ -562,6 +609,9 @@ pub struct Quest {
     /// Shared kill objectives for living, nearby contributors to an elite fight.
     #[serde(default)]
     pub group: bool,
+    /// How many fighters a group quest wants. Its giver rents mercenaries to fill a party up to this number.
+    #[serde(default)]
+    pub recommended_players: u32,
     pub objectives: Vec<QuestObjective>,
     /// A progression quest: it is accepted for the character by itself once they reach this level, so
     /// nobody has to be found to take it. The giver is still where it is handed in.
@@ -918,6 +968,9 @@ pub struct Offer {
     /// An item the offer sells (one per purchase).
     #[serde(default)]
     pub item: Option<String>,
+    /// A mercenary the offer rents: a class name, or "dismiss" to send them all away (see world/mercs.rs).
+    #[serde(default)]
+    pub merc: Option<String>,
 }
 #[derive(Clone, Deserialize, Serialize)]
 pub struct Npc {
