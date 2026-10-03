@@ -20,6 +20,7 @@ const SONGS = [
   { id: 'crags', make: 'createCragMusic', seconds: 54.86, name: 'Ashfall Run' },
   { id: 'rime', make: 'createRimeMusic', seconds: 76.8, name: 'Rimeveil Spiral' },
   { id: 'fen', make: 'createFenMusic', seconds: 72.73, name: 'Lanternmere Dusk' },
+  { id: 'city', make: 'createCityMusic', seconds: 101.05, name: 'Skaldholm Square' },
 ];
 (async () => {
   browser = await chromium.launch({ headless: true });
@@ -55,7 +56,7 @@ const SONGS = [
   await game.locator('#login-guest').click();
   await game.locator('#name').fill('Bard'); await game.locator('#go').click({ timeout: 60000 });
   await game.waitForFunction(() => Online.connected && !!valhalla.fmusic?.running, null, { timeout: 60000 });
-  check(await game.evaluate(() => !valhalla.cmusic.running && !valhalla.rmusic.running && !valhalla.gmusic.running && !valhalla.music.running), 'In Greenmeadow only the meadow tune is running');
+  check(await game.evaluate(() => !valhalla.cmusic.running && !valhalla.rmusic.running && !valhalla.gmusic.running && !valhalla.smusic.running && !valhalla.music.running), 'In Greenmeadow only the meadow tune is running');
   await game.waitForFunction(() => valhalla.fmusic.loaded, null, { timeout: 30000 });
   check(true, 'The meadow mp3 loaded in the game');
   await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 1, x: 48, y: 86.5 } }));
@@ -89,6 +90,17 @@ const SONGS = [
   check(await game.evaluate(() => glevels.length > 0 && Math.abs(glevels.at(-1) - .25) < 1e-9), 'The music slider covers the fen score too (50% = 0.25 gain)');
   await game.evaluate(() => Prefs.set({ sound: false }));
   check(await game.evaluate(() => glevels.at(-1) === 0), 'Sound off silences the fen score');
+  await game.evaluate(() => Prefs.set({ sound: true, musicVol: 1 }));
+  // Skaldholm has the fifth score: Skaldholm Square replaces Lanternmere Dusk, and the slider covers it.
+  await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 4, x: 80, y: 150 } }));
+  await game.waitForFunction(() => Field.zone === 4 && valhalla.smusic.running && !valhalla.gmusic.running && !valhalla.rmusic.running && !valhalla.cmusic.running && !valhalla.fmusic.running, null, { timeout: 10000 });
+  await game.waitForFunction(() => valhalla.smusic.loaded, null, { timeout: 30000 });
+  check(true, 'Crossing into Skaldholm swaps Lanternmere Dusk for Skaldholm Square, and it loads');
+  await game.evaluate(() => { window.slevels = []; const set = valhalla.smusic.setLevel; valhalla.smusic.setLevel = (v, s) => { slevels.push(v); return set.call(valhalla.smusic, v, s); }; });
+  await game.evaluate(() => Prefs.set({ musicVol: .5 }));
+  check(await game.evaluate(() => slevels.length > 0 && Math.abs(slevels.at(-1) - .25) < 1e-9), 'The music slider covers the city score too (50% = 0.25 gain)');
+  await game.evaluate(() => Prefs.set({ sound: false }));
+  check(await game.evaluate(() => slevels.at(-1) === 0), 'Sound off silences the city score');
   await game.evaluate(() => Prefs.set({ sound: true, musicVol: 1 }));
   await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 2, x: 64, y: 118.5 } }));
   await game.waitForFunction(() => Field.zone === 2 && valhalla.rmusic.running && !valhalla.gmusic.running, null, { timeout: 10000 });

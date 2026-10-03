@@ -42,15 +42,29 @@
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn;
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
-    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen';
+    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city';
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
       const i = y * MAP + x, cx = x + .5, cy = y + .5;
-      map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : 2) * .35;
+      map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : 2) * .35;
       let d = 99; for (const p of paths) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
-      if (!ember && !frost && !fen) d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
+      if (!ember && !frost && !fen && !city) d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
       map.dirt[i] = d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0;
     }
+    if (city) paintRoads(zdef.roads);
     objects = zdef.objects.map(o => ({ ...o }));
+  }
+  // Skaldholm's ground: the zone lists its streets (type 1 cobbles), plazas and squares (2 marble, 3 brick) as rectangles, discs and rings.
+  function paintRoads(roads) {
+    map.dirt.fill(0);
+    for (const r of roads || []) {
+      const rect = r.x0 !== undefined, rad = r.r1 ?? r.r, bx0 = rect ? r.x0 : r.x - rad, bx1 = rect ? r.x1 : r.x + rad, by0 = rect ? r.y0 : r.y - rad, by1 = rect ? r.y1 : r.y + rad;
+      for (let y = Math.max(0, Math.floor(by0)); y <= Math.min(MAP - 1, Math.floor(by1)); y++) for (let x = Math.max(0, Math.floor(bx0)); x <= Math.min(MAP - 1, Math.floor(bx1)); x++) {
+        const cx = x + .5, cy = y + .5; let inside;
+        if (rect) inside = cx >= r.x0 && cx <= r.x1 && cy >= r.y0 && cy <= r.y1;
+        else { const d = Math.hypot(cx - r.x, cy - r.y); inside = r.r0 !== undefined ? d >= r.r0 && d <= r.r1 : d <= r.r; }
+        if (inside) map.dirt[y * MAP + x] = r.t;
+      }
+    }
   }
   // Switch to another zone: new ground, obstacles and minimap. Everything tied to the old zone's coordinates goes.
   function setZone(z) {
@@ -379,18 +393,57 @@
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
   function renderChunk(cx, cy) {
     const G = chunkGeom(cx, cy), [c, g] = canvasOf(G.w, G.h, chunkScale);
-    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen';
+    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city';
     for (let ty = 0; ty < CH; ty++) for (let tx = 0; tx < CH; tx++) {
       const x = G.x0 + tx, y = G.y0 + ty; if (x >= MAP || y >= MAP) continue;
       const i = y * MAP + x, px = (x - y) * TW / 2 - G.ox, py = (x + y) * TH / 2 - G.oy, tone = map.tone[i], dirt = map.dirt[i];
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
-      g.fillStyle = fen ? (dirt ? `hsl(${30 + tone * 6}, ${30 + tone * 6}%, ${27 + tone * 6 + alt}%)` : `hsl(${92 + tone * 16}, ${26 + tone * 12}%, ${21 + tone * 9 + alt * .8}%)`)
+      g.fillStyle = city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
+        : fen ? (dirt ? `hsl(${30 + tone * 6}, ${30 + tone * 6}%, ${27 + tone * 6 + alt}%)` : `hsl(${92 + tone * 16}, ${26 + tone * 12}%, ${21 + tone * 9 + alt * .8}%)`)
         : frost ? (dirt ? `hsl(${208 + tone * 8}, ${26 + tone * 8}%, ${66 + tone * 6 + alt}%)` : `hsl(${200 + tone * 12}, ${44 + tone * 10}%, ${84 + tone * 8 + alt * .6}%)`)
         : ember ? (dirt ? `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)` : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`)
         : dirt ? `hsl(${30 + tone * 8}, ${38 + tone * 8}%, ${48 + tone * 8 + alt}%)` : `hsl(${100 + tone * 16}, ${46 + tone * 12}%, ${36 + tone * 12 + alt}%)`;
       g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill();
       const r = rngf(x * 977 + y * 131 + 7), inTile = () => { const a = r() - .5, b = r() - .5; return [px + (a - b) * TW * .4, py + TH / 2 + (a + b) * TH * .4]; };
-      if (fen) {
+      if (city) {
+        const at = (u, v) => [px + (u - v) * TW / 2, py + (u + v) * TH / 2];
+        if (dirt === 1) {                                                              // cobbles: a 3x3 of rounded stones
+          for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) {
+            const [qx, qy] = at((a + .5 + (r() - .5) * .2) / 3, (b + .5 + (r() - .5) * .2) / 3), l = 52 + r() * 14 + tone * 5;
+            g.fillStyle = `hsl(${30 + r() * 12}, ${8 + r() * 6}%, ${l}%)`; g.beginPath(); g.ellipse(qx, qy, TW / 6.6, TH / 6.6, 0, 0, 6.283); g.fill();
+            g.strokeStyle = 'rgba(60,52,40,.35)'; g.lineWidth = .9; g.stroke();
+          }
+        } else if (dirt === 2) {                                                       // marble paving: seams and a few inlays
+          g.strokeStyle = 'rgba(120,105,80,.38)'; g.lineWidth = 1; g.beginPath(); g.moveTo(px, py); g.lineTo(px + TW / 2, py + TH / 2); g.lineTo(px, py + TH); g.lineTo(px - TW / 2, py + TH / 2); g.closePath(); g.stroke();
+          if (((x * 7 + y * 13) % 5) === 0) { g.fillStyle = 'rgba(190,168,120,.55)'; g.beginPath(); g.moveTo(px, py + TH * .3); g.lineTo(px + TW * .2, py + TH / 2); g.lineTo(px, py + TH * .7); g.lineTo(px - TW * .2, py + TH / 2); g.closePath(); g.fill(); }
+        } else if (dirt === 3) {                                                       // brick courts: running bond
+          g.strokeStyle = 'rgba(70,32,22,.45)'; g.lineWidth = 1;
+          for (const f of [.25, .5, .75]) { const [a1, a2] = [at(0, f), at(1, f)]; g.beginPath(); g.moveTo(a1[0], a1[1]); g.lineTo(a2[0], a2[1]); g.stroke(); }
+          for (let row = 0; row < 4; row++) for (const f of [row % 2 ? .25 : .5, row % 2 ? .75 : 1]) { const [a1, a2] = [at(f, row / 4), at(f, (row + 1) / 4)]; g.beginPath(); g.moveTo(a1[0], a1[1]); g.lineTo(a2[0], a2[1]); g.stroke(); }
+        } else {                                                                       // lawn
+          g.lineCap = 'round';
+          const tufts = Math.floor(r() * 2.2);
+          for (let k = 0; k < tufts; k++) {
+            const [qx, qy] = inTile(), h = 4 + r() * 4; g.lineWidth = 1.6;
+            g.strokeStyle = `hsl(${102 + tone * 12}, 50%, ${27 + tone * 8}%)`; g.beginPath(); g.moveTo(qx - 2.5, qy + 1); g.lineTo(qx - 4, qy - h); g.moveTo(qx + 2.5, qy + 1); g.lineTo(qx + 4, qy - h * .9); g.stroke();
+            g.strokeStyle = `hsl(${98 + tone * 12}, 58%, ${46 + tone * 8}%)`; g.beginPath(); g.moveTo(qx, qy + 1); g.lineTo(qx - .5, qy - h * 1.2); g.stroke();
+          }
+          if (r() < .055) {
+            const [qx, qy] = inTile(), col = ['#ffffff', '#ffe066', '#ff9ad5', '#b9a0ff'][Math.floor(r() * 4)];
+            g.strokeStyle = '#2f7a3a'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(qx, qy + 2); g.lineTo(qx, qy - 4); g.stroke();
+            g.fillStyle = col; for (let p = 0; p < 5; p++) { const a = p / 5 * 6.283; g.beginPath(); g.arc(qx + Math.cos(a) * 2.6, qy - 5 + Math.sin(a) * 2.1, 1.9, 0, 6.283); g.fill(); }
+            g.fillStyle = '#f5b82e'; g.beginPath(); g.arc(qx, qy - 5, 1.4, 0, 6.283); g.fill();
+          }
+        }
+        if (dirt === 1 || dirt === 3) {                                                // kerbs where a street meets the lawn
+          const edge = (a, b, c, d2) => { g.strokeStyle = '#6c6250'; g.lineWidth = 2.6; g.beginPath(); g.moveTo(a, b); g.lineTo(c, d2); g.stroke(); g.strokeStyle = 'rgba(255,248,226,.5)'; g.lineWidth = 1; g.beginPath(); g.moveTo(a, b + 1.6); g.lineTo(c, d2 + 1.6); g.stroke(); };
+          const bare = (nx, ny) => nx >= 0 && ny >= 0 && nx < MAP && ny < MAP && !map.dirt[ny * MAP + nx];
+          if (bare(x, y - 1)) edge(px, py, px + TW / 2, py + TH / 2);
+          if (bare(x + 1, y)) edge(px + TW / 2, py + TH / 2, px, py + TH);
+          if (bare(x, y + 1)) edge(px, py + TH, px - TW / 2, py + TH / 2);
+          if (bare(x - 1, y)) edge(px - TW / 2, py + TH / 2, px, py);
+        }
+      } else if (fen) {
         if (dirt) {                                                                    // boardwalk: planks across the tile
           for (const t of [.25, .5, .75]) { g.strokeStyle = 'rgba(20,12,6,.55)'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(px + t * TW / 2, py + t * TH / 2); g.lineTo(px - TW / 2 + t * TW / 2, py + TH / 2 + t * TH / 2); g.stroke();
             g.strokeStyle = 'rgba(255,220,160,.16)'; g.lineWidth = 1; g.beginPath(); g.moveTo(px + t * TW / 2, py + t * TH / 2 + 1.6); g.lineTo(px - TW / 2 + t * TW / 2, py + TH / 2 + t * TH / 2 + 1.6); g.stroke(); }
@@ -441,13 +494,14 @@
       const face = (dir) => {
         const vx = px + dir * TW / 2, vy = py + TH / 2, bx = px, by = py + TH;
         const gr = g.createLinearGradient(0, vy, 0, vy + depth);
-        if (fen) { gr.addColorStop(0, dir > 0 ? '#5a4c38' : '#4a3e2e'); gr.addColorStop(1, dir > 0 ? '#2a2218' : '#201a12'); }
+        if (city) { gr.addColorStop(0, dir > 0 ? '#cdb48a' : '#b79c74'); gr.addColorStop(1, dir > 0 ? '#7a6044' : '#65503a'); }
+        else if (fen) { gr.addColorStop(0, dir > 0 ? '#5a4c38' : '#4a3e2e'); gr.addColorStop(1, dir > 0 ? '#2a2218' : '#201a12'); }
         else if (frost) { gr.addColorStop(0, dir > 0 ? '#a9d3ee' : '#8fbddb'); gr.addColorStop(1, dir > 0 ? '#2f5a82' : '#274b70'); }
         else if (ember) { gr.addColorStop(0, dir > 0 ? '#4a3430' : '#3c2a28'); gr.addColorStop(1, dir > 0 ? '#1e1416' : '#181012'); }
         else { gr.addColorStop(0, dir > 0 ? '#7a5433' : '#684528'); gr.addColorStop(1, dir > 0 ? '#3d2a1c' : '#33221a'); }
         g.fillStyle = gr; g.beginPath(); g.moveTo(vx, vy); g.lineTo(bx, by); g.lineTo(bx, by + depth * (.85 + hash2(x + 3, y, 4) * .3)); g.lineTo(vx, vy + depth); g.closePath(); g.fill();
         g.strokeStyle = 'rgba(0,0,0,.18)'; g.lineWidth = 2; for (let k = 1; k < 4; k++) { g.beginPath(); g.moveTo(vx, vy + depth * k / 4); g.lineTo(bx, by + depth * k / 4 * .9); g.stroke(); }
-        g.strokeStyle = fen ? '#4f7a36' : frost ? '#eaf7ff' : ember ? '#8a3a1c' : '#3f8a3c'; g.lineWidth = 5; g.beginPath(); g.moveTo(vx, vy + 1); g.lineTo(bx, by + 1); g.stroke();
+        g.strokeStyle = city ? '#5faa44' : fen ? '#4f7a36' : frost ? '#eaf7ff' : ember ? '#8a3a1c' : '#3f8a3c'; g.lineWidth = 5; g.beginPath(); g.moveTo(vx, vy + 1); g.lineTo(bx, by + 1); g.stroke();
         if (ember) { g.strokeStyle = 'rgba(255,120,40,.55)'; g.lineWidth = 2; g.beginPath(); g.moveTo(vx, vy + 3); g.lineTo(bx, by + 3); g.stroke(); }
         g.strokeStyle = OL; g.lineWidth = 2; g.beginPath(); g.moveTo(vx, vy + depth); g.lineTo(bx, by + depth * .9); g.stroke();
       };
@@ -523,7 +577,7 @@
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
   }
-  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: zdef.city?.name, hub: City.inside(hero.x, hero.y) ? zdef.city?.name : null, levels: zdef.levels, buffs: hero.buffs || [], traveling: cityRoute.length > 0 && !pendingNpc }); }
+  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: zdef.city?.name, tagline: zdef.tagline, hub: City.inside(hero.x, hero.y) ? zdef.city?.name : null, levels: zdef.levels, buffs: hero.buffs || [], traveling: cityRoute.length > 0 && !pendingNpc }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -568,13 +622,27 @@
     else { cityRoute = routeTo(npc, true); pendingNpc = { npc, until: tAll + Math.max(20, cityRoute.length * .6) }; routeTime = 0; }
   }
   // A small grid route lets the travel button walk around real map obstacles.
+  // Obstacles bucketed in 4-tile cells, rebuilt when the zone's objects change, so a route across a 160-tile city tests a handful of objects per step.
+  let hashFor = null, hash = null;
+  const nearObjects = (x, y) => {
+    if (hashFor !== objects) {
+      const H = 4, w = Math.ceil(MAP / H) + 1, cells = Array.from({ length: w * w }, () => []);
+      for (const o of objects) {
+        const hx = (o.width ? o.width / 2 : o.r) + 1, hy = (o.width ? o.depth / 2 : o.r) + 1;
+        for (let cy = Math.max(0, Math.floor((o.y - hy) / H)); cy <= Math.min(w - 1, Math.floor((o.y + hy) / H)); cy++) for (let cx = Math.max(0, Math.floor((o.x - hx) / H)); cx <= Math.min(w - 1, Math.floor((o.x + hx) / H)); cx++) cells[cy * w + cx].push(o);
+      }
+      hash = { cells, w, H }; hashFor = objects;
+    }
+    const cx = Math.floor(x / hash.H), cy = Math.floor(y / hash.H);
+    return cx >= 0 && cy >= 0 && cx < hash.w && cy < hash.w ? hash.cells[cy * hash.w + cx] : objects;
+  };
   function routeTo(goal, approach = false, origin = hero) {
-    const free = (x,y) => x>=1 && y>=1 && x<MAP-1 && y<MAP-1 && objects.every(o => o.width ? Math.abs(x-o.x)>o.width/2+.55 || Math.abs(y-o.y)>o.depth/2+.55 : Math.hypot(x-o.x,y-o.y)>o.r+.55);
+    const free = (x,y) => x>=1 && y>=1 && x<MAP-1 && y<MAP-1 && nearObjects(x,y).every(o => o.width ? Math.abs(x-o.x)>o.width/2+.55 || Math.abs(y-o.y)>o.depth/2+.55 : Math.hypot(x-o.x,y-o.y)>o.r+.55);
     const segmentFree = (a, b) => {
       const steps = Math.max(1, Math.ceil(Math.hypot(a.x-b.x,a.y-b.y) / .1));
       for (let i=0;i<=steps;i++) {
         const x=a.x+(b.x-a.x)*i/steps, y=a.y+(b.y-a.y)*i/steps;
-        if(objects.some(o => o.width ? Math.abs(x-o.x)<o.width/2+.3-1e-6 && Math.abs(y-o.y)<o.depth/2+.3-1e-6 : Math.hypot(x-o.x,y-o.y)<o.r+.3-1e-6)) return false;
+        if(nearObjects(x,y).some(o => o.width ? Math.abs(x-o.x)<o.width/2+.3-1e-6 && Math.abs(y-o.y)<o.depth/2+.3-1e-6 : Math.hypot(x-o.x,y-o.y)<o.r+.3-1e-6)) return false;
       }
       return true;
     };
@@ -654,8 +722,12 @@
       }
     }
   }
+  // The server's world clock (seconds), as of the last snapshot plus the time since. Walking townspeople are placed from it.
+  const clock = { t: 0, at: 0, ok: false };
+  const serverNow = () => clock.ok ? clock.t + (performance.now() - clock.at) / 1000 : performance.now() / 1000;
   function applySnapshot(packet, initial = false) {
     const own = packet.players.find(p => p.id === Online.id); if (!own) return;
+    if (typeof packet.time === 'number') { clock.t = packet.time; clock.at = performance.now(); clock.ok = true; }
     // The server decides the zone (a gate moved us); rebuild the ground and snap everything to the new place.
     const moved = (own.zone || 0) !== zone;
     if (moved) setZone(own.zone || 0);
@@ -950,6 +1022,10 @@
         const {npc,until}=pendingNpc;
         if(hero.dead || tAll>until) {pendingNpc=null;cityRoute=[];Online.send({type:'stop'});}
         else if(Math.hypot(hero.x-npc.x,hero.y-npc.y)<=2.5) {pendingNpc=null;cityRoute=[];Online.send({type:'interact',npc:npc.id});}
+        else if(npc.route && tAll-routeTime>1) {                       // a walker has moved on: take a fresh route to where it is now
+          const end=cityRoute[cityRoute.length-1];
+          if(!end || Math.hypot(end.x-npc.x,end.y-npc.y)>2.2) {cityRoute=routeTo(npc,true);routeTime=tAll;}
+        }
       }
       if(!paused && cityRoute.length) {
         if(hero.dead)cityRoute=[];
@@ -1290,6 +1366,34 @@
       g.beginPath(); g.ellipse(px, py, 170 * sc, 26 * sc, 0, 0, 6.283); g.ellipse(px - 90 * sc, py + 8 * sc, 90 * sc, 20 * sc, 0, 0, 6.283); g.fill();
     }
   }
+  // Skaldholm: a warm late afternoon. Blue overhead, peach at the horizon, a low sun with a halo and gilded clouds.
+  function drawSkyCity(g, t) {
+    const gr = g.createLinearGradient(0, 0, 0, VH); gr.addColorStop(0, '#3f86d8'); gr.addColorStop(.45, '#8dbdee'); gr.addColorStop(.8, '#f4d6b0'); gr.addColorStop(1, '#fbe6bf');
+    g.fillStyle = gr; g.fillRect(0, 0, VW, VH);
+    const sx = VW * .17, sy = VH * .8, halo = g.createRadialGradient(sx, sy, 10, sx, sy, 420);
+    halo.addColorStop(0, 'rgba(255,240,190,.85)'); halo.addColorStop(.35, 'rgba(255,214,150,.35)'); halo.addColorStop(1, 'rgba(255,200,140,0)');
+    g.fillStyle = halo; g.fillRect(0, 0, VW, VH);
+    g.fillStyle = '#fff6d4'; g.beginPath(); g.arc(sx, sy, 38, 0, 6.283); g.fill();
+    const [cx, cy] = camS();
+    for (let i = 0; i < 14; i++) {
+      const px = ((i * 397 + t * (5 + (i % 4) * 3) - cx * .25) % (VW + 500) + VW + 500) % (VW + 500) - 250, py = (i * 211 % VH) - cy * .12 * ((i % 3) + 1) * .3 + 120 * ((i % 3) - 1) + 470, sc = .8 + (i % 4) * .35;
+      g.fillStyle = i % 3 ? 'rgba(255,244,226,.62)' : 'rgba(255,214,170,.55)';
+      g.beginPath(); g.ellipse(px, py, 130 * sc, 28 * sc, 0, 0, 6.283); g.ellipse(px - 70 * sc, py + 8 * sc, 80 * sc, 22 * sc, 0, 0, 6.283); g.ellipse(px + 76 * sc, py + 10 * sc, 90 * sc, 22 * sc, 0, 0, 6.283); g.fill();
+    }
+  }
+  // Over the city (screen space): drifting blossom petals and the odd pigeon crossing the sky.
+  function drawBlossom(g, t) {
+    for (let i = 0; i < 34; i++) {
+      const x = ((i * 173.1 + Math.sin(t * .6 + i) * 40 + t * (14 + i % 5 * 4)) % VW + VW) % VW, y = (i * 59.3 + t * (18 + (i % 4) * 7)) % VH;
+      g.globalAlpha = .55 + (i % 3) * .15; g.fillStyle = i % 4 ? '#ffd0dc' : '#fff0d0';
+      g.save(); g.translate(x, y); g.rotate(t * (.8 + i % 3 * .4) + i); g.beginPath(); g.ellipse(0, 0, 3.4, 1.8, 0, 0, 6.283); g.fill(); g.restore();
+    }
+    g.globalAlpha = 1; g.strokeStyle = 'rgba(70,64,80,.7)'; g.lineWidth = 2; g.lineCap = 'round';
+    for (let i = 0; i < 6; i++) {
+      const u = ((t * .028 + i * .17) % 1), x = -40 + u * (VW + 80), y = 120 + i * 58 + Math.sin(u * 9 + i) * 24, flap = Math.sin(t * 9 + i * 2) * 5;
+      g.beginPath(); g.moveTo(x - 9, y + flap); g.quadraticCurveTo(x - 3, y - 4, x, y); g.quadraticCurveTo(x + 3, y - 4, x + 9, y + flap); g.stroke();
+    }
+  }
   // Fireflies drifting over the fen (screen space): slow wandering dots that pulse yellow-green.
   function drawFireflies(g, t) {
     for (let i = 0; i < 42; i++) {
@@ -1338,6 +1442,7 @@
     if (zdef.theme === 'ember') return drawSkyEmber(g, t);
     if (zdef.theme === 'frost') return drawSkyFrost(g, t);
     if (zdef.theme === 'fen') return drawSkyFen(g, t);
+    if (zdef.theme === 'city') return drawSkyCity(g, t);
     const gr = g.createLinearGradient(0, 0, 0, VH); gr.addColorStop(0, '#5aa0e8'); gr.addColorStop(.6, '#9fd0f5'); gr.addColorStop(1, '#d4ecff');
     g.fillStyle = gr; g.fillRect(0, 0, VW, VH);
     g.fillStyle = 'rgba(255,255,255,.55)';
@@ -1374,15 +1479,15 @@
   }
   // A gate: two stone posts, a lintel and a swirling plane between them. The server owns the actual move.
   function drawPortal(g, p, sx, sy, t) {
-    const dest = ZONES[p.to] || ZONES[0], warm = dest.theme === 'ember', cold = dest.theme === 'frost', bog = dest.theme === 'fen';
-    const hue = warm ? 18 : cold ? 195 : bog ? 88 : 165, half = 1.5;
+    const dest = ZONES[p.to] || ZONES[0], warm = dest.theme === 'ember', cold = dest.theme === 'frost', bog = dest.theme === 'fen', gold = dest.theme === 'city';
+    const hue = warm ? 18 : cold ? 195 : bog ? 88 : gold ? 44 : 165, half = 1.5;
     const post = (u) => {                                    // an iso column centred u world units along x
       const px = sx + u * TW / 2, py = sy + u * TH / 2, w = 17, h = 112;
       g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(px, py + 2, 30, 11, 0, 0, 6.283); g.fill();
       g.lineJoin = 'round'; g.lineWidth = 3; g.strokeStyle = OL;
-      g.fillStyle = warm ? '#4a3b44' : cold ? '#7f93ad' : bog ? '#6a7a5c' : '#8a8f9c'; g.beginPath(); g.moveTo(px - w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
-      g.fillStyle = warm ? '#30262f' : cold ? '#586c86' : bog ? '#46543e' : '#6a6f7c'; g.beginPath(); g.moveTo(px + w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
-      g.fillStyle = warm ? '#6a5663' : cold ? '#b4cde3' : bog ? '#8a9c74' : '#b9bdc8'; g.beginPath(); g.moveTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.lineTo(px, py - 16 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = warm ? '#4a3b44' : cold ? '#7f93ad' : bog ? '#6a7a5c' : gold ? '#c9bfa2' : '#8a8f9c'; g.beginPath(); g.moveTo(px - w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = warm ? '#30262f' : cold ? '#586c86' : bog ? '#46543e' : gold ? '#a39a80' : '#6a6f7c'; g.beginPath(); g.moveTo(px + w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = warm ? '#6a5663' : cold ? '#b4cde3' : bog ? '#8a9c74' : gold ? '#e6dcc0' : '#b9bdc8'; g.beginPath(); g.moveTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.lineTo(px, py - 16 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
       g.shadowColor = `hsl(${hue}, 100%, 60%)`; g.shadowBlur = 10; g.strokeStyle = `hsl(${hue + 12}, 100%, ${60 + 10 * Math.sin(t * 3 + u)}%)`; g.lineWidth = 2.4;
       g.beginPath(); g.moveTo(px - 8, py - 30); g.lineTo(px - 8, py - 62); g.lineTo(px - 3, py - 74); g.moveTo(px + 8, py - 30); g.lineTo(px + 8, py - 54); g.stroke(); g.shadowBlur = 0;
     };
@@ -1448,8 +1553,9 @@
       if (it.o) {
         const o = it.o;
         if (!set[o.kind]) {
-          const cover=['house','chapel','gate','tent'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
+          const cover=['house','chapel','gate','tent','tower','rampart','meetingstone','grandfountain'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
           City.drawObject(g,o,it.sx,it.sy,cover ? .5 : 1);
+          City.animateObject(g,o,it.sx,it.sy,t);
           if(o.kind==='fountain') { for(let i=0;i<7;i++){const phase=(t*.7+i*.17)%1;g.globalAlpha=Math.sin(phase*Math.PI)*.7;g.fillStyle='#e0ffff';g.beginPath();g.ellipse(it.sx+Math.sin(i*4)*45,it.sy-9-phase*24,2,3,0,0,Math.PI*2);g.fill();}g.globalAlpha=1;}
           continue;
         }
@@ -1536,23 +1642,29 @@
     for (const f of floaters) { const [sx, sy] = w2s(f.x, f.y, f.z + 30); g.globalAlpha = clamp(1.4 - f.t * 1.3, 0, 1); g.font = `${f.big ? 34 : 24}px "Lilita One", "Jua", Impact, sans-serif`; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = 'rgba(20,10,30,.9)'; g.strokeText(f.text, sx, sy); g.fillStyle = f.color; g.fillText(f.text, sx, sy); } g.globalAlpha = 1;
     if (zdef.theme === 'frost') drawSnowfall(g, t);
     if (zdef.theme === 'fen') drawFireflies(g, t);
+    if (zdef.theme === 'city') drawBlossom(g, t);
     drawMini();
   }
   function buildMini() {
-    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen';
-    g.fillStyle = fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
-    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
-    if (zdef.city) {
+    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city';
+    g.fillStyle = city ? '#5f9b4a' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
+    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
+    if (zdef.city && !city) {
       const c = zdef.city;
       g.fillStyle=fen ? '#6a5238' : frost ? '#8fa6bd' : ember ? '#88705d' : '#d8cbb0'; g.fillRect(c.x0*k,c.y0*k,(c.x1-c.x0)*k,(c.y1-c.y0)*k);
       g.fillStyle=fen ? '#ffe08a' : frost ? '#ffd27a' : ember ? '#ffb65c' : '#68bcc6'; g.beginPath();g.arc(c.plaza.x*k,c.plaza.y*k,3,0,Math.PI*2);g.fill();
     }
     for (const o of objects) {
       if (o.kind === 'post') continue;
+      if (city && o.width) {                                                          // buildings and walls as footprints
+        g.fillStyle = o.kind === 'rampart' ? '#6f7078' : o.kind === 'tower' ? '#3f6a8a' : o.kind === 'stall' ? '#e0a040' : o.kind === 'house' || o.kind === 'chapel' ? o.color : '#8a7a62';
+        g.fillRect((o.x - o.width / 2) * k, (o.y - o.depth / 2) * k, Math.max(1, o.width * k), Math.max(1, o.depth * k)); continue;
+      }
+      if (city && (o.kind === 'grandfountain' || o.kind === 'meetingstone' || o.kind === 'fountain')) { g.fillStyle = o.kind === 'meetingstone' ? '#59d9ff' : '#58a8d8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2, o.r * k), 0, 6.283); g.fill(); continue; }
       g.fillStyle = o.kind === 'lava' ? '#ff6a2a' : o.kind === 'ice' ? '#4f93c8' : o.kind === 'water' ? '#244f5c' : o.kind === 'thicket' ? '#6a2f58' : o.kind === 'tree' ? (fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a') : o.kind === 'spire' ? (fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e') : o.kind === 'rock' ? (fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8') : (fen ? '#3f6a35' : frost ? '#3a7a70' : ember ? '#5a3a30' : '#2f8a45');
       g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'water' ? 1.6 : o.kind === 'ice' || o.kind === 'thicket' ? 1.7 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
     }
-    for (const p of zdef.portals) { g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
+    for (const p of zdef.portals) { g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
     miniBase = c;
   }
   function drawMini() {
@@ -1576,6 +1688,7 @@
     if (!last) last = now;                                  // the first frame's timestamp can precede start()
     const dt = clamp((now - last) / 1000, 0, .05); last = now;
     update(dt);
+    City.update(serverNow());
     draw(now / 1000);
   }
   const Field = {
@@ -1613,7 +1726,7 @@
       if(paused || !Online.connected || hero.dead)return;
       if (!zdef.city) return;
       Field.clearInput(); pendingNpc=null; hero.target=null; hero.goal=null;
-      cityRoute=routeTo(zone === 0 ? {x:36,y:79} : zdef.spawn);routeTime=0;
+      cityRoute=routeTo(zone === 0 ? {x:36,y:79} : zdef.city.entry || zdef.spawn);routeTime=0;
     },
     equip(change) {
       if (!isModular()) return;

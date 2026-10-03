@@ -10,6 +10,7 @@ const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const crags = map.zones[0];
 const rime = map.zones[1];
 const fen = map.zones[2];
+const city = map.zones[3];
 // `area` is the map of the zone the bot stands in: the meadow by default, or `crags`.
 async function walkTo(world, bot, goal, area = map) {
   for (const point of route(area, world.player(bot), goal)) {
@@ -80,6 +81,24 @@ async function cast(w, bot, id, enemy) {
   await w.action(bot, { type: 'skill', id, ...aim });
 }
 const lost = (before, after) => !after || after.dead || after.hp < before.hp;
+
+// A walking townsperson's place at world time `time`: the same arithmetic as the server's Npc::position_at.
+function npcAt(n, time) {
+  const r = n.route;
+  if (!r || r.length < 2 || !(n.speed > 0)) return { x: n.x, y: n.y };
+  const m = r.length, leg = i => Math.hypot(r[i][0] - r[(i + 1) % m][0], r[i][1] - r[(i + 1) % m][1]);
+  let cycle = 0;
+  for (let i = 0; i < m; i++) cycle += n.pause + leg(i) / n.speed;
+  let t = (((time + n.phase) % cycle) + cycle) % cycle;
+  for (let i = 0; i < m; i++) {
+    if (t < n.pause) return { x: r[i][0], y: r[i][1] };
+    t -= n.pause;
+    const walk = leg(i) / n.speed;
+    if (t < walk) { const a = r[i], b = r[(i + 1) % m], f = t / walk; return { x: a[0] + (b[0] - a[0]) * f, y: a[1] + (b[1] - a[1]) * f }; }
+    t -= walk;
+  }
+  return { x: r[0][0], y: r[0][1] };
+}
 
 const scenarios = {
   skills: {
@@ -1077,6 +1096,159 @@ const scenarios = {
       check(w.player(bot).zone === 3 && distance(w.player(bot), where) < 1.2, 'Resume puts the character back in the fen');
       await w.restart();
       check(w.player(bot).zone === 3 && w.player(bot).gold === where.gold, 'The fen position and loot survive a Rust restart');
+    },
+  },
+  skaldholm: {
+    description: 'Walk through the Skaldholm Gate in the Rimeveil summit into the walled city, cross the Great Gate to the plaza on foot, find no enemies, meet a walking townsperson where the server says they are, stop at the wall, use both gates, and keep the city across reconnect and restart.',
+    async run(w, check) {
+      const bot = 'Citywalker';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 14 });
+      const up = rime.portals.find(p => p.id === 'city_gate');
+      check(up && up.to === 4 && rime.portals[0].id === 'crags_gate' && rime.portals[1].id === 'fen_gate', 'The Rimeveil summit has a Skaldholm gate to zone 4 after the Crags and fen gates');
+      check(map.zones.length === 4 && city.name === 'Skaldholm' && city.theme === 'city' && city.size === 160 && city.slimes.length === 0, 'Zone 4 is the 160-tile city and has no enemy spawns');
+      await kit.teleport(w, bot, { zone: 2, x: up.x, y: up.y + 8 });
+      await walkTo(w, bot, { x: up.x, y: up.y + 4 }, rime);
+      check(w.player(bot).zone === 2, 'Still on the glacier in front of the gate');
+      await w.action(bot, { type: 'move', x: up.x, y: up.y - 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 4, 15000, 'Step through the Skaldholm gate');
+      await w.action(bot, { type: 'stop' });
+      const arrival = { x: up.tx, y: up.ty };
+      check(w.player(bot).zone === 4 && distance(w.player(bot), arrival) < 1, 'The server moves the walker to the forecourt outside the Great Gate');
+      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.views.get(bot).slimes.length === 0 && w.player(bot).zone === 4, 'The city client is sent no enemies at all');
+      // The Great Gate is the only door: a real walk through it to the plaza, much longer than the straight line.
+      const plaza = { x: 80, y: 68 }, from = { x: w.player(bot).x, y: w.player(bot).y };
+      const path = route(city, from, plaza);
+      for (const point of path) {
+        await w.action(bot, { type: 'move', ...point });
+        await w.waitFor(() => distance(w.player(bot), point) < .5, 40000, `Walk to ${Math.round(point.x)},${Math.round(point.y)}`);
+      }
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 4 && distance(w.player(bot), plaza) < 1.5 && w.player(bot).y < 100, 'The bot walks in through the Great Gate and up the avenue to the plaza');
+      // The wall: walking at it from inside stops short of it.
+      await kit.teleport(w, bot, { zone: 4, x: 30, y: 17 });
+      await w.action(bot, { type: 'move', x: 30, y: 2 });
+      await w.advance(3000);
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).y > 12.5 && w.player(bot).y < 16, `The north wall stops the walker at y ${w.player(bot).y.toFixed(1)}`);
+      // A walking townsperson is where the world clock puts them: talk works there now and fails at the same spot later.
+      const kid = city.npcs.find(n => n.id === 'city_watch_trade'), time = () => w.views.get(bot).time;
+      const at = npcAt(kid, time() + 1);
+      await kit.teleport(w, bot, { zone: 4, x: at.x, y: at.y + .8 });
+      await w.advance(700);
+      const here = npcAt(kid, time() + .3);
+      check(distance(w.player(bot), here) < 2.8, 'Staged beside the walking watchman where the clock puts him');
+      const earlier = new Set(w.events);
+      await w.action(bot, { type: 'interact', npc: kid.id });
+      const hello = await w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && (e.type === 'dialogue' || e.type === 'error')), 5000, 'Talk to the watchman');
+      check(hello.type === 'dialogue' && hello.npc.id === kid.id, 'The server accepts talking to a walker at his current place');
+      let far = null;
+      for (let dt = 8; dt < 60; dt += 2) { const p = npcAt(kid, time() + dt); if (distance(p, here) > 12) { far = dt; break; } }
+      check(far !== null, 'The watchman walks far from where he stood');
+      await w.advance(far * 1000);
+      await w.advance(600);
+      const earlier2 = new Set(w.events);
+      await w.action(bot, { type: 'interact', npc: kid.id });
+      const gone = await w.waitFor(() => w.events.find(e => !earlier2.has(e) && e.bot === bot && (e.type === 'dialogue' || e.type === 'error')), 5000, 'Talk to the empty spot');
+      check(gone.type === 'error' && /closer/i.test(gone.text), 'Standing where the watchman was, a while later, the server says to walk closer');
+      // Both gates, twice, from the forecourt.
+      const back = city.portals[0];
+      check(back.id === 'glacier_gate' && back.to === 2 && back.tx === up.x, 'The Glacier Gate leads back beside the Skaldholm Gate');
+      await kit.teleport(w, bot, { zone: 4, x: arrival.x, y: arrival.y });
+      await w.action(bot, { type: 'move', x: back.x, y: back.y + 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 2, 15000, 'Step through the Glacier Gate');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 2 && distance(w.player(bot), { x: back.tx, y: back.ty }) < 1, 'The Glacier Gate arrives beside the Skaldholm Gate');
+      await w.action(bot, { type: 'move', x: up.x, y: up.y - 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 4, 15000, 'Step through the city gate again');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).zone === 4 && distance(w.player(bot), arrival) < 1, 'The gate works again right after arriving, in both directions');
+      // The city survives a reconnect and a Rust restart.
+      await kit.teleport(w, bot, { zone: 4, x: 80, y: 120 });
+      const where = { ...w.player(bot) };
+      await w.disconnect(bot);
+      await w.connect({ bot });
+      check(w.player(bot).zone === 4 && distance(w.player(bot), where) < 1.2, 'Resume puts the character back in Skaldholm');
+      await w.restart();
+      check(w.player(bot).zone === 4 && distance(w.player(bot), where) < 1.5, 'The city position survives a Rust restart');
+    },
+  },
+  skaldholm_quests: {
+    description: 'Skaldholm: all eleven quests through real NPC offers, including errands that name people in the four earlier maps and hand-ins of materials from them: prerequisites, bag counting, item removal, exact rewards, the repeatable order and persisted progress.',
+    async run(w, check) {
+      const bot = 'Errandboy';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 20, gold: 0, items: Array.from({ length: 4 }, () => ({ item: 'linen_satchel' })) });
+      const q = id => quest(w, bot, id), bag = item => (w.player(bot).inventory.find(i => i.item === item) || {}).quantity || 0;
+      check(kit.describe('quests').quests.filter(x => x.zone === 4).length === 11, 'MCP describes all eleven city quests with their zone');
+      await kit.teleport(w, bot, { npc: 'city_herald' });
+      await kit.talkTo(w, bot, 'city_herald', 'quest:accept:city_seals');
+      check(!q('city_seals'), 'The errands need the introduction first');
+      await kit.teleport(w, bot, { npc: 'city_alchemist' });
+      await kit.talkTo(w, bot, 'city_alchemist', 'quest:accept:city_gel');
+      check(!q('city_gel'), 'Another giver cannot hand out a quest, and a locked one is refused');
+      // Materials already in the bag count the moment a hand-in quest is accepted, and selling them takes progress back.
+      await w.debug(bot, { op: 'give_item', item: 'slime_gel', quantity: 3 });
+      for (const x of city.quests) {
+        await kit.teleport(w, bot, { npc: x.npc });
+        if (x.requires && !(q(x.requires)?.claimed)) throw Error(`Order: ${x.id} needs ${x.requires}`);
+        await kit.talkTo(w, bot, x.npc, `quest:accept:${x.id}`);
+        await w.waitFor(() => !!q(x.id));
+        const bring = x.objectives.filter(o => o.kind === 'bring');
+        check(q(x.id).counts.every((n, k) => x.objectives[k].kind === 'bring' ? n <= x.objectives[k].count : n === 0), `${x.title}: accepted with fresh talk objectives`);
+        const early = await kit.talkTo(w, bot, x.npc, `quest:claim:${x.id}`);
+        check(/Complete the objectives/.test(early.notice), `${x.title}: premature reward refused`);
+        for (const o of x.objectives) {
+          if (o.kind === 'talk') {
+            const zone = [map, ...map.zones].findIndex(a => (a.npcs || []).some(n => n.id === o.target));
+            await kit.teleport(w, bot, { npc: o.target });
+            await w.waitFor(() => w.player(bot).zone === zone);
+            await kit.talkTo(w, bot, o.target);
+          } else {
+            const need = o.count - Math.min(bag(o.target), o.count);
+            if (need > 0) await w.debug(bot, { op: 'give_item', item: o.target, quantity: need });
+          }
+        }
+        await w.waitFor(() => q(x.id).counts.every((n, k) => n === x.objectives[k].count), 10000, `${x.title}: objectives fill`);
+        check(bring.every(o => bag(o.target) >= o.count), `${x.title}: the bag holds every hand-in item`);
+        await kit.teleport(w, bot, { npc: x.npc });
+        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)), bag: Object.fromEntries(bring.map(o => [o.target, bag(o.target)])) };
+        await kit.talkTo(w, bot, x.npc, `quest:claim:${x.id}`);
+        await w.waitFor(() => q(x.id).claimed);
+        check(w.player(bot).gold === before.gold + x.rewardGold && totalXp(w.player(bot)) === before.xp + x.rewardXp, `${x.title}: exact XP and gold reward`);
+        check(bring.every(o => bag(o.target) === before.bag[o.target] - o.count), `${x.title}: exactly the handed-in items leave the bag`);
+        await kit.talkTo(w, bot, x.npc, `quest:claim:${x.id}`);
+        check(w.player(bot).gold === before.gold + x.rewardGold && q(x.id).completions === 1, `${x.title}: duplicate turn-in pays nothing`);
+      }
+      // The repeatable standing order pays again after another hand-in.
+      const standing = city.quests.find(x => x.repeatable);
+      await kit.teleport(w, bot, { npc: standing.npc });
+      await kit.talkTo(w, bot, standing.npc, `quest:accept:${standing.id}`);
+      await w.waitFor(() => !q(standing.id).claimed);
+      check(q(standing.id).completions === 1 && q(standing.id).counts.every(n => n === 0 || n > 0), `${standing.title}: repeat acceptance keeps its history`);
+      for (const o of standing.objectives) await w.debug(bot, { op: 'give_item', item: o.target, quantity: o.count });
+      await w.waitFor(() => q(standing.id).counts.every((n, k) => n === standing.objectives[k].count));
+      const gold = w.player(bot).gold;
+      await kit.talkTo(w, bot, standing.npc, `quest:claim:${standing.id}`);
+      await w.waitFor(() => q(standing.id).completions === 2);
+      check(w.player(bot).gold === gold + standing.rewardGold, `${standing.title}: the second hand-in pays again`);
+      // Selling takes hand-in progress back.
+      await kit.talkTo(w, bot, standing.npc, `quest:accept:${standing.id}`);
+      await w.debug(bot, { op: 'give_item', item: 'magma_fang', quantity: 3 });
+      await w.waitFor(() => q(standing.id).counts[0] === 3);
+      await kit.teleport(w, bot, { npc: 'city_guildmaster' });
+      await kit.talkTo(w, bot, 'city_guildmaster', 'sell:materials');
+      await w.waitFor(() => q(standing.id).counts[0] === 0);
+      check(q(standing.id).counts.every(n => n === 0), 'Selling the materials takes the hand-in progress back');
+      await kit.teleport(w, bot, { npc: 'city_healer' });
+      await w.debug(bot, { op: 'set_hp', hp: 1 });
+      await kit.talkTo(w, bot, 'city_healer', 'blessing');
+      await w.waitFor(() => w.player(bot).hp === w.player(bot).maxHp);
+      check(w.player(bot).hp === w.player(bot).maxHp, 'The cathedral healer restores all HP');
+      const history = JSON.stringify(w.player(bot).quests);
+      await w.restart();
+      check(w.player(bot).zone === 4 && JSON.stringify(w.player(bot).quests) === history, 'Every completion survives a private server restart');
     },
   },
   fen_quests: {

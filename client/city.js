@@ -24,6 +24,7 @@
   }
   function stoneTile(g, px, py, x, y) {
     const city = area().city; if (!city) return false;
+    if (Field.zone > 0 && Field.zoneTheme === 'city') return false;     // Skaldholm's streets are painted by field.js from the zone's road list
     const inCity=inside(x+.5,y+.5), road=!Field.zone && y>=69 && y<city.y0 && Math.abs(x+.5-36)<1.6;
     if (!inCity && !road) return false;
     if (Field.zone > 0) {
@@ -45,8 +46,8 @@
     }
     return true;
   }
-  function building(g,o) {
-    const w=o.width,d=o.depth,h=o.kind==='chapel'?150:117, roof=o.color;
+  function building(g,o,live=false) {
+    const w=o.width,d=o.depth,h=o.kind==='chapel'?150:o.big?140:117, roof=o.color;
     ellipse(g,12,35,135,42,'#37362833');
     prism(g,w+.25,d+.25,12,'#c9beb0','#a89b8b','#918879');
     prism(g,w,d,h,'#e8dbb9','#efdfbb','#ccbfa2',12);
@@ -57,8 +58,9 @@
       for(const z of [25,69,h+8])line(g,[point(-half,z),point(half,z)],'#76533d',7);
       for(const t of [-half,0,half])line(g,[point(t,13),point(t,h+12)],'#76533d',7);
       line(g,[point(-half,72),point(-.1,h+5)],'#99704c',4);line(g,[point(.1,h+5),point(half,72)],'#99704c',4);
-      // Inset windows with glowing panes and wooden shutters.
-      for(const t of [-.9,.9]) {
+      // Inset windows with glowing panes and wooden shutters (a wide wall gets one every 2.2 tiles).
+      const span=side==='x'?w:d, windows=span>5?Array.from({length:Math.floor(span/2.2)},(_,i)=>(i-(Math.floor(span/2.2)-1)/2)*2.2):[-.9,.9];
+      for(const t of windows) {
         const z=94, span=.33;
         poly(g,[point(t-span,z+19),point(t+span,z+19),point(t+span,z-16),point(t-span,z-16)],'#537787','#795638',3);
         line(g,[point(t,z+19),point(t,z-16)],'#e8d4a0',2);line(g,[point(t-span,z),point(t+span,z)],'#e8d4a0',2);
@@ -72,7 +74,7 @@
     const knob=iso(.24,d/2+.05,29);ellipse(g,...knob,3,3,'#eacb75');
     prism(g,1.25,.5,8,'#e2d4ba','#bcac93','#a59b89');
     // Tall gabled roof. The ridge runs in the x direction.
-    const rw=w+.65,rd=d+.65,rise=o.kind==='chapel'?90:69;
+    const rw=w+.65,rd=d+.65,rise=o.kind==='chapel'?90:o.big?88:69;
     const a=iso(-rw/2,-rd/2,h+12),b=iso(rw/2,-rd/2,h+12),c=iso(rw/2,rd/2,h+12),e=iso(-rw/2,rd/2,h+12);
     const r0=iso(-rw/2,0,h+12+rise),r1=iso(rw/2,0,h+12+rise);
     poly(g,[b,c,r1],'#ddcbb0','#6a5042',3);
@@ -95,9 +97,13 @@
     } else {
       const [bx,by]=iso(w/2+.04,-.7,h+6);line(g,[[bx,by],[bx,by+56]],'#574b3c',3);poly(g,[[bx,by+7],[bx+22,by+12],[bx+20,by+41],[bx+10,by+35],[bx,by+40]],'#d7b15f');
     }
-    const sign=iso(0,d/2+.13,79);g.fillStyle='#594739';g.fillRect(sign[0]-90,sign[1]-11,180,25);text(g,o.label,sign[0],sign[1]+7,15,'#ffe7ad');
+    if(!live)signBoard(g,o,0,0);
     // Pots of flowers on the doorstep.
     for(const side of [-1,1]) {const [x,y]=iso(side*1.3,d/2+.15);poly(g,[[x-8,y-3],[x+8,y-3],[x+5,y+12],[x-5,y+12]],'#ad7054');ellipse(g,x,y-7,15,9,'#5b8850');for(let k=0;k<4;k++)ellipse(g,x-9+k*6,y-11-(k%2)*4,3,3,['#edb6c0','#f1d57e'][k%2]);}
+  }
+  // The sign over a door. A city of a hundred houses draws it live (not baked), so houses of one size and colour share a sprite.
+  function signBoard(g,o,ox,oy) {
+    const sign=iso(0,o.depth/2+.13,79);g.fillStyle='#594739';g.fillRect(ox+sign[0]-90,oy+sign[1]-11,180,25);text(g,o.label,ox+sign[0],oy+sign[1]+7,15,'#ffe7ad');
   }
   function fountain(g) {
     ellipse(g,10,12,95,39,'#3b493430');
@@ -106,7 +112,7 @@
     prism(g,.3,.3,40,'#ece8d4','#d5d7c8','#acbcb6',68);ellipse(g,0,-108,9,6,'#e1ded0');
     for(const dx of [-25,25])line(g,[[dx,-66],[dx*1.3,-34],[dx*1.6,-5]],'#cbf3efb0',3);
   }
-  function objectArt(g,o) {
+  function objectArt(g,o,live=false) {
     if(o.kind==='tent') {
       const w=o.width,d=o.depth,h=110;
       ellipse(g,8,9,115,35,'#160f1738');
@@ -132,7 +138,7 @@
       for(const x of [-31,0,31])poly(g,[[x-10,-101],[x+11,-99],[x+9,-67],[x-11,-69]],'#e9d3a0',null);
       text(g,o.label,0,-137,17,'#ffd58d');return;
     }
-    if(o.kind==='house'||o.kind==='chapel')return building(g,o);
+    if(o.kind==='house'||o.kind==='chapel')return building(g,o,live);
     if(o.kind==='fountain')return fountain(g);
     if(o.kind==='wall') {prism(g,o.width,o.depth,39,'#d7d3bc','#afa993','#949c91');for(let i=-1;i<=1;i++){g.save();g.translate(...iso(o.width>o.depth?i*o.width/3:0,o.depth>o.width?i*o.depth/3:0,39));prism(g,.32,.32,12,'#e4dfc9','#c0b8a0','#a9ac9d');g.restore();}return;}
     if(o.kind==='gate') {prism(g,1.1,1.1,119,'#dad5be','#b9b4a1','#939e95');prism(g,1.35,1.35,17,'#e7dec3','#bab79f','#9ca899',119);line(g,[[0,-148],[0,-215]],'#70593f',4);poly(g,[[0,-214],[32,-205],[25,-182],[0,-188]],'#ac6570');text(g,'✦',13,-194,14);return;}
@@ -148,23 +154,92 @@
       text(g,o.label,0,-112,17);return;
     }
   }
+  // Extra kinds from cityart.js: art[kind] = { box: [w, h, originX, originY] in logical px (default 360x470 at 180,400), draw(g, o, kit), animate?(g, o, sx, sy, t) }.
+  const art={};
+  const kit={iso,poly,line,ellipse,prism,text};
   function drawObject(g,o,sx,sy,fade=1) {
-    const key=JSON.stringify([o.kind,o.width,o.depth,o.color,o.label]);let sprite=cache.get(key);
-    if(!sprite){const c=document.createElement('canvas');c.width=720;c.height=940;const cg=c.getContext('2d');cg.scale(2,2);cg.translate(180,400);objectArt(cg,o);sprite=c;cache.set(key,c);}
-    g.save();g.globalAlpha=fade;g.drawImage(sprite,sx-180,sy-400,360,470);g.restore();
+    const def=art[o.kind], live=o.sign==='live'&&!!o.label;
+    const key=o.kind+'|'+o.width+'|'+o.depth+'|'+o.color+'|'+(live?'':o.label)+'|'+(o.v||0)+'|'+(o.big?1:0);let sprite=cache.get(key);
+    const [bw,bh,ox,oy]=def?.box||[360,470,180,400];
+    if(!sprite){const c=document.createElement('canvas');c.width=bw*2;c.height=bh*2;const cg=c.getContext('2d');cg.scale(2,2);cg.translate(ox,oy);if(def)def.draw(cg,o,kit);else objectArt(cg,o,live);sprite=c;cache.set(key,c);}
+    g.save();g.globalAlpha=fade;g.drawImage(sprite,sx-ox,sy-oy,bw,bh);
+    if(live)signBoard(g,o,sx,sy);
+    g.restore();
+  }
+  // Live decoration of a kind (a fountain's jets, a stone's glowing runes), drawn right after the object's sprite.
+  function animateObject(g,o,sx,sy,t) {const def=art[o.kind];if(def?.animate)def.animate(g,o,sx,sy,t,kit);}
+  // ---- walking townspeople: the same arithmetic as model.rs Npc::position_at, driven by the server's clock ----
+  function routePoint(n,time) {
+    const r=n.route;if(!r||r.length<2||!(n.speed>0))return {x:n.x0??n.x,y:n.y0??n.y};
+    const m=r.length,leg=i=>{const a=r[i],b=r[(i+1)%m];return Math.hypot(a[0]-b[0],a[1]-b[1]);};
+    let cycle=0;for(let i=0;i<m;i++)cycle+=n.pause+leg(i)/n.speed;
+    let t=(((time+n.phase)%cycle)+cycle)%cycle;
+    for(let i=0;i<m;i++){
+      if(t<n.pause)return {x:r[i][0],y:r[i][1]};
+      t-=n.pause;const walk=leg(i)/n.speed;
+      if(t<walk){const a=r[i],b=r[(i+1)%m],f=t/walk;return {x:a[0]+(b[0]-a[0])*f,y:a[1]+(b[1]-a[1])*f};}
+      t-=walk;
+    }
+    return {x:r[0][0],y:r[0][1]};
+  }
+  // One mutable copy of each zone's people (the walkers move), made on first use.
+  const folk=new Map();
+  function folkOf(zone) {
+    if(!folk.has(zone)){
+      const quests=(area().quests||[]);
+      folk.set(zone,(area().npcs||[]).map(n=>({...n,x0:n.x,y0:n.y,moving:false,fx:0,fy:1,key:!n.look||!!n.offers.length||!!n.buys||quests.some(q=>q.npc===n.id)})));
+    }
+    return folk.get(zone);
+  }
+  let clockAt=0;
+  // Called every frame with the server's world time (seconds); walkers are placed, and face the way they go.
+  function update(time) {
+    clockAt=time;
+    for(const n of folkOf(Field.zone||0)){
+      if(!n.route)continue;
+      const p=routePoint(n,time),dx=p.x-n.x,dy=p.y-n.y;
+      n.moving=Math.hypot(dx,dy)>1e-4;if(n.moving){n.fx=dx;n.fy=dy;}
+      n.x=p.x;n.y=p.y;
+    }
   }
   // Distance from the feet to the top of each NPC's head gear (the guard's banner, the baker's hat), so the nameplate sits just above it.
-  const headTop=n=>n.id==='gatekeeper'?125:n.id==='baker'?114:101;
+  const headTop=n=>n.look?(n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101;
   // World of Warcraft nameplate: yellow name over a <Role> line, both in a heavy black outline, with the quest mark above them.
   function plate(g,value,y,size,color) {
     g.font=`${size}px "Jua", sans-serif`;g.textAlign='center';g.lineJoin='round';g.lineWidth=size>14?5:3;g.strokeStyle='#000';
     g.strokeText(value,0,y);g.fillStyle=color;g.fillText(value,0,y);
   }
+  // A townsperson drawn from data (n.look): skin, hair and its style, a hat, an apron, a beard, a size. Frontal like the originals.
+  function drawFolk(g,n,t,swing) {
+    const L=n.look,skin=L.skin||'#edc5a1',hair=L.hair||'#755841',style=L.style||'short',hat=L.hat,hatColor=L.hatColor||'#7a5a3c',darker='#4a4543';
+    const sw=swing?Math.sin(t*9+n.x*3)*5:0;
+    line(g,[[-8,-26],[-9+sw,-5]],'#584d46',10);line(g,[[8,-26],[9-sw,-5]],'#584d46',10);
+    if(style==='long')poly(g,[[-17,-84],[17,-84],[19,-48],[-19,-48]],hair,null);
+    poly(g,[[-15,-64],[15,-64],[20,-25],[-20,-25]],n.color,darker,2.5);
+    if(L.apron)poly(g,[[-9,-58],[9,-58],[13,-26],[-13,-26]],L.apron);
+    const armSwing=swing?-sw*.8:0;
+    line(g,[[-15,-57],[-24,-33+armSwing]],n.color,11);line(g,[[15,-57],[24,-33-armSwing]],n.color,11);ellipse(g,-24,-30+armSwing,5,6,skin);ellipse(g,24,-30-armSwing,5,6,skin);
+    ellipse(g,0,-77,18,20,skin,'#634d42');
+    if(L.beard)poly(g,[[-14,-72],[14,-72],[10,-56],[0,-52],[-10,-56]],L.beard,'#4a3b30',1.5);
+    if(style!=='bald')poly(g,[[-18,-80],[-17,-93],[-6,-100],[12,-96],[19,-84],[10,-84],[6,-92],[-5,-83]],hair);
+    if(style==='bun')ellipse(g,0,-101,9,8,hair);
+    ellipse(g,-6,-77,2,2.8,'#443c39');ellipse(g,6,-77,2,2.8,'#443c39');line(g,[[-4,-66],[0,-64],[4,-66]],'#a86b5d',1.5);
+    if(hat==='cap')poly(g,[[-19,-88],[-14,-100],[14,-100],[19,-88],[26,-86],[10,-84],[-10,-84]],hatColor,'#3a2e28',2);
+    else if(hat==='straw'){ellipse(g,0,-92,30,9,hatColor,'#8a7040');poly(g,[[-13,-94],[-11,-108],[11,-108],[13,-94]],hatColor,'#8a7040',2);}
+    else if(hat==='helm'){poly(g,[[-19,-84],[-17,-102],[0,-109],[17,-102],[19,-84],[11,-84],[0,-88],[-11,-84]],hatColor,'#4a5560',2.5);line(g,[[0,-109],[0,-88]],'#7a8590',3);}
+    else if(hat==='feather'){poly(g,[[-19,-88],[-14,-101],[14,-101],[19,-88],[26,-86],[10,-84],[-10,-84]],hatColor,'#3a2e28',2);line(g,[[8,-100],[20,-120],[22,-112]],'#f4e8c8',4);}
+    else if(hat==='hood'){poly(g,[[-21,-70],[-20,-96],[-8,-107],[8,-107],[20,-96],[21,-70],[12,-76],[-12,-76]],hatColor,'#3a3a3a',2.5);}
+    else if(hat==='bonnet'){ellipse(g,0,-90,19,12,hatColor,'#8a7a60');line(g,[[-16,-78],[-18,-68]],hatColor,5);line(g,[[16,-78],[18,-68]],hatColor,5);}
+  }
   function drawNpc(g,n,sx,sy,t,near) {
-    g.save();g.translate(sx,sy);const bob=Math.sin(t*2+n.x)*1.2;
-    ellipse(g,0,1,21,9,'#233d3833');
+    g.save();g.translate(sx,sy);const L=n.look,sc=L?.scale||1,moving=!!n.moving;
+    const bob=L&&moving?Math.abs(Math.sin(t*9+n.x*3))*2.4:Math.sin(t*2+n.x)*1.2;
+    ellipse(g,0,1,21*sc,9*sc,'#233d3833');
     if(near){g.strokeStyle='#ffe2a2';g.lineWidth=2;g.beginPath();g.ellipse(0,0,27,12,0,0,Math.PI*2);g.stroke();}
-    g.translate(0,bob);line(g,[[-8,-26],[-9,-5]],'#584d46',10);line(g,[[8,-26],[9,-5]],'#584d46',10);
+    g.save();g.scale(sc,sc);g.translate(0,-bob);
+    if(L)drawFolk(g,n,t,moving);
+    else {
+    line(g,[[-8,-26],[-9,-5]],'#584d46',10);line(g,[[8,-26],[9,-5]],'#584d46',10);
     poly(g,[[-15,-64],[15,-64],[20,-25],[-20,-25]],n.color,'#4a4543',2.5);
     if(['baker','smith','innkeeper','apothecary'].includes(n.id))poly(g,[[-8,-57],[8,-57],[12,-26],[-12,-26]],'#e7d6b4');
     line(g,[[-15,-57],[-24,-33]],n.color,11);line(g,[[15,-57],[24,-33]],n.color,11);ellipse(g,-24,-30,5,6,'#eac3a0');ellipse(g,24,-30,5,6,'#eac3a0');
@@ -173,10 +248,16 @@
     ellipse(g,-6,-77,2,2.8,'#443c39');ellipse(g,6,-77,2,2.8,'#443c39');line(g,[[-4,-66],[0,-64],[4,-66]],'#a86b5d',1.5);
     if(n.id==='gatekeeper'){poly(g,[[-19,-91],[-12,-105],[12,-105],[20,-91]],'#a4b5c0');line(g,[[29,-8],[29,-107]],'#7a6954',3);poly(g,[[25,-108],[29,-123],[33,-108]],'#d6d9ce');}
     if(n.id==='baker'){ellipse(g,-9,-103,10,9,'#f6ecd2');ellipse(g,8,-103,12,10,'#f6ecd2');g.fillStyle='#f6ecd2';g.fillRect(-17,-103,34,12);}
-    const top=headTop(n),roleY=-(top+5),nameY=roleY-17;
-    plate(g,`<${n.role}>`,roleY,13,'#f3e1a0');plate(g,n.name,nameY,18,'#ffd100');
-    const mark=window.Quests?.markerInfo(n.id);if(mark?.symbol)plate(g,mark.symbol,nameY-15,28,mark.color);
-    g.translate(0,-bob);if(near)plate(g,'[ F ] Talk',30,13,'#ffdf88');g.restore();
+    }
+    g.restore();
+    // Everyone with work or wares always shows a nameplate; a passer-by in the city shows one only when you are close.
+    const hero=window.Field?.hero,close=!hero||Math.hypot(hero.x-n.x,hero.y-n.y)<9;
+    if(n.key||close||near){
+      const top=headTop(n),roleY=-(top+5),nameY=roleY-17;
+      plate(g,`<${n.role}>`,roleY,13,'#f3e1a0');plate(g,n.name,nameY,18,'#ffd100');
+      const mark=window.Quests?.markerInfo(n.id);if(mark?.symbol)plate(g,mark.symbol,nameY-15,28,mark.color);
+    }
+    if(near)plate(g,'[ F ] Talk',30,13,'#ffdf88');g.restore();
   }
   function drawPlaza(g,w2s) {
     const city = area().city; if (!city || Field.zone > 0) return;
@@ -254,5 +335,5 @@
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={nameplateTop:n=>headTop(n)+24,inside,stoneTile,drawObject,drawNpc,drawPlaza,get npcs(){return area().npcs || [];},dialogue,close,refreshInventory() { if(current&&view.kind==='sell') Inventory.renderShop(current, $('npc-inventory')); },get open(){return !!current;}};
+  window.City={nameplateTop:n=>headTop(n)+24,inside,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},dialogue,close,refreshInventory() { if(current&&view.kind==='sell') Inventory.renderShop(current, $('npc-inventory')); },get open(){return !!current;}};
 })();

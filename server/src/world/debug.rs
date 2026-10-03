@@ -316,6 +316,11 @@ fn complete_quest(character: &mut Character, quests: &[Quest], id: &str) -> Resu
         .find(|q| q.id == id)
         .expect("quest was just accepted");
     progress.counts = quest.objectives.iter().map(|o| o.count).collect();
+    // Hand-in objectives count the bag, so completing one for a test puts the missing items in it.
+    for o in quest.objectives.iter().filter(|o| o.kind == "bring") {
+        let missing = o.count.saturating_sub(character.quantity(&o.target));
+        character.add_item(&o.target, missing);
+    }
     Ok(0)
 }
 

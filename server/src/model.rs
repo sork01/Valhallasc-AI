@@ -495,6 +495,40 @@ pub struct QuestObjective {
     pub count: u32,
 }
 impl Quest {
+    /// Whether any objective asks the player to hand in items ("bring").
+    pub fn has_bring(&self) -> bool {
+        self.objectives.iter().any(|o| o.kind == "bring")
+    }
+    /// "bring" objectives count what the bag holds right now (up to the count), so selling or dropping an item
+    /// takes its progress back and an item collected before accepting the quest already counts.
+    pub fn sync_bring(&self, character: &mut Character) {
+        let Some(at) = character
+            .quests
+            .iter()
+            .position(|q| q.id == self.id && !q.claimed)
+        else {
+            return;
+        };
+        for (i, o) in self.objectives.iter().enumerate() {
+            if o.kind == "bring" {
+                let have = character.quantity(&o.target).min(o.count);
+                let counts = &mut character.quests[at].counts;
+                if counts.len() <= i {
+                    counts.resize(i + 1, 0);
+                }
+                counts[i] = have;
+            }
+        }
+    }
+    /// Takes the handed-in items out of the bag; call only after `ready` agreed.
+    pub fn take_bring(&self, character: &mut Character) {
+        for o in self.objectives.iter().filter(|o| o.kind == "bring") {
+            if let Some(stack) = character.inventory.iter_mut().find(|s| s.item == o.target) {
+                stack.quantity = stack.quantity.saturating_sub(o.count);
+            }
+        }
+        character.inventory.retain(|s| s.quantity > 0);
+    }
     pub fn unlocked(&self, character: &Character) -> bool {
         self.requires.as_ref().is_none_or(|id| {
             character
@@ -755,6 +789,53 @@ pub struct Npc {
     pub offers: Vec<Offer>,
     #[serde(default)]
     pub buys: bool,
+    /// A closed loop of waypoints the NPC walks, at `speed` tiles per second, standing `pause` seconds at each corner.
+    /// Empty means it stays at (x, y). The position is a pure function of the world clock (plus `phase` seconds),
+    /// so the server and every client agree on it without any message.
+    #[serde(default, skip_serializing)]
+    pub route: Vec<[f64; 2]>,
+    #[serde(default, skip_serializing)]
+    pub speed: f64,
+    #[serde(default, skip_serializing)]
+    pub pause: f64,
+    #[serde(default, skip_serializing)]
+    pub phase: f64,
+}
+impl Npc {
+    /// Where this NPC stands at world time `time` (seconds). client/city.js `routePoint` computes the same thing.
+    pub fn position_at(&self, time: f64) -> Point {
+        let at = |p: [f64; 2]| Point { x: p[0], y: p[1] };
+        if self.route.len() < 2 || self.speed <= 0. {
+            return Point {
+                x: self.x,
+                y: self.y,
+            };
+        }
+        let n = self.route.len();
+        let leg = |i: usize| {
+            let (a, b) = (self.route[i], self.route[(i + 1) % n]);
+            (a[0] - b[0]).hypot(a[1] - b[1])
+        };
+        let cycle: f64 = (0..n).map(|i| self.pause + leg(i) / self.speed).sum();
+        let mut t = (time + self.phase).rem_euclid(cycle);
+        for i in 0..n {
+            if t < self.pause {
+                return at(self.route[i]);
+            }
+            t -= self.pause;
+            let walk = leg(i) / self.speed;
+            if t < walk {
+                let (a, b) = (self.route[i], self.route[(i + 1) % n]);
+                let f = t / walk;
+                return Point {
+                    x: a[0] + (b[0] - a[0]) * f,
+                    y: a[1] + (b[1] - a[1]) * f,
+                };
+            }
+            t -= walk;
+        }
+        at(self.route[0])
+    }
 }
 #[derive(Clone, Deserialize)]
 pub struct City {

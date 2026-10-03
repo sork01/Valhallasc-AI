@@ -463,7 +463,8 @@ def main():
         PATH.write_text(json.dumps(meadow, indent=2) + '\n')
         print(f'Updated Lanternmere: {len(npcs)} NPCs, {len(quests)} quests. Terrain and enemy spawns preserved. Now run node scripts/sync-world.cjs')
         return
-    meadow['zones'] = [z for z in meadow['zones'] if z['name'] != NAME]
+    later = meadow['zones'][3:]       # zones after Gloamfen (Skaldholm) survive a rebuild; re-run generate_skaldholm.py for its glacier gate
+    meadow['zones'] = [z for z in meadow['zones'][:3] if z['name'] != NAME]
     moved = add_summit_gate(meadow, random.Random(20261005))   # its own stream: it only draws numbers on the first run
     zone = build(random.Random(20261006))
     missing = fen_unreachable(zone)
@@ -471,6 +472,7 @@ def main():
         raise SystemExit(f'unreachable from the arrival point: {missing}')
     meadow['zones'].append(zone)
     assert len(meadow['zones']) == 3, 'Gloamfen must be zone 3'
+    meadow['zones'] += later
     PATH.write_text(json.dumps(meadow, indent=2) + '\n')
     kinds = {}
     for s in zone['slimes']:

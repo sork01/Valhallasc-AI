@@ -928,8 +928,8 @@ impl World {
         let Some(npc) = map.npcs.iter().find(|npc| npc.id == npc_id) else {
             return;
         };
-        if p.character.hp <= 0. || p.character.point().distance(Point { x: npc.x, y: npc.y }) > 2.8
-        {
+        // Walking townspeople are wherever the world clock puts them.
+        if p.character.hp <= 0. || p.character.point().distance(npc.position_at(self.time)) > 2.8 {
             let _ = p.peer.try_send(
                 json!({"type":"error","text":"Walk closer to speak with this townsperson."}),
             );
@@ -937,7 +937,10 @@ impl World {
         }
         p.stop();
         p.attack = 0.;
-        quest_progress(&mut p.character, &map.quests, "talk", npc_id);
+        // A talk objective can name someone in another zone (the city's errands), so every zone's quests are checked.
+        for area in &self.maps {
+            quest_progress(&mut p.character, &area.quests, "talk", npc_id);
+        }
         let mut notice = String::new();
         let mut levels = 0;
         let mut quest_changed = false;
@@ -1158,6 +1161,21 @@ impl World {
         }
         if self.time - p.last_hurt > 5. {
             p.character.hp = (p.character.hp + 3. * TICK).min(p.character.max_hp());
+        }
+        // Hand-in quests follow the bag, so the journal counts what the player carries right now.
+        for i in 0..p.character.quests.len() {
+            if p.character.quests[i].claimed {
+                continue;
+            }
+            let id = &p.character.quests[i].id;
+            let quest = self
+                .maps
+                .iter()
+                .flat_map(|m| m.quests.iter())
+                .find(|q| &q.id == id && q.has_bring());
+            if let Some(quest) = quest {
+                quest.sync_bring(&mut p.character);
+            }
         }
         let mut strike = false;
         if p.attack > 0. {
@@ -2295,6 +2313,7 @@ fn quest_action(character: &mut Character, quest: &Quest, action: &str) -> (Stri
             } else {
                 character.quests.push(progress);
             }
+            quest.sync_bring(character);
             (
                 format!(
                     "Quest accepted: {}. Follow it in your journal (Q).",
@@ -2308,9 +2327,11 @@ fn quest_action(character: &mut Character, quest: &Quest, action: &str) -> (Stri
             let Some(i) = prior else {
                 return refused("Accept this quest before collecting its reward.");
             };
+            quest.sync_bring(character);
             if !quest.ready(&character.quests[i]) {
                 return refused("Complete the objectives before collecting your reward.");
             }
+            quest.take_bring(character);
             character.quests[i].claimed = true;
             character.quests[i].completions = character.quests[i].completions.saturating_add(1);
             character.gold = character.gold.saturating_add(quest.reward_gold);
@@ -2357,10 +2378,11 @@ mod tests {
     fn quest_interact(w: &mut World, npc: &str, offer: Option<&str>) {
         let zone = w.players[&1].character.zone;
         let n = w.maps[zone].npcs.iter().find(|n| n.id == npc).unwrap();
-        let c = &mut w.players.get_mut(&1).unwrap().character;
-        c.x = n.x;
-        c.y = n.y;
         w.time += 0.6;
+        let here = n.position_at(w.time);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.x = here.x;
+        c.y = here.y;
         w.interact(1, npc, offer);
     }
 
@@ -2404,12 +2426,18 @@ mod tests {
                 for o in &q.objectives {
                     assert!(o.count > 0);
                     match o.kind.as_str() {
-                        "talk" => assert!(area.npcs.iter().any(|n| n.id == o.target)),
+                        // A talk objective may name someone in another map (Skaldholm's errands).
+                        "talk" => assert!(
+                            w.maps
+                                .iter()
+                                .any(|m| m.npcs.iter().any(|n| n.id == o.target))
+                        ),
                         "kill" => assert!(
                             o.target == "any"
                                 || o.target == "slime"
                                 || area.slimes.iter().any(|s| s.kind == o.target)
                         ),
+                        "bring" => assert!(item(&o.target).is_some_and(|i| i.kind == "material")),
                         _ => panic!("unsupported objective"),
                     }
                 }
@@ -2587,7 +2615,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(w.maps.len(), 4);
+        assert_eq!(w.maps.len(), 5);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -3084,7 +3112,7 @@ mod tests {
         w.players.get_mut(&1).unwrap().character.zone = 2;
         w.players.get_mut(&2).unwrap().character.zone = 1;
         let snapshot = w.snapshot();
-        assert_eq!(snapshot["zones"].as_array().unwrap().len(), 4);
+        assert_eq!(snapshot["zones"].as_array().unwrap().len(), 5);
         for (zone, count) in [(0, 21), (1, 26), (2, 27)] {
             let view = w.snapshot_for(zone);
             assert_eq!(
@@ -3188,7 +3216,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(w.maps.len(), 4);
+        assert_eq!(w.maps.len(), 5);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -3755,6 +3783,816 @@ mod tests {
             "the town drops chase targets"
         );
         assert!(!w.maps[3].in_city(w.slimes[toad].point()));
+    }
+
+    // ---- Skaldholm (zone 4): a walled city with no enemies, walking townspeople and hand-in quests ----
+    const CITY: usize = 4;
+
+    #[test]
+    fn skaldholm_is_a_big_enemy_free_city_with_a_hundred_houses_a_wall_and_a_gate_pair() {
+        let w = world();
+        let map = &w.maps[CITY];
+        assert_eq!(w.maps.len(), 5, "Skaldholm is the fifth map");
+        assert_eq!(map.name, "Skaldholm");
+        assert_eq!(map.size, 160);
+        assert_eq!(map.size % 8, 0, "whole ground chunks");
+        assert!(map.slimes.is_empty() && w.slimes.iter().all(|s| s.zone != CITY));
+        assert!(
+            map.levels.is_none(),
+            "a safe city has no recommended levels"
+        );
+        let count = |kind: &str| {
+            let text = include_str!("../../world/map.txt");
+            let all: serde_json::Value = serde_json::from_str(text).unwrap();
+            all["zones"][CITY - 1]["objects"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter(|o| o["kind"] == kind)
+                .count()
+        };
+        // 100 timber houses with a street-and-number sign, plus the halls: a hall, an archive, a guildhall, an inn, a smithy ...
+        let houses = {
+            let text = include_str!("../../world/map.txt");
+            let all: serde_json::Value = serde_json::from_str(text).unwrap();
+            all["zones"][CITY - 1]["objects"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter(|o| o["kind"] == "house" && o["sign"] == "live")
+                .count()
+        };
+        assert!(
+            (100..=104).contains(&houses),
+            "about a hundred houses, got {houses}"
+        );
+        assert!(count("rampart") >= 60 && count("tower") >= 9);
+        assert_eq!(count("grandfountain"), 1);
+        assert_eq!(count("meetingstone"), 1);
+        assert!(count("stall") >= 14 && count("lamp") >= 30);
+        // The great fountain sits in the middle of the plaza the city names.
+        let city = map.city.as_ref().unwrap();
+        assert!(!city.contains(map.spawn), "you arrive outside the wall");
+        assert!(map.in_city(Point { x: 80., y: 76. }));
+        // Gates: the glacier's Skaldholm Gate brings you to the forecourt, the Glacier Gate takes you back to its arrival.
+        let up = w.maps[2]
+            .portals
+            .iter()
+            .find(|p| p.id == "city_gate")
+            .unwrap();
+        let down = &map.portals[0];
+        assert_eq!((up.to, down.to), (CITY, 2));
+        assert_eq!((up.tx, up.ty), (map.spawn.x, map.spawn.y));
+        assert_eq!(down.id, "glacier_gate");
+        assert!(down.tx == up.x && (down.ty - (up.y + 4.5)).abs() < 1e-6);
+        let outside_gate = |gate: &Portal, p: Point| {
+            p.distance(Point {
+                x: gate.x,
+                y: gate.y,
+            }) > gate.r + 0.5
+        };
+        assert!(
+            outside_gate(down, map.spawn),
+            "the forecourt arrival is clear of the Glacier Gate"
+        );
+        assert!(
+            outside_gate(
+                up,
+                Point {
+                    x: down.tx,
+                    y: down.ty
+                }
+            ),
+            "the summit arrival is clear of the Skaldholm Gate"
+        );
+        // The glacier keeps all four of its wyrms, and no glacier spawn stands within 8 of any place a gate drops you.
+        let wyrms = w
+            .slimes
+            .iter()
+            .filter(|s| s.zone == 2 && s.kind == "wyrm")
+            .count();
+        assert_eq!(wyrms, 4);
+        for s in w.slimes.iter().filter(|s| s.zone == 2) {
+            for gate in w
+                .maps
+                .iter()
+                .flat_map(|m| m.portals.iter())
+                .filter(|p| p.to == 2)
+            {
+                assert!(
+                    s.point().distance(Point {
+                        x: gate.tx,
+                        y: gate.ty
+                    }) > 8.0,
+                    "a {} stands at {:?}, too near an arrival point",
+                    s.kind,
+                    s.point()
+                );
+            }
+        }
+        // Everything solid is inside the map.
+        for o in &map.objects {
+            assert!(o.x > 0. && o.y > 0. && o.x < 160. && o.y < 160.);
+        }
+    }
+
+    #[test]
+    fn skaldholm_people_stand_on_free_ground_and_everything_is_reachable_on_foot_from_the_gate() {
+        let w = world();
+        let map = &w.maps[CITY];
+        let start = map.spawn;
+        let steps = walk_steps(map, start);
+        let reach = |p: Point| {
+            steps
+                .get(&((p.x / 0.5) as i32, (p.y / 0.5) as i32))
+                .copied()
+        };
+        let mut ids = std::collections::HashSet::new();
+        let mut walkers = 0;
+        for npc in &map.npcs {
+            assert!(
+                npc.id.starts_with("city_") && ids.insert(&npc.id),
+                "{} is unique",
+                npc.id
+            );
+            if npc.route.is_empty() {
+                let p = Point { x: npc.x, y: npc.y };
+                assert!(free_for_player(map, p), "{} stands on free ground", npc.id);
+                assert!(
+                    reach(p).is_some(),
+                    "{} can be reached from the gate",
+                    npc.id
+                );
+                assert!(map.in_city(p), "{} is inside the walls", npc.id);
+            } else {
+                walkers += 1;
+            }
+        }
+        assert!(map.npcs.len() >= 40, "{} people", map.npcs.len());
+        assert!(walkers >= 12, "{walkers} walk");
+        // The plaza, the stone court, the gate and the far corners can all be walked to.
+        for (name, p) in [
+            ("plaza", Point { x: 80., y: 66. }),
+            ("stone court", Point { x: 100., y: 123. }),
+            ("return gate", Point { x: 80., y: 153. }),
+            ("garden", Point { x: 27.4, y: 34. }),
+            ("orchard", Point { x: 121.4, y: 30. }),
+        ] {
+            assert!(reach(p).is_some(), "{name} is reachable");
+        }
+        // The wall holds: the long way round the outside never gets in, so the Great Gate is the only door.
+        assert!(
+            !free_for_player(map, Point { x: 30., y: 12. }),
+            "the north wall is solid"
+        );
+        assert!(
+            !free_for_player(map, Point { x: 16., y: 100. }),
+            "the west wall is solid"
+        );
+        assert!(
+            free_for_player(map, Point { x: 80., y: 140. }),
+            "the Great Gate is open"
+        );
+        let gate_walk = *reach(Point { x: 80., y: 68. }).as_ref().unwrap() as f64 * 0.5;
+        assert!(
+            gate_walk > 78. && gate_walk < 110.,
+            "the forecourt to the plaza is a real walk: {gate_walk}"
+        );
+    }
+
+    #[test]
+    fn walking_townspeople_follow_their_loop_pause_at_corners_and_never_cross_scenery() {
+        let walker: Npc = serde_json::from_value(json!({
+            "id": "t", "name": "T", "role": "r", "x": 0.0, "y": 0.0, "dialogue": "", "offers": [],
+            "route": [[0.0, 0.0], [10.0, 0.0], [10.0, 5.0]], "speed": 2.0, "pause": 1.0, "phase": 0.5
+        }))
+        .unwrap();
+        let diagonal = 125f64.sqrt();
+        let cycle = 1. + 5. + 1. + 2.5 + 1. + diagonal / 2.;
+        for (time, x, y) in [
+            (0.0, 0.0, 0.0),  // pausing at the first corner
+            (1.0, 1.0, 0.0),  // half a second into the first leg
+            (6.0, 10.0, 0.0), // pausing at the second corner
+            (8.0, 10.0, 3.0),
+            (
+                11.0 - 0.5,
+                10.0 - 0.894_427_190_999_916,
+                5.0 - 0.447_213_595_499_958,
+            ),
+            (16.0, 0.0, 0.0),
+        ] {
+            let p = walker.position_at(time);
+            assert!(
+                (p.x - x).abs() < 1e-6 && (p.y - y).abs() < 1e-6,
+                "t={time}: {p:?} want ({x},{y})"
+            );
+        }
+        // Periodic, continuous and never faster than its speed.
+        for t in [0.3, 4.7, 9.9, 13.1] {
+            let (a, b) = (walker.position_at(t), walker.position_at(t + cycle));
+            assert!(a.distance(b) < 1e-6, "periodic at {t}");
+            let step = a.distance(walker.position_at(t + 0.05));
+            assert!(step <= 2.0 * 0.05 + 1e-9, "no jumps at {t}");
+        }
+        // A person without a loop (or without a speed) stays where the map put them.
+        let still: Npc = serde_json::from_value(json!({
+            "id": "s", "name": "S", "role": "r", "x": 3.0, "y": 4.0, "dialogue": "", "offers": [],
+            "route": [[0.0, 0.0], [10.0, 0.0]], "speed": 0.0
+        }))
+        .unwrap();
+        assert_eq!(
+            (still.position_at(99.).x, still.position_at(99.).y),
+            (3., 4.)
+        );
+        // The city's walkers: every point of every loop is clear ground, at every moment they move.
+        let w = world();
+        let map = &w.maps[CITY];
+        let walkers: Vec<_> = map.npcs.iter().filter(|n| !n.route.is_empty()).collect();
+        assert!(walkers.len() >= 12);
+        for npc in &walkers {
+            assert!(
+                npc.speed > 0. && npc.speed < 4. && npc.pause >= 0.,
+                "{} walks at a human pace",
+                npc.id
+            );
+            let mut t = 0.;
+            while t < 300. {
+                let p = npc.position_at(t);
+                assert!(
+                    free_for_player(map, p),
+                    "{} would walk through scenery at t={t}: {p:?}",
+                    npc.id
+                );
+                assert!(map.in_city(p), "{} stays inside the walls", npc.id);
+                t += 0.5;
+            }
+            let start = npc.position_at(-npc.phase);
+            assert!(
+                start.distance(Point {
+                    x: npc.route[0][0],
+                    y: npc.route[0][1]
+                }) < 1e-6,
+                "{} starts at its first corner",
+                npc.id
+            );
+        }
+        assert!(
+            walkers.iter().any(|n| n.pause > 0.) && walkers.iter().any(|n| n.pause == 0.),
+            "strollers and loiterers"
+        );
+        let a = walkers.iter().find(|n| n.id == "city_kid_lotta").unwrap();
+        let b = walkers.iter().find(|n| n.id == "city_kid_pelle").unwrap();
+        assert!(
+            a.position_at(10.).distance(b.position_at(10.)) > 3.,
+            "the children are spread round the fountain"
+        );
+    }
+
+    #[test]
+    fn talking_to_a_walking_person_checks_the_distance_to_where_they_are_now() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, None, Some(Look::default()), tx).unwrap();
+        w.players.get_mut(&1).unwrap().character.zone = CITY;
+        let walker = w.maps[CITY]
+            .npcs
+            .iter()
+            .find(|n| n.id == "city_watch_trade")
+            .unwrap()
+            .clone();
+        // Where the watchman was at t=3 and at t=40 are far apart.
+        let (a, b) = (walker.position_at(3.), walker.position_at(40.));
+        assert!(a.distance(b) > 10., "{a:?} {b:?}");
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.x = a.x;
+            c.y = a.y;
+        }
+        w.time = 3.;
+        w.players.get_mut(&1).unwrap().service_at = -99.;
+        let mut rx = {
+            let (tx, rx) = mpsc::channel(256);
+            w.players.get_mut(&1).unwrap().peer = tx;
+            rx
+        };
+        w.interact(1, "city_watch_trade", None);
+        let first = rx.try_recv().unwrap();
+        assert_eq!(
+            first["type"], "dialogue",
+            "standing at the watchman's place at t=3 works: {first}"
+        );
+        // Standing in the same place at t=40, the watchman has long gone.
+        w.time = 40.;
+        w.interact(1, "city_watch_trade", None);
+        let second = rx.try_recv().unwrap();
+        assert_eq!(second["type"], "error");
+        assert!(second["text"].as_str().unwrap().contains("closer"));
+        // ... and walking up to where they are now works again.
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.x = b.x + 1.0;
+            c.y = b.y;
+        }
+        w.interact(1, "city_watch_trade", None);
+        assert_eq!(rx.try_recv().unwrap()["type"], "dialogue");
+    }
+
+    #[test]
+    fn skaldholm_has_eleven_valid_quests_mostly_errands_between_the_maps() {
+        let w = world();
+        let map = &w.maps[CITY];
+        assert_eq!(map.quests.len(), 11);
+        assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 1);
+        let all_npcs: Vec<(usize, &Npc)> = w
+            .maps
+            .iter()
+            .enumerate()
+            .flat_map(|(z, m)| m.npcs.iter().map(move |n| (z, n)))
+            .collect();
+        let (mut roots, mut far_talk, mut bring_quests) = (0, std::collections::BTreeSet::new(), 0);
+        for q in &map.quests {
+            assert!(q.id.starts_with("city_") && q.npc.starts_with("city_"));
+            assert!((11..=20).contains(&q.level), "{} level {}", q.id, q.level);
+            assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
+            assert!(q.reward_gold >= 250, "{}", q.id);
+            roots += q.requires.is_none() as usize;
+            if let Some(id) = &q.requires {
+                let prereq = map
+                    .quests
+                    .iter()
+                    .find(|p| &p.id == id)
+                    .expect("the prerequisite is in the city");
+                assert!(prereq.level <= q.level, "{} unlocks upward", q.id);
+            }
+            assert!(map.npcs.iter().any(|n| n.id == q.npc), "{} giver", q.id);
+            assert!(q.objectives.iter().all(|o| o.count >= 1));
+            bring_quests += q.has_bring() as usize;
+            for o in &q.objectives {
+                match o.kind.as_str() {
+                    "talk" => {
+                        let (zone, _) = all_npcs
+                            .iter()
+                            .find(|(_, n)| n.id == o.target)
+                            .unwrap_or_else(|| panic!("{} names {}", q.id, o.target));
+                        if *zone != CITY {
+                            far_talk.insert(*zone);
+                        }
+                    }
+                    "bring" => {
+                        let wanted = crate::items::item(&o.target)
+                            .unwrap_or_else(|| panic!("{} asks for {}", q.id, o.target));
+                        assert_eq!(wanted.kind, "material", "{}", q.id);
+                    }
+                    other => panic!("{} has a {other} objective", q.id),
+                }
+            }
+        }
+        assert_eq!(roots, 1, "one introduction unlocks everything");
+        assert!(bring_quests >= 6, "{bring_quests} hand-in quests");
+        assert_eq!(
+            far_talk.into_iter().collect::<Vec<_>>(),
+            vec![0, 1, 2, 3],
+            "people to meet in all four earlier maps"
+        );
+        // A material from each earlier map is wanted somewhere.
+        for item in [
+            "slime_gel",
+            "ember_core",
+            "frost_pelt",
+            "toad_gland",
+            "hydra_fang",
+        ] {
+            assert!(
+                map.quests
+                    .iter()
+                    .any(|q| q.objectives.iter().any(|o| o.target == item)),
+                "{item}"
+            );
+        }
+        // The people who give errands and sell things.
+        for id in [
+            "city_captain",
+            "city_steward",
+            "city_herald",
+            "city_alchemist",
+            "city_smith",
+            "city_guildmaster",
+            "city_healer",
+            "city_bard",
+            "city_librarian",
+            "city_stonewarden",
+        ] {
+            assert!(map.npcs.iter().any(|n| n.id == id), "{id}");
+        }
+        let guild = map
+            .npcs
+            .iter()
+            .find(|n| n.id == "city_guildmaster")
+            .unwrap();
+        assert!(guild.buys && guild.offers.len() == 2);
+        assert!(
+            map.npcs
+                .iter()
+                .any(|n| n.offers.iter().any(|o| o.heal >= 10000.)),
+            "a healer"
+        );
+    }
+
+    #[test]
+    fn a_talk_objective_is_credited_when_you_speak_to_someone_in_another_map() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, None, Some(Look::default()), tx).unwrap();
+        // Accept the herald's letters (the welcome quest first, since it unlocks them).
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.zone = CITY;
+            c.quests.push(QuestProgress {
+                id: "city_welcome".into(),
+                counts: vec![1; 5],
+                claimed: true,
+                completions: 1,
+            });
+        }
+        // Talking in another map before accepting counts for nothing.
+        for (zone, npc) in [(0, "gatekeeper"), (1, "crags_captain")] {
+            w.players.get_mut(&1).unwrap().character.zone = zone;
+            quest_interact(&mut w, npc, None);
+        }
+        assert!(
+            w.players[&1]
+                .character
+                .quests
+                .iter()
+                .all(|q| q.id == "city_welcome")
+        );
+        w.players.get_mut(&1).unwrap().character.zone = CITY;
+        quest_interact(&mut w, "city_herald", Some("quest:accept:city_seals"));
+        assert_eq!(w.players[&1].character.quests[1].counts, vec![0, 0, 0, 0]);
+        // Now walk the four maps: each leader ticks off one objective, in any order, and a repeat adds nothing.
+        for (zone, npc) in [
+            (2, "rime_warden"),
+            (0, "gatekeeper"),
+            (3, "fen_reeve"),
+            (0, "gatekeeper"),
+            (1, "crags_captain"),
+        ] {
+            w.players.get_mut(&1).unwrap().character.zone = zone;
+            quest_interact(&mut w, npc, None);
+        }
+        assert_eq!(w.players[&1].character.quests[1].counts, vec![1, 1, 1, 1]);
+        // Speaking to the herald with the quest done pays out once.
+        w.players.get_mut(&1).unwrap().character.zone = CITY;
+        quest_interact(&mut w, "city_herald", Some("quest:claim:city_seals"));
+        let c = &w.players[&1].character;
+        assert_eq!(c.gold, 520);
+        assert!(c.quests[1].claimed && c.quests[1].completions == 1);
+        // Kills are still credited only inside the killer's own zone: a kill in the glacier touches no city quest.
+        let mut c2 = c.clone();
+        quest_progress(&mut c2, &w.maps[2].quests, "kill", "crab");
+        assert_eq!(c2.quests[1].counts, vec![1, 1, 1, 1]);
+    }
+
+    fn give(w: &mut World, item: &str, n: u32) {
+        w.players.get_mut(&1).unwrap().character.add_item(item, n);
+    }
+    fn counts(w: &World, quest: &str) -> Vec<u32> {
+        w.players[&1]
+            .character
+            .quests
+            .iter()
+            .find(|q| q.id == quest)
+            .unwrap()
+            .counts
+            .clone()
+    }
+    fn city_player(w: &mut World) {
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, None, Some(Look::default()), tx).unwrap();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.zone = CITY;
+        c.quests.push(QuestProgress {
+            id: "city_welcome".into(),
+            counts: vec![1; 5],
+            claimed: true,
+            completions: 1,
+        });
+    }
+
+    #[test]
+    fn hand_in_objectives_count_the_bag_take_exactly_the_items_and_pay_once() {
+        let mut w = world();
+        city_player(&mut w);
+        // Materials gathered before accepting already count.
+        give(&mut w, "slime_gel", 10);
+        give(&mut w, "blue_gel", 3);
+        quest_interact(&mut w, "city_alchemist", Some("quest:accept:city_gel"));
+        assert_eq!(
+            counts(&w, "city_gel"),
+            vec![8, 3],
+            "up to the count, from the bag"
+        );
+        // Short of the blue gel: the reward is refused and nothing is taken.
+        quest_interact(&mut w, "city_alchemist", Some("quest:claim:city_gel"));
+        assert_eq!(w.players[&1].character.gold, 0);
+        assert_eq!(w.players[&1].character.quantity("slime_gel"), 10);
+        assert!(
+            !w.players[&1]
+                .character
+                .quests
+                .iter()
+                .find(|q| q.id == "city_gel")
+                .unwrap()
+                .claimed
+        );
+        // A tick later the count follows the bag as items arrive and leave.
+        give(&mut w, "blue_gel", 5);
+        w.update_player(1);
+        assert_eq!(counts(&w, "city_gel"), vec![8, 4], "capped at the count");
+        w.players
+            .get_mut(&1)
+            .unwrap()
+            .character
+            .sell_item("slime_gel", 5)
+            .unwrap();
+        w.update_player(1);
+        assert_eq!(
+            counts(&w, "city_gel"),
+            vec![5, 4],
+            "selling takes progress back"
+        );
+        quest_interact(&mut w, "city_alchemist", Some("quest:claim:city_gel"));
+        assert_eq!(
+            w.players[&1].character.gold,
+            5 * 3,
+            "no reward while a hand-in is short (only the sale gold)"
+        );
+        give(&mut w, "slime_gel", 4);
+        quest_interact(&mut w, "city_alchemist", Some("quest:claim:city_gel"));
+        let c = &w.players[&1].character;
+        assert_eq!(c.gold, 480 + 15, "reward paid");
+        // Exactly 8 and 4 were taken: 9 gel - 8 = 1, 8 blue - 4 = 4.
+        assert_eq!((c.quantity("slime_gel"), c.quantity("blue_gel")), (1, 4));
+        assert!(
+            c.quests
+                .iter()
+                .find(|q| q.id == "city_gel")
+                .unwrap()
+                .claimed
+        );
+        let before = c.gold;
+        quest_interact(&mut w, "city_alchemist", Some("quest:claim:city_gel"));
+        assert_eq!(w.players[&1].character.gold, before, "no second reward");
+        assert_eq!(
+            w.players[&1].character.quantity("slime_gel"),
+            1,
+            "nothing more is taken"
+        );
+        // The count freezes once claimed: later items do not change a finished quest.
+        give(&mut w, "slime_gel", 20);
+        w.update_player(1);
+        assert_eq!(
+            counts(&w, "city_gel"),
+            vec![8, 4],
+            "a finished quest keeps its count"
+        );
+    }
+
+    #[test]
+    fn the_standing_order_can_be_handed_in_again_and_again() {
+        let mut w = world();
+        city_player(&mut w);
+        quest_interact(&mut w, "city_guildmaster", Some("quest:accept:city_order"));
+        for round in 1..=2u32 {
+            give(&mut w, "magma_fang", 3);
+            give(&mut w, "rime_shell", 4);
+            w.update_player(1);
+            assert_eq!(counts(&w, "city_order"), vec![3, 3]);
+            quest_interact(&mut w, "city_guildmaster", Some("quest:claim:city_order"));
+            let c = &w.players[&1].character;
+            assert_eq!(
+                c.quests
+                    .iter()
+                    .find(|q| q.id == "city_order")
+                    .unwrap()
+                    .completions,
+                round
+            );
+            assert_eq!(c.quantity("magma_fang"), 0);
+            assert_eq!(
+                c.quantity("rime_shell"),
+                round,
+                "one spare shell per round stays in the bag"
+            );
+            quest_interact(&mut w, "city_guildmaster", Some("quest:accept:city_order"));
+            // Accepting again re-counts what is already in the bag (the spare shells), never the handed-in ones.
+            assert_eq!(counts(&w, "city_order"), vec![0, round]);
+        }
+        assert_eq!(w.players[&1].character.gold, 2 * 540);
+    }
+
+    #[test]
+    fn the_whole_city_questline_runs_from_the_gate_captain_to_the_steward() {
+        let mut w = world();
+        city_player(&mut w);
+        w.players.get_mut(&1).unwrap().character.quests.clear();
+        // Welcome: five people to meet.
+        quest_interact(&mut w, "city_captain", Some("quest:accept:city_welcome"));
+        for npc in [
+            "city_herald",
+            "city_librarian",
+            "city_guildmaster",
+            "city_stonewarden",
+            "city_healer",
+        ] {
+            quest_interact(&mut w, npc, None);
+        }
+        quest_interact(&mut w, "city_captain", Some("quest:claim:city_welcome"));
+        // Errands: people in the other maps ...
+        quest_interact(&mut w, "city_herald", Some("quest:accept:city_seals"));
+        quest_interact(&mut w, "city_bard", Some("quest:accept:city_hearths"));
+        quest_interact(&mut w, "city_librarian", Some("quest:accept:city_archive"));
+        for (zone, npc) in [
+            (0, "gatekeeper"),
+            (0, "baker"),
+            (1, "crags_captain"),
+            (1, "crags_scout"),
+            (2, "rime_warden"),
+            (2, "rime_loremaster"),
+            (3, "fen_reeve"),
+            (3, "fen_ferryman"),
+            (3, "fen_scholar"),
+        ] {
+            w.players.get_mut(&1).unwrap().character.zone = zone;
+            quest_interact(&mut w, npc, None);
+        }
+        w.players.get_mut(&1).unwrap().character.zone = CITY;
+        quest_interact(&mut w, "city_herald", Some("quest:claim:city_seals"));
+        quest_interact(&mut w, "city_bard", Some("quest:claim:city_hearths"));
+        // ... and goods from them.
+        for (npc, quest, items) in [
+            (
+                "city_alchemist",
+                "city_gel",
+                vec![("slime_gel", 8), ("blue_gel", 4)],
+            ),
+            (
+                "city_smith",
+                "city_forge",
+                vec![("ember_core", 4), ("magma_fang", 3)],
+            ),
+            (
+                "city_guildmaster",
+                "city_pelts",
+                vec![("frost_pelt", 4), ("yeti_horn", 2)],
+            ),
+            (
+                "city_alchemist",
+                "city_marsh",
+                vec![("toad_gland", 4), ("croc_hide", 3)],
+            ),
+            (
+                "city_librarian",
+                "city_archive",
+                vec![("drowned_gauntlet", 3)],
+            ),
+            (
+                "city_stonewarden",
+                "city_stone",
+                vec![("hydra_fang", 2), ("wyrm_scale", 2), ("basalt_heart", 2)],
+            ),
+            (
+                "city_steward",
+                "city_tribute",
+                vec![
+                    ("ironhide_shell", 2),
+                    ("ash_veil", 2),
+                    ("rime_shell", 2),
+                    ("croc_hide", 2),
+                ],
+            ),
+        ] {
+            quest_interact(&mut w, npc, Some(&format!("quest:accept:{quest}")));
+            for (item, n) in items {
+                give(&mut w, item, n);
+            }
+            w.update_player(1);
+            quest_interact(&mut w, npc, Some(&format!("quest:claim:{quest}")));
+        }
+        let c = &w.players[&1].character;
+        for q in &w.maps[CITY].quests {
+            if !q.repeatable {
+                let p = c
+                    .quests
+                    .iter()
+                    .find(|p| p.id == q.id)
+                    .unwrap_or_else(|| panic!("{} never accepted", q.id));
+                assert!(p.claimed && p.completions == 1, "{} finished", q.id);
+            }
+        }
+        let gold: u32 = w.maps[CITY]
+            .quests
+            .iter()
+            .filter(|q| !q.repeatable)
+            .map(|q| q.reward_gold)
+            .sum();
+        assert_eq!(c.gold, gold, "every reward paid once");
+        assert!(
+            c.inventory
+                .iter()
+                .all(|s| item(&s.item).unwrap().kind != "material"),
+            "every handed-in item was taken: {:?}",
+            c.inventory
+        );
+        let xp: u32 = w.maps[CITY]
+            .quests
+            .iter()
+            .filter(|q| !q.repeatable)
+            .map(|q| q.reward_xp)
+            .sum();
+        let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
+        assert_eq!(paid, xp, "every experience reward paid once");
+    }
+
+    #[test]
+    fn the_skaldholm_gate_pair_saves_the_zone_and_dying_in_the_city_respawns_there() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        let up = w.maps[2]
+            .portals
+            .iter()
+            .find(|p| p.id == "city_gate")
+            .unwrap()
+            .clone();
+        let back = w.maps[CITY].portals[0].clone();
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.zone = 2;
+            c.x = up.x;
+            c.y = up.y + 4.;
+        }
+        w.message(
+            1,
+            ClientMessage::Move {
+                x: up.x,
+                y: up.y - 1.,
+            },
+        );
+        for _ in 0..200 {
+            w.time += TICK;
+            w.update_player(1);
+            if w.players[&1].character.zone == CITY {
+                break;
+            }
+        }
+        let c = &w.players[&1].character;
+        assert_eq!(c.zone, CITY);
+        assert!(c.point().distance(Point { x: up.tx, y: up.ty }) < 1e-6);
+        assert_eq!(
+            w.store.load(&token).unwrap().unwrap().zone,
+            CITY,
+            "the zone saves at once"
+        );
+        assert_eq!(w.snapshot_for(CITY)["players"][0]["zone"], CITY);
+        assert!(w.snapshot_for(2)["players"].as_array().unwrap().is_empty());
+        assert!(
+            w.snapshot_for(CITY)["slimes"]
+                .as_array()
+                .unwrap()
+                .is_empty(),
+            "no enemies in the city"
+        );
+        // The Glacier Gate takes the player back to the summit bowl, beside the Skaldholm Gate.
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.x = back.x;
+            c.y = back.y;
+        }
+        w.time += PORTAL_DELAY + 0.1;
+        w.update_player(1);
+        assert_eq!(w.players[&1].character.zone, 2);
+        assert!(
+            w.players[&1].character.point().distance(Point {
+                x: back.tx,
+                y: back.ty
+            }) < 1e-6
+        );
+        // The city's enemy-free ground is a sanctuary.
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.zone = CITY;
+            p.character.x = 40.;
+            p.character.y = 60.;
+            p.character.hp = 0.;
+            p.dead_time = 3.3;
+        }
+        w.update_player(1);
+        let c = &w.players[&1].character;
+        assert_eq!(c.zone, CITY);
+        assert_eq!(c.hp, c.max_hp());
+        assert!(c.point().distance(w.maps[CITY].spawn) < 1.);
     }
 
     #[test]
@@ -4642,7 +5480,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(w.maps.len(), 4);
+        assert_eq!(w.maps.len(), 5);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));
@@ -6274,6 +7112,44 @@ mod tests {
             w.step();
         }
         assert_eq!(ch(&w).quantity("royal_jelly"), 2);
+    }
+
+    #[test]
+    fn finishing_a_hand_in_quest_by_shortcut_puts_the_items_in_the_bag_and_takes_them_again() {
+        let (mut w, _rx) = debug_world();
+        let result = dbg(
+            &mut w,
+            DebugCommand::Quest {
+                id: "city_tribute".into(),
+                action: QuestDebug::Finish,
+            },
+        )
+        .unwrap();
+        let claimed: Vec<_> = result["claimed"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_str().unwrap())
+            .collect();
+        assert_eq!(
+            claimed,
+            ["city_welcome", "city_archive", "city_stone", "city_tribute"]
+        );
+        let gold: u32 = w.maps[CITY]
+            .quests
+            .iter()
+            .filter(|q| claimed.contains(&q.id.as_str()))
+            .map(|q| q.reward_gold)
+            .sum();
+        assert_eq!(ch(&w).gold, gold);
+        assert!(
+            ch(&w)
+                .inventory
+                .iter()
+                .all(|s| item(&s.item).unwrap().kind != "material"),
+            "every handed-in item was taken: {:?}",
+            ch(&w).inventory
+        );
     }
 
     #[test]
