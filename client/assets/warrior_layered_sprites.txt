@@ -57,6 +57,10 @@
       "png": "warrior_layered_armor_azure.png",
       "depth": "warrior_layered_armor_azure_depth.png"
     },
+    "armor_gm": {
+      "png": "warrior_layered_armor_gm.png",
+      "depth": "warrior_layered_armor_gm_depth.png"
+    },
     "pants_wayfarer": {
       "png": "warrior_layered_pants_wayfarer.png",
       "depth": "warrior_layered_pants_wayfarer_depth.png"
@@ -97,6 +101,10 @@
       "png": "warrior_layered_head_ironhide.png",
       "depth": "warrior_layered_head_ironhide_depth.png"
     },
+    "head_gm": {
+      "png": "warrior_layered_head_gm.png",
+      "depth": "warrior_layered_head_gm_depth.png"
+    },
     "necklace_moonstone": {
       "png": "warrior_layered_necklace_moonstone.png",
       "depth": "warrior_layered_necklace_moonstone_depth.png"
@@ -112,6 +120,10 @@
     "weapon_royal": {
       "png": "warrior_layered_weapon_royal.png",
       "depth": "warrior_layered_weapon_royal_depth.png"
+    },
+    "weapon_gm": {
+      "png": "warrior_layered_weapon_gm.png",
+      "depth": "warrior_layered_weapon_gm_depth.png"
     }
   },
   "gender": "male",
@@ -128,6 +140,10 @@
       "azure": {
         "name": "Azure guard",
         "defense": 5
+      },
+      "gm": {
+        "name": "Golden Robe of the Game Master",
+        "defense": 12
       }
     },
     "shoulders": {
@@ -179,6 +195,10 @@
         "name": "Azure Winged Helm",
         "defense": 3
       },
+      "gm": {
+        "name": "Golden Top Hat",
+        "defense": 4
+      },
       "ironhide": {
         "name": "Ironhide Helm",
         "defense": 2
@@ -196,6 +216,10 @@
       "royal": {
         "name": "Royal sword & shield",
         "attack": 8
+      },
+      "gm": {
+        "name": "Golden Sword & Shield",
+        "attack": 20
       }
     },
     "pants": {
@@ -436,7 +460,47 @@
     "warrior_cel_die_se_azure": "cc14bf16338dd6d9",
     "warrior_cel_die_se_arms": "c6bdd309abfb285a",
     "warrior_cel_die_se_generic": "0fbf8fbad1fb4568",
-    "warrior_cel_die_se_trinkets": "636dddc3ea3c4757"
+    "warrior_cel_die_se_trinkets": "636dddc3ea3c4757",
+    "warrior_cel_idle_s_gm": "92bc16a9d6a70f1c",
+    "warrior_cel_idle_sw_gm": "63d2602349cc04cc",
+    "warrior_cel_idle_w_gm": "329dc8bb19d076c3",
+    "warrior_cel_idle_nw_gm": "b7b8318e8fe79ece",
+    "warrior_cel_idle_n_gm": "e38f6c6d76fbb7a5",
+    "warrior_cel_idle_ne_gm": "e21714007224fb6f",
+    "warrior_cel_idle_e_gm": "8e516595bc3193bd",
+    "warrior_cel_idle_se_gm": "ca20e18271faffcb",
+    "warrior_cel_walk_s_gm": "83b79243be9cb157",
+    "warrior_cel_walk_sw_gm": "a3709aea455e8c10",
+    "warrior_cel_walk_w_gm": "4b11b6e74cf70374",
+    "warrior_cel_walk_nw_gm": "156871138939a1b5",
+    "warrior_cel_walk_n_gm": "20ac92d070e7f74b",
+    "warrior_cel_walk_ne_gm": "7942025ab75fb259",
+    "warrior_cel_walk_e_gm": "a327e4b5b1c51ce0",
+    "warrior_cel_walk_se_gm": "a992ba700a83ad7a",
+    "warrior_cel_attack_s_gm": "dda5a49d9b86ce31",
+    "warrior_cel_attack_sw_gm": "91b3cc4f98fad03f",
+    "warrior_cel_attack_w_gm": "a8d61bff497033ae",
+    "warrior_cel_attack_nw_gm": "071dc9fed3e53170",
+    "warrior_cel_attack_n_gm": "b308172e27e33a8a",
+    "warrior_cel_attack_ne_gm": "54aafa35c038020c",
+    "warrior_cel_attack_e_gm": "d871af63033e37a4",
+    "warrior_cel_attack_se_gm": "33d521e9d3f1acf0",
+    "warrior_cel_hurt_s_gm": "69bb8be294fe2f40",
+    "warrior_cel_hurt_sw_gm": "388902bc9b89bc55",
+    "warrior_cel_hurt_w_gm": "7e820caf4d15063b",
+    "warrior_cel_hurt_nw_gm": "4894525e8ed27278",
+    "warrior_cel_hurt_n_gm": "f253ff23fc55b4f8",
+    "warrior_cel_hurt_ne_gm": "2f93a2257165a261",
+    "warrior_cel_hurt_e_gm": "cea5215da400a740",
+    "warrior_cel_hurt_se_gm": "f8bf9f3e70a540d3",
+    "warrior_cel_die_s_gm": "6c0cb777211deaaf",
+    "warrior_cel_die_sw_gm": "1fb20c4a742773c0",
+    "warrior_cel_die_w_gm": "bd04a4a31efcd1ff",
+    "warrior_cel_die_nw_gm": "db53494fd2a6325c",
+    "warrior_cel_die_n_gm": "571c05b7e6a1cb21",
+    "warrior_cel_die_ne_gm": "922d2aa7961f0664",
+    "warrior_cel_die_e_gm": "ee2a48853c2cafcc",
+    "warrior_cel_die_se_gm": "484a7ef57c5ee451"
   },
   "ramps": {
     "skin": [
@@ -582,6 +646,30 @@
       "#b0641c",
       "#e8a040",
       "#fff0b0"
+    ],
+    "gilt": [
+      "#8c5c12",
+      "#d9a226",
+      "#ffd84e",
+      "#fff8c4"
+    ],
+    "brocade": [
+      "#5e3808",
+      "#a8700f",
+      "#d89a1c",
+      "#f6d870"
+    ],
+    "ruby": [
+      "#58081a",
+      "#a8142e",
+      "#e8344e",
+      "#ff9ca8"
+    ],
+    "pearl": [
+      "#8c8678",
+      "#cac4b6",
+      "#f4f0e4",
+      "#fffcf2"
     ]
   },
   "depth": {
@@ -592,7 +680,7 @@
   },
   "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
   "style": "2D Korean RPG anime cel illustration",
-  "editing": "Three PixelFlow sprites per clip and facing (warrior_cel_<clip>_<facing>_crimson|azure|arms|generic|trinkets). ref_body layers are read-only context. build --replace discards edits.",
+  "editing": "Three PixelFlow sprites per clip and facing (warrior_cel_<clip>_<facing>_crimson|azure|arms|generic|trinkets|gm). ref_body layers are read-only context. build --replace discards edits.",
   "attack": {
     "duration": 0.42,
     "impact": 0.21

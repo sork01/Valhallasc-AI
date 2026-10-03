@@ -226,9 +226,21 @@
   "accessory_upgrade": [
    5,
    5
+  ],
+  "warrior_armor_gm": [
+   6,
+   5
+  ],
+  "warrior_headgear_gm": [
+   7,
+   5
+  ],
+  "warrior_weapon_gm": [
+   8,
+   5
   ]
  },
- "sprite": "523055641b34819b",
+ "sprite": "d7da28faab37c9dc",
  "light": "top left",
  "editing": "one PixelFlow sprite, one frame per item in `at` order; build --replace discards edits"
 }

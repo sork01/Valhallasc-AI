@@ -87,8 +87,18 @@ impl Store {
     pub fn create_for(
         &self,
         account: Option<&str>,
+        look: Look,
+        spawn: Point,
+    ) -> Result<(Character, String), Box<dyn std::error::Error>> {
+        self.create_character(account, look, spawn, false)
+    }
+    /// `gm` makes the administrator character (golden gear, debug commands); only a GM account's join may ask for it.
+    pub fn create_character(
+        &self,
+        account: Option<&str>,
         mut look: Look,
         spawn: Point,
+        gm: bool,
     ) -> Result<(Character, String), Box<dyn std::error::Error>> {
         let token = random_key();
         // Appearance is client-selected; starter equipment and ownership are server-issued.
@@ -129,8 +139,12 @@ impl Store {
             friends: vec![],
             potion_ready: 0,
             explored: vec![],
+            gm: false,
         };
         c.seed_inventory();
+        if gm {
+            c.become_gm();
+        }
         self.conn().execute(
             "INSERT INTO characters(id,token_hash,state,account_id) VALUES(?1,?2,?3,?4)",
             params![c.id, hash(&token), serde_json::to_string(&c)?, account],
@@ -327,19 +341,24 @@ impl Store {
                 id,
                 look: v["look"].clone(),
                 level: v["level"].as_u64().unwrap_or(1) as u32,
+                gm: v["gm"].as_bool().unwrap_or(false),
             });
         }
         Ok(list)
     }
+    /// Ordinary characters only: the administrator character sits in its own extra slot.
     pub fn account_character_count(
         &self,
         account: &str,
     ) -> Result<usize, Box<dyn std::error::Error>> {
-        Ok(self.conn().query_row(
-            "SELECT COUNT(*) FROM characters WHERE account_id=?1",
-            [account],
-            |r| r.get::<_, i64>(0),
-        )? as usize)
+        Ok(self
+            .account_characters(account)?
+            .iter()
+            .filter(|c| !c.gm)
+            .count())
+    }
+    pub fn account_has_gm(&self, account: &str) -> Result<bool, Box<dyn std::error::Error>> {
+        Ok(self.account_characters(account)?.iter().any(|c| c.gm))
     }
     /// Permanently deletes one of the account's characters. False when it isn't theirs.
     pub fn delete_account_character(
@@ -366,10 +385,20 @@ pub struct Account {
     pub kind: AccountKind,
     pub name: String,
 }
+impl Account {
+    /// Only the gunning.se SSO login "Sork" is a game master. The SSO check is made against the site by loopback, so a
+    /// game account that merely picks the name "Sork" is a different (kind `game`) account and gets nothing.
+    pub fn is_gm(&self) -> bool {
+        self.kind == AccountKind::Sso && self.name.eq_ignore_ascii_case(GM_ACCOUNT)
+    }
+}
+/// The site login that owns the extra administrator character slot.
+pub const GM_ACCOUNT: &str = "Sork";
 pub struct CharacterEntry {
     pub id: String,
     pub look: serde_json::Value,
     pub level: u32,
+    pub gm: bool,
 }
 pub(crate) fn unix_now() -> i64 {
     std::time::SystemTime::now()

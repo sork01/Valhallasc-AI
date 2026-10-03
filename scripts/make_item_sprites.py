@@ -57,6 +57,11 @@ RAMPS = {name: [rgb(h) for h in hs] for name, hs in dict(
     bone=['#6a5c44', '#a8977a', '#d8c8a4', '#fff2d4'],
     ink=['#0c0a12', '#1c1828', '#2e2840', '#463e5e'],
     pearl=['#5a5a82', '#9a9ac4', '#d4d4f2', '#ffffff'],
+    # the game master's golden set (same ramps as the worn art in make_warrior_cel_sprites.py)
+    gilt=['#8c5c12', '#d9a226', '#ffd84e', '#fff8c4'],
+    brocade=['#5e3808', '#a8700f', '#d89a1c', '#f6d870'],
+    ruby=['#58081a', '#a8142e', '#e8344e', '#ff9ca8'],
+    ivory=['#8c8678', '#cac4b6', '#f4f0e4', '#fffcf2'],
 ).items()}
 R = type('R', (), RAMPS)
 BAYER = np.array([[0, 2], [3, 1]]) / 4.0 - .375
@@ -860,6 +865,60 @@ def _(p):
     p.poly([(24, 6), (31.5, 11.5), (31.5, 19), (24, 25), (16.5, 19), (16.5, 11.5)], R.amber)
     p.poly([(24, 6), (16.5, 11.5), (16.5, 19), (24, 25)], R.amber, tone=3, edge=False)
     p.dots([(19, 11), (20, 10)], R.amber[3]); p.dots([(18, 26), (30, 26)], R.gold[3])
+
+
+# ---------------------------------------------------------------- the game master's golden set
+@icon('warrior_armor_gm', 'armor')
+def _(p):
+    p.poly(sym([(15, 7), (7, 12), (2, 27), (5, 33), (10, 29), (13, 22), (9, 45)]), R.gilt)
+    p.poly([(2.4, 30), (6.5, 34), (11, 30), (7.6, 26.6)], R.ivory)
+    p.poly([(45.6, 30), (41.5, 34), (37, 30), (40.4, 26.6)], R.ivory)
+    p.poly([(17, 7), (22, 7), (33, 28), (28, 28)], R.brocade)
+    p.poly([(31, 7), (26, 7), (15, 28), (20, 28)], R.brocade)
+    p.poly(sym([(24, 6), (18, 6), (16, 9), (24, 24)]), R.ivory)
+    p.poly([(11, 28), (37, 28), (38, 34), (10, 34)], R.ruby); gem(p, 24, 31, R.gilt, 2.4)
+    p.poly([(21, 35), (27, 35), (30, 40), (24, 45), (18, 40)], R.brocade)
+    p.poly([(24, 37), (27, 40.5), (24, 44), (21, 40.5)], R.ruby, edge=False)
+    p.poly([(9, 43), (39, 43), (40, 46.5), (8, 46.5)], R.ivory)
+    p.rect(9, 44, 39, 45, R.ruby[2])
+    p.dots([(14, 38), (34, 38), (24, 16)], R.gilt[3])
+
+
+@icon('warrior_headgear_gm', 'headgear')
+def _(p):
+    p.poly([(15.5, 7), (32.5, 7), (33.5, 31), (14.5, 31)], R.gilt)
+    p.poly([(32.5, 7), (28, 7), (28.5, 31), (33.5, 31)], R.gilt, tone=1, edge=False)
+    p.poly([(17.5, 8), (20.5, 8), (20.5, 30), (17.5, 30)], R.gilt, tone=3, edge=False)
+    p.ell(24, 7, 8.6, 2.8, R.gilt, tone=3)
+    p.ell(24, 7, 6.2, 1.6, R.brocade, tone=2, edge=False)
+    p.poly([(14.6, 22.5), (33.4, 22.5), (33.8, 30), (14.2, 30)], R.ruby)
+    p.poly([(33.4, 22.5), (28.5, 22.5), (28.6, 30), (33.8, 30)], R.ruby, tone=1, edge=False)
+    p.rect(14, 21, 34, 22.4, R.ivory[2])
+    p.poly([(20, 22), (28, 22), (28, 31), (20, 31)], R.gilt, tone=3)
+    p.poly([(22, 24), (26, 24), (26, 29.5), (22, 29.5)], R.ruby, tone=2, edge=False)
+    p.ell(24, 33, 18.5, 4.6, R.gilt)
+    p.poly([(7, 34), (41, 34), (38, 38.4), (24, 39.6), (10, 38.4)], R.gilt, tone=1, edge=False)
+    p.dots([(9, 31), (10, 31), (11, 32)], R.ivory[3])
+    p.poly(star(24, 14.6, 3.6, 1.5), R.ivory, tone=2, edge=False)
+
+
+def star(cx, cy, r1, r2):
+    return [(cx + (r1 if i % 2 == 0 else r2) * math.sin(i * math.pi / 5), cy - (r1 if i % 2 == 0 else r2) * math.cos(i * math.pi / 5)) for i in range(10)]
+
+
+@icon('warrior_weapon_gm', 'weapon')
+def _(p):
+    p.ell(15, 32, 12.8, 12.8, R.gilt, tone=1)
+    p.ell(15, 32, 11.2, 11.2, R.gilt, tone=2)
+    p.ell(15, 32, 9.4, 9.4, R.ivory, tone=2)
+    p.ell(15, 32, 8, 8, R.ruby, tone=2)
+    p.poly(star(15, 32, 7.2, 3.2) + [], R.gilt, tone=3, edge=False)
+    p.ell(15, 32, 2.6, 2.6, R.ruby, tone=3)
+    p.dots([(15, 20.6), (15, 43.4), (3.6, 32), (26.4, 32)], R.ivory[3])
+    p.poly(strip((16, 37), (44, 3), [(0, 1.5), (.08, 3.4), (.8, 3.4), (1, 0)]), R.gilt)
+    p.line((18, 35), (41, 6), 1.2, R.ivory, tone=3, edge=False)
+    p.poly(strip((17, 38), (22.5, 31), [(0, 8), (.3, 5.4), (.5, 3.4), (.7, 5.4), (1, 8)]), R.gilt)
+    p.line((12, 43), (17, 38), 3.4, R.ruby); gem(p, 11, 44, R.ruby, 2.6)
 
 
 # ---------------------------------------------------------------- output

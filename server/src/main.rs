@@ -245,6 +245,7 @@ async fn connection(mut socket: WebSocket, mut app: App) {
                     .and_then(|r| r);
                     match found {
                         Ok(Some(account)) => Identity::Account {
+                            gm: account.is_gm(),
                             id: account.id,
                             character,
                             look: look.map(|l| *l),

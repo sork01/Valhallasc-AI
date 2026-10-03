@@ -57,6 +57,10 @@
       "png": "warrior_layered_f_armor_azure.png",
       "depth": "warrior_layered_f_armor_azure_depth.png"
     },
+    "armor_gm": {
+      "png": "warrior_layered_f_armor_gm.png",
+      "depth": "warrior_layered_f_armor_gm_depth.png"
+    },
     "pants_wayfarer": {
       "png": "warrior_layered_f_pants_wayfarer.png",
       "depth": "warrior_layered_f_pants_wayfarer_depth.png"
@@ -97,6 +101,10 @@
       "png": "warrior_layered_f_head_ironhide.png",
       "depth": "warrior_layered_f_head_ironhide_depth.png"
     },
+    "head_gm": {
+      "png": "warrior_layered_f_head_gm.png",
+      "depth": "warrior_layered_f_head_gm_depth.png"
+    },
     "necklace_moonstone": {
       "png": "warrior_layered_f_necklace_moonstone.png",
       "depth": "warrior_layered_f_necklace_moonstone_depth.png"
@@ -112,6 +120,10 @@
     "weapon_royal": {
       "png": "warrior_layered_f_weapon_royal.png",
       "depth": "warrior_layered_f_weapon_royal_depth.png"
+    },
+    "weapon_gm": {
+      "png": "warrior_layered_f_weapon_gm.png",
+      "depth": "warrior_layered_f_weapon_gm_depth.png"
     }
   },
   "gender": "female",
@@ -128,6 +140,10 @@
       "azure": {
         "name": "Azure guard",
         "defense": 5
+      },
+      "gm": {
+        "name": "Golden Robe of the Game Master",
+        "defense": 12
       }
     },
     "shoulders": {
@@ -179,6 +195,10 @@
         "name": "Azure Winged Helm",
         "defense": 3
       },
+      "gm": {
+        "name": "Golden Top Hat",
+        "defense": 4
+      },
       "ironhide": {
         "name": "Ironhide Helm",
         "defense": 2
@@ -196,6 +216,10 @@
       "royal": {
         "name": "Royal sword & shield",
         "attack": 8
+      },
+      "gm": {
+        "name": "Golden Sword & Shield",
+        "attack": 20
       }
     },
     "pants": {
@@ -381,6 +405,30 @@
       "#b0641c",
       "#e8a040",
       "#fff0b0"
+    ],
+    "gilt": [
+      "#8c5c12",
+      "#d9a226",
+      "#ffd84e",
+      "#fff8c4"
+    ],
+    "brocade": [
+      "#5e3808",
+      "#a8700f",
+      "#d89a1c",
+      "#f6d870"
+    ],
+    "ruby": [
+      "#58081a",
+      "#a8142e",
+      "#e8344e",
+      "#ff9ca8"
+    ],
+    "pearl": [
+      "#8c8678",
+      "#cac4b6",
+      "#f4f0e4",
+      "#fffcf2"
     ]
   },
   "depth": {

@@ -6,17 +6,20 @@ usage: make_warrior_cel_sprites.py preview [clip|all] [directory]   contact shee
        make_warrior_cel_sprites.py export [--local]                  PixelFlow (edits kept) -> client/assets/warrior_layered_*.png + warrior_layered_sprites.txt
 
 Eleven layers: body + armor, shoulders, gloves, head (crimson, azure) + weapon (sword, royal). The weapon layers carry
-the sword and the round shield on the left arm. A broader build than the other classes (limbs x1.15). build --replace
+the sword and the round shield on the left arm. Three more, `gm`, are the administrator's golden robe, top hat and
+sword & shield (one PixelFlow group `gm`: build/export it alone with `--only gm`, so the other groups' edits stay). A broader build than the other classes (limbs x1.15). build --replace
 DISCARDS WARRIOR HAND EDITS. Files keep the old warrior_layered_ names so the game's part names stay valid.
 """
 import math
+
+import numpy as np
 
 import cel_common as cc
 import generic_gear as gg
 from cel_common import V, unit, rig
 
-SLOTS = {'armor': ('crimson', 'azure'), 'shoulders': ('crimson', 'azure', 'ironhide'), 'gloves': ('crimson', 'azure', 'duelist'),
-         'head': ('crimson', 'azure', 'ironhide'), 'weapon': ('sword', 'royal'),
+SLOTS = {'armor': ('crimson', 'azure', 'gm'), 'shoulders': ('crimson', 'azure', 'ironhide'), 'gloves': ('crimson', 'azure', 'duelist'),
+         'head': ('crimson', 'azure', 'ironhide', 'gm'), 'weapon': ('sword', 'royal', 'gm'),
          'pants': ('wayfarer',), 'necklace': ('moonstone',), 'accessory': ('amber',)}
 MATS = {
     **cc.FACE_MATS,
@@ -33,6 +36,11 @@ MATS = {
     'wing': ['#8a9ab0', '#c4d0e0', '#f0f5ff', '#ffffee'],
     'glow': ['#0f8a96', '#2fd0d8', '#8af0ee', '#e4ffff'],
     'iris': ['#6a3410', '#b0641c', '#e8a040', '#fff0b0'],
+    # the game master's golden set (appended last, so every older index keeps its value)
+    'gilt': ['#8c5c12', '#d9a226', '#ffd84e', '#fff8c4'],       # polished gold
+    'brocade': ['#5e3808', '#a8700f', '#d89a1c', '#f6d870'],    # deep gold for panels and shadows
+    'ruby': ['#58081a', '#a8142e', '#e8344e', '#ff9ca8'],
+    'pearl': ['#8c8678', '#cac4b6', '#f4f0e4', '#fffcf2'],
 }
 PALETTE, COLOR = cc.palette_of(MATS)
 BULK = 1.15
@@ -100,12 +108,34 @@ GEAR = {
     'head': {'none': {'name': 'Bare head', 'defense': 0},
              'crimson': {'name': 'Crimson Plumed Helm', 'defense': 2}, 'azure': {'name': 'Azure Winged Helm', 'defense': 3}},
     'weapon': {'none': {'name': 'Empty hands', 'attack': 0},
-               'sword': {'name': 'Sword & shield', 'attack': 4}, 'royal': {'name': 'Royal sword & shield', 'attack': 8}},
+               'sword': {'name': 'Sword & shield', 'attack': 4}, 'royal': {'name': 'Royal sword & shield', 'attack': 8},
+               'gm': {'name': 'Golden Sword & Shield', 'attack': 20}},
 }
+GEAR['armor']['gm'] = {'name': 'Golden Robe of the Game Master', 'defense': 12}
+GEAR['head']['gm'] = {'name': 'Golden Top Hat', 'defense': 4}
 
 
 def disc(centre, a1, a2, rx, ry, n=14):
     return [centre + a1 * math.cos(i / n * math.tau) * rx + a2 * math.sin(i / n * math.tau) * ry for i in range(n)]
+
+
+def surface(ink, points, mat, tone=2, bias=0., outline=True):
+    """A flat polygon whose depth follows its own plane (Ink.plate gives one mean depth, so a tall plate cannot hide a
+    leg behind it). `bias` makes it nearer than the limbs' radius bias; details pass a slightly larger one."""
+    proj = [ink.project(q) for q in points]
+    xy = np.array([q[0] for q in proj], float)
+    d = np.array([q[1] for q in proj], float)
+    c = np.linalg.lstsq(np.c_[np.ones(len(xy)), xy], d, rcond=None)[0]
+    g = np.array([c[1], c[2]])
+    n = float(np.linalg.norm(g))
+    if n < 1e-6:
+        ink.poly(xy, ink.color[mat][tone], float(d.mean()) - bias, outline)
+        return
+    axis = g / n
+    along = xy @ axis
+    a, b = xy.mean(0) + axis * (along.min() - xy.mean(0) @ axis), xy.mean(0) + axis * (along.max() - xy.mean(0) @ axis)
+    za, zb = c[0] + c[1] * a[0] + c[2] * a[1], c[0] + c[1] * b[0] + c[2] * b[1]
+    ink.poly(xy, ink.color[mat][tone], -bias, outline, gradient=(a, b, za, zb))
 
 
 def render_frame(clip, facing, k):
@@ -254,6 +284,127 @@ def render_frame(clip, facing, k):
             ink.poly([H(*q) for q in plume], COLOR['plume'][2], hd - 7.1)
             ink.poly([H(*q) for q in [(2.4, 17.6), (4.4, 22), (3, 27), (.4, 28.6), (1.4, 22)]], COLOR['plume'][1], hd - 7.15, False)
 
+
+    # ---- the game master's golden set ----
+    ink = inks['armor_gm']
+    s = sw * .6
+    torso(ink, 'gilt', 9.8, 5.0, 38, 69)
+    # Crossed lapels of deep gold over a pearl vest, edged in pearl, with a ruby clasp.
+    ink.plate([xf(q) for q in [(-3.6, 5.5, 69), (3.6, 5.5, 69), (0, 5.6, 53)]], 'pearl', 2)
+    ink.plate([xf(q) for q in [(-7, 5.4, 69), (-3.4, 5.5, 69), (4.8, 5.7, 41), (1.4, 5.7, 41)]], 'brocade', 2)
+    ink.plate([xf(q) for q in [(7, 5.4, 69), (3.4, 5.5, 69), (-4.8, 5.8, 41), (-1.4, 5.8, 41)]], 'brocade', 1)
+    ink.plate([xf(q) for q in [(0, 6, 64), (1.9, 6, 61.6), (0, 6, 59.2), (-1.9, 6, 61.6)]], 'ruby', 2, True)
+    ink.plate([xf(q) for q in [(0, 6.1, 63), (.8, 6.1, 61.8), (0, 6.1, 60.6), (-.8, 6.1, 61.8)]], 'ruby', 3, True)
+    ink.bone(xf((-5.2, 0, 69.6)), xf((5.2, 0, 69.6)), 3.5, 3.5, 'pearl', -1.4, 2)      # stand collar
+    ink.bone(xf((-5.2, 0, 71)), xf((5.2, 0, 71)), 3.0, 3.0, 'gilt', -1.45, 3)
+    # A long bell skirt (a six-point outline per face: top, mid, hem), split at the front over a deep-gold underskirt,
+    # hemmed in pearl and ruby, with a ruby obi hiding the join at the waist.
+    hem = 9
+    rings = [(42, 11., 6.6), (26, 13., 10.6), (hem, 15.6, 15.8)]
+    sway = lambda z: s * (42 - z) / 33
+    def face_pts(sy=None, sx=None):
+        """Six points round one face of the skirt: top left, top right and down the right edge, then back up the left."""
+        if sy is not None:
+            left = [(-wx + sway(z), sy * dy, z) for z, wx, dy in rings]
+            right = [(wx + sway(z), sy * dy, z) for z, wx, dy in rings]
+        else:
+            left = [(sx * wx + sway(z), -dy, z) for z, wx, dy in rings]
+            right = [(sx * wx + sway(z), dy, z) for z, wx, dy in rings]
+        return [xf(q) for q in [left[0], right[0], right[1], right[2], left[2], left[1]]]
+    B = 6.
+    def face_y(z):                      # where the skirt surface is at height z (the rings, interpolated)
+        for (z0, _, y0), (z1, _, y1) in zip(rings, rings[1:]):
+            if z1 <= z <= z0:
+                return y0 + (y1 - y0) * (z0 - z) / (z0 - z1)
+        return rings[-1][2]
+    for sy in (-1, 1):
+        surface(ink, face_pts(sy=sy), 'gilt', 2, B)
+    for sx in (-1, 1):
+        surface(ink, face_pts(sx=sx), 'gilt', 1, B)
+    yf = rings[-1][2]
+    wx = rings[-1][1]
+    def reach(z):                       # half-width of the skirt at height z
+        return rings[0][1] + (13. - rings[0][1]) * (42 - z) / 16 if z > 26 else 13. + (wx - 13.) * (26 - z) / 17
+    for sy in (-1, 1):                  # pleats: darker panels running from the waist to the hem
+        for k_ in (-1, 1) if sy > 0 else (-2, -1, 1, 2):
+            lo, hi = (k_ * .45, k_ * .62) if sy > 0 else (k_ * .2 - .08 * k_ / abs(k_) , k_ * .2 + .22 * k_ / abs(k_))
+            pts = [(lo * reach(42), sy * (face_y(42) + .12), 42), (hi * reach(42), sy * (face_y(42) + .12), 42),
+                   (hi * reach(hem + 4) + sway(hem), sy * (face_y(hem + 4) + .12), hem + 4), (lo * reach(hem + 4) + sway(hem), sy * (face_y(hem + 4) + .12), hem + 4)]
+            surface(ink, [xf(q) for q in pts], 'gilt', 1, B + .1, False)
+    surface(ink, [xf(q) for q in [(-3.6, 6.8, 42), (3.6, 6.8, 42), (6.6 + sway(hem), yf + .4, hem), (-6.6 + sway(hem), yf + .4, hem)]], 'brocade', 2, B + .1)
+    for sx in (-1, 1):                  # pearl piping down both sides of the split
+        surface(ink, [xf(q) for q in [(sx * 3.6, 6.9, 42), (sx * 4.3, 6.9, 42), (sx * 7.3 + sway(hem), yf + .5, hem), (sx * 6.6 + sway(hem), yf + .5, hem)]], 'pearl', 2, B + .2, False)
+    for x_ in (-1, 1):                  # a woven seam on each side of the front
+        surface(ink, [xf(q) for q in [(x_ * 7.2, face_y(36) + .15, 36), (x_ * 7.9, face_y(36) + .15, 36), (x_ * 12.4 + sway(hem), face_y(hem + 3) + .15, hem + 3), (x_ * 11.7 + sway(hem), face_y(hem + 3) + .15, hem + 3)]], 'brocade', 1, B + .2, False)
+    def band(sy, lo, hi, mat, tone, bias):
+        pts = [(-rings[-1][1] + sway(hem), sy * (face_y(lo) + .2), lo), (rings[-1][1] + sway(hem), sy * (face_y(lo) + .2), lo),
+               (rings[-1][1] + sway(hem), sy * (face_y(hi) + .2), hi), (-rings[-1][1] + sway(hem), sy * (face_y(hi) + .2), hi)]
+        # the face is wider at the hem than at height `hi`, so the band narrows with it
+        shrink = lambda z: (rings[0][1] + (rings[-1][1] - rings[0][1]) * (42 - z) / 33) if z > 26 else (13. + (rings[-1][1] - 13.) * (26 - z) / 17)
+        pts = [(-shrink(z) + sway(hem), y, z) for (_, y, z) in (pts[0], pts[3])]
+        pts = [(-shrink(lo) + sway(hem), sy * (face_y(lo) + .2), lo), (shrink(lo) + sway(hem), sy * (face_y(lo) + .2), lo),
+               (shrink(hi) + sway(hem), sy * (face_y(hi) + .2), hi), (-shrink(hi) + sway(hem), sy * (face_y(hi) + .2), hi)]
+        surface(ink, [xf(q) for q in pts], mat, tone, bias, False)
+    for sy in (-1, 1):
+        band(sy, hem, hem + 3, 'pearl', 2, B + .3)
+        band(sy, hem + 3, hem + 3.9, 'ruby', 2, B + .3)
+        for x_ in (-11, -5.5, 0, 5.5, 11):  # gold lozenges along the hem
+            y_ = sy * (face_y(hem + 1.5) + .4)
+            surface(ink, [xf(q) for q in [(x_ - 1.5 + sway(hem), y_, hem + 1.5), (x_ + sway(hem), y_, hem + 2.9), (x_ + 1.5 + sway(hem), y_, hem + 1.5), (x_ + sway(hem), y_, hem + .2)]], 'gilt', 3, B + .5, False)
+    for sx in (-1, 1):
+        surface(ink, [xf(q) for q in [(sx * (wx + .2) + sway(hem), -yf, hem + 3), (sx * (wx + .2) + sway(hem), yf, hem + 3), (sx * (wx + .2) + sway(hem), yf, hem), (sx * (wx + .2) + sway(hem), -yf, hem)]], 'pearl', 1, B + .3, False)
+    # The back carries a large embroidered ruby-and-pearl diamond.
+    def back(x_, z):
+        return (x_ + sway(z), -(face_y(z) + .3), z)
+    surface(ink, [xf(q) for q in [back(0, 38), back(5.4, 28), back(0, 16), back(-5.4, 28)]], 'pearl', 2, B + .3, False)
+    surface(ink, [xf(q) for q in [back(0, 35), back(3.8, 28), back(0, 19.4), back(-3.8, 28)]], 'ruby', 2, B + .4, False)
+    surface(ink, [xf(q) for q in [back(0, 31), back(1.8, 28), back(0, 24.6), back(-1.8, 28)]], 'gilt', 3, B + .5, False)
+    # A ruby obi with a gilt knot and two hanging tails.
+    for sy in (-1, 1):
+        ink.plate([xf(q) for q in [(-11.8, sy * 7.1, 45), (11.8, sy * 7.1, 45), (11.8, sy * 7.1, 39.6), (-11.8, sy * 7.1, 39.6)]], 'ruby', 2 if sy > 0 else 1)
+    for sx in (-1, 1):
+        ink.plate([xf(q) for q in [(sx * 11.8, -7.1, 45), (sx * 11.8, 7.1, 45), (sx * 11.8, 7.1, 39.6), (sx * 11.8, -7.1, 39.6)]], 'ruby', 1)
+    ink.plate([xf(q) for q in [(-11.8, 7.2, 43.6), (11.8, 7.2, 43.6), (11.8, 7.2, 43), (-11.8, 7.2, 43)]], 'gilt', 3, True)
+    ink.plate([xf(q) for q in [(0, 7.5, 46.4), (3, 7.5, 42.4), (0, 7.5, 38.4), (-3, 7.5, 42.4)]], 'gilt', 2)
+    ink.plate([xf(q) for q in [(0, 7.6, 44.6), (1.5, 7.6, 42.4), (0, 7.6, 40.2), (-1.5, 7.6, 42.4)]], 'ruby', 3, True)
+    ink.plate([xf(q) for q in [(1.2, 7.3, 40), (4.2 + s * .5, 7.6, 40), (5.8 + sway(24), 9, 22), (2.4 + sway(24), 8.8, 25)]], 'ruby', 2)
+    ink.plate([xf(q) for q in [(-1.2, 7.3, 40), (-4.2 + s * .5, 7.6, 40), (-5.8 + sway(24), 9, 25), (-2.4 + sway(24), 8.8, 28)]], 'ruby', 1)
+    # Wide bell sleeves with a pearl cuff, and golden boots under the hem.
+    for key in 'LR':
+        j = joints[key]
+        ink.bone(j['shoulder'], j['elbow'], 3.9, 3.7, 'gilt', -.8)
+        ink.bone(j['elbow'], cuff(j, .3), 3.7, 5.2, 'gilt', -.75)
+        ink.bone(cuff(j, .34), cuff(j, .2), 5.3, 5.5, 'pearl', -.9, 2)
+        ink.bone(cuff(j, .2), cuff(j, .16), 5.5, 5.5, 'ruby', -.95, 2)
+        leg = j['ankle'] - j['knee']
+        ink.bone(j['knee'] + leg * .62, j['ankle'], 3.3, 2.7, 'brocade', -.8, 2)
+        ink.bone(j['knee'] + leg * .6, j['knee'] + leg * .7, 3.6, 3.5, 'pearl', -.9, 2)
+        ink.bone(j['ankle'] + V(0, -1, -1), j['ankle'] + V(0, 5.2, -2), 3.0, 2.9, 'gilt', -.8, 2)
+        ink.bone(j['ankle'] + V(0, 4.4, -1.9), j['ankle'] + V(0, 6, -2.3), 2.7, 2.4, 'pearl', -.9, 3)
+
+    # A golden top hat: a tall straight crown with a ruby band and gilt buckle on a wide brim, tilted a little.
+    ink = inks['head_gm']
+    def ellipse(cx, cy, rx, ry, n=22, lo=0., hi=math.tau):
+        return [(cx + rx * math.cos(lo + (hi - lo) * i / n), cy + ry * math.sin(lo + (hi - lo) * i / n)) for i in range(n + 1)]
+    ink.poly([H(*q) for q in [(-8.2, 12), (-7.4, 29), (7.4, 29), (8.2, 12)]], COLOR['gilt'][2], hd - 7)
+    ink.poly([H(*q) for q in [(8.2, 12), (7.4, 29), (4.2, 29), (5, 12)]], COLOR['gilt'][1], hd - 7.05, False)
+    ink.poly([H(*q) for q in [(-6.8, 12), (-6.2, 29), (-4.2, 29), (-4.8, 12)]], COLOR['gilt'][3], hd - 7.05, False)
+    ink.poly([H(*q) for q in ellipse(0, 29, 7.4, 2)], COLOR['gilt'][3], hd - 7.08)
+    ink.poly([H(*q) for q in ellipse(0, 29, 5.4, 1.1)], COLOR['brocade'][2], hd - 7.1, False)
+    ink.poly([H(*q) for q in ellipse(0, 11.4, 13.6, 3)], COLOR['gilt'][2], hd - 7.2)
+    ink.poly([H(*q) for q in ellipse(0, 10.6, 12.8, 1.8, 14, 0, math.pi)[::-1] + ellipse(0, 11.4, 13.6, 3, 14, math.pi, math.tau)[::-1]], COLOR['gilt'][1], hd - 7.25, False)
+    ink.poly([H(*q) for q in ellipse(0, 12, 12.6, 1.9, 12, math.pi * .6, math.pi * 1.2)], COLOR['pearl'][3], hd - 7.3, False)
+    ink.poly([H(*q) for q in [(-8.1, 14), (8.1, 14), (7.9, 19.2), (-7.9, 19.2)]], COLOR['ruby'][2], hd - 7.4)
+    ink.poly([H(*q) for q in [(8.1, 14), (7.9, 19.2), (5, 19.2), (5.4, 14)]], COLOR['ruby'][1], hd - 7.45, False)
+    ink.poly([H(*q) for q in [(-8.1, 19.2), (7.9, 19.2), (7.9, 20.3), (-8.1, 20.3)]], COLOR['pearl'][2], hd - 7.45, False)
+    ink.poly([H(*q) for q in [(-8.2, 12.9), (8.2, 12.9), (8.1, 14), (-8.1, 14)]], COLOR['pearl'][2], hd - 7.45, False)
+    if front > -.4:
+        ink.poly([H(*q) for q in [(-3.2, 13.4), (3.2, 13.4), (3.2, 19.8), (-3.2, 19.8)]], COLOR['gilt'][3], hd - 7.5)
+        ink.poly([H(*q) for q in [(-1.8, 14.6), (1.8, 14.6), (1.8, 18.6), (-1.8, 18.6)]], COLOR['ruby'][2], hd - 7.55, False)
+        ink.poly([H(*q) for q in [(-.7, 15.6), (.7, 15.6), (.7, 17.6), (-.7, 17.6)]], COLOR['ruby'][3], hd - 7.6, False)
+        star = [(r * math.sin(i * math.pi / 5), 24.4 + r * math.cos(i * math.pi / 5)) for i, r in enumerate([3.6, 1.6] * 5)]
+        ink.poly([H(*q) for q in star], COLOR['pearl'][2], hd - 7.5)
+
     # Sword in the right hand, round shield on the left forearm.
     hand_r, hand_l = joints['R']['hand'], joints['L']['hand']
     u = R @ unit(V(*p['blade']))
@@ -291,6 +442,33 @@ def render_frame(clip, facing, k):
         ink.plate(disc(centre + shield_n * 1.4, a1, a2, 6.8, 6.8), 'azure' if royal else 'crimson', 2, True)
         ink.plate(disc(centre + shield_n * 2.2, a1, a2, 2.4, 2.4, 8), 'gold' if not royal else 'glow', 3, True)
         ink.plate([centre + shield_n * 1.8 + a2 * 6, centre + shield_n * 1.8 + a1 * .9, centre + shield_n * 1.8 - a2 * 6, centre + shield_n * 1.8 - a1 * .9], 'gold', 3, True)
+
+    # The game master's blade: a long gilt sword with a winged guard and ruby wrap, and a round shield with a sunburst.
+    ink = inks['weapon_gm']
+    grip = hand_r - u * 4.8
+    guard = hand_r + u * 2.2
+    tip = guard + u * 38
+    base = guard + u * 1.6
+    ink.bone(grip, guard, 1.4, 1.4, 'ruby', -.1, 2)
+    ink.bone(grip - u * 1.8, grip, 2.2, 2.2, 'gilt', -.12, 3)
+    ink.bone(grip - u * 2.7, grip - u * 2.2, 1.3, 1.3, 'ruby', -.14, 3)
+    ink.plate([guard - across * 7.8 - u * .6, guard - across * 5.4 + u * 3, guard - across * 2.4 + u * .8, guard + across * 2.4 + u * .8, guard + across * 5.4 + u * 3, guard + across * 7.8 - u * .6, guard + across * 4 - u * 1.8, guard - across * 4 - u * 1.8], 'gilt', 2)
+    ink.plate([guard + across * 2.4 + u * .8, guard + across * 5.4 + u * 3, guard + across * 7.8 - u * .6, guard + across * 4 - u * 1.8], 'gilt', 1, True)
+    ink.plate([guard + u * 2.4, guard + across * 1.6 + u * .6, guard - u * 1.2, guard - across * 1.6 + u * .6], 'ruby', 3, True)
+    ink.plate([base - across * 3.4, base + across * 3.4, tip + across * .8, tip + u * 4, tip - across * .8], 'gilt', 2)
+    ink.plate([base, base + across * 3.4, tip + across * .8, tip + u * 4], 'gilt', 1, True)
+    ink.plate([base + u * 1.2, base + u * 1.2 + across * .8, tip - u * 2, tip - u * 2 - across * .8], 'pearl', 3, True)
+    face_n = shield_n
+    ink.plate(disc(centre, a1, a2, 12.2, 12.2, 20), 'gilt', 1)
+    ink.plate(disc(centre + face_n * .8, a1, a2, 10.8, 10.8, 20), 'gilt', 2)
+    ink.plate(disc(centre + face_n * 1.3, a1, a2, 9.2, 9.2, 20), 'pearl', 2, True)
+    ink.plate(disc(centre + face_n * 1.7, a1, a2, 7.8, 7.8, 20), 'ruby', 2, True)
+    burst = [centre + face_n * 2.2 + (a1 * math.cos(i * math.pi / 8) + a2 * math.sin(i * math.pi / 8)) * (7.2 if i % 2 == 0 else 3.4) for i in range(16)]
+    ink.plate(burst, 'gilt', 3, True)
+    ink.plate(disc(centre + face_n * 2.7, a1, a2, 2.8, 2.8, 12), 'ruby', 3, True)
+    for i in range(8):                  # studs round the rim
+        t = i * math.pi / 4 + .39
+        ink.plate(disc(centre + face_n * 1.1 + (a1 * math.cos(t) + a2 * math.sin(t)) * 10, a1, a2, .9, .9, 6), 'pearl', 3, True)
     gg.draw(inks, R, xf, joints, head)
     flash = clip in ('hurt', 'die') and k == 0
     return {part: ink.resolve(flash) for part, ink in inks.items()}
@@ -303,14 +481,23 @@ def np_cross(a, b):
 NAKED = {slot: 'none' for slot in SLOTS}
 CRIMSON = {'armor': 'crimson', 'shoulders': 'crimson', 'gloves': 'crimson', 'head': 'crimson', 'weapon': 'sword'}
 AZURE = {'armor': 'azure', 'shoulders': 'azure', 'gloves': 'azure', 'head': 'azure', 'weapon': 'royal'}
+GM = {'armor': 'gm', 'shoulders': 'none', 'gloves': 'none', 'head': 'gm', 'weapon': 'gm'}
 GENERIC = {'armor': 'crimson', 'shoulders': 'ironhide', 'gloves': 'duelist', 'head': 'ironhide', 'pants': 'wayfarer',
            'necklace': 'moonstone', 'accessory': 'amber', 'weapon': 'sword'}
 SHEET = cc.Sheet(
     'warrior', files='warrior_layered', pixel='warrior_cel_', mats=MATS, clips=CLIPS, slots=SLOTS, gear=GEAR, render=render_frame,
     revision=cc.revision_of([open(__file__).read(), open(gg.__file__).read()]),
+    # The auto grouping would put the three gm layers into the generic and trinkets sprites and change them; this is the
+    # same grouping the five older sprites already have, plus one `gm` sprite per clip and facing.
+    groups={'crimson': ['body', 'armor_crimson', 'shoulders_crimson', 'gloves_crimson', 'head_crimson'],
+            'azure': ['ref_body', 'armor_azure', 'shoulders_azure', 'gloves_azure', 'head_azure'],
+            'arms': ['ref_body', 'weapon_sword', 'weapon_royal'],
+            'generic': ['ref_body', 'pants_wayfarer', 'shoulders_ironhide', 'gloves_duelist', 'head_ironhide'],
+            'trinkets': ['ref_body', 'necklace_moonstone', 'accessory_amber'],
+            'gm': ['ref_body', 'armor_gm', 'head_gm', 'weapon_gm']},
     default_equip={'armor': 'crimson', 'shoulders': 'none', 'gloves': 'none', 'head': 'none', 'weapon': 'sword'},
     meta={'attack': {'duration': .42, 'impact': .21}, 'portrait': [57, 15, 46, 46]},
-    combos=[('naked', NAKED), ('crimson', CRIMSON), ('azure', AZURE), ('generic', GENERIC)])
+    combos=[('naked', NAKED), ('crimson', CRIMSON), ('azure', AZURE), ('generic', GENERIC), ('gm', GM)])
 
 if __name__ == '__main__':
     SHEET.cli()

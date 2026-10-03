@@ -112,8 +112,10 @@ fn account_json(
         "ok":true,
         "session":session,
         "account":{"name":account.name,"kind":match account.kind {AccountKind::Game=>"game",AccountKind::Sso=>"sso"}},
+        // A game master's account has one more slot, for the administrator character.
         "max":MAX_ACCOUNT_CHARACTERS,
-        "characters":characters.iter().map(|c| json!({"id":c.id,"look":c.look,"level":c.level})).collect::<Vec<_>>(),
+        "gm":account.is_gm(),
+        "characters":characters.iter().map(|c| json!({"id":c.id,"look":c.look,"level":c.level,"gm":c.gm})).collect::<Vec<_>>(),
     }))
     .into_response()
 }

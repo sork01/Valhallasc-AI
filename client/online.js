@@ -13,7 +13,7 @@
   let acct = { session: null, name: null, kind: null, current: null, slots: {} };
   try { const raw = JSON.parse(localStorage.getItem(accountKey) || 'null'); if (raw && typeof raw === 'object') acct = { ...acct, ...raw, slots: raw.slots || {} }; } catch (_) {}
   const persistAccount = () => { try { localStorage.setItem(accountKey, JSON.stringify(acct)); } catch (_) {} };
-  let mode = 'guest', accountList = [], accountMax = 5;
+  let mode = 'guest', accountList = [], accountMax = 5, accountGm = false, characterGm = false;
   // Where the current character's local layouts live: its guest slot, or its entry under the account.
   const layoutSlot = () => mode === 'account' ? (acct.current ? (acct.slots[acct.current] ||= {}) : null) : saved.characters.find(c => c.token === saved.current);
   const persistSlot = () => mode === 'account' ? persistAccount() : persist();
@@ -27,7 +27,7 @@
   function log(text, name, channel) {
     const line = document.createElement('p');
     if (channel) line.className = 'chat-' + channel;
-    if (name) { const label = document.createElement('b'); label.textContent = name + ': '; line.append(label); }
+    if (name) { const label = document.createElement('b'); label.textContent = name + ': '; if (name.startsWith('[GM]')) label.className = 'gm'; line.append(label); }
     line.append(document.createTextNode(text)); $('chat-log').append(line);
     while ($('chat-log').children.length > 80) $('chat-log').firstElementChild.remove();
     $('chat-log').scrollTop = $('chat-log').scrollHeight;
@@ -66,6 +66,7 @@
             saved.current = packet.token;
             saved.characters.push({ token: packet.token, look: character.look }); persist();
           }
+          characterGm = character?.gm === true; window.GM?.onSelf(character);
           callbacks.onWelcome?.(packet);
           window.Social?.reset(); send({ type: 'social', command: { op: 'refresh' } });
           $('connection-overlay').hidden = true; $('chat-input').disabled = false;
@@ -79,6 +80,7 @@
           const away = character?.zone > 0 ? WORLD_MAP.zones?.[character.zone - 1]?.name : null;
           status(`${away || (window.City?.inside(character?.x, character?.y) ? WORLD_MAP.city.name : 'Greenmeadow')} · ${packet.online} online`, true);
           const slot = mode === 'guest' ? saved.characters.find(c => c.token === saved.current) : null;
+          if (character) window.GM?.onSelf(character);
           if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
           callbacks.onSnapshot?.(packet); break;
         }
@@ -87,6 +89,7 @@
         case 'chat': log(packet.text, packet.channel === 'party' ? `[Party] ${packet.name}` : packet.name, packet.channel); break;
         case 'system': log(packet.text); break;
         case 'notice': log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;
+        case 'debug': window.GM?.onReply(packet); break;
         case 'social': window.Social?.onState(packet); break;
         case 'party': window.Social?.onParty(packet.party); break;
         case 'who': window.Social?.onWho(packet.players); break;
@@ -102,7 +105,7 @@
       clearTimeout(joinTimeout);
       if (!active || currentGeneration !== generation) return;
       clearInterval(heartbeat);
-      connected = false; window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; characterGm = false; window.GM?.onSelf(null); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay('Connection lost. Reconnecting to your character…');
@@ -144,14 +147,17 @@
       slot.skillSlots = [...slots]; if (level) slot.skillLevel = level; persistSlot();
     },
     get characters() {
-      return mode === 'account' ? accountList.map(c => ({ key: c.id, look: { ...c.look }, level: c.level }))
+      return mode === 'account' ? accountList.map(c => ({ key: c.id, look: { ...c.look }, level: c.level, gm: c.gm === true }))
         : saved.characters.map(c => ({ key: c.token, look: { ...c.look } }));
     },
     // ----- accounts -----
     get mode() { return mode; },
     useGuest() { mode = 'guest'; },
     useAccount() { mode = 'account'; },
-    get account() { return acct.session ? { name: acct.name, kind: acct.kind, max: accountMax } : null; },
+    get account() { return acct.session ? { name: acct.name, kind: acct.kind, max: accountMax, gm: accountGm } : null; },
+    // True while the character in the world is the administrator character; the server decides it, this only shows the console.
+    get gm() { return characterGm; },
+    log,
     async api(path, body) {
       try {
         const res = await fetch(new URL('api/' + path, location.href), {
@@ -167,7 +173,7 @@
     adopt(data) {
       if (!data?.ok) return data;
       if (data.session) { if (data.session !== acct.session) acct.current = null; acct.session = data.session; }
-      acct.name = data.account.name; acct.kind = data.account.kind; accountMax = data.max || 5;
+      acct.name = data.account.name; acct.kind = data.account.kind; accountMax = data.max || 5; accountGm = data.gm === true;
       accountList = data.characters || []; persistAccount(); return data;
     },
     async login(username, password) { return this.adopt(await this.api('login', { username, password })); },
@@ -196,7 +202,7 @@
   };
   $('chat-form').addEventListener('submit', event => {
     event.preventDefault(); const input = $('chat-input'), text = input.value.trim();
-    if (text.startsWith('/') && window.Social?.command(text)) input.value = '';
+    if (text.startsWith('/') && (window.GM?.command(text) || window.Social?.command(text))) input.value = '';
     else if (text && send({ type: 'chat', text })) input.value = '';
     input.blur();
   });

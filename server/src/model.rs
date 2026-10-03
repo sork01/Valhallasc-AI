@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 
 pub const TICK: f64 = 0.05;
 pub const MAX_PLAYERS: usize = 128;
+/// Name of the administrator character (see `Character::gm`).
+pub const GM_NAME: &str = "[GM]Sork";
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
 pub struct Point {
@@ -189,6 +191,10 @@ impl Look {
             *piece = "none".into();
         }
     }
+    /// "[GM]" in a name is reserved for the administrator character, so nobody else can pass as one.
+    pub fn name_is_reserved(&self) -> bool {
+        self.name.to_lowercase().contains("[gm]")
+    }
     pub fn validate(&self) -> Result<(), &'static str> {
         let len = self.name.trim().chars().count();
         if !(2..=16).contains(&len) || self.name.chars().any(char::is_control) {
@@ -330,6 +336,10 @@ pub struct Character {
     /// character has stood in, bit `row * FOG_GRID + column`. The maps show only these cells.
     #[serde(default)]
     pub explored: Vec<u16>,
+    /// The administrator character of a GM account (see `Account::is_gm`): may use the debug commands and wears the
+    /// golden GM gear. Set only by the server when that character is created; a client's look can never carry it.
+    #[serde(default)]
+    pub gm: bool,
 }
 /// Every zone is cut into this many cells a side for the fog of war: nine spots to uncover per map.
 pub const FOG_GRID: usize = 3;
@@ -833,6 +843,10 @@ pub enum DebugCommand {
         zone: usize,
         x: f64,
         y: f64,
+    },
+    /// Teleports to the online player with this name (a game master's `/goto`).
+    Goto {
+        name: String,
     },
     GiveItem {
         item: String,

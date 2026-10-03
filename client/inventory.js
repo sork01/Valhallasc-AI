@@ -46,7 +46,7 @@
     shell: '<path d="M12 39c0-36 40-36 40 0l-9 14H21z" fill="currentColor"/><path d="M32 12v40M16 30l16 8 16-8M19 44l13-6 13 6" fill="none" stroke="#f1d59c" stroke-width="3"/>',
     bag: '<path d="M18 20c0-17 28-17 28 0M12 21h40l3 31H9z" fill="none" stroke="currentColor" stroke-width="5"/><path d="M10 32h44M25 26v12h14V26" fill="none" stroke="currentColor" stroke-width="3"/>',
   };
-  const RARITY_NAMES = { common: 'Common', uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic', legendary: 'Legendary' };
+  const RARITY_NAMES = { common: 'Common', uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic', legendary: 'Legendary', gm: 'Game Master' };
   const rarityName = i => RARITY_NAMES[i?.rarity] || 'Common';
   function icon(i, emptyKind) {
     const kind = i?.kind || emptyKind;
@@ -60,7 +60,7 @@
     }
     const glyph = kind === 'weapon' && i?.class === 'mage' ? 'staff' : kind === 'weapon' && i?.class === 'assassin' ? 'daggers' : kind === 'weapon' && i?.class === 'priest' ? 'mace' : kind === 'weapon' && i?.class === 'hunter' ? 'bow' : i?.id === 'ironhide_shell' ? 'shell' : kind;
     const palette = { slime_gel: '#88c675', blue_gel: '#6ca6ec', pink_gel: '#dd88b1', golden_gel: '#edc561', royal_jelly: '#bd84e2', traveler_stew: '#c98a4b', health_potion: '#e0476b', mana_potion: '#5488ef' };
-    const color = palette[i?.id] || (i?.variant === 'crimson' ? '#c16b67' : { uncommon: '#6fcf86', rare: '#86acd5', epic: '#b98be6', legendary: '#f0a85a' }[i?.rarity] || '#ab8e68');
+    const color = palette[i?.id] || (i?.variant === 'crimson' ? '#c16b67' : { uncommon: '#6fcf86', rare: '#86acd5', epic: '#b98be6', legendary: '#f0a85a', gm: '#e8c050' }[i?.rarity] || '#ab8e68');
     return `<svg viewBox="0 0 64 64" aria-hidden="true" style="color:${color}" stroke="#15151a" stroke-width="2" stroke-linejoin="round">${art[glyph] || art.accessory}</svg>`;
   }
   function summary(i, count = quantity(i.id)) {

@@ -63,10 +63,10 @@
   function renderChars() {
     const account = Online.account, list = $('chars-list');
     if (!account) { handlers.show('login'); return; }
-    const entries = Online.characters;
-    $('chars-who').textContent = `${account.name}${account.kind === 'sso' ? ' (gunning.se)' : ''} · ${entries.length} of ${account.max} characters`;
+    const entries = Online.characters, ordinary = entries.filter(c => !c.gm).length, hasGm = entries.some(c => c.gm);
+    $('chars-who').textContent = `${account.name}${account.kind === 'sso' ? ' (gunning.se)' : ''} · ${ordinary} of ${account.max} characters${hasGm ? ' + [GM]' : ''}`;
     list.replaceChildren(...entries.map(c => {
-      const row = document.createElement('div'); row.className = 'char-row';
+      const row = document.createElement('div'); row.className = c.gm ? 'char-row gm' : 'char-row';
       const play = document.createElement('button'); play.type = 'button'; play.className = 'btn ghost char-play';
       play.textContent = `${c.look.name} · Lv ${c.level} ${c.look.class}`;
       play.addEventListener('click', () => { const look = Online.select(c.key); if (look) handlers.play(look); });
@@ -84,7 +84,9 @@
       row.append(play, del); return row;
     }));
     if (!entries.length) list.textContent = 'No characters yet. Create your first one.';
-    $('chars-new').disabled = entries.length >= account.max;
+    $('chars-new').disabled = ordinary >= account.max;
+    // The administrator character is a sixth, separate slot that only the game master's login is offered.
+    $('chars-gm').hidden = !(account.gm && !hasGm);
   }
   function enterChars() {
     say('chars-msg', ''); renderChars();
@@ -104,6 +106,7 @@
       $('login-logout').addEventListener('click', async () => { if (busy) return; setBusy(true); await Online.logout(); setBusy(false); renderLogin(); say('login-msg', 'Logged out.', true); });
       $('login-back').addEventListener('click', () => handlers.show('splash'));
       $('chars-new').addEventListener('click', () => { if (!$('chars-new').disabled) handlers.create(); });
+      $('chars-gm').addEventListener('click', () => { if (!$('chars-gm').hidden) handlers.createGm(); });
       $('chars-back').addEventListener('click', () => handlers.show('login'));
     },
     enter, enterChars, renderChars,

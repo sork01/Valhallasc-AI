@@ -6,6 +6,7 @@
 .chat-log { height: 7cqw; overflow: auto; padding: .55cqw .8cqw; scrollbar-width: thin; }
 .chat-log p { margin: .25cqw 0; overflow-wrap: anywhere; line-height: 1.35; }
 .chat-log b { color: #e9ce82; }
+.chat-log b.gm, .chat-log p.chat-gm { color: #ffd24a; text-shadow: 0 0 .5cqw #ffb30055; }
 .chat form { display: flex; border-top: 1px solid #a9b4dc40; }
 .chat input { min-width: 0; flex: 1; background: #0e142a; border: 0; color: white; padding: .65cqw; font: inherit; }
 .chat button { border: 0; background: #304466; color: #f1e2b0; padding: .55cqw .8cqw; font: inherit; cursor: pointer; }
@@ -79,6 +80,7 @@
 .gossip-parchment .inventory-item[data-rarity="rare"] b { color: #1b5ea8; }
 .gossip-parchment .inventory-item[data-rarity="epic"] b { color: #6a24ad; }
 .gossip-parchment .inventory-item[data-rarity="legendary"] b { color: #a35300; }
+.gossip-parchment .inventory-item[data-rarity="gm"] b { color: #8a6a00; }
 .gossip-parchment .shop-item-icon { background: #2a1a0acc; border-color: #5a4a30; }
 @media (pointer: coarse) { .gossip-row { min-height: 44px; } .gossip-button, .gossip-parchment .btn, .gossip-titlebar .window-close { min-height: 44px; min-width: 44px; } }
 .quest-tracker { position: absolute; right: 1.4cqw; top: 22cqw; width: 23cqw; z-index: 20; color: #f7e9c9; text-align: left; font: 1cqw/1.45 Arial, sans-serif; text-shadow: 0 1px 3px #000, 1px 0 2px #000; }
@@ -117,11 +119,13 @@
 .inventory-item[data-rarity="rare"] { border-color: #64b5ff90; }
 .inventory-item[data-rarity="epic"] { border-color: #b45cff90; }
 .inventory-item[data-rarity="legendary"] { border-color: #ff9a2e90; }
+.inventory-item[data-rarity="gm"] { border-color: #ffd24a90; }
 .inventory-item[data-rarity="common"] b { color: #c4c4c4; }
 .inventory-item[data-rarity="uncommon"] b { color: #4ad66d; }
 .inventory-item[data-rarity="rare"] b { color: #64b5ff; }
 .inventory-item[data-rarity="epic"] b { color: #b45cff; }
 .inventory-item[data-rarity="legendary"] b { color: #ff9a2e; }
+.inventory-item[data-rarity="gm"] b { color: #ffd24a; }
 .inventory-item .btn, #npc-inventory > .btn { margin: .4cqw .4cqw 0 0; font-size: .9cqw; }
 .inventory-open:focus-visible, .equipment-workspace :focus-visible { outline: 3px solid #ffdc87; outline-offset: 3px; }
 @media (pointer: coarse) { .inventory-open, .inventory-item .btn { min-height: 44px; } }
@@ -225,6 +229,7 @@
 .inventory-item[data-rarity="rare"] .item-tile, .equipped-slot[data-rarity="rare"] .gear-icon { border-color: #64b5ff; box-shadow: inset 0 0 .7cqw #377cca36, 0 0 .3cqw #377cca33; }
 .inventory-item[data-rarity="epic"] .item-tile, .equipped-slot[data-rarity="epic"] .gear-icon { border-color: #b45cff; box-shadow: inset 0 0 .7cqw #8a3fd636, 0 0 .3cqw #8a3fd633; }
 .inventory-item[data-rarity="legendary"] .item-tile, .equipped-slot[data-rarity="legendary"] .gear-icon { border-color: #ff9a2e; box-shadow: inset 0 0 .7cqw #e07a1036, 0 0 .3cqw #e07a1033; }
+.inventory-item[data-rarity="gm"] .item-tile, .equipped-slot[data-rarity="gm"] .gear-icon { border-color: #ffd24a; box-shadow: inset 0 0 .7cqw #ffd24a40, 0 0 .4cqw #ffd24a55; }
 .bag-details { margin-top: .75cqw; min-height: 6.2cqw; padding: .7cqw; border: 1px solid #675b4044; background: #080c0e80; text-align: left; }
 .bag-details .item-name { display: block; color: #f0e5cd; font: 1cqw 'Jua', sans-serif; }
 .bag-details .item-name[data-rarity="common"] { color: #c4c4c4; }
@@ -234,6 +239,7 @@
 .bag-details .item-name[data-rarity="rare"] { color: #64b5ff; }
 .bag-details .item-name[data-rarity="epic"] { color: #b45cff; }
 .bag-details .item-name[data-rarity="legendary"] { color: #ff9a2e; }
+.bag-details .item-name[data-rarity="gm"] { color: #ffd24a; }
 .bag-details small { display: block; color: #baa98c; font: .75cqw/1.5 'Jua', sans-serif; }
 .bag-details p { margin: .4cqw 0; }
 .item-action { margin: .5cqw .4cqw 0 0; }
@@ -251,6 +257,7 @@
 .item-tooltip[data-rarity="rare"] b { color: #64b5ff; }
 .item-tooltip[data-rarity="epic"] b { color: #b45cff; }
 .item-tooltip[data-rarity="legendary"] b { color: #ff9a2e; }
+.item-tooltip[data-rarity="gm"] b { color: #ffd24a; }
 .item-tooltip small { display: block; font-size: 12px; color: #b9baa9; }
 .item-tooltip p { margin: 6px 0; }
 .item-tooltip .item-comparison { color: #9ecf9c; }
@@ -465,6 +472,8 @@
 .char-row { display: flex; gap: .5cqw; align-items: stretch; }
 .char-row .char-play { flex: 1; text-align: left; }
 .char-row .char-del { flex: 0 0 auto; padding-inline: 1em; }
+.char-row.gm .char-play { color: #ffd24a; border-color: #ffd24a99; background: linear-gradient(90deg, #ffd24a22, transparent); }
+#chars-gm { color: #ffd24a; border-color: #ffd24a99; }
 .login-wrap [hidden] { display: none !important; }
 @media (pointer: coarse) { .login-panel .btn, .login-form input { min-height: 44px; } }
 @media (max-width: 760px) { .login-panel { min-width: 80cqw; max-width: 90cqw; padding: 3cqw; } .login-panel h3 { font-size: 20px; } }

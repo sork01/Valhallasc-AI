@@ -705,6 +705,8 @@
     account() { setMode('account'); },
     play(look) { save.char = { ...look }; save.draft = null; persist(); show('game'); },
     create() { load(save.char || cfg); save.draft = { ...cfg }; persist(); Online.newCharacter(); show('create'); },
+    // The game master's own character: the server builds it (golden Warrior), so only the reserved name is sent.
+    createGm() { const draft = { ...cfg }; load({ name: '[GM]Sork', class: 'warrior', gender: 'male' }); Online.newCharacter(); save.char = { ...cfg }; cfg = draft; save.draft = null; persist(); show('game'); },
   });
 
   // ---------- effects: snow, embers, twinkling stars ----------

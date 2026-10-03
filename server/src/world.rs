@@ -40,11 +40,13 @@ pub enum Identity {
     },
     Account {
         id: String,
+        /// The login is a game master's (`Account::is_gm`): it may hold one extra, administrator character.
+        gm: bool,
         character: Option<String>,
         look: Option<Look>,
     },
 }
-/// Characters one account may hold.
+/// Ordinary characters one account may hold. A game master's account has one more slot, for the administrator character.
 pub const MAX_ACCOUNT_CHARACTERS: usize = 5;
 // A Join carries a whole Look and is sent once per connection, so boxing it would only add noise.
 #[allow(clippy::large_enum_variant)]
@@ -100,6 +102,8 @@ struct Player {
     service_at: f64,
     bag_notice_at: f64,
     portal_at: f64,
+    /// Personal god mode of a game master (the debug command `set_god_mode`): no damage for this player only.
+    god: bool,
 }
 impl Player {
     // Called once when hp reaches 0: the XP penalty, then a notice naming what it cost.
@@ -158,6 +162,7 @@ impl Player {
             service_at: -99.,
             bag_notice_at: -99.,
             portal_at: -99.,
+            god: false,
         }
     }
     fn snapshot(&self) -> Value {
@@ -168,7 +173,7 @@ impl Player {
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
-            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored})
+            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored,"gm":c.gm,"god":self.god})
     }
     /// The sum of every active buff of one kind.
     fn buff(&self, kind: BuffKind) -> f64 {
@@ -717,15 +722,29 @@ impl World {
             }
             Identity::Account {
                 id,
+                gm,
                 character: None,
                 look,
             } => {
                 let mut look = look.ok_or("Create a character first.")?;
                 look.name = look.name.trim().into();
                 look.clear_worn();
+                // The reserved name asks for the administrator character; the server then builds it itself.
+                let wants_gm = look.name_is_reserved();
+                if wants_gm {
+                    if !gm || look.name != GM_NAME {
+                        return Err("That name is reserved.".into());
+                    }
+                    if self.store.account_has_gm(&id).map_err(storage)? {
+                        return Err("You already have your [GM] character.".into());
+                    }
+                    look.class = Class::Warrior;
+                    look.gender = Gender::Male;
+                }
                 look.validate()?;
-                if self.store.account_character_count(&id).map_err(storage)?
-                    >= MAX_ACCOUNT_CHARACTERS
+                if !wants_gm
+                    && self.store.account_character_count(&id).map_err(storage)?
+                        >= MAX_ACCOUNT_CHARACTERS
                 {
                     return Err(format!(
                         "Your account already has {MAX_ACCOUNT_CHARACTERS} characters. Delete one first."
@@ -733,7 +752,7 @@ impl World {
                 }
                 let (c, _) = self
                     .store
-                    .create_for(Some(&id), look, self.maps[0].spawn)
+                    .create_character(Some(&id), look, self.maps[0].spawn, wants_gm)
                     .map_err(storage)?;
                 (self.with_start_level(c), None)
             }
@@ -741,6 +760,9 @@ impl World {
                 let mut look = look.ok_or("Create a character first.")?;
                 look.name = look.name.trim().into();
                 look.clear_worn();
+                if look.name_is_reserved() {
+                    return Err("That name is reserved.".into());
+                }
                 look.validate()?;
                 let (c, token) = self
                     .store
@@ -2127,6 +2149,7 @@ impl World {
         }
         let p = &self.players[&session];
         if self.god_mode
+            || p.god
             || p.character.hp <= 0.
             || self.maps[p.character.zone].in_city(p.character.point())
             || p.dash > 0.
@@ -6682,6 +6705,7 @@ mod tests {
                     session,
                     Identity::Account {
                         id: who.to_owned(),
+                        gm: false,
                         character,
                         look,
                     },
@@ -8032,6 +8056,191 @@ mod tests {
             1
         );
         assert!(dbg(&mut w, DebugCommand::SummonKing).is_err());
+    }
+
+    fn join_gm(
+        w: &mut World,
+        session: u64,
+        account: &crate::store::Account,
+        name: &str,
+    ) -> Result<(), String> {
+        let (tx, rx) = mpsc::channel(256);
+        std::mem::forget(rx);
+        w.join_as(
+            session,
+            Identity::Account {
+                id: account.id.clone(),
+                gm: account.is_gm(),
+                character: None,
+                look: Some(Look {
+                    name: name.into(),
+                    class: Class::Mage,
+                    gender: Gender::Female,
+                    ..Look::default()
+                }),
+            },
+            tx,
+        )
+        .map(|_| ())
+    }
+
+    #[test]
+    fn only_the_sso_login_sork_is_a_game_master() {
+        let w = world();
+        assert!(w.store.sso_account("Sork").unwrap().is_gm());
+        assert!(w.store.sso_account("sork").unwrap().is_gm());
+        assert!(!w.store.sso_account("Ann").unwrap().is_gm());
+        let game = w.store.create_account("Sork", "x").unwrap().unwrap();
+        assert!(
+            !game.is_gm(),
+            "a game account may pick any free name but gets nothing"
+        );
+    }
+
+    #[test]
+    fn the_gm_character_is_an_extra_slot_built_by_the_server() {
+        let mut w = world();
+        let sork = w.store.sso_account("Sork").unwrap();
+        // Five ordinary characters fill the ordinary slots; the sixth is the administrator.
+        for n in 0..MAX_ACCOUNT_CHARACTERS {
+            join_gm(&mut w, 1, &sork, &format!("Hero{n}")).unwrap();
+            w.leave(1);
+        }
+        assert!(
+            join_gm(&mut w, 1, &sork, "Hero9").is_err(),
+            "the ordinary cap still holds"
+        );
+        // Whatever class and body the client asks for, the server builds the golden male Warrior.
+        join_gm(&mut w, 1, &sork, GM_NAME).unwrap();
+        let c = &w.players[&1].character;
+        assert!(c.gm);
+        assert_eq!(c.look.name, "[GM]Sork");
+        assert_eq!(
+            (c.look.class, c.look.gender),
+            (Class::Warrior, Gender::Male)
+        );
+        assert_eq!(
+            (
+                c.look.warrior_armor.as_str(),
+                c.look.warrior_weapon.as_str(),
+                c.look.head.as_str()
+            ),
+            ("gm", "gm", "gm")
+        );
+        for id in GM_GEAR {
+            assert_eq!(c.quantity(id), 1, "{id}");
+        }
+        assert!(c.bag_used() <= c.bag_capacity());
+        assert_eq!(w.store.account_characters(&sork.id).unwrap().len(), 6);
+        assert_eq!(w.store.account_character_count(&sork.id).unwrap(), 5);
+        w.leave(1);
+        assert!(
+            join_gm(&mut w, 1, &sork, GM_NAME).is_err(),
+            "only one administrator character"
+        );
+        // The stored character comes back as the administrator.
+        let entry = w.store.account_characters(&sork.id).unwrap().pop().unwrap();
+        assert!(entry.gm);
+    }
+
+    #[test]
+    fn nobody_else_can_take_a_gm_name_or_the_golden_gear() {
+        let mut w = world();
+        let ann = w.store.sso_account("Ann").unwrap();
+        let game = w.store.create_account("Sork", "x").unwrap().unwrap();
+        for who in [&ann, &game] {
+            assert!(join_gm(&mut w, 1, who, GM_NAME).is_err());
+            assert!(join_gm(&mut w, 1, who, "[gm]Ann").is_err());
+            assert!(join_gm(&mut w, 1, who, "Ann [GM]").is_err());
+        }
+        let sork = w.store.sso_account("Sork").unwrap();
+        assert!(
+            join_gm(&mut w, 1, &sork, "[GM]Other").is_err(),
+            "even Sork gets only [GM]Sork"
+        );
+        let (tx, _rx) = mpsc::channel(8);
+        let look = Look {
+            name: "[GM]Guest".into(),
+            ..Look::default()
+        };
+        assert!(w.join(2, None, Some(look), tx).is_err(), "guests too");
+        // A look that asks for the gear in its draft is reset to the starters.
+        let (tx, _rx) = mpsc::channel(8);
+        let look = Look {
+            warrior_armor: "gm".into(),
+            warrior_weapon: "gm".into(),
+            ..Look::default()
+        };
+        w.join(3, None, Some(look), tx).unwrap();
+        let c = &w.players[&3].character;
+        assert!(!c.gm);
+        assert_eq!(
+            (
+                c.look.warrior_armor.as_str(),
+                c.look.warrior_weapon.as_str()
+            ),
+            ("crimson", "sword")
+        );
+        let mut c = c.clone();
+        assert!(
+            c.equip_owned("gm", "gm").is_err(),
+            "not owned, so not wearable"
+        );
+        c.add_item("warrior_weapon_gm", 1);
+        assert!(c.sell_item("warrior_weapon_gm", 1).is_err());
+    }
+
+    #[test]
+    fn a_game_master_runs_the_debug_commands_on_a_public_server_and_nobody_else_does() {
+        let mut w = world();
+        assert!(!w.test_commands);
+        let sork = w.store.sso_account("Sork").unwrap();
+        join_gm(&mut w, 1, &sork, GM_NAME).unwrap();
+        let _ = join(&mut w, 2, Class::Warrior);
+        let (tx, mut gm_rx) = mpsc::channel(64);
+        w.players.get_mut(&1).unwrap().peer = tx;
+        let run = |w: &mut World, session: u64, text: &str| {
+            w.message(
+                session,
+                serde_json::from_str(&format!(r#"{{"type":"debug","ref":1,"command":{text}}}"#))
+                    .unwrap(),
+            );
+        };
+        run(&mut w, 1, r#"{"op":"set_level","level":30}"#);
+        assert_eq!(w.players[&1].character.level, 30);
+        assert_eq!(packets(&mut gm_rx, "debug").pop().unwrap()["ok"], true);
+        run(
+            &mut w,
+            1,
+            r#"{"op":"give_item","item":"slime_gel","quantity":3}"#,
+        );
+        assert_eq!(w.players[&1].character.quantity("slime_gel"), 3);
+        run(&mut w, 1, r#"{"op":"teleport","zone":1,"x":40.0,"y":40.0}"#);
+        assert_eq!(w.players[&1].character.zone, 1);
+        // Another player is refused every one of them.
+        run(&mut w, 2, r#"{"op":"set_level","level":30}"#);
+        assert_eq!(w.players[&2].character.level, 1);
+        // God mode is personal: the world flag stays off and the other player still takes damage.
+        run(&mut w, 1, r#"{"op":"set_god_mode","enabled":true}"#);
+        assert!(w.players[&1].god && !w.god_mode && !w.players[&2].god);
+        assert_eq!(w.players[&1].snapshot()["god"], true);
+        assert_eq!(w.players[&1].snapshot()["gm"], true);
+        let before = w.players[&1].character.hp;
+        w.hurt_player(1, 50., Point::default());
+        assert_eq!(w.players[&1].character.hp, before);
+        run(&mut w, 2, r#"{"op":"set_god_mode","enabled":true}"#);
+        assert!(!w.god_mode && !w.players[&2].god, "refused for a non-GM");
+        // Goto finds a player by name, in any zone.
+        let name = w.players[&2].character.look.name.clone();
+        let zone = w.players[&2].character.zone;
+        run(
+            &mut w,
+            1,
+            &format!(r#"{{"op":"goto","name":"{}"}}"#, name.to_uppercase()),
+        );
+        assert_eq!(w.players[&1].character.zone, zone);
+        run(&mut w, 1, r#"{"op":"goto","name":"nobody"}"#);
+        assert_eq!(packets(&mut gm_rx, "debug").pop().unwrap()["ok"], false);
     }
 
     #[test]

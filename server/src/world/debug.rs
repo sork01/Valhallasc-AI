@@ -1,13 +1,20 @@
 //! Test-server shortcuts. They exist so automated tests can reach a state (level 20, a quest turned in, a far zone)
 //! without hours of play, while every rule that is not the shortcut itself still runs: rewards, level-up events, unlocks,
 //! drops, saves. `World::test_commands` stays off unless VALHALLA_TEST_COMMANDS=1, and the public service never sets it.
+//! The one exception is the administrator character (`Character::gm`, only ever created for the site login Sork): it
+//! may run the same commands on the public service, from its chat box (`/tp`, `/give`, `/level` ...), and every command
+//! it runs is written to the log. For it `set_god_mode` is personal instead of world-wide.
 use super::*;
 
 const MAX_DEBUG_LEVEL: u32 = 100;
 
 impl World {
     pub(super) fn debug(&mut self, session: u64, reference: Option<u64>, command: DebugCommand) {
-        let outcome = if self.test_commands {
+        let gm = self.players.get(&session).filter(|p| p.character.gm);
+        if let Some(p) = gm {
+            tracing::info!(gm = %p.character.look.name, ?command, "game master command");
+        }
+        let outcome = if self.test_commands || gm.is_some() {
             self.run_debug(session, command)
         } else {
             Err("Test commands are disabled on this server.".to_owned())
@@ -114,8 +121,36 @@ impl World {
                 json!({"cleared":true})
             }
             DebugCommand::SetGodMode { enabled } => {
-                self.god_mode = enabled;
+                if p.character.gm {
+                    p.god = enabled;
+                } else {
+                    self.god_mode = enabled;
+                }
                 json!({"godMode":enabled})
+            }
+            DebugCommand::Goto { name } => {
+                let wanted = name.trim().to_lowercase();
+                let target = self
+                    .players
+                    .iter()
+                    .filter(|(id, _)| **id != session)
+                    .map(|(_, other)| &other.character)
+                    .find(|c| c.look.name.to_lowercase() == wanted)
+                    .ok_or_else(|| format!("No player named {name} is online."))?;
+                let (zone, x, y) = (target.zone, target.x, target.y);
+                let mut arrival = Point { x, y };
+                self.maps[zone].collide(&mut arrival, PLAYER_RADIUS);
+                let time = self.time;
+                let p = self.players.get_mut(&session).ok_or("Unknown session.")?;
+                p.character.zone = zone;
+                p.character.x = arrival.x;
+                p.character.y = arrival.y;
+                p.portal_at = time;
+                p.stop();
+                p.attack = 0.;
+                p.dash = 0.;
+                self.separate_enemies();
+                json!({"zone":zone,"x":arrival.x,"y":arrival.y})
             }
             DebugCommand::Teleport { zone, x, y } => {
                 if zone >= self.maps.len() {

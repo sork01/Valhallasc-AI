@@ -1,4 +1,4 @@
-use crate::model::{Character, Class};
+use crate::model::{Character, Class, GM_NAME};
 use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 
@@ -116,6 +116,13 @@ pub fn material(kind: &str) -> &'static str {
         _ => "slime_gel",
     }
 }
+/// The golden gear of the administrator character. Its rarity "gm" is not in `RARITIES`, so no enemy ever rolls it.
+pub const GM_RARITY: &str = "gm";
+pub const GM_GEAR: [&str; 3] = [
+    "warrior_armor_gm",
+    "warrior_headgear_gm",
+    "warrior_weapon_gm",
+];
 /// Rarity tiers, lowest first. The catalog colours them gray, green, blue, purple and orange.
 pub const RARITIES: [&str; 5] = ["common", "uncommon", "rare", "epic", "legendary"];
 /// Elites (special enemies) roll every tier this many times as often, and are the only source of legendary gear.
@@ -139,6 +146,7 @@ pub fn rarity_color(rarity: &str) -> &'static str {
         "rare" => "#4aa3ff",
         "epic" => "#b45cff",
         "legendary" => "#ff9a2e",
+        "gm" => "#ffd24a",
         _ => "#c4c4c4",
     }
 }
@@ -313,6 +321,24 @@ impl Character {
             }
         }
     }
+    /// Turns a new character into the administrator character: a male Warrior named [GM]Sork wearing the golden robe,
+    /// top hat, sword and shield. Called by the store while the character is created, never for a loaded save.
+    pub fn become_gm(&mut self) {
+        self.gm = true;
+        self.look.name = GM_NAME.into();
+        self.look.class = Class::Warrior;
+        self.look.gender = crate::model::Gender::Male;
+        self.hp = self.max_hp();
+        for id in GM_GEAR {
+            if self.quantity(id) == 0 {
+                self.add_item(id, 1);
+            }
+        }
+        let _ = self.look.equip("gm", "gm");
+        self.equipment
+            .insert("headgear".into(), "warrior_headgear_gm".into());
+        self.sync_look();
+    }
     /// Gives a character the starter pieces of their class that they do not own yet (new catalog entries reach
     /// existing saves this way). Starter gear cannot be sold, so a missing one was never granted. Pieces that would
     /// overfill the bags wait for the next load.
@@ -470,6 +496,9 @@ impl Character {
         if i.starter {
             return Err("Starter gear cannot be sold.");
         }
+        if i.rarity == GM_RARITY {
+            return Err("Game master gear cannot be sold.");
+        }
         let available = self.quantity(id).saturating_sub(self.equipped_count(i));
         if quantity == 0 || quantity > available {
             return Err("You can only sell items you own. Equipped items must be kept.");
@@ -600,10 +629,28 @@ mod tests {
         }
     }
     #[test]
+    fn game_master_gear_never_drops_and_the_gm_rarity_cannot_be_rolled() {
+        assert_eq!(GM_GEAR.len(), 3);
+        for id in GM_GEAR {
+            let i = item(id).expect("in the catalog");
+            assert_eq!(
+                (i.rarity.as_str(), i.sell, i.starter),
+                (GM_RARITY, 0, false),
+                "{id}"
+            );
+        }
+        assert_eq!(base_drop_chance(GM_RARITY), 0.);
+        for kind in ["green", "big", "cinderlord", "hydra"] {
+            for n in 0..2000 {
+                assert_ne!(roll_rarity(kind, n as f64 / 2000.), Some(GM_RARITY));
+            }
+        }
+    }
+    #[test]
     fn every_item_has_a_known_rarity_and_starters_are_common() {
         for i in ITEMS.iter() {
             assert!(
-                RARITIES.contains(&i.rarity.as_str()),
+                RARITIES.contains(&i.rarity.as_str()) || i.rarity == GM_RARITY,
                 "{} has rarity {}",
                 i.id,
                 i.rarity
@@ -958,7 +1005,11 @@ mod tests {
             (1.30..=1.40).contains(&(tier("epic") / tier("uncommon"))),
             "purple vs green"
         );
-        for i in ITEMS.iter().filter(|i| i.attack > 0. || i.defense > 0.) {
+        // The game master's gear is outside the ladder: it never drops and is not for sale.
+        for i in ITEMS
+            .iter()
+            .filter(|i| (i.attack > 0. || i.defense > 0.) && i.rarity != GM_RARITY)
+        {
             let base = match i.kind.as_str() {
                 "weapon" => 4.,
                 "armor" if matches!(i.class, Some(Class::Mage | Class::Assassin)) => 2.,

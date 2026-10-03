@@ -296,7 +296,7 @@ class Sheet:
         self.all_parts = ['body'] + [f'{slot}_{v}' for slot in SLOT_ORDER for v in slots.get(slot, ())]
         self.parts = [part for part in self.all_parts if part not in self.legacy]
         tier_parts = lambda t: [f'{slot}_{t}' for slot in ('armor', 'shoulders', 'gloves', 'head') if f'{slot}_{t}' in self.parts]
-        t1, t2 = slots['armor']
+        t1, t2 = slots['armor'][:2]      # a third armor (the warrior's gm robe) belongs to an explicit group
         weapons = [f'weapon_{v}' for v in slots['weapon'] if f'weapon_{v}' in self.parts]
         ref = lambda: ['ref_body'] if 'body' in self.parts else []
         self.groups = groups or {t1: (['body'] if 'body' in self.parts else []) + tier_parts(t1), t2: ref() + tier_parts(t2), 'arms': ref() + weapons}
@@ -419,9 +419,18 @@ class Sheet:
         ids.update(pf.ids(self.pixel))      # list shows only the newest 100, so the manifest carries the rest
         return ids
 
-    def build(self, replace=False):
+    def selected(self, only):
+        """The groups a build or export touches: all of them, or just the named ones (`--only gm`)."""
+        if only:
+            unknown = set(only) - set(self.groups)
+            assert not unknown, f'unknown groups {sorted(unknown)}; the groups are {list(self.groups)}'
+        return {g: layers for g, layers in self.groups.items() if not only or g in only}
+
+    def build(self, replace=False, only=None):
         pf = self.pixel_api()
-        existing = self.pixel_ids(pf)
+        groups = self.selected(only)
+        everything = self.pixel_ids(pf)
+        existing = {name: sid for name, sid in everything.items() if name.rsplit('_', 1)[1] in groups}
         if existing and not replace:
             raise SystemExit(f'{self.name} sprites already exist; use export to keep edits, or build --replace to discard them.')
         for sid in existing.values():
@@ -432,7 +441,7 @@ class Sheet:
             for clip, (fps, n, _) in self.clips.items():
                 for facing in DIRS:
                     frames = [self.read_frame(clip, facing, k) for k in range(n)]
-                    for group, layers in self.groups.items():
+                    for group, layers in groups.items():
                         assert FW * FH * len(layers) * n <= 1048576
                         name = self.pixel_name(clip, facing, group)
                         sid = pf.create(name, FW, FH, n, self.palette, fps=fps, layers=len(layers),
@@ -450,20 +459,23 @@ class Sheet:
                 pf.api('delete', {'sprite_id': sid})
             raise
         self.cache.mkdir(exist_ok=True)
-        (self.cache / 'editor_ids.txt').write_text(json.dumps(ids, indent=2) + '\n')
+        kept = {name: sid for name, sid in everything.items() if name not in existing}      # groups this build did not touch
+        (self.cache / 'editor_ids.txt').write_text(json.dumps({**kept, **ids}, indent=2) + '\n')
 
-    def export(self, local=False):
+    def export(self, local=False, only=None):
         pf = None if local else self.pixel_api()
         ids = {} if local else self.pixel_ids(pf)
+        groups = self.selected(only)
+        parts = [part for part in self.parts if not only or any(part in layers for layers in groups.values())]
         meta_clips = {clip: {'row0': ci * 8, 'n': n, 'fps': fps} for ci, (clip, (fps, n, _)) in enumerate(self.clips.items())}
         size = (FW * 8, FH * 8 * len(self.clips))
-        atlases = {part: Image.new('RGBA', size) for part in self.parts}
-        depths = {part: Image.new('RGB', size, (255, 255, 0)) for part in self.parts}
+        atlases = {part: Image.new('RGBA', size) for part in parts}
+        depths = {part: Image.new('RGB', size, (255, 255, 0)) for part in parts}
         for clip, (_, n, _) in self.clips.items():
             for di, facing in enumerate(DIRS):
                 edited = {}
                 if not local:
-                    for group, layers in self.groups.items():
+                    for group, layers in groups.items():
                         sp, frames = pf.load(ids[self.pixel_name(clip, facing, group)])
                         assert (sp['width'], sp['height']) == (FW, FH) and len(frames) == n
                         assert [layer['name'] for layer in sp['layers']] == layers
@@ -473,7 +485,7 @@ class Sheet:
                 for k in range(n):
                     raw = self.read_frame(clip, facing, k)
                     x, y = k * FW, (meta_clips[clip]['row0'] + di) * FH
-                    for part in self.parts:
+                    for part in parts:
                         depth = raw[part][1].copy()
                         if edited:
                             palette, grids = edited[part]
@@ -494,7 +506,7 @@ class Sheet:
                         atlases[part].paste(picture, (x, y))
                         depths[part].paste(Image.fromarray(rgb, 'RGB'), (x, y))
             print('export', clip, flush=True)
-        for part in self.parts:
+        for part in parts:
             atlases[part].save(ASSETS / f'{self.files}_{part}.png', optimize=True)
             depths[part].save(ASSETS / f'{self.files}_{part}_depth.png', optimize=True)
         meta = {'frame': [FW, FH], 'anchor': [AX, AY], 'dirs': DIRS, 'clips': meta_clips,
@@ -511,7 +523,7 @@ class Sheet:
                             'ref_body layers are read-only context. build --replace discards edits.'),
                 **self.meta}
         (ASSETS / f'{self.files}_sprites.txt').write_text(json.dumps(meta, indent=2) + '\n')
-        print('exported', len(self.parts), 'parts and depth maps', size, flush=True)
+        print('exported', len(parts), 'parts and depth maps', size, flush=True)
 
     def cli(self):
         ap = argparse.ArgumentParser(description=f'{self.name}: preview | build [--replace] | export [--local]')
@@ -520,10 +532,11 @@ class Sheet:
         ap.add_argument('directory', nargs='?', default=os.path.join(os.environ.get('TMPDIR', '/tmp'), f'valhalla-{self.name}-preview'))
         ap.add_argument('--replace', action='store_true')
         ap.add_argument('--local', action='store_true')
+        ap.add_argument('--only', nargs='+', metavar='GROUP', help='build or export just these PixelFlow groups (the rest are left as they are, edits and all)')
         args = ap.parse_args()
         if args.command == 'preview':
             self.preview(list(self.clips) if args.clip == 'all' else [args.clip], Path(args.directory))
         elif args.command == 'build':
-            self.build(args.replace)
+            self.build(args.replace, args.only)
         else:
-            self.export(args.local)
+            self.export(args.local, args.only)

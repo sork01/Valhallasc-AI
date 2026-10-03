@@ -8881,5 +8881,44 @@
     "sell": 8,
     "mana": 100,
     "cooldown": 60
+  },
+  {
+    "id": "warrior_armor_gm",
+    "name": "Golden Robe of the Game Master",
+    "kind": "armor",
+    "rarity": "gm",
+    "requiredLevel": 1,
+    "sell": 0,
+    "class": "warrior",
+    "variant": "gm",
+    "attack": 0.0,
+    "defense": 12.0,
+    "starter": false
+  },
+  {
+    "id": "warrior_headgear_gm",
+    "name": "Golden Top Hat",
+    "kind": "headgear",
+    "rarity": "gm",
+    "requiredLevel": 1,
+    "sell": 0,
+    "class": "warrior",
+    "variant": "gm",
+    "attack": 0.0,
+    "defense": 4.0,
+    "starter": false
+  },
+  {
+    "id": "warrior_weapon_gm",
+    "name": "Golden Sword & Shield",
+    "kind": "weapon",
+    "rarity": "gm",
+    "requiredLevel": 1,
+    "sell": 0,
+    "class": "warrior",
+    "variant": "gm",
+    "attack": 20.0,
+    "defense": 4.0,
+    "starter": false
   }
 ]

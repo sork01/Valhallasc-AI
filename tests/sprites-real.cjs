@@ -67,12 +67,19 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
       // other tier, and goes away again with 'none'.
       for (const slot of ['head', 'shoulders', 'gloves']) {
         if (!gear.tiers.length) { check((await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: 'crimson' })).hash === dressed.hash, `${cls}: no ${slot} layer, so a ${slot} piece changes nothing`); continue; }
-        const worn = [];
-        for (const tier of gear.tiers) worn.push(await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: tier }));
+        const worn = [], slotTiers = gear.tiers.filter(t => t !== 'gm' || slot === 'head');      // the game master's set has a hat but no shoulders or gloves
+        for (const tier of slotTiers) worn.push(await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: tier }));
         check(worn.every(w => w.hash !== dressed.hash && w.visible > 0), `${cls}: each ${slot} tier is drawn`);
         check(worn[0].hash !== worn[1].hash, `${cls}: the two ${slot} tiers look different`);
         check((await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: 'none' })).hash === dressed.hash, `${cls}: ${slot} 'none' removes the layer`);
         check((await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: 'azure_not_a_tier' })).hash === dressed.hash, `${cls}: an unknown ${slot} tier is ignored`);
+      }
+      if (cls === 'warrior') {
+        // The game master's golden robe, top hat, sword and shield (items.txt rarity "gm"): each is its own layer, drawn, and different from every other set.
+        const gold = await figure(page, cls, 'gm', 'gm', { head: 'gm' }), robe = await figure(page, cls, 'gm', gear.weapon[0]), blade = await figure(page, cls, gear.armor[0], 'gm'), hat = await figure(page, cls, gear.armor[0], gear.weapon[0], { head: 'gm' });
+        check(robe.hash !== dressed.hash && blade.hash !== dressed.hash && hat.hash !== dressed.hash, 'warrior: the golden robe, golden sword and shield and golden top hat each change the figure');
+        check(new Set([gold.hash, dressed.hash, other.hash, robe.hash, blade.hash, hat.hash]).size === 6, 'warrior: the golden set is its own picture');
+        check(gold.visible > dressed.visible, `warrior: the golden set is a full figure (${gold.visible} visible pixels)`);
       }
       if (gear.tiers.length) {
         const all = await figure(page, cls, gear.armor[0], gear.weapon[0], { head: gear.tiers[0], shoulders: gear.tiers[0], gloves: gear.tiers[0] });
@@ -117,7 +124,7 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
       for (const slot of ['head', 'shoulders', 'gloves']) {
         if (!gear.tiers.length) continue;
         const worn = [];
-        for (const tier of gear.tiers) worn.push(await f(gear.armor[0], gear.weapon[0], { [slot]: tier }));
+        for (const tier of gear.tiers.filter(t => t !== 'gm' || slot === 'head')) worn.push(await f(gear.armor[0], gear.weapon[0], { [slot]: tier }));
         check(worn.every(w => w.hash !== fDressed.hash && w.visible > 0) && worn[0].hash !== worn[1].hash, `${cls} (female): each ${slot} tier is drawn and they differ`);
         check((await f(gear.armor[0], gear.weapon[0], { [slot]: 'none' })).hash === fDressed.hash, `${cls} (female): ${slot} 'none' removes the layer`);
       }
