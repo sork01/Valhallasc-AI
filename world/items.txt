@@ -9266,8 +9266,8 @@
     "sell": 0,
     "class": "warrior",
     "variant": "gm",
-    "attack": 20.0,
-    "defense": 4.0,
+    "attack": 10020.0,
+    "defense": 10004.0,
     "starter": false
   },
   {

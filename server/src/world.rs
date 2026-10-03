@@ -17,6 +17,7 @@ mod ranged;
 #[cfg(test)]
 mod resource_tests;
 mod resources;
+mod rolls;
 mod social;
 #[cfg(test)]
 mod vault_tests;
@@ -554,6 +555,10 @@ pub struct World {
     // The private copies of every dungeon (world/instances.rs).
     instances: Vec<instances::Instance>,
     drops: Vec<Drop>,
+    // Party loot rolls in progress (world/rolls.rs).
+    rolls: Vec<rolls::Roll>,
+    // Whose turn the next round-robin drop is, per party (keyed by its first member's character id).
+    loot_turns: BTreeMap<String, usize>,
     // Failed disconnect writes are retried by the next periodic transaction.
     pending_saves: Vec<Character>,
     time: f64,
@@ -606,6 +611,8 @@ impl World {
             enemy_bolts: vec![],
             instances,
             drops: vec![],
+            rolls: vec![],
+            loot_turns: BTreeMap::new(),
             pending_saves: vec![],
             time: 0.,
             tick: 0,
@@ -1135,6 +1142,7 @@ impl World {
             ClientMessage::Social { command } => {
                 self.social(session, command);
             }
+            ClientMessage::Roll { id, choice } => self.roll_vote(session, id, choice),
             ClientMessage::Ping { nonce } => {
                 let _ = p.peer.try_send(json!({"type":"pong","nonce":nonce}));
             }
@@ -1364,6 +1372,7 @@ impl World {
         self.update_bolts();
         self.update_enemy_bolts();
         self.update_drops();
+        self.update_rolls();
         let stale: Vec<_> = self
             .players
             .iter()
@@ -2172,26 +2181,13 @@ impl World {
                 let point = self.players[&credit].character.point();
                 self.level_up_event(&credit_id, point, levels);
             }
-            let id = self.entity();
             let value = if gold > 0 {
                 gold
             } else {
                 3 + (self.random() * 4.) as u32
             };
-            self.drops.push(Drop {
-                id,
-                owner: credit_id.clone(),
-                zone,
-                x: point.x,
-                y: point.y,
-                z: 8.,
-                value,
-                item: None,
-                quantity: 0,
-                t: 0.,
-                col: "#ffe066",
-            });
-            self.item_drop(&credit_id, zone, point, material(&kind), 1);
+            self.gold_drop(&credit_id, zone, point, value);
+            self.loot_drop(&credit_id, zone, point, material(&kind));
             if is_boss(&kind) {
                 self.boss_loot(&kind, zone, point, &contributors);
             }
@@ -2201,7 +2197,7 @@ impl World {
             let chance = self.random();
             let choice = self.random();
             if let Some(i) = roll_equipment(&kind, level, chance, choice) {
-                self.item_drop(&credit_id, zone, point, &i.id, 1);
+                self.loot_drop(&credit_id, zone, point, &i.id);
             }
         }
         dealt
@@ -2391,7 +2387,9 @@ impl World {
                             s.volley = true;
                         } else if d > r.range * 0.85 {
                             goal = Some(point);
-                        } else if d < r.range * 0.35 && !is_elite(&s.kind) {
+                        } else if d < r.range * 0.35
+                            && matches!(s.kind.as_str(), "archer" | "acolyte")
+                        {
                             // Too close for comfort: back away from the hero while the shot recovers.
                             let away = point.direction(s.point());
                             goal = Some(Point {

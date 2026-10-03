@@ -176,7 +176,11 @@ pub fn rarity_color(rarity: &str) -> &'static str {
     }
 }
 pub fn is_elite(kind: &str) -> bool {
-    matches!(kind, "big" | "cinderlord" | "gloomroot") || is_boss(kind)
+    matches!(kind, "big" | "cinderlord" | "gloomroot") || is_vault_enemy(kind)
+}
+/// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.
+pub fn is_vault_enemy(kind: &str) -> bool {
+    matches!(kind, "thrall" | "archer" | "acolyte") || is_boss(kind)
 }
 /// The four bosses of the Undervault (the dungeon under Skaldholm). Each pays every contributor a guaranteed blue piece.
 pub fn is_boss(kind: &str) -> bool {

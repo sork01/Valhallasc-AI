@@ -398,6 +398,20 @@
 .party-frame .social-row { padding: .3cqw .5cqw; background: #101a2ccc; flex-wrap: wrap; gap: .2cqw .5cqw; }
 .party-frame .social-who small { display: none; }
 .party-frame .member-bar { width: 100%; height: 1cqw; }
+.loot-rolls { position: absolute; left: 50%; top: 11cqw; transform: translateX(-50%); z-index: 43; align-items: stretch; display: flex; flex-direction: column; gap: .5cqw; width: 18cqw; }
+.roll-card { padding: .6cqw .8cqw; border: 1px solid #d9c492aa; border-radius: .6cqw; background: #1b2530f2; color: #f6ead0; font: .95cqw 'Jua', sans-serif; box-shadow: 0 .4cqw 1.2cqw #0009; }
+.roll-card[data-rarity="rare"] { border-color: #4aa3ffb0; }
+.roll-card[data-rarity="epic"] { border-color: #b45cffb0; }
+.roll-card[data-rarity="legendary"] { border-color: #ff9a2eb0; }
+.roll-head { display: flex; justify-content: space-between; gap: .6cqw; align-items: baseline; }
+.roll-time { color: #cdbd93; font-size: .85cqw; }
+.roll-stats { display: block; margin: .15cqw 0 .4cqw; color: #b9c2cc; font-size: .8cqw; }
+.roll-buttons { display: flex; gap: .4cqw; }
+.roll-buttons button { flex: 1; min-height: 2.2cqw; border: 1px solid #b89b5c80; border-radius: .4cqw; background: #26364a; color: #fff; font: inherit; cursor: pointer; }
+.roll-buttons button:hover:not(:disabled) { background: #345074; }
+.roll-buttons button:disabled { opacity: .45; cursor: default; }
+.roll-buttons .roll-need { border-color: #6fdc8c; }
+.roll-buttons button:focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }
 .social-invites { position: absolute; left: 50%; top: 5cqw; transform: translateX(-50%); z-index: 44; display: flex; flex-direction: column; gap: .6cqw; align-items: center; }
 .invite-card { display: flex; align-items: center; gap: .8cqw; padding: .6cqw 1cqw; border: 1px solid #d9c492aa; border-radius: .6cqw; background: #1f2d29f2; color: #f6ead0; font: 1cqw 'Jua', sans-serif; box-shadow: 0 .4cqw 1.2cqw #0009; }
 .invite-card p { margin: 0; }

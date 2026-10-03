@@ -823,6 +823,11 @@ pub enum ClientMessage {
     Social {
         command: SocialCommand,
     },
+    /// A vote on a party loot roll (server/src/world/rolls.rs).
+    Roll {
+        id: u64,
+        choice: RollChoice,
+    },
     Ping {
         nonce: u64,
     },
@@ -836,6 +841,15 @@ pub enum ClientMessage {
 
 /// A target is the character id (from the friends list, the online list or an invite), or else a name that
 /// must match exactly one online player.
+/// What a party member says about a piece of gear that dropped: need it (to wear it), want it for the gold, or pass.
+#[derive(Debug, Deserialize, serde::Serialize, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum RollChoice {
+    Need,
+    Greed,
+    Pass,
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 pub enum SocialCommand {
