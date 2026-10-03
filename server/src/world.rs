@@ -13,6 +13,7 @@ mod consumables;
 mod debug;
 mod instances;
 mod mercs;
+mod partyxp;
 mod ranged;
 #[cfg(test)]
 mod resource_tests;
@@ -2144,7 +2145,7 @@ impl World {
             json!({"enemy":kind,"level":level,"skill":self.cur_skill,"killed":killed}),
         );
         if killed {
-            // Only explicitly shared quests benefit. XP, loot and ordinary quests retain their killer ownership.
+            // Only explicitly shared quests benefit. Ordinary quests keep their killer's ownership; XP and loot are shared by `partyxp.rs` and `rolls.rs`.
             let contributors = self.slimes[id].contributors.clone();
             if is_elite(&kind) {
                 for (&other, player) in &mut self.players {
@@ -2168,7 +2169,8 @@ impl World {
             let p = self.players.get_mut(&credit).unwrap();
             p.character.kills += 1;
             quest_progress(&mut p.character, &self.maps[zone].quests, "kill", &kind);
-            let levels = p.character.grant_xp(xp);
+            // A party shares the XP (see `partyxp.rs`); alone, the killer's hero gets all of it.
+            let (xp, levels) = self.share_xp(&credit_id, zone, point, xp, level, &kind);
             self.event_with(
                 "slimeDie",
                 &credit_id,

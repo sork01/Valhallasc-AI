@@ -37,6 +37,7 @@
       case 'hit': return [[`You hit ${who(e.enemy, e.level)} for ${e.value}${e.crit ? ' (critical)' : ''} with ${e.skill ? skillName(e.skill) : 'a basic attack'}.`, e.crit ? 'sys-crit' : 'sys-dealt']];
       case 'miss': return [['Your attack missed.', 'sys-dealt']];
       case 'slimeDie': return [[`${who(e.enemy, e.level)} was defeated. +${e.xp} XP.`, 'sys-xp']];
+      case 'partyXp': return [[`${who(e.enemy, e.level)} was defeated by your party. +${e.xp} XP.`, 'sys-xp']];
       case 'hurt': return [[`${e.enemy ? who(e.enemy, e.level) : 'Something'} hits you for ${e.value}.`, 'sys-taken']];
       case 'dodge': return [[`You dodge an attack${e.enemy ? ` from ${who(e.enemy, e.level)}` : ''}.`, 'sys-taken']];
       case 'death': return [[`You were slain${e.enemy ? ` by ${who(e.enemy, e.level)}` : ''}.`, 'sys-taken']];

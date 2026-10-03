@@ -340,6 +340,10 @@ pub struct Character {
     /// golden GM gear. Set only by the server when that character is created; a client's look can never carry it.
     #[serde(default)]
     pub gm: bool,
+    /// Fellowship points earned by killing in a party (see `world/partyxp.rs`). The party's level comes from the
+    /// average of its members' points, so it survives a restart and a party that is rebuilt.
+    #[serde(default)]
+    pub party_points: u32,
 }
 impl Character {
     /// A hired mercenary: this class and level with the class's starter gear and a few potions, every stat point in the
@@ -371,6 +375,7 @@ impl Character {
             potion_ready: 0,
             explored: vec![],
             gm: false,
+            party_points: 0,
         };
         c.seed_inventory();
         // The best potions the mercenary's level allows: health for everyone, mana for casters.

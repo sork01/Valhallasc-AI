@@ -88,6 +88,8 @@ async function call(name, args = {}) {
   await alice.keyboard.press('Escape'); // closes the panel that is still open on the friends tab
   await alice.keyboard.press('p');
   check(await alice.locator('#social-body [data-list="party"] .social-row').count() === 2, 'The party tab lists the members');
+  check(await alice.locator('#party-frame .party-head').textContent().then(t => t.includes('Lv 1')), 'The frame header shows the party level');
+  check(await alice.locator('#social-body .party-level').textContent().then(t => t.includes('Party level 1/5') && t.includes('40%')), 'The party tab shows the party level and the XP share');
   check(await alice.locator('#social-body button', { hasText: 'Make leader' }).count() === 1 && await alice.locator('#social-body button', { hasText: 'Remove' }).count() === 1, 'The leader gets promote and remove for the other member');
   await bobby.keyboard.press('p');
   check(await bobby.locator('#social-body button', { hasText: 'Make leader' }).count() === 0 && await bobby.locator('#social-body').textContent().then(t => t.includes('Only the leader can invite')), 'A member gets no leader controls');

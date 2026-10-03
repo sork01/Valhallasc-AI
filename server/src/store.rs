@@ -140,6 +140,7 @@ impl Store {
             potion_ready: 0,
             explored: vec![],
             gm: false,
+            party_points: 0,
         };
         c.seed_inventory();
         if gm {

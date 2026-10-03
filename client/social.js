@@ -53,6 +53,16 @@
     text.textContent = !m.online ? '' : m.dead ? 'Defeated' : `${Math.ceil(m.hp)}/${Math.ceil(m.maxHp)}`;
     row.dataset.dead = String(!!m.dead);
   }
+  // Party level: how much of a kill's XP each member earns, and the progress to the next level.
+  function fellowship(xp) {
+    const box = el('div', '', 'party-level'); box.dataset.partyLevel = String(xp?.level || 1);
+    if (!xp) return box;
+    const next = xp.next, share = next ? Math.max(0, Math.min(1, (xp.points - xp.from) / (next - xp.from))) : 1;
+    const bar = el('div', '', 'party-level-bar'), fill = el('i'); fill.style.width = `${share * 100}%`; bar.append(fill);
+    box.append(el('b', `Party level ${xp.level}/${xp.maxLevel}`), el('span', ` · each member earns ${xp.xpPercent}% of an enemy's XP${xp.xpPercent >= 100 ? ' (as much as alone)' : ''}`), bar,
+      el('small', next ? `${xp.points - xp.from}/${next - xp.from} to level ${xp.level + 1}. Kill together, near each other, to level the party.` : 'Maximum party level.', 'social-note'));
+    return box;
+  }
   function sectionTitle(text) { return el('h4', text, 'social-title'); }
   function inviteRows(list) {
     return list.map(i => {
@@ -90,7 +100,7 @@
     if (!party) {
       body.append(el('p', 'You are not in a party. Invite a player by name, from the Friends tab, or from the Online tab. A party holds up to 5.', 'social-note'));
     } else {
-      body.append(sectionTitle(`Party (${party.members.length}/${party.max})`));
+      body.append(sectionTitle(`Party (${party.members.length}/${party.max})`), fellowship(party.xp));
       const list = el('ul', '', 'social-list'); list.dataset.list = 'party';
       list.append(...party.members.map(m => member(m, true)));
       body.append(list, button('Leave party', 'leave', () => send({ op: 'party_leave' }), 'window-tool danger'));
@@ -146,7 +156,7 @@
   function renderFrame() {
     const frame = $('party-frame'), party = state.party;
     frame.hidden = !party; if (!party) { frame.replaceChildren(); return; }
-    const head = button(`Party ${party.members.length}/${party.max} · P`, 'frame-open', () => show('party'), 'party-head');
+    const head = button(`Party ${party.members.length}/${party.max} · Lv ${party.xp?.level || 1} · P`, 'frame-open', () => show('party'), 'party-head');
     const list = el('ul', '', 'social-list');
     list.append(...party.members.map(m => member(m, false)));
     frame.replaceChildren(head, list);
@@ -172,7 +182,7 @@
     }
   }
   function render() { renderFrame(); renderPrompts(); renderPanel(); }
-  const shape = party => party && JSON.stringify([party.leader, party.members.map(m => [m.id, m.online, m.dead, m.level, m.place])]);
+  const shape = party => party && JSON.stringify([party.leader, party.xp, party.members.map(m => [m.id, m.online, m.dead, m.level, m.place])]);
   // Party health arrives twice a second; update the bars in place and rebuild only when the members change.
   function updateParty(party) {
     const changed = shape(party) !== shape(state.party);

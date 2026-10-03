@@ -61,7 +61,7 @@ pub struct Social {
 }
 
 impl World {
-    fn online(&self, id: &str) -> Option<&Player> {
+    pub(super) fn online(&self, id: &str) -> Option<&Player> {
         self.players.values().find(|p| p.character.id == id)
     }
     fn name_of(&self, id: &str) -> String {
@@ -83,7 +83,7 @@ impl World {
             None => vec![id.to_string()],
         }
     }
-    fn party_index(&self, id: &str) -> Option<usize> {
+    pub(super) fn party_index(&self, id: &str) -> Option<usize> {
         self.social
             .parties
             .iter()
@@ -96,7 +96,7 @@ impl World {
             .position(|i| i.kind == kind && i.from == from && i.to == to)
     }
     /// A short message shown in the chat log and the social panel. `ok` is false for a refusal.
-    fn tell(&self, id: &str, text: impl Into<String>, ok: bool) {
+    pub(super) fn tell(&self, id: &str, text: impl Into<String>, ok: bool) {
         if let Some(p) = self.online(id) {
             let _ = p
                 .peer
@@ -156,7 +156,7 @@ impl World {
             json!({"id":id,"name":s.name,"class":s.class,"level":s.level,"online":false,"place":null})
         })
     }
-    fn party_value(&self, index: usize) -> Value {
+    pub(super) fn party_value(&self, index: usize) -> Value {
         let party = &self.social.parties[index];
         let members: Vec<Value> = party
             .members
@@ -171,7 +171,7 @@ impl World {
                     "place":null,"online":false,"dead":false}),
             })
             .collect();
-        json!({"leader":party.leader,"max":PARTY_MAX,"members":members})
+        json!({"leader":party.leader,"max":PARTY_MAX,"members":members,"xp":self.party_xp_value(&party.leader)})
     }
     fn social_state(&self, id: &str) -> Value {
         let Some(p) = self.online(id) else {
@@ -221,7 +221,7 @@ impl World {
             }
         }
     }
-    fn push_party(&self, index: usize) {
+    pub(super) fn push_party(&self, index: usize) {
         let packet = json!({"type":"party","party":self.party_value(index)});
         for m in &self.social.parties[index].members {
             if let Some(p) = self.online(&m.id) {
