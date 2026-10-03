@@ -97,6 +97,7 @@ pub struct Skill {
     pub class: Class,
     pub level: u32,
     pub cooldown: f64,
+    pub cost: f64,
     #[serde(default)]
     pub lifesteal: f64,
     #[serde(default)]
@@ -162,6 +163,11 @@ mod tests {
         ids.dedup();
         assert_eq!(ids.len(), SKILLS.len());
         for s in SKILLS.iter() {
+            assert!(
+                s.cost > 0. && s.cost.is_finite() && s.cost <= 100.,
+                "{}",
+                s.id
+            );
             assert!(s.cooldown > 0. && s.cooldown.is_finite(), "{}", s.id);
             assert!((0. ..=1.).contains(&s.lifesteal), "{}", s.id);
             match &s.effect {

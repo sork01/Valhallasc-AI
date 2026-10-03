@@ -195,6 +195,11 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 .bar { position: relative; height: 1.9cqw; border-radius: 999px; background: rgba(0, 0, 0, .5); border: .15cqw solid rgba(255, 255, 255, .25); overflow: hidden; }
 .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; border-radius: 999px; transition: width .15s; }
 .bar.hp i { background: linear-gradient(#ff8a8a, #d63a4e); } .bar.xp { height: .9cqw; margin-top: .5cqw; } .bar.xp i { background: linear-gradient(#9af0ff, #3a9be0); width: 0; }
+.bar.resource { margin-top: .35cqw; }
+.bar.resource[data-type="mana"] i { background: linear-gradient(#85c8ff, #3464db); }
+.bar.resource[data-type="energy"] i { background: linear-gradient(#fff08c, #dca52e); }
+.bar.resource[data-type="rage"] i { background: linear-gradient(#ffb070, #d85a26); }
+.skill-slot.resource-empty .skill-icon { opacity: .35; }
 .bar span { position: absolute; inset: 0; display: grid; place-items: center; font-size: 1.15cqw; text-shadow: 0 .1cqw .2cqw #000; }
 .hud-tr { right: 1.4cqw; top: 1.4cqw; text-align: right; }
 #minimap { display: block; width: 12cqw; height: 12cqw; border-radius: 1.2cqw; border: .25cqw solid rgba(245, 197, 66, .7); box-shadow: 0 .4cqw 1.4cqw rgba(0, 0, 0, .4); }

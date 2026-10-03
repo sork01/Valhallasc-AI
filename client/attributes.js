@@ -11,7 +11,7 @@
     const descriptions = {
       strength: `+${best === 'strength' ? 2 : 0.5} attack, +0.2 defense`,
       agility: `+${best === 'agility' ? 2 : 0.5} attack, +0.5% crit (60% cap)`,
-      intellect: `+${best === 'intellect' ? 2 : 0.5} attack, 1% faster recovery (30% cap)`,
+      intellect: `+${best === 'intellect' ? 2 : 0.5} attack, 1% faster recovery (30% cap)${c.resourceType === 'mana' ? ", +5 maximum mana" : ""}`,
       stamina: '+8 maximum health',
       dexterity: '+0.5% dodge (35% cap)',
       accuracy: '+0.5% hit (100% cap)',

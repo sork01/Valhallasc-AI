@@ -14,7 +14,7 @@
   const spare = s => definition(s.item)?.starter ? 0 : bagQuantity(s.item);
   const consumable = i => i && ['food', 'potion'].includes(i.kind);
   const compatible = i => i && !['material', 'bag', 'food', 'potion'].includes(i.kind) && (!i.class || i.class === look?.class);
-  const effect = i => i.kind === 'food' ? `Restores ${i.heal} HP over ${i.duration} s · one meal at a time` : `Restores ${i.heal} HP at once · ${i.cooldown} s cooldown shared by all potions`;
+  const effect = i => { const restores = [i.heal ? `${i.heal} HP` : '', i.mana ? `${i.mana} mana` : ''].filter(Boolean).join(' and '); return i.kind === 'food' ? `Restores ${restores} over ${i.duration} s · one meal at a time` : `Restores ${restores} at once · ${i.cooldown} s cooldown shared by all potions`; };
   const useItem = i => consumable(i) && canEquip() && bagQuantity(i.id) > 0 && Field.useItem(i.id);
   const activate = i => consumable(i) ? useItem(i) : equip(i);
   const num = n => Number(n.toFixed(1));
@@ -59,7 +59,7 @@
       return `<span class="item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-size:${cols * 100}% ${rows * 100}%;background-position:${cell[0] / (cols - 1) * 100}% ${cell[1] / (rows - 1) * 100}%${t ? `;filter:${tint}drop-shadow(1px 2px 1px #000b)` : ''}"></span>`;
     }
     const glyph = kind === 'weapon' && i?.class === 'mage' ? 'staff' : kind === 'weapon' && i?.class === 'assassin' ? 'daggers' : kind === 'weapon' && i?.class === 'priest' ? 'mace' : kind === 'weapon' && i?.class === 'hunter' ? 'bow' : i?.id === 'ironhide_shell' ? 'shell' : kind;
-    const palette = { slime_gel: '#88c675', blue_gel: '#6ca6ec', pink_gel: '#dd88b1', golden_gel: '#edc561', royal_jelly: '#bd84e2', traveler_stew: '#c98a4b', health_potion: '#e0476b' };
+    const palette = { slime_gel: '#88c675', blue_gel: '#6ca6ec', pink_gel: '#dd88b1', golden_gel: '#edc561', royal_jelly: '#bd84e2', traveler_stew: '#c98a4b', health_potion: '#e0476b', mana_potion: '#5488ef' };
     const color = palette[i?.id] || (i?.variant === 'crimson' ? '#c16b67' : { uncommon: '#6fcf86', rare: '#86acd5', epic: '#b98be6', legendary: '#f0a85a' }[i?.rarity] || '#ab8e68');
     return `<svg viewBox="0 0 64 64" aria-hidden="true" style="color:${color}" stroke="#15151a" stroke-width="2" stroke-linejoin="round">${art[glyph] || art.accessory}</svg>`;
   }

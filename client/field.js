@@ -578,7 +578,7 @@
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
   }
-  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: zdef.city?.name, tagline: zdef.tagline, hub: City.inside(hero.x, hero.y) ? zdef.city?.name : null, levels: zdef.levels, buffs: hero.buffs || [], traveling: cityRoute.length > 0 && !pendingNpc }); }
+  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: zdef.city?.name, tagline: zdef.tagline, hub: City.inside(hero.x, hero.y) ? zdef.city?.name : null, levels: zdef.levels, buffs: hero.buffs || [], traveling: cityRoute.length > 0 && !pendingNpc }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -795,6 +795,7 @@
     // Food and potions: a potion lands at once with a ring and its number; a meal shows its share every second.
     if (event.kind === 'consume') {
       spark(event.x, event.y, 14, ['#9dffb4', '#d8ffe0', '#f0d9a0'], 10, 1, .9);
+      if (event.mana > 0) floater(event.x, event.y, '+' + event.mana + ' mana', '#85baff', false);
       if (event.value > 0) { effects.push({ kind: 'skAura', x: event.x, y: event.y, core: '#d9ffe0', glow: '#3fd36a', col: '#3fd36a', a: 0, t: 0, life: 1 }); floater(event.x, event.y, '+' + event.value, '#7dff9a', true); }
     }
     // A party member healed by a priest: their own number and glow, whoever cast it.
@@ -1764,9 +1765,9 @@
     useSkill(id) {
       if (!running || paused || !Online.connected || hero.dead) return false;
       if (id === 'attack' && hero.atkCd <= 0 && hero.dashT <= 0) { swing(); return true; }
-      if (id === 'shadowstep' && isAssassin() && hero.dashCd <= 0) { shadowstep(); return true; }
+      if (id === 'shadowstep' && isAssassin() && hero.dashCd <= 0 && hero.dashT <= 0 && hero.resource >= 20) { shadowstep(); return true; }
       const def = SKILL_BY_ID[id];
-      if (def && def.class === hero.look.class && hero.level >= def.level && !(hero.skillCd?.[id] > 0) && hero.dashT <= 0) { castSkill(def); return true; }
+      if (def && def.class === hero.look.class && hero.level >= def.level && !(hero.skillCd?.[id] > 0) && hero.dashT <= 0 && hero.resource >= def.cost) { castSkill(def); return true; }
       return false;
     },
     get canAct() { return running && !paused && Online.connected && !hero.dead; },

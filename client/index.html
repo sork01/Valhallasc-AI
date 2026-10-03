@@ -136,6 +136,7 @@
       <div class="hud-bars">
         <p class="hud-name"><b id="hud-name"></b><span id="hud-lv"></span></p>
         <div class="bar hp"><i id="hp-fill"></i><span id="hp-text"></span></div>
+        <div class="bar resource" id="resource-bar" role="progressbar" aria-label="Class resource" aria-valuemin="0"><i id="resource-fill"></i><span id="resource-text"></span></div>
         <div class="bar xp"><i id="xp-fill"></i></div>
       </div>
     </div>
@@ -265,7 +266,7 @@
       <div id="skillbar-slots" class="skillbar-slots"></div>
       <button id="skills-open" class="skills-open" type="button">Skills <kbd>K</kbd></button>
     </div>
-    <div id="quickuse" class="quickuse" role="group" aria-label="Quick use, Z for food and X for a health potion"></div>
+    <div id="quickuse" class="quickuse" role="group" aria-label="Quick use, Z food, X health potion, C mana potion"></div>
     <div class="pause" id="skills-panel" hidden>
       <section class="panel skills-panel" role="dialog" aria-modal="true" aria-labelledby="skills-title" aria-describedby="skills-help">
         <p class="npc-role">Your abilities</p>

@@ -112,6 +112,7 @@ impl Store {
         let mut c = Character {
             id: Uuid::new_v4().to_string(),
             hp: look.class.health(),
+            resource: None,
             look,
             x: spawn.x,
             y: spawn.y,

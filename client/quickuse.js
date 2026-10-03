@@ -1,10 +1,10 @@
 'use strict';
-// Two quick slots for what the pack holds: Z eats the best food, X drinks the best health potion. They only send
+// Quick slots: Z food, X health potion, C mana potion (mana classes). They only send
 // "use this item"; the server owns ownership, the one-meal rule, the 60 s potion cooldown and the healing.
 (() => {
   const $ = id => document.getElementById(id);
-  const KINDS = [{ kind: 'food', key: 'z', name: 'Food', empty: 'No food · buy Traveler\'s Stew from Pip in Alderhaven' }, { kind: 'potion', key: 'x', name: 'Potion', empty: 'No potion · buy Health Potions from Mira Moonleaf in Alderhaven' }];
-  const best = kind => WORLD_ITEMS.filter(i => i.kind === kind && Inventory.quantity(i.id) > 0).sort((a, b) => b.heal - a.heal)[0];
+  const KINDS = [{ kind: 'food', key: 'z', name: 'Food', empty: 'No food · buy Traveler\'s Stew from Pip in Alderhaven' }, { kind: 'potion', key: 'x', name: 'Potion', empty: 'No potion · buy Health Potions from Mira Moonleaf in Alderhaven' }, { kind: 'mana', key: 'c', name: 'Mana', empty: 'No mana potion · buy from a potion merchant' }];
+  const best = kind => WORLD_ITEMS.filter(i => (kind === 'mana' ? i.kind === 'potion' && i.mana > 0 : i.kind === kind && (kind !== 'potion' || i.heal > 0)) && Inventory.quantity(i.id) > 0).sort((a, b) => kind === 'mana' ? b.mana - a.mana : (b.heal || 0) - (a.heal || 0))[0];
   const node = (tag, text, cls) => { const n = document.createElement(tag); if (text) n.textContent = text; if (cls) n.className = cls; return n; };
   const slots = new Map();
   function use(kind) {
@@ -15,7 +15,7 @@
   function build() {
     for (const k of KINDS) {
       const b = node('button', '', 'skill-slot quick-slot'); b.type = 'button'; b.dataset.kind = k.kind; b.dataset.item = ''; b.setAttribute('aria-keyshortcuts', k.key.toUpperCase());
-      const glyph = node('span', '', 'skill-icon'); glyph.innerHTML = Skillbar.icon(k.kind);
+      const glyph = node('span', '', 'skill-icon'); glyph.innerHTML = Skillbar.icon(k.kind === 'mana' ? 'potion' : k.kind);
       b.append(node('kbd', k.key.toUpperCase()), glyph, node('span', k.name, 'skill-name'), node('span', '', 'quick-count'), node('span', '', 'skill-cooldown'));
       b.addEventListener('click', () => use(k.kind));
       slots.set(k.kind, b); $('quickuse').append(b);
@@ -29,7 +29,8 @@
   function update() {
     if (!slots.size) build();
     for (const k of KINDS) {
-      const b = slots.get(k.kind), i = best(k.kind), [left, total] = wait(k.kind, i);
+      const b = slots.get(k.kind); b.hidden = k.kind === 'mana' && Field.hero.resourceType !== 'mana';
+      const i = best(k.kind), [left, total] = wait(k.kind, i);
       b.dataset.item = i?.id || '';
       b.disabled = !Field.canAct || (!!i && left > 0);
       b.classList.toggle('on-cooldown', !!i && left > 0);
@@ -44,7 +45,7 @@
   addEventListener('keydown', event => {
     if ($('scene-game').hidden || event.repeat || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target?.tagName || '') || event.ctrlKey || event.altKey || event.metaKey) return;
     const slot = KINDS.find(k => k.key === event.key.toLowerCase());
-    if (!slot || !Field.canAct) return;
+    if (!slot || !Field.canAct || (slot.kind === 'mana' && Field.hero.resourceType !== 'mana')) return;
     event.preventDefault(); use(slot.kind);
   });
   window.Quickuse = { update, use };

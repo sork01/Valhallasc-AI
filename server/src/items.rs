@@ -39,6 +39,9 @@ pub struct Item {
     /// Food and potions: hit points restored in total.
     #[serde(default)]
     pub heal: f64,
+    /// Mana restored, alongside optional health recovery.
+    #[serde(default)]
+    pub mana: f64,
     /// Food: seconds over which `heal` arrives. Potions heal at once.
     #[serde(default)]
     pub duration: f64,

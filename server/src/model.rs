@@ -52,6 +52,13 @@ impl Class {
     pub fn ranged(self) -> bool {
         matches!(self, Self::Mage | Self::Hunter)
     }
+    pub fn resource_type(self) -> &'static str {
+        match self {
+            Self::Warrior => "rage",
+            Self::Assassin | Self::Hunter => "energy",
+            Self::Mage | Self::Priest => "mana",
+        }
+    }
     pub fn health(self) -> f64 {
         match self {
             Self::Warrior => 120.,
@@ -293,6 +300,9 @@ pub struct Character {
     pub x: f64,
     pub y: f64,
     pub hp: f64,
+    /// Saved mana; missing legacy values start full. Energy and rage reset on joining.
+    #[serde(default)]
+    pub resource: Option<f64>,
     pub level: u32,
     pub xp: u32,
     pub gold: u32,
@@ -358,6 +368,34 @@ pub fn enemy_xp(level: u32) -> u32 {
     45 + 5 * level.max(1)
 }
 impl Character {
+    pub fn max_resource(&self) -> f64 {
+        if self.look.class.resource_type() == "mana" {
+            100. + self.level.saturating_sub(1) as f64 * 10. + self.attributes.intellect as f64 * 5.
+        } else {
+            100.
+        }
+    }
+    pub fn resource(&self) -> f64 {
+        self.resource
+            .unwrap_or_else(|| {
+                if self.look.class == Class::Warrior {
+                    0.
+                } else {
+                    self.max_resource()
+                }
+            })
+            .clamp(0., self.max_resource())
+    }
+    pub fn change_resource(&mut self, amount: f64) {
+        self.resource = Some((self.resource() + amount).clamp(0., self.max_resource()));
+    }
+    pub fn reset_resource(&mut self) {
+        self.resource = Some(if self.look.class == Class::Warrior {
+            0.
+        } else {
+            self.max_resource()
+        });
+    }
     pub fn max_hp(&self) -> f64 {
         self.look.class.health()
             + self.level.saturating_sub(1) as f64 * 20.
@@ -476,6 +514,9 @@ impl Character {
             self.xp -= self.xp_need();
             self.level += 1;
             self.hp = self.max_hp();
+            if self.look.class.resource_type() == "mana" {
+                self.reset_resource();
+            }
             levels += 1;
         }
         levels
@@ -773,6 +814,9 @@ pub enum DebugCommand {
     },
     SetGold {
         gold: u32,
+    },
+    SetResource {
+        amount: f64,
     },
     SetHp {
         hp: f64,

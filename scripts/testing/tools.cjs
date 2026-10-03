@@ -205,7 +205,7 @@ function describe(what = 'overview') {
     case 'npcs': return { npcs: zones.flatMap((a, zone) => (a.npcs || []).map(n => ({ zone, id: n.id, name: n.name, role: n.role, x: n.x, y: n.y, buys: !!n.buys, offers: n.offers.map(o => ({ id: o.id, label: o.label, cost: o.cost })) }))) };
     case 'quests': return { quests: quests.map(q => ({ zone: q.zone, id: q.id, title: q.title, npc: q.npc, requires: q.requires || null, repeatable: !!q.repeatable, level: q.level, rewardXp: q.reward_xp ?? q.rewardXp, rewardGold: q.reward_gold ?? q.rewardGold, objectives: q.objectives })) };
     case 'items': return { items };
-    case 'skills': return { skills: skills.map(({ id, name, class: c, level, cooldown, effect }) => ({ id, name, class: c, level, cooldown, effect: effect.effect })) };
+    case 'skills': return { skills: skills.map(({ id, name, class: c, level, cooldown, cost, effect }) => ({ id, name, class: c, level, cooldown, cost, effect: effect.effect })) };
     case 'enemies': return { defaultLevels: DEFAULT_LEVELS, zones: zones.map(area).map(({ zone, name, enemies }) => ({ zone, name, enemies })) };
     default: return { zones: zones.map(area), quests: quests.map(q => q.id), itemCount: items.length, skillCount: skills.length,
       hint: 'Ask for npcs, quests, items, skills, enemies or zones in full.' };

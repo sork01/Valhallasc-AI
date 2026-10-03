@@ -119,6 +119,7 @@ const scenarios = {
       // Warrior: area damage, cooldown, buffs.
       const front = await approach(w, 'Skillful', 'green', 1.5);
       const before = { ...front() };
+      await w.debug('Skillful', { op: 'set_resource', amount: 100 });
       await cast(w, 'Skillful', 'whirlwind', front());
       await w.waitFor(() => w.player('Skillful').skillCd.whirlwind > 0, 5000, 'Whirlwind cooldown');
       check(lost(before, front()), 'Whirlwind damages an enemy beside the warrior');
@@ -571,6 +572,7 @@ const scenarios = {
       check(me().gold === 1000 + rewardGold && finished.every(id => quest(w, 'Gm', id)?.claimed), 'Finishing a quest walks its prerequisites and pays every reward once');
       check(me().quests.find(q => q.id === 'king_challenge').completions === 1, 'A finished one-time quest records one completion');
       check(me().zone === 1 && me().inventory.find(i => i.item === 'slime_gel').quantity === 12, 'The character stands in the Crags and holds the given items');
+      await w.debug('Gm', { op: 'set_resource', amount: 100 });
       await kit.castSkill(w, 'Gm', { skill: 'battlecry' }).then(r => check(r.cast && r.buffs.some(b => b.id === 'battlecry') && r.cooldownLeft > 20, 'cast_skill casts a skill and reports its buff and cooldown'));
       const again = await kit.castSkill(w, 'Gm', { skill: 'battlecry', settleMs: 300 });
       check(!again.cast && again.cooldownLeft > 19, 'A repeated cast is ignored while the skill is on cooldown');
@@ -1406,6 +1408,9 @@ const scenarios = {
       await w.waitFor(() => hp('Tank') > 100, 5000, 'Holy Nova heal');
       check(hp('Tank') > 100, 'Holy Nova heals the party while it burns enemies');
       // Alone on the field the priest fights: Smite and the mace.
+      // This check requires a landed hit, so train the normal accuracy cap instead of relying on a random roll.
+      for (let i = 0; i < 20; i++) await w.action('Pia', { type: 'allocate_stat', stat: 'accuracy' });
+      await w.waitFor(() => pia().hitChance === 1);
       const front = await approach(w, 'Pia', 'green', 4);
       const before = { ...front() };
       await cast(w, 'Pia', 'smite', front());
@@ -1554,6 +1559,78 @@ const scenarios = {
         check(w.player(bot).quests.filter(q => ids.includes(q.id)).length === quests, `Level ${level} has brought ${quests} progression quests in all`);
       }
       check(JSON.stringify(quest(w, bot, 'city_onward').counts) === '[0]' && JSON.stringify(quest(w, bot, 'fen_onward').counts) === '[0]', 'The later quests still wait for the trip');
+    },
+  },
+  resources: {
+    description: 'All five class resources through real protocol: spending, exhaustion, combat recovery, food/potions, rage from a real fight, and mana persistence.',
+    startLevel: 20,
+    levelSpread: 0,
+    async run(w, check) {
+      for (const [bot, cls] of [['Rage','warrior'],['Mana','mage'],['Faith','priest'],['Energy','assassin'],['Arrows','hunter']]) {
+        await w.connect({ bot, class: cls });
+        const p = w.player(bot);
+        check(p.resourceType === (cls === 'warrior' ? 'rage' : ['assassin','hunter'].includes(cls) ? 'energy' : 'mana'), `${cls} has its authoritative resource`);
+        check(p.resource === (cls === 'warrior' ? 0 : p.maxResource), `${cls} starts with the correct resource amount`);
+      }
+      const mage = () => w.player('Mana');
+      await cast(w, 'Mana', 'twinbolt');
+      await w.waitFor(() => mage().skillCd.twinbolt > 0);
+      check(mage().resource === mage().maxResource - skillCatalog.find(s => s.id === 'twinbolt').cost, 'A valid mage cast spends its catalog mana cost exactly');
+      await w.debug('Mana', { op: 'set_resource', amount: 0 });
+      await cast(w, 'Mana', 'starfall');
+      await w.waitFor(() => w.events.some(e => e.bot === 'Mana' && e.type === 'error' && /Not enough mana/.test(e.text)));
+      check(!mage().skillCd.starfall && mage().resource === 0, 'An exhausted cast produces no cooldown or resource change');
+      await w.action('Mana', { type: 'attack', fx: 1, fy: 0 });
+      await w.waitFor(() => mage().atkCd > 0);
+      check(mage().resource === 0, 'Basic attacks remain free when mana is empty');
+      await w.advance(1000);
+      check(mage().resource === 0, 'Mana does not regenerate while fighting');
+      await w.action('Mana', { type: 'stop' });
+      await w.waitFor(() => mage().resource > 0, 6500, 'Out-of-combat mana recovery');
+      check(!mage().inCombat, 'Mana recovers after the combat grace period');
+      for (const bot of ['Energy','Arrows']) {
+        await w.debug(bot, { op: 'set_resource', amount: 0 });
+        await w.action(bot, { type: 'attack', fx: 1, fy: 0 });
+        await w.advance(700);
+        check(w.player(bot).resource > 5 && w.player(bot).inCombat, `${bot} recovers energy even in combat`);
+      }
+      await kit.setupCharacter(w, 'Mana', { gold: 100, teleportTo: { npc: 'apothecary' } });
+      await kit.talkTo(w, 'Mana', 'apothecary', 'buy_mana_potion');
+      await w.waitFor(() => mage().gold === 70 && mage().inventory.some(i => i.item === 'mana_potion'), 3000, 'Mana potion purchase snapshot');
+      check(mage().gold === 70 && mage().inventory.some(i => i.item === 'mana_potion'), 'An ordinary merchant purchase supplies a mana potion for 30 gold');
+      await w.debug('Mana', { op: 'give_item', item: 'health_potion', quantity: 1 });
+      await w.debug('Mana', { op: 'set_resource', amount: 0 });
+      await w.action('Mana', { type: 'attack', fx: 1, fy: 0 });
+      await w.action('Mana', { type: 'use_item', item: 'mana_potion' });
+      await w.waitFor(() => mage().potionCd > 0);
+      check(mage().resource >= 100 && mage().resource < 103 && mage().hp === mage().maxHp && w.events.some(e => e.bot === 'Mana' && e.kind === 'consume' && e.mana === 100), 'A mana potion restores 100 mana even at full health');
+      await w.debug('Mana', { op: 'set_hp', hp: 1 });
+      await w.action('Mana', { type: 'use_item', item: 'health_potion' });
+      await w.advance(200);
+      check(mage().inventory.some(i => i.item === 'health_potion'), 'Mana and health potions share the same cooldown');
+      await w.debug('Faith', { op: 'give_item', item: 'traveler_stew', quantity: 1 });
+      await w.debug('Faith', { op: 'set_resource', amount: 0 });
+      await w.action('Faith', { type: 'attack', fx: 1, fy: 0 });
+      await w.action('Faith', { type: 'use_item', item: 'traveler_stew' });
+      await w.waitFor(() => w.player('Faith').buffs.some(b => b.kind === 'regen'));
+      await w.advance(1000);
+      check(w.player('Faith').resource >= 10 && w.player('Faith').hp === w.player('Faith').maxHp, 'Food restores priest mana at full health during combat');
+      // Stage a target, then use ordinary attacks to build rage; no debug damage or resource grant.
+      const enemy = await kit.spawnEnemy(w, 'Rage', { kind: 'beetle', level: 5, distance: 2 });
+      const id = enemy.enemy?.id ?? enemy.id;
+      await w.action('Rage', { type: 'target', id });
+      await w.waitFor(() => w.player('Rage').resource >= 15, 10000, 'Rage from real hits');
+      check(w.player('Rage').inCombat, 'The warrior builds rage through real damage');
+      await cast(w, 'Rage', 'battlecry');
+      await w.waitFor(() => w.player('Rage').buffs.some(b => b.id === 'battlecry'), 5000, 'Rage skill');
+      check(w.player('Rage').skillCd.battlecry > 0, 'Built rage pays for a warrior skill');
+      await w.action('Rage', { type: 'stop' });
+      await kit.teleport(w, 'Rage', { npc: 'healer' });
+      await w.debug('Mana', { op: 'set_resource', amount: 37 });
+      await w.restart();
+      check(mage().resource >= 37 && mage().resource < 60, 'Mana survives private server restart without refilling');
+      check(mage().potionCd > 30, 'The shared potion cooldown also survives restart');
+      check(w.player('Rage').resource === 0 && w.player('Energy').resource === 100, 'Rage resets to zero and energy starts full on resume');
     },
   },
 };

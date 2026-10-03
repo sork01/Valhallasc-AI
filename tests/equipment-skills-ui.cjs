@@ -228,7 +228,12 @@ async function call(name, args = {}) {
   });
   await fixture.addScriptTag({ path: path.join(root, 'client/inventory.js') });
   await fixture.evaluate(() => {
-    Inventory.update(WORLD_ITEMS.filter(i => i.kind !== 'bag').map(i => ({ item: i.id, quantity: 3 })), { class: 'mage', name: 'Moonleaf', mageArmor: 'runic', mageWeapon: 'crystal' }, { headgear: 'headgear_upgrade', shoulders: 'shoulders_upgrade', pants: 'pants_upgrade', gloves: 'gloves_upgrade', necklace: 'necklace_upgrade', accessory1: 'accessory_upgrade', accessory2: 'accessory_upgrade' }, ['traveler_pack']);
+    // Keep this display fixture within its 32 cells and include every piece its assertions use.
+    const fixtureItems = WORLD_ITEMS.filter(i => i.kind !== 'bag').slice(0, 32);
+    ['headgear_upgrade', 'shoulders_upgrade', 'pants_upgrade', 'gloves_upgrade', 'necklace_upgrade', 'accessory_upgrade'].forEach((id, index) => {
+      if (!fixtureItems.some(i => i.id === id)) fixtureItems[index] = WORLD_ITEMS.find(i => i.id === id);
+    });
+    Inventory.update(fixtureItems.map(i => ({ item: i.id, quantity: 3 })), { class: 'mage', name: 'Moonleaf', mageArmor: 'runic', mageWeapon: 'crystal' }, { headgear: 'headgear_upgrade', shoulders: 'shoulders_upgrade', pants: 'pants_upgrade', gloves: 'gloves_upgrade', necklace: 'necklace_upgrade', accessory1: 'accessory_upgrade', accessory2: 'accessory_upgrade' }, ['traveler_pack']);
     Inventory.renderEquipped(document.getElementById('equipped-slots')); Inventory.render(document.getElementById('inventory-list'));
     document.getElementById('character-subtitle').textContent = 'Moonleaf · Level 6 Mage';
     document.getElementById('equipment-stats').textContent = 'Attack: 60 · Defense: 16';
@@ -251,7 +256,7 @@ async function call(name, args = {}) {
   await fixture.evaluate(() => { statFixture.dead = false; Attributes.update(statFixture); sent = []; });
   check(await fixture.locator('#bag-tabs .bag-tab[data-locked="false"]').count() === 2, 'An owned expansion pack provides a second bag');
   await fixture.locator('#bag-tabs [data-bag="1"]').click();
-  // Every non-bag catalog item is one stack; the 16-cell backpack holds the first 16 and the second bag (16 cells) the next ones.
+  // The 32 fixture stacks fill the backpack and its one 16-cell expansion.
   const overflow = await fixture.evaluate(() => Math.min(16, WORLD_ITEMS.filter(i => i.kind !== 'bag').length - 16));
   check(overflow > 0 && await fixture.locator('#inventory-list .inventory-item').count() === overflow, `Overflow bag displays the next ${overflow} stacks`);
   await fixture.locator('#bag-search').fill('amber');

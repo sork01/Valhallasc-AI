@@ -463,6 +463,12 @@
   const hud = { lv: $('hud-lv'), hp: $('hp-fill'), hpT: $('hp-text'), xp: $('xp-fill'), gold: $('hud-gold'), kills: $('hud-kills') };
   function onHud(s) {
     hud.hp.style.width = (s.hp / s.maxHp * 100).toFixed(1) + '%'; hud.hpT.textContent = `${Math.ceil(s.hp)} / ${s.maxHp}`;
+    const resource = $('resource-bar'), kind = s.resourceType || 'rage', current = s.resource || 0, max = s.maxResource || 100;
+    resource.dataset.type = kind; resource.setAttribute('aria-label', kind[0].toUpperCase() + kind.slice(1));
+    resource.setAttribute('aria-valuenow', Math.floor(current)); resource.setAttribute('aria-valuemax', max);
+    resource.title = kind === 'energy' ? 'Energy · regenerates 10 per second, including in combat' : kind === 'rage' ? 'Rage · gained by dealing and taking damage, fades outside combat' : 'Mana · regenerates outside combat · food and mana potions restore it';
+    $('resource-fill').style.width = (current / max * 100).toFixed(1) + '%';
+    $('resource-text').textContent = `${kind[0].toUpperCase() + kind.slice(1)} ${Math.floor(current)} / ${max}`;
     hud.xp.style.width = (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.lv.textContent = ` ${t('lvl')} ${s.level}`; window.Quests?.setLevel(s.level);
     hud.gold.textContent = s.gold; hud.kills.textContent = s.kills; $('bag-gold').textContent = `${s.gold} gold`;
     const inCity = !!s.hub || s.area === 'Alderhaven', title = $('area-title'), away = s.zone > 0;
@@ -497,7 +503,7 @@
     if (buffBar.dataset.key !== key) {
       buffBar.dataset.key = key;
       buffBar.replaceChildren(...list.map(b => {
-        const food = WORLD_ITEMS.find(k => k.id === b.id), def = WORLD_SKILLS.find(k => k.id === b.id) || (food && { name: food.name, icon: 'food', description: `Restores ${food.heal} HP over ${food.duration} s.` });
+        const food = WORLD_ITEMS.find(k => k.id === b.id), def = WORLD_SKILLS.find(k => k.id === b.id) || (food && { name: food.name, icon: 'food', description: Inventory.effect(food) });
         const chip = el('span', { class: 'buff-chip', 'data-buff': b.id, 'data-kind': b.kind, title: `${def?.name || b.id}: ${def?.description || ''}` }), glyph = el('span', { class: 'skill-icon' });
         glyph.innerHTML = Skillbar.icon(def?.icon || 'attack'); chip.append(glyph, el('i')); return chip;
       }));

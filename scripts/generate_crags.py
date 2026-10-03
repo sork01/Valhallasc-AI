@@ -50,10 +50,11 @@ def quest_hub():
         npc('crags_healer', 'Sister Iona', 'Camp healer', 53, 84, '#c8b9d3',
             'Rest within the camp; enemies cannot enter. My blessing is free, and I sell Health Potions for the climb. The Ash Wraiths beyond the second ford must be laid to rest.',
             [dict(id='blessing', label='Receive a healing blessing', cost=0, heal=10000),
+             dict(id='buy_mana_potion', label='Buy Mana Potion · 100 mana instantly', cost=30, item='mana_potion'),
              dict(id='buy_health_potion', label='Buy Health Potion · 100 HP instantly', cost=30, item='health_potion')]),
         npc('crags_supplier', 'Quartermaster Dain', 'Supplies & bounties', 43, 86, '#b69a64',
             'Bring me materials or spare gear from the Crags. I buy loot and sell stew and satchels. Our recurring patrol contracts keep the expedition supplied.',
-            [dict(id='buy_traveler_stew', label="Buy Traveler's Stew · 100 HP over 8 s", cost=12, item='traveler_stew'),
+            [dict(id='buy_traveler_stew', label="Buy Traveler's Stew · 100 HP and mana over 8 s", cost=12, item='traveler_stew'),
              dict(id='satchel', label='Buy Linen Satchel · 6 extra bag slots', cost=500, bag='linen_satchel')], buys=True),
     ]
     def kill(kind, count, label):

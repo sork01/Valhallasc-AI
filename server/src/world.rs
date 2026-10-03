@@ -11,6 +11,9 @@ use tokio::sync::{mpsc, oneshot, watch};
 
 mod consumables;
 mod debug;
+#[cfg(test)]
+mod resource_tests;
+mod resources;
 mod social;
 
 pub type Peer = mpsc::Sender<Value>;
@@ -79,6 +82,7 @@ struct Player {
     hit: bool,
     hurt: f64,
     last_hurt: f64,
+    combat_left: f64,
     dead_time: f64,
     dash: f64,
     dash_cd: f64,
@@ -101,6 +105,8 @@ impl Player {
     // Called once when hp reaches 0: the XP penalty, then a notice naming what it cost.
     fn apply_death_penalty(&mut self) {
         let (lost, levels) = self.character.lose_death_xp();
+        self.character.resource = Some(0.);
+        self.combat_left = 0.;
         let text = if levels > 0 {
             format!(
                 "You lost {lost} XP and dropped to level {}.",
@@ -113,7 +119,13 @@ impl Player {
             .peer
             .try_send(json!({"type":"notice","ok":false,"text":text}));
     }
-    fn new(character: Character, peer: Peer) -> Self {
+    fn new(mut character: Character, peer: Peer) -> Self {
+        if character.hp <= 0. {
+            character.resource = Some(0.);
+        } else if character.look.class.resource_type() != "mana" {
+            character.reset_resource();
+        }
+        character.resource = Some(character.resource());
         let potion_cd = character.potion_cooldown_left();
         Self {
             character,
@@ -130,6 +142,7 @@ impl Player {
             hit: false,
             hurt: 0.,
             last_hurt: -99.,
+            combat_left: 0.,
             dead_time: 0.,
             dash: 0.,
             dash_cd: 0.,
@@ -154,6 +167,7 @@ impl Player {
             "attributes":c.attributes,"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
+            "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
             "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored})
     }
     /// The sum of every active buff of one kind.
@@ -848,6 +862,13 @@ impl World {
                     && p.character.look.class == Class::Assassin
                     && p.dash_cd <= 0. =>
             {
+                if p.character.resource() < 20. {
+                    let _ = p.peer.try_send(
+                        json!({"type":"error","text":"Not enough energy: Shadowstep costs 20."}),
+                    );
+                    return;
+                }
+                p.character.change_resource(-20.);
                 let dir = normalize(dx, dy);
                 p.dash_direction = if dir.x == 0. && dir.y == 0. {
                     p.face
@@ -1094,6 +1115,7 @@ impl World {
         if p.character.hp <= 0. || p.cooldown > 0. || p.dash > 0. {
             return;
         }
+        p.combat_left = 5.;
         p.attack = 0.0001;
         p.hit = false;
         p.cooldown = p.character.attack_cooldown() / (1. + p.buff(BuffKind::Haste));
@@ -1139,6 +1161,7 @@ impl World {
         }
     }
     fn update_player(&mut self, session: u64) {
+        self.update_resource(session);
         let p = self.players.get_mut(&session).unwrap();
         p.cooldown = (p.cooldown - TICK).max(0.);
         p.hurt = (p.hurt - TICK).max(0.);
@@ -1162,6 +1185,8 @@ impl World {
                 p.character.x = point.x;
                 p.character.y = point.y;
                 p.character.hp = p.character.max_hp();
+                p.character.reset_resource();
+                p.combat_left = 0.;
                 p.dead_time = 0.;
                 p.attack = 0.;
                 p.cooldown = 0.;
@@ -1480,11 +1505,23 @@ impl World {
             return;
         }
         let p = self.players.get_mut(&session).unwrap();
+        if p.character.resource() < skill.cost {
+            let text = format!(
+                "Not enough {}: {} costs {}.",
+                class.resource_type(),
+                skill.name,
+                skill.cost
+            );
+            let _ = p.peer.try_send(json!({"type":"error","text":text}));
+            return;
+        }
+        p.character.change_resource(-skill.cost);
         p.skill_cd.insert(
             id.to_string(),
             skill.cooldown * p.character.cooldown_multiplier(),
         );
         if melee && !matches!(skill.effect, Effect::Dash { mult, .. } if mult == 0.) {
+            p.combat_left = 5.;
             p.attack = 0.0001;
             p.hit = true;
             p.cooldown = p.cooldown.max(0.35);
@@ -1634,6 +1671,7 @@ impl World {
                 } else {
                     vec![session]
                 };
+                self.assist_combat(session, &sessions);
                 for target in sessions {
                     let p = self.players.get_mut(&target).unwrap();
                     p.buffs.retain(|b| b.id != id);
@@ -1724,6 +1762,7 @@ impl World {
         let amount = (self.players[&caster].character.stats().0 * mult).round();
         let from = self.players[&caster].character.id.clone();
         let mut points = vec![];
+        self.assist_combat(caster, sessions);
         for s in sessions {
             let Some(p) = self.players.get_mut(s) else {
                 continue;
@@ -1770,12 +1809,17 @@ impl World {
         if s.dead || s.zone != p.character.zone {
             return 0.;
         }
+        let p = self.players.get_mut(&session).unwrap();
+        p.combat_left = 5.;
         if damage <= 0. {
             let point = s.point();
             self.event("miss", &actor, point, 0., false);
             return 0.;
         }
         let dealt = damage.min(s.hp);
+        if p.character.look.class == Class::Warrior {
+            p.character.change_resource(dealt * 0.5);
+        }
         if is_elite(&s.kind) {
             s.contributors.insert(actor.clone());
         }
@@ -2078,6 +2122,10 @@ impl World {
         let Some(p) = self.players.get(&session) else {
             return;
         };
+        if p.character.hp > 0. && !self.maps[p.character.zone].in_city(p.character.point()) {
+            self.players.get_mut(&session).unwrap().combat_left = 5.;
+        }
+        let p = &self.players[&session];
         if self.god_mode
             || p.character.hp <= 0.
             || self.maps[p.character.zone].in_city(p.character.point())
@@ -2086,6 +2134,7 @@ impl World {
         {
             return;
         }
+        // Being attacked counts as combat even when god mode or a dodge prevents damage.
         let dodge_chance = (p.character.dodge_chance() + p.buff(BuffKind::Dodge)).min(0.95);
         let actor = p.character.id.clone();
         let point = p.character.point();
@@ -2101,6 +2150,10 @@ impl World {
             .max(1.);
         if shield > 0. {
             value = (value * (1. - shield)).round().max(1.);
+        }
+        let taken = value.min(p.character.hp);
+        if p.character.look.class == Class::Warrior {
+            p.character.change_resource(taken);
         }
         p.character.hp = (p.character.hp - value).max(0.);
         p.last_hurt = self.time;
@@ -6750,6 +6803,7 @@ mod tests {
         }
         let p = w.players.get_mut(&1).unwrap();
         p.character.level = level;
+        p.character.resource = Some(p.character.max_resource());
         p.character.attributes.accuracy = 20;
         p.face = Point { x: 1., y: 0. };
         p.character.point()

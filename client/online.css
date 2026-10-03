@@ -441,6 +441,7 @@
 .quick-slot[data-item]:not([data-item=""]) { border-color: #cfb179; background: radial-gradient(ellipse at 50% 35%, #4a586e, #15243d 80%); color: #ffe1a0; }
 .quick-slot[data-kind="food"]:not([data-item=""]) { color: #f2c27b; }
 .quick-slot[data-kind="potion"]:not([data-item=""]) { color: #ff8aa0; }
+.quick-slot[data-kind="mana"]:not([data-item=""]) { color: #85baff; }
 .quick-count { position: absolute; z-index: 3; right: .3cqw; top: .2cqw; font: max(10px, .9cqw) 'Jua', sans-serif; color: #fff; text-shadow: 0 1px 2px #000; }
 .buff-chip[data-kind="regen"] { --buff: #58d68d; border-color: #58d68d; }
 .stage.ui-editing #quickuse:empty { min-width: 8cqw; min-height: 5cqw; }

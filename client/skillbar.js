@@ -72,9 +72,11 @@
       icon: cls === 'mage' ? 'cast' : cls === 'hunter' ? 'arrow' : 'attack', cooldown: cls === 'mage' ? .7 : cls === 'assassin' ? .46 : cls === 'priest' ? .62 : cls === 'hunter' ? .58 : .55,
       description: cls === 'mage' ? 'Cast a bolt at your target or in your aim direction.' : cls === 'hunter' ? 'Loose an arrow at your target or in your aim direction.' : 'Strike enemies within reach in your aim direction.' },
     ...(cls === 'assassin' ? [{ id: 'shadowstep', name: 'Shadowstep', icon: 'shadowstep', cooldown: 1.2, level: 1,
-      description: 'Dash in your movement direction, or forward while standing still.' }] : []),
+      cost: 20, description: 'Dash in your movement direction, or forward while standing still.' }] : []),
     ...WORLD_SKILLS.filter(s => s.class === cls).sort((a, b) => a.level - b.level)];
   }
+  const resourceName = () => { const k = Field.hero.resourceType || 'rage'; return k[0].toUpperCase() + k.slice(1); };
+  const costText = skill => skill.cost ? `${skill.cost} ${resourceName()}` : 'Free';
   const level = () => Field.hero.level || 1;
   const unlocked = skill => !!skill && skill.level <= level();
   const find = id => { const skill = skills.find(s => s.id === id); return unlocked(skill) ? skill : undefined; };
@@ -114,7 +116,7 @@
     const skill = find(slots[index]), b = node('button', '', 'skill-slot'); b.type = 'button'; b.dataset.slot = index + 1;
     b.dataset.skill = skill?.id || ''; b.setAttribute('aria-keyshortcuts', KEYS[index]);
     b.setAttribute('aria-label', `Slot ${KEYS[index]}: ${skill?.name || 'Empty'}${editor ? ', select to assign' : ''}`);
-    b.title = `${KEYS[index]} · ${skill?.name || 'Empty slot — assign in Skills (K)'}${skill ? '\n' + skill.description : ''}`;
+    b.title = `${KEYS[index]} · ${skill?.name || 'Empty slot — assign in Skills (K)'}${skill ? '\n' + costText(skill) + ' · ' + skill.description : ''}`;
     b.append(node('kbd', KEYS[index]), node('span', skill?.name || 'Empty', 'skill-name'));
     const glyph = node('span', '', 'skill-icon'); glyph.innerHTML = skill ? icon(skill.icon) : '<span aria-hidden="true">+</span>'; b.append(glyph);
     b.append(node('span', '', 'skill-cooldown'));
@@ -140,7 +142,7 @@
     $('skill-library').replaceChildren(...skills.map(skill => {
       const ready = unlocked(skill), b = node(ready ? 'button' : 'div', '', 'skill-card' + (ready ? '' : ' locked')); b.dataset.skill = skill.id;
       const glyph = node('span', '', 'skill-icon'); glyph.innerHTML = icon(skill.icon);
-      b.append(glyph, node('b', skill.name), node('small', ready ? `${skill.description} ${skill.cooldown}s cooldown.` : `Unlocks at level ${skill.level}. ${skill.description}`));
+      b.append(glyph, node('b', skill.name), node('small', ready ? `${skill.description} ${costText(skill)} · ${skill.cooldown}s cooldown.` : `Unlocks at level ${skill.level}. ${costText(skill)} · ${skill.description}`));
       if (!ready) { b.setAttribute('aria-disabled', 'true'); b.append(node('em', `Lv ${skill.level}`, 'skill-level')); return b; }
       b.type = 'button'; b.draggable = true;
       if (skill.level > 1) b.append(node('em', `Lv ${skill.level}`, 'skill-level'));
@@ -189,7 +191,9 @@
     for (const b of $('skillbar-slots').children) {
       const skill = find(b.dataset.skill), cooldown = skill ? remaining(skill) : 0;
       // Snapshot values are the authority; never start a local gameplay cooldown.
-      b.disabled = !Field.canAct || cooldown > 0;
+      const empty = !!skill?.cost && (Field.hero.resource || 0) < skill.cost;
+      b.disabled = !Field.canAct || cooldown > 0 || empty;
+      b.classList.toggle('resource-empty', empty);
       b.classList.toggle('on-cooldown', cooldown > 0);
       b.style.setProperty('--cooldown', skill ? Math.min(1, cooldown / skill.cooldown) : 0);
       b.querySelector('.skill-cooldown').textContent = cooldown > 0 ? cooldown.toFixed(1) : '';

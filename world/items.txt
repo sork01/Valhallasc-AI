@@ -430,7 +430,8 @@
     "rarity": "common",
     "sell": 3,
     "heal": 100,
-    "duration": 8
+    "duration": 8,
+    "mana": 100
   },
   {
     "id": "health_potion",
@@ -8871,5 +8872,14 @@
     "starter": false,
     "attack": 11.0,
     "defense": 2.8
+  },
+  {
+    "id": "mana_potion",
+    "name": "Mana Potion",
+    "kind": "potion",
+    "rarity": "common",
+    "sell": 8,
+    "mana": 100,
+    "cooldown": 60
   }
 ]

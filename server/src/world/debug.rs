@@ -49,6 +49,9 @@ impl World {
                 c.level = level;
                 c.xp = 0;
                 c.hp = c.max_hp();
+                if c.look.class.resource_type() == "mana" {
+                    c.reset_resource();
+                }
                 levels = level.saturating_sub(before);
                 json!({"level":level,"unlocked":skills::unlocked(c.look.class, before, level)})
             }
@@ -61,6 +64,13 @@ impl World {
             DebugCommand::SetGold { gold } => {
                 p.character.gold = gold;
                 json!({"gold":gold})
+            }
+            DebugCommand::SetResource { amount } => {
+                if !amount.is_finite() || amount < 0. {
+                    return Err("Resource must be finite and nonnegative.".into());
+                }
+                p.character.resource = Some(amount.min(p.character.max_resource()));
+                json!({"resource":p.character.resource(),"maxResource":p.character.max_resource()})
             }
             DebugCommand::SetHp { hp } => {
                 if !hp.is_finite() || hp <= 0. {

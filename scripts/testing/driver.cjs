@@ -51,6 +51,7 @@ const debugSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('set_level'), level: z.number().int().min(1).max(100) }).strict(),
   z.object({ op: z.literal('give_xp'), amount: z.number().int().min(0).max(4294967295) }).strict(),
   z.object({ op: z.literal('set_gold'), gold: z.number().int().min(0).max(4294967295) }).strict(),
+  z.object({ op: z.literal('set_resource'), amount: number.nonnegative() }).strict(),
   z.object({ op: z.literal('set_hp'), hp: number.positive() }).strict(),
   z.object({ op: z.literal('die') }).strict(),
   z.object({ op: z.literal('reset_stats') }).strict(),
@@ -386,8 +387,8 @@ class TestWorld extends EventEmitter {
   summary(bot) {
     const p = this.player(bot);
     if (!p) return null;
-    const { id, zone = 0, x, y, hp, maxHp, level, xp, xpNeed, gold, kills, statPoints, dead, skillCd, buffs, bagCapacity, bagUsed } = p;
-    return { id, zone, x, y, hp, maxHp, level, xp, xpNeed, gold, kills, statPoints, dead, skillCd, buffs, bagCapacity, bagUsed };
+    const { id, zone = 0, x, y, hp, maxHp, level, xp, xpNeed, gold, kills, statPoints, dead, resourceType, resource, maxResource, inCombat, skillCd, buffs, bagCapacity, bagUsed } = p;
+    return { id, zone, x, y, hp, maxHp, level, xp, xpNeed, gold, kills, statPoints, dead, resourceType, resource, maxResource, inCombat, skillCd, buffs, bagCapacity, bagUsed };
   }
   inspect({ bot, events = 20 } = {}) {
     this.requireRunning();
