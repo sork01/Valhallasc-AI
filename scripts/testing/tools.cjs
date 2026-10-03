@@ -12,7 +12,7 @@ const map = read('map.txt'), items = read('items.txt'), skills = read('skills.tx
 // Zone 0 is the top-level map (Greenmeadow + Alderhaven); the rest come from `zones`.
 const zones = [map, ...(map.zones || [])];
 const quests = zones.flatMap((area, zone) => (area.quests || []).map(q => ({ ...q, zone })));
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20 };
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const number = z.number().finite();
 const botName = z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,15}$/);

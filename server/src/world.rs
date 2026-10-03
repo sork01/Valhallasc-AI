@@ -185,6 +185,7 @@ struct Buff {
 struct Slime {
     id: usize,
     kind: String,
+    elite: bool,
     zone: usize,
     level: u32,
     x: f64,
@@ -221,6 +222,9 @@ struct Slime {
     goal: Point,
     #[serde(skip)]
     hit: bool,
+    /// Character IDs, so reconnecting does not lose participation. Cleared on evade/respawn.
+    #[serde(skip)]
+    contributors: std::collections::BTreeSet<String>,
 }
 impl Slime {
     // Health, damage, speed and body scale of a default-level enemy.
@@ -235,6 +239,8 @@ impl Slime {
             "spider" => (420., 42., 3., 1.2),
             "wraith" => (520., 52., 2.6, 1.15),
             "golem" => (1100., 64., 1.9, 1.5),
+            // Two level-10 heroes, with skills and healing, rather than an ordinary solo pull.
+            "cinderlord" => (2400., 180., 2.5, 1.7),
             "crab" => (900., 60., 2.8, 1.1),
             "wolf" => (1000., 72., 3.6, 1.2),
             "yeti" => (1900., 88., 2.2, 1.6),
@@ -257,6 +263,7 @@ impl Slime {
             "spider" => 7,
             "wraith" => 8,
             "golem" => 10,
+            "cinderlord" => 10,
             "crab" => 10,
             "wolf" => 12,
             "yeti" => 13,
@@ -277,6 +284,7 @@ impl Slime {
             "spider" => 26,
             "wraith" => 36,
             "golem" => 55,
+            "cinderlord" => 100,
             "crab" => 60,
             "wolf" => 78,
             "yeti" => 105,
@@ -297,6 +305,7 @@ impl Slime {
             "spider" => (0.4, 1.1, 8., 7.5),
             "wraith" => (0.5, 1.2, 7.5, 8.),
             "golem" => (0.6, 1.5, 6., 6.5),
+            "cinderlord" => (0.65, 1.25, 7., 7.),
             "crab" => (0.4, 1., 8., 7.),
             "wolf" => (0.3, 0.9, 9.5, 9.),
             "yeti" => (0.7, 1.6, 6.5, 7.),
@@ -322,6 +331,7 @@ impl Slime {
         Self {
             id,
             kind: s.kind.clone(),
+            elite: is_elite(&s.kind),
             zone: s.zone,
             level,
             x: s.x,
@@ -353,6 +363,7 @@ impl Slime {
             target: None,
             goal: Point { x: s.x, y: s.y },
             hit: false,
+            contributors: Default::default(),
         }
     }
     fn point(&self) -> Point {
@@ -1756,7 +1767,7 @@ impl World {
         }
         let actor = p.character.id.clone();
         let s = &mut self.slimes[id];
-        if s.dead {
+        if s.dead || s.zone != p.character.zone {
             return 0.;
         }
         if damage <= 0. {
@@ -1765,6 +1776,9 @@ impl World {
             return 0.;
         }
         let dealt = damage.min(s.hp);
+        if is_elite(&s.kind) {
+            s.contributors.insert(actor.clone());
+        }
         s.hp = (s.hp - damage).max(0.);
         s.hurt_t = 0.4;
         s.target = Some(session);
@@ -1778,11 +1792,32 @@ impl World {
         if killed {
             s.dead = true;
             s.die_t = 0.;
-            s.respawn = if kind == "big" { 0. } else { 22. };
+            s.respawn = match kind.as_str() {
+                "big" => 0.,
+                "cinderlord" => 180.,
+                _ => 22.,
+            };
             s.state = "dead".into();
         }
         self.event("hit", &actor, point, damage, crit);
         if killed {
+            // Only explicitly shared quests benefit. XP, loot and ordinary quests retain their killer ownership.
+            let contributors = self.slimes[id].contributors.clone();
+            if is_elite(&kind) {
+                for (&other, player) in &mut self.players {
+                    let c = &mut player.character;
+                    if other != session
+                        && c.hp > 0.
+                        && c.zone == zone
+                        && c.point().distance(point) <= 12.
+                        && contributors.contains(&c.id)
+                    {
+                        for q in self.maps[zone].quests.iter().filter(|q| q.group) {
+                            quest_progress(c, std::slice::from_ref(q), "kill", &kind);
+                        }
+                    }
+                }
+            }
             if kind == "big" {
                 self.next_king_spawn = self.time + self.king_spawn_delay();
             }
@@ -1966,6 +2001,7 @@ impl World {
                 } else {
                     s.state = "return".into();
                     s.target = None;
+                    s.contributors.clear();
                 }
             }
             "windup" => {
@@ -1996,11 +2032,16 @@ impl World {
                 }
             }
             "return" => {
+                s.contributors.clear();
                 let home = Point { x: s.hx, y: s.hy };
                 if s.point().distance(home) < 0.4 {
                     s.state = "idle".into();
                     s.st = 1.;
-                    s.hp = (s.hp + s.max_hp * 0.5).min(s.max_hp);
+                    s.hp = if s.kind == "cinderlord" {
+                        s.max_hp
+                    } else {
+                        (s.hp + s.max_hp * 0.5).min(s.max_hp)
+                    };
                 } else {
                     goal = Some(home);
                 }
@@ -2340,15 +2381,30 @@ fn quest_action(character: &mut Character, quest: &Quest, action: &str) -> (Stri
             if !quest.ready(&character.quests[i]) {
                 return refused("Complete the objectives before collecting your reward.");
             }
-            quest.take_bring(character);
+            let mut next = character.clone();
+            quest.take_bring(&mut next);
+            if let Some(id) = &quest.reward_item {
+                if !next.can_collect(id) {
+                    return refused("Your bags are full. Make room for the quest reward.");
+                }
+                next.add_item(id, 1);
+            }
+            *character = next;
             character.quests[i].claimed = true;
             character.quests[i].completions = character.quests[i].completions.saturating_add(1);
             character.gold = character.gold.saturating_add(quest.reward_gold);
             let levels = character.grant_xp(quest.reward_xp);
             (
                 format!(
-                    "Quest complete: {}! +{} XP and +{} gold.",
-                    quest.title, quest.reward_xp, quest.reward_gold
+                    "Quest complete: {}! +{} XP and +{} gold.{}",
+                    quest.title,
+                    quest.reward_xp,
+                    quest.reward_gold,
+                    quest
+                        .reward_item
+                        .as_deref()
+                        .and_then(item)
+                        .map_or(String::new(), |i| format!(" Received {}.", i.name))
                 ),
                 levels,
                 true,
@@ -2393,6 +2449,225 @@ mod tests {
         c.x = here.x;
         c.y = here.y;
         w.interact(1, npc, offer);
+    }
+
+    #[test]
+    fn cinderlord_credits_nearby_living_contributors_only_for_the_group_quest() {
+        // contributor 2 is valid, 3 never hits, 4 is dead, 5 is far away, 6 is in another zone.
+        let mut w = world();
+        let id = w
+            .slimes
+            .iter()
+            .position(|s| s.kind == "cinderlord")
+            .unwrap();
+        let point = w.slimes[id].point();
+        let q = w.maps[1]
+            .quests
+            .iter()
+            .find(|q| q.id == "crags_cinderlord")
+            .unwrap()
+            .clone();
+        let _receivers: Vec<_> = (1..=6)
+            .map(|session| join(&mut w, session, Class::Warrior))
+            .collect();
+        for session in 1..=6 {
+            let c = &mut w.players.get_mut(&session).unwrap().character;
+            c.zone = 1;
+            c.x = point.x + 2.;
+            c.y = point.y;
+            assert!(quest_action(c, &q, "accept").2);
+            c.quests.push(QuestProgress {
+                id: "crags_bounty".into(),
+                counts: vec![0],
+                ..Default::default()
+            });
+            if session != 3 {
+                w.hit_slime(id, session, 1., false);
+            }
+        }
+        w.players.get_mut(&4).unwrap().character.hp = 0.;
+        w.players.get_mut(&5).unwrap().character.x = point.x - 20.;
+        w.players.get_mut(&6).unwrap().character.zone = 0;
+        w.hit_slime(id, 1, 10000., false);
+        for session in 1..=6 {
+            let c = &w.players[&session].character;
+            assert_eq!(
+                c.quests[0].counts,
+                vec![u32::from(session <= 2)],
+                "session {session}"
+            );
+            assert_eq!(
+                c.quests[1].counts,
+                vec![u32::from(session == 1)],
+                "ordinary bounty stays killer-only"
+            );
+            assert_eq!(c.kills, u32::from(session == 1));
+        }
+        assert_eq!(w.slimes[id].respawn, 180.);
+        assert!(w.slimes[id].elite);
+        assert!(
+            w.drops
+                .iter()
+                .all(|d| d.owner == w.players[&1].character.id)
+        );
+        w.hit_slime(id, 2, 10000., false);
+        assert_eq!(w.players[&2].character.quests[0].counts, vec![1]);
+        w.slimes[id].respawn = TICK;
+        w.update_slime(id);
+        assert!(!w.slimes[id].dead && w.slimes[id].contributors.is_empty());
+    }
+
+    #[test]
+    fn cinderlord_evade_clears_contributors_and_restores_all_health() {
+        let mut w = world();
+        let id = w
+            .slimes
+            .iter()
+            .position(|s| s.kind == "cinderlord")
+            .unwrap();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        w.hit_slime(id, 1, 500., false);
+        assert_eq!(w.slimes[id].contributors.len(), 1);
+        w.slimes[id].state = "return".into();
+        w.update_slime(id);
+        assert!(w.slimes[id].contributors.is_empty());
+        assert_eq!(w.slimes[id].hp, w.slimes[id].max_hp);
+    }
+
+    #[test]
+    fn cinderlord_gear_reward_checks_capacity_and_is_saved_once() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(4096);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        quest_interact(
+            &mut w,
+            "crags_captain",
+            Some("quest:accept:crags_cinderlord"),
+        );
+        let q = w.maps[1]
+            .quests
+            .iter()
+            .find(|q| q.id == "crags_cinderlord")
+            .unwrap()
+            .clone();
+        let reward = q.reward_item.as_deref().unwrap();
+        assert_eq!(item(reward).unwrap().rarity, "uncommon");
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.quests.iter_mut().find(|p| p.id == q.id).unwrap().counts = vec![1];
+        for i in ITEMS.iter().filter(|i| i.kind == "material") {
+            if c.bag_used() == c.bag_capacity() {
+                break;
+            }
+            c.add_item(&i.id, 1);
+        }
+        assert_eq!(c.bag_used(), c.bag_capacity());
+        let before = serde_json::to_value(&*c).unwrap();
+        assert!(quest_action(c, &q, "claim").0.contains("bags are full"));
+        assert_eq!(serde_json::to_value(&*c).unwrap(), before);
+        let free = c
+            .inventory
+            .iter()
+            .find(|s| item(&s.item).unwrap().kind == "material")
+            .unwrap()
+            .item
+            .clone();
+        c.inventory.retain(|s| s.item != free);
+        let gold = c.gold;
+        quest_interact(
+            &mut w,
+            "crags_captain",
+            Some("quest:claim:crags_cinderlord"),
+        );
+        let saved = w.store.load(&token).unwrap().unwrap();
+        assert_eq!(saved.quantity(reward), 1);
+        assert_eq!(saved.gold, gold + q.reward_gold);
+        assert!(
+            saved
+                .quests
+                .iter()
+                .any(|p| p.id == q.id && p.claimed && p.completions == 1)
+        );
+        quest_interact(
+            &mut w,
+            "crags_captain",
+            Some("quest:claim:crags_cinderlord"),
+        );
+        assert_eq!(w.players[&1].character.quantity(reward), 1);
+        assert_eq!(w.players[&1].character.gold, saved.gold);
+    }
+
+    #[test]
+    fn cinderlord_two_level_ten_warriors_win_but_one_cannot_trade_hits() {
+        for seed in [1, 42, 123] {
+            for count in [1, 2] {
+                let mut w = world();
+                w.rng = seed;
+                let id = w
+                    .slimes
+                    .iter()
+                    .position(|s| s.kind == "cinderlord")
+                    .unwrap();
+                let point = w.slimes[id].point();
+                for s in w.slimes.iter_mut().filter(|s| s.id != id) {
+                    s.dead = true;
+                    s.respawn = 10000.;
+                }
+                let _receivers: Vec<_> = (1..=count)
+                    .map(|session| join(&mut w, session, Class::Warrior))
+                    .collect();
+                for session in 1..=count {
+                    let c = &mut w.players.get_mut(&session).unwrap().character;
+                    c.zone = 1;
+                    c.x = point.x + if session == 1 { -2. } else { 2. };
+                    c.y = point.y;
+                    c.level = 10;
+                    c.hp = c.max_hp();
+                    c.attributes.strength = 20;
+                    c.attributes.accuracy = 7;
+                    c.add_item("health_potion", 1);
+                    w.message(session, ClientMessage::Target { id });
+                }
+                for _ in 0..(90. / TICK) as usize {
+                    for session in 1..=count {
+                        if w.players[&session].character.hp <= 0. {
+                            continue;
+                        }
+                        let aim = w.players[&session]
+                            .character
+                            .point()
+                            .direction(w.slimes[id].point());
+                        for skill in ["battlecry", "shieldwall", "cleave", "whirlwind"] {
+                            w.use_skill(session, skill, aim);
+                        }
+                        if w.players[&session].character.hp
+                            <= w.players[&session].character.max_hp() - 100.
+                        {
+                            w.use_item(session, "health_potion");
+                        }
+                    }
+                    w.step();
+                    if w.slimes[id].dead || w.players.values().all(|p| p.character.hp <= 0.) {
+                        break;
+                    }
+                }
+                assert_eq!(
+                    w.slimes[id].dead,
+                    count == 2,
+                    "seed {seed}, {count} player(s), enemy HP {}, time {}",
+                    w.slimes[id].hp,
+                    w.time
+                );
+                if count == 2 {
+                    assert!(
+                        w.players.values().all(|p| p.character.hp > 0.),
+                        "both survive, seed {seed}"
+                    );
+                }
+            }
+        }
     }
 
     #[test]
@@ -2508,11 +2783,11 @@ mod tests {
     }
 
     #[test]
-    fn crags_hub_catalog_is_connected_and_has_twelve_valid_quests() {
+    fn crags_hub_catalog_is_connected_and_has_valid_quests() {
         let w = world();
         let map = &w.maps[1];
         assert_eq!(map.npcs.len(), 4);
-        assert_eq!(map.quests.len(), 13);
+        assert_eq!(map.quests.len(), 14);
         assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 2);
         let mut ids = std::collections::HashSet::new();
         let mut npc_ids = std::collections::HashSet::new();
@@ -2524,6 +2799,13 @@ mod tests {
                 assert!(ids.insert(&q.id), "globally unique persistent quest ids");
                 assert!(area.npcs.iter().any(|n| n.id == q.npc));
                 assert!(q.reward_xp > 0 && q.reward_gold > 0 && !q.objectives.is_empty());
+                if let Some(id) = &q.reward_item {
+                    assert!(
+                        item(id).is_some_and(is_gear),
+                        "valid gear reward for {}",
+                        q.id
+                    );
+                }
                 let need = xp_to_level(q.level);
                 assert!(q.level >= 1, "{} needs a recommended level", q.id);
                 assert_eq!(
@@ -2757,7 +3039,7 @@ mod tests {
         );
         // Enemy ids of the older zones are unchanged: the new zone's enemies come last.
         let first = w.slimes.iter().position(|s| s.zone == 2).unwrap();
-        assert!(w.slimes[..first].iter().all(|s| s.zone < 2) && first == 47);
+        assert!(w.slimes[..first].iter().all(|s| s.zone < 2) && first == 48);
         // Each kind keeps to its own ring: crabs on the outer shelf, wyrms in the summit bowl.
         let band = |kind: &str| {
             let radii: Vec<f64> = w
@@ -3236,7 +3518,7 @@ mod tests {
         w.players.get_mut(&2).unwrap().character.zone = 1;
         let snapshot = w.snapshot();
         assert_eq!(snapshot["zones"].as_array().unwrap().len(), 5);
-        for (zone, count) in [(0, 21), (1, 26), (2, 27)] {
+        for (zone, count) in [(0, 21), (1, 27), (2, 27)] {
             let view = w.snapshot_for(zone);
             assert_eq!(
                 view["slimes"].as_array().unwrap().len(),
@@ -3364,7 +3646,7 @@ mod tests {
         );
         // The new zone's enemies come last, so every older enemy id is unchanged.
         let first = w.slimes.iter().position(|s| s.zone == 3).unwrap();
-        assert!(w.slimes[..first].iter().all(|s| s.zone < 3) && first == 74);
+        assert!(w.slimes[..first].iter().all(|s| s.zone < 3) && first == 75);
         // The summit gate in the glacier and the way back (the glacier's first portal stays the Crags gate).
         let up = w.maps[2]
             .portals
@@ -3854,7 +4136,7 @@ mod tests {
         let _rx2 = join(&mut w, 2, Class::Mage);
         w.players.get_mut(&1).unwrap().character.zone = 3;
         w.players.get_mut(&2).unwrap().character.zone = 2;
-        for (zone, count) in [(0, 21), (1, 26), (2, 27), (3, 31)] {
+        for (zone, count) in [(0, 21), (1, 27), (2, 27), (3, 31)] {
             let view = w.snapshot_for(zone);
             assert_eq!(
                 view["slimes"].as_array().unwrap().len(),

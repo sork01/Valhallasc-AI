@@ -35,13 +35,13 @@ const look = page => page.evaluate(() => {
   // Display-only fixture: while `stage` is set, the browser's copy of each Crags snapshot gets one extra monster of
   // every kind in a chosen state, so every clip can be drawn without a level-1 hero meeting them. The server is untouched.
   let stage = null;
-  const levels = { wisp: 6, spider: 8, wraith: 7, golem: 11 }, health = { wisp: 280, spider: 420, wraith: 520, golem: 1100 }, windup = { wisp: .35, spider: .4, wraith: .5, golem: .6 };
+  const levels = { wisp: 6, spider: 8, wraith: 7, golem: 11, cinderlord: 10 }, health = { wisp: 280, spider: 420, wraith: 520, golem: 1100, cinderlord: 2400 }, windup = { wisp: .35, spider: .4, wraith: .5, golem: .6, cinderlord: .65 };
   const restage = text => {
     let packet; try { packet = JSON.parse(text); } catch { return text; }
     const snap = packet.type === 'welcome' ? packet.snapshot : packet.type === 'snapshot' ? packet : null, me = snap?.players[0];
     if (!stage || !me || me.zone !== 1) return text;
-    ['wisp', 'spider', 'wraith', 'golem'].forEach((kind, i) => {
-      const D = [-9, -3, 3, 9][i], x = me.x + (-7 + D) / 2, y = me.y + (-7 - D) / 2, dead = stage.state === 'dead';
+    ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'].forEach((kind, i) => {
+      const D = [-16, -8, 0, 8, 16][i], x = me.x + (-7 + D) / 2, y = me.y + (-7 - D) / 2, dead = stage.state === 'dead';
       snap.slimes.push({ id: 1000 + i, kind, zone: 1, level: levels[kind], x, y, hx: x, hy: y, hp: dead ? 0 : health[kind] * (stage.state === 'hurt' ? .55 : 1), maxHp: health[kind], r: .4, windupTime: windup[kind],
         state: stage.state, st: stage.state === 'windup' ? .1 : stage.state === 'lunge' ? .15 : 1, hop: 0, hopV: 0, hurtT: stage.state === 'hurt' ? .2 : 0, recT: 0, landT: 0, dead, dieT: dead ? stage.dieT : 0, respawn: 0, atkCd: 1, blink: 2, seed: 3, dir: i % 2 ? -1 : 1 });
     });
@@ -68,7 +68,7 @@ const look = page => page.evaluate(() => {
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, portals: z.portals.length, enemies: z.slimes?.length })));
   check(zones.length === 5 && zones[1].name === 'Emberfall Crags' && zones[1].theme === 'ember' && zones[2].name === 'Rimeveil Glacier', 'The client knows all five zones');
-  check(await page.evaluate(stub => { const m = Field.cragSprites.meta; return m.kinds.join() === 'wisp,spider,wraith,golem' && (stub || m.kinds.every(k => Field.cragSprites.img[k].naturalWidth === 768 && Field.cragSprites.img[k].naturalHeight === 480)); }, STUB), 'All four monster atlases load at their documented size');
+  check(await page.evaluate(stub => { const m = Field.cragSprites.meta; return m.kinds.join() === 'wisp,spider,wraith,golem,cinderlord' && (stub || m.kinds.every(k => Field.cragSprites.img[k].naturalWidth === 768 && Field.cragSprites.img[k].naturalHeight === 480)); }, STUB), 'All five monster atlases load at their documented size');
   check(await page.evaluate(() => Field.zone === 0 && document.getElementById('area-title').textContent.includes('Greenmeadow')), 'The hero starts in Greenmeadow');
   const meadow = await look(page);
   check(meadow.g > meadow.r && meadow.g > meadow.b, `The meadow is green (${meadow.r | 0},${meadow.g | 0},${meadow.b | 0})`);
@@ -123,19 +123,28 @@ const look = page => page.evaluate(() => {
   check(await page.evaluate(() => Field.slimes.length > 0 && Field.slimes.every(s => s.zone === 1 && Number.isInteger(s.level) && s.level >= 3 && s.level <= 12)), 'Only Crags enemies, each with an integer level, are shown');
   check(await page.evaluate(() => Field.remotePlayers.length === 0), 'Nobody else is shown (only players in this zone are drawn)');
   const names = await page.evaluate(() => [...new Set(Field.slimes.map(s => s.d.name))].sort());
-  check(names.every(n => ['Ash Wraith', 'Basalt Golem', 'Cinder Wisp', 'Magma Spider'].includes(n)), `Enemy names come from the new bestiary: ${names}`);
+  check(names.every(n => ['Ash Wraith', 'Basalt Golem', 'Cinder Wisp', 'Cinderlord', 'Magma Spider'].includes(n)), `Enemy names come from the new bestiary: ${names}`);
   const miniPixels = await page.evaluate(() => { const c = document.getElementById('minimap'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let ember = 0; for (let i = 0; i < d.length; i += 4) if (d[i] > 200 && d[i + 1] < 130 && d[i + 2] < 80 && d[i + 3] > 0) ember++; return ember; });
   check(miniPixels > 40, `The minimap shows the lava rivers (${miniPixels} ember pixels)`);
 
   // The journal routes to local camp NPCs, while explaining where the meadow givers live.
   await page.keyboard.press('q');
   check(await page.locator('#quest-journal').isVisible() && (await page.locator('#quest-list [data-quest="welcome"]').textContent()).includes('is back in Greenmeadow'), 'Meadow quests explain that their givers are in Greenmeadow');
-  check(await page.locator('#quest-list [data-quest^="crags_"]').count() === 13, 'All thirteen Crags quests appear in the journal');
+  check(await page.locator('#quest-list [data-quest^="crags_"]').count() === 14, 'All fourteen Crags quests appear in the journal');
   check(await page.locator('#quest-list .quest-card').first().getAttribute('data-quest') === 'crags_welcome', 'Local camp quests sort first');
   check(await page.locator('#quest-list [data-quest="crags_golems"]').textContent().then(t => t.includes('Locked') && t.includes('Voices in the Ash')), 'Later hunts explain their prerequisite');
+  const eliteCard = page.locator('#quest-list [data-quest="crags_cinderlord"]');
+  check(await eliteCard.locator('.quest-level').textContent().then(t => t.includes('level 10') && t.includes('2 players')), 'The elite quest recommends level 10 and two players');
+  const eliteReward = eliteCard.locator('[data-item="necklace_moonstone_l10_green"]');
+  check(await eliteReward.textContent().then(t => t.includes('Reinforced Moonstone Necklace') && t.includes('All classes') && t.includes('green'))
+    && await eliteReward.evaluate(e => getComputedStyle(e).color) === 'rgb(74, 214, 109)', 'The journal shows the guaranteed all-class green gear reward in green');
   await page.locator('#quest-list [data-quest="crags_welcome"] button').filter({ hasText: 'Get quest from Captain Sera' }).click();
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
   check(await page.locator('#npc-name').textContent() === 'Captain Sera', 'Journal travel reaches the camp commander');
+  await page.locator('#npc-quests .gossip-row[data-quest="crags_cinderlord"]').click();
+  check(await page.locator('#npc-quests [data-quest="crags_cinderlord"] [data-item="necklace_moonstone_l10_green"]').textContent().then(t => t.includes('Uncommon (green)'))
+    && await page.locator('#npc-quests [data-quest="crags_cinderlord"] .quest-level').textContent().then(t => t.includes('2 players')), 'Captain Sera shows the group size and green reward before acceptance');
+  await page.locator('#npc-quests [data-action="decline"]').click();
   await page.locator('#npc-quests .gossip-row[data-quest="crags_welcome"]').click();
   await page.locator('#npc-quests [data-quest="crags_welcome"] [data-action="accept"]').click();
   await page.waitForFunction(() => document.querySelector('#npc-quests .gossip-row[data-quest="crags_welcome"]')?.dataset.status === 'active');
@@ -189,7 +198,7 @@ const look = page => page.evaluate(() => {
   // One hash per monster, from the box it stands in; the sky, lava and gate animate, but the ground there does not.
   const monsterHashes = () => page.evaluate(() => {
     const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'), k = cv.width / 1600;
-    return [1000, 1001, 1002, 1003].map(id => {
+    return [1000, 1001, 1002, 1003, 1004].map(id => {
       const s = Field.slimes.find(m => m.id === id), [sx, sy] = Field._debug.w2s(s.x, s.y);
       const x = Math.max(0, Math.round((sx - 110) * k)), y = Math.max(0, Math.round((sy - 250) * k)), d = g.getImageData(x, y, Math.round(220 * k), Math.round(270 * k)).data;
       let h = 0; for (let i = 0; i < d.length; i += 5) h = (Math.imul(h, 31) + d[i] + (d[i + 1] << 3) + (d[i + 2] << 6)) | 0;
@@ -199,7 +208,7 @@ const look = page => page.evaluate(() => {
   const seen = [];
   for (const [state, dieT] of [['idle', 0], ['windup', 0], ['lunge', 0], ['hurt', 0], ['dead', .2], ['dead', .45], ['dead', 3]]) {
     stage = { state, dieT };
-    await page.waitForFunction(([state]) => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000 && s.state === state).length === 4, [state], { timeout: 10000 });
+    await page.waitForFunction(([state]) => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000 && s.state === state).length === 5, [state], { timeout: 10000 });
     await page.evaluate(() => { Field.hero.target = Field.slimes.find(s => s.id === 1002) || null; });
     await page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));   // the new state has been drawn
     check(await page.evaluate(() => Field.slimes.every(s => s.zone === 1) && Field.remotePlayers.length === 0), `A monster and a player from another zone in the ${state} packet are not shown`);
@@ -208,13 +217,19 @@ const look = page => page.evaluate(() => {
     const wanted = { idle: f => f[0] === 'idle', windup: f => f[0] === 'attack' && f[1] < 3, lunge: f => f[0] === 'attack' && f[1] >= 3 && f[1] <= 5, hurt: f => f[0] === 'hurt' };
     // The client adds frame time to the server's dieT between snapshots, so allow the next frame.
     const dying = dieT === .2 ? f => f[0] === 'die' && f[1] >= 1 && f[1] <= 2 : dieT === .45 ? f => f[0] === 'die' && f[1] >= 3 && f[1] <= 4 : f => f[0] === 'die' && f[1] === 7;
-    check(frames.length === 4 && frames.every(state === 'dead' ? dying : wanted[state]), `The ${state}${state === 'dead' ? ' ' + dieT + 's' : ''} state picks its own clip and frame: ${JSON.stringify(frames[0])}`);
+    check(frames.length === 5 && frames.every(state === 'dead' ? dying : wanted[state]), `The ${state}${state === 'dead' ? ' ' + dieT + 's' : ''} state picks its own clip and frame: ${JSON.stringify(frames[0])}`);
     seen.push(await monsterHashes());
     if (state === 'idle' || state === 'lunge') await shot('bestiary-' + state);
   }
   stage = null;
   // Needs the real animation frames; the stub is one still picture. `npm run test:art` runs this suite on the real art.
-  check(STUB || seen.every((hashes, i) => i === 0 || hashes.every((h, kind) => h !== seen[i - 1][kind])), `All four monsters draw something new in each state: idle, windup, lunge, hurt, early and late dying frames, then gone (${seen.length} states)`);
+  check(STUB || seen.every((hashes, i) => i === 0 || hashes.every((h, kind) => h !== seen[i - 1][kind])), `All five monsters draw something new in each state: idle, windup, lunge, hurt, early and late dying frames, then gone (${seen.length} states)`);
+  const campPosition = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y }));
+  await stageAt(1, 81, 10);
+  await page.waitForTimeout(800);
+  check(await page.evaluate(() => { const s = Field.slimes.find(s => s.kind === 'cinderlord'); return s && s.d.elite && s.d.name === 'Cinderlord' && Math.hypot(s.x - Field.hero.x, s.y - Field.hero.y) < 7; }), 'The real Cinderlord appears in the northeastern arena with an elite nameplate');
+  await shot('cinderlord-elite');
+  await stageAt(1, campPosition.x, campPosition.y);
   await page.waitForFunction(() => Field.slimes.every(s => s.id < 1000), null, { timeout: 10000 });
   await page.evaluate(() => { Field.hero.target = null; });
 

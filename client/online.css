@@ -229,6 +229,8 @@
 .bag-details .item-name { display: block; color: #f0e5cd; font: 1cqw 'Jua', sans-serif; }
 .bag-details .item-name[data-rarity="common"] { color: #c4c4c4; }
 .bag-details .item-name[data-rarity="uncommon"] { color: #4ad66d; }
+.quest-reward[data-rarity="uncommon"] { color: #4ad66d; }
+.gossip-parchment .quest-reward[data-rarity="uncommon"] { color: #14782e; }
 .bag-details .item-name[data-rarity="rare"] { color: #64b5ff; }
 .bag-details .item-name[data-rarity="epic"] { color: #b45cff; }
 .bag-details .item-name[data-rarity="legendary"] { color: #ff9a2e; }

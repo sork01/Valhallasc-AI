@@ -11,7 +11,8 @@
     "wisp",
     "spider",
     "wraith",
-    "golem"
+    "golem",
+    "cinderlord"
   ],
   "clips": {
     "idle": {
@@ -49,6 +50,7 @@
     "wisp": "019ef97089e68b84",
     "spider": "c56d8ca744b3276e",
     "wraith": "109a09ba62bb49ec",
-    "golem": "8e8a0a196dc625b5"
+    "golem": "8e8a0a196dc625b5",
+    "cinderlord": "e73cf244cb32ce77"
   }
 }

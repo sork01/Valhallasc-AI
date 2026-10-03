@@ -29,7 +29,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20 };
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
 const levelXp = JSON.parse(fs.readFileSync(path.join(root, 'world/levels.txt'), 'utf8'));
@@ -441,7 +441,7 @@ const scenarios = {
     async run(w, check) {
       const bot = 'Crawler';
       await w.connect({ bot, class: 'warrior' });
-      const defaults = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10 };
+      const defaults = DEFAULT_LEVELS;
       const home = w.snapshot.slimes;
       check(w.player(bot).zone === 0, 'New characters start in Greenmeadow');
       check(home.length === 21 && home.every(s => s.zone === 0), 'A meadow client receives exactly the 21 meadow enemies and nothing from the Crags');
@@ -455,8 +455,8 @@ const scenarios = {
       const arrival = { x: gate.tx, y: gate.ty };
       check(w.player(bot).zone === 1 && distance(w.player(bot), arrival) < 1, 'The server moves the walker to the Crags arrival camp');
       const away = w.snapshot.slimes;
-      check(away.length === 26 && away.every(s => s.zone === 1) && new Set(away.map(s => s.kind)).size === 4
-        && ['wisp', 'spider', 'wraith', 'golem'].every(k => away.some(s => s.kind === k)), 'A Crags client receives exactly the 26 Crags monsters, four kinds, and nothing from the meadow');
+      check(away.length === 27 && away.every(s => s.zone === 1) && new Set(away.map(s => s.kind)).size === 5
+        && ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'].every(k => away.some(s => s.kind === k)), 'A Crags client receives exactly the 27 Crags monsters, five kinds, and nothing from the meadow');
       check(away.every(s => Math.abs(s.level - defaults[s.kind]) <= 2 && s.level >= 3) && new Set(away.map(s => s.level - defaults[s.kind])).size >= 3,
         'Crags levels sit within two of each default and really vary');
       check(away.filter(s => s.kind === 'wisp').every(s => s.maxHp === Math.round(280 * (1 + .12 * (s.level - 5)))), 'Health follows each rolled level');
@@ -808,7 +808,7 @@ const scenarios = {
       check(!quest(w, bot, 'crags_wisps'), 'The Crags hunt requires the camp introduction');
       await kit.talkTo(w, bot, 'crags_scout', 'quest:accept:crags_welcome');
       check(!quest(w, bot, 'crags_welcome'), 'The wrong NPC cannot offer another giver\'s quest');
-      check(kit.describe('quests').quests.filter(q => q.zone === 1).length === 13, 'MCP describes all thirteen Crags quests with their zone');
+      check(kit.describe('quests').quests.filter(q => q.zone === 1).length === 14, 'MCP describes all fourteen Crags quests with their zone');
       for (const q of crags.quests.filter(q => !q.autoLevel)) {
         await kit.teleport(w, bot, { npc: q.npc });
         await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
@@ -1460,6 +1460,62 @@ const scenarios = {
       check(front().dead, 'Arrows alone defeat an enemy');
     },
   },
+  cinderlord: {
+    description: 'Two level-10 warriors fight the Cinderlord with real damage, skills and potions, both earn quest credit and guaranteed green gear, then equip it and retain the reward after restart.',
+    startLevel: 10, godMode: false, levelSpread: 0,
+    async run(w, check) {
+      const bots = ['Ember', 'Cinder'], qid = 'crags_cinderlord', reward = 'necklace_moonstone_l10_green';
+      for (const bot of bots) {
+        await w.connect({ bot, class: 'warrior' });
+        await kit.setupCharacter(w, bot, { items: [{ item: 'health_potion' }], teleportTo: { npc: 'crags_captain' } });
+        for (let i = 0; i < 27; i++) await w.action(bot, { type: 'allocate_stat', stat: i < 20 ? 'strength' : 'accuracy' });
+        await w.waitFor(() => w.player(bot).statPoints === 0, 5000, 'All training spent');
+        await kit.talkTo(w, bot, 'crags_captain', `quest:accept:${qid}`);
+        await w.waitFor(() => !!quest(w, bot, qid));
+        check(quest(w, bot, qid).counts[0] === 0, `${bot} accepts the elite quest with no kill credit`);
+      }
+      const elite = w.snapshot.slimes.find(s => s.kind === 'cinderlord');
+      check(elite.elite && elite.level === 10 && elite.maxHp === 2400 && elite.zone === 1, 'Exactly the new level-10 elite is present with authoritative 2400 HP');
+      for (const [i, bot] of bots.entries()) await kit.teleport(w, bot, { zone: 1, x: elite.x + (i ? 2 : -2), y: elite.y });
+      for (const bot of bots) await w.action(bot, { type: 'target', id: elite.id });
+      const current = () => w.snapshot.slimes.find(s => s.id === elite.id), began = Date.now();
+      while (!current().dead && Date.now() - began < 60000) {
+        for (const bot of bots) {
+          const p = w.player(bot);
+          if (p.dead) throw Error(`${bot} died during the two-player fight`);
+          for (const id of ['battlecry', 'shieldwall', 'cleave', 'whirlwind']) {
+            if (!p.skillCd[id]) await w.action(bot, { type: 'skill', id, ...aimAt(w, bot, current()) });
+          }
+          if (p.hp <= p.maxHp - 100 && !p.potionCd && p.inventory.some(s => s.item === 'health_potion')) await w.action(bot, { type: 'use_item', item: 'health_potion' });
+        }
+        await w.advance(200);
+      }
+      check(current().dead, 'Two warriors defeat the elite through ordinary combat with god mode disabled');
+      for (const bot of bots) {
+        await w.action(bot, { type: 'stop' });
+        await w.waitFor(() => quest(w, bot, qid).counts[0] === 1);
+        check(w.player(bot).hp > 0 && w.player(bot).hp < w.player(bot).maxHp, `${bot} survives and took real damage`);
+        check(w.events.some(e => e.type === 'event' && e.kind === 'hit' && e.actor === w.player(bot).id), `${bot} personally damaged the Cinderlord`);
+        check(quest(w, bot, qid).counts[0] === 1, `${bot} earns shared elite quest credit`);
+      }
+      check(bots.reduce((n, bot) => n + w.player(bot).kills, 0) === 1, 'The ordinary kill reward still has only one owner');
+      for (const bot of bots) {
+        await kit.teleport(w, bot, { npc: 'crags_captain' });
+        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        await kit.talkTo(w, bot, 'crags_captain', `quest:claim:${qid}`);
+        await w.waitFor(() => quest(w, bot, qid).claimed && w.player(bot).inventory.some(s => s.item === reward));
+        check(w.player(bot).gold === before.gold + 200 && totalXp(w.player(bot)) === before.xp + levelXp[9] / 10, `${bot} gets exact quest XP and gold`);
+        check(w.player(bot).inventory.find(s => s.item === reward).quantity === 1 && kit.items.find(i => i.id === reward).rarity === 'uncommon', `${bot} gets one guaranteed green necklace`);
+        await kit.talkTo(w, bot, 'crags_captain', `quest:claim:${qid}`);
+        check(w.player(bot).gold === before.gold + 200 && w.player(bot).inventory.find(s => s.item === reward).quantity === 1, `${bot} cannot claim twice`);
+        await w.action(bot, { type: 'equip', slots: { necklace: reward } });
+        await w.waitFor(() => w.player(bot).equipment.necklace === reward);
+        check(true, `${bot} can equip the level-10 reward`);
+      }
+      await w.restart();
+      check(bots.every(bot => quest(w, bot, qid).claimed && w.player(bot).equipment.necklace === reward && w.player(bot).inventory.find(s => s.item === reward).quantity === 1), 'Both quest completions and worn rewards survive a private server restart');
+    },
+  },
   progression_quests: {
     description: 'Progression quests: one arrives by itself every five levels, is never offered at a giver, completes on arrival in the next zone, pays at that zone\'s captain and survives a restart.',
     async run(w, check) {
@@ -1510,6 +1566,8 @@ async function runScenario(name, world = new TestWorld()) {
   let result;
   try {
     if (scenarios[name].startLevel) world.startLevel = scenarios[name].startLevel;
+    if (scenarios[name].godMode !== undefined) world.godMode = scenarios[name].godMode;
+    if (scenarios[name].levelSpread !== undefined) world.levelSpread = scenarios[name].levelSpread;
     await world.start();
     await scenarios[name].run(world, check);
     check(!world.spacingFailure, 'Every observed snapshot preserves enemy spacing');

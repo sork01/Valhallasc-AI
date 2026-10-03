@@ -4509,6 +4509,11 @@
           "x": 35.83,
           "y": 12.68,
           "kind": "golem"
+        },
+        {
+          "x": 84,
+          "y": 10,
+          "kind": "cinderlord"
         }
       ],
       "npcs": [
@@ -4803,6 +4808,28 @@
           "rewardGold": 250,
           "requires": "crags_golems",
           "repeatable": false
+        },
+        {
+          "id": "crags_cinderlord",
+          "title": "Two Against the Cinderlord",
+          "npc": "crags_captain",
+          "description": "The Cinderlord, a horned tyrant with a molten warhammer, guards the northeastern heights. Bring a companion: this elite is meant for two level-10 adventurers using skills and healing. Both accept this quest and damage him; stay alive and nearby when he falls. Return to Captain Sera for a guaranteed green Reinforced Moonstone Necklace, usable by every class.",
+          "objectives": [
+            {
+              "kind": "kill",
+              "target": "cinderlord",
+              "label": "Defeat the Cinderlord (Elite \u00b7 2 players)",
+              "count": 1
+            }
+          ],
+          "level": 10,
+          "rewardXp": 210,
+          "rewardGold": 200,
+          "requires": null,
+          "repeatable": false,
+          "group": true,
+          "rewardItem": "necklace_moonstone_l10_green",
+          "recommendedPlayers": 2
         },
         {
           "id": "crags_bounty",

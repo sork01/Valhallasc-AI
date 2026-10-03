@@ -267,7 +267,7 @@ impl World {
                     .filter(|s| s.kind == kind)
                     .min_by_key(|s| (!s.dead, s.id))
                     .map(|s| s.id)
-                    .ok_or("No enemy of that kind exists. Kinds: green, blue, pink, yellow, beetle, wisp, spider, wraith, golem, crab, wolf, yeti, wyrm, toad, croc, knight, hydra.")?;
+                    .ok_or("No enemy of that kind exists. Kinds: green, blue, pink, yellow, beetle, wisp, spider, wraith, golem, cinderlord, crab, wolf, yeti, wyrm, toad, croc, knight, hydra.")?;
                 let zone = self.players[&session].character.zone;
                 let mut enemy = Slime::with_level(
                     id,

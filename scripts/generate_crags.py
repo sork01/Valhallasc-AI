@@ -99,6 +99,13 @@ def quest_hub():
               [kill(kind, 2, 'Defeat ' + label) for kind, label in
                [('wisp', 'Cinder Wisps'), ('spider', 'Magma Spiders'), ('wraith', 'Ash Wraiths'), ('golem', 'Basalt Golems')]],
               10, 250, 'golems'),
+        dict(quest('cinderlord', 'Two Against the Cinderlord', 'captain',
+              'The Cinderlord, a horned tyrant with a molten warhammer, guards the northeastern heights. '
+              'Bring a companion: this elite is meant for two level-10 adventurers using skills and healing. '
+              'Both accept this quest and damage him; stay alive and nearby when he falls. '
+              'Return to Captain Sera for a guaranteed green Reinforced Moonstone Necklace, usable by every class.',
+              [kill('cinderlord', 1, 'Defeat the Cinderlord (Elite · 2 players)')], 10, 200),
+              group=True, rewardItem='necklace_moonstone_l10_green', recommendedPlayers=2),
         quest('bounty', 'Cinderwatch Patrol', 'supplier',
               'Defeat ten enemies anywhere in Emberfall Crags and return to Dain. This camp patrol can be repeated.',
               [kill('any', 10, 'Defeat Crags enemies')], 6, 100, 'welcome', True),
@@ -192,6 +199,25 @@ def build(rng, meadow_objects):
     return zone
 
 
+def ensure_elite(zone):
+    """Reserve a clear arena in the northeast without moving existing terrain, enemies or gates."""
+    if any(s['kind'] == 'cinderlord' for s in zone['slimes']):
+        return
+    candidates = [(x, y) for y in range(8, 17) for x in range(76, 91)]
+    candidates.sort(key=lambda p: math.hypot(p[0] - 84, p[1] - 10))
+    for x, y in candidates:
+        if (any(math.hypot(x - o['x'], y - o['y']) < o['r'] + 3 for o in zone['objects'])
+                or any(math.hypot(x - s['x'], y - s['y']) < 11 for s in zone['slimes'])
+                or any(min(math.hypot(x - p['x'], y - p['y']),
+                           math.hypot(x - p['tx'], y - p['ty'])) < 11 for p in zone['portals'])):
+            continue
+        zone['slimes'].append(dict(x=x, y=y, kind='cinderlord'))
+        if not reachable(zone):
+            return
+        zone['slimes'].pop()
+    raise SystemExit('No reachable, clear Cinderlord arena in the northeastern heights')
+
+
 def reachable(zone):
     """Grid flood fill with the player's radius: every spawn and the gate must connect to the arrival."""
     step, margin = .5, .62
@@ -232,9 +258,12 @@ def main():
         zone = meadow['zones'][0]
         assert zone['name'] == 'Emberfall Crags', 'zone 1 must be the Crags'
         npcs, quests, objects, city = quest_hub()
-        zone['objects'] = [o for o in zone['objects']
-                           if not (city['x0'] - 2 < o['x'] < city['x1'] + 2 and city['y0'] - 2 < o['y'] < city['y1'] + 2)] + objects
+        is_camp = lambda o: city['x0'] - 2 < o['x'] < city['x1'] + 2 and city['y0'] - 2 < o['y'] < city['y1'] + 2
+        at = next(i for i, o in enumerate(zone['objects']) if is_camp(o))
+        outside = [o for o in zone['objects'] if not is_camp(o)]
+        zone['objects'] = outside[:at] + objects + outside[at:]
         zone.update(npcs=npcs, quests=quests, city=city)
+        ensure_elite(zone)
         missing = reachable(zone)
         if missing:
             raise SystemExit(f'unreachable from the arrival point: {missing}')
@@ -270,6 +299,7 @@ def main():
         if o['kind'] != 'post' and math.hypot(o['x'] - MEADOW_GATE[0], o['y'] - MEADOW_GATE[1]) < o['r'] + 1.6:
             raise SystemExit(f'meadow object {o} blocks the gate')
     zone = build(rng, meadow['objects'])
+    ensure_elite(zone)
     missing = reachable(zone)
     if missing:
         raise SystemExit(f'unreachable from the arrival point: {missing}')

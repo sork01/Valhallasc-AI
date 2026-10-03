@@ -64,7 +64,7 @@ const debugSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('quest'), id: z.string().max(40), action: questAction }).strict(),
   z.object({ op: z.literal('kill_enemy'), id: z.number().int().nonnegative() }).strict(),
   z.object({ op: z.literal('respawn_enemy'), id: z.number().int().nonnegative() }).strict(),
-  z.object({ op: z.literal('spawn_enemy'), kind: z.enum(['green', 'blue', 'pink', 'yellow', 'beetle', 'wisp', 'spider', 'wraith', 'golem']), x: number, y: number, level: z.number().int().min(1).max(100).optional() }).strict(),
+  z.object({ op: z.literal('spawn_enemy'), kind: z.enum(['green', 'blue', 'pink', 'yellow', 'beetle', 'wisp', 'spider', 'wraith', 'golem', 'cinderlord']), x: number, y: number, level: z.number().int().min(1).max(100).optional() }).strict(),
   z.object({ op: z.literal('summon_king') }).strict(),
 ]);
 const botSchema = z.object({

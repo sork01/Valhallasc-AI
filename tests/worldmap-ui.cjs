@@ -140,7 +140,8 @@ async function call(name, args = {}) {
   const listed = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('.wm-kind')].map(b => [b.dataset.kind, Number(b.querySelector('small').textContent.split('·')[1])])));
   check(JSON.stringify(listed) === JSON.stringify(expectKinds) && Object.keys(listed).length >= 1, `The legend counts only enemies in uncovered cells (${JSON.stringify(listed)})`);
   const side = await page.locator('#wm-side').textContent();
-  check(/Recommended levels 10–15/.test(side) && /13 quests/.test(side) && /Charted 2 of 9 places/.test(side), 'It gives the level range, the quest count and how much is charted');
+  const questCount = await page.evaluate(() => Field._debug.zones[2].quests.length);
+  check(/Recommended levels 10–15/.test(side) && side.includes(`${questCount} quests`) && /Charted 2 of 9 places/.test(side), 'It gives the level range, the quest count and how much is charted');
   const dots = () => page.evaluate(() => { const g = document.getElementById('wm-dots').getContext('2d').getImageData(0, 0, 768, 768).data; let a = 0; for (let i = 3; i < g.length; i += 4) if (g[i] > 200) a++; return a; });
   const kind = Object.keys(listed)[0], total = Object.values(listed).reduce((a, b) => a + b, 0);
   const lit = await dots(); await page.locator(`.wm-kind[data-kind="${kind}"]`).hover(); const one = await dots();

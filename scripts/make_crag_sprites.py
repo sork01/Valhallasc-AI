@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """makesprites workflow for the Emberfall Crags monsters: preview | build [--replace] | export.
 
-Four kinds (wisp, spider, wraith, golem) share one 96x96 frame, a foot anchor at (48, 90),
+Five kinds (wisp, spider, wraith, golem, cinderlord) share one 96x96 frame, a foot anchor at (48, 90),
 right-facing art (the game mirrors it) and the same five clips as the Ironhide Beetle
 (idle 6, walk 8, attack 8, hurt 4, die 8), so client/field.js drives them with one state machine.
 
@@ -29,7 +29,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'client/assets'
 W, H, AX, AY = 96, 96, 48, 90
 PREFIX = 'valhallasc_crag_'
-KINDS = ['wisp', 'spider', 'wraith', 'golem']
+KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord']
 CLIPS = {'idle': (6, 6), 'walk': (10, 8), 'attack': (12, 8), 'hurt': (10, 4), 'die': (8, 8)}
 OUTLINE = '#1a1118'
 FLASH = '#fffaf0'
@@ -833,7 +833,115 @@ def golem(clip, n):
 # ----------------------------------------------------------------------------------------------
 # Rendering and PixelFlow plumbing (same contract as scripts/make_ironhide_sprites.py)
 # ----------------------------------------------------------------------------------------------
-DRAWERS = {'wisp': (wisp, WISP), 'spider': (spider, SPIDER), 'wraith': (wraith, WRAITH), 'golem': (golem, GOLEM)}
+# A horned, armoured fire tyrant with a warhammer: its own rig and silhouette, not a golem palette swap.
+CINDERLORD = Palette({
+    'rock0': '#211e27', 'rock1': '#39333e', 'rock2': '#58505b', 'rock3': '#867986', 'rock4': '#b9a6aa',
+    'fire0': '#7d211d', 'fire1': '#c24120', 'fire2': '#ed7626', 'fire3': '#ffb83f', 'fire4': '#ffe9a3',
+    'gold0': '#684324', 'gold1': '#a57835', 'gold2': '#dfb35b', 'gold3': '#fff0b0',
+    'face': '#150f1c', 'eye': '#fff8c5', 'ash': '#a78677',
+})
+
+
+def cinderlord(clip, n):
+    p = CINDERLORD
+    f = Frame(p)
+    phase = n * math.pi / 4
+    cx, ground, lean, lift, sag, angle = 40., AY - 1., 0., 0., 0., .1
+    flash = clip == 'hurt' and n == 0 or clip == 'die' and n == 0
+    stride = 0.
+    if clip == 'idle':
+        lift = [0, .6, 1.2, 1.2, .6, 0][n]
+    elif clip == 'walk':
+        stride = math.sin(phase) * 5
+        lift = [0, 1, 2, 3, 2, 0, -2, 0][n]
+        lean = [0, 1, 2, 3, 2, 1, 0, 0][n]
+    elif clip == 'attack':
+        lean = [-1, -3, -4, 3, 6, 5, 2, 0][n]
+        lift = [0, -1, -2, 2, -2, -1, 0, 0][n]
+        angle = [.1, -.15, 0., .75, 1.65, 1.65, .7, .1][n]
+    elif clip == 'hurt':
+        cx += [-4, -3, -1, 0][n]
+        lean = [-4, -2, -1, 0][n]
+    elif clip == 'die':
+        sag = [0, .08, .25, .5, .75, .9, 1, 1][n]
+        angle = .1 + sag * 1.1
+        lean = -sag * 9
+
+    def at(x, y):
+        return cx + x + lean * (-y / 75), ground + y * (1 - sag * .85) - lift * (1 - sag)
+
+    rock = p.ramp('rock0', 'rock1', 'rock2', 'rock3', 'rock4')
+    fire = p.ramp('fire0', 'fire1', 'fire2', 'fire3', 'fire4')
+    gold = p.ramp('gold0', 'gold1', 'gold2', 'gold3')
+
+    def plate(points, ramp):
+        pts = [at(x, y) for x, y in points]
+        f.paint(gradient(polygon(pts), cx + 20, ground, cx - 18, ground - 80), ramp, dither=.3)
+
+    # A ragged molten mantle, behind the articulated legs, gives him a wide triangular silhouette.
+    flutter = math.sin(phase) * 2 if clip in ('idle', 'walk') else 0
+    plate([(-13, -64), (9, -62), (5, -10), (-8, -4), (-16, -11),
+           (-26 - flutter, -5), (-22, -28)], fire)
+    for side in (-1, 1):
+        hip = at(side * 8, -30)
+        knee = at(side * 10 + stride * side, -17)
+        foot = at(side * 12 + stride * side, -4)
+        f.paint(capsule(hip, knee, 6.5, 5), rock)
+        f.paint(capsule(knee, foot, 5, 6), rock)
+        f.paint(ellipsoid(*foot, 10, max(2, 4 * (1 - sag * .4))), rock)
+    # Belt, angular breastplate and a diamond-shaped furnace inside it.
+    plate([(-14, -32), (15, -32), (13, -22), (-12, -22)], gold)
+    plate([(-17, -60), (16, -60), (18, -47), (11, -31), (-10, -31), (-19, -49)], rock)
+    plate([(1, -57), (10, -47), (1, -36), (-8, -47)], fire)
+    f.line(at(1, -54), at(1, -40), 'fire4', 2)
+    # Spiked pauldrons; the far hand clenches below the shoulder.
+    plate([(-18, -69), (-25, -74), (-25, -64), (-30, -62), (-25, -52), (-14, -55)], gold)
+    plate([(15, -68), (23, -74), (23, -65), (29, -60), (25, -52), (13, -55)], gold)
+    f.paint(capsule(at(-21, -55), at(-23, -36), 5, 6), rock)
+    f.paint(ellipsoid(*at(-23, -34), 7, 7 * (1 - sag * .6)), rock)
+    # Helmet, two swept horns and a readable black face with molten eyes.
+    plate([(-9, -79), (3, -81), (13, -77), (12, -65), (2, -60), (-10, -66)], rock)
+    plate([(-8, -75), (-16, -80), (-18, -84), (-13, -82), (-7, -80)], gold)
+    plate([(10, -76), (17, -80), (20, -84), (18, -77), (13, -71)], gold)
+    plate([(-2, -78), (4, -83), (8, -78)], fire)
+    plate([(-5, -74), (9, -74), (8, -66), (1, -63), (-5, -67)], p.ramp('face', 'face'))
+    if not (clip == 'idle' and n == 3) and sag < .8:
+        for ex in (-2, 6):
+            f.line(at(ex - 1, -71), at(ex + 2, -72), 'eye', 2)
+    f.line(at(-1, -66), at(5, -66), 'fire2', 1)
+    # Animated hammer rig: the head follows the hand through a raised anticipation and a ground smash.
+    hx, hy = at(20, -40)
+    if clip == 'attack':
+        hy += [0, -8, -14, -4, 15, 15, 3, 0][n]
+    handle_dx, handle_dy = math.sin(angle) * 19, -math.cos(angle) * 19
+    head = (hx + handle_dx, hy + handle_dy)
+    elbow = at(24, -52)
+    f.paint(capsule(at(20, -58), elbow, 5.5, 5), rock)
+    f.paint(capsule(elbow, (hx, hy), 5, 5), rock)
+    f.line((hx - handle_dx * .6, hy - handle_dy * .6), head, 'ol', 5)
+    f.line((hx - handle_dx * .6, hy - handle_dy * .6), head, 'gold1', 3)
+    hammer = []
+    for dx, dy in [(-12, -7), (10, -7), (13, -3), (13, 5), (-10, 7), (-13, 3)]:
+        rx, ry = rotate(dx, dy, -angle)
+        hammer.append((head[0] + rx, head[1] + ry))
+    f.paint(gradient(polygon(hammer), head[0] + 12, head[1] + 7, head[0] - 10, head[1] - 7), rock)
+    f.line((head[0] - 3, head[1] - 5), (head[0] + 3, head[1] + 4), 'fire3', 2)
+    f.paint(ellipsoid(hx, hy, 6, 5), gold)
+    if clip == 'attack' and n in (4, 5):
+        for k in range(5):
+            x = min(89, head[0] + (k - 2) * 6)
+            f.line((x, ground - 3), (min(92, x + (k - 2) * 2), ground - 10 - (k % 2) * 6), 'fire3', 2)
+    if sag:
+        # The furnace dims to ash; the hammer and horns remain beside the collapsed armour.
+        glow = (f.a == p['fire3']) | (f.a == p['fire4']) | (f.a == p['eye'])
+        if sag > .7:
+            f.a[glow] = p['fire1'] if sag < 1 else p['ash']
+    if flash:
+        f.whiten()
+    return f.a
+
+
+DRAWERS = {'wisp': (wisp, WISP), 'spider': (spider, SPIDER), 'wraith': (wraith, WRAITH), 'golem': (golem, GOLEM), 'cinderlord': (cinderlord, CINDERLORD)}
 for _kind, _pair in list(DRAWERS.items()):
     assert len(_pair[1].hex) <= 255
 
@@ -884,7 +992,11 @@ def api(route, body=None):
 
 
 def ids():
-    return {s['name']: s['sprite_id'] for s in api('list')['sprites'] if s['name'].startswith(PREFIX)}
+    # list returns only the latest 100 sprites. Older editable art is addressed by its saved manifest.
+    meta_path = ASSETS / 'crags.txt'
+    saved = json.loads(meta_path.read_text()).get('sprites', {}) if meta_path.exists() else {}
+    return {**{PREFIX + k + '_all': sid for k, sid in saved.items()},
+            **{s['name']: s['sprite_id'] for s in api('list')['sprites'] if s['name'].startswith(PREFIX)}}
 
 
 def build(kinds, replace=False):

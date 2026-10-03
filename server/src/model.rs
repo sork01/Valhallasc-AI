@@ -505,6 +505,12 @@ pub struct Quest {
     pub level: u32,
     pub reward_xp: u32,
     pub reward_gold: u32,
+    /// Guaranteed gear, granted atomically with XP and gold when there is bag space.
+    #[serde(default)]
+    pub reward_item: Option<String>,
+    /// Shared kill objectives for living, nearby contributors to an elite fight.
+    #[serde(default)]
+    pub group: bool,
     pub objectives: Vec<QuestObjective>,
     /// A progression quest: it is accepted for the character by itself once they reach this level, so
     /// nobody has to be found to take it. The giver is still where it is handed in.

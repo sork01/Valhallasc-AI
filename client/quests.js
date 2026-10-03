@@ -28,17 +28,25 @@
     const p = state(quest);
     return quest.objectives.map((o, i) => `${o.label}: ${p?.claimed ? o.count : p?.counts[i] || 0}/${o.count}`);
   }
+  function gearReward(quest, container) {
+    const i = (window.WORLD_ITEMS || []).find(i => i.id === quest.rewardItem);
+    if (!i) return;
+    const reward = element('p', `${i.name} · ${i.rarity === 'uncommon' ? 'Uncommon (green)' : i.rarity} · Level ${i.requiredLevel || 1} · ${i.class || 'All classes'} · +${i.attack || 0} attack · +${i.defense || 0} defense`, 'quest-reward item-name');
+    reward.dataset.rarity = i.rarity; reward.dataset.item = i.id;
+    container.append(reward);
+  }
   function card(quest, atNpc) {
     const s = status(quest), npc = giver(quest);
     const node = element('article', '', 'quest-card'); node.dataset.quest = quest.id; node.dataset.repeatable = String(quest.repeatable);
     node.append(element('h4', quest.title), element('span', words[s] + (quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
     if (!atNpc) node.append(element('small', `${areas[quest.zone].name} · ${areas[quest.zone].city?.name || 'Quest giver'}`, 'quest-location quest-history'));
     const gap = quest.level - (heroLevel);
-    const rec = element('p', `Recommended level ${quest.level}`, 'quest-level'); rec.dataset.level = String(quest.level);
+    const rec = element('p', `Recommended level ${quest.level}${quest.recommendedPlayers ? ` · Group: ${quest.recommendedPlayers} players` : ''}`, 'quest-level'); rec.dataset.level = String(quest.level);
     if (gap >= 5) rec.style.color = '#ff6b6b'; else if (gap >= 3) rec.style.color = '#ffa65a'; else if (gap <= -5) rec.style.color = '#9fb0a0';
     node.append(rec);
     node.append(element('p', quest.description), element('p', objectives(quest).join(' · '), 'quest-objectives'));
     node.append(element('p', `Reward: ${quest.rewardXp} XP · ${quest.rewardGold} gold`, 'quest-reward'));
+    gearReward(quest, node);
     if (s === 'upcoming') {
       node.append(element('p', `This quest finds you by itself at level ${quest.autoLevel}.`, 'quest-history'));
     } else if (s === 'locked') {
@@ -144,8 +152,10 @@
       const node = element('article', '', 'quest-card quest-detail'); node.dataset.quest = quest.id; node.dataset.status = s;
       node.append(element('h4', quest.title), element('span', words[s] + (quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
       node.append(element('p', quest.description));
+      if (quest.recommendedPlayers) node.append(element('p', `Recommended level ${quest.level} · Group: ${quest.recommendedPlayers} players`, 'quest-level'));
       node.append(element('h5', 'Objectives'), element('p', objectives(quest).join('\n'), 'quest-objectives'));
       node.append(element('h5', 'Rewards'), element('p', `${quest.rewardXp} experience · ${quest.rewardGold} gold`, 'quest-reward'));
+      gearReward(quest, node);
       const actions = element('div', '', 'quest-actions');
       if (['available', 'ready'].includes(s)) {
         const action = s === 'ready' ? 'claim' : 'accept';

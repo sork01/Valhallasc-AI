@@ -62,7 +62,7 @@ test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and pare
     for (const name of ['start_world', 'stop_world', 'connect_bot', 'disconnect_bot', 'send_action', 'inspect_world', 'wait_world', 'list_scenarios', 'run_scenario']) {
       assert.ok(listed.tools.some(t => t.name === name), `Advertises ${name}`);
     }
-    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['skills', 'movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'stats', 'crags', 'bags', 'shortcuts', 'social', 'consumables', 'crags_quests', 'rimeveil', 'rime_quests', 'gloamfen', 'skaldholm', 'skaldholm_quests', 'fen_quests', 'gender', 'priest', 'hunter']);
+    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['skills', 'movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'stats', 'crags', 'bags', 'shortcuts', 'social', 'consumables', 'crags_quests', 'rimeveil', 'rime_quests', 'gloamfen', 'skaldholm', 'skaldholm_quests', 'fen_quests', 'gender', 'priest', 'hunter', 'cinderlord', 'progression_quests']);
     const first = await call('start_world');
     url = first.url;
     assert.match(url, /^http:\/\/127\.0\.0\.1:\d+\/$/);
@@ -146,6 +146,10 @@ test('MCP shortcuts: every tool advertised, strict inputs, and server-side effec
     const moved = await call('teleport', { bot: 'Gm', to: { spawn: 1 } });
     assert.equal(moved.player.zone, 1);
     assert.equal(moved.player.x, 48);
+    const elite = await call('spawn_enemy', { bot: 'Gm', kind: 'cinderlord', level: 10, x: 84, y: 10 });
+    assert.equal(elite.enemy.kind, 'cinderlord');
+    assert.equal(elite.enemy.level, 10);
+    assert.equal(elite.enemy.zone, 1);
     const cast = await call('cast_skill', { bot: 'Gm', skill: 'evasion' });
     assert.equal(cast.cast, true);
     assert.ok(cast.buffs.some(b => b.id === 'evasion'));

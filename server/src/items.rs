@@ -101,7 +101,7 @@ pub fn material(kind: &str) -> &'static str {
         "wisp" => "ember_core",
         "spider" => "magma_fang",
         "wraith" => "ash_veil",
-        "golem" => "basalt_heart",
+        "golem" | "cinderlord" => "basalt_heart",
         "crab" => "rime_shell",
         "wolf" => "frost_pelt",
         "yeti" => "yeti_horn",
@@ -140,7 +140,7 @@ pub fn rarity_color(rarity: &str) -> &'static str {
     }
 }
 pub fn is_elite(kind: &str) -> bool {
-    kind == "big"
+    matches!(kind, "big" | "cinderlord")
 }
 /// Which tier, if any, a kill drops. `roll` is uniform in [0, 1): the bands start with the rarest tier, so one roll
 /// gives at most one piece. Legendary exists only for elites.
@@ -1017,10 +1017,16 @@ mod tests {
         let mut c = character();
         // The character already carries its unworn starter pieces; fill what is left of the 16 cells.
         let room = 16 - c.bag_used();
+        // Reserve the gear used below: the catalog's ordering grows when new classes are added.
+        c.add_item("warrior_weapon_royal", 1);
         for i in ITEMS
             .iter()
-            .filter(|i| i.kind != "bag" && !(i.class == Some(Class::Warrior) && i.starter))
-            .take(room)
+            .filter(|i| {
+                i.kind != "bag"
+                    && i.id != "warrior_weapon_royal"
+                    && !(i.class == Some(Class::Warrior) && i.starter)
+            })
+            .take(room - 1)
         {
             c.add_item(&i.id, 1);
         }
@@ -1030,7 +1036,7 @@ mod tests {
         assert!(!c.can_collect("headgear_upgrade"));
         assert!(c.equip_owned("none", "none").is_err());
         assert_eq!(c.gear(), ("crimson", "sword"));
-        c.level = 15;
+        c.level = item("warrior_weapon_royal").unwrap().required_level;
         c.equip_slots(&[("hands".into(), "warrior_weapon_royal".into())].into())
             .unwrap();
         assert_eq!(c.bag_used(), 16);

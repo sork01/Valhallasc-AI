@@ -554,6 +554,7 @@
     spider: { name: 'Magma Spider', scale: 1.05, top: 66, col: ['#7d6f80', '#3d3544', '#27222d'] },
     wraith: { name: 'Ash Wraith', scale: 1, top: 88, col: ['#746b8e', '#383250', '#15121d'] },
     golem: { name: 'Basalt Golem', scale: 1.2, top: 86, col: ['#9a939a', '#544f58', '#24212a'] },
+    cinderlord: { name: 'Cinderlord', elite: true, scale: 1.55, top: 90, col: ['#ffe095', '#e96d25', '#392c32'] },
     crab: { name: 'Rime Crab', scale: 1.1, top: 53, col: ['#d8f2ff', '#6fb3dc', '#2d5f8a'] },
     wolf: { name: 'Frostfang Wolf', scale: 1.1, top: 67, col: ['#f2f6fa', '#9fb4c8', '#4a5d74'] },
     yeti: { name: 'Glacier Yeti', scale: 1.2, top: 85, col: ['#f4f8fc', '#b9cbdc', '#5e7690'] },
@@ -563,7 +564,7 @@
     knight: { name: 'Drowned Knight', scale: 1.15, top: 87, col: ['#cde8d4', '#6a8d7a', '#2d403c'] },
     hydra: { name: 'Mire Hydra', scale: 1.3, top: 70, col: ['#b0d6a0', '#4b7a74', '#233040'] },
   };
-  const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra'];
+  const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra'];
   // Colour a level label by how it compares with the hero: grey, normal, orange, red.
   const levelColor = level => { const d = level - (hero?.level || 1); return d >= 5 ? '#ff6b6b' : d >= 3 ? '#ffa65a' : d <= -5 ? '#9fb0a0' : '#fff4ca'; };
   function newHero() {
@@ -1186,7 +1187,7 @@
   // same five clips and frame meanings as the Ironhide Beetle.
   function loadCragSprites() {
     if (cragSrc) return;
-    if (stubOn()) { cragSrc = stubEnemies(['wisp', 'spider', 'wraith', 'golem'], { wisp: '#6ef', spider: '#555', wraith: '#a6f', golem: '#e83' }); return; }
+    if (stubOn()) { cragSrc = stubEnemies(CRAG_KINDS, { wisp: '#6ef', spider: '#555', wraith: '#a6f', golem: '#e83', cinderlord: '#fa4' }); return; }
     fetch('assets/crags.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/crags_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); cragSrc = { meta, img }; })).catch(() => { cragSrc = null; });
   }
@@ -1572,7 +1573,7 @@
         const barY = src ? -(s.d.top ?? (s.kind === 'big' ? 36 : s.kind === 'beetle' ? 40 : 28)) * SLIME_K * s.d.scale : -62 * s.d.scale - s.hop * 16;
         if (!s.dead && s.hp < s.maxHp) { const w = 52 * s.d.scale ** .7; g.fillStyle = 'rgba(20,10,30,.8)'; g.fillRect(-w / 2 - 2, barY - 2, w + 4, 8); g.fillStyle = '#ff5a6e'; g.fillRect(-w / 2, barY, w * s.hp / s.maxHp, 4); }
         if (!s.dead && (hero.target === s || Math.hypot(hero.x - s.x, hero.y - s.y) < 7)) {
-          const label = `Lv ${s.level ?? '?'} ${s.d.name || s.kind}`;
+          const label = `Lv ${s.level ?? '?'} ${s.d.name || s.kind}${s.d.elite ? ' · Elite' : ''}`;
           g.font = '16px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = OL; g.fillStyle = levelColor(s.level);
           g.strokeText(label, 0, barY - 8); g.fillText(label, 0, barY - 8);
         }
