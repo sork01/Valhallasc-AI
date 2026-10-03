@@ -72,8 +72,8 @@ async function call(name, args = {}) {
   };
   const miniPx = (x, y) => page.evaluate(([x, y]) => Array.from(document.getElementById('minimap').getContext('2d').getImageData(x, y, 1, 1).data), [x, y]);
   check(await page.evaluate(() => JSON.stringify(Field.explored)) === '[16]', `A new character has uncovered only the middle cell of Greenmeadow (${await page.evaluate(() => JSON.stringify(Field.explored))})`);
-  const dark = px => px[0] < 40 && px[1] < 50 && px[2] < 70;
-  check(dark(await miniPx(8, 8)) && dark(await miniPx(136, 136)) && dark(await miniPx(72, 8)) && !dark(await miniPx(72, 72)) && !dark(await miniPx(60, 80)), 'The minimap is fogged except the middle cell');
+  const dark = px => px[0] > 130 && px[1] > 140 && px[2] > 160;                      // fog is pale mist, not black
+  check(dark(await miniPx(8, 8)) && dark(await miniPx(136, 136)) && dark(await miniPx(72, 8)) && !dark(await miniPx(72, 72)) && !dark(await miniPx(60, 80)), 'The minimap is misted over except the middle cell');
   const hidden = await page.evaluate(() => { let fogged = 0, drawn = 0; const g = document.getElementById('minimap').getContext('2d'); for (const s of Field.slimes) { if (s.dead || Field.fog.seen(0, s.x, s.y)) continue; fogged++; const d = g.getImageData(Math.round(s.x * 1.5), Math.round(s.y * 1.5), 1, 1).data; if (d[0] > 200 && d[1] < 140 && d[2] > 100) drawn++; } return { fogged, drawn }; });
   check(hidden.fogged > 0 && hidden.drawn === 0, `No enemy dot shows in the fog (${hidden.fogged} slimes are in fogged cells)`);
   await press('m');
@@ -180,7 +180,7 @@ async function call(name, args = {}) {
   check(here === 'false,false,false,true,false', `The marker moved to the Gloamfen tile (${here})`);
   await page.locator('.wm-tile[data-zone="3"]').click();
   await page.waitForFunction(() => { const m = document.querySelector('.wm-me'); return m && !m.hidden; });
-  const fogNow = await page.evaluate(() => { const g = document.getElementById('wm-fog').getContext('2d'); return g.getImageData(Math.round(90 / 128 * 768), Math.round(40 / 128 * 768), 1, 1).data[3]; });
+  const fogNow = await page.evaluate(() => { const g = document.getElementById('wm-fog').getContext('2d'); return g.getImageData(Math.round(106 / 128 * 768), Math.round(21 / 128 * 768), 1, 1).data[3]; });
   check(fogNow === 0, 'The new cell is clear on the zone map');
   const me = await page.evaluate(() => { const s = document.querySelector('.wm-stage').getBoundingClientRect(), m = document.querySelector('.wm-me i').getBoundingClientRect(); return { x: (m.left + m.width / 2 - s.left) / s.width, y: (m.top + m.height / 2 - s.top) / s.height, hx: Field.hero.x / 128, hy: Field.hero.y / 128 }; });
   check(Math.abs(me.x - me.hx) < .01 && Math.abs(me.y - me.hy) < .01, `"You" stands at the hero's place on the zone map (${me.x.toFixed(3)},${me.y.toFixed(3)} vs ${me.hx.toFixed(3)},${me.hy.toFixed(3)})`);

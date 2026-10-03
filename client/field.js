@@ -1656,16 +1656,39 @@
   let explored = [];
   const fogCell = (zi, x, y) => { const f = v => Math.min(FOG - 1, Math.max(0, Math.floor(v / ZONES[zi].size * FOG))); return f(y) * FOG + f(x); };
   const seen = (zi, x, y) => !explored || (((explored[zi] || 0) >> fogCell(zi, x, y)) & 1) === 1;
-  // Draws the fog of zone `zi` over the w x h area of g. The mask is a small image (12 pixels a cell) stretched with
-  // smoothing, so each cell edge fades over a few pixels instead of cutting.
+  // Draws the fog of zone `zi` over the w x h area of g. Fog is drawn as mist: pale cloud with fractal noise for body, thinning to
+  // wisps where it meets explored ground. The mask is built once per bit pattern (CLOUD pixels a side) and stretched with smoothing.
+  const CLOUD = FOG * 64; let cloudNoise = null;
+  function noiseField(seed) {
+    const h = (ix, iy) => { let n = (ix * 374761393 + iy * 668265263 + seed * 1274126177) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); return ((n ^ (n >>> 16)) >>> 0) / 4294967295; };
+    const sm = t => t * t * (3 - 2 * t), out = new Float32Array(CLOUD * CLOUD);
+    for (let y = 0; y < CLOUD; y++) for (let x = 0; x < CLOUD; x++) {
+      let v = 0, amp = .5, tot = 0;
+      for (let o = 0, f = 6; o < 5; o++, f *= 2, amp *= .5) {
+        const px = x / CLOUD * f, py = y / CLOUD * f, ix = Math.floor(px), iy = Math.floor(py), fx = sm(px - ix), fy = sm(py - iy);
+        const a = h(ix, iy), b = h(ix + 1, iy), c = h(ix, iy + 1), d = h(ix + 1, iy + 1);
+        v += amp * (a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy); tot += amp;
+      }
+      out[y * CLOUD + x] = v / tot;
+    }
+    return out;
+  }
   function paintFog(g, w, h, zi) {
     if (!explored) return;
     const bits = explored[zi] || 0; let mask = fogMasks.get(bits);
     if (!mask) {
-      const N = FOG * 12, [c, mg] = canvasOf(N, N, 1), img = mg.createImageData(N, N);
+      if (!cloudNoise) cloudNoise = [noiseField(1), noiseField(7)];
+      const [shape, body] = cloudNoise, N = CLOUD, cell = N / FOG, [c, mg] = canvasOf(N, N, 1), img = mg.createImageData(N, N);
+      const fogged = (cx, cy) => (bits >> (Math.min(FOG - 1, Math.max(0, cy)) * FOG + Math.min(FOG - 1, Math.max(0, cx)))) & 1 ? 0 : 1;
       for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-        const i = (y * N + x) * 4, cell = Math.floor(y / 12) * FOG + Math.floor(x / 12);
-        img.data[i] = 12; img.data[i + 1] = 18; img.data[i + 2] = 30; img.data[i + 3] = (bits >> cell) & 1 ? 0 : 252;
+        const gx = x / cell - .5, gy = y / cell - .5, cx = Math.floor(gx), cy = Math.floor(gy), tx = gx - cx, ty = gy - cy;
+        const a = fogged(cx, cy), b = fogged(cx + 1, cy), cc = fogged(cx, cy + 1), d = fogged(cx + 1, cy + 1);
+        const cover = a + (b - a) * tx + (cc - a) * ty + (a - b - cc + d) * tx * ty;               // 1 deep in fog, 0 on explored ground
+        const n = shape[y * N + x], t = Math.min(1, Math.max(0, (cover + (n - .5) * .9 - .3) / .4));
+        const alpha = t * t * (3 - 2 * t), m = body[y * N + x], shade = .55 + m * .9;                // cloud body: lighter puffs, bluer hollows
+        const i = (y * N + x) * 4;
+        img.data[i] = Math.min(255, 150 + shade * 62); img.data[i + 1] = Math.min(255, 164 + shade * 56); img.data[i + 2] = Math.min(255, 186 + shade * 46);
+        img.data[i + 3] = Math.round(alpha * (238 + m * 17));
       }
       mg.putImageData(img, 0, 0); mask = c; fogMasks.set(bits, mask);
     }
