@@ -11,7 +11,8 @@
     "toad",
     "croc",
     "knight",
-    "hydra"
+    "hydra",
+    "gloomroot"
   ],
   "clips": {
     "idle": {
@@ -49,6 +50,7 @@
     "toad": "8b12263d725df078",
     "croc": "ee12dc9daaab1077",
     "knight": "2d83f47e45f0f64d",
-    "hydra": "dd2eed6a51916b3d"
+    "hydra": "dd2eed6a51916b3d",
+    "gloomroot": "c7bd8d18c35a484c"
   }
 }

@@ -12,7 +12,7 @@ const map = read('map.txt'), items = read('items.txt'), skills = read('skills.tx
 // Zone 0 is the top-level map (Greenmeadow + Alderhaven); the rest come from `zones`.
 const zones = [map, ...(map.zones || [])];
 const quests = zones.flatMap((area, zone) => (area.quests || []).map(q => ({ ...q, zone })));
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20 };
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const number = z.number().finite();
 const botName = z.string().regex(/^[a-zA-Z][a-zA-Z0-9_-]{0,15}$/);
@@ -203,7 +203,7 @@ function describe(what = 'overview') {
   switch (what) {
     case 'zones': return { zones: zones.map(area) };
     case 'npcs': return { npcs: zones.flatMap((a, zone) => (a.npcs || []).map(n => ({ zone, id: n.id, name: n.name, role: n.role, x: n.x, y: n.y, buys: !!n.buys, offers: n.offers.map(o => ({ id: o.id, label: o.label, cost: o.cost })) }))) };
-    case 'quests': return { quests: quests.map(q => ({ zone: q.zone, id: q.id, title: q.title, npc: q.npc, requires: q.requires || null, repeatable: !!q.repeatable, level: q.level, rewardXp: q.reward_xp ?? q.rewardXp, rewardGold: q.reward_gold ?? q.rewardGold, objectives: q.objectives })) };
+    case 'quests': return { quests: quests.map(q => ({ zone: q.zone, id: q.id, title: q.title, npc: q.npc, requires: q.requires || null, repeatable: !!q.repeatable, level: q.level, rewardXp: q.reward_xp ?? q.rewardXp, rewardGold: q.reward_gold ?? q.rewardGold, group: !!q.group, recommendedPlayers: q.recommendedPlayers ?? null, rewardItem: q.rewardItem ?? q.reward_item ?? null, objectives: q.objectives })) };
     case 'items': return { items };
     case 'skills': return { skills: skills.map(({ id, name, class: c, level, cooldown, cost, effect }) => ({ id, name, class: c, level, cooldown, cost, effect: effect.effect })) };
     case 'enemies': return { defaultLevels: DEFAULT_LEVELS, zones: zones.map(area).map(({ zone, name, enemies }) => ({ zone, name, enemies })) };

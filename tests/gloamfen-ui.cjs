@@ -36,14 +36,14 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   // Display-only fixture: while `stage` is set, the browser's copy of each glacier snapshot gets one extra monster of every
   // kind in a chosen state, so every clip can be drawn without a level-1 hero meeting them. The server is untouched.
   let stage = null;
-  const kinds = ['toad', 'croc', 'knight', 'hydra'];
-  const levels = { toad: 15, croc: 17, knight: 18, hydra: 20 }, health = { toad: 2000, croc: 2800, knight: 3400, hydra: 5200 }, windup = { toad: .45, croc: .35, knight: .6, hydra: .55 };
+  const kinds = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
+  const levels = { toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20 }, health = { toad: 2000, croc: 2800, knight: 3400, hydra: 5200, gloomroot: 20000 }, windup = { toad: .45, croc: .35, knight: .6, hydra: .55, gloomroot: .85 };
   const restage = text => {
     let packet; try { packet = JSON.parse(text); } catch { return text; }
     const snap = packet.type === 'welcome' ? packet.snapshot : packet.type === 'snapshot' ? packet : null, me = snap?.players[0];
     if (!stage || !me || me.zone !== 3) return text;
     kinds.forEach((kind, i) => {
-      const D = [-9, -3, 3, 9][i], x = me.x + (-7 + D) / 2, y = me.y + (-7 - D) / 2, dead = stage.state === 'dead';
+      const D = [-12, -6, 0, 6, 12][i], x = me.x + (-7 + D) / 2, y = me.y + (-7 - D) / 2, dead = stage.state === 'dead';
       snap.slimes.push({ id: 1000 + i, kind, zone: 3, level: levels[kind], x, y, hx: x, hy: y, hp: dead ? 0 : health[kind] * (stage.state === 'hurt' ? .55 : 1), maxHp: health[kind], r: .4, windupTime: windup[kind],
         state: stage.state, st: stage.state === 'windup' ? .1 : stage.state === 'lunge' ? .15 : 1, hop: 0, hopV: 0, hurtT: stage.state === 'hurt' ? .2 : 0, recT: 0, landT: 0, dead, dieT: dead ? stage.dieT : 0, respawn: 0, atkCd: 1, blink: 2, seed: 3, dir: i % 2 ? -1 : 1 });
     });
@@ -73,7 +73,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   check(zones.length === 5 && zones[3].name === 'Gloamfen' && zones[3].theme === 'fen' && zones[3].size === 128 && zones[3].levels.join() === '15,20', 'The client knows the fen: name, fen theme, 128 tiles, levels 15-20');
   check(zones[2].portals.join() === 'crags_gate>1,fen_gate>3,city_gate>4' && zones[3].portals.join() === 'summit_gate>2', 'The glacier summit has a gate to the fen, which has the gate back');
   check(zones[3].water > 150 && zones[3].thicket > 100, `The fen has a lake of ${zones[3].water} water discs and ${zones[3].thicket} thicket blocks`);
-  check(await page.evaluate(stub => { const m = Field.fenSprites.meta; return m.kinds.join() === 'toad,croc,knight,hydra' && (stub || m.kinds.every(k => Field.fenSprites.img[k].naturalWidth === 768 && Field.fenSprites.img[k].naturalHeight === 480)); }, STUB), 'The four fen monster atlases are loaded (768x480 on the real art)');
+  check(await page.evaluate(stub => { const m = Field.fenSprites.meta; return m.kinds.join() === 'toad,croc,knight,hydra,gloomroot' && (stub || m.kinds.every(k => Field.fenSprites.img[k].naturalWidth === 768 && Field.fenSprites.img[k].naturalHeight === 480)); }, STUB), 'The four fen monster atlases are loaded (768x480 on the real art)');
 
   // Staging only: a test shortcut puts the hero near what is under test, instead of a long walk across the map. The gate
   // crossings, the NPC clicks, the walk through the first gap and the last steps of each approach stay real.
@@ -126,10 +126,13 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   // The journal: sixteen fen quests, local ones first, the first town conversation through real clicks.
   await page.keyboard.press('q');
   check(await page.locator('#quest-journal').isVisible() && (await page.locator('#quest-list [data-quest="welcome"]').textContent()).includes('is back in Greenmeadow'), 'Meadow quests explain that their givers are in Greenmeadow');
-  check(await page.locator('#quest-list [data-quest^="fen_"]').count() === 17 && await page.locator('#quest-list [data-quest^="rime_"]').count() === 14 && await page.locator('#quest-list [data-quest^="crags_"]').count() === 13, 'The journal lists all seventeen fen quests beside the fourteen glacier and thirteen Crags quests');
+  check(await page.locator('#quest-list [data-quest^="fen_"]').count() === 18 && await page.locator('#quest-list [data-quest^="rime_"]').count() === 14 && await page.locator('#quest-list [data-quest^="crags_"]').count() === 14, 'The journal lists all eighteen fen quests beside the fourteen glacier and fourteen Crags quests');
   check(await page.locator('#quest-list .quest-card').first().getAttribute('data-quest') === 'fen_welcome', 'Local town quests sort first');
   check(await page.locator('#quest-list [data-quest="fen_crocs"]').textContent().then(t => t.includes('Locked') && t.includes('The Choir in the Reeds')), 'Later hunts explain their prerequisite');
   check(await page.locator('#quest-list [data-quest="fen_hydra_hunt"]').textContent().then(t => t.includes('Recommended level 20')), 'The journal shows each quest\'s recommended level');
+  // The elite quest: five players, a guaranteed blue ring, shown in the journal.
+  check(await page.locator('#quest-list [data-quest="fen_gloomroot"]').textContent().then(t => t.includes('Group: 5 players') && t.includes('Recommended level 20') && t.includes('Celestial Amber Ring') && t.includes('Rare (blue)')), 'The journal shows the five-player elite quest and its blue ring');
+  check(await page.locator('#quest-list [data-quest="fen_gloomroot"] [data-rarity="rare"]').count() === 1, 'The reward line carries the blue rarity');
   await page.locator('#quest-list [data-quest="fen_welcome"] button').filter({ hasText: 'Get quest from Reeve Osric' }).click();
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
   check(await page.locator('#npc-name').textContent() === 'Reeve Osric', 'Journal travel reaches the town reeve');
@@ -174,7 +177,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   // Every kind in every clip: the canvas must change from one state to the next and nothing may throw.
   const monsterHashes = () => page.evaluate(() => {
     const cv = document.getElementById('fieldcv'), g = cv.getContext('2d'), k = cv.width / 1600;
-    return [1000, 1001, 1002, 1003].map(id => {
+    return [1000, 1001, 1002, 1003, 1004].map(id => {
       const s = Field.slimes.find(m => m.id === id), [sx, sy] = Field._debug.w2s(s.x, s.y);
       const x = Math.max(0, Math.round((sx - 110) * k)), y = Math.max(0, Math.round((sy - 250) * k)), d = g.getImageData(x, y, Math.round(220 * k), Math.round(270 * k)).data;
       let h = 0; for (let i = 0; i < d.length; i += 5) h = (Math.imul(h, 31) + d[i] + (d[i + 1] << 3) + (d[i + 2] << 6)) | 0;
@@ -184,20 +187,20 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   const seen = [];
   for (const [state, dieT] of [['idle', 0], ['windup', 0], ['lunge', 0], ['hurt', 0], ['dead', .2], ['dead', .45], ['dead', 3]]) {
     stage = { state, dieT };
-    await page.waitForFunction(([state]) => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000 && s.state === state).length === 4, [state], { timeout: 10000 });
+    await page.waitForFunction(([state]) => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000 && s.state === state).length === 5, [state], { timeout: 10000 });
     await page.evaluate(() => { Field.hero.target = Field.slimes.find(s => s.id === 1002) || null; });
     await page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
     check(await page.evaluate(() => Field.slimes.every(s => s.zone === 3) && Field.remotePlayers.length === 0), `A glacier monster, a meadow monster and a glacier player in the ${state} packet are not shown`);
     const frames = await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000).map(s => Field._debug.enemyFrame(s)));
     const wanted = { idle: f => f[0] === 'idle', windup: f => f[0] === 'attack' && f[1] < 3, lunge: f => f[0] === 'attack' && f[1] >= 3 && f[1] <= 5, hurt: f => f[0] === 'hurt' };
     const dying = dieT === .2 ? f => f[0] === 'die' && f[1] >= 1 && f[1] <= 2 : dieT === .45 ? f => f[0] === 'die' && f[1] >= 3 && f[1] <= 4 : f => f[0] === 'die' && f[1] === 7;
-    check(frames.length === 4 && frames.every(state === 'dead' ? dying : wanted[state]), `The ${state}${state === 'dead' ? ' ' + dieT + 's' : ''} state picks its own clip and frame: ${JSON.stringify(frames[0])}`);
-    if (state === 'idle') check((await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000).map(s => s.d.name))).join() === 'Fen Toad,Mire Crocodile,Drowned Knight,Mire Hydra', 'The bestiary names come from the fen table');
+    check(frames.length === 5 && frames.every(state === 'dead' ? dying : wanted[state]), `The ${state}${state === 'dead' ? ' ' + dieT + 's' : ''} state picks its own clip and frame: ${JSON.stringify(frames[0])}`);
+    if (state === 'idle') check((await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000).map(s => s.d.name))).join() === 'Fen Toad,Mire Crocodile,Drowned Knight,Mire Hydra,Gloomroot Colossus', 'The bestiary names come from the fen table');
     seen.push(await monsterHashes());
     if (state === 'idle' || state === 'lunge') await shot('bestiary-' + state);
   }
   stage = null;
-  check(STUB || seen.every((hashes, i) => i === 0 || hashes.every((h, kind) => h !== seen[i - 1][kind])), `All four monsters draw something new in each state (${seen.length} states)`);
+  check(STUB || seen.every((hashes, i) => i === 0 || hashes.every((h, kind) => h !== seen[i - 1][kind])), `All five monsters draw something new in each state (${seen.length} states)`);
   await page.waitForFunction(() => Field.slimes.every(s => s.id < 1000), null, { timeout: 10000 });
   await page.evaluate(() => { Field.hero.target = null; });
 

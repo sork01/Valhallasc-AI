@@ -268,6 +268,8 @@ impl Slime {
             "croc" => (2800., 112., 3.2, 1.5),
             "knight" => (3400., 130., 2.4, 1.4),
             "hydra" => (5200., 150., 2.2, 1.8),
+            // Five level-20 heroes, with skills, healing and a tank, rather than any solo or duo pull.
+            "gloomroot" => (20000., 300., 2.3, 2.1),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -291,6 +293,7 @@ impl Slime {
             "croc" => 17,
             "knight" => 18,
             "hydra" => 20,
+            "gloomroot" => 20,
             _ => 2,
         }
     }
@@ -312,6 +315,7 @@ impl Slime {
             "croc" => 205,
             "knight" => 245,
             "hydra" => 360,
+            "gloomroot" => 1200,
             _ => 0,
         }
     }
@@ -333,6 +337,7 @@ impl Slime {
             "croc" => (0.35, 1.1, 10., 8.5),
             "knight" => (0.6, 1.4, 6.5, 7.5),
             "hydra" => (0.55, 1.3, 7.5, 9.),
+            "gloomroot" => (0.85, 1.5, 7.5, 8.5),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -1861,6 +1866,7 @@ impl World {
             s.respawn = match kind.as_str() {
                 "big" => 0.,
                 "cinderlord" => 180.,
+                "gloomroot" => 300.,
                 _ => 22.,
             };
             s.state = "dead".into();
@@ -2103,7 +2109,7 @@ impl World {
                 if s.point().distance(home) < 0.4 {
                     s.state = "idle".into();
                     s.st = 1.;
-                    s.hp = if s.kind == "cinderlord" {
+                    s.hp = if matches!(s.kind.as_str(), "cinderlord" | "gloomroot") {
                         s.max_hp
                     } else {
                         (s.hp + s.max_hp * 0.5).min(s.max_hp)
@@ -2691,7 +2697,7 @@ mod tests {
                     s.dead = true;
                     s.respawn = 10000.;
                 }
-                let _receivers: Vec<_> = (1..=count)
+                let mut receivers: Vec<_> = (1..=count)
                     .map(|session| join(&mut w, session, Class::Warrior))
                     .collect();
                 for session in 1..=count {
@@ -2725,6 +2731,9 @@ mod tests {
                         }
                     }
                     w.step();
+                    for rx in receivers.iter_mut() {
+                        while rx.try_recv().is_ok() {}
+                    }
                     if w.slimes[id].dead || w.players.values().all(|p| p.character.hp <= 0.) {
                         break;
                     }
@@ -2744,6 +2753,165 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn gloomroot_takes_five_trained_level_twenty_warriors_and_beats_four() {
+        // Warriors only (no healer, one potion each), so a real group with a priest has margin; the point is the shape:
+        // one to four cannot finish it, five can. Seeded, deterministic.
+        for count in [1usize, 2, 3, 4, 5] {
+            let mut w = world();
+            w.rng = 7;
+            let id = w.slimes.iter().position(|s| s.kind == "gloomroot").unwrap();
+            let point = w.slimes[id].point();
+            assert_eq!(w.slimes[id].zone, 3);
+            for s in w.slimes.iter_mut().filter(|s| s.id != id) {
+                s.dead = true;
+                s.respawn = 10000.;
+            }
+            let mut receivers: Vec<_> = (1..=count)
+                .map(|session| join(&mut w, session as u64, Class::Warrior))
+                .collect();
+            for session in 1..=count as u64 {
+                let c = &mut w.players.get_mut(&session).unwrap().character;
+                c.zone = 3;
+                c.x = point.x - 3. + session as f64;
+                c.y = point.y;
+                c.level = 20;
+                c.hp = c.max_hp();
+                c.attributes.strength = 40;
+                c.attributes.stamina = 10;
+                c.attributes.accuracy = 7;
+                c.add_item("health_potion", 1);
+                w.message(session, ClientMessage::Target { id });
+            }
+            let mut deaths = 0;
+            let mut was_dead = vec![false; count + 1];
+            for _ in 0..(300. / TICK) as usize {
+                for session in 1..=count as u64 {
+                    if w.players[&session].character.hp <= 0. {
+                        continue;
+                    }
+                    let aim = w.players[&session]
+                        .character
+                        .point()
+                        .direction(w.slimes[id].point());
+                    for skill in [
+                        "battlecry",
+                        "shieldwall",
+                        "cleave",
+                        "whirlwind",
+                        "charge",
+                        "groundslam",
+                    ] {
+                        w.use_skill(session, skill, aim);
+                    }
+                    let c = &w.players[&session].character;
+                    if c.hp <= c.max_hp() - 100. {
+                        w.use_item(session, "health_potion");
+                    }
+                }
+                w.step();
+                for rx in receivers.iter_mut() {
+                    while rx.try_recv().is_ok() {}
+                }
+                for (session, was) in was_dead.iter_mut().enumerate().skip(1) {
+                    let dead = w.players[&(session as u64)].character.hp <= 0.;
+                    deaths += usize::from(dead && !*was);
+                    *was = dead;
+                }
+                if w.slimes[id].dead {
+                    break;
+                }
+            }
+            assert_eq!(
+                w.slimes[id].dead,
+                count == 5,
+                "{count} player(s): enemy HP {} of {}, {deaths} deaths, time {:.0}",
+                w.slimes[id].hp,
+                w.slimes[id].max_hp,
+                w.time
+            );
+            if count == 5 {
+                assert!(deaths <= 3, "a trained five lose at most three: {deaths}");
+            } else {
+                assert!(
+                    deaths >= count,
+                    "{count} player(s) all fall at least once: {deaths}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn gloomroot_credits_every_nearby_contributor_pays_a_blue_ring_and_resets_whole() {
+        let mut w = world();
+        let id = w.slimes.iter().position(|s| s.kind == "gloomroot").unwrap();
+        let point = w.slimes[id].point();
+        let q = w.maps[3]
+            .quests
+            .iter()
+            .find(|q| q.id == "fen_gloomroot")
+            .unwrap()
+            .clone();
+        assert!(q.group && q.level == 20);
+        assert_eq!(q.reward_xp, xp_to_level(20) / 10);
+        let reward = q.reward_item.as_deref().unwrap();
+        assert_eq!(item(reward).unwrap().rarity, "rare", "a blue piece");
+        assert!(
+            item(reward).unwrap().class.is_none(),
+            "wearable by every class"
+        );
+        assert_eq!(item(reward).unwrap().required_level, 20);
+        // sessions 1-5 contribute and stand close; 6 contributes from far away; 7 never hits.
+        let _receivers: Vec<_> = (1..=7)
+            .map(|session| join(&mut w, session, Class::Warrior))
+            .collect();
+        for session in 1..=7 {
+            let c = &mut w.players.get_mut(&session).unwrap().character;
+            c.zone = 3;
+            c.x = point.x + 2.;
+            c.y = point.y;
+            c.quests.push(QuestProgress {
+                id: "fen_hydra".into(),
+                claimed: true,
+                completions: 1,
+                ..Default::default()
+            });
+            assert!(quest_action(c, &q, "accept").2, "session {session}");
+            if session != 7 {
+                w.hit_slime(id, session, 1., false);
+            }
+        }
+        w.players.get_mut(&6).unwrap().character.x = point.x - 20.;
+        w.hit_slime(id, 1, 1e9, false);
+        for session in 1..=7 {
+            let c = &w.players[&session].character;
+            let progress = c.quests.iter().find(|p| p.id == "fen_gloomroot").unwrap();
+            assert_eq!(
+                progress.counts,
+                vec![u32::from(session <= 5)],
+                "session {session}"
+            );
+        }
+        assert_eq!(w.slimes[id].respawn, 300.);
+        assert!(w.slimes[id].elite);
+        // The reward is the same guaranteed piece for each of the five, and a full claim saves it.
+        for session in 1..=5 {
+            let c = &mut w.players.get_mut(&session).unwrap().character;
+            let (text, _, changed) = quest_action(c, &q, "claim");
+            assert!(changed, "{text}");
+            assert_eq!(c.quantity(reward), 1);
+        }
+        // Evading restores every point of health and forgets who helped.
+        w.slimes[id].respawn = TICK;
+        w.update_slime(id);
+        w.hit_slime(id, 1, 5000., false);
+        assert_eq!(w.slimes[id].contributors.len(), 1);
+        w.slimes[id].state = "return".into();
+        w.update_slime(id);
+        assert!(w.slimes[id].contributors.is_empty());
+        assert_eq!(w.slimes[id].hp, w.slimes[id].max_hp);
     }
 
     #[test]
@@ -3715,6 +3883,7 @@ mod tests {
             counts,
             std::collections::BTreeMap::from([
                 ("croc", 9),
+                ("gloomroot", 1),
                 ("hydra", 4),
                 ("knight", 8),
                 ("toad", 10)
@@ -3783,7 +3952,7 @@ mod tests {
             ),
             (
                 vec![seal(FEN_MOUTH.0, FEN_MOUTH.1, 3.)],
-                vec!["croc", "knight", "toad"],
+                vec!["croc", "gloomroot", "knight", "toad"],
             ),
         ];
         for (seals, want) in &closed {
@@ -3796,7 +3965,10 @@ mod tests {
         }
         // Nothing is walled off when every gap is open, and the lake itself is not walkable.
         let reach = reachable(&[]);
-        assert_eq!(open_kinds(&reach), vec!["croc", "hydra", "knight", "toad"]);
+        assert_eq!(
+            open_kinds(&reach),
+            vec!["croc", "gloomroot", "hydra", "knight", "toad"]
+        );
         for n in &map.npcs {
             assert!(reach(Point { x: n.x, y: n.y }).is_some());
         }
@@ -3863,6 +4035,15 @@ mod tests {
             ("croc", 17, 2800., 112., 0.35, 205, "croc_hide"),
             ("knight", 18, 3400., 130., 0.6, 245, "drowned_gauntlet"),
             ("hydra", 20, 5200., 150., 0.55, 360, "hydra_fang"),
+            (
+                "gloomroot",
+                20,
+                20000.,
+                300.,
+                0.85,
+                1200,
+                "gloomroot_heartwood",
+            ),
         ] {
             assert_eq!(Slime::default_level(kind), level);
             assert_ne!(
@@ -3935,7 +4116,7 @@ mod tests {
             Some((40., 88., 6., 31.))
         );
         assert_eq!(map.npcs.len(), 7);
-        assert_eq!(map.quests.len(), 17);
+        assert_eq!(map.quests.len(), 18);
         assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 3);
         let mut roots = 0;
         for q in &map.quests {
@@ -4212,7 +4393,7 @@ mod tests {
         let _rx2 = join(&mut w, 2, Class::Mage);
         w.players.get_mut(&1).unwrap().character.zone = 3;
         w.players.get_mut(&2).unwrap().character.zone = 2;
-        for (zone, count) in [(0, 21), (1, 27), (2, 27), (3, 31)] {
+        for (zone, count) in [(0, 21), (1, 27), (2, 27), (3, 32)] {
             let view = w.snapshot_for(zone);
             assert_eq!(
                 view["slimes"].as_array().unwrap().len(),

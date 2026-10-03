@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """makesprites workflow for the Gloamfen monsters: preview | build [--replace] | export | verify.
 
-Four kinds (toad, croc, knight, hydra) share the Emberfall Crags contract (scripts/make_crag_sprites.py): one 96x96 frame,
+Five kinds (toad, croc, knight, hydra and the elite gloomroot) share the Emberfall Crags contract (scripts/make_crag_sprites.py): one 96x96 frame,
 a foot anchor at (48, 90), right-facing art (the game mirrors it) and five clips (idle 6, walk 8, attack 8, hurt 4,
 die 8) so client/field.js drives them with the Ironhide's state machine: walk frames 2-4 are the hop, 5-7 the landing,
 attack 0-2 the windup, 3-5 the lunge, 6-7 the recovery.
@@ -27,7 +27,7 @@ from make_crag_sprites import (AX, AY, CLIPS, DITHER, H, W, XX, YY, Frame, Palet
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'client/assets'
 PREFIX = 'valhallasc_fen_'
-KINDS = ['toad', 'croc', 'knight', 'hydra']
+KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot']
 RAW = ROOT / 'scripts'
 
 
@@ -807,10 +807,275 @@ def hydra(clip, n):
 
 
 # ----------------------------------------------------------------------------------------------
+# Gloomroot Colossus (elite): a drowned willow grown into a giant. Bark body, a hollow chest that glows like the
+# fen's mushrooms, a stump of a head with antler branches and hanging willow fronds, root-club fists, root feet.
+# Heavy and slow: it stomps, raises both fists and slams them down, and falls apart into a heap of roots.
+# ----------------------------------------------------------------------------------------------
+GLOOMROOT = Palette({
+    'bk0': '#120f0b', 'bk1': '#241b12', 'bk2': '#3a2b1c', 'bk3': '#573f27', 'bk4': '#7a5a38', 'bk5': '#a3835a',
+    'ms0': '#142210', 'ms1': '#24401a', 'ms2': '#3c6a26', 'ms3': '#62953a', 'ms4': '#9bc85a',
+    'gl0': '#0c5a52', 'gl1': '#18a597', 'gl2': '#4fe0c8', 'gl3': '#b8fff0',
+    'fr0': '#1d3a2a', 'fr1': '#2f5e3d', 'fr2': '#4f8a55',
+    'fu0': '#5a3d8a', 'fu1': '#8a64c8', 'fu2': '#c8a8f2',
+    'eye': '#e8ff6a', 'eye2': '#fbffc0', 'socket': '#07100c', 'tooth': '#e6dcc0',
+    'mud': '#2a1f14', 'drip': '#6fb0a0', 'spray': '#c4e8d8',
+})
+
+
+def gloomroot(clip, n):
+    f = Frame(GLOOMROOT)
+    p = GLOOMROOT
+    rng = rng_for('gloomroot', clip, n)
+    cx = 42.
+    eyes, glow, flash, squash, lean, lift, rubble = 'open', 1., False, 1., 0., 0., 0.
+    sway = n / 6 * 2 * math.pi
+    fist_n, fist_f = (23., -27.), (-19., -29.)           # near (right) and far (left) fists, relative to the foot anchor
+    step = 0.                                            # walking: -1..1, the near foot forward when positive
+    breathe = 0.
+    impact = 0
+    wind = 0.                                            # fronds trail behind when it moves
+    if clip == 'idle':
+        breathe = [0, .6, 1.2, 1.2, .6, 0][n]
+        glow = [.8, 1, 1.2, 1.3, 1.1, .9][n]
+        fist_n = (23 + math.sin(sway) * .8, -27 + math.cos(sway) * 1.2)
+        fist_f = (-19 - math.sin(sway) * .8, -29 + math.cos(sway) * 1.0)
+        eyes = 'blink' if n == 4 else 'open'
+        wind = math.sin(sway) * .6
+    elif clip == 'walk':
+        lift = [0, 0, 1, 2, 1, 0, 0, 0][n]
+        step = [-1, -.5, .6, 1, .7, 0, -.8, -1][n]
+        lean = [1, 1, 2, 3, 2, 0, -1, 0][n]
+        squash = [1, 1, 1, 1, 1, .98, .96, .99][n]
+        fist_n = (23 - step * 5, -27 + abs(step) * 1.5)
+        fist_f = (-19 + step * 5, -29 + abs(step) * 1.5)
+        glow = [1, 1.1, 1.2, 1.2, 1.1, 1, .9, .9][n]
+        wind = [0, .3, .8, 1, .6, -.4, -.6, -.2][n]
+    elif clip == 'attack':
+        lean = [-2, -3, -4, 3, 8, 6, 2, 0][n]
+        cx += [-1, -2, -3, 1, 3, 3, 2, 0][n]
+        squash = [1, 1.02, 1.03, .98, .93, .95, .98, 1][n]
+        glow = [1.3, 1.6, 1.9, 1.9, 1.6, 1.3, 1.1, 1][n]
+        eyes = 'angry'
+        impact = 1 if n in (4, 5) else 0
+        fist_n = [(21, -33), (14, -56), (8, -69), (17, -60), (30, -9), (29, -8), (27, -20), (24, -28)][n]
+        fist_f = [(-19, -30), (-13, -54), (-7, -67), (2, -58), (18, -11), (18, -12), (6, -22), (-14, -28)][n]
+        wind = [0, -.5, -1, 1, 1.4, .8, 0, 0][n]
+    elif clip == 'hurt':
+        flash = n == 0
+        lean = [-6, -4, -2, 0][n]
+        cx += [-3, -2, -1, 0][n]
+        squash = [.95, .97, .99, 1][n]
+        glow = [1.9, 1.5, 1.2, 1][n]
+        eyes = 'hurt' if n < 3 else 'angry'
+        fist_n = [(14, -38), (18, -34), (21, -30), (23, -27)][n]
+        fist_f = [(-12, -40), (-15, -35), (-17, -31), (-19, -29)][n]
+        wind = [-1, -.6, -.2, 0][n]
+    elif clip == 'die':
+        flash = n == 0
+        eyes = 'dead' if n else 'hurt'
+        lean = [0, -4, -6, -2, 3, 5, 5, 5][n]
+        rubble = [0, 0, .2, .5, .75, .92, 1, 1][n]
+        squash = [1, .97, .92, .8, .62, .5, .45, .45][n]
+        glow = [1.9, 1.3, 1., .7, .45, .25, .12, .05][n]
+        fist_n = [(23, -27), (24, -25), (26, -20), (29, -13), (31, -8), (32, -5), (32, -4), (32, -4)][n]
+        fist_f = [(-19, -29), (-20, -26), (-22, -20), (-25, -13), (-27, -8), (-28, -5), (-28, -4), (-28, -4)][n]
+        wind = 0.
+    ground = AY
+    bark = p.ramp('bk0', 'bk1', 'bk2', 'bk3', 'bk4', 'bk5')
+    bark_far = p.ramp('bk0', 'bk1', 'bk2', 'bk3')
+    moss = p.ramp('ms0', 'ms1', 'ms2', 'ms3', 'ms4')
+    frond = p.ramp('fr0', 'fr1', 'fr2')
+    fungus = p.ramp('fu0', 'fu1', 'fu2')
+
+    def place(base, k_=1.):
+        x, y = base
+        k = (-y) / 70
+        return cx + x + lean * k * 1.5 * k_, ground + y * squash - lift
+
+    def foot(sign, w):
+        """Foot position and a lifted flag for the near (+1) or far (-1) leg."""
+        fx = sign * 10 + w * 8 * sign
+        up = max(0., w * sign) * 5
+        return fx, -3 - up
+
+    # ---- far leg and far arm sit behind the trunk
+    legs = {}
+    for sign, tone in ((-1, bark_far), (1, bark)):
+        fx, fy = foot(sign, step)
+        hip = place((sign * 7, -27 + breathe * .3))
+        kneex = hip[0] + (fx - sign * 7) * .45 + sign * 3
+        knee = (kneex, ground + (-15 + fy * .3 + 3) * squash - lift)
+        ft = place((fx, fy))
+        legs[sign] = (hip, knee, ft, tone)
+    if rubble:
+        for sign in (-1, 1):
+            hip, knee, ft, tone = legs[sign]
+            t = rubble
+            legs[sign] = ((hip[0], lerp(hip[1], ground - 6, t)), (lerp(knee[0], cx + sign * 14, t), lerp(knee[1], ground - 3, t)), (lerp(ft[0], cx + sign * 22, t), lerp(ft[1], ground - 2, t)), tone)
+
+    def draw_leg(sign):
+        hip, knee, ft, tone = legs[sign]
+        thigh = capsule(hip, knee, 6.4, 5.2)
+        shin = capsule(knee, ft, 5.0, 4.0)
+        chain_paint(f, [thigh, shin], tone, dither=.55)
+        # a broad root foot with three toes gripping the ground
+        fm = ellipsoid(ft[0] + 2, ground - 3 + (ft[1] - ground) * .4, 8.5, 3.6)
+        f.paint(fm, tone, dither=.5)
+        for t_ in (-1, 0, 1):
+            f.paint(capsule((ft[0] + 5, ft[1] - 1), (ft[0] + 11 + t_ * 2, ft[1] + 1.5 + t_ * 1.4), 2.4, 1.2), tone, dither=.4)
+
+    def draw_arm(sign, fist, hid):
+        sh = place((sign * 14.5, -52 + breathe * .5), 1.)
+        fh = place(fist) if not rubble else (lerp(place(fist)[0], cx + sign * 24, rubble * .3), place(fist)[1])
+        fh = (fh[0], min(fh[1], ground - 8))
+        mid = ((sh[0] + fh[0]) / 2 + sign * 3.5, (sh[1] + fh[1]) / 2 + 5)
+        tone = bark_far if hid else bark
+        upper = capsule(sh, mid, 6.2, 5.0)
+        lower = capsule(mid, fh, 5.0, 5.6)
+        chain_paint(f, [upper, lower], tone, dither=.55)
+        # the club of roots at the end of the arm
+        fm = ellipsoid(fh[0], fh[1] + 1, 7.6, 7.0)
+        f.paint(fm, tone, dither=.55)
+        for k in range(3):
+            a = (-.7 + k * .7) + (0 if sign > 0 else math.pi)
+            f.paint(capsule((fh[0], fh[1] + 2), (fh[0] + math.cos(a) * 9, fh[1] + 2 + math.sin(a) * 3 + 3), 2.6, 1.3), tone, dither=.4)
+        f.dots([(fh[0] - 3, fh[1] - 2), (fh[0] - 2, fh[1] - 2), (fh[0] + 2, fh[1] + 2)], 'ms2' if sign > 0 else 'ms1')
+        return fh
+
+    draw_arm(-1, fist_f, True)
+    draw_leg(-1)
+
+    # ---- fronds trailing from the shoulders and the crown (behind the trunk)
+    def fronds(origin, count, length, spread, seed):
+        for k in range(count):
+            r2 = rng_for('gloomfrond' + seed, 'x', k)
+            ox = origin[0] + (k - (count - 1) / 2) * spread
+            pts = []
+            for i in range(9):
+                u = i / 8
+                pts.append((ox - wind * 3 * u * u - u * 2.5 + math.sin(sway * 1.0 + k + u * 3) * .8 * u, origin[1] + u * length * (.8 + .4 * r2.random())))
+            discs = [ellipsoid(x, y, 1.7 - .7 * (i / 8), 2.1 - .6 * (i / 8)) for i, (x, y) in enumerate(pts)]
+            chain_paint(f, discs, frond, dither=.35)
+
+    if not rubble:
+        fronds(place((-12, -56)), 3, 24 * squash, 4.0, 'a')
+        fronds(place((17, -56)), 3, 20 * squash, 4.0, 'b')
+
+    # ---- trunk: belly, chest, shoulders
+    trunk_c = place((0, -41 + breathe * .4))
+    trunk = ellipsoid(trunk_c[0], trunk_c[1], 16.5, 21 * squash ** .8)
+    belly = ellipsoid(*place((0, -29)), 14, 10 * squash ** .8)
+    sh_n = ellipsoid(*place((14.5, -52 + breathe * .5)), 8.4, 7.4)
+    sh_f = ellipsoid(*place((-14.5, -52 + breathe * .5)), 8.4, 7.4)
+    chain_paint(f, [belly, trunk, sh_f, sh_n], bark, dither=.6)
+    union = belly[0] | trunk[0] | sh_f[0] | sh_n[0]
+    # bark fissures, knots and moss
+    for k in range(7):
+        x0 = trunk_c[0] - 13 + k * 4.4
+        f.a[union & (np.abs(XX - x0 - (YY - trunk_c[1]) * .08) < .55) & (YY > trunk_c[1] - 19 * squash) & (YY < trunk_c[1] + 23 * squash) & (DITHER > -.25)] = p['bk1']
+    for k in range(5):
+        r2 = rng_for('gloombark', 'x', k)
+        x, y = trunk_c[0] + r2.uniform(-12, 12), trunk_c[1] + r2.uniform(-17, 17) * squash
+        if 0 <= int(y) < H and 0 <= int(x) < W and union[int(y), int(x)]:
+            f.a[ellipsoid(x, y, 2.6, 3.4)[0] & union] = p['bk0']
+            f.dots([(x - 1, y - 1)], 'bk4')
+    top_lit = union & (YY < trunk_c[1] - 14 * squash + (XX - trunk_c[0]) * .35) & (XX < trunk_c[0] + 2) & (DITHER > -.35)
+    f.a[top_lit] = p['ms2']
+    f.a[top_lit & (DITHER > .1)] = p['ms3']
+    f.a[union & (YY > ground - 14) & (DITHER > .25)] = p['ms1']
+    # the hollow chest: a dark cavity with a glowing heart of fungus
+    if not rubble or rubble < .6:
+        cav = ellipsoid(trunk_c[0] + 2.5, trunk_c[1] - 1, 6.6, 10.5 * squash ** .8)
+        f.paint(cav, p.ramp('socket', 'bk0'), outline=True, edge='bk0', dither=.1)
+        heart = ellipsoid(trunk_c[0] + 2.5, trunk_c[1] + 1, 3.8 * glow ** .4, 6.2 * squash ** .8 * glow ** .3)
+        f.paint(heart, p.ramp('gl0', 'gl1', 'gl2', 'gl3'), outline=False, dither=.35)
+        for k in range(3):
+            f.dots([(trunk_c[0] + 1 + k * 2.2, trunk_c[1] - 6 - (k % 2) * 3)], 'gl2')
+    # bracket fungus on the shoulders
+    for (bx, by, size) in ((-18, -57, 4.2), (-12, -59, 3.2), (19, -56, 4.6), (13, -59, 3.4), (-3, -26, 3.6)):
+        c = place((bx, by))
+        f.paint(ellipsoid(c[0], c[1], size, size * .55), fungus, dither=.4)
+        f.dots([(c[0] - size * .4, c[1] - 1), (c[0] + size * .5, c[1])], 'gl2' if glow > 1 else 'fu2')
+
+    draw_leg(1)
+
+    # ---- head: a stump with a brow, glowing eyes, a canopy of leaves and antler branches
+    head_c = place((7, -68 + breathe * .6), 1.4)
+    hr = (10.6, 9.4 * squash ** .8)
+    if not rubble:
+        fronds((head_c[0] - 8, head_c[1] - 2), 4, 24 * squash, 3.4, 'c')        # willow fronds hang behind the head and down the back
+    for sign in (-1, 1):
+        base = (head_c[0] + sign * 6, head_c[1] - 6)
+        tip = (head_c[0] + sign * (13 + 1.5 * glow) + lean * .3, head_c[1] - 10 * squash - 2)
+        mid = (base[0] + sign * 5, base[1] - 3)
+        f.paint(capsule(base, mid, 2.8, 2.2), bark, dither=.5)
+        f.paint(capsule(mid, tip, 2.2, 1.0), bark, dither=.5)
+        if not rubble:
+            f.paint(ellipsoid(tip[0], tip[1] - 1, 3.2, 2.6), moss, dither=.45)
+            f.dots([(tip[0] + sign, tip[1] - 1)], 'gl2')
+    f.paint(ellipsoid(head_c[0], head_c[1], *hr), bark, dither=.6)
+    hm = ellipsoid(head_c[0], head_c[1], *hr)[0]
+    if not rubble:
+        for (dx_, dy_, rx_, ry_) in ((-4, -8.5, 9.5, 4.2), (5, -8, 7, 3.4), (-9, -5, 4.6, 3.2)):
+            f.paint(ellipsoid(head_c[0] + dx_, head_c[1] + dy_, rx_, ry_), moss, dither=.5)
+    f.a[hm & (YY < head_c[1] - 5) & (DITHER > -.1)] = p['ms2']
+    brow = polygon([(head_c[0] - 7, head_c[1] - 2.4), (head_c[0] + 10.5, head_c[1] - 3.6), (head_c[0] + 10.5, head_c[1] - 1.2), (head_c[0] - 7, head_c[1] + .2)])
+    f.a[brow & hm] = p['bk0']
+    for ex in (head_c[0] + 2, head_c[0] + 7.6):
+        ey = head_c[1] + .4
+        if eyes == 'dead':
+            f.dots([(ex - 1, ey - 1), (ex + 1, ey + 1), (ex + 1, ey - 1), (ex - 1, ey + 1)], 'bk4')
+        elif eyes == 'blink':
+            f.line((ex - 1.5, ey), (ex + 1.5, ey), 'socket', 1)
+        else:
+            h_ = 1.2 if eyes == 'angry' else 2.0
+            f.flat(ellipsoid(ex, ey, 2.3, h_)[0], 'eye', outline=True, edge='socket')
+            f.dots([(ex + .6, ey)], 'eye2')
+            if glow > 1.4:
+                f.dots([(ex, ey - 2.6), (ex + 1, ey + 2.6)], 'gl2')
+    jaw = 2.2 if (clip == 'attack' and n in (3, 4, 5)) else 1.1
+    f.a[polygon([(head_c[0] + 1.5, head_c[1] + 4.6), (head_c[0] + 10, head_c[1] + 4), (head_c[0] + 9, head_c[1] + 4.6 + jaw * 1.5), (head_c[0] + 2.5, head_c[1] + 4.8 + jaw * 1.5)]) & hm] = p['socket']
+    f.dots([(head_c[0] + 4, head_c[1] + 5), (head_c[0] + 7.4, head_c[1] + 4.8)], 'tooth')
+
+    draw_arm(1, fist_n, False)
+
+    # ---- effects
+    if impact:
+        gx = cx + 27 + lean * .3
+        for k in range(5):                       # roots bursting from the ground
+            bx = gx - 12 + k * 6 + rng.uniform(-1, 1)
+            hgt = [10, 17, 22, 15, 9][k] * (1 if n == 4 else .8)
+            sp = polygon([(bx - 3.2, ground), (bx + .6 * (k - 2), ground - hgt), (bx + 3.2, ground)])
+            f.paint((sp, np.where(sp, .55 + .4 * (XX < bx), 0)), p.ramp('bk1', 'bk2', 'bk3', 'bk4'), dither=.2)
+        for k in range(12):
+            a_ = rng.uniform(-3.1, 0)
+            d_ = rng.uniform(5, 13) * (1 if n == 4 else 1.15)
+            f.dots([(gx + math.cos(a_) * d_, ground - 2 + math.sin(a_) * d_ * .8)], 'spray' if k % 2 else 'mud')
+        f.a[ellipsoid(gx, ground - 1, 13, 2.8)[0] & (f.a == 0) & (DITHER > -.1)] = p['drip']
+    if clip != 'die':
+        for k in range(3):                       # swamp water running off the bark
+            f.dots([(cx - 12 + rng.uniform(0, 28), ground - 6 - rng.uniform(0, 48))], 'drip')
+    if clip == 'idle' or clip == 'walk':
+        for k in range(3):                       # spores drifting from the fungus
+            u = (n / 6 + k / 3) % 1
+            f.dots([(cx - 14 + k * 16 + math.sin(u * 6 + k) * 3, ground - 62 - u * 18)], 'gl2' if k % 2 else 'gl3')
+    if clip == 'die' and n >= 3:
+        for k in range(6 + n):
+            u = (n - 2) / 5
+            f.dots([(cx - 22 + rng.uniform(0, 50), ground - 10 - rng.uniform(0, 28) * u - rng.uniform(0, 6))], 'gl3' if k % 3 == 0 else 'gl2')
+        for k in range(6 if n < 7 else 3):
+            f.dots([(cx - 26 + rng.uniform(0, 60), ground - 2 - rng.uniform(0, 4))], 'drip' if k % 2 else 'mud')
+    if flash:
+        f.whiten()
+    return f.a
+
+
+# ----------------------------------------------------------------------------------------------
 # Rendering and PixelFlow plumbing (same contract as scripts/make_crag_sprites.py)
 # ----------------------------------------------------------------------------------------------
 DRAWERS = {k: pair for k, pair in {'toad': (globals().get('toad'), globals().get('TOAD')), 'croc': (globals().get('croc'), globals().get('CROC')),
-                                   'knight': (globals().get('knight'), globals().get('KNIGHT')), 'hydra': (globals().get('hydra'), globals().get('HYDRA'))}.items()
+                                   'knight': (globals().get('knight'), globals().get('KNIGHT')), 'hydra': (globals().get('hydra'), globals().get('HYDRA')),
+                                   'gloomroot': (globals().get('gloomroot'), globals().get('GLOOMROOT'))}.items()
            if pair[0] is not None}
 for _kind, _pair in DRAWERS.items():
     assert len(_pair[1].hex) <= 255

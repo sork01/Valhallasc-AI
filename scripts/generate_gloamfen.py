@@ -150,6 +150,15 @@ def quest_hub():
               [kill(kind, 2, 'Defeat ' + label) for kind, label in
                [('toad', 'Fen Toads'), ('croc', 'Mire Crocodiles'), ('knight', 'Drowned Knights'), ('hydra', 'Mire Hydras')]],
               20, 820, 'hydra'),
+        # The elite quest: group-credited kills, a guaranteed blue (rare) ring, five players recommended.
+        dict(quest('gloomroot', 'Five Against the Gloomroot', 'reeve',
+              'In the far south-eastern corner of the fen, past the third gap and along the dark shore, a drowned willow has grown into a giant: '
+              'the Gloomroot Colossus, its heart burning cyan. It crushes a lone hero in a few blows, and two do not do much better. '
+              'Bring four companions, five adventurers of level 20 with someone to hold it, someone to heal and the rest to hit hard. '
+              'All five accept this quest and damage the Colossus; stay alive and close when it falls. '
+              'Return to Reeve Osric for a guaranteed blue Celestial Amber Ring, usable by every class.',
+              [kill('gloomroot', 1, 'Defeat the Gloomroot Colossus (Elite · 5 players)')], 20, 1500, 'hydra'),
+             group=True, rewardItem='accessory_amber_l20_blue', recommendedPlayers=5),
         quest('bounty', 'Boardwalk Patrol', 'trader',
               'Defeat ten enemies anywhere in Gloamfen and return to Torvald. This patrol can be repeated.',
               [kill('any', 10, 'Defeat fen enemies')], 16, 340, 'welcome', True),
@@ -398,6 +407,35 @@ def glacier_targets(zone):
     return ([(s['x'], s['y'], s['kind']) for s in zone['slimes']] + [(n['x'], n['y'], n['id']) for n in zone['npcs']])
 
 
+ELITE = 'gloomroot'
+DECOR = ('tree', 'bush', 'rock', 'spire')
+
+
+def ensure_elite(zone):
+    """The Gloomroot Colossus's hollow: the clearest ground in the fen far from every other spawn and every choke
+    (the south-eastern corner of the east bank). Scenery is cleared round it, so nothing else moves."""
+    if any(s['kind'] == ELITE for s in zone['slimes']):
+        return
+    from scipy import ndimage as ndi
+    east = regions(zone)[0][3]
+    bare = dict(zone, objects=[o for o in zone['objects'] if o['kind'] not in DECOR])
+    clearance = ndi.distance_transform_edt(~obstacle_grid(bare)) * .5
+    best = None
+    for j, i in np.argwhere(east & (clearance >= 10)).tolist():
+        x, y = (i + .5) * .5, (j + .5) * .5
+        if not (7 < x < SIZE - 7 and 7 < y < SIZE - 7):
+            continue
+        score = min(min(math.hypot(x - s['x'], y - s['y']) for s in zone['slimes']),
+                    min(math.hypot(x - cx, y - cy) for cx, cy in GAPS + [MOUTH]))
+        if best is None or score > best[0]:
+            best = (score, round(x, 1), round(y, 1))
+    if best is None:
+        raise SystemExit('No clear ground for the Gloomroot Colossus in the east bank')
+    _, x, y = best
+    zone['objects'] = [o for o in zone['objects'] if not (o['kind'] in DECOR and math.hypot(o['x'] - x, o['y'] - y) < 9.5 + o['r'])]
+    zone['slimes'].append(dict(x=x, y=y, kind=ELITE))
+
+
 def fen_unreachable(zone):
     seen, _ = flood(zone, ARRIVAL)
     step = .5
@@ -461,6 +499,7 @@ def main():
                            if not (city['x0'] - 2 < o['x'] < city['x1'] + 2 and city['y0'] - 2 < o['y'] < city['y1'] + 2
                                    and o['kind'] in ('house', 'chapel', 'fountain', 'stall', 'noticeboard', 'bench', 'lamp'))] + objects
         zone.update(npcs=npcs, quests=quests, city=city)
+        ensure_elite(zone)
         missing = fen_unreachable(zone)
         if missing:
             raise SystemExit(f'unreachable from the arrival point: {missing}')
@@ -471,6 +510,7 @@ def main():
     meadow['zones'] = [z for z in meadow['zones'][:3] if z['name'] != NAME]
     moved = add_summit_gate(meadow, random.Random(20261005))   # its own stream: it only draws numbers on the first run
     zone = build(random.Random(20261006))
+    ensure_elite(zone)
     missing = fen_unreachable(zone)
     if missing:
         raise SystemExit(f'unreachable from the arrival point: {missing}')

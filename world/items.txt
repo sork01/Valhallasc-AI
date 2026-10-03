@@ -126,6 +126,13 @@
     "sell": 230
   },
   {
+    "id": "gloomroot_heartwood",
+    "name": "Gloomroot Heartwood",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 420
+  },
+  {
     "id": "warrior_armor_crimson",
     "name": "Crimson Armor",
     "kind": "armor",

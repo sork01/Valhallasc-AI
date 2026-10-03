@@ -113,6 +113,7 @@ pub fn material(kind: &str) -> &'static str {
         "croc" => "croc_hide",
         "knight" => "drowned_gauntlet",
         "hydra" => "hydra_fang",
+        "gloomroot" => "gloomroot_heartwood",
         _ => "slime_gel",
     }
 }
@@ -151,7 +152,7 @@ pub fn rarity_color(rarity: &str) -> &'static str {
     }
 }
 pub fn is_elite(kind: &str) -> bool {
-    matches!(kind, "big" | "cinderlord")
+    matches!(kind, "big" | "cinderlord" | "gloomroot")
 }
 /// Which tier, if any, a kill drops. `roll` is uniform in [0, 1): the bands start with the rarest tier, so one roll
 /// gives at most one piece. Legendary exists only for elites.
@@ -622,6 +623,7 @@ mod tests {
             ("croc", "croc_hide", 170),
             ("knight", "drowned_gauntlet", 195),
             ("hydra", "hydra_fang", 230),
+            ("gloomroot", "gloomroot_heartwood", 420),
         ] {
             assert_eq!(material(kind), id);
             let i = item(id).expect("the material exists in the catalog");
@@ -640,7 +642,7 @@ mod tests {
             );
         }
         assert_eq!(base_drop_chance(GM_RARITY), 0.);
-        for kind in ["green", "big", "cinderlord", "hydra"] {
+        for kind in ["green", "big", "cinderlord", "gloomroot", "hydra"] {
             for n in 0..2000 {
                 assert_ne!(roll_rarity(kind, n as f64 / 2000.), Some(GM_RARITY));
             }

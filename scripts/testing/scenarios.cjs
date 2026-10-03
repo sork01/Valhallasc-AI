@@ -29,7 +29,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20 };
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
 const levelXp = JSON.parse(fs.readFileSync(path.join(root, 'world/levels.txt'), 'utf8'));
@@ -1036,10 +1036,10 @@ const scenarios = {
       const arrival = { x: up.tx, y: up.ty };
       check(w.player(bot).zone === 3 && distance(w.player(bot), arrival) < 1, 'The server moves the walker into Lanternmere');
       const bogs = w.snapshot.slimes;
-      check(bogs.length === 31 && bogs.every(s => s.zone === 3) && new Set(bogs.map(s => s.kind)).size === 4
-        && ['toad', 'croc', 'knight', 'hydra'].every(k => bogs.some(s => s.kind === k)), 'A fen client receives exactly the 31 fen monsters, four kinds, and nothing from the other zones');
+      check(bogs.length === 32 && bogs.every(s => s.zone === 3) && new Set(bogs.map(s => s.kind)).size === 5
+        && ['toad', 'croc', 'knight', 'hydra', 'gloomroot'].every(k => bogs.some(s => s.kind === k)), 'A fen client receives exactly the 32 fen monsters, five kinds, and nothing from the other zones');
       check(bogs.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2 && s.level >= 13) && new Set(bogs.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'Fen levels sit within two of each default (15-20) and really vary');
-      const hp = { toad: 2000, croc: 2800, knight: 3400, hydra: 5200 };
+      const hp = { toad: 2000, croc: 2800, knight: 3400, hydra: 5200, gloomroot: 20000 };
       check(bogs.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
       check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
       check(w.events.some(e => e.type === 'system' && e.text.includes('Gloamfen') && e.text.includes('15–20')), 'The player is told the recommended levels');
@@ -1271,7 +1271,7 @@ const scenarios = {
       check(!quest(w, bot, 'fen_toads'), 'The fen hunt requires the town introduction');
       await kit.talkTo(w, bot, 'fen_ranger', 'quest:accept:fen_welcome');
       check(!quest(w, bot, 'fen_welcome'), 'The wrong NPC cannot offer another giver\'s quest');
-      check(kit.describe('quests').quests.filter(q => q.zone === 3).length === 17 && fen.quests.length >= 10, 'MCP describes all seventeen fen quests with their zone');
+      check(kit.describe('quests').quests.filter(q => q.zone === 3).length === 18 && fen.quests.length >= 10, 'MCP describes all eighteen fen quests with their zone');
       for (const q of fen.quests.filter(q => !q.autoLevel)) {
         await kit.teleport(w, bot, { npc: q.npc });
         await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
@@ -1519,6 +1519,62 @@ const scenarios = {
       }
       await w.restart();
       check(bots.every(bot => quest(w, bot, qid).claimed && w.player(bot).equipment.necklace === reward && w.player(bot).inventory.find(s => s.item === reward).quantity === 1), 'Both quest completions and worn rewards survive a private server restart');
+    },
+  },
+  gloomroot: {
+    description: 'Five level-20 warriors take the Gloamfen elite quest, every one of them damages the Gloomroot Colossus, all five earn shared kill credit and a guaranteed blue ring, then equip it and keep it after a restart. The combat balance is a Rust test.',
+    startLevel: 20, godMode: true, levelSpread: 0,
+    async run(w, check) {
+      const bots = ['Root1', 'Root2', 'Root3', 'Root4', 'Root5'], qid = 'fen_gloomroot', reward = 'accessory_amber_l20_blue';
+      for (const bot of bots) {
+        await w.connect({ bot, class: 'warrior' });
+        await kit.setupCharacter(w, bot, { items: [{ item: 'health_potion' }] });
+        await w.debug(bot, { op: 'quest', id: 'fen_hydra', action: 'finish' });
+        await kit.teleport(w, bot, { zone: 3, x: 64, y: 12 });
+        await kit.teleport(w, bot, { npc: 'fen_reeve' });
+        await kit.talkTo(w, bot, 'fen_reeve', `quest:accept:${qid}`);
+        await w.waitFor(() => !!quest(w, bot, qid));
+        check(quest(w, bot, qid).counts[0] === 0, `${bot} accepts the five-player quest with no kill credit`);
+      }
+      const q = kit.describe('quests').quests.find(q => q.id === qid);
+      check(q.group === true && q.recommendedPlayers === 5 && q.level === 20 && q.rewardItem === reward, 'The quest is a shared five-player level-20 quest with a guaranteed item');
+      check(kit.items.find(i => i.id === reward).rarity === 'rare' && !kit.items.find(i => i.id === reward).class, 'The reward is a blue piece every class can wear');
+      const elite = w.snapshot.slimes.find(s => s.kind === 'gloomroot');
+      check(elite.elite && elite.level === 20 && elite.maxHp === 20000 && elite.zone === 3, 'Exactly the level-20 elite is present in Gloamfen with authoritative 20000 HP');
+      const place = [[-3, -3], [3, -3], [-3, 3], [3, 3], [0, 5]];
+      for (const [i, bot] of bots.entries()) await kit.teleport(w, bot, { zone: 3, x: elite.x + place[i][0], y: elite.y + place[i][1] });
+      for (const bot of bots) await w.action(bot, { type: 'target', id: elite.id });
+      const current = () => w.snapshot.slimes.find(s => s.id === elite.id);
+      for (const bot of bots) {
+        for (let tries = 0; tries < 20 && !w.events.some(e => e.type === 'event' && e.kind === 'hit' && e.actor === w.player(bot).id); tries++) {
+          await w.action(bot, { type: 'skill', id: 'cleave', ...aimAt(w, bot, current()) });
+          await w.advance(300);
+        }
+        check(w.events.some(e => e.type === 'event' && e.kind === 'hit' && e.actor === w.player(bot).id), `${bot} personally damages the Colossus`);
+      }
+      check(current().hp < current().maxHp && !current().dead, 'Five opening strikes do not come close to killing it');
+      await w.debug(bots[0], { op: 'kill_enemy', id: elite.id });
+      await w.waitFor(() => current().dead);
+      for (const bot of bots) {
+        await w.waitFor(() => quest(w, bot, qid).counts[0] === 1);
+        check(quest(w, bot, qid).counts[0] === 1, `${bot} earns shared elite quest credit`);
+      }
+      check(bots.reduce((n, bot) => n + w.player(bot).kills, 0) === 1, 'The ordinary kill reward still has only one owner');
+      for (const bot of bots) {
+        await kit.teleport(w, bot, { npc: 'fen_reeve' });
+        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        await kit.talkTo(w, bot, 'fen_reeve', `quest:claim:${qid}`);
+        await w.waitFor(() => quest(w, bot, qid).claimed && w.player(bot).inventory.some(s => s.item === reward));
+        check(w.player(bot).gold === before.gold + 1500 && totalXp(w.player(bot)) === before.xp + levelXp[19] / 10, `${bot} gets exact quest XP and gold`);
+        check(w.player(bot).inventory.find(s => s.item === reward).quantity === 1, `${bot} gets one guaranteed blue ring`);
+        await kit.talkTo(w, bot, 'fen_reeve', `quest:claim:${qid}`);
+        check(w.player(bot).gold === before.gold + 1500 && w.player(bot).inventory.find(s => s.item === reward).quantity === 1, `${bot} cannot claim twice`);
+        await w.action(bot, { type: 'equip', slots: { accessory1: reward } });
+        await w.waitFor(() => w.player(bot).equipment.accessory1 === reward);
+        check(true, `${bot} can equip the level-20 reward`);
+      }
+      await w.restart();
+      check(bots.every(bot => quest(w, bot, qid).claimed && w.player(bot).equipment.accessory1 === reward), 'All five completions and worn rings survive a private server restart');
     },
   },
   progression_quests: {

@@ -563,8 +563,9 @@
     croc: { name: 'Mire Crocodile', scale: 1.25, top: 32, col: ['#b3c76a', '#5b7433', '#26331f'] },
     knight: { name: 'Drowned Knight', scale: 1.15, top: 87, col: ['#cde8d4', '#6a8d7a', '#2d403c'] },
     hydra: { name: 'Mire Hydra', scale: 1.3, top: 70, col: ['#b0d6a0', '#4b7a74', '#233040'] },
+    gloomroot: { name: 'Gloomroot Colossus', elite: true, scale: 1.8, top: 85, col: ['#8affd8', '#57412a', '#12100c'] },
   };
-  const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra'];
+  const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
   // Colour a level label by how it compares with the hero: grey, normal, orange, red.
   const levelColor = level => { const d = level - (hero?.level || 1); return d >= 5 ? '#ff6b6b' : d >= 3 ? '#ffa65a' : d <= -5 ? '#9fb0a0' : '#fff4ca'; };
   function newHero() {
@@ -1195,7 +1196,7 @@
   // Gloamfen monsters: assets/fen_<kind>.png (scripts/make_fen_sprites.py), the same clips again.
   function loadFenSprites() {
     if (fenSrc) return;
-    if (stubOn()) { fenSrc = stubEnemies(FEN_KINDS, { toad: '#7c4', croc: '#5a3', knight: '#8ca', hydra: '#a6c' }); return; }
+    if (stubOn()) { fenSrc = stubEnemies(FEN_KINDS, { toad: '#7c4', croc: '#5a3', knight: '#8ca', hydra: '#a6c', gloomroot: '#4fa' }); return; }
     fetch('assets/fen.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/fen_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); fenSrc = { meta, img }; })).catch(() => { fenSrc = null; });
   }

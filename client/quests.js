@@ -31,7 +31,7 @@
   function gearReward(quest, container) {
     const i = (window.WORLD_ITEMS || []).find(i => i.id === quest.rewardItem);
     if (!i) return;
-    const reward = element('p', `${i.name} · ${i.rarity === 'uncommon' ? 'Uncommon (green)' : i.rarity} · Level ${i.requiredLevel || 1} · ${i.class || 'All classes'} · +${i.attack || 0} attack · +${i.defense || 0} defense`, 'quest-reward item-name');
+    const reward = element('p', `${i.name} · ${{ uncommon: 'Uncommon (green)', rare: 'Rare (blue)', epic: 'Epic (purple)' }[i.rarity] || i.rarity} · Level ${i.requiredLevel || 1} · ${i.class || 'All classes'} · +${i.attack || 0} attack · +${i.defense || 0} defense`, 'quest-reward item-name');
     reward.dataset.rarity = i.rarity; reward.dataset.item = i.id;
     container.append(reward);
   }

@@ -26,6 +26,7 @@
     wisp: ['Cinder Wisp', 5, '#ee6a1c'], spider: ['Magma Spider', 7, '#b09ab8'], wraith: ['Ash Wraith', 8, '#a89cd0'], golem: ['Basalt Golem', 10, '#c0b8c0'],
     cinderlord: ['Cinderlord (Elite · 2 players)', 10, '#ffb13b'],
     crab: ['Rime Crab', 10, '#6fb3dc'], wolf: ['Frostfang Wolf', 12, '#9fb4c8'], yeti: ['Glacier Yeti', 13, '#e4eef8'], wyrm: ['Rime Wyrm', 15, '#6bc6e8'],
+    gloomroot: ['Gloomroot Colossus (Elite · 5 players)', 20, '#4fe0c8'],
     toad: ['Fen Toad', 15, '#8bc34a'], croc: ['Mire Crocodile', 17, '#a9c45a'], knight: ['Drowned Knight', 18, '#8fc0a8'], hydra: ['Mire Hydra', 20, '#c4e8b0'],
   };
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
