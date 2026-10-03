@@ -31,6 +31,8 @@
     line.append(document.createTextNode(text)); $('chat-log').append(line);
     while ($('chat-log').children.length > 80) $('chat-log').firstElementChild.remove();
     $('chat-log').scrollTop = $('chat-log').scrollHeight;
+    // Everything that is not a player's chat line is also kept on the System tab.
+    if (!name) window.SystemLog?.add(text, channel === 'refused' ? 'sys-taken' : 'sys-note');
   }
   function overlay(text, fatal = false) {
     $('connection-overlay').hidden = false; $('connection-text').textContent = text;
@@ -84,9 +86,9 @@
           if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
           callbacks.onSnapshot?.(packet); break;
         }
-        case 'event': callbacks.onEvent?.(packet); break;
+        case 'event': window.SystemLog?.event(packet, id); callbacks.onEvent?.(packet); break;
         case 'dialogue': window.City?.dialogue(packet); break;
-        case 'chat': log(packet.text, packet.channel === 'party' ? `[Party] ${packet.name}` : packet.name, packet.channel); break;
+        case 'chat': window.Field?.bubble(packet.id, packet.text, packet.channel === 'party'); log(packet.text, packet.channel === 'party' ? `[Party] ${packet.name}` : packet.name, packet.channel); break;
         case 'system': log(packet.text); break;
         case 'notice': log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;
         case 'debug': window.GM?.onReply(packet); break;

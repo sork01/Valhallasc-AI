@@ -93,6 +93,7 @@ struct Player {
     dash_speed: f64,
     dash_mult: f64,
     dash_hits: Vec<usize>,
+    dash_skill: String,
     skill_cd: BTreeMap<String, f64>,
     buffs: Vec<Buff>,
     /// Seconds until any potion can be drunk again.
@@ -157,6 +158,7 @@ impl Player {
             dash_speed: 15.,
             dash_mult: 0.,
             dash_hits: vec![],
+            dash_skill: String::new(),
             skill_cd: BTreeMap::new(),
             buffs: vec![],
             potion_cd,
@@ -423,6 +425,9 @@ struct Bolt {
     blast: f64,
     #[serde(skip)]
     hits: Vec<usize>,
+    /// The skill that fired this bolt (empty for a basic attack), for the system log.
+    #[serde(skip)]
+    skill: String,
 }
 #[derive(Clone, Serialize)]
 struct Drop {
@@ -456,6 +461,8 @@ pub struct World {
     rng: u64,
     next_entity: u64,
     next_king_spawn: f64,
+    // The skill whose damage is being applied right now (empty: a basic attack); hit events carry it for the system log.
+    cur_skill: String,
     /// Counter for mercenary sessions.
     merc_seq: u64,
     level_spread: i32,
@@ -502,6 +509,7 @@ impl World {
             rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
             next_entity: 1,
             next_king_spawn: 0.,
+            cur_skill: String::new(),
             merc_seq: 0,
             level_spread,
             god_mode: false,
@@ -674,6 +682,14 @@ impl World {
     }
     fn event(&self, kind: &str, actor: &str, p: Point, value: f64, crit: bool) {
         self.emit_zone(self.zone_of(actor), json!({"type":"event","kind":kind,"actor":actor,"x":p.x,"y":p.y,"value":value,"crit":crit}));
+    }
+    /// An event with extra fields (who was hit, by what) merged in, for the client's system log.
+    fn event_with(&self, kind: &str, actor: &str, p: Point, value: f64, crit: bool, extra: Value) {
+        let mut v = json!({"type":"event","kind":kind,"actor":actor,"x":p.x,"y":p.y,"value":value,"crit":crit});
+        if let (Some(o), Some(e)) = (v.as_object_mut(), extra.as_object()) {
+            o.extend(e.clone());
+        }
+        self.emit_zone(self.zone_of(actor), v);
     }
     // What one client needs: its own zone's players, enemies, bolts and drops. Zones are separate maps, so
     // nothing about another zone is ever sent to this client.
@@ -1467,6 +1483,7 @@ impl World {
                 pierce: false,
                 blast: 0.,
                 hits: vec![],
+                skill: String::new(),
             });
             return;
         }
@@ -1597,6 +1614,7 @@ impl World {
         let mut points: Vec<[f64; 2]> = vec![];
         let mut healed = 0.;
         let mut value = 0.;
+        self.cur_skill = id.to_string();
         match &skill.effect {
             Effect::Cone { reach, dot, mult } => {
                 value = *reach;
@@ -1660,6 +1678,7 @@ impl World {
                         pierce: *pierce,
                         blast: *blast,
                         hits: vec![],
+                        skill: id.to_string(),
                     });
                 }
                 value = *count as f64;
@@ -1671,6 +1690,7 @@ impl World {
                 p.dash_speed = *speed;
                 p.dash_mult = *mult;
                 p.dash_hits.clear();
+                p.dash_skill = id.to_string();
                 p.attack = 0.;
                 p.hurt = 0.;
                 p.stop();
@@ -1773,6 +1793,7 @@ impl World {
                 healed = (p.character.hp - before).round();
             }
         }
+        self.cur_skill.clear();
         if let Some(pulse) = &skill.pulse {
             let wounded = self.wounded_allies(session, pulse.range);
             points.extend(self.heal_players(session, &wounded, pulse.mult));
@@ -1855,6 +1876,7 @@ impl World {
         let p = &self.players[&session];
         let (point, zone, mult) = (p.character.point(), p.character.zone, p.dash_mult);
         let skip = p.dash_hits.clone();
+        self.cur_skill = p.dash_skill.clone();
         for i in self.enemies_near(zone, point, 0.9, &skip) {
             let (damage, crit) = self.roll_damage(session, mult);
             self.hit_slime(i, session, damage, crit);
@@ -1862,6 +1884,7 @@ impl World {
                 p.dash_hits.push(i);
             }
         }
+        self.cur_skill.clear();
     }
     /// Returns the health the enemy actually lost.
     fn hit_slime(&mut self, id: usize, session: u64, damage: f64, crit: bool) -> f64 {
@@ -1918,7 +1941,14 @@ impl World {
             };
             s.state = "dead".into();
         }
-        self.event("hit", &actor, point, damage, crit);
+        self.event_with(
+            "hit",
+            &actor,
+            point,
+            damage,
+            crit,
+            json!({"enemy":kind,"level":level,"skill":self.cur_skill,"killed":killed}),
+        );
         if killed {
             // Only explicitly shared quests benefit. XP, loot and ordinary quests retain their killer ownership.
             let contributors = self.slimes[id].contributors.clone();
@@ -1945,7 +1975,14 @@ impl World {
             p.character.kills += 1;
             quest_progress(&mut p.character, &self.maps[zone].quests, "kill", &kind);
             let levels = p.character.grant_xp(xp);
-            self.event("slimeDie", &credit_id, point, 0., false);
+            self.event_with(
+                "slimeDie",
+                &credit_id,
+                point,
+                0.,
+                false,
+                json!({"enemy":kind,"level":level,"xp":xp}),
+            );
             if levels > 0 {
                 let point = self.players[&credit].character.point();
                 self.level_up_event(&credit_id, point, levels);
@@ -2190,11 +2227,17 @@ impl World {
             }
         }
         let point = s.point();
+        let (kind, level) = (s.kind.clone(), s.level);
         if let Some(session) = hit {
-            self.hurt_player(session, damage, point);
+            self.hurt_player_by(session, damage, point, &kind, level);
         }
     }
-    fn hurt_player(&mut self, session: u64, damage: f64, _from: Point) {
+    #[cfg(test)]
+    fn hurt_player(&mut self, session: u64, damage: f64, from: Point) {
+        self.hurt_player_by(session, damage, from, "", 0);
+    }
+    /// `enemy` is the attacker's kind and `level` its level, shown in the system log.
+    fn hurt_player_by(&mut self, session: u64, damage: f64, _from: Point, enemy: &str, level: u32) {
         let Some(p) = self.players.get(&session) else {
             return;
         };
@@ -2217,7 +2260,14 @@ impl World {
         let point = p.character.point();
         if dodge_chance > 0. && self.random() < dodge_chance {
             self.players.get_mut(&session).unwrap().last_hurt = self.time;
-            self.event("dodge", &actor, point, 0., false);
+            self.event_with(
+                "dodge",
+                &actor,
+                point,
+                0.,
+                false,
+                json!({"enemy":enemy,"level":level}),
+            );
             return;
         }
         let p = self.players.get_mut(&session).unwrap();
@@ -2245,9 +2295,23 @@ impl World {
             p.stop();
             p.apply_death_penalty();
         }
-        self.event("hurt", &actor, point, value, false);
+        self.event_with(
+            "hurt",
+            &actor,
+            point,
+            value,
+            false,
+            json!({"enemy":enemy,"level":level}),
+        );
         if dead {
-            self.event("death", &actor, point, 0., false);
+            self.event_with(
+                "death",
+                &actor,
+                point,
+                0.,
+                false,
+                json!({"enemy":enemy,"level":level}),
+            );
             self.save();
         }
     }
@@ -2282,6 +2346,7 @@ impl World {
             if !b.pierce {
                 hit.truncate(1);
             }
+            self.cur_skill = b.skill.clone();
             for (_, id) in hit {
                 b.hits.push(id);
                 if b.blast > 0. {
@@ -2297,6 +2362,7 @@ impl World {
                     b.t = 1.;
                 }
             }
+            self.cur_skill.clear();
         }
         bolts.retain(|b| b.t < 0.65);
         self.bolts = bolts;
@@ -8105,6 +8171,40 @@ mod tests {
             }
         }
         found
+    }
+
+    #[test]
+    fn combat_events_name_the_enemy_and_the_skill_for_the_system_log() {
+        let (mut w, mut rx) = debug_world();
+        let kind = w.slimes[0].kind.clone();
+        let level = w.slimes[0].level;
+        w.slimes[0].zone = w.players[&1].character.zone;
+        w.slimes[0].dead = false;
+        w.slimes[0].hp = w.slimes[0].max_hp;
+        w.cur_skill = "cleave".into();
+        w.hit_slime(0, 1, 3., false);
+        w.cur_skill.clear();
+        let point = w.players[&1].character.point();
+        w.time = 10.;
+        w.players.get_mut(&1).unwrap().god = false;
+        w.hurt_player_by(1, 20., point, &kind, level);
+        let events = packets(&mut rx, "event");
+        let hit = events.iter().find(|e| e["kind"] == "hit").unwrap();
+        assert_eq!(hit["enemy"], kind.as_str());
+        assert_eq!(hit["level"], level);
+        assert_eq!(hit["skill"], "cleave");
+        assert_eq!(hit["killed"], false);
+        let hurt = events.iter().find(|e| e["kind"] == "hurt").unwrap();
+        assert_eq!(hurt["enemy"], kind.as_str());
+        assert_eq!(hurt["level"], level);
+        w.slimes[0].hp = 1.;
+        w.hit_slime(0, 1, 50., false);
+        let die = packets(&mut rx, "event")
+            .into_iter()
+            .find(|e| e["kind"] == "slimeDie")
+            .unwrap();
+        assert_eq!(die["enemy"], kind.as_str());
+        assert!(die["xp"].as_u64().unwrap() > 0);
     }
 
     #[test]

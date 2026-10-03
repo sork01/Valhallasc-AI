@@ -326,7 +326,12 @@
 
   <p id="network-status" class="network-status" role="status">Valhalla · Shared world</p>
   <section id="chat" class="chat" aria-label="World chat" hidden>
+    <div class="chat-tabs" role="tablist" aria-label="Chat tabs">
+      <button id="tab-chat" class="on" type="button" role="tab" aria-selected="true" aria-controls="chat-log">Chat</button>
+      <button id="tab-system" type="button" role="tab" aria-selected="false" aria-controls="system-log">System</button>
+    </div>
     <div id="chat-log" class="chat-log" role="log" aria-live="polite"></div>
+    <div id="system-log" class="chat-log system-log" role="log" aria-live="off" hidden></div>
     <form id="chat-form"><input id="chat-input" type="text" maxlength="240" placeholder="Enter to chat…" aria-label="Chat message" autocomplete="off" disabled><button type="submit">Send</button></form>
   </section>
   <div id="layout-bar" class="layout-bar" role="toolbar" aria-label="Edit UI" hidden>
@@ -372,6 +377,7 @@
 <script src="skills.js"></script>
 <script src="inventory.js"></script>
 <script src="attributes.js"></script>
+<script src="syslog.js"></script>
 <script src="online.js"></script>
 <script src="account.js"></script>
 <script src="social.js"></script>

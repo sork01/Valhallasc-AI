@@ -72,7 +72,7 @@
     buildMap(); chunks.clear();
     if (mini) buildMini();
     if (hero) { pendingNpc = null; cityRoute = []; hero.target = null; hero.goal = null; }
-    floaters = []; parts = []; effects = []; bolts = []; drops = []; marker = null; slimes = []; remotePlayers.clear();
+    floaters = []; parts = []; effects = []; bolts = []; drops = []; marker = null; slimes = []; remotePlayers.clear(); bubbles.clear();
   }
 
   // ---------- sprites (drawn once) ----------
@@ -523,6 +523,9 @@
   let hero, slimes, drops, floaters, parts, effects, bolts, marker, cam, shake, keys, pointer, msg, hudT, tAll;
   let mageSpr = null, spriteGeneration = 0;
   let pendingNpc = null, cityRoute = [], routeTime = 0;
+  // Speech bubbles over characters that just chatted: id -> {text, until, lines}.
+  const bubbles = new Map();
+  let bubblesDrawn = 0, bubblesLast = 0;
   let remotePlayers = new Map(), onCharacter = () => {}, inputT = 0, lastLook = '';
   const isMage = () => hero?.look?.class === 'mage';
   const isAssassin = () => hero?.look?.class === 'assassin';
@@ -1091,6 +1094,37 @@
     }
     g.restore();
   }
+  // Word-wraps text into at most four lines of `max` pixels in the context's current font; the last line ends in an ellipsis when cut.
+  function wrapBubble(g, text, max) {
+    const lines = []; let line = '';
+    for (const word of text.split(/\s+/).filter(Boolean)) {
+      let w = word;
+      while (g.measureText(w).width > max) {              // a word wider than the bubble is broken
+        let n = w.length; while (n > 1 && g.measureText(w.slice(0, n)).width > max) n--;
+        if (line) { lines.push(line); line = ''; }
+        lines.push(w.slice(0, n)); w = w.slice(n);
+      }
+      const next = line ? line + ' ' + w : w;
+      if (g.measureText(next).width > max) { lines.push(line); line = w; } else line = next;
+    }
+    if (line) lines.push(line);
+    if (lines.length > 4) { lines.length = 4; lines[3] = lines[3].replace(/.{0,2}$/, '') + '…'; }
+    return lines;
+  }
+  // A white speech bubble whose tail points down at (sx, sy + 8); `left` seconds remain, the last half second fades it.
+  function drawBubble(g, b, sx, sy, left) {
+    g.save(); g.globalAlpha = Math.min(1, left / .5); g.font = '17px "Jua", sans-serif'; g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    if (!b.lines) b.lines = wrapBubble(g, b.text, 230);
+    const lh = 20, pad = 9, w = Math.max(...b.lines.map(l => g.measureText(l).width)) + pad * 2, h = b.lines.length * lh + pad * 2 - 4, r = 9;
+    const x = clamp(sx - w / 2, 6, VW - w - 6), y = sy - h, tx = clamp(sx, x + r + 6, x + w - r - 6);
+    g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, tx + 7, y + h, r);
+    g.lineTo(tx + 7, y + h); g.lineTo(tx, y + h + 9); g.lineTo(tx - 7, y + h); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+    g.fillStyle = '#fffdf0'; g.strokeStyle = '#151c35'; g.lineWidth = 2.5; g.fill(); g.stroke();
+    b.box = { l: x, r: x + w, t: y - 0, b: y + h, lines: b.lines.length }; bubblesDrawn++;
+    g.fillStyle = b.party ? '#1d5a8a' : '#1b1b2e';
+    b.lines.forEach((l, i) => g.fillText(l, x + pad, y + pad + 14 + i * lh - 2));
+    g.restore();
+  }
   function drawHero(g, h, t) {
     const o = OPT(), c = hero.look || {};
     const beard = o.hairSwatch[c.hairColor || 0] || '#c0501e', skin = o.skinSwatch[c.skin || 0] || '#f0a386', rune = o.runeSwatch[c.rune || 0] || '#59d9ff', armor = ARMOR[c.armor || 0] || ARMOR[0];
@@ -1605,6 +1639,16 @@
         else { g.fillStyle = '#8acfff'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
       } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } g.restore(); }
     }
+    // speech bubbles go over everything, so a tree or a roof never hides what somebody said
+    bubblesLast = bubblesDrawn; bubblesDrawn = 0;
+    if (bubbles.size) {
+      const now = performance.now();
+      for (const [id, b] of bubbles) {
+        if (b.until <= now) { bubbles.delete(id); continue; }
+        const who = id === Online.id ? hero : remotePlayers.get(id); if (!who || who.dead) continue;
+        const [bx, by] = w2s(who.x, who.y); if (bx > -200 && bx < VW + 200 && by > -50 && by < VH + 250) drawBubble(g, b, bx, by - (who === hero ? 138 : 152), (b.until - now) / 1000);
+      }
+    }
     // slash arc on the ground plane (over everything: it is the axe's motion)
     for (const e of effects) if ((e.kind === 'slash' || e.kind === 'dualSlash') && (heroSpr || e.t < 0)) continue; else if (e.kind === 'slash') {
       const p = e.t / .32, a0 = e.a - 1.25, a1 = a0 + 2.5 * Math.min(1, p * 1.8);
@@ -1806,6 +1850,16 @@
       return Online.send({ type: 'equip', slots: { [slot]: item } });
     },
     get remotePlayers() { return [...remotePlayers.values()]; },
+    // Shows `text` in a speech bubble over the character `id` for a few seconds (longer for longer messages).
+    bubble(id, text, party = false) {
+      text = String(text || '').trim(); if (!id || !text) return;
+      bubbles.set(id, { text, party, lines: null, until: performance.now() + 3500 + Math.min(text.length, 120) * 45 });
+    },
+    // Test hooks: the live bubble text and box for a character, and how many bubbles the last frame drew.
+    bubbleText(id) { const b = bubbles.get(id); return b && b.until > performance.now() ? b.text : null; },
+    bubbleBox(id) { return bubbles.get(id)?.box || null; },
+    bubbleDrawn() { return bubblesLast; },
+    enemyName(kind) { return SLIME[kind]?.name || null; },
     get equipmentStats() { return equipmentStats(); },
     get warriorSprites() { return !isMage() && !isAssassin() && !isPriest() && !isHunter() ? mageSpr : null; },
     get mageSprites() { return isMage() ? mageSpr : null; },

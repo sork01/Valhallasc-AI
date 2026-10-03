@@ -549,3 +549,21 @@
 @media (pointer: coarse) { .wm-panel .window-tool, .wm-kind { min-height: 44px; } .wm-open { width: 44px; height: 44px; } .wm-gate { min-width: 44px; min-height: 44px; } .wm-panel .window-close { min-width: 44px; min-height: 44px; } }
 @media (max-width: 850px) { .wm-side, .wm-foot, .wm-kind, .wm-gate-label, .wm-hub, .wm-tile-label small { font-size: 10px; } .wm-tile-label b { font-size: 11px; } }
 @media (prefers-reduced-motion: reduce) { .wm-you, .wm-me i, .wm-fade { animation: none; } .wm-tile { transition: none; } }
+
+/* Chat window tabs: Chat (player talk) and System (combat and game log). */
+.chat-tabs { display: flex; border-bottom: 1px solid #a9b4dc40; }
+.chat .chat-tabs button { flex: 0 0 auto; background: transparent; color: #b7bfd8; padding: .35cqw 1cqw; border-bottom: 2px solid transparent; }
+.chat .chat-tabs button.on { color: #f1e2b0; background: #1b2644; border-bottom-color: #e9ce82; }
+.chat .chat-tabs button.unread:not(.on)::after { content: ''; display: inline-block; width: .5cqw; height: .5cqw; margin-left: .4cqw; border-radius: 50%; background: #ffb347; vertical-align: middle; }
+.system-log p { margin: .15cqw 0; }
+.sys-note { color: #cfe8c8; }
+.sys-dealt { color: #f1ecda; }
+.sys-crit { color: #ffe066; font-weight: bold; }
+.sys-taken { color: #ff9aa8; }
+.sys-heal { color: #8ff0a4; }
+.sys-xp { color: #e9ce82; }
+.sys-loot { color: #7fc4ff; }
+.sys-skill { color: #c9b2ff; }
+@media (pointer: coarse) {
+  .chat .chat-tabs button { min-height: 44px; }
+}
