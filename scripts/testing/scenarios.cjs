@@ -1859,6 +1859,70 @@ const scenarios = {
       check(w.player(bot).zone === 4, 'The city position survives a Rust restart');
     },
   },
+
+  spark_travel: {
+    description: 'Spark Travel discovery, missing intermediate stops, fares, real flights through every stop, immunity and resume after restart.',
+    godMode: false,
+    levelSpread: 0,
+    async run(w, check) {
+      const bot = 'Spark', A = 'travel_alderhaven', B = 'travel_cinderwatch', C = 'travel_rimeward';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { gold: 100 });
+      const visit = async id => { await kit.teleport(w, bot, { npc: id }); return kit.talkTo(w, bot, id); };
+      const choose = async (from, to) => {
+        const before = new Set(w.events);
+        await w.advance(550);
+        await w.action(bot, { type: 'interact', npc: from, offer: `spark:${to}` });
+        return w.waitFor(() => w.events.find(e => !before.has(e) && e.bot === bot && (e.type === 'dialogue' || e.type === 'notice')), 5000, 'Spark reply');
+      };
+      let reply = await visit(A);
+      check(reply.travel.length === 4, 'Every other settlement appears as a destination');
+      check(reply.travel.find(d => d.id === C).cost === 40, 'Two legs cost 40 gold');
+      await visit(C); await kit.teleport(w, bot, { npc: A });
+      reply = await choose(A, C);
+      check(reply.notice.includes('Cinderwatch'), 'A missing intermediate master blocks the third stop');
+      check(w.player(bot).gold === 100 && !w.player(bot).sparkTravel, 'Blocked travel spends no gold and does not launch');
+      await visit(B); await visit(A);
+      await w.waitFor(() => w.player(bot).travelStops.length === 3);
+      check(new Set(w.player(bot).travelStops).size === 3, 'Talking twice never duplicates discovery');
+      await w.debug(bot, { op: 'set_gold', gold: 39 });
+      reply = await choose(A, C);
+      check(reply.notice.includes('enough'), 'A hero with 39 gold cannot buy a 40-gold flight');
+      check(w.player(bot).gold === 39, 'Insufficient gold is preserved');
+      await w.debug(bot, { op: 'set_gold', gold: 100 });
+      const oldEvents = new Set(w.events);
+      reply = await choose(A, C);
+      await w.waitFor(() => !!w.player(bot).sparkTravel);
+      check(reply.ok === true && w.player(bot).gold === 60, 'The full fare is charged once at departure');
+      check(w.player(bot).sparkTravel.stops.join(',') === [A,B,C].join(','), 'The authoritative itinerary includes the second stop');
+      const before = { ...w.player(bot) }, time = w.views.get(bot).time;
+      await w.advance(500);
+      const after = w.player(bot), elapsed = w.views.get(bot).time - time;
+      check(Math.abs(distance(before, after) - 5.2 * 3 * elapsed) < .02, 'Real snapshots move at three times Warrior walking speed');
+      await w.action(bot, { type: 'stop' });
+      await w.action(bot, { type: 'move', x: 1, y: 1 });
+      await w.action(bot, { type: 'attack', fx: 1, fy: 0 });
+      await w.advance(300);
+      check(!!w.player(bot).sparkTravel && w.player(bot).atkT === 0, 'Ground inputs cannot interrupt or attack during a flight');
+      await w.restart();
+      check(w.player(bot).gold === 60 && !!w.player(bot).sparkTravel, 'A private server restart resumes the paid flight');
+      check(w.player(bot).travelStops.length === 3, 'Discovered masters survive restart');
+      await w.waitFor(() => !w.player(bot).sparkTravel && w.player(bot).zone === 2, 30000, 'Arrive at the third stop');
+      const stops = w.events.filter(e => !oldEvents.has(e) && e.bot === bot && e.kind === 'sparkStop').map(e => e.stop);
+      check(stops.join(',') === [B,C].join(','), 'The spark passes the second master before stopping at the third');
+      const master = rime.npcs.find(n => n.id === C);
+      check(distance(w.player(bot), master) < .05, 'Arrival is beside the chosen travel master');
+      check(w.player(bot).gold === 60 && w.player(bot).hp === w.player(bot).maxHp && w.player(bot).kills === 0, 'Flying past enemies causes no damage, rewards or extra fares');
+      reply = await kit.talkTo(w, bot, C);
+      check(reply.travel.find(d => d.id === B).cost === 20 && reply.travel.find(d => d.id === A).cost === 40, 'Return fares count the same legs');
+      await choose(C, B);
+      await w.waitFor(() => !w.player(bot).sparkTravel && w.player(bot).zone === 1, 20000, 'Return to Cinderwatch');
+      check(w.player(bot).gold === 40, 'One-leg return charges exactly 20 gold');
+      await w.disconnect(bot); await w.connect({ bot });
+      check(w.player(bot).gold === 40 && w.player(bot).zone === 1 && w.player(bot).travelStops.length === 3, 'Arrival and discoveries survive logout');
+    },
+  },
+
 };
 
 async function runScenario(name, world = new TestWorld()) {

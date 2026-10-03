@@ -76,7 +76,7 @@ const botSchema = z.object({
 }).strict();
 
 function spacingViolation(snapshot) {
-  const actors = [...snapshot.players, ...snapshot.slimes].filter(a => !a.dead);
+  const actors = [...snapshot.players, ...snapshot.slimes].filter(a => !a.dead && !a.sparkTravel);
   for (let i = 0; i < actors.length; i++) for (let j = i + 1; j < actors.length; j++) {
     const a = actors[i], b = actors[j];
     if (!a.kind && !b.kind) continue;

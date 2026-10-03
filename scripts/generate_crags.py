@@ -11,6 +11,7 @@ Afterwards: node scripts/sync-world.cjs, then rebuild Rust.
 """
 import argparse
 import json
+import spark_travel
 import math
 from pathlib import Path
 import random
@@ -271,6 +272,7 @@ def main():
         missing = reachable(zone)
         if missing:
             raise SystemExit(f'unreachable from the arrival point: {missing}')
+        spark_travel.ensure(meadow)
         PATH.write_text(json.dumps(meadow, indent=2) + '\n')
         print(f'Updated Cinderwatch Camp: {len(npcs)} NPCs, {len(quests)} quests. Terrain and enemy spawns preserved. Now run node scripts/sync-world.cjs')
         return
@@ -308,6 +310,7 @@ def main():
     if missing:
         raise SystemExit(f'unreachable from the arrival point: {missing}')
     meadow['zones'] = [zone] + later_zones
+    spark_travel.ensure(meadow)
     PATH.write_text(json.dumps(meadow, indent=2) + '\n')
     kinds = {}
     for s in zone['slimes']:

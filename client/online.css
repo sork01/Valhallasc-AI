@@ -586,3 +586,4 @@
 .party-level b { color: #ffd56b; }
 .party-level-bar { height: .7cqw; margin: .35cqw 0; border-radius: 999px; background: #0008; border: 1px solid #b89b5c80; overflow: hidden; }
 .party-level-bar i { display: block; height: 100%; background: linear-gradient(#ffe9a0, #d9a441); transition: width .2s; }
+.spark-route { grid-column: 2 / -1; display: block; font-size: .85em; color: #315d66; white-space: normal; }

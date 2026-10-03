@@ -151,7 +151,7 @@ const look = page => page.evaluate(() => {
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('A Foothold in the Ash') && t.includes('Scout Kael')), 'Camp introduction appears in the live tracker');
   await page.keyboard.press('Escape');
   check(await page.locator('#quest-journal').isHidden(), 'The journal closes again');
-  check(await page.evaluate(() => City.npcs.length === 4 && City.npcs.every(n => n.id.startsWith('crags_')) && Quests.marker('crags_scout') === '◆'), 'Only the four camp NPCs and their talk-objective markers are shown');
+  check(await page.evaluate(() => City.npcs.length === 5 && City.npcs.every(n => n.id.startsWith('crags_') || n.id === 'travel_cinderwatch') && Quests.marker('crags_scout') === '◆'), 'The camp NPCs, travel master and talk-objective markers are shown');
   await page.getByRole('button', { name: 'Collapse quest tracker' }).click();
   await page.waitForTimeout(700);
   for (const id of ['crags_scout', 'crags_healer', 'crags_supplier']) {

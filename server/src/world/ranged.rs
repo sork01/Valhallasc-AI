@@ -82,7 +82,11 @@ impl World {
             let victim = self
                 .players
                 .iter()
-                .filter(|(_, p)| p.character.hp > 0. && p.character.zone == b.zone)
+                .filter(|(_, p)| {
+                    p.character.hp > 0.
+                        && p.character.zone == b.zone
+                        && p.character.spark_travel.is_none()
+                })
                 .map(|(session, p)| (segment_distance(p.character.point(), start, end), *session))
                 .filter(|(d, _)| *d < PLAYER_RADIUS + BOLT_RADIUS * b.size.max(1.))
                 .min_by(|a, c| a.0.total_cmp(&c.0));

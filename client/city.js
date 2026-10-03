@@ -193,7 +193,7 @@
   function folkOf(zone) {
     if(!folk.has(zone)){
       const quests=(area().quests||[]);
-      folk.set(zone,(area().npcs||[]).map(n=>({...n,x0:n.x,y0:n.y,moving:false,fx:0,fy:1,key:!n.look||!!n.offers.length||!!n.buys||quests.some(q=>q.npc===n.id)})));
+      folk.set(zone,(area().npcs||[]).map(n=>({...n,x0:n.x,y0:n.y,moving:false,fx:0,fy:1,key:!n.look||!!n.offers.length||!!n.buys||!!n.travelStop||quests.some(q=>q.npc===n.id)})));
     }
     return folk.get(zone);
   }
@@ -239,6 +239,7 @@
   }
   function drawNpc(g,n,sx,sy,t,near) {
     g.save();g.translate(sx,sy);const L=n.look,sc=L?.scale||1,moving=!!n.moving;
+    if(n.travelStop)window.Spark?.draw(g,n,t,true);
     const bob=L&&moving?Math.abs(Math.sin(t*9+n.x*3))*2.4:Math.sin(t*2+n.x)*1.2;
     ellipse(g,0,1,21*sc,9*sc,'#233d3833');
     if(near){g.strokeStyle='#ffe2a2';g.lineWidth=2;g.beginPath();g.ellipse(0,0,27,12,0,0,Math.PI*2);g.stroke();}
@@ -307,6 +308,14 @@
     else if(view.kind==='sell')$('npc-quests').replaceChildren();
     const offers=[];
     if(view.kind==='gossip'){
+      for(const destination of packet.travel||[]){
+        const b=row('vendor',`Spark Travel · ${destination.name}`,destination.cost==null?'Unavailable':`${destination.cost} gold`);
+        b.dataset.travel=destination.id;b.disabled=!destination.available;
+        const detail=document.createElement('small');detail.className='spark-route';
+        detail.textContent=destination.available?destination.stops.join(' → '):destination.reason;
+        b.append(detail);b.title=destination.stops.join(' → ');
+        b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:`spark:${destination.id}`}))b.disabled=true;});offers.push(b);
+      }
       if(npc.buys){const b=row('vendor','I have something to sell.');b.dataset.view='sell';b.addEventListener('click',()=>show({kind:'sell'},'#npc-back'));offers.push(b);}
       // A tiered offer (potions and food) sells the best tier of its line for the player's level, so it shows that tier.
       const tierFor=offer=>{

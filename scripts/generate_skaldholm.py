@@ -15,6 +15,7 @@ zones alone but not their own gates). Afterwards: node scripts/sync-world.cjs, t
 """
 import argparse
 import json
+import spark_travel
 import math
 from pathlib import Path
 import random
@@ -643,6 +644,7 @@ def main():
     meadow['zones'].append(zone)
     assert len(meadow['zones']) == 4, 'Skaldholm must be zone 4'
     meadow['zones'] += later
+    spark_travel.ensure(meadow)
     PATH.write_text(json.dumps(meadow, indent=2) + '\n')
     kinds = {}
     for o in zone['objects']:

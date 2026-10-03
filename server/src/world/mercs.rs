@@ -252,6 +252,12 @@ impl World {
         let me = p.character.point();
         let zone = p.character.zone;
         let owner_p = &self.players[&owner];
+        if owner_p.character.spark_travel.is_some() {
+            let p = self.players.get_mut(&session).unwrap();
+            p.stop();
+            p.attack = 0.;
+            return;
+        }
         let there = owner_p.character.point();
         let owner_target = owner_p.target;
         let mate_sessions: Vec<u64> = self

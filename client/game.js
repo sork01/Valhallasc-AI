@@ -478,8 +478,9 @@
     title.querySelector('span').textContent = away ? (s.hub ? `${s.hub} · Sanctuary · quests · supplies` : s.players ? `Dungeon · ${s.players} players · level ${s.levels[0]} · ${s.tagline || 'private to your party'}` : s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : (s.tagline || 'Unexplored lands')) : inCity ? 'Sanctuary · shops · townspeople' : '푸른 초원';
     renderBuffs(s.buffs || []);
     if ((s.zone || 0) !== musicZone) { musicZone = s.zone || 0; syncMusic(); }
-    $('city-travel').hidden = inCity || (away && !s.camp);
-    $('city-travel').textContent = s.traveling ? (away ? `Walking to ${(s.camp || 'camp').split(' ')[0]}…` : 'Walking to Alderhaven…') : (away ? `Visit ${s.camp || 'the camp'} ↓` : 'Visit Alderhaven ↓');
+    $('city-travel').hidden = !s.sparkTravel && (inCity || (away && !s.camp));
+    $('city-travel').disabled = !!s.sparkTravel;
+    $('city-travel').textContent = s.sparkTravel ? `Spark Travel · ${s.sparkTravel.destination}…` : s.traveling ? (away ? `Walking to ${(s.camp || 'camp').split(' ')[0]}…` : 'Walking to Alderhaven…') : (away ? `Visit ${s.camp || 'the camp'} ↓` : 'Visit Alderhaven ↓');
   }
   // ---------- level-up banner, flash and active effects ----------
   const luBanner = $('levelup-banner'), luFlash = $('levelup-flash'), buffBar = $('buff-bar');

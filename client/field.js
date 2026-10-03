@@ -611,7 +611,7 @@
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
   }
-  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: zdef.city?.name, tagline: zdef.tagline, hub: City.inside(hero.x, hero.y) ? zdef.city?.name : null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], traveling: cityRoute.length > 0 && !pendingNpc }); }
+  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: zdef.city?.name, tagline: zdef.tagline, hub: City.inside(hero.x, hero.y) ? zdef.city?.name : null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -623,7 +623,7 @@
   // ---------- input ----------
   const KEYDIR = { w: [0, -1], arrowup: [0, -1], s: [0, 1], arrowdown: [0, 1], a: [-1, 0], arrowleft: [-1, 0], d: [1, 0], arrowright: [1, 0] };
   function onKeyDown(e) {
-    if (e.defaultPrevented || !running || paused || !Online.connected || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '')) return;
+    if (e.defaultPrevented || !running || paused || hero.sparkTravel || !Online.connected || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '')) return;
     const k = e.key.toLowerCase();
     if (k === 'f' && !e.repeat && !hero.dead) {
       e.preventDefault(); const npc = City.npcs.filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
@@ -640,7 +640,7 @@
     return best;
   }
   function onPointerDown(e) {
-    if (!running || paused || !Online.connected || hero.dead) return;
+    if (!running || paused || !Online.connected || hero.dead || hero.sparkTravel) return;
     pendingNpc = null; cityRoute = [];
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
     const npc = City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-City.nameplateTop(n) && my<y+12; });
@@ -743,7 +743,7 @@
   }
   function keepActorsSeparated() {
     const enemies = new Set(slimes);
-    const actors = [hero, ...remotePlayers.values(), ...slimes].filter(actor => !actor.dead);
+    const actors = [hero, ...remotePlayers.values(), ...slimes].filter(actor => !actor.dead && !actor.sparkTravel);
     for (let i = 0; i < actors.length; i++) for (let j = i + 1; j < actors.length; j++) {
       const a = actors[i], b = actors[j];
       if (!enemies.has(a) && !enemies.has(b)) continue;
@@ -769,7 +769,8 @@
     const inZone = a => (a.zone || 0) === zone;
     const selectedTarget = hero.target?.id;
     const wasDead = hero.dead;
-    applyActor(hero, own, initial || moved);
+    applyActor(hero, own, initial || moved || !!hero.sparkTravel !== !!own.sparkTravel);
+    if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;hero.target=null;hero.goal=null;}
     window.Attributes?.update(own);
     window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || []);
     window.Quests?.update(own.quests || []);
@@ -796,7 +797,7 @@
       present.add(player.id);
       let remote = remotePlayers.get(player.id);
       if (!remote) { remote = { ...player, sprite: null, signature: '' }; remotePlayers.set(player.id, remote); }
-      applyActor(remote, player, initial || moved);
+      applyActor(remote, player, initial || moved || !!remote.sparkTravel !== !!player.sparkTravel);
       const lookKey = JSON.stringify(player.look);
       if (remote.signature !== lookKey) {
         remote.signature = lookKey; const generation = spriteGeneration;
@@ -1054,9 +1055,9 @@
       inputT -= dt;
       if (inputT <= 0) {
         inputT = .05;
-        const [dx, dy] = paused ? [0, 0] : keyboardDirection();
+        const [dx, dy] = paused || hero.sparkTravel ? [0, 0] : keyboardDirection();
         Online.send({ type: 'input', dx, dy });
-        if (!paused && pointer.down && !hero.target) Online.send({ type: 'move', x: pointer.x, y: pointer.y });
+        if (!paused && !hero.sparkTravel && pointer.down && !hero.target) Online.send({ type: 'move', x: pointer.x, y: pointer.y });
       }
       if (!paused && pendingNpc) {
         const {npc,until}=pendingNpc;
@@ -1626,10 +1627,10 @@
     for (const n of City.npcs) { const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
     for (const s of slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, 100)) { shadow(g, s.x, s.y, 28 * s.d.scale * (1 - s.hop * .12), 11 * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 60)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
-    { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, .32); list.push({ d: hero.x + hero.y + .001, hero, sx, sy }); }
+    { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, .32); list.push({ d: hero.sparkTravel ? Infinity : hero.x + hero.y + .001, hero, sx, sy }); }
     for (const remote of remotePlayers.values()) {
       const [sx, sy] = w2s(remote.x, remote.y);
-      if (onScreen(sx, sy, 160)) { shadow(g, remote.x, remote.y, 30, 12, .28); list.push({ d: remote.x + remote.y + .001, remote, sx, sy }); }
+      if (onScreen(sx, sy, 160)) { shadow(g, remote.x, remote.y, 30, 12, .28); list.push({ d: remote.sparkTravel ? Infinity : remote.x + remote.y + .001, remote, sx, sy }); }
     }
     list.sort((a, b) => a.d - b.d);
     const [hsx, hsy] = w2s(hero.x, hero.y), hd = hero.x + hero.y;
@@ -1674,13 +1675,14 @@
         g.restore();
       } else if (it.remote) {
         const remote = it.remote; g.save(); g.translate(it.sx, it.sy);
-        if (remote.sprite) remote.sprite.draw(g, remote, t);
+        if (remote.sparkTravel) Spark.draw(g,remote,t);
+        else if (remote.sprite) remote.sprite.draw(g, remote, t);
         else { g.fillStyle = '#cfb5fa'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
         g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = window.Social?.isPartyMember(remote.id) ? '#9dffb2' : '#fff4ca';
         g.strokeText(remote.look.name, 0, -128); g.fillText(remote.look.name, 0, -128);
         g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
         g.restore();
-      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (isModular()) {
+      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.sparkTravel) Spark.draw(g,hero,t); else if (isModular()) {
         if (mageSpr) mageSpr.draw(g, hero, t);
         else { g.fillStyle = '#8acfff'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
       } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } g.restore(); }

@@ -20,6 +20,7 @@ mod resource_tests;
 mod resources;
 mod rolls;
 mod social;
+mod travel;
 #[cfg(test)]
 mod vault_tests;
 
@@ -185,7 +186,7 @@ impl Player {
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
-            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored,"gm":c.gm,"god":self.god})
+            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel})
     }
     /// The sum of every active buff of one kind.
     fn buff(&self, kind: BuffKind) -> f64 {
@@ -707,7 +708,10 @@ impl World {
         self.players
             .iter()
             .filter(|(id, p)| {
-                Some(**id) != player && p.character.hp > 0. && p.character.zone == zone
+                Some(**id) != player
+                    && p.character.hp > 0.
+                    && p.character.zone == zone
+                    && p.character.spark_travel.is_none()
             })
             .map(|(_, p)| (p.character.point(), player_gap))
             .chain(
@@ -953,7 +957,9 @@ impl World {
             (c.zone, c.x, c.y) = (door.to, door.tx, door.ty);
         }
         let mut point = c.point();
-        self.maps[c.zone].collide(&mut point, PLAYER_RADIUS);
+        if c.spark_travel.is_none() {
+            self.maps[c.zone].collide(&mut point, PLAYER_RADIUS);
+        }
         c.x = point.x;
         c.y = point.y;
         let id = c.id.clone();
@@ -1015,6 +1021,17 @@ impl World {
         let Some(p) = self.players.get_mut(&session) else {
             return;
         };
+        if p.character.spark_travel.is_some()
+            && !matches!(
+                message,
+                ClientMessage::Chat { .. }
+                    | ClientMessage::Social { .. }
+                    | ClientMessage::Roll { .. }
+                    | ClientMessage::Ping { .. }
+            )
+        {
+            return;
+        }
         match message {
             ClientMessage::Input { dx, dy }
                 if dx.is_finite() && dy.is_finite() && dx.abs() <= 1. && dy.abs() <= 1. =>
@@ -1154,6 +1171,9 @@ impl World {
         }
     }
     fn interact(&mut self, session: u64, npc_id: &str, offer_id: Option<&str>) {
+        if self.travel_master(npc_id).is_some() {
+            return self.spark_interact(session, npc_id, offer_id);
+        }
         if let Some(what) = offer_id.and_then(|id| self.merc_offer(session, npc_id, id)) {
             return self.merc_interact(session, npc_id, &what);
         }
@@ -1404,6 +1424,10 @@ impl World {
             b.left -= TICK;
             b.left > 0.
         });
+        if p.character.spark_travel.is_some() {
+            self.update_spark(session);
+            return;
+        }
         if p.character.hp <= 0. {
             p.moving = false;
             p.dead_time += TICK;
@@ -2243,6 +2267,13 @@ impl World {
         .map(|kind| self.roll_level(&kind));
         let map = &self.maps[zone];
         let s = &mut self.slimes[id];
+        if s.target.is_some_and(|session| {
+            self.players
+                .get(&session)
+                .is_some_and(|p| p.character.spark_travel.is_some())
+        }) {
+            s.target = None;
+        }
         let (windup, cooldown, charge_speed, awareness) = Slime::attack_profile(&s.kind);
         s.hurt_t = (s.hurt_t - TICK).max(0.);
         s.rec_t = (s.rec_t - TICK).max(0.);
@@ -2284,7 +2315,10 @@ impl World {
             .players
             .iter()
             .filter(|(_, p)| {
-                p.character.hp > 0. && p.character.zone == zone && !map.in_city(p.character.point())
+                p.character.hp > 0.
+                    && p.character.zone == zone
+                    && p.character.spark_travel.is_none()
+                    && !map.in_city(p.character.point())
             })
             .map(|(id, p)| {
                 (
@@ -2301,6 +2335,7 @@ impl World {
                 .filter(|p| {
                     p.character.hp > 0.
                         && p.character.zone == zone
+                        && p.character.spark_travel.is_none()
                         && !map.in_city(p.character.point())
                 })
                 .map(|p| {
@@ -2525,6 +2560,9 @@ impl World {
         let Some(p) = self.players.get(&session) else {
             return;
         };
+        if p.character.spark_travel.is_some() {
+            return;
+        }
         if p.character.hp > 0. && !self.maps[p.character.zone].in_city(p.character.point()) {
             self.players.get_mut(&session).unwrap().combat_left = 5.;
         }
@@ -2659,7 +2697,10 @@ impl World {
                 continue;
             }
             if let Some((_, p)) = self.players.iter_mut().find(|(_, p)| {
-                p.character.id == d.owner && p.character.hp > 0. && p.character.zone == d.zone
+                p.character.id == d.owner
+                    && p.character.hp > 0.
+                    && p.character.zone == d.zone
+                    && p.character.spark_travel.is_none()
             }) {
                 let point = Point { x: d.x, y: d.y };
                 let distance = point.distance(p.character.point());
@@ -4070,7 +4111,7 @@ mod tests {
     fn crags_hub_catalog_is_connected_and_has_valid_quests() {
         let w = world();
         let map = &w.maps[1];
-        assert_eq!(map.npcs.len(), 4);
+        assert_eq!(map.npcs.len(), 5);
         assert_eq!(map.quests.len(), 14);
         assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 2);
         let mut ids = std::collections::HashSet::new();
@@ -4523,14 +4564,14 @@ mod tests {
     }
 
     #[test]
-    fn rimeward_camp_has_five_npcs_and_thirteen_valid_quests_levelled_ten_to_fifteen() {
+    fn rimeward_camp_has_a_travel_master_and_valid_quests_levelled_ten_to_fifteen() {
         let w = world();
         let map = &w.maps[2];
         assert_eq!(
             map.city.as_ref().map(|c| (c.x0, c.x1, c.y0, c.y1)),
             Some((52., 76., 108., 121.))
         );
-        assert_eq!(map.npcs.len(), 5);
+        assert_eq!(map.npcs.len(), 6);
         assert_eq!(map.quests.len(), 14);
         assert!(
             map.quests.len() >= 10,
@@ -5148,14 +5189,14 @@ mod tests {
     }
 
     #[test]
-    fn lanternmere_has_seven_npcs_and_sixteen_valid_quests_levelled_fifteen_to_twenty() {
+    fn lanternmere_has_a_travel_master_and_valid_quests_levelled_fifteen_to_twenty() {
         let w = world();
         let map = &w.maps[3];
         assert_eq!(
             map.city.as_ref().map(|c| (c.x0, c.x1, c.y0, c.y1)),
             Some((40., 88., 6., 31.))
         );
-        assert_eq!(map.npcs.len(), 7);
+        assert_eq!(map.npcs.len(), 8);
         assert_eq!(map.quests.len(), 18);
         assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 3);
         let mut roots = 0;
@@ -5618,7 +5659,8 @@ mod tests {
         let mut walkers = 0;
         for npc in &map.npcs {
             assert!(
-                npc.id.starts_with("city_") && ids.insert(&npc.id),
+                (npc.id.starts_with("city_") || npc.id == "travel_skaldholm")
+                    && ids.insert(&npc.id),
                 "{} is unique",
                 npc.id
             );

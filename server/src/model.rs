@@ -344,6 +344,27 @@ pub struct Character {
     /// average of its members' points, so it survives a restart and a party that is rebuilt.
     #[serde(default)]
     pub party_points: u32,
+    /// Travel masters spoken to. A route requires every stop, including the intermediate ones.
+    #[serde(default)]
+    pub travel_stops: Vec<String>,
+    /// Saved flight, so reconnecting or restarting resumes without another fare or an unsafe landing.
+    #[serde(default)]
+    pub spark_travel: Option<SparkTravel>,
+}
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SparkTravel {
+    pub destination: String,
+    pub stops: Vec<String>,
+    pub points: Vec<SparkPoint>,
+    pub next: usize,
+}
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct SparkPoint {
+    pub zone: usize,
+    pub x: f64,
+    pub y: f64,
+    pub stop: Option<String>,
 }
 impl Character {
     /// A hired mercenary: this class and level with the class's starter gear and a few potions, every stat point in the
@@ -376,6 +397,8 @@ impl Character {
             explored: vec![],
             gm: false,
             party_points: 0,
+            travel_stops: vec![],
+            spark_travel: None,
         };
         c.seed_inventory();
         // The best potions the mercenary's level allows: health for everyone, mana for casters.
@@ -1021,6 +1044,10 @@ pub struct Npc {
     pub offers: Vec<Offer>,
     #[serde(default)]
     pub buys: bool,
+    #[serde(default, rename = "travelStop")]
+    pub travel_stop: Option<String>,
+    #[serde(default, rename = "travelLinks")]
+    pub travel_links: Vec<String>,
     /// A closed loop of waypoints the NPC walks, at `speed` tiles per second, standing `pause` seconds at each corner.
     /// Empty means it stays at (x, y). The position is a pure function of the world clock (plus `phase` seconds),
     /// so the server and every client agree on it without any message.

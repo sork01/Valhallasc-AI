@@ -141,7 +141,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   await page.waitForFunction(() => document.querySelector('#npc-quests .gossip-row[data-quest="fen_welcome"]')?.dataset.status === 'active');
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('Lights on the Water') && t.includes('Lamplighter Wren')), 'The introduction appears in the live tracker');
   await page.keyboard.press('Escape');
-  check(await page.evaluate(() => City.npcs.length === 7 && City.npcs.every(n => n.id.startsWith('fen_')) && Quests.marker('fen_ranger') === '◆'), 'Only the seven town NPCs and their talk-objective markers are shown');
+  check(await page.evaluate(() => City.npcs.length === 8 && City.npcs.every(n => n.id.startsWith('fen_') || n.id === 'travel_lanternmere') && Quests.marker('fen_ranger') === '◆'), 'The town NPCs, travel master and talk-objective markers are shown');
   await page.getByRole('button', { name: 'Collapse quest tracker' }).click();
   await page.waitForTimeout(700);
   for (const id of ['fen_lamplighter', 'fen_healer', 'fen_trader', 'fen_ranger', 'fen_scholar', 'fen_ferryman']) {

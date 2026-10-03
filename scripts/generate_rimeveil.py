@@ -15,6 +15,7 @@ Afterwards: node scripts/sync-world.cjs, then rebuild Rust.
 """
 import argparse
 import json
+import spark_travel
 import math
 from pathlib import Path
 import random
@@ -358,6 +359,7 @@ def main():
         missing = unreachable(zone, ARRIVAL, glacier_targets(zone))
         if missing:
             raise SystemExit(f'unreachable from the arrival point: {missing}')
+        spark_travel.ensure(meadow)
         PATH.write_text(json.dumps(meadow, indent=2) + '\n')
         print(f'Updated Rimeward Camp: {len(npcs)} NPCs, {len(quests)} quests. Terrain and enemy spawns preserved. Now run node scripts/sync-world.cjs')
         return
@@ -371,6 +373,7 @@ def main():
     meadow['zones'].append(zone)
     assert len(meadow['zones']) == 2, 'Rimeveil must be zone 2'
     meadow['zones'] += later
+    spark_travel.ensure(meadow)
     PATH.write_text(json.dumps(meadow, indent=2) + '\n')
     kinds = {}
     for s in zone['slimes']:

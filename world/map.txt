@@ -1489,6 +1489,28 @@
       "color": "#cc7d83",
       "dialogue": "Welcome, adventurer! I have a little introduction to Alderhaven for you. Captain Rowan has work at the north gate, too. Open your quest journal with Q to follow your adventures.",
       "offers": []
+    },
+    {
+      "id": "travel_alderhaven",
+      "name": "Travel Master",
+      "role": "Spark Travel",
+      "x": 36,
+      "y": 85,
+      "color": "#74d7d0",
+      "travelStop": "Alderhaven",
+      "travelLinks": [
+        "travel_cinderwatch"
+      ],
+      "look": {
+        "hair": "#e4edf4",
+        "skin": "#edc5a1",
+        "style": "long",
+        "hat": "hood",
+        "hatColor": "#328e97"
+      },
+      "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+      "offers": [],
+      "buys": false
     }
   ],
   "quests": [
@@ -4641,6 +4663,29 @@
             }
           ],
           "buys": true
+        },
+        {
+          "id": "travel_cinderwatch",
+          "name": "Travel Master",
+          "role": "Spark Travel",
+          "x": 48,
+          "y": 83.5,
+          "color": "#74d7d0",
+          "travelStop": "Cinderwatch Camp",
+          "travelLinks": [
+            "travel_alderhaven",
+            "travel_rimeward"
+          ],
+          "look": {
+            "hair": "#e4edf4",
+            "skin": "#edc5a1",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#328e97"
+          },
+          "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+          "offers": [],
+          "buys": false
         }
       ],
       "quests": [
@@ -10672,6 +10717,30 @@
           "dialogue": "The ice here is older than the Crags and it is not quiet. I chart every footprint I can reach. Something coils in the summit bowl and breathes the cold out through the rings. Help me learn what it is.",
           "offers": [],
           "buys": false
+        },
+        {
+          "id": "travel_rimeward",
+          "name": "Travel Master",
+          "role": "Spark Travel",
+          "x": 64,
+          "y": 115.5,
+          "color": "#74d7d0",
+          "travelStop": "Rimeward Camp",
+          "travelLinks": [
+            "travel_cinderwatch",
+            "travel_lanternmere",
+            "travel_skaldholm"
+          ],
+          "look": {
+            "hair": "#e4edf4",
+            "skin": "#edc5a1",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#328e97"
+          },
+          "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+          "offers": [],
+          "buys": false
         }
       ],
       "quests": [
@@ -16407,6 +16476,28 @@
           "y": 25.6,
           "color": "#6a8fa8",
           "dialogue": "I ran the ferry across the mere for forty years, until the island woke up. Now the causeway on the east shore is the only way across, and I will not walk it. Clear the road and I will owe you a ride.",
+          "offers": [],
+          "buys": false
+        },
+        {
+          "id": "travel_lanternmere",
+          "name": "Travel Master",
+          "role": "Spark Travel",
+          "x": 64,
+          "y": 20.5,
+          "color": "#74d7d0",
+          "travelStop": "Lanternmere",
+          "travelLinks": [
+            "travel_rimeward"
+          ],
+          "look": {
+            "hair": "#e4edf4",
+            "skin": "#edc5a1",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#328e97"
+          },
+          "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
           "offers": [],
           "buys": false
         }
@@ -25156,6 +25247,28 @@
           "speed": 1.0,
           "pause": 8.0,
           "phase": 0
+        },
+        {
+          "id": "travel_skaldholm",
+          "name": "Travel Master",
+          "role": "Spark Travel",
+          "x": 80,
+          "y": 128,
+          "color": "#74d7d0",
+          "travelStop": "Skaldholm",
+          "travelLinks": [
+            "travel_rimeward"
+          ],
+          "look": {
+            "hair": "#e4edf4",
+            "skin": "#edc5a1",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#328e97"
+          },
+          "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+          "offers": [],
+          "buys": false
         }
       ],
       "quests": [

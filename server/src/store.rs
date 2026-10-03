@@ -141,6 +141,8 @@ impl Store {
             explored: vec![],
             gm: false,
             party_points: 0,
+            travel_stops: vec![],
+            spark_travel: None,
         };
         c.seed_inventory();
         if gm {

@@ -137,7 +137,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   await page.waitForFunction(() => document.querySelector('#npc-quests .gossip-row[data-quest="rime_welcome"]')?.dataset.status === 'active');
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('Into the White') && t.includes('Huntress Brynja')), 'The introduction appears in the live tracker');
   await page.keyboard.press('Escape');
-  check(await page.evaluate(() => City.npcs.length === 5 && City.npcs.every(n => n.id.startsWith('rime_')) && Quests.marker('rime_tracker') === '◆'), 'Only the five camp NPCs and their talk-objective markers are shown');
+  check(await page.evaluate(() => City.npcs.length === 6 && City.npcs.every(n => n.id.startsWith('rime_') || n.id === 'travel_rimeward') && Quests.marker('rime_tracker') === '◆'), 'The camp NPCs, travel master and talk-objective markers are shown');
   await page.getByRole('button', { name: 'Collapse quest tracker' }).click();
   await page.waitForTimeout(700);
   for (const id of ['rime_tracker', 'rime_healer', 'rime_trader', 'rime_loremaster']) {

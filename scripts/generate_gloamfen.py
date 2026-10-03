@@ -18,6 +18,7 @@ without rebuilding the fen. Afterwards: node scripts/sync-world.cjs, then rebuil
 """
 import argparse
 import json
+import spark_travel
 import math
 from pathlib import Path
 import random
@@ -506,6 +507,7 @@ def main():
         missing = fen_unreachable(zone)
         if missing:
             raise SystemExit(f'unreachable from the arrival point: {missing}')
+        spark_travel.ensure(meadow)
         PATH.write_text(json.dumps(meadow, indent=2) + '\n')
         print(f'Updated Lanternmere: {len(npcs)} NPCs, {len(quests)} quests. Terrain and enemy spawns preserved. Now run node scripts/sync-world.cjs')
         return
@@ -520,6 +522,7 @@ def main():
     meadow['zones'].append(zone)
     assert len(meadow['zones']) == 3, 'Gloamfen must be zone 3'
     meadow['zones'] += later
+    spark_travel.ensure(meadow)
     PATH.write_text(json.dumps(meadow, indent=2) + '\n')
     kinds = {}
     for s in zone['slimes']:

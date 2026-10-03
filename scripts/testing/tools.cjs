@@ -110,7 +110,7 @@ async function talkTo(world, bot, npcId, offer) {
   await world.action(bot, { type: 'interact', npc: npcId, ...(offer ? { offer } : {}) });
   const reply = await world.waitFor(() => world.events.find(e => !earlier.has(e) && e.bot === bot && (e.type === 'dialogue' || e.type === 'error') && (e.type === 'error' || e.npc?.id === npcId)), 5000, `Talk to ${npcId}`);
   if (reply.type === 'error') throw Error(reply.text);
-  return { bot, npc: npcId, offer: offer || null, notice: reply.notice, dialogue: reply.npc.dialogue, offers: reply.npc.offers.map(o => o.id), gold: reply.gold, quests: reply.quests };
+  return { bot, npc: npcId, offer: offer || null, notice: reply.notice, dialogue: reply.npc.dialogue, offers: reply.npc.offers.map(o => o.id), gold: reply.gold, quests: reply.quests, ...(reply.travel ? { travel: reply.travel, travelStops: reply.travelStops } : {}) };
 }
 
 function aimAt(from, to) {
