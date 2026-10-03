@@ -12,7 +12,7 @@
   // ---------- text ----------
   const T = {
     en: {
-      soundOn: 'Sound on (M)', soundOff: 'Sound off (M)',
+      soundOn: 'Sound on (N)', soundOff: 'Sound off (N)',
       back: 'Back', toTitle: 'Back to Title', newChar: 'New Character',
       ccTitle: 'Assemble Your Warband!', forged: 'Forged in Battle!',
       warriorDesc: 'A brave sword-and-shield vanguard. High health, strong melee attacks, and armor ready for the front lines.',
@@ -49,7 +49,7 @@
       health: 'Health', attack: 'Attack', defense: 'Defense', speed: 'Speed',
     },
     ko: {
-      soundOn: '소리 켜짐 (M)', soundOff: '소리 꺼짐 (M)',
+      soundOn: '소리 켜짐 (N)', soundOff: '소리 꺼짐 (N)',
       back: '뒤로', toTitle: '타이틀로', newChar: '새 캐릭터',
       ccTitle: '워밴드를 결성하라!', forged: '전투로 단련되어!',
       warriorDesc: '검과 방패를 든 용감한 선봉장. 높은 체력과 강력한 근접 공격으로 최전선을 지킵니다.',
@@ -162,9 +162,10 @@
   const toast = $('toast');
   let toastT = 0;
   function showToast(msg) { toast.textContent = msg; toast.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove('show'), 1600); }
-  addEventListener('keydown', e => {                      // M = mute / unmute all sound
-    if (e.key !== 'm' && e.key !== 'M') return;
+  addEventListener('keydown', e => {                      // M = mute / unmute all sound (in the field: N, because M is the world map)
+    const k = e.key.toLowerCase(); if (k !== 'm' && k !== 'n') return;
     if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if (k === 'm' && scene === 'game' && !window.Settings?.active) return;   // in the field M opens the world map; N always mutes
     save.sound = !save.sound; persist(); applyMusicLevel(.6); dispatchEvent(new Event('prefs-change')); showToast(save.sound ? t('soundOn') : t('soundOff'));
   });
   function blip(freq = 660, dur = .08, vol = .05) {

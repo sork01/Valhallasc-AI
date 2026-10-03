@@ -102,7 +102,7 @@
       clearTimeout(joinTimeout);
       if (!active || currentGeneration !== generation) return;
       clearInterval(heartbeat);
-      connected = false; window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.Social?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay('Connection lost. Reconnecting to your character…');

@@ -1,0 +1,175 @@
+// Browser checks for the world map (M): it opens and closes with the keys, shows every zone as a pressable tile with
+// its own ground, zooms into a zone with its gates and enemies, follows the hero, and leaves the other panels alone.
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const { chromium } = require('./lib/playwright.cjs');
+const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
+const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
+const root = path.resolve(__dirname, '..');
+const client = new Client({ name: 'valhallasc-worldmap-ui', version: '1.0.0' });
+let browser, started = false, checks = 0;
+const check = (condition, message) => { assert.ok(condition, message); checks++; };
+async function call(name, args = {}) {
+  const result = await client.callTool({ name, arguments: args });
+  assert.ok(!result.isError, `${name}: ${JSON.stringify(result.content)}`);
+  return result.structuredContent;
+}
+(async () => {
+  // Source checks that need no browser: the enemy table the map uses must match the server's levels.
+  const rust = fs.readFileSync(path.join(root, 'server/src/world.rs'), 'utf8');
+  const body = rust.slice(rust.indexOf('pub fn default_level'), rust.indexOf('// Gold carried by a default-level enemy'));
+  const server = {}; for (const [, names, level] of body.matchAll(/((?:"\w+"\s*\|?\s*)+)=>\s*(\d+)/g)) for (const [, name] of names.matchAll(/"(\w+)"/g)) server[name] = Number(level);
+  check(Object.keys(server).length >= 17, `Parsed ${Object.keys(server).length} enemy levels from world.rs`);
+
+  const transport = new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe' });
+  await client.connect(transport);
+  const world = await call('start_world'); started = true;
+  browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('console', message => { if (message.type() === 'error' && !/401|Failed to load resource/.test(message.text())) errors.push(message.text()); });
+  await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
+  await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.locator('#cls-warrior').click(); await page.locator('#name').fill('MapUI');
+  await page.locator('#go').click({ timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.warriorSprites, null, { timeout: 60000 });
+  const shot = name => page.screenshot({ path: path.join(world.artifacts, name + '.png') });
+  const visible = id => page.locator(id).isVisible();
+  const press = async key => { await page.evaluate(() => document.activeElement?.blur?.()); await page.keyboard.press(key); };
+
+  // --- the data the map was written against ---
+  const data = await page.evaluate(() => ({ zones: Field._debug.zones.map(z => ({ name: z.name, kinds: [...new Set((z.slimes || []).map(s => s.kind))], portals: (z.portals || []).map(p => p.to) })), layout: WorldMap._layout.length, kinds: Object.fromEntries(Object.entries(WorldMap._kinds).map(([k, v]) => [k, v[1]])) }));
+  check(data.layout >= data.zones.length, `Every one of the ${data.zones.length} zones has a place on the world sheet (${data.layout})`);
+  check(data.zones.every(z => z.kinds.every(k => k in data.kinds)), 'Every enemy kind in every zone is in the map legend');
+  check(Object.entries(data.kinds).every(([k, level]) => (server[k] ?? 2) === level), `The legend levels equal the server's (${Object.entries(data.kinds).filter(([k, l]) => (server[k] ?? 2) !== l).map(([k]) => k)})`);
+
+  // --- opening and closing ---
+  check(!await visible('#worldmap') && await visible('#wm-open'), 'The map is closed and a globe button is on the minimap');
+  check(await page.evaluate(() => { const hit = (a, b) => !(a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top), r = id => document.querySelector(id).getBoundingClientRect(), m = r('#wm-open'); const mini = r('#minimap'); return ['#city-travel', '#equipment-open', '#hud-portrait', '.hud-stats'].every(id => !hit(m, r(id))) && hit(m, mini) && m.width < mini.width / 3 && m.width > 20 && m.left >= 0 && m.right <= innerWidth; }), 'The globe is small, stuck to the minimap corner and overlaps no other control');
+  check(await page.evaluate(() => { const b = document.getElementById('wm-open'); return !b.textContent.trim() && !!b.querySelector('svg circle') && b.getAttribute('aria-label').includes('(M)'); }), 'The globe is an icon with an accessible name');
+  await press('m');
+  check(await visible('#worldmap') && await page.evaluate(() => WorldMap.open && WorldMap.view === 'world'), 'M opens the world map on the world view');
+  check(await page.evaluate(() => !Field.canAct), 'The game is paused behind the map');
+  check(await page.locator('#pause').isHidden(), 'M does not open the pause menu');
+  await shot('map-world');
+  await press('m');
+  check(!await visible('#worldmap') && await page.evaluate(() => Field.canAct), 'M closes it and the game resumes');
+  await press('m'); await press('Escape');
+  check(!await visible('#worldmap') && await page.locator('#pause').isHidden(), 'Esc closes the map without opening the pause menu');
+  await page.locator('#minimap').click();
+  check(await visible('#worldmap'), 'Pressing the minimap opens it');
+  await page.locator('#wm-close').click();
+  await page.locator('#wm-open').click();
+  check(await visible('#worldmap'), 'The globe opens it');
+  await page.keyboard.press('Escape');
+
+  // --- the world view ---
+  await press('m');
+  const tiles = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => { const r = t.getBoundingClientRect(), g = t.querySelector('canvas').getContext('2d').getImageData(0, 0, 220, 220).data; let sum = 0, dist = new Set(); for (let i = 0; i < g.length; i += 4 * 97) { sum += g[i + 1]; dist.add((g[i] >> 4) + ',' + (g[i + 1] >> 4) + ',' + (g[i + 2] >> 4)); } return { zone: t.dataset.zone, name: t.querySelector('b').textContent, lv: t.querySelector('small').textContent, left: r.left, top: r.top, right: r.right, bottom: r.bottom, colours: dist.size, green: sum, theme: t.dataset.theme }; }));
+  const stage = await page.evaluate(() => { const r = document.getElementById('wm-world').getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; });
+  check(tiles.length === data.zones.length && tiles.map(t => t.name).join() === data.zones.map(z => z.name).join(), `One tile per zone: ${tiles.map(t => t.name).join(', ')}`);
+  check(tiles.every(t => t.left >= stage.left && t.right <= stage.right && t.top >= stage.top && t.bottom <= stage.bottom), 'Every tile is inside the world sheet');
+  check(tiles.every((a, i) => tiles.every((b, j) => i >= j || a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top)), 'No two tiles overlap');
+  check(tiles.every(t => t.colours >= 6), `Every tile shows drawn ground, not a blank (${tiles.map(t => t.colours).join('/')} colours)`);
+  check(tiles[2].lv === 'Lv 10–15' && tiles[3].lv === 'Lv 15–20' && tiles[1].lv === 'Lv 5–10' && tiles[4].lv === 'Safe city' && /^Lv 2/.test(tiles[0].lv), `Levels on the tiles: ${tiles.map(t => t.lv).join(' | ')}`);
+  const roads = await page.evaluate(() => [...document.querySelectorAll('.wm-roads [data-road]')].map(r => r.dataset.road).sort());
+  check(roads.join() === '0-1,1-2,2-3,2-4', `The gate roads join Meadow-Crags-Glacier and Glacier to the Fen and the city (${roads})`);
+  const you = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => { const y = t.querySelector('.wm-you'), r = t.getBoundingClientRect(), p = y.getBoundingClientRect(); return { shown: !y.hidden, x: (p.left + p.width / 2 - r.left) / r.width, y: (p.top + p.height / 2 - r.top) / r.height }; }));
+  const spawn = await page.evaluate(() => ({ x: Field.hero.x / 96, y: Field.hero.y / 96 }));
+  check(you.map(y => y.shown).join() === 'true,false,false,false,false' && Math.abs(you[0].x - spawn.x) < .02 && Math.abs(you[0].y - spawn.y) < .02, `The marker is on Greenmeadow where the hero stands (${you[0].x.toFixed(2)},${you[0].y.toFixed(2)} vs ${spawn.x.toFixed(2)},${spawn.y.toFixed(2)})`);
+  check(await page.evaluate(() => document.activeElement.classList.contains('wm-tile') && document.activeElement.dataset.zone === '0'), 'Focus starts on the tile of the zone you are in');
+  const panel = await page.locator('.wm-panel').boundingBox();
+  check(panel.x >= 0 && panel.y >= 0 && panel.x + panel.width <= 1440 && panel.y + panel.height <= 900, `The panel fits the window (${panel.width | 0}x${panel.height | 0})`);
+
+  // --- zooming into a zone ---
+  await page.locator('.wm-tile[data-zone="2"]').click();
+  check(await visible('#wm-zone') && await page.locator('#wm-world').isHidden() && await page.evaluate(() => WorldMap.view === 'zone' && WorldMap.zone === 2), 'Pressing the Glacier tile zooms into its map');
+  check(await page.locator('#wm-title').textContent() === 'World Map › Rimeveil Glacier' && await visible('#wm-back'), 'The title names the zone and a Back to world button appears');
+  const ground = await page.evaluate(() => { const g = document.getElementById('wm-ground').getContext('2d').getImageData(0, 0, 768, 768).data; let r = 0, b = 0, n = 0; for (let i = 0; i < g.length; i += 4 * 61) { r += g[i]; b += g[i + 2]; n++; } return { r: r / n, b: b / n }; });
+  check(ground.b > 140 && ground.r > 100, `The glacier ground is pale and cold (${ground.r | 0},${ground.b | 0})`);
+  await shot('map-glacier');
+  check(await page.evaluate(() => { const l = [...document.querySelectorAll('.wm-gate-label')].map(e => e.getBoundingClientRect()); return l.every((a, i) => l.every((b, j) => i >= j || a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top)); }), 'The three gate labels do not cover one another');
+  const gates = await page.evaluate(() => [...document.querySelectorAll('.wm-gate')].map(g => ({ id: g.dataset.portal, to: g.dataset.to, label: g.textContent, x: g.style.left, y: g.style.top })));
+  check(gates.map(g => g.id).join() === 'crags_gate,fen_gate,city_gate' && gates.map(g => g.label).join() === 'to Emberfall Crags,to Gloamfen,to Skaldholm', `Its three gates are marked and say where they lead (${gates.map(g => g.label)})`);
+  const gp = await page.evaluate(() => Field._debug.zones[2].portals.map(p => [p.x / 128 * 100, p.y / 128 * 100]));
+  check(gates.every((g, i) => Math.abs(parseFloat(g.x) - gp[i][0]) < .01 && Math.abs(parseFloat(g.y) - gp[i][1]) < .01), 'Each gate sits at the real portal position');
+  check(await page.evaluate(() => { const r = document.querySelector('.wm-stage').getBoundingClientRect(), p = document.querySelector('.wm-panel').getBoundingClientRect(); return r.width === r.height && r.right <= p.right && r.bottom <= p.bottom; }), 'The zone map is square and inside the panel');
+  const hub = await page.locator('.wm-hub').textContent();
+  check(hub === 'Rimeward Camp', `The camp is labelled (${hub})`);
+  const side = await page.evaluate(() => ({ kinds: [...document.querySelectorAll('.wm-kind')].map(b => b.textContent), text: document.getElementById('wm-side').textContent }));
+  check(side.kinds.length === 4 && /Rime Crab.*Lv 10 · 9/.test(side.kinds[0]) && /Frostfang Wolf.*Lv 12 · 8/.test(side.kinds[1]) && /Glacier Yeti.*Lv 13 · 6/.test(side.kinds[2]) && /Rime Wyrm.*Lv 15 · 4/.test(side.kinds[3]), `The side panel counts the four bands (${side.kinds.join(' | ')})`);
+  check(/Recommended levels 10–15/.test(side.text) && /13 quests/.test(side.text), 'It gives the level range and the quest count');
+  // Hovering a kind lights only its dots.
+  const dots = () => page.evaluate(() => { const g = document.getElementById('wm-dots').getContext('2d').getImageData(0, 0, 768, 768).data; let a = 0; for (let i = 3; i < g.length; i += 4) if (g[i] > 200) a++; return a; });
+  const all = await dots(); await page.locator('.wm-kind[data-kind="wyrm"]').hover(); const wyrm = await dots();
+  check(all > 0 && wyrm > 0 && wyrm < all, `Hovering Rime Wyrm brightens its dots only (${wyrm} of ${all} opaque pixels)`);
+  await page.mouse.move(5, 5); check(await dots() === all, 'Moving away restores them');
+  // Through a gate, straight to the next zone's map.
+  await page.locator('.wm-gate[data-portal="fen_gate"]').click();
+  check(await page.locator('#wm-title').textContent() === 'World Map › Gloamfen' && await page.locator('.wm-hub').textContent() === 'Lanternmere', 'Pressing a gate opens the zone beyond it');
+  await page.locator('.wm-gates button[data-to="2"]').click();
+  check(await page.locator('#wm-title').textContent() === 'World Map › Rimeveil Glacier', 'The Gates list navigates too');
+  // The player marker: not here, then here after a teleport.
+  check(await page.locator('.wm-me').isHidden() && /You are in Greenmeadow/.test(await page.locator('#wm-here').textContent()), 'In another zone the map says where you are instead');
+  // --- stepping back ---
+  await press('Escape');
+  check(await visible('#worldmap') && await visible('#wm-world') && await page.locator('#wm-zone').isHidden(), 'Esc from a zone goes back to the world, not out of the map');
+  await page.locator('.wm-tile[data-zone="4"]').click();
+  await page.locator('#wm-back').click();
+  check(await visible('#wm-world') && await page.locator('#wm-title').textContent() === 'World Map', 'The Back button returns to the world');
+  await page.locator('.wm-tile[data-zone="3"]').click(); await press('Backspace');
+  check(await visible('#wm-world'), 'Backspace also goes back');
+  await press('Escape');
+  check(!await visible('#worldmap'), 'Esc from the world closes the map');
+
+  // --- the hero's marker follows ---
+  await page.evaluate(() => Online.send({ type: 'debug', ref: 1, command: { op: 'teleport', zone: 3, x: 90, y: 40 } }));
+  await page.waitForFunction(() => Field.zone === 3 && Math.hypot(Field.hero.x - 90, Field.hero.y - 40) < 2, null, { timeout: 15000 });
+  await press('m');
+  check(await page.evaluate(() => document.activeElement.dataset.zone === '3'), 'Opened in Gloamfen, focus starts on its tile');
+  const here = await page.evaluate(() => [...document.querySelectorAll('.wm-you')].map(y => !y.hidden).join());
+  check(here === 'false,false,false,true,false', `The marker moved to the Gloamfen tile (${here})`);
+  await page.locator('.wm-tile[data-zone="3"]').click();
+  await page.waitForFunction(() => { const m = document.querySelector('.wm-me'); return m && !m.hidden; });
+  const me = await page.evaluate(() => { const s = document.querySelector('.wm-stage').getBoundingClientRect(), m = document.querySelector('.wm-me i').getBoundingClientRect(); return { x: (m.left + m.width / 2 - s.left) / s.width, y: (m.top + m.height / 2 - s.top) / s.height, hx: Field.hero.x / 128, hy: Field.hero.y / 128 }; });
+  check(Math.abs(me.x - me.hx) < .01 && Math.abs(me.y - me.hy) < .01, `"You" stands at the hero's place on the zone map (${me.x.toFixed(3)},${me.y.toFixed(3)} vs ${me.hx.toFixed(3)},${me.hy.toFixed(3)})`);
+  await shot('map-gloamfen');
+  await press('Escape'); await press('Escape');
+
+  // --- other panels and keys ---
+  await press('q');
+  check(await page.evaluate(() => Quests.open), 'Q opens the quest journal');
+  await press('m');
+  check(!await visible('#worldmap'), 'M does nothing while the journal is open');
+  await press('Escape');
+  await press('m');
+  await press('q'); await press('i'); await press('e');
+  check(await visible('#worldmap') && !await page.evaluate(() => Quests.open) && await page.locator('#equipment').isHidden(), 'With the map open, Q, I and E do not open panels behind it');
+  await press('Escape');
+  const sound = () => page.evaluate(() => JSON.parse(localStorage.getItem('valhallasc.save.v1')).sound);
+  const before = await sound(); await press('n');
+  check(await sound() === !before && !await visible('#worldmap'), 'N toggles the sound in the field and M no longer does');
+  await press('n');
+  check(await sound() === before, 'N toggles it back');
+
+  // --- the zoom animation (motion allowed) ---
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await press('m');
+  await page.locator('.wm-tile[data-zone="1"]').click();
+  check(await page.evaluate(() => document.getElementById('wm-body').dataset.view) === 'zooming', 'With motion on, the sheet zooms toward the tile first');
+  await page.waitForFunction(() => !document.getElementById('wm-zone').hidden && WorldMap.view === 'zone', null, { timeout: 3000 });
+  check(await page.evaluate(() => { const w = document.getElementById('wm-world'); return w.hidden && !w.style.transform && !w.style.opacity; }), 'After the zoom the world sheet is reset for next time');
+  await page.locator('#wm-back').click();
+  await page.waitForTimeout(450);
+  check(await page.evaluate(() => { const w = document.getElementById('wm-world'); return !w.hidden && !w.style.transform && getComputedStyle(w).opacity === '1'; }), 'Zooming back out ends on the full sheet');
+  await press('Escape');
+  check(await page.evaluate(() => Field.canAct), 'Closing the map hands the game back');
+  check(errors.length === 0, `No browser runtime errors: ${errors.join('; ')}`);
+  console.log(`${checks} world map UI checks passed; screenshots: ${world.artifacts}`);
+})().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
+  await browser?.close();
+  if (started) await call('stop_world').catch(() => {});
+  await client.close();
+});

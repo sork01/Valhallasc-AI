@@ -1,0 +1,327 @@
+'use strict';
+// World map (M, or the button under the minimap). Everything is drawn from window.WORLD_MAP, so a zone added to
+// world/map.txt appears with its real ground, obstacles, camp, gates and spawn points; the only hand-made part is
+// LAYOUT, where each zone sits on the world sheet (tests/worldmap-ui.cjs fails when a zone has no place).
+// The world view is a row of zone tiles joined by the gate roads; pressing a tile zooms into that zone's map.
+(() => {
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const STAGE = { w: 100, h: 62 };
+  // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm.
+  const LAYOUT = [{ x: 4, y: 38, s: 17 }, { x: 27, y: 22, s: 17 }, { x: 49, y: 5, s: 22 }, { x: 76, y: 3, s: 22 }, { x: 70, y: 33, s: 27 }];
+  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a' };
+  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c' };
+  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a' };
+  const BLURB = {
+    meadow: 'Green pastures round the walled town of Alderhaven.',
+    ember: 'Lava fords and ash-grey crags above Cinderwatch Camp.',
+    frost: 'Four rings of ice that spiral up to a summit bowl.',
+    fen: 'A dusk fen round a dark lake, lit by the lanterns of Lanternmere.',
+  };
+  // Base level and a dot colour for every enemy kind (the level matches Slime::default_level in server/src/world.rs;
+  // the test compares the two).
+  const KINDS = {
+    green: ['Green Slime', 2, '#4fd25f'], blue: ['Blue Slime', 3, '#4aa8ff'], pink: ['Pink Slime', 3, '#ff7bbd'], yellow: ['Golden Slime', 4, '#ffd23f'],
+    beetle: ['Ironhide Beetle', 5, '#8aafbf'], big: ['King Slime', 6, '#8f6bff'],
+    wisp: ['Cinder Wisp', 5, '#ee6a1c'], spider: ['Magma Spider', 7, '#b09ab8'], wraith: ['Ash Wraith', 8, '#a89cd0'], golem: ['Basalt Golem', 10, '#c0b8c0'],
+    crab: ['Rime Crab', 10, '#6fb3dc'], wolf: ['Frostfang Wolf', 12, '#9fb4c8'], yeti: ['Glacier Yeti', 13, '#e4eef8'], wyrm: ['Rime Wyrm', 15, '#6bc6e8'],
+    toad: ['Fen Toad', 15, '#8bc34a'], croc: ['Mire Crocodile', 17, '#a9c45a'], knight: ['Drowned Knight', 18, '#8fc0a8'], hydra: ['Mire Hydra', 20, '#c4e8b0'],
+  };
+  const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const kindInfo = kind => KINDS[kind] || [kind, 1, '#ff6b8a'];
+  function el(tag, text, className) {
+    const node = document.createElement(tag);
+    if (text !== undefined && text !== null) node.textContent = text;
+    if (className) node.className = className;
+    return node;
+  }
+
+  let zones = null, tiles = [], view = 'world', current = 0, previousFocus = null, highlight = null, timer = 0, tickTimer = 0;
+  const cache = new Map();
+
+  function load() {
+    if (zones) return zones;
+    const W = window.WORLD_MAP;
+    zones = [{ ...W, theme: 'meadow', name: W.name || 'Greenmeadow', paths: window.Field?.meadowPaths || [] },
+      ...(W.zones || []).map(z => ({ theme: 'ember', paths: [], ...z }))];
+    zones.forEach((z, i) => {
+      z.portals ||= [];
+      const levels = z.levels || (() => { const l = z.slimes.filter(s => s.kind !== 'big').map(s => kindInfo(s.kind)[1]); return l.length ? [Math.min(...l), Math.max(...l)] : null; })();
+      z.range = levels;
+      z.place = LAYOUT[i] || { x: 4 + ((i - LAYOUT.length) % 4) * 24, y: 58, s: 16 };   // unplaced zones queue along the bottom edge
+    });
+    return zones;
+  }
+
+  // ---------- ground ----------
+  function objectColour(o, theme) {
+    const fen = theme === 'fen', frost = theme === 'frost', ember = theme === 'ember';
+    switch (o.kind) {
+      case 'lava': return '#ff6a2a';
+      case 'ice': return '#4f93c8';
+      case 'water': return '#244f5c';
+      case 'thicket': return '#6a2f58';
+      case 'tree': return fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a';
+      case 'spire': return fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e';
+      case 'rock': return fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8';
+      case 'rampart': return '#6f7078';
+      case 'tower': return '#3f6a8a';
+      case 'stall': return '#e0a040';
+      case 'house': case 'chapel': return o.color || '#a08060';
+      case 'bush': return fen ? '#3f6a3a' : frost ? '#4a8a78' : ember ? '#3a2a30' : '#2f8a45';
+      default: return '#8a7a62';
+    }
+  }
+  const FEATURE = new Set(['lava', 'ice', 'water', 'thicket']);
+  const RADIUS = { lava: 1.5, water: 1.1, ice: 1.15, thicket: 1.15, tree: 1.4, bush: .8, rock: .9, spire: 1, lamp: .5, flowers: .5 };
+  function paint(index, px) {
+    const key = `${index}:${px}`; if (cache.has(key)) return cache.get(key);
+    const z = zones[index], k = px / z.size, c = document.createElement('canvas'); c.width = c.height = px;
+    const g = c.getContext('2d');
+    g.fillStyle = GROUND[z.theme]; g.fillRect(0, 0, px, px);
+    let seed = 7 + index * 131; const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+    for (let n = 0; n < 70; n++) { g.fillStyle = rnd() < .5 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.07)'; g.beginPath(); g.arc(rnd() * px, rnd() * px, (4 + rnd() * 9) * k, 0, 6.283); g.fill(); }
+    g.lineCap = g.lineJoin = 'round'; g.strokeStyle = g.fillStyle = DIRT[z.theme]; g.lineWidth = 2.8 * k;
+    for (const p of z.paths || []) { g.beginPath(); p.forEach(([x, y], i) => i ? g.lineTo(x * k, y * k) : g.moveTo(x * k, y * k)); g.stroke(); }
+    if (z.theme === 'meadow') { g.beginPath(); g.arc(36 * k, 36 * k, 3.5 * k, 0, 6.283); g.fill(); }
+    const PAVE = { 1: '#b6a98c', 2: '#ece2c8', 3: '#b8765a' };
+    for (const r of z.roads || []) {
+      g.fillStyle = g.strokeStyle = PAVE[r.t] || '#b6a98c';
+      if (r.x0 !== undefined) g.fillRect(r.x0 * k, r.y0 * k, (r.x1 - r.x0) * k, (r.y1 - r.y0) * k);
+      else if (r.r0 !== undefined) { g.lineWidth = (r.r1 - r.r0) * k; g.beginPath(); g.arc(r.x * k, r.y * k, (r.r0 + r.r1) / 2 * k, 0, 6.283); g.stroke(); }
+      else { g.beginPath(); g.arc(r.x * k, r.y * k, r.r * k, 0, 6.283); g.fill(); }
+    }
+    if (z.city && z.theme !== 'city') {
+      const t = z.city; g.fillStyle = { meadow: '#d8cbb0', ember: '#88705d', frost: '#8fa6bd', fen: '#6a5238' }[z.theme];
+      g.fillRect(t.x0 * k, t.y0 * k, (t.x1 - t.x0) * k, (t.y1 - t.y0) * k);
+    }
+    const objects = (z.objects || []).filter(o => o.kind !== 'post');
+    for (const pass of [0, 1]) for (const o of objects) {
+      if (FEATURE.has(o.kind) !== (pass === 0)) continue;
+      g.fillStyle = objectColour(o, z.theme);
+      if (o.width) { g.fillRect((o.x - o.width / 2) * k, (o.y - o.depth / 2) * k, Math.max(1, o.width * k), Math.max(1, o.depth * k)); continue; }
+      if (o.kind === 'grandfountain' || o.kind === 'fountain' || o.kind === 'meetingstone') { g.fillStyle = o.kind === 'meetingstone' ? '#59d9ff' : '#58a8d8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2, (o.r || 1) * k), 0, 6.283); g.fill(); continue; }
+      g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(1, (RADIUS[o.kind] || .8) * k), 0, 6.283); g.fill();
+    }
+    if (z.city && z.theme !== 'city') { g.fillStyle = '#ffe9a0'; g.beginPath(); g.arc(z.city.plaza.x * k, z.city.plaza.y * k, Math.max(2, 2.4 * k), 0, 6.283); g.fill(); }
+    for (const n of z.npcs || []) { g.fillStyle = '#f5d477'; g.beginPath(); g.arc(n.x * k, n.y * k, Math.max(1, .55 * k), 0, 6.283); g.fill(); }
+    cache.set(key, c); return c;
+  }
+  function copy(canvas, source) { canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height); canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height); }
+
+  // ---------- world view ----------
+  const rangeText = z => z.range ? `Lv ${z.range[0]}–${z.range[1]}` : 'Safe city';
+  const edgePoint = (a, b) => {                                     // where the road from a's centre to b's centre leaves a's square
+    const ax = a.x + a.s / 2, ay = a.y + a.s / 2, dx = b.x + b.s / 2 - ax, dy = b.y + b.s / 2 - ay, t = (a.s / 2 + .6) / Math.max(Math.abs(dx), Math.abs(dy));
+    return [ax + dx * t, ay + dy * t];
+  };
+  function svgNode(tag, attrs) { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); return n; }
+  function buildWorld() {
+    const stage = $('wm-world'); stage.replaceChildren(); tiles = [];
+    const roads = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, class: 'wm-roads', 'aria-hidden': 'true' });
+    const seen = new Set();
+    zones.forEach((z, i) => z.portals.forEach(p => {
+      const pair = [i, p.to].sort().join('-'); if (seen.has(pair) || !zones[p.to]) return; seen.add(pair);
+      const a = z.place, b = zones[p.to].place, [x1, y1] = edgePoint(a, b), [x2, y2] = edgePoint(b, a);
+      const road = svgNode('g', { 'data-road': pair });
+      road.append(svgNode('title', {}), svgNode('line', { x1, y1, x2, y2, class: 'wm-road-under' }), svgNode('line', { x1, y1, x2, y2, class: 'wm-road' }),
+        svgNode('circle', { cx: x1, cy: y1, r: .9, class: 'wm-gate-dot' }), svgNode('circle', { cx: x2, cy: y2, r: .9, class: 'wm-gate-dot' }));
+      road.firstChild.textContent = `${p.name[0].toUpperCase()}${p.name.slice(1)} joins ${z.name} and ${zones[p.to].name}`;
+      roads.append(road);
+    }));
+    stage.append(roads);
+    zones.forEach((z, i) => {
+      const { x, y, s } = z.place, tile = el('button', '', 'wm-tile'); tile.type = 'button'; tile.dataset.zone = String(i); tile.dataset.theme = z.theme;
+      Object.assign(tile.style, { left: `${x / STAGE.w * 100}%`, top: `${y / STAGE.h * 100}%`, width: `${s / STAGE.w * 100}%`, height: `${s / STAGE.h * 100}%` });
+      tile.setAttribute('aria-label', `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}. Open its map`);
+      const canvas = el('canvas'); canvas.width = canvas.height = 220; copy(canvas, paint(i, 220));
+      const label = el('span', '', 'wm-tile-label'); label.append(el('b', z.name), el('small', rangeText(z)));
+      const you = el('i', '', 'wm-you'); you.hidden = true; you.title = 'You are here';
+      tile.append(canvas, label, you);
+      tile.addEventListener('click', () => zoomTo(i, tile));
+      stage.append(tile); tiles.push(tile);
+    });
+    stage.append(el('div', 'Valhalla', 'wm-sheet-title'));
+  }
+
+  // ---------- zone view ----------
+  function drawDots(z) {
+    const canvas = $('wm-dots'), g = canvas.getContext('2d'), k = canvas.width / z.size;
+    g.clearRect(0, 0, canvas.width, canvas.height);
+    for (const s of z.slimes || []) {
+      const [, , col] = kindInfo(s.kind), dim = highlight && highlight !== s.kind;
+      g.globalAlpha = dim ? .18 : 1; g.fillStyle = col; g.strokeStyle = '#10141c'; g.lineWidth = highlight === s.kind ? 3 : 1.5;
+      g.beginPath(); g.arc(s.x * k, s.y * k, (highlight === s.kind ? 1.3 : .95) * k, 0, 6.283); g.fill(); g.stroke();
+    }
+    g.globalAlpha = 1;
+  }
+  const pos = (z, x, y) => ({ left: `${x / z.size * 100}%`, top: `${y / z.size * 100}%` });
+  function renderZone(index) {
+    const z = zones[index]; current = index;
+    copy($('wm-ground'), paint(index, 768)); highlight = null; drawDots(z);
+    const markers = $('wm-markers'); markers.replaceChildren();
+    for (const p of z.portals) {
+      const dest = zones[p.to]; if (!dest) continue;
+      const gate = el('button', '', 'wm-gate'); gate.type = 'button'; gate.dataset.portal = p.id; gate.dataset.to = String(p.to); gate.style.setProperty('--glow', PORTAL[dest.theme]);
+      Object.assign(gate.style, pos(z, p.x, p.y));
+      gate.classList.toggle('low', p.y / z.size > .85); gate.classList.toggle('right', p.x / z.size > .72); gate.classList.toggle('high', p.y / z.size < .08);
+      const near = z.portals.find(o => o !== p && Math.hypot(o.x - p.x, o.y - p.y) < z.size * .14);   // close gates put their labels on opposite sides
+      if (near) gate.classList.add(p.x < near.x ? 'west' : 'east');
+      gate.append(el('span', `to ${dest.name}`, 'wm-gate-label'));
+      gate.setAttribute('aria-label', `${p.name}, leads to ${dest.name}. Open its map`);
+      gate.addEventListener('click', () => { highlight = null; renderZone(p.to); setView('zone'); });
+      markers.append(gate);
+    }
+    if (z.city) {
+      const hub = el('span', z.city.name === z.name ? 'City centre' : z.city.name, 'wm-hub'); hub.dataset.hub = 'true';
+      Object.assign(hub.style, pos(z, z.city.plaza.x, z.city.plaza.y)); markers.append(hub);
+    }
+    const me = el('span', '', 'wm-me'); me.append(el('i'), el('b', 'You')); me.hidden = true; me.dataset.me = 'true'; markers.append(me);
+    markers.append(el('div', '', 'wm-party'));
+    side(z); tick();
+  }
+  function side(z) {
+    const box = $('wm-side'); box.replaceChildren();
+    box.append(el('h4', z.name, 'wm-side-name'), el('p', z.tagline || BLURB[z.theme] || '', 'wm-side-blurb'));
+    const facts = el('ul', '', 'wm-facts');
+    facts.append(el('li', z.range ? `Recommended levels ${z.range[0]}–${z.range[1]}` : 'No enemies inside the walls'));
+    if (z.city) facts.append(el('li', `${z.city.name}: sanctuary, ${(z.quests || []).length} quest${(z.quests || []).length === 1 ? '' : 's'}`));
+    box.append(facts);
+    const counts = new Map(); for (const s of z.slimes || []) counts.set(s.kind, (counts.get(s.kind) || 0) + 1);
+    if (counts.size) {
+      box.append(el('h5', 'Enemies', 'wm-side-title'));
+      const list = el('ul', '', 'wm-kinds');
+      [...counts].sort((a, b) => kindInfo(a[0])[1] - kindInfo(b[0])[1]).forEach(([kind, n]) => {
+        const [name, level, col] = kindInfo(kind), row = el('li'), b = el('button', '', 'wm-kind'); b.type = 'button'; b.dataset.kind = kind;
+        const dot = el('i'); dot.style.background = col;
+        b.append(dot, el('span', name), el('small', kind === 'big' ? 'king, rare' : `Lv ${level} · ${n}`));
+        const on = () => { highlight = kind; drawDots(z); }, off = () => { highlight = null; drawDots(z); };
+        b.addEventListener('pointerenter', on); b.addEventListener('pointerleave', off); b.addEventListener('focus', on); b.addEventListener('blur', off);
+        row.append(b); list.append(row);
+      });
+      box.append(list);
+    }
+    if (z.portals.length) {
+      box.append(el('h5', 'Gates', 'wm-side-title'));
+      const list = el('ul', '', 'wm-gates');
+      z.portals.forEach(p => {
+        if (!zones[p.to]) return; const row = el('li'), b = el('button', `${p.name[0].toUpperCase()}${p.name.slice(1)} → ${zones[p.to].name}`, 'window-tool'); b.type = 'button'; b.dataset.to = String(p.to);
+        b.addEventListener('click', () => { renderZone(p.to); setView('zone'); }); row.append(b); list.append(row);
+      });
+      box.append(list);
+    }
+  }
+
+  // ---------- live markers ----------
+  function tick() {
+    if (!open()) return;
+    if (window.Field?.hero?.dead || !window.Online?.connected) { close(); return; }
+    const hero = window.Field.hero, here = window.Field.zone || 0;
+    zones.forEach((z, i) => {
+      const you = tiles[i]?.querySelector('.wm-you'); if (!you) return;
+      you.hidden = i !== here; if (i === here) Object.assign(you.style, pos(z, hero.x, hero.y));
+    });
+    if (view !== 'zone') return;
+    const z = zones[current], me = $('wm-markers').querySelector('.wm-me');
+    me.hidden = here !== current; if (!me.hidden) Object.assign(me.style, pos(z, hero.x, hero.y));
+    const party = $('wm-markers').querySelector('.wm-party');
+    const mates = here === current ? (window.Field.remotePlayers || []).filter(r => window.Social?.isPartyMember(r.id)) : [];
+    party.replaceChildren(...mates.map(r => { const m = el('i', '', 'wm-mate'); m.title = r.name || 'Party member'; Object.assign(m.style, pos(z, r.x, r.y)); return m; }));
+    $('wm-here').textContent = here === current ? 'You are here' : `You are in ${zones[here].name}`;
+  }
+
+  // ---------- views and the zoom ----------
+  function setView(next) {
+    view = next; $('wm-body').dataset.view = next; $('wm-zone').hidden = next !== 'zone'; $('wm-world').hidden = next !== 'world';
+    $('wm-back').hidden = next === 'world';
+    $('wm-title-zone').textContent = next === 'zone' ? ` › ${zones[current].name}` : '';
+    if (next === 'zone') { const zv = $('wm-zone'); zv.classList.remove('wm-fade'); void zv.offsetWidth; zv.classList.add('wm-fade'); }
+    tick();
+  }
+  function zoomTo(index, tile) {
+    clearTimeout(timer); renderZone(index);
+    const world = $('wm-world');
+    if (reduced() || !tile) { world.style.transition = world.style.transform = world.style.opacity = ''; setView('zone'); return; }
+    const st = world.getBoundingClientRect(), r = tile.getBoundingClientRect();
+    const scale = Math.min(st.width / r.width, st.height / r.height) * .92;
+    world.style.transformOrigin = `${r.left + r.width / 2 - st.left}px ${r.top + r.height / 2 - st.top}px`;
+    world.style.transition = 'transform .38s ease-in, opacity .38s ease-in';
+    world.style.transform = `translate(${st.left + st.width / 2 - r.left - r.width / 2}px, ${st.top + st.height / 2 - r.top - r.height / 2}px) scale(${scale})`;
+    world.style.opacity = '0';
+    $('wm-body').dataset.view = 'zooming';
+    timer = setTimeout(() => { world.style.transition = world.style.transform = world.style.opacity = ''; setView('zone'); $('wm-back').focus(); }, 390);
+  }
+  function toWorld() {
+    clearTimeout(timer);
+    const world = $('wm-world'), tile = tiles[current];
+    setView('world');
+    if (!reduced() && tile) {
+      const st = world.getBoundingClientRect(), r = tile.getBoundingClientRect();
+      world.style.transformOrigin = `${r.left + r.width / 2 - st.left}px ${r.top + r.height / 2 - st.top}px`;
+      world.style.transition = 'none'; world.style.opacity = '0';
+      world.style.transform = `translate(${st.left + st.width / 2 - r.left - r.width / 2}px, ${st.top + st.height / 2 - r.top - r.height / 2}px) scale(${Math.min(st.width / r.width, st.height / r.height) * .92})`;
+      void world.offsetWidth;
+      world.style.transition = 'transform .32s ease-out, opacity .32s ease-out'; world.style.transform = 'none'; world.style.opacity = '1';
+      timer = setTimeout(() => { world.style.transition = world.style.transform = world.style.opacity = ''; }, 340);
+    }
+    tile?.focus({ preventScroll: true });
+  }
+  const open = () => !$('worldmap').hidden;
+  function canShow() {
+    return !$('scene-game').hidden && window.Online?.connected && !window.Field?.hero?.dead && !open() && $('pause').hidden && $('equipment').hidden
+      && $('npc-dialogue').hidden && !window.Skillbar?.open && !window.Quests?.open && !window.Social?.open && !window.City?.open && !window.Settings?.active;
+  }
+  function show() {
+    if (!canShow()) return false;
+    load(); if (!tiles.length) buildWorld();
+    previousFocus = document.activeElement;
+    window.Field.setPaused(true); $('worldmap').hidden = false; setView('world');
+    const here = window.Field.zone || 0; (tiles[here] || tiles[0]).focus({ preventScroll: true });
+    clearInterval(tickTimer); tickTimer = setInterval(tick, 250);
+    return true;
+  }
+  function close(resume = true) {
+    if (!open()) return;
+    clearTimeout(timer); clearInterval(tickTimer);
+    const world = $('wm-world'); world.style.transition = world.style.transform = world.style.opacity = '';
+    $('worldmap').hidden = true; setView('world');
+    if (resume) { window.Field?.setPaused(false); previousFocus?.focus?.({ preventScroll: true }); }
+  }
+  const back = () => view === 'zone' ? toWorld() : close();
+
+  $('wm-close').addEventListener('click', () => close());
+  $('wm-back').addEventListener('click', () => toWorld());
+  $('wm-open').addEventListener('click', () => show());
+  $('minimap').addEventListener('click', () => show());
+  $('worldmap').addEventListener('pointerdown', event => { if (event.target === $('worldmap')) close(); });
+  // Registered before game.js, so an open map keeps every key and M never reaches the other panels.
+  addEventListener('keydown', event => {
+    if ($('scene-game').hidden || event.ctrlKey || event.altKey || event.metaKey) return;
+    const key = event.key.toLowerCase(), typing = /^(INPUT|TEXTAREA|SELECT)$/.test(event.target?.tagName || '');
+    if (open()) {
+      if (key === 'tab') {                                          // keep focus inside the panel
+        const buttons = [...$('worldmap').querySelectorAll('button:not(:disabled)')].filter(b => b.offsetParent);
+        const first = buttons[0], last = buttons.at(-1); event.stopImmediatePropagation();
+        if (event.shiftKey && (document.activeElement === first || !buttons.includes(document.activeElement))) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && (document.activeElement === last || !buttons.includes(document.activeElement))) { event.preventDefault(); first.focus(); }
+        return;
+      }
+      event.stopImmediatePropagation();
+      if (key === 'enter' || key === ' ') return;                   // let the focused button act
+      event.preventDefault();
+      if (event.repeat) return;
+      if (key === 'escape' || key === 'backspace') back();
+      else if (key === 'm') close();
+      return;
+    }
+    if (key !== 'm' || event.repeat || typing) return;            // N is the sound toggle in the field
+    if (show()) { event.preventDefault(); event.stopImmediatePropagation(); }
+  }, true);
+
+  window.WorldMap = {
+    show, close, get open() { return open(); }, get view() { return view; }, get zone() { return current; },
+    reset() { close(false); },
+    // For the tests: the layout and kind table the map was written against.
+    _layout: LAYOUT, _kinds: KINDS,
+  };
+})();

@@ -571,7 +571,7 @@
   }
   function reset() {
     pendingNpc = null; cityRoute = [];
-    window.Quests?.reset();
+    window.Quests?.reset(); window.WorldMap?.reset();
     hero = newHero(); drops = []; floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
     keys = new Set(); pointer = { down: false, x: 0, y: 0 };
     cam = { x: hero.x, y: hero.y };
@@ -1760,7 +1760,7 @@
     get assassinSprites() { return isAssassin() ? mageSpr : null; },
     get priestSprites() { return isPriest() ? mageSpr : null; },
     get hunterSprites() { return isHunter() ? mageSpr : null; },
-    get hero() { return hero; }, get slimes() { return slimes; },
+    get hero() { return hero; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; },
     _debug: { get effects() { return effects; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll) },
