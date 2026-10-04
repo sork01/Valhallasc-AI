@@ -22,6 +22,7 @@ const SONGS = [
   { id: 'fen', make: 'createFenMusic', seconds: 72.73, name: 'Lanternmere Dusk' },
   { id: 'city', make: 'createCityMusic', seconds: 101.05, name: 'Skaldholm Square' },
   { id: 'wyrd', make: 'createWyrdMusic', seconds: 60.02, name: 'Wyrdwood Wanderings' },
+  { id: 'sky', make: 'createSkyMusic', seconds: 91.43, name: 'Above the Storm' },
 ];
 (async () => {
   browser = await chromium.launch({ headless: true });
@@ -114,6 +115,20 @@ const SONGS = [
   await game.evaluate(() => Prefs.set({ sound: false }));
   check(await game.evaluate(() => wlevels.at(-1) === 0), 'Sound off silences the Wyrdwood score');
   await game.evaluate(() => Prefs.set({ sound: true, musicVol: 1 }));
+  // Bifrost Reach has the eighth score: Above the Storm replaces Wyrdwood Wanderings, and the slider covers it.
+  await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 7, x: 80, y: 144 } }));
+  await game.waitForFunction(() => Field.zone === 7 && valhalla.kmusic.running && !valhalla.wmusic.running && !valhalla.smusic.running && !valhalla.cmusic.running, null, { timeout: 10000 });
+  await game.waitForFunction(() => valhalla.kmusic.loaded, null, { timeout: 30000 });
+  check(true, 'Climbing into Bifrost Reach swaps Wyrdwood Wanderings for Above the Storm, and it loads');
+  await game.evaluate(() => { window.klevels = []; const set = valhalla.kmusic.setLevel; valhalla.kmusic.setLevel = (v, s) => { klevels.push(v); return set.call(valhalla.kmusic, v, s); }; });
+  await game.evaluate(() => Prefs.set({ musicVol: .5 }));
+  check(await game.evaluate(() => klevels.length > 0 && Math.abs(klevels.at(-1) - .25) < 1e-9), 'The music slider covers the Bifrost score too (50% = 0.25 gain)');
+  await game.evaluate(() => Prefs.set({ sound: false }));
+  check(await game.evaluate(() => klevels.at(-1) === 0), 'Sound off silences the Bifrost score');
+  await game.evaluate(() => Prefs.set({ sound: true, musicVol: 1 }));
+  await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 6, x: 33, y: 156 } }));
+  await game.waitForFunction(() => Field.zone === 6 && valhalla.wmusic.running && !valhalla.kmusic.running, null, { timeout: 10000 });
+  check(true, 'Back in the Wyrdwood its own score returns');
   await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 2, x: 64, y: 118.5 } }));
   await game.waitForFunction(() => Field.zone === 2 && valhalla.rmusic.running && !valhalla.gmusic.running, null, { timeout: 10000 });
   check(true, 'Back on the glacier Rimeveil Spiral returns');

@@ -12,6 +12,7 @@ const rime = map.zones[1];
 const fen = map.zones[2];
 const city = map.zones[3];
 const wyrd = map.zones[5];
+const sky = map.zones[6];
 // `area` is the map of the zone the bot stands in: the meadow by default, or `crags`.
 async function walkTo(world, bot, goal, area = map) {
   for (const point of route(area, world.player(bot), goal)) {
@@ -30,7 +31,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35 };
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
 const levelXp = JSON.parse(fs.readFileSync(path.join(root, 'world/levels.txt'), 'utf8'));
@@ -2217,6 +2218,252 @@ const scenarios = {
       // Persistence.
       await w.restart();
       check(['wyrd_welcome', 'wyrd_boars', 'wyrd_seal', 'wyrd_trolls', 'wyrd_escort', 'wyrd_beacons', 'wyrd_onward'].every(id => state(id)?.claimed) && state('wyrd_patrol').completions === 3, 'Every claim and the repeatable count survive a private server restart');
+    },
+  },
+
+  bifrost: {
+    description: 'Walk through the Wyrdwood\'s Stormrift up into the level 30-35 Bifrost Reach, check its 56 monster slots (five kinds, eleven sleeping ward ambushers) and their levels, walk the real route over the bridges, prove the void cannot be walked into, fight a level-1 Galehound for its own XP, gold and Gale Fang, keep the zone over a server restart and use both gates.',
+    godMode: true,
+    async run(w, check) {
+      const bot = 'Skywalker';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 32 });
+      const up = wyrd.portals.find(p => p.id === 'sky_gate'), down = sky.portals.find(p => p.id === 'stormrift_down');
+      check(up && up.to === 7 && down && down.to === 6 && sky.name === 'Bifrost Reach' && sky.levels.join() === '30,35' && sky.size === 160 && sky.theme === 'sky', 'The Wyrdwood has a Stormrift to zone 7, the 160-tile Bifrost Reach of levels 30-35, which has the gate back down');
+      check(sky.city.name === "Heimdall's Perch" && !sky.camps && sky.npcs.length === 8 && sky.quests.length === 22, 'The zone has one hub, Heimdall\'s Perch, eight people (seven and a travel master) and 22 quests');
+      const rows = sky.sky, onFloor = p => rows[Math.floor(p.y)]?.[Math.floor(p.x)] !== undefined && rows[Math.floor(p.y)][Math.floor(p.x)] !== ' ';
+      check(rows.length === 160 && rows.every(r => r.length === 160) && sky.objects.filter(o => o.kind === 'void').length > 300, 'The zone lists its floor and a ring of void obstacles');
+      // Staging only: stand in the summit court below the rift. The walk into the gate is real.
+      await kit.teleport(w, bot, { zone: 6, x: up.x + 6, y: up.y + 6 });
+      await w.action(bot, { type: 'move', x: up.x, y: up.y - 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 7, 20000, 'Walk up the Stormrift');
+      await w.action(bot, { type: 'stop' });
+      const arrival = { x: up.tx, y: up.ty };
+      check(distance(w.player(bot), arrival) < 1.2, 'The server sets the climber down on the Perch');
+      const here = w.snapshot.slimes, kinds = {};
+      for (const s of here) kinds[s.kind] = (kinds[s.kind] || 0) + 1;
+      check(here.every(s => s.zone === 7) && JSON.stringify(Object.entries(kinds).sort()) === JSON.stringify([['einherjar', 12], ['galehound', 10], ['prismgolem', 10], ['skyray', 11], ['thunderroc', 13]]),
+        'A Bifrost client receives exactly its 56 monster slots: 10 galehounds, 10 prism golems, 11 skyrays, 12 einherjar and 13 thunderrocs');
+      const asleep = here.filter(s => s.dead && s.state === 'waiting');
+      check(asleep.length === 11 && asleep.filter(s => s.kind === 'galehound').length === 2 && asleep.filter(s => s.kind === 'thunderroc').length === 4, 'Eleven ward ambushers sleep until a hero holds their ward');
+      const hp = { galehound: 12500, prismgolem: 17500, skyray: 13500, einherjar: 18500, thunderroc: 22000 };
+      const living = here.filter(s => !s.dead);
+      check(living.length === 45 && living.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2) && new Set(living.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'The 45 live monsters roll within two of each default level (30, 31, 32, 33, 35)');
+      check(living.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
+      check(living.every(s => !s.elite), 'There are no elites in this zone');
+      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.type === 'system' && e.text.includes('Bifrost Reach') && e.text.includes('30–35')), 'The player is told the recommended levels');
+      // Another character in Skaldholm shares nothing with the sky.
+      await w.connect({ bot: 'Citizen', class: 'mage' });
+      await kit.teleport(w, 'Citizen', { zone: 4, x: 80, y: 120 });
+      check(w.views.get('Citizen').slimes.length === 0 && w.views.get(bot).slimes.every(s => s.zone === 7) && w.views.get(bot).players.length === 1, 'Each client is sent only its own zone');
+      await w.disconnect('Citizen');
+      // The first bridge, on foot: the Perch to Windward Meadow.
+      const windward = { x: 30, y: 112 }, start = { x: w.player(bot).x, y: w.player(bot).y };
+      const path = route(sky, start, windward);
+      check(path.length >= 3 && path.every(onFloor), `The route to Windward Meadow is ${path.length} legs, all on the floor`);
+      for (const point of path) {
+        await w.action(bot, { type: 'move', ...point });
+        await w.waitFor(() => distance(w.player(bot), point) < .6, 60000, `Walk to ${Math.round(point.x)},${Math.round(point.y)}`);
+      }
+      await w.action(bot, { type: 'stop' });
+      check(distance(w.player(bot), windward) < 1.5, 'The hero crosses the western bridge on foot');
+      // The void cannot be walked into: from the middle of the bridge, step off the side.
+      await kit.teleport(w, bot, { zone: 7, x: 43.5, y: 134.5 });
+      await w.action(bot, { type: 'move', x: 43.5, y: 118 });
+      await w.advance(2500);
+      await w.action(bot, { type: 'stop' });
+      check(onFloor(w.player(bot)) && w.player(bot).y > 131, `Walking off the side of the bridge stops at its edge (y ${w.player(bot).y.toFixed(1)})`);
+      await w.action(bot, { type: 'move', x: 43.5, y: 150 });
+      await w.advance(2500);
+      await w.action(bot, { type: 'stop' });
+      check(onFloor(w.player(bot)) && w.player(bot).y < 137, 'and so does the other side');
+      // A level-1 Galehound is a short real fight, and pays its own level (staging: Windward Meadow, away from the pack).
+      await kit.teleport(w, bot, { zone: 7, x: 38, y: 100 });
+      const before = { ...w.player(bot) };
+      const hound = (await kit.spawnEnemy(w, bot, { kind: 'galehound', level: 1, distance: 2.5 })).enemy;
+      await w.waitFor(() => w.snapshot.slimes.find(s => s.id === hound.id)?.level === 1, 5000, 'See the spawned galehound');
+      check(w.snapshot.slimes.find(s => s.id === hound.id).maxHp === Math.round(12500 * .2), 'A level-1 galehound has the floor of 20% of its health (2500)');
+      await w.action(bot, { type: 'target', id: hound.id });
+      await w.waitFor(() => w.snapshot.slimes.find(s => s.id === hound.id).dead, 240000, 'Defeat the galehound');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + enemyXp(1), `The kill pays the level-1 XP (${enemyXp(1)})`);
+      await w.waitFor(() => w.player(bot).gold >= before.gold + 86, 15000, 'Pick up the gold');
+      check(w.player(bot).gold === before.gold + 86, 'The kill drops 20% of the galehound gold (86)');
+      await w.waitFor(() => w.player(bot).inventory.some(s => s.item === 'gale_fang'), 15000, 'Pick up the fang');
+      check(true, 'The galehound drops its Gale Fang');
+      // A restart keeps the character in the sky.
+      await w.restart();
+      check(w.player(bot).zone === 7, 'The character resumes in Bifrost Reach after a server restart');
+      // The way back is a real walk to the Stormrift on the Perch, then up again from the court.
+      await kit.teleport(w, bot, { zone: 7, x: down.x, y: down.y - 4.5 });
+      await w.action(bot, { type: 'move', x: down.x, y: down.y + .8 });
+      await w.waitFor(() => w.player(bot).zone === 6, 15000, 'Step through the gate back down');
+      await w.action(bot, { type: 'stop' });
+      check(distance(w.player(bot), { x: down.tx, y: down.ty }) < 1.2, 'The Perch gate sets you down in the summit court beside the Stormrift');
+      await w.action(bot, { type: 'move', x: up.x, y: up.y - 1.2 });
+      await w.waitFor(() => w.player(bot).zone === 7, 15000, 'Walk up the Stormrift again');
+      check(distance(w.player(bot), arrival) < 1.5, 'The Stormrift works again right after arriving');
+    },
+  },
+
+  sky_quests: {
+    description: 'Every ordinary quest of Heimdall\'s Perch played in dependency order through the real accept and claim paths (talk, kill, bring, visit and the new hold objective) with exact XP and gold: the first ward and the vigil are really held, their waves wake, hunt and dissolve; repeatable bounties pay twice; the group quest hires its two fighters; the progression quest arrives by itself.',
+    startLevel: 30, godMode: true, levelSpread: 0,
+    async run(w, check) {
+      const bot = 'Wardholder';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 33, gold: 4000 });
+      const defs = sky.quests, npcs = sky.npcs;
+      check(npcs.length === 8 && defs.length === 22 && defs.every(q => q.id.startsWith('sky_')), `The Perch holds ${npcs.length} people and ${defs.length} quests`);
+      const find = id => defs.find(q => q.id === id);
+      const placeOf = id => sky.places.find(p => p.id === id);
+      const state = id => quest(w, bot, id);
+      const give = (item, quantity) => w.debug(bot, { op: 'give_item', item, quantity });
+      const rows = sky.sky;
+      const floor = (x, y) => (rows[Math.floor(y)] || '')[Math.floor(x)] > ' ';
+      // Three metres from an enemy, on the side that is floor (the island's edge is void).
+      const beside = e => [[3, 0], [-3, 0], [0, 3], [0, -3], [2, 2], [-2, -2]].map(([dx, dy]) => ({ x: e.x + dx, y: e.y + dy })).find(p => floor(p.x, p.y) && floor(p.x + Math.sign(p.x - e.x), p.y + Math.sign(p.y - e.y)));
+      async function refill(at, radius, n) {
+        const live = () => w.snapshot.slimes.filter(s => !s.dead && distance(s, at) < radius).length;
+        if (live() >= n) return;
+        for (const d of w.snapshot.slimes.filter(s => s.dead && s.state !== 'waiting' && distance(s, at) < radius)) await w.debug(bot, { op: 'respawn_enemy', id: d.id }).catch(e => { if (!/already alive/.test(e.message)) throw e; });
+        await w.waitFor(() => live() >= n, 10000, 'The Reach refills');
+      }
+      // Kills "any" enemy until a quest's counter is full: the Reach's packs are islands apart, so go from one to the next.
+      async function killAny(id, index, n) {
+        for (let round = 0; round < 12 && (state(id).counts[index] || 0) < n; round++) {
+          const live = w.snapshot.slimes.filter(s => !s.dead && !sleeping.has(s.id));
+          const next = live.sort((a, b) => distance(a, w.player(bot)) - distance(b, w.player(bot)))[0];
+          assert.ok(next, 'A living enemy is available');
+          await kit.teleport(w, bot, { zone: 7, ...(beside(next) || next) });
+          await kit.killEnemies(w, bot, { radius: 14, max: Math.min(4, n - state(id).counts[index]) });
+        }
+      }
+      const woke = new Set();
+      await kit.teleport(w, bot, { zone: 7, x: 80, y: 144 });            // staging: the sky is entered through the Stormrift (see `bifrost`)
+      await w.waitFor(() => w.player(bot).zone === 7 && w.snapshot.slimes.some(s => s.zone === 7), 8000, 'Arrive on the Perch');
+      const sleepers = () => new Set(w.snapshot.slimes.filter(s => s.dead && s.state === 'waiting').map(s => s.id));
+      const sleeping = sleepers();
+      check(sleeping.size === 11, 'Eleven ambushers sleep before any ward is held');
+      async function playQuest(id) {
+        const q = find(id);
+        await kit.teleport(w, bot, { npc: q.npc });
+        await kit.talkTo(w, bot, q.npc, `quest:accept:${id}`);
+        await w.waitFor(() => state(id) && !state(id).claimed, 5000, `Accept ${id}`);
+        for (const [i, o] of q.objectives.entries()) {
+          if (o.kind === 'talk') { await kit.teleport(w, bot, { npc: o.target }); await kit.talkTo(w, bot, o.target); }
+          else if (o.kind === 'bring') await give(o.target, o.count);
+          else if (o.kind === 'visit') { const p = placeOf(o.target); await kit.teleport(w, bot, { zone: 7, x: p.x, y: p.y + 2.4 }); }
+          else if (o.kind === 'hold') {
+            const p = placeOf(o.target), before = state(id).counts[i];
+            await kit.teleport(w, bot, { zone: 7, x: p.x, y: p.y + 2 });
+            check(before === 0, `${id}: the ward starts at zero`);
+            // Hold the circle. The count must rise by about one a second, and the waves must wake, hunt and, at the end, dissolve.
+            const t0 = Date.now(), c0 = state(id).counts[i];
+            await w.advance(5200);
+            const c1 = state(id).counts[i];
+            check(c1 >= 4 && c1 <= 6, `${id}: five seconds in the circle count about five (${c1 - c0})`);
+            // stepping out pauses the count
+            await kit.teleport(w, bot, { zone: 7, x: p.x + p.r + .9, y: p.y });
+            await w.advance(800);
+            const c2 = state(id).counts[i];
+            await w.advance(2500);
+            check(c2 - c1 <= 1 && state(id).counts[i] === c2, `${id}: outside the circle the count pauses at ${c2}`);
+            await kit.teleport(w, bot, { zone: 7, x: p.x, y: p.y + 2 });
+            const last = Math.max(...p.waves.map(x => x.at));
+            while (state(id).counts[i] < o.count && Date.now() - t0 < (o.count + 60) * 1000) {
+              for (const s of w.snapshot.slimes) if (!s.dead && sleeping.has(s.id)) woke.add(s.id);
+              await w.advance(1000);
+            }
+            await w.waitFor(() => state(id).counts[i] >= o.count, 20000, `${id} ward held`);
+            check(Date.now() - t0 >= (o.count - 12) * 1000, `${id}: a ward of ${o.count} s takes about that long (${Math.round((Date.now() - t0) / 1000)} s)`);
+            check(woke.size >= 1 && last < o.count, `${id}: its waves woke (${woke.size} enemies so far) before the end`);
+            await w.advance(500);
+            check(w.snapshot.slimes.filter(s => sleeping.has(s.id)).every(s => s.dead && s.state === 'waiting'), `${id}: when the ward holds every wave dissolves`);
+          }
+          else if (o.kind === 'kill') {
+            if (o.target === 'any') { await kit.teleport(w, bot, { npc: q.npc }); await refill({ x: 80, y: 90 }, 90, o.count + 2); await killAny(id, i, o.count); }
+            else {
+              const alive = () => w.snapshot.slimes.filter(s => !s.dead && s.kind === o.target && !sleeping.has(s.id)).length;
+              if (alive() < o.count) {
+                for (const d of w.snapshot.slimes.filter(s => s.dead && s.kind === o.target && s.state !== 'waiting').slice(0, o.count - alive())) await w.debug(bot, { op: 'respawn_enemy', id: d.id }).catch(e => { if (!/already alive/.test(e.message)) throw e; });
+                await w.waitFor(() => alive() >= o.count, 10000, `Respawn ${o.target}`);
+              }
+            }
+            if (o.target === 'any') { await w.waitFor(() => (state(id).counts[i] || 0) >= o.count, 8000, `${id} patrol`); continue; }
+            const targets = w.snapshot.slimes.filter(s => !s.dead && !sleeping.has(s.id) && s.kind === o.target);
+            const first = targets.sort((a, b) => distance(a, w.player(bot)) - distance(b, w.player(bot)))[0];
+            if (first) { const spot = beside(first) || { x: first.x, y: first.y }; await kit.teleport(w, bot, { zone: 7, ...spot }); }
+            const done = await kit.killEnemies(w, bot, { kind: o.target, max: o.count });
+            assert.ok(done.count >= o.count, `Killed enough ${o.target}`);
+          } else throw Error(`${id}: unexpected objective ${o.kind}`);
+          await w.waitFor(() => (state(id).counts[i] || 0) >= Math.min(o.count, o.kind === 'kill' ? 99 : o.count), 8000, `${id} objective ${i}`);
+        }
+        await w.waitFor(() => state(id).counts.every((c, i) => c >= q.objectives[i].count), 8000, `${id} is ready`);
+        await kit.teleport(w, bot, { npc: q.npc });
+        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        const held = item => w.player(bot).inventory.filter(s => s.item === item).reduce((n, s) => n + s.quantity, 0);
+        const bringing = q.objectives.filter(o => o.kind === 'bring').map(o => [o.target, o.count, held(o.target)]);
+        await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
+        await w.waitFor(() => state(id).claimed, 5000, `Claim ${id}`);
+        for (const [item, count, had] of bringing) check(held(item) === had - count, `${id}: the hand-in took exactly ${count} ${item}`);
+        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${q.rewardGold} gold and a tenth of level ${q.level}'s XP`);
+        return q;
+      }
+      // Dependency order: every ordinary quest, none of the group quest or the progression quest (it arrives by itself).
+      const skip = new Set(['sky_ward_last', 'sky_onward']);
+      const order = [], seen = new Set();
+      const visit = q => { if (seen.has(q.id) || skip.has(q.id)) return; seen.add(q.id); if (q.requires && !skip.has(q.requires)) visit(find(q.requires)); order.push(q); };
+      defs.forEach(visit);
+      const tally = {};
+      for (const q of order) { await playQuest(q.id); for (const o of q.objectives) tally[o.kind] = (tally[o.kind] || 0) + 1; }
+      check(order.length >= 19 && ['talk', 'kill', 'bring', 'visit'].every(k => tally[k] >= 3) && tally.hold === 2, `${order.length} quests played end to end: ${JSON.stringify(tally)}`);
+      const onward = state('sky_onward');
+      check(onward && onward.counts[0] === 1 && !onward.claimed, 'The level-30 progression quest arrived by itself and already counts: the hero stands in Bifrost Reach');
+      await kit.teleport(w, bot, { npc: 'sky_warden' });
+      await kit.talkTo(w, bot, 'sky_warden', 'quest:claim:sky_onward');
+      await w.waitFor(() => state('sky_onward').claimed, 5000, 'Claim the progression quest');
+      // The repeatable patrol can be taken and paid again.
+      const rep = find('sky_patrol');
+      for (let round = 0; round < 2; round++) {
+        const before = { gold: w.player(bot).gold, completions: state('sky_patrol').completions };
+        await kit.teleport(w, bot, { npc: rep.npc });
+        await kit.talkTo(w, bot, rep.npc, 'quest:accept:sky_patrol');
+        await w.waitFor(() => !state('sky_patrol').claimed, 5000, 'Take the patrol again');
+        await refill({ x: 80, y: 90 }, 90, 16);
+        await killAny('sky_patrol', 0, 14);
+        await w.waitFor(() => state('sky_patrol').counts[0] === 14, 8000, 'Patrol count');
+        await kit.teleport(w, bot, { npc: rep.npc });
+        await w.advance(1500);                                     // let the last drops settle before the gold is read
+        before.gold = w.player(bot).gold;
+        await kit.talkTo(w, bot, rep.npc, 'quest:claim:sky_patrol');
+        await w.waitFor(() => state('sky_patrol').completions === before.completions + 1, 5000, 'Patrol paid');
+        check(w.player(bot).gold === before.gold + rep.rewardGold, `The repeatable patrol pays ${rep.rewardGold} gold again (round ${round + 1})`);
+      }
+      // The group quest: the giver hires exactly the missing fighters, up to the quest's party size.
+      const mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name)).length;
+      await kit.teleport(w, bot, { npc: 'sky_warden' });
+      await kit.talkTo(w, bot, 'sky_warden', 'quest:accept:sky_ward_last');
+      await w.waitFor(() => state('sky_ward_last'), 5000, 'Accept the Last Ward');
+      for (const c of ['warrior', 'priest', 'mage']) await kit.talkTo(w, bot, 'sky_warden', `merc_${c}`);
+      await w.waitFor(() => mercs() === 2, 8000, 'Two fighters join');
+      const last = find('sky_ward_last');
+      check(mercs() === 2 && last.recommendedPlayers === 3 && last.rewardItem === 'pants_wayfarer_l20_purple' && last.objectives[0].kind === 'hold' && last.objectives[0].count === 120, 'The Last Ward wants three heroes for 120 s, hires two fighters and refuses the third; its reward is an epic item');
+      await kit.talkTo(w, bot, 'sky_warden', 'merc_dismiss');
+      await w.waitFor(() => mercs() === 0, 8000, 'Send them away');
+      // Falling at a ward loses the count: the hero dies inside the Last Ward's circle and the objective starts over.
+      const ward = placeOf('sky_ward_last');
+      await kit.teleport(w, bot, { zone: 7, x: ward.x, y: ward.y + 2 });
+      await w.advance(4300);
+      check(state('sky_ward_last').counts[0] >= 3, `Three seconds of the Last Ward are counted (${state('sky_ward_last').counts[0]})`);
+      await w.debug(bot, { op: 'set_god_mode', enabled: false });
+      await w.debug(bot, { op: 'die' });
+      await w.waitFor(() => state('sky_ward_last').counts[0] === 0, 6000, 'The ward collapses');
+      check(w.events.some(e => e.bot === bot && /collapses/.test(e.text || '')), 'The hero is told the ward collapsed');
+      // Persistence.
+      await w.restart();
+      check(['sky_welcome', 'sky_hounds', 'sky_ward_wind', 'sky_ward_vigil', 'sky_onward'].every(id => state(id)?.claimed) && state('sky_patrol').completions === 3, 'Every claimed quest and the repeatable\'s count survive a restart');
     },
   },
 };

@@ -11,7 +11,9 @@ STOPS = [
     ('Skaldholm', 'travel_skaldholm', 80, 128, ['travel_rimeward', 'travel_hollowmoot']),
     # The Wyrdwood has two stops in one zone: the flight between them crosses the river in a straight line.
     ('Hollowmoot', 'travel_hollowmoot', 23, 153, ['travel_skaldholm', 'travel_skuldwatch']),
-    ('Skuldwatch', 'travel_skuldwatch', 88, 89, ['travel_hollowmoot']),
+    ('Skuldwatch', 'travel_skuldwatch', 88, 89, ['travel_hollowmoot', 'travel_perch']),
+    # Bifrost Reach: the flight from Skuldwatch crosses the Highmoor to the Stormrift and climbs the rift.
+    ("Heimdall's Perch", 'travel_perch', 86, 135, ['travel_skuldwatch']),
 ]
 
 

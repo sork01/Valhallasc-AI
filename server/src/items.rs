@@ -145,6 +145,11 @@ pub fn material(kind: &str) -> &'static str {
         "ram" => "stormram_horn",
         "oakhorn" => "oakhorn_crown",
         "hrungnir" => "stormheart_shard",
+        "galehound" => "gale_fang",
+        "prismgolem" => "prism_shard",
+        "skyray" => "stormray_wing",
+        "einherjar" => "rune_token",
+        "thunderroc" => "thunderroc_quill",
         _ => "slime_gel",
     }
 }

@@ -7,17 +7,18 @@
   const $ = id => document.getElementById(id);
   const NS = 'http://www.w3.org/2000/svg';
   const STAGE = { w: 100, h: 62 };
-  // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm -> the Wyrdwood.
-  const LAYOUT = [{ x: 2, y: 42, s: 15 }, { x: 19, y: 28, s: 15 }, { x: 35, y: 8, s: 20 }, { x: 59, y: 2, s: 20 }, { x: 48, y: 32, s: 21 }, { x: 30, y: 44, s: 16 }, { x: 72, y: 24, s: 28 }];
-  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', vault: '#07080e', wyrd: '#6a5430' };
-  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', vault: '#3a3f55', wyrd: '#b89860' };
-  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', vault: '#59d9ff', wyrd: '#e0963a' };
+  // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm -> the Wyrdwood -> Bifrost Reach, up the Stormrift.
+  const LAYOUT = [{ x: 2, y: 42, s: 15 }, { x: 19, y: 28, s: 15 }, { x: 35, y: 8, s: 20 }, { x: 59, y: 2, s: 20 }, { x: 48, y: 32, s: 21 }, { x: 30, y: 44, s: 16 }, { x: 72, y: 24, s: 28 }, { x: 80, y: 1, s: 19 }];
+  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838' };
+  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4' };
+  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff' };
   const BLURB = {
     meadow: 'Green pastures round the walled town of Alderhaven.',
     ember: 'Lava fords and ash-grey crags above Cinderwatch Camp.',
     frost: 'Four rings of ice that spiral up to a summit bowl.',
     fen: 'A dusk fen round a dark lake, lit by the lanterns of Lanternmere.',
     wyrd: 'An autumn forest, a troll bridge and a storm-wracked moor, between Hollowmoot and Skuldwatch.',
+    sky: 'Floating islands over the storm, joined by rainbow-shard bridges, around Heimdall\'s Perch.',
     vault: 'A dungeon of bones and torchlight under the Meeting Stone, for a party of five.',
   };
   // Base level and a dot colour for every enemy kind (the level matches Slime::default_level in server/src/world.rs;
@@ -34,6 +35,7 @@
     gatewarden: ['Hrolf Bonegate (Boss)', 20, '#ffd24a'], choir: ['Valka, the Hollow Choir (Boss)', 20, '#7be0ff'],
     colossus: ['Ironwake, the Vault Colossus (Boss)', 21, '#ff9a3a'], hollowking: ['Haldor, the Hollow King (Boss)', 21, '#9cff8f'],
     boar: ['Rotfang Boar', 21, '#d0603a'], crow: ['Gallowcrow (ranged)', 23, '#9a84d6'], troll: ['Mosshide Troll', 25, '#6fb064'], weaver: ['Wyrdweaver (ranged)', 27, '#c070e8'],
+    galehound: ['Galehound', 30, '#9fc0ee'], prismgolem: ['Prism Golem', 31, '#a9a0f0'], skyray: ['Skyray (ranged)', 32, '#6a86d0'], einherjar: ['Hollow Einherjar', 33, '#8ad0e8'], thunderroc: ['Thunderroc', 35, '#f0c070'],
     ram: ['Stormram', 29, '#8fe0ff'], oakhorn: ['Oakhorn (Elite · 3 players)', 25, '#ff9a3a'], hrungnir: ['Hrungnir (Elite · 5 players)', 30, '#7ab4ff'],
   };
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -73,6 +75,13 @@
   function objectColour(o, theme) {
     const fen = theme === 'fen', frost = theme === 'frost', ember = theme === 'ember', wyrd = theme === 'wyrd';
     switch (o.kind) {
+      case 'skypine': return '#52c0a0';
+      case 'prism': return '#b9a0ff';
+      case 'column': return '#e8ecff';
+      case 'skyrock': return '#aab6d8';
+      case 'cloudpuff': return '#f0f4ff';
+      case 'wardstone': case 'windcairn': case 'spirelight': case 'pylon': case 'hallgate': return '#ffd36a';
+      case 'nest': return '#8a6a4a';
       case 'lava': return '#ff6a2a';
       case 'ice': return '#4f93c8';
       case 'water': return wyrd ? '#2f6f9a' : '#244f5c';
@@ -111,6 +120,7 @@
     g.lineCap = g.lineJoin = 'round'; g.strokeStyle = g.fillStyle = DIRT[z.theme]; g.lineWidth = 2.8 * k;
     for (const p of z.paths || []) { g.beginPath(); p.forEach(([x, y], i) => i ? g.lineTo(x * k, y * k) : g.moveTo(x * k, y * k)); g.stroke(); }
     if (z.theme === 'meadow') { g.beginPath(); g.arc(36 * k, 36 * k, 3.5 * k, 0, 6.283); g.fill(); }
+    (z.sky || []).forEach((row, y) => { for (let x = 0; x < z.size; x++) { const c = row[x]; if (c && c !== ' ') { g.fillStyle = c === '=' ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .6, k + .6); } } });   // floating islands and their bridges
     for (const [x0, y0, x1, y1] of z.rooms || []) { g.fillStyle = '#2f3347'; g.fillRect(x0 * k, y0 * k, (x1 - x0) * k, (y1 - y0) * k); }   // a dungeon's floor
     const PAVE = { 1: '#b6a98c', 2: '#ece2c8', 3: '#b8765a' };
     for (const r of z.roads || []) {
@@ -120,10 +130,10 @@
       else { g.beginPath(); g.arc(r.x * k, r.y * k, r.r * k, 0, 6.283); g.fill(); }
     }
     if (z.city && z.theme !== 'city') for (const t of [z.city, ...(z.camps || [])]) {
-      g.fillStyle = { meadow: '#d8cbb0', ember: '#88705d', frost: '#8fa6bd', fen: '#6a5238', wyrd: '#8a6a44' }[z.theme];
+      g.fillStyle = { meadow: '#d8cbb0', ember: '#88705d', frost: '#8fa6bd', fen: '#6a5238', wyrd: '#8a6a44', sky: '#cdd2f2' }[z.theme];
       g.fillRect(t.x0 * k, t.y0 * k, (t.x1 - t.x0) * k, (t.y1 - t.y0) * k);
     }
-    const objects = (z.objects || []).filter(o => o.kind !== 'post');
+    const objects = (z.objects || []).filter(o => o.kind !== 'post' && o.kind !== 'void');
     for (const pass of [0, 1]) for (const o of objects) {
       if (FEATURE.has(o.kind) !== (pass === 0)) continue;
       g.fillStyle = objectColour(o, z.theme);

@@ -42,16 +42,18 @@
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn;
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
-    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault', wyrd = zdef.theme === 'wyrd';
+    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault', wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky';
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
       const i = y * MAP + x, cx = x + .5, cy = y + .5;
-      map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : vault ? 51 : wyrd ? 61 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : vault ? 52 : wyrd ? 62 : 2) * .35;
+      map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : vault ? 51 : wyrd ? 61 : sky ? 71 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : vault ? 52 : wyrd ? 62 : sky ? 72 : 2) * .35;
       let d = 99; for (const p of paths) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
-      if (!ember && !frost && !fen && !city && !vault && !wyrd) d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
+      if (!ember && !frost && !fen && !city && !vault && !wyrd && !sky) d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
       map.dirt[i] = d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0;
     }
     if (city) paintRoads(zdef.roads);
     if (vault) paintRooms(zdef.rooms);
+    map.floor = null;
+    if (sky) paintSky(zdef.sky);
     objects = zdef.objects.map(o => ({ ...o }));
   }
   // Skaldholm's ground: the zone lists its streets (type 1 cobbles), plazas and squares (2 marble, 3 brick) as rectangles, discs and rings.
@@ -72,6 +74,12 @@
     map.dirt.fill(0);
     for (const [x0, y0, x1, y1] of rooms || []) for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) map.dirt[y * MAP + x] = 1;
   }
+  // Bifrost Reach: the zone lists its 160 rows as text (' ' void, '#' island, '=' bridge). Only floor is drawn; void shows the sky and the storm below.
+  function paintSky(rows) {
+    map.floor = new Uint8Array(MAP * MAP); map.dirt.fill(0);
+    (rows || []).forEach((row, y) => { for (let x = 0; x < MAP; x++) { const c = row[x]; if (c && c !== ' ') { map.floor[y * MAP + x] = 1; if (c === '=') map.dirt[y * MAP + x] = 1; } } });
+  }
+  const isVoid = (x, y) => !!map.floor && (x < 0 || y < 0 || x >= MAP || y >= MAP || !map.floor[y * MAP + x]);
   // Switch to another zone: new ground, obstacles and minimap. Everything tied to the old zone's coordinates goes.
   function setZone(z) {
     zone = ZONES[z] ? z : 0; zdef = ZONES[zone];
@@ -393,7 +401,7 @@
     }
   }
   const WYRD_NONE = {};                                   // the Wyrdwood's scenery is drawn by client/wyrdart.js through City.art
-  const spriteSet = () => zdef.theme === 'wyrd' ? WYRD_NONE : zdef.theme === 'ember' ? emberSprites : zdef.theme === 'frost' ? frostSprites : zdef.theme === 'fen' ? fenSprites : sprites;
+  const spriteSet = () => zdef.theme === 'wyrd' || zdef.theme === 'sky' ? WYRD_NONE : zdef.theme === 'ember' ? emberSprites : zdef.theme === 'frost' ? frostSprites : zdef.theme === 'fen' ? fenSprites : sprites;
 
   // ---------- ground chunks ----------
   const chunks = new Map(); let chunkScale = 1;
@@ -401,14 +409,16 @@
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
   function renderChunk(cx, cy) {
     const G = chunkGeom(cx, cy), [c, g] = canvasOf(G.w, G.h, chunkScale);
-    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault', wyrd = zdef.theme === 'wyrd';
+    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault', wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky';
     const arenas = vault ? (zdef.slimes || []).filter(m => BOSS_KINDS.includes(m.kind)) : [];
     for (let ty = 0; ty < CH; ty++) for (let tx = 0; tx < CH; tx++) {
       const x = G.x0 + tx, y = G.y0 + ty; if (x >= MAP || y >= MAP) continue;
       const i = y * MAP + x, px = (x - y) * TW / 2 - G.ox, py = (x + y) * TH / 2 - G.oy, tone = map.tone[i], dirt = map.dirt[i];
       if (vault && !dirt) continue;                                                  // solid rock: stays black
+      if (sky && !map.floor[i]) continue;                                            // open sky: nothing to draw
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
       g.fillStyle = vault ? `hsl(${226 + tone * 10}, ${9 + tone * 5}%, ${19 + tone * 7 + alt * .7}%)` : city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
+        : sky ? skyGround(x, y, tone, dirt, alt)
         : wyrd ? wyrdGround(x, y, tone, dirt, alt)
         : fen ? (dirt ? `hsl(${30 + tone * 6}, ${30 + tone * 6}%, ${27 + tone * 6 + alt}%)` : `hsl(${92 + tone * 16}, ${26 + tone * 12}%, ${21 + tone * 9 + alt * .8}%)`)
         : frost ? (dirt ? `hsl(${208 + tone * 8}, ${26 + tone * 8}%, ${66 + tone * 6 + alt}%)` : `hsl(${200 + tone * 12}, ${44 + tone * 10}%, ${84 + tone * 8 + alt * .6}%)`)
@@ -465,6 +475,8 @@
           if (bare(x, y + 1)) edge(px, py + TH, px - TW / 2, py + TH / 2);
           if (bare(x - 1, y)) edge(px - TW / 2, py + TH / 2, px, py);
         }
+      } else if (sky) {
+        skyDetail(g, r, inTile, px, py, x, y, tone, dirt);
       } else if (wyrd) {
         wyrdDetail(g, r, inTile, px, py, x, y, tone, dirt);
       } else if (fen) {
@@ -514,11 +526,12 @@
       }
       if (!vault) City.stoneTile(g, px, py, x, y);
       // earth cliff on the two front edges of the island
-      const depth = CLIFF - 34 + hash2(x, y, 9) * 26;
+      const depth = sky ? CLIFF - 40 + hash2(x, y, 9) * 36 : CLIFF - 34 + hash2(x, y, 9) * 26;
       const face = (dir) => {
         const vx = px + dir * TW / 2, vy = py + TH / 2, bx = px, by = py + TH;
         const gr = g.createLinearGradient(0, vy, 0, vy + depth);
         if (city) { gr.addColorStop(0, dir > 0 ? '#cdb48a' : '#b79c74'); gr.addColorStop(1, dir > 0 ? '#7a6044' : '#65503a'); }
+        else if (sky) { gr.addColorStop(0, dir > 0 ? '#c3cbe6' : '#a9b3d6'); gr.addColorStop(.45, dir > 0 ? '#7a84ae' : '#6a7399'); gr.addColorStop(1, dir > 0 ? '#2c3156' : '#23284a'); }
         else if (wyrd) { gr.addColorStop(0, dir > 0 ? '#6a4a2e' : '#583a22'); gr.addColorStop(1, dir > 0 ? '#2e2016' : '#241a12'); }
         else if (fen) { gr.addColorStop(0, dir > 0 ? '#5a4c38' : '#4a3e2e'); gr.addColorStop(1, dir > 0 ? '#2a2218' : '#201a12'); }
         else if (frost) { gr.addColorStop(0, dir > 0 ? '#a9d3ee' : '#8fbddb'); gr.addColorStop(1, dir > 0 ? '#2f5a82' : '#274b70'); }
@@ -526,12 +539,12 @@
         else { gr.addColorStop(0, dir > 0 ? '#7a5433' : '#684528'); gr.addColorStop(1, dir > 0 ? '#3d2a1c' : '#33221a'); }
         g.fillStyle = gr; g.beginPath(); g.moveTo(vx, vy); g.lineTo(bx, by); g.lineTo(bx, by + depth * (.85 + hash2(x + 3, y, 4) * .3)); g.lineTo(vx, vy + depth); g.closePath(); g.fill();
         g.strokeStyle = 'rgba(0,0,0,.18)'; g.lineWidth = 2; for (let k = 1; k < 4; k++) { g.beginPath(); g.moveTo(vx, vy + depth * k / 4); g.lineTo(bx, by + depth * k / 4 * .9); g.stroke(); }
-        g.strokeStyle = city ? '#5faa44' : wyrd ? '#b8742a' : fen ? '#4f7a36' : frost ? '#eaf7ff' : ember ? '#8a3a1c' : '#3f8a3c'; g.lineWidth = 5; g.beginPath(); g.moveTo(vx, vy + 1); g.lineTo(bx, by + 1); g.stroke();
+        g.strokeStyle = sky ? '#f4fbff' : city ? '#5faa44' : wyrd ? '#b8742a' : fen ? '#4f7a36' : frost ? '#eaf7ff' : ember ? '#8a3a1c' : '#3f8a3c'; g.lineWidth = 5; g.beginPath(); g.moveTo(vx, vy + 1); g.lineTo(bx, by + 1); g.stroke();
         if (ember) { g.strokeStyle = 'rgba(255,120,40,.55)'; g.lineWidth = 2; g.beginPath(); g.moveTo(vx, vy + 3); g.lineTo(bx, by + 3); g.stroke(); }
         g.strokeStyle = OL; g.lineWidth = 2; g.beginPath(); g.moveTo(vx, vy + depth); g.lineTo(bx, by + depth * .9); g.stroke();
       };
-      if (!vault && x === MAP - 1) face(1);
-      if (!vault && y === MAP - 1) face(-1);
+      if (sky) { if (isVoid(x + 1, y)) face(1); if (isVoid(x, y + 1)) face(-1); }
+      else { if (!vault && x === MAP - 1) face(1); if (!vault && y === MAP - 1) face(-1); }
     }
     return { c, G };
   }
@@ -607,9 +620,14 @@
     ram: { name: 'Stormram', scale: 1.35, top: 49, col: ['#b8f0ff', '#68799b', '#252c3d'] },
     oakhorn: { name: 'Oakhorn', elite: true, scale: 1.7, top: 77, col: ['#e87a1e', '#975a34', '#2a1810'] },
     hrungnir: { name: 'Hrungnir', elite: true, scale: 1.9, top: 75, col: ['#b8f0ff', '#4a5676', '#1b2030'] },
+    galehound: { name: 'Galehound', scale: 1.3, top: 58, col: ['#e4f0ff', '#7088b0', '#2a3550'] },
+    prismgolem: { name: 'Prism Golem', scale: 1.6, top: 78, col: ['#d4e0fa', '#7a80c8', '#2a2a5e'] },
+    skyray: { name: 'Skyray', scale: 1.55, top: 62, col: ['#8ea6dc', '#3e4c82', '#161c34'] },
+    einherjar: { name: 'Hollow Einherjar', scale: 1.3, top: 66, col: ['#a8f0ff', '#6a7486', '#1a1e26'] },
+    thunderroc: { name: 'Thunderroc', scale: 1.6, top: 81, col: ['#f6faff', '#a86e34', '#26304c'] },
   };
   const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
-  const WYRD_KINDS = ['boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir'];
+  const WYRD_KINDS = ['boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir'], SKY_KINDS = ['galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc'];
   const VAULT_KINDS = ['thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking'], BOSS_KINDS = VAULT_KINDS.slice(3);
   // Colour a level label by how it compares with the hero: grey, normal, orange, red.
   const levelColor = level => { const d = level - (hero?.level || 1); return d >= 5 ? '#ff6b6b' : d >= 3 ? '#ffa65a' : d <= -5 ? '#9fb0a0' : '#fff4ca'; };
@@ -1239,8 +1257,8 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null;    // {meta, img: {kind: Image}}
-  const enemySource = s => s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : WYRD_KINDS.includes(s.kind) ? wyrdSrc : VAULT_KINDS.includes(s.kind) ? vaultSrc : slimeSrc;
+  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null;    // {meta, img: {kind: Image}}
+  const enemySource = s => s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : WYRD_KINDS.includes(s.kind) ? wyrdSrc : SKY_KINDS.includes(s.kind) ? skySrc : VAULT_KINDS.includes(s.kind) ? vaultSrc : slimeSrc;
   const SLIME_K = 2.1, DIE_SHOW = 1.7;                      // sprite pixel -> screen px; seconds a dead slime stays on screen
   // Test mode (window.__valhallaTestSprites): one small coloured block per enemy kind instead of the atlas PNGs. The clip
   // table is the real one's shape (same names, frame counts and rates), so every animation state still finds its frame.
@@ -1299,6 +1317,13 @@
     if (stubOn()) { wyrdSrc = stubEnemies(WYRD_KINDS, { boar: '#a64', crow: '#446', troll: '#6a5', weaver: '#a6e', ram: '#9cf', oakhorn: '#e83', hrungnir: '#8af' }); return; }
     fetch('assets/wyrd.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/wyrd_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); wyrdSrc = { meta, img }; })).catch(() => { wyrdSrc = null; });
+  }
+  // Bifrost Reach monsters: assets/sky_<kind>.png (scripts/make_sky_sprites.py), the same clips again.
+  function loadSkySprites() {
+    if (skySrc) return;
+    if (stubOn()) { skySrc = stubEnemies(SKY_KINDS, { galehound: '#9bd', prismgolem: '#a9f', skyray: '#58c', einherjar: '#8cd', thunderroc: '#fc6' }); return; }
+    fetch('assets/sky.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/sky_${k}.png`; })))
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); skySrc = { meta, img }; })).catch(() => { skySrc = null; });
   }
   // Rimeveil Glacier monsters: assets/rime_<kind>.png (scripts/make_rime_sprites.py), the same clips as the Crags.
   function loadRimeSprites() {
@@ -1539,6 +1564,104 @@
       if (k % 7 === 2) { const gl = Math.max(0, Math.sin(t * 1.6 + k)); g.fillStyle = `rgba(210,240,250,${gl * .55})`; g.fillRect(sx - 4, sy - 2, 8, 1.4); }
     }
   }
+  // ---------- Bifrost Reach: floating islands over a storm, rainbow-shard bridges ----------
+  const RAINBOW = ['#ff5a7a', '#ffb050', '#fff070', '#60e0a0', '#50b8ff', '#b070ff'];
+  function skyGround(x, y, tone, dirt, alt) {
+    if (dirt) {                                                                       // a bridge: pale glass catching every colour of the spectrum
+      const hue = (x * 17 + y * 29) % 360;
+      return `hsl(${hue}, 78%, ${74 + tone * 8 + alt * .4}%)`;
+    }
+    return `hsl(${154 + tone * 22}, ${40 + tone * 14}%, ${57 + tone * 10 + alt}%)`;  // windswept turquoise grass
+  }
+  function skyDetail(g, r, inTile, px, py, x, y, tone, dirt) {
+    if (dirt) {
+      g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(px - TW / 2 + 8, py + TH / 2); g.lineTo(px, py + 5); g.lineTo(px + TW / 2 - 8, py + TH / 2); g.stroke();
+      if (r() < .4) { const [qx, qy] = inTile(); g.fillStyle = 'rgba(255,255,255,.7)'; g.fillRect(qx - 1, qy - 1, 2, 2); }
+      g.strokeStyle = 'rgba(80,90,160,.25)'; g.lineWidth = 1; g.beginPath(); g.moveTo(px, py + 2); g.lineTo(px, py + TH - 2); g.stroke();
+      return;
+    }
+    g.lineCap = 'round';
+    for (let k = 0; k < 2; k++) {                                                      // a few combed tufts and a wisp of low cloud
+      const [qx, qy] = inTile();
+      if (r() < .5) { const h = 4 + r() * 5; g.lineWidth = 1.6; g.strokeStyle = `hsl(${150 + tone * 20}, 50%, ${34 + tone * 8}%)`; g.beginPath(); g.moveTo(qx - 2, qy + 1); g.lineTo(qx - 5, qy - h); g.moveTo(qx + 2, qy + 1); g.lineTo(qx + 4, qy - h * .9); g.stroke(); }
+      else if (r() < .35) { g.fillStyle = 'rgba(255,255,255,.2)'; g.beginPath(); g.ellipse(qx, qy, 6 + r() * 8, 2 + r() * 2, 0, 0, 6.283); g.fill(); }
+    }
+    if (r() < .06) { const [qx, qy] = inTile(), col = ['#ffffff', '#ffd0f0', '#c8e4ff', '#fff0a0'][Math.floor(r() * 4)]; g.strokeStyle = '#3a8a6a'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(qx, qy + 2); g.lineTo(qx, qy - 4); g.stroke(); g.fillStyle = col; for (let p = 0; p < 5; p++) { const a = p / 5 * 6.283; g.beginPath(); g.arc(qx + Math.cos(a) * 2.8, qy - 5 + Math.sin(a) * 2.2, 1.8, 0, 6.283); g.fill(); } g.fillStyle = '#f5b82e'; g.beginPath(); g.arc(qx, qy - 5, 1.3, 0, 6.283); g.fill(); }
+  }
+  // Above the storm: a clear gold-and-blue sky, and far below the islands a sea of dark cloud with lightning moving inside it.
+  function drawSkySky(g, t) {
+    const [cx, cy] = camS(), hz = VH * .6;
+    const gr = g.createLinearGradient(0, 0, 0, VH);
+    gr.addColorStop(0, '#244596'); gr.addColorStop(.3, '#4f88dc'); gr.addColorStop(.5, '#a8d0f4'); gr.addColorStop(.6, '#ffe0b4'); gr.addColorStop(.62, '#6a5a86'); gr.addColorStop(.8, '#2c2848'); gr.addColorStop(1, '#14122a');
+    g.fillStyle = gr; g.fillRect(0, 0, VW, VH);
+    const sx = VW * .78 - cx * .02, sy = VH * .2 - cy * .01, sun = g.createRadialGradient(sx, sy, 8, sx, sy, 340);
+    sun.addColorStop(0, 'rgba(255,248,215,.95)'); sun.addColorStop(.12, 'rgba(255,236,170,.6)'); sun.addColorStop(1, 'rgba(255,210,140,0)'); g.fillStyle = sun; g.fillRect(sx - 360, sy - 360, 720, 720);
+    g.save(); g.globalAlpha = .08; g.fillStyle = '#fff';                                    // slanting shafts of light
+    for (let i = 0; i < 5; i++) { const bx = sx - 520 + i * 210; g.beginPath(); g.moveTo(sx - 14, sy); g.lineTo(sx + 14, sy); g.lineTo(bx + 90, VH * .62); g.lineTo(bx - 90, VH * .62); g.closePath(); g.fill(); }
+    g.restore();
+    for (let i = 0; i < 6; i++) {                                                       // distant islands in the haze
+      const px = ((i * 331 - cx * .08) % (VW + 500) + VW + 500) % (VW + 500) - 250, py = VH * (.34 + (i % 3) * .08) - cy * .04, s = .6 + (i % 3) * .3;
+      g.fillStyle = 'rgba(150,170,215,.55)'; g.beginPath(); g.ellipse(px, py, 70 * s, 12 * s, 0, 0, 6.283); g.fill();
+      g.beginPath(); g.moveTo(px - 60 * s, py + 4 * s); g.lineTo(px + 60 * s, py + 4 * s); g.lineTo(px + 8 * s, py + 46 * s); g.lineTo(px - 14 * s, py + 30 * s); g.closePath(); g.fill();
+    }
+    // high, bright cloud
+    g.fillStyle = 'rgba(255,255,255,.6)';
+    for (let i = 0; i < 8; i++) {
+      const px = ((i * 397 + t * (5 + (i % 3) * 2) - cx * .16) % (VW + 600) + VW + 600) % (VW + 600) - 300, py = VH * (.1 + (i % 4) * .1) - cy * .05, sc = .8 + (i % 3) * .4;
+      g.beginPath(); g.ellipse(px, py, 150 * sc, 22 * sc, 0, 0, 6.283); g.ellipse(px - 80 * sc, py + 6 * sc, 90 * sc, 18 * sc, 0, 0, 6.283); g.ellipse(px + 90 * sc, py + 7 * sc, 100 * sc, 18 * sc, 0, 0, 6.283); g.fill();
+    }
+    // the storm below: banks of dark cloud that slide with the camera, lit from inside
+    const L = lightningAt(t);
+    for (let layer = 0; layer < 3; layer++) {
+      g.fillStyle = ['rgba(70,62,104,.8)', 'rgba(48,42,80,.85)', 'rgba(30,26,58,.9)'][layer];
+      for (let i = 0; i < 9; i++) {
+        const sp = .22 + layer * .14, px = ((i * 283 + layer * 91 + t * (6 + layer * 3) - cx * sp) % (VW + 700) + VW + 700) % (VW + 700) - 350, py = hz + 30 + layer * 90 - cy * (.1 + layer * .06) + (i % 3) * 14, sc = 1 + (i % 3) * .3;
+        g.beginPath(); g.ellipse(px, py, 230 * sc, 52 * sc, 0, 0, 6.283); g.ellipse(px - 150 * sc, py + 18 * sc, 150 * sc, 40 * sc, 0, 0, 6.283); g.ellipse(px + 160 * sc, py + 20 * sc, 160 * sc, 42 * sc, 0, 0, 6.283); g.fill();
+      }
+    }
+    if (L.flash > 0) {
+      g.save(); g.globalCompositeOperation = 'lighter';
+      const rng = rngf(L.k * 7919 + 5), fx = VW * (.1 + rng() * .8), fy = VH * (.74 + rng() * .1), fl = g.createRadialGradient(fx, fy, 10, fx, fy, 420);
+      fl.addColorStop(0, `rgba(190,170,255,${.7 * L.flash})`); fl.addColorStop(1, 'rgba(120,100,220,0)'); g.fillStyle = fl; g.fillRect(0, hz, VW, VH - hz);
+      g.strokeStyle = `rgba(235,230,255,${L.flash})`; g.lineWidth = 3; g.lineJoin = 'round'; g.beginPath(); let x = fx, y = hz + 40; g.moveTo(x, y);
+      for (let i = 0; i < 7; i++) { x += (rng() - .5) * 50; y += 26 + rng() * 14; g.lineTo(x, y); } g.stroke();
+      g.restore();
+    }
+  }
+  // Wisps of cloud drifting past in front, and sparks of bridge-glass.
+  function drawSkyWeather(g, t) {
+    g.save();
+    for (let i = 0; i < 7; i++) {
+      const x = ((i * 313 + t * (38 + (i % 3) * 14)) % (VW + 600) + VW + 600) % (VW + 600) - 300, y = (i * 137 + 40 + Math.sin(t * .2 + i) * 20) % VH, sc = 1 + (i % 3) * .5;
+      g.globalAlpha = .1; g.fillStyle = '#fff'; g.beginPath(); g.ellipse(x, y, 190 * sc, 12 * sc, 0, 0, 6.283); g.fill();
+    }
+    g.globalAlpha = 1; g.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 26; i++) { const a = Math.max(0, Math.sin(t * 1.7 + i * 2.3)); if (a < .2) continue; const x = (i * 211.7 + Math.sin(t * .3 + i) * 30) % VW, y = (i * 97.3 + t * 12) % VH; g.fillStyle = `hsla(${(i * 47 + t * 30) % 360}, 100%, 80%, ${a * .6})`; g.fillRect(x, y, 2, 2); }
+    g.restore();
+  }
+  // A ward's rune circle on the ground. Dim blue when you have no use for it, amber while you are holding it (with an arc for the
+  // progress), gold once it holds. The circle is as wide as the place the server checks.
+  function drawWardRings(g, t) {
+    for (const o of objects) {
+      if (o.kind !== 'wardstone') continue;
+      const place = (zdef.places || []).find(p => p.id === o.place); if (!place) continue;
+      const [sx, sy] = w2s(place.x, place.y); if (sx < -300 || sx > VW + 300 || sy < -200 || sy > VH + 200) continue;
+      const h = window.Quests?.hold?.(o.place) || { state: 'none', have: 0, need: 1 }, inside = Math.hypot(hero.x - place.x, hero.y - place.y) <= place.r;
+      const rx = place.r * TW * .7071, ry = place.r * TH * .7071, col = h.state === 'done' ? '255,215,90' : h.state === 'active' ? (inside ? '255,170,60' : '255,200,120') : '110,200,255';
+      g.save(); g.translate(sx, sy);
+      const fill = g.createRadialGradient(0, 0, 4, 0, 0, rx); fill.addColorStop(0, `rgba(${col},${h.state === 'active' && inside ? .26 : .1})`); fill.addColorStop(1, `rgba(${col},.02)`);
+      g.fillStyle = fill; g.beginPath(); g.ellipse(0, 0, rx, ry, 0, 0, 6.283); g.fill();
+      g.lineWidth = 3; g.strokeStyle = `rgba(${col},${.45 + .25 * Math.sin(t * 2)})`; g.beginPath(); g.ellipse(0, 0, rx, ry, 0, 0, 6.283); g.stroke();
+      g.lineWidth = 1.6; g.strokeStyle = `rgba(${col},.5)`; g.beginPath(); g.ellipse(0, 0, rx * .8, ry * .8, 0, 0, 6.283); g.stroke();
+      for (let i = 0; i < 12; i++) { const a = i / 12 * 6.283 + t * (h.state === 'active' ? .5 : .1); g.fillStyle = `rgba(${col},.8)`; g.fillRect(Math.cos(a) * rx * .9 - 2, Math.sin(a) * ry * .9 - 2, 4, 3); }
+      if (h.state === 'active' || h.state === 'done') {
+        const f = h.state === 'done' ? 1 : clamp(h.have / h.need, 0, 1);
+        g.lineWidth = 6; g.lineCap = 'round'; g.strokeStyle = `rgba(${col},.95)`; g.shadowColor = `rgb(${col})`; g.shadowBlur = 12; g.beginPath(); g.ellipse(0, 0, rx * 1.04, ry * 1.04, 0, -Math.PI / 2, -Math.PI / 2 + 6.283 * f); g.stroke(); g.shadowBlur = 0;
+        if (h.state === 'active' && inside) { g.font = '700 22px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#2a2040'; const text = `${h.have} / ${h.need} s`; g.strokeText(text, 0, ry + 34); g.fillStyle = '#fff2c8'; g.fillText(text, 0, ry + 34); }
+      }
+      g.restore();
+    }
+  }
   // ---------- the Wyrdwood: ground, river bridge, storm sky and weather ----------
   const moorK = y => clamp((104 - y) / 10, 0, 1);              // 0 in the south forest, 1 on the Highmoor
   function wyrdGround(x, y, tone, dirt, alt) {
@@ -1638,6 +1761,7 @@
     if (zdef.theme === 'frost') return drawSkyFrost(g, t);
     if (zdef.theme === 'fen') return drawSkyFen(g, t);
     if (zdef.theme === 'wyrd') return drawSkyWyrd(g, t);
+    if (zdef.theme === 'sky') return drawSkySky(g, t);
     if (zdef.theme === 'city') return drawSkyCity(g, t);
     const gr = g.createLinearGradient(0, 0, 0, VH); gr.addColorStop(0, '#5aa0e8'); gr.addColorStop(.6, '#9fd0f5'); gr.addColorStop(1, '#d4ecff');
     g.fillStyle = gr; g.fillRect(0, 0, VW, VH);
@@ -1678,15 +1802,15 @@
     if (p.look === 'stairs_down') { const d = ZONES[p.to]; return VaultArt.stairsDown(g, sx, sy, t, d?.min_level ? `Stairs to ${d.name} · Lv ${d.min_level}+` : 'Stairs down'); }
     if (p.look === 'stairs_up') return VaultArt.stairsUp(g, sx, sy, t);
     if (p.look === 'exit') return VaultArt.exitPortal(g, sx, sy, t, t - clearedAt);
-    const dest = ZONES[p.to] || ZONES[0], warm = dest.theme === 'ember', cold = dest.theme === 'frost', bog = dest.theme === 'fen', gold = dest.theme === 'city', leaf = dest.theme === 'wyrd';
-    const hue = warm ? 18 : cold ? 195 : bog ? 88 : gold ? 44 : leaf ? 28 : 165, half = 1.5;
+    const dest = ZONES[p.to] || ZONES[0], warm = dest.theme === 'ember', cold = dest.theme === 'frost', bog = dest.theme === 'fen', gold = dest.theme === 'city', leaf = dest.theme === 'wyrd', dsky = dest.theme === 'sky';
+    const hue = dsky ? 215 : warm ? 18 : cold ? 195 : bog ? 88 : gold ? 44 : leaf ? 28 : 165, half = 1.5;
     const post = (u) => {                                    // an iso column centred u world units along x
       const px = sx + u * TW / 2, py = sy + u * TH / 2, w = 17, h = 112;
       g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(px, py + 2, 30, 11, 0, 0, 6.283); g.fill();
       g.lineJoin = 'round'; g.lineWidth = 3; g.strokeStyle = OL;
-      g.fillStyle = warm ? '#4a3b44' : cold ? '#7f93ad' : bog ? '#6a7a5c' : leaf ? '#7a5a38' : gold ? '#c9bfa2' : '#8a8f9c'; g.beginPath(); g.moveTo(px - w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
-      g.fillStyle = warm ? '#30262f' : cold ? '#586c86' : bog ? '#46543e' : leaf ? '#5a4028' : gold ? '#a39a80' : '#6a6f7c'; g.beginPath(); g.moveTo(px + w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
-      g.fillStyle = warm ? '#6a5663' : cold ? '#b4cde3' : bog ? '#8a9c74' : leaf ? '#a8825a' : gold ? '#e6dcc0' : '#b9bdc8'; g.beginPath(); g.moveTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.lineTo(px, py - 16 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = dsky ? '#9aa6d0' : warm ? '#4a3b44' : cold ? '#7f93ad' : bog ? '#6a7a5c' : leaf ? '#7a5a38' : gold ? '#c9bfa2' : '#8a8f9c'; g.beginPath(); g.moveTo(px - w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = dsky ? '#6c789e' : warm ? '#30262f' : cold ? '#586c86' : bog ? '#46543e' : leaf ? '#5a4028' : gold ? '#a39a80' : '#6a6f7c'; g.beginPath(); g.moveTo(px + w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = dsky ? '#d8e0f6' : warm ? '#6a5663' : cold ? '#b4cde3' : bog ? '#8a9c74' : leaf ? '#a8825a' : gold ? '#e6dcc0' : '#b9bdc8'; g.beginPath(); g.moveTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.lineTo(px, py - 16 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
       g.shadowColor = `hsl(${hue}, 100%, 60%)`; g.shadowBlur = 10; g.strokeStyle = `hsl(${hue + 12}, 100%, ${60 + 10 * Math.sin(t * 3 + u)}%)`; g.lineWidth = 2.4;
       g.beginPath(); g.moveTo(px - 8, py - 30); g.lineTo(px - 8, py - 62); g.lineTo(px - 3, py - 74); g.moveTo(px + 8, py - 30); g.lineTo(px + 8, py - 54); g.stroke(); g.shadowBlur = 0;
     };
@@ -1726,6 +1850,7 @@
     if (zdef.theme === 'ember') drawLava(g, t);
     if (zdef.theme === 'fen' || zdef.theme === 'wyrd') drawWater(g, t);
     if (zdef.theme === 'wyrd') drawBridges(g, t);
+    if (zdef.theme === 'sky') drawWardRings(g, t);
     // ground decals: splats, target marker, slash, shadows
     for (const who of [hero, ...remotePlayers.values()]) drawBuffRings(g, who, t);
     for (const e of effects) if (e.kind === 'splat') { const [sx, sy] = w2s(e.x, e.y), a = clamp(1 - (e.t - 3) / 3, 0, 1) * .5; g.fillStyle = e.col; g.globalAlpha = a; g.beginPath(); g.ellipse(sx, sy, 26 * e.s, 12 * e.s, 0, 0, 6.283); g.fill(); g.globalAlpha = 1; }
@@ -1734,7 +1859,7 @@
     const list = [], onScreen = (sx, sy, m) => sx > -m && sx < VW + m && sy > -m * 1.6 && sy < VH + m * 1.6;
     const set = spriteSet();
     for (const o of objects) {
-      if (o.kind === 'lava' || o.kind === 'water' || o.kind === 'post') continue;
+      if (o.kind === 'lava' || o.kind === 'water' || o.kind === 'post' || o.kind === 'void') continue;
       const [sx, sy] = w2s(o.x, o.y);
       if (onScreen(sx, sy, 200)) { list.push({ d: o.x + o.y, o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
     }
@@ -1754,7 +1879,7 @@
       if (it.o) {
         const o = it.o;
         if (!set[o.kind]) {
-          const cover=['house','chapel','gate','tent','tower','rampart','meetingstone','grandfountain','vaultwall','pillar','tree','pine','elderash','ribcage','gallows'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
+          const cover=['house','chapel','gate','tent','tower','rampart','meetingstone','grandfountain','vaultwall','pillar','tree','pine','elderash','ribcage','gallows','skypine','prism','column','spirelight','pylon','hallgate','wardstone','windcairn'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
           City.drawObject(g,o,it.sx,it.sy,cover ? .5 : 1);
           City.animateObject(g,o,it.sx,it.sy,t);
           if(o.kind==='fountain') { for(let i=0;i<7;i++){const phase=(t*.7+i*.17)%1;g.globalAlpha=Math.sin(phase*Math.PI)*.7;g.fillStyle='#e0ffff';g.beginPath();g.ellipse(it.sx+Math.sin(i*4)*45,it.sy-9-phase*24,2,3,0,0,Math.PI*2);g.fill();}g.globalAlpha=1;}
@@ -1872,6 +1997,7 @@
     if (zdef.theme === 'frost') drawSnowfall(g, t);
     if (zdef.theme === 'fen') drawFireflies(g, t);
     if (zdef.theme === 'wyrd') drawWyrdWeather(g, t);
+    if (zdef.theme === 'sky') drawSkyWeather(g, t);
     if (zdef.theme === 'city') drawBlossom(g, t);
     if (zdef.theme === 'vault') { drawDarkness(g, t); drawBossBar(g); }
     drawMini();
@@ -1962,16 +2088,17 @@
     g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(mask, 0, 0, w, h); g.restore();
   }
   function buildMini() {
-    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault', wyrd = zdef.theme === 'wyrd';
-    g.fillStyle = vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
-    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : wyrd ? '#b89860' : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
+    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault', wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky';
+    g.fillStyle = sky ? '#1a1838' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
+    if (sky) { for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) { g.fillStyle = map.dirt[y * MAP + x] ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .5, k + .5); } }
+    else for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : wyrd ? '#b89860' : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
     if (wyrd) { const gr = g.createLinearGradient(0, 0, 0, 144); gr.addColorStop(0, 'rgba(120,128,92,.95)'); gr.addColorStop(.42, 'rgba(120,128,92,.9)'); gr.addColorStop(.56, 'rgba(120,128,92,0)'); g.fillStyle = gr; g.fillRect(0, 0, 144, 144); for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = '#c4b290'; if (y < MAP * .5) g.fillRect(x * k, y * k, k + .5, k + .5); } }
     if (zdef.city && !city) for (const c of [zdef.city, ...(zdef.camps || [])]) {
-      g.fillStyle=wyrd ? '#8a6a44' : fen ? '#6a5238' : frost ? '#8fa6bd' : ember ? '#88705d' : '#d8cbb0'; g.fillRect(c.x0*k,c.y0*k,(c.x1-c.x0)*k,(c.y1-c.y0)*k);
+      g.fillStyle=sky ? '#cdd2f2' : wyrd ? '#8a6a44' : fen ? '#6a5238' : frost ? '#8fa6bd' : ember ? '#88705d' : '#d8cbb0'; g.fillRect(c.x0*k,c.y0*k,(c.x1-c.x0)*k,(c.y1-c.y0)*k);
       g.fillStyle=wyrd ? '#ffd9a0' : fen ? '#ffe08a' : frost ? '#ffd27a' : ember ? '#ffb65c' : '#68bcc6'; g.beginPath();g.arc(c.plaza.x*k,c.plaza.y*k,3,0,Math.PI*2);g.fill();
     }
     for (const o of objects) {
-      if (o.kind === 'post') continue;
+      if (o.kind === 'post' || o.kind === 'void') continue;
       if (vault) { if (o.kind === 'brazier') { g.fillStyle = '#ff9a3a'; g.fillRect(o.x * k - 1, o.y * k - 1, 2, 2); } continue; }
       if (city && o.width) {                                                          // buildings and walls as footprints
         g.fillStyle = o.kind === 'rampart' ? '#6f7078' : o.kind === 'tower' ? '#3f6a8a' : o.kind === 'stall' ? '#e0a040' : o.kind === 'house' || o.kind === 'chapel' ? o.color : '#8a7a62';
@@ -1981,7 +2108,7 @@
       g.fillStyle = o.kind === 'lava' ? '#ff6a2a' : o.kind === 'ice' ? '#4f93c8' : o.kind === 'water' ? (wyrd ? '#2f6f9a' : '#244f5c') : o.kind === 'crag' ? '#4a4a58' : o.kind === 'pine' ? '#1f4a3a' : o.kind === 'beacon' ? '#ff9a2e' : o.kind === 'gallows' || o.kind === 'ribcage' ? '#d8d0b8' : o.kind === 'elderash' ? '#8a5a2a' : o.kind === 'thicket' ? '#6a2f58' : o.kind === 'tree' ? (wyrd ? '#a8451e' : fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a') : o.kind === 'spire' ? (wyrd ? '#d8d8c8' : fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e') : o.kind === 'rock' ? (wyrd ? '#7a7a80' : fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8') : (fen ? '#3f6a35' : frost ? '#3a7a70' : ember ? '#5a3a30' : '#2f8a45');
       g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'water' ? 1.6 : o.kind === 'ice' || o.kind === 'thicket' ? 1.7 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
     }
-    for (const p of zdef.portals) { if (p.after_clear && !instanceCleared) continue; g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
+    for (const p of zdef.portals) { if (p.after_clear && !instanceCleared) continue; g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'sky' ? '#9fc4ff' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
     miniBase = c;
   }
   function drawMini() {
@@ -2019,7 +2146,7 @@
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
       if (o.slimeSprites) loadSlimeSprites(o.slimeSprites);
-      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadVaultSprites();
+      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadSkySprites(); loadVaultSprites();
       if (!Field._bound) {
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize);
@@ -2091,8 +2218,8 @@
     get hunterSprites() { return isHunter() ? mageSpr : null; },
     get hero() { return hero; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
-    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get vaultSprites() { return vaultSrc; },
-    get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; },
+    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get vaultSprites() { return vaultSrc; },
+    get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
     _debug: { get effects() { return effects; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll) },
   };
   window.Field = Field;

@@ -1134,7 +1134,7 @@ pub struct AmbushDef {
     pub r: f64,
     pub tag: String,
 }
-/// A named spot a `visit` objective can name (a beacon, a glade, a standing stone).
+/// A named spot a `visit` or `hold` objective can name (a beacon, a glade, a standing stone, a ward).
 #[derive(Clone, Deserialize)]
 pub struct Place {
     pub id: String,
@@ -1142,6 +1142,15 @@ pub struct Place {
     pub x: f64,
     pub y: f64,
     pub r: f64,
+    /// A ward a `hold` objective names: when the hero's own progress reaches `at` seconds, every sleeping enemy
+    /// tagged `tag` attacks (world/hold.rs).
+    #[serde(default)]
+    pub waves: Vec<Wave>,
+}
+#[derive(Clone, Deserialize)]
+pub struct Wave {
+    pub at: u32,
+    pub tag: String,
 }
 impl Npc {
     /// Where this NPC stands at world time `time` (seconds). client/city.js `routePoint` computes the same thing.
@@ -1196,7 +1205,7 @@ pub struct SlimeSpawn {
     pub x: f64,
     pub y: f64,
     pub kind: String,
-    /// An ambusher: the escort ("<npc id>#<n>") whose journey wakes it. It sleeps (dead, never respawning) until then.
+    /// An ambusher: the escort ("<npc id>#<n>") or ward wave ("<place id>#<n>") that wakes it. It sleeps (dead, never respawning) until then.
     #[serde(default)]
     pub ambush: Option<String>,
     /// Filled in when the zones' spawns are flattened into the world's enemy list.

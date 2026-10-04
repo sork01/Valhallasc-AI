@@ -33,8 +33,10 @@
   }
   function objectives(quest) {
     const p = state(quest);
-    return quest.objectives.map((o, i) => `${o.label}: ${p?.claimed ? o.count : p?.counts[i] || 0}/${o.count}`);
+    return quest.objectives.map((o, i) => `${o.label}: ${p?.claimed ? o.count : p?.counts[i] || 0}/${o.count}${unit(o)}`);
   }
+  // A `hold` objective counts seconds of channelling in a ward.
+  const unit = o => o.kind === 'hold' ? ' s' : '';
   function gearReward(quest, container) {
     const i = (window.WORLD_ITEMS || []).find(i => i.id === quest.rewardItem);
     if (!i) return;
@@ -46,7 +48,7 @@
   function mates(quest) {
     return (window.Social?.questMates?.(quest.id) || []).map(m => {
       const done = quest.objectives.every((o, i) => (m.counts[i] || 0) >= o.count);
-      const text = quest.objectives.map((o, i) => `${Math.min(m.counts[i] || 0, o.count)}/${o.count}`).join(' · ');
+      const text = quest.objectives.map((o, i) => `${Math.min(m.counts[i] || 0, o.count)}/${o.count}${unit(o)}`).join(' · ');
       return { name: m.name, done, text };
     });
   }
@@ -109,7 +111,7 @@
       if (status(quest) === 'ready') row.append(element('small', `✓ ${quest.autoLevel ? 'Report to' : 'Return to'} ${giver(quest).name} for your reward`, 'tracker-objective complete'));
       else quest.objectives.forEach((o, i) => {
         const count = Math.min(state(quest)?.counts[i] || 0, o.count), done = count >= o.count;
-        row.append(element('small', `${done ? '✓' : '•'} ${o.label}: ${count}/${o.count}`, `tracker-objective${done ? ' complete' : ''}`));
+        row.append(element('small', `${done ? '✓' : '•'} ${o.label}: ${count}/${o.count}${unit(o)}`, `tracker-objective${done ? ' complete' : ''}`));
       });
       const party = mates(quest);
       if (party.length) { const line = element('small', `Party: ${party.map(m => m.name).join(', ')}`, 'tracker-objective tracker-party'); line.dataset.partyQuest = String(party.length); row.append(line); }
@@ -174,6 +176,18 @@
     },
     // Whether any of your quests has a `visit` objective for this place that is done (a beacon you have lit).
     visited(placeId) { return definitions.some(q => q.objectives.some((o, i) => o.kind === 'visit' && o.target === placeId && (state(q)?.claimed || (state(q)?.counts[i] || 0) >= o.count))); },
+    // Your progress at a ward (a place a `hold` objective names): 'active' while a quest of yours still needs it, 'done' once it holds, else 'none'.
+    hold(placeId) {
+      let out = { state: 'none', have: 0, need: 0 };
+      for (const q of definitions) q.objectives.forEach((o, i) => {
+        if (o.kind !== 'hold' || o.target !== placeId) return;
+        const p = state(q); if (!p) return;
+        const have = p.claimed ? o.count : Math.min(p.counts[i] || 0, o.count);
+        if (have < o.count) out = { state: 'active', have, need: o.count };
+        else if (out.state !== 'active') out = { state: 'done', have, need: o.count };
+      });
+      return out;
+    },
     reset() { progress = []; signature = ''; tracked = null; close(false); render(); },
     update(next) { const key = `${Field.zone}:` + JSON.stringify(next); if (key === signature) return; progress = next; signature = key; render(); },
     // What an NPC's conversation lists, in World of Warcraft order: turn-ins, new quests, then quests still in progress.

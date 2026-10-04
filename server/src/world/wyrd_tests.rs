@@ -6,10 +6,10 @@ const SKALD: usize = 4;
 const WYRD: usize = 6;
 const STEP: f64 = 1.;
 
-fn world() -> World {
+pub(super) fn world() -> World {
     World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)
 }
-fn join(w: &mut World, id: u64, class: Class) -> mpsc::Receiver<Value> {
+pub(super) fn join(w: &mut World, id: u64, class: Class) -> mpsc::Receiver<Value> {
     let (tx, rx) = mpsc::channel(4096);
     let look = Look {
         class,
@@ -18,11 +18,11 @@ fn join(w: &mut World, id: u64, class: Class) -> mpsc::Receiver<Value> {
     w.join(id, None, Some(look), tx).unwrap();
     rx
 }
-fn drain(rx: &mut mpsc::Receiver<Value>) -> Vec<Value> {
+pub(super) fn drain(rx: &mut mpsc::Receiver<Value>) -> Vec<Value> {
     std::iter::from_fn(|| rx.try_recv().ok()).collect()
 }
 /// Every notice and system line the player was sent, as text.
-fn lines(rx: &mut mpsc::Receiver<Value>) -> Vec<String> {
+pub(super) fn lines(rx: &mut mpsc::Receiver<Value>) -> Vec<String> {
     drain(rx)
         .into_iter()
         .filter(|v| matches!(v["type"].as_str(), Some("notice" | "system" | "dialogue")))
@@ -34,14 +34,14 @@ fn lines(rx: &mut mpsc::Receiver<Value>) -> Vec<String> {
         })
         .collect()
 }
-fn place(w: &mut World, session: u64, zone: usize, at: Point) {
+pub(super) fn place(w: &mut World, session: u64, zone: usize, at: Point) {
     let c = &mut w.players.get_mut(&session).unwrap().character;
     c.zone = zone;
     c.x = at.x;
     c.y = at.y;
     c.hp = c.max_hp();
 }
-fn at(x: f64, y: f64) -> Point {
+pub(super) fn at(x: f64, y: f64) -> Point {
     Point { x, y }
 }
 fn npc(w: &World, id: &str) -> Npc {
@@ -61,7 +61,7 @@ fn quest(w: &World, id: &str) -> Quest {
         .clone()
 }
 /// Everything that moves in the Wyrdwood is put to sleep except what a test wants.
-fn calm(w: &mut World) {
+pub(super) fn calm(w: &mut World) {
     for s in w.slimes.iter_mut() {
         s.dead = true;
         s.respawn = 1e9;
@@ -69,10 +69,10 @@ fn calm(w: &mut World) {
 }
 
 // ---- a coarse walking grid: the same obstacles as Map::collide, rasterised --------------------------------------------------
-fn grid_size(map: &Map) -> usize {
+pub(super) fn grid_size(map: &Map) -> usize {
     (map.size as f64 / STEP) as usize
 }
-fn blocked(map: &Map, extra: &[(f64, f64, f64)]) -> Vec<bool> {
+pub(super) fn blocked(map: &Map, extra: &[(f64, f64, f64)]) -> Vec<bool> {
     let n = grid_size(map);
     let mut grid = vec![false; n * n];
     let r = PLAYER_RADIUS;
@@ -124,7 +124,7 @@ fn blocked(map: &Map, extra: &[(f64, f64, f64)]) -> Vec<bool> {
     }
     grid
 }
-fn flood(map: &Map, grid: &[bool], from: Point) -> Vec<bool> {
+pub(super) fn flood(map: &Map, grid: &[bool], from: Point) -> Vec<bool> {
     let n = grid_size(map);
     let start = ((from.y / STEP) as usize) * n + (from.x / STEP) as usize;
     let mut seen = vec![false; n * n];
@@ -147,7 +147,7 @@ fn flood(map: &Map, grid: &[bool], from: Point) -> Vec<bool> {
     }
     seen
 }
-fn reached(map: &Map, seen: &[bool], p: Point) -> bool {
+pub(super) fn reached(map: &Map, seen: &[bool], p: Point) -> bool {
     seen[((p.y / STEP) as usize) * grid_size(map) + (p.x / STEP) as usize]
 }
 /// A straight walk from a to b with the real collision: true when nothing stops it.
@@ -665,7 +665,7 @@ fn skaldholm_flies_to_both_wyrdwood_hubs_through_the_east_gate_for_twenty_gold_a
     );
     assert_eq!(
         npc(&w, "travel_skuldwatch").travel_links,
-        ["travel_hollowmoot"]
+        ["travel_hollowmoot", "travel_perch"]
     );
     {
         let c = &mut w.players.get_mut(&1).unwrap().character;

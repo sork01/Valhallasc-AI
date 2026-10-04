@@ -9369,6 +9369,41 @@
     "sell": 1100
   },
   {
+    "id": "gale_fang",
+    "name": "Gale Fang",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 400
+  },
+  {
+    "id": "prism_shard",
+    "name": "Prism Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 430
+  },
+  {
+    "id": "stormray_wing",
+    "name": "Stormray Wing",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 460
+  },
+  {
+    "id": "rune_token",
+    "name": "Worn Rune Token",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 500
+  },
+  {
+    "id": "thunderroc_quill",
+    "name": "Thunderroc Quill",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 580
+  },
+  {
     "id": "warrior_armor_crimson_l20_vault",
     "name": "Hollowsteel Cuirass",
     "kind": "armor",

@@ -577,6 +577,27 @@ def check(zone):
     return problems
 
 
+def open_stormrift(zone, world):
+    """The Stormrift in the summit court's north-west corner: a ring of standing stones round a portal up to Bifrost Reach.
+    Done after the zone is built and only when Bifrost Reach exists, so no random number is drawn and the rest of the zone is
+    unchanged; scenery in the clearing goes. Idempotent."""
+    import sky_layout as S
+    if not any(z['name'] == S.NAME for z in world['zones']):
+        return
+    gx, gy = S.WYRD_GATE
+    zone['objects'] = [o for o in zone['objects'] if o['kind'] not in ('tree', 'pine', 'bush', 'rock', 'spire', 'post', 'bones', 'crag')
+                       or math.hypot(o['x'] - gx, o['y'] - gy) > 8.0 or o.get('place')]
+    zone['objects'] = [o for o in zone['objects'] if o.get('rift') is None]
+    for i in range(7):
+        a = 2 * math.pi * i / 7 + .3
+        zone['objects'].append(obj('spire', gx + 3.6 * math.cos(a), gy + 3.6 * math.sin(a), .55, i % 4, rift=1))
+    zone['portals'] = [p for p in zone['portals'] if p['id'] != 'sky_gate']
+    zone['portals'].append({'id': 'sky_gate', 'name': 'the Stormrift', 'x': gx, 'y': gy, 'r': 1.3, 'to': 7, 'tx': S.ARRIVAL[0], 'ty': S.ARRIVAL[1]})
+    # the summit court's arrival point must be free ground
+    wx, wy = S.WYRD_ARRIVAL
+    assert not any(math.hypot(o['x'] - wx, o['y'] - wy) < o['r'] + 1.0 for o in zone['objects'] if o.get('r')), 'the Stormrift arrival is blocked'
+
+
 def add_materials():
     items = json.loads(ITEMS.read_text())
     have = {i['id'] for i in items}
@@ -606,8 +627,12 @@ def main():
     assert json.dumps(world, indent=2) + '\n' == raw, 'map.txt is not in the canonical 2-space JSON layout'
     names = [z['name'] for z in world['zones']]
     assert names[:5] == ['Emberfall Crags', 'Rimeveil Glacier', 'Gloamfen', 'Skaldholm', 'The Undervault'], f'unexpected zones {names}'
-    world['zones'] = [z for z in world['zones'] if z['name'] != L.NAME] + [zone]
-    assert len(world['zones']) == 6, 'the Wyrdwood must be zone 6'
+    # a rebuild keeps every later zone (Bifrost Reach) and puts the Wyrdwood back in the same place
+    others = [z for z in world['zones'] if z['name'] != L.NAME]
+    at = names.index(L.NAME) if L.NAME in names else len(others)
+    world['zones'] = others[:at] + [zone] + others[at:]
+    assert world['zones'][5]['name'] == L.NAME, 'the Wyrdwood must be zone 6'
+    open_stormrift(zone, world)
     skald = world['zones'][3]
     assert any(p['id'] == 'wyrd_gate' for p in skald['portals']), 'run generate_skaldholm.py first: Skaldholm has no East Gate'
     spark_travel.ensure(world)

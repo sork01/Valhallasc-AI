@@ -40,6 +40,10 @@ PROGRESSION = {
         'wyrd_onward', 'The Road East', 'wyrd_warden', 22, 500,
         'Skaldholm is not the end of the road. Leave the city by the East Gate at the end of the Trade Road and walk into the Wyrdwood, where the forest has begun to go wrong. Find Hollowmoot beneath the Elder Ash and report to Moot-Warden Bjorn Oakhand.',
         'Travel to the Wyrdwood'),
+    'Bifrost Reach': (
+        'sky_onward', 'Up Through the Rift', 'sky_warden', 30, 600,
+        'The Highmoor has taught you all it can. In the north-west corner of the summit court, beyond the second ridge, lightning has begun to rise instead of fall: walk into the Stormrift, climb into the sky and report to Shieldmaiden Sigrun Cloudwatcher at Heimdall\'s Perch.',
+        'Travel to Bifrost Reach'),
 }
 
 

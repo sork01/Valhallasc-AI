@@ -12,6 +12,7 @@ use tokio::sync::{mpsc, oneshot, watch};
 mod consumables;
 mod debug;
 mod escort;
+mod hold;
 mod instances;
 mod mercs;
 mod partyxp;
@@ -21,6 +22,8 @@ mod ranged;
 mod resource_tests;
 mod resources;
 mod rolls;
+#[cfg(test)]
+mod sky_tests;
 mod social;
 mod travel;
 #[cfg(test)]
@@ -328,6 +331,13 @@ impl Slime {
             "ram" => (11500., 255., 3.4, 1.5),
             "oakhorn" => (60000., 1300., 2.8, 2.),
             "hrungnir" => (150000., 2600., 2.2, 2.3),
+            // Bifrost Reach (levels 30-35): a fast cloud-wolf, a slamming crystal golem, a lightning-shooting ray,
+            // a sword-and-shield dead hero and a diving storm roc.
+            "galehound" => (12500., 275., 3.8, 1.35),
+            "prismgolem" => (17500., 330., 1.9, 1.8),
+            "skyray" => (13500., 300., 2.8, 1.5),
+            "einherjar" => (18500., 370., 2.6, 1.35),
+            "thunderroc" => (22000., 440., 3.2, 1.75),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -361,6 +371,11 @@ impl Slime {
             "weaver" => 27,
             "ram" => 29,
             "hrungnir" => 30,
+            "galehound" => 30,
+            "prismgolem" => 31,
+            "skyray" => 32,
+            "einherjar" => 33,
+            "thunderroc" => 35,
             _ => 2,
         }
     }
@@ -397,6 +412,11 @@ impl Slime {
             "ram" => 400,
             "oakhorn" => 2000,
             "hrungnir" => 3000,
+            "galehound" => 430,
+            "prismgolem" => 460,
+            "skyray" => 490,
+            "einherjar" => 520,
+            "thunderroc" => 600,
             _ => 0,
         }
     }
@@ -434,6 +454,11 @@ impl Slime {
             // Oakhorn lowers its antlers for a full second before the stampede.
             "oakhorn" => (1., 1.5, 12., 10.),
             "hrungnir" => (0.9, 1.9, 7., 14.),
+            "galehound" => (0.28, 0.85, 12., 10.),
+            "prismgolem" => (0.8, 1.7, 6., 7.5),
+            "skyray" => (0.5, 1.8, 0., 12.),
+            "einherjar" => (0.55, 1.3, 7.5, 8.5),
+            "thunderroc" => (0.35, 1.0, 13., 11.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -449,6 +474,7 @@ impl Slime {
             "crow" => (11., 11., "#c9d2e8", 0.5, 2, 0.16),
             "weaver" => (11., 8.5, "#ffd86b", 0.9, 3, 0.3),
             "hrungnir" => (13., 14., "#bfe8ff", 1.1, 3, 0.22),
+            "skyray" => (12., 12., "#9fe8ff", 0.7, 2, 0.18),
             _ => return None,
         };
         Some(Ranged {
@@ -476,6 +502,7 @@ impl Slime {
             "colossus" => 4.,
             "hollowking" => 3.2,
             "troll" => 2.6,
+            "prismgolem" => 3.0,
             "hrungnir" => 3.6,
             _ => 0.,
         }
@@ -654,6 +681,8 @@ pub struct World {
     pub test_commands: bool,
     // Friend requests, party invites and parties. Nothing here is persisted except `Character::friends`.
     social: social::Social,
+    // Hold objectives in progress (world/hold.rs).
+    hold: hold::Holds,
 }
 impl World {
     // Production code reads VALHALLA_LEVEL_SPREAD in main; tests that want real random levels use this.
@@ -702,6 +731,7 @@ impl World {
             start_level: 1,
             test_commands: false,
             social: social::Social::default(),
+            hold: hold::Holds::default(),
         };
         for id in 0..world.spawns.len() {
             let enemy = world.fresh_enemy(id);
@@ -1453,6 +1483,7 @@ impl World {
         self.update_instances();
         self.update_mercenaries();
         self.update_escorts();
+        self.update_holds();
         let sessions: Vec<_> = self.players.keys().copied().collect();
         for session in sessions {
             self.update_food(session);
@@ -2498,7 +2529,10 @@ impl World {
                         } else if d > r.range * 0.85 {
                             goal = Some(point);
                         } else if d < r.range * 0.35
-                            && matches!(s.kind.as_str(), "archer" | "acolyte" | "crow" | "weaver")
+                            && matches!(
+                                s.kind.as_str(),
+                                "archer" | "acolyte" | "crow" | "weaver" | "skyray"
+                            )
                         {
                             // Too close for comfort: back away from the hero while the shot recovers.
                             let away = point.direction(s.point());
@@ -4142,7 +4176,10 @@ mod tests {
             }
         }
         found.sort();
-        assert_eq!(found, vec![(5, 1), (10, 2), (15, 3), (20, 4), (22, 6)]);
+        assert_eq!(
+            found,
+            vec![(5, 1), (10, 2), (15, 3), (20, 4), (22, 6), (30, 7)]
+        );
     }
 
     #[test]
@@ -4289,7 +4326,7 @@ mod tests {
                         ),
                         "bring" => assert!(item(&o.target).is_some_and(|i| i.kind == "material")),
                         "reach" => assert!(w.maps.iter().any(|m| m.name == o.target)),
-                        "visit" => assert!(area.places.iter().any(|p| p.id == o.target)),
+                        "visit" | "hold" => assert!(area.places.iter().any(|p| p.id == o.target)),
                         "escort" => assert!(
                             area.npcs
                                 .iter()
@@ -4472,7 +4509,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 7);
+        assert_eq!(zone_count(&w), 8);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -5075,7 +5112,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 7);
+        assert_eq!(zone_count(&w), 8);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -5668,8 +5705,8 @@ mod tests {
         let map = &w.maps[CITY];
         assert_eq!(
             zone_count(&w),
-            7,
-            "Skaldholm is the fifth map, the Undervault the sixth and the Wyrdwood the seventh"
+            8,
+            "Skaldholm is the fifth map, the Undervault the sixth, the Wyrdwood the seventh and Bifrost Reach the eighth"
         );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
@@ -7374,7 +7411,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 7);
+        assert_eq!(zone_count(&w), 8);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));

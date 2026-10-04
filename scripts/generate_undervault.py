@@ -233,7 +233,7 @@ def main():
     missing = check(zone)
     if missing:
         raise SystemExit(f'Undervault problems: {missing}')
-    meadow['zones'] = zones[:4] + [zone]
+    meadow['zones'] = zones[:4] + [zone] + zones[5:]
     PATH.write_text(json.dumps(meadow, indent=2) + '\n')
     add_materials()
     kinds = {}
