@@ -70,7 +70,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
 
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, size: z.size, levels: z.levels, portals: z.portals.map(p => p.id + '>' + p.to), water: z.objects.filter(o => o.kind === 'water').length, thicket: z.objects.filter(o => o.kind === 'thicket').length })));
-  check(zones.length === 9 && zones[3].name === 'Gloamfen' && zones[3].theme === 'fen' && zones[3].size === 128 && zones[3].levels.join() === '15,20', 'The client knows the fen: name, fen theme, 128 tiles, levels 15-20');
+  check(zones.length === 10 && zones[3].name === 'Gloamfen' && zones[3].theme === 'fen' && zones[3].size === 128 && zones[3].levels.join() === '15,20', 'The client knows the fen: name, fen theme, 128 tiles, levels 15-20');
   check(zones[2].portals.join() === 'crags_gate>1,fen_gate>3,city_gate>4' && zones[3].portals.join() === 'summit_gate>2', 'The glacier summit has a gate to the fen, which has the gate back');
   check(zones[3].water > 150 && zones[3].thicket > 100, `The fen has a lake of ${zones[3].water} water discs and ${zones[3].thicket} thicket blocks`);
   check(await page.evaluate(stub => { const m = Field.fenSprites.meta; return m.kinds.join() === 'toad,croc,knight,hydra,gloomroot' && (stub || m.kinds.every(k => Field.fenSprites.img[k].naturalWidth === 768 && Field.fenSprites.img[k].naturalHeight === 480)); }, STUB), 'The four fen monster atlases are loaded (768x480 on the real art)');

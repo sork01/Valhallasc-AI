@@ -15,7 +15,8 @@ STOPS = [
     # Bifrost Reach: the flight from Skuldwatch crosses the Highmoor to the Stormrift and climbs the rift.
     ("Heimdall's Perch", 'travel_perch', 86, 135, ['travel_skuldwatch', 'travel_keelhaven']),
     # Ran's Deep: the flight from the Perch dives off the Eyrie's storm and down the Maelstrom.
-    ('Keelhaven', 'travel_keelhaven', 86, 154, ['travel_perch']),
+    ('Keelhaven', 'travel_keelhaven', 86, 154, ['travel_perch', 'travel_nacrehold']),
+    ('Nacrehold', 'travel_nacrehold', 100, 164, ['travel_keelhaven']),
 ]
 
 
@@ -31,6 +32,9 @@ def ensure(world):
                               look=dict(hair='#e4edf4', skin='#edc5a1', style='long', hat='hood', hatColor='#328e97'),
                               dialogue='This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.',
                               offers=[], buys=False)
+                if name == 'Nacrehold':
+                    master.update(name='Travel Master Auralis', role='Mermaid · Spark Travel')
+                    master['look'].update(species='merfolk', female=True, tail='#81d6cc', skin='#abd4e4')
                 folk = area.setdefault('npcs', [])
                 old = next((i for i, n in enumerate(folk) if n['id'] == id_), None)
                 if old is None:

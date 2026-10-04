@@ -8,10 +8,10 @@
   const NS = 'http://www.w3.org/2000/svg';
   const STAGE = { w: 100, h: 62 };
   // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm -> the Wyrdwood -> Bifrost Reach, up the Stormrift -> Ran's Deep, down the Maelstrom.
-  const LAYOUT = [{ x: 2, y: 42, s: 15 }, { x: 19, y: 28, s: 15 }, { x: 35, y: 8, s: 20 }, { x: 12, y: 3, s: 20 }, { x: 48, y: 32, s: 21 }, { x: 30, y: 44, s: 16 }, { x: 72, y: 24, s: 28 }, { x: 59, y: 2, s: 20 }, { x: 80, y: 1, s: 19 }];
-  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550' };
-  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a' };
-  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8' };
+  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18}];
+  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776' };
+  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3' };
+  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6' };
   const BLURB = {
     meadow: 'Green pastures round the walled town of Alderhaven.',
     ember: 'Lava fords and ash-grey crags above Cinderwatch Camp.',
@@ -20,6 +20,7 @@
     wyrd: 'An autumn forest, a troll bridge and a storm-wracked moor, between Hollowmoot and Skuldwatch.',
     sky: 'Floating islands over the storm, joined by rainbow-shard bridges, around Heimdall\'s Perch.',
     deep: 'The sea floor under the storm: the Shallows round Keelhaven and the Net, a labyrinth of living coral with Ran\'s Court at its heart.',
+    nacre: 'A peaceful merfolk city of 120 shell homes, coral gardens and a Meeting Stone beside the sealed Drowned Cathedral.',
     vault: 'A dungeon of bones and torchlight under the Meeting Stone, for a party of five.',
   };
   // Base level and a dot colour for every enemy kind (the level matches Slime::default_level in server/src/world.rs;
@@ -113,7 +114,7 @@
       case 'bones': return '#d6cfb6';
       case 'tower': return '#3f6a8a';
       case 'stall': return '#e0a040';
-      case 'house': case 'chapel': return o.color || '#a08060';
+      case 'nacrehouse': case 'nacrestall': case 'house': case 'chapel': return o.color || '#a08060';
       case 'bush': return fen ? '#3f6a3a' : frost ? '#4a8a78' : ember ? '#3a2a30' : '#2f8a45';
       default: return '#8a7a62';
     }
@@ -139,7 +140,7 @@
       else if (r.r0 !== undefined) { g.lineWidth = (r.r1 - r.r0) * k; g.beginPath(); g.arc(r.x * k, r.y * k, (r.r0 + r.r1) / 2 * k, 0, 6.283); g.stroke(); }
       else { g.beginPath(); g.arc(r.x * k, r.y * k, r.r * k, 0, 6.283); g.fill(); }
     }
-    if (z.city && z.theme !== 'city') for (const t of [z.city, ...(z.camps || [])]) {
+    if (z.city && z.theme !== 'city' && z.theme !== 'nacre') for (const t of [z.city, ...(z.camps || [])]) {
       g.fillStyle = { meadow: '#d8cbb0', ember: '#88705d', frost: '#8fa6bd', fen: '#6a5238', wyrd: '#8a6a44', sky: '#cdd2f2', deep: '#4a7a82' }[z.theme];
       g.fillRect(t.x0 * k, t.y0 * k, (t.x1 - t.x0) * k, (t.y1 - t.y0) * k);
     }
@@ -151,7 +152,7 @@
       if (o.kind === 'grandfountain' || o.kind === 'fountain' || o.kind === 'meetingstone') { g.fillStyle = o.kind === 'meetingstone' ? '#59d9ff' : '#58a8d8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2, (o.r || 1) * k), 0, 6.283); g.fill(); continue; }
       g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(1, (RADIUS[o.kind] || .8) * k), 0, 6.283); g.fill();
     }
-    if (z.city && z.theme !== 'city') for (const t of [z.city, ...(z.camps || [])]) { g.fillStyle = '#ffe9a0'; g.beginPath(); g.arc(t.plaza.x * k, t.plaza.y * k, Math.max(2, 2.4 * k), 0, 6.283); g.fill(); }
+    if (z.city && z.theme !== 'city' && z.theme !== 'nacre') for (const t of [z.city, ...(z.camps || [])]) { g.fillStyle = '#ffe9a0'; g.beginPath(); g.arc(t.plaza.x * k, t.plaza.y * k, Math.max(2, 2.4 * k), 0, 6.283); g.fill(); }
     for (const n of z.npcs || []) { g.fillStyle = '#f5d477'; g.beginPath(); g.arc(n.x * k, n.y * k, Math.max(1, .55 * k), 0, 6.283); g.fill(); }
     cache.set(key, c); return c;
   }

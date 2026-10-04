@@ -290,8 +290,8 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         );
     }
     // the dungeon copies come after every file zone
-    assert_eq!(w.maps.len(), 12);
-    assert!(w.maps[9].template.is_some());
+    assert_eq!(w.maps.len(), 13);
+    assert!(w.maps[10].template.is_some());
 }
 
 // ---- the Net ------------------------------------------------------------------------------------------------------------------
@@ -793,7 +793,10 @@ fn the_deep_progression_quest_comes_at_level_thirty_five_and_completes_on_arriva
 #[test]
 fn the_deep_spark_master_links_keelhaven_to_the_perch() {
     let w = world();
-    assert_eq!(npc(&w, "travel_keelhaven").travel_links, ["travel_perch"]);
+    assert_eq!(
+        npc(&w, "travel_keelhaven").travel_links,
+        ["travel_perch", "travel_nacrehold"]
+    );
     assert_eq!(
         w.maps[SKY]
             .npcs

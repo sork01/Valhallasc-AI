@@ -629,8 +629,11 @@ def main():
     assert json.dumps(world, indent=2) + '\n' == raw, 'map.txt is not in the canonical 2-space JSON layout'
     names = [z['name'] for z in world['zones']]
     assert names[:7] == ['Emberfall Crags', 'Rimeveil Glacier', 'Gloamfen', 'Skaldholm', 'The Undervault', 'Wyrdwood', 'Bifrost Reach'], f'unexpected zones {names}'
-    world['zones'] = [z for z in world['zones'] if z['name'] != L.NAME] + [zone]
-    assert len(world['zones']) == 8, "Ran's Deep must be zone 8"
+    later = world['zones'][8:]
+    world['zones'] = world['zones'][:7] + [zone] + later
+    if any(z['name'] == 'Nacrehold' for z in later):
+        from generate_nacrehold import open_tideway
+        open_tideway(zone)
     open_maelstrom(world['zones'][6], world)
     spark_travel.ensure(world)
     PATH.write_text(json.dumps(world, indent=2) + '\n')

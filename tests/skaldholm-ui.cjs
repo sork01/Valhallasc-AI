@@ -47,7 +47,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, size: z.size, levels: z.levels, portals: z.portals.map(p => p.id + '>' + p.to), roads: (z.roads || []).length,
     houses: z.objects.filter(o => o.kind === 'house' && o.sign === 'live').length, kinds: [...new Set(z.objects.map(o => o.kind))].sort().join(), slimes: (z.slimes || []).length, npcs: (z.npcs || []).length, walkers: (z.npcs || []).filter(n => n.route).length })));
-  check(zones.length === 9 && zones[4].name === 'Skaldholm' && zones[4].theme === 'city' && zones[4].size === 160 && !zones[4].levels && zones[4].slimes === 0, 'The client knows the city: name, city theme, 160 tiles, no levels, no enemies');
+  check(zones.length === 10 && zones[4].name === 'Skaldholm' && zones[4].theme === 'city' && zones[4].size === 160 && !zones[4].levels && zones[4].slimes === 0, 'The client knows the city: name, city theme, 160 tiles, no levels, no enemies');
   check(zones[2].portals.join() === 'crags_gate>1,fen_gate>3,city_gate>4' && zones[4].portals.join() === 'glacier_gate>2,undervault_stairs>5,wyrd_gate>6', 'The glacier summit has a second gate to the city, which has the gate back');
   check(zones[4].houses >= 100 && zones[4].roads >= 15 && ['rampart', 'tower', 'grandfountain', 'meetingstone'].every(k => zones[4].kinds.includes(k)), `The city has ${zones[4].houses} signed houses, ${zones[4].roads} road shapes, a wall, towers, the fountain and the stone`);
   check(zones[4].npcs >= 40 && zones[4].walkers >= 12, `${zones[4].npcs} townspeople, ${zones[4].walkers} of them walkers`);

@@ -67,7 +67,7 @@ const look = page => page.evaluate(() => {
 
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, portals: z.portals.length, enemies: z.slimes?.length })));
-  check(zones.length === 9 && zones[1].name === 'Emberfall Crags' && zones[1].theme === 'ember' && zones[2].name === 'Rimeveil Glacier', 'The client knows all nine zones');
+  check(zones.length === 10 && zones[1].name === 'Emberfall Crags' && zones[1].theme === 'ember' && zones[2].name === 'Rimeveil Glacier', 'The client knows all nine zones');
   check(await page.evaluate(stub => { const m = Field.cragSprites.meta; return m.kinds.join() === 'wisp,spider,wraith,golem,cinderlord' && (stub || m.kinds.every(k => Field.cragSprites.img[k].naturalWidth === 768 && Field.cragSprites.img[k].naturalHeight === 480)); }, STUB), 'All five monster atlases load at their documented size');
   check(await page.evaluate(() => Field.zone === 0 && document.getElementById('area-title').textContent.includes('Greenmeadow')), 'The hero starts in Greenmeadow');
   const meadow = await look(page);

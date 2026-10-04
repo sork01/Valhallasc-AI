@@ -2710,6 +2710,125 @@ const scenarios = {
     },
   },
 
+  nacrehold: {
+    description: 'Nacrehold: real paired Tideway entries, safe houses and authoritative collision, local view isolation, merfolk dialogue, services, Meeting Stone hire/dismiss, Spark discovery and flight, persisted city and quests after Rust restart.',
+    startLevel: 40,
+    async run(w, check) {
+      const bot = 'Pearlwalker', watcher = 'Surface';
+      await w.connect({ bot, class: 'warrior' });
+      await w.connect({ bot: watcher, class: 'mage' });
+      await kit.setupCharacter(w, bot, { gold: 2000 });
+      const town = map.zones[8], gate = deep.portals.find(p => p.id === 'nacre_gate'), back = town.portals[0];
+      check(town.objects.filter(o => o.kind === 'nacrehouse').length === 120 && town.npcs.length === 30 && town.slimes.length === 0, '120 homes, 30 people, no enemies');
+      check(town.futureInstance.status === 'sealed' && town.futureInstance.players === 5 && town.portals.length === 1, 'The future Drowned Cathedral is sealed, beside its Meeting Stone');
+      await kit.teleport(w, bot, { npc: 'travel_keelhaven' });
+      await kit.talkTo(w, bot, 'travel_keelhaven');
+      await kit.teleport(w, bot, { zone: 8, x: gate.x, y: gate.y - 4 });
+      await w.action(bot, { type: 'move', x: gate.x, y: gate.y });
+      await w.waitFor(() => w.player(bot).zone === 9, 15000, 'Walk into the Tideway');
+      await w.action(bot, { type: 'stop' });
+      check(distance(w.player(bot), { x: gate.tx, y: gate.ty }) < 1.5, 'The Tideway arrives at the south city boulevard');
+      const view = b => w.views.get(b);
+      check(view(bot).slimes.length === 0 && view(bot).players.every(p => p.zone === 9) && view(watcher).players.every(p => p.zone === 0), 'City and meadow sockets receive separate zone views');
+      const reply = await kit.talkTo(w, bot, 'nacre_envoy', 'quest:accept:nacre_welcome');
+      await w.waitFor(() => !!quest(w, bot, 'nacre_welcome'));
+      check(reply.dialogue.includes('hundred and twenty') && !!quest(w, bot, 'nacre_welcome'), 'The mermaid envoy introduces the city and accepts its quest');
+      await kit.walkTo(w, bot, { zone: 9, x: 96, y: 151 });
+      check(distance(w.player(bot), { x: 96, y: 151 }) < .6, 'A real walk follows the clear residential avenue');
+      const house = town.objects.find(o => o.kind === 'nacrehouse' && o.y === 151);
+      await kit.teleport(w, bot, { zone: 9, x: house.x, y: house.y + 4 });
+      await w.action(bot, { type: 'move', x: house.x, y: house.y });
+      await w.advance(1800); await w.action(bot, { type: 'stop' });
+      check(w.player(bot).y > house.y + house.depth / 2, 'The server blocks movement into a shell home');
+      await kit.teleport(w, bot, { npc: 'nacre_healer' });
+      await w.debug(bot, { op: 'set_hp', hp: 1 });
+      await kit.talkTo(w, bot, 'nacre_healer', 'blessing');
+      await w.waitFor(() => w.player(bot).hp === w.player(bot).maxHp);
+      check(w.player(bot).hp === w.player(bot).maxHp, 'The tide healer restores health through the real offer');
+      await kit.teleport(w, bot, { npc: 'nacre_trader' });
+      const gold = w.player(bot).gold;
+      await kit.talkTo(w, bot, 'nacre_trader', 'satchel');
+      await w.waitFor(() => w.player(bot).gold === gold - 500);
+      check(w.player(bot).gold === gold - 500 && w.player(bot).bagCapacity === 22, 'The market sells the authoritative six-slot satchel for 500 gold');
+      await kit.teleport(w, bot, { npc: 'nacre_stone' });
+      const g = w.player(bot).gold;
+      await kit.talkTo(w, bot, 'nacre_stone', 'merc_priest');
+      await w.waitFor(() => view(bot).players.some(p => /^Merc /.test(p.look.name)) && w.player(bot).gold === g - 250);
+      check(w.player(bot).gold === g - 250 && view(bot).players.some(p => /^Merc /.test(p.look.name) && p.look.class === 'priest'), 'The Meeting Stone hires a priest for 250 gold');
+      await kit.talkTo(w, bot, 'nacre_stone', 'merc_dismiss');
+      await w.waitFor(() => !view(bot).players.some(p => /^Merc /.test(p.look.name)));
+      check(!view(bot).players.some(p => /^Merc /.test(p.look.name)), 'The stone dismisses hired companions');
+      await kit.teleport(w, bot, { npc: 'travel_nacrehold' });
+      await kit.talkTo(w, bot, 'travel_nacrehold');
+      await w.waitFor(() => w.player(bot).travelStops.includes('travel_nacrehold'));
+      check(w.player(bot).travelStops.includes('travel_nacrehold'), 'Speaking to the mermaid travel master discovers Nacrehold');
+      await w.restart();
+      check(w.player(bot).zone === 9 && w.player(bot).travelStops.includes('travel_nacrehold') && quest(w, bot, 'nacre_welcome'), 'City position, discovery and accepted quest survive Rust restart');
+      const fare = w.player(bot).gold;
+      await w.advance(550);
+      await w.action(bot, { type: 'interact', npc: 'travel_nacrehold', offer: 'spark:travel_keelhaven' });
+      await w.waitFor(() => !w.player(bot).sparkTravel && w.player(bot).zone === 8, 30000, 'Fly to Keelhaven');
+      check(w.player(bot).gold === fare - 20 && distance(w.player(bot), deep.npcs.find(n => n.id === 'travel_keelhaven')) < 2, 'The linked Spark flight costs 20 gold and reaches Keelhaven');
+      await kit.teleport(w, bot, { zone: 8, x: gate.x, y: gate.y - 4 });
+      await w.action(bot, { type: 'move', x: gate.x, y: gate.y });
+      await w.waitFor(() => w.player(bot).zone === 9, 15000);
+      await w.action(bot, { type: 'stop' });
+      await w.advance(1200);
+      await w.action(bot, { type: 'move', x: back.x, y: back.y });
+      await w.waitFor(() => w.player(bot).zone === 8, 15000, 'Walk back to the sea floor');
+      await w.action(bot, { type: 'stop' });
+      check(distance(w.player(bot), { x: back.tx, y: back.ty }) < 1.5, 'The return Tideway arrives outside its gate disc');
+    },
+  },
+  nacre_quests: {
+    description: 'Play all nine Nacrehold quests through authoritative NPC offers: real talks and visits, hand-in item consumption, exact XP/gold, locked and duplicate rewards, repeatable supply order and persisted ledger.',
+    startLevel: 40,
+    async run(w, check) {
+      const bot = 'Shellcourier', town = map.zones[8];
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { gold: 0 });
+      await kit.teleport(w, bot, { npc: 'nacre_warden' });
+      await kit.talkTo(w, bot, 'nacre_warden', 'quest:accept:nacre_cathedral');
+      check(!quest(w, bot, 'nacre_cathedral'), 'The Cathedral preparation requires the city history first');
+      for (const q of town.quests) {
+        await kit.teleport(w, bot, { npc: q.npc });
+        await kit.talkTo(w, bot, q.npc, `quest:accept:${q.id}`);
+        await w.waitFor(() => !!quest(w, bot, q.id));
+        const refused = await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
+        check(/Complete the objectives/.test(refused.notice), `${q.title}: unfinished claim refused`);
+        for (const o of q.objectives) {
+          if (o.kind === 'talk') {
+            await kit.teleport(w, bot, { npc: o.target });
+            await kit.talkTo(w, bot, o.target);
+          } else if (o.kind === 'visit') {
+            const p = town.places.find(p => p.id === o.target);
+            await kit.teleport(w, bot, { zone: 9, x: p.x, y: p.y });
+            await w.advance(150);
+          } else await w.debug(bot, { op: 'give_item', item: o.target, quantity: o.count });
+        }
+        await w.waitFor(() => quest(w, bot, q.id).counts.every((n, i) => n === q.objectives[i].count));
+        await kit.teleport(w, bot, { npc: q.npc });
+        const before = w.player(bot).gold, xp = totalXp(w.player(bot));
+        const bag = id => w.player(bot).inventory.find(i => i.item === id)?.quantity || 0;
+        const handed = q.objectives.filter(o => o.kind === 'bring').map(o => [o, bag(o.target)]);
+        await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
+        await w.waitFor(() => quest(w, bot, q.id).claimed);
+        check(w.player(bot).gold === before + q.rewardGold && totalXp(w.player(bot)) === xp + q.rewardXp, `${q.title}: exact level-table XP and gold`);
+        check(handed.every(([o, n]) => bag(o.target) === n - o.count), `${q.title}: hand-in consumes exactly the requested items`);
+        await kit.talkTo(w, bot, q.npc, `quest:claim:${q.id}`);
+        check(w.player(bot).gold === before + q.rewardGold, `${q.title}: duplicate claim pays nothing`);
+      }
+      const repeat = town.quests.find(q => q.repeatable);
+      await kit.talkTo(w, bot, repeat.npc, `quest:accept:${repeat.id}`);
+      await w.debug(bot, { op: 'give_item', item: 'drowned_coin', quantity: 4 });
+      await kit.talkTo(w, bot, repeat.npc, `quest:claim:${repeat.id}`);
+      await w.waitFor(() => quest(w, bot, repeat.id).completions === 2);
+      check(quest(w, bot, repeat.id).completions === 2, 'The standing order repeats with a second real hand-in');
+      await w.restart();
+      check(town.quests.every(q => quest(w, bot, q.id).claimed), 'All nine claimed quests survive Rust restart');
+    },
+  },
+
 };
 
 async function runScenario(name, world = new TestWorld()) {

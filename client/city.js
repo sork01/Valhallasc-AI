@@ -26,7 +26,7 @@
   }
   function stoneTile(g, px, py, x, y) {
     const city = area().city; if (!city) return false;
-    if (Field.zone > 0 && Field.zoneTheme === 'city') return false;     // Skaldholm's streets are painted by field.js from the zone's road list
+    if (Field.zone > 0 && (Field.zoneTheme === 'city' || Field.zoneTheme === 'nacre')) return false;     // Skaldholm's streets are painted by field.js from the zone's road list
     const inCity=inside(x+.5,y+.5), road=!Field.zone && y>=69 && y<city.y0 && Math.abs(x+.5-36)<1.6;
     if (!inCity && !road) return false;
     if (Field.zone > 0) {
@@ -222,7 +222,7 @@
     }
   }
   // Distance from the feet to the top of each NPC's head gear (the guard's banner, the baker's hat), so the nameplate sits just above it.
-  const headTop=n=>n.art==='stone'?330:n.look?(n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101;
+  const headTop=n=>n.art==='stone'?330:n.look?.species==='merfolk'?120:n.look?(n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101;
   // World of Warcraft nameplate: yellow name over a <Role> line, both in a heavy black outline, with the quest mark above them.
   function plate(g,value,y,size,color) {
     g.font=`${size}px "Jua", sans-serif`;g.textAlign='center';g.lineJoin='round';g.lineWidth=size>14?5:3;g.strokeStyle='#000';
@@ -258,6 +258,7 @@
     if(near){g.strokeStyle='#ffe2a2';g.lineWidth=2;g.beginPath();g.ellipse(0,0,27,12,0,0,Math.PI*2);g.stroke();}
     g.save();g.scale(sc,sc);g.translate(0,-bob);
     if(n.art==='stone'){}                      // the Meeting Stone speaks for itself: its art is the stone, drawn as an object
+    else if(L?.species==='merfolk'&&window.NacreArt)NacreArt.merfolk(g,n,t);
     else if(L)drawFolk(g,n,t,moving);
     else {
     line(g,[[-8,-26],[-9,-5]],'#584d46',10);line(g,[[8,-26],[9,-5]],'#584d46',10);

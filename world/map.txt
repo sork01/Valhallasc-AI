@@ -58069,13 +58069,6 @@
         },
         {
           "kind": "coral",
-          "x": 109.71,
-          "y": 164.41,
-          "r": 0.6,
-          "v": 0
-        },
-        {
-          "kind": "coral",
           "x": 163.51,
           "y": 152.18,
           "r": 0.6,
@@ -58164,13 +58157,6 @@
           "y": 130.75,
           "r": 0.8,
           "v": 2
-        },
-        {
-          "kind": "deeprock",
-          "x": 105.97,
-          "y": 165.87,
-          "r": 0.8,
-          "v": 0
         },
         {
           "kind": "deeprock",
@@ -59443,7 +59429,8 @@
           "color": "#74d7d0",
           "travelStop": "Keelhaven",
           "travelLinks": [
-            "travel_perch"
+            "travel_perch",
+            "travel_nacrehold"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -60047,6 +60034,3666 @@
           "tx": 103.5,
           "ty": 32.4,
           "look": "maelstrom"
+        },
+        {
+          "id": "nacre_gate",
+          "name": "The Nacrehold Tideway",
+          "x": 108,
+          "y": 170,
+          "r": 1.1,
+          "to": 9,
+          "tx": 96,
+          "ty": 171
+        }
+      ]
+    },
+    {
+      "name": "Nacrehold",
+      "theme": "nacre",
+      "tagline": "A hundred and twenty shell-roofed homes beneath a quiet tide",
+      "size": 192,
+      "spawn": {
+        "x": 96,
+        "y": 171
+      },
+      "city": {
+        "name": "Nacrehold",
+        "x0": 8,
+        "x1": 184,
+        "y0": 8,
+        "y1": 184,
+        "plaza": {
+          "x": 96,
+          "y": 96
+        },
+        "radius": 18,
+        "entry": {
+          "x": 96,
+          "y": 168
+        }
+      },
+      "roads": [
+        {
+          "x0": 21.6,
+          "x1": 26.4,
+          "y0": 12,
+          "y1": 180,
+          "t": 1
+        },
+        {
+          "x0": 45.6,
+          "x1": 50.4,
+          "y0": 12,
+          "y1": 180,
+          "t": 1
+        },
+        {
+          "x0": 69.6,
+          "x1": 74.4,
+          "y0": 12,
+          "y1": 180,
+          "t": 1
+        },
+        {
+          "x0": 93,
+          "x1": 99,
+          "y0": 12,
+          "y1": 180,
+          "t": 2
+        },
+        {
+          "x0": 117.6,
+          "x1": 122.4,
+          "y0": 12,
+          "y1": 180,
+          "t": 1
+        },
+        {
+          "x0": 141.6,
+          "x1": 146.4,
+          "y0": 12,
+          "y1": 180,
+          "t": 1
+        },
+        {
+          "x0": 165.6,
+          "x1": 170.4,
+          "y0": 12,
+          "y1": 180,
+          "t": 1
+        },
+        {
+          "x0": 16,
+          "x1": 176,
+          "y0": 45.6,
+          "y1": 50.4,
+          "t": 1
+        },
+        {
+          "x0": 16,
+          "x1": 176,
+          "y0": 69.6,
+          "y1": 74.4,
+          "t": 1
+        },
+        {
+          "x0": 16,
+          "x1": 176,
+          "y0": 93.6,
+          "y1": 98.4,
+          "t": 1
+        },
+        {
+          "x0": 16,
+          "x1": 176,
+          "y0": 117.6,
+          "y1": 122.4,
+          "t": 1
+        },
+        {
+          "x0": 16,
+          "x1": 176,
+          "y0": 141.6,
+          "y1": 146.4,
+          "t": 1
+        },
+        {
+          "x0": 16,
+          "x1": 176,
+          "y0": 165.6,
+          "y1": 170.4,
+          "t": 1
+        },
+        {
+          "x": 96,
+          "y": 96,
+          "r": 18,
+          "t": 2
+        },
+        {
+          "x0": 76,
+          "x1": 124,
+          "y0": 32,
+          "y1": 41,
+          "t": 2
+        },
+        {
+          "x0": 24,
+          "x1": 168,
+          "y0": 25,
+          "y1": 33,
+          "t": 1
+        }
+      ],
+      "paths": [],
+      "objects": [
+        {
+          "kind": "nacrefountain",
+          "x": 96,
+          "y": 96,
+          "r": 2.2,
+          "v": 0
+        },
+        {
+          "kind": "nacrecathedral",
+          "x": 96,
+          "y": 24,
+          "r": 0.4,
+          "v": 0,
+          "width": 7,
+          "depth": 6
+        },
+        {
+          "kind": "nacrepalace",
+          "x": 144,
+          "y": 24,
+          "r": 0.4,
+          "v": 0,
+          "width": 7,
+          "depth": 5
+        },
+        {
+          "kind": "nacrearchive",
+          "x": 144,
+          "y": 59,
+          "r": 0.4,
+          "v": 0,
+          "width": 5,
+          "depth": 4
+        },
+        {
+          "kind": "nacregarden",
+          "x": 40,
+          "y": 24,
+          "r": 2.2,
+          "v": 0
+        },
+        {
+          "kind": "nacrememorial",
+          "x": 120,
+          "y": 28,
+          "r": 1.2,
+          "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 89,
+          "y": 31,
+          "r": 1.7,
+          "v": 0
+        },
+        {
+          "kind": "nacreinn",
+          "x": 52,
+          "y": 130,
+          "r": 0.4,
+          "v": 0,
+          "width": 5,
+          "depth": 4
+        },
+        {
+          "kind": "nacrestall",
+          "x": 90,
+          "y": 126,
+          "r": 0.4,
+          "v": 0,
+          "width": 2.5,
+          "depth": 1.8,
+          "color": "#b2b4ef"
+        },
+        {
+          "kind": "nacrestall",
+          "x": 102,
+          "y": 126,
+          "r": 0.4,
+          "v": 0,
+          "width": 2.5,
+          "depth": 1.8,
+          "color": "#eccb89"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 32,
+          "y": 41,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 1",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 40,
+          "y": 41,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 2",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 56,
+          "y": 41,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 3",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 64,
+          "y": 41,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 4",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 80,
+          "y": 41,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 5",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 88,
+          "y": 41,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 6",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 104,
+          "y": 41,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 7",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 112,
+          "y": 41,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 8",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 128,
+          "y": 41,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 9",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 136,
+          "y": 41,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 10",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 152,
+          "y": 41,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 11",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 160,
+          "y": 41,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 12",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 32,
+          "y": 55,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 13",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 40,
+          "y": 55,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 14",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 56,
+          "y": 55,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 15",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 64,
+          "y": 55,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 16",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 80,
+          "y": 55,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 17",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 88,
+          "y": 55,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 18",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 104,
+          "y": 55,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 19",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 112,
+          "y": 55,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 20",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 128,
+          "y": 55,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 21",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 136,
+          "y": 55,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 22",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 152,
+          "y": 55,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 23",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 160,
+          "y": 55,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 24",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 32,
+          "y": 64,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 25",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 40,
+          "y": 64,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 26",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 56,
+          "y": 64,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 27",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 64,
+          "y": 64,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 28",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 80,
+          "y": 64,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 29",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 88,
+          "y": 64,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 30",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 104,
+          "y": 64,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 31",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 112,
+          "y": 64,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 32",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 128,
+          "y": 64,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 33",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 136,
+          "y": 64,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 34",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 152,
+          "y": 64,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 35",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 160,
+          "y": 64,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 36",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 32,
+          "y": 79,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 37",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 40,
+          "y": 79,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 38",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 56,
+          "y": 79,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 39",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 64,
+          "y": 79,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 40",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 80,
+          "y": 79,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 41",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 112,
+          "y": 79,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 42",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 128,
+          "y": 79,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 43",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 136,
+          "y": 79,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 44",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 152,
+          "y": 79,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 45",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 160,
+          "y": 79,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 46",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 32,
+          "y": 88,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 47",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 40,
+          "y": 88,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 48",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 56,
+          "y": 88,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 49",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 64,
+          "y": 88,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#e9acc8",
+          "label": "Rosecoral 50",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 128,
+          "y": 88,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 51",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 136,
+          "y": 88,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 52",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 152,
+          "y": 88,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 53",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 160,
+          "y": 88,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#81d6cc",
+          "label": "Azure Shells 54",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 32,
+          "y": 103,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 55",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 40,
+          "y": 103,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 56",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 56,
+          "y": 103,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 57",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 64,
+          "y": 103,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 58",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 128,
+          "y": 103,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 59",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 136,
+          "y": 103,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 60",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 152,
+          "y": 103,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 61",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 160,
+          "y": 103,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 62",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 32,
+          "y": 112,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 63",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 40,
+          "y": 112,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 64",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 56,
+          "y": 112,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 65",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 64,
+          "y": 112,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 66",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 80,
+          "y": 112,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 67",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 112,
+          "y": 112,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 68",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 128,
+          "y": 112,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 69",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 136,
+          "y": 112,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 70",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 152,
+          "y": 112,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 71",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 160,
+          "y": 112,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 72",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 32,
+          "y": 127,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 73",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 40,
+          "y": 127,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 74",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 64,
+          "y": 127,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 75",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 80,
+          "y": 127,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 76",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 112,
+          "y": 127,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 77",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 128,
+          "y": 127,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 78",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 136,
+          "y": 127,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 79",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 152,
+          "y": 127,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 80",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 160,
+          "y": 127,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 81",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 32,
+          "y": 136,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 82",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 40,
+          "y": 136,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 83",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 56,
+          "y": 136,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 84",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 64,
+          "y": 136,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 85",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 80,
+          "y": 136,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 86",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 88,
+          "y": 136,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#b2b4ef",
+          "label": "Violet Reach 87",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 104,
+          "y": 136,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 88",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 112,
+          "y": 136,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 89",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 128,
+          "y": 136,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 90",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 136,
+          "y": 136,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 91",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 152,
+          "y": 136,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 92",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 160,
+          "y": 136,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#eccb89",
+          "label": "Gilded Shoals 93",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 32,
+          "y": 151,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 94",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 40,
+          "y": 151,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 95",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 56,
+          "y": 151,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 96",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 64,
+          "y": 151,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 97",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 80,
+          "y": 151,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 98",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 88,
+          "y": 151,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 99",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 104,
+          "y": 151,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#ecb395",
+          "label": "Amberwake 100",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 112,
+          "y": 151,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#ecb395",
+          "label": "Amberwake 101",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 128,
+          "y": 151,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#ecb395",
+          "label": "Amberwake 102",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 136,
+          "y": 151,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#ecb395",
+          "label": "Amberwake 103",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 152,
+          "y": 151,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#ecb395",
+          "label": "Amberwake 104",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 160,
+          "y": 151,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#ecb395",
+          "label": "Amberwake 105",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 32,
+          "y": 160,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 106",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 40,
+          "y": 160,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 107",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 56,
+          "y": 160,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 108",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 64,
+          "y": 160,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 109",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 80,
+          "y": 160,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 110",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 88,
+          "y": 160,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 111",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 104,
+          "y": 160,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#ecb395",
+          "label": "Amberwake 112",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 112,
+          "y": 160,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#ecb395",
+          "label": "Amberwake 113",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 128,
+          "y": 160,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#ecb395",
+          "label": "Amberwake 114",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 136,
+          "y": 160,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#ecb395",
+          "label": "Amberwake 115",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 152,
+          "y": 160,
+          "r": 0.4,
+          "v": 0,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#ecb395",
+          "label": "Amberwake 116",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 160,
+          "y": 160,
+          "r": 0.4,
+          "v": 2,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#ecb395",
+          "label": "Amberwake 117",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 32,
+          "y": 175,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 118",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 40,
+          "y": 175,
+          "r": 0.4,
+          "v": 3,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 119",
+          "sign": "live"
+        },
+        {
+          "kind": "nacrehouse",
+          "x": 56,
+          "y": 175,
+          "r": 0.4,
+          "v": 1,
+          "width": 3.4,
+          "depth": 2.6,
+          "color": "#8dbedc",
+          "label": "Jade Current 120",
+          "sign": "live"
+        },
+        {
+          "kind": "pearllamp",
+          "x": 27.4,
+          "y": 44.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 51.4,
+          "y": 44.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 75.4,
+          "y": 44.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 123.4,
+          "y": 44.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 147.4,
+          "y": 44.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 171.4,
+          "y": 44.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 27.4,
+          "y": 68.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 51.4,
+          "y": 68.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 75.4,
+          "y": 68.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 123.4,
+          "y": 68.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 147.4,
+          "y": 68.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 171.4,
+          "y": 68.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 27.4,
+          "y": 92.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 51.4,
+          "y": 92.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 75.4,
+          "y": 92.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 123.4,
+          "y": 92.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 147.4,
+          "y": 92.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 171.4,
+          "y": 92.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 27.4,
+          "y": 116.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 51.4,
+          "y": 116.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 75.4,
+          "y": 116.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 123.4,
+          "y": 116.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 147.4,
+          "y": 116.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 171.4,
+          "y": 116.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 27.4,
+          "y": 140.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 51.4,
+          "y": 140.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 75.4,
+          "y": 140.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 123.4,
+          "y": 140.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 147.4,
+          "y": 140.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 171.4,
+          "y": 140.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 27.4,
+          "y": 164.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 51.4,
+          "y": 164.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 75.4,
+          "y": 164.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 123.4,
+          "y": 164.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 147.4,
+          "y": 164.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "pearllamp",
+          "x": 171.4,
+          "y": 164.6,
+          "r": 0.18,
+          "v": 0
+        },
+        {
+          "kind": "coral",
+          "x": 30,
+          "y": 18,
+          "r": 0.55,
+          "v": 0
+        },
+        {
+          "kind": "coral",
+          "x": 38,
+          "y": 16,
+          "r": 0.55,
+          "v": 1
+        },
+        {
+          "kind": "coral",
+          "x": 48,
+          "y": 18,
+          "r": 0.55,
+          "v": 0
+        },
+        {
+          "kind": "coral",
+          "x": 54,
+          "y": 22,
+          "r": 0.55,
+          "v": 1
+        },
+        {
+          "kind": "coral",
+          "x": 32,
+          "y": 34,
+          "r": 0.55,
+          "v": 1
+        },
+        {
+          "kind": "coral",
+          "x": 54,
+          "y": 34,
+          "r": 0.55,
+          "v": 2
+        },
+        {
+          "kind": "coral",
+          "x": 132,
+          "y": 18,
+          "r": 0.55,
+          "v": 2
+        },
+        {
+          "kind": "coral",
+          "x": 158,
+          "y": 18,
+          "r": 0.55,
+          "v": 1
+        },
+        {
+          "kind": "coral",
+          "x": 134,
+          "y": 36,
+          "r": 0.55,
+          "v": 0
+        },
+        {
+          "kind": "coral",
+          "x": 158,
+          "y": 36,
+          "r": 0.55,
+          "v": 2
+        },
+        {
+          "kind": "coral",
+          "x": 12,
+          "y": 16,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "kelp",
+          "x": 12,
+          "y": 24,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "coral",
+          "x": 12,
+          "y": 32,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "kelp",
+          "x": 12,
+          "y": 40,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "coral",
+          "x": 12,
+          "y": 48,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "kelp",
+          "x": 12,
+          "y": 56,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "coral",
+          "x": 12,
+          "y": 64,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "kelp",
+          "x": 12,
+          "y": 72,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "coral",
+          "x": 12,
+          "y": 80,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "kelp",
+          "x": 12,
+          "y": 88,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "coral",
+          "x": 12,
+          "y": 96,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "kelp",
+          "x": 12,
+          "y": 104,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "coral",
+          "x": 12,
+          "y": 112,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "kelp",
+          "x": 12,
+          "y": 120,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "coral",
+          "x": 12,
+          "y": 128,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "kelp",
+          "x": 12,
+          "y": 136,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "coral",
+          "x": 12,
+          "y": 144,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "kelp",
+          "x": 12,
+          "y": 152,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "coral",
+          "x": 12,
+          "y": 160,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "kelp",
+          "x": 12,
+          "y": 168,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "coral",
+          "x": 12,
+          "y": 176,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "coral",
+          "x": 180,
+          "y": 16,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "kelp",
+          "x": 180,
+          "y": 24,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "coral",
+          "x": 180,
+          "y": 32,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "kelp",
+          "x": 180,
+          "y": 40,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "coral",
+          "x": 180,
+          "y": 48,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "kelp",
+          "x": 180,
+          "y": 56,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "coral",
+          "x": 180,
+          "y": 64,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "kelp",
+          "x": 180,
+          "y": 72,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "coral",
+          "x": 180,
+          "y": 80,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "kelp",
+          "x": 180,
+          "y": 88,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "coral",
+          "x": 180,
+          "y": 96,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "kelp",
+          "x": 180,
+          "y": 104,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "coral",
+          "x": 180,
+          "y": 112,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "kelp",
+          "x": 180,
+          "y": 120,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "coral",
+          "x": 180,
+          "y": 128,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "kelp",
+          "x": 180,
+          "y": 136,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "coral",
+          "x": 180,
+          "y": 144,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "kelp",
+          "x": 180,
+          "y": 152,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "coral",
+          "x": 180,
+          "y": 160,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "kelp",
+          "x": 180,
+          "y": 168,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "coral",
+          "x": 180,
+          "y": 176,
+          "r": 0.4,
+          "v": 0
+        }
+      ],
+      "slimes": [],
+      "npcs": [
+        {
+          "id": "nacre_envoy",
+          "name": "Lyris Pearlvoice",
+          "role": "Mermaid \u00b7 City envoy",
+          "x": 92,
+          "y": 166,
+          "color": "#eccb89",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#eccb89",
+            "skin": "#a4dbc9",
+            "hair": "#ebdbbd",
+            "style": "long"
+          },
+          "dialogue": "Welcome, air-breather. The tide grants you breath beneath these waters. Nacrehold is a city, not a wreck: six neighbourhoods, a hundred and twenty homes, and a thousand stories. Meet our people; let the sea teach you to walk slowly."
+        },
+        {
+          "id": "nacre_healer",
+          "name": "Nerissa Stillwater",
+          "role": "Mermaid \u00b7 Tide healer",
+          "x": 144,
+          "y": 36,
+          "color": "#81d6cc",
+          "offers": [
+            {
+              "id": "blessing",
+              "label": "Receive a healing blessing",
+              "cost": 0,
+              "heal": 10000
+            },
+            {
+              "id": "buy_mana_potion",
+              "label": "Buy Mana Potion \u00b7 100 mana instantly",
+              "cost": 30,
+              "item": "mana_potion",
+              "tiered": true
+            },
+            {
+              "id": "buy_health_potion",
+              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "cost": 30,
+              "item": "health_potion",
+              "tiered": true
+            }
+          ],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#81d6cc",
+            "skin": "#abd4e4",
+            "hair": "#ebdbbd",
+            "style": "long"
+          },
+          "dialogue": "Rest beneath the pearl lanterns. My blessing is free; my potions are prepared for your level. Nothing hunts you inside Nacrehold."
+        },
+        {
+          "id": "nacre_trader",
+          "name": "Orin Shellweaver",
+          "role": "Merman \u00b7 Market keeper",
+          "x": 102,
+          "y": 130,
+          "color": "#e9acc8",
+          "offers": [
+            {
+              "id": "buy_traveler_stew",
+              "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
+              "cost": 12,
+              "item": "traveler_stew",
+              "tiered": true
+            },
+            {
+              "id": "satchel",
+              "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+              "cost": 500,
+              "bag": "linen_satchel"
+            }
+          ],
+          "buys": true,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#e9acc8",
+            "skin": "#a4dbc9",
+            "hair": "#b96289",
+            "style": "short"
+          },
+          "dialogue": "We trade in memories as well as shells. I buy spare equipment and materials, and sell hot stew and satchels. The kettle is sealed. Do not ask how."
+        },
+        {
+          "id": "nacre_smith",
+          "name": "Thalos Reefhammer",
+          "role": "Merman \u00b7 Coral smith",
+          "x": 90,
+          "y": 130,
+          "color": "#eccb89",
+          "offers": [
+            {
+              "id": "fitting",
+              "label": "Replace and fit starter gear",
+              "cost": 0,
+              "gear": true
+            }
+          ],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#eccb89",
+            "skin": "#a4dbc9",
+            "hair": "#ebdbbd",
+            "style": "short"
+          },
+          "dialogue": "Coral grows slowly; a good blade lasts longer. Bring your starter gear for a free fitting. My hammer rings softly out of respect for the sleeping reef."
+        },
+        {
+          "id": "nacre_archivist",
+          "name": "Vaela Inkfin",
+          "role": "Mermaid \u00b7 Keeper of tides",
+          "x": 140,
+          "y": 64,
+          "color": "#81d6cc",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#81d6cc",
+            "skin": "#abd4e4",
+            "hair": "#ebdbbd",
+            "style": "long"
+          },
+          "dialogue": "We carved our histories on mother-of-pearl. The Drowned Cathedral once kept the Heart of the Tide. Now its bells ring without hands. Its doors are sealed; read our memorials before you ask why."
+        },
+        {
+          "id": "nacre_gardener",
+          "name": "Pelar Kelpbraid",
+          "role": "Merman \u00b7 Reef gardener",
+          "x": 42,
+          "y": 36,
+          "color": "#e9acc8",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#e9acc8",
+            "skin": "#a4dbc9",
+            "hair": "#243e62",
+            "style": "short"
+          },
+          "dialogue": "The Lantern Gardens are tended, never harvested. A reef is a neighbourhood too: the coral builds homes, the little fish pay rent in gossip."
+        },
+        {
+          "id": "nacre_singer",
+          "name": "Syllene Softsong",
+          "role": "Mermaid \u00b7 Conch singer",
+          "x": 104,
+          "y": 92,
+          "color": "#e9acc8",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#e9acc8",
+            "skin": "#a4dbc9",
+            "hair": "#243e62",
+            "style": "long"
+          },
+          "dialogue": "Our fountain does not splash. It remembers the surface, and hums. Walk the six districts and bring me their voices; the city needs a new lullaby."
+        },
+        {
+          "id": "nacre_warden",
+          "name": "Captain Namar Deepwatch",
+          "role": "Merman \u00b7 Cathedral warden",
+          "x": 96,
+          "y": 31,
+          "color": "#ecb395",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#ecb395",
+            "skin": "#cdbfea",
+            "hair": "#ebdbbd",
+            "style": "short"
+          },
+          "dialogue": "Beyond this sealed arch lies the Drowned Cathedral, the next level-40 five-player instance: flooded cloisters, a choir bound to a stolen bell, and the drowned hierophant who guards the Heart of the Tide. Gather at the Meeting Stone. The seal will open in a future expedition."
+        },
+        {
+          "id": "nacre_innkeeper",
+          "name": "Maera Warmcurrent",
+          "role": "Mermaid \u00b7 The Sleeping Nautilus",
+          "x": 52,
+          "y": 136,
+          "color": "#81d6cc",
+          "offers": [
+            {
+              "id": "rest",
+              "label": "Rest in the warm current \u00b7 restores HP",
+              "cost": 5,
+              "heal": 10000
+            }
+          ],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#81d6cc",
+            "skin": "#abd4e4",
+            "hair": "#ebdbbd",
+            "style": "long"
+          },
+          "dialogue": "The nautilus never hurries. Neither should you. I have a warm current and a bed of soft sea grass, if you need to rest."
+        },
+        {
+          "id": "nacre_lamplighter",
+          "name": "Ilo Glowfin",
+          "role": "Merman \u00b7 Pearl lamplighter",
+          "x": 156,
+          "y": 112,
+          "color": "#81d6cc",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#81d6cc",
+            "skin": "#abd4e4",
+            "hair": "#ebdbbd",
+            "style": "short"
+          },
+          "dialogue": "The lamps are living pearls; I sing them awake. A little siren pearl helps a tired lamp remember its light."
+        },
+        {
+          "id": "nacre_stone",
+          "name": "The Nacre Meeting Stone",
+          "role": "Gather your party",
+          "x": 90.7,
+          "y": 32.7,
+          "color": "#81d6cc",
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#81d6cc",
+            "skin": "#abd4e4",
+            "hair": "#ebdbbd",
+            "style": "short"
+          },
+          "dialogue": "The sea-blue runes offer companions of every calling for 250 gold each, up to five in your party. The sealed Drowned Cathedral stands beside you. Its expedition has not opened yet.",
+          "art": "stone"
+        },
+        {
+          "id": "nacre_resident_0",
+          "name": "Aren",
+          "role": "Merman \u00b7 Resident",
+          "x": 48,
+          "y": 72,
+          "color": "#eccb89",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#eccb89",
+            "skin": "#a4dbc9",
+            "hair": "#ebdbbd",
+            "style": "short"
+          },
+          "dialogue": "The roof of my home is older than my grandmother.",
+          "route": [
+            [
+              48,
+              72
+            ],
+            [
+              72,
+              72
+            ],
+            [
+              72,
+              96
+            ],
+            [
+              48,
+              96
+            ]
+          ],
+          "speed": 1.25,
+          "pause": 3,
+          "phase": 0.0
+        },
+        {
+          "id": "nacre_resident_1",
+          "name": "Miriel",
+          "role": "Mermaid \u00b7 Resident",
+          "x": 72,
+          "y": 72,
+          "color": "#8dbedc",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#8dbedc",
+            "skin": "#abd4e4",
+            "hair": "#b96289",
+            "style": "long"
+          },
+          "dialogue": "Surface stars are beautiful. We have lanternfish.",
+          "route": [
+            [
+              72,
+              72
+            ],
+            [
+              72,
+              92
+            ]
+          ],
+          "speed": 1.4,
+          "pause": 3,
+          "phase": 7.3
+        },
+        {
+          "id": "nacre_resident_2",
+          "name": "Kovar",
+          "role": "Merman \u00b7 Resident",
+          "x": 120,
+          "y": 72,
+          "color": "#ecb395",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#ecb395",
+            "skin": "#cdbfea",
+            "hair": "#43827a",
+            "style": "short"
+          },
+          "dialogue": "Listen: the whole reef is breathing.",
+          "route": [
+            [
+              120,
+              72
+            ],
+            [
+              144,
+              72
+            ],
+            [
+              144,
+              96
+            ],
+            [
+              120,
+              96
+            ]
+          ],
+          "speed": 1.55,
+          "pause": 3,
+          "phase": 14.6
+        },
+        {
+          "id": "nacre_resident_3",
+          "name": "Oceane",
+          "role": "Mermaid \u00b7 Resident",
+          "x": 144,
+          "y": 72,
+          "color": "#e9acc8",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#e9acc8",
+            "skin": "#a4dbc9",
+            "hair": "#243e62",
+            "style": "long"
+          },
+          "dialogue": "The Cathedral bells sound different lately.",
+          "route": [
+            [
+              144,
+              72
+            ],
+            [
+              168,
+              72
+            ],
+            [
+              168,
+              96
+            ],
+            [
+              144,
+              96
+            ]
+          ],
+          "speed": 1.25,
+          "pause": 3,
+          "phase": 21.9
+        },
+        {
+          "id": "nacre_resident_4",
+          "name": "Tethis",
+          "role": "Merman \u00b7 Resident",
+          "x": 168,
+          "y": 72,
+          "color": "#81d6cc",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#81d6cc",
+            "skin": "#abd4e4",
+            "hair": "#ebdbbd",
+            "style": "short"
+          },
+          "dialogue": "The roof of my home is older than my grandmother.",
+          "route": [
+            [
+              168,
+              72
+            ],
+            [
+              168,
+              92
+            ]
+          ],
+          "speed": 1.4,
+          "pause": 3,
+          "phase": 29.2
+        },
+        {
+          "id": "nacre_resident_5",
+          "name": "Luma",
+          "role": "Mermaid \u00b7 Resident",
+          "x": 24,
+          "y": 72,
+          "color": "#b2b4ef",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#b2b4ef",
+            "skin": "#cdbfea",
+            "hair": "#b96289",
+            "style": "long"
+          },
+          "dialogue": "Surface stars are beautiful. We have lanternfish.",
+          "route": [
+            [
+              24,
+              72
+            ],
+            [
+              48,
+              72
+            ],
+            [
+              48,
+              96
+            ],
+            [
+              24,
+              96
+            ]
+          ],
+          "speed": 1.55,
+          "pause": 3,
+          "phase": 36.5
+        },
+        {
+          "id": "nacre_resident_6",
+          "name": "Soren",
+          "role": "Merman \u00b7 Resident",
+          "x": 48,
+          "y": 120,
+          "color": "#eccb89",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#eccb89",
+            "skin": "#a4dbc9",
+            "hair": "#43827a",
+            "style": "short"
+          },
+          "dialogue": "Listen: the whole reef is breathing.",
+          "route": [
+            [
+              48,
+              120
+            ],
+            [
+              72,
+              120
+            ],
+            [
+              72,
+              144
+            ],
+            [
+              48,
+              144
+            ]
+          ],
+          "speed": 1.25,
+          "pause": 3,
+          "phase": 43.8
+        },
+        {
+          "id": "nacre_resident_7",
+          "name": "Elyra",
+          "role": "Mermaid \u00b7 Resident",
+          "x": 72,
+          "y": 120,
+          "color": "#8dbedc",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#8dbedc",
+            "skin": "#abd4e4",
+            "hair": "#243e62",
+            "style": "long"
+          },
+          "dialogue": "The Cathedral bells sound different lately.",
+          "route": [
+            [
+              72,
+              120
+            ],
+            [
+              96,
+              120
+            ],
+            [
+              96,
+              144
+            ],
+            [
+              72,
+              144
+            ]
+          ],
+          "speed": 1.4,
+          "pause": 3,
+          "phase": 51.1
+        },
+        {
+          "id": "nacre_resident_8",
+          "name": "Brin",
+          "role": "Merman \u00b7 Resident",
+          "x": 120,
+          "y": 120,
+          "color": "#ecb395",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#ecb395",
+            "skin": "#cdbfea",
+            "hair": "#ebdbbd",
+            "style": "short"
+          },
+          "dialogue": "The roof of my home is older than my grandmother.",
+          "route": [
+            [
+              120,
+              120
+            ],
+            [
+              144,
+              120
+            ],
+            [
+              144,
+              144
+            ],
+            [
+              120,
+              144
+            ]
+          ],
+          "speed": 1.55,
+          "pause": 3,
+          "phase": 58.4
+        },
+        {
+          "id": "nacre_resident_9",
+          "name": "Coralie",
+          "role": "Mermaid \u00b7 Resident",
+          "x": 144,
+          "y": 120,
+          "color": "#e9acc8",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#e9acc8",
+            "skin": "#a4dbc9",
+            "hair": "#b96289",
+            "style": "long"
+          },
+          "dialogue": "Surface stars are beautiful. We have lanternfish.",
+          "route": [
+            [
+              144,
+              120
+            ],
+            [
+              168,
+              120
+            ],
+            [
+              168,
+              144
+            ],
+            [
+              144,
+              144
+            ]
+          ],
+          "speed": 1.25,
+          "pause": 3,
+          "phase": 65.7
+        },
+        {
+          "id": "nacre_resident_10",
+          "name": "Damar",
+          "role": "Merman \u00b7 Resident",
+          "x": 168,
+          "y": 120,
+          "color": "#8dbedc",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#8dbedc",
+            "skin": "#abd4e4",
+            "hair": "#b96289",
+            "style": "short"
+          },
+          "dialogue": "Listen: the whole reef is breathing.",
+          "route": [
+            [
+              168,
+              120
+            ],
+            [
+              168,
+              140
+            ]
+          ],
+          "speed": 1.4,
+          "pause": 3,
+          "phase": 73.0
+        },
+        {
+          "id": "nacre_resident_11",
+          "name": "Iselle",
+          "role": "Mermaid \u00b7 Resident",
+          "x": 24,
+          "y": 120,
+          "color": "#ecb395",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#ecb395",
+            "skin": "#cdbfea",
+            "hair": "#43827a",
+            "style": "long"
+          },
+          "dialogue": "The Cathedral bells sound different lately.",
+          "route": [
+            [
+              24,
+              120
+            ],
+            [
+              48,
+              120
+            ],
+            [
+              48,
+              144
+            ],
+            [
+              24,
+              144
+            ]
+          ],
+          "speed": 1.55,
+          "pause": 3,
+          "phase": 80.3
+        },
+        {
+          "id": "nacre_resident_12",
+          "name": "Kelp",
+          "role": "Merman \u00b7 Resident",
+          "x": 48,
+          "y": 144,
+          "color": "#e9acc8",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#e9acc8",
+            "skin": "#a4dbc9",
+            "hair": "#243e62",
+            "style": "short"
+          },
+          "dialogue": "The roof of my home is older than my grandmother.",
+          "route": [
+            [
+              48,
+              144
+            ],
+            [
+              72,
+              144
+            ],
+            [
+              72,
+              168
+            ],
+            [
+              48,
+              168
+            ]
+          ],
+          "speed": 1.25,
+          "pause": 3,
+          "phase": 87.6
+        },
+        {
+          "id": "nacre_resident_13",
+          "name": "Pearl",
+          "role": "Mermaid \u00b7 Resident",
+          "x": 72,
+          "y": 144,
+          "color": "#81d6cc",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#81d6cc",
+            "skin": "#abd4e4",
+            "hair": "#ebdbbd",
+            "style": "long"
+          },
+          "dialogue": "Surface stars are beautiful. We have lanternfish.",
+          "route": [
+            [
+              72,
+              144
+            ],
+            [
+              96,
+              144
+            ],
+            [
+              96,
+              168
+            ],
+            [
+              72,
+              168
+            ]
+          ],
+          "speed": 1.4,
+          "pause": 3,
+          "phase": 94.89999999999999
+        },
+        {
+          "id": "nacre_resident_14",
+          "name": "Finn",
+          "role": "Merman \u00b7 Resident",
+          "x": 120,
+          "y": 144,
+          "color": "#b2b4ef",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#b2b4ef",
+            "skin": "#cdbfea",
+            "hair": "#b96289",
+            "style": "short"
+          },
+          "dialogue": "Listen: the whole reef is breathing.",
+          "route": [
+            [
+              120,
+              144
+            ],
+            [
+              144,
+              144
+            ],
+            [
+              144,
+              168
+            ],
+            [
+              120,
+              168
+            ]
+          ],
+          "speed": 1.55,
+          "pause": 3,
+          "phase": 102.2
+        },
+        {
+          "id": "nacre_resident_15",
+          "name": "Nori",
+          "role": "Mermaid \u00b7 Resident",
+          "x": 144,
+          "y": 144,
+          "color": "#eccb89",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#eccb89",
+            "skin": "#a4dbc9",
+            "hair": "#43827a",
+            "style": "long"
+          },
+          "dialogue": "The Cathedral bells sound different lately.",
+          "route": [
+            [
+              144,
+              144
+            ],
+            [
+              168,
+              144
+            ],
+            [
+              168,
+              168
+            ],
+            [
+              144,
+              168
+            ]
+          ],
+          "speed": 1.25,
+          "pause": 3,
+          "phase": 109.5
+        },
+        {
+          "id": "nacre_resident_16",
+          "name": "Reef",
+          "role": "Merman \u00b7 Resident",
+          "x": 168,
+          "y": 144,
+          "color": "#8dbedc",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": false,
+            "tail": "#8dbedc",
+            "skin": "#abd4e4",
+            "hair": "#243e62",
+            "style": "short"
+          },
+          "dialogue": "The roof of my home is older than my grandmother.",
+          "route": [
+            [
+              168,
+              144
+            ],
+            [
+              168,
+              164
+            ]
+          ],
+          "speed": 1.4,
+          "pause": 3,
+          "phase": 116.8
+        },
+        {
+          "id": "nacre_resident_17",
+          "name": "Mira",
+          "role": "Mermaid \u00b7 Resident",
+          "x": 24,
+          "y": 144,
+          "color": "#ecb395",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#ecb395",
+            "skin": "#cdbfea",
+            "hair": "#ebdbbd",
+            "style": "long"
+          },
+          "dialogue": "Surface stars are beautiful. We have lanternfish.",
+          "route": [
+            [
+              24,
+              144
+            ],
+            [
+              48,
+              144
+            ],
+            [
+              48,
+              168
+            ],
+            [
+              24,
+              168
+            ]
+          ],
+          "speed": 1.55,
+          "pause": 3,
+          "phase": 124.1
+        },
+        {
+          "id": "travel_nacrehold",
+          "name": "Travel Master Auralis",
+          "role": "Mermaid \u00b7 Spark Travel",
+          "x": 100,
+          "y": 164,
+          "color": "#74d7d0",
+          "travelStop": "Nacrehold",
+          "travelLinks": [
+            "travel_keelhaven"
+          ],
+          "look": {
+            "hair": "#e4edf4",
+            "skin": "#abd4e4",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#328e97",
+            "species": "merfolk",
+            "female": true,
+            "tail": "#81d6cc"
+          },
+          "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+          "offers": [],
+          "buys": false
+        }
+      ],
+      "places": [
+        {
+          "id": "nacre_garden",
+          "name": "Lantern Gardens",
+          "x": 48,
+          "y": 28,
+          "r": 3
+        },
+        {
+          "id": "nacre_sanctuary",
+          "name": "Palace of the Gentle Tide",
+          "x": 144,
+          "y": 32,
+          "r": 3
+        },
+        {
+          "id": "nacre_archive",
+          "name": "The Pearl Archive",
+          "x": 144,
+          "y": 72,
+          "r": 3
+        },
+        {
+          "id": "nacre_memorial",
+          "name": "Memorial of the Lost Choir",
+          "x": 120,
+          "y": 36,
+          "r": 3
+        },
+        {
+          "id": "nacre_cathedral",
+          "name": "The Sealed Drowned Cathedral",
+          "x": 96,
+          "y": 36,
+          "r": 3
+        },
+        {
+          "id": "nacre_rose",
+          "name": "Rosecoral Quarter",
+          "x": 48,
+          "y": 72,
+          "r": 3
+        },
+        {
+          "id": "nacre_azure",
+          "name": "Azure Shells",
+          "x": 144,
+          "y": 72,
+          "r": 3
+        },
+        {
+          "id": "nacre_violet",
+          "name": "Violet Reach",
+          "x": 48,
+          "y": 120,
+          "r": 3
+        },
+        {
+          "id": "nacre_gold",
+          "name": "Gilded Shoals",
+          "x": 144,
+          "y": 120,
+          "r": 3
+        },
+        {
+          "id": "nacre_mint",
+          "name": "Jade Current",
+          "x": 48,
+          "y": 168,
+          "r": 3
+        },
+        {
+          "id": "nacre_amber",
+          "name": "Amberwake",
+          "x": 144,
+          "y": 168,
+          "r": 3
+        }
+      ],
+      "quests": [
+        {
+          "id": "nacre_welcome",
+          "title": "A City Beneath the Waves",
+          "npc": "nacre_envoy",
+          "description": "Meet the healer, market keeper, gardener and Cathedral warden, then return to Lyris.",
+          "objectives": [
+            {
+              "kind": "talk",
+              "target": "nacre_healer",
+              "label": "Speak to Nerissa",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "nacre_trader",
+              "label": "Speak to Orin",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "nacre_gardener",
+              "label": "Speak to Pelar",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "nacre_warden",
+              "label": "Speak to Captain Namar",
+              "count": 1
+            }
+          ],
+          "level": 35,
+          "rewardXp": 1740,
+          "rewardGold": 100,
+          "requires": null,
+          "repeatable": false
+        },
+        {
+          "id": "nacre_gardens",
+          "title": "Where the Lanternfish Sleep",
+          "npc": "nacre_gardener",
+          "description": "Visit the Lantern Gardens and the gentle tide sanctuary. Take only memories.",
+          "objectives": [
+            {
+              "kind": "visit",
+              "target": "nacre_garden",
+              "label": "Visit the Lantern Gardens",
+              "count": 1
+            },
+            {
+              "kind": "visit",
+              "target": "nacre_sanctuary",
+              "label": "Visit the tide sanctuary",
+              "count": 1
+            }
+          ],
+          "level": 35,
+          "rewardXp": 1740,
+          "rewardGold": 100,
+          "requires": "nacre_welcome",
+          "repeatable": false
+        },
+        {
+          "id": "nacre_districts",
+          "title": "Six Verses for the Sea",
+          "npc": "nacre_singer",
+          "description": "Learn the rhythm of all six residential districts for Syllene\u2019s lullaby.",
+          "objectives": [
+            {
+              "kind": "visit",
+              "target": "nacre_rose",
+              "label": "Visit Rosecoral Quarter",
+              "count": 1
+            },
+            {
+              "kind": "visit",
+              "target": "nacre_azure",
+              "label": "Visit Azure Shells",
+              "count": 1
+            },
+            {
+              "kind": "visit",
+              "target": "nacre_violet",
+              "label": "Visit Violet Reach",
+              "count": 1
+            },
+            {
+              "kind": "visit",
+              "target": "nacre_gold",
+              "label": "Visit Gilded Shoals",
+              "count": 1
+            },
+            {
+              "kind": "visit",
+              "target": "nacre_mint",
+              "label": "Visit Jade Current",
+              "count": 1
+            },
+            {
+              "kind": "visit",
+              "target": "nacre_amber",
+              "label": "Visit Amberwake",
+              "count": 1
+            }
+          ],
+          "level": 35,
+          "rewardXp": 1740,
+          "rewardGold": 150,
+          "requires": "nacre_welcome",
+          "repeatable": false
+        },
+        {
+          "id": "nacre_history",
+          "title": "Names the Sea Has Kept",
+          "npc": "nacre_archivist",
+          "description": "Read the Pearl Archive and stand beside the memorial of the choir that never returned.",
+          "objectives": [
+            {
+              "kind": "visit",
+              "target": "nacre_archive",
+              "label": "Read the Pearl Archive",
+              "count": 1
+            },
+            {
+              "kind": "visit",
+              "target": "nacre_memorial",
+              "label": "Visit the Lost Choir memorial",
+              "count": 1
+            }
+          ],
+          "level": 38,
+          "rewardXp": 2010,
+          "rewardGold": 100,
+          "requires": "nacre_welcome",
+          "repeatable": false
+        },
+        {
+          "id": "nacre_cathedral",
+          "title": "The Bell Behind the Seal",
+          "npc": "nacre_warden",
+          "description": "Study the sealed Cathedral, speak to its archivist, and gather beside the Meeting Stone. This is preparation; the expedition itself is still sealed.",
+          "objectives": [
+            {
+              "kind": "visit",
+              "target": "nacre_cathedral",
+              "label": "Inspect the sealed Cathedral",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "nacre_archivist",
+              "label": "Speak to Vaela",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "nacre_stone",
+              "label": "Speak to the Nacre Meeting Stone",
+              "count": 1
+            }
+          ],
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 200,
+          "requires": "nacre_history",
+          "repeatable": false
+        },
+        {
+          "id": "nacre_lamps",
+          "title": "A Pearl for Every Window",
+          "npc": "nacre_lamplighter",
+          "description": "Bring three Siren Pearls from Ran\u2019s Deep to refresh the city\u2019s lamps. No creature is hunted inside the city.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "siren_pearl",
+              "label": "Bring Siren Pearls",
+              "count": 3
+            }
+          ],
+          "level": 38,
+          "rewardXp": 2010,
+          "rewardGold": 700,
+          "requires": "nacre_welcome",
+          "repeatable": false
+        },
+        {
+          "id": "nacre_smithwork",
+          "title": "Coral That Remembers Iron",
+          "npc": "nacre_smith",
+          "description": "Bring Shellback Plates from Ran\u2019s Deep for Thalos\u2019s patient craft.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "shellback_plate",
+              "label": "Bring Shellback Plates",
+              "count": 3
+            }
+          ],
+          "level": 39,
+          "rewardXp": 2110,
+          "rewardGold": 700,
+          "requires": "nacre_welcome",
+          "repeatable": false
+        },
+        {
+          "id": "nacre_letters",
+          "title": "A Letter in a Shell",
+          "npc": "nacre_innkeeper",
+          "description": "Carry Maera\u2019s greetings to the city envoy and its gardener, then return for a warm welcome.",
+          "objectives": [
+            {
+              "kind": "talk",
+              "target": "nacre_envoy",
+              "label": "Speak to Lyris",
+              "count": 1
+            },
+            {
+              "kind": "talk",
+              "target": "nacre_gardener",
+              "label": "Speak to Pelar",
+              "count": 1
+            }
+          ],
+          "level": 35,
+          "rewardXp": 1740,
+          "rewardGold": 80,
+          "requires": "nacre_welcome",
+          "repeatable": false
+        },
+        {
+          "id": "nacre_supplies",
+          "title": "The Tide\u2019s Standing Order",
+          "npc": "nacre_trader",
+          "description": "Orin always needs Drowned Coins from Ran\u2019s Deep. This order can be repeated.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "drowned_coin",
+              "label": "Bring Drowned Coins",
+              "count": 4
+            }
+          ],
+          "level": 35,
+          "rewardXp": 1740,
+          "rewardGold": 800,
+          "requires": "nacre_welcome",
+          "repeatable": true
+        }
+      ],
+      "futureInstance": {
+        "name": "The Drowned Cathedral",
+        "level": 40,
+        "players": 5,
+        "status": "sealed",
+        "x": 96,
+        "y": 24,
+        "story": "Recover the Heart of the Tide from the drowned hierophant and free the bound choir."
+      },
+      "portals": [
+        {
+          "id": "nacre_deep_gate",
+          "name": "The Keelhaven Tideway",
+          "x": 96,
+          "y": 178,
+          "r": 1.1,
+          "to": 8,
+          "tx": 108,
+          "ty": 165
         }
       ]
     }
