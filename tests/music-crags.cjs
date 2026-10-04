@@ -21,6 +21,7 @@ const SONGS = [
   { id: 'rime', make: 'createRimeMusic', seconds: 76.8, name: 'Rimeveil Spiral' },
   { id: 'fen', make: 'createFenMusic', seconds: 72.73, name: 'Lanternmere Dusk' },
   { id: 'city', make: 'createCityMusic', seconds: 101.05, name: 'Skaldholm Square' },
+  { id: 'wyrd', make: 'createWyrdMusic', seconds: 60.02, name: 'Wyrdwood Wanderings' },
 ];
 (async () => {
   browser = await chromium.launch({ headless: true });
@@ -56,7 +57,7 @@ const SONGS = [
   await game.locator('#login-guest').click();
   await game.locator('#name').fill('Bard'); await game.locator('#go').click({ timeout: 60000 });
   await game.waitForFunction(() => Online.connected && !!valhalla.fmusic?.running, null, { timeout: 60000 });
-  check(await game.evaluate(() => !valhalla.cmusic.running && !valhalla.rmusic.running && !valhalla.gmusic.running && !valhalla.smusic.running && !valhalla.music.running), 'In Greenmeadow only the meadow tune is running');
+  check(await game.evaluate(() => !valhalla.cmusic.running && !valhalla.rmusic.running && !valhalla.gmusic.running && !valhalla.smusic.running && !valhalla.wmusic.running && !valhalla.music.running), 'In Greenmeadow only the meadow tune is running');
   await game.waitForFunction(() => valhalla.fmusic.loaded, null, { timeout: 30000 });
   check(true, 'The meadow mp3 loaded in the game');
   await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 1, x: 48, y: 86.5 } }));
@@ -101,6 +102,17 @@ const SONGS = [
   check(await game.evaluate(() => slevels.length > 0 && Math.abs(slevels.at(-1) - .25) < 1e-9), 'The music slider covers the city score too (50% = 0.25 gain)');
   await game.evaluate(() => Prefs.set({ sound: false }));
   check(await game.evaluate(() => slevels.at(-1) === 0), 'Sound off silences the city score');
+  await game.evaluate(() => Prefs.set({ sound: true, musicVol: 1 }));
+  // The Wyrdwood has the seventh score: Wyrdwood Wanderings replaces Skaldholm Square, and the slider covers it.
+  await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 6, x: 33, y: 156 } }));
+  await game.waitForFunction(() => Field.zone === 6 && valhalla.wmusic.running && !valhalla.smusic.running && !valhalla.cmusic.running, null, { timeout: 10000 });
+  await game.waitForFunction(() => valhalla.wmusic.loaded, null, { timeout: 30000 });
+  check(true, 'Crossing into the Wyrdwood swaps Skaldholm Square for Wyrdwood Wanderings, and it loads');
+  await game.evaluate(() => { window.wlevels = []; const set = valhalla.wmusic.setLevel; valhalla.wmusic.setLevel = (v, s) => { wlevels.push(v); return set.call(valhalla.wmusic, v, s); }; });
+  await game.evaluate(() => Prefs.set({ musicVol: .5 }));
+  check(await game.evaluate(() => wlevels.length > 0 && Math.abs(wlevels.at(-1) - .25) < 1e-9), 'The music slider covers the Wyrdwood score too (50% = 0.25 gain)');
+  await game.evaluate(() => Prefs.set({ sound: false }));
+  check(await game.evaluate(() => wlevels.at(-1) === 0), 'Sound off silences the Wyrdwood score');
   await game.evaluate(() => Prefs.set({ sound: true, musicVol: 1 }));
   await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 2, x: 64, y: 118.5 } }));
   await game.waitForFunction(() => Field.zone === 2 && valhalla.rmusic.running && !valhalla.gmusic.running, null, { timeout: 10000 });

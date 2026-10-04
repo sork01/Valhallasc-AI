@@ -3,7 +3,7 @@
 //! * gold is split evenly between the party members who are in the zone and near the body (the remainder goes
 //!   round robin);
 //! * gray gear and materials go round robin, one recipient per drop;
-//! * green, blue, purple and orange gear is rolled for: need (only for a piece your class can wear at your level),
+//! * green, blue, purple and orange gear is rolled for: need (only for a piece your class can wear, whatever its level),
 //!   greed or pass, 1-100 with need beating greed, thirty seconds to answer, nobody who stays silent can win.
 //!
 //! A hired mercenary is a party member like any other: it takes a share of the gold, a turn in the round robin and
@@ -16,6 +16,10 @@ use super::*;
 pub const ROLL_SECONDS: f64 = 30.;
 /// Party members farther than this from the body (or in another zone) take no part in a drop.
 pub const SHARE_RANGE: f64 = 60.;
+
+/// What a pickup paid: (who, where they stand, gold, item, quantity, name of the member who picked the pile up
+/// when it was somebody else).
+pub(super) type Reward = (String, Point, u32, Option<String>, u32, Option<String>);
 
 pub(super) struct Roll {
     id: u64,
@@ -32,9 +36,10 @@ pub(super) struct Roll {
 pub fn rollable(rarity: &str) -> bool {
     matches!(rarity, "uncommon" | "rare" | "epic" | "legendary")
 }
-/// Whether this character may need the piece: it is gear, their class can wear it and their level is high enough.
+/// Whether this character may need the piece: it is gear their class can wear. The level does not matter: a piece a
+/// few levels too high is still theirs to grow into (the level only gates wearing it), so a hunter can need hunter gloves.
 pub fn can_need(c: &Character, i: &Item) -> bool {
-    is_gear(i) && i.class.is_none_or(|k| k == c.look.class) && i.required_level <= c.level
+    is_gear(i) && i.class.is_none_or(|k| k == c.look.class)
 }
 
 impl World {
@@ -72,37 +77,28 @@ impl World {
         *turn += 1;
         who
     }
-    /// Gold from a kill: split evenly inside a party, the odd coins going to whoever is next in line.
+    /// Gold from a kill. Inside a party it is one pile that any member may pick up; whoever does shares it
+    /// evenly with the rest (see `collect_drop`). Alone, the killer's pile is theirs.
     pub(super) fn gold_drop(&mut self, owner: &str, zone: usize, point: Point, value: u32) {
         let group = self.loot_group(owner, zone, point);
-        let n = group.len() as u32;
-        let mut shares = vec![value / n; group.len()];
-        for _ in 0..value % n {
-            let who = self.next_in_line(&group);
-            let at = group.iter().position(|g| *g == who).unwrap();
-            shares[at] += 1;
-        }
-        for (who, share) in group.iter().zip(shares) {
-            if share == 0 || self.merc_id(who) {
-                continue;
-            }
-            let id = self.entity();
-            self.drops.push(Drop {
-                id,
-                owner: who.clone(),
-                zone,
-                x: point.x,
-                y: point.y,
-                z: 8.,
-                value: share,
-                item: None,
-                quantity: 0,
-                t: 0.,
-                col: "#ffe066",
-            });
-        }
+        let id = self.entity();
+        self.drops.push(Drop {
+            id,
+            owner: owner.into(),
+            zone,
+            x: point.x,
+            y: point.y,
+            z: 8.,
+            value,
+            item: None,
+            quantity: 0,
+            t: 0.,
+            col: "#ffe066",
+            group: if group.len() < 2 { vec![] } else { group },
+        });
     }
-    /// An item from a kill. Gray gear and materials go to the next member in line; green and better is rolled for.
+    /// An item from a kill. Gray gear and materials lie on the ground for any member of the party and go to the
+    /// next in line when picked up; green and better is rolled for.
     pub(super) fn loot_drop(&mut self, owner: &str, zone: usize, point: Point, item_id: &str) {
         let group = self.loot_group(owner, zone, point);
         if group.len() < 2 {
@@ -110,11 +106,11 @@ impl World {
         }
         let rarity = item(item_id).map_or("common", |i| i.rarity.as_str());
         if !rollable(rarity) {
-            let who = self.next_in_line(&group);
-            if self.merc_id(&who) {
-                return;
+            self.item_drop(owner, zone, point, item_id, 1);
+            if let Some(d) = self.drops.last_mut() {
+                d.group = group;
             }
-            return self.item_drop(&who, zone, point, item_id, 1);
+            return;
         }
         let id = self.entity();
         // (member, may need it, is a mercenary)
@@ -125,7 +121,9 @@ impl World {
                 let merc = found.is_some_and(|p| p.merc.is_some());
                 // A person needs what their class can wear; a mercenary only a piece that beats what it wears.
                 let need = found.zip(item(item_id)).is_some_and(|(p, i)| {
-                    can_need(&p.character, i) && (!merc || p.character.is_upgrade(i))
+                    can_need(&p.character, i)
+                        && (!merc
+                            || (i.required_level <= p.character.level && p.character.is_upgrade(i)))
                 });
                 (g.clone(), need, merc)
             })
@@ -162,6 +160,109 @@ impl World {
                 .collect(),
         });
     }
+    /// The next member in line who can take `item_id`, skipping people whose bags are full. A mercenary always
+    /// can: its turn forfeits the item.
+    fn next_taker(&mut self, group: &[String], item_id: &str) -> Option<String> {
+        let start = self.loot_turns.get(&group[0]).copied().unwrap_or(0);
+        for k in 0..group.len() {
+            let who = &group[(start + k) % group.len()];
+            let fits = self
+                .players
+                .values()
+                .find(|p| p.character.id == *who)
+                .is_some_and(|p| p.merc.is_some() || p.character.can_collect(item_id));
+            if fits {
+                self.loot_turns.insert(group[0].clone(), start + k + 1);
+                return Some(who.clone());
+            }
+        }
+        None
+    }
+    /// `session`'s hero has reached drop `index`. A party's gold is shared evenly between the members near the
+    /// pile (odd coins round robin); an item goes to the next member in line. Returns whether the pile is used up;
+    /// a pile nobody has room for stays on the ground.
+    pub(super) fn collect_drop(
+        &mut self,
+        index: usize,
+        session: u64,
+        rewards: &mut Vec<Reward>,
+    ) -> bool {
+        let d = self.drops[index].clone();
+        let Some(picker) = self.players.get(&session).map(|p| p.character.id.clone()) else {
+            return false;
+        };
+        let picker_name = self.name_of(&picker);
+        let group = if d.group.is_empty() {
+            vec![picker.clone()]
+        } else {
+            self.loot_group(&picker, d.zone, d.point())
+        };
+        let by = |who: &str| (who != picker).then(|| picker_name.clone());
+        let place = |w: &World, who: &str| {
+            w.players
+                .values()
+                .find(|p| p.character.id == who)
+                .map_or(d.point(), |p| p.character.point())
+        };
+        let Some(id) = &d.item else {
+            let n = group.len() as u32;
+            let mut shares = vec![d.value / n; group.len()];
+            for _ in 0..d.value % n {
+                let who = self.next_in_line(&group);
+                let at = group.iter().position(|g| *g == who).unwrap();
+                shares[at] += 1;
+            }
+            for (who, share) in group.iter().zip(shares) {
+                if share == 0 || self.merc_id(who) {
+                    continue;
+                }
+                if let Some(p) = self.players.values_mut().find(|p| p.character.id == *who) {
+                    p.character.gold = p.character.gold.saturating_add(share);
+                }
+                rewards.push((who.clone(), place(self, who), share, None, 0, by(who)));
+            }
+            return true;
+        };
+        let Some(who) = self.next_taker(&group, id) else {
+            let now = self.time;
+            if let Some(p) = self.players.get_mut(&session)
+                && now - p.bag_notice_at >= 5.
+            {
+                p.bag_notice_at = now;
+                let text = if group.len() < 2 {
+                    "Your bags are full. Sell loot or fit an extra six-slot bag from Linden. This item stays on the ground until it expires."
+                } else {
+                    "Nobody in your party has bag room for this. It stays on the ground until it expires."
+                };
+                let _ = p.peer.try_send(json!({"type":"system","text":text}));
+            }
+            return false;
+        };
+        if self.merc_id(&who) {
+            return true;
+        }
+        if let Some(p) = self.players.values_mut().find(|p| p.character.id == who) {
+            p.character.add_item(id, d.quantity);
+        }
+        if who != picker {
+            let name = self.name_of(&who);
+            let item_name = item(id).map_or("An item", |i| i.name.as_str());
+            self.tell(
+                &picker,
+                format!("{item_name} goes to {name}: the party takes turns."),
+                true,
+            );
+        }
+        rewards.push((
+            who.clone(),
+            place(self, &who),
+            0,
+            Some(id.clone()),
+            d.quantity,
+            by(&who),
+        ));
+        true
+    }
     pub(super) fn roll_vote(&mut self, session: u64, id: u64, choice: RollChoice) {
         let Some(p) = self.players.get(&session) else {
             return;
@@ -182,7 +283,7 @@ impl World {
             && !item(&roll.item).is_some_and(|i| can_need(&p.character, i))
         {
             return refuse(
-                "You cannot use that piece: Need is for gear your class can wear at your level. Choose Greed or Pass.",
+                "You cannot use that piece: Need is for gear your class can wear. Choose Greed or Pass.",
             );
         }
         let _ = p
@@ -352,6 +453,16 @@ mod tests {
     fn owned_by(w: &World, id: &str) -> Vec<Drop> {
         w.drops.iter().filter(|d| d.owner == id).cloned().collect()
     }
+    /// Lets every pile on the ground be taken by whoever stands nearest to it (the drops lie at the party's spot).
+    fn collect_all(w: &mut World) {
+        for d in &mut w.drops {
+            d.t = 1.;
+        }
+        w.update_drops();
+    }
+    fn gold_of(w: &World, session: u64) -> u32 {
+        w.players[&session].character.gold
+    }
     /// A green piece only the given class can use, at level 20 or below.
     fn green_for(class: Class) -> &'static Item {
         ITEMS
@@ -379,14 +490,24 @@ mod tests {
     }
 
     #[test]
-    fn gold_is_split_between_party_members_with_the_odd_coins_shared_out() {
+    fn a_party_pile_of_gold_is_one_pile_and_whoever_takes_it_shares_it_with_everyone() {
         let mut w = world();
         let who = party(&mut w, &["Ann", "Bob", "Cat"]);
         let at = spot(&w);
+        let before: Vec<u32> = who.iter().map(|(s, ..)| gold_of(&w, *s)).collect();
         w.gold_drop(&who[0].1, 0, at, 10);
+        assert_eq!(w.drops.len(), 1, "one pile, not one per member");
+        assert_eq!(w.drops[0].value, 10);
+        // Cat, who did not kill anything, is the one who reaches it.
+        for (s, ..) in &who[..2] {
+            w.players.get_mut(s).unwrap().character.x += 10.;
+        }
+        collect_all(&mut w);
+        assert!(w.drops.is_empty(), "taken");
         let shares: Vec<u32> = who
             .iter()
-            .map(|(_, id, _)| owned_by(&w, id).iter().map(|d| d.value).sum())
+            .zip(&before)
+            .map(|((s, ..), b)| gold_of(&w, *s) - b)
             .collect();
         assert_eq!(
             shares.iter().sum::<u32>(),
@@ -398,35 +519,228 @@ mod tests {
         let mut solo = world();
         let who = party(&mut solo, &["Dan"]);
         let at = spot(&solo);
+        let before = gold_of(&solo, 1);
         solo.gold_drop(&who[0].1, 0, at, 10);
         assert_eq!(owned_by(&solo, &who[0].1)[0].value, 10);
-        assert_eq!(solo.drops.len(), 1);
+        collect_all(&mut solo);
+        assert_eq!(gold_of(&solo, 1) - before, 10);
     }
 
     #[test]
-    fn far_or_absent_members_take_no_share() {
+    fn a_member_far_from_the_pile_takes_no_share_of_it() {
         let mut w = world();
         let who = party(&mut w, &["Ann", "Bob"]);
-        // Bob wanders off beyond the sharing range.
-        w.players.get_mut(&2).unwrap().character.x += SHARE_RANGE + 5.;
         let at = spot(&w);
         w.gold_drop(&who[0].1, 0, at, 9);
-        assert_eq!(w.drops.len(), 1);
-        assert_eq!(owned_by(&w, &who[0].1)[0].value, 9);
+        // Bob wanders off beyond the sharing range before Ann picks it up.
+        w.players.get_mut(&2).unwrap().character.x += SHARE_RANGE + 5.;
+        let (ann, bob) = (gold_of(&w, 1), gold_of(&w, 2));
+        collect_all(&mut w);
+        assert_eq!(gold_of(&w, 1) - ann, 9);
+        assert_eq!(gold_of(&w, 2), bob);
     }
 
     #[test]
-    fn gray_drops_go_round_robin() {
+    fn a_drop_belongs_to_nobody_outside_the_party() {
+        let mut w = world();
+        let who = party(&mut w, &["Ann", "Bob"]);
+        // A stranger stands on the pile; only Ann (beside it, with Bob) may take it.
+        let (tx, _rx) = mpsc::channel(512);
+        let at = spot(&w);
+        w.join(
+            3,
+            None,
+            Some(Look {
+                name: "Eve".into(),
+                ..Look::default()
+            }),
+            tx,
+        )
+        .unwrap();
+        {
+            let c = &mut w.players.get_mut(&3).unwrap().character;
+            c.x = at.x;
+            c.y = at.y;
+        }
+        for (s, ..) in &who {
+            w.players.get_mut(s).unwrap().character.x += 2.;
+        }
+        w.gold_drop(&who[0].1, 0, at, 8);
+        let eve = gold_of(&w, 3);
+        collect_all(&mut w);
+        assert_eq!(gold_of(&w, 3), eve, "the stranger got nothing");
+        w.players.get_mut(&3).unwrap().character.x -= 50.;
+        for _ in 0..20 {
+            w.update_drops();
+        }
+        assert!(w.drops.is_empty(), "the party took it");
+        assert_eq!(gold_of(&w, 3), eve);
+    }
+
+    #[test]
+    fn gray_drops_lie_open_to_everyone_and_go_round_robin_whoever_takes_them() {
         let mut w = world();
         let who = party(&mut w, &["Ann", "Bob", "Cat"]);
         let at = spot(&w);
         for _ in 0..6 {
             w.loot_drop(&who[0].1, 0, at, "slime_gel");
         }
-        for (_, id, _) in &who {
-            assert_eq!(owned_by(&w, id).len(), 2, "two each, not all to the killer");
-        }
+        assert_eq!(w.drops.len(), 6, "piles on the ground, not assigned yet");
         assert!(w.rolls.is_empty(), "gray items are never rolled for");
+        // Only Cat walks over them, yet the party takes turns.
+        for (s, ..) in &who[..2] {
+            w.players.get_mut(s).unwrap().character.x += 10.;
+        }
+        collect_all(&mut w);
+        assert!(w.drops.is_empty());
+        for (s, ..) in &who {
+            let c = &w.players[s].character;
+            assert_eq!(
+                c.quantity("slime_gel"),
+                2,
+                "two each, not all to the one who walked: {}",
+                c.look.name
+            );
+        }
+    }
+
+    /// Gives `session` the King Slime quest with nothing done yet.
+    fn take_king_quest(w: &mut World, session: u64) {
+        w.players
+            .get_mut(&session)
+            .unwrap()
+            .character
+            .quests
+            .push(QuestProgress {
+                id: "king_challenge".into(),
+                counts: vec![0],
+                ..Default::default()
+            });
+    }
+    fn king_done(w: &World, session: u64) -> u32 {
+        w.players[&session].character.quests[0].counts[0]
+    }
+
+    #[test]
+    fn a_kill_counts_for_the_quest_of_every_living_party_member_beside_it() {
+        // Ann (1), Bob (2), Cat (3) are a party; Dee (4) is a stranger; Eve (5) is Cat's partner too but is away.
+        let mut w = world();
+        let who = party(&mut w, &["Ann", "Bob", "Cat", "Dee", "Eve"]);
+        // Dee and Eve joined the party list by the helper; take Dee out and stand Eve far away.
+        w.leave_party(&who[3].1);
+        let at = spot(&w);
+        let id = w.slimes.iter().position(|s| s.kind == "big").unwrap();
+        w.slimes[id].dead = false;
+        w.slimes[id].hp = 1.;
+        w.slimes[id].x = at.x;
+        w.slimes[id].y = at.y;
+        for (s, ..) in &who {
+            take_king_quest(&mut w, *s);
+        }
+        w.players.get_mut(&5).unwrap().character.x += SHARE_RANGE + 10.;
+        w.players.get_mut(&3).unwrap().character.hp = 0.;
+        w.hit_slime(id, 2, 50., false);
+        assert!(w.slimes[id].dead);
+        assert_eq!(king_done(&w, 2), 1, "the killer");
+        assert_eq!(king_done(&w, 1), 1, "a party mate who never swung");
+        assert_eq!(king_done(&w, 3), 0, "a dead mate");
+        assert_eq!(king_done(&w, 4), 0, "outside the party");
+        assert_eq!(king_done(&w, 5), 0, "too far away");
+        // Only the killer's own kill counter moves.
+        assert_eq!(w.players[&2].character.kills, 1);
+        assert_eq!(w.players[&1].character.kills, 0);
+    }
+
+    #[test]
+    fn a_hunter_can_need_hunter_gloves_above_their_level_but_not_another_class_piece() {
+        let mut w = world();
+        let mut who = party(&mut w, &["Ann", "Bob"]);
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.look.class = Class::Hunter;
+            c.level = 5;
+        }
+        let gloves = ITEMS
+            .iter()
+            .find(|i| {
+                i.kind == "gloves"
+                    && i.class == Some(Class::Hunter)
+                    && i.rarity == "uncommon"
+                    && i.required_level >= 10
+            })
+            .expect("hunter gloves above level 5");
+        let at = spot(&w);
+        w.loot_drop(&who[1].1, 0, at, &gloves.id);
+        let start = heard(&mut who[0].2)
+            .into_iter()
+            .find(|v| v["op"] == "start")
+            .unwrap();
+        assert_eq!(
+            start["need"], true,
+            "a class piece is needable at any level"
+        );
+        let id = start["id"].as_u64().unwrap();
+        vote(&mut w, &who[0], id, RollChoice::Need);
+        assert!(
+            heard(&mut who[0].2).iter().all(|v| v["type"] != "error"),
+            "the server accepts the Need vote"
+        );
+        // Bob is a mage: hunter gloves are never his to need.
+        let start = heard(&mut who[1].2)
+            .into_iter()
+            .find(|v| v["op"] == "start")
+            .unwrap();
+        assert_eq!(start["need"], false);
+    }
+
+    #[test]
+    fn the_party_packet_tells_each_member_which_quests_the_others_have_taken() {
+        let mut w = world();
+        let who = party(&mut w, &["Ann", "Bob"]);
+        take_king_quest(&mut w, 1);
+        let index = w.party_index(&who[0].1).unwrap();
+        let members = w.party_value(index)["members"].clone();
+        let quests = |name: &str| {
+            members
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|m| m["name"] == name)
+                .unwrap()["quests"]
+                .clone()
+        };
+        assert_eq!(quests("Ann")[0]["id"], "king_challenge");
+        assert_eq!(quests("Ann")[0]["counts"][0], 0);
+        assert_eq!(quests("Bob").as_array().unwrap().len(), 0);
+        // A handed-in quest is no longer shown.
+        w.players.get_mut(&1).unwrap().character.quests[0].claimed = true;
+        let members = w.party_value(index)["members"].clone();
+        assert!(members[0]["quests"].as_array().unwrap().is_empty());
+    }
+
+    #[test]
+    fn an_item_skips_a_member_whose_bags_are_full() {
+        let mut w = world();
+        let who = party(&mut w, &["Ann", "Bob"]);
+        let at = spot(&w);
+        {
+            let c = &mut w.players.get_mut(&2).unwrap().character;
+            let room = c.bag_capacity();
+            for i in ITEMS
+                .iter()
+                .filter(|i| i.kind != "bag" && i.id != "slime_gel")
+                .take(room)
+            {
+                c.add_item(&i.id, 1);
+            }
+            assert!(!c.can_collect("slime_gel"), "Bob is full");
+        }
+        for _ in 0..3 {
+            w.loot_drop(&who[0].1, 0, at, "slime_gel");
+        }
+        collect_all(&mut w);
+        assert_eq!(w.players[&1].character.quantity("slime_gel"), 3);
+        assert_eq!(w.players[&2].character.quantity("slime_gel"), 0);
     }
 
     #[test]
@@ -544,23 +858,24 @@ mod tests {
         hire_priest(&mut w, &who[0].1, 1);
         let at = spot(&w);
         // Three ways: the fighter's 4 coins are its pay and go nowhere.
+        let before = gold_of(&w, 1) + gold_of(&w, 2);
         w.gold_drop(&who[0].1, 0, at, 12);
-        let humans: u32 = w.drops.iter().map(|d| d.value).sum();
+        collect_all(&mut w);
         assert_eq!(
-            humans, 8,
+            gold_of(&w, 1) + gold_of(&w, 2) - before,
+            8,
             "each human gets a third, the mercenary's third is gone"
         );
-        assert!(
-            w.drops
-                .iter()
-                .all(|d| d.owner == who[0].1 || d.owner == who[1].1)
-        );
         // Round robin: of six gray drops, two fall to the mercenary and are lost.
-        w.drops.clear();
         for _ in 0..6 {
             w.loot_drop(&who[0].1, 0, at, "slime_gel");
         }
-        assert_eq!(w.drops.len(), 4);
+        collect_all(&mut w);
+        let gel: u32 = [1, 2]
+            .iter()
+            .map(|s| w.players[s].character.quantity("slime_gel"))
+            .sum();
+        assert_eq!(gel, 4);
     }
 
     /// A green piece of this kind that only the given class can use.
@@ -622,12 +937,10 @@ mod tests {
         let who = party(&mut w, &["Ann"]);
         hire_priest(&mut w, &who[0].1, 1);
         let at = spot(&w);
+        let before = gold_of(&w, 1);
         w.gold_drop(&who[0].1, 0, at, 10);
-        assert_eq!(
-            owned_by(&w, &who[0].1)[0].value,
-            5,
-            "half goes to the fighter"
-        );
+        collect_all(&mut w);
+        assert_eq!(gold_of(&w, 1) - before, 5, "half goes to the fighter");
     }
 
     #[test]
@@ -700,6 +1013,7 @@ mod tests {
                 Slime::new(
                     0,
                     &SlimeSpawn {
+                        ambush: None,
                         kind: kind.into(),
                         x: 1.,
                         y: 1.,

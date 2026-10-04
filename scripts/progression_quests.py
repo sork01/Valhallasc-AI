@@ -36,6 +36,10 @@ PROGRESSION = {
         'city_onward', 'The Capital Awaits', 'city_captain', 20, 400,
         'You are ready for the greatest city in the north. Take the city gate beside the Rimeveil summit and walk the long road into Skaldholm, then report to Captain Ingrid Stormwatch at the Great Gate.',
         'Travel to Skaldholm'),
+    'Wyrdwood': (
+        'wyrd_onward', 'The Road East', 'wyrd_warden', 22, 500,
+        'Skaldholm is not the end of the road. Leave the city by the East Gate at the end of the Trade Road and walk into the Wyrdwood, where the forest has begun to go wrong. Find Hollowmoot beneath the Elder Ash and report to Moot-Warden Bjorn Oakhand.',
+        'Travel to the Wyrdwood'),
 }
 
 

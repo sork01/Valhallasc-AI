@@ -718,6 +718,48 @@ impl Quest {
     }
 }
 
+/// Marks `visit` objectives done for the places the character stands in (a place's `id` is the objective's target).
+/// Returns the names of the places just reached for the first time.
+pub fn sync_visits(character: &mut Character, maps: &[Map]) -> Vec<String> {
+    let mut reached = Vec::new();
+    let Some(map) = maps.get(character.zone).filter(|m| !m.places.is_empty()) else {
+        return reached;
+    };
+    let here = character.point();
+    for i in 0..character.quests.len() {
+        if character.quests[i].claimed {
+            continue;
+        }
+        let Some(quest) = map.quests.iter().find(|q| q.id == character.quests[i].id) else {
+            continue;
+        };
+        for (n, objective) in quest.objectives.iter().enumerate() {
+            if objective.kind != "visit" {
+                continue;
+            }
+            let Some(place) = map.places.iter().find(|p| p.id == objective.target) else {
+                continue;
+            };
+            if here.distance(Point {
+                x: place.x,
+                y: place.y,
+            }) > place.r
+            {
+                continue;
+            }
+            let counts = &mut character.quests[i].counts;
+            if counts.len() <= n {
+                counts.resize(n + 1, 0);
+            }
+            if counts[n] < objective.count {
+                counts[n] = objective.count;
+                reached.push(place.name.clone());
+            }
+        }
+    }
+    reached
+}
+
 /// Accepts every progression quest the character has reached the level for and marks "reach" objectives
 /// done for the zone they stand in or have already explored. Returns the titles of the quests that
 /// just arrived. Cheap enough for every tick: it only walks the quest list.
@@ -1059,6 +1101,47 @@ pub struct Npc {
     pub pause: f64,
     #[serde(default, skip_serializing)]
     pub phase: f64,
+    /// A stranded person who joins whoever speaks to them while their escort quest is active (see world/escort.rs).
+    #[serde(default, skip_serializing)]
+    pub escort: Option<EscortDef>,
+}
+/// How an escortable NPC travels: who they are, how tough, the walked route (free of obstacles) and where ambushers wake.
+#[derive(Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EscortDef {
+    /// The quest whose escort objective this person serves.
+    pub quest: String,
+    pub class: String,
+    #[serde(default)]
+    pub female: bool,
+    #[serde(default)]
+    pub hair_color: u8,
+    #[serde(default)]
+    pub skin: u8,
+    /// Level of the escorted hero: it decides their health (the walkers are tough, not fighters).
+    pub level: u32,
+    /// Walking speed in tiles per second.
+    pub speed: f64,
+    /// Waypoints from the starting place to safety; the last one is where the journey ends.
+    pub route: Vec<[f64; 2]>,
+    /// Ambushes: when the escort comes within `r` of `at`, every sleeping enemy tagged `tag` attacks.
+    #[serde(default)]
+    pub ambush: Vec<AmbushDef>,
+}
+#[derive(Clone, Deserialize)]
+pub struct AmbushDef {
+    pub at: [f64; 2],
+    pub r: f64,
+    pub tag: String,
+}
+/// A named spot a `visit` objective can name (a beacon, a glade, a standing stone).
+#[derive(Clone, Deserialize)]
+pub struct Place {
+    pub id: String,
+    pub name: String,
+    pub x: f64,
+    pub y: f64,
+    pub r: f64,
 }
 impl Npc {
     /// Where this NPC stands at world time `time` (seconds). client/city.js `routePoint` computes the same thing.
@@ -1113,6 +1196,9 @@ pub struct SlimeSpawn {
     pub x: f64,
     pub y: f64,
     pub kind: String,
+    /// An ambusher: the escort ("<npc id>#<n>") whose journey wakes it. It sleeps (dead, never respawning) until then.
+    #[serde(default)]
+    pub ambush: Option<String>,
     /// Filled in when the zones' spawns are flattened into the world's enemy list.
     #[serde(skip)]
     pub zone: usize,
@@ -1145,8 +1231,14 @@ pub struct Map {
     #[serde(default)]
     pub quests: Vec<Quest>,
     pub city: Option<City>,
+    /// Further sanctuaries of a zone with more than one hub (the Wyrdwood's Skuldwatch): `city` is the first.
+    #[serde(default)]
+    pub camps: Vec<City>,
     #[serde(default)]
     pub portals: Vec<Portal>,
+    /// Spots that `visit` quest objectives name: standing inside one marks the objective done.
+    #[serde(default)]
+    pub places: Vec<Place>,
     /// Recommended character levels, shown when a portal is used.
     #[serde(default)]
     pub levels: Option<[u32; 2]>,
@@ -1177,7 +1269,10 @@ impl Default for Map {
 }
 impl Map {
     pub fn in_city(&self, point: Point) -> bool {
-        self.city.as_ref().is_some_and(|city| city.contains(point))
+        self.city
+            .iter()
+            .chain(&self.camps)
+            .any(|city| city.contains(point))
     }
     pub fn collide(&self, p: &mut Point, radius: f64) {
         for _ in 0..2 {
@@ -1303,6 +1398,8 @@ mod tests {
             npcs: vec![],
             quests: vec![],
             city: None,
+            camps: vec![],
+            places: vec![],
             portals: vec![],
             levels: None,
             zones: vec![],

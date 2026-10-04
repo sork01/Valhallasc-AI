@@ -70,7 +70,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
 
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, size: z.size, levels: z.levels, portals: z.portals.map(p => p.id + '>' + p.to), ice: z.objects.filter(o => o.kind === 'ice').length })));
-  check(zones.length === 6 && zones[2].name === 'Rimeveil Glacier' && zones[2].theme === 'frost' && zones[2].size === 128 && zones[2].levels.join() === '10,15', 'The client knows the glacier: name, frost theme, 128 tiles, levels 10-15');
+  check(zones.length === 7 && zones[2].name === 'Rimeveil Glacier' && zones[2].theme === 'frost' && zones[2].size === 128 && zones[2].levels.join() === '10,15', 'The client knows the glacier: name, frost theme, 128 tiles, levels 10-15');
   check(zones[1].portals.join() === 'meadow_gate>0,rimeveil_gate>2' && zones[2].portals[0] === 'crags_gate>1', 'The Crags have a second gate to the glacier, which has the gate back (and now a summit gate onward)');
   check(zones[2].ice > 400, `The glacier walls are ${zones[2].ice} ice blocks`);
   check(await page.evaluate(stub => { const m = Field.rimeSprites.meta; return m.kinds.join() === 'crab,wolf,yeti,wyrm' && (stub || m.kinds.every(k => Field.rimeSprites.img[k].naturalWidth === 768 && Field.rimeSprites.img[k].naturalHeight === 480)); }, STUB), 'The four glacier monster atlases are loaded (768x480 on the real art)');
@@ -122,14 +122,12 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   const ice = await page.evaluate(() => { const c = document.getElementById('minimap'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 2] > 170 && d[i + 2] - d[i] > 60 && d[i + 3] > 0) n++; return n; });
   check(ice > 250, `The minimap draws the four ice rings (${ice} ice-blue pixels)`);
 
-  // The journal: thirteen glacier quests, local ones first, the first camp conversation through real clicks.
+  // The journal holds only quests taken; the first camp conversation through the walk to the warden.
   await page.keyboard.press('q');
-  check(await page.locator('#quest-journal').isVisible() && (await page.locator('#quest-list [data-quest="welcome"]').textContent()).includes('is back in Greenmeadow'), 'Meadow quests explain that their givers are in Greenmeadow');
-  check(await page.locator('#quest-list [data-quest^="rime_"]').count() === 14 && await page.locator('#quest-list [data-quest^="crags_"]').count() === 14, 'The journal lists all fourteen glacier quests beside the fourteen Crags quests (thirteen camp quests plus the progression one)');
-  check(await page.locator('#quest-list .quest-card').first().getAttribute('data-quest') === 'rime_welcome', 'Local camp quests sort first');
-  check(await page.locator('#quest-list [data-quest="rime_yetis"]').textContent().then(t => t.includes('Locked') && t.includes('Howls in the Whiteout')), 'Later hunts explain their prerequisite');
-  check(await page.locator('#quest-list [data-quest="rime_wyrm_hunt"]').textContent().then(t => t.includes('Recommended level 15')), 'The journal shows each quest\'s recommended level');
-  await page.locator('#quest-list [data-quest="rime_welcome"] button').filter({ hasText: 'Get quest from Warden Halvard' }).click();
+  check(await page.locator('#quest-journal').isVisible() && await page.locator('#quest-list .quest-card').count() === 0 && await page.locator('#quest-list .quest-empty').count() > 0, 'The journal lists no quest that has not been taken');
+  check(await page.evaluate(() => { const q = WORLD_MAP.zones.flatMap(z => z.quests || []); return q.filter(x => x.id.startsWith('rime_')).length === 14 && q.find(x => x.id === 'rime_wyrm_hunt').level === 15; }), 'The glacier catalogue has fourteen quests, the wyrm hunt at level 15');
+  await page.keyboard.press('Escape');
+  await page.evaluate(() => Field.visitNpc('rime_warden'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
   check(await page.locator('#npc-name').textContent() === 'Warden Halvard', 'Journal travel reaches the camp warden');
   await page.locator('#npc-quests .gossip-row[data-quest="rime_welcome"]').click();

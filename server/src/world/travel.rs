@@ -310,30 +310,38 @@ mod spark_tests {
     #[test]
     fn spark_every_hub_has_one_clear_master_and_a_reciprocal_connected_network() {
         let (w, _, _) = world(Class::Warrior);
-        let hubs: Vec<_> = w.maps.iter().filter(|m| m.city.is_some()).collect();
-        assert_eq!(hubs.len(), 5);
-        for map in hubs {
+        let hubs: Vec<_> = w
+            .maps
+            .iter()
+            .enumerate()
+            .filter(|(_, m)| m.city.is_some())
+            .collect();
+        assert_eq!(hubs.len(), 6);
+        for (index, map) in hubs {
             let masters: Vec<_> = map
                 .npcs
                 .iter()
                 .filter(|n| n.travel_stop.is_some())
                 .collect();
-            assert_eq!(masters.len(), 1);
-            let n = masters[0];
-            let point = n.position_at(0.);
-            let mut resolved = point;
-            map.collide(&mut resolved, PLAYER_RADIUS);
-            assert!(resolved.distance(point) < 1e-8, "{} blocked", n.id);
-            assert!(map.in_city(point));
-            assert!(
-                map.portals
-                    .iter()
-                    .all(|g| point.distance(Point { x: g.x, y: g.y }) > g.r + 1.)
-            );
-            for link in &n.travel_links {
-                let (zone, next) = w.travel_master(link).unwrap();
-                assert!(next.travel_links.contains(&n.id));
-                assert!(map.portals.iter().any(|g| g.to == zone));
+            // one master in every hub: the Wyrdwood has two hubs, Hollowmoot and Skuldwatch
+            assert_eq!(masters.len(), 1 + map.camps.len());
+            for n in masters {
+                let point = n.position_at(0.);
+                let mut resolved = point;
+                map.collide(&mut resolved, PLAYER_RADIUS);
+                assert!(resolved.distance(point) < 1e-8, "{} blocked", n.id);
+                assert!(map.in_city(point));
+                assert!(
+                    map.portals
+                        .iter()
+                        .all(|g| point.distance(Point { x: g.x, y: g.y }) > g.r + 1.)
+                );
+                for link in &n.travel_links {
+                    let (zone, next) = w.travel_master(link).unwrap();
+                    assert!(next.travel_links.contains(&n.id));
+                    // a link to another zone goes through a gate; a link inside the zone is a flight over the river
+                    assert!(zone == index || map.portals.iter().any(|g| g.to == zone));
+                }
             }
         }
         assert_eq!(w.spark_route(A, C).unwrap(), [A, B, C]);

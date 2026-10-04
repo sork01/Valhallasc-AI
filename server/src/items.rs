@@ -138,6 +138,13 @@ pub fn material(kind: &str) -> &'static str {
         "choir" => "hollow_chime",
         "colossus" => "runed_keystone",
         "hollowking" => "crown_shard",
+        "boar" => "rotfang_tusk",
+        "crow" => "gallows_feather",
+        "troll" => "mosshide_scrap",
+        "weaver" => "fate_thread",
+        "ram" => "stormram_horn",
+        "oakhorn" => "oakhorn_crown",
+        "hrungnir" => "stormheart_shard",
         _ => "slime_gel",
     }
 }
@@ -176,7 +183,10 @@ pub fn rarity_color(rarity: &str) -> &'static str {
     }
 }
 pub fn is_elite(kind: &str) -> bool {
-    matches!(kind, "big" | "cinderlord" | "gloomroot") || is_vault_enemy(kind)
+    matches!(
+        kind,
+        "big" | "cinderlord" | "gloomroot" | "oakhorn" | "hrungnir"
+    ) || is_vault_enemy(kind)
 }
 /// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.
 pub fn is_vault_enemy(kind: &str) -> bool {

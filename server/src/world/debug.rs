@@ -323,14 +323,15 @@ impl World {
                 let id = self
                     .slimes
                     .iter()
-                    .filter(|s| s.kind == kind)
+                    .filter(|s| s.kind == kind && self.spawns[s.id].ambush.is_none())
                     .min_by_key(|s| (!s.dead, s.id))
                     .map(|s| s.id)
-                    .ok_or("No enemy of that kind exists. Kinds: green, blue, pink, yellow, beetle, wisp, spider, wraith, golem, cinderlord, crab, wolf, yeti, wyrm, toad, croc, knight, hydra, gloomroot, thrall, archer, acolyte, gatewarden, choir, colossus, hollowking.")?;
+                    .ok_or("No enemy of that kind exists. Kinds: green, blue, pink, yellow, beetle, wisp, spider, wraith, golem, cinderlord, crab, wolf, yeti, wyrm, toad, croc, knight, hydra, gloomroot, thrall, archer, acolyte, gatewarden, choir, colossus, hollowking, boar, crow, troll, weaver, ram, oakhorn, hrungnir.")?;
                 let zone = self.players[&session].character.zone;
                 let mut enemy = Slime::with_level(
                     id,
                     &SlimeSpawn {
+                        ambush: None,
                         x,
                         y,
                         kind: kind.clone(),

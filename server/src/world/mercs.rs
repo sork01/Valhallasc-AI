@@ -10,13 +10,13 @@ use super::*;
 /// Gold for one mercenary, whatever its class.
 pub const MERC_COST: u32 = 250;
 /// Mercenary sessions live far above every socket's counter, so the two can never collide.
-const MERC_BASE: u64 = 1 << 62;
+pub(super) const MERC_BASE: u64 = 1 << 62;
 /// A mercenary farther than this from its hirer (or in another zone) is carried to their side.
 const MERC_LEASH: f64 = 26.;
 /// Enemies attacking the party this close are fought without waiting for the hirer to pick a target.
 const MERC_SIGHT: f64 = 14.;
 
-fn class_named(name: &str) -> Option<Class> {
+pub(super) fn class_named(name: &str) -> Option<Class> {
     Some(match name {
         "warrior" => Class::Warrior,
         "mage" => Class::Mage,
@@ -44,7 +44,7 @@ impl World {
     pub(super) fn humans_online(&self) -> usize {
         self.players.values().filter(|p| p.merc.is_none()).count()
     }
-    fn session_of(&self, character: &str) -> Option<u64> {
+    pub(super) fn session_of(&self, character: &str) -> Option<u64> {
         self.players
             .iter()
             .find(|(_, p)| p.merc.is_none() && p.character.id == character)
@@ -61,7 +61,7 @@ impl World {
     fn mercenaries_of(&self, owner: &str) -> Vec<u64> {
         self.players
             .iter()
-            .filter(|(_, p)| p.merc.as_deref() == Some(owner))
+            .filter(|(_, p)| p.merc.as_deref() == Some(owner) && p.escort.is_none())
             .map(|(session, _)| *session)
             .collect()
     }
@@ -235,7 +235,7 @@ impl World {
         let mercs: Vec<u64> = self
             .players
             .iter()
-            .filter(|(_, p)| p.merc.is_some())
+            .filter(|(_, p)| p.merc.is_some() && p.escort.is_none())
             .map(|(session, _)| *session)
             .collect();
         for session in mercs {

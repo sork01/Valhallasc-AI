@@ -7,16 +7,17 @@
   const $ = id => document.getElementById(id);
   const NS = 'http://www.w3.org/2000/svg';
   const STAGE = { w: 100, h: 62 };
-  // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm.
-  const LAYOUT = [{ x: 4, y: 38, s: 17 }, { x: 27, y: 22, s: 17 }, { x: 49, y: 5, s: 22 }, { x: 76, y: 3, s: 22 }, { x: 70, y: 33, s: 27 }, { x: 45, y: 40, s: 20 }];
-  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', vault: '#07080e' };
-  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', vault: '#3a3f55' };
-  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', vault: '#59d9ff' };
+  // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm -> the Wyrdwood.
+  const LAYOUT = [{ x: 2, y: 42, s: 15 }, { x: 19, y: 28, s: 15 }, { x: 35, y: 8, s: 20 }, { x: 59, y: 2, s: 20 }, { x: 48, y: 32, s: 21 }, { x: 30, y: 44, s: 16 }, { x: 72, y: 24, s: 28 }];
+  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', vault: '#07080e', wyrd: '#6a5430' };
+  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', vault: '#3a3f55', wyrd: '#b89860' };
+  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', vault: '#59d9ff', wyrd: '#e0963a' };
   const BLURB = {
     meadow: 'Green pastures round the walled town of Alderhaven.',
     ember: 'Lava fords and ash-grey crags above Cinderwatch Camp.',
     frost: 'Four rings of ice that spiral up to a summit bowl.',
     fen: 'A dusk fen round a dark lake, lit by the lanterns of Lanternmere.',
+    wyrd: 'An autumn forest, a troll bridge and a storm-wracked moor, between Hollowmoot and Skuldwatch.',
     vault: 'A dungeon of bones and torchlight under the Meeting Stone, for a party of five.',
   };
   // Base level and a dot colour for every enemy kind (the level matches Slime::default_level in server/src/world.rs;
@@ -32,6 +33,8 @@
     thrall: ['Vault Thrall', 19, '#d8d2bc'], archer: ['Bone Archer (ranged)', 19, '#e6dfc4'], acolyte: ['Hollow Acolyte (ranged)', 20, '#b46bff'],
     gatewarden: ['Hrolf Bonegate (Boss)', 20, '#ffd24a'], choir: ['Valka, the Hollow Choir (Boss)', 20, '#7be0ff'],
     colossus: ['Ironwake, the Vault Colossus (Boss)', 21, '#ff9a3a'], hollowking: ['Haldor, the Hollow King (Boss)', 21, '#9cff8f'],
+    boar: ['Rotfang Boar', 21, '#d0603a'], crow: ['Gallowcrow (ranged)', 23, '#9a84d6'], troll: ['Mosshide Troll', 25, '#6fb064'], weaver: ['Wyrdweaver (ranged)', 27, '#c070e8'],
+    ram: ['Stormram', 29, '#8fe0ff'], oakhorn: ['Oakhorn (Elite · 3 players)', 25, '#ff9a3a'], hrungnir: ['Hrungnir (Elite · 5 players)', 30, '#7ab4ff'],
   };
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const kindInfo = kind => KINDS[kind] || [kind, 1, '#ff6b8a'];
@@ -68,15 +71,20 @@
 
   // ---------- ground ----------
   function objectColour(o, theme) {
-    const fen = theme === 'fen', frost = theme === 'frost', ember = theme === 'ember';
+    const fen = theme === 'fen', frost = theme === 'frost', ember = theme === 'ember', wyrd = theme === 'wyrd';
     switch (o.kind) {
       case 'lava': return '#ff6a2a';
       case 'ice': return '#4f93c8';
-      case 'water': return '#244f5c';
+      case 'water': return wyrd ? '#2f6f9a' : '#244f5c';
+      case 'crag': return '#4a4a58';
+      case 'pine': return '#1f4a3a';
+      case 'beacon': return '#ff9a2e';
+      case 'gallows': case 'ribcage': return '#d8d0b8';
+      case 'elderash': return '#8a5a2a';
       case 'thicket': return '#6a2f58';
-      case 'tree': return fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a';
-      case 'spire': return fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e';
-      case 'rock': return fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8';
+      case 'tree': return wyrd ? '#a8451e' : fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a';
+      case 'spire': return wyrd ? '#d8d8c8' : fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e';
+      case 'rock': return wyrd ? '#7a7a80' : fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8';
       case 'rampart': return '#6f7078';
       case 'vaultwall': return '#5d6482';
       case 'pillar': return '#a3abc0';
@@ -92,7 +100,7 @@
     }
   }
   const FEATURE = new Set(['lava', 'ice', 'water', 'thicket']);
-  const RADIUS = { lava: 1.5, water: 1.1, ice: 1.15, thicket: 1.15, tree: 1.4, bush: .8, rock: .9, spire: 1, lamp: .5, flowers: .5 };
+  const RADIUS = { crag: 1.3, pine: 1.4, elderash: 3.5, lava: 1.5, water: 1.1, ice: 1.15, thicket: 1.15, tree: 1.4, bush: .8, rock: .9, spire: 1, lamp: .5, flowers: .5 };
   function paint(index, px) {
     const key = `${index}:${px}`; if (cache.has(key)) return cache.get(key);
     const z = zones[index], k = px / z.size, c = document.createElement('canvas'); c.width = c.height = px;
@@ -111,8 +119,8 @@
       else if (r.r0 !== undefined) { g.lineWidth = (r.r1 - r.r0) * k; g.beginPath(); g.arc(r.x * k, r.y * k, (r.r0 + r.r1) / 2 * k, 0, 6.283); g.stroke(); }
       else { g.beginPath(); g.arc(r.x * k, r.y * k, r.r * k, 0, 6.283); g.fill(); }
     }
-    if (z.city && z.theme !== 'city') {
-      const t = z.city; g.fillStyle = { meadow: '#d8cbb0', ember: '#88705d', frost: '#8fa6bd', fen: '#6a5238' }[z.theme];
+    if (z.city && z.theme !== 'city') for (const t of [z.city, ...(z.camps || [])]) {
+      g.fillStyle = { meadow: '#d8cbb0', ember: '#88705d', frost: '#8fa6bd', fen: '#6a5238', wyrd: '#8a6a44' }[z.theme];
       g.fillRect(t.x0 * k, t.y0 * k, (t.x1 - t.x0) * k, (t.y1 - t.y0) * k);
     }
     const objects = (z.objects || []).filter(o => o.kind !== 'post');
@@ -123,7 +131,7 @@
       if (o.kind === 'grandfountain' || o.kind === 'fountain' || o.kind === 'meetingstone') { g.fillStyle = o.kind === 'meetingstone' ? '#59d9ff' : '#58a8d8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2, (o.r || 1) * k), 0, 6.283); g.fill(); continue; }
       g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(1, (RADIUS[o.kind] || .8) * k), 0, 6.283); g.fill();
     }
-    if (z.city && z.theme !== 'city') { g.fillStyle = '#ffe9a0'; g.beginPath(); g.arc(z.city.plaza.x * k, z.city.plaza.y * k, Math.max(2, 2.4 * k), 0, 6.283); g.fill(); }
+    if (z.city && z.theme !== 'city') for (const t of [z.city, ...(z.camps || [])]) { g.fillStyle = '#ffe9a0'; g.beginPath(); g.arc(t.plaza.x * k, t.plaza.y * k, Math.max(2, 2.4 * k), 0, 6.283); g.fill(); }
     for (const n of z.npcs || []) { g.fillStyle = '#f5d477'; g.beginPath(); g.arc(n.x * k, n.y * k, Math.max(1, .55 * k), 0, 6.283); g.fill(); }
     cache.set(key, c); return c;
   }
@@ -213,9 +221,9 @@
       gate.addEventListener('click', () => { highlight = null; renderZone(p.to); setView('zone'); });
       markers.append(gate);
     }
-    if (z.city && known(index, z.city.plaza.x, z.city.plaza.y)) {
-      const hub = el('span', z.city.name === z.name ? 'City centre' : z.city.name, 'wm-hub'); hub.dataset.hub = 'true';
-      Object.assign(hub.style, pos(z, z.city.plaza.x, z.city.plaza.y)); markers.append(hub);
+    for (const c of [z.city, ...(z.camps || [])].filter(Boolean)) if (known(index, c.plaza.x, c.plaza.y)) {
+      const hub = el('span', c.name === z.name ? 'City centre' : c.name, 'wm-hub'); hub.dataset.hub = 'true';
+      Object.assign(hub.style, pos(z, c.plaza.x, c.plaza.y)); markers.append(hub);
     }
     const me = el('span', '', 'wm-me'); me.append(el('i'), el('b', 'You')); me.hidden = true; me.dataset.me = 'true'; markers.append(me);
     markers.append(el('div', '', 'wm-party'));
@@ -227,7 +235,8 @@
     const facts = el('ul', '', 'wm-facts');
     facts.append(el('li', z.range ? (z.players ? `Dungeon for ${z.players} players of level ${z.range[0]}` : `Recommended levels ${z.range[0]}–${z.range[1]}`) : 'No enemies inside the walls'));
     facts.append(el('li', `Charted ${charted(current)} of ${CELLS} places`, 'wm-charted'));
-    if (z.city && known(current, z.city.plaza.x, z.city.plaza.y)) facts.append(el('li', `${z.city.name}: sanctuary, ${(z.quests || []).length} quest${(z.quests || []).length === 1 ? '' : 's'}`));
+    for (const c of [z.city, ...(z.camps || [])].filter(Boolean)) if (known(current, c.plaza.x, c.plaza.y)) facts.append(el('li', `${c.name}: sanctuary${z.camps?.length ? '' : `, ${(z.quests || []).length} quest${(z.quests || []).length === 1 ? '' : 's'}`}`));
+    if (z.camps?.length) facts.append(el('li', `${(z.quests || []).length} quests across ${1 + z.camps.length} hubs`));
     box.append(facts);
     const counts = new Map(); for (const s of (z.slimes || []).filter(s => known(current, s.x, s.y))) counts.set(s.kind, (counts.get(s.kind) || 0) + 1);
     if (counts.size) {

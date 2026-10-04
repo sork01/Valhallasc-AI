@@ -61,7 +61,7 @@
     cd: ['', 'Clear every cooldown.', () => ({ op: 'reset_cooldowns' })],
     resetstats: ['', 'Take back every trained stat point.', () => ({ op: 'reset_stats' })],
     explore: ['', 'Uncover the fog on every map.', () => ({ op: 'explore_all' })],
-    spawn: ['<kind> [level]', 'Put an enemy next to you (green, blue, pink, yellow, beetle, wisp, spider, wraith, golem, cinderlord, crab, wolf, yeti, wyrm, toad, croc, knight, hydra).', a => {
+    spawn: ['<kind> [level]', 'Put an enemy next to you (green, blue, pink, yellow, beetle, wisp, spider, wraith, golem, cinderlord, crab, wolf, yeti, wyrm, toad, croc, knight, hydra, boar, crow, troll, weaver, ram, oakhorn, hrungnir).', a => {
       if (!a[0]) return 'Name an enemy kind.';
       const level = a[1] === undefined ? undefined : whole(a[1]);
       return level === null ? 'Use /spawn <kind> [level].' : { op: 'spawn_enemy', kind: a[0].toLowerCase(), x: (self?.x ?? 0) + 2, y: (self?.y ?? 0) + 2, ...(level === undefined ? {} : { level }) };

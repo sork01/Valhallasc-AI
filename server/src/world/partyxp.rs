@@ -59,7 +59,7 @@ pub fn kill_points(kind: &str) -> u32 {
 impl World {
     /// The real players of `id`'s party (`id` included, alive or not) who are in the zone near the body, sorted by id.
     /// Mercenaries are never in it.
-    fn xp_group(&self, id: &str, zone: usize, point: Point) -> Vec<String> {
+    pub(super) fn xp_group(&self, id: &str, zone: usize, point: Point) -> Vec<String> {
         let mut group: Vec<String> = self
             .party_mates(id)
             .into_iter()

@@ -70,7 +70,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
 
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, size: z.size, levels: z.levels, portals: z.portals.map(p => p.id + '>' + p.to), water: z.objects.filter(o => o.kind === 'water').length, thicket: z.objects.filter(o => o.kind === 'thicket').length })));
-  check(zones.length === 6 && zones[3].name === 'Gloamfen' && zones[3].theme === 'fen' && zones[3].size === 128 && zones[3].levels.join() === '15,20', 'The client knows the fen: name, fen theme, 128 tiles, levels 15-20');
+  check(zones.length === 7 && zones[3].name === 'Gloamfen' && zones[3].theme === 'fen' && zones[3].size === 128 && zones[3].levels.join() === '15,20', 'The client knows the fen: name, fen theme, 128 tiles, levels 15-20');
   check(zones[2].portals.join() === 'crags_gate>1,fen_gate>3,city_gate>4' && zones[3].portals.join() === 'summit_gate>2', 'The glacier summit has a gate to the fen, which has the gate back');
   check(zones[3].water > 150 && zones[3].thicket > 100, `The fen has a lake of ${zones[3].water} water discs and ${zones[3].thicket} thicket blocks`);
   check(await page.evaluate(stub => { const m = Field.fenSprites.meta; return m.kinds.join() === 'toad,croc,knight,hydra,gloomroot' && (stub || m.kinds.every(k => Field.fenSprites.img[k].naturalWidth === 768 && Field.fenSprites.img[k].naturalHeight === 480)); }, STUB), 'The four fen monster atlases are loaded (768x480 on the real art)');
@@ -123,17 +123,13 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   const lake = await page.evaluate(() => { const c = document.getElementById('minimap'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (Math.abs(d[i] - 36) < 12 && Math.abs(d[i + 1] - 79) < 12 && Math.abs(d[i + 2] - 92) < 12 && d[i + 3] > 0) n++; return n; });
   check(lake > 400, `The minimap draws the mere (${lake} lake-coloured pixels)`);
 
-  // The journal: sixteen fen quests, local ones first, the first town conversation through real clicks.
+  // The journal holds only quests taken; the first town conversation through the walk to the reeve.
   await page.keyboard.press('q');
-  check(await page.locator('#quest-journal').isVisible() && (await page.locator('#quest-list [data-quest="welcome"]').textContent()).includes('is back in Greenmeadow'), 'Meadow quests explain that their givers are in Greenmeadow');
-  check(await page.locator('#quest-list [data-quest^="fen_"]').count() === 18 && await page.locator('#quest-list [data-quest^="rime_"]').count() === 14 && await page.locator('#quest-list [data-quest^="crags_"]').count() === 14, 'The journal lists all eighteen fen quests beside the fourteen glacier and fourteen Crags quests');
-  check(await page.locator('#quest-list .quest-card').first().getAttribute('data-quest') === 'fen_welcome', 'Local town quests sort first');
-  check(await page.locator('#quest-list [data-quest="fen_crocs"]').textContent().then(t => t.includes('Locked') && t.includes('The Choir in the Reeds')), 'Later hunts explain their prerequisite');
-  check(await page.locator('#quest-list [data-quest="fen_hydra_hunt"]').textContent().then(t => t.includes('Recommended level 20')), 'The journal shows each quest\'s recommended level');
-  // The elite quest: five players, a guaranteed blue ring, shown in the journal.
-  check(await page.locator('#quest-list [data-quest="fen_gloomroot"]').textContent().then(t => t.includes('Group: 5 players') && t.includes('Recommended level 20') && t.includes('Celestial Amber Ring') && t.includes('Rare (blue)')), 'The journal shows the five-player elite quest and its blue ring');
-  check(await page.locator('#quest-list [data-quest="fen_gloomroot"] [data-rarity="rare"]').count() === 1, 'The reward line carries the blue rarity');
-  await page.locator('#quest-list [data-quest="fen_welcome"] button').filter({ hasText: 'Get quest from Reeve Osric' }).click();
+  check(await page.locator('#quest-journal').isVisible() && await page.locator('#quest-list .quest-card').count() === 0 && await page.locator('#quest-list .quest-empty').count() > 0, 'The journal lists no quest that has not been taken');
+  // The data behind the fen quests: levels, the five-player elite and its blue ring.
+  check(await page.evaluate(() => { const q = WORLD_MAP.zones.flatMap(z => z.quests || []); const e = q.find(x => x.id === 'fen_gloomroot'); return q.filter(x => x.id.startsWith('fen_')).length === 18 && q.find(x => x.id === 'fen_hydra_hunt').level === 20 && e.recommendedPlayers === 5 && e.level === 20 && WORLD_ITEMS.find(i => i.id === e.rewardItem).rarity === 'rare'; }), 'The fen catalogue has eighteen quests and the five-player elite pays a blue ring');
+  await page.keyboard.press('Escape');
+  await page.evaluate(() => Field.visitNpc('fen_reeve'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
   check(await page.locator('#npc-name').textContent() === 'Reeve Osric', 'Journal travel reaches the town reeve');
   await page.locator('#npc-quests .gossip-row[data-quest="fen_welcome"]').click();

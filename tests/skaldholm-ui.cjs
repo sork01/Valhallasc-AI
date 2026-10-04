@@ -47,8 +47,8 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, size: z.size, levels: z.levels, portals: z.portals.map(p => p.id + '>' + p.to), roads: (z.roads || []).length,
     houses: z.objects.filter(o => o.kind === 'house' && o.sign === 'live').length, kinds: [...new Set(z.objects.map(o => o.kind))].sort().join(), slimes: (z.slimes || []).length, npcs: (z.npcs || []).length, walkers: (z.npcs || []).filter(n => n.route).length })));
-  check(zones.length === 6 && zones[4].name === 'Skaldholm' && zones[4].theme === 'city' && zones[4].size === 160 && !zones[4].levels && zones[4].slimes === 0, 'The client knows the city: name, city theme, 160 tiles, no levels, no enemies');
-  check(zones[2].portals.join() === 'crags_gate>1,fen_gate>3,city_gate>4' && zones[4].portals.join() === 'glacier_gate>2,undervault_stairs>5', 'The glacier summit has a second gate to the city, which has the gate back');
+  check(zones.length === 7 && zones[4].name === 'Skaldholm' && zones[4].theme === 'city' && zones[4].size === 160 && !zones[4].levels && zones[4].slimes === 0, 'The client knows the city: name, city theme, 160 tiles, no levels, no enemies');
+  check(zones[2].portals.join() === 'crags_gate>1,fen_gate>3,city_gate>4' && zones[4].portals.join() === 'glacier_gate>2,undervault_stairs>5,wyrd_gate>6', 'The glacier summit has a second gate to the city, which has the gate back');
   check(zones[4].houses >= 100 && zones[4].roads >= 15 && ['rampart', 'tower', 'grandfountain', 'meetingstone'].every(k => zones[4].kinds.includes(k)), `The city has ${zones[4].houses} signed houses, ${zones[4].roads} road shapes, a wall, towers, the fountain and the stone`);
   check(zones[4].npcs >= 40 && zones[4].walkers >= 12, `${zones[4].npcs} townspeople, ${zones[4].walkers} of them walkers`);
   // A house's sprite is drawn into a box; the roof reaches (w+d)/2*44 px to each side and the front corner (w+d)/2*22 px below the origin.
@@ -193,10 +193,8 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   // The journal: eleven city quests, local ones first; the first conversation at the gate captain through a real canvas click.
   await stageAt(4, 80, 128);
   await page.keyboard.press('q');
-  check(await page.locator('#quest-journal').isVisible() && await page.locator('#quest-list [data-quest^="city_"]').count() === 12 && await page.locator('#quest-list [data-quest^="fen_"]').count() === 18, 'The journal lists the twelve city quests beside the others (each includes its progression quest)');
-  check(await page.locator('#quest-list .quest-card').first().getAttribute('data-quest') === 'city_welcome', 'Local city quests sort first');
-  check(await page.locator('#quest-list [data-quest="city_seals"]').textContent().then(t => t.includes('Locked') && t.includes('The Great Gate Opens')), 'The letters explain their prerequisite');
-  check(await page.locator('#quest-list [data-quest="city_gel"]').textContent().then(t => t.includes('Bring Slime Gel: 0/8') && t.includes('Recommended level 12')), 'A hand-in quest lists what to bring');
+  check(await page.locator('#quest-journal').isVisible() && await page.locator('#quest-list .quest-card').count() === 0 && await page.locator('#quest-list .quest-empty').count() > 0, 'The journal lists no quest that has not been taken');
+  check(await page.evaluate(() => { const q = WORLD_MAP.zones.flatMap(z => z.quests || []); const g = q.find(x => x.id === 'city_gel'); return q.filter(x => x.id.startsWith('city_')).length === 12 && g.level === 12 && g.objectives[0].label.includes('Slime Gel') && g.objectives[0].count === 8; }), 'The city catalogue has twelve quests, including the hand-in of eight Slime Gel at level 12');
   await page.keyboard.press('Escape');
   const nameplate = id => page.evaluate(id => { const n = City.npcs.find(n => n.id === id); return Field._debug.w2s(n.x, n.y); }, id);
   const talkByClick = async id => {

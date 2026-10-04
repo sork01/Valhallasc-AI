@@ -1,0 +1,60 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "boar",
+    "crow",
+    "troll",
+    "weaver",
+    "ram",
+    "oakhorn",
+    "hrungnir"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 6,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 12,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 8,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "boar": "41a3eab8b98bf1b7",
+    "crow": "022d3bf063e4f01d",
+    "troll": "165b0f00cd55a7a4",
+    "weaver": "1c4d164a2cf97539",
+    "ram": "84a62a17cf044049",
+    "oakhorn": "221af4bc261566b4",
+    "hrungnir": "02156c37a7226787"
+  }
+}

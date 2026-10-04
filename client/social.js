@@ -37,6 +37,9 @@
     const name = el('b', m.name + (state.party.leader === m.id ? ' ★' : ''));
     name.title = state.party.leader === m.id ? 'Party leader' : '';
     who.append(name, el('small', `Lv ${m.level} ${CLASSES[m.class] || ''} · ${m.online ? m.place : 'Offline'}`));
+    // In the panel, name the quests this member has in common with you.
+    const shared = withActions && m.id !== myId() ? (window.Quests?.sharedWith?.(m) || []) : [];
+    if (shared.length) { const line = el('small', `Same quest: ${shared.join(', ')}`, 'member-quests'); line.dataset.sharedQuests = String(shared.length); who.append(line); }
     const bar = el('span', '', 'member-bar'); bar.append(el('i', '', 'member-fill'), el('em', ''));
     row.append(who, bar);
     paintHealth(row, m);
@@ -63,6 +66,12 @@
       el('small', next ? `${xp.points - xp.from}/${next - xp.from} to level ${xp.level + 1}. Kill together, near each other, to level the party.` : 'Maximum party level.', 'social-note'));
     return box;
   }
+  // The party mates (not you) who have taken a quest and not yet handed it in, with their objective counts.
+  function questMates(id) {
+    return (state.party?.members || []).filter(m => m.id !== myId() && m.online)
+      .map(m => ({ id: m.id, name: m.name, counts: (m.quests || []).find(q => q.id === id)?.counts })).filter(m => m.counts);
+  }
+  const questShape = party => JSON.stringify((party?.members || []).map(m => [m.id, m.quests || []]));
   function sectionTitle(text) { return el('h4', text, 'social-title'); }
   function inviteRows(list) {
     return list.map(i => {
@@ -182,11 +191,12 @@
     }
   }
   function render() { renderFrame(); renderPrompts(); renderPanel(); }
-  const shape = party => party && JSON.stringify([party.leader, party.xp, party.members.map(m => [m.id, m.online, m.dead, m.level, m.place])]);
+  const shape = party => party && JSON.stringify([party.leader, party.xp, party.members.map(m => [m.id, m.online, m.dead, m.level, m.place, (m.quests || []).map(q => q.id)])]);
   // Party health arrives twice a second; update the bars in place and rebuild only when the members change.
   function updateParty(party) {
-    const changed = shape(party) !== shape(state.party);
+    const changed = shape(party) !== shape(state.party), quests = questShape(party) !== questShape(state.party);
     state.party = party;
+    if (quests) window.Quests?.refresh?.();
     if (changed) { render(); return; }
     for (const m of party?.members || []) for (const row of document.querySelectorAll(`[data-member="${CSS.escape(m.id)}"]`)) paintHealth(row, m);
   }
@@ -267,7 +277,7 @@
   window.Social = {
     show, close, command, get open() { return open(); },
     get state() { return state; }, get roster() { return roster; },
-    isPartyMember: id => inParty(id), isFriend,
+    isPartyMember: id => inParty(id), isFriend, questMates,
     reset() { close(false); state = empty(); roster = []; lapse.clear(); render(); },
     // Packets from the server.
     onState: setState,

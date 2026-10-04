@@ -4,7 +4,9 @@
   const cache = new Map();
   const area = () => window.Field?.zone > 0 ? WORLD_MAP.zones[Field.zone - 1] : WORLD_MAP;
   const iso = (x, y, z = 0) => [(x - y) * 44, (x + y) * 22 - z];
-  const inside = (x, y) => { const city = area().city; return city && x >= city.x0 && x <= city.x1 && y >= city.y0 && y <= city.y1; };
+  // A zone has one hub (`city`) or several (`city` plus `camps`, like the Wyrdwood's Hollowmoot and Skuldwatch).
+  const hubsOf = a => [a.city, ...(a.camps || [])].filter(Boolean);
+  const inside = (x, y) => hubsOf(area()).some(city => x >= city.x0 && x <= city.x1 && y >= city.y0 && y <= city.y1);
   function poly(g, points, fill, stroke = '#54483e', line = 2) {
     g.beginPath(); points.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath();
     g.fillStyle = fill; g.fill(); if (stroke) { g.strokeStyle = stroke; g.lineWidth = line; g.lineJoin = 'round'; g.stroke(); }
@@ -28,7 +30,7 @@
     const inCity=inside(x+.5,y+.5), road=!Field.zone && y>=69 && y<city.y0 && Math.abs(x+.5-36)<1.6;
     if (!inCity && !road) return false;
     if (Field.zone > 0) {
-      if (Field.zoneTheme === 'fen') {                                  // Lanternmere stands on timber decking
+      if (Field.zoneTheme === 'fen' || Field.zoneTheme === 'wyrd') {      // Lanternmere, Hollowmoot and Skuldwatch stand on timber decking
         poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],`hsl(${26+(x*7+y*3)%5}, 30%, ${27+(x*17+y*31)%7}%)`,'#3a2818',.6);
         for(const t of [.33,.66]){g.strokeStyle='rgba(20,12,6,.5)';g.lineWidth=1.4;g.beginPath();g.moveTo(px+t*44,py+t*22);g.lineTo(px-44+t*44,py+22+t*22);g.stroke();}
         return true;

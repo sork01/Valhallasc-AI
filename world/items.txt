@@ -9320,6 +9320,55 @@
     "sell": 1200
   },
   {
+    "id": "rotfang_tusk",
+    "name": "Rotfang Tusk",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 260
+  },
+  {
+    "id": "gallows_feather",
+    "name": "Gallows Feather",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 280
+  },
+  {
+    "id": "mosshide_scrap",
+    "name": "Mosshide Scrap",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 310
+  },
+  {
+    "id": "fate_thread",
+    "name": "Frayed Fate Thread",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 340
+  },
+  {
+    "id": "stormram_horn",
+    "name": "Stormram Horn",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 390
+  },
+  {
+    "id": "oakhorn_crown",
+    "name": "Oakhorn Crown Antler",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 700
+  },
+  {
+    "id": "stormheart_shard",
+    "name": "Stormheart Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1100
+  },
+  {
     "id": "warrior_armor_crimson_l20_vault",
     "name": "Hollowsteel Cuirass",
     "kind": "armor",

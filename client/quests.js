@@ -3,9 +3,16 @@
   const $ = id => document.getElementById(id);
   const areas = [WORLD_MAP, ...(WORLD_MAP.zones || [])];
   const definitions = areas.flatMap((area, zone) => (area.quests || []).map(q => ({ ...q, zone })));
-  let heroLevel = 1, progress = [], signature = '', tracked = null, previousFocus = null, collapsed = false;
+  let heroLevel = 1, progress = [], signature = '', tracked = null, previousFocus = null, collapsed = false, completedOpen = false;
   const state = quest => progress.find(p => p.id === quest.id);
   const giver = quest => areas[quest.zone].npcs.find(n => n.id === quest.npc);
+  // The hub a quest's giver belongs to: a zone may have several (the Wyrdwood's Hollowmoot and Skuldwatch).
+  const hubName = quest => {
+    const a = areas[quest.zone], hubs = [a.city, ...(a.camps || [])].filter(Boolean), g = giver(quest);
+    if (!hubs.length) return undefined;
+    if (!g || hubs.length === 1) return hubs[0].name;
+    return hubs.reduce((best, c) => Math.hypot(g.x - c.plaza.x, g.y - c.plaza.y) < Math.hypot(g.x - best.plaza.x, g.y - best.plaza.y) ? c : best).name;
+  };
   function status(quest) {
     const p = state(quest);
     if (p && !p.claimed) return quest.objectives.every((o, i) => (p.counts[i] || 0) >= o.count) ? 'ready' : 'active';
@@ -35,16 +42,30 @@
     reward.dataset.rarity = i.rarity; reward.dataset.item = i.id;
     container.append(reward);
   }
+  // Party mates (not you) who have also taken this quest, with how far each one is.
+  function mates(quest) {
+    return (window.Social?.questMates?.(quest.id) || []).map(m => {
+      const done = quest.objectives.every((o, i) => (m.counts[i] || 0) >= o.count);
+      const text = quest.objectives.map((o, i) => `${Math.min(m.counts[i] || 0, o.count)}/${o.count}`).join(' · ');
+      return { name: m.name, done, text };
+    });
+  }
+  const here = quest => areas[quest.zone].name;
   function card(quest, atNpc) {
     const s = status(quest), npc = giver(quest);
     const node = element('article', '', 'quest-card'); node.dataset.quest = quest.id; node.dataset.repeatable = String(quest.repeatable);
     node.append(element('h4', quest.title), element('span', words[s] + (quest.repeatable ? ' · Repeatable' : ''), 'quest-state'));
-    if (!atNpc) node.append(element('small', `${areas[quest.zone].name} · ${areas[quest.zone].city?.name || 'Quest giver'}`, 'quest-location quest-history'));
+    if (!atNpc) node.append(element('small', `${areas[quest.zone].name} · ${hubName(quest) || 'Quest giver'}`, 'quest-location quest-history'));
     const gap = quest.level - (heroLevel);
     const rec = element('p', `Recommended level ${quest.level}${quest.recommendedPlayers ? ` · Group: ${quest.recommendedPlayers} players` : ''}`, 'quest-level'); rec.dataset.level = String(quest.level);
     if (gap >= 5) rec.style.color = '#ff6b6b'; else if (gap >= 3) rec.style.color = '#ffa65a'; else if (gap <= -5) rec.style.color = '#9fb0a0';
     node.append(rec);
     node.append(element('p', quest.description), element('p', objectives(quest).join(' · '), 'quest-objectives'));
+    const party = mates(quest);
+    if (party.length) {
+      const line = element('p', `Party on this quest: ${party.map(m => `${m.name} (${m.done ? 'ready' : m.text})`).join(', ')}`, 'quest-party');
+      line.dataset.partyQuest = String(party.length); node.append(line);
+    }
     node.append(element('p', `Reward: ${quest.rewardXp} XP · ${quest.rewardGold} gold`, 'quest-reward'));
     gearReward(quest, node);
     if (s === 'upcoming') {
@@ -60,7 +81,7 @@
     } else if (!atNpc && !['completed', 'upcoming'].includes(s)) {
       if (Field.zone !== quest.zone) node.append(element('p', quest.zone === 0
         ? `${npc.name} is back in Greenmeadow. Return through the gate first.`
-        : `${npc.name} is in ${areas[quest.zone].name}. Travel through the gate to ${areas[quest.zone].city?.name || 'meet them'}.`, 'quest-history'));
+        : `${npc.name} is in ${areas[quest.zone].name}. Travel through the gate to ${hubName(quest) || 'meet them'}.`, 'quest-history'));
       else node.append(button(`${s === 'ready' ? (quest.autoLevel ? 'Report to' : 'Return to') : s === 'available' ? 'Get quest from' : 'Visit'} ${npc.name}`, () => {
         close(); Field.visitNpc(quest.npc);
       }));
@@ -90,15 +111,38 @@
         const count = Math.min(state(quest)?.counts[i] || 0, o.count), done = count >= o.count;
         row.append(element('small', `${done ? '✓' : '•'} ${o.label}: ${count}/${o.count}`, `tracker-objective${done ? ' complete' : ''}`));
       });
+      const party = mates(quest);
+      if (party.length) { const line = element('small', `Party: ${party.map(m => m.name).join(', ')}`, 'tracker-objective tracker-party'); line.dataset.partyQuest = String(party.length); row.append(line); }
       list.append(row);
     }
     if (!active.length) {
       const next = definitions.find(q => q.zone === (window.Field?.zone || 0) && status(q) === 'available') || definitions.find(q => status(q) === 'available');
-      if (next) list.append(element('span', next.title, 'tracker-title'), element('small', `Speak to ${giver(next).name} in ${areas[next.zone].city?.name || areas[next.zone].name}`, 'tracker-objective'));
+      if (next) list.append(element('span', next.title, 'tracker-title'), element('small', `Speak to ${giver(next).name} in ${hubName(next) || areas[next.zone].name}`, 'tracker-objective'));
       else list.append(element('small', 'All stories complete. Visit a quartermaster for another bounty.', 'tracker-objective'));
     }
     tracker.append(list);
-    if (open()) $('quest-list').replaceChildren(...[...definitions].sort((a, b) => Number(b.zone === (window.Field?.zone || 0)) - Number(a.zone === (window.Field?.zone || 0))).map(q => card(q, false)));
+    if (open()) renderJournal(active);
+  }
+  // The journal holds your own quests only: the ones in progress or ready to hand in (those of this zone first), and a
+  // folded list of the finished ones. Quests you have not taken are found at the people marked with !.
+  function renderJournal(active) {
+    const zone = window.Field?.zone || 0;
+    const mine = [...active].sort((a, b) => Number(b.id === tracked) - Number(a.id === tracked) || Number(status(b) === 'ready') - Number(status(a) === 'ready') || Number(b.zone === zone) - Number(a.zone === zone));
+    const nodes = mine.map(q => card(q, false));
+    if (!mine.length) {
+      nodes.push(element('p', 'You have no quests in progress. Speak to anyone with a ! over their head to take one.', 'quest-empty'));
+      const next = definitions.find(q => q.zone === zone && status(q) === 'available') || definitions.find(q => status(q) === 'available');
+      if (next) nodes.push(element('p', `Next: “${next.title}”. Speak to ${giver(next).name} in ${hubName(next) || areas[next.zone].name}.`, 'quest-empty quest-next'));
+    }
+    const done = definitions.filter(q => status(q) === 'completed');
+    if (done.length) {
+      const folded = document.createElement('details'); folded.className = 'quest-completed'; folded.open = completedOpen;
+      folded.addEventListener('toggle', () => { completedOpen = folded.open; });
+      folded.append(element('summary', `Completed (${done.length})`));
+      for (const q of done) { const row = element('p', `${q.title} · ${here(q)}`, 'quest-done'); row.dataset.quest = q.id; folded.append(row); }
+      nodes.push(folded);
+    }
+    $('quest-list').replaceChildren(...nodes);
   }
   function open() { return !$('quest-journal').hidden; }
   function show() {
@@ -123,6 +167,13 @@
   window.Quests = {
     show, close, get open() { return open(); },
     setLevel(level) { heroLevel = level; },
+    refresh() { render(); },
+    // Titles of the quests you and this party member both have in progress.
+    sharedWith(member) {
+      return (member.quests || []).map(q => definitions.find(d => d.id === q.id)).filter(q => q && ['ready', 'active'].includes(status(q))).map(q => q.title);
+    },
+    // Whether any of your quests has a `visit` objective for this place that is done (a beacon you have lit).
+    visited(placeId) { return definitions.some(q => q.objectives.some((o, i) => o.kind === 'visit' && o.target === placeId && (state(q)?.claimed || (state(q)?.counts[i] || 0) >= o.count))); },
     reset() { progress = []; signature = ''; tracked = null; close(false); render(); },
     update(next) { const key = `${Field.zone}:` + JSON.stringify(next); if (key === signature) return; progress = next; signature = key; render(); },
     // What an NPC's conversation lists, in World of Warcraft order: turn-ins, new quests, then quests still in progress.
@@ -176,7 +227,7 @@
           || definitions.find(q => q.npc === id && status(q) === s);
         if (quest) return { symbol: s === 'ready' ? '?' : '!', color: quest.repeatable ? '#64b5ff' : '#ffdf88', repeatable: quest.repeatable };
       }
-      if (definitions.some(q => status(q) === 'active' && q.objectives.some((o, i) => o.kind === 'talk' && o.target === id && !(state(q)?.counts[i] >= o.count)))) return { symbol: '◆', color: '#ffdf88' };
+      if (definitions.some(q => status(q) === 'active' && q.objectives.some((o, i) => (o.kind === 'talk' || o.kind === 'escort') && o.target === id && !(state(q)?.counts[i] >= o.count)))) return { symbol: '◆', color: '#ffdf88' };
       return { symbol: '', color: '#ffdf88' };
     },
   };

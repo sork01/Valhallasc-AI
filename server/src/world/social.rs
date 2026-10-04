@@ -64,7 +64,7 @@ impl World {
     pub(super) fn online(&self, id: &str) -> Option<&Player> {
         self.players.values().find(|p| p.character.id == id)
     }
-    fn name_of(&self, id: &str) -> String {
+    pub(super) fn name_of(&self, id: &str) -> String {
         self.online(id)
             .map_or_else(|| "Someone".into(), |p| p.character.look.name.clone())
     }
@@ -165,10 +165,11 @@ impl World {
                 Some(p) => {
                     let c = &p.character;
                     json!({"id":m.id,"name":m.name,"class":c.look.class,"level":c.level,"hp":c.hp.max(0.),"maxHp":c.max_hp(),
-                        "zone":c.zone,"place":self.zone_name(c.zone),"online":true,"dead":c.hp<=0.})
+                        "zone":c.zone,"place":self.zone_name(c.zone),"online":true,"dead":c.hp<=0.,
+                        "quests":c.quests.iter().filter(|q| !q.claimed).map(|q| json!({"id":q.id,"counts":q.counts})).collect::<Vec<_>>()})
                 }
                 None => json!({"id":m.id,"name":m.name,"class":m.class,"level":m.level,"hp":0,"maxHp":0,"zone":null,
-                    "place":null,"online":false,"dead":false}),
+                    "place":null,"online":false,"dead":false,"quests":[]}),
             })
             .collect();
         json!({"leader":party.leader,"max":PARTY_MAX,"members":members,"xp":self.party_xp_value(&party.leader)})

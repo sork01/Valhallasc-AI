@@ -42,12 +42,12 @@
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn;
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
-    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault';
+    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault', wyrd = zdef.theme === 'wyrd';
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
       const i = y * MAP + x, cx = x + .5, cy = y + .5;
-      map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : vault ? 51 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : vault ? 52 : 2) * .35;
+      map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : vault ? 51 : wyrd ? 61 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : vault ? 52 : wyrd ? 62 : 2) * .35;
       let d = 99; for (const p of paths) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
-      if (!ember && !frost && !fen && !city && !vault) d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
+      if (!ember && !frost && !fen && !city && !vault && !wyrd) d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
       map.dirt[i] = d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0;
     }
     if (city) paintRoads(zdef.roads);
@@ -392,7 +392,8 @@
       fenSprites.tree[v] = makeWillow(v); fenSprites.bush[v] = makeReeds(v); fenSprites.rock[v] = makeFenRock(v); fenSprites.spire[v] = makeColumn(v); fenSprites.thicket[v] = makeThicket(v);
     }
   }
-  const spriteSet = () => zdef.theme === 'ember' ? emberSprites : zdef.theme === 'frost' ? frostSprites : zdef.theme === 'fen' ? fenSprites : sprites;
+  const WYRD_NONE = {};                                   // the Wyrdwood's scenery is drawn by client/wyrdart.js through City.art
+  const spriteSet = () => zdef.theme === 'wyrd' ? WYRD_NONE : zdef.theme === 'ember' ? emberSprites : zdef.theme === 'frost' ? frostSprites : zdef.theme === 'fen' ? fenSprites : sprites;
 
   // ---------- ground chunks ----------
   const chunks = new Map(); let chunkScale = 1;
@@ -400,7 +401,7 @@
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
   function renderChunk(cx, cy) {
     const G = chunkGeom(cx, cy), [c, g] = canvasOf(G.w, G.h, chunkScale);
-    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault';
+    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault', wyrd = zdef.theme === 'wyrd';
     const arenas = vault ? (zdef.slimes || []).filter(m => BOSS_KINDS.includes(m.kind)) : [];
     for (let ty = 0; ty < CH; ty++) for (let tx = 0; tx < CH; tx++) {
       const x = G.x0 + tx, y = G.y0 + ty; if (x >= MAP || y >= MAP) continue;
@@ -408,6 +409,7 @@
       if (vault && !dirt) continue;                                                  // solid rock: stays black
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
       g.fillStyle = vault ? `hsl(${226 + tone * 10}, ${9 + tone * 5}%, ${19 + tone * 7 + alt * .7}%)` : city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
+        : wyrd ? wyrdGround(x, y, tone, dirt, alt)
         : fen ? (dirt ? `hsl(${30 + tone * 6}, ${30 + tone * 6}%, ${27 + tone * 6 + alt}%)` : `hsl(${92 + tone * 16}, ${26 + tone * 12}%, ${21 + tone * 9 + alt * .8}%)`)
         : frost ? (dirt ? `hsl(${208 + tone * 8}, ${26 + tone * 8}%, ${66 + tone * 6 + alt}%)` : `hsl(${200 + tone * 12}, ${44 + tone * 10}%, ${84 + tone * 8 + alt * .6}%)`)
         : ember ? (dirt ? `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)` : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`)
@@ -463,6 +465,8 @@
           if (bare(x, y + 1)) edge(px, py + TH, px - TW / 2, py + TH / 2);
           if (bare(x - 1, y)) edge(px - TW / 2, py + TH / 2, px, py);
         }
+      } else if (wyrd) {
+        wyrdDetail(g, r, inTile, px, py, x, y, tone, dirt);
       } else if (fen) {
         if (dirt) {                                                                    // boardwalk: planks across the tile
           for (const t of [.25, .5, .75]) { g.strokeStyle = 'rgba(20,12,6,.55)'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(px + t * TW / 2, py + t * TH / 2); g.lineTo(px - TW / 2 + t * TW / 2, py + TH / 2 + t * TH / 2); g.stroke();
@@ -515,13 +519,14 @@
         const vx = px + dir * TW / 2, vy = py + TH / 2, bx = px, by = py + TH;
         const gr = g.createLinearGradient(0, vy, 0, vy + depth);
         if (city) { gr.addColorStop(0, dir > 0 ? '#cdb48a' : '#b79c74'); gr.addColorStop(1, dir > 0 ? '#7a6044' : '#65503a'); }
+        else if (wyrd) { gr.addColorStop(0, dir > 0 ? '#6a4a2e' : '#583a22'); gr.addColorStop(1, dir > 0 ? '#2e2016' : '#241a12'); }
         else if (fen) { gr.addColorStop(0, dir > 0 ? '#5a4c38' : '#4a3e2e'); gr.addColorStop(1, dir > 0 ? '#2a2218' : '#201a12'); }
         else if (frost) { gr.addColorStop(0, dir > 0 ? '#a9d3ee' : '#8fbddb'); gr.addColorStop(1, dir > 0 ? '#2f5a82' : '#274b70'); }
         else if (ember) { gr.addColorStop(0, dir > 0 ? '#4a3430' : '#3c2a28'); gr.addColorStop(1, dir > 0 ? '#1e1416' : '#181012'); }
         else { gr.addColorStop(0, dir > 0 ? '#7a5433' : '#684528'); gr.addColorStop(1, dir > 0 ? '#3d2a1c' : '#33221a'); }
         g.fillStyle = gr; g.beginPath(); g.moveTo(vx, vy); g.lineTo(bx, by); g.lineTo(bx, by + depth * (.85 + hash2(x + 3, y, 4) * .3)); g.lineTo(vx, vy + depth); g.closePath(); g.fill();
         g.strokeStyle = 'rgba(0,0,0,.18)'; g.lineWidth = 2; for (let k = 1; k < 4; k++) { g.beginPath(); g.moveTo(vx, vy + depth * k / 4); g.lineTo(bx, by + depth * k / 4 * .9); g.stroke(); }
-        g.strokeStyle = city ? '#5faa44' : fen ? '#4f7a36' : frost ? '#eaf7ff' : ember ? '#8a3a1c' : '#3f8a3c'; g.lineWidth = 5; g.beginPath(); g.moveTo(vx, vy + 1); g.lineTo(bx, by + 1); g.stroke();
+        g.strokeStyle = city ? '#5faa44' : wyrd ? '#b8742a' : fen ? '#4f7a36' : frost ? '#eaf7ff' : ember ? '#8a3a1c' : '#3f8a3c'; g.lineWidth = 5; g.beginPath(); g.moveTo(vx, vy + 1); g.lineTo(bx, by + 1); g.stroke();
         if (ember) { g.strokeStyle = 'rgba(255,120,40,.55)'; g.lineWidth = 2; g.beginPath(); g.moveTo(vx, vy + 3); g.lineTo(bx, by + 3); g.stroke(); }
         g.strokeStyle = OL; g.lineWidth = 2; g.beginPath(); g.moveTo(vx, vy + depth); g.lineTo(bx, by + depth * .9); g.stroke();
       };
@@ -595,8 +600,16 @@
     choir: { name: 'Valka, the Hollow Choir', elite: true, boss: true, scale: 1.35, top: 87, col: ['#bdeaff', '#4a78c0', '#161c3a'] },
     colossus: { name: 'Ironwake, the Vault Colossus', elite: true, boss: true, scale: 1.4, top: 89, col: ['#9fe8ff', '#5a6074', '#20222e'] },
     hollowking: { name: 'Haldor, the Hollow King', elite: true, boss: true, scale: 1.4, top: 85, col: ['#c8ffc0', '#4a6a52', '#101a14'] },
+    boar: { name: 'Rotfang Boar', scale: 1.3, top: 53, col: ['#b8977a', '#6f5340', '#33261d'] },
+    crow: { name: 'Gallowcrow', scale: 1.15, top: 64, col: ['#9a84d6', '#444768', '#0d0c14'] },
+    troll: { name: 'Mosshide Troll', scale: 1.5, top: 77, col: ['#98b48a', '#48634e', '#1c2620'] },
+    weaver: { name: 'Wyrdweaver', scale: 1.2, top: 74, col: ['#ffd25a', '#5a41a0', '#150f28'] },
+    ram: { name: 'Stormram', scale: 1.35, top: 49, col: ['#b8f0ff', '#68799b', '#252c3d'] },
+    oakhorn: { name: 'Oakhorn', elite: true, scale: 1.7, top: 77, col: ['#e87a1e', '#975a34', '#2a1810'] },
+    hrungnir: { name: 'Hrungnir', elite: true, scale: 1.9, top: 75, col: ['#b8f0ff', '#4a5676', '#1b2030'] },
   };
   const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
+  const WYRD_KINDS = ['boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir'];
   const VAULT_KINDS = ['thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking'], BOSS_KINDS = VAULT_KINDS.slice(3);
   // Colour a level label by how it compares with the hero: grey, normal, orange, red.
   const levelColor = level => { const d = level - (hero?.level || 1); return d >= 5 ? '#ff6b6b' : d >= 3 ? '#ffa65a' : d <= -5 ? '#9fb0a0' : '#fff4ca'; };
@@ -611,7 +624,10 @@
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
   }
-  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: zdef.city?.name, tagline: zdef.tagline, hub: City.inside(hero.x, hero.y) ? zdef.city?.name : null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc }); }
+  const hubs = () => [zdef.city, ...(zdef.camps || [])].filter(Boolean);
+  const hubAt = (x, y) => hubs().find(c => x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1);
+  const campNear = () => hubs().reduce((a, c) => !a || Math.hypot(hero.x - c.plaza.x, hero.y - c.plaza.y) < Math.hypot(hero.x - a.plaza.x, hero.y - a.plaza.y) ? c : a, null);
+  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -1223,8 +1239,8 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, vaultSrc = null;    // {meta, img: {kind: Image}}
-  const enemySource = s => s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : VAULT_KINDS.includes(s.kind) ? vaultSrc : slimeSrc;
+  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null;    // {meta, img: {kind: Image}}
+  const enemySource = s => s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : WYRD_KINDS.includes(s.kind) ? wyrdSrc : VAULT_KINDS.includes(s.kind) ? vaultSrc : slimeSrc;
   const SLIME_K = 2.1, DIE_SHOW = 1.7;                      // sprite pixel -> screen px; seconds a dead slime stays on screen
   // Test mode (window.__valhallaTestSprites): one small coloured block per enemy kind instead of the atlas PNGs. The clip
   // table is the real one's shape (same names, frame counts and rates), so every animation state still finds its frame.
@@ -1276,6 +1292,13 @@
     if (stubOn()) { vaultSrc = stubEnemies(VAULT_KINDS, { thrall: '#cba', archer: '#dc8', acolyte: '#a7f', gatewarden: '#fd8', choir: '#8df', colossus: '#9cf', hollowking: '#9f8' }); return; }
     fetch('assets/vault.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/vault_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); vaultSrc = { meta, img }; })).catch(() => { vaultSrc = null; });
+  }
+  // Wyrdwood monsters: assets/wyrd_<kind>.png (scripts/make_wyrd_sprites.py), the same clips again.
+  function loadWyrdSprites() {
+    if (wyrdSrc) return;
+    if (stubOn()) { wyrdSrc = stubEnemies(WYRD_KINDS, { boar: '#a64', crow: '#446', troll: '#6a5', weaver: '#a6e', ram: '#9cf', oakhorn: '#e83', hrungnir: '#8af' }); return; }
+    fetch('assets/wyrd.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/wyrd_${k}.png`; })))
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); wyrdSrc = { meta, img }; })).catch(() => { wyrdSrc = null; });
   }
   // Rimeveil Glacier monsters: assets/rime_<kind>.png (scripts/make_rime_sprites.py), the same clips as the Crags.
   function loadRimeSprites() {
@@ -1493,14 +1516,20 @@
     const ex = o => o.r * TW * .7071, ey = o => o.r * TH * .7071;
     const pass = (grow, fill) => { for (const [o, sx, sy] of rows) { g.fillStyle = typeof fill === 'function' ? fill(o) : fill; g.beginPath(); g.ellipse(sx, sy + (grow < 0 ? 1 : 0), ex(o) * grow, ey(o) * grow, 0, 0, 6.283); g.fill(); } };
     const shimmer = o => .5 + .5 * Math.sin(t * .8 + o.x * .45 + o.y * .33);
-    pass(1.36, '#2c2a1c');
-    pass(1.2, '#3c5a30');
-    pass(1.04, o => `hsl(${176 + shimmer(o) * 8}, 34%, ${14 + shimmer(o) * 3}%)`);
-    pass(.8, o => `hsl(${184 + shimmer(o) * 10}, 40%, ${10 + shimmer(o) * 3}%)`);
+    const river = zdef.theme === 'wyrd';
+    pass(1.36, river ? '#3c2c1c' : '#2c2a1c');
+    pass(1.2, river ? '#6a7a3a' : '#3c5a30');
+    pass(1.04, o => river ? `hsl(${200 + shimmer(o) * 8}, 46%, ${30 + shimmer(o) * 5}%)` : `hsl(${176 + shimmer(o) * 8}, 34%, ${14 + shimmer(o) * 3}%)`);
+    pass(.8, o => river ? `hsl(${206 + shimmer(o) * 10}, 52%, ${24 + shimmer(o) * 5}%)` : `hsl(${184 + shimmer(o) * 10}, 40%, ${10 + shimmer(o) * 3}%)`);
     for (const [o, sx, sy] of rows) {
       const k = (o.x * 7 + o.y * 13) | 0;
       if (k % 3 === 0) {                                                            // an expanding ripple ring
         const ph = (t * .35 + (k % 7) * .13) % 1; g.strokeStyle = `rgba(150,210,210,${.38 * (1 - ph)})`; g.lineWidth = 1.4; g.beginPath(); g.ellipse(sx + Math.sin(k) * 10, sy + Math.cos(k) * 4, 6 + ph * 26, 2.6 + ph * 11, 0, 0, 6.283); g.stroke();
+      }
+      if (river) {                                                                  // the current: a pale streak sliding east, and a drifting autumn leaf
+        if (k % 3 === 1) { const ph = (t * .25 + (k % 9) * .11) % 1; g.strokeStyle = `rgba(210,235,245,${.4 * Math.sin(ph * Math.PI)})`; g.lineWidth = 1.5; g.beginPath(); g.moveTo(sx - 12 + ph * 24, sy - 1); g.lineTo(sx + 2 + ph * 24, sy - 1); g.stroke(); }
+        if (k % 4 === 2) { const ph = (t * .08 + (k % 11) * .09) % 1; g.fillStyle = ['#c0481e', '#e8802a', '#eab833'][k % 3]; g.beginPath(); g.ellipse(sx - ex(o) + ph * ex(o) * 2, sy + Math.sin(ph * 9 + k) * 2, 3.4, 1.8, ph * 3, 0, 6.283); g.fill(); }
+        continue;
       }
       if (k % 5 === 1) {                                                            // a lily pad, now and then with a bloom
         const lx = sx + Math.cos(k * 2) * ex(o) * .5, ly = sy + Math.sin(k * 3) * ey(o) * .5;
@@ -1509,6 +1538,90 @@
       }
       if (k % 7 === 2) { const gl = Math.max(0, Math.sin(t * 1.6 + k)); g.fillStyle = `rgba(210,240,250,${gl * .55})`; g.fillRect(sx - 4, sy - 2, 8, 1.4); }
     }
+  }
+  // ---------- the Wyrdwood: ground, river bridge, storm sky and weather ----------
+  const moorK = y => clamp((104 - y) / 10, 0, 1);              // 0 in the south forest, 1 on the Highmoor
+  function wyrdGround(x, y, tone, dirt, alt) {
+    const m = moorK(y + .5);
+    if (dirt) return `hsl(${lerp(32, 40, m) + tone * 6}, ${lerp(34, 10, m)}%, ${lerp(38, 46, m) + tone * 6 + alt}%)`;
+    return `hsl(${lerp(26, 88, m) + tone * 10}, ${lerp(40, 22, m) + tone * 6}%, ${lerp(24, 27, m) + tone * 8 + alt * .7}%)`;
+  }
+  function wyrdDetail(g, r, inTile, px, py, x, y, tone, dirt) {
+    const m = moorK(y + .5);
+    g.lineCap = 'round';
+    if (dirt) { for (let k = 0; k < 3; k++) { const [qx, qy] = inTile(); g.fillStyle = r() < .5 ? 'rgba(70,44,20,.35)' : 'rgba(255,225,170,.2)'; g.beginPath(); g.ellipse(qx, qy, 2 + r() * 3, 1.2 + r() * 1.5, 0, 0, 6.283); g.fill(); } return; }
+    if (m < .5) {                                                                   // forest floor: fallen leaves, moss, the odd toadstool
+      const n = 1 + Math.floor(r() * 3);
+      for (let k = 0; k < n; k++) { const [qx, qy] = inTile(); g.fillStyle = ['#b8421e', '#e2761f', '#e8b02a', '#8a3a1a', '#c8892a'][Math.floor(r() * 5)]; g.beginPath(); g.ellipse(qx, qy, 2.4 + r() * 1.8, 1.2 + r(), r() * 3, 0, 6.283); g.fill(); }
+      if (r() < .05) { const [qx, qy] = inTile(); g.fillStyle = '#e8e0c8'; g.fillRect(qx - 1, qy - 4, 2, 4); g.fillStyle = '#c42a38'; g.beginPath(); g.ellipse(qx, qy - 5, 4, 2.6, 0, Math.PI, 0); g.fill(); g.fillStyle = '#f7f0dc'; g.fillRect(qx - 1, qy - 6, 1.4, 1.4); }
+      else if (r() < .09) { const [qx, qy] = inTile(); g.fillStyle = 'rgba(58,96,38,.4)'; g.beginPath(); g.ellipse(qx, qy, 5 + r() * 7, 2 + r() * 2.4, 0, 0, 6.283); g.fill(); }
+      else if (r() < .07) { const [qx, qy] = inTile(), h = 4 + r() * 4; g.strokeStyle = '#8a7a34'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(qx - 2, qy + 1); g.lineTo(qx - 3.5, qy - h); g.moveTo(qx + 2, qy + 1); g.lineTo(qx + 3.5, qy - h * .9); g.stroke(); }
+    } else {                                                                        // moor: heather, tussocks, small stones
+      if (r() < .3) { const [qx, qy] = inTile(), h = 4 + r() * 4; g.strokeStyle = `hsl(${74 + tone * 14}, 24%, ${30 + tone * 8}%)`; g.lineWidth = 1.6; g.beginPath(); g.moveTo(qx - 2.5, qy + 1); g.lineTo(qx - 4, qy - h); g.moveTo(qx + 2.5, qy + 1); g.lineTo(qx + 4, qy - h * .9); g.moveTo(qx, qy + 1); g.lineTo(qx, qy - h * 1.2); g.stroke(); }
+      if (r() < .16) { const [qx, qy] = inTile(); g.fillStyle = r() < .5 ? '#8a5ab0' : '#b080d0'; for (let k = 0; k < 3; k++) g.fillRect(qx + k * 2 - 2, qy - 2 - (k % 2), 1.7, 1.7); }
+      if (r() < .05) { const [qx, qy] = inTile(); g.fillStyle = '#7f8590'; g.strokeStyle = OL; g.lineWidth = 1.1; g.beginPath(); g.ellipse(qx, qy - 2, 3.4, 2.5, 0, 0, 6.283); g.fill(); g.stroke(); g.fillStyle = '#a9afb8'; g.fillRect(qx - 2, qy - 3.4, 2.4, 1); }
+      else if (r() < .02) { const [qx, qy] = inTile(); g.fillStyle = 'rgba(60,82,110,.55)'; g.beginPath(); g.ellipse(qx, qy, 8 + r() * 5, 3.2 + r() * 2, 0, 0, 6.283); g.fill(); g.fillStyle = 'rgba(190,215,235,.35)'; g.fillRect(qx - 3, qy - 1, 5, 1); }
+    }
+  }
+  // The Troll Bridge: a plank deck over the gap in the river, with rails (the zone lists `bridges`; the server only has the gap).
+  function drawBridges(g, t) {
+    for (const b of zdef.bridges || []) {
+      const dx = b.x1 - b.x0, dy = b.y1 - b.y0, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len, half = b.w / 2 + .45;
+      const P = (u, v, z = 0) => w2s(b.x0 + ux * u - uy * half * v, b.y0 + uy * u + ux * half * v, z);
+      const quad = (pts, fill, stroke) => { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fillStyle = fill; g.fill(); if (stroke) { g.strokeStyle = stroke; g.lineWidth = 2; g.lineJoin = 'round'; g.stroke(); } };
+      quad([P(-.4, -1, -2), P(len + .4, -1, -2), P(len + .4, 1, -2), P(-.4, 1, -2)], 'rgba(10,18,20,.45)', null);        // the shadow on the water
+      quad([P(0, 1, 5), P(len, 1, 5), P(len, 1, -9), P(0, 1, -9)], '#4a3320', OL);                                  // the near side beam
+      quad([P(0, -1, 5), P(len, -1, 5), P(len, 1, 5), P(0, 1, 5)], '#8f6d44', OL);                                  // the deck
+      g.lineWidth = 1.4; g.strokeStyle = 'rgba(40,24,10,.5)';
+      for (let u = .5; u < len; u += .75) { const a = P(u, -1, 5), c = P(u, 1, 5); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(c[0], c[1]); g.stroke(); }
+      g.strokeStyle = 'rgba(255,225,170,.18)'; for (let u = .5; u < len; u += 1.5) { const a = P(u, -.8, 5), c = P(u + .5, -.8, 5); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(c[0], c[1]); g.stroke(); }
+      for (const v of [-1, 1]) {                                                                                       // rails: posts and two bars
+        for (let u = 0; u <= len + .01; u += 2.4) { const a = P(u, v, 5), c = P(u, v, 34); g.strokeStyle = OL; g.lineWidth = 6; g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(c[0], c[1]); g.stroke(); g.strokeStyle = '#6a4a2a'; g.lineWidth = 3.4; g.stroke(); }
+        for (const z of [34, 20]) { const a = P(0, v, z), c = P(len, v, z); g.strokeStyle = OL; g.lineWidth = 6; g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(c[0], c[1]); g.stroke(); g.strokeStyle = z > 30 ? '#8a6238' : '#75522e'; g.lineWidth = 3.2; g.stroke(); }
+      }
+      for (const u of [0, len]) for (const v of [-1, 1]) { const a = P(u, v, 34); g.fillStyle = '#c9a870'; g.strokeStyle = OL; g.lineWidth = 2; g.beginPath(); g.arc(a[0], a[1] - 3, 4, 0, 6.283); g.fill(); g.stroke(); }
+    }
+  }
+  const lightningAt = t => { const k = Math.floor(t / 7.3), ph = t - k * 7.3; return { k, ph, flash: ph < .12 ? 1 - ph / .12 : ph > .3 && ph < .4 ? .55 * (1 - (ph - .3) / .1) : 0 }; };
+  const stormLevel = () => clamp((100 - hero.y) / 55, 0, 1);       // 0 in the forest, 1 on the heights
+  function drawSkyWyrd(g, t) {
+    const st = stormLevel();
+    const gr = g.createLinearGradient(0, 0, 0, VH);
+    gr.addColorStop(0, `hsl(${lerp(236, 250, st)}, ${lerp(32, 22, st)}%, ${lerp(24, 13, st)}%)`); gr.addColorStop(.5, `hsl(${lerp(12, 262, st)}, ${lerp(46, 18, st)}%, ${lerp(38, 28, st)}%)`); gr.addColorStop(1, `hsl(${lerp(28, 280, st)}, ${lerp(70, 14, st)}%, ${lerp(52, 38, st)}%)`);
+    g.fillStyle = gr; g.fillRect(0, 0, VW, VH);
+    const sunA = 1 - st;
+    if (sunA > .02) { const sx = VW * .2, sy = VH * .3, glow = g.createRadialGradient(sx, sy, 10, sx, sy, 300); glow.addColorStop(0, `rgba(255,190,110,${.5 * sunA})`); glow.addColorStop(1, 'rgba(255,170,90,0)'); g.fillStyle = glow; g.fillRect(sx - 320, sy - 320, 640, 640); g.fillStyle = `rgba(255,214,150,${.9 * sunA})`; g.beginPath(); g.arc(sx, sy, 46, 0, 6.283); g.fill(); }
+    const [cx, cy] = camS();
+    g.fillStyle = `rgba(${lerp(70, 22, st)},${lerp(48, 22, st)},${lerp(60, 36, st)},${.28 + st * .3})`;
+    for (let i = 0; i < 12; i++) {
+      const px = ((i * 397 + t * (5 + (i % 4) * 2) - cx * .2) % (VW + 600) + VW + 600) % (VW + 600) - 300, py = (i * 173 % (VH * .7)) - cy * .04 + 80 + (i % 3) * 70, sc = 1 + (i % 4) * .35;
+      g.beginPath(); g.ellipse(px, py, 200 * sc, 34 * sc, 0, 0, 6.283); g.ellipse(px - 110 * sc, py + 10 * sc, 120 * sc, 26 * sc, 0, 0, 6.283); g.ellipse(px + 120 * sc, py + 12 * sc, 130 * sc, 26 * sc, 0, 0, 6.283); g.fill();
+    }
+    const L = lightningAt(t);
+    if (L.flash > 0 && st > .05) {                                   // a forked bolt from the cloud base, somewhere across the sky
+      const rng = rngf(L.k * 7919 + 13), x0 = VW * (.15 + rng() * .7);
+      g.strokeStyle = `rgba(215,236,255,${L.flash})`; g.lineWidth = 3; g.shadowColor = '#9fd0ff'; g.shadowBlur = 18; g.lineJoin = 'round';
+      g.beginPath(); let x = x0, y = 40; g.moveTo(x, y); for (let i = 0; i < 9; i++) { x += (rng() - .5) * 60; y += 38 + rng() * 22; g.lineTo(x, y); if (i === 3) { const bx = x, by = y; g.moveTo(bx, by); g.lineTo(bx + 40 * (rng() - .3), by + 90); g.moveTo(x, y); } } g.stroke(); g.shadowBlur = 0;
+    }
+  }
+  function drawWyrdWeather(g, t) {
+    const st = stormLevel();
+    g.save();
+    for (let i = 0; i < 44; i++) {                                    // falling leaves, fewer in the storm
+      if (i / 44 > 1 - st * .7) continue;
+      const sp = 22 + (i % 5) * 7, x = ((i * 151.7 + Math.sin(t * .8 + i) * 40 + t * 26) % (VW + 80) + VW + 80) % (VW + 80) - 40, y = (i * 67.3 + t * sp) % (VH + 40) - 20, a = t * 1.3 + i;
+      g.globalAlpha = .75; g.fillStyle = ['#c0481e', '#e8802a', '#eab833', '#9a3a1a'][i % 4];
+      g.beginPath(); g.ellipse(x, y, 4.2, 2.1, a, 0, 6.283); g.fill();
+    }
+    g.globalAlpha = 1;
+    if (st > .08) {                                                   // rain on the heights
+      g.strokeStyle = `rgba(190,210,235,${.32 * st})`; g.lineWidth = 1.2; g.beginPath();
+      for (let i = 0; i < 150 * st; i++) { const x = ((i * 97.3 + t * 160) % (VW + 200)) - 100, y = (i * 53.9 + t * 760) % (VH + 60) - 30; g.moveTo(x, y); g.lineTo(x - 7, y + 18); }
+      g.stroke();
+    }
+    const L = lightningAt(t);
+    if (L.flash > 0) { g.fillStyle = `rgba(215,232,255,${L.flash * (.1 + .3 * st)})`; g.fillRect(0, 0, VW, VH); }
+    g.restore();
   }
   // Snow falling over the world (screen space) on the glacier.
   function drawSnowfall(g, t) {
@@ -1524,6 +1637,7 @@
     if (zdef.theme === 'ember') return drawSkyEmber(g, t);
     if (zdef.theme === 'frost') return drawSkyFrost(g, t);
     if (zdef.theme === 'fen') return drawSkyFen(g, t);
+    if (zdef.theme === 'wyrd') return drawSkyWyrd(g, t);
     if (zdef.theme === 'city') return drawSkyCity(g, t);
     const gr = g.createLinearGradient(0, 0, 0, VH); gr.addColorStop(0, '#5aa0e8'); gr.addColorStop(.6, '#9fd0f5'); gr.addColorStop(1, '#d4ecff');
     g.fillStyle = gr; g.fillRect(0, 0, VW, VH);
@@ -1564,15 +1678,15 @@
     if (p.look === 'stairs_down') { const d = ZONES[p.to]; return VaultArt.stairsDown(g, sx, sy, t, d?.min_level ? `Stairs to ${d.name} · Lv ${d.min_level}+` : 'Stairs down'); }
     if (p.look === 'stairs_up') return VaultArt.stairsUp(g, sx, sy, t);
     if (p.look === 'exit') return VaultArt.exitPortal(g, sx, sy, t, t - clearedAt);
-    const dest = ZONES[p.to] || ZONES[0], warm = dest.theme === 'ember', cold = dest.theme === 'frost', bog = dest.theme === 'fen', gold = dest.theme === 'city';
-    const hue = warm ? 18 : cold ? 195 : bog ? 88 : gold ? 44 : 165, half = 1.5;
+    const dest = ZONES[p.to] || ZONES[0], warm = dest.theme === 'ember', cold = dest.theme === 'frost', bog = dest.theme === 'fen', gold = dest.theme === 'city', leaf = dest.theme === 'wyrd';
+    const hue = warm ? 18 : cold ? 195 : bog ? 88 : gold ? 44 : leaf ? 28 : 165, half = 1.5;
     const post = (u) => {                                    // an iso column centred u world units along x
       const px = sx + u * TW / 2, py = sy + u * TH / 2, w = 17, h = 112;
       g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(px, py + 2, 30, 11, 0, 0, 6.283); g.fill();
       g.lineJoin = 'round'; g.lineWidth = 3; g.strokeStyle = OL;
-      g.fillStyle = warm ? '#4a3b44' : cold ? '#7f93ad' : bog ? '#6a7a5c' : gold ? '#c9bfa2' : '#8a8f9c'; g.beginPath(); g.moveTo(px - w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
-      g.fillStyle = warm ? '#30262f' : cold ? '#586c86' : bog ? '#46543e' : gold ? '#a39a80' : '#6a6f7c'; g.beginPath(); g.moveTo(px + w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
-      g.fillStyle = warm ? '#6a5663' : cold ? '#b4cde3' : bog ? '#8a9c74' : gold ? '#e6dcc0' : '#b9bdc8'; g.beginPath(); g.moveTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.lineTo(px, py - 16 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = warm ? '#4a3b44' : cold ? '#7f93ad' : bog ? '#6a7a5c' : leaf ? '#7a5a38' : gold ? '#c9bfa2' : '#8a8f9c'; g.beginPath(); g.moveTo(px - w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = warm ? '#30262f' : cold ? '#586c86' : bog ? '#46543e' : leaf ? '#5a4028' : gold ? '#a39a80' : '#6a6f7c'; g.beginPath(); g.moveTo(px + w, py - 4); g.lineTo(px, py + 8); g.lineTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = warm ? '#6a5663' : cold ? '#b4cde3' : bog ? '#8a9c74' : leaf ? '#a8825a' : gold ? '#e6dcc0' : '#b9bdc8'; g.beginPath(); g.moveTo(px, py + 8 - h); g.lineTo(px + w, py - 4 - h); g.lineTo(px, py - 16 - h); g.lineTo(px - w, py - 4 - h); g.closePath(); g.fill(); g.stroke();
       g.shadowColor = `hsl(${hue}, 100%, 60%)`; g.shadowBlur = 10; g.strokeStyle = `hsl(${hue + 12}, 100%, ${60 + 10 * Math.sin(t * 3 + u)}%)`; g.lineWidth = 2.4;
       g.beginPath(); g.moveTo(px - 8, py - 30); g.lineTo(px - 8, py - 62); g.lineTo(px - 3, py - 74); g.moveTo(px + 8, py - 30); g.lineTo(px + 8, py - 54); g.stroke(); g.shadowBlur = 0;
     };
@@ -1610,7 +1724,8 @@
     g.imageSmoothingEnabled = true;
     City.drawPlaza(g, w2s);
     if (zdef.theme === 'ember') drawLava(g, t);
-    if (zdef.theme === 'fen') drawWater(g, t);
+    if (zdef.theme === 'fen' || zdef.theme === 'wyrd') drawWater(g, t);
+    if (zdef.theme === 'wyrd') drawBridges(g, t);
     // ground decals: splats, target marker, slash, shadows
     for (const who of [hero, ...remotePlayers.values()]) drawBuffRings(g, who, t);
     for (const e of effects) if (e.kind === 'splat') { const [sx, sy] = w2s(e.x, e.y), a = clamp(1 - (e.t - 3) / 3, 0, 1) * .5; g.fillStyle = e.col; g.globalAlpha = a; g.beginPath(); g.ellipse(sx, sy, 26 * e.s, 12 * e.s, 0, 0, 6.283); g.fill(); g.globalAlpha = 1; }
@@ -1621,10 +1736,11 @@
     for (const o of objects) {
       if (o.kind === 'lava' || o.kind === 'water' || o.kind === 'post') continue;
       const [sx, sy] = w2s(o.x, o.y);
-      if (onScreen(sx, sy, 200)) { list.push({ d: o.x + o.y, o, sx, sy }); if (o.kind === 'tree') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind]) shadow(g, o.x, o.y, 26, 9, .25); }
+      if (onScreen(sx, sy, 200)) { list.push({ d: o.x + o.y, o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
     }
     for (const portal of zdef.portals) { if (portal.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y + (portal.look ? .3 : 0), portal, sx, sy }); }
-    for (const n of City.npcs) { const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
+    const escorted = id => { for (const r of remotePlayers.values()) if (r.escort && r.escort.npc === id && r.escort.owner === Online.id) return true; return false; };   // a stranded person walks with their rescuer
+    for (const n of City.npcs) { if (n.escort && escorted(n.id)) continue; const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
     for (const s of slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, 100)) { shadow(g, s.x, s.y, 28 * s.d.scale * (1 - s.hop * .12), 11 * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 60)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
     { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, .32); list.push({ d: hero.sparkTravel ? Infinity : hero.x + hero.y + .001, hero, sx, sy }); }
@@ -1638,7 +1754,7 @@
       if (it.o) {
         const o = it.o;
         if (!set[o.kind]) {
-          const cover=['house','chapel','gate','tent','tower','rampart','meetingstone','grandfountain','vaultwall','pillar'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
+          const cover=['house','chapel','gate','tent','tower','rampart','meetingstone','grandfountain','vaultwall','pillar','tree','pine','elderash','ribcage','gallows'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
           City.drawObject(g,o,it.sx,it.sy,cover ? .5 : 1);
           City.animateObject(g,o,it.sx,it.sy,t);
           if(o.kind==='fountain') { for(let i=0;i<7;i++){const phase=(t*.7+i*.17)%1;g.globalAlpha=Math.sin(phase*Math.PI)*.7;g.fillStyle='#e0ffff';g.beginPath();g.ellipse(it.sx+Math.sin(i*4)*45,it.sy-9-phase*24,2,3,0,0,Math.PI*2);g.fill();}g.globalAlpha=1;}
@@ -1678,9 +1794,10 @@
         if (remote.sparkTravel) Spark.draw(g,remote,t);
         else if (remote.sprite) remote.sprite.draw(g, remote, t);
         else { g.fillStyle = '#cfb5fa'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
-        g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = window.Social?.isPartyMember(remote.id) ? '#9dffb2' : '#fff4ca';
-        g.strokeText(remote.look.name, 0, -128); g.fillText(remote.look.name, 0, -128);
-        g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
+        g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : '#fff4ca';
+        const nameText = remote.escort ? remote.look.name + ' · Escort' : remote.look.name;
+        g.strokeText(nameText, 0, -128); g.fillText(nameText, 0, -128);
+        g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
         g.restore();
       } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.sparkTravel) Spark.draw(g,hero,t); else if (isModular()) {
         if (mageSpr) mageSpr.draw(g, hero, t);
@@ -1754,6 +1871,7 @@
     for (const f of floaters) { const [sx, sy] = w2s(f.x, f.y, f.z + 30); g.globalAlpha = clamp(1.4 - f.t * 1.3, 0, 1); g.font = `${f.big ? 34 : 24}px "Lilita One", "Jua", Impact, sans-serif`; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = 'rgba(20,10,30,.9)'; g.strokeText(f.text, sx, sy); g.fillStyle = f.color; g.fillText(f.text, sx, sy); } g.globalAlpha = 1;
     if (zdef.theme === 'frost') drawSnowfall(g, t);
     if (zdef.theme === 'fen') drawFireflies(g, t);
+    if (zdef.theme === 'wyrd') drawWyrdWeather(g, t);
     if (zdef.theme === 'city') drawBlossom(g, t);
     if (zdef.theme === 'vault') { drawDarkness(g, t); drawBossBar(g); }
     drawMini();
@@ -1844,13 +1962,13 @@
     g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(mask, 0, 0, w, h); g.restore();
   }
   function buildMini() {
-    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault';
-    g.fillStyle = vault ? '#07080e' : city ? '#5f9b4a' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
-    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
-    if (zdef.city && !city) {
-      const c = zdef.city;
-      g.fillStyle=fen ? '#6a5238' : frost ? '#8fa6bd' : ember ? '#88705d' : '#d8cbb0'; g.fillRect(c.x0*k,c.y0*k,(c.x1-c.x0)*k,(c.y1-c.y0)*k);
-      g.fillStyle=fen ? '#ffe08a' : frost ? '#ffd27a' : ember ? '#ffb65c' : '#68bcc6'; g.beginPath();g.arc(c.plaza.x*k,c.plaza.y*k,3,0,Math.PI*2);g.fill();
+    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault', wyrd = zdef.theme === 'wyrd';
+    g.fillStyle = vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
+    for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : wyrd ? '#b89860' : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
+    if (wyrd) { const gr = g.createLinearGradient(0, 0, 0, 144); gr.addColorStop(0, 'rgba(120,128,92,.95)'); gr.addColorStop(.42, 'rgba(120,128,92,.9)'); gr.addColorStop(.56, 'rgba(120,128,92,0)'); g.fillStyle = gr; g.fillRect(0, 0, 144, 144); for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = '#c4b290'; if (y < MAP * .5) g.fillRect(x * k, y * k, k + .5, k + .5); } }
+    if (zdef.city && !city) for (const c of [zdef.city, ...(zdef.camps || [])]) {
+      g.fillStyle=wyrd ? '#8a6a44' : fen ? '#6a5238' : frost ? '#8fa6bd' : ember ? '#88705d' : '#d8cbb0'; g.fillRect(c.x0*k,c.y0*k,(c.x1-c.x0)*k,(c.y1-c.y0)*k);
+      g.fillStyle=wyrd ? '#ffd9a0' : fen ? '#ffe08a' : frost ? '#ffd27a' : ember ? '#ffb65c' : '#68bcc6'; g.beginPath();g.arc(c.plaza.x*k,c.plaza.y*k,3,0,Math.PI*2);g.fill();
     }
     for (const o of objects) {
       if (o.kind === 'post') continue;
@@ -1860,10 +1978,10 @@
         g.fillRect((o.x - o.width / 2) * k, (o.y - o.depth / 2) * k, Math.max(1, o.width * k), Math.max(1, o.depth * k)); continue;
       }
       if (city && (o.kind === 'grandfountain' || o.kind === 'meetingstone' || o.kind === 'fountain')) { g.fillStyle = o.kind === 'meetingstone' ? '#59d9ff' : '#58a8d8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2, o.r * k), 0, 6.283); g.fill(); continue; }
-      g.fillStyle = o.kind === 'lava' ? '#ff6a2a' : o.kind === 'ice' ? '#4f93c8' : o.kind === 'water' ? '#244f5c' : o.kind === 'thicket' ? '#6a2f58' : o.kind === 'tree' ? (fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a') : o.kind === 'spire' ? (fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e') : o.kind === 'rock' ? (fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8') : (fen ? '#3f6a35' : frost ? '#3a7a70' : ember ? '#5a3a30' : '#2f8a45');
+      g.fillStyle = o.kind === 'lava' ? '#ff6a2a' : o.kind === 'ice' ? '#4f93c8' : o.kind === 'water' ? (wyrd ? '#2f6f9a' : '#244f5c') : o.kind === 'crag' ? '#4a4a58' : o.kind === 'pine' ? '#1f4a3a' : o.kind === 'beacon' ? '#ff9a2e' : o.kind === 'gallows' || o.kind === 'ribcage' ? '#d8d0b8' : o.kind === 'elderash' ? '#8a5a2a' : o.kind === 'thicket' ? '#6a2f58' : o.kind === 'tree' ? (wyrd ? '#a8451e' : fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a') : o.kind === 'spire' ? (wyrd ? '#d8d8c8' : fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e') : o.kind === 'rock' ? (wyrd ? '#7a7a80' : fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8') : (fen ? '#3f6a35' : frost ? '#3a7a70' : ember ? '#5a3a30' : '#2f8a45');
       g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'water' ? 1.6 : o.kind === 'ice' || o.kind === 'thicket' ? 1.7 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
     }
-    for (const p of zdef.portals) { if (p.after_clear && !instanceCleared) continue; g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
+    for (const p of zdef.portals) { if (p.after_clear && !instanceCleared) continue; g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }
     miniBase = c;
   }
   function drawMini() {
@@ -1901,7 +2019,7 @@
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
       if (o.slimeSprites) loadSlimeSprites(o.slimeSprites);
-      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadVaultSprites();
+      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadVaultSprites();
       if (!Field._bound) {
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize);
@@ -1927,7 +2045,7 @@
       if(paused || !Online.connected || hero.dead)return;
       if (!zdef.city) return;
       Field.clearInput(); pendingNpc=null; hero.target=null; hero.goal=null;
-      cityRoute=routeTo(zone === 0 ? {x:36,y:79} : zdef.city.entry || zdef.spawn);routeTime=0;
+      cityRoute=routeTo(zone === 0 ? {x:36,y:79} : campNear()?.entry || zdef.spawn);routeTime=0;
     },
     equip(change) {
       if (!isModular()) return;
@@ -1973,7 +2091,7 @@
     get hunterSprites() { return isHunter() ? mageSpr : null; },
     get hero() { return hero; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
-    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get vaultSprites() { return vaultSrc; },
+    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get vaultSprites() { return vaultSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; },
     _debug: { get effects() { return effects; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll) },
   };

@@ -35,12 +35,11 @@ async function call(name, args = {}) {
   const closeJournal = async () => { await page.keyboard.press('Escape'); await page.locator('#quest-journal').waitFor({ state: 'hidden' }); };
   const ids = ['crags_onward', 'rime_onward', 'fen_onward', 'city_onward'], levels = [5, 10, 15, 20];
 
-  // Before any level: the journal previews them, with nothing to accept and nobody to visit.
+  // Before any level: the journal shows none of them, and the catalogue holds each one for its level.
   await journal();
   for (const [i, id] of ids.entries()) {
-    const text = await card(id).textContent();
-    check(text.includes('Comes at a later level') && text.includes(`finds you by itself at level ${levels[i]}`), `${id} is previewed with its level`);
-    check(await card(id).locator('button').count() === 0, `${id} has no accept, visit or track button before it arrives`);
+    check(await card(id).count() === 0, `${id} is not in the journal before it arrives`);
+    check(await page.evaluate(([id, level]) => WORLD_MAP.zones.flatMap(z => z.quests || []).find(q => q.id === id).autoLevel === level, [id, levels[i]]), `${id} finds the hero by itself at level ${levels[i]}`);
   }
   check(!(await tracker()).includes('Onward to the Crags'), 'The HUD tracker does not list a quest that has not arrived');
   await closeJournal();
@@ -53,7 +52,7 @@ async function call(name, args = {}) {
   await journal();
   let text = await card('crags_onward').textContent();
   check(text.includes('In progress') && text.includes('Captain Sera is in Emberfall Crags'), 'The journal points the player to the new zone and its captain');
-  check(await card('rime_onward').textContent().then(t => t.includes('Comes at a later level')), 'The next one still waits for level 10');
+  check(await card('rime_onward').count() === 0, 'The next one still waits for level 10');
   await closeJournal();
   const row = await page.locator('#npc-quests .gossip-row[data-quest="crags_onward"]').count();
   check(row === 0, 'Nothing is listed at a giver that the player could accept');
@@ -74,7 +73,7 @@ async function call(name, args = {}) {
   await page.waitForFunction(() => document.getElementById('npc-notice').textContent.includes('Quest complete: Onward to the Crags'), null, { timeout: 10000 });
   await page.locator('#npc-close').click();
   await journal();
-  check(await card('crags_onward').textContent().then(t => t.includes('Completed')), 'The journal shows it completed');
+  check(await card('crags_onward').count() === 1 && await card('crags_onward').evaluate(n => n.matches('details.quest-completed *')), 'The journal moves it to the completed list');
   await closeJournal();
 
   // Level 10: the next one arrives, aimed at the glacier.

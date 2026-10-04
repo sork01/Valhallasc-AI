@@ -38,7 +38,7 @@
       });
       return b;
     };
-    const need = make('Need', 'need', packet.need ? 'You can wear this piece' : 'Your class or level cannot use this piece');
+    const need = make('Need', 'need', packet.need ? 'Your class can wear this piece' : 'Your class cannot use this piece');
     need.disabled = !packet.need;
     buttons.append(need, make('Greed', 'greed', 'Roll for the gold value'), make('Pass', 'pass', 'Give it up'));
     node.append(head, el('small', summary(item), 'roll-stats'), buttons);

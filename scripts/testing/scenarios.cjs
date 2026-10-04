@@ -11,6 +11,7 @@ const crags = map.zones[0];
 const rime = map.zones[1];
 const fen = map.zones[2];
 const city = map.zones[3];
+const wyrd = map.zones[5];
 // `area` is the map of the zone the bot stands in: the meadow by default, or `crags`.
 async function walkTo(world, bot, goal, area = map) {
   for (const point of route(area, world.player(bot), goal)) {
@@ -29,7 +30,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30 };
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
 const levelXp = JSON.parse(fs.readFileSync(path.join(root, 'world/levels.txt'), 'utf8'));
@@ -1110,7 +1111,7 @@ const scenarios = {
       await kit.setupCharacter(w, bot, { level: 14 });
       const up = rime.portals.find(p => p.id === 'city_gate');
       check(up && up.to === 4 && rime.portals[0].id === 'crags_gate' && rime.portals[1].id === 'fen_gate', 'The Rimeveil summit has a Skaldholm gate to zone 4 after the Crags and fen gates');
-      check(map.zones.length === 4 && city.name === 'Skaldholm' && city.theme === 'city' && city.size === 160 && city.slimes.length === 0, 'Zone 4 is the 160-tile city and has no enemy spawns');
+      check(map.zones.length === 6 && city.name === 'Skaldholm' && city.theme === 'city' && city.size === 160 && city.slimes.length === 0, 'Zone 4 is the 160-tile city and has no enemy spawns');
       await kit.teleport(w, bot, { zone: 2, x: up.x, y: up.y + 8 });
       await walkTo(w, bot, { x: up.x, y: up.y + 4 }, rime);
       check(w.player(bot).zone === 2, 'Still on the glacier in front of the gate');
@@ -1881,7 +1882,7 @@ const scenarios = {
         return w.waitFor(() => w.events.find(e => !before.has(e) && e.bot === bot && (e.type === 'dialogue' || e.type === 'notice')), 5000, 'Spark reply');
       };
       let reply = await visit(A);
-      check(reply.travel.length === 4, 'Every other settlement appears as a destination');
+      check(reply.travel.length === 6, 'Every other settlement appears as a destination');
       check(reply.travel.find(d => d.id === C).cost === 40, 'Two legs cost 40 gold');
       await visit(C); await kit.teleport(w, bot, { npc: A });
       reply = await choose(A, C);
@@ -1976,6 +1977,248 @@ const scenarios = {
     },
   },
 
+
+  wyrdwood: {
+    description: 'Walk out of Skaldholm through the new East Gate into the level 20-30 Wyrdwood, check its 67 monster slots (five kinds, two elites, five sleeping ambushers) and their levels, walk the real route to the Troll Bridge and across it into Skuldwatch, fight a level-1 Rotfang Boar for exact XP, gold and loot, keep the zone across a restart and walk back through the gate.',
+    async run(w, check) {
+      const bot = 'Woodwalker';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 24 });
+      const east = city.portals.find(p => p.id === 'wyrd_gate'), back = wyrd.portals.find(p => p.id === 'skaldholm_gate');
+      check(east && east.to === 6 && back && back.to === 4 && wyrd.name === 'Wyrdwood' && wyrd.levels.join() === '20,30' && wyrd.size === 192, 'Skaldholm has an East Gate to zone 6, the 192-tile Wyrdwood of levels 20-30, which has the gate back');
+      check(wyrd.camps.length === 1 && wyrd.city.name === 'Hollowmoot' && wyrd.camps[0].name === 'Skuldwatch', 'The zone has two hubs, Hollowmoot and Skuldwatch');
+      // Staging only: stand inside the city by the east wall. The walk through the gap in the wall and the gate are real.
+      await kit.teleport(w, bot, { zone: 4, x: east.x - 14, y: east.y });
+      await walkTo(w, bot, { x: east.x - 3, y: east.y }, city);
+      check(w.player(bot).zone === 4, 'Still in Skaldholm in front of the gate');
+      await w.action(bot, { type: 'move', x: east.x + 1.2, y: east.y });
+      await w.waitFor(() => w.player(bot).zone === 6, 20000, 'Step through the East Gate');
+      await w.action(bot, { type: 'stop' });
+      const arrival = { x: east.tx, y: east.ty };
+      check(distance(w.player(bot), arrival) < 1.2, 'The server moves the walker to the west edge of Hollowmoot');
+      const woods = w.snapshot.slimes;
+      const kinds = {}; for (const s of woods) kinds[s.kind] = (kinds[s.kind] || 0) + 1;
+      check(woods.every(s => s.zone === 6) && JSON.stringify(Object.entries(kinds).sort()) === JSON.stringify([['boar', 14], ['crow', 15], ['hrungnir', 1], ['oakhorn', 1], ['ram', 10], ['troll', 14], ['weaver', 12]]),
+        'A Wyrdwood client receives exactly its 67 monster slots: 14 boars, 15 crows, 14 trolls, 12 weavers, 10 rams and the two elites');
+      const asleep = woods.filter(s => s.dead && s.state === 'waiting');
+      check(asleep.length === 5 && asleep.filter(s => s.kind === 'crow').length === 3 && asleep.filter(s => s.kind === 'troll').length === 2, 'Five ambushers sleep (three crows, two trolls) until an escort passes');
+      const hp = { boar: 5600, crow: 4300, troll: 9500, weaver: 7600, ram: 11500, oakhorn: 60000, hrungnir: 150000 };
+      const living = woods.filter(s => !s.dead);
+      check(living.length === 62 && living.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2) && new Set(living.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'The 62 live monsters roll within two of each default level (21, 23, 25, 27, 29, 25, 30) and really vary');
+      check(living.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
+      check(living.filter(s => s.elite).map(s => s.kind).sort().join() === 'hrungnir,oakhorn', 'Exactly Oakhorn and Hrungnir are elites');
+      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.type === 'system' && e.text.includes('Wyrdwood') && e.text.includes('20–30')), 'The player is told the recommended levels');
+      // Another character in Skaldholm shares nothing with the forest.
+      await w.connect({ bot: 'Citizen', class: 'mage' });
+      await kit.teleport(w, 'Citizen', { zone: 4, x: 80, y: 120 });
+      check(w.views.get('Citizen').slimes.length === 0 && w.views.get(bot).slimes.every(s => s.zone === 6) && w.views.get(bot).players.length === 1, 'Each client is sent only its own zone');
+      await w.disconnect('Citizen');
+      // The way to Skuldwatch: through the south forest to the bridge. The river is crossed in one place only.
+      const bridge = { x: 96, y: 108 }, hubSouth = { x: 96, y: 92 };
+      const start = { x: w.player(bot).x, y: w.player(bot).y }, to = route(wyrd, start, { x: 96, y: 118 }), over = route(wyrd, { x: 96, y: 118 }, hubSouth);
+      const crossings = [...to, ...over].map((p, i, all) => [i ? all[i - 1] : start, p]).filter(([a, b]) => (a.y - 108) * (b.y - 108) <= 0 && a.y !== b.y).map(([a, b]) => a.x + (b.x - a.x) * (108 - a.y) / (b.y - a.y));
+      check(crossings.length >= 1 && crossings.every(x => Math.abs(x - 96) < 3.5), `The only crossing of the river is the bridge (${crossings.map(x => x.toFixed(1)).join(', ')})`);
+      for (const point of [...to, ...over]) {
+        await w.action(bot, { type: 'move', ...point });
+        await w.waitFor(() => distance(w.player(bot), point) < .6, 60000, `Walk the Wyrdwood to ${Math.round(point.x)},${Math.round(point.y)}`);
+      }
+      await w.action(bot, { type: 'stop' });
+      check(distance(w.player(bot), hubSouth) < 1.5 && w.player(bot).y < bridge.y, 'The bot crosses the Troll Bridge on foot and reaches Skuldwatch');
+      // A level-1 Rotfang Boar is a short real fight, and pays its own level (staging: the spot is in the forest, away from the packs).
+      await kit.teleport(w, bot, { zone: 6, x: 70, y: 150 });
+      const before = { ...w.player(bot) };
+      const boar = (await kit.spawnEnemy(w, bot, { kind: 'boar', level: 1, distance: 2.5 })).enemy;
+      await w.waitFor(() => w.snapshot.slimes.find(s => s.id === boar.id)?.level === 1, 5000, 'See the spawned boar');
+      check(w.snapshot.slimes.find(s => s.id === boar.id).maxHp === Math.round(5600 * .2), 'A level-1 boar has the floor of 20% of its health (1120)');
+      await w.action(bot, { type: 'target', id: boar.id });
+      await w.waitFor(() => w.snapshot.slimes.find(s => s.id === boar.id).dead, 120000, 'Defeat the boar');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + enemyXp(1), `The kill pays the level-1 XP (${enemyXp(1)})`);
+      await w.waitFor(() => w.player(bot).gold >= before.gold + 54, 15000, 'Pick up the gold');
+      check(w.player(bot).gold === before.gold + 54, 'The kill drops 20% of the boar gold (54)');
+      await w.waitFor(() => w.player(bot).inventory.some(s => s.item === 'rotfang_tusk'), 15000, 'Pick up the tusk');
+      check(true, 'The boar drops its Rotfang Tusk');
+      // A restart keeps the character in the Wyrdwood.
+      await w.restart();
+      check(w.player(bot).zone === 6, 'The character resumes in the Wyrdwood after a server restart');
+      // The way back is a real walk through the Wyrdwood gate.
+      await kit.teleport(w, bot, { zone: 6, x: 12, y: 150 });
+      await w.action(bot, { type: 'move', x: back.x - 1.5, y: back.y });
+      await w.waitFor(() => w.player(bot).zone === 4, 15000, 'Step through the gate back');
+      await w.action(bot, { type: 'stop' });
+      check(distance(w.player(bot), { x: back.tx, y: back.ty }) < 1.2, 'The gate sets you down outside Skaldholm\'s East Gate');
+      await w.action(bot, { type: 'move', x: east.x + 1.2, y: east.y });
+      await w.waitFor(() => w.player(bot).zone === 6, 15000, 'Step through the East Gate again');
+      check(distance(w.player(bot), arrival) < 1.5, 'The gate works again right after arriving');
+    },
+  },
+
+  wyrd_quests: {
+    description: 'Every ordinary quest of Hollowmoot and Skuldwatch played in dependency order through the real accept and claim paths (talk, kill, bring, visit, cross-hub message, repeatable bounties) with exact XP and gold, the two group quests hire their fighters, then the escort: Eydis is found, walked past two real ambushes and across the Troll Bridge into Skuldwatch for the reward; a second hero fails it by dying and starts again.',
+    startLevel: 20, godMode: true, levelSpread: 0,
+    async run(w, check) {
+      const bot = 'Questwalker';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 26, gold: 4000 });
+      const defs = wyrd.quests, npcs = wyrd.npcs;
+      check(npcs.length === 17 && defs.length >= 24 && defs.every(q => q.id.startsWith('wyrd_')), `The two hubs hold ${npcs.length} people and ${defs.length} quests`);
+      const find = id => defs.find(q => q.id === id);
+      const placeOf = id => wyrd.places.find(p => p.id === id);
+      const state = id => quest(w, bot, id);
+      const give = (item, quantity) => w.debug(bot, { op: 'give_item', item, quantity });
+      // Earlier quests used the packs up: bring back the dead ones near a point (never the sleeping ambushers or the elites) until `n` live ones are within `radius`.
+      async function refill(at, radius, n) {
+        const live = () => w.snapshot.slimes.filter(s => !s.dead && !s.elite && distance(s, at) < radius).length;
+        if (live() >= n) return;
+        for (const d of w.snapshot.slimes.filter(s => s.dead && s.state !== 'waiting' && !s.elite && distance(s, at) < radius)) await w.debug(bot, { op: 'respawn_enemy', id: d.id });
+        await w.waitFor(() => live() >= n, 10000, 'The woods refill');
+      }
+      async function playQuest(id) {
+        const q = find(id);
+        await kit.teleport(w, bot, { npc: q.npc });
+        await kit.talkTo(w, bot, q.npc, `quest:accept:${id}`);
+        await w.waitFor(() => state(id) && !state(id).claimed, 5000, `Accept ${id}`);
+        for (const [i, o] of q.objectives.entries()) {
+          if (o.kind === 'talk') { await kit.teleport(w, bot, { npc: o.target }); await kit.talkTo(w, bot, o.target); }
+          else if (o.kind === 'bring') await give(o.target, o.count);
+          else if (o.kind === 'visit') { const p = placeOf(o.target); await kit.teleport(w, bot, { zone: 6, x: p.x, y: p.y + (o.target.includes('beacon') ? 2.4 : 0) }); }
+          else if (o.kind === 'kill') {
+            const kinds = o.target === 'any' ? [undefined] : [o.target];
+            const fields = o.target === 'any' ? { radius: 60, max: o.count } : { kind: o.target, max: o.count };
+            if (o.target === 'any') { await kit.teleport(w, bot, { npc: q.npc }); await refill(w.player(bot), 60, o.count + 2); }
+            if (o.target !== 'any') {                                  // earlier quests used the pack up: bring the dead ones back (never the sleeping ambushers)
+              const alive = () => w.snapshot.slimes.filter(s => !s.dead && s.kind === o.target).length;
+              if (alive() < o.count) {
+                for (const d of w.snapshot.slimes.filter(s => s.dead && s.kind === o.target && s.state !== 'waiting').slice(0, o.count - alive())) await w.debug(bot, { op: 'respawn_enemy', id: d.id });
+                await w.waitFor(() => alive() >= o.count, 10000, `Respawn ${o.target}`);
+              }
+            }
+            const here = w.snapshot.slimes.filter(s => !s.dead && (o.target === 'any' || s.kind === o.target)).sort((a, b) => distance(a, w.player(bot)) - distance(b, w.player(bot)))[0];
+            if (here) await kit.teleport(w, bot, { zone: 6, x: here.x + 3, y: here.y });
+            const done = await kit.killEnemies(w, bot, fields); void kinds;
+            assert.ok(done.count >= o.count || o.target === 'any', `Killed enough ${o.target}`);
+          } else throw Error(`${id}: unexpected objective ${o.kind}`);
+          await w.waitFor(() => (state(id).counts[i] || 0) >= Math.min(o.count, o.kind === 'kill' ? 99 : o.count), 8000, `${id} objective ${i}`);
+        }
+        await w.waitFor(() => state(id).counts.every((c, i) => c >= q.objectives[i].count), 8000, `${id} is ready`);
+        await kit.teleport(w, bot, { npc: q.npc });
+        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        const held = item => w.player(bot).inventory.filter(s => s.item === item).reduce((n, s) => n + s.quantity, 0);
+        const bringing = q.objectives.filter(o => o.kind === 'bring').map(o => [o.target, o.count, held(o.target)]);
+        await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
+        await w.waitFor(() => state(id).claimed, 5000, `Claim ${id}`);
+        for (const [item, count, had] of bringing) check(held(item) === had - count, `${id}: the hand-in took exactly ${count} ${item}`);
+        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${q.rewardGold} gold and a tenth of level ${q.level}'s XP`);
+        return q;
+      }
+      // Dependency order: every ordinary quest, none of the group quests, the escort or the progression quest (it arrives by itself).
+      const skip = new Set(['wyrd_oakhorn', 'wyrd_hrungnir', 'wyrd_escort', 'wyrd_onward']);
+      const order = [], seen = new Set();
+      const visit = q => { if (seen.has(q.id) || skip.has(q.id)) return; seen.add(q.id); if (q.requires && !skip.has(q.requires)) visit(find(q.requires)); order.push(q); };
+      defs.forEach(visit);
+      const tally = {};
+      for (const q of order) { await playQuest(q.id); for (const o of q.objectives) tally[o.kind] = (tally[o.kind] || 0) + 1; }
+      check(order.length >= 20 && ['talk', 'kill', 'bring', 'visit'].every(k => tally[k] >= 3), `${order.length} quests played end to end: ${JSON.stringify(tally)}`);
+      const onward = state('wyrd_onward');
+      check(onward && onward.counts[0] === 1 && !onward.claimed, 'The level-22 progression quest arrived by itself and already counts: the hero stands in the Wyrdwood');
+      await kit.teleport(w, bot, { npc: 'wyrd_warden' });
+      await kit.talkTo(w, bot, 'wyrd_warden', 'quest:claim:wyrd_onward');
+      await w.waitFor(() => state('wyrd_onward').claimed, 5000, 'Claim the progression quest');
+      // A repeatable bounty can be taken and paid again.
+      const rep = defs.find(q => q.id === 'wyrd_patrol');
+      for (let round = 0; round < 2; round++) {
+        const before = { gold: w.player(bot).gold, completions: state('wyrd_patrol').completions };
+        await kit.teleport(w, bot, { npc: rep.npc });
+        await kit.talkTo(w, bot, rep.npc, 'quest:accept:wyrd_patrol');
+        await w.waitFor(() => !state('wyrd_patrol').claimed, 5000, 'Take the patrol again');
+        await kit.teleport(w, bot, { zone: 6, x: 60, y: 150 });
+        await refill({ x: 60, y: 150 }, 80, 12);
+        await kit.killEnemies(w, bot, { radius: 80, max: 12 });
+        await w.waitFor(() => state('wyrd_patrol').counts[0] === 12, 8000, 'Patrol count');
+        await kit.teleport(w, bot, { npc: rep.npc });
+        await kit.talkTo(w, bot, rep.npc, 'quest:claim:wyrd_patrol');
+        await w.waitFor(() => state('wyrd_patrol').completions === before.completions + 1, 5000, 'Patrol paid');
+        check(w.player(bot).gold === before.gold + rep.rewardGold, `The repeatable patrol pays ${rep.rewardGold} gold again (round ${round + 1})`);
+      }
+      // The group quests: the giver hires exactly the missing fighters, up to the quest's party size.
+      const mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name)).length;
+      await kit.teleport(w, bot, { npc: 'wyrd_warden' });
+      await kit.talkTo(w, bot, 'wyrd_warden', 'quest:accept:wyrd_oakhorn');
+      await w.waitFor(() => state('wyrd_oakhorn'), 5000, 'Accept the Oakhorn quest');
+      for (const c of ['warrior', 'priest', 'mage']) await kit.talkTo(w, bot, 'wyrd_warden', `merc_${c}`);
+      await w.waitFor(() => mercs() === 2, 8000, 'Two fighters join');
+      check(mercs() === 2 && find('wyrd_oakhorn').recommendedPlayers === 3 && find('wyrd_oakhorn').rewardItem === 'pants_wayfarer_l20_blue', 'The Oakhorn quest wants three heroes, hires two fighters and refuses the third; its reward is a blue item');
+      await kit.talkTo(w, bot, 'wyrd_warden', 'merc_dismiss');
+      await w.waitFor(() => mercs() === 0, 8000, 'Send them away');
+      await kit.teleport(w, bot, { npc: 'wyrd_captain' });
+      await kit.talkTo(w, bot, 'wyrd_captain', 'quest:accept:wyrd_hrungnir');
+      await w.waitFor(() => state('wyrd_hrungnir'), 5000, 'Accept the Hrungnir quest');
+      for (const c of ['warrior', 'priest', 'mage', 'hunter', 'assassin']) await kit.talkTo(w, bot, 'wyrd_captain', `merc_${c}`);
+      await w.waitFor(() => mercs() === 4, 8000, 'Four fighters join');
+      check(mercs() === 4 && find('wyrd_hrungnir').recommendedPlayers === 5 && find('wyrd_hrungnir').rewardItem === 'necklace_moonstone_l20_purple', 'The Hrungnir quest wants five heroes, hires four fighters and refuses the fifth; its reward is an epic item');
+      await kit.talkTo(w, bot, 'wyrd_captain', 'merc_dismiss');
+      // The escort. Everything the server does is real; only the hero's own steps are staged (it stays beside her).
+      const eydis = npcs.find(n => n.id === 'wyrd_eydis'), q = find('wyrd_escort');
+      const asleep = new Set(w.snapshot.slimes.filter(s => s.dead && s.state === 'waiting').map(s => s.id));
+      check(asleep.size === 5, 'Five ambushers sleep before the journey');
+      await kit.teleport(w, bot, { npc: 'wyrd_loremaster' });
+      await kit.talkTo(w, bot, 'wyrd_loremaster', 'quest:accept:wyrd_escort');
+      await w.waitFor(() => state('wyrd_escort'), 5000, 'Accept the escort quest');
+      const escortOf = () => w.snapshot.players.find(p => p.escort && p.escort.npc === 'wyrd_eydis');
+      await kit.teleport(w, bot, { zone: 6, x: eydis.x, y: eydis.y + 1.2 });
+      check(!escortOf(), 'Eydis only stands at the ruined mill until she is spoken to');
+      await kit.talkTo(w, bot, 'wyrd_eydis');
+      await w.waitFor(escortOf, 5000, 'Eydis joins');
+      check(escortOf().look.name === 'Eydis Mapwright' && escortOf().look.class === 'mage' && escortOf().maxHp > 400 && escortOf().escort.owner === w.player(bot).id && w.snapshot.players.filter(p => p.escort).length === 1, 'Eydis Mapwright joins as a tough walking mage owned by the hero');
+      const wokeIds = new Set(), began = Date.now();
+      let walked = 0, last = { x: eydis.x, y: eydis.y };
+      while (escortOf() && state('wyrd_escort').counts[0] < 1 && Date.now() - began < 360000) {
+        const e = escortOf();
+        await kit.teleport(w, bot, { zone: 6, x: e.x + 1, y: e.y + 1 });
+        const foes = w.snapshot.slimes.filter(s => !s.dead && distance(s, e) < 15);
+        for (const f of foes) if (asleep.has(f.id)) wokeIds.add(f.id);
+        if (foes.length) await kit.killEnemies(w, bot, { ids: foes.map(s => s.id) });
+        walked += distance(last, e); last = { x: e.x, y: e.y };
+        await w.advance(600);
+      }
+      check(state('wyrd_escort').counts[0] === 1, 'Eydis reached Skuldwatch alive: the escort objective is done');
+      check(wokeIds.size === 5 && [...wokeIds].every(id => asleep.has(id)), 'Both ambushes woke on the way (three crows and two trolls attacked her)');
+      const routeLength = eydis.escort.route.reduce((n, p, i, r) => n + Math.hypot(p[0] - (i ? r[i - 1][0] : eydis.x), p[1] - (i ? r[i - 1][1] : eydis.y)), 0);
+      check(walked > routeLength * .8 && last.y < 105, `She walked ${Math.round(walked)} tiles of her ${Math.round(routeLength)}-tile route and ended north of the river, over the Troll Bridge`);
+      await w.waitFor(() => !escortOf(), 15000, 'Eydis walks off');
+      check(w.snapshot.slimes.filter(s => asleep.has(s.id)).every(s => s.dead && s.state === 'waiting'), 'Every ambusher is asleep again');
+      await kit.teleport(w, bot, { npc: 'wyrd_loremaster' });
+      const gold = w.player(bot).gold;
+      await kit.talkTo(w, bot, 'wyrd_loremaster', 'quest:claim:wyrd_escort');
+      await w.waitFor(() => state('wyrd_escort').claimed, 5000, 'Claim the escort quest');
+      check(w.player(bot).gold === gold + q.rewardGold, `Vigdis pays ${q.rewardGold} gold once`);
+      // A second hero fails it: if the hero falls the quest fails, the escort is gone and the quest can be started again at the mill.
+      const loser = 'Failer';
+      await w.connect({ bot: loser, class: 'mage' });
+      await kit.setupCharacter(w, loser, { level: 26, finishQuests: ['wyrd_watch_welcome'] });
+      await kit.teleport(w, loser, { npc: 'wyrd_loremaster' });
+      await kit.talkTo(w, loser, 'wyrd_loremaster', 'quest:accept:wyrd_escort');
+      await w.waitFor(() => quest(w, loser, 'wyrd_escort'), 5000, 'The second hero accepts');
+      await kit.teleport(w, loser, { zone: 6, x: eydis.x, y: eydis.y + 1.2 });
+      await kit.talkTo(w, loser, 'wyrd_eydis');
+      await w.waitFor(() => w.snapshot.players.find(p => p.escort?.owner === w.player(loser).id), 5000, 'The second Eydis joins');
+      await w.advance(2000);
+      await w.debug(loser, { op: 'die' });
+      await w.waitFor(() => !w.snapshot.players.find(p => p.escort?.owner === w.player(loser).id), 8000, 'Eydis is gone when her hero falls');
+      check(w.events.some(e => e.bot === loser && (e.type === 'notice' || e.type === 'system') && /Quest failed: Safe Passage/.test(e.text || '')), 'The hero is told the quest failed');
+      const failed = quest(w, loser, 'wyrd_escort');
+      check(failed.counts[0] === 0 && !failed.claimed, 'The objective is open again');
+      await w.waitFor(() => !w.player(loser).dead, 15000, 'The fallen hero wakes');
+      await kit.teleport(w, loser, { zone: 6, x: eydis.x, y: eydis.y + 1.2 });
+      await kit.talkTo(w, loser, 'wyrd_eydis');
+      await w.waitFor(() => w.snapshot.players.find(p => p.escort?.owner === w.player(loser).id), 5000, 'A second try');
+      check(true, 'Speaking to Eydis again starts the escort over');
+      // Persistence.
+      await w.restart();
+      check(['wyrd_welcome', 'wyrd_boars', 'wyrd_seal', 'wyrd_trolls', 'wyrd_escort', 'wyrd_beacons', 'wyrd_onward'].every(id => state(id)?.claimed) && state('wyrd_patrol').completions === 3, 'Every claim and the repeatable count survive a private server restart');
+    },
+  },
 };
 
 async function runScenario(name, world = new TestWorld()) {

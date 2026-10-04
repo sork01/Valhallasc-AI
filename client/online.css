@@ -108,6 +108,13 @@
 .quest-card .btn { margin: .4cqw .4cqw 0 0; font-size: .95cqw; }
 .quest-tracker:focus-visible { outline: 3px solid #ffdc87; outline-offset: 3px; }
 @media (pointer: coarse) { .quest-tracker, .quest-card .btn, #quest-close { min-height: 44px; } }
+.quest-card .quest-party { color: #9dffb2; font-size: .9cqw; }
+.tracker-objective.tracker-party { color: #9dffb2; }
+.quest-empty { margin: .8cqw 0; color: #cfd8cf; font-size: .95cqw; }
+.quest-completed { margin: 1cqw 0 .4cqw; padding-top: .6cqw; border-top: 1px solid #d9c49244; }
+.quest-completed summary { cursor: pointer; color: #b7d5b8; font: .95cqw 'Jua', sans-serif; }
+.quest-done { margin: .3cqw 0 .3cqw 1cqw; color: #9fb0a0; font-size: .9cqw; }
+.social-who .member-quests { display: block; color: #9dffb2; }
 .quest-card[data-repeatable="true"] { border-color: #64b5ff80; }
 .quest-card[data-repeatable="true"] h4, .quest-card[data-repeatable="true"] .quest-state { color: #64b5ff; }
 .inventory-open { position: absolute; right: 1.4cqw; top: 18.5cqw; z-index: 20; padding: .6cqw 1cqw; border: 1px solid #a7c8ed; border-radius: .6cqw; color: #daecff; background: #183251ed; font: 1cqw 'Jua', sans-serif; cursor: pointer; }

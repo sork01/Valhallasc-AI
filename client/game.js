@@ -131,7 +131,7 @@
   // ---------- background music (music.js) ----------
   // Browsers only let audio start after a tap or key press, so the score begins on the first one
   // (on the title screen that is the tap that awakens the horn) and then plays on every screen.
-  let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, musicZone = 0;   // title/creation theme, meadow theme, Crags theme (zone 1), glacier theme (zone 2), fen theme (zone 3), city theme (zone 4)
+  let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, wmusic = null, musicZone = 0;   // title/creation theme, meadow theme, Crags theme (zone 1), glacier theme (zone 2), fen theme (zone 3), city theme (zone 4), Wyrdwood theme (zone 6)
   function ensureMusic() {
     const c = audio(); if (!c || !window.createMusic) return;
     if (!music) { music = window.createMusic(c); c.addEventListener('statechange', ensureMusic); }
@@ -141,21 +141,22 @@
     if (!gmusic && window.createFenMusic) gmusic = window.createFenMusic(c);
     if (!smusic && window.createCityMusic) smusic = window.createCityMusic(c);
     if (!vmusic && window.createVaultMusic) vmusic = window.createVaultMusic(c);
+    if (!wmusic && window.createWyrdMusic) wmusic = window.createWyrdMusic(c);
     syncMusic();
   }
   // the field has its own theme; the title and creation screens share the snowy one (one plays at a time, fading over)
   function syncMusic() {
     if (!ac || ac.state !== 'running') return;
     // In the game the zone picks the score: Greenmeadow and Alderhaven keep the folk tune, the Crags, the glacier and the fen get their own.
-    const here = scene === 'game' ? (musicZone === 5 ? vmusic : musicZone === 4 && smusic ? smusic : musicZone === 3 && gmusic ? gmusic : musicZone === 2 && rmusic ? rmusic : musicZone > 0 && cmusic ? cmusic : fmusic) : null;
-    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic]) if (m && m !== here && m.running) m.stop();
+    const here = scene === 'game' ? (musicZone === 6 && wmusic ? wmusic : musicZone === 5 ? vmusic : musicZone === 4 && smusic ? smusic : musicZone === 3 && gmusic ? gmusic : musicZone === 2 && rmusic ? rmusic : musicZone > 0 && cmusic ? cmusic : fmusic) : null;
+    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic]) if (m && m !== here && m.running) m.stop();
     if (scene === 'game') { if (music && music.running) music.stop(); if (here && !here.running) here.start(); }
     else if (music && !music.running) music.start();
     applyMusicLevel(3);
   }
   function applyMusicLevel(secs = 1.5) {
     if (music) music.setLevel(save.sound ? (scene === 'splash' ? 1 : .55) * taper(save.musicVol) : 0, secs);
-    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic]) if (m) m.setLevel(save.sound ? taper(save.musicVol) : 0, secs);
+    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic]) if (m) m.setLevel(save.sound ? taper(save.musicVol) : 0, secs);
   }
   function unlockAudio() { const c = audio(); if (c) c.resume().then(ensureMusic).catch(() => {}); }
   ['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, unlockAudio, { capture: true }));
@@ -281,7 +282,7 @@
   const wcv = $('wcv');
   const view = new window.WarriorView(wcv, name => onWarrior(name));
   view.reduced = reduced;
-  window.valhalla = { view, get music() { return music; }, get fmusic() { return fmusic; }, get cmusic() { return cmusic; }, get rmusic() { return rmusic; }, get gmusic() { return gmusic; }, get smusic() { return smusic; }, get ctx() { return ac; } };   // debug handle (also used by the tests)
+  window.valhalla = { view, get music() { return music; }, get fmusic() { return fmusic; }, get cmusic() { return cmusic; }, get rmusic() { return rmusic; }, get gmusic() { return gmusic; }, get smusic() { return smusic; }, get wmusic() { return wmusic; }, get ctx() { return ac; } };   // debug handle (also used by the tests)
   if (view.ok) {
     view.load('assets/warrior.webp', 'assets/warrior_mask.png').then(() => { view.bind(); view.set(cfg); if (scene === 'create' && !modular(cfg)) view.setActive(true); }).catch(() => fallbackWarrior());
   } else fallbackWarrior();

@@ -104,13 +104,13 @@ fn the_undervault_is_a_five_player_dungeon_with_four_private_copies_four_bosses_
         (4, 5, Some([20, 20]), "hollowking")
     );
     assert!(vault.city.is_none(), "no safe ground in a dungeon");
-    // The world keeps three more copies after every file zone; clients are told the template's number.
-    assert_eq!(w.maps.len(), 9);
+    // The world keeps three more copies after every file zone (the Wyrdwood is file zone 6, so the copies are zones 7-9); clients are told the template's number.
+    assert_eq!(w.maps.len(), 10);
     assert_eq!(w.instances.len(), 4);
     for (n, i) in w.instances.iter().enumerate() {
         assert_eq!(
             (i.template, i.zone),
-            (VAULT, if n == 0 { VAULT } else { 5 + n })
+            (VAULT, if n == 0 { VAULT } else { 6 + n })
         );
         assert!(!i.active && !i.cleared);
         if n > 0 {
@@ -125,7 +125,7 @@ fn the_undervault_is_a_five_player_dungeon_with_four_private_copies_four_bosses_
             .filter(|s| s.zone == zone && s.kind == kind)
             .count()
     };
-    for zone in [5, 6, 7, 8] {
+    for zone in [5, 7, 8, 9] {
         let counts: Vec<_> = [
             "thrall",
             "archer",
@@ -262,7 +262,7 @@ fn a_party_is_given_its_own_copy_strangers_get_another_and_a_full_house_is_turne
     assert!(w.instances[0].active);
     // A stranger does not share it.
     take_the_stairs(&mut w, 2);
-    assert_eq!(zone_of(&w, 2), 6);
+    assert_eq!(zone_of(&w, 2), 7);
     // A party mate of the first hero joins the first copy even though others are free.
     let (a, b) = (
         w.players[&1].character.id.clone(),
@@ -276,7 +276,7 @@ fn a_party_is_given_its_own_copy_strangers_get_another_and_a_full_house_is_turne
     // Copies three and four go to the next two strangers; the sixth hero finds the house full.
     take_the_stairs(&mut w, 4);
     take_the_stairs(&mut w, 5);
-    assert_eq!((zone_of(&w, 4), zone_of(&w, 5)), (7, 8));
+    assert_eq!((zone_of(&w, 4), zone_of(&w, 5)), (8, 9));
     drain(&mut rxs[5]);
     take_the_stairs(&mut w, 6);
     assert_eq!(zone_of(&w, 6), SKALD, "no copy is free: still in Skaldholm");
@@ -291,7 +291,7 @@ fn a_party_is_given_its_own_copy_strangers_get_another_and_a_full_house_is_turne
     w.step();
     assert!(!w.instances[1].active, "an empty copy is reset");
     take_the_stairs(&mut w, 6);
-    assert_eq!(zone_of(&w, 6), 6);
+    assert_eq!(zone_of(&w, 6), 7);
 }
 
 fn view_index(snapshot: &Value, id: &str) -> usize {
@@ -314,8 +314,8 @@ fn copies_do_not_share_enemies_players_or_snapshots_and_clients_are_told_the_tem
     let _b = join(&mut w, 2, Class::Mage);
     take_the_stairs(&mut w, 1);
     take_the_stairs(&mut w, 2);
-    assert_eq!((zone_of(&w, 1), zone_of(&w, 2)), (5, 6));
-    let (t5, t6) = (first(&w, 5, "thrall"), first(&w, 6, "thrall"));
+    assert_eq!((zone_of(&w, 1), zone_of(&w, 2)), (5, 7));
+    let (t5, t6) = (first(&w, 5, "thrall"), first(&w, 7, "thrall"));
     assert_ne!(t5, t6);
     let (x, y) = (w.slimes[t5].x, w.slimes[t5].y);
     // Both heroes stand beside the same thrall of their own copy; only the first copy's thrall is hurt.
@@ -333,8 +333,8 @@ fn copies_do_not_share_enemies_players_or_snapshots_and_clients_are_told_the_tem
     // Snapshots: each copy lists only its own hero and enemies, all labelled with the template's zone.
     let all = w.snapshot();
     let zones = all["zones"].as_array().unwrap();
-    assert_eq!(zones.len(), 9);
-    for (copy, who) in [(5usize, 1u64), (6, 2)] {
+    assert_eq!(zones.len(), 10);
+    for (copy, who) in [(5usize, 1u64), (7, 2)] {
         let v = &zones[copy];
         let players = v["players"].as_array().unwrap();
         assert_eq!(players.len(), 1);
@@ -346,9 +346,9 @@ fn copies_do_not_share_enemies_players_or_snapshots_and_clients_are_told_the_tem
         assert_eq!(v["instance"]["cleared"], false);
     }
     // An unused copy sends no enemies at all.
-    assert!(zones[7]["slimes"].as_array().unwrap().is_empty());
+    assert!(zones[8]["slimes"].as_array().unwrap().is_empty());
     // main.rs picks the view that lists the hero, so each client gets its own copy.
-    assert_eq!(view_index(&all, &w.players[&2].character.id), 6);
+    assert_eq!(view_index(&all, &w.players[&2].character.id), 7);
 }
 
 #[test]
@@ -381,6 +381,7 @@ fn a_dungeon_copy_resets_when_its_last_hero_leaves_and_a_hero_who_logged_out_ins
         quantity: 0,
         t: 0.,
         col: "#fff",
+        group: vec![],
     });
     // The hero walks out by the stairs up; the copy resets.
     let up = w.maps[VAULT].portals[0].clone();
@@ -555,8 +556,8 @@ fn missiles_stop_at_walls_fan_out_for_a_volley_and_miss_a_hero_who_has_left_the_
     // Missiles are zone-bound: another copy's hero standing in the line is not hit either.
     let _b = join(&mut w, 2, Class::Warrior);
     take_the_stairs(&mut w, 2);
-    assert_eq!(zone_of(&w, 2), 6);
-    place(&mut w, 2, 6, Point { x: 14., y: 111. });
+    assert_eq!(zone_of(&w, 2), 7);
+    place(&mut w, 2, 7, Point { x: 14., y: 111. });
     w.fire_enemy_bolts(choir, Point { x: 25., y: 111. }, &r);
     for _ in 0..30 {
         w.update_enemy_bolts();
@@ -1461,7 +1462,7 @@ fn instance_pursuit_retargets_after_death_but_never_crosses_private_copies() {
         Some(2),
         "the living ally is pursued beyond awareness range"
     );
-    place(&mut w, 2, 6, end);
+    place(&mut w, 2, 7, end);
     w.update_slime(id);
     assert_eq!(w.slimes[id].target, None);
     assert_eq!(w.slimes[id].state, "return");
@@ -1518,7 +1519,7 @@ fn a_cleared_instance_dismisses_its_mercenaries_after_the_final_kills_loot_is_cr
         w.update_mercenaries();
     }
     assert_eq!(zone_of(&w, 1), VAULT);
-    assert_eq!(zone_of(&w, 2), 6);
+    assert_eq!(zone_of(&w, 2), 7);
     let owner = w.players[&1].character.id.clone();
     let merc = *w
         .players
@@ -1610,7 +1611,7 @@ fn a_cleared_instance_dismisses_its_mercenaries_after_the_final_kills_loot_is_cr
     w.update_mercenaries();
     assert!(!w.players.contains_key(&merc));
     assert_eq!(mercs_of(&w).len(), 1);
-    assert_eq!(mercs_of(&w)[0].character.zone, 6);
+    assert_eq!(mercs_of(&w)[0].character.zone, 7);
     assert_eq!(w.party_mates(&owner).len(), 1);
 }
 

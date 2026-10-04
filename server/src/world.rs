@@ -11,6 +11,7 @@ use tokio::sync::{mpsc, oneshot, watch};
 
 mod consumables;
 mod debug;
+mod escort;
 mod instances;
 mod mercs;
 mod partyxp;
@@ -24,6 +25,8 @@ mod social;
 mod travel;
 #[cfg(test)]
 mod vault_tests;
+#[cfg(test)]
+mod wyrd_tests;
 
 pub type Peer = mpsc::Sender<Value>;
 const KING_SPAWN_MIN: f64 = 300.;
@@ -118,6 +121,9 @@ struct Player {
     merc: Option<String>,
     /// The particular group objective this fighter was hired for; Meeting Stone hires have no quest contract.
     merc_quest: Option<String>,
+    /// Set on a stranded person walking an escort quest's route (see world/escort.rs). Always with `merc` set to the
+    /// character being escorted for, so an escort is never saved, counted as online or put in a party.
+    escort: Option<escort::Escort>,
 }
 impl Player {
     // Called once when hp reaches 0: the XP penalty, then a notice naming what it cost.
@@ -180,6 +186,7 @@ impl Player {
             god: false,
             merc: None,
             merc_quest: None,
+            escort: None,
         }
     }
     fn snapshot(&self) -> Value {
@@ -190,7 +197,8 @@ impl Player {
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
-            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel})
+            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,
+            "escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
     }
     /// The sum of every active buff of one kind.
     fn buff(&self, kind: BuffKind) -> f64 {
@@ -270,6 +278,9 @@ struct Slime {
     /// The attack in progress is a shot (or a volley), not a blow.
     #[serde(skip)]
     volley: bool,
+    /// An ambusher sent after an escort: it pursues its target without a leash, like a dungeon's enemies.
+    #[serde(skip)]
+    hunt: bool,
     /// Character IDs, so reconnecting does not lose participation. Cleared on evade/respawn.
     #[serde(skip)]
     contributors: std::collections::BTreeSet<String>,
@@ -308,6 +319,15 @@ impl Slime {
             "choir" => (100000., 600., 2.3, 1.6),
             "colossus" => (110000., 1300., 1.9, 2.3),
             "hollowking" => (130000., 900., 2.6, 2.1),
+            // The Wyrdwood (levels 21-29): a charging boar, a feather-shooting crow, a ground-pounding troll,
+            // a thread-bolt witch and a very fast ram. Oakhorn (three heroes) and Hrungnir (five) are its elites.
+            "boar" => (5600., 165., 3.4, 1.35),
+            "crow" => (4300., 150., 3.0, 1.1),
+            "troll" => (9500., 210., 2., 1.9),
+            "weaver" => (7600., 190., 2.4, 1.2),
+            "ram" => (11500., 255., 3.4, 1.5),
+            "oakhorn" => (60000., 1300., 2.8, 2.),
+            "hrungnir" => (150000., 2600., 2.2, 2.3),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -335,6 +355,12 @@ impl Slime {
             "thrall" | "archer" => 19,
             "acolyte" | "gatewarden" | "choir" => 20,
             "colossus" | "hollowking" => 21,
+            "boar" => 21,
+            "crow" => 23,
+            "troll" | "oakhorn" => 25,
+            "weaver" => 27,
+            "ram" => 29,
+            "hrungnir" => 30,
             _ => 2,
         }
     }
@@ -364,6 +390,13 @@ impl Slime {
             "choir" => 1800,
             "colossus" => 2200,
             "hollowking" => 3500,
+            "boar" => 270,
+            "crow" => 290,
+            "troll" => 330,
+            "weaver" => 360,
+            "ram" => 400,
+            "oakhorn" => 2000,
+            "hrungnir" => 3000,
             _ => 0,
         }
     }
@@ -393,6 +426,14 @@ impl Slime {
             "choir" => (0.8, 2.6, 0., 13.),
             "colossus" => (1., 2.2, 6., 9.),
             "hollowking" => (0.8, 1.7, 8., 14.),
+            "boar" => (0.3, 0.9, 11., 9.),
+            "crow" => (0.5, 1.7, 0., 11.),
+            "troll" => (0.8, 1.6, 6., 7.5),
+            "weaver" => (0.7, 2.2, 0., 12.),
+            "ram" => (0.25, 0.8, 12., 10.),
+            // Oakhorn lowers its antlers for a full second before the stampede.
+            "oakhorn" => (1., 1.5, 12., 10.),
+            "hrungnir" => (0.9, 1.9, 7., 14.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -405,6 +446,9 @@ impl Slime {
             "acolyte" => (10., 9., "#b46bff", 0.8, 1, 0.),
             "choir" => (11., 9., "#7be0ff", 0.9, 3, 0.34),
             "hollowking" => (12., 10., "#9cff8f", 1.0, 5, 0.24),
+            "crow" => (11., 11., "#c9d2e8", 0.5, 2, 0.16),
+            "weaver" => (11., 8.5, "#ffd86b", 0.9, 3, 0.3),
+            "hrungnir" => (13., 14., "#bfe8ff", 1.1, 3, 0.22),
             _ => return None,
         };
         Some(Ranged {
@@ -418,7 +462,11 @@ impl Slime {
     }
     /// A ranged kind that also fights toe to toe: it shoots only from farther than this.
     fn melee_inside(kind: &str) -> f64 {
-        if kind == "hollowking" { 4.5 } else { 0. }
+        if matches!(kind, "hollowking" | "hrungnir") {
+            4.5
+        } else {
+            0.
+        }
     }
     /// Radius of the ground-pound a kind does instead of a single blow (0: an ordinary strike). It lands when the
     /// windup ends, on everyone inside, so the wind-up is the warning.
@@ -427,6 +475,8 @@ impl Slime {
             "gatewarden" => 3.6,
             "colossus" => 4.,
             "hollowking" => 3.2,
+            "troll" => 2.6,
+            "hrungnir" => 3.6,
             _ => 0.,
         }
     }
@@ -496,6 +546,7 @@ impl Slime {
             goal: Point { x: s.x, y: s.y },
             hit: false,
             volley: false,
+            hunt: false,
             contributors: Default::default(),
         }
     }
@@ -545,6 +596,23 @@ struct Drop {
     quantity: u32,
     t: f64,
     col: &'static str,
+    /// A party's shared pile: every member who was near the body when it fell may take it (the pickup rules are in
+    /// `rolls.rs`). Empty means the pile belongs to `owner` alone.
+    #[serde(skip)]
+    group: Vec<String>,
+}
+
+impl Drop {
+    fn point(&self) -> Point {
+        Point {
+            x: self.x,
+            y: self.y,
+        }
+    }
+    /// Whether this character may take the pile: its owner, or any member of the party it was shared with.
+    fn open_to(&self, id: &str) -> bool {
+        self.owner == id || self.group.iter().any(|g| g == id)
+    }
 }
 
 pub struct World {
@@ -648,6 +716,10 @@ impl World {
     /// A new enemy for spawn `id`, at full health and a freshly rolled level (kings start hidden until the world timer).
     fn fresh_enemy(&mut self, id: usize) -> Slime {
         let spawn = self.spawns[id].clone();
+        if spawn.ambush.is_some() {
+            // Ambushers sleep until their escort's journey passes them.
+            return self.dormant_enemy(id);
+        }
         let level = self.roll_level(&spawn.kind);
         let mut enemy = Slime::with_level(id, &spawn, level);
         if spawn.kind == "big" {
@@ -1183,6 +1255,8 @@ impl World {
         if let Some(what) = offer_id.and_then(|id| self.merc_offer(session, npc_id, id)) {
             return self.merc_interact(session, npc_id, &what);
         }
+        // A stranded person joins whoever has taken their escort quest.
+        let escort_note = self.try_start_escort(session, npc_id);
         let p = self.players.get_mut(&session).unwrap();
         let map = &self.maps[p.character.zone];
         let Some(npc) = map.npcs.iter().find(|npc| npc.id == npc_id) else {
@@ -1201,7 +1275,7 @@ impl World {
         for area in &self.maps {
             quest_progress(&mut p.character, &area.quests, "talk", npc_id);
         }
-        let mut notice = String::new();
+        let mut notice = escort_note.unwrap_or_default();
         let mut levels = 0;
         let mut quest_changed = false;
         if let Some(id) = offer_id {
@@ -1378,6 +1452,7 @@ impl World {
         self.update_king_spawn();
         self.update_instances();
         self.update_mercenaries();
+        self.update_escorts();
         let sessions: Vec<_> = self.players.keys().copied().collect();
         for session in sessions {
             self.update_food(session);
@@ -1465,6 +1540,11 @@ impl World {
                 "A new quest has found you: {title}. Follow it in your journal (Q)."
             )}));
         }
+        for place in sync_visits(&mut p.character, &self.maps) {
+            let _ = p.peer.try_send(
+                json!({"type":"notice","ok":true,"text":format!("You have reached {place}.")}),
+            );
+        }
         // Hand-in quests follow the bag, so the journal counts what the player carries right now.
         for i in 0..p.character.quests.len() {
             if p.character.quests[i].claimed {
@@ -1527,7 +1607,10 @@ impl World {
                 dir = p.character.point().direction(goal);
             }
         }
-        let mut distance = (p.character.look.class.speed()
+        let mut distance = (p
+            .escort
+            .as_ref()
+            .map_or(p.character.look.class.speed(), |e| e.speed())
             * (1. + p.buff(BuffKind::Haste))
             * TICK
             * if p.attack > 0. { 0.25 } else { 1. })
@@ -1565,7 +1648,7 @@ impl World {
     // Stepping into a portal disc moves the player; the zone is never client-chosen.
     fn use_portal(&mut self, session: u64) {
         let p = &self.players[&session];
-        if p.character.hp <= 0. || self.time - p.portal_at < PORTAL_DELAY {
+        if p.character.hp <= 0. || self.time - p.portal_at < PORTAL_DELAY || p.escort.is_some() {
             return;
         }
         let here = p.character.point();
@@ -2154,9 +2237,11 @@ impl World {
             // Nothing in a dungeon comes back until the dungeon itself resets.
             s.respawn = match kind.as_str() {
                 _ if self.instances.iter().any(|i| i.zone == zone) => 1e9,
+                _ if self.spawns[id].ambush.is_some() => 1e9,
                 "big" => 0.,
                 "cinderlord" => 180.,
-                "gloomroot" => 300.,
+                "gloomroot" | "hrungnir" => 300.,
+                "oakhorn" => 180.,
                 _ => 22.,
             };
             s.state = "dead".into();
@@ -2170,21 +2255,24 @@ impl World {
             json!({"enemy":kind,"level":level,"skill":self.cur_skill,"killed":killed}),
         );
         if killed {
-            // Only explicitly shared quests benefit. Ordinary quests keep their killer's ownership; XP and loot are shared by `partyxp.rs` and `rolls.rs`.
+            // Quest kill credit goes to the killer, and also to every living real member of their party who is near
+            // the body (the people who share the XP). Elite kills also credit nearby contributors outside the
+            // party, but only for quests marked `group`. Each person is credited once.
             let contributors = self.slimes[id].contributors.clone();
-            if is_elite(&kind) {
-                for (&other, player) in &mut self.players {
-                    let c = &mut player.character;
-                    if other != credit
-                        && other != session
-                        && c.hp > 0.
-                        && c.zone == zone
-                        && c.point().distance(point) <= 12.
-                        && contributors.contains(&c.id)
-                    {
-                        for q in self.maps[zone].quests.iter().filter(|q| q.group) {
-                            quest_progress(c, std::slice::from_ref(q), "kill", &kind);
-                        }
+            let party = self.xp_group(&credit_id, zone, point);
+            for (&other, player) in &mut self.players {
+                let c = &mut player.character;
+                if other == credit || other == session || c.hp <= 0. || c.zone != zone {
+                    continue;
+                }
+                if party.contains(&c.id) {
+                    quest_progress(c, &self.maps[zone].quests, "kill", &kind);
+                } else if is_elite(&kind)
+                    && c.point().distance(point) <= 12.
+                    && contributors.contains(&c.id)
+                {
+                    for q in self.maps[zone].quests.iter().filter(|q| q.group) {
+                        quest_progress(c, std::slice::from_ref(q), "kill", &kind);
                     }
                 }
             }
@@ -2253,6 +2341,7 @@ impl World {
             quantity,
             t: 0.,
             col: rarity_color(item(item_id).map_or("common", |i| i.rarity.as_str())),
+            group: vec![],
         });
     }
     fn update_slime(&mut self, id: usize) {
@@ -2277,6 +2366,7 @@ impl World {
             s.target = None;
         }
         let (windup, cooldown, charge_speed, awareness) = Slime::attack_profile(&s.kind);
+        let hunting = dungeon.is_some() || s.hunt;
         s.hurt_t = (s.hurt_t - TICK).max(0.);
         s.rec_t = (s.rec_t - TICK).max(0.);
         s.land_t = (s.land_t - TICK).max(0.);
@@ -2329,7 +2419,7 @@ impl World {
                     s.point().distance(p.character.point()),
                 )
             })
-            .filter(|(_, _, d)| *d < awareness || (dungeon.is_some() && s.target.is_some()))
+            .filter(|(_, _, d)| *d < awareness || (hunting && s.target.is_some()))
             .min_by(|a, b| a.2.total_cmp(&b.2));
         let target = s.target.and_then(|id| {
             self.players
@@ -2348,9 +2438,7 @@ impl World {
                     )
                 })
         });
-        let target = target
-            .filter(|(_, _, d)| dungeon.is_some() || *d < 9.)
-            .or(nearest);
+        let target = target.filter(|(_, _, d)| hunting || *d < 9.).or(nearest);
         if s.state != "return"
             && s.state != "windup"
             && s.state != "lunge"
@@ -2389,9 +2477,9 @@ impl World {
                 }
             }
             "chase" => {
-                if let Some((_, point, d)) = target.filter(|_| {
-                    dungeon.is_some() || s.point().distance(Point { x: s.hx, y: s.hy }) < 14.
-                }) {
+                if let Some((_, point, d)) = target
+                    .filter(|_| hunting || s.point().distance(Point { x: s.hx, y: s.hy }) < 14.)
+                {
                     let attack_reach = ranged
                         .as_ref()
                         .map_or(1.15 + s.r + if slam > 0. { 0.9 } else { 0. }, |r| r.range);
@@ -2410,7 +2498,7 @@ impl World {
                         } else if d > r.range * 0.85 {
                             goal = Some(point);
                         } else if d < r.range * 0.35
-                            && matches!(s.kind.as_str(), "archer" | "acolyte")
+                            && matches!(s.kind.as_str(), "archer" | "acolyte" | "crow" | "weaver")
                         {
                             // Too close for comfort: back away from the hero while the shot recovers.
                             let away = point.direction(s.point());
@@ -2505,8 +2593,10 @@ impl World {
                 if s.point().distance(home) < 0.4 {
                     s.state = "idle".into();
                     s.st = 1.;
-                    s.hp = if matches!(s.kind.as_str(), "cinderlord" | "gloomroot")
-                        || is_boss(&s.kind)
+                    s.hp = if matches!(
+                        s.kind.as_str(),
+                        "cinderlord" | "gloomroot" | "oakhorn" | "hrungnir"
+                    ) || is_boss(&s.kind)
                     {
                         s.max_hp
                     } else {
@@ -2713,63 +2803,64 @@ impl World {
         self.bolts = bolts;
     }
     fn update_drops(&mut self) {
-        let mut rewards = vec![];
-        for d in &mut self.drops {
-            d.t += TICK;
-            if d.t < 0.6 {
+        let mut taken = vec![];
+        for i in 0..self.drops.len() {
+            self.drops[i].t += TICK;
+            if self.drops[i].t < 0.6 {
                 continue;
             }
-            if let Some((_, p)) = self.players.iter_mut().find(|(_, p)| {
-                p.character.id == d.owner
-                    && p.character.hp > 0.
-                    && p.character.zone == d.zone
-                    && p.character.spark_travel.is_none()
-            }) {
-                let point = Point { x: d.x, y: d.y };
-                let distance = point.distance(p.character.point());
-                if distance < 3. {
-                    let dir = point.direction(p.character.point());
-                    let travel = (9. * TICK).min(distance);
-                    d.x += dir.x * travel;
-                    d.y += dir.y * travel;
-                    if distance < 0.5 {
-                        if let Some(id) = &d.item {
-                            if !p.character.can_collect(id) {
-                                if self.time - p.bag_notice_at >= 5. {
-                                    p.bag_notice_at = self.time;
-                                    let _ = p.peer.try_send(json!({"type":"system","text":"Your bags are full. Sell loot or fit an extra six-slot bag from Linden. This item stays on the ground until it expires."}));
-                                }
-                                continue;
-                            }
-                            p.character.add_item(id, d.quantity);
-                        } else {
-                            p.character.gold = p.character.gold.saturating_add(d.value);
-                        }
-                        rewards.push((
-                            d.owner.clone(),
-                            p.character.point(),
-                            d.value,
-                            d.item.clone(),
-                            d.quantity,
-                        ));
-                        d.t = 61.;
-                    }
+            let (point, zone) = (self.drops[i].point(), self.drops[i].zone);
+            // The nearest hero who may take it; a party's pile is open to every member.
+            let nearest = self
+                .players
+                .iter()
+                .filter(|(_, p)| {
+                    p.merc.is_none()
+                        && p.character.hp > 0.
+                        && p.character.zone == zone
+                        && p.character.spark_travel.is_none()
+                        && self.drops[i].open_to(&p.character.id)
+                })
+                .map(|(&s, p)| (s, p.character.point()))
+                .min_by(|a, b| point.distance(a.1).total_cmp(&point.distance(b.1)));
+            let Some((session, at)) = nearest else {
+                continue;
+            };
+            let distance = point.distance(at);
+            if distance < 3. {
+                let dir = point.direction(at);
+                let travel = (9. * TICK).min(distance);
+                let d = &mut self.drops[i];
+                d.x += dir.x * travel;
+                d.y += dir.y * travel;
+                if distance < 0.5 {
+                    taken.push((i, session));
                 }
             }
+        }
+        let mut rewards = vec![];
+        let mut spent = vec![];
+        for (i, session) in taken {
+            if self.collect_drop(i, session, &mut rewards) {
+                spent.push(i);
+            }
+        }
+        for i in spent {
+            self.drops[i].t = 61.;
         }
         self.drops.retain(|d| d.t < 60.);
         if !rewards.is_empty() {
             self.save();
         }
-        for (id, p, value, item_id, quantity) in rewards {
+        for (id, p, value, item_id, quantity, by) in rewards {
             if let Some(item_id) = item_id {
                 self.emit_zone(
                     self.zone_of(&id),
                     json!({"type":"event","kind":"itemPickup","actor":id,"x":p.x,"y":p.y,
-                    "item":item_id,"quantity":quantity,"name":item(&item_id).map(|i| &i.name)}),
+                    "item":item_id,"quantity":quantity,"name":item(&item_id).map(|i| &i.name),"by":by}),
                 );
             } else {
-                self.event("pickup", &id, p, value as f64, false);
+                self.event_with("pickup", &id, p, value as f64, false, json!({"by":by}));
             }
         }
     }
@@ -4051,7 +4142,7 @@ mod tests {
             }
         }
         found.sort();
-        assert_eq!(found, vec![(5, 1), (10, 2), (15, 3), (20, 4)]);
+        assert_eq!(found, vec![(5, 1), (10, 2), (15, 3), (20, 4), (22, 6)]);
     }
 
     #[test]
@@ -4198,6 +4289,12 @@ mod tests {
                         ),
                         "bring" => assert!(item(&o.target).is_some_and(|i| i.kind == "material")),
                         "reach" => assert!(w.maps.iter().any(|m| m.name == o.target)),
+                        "visit" => assert!(area.places.iter().any(|p| p.id == o.target)),
+                        "escort" => assert!(
+                            area.npcs
+                                .iter()
+                                .any(|n| n.id == o.target && n.escort.is_some())
+                        ),
                         _ => panic!("unsupported objective"),
                     }
                 }
@@ -4375,7 +4472,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 6);
+        assert_eq!(zone_count(&w), 7);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -4540,6 +4637,7 @@ mod tests {
             assert_eq!(Slime::attack_profile(kind).0, windup);
             assert_eq!(crate::items::material(kind), material_id);
             let spawn = || SlimeSpawn {
+                ambush: None,
                 kind: kind.into(),
                 x: 64.,
                 y: 60.,
@@ -4977,7 +5075,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 6);
+        assert_eq!(zone_count(&w), 7);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -5166,6 +5264,7 @@ mod tests {
             assert_eq!(Slime::attack_profile(kind).0, windup);
             assert_eq!(crate::items::material(kind), material_id);
             let spawn = || SlimeSpawn {
+                ambush: None,
                 kind: kind.into(),
                 x: 64.,
                 y: 60.,
@@ -5569,8 +5668,8 @@ mod tests {
         let map = &w.maps[CITY];
         assert_eq!(
             zone_count(&w),
-            6,
-            "Skaldholm is the fifth map; the Undervault the sixth"
+            7,
+            "Skaldholm is the fifth map, the Undervault the sixth and the Wyrdwood the seventh"
         );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
@@ -6504,6 +6603,7 @@ mod tests {
             quantity: 0,
             t: 1.,
             col: "#ffe066",
+            group: vec![],
         });
         for drop in &mut w.drops {
             drop.t = 1.;
@@ -6808,6 +6908,7 @@ mod tests {
                 w.slimes[0] = Slime::new(
                     0,
                     &SlimeSpawn {
+                        ambush: None,
                         kind: "green".into(),
                         zone: 0,
                         x: start.x + 3.5,
@@ -6845,6 +6946,8 @@ mod tests {
             npcs: vec![],
             quests: vec![],
             city: None,
+            camps: vec![],
+            places: vec![],
             portals: vec![],
             levels: None,
             zones: vec![],
@@ -6893,6 +6996,7 @@ mod tests {
         w.slimes[0] = Slime::new(
             0,
             &SlimeSpawn {
+                ambush: None,
                 kind: "green".into(),
                 zone: 0,
                 x: start.x + 1.5,
@@ -6969,6 +7073,7 @@ mod tests {
         w.slimes[0] = Slime::new(
             0,
             &SlimeSpawn {
+                ambush: None,
                 kind: "beetle".into(),
                 zone: 0,
                 x: player.x + 1.,
@@ -6992,6 +7097,7 @@ mod tests {
         w.slimes[1] = Slime::new(
             1,
             &SlimeSpawn {
+                ambush: None,
                 kind: "green".into(),
                 zone: 0,
                 x: blocked.x + 2.,
@@ -7227,6 +7333,7 @@ mod tests {
             w.slimes[0] = Slime::new(
                 0,
                 &SlimeSpawn {
+                    ambush: None,
                     kind: kind.into(),
                     zone: 0,
                     x: point.x + 1.,
@@ -7267,7 +7374,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 6);
+        assert_eq!(zone_count(&w), 7);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));
@@ -7407,6 +7514,7 @@ mod tests {
     #[test]
     fn level_changes_health_damage_xp_and_gold_around_the_default() {
         let spawn = |kind: &str| SlimeSpawn {
+            ambush: None,
             kind: kind.into(),
             x: 10.,
             y: 10.,
@@ -7666,6 +7774,7 @@ mod tests {
             w.slimes[id] = Slime::new(
                 id,
                 &SlimeSpawn {
+                    ambush: None,
                     kind: kind.into(),
                     x: point.x + 1.,
                     y: point.y,
@@ -9255,6 +9364,7 @@ mod tests {
             Slime::with_level(
                 id,
                 &SlimeSpawn {
+                    ambush: None,
                     x: 0.,
                     y: 0.,
                     kind: "yellow".into(),

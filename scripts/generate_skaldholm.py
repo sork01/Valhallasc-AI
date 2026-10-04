@@ -27,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import generate_gloamfen as fen                   # noqa: E402  (flood fill helpers and the summit constants)
 import skaldholm_content as content               # noqa: E402
 import undervault_layout as uv                    # noqa: E402
+import wyrd_layout as wyrd                        # noqa: E402  (the East Gate leads to the Wyrdwood)
 
 ROOT = Path(__file__).resolve().parents[1]
 PATH = ROOT / 'world/map.txt'
@@ -182,6 +183,51 @@ def build_walls(b):
     # banners on the gate towers
     for sx in (-1, 1):
         b.add(obj('banner', 80 + sx * (GATE_HALF + 0.2), W['y1'] - 3.0, .3, 0, color='#9a2f3a' if sx < 0 else '#2f5a9a'), force=True)
+
+
+# ---- the East Gate -----------------------------------------------------------------------------------------------------
+EAST_GATE = wyrd.SKALD_GATE                       # the portal outside the east wall
+EAST_ARRIVAL = wyrd.SKALD_ARRIVAL                 # where the Wyrdwood sets you down
+WYRD_ZONE = 6
+
+
+def open_east_gate(zone):
+    """Cut a gate in the middle of the east wall (where the Trade Road meets it) and put the portal to the Wyrdwood
+    outside. Done after the city is built so no random number is drawn: the rest of the city is unchanged."""
+    W = WALL
+    gy0, gy1 = 76 - GATE_HALF - TOWER / 2, 76 + GATE_HALF + TOWER / 2
+    objs = zone['objects']
+    keep = []
+    for o in objs:
+        east_wall = abs(o['x'] - W['x1']) < .01 and W['y0'] < o['y'] < W['y1']
+        if o['kind'] == 'tower' and east_wall and abs(o['y'] - 76) < .01:
+            continue
+        if o['kind'] == 'rampart' and east_wall:
+            continue
+        # the forecourt and the opening: no scenery in the way
+        if o['kind'] in ('tree', 'bush', 'rock', 'flowers') and o['x'] > W['x1'] - 1.6 and abs(o['y'] - 76) < 9.5 and o['x'] < EAST_GATE[0] + 8:
+            continue
+        keep.append(o)
+    zone['objects'] = keep
+
+    def run(y0, y1):
+        length = y1 - y0
+        n = max(1, math.ceil((length - TOWER) / 6.0))
+        piece = (length - TOWER) / n
+        for i in range(n):
+            c = -length / 2 + TOWER / 2 + piece * (i + .5)
+            zone['objects'].append(building('rampart', W['x1'], (y0 + y1) / 2 + c, 1.8, piece + .15, '#d7d3bc', ''))
+    run(W['y0'], gy0)
+    run(gy1, W['y1'])
+    for y in (gy0, gy1):
+        zone['objects'].append(building('tower', W['x1'], y, TOWER, TOWER, '#4a7a9a', ''))
+    for sy in (-1, 1):                                  # banners on the gate towers, as on the Great Gate
+        zone['objects'].append(obj('banner', W['x1'] - 3.0, 76 + sy * (GATE_HALF + .2), .3, 0, color='#2f5a9a' if sy < 0 else '#9a2f3a'))
+    for dy in (-1.5, 1.5):                              # the portal's two posts
+        zone['objects'].append(obj('post', EAST_GATE[0], EAST_GATE[1] + dy, 0.45))
+    zone['roads'].append(dict(t=1, x0=W['x1'] - 1, y0=76 - TRADE_W / 2, x1=EAST_GATE[0] + .5, y1=76 + TRADE_W / 2))
+    zone['portals'].append({'id': 'wyrd_gate', 'name': 'the East Gate', 'x': EAST_GATE[0], 'y': EAST_GATE[1], 'r': 1.1,
+                            'to': WYRD_ZONE, 'tx': wyrd.ARRIVAL[0], 'ty': wyrd.ARRIVAL[1]})
 
 
 # ---- the civic buildings and their furniture --------------------------------------------------------------------------------
@@ -612,7 +658,7 @@ def check_zone(zone):
         if not seen[int(n['y'] / .5), int(n['x'] / .5)]:
             missing.append(n['id'])
     for name, (x, y) in [('return gate', (RETURN_GATE[0], RETURN_GATE[1] - 2)), ('plaza', (FOUNTAIN[0] + 9.7, FOUNTAIN[1])),
-                         ('stone court', (100, 123)), ('stairs', (uv.STAIRS_DOWN[0], uv.STAIRS_DOWN[1] + 1.6)), ('stairs return', uv.STAIRS_RETURN), ('orchard', (123, 28)), ('garden', (27.4, 34))]:
+                         ('east gate', (EAST_GATE[0] - 2, EAST_GATE[1])), ('east arrival', EAST_ARRIVAL), ('stone court', (100, 123)), ('stairs', (uv.STAIRS_DOWN[0], uv.STAIRS_DOWN[1] + 1.6)), ('stairs return', uv.STAIRS_RETURN), ('orchard', (123, 28)), ('garden', (27.4, 34))]:
         if not seen[int(y / .5), int(x / .5)]:
             missing.append(name)
     soft = fen.obstacle_grid(zone, .5, margin=.35)
@@ -637,6 +683,7 @@ def main():
     meadow['zones'] = [z for z in meadow['zones'][:3] if z['name'] != NAME]
     (gx, gy), moved = add_city_gate(meadow, random.Random(20261007))     # its own stream: it only draws numbers on the first run
     zone, stats = build(random.Random(20261008))
+    open_east_gate(zone)
     zone['portals'][0].update(tx=round(gx, 2), ty=round(gy + 4.5, 2))
     missing, bad_routes = check_zone(zone)
     if missing or bad_routes:
