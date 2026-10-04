@@ -35,6 +35,12 @@
         for(const t of [.33,.66]){g.strokeStyle='rgba(20,12,6,.5)';g.lineWidth=1.4;g.beginPath();g.moveTo(px+t*44,py+t*22);g.lineTo(px-44+t*44,py+22+t*22);g.stroke();}
         return true;
       }
+      if (Field.zoneTheme === 'deep') {                                   // Keelhaven: the bleached, weed-furred decks of overturned longships
+        poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],`hsl(${24+(x*7+y*3)%6}, 16%, ${33+(x*17+y*31)%7}%)`,'#1c3640',.7);
+        for(const t of [.33,.66]){g.strokeStyle='rgba(8,24,30,.55)';g.lineWidth=1.4;g.beginPath();g.moveTo(px+t*44,py+t*22);g.lineTo(px-44+t*44,py+22+t*22);g.stroke();}
+        if(((x*5+y*11)%9)===0){poly(g,[[px,py+14],[px+9,py+22],[px,py+30],[px-9,py+22]],'rgba(60,150,120,.35)',null);}
+        return true;
+      }
       if (Field.zoneTheme === 'sky') {                                    // Heimdall's Perch: pale cloud-marble flags
         poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],`hsl(${228+(x*7+y*3)%9}, 30%, ${80+(x*17+y*31)%8}%)`,'#a9b3d6',.7);
         if(((x*5+y*11)%7)===0){poly(g,[[px,py+13],[px+11,py+22],[px,py+31],[px-11,py+22]],`hsl(${(x*40+y*70)%360}, 70%, 84%)`,null);}

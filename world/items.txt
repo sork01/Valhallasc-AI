@@ -9404,6 +9404,62 @@
     "sell": 580
   },
   {
+    "id": "captains_signet",
+    "name": "Captain's Signet",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1400
+  },
+  {
+    "id": "ghostmaw_tooth",
+    "name": "Ghostmaw Tooth",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1500
+  },
+  {
+    "id": "drowned_coin",
+    "name": "Drowned Coin",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 620
+  },
+  {
+    "id": "angler_lure",
+    "name": "Angler Lure",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 660
+  },
+  {
+    "id": "moray_tooth",
+    "name": "Moray Tooth",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 700
+  },
+  {
+    "id": "siren_pearl",
+    "name": "Siren Pearl",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 760
+  },
+  {
+    "id": "shellback_plate",
+    "name": "Shellback Plate",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 820
+  },
+  {
+    "id": "kraken_beak",
+    "name": "Kraken Beak",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1800
+  },
+  {
     "id": "warrior_armor_crimson_l20_vault",
     "name": "Hollowsteel Cuirass",
     "kind": "armor",

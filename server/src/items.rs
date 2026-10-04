@@ -150,6 +150,14 @@ pub fn material(kind: &str) -> &'static str {
         "skyray" => "stormray_wing",
         "einherjar" => "rune_token",
         "thunderroc" => "thunderroc_quill",
+        "draugr" => "drowned_coin",
+        "angler" => "angler_lure",
+        "moray" => "moray_tooth",
+        "siren" => "siren_pearl",
+        "shellback" => "shellback_plate",
+        "kraken" => "kraken_beak",
+        "hvitserk" => "captains_signet",
+        "ghostmaw" => "ghostmaw_tooth",
         _ => "slime_gel",
     }
 }
@@ -190,7 +198,14 @@ pub fn rarity_color(rarity: &str) -> &'static str {
 pub fn is_elite(kind: &str) -> bool {
     matches!(
         kind,
-        "big" | "cinderlord" | "gloomroot" | "oakhorn" | "hrungnir"
+        "big"
+            | "cinderlord"
+            | "gloomroot"
+            | "oakhorn"
+            | "hrungnir"
+            | "kraken"
+            | "hvitserk"
+            | "ghostmaw"
     ) || is_vault_enemy(kind)
 }
 /// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.

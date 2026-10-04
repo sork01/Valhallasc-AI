@@ -3,7 +3,7 @@
   const $ = id => document.getElementById(id);
   const areas = [WORLD_MAP, ...(WORLD_MAP.zones || [])];
   const definitions = areas.flatMap((area, zone) => (area.quests || []).map(q => ({ ...q, zone })));
-  let heroLevel = 1, progress = [], signature = '', tracked = null, previousFocus = null, collapsed = false, completedOpen = false;
+  let heroLevel = 1, progress = [], bells = [], signature = '', tracked = null, previousFocus = null, collapsed = false, completedOpen = false;
   const state = quest => progress.find(p => p.id === quest.id);
   const giver = quest => areas[quest.zone].npcs.find(n => n.id === quest.npc);
   // The hub a quest's giver belongs to: a zone may have several (the Wyrdwood's Hollowmoot and Skuldwatch).
@@ -35,8 +35,8 @@
     const p = state(quest);
     return quest.objectives.map((o, i) => `${o.label}: ${p?.claimed ? o.count : p?.counts[i] || 0}/${o.count}${unit(o)}`);
   }
-  // A `hold` objective counts seconds of channelling in a ward.
-  const unit = o => o.kind === 'hold' ? ' s' : '';
+  // A `hold` objective counts seconds of channelling in a ward; a `chime` objective counts the bells of its chain that ring right now.
+  const unit = o => o.kind === 'hold' ? ' s' : o.kind === 'chime' ? ' ringing' : '';
   function gearReward(quest, container) {
     const i = (window.WORLD_ITEMS || []).find(i => i.id === quest.rewardItem);
     if (!i) return;
@@ -188,7 +188,25 @@
       });
       return out;
     },
-    reset() { progress = []; signature = ''; tracked = null; close(false); render(); },
+    // The bells you have ringing, from your own snapshot: [{ place, left }] (seconds left on each).
+    setBells(list) { bells = Array.isArray(list) ? list : []; },
+    // Your state at a tidebell (a place of a chain a `chime` objective names): 'waiting' while a quest of yours still needs it, 'ringing' while
+    // it sounds (with the seconds `left` of its `burn`, and how many of the chain ring: `have` of `need`), 'done' once the chain has rung, else 'none'.
+    chime(placeId) {
+      const place = window.Field?.place?.(placeId);
+      if (!place || !place.chain) return { state: 'none' };
+      let out = null, done = false;
+      for (const q of definitions) q.objectives.forEach((o, i) => {
+        if (o.kind !== 'chime' || o.target !== place.chain) return;
+        const p = state(q); if (!p) return;
+        const have = p.claimed ? o.count : Math.min(p.counts[i] || 0, o.count);
+        if (have < o.count) out = { have, need: o.count }; else done = true;
+      });
+      const ringing = bells.find(b => b.place === placeId);
+      if (out) return { state: ringing ? 'ringing' : 'waiting', left: ringing ? ringing.left : 0, burn: place.burn, ...out };
+      return done ? { state: 'done', burn: place.burn } : { state: 'none' };
+    },
+    reset() { progress = []; signature = ''; tracked = null; bells = []; close(false); render(); },
     update(next) { const key = `${Field.zone}:` + JSON.stringify(next); if (key === signature) return; progress = next; signature = key; render(); },
     // What an NPC's conversation lists, in World of Warcraft order: turn-ins, new quests, then quests still in progress.
     // Locked and finished quests are hidden, as they are there.

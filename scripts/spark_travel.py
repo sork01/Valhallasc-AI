@@ -13,7 +13,9 @@ STOPS = [
     ('Hollowmoot', 'travel_hollowmoot', 23, 153, ['travel_skaldholm', 'travel_skuldwatch']),
     ('Skuldwatch', 'travel_skuldwatch', 88, 89, ['travel_hollowmoot', 'travel_perch']),
     # Bifrost Reach: the flight from Skuldwatch crosses the Highmoor to the Stormrift and climbs the rift.
-    ("Heimdall's Perch", 'travel_perch', 86, 135, ['travel_skuldwatch']),
+    ("Heimdall's Perch", 'travel_perch', 86, 135, ['travel_skuldwatch', 'travel_keelhaven']),
+    # Ran's Deep: the flight from the Perch dives off the Eyrie's storm and down the Maelstrom.
+    ('Keelhaven', 'travel_keelhaven', 86, 154, ['travel_perch']),
 ]
 
 

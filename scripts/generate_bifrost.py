@@ -24,6 +24,7 @@ from scipy import ndimage
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import generate_gloamfen as fen                    # noqa: E402  (flood fill helpers)
+import generate_deep                               # noqa: E402  (open_maelstrom)
 import generate_wyrdwood as wyrd                   # noqa: E402  (open_stormrift)
 import progression_quests                          # noqa: E402
 import sky_content as content                      # noqa: E402
@@ -410,9 +411,13 @@ def main():
     assert json.dumps(world, indent=2) + '\n' == raw, 'map.txt is not in the canonical 2-space JSON layout'
     names = [z['name'] for z in world['zones']]
     assert names[:6] == ['Emberfall Crags', 'Rimeveil Glacier', 'Gloamfen', 'Skaldholm', 'The Undervault', 'Wyrdwood'], f'unexpected zones {names}'
-    world['zones'] = [z for z in world['zones'] if z['name'] != L.NAME] + [zone]
-    assert len(world['zones']) == 7, 'Bifrost Reach must be zone 7'
+    # a rebuild keeps every later zone (Ran's Deep) and puts Bifrost Reach back in the same place
+    others = [z for z in world['zones'] if z['name'] != L.NAME]
+    at = names.index(L.NAME) if L.NAME in names else len(others)
+    world['zones'] = others[:at] + [zone] + others[at:]
+    assert world['zones'][6]['name'] == L.NAME, 'Bifrost Reach must be zone 7'
     wyrd.open_stormrift(world['zones'][5], world)
+    generate_deep.open_maelstrom(world['zones'][6], world)
     spark_travel.ensure(world)
     PATH.write_text(json.dumps(world, indent=2) + '\n')
     new = add_materials()

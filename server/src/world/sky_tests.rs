@@ -874,7 +874,10 @@ fn the_stormrift_carries_a_hero_up_and_the_perch_gate_carries_them_down_without_
 #[test]
 fn the_perch_has_its_own_spark_travel_master_linked_to_skuldwatch() {
     let w = world();
-    assert_eq!(npc(&w, "travel_perch").travel_links, ["travel_skuldwatch"]);
+    assert_eq!(
+        npc(&w, "travel_perch").travel_links,
+        ["travel_skuldwatch", "travel_keelhaven"]
+    );
     assert!(
         w.maps[WYRD]
             .npcs

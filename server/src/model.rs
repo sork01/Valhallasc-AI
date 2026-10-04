@@ -1134,7 +1134,7 @@ pub struct AmbushDef {
     pub r: f64,
     pub tag: String,
 }
-/// A named spot a `visit` or `hold` objective can name (a beacon, a glade, a standing stone, a ward).
+/// A named spot a `visit`, `hold` or `chime` objective can name (a beacon, a glade, a standing stone, a ward, a tidebell).
 #[derive(Clone, Deserialize)]
 pub struct Place {
     pub id: String,
@@ -1146,6 +1146,12 @@ pub struct Place {
     /// tagged `tag` attacks (world/hold.rs).
     #[serde(default)]
     pub waves: Vec<Wave>,
+    /// A tidebell a `chime` objective names (its target is this chain id): walking into the circle rings it for `burn` seconds
+    /// (world/chime.rs). Empty for every other place.
+    #[serde(default)]
+    pub chain: String,
+    #[serde(default)]
+    pub burn: f64,
 }
 #[derive(Clone, Deserialize)]
 pub struct Wave {

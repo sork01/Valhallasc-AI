@@ -44,6 +44,10 @@ PROGRESSION = {
         'sky_onward', 'Up Through the Rift', 'sky_warden', 30, 600,
         'The Highmoor has taught you all it can. In the north-west corner of the summit court, beyond the second ridge, lightning has begun to rise instead of fall: walk into the Stormrift, climb into the sky and report to Shieldmaiden Sigrun Cloudwatcher at Heimdall\'s Perch.',
         'Travel to Bifrost Reach'),
+    "R\u00e1n's Deep": (
+        'deep_onward', 'Down the Maelstrom', 'deep_warden', 35, 700,
+        "Bifrost Reach has no sky left to climb. On the Roc's Eyrie, at the north-east edge of the last island, a waterspout stands up out of the storm: step into the Maelstrom, fall through the sea and report to Skipper Ylva Saltbeard in Keelhaven.",
+        "Travel to R\u00e1n's Deep"),
 }
 
 

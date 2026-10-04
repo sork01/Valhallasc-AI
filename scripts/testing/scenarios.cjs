@@ -13,6 +13,7 @@ const fen = map.zones[2];
 const city = map.zones[3];
 const wyrd = map.zones[5];
 const sky = map.zones[6];
+const deep = map.zones[7];
 // `area` is the map of the zone the bot stands in: the meadow by default, or `crags`.
 async function walkTo(world, bot, goal, area = map) {
   for (const point of route(area, world.player(bot), goal)) {
@@ -31,7 +32,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39 };
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
 const levelXp = JSON.parse(fs.readFileSync(path.join(root, 'world/levels.txt'), 'utf8'));
@@ -2466,6 +2467,249 @@ const scenarios = {
       check(['sky_welcome', 'sky_hounds', 'sky_ward_wind', 'sky_ward_vigil', 'sky_onward'].every(id => state(id)?.claimed) && state('sky_patrol').completions === 3, 'Every claimed quest and the repeatable\'s count survive a restart');
     },
   },
+  deep: {
+    description: 'Fall through the Roc\'s Eyrie\'s Maelstrom into the level 35-40 Ran\'s Deep, check its 53 monster slots (six kinds and three elites: the Kraken, Hvitserk and the Ghostmaw) and their levels, walk the real route to the Pearl Gate, prove the coral walls cannot be walked through, fight a level-1 Drowned Draugr for its own XP, gold and Drowned Coin, keep the zone over a server restart and use both Maelstrom gates.',
+    godMode: true,
+    async run(w, check) {
+      const bot = 'Diver';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 37 });
+      const down = sky.portals.find(p => p.id === 'maelstrom_down'), up = deep.portals.find(p => p.id === 'maelstrom_up');
+      const NAME = "Rán's Deep";
+      check(down && down.to === 8 && up && up.to === 7 && deep.name === NAME && deep.levels.join() === '35,40' && deep.size === 176 && deep.theme === 'deep', 'The Roc\'s Eyrie has a Maelstrom to zone 8, the 176-tile Ran\'s Deep of levels 35-40, which has the Maelstrom back up');
+      check(deep.city.name === 'Keelhaven' && !deep.camps && deep.npcs.length === 8 && deep.quests.length === 24, 'The zone has one hub, Keelhaven, eight people (seven and a travel master) and 24 quests');
+      check(deep.objects.filter(o => o.kind === 'reefwall').length > 300 && deep.places.filter(p => p.chain).length === 12, 'The Net is built of hundreds of coral wall pieces, and twelve tidebells stand in three chains');
+      // Staging only: stand on the Eyrie beside the spout. The step into the Maelstrom is real.
+      await kit.teleport(w, bot, { zone: 7, x: down.x, y: down.y + 5 });
+      await w.action(bot, { type: 'move', x: down.x, y: down.y + .3 });
+      await w.waitFor(() => w.player(bot).zone === 8, 20000, 'Step into the Maelstrom');
+      await w.action(bot, { type: 'stop' });
+      const arrival = { x: down.tx, y: down.ty };
+      check(distance(w.player(bot), arrival) < 1.2, 'The server sets the diver down in Keelhaven');
+      const here = w.snapshot.slimes, kinds = {};
+      for (const s of here) kinds[s.kind] = (kinds[s.kind] || 0) + 1;
+      check(here.every(s => s.zone === 8) && JSON.stringify(Object.entries(kinds).sort()) === JSON.stringify([['angler', 10], ['draugr', 11], ['ghostmaw', 1], ['hvitserk', 1], ['kraken', 1], ['moray', 10], ['shellback', 9], ['siren', 10]]),
+        'A Ran\'s Deep client receives exactly its 53 monster slots: 11 draugr, 10 anglers, 10 morays, 10 sirens, 9 shellbacks and the three elites');
+      const hp = { draugr: 24000, angler: 20500, moray: 27000, siren: 23500, shellback: 40000, kraken: 280000, hvitserk: 150000, ghostmaw: 190000 };
+      check(here.every(s => !s.dead) && here.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2), 'Every monster is awake and rolls within two of its default level');
+      check(here.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
+      check(here.filter(s => s.elite).map(s => s.kind).sort().join() === 'ghostmaw,hvitserk,kraken', 'Exactly the Kraken, Hvitserk and the Ghostmaw are elites');
+      check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
+      check(w.events.some(e => e.type === 'system' && e.text.includes('Deep') && e.text.includes('35–40')), 'The player is told the recommended levels');
+      // Another character in Skaldholm shares nothing with the sea floor.
+      await w.connect({ bot: 'Citizen', class: 'mage' });
+      await kit.teleport(w, 'Citizen', { zone: 4, x: 80, y: 120 });
+      check(w.views.get('Citizen').slimes.length === 0 && w.views.get(bot).slimes.every(s => s.zone === 8) && w.views.get(bot).players.length === 1, 'Each client is sent only its own zone');
+      await w.disconnect('Citizen');
+      // The way to the Pearl Gate, on foot, through the real collision geometry.
+      const gate = { x: 80, y: 124.5 }, start = { x: w.player(bot).x, y: w.player(bot).y };
+      const path = route(deep, start, gate);
+      check(path.length >= 2, `The route to the Pearl Gate is ${path.length} legs`);
+      for (const point of path) {
+        await w.action(bot, { type: 'move', ...point });
+        await w.waitFor(() => distance(w.player(bot), point) < .6, 60000, `Walk to ${Math.round(point.x)},${Math.round(point.y)}`);
+      }
+      await w.action(bot, { type: 'stop' });
+      check(distance(w.player(bot), gate) < 1.5, 'The diver walks from Keelhaven to the Net\'s door');
+      // The coral cannot be walked through: the south wall of the maze beside the door, and the outer wall.
+      await kit.teleport(w, bot, { zone: 8, x: 60, y: 126 });
+      await w.action(bot, { type: 'move', x: 60, y: 108 });
+      await w.advance(2500);
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).y > 121.4, `Walking north into the maze's south wall stops in front of it (y ${w.player(bot).y.toFixed(1)})`);
+      await kit.teleport(w, bot, { zone: 8, x: 16, y: 100 });
+      await w.action(bot, { type: 'move', x: 1, y: 100 });
+      await w.advance(2500);
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).x > 9.4, `and so does the outer wall (x ${w.player(bot).x.toFixed(1)})`);
+      // Through the door, into the first corridor: the way in is open.
+      await kit.teleport(w, bot, { zone: 8, x: 80, y: 126 });
+      await w.action(bot, { type: 'move', x: 80, y: 108 });
+      await w.waitFor(() => w.player(bot).y < 110, 15000, 'Walk through the door');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).y < 110, 'The Net\'s door lets a hero in');
+      // A level-1 Draugr is a short real fight, and pays its own level (staging: the west Shallows, away from the packs).
+      await kit.teleport(w, bot, { zone: 8, x: 40, y: 134 });
+      const before = { ...w.player(bot) };
+      const dead = (await kit.spawnEnemy(w, bot, { kind: 'draugr', level: 1, distance: 2.5 })).enemy;
+      await w.waitFor(() => w.snapshot.slimes.find(s => s.id === dead.id)?.level === 1, 5000, 'See the spawned draugr');
+      check(w.snapshot.slimes.find(s => s.id === dead.id).maxHp === Math.round(24000 * .2), 'A level-1 draugr has the floor of 20% of its health (4800)');
+      await w.action(bot, { type: 'target', id: dead.id });
+      await w.waitFor(() => w.snapshot.slimes.find(s => s.id === dead.id).dead, 240000, 'Defeat the draugr');
+      await w.action(bot, { type: 'stop' });
+      check(w.player(bot).kills === before.kills + 1 && totalXp(w.player(bot)) === totalXp(before) + enemyXp(1), `The kill pays the level-1 XP (${enemyXp(1)})`);
+      await w.waitFor(() => w.player(bot).gold >= before.gold + 128, 15000, 'Pick up the gold');
+      check(w.player(bot).gold === before.gold + 128, 'The kill drops 20% of the draugr gold (128)');
+      await w.waitFor(() => w.player(bot).inventory.some(s => s.item === 'drowned_coin'), 15000, 'Pick up the coin');
+      check(true, 'The draugr drops its Drowned Coin');
+      // A restart keeps the character on the sea floor.
+      await w.restart();
+      check(w.player(bot).zone === 8, 'The character resumes in Ran\'s Deep after a server restart');
+      // The way back up is a real walk into Keelhaven's Maelstrom, and down again from the Eyrie.
+      await kit.teleport(w, bot, { zone: 8, x: up.x, y: up.y - 4.5 });
+      await w.action(bot, { type: 'move', x: up.x, y: up.y + .5 });
+      await w.waitFor(() => w.player(bot).zone === 7, 15000, 'Step through the Maelstrom back up');
+      await w.action(bot, { type: 'stop' });
+      check(distance(w.player(bot), { x: up.tx, y: up.ty }) < 1.2, 'Keelhaven\'s Maelstrom sets you down on the Roc\'s Eyrie beside the spout');
+      await w.action(bot, { type: 'move', x: down.x, y: down.y });
+      await w.waitFor(() => w.player(bot).zone === 8, 15000, 'Dive again');
+      check(distance(w.player(bot), arrival) < 1.5, 'The Maelstrom works again right after arriving');
+    },
+  },
+
+  deep_quests: {
+    description: 'Every ordinary quest of Keelhaven played in dependency order through the real accept and claim paths (talk, kill, bring, visit and the new chime objective) with exact XP and gold: each bell chain is really rung in real time (a chain rung too slowly fails and its count falls as the bells go silent); repeatable bounties pay twice; both group quests hire their fighters; the Ghostmaw has no quest; the progression quest arrives by itself.',
+    startLevel: 35, godMode: true, levelSpread: 0,
+    async run(w, check) {
+      const bot = 'Bellringer';
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { level: 40, gold: 9000 });
+      const defs = deep.quests, npcs = deep.npcs;
+      check(npcs.length === 8 && defs.length === 24 && defs.every(q => q.id.startsWith('deep_')), `Keelhaven holds ${npcs.length} people and ${defs.length} quests`);
+      const find = id => defs.find(q => q.id === id);
+      const placeOf = id => deep.places.find(p => p.id === id);
+      const state = id => quest(w, bot, id);
+      const give = (item, quantity) => w.debug(bot, { op: 'give_item', item, quantity });
+      const bellsOf = chain => deep.places.filter(p => p.chain === chain);
+      const spot = p => p.id === 'deep_garden' ? { x: p.x, y: p.y } : { x: p.x, y: p.y + 2 };
+      const elites = () => w.snapshot.slimes.filter(s => s.elite);
+      const nearElite = p => elites().some(e => distance(e, p) < 24);
+      const sleeping = new Set();
+      async function refill(kind, n) {
+        const alive = () => w.snapshot.slimes.filter(s => !s.dead && s.kind === kind).length;
+        if (alive() >= n) return;
+        for (const d of w.snapshot.slimes.filter(s => s.dead && s.kind === kind).slice(0, n - alive())) await w.debug(bot, { op: 'respawn_enemy', id: d.id }).catch(e => { if (!/already alive/.test(e.message)) throw e; });
+        await w.waitFor(() => alive() >= n, 10000, `Respawn ${kind}`);
+      }
+      // Kills "any" enemy until a quest counter is full, going from pack to pack and keeping away from the elites.
+      async function killAny(id, index, n) {
+        for (let round = 0; round < 20 && (state(id).counts[index] || 0) < n; round++) {
+          const live = w.snapshot.slimes.filter(s => !s.dead && !s.elite && !nearElite(s));
+          const next = live.sort((a, b) => distance(a, w.player(bot)) - distance(b, w.player(bot)))[0];
+          assert.ok(next, 'A living enemy is available');
+          await kit.teleport(w, bot, { zone: 8, x: next.x + 3, y: next.y });
+          await kit.killEnemies(w, bot, { radius: 8, max: Math.min(3, n - state(id).counts[index]) });
+        }
+      }
+      await kit.teleport(w, bot, { zone: 8, x: 80, y: 162 });            // staging: the deep is entered through the Maelstrom (see `deep`)
+      await w.waitFor(() => w.player(bot).zone === 8 && w.snapshot.slimes.some(s => s.zone === 8), 8000, 'Arrive in Keelhaven');
+      // The chime: ring every bell of a chain in order, `gap` ms apart; the count must follow the bells that are still sounding.
+      async function ringChain(id, i, chain, gap) {
+        const bells = bellsOf(chain), burn = bells[0].burn;
+        await kit.teleport(w, bot, { zone: 8, x: 80, y: 162 });
+        check(state(id).counts[i] === 0, `${id}: no bell rings before the hero reaches one`);
+        for (const [k, b] of bells.entries()) {
+          await kit.teleport(w, bot, { zone: 8, ...spot(b) });
+          await w.waitFor(() => state(id).counts[i] >= Math.min(k + 1, bells.length), 4000, `${b.id} rings`);
+          check(state(id).counts[i] === k + 1 || k === bells.length - 1, `${id}: bell ${k + 1} of ${bells.length} sounds at once (${state(id).counts[i]} ringing)`);
+          if (k < bells.length - 1) { await kit.teleport(w, bot, { zone: 8, x: 80, y: 162 }); await w.advance(gap); }
+        }
+        await w.waitFor(() => state(id).counts[i] >= bells.length, 5000, `${id} chain rung`);
+        check(state(id).counts[i] === bells.length, `${id}: all ${bells.length} bells rang at once within the ${burn} s window`);
+      }
+      const pause = async ms => { while (ms > 0) { const d = Math.min(ms, 25000); await w.advance(d); ms -= d; } };
+      async function failChain(id, i, chain) {
+        const bells = bellsOf(chain), burn = bells[0].burn;
+        await kit.teleport(w, bot, { zone: 8, ...spot(bells[0]) });
+        await w.waitFor(() => state(id).counts[i] === 1, 4000, 'The first bell rings');
+        await kit.teleport(w, bot, { zone: 8, x: 80, y: 162 });
+        await pause((burn + 2) * 1000);
+        check(state(id).counts[i] === 0, `${id}: a bell goes silent after its ${burn} s and takes its share of the count with it`);
+        check(w.events.some(e => e.bot === bot && /falls silent/.test(e.text || '')), `${id}: the hero is told the last bell fell silent`);
+        await kit.teleport(w, bot, { zone: 8, ...spot(bells[1]) });
+        await w.waitFor(() => state(id).counts[i] === 1, 4000, 'Another bell rings alone');
+        await kit.teleport(w, bot, { zone: 8, x: 80, y: 162 });
+        await w.advance(500);
+        check(state(id).counts[i] === 1 && state(id).counts[i] < bells.length, `${id}: a slow hero has rung one bell, not the chain`);
+        await pause((burn + 1) * 1000);
+      }
+      async function playQuest(id) {
+        const q = find(id);
+        await kit.teleport(w, bot, { npc: q.npc });
+        await kit.talkTo(w, bot, q.npc, `quest:accept:${id}`);
+        await w.waitFor(() => state(id) && !state(id).claimed, 5000, `Accept ${id}`);
+        for (const [i, o] of q.objectives.entries()) {
+          if (o.kind === 'talk') { await kit.teleport(w, bot, { npc: o.target }); await kit.talkTo(w, bot, o.target); }
+          else if (o.kind === 'bring') await give(o.target, o.count);
+          else if (o.kind === 'visit') { const p = placeOf(o.target); await kit.teleport(w, bot, { zone: 8, ...spot(p) }); }
+          else if (o.kind === 'chime') {
+            const gap = { deep_harbour: 9000, deep_net: 9000, deep_rans: 8500 }[o.target];
+            if (o.target === 'deep_harbour') await failChain(id, i, o.target);
+            await ringChain(id, i, o.target, gap);
+          }
+          else if (o.kind === 'kill') {
+            if (o.target === 'any') { await kit.teleport(w, bot, { npc: q.npc }); await killAny(id, i, o.count); await w.waitFor(() => (state(id).counts[i] || 0) >= o.count, 8000, `${id} patrol`); continue; }
+            await refill(o.target, o.count);
+            const targets = w.snapshot.slimes.filter(s => !s.dead && s.kind === o.target && !nearElite(s));
+            const first = targets.sort((a, b) => distance(a, w.player(bot)) - distance(b, w.player(bot)))[0];
+            assert.ok(first, `A living ${o.target} away from the elites`);
+            await kit.teleport(w, bot, { zone: 8, x: first.x + 3, y: first.y });
+            const done = await kit.killEnemies(w, bot, { kind: o.target, max: o.count });
+            assert.ok(done.count >= o.count, `Killed enough ${o.target}`);
+          } else throw Error(`${id}: unexpected objective ${o.kind}`);
+          await w.waitFor(() => (state(id).counts[i] || 0) >= Math.min(o.count, o.kind === 'kill' ? 99 : o.count), 8000, `${id} objective ${i}`);
+        }
+        await w.waitFor(() => state(id).counts.every((c, i) => c >= q.objectives[i].count), 8000, `${id} is ready`);
+        await kit.teleport(w, bot, { npc: q.npc });
+        const before = { gold: w.player(bot).gold, xp: totalXp(w.player(bot)) };
+        const held = item => w.player(bot).inventory.filter(s => s.item === item).reduce((n, s) => n + s.quantity, 0);
+        const bringing = q.objectives.filter(o => o.kind === 'bring').map(o => [o.target, o.count, held(o.target)]);
+        await kit.talkTo(w, bot, q.npc, `quest:claim:${id}`);
+        await w.waitFor(() => state(id).claimed, 5000, `Claim ${id}`);
+        for (const [item, count, had] of bringing) check(held(item) === had - count, `${id}: the hand-in took exactly ${count} ${item}`);
+        check(w.player(bot).gold === before.gold + q.rewardGold && totalXp(w.player(bot)) === before.xp + levelXp[q.level - 1] / 10, `${id}: the claim pays ${q.rewardGold} gold and a tenth of level ${q.level}'s XP`);
+        return q;
+      }
+      // Dependency order: every ordinary quest, none of the elite quests, the capstone or the progression quest.
+      const skip = new Set(['deep_kraken', 'deep_captain', 'deep_vanguard', 'deep_onward']);
+      const order = [], seen = new Set();
+      const visit = q => { if (seen.has(q.id) || skip.has(q.id)) return; seen.add(q.id); if (q.requires && !skip.has(q.requires)) visit(find(q.requires)); order.push(q); };
+      defs.forEach(visit);
+      const tally = {};
+      for (const q of order) { await playQuest(q.id); for (const o of q.objectives) tally[o.kind] = (tally[o.kind] || 0) + 1; }
+      check(order.length >= 19 && ['talk', 'kill', 'bring', 'visit'].every(k => tally[k] >= 3) && tally.chime === 3, `${order.length} quests played end to end: ${JSON.stringify(tally)}`);
+      const onward = state('deep_onward');
+      check(onward && onward.counts[0] === 1 && !onward.claimed, 'The level-35 progression quest arrived by itself and already counts: the hero stands in Ran\'s Deep');
+      await kit.teleport(w, bot, { npc: 'deep_warden' });
+      await kit.talkTo(w, bot, 'deep_warden', 'quest:claim:deep_onward');
+      await w.waitFor(() => state('deep_onward').claimed, 5000, 'Claim the progression quest');
+      // The repeatable patrol can be taken and paid again.
+      const rep = find('deep_patrol');
+      for (let round = 0; round < 2; round++) {
+        const before = { completions: state('deep_patrol').completions };
+        await kit.teleport(w, bot, { npc: rep.npc });
+        await kit.talkTo(w, bot, rep.npc, 'quest:accept:deep_patrol');
+        await w.waitFor(() => !state('deep_patrol').claimed, 5000, 'Take the patrol again');
+        for (const kind of ['draugr', 'angler', 'moray', 'siren', 'shellback']) await refill(kind, 4);
+        await killAny('deep_patrol', 0, 14);
+        await w.waitFor(() => state('deep_patrol').counts[0] === 14, 8000, 'Patrol count');
+        await kit.teleport(w, bot, { npc: rep.npc });
+        await w.advance(1500);
+        before.gold = w.player(bot).gold;
+        await kit.talkTo(w, bot, rep.npc, 'quest:claim:deep_patrol');
+        await w.waitFor(() => state('deep_patrol').completions === before.completions + 1, 5000, 'Patrol paid');
+        check(w.player(bot).gold === before.gold + rep.rewardGold, `The repeatable patrol pays ${rep.rewardGold} gold again (round ${round + 1})`);
+      }
+      // The two group quests: the giver hires exactly the missing fighters, up to the quest's party size.
+      const mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name)).length;
+      for (const [id, size, kind, reward] of [['deep_captain', 3, 'hvitserk', 'accessory_amber_l20_blue'], ['deep_kraken', 5, 'kraken', 'necklace_moonstone_l20_purple']]) {
+        const g = find(id);
+        await kit.teleport(w, bot, { npc: g.npc });
+        await kit.talkTo(w, bot, g.npc, `quest:accept:${id}`);
+        await w.waitFor(() => state(id), 5000, `Accept ${id}`);
+        for (const c of ['warrior', 'priest', 'mage', 'hunter', 'assassin', 'warrior']) await kit.talkTo(w, bot, g.npc, `merc_${c}`);
+        await w.waitFor(() => mercs() === size - 1, 8000, 'The missing fighters join');
+        check(mercs() === size - 1 && g.group && g.recommendedPlayers === size && g.rewardItem === reward && g.objectives[0].kind === 'kill' && g.objectives[0].target === kind, `${id} wants ${size} heroes, hires ${size - 1} fighters and refuses more; its reward is ${reward}`);
+        await kit.talkTo(w, bot, g.npc, 'merc_dismiss');
+        await w.waitFor(() => mercs() === 0, 8000, 'Send them away');
+      }
+      check(!defs.some(q => q.objectives.some(o => o.target === 'ghostmaw')) && w.snapshot.slimes.some(s => s.kind === 'ghostmaw' && s.elite), 'The Ghostmaw is an elite no quest asks for');
+      // Persistence.
+      await w.restart();
+      check(['deep_welcome', 'deep_draugr', 'deep_harbour', 'deep_net', 'deep_rans', 'deep_onward'].every(id => state(id)?.claimed) && state('deep_patrol').completions === 3, 'Every claimed quest and the repeatable\'s count survive a restart');
+    },
+  },
+
 };
 
 async function runScenario(name, world = new TestWorld()) {

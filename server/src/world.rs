@@ -9,8 +9,11 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
+mod chime;
 mod consumables;
 mod debug;
+#[cfg(test)]
+mod deep_tests;
 mod escort;
 mod hold;
 mod instances;
@@ -338,6 +341,19 @@ impl Slime {
             "skyray" => (13500., 300., 2.8, 1.5),
             "einherjar" => (18500., 370., 2.6, 1.35),
             "thunderroc" => (22000., 440., 3.2, 1.75),
+            // Ran's Deep (levels 35-40): a slow drowned sailor, a lamp-fishing angler that shoots a bead of light,
+            // a fast charging moray, a three-bolt siren, a ground-pounding shellback turtle and, for five heroes,
+            // the Kraken in the middle of the Net.
+            "draugr" => (24000., 470., 2.4, 1.4),
+            "angler" => (20500., 440., 2.8, 1.3),
+            "moray" => (27000., 540., 3.5, 1.55),
+            "siren" => (23500., 520., 2.6, 1.25),
+            "shellback" => (40000., 700., 1.8, 1.95),
+            "kraken" => (280000., 4400., 2.2, 2.5),
+            // Two more elites for three heroes: the drowned captain of Naglfar (a quest) and the Ghostmaw, a huge pale moray that
+            // guards the deepest corridors (no quest).
+            "hvitserk" => (150000., 2600., 2.4, 2.),
+            "ghostmaw" => (190000., 3000., 3.3, 2.1),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -376,6 +392,14 @@ impl Slime {
             "skyray" => 32,
             "einherjar" => 33,
             "thunderroc" => 35,
+            "draugr" => 35,
+            "angler" => 36,
+            "moray" => 37,
+            "siren" => 38,
+            "shellback" => 39,
+            "kraken" => 40,
+            "hvitserk" => 37,
+            "ghostmaw" => 39,
             _ => 2,
         }
     }
@@ -417,6 +441,14 @@ impl Slime {
             "skyray" => 490,
             "einherjar" => 520,
             "thunderroc" => 600,
+            "draugr" => 640,
+            "angler" => 680,
+            "moray" => 720,
+            "siren" => 770,
+            "shellback" => 830,
+            "kraken" => 4500,
+            "hvitserk" => 2500,
+            "ghostmaw" => 3200,
             _ => 0,
         }
     }
@@ -459,6 +491,15 @@ impl Slime {
             "skyray" => (0.5, 1.8, 0., 12.),
             "einherjar" => (0.55, 1.3, 7.5, 8.5),
             "thunderroc" => (0.35, 1.0, 13., 11.),
+            "draugr" => (0.55, 1.3, 7.5, 8.5),
+            "angler" => (0.6, 1.9, 0., 12.),
+            "moray" => (0.25, 0.8, 13., 10.),
+            "siren" => (0.7, 2.2, 0., 12.5),
+            "shellback" => (0.9, 1.8, 6., 7.5),
+            // The Kraken coils for a full second before its slam.
+            "kraken" => (1., 2., 7., 14.),
+            "hvitserk" => (0.9, 1.6, 7., 10.),
+            "ghostmaw" => (0.35, 0.9, 12., 11.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -475,6 +516,9 @@ impl Slime {
             "weaver" => (11., 8.5, "#ffd86b", 0.9, 3, 0.3),
             "hrungnir" => (13., 14., "#bfe8ff", 1.1, 3, 0.22),
             "skyray" => (12., 12., "#9fe8ff", 0.7, 2, 0.18),
+            "angler" => (12., 8., "#9ffff0", 1.1, 1, 0.),
+            "siren" => (12.5, 9., "#ff9ae8", 0.9, 3, 0.3),
+            "kraken" => (13., 11., "#5a4aa8", 1.3, 3, 0.26),
             _ => return None,
         };
         Some(Ranged {
@@ -488,7 +532,7 @@ impl Slime {
     }
     /// A ranged kind that also fights toe to toe: it shoots only from farther than this.
     fn melee_inside(kind: &str) -> f64 {
-        if matches!(kind, "hollowking" | "hrungnir") {
+        if matches!(kind, "hollowking" | "hrungnir" | "kraken") {
             4.5
         } else {
             0.
@@ -504,6 +548,9 @@ impl Slime {
             "troll" => 2.6,
             "prismgolem" => 3.0,
             "hrungnir" => 3.6,
+            "shellback" => 3.2,
+            "kraken" => 4.0,
+            "hvitserk" => 3.0,
             _ => 0.,
         }
     }
@@ -683,6 +730,7 @@ pub struct World {
     social: social::Social,
     // Hold objectives in progress (world/hold.rs).
     hold: hold::Holds,
+    chime: chime::Chimes,
 }
 impl World {
     // Production code reads VALHALLA_LEVEL_SPREAD in main; tests that want real random levels use this.
@@ -732,6 +780,7 @@ impl World {
             test_commands: false,
             social: social::Social::default(),
             hold: hold::Holds::default(),
+            chime: chime::Chimes::default(),
         };
         for id in 0..world.spawns.len() {
             let enemy = world.fresh_enemy(id);
@@ -929,7 +978,15 @@ impl World {
     pub fn snapshot_for(&self, zone: usize) -> Value {
         let idle = self.zone_idle(zone);
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,
-        "players":self.players.values().filter(|p| p.character.zone == zone).map(Player::snapshot).collect::<Vec<_>>(),
+        "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
+            let mut view = p.snapshot();
+            // The bells a hero has ringing and how long each has left (only listed while there are any).
+            let bells = self.chime.view(*session);
+            if !bells.is_empty() {
+                view["bells"] = json!(bells.iter().map(|(place, left)| json!({"place":place,"left":left})).collect::<Vec<_>>());
+            }
+            view
+        }).collect::<Vec<_>>(),
         "slimes":self.slimes.iter().filter(|s| s.zone == zone && !idle).collect::<Vec<_>>(),
         "bolts":self.bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
         "ebolts":self.enemy_bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
@@ -1484,6 +1541,7 @@ impl World {
         self.update_mercenaries();
         self.update_escorts();
         self.update_holds();
+        self.update_chimes();
         let sessions: Vec<_> = self.players.keys().copied().collect();
         for session in sessions {
             self.update_food(session);
@@ -2271,7 +2329,8 @@ impl World {
                 _ if self.spawns[id].ambush.is_some() => 1e9,
                 "big" => 0.,
                 "cinderlord" => 180.,
-                "gloomroot" | "hrungnir" => 300.,
+                "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
+                "ghostmaw" => 600.,
                 "oakhorn" => 180.,
                 _ => 22.,
             };
@@ -2629,7 +2688,13 @@ impl World {
                     s.st = 1.;
                     s.hp = if matches!(
                         s.kind.as_str(),
-                        "cinderlord" | "gloomroot" | "oakhorn" | "hrungnir"
+                        "cinderlord"
+                            | "gloomroot"
+                            | "oakhorn"
+                            | "hrungnir"
+                            | "kraken"
+                            | "hvitserk"
+                            | "ghostmaw"
                     ) || is_boss(&s.kind)
                     {
                         s.max_hp
@@ -4178,7 +4243,7 @@ mod tests {
         found.sort();
         assert_eq!(
             found,
-            vec![(5, 1), (10, 2), (15, 3), (20, 4), (22, 6), (30, 7)]
+            vec![(5, 1), (10, 2), (15, 3), (20, 4), (22, 6), (30, 7), (35, 8)]
         );
     }
 
@@ -4327,6 +4392,7 @@ mod tests {
                         "bring" => assert!(item(&o.target).is_some_and(|i| i.kind == "material")),
                         "reach" => assert!(w.maps.iter().any(|m| m.name == o.target)),
                         "visit" | "hold" => assert!(area.places.iter().any(|p| p.id == o.target)),
+                        "chime" => assert!(area.places.iter().any(|p| p.chain == o.target)),
                         "escort" => assert!(
                             area.npcs
                                 .iter()
@@ -4509,7 +4575,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 8);
+        assert_eq!(zone_count(&w), 9);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -5112,7 +5178,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 8);
+        assert_eq!(zone_count(&w), 9);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -5705,8 +5771,8 @@ mod tests {
         let map = &w.maps[CITY];
         assert_eq!(
             zone_count(&w),
-            8,
-            "Skaldholm is the fifth map, the Undervault the sixth, the Wyrdwood the seventh and Bifrost Reach the eighth"
+            9,
+            "Skaldholm is the fifth map, the Undervault the sixth, the Wyrdwood the seventh, Bifrost Reach the eighth and Ran's Deep the ninth"
         );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
@@ -7411,7 +7477,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 8);
+        assert_eq!(zone_count(&w), 9);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));

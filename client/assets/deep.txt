@@ -1,0 +1,62 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "draugr",
+    "angler",
+    "moray",
+    "siren",
+    "shellback",
+    "kraken",
+    "hvitserk",
+    "ghostmaw"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 6,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 12,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 8,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "draugr": "22b6ea8f0ae660a8",
+    "angler": "af8cc28597c45be9",
+    "moray": "46305bdb1cafe380",
+    "siren": "d66a31a525a4feed",
+    "shellback": "820c52e9fb7585aa",
+    "kraken": "b1ab100b46e59fea",
+    "hvitserk": "3af48ed590a03d05",
+    "ghostmaw": "e9c012c716196e80"
+  }
+}
