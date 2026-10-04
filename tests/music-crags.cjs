@@ -23,7 +23,7 @@ const SONGS = [
   { id: 'city', make: 'createCityMusic', seconds: 101.05, name: 'Skaldholm Square' },
   { id: 'wyrd', make: 'createWyrdMusic', seconds: 60.02, name: 'Wyrdwood Wanderings' },
   { id: 'sky', make: 'createSkyMusic', seconds: 91.43, name: 'Above the Storm' },
-  { id: 'deep', make: 'createDeepMusic', seconds: 85.71, name: 'The Net Remembers' },
+  { id: 'deep', make: 'createDeepMusic', seconds: 85.34, name: 'Lantern Tide' },
 ];
 (async () => {
   browser = await chromium.launch({ headless: true });
@@ -127,11 +127,11 @@ const SONGS = [
   await game.evaluate(() => Prefs.set({ sound: false }));
   check(await game.evaluate(() => klevels.at(-1) === 0), 'Sound off silences the Bifrost score');
   await game.evaluate(() => Prefs.set({ sound: true, musicVol: 1 }));
-  // Ran's Deep has the ninth score, in a different style (dub techno): it replaces Above the Storm and the slider covers it.
+  // Ran's Deep has the ninth score, in a different style (a swung downtempo groove): it replaces Above the Storm and the slider covers it.
   await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'teleport', zone: 8, x: 80, y: 160 } }));
   await game.waitForFunction(() => Field.zone === 8 && valhalla.dmusic.running && !valhalla.kmusic.running && !valhalla.wmusic.running, null, { timeout: 10000 });
   await game.waitForFunction(() => valhalla.dmusic.loaded, null, { timeout: 30000 });
-  check(true, 'Diving into Ran\'s Deep swaps Above the Storm for The Net Remembers, and it loads');
+  check(true, 'Diving into Ran\'s Deep swaps Above the Storm for Lantern Tide, and it loads');
   await game.evaluate(() => { window.dlevels = []; const set = valhalla.dmusic.setLevel; valhalla.dmusic.setLevel = (v, s) => { dlevels.push(v); return set.call(valhalla.dmusic, v, s); }; });
   await game.evaluate(() => Prefs.set({ musicVol: .5 }));
   check(await game.evaluate(() => dlevels.length > 0 && Math.abs(dlevels.at(-1) - .25) < 1e-9), 'The music slider covers the Deep score too (50% = 0.25 gain)');
