@@ -1,9 +1,8 @@
 'use strict';
-/* Music for Ran's Deep: "Lantern Tide", F minor, 90 BPM, 32 bars (85.3 s), written in dybase2 (project "Valhalla Rans Deep - Lantern Tide"):
-   a downtempo, swung hip-hop groove, deliberately unlike the other zone songs: chorus electric-piano chords (Fm9 Dbmaj7 Bbm9 Cm7 / Fm9 Dbmaj7
-   Dbmaj7 Cm7) and a swung kick-snare-hat loop from the first bar, an 808 sub bass at 5 (the first bar of the groove), a bell-tine theme at 9 that
-   rests for the third eight bars (17-24, an open hat added) and returns at 25. No noise or drone layers. Played from assets/music_deep.mp3 by
-   music_player.js. */
+/* Music for Ran's Deep: "Lullaby of the Deep", D dorian, 72 BPM, 32 bars (106.7 s), written in dybase2 (project "Valhalla Rans Deep - Lullaby of the
+   Deep"): a Mellow Pad on Dm9 Gadd9 Am7 Cmaj7 Dm9 Gadd9 Fmaj7 Am7 all the way through, a soft chorus electric-piano arpeggio from bar 5, and from bar 9
+   a sub bass, a Rumble kick on beats 1 and 3 and a quiet vibrato-lead theme (bars 9-16 and 25-32; it rests in 17-24). No hats or cymbals and nothing
+   above 2 kHz: an earlier song with hats and a bell lead was rejected. Played from assets/music_deep.mp3 by music_player.js. */
 (() => {
   window.createDeepMusic = ctx => window.createLoopMusic(ctx, 'assets/music_deep.mp3');
 })();
