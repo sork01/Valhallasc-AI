@@ -66,7 +66,7 @@ const debugSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('quest'), id: z.string().max(40), action: questAction }).strict(),
   z.object({ op: z.literal('kill_enemy'), id: z.number().int().nonnegative() }).strict(),
   z.object({ op: z.literal('respawn_enemy'), id: z.number().int().nonnegative() }).strict(),
-  z.object({ op: z.literal('spawn_enemy'), kind: z.enum(['green', 'blue', 'pink', 'yellow', 'beetle', 'wisp', 'spider', 'wraith', 'golem', 'cinderlord', 'gloomroot', 'thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking', 'boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir', 'galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc', 'draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw']), x: number, y: number, level: z.number().int().min(1).max(100).optional() }).strict(),
+  z.object({ op: z.literal('spawn_enemy'), kind: z.enum(['green', 'blue', 'pink', 'yellow', 'beetle', 'wisp', 'spider', 'wraith', 'golem', 'cinderlord', 'gloomroot', 'thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking', 'boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir', 'galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc', 'draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw', 'tidetemplar', 'tidecantor', 'tideleech', 'reliccrab', 'abysszealot', 'bellkeeper', 'mournsister', 'rootabbot', 'choirmother', 'pearlwidow', 'glasscantor', 'relicwarden', 'coralregent', 'chainmarshal', 'starseraph', 'tidejudicator', 'hierophant']), x: number, y: number, level: z.number().int().min(1).max(100).optional() }).strict(),
   z.object({ op: z.literal('summon_king') }).strict(),
 ]);
 const botSchema = z.object({
@@ -284,7 +284,7 @@ class TestWorld extends EventEmitter {
   player(bot) {
     const identity = this.bots.get(bot);
     if (!identity) throw Error(`Unknown bot: ${bot}`);
-    return this.snapshot?.players.find(p => p.id === identity.id) || null;
+    return this.views.get(bot)?.players.find(p => p.id === identity.id) || this.snapshot?.players.find(p => p.id === identity.id) || null;
   }
   async disconnect(bot) {
     const player = this.bots.get(bot);

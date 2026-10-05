@@ -8,10 +8,10 @@
   const NS = 'http://www.w3.org/2000/svg';
   const STAGE = { w: 100, h: 62 };
   // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm -> the Wyrdwood -> Bifrost Reach, up the Stormrift -> Ran's Deep, down the Maelstrom.
-  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18}];
-  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776' };
-  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3' };
-  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6' };
+  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:89,y:53,s:8}];
+  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776' , cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
+  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3' , cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
+  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6' , cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
   const BLURB = {
     meadow: 'Green pastures round the walled town of Alderhaven.',
     ember: 'Lava fords and ash-grey crags above Cinderwatch Camp.',
@@ -20,7 +20,10 @@
     wyrd: 'An autumn forest, a troll bridge and a storm-wracked moor, between Hollowmoot and Skuldwatch.',
     sky: 'Floating islands over the storm, joined by rainbow-shard bridges, around Heimdall\'s Perch.',
     deep: 'The sea floor under the storm: the Shallows round Keelhaven and the Net, a labyrinth of living coral with Ran\'s Court at its heart.',
-    nacre: 'A peaceful merfolk city of 120 shell homes, coral gardens and a Meeting Stone beside the sealed Drowned Cathedral.',
+    nacre: 'A peaceful merfolk city of 120 shell homes, coral gardens and a Meeting Stone beside the three-wing Drowned Cathedral.',
+    cathedral_left:'The Flooded Cloister: level 40, four bosses, a private five-player wing.',
+    cathedral_right:'The Coral Reliquary: level 45, four bosses, a private five-player wing.',
+    cathedral_main:'The Grand Nave: level 50, four bosses, a private five-player wing.',
     vault: 'A dungeon of bones and torchlight under the Meeting Stone, for a party of five.',
   };
   // Base level and a dot colour for every enemy kind (the level matches Slime::default_level in server/src/world.rs;
@@ -41,6 +44,7 @@
     draugr: ['Drowned Draugr', 35, '#8ac4b8'], angler: ['Lantern Angler (ranged)', 36, '#9ffff0'], moray: ['Gnashing Moray', 37, '#c8e070'], siren: ['Siren (ranged)', 38, '#ff9ae8'], shellback: ['Shellback', 39, '#a8d090'], kraken: ['The Kraken (Elite · 5 players)', 40, '#b890f0'], hvitserk: ['Hvitserk (Elite · 3 players)', 37, '#e0b43a'], ghostmaw: ['Ghostmaw (Elite · 3 players)', 39, '#d8f0f8'],
     ram: ['Stormram', 29, '#8fe0ff'], oakhorn: ['Oakhorn (Elite · 3 players)', 25, '#ff9a3a'], hrungnir: ['Hrungnir (Elite · 5 players)', 30, '#7ab4ff'],
   };
+  for (const e of CATHEDRAL_ENEMIES) KINDS[e.kind]=[e.name+(e.boss?' (Boss)':''),e.level,e.color];
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const kindInfo = kind => KINDS[kind] || [kind, 1, '#ff6b8a'];
   // Fog of war: the server saves which of a zone's 3x3 cells the character has stood in (Field.explored, one bitmask per
@@ -264,7 +268,7 @@
       box.append(el('h5', 'Enemies', 'wm-side-title'));
       const list = el('ul', '', 'wm-kinds');
       [...counts].sort((a, b) => kindInfo(a[0])[1] - kindInfo(b[0])[1]).forEach(([kind, n]) => {
-        const [name, level, col] = kindInfo(kind), row = el('li'), b = el('button', '', 'wm-kind'); b.type = 'button'; b.dataset.kind = kind;
+        const [name, baseLevel, col] = kindInfo(kind), level = z.cathedralWing ? z.min_level : baseLevel, row = el('li'), b = el('button', '', 'wm-kind'); b.type = 'button'; b.dataset.kind = kind;
         const dot = el('i'); dot.style.background = col;
         b.append(dot, el('span', name), el('small', kind === 'big' ? 'king, rare' : `Lv ${level} · ${n}`));
         const on = () => { highlight = kind; drawDots(z); }, off = () => { highlight = null; drawDots(z); };

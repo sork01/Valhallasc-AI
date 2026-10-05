@@ -20,6 +20,7 @@ async function call(name, args = {}) {
   const rust = fs.readFileSync(path.join(root, 'server/src/world.rs'), 'utf8');
   const body = rust.slice(rust.indexOf('pub fn default_level'), rust.indexOf('// Gold carried by a default-level enemy'));
   const server = {}; for (const [, names, level] of body.matchAll(/((?:"\w+"\s*\|?\s*)+)=>\s*(\d+)/g)) for (const [, name] of names.matchAll(/"(\w+)"/g)) server[name] = Number(level);
+  Object.assign(server, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'world/cathedral.txt'), 'utf8')).map(e => [e.kind, e.level])));
   check(Object.keys(server).length >= 17, `Parsed ${Object.keys(server).length} enemy levels from world.rs`);
 
   const transport = new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe' });
@@ -111,12 +112,16 @@ async function call(name, args = {}) {
 
   // --- visiting the other zones uncovers one cell each, and the glacier two ---
   await stand(1, 48, 86); await stand(2, 64, 118); await stand(2, 64, 52); await stand(3, 64, 9); await stand(5, 15, 111); await stand(6, 12, 150); await stand(7, 80, 144); await stand(8, 80, 160); await stand(4, 80, 150);
+  const later = await page.evaluate(() => Field._debug.zones.slice(9).map((z,i) => ({zone:i+9,...z.spawn})));
+  for (const z of later) await stand(z.zone,z.x,z.y);
+  await stand(4,80,150);
   await press('m');
   const all = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => ({ name: t.querySelector('b').textContent, small: t.querySelector('small').textContent, disabled: t.disabled })));
   check(all.map(t => t.name).join() === data.zones.map(z => z.name).join() && all.every(t => !t.disabled), `Every visited zone is named again: ${all.map(t => t.name).join(', ')}`);
   check(/^Lv 5–10 · 1\/9/.test(all[1].small) && /^Lv 10–15 · 2\/9/.test(all[2].small) && /^Lv 15–20 · 1\/9/.test(all[3].small) && /^Safe city · 1\/9/.test(all[4].small) && /^Lv 20 · 5 players · 1\/9/.test(all[5].small) && /^Lv 2–5 · 1\/9/.test(all[0].small) && /^Lv 20–30 · 1\/9/.test(all[6].small), `Levels and charted counts on the tiles: ${all.map(t => t.small).join(' | ')}`);
   const roads = await page.evaluate(() => [...document.querySelectorAll('.wm-roads [data-road]')].filter(r => r.getAttribute('visibility') === 'visible').map(r => r.dataset.road).sort());
-  check(roads.join() === '0-1,1-2,2-3,2-4,4-5,4-6,6-7,7-8', `Roads appear once either end's gate has been seen (${roads})`);
+  const expectedRoads = [...new Set(data.zones.flatMap((z,i) => z.portals.map(to => [i,to].sort().join('-'))))].sort();
+  check(roads.join() === expectedRoads.join(), `Roads appear once either end's gate has been seen (${roads})`);
   check(await page.evaluate(() => [...document.querySelectorAll('.wm-tile canvas:not(.wm-tile-fog)')].every(c => { const g = c.getContext('2d').getImageData(0, 0, 220, 220).data; const set = new Set(); for (let i = 0; i < g.length; i += 4 * 97) set.add((g[i] >> 4) + ',' + (g[i + 1] >> 4) + ',' + (g[i + 2] >> 4)); return set.size >= 6; })), 'Every tile carries drawn ground under its fog');
   await shot('map-world');
 
@@ -177,7 +182,7 @@ async function call(name, args = {}) {
   await page.waitForFunction(() => /2\/9 charted/.test(document.querySelector('.wm-tile[data-zone="3"] small').textContent), null, { timeout: 3000 });
   check(true, 'Standing in a new cell uncovers it on the open map within a moment');
   const here = await page.evaluate(() => [...document.querySelectorAll('.wm-you')].map(y => !y.hidden).join());
-  check(here === 'false,false,false,true,false,false,false,false,false', `The marker moved to the Gloamfen tile (${here})`);
+  check(here === data.zones.map((_,i)=>i===3).join(), `The marker moved to the Gloamfen tile (${here})`);
   await page.locator('.wm-tile[data-zone="3"]').click();
   await page.waitForFunction(() => { const m = document.querySelector('.wm-me'); return m && !m.hidden; });
   const fogNow = await page.evaluate(() => { const g = document.getElementById('wm-fog').getContext('2d'); return g.getImageData(Math.round(106 / 128 * 768), Math.round(21 / 128 * 768), 1, 1).data[3]; });

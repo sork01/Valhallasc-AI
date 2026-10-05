@@ -68,6 +68,13 @@ impl World {
     /// the first free one.
     pub(super) fn instance_for(&self, session: u64, template: usize) -> Result<usize, String> {
         let me = &self.players[&session].character;
+        // Moving within a wing keeps its existing copy, even for a solo visitor.
+        if self
+            .instance_at(me.zone)
+            .is_some_and(|i| i.template == template)
+        {
+            return Ok(me.zone);
+        }
         let mates = self.party_mates(&me.id);
         for q in self.players.values() {
             if q.character.id != me.id

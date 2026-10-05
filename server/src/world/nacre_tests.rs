@@ -35,8 +35,8 @@ fn nacre_city_is_large_safe_and_has_120_distinct_addressed_homes() {
     assert_eq!(names.len(), 120);
     assert_eq!(m.npcs.len(), 30);
     assert_eq!(m.quests.len(), 9);
-    assert_eq!(w.maps.len(), 13);
-    assert_eq!(w.maps[10].template, Some(5));
+    assert_eq!(w.maps.len(), 25);
+    assert_eq!(w.maps[13].template, Some(5));
 }
 
 #[test]
@@ -75,7 +75,7 @@ fn nacre_every_house_door_person_place_and_swim_route_is_reachable() {
 }
 
 #[test]
-fn nacre_all_people_are_merfolk_except_the_stone_and_the_future_dungeon_is_sealed() {
+fn nacre_all_people_are_merfolk_except_the_stone_and_the_cathedral_has_three_open_wings() {
     let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let z = &raw["zones"][NACRE - 1];
     let people = z["npcs"].as_array().unwrap();
@@ -85,15 +85,28 @@ fn nacre_all_people_are_merfolk_except_the_stone_and_the_future_dungeon_is_seale
     }
     let plan = &z["futureInstance"];
     assert_eq!(plan["name"], "The Drowned Cathedral");
-    assert_eq!(plan["status"], "sealed");
+    assert_eq!(plan["status"], "open");
+    let warden = z["npcs"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|n| n["id"] == "nacre_warden")
+        .unwrap();
+    let dialogue = warden["dialogue"].as_str().unwrap();
+    assert!(
+        dialogue.contains("level 40")
+            && dialogue.contains("Coral Reliquary")
+            && dialogue.contains("Grand Nave")
+            && !dialogue.contains("sealed")
+    );
     assert_eq!(
         (plan["level"].as_u64(), plan["players"].as_u64()),
-        (Some(40), Some(5))
+        (None, Some(5))
     );
     assert_eq!(
         z["portals"].as_array().unwrap().len(),
-        1,
-        "no fake portal into the unfinished dungeon"
+        4,
+        "Tideway and three working Cathedral entrances"
     );
     let stone = z["objects"]
         .as_array()

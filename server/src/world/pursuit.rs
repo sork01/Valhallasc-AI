@@ -37,17 +37,33 @@ pub(super) fn clear_line(map: &Map, from: Point, to: Point, radius: f64) -> bool
 impl Grid {
     fn new(map: &Map, radius: f64) -> Self {
         let side = (map.size as f64 / CELL) as usize;
-        let free = (0..side * side)
+        let mut free: Vec<bool> = (0..side * side)
             .map(|i| {
-                let p = Point {
-                    x: (i % side) as f64 * CELL + CELL / 2.,
-                    y: (i / side) as f64 * CELL + CELL / 2.,
-                };
-                let mut q = p;
-                map.collide(&mut q, radius);
-                q.distance(p) < 1e-8
+                let x = (i % side) as f64 * CELL + CELL / 2.;
+                let y = (i / side) as f64 * CELL + CELL / 2.;
+                x >= 0.7 && y >= 0.7 && x <= map.size as f64 - 0.7 && y <= map.size as f64 - 0.7
             })
             .collect();
+        // Rasterise each expanded obstacle only over the cells it covers. Scanning every obstacle for every
+        // cell pauses the simulation for seconds when a large dungeon first needs a pursuit route.
+        for o in &map.objects {
+            let rectangular = o.width > 0. && o.depth > 0.;
+            let hx = if rectangular { o.width / 2. } else { o.r } + radius;
+            let hy = if rectangular { o.depth / 2. } else { o.r } + radius;
+            let begin = |n: f64| ((n / CELL).floor() as isize).clamp(0, side as isize) as usize;
+            let end = |n: f64| ((n / CELL).ceil() as isize).clamp(0, side as isize) as usize;
+            for y in begin(o.y - hy)..end(o.y + hy) {
+                for x in begin(o.x - hx)..end(o.x + hx) {
+                    let dx = x as f64 * CELL + CELL / 2. - o.x;
+                    let dy = y as f64 * CELL + CELL / 2. - o.y;
+                    if (rectangular && dx.abs() < hx && dy.abs() < hy)
+                        || (!rectangular && dx.hypot(dy) < hx)
+                    {
+                        free[y * side + x] = false;
+                    }
+                }
+            }
+        }
         Self { side, free }
     }
     fn point(&self, i: usize) -> Point {
@@ -105,6 +121,17 @@ impl Grid {
             distance,
         }
     }
+}
+
+#[cfg(test)]
+pub(super) fn grid_matches_collision(map: &Map, radius: f64) -> bool {
+    let grid = Grid::new(map, radius);
+    (0..grid.free.len()).step_by(11).all(|i| {
+        let p = grid.point(i);
+        let mut q = p;
+        map.collide(&mut q, radius);
+        grid.free[i] == (q.distance(p) < 1e-8)
+    })
 }
 
 impl Pursuit {

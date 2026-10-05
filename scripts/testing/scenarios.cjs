@@ -33,6 +33,7 @@ async function talk(w, bot, npcId, offer) {
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
 const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39 };
+Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'world/cathedral.txt'), 'utf8')).map(e => [e.kind, e.level])));
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
 const levelXp = JSON.parse(fs.readFileSync(path.join(root, 'world/levels.txt'), 'utf8'));
@@ -2720,7 +2721,7 @@ const scenarios = {
       await kit.setupCharacter(w, bot, { gold: 2000 });
       const town = map.zones[8], gate = deep.portals.find(p => p.id === 'nacre_gate'), back = town.portals[0];
       check(town.objects.filter(o => o.kind === 'nacrehouse').length === 120 && town.npcs.length === 30 && town.slimes.length === 0, '120 homes, 30 people, no enemies');
-      check(town.futureInstance.status === 'sealed' && town.futureInstance.players === 5 && town.portals.length === 1, 'The future Drowned Cathedral is sealed, beside its Meeting Stone');
+      check(town.futureInstance.status === 'open' && town.futureInstance.players === 5 && town.portals.length === 4, 'The Drowned Cathedral has three open wings, beside its Meeting Stone');
       await kit.teleport(w, bot, { npc: 'travel_keelhaven' });
       await kit.talkTo(w, bot, 'travel_keelhaven');
       await kit.teleport(w, bot, { zone: 8, x: gate.x, y: gate.y - 4 });
@@ -2828,6 +2829,8 @@ const scenarios = {
       check(town.quests.every(q => quest(w, bot, q.id).claimed), 'All nine claimed quests survive Rust restart');
     },
   },
+
+  cathedral: require('./cathedral-scenario.cjs'),
 
 };
 

@@ -112,6 +112,9 @@ pub fn equipment(class: Class, kind: &str, variant: &str) -> Option<&'static Ite
         .find(|i| i.class == Some(class) && i.kind == kind && i.variant.as_deref() == Some(variant))
 }
 pub fn material(kind: &str) -> &'static str {
+    if let Some(e) = crate::cathedral::enemy(kind) {
+        return &e.material;
+    }
     match kind {
         "blue" => "blue_gel",
         "pink" => "pink_gel",
@@ -196,6 +199,9 @@ pub fn rarity_color(rarity: &str) -> &'static str {
     }
 }
 pub fn is_elite(kind: &str) -> bool {
+    if crate::cathedral::enemy(kind).is_some() {
+        return true;
+    }
     matches!(
         kind,
         "big"
@@ -210,14 +216,47 @@ pub fn is_elite(kind: &str) -> bool {
 }
 /// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.
 pub fn is_vault_enemy(kind: &str) -> bool {
+    if crate::cathedral::enemy(kind).is_some() {
+        return false;
+    }
     matches!(kind, "thrall" | "archer" | "acolyte") || is_boss(kind)
 }
 /// The four bosses of the Undervault (the dungeon under Skaldholm). Each drops guaranteed blue gear.
 pub fn is_boss(kind: &str) -> bool {
+    if let Some(e) = crate::cathedral::enemy(kind) {
+        return e.boss;
+    }
     matches!(kind, "gatewarden" | "choir" | "colossus" | "hollowking")
 }
 /// The slot pools a boss drops from: one shared blue level-20 piece per pool, chosen across all classes.
 pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
+    if let Some(e) = crate::cathedral::enemy(kind) {
+        if !e.boss {
+            return &[];
+        }
+        return if matches!(kind, "choirmother" | "coralregent" | "hierophant") {
+            &[
+                &["armor"],
+                &[
+                    "weapon",
+                    "headgear",
+                    "shoulders",
+                    "gloves",
+                    "pants",
+                    "accessory",
+                ],
+            ]
+        } else {
+            &[&[
+                "weapon",
+                "headgear",
+                "shoulders",
+                "gloves",
+                "pants",
+                "accessory",
+            ]]
+        };
+    }
     match kind {
         "gatewarden" => &[&["headgear", "shoulders"]],
         "choir" => &[&["gloves", "pants"]],
@@ -245,6 +284,32 @@ pub fn boss_piece(slots: &[&str], choice: f64) -> Option<&'static Item> {
             i.rarity == "rare"
                 && i.required_level == 20
                 && i.source.as_deref() == Some("undervault")
+                && slots.contains(&i.kind.as_str())
+        })
+        .collect();
+    pool.get((choice * pool.len() as f64) as usize).copied()
+}
+/// Cathedral bosses guarantee the strongest existing blue gear below the wing's level; preserve the gear catalog.
+pub fn boss_piece_for(kind: &str, slots: &[&str], choice: f64) -> Option<&'static Item> {
+    let Some(e) = crate::cathedral::enemy(kind) else {
+        return boss_piece(slots, choice);
+    };
+    let level = ITEMS
+        .iter()
+        .filter(|i| {
+            i.rarity == "rare"
+                && i.required_level <= e.level
+                && i.source.is_none()
+                && slots.contains(&i.kind.as_str())
+        })
+        .map(|i| i.required_level)
+        .max()?;
+    let pool: Vec<_> = ITEMS
+        .iter()
+        .filter(|i| {
+            i.rarity == "rare"
+                && i.required_level == level
+                && i.source.is_none()
                 && slots.contains(&i.kind.as_str())
         })
         .collect();

@@ -223,6 +223,8 @@ def main():
     assert world['zones'][7]['name'] == "Rán's Deep"
     later = world['zones'][9:]
     world['zones'] = world['zones'][:8] + [zone] + later
+    from generate_cathedral import open_cathedral
+    open_cathedral(zone, world)
     open_tideway(world['zones'][7])
     spark_travel.ensure(world)
     PATH.write_text(json.dumps(world, indent=2) + '\n')

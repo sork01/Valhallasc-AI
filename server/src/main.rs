@@ -1,5 +1,6 @@
 #![recursion_limit = "256"]
 mod auth;
+mod cathedral;
 mod items;
 mod model;
 mod skills;
@@ -68,11 +69,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if world.god_mode {
         tracing::warn!("VALHALLA_GOD_MODE is on: players cannot be hurt");
     }
-    // For automated tests only: new characters start at this level (1-40), so skills can be driven for real.
+    // For automated tests only: new characters start at this level (1-100), so skills can be driven for real.
     world.start_level = std::env::var("VALHALLA_START_LEVEL")
         .ok()
         .and_then(|v| v.parse::<u32>().ok())
-        .map_or(1, |v| v.clamp(1, 40));
+        .map_or(1, |v| v.clamp(1, 100));
     if world.start_level > 1 {
         tracing::warn!(
             "VALHALLA_START_LEVEL={} is on: new characters start above level 1",

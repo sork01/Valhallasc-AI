@@ -10,3 +10,6 @@ const skills = JSON.parse(fs.readFileSync(path.join(root, 'world/skills.txt'), '
 fs.writeFileSync(path.join(root, 'client/skills.js'), "'use strict';\nwindow.WORLD_SKILLS = " + JSON.stringify(skills) + ';\n');
 const zones = map.zones || [];
 console.log(`Synced ${map.objects.length} obstacles and ${map.slimes.length} spawns` + zones.map(z => `, plus zone "${z.name}": ${z.objects.length} obstacles and ${z.slimes.length} spawns`).join('') + '. Rebuild Rust after changing the map.');
+
+const cathedral = JSON.parse(fs.readFileSync(path.join(root, "world/cathedral.txt"), "utf8"));
+fs.writeFileSync(path.join(root, "client/cathedral.js"), "'use strict';\nwindow.CATHEDRAL_ENEMIES = " + JSON.stringify(cathedral) + ";\n");

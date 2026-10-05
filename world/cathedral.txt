@@ -1,0 +1,500 @@
+[
+  {
+    "kind": "tidetemplar",
+    "name": "Drowned Templar",
+    "level": 40,
+    "stats": [
+      34000,
+      1050,
+      2.5,
+      1.4
+    ],
+    "profile": [
+      0.65,
+      1.5,
+      7.5,
+      9
+    ],
+    "art": "knight",
+    "color": "#84bbb7",
+    "boss": false,
+    "gold": 1170,
+    "material": "cathedral_tidetemplar",
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "variant": 0
+  },
+  {
+    "kind": "tidecantor",
+    "name": "Bound Cantor",
+    "level": 40,
+    "stats": [
+      26000,
+      800,
+      2.4,
+      1.25
+    ],
+    "profile": [
+      0.75,
+      2.3,
+      0,
+      12
+    ],
+    "art": "cantor",
+    "color": "#8cd4ee",
+    "boss": false,
+    "gold": 1170,
+    "material": "cathedral_tidecantor",
+    "ranged": [
+      11,
+      9,
+      "#89e4ea",
+      0.9,
+      2,
+      0.18
+    ],
+    "slam": 0,
+    "melee": 0,
+    "variant": 0
+  },
+  {
+    "kind": "tideleech",
+    "name": "Cloister Tide Leech",
+    "level": 40,
+    "stats": [
+      28000,
+      900,
+      3.6,
+      1.35
+    ],
+    "profile": [
+      0.3,
+      1,
+      11,
+      9
+    ],
+    "art": "leech",
+    "color": "#78b78a",
+    "boss": false,
+    "gold": 1170,
+    "material": "cathedral_tideleech",
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "variant": 0
+  },
+  {
+    "kind": "reliccrab",
+    "name": "Reliquary Crab",
+    "level": 45,
+    "stats": [
+      48000,
+      1400,
+      2.1,
+      1.6
+    ],
+    "profile": [
+      0.9,
+      1.8,
+      6,
+      8
+    ],
+    "art": "crab",
+    "color": "#e999b0",
+    "boss": false,
+    "gold": 1210,
+    "material": "cathedral_reliccrab",
+    "ranged": null,
+    "slam": 2.8,
+    "melee": 0,
+    "variant": 0
+  },
+  {
+    "kind": "abysszealot",
+    "name": "Abyssal Zealot",
+    "level": 50,
+    "stats": [
+      47000,
+      1250,
+      2.8,
+      1.35
+    ],
+    "profile": [
+      0.8,
+      2,
+      0,
+      13
+    ],
+    "art": "cantor",
+    "color": "#b295e8",
+    "boss": false,
+    "gold": 1250,
+    "material": "cathedral_abysszealot",
+    "ranged": [
+      12,
+      11,
+      "#c6a3ff",
+      1,
+      3,
+      0.3
+    ],
+    "slam": 0,
+    "melee": 0,
+    "variant": 1
+  },
+  {
+    "kind": "bellkeeper",
+    "name": "Orrin, the Sunken Bellkeeper",
+    "level": 40,
+    "stats": [
+      240000,
+      1950,
+      2.2,
+      2
+    ],
+    "profile": [
+      1.1,
+      2.1,
+      7,
+      11
+    ],
+    "art": "bell",
+    "color": "#70cbbc",
+    "boss": true,
+    "gold": 5600,
+    "material": "cathedral_bellkeeper",
+    "ranged": null,
+    "slam": 3.8,
+    "melee": 0,
+    "variant": 0
+  },
+  {
+    "kind": "mournsister",
+    "name": "Sister Veyra of the Stillwater",
+    "level": 40,
+    "stats": [
+      260000,
+      1300,
+      2.5,
+      1.8
+    ],
+    "profile": [
+      0.9,
+      2.6,
+      0,
+      14
+    ],
+    "art": "cantor",
+    "color": "#a3d9e5",
+    "boss": true,
+    "gold": 5600,
+    "material": "cathedral_mournsister",
+    "ranged": [
+      12,
+      9,
+      "#a3e6ff",
+      1.1,
+      3,
+      0.36
+    ],
+    "slam": 0,
+    "melee": 0,
+    "variant": 2
+  },
+  {
+    "kind": "rootabbot",
+    "name": "Abbot Thorne, the Kelpbound",
+    "level": 40,
+    "stats": [
+      300000,
+      2210,
+      1.9,
+      2.2
+    ],
+    "profile": [
+      1.15,
+      2.3,
+      6,
+      11
+    ],
+    "art": "root",
+    "color": "#7aaa75",
+    "boss": true,
+    "gold": 5600,
+    "material": "cathedral_rootabbot",
+    "ranged": null,
+    "slam": 4.2,
+    "melee": 0,
+    "variant": 0
+  },
+  {
+    "kind": "choirmother",
+    "name": "Elyss, Mother of the Bound Choir",
+    "level": 40,
+    "stats": [
+      330000,
+      1495,
+      2.4,
+      2
+    ],
+    "profile": [
+      1,
+      2.2,
+      0,
+      14
+    ],
+    "art": "choir",
+    "color": "#74e8db",
+    "boss": true,
+    "gold": 5600,
+    "material": "cathedral_choirmother",
+    "ranged": [
+      13,
+      10,
+      "#72f4e0",
+      1.2,
+      5,
+      0.28
+    ],
+    "slam": 0,
+    "melee": 0,
+    "variant": 3
+  },
+  {
+    "kind": "pearlwidow",
+    "name": "Neritha, the Pearl Widow",
+    "level": 45,
+    "stats": [
+      300000,
+      1885,
+      3.1,
+      2
+    ],
+    "profile": [
+      0.65,
+      1.6,
+      10,
+      12
+    ],
+    "art": "spider",
+    "color": "#f1b4c7",
+    "boss": true,
+    "gold": 5800,
+    "material": "cathedral_pearlwidow",
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "variant": 4
+  },
+  {
+    "kind": "glasscantor",
+    "name": "Ilyr, Cantor of Shattered Glass",
+    "level": 45,
+    "stats": [
+      330000,
+      1560,
+      2.5,
+      1.9
+    ],
+    "profile": [
+      0.8,
+      2.2,
+      0,
+      14
+    ],
+    "art": "glass",
+    "color": "#e5a4de",
+    "boss": true,
+    "gold": 5800,
+    "material": "cathedral_glasscantor",
+    "ranged": [
+      13,
+      14,
+      "#ffa8de",
+      0.8,
+      5,
+      0.38
+    ],
+    "slam": 0,
+    "melee": 0,
+    "variant": 0
+  },
+  {
+    "kind": "relicwarden",
+    "name": "Sarkhos, Warden of the Reliquary",
+    "level": 45,
+    "stats": [
+      350000,
+      2470,
+      2.3,
+      2.1
+    ],
+    "profile": [
+      1,
+      2,
+      8,
+      12
+    ],
+    "art": "crab",
+    "color": "#df957c",
+    "boss": true,
+    "gold": 5800,
+    "material": "cathedral_relicwarden",
+    "ranged": null,
+    "slam": 3.5,
+    "melee": 0,
+    "variant": 5
+  },
+  {
+    "kind": "coralregent",
+    "name": "Queen Avariel, the Coral Regent",
+    "level": 45,
+    "stats": [
+      400000,
+      1950,
+      2.6,
+      2.1
+    ],
+    "profile": [
+      0.9,
+      1.9,
+      8.5,
+      14
+    ],
+    "art": "regent",
+    "color": "#ec8db9",
+    "boss": true,
+    "gold": 5800,
+    "material": "cathedral_coralregent",
+    "ranged": [
+      13,
+      10,
+      "#ffb9d5",
+      1,
+      3,
+      0.24
+    ],
+    "slam": 3.2,
+    "melee": 4.5,
+    "variant": 0
+  },
+  {
+    "kind": "chainmarshal",
+    "name": "Vargast, Marshal of the Drowned Chains",
+    "level": 50,
+    "stats": [
+      370000,
+      2665,
+      2.6,
+      2.1
+    ],
+    "profile": [
+      1,
+      1.8,
+      9,
+      12
+    ],
+    "art": "chain",
+    "color": "#909daf",
+    "boss": true,
+    "gold": 6000,
+    "material": "cathedral_chainmarshal",
+    "ranged": null,
+    "slam": 3.6,
+    "melee": 0,
+    "variant": 0
+  },
+  {
+    "kind": "starseraph",
+    "name": "Astrael, the Fallen Tide Seraph",
+    "level": 50,
+    "stats": [
+      390000,
+      1950,
+      2.8,
+      2
+    ],
+    "profile": [
+      0.9,
+      2.3,
+      0,
+      15
+    ],
+    "art": "seraph",
+    "color": "#d0c9ef",
+    "boss": true,
+    "gold": 6000,
+    "material": "cathedral_starseraph",
+    "ranged": [
+      14,
+      12,
+      "#d9c4ff",
+      1,
+      5,
+      0.3
+    ],
+    "slam": 0,
+    "melee": 0,
+    "variant": 0
+  },
+  {
+    "kind": "tidejudicator",
+    "name": "The Blind Tide Judicator",
+    "level": 50,
+    "stats": [
+      420000,
+      2925,
+      2,
+      2.3
+    ],
+    "profile": [
+      1.2,
+      2.4,
+      7,
+      12
+    ],
+    "art": "judge",
+    "color": "#c2bbaa",
+    "boss": true,
+    "gold": 6000,
+    "material": "cathedral_tidejudicator",
+    "ranged": null,
+    "slam": 4.5,
+    "melee": 0,
+    "variant": 0
+  },
+  {
+    "kind": "hierophant",
+    "name": "High Hierophant Vael, Heart of the Tide",
+    "level": 50,
+    "stats": [
+      480000,
+      2275,
+      2.6,
+      2.2
+    ],
+    "profile": [
+      1,
+      2,
+      9,
+      15
+    ],
+    "art": "hierophant",
+    "color": "#b392ed",
+    "boss": true,
+    "gold": 6000,
+    "material": "cathedral_hierophant",
+    "ranged": [
+      14,
+      11,
+      "#be9dff",
+      1.25,
+      5,
+      0.32
+    ],
+    "slam": 4,
+    "melee": 4.8,
+    "variant": 0
+  }
+]

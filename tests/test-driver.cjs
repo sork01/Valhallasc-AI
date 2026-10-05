@@ -49,6 +49,32 @@ test('private driver: isolated storage, normal actions, resume, credentials, and
   await w.stop(); // Cleanup is idempotent.
 });
 
+test('private driver: each visitor keeps their own view when separate dungeon copies share a public zone', { timeout: 30000 }, async () => {
+  const w = new TestWorld();
+  w.startLevel = 50;
+  try {
+    await w.start();
+    await w.connect({ bot: 'FirstCopy' });
+    await w.connect({ bot: 'SecondCopy' });
+    await w.debug('FirstCopy', { op: 'teleport', zone: 10, x: 24, y: 140 });
+    await w.debug('SecondCopy', { op: 'teleport', zone: 10, x: 24, y: 140 });
+    const firstIds = w.views.get('FirstCopy').slimes.map(s => s.id);
+    const secondIds = w.views.get('SecondCopy').slimes.map(s => s.id);
+    assert.ok(firstIds.every(id => !secondIds.includes(id)));
+    await w.advance(300);
+    for (const bot of ['FirstCopy', 'SecondCopy']) {
+      assert.equal(w.player(bot).id, w.bots.get(bot).id);
+      assert.equal(w.player(bot).zone, 10);
+      assert.equal(w.inspect({ bot }).snapshot.id, w.bots.get(bot).id);
+    }
+    await w.debug('FirstCopy', { op: 'set_gold', gold: 1234 });
+    assert.equal(w.player('FirstCopy').gold, 1234);
+    assert.notEqual(w.player('SecondCopy').gold, 1234);
+    await w.debug('SecondCopy', { op: 'teleport', zone: 10, x: 24, y: 140 });
+    assert.deepEqual(w.views.get('SecondCopy').slimes.map(s => s.id), secondIds);
+  } finally { await w.stop(); }
+});
+
 test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and parent disconnect', { timeout: 30000 }, async () => {
   const transport = new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root,
     env: { VALHALLA_BIND: '0.0.0.0:8080', VALHALLA_DB: '/tmp/mcp-must-not-use.sqlite', VALHALLA_ORIGIN: 'https://production.invalid' }, stderr: 'pipe' });
@@ -65,7 +91,7 @@ test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and pare
     for (const name of ['start_world', 'stop_world', 'connect_bot', 'disconnect_bot', 'send_action', 'inspect_world', 'wait_world', 'list_scenarios', 'run_scenario']) {
       assert.ok(listed.tools.some(t => t.name === name), `Advertises ${name}`);
     }
-    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['skills', 'movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'stats', 'crags', 'bags', 'shortcuts', 'social', 'consumables', 'crags_quests', 'rimeveil', 'rime_quests', 'gloamfen', 'skaldholm', 'skaldholm_quests', 'fen_quests', 'gender', 'priest', 'hunter', 'cinderlord', 'gloomroot', 'mercenaries', 'progression_quests', 'resources', 'undervault', 'spark_travel', 'instance_pursuit', 'wyrdwood', 'wyrd_quests', 'bifrost', 'sky_quests', 'deep', 'deep_quests', 'nacrehold', 'nacre_quests']);
+    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['skills', 'movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'stats', 'crags', 'bags', 'shortcuts', 'social', 'consumables', 'crags_quests', 'rimeveil', 'rime_quests', 'gloamfen', 'skaldholm', 'skaldholm_quests', 'fen_quests', 'gender', 'priest', 'hunter', 'cinderlord', 'gloomroot', 'mercenaries', 'progression_quests', 'resources', 'undervault', 'spark_travel', 'instance_pursuit', 'wyrdwood', 'wyrd_quests', 'bifrost', 'sky_quests', 'deep', 'deep_quests', 'nacrehold', 'nacre_quests', 'cathedral']);
     const first = await call('start_world');
     url = first.url;
     assert.match(url, /^http:\/\/127\.0\.0\.1:\d+\/$/);
@@ -75,7 +101,7 @@ test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and pare
     assert.equal(rejected.isError, true);
     await call('send_action', { bot: 'McpMage', action: { type: 'equip', armor: 'runic', weapon: 'crystal' } });
     await call('send_action', { bot: 'McpMage', action: { type: 'equip', slots: { hands: 'none' } } });
-    await call('wait_world', { milliseconds: 100 });
+    await call('wait_world', { milliseconds: 300 });
     const slotsResult = await call('inspect_world', { bot: 'McpMage', events: 0 });
     assert.equal(slotsResult.snapshot.look.mageWeapon, 'none');
     await call('send_action', { bot: 'McpMage', action: { type: 'equip', slots: { hands: 'mage_weapon_ash' } } });

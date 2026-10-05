@@ -30,7 +30,7 @@ function tool(name, description, schema, handler, readOnly = false) {
 }
 const empty = z.object({}).strict();
 const startOptions = z.object({
-  startLevel: z.number().int().min(1).max(40).optional().describe('new characters begin at this level (VALHALLA_START_LEVEL)'),
+  startLevel: z.number().int().min(1).max(100).optional().describe('new characters begin at this level (VALHALLA_START_LEVEL)'),
   godMode: z.boolean().optional().describe('players take no damage; default on'),
   levelSpread: z.number().int().min(0).max(5).optional().describe('enemy levels roll within this distance of their default; 0 pins them (default 2)'),
 }).strict();
@@ -105,7 +105,7 @@ tool('kill_enemies', 'Defeat living enemies in the bot\'s zone through the real 
   forBot({ ids: z.array(z.number().int().min(0)).max(100).optional(), kind: z.string().optional(), radius: z.number().positive().optional(), max: z.number().int().min(1).max(100).default(50) }),
   ({ bot, ...options }) => kit.killEnemies(current(), bot, options));
 tool('spawn_enemy', 'Put an enemy exactly where a test needs it: kind (green, blue, pink, yellow, beetle, wisp, spider, wraith, golem, cinderlord), optional level (default: the kind\'s own, no spread), and either x/y or, by default, `distance` (3) east of the bot. Uses a free slot of that kind (a dead one first), on the nearest free ground in the bot\'s zone; it fights, drops and respawns like any other. Returns its id.',
-  forBot({ kind: z.enum(['green', 'blue', 'pink', 'yellow', 'beetle', 'wisp', 'spider', 'wraith', 'golem', 'cinderlord', 'gloomroot', 'thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking', 'boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir', 'galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc', 'draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw']), level: z.number().int().min(1).max(100).optional(),
+  forBot({ kind: z.enum(['green', 'blue', 'pink', 'yellow', 'beetle', 'wisp', 'spider', 'wraith', 'golem', 'cinderlord', 'gloomroot', 'thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking', 'boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir', 'galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc', 'draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw', 'tidetemplar', 'tidecantor', 'tideleech', 'reliccrab', 'abysszealot', 'bellkeeper', 'mournsister', 'rootabbot', 'choirmother', 'pearlwidow', 'glasscantor', 'relicwarden', 'coralregent', 'chainmarshal', 'starseraph', 'tidejudicator', 'hierophant']), level: z.number().int().min(1).max(100).optional(),
     x: z.number().finite().optional(), y: z.number().finite().optional(), distance: z.number().min(1.5).max(20).default(3) }),
   ({ bot, ...options }) => kit.spawnEnemy(current(), bot, options));
 tool('respawn_enemy', 'Bring a dead enemy back next tick (id), or call the King Slime now (king:true) instead of waiting 5-10 minutes.',

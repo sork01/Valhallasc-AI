@@ -9,6 +9,8 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
+#[cfg(test)]
+mod cathedral_tests;
 mod chime;
 mod consumables;
 mod debug;
@@ -296,6 +298,10 @@ struct Slime {
 impl Slime {
     // Health, damage, speed and body scale of a default-level enemy.
     fn stats(kind: &str) -> (f64, f64, f64, f64) {
+        if let Some(e) = crate::cathedral::enemy(kind) {
+            let [hp, damage, speed, scale] = e.stats;
+            return (hp, damage, speed, scale);
+        }
         match kind {
             "blue" => (80., 10., 2.4, 1.05),
             "pink" => (70., 9., 2.1, 1.),
@@ -361,6 +367,9 @@ impl Slime {
     }
     // The level an enemy of this kind has before its random spread is applied.
     pub fn default_level(kind: &str) -> u32 {
+        if let Some(e) = crate::cathedral::enemy(kind) {
+            return e.level;
+        }
         match kind {
             "blue" | "pink" => 3,
             "yellow" => 4,
@@ -407,6 +416,9 @@ impl Slime {
     }
     // Gold carried by a default-level enemy; ordinary slimes add a small random amount.
     fn base_gold(kind: &str) -> u32 {
+        if let Some(e) = crate::cathedral::enemy(kind) {
+            return e.gold;
+        }
         match kind {
             "big" => 30,
             "beetle" => 10,
@@ -456,6 +468,10 @@ impl Slime {
     }
     // Windup, recovery cooldown, charge speed, awareness radius.
     fn attack_profile(kind: &str) -> (f64, f64, f64, f64) {
+        if let Some(e) = crate::cathedral::enemy(kind) {
+            let [windup, cooldown, charge, awareness] = e.profile;
+            return (windup, cooldown, charge, awareness);
+        }
         match kind {
             "big" => (0.35, 0.85, 8., 7.5),
             "beetle" => (0.4, 1.1, 7.5, 7.),
@@ -509,6 +525,19 @@ impl Slime {
     /// fly at once (spread across `spread` radians). The shot is released when the windup ends, so a hero who walks
     /// out of the line in that moment is missed.
     fn ranged(kind: &str) -> Option<Ranged> {
+        if let Some(e) = crate::cathedral::enemy(kind) {
+            return e
+                .ranged
+                .as_ref()
+                .map(|(range, speed, color, size, shots, spread)| Ranged {
+                    range: *range,
+                    speed: *speed,
+                    color: color.as_str(),
+                    size: *size,
+                    shots: *shots,
+                    spread: *spread,
+                });
+        }
         let (range, speed, color, size, shots, spread) = match kind {
             "archer" => (10., 14., "#f1e2b0", 0.5, 1, 0.),
             "acolyte" => (10., 9., "#b46bff", 0.8, 1, 0.),
@@ -534,6 +563,9 @@ impl Slime {
     }
     /// A ranged kind that also fights toe to toe: it shoots only from farther than this.
     fn melee_inside(kind: &str) -> f64 {
+        if let Some(e) = crate::cathedral::enemy(kind) {
+            return e.melee;
+        }
         if matches!(kind, "hollowking" | "hrungnir" | "kraken") {
             4.5
         } else {
@@ -543,6 +575,9 @@ impl Slime {
     /// Radius of the ground-pound a kind does instead of a single blow (0: an ordinary strike). It lands when the
     /// windup ends, on everyone inside, so the wind-up is the warning.
     fn slam_radius(kind: &str) -> f64 {
+        if let Some(e) = crate::cathedral::enemy(kind) {
+            return e.slam;
+        }
         match kind {
             "gatewarden" => 3.6,
             "colossus" => 4.,
@@ -566,6 +601,9 @@ impl Slime {
     }
     /// Dungeon enemies keep one level (the Undervault is tuned for exactly level 20 heroes).
     fn fixed_level(kind: &str) -> bool {
+        if crate::cathedral::enemy(kind).is_some() {
+            return true;
+        }
         matches!(
             kind,
             "thrall" | "archer" | "acolyte" | "gatewarden" | "choir" | "colossus" | "hollowking"
@@ -801,7 +839,13 @@ impl World {
             // Ambushers sleep until their escort's journey passes them.
             return self.dormant_enemy(id);
         }
-        let level = self.roll_level(&spawn.kind);
+        let level = if crate::cathedral::enemy(&spawn.kind).is_some() {
+            self.maps[spawn.zone]
+                .levels
+                .map_or_else(|| Slime::default_level(&spawn.kind), |l| l[0])
+        } else {
+            self.roll_level(&spawn.kind)
+        };
         let mut enemy = Slime::with_level(id, &spawn, level);
         if spawn.kind == "big" {
             // Keep stable entity IDs while hiding kings until the world timer fires.
@@ -2398,7 +2442,18 @@ impl World {
             if is_boss(&kind) {
                 self.boss_loot(&credit_id, &kind, zone, point);
             }
-            if !self.maps[zone].final_boss.is_empty() && self.maps[zone].final_boss == kind {
+            let cathedral = crate::cathedral::enemy(&self.maps[zone].final_boss).is_some();
+            if (cathedral
+                && is_boss(&kind)
+                && self
+                    .slimes
+                    .iter()
+                    .filter(|s| s.zone == zone && is_boss(&s.kind))
+                    .all(|s| s.dead))
+                || (!cathedral
+                    && !self.maps[zone].final_boss.is_empty()
+                    && self.maps[zone].final_boss == kind)
+            {
                 self.clear_instance(zone, point);
             }
             let chance = self.random();
@@ -2414,7 +2469,7 @@ impl World {
     fn boss_loot(&mut self, owner: &str, kind: &str, zone: usize, point: Point) {
         for slots in boss_slots(kind) {
             let choice = self.random();
-            if let Some(piece) = boss_piece(slots, choice) {
+            if let Some(piece) = boss_piece_for(kind, slots, choice) {
                 self.loot_drop(owner, zone, point, &piece.id);
             }
         }
@@ -4577,7 +4632,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 10);
+        assert_eq!(zone_count(&w), 13);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -5180,7 +5235,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 10);
+        assert_eq!(zone_count(&w), 13);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -5773,7 +5828,7 @@ mod tests {
         let map = &w.maps[CITY];
         assert_eq!(
             zone_count(&w),
-            10,
+            13,
             "Skaldholm is the fifth map, the Undervault the sixth, the Wyrdwood the seventh, Bifrost Reach the eighth and Ran's Deep the ninth"
         );
         assert_eq!(map.name, "Skaldholm");
@@ -7479,7 +7534,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 10);
+        assert_eq!(zone_count(&w), 13);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));
@@ -7565,7 +7620,11 @@ mod tests {
     fn enemy_levels_roll_two_either_side_of_each_kinds_default() {
         let mut w = World::new(Store::open(std::path::Path::new(":memory:")).unwrap());
         for s in &w.slimes {
-            let default = Slime::default_level(&s.kind);
+            let default = if crate::cathedral::enemy(&s.kind).is_some() {
+                w.maps[s.zone].min_level
+            } else {
+                Slime::default_level(&s.kind)
+            };
             assert!(
                 (default.saturating_sub(2).max(1)..=default + 2).contains(&s.level),
                 "{} level {} is outside {default}±2",
@@ -7609,11 +7668,12 @@ mod tests {
         }
         // With no spread every enemy sits exactly on its default.
         let w = world();
-        assert!(
-            w.slimes
-                .iter()
-                .all(|s| s.level == Slime::default_level(&s.kind))
-        );
+        assert!(w.slimes.iter().all(|s| s.level
+            == if crate::cathedral::enemy(&s.kind).is_some() {
+                w.maps[s.zone].min_level
+            } else {
+                Slime::default_level(&s.kind)
+            }));
     }
 
     #[test]

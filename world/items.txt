@@ -9996,5 +9996,124 @@
     "attack": 8.2,
     "defense": 2.1,
     "source": "undervault"
+  },
+  {
+    "id": "cathedral_tidetemplar",
+    "name": "Drowned Templar Fragment",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 180
+  },
+  {
+    "id": "cathedral_tidecantor",
+    "name": "Bound Cantor Fragment",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 180
+  },
+  {
+    "id": "cathedral_tideleech",
+    "name": "Cloister Tide Leech Fragment",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 180
+  },
+  {
+    "id": "cathedral_reliccrab",
+    "name": "Reliquary Crab Fragment",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 180
+  },
+  {
+    "id": "cathedral_abysszealot",
+    "name": "Abyssal Zealot Fragment",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 180
+  },
+  {
+    "id": "cathedral_bellkeeper",
+    "name": "Orrin, the Sunken Bellkeeper Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "cathedral_mournsister",
+    "name": "Sister Veyra of the Stillwater Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "cathedral_rootabbot",
+    "name": "Abbot Thorne, the Kelpbound Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "cathedral_choirmother",
+    "name": "Elyss, Mother of the Bound Choir Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "cathedral_pearlwidow",
+    "name": "Neritha, the Pearl Widow Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "cathedral_glasscantor",
+    "name": "Ilyr, Cantor of Shattered Glass Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "cathedral_relicwarden",
+    "name": "Sarkhos, Warden of the Reliquary Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "cathedral_coralregent",
+    "name": "Queen Avariel, the Coral Regent Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "cathedral_chainmarshal",
+    "name": "Vargast, Marshal of the Drowned Chains Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "cathedral_starseraph",
+    "name": "Astrael, the Fallen Tide Seraph Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "cathedral_tidejudicator",
+    "name": "The Blind Tide Judicator Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "cathedral_hierophant",
+    "name": "High Hierophant Vael, Heart of the Tide Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
   }
 ]

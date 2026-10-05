@@ -1,0 +1,99 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "tidetemplar",
+    "tidecantor",
+    "tideleech",
+    "reliccrab",
+    "abysszealot",
+    "bellkeeper",
+    "mournsister",
+    "rootabbot",
+    "choirmother",
+    "pearlwidow",
+    "glasscantor",
+    "relicwarden",
+    "coralregent",
+    "chainmarshal",
+    "starseraph",
+    "tidejudicator",
+    "hierophant"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 6,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 12,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 8,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "tidetemplar": "1393179c70f6ee0b",
+    "tidecantor": "7845af0140d8dc0a",
+    "tideleech": "20e2b62b75f3be88",
+    "reliccrab": "a8419642f71ac1b0",
+    "abysszealot": "cb0a73c7bc2bce7a",
+    "bellkeeper": "a3b3974b95d39ce2",
+    "mournsister": "60d65f106f129db1",
+    "rootabbot": "b94ce497557f6f58",
+    "choirmother": "2ab498a9f80fafb3",
+    "pearlwidow": "91349de47fa05093",
+    "glasscantor": "d43114852d662c2f",
+    "relicwarden": "7dd589f75441ddff",
+    "coralregent": "a557dda281fa4a52",
+    "chainmarshal": "d833fbe4eb1492c8",
+    "starseraph": "b73d00d8a82a2ccb",
+    "tidejudicator": "276f78e7a19a5a24",
+    "hierophant": "4a0fe7a0aa66f501"
+  },
+  "tops": {
+    "tidetemplar": 69,
+    "tidecantor": 75,
+    "tideleech": 32,
+    "reliccrab": 47,
+    "abysszealot": 75,
+    "bellkeeper": 77,
+    "mournsister": 80,
+    "rootabbot": 81,
+    "choirmother": 69,
+    "pearlwidow": 60,
+    "glasscantor": 77,
+    "relicwarden": 60,
+    "coralregent": 77,
+    "chainmarshal": 77,
+    "starseraph": 76,
+    "tidejudicator": 69,
+    "hierophant": 80
+  }
+}

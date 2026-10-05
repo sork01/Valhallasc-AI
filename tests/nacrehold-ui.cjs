@@ -44,7 +44,7 @@ async function call(name, args = {}) {
   check(z.objects.filter(o => o.kind === 'nacrehouse').length === 120 && z.npcs.length === 30 && z.quests.length === 9, '120 houses, 30 people and nine quests');
   check(z.slimes.length === 0 && z.npcs.filter(n => n.route).length === 18, 'A safe city with eighteen swimming residents');
   check(z.npcs.filter(n => n.art !== 'stone').every(n => n.look.species === 'merfolk') && z.npcs.some(n => n.look.female) && z.npcs.some(n => n.look.female === false), 'Both mermaids and mermen, including the travel master');
-  check(z.futureInstance.name === 'The Drowned Cathedral' && z.futureInstance.status === 'sealed' && z.futureInstance.players === 5, 'The next five-player instance is named and visibly sealed');
+  check(z.futureInstance.name === 'The Drowned Cathedral' && z.futureInstance.status === 'open' && z.futureInstance.players === 5, 'The Cathedral has three open five-player wings');
   check(await page.evaluate(() => WORLD_MAP.zones[7].portals.some(p => p.id === 'nacre_gate' && p.to === 9)), 'Ran’s Deep includes the incoming Tideway');
   await stage(96, 164);
   check(await page.locator('#area-title b').textContent() === 'Nacrehold', 'The arrival banner names the city');
@@ -92,8 +92,8 @@ async function call(name, args = {}) {
   await stage(96, 32);
   await page.evaluate(() => Field.visitNpc('nacre_warden'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible' });
-  check((await page.locator('#npc-text').textContent()).includes('next level-40 five-player instance'), 'The warden explains the future Cathedral expedition');
-  check((await page.locator('#npc-text').textContent()).includes('future expedition'), 'The sealed entrance cannot pretend the instance is playable');
+  check((await page.locator('#npc-text').textContent()).includes('level 40'), 'The warden explains the open level-40 Cathedral wing');
+  check((await page.locator('#npc-text').textContent()).includes('Grand Nave'), 'The warden describes all three playable wings');
   await stage(90.7, 33.7);
   await debug({ op: 'set_gold', gold: 1000 });
   await page.evaluate(() => Field.visitNpc('nacre_stone'));
@@ -115,7 +115,7 @@ async function call(name, args = {}) {
   check((await page.locator('#quest-journal').textContent()).includes('A City Beneath the Waves'), 'The journal lists the accepted city quest');
   await page.evaluate(() => Quests.close());
   await debug({ op: 'explore_all' });
-  await page.waitForFunction(() => Field.explored?.length === 10 && Field.explored.every(x => x === 511));
+  await page.waitForFunction(() => Field.explored?.length === Field._debug.zones.length && Field.explored.every(x => x === 511));
   await page.keyboard.press('m');
   check((await page.locator('#worldmap').textContent()).includes('Nacrehold'), 'The world map includes the underwater city');
   await shot('nacrehold-world-map');
