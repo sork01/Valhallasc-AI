@@ -71,7 +71,8 @@
     if (!response.ok) throw new Error('Character sprite metadata could not be loaded');
     const meta = await response.json(), parts = {}, loading = new Map();
     if (window.__valhallaTestSprites === true) return stubSource(meta);
-    for (const [part, files] of Object.entries(meta.parts)) if (!LAZY.has(part)) parts[part] = await decodePart(meta, files);
+    const lazy = new Set([...LAZY, ...(meta.lazyParts || [])]);
+    for (const [part, files] of Object.entries(meta.parts)) if (!lazy.has(part)) parts[part] = await decodePart(meta, files);
     const ensure = part => {
       if (parts[part] || !meta.parts[part]) return Promise.resolve();
       if (!loading.has(part)) loading.set(part, decodePart(meta, meta.parts[part]).then(frames => { parts[part] = frames; }, error => { console.warn('Equipment art could not be loaded', part, error); }));
@@ -89,7 +90,8 @@
     if (!catalog || catalogSize !== items.length) { catalog = new Map(items.filter(i => i.variant).map(i => [`${i.kind}|${i.variant}`, i])); catalogSize = items.length; }
     return catalog;
   };
-  const hasGear = (table, kind, variant) => Object.hasOwn(table, variant) || gearIndex().has(`${kind}|${variant}`);
+  const PROGRESSION = ['regearl25', 'regearl30', 'regearl35', 'regearl40', 'regearl45', 'regearl50', 'regearcloister', 'regearreliquary', 'regearnave'];
+  const hasGear = (table, kind, variant) => Object.hasOwn(table, variant) || PROGRESSION.includes(variant) || gearIndex().has(`${kind}|${variant}`);
   const resolve = (slot, variant) => {
     const i = variant && variant !== 'none' ? gearIndex().get(`${KIND[slot]}|${variant}`) : null;
     return { art: i?.art || variant, tint: i?.tint || null };
@@ -113,7 +115,7 @@
   // A head, shoulder or glove piece is the class's own tier or the shared generic piece; pants, necklace and ring are generic only.
   const CLASS_SLOTS = ['head', 'shoulders', 'gloves'];
   const pieces = (C, look) => Object.fromEntries(Object.entries(GENERIC).map(([slot, generic]) => {
-    const allowed = CLASS_SLOTS.includes(slot) ? [...(C.TIERS || []), generic] : [generic];
+    const allowed = [...(CLASS_SLOTS.includes(slot) ? [...(C.TIERS || []), generic] : [generic]), ...PROGRESSION];
     return [slot, allowed.includes(resolve(slot, look?.[slot]).art) ? look[slot] : 'none'];
   }));
   class MageSprite {

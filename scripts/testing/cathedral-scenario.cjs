@@ -3,6 +3,7 @@ const path = require('node:path');
 const kit = require('./tools.cjs');
 const map = JSON.parse(fs.readFileSync(path.join(__dirname, '../../world/map.txt'), 'utf8'));
 const catalog = JSON.parse(fs.readFileSync(path.join(__dirname, '../../world/cathedral.txt'), 'utf8'));
+const items = JSON.parse(fs.readFileSync(path.join(__dirname, '../../world/items.txt'), 'utf8'));
 const bossKind = kind => catalog.find(e => e.kind === kind)?.boss;
 const levels = JSON.parse(fs.readFileSync(path.join(__dirname, '../../world/levels.txt'), 'utf8'));
 const totalXp = p => p.xp + levels.slice(0, p.level - 1).reduce((a,b)=>a+b,0);
@@ -68,6 +69,9 @@ module.exports = {
         const rolls=await w.waitFor(()=>{
           const all=w.events.filter(e=>!earlier.has(e)&&e.bot===bot&&e.type==='roll'&&e.op==='start');return all.length>=count&&all;
         },5000,'Guaranteed shared boss loot rolls');
+        const source=`cathedral_${z.cathedralWing}`;
+        const exclusiveRolls=rolls.filter(r=>items.find(i=>i.id===r.item)?.source===source);
+        check(exclusiveRolls.length===count && exclusiveRolls.every(r=>items.find(i=>i.id===r.item).requiredLevel===level),`${boss.kind}: guaranteed exclusive level-${level} wing rewards`);
         check(rolls.every(r=>w.events.some(e=>!earlier.has(e)&&e.bot===mate&&e.type==='roll'&&e.op==='start'&&e.id===r.id)),`${boss.kind}: one shared roll per pool, both nearby party members eligible`);
         for (const r of rolls) { await w.action(bot,{type:'roll',id:r.id,choice:'greed'});await w.action(mate,{type:'roll',id:r.id,choice:'pass'}); }
         const corpse=view(bot).slimes.find(s=>s.id===boss.id);
@@ -75,6 +79,8 @@ module.exports = {
         await w.waitFor(()=>w.player(bot).gold+w.player(mate).gold>goldBefore,5000,'Collect real shared boss gold');
         const material=catalog.find(e=>e.kind===boss.kind).material;
         await w.waitFor(()=>[bot,mate].some(b=>w.player(b).inventory.some(i=>i.item===material)),5000,'Collect real boss material');
+        await w.waitFor(()=>exclusiveRolls.every(r=>w.player(bot).inventory.some(i=>i.item===r.item)),5000,'Collect won Cathedral equipment');
+        check(exclusiveRolls.every(r=>w.player(bot).inventory.some(i=>i.item===r.item)),`${boss.kind}: Greed winner collects the exclusive equipment`);
         check([bot,mate].some(b=>w.player(b).inventory.some(i=>i.item===material)),`${boss.kind}: shared gold and its unique material collect through real movement`);
         await w.action(bot,{type:'stop'});
         await w.waitFor(()=>view(bot).instance.cleared===(n===3));
@@ -95,5 +101,6 @@ module.exports = {
     }
     await w.restart();
     check(w.player(bot).zone===9 && w.player(mate).zone===9,'Rust restart preserves safe character positions');
+    check(['cloister','reliquary','nave'].every(wing=>w.player(bot).inventory.some(s=>items.find(i=>i.id===s.item)?.source===`cathedral_${wing}`)), 'Won gear from all three wings persists across reconnect and Rust restart');
   },
 };

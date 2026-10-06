@@ -11,6 +11,8 @@ pub struct Enemy {
     pub boss: bool,
     pub gold: u32,
     pub material: String,
+    #[serde(rename = "lootSource")]
+    pub loot_source: Option<String>,
     pub ranged: Option<(f64, f64, String, f64, u32, f64)>,
     pub slam: f64,
     pub melee: f64,

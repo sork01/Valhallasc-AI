@@ -255,12 +255,9 @@ fn cathedral_encounters_have_materials_fixed_levels_distinct_profiles_and_guaran
                 for n in 0..20 {
                     let i = boss_piece_for(&e.kind, slots, n as f64 / 20.).unwrap();
                     assert_eq!(i.rarity, "rare");
-                    assert!(i.required_level <= e.level);
-                    assert!(!ITEMS.iter().any(|other| other.rarity == "rare"
-                        && other.source.is_none()
-                        && slots.contains(&other.kind.as_str())
-                        && other.required_level <= e.level
-                        && other.required_level > i.required_level));
+                    assert_eq!(i.required_level, e.level);
+                    assert_eq!(i.source.as_deref(), e.loot_source.as_deref());
+                    assert!(i.source.as_deref().unwrap().starts_with("cathedral_"));
                     assert!(slots.contains(&i.kind.as_str()));
                 }
             }
@@ -293,6 +290,20 @@ fn cathedral_final_boss_first_does_not_clear_but_all_four_bosses_open_only_their
             let xp = w.slimes[id].xp;
             let before = lifetime_xp(&w.players[&1].character);
             w.hit_slime(id, 1, 1e9, false);
+            let encounter = crate::cathedral::enemy(&w.slimes[id].kind).unwrap();
+            let loot: Vec<_> = w
+                .drops
+                .iter()
+                .filter(|d| d.zone == zone && d.point().distance(point) < 1.)
+                .filter_map(|d| d.item.as_deref().and_then(item))
+                .filter(|i| i.source.as_deref() == encounter.loot_source.as_deref())
+                .collect();
+            assert_eq!(
+                loot.len(),
+                boss_slots(&encounter.kind).len(),
+                "guaranteed exclusive pieces from the real kill path"
+            );
+            assert!(loot.iter().all(|i| i.required_level == encounter.level));
             assert!(w.slimes[id].dead && w.slimes[id].respawn > 1e8);
             assert_eq!(w.instance_cleared(zone), n == 3);
             assert_eq!(lifetime_xp(&w.players[&1].character), before + xp as u64);

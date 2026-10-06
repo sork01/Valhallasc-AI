@@ -18,7 +18,7 @@ pub struct Item {
     pub name: String,
     pub kind: String,
     pub rarity: String,
-    /// Character level needed to wear the piece (1, 5, 10, 15 or 20 for gear). Wearing it earlier is refused, and
+    /// Character level needed to wear the piece (1 or a five-level step through 50). Wearing it earlier is refused, and
     /// a piece worn above the character's level (a level lost to a death) adds nothing until the level is back.
     #[serde(default = "first_level", rename = "requiredLevel")]
     pub required_level: u32,
@@ -53,7 +53,7 @@ pub struct Item {
     /// level allows, at its `price`.
     #[serde(default)]
     pub family: Option<String>,
-    /// Gear that only one source hands out (`undervault`: the dungeon's bosses). It is never part of the ordinary drop pool.
+    /// Gear that only one dungeon's bosses hand out. It is never part of the ordinary drop pool.
     #[serde(default)]
     pub source: Option<String>,
     #[serde(default)]
@@ -95,7 +95,7 @@ pub fn is_gear(i: &Item) -> bool {
     GEAR_KINDS.contains(&i.kind.as_str())
 }
 /// The highest required level an enemy of this level can drop: its own level rounded up to the next gear step, plus
-/// one more step, so an early enemy rewards what the next zone is about and the last zones reach level 20.
+/// one more step, so an early enemy can reward gear for the next zone.
 pub fn max_drop_level(enemy_level: u32) -> u32 {
     enemy_level.div_ceil(5) * 5 + 5
 }
@@ -228,7 +228,7 @@ pub fn is_boss(kind: &str) -> bool {
     }
     matches!(kind, "gatewarden" | "choir" | "colossus" | "hollowking")
 }
-/// The slot pools a boss drops from: one shared blue level-20 piece per pool, chosen across all classes.
+/// The slot pools a boss drops from: one shared wing-level blue piece per pool, chosen across all classes.
 pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
     if let Some(e) = crate::cathedral::enemy(kind) {
         if !e.boss {
@@ -243,18 +243,17 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
                     "shoulders",
                     "gloves",
                     "pants",
+                    "necklace",
                     "accessory",
                 ],
             ]
         } else {
-            &[&[
-                "weapon",
-                "headgear",
-                "shoulders",
-                "gloves",
-                "pants",
-                "accessory",
-            ]]
+            match kind {
+                "bellkeeper" | "pearlwidow" | "chainmarshal" => &[&["headgear", "shoulders"]],
+                "mournsister" | "glasscantor" | "starseraph" => &[&["gloves", "pants", "necklace"]],
+                "rootabbot" | "relicwarden" | "tidejudicator" => &[&["weapon", "accessory"]],
+                _ => &[],
+            }
         };
     }
     match kind {
@@ -289,27 +288,18 @@ pub fn boss_piece(slots: &[&str], choice: f64) -> Option<&'static Item> {
         .collect();
     pool.get((choice * pool.len() as f64) as usize).copied()
 }
-/// Cathedral bosses guarantee the strongest existing blue gear below the wing's level; preserve the gear catalog.
+/// Cathedral bosses guarantee their own wing's exclusive blue set at its exact required level.
 pub fn boss_piece_for(kind: &str, slots: &[&str], choice: f64) -> Option<&'static Item> {
     let Some(e) = crate::cathedral::enemy(kind) else {
         return boss_piece(slots, choice);
     };
-    let level = ITEMS
-        .iter()
-        .filter(|i| {
-            i.rarity == "rare"
-                && i.required_level <= e.level
-                && i.source.is_none()
-                && slots.contains(&i.kind.as_str())
-        })
-        .map(|i| i.required_level)
-        .max()?;
+    let source = e.loot_source.as_deref()?;
     let pool: Vec<_> = ITEMS
         .iter()
         .filter(|i| {
             i.rarity == "rare"
-                && i.required_level == level
-                && i.source.is_none()
+                && i.required_level == e.level
+                && i.source.as_deref() == Some(source)
                 && slots.contains(&i.kind.as_str())
         })
         .collect();
@@ -1032,6 +1022,7 @@ mod tests {
                     && i.kind == kind
                     && i.required_level == level
                     && i.rarity == rarity
+                    && i.source.is_none()
             })
         };
         let classes = [
@@ -1041,9 +1032,9 @@ mod tests {
             Class::Priest,
             Class::Hunter,
         ];
-        for level in [1, 5, 10, 15, 20] {
+        for level in std::iter::once(1).chain((5..=50).step_by(5)) {
             for rarity in ["common", "uncommon", "rare", "epic"] {
-                let purple_level = matches!(level, 10 | 20);
+                let purple_level = level % 10 == 0;
                 for class in classes {
                     for kind in ["armor", "headgear", "shoulders", "gloves", "weapon"] {
                         assert_eq!(
@@ -1081,6 +1072,166 @@ mod tests {
                     })
                     .unwrap_or_else(|| panic!("{} recolours {art}, which does not exist", i.id));
                 assert!(base.art.is_none(), "{} recolours a recolouring", i.id);
+            }
+        }
+    }
+    #[test]
+    fn cathedral_sets_cover_every_slot_and_only_their_own_bosses_can_award_them() {
+        for (source, level) in [
+            ("cathedral_cloister", 40),
+            ("cathedral_reliquary", 45),
+            ("cathedral_nave", 50),
+        ] {
+            let pieces: std::collections::BTreeSet<_> = ITEMS
+                .iter()
+                .filter(|i| i.source.as_deref() == Some(source))
+                .map(|i| i.id.as_str())
+                .collect();
+            assert_eq!(
+                pieces.len(),
+                28,
+                "{source}: five class slots and three shared slots"
+            );
+            let mut reachable = std::collections::BTreeSet::new();
+            for e in crate::cathedral::ENEMIES
+                .iter()
+                .filter(|e| e.loot_source.as_deref() == Some(source))
+            {
+                assert!(e.boss);
+                assert_eq!(e.level, level);
+                for slots in boss_slots(&e.kind) {
+                    for n in 0..100 {
+                        let i = boss_piece_for(&e.kind, slots, n as f64 / 100.).unwrap();
+                        assert_eq!(i.required_level, level);
+                        assert_eq!(i.source.as_deref(), Some(source));
+                        assert_eq!(i.rarity, "rare");
+                        reachable.insert(i.id.as_str());
+                        let base_id = i.id.replace(
+                            &format!("_l{level}_{}", &source[10..]),
+                            &format!("_l{level}_blue"),
+                        );
+                        let base = item(&base_id).unwrap();
+                        assert!(
+                            (i.attack - base.attack * 1.15).abs() <= 0.051,
+                            "{} attack",
+                            i.id
+                        );
+                        assert!(
+                            (i.defense - base.defense * 1.15).abs() <= 0.051,
+                            "{} defense",
+                            i.id
+                        );
+                    }
+                }
+            }
+            assert_eq!(reachable, pieces, "{source}: no reward is unreachable");
+        }
+        for e in crate::cathedral::ENEMIES.iter().filter(|e| !e.boss) {
+            assert!(e.loot_source.is_none());
+            assert!(boss_piece_for(&e.kind, &["weapon"], 0.).is_none());
+        }
+        // Walk every ordinary drop-pool cell, including all high-level pieces. Source gear must never leak in.
+        for rarity in ["common", "uncommon", "rare", "epic"] {
+            let eligible: std::collections::BTreeSet<_> = ITEMS
+                .iter()
+                .filter(|i| is_gear(i) && i.rarity == rarity && !i.starter && i.source.is_none())
+                .map(|i| i.id.as_str())
+                .collect();
+            let drops: std::collections::BTreeSet<_> = (0..eligible.len())
+                .map(|n| {
+                    roll_equipment(
+                        "hierophant",
+                        50,
+                        roll_for("hierophant", rarity),
+                        (n as f64 + 0.5) / eligible.len() as f64,
+                    )
+                    .unwrap()
+                    .id
+                    .as_str()
+                })
+                .collect();
+            assert_eq!(
+                drops, eligible,
+                "{rarity}: only world gear in ordinary rolls"
+            );
+            assert!(
+                drops
+                    .iter()
+                    .any(|id| item(id).unwrap().required_level == 50)
+            );
+        }
+    }
+    #[test]
+    fn level_25_through_50_gear_enforces_requirements_updates_look_stats_and_survives_saves() {
+        for i in ITEMS.iter().filter(|i| is_gear(i) && i.required_level > 20) {
+            let slot = match i.kind.as_str() {
+                "armor" => "chest",
+                "weapon" => "hands",
+                "accessory" => "accessory1",
+                kind => kind,
+            };
+            let mut c = character();
+            c.look.class = i.class.unwrap_or(Class::Warrior);
+            c.inventory.clear();
+            c.seed_inventory();
+            c.add_item(&i.id, 1);
+            c.level = i.required_level - 1;
+            let before = c.clone();
+            assert!(
+                c.equip_slots(&slots(&[(slot, &i.id)])).is_err(),
+                "{} below level",
+                i.id
+            );
+            assert_eq!(c.stats(), before.stats());
+            assert_eq!(c.quantity(&i.id), 1);
+            c.level = i.required_level;
+            c.equip_slots(&slots(&[(slot, "none")])).unwrap();
+            let naked = c.stats();
+            c.equip_slots(&slots(&[(slot, &i.id)])).unwrap();
+            let equipped = c.stats();
+            assert!(
+                (equipped.0 - naked.0 - i.attack).abs() < 1e-8,
+                "{} attack",
+                i.id
+            );
+            assert!(
+                (equipped.1 - naked.1 - i.defense).abs() < 1e-8,
+                "{} defense",
+                i.id
+            );
+            assert!(c.look.validate().is_ok(), "{} worn look", i.id);
+            let saved: Character =
+                serde_json::from_str(&serde_json::to_string(&c).unwrap()).unwrap();
+            assert_eq!(saved.stats(), equipped);
+            assert_eq!(
+                serde_json::to_value(&saved.look).unwrap(),
+                serde_json::to_value(&c.look).unwrap()
+            );
+            c.level -= 1;
+            let worn = c.clone();
+            c.equip_slots(&slots(&[(slot, "none")])).unwrap();
+            assert_eq!(
+                worn.stats(),
+                c.stats(),
+                "{} dormant after a level loss",
+                i.id
+            );
+            if let Some(class) = i.class {
+                c = character();
+                c.level = i.required_level;
+                c.look.class = if class == Class::Mage {
+                    Class::Warrior
+                } else {
+                    Class::Mage
+                };
+                c.inventory.clear();
+                c.seed_inventory();
+                c.add_item(&i.id, 1);
+                assert!(
+                    c.equip_slots(&slots(&[(slot, &i.id)])).is_err(),
+                    "{} wrong class",
+                    i.id
+                );
             }
         }
     }
@@ -1165,7 +1316,7 @@ mod tests {
                 continue;
             }
             assert!(
-                [1, 5, 10, 15, 20].contains(&i.required_level),
+                i.required_level == 1 || (i.required_level <= 50 && i.required_level % 5 == 0),
                 "{} needs level {}",
                 i.id,
                 i.required_level
@@ -1175,7 +1326,12 @@ mod tests {
             }
             used.insert(i.required_level);
         }
-        assert_eq!(used.into_iter().collect::<Vec<_>>(), [1, 5, 10, 15, 20]);
+        assert_eq!(
+            used.into_iter().collect::<Vec<_>>(),
+            std::iter::once(1)
+                .chain((5..=50).step_by(5))
+                .collect::<Vec<_>>()
+        );
     }
     #[test]
     fn gear_above_your_level_cannot_be_put_on_and_adds_nothing() {
@@ -1279,7 +1435,7 @@ mod tests {
                 5 => 1.6,
                 10 => 2.4,
                 15 => 3.2,
-                _ => 4.,
+                level => 0.16 * level as f64 + 0.8,
             }
         };
         let tier = |rarity: &str| -> f64 {
@@ -1312,12 +1468,8 @@ mod tests {
                 _ => 1.,
             };
             let total = i.attack + i.defense;
-            // Undervault gear is its blue set recoloured and made 15% stronger.
-            let bonus = if i.source.as_deref() == Some("undervault") {
-                1.15
-            } else {
-                1.
-            };
+            // Instance gear is its wing's blue set recoloured and made 15% stronger.
+            let bonus = if i.source.is_some() { 1.15 } else { 1. };
             let expected = base * factor(i.required_level) * tier(&i.rarity) * bonus;
             assert!(
                 (total - expected).abs() <= if bonus > 1. { 0.2 } else { 0.1 } + 1e-9,
@@ -1354,7 +1506,7 @@ mod tests {
                 );
             }
         }
-        // A step up in rarity never beats a step up of five levels, and a higher level always beats a lower one.
+        // Preserve the original low-level curve; later levels continue that same linear growth.
         assert!(factor(5) / factor(1) > 1.175 && factor(20) / factor(15) > 1.175);
     }
     #[test]

@@ -98,6 +98,34 @@ async function call(name, args = {}) {
   await page.locator('#npc-close').click(); await page.locator('#inventory-open').click();
   await page.keyboard.press('Escape');
   check(await page.locator('#equipment').isHidden(), 'Escape closes inventory');
+  // New tiers: use test-only grants for prerequisites, then the actual bag controls and server equip path.
+  const newGear = await page.evaluate(() => [25, 30, 35, 40, 45, 50].map(level => WORLD_ITEMS.find(i => i.class === 'mage' && i.kind === 'weapon' && i.rarity === 'rare' && !i.source && i.requiredLevel === level))
+    .concat(['cloister', 'reliquary', 'nave'].map(wing => WORLD_ITEMS.find(i => i.class === 'mage' && i.kind === 'armor' && i.source === 'cathedral_' + wing))));
+  for (const i of newGear) {
+    await page.evaluate(i => {
+      Online.send({ type: 'debug', ref: 1, command: { op: 'give_item', item: i.id, quantity: 1 } });
+      Online.send({ type: 'debug', ref: 2, command: { op: 'set_level', level: i.requiredLevel - 1 } });
+    }, i);
+    await page.waitForFunction(i => Inventory.quantity(i.id) === 1 && Field.hero.level === i.requiredLevel - 1, i);
+    await page.keyboard.press('e');
+    await page.locator(`#inventory-list [data-item="${i.id}"] button`).click();
+    check(await page.locator('#bag-details [data-action="equip"]').isDisabled(), `${i.name}: level ${i.requiredLevel - 1} cannot equip`);
+    check(await page.locator('#bag-details .item-restriction').textContent().then(t => t.includes(`Requires level ${i.requiredLevel}`)), `${i.name}: correct level requirement displayed`);
+    await page.evaluate(level => Online.send({ type: 'debug', ref: 3, command: { op: 'set_level', level } }), i.requiredLevel);
+    await page.waitForFunction(level => Field.hero.level === level, i.requiredLevel);
+    await page.waitForFunction(() => document.querySelector('#bag-details [data-action="equip"]')?.disabled === false);
+    await page.locator('#bag-details [data-action="equip"]').click();
+    const slot = i.kind === 'weapon' ? 'hands' : 'chest';
+    await page.waitForFunction(i => Field.hero.look[i.kind === 'weapon' ? 'mageWeapon' : 'mageArmor'] === i.variant, i);
+    check(await page.locator(`[data-slot="${slot}"] b`).textContent() === i.name, `${i.name}: owned piece equips through the server`);
+    check(await page.locator(`[data-slot="${slot}"] .item-art`).evaluate((n, i) => n.dataset.icon === i.id && getComputedStyle(n).backgroundImage.includes('items.png') && n.style.filter.includes(`hue-rotate(${i.tint.hue}deg)`), i), `${i.name}: worn slot uses its matching recoloured icon`);
+    await page.keyboard.press('Escape');
+  }
+  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.waitForFunction(() => Online.connected && Field.hero.look.mageWeapon === 'ash_l50_blue' && Field.hero.look.mageArmor === 'apprentice_l50_nave', null, { timeout: 60000 });
+  check(await page.evaluate(() => Inventory.quantity('mage_weapon_ash_l50_blue') === 1 && Inventory.quantity('mage_armor_apprentice_l50_nave') === 1), 'Level-50 world gear and Cathedral gear persist through browser reload');
+  await page.keyboard.press('e');
+  await page.screenshot({ path: path.join(world.artifacts, 'inventory-gear-50-cathedral.png') });
   check(errors.length === 0, `No browser runtime errors: ${errors.join('; ')}`);
 
   // Display-only fixtures use the real UI modules without a game connection.

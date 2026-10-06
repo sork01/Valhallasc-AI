@@ -1,10 +1,10 @@
-"""Builds every piece of gear in world/items.txt: 17 sets by required level and rarity, with their stats.
+"""Builds the level 1–50 gear ladder and exclusive Undervault/Cathedral sets in world/items.txt.
 
 Run `python3 scripts/gear_levels.py`, then `node scripts/sync-world.cjs` and rebuild Rust. It is idempotent: it keeps
 every non-gear item and every original piece (an entry with no `art` key) and regenerates the rest.
 
-SETS. Required levels come in steps of five (1, 5, 10, 15, 20). Every level has a gray, a green and a blue set; purple
-exists only at 10 and 20 (every other step). That is 17 sets. A set holds, per class, a chest, headgear, shoulders,
+SETS. Required levels come in steps of five (1, 5, ... 50). Every level has a gray, a green and a blue set; purple
+exists at every multiple of ten. That is 38 sets. A set holds, per class, a chest, headgear, shoulders,
 gloves and weapon, plus the shared (class-independent) pants, necklace and ring.
 
 ART. No new art is drawn. A generated piece names the original piece it recolours (`art`: the original's variant) and
@@ -16,19 +16,20 @@ cells. The three shared headgear/shoulders/gloves pieces are extras outside the 
 
 STATS follow WoW's tiers. Gray has no stat budget: only base armor (defense) or weapon damage (attack). Green keeps
 that base and adds a secondary stat; blue is 17.5% over green, purple 17.5% over blue, orange 17.5% over purple. Each
-five-level step is worth more than a tier.
+level factor follows the existing linear ladder (0.16 per level after level 5).
 """
 import json
 import pathlib
+from cathedral_content import WINGS
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ITEMS = ROOT / 'world' / 'items.txt'
 
-LEVELS = (1, 5, 10, 15, 20)
+LEVELS = (1, *range(5, 51, 5))
 RARITIES = ['common', 'uncommon', 'rare', 'epic']       # gray, green, blue, purple
 COLOUR = {'common': 'gray', 'uncommon': 'green', 'rare': 'blue', 'epic': 'purple'}
-SETS = [(level, rarity) for level in LEVELS for rarity in RARITIES if rarity != 'epic' or level in (10, 20)]
-LEVEL_FACTOR = {1: 1.0, 5: 1.6, 10: 2.4, 15: 3.2, 20: 4.0}
+SETS = [(level, rarity) for level in LEVELS for rarity in RARITIES if rarity != 'epic' or level % 10 == 0]
+LEVEL_FACTOR = {level: 1.0 if level == 1 else round(0.16 * level + 0.8, 1) for level in LEVELS}
 TIER_STEP = 1.175
 GREEN_BUDGET = 1.25
 SECONDARY_SHARE = 0.2
@@ -61,8 +62,14 @@ WORDS = {
     (10, 'common'): 'Battered', (10, 'uncommon'): 'Reinforced', (10, 'rare'): 'Runed', (10, 'epic'): 'Exalted',
     (15, 'common'): 'Faded', (15, 'uncommon'): 'Veteran', (15, 'rare'): 'Radiant',
     (20, 'common'): 'Ancient', (20, 'uncommon'): 'Heroic', (20, 'rare'): 'Celestial', (20, 'epic'): 'Mythic',
+    (25, 'common'): 'Brambleworn', (25, 'uncommon'): 'Thornforged', (25, 'rare'): 'Wyrdbound',
+    (30, 'common'): 'Windworn', (30, 'uncommon'): 'Galesworn', (30, 'rare'): 'Prismatic', (30, 'epic'): 'Stormcrowned',
+    (35, 'common'): 'Saltworn', (35, 'uncommon'): 'Tideforged', (35, 'rare'): 'Maelstrom',
+    (40, 'common'): 'Drowned', (40, 'uncommon'): 'Pearlbound', (40, 'rare'): 'Nacreous', (40, 'epic'): 'Tidesovereign',
+    (45, 'common'): 'Coralworn', (45, 'uncommon'): 'Reefguard', (45, 'rare'): 'Abyssal',
+    (50, 'common'): 'Timeworn', (50, 'uncommon'): 'Starforged', (50, 'rare'): 'Empyrean', (50, 'epic'): 'Ascendant',
 }
-LEVEL_HUE = {1: 0, 5: 70, 10: 140, 15: 210, 20: 280}
+LEVEL_HUE = {level: (index * 70) % 360 for index, level in enumerate(LEVELS)}
 RARITY_TINT = {   # hue offset, saturate, brightness
     'common': (0, 0.5, 0.9), 'uncommon': (0, 1.0, 1.0), 'rare': (30, 1.15, 1.1), 'epic': (60, 1.2, 1.15),
 }
@@ -72,7 +79,11 @@ def tint(level, rarity, shared=False):
     """Hue turns with the level and the tier. Shared pieces turn 20 more degrees, so none is the untouched original
     (the level 1 green set would be, and the original shared pieces sit in other cells)."""
     offset, saturate, brightness = RARITY_TINT[rarity]
-    return {'hue': (LEVEL_HUE[level] + offset + (20 if shared else 0)) % 360, 'saturate': saturate, 'brightness': brightness}
+    hue = (LEVEL_HUE[level] + offset + (20 if shared else 0)) % 360
+    # The hue wheel wraps at level 50 for shared green pieces; keep every generated piece distinct from its base.
+    if hue == 0 and saturate == brightness == 1:
+        hue = 5
+    return {'hue': hue, 'saturate': saturate, 'brightness': brightness}
 
 
 def budget(kind, cls, rarity, level):
@@ -104,11 +115,12 @@ def finish(i, level, rarity):
 
 
 def main():
-    items = [i for i in json.loads(ITEMS.read_text()) if 'art' not in i]
+    existing = json.loads(ITEMS.read_text())
+    items = [i for i in existing if 'art' not in i]
     gear = {'armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'}
     out, bases = [], {}
     for i in items:
-        if i['kind'] not in gear:
+        if i['kind'] not in gear or i['rarity'] == 'gm':
             out.append(i)
             continue
         if i.get('starter'):
@@ -128,8 +140,70 @@ def main():
         for kind in SHARED_KINDS:
             add(out, bases, None, kind, level, rarity)
     out.extend(vault_pieces(out))
+    out.extend(cathedral_pieces(out))
+    # Keep existing catalog order stable: migrations, item-icon cells and reviews need no reshuffle.
+    order = {i['id']: n for n, i in enumerate(existing)}
+    out.sort(key=lambda i: order.get(i['id'], len(order)))
+    # Redesigned pieces are wired one at a time; rarity recolors the new base for that level.
+    import gear_art_catalog
+    gear_art_catalog.apply(out)
     ITEMS.write_text(json.dumps(out, indent=2, ensure_ascii=False) + '\n')
     print(len(out), 'items,', len(SETS), 'sets')
+
+
+# Cathedral rewards use the wing's exact level, with the Undervault's 15% dungeon bonus.
+# A source locks each set to its own wing's bosses; every slot (including necklaces) has a reward.
+CATHEDRAL_BONUS = 1.15
+CATHEDRAL_TINTS = {
+    'cloister': {'hue': 175, 'saturate': 0.85, 'brightness': 1.18},
+    'reliquary': {'hue': 325, 'saturate': 1.1, 'brightness': 1.23},
+    'nave': {'hue': 245, 'saturate': 1.35, 'brightness': 1.05},
+}
+CATHEDRAL_NAMES = {
+    'cloister': ('Stillwater', 'Kelpweaver', 'Drowned Whisper', 'Bound Choir', 'Tidereed'),
+    'reliquary': ('Coralguard', 'Pearlweaver', 'Glassveil', 'Pearl Cantor', 'Reefstalker'),
+    'nave': ('Abyssal Oath', 'Drowned Star', 'Nighttide', 'Freed Choir', 'Voidwatcher'),
+}
+CATHEDRAL_WEAPONS = {
+    'cloister': ('Bellkeeper Sword & Shield', 'Stillwater Staff', 'Kelpglass Daggers', 'Bound Choir Mace', 'Tidereed Bow'),
+    'reliquary': ('Coral Regent Sword & Shield', 'Shattered Pearl Staff', 'Pearl Widow Fangs', 'Reliquary Mace', 'Coralspine Bow'),
+    'nave': ('Judicator Sword & Shield', 'Drowned Star Staff', 'Nighttide Daggers', 'Heart of the Tide Mace', 'Seraph Bow'),
+}
+CATHEDRAL_SHARED = {
+    'cloister': ('Stillwater Waders', 'Bellkeeper Pendant', 'Bound Choir Signet'),
+    'reliquary': ('Coralguard Leggings', 'Pearl Widow Pendant', 'Coral Regent Signet'),
+    'nave': ('Abyssal Procession Leggings', 'Heart of the Tide Pendant', 'Hierophant Signet'),
+}
+SLOT_NAMES = {'armor': 'Vestments', 'headgear': 'Crown', 'shoulders': 'Mantle', 'gloves': 'Grips'}
+
+
+def cathedral_pieces(out):
+    pieces = []
+    for wing in WINGS:
+        level, name = wing['level'], wing['id']
+        for i in out:
+            if i.get('source') or i['rarity'] != 'rare' or i.get('requiredLevel') != level:
+                continue
+            if i['kind'] not in CLASS_KINDS + SHARED_KINDS:
+                continue
+            v = dict(i)
+            suffix = f'_l{level}_blue'
+            assert i['id'].endswith(suffix), i['id']
+            v['id'] = i['id'][:-len(suffix)] + f'_l{level}_{name}'
+            v['variant'] = i['variant'][:-len(suffix)] + f'_l{level}_{name}'
+            if i.get('class'):
+                c = CLASSES.index(i['class'])
+                v['name'] = (CATHEDRAL_WEAPONS[name][c] if i['kind'] == 'weapon'
+                             else f"{CATHEDRAL_NAMES[name][c]} {SLOT_NAMES[i['kind']]}")
+            else:
+                v['name'] = CATHEDRAL_SHARED[name][SHARED_KINDS.index(i['kind'])]
+            v['tint'] = dict(CATHEDRAL_TINTS[name])
+            v['attack'] = round(i['attack'] * CATHEDRAL_BONUS, 1)
+            v['defense'] = round(i['defense'] * CATHEDRAL_BONUS, 1)
+            v['sell'] = round(i['sell'] * CATHEDRAL_BONUS)
+            v['source'] = f'cathedral_{name}'
+            pieces.append(ordered(v))
+    return pieces
 
 
 # The Undervault's own gear: a recolour of every level-20 blue piece the dungeon's bosses can drop (see items::boss_slots),
@@ -197,9 +271,12 @@ def add(out, bases, cls, kind, level, rarity):
 
 def vault_only():
     """Regenerates just the Undervault pieces in the existing catalog (leaves every other item untouched, byte for byte)."""
-    items = [i for i in json.loads(ITEMS.read_text()) if i.get('source') != 'undervault']
+    existing = json.loads(ITEMS.read_text())
+    items = [i for i in existing if i.get('source') != 'undervault']
     items.extend(vault_pieces(items))
-    ITEMS.write_text(json.dumps(items, indent=2, ensure_ascii=False))
+    order = {i['id']: n for n, i in enumerate(existing)}
+    items.sort(key=lambda i: order.get(i['id'], len(order)))
+    ITEMS.write_text(json.dumps(items, indent=2, ensure_ascii=False) + '\n')
     print(len(items), 'items')
 
 

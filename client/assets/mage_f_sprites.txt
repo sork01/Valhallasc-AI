@@ -112,6 +112,294 @@
     "weapon_crystal": {
       "png": "mage_f_weapon_crystal.png",
       "depth": "mage_f_weapon_crystal_depth.png"
+    },
+    "pants_regearl50": {
+      "png": "mage_f_progression_pants_regearl50.png",
+      "depth": "mage_f_progression_pants_regearl50_depth.png"
+    },
+    "necklace_regearl50": {
+      "png": "mage_f_progression_necklace_regearl50.png",
+      "depth": "mage_f_progression_necklace_regearl50_depth.png"
+    },
+    "accessory_regearl50": {
+      "png": "mage_f_progression_accessory_regearl50.png",
+      "depth": "mage_f_progression_accessory_regearl50_depth.png"
+    },
+    "pants_regearl25": {
+      "png": "mage_f_progression_pants_regearl25.png",
+      "depth": "mage_f_progression_pants_regearl25_depth.png"
+    },
+    "necklace_regearl25": {
+      "png": "mage_f_progression_necklace_regearl25.png",
+      "depth": "mage_f_progression_necklace_regearl25_depth.png"
+    },
+    "accessory_regearl25": {
+      "png": "mage_f_progression_accessory_regearl25.png",
+      "depth": "mage_f_progression_accessory_regearl25_depth.png"
+    },
+    "armor_regearl25": {
+      "png": "mage_f_progression_armor_regearl25.png",
+      "depth": "mage_f_progression_armor_regearl25_depth.png"
+    },
+    "head_regearl25": {
+      "png": "mage_f_progression_head_regearl25.png",
+      "depth": "mage_f_progression_head_regearl25_depth.png"
+    },
+    "shoulders_regearl25": {
+      "png": "mage_f_progression_shoulders_regearl25.png",
+      "depth": "mage_f_progression_shoulders_regearl25_depth.png"
+    },
+    "gloves_regearl25": {
+      "png": "mage_f_progression_gloves_regearl25.png",
+      "depth": "mage_f_progression_gloves_regearl25_depth.png"
+    },
+    "weapon_regearl25": {
+      "png": "mage_f_progression_weapon_regearl25.png",
+      "depth": "mage_f_progression_weapon_regearl25_depth.png"
+    },
+    "armor_regearl30": {
+      "png": "mage_f_progression_armor_regearl30.png",
+      "depth": "mage_f_progression_armor_regearl30_depth.png"
+    },
+    "head_regearl30": {
+      "png": "mage_f_progression_head_regearl30.png",
+      "depth": "mage_f_progression_head_regearl30_depth.png"
+    },
+    "shoulders_regearl30": {
+      "png": "mage_f_progression_shoulders_regearl30.png",
+      "depth": "mage_f_progression_shoulders_regearl30_depth.png"
+    },
+    "gloves_regearl30": {
+      "png": "mage_f_progression_gloves_regearl30.png",
+      "depth": "mage_f_progression_gloves_regearl30_depth.png"
+    },
+    "weapon_regearl30": {
+      "png": "mage_f_progression_weapon_regearl30.png",
+      "depth": "mage_f_progression_weapon_regearl30_depth.png"
+    },
+    "pants_regearl30": {
+      "png": "mage_f_progression_pants_regearl30.png",
+      "depth": "mage_f_progression_pants_regearl30_depth.png"
+    },
+    "necklace_regearl30": {
+      "png": "mage_f_progression_necklace_regearl30.png",
+      "depth": "mage_f_progression_necklace_regearl30_depth.png"
+    },
+    "accessory_regearl30": {
+      "png": "mage_f_progression_accessory_regearl30.png",
+      "depth": "mage_f_progression_accessory_regearl30_depth.png"
+    },
+    "armor_regearl35": {
+      "png": "mage_f_progression_armor_regearl35.png",
+      "depth": "mage_f_progression_armor_regearl35_depth.png"
+    },
+    "head_regearl35": {
+      "png": "mage_f_progression_head_regearl35.png",
+      "depth": "mage_f_progression_head_regearl35_depth.png"
+    },
+    "shoulders_regearl35": {
+      "png": "mage_f_progression_shoulders_regearl35.png",
+      "depth": "mage_f_progression_shoulders_regearl35_depth.png"
+    },
+    "gloves_regearl35": {
+      "png": "mage_f_progression_gloves_regearl35.png",
+      "depth": "mage_f_progression_gloves_regearl35_depth.png"
+    },
+    "weapon_regearl35": {
+      "png": "mage_f_progression_weapon_regearl35.png",
+      "depth": "mage_f_progression_weapon_regearl35_depth.png"
+    },
+    "pants_regearl35": {
+      "png": "mage_f_progression_pants_regearl35.png",
+      "depth": "mage_f_progression_pants_regearl35_depth.png"
+    },
+    "necklace_regearl35": {
+      "png": "mage_f_progression_necklace_regearl35.png",
+      "depth": "mage_f_progression_necklace_regearl35_depth.png"
+    },
+    "accessory_regearl35": {
+      "png": "mage_f_progression_accessory_regearl35.png",
+      "depth": "mage_f_progression_accessory_regearl35_depth.png"
+    },
+    "armor_regearl40": {
+      "png": "mage_f_progression_armor_regearl40.png",
+      "depth": "mage_f_progression_armor_regearl40_depth.png"
+    },
+    "head_regearl40": {
+      "png": "mage_f_progression_head_regearl40.png",
+      "depth": "mage_f_progression_head_regearl40_depth.png"
+    },
+    "shoulders_regearl40": {
+      "png": "mage_f_progression_shoulders_regearl40.png",
+      "depth": "mage_f_progression_shoulders_regearl40_depth.png"
+    },
+    "gloves_regearl40": {
+      "png": "mage_f_progression_gloves_regearl40.png",
+      "depth": "mage_f_progression_gloves_regearl40_depth.png"
+    },
+    "weapon_regearl40": {
+      "png": "mage_f_progression_weapon_regearl40.png",
+      "depth": "mage_f_progression_weapon_regearl40_depth.png"
+    },
+    "pants_regearl40": {
+      "png": "mage_f_progression_pants_regearl40.png",
+      "depth": "mage_f_progression_pants_regearl40_depth.png"
+    },
+    "necklace_regearl40": {
+      "png": "mage_f_progression_necklace_regearl40.png",
+      "depth": "mage_f_progression_necklace_regearl40_depth.png"
+    },
+    "accessory_regearl40": {
+      "png": "mage_f_progression_accessory_regearl40.png",
+      "depth": "mage_f_progression_accessory_regearl40_depth.png"
+    },
+    "armor_regearl45": {
+      "png": "mage_f_progression_armor_regearl45.png",
+      "depth": "mage_f_progression_armor_regearl45_depth.png"
+    },
+    "head_regearl45": {
+      "png": "mage_f_progression_head_regearl45.png",
+      "depth": "mage_f_progression_head_regearl45_depth.png"
+    },
+    "shoulders_regearl45": {
+      "png": "mage_f_progression_shoulders_regearl45.png",
+      "depth": "mage_f_progression_shoulders_regearl45_depth.png"
+    },
+    "gloves_regearl45": {
+      "png": "mage_f_progression_gloves_regearl45.png",
+      "depth": "mage_f_progression_gloves_regearl45_depth.png"
+    },
+    "weapon_regearl45": {
+      "png": "mage_f_progression_weapon_regearl45.png",
+      "depth": "mage_f_progression_weapon_regearl45_depth.png"
+    },
+    "pants_regearl45": {
+      "png": "mage_f_progression_pants_regearl45.png",
+      "depth": "mage_f_progression_pants_regearl45_depth.png"
+    },
+    "necklace_regearl45": {
+      "png": "mage_f_progression_necklace_regearl45.png",
+      "depth": "mage_f_progression_necklace_regearl45_depth.png"
+    },
+    "accessory_regearl45": {
+      "png": "mage_f_progression_accessory_regearl45.png",
+      "depth": "mage_f_progression_accessory_regearl45_depth.png"
+    },
+    "armor_regearl50": {
+      "png": "mage_f_progression_armor_regearl50.png",
+      "depth": "mage_f_progression_armor_regearl50_depth.png"
+    },
+    "head_regearl50": {
+      "png": "mage_f_progression_head_regearl50.png",
+      "depth": "mage_f_progression_head_regearl50_depth.png"
+    },
+    "shoulders_regearl50": {
+      "png": "mage_f_progression_shoulders_regearl50.png",
+      "depth": "mage_f_progression_shoulders_regearl50_depth.png"
+    },
+    "gloves_regearl50": {
+      "png": "mage_f_progression_gloves_regearl50.png",
+      "depth": "mage_f_progression_gloves_regearl50_depth.png"
+    },
+    "weapon_regearl50": {
+      "png": "mage_f_progression_weapon_regearl50.png",
+      "depth": "mage_f_progression_weapon_regearl50_depth.png"
+    },
+    "armor_regearcloister": {
+      "png": "mage_f_progression_armor_regearcloister.png",
+      "depth": "mage_f_progression_armor_regearcloister_depth.png"
+    },
+    "head_regearcloister": {
+      "png": "mage_f_progression_head_regearcloister.png",
+      "depth": "mage_f_progression_head_regearcloister_depth.png"
+    },
+    "shoulders_regearcloister": {
+      "png": "mage_f_progression_shoulders_regearcloister.png",
+      "depth": "mage_f_progression_shoulders_regearcloister_depth.png"
+    },
+    "gloves_regearcloister": {
+      "png": "mage_f_progression_gloves_regearcloister.png",
+      "depth": "mage_f_progression_gloves_regearcloister_depth.png"
+    },
+    "weapon_regearcloister": {
+      "png": "mage_f_progression_weapon_regearcloister.png",
+      "depth": "mage_f_progression_weapon_regearcloister_depth.png"
+    },
+    "pants_regearcloister": {
+      "png": "mage_f_progression_pants_regearcloister.png",
+      "depth": "mage_f_progression_pants_regearcloister_depth.png"
+    },
+    "necklace_regearcloister": {
+      "png": "mage_f_progression_necklace_regearcloister.png",
+      "depth": "mage_f_progression_necklace_regearcloister_depth.png"
+    },
+    "accessory_regearcloister": {
+      "png": "mage_f_progression_accessory_regearcloister.png",
+      "depth": "mage_f_progression_accessory_regearcloister_depth.png"
+    },
+    "armor_regearreliquary": {
+      "png": "mage_f_progression_armor_regearreliquary.png",
+      "depth": "mage_f_progression_armor_regearreliquary_depth.png"
+    },
+    "head_regearreliquary": {
+      "png": "mage_f_progression_head_regearreliquary.png",
+      "depth": "mage_f_progression_head_regearreliquary_depth.png"
+    },
+    "shoulders_regearreliquary": {
+      "png": "mage_f_progression_shoulders_regearreliquary.png",
+      "depth": "mage_f_progression_shoulders_regearreliquary_depth.png"
+    },
+    "gloves_regearreliquary": {
+      "png": "mage_f_progression_gloves_regearreliquary.png",
+      "depth": "mage_f_progression_gloves_regearreliquary_depth.png"
+    },
+    "weapon_regearreliquary": {
+      "png": "mage_f_progression_weapon_regearreliquary.png",
+      "depth": "mage_f_progression_weapon_regearreliquary_depth.png"
+    },
+    "pants_regearreliquary": {
+      "png": "mage_f_progression_pants_regearreliquary.png",
+      "depth": "mage_f_progression_pants_regearreliquary_depth.png"
+    },
+    "necklace_regearreliquary": {
+      "png": "mage_f_progression_necklace_regearreliquary.png",
+      "depth": "mage_f_progression_necklace_regearreliquary_depth.png"
+    },
+    "accessory_regearreliquary": {
+      "png": "mage_f_progression_accessory_regearreliquary.png",
+      "depth": "mage_f_progression_accessory_regearreliquary_depth.png"
+    },
+    "armor_regearnave": {
+      "png": "mage_f_progression_armor_regearnave.png",
+      "depth": "mage_f_progression_armor_regearnave_depth.png"
+    },
+    "head_regearnave": {
+      "png": "mage_f_progression_head_regearnave.png",
+      "depth": "mage_f_progression_head_regearnave_depth.png"
+    },
+    "shoulders_regearnave": {
+      "png": "mage_f_progression_shoulders_regearnave.png",
+      "depth": "mage_f_progression_shoulders_regearnave_depth.png"
+    },
+    "gloves_regearnave": {
+      "png": "mage_f_progression_gloves_regearnave.png",
+      "depth": "mage_f_progression_gloves_regearnave_depth.png"
+    },
+    "weapon_regearnave": {
+      "png": "mage_f_progression_weapon_regearnave.png",
+      "depth": "mage_f_progression_weapon_regearnave_depth.png"
+    },
+    "pants_regearnave": {
+      "png": "mage_f_progression_pants_regearnave.png",
+      "depth": "mage_f_progression_pants_regearnave_depth.png"
+    },
+    "necklace_regearnave": {
+      "png": "mage_f_progression_necklace_regearnave.png",
+      "depth": "mage_f_progression_necklace_regearnave_depth.png"
+    },
+    "accessory_regearnave": {
+      "png": "mage_f_progression_accessory_regearnave.png",
+      "depth": "mage_f_progression_accessory_regearnave_depth.png"
     }
   },
   "gender": "female",
@@ -401,5 +689,297 @@
     15,
     46,
     46
-  ]
+  ],
+  "lazyParts": [
+    "accessory_regearcloister",
+    "accessory_regearl25",
+    "accessory_regearl30",
+    "accessory_regearl35",
+    "accessory_regearl40",
+    "accessory_regearl45",
+    "accessory_regearl50",
+    "accessory_regearnave",
+    "accessory_regearreliquary",
+    "armor_regearcloister",
+    "armor_regearl25",
+    "armor_regearl30",
+    "armor_regearl35",
+    "armor_regearl40",
+    "armor_regearl45",
+    "armor_regearl50",
+    "armor_regearnave",
+    "armor_regearreliquary",
+    "gloves_regearcloister",
+    "gloves_regearl25",
+    "gloves_regearl30",
+    "gloves_regearl35",
+    "gloves_regearl40",
+    "gloves_regearl45",
+    "gloves_regearl50",
+    "gloves_regearnave",
+    "gloves_regearreliquary",
+    "head_regearcloister",
+    "head_regearl25",
+    "head_regearl30",
+    "head_regearl35",
+    "head_regearl40",
+    "head_regearl45",
+    "head_regearl50",
+    "head_regearnave",
+    "head_regearreliquary",
+    "necklace_regearcloister",
+    "necklace_regearl25",
+    "necklace_regearl30",
+    "necklace_regearl35",
+    "necklace_regearl40",
+    "necklace_regearl45",
+    "necklace_regearl50",
+    "necklace_regearnave",
+    "necklace_regearreliquary",
+    "pants_regearcloister",
+    "pants_regearl25",
+    "pants_regearl30",
+    "pants_regearl35",
+    "pants_regearl40",
+    "pants_regearl45",
+    "pants_regearl50",
+    "pants_regearnave",
+    "pants_regearreliquary",
+    "shoulders_regearcloister",
+    "shoulders_regearl25",
+    "shoulders_regearl30",
+    "shoulders_regearl35",
+    "shoulders_regearl40",
+    "shoulders_regearl45",
+    "shoulders_regearl50",
+    "shoulders_regearnave",
+    "shoulders_regearreliquary",
+    "weapon_regearcloister",
+    "weapon_regearl25",
+    "weapon_regearl30",
+    "weapon_regearl35",
+    "weapon_regearl40",
+    "weapon_regearl45",
+    "weapon_regearl50",
+    "weapon_regearnave",
+    "weapon_regearreliquary"
+  ],
+  "gearSprites": {
+    "pants_regearl50": {
+      "local": "scripts/make_progression_gear.py export L50-shared-pants"
+    },
+    "necklace_regearl50": {
+      "local": "scripts/make_progression_gear.py export L50-shared-necklace"
+    },
+    "accessory_regearl50": {
+      "local": "scripts/make_progression_gear.py export L50-shared-accessory"
+    },
+    "pants_regearl25": {
+      "local": "scripts/make_progression_gear.py export L25-shared-pants"
+    },
+    "necklace_regearl25": {
+      "local": "scripts/make_progression_gear.py export L25-shared-necklace"
+    },
+    "accessory_regearl25": {
+      "local": "scripts/make_progression_gear.py export L25-shared-accessory"
+    },
+    "armor_regearl25": {
+      "local": "scripts/make_progression_gear.py export L25-mage-armor"
+    },
+    "head_regearl25": {
+      "local": "scripts/make_progression_gear.py export L25-mage-headgear"
+    },
+    "shoulders_regearl25": {
+      "local": "scripts/make_progression_gear.py export L25-mage-shoulders"
+    },
+    "gloves_regearl25": {
+      "local": "scripts/make_progression_gear.py export L25-mage-gloves"
+    },
+    "weapon_regearl25": {
+      "local": "scripts/make_progression_gear.py export L25-mage-weapon"
+    },
+    "armor_regearl30": {
+      "local": "scripts/make_progression_gear.py export L30-mage-armor"
+    },
+    "head_regearl30": {
+      "local": "scripts/make_progression_gear.py export L30-mage-headgear"
+    },
+    "shoulders_regearl30": {
+      "local": "scripts/make_progression_gear.py export L30-mage-shoulders"
+    },
+    "gloves_regearl30": {
+      "local": "scripts/make_progression_gear.py export L30-mage-gloves"
+    },
+    "weapon_regearl30": {
+      "local": "scripts/make_progression_gear.py export L30-mage-weapon"
+    },
+    "pants_regearl30": {
+      "local": "scripts/make_progression_gear.py export L30-shared-pants"
+    },
+    "necklace_regearl30": {
+      "local": "scripts/make_progression_gear.py export L30-shared-necklace"
+    },
+    "accessory_regearl30": {
+      "local": "scripts/make_progression_gear.py export L30-shared-accessory"
+    },
+    "armor_regearl35": {
+      "local": "scripts/make_progression_gear.py export L35-mage-armor"
+    },
+    "head_regearl35": {
+      "local": "scripts/make_progression_gear.py export L35-mage-headgear"
+    },
+    "shoulders_regearl35": {
+      "local": "scripts/make_progression_gear.py export L35-mage-shoulders"
+    },
+    "gloves_regearl35": {
+      "local": "scripts/make_progression_gear.py export L35-mage-gloves"
+    },
+    "weapon_regearl35": {
+      "local": "scripts/make_progression_gear.py export L35-mage-weapon"
+    },
+    "pants_regearl35": {
+      "local": "scripts/make_progression_gear.py export L35-shared-pants"
+    },
+    "necklace_regearl35": {
+      "local": "scripts/make_progression_gear.py export L35-shared-necklace"
+    },
+    "accessory_regearl35": {
+      "local": "scripts/make_progression_gear.py export L35-shared-accessory"
+    },
+    "armor_regearl40": {
+      "local": "scripts/make_progression_gear.py export L40-mage-armor"
+    },
+    "head_regearl40": {
+      "local": "scripts/make_progression_gear.py export L40-mage-headgear"
+    },
+    "shoulders_regearl40": {
+      "local": "scripts/make_progression_gear.py export L40-mage-shoulders"
+    },
+    "gloves_regearl40": {
+      "local": "scripts/make_progression_gear.py export L40-mage-gloves"
+    },
+    "weapon_regearl40": {
+      "local": "scripts/make_progression_gear.py export L40-mage-weapon"
+    },
+    "pants_regearl40": {
+      "local": "scripts/make_progression_gear.py export L40-shared-pants"
+    },
+    "necklace_regearl40": {
+      "local": "scripts/make_progression_gear.py export L40-shared-necklace"
+    },
+    "accessory_regearl40": {
+      "local": "scripts/make_progression_gear.py export L40-shared-accessory"
+    },
+    "armor_regearl45": {
+      "local": "scripts/make_progression_gear.py export L45-mage-armor"
+    },
+    "head_regearl45": {
+      "local": "scripts/make_progression_gear.py export L45-mage-headgear"
+    },
+    "shoulders_regearl45": {
+      "local": "scripts/make_progression_gear.py export L45-mage-shoulders"
+    },
+    "gloves_regearl45": {
+      "local": "scripts/make_progression_gear.py export L45-mage-gloves"
+    },
+    "weapon_regearl45": {
+      "local": "scripts/make_progression_gear.py export L45-mage-weapon"
+    },
+    "pants_regearl45": {
+      "local": "scripts/make_progression_gear.py export L45-shared-pants"
+    },
+    "necklace_regearl45": {
+      "local": "scripts/make_progression_gear.py export L45-shared-necklace"
+    },
+    "accessory_regearl45": {
+      "local": "scripts/make_progression_gear.py export L45-shared-accessory"
+    },
+    "armor_regearl50": {
+      "local": "scripts/make_progression_gear.py export L50-mage-armor"
+    },
+    "head_regearl50": {
+      "local": "scripts/make_progression_gear.py export L50-mage-headgear"
+    },
+    "shoulders_regearl50": {
+      "local": "scripts/make_progression_gear.py export L50-mage-shoulders"
+    },
+    "gloves_regearl50": {
+      "local": "scripts/make_progression_gear.py export L50-mage-gloves"
+    },
+    "weapon_regearl50": {
+      "local": "scripts/make_progression_gear.py export L50-mage-weapon"
+    },
+    "armor_regearcloister": {
+      "local": "scripts/make_progression_gear.py export cloister-mage-armor"
+    },
+    "head_regearcloister": {
+      "local": "scripts/make_progression_gear.py export cloister-mage-headgear"
+    },
+    "shoulders_regearcloister": {
+      "local": "scripts/make_progression_gear.py export cloister-mage-shoulders"
+    },
+    "gloves_regearcloister": {
+      "local": "scripts/make_progression_gear.py export cloister-mage-gloves"
+    },
+    "weapon_regearcloister": {
+      "local": "scripts/make_progression_gear.py export cloister-mage-weapon"
+    },
+    "pants_regearcloister": {
+      "local": "scripts/make_progression_gear.py export cloister-shared-pants"
+    },
+    "necklace_regearcloister": {
+      "local": "scripts/make_progression_gear.py export cloister-shared-necklace"
+    },
+    "accessory_regearcloister": {
+      "local": "scripts/make_progression_gear.py export cloister-shared-accessory"
+    },
+    "armor_regearreliquary": {
+      "local": "scripts/make_progression_gear.py export reliquary-mage-armor"
+    },
+    "head_regearreliquary": {
+      "local": "scripts/make_progression_gear.py export reliquary-mage-headgear"
+    },
+    "shoulders_regearreliquary": {
+      "local": "scripts/make_progression_gear.py export reliquary-mage-shoulders"
+    },
+    "gloves_regearreliquary": {
+      "local": "scripts/make_progression_gear.py export reliquary-mage-gloves"
+    },
+    "weapon_regearreliquary": {
+      "local": "scripts/make_progression_gear.py export reliquary-mage-weapon"
+    },
+    "pants_regearreliquary": {
+      "local": "scripts/make_progression_gear.py export reliquary-shared-pants"
+    },
+    "necklace_regearreliquary": {
+      "local": "scripts/make_progression_gear.py export reliquary-shared-necklace"
+    },
+    "accessory_regearreliquary": {
+      "local": "scripts/make_progression_gear.py export reliquary-shared-accessory"
+    },
+    "armor_regearnave": {
+      "local": "scripts/make_progression_gear.py export nave-mage-armor"
+    },
+    "head_regearnave": {
+      "local": "scripts/make_progression_gear.py export nave-mage-headgear"
+    },
+    "shoulders_regearnave": {
+      "local": "scripts/make_progression_gear.py export nave-mage-shoulders"
+    },
+    "gloves_regearnave": {
+      "local": "scripts/make_progression_gear.py export nave-mage-gloves"
+    },
+    "weapon_regearnave": {
+      "local": "scripts/make_progression_gear.py export nave-mage-weapon"
+    },
+    "pants_regearnave": {
+      "local": "scripts/make_progression_gear.py export nave-shared-pants"
+    },
+    "necklace_regearnave": {
+      "local": "scripts/make_progression_gear.py export nave-shared-necklace"
+    },
+    "accessory_regearnave": {
+      "local": "scripts/make_progression_gear.py export nave-shared-accessory"
+    }
+  }
 }

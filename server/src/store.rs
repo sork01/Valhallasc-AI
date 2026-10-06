@@ -581,12 +581,12 @@ mod tests {
     fn unlimited_inventory_migration_preserves_every_item_and_grants_only_needed_bags() {
         let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();
         let (mut c, token) = s.create(Look::default(), Point::default()).unwrap();
-        // One item in eight of the catalog (it holds hundreds of pieces): still more than the backpack holds.
-        for i in crate::items::ITEMS
+        // Sample the growing catalog within the legacy four-pack capacity, still exceeding the backpack.
+        let candidates: Vec<_> = crate::items::ITEMS
             .iter()
             .filter(|i| i.kind != "bag")
-            .step_by(8)
-        {
+            .collect();
+        for i in candidates.iter().step_by(candidates.len().div_ceil(60)) {
             c.add_item(&i.id, 1);
         }
         let mut old = serde_json::to_value(&c).unwrap();

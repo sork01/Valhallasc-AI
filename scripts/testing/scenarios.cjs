@@ -1811,14 +1811,15 @@ const scenarios = {
       const mirror = view(rival).slimes.find(s => s.kind === 'thrall');
       check(mirror && mirror.id !== thrall.id && !mirror.dead && mirror.hp === mirror.maxHp, 'Its twin in the other copy (another enemy id) is untouched');
       await w.disconnect(rival);
-      // A real archer shoots real missiles at the hero.
-      const archer = view(bot).slimes.filter(s => s.kind === 'archer' && !s.dead)[0];
-      await kit.teleport(w, bot, { zone: 5, x: archer.x - 7, y: archer.y });
-      await w.waitFor(() => (view(bot).ebolts || []).some(b => b.kind === 'archer'), 20000, 'An arrow is in the air');
-      check((view(bot).ebolts || []).every(b => b.zone === 5 && typeof b.speed === 'number'), 'Missiles are in the snapshot with their speed, labelled zone 5');
-      // Replace the hired party with two real heroes so we can answer the shared boss rolls.
+      // Stage a clear shot without mercenaries intercepting the archer at melee range between snapshots.
       await kit.teleport(w, bot, { zone: 4, x: 100, y: 128 });
       await kit.talkTo(w, bot, 'city_meetingstone', 'merc_dismiss');
+      await kit.teleport(w, bot, { zone: 5, x: vault.spawn.x, y: vault.spawn.y });
+      await kit.spawnEnemy(w, bot, { kind: 'archer', x: vault.spawn.x + 7, y: vault.spawn.y });
+      await w.waitFor(() => (view(bot).ebolts || []).some(b => b.kind === 'archer'), 20000, 'An arrow is in the air');
+      check((view(bot).ebolts || []).every(b => b.zone === 5 && typeof b.speed === 'number'), 'Missiles are in the snapshot with their speed, labelled zone 5');
+      // Two real heroes can answer the shared boss rolls.
+      await kit.teleport(w, bot, { zone: 4, x: 100, y: 128 });
       await w.connect({ bot: rival, class: 'mage' });
       await kit.setupCharacter(w, rival, { level: 20 });
       await w.social(bot, { op: 'party_invite', bot: rival });

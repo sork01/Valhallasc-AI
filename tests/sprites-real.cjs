@@ -52,10 +52,13 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
 
 (async () => {
   const dir = fs.mkdtempSync(path.join(root, 'test-results/sprites-'));
+  const artDir = path.join(root, 'test-results/gear-25-50'); fs.mkdirSync(artDir, { recursive: true });
   await startServer(path.join(dir, 'test.sqlite'));
   browser = await chromium.launch({ headless: true });
   try {
-    for (const cls of ['warrior', 'mage', 'assassin', 'priest', 'hunter']) {
+    const classes = process.argv.slice(2).length ? process.argv.slice(2) : ['warrior', 'mage', 'assassin', 'priest', 'hunter'];
+    assert.ok(classes.every(c => ['warrior', 'mage', 'assassin', 'priest', 'hunter'].includes(c)), 'Use class names to filter the art checks');
+    for (const cls of classes) {
       const page = await enter(false, cls, 'Real' + cls);
       check(await page.evaluate(() => window.__valhallaTestSprites === undefined), `${cls}: the stub is off`);
       const gear = await page.evaluate(cls => { const C = { warrior: WarriorSprite, mage: MageSprite, assassin: AssassinSprite, priest: PriestSprite, hunter: HunterSprite }[cls]; return { armor: Object.keys(C.ARMOR).filter(k => k !== 'none'), weapon: Object.keys(C.WEAPON).filter(k => k !== 'none'), tiers: C.TIERS }; }, cls);
@@ -99,20 +102,23 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
       check(everything.visible > dressed.visible && everything.hash !== dressed.hash, `${cls}: all six generic pieces worn together make a bigger figure`);
       // Recoloured pieces (the catalog's `art` + `tint`): drawn as their base drawing, same silhouette, different colours,
       // and every set of the same drawing looks different from every other.
-      const recoloured = await page.evaluate(cls => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && ['armor', 'weapon', 'headgear', 'pants'].includes(i.kind)).map(i => [i.kind, i.variant, i.art]), cls);
-      const baseOf = new Map(), byArt = new Map();
-      const wear = (kind, v) => kind === 'armor' ? figure(page, cls, v, gear.weapon[0]) : kind === 'weapon' ? figure(page, cls, gear.armor[0], v) : figure(page, cls, gear.armor[0], gear.weapon[0], { [kind === 'headgear' ? 'head' : kind]: v });
-      let recolourOk = 0, silhouetteOk = 0;
+      const recoloured = await page.evaluate(cls => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && ['armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'].includes(i.kind)).map(i => [i.kind, i.variant, i.art]), cls);
+      const baseOf = new Map(), byArt = new Map(), colourGroups = new Map();
+      // Inspect each small piece on the bare figure: a robe can hide two differently coloured pants identically.
+      const wear = (kind, v) => kind === 'armor' ? figure(page, cls, v, gear.weapon[0]) : kind === 'weapon' ? figure(page, cls, gear.armor[0], v) : figure(page, cls, 'none', 'none', { [kind === 'headgear' ? 'head' : kind]: v });
+      let recolourOk = 0, silhouetteOk = 0; const unchanged = [];
       for (const [kind, variant, art] of recoloured) {
         const key = kind + '|' + art; if (!baseOf.has(key)) baseOf.set(key, await wear(kind, art));
         const w = await wear(kind, variant), base = baseOf.get(key);
         recolourOk += w.hash !== base.hash; silhouetteOk += w.visible === base.visible;
+        if (w.hash === base.hash) unchanged.push(kind + ':' + variant);
         byArt.set(key, (byArt.get(key) || new Set()).add(w.hash));
+        const hashKey = key + '|' + w.hash; colourGroups.set(hashKey, [...(colourGroups.get(hashKey) || []), variant]);
       }
-      check(recoloured.length >= 60 && recolourOk === recoloured.length, `${cls}: all ${recoloured.length} recoloured armor, weapon, helm and pants pieces draw in colours of their own (${recolourOk})`);
+      check(recoloured.length >= 60 && recolourOk === recoloured.length, `${cls}: all ${recoloured.length} recoloured pieces draw in colours of their own (${recolourOk}; unchanged: ${unchanged.join(', ')})`);
       check(silhouetteOk === recoloured.length, `${cls}: a recolouring keeps the drawing's silhouette (${silhouetteOk}/${recoloured.length})`);
       const perArt = recoloured.reduce((m, [k, , art]) => m.set(k + '|' + art, (m.get(k + '|' + art) || 0) + 1), new Map());
-      check([...byArt].every(([key, hashes]) => hashes.size === perArt.get(key)), `${cls}: no two sets of one drawing share their colours`);
+      check([...byArt].every(([key, hashes]) => hashes.size === perArt.get(key)), `${cls}: no two sets of one drawing share their colours (duplicates: ${JSON.stringify([...colourGroups].filter(([, variants]) => variants.length > 1))})`);
       check(await page.evaluate(cls => valhalla[cls].portrait().length > 2000, cls), `${cls}: the portrait renders`);
       // The female set: its own atlases, the same equipment, a body that is not the male one.
       const f = (armor, weapon, extras) => figure(page, cls, armor, weapon, extras, true);
@@ -132,6 +138,39 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
         const w = await f(gear.armor[0], gear.weapon[0], { [slot]: variant });
         check(w.hash !== fDressed.hash && w.visible > 0 && (await f(gear.armor[0], gear.weapon[0], { [slot]: 'none' })).hash === fDressed.hash, `${cls} (female): the generic ${slot} piece is drawn and 'none' removes it`);
       }
+      // High-level and Cathedral colours must draw on the female layers too, including every small worn slot.
+      const newPieces = await page.evaluate(cls => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && i.requiredLevel > 20).map(i => [i.kind, i.variant, i.art]), cls);
+      const femaleWear = (kind, v) => kind === 'armor' ? f(v, gear.weapon[0]) : kind === 'weapon' ? f(gear.armor[0], v) : f('none', 'none', { [kind === 'headgear' ? 'head' : kind]: v });
+      const femaleBases = new Map(), femaleColours = new Map();
+      let femaleChanged = 0, femaleSilhouette = 0;
+      for (const [kind, variant, art] of newPieces) {
+        const key = kind + '|' + art;
+        if (!femaleBases.has(key)) femaleBases.set(key, await femaleWear(kind, art));
+        const worn = await femaleWear(kind, variant), base = femaleBases.get(key);
+        femaleChanged += worn.hash !== base.hash; femaleSilhouette += worn.visible === base.visible;
+        femaleColours.set(key, (femaleColours.get(key) || new Set()).add(worn.hash));
+      }
+      check(newPieces.length === 192 && femaleChanged === newPieces.length && femaleSilhouette === newPieces.length, `${cls} (female): every new tier and wing piece draws with its own colours and the base silhouette`);
+      check([...femaleColours].every(([key, hashes]) => hashes.size === newPieces.filter(([kind, , art]) => kind + '|' + art === key).length), `${cls} (female): no new tier or wing piece shares its colours`);
+      // Save a contact sheet of complete ordinary/wing outfits, both bodies, attack at two facings and death.
+      const contact = await page.evaluate(async cls => {
+        const outfits = [25, 30, 35, 40, 45, 50, 'cathedral_cloister', 'cathedral_reliquary', 'cathedral_nave'];
+        const c = document.createElement('canvas'); c.width = outfits.length * 160; c.height = 6 * 180;
+        const g = c.getContext('2d'); g.fillStyle = '#253b46'; g.fillRect(0, 0, c.width, c.height);
+        for (let x = 0; x < outfits.length; x++) {
+          const id = outfits[x], gear = WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && (typeof id === 'number' ? i.requiredLevel === id && i.rarity === 'rare' && !i.source : i.source === id));
+          const look = {};
+          for (const i of gear) look[i.kind === 'armor' ? cls + 'Armor' : i.kind === 'weapon' ? cls + 'Weapon' : i.kind === 'headgear' ? 'head' : i.kind] = i.variant;
+          for (let y = 0; y < 6; y++) {
+            const s = y < 3 ? valhalla[cls] : femaleSprites[cls]; s.set({...s.look, ...look});
+            await Promise.all(Object.entries(s.equipment).map(([slot, v]) => s.source.ensure(slot + '_' + v))); s.cache.clear();
+            g.drawImage(s.frame(y % 3 === 2 ? 'die' : 'attack', y % 3 === 1 ? 5 : 0, y % 3 === 2 ? 7 : 4), x * 160, y * 180 + 18);
+            g.fillStyle = '#ffffff'; g.font = '11px sans-serif'; g.fillText(String(id).replace('cathedral_', '') + (y < 3 ? ' M' : ' F'), x * 160 + 3, y * 180 + 12);
+          }
+        }
+        return c.toDataURL('image/png');
+      }, cls);
+      fs.writeFileSync(path.join(artDir, cls + '-gear-25-50.png'), Buffer.from(contact.split(',')[1], 'base64'));
       check(await page.evaluate(cls => { const s = femaleSprites[cls]; return s.meta.gender === 'female' && s.portrait().length > 2000 && ['idle', 'walk', 'attack', 'hurt', 'die'].every(c => s.frame(c, 5, 0).width > 0); }, cls), `${cls} (female): metadata, portrait and every clip render`);
       // Animation: the walk and the attack are different pictures from standing still, in the female set too.
       check(await page.evaluate(cls => { const hash = (clip, i) => { const c = femaleSprites[cls].frame(clip, 3, i), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let h = 0; for (let k = 3; k < d.length; k += 4) h = (h * 31 + d[k - 3] + d[k - 2] * 3) >>> 0; return h; }; return new Set([hash('idle', 0), hash('walk', 2), hash('attack', 4), hash('die', 7)]).size === 4; }, cls), `${cls} (female): idle, walk, attack and die are four different pictures`);

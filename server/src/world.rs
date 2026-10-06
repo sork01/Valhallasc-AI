@@ -6889,12 +6889,12 @@ mod tests {
         let token = welcome["token"].as_str().unwrap();
         let id = w.slimes.iter().position(|s| s.kind == "beetle").unwrap();
         let point = w.slimes[id].point();
-        // One piece in fifteen of the non-starter gear (the catalog holds hundreds): enough to span every class, slot,
-        // level and tier, and few enough to fit the bags below.
-        let gear: Vec<_> = ITEMS
+        // Sample across the growing catalog, keeping the pieces within the test's bag capacity.
+        let candidates: Vec<_> = ITEMS.iter().filter(|i| is_gear(i) && !i.starter).collect();
+        let gear: Vec<_> = candidates
             .iter()
-            .filter(|i| is_gear(i) && !i.starter)
-            .step_by(15)
+            .copied()
+            .step_by(candidates.len().div_ceil(30))
             .collect();
         assert!(gear.len() > 20 && gear.len() <= 34);
         // Real kills drop the material; gear is rolled so rarely that the pieces are dropped through the same

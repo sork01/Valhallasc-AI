@@ -22,7 +22,8 @@ def enemy(kind, name, level, hp, damage, speed, scale, profile, art, color, boss
           ranged=None, slam=0, melee=0, variant=0):
     return dict(kind=kind, name=name, level=level, stats=[hp,round(damage*.65) if boss else damage,speed,scale], profile=profile,
                 art=art, color=color, boss=boss, gold=(4000 + level*40 if boss else 850 + level*8),
-                material='cathedral_'+kind, ranged=ranged, slam=slam, melee=melee, variant=variant)
+                material='cathedral_'+kind, ranged=ranged, slam=slam, melee=melee, variant=variant,
+                lootSource=next('cathedral_'+w['id'] for w in WINGS if kind in w['bosses']) if boss else None)
 
 ENEMIES = [
     enemy('tidetemplar','Drowned Templar',40,34000,1050,2.5,1.4,[.65,1.5,7.5,9],'knight','#84bbb7'),

@@ -148,7 +148,7 @@ def main():
     for e in C.ENEMIES:
         if e['material'] not in have:
             items.append(dict(id=e['material'],name=e['name']+(' Relic' if e['boss'] else ' Fragment'),kind='material',rarity='common',sell=1200 if e['boss'] else 180))
-    items_path.write_text(json.dumps(items,indent=2))
+    items_path.write_text(json.dumps(items,indent=2,ensure_ascii=False)+'\n')
     if args.plot: plot(zones,args.plot)
     print('Drowned Cathedral: three reachable private wings, levels 40/45/50, 12 unique bosses, 48 trash enemies.')
 
