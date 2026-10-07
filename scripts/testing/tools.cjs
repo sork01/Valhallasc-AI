@@ -12,7 +12,7 @@ const map = read('map.txt'), items = read('items.txt'), skills = read('skills.tx
 // Zone 0 is the top-level map (Greenmeadow + Alderhaven); the rest come from `zones`.
 const zones = [map, ...(map.zones || [])];
 const quests = zones.flatMap((area, zone) => (area.quests || []).map(q => ({ ...q, zone })));
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45 };
 Object.assign(DEFAULT_LEVELS, Object.fromEntries(read('cathedral.txt').map(e => [e.kind, e.level])));
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const number = z.number().finite();

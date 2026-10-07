@@ -362,6 +362,13 @@ impl Slime {
             // guards the deepest corridors (no quest).
             "hvitserk" => (150000., 2600., 2.4, 2.),
             "ghostmaw" => (190000., 3000., 3.3, 2.1),
+            // Astralhollow (levels 40-45): moth swarms, crystal wyrms, orbiting beetles,
+            // eclipse dryads and slow meteor golems.
+            "voidmoth" => (30000., 560., 3.8, 1.15),
+            "crystalwyrm" => (36000., 680., 3.1, 1.45),
+            "orbitbeetle" => (42000., 760., 2.7, 1.55),
+            "eclipsedryad" => (39000., 720., 2.5, 1.5),
+            "meteorgolem" => (60000., 980., 1.8, 1.95),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -411,6 +418,11 @@ impl Slime {
             "kraken" => 40,
             "hvitserk" => 37,
             "ghostmaw" => 39,
+            "voidmoth" => 40,
+            "crystalwyrm" => 41,
+            "orbitbeetle" => 42,
+            "eclipsedryad" => 43,
+            "meteorgolem" => 45,
             _ => 2,
         }
     }
@@ -463,6 +475,11 @@ impl Slime {
             "kraken" => 4500,
             "hvitserk" => 2500,
             "ghostmaw" => 3200,
+            "voidmoth" => 900,
+            "crystalwyrm" => 980,
+            "orbitbeetle" => 1060,
+            "eclipsedryad" => 1140,
+            "meteorgolem" => 1450,
             _ => 0,
         }
     }
@@ -518,6 +535,11 @@ impl Slime {
             "kraken" => (1., 2., 7., 14.),
             "hvitserk" => (0.9, 1.6, 7., 10.),
             "ghostmaw" => (0.35, 0.9, 12., 11.),
+            "voidmoth" => (0.35, 0.9, 11., 10.),
+            "crystalwyrm" => (0.45, 1.1, 10., 9.),
+            "orbitbeetle" => (0.55, 1.3, 8., 8.),
+            "eclipsedryad" => (0.7, 1.7, 7., 10.),
+            "meteorgolem" => (1.0, 2.0, 5.5, 7.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -4632,7 +4654,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 13);
+        assert_eq!(zone_count(&w), 14);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -5235,7 +5257,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 13);
+        assert_eq!(zone_count(&w), 14);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -7534,7 +7556,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 13);
+        assert_eq!(zone_count(&w), 14);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));

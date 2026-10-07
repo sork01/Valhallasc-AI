@@ -35,8 +35,8 @@ fn nacre_city_is_large_safe_and_has_120_distinct_addressed_homes() {
     assert_eq!(names.len(), 120);
     assert_eq!(m.npcs.len(), 30);
     assert_eq!(m.quests.len(), 9);
-    assert_eq!(w.maps.len(), 25);
-    assert_eq!(w.maps[13].template, Some(5));
+    assert_eq!(w.maps.len(), 26);
+    assert_eq!(w.maps[14].template, Some(5));
 }
 
 #[test]
@@ -105,8 +105,8 @@ fn nacre_all_people_are_merfolk_except_the_stone_and_the_cathedral_has_three_ope
     );
     assert_eq!(
         z["portals"].as_array().unwrap().len(),
-        4,
-        "Tideway and three working Cathedral entrances"
+        5,
+        "Tideway, three Cathedral entrances and the Astralhollow Starway"
     );
     let stone = z["objects"]
         .as_array()
@@ -255,7 +255,10 @@ fn nacre_travel_stop_has_a_reciprocal_link_and_discovery_is_authoritative() {
         .iter()
         .find(|n| n.id == "travel_nacrehold")
         .unwrap();
-    assert_eq!(master.travel_links, ["travel_keelhaven"]);
+    assert_eq!(
+        master.travel_links,
+        ["travel_keelhaven", "travel_astralhollow"]
+    );
     assert!(
         w.maps[DEEP]
             .npcs

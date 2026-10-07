@@ -22896,4 +22896,15 @@
     "defense": 4.5,
     "source": "cathedral_nave"
   }
+  ,{
+    "id": "voidwing", "name": "Voidwing", "kind": "material", "rarity": "common", "sell": 900
+  },{
+    "id": "astral_scale", "name": "Astral Scale", "kind": "material", "rarity": "common", "sell": 980
+  },{
+    "id": "orbit_shell", "name": "Orbit Shell", "kind": "material", "rarity": "common", "sell": 1060
+  },{
+    "id": "eclipse_bark", "name": "Eclipse Bark", "kind": "material", "rarity": "common", "sell": 1140
+  },{
+    "id": "meteor_core", "name": "Meteor Core", "kind": "material", "rarity": "common", "sell": 1450
+  }
 ]

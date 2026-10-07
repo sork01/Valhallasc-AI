@@ -216,7 +216,7 @@ async function call(name, args = {}) {
   await page.waitForFunction(() => !document.getElementById('wm-zone').hidden && WorldMap.view === 'zone', null, { timeout: 3000 });
   check(await page.evaluate(() => { const w = document.getElementById('wm-world'); return w.hidden && !w.style.transform && !w.style.opacity; }), 'After the zoom the world sheet is reset for next time');
   await page.locator('#wm-back').click();
-  await page.waitForTimeout(450);
+  await page.waitForFunction(() => { const w = document.getElementById('wm-world'); return !w.hidden && !w.style.transform && getComputedStyle(w).opacity === '1'; }, null, { timeout: 3000 });
   check(await page.evaluate(() => { const w = document.getElementById('wm-world'); return !w.hidden && !w.style.transform && getComputedStyle(w).opacity === '1'; }), 'Zooming back out ends on the full sheet');
   await press('Escape');
   check(await page.evaluate(() => Field.canAct), 'Closing the map hands the game back');

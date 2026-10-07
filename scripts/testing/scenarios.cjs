@@ -32,7 +32,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45 };
 Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'world/cathedral.txt'), 'utf8')).map(e => [e.kind, e.level])));
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
@@ -2722,7 +2722,7 @@ const scenarios = {
       await kit.setupCharacter(w, bot, { gold: 2000 });
       const town = map.zones[8], gate = deep.portals.find(p => p.id === 'nacre_gate'), back = town.portals[0];
       check(town.objects.filter(o => o.kind === 'nacrehouse').length === 120 && town.npcs.length === 30 && town.slimes.length === 0, '120 homes, 30 people, no enemies');
-      check(town.futureInstance.status === 'open' && town.futureInstance.players === 5 && town.portals.length === 4, 'The Drowned Cathedral has three open wings, beside its Meeting Stone');
+      check(town.futureInstance.status === 'open' && town.futureInstance.players === 5 && town.portals.length === 5, 'The Drowned Cathedral has three open wings and Astralhollow has its Nacrehold starway');
       await kit.teleport(w, bot, { npc: 'travel_keelhaven' });
       await kit.talkTo(w, bot, 'travel_keelhaven');
       await kit.teleport(w, bot, { zone: 8, x: gate.x, y: gate.y - 4 });
@@ -2832,6 +2832,47 @@ const scenarios = {
   },
 
   cathedral: require('./cathedral-scenario.cjs'),
+
+  astral: {
+    description: 'Astralhollow: Nacrehold gate, nearby return, sanctuary quests and services, and reciprocal Spark travel.',
+    startLevel: 42,
+    async run(w, check) {
+      const bot = 'Starfarer', area = map.zones[12];
+      await w.connect({ bot, class: 'warrior' });
+      await kit.setupCharacter(w, bot, { gold: 2000 });
+      const gate = map.zones[8].portals.find(p => p.id === 'nacre_astral_gate');
+      const back = area.portals.find(p => p.id === 'astral_nacre_gate');
+      check(!!gate && !!back && area.quests.length === 12 && area.npcs.length === 7 && area.objects.length >= 400, 'The Nacrehold link, inhabited hub, quests and dense scenery exist');
+      check(distance(area.spawn, back) <= 4.5 && back.y > area.spawn.y, 'The return gate is near and in front of arrival');
+      await kit.teleport(w, bot, { zone: 9, x: gate.x, y: gate.y + 4 });
+      await w.action(bot, { type: 'move', x: gate.x, y: gate.y });
+      await w.waitFor(() => w.player(bot).zone === 13, 15000, 'Enter Astralhollow');
+      await w.action(bot, { type: 'stop' });
+      check(distance(w.player(bot), area.spawn) < 2, 'The Nacrehold starway reaches the sanctuary');
+      await kit.teleport(w, bot, { npc: 'astral_steward' });
+      await kit.talkTo(w, bot, 'astral_steward', 'quest:accept:astral_welcome');
+      await w.waitFor(() => !!quest(w, bot, 'astral_welcome'));
+      for (const npc of ['astral_healer', 'astral_scholar', 'astral_warden']) {
+        await kit.teleport(w, bot, { npc });
+        await kit.talkTo(w, bot, npc);
+      }
+      await w.waitFor(() => quest(w, bot, 'astral_welcome').counts.every(n => n === 1));
+      check(quest(w, bot, 'astral_welcome').counts.every(n => n === 1), 'The introductory quest counts real sanctuary conversations');
+      await kit.teleport(w, bot, { npc: 'astral_steward' });
+      const before = w.player(bot).gold;
+      await kit.talkTo(w, bot, 'astral_steward', 'quest:claim:astral_welcome');
+      await w.waitFor(() => quest(w, bot, 'astral_welcome').claimed);
+      check(w.player(bot).gold === before + area.quests[0].rewardGold, 'The steward pays the quest reward exactly once');
+      await kit.teleport(w, bot, { npc: 'travel_astralhollow' });
+      await kit.talkTo(w, bot, 'travel_astralhollow');
+      await w.waitFor(() => w.player(bot).travelStops.includes('travel_astralhollow'));
+      check(w.player(bot).travelStops.includes('travel_astralhollow'), 'The Astralhollow travel master discovers the stop');
+      await kit.teleport(w, bot, { zone: 13, x: back.x, y: back.y - 4 });
+      await w.action(bot, { type: 'move', x: back.x, y: back.y });
+      await w.waitFor(() => w.player(bot).zone === 9, 15000, 'Return to Nacrehold');
+      check(distance(w.player(bot), { x: back.tx, y: back.ty }) < 2, 'The nearby return gate works without bouncing');
+    },
+  },
 
 };
 

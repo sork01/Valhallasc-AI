@@ -161,6 +161,11 @@ pub fn material(kind: &str) -> &'static str {
         "kraken" => "kraken_beak",
         "hvitserk" => "captains_signet",
         "ghostmaw" => "ghostmaw_tooth",
+        "voidmoth" => "voidwing",
+        "crystalwyrm" => "astral_scale",
+        "orbitbeetle" => "orbit_shell",
+        "eclipsedryad" => "eclipse_bark",
+        "meteorgolem" => "meteor_core",
         _ => "slime_gel",
     }
 }
