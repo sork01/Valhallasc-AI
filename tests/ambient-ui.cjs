@@ -27,6 +27,7 @@ const check = (condition, message) => { assert.ok(condition, message); checks++;
   check(first.length >= 3 && first.length <= 6, 'An occupied shared zone has three to six adventurers');
   check(first.every(p => names.has(p.name) && p.level >= 1 && p.level <= 5 && p.sprite), 'Names, map levels and class sprites are present');
   check(new Set(first.map(p => p.name)).size === first.length, 'Names do not repeat within the zone');
+  check(first.every(p => p.x < 24 || p.x > 48 || p.y < 72 || p.y > 94), 'Field arrivals do not appear inside the Alderhaven quest hub');
   const health = await (await fetch(started.url + 'health')).json();
   check(health.online === 1 && health.visibleOnline === first.length + 1, 'The real connection count stays separate from visible players');
   await page.keyboard.press('o');

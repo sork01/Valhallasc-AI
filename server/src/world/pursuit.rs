@@ -135,6 +135,53 @@ pub(super) fn grid_matches_collision(map: &Map, radius: f64) -> bool {
 }
 
 impl Pursuit {
+    /// A one-off route for an autonomous adventurer walking between a quest giver and hunting ground. The collision
+    /// grid is shared with enemy pursuit, but this does not occupy a cached enemy distance field.
+    pub(super) fn route(
+        &mut self,
+        map: &Map,
+        zone: usize,
+        from: Point,
+        to: Point,
+        radius: f64,
+    ) -> Option<Vec<Point>> {
+        let body = (radius * 10.).ceil() as u32;
+        let radius = body as f64 / 10.;
+        let grid = self
+            .grids
+            .entry((zone, body))
+            .or_insert_with(|| Grid::new(map, radius));
+        let start = grid.anchor(map, from, radius)?;
+        let goal = grid.anchor(map, to, radius)?;
+        let field = grid.field(goal, 0.);
+        if field.distance[start] == u32::MAX {
+            return None;
+        }
+        let mut cells = vec![from];
+        let mut at = start;
+        while at != goal {
+            at = grid
+                .neighbors(at)
+                .filter(|i| field.distance[*i] < field.distance[at])
+                .min_by_key(|i| field.distance[*i])?;
+            cells.push(grid.point(at));
+        }
+        cells.push(to);
+        let mut route = Vec::new();
+        let mut anchor = from;
+        let mut index = 0;
+        while index + 1 < cells.len() {
+            let end = (index + 16).min(cells.len() - 1);
+            let next = (index + 1..=end)
+                .rev()
+                .find(|i| clear_line(map, anchor, cells[*i], radius))?;
+            route.push(cells[next]);
+            anchor = cells[next];
+            index = next;
+        }
+        Some(route)
+    }
+
     pub(super) fn retain(&mut self, players: &BTreeMap<u64, Player>) {
         self.fields.retain(|(zone, session, _), _| {
             players

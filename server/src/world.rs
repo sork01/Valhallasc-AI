@@ -1691,7 +1691,7 @@ impl World {
             p.stop();
             if p.dead_time >= 3.2 {
                 let map = &self.maps[p.character.zone];
-                let mut point = map.spawn;
+                let mut point = p.ambient.as_ref().map_or(map.spawn, ambient::Ambient::hub);
                 map.collide(&mut point, PLAYER_RADIUS);
                 p.character.x = point.x;
                 p.character.y = point.y;
@@ -1701,6 +1701,9 @@ impl World {
                 p.dead_time = 0.;
                 p.attack = 0.;
                 p.cooldown = 0.;
+                if let Some(brain) = p.ambient.as_mut() {
+                    brain.on_respawn(self.time, point);
+                }
                 let id = p.character.id.clone();
                 self.event("respawn", &id, point, 0., false);
             }
