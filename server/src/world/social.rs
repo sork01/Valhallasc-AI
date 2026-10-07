@@ -306,6 +306,21 @@ impl World {
             self.tell(&i.from, text, false);
             self.push_social(&[&i.from, &i.to]);
         }
+        // Autonomous adventurers have no persisted friendship or party seat. They answer invitations after a short
+        // pause, instead of leaving a request pending forever in a real player's panel.
+        let declined: Vec<_> = self
+            .social
+            .invites
+            .iter()
+            .filter(|i| {
+                i.expires - now <= INVITE_LIFETIME - 3.
+                    && self.online(&i.to).is_some_and(|p| p.ambient.is_some())
+            })
+            .cloned()
+            .collect();
+        for invite in declined {
+            let _ = self.decline(invite.kind, &invite.to, &invite.from);
+        }
         let gone: Vec<String> = self
             .social
             .away

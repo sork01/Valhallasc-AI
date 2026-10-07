@@ -43,7 +43,7 @@ impl World {
         let sessions: Vec<u64> = self
             .players
             .iter()
-            .filter(|(_, p)| p.merc.is_none())
+            .filter(|(_, p)| p.merc.is_none() && p.ambient.is_none())
             .map(|(session, _)| *session)
             .collect();
         for session in sessions {

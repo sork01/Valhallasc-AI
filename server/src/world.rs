@@ -9,6 +9,7 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
+mod ambient;
 #[cfg(test)]
 mod cathedral_tests;
 mod chime;
@@ -131,6 +132,8 @@ struct Player {
     merc: Option<String>,
     /// The particular group objective this fighter was hired for; Meeting Stone hires have no quest contract.
     merc_quest: Option<String>,
+    /// A temporary autonomous adventurer in an occupied shared zone.
+    ambient: Option<ambient::Ambient>,
     /// Set on a stranded person walking an escort quest's route (see world/escort.rs). Always with `merc` set to the
     /// character being escorted for, so an escort is never saved, counted as online or put in a party.
     escort: Option<escort::Escort>,
@@ -196,6 +199,7 @@ impl Player {
             god: false,
             merc: None,
             merc_quest: None,
+            ambient: None,
             escort: None,
         }
     }
@@ -781,6 +785,9 @@ pub struct World {
     cur_skill: String,
     /// Counter for mercenary sessions.
     merc_seq: u64,
+    /// Desired autonomous adventurers in each currently occupied shared zone.
+    ambient_targets: BTreeMap<usize, usize>,
+    pub ambient_enabled: bool,
     level_spread: i32,
     // Test servers only (VALHALLA_GOD_MODE=1): enemies still fight, but players take no damage.
     pub god_mode: bool,
@@ -836,6 +843,8 @@ impl World {
             next_king_spawn: 0.,
             cur_skill: String::new(),
             merc_seq: 0,
+            ambient_targets: BTreeMap::new(),
+            ambient_enabled: false,
             level_spread,
             god_mode: false,
             start_level: 1,
@@ -1059,7 +1068,7 @@ impl World {
         "bolts":self.bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
         "ebolts":self.enemy_bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
         "drops":self.drops.iter().filter(|d| d.zone == zone).collect::<Vec<_>>(),
-        "online":self.humans_online()});
+        "online":self.visible_online()});
         if let Some(instance) = self.instance_at(zone) {
             view["instance"] = json!({"cleared":instance.cleared});
             // A private copy is told it is the template zone, so a client has one dungeon whatever copy it stands in.
@@ -1076,7 +1085,7 @@ impl World {
     // Published to every connection: one complete view per zone. Each connection forwards only the view
     // that holds its own character; `tick` and `online` also sit at the top for the health route.
     pub fn snapshot(&self) -> Value {
-        json!({"tick":self.tick,"online":self.humans_online(),
+        json!({"tick":self.tick,"online":self.visible_online(),"humansOnline":self.humans_online(),
         "zones":(0..self.maps.len()).map(|zone| self.snapshot_for(zone)).collect::<Vec<_>>()})
     }
 
@@ -1223,6 +1232,16 @@ impl World {
         }
     }
     fn leave(&mut self, session: u64) {
+        if self
+            .players
+            .get(&session)
+            .is_some_and(|p| p.ambient.is_some())
+        {
+            if let Some(p) = self.players.remove(&session) {
+                self.social_left(&p.character.id, &p.character.look.name, &[]);
+            }
+            return;
+        }
         if self.is_merc(session) {
             return self.remove_mercenary(session);
         }
@@ -1242,7 +1261,7 @@ impl World {
             self.pending_saves.iter().chain(
                 self.players
                     .values()
-                    .filter(|p| p.merc.is_none())
+                    .filter(|p| p.merc.is_none() && p.ambient.is_none())
                     .map(|p| &p.character),
             ),
         ) {
@@ -1606,6 +1625,7 @@ impl World {
         self.tick += 1;
         self.update_king_spawn();
         self.update_instances();
+        self.update_ambient();
         self.update_mercenaries();
         self.update_escorts();
         self.update_holds();
@@ -1630,7 +1650,11 @@ impl World {
         let stale: Vec<_> = self
             .players
             .iter()
-            .filter(|(_, p)| p.merc.is_none() && (p.peer.is_closed() || p.peer.capacity() == 0))
+            .filter(|(_, p)| {
+                p.merc.is_none()
+                    && p.ambient.is_none()
+                    && (p.peer.is_closed() || p.peer.capacity() == 0)
+            })
             .map(|(id, _)| *id)
             .collect();
         for session in stale {
@@ -1690,17 +1714,19 @@ impl World {
             .iter()
             .find(|i| i.zone == p.character.zone)
             .map_or(p.character.zone, |i| i.template);
-        p.character
-            .explore_in(public, self.maps[p.character.zone].size);
-        for title in sync_progression(&mut p.character, &self.maps) {
-            let _ = p.peer.try_send(json!({"type":"system","text":format!(
-                "A new quest has found you: {title}. Follow it in your journal (Q)."
-            )}));
-        }
-        for place in sync_visits(&mut p.character, &self.maps) {
-            let _ = p.peer.try_send(
-                json!({"type":"notice","ok":true,"text":format!("You have reached {place}.")}),
-            );
+        if p.ambient.is_none() {
+            p.character
+                .explore_in(public, self.maps[p.character.zone].size);
+            for title in sync_progression(&mut p.character, &self.maps) {
+                let _ = p.peer.try_send(json!({"type":"system","text":format!(
+                    "A new quest has found you: {title}. Follow it in your journal (Q)."
+                )}));
+            }
+            for place in sync_visits(&mut p.character, &self.maps) {
+                let _ = p.peer.try_send(
+                    json!({"type":"notice","ok":true,"text":format!("You have reached {place}.")}),
+                );
+            }
         }
         // Hand-in quests follow the bag, so the journal counts what the player carries right now.
         for i in 0..p.character.quests.len() {
@@ -1800,7 +1826,9 @@ impl World {
         if auto_attack {
             self.start_attack(session);
         }
-        self.use_portal(session);
+        if self.players[&session].ambient.is_none() {
+            self.use_portal(session);
+        }
     }
     // Stepping into a portal disc moves the player; the zone is never client-chosen.
     fn use_portal(&mut self, session: u64) {

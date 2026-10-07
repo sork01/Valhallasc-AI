@@ -33,13 +33,15 @@ const startOptions = z.object({
   startLevel: z.number().int().min(1).max(100).optional().describe('new characters begin at this level (VALHALLA_START_LEVEL)'),
   godMode: z.boolean().optional().describe('players take no damage; default on'),
   levelSpread: z.number().int().min(0).max(5).optional().describe('enemy levels roll within this distance of their default; 0 pins them (default 2)'),
+  ambientPlayers: z.boolean().optional().describe('temporary autonomous adventurers in occupied public zones; default off for isolated tests'),
 }).strict();
-tool('start_world', 'Start an isolated Rust server on loopback with a fresh test database and test shortcuts enabled. Build the binary first. Never connects to production. Options: startLevel, godMode, levelSpread.', startOptions, async options => {
+tool('start_world', 'Start an isolated Rust server on loopback with a fresh test database and test shortcuts enabled. Build the binary first. Never connects to production. Options: startLevel, godMode, levelSpread, ambientPlayers.', startOptions, async options => {
   if (world) throw Error('A world is already active. Call stop_world first.');
   world = new TestWorld();
   world.startLevel = options.startLevel;
   world.godMode = options.godMode;
   world.levelSpread = options.levelSpread;
+  world.ambientPlayers = !!options.ambientPlayers;
   try { return await world.start(); } catch (error) { world = null; throw error; }
 });
 tool('stop_world', 'Disconnect bots and gracefully stop the private server. Test artifacts remain available.', empty, async () => {

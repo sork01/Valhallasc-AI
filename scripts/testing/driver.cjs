@@ -109,6 +109,7 @@ class TestWorld extends EventEmitter {
     // Optional per-world overrides, applied at every (re)launch: godMode true/false, levelSpread 0-5.
     this.godMode = undefined;
     this.levelSpread = undefined;
+    this.ambientPlayers = false;
   }
   get snapshot() { return this.merged; }
   set snapshot(value) { if (value === null) { this.views.clear(); this.merged = null; } else this.merged = value; }
@@ -144,7 +145,7 @@ class TestWorld extends EventEmitter {
       // Test worlds are invulnerable (enemies still fight and enemy levels are still random), so scenarios never fail by dying.
       VALHALLA_GOD_MODE: this.godMode === undefined ? process.env.VALHALLA_GOD_MODE ?? '1' : this.godMode ? '1' : '0',
       // Lets bots send `debug` shortcuts (levels, items, teleports, quests); see debug() below.
-      VALHALLA_TEST_COMMANDS: '1' };
+      VALHALLA_TEST_COMMANDS: '1', VALHALLA_AMBIENT_PLAYERS: this.ambientPlayers ? '1' : '0' };
     if (this.levelSpread !== undefined) environment.VALHALLA_LEVEL_SPREAD = String(this.levelSpread);
     // Optional: new characters start at this level (test servers only), so learned skills can be driven for real.
     if (this.startLevel || process.env.VALHALLA_START_LEVEL) environment.VALHALLA_START_LEVEL = String(this.startLevel || process.env.VALHALLA_START_LEVEL);

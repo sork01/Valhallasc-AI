@@ -301,7 +301,7 @@ impl World {
         let online: Vec<String> = self
             .players
             .values()
-            .filter(|p| p.merc.is_none())
+            .filter(|p| p.merc.is_none() && p.ambient.is_none())
             .map(|p| p.character.id.clone())
             .collect();
         let now = self.time;

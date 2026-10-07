@@ -64,6 +64,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .and_then(|v| v.parse::<i32>().ok())
         .map_or(world::LEVEL_SPREAD, |v| v.clamp(0, 5));
     let mut world = world::World::with_level_spread(store, spread);
+    // Shared outdoor maps and cities may host temporary autonomous adventurers. Test servers leave this off unless
+    // they explicitly exercise the feature; private dungeon copies never receive them.
+    world.ambient_enabled = std::env::var("VALHALLA_AMBIENT_PLAYERS").is_ok_and(|v| v == "1");
     // For automated tests only: players take no damage. Never set on the public service.
     world.god_mode = std::env::var("VALHALLA_GOD_MODE").is_ok_and(|v| v == "1");
     if world.god_mode {
@@ -157,7 +160,7 @@ async fn shutdown_signal() {
 async fn health(State(app): State<App>) -> impl IntoResponse {
     let snapshot = app.snapshots.borrow();
     axum::Json(
-        json!({"status":"ok","version":1,"tick":snapshot["tick"],"online":snapshot["online"],"capacity":MAX_PLAYERS}),
+        json!({"status":"ok","version":1,"tick":snapshot["tick"],"online":snapshot["humansOnline"],"visibleOnline":snapshot["online"],"capacity":MAX_PLAYERS}),
     )
 }
 // One zone's complete snapshot: the one listing this player, else the last zone they were in.

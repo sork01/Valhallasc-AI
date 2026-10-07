@@ -42,12 +42,15 @@ impl World {
     }
     /// Players who are really connected.
     pub(super) fn humans_online(&self) -> usize {
-        self.players.values().filter(|p| p.merc.is_none()).count()
+        self.players
+            .values()
+            .filter(|p| p.merc.is_none() && p.ambient.is_none())
+            .count()
     }
     pub(super) fn session_of(&self, character: &str) -> Option<u64> {
         self.players
             .iter()
-            .find(|(_, p)| p.merc.is_none() && p.character.id == character)
+            .find(|(_, p)| p.merc.is_none() && p.ambient.is_none() && p.character.id == character)
             .map(|(session, _)| *session)
     }
     /// Whose rewards a kill by `session` pays: the hirer's when it is a mercenary's.
@@ -347,7 +350,49 @@ impl World {
                     .min_by(|a, b| a.point().distance(me).total_cmp(&b.point().distance(me)))
                     .map(|s| s.id)
             });
-        let class = self.players[&session].character.look.class;
+        self.ai_combat(session, &mate_sessions, chosen);
+        // Move: fight the chosen enemy, or keep to the hirer's side.
+        let slot = {
+            let mut hired: Vec<u64> = self.mercenaries_of(&self.players[&owner].character.id);
+            hired.sort_unstable();
+            hired.iter().position(|s| *s == session).unwrap_or(0) as f64
+        };
+        let p = self.players.get_mut(&session).unwrap();
+        match chosen {
+            Some(id) => {
+                if p.target != Some(id) {
+                    p.target = Some(id);
+                    p.goal = None;
+                    p.input = Point::default();
+                }
+            }
+            None => {
+                p.target = None;
+                let angle = slot * 1.3 + 0.6;
+                let goal = Point {
+                    x: there.x + angle.cos() * 2.4,
+                    y: there.y + angle.sin() * 2.4,
+                };
+                if me.distance(goal) > 1.6 {
+                    p.goal = Some(goal);
+                } else if me.distance(there) < 1. {
+                    p.goal = None;
+                }
+            }
+        }
+    }
+
+    /// Combat decisions shared by hired mercenaries and independent adventurers. Movement and ownership stay separate.
+    pub(super) fn ai_combat(&mut self, session: u64, mate_sessions: &[u64], chosen: Option<usize>) {
+        let Some(p) = self.players.get(&session) else {
+            return;
+        };
+        if p.character.hp <= 0. {
+            return;
+        }
+        let me = p.character.point();
+        let zone = p.character.zone;
+        let class = p.character.look.class;
         // Keep the party alive first: one potion at a time (they share a cooldown), health before mana.
         {
             let p = &self.players[&session];
@@ -439,35 +484,6 @@ impl World {
             };
             if fire {
                 self.use_skill(session, &skill.id, aim);
-            }
-        }
-        // Move: fight the chosen enemy, or keep to the hirer's side.
-        let slot = {
-            let mut hired: Vec<u64> = self.mercenaries_of(&self.players[&owner].character.id);
-            hired.sort_unstable();
-            hired.iter().position(|s| *s == session).unwrap_or(0) as f64
-        };
-        let p = self.players.get_mut(&session).unwrap();
-        match chosen {
-            Some(id) => {
-                if p.target != Some(id) {
-                    p.target = Some(id);
-                    p.goal = None;
-                    p.input = Point::default();
-                }
-            }
-            None => {
-                p.target = None;
-                let angle = slot * 1.3 + 0.6;
-                let goal = Point {
-                    x: there.x + angle.cos() * 2.4,
-                    y: there.y + angle.sin() * 2.4,
-                };
-                if me.distance(goal) > 1.6 {
-                    p.goal = Some(goal);
-                } else if me.distance(there) < 1. {
-                    p.goal = None;
-                }
             }
         }
     }
