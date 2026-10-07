@@ -13,6 +13,7 @@ from pathlib import Path
 
 import generate_gloamfen as fen
 import spark_travel
+from quest_gear_rewards import add_reward
 
 ROOT = Path(__file__).resolve().parents[1]
 PATH = ROOT / 'world/map.txt'
@@ -63,9 +64,9 @@ def content():
     def kill(target, label, count): return {'kind': 'kill', 'target': target, 'label': label, 'count': count}
     def bring(target, label, count): return {'kind': 'bring', 'target': target, 'label': label, 'count': count}
     def quest(id_, title, giver, description, objectives, level, gold, requires=None, repeatable=False):
-        return {'id': 'astral_' + id_, 'title': title, 'npc': 'astral_' + giver, 'description': description,
+        return add_reward({'id': 'astral_' + id_, 'title': title, 'npc': 'astral_' + giver, 'description': description,
                 'objectives': objectives, 'level': level, 'rewardXp': XP[level - 1] // 10,
-                'rewardGold': gold, 'requires': 'astral_' + requires if requires else None, 'repeatable': repeatable}
+                'rewardGold': gold, 'requires': 'astral_' + requires if requires else None, 'repeatable': repeatable})
     quests = [
         quest('welcome', 'A Map of Falling Stars', 'steward', 'Meet the observatory keepers before you take the trail.',
               [talk('healer', 'Speak with Ilyra Nightbloom'), talk('scholar', 'Speak with Vey Orison'), talk('warden', 'Speak with Orun Nightshield')], 40, 300),

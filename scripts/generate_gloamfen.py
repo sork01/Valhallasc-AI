@@ -22,6 +22,7 @@ import spark_travel
 import math
 from pathlib import Path
 import random
+from quest_gear_rewards import add_reward
 
 import mercenary_offers as mo
 import progression_quests
@@ -107,9 +108,9 @@ def quest_hub():
 
     def quest(id, title, npc, description, objectives, level, gold, requires=None, repeatable=False):
         # Recommended level; the XP reward is 10% of what that level needs (server test enforces it).
-        return dict(id='fen_' + id, title=title, npc='fen_' + npc, description=description,
+        return add_reward(dict(id='fen_' + id, title=title, npc='fen_' + npc, description=description,
                     objectives=objectives, level=level, rewardXp=LEVEL_XP[level - 1] // 10, rewardGold=gold,
-                    requires='fen_' + requires if requires else None, repeatable=repeatable)
+                    requires='fen_' + requires if requires else None, repeatable=repeatable))
 
     quests = [
         quest('welcome', 'Lights on the Water', 'reeve',

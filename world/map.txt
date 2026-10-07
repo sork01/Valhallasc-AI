@@ -1223,6 +1223,1406 @@
       "y": 9.0,
       "r": 0.45,
       "v": 0
+    },
+    {
+      "kind": "water",
+      "x": 79,
+      "y": 28,
+      "r": 2.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "water",
+      "x": 81.5,
+      "y": 29.5,
+      "r": 2.2,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "water",
+      "x": 78.2,
+      "y": 30.5,
+      "r": 1.7,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 85.54,
+      "y": 85.54,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 82.0,
+      "y": 87.0,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 78.46,
+      "y": 85.54,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 77.0,
+      "y": 82.0,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 78.46,
+      "y": 78.46,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 82.0,
+      "y": 77.0,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 85.54,
+      "y": 78.46,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 74.57,
+      "y": 16.69,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 74.28,
+      "y": 20.94,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 88.36,
+      "y": 13.44,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 90.78,
+      "y": 5.63,
+      "r": 0.3,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 71.58,
+      "y": 9.94,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 82.61,
+      "y": 22.63,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 72.55,
+      "y": 4.28,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 67.44,
+      "y": 3.81,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 90.29,
+      "y": 16.82,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 92.99,
+      "y": 24.31,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 92.87,
+      "y": 14.08,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 92.17,
+      "y": 9.16,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 79.13,
+      "y": 7.3,
+      "r": 0.4,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 68.95,
+      "y": 12.37,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 74.01,
+      "y": 11.19,
+      "r": 0.3,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 68.6,
+      "y": 19.88,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 67.81,
+      "y": 6.71,
+      "r": 0.3,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 83.16,
+      "y": 4.24,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 86.95,
+      "y": 17.95,
+      "r": 0.4,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 73.26,
+      "y": 19.02,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 78.98,
+      "y": 18.73,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 72.61,
+      "y": 8.85,
+      "r": 0.4,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 76.49,
+      "y": 24.17,
+      "r": 0.4,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 84.25,
+      "y": 22.05,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 68.51,
+      "y": 4.87,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 79.74,
+      "y": 9.69,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 79.54,
+      "y": 3.64,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 71.93,
+      "y": 11.41,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 71.07,
+      "y": 17.94,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 68.54,
+      "y": 21.49,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 81.63,
+      "y": 24.25,
+      "r": 0.3,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 74.84,
+      "y": 18.53,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 88.42,
+      "y": 3.36,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 84.28,
+      "y": 8.5,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 77.14,
+      "y": 18.61,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 78.65,
+      "y": 16.0,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 82.32,
+      "y": 5.33,
+      "r": 0.3,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 85.51,
+      "y": 5.68,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 88.93,
+      "y": 6.62,
+      "r": 0.3,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 77.51,
+      "y": 17.01,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 76.45,
+      "y": 5.68,
+      "r": 0.3,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 91.11,
+      "y": 12.16,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 75.21,
+      "y": 50.92,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 67.56,
+      "y": 26.66,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 67.79,
+      "y": 38.88,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 77.44,
+      "y": 54.09,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 88.18,
+      "y": 39.87,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 69.7,
+      "y": 37.38,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 81.66,
+      "y": 49.28,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 67.53,
+      "y": 37.18,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 80.83,
+      "y": 45.72,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 77.29,
+      "y": 40.47,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 77.17,
+      "y": 48.25,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 89.97,
+      "y": 28.44,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 82.56,
+      "y": 51.74,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 67.19,
+      "y": 44.46,
+      "r": 0.3,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 69.63,
+      "y": 51.81,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 73.74,
+      "y": 43.58,
+      "r": 0.3,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 72.99,
+      "y": 33.22,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 70.05,
+      "y": 55.45,
+      "r": 0.4,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 69.06,
+      "y": 32.7,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 82.25,
+      "y": 46.96,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 88.47,
+      "y": 53.76,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 87.2,
+      "y": 32.75,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 91.59,
+      "y": 56.33,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 73.49,
+      "y": 30.4,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 92.94,
+      "y": 54.07,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 78.91,
+      "y": 51.66,
+      "r": 0.3,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 87.93,
+      "y": 37.89,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 80.01,
+      "y": 43.64,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 91.59,
+      "y": 44.06,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 87.99,
+      "y": 41.86,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 82.67,
+      "y": 44.63,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 75.7,
+      "y": 32.63,
+      "r": 0.3,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 90.11,
+      "y": 41.63,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 71.62,
+      "y": 50.48,
+      "r": 0.3,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 92.72,
+      "y": 40.86,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 69.11,
+      "y": 56.9,
+      "r": 0.3,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 72.14,
+      "y": 54.71,
+      "r": 0.3,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 85.68,
+      "y": 57.26,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 90.02,
+      "y": 39.71,
+      "r": 0.3,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 71.11,
+      "y": 32.42,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 73.44,
+      "y": 42.02,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 87.45,
+      "y": 43.44,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 79.85,
+      "y": 52.9,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 67.99,
+      "y": 48.05,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 70.39,
+      "y": 29.1,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 90.58,
+      "y": 54.15,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 92.73,
+      "y": 47.29,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 71.88,
+      "y": 52.74,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 83.94,
+      "y": 48.46,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 67.43,
+      "y": 29.83,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 79.45,
+      "y": 68.7,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 87.23,
+      "y": 74.66,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 87.24,
+      "y": 70.88,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 91.15,
+      "y": 61.46,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 80.7,
+      "y": 62.45,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 71.84,
+      "y": 72.53,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 78.6,
+      "y": 64.08,
+      "r": 0.3,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 74.76,
+      "y": 65.8,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 92.25,
+      "y": 59.62,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 71.37,
+      "y": 59.41,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 91.79,
+      "y": 78.53,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 89.66,
+      "y": 83.24,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 67.07,
+      "y": 72.17,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 69.83,
+      "y": 75.3,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 69.35,
+      "y": 77.21,
+      "r": 0.4,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 92.25,
+      "y": 73.22,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 67.9,
+      "y": 84.7,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 68.8,
+      "y": 81.78,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 72.34,
+      "y": 60.64,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 83.49,
+      "y": 90.35,
+      "r": 0.3,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 71.02,
+      "y": 82.18,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 88.01,
+      "y": 73.05,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 74.04,
+      "y": 89.38,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 67.94,
+      "y": 62.76,
+      "r": 0.3,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 92.85,
+      "y": 63.66,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 70.55,
+      "y": 73.59,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 90.9,
+      "y": 70.78,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 81.7,
+      "y": 65.41,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 90.18,
+      "y": 67.93,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 77.73,
+      "y": 67.0,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 79.99,
+      "y": 90.98,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 73.81,
+      "y": 78.45,
+      "r": 0.42,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 90.57,
+      "y": 63.8,
+      "r": 0.3,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 69.28,
+      "y": 79.54,
+      "r": 0.3,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 67.73,
+      "y": 75.25,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 83.71,
+      "y": 61.7,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 68.15,
+      "y": 90.32,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 79.91,
+      "y": 66.1,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 85.2,
+      "y": 67.53,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 90.41,
+      "y": 82.18,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 87.81,
+      "y": 61.05,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 92.37,
+      "y": 75.54,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 73.82,
+      "y": 91.37,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 84.45,
+      "y": 70.04,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 90.2,
+      "y": 79.26,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 76.04,
+      "y": 74.99,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 77.04,
+      "y": 64.95,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 70.91,
+      "y": 77.51,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 66.07,
+      "y": 87.33,
+      "r": 0.3,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 84.65,
+      "y": 90.95,
+      "r": 0.3,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 88.73,
+      "y": 91.65,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 85.62,
+      "y": 59.16,
+      "r": 0.42,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 66.45,
+      "y": 61.76,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 17.96,
+      "y": 89.26,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 11.6,
+      "y": 74.65,
+      "r": 0.4,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 4.11,
+      "y": 66.02,
+      "r": 0.4,
+      "v": 0,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 7.99,
+      "y": 73.45,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 14.49,
+      "y": 89.2,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 7.01,
+      "y": 67.49,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 10.92,
+      "y": 85.34,
+      "r": 0.42,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 5.33,
+      "y": 77.89,
+      "r": 0.4,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 21.56,
+      "y": 86.36,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 11.59,
+      "y": 91.4,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 5.44,
+      "y": 73.95,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 11.59,
+      "y": 88.27,
+      "r": 0.3,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 19.66,
+      "y": 77.27,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 19.23,
+      "y": 68.42,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 18.91,
+      "y": 87.64,
+      "r": 0.3,
+      "v": 3,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "tree",
+      "x": 20.74,
+      "y": 69.06,
+      "r": 0.42,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 10.81,
+      "y": 83.93,
+      "r": 0.3,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 4.81,
+      "y": 87.51,
+      "r": 0.4,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "bush",
+      "x": 15.12,
+      "y": 70.85,
+      "r": 0.3,
+      "v": 2,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "rock",
+      "x": 18.18,
+      "y": 78.99,
+      "r": 0.4,
+      "v": 1,
+      "layout": "greenmeadow_wide_v1"
     }
   ],
   "slimes": [
@@ -1297,8 +2697,8 @@
       "kind": "big"
     },
     {
-      "x": 48.69230359699577,
-      "y": 46.80886775627732,
+      "x": 84,
+      "y": 41,
       "kind": "big"
     },
     {
@@ -1330,6 +2730,72 @@
       "x": 18,
       "y": 42,
       "kind": "beetle"
+    },
+    {
+      "kind": "green",
+      "x": 12,
+      "y": 79,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "green",
+      "x": 18,
+      "y": 74,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "green",
+      "x": 75,
+      "y": 58,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "green",
+      "x": 90,
+      "y": 88,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "blue",
+      "x": 72,
+      "y": 47,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "blue",
+      "x": 83,
+      "y": 16,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "blue",
+      "x": 81,
+      "y": 58,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "pink",
+      "x": 91,
+      "y": 32,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "yellow",
+      "x": 72,
+      "y": 24,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "beetle",
+      "x": 88,
+      "y": 49,
+      "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "beetle",
+      "x": 75,
+      "y": 86,
+      "layout": "greenmeadow_wide_v1"
     }
   ],
   "city": {
@@ -1562,7 +3028,8 @@
       "rewardXp": 20,
       "rewardGold": 24,
       "requires": null,
-      "repeatable": false
+      "repeatable": false,
+      "rewardItem": "necklace_moonstone_l1_green"
     },
     {
       "id": "ironhide_hunt",
@@ -1581,7 +3048,8 @@
       "rewardXp": 60,
       "rewardGold": 35,
       "requires": "slime_patrol",
-      "repeatable": false
+      "repeatable": false,
+      "rewardItem": "pants_upgrade"
     },
     {
       "id": "king_challenge",
@@ -1600,7 +3068,8 @@
       "rewardXp": 80,
       "rewardGold": 60,
       "requires": "ironhide_hunt",
-      "repeatable": false
+      "repeatable": false,
+      "rewardItem": "accessory_amber_l5_blue"
     },
     {
       "id": "meadow_bounty",
@@ -1634,6 +3103,166 @@
       "tx": 48.0,
       "ty": 86.5
     }
+  ],
+  "paths": [
+    [
+      [
+        36,
+        79
+      ],
+      [
+        36,
+        71
+      ],
+      [
+        36,
+        62
+      ],
+      [
+        33,
+        52
+      ],
+      [
+        38,
+        44
+      ],
+      [
+        36,
+        36
+      ],
+      [
+        42,
+        28
+      ],
+      [
+        50,
+        22
+      ],
+      [
+        54,
+        12
+      ]
+    ],
+    [
+      [
+        36,
+        36
+      ],
+      [
+        26,
+        32
+      ],
+      [
+        16,
+        26
+      ],
+      [
+        10,
+        16
+      ]
+    ],
+    [
+      [
+        33,
+        52
+      ],
+      [
+        21,
+        57
+      ],
+      [
+        11,
+        68
+      ],
+      [
+        8,
+        84
+      ]
+    ],
+    [
+      [
+        38,
+        44
+      ],
+      [
+        55,
+        42
+      ],
+      [
+        66,
+        43
+      ],
+      [
+        75,
+        39
+      ],
+      [
+        84,
+        34
+      ],
+      [
+        90,
+        20
+      ]
+    ],
+    [
+      [
+        50,
+        22
+      ],
+      [
+        64,
+        17
+      ],
+      [
+        78,
+        13
+      ],
+      [
+        89,
+        10
+      ]
+    ],
+    [
+      [
+        38,
+        52
+      ],
+      [
+        54,
+        60
+      ],
+      [
+        69,
+        66
+      ],
+      [
+        79,
+        72
+      ],
+      [
+        87,
+        81
+      ]
+    ],
+    [
+      [
+        36,
+        69
+      ],
+      [
+        52,
+        68
+      ],
+      [
+        67,
+        69
+      ],
+      [
+        79,
+        72
+      ]
+    ]
   ],
   "zones": [
     {
@@ -4737,7 +6366,8 @@
           "rewardXp": 80,
           "rewardGold": 65,
           "requires": "crags_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l5_green"
         },
         {
           "id": "crags_wisp_sweep",
@@ -4775,7 +6405,8 @@
           "rewardXp": 100,
           "rewardGold": 100,
           "requires": "crags_wisps",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_upgrade"
         },
         {
           "id": "crags_spider_sweep",
@@ -4907,7 +6538,8 @@
           "rewardXp": 210,
           "rewardGold": 250,
           "requires": "crags_golems",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "accessory_amber_l10_blue"
         },
         {
           "id": "crags_cinderlord",
@@ -4928,7 +6560,7 @@
           "requires": null,
           "repeatable": false,
           "group": true,
-          "rewardItem": "necklace_moonstone_l10_green",
+          "rewardItem": "necklace_moonstone_l10_blue",
           "recommendedPlayers": 2
         },
         {
@@ -10798,7 +12430,8 @@
           "rewardXp": 210,
           "rewardGold": 220,
           "requires": "rime_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l10_green"
         },
         {
           "id": "rime_crab_sweep",
@@ -10836,7 +12469,8 @@
           "rewardXp": 280,
           "rewardGold": 300,
           "requires": "rime_crabs",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l10_green"
         },
         {
           "id": "rime_wolf_pack",
@@ -10956,7 +12590,8 @@
           "rewardXp": 410,
           "rewardGold": 550,
           "requires": "rime_wyrm",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "accessory_amber_l15_blue"
         },
         {
           "id": "rime_vanguard",
@@ -10993,7 +12628,8 @@
           "rewardXp": 410,
           "rewardGold": 600,
           "requires": "rime_wyrm",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l15_blue"
         },
         {
           "id": "rime_bounty",
@@ -16569,7 +18205,8 @@
           "rewardXp": 410,
           "rewardGold": 320,
           "requires": "fen_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l15_green"
         },
         {
           "id": "fen_toad_sweep",
@@ -16626,7 +18263,8 @@
           "rewardXp": 500,
           "rewardGold": 420,
           "requires": "fen_toads",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l15_green"
         },
         {
           "id": "fen_croc_hunt",
@@ -16808,7 +18446,8 @@
           "rewardXp": 650,
           "rewardGold": 820,
           "requires": "fen_hydra",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l20_blue"
         },
         {
           "id": "fen_gloomroot",
@@ -25345,7 +26984,8 @@
           "rewardXp": 280,
           "rewardGold": 480,
           "requires": "city_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l10_green"
         },
         {
           "id": "city_forge",
@@ -25395,7 +27035,8 @@
           "rewardXp": 360,
           "rewardGold": 620,
           "requires": "city_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l15_green"
         },
         {
           "id": "city_hearths",
@@ -25550,7 +27191,8 @@
           "rewardXp": 650,
           "rewardGold": 1100,
           "requires": "city_stone",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "accessory_amber_l20_blue"
         },
         {
           "id": "city_order",
@@ -41711,7 +43353,8 @@
           "rewardXp": 710,
           "rewardGold": 460,
           "requires": "wyrd_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l20_green"
         },
         {
           "id": "wyrd_tusks",
@@ -41774,7 +43417,8 @@
           "rewardXp": 830,
           "rewardGold": 540,
           "requires": "wyrd_boars",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l25_green"
         },
         {
           "id": "wyrd_feathers",
@@ -41853,7 +43497,8 @@
           "rewardXp": 960,
           "rewardGold": 600,
           "requires": "wyrd_crows",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "accessory_amber_l25_blue"
         },
         {
           "id": "wyrd_patrol",
@@ -41979,7 +43624,8 @@
           "rewardXp": 960,
           "rewardGold": 700,
           "requires": "wyrd_watch_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l25_green"
         },
         {
           "id": "wyrd_scrap",
@@ -42067,7 +43713,8 @@
           "rewardXp": 1100,
           "rewardGold": 900,
           "requires": "wyrd_watch_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l30_green"
         },
         {
           "id": "wyrd_fate",
@@ -42245,7 +43892,8 @@
           "rewardXp": 1320,
           "rewardGold": 1200,
           "requires": "wyrd_stones",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "accessory_amber_l30_blue"
         }
       ],
       "city": {
@@ -49494,7 +51142,8 @@
           "rewardXp": 1320,
           "rewardGold": 850,
           "requires": "sky_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l30_green"
         },
         {
           "id": "sky_fangs",
@@ -49576,7 +51225,8 @@
           "rewardXp": 1400,
           "rewardGold": 950,
           "requires": "sky_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l30_green"
         },
         {
           "id": "sky_shards",
@@ -49919,7 +51569,8 @@
           "rewardXp": 1740,
           "rewardGold": 1600,
           "requires": "sky_quills",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l35_blue"
         },
         {
           "id": "sky_onward",
@@ -59511,7 +61162,8 @@
           "rewardXp": 1740,
           "rewardGold": 1250,
           "requires": "deep_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l35_green"
         },
         {
           "id": "deep_coins",
@@ -59593,7 +61245,8 @@
           "rewardXp": 1830,
           "rewardGold": 1400,
           "requires": "deep_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l35_green"
         },
         {
           "id": "deep_lures",
@@ -59984,7 +61637,8 @@
           "rewardXp": 2210,
           "rewardGold": 2400,
           "requires": "deep_kraken",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "accessory_amber_l40_blue"
         },
         {
           "id": "deep_onward",
@@ -63500,7 +65154,8 @@
           "rewardXp": 1740,
           "rewardGold": 100,
           "requires": "nacre_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l35_green"
         },
         {
           "id": "nacre_districts",
@@ -63574,7 +65229,8 @@
           "rewardXp": 2010,
           "rewardGold": 100,
           "requires": "nacre_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l35_green"
         },
         {
           "id": "nacre_cathedral",
@@ -63605,7 +65261,8 @@
           "rewardXp": 2210,
           "rewardGold": 200,
           "requires": "nacre_history",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "accessory_amber_l40_blue"
         },
         {
           "id": "nacre_lamps",
@@ -63643,7 +65300,8 @@
           "rewardXp": 2110,
           "rewardGold": 700,
           "requires": "nacre_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l40_blue"
         },
         {
           "id": "nacre_letters",
@@ -88295,7 +89953,8 @@
           "rewardXp": 2210,
           "rewardGold": 420,
           "requires": "astral_welcome",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l40_green"
         },
         {
           "id": "astral_wyrms",
@@ -88314,7 +89973,8 @@
           "rewardXp": 2310,
           "rewardGold": 520,
           "requires": "astral_moths",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l40_green"
         },
         {
           "id": "astral_beetles",
@@ -88371,7 +90031,8 @@
           "rewardXp": 2740,
           "rewardGold": 800,
           "requires": "astral_dryads",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l45_blue"
         },
         {
           "id": "astral_garden",
@@ -88465,7 +90126,8 @@
           "rewardXp": 2630,
           "rewardGold": 900,
           "requires": "astral_golems",
-          "repeatable": false
+          "repeatable": false,
+          "rewardItem": "accessory_amber_l45_blue"
         },
         {
           "id": "astral_patrol",

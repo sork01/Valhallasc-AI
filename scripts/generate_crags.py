@@ -18,6 +18,7 @@ import random
 
 import mercenary_offers as mo
 import progression_quests
+from quest_gear_rewards import add_reward
 
 ROOT = Path(__file__).resolve().parents[1]
 PATH = ROOT / 'world/map.txt'
@@ -66,9 +67,9 @@ def quest_hub():
 
     def quest(id, title, npc, description, objectives, level, gold, requires=None, repeatable=False):
         # Recommended level; the XP reward is 10% of what that level needs (server test enforces it).
-        return dict(id='crags_' + id, title=title, npc='crags_' + npc, description=description,
+        return add_reward(dict(id='crags_' + id, title=title, npc='crags_' + npc, description=description,
                     objectives=objectives, level=level, rewardXp=LEVEL_XP[level - 1] // 10, rewardGold=gold,
-                    requires='crags_' + requires if requires else None, repeatable=repeatable)
+                    requires='crags_' + requires if requires else None, repeatable=repeatable))
 
     quests = [
         quest('welcome', 'A Foothold in the Ash', 'captain',
@@ -110,7 +111,7 @@ def quest_hub():
               'Both accept this quest and damage him; stay alive and nearby when he falls. '
               'Return to Captain Sera for a guaranteed green Reinforced Moonstone Necklace, usable by every class.',
               [kill('cinderlord', 1, 'Defeat the Cinderlord (Elite · 2 players)')], 10, 200),
-              group=True, rewardItem='necklace_moonstone_l10_green', recommendedPlayers=2),
+              group=True, rewardItem='necklace_moonstone_l10_blue', recommendedPlayers=2),
         quest('bounty', 'Cinderwatch Patrol', 'supplier',
               'Defeat ten enemies anywhere in Emberfall Crags and return to Dain. This camp patrol can be repeated.',
               [kill('any', 10, 'Defeat Crags enemies')], 6, 100, 'welcome', True),

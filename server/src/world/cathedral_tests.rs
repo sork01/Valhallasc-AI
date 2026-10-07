@@ -303,6 +303,13 @@ fn cathedral_final_boss_first_does_not_clear_but_all_four_bosses_open_only_their
                 boss_slots(&encounter.kind).len(),
                 "guaranteed exclusive pieces from the real kill path"
             );
+            if w.slimes[id].kind == w.maps[zone].final_boss {
+                assert!(
+                    loot.len() >= 2,
+                    "the finale must drop at least two blue items"
+                );
+                assert!(loot.iter().all(|i| i.rarity == "rare"));
+            }
             assert!(loot.iter().all(|i| i.required_level == encounter.level));
             assert!(w.slimes[id].dead && w.slimes[id].respawn > 1e8);
             assert_eq!(w.instance_cleared(zone), n == 3);

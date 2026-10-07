@@ -18,7 +18,9 @@
   const useItem = i => consumable(i) && canEquip() && bagQuantity(i.id) > 0 && Field.useItem(i.id);
   const activate = i => consumable(i) ? useItem(i) : equip(i);
   const num = n => Number(n.toFixed(1));
-  const stats = i => [i.attack ? `+${num(i.attack)} attack` : '', i.defense ? `${num(i.defense)} defense` : ''].filter(Boolean).join(' · ');
+  const statNames = ['strength', 'agility', 'intellect', 'stamina', 'dexterity', 'accuracy'];
+  const bonusStats = i => statNames.filter(stat => i.bonusStats?.[stat]).map(stat => `+${i.bonusStats[stat]} ${stat}`).join(' · ');
+  const stats = i => [i.attack ? `+${num(i.attack)} attack` : '', i.defense ? `${num(i.defense)} defense` : '', bonusStats(i)].filter(Boolean).join(' · ');
   const heroLevel = () => Field.hero?.level || 1;
   const levelOf = i => i?.requiredLevel || 1;
   const tooLow = i => !!i && levelOf(i) > heroLevel();   // gear above the hero's level cannot be put on (the server refuses it too)
@@ -81,7 +83,8 @@
       const target = slots.find(([s]) => slotKind(s) === i.kind)?.[0], current = target && itemAtSlot(target);
       if (current && current.id !== i.id) {
         const attack = num((i.attack || 0) - (current.attack || 0)), defense = num((i.defense || 0) - (current.defense || 0));
-        t.append(node('p', `Compared with ${current.name}: ${attack >= 0 ? '+' : ''}${attack} attack · ${defense >= 0 ? '+' : ''}${defense} defense`, 'item-comparison'));
+        const bonus = statNames.map(stat => ({ stat, delta: (i.bonusStats?.[stat] || 0) - (current.bonusStats?.[stat] || 0) })).filter(v => v.delta).map(v => `${v.delta > 0 ? '+' : ''}${v.delta} ${v.stat}`).join(' · ');
+        t.append(node('p', `Compared with ${current.name}: ${attack >= 0 ? '+' : ''}${attack} attack · ${defense >= 0 ? '+' : ''}${defense} defense${bonus ? ` · ${bonus}` : ''}`, 'item-comparison'));
       }
     }
     t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', i.starter ? 'Starter gear · cannot be sold' : `Sells for ${i.sell} gold each`));

@@ -102,6 +102,9 @@ const look = page => page.evaluate(() => {
       last = now; await page.waitForTimeout(80);
     }
   };
+  check(await page.evaluate(() => Field._debug.zones[0].objects.filter(o => o.x >= 66).length >= 140), 'Greenmeadow scenery extends across its eastern third');
+  await stageAt(0, 79, 36); await shot('greenmeadow-eastern-pond');
+  await stageAt(0, 82, 82); await shot('greenmeadow-southeastern-stones');
   await stageAt(0, gate.x, gate.y + 8);
   for (const step of await page.evaluate(([x, y]) => Field._debug.routeTo({ x, y }), [gate.x, gate.y + 4])) {
     await click(step.x, step.y); await reach(step.x, step.y, 1.3);
@@ -127,23 +130,19 @@ const look = page => page.evaluate(() => {
   const miniPixels = await page.evaluate(() => { const c = document.getElementById('minimap'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let ember = 0; for (let i = 0; i < d.length; i += 4) if (d[i] > 200 && d[i + 1] < 130 && d[i + 2] < 80 && d[i + 3] > 0) ember++; return ember; });
   check(miniPixels > 40, `The minimap shows the lava rivers (${miniPixels} ember pixels)`);
 
-  // The journal routes to local camp NPCs, while explaining where the meadow givers live.
+  // The journal shows accepted quests; unaccepted work is offered by marked camp NPCs.
   await page.keyboard.press('q');
-  check(await page.locator('#quest-journal').isVisible() && (await page.locator('#quest-list [data-quest="welcome"]').textContent()).includes('is back in Greenmeadow'), 'Meadow quests explain that their givers are in Greenmeadow');
-  check(await page.locator('#quest-list [data-quest^="crags_"]').count() === 14, 'All fourteen Crags quests appear in the journal');
-  check(await page.locator('#quest-list .quest-card').first().getAttribute('data-quest') === 'crags_welcome', 'Local camp quests sort first');
-  check(await page.locator('#quest-list [data-quest="crags_golems"]').textContent().then(t => t.includes('Locked') && t.includes('Voices in the Ash')), 'Later hunts explain their prerequisite');
-  const eliteCard = page.locator('#quest-list [data-quest="crags_cinderlord"]');
-  check(await eliteCard.locator('.quest-level').textContent().then(t => t.includes('level 10') && t.includes('2 players')), 'The elite quest recommends level 10 and two players');
-  const eliteReward = eliteCard.locator('[data-item="necklace_moonstone_l10_green"]');
-  check(await eliteReward.textContent().then(t => t.includes('Reinforced Moonstone Necklace') && t.includes('All classes') && t.includes('green'))
-    && await eliteReward.evaluate(e => getComputedStyle(e).color) === 'rgb(74, 214, 109)', 'The journal shows the guaranteed all-class green gear reward in green');
-  await page.locator('#quest-list [data-quest="crags_welcome"] button').filter({ hasText: 'Get quest from Captain Sera' }).click();
+  check(await page.locator('#quest-journal').isVisible() && (await page.locator('#quest-list .quest-empty').first().textContent()).includes('no quests in progress'), 'The journal lists only quests the hero has accepted');
+  await page.keyboard.press('Escape');
+  await page.evaluate(() => Field.visitNpc('crags_captain'));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 });
-  check(await page.locator('#npc-name').textContent() === 'Captain Sera', 'Journal travel reaches the camp commander');
+  check(await page.locator('#npc-name').textContent() === 'Captain Sera', 'Travel reaches the camp commander');
   await page.locator('#npc-quests .gossip-row[data-quest="crags_cinderlord"]').click();
-  check(await page.locator('#npc-quests [data-quest="crags_cinderlord"] [data-item="necklace_moonstone_l10_green"]').textContent().then(t => t.includes('Uncommon (green)'))
-    && await page.locator('#npc-quests [data-quest="crags_cinderlord"] .quest-level').textContent().then(t => t.includes('2 players')), 'Captain Sera shows the group size and green reward before acceptance');
+  const eliteReward = page.locator('#npc-quests [data-quest="crags_cinderlord"] [data-item="necklace_moonstone_l10_blue"]');
+  check(await eliteReward.textContent().then(t => t.includes('Runed Moonstone Necklace') && t.includes('Rare (blue)') && t.includes('All classes'))
+    && await eliteReward.evaluate(e => getComputedStyle(e).color) === 'rgb(27, 94, 168)', 'Captain Sera shows the guaranteed all-class blue gear reward in blue');
+  check(await eliteReward.textContent().then(t => t.includes('Rare (blue)'))
+    && await page.locator('#npc-quests [data-quest="crags_cinderlord"] .quest-level').textContent().then(t => t.includes('2 players')), 'Captain Sera shows the group size and blue reward before acceptance');
   await page.locator('#npc-quests [data-action="decline"]').click();
   await page.locator('#npc-quests .gossip-row[data-quest="crags_welcome"]').click();
   await page.locator('#npc-quests [data-quest="crags_welcome"] [data-action="accept"]').click();
@@ -208,7 +207,7 @@ const look = page => page.evaluate(() => {
   const seen = [];
   for (const [state, dieT] of [['idle', 0], ['windup', 0], ['lunge', 0], ['hurt', 0], ['dead', .2], ['dead', .45], ['dead', 3]]) {
     stage = { state, dieT };
-    await page.waitForFunction(([state]) => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000 && s.state === state).length === 5, [state], { timeout: 10000 });
+    await page.waitForFunction(([state, dieT]) => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000 && s.state === state && (state !== 'dead' || s.dieT >= dieT - .03)).length === 5, [state, dieT], { timeout: 10000 });
     await page.evaluate(() => { Field.hero.target = Field.slimes.find(s => s.id === 1002) || null; });
     await page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));   // the new state has been drawn
     check(await page.evaluate(() => Field.slimes.every(s => s.zone === 1) && Field.remotePlayers.length === 0), `A monster and a player from another zone in the ${state} packet are not shown`);

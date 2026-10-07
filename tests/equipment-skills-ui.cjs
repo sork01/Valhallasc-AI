@@ -251,6 +251,12 @@ async function call(name, args = {}) {
   check(await fixture.locator('[data-stat="dexterity"] b').textContent() === 'Dexterity 0', 'UI waits for the authoritative allocation');
   await fixture.evaluate(() => { statFixture.attributes.dexterity = 1; statFixture.statPoints = 5; statFixture.dodgeChance = .005; Attributes.update(statFixture); });
   check(await fixture.locator('#character-attributes').textContent().then(t => t.includes('Dexterity 1') && t.includes('5 points available') && t.includes('Dodge 0.5%')), 'Confirmed training updates point balance and dodge');
+  await fixture.evaluate(() => { statFixture.gearAttributes = { intellect: 2, stamina: 1 }; Attributes.update(statFixture); });
+  check(await fixture.locator('[data-stat="intellect"] b').textContent() === 'Intellect 2 (0 trained + 2 gear) ★' && await fixture.locator('[data-stat="stamina"] b').textContent() === 'Stamina 1 (0 trained + 1 gear)', 'Character window separates fixed gear attributes from trained points');
+  check(await fixture.locator('#character-attributes').textContent().then(t => t.includes('5 points available')), 'Gear attributes do not consume training points');
+  await fixture.locator('#equipped-slots [data-slot="necklace"] .gear-icon').hover();
+  const necklaceBonus = await fixture.evaluate(() => Object.entries(WORLD_ITEMS.find(i => i.id === 'necklace_upgrade').bonusStats)[0]);
+  check(await fixture.locator('#item-tooltip').textContent().then(t => t.includes(`+${necklaceBonus[1]} ${necklaceBonus[0]}`)), 'Blue item tooltip displays its fixed attribute bonus');
   await fixture.evaluate(() => { statFixture.dead = true; Attributes.update(statFixture); });
   check(await fixture.locator('.attribute-add:disabled').count() === 6, 'Dead characters cannot train');
   await fixture.evaluate(() => { statFixture.dead = false; Attributes.update(statFixture); sent = []; });

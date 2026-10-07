@@ -54,6 +54,41 @@ class GearGeneratorTests(unittest.TestCase):
             self.assertTrue(key not in seen, i['id'])
             seen.add(key)
 
+    def test_blue_and_purple_bonuses_are_fixed_by_item_id_and_class_useful(self):
+        self.run_generator()
+        items = json.loads(gear.ITEMS.read_text())
+        for item in items:
+            if item['kind'] not in gear.CLASS_KINDS + gear.SHARED_KINDS or item['rarity'] == 'gm':
+                continue
+            bonus = item.get('bonusStats', {})
+            expected = {'rare': 1, 'epic': 2}.get(item['rarity'], 0)
+            self.assertEqual(len(bonus), expected, item['id'])
+            self.assertEqual(bonus, gear.bonus_stats(item), item['id'])
+            level = min(90, max(5, item.get('requiredLevel', 1) // 5 * 5))
+            self.assertTrue(all(value == gear.ATTRIBUTE_BONUS[level] and stat in gear.bonus_choices(item.get('class'), value)
+                                for stat, value in bonus.items()), item['id'])
+
+    def test_attribute_bonus_scales_beyond_the_current_catalog(self):
+        expected_by_level = {
+            1: 1, 5: 1, 10: 3, 15: 5, 20: 7, 25: 10, 30: 15, 35: 20,
+            40: 30, 45: 35, 50: 40, 55: 48, 60: 55, 65: 63,
+            70: 70, 75: 78, 80: 85, 85: 93, 90: 100,
+        }
+        for level, expected in expected_by_level.items():
+            blue = {'id': 'future_warrior_blue', 'class': 'warrior', 'rarity': 'rare', 'requiredLevel': level}
+            purple = {'id': 'future_warrior_purple', 'class': 'warrior', 'rarity': 'epic', 'requiredLevel': level}
+            self.assertEqual(list(gear.bonus_stats(blue).values()), [expected])
+            self.assertEqual(sorted(gear.bonus_stats(purple).values()), [expected, expected])
+            self.assertNotIn('accuracy', gear.bonus_stats(blue) if expected > 20 else {})
+            self.assertNotIn('dexterity', gear.bonus_stats(purple) if expected > 70 else {})
+        self.assertEqual(set(gear.bonus_choices(None, 100)), {'stamina', 'strength', 'agility'})
+        for rarity, count in [('rare', 1), ('epic', 2)]:
+            shared = {'id': f'future_shared_{rarity}', 'rarity': rarity, 'requiredLevel': 90}
+            bonus = gear.bonus_stats(shared)
+            self.assertEqual(len(bonus), count)
+            self.assertTrue(set(bonus) <= {'stamina', 'strength', 'agility'})
+            self.assertTrue(all(value == 100 for value in bonus.values()))
+
 
 if __name__ == '__main__':
     unittest.main()

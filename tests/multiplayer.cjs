@@ -113,7 +113,7 @@ async function stageAt(page, point) {
   browser = await chromium.launch({ headless: true });
   const [warrior, mage, assassin] = await Promise.all([makePlayer('warrior','TestWarrior'), makePlayer('mage','TestMage'), makePlayer('assassin','TestAssassin')]);
   await warrior.waitForFunction(() => !!Field.beetleSprites);
-  check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='beetle').length===5 && Field.slimes.filter(s=>s.kind==='beetle').every(s=>s.level===5 && s.maxHp===240 && s.windupTime===.4)), 'Five tougher beetles arrive from authoritative snapshots, each at its default level 5 (the suite pins VALHALLA_LEVEL_SPREAD=0)');
+  check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='beetle').length===7 && Field.slimes.filter(s=>s.kind==='beetle').every(s=>s.level===5 && s.maxHp===240 && s.windupTime===.4)), 'Seven tougher beetles arrive from authoritative snapshots, each at its default level 5 (the suite pins VALHALLA_LEVEL_SPREAD=0)');
   check(await warrior.evaluate(() => Field.slimes.filter(s=>s.kind==='big').every(s=>s.level===6 && s.maxHp===600 && s.windupTime===.35)), 'King Slime has stronger health and faster windup');
   check(await warrior.evaluate(() => {const kings=Field.slimes.filter(s=>s.kind==='big');return kings.length===2 && kings.every(s=>s.dead && s.hp===0 && s.state==='waiting' && s.dieT>=2);}), 'Kings start hidden while waiting for the rare spawn timer');
   check(await warrior.evaluate(() => Field.hero.xpNeed===100), 'Server sends the level table threshold');

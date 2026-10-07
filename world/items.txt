@@ -349,7 +349,10 @@
     "sell": 192,
     "attack": 0.9,
     "defense": 3.8,
-    "variant": "ironhide"
+    "variant": "ironhide",
+    "bonusStats": {
+      "stamina": 5
+    }
   },
   {
     "id": "shoulders_upgrade",
@@ -393,7 +396,10 @@
     "sell": 240,
     "attack": 9.4,
     "defense": 2.4,
-    "variant": "moonstone"
+    "variant": "moonstone",
+    "bonusStats": {
+      "dexterity": 7
+    }
   },
   {
     "id": "accessory_upgrade",
@@ -404,7 +410,11 @@
     "sell": 480,
     "attack": 8.3,
     "defense": 2.1,
-    "variant": "amber"
+    "variant": "amber",
+    "bonusStats": {
+      "dexterity": 7,
+      "stamina": 7
+    }
   },
   {
     "id": "adventurer_satchel",
@@ -1247,7 +1257,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.5
+    "defense": 3.5,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "warrior_headgear_crimson_l1_blue",
@@ -1266,7 +1279,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "warrior_shoulders_crimson_l1_blue",
@@ -1285,7 +1301,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "strength": 1
+    }
   },
   {
     "id": "warrior_gloves_crimson_l1_blue",
@@ -1304,7 +1323,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "strength": 1
+    }
   },
   {
     "id": "warrior_weapon_sword_l1_blue",
@@ -1323,7 +1345,10 @@
     },
     "starter": false,
     "attack": 4.7,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "strength": 1
+    }
   },
   {
     "id": "mage_armor_apprentice_l1_blue",
@@ -1342,7 +1367,10 @@
     },
     "starter": false,
     "attack": 0.6,
-    "defense": 2.4
+    "defense": 2.4,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "mage_headgear_apprentice_l1_blue",
@@ -1361,7 +1389,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "accuracy": 1
+    }
   },
   {
     "id": "mage_shoulders_apprentice_l1_blue",
@@ -1380,7 +1411,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "agility": 1
+    }
   },
   {
     "id": "mage_gloves_apprentice_l1_blue",
@@ -1399,7 +1433,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "agility": 1
+    }
   },
   {
     "id": "mage_weapon_ash_l1_blue",
@@ -1418,7 +1455,10 @@
     },
     "starter": false,
     "attack": 4.7,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "agility": 1
+    }
   },
   {
     "id": "assassin_armor_shadow_l1_blue",
@@ -1437,7 +1477,10 @@
     },
     "starter": false,
     "attack": 0.6,
-    "defense": 2.4
+    "defense": 2.4,
+    "bonusStats": {
+      "accuracy": 1
+    }
   },
   {
     "id": "assassin_headgear_shadow_l1_blue",
@@ -1456,7 +1499,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "assassin_shoulders_shadow_l1_blue",
@@ -1475,7 +1521,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "assassin_gloves_shadow_l1_blue",
@@ -1494,7 +1543,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "agility": 1
+    }
   },
   {
     "id": "assassin_weapon_daggers_l1_blue",
@@ -1513,7 +1565,10 @@
     },
     "starter": false,
     "attack": 4.7,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "strength": 1
+    }
   },
   {
     "id": "priest_armor_pilgrim_l1_blue",
@@ -1532,7 +1587,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.5
+    "defense": 3.5,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "priest_headgear_pilgrim_l1_blue",
@@ -1551,7 +1609,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "intellect": 1
+    }
   },
   {
     "id": "priest_shoulders_pilgrim_l1_blue",
@@ -1570,7 +1631,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "priest_gloves_pilgrim_l1_blue",
@@ -1589,7 +1653,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "priest_weapon_mace_l1_blue",
@@ -1608,7 +1675,10 @@
     },
     "starter": false,
     "attack": 4.7,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "accuracy": 1
+    }
   },
   {
     "id": "hunter_armor_scout_l1_blue",
@@ -1627,7 +1697,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.5
+    "defense": 3.5,
+    "bonusStats": {
+      "accuracy": 1
+    }
   },
   {
     "id": "hunter_headgear_scout_l1_blue",
@@ -1646,7 +1719,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "strength": 1
+    }
   },
   {
     "id": "hunter_shoulders_scout_l1_blue",
@@ -1665,7 +1741,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "hunter_gloves_scout_l1_blue",
@@ -1684,7 +1763,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "strength": 1
+    }
   },
   {
     "id": "hunter_weapon_shortbow_l1_blue",
@@ -1703,7 +1785,10 @@
     },
     "starter": false,
     "attack": 4.7,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "accuracy": 1
+    }
   },
   {
     "id": "pants_wayfarer_l1_blue",
@@ -1721,7 +1806,10 @@
     },
     "starter": false,
     "attack": 0.3,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "necklace_moonstone_l1_blue",
@@ -1739,7 +1827,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 0.6
+    "defense": 0.6,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "accessory_amber_l1_blue",
@@ -1757,7 +1848,10 @@
     },
     "starter": false,
     "attack": 1.8,
-    "defense": 0.4
+    "defense": 0.4,
+    "bonusStats": {
+      "accuracy": 1
+    }
   },
   {
     "id": "warrior_armor_crimson_l5_gray",
@@ -2816,7 +2910,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "warrior_headgear_crimson_l5_blue",
@@ -2835,7 +2932,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "agility": 1
+    }
   },
   {
     "id": "warrior_shoulders_crimson_l5_blue",
@@ -2854,7 +2954,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "warrior_gloves_crimson_l5_blue",
@@ -2873,7 +2976,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "accuracy": 1
+    }
   },
   {
     "id": "warrior_weapon_sword_l5_blue",
@@ -2892,7 +2998,10 @@
     },
     "starter": false,
     "attack": 7.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "mage_armor_apprentice_l5_blue",
@@ -2911,7 +3020,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "intellect": 1
+    }
   },
   {
     "id": "mage_headgear_apprentice_l5_blue",
@@ -2930,7 +3042,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "intellect": 1
+    }
   },
   {
     "id": "mage_shoulders_apprentice_l5_blue",
@@ -2949,7 +3064,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "mage_gloves_apprentice_l5_blue",
@@ -2968,7 +3086,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "mage_weapon_ash_l5_blue",
@@ -2987,7 +3108,10 @@
     },
     "starter": false,
     "attack": 7.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "agility": 1
+    }
   },
   {
     "id": "assassin_armor_shadow_l5_blue",
@@ -3006,7 +3130,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "strength": 1
+    }
   },
   {
     "id": "assassin_headgear_shadow_l5_blue",
@@ -3025,7 +3152,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "assassin_shoulders_shadow_l5_blue",
@@ -3044,7 +3174,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "assassin_gloves_shadow_l5_blue",
@@ -3063,7 +3196,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "assassin_weapon_daggers_l5_blue",
@@ -3082,7 +3218,10 @@
     },
     "starter": false,
     "attack": 7.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "priest_armor_pilgrim_l5_blue",
@@ -3101,7 +3240,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "priest_headgear_pilgrim_l5_blue",
@@ -3120,7 +3262,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "priest_shoulders_pilgrim_l5_blue",
@@ -3139,7 +3284,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "priest_gloves_pilgrim_l5_blue",
@@ -3158,7 +3306,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "intellect": 1
+    }
   },
   {
     "id": "priest_weapon_mace_l5_blue",
@@ -3177,7 +3328,10 @@
     },
     "starter": false,
     "attack": 7.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "dexterity": 1
+    }
   },
   {
     "id": "hunter_armor_scout_l5_blue",
@@ -3196,7 +3350,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "accuracy": 1
+    }
   },
   {
     "id": "hunter_headgear_scout_l5_blue",
@@ -3215,7 +3372,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "hunter_shoulders_scout_l5_blue",
@@ -3234,7 +3394,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "agility": 1
+    }
   },
   {
     "id": "hunter_gloves_scout_l5_blue",
@@ -3253,7 +3416,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "accuracy": 1
+    }
   },
   {
     "id": "hunter_weapon_shortbow_l5_blue",
@@ -3272,7 +3438,10 @@
     },
     "starter": false,
     "attack": 7.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "strength": 1
+    }
   },
   {
     "id": "pants_wayfarer_l5_blue",
@@ -3290,7 +3459,10 @@
     },
     "starter": false,
     "attack": 0.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "accuracy": 1
+    }
   },
   {
     "id": "necklace_moonstone_l5_blue",
@@ -3308,7 +3480,10 @@
     },
     "starter": false,
     "attack": 3.8,
-    "defense": 0.9
+    "defense": 0.9,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "accessory_amber_l5_blue",
@@ -3326,7 +3501,10 @@
     },
     "starter": false,
     "attack": 2.8,
-    "defense": 0.7
+    "defense": 0.7,
+    "bonusStats": {
+      "stamina": 1
+    }
   },
   {
     "id": "warrior_armor_crimson_l10_gray",
@@ -4403,7 +4581,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "dexterity": 3
+    }
   },
   {
     "id": "warrior_headgear_crimson_l10_blue",
@@ -4422,7 +4603,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "accuracy": 3
+    }
   },
   {
     "id": "warrior_shoulders_crimson_l10_blue",
@@ -4441,7 +4625,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "agility": 3
+    }
   },
   {
     "id": "warrior_gloves_crimson_l10_blue",
@@ -4460,7 +4647,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "dexterity": 3
+    }
   },
   {
     "id": "warrior_weapon_sword_l10_blue",
@@ -4479,7 +4669,10 @@
     },
     "starter": false,
     "attack": 11.3,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "stamina": 3
+    }
   },
   {
     "id": "mage_armor_apprentice_l10_blue",
@@ -4498,7 +4691,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "stamina": 3
+    }
   },
   {
     "id": "mage_headgear_apprentice_l10_blue",
@@ -4517,7 +4713,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "agility": 3
+    }
   },
   {
     "id": "mage_shoulders_apprentice_l10_blue",
@@ -4536,7 +4735,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "intellect": 3
+    }
   },
   {
     "id": "mage_gloves_apprentice_l10_blue",
@@ -4555,7 +4757,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "dexterity": 3
+    }
   },
   {
     "id": "mage_weapon_ash_l10_blue",
@@ -4574,7 +4779,10 @@
     },
     "starter": false,
     "attack": 11.3,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "accuracy": 3
+    }
   },
   {
     "id": "assassin_armor_shadow_l10_blue",
@@ -4593,7 +4801,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "stamina": 3
+    }
   },
   {
     "id": "assassin_headgear_shadow_l10_blue",
@@ -4612,7 +4823,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "dexterity": 3
+    }
   },
   {
     "id": "assassin_shoulders_shadow_l10_blue",
@@ -4631,7 +4845,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "dexterity": 3
+    }
   },
   {
     "id": "assassin_gloves_shadow_l10_blue",
@@ -4650,7 +4867,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "strength": 3
+    }
   },
   {
     "id": "assassin_weapon_daggers_l10_blue",
@@ -4669,7 +4889,10 @@
     },
     "starter": false,
     "attack": 11.3,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "dexterity": 3
+    }
   },
   {
     "id": "priest_armor_pilgrim_l10_blue",
@@ -4688,7 +4911,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "stamina": 3
+    }
   },
   {
     "id": "priest_headgear_pilgrim_l10_blue",
@@ -4707,7 +4933,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "dexterity": 3
+    }
   },
   {
     "id": "priest_shoulders_pilgrim_l10_blue",
@@ -4726,7 +4955,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "intellect": 3
+    }
   },
   {
     "id": "priest_gloves_pilgrim_l10_blue",
@@ -4745,7 +4977,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "intellect": 3
+    }
   },
   {
     "id": "priest_weapon_mace_l10_blue",
@@ -4764,7 +4999,10 @@
     },
     "starter": false,
     "attack": 11.3,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "stamina": 3
+    }
   },
   {
     "id": "hunter_armor_scout_l10_blue",
@@ -4783,7 +5021,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "agility": 3
+    }
   },
   {
     "id": "hunter_headgear_scout_l10_blue",
@@ -4802,7 +5043,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "agility": 3
+    }
   },
   {
     "id": "hunter_shoulders_scout_l10_blue",
@@ -4821,7 +5065,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "accuracy": 3
+    }
   },
   {
     "id": "hunter_gloves_scout_l10_blue",
@@ -4840,7 +5087,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "accuracy": 3
+    }
   },
   {
     "id": "hunter_weapon_shortbow_l10_blue",
@@ -4859,7 +5109,10 @@
     },
     "starter": false,
     "attack": 11.3,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "agility": 3
+    }
   },
   {
     "id": "pants_wayfarer_l10_blue",
@@ -4877,7 +5130,10 @@
     },
     "starter": false,
     "attack": 0.7,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "accuracy": 3
+    }
   },
   {
     "id": "necklace_moonstone_l10_blue",
@@ -4895,7 +5151,10 @@
     },
     "starter": false,
     "attack": 5.6,
-    "defense": 1.4
+    "defense": 1.4,
+    "bonusStats": {
+      "stamina": 3
+    }
   },
   {
     "id": "accessory_amber_l10_blue",
@@ -4913,7 +5172,10 @@
     },
     "starter": false,
     "attack": 4.2,
-    "defense": 1.1
+    "defense": 1.1,
+    "bonusStats": {
+      "dexterity": 3
+    }
   },
   {
     "id": "warrior_armor_azure_l10_purple",
@@ -4932,7 +5194,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "strength": 3,
+      "accuracy": 3
+    }
   },
   {
     "id": "warrior_headgear_azure_l10_purple",
@@ -4951,7 +5217,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "dexterity": 3,
+      "agility": 3
+    }
   },
   {
     "id": "warrior_shoulders_azure_l10_purple",
@@ -4970,7 +5240,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "strength": 3,
+      "stamina": 3
+    }
   },
   {
     "id": "warrior_gloves_azure_l10_purple",
@@ -4989,7 +5263,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "dexterity": 3,
+      "stamina": 3
+    }
   },
   {
     "id": "warrior_weapon_royal_l10_purple",
@@ -5008,7 +5286,11 @@
     },
     "starter": false,
     "attack": 13.3,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "strength": 3,
+      "accuracy": 3
+    }
   },
   {
     "id": "mage_armor_runic_l10_purple",
@@ -5027,7 +5309,11 @@
     },
     "starter": false,
     "attack": 1.7,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "agility": 3,
+      "intellect": 3
+    }
   },
   {
     "id": "mage_headgear_runic_l10_purple",
@@ -5046,7 +5332,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "intellect": 3,
+      "stamina": 3
+    }
   },
   {
     "id": "mage_shoulders_runic_l10_purple",
@@ -5065,7 +5355,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "stamina": 3,
+      "dexterity": 3
+    }
   },
   {
     "id": "mage_gloves_runic_l10_purple",
@@ -5084,7 +5378,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "intellect": 3,
+      "dexterity": 3
+    }
   },
   {
     "id": "mage_weapon_crystal_l10_purple",
@@ -5103,7 +5401,11 @@
     },
     "starter": false,
     "attack": 13.3,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "dexterity": 3,
+      "agility": 3
+    }
   },
   {
     "id": "assassin_armor_moon_l10_purple",
@@ -5122,7 +5424,11 @@
     },
     "starter": false,
     "attack": 1.7,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "accuracy": 3,
+      "strength": 3
+    }
   },
   {
     "id": "assassin_headgear_moon_l10_purple",
@@ -5141,7 +5447,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "stamina": 3,
+      "agility": 3
+    }
   },
   {
     "id": "assassin_shoulders_moon_l10_purple",
@@ -5160,7 +5470,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "dexterity": 3,
+      "accuracy": 3
+    }
   },
   {
     "id": "assassin_gloves_moon_l10_purple",
@@ -5179,7 +5493,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "accuracy": 3,
+      "agility": 3
+    }
   },
   {
     "id": "assassin_weapon_moonfang_l10_purple",
@@ -5198,7 +5516,11 @@
     },
     "starter": false,
     "attack": 13.3,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "accuracy": 3,
+      "strength": 3
+    }
   },
   {
     "id": "priest_armor_dawn_l10_purple",
@@ -5217,7 +5539,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "intellect": 3,
+      "accuracy": 3
+    }
   },
   {
     "id": "priest_headgear_dawn_l10_purple",
@@ -5236,7 +5562,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "dexterity": 3,
+      "intellect": 3
+    }
   },
   {
     "id": "priest_shoulders_dawn_l10_purple",
@@ -5255,7 +5585,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "intellect": 3,
+      "dexterity": 3
+    }
   },
   {
     "id": "priest_gloves_dawn_l10_purple",
@@ -5274,7 +5608,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "agility": 3,
+      "intellect": 3
+    }
   },
   {
     "id": "priest_weapon_sunmace_l10_purple",
@@ -5293,7 +5631,11 @@
     },
     "starter": false,
     "attack": 13.3,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "accuracy": 3,
+      "dexterity": 3
+    }
   },
   {
     "id": "hunter_armor_warden_l10_purple",
@@ -5312,7 +5654,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "agility": 3,
+      "accuracy": 3
+    }
   },
   {
     "id": "hunter_headgear_warden_l10_purple",
@@ -5331,7 +5677,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "agility": 3,
+      "stamina": 3
+    }
   },
   {
     "id": "hunter_shoulders_warden_l10_purple",
@@ -5350,7 +5700,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "agility": 3,
+      "accuracy": 3
+    }
   },
   {
     "id": "hunter_gloves_warden_l10_purple",
@@ -5369,7 +5723,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "agility": 3,
+      "strength": 3
+    }
   },
   {
     "id": "hunter_weapon_wardenbow_l10_purple",
@@ -5388,7 +5746,11 @@
     },
     "starter": false,
     "attack": 13.3,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "agility": 3,
+      "stamina": 3
+    }
   },
   {
     "id": "pants_wayfarer_l10_purple",
@@ -5406,7 +5768,11 @@
     },
     "starter": false,
     "attack": 0.8,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "stamina": 3,
+      "dexterity": 3
+    }
   },
   {
     "id": "necklace_moonstone_l10_purple",
@@ -5424,7 +5790,11 @@
     },
     "starter": false,
     "attack": 6.6,
-    "defense": 1.7
+    "defense": 1.7,
+    "bonusStats": {
+      "stamina": 3,
+      "dexterity": 3
+    }
   },
   {
     "id": "accessory_amber_l10_purple",
@@ -5442,7 +5812,11 @@
     },
     "starter": false,
     "attack": 5.0,
-    "defense": 1.2
+    "defense": 1.2,
+    "bonusStats": {
+      "dexterity": 3,
+      "stamina": 3
+    }
   },
   {
     "id": "warrior_armor_crimson_l15_gray",
@@ -6519,7 +6893,10 @@
     },
     "starter": false,
     "attack": 2.8,
-    "defense": 11.3
+    "defense": 11.3,
+    "bonusStats": {
+      "accuracy": 5
+    }
   },
   {
     "id": "warrior_headgear_crimson_l15_blue",
@@ -6538,7 +6915,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "strength": 5
+    }
   },
   {
     "id": "warrior_shoulders_crimson_l15_blue",
@@ -6557,7 +6937,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "agility": 5
+    }
   },
   {
     "id": "warrior_gloves_crimson_l15_blue",
@@ -6576,7 +6959,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "stamina": 5
+    }
   },
   {
     "id": "warrior_weapon_sword_l15_blue",
@@ -6595,7 +6981,10 @@
     },
     "starter": false,
     "attack": 15.0,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "agility": 5
+    }
   },
   {
     "id": "mage_armor_apprentice_l15_blue",
@@ -6614,7 +7003,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "stamina": 5
+    }
   },
   {
     "id": "mage_headgear_apprentice_l15_blue",
@@ -6633,7 +7025,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "accuracy": 5
+    }
   },
   {
     "id": "mage_shoulders_apprentice_l15_blue",
@@ -6652,7 +7047,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "stamina": 5
+    }
   },
   {
     "id": "mage_gloves_apprentice_l15_blue",
@@ -6671,7 +7069,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "stamina": 5
+    }
   },
   {
     "id": "mage_weapon_ash_l15_blue",
@@ -6690,7 +7091,10 @@
     },
     "starter": false,
     "attack": 15.0,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "dexterity": 5
+    }
   },
   {
     "id": "assassin_armor_shadow_l15_blue",
@@ -6709,7 +7113,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "agility": 5
+    }
   },
   {
     "id": "assassin_headgear_shadow_l15_blue",
@@ -6728,7 +7135,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "agility": 5
+    }
   },
   {
     "id": "assassin_shoulders_shadow_l15_blue",
@@ -6747,7 +7157,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "accuracy": 5
+    }
   },
   {
     "id": "assassin_gloves_shadow_l15_blue",
@@ -6766,7 +7179,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "stamina": 5
+    }
   },
   {
     "id": "assassin_weapon_daggers_l15_blue",
@@ -6785,7 +7201,10 @@
     },
     "starter": false,
     "attack": 15.0,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "agility": 5
+    }
   },
   {
     "id": "priest_armor_pilgrim_l15_blue",
@@ -6804,7 +7223,10 @@
     },
     "starter": false,
     "attack": 2.8,
-    "defense": 11.3
+    "defense": 11.3,
+    "bonusStats": {
+      "agility": 5
+    }
   },
   {
     "id": "priest_headgear_pilgrim_l15_blue",
@@ -6823,7 +7245,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "agility": 5
+    }
   },
   {
     "id": "priest_shoulders_pilgrim_l15_blue",
@@ -6842,7 +7267,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "stamina": 5
+    }
   },
   {
     "id": "priest_gloves_pilgrim_l15_blue",
@@ -6861,7 +7289,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "stamina": 5
+    }
   },
   {
     "id": "priest_weapon_mace_l15_blue",
@@ -6880,7 +7311,10 @@
     },
     "starter": false,
     "attack": 15.0,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "intellect": 5
+    }
   },
   {
     "id": "hunter_armor_scout_l15_blue",
@@ -6899,7 +7333,10 @@
     },
     "starter": false,
     "attack": 2.8,
-    "defense": 11.3
+    "defense": 11.3,
+    "bonusStats": {
+      "dexterity": 5
+    }
   },
   {
     "id": "hunter_headgear_scout_l15_blue",
@@ -6918,7 +7355,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "accuracy": 5
+    }
   },
   {
     "id": "hunter_shoulders_scout_l15_blue",
@@ -6937,7 +7377,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "accuracy": 5
+    }
   },
   {
     "id": "hunter_gloves_scout_l15_blue",
@@ -6956,7 +7399,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "stamina": 5
+    }
   },
   {
     "id": "hunter_weapon_shortbow_l15_blue",
@@ -6975,7 +7421,10 @@
     },
     "starter": false,
     "attack": 15.0,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "strength": 5
+    }
   },
   {
     "id": "pants_wayfarer_l15_blue",
@@ -6993,7 +7442,10 @@
     },
     "starter": false,
     "attack": 0.9,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "dexterity": 5
+    }
   },
   {
     "id": "necklace_moonstone_l15_blue",
@@ -7011,7 +7463,10 @@
     },
     "starter": false,
     "attack": 7.5,
-    "defense": 1.9
+    "defense": 1.9,
+    "bonusStats": {
+      "stamina": 5
+    }
   },
   {
     "id": "accessory_amber_l15_blue",
@@ -7029,7 +7484,10 @@
     },
     "starter": false,
     "attack": 5.6,
-    "defense": 1.4
+    "defense": 1.4,
+    "bonusStats": {
+      "dexterity": 5
+    }
   },
   {
     "id": "warrior_armor_crimson_l20_gray",
@@ -8106,7 +8564,10 @@
     },
     "starter": false,
     "attack": 3.5,
-    "defense": 14.1
+    "defense": 14.1,
+    "bonusStats": {
+      "accuracy": 7
+    }
   },
   {
     "id": "warrior_headgear_crimson_l20_blue",
@@ -8125,7 +8586,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "dexterity": 7
+    }
   },
   {
     "id": "warrior_shoulders_crimson_l20_blue",
@@ -8144,7 +8608,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "dexterity": 7
+    }
   },
   {
     "id": "warrior_gloves_crimson_l20_blue",
@@ -8163,7 +8630,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "stamina": 7
+    }
   },
   {
     "id": "warrior_weapon_sword_l20_blue",
@@ -8182,7 +8652,10 @@
     },
     "starter": false,
     "attack": 18.8,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "agility": 7
+    }
   },
   {
     "id": "mage_armor_apprentice_l20_blue",
@@ -8201,7 +8674,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "accuracy": 7
+    }
   },
   {
     "id": "mage_headgear_apprentice_l20_blue",
@@ -8220,7 +8696,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "accuracy": 7
+    }
   },
   {
     "id": "mage_shoulders_apprentice_l20_blue",
@@ -8239,7 +8718,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "agility": 7
+    }
   },
   {
     "id": "mage_gloves_apprentice_l20_blue",
@@ -8258,7 +8740,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "agility": 7
+    }
   },
   {
     "id": "mage_weapon_ash_l20_blue",
@@ -8277,7 +8762,10 @@
     },
     "starter": false,
     "attack": 18.8,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "stamina": 7
+    }
   },
   {
     "id": "assassin_armor_shadow_l20_blue",
@@ -8296,7 +8784,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "stamina": 7
+    }
   },
   {
     "id": "assassin_headgear_shadow_l20_blue",
@@ -8315,7 +8806,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "stamina": 7
+    }
   },
   {
     "id": "assassin_shoulders_shadow_l20_blue",
@@ -8334,7 +8828,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "accuracy": 7
+    }
   },
   {
     "id": "assassin_gloves_shadow_l20_blue",
@@ -8353,7 +8850,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "accuracy": 7
+    }
   },
   {
     "id": "assassin_weapon_daggers_l20_blue",
@@ -8372,7 +8872,10 @@
     },
     "starter": false,
     "attack": 18.8,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "agility": 7
+    }
   },
   {
     "id": "priest_armor_pilgrim_l20_blue",
@@ -8391,7 +8894,10 @@
     },
     "starter": false,
     "attack": 3.5,
-    "defense": 14.1
+    "defense": 14.1,
+    "bonusStats": {
+      "accuracy": 7
+    }
   },
   {
     "id": "priest_headgear_pilgrim_l20_blue",
@@ -8410,7 +8916,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "intellect": 7
+    }
   },
   {
     "id": "priest_shoulders_pilgrim_l20_blue",
@@ -8429,7 +8938,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "stamina": 7
+    }
   },
   {
     "id": "priest_gloves_pilgrim_l20_blue",
@@ -8448,7 +8960,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "dexterity": 7
+    }
   },
   {
     "id": "priest_weapon_mace_l20_blue",
@@ -8467,7 +8982,10 @@
     },
     "starter": false,
     "attack": 18.8,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "agility": 7
+    }
   },
   {
     "id": "hunter_armor_scout_l20_blue",
@@ -8486,7 +9004,10 @@
     },
     "starter": false,
     "attack": 3.5,
-    "defense": 14.1
+    "defense": 14.1,
+    "bonusStats": {
+      "strength": 7
+    }
   },
   {
     "id": "hunter_headgear_scout_l20_blue",
@@ -8505,7 +9026,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "dexterity": 7
+    }
   },
   {
     "id": "hunter_shoulders_scout_l20_blue",
@@ -8524,7 +9048,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "dexterity": 7
+    }
   },
   {
     "id": "hunter_gloves_scout_l20_blue",
@@ -8543,7 +9070,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "accuracy": 7
+    }
   },
   {
     "id": "hunter_weapon_shortbow_l20_blue",
@@ -8562,7 +9092,10 @@
     },
     "starter": false,
     "attack": 18.8,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "stamina": 7
+    }
   },
   {
     "id": "pants_wayfarer_l20_blue",
@@ -8580,7 +9113,10 @@
     },
     "starter": false,
     "attack": 1.2,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "dexterity": 7
+    }
   },
   {
     "id": "accessory_amber_l20_blue",
@@ -8598,7 +9134,10 @@
     },
     "starter": false,
     "attack": 7.1,
-    "defense": 1.8
+    "defense": 1.8,
+    "bonusStats": {
+      "dexterity": 7
+    }
   },
   {
     "id": "warrior_armor_azure_l20_purple",
@@ -8617,7 +9156,11 @@
     },
     "starter": false,
     "attack": 4.1,
-    "defense": 16.6
+    "defense": 16.6,
+    "bonusStats": {
+      "strength": 7,
+      "agility": 7
+    }
   },
   {
     "id": "warrior_headgear_azure_l20_purple",
@@ -8636,7 +9179,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "stamina": 7,
+      "accuracy": 7
+    }
   },
   {
     "id": "warrior_shoulders_azure_l20_purple",
@@ -8655,7 +9202,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "accuracy": 7,
+      "dexterity": 7
+    }
   },
   {
     "id": "warrior_gloves_azure_l20_purple",
@@ -8674,7 +9225,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "agility": 7,
+      "stamina": 7
+    }
   },
   {
     "id": "warrior_weapon_royal_l20_purple",
@@ -8693,7 +9248,11 @@
     },
     "starter": false,
     "attack": 22.1,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "accuracy": 7,
+      "agility": 7
+    }
   },
   {
     "id": "mage_armor_runic_l20_purple",
@@ -8712,7 +9271,11 @@
     },
     "starter": false,
     "attack": 2.8,
-    "defense": 11.0
+    "defense": 11.0,
+    "bonusStats": {
+      "intellect": 7,
+      "accuracy": 7
+    }
   },
   {
     "id": "mage_headgear_runic_l20_purple",
@@ -8731,7 +9294,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "dexterity": 7,
+      "stamina": 7
+    }
   },
   {
     "id": "mage_shoulders_runic_l20_purple",
@@ -8750,7 +9317,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "intellect": 7,
+      "accuracy": 7
+    }
   },
   {
     "id": "mage_gloves_runic_l20_purple",
@@ -8769,7 +9340,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "intellect": 7,
+      "stamina": 7
+    }
   },
   {
     "id": "mage_weapon_crystal_l20_purple",
@@ -8788,7 +9363,11 @@
     },
     "starter": false,
     "attack": 22.1,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "stamina": 7,
+      "accuracy": 7
+    }
   },
   {
     "id": "assassin_armor_moon_l20_purple",
@@ -8807,7 +9386,11 @@
     },
     "starter": false,
     "attack": 2.8,
-    "defense": 11.0
+    "defense": 11.0,
+    "bonusStats": {
+      "dexterity": 7,
+      "stamina": 7
+    }
   },
   {
     "id": "assassin_headgear_moon_l20_purple",
@@ -8826,7 +9409,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "agility": 7,
+      "accuracy": 7
+    }
   },
   {
     "id": "assassin_shoulders_moon_l20_purple",
@@ -8845,7 +9432,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "agility": 7,
+      "strength": 7
+    }
   },
   {
     "id": "assassin_gloves_moon_l20_purple",
@@ -8864,7 +9455,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "dexterity": 7,
+      "strength": 7
+    }
   },
   {
     "id": "assassin_weapon_moonfang_l20_purple",
@@ -8883,7 +9478,11 @@
     },
     "starter": false,
     "attack": 22.1,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "agility": 7,
+      "accuracy": 7
+    }
   },
   {
     "id": "priest_armor_dawn_l20_purple",
@@ -8902,7 +9501,11 @@
     },
     "starter": false,
     "attack": 4.1,
-    "defense": 16.6
+    "defense": 16.6,
+    "bonusStats": {
+      "agility": 7,
+      "stamina": 7
+    }
   },
   {
     "id": "priest_headgear_dawn_l20_purple",
@@ -8921,7 +9524,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "stamina": 7,
+      "agility": 7
+    }
   },
   {
     "id": "priest_shoulders_dawn_l20_purple",
@@ -8940,7 +9547,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "agility": 7,
+      "stamina": 7
+    }
   },
   {
     "id": "priest_gloves_dawn_l20_purple",
@@ -8959,7 +9570,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "dexterity": 7,
+      "intellect": 7
+    }
   },
   {
     "id": "priest_weapon_sunmace_l20_purple",
@@ -8978,7 +9593,11 @@
     },
     "starter": false,
     "attack": 22.1,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "intellect": 7,
+      "agility": 7
+    }
   },
   {
     "id": "hunter_armor_warden_l20_purple",
@@ -8997,7 +9616,11 @@
     },
     "starter": false,
     "attack": 4.1,
-    "defense": 16.6
+    "defense": 16.6,
+    "bonusStats": {
+      "agility": 7,
+      "dexterity": 7
+    }
   },
   {
     "id": "hunter_headgear_warden_l20_purple",
@@ -9016,7 +9639,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "agility": 7,
+      "strength": 7
+    }
   },
   {
     "id": "hunter_shoulders_warden_l20_purple",
@@ -9035,7 +9662,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "stamina": 7,
+      "accuracy": 7
+    }
   },
   {
     "id": "hunter_gloves_warden_l20_purple",
@@ -9054,7 +9685,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "stamina": 7,
+      "agility": 7
+    }
   },
   {
     "id": "hunter_weapon_wardenbow_l20_purple",
@@ -9073,7 +9708,11 @@
     },
     "starter": false,
     "attack": 22.1,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "agility": 7,
+      "dexterity": 7
+    }
   },
   {
     "id": "pants_wayfarer_l20_purple",
@@ -9091,7 +9730,11 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.5
+    "defense": 5.5,
+    "bonusStats": {
+      "accuracy": 7,
+      "dexterity": 7
+    }
   },
   {
     "id": "necklace_moonstone_l20_purple",
@@ -9109,7 +9752,11 @@
     },
     "starter": false,
     "attack": 11.0,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "stamina": 7,
+      "accuracy": 7
+    }
   },
   {
     "id": "mana_potion",
@@ -9477,6 +10124,9 @@
     "starter": false,
     "attack": 4.0,
     "defense": 16.2,
+    "bonusStats": {
+      "accuracy": 7
+    },
     "source": "undervault"
   },
   {
@@ -9497,6 +10147,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "agility": 7
+    },
     "source": "undervault"
   },
   {
@@ -9517,6 +10170,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "accuracy": 7
+    },
     "source": "undervault"
   },
   {
@@ -9537,6 +10193,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "dexterity": 7
+    },
     "source": "undervault"
   },
   {
@@ -9557,6 +10216,9 @@
     "starter": false,
     "attack": 21.6,
     "defense": 5.4,
+    "bonusStats": {
+      "agility": 7
+    },
     "source": "undervault"
   },
   {
@@ -9577,6 +10239,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "agility": 7
+    },
     "source": "undervault"
   },
   {
@@ -9597,6 +10262,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "intellect": 7
+    },
     "source": "undervault"
   },
   {
@@ -9617,6 +10285,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "accuracy": 7
+    },
     "source": "undervault"
   },
   {
@@ -9637,6 +10308,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "agility": 7
+    },
     "source": "undervault"
   },
   {
@@ -9657,6 +10331,9 @@
     "starter": false,
     "attack": 21.6,
     "defense": 5.4,
+    "bonusStats": {
+      "stamina": 7
+    },
     "source": "undervault"
   },
   {
@@ -9677,6 +10354,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "dexterity": 7
+    },
     "source": "undervault"
   },
   {
@@ -9697,6 +10377,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "dexterity": 7
+    },
     "source": "undervault"
   },
   {
@@ -9717,6 +10400,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "agility": 7
+    },
     "source": "undervault"
   },
   {
@@ -9737,6 +10423,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "strength": 7
+    },
     "source": "undervault"
   },
   {
@@ -9757,6 +10446,9 @@
     "starter": false,
     "attack": 21.6,
     "defense": 5.4,
+    "bonusStats": {
+      "accuracy": 7
+    },
     "source": "undervault"
   },
   {
@@ -9777,6 +10469,9 @@
     "starter": false,
     "attack": 4.0,
     "defense": 16.2,
+    "bonusStats": {
+      "intellect": 7
+    },
     "source": "undervault"
   },
   {
@@ -9797,6 +10492,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "intellect": 7
+    },
     "source": "undervault"
   },
   {
@@ -9817,6 +10515,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "dexterity": 7
+    },
     "source": "undervault"
   },
   {
@@ -9837,6 +10538,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "accuracy": 7
+    },
     "source": "undervault"
   },
   {
@@ -9857,6 +10561,9 @@
     "starter": false,
     "attack": 21.6,
     "defense": 5.4,
+    "bonusStats": {
+      "intellect": 7
+    },
     "source": "undervault"
   },
   {
@@ -9877,6 +10584,9 @@
     "starter": false,
     "attack": 4.0,
     "defense": 16.2,
+    "bonusStats": {
+      "accuracy": 7
+    },
     "source": "undervault"
   },
   {
@@ -9897,6 +10607,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "strength": 7
+    },
     "source": "undervault"
   },
   {
@@ -9917,6 +10630,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "accuracy": 7
+    },
     "source": "undervault"
   },
   {
@@ -9937,6 +10653,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "agility": 7
+    },
     "source": "undervault"
   },
   {
@@ -9957,6 +10676,9 @@
     "starter": false,
     "attack": 21.6,
     "defense": 5.4,
+    "bonusStats": {
+      "strength": 7
+    },
     "source": "undervault"
   },
   {
@@ -9976,6 +10698,9 @@
     "starter": false,
     "attack": 1.4,
     "defense": 5.4,
+    "bonusStats": {
+      "stamina": 7
+    },
     "source": "undervault"
   },
   {
@@ -9995,6 +10720,9 @@
     "starter": false,
     "attack": 8.2,
     "defense": 2.1,
+    "bonusStats": {
+      "stamina": 7
+    },
     "source": "undervault"
   },
   {
@@ -11191,7 +11919,10 @@
     },
     "starter": false,
     "attack": 4.2,
-    "defense": 16.9
+    "defense": 16.9,
+    "bonusStats": {
+      "dexterity": 10
+    }
   },
   {
     "id": "warrior_headgear_crimson_l25_blue",
@@ -11210,7 +11941,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "strength": 10
+    }
   },
   {
     "id": "warrior_shoulders_crimson_l25_blue",
@@ -11229,7 +11963,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "accuracy": 10
+    }
   },
   {
     "id": "warrior_gloves_crimson_l25_blue",
@@ -11248,7 +11985,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "agility": 10
+    }
   },
   {
     "id": "warrior_weapon_sword_l25_blue",
@@ -11267,7 +12007,10 @@
     },
     "starter": false,
     "attack": 22.6,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "strength": 10
+    }
   },
   {
     "id": "mage_armor_apprentice_l25_blue",
@@ -11286,7 +12029,10 @@
     },
     "starter": false,
     "attack": 2.8,
-    "defense": 11.3
+    "defense": 11.3,
+    "bonusStats": {
+      "dexterity": 10
+    }
   },
   {
     "id": "mage_headgear_apprentice_l25_blue",
@@ -11305,7 +12051,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "dexterity": 10
+    }
   },
   {
     "id": "mage_shoulders_apprentice_l25_blue",
@@ -11324,7 +12073,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "dexterity": 10
+    }
   },
   {
     "id": "mage_gloves_apprentice_l25_blue",
@@ -11343,7 +12095,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "intellect": 10
+    }
   },
   {
     "id": "mage_weapon_ash_l25_blue",
@@ -11362,7 +12117,10 @@
     },
     "starter": false,
     "attack": 22.6,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "dexterity": 10
+    }
   },
   {
     "id": "assassin_armor_shadow_l25_blue",
@@ -11381,7 +12139,10 @@
     },
     "starter": false,
     "attack": 2.8,
-    "defense": 11.3
+    "defense": 11.3,
+    "bonusStats": {
+      "stamina": 10
+    }
   },
   {
     "id": "assassin_headgear_shadow_l25_blue",
@@ -11400,7 +12161,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "strength": 10
+    }
   },
   {
     "id": "assassin_shoulders_shadow_l25_blue",
@@ -11419,7 +12183,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "strength": 10
+    }
   },
   {
     "id": "assassin_gloves_shadow_l25_blue",
@@ -11438,7 +12205,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "strength": 10
+    }
   },
   {
     "id": "assassin_weapon_daggers_l25_blue",
@@ -11457,7 +12227,10 @@
     },
     "starter": false,
     "attack": 22.6,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "stamina": 10
+    }
   },
   {
     "id": "priest_armor_pilgrim_l25_blue",
@@ -11476,7 +12249,10 @@
     },
     "starter": false,
     "attack": 4.2,
-    "defense": 16.9
+    "defense": 16.9,
+    "bonusStats": {
+      "dexterity": 10
+    }
   },
   {
     "id": "priest_headgear_pilgrim_l25_blue",
@@ -11495,7 +12271,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "stamina": 10
+    }
   },
   {
     "id": "priest_shoulders_pilgrim_l25_blue",
@@ -11514,7 +12293,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "accuracy": 10
+    }
   },
   {
     "id": "priest_gloves_pilgrim_l25_blue",
@@ -11533,7 +12315,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "intellect": 10
+    }
   },
   {
     "id": "priest_weapon_mace_l25_blue",
@@ -11552,7 +12337,10 @@
     },
     "starter": false,
     "attack": 22.6,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "accuracy": 10
+    }
   },
   {
     "id": "hunter_armor_scout_l25_blue",
@@ -11571,7 +12359,10 @@
     },
     "starter": false,
     "attack": 4.2,
-    "defense": 16.9
+    "defense": 16.9,
+    "bonusStats": {
+      "accuracy": 10
+    }
   },
   {
     "id": "hunter_headgear_scout_l25_blue",
@@ -11590,7 +12381,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "stamina": 10
+    }
   },
   {
     "id": "hunter_shoulders_scout_l25_blue",
@@ -11609,7 +12403,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "agility": 10
+    }
   },
   {
     "id": "hunter_gloves_scout_l25_blue",
@@ -11628,7 +12425,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "dexterity": 10
+    }
   },
   {
     "id": "hunter_weapon_shortbow_l25_blue",
@@ -11647,7 +12447,10 @@
     },
     "starter": false,
     "attack": 22.6,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "strength": 10
+    }
   },
   {
     "id": "pants_wayfarer_l25_blue",
@@ -11665,7 +12468,10 @@
     },
     "starter": false,
     "attack": 1.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "bonusStats": {
+      "dexterity": 10
+    }
   },
   {
     "id": "necklace_moonstone_l25_blue",
@@ -11683,7 +12489,10 @@
     },
     "starter": false,
     "attack": 11.3,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "accuracy": 10
+    }
   },
   {
     "id": "accessory_amber_l25_blue",
@@ -11701,7 +12510,10 @@
     },
     "starter": false,
     "attack": 8.5,
-    "defense": 2.1
+    "defense": 2.1,
+    "bonusStats": {
+      "dexterity": 10
+    }
   },
   {
     "id": "warrior_armor_crimson_l30_gray",
@@ -12778,7 +13590,10 @@
     },
     "starter": false,
     "attack": 4.9,
-    "defense": 19.7
+    "defense": 19.7,
+    "bonusStats": {
+      "agility": 15
+    }
   },
   {
     "id": "warrior_headgear_crimson_l30_blue",
@@ -12797,7 +13612,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "strength": 15
+    }
   },
   {
     "id": "warrior_shoulders_crimson_l30_blue",
@@ -12816,7 +13634,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "strength": 15
+    }
   },
   {
     "id": "warrior_gloves_crimson_l30_blue",
@@ -12835,7 +13656,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "strength": 15
+    }
   },
   {
     "id": "warrior_weapon_sword_l30_blue",
@@ -12854,7 +13678,10 @@
     },
     "starter": false,
     "attack": 26.3,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "agility": 15
+    }
   },
   {
     "id": "mage_armor_apprentice_l30_blue",
@@ -12873,7 +13700,10 @@
     },
     "starter": false,
     "attack": 3.3,
-    "defense": 13.2
+    "defense": 13.2,
+    "bonusStats": {
+      "stamina": 15
+    }
   },
   {
     "id": "mage_headgear_apprentice_l30_blue",
@@ -12892,7 +13722,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "intellect": 15
+    }
   },
   {
     "id": "mage_shoulders_apprentice_l30_blue",
@@ -12911,7 +13744,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "intellect": 15
+    }
   },
   {
     "id": "mage_gloves_apprentice_l30_blue",
@@ -12930,7 +13766,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "stamina": 15
+    }
   },
   {
     "id": "mage_weapon_ash_l30_blue",
@@ -12949,7 +13788,10 @@
     },
     "starter": false,
     "attack": 26.3,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "agility": 15
+    }
   },
   {
     "id": "assassin_armor_shadow_l30_blue",
@@ -12968,7 +13810,10 @@
     },
     "starter": false,
     "attack": 3.3,
-    "defense": 13.2
+    "defense": 13.2,
+    "bonusStats": {
+      "agility": 15
+    }
   },
   {
     "id": "assassin_headgear_shadow_l30_blue",
@@ -12987,7 +13832,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "stamina": 15
+    }
   },
   {
     "id": "assassin_shoulders_shadow_l30_blue",
@@ -13006,7 +13854,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "agility": 15
+    }
   },
   {
     "id": "assassin_gloves_shadow_l30_blue",
@@ -13025,7 +13876,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "strength": 15
+    }
   },
   {
     "id": "assassin_weapon_daggers_l30_blue",
@@ -13044,7 +13898,10 @@
     },
     "starter": false,
     "attack": 26.3,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "dexterity": 15
+    }
   },
   {
     "id": "priest_armor_pilgrim_l30_blue",
@@ -13063,7 +13920,10 @@
     },
     "starter": false,
     "attack": 4.9,
-    "defense": 19.7
+    "defense": 19.7,
+    "bonusStats": {
+      "stamina": 15
+    }
   },
   {
     "id": "priest_headgear_pilgrim_l30_blue",
@@ -13082,7 +13942,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "accuracy": 15
+    }
   },
   {
     "id": "priest_shoulders_pilgrim_l30_blue",
@@ -13101,7 +13964,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "dexterity": 15
+    }
   },
   {
     "id": "priest_gloves_pilgrim_l30_blue",
@@ -13120,7 +13986,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "dexterity": 15
+    }
   },
   {
     "id": "priest_weapon_mace_l30_blue",
@@ -13139,7 +14008,10 @@
     },
     "starter": false,
     "attack": 26.3,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "intellect": 15
+    }
   },
   {
     "id": "hunter_armor_scout_l30_blue",
@@ -13158,7 +14030,10 @@
     },
     "starter": false,
     "attack": 4.9,
-    "defense": 19.7
+    "defense": 19.7,
+    "bonusStats": {
+      "dexterity": 15
+    }
   },
   {
     "id": "hunter_headgear_scout_l30_blue",
@@ -13177,7 +14052,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "accuracy": 15
+    }
   },
   {
     "id": "hunter_shoulders_scout_l30_blue",
@@ -13196,7 +14074,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "accuracy": 15
+    }
   },
   {
     "id": "hunter_gloves_scout_l30_blue",
@@ -13215,7 +14096,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "agility": 15
+    }
   },
   {
     "id": "hunter_weapon_shortbow_l30_blue",
@@ -13234,7 +14118,10 @@
     },
     "starter": false,
     "attack": 26.3,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "strength": 15
+    }
   },
   {
     "id": "pants_wayfarer_l30_blue",
@@ -13252,7 +14139,10 @@
     },
     "starter": false,
     "attack": 1.6,
-    "defense": 6.6
+    "defense": 6.6,
+    "bonusStats": {
+      "stamina": 15
+    }
   },
   {
     "id": "necklace_moonstone_l30_blue",
@@ -13270,7 +14160,10 @@
     },
     "starter": false,
     "attack": 13.2,
-    "defense": 3.3
+    "defense": 3.3,
+    "bonusStats": {
+      "accuracy": 15
+    }
   },
   {
     "id": "accessory_amber_l30_blue",
@@ -13288,7 +14181,10 @@
     },
     "starter": false,
     "attack": 9.9,
-    "defense": 2.5
+    "defense": 2.5,
+    "bonusStats": {
+      "stamina": 15
+    }
   },
   {
     "id": "warrior_armor_azure_l30_purple",
@@ -13307,7 +14203,11 @@
     },
     "starter": false,
     "attack": 5.8,
-    "defense": 23.2
+    "defense": 23.2,
+    "bonusStats": {
+      "stamina": 15,
+      "agility": 15
+    }
   },
   {
     "id": "warrior_headgear_azure_l30_purple",
@@ -13326,7 +14226,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "dexterity": 15,
+      "agility": 15
+    }
   },
   {
     "id": "warrior_shoulders_azure_l30_purple",
@@ -13345,7 +14249,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "stamina": 15,
+      "dexterity": 15
+    }
   },
   {
     "id": "warrior_gloves_azure_l30_purple",
@@ -13364,7 +14272,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "accuracy": 15,
+      "stamina": 15
+    }
   },
   {
     "id": "warrior_weapon_royal_l30_purple",
@@ -13383,7 +14295,11 @@
     },
     "starter": false,
     "attack": 30.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "accuracy": 15,
+      "agility": 15
+    }
   },
   {
     "id": "mage_armor_runic_l30_purple",
@@ -13402,7 +14318,11 @@
     },
     "starter": false,
     "attack": 3.9,
-    "defense": 15.5
+    "defense": 15.5,
+    "bonusStats": {
+      "accuracy": 15,
+      "intellect": 15
+    }
   },
   {
     "id": "mage_headgear_runic_l30_purple",
@@ -13421,7 +14341,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "agility": 15,
+      "accuracy": 15
+    }
   },
   {
     "id": "mage_shoulders_runic_l30_purple",
@@ -13440,7 +14364,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "agility": 15,
+      "intellect": 15
+    }
   },
   {
     "id": "mage_gloves_runic_l30_purple",
@@ -13459,7 +14387,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "intellect": 15,
+      "dexterity": 15
+    }
   },
   {
     "id": "mage_weapon_crystal_l30_purple",
@@ -13478,7 +14410,11 @@
     },
     "starter": false,
     "attack": 30.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "intellect": 15,
+      "stamina": 15
+    }
   },
   {
     "id": "assassin_armor_moon_l30_purple",
@@ -13497,7 +14433,11 @@
     },
     "starter": false,
     "attack": 3.9,
-    "defense": 15.5
+    "defense": 15.5,
+    "bonusStats": {
+      "dexterity": 15,
+      "strength": 15
+    }
   },
   {
     "id": "assassin_headgear_moon_l30_purple",
@@ -13516,7 +14456,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "agility": 15,
+      "dexterity": 15
+    }
   },
   {
     "id": "assassin_shoulders_moon_l30_purple",
@@ -13535,7 +14479,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "dexterity": 15,
+      "accuracy": 15
+    }
   },
   {
     "id": "assassin_gloves_moon_l30_purple",
@@ -13554,7 +14502,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "strength": 15,
+      "dexterity": 15
+    }
   },
   {
     "id": "assassin_weapon_moonfang_l30_purple",
@@ -13573,7 +14525,11 @@
     },
     "starter": false,
     "attack": 30.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "strength": 15,
+      "dexterity": 15
+    }
   },
   {
     "id": "priest_armor_dawn_l30_purple",
@@ -13592,7 +14548,11 @@
     },
     "starter": false,
     "attack": 5.8,
-    "defense": 23.2
+    "defense": 23.2,
+    "bonusStats": {
+      "agility": 15,
+      "dexterity": 15
+    }
   },
   {
     "id": "priest_headgear_dawn_l30_purple",
@@ -13611,7 +14571,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "intellect": 15,
+      "dexterity": 15
+    }
   },
   {
     "id": "priest_shoulders_dawn_l30_purple",
@@ -13630,7 +14594,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "intellect": 15,
+      "dexterity": 15
+    }
   },
   {
     "id": "priest_gloves_dawn_l30_purple",
@@ -13649,7 +14617,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "dexterity": 15,
+      "stamina": 15
+    }
   },
   {
     "id": "priest_weapon_sunmace_l30_purple",
@@ -13668,7 +14640,11 @@
     },
     "starter": false,
     "attack": 30.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "stamina": 15,
+      "intellect": 15
+    }
   },
   {
     "id": "hunter_armor_warden_l30_purple",
@@ -13687,7 +14663,11 @@
     },
     "starter": false,
     "attack": 5.8,
-    "defense": 23.2
+    "defense": 23.2,
+    "bonusStats": {
+      "agility": 15,
+      "dexterity": 15
+    }
   },
   {
     "id": "hunter_headgear_warden_l30_purple",
@@ -13706,7 +14686,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "stamina": 15,
+      "strength": 15
+    }
   },
   {
     "id": "hunter_shoulders_warden_l30_purple",
@@ -13725,7 +14709,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "stamina": 15,
+      "accuracy": 15
+    }
   },
   {
     "id": "hunter_gloves_warden_l30_purple",
@@ -13744,7 +14732,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "strength": 15,
+      "accuracy": 15
+    }
   },
   {
     "id": "hunter_weapon_wardenbow_l30_purple",
@@ -13763,7 +14755,11 @@
     },
     "starter": false,
     "attack": 30.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "accuracy": 15,
+      "dexterity": 15
+    }
   },
   {
     "id": "pants_wayfarer_l30_purple",
@@ -13781,7 +14777,11 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.7
+    "defense": 7.7,
+    "bonusStats": {
+      "accuracy": 15,
+      "dexterity": 15
+    }
   },
   {
     "id": "necklace_moonstone_l30_purple",
@@ -13799,7 +14799,11 @@
     },
     "starter": false,
     "attack": 15.5,
-    "defense": 3.9
+    "defense": 3.9,
+    "bonusStats": {
+      "accuracy": 15,
+      "dexterity": 15
+    }
   },
   {
     "id": "accessory_amber_l30_purple",
@@ -13817,7 +14821,11 @@
     },
     "starter": false,
     "attack": 11.6,
-    "defense": 2.9
+    "defense": 2.9,
+    "bonusStats": {
+      "dexterity": 15,
+      "stamina": 15
+    }
   },
   {
     "id": "warrior_armor_crimson_l35_gray",
@@ -14894,7 +15902,10 @@
     },
     "starter": false,
     "attack": 5.6,
-    "defense": 22.6
+    "defense": 22.6,
+    "bonusStats": {
+      "accuracy": 20
+    }
   },
   {
     "id": "warrior_headgear_crimson_l35_blue",
@@ -14913,7 +15924,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "dexterity": 20
+    }
   },
   {
     "id": "warrior_shoulders_crimson_l35_blue",
@@ -14932,7 +15946,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "agility": 20
+    }
   },
   {
     "id": "warrior_gloves_crimson_l35_blue",
@@ -14951,7 +15968,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "strength": 20
+    }
   },
   {
     "id": "warrior_weapon_sword_l35_blue",
@@ -14970,7 +15990,10 @@
     },
     "starter": false,
     "attack": 30.1,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "accuracy": 20
+    }
   },
   {
     "id": "mage_armor_apprentice_l35_blue",
@@ -14989,7 +16012,10 @@
     },
     "starter": false,
     "attack": 3.8,
-    "defense": 15.0
+    "defense": 15.0,
+    "bonusStats": {
+      "intellect": 20
+    }
   },
   {
     "id": "mage_headgear_apprentice_l35_blue",
@@ -15008,7 +16034,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "dexterity": 20
+    }
   },
   {
     "id": "mage_shoulders_apprentice_l35_blue",
@@ -15027,7 +16056,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "intellect": 20
+    }
   },
   {
     "id": "mage_gloves_apprentice_l35_blue",
@@ -15046,7 +16078,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "agility": 20
+    }
   },
   {
     "id": "mage_weapon_ash_l35_blue",
@@ -15065,7 +16100,10 @@
     },
     "starter": false,
     "attack": 30.1,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "intellect": 20
+    }
   },
   {
     "id": "assassin_armor_shadow_l35_blue",
@@ -15084,7 +16122,10 @@
     },
     "starter": false,
     "attack": 3.8,
-    "defense": 15.0
+    "defense": 15.0,
+    "bonusStats": {
+      "agility": 20
+    }
   },
   {
     "id": "assassin_headgear_shadow_l35_blue",
@@ -15103,7 +16144,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "dexterity": 20
+    }
   },
   {
     "id": "assassin_shoulders_shadow_l35_blue",
@@ -15122,7 +16166,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "accuracy": 20
+    }
   },
   {
     "id": "assassin_gloves_shadow_l35_blue",
@@ -15141,7 +16188,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "accuracy": 20
+    }
   },
   {
     "id": "assassin_weapon_daggers_l35_blue",
@@ -15160,7 +16210,10 @@
     },
     "starter": false,
     "attack": 30.1,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "dexterity": 20
+    }
   },
   {
     "id": "priest_armor_pilgrim_l35_blue",
@@ -15179,7 +16232,10 @@
     },
     "starter": false,
     "attack": 5.6,
-    "defense": 22.6
+    "defense": 22.6,
+    "bonusStats": {
+      "intellect": 20
+    }
   },
   {
     "id": "priest_headgear_pilgrim_l35_blue",
@@ -15198,7 +16254,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "dexterity": 20
+    }
   },
   {
     "id": "priest_shoulders_pilgrim_l35_blue",
@@ -15217,7 +16276,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "agility": 20
+    }
   },
   {
     "id": "priest_gloves_pilgrim_l35_blue",
@@ -15236,7 +16298,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "intellect": 20
+    }
   },
   {
     "id": "priest_weapon_mace_l35_blue",
@@ -15255,7 +16320,10 @@
     },
     "starter": false,
     "attack": 30.1,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "stamina": 20
+    }
   },
   {
     "id": "hunter_armor_scout_l35_blue",
@@ -15274,7 +16342,10 @@
     },
     "starter": false,
     "attack": 5.6,
-    "defense": 22.6
+    "defense": 22.6,
+    "bonusStats": {
+      "stamina": 20
+    }
   },
   {
     "id": "hunter_headgear_scout_l35_blue",
@@ -15293,7 +16364,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "strength": 20
+    }
   },
   {
     "id": "hunter_shoulders_scout_l35_blue",
@@ -15312,7 +16386,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "agility": 20
+    }
   },
   {
     "id": "hunter_gloves_scout_l35_blue",
@@ -15331,7 +16408,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "accuracy": 20
+    }
   },
   {
     "id": "hunter_weapon_shortbow_l35_blue",
@@ -15350,7 +16430,10 @@
     },
     "starter": false,
     "attack": 30.1,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "agility": 20
+    }
   },
   {
     "id": "pants_wayfarer_l35_blue",
@@ -15368,7 +16451,10 @@
     },
     "starter": false,
     "attack": 1.9,
-    "defense": 7.5
+    "defense": 7.5,
+    "bonusStats": {
+      "stamina": 20
+    }
   },
   {
     "id": "necklace_moonstone_l35_blue",
@@ -15386,7 +16472,10 @@
     },
     "starter": false,
     "attack": 15.0,
-    "defense": 3.8
+    "defense": 3.8,
+    "bonusStats": {
+      "dexterity": 20
+    }
   },
   {
     "id": "accessory_amber_l35_blue",
@@ -15404,7 +16493,10 @@
     },
     "starter": false,
     "attack": 11.3,
-    "defense": 2.8
+    "defense": 2.8,
+    "bonusStats": {
+      "dexterity": 20
+    }
   },
   {
     "id": "warrior_armor_crimson_l40_gray",
@@ -16481,7 +17573,10 @@
     },
     "starter": false,
     "attack": 6.3,
-    "defense": 25.4
+    "defense": 25.4,
+    "bonusStats": {
+      "strength": 30
+    }
   },
   {
     "id": "warrior_headgear_crimson_l40_blue",
@@ -16500,7 +17595,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "strength": 30
+    }
   },
   {
     "id": "warrior_shoulders_crimson_l40_blue",
@@ -16519,7 +17617,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "agility": 30
+    }
   },
   {
     "id": "warrior_gloves_crimson_l40_blue",
@@ -16538,7 +17639,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "agility": 30
+    }
   },
   {
     "id": "warrior_weapon_sword_l40_blue",
@@ -16557,7 +17661,10 @@
     },
     "starter": false,
     "attack": 33.8,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "dexterity": 30
+    }
   },
   {
     "id": "mage_armor_apprentice_l40_blue",
@@ -16576,7 +17683,10 @@
     },
     "starter": false,
     "attack": 4.2,
-    "defense": 16.9
+    "defense": 16.9,
+    "bonusStats": {
+      "dexterity": 30
+    }
   },
   {
     "id": "mage_headgear_apprentice_l40_blue",
@@ -16595,7 +17705,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "agility": 30
+    }
   },
   {
     "id": "mage_shoulders_apprentice_l40_blue",
@@ -16614,7 +17727,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "agility": 30
+    }
   },
   {
     "id": "mage_gloves_apprentice_l40_blue",
@@ -16633,7 +17749,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "stamina": 30
+    }
   },
   {
     "id": "mage_weapon_ash_l40_blue",
@@ -16652,7 +17771,10 @@
     },
     "starter": false,
     "attack": 33.8,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "stamina": 30
+    }
   },
   {
     "id": "assassin_armor_shadow_l40_blue",
@@ -16671,7 +17793,10 @@
     },
     "starter": false,
     "attack": 4.2,
-    "defense": 16.9
+    "defense": 16.9,
+    "bonusStats": {
+      "dexterity": 30
+    }
   },
   {
     "id": "assassin_headgear_shadow_l40_blue",
@@ -16690,7 +17815,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "strength": 30
+    }
   },
   {
     "id": "assassin_shoulders_shadow_l40_blue",
@@ -16709,7 +17837,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "agility": 30
+    }
   },
   {
     "id": "assassin_gloves_shadow_l40_blue",
@@ -16728,7 +17859,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "dexterity": 30
+    }
   },
   {
     "id": "assassin_weapon_daggers_l40_blue",
@@ -16747,7 +17881,10 @@
     },
     "starter": false,
     "attack": 33.8,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "strength": 30
+    }
   },
   {
     "id": "priest_armor_pilgrim_l40_blue",
@@ -16766,7 +17903,10 @@
     },
     "starter": false,
     "attack": 6.3,
-    "defense": 25.4
+    "defense": 25.4,
+    "bonusStats": {
+      "intellect": 30
+    }
   },
   {
     "id": "priest_headgear_pilgrim_l40_blue",
@@ -16785,7 +17925,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "agility": 30
+    }
   },
   {
     "id": "priest_shoulders_pilgrim_l40_blue",
@@ -16804,7 +17947,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "intellect": 30
+    }
   },
   {
     "id": "priest_gloves_pilgrim_l40_blue",
@@ -16823,7 +17969,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "agility": 30
+    }
   },
   {
     "id": "priest_weapon_mace_l40_blue",
@@ -16842,7 +17991,10 @@
     },
     "starter": false,
     "attack": 33.8,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "intellect": 30
+    }
   },
   {
     "id": "hunter_armor_scout_l40_blue",
@@ -16861,7 +18013,10 @@
     },
     "starter": false,
     "attack": 6.3,
-    "defense": 25.4
+    "defense": 25.4,
+    "bonusStats": {
+      "agility": 30
+    }
   },
   {
     "id": "hunter_headgear_scout_l40_blue",
@@ -16880,7 +18035,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "strength": 30
+    }
   },
   {
     "id": "hunter_shoulders_scout_l40_blue",
@@ -16899,7 +18057,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "stamina": 30
+    }
   },
   {
     "id": "hunter_gloves_scout_l40_blue",
@@ -16918,7 +18079,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "agility": 30
+    }
   },
   {
     "id": "hunter_weapon_shortbow_l40_blue",
@@ -16937,7 +18101,10 @@
     },
     "starter": false,
     "attack": 33.8,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "dexterity": 30
+    }
   },
   {
     "id": "pants_wayfarer_l40_blue",
@@ -16955,7 +18122,10 @@
     },
     "starter": false,
     "attack": 2.1,
-    "defense": 8.5
+    "defense": 8.5,
+    "bonusStats": {
+      "stamina": 30
+    }
   },
   {
     "id": "necklace_moonstone_l40_blue",
@@ -16973,7 +18143,10 @@
     },
     "starter": false,
     "attack": 16.9,
-    "defense": 4.2
+    "defense": 4.2,
+    "bonusStats": {
+      "dexterity": 30
+    }
   },
   {
     "id": "accessory_amber_l40_blue",
@@ -16991,7 +18164,10 @@
     },
     "starter": false,
     "attack": 12.7,
-    "defense": 3.2
+    "defense": 3.2,
+    "bonusStats": {
+      "stamina": 30
+    }
   },
   {
     "id": "warrior_armor_azure_l40_purple",
@@ -17010,7 +18186,11 @@
     },
     "starter": false,
     "attack": 7.5,
-    "defense": 29.8
+    "defense": 29.8,
+    "bonusStats": {
+      "strength": 30,
+      "dexterity": 30
+    }
   },
   {
     "id": "warrior_headgear_azure_l40_purple",
@@ -17029,7 +18209,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "strength": 30,
+      "agility": 30
+    }
   },
   {
     "id": "warrior_shoulders_azure_l40_purple",
@@ -17048,7 +18232,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "agility": 30,
+      "stamina": 30
+    }
   },
   {
     "id": "warrior_gloves_azure_l40_purple",
@@ -17067,7 +18255,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "agility": 30,
+      "dexterity": 30
+    }
   },
   {
     "id": "warrior_weapon_royal_l40_purple",
@@ -17086,7 +18278,11 @@
     },
     "starter": false,
     "attack": 39.8,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "agility": 30,
+      "strength": 30
+    }
   },
   {
     "id": "mage_armor_runic_l40_purple",
@@ -17105,7 +18301,11 @@
     },
     "starter": false,
     "attack": 5.0,
-    "defense": 19.9
+    "defense": 19.9,
+    "bonusStats": {
+      "intellect": 30,
+      "agility": 30
+    }
   },
   {
     "id": "mage_headgear_runic_l40_purple",
@@ -17124,7 +18324,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "intellect": 30,
+      "agility": 30
+    }
   },
   {
     "id": "mage_shoulders_runic_l40_purple",
@@ -17143,7 +18347,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "intellect": 30,
+      "stamina": 30
+    }
   },
   {
     "id": "mage_gloves_runic_l40_purple",
@@ -17162,7 +18370,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "dexterity": 30,
+      "intellect": 30
+    }
   },
   {
     "id": "mage_weapon_crystal_l40_purple",
@@ -17181,7 +18393,11 @@
     },
     "starter": false,
     "attack": 39.8,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "dexterity": 30,
+      "agility": 30
+    }
   },
   {
     "id": "assassin_armor_moon_l40_purple",
@@ -17200,7 +18416,11 @@
     },
     "starter": false,
     "attack": 5.0,
-    "defense": 19.9
+    "defense": 19.9,
+    "bonusStats": {
+      "stamina": 30,
+      "strength": 30
+    }
   },
   {
     "id": "assassin_headgear_moon_l40_purple",
@@ -17219,7 +18439,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "dexterity": 30,
+      "stamina": 30
+    }
   },
   {
     "id": "assassin_shoulders_moon_l40_purple",
@@ -17238,7 +18462,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "strength": 30,
+      "agility": 30
+    }
   },
   {
     "id": "assassin_gloves_moon_l40_purple",
@@ -17257,7 +18485,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "agility": 30,
+      "dexterity": 30
+    }
   },
   {
     "id": "assassin_weapon_moonfang_l40_purple",
@@ -17276,7 +18508,11 @@
     },
     "starter": false,
     "attack": 39.8,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "agility": 30,
+      "strength": 30
+    }
   },
   {
     "id": "priest_armor_dawn_l40_purple",
@@ -17295,7 +18531,11 @@
     },
     "starter": false,
     "attack": 7.5,
-    "defense": 29.8
+    "defense": 29.8,
+    "bonusStats": {
+      "dexterity": 30,
+      "intellect": 30
+    }
   },
   {
     "id": "priest_headgear_dawn_l40_purple",
@@ -17314,7 +18554,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "dexterity": 30,
+      "stamina": 30
+    }
   },
   {
     "id": "priest_shoulders_dawn_l40_purple",
@@ -17333,7 +18577,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "dexterity": 30,
+      "stamina": 30
+    }
   },
   {
     "id": "priest_gloves_dawn_l40_purple",
@@ -17352,7 +18600,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "stamina": 30,
+      "dexterity": 30
+    }
   },
   {
     "id": "priest_weapon_sunmace_l40_purple",
@@ -17371,7 +18623,11 @@
     },
     "starter": false,
     "attack": 39.8,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "stamina": 30,
+      "dexterity": 30
+    }
   },
   {
     "id": "hunter_armor_warden_l40_purple",
@@ -17390,7 +18646,11 @@
     },
     "starter": false,
     "attack": 7.5,
-    "defense": 29.8
+    "defense": 29.8,
+    "bonusStats": {
+      "strength": 30,
+      "stamina": 30
+    }
   },
   {
     "id": "hunter_headgear_warden_l40_purple",
@@ -17409,7 +18669,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "agility": 30,
+      "dexterity": 30
+    }
   },
   {
     "id": "hunter_shoulders_warden_l40_purple",
@@ -17428,7 +18692,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "agility": 30,
+      "stamina": 30
+    }
   },
   {
     "id": "hunter_gloves_warden_l40_purple",
@@ -17447,7 +18715,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "stamina": 30,
+      "strength": 30
+    }
   },
   {
     "id": "hunter_weapon_wardenbow_l40_purple",
@@ -17466,7 +18738,11 @@
     },
     "starter": false,
     "attack": 39.8,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "strength": 30,
+      "stamina": 30
+    }
   },
   {
     "id": "pants_wayfarer_l40_purple",
@@ -17484,7 +18760,11 @@
     },
     "starter": false,
     "attack": 2.5,
-    "defense": 9.9
+    "defense": 9.9,
+    "bonusStats": {
+      "stamina": 30,
+      "dexterity": 30
+    }
   },
   {
     "id": "necklace_moonstone_l40_purple",
@@ -17502,7 +18782,11 @@
     },
     "starter": false,
     "attack": 19.9,
-    "defense": 5.0
+    "defense": 5.0,
+    "bonusStats": {
+      "dexterity": 30,
+      "stamina": 30
+    }
   },
   {
     "id": "accessory_amber_l40_purple",
@@ -17520,7 +18804,11 @@
     },
     "starter": false,
     "attack": 14.9,
-    "defense": 3.7
+    "defense": 3.7,
+    "bonusStats": {
+      "dexterity": 30,
+      "stamina": 30
+    }
   },
   {
     "id": "warrior_armor_crimson_l45_gray",
@@ -18597,7 +19885,10 @@
     },
     "starter": false,
     "attack": 7.1,
-    "defense": 28.2
+    "defense": 28.2,
+    "bonusStats": {
+      "dexterity": 35
+    }
   },
   {
     "id": "warrior_headgear_crimson_l45_blue",
@@ -18616,7 +19907,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "strength": 35
+    }
   },
   {
     "id": "warrior_shoulders_crimson_l45_blue",
@@ -18635,7 +19929,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "stamina": 35
+    }
   },
   {
     "id": "warrior_gloves_crimson_l45_blue",
@@ -18654,7 +19951,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "dexterity": 35
+    }
   },
   {
     "id": "warrior_weapon_sword_l45_blue",
@@ -18673,7 +19973,10 @@
     },
     "starter": false,
     "attack": 37.6,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "dexterity": 35
+    }
   },
   {
     "id": "mage_armor_apprentice_l45_blue",
@@ -18692,7 +19995,10 @@
     },
     "starter": false,
     "attack": 4.7,
-    "defense": 18.8
+    "defense": 18.8,
+    "bonusStats": {
+      "intellect": 35
+    }
   },
   {
     "id": "mage_headgear_apprentice_l45_blue",
@@ -18711,7 +20017,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "dexterity": 35
+    }
   },
   {
     "id": "mage_shoulders_apprentice_l45_blue",
@@ -18730,7 +20039,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "agility": 35
+    }
   },
   {
     "id": "mage_gloves_apprentice_l45_blue",
@@ -18749,7 +20061,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "intellect": 35
+    }
   },
   {
     "id": "mage_weapon_ash_l45_blue",
@@ -18768,7 +20083,10 @@
     },
     "starter": false,
     "attack": 37.6,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "intellect": 35
+    }
   },
   {
     "id": "assassin_armor_shadow_l45_blue",
@@ -18787,7 +20105,10 @@
     },
     "starter": false,
     "attack": 4.7,
-    "defense": 18.8
+    "defense": 18.8,
+    "bonusStats": {
+      "strength": 35
+    }
   },
   {
     "id": "assassin_headgear_shadow_l45_blue",
@@ -18806,7 +20127,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "agility": 35
+    }
   },
   {
     "id": "assassin_shoulders_shadow_l45_blue",
@@ -18825,7 +20149,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "stamina": 35
+    }
   },
   {
     "id": "assassin_gloves_shadow_l45_blue",
@@ -18844,7 +20171,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "stamina": 35
+    }
   },
   {
     "id": "assassin_weapon_daggers_l45_blue",
@@ -18863,7 +20193,10 @@
     },
     "starter": false,
     "attack": 37.6,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "agility": 35
+    }
   },
   {
     "id": "priest_armor_pilgrim_l45_blue",
@@ -18882,7 +20215,10 @@
     },
     "starter": false,
     "attack": 7.1,
-    "defense": 28.2
+    "defense": 28.2,
+    "bonusStats": {
+      "dexterity": 35
+    }
   },
   {
     "id": "priest_headgear_pilgrim_l45_blue",
@@ -18901,7 +20237,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "stamina": 35
+    }
   },
   {
     "id": "priest_shoulders_pilgrim_l45_blue",
@@ -18920,7 +20259,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "dexterity": 35
+    }
   },
   {
     "id": "priest_gloves_pilgrim_l45_blue",
@@ -18939,7 +20281,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "dexterity": 35
+    }
   },
   {
     "id": "priest_weapon_mace_l45_blue",
@@ -18958,7 +20303,10 @@
     },
     "starter": false,
     "attack": 37.6,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "intellect": 35
+    }
   },
   {
     "id": "hunter_armor_scout_l45_blue",
@@ -18977,7 +20325,10 @@
     },
     "starter": false,
     "attack": 7.1,
-    "defense": 28.2
+    "defense": 28.2,
+    "bonusStats": {
+      "agility": 35
+    }
   },
   {
     "id": "hunter_headgear_scout_l45_blue",
@@ -18996,7 +20347,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "stamina": 35
+    }
   },
   {
     "id": "hunter_shoulders_scout_l45_blue",
@@ -19015,7 +20369,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "strength": 35
+    }
   },
   {
     "id": "hunter_gloves_scout_l45_blue",
@@ -19034,7 +20391,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "dexterity": 35
+    }
   },
   {
     "id": "hunter_weapon_shortbow_l45_blue",
@@ -19053,7 +20413,10 @@
     },
     "starter": false,
     "attack": 37.6,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "agility": 35
+    }
   },
   {
     "id": "pants_wayfarer_l45_blue",
@@ -19071,7 +20434,10 @@
     },
     "starter": false,
     "attack": 2.4,
-    "defense": 9.4
+    "defense": 9.4,
+    "bonusStats": {
+      "dexterity": 35
+    }
   },
   {
     "id": "necklace_moonstone_l45_blue",
@@ -19089,7 +20455,10 @@
     },
     "starter": false,
     "attack": 18.8,
-    "defense": 4.7
+    "defense": 4.7,
+    "bonusStats": {
+      "stamina": 35
+    }
   },
   {
     "id": "accessory_amber_l45_blue",
@@ -19107,7 +20476,10 @@
     },
     "starter": false,
     "attack": 14.1,
-    "defense": 3.5
+    "defense": 3.5,
+    "bonusStats": {
+      "dexterity": 35
+    }
   },
   {
     "id": "warrior_armor_crimson_l50_gray",
@@ -20184,7 +21556,10 @@
     },
     "starter": false,
     "attack": 7.8,
-    "defense": 31.0
+    "defense": 31.0,
+    "bonusStats": {
+      "stamina": 40
+    }
   },
   {
     "id": "warrior_headgear_crimson_l50_blue",
@@ -20203,7 +21578,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "stamina": 40
+    }
   },
   {
     "id": "warrior_shoulders_crimson_l50_blue",
@@ -20222,7 +21600,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "dexterity": 40
+    }
   },
   {
     "id": "warrior_gloves_crimson_l50_blue",
@@ -20241,7 +21622,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "dexterity": 40
+    }
   },
   {
     "id": "warrior_weapon_sword_l50_blue",
@@ -20260,7 +21644,10 @@
     },
     "starter": false,
     "attack": 41.4,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "agility": 40
+    }
   },
   {
     "id": "mage_armor_apprentice_l50_blue",
@@ -20279,7 +21666,10 @@
     },
     "starter": false,
     "attack": 5.2,
-    "defense": 20.7
+    "defense": 20.7,
+    "bonusStats": {
+      "agility": 40
+    }
   },
   {
     "id": "mage_headgear_apprentice_l50_blue",
@@ -20298,7 +21688,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "agility": 40
+    }
   },
   {
     "id": "mage_shoulders_apprentice_l50_blue",
@@ -20317,7 +21710,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "stamina": 40
+    }
   },
   {
     "id": "mage_gloves_apprentice_l50_blue",
@@ -20336,7 +21732,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "intellect": 40
+    }
   },
   {
     "id": "mage_weapon_ash_l50_blue",
@@ -20355,7 +21754,10 @@
     },
     "starter": false,
     "attack": 41.4,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "agility": 40
+    }
   },
   {
     "id": "assassin_armor_shadow_l50_blue",
@@ -20374,7 +21776,10 @@
     },
     "starter": false,
     "attack": 5.2,
-    "defense": 20.7
+    "defense": 20.7,
+    "bonusStats": {
+      "dexterity": 40
+    }
   },
   {
     "id": "assassin_headgear_shadow_l50_blue",
@@ -20393,7 +21798,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "dexterity": 40
+    }
   },
   {
     "id": "assassin_shoulders_shadow_l50_blue",
@@ -20412,7 +21820,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "agility": 40
+    }
   },
   {
     "id": "assassin_gloves_shadow_l50_blue",
@@ -20431,7 +21842,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "stamina": 40
+    }
   },
   {
     "id": "assassin_weapon_daggers_l50_blue",
@@ -20450,7 +21864,10 @@
     },
     "starter": false,
     "attack": 41.4,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "strength": 40
+    }
   },
   {
     "id": "priest_armor_pilgrim_l50_blue",
@@ -20469,7 +21886,10 @@
     },
     "starter": false,
     "attack": 7.8,
-    "defense": 31.0
+    "defense": 31.0,
+    "bonusStats": {
+      "intellect": 40
+    }
   },
   {
     "id": "priest_headgear_pilgrim_l50_blue",
@@ -20488,7 +21908,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "agility": 40
+    }
   },
   {
     "id": "priest_shoulders_pilgrim_l50_blue",
@@ -20507,7 +21930,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "agility": 40
+    }
   },
   {
     "id": "priest_gloves_pilgrim_l50_blue",
@@ -20526,7 +21952,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "intellect": 40
+    }
   },
   {
     "id": "priest_weapon_mace_l50_blue",
@@ -20545,7 +21974,10 @@
     },
     "starter": false,
     "attack": 41.4,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "intellect": 40
+    }
   },
   {
     "id": "hunter_armor_scout_l50_blue",
@@ -20564,7 +21996,10 @@
     },
     "starter": false,
     "attack": 7.8,
-    "defense": 31.0
+    "defense": 31.0,
+    "bonusStats": {
+      "stamina": 40
+    }
   },
   {
     "id": "hunter_headgear_scout_l50_blue",
@@ -20583,7 +22018,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "stamina": 40
+    }
   },
   {
     "id": "hunter_shoulders_scout_l50_blue",
@@ -20602,7 +22040,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "agility": 40
+    }
   },
   {
     "id": "hunter_gloves_scout_l50_blue",
@@ -20621,7 +22062,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "stamina": 40
+    }
   },
   {
     "id": "hunter_weapon_shortbow_l50_blue",
@@ -20640,7 +22084,10 @@
     },
     "starter": false,
     "attack": 41.4,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "dexterity": 40
+    }
   },
   {
     "id": "pants_wayfarer_l50_blue",
@@ -20658,7 +22105,10 @@
     },
     "starter": false,
     "attack": 2.6,
-    "defense": 10.3
+    "defense": 10.3,
+    "bonusStats": {
+      "dexterity": 40
+    }
   },
   {
     "id": "necklace_moonstone_l50_blue",
@@ -20676,7 +22126,10 @@
     },
     "starter": false,
     "attack": 20.7,
-    "defense": 5.2
+    "defense": 5.2,
+    "bonusStats": {
+      "stamina": 40
+    }
   },
   {
     "id": "accessory_amber_l50_blue",
@@ -20694,7 +22147,10 @@
     },
     "starter": false,
     "attack": 15.5,
-    "defense": 3.9
+    "defense": 3.9,
+    "bonusStats": {
+      "stamina": 40
+    }
   },
   {
     "id": "warrior_armor_azure_l50_purple",
@@ -20713,7 +22169,11 @@
     },
     "starter": false,
     "attack": 9.1,
-    "defense": 36.4
+    "defense": 36.4,
+    "bonusStats": {
+      "stamina": 40,
+      "agility": 40
+    }
   },
   {
     "id": "warrior_headgear_azure_l50_purple",
@@ -20732,7 +22192,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "strength": 40,
+      "agility": 40
+    }
   },
   {
     "id": "warrior_shoulders_azure_l50_purple",
@@ -20751,7 +22215,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "stamina": 40,
+      "agility": 40
+    }
   },
   {
     "id": "warrior_gloves_azure_l50_purple",
@@ -20770,7 +22238,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "dexterity": 40,
+      "agility": 40
+    }
   },
   {
     "id": "warrior_weapon_royal_l50_purple",
@@ -20789,7 +22261,11 @@
     },
     "starter": false,
     "attack": 48.6,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "agility": 40,
+      "strength": 40
+    }
   },
   {
     "id": "mage_armor_runic_l50_purple",
@@ -20808,7 +22284,11 @@
     },
     "starter": false,
     "attack": 6.1,
-    "defense": 24.3
+    "defense": 24.3,
+    "bonusStats": {
+      "agility": 40,
+      "dexterity": 40
+    }
   },
   {
     "id": "mage_headgear_runic_l50_purple",
@@ -20827,7 +22307,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "agility": 40,
+      "dexterity": 40
+    }
   },
   {
     "id": "mage_shoulders_runic_l50_purple",
@@ -20846,7 +22330,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "agility": 40,
+      "stamina": 40
+    }
   },
   {
     "id": "mage_gloves_runic_l50_purple",
@@ -20865,7 +22353,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "intellect": 40,
+      "agility": 40
+    }
   },
   {
     "id": "mage_weapon_crystal_l50_purple",
@@ -20884,7 +22376,11 @@
     },
     "starter": false,
     "attack": 48.6,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "agility": 40,
+      "intellect": 40
+    }
   },
   {
     "id": "assassin_armor_moon_l50_purple",
@@ -20903,7 +22399,11 @@
     },
     "starter": false,
     "attack": 6.1,
-    "defense": 24.3
+    "defense": 24.3,
+    "bonusStats": {
+      "stamina": 40,
+      "agility": 40
+    }
   },
   {
     "id": "assassin_headgear_moon_l50_purple",
@@ -20922,7 +22422,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "stamina": 40,
+      "strength": 40
+    }
   },
   {
     "id": "assassin_shoulders_moon_l50_purple",
@@ -20941,7 +22445,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "agility": 40,
+      "strength": 40
+    }
   },
   {
     "id": "assassin_gloves_moon_l50_purple",
@@ -20960,7 +22468,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "stamina": 40,
+      "strength": 40
+    }
   },
   {
     "id": "assassin_weapon_moonfang_l50_purple",
@@ -20979,7 +22491,11 @@
     },
     "starter": false,
     "attack": 48.6,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "dexterity": 40,
+      "stamina": 40
+    }
   },
   {
     "id": "priest_armor_dawn_l50_purple",
@@ -20998,7 +22514,11 @@
     },
     "starter": false,
     "attack": 9.1,
-    "defense": 36.4
+    "defense": 36.4,
+    "bonusStats": {
+      "intellect": 40,
+      "dexterity": 40
+    }
   },
   {
     "id": "priest_headgear_dawn_l50_purple",
@@ -21017,7 +22537,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "stamina": 40,
+      "dexterity": 40
+    }
   },
   {
     "id": "priest_shoulders_dawn_l50_purple",
@@ -21036,7 +22560,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "intellect": 40,
+      "stamina": 40
+    }
   },
   {
     "id": "priest_gloves_dawn_l50_purple",
@@ -21055,7 +22583,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "dexterity": 40,
+      "stamina": 40
+    }
   },
   {
     "id": "priest_weapon_sunmace_l50_purple",
@@ -21074,7 +22606,11 @@
     },
     "starter": false,
     "attack": 48.6,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "intellect": 40,
+      "agility": 40
+    }
   },
   {
     "id": "hunter_armor_warden_l50_purple",
@@ -21093,7 +22629,11 @@
     },
     "starter": false,
     "attack": 9.1,
-    "defense": 36.4
+    "defense": 36.4,
+    "bonusStats": {
+      "dexterity": 40,
+      "strength": 40
+    }
   },
   {
     "id": "hunter_headgear_warden_l50_purple",
@@ -21112,7 +22652,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "agility": 40,
+      "strength": 40
+    }
   },
   {
     "id": "hunter_shoulders_warden_l50_purple",
@@ -21131,7 +22675,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "agility": 40,
+      "strength": 40
+    }
   },
   {
     "id": "hunter_gloves_warden_l50_purple",
@@ -21150,7 +22698,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "stamina": 40,
+      "strength": 40
+    }
   },
   {
     "id": "hunter_weapon_wardenbow_l50_purple",
@@ -21169,7 +22721,11 @@
     },
     "starter": false,
     "attack": 48.6,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "stamina": 40,
+      "strength": 40
+    }
   },
   {
     "id": "pants_wayfarer_l50_purple",
@@ -21187,7 +22743,11 @@
     },
     "starter": false,
     "attack": 3.0,
-    "defense": 12.1
+    "defense": 12.1,
+    "bonusStats": {
+      "stamina": 40,
+      "dexterity": 40
+    }
   },
   {
     "id": "necklace_moonstone_l50_purple",
@@ -21205,7 +22765,11 @@
     },
     "starter": false,
     "attack": 24.3,
-    "defense": 6.1
+    "defense": 6.1,
+    "bonusStats": {
+      "dexterity": 40,
+      "stamina": 40
+    }
   },
   {
     "id": "accessory_amber_l50_purple",
@@ -21223,7 +22787,11 @@
     },
     "starter": false,
     "attack": 18.2,
-    "defense": 4.6
+    "defense": 4.6,
+    "bonusStats": {
+      "dexterity": 40,
+      "stamina": 40
+    }
   },
   {
     "id": "warrior_armor_crimson_l40_cloister",
@@ -21243,6 +22811,9 @@
     "starter": false,
     "attack": 7.2,
     "defense": 29.2,
+    "bonusStats": {
+      "stamina": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21263,6 +22834,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "strength": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21283,6 +22857,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "strength": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21303,6 +22880,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "strength": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21323,6 +22903,9 @@
     "starter": false,
     "attack": 38.9,
     "defense": 9.8,
+    "bonusStats": {
+      "strength": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21343,6 +22926,9 @@
     "starter": false,
     "attack": 4.8,
     "defense": 19.4,
+    "bonusStats": {
+      "stamina": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21363,6 +22949,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "stamina": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21383,6 +22972,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "stamina": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21403,6 +22995,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "agility": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21423,6 +23018,9 @@
     "starter": false,
     "attack": 38.9,
     "defense": 9.8,
+    "bonusStats": {
+      "stamina": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21443,6 +23041,9 @@
     "starter": false,
     "attack": 4.8,
     "defense": 19.4,
+    "bonusStats": {
+      "dexterity": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21463,6 +23064,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "strength": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21483,6 +23087,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "stamina": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21503,6 +23110,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "stamina": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21523,6 +23133,9 @@
     "starter": false,
     "attack": 38.9,
     "defense": 9.8,
+    "bonusStats": {
+      "strength": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21543,6 +23156,9 @@
     "starter": false,
     "attack": 7.2,
     "defense": 29.2,
+    "bonusStats": {
+      "dexterity": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21563,6 +23179,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "dexterity": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21583,6 +23202,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "stamina": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21603,6 +23225,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "intellect": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21623,6 +23248,9 @@
     "starter": false,
     "attack": 38.9,
     "defense": 9.8,
+    "bonusStats": {
+      "stamina": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21643,6 +23271,9 @@
     "starter": false,
     "attack": 7.2,
     "defense": 29.2,
+    "bonusStats": {
+      "strength": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21663,6 +23294,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "agility": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21683,6 +23317,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "dexterity": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21703,6 +23340,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "strength": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21723,6 +23363,9 @@
     "starter": false,
     "attack": 38.9,
     "defense": 9.8,
+    "bonusStats": {
+      "dexterity": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21742,6 +23385,9 @@
     "starter": false,
     "attack": 2.4,
     "defense": 9.8,
+    "bonusStats": {
+      "dexterity": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21761,6 +23407,9 @@
     "starter": false,
     "attack": 19.4,
     "defense": 4.8,
+    "bonusStats": {
+      "stamina": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21780,6 +23429,9 @@
     "starter": false,
     "attack": 14.6,
     "defense": 3.7,
+    "bonusStats": {
+      "stamina": 30
+    },
     "source": "cathedral_cloister"
   },
   {
@@ -21800,6 +23452,9 @@
     "starter": false,
     "attack": 8.2,
     "defense": 32.4,
+    "bonusStats": {
+      "strength": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -21820,6 +23475,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "agility": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -21840,6 +23498,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "agility": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -21860,6 +23521,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "agility": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -21880,6 +23544,9 @@
     "starter": false,
     "attack": 43.2,
     "defense": 10.8,
+    "bonusStats": {
+      "strength": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -21900,6 +23567,9 @@
     "starter": false,
     "attack": 5.4,
     "defense": 21.6,
+    "bonusStats": {
+      "stamina": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -21920,6 +23590,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "intellect": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -21940,6 +23613,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "dexterity": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -21960,6 +23636,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "dexterity": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -21980,6 +23659,9 @@
     "starter": false,
     "attack": 43.2,
     "defense": 10.8,
+    "bonusStats": {
+      "stamina": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22000,6 +23682,9 @@
     "starter": false,
     "attack": 5.4,
     "defense": 21.6,
+    "bonusStats": {
+      "stamina": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22020,6 +23705,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "strength": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22040,6 +23728,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "strength": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22060,6 +23751,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "agility": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22080,6 +23774,9 @@
     "starter": false,
     "attack": 43.2,
     "defense": 10.8,
+    "bonusStats": {
+      "agility": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22100,6 +23797,9 @@
     "starter": false,
     "attack": 8.2,
     "defense": 32.4,
+    "bonusStats": {
+      "stamina": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22120,6 +23820,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "dexterity": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22140,6 +23843,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "stamina": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22160,6 +23866,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "intellect": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22180,6 +23889,9 @@
     "starter": false,
     "attack": 43.2,
     "defense": 10.8,
+    "bonusStats": {
+      "stamina": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22200,6 +23912,9 @@
     "starter": false,
     "attack": 8.2,
     "defense": 32.4,
+    "bonusStats": {
+      "dexterity": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22220,6 +23935,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "stamina": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22240,6 +23958,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "agility": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22260,6 +23981,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "stamina": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22280,6 +24004,9 @@
     "starter": false,
     "attack": 43.2,
     "defense": 10.8,
+    "bonusStats": {
+      "dexterity": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22299,6 +24026,9 @@
     "starter": false,
     "attack": 2.8,
     "defense": 10.8,
+    "bonusStats": {
+      "stamina": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22318,6 +24048,9 @@
     "starter": false,
     "attack": 21.6,
     "defense": 5.4,
+    "bonusStats": {
+      "dexterity": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22337,6 +24070,9 @@
     "starter": false,
     "attack": 16.2,
     "defense": 4.0,
+    "bonusStats": {
+      "dexterity": 35
+    },
     "source": "cathedral_reliquary"
   },
   {
@@ -22357,6 +24093,9 @@
     "starter": false,
     "attack": 9.0,
     "defense": 35.6,
+    "bonusStats": {
+      "stamina": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22377,6 +24116,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "stamina": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22397,6 +24139,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "stamina": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22417,6 +24162,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "stamina": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22437,6 +24185,9 @@
     "starter": false,
     "attack": 47.6,
     "defense": 11.8,
+    "bonusStats": {
+      "agility": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22457,6 +24208,9 @@
     "starter": false,
     "attack": 6.0,
     "defense": 23.8,
+    "bonusStats": {
+      "intellect": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22477,6 +24231,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "agility": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22497,6 +24254,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "dexterity": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22517,6 +24277,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "agility": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22537,6 +24300,9 @@
     "starter": false,
     "attack": 47.6,
     "defense": 11.8,
+    "bonusStats": {
+      "stamina": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22557,6 +24323,9 @@
     "starter": false,
     "attack": 6.0,
     "defense": 23.8,
+    "bonusStats": {
+      "strength": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22577,6 +24346,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "strength": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22597,6 +24369,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "agility": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22617,6 +24392,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "dexterity": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22637,6 +24415,9 @@
     "starter": false,
     "attack": 47.6,
     "defense": 11.8,
+    "bonusStats": {
+      "stamina": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22657,6 +24438,9 @@
     "starter": false,
     "attack": 9.0,
     "defense": 35.6,
+    "bonusStats": {
+      "stamina": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22677,6 +24461,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "intellect": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22697,6 +24484,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "dexterity": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22717,6 +24507,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "dexterity": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22737,6 +24530,9 @@
     "starter": false,
     "attack": 47.6,
     "defense": 11.8,
+    "bonusStats": {
+      "intellect": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22757,6 +24553,9 @@
     "starter": false,
     "attack": 9.0,
     "defense": 35.6,
+    "bonusStats": {
+      "dexterity": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22777,6 +24576,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "agility": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22797,6 +24599,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "strength": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22817,6 +24622,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "dexterity": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22837,6 +24645,9 @@
     "starter": false,
     "attack": 47.6,
     "defense": 11.8,
+    "bonusStats": {
+      "strength": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22856,6 +24667,9 @@
     "starter": false,
     "attack": 3.0,
     "defense": 11.8,
+    "bonusStats": {
+      "dexterity": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22875,6 +24689,9 @@
     "starter": false,
     "attack": 23.8,
     "defense": 6.0,
+    "bonusStats": {
+      "stamina": 40
+    },
     "source": "cathedral_nave"
   },
   {
@@ -22894,17 +24711,44 @@
     "starter": false,
     "attack": 17.8,
     "defense": 4.5,
+    "bonusStats": {
+      "stamina": 40
+    },
     "source": "cathedral_nave"
-  }
-  ,{
-    "id": "voidwing", "name": "Voidwing", "kind": "material", "rarity": "common", "sell": 900
-  },{
-    "id": "astral_scale", "name": "Astral Scale", "kind": "material", "rarity": "common", "sell": 980
-  },{
-    "id": "orbit_shell", "name": "Orbit Shell", "kind": "material", "rarity": "common", "sell": 1060
-  },{
-    "id": "eclipse_bark", "name": "Eclipse Bark", "kind": "material", "rarity": "common", "sell": 1140
-  },{
-    "id": "meteor_core", "name": "Meteor Core", "kind": "material", "rarity": "common", "sell": 1450
+  },
+  {
+    "id": "voidwing",
+    "name": "Voidwing",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 900
+  },
+  {
+    "id": "astral_scale",
+    "name": "Astral Scale",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 980
+  },
+  {
+    "id": "orbit_shell",
+    "name": "Orbit Shell",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1060
+  },
+  {
+    "id": "eclipse_bark",
+    "name": "Eclipse Bark",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1140
+  },
+  {
+    "id": "meteor_core",
+    "name": "Meteor Core",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1450
   }
 ]

@@ -19,6 +19,7 @@ that base and adds a secondary stat; blue is 17.5% over green, purple 17.5% over
 level factor follows the existing linear ladder (0.16 per level after level 5).
 """
 import json
+import hashlib
 import pathlib
 from cathedral_content import WINGS
 
@@ -34,6 +35,30 @@ TIER_STEP = 1.175
 GREEN_BUDGET = 1.25
 SECONDARY_SHARE = 0.2
 RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary']
+USEFUL_STATS = {
+    'warrior': ('strength', 'stamina', 'agility', 'accuracy', 'dexterity'),
+    'mage': ('intellect', 'stamina', 'agility', 'accuracy', 'dexterity'),
+    'assassin': ('agility', 'stamina', 'strength', 'accuracy', 'dexterity'),
+    'priest': ('intellect', 'stamina', 'agility', 'accuracy', 'dexterity'),
+    'hunter': ('agility', 'stamina', 'strength', 'accuracy', 'dexterity'),
+    None: ('stamina', 'accuracy', 'dexterity'),
+}
+# Item levels arrive in five-level steps. The levels after 50 extend the requested
+# 50→90 rise linearly (rounded to whole points); no gear above 50 exists yet.
+ATTRIBUTE_BONUS = {
+    5: 1, 10: 3, 15: 5, 20: 7, 25: 10, 30: 15, 35: 20,
+    40: 30, 45: 35, 50: 40, 55: 48, 60: 55, 65: 63,
+    70: 70, 75: 78, 80: 85, 85: 93, 90: 100,
+}
+
+
+def bonus_choices(cls, amount):
+    """Keep large rolls off hit/dodge attributes once a single item would exceed their caps."""
+    choices = [stat for stat in USEFUL_STATS[cls]
+               if (stat != 'accuracy' or amount <= 20) and (stat != 'dexterity' or amount <= 70)]
+    if cls is None and amount > 70:
+        choices.extend(('strength', 'agility'))   # useful to every class, unlike capped hit/dodge
+    return choices
 SELL_BASE = {'common': 4, 'uncommon': 25, 'rare': 60, 'epic': 120}
 
 # (primary stat, base budget at level 1) per slot kind; the secondary stat is the other one.
@@ -101,6 +126,21 @@ def budget(kind, cls, rarity, level):
     return round(values['attack'], 1), round(values['defense'], 1)
 
 
+def bonus_stats(i):
+    """One useful attribute on blue, two different ones on purple, fixed by item ID.
+
+    Attribute amounts follow the requested level ladder, while the existing
+    17.5% attack/defense tier increase remains intact. Shared gear only rolls
+    universally useful stats.
+    """
+    count = {'rare': 1, 'epic': 2}.get(i['rarity'], 0)
+    digest = hashlib.sha256(i['id'].encode()).digest()
+    step = min(90, max(5, i.get('requiredLevel', 1) // 5 * 5))
+    amount = ATTRIBUTE_BONUS[step]
+    choices = bonus_choices(i.get('class'), amount)
+    return {choices.pop(digest[n] % len(choices)): amount for n in range(count)}
+
+
 def ordered(i):
     keys = ['id', 'name', 'kind', 'rarity', 'requiredLevel']
     return {**{k: i[k] for k in keys if k in i}, **{k: v for k, v in i.items() if k not in keys}}
@@ -111,6 +151,9 @@ def finish(i, level, rarity):
     i['requiredLevel'] = level
     i['sell'] = 0 if i.get('starter') else round(SELL_BASE[rarity] * LEVEL_FACTOR[level])
     i['attack'], i['defense'] = budget(i['kind'], i.get('class'), rarity, level)
+    i.pop('bonusStats', None)
+    if bonus := bonus_stats(i):
+        i['bonusStats'] = bonus
     return ordered(i)
 
 
@@ -202,6 +245,7 @@ def cathedral_pieces(out):
             v['defense'] = round(i['defense'] * CATHEDRAL_BONUS, 1)
             v['sell'] = round(i['sell'] * CATHEDRAL_BONUS)
             v['source'] = f'cathedral_{name}'
+            v['bonusStats'] = bonus_stats(v)
             pieces.append(ordered(v))
     return pieces
 
@@ -240,6 +284,7 @@ def vault_pieces(out):
             v['defense'] = round(i['defense'] * VAULT_BONUS, 1)
             v['sell'] = round(i['sell'] * VAULT_BONUS)
             v['source'] = 'undervault'
+            v['bonusStats'] = bonus_stats(v)
             pieces.append(ordered(v))
     return pieces
 

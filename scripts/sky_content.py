@@ -13,6 +13,7 @@ from pathlib import Path
 
 import mercenary_offers as mo
 import progression_quests
+from quest_gear_rewards import add_reward
 from skaldholm_content import look
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,9 +67,9 @@ def hold(place, seconds, label):
 
 def quest(id, title, giver, description, objectives, level, gold, requires=None, repeatable=False, **extra):
     # Recommended level; the XP reward is 10% of what that level needs (a server test enforces it).
-    return dict(id=P + id, title=title, npc=P + giver, description=description, objectives=objectives, level=level,
+    return add_reward(dict(id=P + id, title=title, npc=P + giver, description=description, objectives=objectives, level=level,
                 rewardXp=LEVEL_XP[level - 1] // 10, rewardGold=gold, requires=P + requires if requires else None,
-                repeatable=repeatable, **extra)
+                repeatable=repeatable, **extra))
 
 
 def perch():

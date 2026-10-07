@@ -8,6 +8,7 @@ from pathlib import Path
 
 import mercenary_offers
 import progression_quests
+from quest_gear_rewards import add_reward
 
 ROOT = Path(__file__).resolve().parents[1]
 LEVEL_XP = json.loads((ROOT / 'world/levels.txt').read_text())  # XP to next level; a quest pays a tenth
@@ -225,9 +226,9 @@ def bring(item, count, label):
 
 
 def quest(id, title, npc, description, objectives, level, gold, requires=None, repeatable=False):
-    return dict(id=P + id, title=title, npc=P + npc, description=description, objectives=objectives, level=level,
+    return add_reward(dict(id=P + id, title=title, npc=P + npc, description=description, objectives=objectives, level=level,
                 rewardXp=LEVEL_XP[level - 1] // 10, rewardGold=gold, requires=P + requires if requires else None,
-                repeatable=repeatable)
+                repeatable=repeatable))
 
 
 def quests():

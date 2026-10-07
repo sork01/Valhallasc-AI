@@ -9,6 +9,7 @@ import argparse
 import json
 import math
 import random
+from quest_gear_rewards import add_reward
 from pathlib import Path
 
 import generate_gloamfen as fen
@@ -44,10 +45,10 @@ def objective(kind, target, label, count=1):
 
 
 def quest(id_, title, giver, description, objectives, level=35, gold=100, requires='welcome', **kw):
-    return dict(id='nacre_' + id_, title=title, npc='nacre_' + giver,
+    return add_reward(dict(id='nacre_' + id_, title=title, npc='nacre_' + giver,
                 description=description, objectives=objectives, level=level,
                 rewardXp=XP[level - 1] // 10, rewardGold=gold,
-                requires='nacre_' + requires if requires else None, repeatable=False, **kw)
+                requires='nacre_' + requires if requires else None, repeatable=False, **kw))
 
 
 def content():

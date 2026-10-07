@@ -463,7 +463,8 @@ pub fn enemy_xp(level: u32) -> u32 {
 impl Character {
     pub fn max_resource(&self) -> f64 {
         if self.look.class.resource_type() == "mana" {
-            100. + self.level.saturating_sub(1) as f64 * 10. + self.attributes.intellect as f64 * 5.
+            100. + self.level.saturating_sub(1) as f64 * 10.
+                + self.effective_attributes().intellect as f64 * 5.
         } else {
             100.
         }
@@ -492,7 +493,7 @@ impl Character {
     pub fn max_hp(&self) -> f64 {
         self.look.class.health()
             + self.level.saturating_sub(1) as f64 * 20.
-            + self.attributes.stamina as f64 * 8.
+            + self.effective_attributes().stamina as f64 * 8.
     }
     pub fn stat_points(&self) -> u32 {
         let a = &self.attributes;
@@ -540,17 +541,17 @@ impl Character {
             0.28
         } else {
             0.14
-        }) + self.attributes.agility as f64 * 0.005)
+        }) + self.effective_attributes().agility as f64 * 0.005)
             .min(0.60)
     }
     pub fn cooldown_multiplier(&self) -> f64 {
-        1. - (self.attributes.intellect as f64 * 0.01).min(0.30)
+        1. - (self.effective_attributes().intellect as f64 * 0.01).min(0.30)
     }
     pub fn dodge_chance(&self) -> f64 {
-        (self.attributes.dexterity as f64 * 0.005).min(0.35)
+        (self.effective_attributes().dexterity as f64 * 0.005).min(0.35)
     }
     pub fn hit_chance(&self) -> f64 {
-        (0.90 + self.attributes.accuracy as f64 * 0.005).min(1.)
+        (0.90 + self.effective_attributes().accuracy as f64 * 0.005).min(1.)
     }
     pub fn attack_cooldown(&self) -> f64 {
         (self.look.class.cooldown() * self.cooldown_multiplier()).max(self.look.class.duration())

@@ -449,7 +449,7 @@ const scenarios = {
       const defaults = DEFAULT_LEVELS;
       const home = w.snapshot.slimes;
       check(w.player(bot).zone === 0, 'New characters start in Greenmeadow');
-      check(home.length === 21 && home.every(s => s.zone === 0), 'A meadow client receives exactly the 21 meadow enemies and nothing from the Crags');
+      check(home.length === 32 && home.every(s => s.zone === 0), 'A meadow client receives exactly the 32 meadow enemies and nothing from the Crags');
       check(home.every(s => Math.abs(s.level - defaults[s.kind]) <= 2 && s.level >= 1), 'Every meadow enemy level is within two of its kind default');
       // The gate is a real walk: the meadow route ends between its two posts.
       const gate = map.portals[0];
@@ -1471,10 +1471,10 @@ const scenarios = {
     },
   },
   cinderlord: {
-    description: 'Two level-10 warriors fight the Cinderlord with real damage, skills and potions, both earn quest credit and guaranteed green gear, then equip it and retain the reward after restart.',
+    description: 'Two level-10 warriors fight the Cinderlord with real damage, skills and potions, both earn quest credit and guaranteed blue gear, then equip it and retain the reward after restart.',
     startLevel: 10, godMode: false, levelSpread: 0,
     async run(w, check) {
-      const bots = ['Ember', 'Cinder'], qid = 'crags_cinderlord', reward = 'necklace_moonstone_l10_green';
+      const bots = ['Ember', 'Cinder'], qid = 'crags_cinderlord', reward = 'necklace_moonstone_l10_blue';
       for (const bot of bots) {
         await w.connect({ bot, class: 'warrior' });
         await kit.setupCharacter(w, bot, { items: [{ item: 'health_potion' }], teleportTo: { npc: 'crags_captain' } });
@@ -1515,7 +1515,7 @@ const scenarios = {
         await kit.talkTo(w, bot, 'crags_captain', `quest:claim:${qid}`);
         await w.waitFor(() => quest(w, bot, qid).claimed && w.player(bot).inventory.some(s => s.item === reward));
         check(w.player(bot).gold === before.gold + 200 && totalXp(w.player(bot)) === before.xp + levelXp[9] / 10, `${bot} gets exact quest XP and gold`);
-        check(w.player(bot).inventory.find(s => s.item === reward).quantity === 1 && kit.items.find(i => i.id === reward).rarity === 'uncommon', `${bot} gets one guaranteed green necklace`);
+        check(w.player(bot).inventory.find(s => s.item === reward).quantity === 1 && kit.items.find(i => i.id === reward).rarity === 'rare', `${bot} gets one guaranteed blue necklace`);
         await kit.talkTo(w, bot, 'crags_captain', `quest:claim:${qid}`);
         check(w.player(bot).gold === before.gold + 200 && w.player(bot).inventory.find(s => s.item === reward).quantity === 1, `${bot} cannot claim twice`);
         await w.action(bot, { type: 'equip', slots: { necklace: reward } });

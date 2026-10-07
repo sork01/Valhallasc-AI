@@ -21,6 +21,7 @@ from pathlib import Path
 import random
 
 import progression_quests
+from quest_gear_rewards import add_reward
 
 ROOT = Path(__file__).resolve().parents[1]
 PATH = ROOT / 'world/map.txt'
@@ -74,9 +75,9 @@ def quest_hub():
 
     def quest(id, title, npc, description, objectives, level, gold, requires=None, repeatable=False):
         # Recommended level; the XP reward is 10% of what that level needs (server test enforces it).
-        return dict(id='rime_' + id, title=title, npc='rime_' + npc, description=description,
+        return add_reward(dict(id='rime_' + id, title=title, npc='rime_' + npc, description=description,
                     objectives=objectives, level=level, rewardXp=LEVEL_XP[level - 1] // 10, rewardGold=gold,
-                    requires='rime_' + requires if requires else None, repeatable=repeatable)
+                    requires='rime_' + requires if requires else None, repeatable=repeatable))
 
     def talk(id, name):
         return dict(kind='talk', target='rime_' + id, label='Speak to ' + name, count=1)

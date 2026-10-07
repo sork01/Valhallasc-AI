@@ -13,7 +13,7 @@
   const OL = '#1c1428';
   // Zone 0 is Greenmeadow with Alderhaven; the server numbers the rest like WORLD_MAP.zones. Each has its own
   // size, obstacles, theme (terrain, sky, sprites) and gates. The server decides which zone the hero is in.
-  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: null, levels: null },
+  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: WORLD_MAP.paths || null, levels: null },
     ...(WORLD_MAP.zones || []).map(z => ({ theme: 'ember', paths: null, levels: null, portals: [], ...z }))];
   let zone = 0, zdef = ZONES[0], SPAWN = WORLD_MAP.spawn;
 
@@ -1604,15 +1604,21 @@
     const ex = o => o.r * TW * .7071, ey = o => o.r * TH * .7071;
     const pass = (grow, fill) => { for (const [o, sx, sy] of rows) { g.fillStyle = typeof fill === 'function' ? fill(o) : fill; g.beginPath(); g.ellipse(sx, sy + (grow < 0 ? 1 : 0), ex(o) * grow, ey(o) * grow, 0, 0, 6.283); g.fill(); } };
     const shimmer = o => .5 + .5 * Math.sin(t * .8 + o.x * .45 + o.y * .33);
-    const river = zdef.theme === 'wyrd';
-    pass(1.36, river ? '#3c2c1c' : '#2c2a1c');
-    pass(1.2, river ? '#6a7a3a' : '#3c5a30');
-    pass(1.04, o => river ? `hsl(${200 + shimmer(o) * 8}, 46%, ${30 + shimmer(o) * 5}%)` : `hsl(${176 + shimmer(o) * 8}, 34%, ${14 + shimmer(o) * 3}%)`);
-    pass(.8, o => river ? `hsl(${206 + shimmer(o) * 10}, 52%, ${24 + shimmer(o) * 5}%)` : `hsl(${184 + shimmer(o) * 10}, 40%, ${10 + shimmer(o) * 3}%)`);
+    const river = zdef.theme === 'wyrd', meadow = zone === 0;
+    pass(1.36, meadow ? '#a1ad65' : river ? '#3c2c1c' : '#2c2a1c');
+    pass(1.2, meadow ? '#74a57b' : river ? '#6a7a3a' : '#3c5a30');
+    pass(1.04, o => meadow ? `hsl(${192 + shimmer(o) * 7}, 58%, ${46 + shimmer(o) * 5}%)` : river ? `hsl(${200 + shimmer(o) * 8}, 46%, ${30 + shimmer(o) * 5}%)` : `hsl(${176 + shimmer(o) * 8}, 34%, ${14 + shimmer(o) * 3}%)`);
+    pass(.8, o => meadow ? `hsl(${199 + shimmer(o) * 7}, 60%, ${36 + shimmer(o) * 5}%)` : river ? `hsl(${206 + shimmer(o) * 10}, 52%, ${24 + shimmer(o) * 5}%)` : `hsl(${184 + shimmer(o) * 10}, 40%, ${10 + shimmer(o) * 3}%)`);
     for (const [o, sx, sy] of rows) {
       const k = (o.x * 7 + o.y * 13) | 0;
       if (k % 3 === 0) {                                                            // an expanding ripple ring
         const ph = (t * .35 + (k % 7) * .13) % 1; g.strokeStyle = `rgba(150,210,210,${.38 * (1 - ph)})`; g.lineWidth = 1.4; g.beginPath(); g.ellipse(sx + Math.sin(k) * 10, sy + Math.cos(k) * 4, 6 + ph * 26, 2.6 + ph * 11, 0, 0, 6.283); g.stroke();
+      }
+      if (meadow) {
+        const gl = .35 + .22 * Math.sin(t * 1.3 + k);
+        g.strokeStyle = `rgba(235,255,255,${gl})`; g.lineWidth = 1.5; g.beginPath();
+        g.moveTo(sx - ex(o) * .4, sy - ey(o) * .1); g.lineTo(sx + ex(o) * .12, sy - ey(o) * .1); g.stroke();
+        continue;
       }
       if (river) {                                                                  // the current: a pale streak sliding east, and a drifting autumn leaf
         if (k % 3 === 1) { const ph = (t * .25 + (k % 9) * .11) % 1; g.strokeStyle = `rgba(210,235,245,${.4 * Math.sin(ph * Math.PI)})`; g.lineWidth = 1.5; g.beginPath(); g.moveTo(sx - 12 + ph * 24, sy - 1); g.lineTo(sx + 2 + ph * 24, sy - 1); g.stroke(); }
@@ -2008,7 +2014,7 @@
     g.imageSmoothingEnabled = true;
     City.drawPlaza(g, w2s);
     if (zdef.theme === 'ember') drawLava(g, t);
-    if (zdef.theme === 'fen' || zdef.theme === 'wyrd') drawWater(g, t);
+    if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd') drawWater(g, t);
     if (zdef.theme === 'wyrd') drawBridges(g, t);
     if (zdef.theme === 'sky') drawWardRings(g, t);
     if (zdef.theme === 'deep') drawChimeRings(g, t);
@@ -2276,7 +2282,7 @@
         g.fillRect((o.x - o.width / 2) * k, (o.y - o.depth / 2) * k, Math.max(1, o.width * k), Math.max(1, o.depth * k)); continue;
       }
       if ((city || zdef.theme === 'nacre') && (o.kind === 'grandfountain' || o.kind === 'nacrefountain' || o.kind === 'meetingstone' || o.kind === 'fountain')) { g.fillStyle = o.kind === 'meetingstone' ? '#59d9ff' : '#58a8d8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2, o.r * k), 0, 6.283); g.fill(); continue; }
-      g.fillStyle = o.kind === 'lava' ? '#ff6a2a' : o.kind === 'ice' ? '#4f93c8' : o.kind === 'water' ? (wyrd ? '#2f6f9a' : '#244f5c') : o.kind === 'crag' ? '#4a4a58' : o.kind === 'pine' ? '#1f4a3a' : o.kind === 'beacon' ? '#ff9a2e' : o.kind === 'gallows' || o.kind === 'ribcage' ? '#d8d0b8' : o.kind === 'elderash' ? '#8a5a2a' : o.kind === 'thicket' ? '#6a2f58' : o.kind === 'tree' ? (wyrd ? '#a8451e' : fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a') : o.kind === 'spire' ? (wyrd ? '#d8d8c8' : fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e') : o.kind === 'rock' ? (wyrd ? '#7a7a80' : fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8') : (fen ? '#3f6a35' : frost ? '#3a7a70' : ember ? '#5a3a30' : '#2f8a45');
+      g.fillStyle = o.kind === 'lava' ? '#ff6a2a' : o.kind === 'ice' ? '#4f93c8' : o.kind === 'water' ? (zone === 0 ? '#4fa9c8' : wyrd ? '#2f6f9a' : '#244f5c') : o.kind === 'crag' ? '#4a4a58' : o.kind === 'pine' ? '#1f4a3a' : o.kind === 'beacon' ? '#ff9a2e' : o.kind === 'gallows' || o.kind === 'ribcage' ? '#d8d0b8' : o.kind === 'elderash' ? '#8a5a2a' : o.kind === 'thicket' ? '#6a2f58' : o.kind === 'tree' ? (wyrd ? '#a8451e' : fen ? '#1b4a2a' : frost ? '#1f5a52' : ember ? '#150f13' : '#1f6b3a') : o.kind === 'spire' ? (wyrd ? '#d8d8c8' : fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e') : o.kind === 'rock' ? (wyrd ? '#7a7a80' : fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8') : (fen ? '#3f6a35' : frost ? '#3a7a70' : ember ? '#5a3a30' : '#2f8a45');
       g.beginPath(); g.arc(o.x * k, o.y * k, o.kind === 'lava' ? 2.2 : o.kind === 'water' ? 1.6 : o.kind === 'ice' || o.kind === 'thicket' ? 1.7 : o.kind === 'tree' ? 2.1 : 1.2, 0, 6.283); g.fill();
     }
     for (const p of zdef.portals) { if (p.after_clear && !instanceCleared) continue; g.strokeStyle = ZONES[p.to]?.theme === 'ember' ? '#ff8a3a' : ZONES[p.to]?.theme === 'frost' ? '#8fd8ff' : ZONES[p.to]?.theme === 'fen' ? '#b8e060' : ZONES[p.to]?.theme === 'wyrd' ? '#e0963a' : ZONES[p.to]?.theme === 'sky' ? '#9fc4ff' : ['deep','nacre'].includes(ZONES[p.to]?.theme) ? '#4fe0e8' : ZONES[p.to]?.theme === 'city' ? '#ffd36a' : '#7ae8c8'; g.lineWidth = 2; g.beginPath(); g.arc(p.x * k, p.y * k, 4, 0, 6.283); g.stroke(); }

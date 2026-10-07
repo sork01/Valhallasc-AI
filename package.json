@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "npm run test:gear-generator && npm run test:driver && npm run test:scenarios && npm run test:ui",
-    "test:gear-generator": "python3 tests/gear-generator.py",
+    "test:gear-generator": "python3 tests/gear-generator.py && python3 tests/quest-rewards.py && python3 tests/quest-backfill.py",
     "test:driver": "node --test tests/test-driver.cjs",
     "test:scenarios": "node scripts/test-via-mcp.cjs run all",
     "test:mcp": "node scripts/test-mcp.cjs",

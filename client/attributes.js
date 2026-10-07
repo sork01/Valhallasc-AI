@@ -22,7 +22,8 @@
     for (const stat of names) {
       const name = stat[0].toUpperCase() + stat.slice(1), row = node('div', '', 'attribute-row'); row.dataset.stat = stat;
       const label = node('div', '', 'attribute-label');
-      label.append(node('b', `${name} ${c.attributes?.[stat] || 0}${stat === best ? ' ★' : ''}`), node('small', descriptions[stat]));
+      const trained = c.attributes?.[stat] || 0, gear = c.gearAttributes?.[stat] || 0;
+      label.append(node('b', `${name} ${trained + gear}${gear ? ` (${trained} trained + ${gear} gear)` : ''}${stat === best ? ' ★' : ''}`), node('small', descriptions[stat]));
       const capped = (stat === 'accuracy' && c.attributes?.accuracy >= 20) || (stat === 'dexterity' && c.attributes?.dexterity >= 70);
       const add = node('button', capped ? '✓' : '+', 'attribute-add'); add.type = 'button'; add.setAttribute('aria-label', capped ? `${name} at maximum` : `Increase ${name}`); add.title = descriptions[stat];
       add.disabled = capped || pending || points === 0 || c.dead || !Online.connected;
@@ -36,7 +37,7 @@
   window.Attributes = {
     render,
     update(c) {
-      const key = JSON.stringify([c.id, c.level, c.attributes, c.statPoints, c.dead, c.look.class, c.hitChance, c.dodgeChance, c.critChance, c.attackCooldown]);
+      const key = JSON.stringify([c.id, c.level, c.attributes, c.gearAttributes, c.statPoints, c.dead, c.look.class, c.hitChance, c.dodgeChance, c.critChance, c.attackCooldown]);
       character = c; if (signature === key && !pending) return; signature = key; pending = false; render();
       dispatchEvent(new Event('character-stats-change'));
     },

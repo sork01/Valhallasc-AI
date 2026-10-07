@@ -203,7 +203,7 @@ impl Player {
         let c = &self.character;
         json!({"id":c.id,"look":c.look,"zone":c.zone,"x":c.x,"y":c.y,"r":PLAYER_RADIUS,"hp":c.hp,"maxHp":c.max_hp(),"level":c.level,
             "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"quests":c.quests,"inventory":c.inventory,"equipment":c.equipment,"bags":c.bags,"bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used(),"fx":self.face.x,"fy":self.face.y,
-            "attributes":c.attributes,"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
+            "attributes":c.attributes,"gearAttributes":c.gear_attributes(),"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
@@ -2478,10 +2478,21 @@ impl World {
             {
                 self.clear_instance(zone, point);
             }
-            let chance = self.random();
-            let choice = self.random();
-            if let Some(i) = roll_equipment(&kind, level, chance, choice) {
-                self.loot_drop(&credit_id, zone, point, &i.id);
+            if is_elite(&kind) && !self.is_instance(zone) {
+                for rarity in ["uncommon", "rare", "epic", "common", "legendary"] {
+                    if self.random() < outdoor_elite_drop_chance(rarity) {
+                        let choice = self.random();
+                        if let Some(i) = equipment_of_rarity(rarity, level, choice) {
+                            self.loot_drop(&credit_id, zone, point, &i.id);
+                        }
+                    }
+                }
+            } else {
+                let chance = self.random();
+                let choice = self.random();
+                if let Some(i) = roll_equipment(&kind, level, chance, choice) {
+                    self.loot_drop(&credit_id, zone, point, &i.id);
+                }
             }
         }
         dealt
@@ -3371,7 +3382,7 @@ mod tests {
             .unwrap()
             .clone();
         let reward = q.reward_item.as_deref().unwrap();
-        assert_eq!(item(reward).unwrap().rarity, "uncommon");
+        assert_eq!(item(reward).unwrap().rarity, "rare");
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.quests.iter_mut().find(|p| p.id == q.id).unwrap().counts = vec![1];
         for i in ITEMS.iter().filter(|i| i.kind == "material") {
@@ -4674,7 +4685,7 @@ mod tests {
         );
         // Enemy ids of the older zones are unchanged: the new zone's enemies come last.
         let first = w.slimes.iter().position(|s| s.zone == 2).unwrap();
-        assert!(w.slimes[..first].iter().all(|s| s.zone < 2) && first == 48);
+        assert!(w.slimes[..first].iter().all(|s| s.zone < 2) && first == 59);
         // Each kind keeps to its own ring: crabs on the outer shelf, wyrms in the summit bowl.
         let band = |kind: &str| {
             let radii: Vec<f64> = w
@@ -5154,7 +5165,7 @@ mod tests {
         w.players.get_mut(&2).unwrap().character.zone = 1;
         let snapshot = w.snapshot();
         assert_eq!(snapshot["zones"].as_array().unwrap().len(), w.maps.len());
-        for (zone, count) in [(0, 21), (1, 27), (2, 27)] {
+        for (zone, count) in [(0, 32), (1, 27), (2, 27)] {
             let view = w.snapshot_for(zone);
             assert_eq!(
                 view["slimes"].as_array().unwrap().len(),
@@ -5283,7 +5294,7 @@ mod tests {
         );
         // The new zone's enemies come last, so every older enemy id is unchanged.
         let first = w.slimes.iter().position(|s| s.zone == 3).unwrap();
-        assert!(w.slimes[..first].iter().all(|s| s.zone < 3) && first == 75);
+        assert!(w.slimes[..first].iter().all(|s| s.zone < 3) && first == 86);
         // The summit gate in the glacier and the way back (the glacier's first portal stays the Crags gate).
         let up = w.maps[2]
             .portals
@@ -5497,6 +5508,109 @@ mod tests {
                 "{kind} material"
             );
             assert!(w.drops.iter().all(|d| d.zone == 3));
+        }
+    }
+    #[test]
+    fn every_outdoor_elite_kill_guarantees_green_equipment() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        for kind in [
+            "cinderlord",
+            "gloomroot",
+            "oakhorn",
+            "hrungnir",
+            "hvitserk",
+            "kraken",
+        ] {
+            let id = w.slimes.iter().position(|s| s.kind == kind).unwrap();
+            let zone = w.slimes[id].zone;
+            assert!(!w.is_instance(zone));
+            w.players.get_mut(&1).unwrap().character.zone = zone;
+            let before = w.drops.len();
+            w.hit_slime(id, 1, 1_000_000., false);
+            let greens: Vec<_> = w.drops[before..]
+                .iter()
+                .filter_map(|d| d.item.as_deref().and_then(item))
+                .filter(|i| is_gear(i) && i.rarity == "uncommon")
+                .collect();
+            assert_eq!(greens.len(), 1, "{kind} must drop one guaranteed green");
+            assert!(greens[0].required_level <= max_drop_level(w.slimes[id].level));
+        }
+    }
+
+    #[test]
+    fn every_quest_hub_has_two_green_rewards_and_a_hard_blue_reward() {
+        let w = world();
+        let hard = [
+            (0, "king_challenge"),
+            (1, "crags_cinderlord"),
+            (2, "rime_wyrm_hunt"),
+            (3, "fen_gloomroot"),
+            (4, "city_tribute"),
+            (6, "wyrd_oakhorn"),
+            (7, "sky_ward_vigil"),
+            (8, "deep_captain"),
+            (9, "nacre_cathedral"),
+            (13, "astral_survey"),
+        ];
+        for (zone, hard_id) in hard {
+            let quests = &w.maps[zone].quests;
+            let greens = quests
+                .iter()
+                .filter(|q| {
+                    q.reward_item
+                        .as_deref()
+                        .and_then(item)
+                        .is_some_and(|i| is_gear(i) && i.rarity == "uncommon")
+                })
+                .count();
+            assert!(
+                greens >= 2,
+                "{} needs two green quest rewards",
+                w.maps[zone].name
+            );
+            let quest = quests.iter().find(|q| q.id == hard_id).unwrap();
+            let gear = item(quest.reward_item.as_deref().unwrap()).unwrap();
+            assert_eq!(gear.rarity, "rare", "{hard_id} must award blue gear");
+            assert!(!quest.repeatable);
+        }
+        for id in ["wyrd_trolls", "wyrd_weavers"] {
+            let q = w.maps[6].quests.iter().find(|q| q.id == id).unwrap();
+            assert_eq!(
+                item(q.reward_item.as_deref().unwrap()).unwrap().rarity,
+                "uncommon"
+            );
+        }
+        let q = w.maps[6]
+            .quests
+            .iter()
+            .find(|q| q.id == "wyrd_vanguard")
+            .unwrap();
+        assert_eq!(
+            item(q.reward_item.as_deref().unwrap()).unwrap().rarity,
+            "rare"
+        );
+        for id in [
+            "crags_expedition",
+            "rime_vanguard",
+            "fen_vanguard",
+            "wyrd_seal",
+            "sky_vanguard",
+            "deep_vanguard",
+            "nacre_smithwork",
+            "astral_golems",
+        ] {
+            let q = w
+                .maps
+                .iter()
+                .flat_map(|m| &m.quests)
+                .find(|q| q.id == id)
+                .unwrap();
+            assert_eq!(
+                item(q.reward_item.as_deref().unwrap()).unwrap().rarity,
+                "rare",
+                "{id}"
+            );
         }
     }
 
@@ -5786,7 +5900,7 @@ mod tests {
         let _rx2 = join(&mut w, 2, Class::Mage);
         w.players.get_mut(&1).unwrap().character.zone = 3;
         w.players.get_mut(&2).unwrap().character.zone = 2;
-        for (zone, count) in [(0, 21), (1, 27), (2, 27), (3, 32)] {
+        for (zone, count) in [(0, 32), (1, 27), (2, 27), (3, 32)] {
             let view = w.snapshot_for(zone);
             assert_eq!(
                 view["slimes"].as_array().unwrap().len(),
@@ -5850,8 +5964,8 @@ mod tests {
         let map = &w.maps[CITY];
         assert_eq!(
             zone_count(&w),
-            13,
-            "Skaldholm is the fifth map, the Undervault the sixth, the Wyrdwood the seventh, Bifrost Reach the eighth and Ran's Deep the ninth"
+            14,
+            "Skaldholm is the fifth map; Astralhollow is the fourteenth public map"
         );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
@@ -7496,7 +7610,7 @@ mod tests {
     #[test]
     fn harder_enemies_spawn_clear_and_charge_with_authoritative_damage() {
         let w = world();
-        assert_eq!(w.slimes.iter().filter(|s| s.kind == "beetle").count(), 5);
+        assert_eq!(w.slimes.iter().filter(|s| s.kind == "beetle").count(), 7);
         for s in &w.slimes {
             let mut point = s.point();
             w.maps[s.zone].collide(&mut point, s.r);

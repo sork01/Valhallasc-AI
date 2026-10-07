@@ -1,4 +1,4 @@
-use crate::model::{Character, Class, GM_NAME};
+use crate::model::{Attributes, Character, Class, GM_NAME};
 use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 
@@ -27,6 +27,9 @@ pub struct Item {
     pub attack: f64,
     #[serde(default)]
     pub defense: f64,
+    /// Fixed per item type: one level-scaled useful attribute on blue gear, two on purple.
+    #[serde(default, rename = "bonusStats")]
+    pub bonus_stats: Attributes,
     pub class: Option<Class>,
     pub variant: Option<String>,
     /// The drawn piece this one is a recolouring of (its `variant` names the recolouring itself). Unset for the
@@ -178,7 +181,7 @@ pub const GM_GEAR: [&str; 3] = [
 ];
 /// Rarity tiers, lowest first. The catalog colours them gray, green, blue, purple and orange.
 pub const RARITIES: [&str; 5] = ["common", "uncommon", "rare", "epic", "legendary"];
-/// Elites (special enemies) roll every tier this many times as often, and are the only source of legendary gear.
+/// Instance elites still use the original single-roll table; outdoor elites have independent tier rolls below.
 pub const ELITE_DROP_MULTIPLIER: f64 = 5.;
 /// Chance per ordinary kill that one piece of this tier drops. Gray gear drops too (it is mostly for selling);
 /// the starter pieces never do.
@@ -310,8 +313,8 @@ pub fn boss_piece_for(kind: &str, slots: &[&str], choice: f64) -> Option<&'stati
         .collect();
     pool.get((choice * pool.len() as f64) as usize).copied()
 }
-/// Which tier, if any, a kill drops. `roll` is uniform in [0, 1): the bands start with the rarest tier, so one roll
-/// gives at most one piece. Legendary exists only for elites.
+/// The original single-roll table for ordinary enemies and instance elites. Outdoor elites use
+/// independent rolls instead. `roll` is uniform in [0, 1); legendary exists only for elites.
 pub fn roll_rarity(kind: &str, roll: f64) -> Option<&'static str> {
     let elite = is_elite(kind);
     let multiplier = if elite { ELITE_DROP_MULTIPLIER } else { 1. };
@@ -327,10 +330,24 @@ pub fn roll_rarity(kind: &str, roll: f64) -> Option<&'static str> {
     }
     None
 }
+/// Independent equipment rolls for an elite killed outside an instance. Green is guaranteed;
+/// blue and purple can both drop on the same kill. Preserve the old gray and orange odds.
+pub fn outdoor_elite_drop_chance(rarity: &str) -> f64 {
+    match rarity {
+        "uncommon" => 1.,
+        "rare" => 0.33,
+        "epic" => 0.05,
+        "common" | "legendary" => base_drop_chance(rarity) * ELITE_DROP_MULTIPLIER,
+        _ => 0.,
+    }
+}
 /// A random piece of gear of the rolled tier that an enemy of this level can drop (see `max_drop_level`); starter
 /// pieces never drop, and an empty tier drops nothing.
 pub fn roll_equipment(kind: &str, level: u32, chance: f64, choice: f64) -> Option<&'static Item> {
     let rarity = roll_rarity(kind, chance)?;
+    equipment_of_rarity(rarity, level, choice)
+}
+pub fn equipment_of_rarity(rarity: &str, level: u32, choice: f64) -> Option<&'static Item> {
     let limit = max_drop_level(level);
     let pool: Vec<_> = ITEMS
         .iter()
@@ -463,6 +480,41 @@ impl Character {
             .chain(equipment(class, "weapon", weapon))
             .collect()
     }
+    /// Attribute points supplied by usable worn gear. These never spend or refund trained points.
+    pub fn gear_attributes(&self) -> Attributes {
+        let mut bonus = Attributes::default();
+        for i in self.worn_items().into_iter().filter(|i| {
+            i.required_level <= self.level && i.class.is_none_or(|class| class == self.look.class)
+        }) {
+            bonus.strength = bonus.strength.saturating_add(i.bonus_stats.strength);
+            bonus.agility = bonus.agility.saturating_add(i.bonus_stats.agility);
+            bonus.intellect = bonus.intellect.saturating_add(i.bonus_stats.intellect);
+            bonus.stamina = bonus.stamina.saturating_add(i.bonus_stats.stamina);
+            bonus.dexterity = bonus.dexterity.saturating_add(i.bonus_stats.dexterity);
+            bonus.accuracy = bonus.accuracy.saturating_add(i.bonus_stats.accuracy);
+        }
+        bonus
+    }
+    pub fn effective_attributes(&self) -> Attributes {
+        let bonus = self.gear_attributes();
+        Attributes {
+            strength: self.attributes.strength.saturating_add(bonus.strength),
+            agility: self.attributes.agility.saturating_add(bonus.agility),
+            intellect: self.attributes.intellect.saturating_add(bonus.intellect),
+            stamina: self.attributes.stamina.saturating_add(bonus.stamina),
+            dexterity: self.attributes.dexterity.saturating_add(bonus.dexterity),
+            accuracy: self.attributes.accuracy.saturating_add(bonus.accuracy),
+        }
+    }
+    /// Keep missing HP/mana stable when an item's Stamina or Intellect changes the maxima.
+    fn preserve_vitals_after_equipping(&mut self, before: &Character) {
+        let health_change = self.max_hp() - before.max_hp();
+        self.hp = (before.hp + health_change).clamp(1., self.max_hp());
+        if self.look.class.resource_type() == "mana" {
+            let mana_change = self.max_resource() - before.max_resource();
+            self.resource = Some((before.resource() + mana_change).clamp(0., self.max_resource()));
+        }
+    }
     /// Refuses a change that puts on a piece above this character's level. Pieces already worn in `before` are not
     /// asked again, so an old save keeps what it wore and an unrelated swap is never blocked by it.
     pub fn check_required_levels(&self, before: &Character) -> Result<(), &'static str> {
@@ -583,6 +635,7 @@ impl Character {
         if next.bag_used() > next.bag_capacity() {
             return Err("Your bags are full. Make room before unequipping gear.");
         }
+        next.preserve_vitals_after_equipping(self);
         *self = next;
         Ok(())
     }
@@ -642,12 +695,14 @@ impl Character {
         if next.bag_used() > next.bag_capacity() {
             return Err("Your bags are full. Make room before unequipping gear.");
         }
+        next.preserve_vitals_after_equipping(self);
         *self = next;
         Ok(())
     }
     pub fn stats(&self) -> (f64, f64) {
         let (mut attack, mut defense) = self.look.stats(self.level);
-        let a = &self.attributes;
+        let effective = self.effective_attributes();
+        let a = &effective;
         attack += a.strength as f64
             * if self.look.class == Class::Warrior {
                 2.
@@ -713,6 +768,187 @@ mod tests {
             .create(Look::default(), Point::default())
             .unwrap()
             .0
+    }
+    fn attribute_attack(a: &Attributes, class: Class) -> f64 {
+        a.strength as f64 * if class == Class::Warrior { 2. } else { 0.5 }
+            + a.agility as f64
+                * if matches!(class, Class::Assassin | Class::Hunter) {
+                    2.
+                } else {
+                    0.5
+                }
+            + a.intellect as f64
+                * if matches!(class, Class::Mage | Class::Priest) {
+                    2.
+                } else {
+                    0.5
+                }
+    }
+    #[test]
+    fn blue_and_purple_attribute_bonuses_are_fixed_useful_and_save_with_gear() {
+        for i in ITEMS.iter().filter(|i| is_gear(i) && i.rarity != GM_RARITY) {
+            let a = &i.bonus_stats;
+            let values = [
+                ("strength", a.strength),
+                ("agility", a.agility),
+                ("intellect", a.intellect),
+                ("stamina", a.stamina),
+                ("dexterity", a.dexterity),
+                ("accuracy", a.accuracy),
+            ];
+            let expected = match i.rarity.as_str() {
+                "rare" => 1,
+                "epic" => 2,
+                _ => 0,
+            };
+            assert_eq!(
+                values.iter().filter(|(_, value)| *value > 0).count(),
+                expected,
+                "{}",
+                i.id
+            );
+            let useful: &[&str] = match i.class {
+                Some(Class::Warrior) => {
+                    &["strength", "stamina", "agility", "accuracy", "dexterity"]
+                }
+                Some(Class::Mage | Class::Priest) => {
+                    &["intellect", "stamina", "agility", "accuracy", "dexterity"]
+                }
+                Some(Class::Assassin | Class::Hunter) => {
+                    &["agility", "stamina", "strength", "accuracy", "dexterity"]
+                }
+                None if i.required_level >= 75 => &["stamina", "strength", "agility"],
+                None => &["stamina", "accuracy", "dexterity"],
+            };
+            for (name, value) in values {
+                if value > 0 {
+                    let expected = match i.required_level {
+                        1 | 5 => 1,
+                        10 => 3,
+                        15 => 5,
+                        20 => 7,
+                        25 => 10,
+                        30 => 15,
+                        35 => 20,
+                        40 => 30,
+                        45 => 35,
+                        50 => 40,
+                        level => panic!("unexpected gear level {level}"),
+                    };
+                    assert_eq!(value, expected, "{}", i.id);
+                    assert!(useful.contains(&name), "{} has irrelevant {name}", i.id);
+                    assert!(name != "accuracy" || value <= 20, "{} overcaps hit", i.id);
+                    assert!(
+                        name != "dexterity" || value <= 70,
+                        "{} overcaps dodge",
+                        i.id
+                    );
+                }
+            }
+        }
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
+            for rarity in ["rare", "epic"] {
+                let i = ITEMS
+                    .iter()
+                    .find(|i| {
+                        i.class == Some(class)
+                            && i.kind == "weapon"
+                            && i.required_level == 40
+                            && i.rarity == rarity
+                            && i.source.is_none()
+                    })
+                    .unwrap();
+                let mut c = character();
+                c.look.class = class;
+                c.inventory.clear();
+                c.seed_inventory();
+                c.level = 40;
+                c.add_item(&i.id, 1);
+                c.equip_slots(&slots(&[("hands", "none")])).unwrap();
+                let points = c.stat_points();
+                let before = c.stats();
+                let hp = c.max_hp();
+                let mana = c.max_resource();
+                c.equip_slots(&slots(&[("hands", &i.id)])).unwrap();
+                assert_eq!(c.gear_attributes(), i.bonus_stats, "{} fixed bonus", i.id);
+                assert_eq!(
+                    c.stat_points(),
+                    points,
+                    "gear does not spend trained points"
+                );
+                assert!(
+                    (c.stats().0 - before.0 - i.attack - attribute_attack(&i.bonus_stats, class))
+                        .abs()
+                        < 1e-8,
+                    "{} attack",
+                    i.id
+                );
+                assert!(
+                    (c.stats().1 - before.1 - i.defense - i.bonus_stats.strength as f64 * 0.2)
+                        .abs()
+                        < 1e-8,
+                    "{} defense",
+                    i.id
+                );
+                assert_eq!(
+                    c.max_hp() - hp,
+                    i.bonus_stats.stamina as f64 * 8.,
+                    "{} health",
+                    i.id
+                );
+                assert_eq!(
+                    c.max_resource() - mana,
+                    if class.resource_type() == "mana" {
+                        i.bonus_stats.intellect as f64 * 5.
+                    } else {
+                        0.
+                    },
+                    "{} resource",
+                    i.id
+                );
+                let saved: Character =
+                    serde_json::from_str(&serde_json::to_string(&c).unwrap()).unwrap();
+                assert_eq!(
+                    saved.gear_attributes(),
+                    i.bonus_stats,
+                    "{} survives save",
+                    i.id
+                );
+            }
+        }
+    }
+    #[test]
+    fn equipping_stamina_and_intellect_preserves_missing_health_and_mana() {
+        let id = "mage_gloves_runic_l20_purple";
+        let i = item(id).unwrap();
+        assert_eq!(i.bonus_stats.stamina, 7);
+        assert_eq!(i.bonus_stats.intellect, 7);
+        let mut c = character();
+        c.look.class = Class::Mage;
+        c.inventory.clear();
+        c.seed_inventory();
+        c.level = 20;
+        c.add_item(id, 1);
+        let hp = c.max_hp();
+        let mana = c.max_resource();
+        c.hp = hp - 25.;
+        c.resource = Some(mana - 15.);
+        let points = c.stat_points();
+        c.equip_slots(&slots(&[("gloves", id)])).unwrap();
+        assert_eq!(c.max_hp(), hp + 56.);
+        assert_eq!(c.hp, hp - 25. + 56.);
+        assert_eq!(c.max_resource(), mana + 35.);
+        assert_eq!(c.resource(), mana - 15. + 35.);
+        assert_eq!(c.stat_points(), points);
+        c.equip_slots(&slots(&[("gloves", "none")])).unwrap();
+        assert_eq!(c.hp, hp - 25.);
+        assert_eq!(c.resource(), mana - 15.);
     }
     #[test]
     fn every_attribute_has_a_combat_effect_and_classes_have_specialties() {
@@ -940,8 +1176,73 @@ mod tests {
         assert_eq!(roll_rarity("big", 0.9), None);
     }
     #[test]
-    fn elites_roll_every_tier_five_times_as_often() {
-        // The width of a tier's band is its chance. Elites: band = 5x the ordinary width.
+    fn outdoor_elites_roll_green_blue_and_purple_independently() {
+        assert_eq!(outdoor_elite_drop_chance("uncommon"), 1.);
+        assert_eq!(outdoor_elite_drop_chance("rare"), 0.33);
+        assert_eq!(outdoor_elite_drop_chance("epic"), 0.05);
+        assert_eq!(outdoor_elite_drop_chance("common"), 0.10);
+        assert_eq!(outdoor_elite_drop_chance("legendary"), 0.0005);
+        for rarity in ["uncommon", "rare", "epic"] {
+            for level in [5, 10, 20, 30, 40, 45] {
+                let gear = equipment_of_rarity(rarity, level, 0.5).unwrap();
+                assert_eq!(gear.rarity, rarity);
+                assert!(gear.required_level <= max_drop_level(level));
+                assert!(gear.source.is_none());
+            }
+        }
+    }
+    #[test]
+    fn level_twenty_to_forty_five_enemies_can_roll_the_next_gear_step_through_fifty() {
+        for (enemy_level, top) in [(20, 25), (25, 30), (30, 35), (35, 40), (40, 45), (45, 50)] {
+            assert_eq!(max_drop_level(enemy_level), top);
+            for rarity in ["uncommon", "rare", "epic"] {
+                let pool: Vec<_> = ITEMS
+                    .iter()
+                    .filter(|i| {
+                        i.rarity == rarity
+                            && is_gear(i)
+                            && !i.starter
+                            && i.source.is_none()
+                            && i.required_level <= top
+                    })
+                    .collect();
+                assert!(!pool.is_empty());
+                let highest = (0..pool.len())
+                    .filter_map(|n| {
+                        equipment_of_rarity(
+                            rarity,
+                            enemy_level,
+                            (n as f64 + 0.5) / pool.len() as f64,
+                        )
+                    })
+                    .map(|i| i.required_level)
+                    .max()
+                    .unwrap();
+                let expected = if rarity == "epic" { top / 10 * 10 } else { top };
+                assert_eq!(
+                    highest, expected,
+                    "level {enemy_level} {rarity} drops level {expected} gear"
+                );
+            }
+        }
+    }
+    #[test]
+    fn every_instance_finale_has_two_guaranteed_blue_pools() {
+        for kind in ["hollowking", "choirmother", "coralregent", "hierophant"] {
+            let slots = boss_slots(kind);
+            assert!(slots.len() >= 2, "{kind} needs two guaranteed gear rolls");
+            for pool in slots {
+                for choice in [0., 0.5, 0.999] {
+                    let gear = boss_piece_for(kind, pool, choice).unwrap();
+                    assert_eq!(gear.rarity, "rare", "{kind}: blue gear");
+                    assert!(is_gear(gear));
+                }
+            }
+        }
+    }
+    #[test]
+    fn instance_elites_keep_the_original_five_times_single_roll_table() {
+        // The width of a tier's band is its chance. The instance-elite table is 5x the ordinary width.
         let width = |kind: &str, rarity: &str| {
             let step = 0.000001;
             (0..100_000)
@@ -1070,6 +1371,21 @@ mod tests {
                 i.id
             );
             if let Some(art) = &i.art {
+                // Level-25+ art names refer to dedicated progression atlases, not an item variant.
+                if art.starts_with("regear") {
+                    let slot = if i.kind == "headgear" {
+                        "head"
+                    } else {
+                        &i.kind
+                    };
+                    let key = format!("\"{slot}_{art}\"");
+                    assert!(
+                        include_str!("../../client/assets/mage_f_sprites.txt").contains(&key),
+                        "{} names a missing progression atlas {key}",
+                        i.id
+                    );
+                    continue;
+                }
                 let base = ITEMS
                     .iter()
                     .find(|b| {
@@ -1195,12 +1511,15 @@ mod tests {
             c.equip_slots(&slots(&[(slot, &i.id)])).unwrap();
             let equipped = c.stats();
             assert!(
-                (equipped.0 - naked.0 - i.attack).abs() < 1e-8,
+                (equipped.0 - naked.0 - i.attack - attribute_attack(&i.bonus_stats, c.look.class))
+                    .abs()
+                    < 1e-8,
                 "{} attack",
                 i.id
             );
             assert!(
-                (equipped.1 - naked.1 - i.defense).abs() < 1e-8,
+                (equipped.1 - naked.1 - i.defense - i.bonus_stats.strength as f64 * 0.2).abs()
+                    < 1e-8,
                 "{} defense",
                 i.id
             );
@@ -1362,12 +1681,12 @@ mod tests {
             .unwrap();
         assert_eq!(
             c.stats().0,
-            base15.0 - 4. + royal.attack,
+            base15.0 - 4. + royal.attack + attribute_attack(&royal.bonus_stats, c.look.class),
             "sword out, royal in"
         );
         assert_eq!(
             c.stats().1,
-            base15.1 + royal.defense,
+            base15.1 + royal.defense + royal.bonus_stats.strength as f64 * 0.2,
             "the secondary stat counts"
         );
         assert!(
