@@ -49,6 +49,7 @@
   for (const e of CATHEDRAL_ENEMIES) KINDS[e.kind]=[e.name+(e.boss?' (Boss)':''),e.level,e.color];
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const kindInfo = kind => KINDS[kind] || [kind, 1, '#ff6b8a'];
+  const travelMasters = z => (z.npcs || []).filter(n => n.travelStop);
   // Fog of war: the server saves which of a zone's 3x3 cells the character has stood in (Field.explored, one bitmask per
   // zone). Nothing from an unvisited cell is shown: not its ground, gates, camp, enemies or people.
   const CELLS = 9;
@@ -203,6 +204,11 @@
       const label = el('span', '', 'wm-tile-label'); label.append(el('b', z.name), el('small', rangeText(z)));
       const you = el('i', '', 'wm-you'); you.hidden = true; you.title = 'You are here';
       tile.append(canvas, fog, label, you);
+      if (travelMasters(z).length) {
+        const badge = el('span', '✦', 'wm-travel-badge'); badge.setAttribute('aria-hidden', 'true');
+        badge.title = travelMasters(z).map(n => n.name).join(', ');
+        tile.append(badge);
+      }
       tile.addEventListener('click', () => zoomTo(i, tile));
       stage.append(tile); tiles.push(tile);
     });
@@ -219,7 +225,7 @@
       tile.disabled = unseen; tile.dataset.fog = unseen ? 'full' : 'partial';
       tile.querySelector('b').textContent = unseen ? 'Unexplored' : z.name;
       tile.querySelector('small').textContent = unseen ? 'Not yet visited' : `${rangeText(z)} · ${charted(i)}/${CELLS} charted`;
-      tile.setAttribute('aria-label', unseen ? 'Unexplored zone' : `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}, ${charted(i)} of ${CELLS} places charted. Open its map`);
+      tile.setAttribute('aria-label', unseen ? 'Unexplored zone' : `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}, ${charted(i)} of ${CELLS} places charted${travelMasters(z).length ? `, ${travelMasters(z).length} travel master${travelMasters(z).length === 1 ? '' : 's'}` : ''}. Open its map`);
     });
   }
 
@@ -259,6 +265,12 @@
       const hub = el('span', c.name === z.name ? 'City centre' : c.name, 'wm-hub'); hub.dataset.hub = 'true';
       Object.assign(hub.style, pos(z, c.plaza.x, c.plaza.y)); markers.append(hub);
     }
+    for (const n of travelMasters(z)) {
+      const marker = el('span', '', 'wm-travel'); marker.dataset.npc = n.id;
+      marker.setAttribute('role', 'img'); marker.setAttribute('aria-label', `${n.name}, travel master at ${n.travelStop}`);
+      marker.append(el('i', '✦'), el('b', 'Travel Master'));
+      Object.assign(marker.style, pos(z, n.x, n.y)); markers.append(marker);
+    }
     const me = el('span', '', 'wm-me'); me.append(el('i'), el('b', 'You')); me.hidden = true; me.dataset.me = 'true'; markers.append(me);
     markers.append(el('div', '', 'wm-party'));
     side(z); tick();
@@ -272,6 +284,12 @@
     for (const c of [z.city, ...(z.camps || [])].filter(Boolean)) if (known(current, c.plaza.x, c.plaza.y)) facts.append(el('li', `${c.name}: sanctuary${z.camps?.length ? '' : `, ${(z.quests || []).length} quest${(z.quests || []).length === 1 ? '' : 's'}`}`));
     if (z.camps?.length) facts.append(el('li', `${(z.quests || []).length} quests across ${1 + z.camps.length} hubs`));
     box.append(facts);
+    if (travelMasters(z).length) {
+      box.append(el('h5', 'Travel Masters ✦', 'wm-side-title'));
+      const list = el('ul', '', 'wm-travel-list');
+      for (const n of travelMasters(z)) list.append(el('li', `${n.name} · ${n.travelStop}`));
+      box.append(list);
+    }
     const counts = new Map(); for (const s of (z.slimes || []).filter(s => known(current, s.x, s.y))) counts.set(s.kind, (counts.get(s.kind) || 0) + 1);
     if (counts.size) {
       box.append(el('h5', 'Enemies', 'wm-side-title'));

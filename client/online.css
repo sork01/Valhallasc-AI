@@ -527,6 +527,8 @@
 .wm-tile-label { position: absolute; left: 0; right: 0; bottom: 0; padding: 1.6cqw .5cqw .4cqw; text-align: center; background: linear-gradient(transparent, #000c); text-shadow: 0 1px 2px #000; }
 .wm-tile-label b { display: block; font: 400 1.2cqw var(--display); }
 .wm-tile-label small { font: .85cqw 'Jua', sans-serif; color: #ffe9a8; }
+.wm-travel-badge { position: absolute; right: .25cqw; top: .2cqw; display: grid; place-items: center; width: 1.5cqw; height: 1.5cqw; border: .12cqw solid #b7ffeb; border-radius: 50%; background: #10323bdd; color: #b7ffeb; font: 1.3cqw 'Jua', sans-serif; box-shadow: 0 0 .7cqw #6fffd999; pointer-events: none; }
+.wm-tile[data-fog="full"] .wm-travel-badge { display: none; }
 .wm-you, .wm-me i { position: absolute; width: 1.1cqw; height: 1.1cqw; transform: translate(-50%, -50%); border: .2cqw solid #1c1428; border-radius: 50%; background: #fff; box-shadow: 0 0 0 .2cqw #ffffff90; animation: wmPulse 1.6s ease-out infinite; }
 .wm-me i { position: static; display: block; transform: none; }
 @keyframes wmPulse { 0% { box-shadow: 0 0 0 0 #ffffffb0; } 100% { box-shadow: 0 0 0 1.2cqw #ffffff00; } }
@@ -549,6 +551,9 @@
 .wm-gate.west .wm-gate-label { top: 50%; left: auto; right: 100%; margin: 0 .4cqw 0 0; transform: translateY(-50%); }
 .wm-gate.east .wm-gate-label { top: 50%; left: 100%; right: auto; margin: 0 0 0 .4cqw; transform: translateY(-50%); }
 .wm-hub { position: absolute; transform: translate(-50%, -160%); white-space: nowrap; padding: .1cqw .6cqw; border-radius: .3cqw; background: #10141c99; color: #fff; font: .95cqw 'Jua', sans-serif; text-shadow: 0 1px 2px #000; pointer-events: none; }
+.wm-travel { position: absolute; z-index: 2; display: flex; align-items: center; gap: .25cqw; transform: translate(-.9cqw, -50%); color: #bdffec; pointer-events: none; }
+.wm-travel i { display: grid; place-items: center; flex: none; width: 1.8cqw; height: 1.8cqw; border: .2cqw solid #b7ffeb; border-radius: 50%; background: #123840; color: #eafff7; font: normal 1.5cqw 'Jua', sans-serif; box-shadow: 0 0 1cqw #5effd6; }
+.wm-travel b { padding: .1cqw .45cqw; border-radius: .25cqw; background: #10242eea; color: #bdffec; font: .88cqw 'Jua', sans-serif; white-space: nowrap; text-shadow: 0 1px 2px #000; }
 .wm-me { position: absolute; transform: translate(-50%, -50%); pointer-events: none; z-index: 3; }
 .wm-me b { position: absolute; left: 50%; bottom: 100%; margin-bottom: .2cqw; transform: translateX(-50%); padding: 0 .4cqw; border-radius: .25cqw; background: #fff; color: #1c1428; font: .85cqw 'Jua', sans-serif; }
 .wm-mate { position: absolute; width: .9cqw; height: .9cqw; transform: translate(-50%, -50%); border: .15cqw solid #10141c; border-radius: 50%; background: #7dff9b; }
@@ -557,7 +562,9 @@
 .wm-side-blurb { margin: .3cqw 0 .6cqw; color: #cdbf9d; }
 .wm-facts { margin: 0 0 .6cqw; padding-left: 1.2cqw; }
 .wm-side-title { margin: .8cqw 0 .3cqw; font: 400 1.1cqw var(--display); color: #e5cd83; text-transform: uppercase; letter-spacing: .08em; }
-.wm-kinds, .wm-gates { margin: 0; padding: 0; list-style: none; }
+.wm-kinds, .wm-gates, .wm-travel-list { margin: 0; padding: 0; list-style: none; }
+.wm-travel-list { color: #bdffec; }
+.wm-travel-list li { margin: 0 0 .2cqw; }
 .wm-kind { display: flex; align-items: center; gap: .6cqw; width: 100%; padding: .25cqw .4cqw; border: 0; border-radius: .3cqw; background: none; color: #eee3cb; font: inherit; text-align: left; cursor: pointer; }
 .wm-kind:hover { background: #2b3a52; }
 .wm-kind i { flex: none; width: .9cqw; height: .9cqw; border: .15cqw solid #10141c; border-radius: 50%; }
@@ -568,7 +575,7 @@
 .wm-foot { margin: 0; text-align: center; font-size: .9cqw; color: #cdbf9d; }
 .wm-foot span { margin-right: .8cqw; color: #fff; }
 @media (pointer: coarse) { .wm-panel .window-tool, .wm-kind { min-height: 44px; } .wm-open { width: 44px; height: 44px; } .wm-gate { min-width: 44px; min-height: 44px; } .wm-panel .window-close { min-width: 44px; min-height: 44px; } }
-@media (max-width: 850px) { .wm-side, .wm-foot, .wm-kind, .wm-gate-label, .wm-hub, .wm-tile-label small { font-size: 10px; } .wm-tile-label b { font-size: 11px; } }
+@media (max-width: 850px) { .wm-side, .wm-foot, .wm-kind, .wm-gate-label, .wm-hub, .wm-travel b, .wm-tile-label small { font-size: 10px; } .wm-tile-label b { font-size: 11px; } }
 @media (prefers-reduced-motion: reduce) { .wm-you, .wm-me i, .wm-fade { animation: none; } .wm-tile { transition: none; } }
 
 /* Chat window tabs: Chat (player talk) and System (combat and game log). */

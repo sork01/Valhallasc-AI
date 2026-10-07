@@ -52,6 +52,7 @@ async function call(name, args = {}) {
   check(await page.evaluate(() => { const b = document.getElementById('wm-open'); return !b.textContent.trim() && !!b.querySelector('svg circle') && b.getAttribute('aria-label').includes('(M)'); }), 'The globe is an icon with an accessible name');
   await press('m');
   check(await visible('#worldmap') && await page.evaluate(() => WorldMap.open && WorldMap.view === 'world'), 'M opens the world map on the world view');
+  check(await page.locator('.wm-tile[data-zone="9"] .wm-travel-badge').isHidden(), 'Unvisited zones do not reveal their travel-master badge');
   check(await page.evaluate(() => !Field.canAct), 'The game is paused behind the map');
   check(await page.locator('#pause').isHidden(), 'M does not open the pause menu');
   await shot('map-world');
@@ -110,6 +111,19 @@ async function call(name, args = {}) {
   await shot('map-fog-meadow');
   await press('Escape'); await press('Escape');
 
+  // A travel master is a visible navigation landmark even when her cell is still misted over.
+  await stand(9, 150, 35);
+  check(await page.evaluate(() => !Field.fog.seen(9, 100, 164)), 'Nacrehold’s travel-master cell is still unexplored');
+  const masterPx = await miniPx(75, 123);
+  check(masterPx[1] > 200 && masterPx[0] < 220 && masterPx[2] > 190, `The minimap spark marks Auralis through the mist (${masterPx})`);
+  await press('m');
+  check(await page.locator('.wm-tile[data-zone="9"] .wm-travel-badge').isVisible(), 'A visited city shows a travel-master badge on the world sheet');
+  await page.locator('.wm-tile[data-zone="9"]').click();
+  check(await page.locator('.wm-travel[data-npc="travel_nacrehold"]').count() === 1 && (await page.locator('.wm-travel-list').textContent()).includes('Travel Master Auralis'), 'The Nacrehold map and side list name Auralis');
+  check(await page.evaluate(() => { const m = document.querySelector('.wm-travel[data-npc="travel_nacrehold"]'); return Math.abs(parseFloat(m.style.left) - 100 / 192 * 100) < .01 && Math.abs(parseFloat(m.style.top) - 164 / 192 * 100) < .01; }), 'Auralis is marked at her exact map coordinates even before that cell is charted');
+  await shot('map-nacrehold-travel');
+  await press('Escape'); await press('Escape');
+
   // --- visiting the other zones uncovers one cell each, and the glacier two ---
   await stand(1, 48, 86); await stand(2, 64, 118); await stand(2, 64, 52); await stand(3, 64, 9); await stand(5, 15, 111); await stand(6, 12, 150); await stand(7, 80, 144); await stand(8, 80, 160); await stand(4, 80, 150);
   const later = await page.evaluate(() => Field._debug.zones.slice(9).map((z,i) => ({zone:i+9,...z.spawn})));
@@ -118,6 +132,15 @@ async function call(name, args = {}) {
   await press('m');
   const all = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => ({ name: t.querySelector('b').textContent, small: t.querySelector('small').textContent, disabled: t.disabled })));
   check(all.map(t => t.name).join() === data.zones.map(z => z.name).join() && all.every(t => !t.disabled), `Every visited zone is named again: ${all.map(t => t.name).join(', ')}`);
+  const masters = await page.evaluate(() => Field._debug.zones.map((z, zone) => ({ zone, size: z.size, npcs: (z.npcs || []).filter(n => n.travelStop) })).filter(z => z.npcs.length));
+  check(masters.reduce((n, z) => n + z.npcs.length, 0) === 11 && masters.length === 10, 'The catalog includes all 11 travel masters across 10 zones');
+  check(await page.locator('.wm-travel-badge:visible').count() === masters.length, 'Every visited travel-master zone has a world-sheet badge');
+  for (const z of masters) {
+    await page.locator(`.wm-tile[data-zone="${z.zone}"]`).click();
+    const marks = await page.evaluate(() => [...document.querySelectorAll('.wm-travel')].map(m => ({ id: m.dataset.npc, x: parseFloat(m.style.left), y: parseFloat(m.style.top) })));
+    check(marks.length === z.npcs.length && z.npcs.every(n => marks.some(m => m.id === n.id && Math.abs(m.x - n.x / z.size * 100) < .01 && Math.abs(m.y - n.y / z.size * 100) < .01)), `${data.zones[z.zone].name}: every travel master has an exact zone-map marker`);
+    await page.locator('#wm-back').click();
+  }
   check(/^Lv 5–10 · 1\/9/.test(all[1].small) && /^Lv 10–15 · 2\/9/.test(all[2].small) && /^Lv 15–20 · 1\/9/.test(all[3].small) && /^Safe city · 1\/9/.test(all[4].small) && /^Lv 20 · 5 players · 1\/9/.test(all[5].small) && /^Lv 2–5 · 1\/9/.test(all[0].small) && /^Lv 20–30 · 1\/9/.test(all[6].small), `Levels and charted counts on the tiles: ${all.map(t => t.small).join(' | ')}`);
   const roads = await page.evaluate(() => [...document.querySelectorAll('.wm-roads [data-road]')].filter(r => r.getAttribute('visibility') === 'visible').map(r => r.dataset.road).sort());
   const expectedRoads = [...new Set(data.zones.flatMap((z,i) => z.portals.map(to => [i,to].sort().join('-'))))].sort();

@@ -2286,7 +2286,14 @@
     if (!mctx || !miniBase) return;
     const s = mini.width / MAP; mctx.clearRect(0, 0, mini.width, mini.height); mctx.drawImage(miniBase, 0, 0, mini.width, mini.height);
     paintFog(mctx, mini.width, mini.height, zone);
-    for (const n of City.npcs) { if (!seen(zone, n.x, n.y)) continue; mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
+    for (const n of City.npcs) { if (n.travelStop || !seen(zone, n.x, n.y)) continue; mctx.fillStyle='#f5d477';mctx.fillRect(n.x*s-1,n.y*s-1,2,2); }
+    // Travel masters are navigation landmarks: their spark remains visible even through unexplored mist.
+    for (const n of City.npcs) if (n.travelStop) {
+      const x = n.x * s, y = n.y * s;
+      mctx.fillStyle = '#bdffec'; mctx.strokeStyle = '#10242e'; mctx.lineWidth = 1.5;
+      mctx.beginPath(); mctx.moveTo(x, y - 5); mctx.lineTo(x + 1.5, y - 1.5); mctx.lineTo(x + 5, y); mctx.lineTo(x + 1.5, y + 1.5);
+      mctx.lineTo(x, y + 5); mctx.lineTo(x - 1.5, y + 1.5); mctx.lineTo(x - 5, y); mctx.lineTo(x - 1.5, y - 1.5); mctx.closePath(); mctx.fill(); mctx.stroke();
+    }
     for (const remote of remotePlayers.values()) {
       if (!seen(zone, remote.x, remote.y)) continue; mctx.fillStyle = window.Social?.isPartyMember(remote.id) ? '#7dff9b' : '#b3dfff'; mctx.beginPath(); mctx.arc(remote.x * s, remote.y * s, 2.5, 0, 6.283); mctx.fill(); }
     for (const sl of slimes) if (!sl.dead && seen(zone, sl.x, sl.y)) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }
