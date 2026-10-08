@@ -24750,5 +24750,47 @@
     "kind": "material",
     "rarity": "common",
     "sell": 1450
+  },
+  {
+    "id": "mirage_fang",
+    "name": "Mirage Fang",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1550
+  },
+  {
+    "id": "shard_carapace",
+    "name": "Shard Carapace",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1670
+  },
+  {
+    "id": "harrier_pinions",
+    "name": "Harrier Pinions",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1760
+  },
+  {
+    "id": "prism_heart",
+    "name": "Prism Heart",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1950
+  },
+  {
+    "id": "queens_mirror",
+    "name": "Queen's Mirror",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 6500
+  },
+  {
+    "id": "sunshard_core",
+    "name": "Sunshard Core",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
   }
 ]

@@ -51,6 +51,11 @@
         if (((x*7+y*13)%6)===0) {g.strokeStyle='rgba(188,242,249,.65)';g.lineWidth=1.4;g.beginPath();g.moveTo(px-7,py+22);g.lineTo(px,py+15);g.lineTo(px+7,py+22);g.moveTo(px,py+15);g.lineTo(px,py+30);g.stroke();}
         return true;
       }
+      if (Field.zoneTheme === 'prismwaste') {
+        poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],`hsl(${32+(x*7+y*3)%8}, 28%, ${62+(x*17+y*31)%7}%)`,'#9a8290',.8);
+        if (((x*7+y*13)%7)===0) {g.strokeStyle='rgba(255,245,220,.65)';g.lineWidth=1.4;g.beginPath();g.moveTo(px-8,py+22);g.lineTo(px,py+16);g.lineTo(px+8,py+22);g.stroke();}
+        return true;
+      }
       Field.zoneTheme === 'frost' ? poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],`hsl(210, 20%, ${52+(x*17+y*31)%7}%)`,'#6f8399',.6) : poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],`hsl(22, 14%, ${25+(x*17+y*31)%6}%)`,'#51413c',.6);
       return true;
     }

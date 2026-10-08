@@ -153,7 +153,7 @@
   function syncMusic() {
     if (!ac || ac.state !== 'running') return;
     // In the game the zone picks the score: Greenmeadow and Alderhaven keep the folk tune, the Crags, the glacier and the fen get their own.
-    const here = scene === 'game' ? (musicZone === 13 && amusic ? amusic : musicZone >= 10 && musicZone <= 12 && cathedralMusic[musicZone - 10] ? cathedralMusic[musicZone - 10] : musicZone === 9 && nmusic ? nmusic : musicZone === 8 && dmusic ? dmusic : musicZone === 7 && kmusic ? kmusic : musicZone === 6 && wmusic ? wmusic : musicZone === 5 ? vmusic : musicZone === 4 && smusic ? smusic : musicZone === 3 && gmusic ? gmusic : musicZone === 2 && rmusic ? rmusic : musicZone > 0 && cmusic ? cmusic : fmusic) : null;
+    const here = scene === 'game' ? (musicZone >= 13 && amusic ? amusic : musicZone >= 10 && musicZone <= 12 && cathedralMusic[musicZone - 10] ? cathedralMusic[musicZone - 10] : musicZone === 9 && nmusic ? nmusic : musicZone === 8 && dmusic ? dmusic : musicZone === 7 && kmusic ? kmusic : musicZone === 6 && wmusic ? wmusic : musicZone === 5 ? vmusic : musicZone === 4 && smusic ? smusic : musicZone === 3 && gmusic ? gmusic : musicZone === 2 && rmusic ? rmusic : musicZone > 0 && cmusic ? cmusic : fmusic) : null;
     for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, ...cathedralMusic]) if (m && m !== here && m.running) m.stop();
     if (scene === 'game') { if (music && music.running) music.stop(); if (here && !here.running) here.start(); }
     else if (music && !music.running) music.start();

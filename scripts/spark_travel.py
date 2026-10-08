@@ -17,7 +17,8 @@ STOPS = [
     # Ran's Deep: the flight from the Perch dives off the Eyrie's storm and down the Maelstrom.
     ('Keelhaven', 'travel_keelhaven', 86, 154, ['travel_perch', 'travel_nacrehold']),
     ('Nacrehold', 'travel_nacrehold', 100, 164, ['travel_keelhaven', 'travel_astralhollow']),
-    ('Astralhollow', 'travel_astralhollow', 76, 119, ['travel_nacrehold']),
+    ('Astralhollow', 'travel_astralhollow', 76, 119, ['travel_nacrehold', 'travel_last_shade']),
+    ('The Last Shade', 'travel_last_shade', 76, 119, ['travel_astralhollow']),
 ]
 
 

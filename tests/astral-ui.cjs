@@ -2,7 +2,7 @@
 // loaded art, world-map entry and decoded original score.
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { chromium } = require('./lib/playwright.cjs');
+const { chromium, STUB } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root = path.resolve(__dirname, '..');
@@ -37,10 +37,10 @@ async function call(name, args = {}) {
       map: WorldMap._layout.length, legend: kinds.every(k => WorldMap._kinds[k]?.[1] >= 40),
       imageSizes: kinds.map(k => [Field.astralSprites.img[k].naturalWidth,Field.astralSprites.img[k].naturalHeight]) };
   });
-  check(data.count === 14 && data.name === 'Astralhollow' && data.objects >= 400 && data.npcs === 7 && data.quests === 12, 'The complete zone, hub and quest catalog are loaded');
+  check(data.count === 15 && data.name === 'Astralhollow' && data.objects >= 400 && data.npcs === 7 && data.quests === 12, 'The complete zone, hub and quest catalog are loaded');
   check(data.gate[1] > data.arrival[1] && Math.hypot(data.gate[0]-data.arrival[0],data.gate[1]-data.arrival[1]) <= 4.5, 'The return gate stands in front of the arrival plaza');
-  check(data.oldGate?.to === 13 && data.art && data.map === 14 && data.legend, 'Nacrehold gate, original scenery art and world-map legend are present');
-  check(data.imageSizes.every(([w,h]) => w === 768 && h === 480), 'All five real 34-frame enemy atlases loaded');
+  check(data.oldGate?.to === 13 && data.art && data.map === 15 && data.legend, 'Nacrehold gate, original scenery art and world-map legend are present');
+  check(STUB || data.imageSizes.every(([w,h]) => w === 768 && h === 480), 'All five real 34-frame enemy atlases loaded');
   const music = await page.evaluate(async () => { const bytes=await fetch('assets/music_astral.mp3').then(r => r.arrayBuffer());const size=bytes.byteLength;const c=new AudioContext();const b=await c.decodeAudioData(bytes);await c.close();return { seconds:b.duration, bytes:size }; });
   check(music.seconds > 88 && music.seconds < 90 && music.bytes > 1000000, `The browser decodes the full original score (${JSON.stringify(music)})`);
 

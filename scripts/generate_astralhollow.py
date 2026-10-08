@@ -234,12 +234,17 @@ def main():
     args = parser.parse_args()
     world = json.loads(PATH.read_text())
     zone = build()
-    world['zones'] = [z for z in world['zones'] if z.get('name') != NAME]
+    later = world['zones'][ZONE:] if len(world['zones']) >= ZONE else []
+    world['zones'] = world['zones'][:ZONE - 1]
     assert len(world['zones']) == ZONE - 1, f'expected zone {ZONE}, found {len(world["zones"]) + 1}'
     open_city_gate(world['zones'][CITY_ZONE], world)
     # Remove the temporary alternate entrance if an earlier development run added it.
     world['zones'][3]['portals'] = [p for p in world['zones'][3].get('portals', []) if p['id'] != 'skald_astral_gate']
     world['zones'].append(zone)
+    world['zones'].extend(later)
+    if any(z.get('name') == 'The Prismwaste' for z in later):
+        from generate_prismwaste import open_astral_gate
+        open_astral_gate(world['zones'][ZONE - 1])
     spark_travel.ensure(world)
     PATH.write_text(json.dumps(world, indent=2) + '\n')
     if args.plot:

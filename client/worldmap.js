@@ -8,10 +8,10 @@
   const NS = 'http://www.w3.org/2000/svg';
   const STAGE = { w: 100, h: 62 };
   // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm -> the Wyrdwood -> Bifrost Reach, up the Stormrift -> Ran's Deep, down the Maelstrom.
-  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:89,y:53,s:8},{x:63,y:20,s:15}];
-  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
-  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
-  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
+  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:89,y:53,s:8},{x:63,y:20,s:15},{x:2,y:25,s:14}];
+  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', prismwaste: '#ad887e', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
+  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', prismwaste: '#ead7a8', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
+  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', prismwaste: '#ffe3ac', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
   const BLURB = {
     meadow: 'Green pastures round the walled town of Alderhaven.',
     ember: 'Lava fords and ash-grey crags above Cinderwatch Camp.',
@@ -22,6 +22,7 @@
     deep: 'The sea floor under the storm: the Shallows round Keelhaven and the Net, a labyrinth of living coral with Ran\'s Court at its heart.',
     nacre: 'A peaceful merfolk city of 120 shell homes, coral gardens and a Meeting Stone beside the three-wing Drowned Cathedral.',
     astral: 'A grassy impact basin of starglass groves and living constellations, reached from Nacrehold.',
+    prismwaste: 'A salt and mirror desert beyond Astralhollow, with three broken ridges and the Last Shade refuge.',
     cathedral_left:'The Flooded Cloister: level 40, four bosses, a private five-player wing.',
     cathedral_right:'The Coral Reliquary: level 45, four bosses, a private five-player wing.',
     cathedral_main:'The Grand Nave: level 50, four bosses, a private five-player wing.',
@@ -44,6 +45,7 @@
     galehound: ['Galehound', 30, '#9fc0ee'], prismgolem: ['Prism Golem', 31, '#a9a0f0'], skyray: ['Skyray (ranged)', 32, '#6a86d0'], einherjar: ['Hollow Einherjar', 33, '#8ad0e8'], thunderroc: ['Thunderroc', 35, '#f0c070'],
     draugr: ['Drowned Draugr', 35, '#8ac4b8'], angler: ['Lantern Angler (ranged)', 36, '#9ffff0'], moray: ['Gnashing Moray', 37, '#c8e070'], siren: ['Siren (ranged)', 38, '#ff9ae8'], shellback: ['Shellback', 39, '#a8d090'], kraken: ['The Kraken (Elite · 5 players)', 40, '#b890f0'], hvitserk: ['Hvitserk (Elite · 3 players)', 37, '#e0b43a'], ghostmaw: ['Ghostmaw (Elite · 3 players)', 39, '#d8f0f8'],
     voidmoth: ['Void Moth', 40, '#c7a8ff'], crystalwyrm: ['Crystalwyrm', 41, '#6de8ff'], orbitbeetle: ['Orbit Beetle', 42, '#f4a43a'], eclipsedryad: ['Eclipse Dryad', 43, '#9ed17a'], meteorgolem: ['Meteor Golem', 45, '#b39bd1'],
+    miragejackal: ['Mirage Jackal',45,'#e7b990'], shardscarab:['Shard Scarab',46,'#99e6dc'], glassharrier:['Glass Harrier',47,'#d5c5ff'], prismsentinel:['Prism Sentinel',48,'#d5e9ed'], mirrorqueen:['Mirror Queen (Elite · 3 players)',49,'#e7b8ff'], sunshard:['Sunshard (Elite · 5 players)',50,'#ffd58a'],
     ram: ['Stormram', 29, '#8fe0ff'], oakhorn: ['Oakhorn (Elite · 3 players)', 25, '#ff9a3a'], hrungnir: ['Hrungnir (Elite · 5 players)', 30, '#7ab4ff'],
   };
   for (const e of CATHEDRAL_ENEMIES) KINDS[e.kind]=[e.name+(e.boss?' (Boss)':''),e.level,e.color];
@@ -129,6 +131,11 @@
       case 'astralshrub': return '#5eaa91';
       case 'astrolamp': case 'starwell': return '#ffe2a0';
       case 'astralhouse': case 'observatory': return '#94bbc5';
+      case 'mirrorwall': return '#e8d9ef';
+      case 'sunspire': case 'lens_pillar': return '#ffe3ae';
+      case 'glassstone': return '#9b8ca8';
+      case 'saltbrush': return '#d8c9c3';
+      case 'shade_tent': return '#a5798f';
       case 'bush': return fen ? '#3f6a3a' : frost ? '#4a8a78' : ember ? '#3a2a30' : '#2f8a45';
       default: return '#8a7a62';
     }
@@ -155,7 +162,7 @@
       else { g.beginPath(); g.arc(r.x * k, r.y * k, r.r * k, 0, 6.283); g.fill(); }
     }
     if (z.city && z.theme !== 'city' && z.theme !== 'nacre') for (const t of [z.city, ...(z.camps || [])]) {
-      g.fillStyle = { meadow: '#d8cbb0', ember: '#88705d', frost: '#8fa6bd', fen: '#6a5238', wyrd: '#8a6a44', sky: '#cdd2f2', deep: '#4a7a82', astral: '#8fa9b2' }[z.theme];
+      g.fillStyle = { meadow: '#d8cbb0', ember: '#88705d', frost: '#8fa6bd', fen: '#6a5238', wyrd: '#8a6a44', sky: '#cdd2f2', deep: '#4a7a82', astral: '#8fa9b2', prismwaste: '#c5a58d' }[z.theme];
       g.fillRect(t.x0 * k, t.y0 * k, (t.x1 - t.x0) * k, (t.y1 - t.y0) * k);
     }
     const objects = (z.objects || []).filter(o => o.kind !== 'post' && o.kind !== 'void');

@@ -62,6 +62,11 @@ REWARDS = {
     'astral_wyrms': green(40, 'pants'),
     'astral_golems': blue(45, 'necklace'),
     'astral_survey': blue(45, 'accessory'),
+    'prism_jackals': green(45, 'necklace'),
+    'prism_scarabs': green(45, 'pants'),
+    'prism_queen': blue(50, 'accessory'),
+    'prism_sunshard': blue(50, 'necklace'),
+    'prism_survey': blue(50, 'pants'),
 }
 
 

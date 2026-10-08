@@ -32,7 +32,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50 };
 Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'world/cathedral.txt'), 'utf8')).map(e => [e.kind, e.level])));
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
@@ -2871,6 +2871,62 @@ const scenarios = {
       await w.action(bot, { type: 'move', x: back.x, y: back.y });
       await w.waitFor(() => w.player(bot).zone === 9, 15000, 'Return to Nacrehold');
       check(distance(w.player(bot), { x: back.tx, y: back.ty }) < 2, 'The nearby return gate works without bouncing');
+    },
+  },
+
+  prismwaste: {
+    description: 'Prismwaste: both Starbreak gates, local views, six material drops and two group elite quests with level-50 gear.',
+    startLevel: 50,
+    levelSpread: 0,
+    async run(w, check) {
+      const bot='Glasswalker', area=map.zones[13];
+      await w.connect({bot,class:'warrior'});
+      const gate=map.zones[12].portals.find(p=>p.id==='astral_prism_gate');
+      const back=area.portals.find(p=>p.id==='prism_astral_gate');
+      check(!!gate && !!back && gate.to===14 && back.to===13,'The two Starbreak gates point at the paired zones');
+      check(area.levels.join(',')==='45,50' && area.slimes.length===42 && area.npcs.length===6 && area.quests.length===10,'The level range, six families, refuge and quests are present');
+      const kinds=Object.fromEntries([...new Set(area.slimes.map(s=>s.kind))].map(k=>[k,area.slimes.filter(s=>s.kind===k).length]));
+      check(JSON.stringify(kinds)===JSON.stringify({mirrorqueen:1,sunshard:1,miragejackal:11,shardscarab:10,glassharrier:10,prismsentinel:9}),'Four ordinary families and two single-spawn elites hold separate bands');
+      await kit.teleport(w,bot,{zone:13,x:gate.x,y:gate.y+4});
+      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===14,15000,'Enter the Prismwaste');
+      await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),area.spawn)<2,'The northern Astralhollow gate reaches the Last Shade refuge');
+      await w.connect({bot:'MeadowWitness',class:'mage'});
+      check(w.views.get('MeadowWitness').slimes.every(s=>s.zone===0) && w.views.get(bot).slimes.every(s=>s.zone===14),'Each bot sees only the enemies in its own zone');
+      const ordinary=[['miragejackal','mirage_fang'],['shardscarab','shard_carapace'],['glassharrier','harrier_pinions'],['prismsentinel','prism_heart']];
+      for(const [kind,material] of ordinary){
+        const enemy=w.snapshot.slimes.find(s=>s.kind===kind && s.zone===14 && !s.dead);
+        const before=totalXp(w.player(bot));
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>w.snapshot.drops.some(d=>d.zone===14 && d.item===material),5000,`${material} drop`);
+        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} pays level-derived XP`);
+        check(w.snapshot.drops.some(d=>d.zone===14 && d.item===material),`${kind} drops its own material`);
+      }
+      await w.debug(bot,{op:'quest',id:'prism_sentinels',action:'finish'});
+      for(const [id,kind,giver,reward] of [
+        ['prism_queen','mirrorqueen','prism_scout','accessory_amber_l50_blue'],
+        ['prism_sunshard','sunshard','prism_scholar','necklace_moonstone_l50_blue']]){
+        const q=area.quests.find(q=>q.id===id);
+        check(q.group && q.rewardItem===reward && q.objectives[0].target===kind,`${id} is a separate group quest with level-50 blue gear`);
+        await kit.teleport(w,bot,{npc:giver});
+        await kit.talkTo(w,bot,giver,`quest:accept:${id}`);
+        await w.waitFor(()=>!!quest(w,bot,id),5000,`Accept ${id}`);
+        const enemy=w.snapshot.slimes.find(s=>s.kind===kind && s.zone===14 && !s.dead);
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>quest(w,bot,id).counts[0]===1,5000,`Credit ${id}`);
+        check(w.snapshot.drops.some(d=>d.zone===14 && d.item===(kind==='mirrorqueen'?'queens_mirror':'sunshard_core')),`${kind} drops its named material`);
+        await kit.teleport(w,bot,{npc:giver});
+        await kit.talkTo(w,bot,giver,`quest:claim:${id}`);
+        await w.waitFor(()=>quest(w,bot,id).claimed,5000,`Claim ${id}`);
+        check(w.player(bot).inventory.some(i=>i.item===reward),`${id} awards its level-50 blue item`);
+      }
+      await w.restart();
+      check(w.player(bot).zone===14 && ['prism_queen','prism_sunshard'].every(id=>quest(w,bot,id)?.claimed),'Zone and elite claims persist through Rust restart');
+      await kit.teleport(w,bot,{zone:14,x:back.x,y:back.y-4});
+      await w.action(bot,{type:'move',x:back.x,y:back.y});
+      await w.waitFor(()=>w.player(bot).zone===13,15000,'Return to Astralhollow');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'The return gate arrives clear of its paired gate');
     },
   },
 

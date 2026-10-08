@@ -373,6 +373,14 @@ impl Slime {
             "orbitbeetle" => (42000., 760., 2.7, 1.55),
             "eclipsedryad" => (39000., 720., 2.5, 1.5),
             "meteorgolem" => (60000., 980., 1.8, 1.95),
+            // Prismwaste: fast hunters and heavy mirror guardians; the two named
+            // elites are group encounters in separate courts.
+            "miragejackal" => (58000., 920., 3.8, 1.35),
+            "shardscarab" => (67000., 1080., 2.8, 1.55),
+            "glassharrier" => (62000., 1050., 3.4, 1.4),
+            "prismsentinel" => (85000., 1400., 2.1, 1.85),
+            "mirrorqueen" => (520000., 5600., 2.7, 2.0),
+            "sunshard" => (920000., 9200., 2.2, 2.4),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -427,6 +435,12 @@ impl Slime {
             "orbitbeetle" => 42,
             "eclipsedryad" => 43,
             "meteorgolem" => 45,
+            "miragejackal" => 45,
+            "shardscarab" => 46,
+            "glassharrier" => 47,
+            "prismsentinel" => 48,
+            "mirrorqueen" => 49,
+            "sunshard" => 50,
             _ => 2,
         }
     }
@@ -484,6 +498,12 @@ impl Slime {
             "orbitbeetle" => 1060,
             "eclipsedryad" => 1140,
             "meteorgolem" => 1450,
+            "miragejackal" => 1550,
+            "shardscarab" => 1670,
+            "glassharrier" => 1760,
+            "prismsentinel" => 1950,
+            "mirrorqueen" => 6500,
+            "sunshard" => 10000,
             _ => 0,
         }
     }
@@ -544,6 +564,12 @@ impl Slime {
             "orbitbeetle" => (0.55, 1.3, 8., 8.),
             "eclipsedryad" => (0.7, 1.7, 7., 10.),
             "meteorgolem" => (1.0, 2.0, 5.5, 7.),
+            "miragejackal" => (0.3, 0.9, 11.5, 9.),
+            "shardscarab" => (0.55, 1.35, 8., 8.),
+            "glassharrier" => (0.4, 1.0, 11., 9.),
+            "prismsentinel" => (0.9, 1.8, 6., 8.),
+            "mirrorqueen" => (0.85, 1.6, 8., 10.),
+            "sunshard" => (1.1, 2.0, 7., 13.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -614,6 +640,7 @@ impl Slime {
             "shellback" => 3.2,
             "kraken" => 4.0,
             "hvitserk" => 3.0,
+            "sunshard" => 4.0,
             _ => 0.,
         }
     }
@@ -2429,7 +2456,7 @@ impl World {
                 "big" => 0.,
                 "cinderlord" => 180.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
-                "ghostmaw" => 600.,
+                "ghostmaw" | "mirrorqueen" | "sunshard" => 600.,
                 "oakhorn" => 180.,
                 _ => 22.,
             };
@@ -2816,6 +2843,8 @@ impl World {
                             | "kraken"
                             | "hvitserk"
                             | "ghostmaw"
+                            | "mirrorqueen"
+                            | "sunshard"
                     ) || is_boss(&s.kind)
                     {
                         s.max_hp
@@ -4696,7 +4725,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 14);
+        assert_eq!(zone_count(&w), 15);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -5299,7 +5328,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 14);
+        assert_eq!(zone_count(&w), 15);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -5552,6 +5581,8 @@ mod tests {
             "hrungnir",
             "hvitserk",
             "kraken",
+            "mirrorqueen",
+            "sunshard",
         ] {
             let id = w.slimes.iter().position(|s| s.kind == kind).unwrap();
             let zone = w.slimes[id].zone;
@@ -5583,6 +5614,7 @@ mod tests {
             (8, "deep_captain"),
             (9, "nacre_cathedral"),
             (13, "astral_survey"),
+            (14, "prism_sunshard"),
         ];
         for (zone, hard_id) in hard {
             let quests = &w.maps[zone].quests;
@@ -5641,6 +5673,51 @@ mod tests {
                 item(q.reward_item.as_deref().unwrap()).unwrap().rarity,
                 "rare",
                 "{id}"
+            );
+        }
+    }
+
+    #[test]
+    fn prismwaste_has_paired_gates_six_distinct_monsters_and_two_group_elites() {
+        let w = world();
+        let map = &w.maps[14];
+        assert_eq!(map.name, "The Prismwaste");
+        assert_eq!(map.levels, Some([45, 50]));
+        assert_eq!(map.portals[0].to, 13);
+        assert!(w.maps[13].portals.iter().any(|p| p.to == 14));
+        let expected = [
+            ("miragejackal", 45, "mirage_fang", false),
+            ("shardscarab", 46, "shard_carapace", false),
+            ("glassharrier", 47, "harrier_pinions", false),
+            ("prismsentinel", 48, "prism_heart", false),
+            ("mirrorqueen", 49, "queens_mirror", true),
+            ("sunshard", 50, "sunshard_core", true),
+        ];
+        for (kind, level, material_id, elite) in expected {
+            let enemy = w
+                .slimes
+                .iter()
+                .find(|s| s.kind == kind && s.zone == 14)
+                .unwrap();
+            assert_eq!(enemy.level, level);
+            assert_eq!(enemy.elite, elite);
+            assert_eq!(crate::items::material(kind), material_id);
+            assert!(item(material_id).is_some());
+            assert!(enemy.max_hp > 50_000.);
+            assert!(enemy.gold > 1000);
+        }
+        for (id, kind, players) in [
+            ("prism_queen", "mirrorqueen", 3),
+            ("prism_sunshard", "sunshard", 5),
+        ] {
+            let q = map.quests.iter().find(|q| q.id == id).unwrap();
+            assert!(q.group);
+            assert_eq!(q.recommended_players, players);
+            assert_eq!(q.objectives[0].target, kind);
+            assert_eq!(q.reward_xp, xp_to_level(q.level) / 10);
+            assert_eq!(
+                item(q.reward_item.as_deref().unwrap()).unwrap().rarity,
+                "rare"
             );
         }
     }
@@ -5995,8 +6072,8 @@ mod tests {
         let map = &w.maps[CITY];
         assert_eq!(
             zone_count(&w),
-            14,
-            "Skaldholm is the fifth map; Astralhollow is the fourteenth public map"
+            15,
+            "Skaldholm is the fifth map; the Prismwaste is the fifteenth public map"
         );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
@@ -7701,7 +7778,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 14);
+        assert_eq!(zone_count(&w), 15);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));
@@ -7746,7 +7823,12 @@ mod tests {
                     arrival.distance(Point {
                         x: portal.tx,
                         y: portal.ty
-                    }) < 1e-6
+                    }) < 1e-6,
+                    "{} arrival in zone {} collides at ({}, {})",
+                    portal.id,
+                    portal.to,
+                    portal.tx,
+                    portal.ty
                 );
                 assert!(
                     target.portals.iter().all(|back| arrival.distance(Point {

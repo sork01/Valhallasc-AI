@@ -169,6 +169,12 @@ pub fn material(kind: &str) -> &'static str {
         "orbitbeetle" => "orbit_shell",
         "eclipsedryad" => "eclipse_bark",
         "meteorgolem" => "meteor_core",
+        "miragejackal" => "mirage_fang",
+        "shardscarab" => "shard_carapace",
+        "glassharrier" => "harrier_pinions",
+        "prismsentinel" => "prism_heart",
+        "mirrorqueen" => "queens_mirror",
+        "sunshard" => "sunshard_core",
         _ => "slime_gel",
     }
 }
@@ -220,6 +226,8 @@ pub fn is_elite(kind: &str) -> bool {
             | "kraken"
             | "hvitserk"
             | "ghostmaw"
+            | "mirrorqueen"
+            | "sunshard"
     ) || is_vault_enemy(kind)
 }
 /// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.
