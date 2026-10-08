@@ -3,7 +3,7 @@ use super::*;
 
 const SKALD: usize = 4;
 const VAULT: usize = 5;
-/// The first private copy of the dungeon: the world appends the copies after every file zone (Ran's Deep is the last, zone 8).
+/// The first private copy of the dungeon: the world appends copies after every file zone.
 const COPY: usize = 16;
 
 fn world() -> World {
@@ -106,8 +106,8 @@ fn the_undervault_is_a_five_player_dungeon_with_four_private_copies_four_bosses_
         (4, 5, Some([20, 20]), "hollowking")
     );
     assert!(vault.city.is_none(), "no safe ground in a dungeon");
-    // The world keeps three more copies after every file zone (Ran's Deep is file zone 8, so the copies are zones 9-11: COPY is the first); clients are told the template's number.
-    assert_eq!(w.maps.len(), 27);
+    // The world keeps three more copies after every file zone; clients are told the template's number.
+    assert_eq!(w.maps.len(), 28);
     assert_eq!(
         w.instances.iter().filter(|i| i.template == VAULT).count(),
         4
@@ -343,7 +343,7 @@ fn copies_do_not_share_enemies_players_or_snapshots_and_clients_are_told_the_tem
     // Snapshots: each copy lists only its own hero and enemies, all labelled with the template's zone.
     let all = w.snapshot();
     let zones = all["zones"].as_array().unwrap();
-    assert_eq!(zones.len(), 27);
+    assert_eq!(zones.len(), 28);
     for (copy, who) in [(5usize, 1u64), (COPY, 2)] {
         let v = &zones[copy];
         let players = v["players"].as_array().unwrap();

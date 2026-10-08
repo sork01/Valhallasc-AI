@@ -1356,7 +1356,7 @@ mod tests {
             Class::Priest,
             Class::Hunter,
         ];
-        for level in std::iter::once(1).chain((5..=50).step_by(5)) {
+        for level in std::iter::once(1).chain((5..=55).step_by(5)) {
             for rarity in ["common", "uncommon", "rare", "epic"] {
                 let purple_level = level % 10 == 0;
                 for class in classes {
@@ -1469,11 +1469,17 @@ mod tests {
             assert!(e.loot_source.is_none());
             assert!(boss_piece_for(&e.kind, &["weapon"], 0.).is_none());
         }
-        // Walk every ordinary drop-pool cell, including all high-level pieces. Source gear must never leak in.
+        // Walk every level-50+ ordinary drop-pool cell. Source and obsolete gear must never leak in.
         for rarity in ["common", "uncommon", "rare", "epic"] {
             let eligible: std::collections::BTreeSet<_> = ITEMS
                 .iter()
-                .filter(|i| is_gear(i) && i.rarity == rarity && !i.starter && i.source.is_none())
+                .filter(|i| {
+                    is_gear(i)
+                        && i.rarity == rarity
+                        && !i.starter
+                        && i.source.is_none()
+                        && (50..=55).contains(&i.required_level)
+                })
                 .map(|i| i.id.as_str())
                 .collect();
             let drops: std::collections::BTreeSet<_> = (0..eligible.len())
