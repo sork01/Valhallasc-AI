@@ -28,6 +28,14 @@ def apply(items):
     for task, record in jobs():
         for item in items:
             if matches(item, task): item['art'] = record['variant']
+    # The new level-55 ladder uses the completed level-50 class silhouettes,
+    # with its own tint, until a separate level-55 art pass is commissioned.
+    level_50 = {(i.get('class'), i['kind']): i['art'] for i in items
+                if i.get('requiredLevel') == 50 and not i.get('source') and i.get('art')}
+    for item in items:
+        if item.get('requiredLevel') == 55 and not item.get('source'):
+            art = level_50.get((item.get('class'), item['kind']))
+            if art: item['art'] = art
     return items
 
 
@@ -47,6 +55,14 @@ def append_icons(refresh_base=False):
         cell = [number % cols, number // cols]; image.paste(icon, (cell[0] * size, cell[1] * size))
         for item in items:
             if matches(item, task): at[item['id']] = cell
+    for item in items:
+        if item.get('requiredLevel') != 55 or item.get('source'):
+            continue
+        previous = next((old for old in items if old.get('requiredLevel') == 50
+                         and not old.get('source') and old.get('class') == item.get('class')
+                         and old['kind'] == item['kind'] and old['rarity'] == item['rarity']), None)
+        if previous and previous['id'] in at:
+            at[item['id']] = at[previous['id']]
     image.save(ASSETS / 'items.png', optimize=True)
     meta = {**original, 'rows': rows, 'at': at, 'progressionSprites': {task['id']: record['icon']['id'] for task, record in completed}}
     (ASSETS / 'items.txt').write_text(json.dumps(meta, indent=1) + '\n')

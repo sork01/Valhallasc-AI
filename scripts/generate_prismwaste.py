@@ -204,11 +204,16 @@ def open_astral_gate(astral):
 
 def main():
     world=json.loads(MAP.read_text())
-    world['zones']=[z for z in world['zones'] if z.get('name')!=NAME]
+    later=world['zones'][ZONE:]
+    world['zones']=world['zones'][:ZONE-1]
     assert len(world['zones'])==ZONE-1
     zone=build()
     open_astral_gate(world['zones'][12])
     world['zones'].append(zone)
+    world['zones'].extend(later)
+    if any(z.get('name')=='The Obsidian Orrery' for z in later):
+        from generate_orrery import open_prism_gate
+        open_prism_gate(world['zones'][ZONE-1])
     spark_travel.ensure(world)
     MAP.write_text(json.dumps(world,indent=2)+'\n')
     print(f'{NAME}: {len(zone["objects"])} objects, {len(zone["slimes"])} enemies, {len(zone["quests"])} quests')

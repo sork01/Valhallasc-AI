@@ -175,6 +175,12 @@ pub fn material(kind: &str) -> &'static str {
         "prismsentinel" => "prism_heart",
         "mirrorqueen" => "queens_mirror",
         "sunshard" => "sunshard_core",
+        "bronzemantis" => "mantis_blade",
+        "gearling" => "gearling_tooth",
+        "orbitseer" => "seer_lens",
+        "chronoguard" => "chronoguard_plate",
+        "pendulummatron" => "matron_pendulum",
+        "epochengine" => "epoch_core",
         _ => "slime_gel",
     }
 }
@@ -228,6 +234,8 @@ pub fn is_elite(kind: &str) -> bool {
             | "ghostmaw"
             | "mirrorqueen"
             | "sunshard"
+            | "pendulummatron"
+            | "epochengine"
     ) || is_vault_enemy(kind)
 }
 /// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.
@@ -365,6 +373,7 @@ pub fn equipment_of_rarity(rarity: &str, level: u32, choice: f64) -> Option<&'st
                 && !i.starter
                 && i.source.is_none()
                 && i.required_level <= limit
+                && (level < 50 || i.required_level >= 50)
         })
         .collect();
     pool.get((choice * pool.len() as f64) as usize).copied()
@@ -841,6 +850,7 @@ mod tests {
                         40 => 30,
                         45 => 35,
                         50 => 40,
+                        55 => 48,
                         level => panic!("unexpected gear level {level}"),
                     };
                     assert_eq!(value, expected, "{}", i.id);
@@ -1648,7 +1658,7 @@ mod tests {
                 continue;
             }
             assert!(
-                i.required_level == 1 || (i.required_level <= 50 && i.required_level % 5 == 0),
+                i.required_level == 1 || (i.required_level <= 55 && i.required_level % 5 == 0),
                 "{} needs level {}",
                 i.id,
                 i.required_level
@@ -1661,7 +1671,7 @@ mod tests {
         assert_eq!(
             used.into_iter().collect::<Vec<_>>(),
             std::iter::once(1)
-                .chain((5..=50).step_by(5))
+                .chain((5..=55).step_by(5))
                 .collect::<Vec<_>>()
         );
     }

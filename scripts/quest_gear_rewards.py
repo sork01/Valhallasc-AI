@@ -67,6 +67,11 @@ REWARDS = {
     'prism_queen': blue(50, 'accessory'),
     'prism_sunshard': blue(50, 'necklace'),
     'prism_survey': blue(50, 'pants'),
+    'orrery_mantises': green(50, 'necklace'),
+    'orrery_gearlings': green(50, 'pants'),
+    'orrery_matron': blue(55, 'accessory'),
+    'orrery_engine': blue(55, 'necklace'),
+    'orrery_survey': blue(55, 'pants'),
 }
 
 

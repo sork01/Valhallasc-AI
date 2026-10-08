@@ -29,9 +29,9 @@ async function call(name,args={}){const result=await client.callTool({name,argum
       sizes:kinds.map(k=>[Field.prismSprites.img[k].naturalWidth,Field.prismSprites.img[k].naturalHeight]),
       map:WorldMap._layout.length,legend:kinds.every(k=>WorldMap._kinds[k]?.[1]>=45),gate:Field._debug.zones[13].portals.find(p=>p.id==='astral_prism_gate')};
   });
-  check(catalog.count===15 && catalog.name==='The Prismwaste' && catalog.theme==='prismwaste' && catalog.level.join(',')==='45,50','The new zone and level range load');
+  check(catalog.count===16 && catalog.name==='The Prismwaste' && catalog.theme==='prismwaste' && catalog.level.join(',')==='45,50','The new zone and level range load');
   check((STUB || catalog.sizes.every(([w,h])=>w===768 && h===480)) && catalog.kinds.length===6,'Six 34-frame enemy atlases load');
-  check(catalog.art && catalog.map===15 && catalog.legend,'Scenery art and world-map legend are complete');
+  check(catalog.art && catalog.map===16 && catalog.legend,'Scenery art and world-map legend are complete');
   check(catalog.npcs===6 && catalog.quests===10 && catalog.spawns===42 && catalog.objects>=300,'The refuge, quests and monster bands load');
   check(catalog.gate?.to===14,'Astralhollow exposes the outbound Starbreak');
   const debug=command=>page.evaluate(command=>Online.send({type:'debug',ref:19,command}),command);

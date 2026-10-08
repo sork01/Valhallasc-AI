@@ -24792,5 +24792,1718 @@
     "kind": "material",
     "rarity": "common",
     "sell": 10000
+  },
+  {
+    "id": "mantis_blade",
+    "name": "Bronze Mantis Blade",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 235
+  },
+  {
+    "id": "gearling_tooth",
+    "name": "Gearling Tooth",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 250
+  },
+  {
+    "id": "seer_lens",
+    "name": "Orbit Seer Lens",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 275
+  },
+  {
+    "id": "chronoguard_plate",
+    "name": "Chronoguard Plate",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 310
+  },
+  {
+    "id": "matron_pendulum",
+    "name": "Matron Pendulum",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 800
+  },
+  {
+    "id": "epoch_core",
+    "name": "Epoch Core",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1200
+  },
+  {
+    "id": "warrior_armor_crimson_l55_gray",
+    "name": "Clockworn Crimson Armor",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "warrior",
+    "variant": "crimson_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 28.8
+  },
+  {
+    "id": "warrior_headgear_crimson_l55_gray",
+    "name": "Clockworn Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "warrior",
+    "variant": "crimson_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "warrior_shoulders_crimson_l55_gray",
+    "name": "Clockworn Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "warrior",
+    "variant": "crimson_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "warrior_gloves_crimson_l55_gray",
+    "name": "Clockworn Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "warrior",
+    "variant": "crimson_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "warrior_weapon_sword_l55_gray",
+    "name": "Clockworn Iron Sword",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "warrior",
+    "variant": "sword_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 38.4,
+    "defense": 0.0
+  },
+  {
+    "id": "mage_armor_apprentice_l55_gray",
+    "name": "Clockworn Apprentice Robes",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "mage",
+    "variant": "apprentice_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 19.2
+  },
+  {
+    "id": "mage_headgear_apprentice_l55_gray",
+    "name": "Clockworn Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "mage",
+    "variant": "apprentice_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "mage_shoulders_apprentice_l55_gray",
+    "name": "Clockworn Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "mage",
+    "variant": "apprentice_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "mage_gloves_apprentice_l55_gray",
+    "name": "Clockworn Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "mage",
+    "variant": "apprentice_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "mage_weapon_ash_l55_gray",
+    "name": "Clockworn Ash Staff",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "mage",
+    "variant": "ash_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 38.4,
+    "defense": 0.0
+  },
+  {
+    "id": "assassin_armor_shadow_l55_gray",
+    "name": "Clockworn Shadow Armor",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "assassin",
+    "variant": "shadow_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 19.2
+  },
+  {
+    "id": "assassin_headgear_shadow_l55_gray",
+    "name": "Clockworn Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "assassin",
+    "variant": "shadow_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "assassin_shoulders_shadow_l55_gray",
+    "name": "Clockworn Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "assassin",
+    "variant": "shadow_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "assassin_gloves_shadow_l55_gray",
+    "name": "Clockworn Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "assassin",
+    "variant": "shadow_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "assassin_weapon_daggers_l55_gray",
+    "name": "Clockworn Steel Daggers",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "assassin",
+    "variant": "daggers_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 38.4,
+    "defense": 0.0
+  },
+  {
+    "id": "priest_armor_pilgrim_l55_gray",
+    "name": "Clockworn Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "priest",
+    "variant": "pilgrim_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 28.8
+  },
+  {
+    "id": "priest_headgear_pilgrim_l55_gray",
+    "name": "Clockworn Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "priest",
+    "variant": "pilgrim_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l55_gray",
+    "name": "Clockworn Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "priest",
+    "variant": "pilgrim_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "priest_gloves_pilgrim_l55_gray",
+    "name": "Clockworn Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "priest",
+    "variant": "pilgrim_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "priest_weapon_mace_l55_gray",
+    "name": "Clockworn Oak Mace",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "priest",
+    "variant": "mace_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 38.4,
+    "defense": 0.0
+  },
+  {
+    "id": "hunter_armor_scout_l55_gray",
+    "name": "Clockworn Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "hunter",
+    "variant": "scout_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 28.8
+  },
+  {
+    "id": "hunter_headgear_scout_l55_gray",
+    "name": "Clockworn Feathered Headband",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "hunter",
+    "variant": "scout_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "hunter_shoulders_scout_l55_gray",
+    "name": "Clockworn Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "hunter",
+    "variant": "scout_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "hunter_gloves_scout_l55_gray",
+    "name": "Clockworn Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "hunter",
+    "variant": "scout_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "hunter_weapon_shortbow_l55_gray",
+    "name": "Clockworn Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "class": "hunter",
+    "variant": "shortbow_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 38.4,
+    "defense": 0.0
+  },
+  {
+    "id": "pants_wayfarer_l55_gray",
+    "name": "Clockworn Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "variant": "wayfarer_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 70,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 9.6
+  },
+  {
+    "id": "necklace_moonstone_l55_gray",
+    "name": "Clockworn Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "variant": "moonstone_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 70,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 19.2,
+    "defense": 0.0
+  },
+  {
+    "id": "accessory_amber_l55_gray",
+    "name": "Clockworn Amber Ring",
+    "kind": "accessory",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "variant": "amber_l55_gray",
+    "art": "regearl50",
+    "tint": {
+      "hue": 70,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 14.4,
+    "defense": 0.0
+  },
+  {
+    "id": "warrior_armor_azure_l55_green",
+    "name": "Hourforged Azure Armor",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "warrior",
+    "variant": "azure_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 7.2,
+    "defense": 28.8
+  },
+  {
+    "id": "warrior_headgear_azure_l55_green",
+    "name": "Hourforged Azure Winged Helm",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "warrior",
+    "variant": "azure_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "warrior_shoulders_azure_l55_green",
+    "name": "Hourforged Azure Winged Pauldrons",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "warrior",
+    "variant": "azure_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "warrior_gloves_azure_l55_green",
+    "name": "Hourforged Azure Gauntlets",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "warrior",
+    "variant": "azure_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "warrior_weapon_royal_l55_green",
+    "name": "Hourforged Royal Sword",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "warrior",
+    "variant": "royal_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 38.4,
+    "defense": 9.6
+  },
+  {
+    "id": "mage_armor_runic_l55_green",
+    "name": "Hourforged Runic Robes",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "mage",
+    "variant": "runic_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.2
+  },
+  {
+    "id": "mage_headgear_runic_l55_green",
+    "name": "Hourforged Runic Archmage Hat",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "mage",
+    "variant": "runic_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "mage_shoulders_runic_l55_green",
+    "name": "Hourforged Runic Pauldrons",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "mage",
+    "variant": "runic_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "mage_gloves_runic_l55_green",
+    "name": "Hourforged Runic Gloves",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "mage",
+    "variant": "runic_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "mage_weapon_crystal_l55_green",
+    "name": "Hourforged Crystal Staff",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "mage",
+    "variant": "crystal_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 38.4,
+    "defense": 9.6
+  },
+  {
+    "id": "assassin_armor_moon_l55_green",
+    "name": "Hourforged Moon Armor",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "assassin",
+    "variant": "moon_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.2
+  },
+  {
+    "id": "assassin_headgear_moon_l55_green",
+    "name": "Hourforged Moonveil Circlet",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "assassin",
+    "variant": "moon_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "assassin_shoulders_moon_l55_green",
+    "name": "Hourforged Moonveil Crescents",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "assassin",
+    "variant": "moon_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "assassin_gloves_moon_l55_green",
+    "name": "Hourforged Moonveil Gauntlets",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "assassin",
+    "variant": "moon_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "assassin_weapon_moonfang_l55_green",
+    "name": "Hourforged Moonfang Daggers",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "assassin",
+    "variant": "moonfang_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 38.4,
+    "defense": 9.6
+  },
+  {
+    "id": "priest_armor_dawn_l55_green",
+    "name": "Hourforged Dawnweave Vestments",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "priest",
+    "variant": "dawn_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 7.2,
+    "defense": 28.8
+  },
+  {
+    "id": "priest_headgear_dawn_l55_green",
+    "name": "Hourforged Sunburst Diadem",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "priest",
+    "variant": "dawn_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "priest_shoulders_dawn_l55_green",
+    "name": "Hourforged Sunray Pauldrons",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "priest",
+    "variant": "dawn_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "priest_gloves_dawn_l55_green",
+    "name": "Hourforged Dawnweave Gloves",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "priest",
+    "variant": "dawn_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "priest_weapon_sunmace_l55_green",
+    "name": "Hourforged Sunbreaker Mace",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "priest",
+    "variant": "sunmace_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 38.4,
+    "defense": 9.6
+  },
+  {
+    "id": "hunter_armor_warden_l55_green",
+    "name": "Hourforged Wildwarden Coat",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "hunter",
+    "variant": "warden_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 7.2,
+    "defense": 28.8
+  },
+  {
+    "id": "hunter_headgear_warden_l55_green",
+    "name": "Hourforged Wolfhood",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "hunter",
+    "variant": "warden_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "hunter_shoulders_warden_l55_green",
+    "name": "Hourforged Wildwarden Pauldrons",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "hunter",
+    "variant": "warden_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "hunter_gloves_warden_l55_green",
+    "name": "Hourforged Wildwarden Gauntlets",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "hunter",
+    "variant": "warden_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "hunter_weapon_wardenbow_l55_green",
+    "name": "Hourforged Wildwarden Longbow",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "class": "hunter",
+    "variant": "wardenbow_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 50,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 38.4,
+    "defense": 9.6
+  },
+  {
+    "id": "pants_wayfarer_l55_green",
+    "name": "Hourforged Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "variant": "wayfarer_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 70,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.4,
+    "defense": 9.6
+  },
+  {
+    "id": "necklace_moonstone_l55_green",
+    "name": "Hourforged Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "variant": "moonstone_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 70,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 19.2,
+    "defense": 4.8
+  },
+  {
+    "id": "accessory_amber_l55_green",
+    "name": "Hourforged Amber Ring",
+    "kind": "accessory",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "variant": "amber_l55_green",
+    "art": "regearl50",
+    "tint": {
+      "hue": 70,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 14.4,
+    "defense": 3.6
+  },
+  {
+    "id": "warrior_armor_crimson_l55_blue",
+    "name": "Epochbound Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "warrior",
+    "variant": "crimson_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 8.5,
+    "defense": 33.8,
+    "bonusStats": {
+      "dexterity": 48
+    }
+  },
+  {
+    "id": "warrior_headgear_crimson_l55_blue",
+    "name": "Epochbound Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "warrior",
+    "variant": "crimson_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "strength": 48
+    }
+  },
+  {
+    "id": "warrior_shoulders_crimson_l55_blue",
+    "name": "Epochbound Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "warrior",
+    "variant": "crimson_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "stamina": 48
+    }
+  },
+  {
+    "id": "warrior_gloves_crimson_l55_blue",
+    "name": "Epochbound Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "warrior",
+    "variant": "crimson_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "strength": 48
+    }
+  },
+  {
+    "id": "warrior_weapon_sword_l55_blue",
+    "name": "Epochbound Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "warrior",
+    "variant": "sword_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 45.1,
+    "defense": 11.3,
+    "bonusStats": {
+      "agility": 48
+    }
+  },
+  {
+    "id": "mage_armor_apprentice_l55_blue",
+    "name": "Epochbound Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "mage",
+    "variant": "apprentice_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 5.6,
+    "defense": 22.6,
+    "bonusStats": {
+      "dexterity": 48
+    }
+  },
+  {
+    "id": "mage_headgear_apprentice_l55_blue",
+    "name": "Epochbound Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "mage",
+    "variant": "apprentice_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "agility": 48
+    }
+  },
+  {
+    "id": "mage_shoulders_apprentice_l55_blue",
+    "name": "Epochbound Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "mage",
+    "variant": "apprentice_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "agility": 48
+    }
+  },
+  {
+    "id": "mage_gloves_apprentice_l55_blue",
+    "name": "Epochbound Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "mage",
+    "variant": "apprentice_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "dexterity": 48
+    }
+  },
+  {
+    "id": "mage_weapon_ash_l55_blue",
+    "name": "Epochbound Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "mage",
+    "variant": "ash_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 45.1,
+    "defense": 11.3,
+    "bonusStats": {
+      "agility": 48
+    }
+  },
+  {
+    "id": "assassin_armor_shadow_l55_blue",
+    "name": "Epochbound Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "assassin",
+    "variant": "shadow_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 5.6,
+    "defense": 22.6,
+    "bonusStats": {
+      "strength": 48
+    }
+  },
+  {
+    "id": "assassin_headgear_shadow_l55_blue",
+    "name": "Epochbound Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "assassin",
+    "variant": "shadow_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "stamina": 48
+    }
+  },
+  {
+    "id": "assassin_shoulders_shadow_l55_blue",
+    "name": "Epochbound Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "assassin",
+    "variant": "shadow_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "stamina": 48
+    }
+  },
+  {
+    "id": "assassin_gloves_shadow_l55_blue",
+    "name": "Epochbound Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "assassin",
+    "variant": "shadow_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "strength": 48
+    }
+  },
+  {
+    "id": "assassin_weapon_daggers_l55_blue",
+    "name": "Epochbound Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "assassin",
+    "variant": "daggers_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 45.1,
+    "defense": 11.3,
+    "bonusStats": {
+      "agility": 48
+    }
+  },
+  {
+    "id": "priest_armor_pilgrim_l55_blue",
+    "name": "Epochbound Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "priest",
+    "variant": "pilgrim_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 8.5,
+    "defense": 33.8,
+    "bonusStats": {
+      "stamina": 48
+    }
+  },
+  {
+    "id": "priest_headgear_pilgrim_l55_blue",
+    "name": "Epochbound Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "priest",
+    "variant": "pilgrim_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "dexterity": 48
+    }
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l55_blue",
+    "name": "Epochbound Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "priest",
+    "variant": "pilgrim_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "stamina": 48
+    }
+  },
+  {
+    "id": "priest_gloves_pilgrim_l55_blue",
+    "name": "Epochbound Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "priest",
+    "variant": "pilgrim_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "agility": 48
+    }
+  },
+  {
+    "id": "priest_weapon_mace_l55_blue",
+    "name": "Epochbound Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "priest",
+    "variant": "mace_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 45.1,
+    "defense": 11.3,
+    "bonusStats": {
+      "stamina": 48
+    }
+  },
+  {
+    "id": "hunter_armor_scout_l55_blue",
+    "name": "Epochbound Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "hunter",
+    "variant": "scout_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 8.5,
+    "defense": 33.8,
+    "bonusStats": {
+      "agility": 48
+    }
+  },
+  {
+    "id": "hunter_headgear_scout_l55_blue",
+    "name": "Epochbound Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "hunter",
+    "variant": "scout_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "dexterity": 48
+    }
+  },
+  {
+    "id": "hunter_shoulders_scout_l55_blue",
+    "name": "Epochbound Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "hunter",
+    "variant": "scout_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "stamina": 48
+    }
+  },
+  {
+    "id": "hunter_gloves_scout_l55_blue",
+    "name": "Epochbound Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "hunter",
+    "variant": "scout_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "stamina": 48
+    }
+  },
+  {
+    "id": "hunter_weapon_shortbow_l55_blue",
+    "name": "Epochbound Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "class": "hunter",
+    "variant": "shortbow_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 80,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 45.1,
+    "defense": 11.3,
+    "bonusStats": {
+      "stamina": 48
+    }
+  },
+  {
+    "id": "pants_wayfarer_l55_blue",
+    "name": "Epochbound Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "variant": "wayfarer_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 100,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.3,
+    "bonusStats": {
+      "dexterity": 48
+    }
+  },
+  {
+    "id": "necklace_moonstone_l55_blue",
+    "name": "Epochbound Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "variant": "moonstone_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 100,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 22.6,
+    "defense": 5.6,
+    "bonusStats": {
+      "dexterity": 48
+    }
+  },
+  {
+    "id": "accessory_amber_l55_blue",
+    "name": "Epochbound Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "variant": "amber_l55_blue",
+    "art": "regearl50",
+    "tint": {
+      "hue": 100,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 16.9,
+    "defense": 4.2,
+    "bonusStats": {
+      "dexterity": 48
+    }
   }
 ]

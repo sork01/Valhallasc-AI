@@ -4,7 +4,7 @@ use super::*;
 const SKALD: usize = 4;
 const VAULT: usize = 5;
 /// The first private copy of the dungeon: the world appends the copies after every file zone (Ran's Deep is the last, zone 8).
-const COPY: usize = 15;
+const COPY: usize = 16;
 
 fn world() -> World {
     World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)

@@ -1,0 +1,45 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "bronzemantis",
+    "gearling",
+    "orbitseer",
+    "chronoguard",
+    "pendulummatron",
+    "epochengine"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 10,
+      "n": 6,
+      "row": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1
+    },
+    "attack": {
+      "fps": 10,
+      "n": 8,
+      "row": 2
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3
+    },
+    "die": {
+      "fps": 10,
+      "n": 8,
+      "row": 4
+    }
+  }
+}

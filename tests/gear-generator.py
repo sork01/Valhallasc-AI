@@ -31,7 +31,7 @@ class GearGeneratorTests(unittest.TestCase):
         gear.ITEMS.write_text(json.dumps(old))
         self.run_generator()
         new = {i['id']: i for i in json.loads(gear.ITEMS.read_text())}
-        self.assertEqual(len(new) - len(old), 672)
+        self.assertEqual(len(new) - len(old), 756)
         for i in old:
             self.assertEqual(i, new[i['id']], i['id'])
 

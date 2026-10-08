@@ -32,7 +32,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55 };
 Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'world/cathedral.txt'), 'utf8')).map(e => [e.kind, e.level])));
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
@@ -2927,6 +2927,61 @@ const scenarios = {
       await w.action(bot,{type:'move',x:back.x,y:back.y});
       await w.waitFor(()=>w.player(bot).zone===13,15000,'Return to Astralhollow');
       check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'The return gate arrives clear of its paired gate');
+    },
+  },
+
+  orrery: {
+    description: 'Obsidian Orrery: reciprocal gates, six real material drops, elite group quests, level-55 gear and persistence.',
+    startLevel: 55,
+    levelSpread: 0,
+    async run(w, check) {
+      const bot='Clockwalker', area=map.zones[14];
+      await w.connect({bot,class:'warrior'});
+      const gate=map.zones[13].portals.find(p=>p.id==='prism_orrery_gate');
+      const back=area.portals.find(p=>p.id==='orrery_prism_gate');
+      check(!!gate && !!back && gate.to===15 && back.to===14,'Hourglass Pass has reciprocal gates');
+      check(area.levels.join(',')==='50,55' && area.slimes.length===42 && area.npcs.length===6 && area.quests.length===10,'The level-50–55 refuge and quest catalog load');
+      await kit.teleport(w,bot,{zone:14,x:gate.x-9,y:gate.y});
+      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===15,15000,'Enter the Orrery');
+      await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),area.spawn)<2,'The entrance arrives clear of its return gate');
+      await w.connect({bot:'MeadowWitness',class:'mage'});
+      check(w.views.get('MeadowWitness').slimes.every(s=>s.zone===0) && w.views.get(bot).slimes.every(s=>s.zone===15),'Only local enemies enter each zone view');
+      const ordinary=[['bronzemantis','mantis_blade'],['gearling','gearling_tooth'],['orbitseer','seer_lens'],['chronoguard','chronoguard_plate']];
+      for(const [kind,material] of ordinary){
+        const enemy=w.snapshot.slimes.find(s=>s.kind===kind && s.zone===15 && !s.dead);
+        const before=totalXp(w.player(bot));
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>w.snapshot.drops.some(d=>d.zone===15 && d.item===material),5000,`${material} drop`);
+        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} pays level-derived XP`);
+        check(w.snapshot.drops.some(d=>d.zone===15 && d.item===material),`${kind} drops its distinct material`);
+      }
+      await w.debug(bot,{op:'quest',id:'orrery_guards',action:'finish'});
+      for(const [id,kind,giver,reward,material] of [
+        ['orrery_matron','pendulummatron','orrery_scout','accessory_amber_l55_blue','matron_pendulum'],
+        ['orrery_engine','epochengine','orrery_scholar','necklace_moonstone_l55_blue','epoch_core']]){
+        const q=area.quests.find(q=>q.id===id);
+        check(q.group && q.rewardItem===reward && q.objectives[0].target===kind,`${id} is a separate group quest with level-55 blue gear`);
+        await kit.teleport(w,bot,{npc:giver});
+        await kit.talkTo(w,bot,giver,`quest:accept:${id}`);
+        await w.waitFor(()=>!!quest(w,bot,id),5000,`Accept ${id}`);
+        const enemy=w.snapshot.slimes.find(s=>s.kind===kind && s.zone===15 && !s.dead);
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>quest(w,bot,id).counts[0]===1,5000,`Credit ${id}`);
+        check(w.snapshot.drops.some(d=>d.zone===15 && d.item===material),`${kind} drops its named material`);
+        check(w.snapshot.drops.some(d=>d.zone===15 && kit.items.some(i=>i.id===d.item && i.rarity==='uncommon' && i.requiredLevel>=50)),`${kind} guarantees level-appropriate green gear`);
+        await kit.teleport(w,bot,{npc:giver});
+        await kit.talkTo(w,bot,giver,`quest:claim:${id}`);
+        await w.waitFor(()=>quest(w,bot,id).claimed,5000,`Claim ${id}`);
+        check(w.player(bot).inventory.some(i=>i.item===reward),`${id} awards level-55 blue gear`);
+      }
+      await w.restart();
+      check(w.player(bot).zone===15 && ['orrery_matron','orrery_engine'].every(id=>quest(w,bot,id)?.claimed),'Zone and elite claims persist through restart');
+      await kit.teleport(w,bot,{zone:15,x:back.x+5,y:back.y});
+      await w.action(bot,{type:'move',x:back.x,y:back.y});
+      await w.waitFor(()=>w.player(bot).zone===14,15000,'Return to Prismwaste');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrival does not bounce');
     },
   },
 

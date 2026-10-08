@@ -381,6 +381,13 @@ impl Slime {
             "prismsentinel" => (85000., 1400., 2.1, 1.85),
             "mirrorqueen" => (520000., 5600., 2.7, 2.0),
             "sunshard" => (920000., 9200., 2.2, 2.4),
+            // Obsidian Orrery: cutting bronze, skittering teeth, orbiting bolts and heavy clock guards.
+            "bronzemantis" => (90000., 1500., 3.7, 1.45),
+            "gearling" => (98000., 1610., 3.3, 1.35),
+            "orbitseer" => (102000., 1670., 2.5, 1.45),
+            "chronoguard" => (130000., 1950., 1.9, 1.95),
+            "pendulummatron" => (750000., 7600., 2.7, 2.15),
+            "epochengine" => (1250000., 12000., 1.9, 2.6),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -441,6 +448,12 @@ impl Slime {
             "prismsentinel" => 48,
             "mirrorqueen" => 49,
             "sunshard" => 50,
+            "bronzemantis" => 50,
+            "gearling" => 51,
+            "orbitseer" => 52,
+            "chronoguard" => 53,
+            "pendulummatron" => 54,
+            "epochengine" => 55,
             _ => 2,
         }
     }
@@ -504,6 +517,12 @@ impl Slime {
             "prismsentinel" => 1950,
             "mirrorqueen" => 6500,
             "sunshard" => 10000,
+            "bronzemantis" => 2100,
+            "gearling" => 2250,
+            "orbitseer" => 2450,
+            "chronoguard" => 2750,
+            "pendulummatron" => 8000,
+            "epochengine" => 12000,
             _ => 0,
         }
     }
@@ -570,6 +589,12 @@ impl Slime {
             "prismsentinel" => (0.9, 1.8, 6., 8.),
             "mirrorqueen" => (0.85, 1.6, 8., 10.),
             "sunshard" => (1.1, 2.0, 7., 13.),
+            "bronzemantis" => (0.35, 0.95, 11., 9.),
+            "gearling" => (0.4, 1.0, 10., 8.5),
+            "orbitseer" => (0.7, 1.8, 0., 11.),
+            "chronoguard" => (0.95, 1.9, 6., 8.),
+            "pendulummatron" => (0.9, 1.65, 8., 11.),
+            "epochengine" => (1.15, 2.1, 6., 13.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -602,6 +627,7 @@ impl Slime {
             "angler" => (12., 8., "#9ffff0", 1.1, 1, 0.),
             "siren" => (12.5, 9., "#ff9ae8", 0.9, 3, 0.3),
             "kraken" => (13., 11., "#5a4aa8", 1.3, 3, 0.26),
+            "orbitseer" => (11., 11., "#a7e7ff", 0.85, 2, 0.16),
             _ => return None,
         };
         Some(Ranged {
@@ -641,6 +667,7 @@ impl Slime {
             "kraken" => 4.0,
             "hvitserk" => 3.0,
             "sunshard" => 4.0,
+            "epochengine" => 4.3,
             _ => 0.,
         }
     }
@@ -2456,7 +2483,7 @@ impl World {
                 "big" => 0.,
                 "cinderlord" => 180.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
-                "ghostmaw" | "mirrorqueen" | "sunshard" => 600.,
+                "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine" => 600.,
                 "oakhorn" => 180.,
                 _ => 22.,
             };
@@ -2845,6 +2872,8 @@ impl World {
                             | "ghostmaw"
                             | "mirrorqueen"
                             | "sunshard"
+                            | "pendulummatron"
+                            | "epochengine"
                     ) || is_boss(&s.kind)
                     {
                         s.max_hp
@@ -4725,7 +4754,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 15);
+        assert_eq!(zone_count(&w), 16);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -5328,7 +5357,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 15);
+        assert_eq!(zone_count(&w), 16);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -5583,13 +5612,15 @@ mod tests {
             "kraken",
             "mirrorqueen",
             "sunshard",
+            "pendulummatron",
+            "epochengine",
         ] {
             let id = w.slimes.iter().position(|s| s.kind == kind).unwrap();
             let zone = w.slimes[id].zone;
             assert!(!w.is_instance(zone));
             w.players.get_mut(&1).unwrap().character.zone = zone;
             let before = w.drops.len();
-            w.hit_slime(id, 1, 1_000_000., false);
+            w.hit_slime(id, 1, 10_000_000., false);
             let greens: Vec<_> = w.drops[before..]
                 .iter()
                 .filter_map(|d| d.item.as_deref().and_then(item))
@@ -5615,6 +5646,7 @@ mod tests {
             (9, "nacre_cathedral"),
             (13, "astral_survey"),
             (14, "prism_sunshard"),
+            (15, "orrery_engine"),
         ];
         for (zone, hard_id) in hard {
             let quests = &w.maps[zone].quests;
@@ -5719,6 +5751,47 @@ mod tests {
                 item(q.reward_item.as_deref().unwrap()).unwrap().rarity,
                 "rare"
             );
+        }
+    }
+
+    #[test]
+    fn orrery_has_paired_gates_six_materials_and_two_group_elites() {
+        let w = world();
+        let map = &w.maps[15];
+        assert_eq!(map.name, "The Obsidian Orrery");
+        assert_eq!(map.levels, Some([50, 55]));
+        assert!(map.portals.iter().any(|p| p.to == 14));
+        assert!(w.maps[14].portals.iter().any(|p| p.to == 15));
+        for (kind, level, material_id, elite) in [
+            ("bronzemantis", 50, "mantis_blade", false),
+            ("gearling", 51, "gearling_tooth", false),
+            ("orbitseer", 52, "seer_lens", false),
+            ("chronoguard", 53, "chronoguard_plate", false),
+            ("pendulummatron", 54, "matron_pendulum", true),
+            ("epochengine", 55, "epoch_core", true),
+        ] {
+            let enemy = w
+                .slimes
+                .iter()
+                .find(|s| s.kind == kind && s.zone == 15)
+                .unwrap();
+            assert_eq!(enemy.level, level);
+            assert_eq!(enemy.elite, elite);
+            assert_eq!(crate::items::material(kind), material_id);
+            assert!(item(material_id).is_some());
+        }
+        for (id, kind, players) in [
+            ("orrery_matron", "pendulummatron", 3),
+            ("orrery_engine", "epochengine", 5),
+        ] {
+            let q = map.quests.iter().find(|q| q.id == id).unwrap();
+            assert!(q.group);
+            assert_eq!(q.recommended_players, players);
+            assert_eq!(q.objectives[0].target, kind);
+            assert_eq!(q.reward_xp, xp_to_level(q.level) / 10);
+            let reward = item(q.reward_item.as_deref().unwrap()).unwrap();
+            assert_eq!(reward.rarity, "rare");
+            assert_eq!(reward.required_level, 55);
         }
     }
 
@@ -6072,8 +6145,8 @@ mod tests {
         let map = &w.maps[CITY];
         assert_eq!(
             zone_count(&w),
-            15,
-            "Skaldholm is the fifth map; the Prismwaste is the fifteenth public map"
+            16,
+            "Skaldholm is the fifth map; the Orrery is the sixteenth public map"
         );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
@@ -7778,7 +7851,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 15);
+        assert_eq!(zone_count(&w), 16);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));
