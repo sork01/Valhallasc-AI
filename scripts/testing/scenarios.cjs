@@ -32,7 +32,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60 };
 Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'world/cathedral.txt'), 'utf8')).map(e => [e.kind, e.level])));
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
@@ -2982,6 +2982,70 @@ const scenarios = {
       await w.action(bot,{type:'move',x:back.x,y:back.y});
       await w.waitFor(()=>w.player(bot).zone===14,15000,'Return to Prismwaste');
       check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrival does not bounce');
+    },
+  },
+
+  moonspore: {
+    description: 'Moonspore Canopy: paired gates, seven drops, three elite quests, travel master and persistence.',
+    startLevel: 60,
+    levelSpread: 0,
+    async run(w, check) {
+      const bot='Moonwalker',area=map.zones[15];
+      await w.connect({bot,class:'warrior'});
+      const gate=map.zones[14].portals.find(p=>p.id==='orrery_moonspore_gate');
+      const back=area.portals.find(p=>p.id==='moonspore_orrery_gate');
+      check(!!gate && !!back && gate.to===16 && back.to===15,'Moonfall Arch has reciprocal gates');
+      check(area.levels.join(',')==='55,60' && area.slimes.length===43 && area.npcs.length===7 && area.quests.length===12,'Canopy, refuge and twelve quests load');
+      await kit.teleport(w,bot,{zone:15,x:108,y:112});
+      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===16,15000,'Enter the Canopy');
+      await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),area.spawn)<2,'Entry arrives outside the return gate');
+      await w.connect({bot:'MeadowWitness',class:'mage'});
+      check(w.views.get('MeadowWitness').slimes.every(s=>s.zone===0) && w.views.get(bot).slimes.every(s=>s.zone===16),'Zone snapshots remain isolated');
+      await kit.teleport(w,bot,{npc:'travel_lamplight'});
+      const travel=await kit.talkTo(w,bot,'travel_lamplight');
+      check(travel.travelStops?.includes('travel_lamplight') && area.npcs.some(n=>n.id==='travel_lamplight' && n.travelLinks.includes('travel_stillpoint')) && map.zones[14].npcs.some(n=>n.id==='travel_stillpoint' && n.travelLinks.includes('travel_lamplight')),'Travel Master discovers the reciprocal Stillpoint link');
+      await kit.teleport(w,bot,{npc:'moonspore_warden'});
+      await kit.talkTo(w,bot,'moonspore_warden','quest:accept:moonspore_welcome');
+      await w.waitFor(()=>!!quest(w,bot,'moonspore_welcome'),5000,'Accept the refuge introduction');
+      check(quest(w,bot,'moonspore_welcome').counts.length===3,'The introductory quest has three NPC objectives');
+      for(const [kind,material] of [['glowcapgrazer','glowcap'],['silkwing','moon_silk'],['rootlurker','root_heart'],['lanternwraith','wraith_lantern']]){
+        const enemy=w.snapshot.slimes.find(s=>s.kind===kind && s.zone===16 && !s.dead);
+        const before=totalXp(w.player(bot));
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>w.snapshot.drops.some(d=>d.zone===16 && d.item===material),5000,`${material} drop`);
+        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} pays its rolled-level XP`);
+        check(w.snapshot.drops.some(d=>d.zone===16 && d.item===material),`${kind} drops ${material}`);
+      }
+      await w.debug(bot,{op:'quest',id:'moonspore_wraiths',action:'finish'});
+      await w.debug(bot,{op:'quest',id:'moonspore_silkwings',action:'finish'});
+      await w.debug(bot,{op:'quest',id:'moonspore_roots',action:'finish'});
+      for(const [id,kind,giver,reward,material] of [
+        ['moonspore_mireheart','mireheart','moonspore_scholar','accessory_amber_l60_blue','mireheart_seed'],
+        ['moonspore_widow','silverwidow','moonspore_ranger','necklace_moonstone_l60_blue','widow_silk'],
+        ['moonspore_bloom','nightbloom','moonspore_seer','pants_wayfarer_l60_blue','nightbloom_petal']]){
+        const q=area.quests.find(q=>q.id===id);
+        check(q.group && q.rewardItem===reward && q.objectives[0].target===kind,`${id} has its own group quest and level-60 blue reward`);
+        await kit.teleport(w,bot,{npc:giver});
+        await kit.talkTo(w,bot,giver,`quest:accept:${id}`);
+        await w.waitFor(()=>!!quest(w,bot,id),5000,`Accept ${id}`);
+        const enemy=w.snapshot.slimes.find(s=>s.kind===kind && s.zone===16 && !s.dead);
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>quest(w,bot,id).counts[0]===1,5000,`Credit ${id}`);
+        check(w.snapshot.drops.some(d=>d.zone===16 && d.item===material),`${kind} drops its named material`);
+        check(w.snapshot.drops.some(d=>d.zone===16 && kit.items.some(i=>i.id===d.item && i.rarity==='uncommon' && i.requiredLevel>=55)),`${kind} guarantees level-appropriate green gear`);
+        await kit.teleport(w,bot,{npc:giver});
+        await kit.talkTo(w,bot,giver,`quest:claim:${id}`);
+        await w.waitFor(()=>quest(w,bot,id).claimed,5000,`Claim ${id}`);
+        check(w.player(bot).inventory.some(i=>i.item===reward),`${id} awards the blue gear`);
+      }
+      await w.restart();
+      check(w.player(bot).zone===16 && ['moonspore_mireheart','moonspore_widow','moonspore_bloom'].every(id=>quest(w,bot,id)?.claimed),'Zone and elite claims persist through restart');
+      await kit.teleport(w,bot,{zone:16,x:14,y:112});
+      await w.action(bot,{type:'move',x:back.x,y:back.y});
+      await w.waitFor(()=>w.player(bot).zone===15,15000,'Return to the Orrery');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrives outside the Orrery gate');
     },
   },
 

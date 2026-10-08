@@ -72,6 +72,12 @@ REWARDS = {
     'orrery_matron': blue(55, 'accessory'),
     'orrery_engine': blue(55, 'necklace'),
     'orrery_survey': blue(55, 'pants'),
+    'moonspore_grazers': green(55, 'necklace'),
+    'moonspore_silkwings': green(55, 'pants'),
+    'moonspore_mireheart': blue(60, 'accessory'),
+    'moonspore_widow': blue(60, 'necklace'),
+    'moonspore_bloom': blue(60, 'pants'),
+    'moonspore_survey': blue(60, 'accessory'),
 }
 
 

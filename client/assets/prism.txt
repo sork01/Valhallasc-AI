@@ -19,27 +19,40 @@
     "idle": {
       "fps": 10,
       "n": 6,
-      "row": 0
+      "row": 0,
+      "editorStart": 0
     },
     "walk": {
       "fps": 10,
       "n": 8,
-      "row": 1
+      "row": 1,
+      "editorStart": 6
     },
     "attack": {
       "fps": 10,
       "n": 8,
-      "row": 2
+      "row": 2,
+      "editorStart": 14
     },
     "hurt": {
       "fps": 10,
       "n": 4,
-      "row": 3
+      "row": 3,
+      "editorStart": 22
     },
     "die": {
       "fps": 10,
       "n": 8,
-      "row": 4
+      "row": 4,
+      "editorStart": 26
     }
+  },
+  "sprites": {
+    "miragejackal": "dc01bbc3b401c2e0",
+    "shardscarab": "26e0e7e384e79757",
+    "glassharrier": "88e464f4208ca355",
+    "prismsentinel": "67fad38f7774636a",
+    "mirrorqueen": "f3f1a7abad63b61d",
+    "sunshard": "64ce62234b1a938e"
   }
 }

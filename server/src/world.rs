@@ -388,6 +388,14 @@ impl Slime {
             "chronoguard" => (130000., 1950., 1.9, 1.95),
             "pendulummatron" => (750000., 7600., 2.7, 2.15),
             "epochengine" => (1250000., 12000., 1.9, 2.6),
+            // Moonspore Canopy: an overgrown moonfall with three distinct group courts.
+            "glowcapgrazer" => (145000., 2100., 3.4, 1.45),
+            "silkwing" => (150000., 2250., 3.9, 1.35),
+            "rootlurker" => (175000., 2550., 2.2, 1.8),
+            "lanternwraith" => (165000., 2450., 2.7, 1.5),
+            "mireheart" => (900000., 9300., 2.0, 2.25),
+            "silverwidow" => (1100000., 10500., 3.0, 2.1),
+            "nightbloom" => (1700000., 14500., 1.8, 2.65),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -454,6 +462,13 @@ impl Slime {
             "chronoguard" => 53,
             "pendulummatron" => 54,
             "epochengine" => 55,
+            "glowcapgrazer" => 55,
+            "silkwing" => 56,
+            "rootlurker" => 57,
+            "lanternwraith" => 58,
+            "mireheart" => 58,
+            "silverwidow" => 59,
+            "nightbloom" => 60,
             _ => 2,
         }
     }
@@ -523,6 +538,13 @@ impl Slime {
             "chronoguard" => 2750,
             "pendulummatron" => 8000,
             "epochengine" => 12000,
+            "glowcapgrazer" => 3000,
+            "silkwing" => 3250,
+            "rootlurker" => 3500,
+            "lanternwraith" => 3800,
+            "mireheart" => 10000,
+            "silverwidow" => 11500,
+            "nightbloom" => 16000,
             _ => 0,
         }
     }
@@ -595,6 +617,13 @@ impl Slime {
             "chronoguard" => (0.95, 1.9, 6., 8.),
             "pendulummatron" => (0.9, 1.65, 8., 11.),
             "epochengine" => (1.15, 2.1, 6., 13.),
+            "glowcapgrazer" => (0.35, 1.0, 10., 9.),
+            "silkwing" => (0.45, 1.2, 11., 10.),
+            "rootlurker" => (0.85, 1.7, 6., 8.),
+            "lanternwraith" => (0.7, 1.9, 0., 11.),
+            "mireheart" => (1.0, 1.8, 6., 11.),
+            "silverwidow" => (0.7, 1.5, 9., 12.),
+            "nightbloom" => (1.2, 2.2, 5.5, 14.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -628,6 +657,7 @@ impl Slime {
             "siren" => (12.5, 9., "#ff9ae8", 0.9, 3, 0.3),
             "kraken" => (13., 11., "#5a4aa8", 1.3, 3, 0.26),
             "orbitseer" => (11., 11., "#a7e7ff", 0.85, 2, 0.16),
+            "lanternwraith" => (11., 9., "#c6ffb9", 0.9, 2, 0.2),
             _ => return None,
         };
         Some(Ranged {
@@ -668,6 +698,8 @@ impl Slime {
             "hvitserk" => 3.0,
             "sunshard" => 4.0,
             "epochengine" => 4.3,
+            "mireheart" => 3.5,
+            "nightbloom" => 4.5,
             _ => 0.,
         }
     }
@@ -2483,7 +2515,8 @@ impl World {
                 "big" => 0.,
                 "cinderlord" => 180.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
-                "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine" => 600.,
+                "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
+                | "mireheart" | "silverwidow" | "nightbloom" => 600.,
                 "oakhorn" => 180.,
                 _ => 22.,
             };
@@ -2874,6 +2907,9 @@ impl World {
                             | "sunshard"
                             | "pendulummatron"
                             | "epochengine"
+                            | "mireheart"
+                            | "silverwidow"
+                            | "nightbloom"
                     ) || is_boss(&s.kind)
                     {
                         s.max_hp
@@ -4754,7 +4790,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 16);
+        assert_eq!(zone_count(&w), 17);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -5357,7 +5393,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 16);
+        assert_eq!(zone_count(&w), 17);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -5614,6 +5650,9 @@ mod tests {
             "sunshard",
             "pendulummatron",
             "epochengine",
+            "mireheart",
+            "silverwidow",
+            "nightbloom",
         ] {
             let id = w.slimes.iter().position(|s| s.kind == kind).unwrap();
             let zone = w.slimes[id].zone;
@@ -5647,6 +5686,7 @@ mod tests {
             (13, "astral_survey"),
             (14, "prism_sunshard"),
             (15, "orrery_engine"),
+            (16, "moonspore_bloom"),
         ];
         for (zone, hard_id) in hard {
             let quests = &w.maps[zone].quests;
@@ -5792,6 +5832,53 @@ mod tests {
             let reward = item(q.reward_item.as_deref().unwrap()).unwrap();
             assert_eq!(reward.rarity, "rare");
             assert_eq!(reward.required_level, 55);
+        }
+    }
+
+    #[test]
+    fn moonspore_has_reciprocal_gates_seven_materials_and_three_elite_quests() {
+        let w = world();
+        let map = &w.maps[16];
+        assert_eq!(map.name, "The Moonspore Canopy");
+        assert_eq!(map.levels, Some([55, 60]));
+        assert_eq!(w.spawns.iter().filter(|s| s.zone == 16).count(), 43);
+        assert_eq!(map.quests.len(), 12);
+        assert!(map.portals.iter().any(|p| p.to == 15));
+        assert!(w.maps[15].portals.iter().any(|p| p.to == 16));
+        assert!(map.npcs.iter().any(|n| n.id == "travel_lamplight"));
+        for (kind, level, material_id, elite) in [
+            ("glowcapgrazer", 55, "glowcap", false),
+            ("silkwing", 56, "moon_silk", false),
+            ("rootlurker", 57, "root_heart", false),
+            ("lanternwraith", 58, "wraith_lantern", false),
+            ("mireheart", 58, "mireheart_seed", true),
+            ("silverwidow", 59, "widow_silk", true),
+            ("nightbloom", 60, "nightbloom_petal", true),
+        ] {
+            let enemy = w
+                .slimes
+                .iter()
+                .find(|s| s.kind == kind && s.zone == 16)
+                .unwrap();
+            assert_eq!(enemy.level, level);
+            assert_eq!(enemy.elite, elite);
+            assert_eq!(crate::items::material(kind), material_id);
+            assert!(item(material_id).is_some());
+            assert!(enemy.gold >= 3000);
+        }
+        for (id, kind, players) in [
+            ("moonspore_mireheart", "mireheart", 3),
+            ("moonspore_widow", "silverwidow", 3),
+            ("moonspore_bloom", "nightbloom", 5),
+        ] {
+            let q = map.quests.iter().find(|q| q.id == id).unwrap();
+            assert!(q.group);
+            assert_eq!(q.recommended_players, players);
+            assert_eq!(q.objectives[0].target, kind);
+            assert_eq!(q.reward_xp, xp_to_level(q.level) / 10);
+            let reward = item(q.reward_item.as_deref().unwrap()).unwrap();
+            assert_eq!(reward.rarity, "rare");
+            assert_eq!(reward.required_level, 60);
         }
     }
 
@@ -6145,8 +6232,8 @@ mod tests {
         let map = &w.maps[CITY];
         assert_eq!(
             zone_count(&w),
-            16,
-            "Skaldholm is the fifth map; the Orrery is the sixteenth public map"
+            17,
+            "Skaldholm is the fifth map; Moonspore is the seventeenth public map"
         );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
@@ -7851,7 +7938,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 16);
+        assert_eq!(zone_count(&w), 17);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));

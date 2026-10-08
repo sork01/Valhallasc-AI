@@ -56,7 +56,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   // ---- the data the client uses comes from the same file the server loads
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, levels: z.levels, players: z.players, min: z.min_level, rooms: (z.rooms || []).length,
     kinds: [...new Set(z.objects.map(o => o.kind))].sort().join(), portals: z.portals.map(p => `${p.id}>${p.to}${p.look ? ':' + p.look : ''}${p.after_clear ? ':after' : ''}`).join(), slimes: (z.slimes || []).length })));
-  check(zones.length === 16 && zones[5].name === 'The Undervault' && zones[5].theme === 'vault' && zones[5].players === 5 && zones[5].min === 20 && zones[5].slimes === 50, 'The client knows zone 5: a vault-themed dungeon for 5 players, level 20, fifty enemies');
+  check(zones.length === 17 && zones[5].name === 'The Undervault' && zones[5].theme === 'vault' && zones[5].players === 5 && zones[5].min === 20 && zones[5].slimes === 50, 'The client knows zone 5: a vault-themed dungeon for 5 players, level 20, fifty enemies');
   check(zones[5].rooms === 15 && ['vaultwall', 'pillar', 'brazier', 'torch', 'sarcophagus', 'bones'].every(k => zones[5].kinds.includes(k)), `The vault is ${zones[5].rooms} rooms and corridors of walls, pillars, braziers, torches, sarcophagi and bones`);
   check(zones[5].portals === 'undervault_stairs_up>4:stairs_up,undervault_exit>4:exit:after' && zones[4].portals.includes('undervault_stairs>5:stairs_down'), 'Stairs down from Skaldholm; stairs up and a closed exit in the dungeon');
   const stairs = await page.evaluate(() => Field._debug.zones[4].portals.find(p => p.id === 'undervault_stairs'));

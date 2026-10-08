@@ -316,7 +316,7 @@ mod spark_tests {
             .enumerate()
             .filter(|(_, m)| m.city.is_some())
             .collect();
-        assert_eq!(hubs.len(), 12);
+        assert_eq!(hubs.len(), 13);
         for (index, map) in hubs {
             let masters: Vec<_> = map
                 .npcs

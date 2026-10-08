@@ -133,7 +133,7 @@ async function call(name, args = {}) {
   const all = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => ({ name: t.querySelector('b').textContent, small: t.querySelector('small').textContent, disabled: t.disabled })));
   check(all.map(t => t.name).join() === data.zones.map(z => z.name).join() && all.every(t => !t.disabled), `Every visited zone is named again: ${all.map(t => t.name).join(', ')}`);
   const masters = await page.evaluate(() => Field._debug.zones.map((z, zone) => ({ zone, size: z.size, npcs: (z.npcs || []).filter(n => n.travelStop) })).filter(z => z.npcs.length));
-  check(masters.reduce((n, z) => n + z.npcs.length, 0) === 12 && masters.length === 11, 'The catalog includes all 12 travel masters across 11 zones');
+  check(masters.reduce((n, z) => n + z.npcs.length, 0) === 14 && masters.length === 13, 'The catalog includes all 14 travel masters across 13 zones');
   check(await page.locator('.wm-travel-badge:visible').count() === masters.length, 'Every visited travel-master zone has a world-sheet badge');
   for (const z of masters) {
     await page.locator(`.wm-tile[data-zone="${z.zone}"]`).click();

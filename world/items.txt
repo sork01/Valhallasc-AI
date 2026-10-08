@@ -26505,5 +26505,2366 @@
     "bonusStats": {
       "dexterity": 48
     }
+  },
+  {
+    "id": "glowcap",
+    "name": "Glowcap",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 340
+  },
+  {
+    "id": "moon_silk",
+    "name": "Moon Silk",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 370
+  },
+  {
+    "id": "root_heart",
+    "name": "Rootlurker Heartwood",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 410
+  },
+  {
+    "id": "wraith_lantern",
+    "name": "Lantern Wraith Ember",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 450
+  },
+  {
+    "id": "mireheart_seed",
+    "name": "Mireheart Seed",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1100
+  },
+  {
+    "id": "widow_silk",
+    "name": "Silver Widow Silk",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1350
+  },
+  {
+    "id": "nightbloom_petal",
+    "name": "Nightbloom Petal",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1900
+  },
+  {
+    "id": "warrior_armor_crimson_l60_gray",
+    "name": "Sporeworn Crimson Armor",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "warrior",
+    "variant": "crimson_l60_gray",
+    "art": "crimson",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 31.2
+  },
+  {
+    "id": "warrior_headgear_crimson_l60_gray",
+    "name": "Sporeworn Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "warrior",
+    "variant": "crimson_l60_gray",
+    "art": "crimson",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "warrior_shoulders_crimson_l60_gray",
+    "name": "Sporeworn Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "warrior",
+    "variant": "crimson_l60_gray",
+    "art": "crimson",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "warrior_gloves_crimson_l60_gray",
+    "name": "Sporeworn Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "warrior",
+    "variant": "crimson_l60_gray",
+    "art": "crimson",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "warrior_weapon_sword_l60_gray",
+    "name": "Sporeworn Iron Sword",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "warrior",
+    "variant": "sword_l60_gray",
+    "art": "sword",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 41.6,
+    "defense": 0.0
+  },
+  {
+    "id": "mage_armor_apprentice_l60_gray",
+    "name": "Sporeworn Apprentice Robes",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "mage",
+    "variant": "apprentice_l60_gray",
+    "art": "apprentice",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 20.8
+  },
+  {
+    "id": "mage_headgear_apprentice_l60_gray",
+    "name": "Sporeworn Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "mage",
+    "variant": "apprentice_l60_gray",
+    "art": "apprentice",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "mage_shoulders_apprentice_l60_gray",
+    "name": "Sporeworn Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "mage",
+    "variant": "apprentice_l60_gray",
+    "art": "apprentice",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "mage_gloves_apprentice_l60_gray",
+    "name": "Sporeworn Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "mage",
+    "variant": "apprentice_l60_gray",
+    "art": "apprentice",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "mage_weapon_ash_l60_gray",
+    "name": "Sporeworn Ash Staff",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "mage",
+    "variant": "ash_l60_gray",
+    "art": "ash",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 41.6,
+    "defense": 0.0
+  },
+  {
+    "id": "assassin_armor_shadow_l60_gray",
+    "name": "Sporeworn Shadow Armor",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "assassin",
+    "variant": "shadow_l60_gray",
+    "art": "shadow",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 20.8
+  },
+  {
+    "id": "assassin_headgear_shadow_l60_gray",
+    "name": "Sporeworn Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "assassin",
+    "variant": "shadow_l60_gray",
+    "art": "shadow",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "assassin_shoulders_shadow_l60_gray",
+    "name": "Sporeworn Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "assassin",
+    "variant": "shadow_l60_gray",
+    "art": "shadow",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "assassin_gloves_shadow_l60_gray",
+    "name": "Sporeworn Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "assassin",
+    "variant": "shadow_l60_gray",
+    "art": "shadow",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "assassin_weapon_daggers_l60_gray",
+    "name": "Sporeworn Steel Daggers",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "assassin",
+    "variant": "daggers_l60_gray",
+    "art": "daggers",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 41.6,
+    "defense": 0.0
+  },
+  {
+    "id": "priest_armor_pilgrim_l60_gray",
+    "name": "Sporeworn Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "priest",
+    "variant": "pilgrim_l60_gray",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 31.2
+  },
+  {
+    "id": "priest_headgear_pilgrim_l60_gray",
+    "name": "Sporeworn Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "priest",
+    "variant": "pilgrim_l60_gray",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l60_gray",
+    "name": "Sporeworn Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "priest",
+    "variant": "pilgrim_l60_gray",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "priest_gloves_pilgrim_l60_gray",
+    "name": "Sporeworn Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "priest",
+    "variant": "pilgrim_l60_gray",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "priest_weapon_mace_l60_gray",
+    "name": "Sporeworn Oak Mace",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "priest",
+    "variant": "mace_l60_gray",
+    "art": "mace",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 41.6,
+    "defense": 0.0
+  },
+  {
+    "id": "hunter_armor_scout_l60_gray",
+    "name": "Sporeworn Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "hunter",
+    "variant": "scout_l60_gray",
+    "art": "scout",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 31.2
+  },
+  {
+    "id": "hunter_headgear_scout_l60_gray",
+    "name": "Sporeworn Feathered Headband",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "hunter",
+    "variant": "scout_l60_gray",
+    "art": "scout",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "hunter_shoulders_scout_l60_gray",
+    "name": "Sporeworn Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "hunter",
+    "variant": "scout_l60_gray",
+    "art": "scout",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "hunter_gloves_scout_l60_gray",
+    "name": "Sporeworn Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "hunter",
+    "variant": "scout_l60_gray",
+    "art": "scout",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "hunter_weapon_shortbow_l60_gray",
+    "name": "Sporeworn Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "class": "hunter",
+    "variant": "shortbow_l60_gray",
+    "art": "shortbow",
+    "tint": {
+      "hue": 120,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 41.6,
+    "defense": 0.0
+  },
+  {
+    "id": "pants_wayfarer_l60_gray",
+    "name": "Sporeworn Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "variant": "wayfarer_l60_gray",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 140,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 10.4
+  },
+  {
+    "id": "necklace_moonstone_l60_gray",
+    "name": "Sporeworn Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "variant": "moonstone_l60_gray",
+    "art": "moonstone",
+    "tint": {
+      "hue": 140,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 20.8,
+    "defense": 0.0
+  },
+  {
+    "id": "accessory_amber_l60_gray",
+    "name": "Sporeworn Amber Ring",
+    "kind": "accessory",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "variant": "amber_l60_gray",
+    "art": "amber",
+    "tint": {
+      "hue": 140,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 15.6,
+    "defense": 0.0
+  },
+  {
+    "id": "warrior_armor_azure_l60_green",
+    "name": "Moonwoven Azure Armor",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "warrior",
+    "variant": "azure_l60_green",
+    "art": "azure",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 7.8,
+    "defense": 31.2
+  },
+  {
+    "id": "warrior_headgear_azure_l60_green",
+    "name": "Moonwoven Azure Winged Helm",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "warrior",
+    "variant": "azure_l60_green",
+    "art": "azure",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "warrior_shoulders_azure_l60_green",
+    "name": "Moonwoven Azure Winged Pauldrons",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "warrior",
+    "variant": "azure_l60_green",
+    "art": "azure",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "warrior_gloves_azure_l60_green",
+    "name": "Moonwoven Azure Gauntlets",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "warrior",
+    "variant": "azure_l60_green",
+    "art": "azure",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "warrior_weapon_royal_l60_green",
+    "name": "Moonwoven Royal Sword",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "warrior",
+    "variant": "royal_l60_green",
+    "art": "royal",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 41.6,
+    "defense": 10.4
+  },
+  {
+    "id": "mage_armor_runic_l60_green",
+    "name": "Moonwoven Runic Robes",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "mage",
+    "variant": "runic_l60_green",
+    "art": "runic",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 5.2,
+    "defense": 20.8
+  },
+  {
+    "id": "mage_headgear_runic_l60_green",
+    "name": "Moonwoven Runic Archmage Hat",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "mage",
+    "variant": "runic_l60_green",
+    "art": "runic",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "mage_shoulders_runic_l60_green",
+    "name": "Moonwoven Runic Pauldrons",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "mage",
+    "variant": "runic_l60_green",
+    "art": "runic",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "mage_gloves_runic_l60_green",
+    "name": "Moonwoven Runic Gloves",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "mage",
+    "variant": "runic_l60_green",
+    "art": "runic",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "mage_weapon_crystal_l60_green",
+    "name": "Moonwoven Crystal Staff",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "mage",
+    "variant": "crystal_l60_green",
+    "art": "crystal",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 41.6,
+    "defense": 10.4
+  },
+  {
+    "id": "assassin_armor_moon_l60_green",
+    "name": "Moonwoven Moon Armor",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "assassin",
+    "variant": "moon_l60_green",
+    "art": "moon",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 5.2,
+    "defense": 20.8
+  },
+  {
+    "id": "assassin_headgear_moon_l60_green",
+    "name": "Moonwoven Moonveil Circlet",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "assassin",
+    "variant": "moon_l60_green",
+    "art": "moon",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "assassin_shoulders_moon_l60_green",
+    "name": "Moonwoven Moonveil Crescents",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "assassin",
+    "variant": "moon_l60_green",
+    "art": "moon",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "assassin_gloves_moon_l60_green",
+    "name": "Moonwoven Moonveil Gauntlets",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "assassin",
+    "variant": "moon_l60_green",
+    "art": "moon",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "assassin_weapon_moonfang_l60_green",
+    "name": "Moonwoven Moonfang Daggers",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "assassin",
+    "variant": "moonfang_l60_green",
+    "art": "moonfang",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 41.6,
+    "defense": 10.4
+  },
+  {
+    "id": "priest_armor_dawn_l60_green",
+    "name": "Moonwoven Dawnweave Vestments",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "priest",
+    "variant": "dawn_l60_green",
+    "art": "dawn",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 7.8,
+    "defense": 31.2
+  },
+  {
+    "id": "priest_headgear_dawn_l60_green",
+    "name": "Moonwoven Sunburst Diadem",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "priest",
+    "variant": "dawn_l60_green",
+    "art": "dawn",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "priest_shoulders_dawn_l60_green",
+    "name": "Moonwoven Sunray Pauldrons",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "priest",
+    "variant": "dawn_l60_green",
+    "art": "dawn",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "priest_gloves_dawn_l60_green",
+    "name": "Moonwoven Dawnweave Gloves",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "priest",
+    "variant": "dawn_l60_green",
+    "art": "dawn",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "priest_weapon_sunmace_l60_green",
+    "name": "Moonwoven Sunbreaker Mace",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "priest",
+    "variant": "sunmace_l60_green",
+    "art": "sunmace",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 41.6,
+    "defense": 10.4
+  },
+  {
+    "id": "hunter_armor_warden_l60_green",
+    "name": "Moonwoven Wildwarden Coat",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "hunter",
+    "variant": "warden_l60_green",
+    "art": "warden",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 7.8,
+    "defense": 31.2
+  },
+  {
+    "id": "hunter_headgear_warden_l60_green",
+    "name": "Moonwoven Wolfhood",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "hunter",
+    "variant": "warden_l60_green",
+    "art": "warden",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "hunter_shoulders_warden_l60_green",
+    "name": "Moonwoven Wildwarden Pauldrons",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "hunter",
+    "variant": "warden_l60_green",
+    "art": "warden",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "hunter_gloves_warden_l60_green",
+    "name": "Moonwoven Wildwarden Gauntlets",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "hunter",
+    "variant": "warden_l60_green",
+    "art": "warden",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "hunter_weapon_wardenbow_l60_green",
+    "name": "Moonwoven Wildwarden Longbow",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "class": "hunter",
+    "variant": "wardenbow_l60_green",
+    "art": "wardenbow",
+    "tint": {
+      "hue": 120,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 41.6,
+    "defense": 10.4
+  },
+  {
+    "id": "pants_wayfarer_l60_green",
+    "name": "Moonwoven Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "variant": "wayfarer_l60_green",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 140,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.6,
+    "defense": 10.4
+  },
+  {
+    "id": "necklace_moonstone_l60_green",
+    "name": "Moonwoven Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "variant": "moonstone_l60_green",
+    "art": "moonstone",
+    "tint": {
+      "hue": 140,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 20.8,
+    "defense": 5.2
+  },
+  {
+    "id": "accessory_amber_l60_green",
+    "name": "Moonwoven Amber Ring",
+    "kind": "accessory",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "variant": "amber_l60_green",
+    "art": "amber",
+    "tint": {
+      "hue": 140,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 15.6,
+    "defense": 3.9
+  },
+  {
+    "id": "warrior_armor_crimson_l60_blue",
+    "name": "Nightbloom Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "warrior",
+    "variant": "crimson_l60_blue",
+    "art": "crimson",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 9.2,
+    "defense": 36.7,
+    "bonusStats": {
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "warrior_headgear_crimson_l60_blue",
+    "name": "Nightbloom Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "warrior",
+    "variant": "crimson_l60_blue",
+    "art": "crimson",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "strength": 55
+    }
+  },
+  {
+    "id": "warrior_shoulders_crimson_l60_blue",
+    "name": "Nightbloom Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "warrior",
+    "variant": "crimson_l60_blue",
+    "art": "crimson",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "warrior_gloves_crimson_l60_blue",
+    "name": "Nightbloom Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "warrior",
+    "variant": "crimson_l60_blue",
+    "art": "crimson",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "warrior_weapon_sword_l60_blue",
+    "name": "Nightbloom Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "warrior",
+    "variant": "sword_l60_blue",
+    "art": "sword",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 48.9,
+    "defense": 12.2,
+    "bonusStats": {
+      "strength": 55
+    }
+  },
+  {
+    "id": "mage_armor_apprentice_l60_blue",
+    "name": "Nightbloom Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "mage",
+    "variant": "apprentice_l60_blue",
+    "art": "apprentice",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 6.1,
+    "defense": 24.4,
+    "bonusStats": {
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "mage_headgear_apprentice_l60_blue",
+    "name": "Nightbloom Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "mage",
+    "variant": "apprentice_l60_blue",
+    "art": "apprentice",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "intellect": 55
+    }
+  },
+  {
+    "id": "mage_shoulders_apprentice_l60_blue",
+    "name": "Nightbloom Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "mage",
+    "variant": "apprentice_l60_blue",
+    "art": "apprentice",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "mage_gloves_apprentice_l60_blue",
+    "name": "Nightbloom Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "mage",
+    "variant": "apprentice_l60_blue",
+    "art": "apprentice",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "intellect": 55
+    }
+  },
+  {
+    "id": "mage_weapon_ash_l60_blue",
+    "name": "Nightbloom Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "mage",
+    "variant": "ash_l60_blue",
+    "art": "ash",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 48.9,
+    "defense": 12.2,
+    "bonusStats": {
+      "agility": 55
+    }
+  },
+  {
+    "id": "assassin_armor_shadow_l60_blue",
+    "name": "Nightbloom Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "assassin",
+    "variant": "shadow_l60_blue",
+    "art": "shadow",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 6.1,
+    "defense": 24.4,
+    "bonusStats": {
+      "strength": 55
+    }
+  },
+  {
+    "id": "assassin_headgear_shadow_l60_blue",
+    "name": "Nightbloom Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "assassin",
+    "variant": "shadow_l60_blue",
+    "art": "shadow",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "agility": 55
+    }
+  },
+  {
+    "id": "assassin_shoulders_shadow_l60_blue",
+    "name": "Nightbloom Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "assassin",
+    "variant": "shadow_l60_blue",
+    "art": "shadow",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "strength": 55
+    }
+  },
+  {
+    "id": "assassin_gloves_shadow_l60_blue",
+    "name": "Nightbloom Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "assassin",
+    "variant": "shadow_l60_blue",
+    "art": "shadow",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "stamina": 55
+    }
+  },
+  {
+    "id": "assassin_weapon_daggers_l60_blue",
+    "name": "Nightbloom Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "assassin",
+    "variant": "daggers_l60_blue",
+    "art": "daggers",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 48.9,
+    "defense": 12.2,
+    "bonusStats": {
+      "agility": 55
+    }
+  },
+  {
+    "id": "priest_armor_pilgrim_l60_blue",
+    "name": "Nightbloom Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "priest",
+    "variant": "pilgrim_l60_blue",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 9.2,
+    "defense": 36.7,
+    "bonusStats": {
+      "stamina": 55
+    }
+  },
+  {
+    "id": "priest_headgear_pilgrim_l60_blue",
+    "name": "Nightbloom Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "priest",
+    "variant": "pilgrim_l60_blue",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "stamina": 55
+    }
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l60_blue",
+    "name": "Nightbloom Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "priest",
+    "variant": "pilgrim_l60_blue",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "agility": 55
+    }
+  },
+  {
+    "id": "priest_gloves_pilgrim_l60_blue",
+    "name": "Nightbloom Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "priest",
+    "variant": "pilgrim_l60_blue",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "priest_weapon_mace_l60_blue",
+    "name": "Nightbloom Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "priest",
+    "variant": "mace_l60_blue",
+    "art": "mace",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 48.9,
+    "defense": 12.2,
+    "bonusStats": {
+      "stamina": 55
+    }
+  },
+  {
+    "id": "hunter_armor_scout_l60_blue",
+    "name": "Nightbloom Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "hunter",
+    "variant": "scout_l60_blue",
+    "art": "scout",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 9.2,
+    "defense": 36.7,
+    "bonusStats": {
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "hunter_headgear_scout_l60_blue",
+    "name": "Nightbloom Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "hunter",
+    "variant": "scout_l60_blue",
+    "art": "scout",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "hunter_shoulders_scout_l60_blue",
+    "name": "Nightbloom Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "hunter",
+    "variant": "scout_l60_blue",
+    "art": "scout",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "strength": 55
+    }
+  },
+  {
+    "id": "hunter_gloves_scout_l60_blue",
+    "name": "Nightbloom Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "hunter",
+    "variant": "scout_l60_blue",
+    "art": "scout",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "hunter_weapon_shortbow_l60_blue",
+    "name": "Nightbloom Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "class": "hunter",
+    "variant": "shortbow_l60_blue",
+    "art": "shortbow",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 48.9,
+    "defense": 12.2,
+    "bonusStats": {
+      "strength": 55
+    }
+  },
+  {
+    "id": "pants_wayfarer_l60_blue",
+    "name": "Nightbloom Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "variant": "wayfarer_l60_blue",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 170,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.1,
+    "defense": 12.2,
+    "bonusStats": {
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "necklace_moonstone_l60_blue",
+    "name": "Nightbloom Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "variant": "moonstone_l60_blue",
+    "art": "moonstone",
+    "tint": {
+      "hue": 170,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 24.4,
+    "defense": 6.1,
+    "bonusStats": {
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "accessory_amber_l60_blue",
+    "name": "Nightbloom Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "variant": "amber_l60_blue",
+    "art": "amber",
+    "tint": {
+      "hue": 170,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 18.3,
+    "defense": 4.6,
+    "bonusStats": {
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "warrior_armor_azure_l60_purple",
+    "name": "Mooncrowned Azure Armor",
+    "kind": "armor",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "warrior",
+    "variant": "azure_l60_purple",
+    "art": "azure",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.1,
+    "bonusStats": {
+      "stamina": 55,
+      "agility": 55
+    }
+  },
+  {
+    "id": "warrior_headgear_azure_l60_purple",
+    "name": "Mooncrowned Azure Winged Helm",
+    "kind": "headgear",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "warrior",
+    "variant": "azure_l60_purple",
+    "art": "azure",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "strength": 55,
+      "agility": 55
+    }
+  },
+  {
+    "id": "warrior_shoulders_azure_l60_purple",
+    "name": "Mooncrowned Azure Winged Pauldrons",
+    "kind": "shoulders",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "warrior",
+    "variant": "azure_l60_purple",
+    "art": "azure",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "dexterity": 55,
+      "agility": 55
+    }
+  },
+  {
+    "id": "warrior_gloves_azure_l60_purple",
+    "name": "Mooncrowned Azure Gauntlets",
+    "kind": "gloves",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "warrior",
+    "variant": "azure_l60_purple",
+    "art": "azure",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "strength": 55,
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "warrior_weapon_royal_l60_purple",
+    "name": "Mooncrowned Royal Sword",
+    "kind": "weapon",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "warrior",
+    "variant": "royal_l60_purple",
+    "art": "royal",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 57.4,
+    "defense": 14.4,
+    "bonusStats": {
+      "dexterity": 55,
+      "agility": 55
+    }
+  },
+  {
+    "id": "mage_armor_runic_l60_purple",
+    "name": "Mooncrowned Runic Robes",
+    "kind": "armor",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "mage",
+    "variant": "runic_l60_purple",
+    "art": "runic",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 7.2,
+    "defense": 28.7,
+    "bonusStats": {
+      "intellect": 55,
+      "stamina": 55
+    }
+  },
+  {
+    "id": "mage_headgear_runic_l60_purple",
+    "name": "Mooncrowned Runic Archmage Hat",
+    "kind": "headgear",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "mage",
+    "variant": "runic_l60_purple",
+    "art": "runic",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "stamina": 55,
+      "agility": 55
+    }
+  },
+  {
+    "id": "mage_shoulders_runic_l60_purple",
+    "name": "Mooncrowned Runic Pauldrons",
+    "kind": "shoulders",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "mage",
+    "variant": "runic_l60_purple",
+    "art": "runic",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "intellect": 55,
+      "agility": 55
+    }
+  },
+  {
+    "id": "mage_gloves_runic_l60_purple",
+    "name": "Mooncrowned Runic Gloves",
+    "kind": "gloves",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "mage",
+    "variant": "runic_l60_purple",
+    "art": "runic",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "intellect": 55,
+      "stamina": 55
+    }
+  },
+  {
+    "id": "mage_weapon_crystal_l60_purple",
+    "name": "Mooncrowned Crystal Staff",
+    "kind": "weapon",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "mage",
+    "variant": "crystal_l60_purple",
+    "art": "crystal",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 57.4,
+    "defense": 14.4,
+    "bonusStats": {
+      "agility": 55,
+      "intellect": 55
+    }
+  },
+  {
+    "id": "assassin_armor_moon_l60_purple",
+    "name": "Mooncrowned Moon Armor",
+    "kind": "armor",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "assassin",
+    "variant": "moon_l60_purple",
+    "art": "moon",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 7.2,
+    "defense": 28.7,
+    "bonusStats": {
+      "stamina": 55,
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "assassin_headgear_moon_l60_purple",
+    "name": "Mooncrowned Moonveil Circlet",
+    "kind": "headgear",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "assassin",
+    "variant": "moon_l60_purple",
+    "art": "moon",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "dexterity": 55,
+      "stamina": 55
+    }
+  },
+  {
+    "id": "assassin_shoulders_moon_l60_purple",
+    "name": "Mooncrowned Moonveil Crescents",
+    "kind": "shoulders",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "assassin",
+    "variant": "moon_l60_purple",
+    "art": "moon",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "agility": 55,
+      "stamina": 55
+    }
+  },
+  {
+    "id": "assassin_gloves_moon_l60_purple",
+    "name": "Mooncrowned Moonveil Gauntlets",
+    "kind": "gloves",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "assassin",
+    "variant": "moon_l60_purple",
+    "art": "moon",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "dexterity": 55,
+      "stamina": 55
+    }
+  },
+  {
+    "id": "assassin_weapon_moonfang_l60_purple",
+    "name": "Mooncrowned Moonfang Daggers",
+    "kind": "weapon",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "assassin",
+    "variant": "moonfang_l60_purple",
+    "art": "moonfang",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 57.4,
+    "defense": 14.4,
+    "bonusStats": {
+      "dexterity": 55,
+      "stamina": 55
+    }
+  },
+  {
+    "id": "priest_armor_dawn_l60_purple",
+    "name": "Mooncrowned Dawnweave Vestments",
+    "kind": "armor",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "priest",
+    "variant": "dawn_l60_purple",
+    "art": "dawn",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.1,
+    "bonusStats": {
+      "agility": 55,
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "priest_headgear_dawn_l60_purple",
+    "name": "Mooncrowned Sunburst Diadem",
+    "kind": "headgear",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "priest",
+    "variant": "dawn_l60_purple",
+    "art": "dawn",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "dexterity": 55,
+      "intellect": 55
+    }
+  },
+  {
+    "id": "priest_shoulders_dawn_l60_purple",
+    "name": "Mooncrowned Sunray Pauldrons",
+    "kind": "shoulders",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "priest",
+    "variant": "dawn_l60_purple",
+    "art": "dawn",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "stamina": 55,
+      "intellect": 55
+    }
+  },
+  {
+    "id": "priest_gloves_dawn_l60_purple",
+    "name": "Mooncrowned Dawnweave Gloves",
+    "kind": "gloves",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "priest",
+    "variant": "dawn_l60_purple",
+    "art": "dawn",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "stamina": 55,
+      "agility": 55
+    }
+  },
+  {
+    "id": "priest_weapon_sunmace_l60_purple",
+    "name": "Mooncrowned Sunbreaker Mace",
+    "kind": "weapon",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "priest",
+    "variant": "sunmace_l60_purple",
+    "art": "sunmace",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 57.4,
+    "defense": 14.4,
+    "bonusStats": {
+      "agility": 55,
+      "stamina": 55
+    }
+  },
+  {
+    "id": "hunter_armor_warden_l60_purple",
+    "name": "Mooncrowned Wildwarden Coat",
+    "kind": "armor",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "hunter",
+    "variant": "warden_l60_purple",
+    "art": "warden",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.1,
+    "bonusStats": {
+      "stamina": 55,
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "hunter_headgear_warden_l60_purple",
+    "name": "Mooncrowned Wolfhood",
+    "kind": "headgear",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "hunter",
+    "variant": "warden_l60_purple",
+    "art": "warden",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "strength": 55,
+      "stamina": 55
+    }
+  },
+  {
+    "id": "hunter_shoulders_warden_l60_purple",
+    "name": "Mooncrowned Wildwarden Pauldrons",
+    "kind": "shoulders",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "hunter",
+    "variant": "warden_l60_purple",
+    "art": "warden",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "stamina": 55,
+      "agility": 55
+    }
+  },
+  {
+    "id": "hunter_gloves_warden_l60_purple",
+    "name": "Mooncrowned Wildwarden Gauntlets",
+    "kind": "gloves",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "hunter",
+    "variant": "warden_l60_purple",
+    "art": "warden",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "dexterity": 55,
+      "stamina": 55
+    }
+  },
+  {
+    "id": "hunter_weapon_wardenbow_l60_purple",
+    "name": "Mooncrowned Wildwarden Longbow",
+    "kind": "weapon",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "class": "hunter",
+    "variant": "wardenbow_l60_purple",
+    "art": "wardenbow",
+    "tint": {
+      "hue": 180,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 57.4,
+    "defense": 14.4,
+    "bonusStats": {
+      "stamina": 55,
+      "agility": 55
+    }
+  },
+  {
+    "id": "pants_wayfarer_l60_purple",
+    "name": "Mooncrowned Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "variant": "wayfarer_l60_purple",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 200,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.4,
+    "bonusStats": {
+      "stamina": 55,
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "necklace_moonstone_l60_purple",
+    "name": "Mooncrowned Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "variant": "moonstone_l60_purple",
+    "art": "moonstone",
+    "tint": {
+      "hue": 200,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 28.7,
+    "defense": 7.2,
+    "bonusStats": {
+      "stamina": 55,
+      "dexterity": 55
+    }
+  },
+  {
+    "id": "accessory_amber_l60_purple",
+    "name": "Mooncrowned Amber Ring",
+    "kind": "accessory",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "variant": "amber_l60_purple",
+    "art": "amber",
+    "tint": {
+      "hue": 200,
+      "saturate": 1.2,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 21.5,
+    "defense": 5.4,
+    "bonusStats": {
+      "dexterity": 55,
+      "stamina": 55
+    }
   }
 ]

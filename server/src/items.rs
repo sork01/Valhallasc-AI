@@ -18,7 +18,7 @@ pub struct Item {
     pub name: String,
     pub kind: String,
     pub rarity: String,
-    /// Character level needed to wear the piece (1 or a five-level step through 50). Wearing it earlier is refused, and
+    /// Character level needed to wear the piece (1 or a five-level step through 60). Wearing it earlier is refused, and
     /// a piece worn above the character's level (a level lost to a death) adds nothing until the level is back.
     #[serde(default = "first_level", rename = "requiredLevel")]
     pub required_level: u32,
@@ -181,6 +181,13 @@ pub fn material(kind: &str) -> &'static str {
         "chronoguard" => "chronoguard_plate",
         "pendulummatron" => "matron_pendulum",
         "epochengine" => "epoch_core",
+        "glowcapgrazer" => "glowcap",
+        "silkwing" => "moon_silk",
+        "rootlurker" => "root_heart",
+        "lanternwraith" => "wraith_lantern",
+        "mireheart" => "mireheart_seed",
+        "silverwidow" => "widow_silk",
+        "nightbloom" => "nightbloom_petal",
         _ => "slime_gel",
     }
 }
@@ -236,6 +243,9 @@ pub fn is_elite(kind: &str) -> bool {
             | "sunshard"
             | "pendulummatron"
             | "epochengine"
+            | "mireheart"
+            | "silverwidow"
+            | "nightbloom"
     ) || is_vault_enemy(kind)
 }
 /// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.
@@ -373,7 +383,7 @@ pub fn equipment_of_rarity(rarity: &str, level: u32, choice: f64) -> Option<&'st
                 && !i.starter
                 && i.source.is_none()
                 && i.required_level <= limit
-                && (level < 50 || i.required_level >= 50)
+                && (level < 50 || i.required_level >= (if level >= 55 { 55 } else { 50 }))
         })
         .collect();
     pool.get((choice * pool.len() as f64) as usize).copied()
@@ -851,6 +861,7 @@ mod tests {
                         45 => 35,
                         50 => 40,
                         55 => 48,
+                        60 => 55,
                         level => panic!("unexpected gear level {level}"),
                     };
                     assert_eq!(value, expected, "{}", i.id);
@@ -1356,7 +1367,7 @@ mod tests {
             Class::Priest,
             Class::Hunter,
         ];
-        for level in std::iter::once(1).chain((5..=55).step_by(5)) {
+        for level in std::iter::once(1).chain((5..=60).step_by(5)) {
             for rarity in ["common", "uncommon", "rare", "epic"] {
                 let purple_level = level % 10 == 0;
                 for class in classes {
@@ -1506,6 +1517,43 @@ mod tests {
             );
         }
     }
+    #[test]
+    fn moonspore_drop_pool_uses_only_level_fifty_five_and_sixty_gear() {
+        for rarity in ["common", "uncommon", "rare", "epic"] {
+            let pool: Vec<_> = ITEMS
+                .iter()
+                .filter(|i| {
+                    is_gear(i)
+                        && i.rarity == rarity
+                        && !i.starter
+                        && i.source.is_none()
+                        && (55..=60).contains(&i.required_level)
+                })
+                .collect();
+            assert!(!pool.is_empty(), "{rarity} has level 55/60 gear");
+            for enemy_level in [55, 58, 60] {
+                let drops: std::collections::BTreeSet<_> = (0..pool.len())
+                    .map(|n| {
+                        equipment_of_rarity(
+                            rarity,
+                            enemy_level,
+                            (n as f64 + 0.5) / pool.len() as f64,
+                        )
+                        .unwrap()
+                        .id
+                        .as_str()
+                    })
+                    .collect();
+                let expected: std::collections::BTreeSet<_> = pool
+                    .iter()
+                    .filter(|i| i.required_level <= max_drop_level(enemy_level))
+                    .map(|i| i.id.as_str())
+                    .collect();
+                assert_eq!(drops, expected, "{rarity} at enemy level {enemy_level}");
+            }
+        }
+    }
+
     #[test]
     fn level_25_through_50_gear_enforces_requirements_updates_look_stats_and_survives_saves() {
         for i in ITEMS.iter().filter(|i| is_gear(i) && i.required_level > 20) {
@@ -1664,7 +1712,7 @@ mod tests {
                 continue;
             }
             assert!(
-                i.required_level == 1 || (i.required_level <= 55 && i.required_level % 5 == 0),
+                i.required_level == 1 || (i.required_level <= 60 && i.required_level % 5 == 0),
                 "{} needs level {}",
                 i.id,
                 i.required_level
@@ -1677,7 +1725,7 @@ mod tests {
         assert_eq!(
             used.into_iter().collect::<Vec<_>>(),
             std::iter::once(1)
-                .chain((5..=55).step_by(5))
+                .chain((5..=60).step_by(5))
                 .collect::<Vec<_>>()
         );
     }

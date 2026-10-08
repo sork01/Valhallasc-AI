@@ -61,7 +61,7 @@ fn cathedral_three_wings_have_exact_levels_four_unique_bosses_and_distinct_floor
     assert_eq!(bosses.len(), 12);
     assert_ne!(raw["zones"][9]["rooms"], raw["zones"][10]["rooms"]);
     assert_ne!(raw["zones"][10]["rooms"], raw["zones"][11]["rooms"]);
-    assert_eq!(w.maps.iter().filter(|m| m.template.is_none()).count(), 16);
+    assert_eq!(w.maps.iter().filter(|m| m.template.is_none()).count(), 17);
 }
 
 #[test]

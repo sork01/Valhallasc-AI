@@ -30,6 +30,7 @@ class QuestGearRewards(unittest.TestCase):
             'generate_crags.py', 'generate_rimeveil.py', 'generate_gloamfen.py',
             'skaldholm_content.py', 'wyrd_content.py', 'sky_content.py',
             'deep_content.py', 'generate_nacrehold.py', 'generate_astralhollow.py',
+            'generate_prismwaste.py', 'generate_orrery.py', 'generate_moonspore.py',
         ]:
             with self.subTest(generator=source):
                 code = (ROOT / 'scripts' / source).read_text()
