@@ -180,8 +180,11 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
           crags: Object.fromEntries(Field.cragSprites.meta.kinds.map(k => [k, [Field.cragSprites.img[k].naturalWidth, Field.cragSprites.img[k].naturalHeight]])),
         }));
         check(sizes.beetle.join() === '576,320', 'the Ironhide atlas is 576x320');
-        check(Object.values(sizes.crags).length === 5 && Object.values(sizes.crags).every(s => s.join() === '768,480'), 'all five Crags monster atlases are 768x480');
-        check(await page.evaluate(() => Field.slimes.length > 0 && Field.cragSprites.meta.kinds.join() === 'wisp,spider,wraith,golem,cinderlord'), 'the world lists its monsters');
+        // The Crags atlases on disk are the expectation: every crags_<kind>.png is listed and loaded, none is missing.
+        const onDisk = fs.readdirSync(path.join(root, 'client/assets')).flatMap(f => /^crags_(.+)\.png$/.exec(f)?.[1] ?? []).sort();
+        check(onDisk.length >= 5 && Object.keys(sizes.crags).sort().join() === onDisk.join(), `every Crags monster atlas on disk is listed by the metadata (${onDisk.join(', ')})`);
+        check(Object.values(sizes.crags).every(s => s.join() === '768,480'), `all ${onDisk.length} Crags monster atlases are 768x480`);
+        check(await page.evaluate(() => Field.slimes.length > 0 && ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'].every(k => Field.cragSprites.meta.kinds.includes(k))), 'the world lists its monsters');
       }
       check(page.errors.length === 0, `${cls}: no page errors ${page.errors.join('; ')}`);
       await page.context().close();
