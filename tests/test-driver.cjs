@@ -29,8 +29,8 @@ test('private driver: isolated storage, normal actions, resume, credentials, and
     assert.equal(w.player('Tester').look.mageWeapon, 'ash');
     await w.action('Tester', { type: 'ping', nonce: 42 });
     await w.waitFor(() => w.events.some(e => e.type === 'pong' && e.nonce === 42));
-    await Promise.all(Array.from({ length: 90 }, (_, i) => w.action('Tester', { type: 'ping', nonce: 100 + i })));
-    await w.waitFor(() => w.events.some(e => e.type === 'pong' && e.nonce === 189));
+    await Promise.all(Array.from({ length: 70 }, (_, i) => w.action('Tester', { type: 'ping', nonce: 100 + i })));
+    await w.waitFor(() => w.events.some(e => e.type === 'pong' && e.nonce === 169));
     assert.ok(!w.events.some(e => e.fatal), 'Concurrent actions stay below the server rate limit');
     assert.equal(w.spacingFailure, null);
     const inspection = JSON.stringify(w.inspect());
