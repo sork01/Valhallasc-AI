@@ -908,7 +908,7 @@
       if (remote.signature !== lookKey) {
         remote.signature = lookKey; const generation = spriteGeneration;
         if (remote.sprite && remote.sprite.constructor === classSprite(player.look)) remote.sprite.set(player.look);
-        else classSprite(player.look).load(player.look).then(sprite => {
+        else classSprite(player.look).load(player.look, { background: true }).then(sprite => {
           if (generation === spriteGeneration && remote.signature === lookKey) remote.sprite = sprite;
         }).catch(() => say('spriteError'));
       }

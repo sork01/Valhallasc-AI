@@ -7,12 +7,94 @@
   const ARMOR = { none: { name: 'Simple cloth', defense: 0 }, apprentice: { name: 'Apprentice robes', defense: 2 }, runic: { name: 'Runic vestments', defense: 5 } };
   const WEAPON = { none: { name: 'Empty hands', attack: 0 }, ash: { name: 'Ash staff', attack: 4 }, crystal: { name: 'Crystal staff', attack: 9 } };
   const sources = new Map();
-  const imageData = async url => {
-    const img = new Image(); img.src = url; await img.decode();
-    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
-    const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(img, 0, 0);
-    return g.getImageData(0, 0, c.width, c.height);
+  // ---- Loading ------------------------------------------------------------------------------------------------
+  // Decoding an atlas is main-thread work, so it is cut into slices of about SLICE_MS that yield to the page, and a
+  // load is either foreground (your own character: starts at once) or background (everyone else: one at a time, and
+  // only while no foreground load is running, so other players' art never delays yours).
+  const SLICE_MS = 6;
+  const yielders = [], channel = new MessageChannel();
+  channel.port1.onmessage = () => yielders.shift()?.();
+  const yieldMain = () => new Promise(resolve => { yielders.push(resolve); channel.port2.postMessage(0); });
+  let foreground = 0, backgroundChain = Promise.resolve();
+  const foregroundIdle = [];
+  const leaveForeground = () => { if (--foreground === 0) for (const wake of foregroundIdle.splice(0)) wake(); };
+  const whenForegroundIdle = () => foreground === 0 ? Promise.resolve() : new Promise(resolve => foregroundIdle.push(resolve));
+  // `work(slicer)` does the decoding. A background job can be promoted when your own character needs the same art.
+  function createJob(background, work) {
+    const job = { background, started: false };
+    let slicedAt = performance.now();
+    job.slicer = {
+      due: () => performance.now() - slicedAt > SLICE_MS,
+      yield: async () => { await yieldMain(); if (job.background) await whenForegroundIdle(); slicedAt = performance.now(); },
+    };
+    job.promise = new Promise((resolve, reject) => {
+      job.start = () => {
+        if (job.started) return;
+        job.started = true; slicedAt = performance.now();
+        if (!job.background) foreground++;
+        work(job.slicer, job).then(resolve, reject).finally(() => { if (!job.background) leaveForeground(); });
+      };
+    });
+    if (background) backgroundChain = backgroundChain.then(whenForegroundIdle).then(() => { job.start(); return job.promise.catch(() => {}); });
+    else job.start();
+    return job;
+  }
+  function promote(job) {
+    if (!job.background) return;
+    job.background = false;
+    if (job.started) foreground++; else job.start();
+  }
+  const bitmap = async url => {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Character sprite art could not be loaded: ' + url);
+    return createImageBitmap(await response.blob());
   };
+  // Scratch canvases: a frame is copied out one rectangle at a time, so no full-atlas readback ever happens.
+  const scratch = {};
+  const reader = (name, w, h) => {
+    const c = scratch[name] || (scratch[name] = document.createElement('canvas'));
+    if (c.width < w || c.height < h) { c.width = Math.max(c.width, w); c.height = Math.max(c.height, h); }
+    const g = c.ctx || (c.ctx = c.getContext('2d', { willReadFrequently: true }));
+    g.globalCompositeOperation = 'copy';
+    return (image, sx, sy, sw, sh) => { g.drawImage(image, sx, sy, sw, sh, 0, 0, sw, sh); return g.getImageData(0, 0, sw, sh).data; };
+  };
+  // Slow path for a set without a bounds sidecar (scripts/sprite_bounds.py): find the opaque box of one cell.
+  function scanBounds(pixels, fw, fh) {
+    const alpha = new Uint32Array(pixels.buffer, pixels.byteOffset, fw * fh);
+    let x0 = fw, y0 = fh, x1 = -1, y1 = -1;
+    for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+      if (alpha[y * fw + x] >>> 24 === 0) continue;
+      if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+    }
+    return x1 < 0 ? [0, 0, 0, 0] : [x0, y0, x1 - x0 + 1, y1 - y0 + 1];
+  }
+  const bytesOf = text => { const raw = atob(text), out = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i); return out; };
+  const loadImages = files => Promise.all([bitmap('assets/' + files.png), bitmap('assets/' + files.depth)]);
+  // Retain only occupied rectangles. `bounds` (4 bytes per frame, the sidecar's) tells which rectangle to copy.
+  async function decodePart(meta, bounds, images, slicer) {
+    const [fw, fh] = meta.frame, [color, depth] = images;
+    const readColor = reader('color', fw, fh), readDepth = reader('depth', fw, fh);
+    const frames = {};
+    let n = 0;
+    try {
+      for (const [clip, C] of Object.entries(meta.clips)) for (let dir = 0; dir < 8; dir++) for (let i = 0; i < C.n; i++, n++) {
+        const bx = i * fw, by = (C.row0 + dir) * fh;
+        let box = bounds ? [bounds[n * 4], bounds[n * 4 + 1], bounds[n * 4 + 2], bounds[n * 4 + 3]] : scanBounds(readColor(color, bx, by, fw, fh), fw, fh);
+        const [x, y, width, height] = box;
+        let pixels, z;
+        if (!width || !height) { pixels = new Uint8ClampedArray(0); z = new Uint16Array(0); box = [fw, fh, 0, 0]; }
+        else {
+          pixels = readColor(color, bx + x, by + y, width, height).slice();
+          const d = readDepth(depth, bx + x, by + y, width, height);
+          z = new Uint16Array(width * height);
+          for (let k = 0; k < z.length; k++) z[k] = d[k * 4] * 256 + d[k * 4 + 1];
+        }
+        frames[`${clip}/${dir}/${i}`] = { x: box[0], y: box[1], w: box[2], h: box[3], pixels, z };
+        if (slicer.due()) await slicer.yield();
+      }
+    } finally { color.close(); depth.close(); }
+    return frames;
+  }
   // Test mode (window.__valhallaTestSprites, set only by the automated tests): every class gets one tiny static figure
   // built in code, so a page loads without decoding the multi-megapixel atlases. Only the small metadata file is read,
   // so ramps, equipment names and clip counts stay the real ones. Each skin/hair/armour/weapon choice still changes pixels.
@@ -44,39 +126,43 @@
   // look asks for them: `source.ensure(part)` starts the load once and resolves when the frames are in `source.parts`.
   const GENERIC = { head: 'ironhide', shoulders: 'ironhide', gloves: 'duelist', pants: 'wayfarer', necklace: 'moonstone', accessory: 'amber' };
   const LAZY = new Set(Object.entries(GENERIC).map(([slot, variant]) => `${slot}_${variant}`));
-  // Retain only occupied rectangles; release the large decoded atlases.
-  async function decodePart(meta, files) {
-    const [fw, fh] = meta.frame;
-    const [color, depth] = await Promise.all([imageData('assets/' + files.png), imageData('assets/' + files.depth)]);
-    const frames = {};
-    for (const [clip, C] of Object.entries(meta.clips)) for (let dir = 0; dir < 8; dir++) for (let i = 0; i < C.n; i++) {
-      const bx = i * fw, by = (C.row0 + dir) * fh;
-      let x0 = fw, y0 = fh, x1 = -1, y1 = -1;
-      for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
-        if (!color.data[((by + y) * color.width + bx + x) * 4 + 3]) continue;
-        x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
-      }
-      const width = Math.max(0, x1 - x0 + 1), height = Math.max(0, y1 - y0 + 1);
-      const pixels = new Uint8ClampedArray(width * height * 4), z = new Uint16Array(width * height);
-      for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
-        const src = ((by + y0 + y) * color.width + bx + x0 + x) * 4, dst = (y * width + x) * 4;
-        pixels.set(color.data.subarray(src, src + 4), dst); z[dst / 4] = depth.data[src] * 256 + depth.data[src + 1];
-      }
-      frames[`${clip}/${dir}/${i}`] = { x: x0, y: y0, w: width, h: height, pixels, z };
-    }
-    return frames;
+  async function loadBounds(url, meta) {
+    try {
+      const response = await fetch(url.replace(/_sprites\.txt$/, '_bounds.txt'));
+      if (!response.ok) return {};
+      const sidecar = await response.json(), frames = Object.values(meta.clips).reduce((sum, C) => sum + C.n, 0) * 8;
+      return sidecar.version === 1 && sidecar.frames === frames ? sidecar.parts : {};
+    } catch (error) { return {}; }
   }
-  async function loadSource(url) {
+  async function loadSource(url, job) {
     const response = await fetch(url);
     if (!response.ok) throw new Error('Character sprite metadata could not be loaded');
     const meta = await response.json(), parts = {}, loading = new Map();
     if (window.__valhallaTestSprites === true) return stubSource(meta);
+    const sidecar = await loadBounds(url, meta), frames = Object.values(meta.clips).reduce((sum, C) => sum + C.n, 0) * 8;
+    const boundsOf = part => { const text = sidecar[part]; const bytes = text ? bytesOf(text) : null; return bytes && bytes.length === frames * 4 ? bytes : null; };
     const lazy = new Set([...LAZY, ...(meta.lazyParts || [])]);
-    for (const [part, files] of Object.entries(meta.parts)) if (!lazy.has(part)) parts[part] = await decodePart(meta, files);
-    const ensure = part => {
+    const names = Object.keys(meta.parts).filter(part => !lazy.has(part));
+    // Your own character's next atlas downloads while this one is copied; background loads stay one atlas at a time.
+    let next = null;
+    try {
+      for (let k = 0; k < names.length; k++) {
+        const images = await (next || loadImages(meta.parts[names[k]]));
+        next = k + 1 < names.length && !job.background ? loadImages(meta.parts[names[k + 1]]) : null;
+        parts[names[k]] = await decodePart(meta, boundsOf(names[k]), images, job.slicer);
+      }
+    } catch (error) { next?.then(images => images.forEach(image => image.close()), () => {}); throw error; }
+    const ensure = (part, background = false) => {
       if (parts[part] || !meta.parts[part]) return Promise.resolve();
-      if (!loading.has(part)) loading.set(part, decodePart(meta, meta.parts[part]).then(frames => { parts[part] = frames; }, error => { console.warn('Equipment art could not be loaded', part, error); }));
-      return loading.get(part);
+      let entry = loading.get(part);
+      if (!entry) {
+        entry = createJob(background, async slicer => {
+          try { parts[part] = await decodePart(meta, boundsOf(part), await loadImages(meta.parts[part]), slicer); }
+          catch (error) { console.warn('Equipment art could not be loaded', part, error); }
+        });
+        loading.set(part, entry);
+      } else if (!background) promote(entry);
+      return entry.promise;
     };
     return { meta, parts, ensure };
   }
@@ -119,7 +205,7 @@
     return [slot, allowed.includes(resolve(slot, look?.[slot]).art) ? look[slot] : 'none'];
   }));
   class MageSprite {
-    constructor(source, look = {}) { this.source = source; this.meta = source.meta; this.cache = new Map(); this.set(look); }
+    constructor(source, look = {}, background = false) { this.source = source; this.background = background; this.meta = source.meta; this.cache = new Map(); this.set(look); }
     set(look) {
       this.look = { ...look }; this.cache.clear();
       // `worn` holds the catalog variants; `equipment` the drawings they use; `partTint` the recolouring of each drawn part.
@@ -132,7 +218,7 @@
       }
       for (const slot of SLOT_ORDER) {      // a layer still being decoded appears (and the frames are rebuilt) as soon as it arrives
         const part = slot + '_' + this.equipment[slot];
-        if (this.equipment[slot] !== 'none' && !this.source.parts[part]) this.source.ensure?.(part).then(() => { if (this.source.parts[part]) this.cache.clear(); });
+        if (this.equipment[slot] !== 'none' && !this.source.parts[part]) this.source.ensure?.(part, this.background).then(() => { if (this.source.parts[part]) this.cache.clear(); });
       }
       this.tint = new Map();
       const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
@@ -194,10 +280,16 @@
       g.drawImage(this.frame(), ...(this.meta.portrait || [56, 18, 48, 48]), 0, 0, 128, 128); return c.toDataURL();
     }
     static direction(fx, fy) { return ((Math.round(-Math.atan2(fx - fy, fx + fy) / (Math.PI / 4)) % 8) + 8) % 8; }
-    static async load(look) {
+    // `background` is for other players' sprites: they load one at a time, after your own, without blocking the page.
+    static async load(look, { background = false } = {}) {
       const url = this.METADATA;
-      if (!sources.has(url)) sources.set(url, loadSource(url).catch(error => { sources.delete(url); throw error; }));
-      return new this(await sources.get(url), look);
+      let job = sources.get(url);
+      if (!job) {
+        job = createJob(background, (slicer, self) => loadSource(url, self));
+        sources.set(url, job);
+        job.promise.catch(() => { if (sources.get(url) === job) sources.delete(url); });
+      } else if (!background) promote(job);
+      return new this(await job.promise, look, background);
     }
   }
   MageSprite.GENERIC = GENERIC; MageSprite.hasGear = hasGear; MageSprite.resolveGear = resolve; MageSprite.tintMatrix = tintMatrix;
