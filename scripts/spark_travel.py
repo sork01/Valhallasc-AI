@@ -21,7 +21,8 @@ STOPS = [
     ('The Last Shade', 'travel_last_shade', 76, 119, ['travel_astralhollow', 'travel_stillpoint']),
     ('The Stillpoint', 'travel_stillpoint', 44, 119, ['travel_last_shade', 'travel_lamplight']),
     ('Lamplight Refuge', 'travel_lamplight', 44, 119, ['travel_stillpoint', 'travel_asterion']),
-    ('Asterion', 'travel_asterion', 90, 114, ['travel_lamplight']),
+    ('Asterion', 'travel_asterion', 90, 114, ['travel_lamplight', 'travel_breakwater']),
+    ('Breakwater Camp', 'travel_breakwater', 42, 119, ['travel_asterion']),
 ]
 
 

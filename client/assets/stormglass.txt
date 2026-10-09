@@ -1,0 +1,56 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "saltclaw",
+    "stormgull",
+    "glassray",
+    "breakersentinel",
+    "maelstromheart"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 10,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 10,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 10,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "saltclaw": "bc406f62d8ed2505",
+    "stormgull": "90106b4a5807bea7",
+    "glassray": "e80139fddf07cd00",
+    "breakersentinel": "2f8bca2a0cd75e53",
+    "maelstromheart": "d557002f726fb67e"
+  }
+}

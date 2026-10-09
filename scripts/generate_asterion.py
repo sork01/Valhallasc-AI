@@ -299,10 +299,15 @@ def open_forest_gate(forest):
 def main():
     world=json.loads(MAP.read_text())
     assert world['zones'][15]['name']=='The Moonspore Canopy'
-    world['zones']=[z for z in world['zones'] if z.get('name') not in (CITY_NAME,DUNGEON_NAME)]
+    later=world['zones'][DUNGEON_ID:]
+    world['zones']=world['zones'][:CITY_ID-1]
     assert len(world['zones'])==16
     open_forest_gate(world['zones'][15])
     world['zones'].extend([city(),dungeon()])
+    world['zones'].extend(later)
+    if any(z.get('name')=='The Stormglass Shore' for z in later):
+        from generate_stormglass import open_city_gate
+        open_city_gate(world['zones'][CITY_ID-1])
     spark_travel.ensure(world)
     MAP.write_text(json.dumps(world,indent=2)+'\n')
     items=json.loads(ITEMS.read_text())

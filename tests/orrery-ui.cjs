@@ -30,9 +30,9 @@ async function call(name,args={}){const result=await client.callTool({name,argum
       sizes:kinds.map(k=>[Field.orrerySprites.img[k].naturalWidth,Field.orrerySprites.img[k].naturalHeight]),
       map:WorldMap._layout.length,legend:kinds.every(k=>WorldMap._kinds[k]?.[1]>=50),gate:Field._debug.zones[14].portals.find(p=>p.id==='prism_orrery_gate')};
   });
-  check(data.count===19 && data.name==='The Obsidian Orrery' && data.theme==='orrery' && data.levels.join(',')==='50,55','Zone and level range load');
+  check(data.count===20 && data.name==='The Obsidian Orrery' && data.theme==='orrery' && data.levels.join(',')==='50,55','Zone and level range load');
   check(data.kinds.length===6 && (STUB || data.sizes.every(([w,h])=>w===768 && h===480)),'Six complete enemy atlases load');
-  check(data.art && data.map===19 && data.legend,'Scenery and map legend load');
+  check(data.art && data.map===20 && data.legend,'Scenery and map legend load');
   check(data.npcs===6 && data.quests===10 && data.spawns===42 && data.objects>=300,'Refuge, quests and monster bands load');
   check(data.gate?.to===15,'Prismwaste has the outgoing Hourglass Pass');
   const debug=command=>page.evaluate(command=>Online.send({type:'debug',ref:19,command}),command);

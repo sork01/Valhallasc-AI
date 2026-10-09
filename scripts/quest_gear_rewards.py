@@ -82,6 +82,10 @@ REWARDS = {
     'asterion_roots': green(60, 'pants'),
     'asterion_charts': blue(60, 'necklace'),
     'asterion_descent': blue(60, 'accessory'),
+    'stormglass_crabs': green(60, 'necklace'),
+    'stormglass_gulls': green(60, 'pants'),
+    'stormglass_guards': blue(65, 'necklace'),
+    'stormglass_heart': blue(65, 'accessory'),
 }
 
 

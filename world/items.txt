@@ -28915,5 +28915,1711 @@
     "kind": "material",
     "rarity": "common",
     "sell": 1700
+  },
+  {
+    "id": "saltclaw_shell",
+    "name": "Saltclaw Shell",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 460
+  },
+  {
+    "id": "stormgull_feather",
+    "name": "Stormgull Feather",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 490
+  },
+  {
+    "id": "glassfin",
+    "name": "Glassfin",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 530
+  },
+  {
+    "id": "breaker_core",
+    "name": "Breaker Core",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 600
+  },
+  {
+    "id": "stormheart",
+    "name": "Stormheart",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2200
+  },
+  {
+    "id": "warrior_armor_crimson_l65_gray",
+    "name": "Saltworn Crimson Armor",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "warrior",
+    "variant": "crimson_l65_gray",
+    "art": "crimson",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 33.6
+  },
+  {
+    "id": "warrior_headgear_crimson_l65_gray",
+    "name": "Saltworn Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "warrior",
+    "variant": "crimson_l65_gray",
+    "art": "crimson",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "warrior_shoulders_crimson_l65_gray",
+    "name": "Saltworn Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "warrior",
+    "variant": "crimson_l65_gray",
+    "art": "crimson",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "warrior_gloves_crimson_l65_gray",
+    "name": "Saltworn Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "warrior",
+    "variant": "crimson_l65_gray",
+    "art": "crimson",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "warrior_weapon_sword_l65_gray",
+    "name": "Saltworn Iron Sword",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "warrior",
+    "variant": "sword_l65_gray",
+    "art": "sword",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 44.8,
+    "defense": 0.0
+  },
+  {
+    "id": "mage_armor_apprentice_l65_gray",
+    "name": "Saltworn Apprentice Robes",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "mage",
+    "variant": "apprentice_l65_gray",
+    "art": "apprentice",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 22.4
+  },
+  {
+    "id": "mage_headgear_apprentice_l65_gray",
+    "name": "Saltworn Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "mage",
+    "variant": "apprentice_l65_gray",
+    "art": "apprentice",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "mage_shoulders_apprentice_l65_gray",
+    "name": "Saltworn Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "mage",
+    "variant": "apprentice_l65_gray",
+    "art": "apprentice",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "mage_gloves_apprentice_l65_gray",
+    "name": "Saltworn Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "mage",
+    "variant": "apprentice_l65_gray",
+    "art": "apprentice",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "mage_weapon_ash_l65_gray",
+    "name": "Saltworn Ash Staff",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "mage",
+    "variant": "ash_l65_gray",
+    "art": "ash",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 44.8,
+    "defense": 0.0
+  },
+  {
+    "id": "assassin_armor_shadow_l65_gray",
+    "name": "Saltworn Shadow Armor",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "assassin",
+    "variant": "shadow_l65_gray",
+    "art": "shadow",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 22.4
+  },
+  {
+    "id": "assassin_headgear_shadow_l65_gray",
+    "name": "Saltworn Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "assassin",
+    "variant": "shadow_l65_gray",
+    "art": "shadow",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "assassin_shoulders_shadow_l65_gray",
+    "name": "Saltworn Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "assassin",
+    "variant": "shadow_l65_gray",
+    "art": "shadow",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "assassin_gloves_shadow_l65_gray",
+    "name": "Saltworn Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "assassin",
+    "variant": "shadow_l65_gray",
+    "art": "shadow",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "assassin_weapon_daggers_l65_gray",
+    "name": "Saltworn Steel Daggers",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "assassin",
+    "variant": "daggers_l65_gray",
+    "art": "daggers",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 44.8,
+    "defense": 0.0
+  },
+  {
+    "id": "priest_armor_pilgrim_l65_gray",
+    "name": "Saltworn Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "priest",
+    "variant": "pilgrim_l65_gray",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 33.6
+  },
+  {
+    "id": "priest_headgear_pilgrim_l65_gray",
+    "name": "Saltworn Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "priest",
+    "variant": "pilgrim_l65_gray",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l65_gray",
+    "name": "Saltworn Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "priest",
+    "variant": "pilgrim_l65_gray",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "priest_gloves_pilgrim_l65_gray",
+    "name": "Saltworn Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "priest",
+    "variant": "pilgrim_l65_gray",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "priest_weapon_mace_l65_gray",
+    "name": "Saltworn Oak Mace",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "priest",
+    "variant": "mace_l65_gray",
+    "art": "mace",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 44.8,
+    "defense": 0.0
+  },
+  {
+    "id": "hunter_armor_scout_l65_gray",
+    "name": "Saltworn Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "hunter",
+    "variant": "scout_l65_gray",
+    "art": "scout",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 33.6
+  },
+  {
+    "id": "hunter_headgear_scout_l65_gray",
+    "name": "Saltworn Feathered Headband",
+    "kind": "headgear",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "hunter",
+    "variant": "scout_l65_gray",
+    "art": "scout",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "hunter_shoulders_scout_l65_gray",
+    "name": "Saltworn Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "hunter",
+    "variant": "scout_l65_gray",
+    "art": "scout",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "hunter_gloves_scout_l65_gray",
+    "name": "Saltworn Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "hunter",
+    "variant": "scout_l65_gray",
+    "art": "scout",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "hunter_weapon_shortbow_l65_gray",
+    "name": "Saltworn Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "class": "hunter",
+    "variant": "shortbow_l65_gray",
+    "art": "shortbow",
+    "tint": {
+      "hue": 190,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 44.8,
+    "defense": 0.0
+  },
+  {
+    "id": "pants_wayfarer_l65_gray",
+    "name": "Saltworn Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "variant": "wayfarer_l65_gray",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 210,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 0.0,
+    "defense": 11.2
+  },
+  {
+    "id": "necklace_moonstone_l65_gray",
+    "name": "Saltworn Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "variant": "moonstone_l65_gray",
+    "art": "moonstone",
+    "tint": {
+      "hue": 210,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 22.4,
+    "defense": 0.0
+  },
+  {
+    "id": "accessory_amber_l65_gray",
+    "name": "Saltworn Amber Ring",
+    "kind": "accessory",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "variant": "amber_l65_gray",
+    "art": "amber",
+    "tint": {
+      "hue": 210,
+      "saturate": 0.5,
+      "brightness": 0.9
+    },
+    "starter": false,
+    "attack": 16.8,
+    "defense": 0.0
+  },
+  {
+    "id": "warrior_armor_azure_l65_green",
+    "name": "Stormforged Azure Armor",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "warrior",
+    "variant": "azure_l65_green",
+    "art": "azure",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 8.4,
+    "defense": 33.6
+  },
+  {
+    "id": "warrior_headgear_azure_l65_green",
+    "name": "Stormforged Azure Winged Helm",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "warrior",
+    "variant": "azure_l65_green",
+    "art": "azure",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "warrior_shoulders_azure_l65_green",
+    "name": "Stormforged Azure Winged Pauldrons",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "warrior",
+    "variant": "azure_l65_green",
+    "art": "azure",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "warrior_gloves_azure_l65_green",
+    "name": "Stormforged Azure Gauntlets",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "warrior",
+    "variant": "azure_l65_green",
+    "art": "azure",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "warrior_weapon_royal_l65_green",
+    "name": "Stormforged Royal Sword",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "warrior",
+    "variant": "royal_l65_green",
+    "art": "royal",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 44.8,
+    "defense": 11.2
+  },
+  {
+    "id": "mage_armor_runic_l65_green",
+    "name": "Stormforged Runic Robes",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "mage",
+    "variant": "runic_l65_green",
+    "art": "runic",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 5.6,
+    "defense": 22.4
+  },
+  {
+    "id": "mage_headgear_runic_l65_green",
+    "name": "Stormforged Runic Archmage Hat",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "mage",
+    "variant": "runic_l65_green",
+    "art": "runic",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "mage_shoulders_runic_l65_green",
+    "name": "Stormforged Runic Pauldrons",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "mage",
+    "variant": "runic_l65_green",
+    "art": "runic",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "mage_gloves_runic_l65_green",
+    "name": "Stormforged Runic Gloves",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "mage",
+    "variant": "runic_l65_green",
+    "art": "runic",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "mage_weapon_crystal_l65_green",
+    "name": "Stormforged Crystal Staff",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "mage",
+    "variant": "crystal_l65_green",
+    "art": "crystal",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 44.8,
+    "defense": 11.2
+  },
+  {
+    "id": "assassin_armor_moon_l65_green",
+    "name": "Stormforged Moon Armor",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "assassin",
+    "variant": "moon_l65_green",
+    "art": "moon",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 5.6,
+    "defense": 22.4
+  },
+  {
+    "id": "assassin_headgear_moon_l65_green",
+    "name": "Stormforged Moonveil Circlet",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "assassin",
+    "variant": "moon_l65_green",
+    "art": "moon",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "assassin_shoulders_moon_l65_green",
+    "name": "Stormforged Moonveil Crescents",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "assassin",
+    "variant": "moon_l65_green",
+    "art": "moon",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "assassin_gloves_moon_l65_green",
+    "name": "Stormforged Moonveil Gauntlets",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "assassin",
+    "variant": "moon_l65_green",
+    "art": "moon",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "assassin_weapon_moonfang_l65_green",
+    "name": "Stormforged Moonfang Daggers",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "assassin",
+    "variant": "moonfang_l65_green",
+    "art": "moonfang",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 44.8,
+    "defense": 11.2
+  },
+  {
+    "id": "priest_armor_dawn_l65_green",
+    "name": "Stormforged Dawnweave Vestments",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "priest",
+    "variant": "dawn_l65_green",
+    "art": "dawn",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 8.4,
+    "defense": 33.6
+  },
+  {
+    "id": "priest_headgear_dawn_l65_green",
+    "name": "Stormforged Sunburst Diadem",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "priest",
+    "variant": "dawn_l65_green",
+    "art": "dawn",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "priest_shoulders_dawn_l65_green",
+    "name": "Stormforged Sunray Pauldrons",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "priest",
+    "variant": "dawn_l65_green",
+    "art": "dawn",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "priest_gloves_dawn_l65_green",
+    "name": "Stormforged Dawnweave Gloves",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "priest",
+    "variant": "dawn_l65_green",
+    "art": "dawn",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "priest_weapon_sunmace_l65_green",
+    "name": "Stormforged Sunbreaker Mace",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "priest",
+    "variant": "sunmace_l65_green",
+    "art": "sunmace",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 44.8,
+    "defense": 11.2
+  },
+  {
+    "id": "hunter_armor_warden_l65_green",
+    "name": "Stormforged Wildwarden Coat",
+    "kind": "armor",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "hunter",
+    "variant": "warden_l65_green",
+    "art": "warden",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 8.4,
+    "defense": 33.6
+  },
+  {
+    "id": "hunter_headgear_warden_l65_green",
+    "name": "Stormforged Wolfhood",
+    "kind": "headgear",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "hunter",
+    "variant": "warden_l65_green",
+    "art": "warden",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "hunter_shoulders_warden_l65_green",
+    "name": "Stormforged Wildwarden Pauldrons",
+    "kind": "shoulders",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "hunter",
+    "variant": "warden_l65_green",
+    "art": "warden",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "hunter_gloves_warden_l65_green",
+    "name": "Stormforged Wildwarden Gauntlets",
+    "kind": "gloves",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "hunter",
+    "variant": "warden_l65_green",
+    "art": "warden",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "hunter_weapon_wardenbow_l65_green",
+    "name": "Stormforged Wildwarden Longbow",
+    "kind": "weapon",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "class": "hunter",
+    "variant": "wardenbow_l65_green",
+    "art": "wardenbow",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 44.8,
+    "defense": 11.2
+  },
+  {
+    "id": "pants_wayfarer_l65_green",
+    "name": "Stormforged Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "variant": "wayfarer_l65_green",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 210,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 2.8,
+    "defense": 11.2
+  },
+  {
+    "id": "necklace_moonstone_l65_green",
+    "name": "Stormforged Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "variant": "moonstone_l65_green",
+    "art": "moonstone",
+    "tint": {
+      "hue": 210,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 22.4,
+    "defense": 5.6
+  },
+  {
+    "id": "accessory_amber_l65_green",
+    "name": "Stormforged Amber Ring",
+    "kind": "accessory",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "variant": "amber_l65_green",
+    "art": "amber",
+    "tint": {
+      "hue": 210,
+      "saturate": 1.0,
+      "brightness": 1.0
+    },
+    "starter": false,
+    "attack": 16.8,
+    "defense": 4.2
+  },
+  {
+    "id": "warrior_armor_crimson_l65_blue",
+    "name": "Eye-bound Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "warrior",
+    "variant": "crimson_l65_blue",
+    "art": "crimson",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 9.9,
+    "defense": 39.5,
+    "bonusStats": {
+      "agility": 63
+    }
+  },
+  {
+    "id": "warrior_headgear_crimson_l65_blue",
+    "name": "Eye-bound Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "warrior",
+    "variant": "crimson_l65_blue",
+    "art": "crimson",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "stamina": 63
+    }
+  },
+  {
+    "id": "warrior_shoulders_crimson_l65_blue",
+    "name": "Eye-bound Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "warrior",
+    "variant": "crimson_l65_blue",
+    "art": "crimson",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "strength": 63
+    }
+  },
+  {
+    "id": "warrior_gloves_crimson_l65_blue",
+    "name": "Eye-bound Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "warrior",
+    "variant": "crimson_l65_blue",
+    "art": "crimson",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "agility": 63
+    }
+  },
+  {
+    "id": "warrior_weapon_sword_l65_blue",
+    "name": "Eye-bound Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "warrior",
+    "variant": "sword_l65_blue",
+    "art": "sword",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 52.6,
+    "defense": 13.2,
+    "bonusStats": {
+      "agility": 63
+    }
+  },
+  {
+    "id": "mage_armor_apprentice_l65_blue",
+    "name": "Eye-bound Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "mage",
+    "variant": "apprentice_l65_blue",
+    "art": "apprentice",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.3,
+    "bonusStats": {
+      "stamina": 63
+    }
+  },
+  {
+    "id": "mage_headgear_apprentice_l65_blue",
+    "name": "Eye-bound Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "mage",
+    "variant": "apprentice_l65_blue",
+    "art": "apprentice",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "intellect": 63
+    }
+  },
+  {
+    "id": "mage_shoulders_apprentice_l65_blue",
+    "name": "Eye-bound Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "mage",
+    "variant": "apprentice_l65_blue",
+    "art": "apprentice",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "intellect": 63
+    }
+  },
+  {
+    "id": "mage_gloves_apprentice_l65_blue",
+    "name": "Eye-bound Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "mage",
+    "variant": "apprentice_l65_blue",
+    "art": "apprentice",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "intellect": 63
+    }
+  },
+  {
+    "id": "mage_weapon_ash_l65_blue",
+    "name": "Eye-bound Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "mage",
+    "variant": "ash_l65_blue",
+    "art": "ash",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 52.6,
+    "defense": 13.2,
+    "bonusStats": {
+      "agility": 63
+    }
+  },
+  {
+    "id": "assassin_armor_shadow_l65_blue",
+    "name": "Eye-bound Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "assassin",
+    "variant": "shadow_l65_blue",
+    "art": "shadow",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.3,
+    "bonusStats": {
+      "agility": 63
+    }
+  },
+  {
+    "id": "assassin_headgear_shadow_l65_blue",
+    "name": "Eye-bound Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "assassin",
+    "variant": "shadow_l65_blue",
+    "art": "shadow",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "stamina": 63
+    }
+  },
+  {
+    "id": "assassin_shoulders_shadow_l65_blue",
+    "name": "Eye-bound Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "assassin",
+    "variant": "shadow_l65_blue",
+    "art": "shadow",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "strength": 63
+    }
+  },
+  {
+    "id": "assassin_gloves_shadow_l65_blue",
+    "name": "Eye-bound Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "assassin",
+    "variant": "shadow_l65_blue",
+    "art": "shadow",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "strength": 63
+    }
+  },
+  {
+    "id": "assassin_weapon_daggers_l65_blue",
+    "name": "Eye-bound Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "assassin",
+    "variant": "daggers_l65_blue",
+    "art": "daggers",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 52.6,
+    "defense": 13.2,
+    "bonusStats": {
+      "dexterity": 63
+    }
+  },
+  {
+    "id": "priest_armor_pilgrim_l65_blue",
+    "name": "Eye-bound Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "priest",
+    "variant": "pilgrim_l65_blue",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 9.9,
+    "defense": 39.5,
+    "bonusStats": {
+      "intellect": 63
+    }
+  },
+  {
+    "id": "priest_headgear_pilgrim_l65_blue",
+    "name": "Eye-bound Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "priest",
+    "variant": "pilgrim_l65_blue",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "dexterity": 63
+    }
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l65_blue",
+    "name": "Eye-bound Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "priest",
+    "variant": "pilgrim_l65_blue",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "intellect": 63
+    }
+  },
+  {
+    "id": "priest_gloves_pilgrim_l65_blue",
+    "name": "Eye-bound Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "priest",
+    "variant": "pilgrim_l65_blue",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "agility": 63
+    }
+  },
+  {
+    "id": "priest_weapon_mace_l65_blue",
+    "name": "Eye-bound Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "priest",
+    "variant": "mace_l65_blue",
+    "art": "mace",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 52.6,
+    "defense": 13.2,
+    "bonusStats": {
+      "agility": 63
+    }
+  },
+  {
+    "id": "hunter_armor_scout_l65_blue",
+    "name": "Eye-bound Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "hunter",
+    "variant": "scout_l65_blue",
+    "art": "scout",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 9.9,
+    "defense": 39.5,
+    "bonusStats": {
+      "agility": 63
+    }
+  },
+  {
+    "id": "hunter_headgear_scout_l65_blue",
+    "name": "Eye-bound Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "hunter",
+    "variant": "scout_l65_blue",
+    "art": "scout",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "stamina": 63
+    }
+  },
+  {
+    "id": "hunter_shoulders_scout_l65_blue",
+    "name": "Eye-bound Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "hunter",
+    "variant": "scout_l65_blue",
+    "art": "scout",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "dexterity": 63
+    }
+  },
+  {
+    "id": "hunter_gloves_scout_l65_blue",
+    "name": "Eye-bound Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "hunter",
+    "variant": "scout_l65_blue",
+    "art": "scout",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "stamina": 63
+    }
+  },
+  {
+    "id": "hunter_weapon_shortbow_l65_blue",
+    "name": "Eye-bound Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "class": "hunter",
+    "variant": "shortbow_l65_blue",
+    "art": "shortbow",
+    "tint": {
+      "hue": 220,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 52.6,
+    "defense": 13.2,
+    "bonusStats": {
+      "stamina": 63
+    }
+  },
+  {
+    "id": "pants_wayfarer_l65_blue",
+    "name": "Eye-bound Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "variant": "wayfarer_l65_blue",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 240,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 3.3,
+    "defense": 13.2,
+    "bonusStats": {
+      "dexterity": 63
+    }
+  },
+  {
+    "id": "necklace_moonstone_l65_blue",
+    "name": "Eye-bound Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "variant": "moonstone_l65_blue",
+    "art": "moonstone",
+    "tint": {
+      "hue": 240,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 26.3,
+    "defense": 6.6,
+    "bonusStats": {
+      "stamina": 63
+    }
+  },
+  {
+    "id": "accessory_amber_l65_blue",
+    "name": "Eye-bound Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "variant": "amber_l65_blue",
+    "art": "amber",
+    "tint": {
+      "hue": 240,
+      "saturate": 1.15,
+      "brightness": 1.1
+    },
+    "starter": false,
+    "attack": 19.7,
+    "defense": 4.9,
+    "bonusStats": {
+      "dexterity": 63
+    }
   }
 ]

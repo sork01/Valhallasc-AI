@@ -35,8 +35,8 @@ fn nacre_city_is_large_safe_and_has_120_distinct_addressed_homes() {
     assert_eq!(names.len(), 120);
     assert_eq!(m.npcs.len(), 30);
     assert_eq!(m.quests.len(), 9);
-    assert_eq!(w.maps.len(), 34);
-    assert_eq!(w.maps[19].template, Some(5));
+    assert_eq!(w.maps.len(), 35);
+    assert_eq!(w.maps[20].template, Some(5));
 }
 
 #[test]

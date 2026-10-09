@@ -32,7 +32,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60, dew_moth: 60, lumen_eel: 60, rootbell: 60, tideglass_heron: 60, hourpetal_stag: 60, moonskein_weaver: 60, moonwell_echo: 60 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60, dew_moth: 60, lumen_eel: 60, rootbell: 60, tideglass_heron: 60, hourpetal_stag: 60, moonskein_weaver: 60, moonwell_echo: 60, saltclaw: 60, stormgull: 61, glassray: 62, breakersentinel: 64, maelstromheart: 65 };
 Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'world/cathedral.txt'), 'utf8')).map(e => [e.kind, e.level])));
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
@@ -3120,6 +3120,85 @@ const scenarios = {
       await w.disconnect(other);
       await w.restart();
       check(w.player(bot).zone===17 && quest(w,bot,'asterion_descent').claimed && w.player(bot).travelStops.includes('travel_asterion'),'Quest, travel stop and city persist after restart');
+    },
+  },
+
+  stormglass: {
+    description: 'Stormglass Shore: reciprocal causeway, sealed Eye, Meeting Stone, monsters, quests, loot and persistence.',
+    startLevel: 65,
+    levelSpread: 0,
+    async run(w,check) {
+      const bot='Wavewatcher',area=map.zones[18];
+      await w.connect({bot,class:'warrior'});
+      const gate=map.zones[16].portals.find(p=>p.id==='asterion_stormglass_gate');
+      const back=area.portals.find(p=>p.id==='stormglass_asterion_gate');
+      check(gate?.to===19 && back?.to===17,'Asterion and Stormglass have reciprocal gates');
+      check(area.levels.join(',')==='60,65' && area.slimes.length===41 && area.quests.length===8,'The level 60–65 shore, monsters and quest hub load');
+      check(area.futureInstance?.status==='sealed' && area.futureInstance?.name==='The Eye Below' && area.portals.length===1,'The dungeon entrance is sealed and has no playable instance');
+      await kit.teleport(w,bot,{zone:17,x:164,y:88});
+      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===19,15000,'Enter Stormglass');
+      await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),area.spawn)<2,'Arrival is clear of the return gate');
+      await w.connect({bot:'MeadowObserver',class:'mage'});
+      check(w.views.get('MeadowObserver').slimes.every(s=>s.zone===0) && w.views.get(bot).slimes.every(s=>s.zone===19),'Zone snapshots stay isolated');
+      await kit.teleport(w,bot,{npc:'travel_breakwater'});
+      const travel=await kit.talkTo(w,bot,'travel_breakwater');
+      check(travel.travelStops?.includes('travel_breakwater') && area.npcs.find(n=>n.id==='travel_breakwater').travelLinks.includes('travel_asterion') && map.zones[16].npcs.find(n=>n.id==='travel_asterion').travelLinks.includes('travel_breakwater'),'Spark Travel links Breakwater and Asterion');
+      await w.debug(bot,{op:'set_gold',gold:500});
+      await kit.teleport(w,bot,{npc:'stormglass_stone'});
+      const hire=await kit.talkTo(w,bot,'stormglass_stone','merc_priest');
+      await w.waitFor(()=>w.views.get(bot).players.some(p=>p.look.name==='Merc Priest'),5000,'Meeting Stone hires a fighter');
+      check(/Merc Priest joins your party/.test(hire.notice) && w.player(bot).gold===250,'The Meeting Stone hires a Priest for 250 gold without opening the dungeon');
+      await kit.talkTo(w,bot,'stormglass_stone','merc_dismiss');
+      await w.waitFor(()=>!w.views.get(bot).players.some(p=>p.look.name==='Merc Priest'),5000,'Dismiss Meeting Stone hire');
+      await kit.teleport(w,bot,{npc:'stormglass_warden'});
+      await kit.talkTo(w,bot,'stormglass_warden','quest:accept:stormglass_welcome');
+      await w.waitFor(()=>!!quest(w,bot,'stormglass_welcome'),5000,'Accept camp introductions');
+      for(const npc of ['stormglass_healer','stormglass_scout','stormglass_scholar']){
+        await kit.teleport(w,bot,{npc});await kit.talkTo(w,bot,npc);
+      }
+      await w.waitFor(()=>quest(w,bot,'stormglass_welcome').counts.every(n=>n===1),5000,'Meet the camp crew');
+      await kit.teleport(w,bot,{npc:'stormglass_warden'});
+      await kit.talkTo(w,bot,'stormglass_warden','quest:claim:stormglass_welcome');
+      await w.waitFor(()=>quest(w,bot,'stormglass_welcome').claimed,5000,'Claim introduction');
+      for(const [kind,material] of [['saltclaw','saltclaw_shell'],['stormgull','stormgull_feather'],['glassray','glassfin'],['breakersentinel','breaker_core']]){
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
+        const before=totalXp(w.player(bot));
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material drop`);
+        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} grants authoritative level XP`);
+        check(w.views.get(bot).drops.some(d=>d.item===material),`${kind} drops ${material}`);
+      }
+      await w.debug(bot,{op:'quest',id:'stormglass_guards',action:'finish'});
+      await kit.teleport(w,bot,{npc:'stormglass_warden'});
+      await kit.talkTo(w,bot,'stormglass_warden','quest:accept:stormglass_heart');
+      await w.waitFor(()=>!!quest(w,bot,'stormglass_heart'),5000,'Accept elite quest');
+      const heart=w.views.get(bot).slimes.find(s=>s.kind==='maelstromheart'&&!s.dead);
+      await w.debug(bot,{op:'kill_enemy',id:heart.id});
+      await w.waitFor(()=>quest(w,bot,'stormglass_heart').counts[0]===1,5000,'Elite credits the quest');
+      check(w.views.get(bot).drops.some(d=>d.item==='stormheart'),'Maelstrom Heart drops its material');
+      check(w.views.get(bot).drops.some(d=>kit.items.some(i=>i.id===d.item&&i.rarity==='uncommon'&&i.requiredLevel>=60)),'Outdoor elite guarantees green gear');
+      await kit.teleport(w,bot,{npc:'stormglass_warden'});
+      await kit.talkTo(w,bot,'stormglass_warden','quest:claim:stormglass_heart');
+      await w.waitFor(()=>quest(w,bot,'stormglass_heart').claimed,5000,'Claim elite quest');
+      check(w.player(bot).inventory.some(i=>i.item==='accessory_amber_l65_blue'),'The elite quest awards level-65 blue gear');
+      await w.restart();
+      check(w.player(bot).zone===19 && quest(w,bot,'stormglass_heart').claimed && w.player(bot).travelStops.includes('travel_breakwater'),'Zone, quest and travel discovery persist');
+      await kit.teleport(w,bot,{zone:19,x:12,y:105});
+      await w.action(bot,{type:'move',x:back.x,y:back.y});
+      await w.waitFor(()=>w.player(bot).zone===17,15000,'Return to Asterion');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrival is clear');
+      await w.debug(bot,{op:'set_gold',gold:100});
+      await kit.teleport(w,bot,{npc:'travel_asterion'});
+      const departures=await kit.talkTo(w,bot,'travel_asterion');
+      check(departures.travel.some(d=>d.id==='travel_breakwater'&&d.cost===20),'Asterion offers the discovered Breakwater stop for one fare');
+      await w.advance(550);
+      await w.action(bot,{type:'interact',npc:'travel_asterion',offer:'spark:travel_breakwater'});
+      await w.waitFor(()=>!!w.player(bot).sparkTravel,5000,'Spark departs for Breakwater');
+      check(w.player(bot).gold===80,'One Spark Travel leg charges 20 gold');
+      await w.waitFor(()=>w.player(bot).zone===19&&!w.player(bot).sparkTravel,30000,'Spark arrives at Breakwater');
+      check(distance(w.player(bot),area.npcs.find(n=>n.id==='travel_breakwater'))<.2,'Spark Travel lands beside the Breakwater master');
     },
   },
 

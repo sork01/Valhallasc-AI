@@ -4,7 +4,7 @@ use super::*;
 const SKALD: usize = 4;
 const VAULT: usize = 5;
 /// The first private copy of the dungeon: the world appends copies after every file zone.
-const COPY: usize = 19;
+const COPY: usize = 20;
 
 fn world() -> World {
     World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)
@@ -107,7 +107,7 @@ fn the_undervault_is_a_five_player_dungeon_with_four_private_copies_four_bosses_
     );
     assert!(vault.city.is_none(), "no safe ground in a dungeon");
     // The world keeps three more copies after every file zone; clients are told the template's number.
-    assert_eq!(w.maps.len(), 34);
+    assert_eq!(w.maps.len(), 35);
     assert_eq!(
         w.instances.iter().filter(|i| i.template == VAULT).count(),
         4

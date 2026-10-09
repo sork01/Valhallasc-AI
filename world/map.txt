@@ -100623,7 +100623,22 @@
         "x": 90.0,
         "y": 162.0
       },
-      "paths": [],
+      "paths": [
+        [
+          [
+            134,
+            88
+          ],
+          [
+            160,
+            88
+          ],
+          [
+            170,
+            88
+          ]
+        ]
+      ],
       "roads": [
         {
           "t": 2,
@@ -101165,18 +101180,6 @@
           "depth": 3.1,
           "color": "#e8ac93",
           "label": "35 Glasswalk",
-          "sign": "live"
-        },
-        {
-          "kind": "aetherhouse",
-          "x": 157.79,
-          "y": 93.34,
-          "r": 0,
-          "v": 0,
-          "width": 4.2,
-          "depth": 3.2,
-          "color": "#b9e4dc",
-          "label": "36 Glasswalk",
           "sign": "live"
         },
         {
@@ -101969,18 +101972,6 @@
           "depth": 3.1,
           "color": "#b5d998",
           "label": "102 Glasswalk",
-          "sign": "live"
-        },
-        {
-          "kind": "aetherhouse",
-          "x": 157.79,
-          "y": 82.66,
-          "r": 0,
-          "v": 0,
-          "width": 3.2,
-          "depth": 3.1,
-          "color": "#b5d998",
-          "label": "103 Glasswalk",
           "sign": "live"
         },
         {
@@ -105716,7 +105707,8 @@
           "color": "#74d7d0",
           "travelStop": "Asterion",
           "travelLinks": [
-            "travel_lamplight"
+            "travel_lamplight",
+            "travel_breakwater"
           ],
           "look": {
             "hair": "#e4edf4",
@@ -105944,6 +105936,17 @@
           "tx": 21,
           "ty": 64,
           "look": "stairs_down"
+        },
+        {
+          "id": "asterion_stormglass_gate",
+          "name": "The Stormglass Causeway",
+          "x": 170,
+          "y": 88,
+          "r": 1.2,
+          "to": 19,
+          "tx": 13,
+          "ty": 105,
+          "look": "stormglass"
         }
       ]
     },
@@ -112690,6 +112693,3561 @@
           "ty": 97,
           "after_clear": true,
           "look": "exit"
+        }
+      ]
+    },
+    {
+      "name": "The Stormglass Shore",
+      "theme": "stormglass",
+      "tagline": "Black sand, white lightning, and a sealed eye beneath the sea",
+      "size": 128,
+      "levels": [
+        60,
+        65
+      ],
+      "spawn": {
+        "x": 13,
+        "y": 105
+      },
+      "paths": [
+        [
+          [
+            7,
+            105
+          ],
+          [
+            30,
+            105
+          ],
+          [
+            52,
+            92
+          ],
+          [
+            67,
+            72
+          ],
+          [
+            83,
+            54
+          ],
+          [
+            103,
+            31
+          ]
+        ],
+        [
+          [
+            52,
+            92
+          ],
+          [
+            26,
+            74
+          ],
+          [
+            24,
+            52
+          ],
+          [
+            42,
+            34
+          ],
+          [
+            83,
+            54
+          ]
+        ],
+        [
+          [
+            67,
+            72
+          ],
+          [
+            104,
+            78
+          ],
+          [
+            109,
+            55
+          ],
+          [
+            103,
+            31
+          ]
+        ]
+      ],
+      "objects": [
+        {
+          "kind": "breakwater_hut",
+          "x": 25,
+          "y": 109,
+          "r": 0,
+          "v": 0,
+          "width": 4.5,
+          "depth": 3.5
+        },
+        {
+          "kind": "breakwater_hut",
+          "x": 41,
+          "y": 108,
+          "r": 0,
+          "v": 0,
+          "width": 4.5,
+          "depth": 3.5
+        },
+        {
+          "kind": "breakwater_hut",
+          "x": 19,
+          "y": 119,
+          "r": 0,
+          "v": 0,
+          "width": 4.5,
+          "depth": 3.5
+        },
+        {
+          "kind": "tide_bell",
+          "x": 32,
+          "y": 110,
+          "r": 0.55,
+          "v": 0
+        },
+        {
+          "kind": "stormlamp",
+          "x": 18,
+          "y": 98,
+          "r": 0.28,
+          "v": 0
+        },
+        {
+          "kind": "stormlamp",
+          "x": 43,
+          "y": 99,
+          "r": 0.28,
+          "v": 0
+        },
+        {
+          "kind": "stormlamp",
+          "x": 47,
+          "y": 118,
+          "r": 0.28,
+          "v": 0
+        },
+        {
+          "kind": "stormlamp",
+          "x": 33,
+          "y": 117,
+          "r": 0.28,
+          "v": 0
+        },
+        {
+          "kind": "meetingstone",
+          "x": 89,
+          "y": 25,
+          "r": 1.7,
+          "v": 0
+        },
+        {
+          "kind": "eye_arch",
+          "x": 105,
+          "y": 23,
+          "r": 0,
+          "v": 0,
+          "width": 6,
+          "depth": 4,
+          "place": "stormglass_eye"
+        },
+        {
+          "kind": "tide_bell",
+          "x": 92,
+          "y": 36,
+          "r": 0.55,
+          "v": 0,
+          "place": "stormglass_bell"
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 37.0,
+          "y": 64.0,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 35.96,
+          "y": 71.32,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 28.71,
+          "y": 81.12,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 23.75,
+          "y": 81.9,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 19.0,
+          "y": 79.59,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 15.29,
+          "y": 74.58,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 13.26,
+          "y": 67.74,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 13.26,
+          "y": 60.26,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 15.29,
+          "y": 53.42,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 19.0,
+          "y": 48.41,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 23.75,
+          "y": 46.1,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 33.03,
+          "y": 50.62,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 35.96,
+          "y": 56.68,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 86.0,
+          "y": 39.0,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 84.7,
+          "y": 43.07,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 81.04,
+          "y": 46.43,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 58.86,
+          "y": 33.12,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 63.5,
+          "y": 30.34,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 69.43,
+          "y": 29.05,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 75.64,
+          "y": 29.49,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 81.04,
+          "y": 31.57,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 84.7,
+          "y": 34.93,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 115.0,
+          "y": 86.0,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 113.79,
+          "y": 90.88,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 110.37,
+          "y": 94.92,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 105.33,
+          "y": 97.41,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 99.54,
+          "y": 97.93,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 94.0,
+          "y": 96.39,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 89.67,
+          "y": 93.05,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 87.31,
+          "y": 88.49,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 87.31,
+          "y": 83.51,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 110.37,
+          "y": 77.08,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "stormglass_spire",
+          "x": 113.79,
+          "y": 81.12,
+          "r": 0.9,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 83.39,
+          "y": 96.68,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 22.13,
+          "y": 15.73,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 32.8,
+          "y": 59.56,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 118.82,
+          "y": 50.93,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 103.16,
+          "y": 109.54,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 29.38,
+          "y": 56.0,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 101.06,
+          "y": 92.82,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 47.92,
+          "y": 27.96,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 110.36,
+          "y": 69.12,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 56.12,
+          "y": 68.08,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 97.33,
+          "y": 54.25,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 53.49,
+          "y": 7.7,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 65.13,
+          "y": 64.23,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 9.43,
+          "y": 65.79,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 15.63,
+          "y": 89.53,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 67.5,
+          "y": 17.92,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 116.06,
+          "y": 94.5,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 19.79,
+          "y": 22.26,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 14.73,
+          "y": 50.37,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 51.12,
+          "y": 68.25,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 62.5,
+          "y": 87.1,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 11.34,
+          "y": 47.8,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 43.64,
+          "y": 64.94,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 23.67,
+          "y": 76.97,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 36.14,
+          "y": 66.71,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 109.92,
+          "y": 83.52,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 61.28,
+          "y": 118.45,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 8.84,
+          "y": 12.91,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 87.72,
+          "y": 58.66,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 18.1,
+          "y": 83.51,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 70.94,
+          "y": 56.75,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 75.26,
+          "y": 87.23,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 59.01,
+          "y": 93.16,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 16.24,
+          "y": 20.93,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 51.76,
+          "y": 25.18,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 22.58,
+          "y": 91.12,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 71.18,
+          "y": 40.52,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 58.08,
+          "y": 69.74,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 59.29,
+          "y": 100.48,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 102.07,
+          "y": 99.83,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 30.22,
+          "y": 72.0,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 18.19,
+          "y": 30.85,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 121.07,
+          "y": 94.21,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 21.26,
+          "y": 85.43,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 60.34,
+          "y": 25.15,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 62.28,
+          "y": 13.0,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 35.03,
+          "y": 10.0,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 75.52,
+          "y": 82.52,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 41.01,
+          "y": 7.31,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 76.58,
+          "y": 101.18,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 112.41,
+          "y": 34.26,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 77.71,
+          "y": 107.97,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 51.66,
+          "y": 121.62,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 59.97,
+          "y": 113.86,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 103.56,
+          "y": 56.53,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 93.46,
+          "y": 55.64,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 64.53,
+          "y": 56.65,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 96.86,
+          "y": 108.38,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 44.84,
+          "y": 44.61,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 70.05,
+          "y": 120.1,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 118.25,
+          "y": 100.19,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 36.22,
+          "y": 89.83,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 80.33,
+          "y": 99.78,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 101.17,
+          "y": 56.02,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 105.71,
+          "y": 106.97,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 55.7,
+          "y": 11.46,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 40.05,
+          "y": 74.41,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 47.08,
+          "y": 32.1,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 120.54,
+          "y": 109.25,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 17.06,
+          "y": 92.86,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 112.26,
+          "y": 10.09,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 117.16,
+          "y": 71.26,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 113.63,
+          "y": 13.27,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 26.8,
+          "y": 14.43,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 74.14,
+          "y": 11.64,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 85.31,
+          "y": 68.28,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 52.68,
+          "y": 96.03,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 54.0,
+          "y": 28.43,
+          "r": 0.65,
+          "v": 0
+        },
+        {
+          "kind": "saltpillar",
+          "x": 48.51,
+          "y": 76.13,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 72.68,
+          "y": 99.92,
+          "r": 0.65,
+          "v": 2
+        },
+        {
+          "kind": "saltpillar",
+          "x": 82.41,
+          "y": 60.78,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 64.99,
+          "y": 36.23,
+          "r": 0.65,
+          "v": 3
+        },
+        {
+          "kind": "saltpillar",
+          "x": 31.11,
+          "y": 90.13,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 27.02,
+          "y": 89.51,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "saltpillar",
+          "x": 107.66,
+          "y": 93.63,
+          "r": 0.65,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 39.45,
+          "y": 71.12,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 56.52,
+          "y": 102.68,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 11.2,
+          "y": 44.87,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 103.76,
+          "y": 51.99,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 91.65,
+          "y": 17.68,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 75.19,
+          "y": 121.67,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 65.67,
+          "y": 39.98,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 62.77,
+          "y": 106.97,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 77.04,
+          "y": 104.15,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 110.17,
+          "y": 79.49,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 32.19,
+          "y": 29.22,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 116.73,
+          "y": 56.42,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 10.06,
+          "y": 76.22,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 90.71,
+          "y": 103.18,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 6.06,
+          "y": 84.05,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 46.41,
+          "y": 9.64,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 121.33,
+          "y": 101.7,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 22.9,
+          "y": 29.46,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 54.04,
+          "y": 110.38,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 69.42,
+          "y": 101.47,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 18.36,
+          "y": 67.29,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 52.76,
+          "y": 74.16,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 64.74,
+          "y": 17.7,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 104.04,
+          "y": 90.53,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 34.47,
+          "y": 14.01,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 117.42,
+          "y": 23.72,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 35.38,
+          "y": 92.7,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 68.13,
+          "y": 61.81,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 45.62,
+          "y": 77.7,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 67.81,
+          "y": 88.28,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 41.01,
+          "y": 89.37,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 24.4,
+          "y": 18.4,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 116.19,
+          "y": 80.16,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 31.39,
+          "y": 9.7,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 66.52,
+          "y": 12.07,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 64.26,
+          "y": 49.15,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 60.77,
+          "y": 56.12,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 115.53,
+          "y": 63.05,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 102.59,
+          "y": 96.04,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 74.28,
+          "y": 26.59,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 100.17,
+          "y": 88.19,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 84.28,
+          "y": 8.33,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 39.23,
+          "y": 78.49,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 64.75,
+          "y": 13.49,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 48.08,
+          "y": 20.8,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 89.57,
+          "y": 116.96,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 65.79,
+          "y": 86.6,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 101.9,
+          "y": 113.49,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 70.49,
+          "y": 61.81,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 97.73,
+          "y": 51.2,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 94.45,
+          "y": 47.24,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 71.58,
+          "y": 84.03,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 7.01,
+          "y": 51.59,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 39.5,
+          "y": 43.89,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 33.54,
+          "y": 62.48,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 98.01,
+          "y": 69.04,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 25.05,
+          "y": 40.61,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 86.7,
+          "y": 117.76,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 45.16,
+          "y": 54.46,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 61.99,
+          "y": 6.13,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 79.62,
+          "y": 115.2,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 12.63,
+          "y": 13.52,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 104.17,
+          "y": 6.37,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 107.45,
+          "y": 120.2,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 119.28,
+          "y": 58.6,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 95.45,
+          "y": 62.88,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 61.73,
+          "y": 51.41,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 37.44,
+          "y": 69.43,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 34.74,
+          "y": 48.52,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 77.07,
+          "y": 44.25,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 108.09,
+          "y": 81.09,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 113.98,
+          "y": 37.84,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 39.68,
+          "y": 58.52,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 24.81,
+          "y": 31.68,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 121.0,
+          "y": 16.49,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 34.29,
+          "y": 21.54,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 10.66,
+          "y": 63.71,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 57.67,
+          "y": 45.94,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 106.56,
+          "y": 86.6,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 90.99,
+          "y": 64.88,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 12.7,
+          "y": 52.64,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 39.47,
+          "y": 68.49,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 44.75,
+          "y": 60.31,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 19.08,
+          "y": 87.71,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 73.51,
+          "y": 95.25,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 47.13,
+          "y": 14.32,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 80.14,
+          "y": 21.09,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 115.47,
+          "y": 44.17,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 79.89,
+          "y": 34.64,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 46.33,
+          "y": 22.7,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 60.1,
+          "y": 87.65,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 66.34,
+          "y": 103.33,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 8.91,
+          "y": 60.65,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 8.25,
+          "y": 45.01,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 99.7,
+          "y": 82.31,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "blackpebble",
+          "x": 25.3,
+          "y": 43.96,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 38.7,
+          "y": 20.2,
+          "r": 0.4,
+          "v": 2
+        },
+        {
+          "kind": "blackpebble",
+          "x": 89.34,
+          "y": 63.16,
+          "r": 0.4,
+          "v": 0
+        },
+        {
+          "kind": "blackpebble",
+          "x": 115.01,
+          "y": 116.01,
+          "r": 0.4,
+          "v": 3
+        },
+        {
+          "kind": "blackpebble",
+          "x": 61.75,
+          "y": 20.36,
+          "r": 0.4,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 60.59,
+          "y": 121.99,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 100.09,
+          "y": 6.25,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 112.91,
+          "y": 87.74,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 19.25,
+          "y": 70.39,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 9.62,
+          "y": 72.44,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 67.09,
+          "y": 121.49,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 73.13,
+          "y": 113.53,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 44.33,
+          "y": 78.67,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 97.36,
+          "y": 101.44,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 45.2,
+          "y": 16.6,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 117.29,
+          "y": 27.58,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 52.09,
+          "y": 61.4,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 15.86,
+          "y": 26.94,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 12.34,
+          "y": 21.87,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 95.72,
+          "y": 110.64,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 14.62,
+          "y": 78.3,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 82.37,
+          "y": 21.49,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 38.81,
+          "y": 27.82,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 75.7,
+          "y": 22.65,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 85.81,
+          "y": 99.25,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 113.68,
+          "y": 29.78,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 63.9,
+          "y": 102.79,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 112.5,
+          "y": 36.33,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 101.1,
+          "y": 63.49,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 42.38,
+          "y": 58.87,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 67.82,
+          "y": 77.15,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 18.22,
+          "y": 43.32,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 12.97,
+          "y": 36.07,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 15.06,
+          "y": 41.42,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 11.6,
+          "y": 89.53,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 121.3,
+          "y": 89.74,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 99.36,
+          "y": 57.21,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 76.54,
+          "y": 34.04,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 71.76,
+          "y": 17.5,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 12.5,
+          "y": 70.46,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 80.59,
+          "y": 77.97,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 56.98,
+          "y": 56.79,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 69.59,
+          "y": 113.93,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 115.92,
+          "y": 66.04,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 50.41,
+          "y": 46.15,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 114.0,
+          "y": 57.09,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 79.64,
+          "y": 25.78,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 10.29,
+          "y": 50.47,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 97.26,
+          "y": 57.09,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 71.67,
+          "y": 43.08,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 79.68,
+          "y": 29.43,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 30.7,
+          "y": 92.32,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 86.51,
+          "y": 11.4,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 90.91,
+          "y": 98.73,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 121.88,
+          "y": 113.41,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 26.14,
+          "y": 92.88,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 108.0,
+          "y": 10.47,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 88.39,
+          "y": 111.99,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 68.33,
+          "y": 38.3,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 93.07,
+          "y": 86.95,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 115.86,
+          "y": 74.85,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 7.24,
+          "y": 89.75,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 7.52,
+          "y": 91.33,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 53.58,
+          "y": 65.81,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 81.57,
+          "y": 88.23,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 14.23,
+          "y": 43.95,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 52.75,
+          "y": 48.63,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 121.73,
+          "y": 99.07,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 120.28,
+          "y": 75.59,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 86.43,
+          "y": 103.08,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 6.35,
+          "y": 78.96,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 48.13,
+          "y": 30.42,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 68.07,
+          "y": 24.56,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 81.51,
+          "y": 23.51,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 19.65,
+          "y": 61.4,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 55.64,
+          "y": 117.6,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 51.05,
+          "y": 50.45,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 81.35,
+          "y": 118.75,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 42.98,
+          "y": 72.83,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 89.26,
+          "y": 106.4,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 63.86,
+          "y": 120.78,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 89.62,
+          "y": 66.34,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 79.13,
+          "y": 66.77,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 65.31,
+          "y": 92.12,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 58.42,
+          "y": 117.61,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 51.91,
+          "y": 44.33,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 13.33,
+          "y": 38.15,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 32.91,
+          "y": 6.25,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 81.69,
+          "y": 17.95,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 117.5,
+          "y": 34.24,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 48.81,
+          "y": 48.9,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "seafoam",
+          "x": 17.32,
+          "y": 23.8,
+          "r": 0.1,
+          "v": 2
+        },
+        {
+          "kind": "seafoam",
+          "x": 79.03,
+          "y": 17.43,
+          "r": 0.1,
+          "v": 0
+        },
+        {
+          "kind": "seafoam",
+          "x": 84.72,
+          "y": 101.0,
+          "r": 0.1,
+          "v": 1
+        },
+        {
+          "kind": "seafoam",
+          "x": 46.21,
+          "y": 48.78,
+          "r": 0.1,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 17.65,
+          "y": 63.54,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 73.82,
+          "y": 43.12,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 79.78,
+          "y": 69.17,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 92.32,
+          "y": 8.67,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 121.33,
+          "y": 23.31,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 95.01,
+          "y": 100.34,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 80.89,
+          "y": 83.9,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 72.04,
+          "y": 81.98,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 121.86,
+          "y": 121.3,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 12.62,
+          "y": 87.35,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 92.88,
+          "y": 117.17,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 112.64,
+          "y": 97.34,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 31.26,
+          "y": 25.78,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 20.51,
+          "y": 11.83,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 42.09,
+          "y": 50.09,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 104.77,
+          "y": 82.04,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 65.31,
+          "y": 33.84,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 43.7,
+          "y": 10.06,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 111.46,
+          "y": 89.78,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 92.81,
+          "y": 119.01,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 103.82,
+          "y": 61.01,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 28.6,
+          "y": 53.61,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 62.33,
+          "y": 49.15,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 47.6,
+          "y": 52.21,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 19.0,
+          "y": 75.09,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "stormreed",
+          "x": 72.89,
+          "y": 121.78,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 78.17,
+          "y": 68.66,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "stormreed",
+          "x": 52.88,
+          "y": 20.07,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 14.96,
+          "y": 81.4,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 78.39,
+          "y": 82.31,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 18.82,
+          "y": 44.9,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 117.25,
+          "y": 77.42,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 60.3,
+          "y": 22.59,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 7.48,
+          "y": 37.2,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "stormreed",
+          "x": 118.79,
+          "y": 78.21,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 113.56,
+          "y": 74.12,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 66.66,
+          "y": 59.72,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "stormreed",
+          "x": 35.59,
+          "y": 86.22,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 99.26,
+          "y": 112.23,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 7.43,
+          "y": 72.6,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 94.65,
+          "y": 12.1,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 83.42,
+          "y": 69.79,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 36.74,
+          "y": 27.25,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 41.82,
+          "y": 14.65,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "stormreed",
+          "x": 20.67,
+          "y": 57.83,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "stormreed",
+          "x": 100.68,
+          "y": 108.8,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "stormreed",
+          "x": 34.76,
+          "y": 35.97,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 13.55,
+          "y": 85.59,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 9.83,
+          "y": 54.24,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 51.99,
+          "y": 65.28,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 15.62,
+          "y": 57.87,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 74.4,
+          "y": 33.46,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "stormreed",
+          "x": 32.27,
+          "y": 87.52,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 18.54,
+          "y": 18.38,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 73.96,
+          "y": 45.4,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 63.57,
+          "y": 66.65,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 61.77,
+          "y": 65.48,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 109.9,
+          "y": 89.43,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 72.86,
+          "y": 97.92,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 106.89,
+          "y": 88.77,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 21.01,
+          "y": 60.09,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "stormreed",
+          "x": 12.71,
+          "y": 8.63,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 119.82,
+          "y": 43.96,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 81.0,
+          "y": 43.46,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 16.13,
+          "y": 32.35,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 61.0,
+          "y": 106.74,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 96.27,
+          "y": 95.72,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 82.77,
+          "y": 7.16,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 94.64,
+          "y": 72.22,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 78.97,
+          "y": 47.84,
+          "r": 0.25,
+          "v": 3
+        },
+        {
+          "kind": "stormreed",
+          "x": 73.02,
+          "y": 19.52,
+          "r": 0.25,
+          "v": 2
+        },
+        {
+          "kind": "stormreed",
+          "x": 56.81,
+          "y": 17.09,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 74.03,
+          "y": 105.1,
+          "r": 0.25,
+          "v": 0
+        },
+        {
+          "kind": "stormreed",
+          "x": 31.49,
+          "y": 21.91,
+          "r": 0.25,
+          "v": 1
+        },
+        {
+          "kind": "stormreed",
+          "x": 65.17,
+          "y": 106.78,
+          "r": 0.25,
+          "v": 2
+        }
+      ],
+      "slimes": [
+        {
+          "kind": "maelstromheart",
+          "x": 100,
+          "y": 14
+        },
+        {
+          "kind": "saltclaw",
+          "x": 62.06,
+          "y": 91.95
+        },
+        {
+          "kind": "saltclaw",
+          "x": 90.4,
+          "y": 88.48
+        },
+        {
+          "kind": "saltclaw",
+          "x": 76.82,
+          "y": 90.77
+        },
+        {
+          "kind": "saltclaw",
+          "x": 68.64,
+          "y": 93.21
+        },
+        {
+          "kind": "saltclaw",
+          "x": 98.2,
+          "y": 87.05
+        },
+        {
+          "kind": "saltclaw",
+          "x": 104.94,
+          "y": 93.51
+        },
+        {
+          "kind": "saltclaw",
+          "x": 12.93,
+          "y": 92.52
+        },
+        {
+          "kind": "saltclaw",
+          "x": 117.21,
+          "y": 91.33
+        },
+        {
+          "kind": "saltclaw",
+          "x": 83.04,
+          "y": 99.32
+        },
+        {
+          "kind": "saltclaw",
+          "x": 67.37,
+          "y": 99.58
+        },
+        {
+          "kind": "saltclaw",
+          "x": 28.09,
+          "y": 92.32
+        },
+        {
+          "kind": "stormgull",
+          "x": 91.65,
+          "y": 71.59
+        },
+        {
+          "kind": "stormgull",
+          "x": 73.23,
+          "y": 76.11
+        },
+        {
+          "kind": "stormgull",
+          "x": 109.72,
+          "y": 73.27
+        },
+        {
+          "kind": "stormgull",
+          "x": 36.7,
+          "y": 78.04
+        },
+        {
+          "kind": "stormgull",
+          "x": 49.91,
+          "y": 72.26
+        },
+        {
+          "kind": "stormgull",
+          "x": 17.62,
+          "y": 69.38
+        },
+        {
+          "kind": "stormgull",
+          "x": 69.83,
+          "y": 81.56
+        },
+        {
+          "kind": "stormgull",
+          "x": 101.6,
+          "y": 70.82
+        },
+        {
+          "kind": "stormgull",
+          "x": 56.95,
+          "y": 76.88
+        },
+        {
+          "kind": "stormgull",
+          "x": 30.25,
+          "y": 85.16
+        },
+        {
+          "kind": "glassray",
+          "x": 49.47,
+          "y": 53.2
+        },
+        {
+          "kind": "glassray",
+          "x": 98.53,
+          "y": 43.14
+        },
+        {
+          "kind": "glassray",
+          "x": 117.64,
+          "y": 45.09
+        },
+        {
+          "kind": "glassray",
+          "x": 21.08,
+          "y": 54.24
+        },
+        {
+          "kind": "glassray",
+          "x": 54.4,
+          "y": 62.62
+        },
+        {
+          "kind": "glassray",
+          "x": 109.59,
+          "y": 45.93
+        },
+        {
+          "kind": "glassray",
+          "x": 90.08,
+          "y": 53.22
+        },
+        {
+          "kind": "glassray",
+          "x": 29.64,
+          "y": 50.29
+        },
+        {
+          "kind": "glassray",
+          "x": 20.46,
+          "y": 43.09
+        },
+        {
+          "kind": "glassray",
+          "x": 55.23,
+          "y": 50.54
+        },
+        {
+          "kind": "breakersentinel",
+          "x": 69.16,
+          "y": 36.16
+        },
+        {
+          "kind": "breakersentinel",
+          "x": 36.64,
+          "y": 33.74
+        },
+        {
+          "kind": "breakersentinel",
+          "x": 41.85,
+          "y": 29.23
+        },
+        {
+          "kind": "breakersentinel",
+          "x": 20.02,
+          "y": 26.32
+        },
+        {
+          "kind": "breakersentinel",
+          "x": 43.53,
+          "y": 22.16
+        },
+        {
+          "kind": "breakersentinel",
+          "x": 59.39,
+          "y": 28.27
+        },
+        {
+          "kind": "breakersentinel",
+          "x": 81.76,
+          "y": 36.37
+        },
+        {
+          "kind": "breakersentinel",
+          "x": 50.51,
+          "y": 30.66
+        },
+        {
+          "kind": "breakersentinel",
+          "x": 27.75,
+          "y": 23.8
+        }
+      ],
+      "npcs": [
+        {
+          "id": "stormglass_warden",
+          "name": "Captain Thora Vale",
+          "role": "Keeper of Breakwater Camp",
+          "x": 28,
+          "y": 101,
+          "color": "#a8dfe4",
+          "dialogue": "Asterion sent us to listen to the coast. The sea answers in thunder. Meet the crew before you follow its voice.",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "skin": "#ac806c",
+            "hair": "#d7f4e8",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#31536b"
+          }
+        },
+        {
+          "id": "stormglass_healer",
+          "name": "Iven Saltmender",
+          "role": "Storm physician",
+          "x": 35,
+          "y": 114,
+          "color": "#a8dfe4",
+          "dialogue": "Lightning leaves a wound that salt cannot clean. Rest by the blue lamps.",
+          "offers": [
+            {
+              "id": "blessing",
+              "label": "Receive a healing blessing",
+              "cost": 0,
+              "heal": 10000
+            },
+            {
+              "id": "buy_health_potion",
+              "label": "Buy Health Potion",
+              "cost": 30,
+              "item": "health_potion",
+              "tiered": true
+            }
+          ],
+          "buys": false,
+          "look": {
+            "skin": "#ac806c",
+            "hair": "#d7f4e8",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#31536b"
+          }
+        },
+        {
+          "id": "stormglass_scout",
+          "name": "Nera Kestrel",
+          "role": "Cliff scout",
+          "x": 39,
+          "y": 101,
+          "color": "#a8dfe4",
+          "dialogue": "Gulls strike from the air, rays sail through the spray. The old sentinels wake whenever the tide turns.",
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "cost": 250,
+              "merc": "warrior"
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "cost": 250,
+              "merc": "mage"
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "cost": 250,
+              "merc": "assassin"
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "cost": 250,
+              "merc": "priest"
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "cost": 250,
+              "merc": "hunter"
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
+          "buys": false,
+          "look": {
+            "skin": "#ac806c",
+            "hair": "#d7f4e8",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#31536b"
+          }
+        },
+        {
+          "id": "stormglass_scholar",
+          "name": "Orrin Glass",
+          "role": "Tide historian",
+          "x": 45,
+          "y": 111,
+          "color": "#a8dfe4",
+          "dialogue": "These black pebbles are fused sand. The Eye Below was sealed before anyone remembers why.",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "skin": "#ac806c",
+            "hair": "#d7f4e8",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#31536b"
+          }
+        },
+        {
+          "id": "stormglass_trader",
+          "name": "Bela Netwise",
+          "role": "Quartermaster and material buyer",
+          "x": 29,
+          "y": 119,
+          "color": "#a8dfe4",
+          "dialogue": "I pay for what the tide leaves behind. Take provisions before you climb the cliffs.",
+          "offers": [
+            {
+              "id": "buy_traveler_stew",
+              "label": "Buy Traveler's Stew",
+              "cost": 12,
+              "item": "traveler_stew",
+              "tiered": true
+            },
+            {
+              "id": "satchel",
+              "label": "Buy Linen Satchel",
+              "cost": 500,
+              "bag": "linen_satchel"
+            }
+          ],
+          "buys": true,
+          "look": {
+            "skin": "#ac806c",
+            "hair": "#d7f4e8",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#31536b"
+          }
+        },
+        {
+          "id": "stormglass_watcher",
+          "name": "Mara of the Last Light",
+          "role": "Eye Below warden",
+          "x": 96,
+          "y": 34,
+          "color": "#a8dfe4",
+          "dialogue": "The Eye Below is sealed. Its stone remembers five voices, but no path opens yet. Learn what stalks this shore and return when the seal is ready.",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "skin": "#ac806c",
+            "hair": "#d7f4e8",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#31536b"
+          }
+        },
+        {
+          "id": "stormglass_stone",
+          "name": "The Breakwater Meeting Stone",
+          "role": "Gather a party \u00b7 hire fighters",
+          "x": 91,
+          "y": 27,
+          "color": "#a8dfe4",
+          "dialogue": "The runes gather companions for 250 gold each. The Eye Below is sealed; this stone can still help a party face the shore.",
+          "offers": [
+            {
+              "id": "merc_warrior",
+              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "cost": 250,
+              "merc": "warrior",
+              "open": true
+            },
+            {
+              "id": "merc_mage",
+              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "cost": 250,
+              "merc": "mage",
+              "open": true
+            },
+            {
+              "id": "merc_assassin",
+              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "cost": 250,
+              "merc": "assassin",
+              "open": true
+            },
+            {
+              "id": "merc_priest",
+              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "cost": 250,
+              "merc": "priest",
+              "open": true
+            },
+            {
+              "id": "merc_hunter",
+              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "cost": 250,
+              "merc": "hunter",
+              "open": true
+            },
+            {
+              "id": "merc_dismiss",
+              "label": "Send my mercenaries away",
+              "cost": 0,
+              "merc": "dismiss"
+            }
+          ],
+          "buys": false,
+          "look": {
+            "skin": "#ac806c",
+            "hair": "#d7f4e8",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#31536b"
+          },
+          "art": "stone"
+        },
+        {
+          "id": "travel_breakwater",
+          "name": "Travel Master",
+          "role": "Spark Travel",
+          "x": 42,
+          "y": 119,
+          "color": "#74d7d0",
+          "travelStop": "Breakwater Camp",
+          "travelLinks": [
+            "travel_asterion"
+          ],
+          "look": {
+            "hair": "#e4edf4",
+            "skin": "#edc5a1",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#328e97"
+          },
+          "dialogue": "This stop is now yours to visit by Spark Travel. Become a sparkling spark and fly for 20 gold per leg, at three times walking speed. Talk to every travel master along a route before you can use it.",
+          "offers": [],
+          "buys": false
+        }
+      ],
+      "places": [
+        {
+          "id": "stormglass_eye",
+          "name": "The Eye Below",
+          "x": 105,
+          "y": 23,
+          "r": 5
+        },
+        {
+          "id": "stormglass_bell",
+          "name": "The Tide Bell",
+          "x": 92,
+          "y": 36,
+          "r": 3
+        }
+      ],
+      "quests": [
+        {
+          "id": "stormglass_welcome",
+          "title": "A Camp Against the Tide",
+          "npc": "stormglass_warden",
+          "description": "Meet Breakwater Camp\u2019s physician, scout and historian.",
+          "objectives": [
+            {
+              "kind": "talk",
+              "target": "stormglass_healer",
+              "count": 1,
+              "label": "Meet Iven"
+            },
+            {
+              "kind": "talk",
+              "target": "stormglass_scout",
+              "count": 1,
+              "label": "Meet Nera"
+            },
+            {
+              "kind": "talk",
+              "target": "stormglass_scholar",
+              "count": 1,
+              "label": "Meet Orrin"
+            }
+          ],
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 3200,
+          "requires": null,
+          "repeatable": false
+        },
+        {
+          "id": "stormglass_crabs",
+          "title": "Claws in the Salt",
+          "npc": "stormglass_scout",
+          "description": "Drive the Saltclaws from the lower strand.",
+          "objectives": [
+            {
+              "kind": "kill",
+              "target": "saltclaw",
+              "count": 6,
+              "label": "Defeat Saltclaws"
+            }
+          ],
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 3800,
+          "requires": "stormglass_welcome",
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l60_green"
+        },
+        {
+          "id": "stormglass_gulls",
+          "title": "Wings Over Breakwater",
+          "npc": "stormglass_scout",
+          "description": "Stop the Stormgulls from circling the camp.",
+          "objectives": [
+            {
+              "kind": "kill",
+              "target": "stormgull",
+              "count": 6,
+              "label": "Defeat Stormgulls"
+            }
+          ],
+          "level": 61,
+          "rewardXp": 4820,
+          "rewardGold": 4100,
+          "requires": "stormglass_crabs",
+          "repeatable": false,
+          "rewardItem": "pants_wayfarer_l60_green"
+        },
+        {
+          "id": "stormglass_rays",
+          "title": "Glass in the Surf",
+          "npc": "stormglass_scholar",
+          "description": "Bring the fins of the rays that skim the middle shore.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "glassfin",
+              "count": 5,
+              "label": "Bring Glassfins"
+            }
+          ],
+          "level": 62,
+          "rewardXp": 4960,
+          "rewardGold": 4400,
+          "requires": "stormglass_gulls",
+          "repeatable": false
+        },
+        {
+          "id": "stormglass_guards",
+          "title": "The Tide Remembers",
+          "npc": "stormglass_watcher",
+          "description": "Silence the old Breaker Sentinels along the northern approach.",
+          "objectives": [
+            {
+              "kind": "kill",
+              "target": "breakersentinel",
+              "count": 5,
+              "label": "Defeat Breaker Sentinels"
+            }
+          ],
+          "level": 64,
+          "rewardXp": 5270,
+          "rewardGold": 5200,
+          "requires": "stormglass_rays",
+          "repeatable": false,
+          "rewardItem": "necklace_moonstone_l65_blue"
+        },
+        {
+          "id": "stormglass_eye",
+          "title": "The Eye That Will Not Open",
+          "npc": "stormglass_watcher",
+          "description": "Inspect the sealed Eye and speak to the Meeting Stone. The descent is for a future expedition.",
+          "objectives": [
+            {
+              "kind": "visit",
+              "target": "stormglass_eye",
+              "count": 1,
+              "label": "Inspect the Eye Below"
+            },
+            {
+              "kind": "talk",
+              "target": "stormglass_stone",
+              "count": 1,
+              "label": "Speak with the Meeting Stone"
+            }
+          ],
+          "level": 65,
+          "rewardXp": 5420,
+          "rewardGold": 6200,
+          "requires": "stormglass_guards",
+          "repeatable": false
+        },
+        {
+          "id": "stormglass_heart",
+          "title": "Heart of the Storm",
+          "npc": "stormglass_warden",
+          "description": "The living storm has taken shape on the high shore. Gather five companions.",
+          "objectives": [
+            {
+              "kind": "kill",
+              "target": "maelstromheart",
+              "count": 1,
+              "label": "Defeat the Maelstrom Heart"
+            }
+          ],
+          "level": 65,
+          "rewardXp": 5420,
+          "rewardGold": 9500,
+          "requires": "stormglass_guards",
+          "repeatable": false,
+          "group": true,
+          "recommendedPlayers": 5,
+          "rewardItem": "accessory_amber_l65_blue"
+        },
+        {
+          "id": "stormglass_patrol",
+          "title": "Keep the Lamps Burning",
+          "npc": "stormglass_warden",
+          "description": "Thin the creatures gathering outside camp.",
+          "objectives": [
+            {
+              "kind": "kill",
+              "target": "saltclaw",
+              "count": 3,
+              "label": "Defeat Saltclaws"
+            },
+            {
+              "kind": "kill",
+              "target": "stormgull",
+              "count": 3,
+              "label": "Defeat Stormgulls"
+            }
+          ],
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 2800,
+          "requires": "stormglass_welcome",
+          "repeatable": true
+        }
+      ],
+      "city": {
+        "name": "Breakwater Camp",
+        "x0": 10,
+        "x1": 49,
+        "y0": 96,
+        "y1": 124,
+        "plaza": {
+          "x": 30,
+          "y": 108
+        },
+        "radius": 6,
+        "entry": {
+          "x": 13,
+          "y": 105
+        }
+      },
+      "futureInstance": {
+        "name": "The Eye Below",
+        "level": 65,
+        "players": 5,
+        "status": "sealed",
+        "x": 105,
+        "y": 23,
+        "description": "A sealed five-player descent beneath the stormglass sea."
+      },
+      "portals": [
+        {
+          "id": "stormglass_asterion_gate",
+          "name": "The Stormglass Causeway",
+          "x": 7,
+          "y": 105,
+          "r": 1.2,
+          "to": 17,
+          "tx": 160,
+          "ty": 88,
+          "look": "stormglass"
         }
       ]
     }

@@ -37,11 +37,11 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
       sprite:[Field.moonwellSprites.img.moonwell_echo.naturalWidth,Field.moonwellSprites.img.moonwell_echo.naturalHeight],
       map:WorldMap._layout.length,legend:WorldMap._kinds.moonwell_echo?.[1],music:!!window.createAsterionMusic};
   });
-  check(data.zones===19&&data.city==='Asterion'&&data.theme==='asterion'&&data.size===180,'The full city loads as zone 17');
+  check(data.zones===20&&data.city==='Asterion'&&data.theme==='asterion'&&data.size===180,'The full city loads as zone 17');
   check(data.houses>=120&&data.labels===data.houses,'Every one of the glass-roof houses has a unique address');
   check(data.npcs===21&&data.walkers===10&&data.looks>=8,'Moving townspeople carry distinct clothes and props');
   check(data.quests===6&&data.travel?.includes('travel_lamplight')&&data.stone==='stone','Quest hub, Travel Master and interactive Meeting Stone load');
-  check(data.art&&data.map===19&&data.legend===60&&data.music,'Art, world map and dybase2 music hook load');
+  check(data.art&&data.map===20&&data.legend===60&&data.music,'Art, world map and dybase2 music hook load');
   check(data.well.join(',')==='The Moonwell,moonwell,4,60,moonwell_echo,20,4'&&data.gardenArt,'Floating Moonwell garden and four bosses load');
   check(STUB||data.sprite.join(',')==='768,480','PixelFlow boss atlas loads in its five-clip format');
   check(STUB||data.gardenSprite===768,'Six new five-clip monster atlases load');

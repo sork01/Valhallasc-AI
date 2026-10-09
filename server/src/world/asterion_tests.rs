@@ -44,7 +44,10 @@ fn asterion_is_a_reachable_city_of_distinct_homes_people_and_services() {
         .iter()
         .find(|n| n.id == "travel_asterion")
         .unwrap();
-    assert_eq!(master.travel_links, ["travel_lamplight"]);
+    assert_eq!(
+        master.travel_links,
+        ["travel_lamplight", "travel_breakwater"]
+    );
     assert!(
         w.maps[16].npcs.iter().any(|n| n.id == "travel_lamplight"
             && n.travel_links.contains(&"travel_asterion".to_string()))
@@ -66,7 +69,7 @@ fn moonwell_has_four_private_copies_safe_arrivals_and_a_unique_boss_drop() {
     );
     assert_eq!(well.final_boss, "moonwell_echo");
     assert_eq!(w.instances.iter().filter(|i| i.template == WELL).count(), 4);
-    assert_eq!(w.maps.len(), 34);
+    assert_eq!(w.maps.len(), 35);
     let seen = flood(well, &blocked(well, &[]), well.spawn);
     for s in w.slimes.iter().filter(|s| s.zone == WELL) {
         assert!(reached(well, &seen, s.point()), "{}", s.kind);

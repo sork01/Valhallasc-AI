@@ -35,6 +35,8 @@ mod rolls;
 #[cfg(test)]
 mod sky_tests;
 mod social;
+#[cfg(test)]
+mod stormglass_tests;
 mod travel;
 #[cfg(test)]
 mod vault_tests;
@@ -406,6 +408,12 @@ impl Slime {
             "hourpetal_stag" => (1300000., 12500., 2.6, 2.25),
             "moonskein_weaver" => (1600000., 14000., 2.5, 2.35),
             "moonwell_echo" => (2400000., 16500., 2.2, 2.7),
+            // Stormglass Shore: the surf grows sharper toward the sealed Eye Below.
+            "saltclaw" => (185000., 2700., 2.9, 1.55),
+            "stormgull" => (175000., 2900., 4.0, 1.35),
+            "glassray" => (205000., 3300., 3.5, 1.5),
+            "breakersentinel" => (270000., 3900., 2.0, 1.9),
+            "maelstromheart" => (2100000., 17000., 2.0, 2.7),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -481,6 +489,11 @@ impl Slime {
             "nightbloom" => 60,
             "dew_moth" | "lumen_eel" | "rootbell" | "tideglass_heron" | "hourpetal_stag"
             | "moonskein_weaver" | "moonwell_echo" => 60,
+            "saltclaw" => 60,
+            "stormgull" => 61,
+            "glassray" => 62,
+            "breakersentinel" => 64,
+            "maelstromheart" => 65,
             _ => 2,
         }
     }
@@ -564,6 +577,11 @@ impl Slime {
             "hourpetal_stag" => 15500,
             "moonskein_weaver" => 19000,
             "moonwell_echo" => 24000,
+            "saltclaw" => 3900,
+            "stormgull" => 4200,
+            "glassray" => 4600,
+            "breakersentinel" => 5200,
+            "maelstromheart" => 26000,
             _ => 0,
         }
     }
@@ -650,6 +668,11 @@ impl Slime {
             "hourpetal_stag" => (1.1, 1.8, 7., 12.),
             "moonskein_weaver" => (0.9, 2.1, 0., 14.),
             "moonwell_echo" => (1.0, 1.9, 6.5, 15.),
+            "saltclaw" => (0.5, 1.3, 8., 9.),
+            "stormgull" => (0.35, 1.05, 11., 10.),
+            "glassray" => (0.55, 1.4, 9.5, 10.),
+            "breakersentinel" => (0.85, 1.7, 6.5, 9.),
+            "maelstromheart" => (1.1, 2.1, 6., 15.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -730,6 +753,8 @@ impl Slime {
             "nightbloom" => 4.5,
             "hourpetal_stag" => 3.7,
             "moonwell_echo" => 4.2,
+            "breakersentinel" => 3.0,
+            "maelstromheart" => 4.5,
             _ => 0.,
         }
     }
@@ -2550,7 +2575,7 @@ impl World {
                 "cinderlord" => 180.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
-                | "mireheart" | "silverwidow" | "nightbloom" => 600.,
+                | "mireheart" | "silverwidow" | "nightbloom" | "maelstromheart" => 600.,
                 "oakhorn" => 180.,
                 _ => 22.,
             };
@@ -2967,6 +2992,7 @@ impl World {
                             | "mireheart"
                             | "silverwidow"
                             | "nightbloom"
+                            | "maelstromheart"
                     ) || is_boss(&s.kind)
                     {
                         s.max_hp
@@ -4850,7 +4876,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 19);
+        assert_eq!(zone_count(&w), 20);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -5453,7 +5479,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 19);
+        assert_eq!(zone_count(&w), 20);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -5713,6 +5739,7 @@ mod tests {
             "mireheart",
             "silverwidow",
             "nightbloom",
+            "maelstromheart",
         ] {
             let id = w.slimes.iter().position(|s| s.kind == kind).unwrap();
             let zone = w.slimes[id].zone;
@@ -5747,6 +5774,7 @@ mod tests {
             (14, "prism_sunshard"),
             (15, "orrery_engine"),
             (16, "moonspore_bloom"),
+            (19, "stormglass_heart"),
         ];
         for (zone, hard_id) in hard {
             let quests = &w.maps[zone].quests;
@@ -6292,8 +6320,8 @@ mod tests {
         let map = &w.maps[CITY];
         assert_eq!(
             zone_count(&w),
-            19,
-            "Skaldholm is the fifth map; the Moonwell is the nineteenth public map"
+            20,
+            "Skaldholm is the fifth map; Stormglass is the twentieth public map"
         );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
@@ -7998,7 +8026,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 19);
+        assert_eq!(zone_count(&w), 20);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));

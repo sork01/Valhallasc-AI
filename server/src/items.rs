@@ -195,6 +195,11 @@ pub fn material(kind: &str) -> &'static str {
         "hourpetal_stag" => "hourpetal_antler",
         "moonskein_weaver" => "moonskein_thread",
         "moonwell_echo" => "moonwell_shard",
+        "saltclaw" => "saltclaw_shell",
+        "stormgull" => "stormgull_feather",
+        "glassray" => "glassfin",
+        "breakersentinel" => "breaker_core",
+        "maelstromheart" => "stormheart",
         _ => "slime_gel",
     }
 }
@@ -257,6 +262,7 @@ pub fn is_elite(kind: &str) -> bool {
             | "hourpetal_stag"
             | "moonskein_weaver"
             | "moonwell_echo"
+            | "maelstromheart"
     ) || is_vault_enemy(kind)
 }
 /// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.
@@ -908,6 +914,7 @@ mod tests {
                         50 => 40,
                         55 => 48,
                         60 => 55,
+                        65 => 63,
                         level => panic!("unexpected gear level {level}"),
                     };
                     assert_eq!(value, expected, "{}", i.id);
@@ -1564,7 +1571,7 @@ mod tests {
         }
     }
     #[test]
-    fn moonspore_drop_pool_uses_only_level_fifty_five_and_sixty_gear() {
+    fn moonspore_and_stormglass_drop_pools_reach_level_sixty_five_gear() {
         for rarity in ["common", "uncommon", "rare", "epic"] {
             let pool: Vec<_> = ITEMS
                 .iter()
@@ -1573,11 +1580,11 @@ mod tests {
                         && i.rarity == rarity
                         && !i.starter
                         && i.source.is_none()
-                        && (55..=60).contains(&i.required_level)
+                        && (55..=65).contains(&i.required_level)
                 })
                 .collect();
-            assert!(!pool.is_empty(), "{rarity} has level 55/60 gear");
-            for enemy_level in [55, 58, 60] {
+            assert!(!pool.is_empty(), "{rarity} has level 55/60/65 gear");
+            for enemy_level in [55, 58, 60, 62, 65] {
                 let drops: std::collections::BTreeSet<_> = (0..pool.len())
                     .map(|n| {
                         equipment_of_rarity(
@@ -1758,7 +1765,7 @@ mod tests {
                 continue;
             }
             assert!(
-                i.required_level == 1 || (i.required_level <= 60 && i.required_level % 5 == 0),
+                i.required_level == 1 || (i.required_level <= 65 && i.required_level % 5 == 0),
                 "{} needs level {}",
                 i.id,
                 i.required_level
@@ -1771,7 +1778,7 @@ mod tests {
         assert_eq!(
             used.into_iter().collect::<Vec<_>>(),
             std::iter::once(1)
-                .chain((5..=60).step_by(5))
+                .chain((5..=65).step_by(5))
                 .collect::<Vec<_>>()
         );
     }

@@ -1,10 +1,10 @@
-"""Builds the level 1–60 gear ladder and exclusive Undervault/Cathedral sets in world/items.txt.
+"""Builds the level 1–65 gear ladder and exclusive Undervault/Cathedral sets in world/items.txt.
 
 Run `python3 scripts/gear_levels.py`, then `node scripts/sync-world.cjs` and rebuild Rust. It is idempotent: it keeps
 every non-gear item and every original piece (an entry with no `art` key) and regenerates the rest.
 
-SETS. Required levels come in steps of five (1, 5, ... 60). Every level has a gray, a green and a blue set; purple
-exists at every multiple of ten. That is 41 sets. A set holds, per class, a chest, headgear, shoulders,
+SETS. Required levels come in steps of five (1, 5, ... 65). Every level has a gray, a green and a blue set; purple
+exists at every multiple of ten. That is 48 sets. A set holds, per class, a chest, headgear, shoulders,
 gloves and weapon, plus the shared (class-independent) pants, necklace and ring.
 
 ART. No new art is drawn. A generated piece names the original piece it recolours (`art`: the original's variant) and
@@ -26,7 +26,7 @@ from cathedral_content import WINGS
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ITEMS = ROOT / 'world' / 'items.txt'
 
-LEVELS = (1, *range(5, 61, 5))
+LEVELS = (1, *range(5, 66, 5))
 RARITIES = ['common', 'uncommon', 'rare', 'epic']       # gray, green, blue, purple
 COLOUR = {'common': 'gray', 'uncommon': 'green', 'rare': 'blue', 'epic': 'purple'}
 SETS = [(level, rarity) for level in LEVELS for rarity in RARITIES if rarity != 'epic' or level % 10 == 0]
@@ -95,6 +95,7 @@ WORDS = {
     (50, 'common'): 'Timeworn', (50, 'uncommon'): 'Starforged', (50, 'rare'): 'Empyrean', (50, 'epic'): 'Ascendant',
     (55, 'common'): 'Clockworn', (55, 'uncommon'): 'Hourforged', (55, 'rare'): 'Epochbound',
     (60, 'common'): 'Sporeworn', (60, 'uncommon'): 'Moonwoven', (60, 'rare'): 'Nightbloom', (60, 'epic'): 'Mooncrowned',
+    (65, 'common'): 'Saltworn', (65, 'uncommon'): 'Stormforged', (65, 'rare'): 'Eye-bound',
 }
 LEVEL_HUE = {level: (index * 70) % 360 for index, level in enumerate(LEVELS)}
 RARITY_TINT = {   # hue offset, saturate, brightness
