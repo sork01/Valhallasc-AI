@@ -10,10 +10,11 @@ mod world;
 use axum::{
     Router,
     extract::{
-        State, WebSocketUpgrade,
+        Request, State, WebSocketUpgrade,
         ws::{Message, WebSocket},
     },
     http::{HeaderMap, HeaderValue, StatusCode, header},
+    middleware::{self, Next},
     response::{IntoResponse, Response},
     routing::{any, get},
 };
@@ -114,10 +115,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
         .route("/ws", any(upgrade))
         .fallback_service(ServeDir::new(client))
-        .layer(SetResponseHeaderLayer::overriding(
-            header::CACHE_CONTROL,
-            HeaderValue::from_static("no-store"),
-        ))
+        .layer(middleware::from_fn(cache_policy))
         .layer(SetResponseHeaderLayer::overriding(
             header::X_CONTENT_TYPE_OPTIONS,
             HeaderValue::from_static("nosniff"),
@@ -350,9 +348,82 @@ async fn connection(mut socket: WebSocket, mut app: App) {
     let _ = tokio::time::timeout(Duration::from_secs(1), socket.send(Message::Close(None))).await;
 }
 
+/// Pages, scripts and API replies are never cached, so a saved client file is live at once. The art under /assets/
+/// (sprite atlases and their metadata, music) is megabytes that do not change between visits: `no-cache` lets the
+/// browser keep it but makes it ask first, and ServeDir answers that with a bodiless 304 from Last-Modified. A
+/// regenerated file is therefore still picked up on the next load. (Restoring an older file keeps its older mtime and
+/// would be answered 304: `touch` it.) Errors are never cached.
+async fn cache_policy(request: Request, next: Next) -> Response {
+    let art = request.uri().path().starts_with("/assets/");
+    let mut response = next.run(request).await;
+    let cacheable =
+        art && (response.status().is_success() || response.status() == StatusCode::NOT_MODIFIED);
+    response.headers_mut().insert(
+        header::CACHE_CONTROL,
+        HeaderValue::from_static(if cacheable { "no-cache" } else { "no-store" }),
+    );
+    response
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tower::ServiceExt;
+
+    #[tokio::test]
+    async fn art_is_revalidated_while_code_and_errors_are_never_stored() {
+        let dir = std::env::temp_dir().join(format!("valhalla-cache-test-{}", std::process::id()));
+        std::fs::create_dir_all(dir.join("assets")).unwrap();
+        std::fs::write(dir.join("assets/a.png"), b"png").unwrap();
+        std::fs::write(dir.join("game.js"), b"js").unwrap();
+        let app = Router::new()
+            .route("/health", get(|| async { "ok" }))
+            .fallback_service(ServeDir::new(&dir))
+            .layer(middleware::from_fn(cache_policy));
+        let get_path = |path: &str, since: Option<&str>| {
+            let mut request = Request::builder().uri(path);
+            if let Some(since) = since {
+                request = request.header(header::IF_MODIFIED_SINCE, since);
+            }
+            app.clone()
+                .oneshot(request.body(axum::body::Body::empty()).unwrap())
+        };
+        let cache = |r: &Response| {
+            r.headers()[header::CACHE_CONTROL]
+                .to_str()
+                .unwrap()
+                .to_owned()
+        };
+        let art = get_path("/assets/a.png", None).await.unwrap();
+        assert_eq!(
+            (art.status(), cache(&art).as_str()),
+            (StatusCode::OK, "no-cache")
+        );
+        // The browser's revalidation is a 304 with no body, and stays storable.
+        let stamp = art.headers()[header::LAST_MODIFIED]
+            .to_str()
+            .unwrap()
+            .to_owned();
+        let again = get_path("/assets/a.png", Some(&stamp)).await.unwrap();
+        assert_eq!(
+            (again.status(), cache(&again).as_str()),
+            (StatusCode::NOT_MODIFIED, "no-cache")
+        );
+        for (path, status) in [
+            ("/game.js", StatusCode::OK),
+            ("/health", StatusCode::OK),
+            ("/assets/missing.png", StatusCode::NOT_FOUND),
+        ] {
+            let r = get_path(path, None).await.unwrap();
+            assert_eq!(
+                (r.status(), cache(&r).as_str()),
+                (status, "no-store"),
+                "{path}"
+            );
+        }
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
     #[test]
     fn each_connection_forwards_only_the_zone_that_lists_its_character() {
         let view = |zone: usize, ids: &[&str]| json!({"zone": zone, "players": ids.iter().map(|id| json!({"id": id})).collect::<Vec<_>>()});
