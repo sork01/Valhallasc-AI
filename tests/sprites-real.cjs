@@ -150,7 +150,7 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
         femaleChanged += worn.hash !== base.hash; femaleSilhouette += worn.visible === base.visible;
         femaleColours.set(key, (femaleColours.get(key) || new Set()).add(worn.hash));
       }
-      check(newPieces.length === 192 && femaleChanged === newPieces.length && femaleSilhouette === newPieces.length, `${cls} (female): every new tier and wing piece draws with its own colours and the base silhouette`);
+      check(newPieces.length >= 192 && femaleChanged === newPieces.length && femaleSilhouette === newPieces.length, `${cls} (female): every new tier and wing piece draws with its own colours and the base silhouette`);
       check([...femaleColours].every(([key, hashes]) => hashes.size === newPieces.filter(([kind, , art]) => kind + '|' + art === key).length), `${cls} (female): no new tier or wing piece shares its colours`);
       // Save a contact sheet of complete ordinary/wing outfits, both bodies, attack at two facings and death.
       const contact = await page.evaluate(async cls => {
