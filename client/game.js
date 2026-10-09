@@ -131,7 +131,7 @@
   // ---------- background music (music.js) ----------
   // Browsers only let audio start after a tap or key press, so the score begins on the first one
   // (on the title screen that is the tap that awakens the horn) and then plays on every screen.
-  let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, wmusic = null, kmusic = null, dmusic = null, nmusic = null, amusic = null, pmusic = null, omusic = null, mmusic = null, cathedralMusic = [], musicZone = 0;
+  let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, wmusic = null, kmusic = null, dmusic = null, nmusic = null, amusic = null, pmusic = null, omusic = null, mmusic = null, hmusic = null, cathedralMusic = [], musicZone = 0;
   function ensureMusic() {
     const c = audio(); if (!c || !window.createMusic) return;
     if (!music) { music = window.createMusic(c); c.addEventListener('statechange', ensureMusic); }
@@ -149,6 +149,7 @@
     if (!pmusic && window.createPrismMusic) pmusic = window.createPrismMusic(c);
     if (!omusic && window.createOrreryMusic) omusic = window.createOrreryMusic(c);
     if (!mmusic && window.createMoonsporeMusic) mmusic = window.createMoonsporeMusic(c);
+    if (!hmusic && window.createAsterionMusic) hmusic = window.createAsterionMusic(c);
     if (!cathedralMusic.length && window.createCathedralMusic) cathedralMusic = [0,1,2].map(i => window.createCathedralMusic(c,i));
     syncMusic();
   }
@@ -156,15 +157,15 @@
   function syncMusic() {
     if (!ac || ac.state !== 'running') return;
     // In the game each zone selects its score; Greenmeadow and Alderhaven share the folk tune.
-    const here = scene === 'game' ? (musicZone >= 17 && musicZone <= 19 && vmusic ? vmusic : musicZone === 16 && mmusic ? mmusic : musicZone === 15 && omusic ? omusic : musicZone === 14 && pmusic ? pmusic : musicZone === 13 && amusic ? amusic : musicZone >= 10 && musicZone <= 12 && cathedralMusic[musicZone - 10] ? cathedralMusic[musicZone - 10] : musicZone === 9 && nmusic ? nmusic : musicZone === 8 && dmusic ? dmusic : musicZone === 7 && kmusic ? kmusic : musicZone === 6 && wmusic ? wmusic : musicZone === 5 ? vmusic : musicZone === 4 && smusic ? smusic : musicZone === 3 && gmusic ? gmusic : musicZone === 2 && rmusic ? rmusic : musicZone > 0 && cmusic ? cmusic : fmusic) : null;
-    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, ...cathedralMusic]) if (m && m !== here && m.running) m.stop();
+    const here = scene === 'game' ? (musicZone === 17 && hmusic ? hmusic : ((musicZone >= 18 && musicZone <= 21) || (musicZone >= 31 && musicZone <= 33)) && vmusic ? vmusic : musicZone === 16 && mmusic ? mmusic : musicZone === 15 && omusic ? omusic : musicZone === 14 && pmusic ? pmusic : musicZone === 13 && amusic ? amusic : musicZone >= 10 && musicZone <= 12 && cathedralMusic[musicZone - 10] ? cathedralMusic[musicZone - 10] : musicZone === 9 && nmusic ? nmusic : musicZone === 8 && dmusic ? dmusic : musicZone === 7 && kmusic ? kmusic : musicZone === 6 && wmusic ? wmusic : musicZone === 5 ? vmusic : musicZone === 4 && smusic ? smusic : musicZone === 3 && gmusic ? gmusic : musicZone === 2 && rmusic ? rmusic : musicZone > 0 && cmusic ? cmusic : fmusic) : null;
+    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, ...cathedralMusic]) if (m && m !== here && m.running) m.stop();
     if (scene === 'game') { if (music && music.running) music.stop(); if (here && !here.running) here.start(); }
     else if (music && !music.running) music.start();
     applyMusicLevel(3);
   }
   function applyMusicLevel(secs = 1.5) {
     if (music) music.setLevel(save.sound ? (scene === 'splash' ? 1 : .55) * taper(save.musicVol) : 0, secs);
-    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, ...cathedralMusic]) if (m) m.setLevel(save.sound ? taper(save.musicVol) : 0, secs);
+    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, ...cathedralMusic]) if (m) m.setLevel(save.sound ? taper(save.musicVol) : 0, secs);
   }
   function unlockAudio() { const c = audio(); if (c) c.resume().then(ensureMusic).catch(() => {}); }
   ['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, unlockAudio, { capture: true }));
@@ -290,7 +291,7 @@
   const wcv = $('wcv');
   const view = new window.WarriorView(wcv, name => onWarrior(name));
   view.reduced = reduced;
-  window.valhalla = { view, get music() { return music; }, get fmusic() { return fmusic; }, get cmusic() { return cmusic; }, get rmusic() { return rmusic; }, get gmusic() { return gmusic; }, get smusic() { return smusic; }, get vmusic() { return vmusic; }, get wmusic() { return wmusic; }, get kmusic() { return kmusic; }, get dmusic() { return dmusic; }, get nmusic() { return nmusic; }, get amusic() { return amusic; }, get pmusic() { return pmusic; }, get omusic() { return omusic; }, get mmusic() { return mmusic; }, get cathedralMusic() { return cathedralMusic; }, get ctx() { return ac; } };   // debug handle (also used by the tests)
+  window.valhalla = { view, get music() { return music; }, get fmusic() { return fmusic; }, get cmusic() { return cmusic; }, get rmusic() { return rmusic; }, get gmusic() { return gmusic; }, get smusic() { return smusic; }, get vmusic() { return vmusic; }, get wmusic() { return wmusic; }, get kmusic() { return kmusic; }, get dmusic() { return dmusic; }, get nmusic() { return nmusic; }, get amusic() { return amusic; }, get pmusic() { return pmusic; }, get omusic() { return omusic; }, get mmusic() { return mmusic; }, get hmusic() { return hmusic; }, get cathedralMusic() { return cathedralMusic; }, get ctx() { return ac; } };   // debug handle (also used by the tests)
   if (view.ok) {
     view.load('assets/warrior.webp', 'assets/warrior_mask.png').then(() => { view.bind(); view.set(cfg); if (scene === 'create' && !modular(cfg)) view.setActive(true); }).catch(() => fallbackWarrior());
   } else fallbackWarrior();

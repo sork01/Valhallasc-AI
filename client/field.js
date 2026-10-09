@@ -42,7 +42,7 @@
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn;
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
-    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
+    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
       const i = y * MAP + x, cx = x + .5, cy = y + .5;
       map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : vault ? 51 : wyrd ? 61 : sky ? 71 : astral ? 91 : prism ? 101 : orrery ? 111 : moonspore ? 121 : deep ? 81 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : vault ? 52 : wyrd ? 62 : sky ? 72 : astral ? 92 : prism ? 102 : orrery ? 112 : moonspore ? 122 : deep ? 82 : 2) * .35;
@@ -409,7 +409,7 @@
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
   function renderChunk(cx, cy) {
     const G = chunkGeom(cx, cy), [c, g] = canvasOf(G.w, G.h, chunkScale);
-    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
+    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', asterion = zdef.theme === 'asterion', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     const arenas = vault ? (zdef.slimes || []).filter(m => BOSS_KINDS.includes(m.kind)) : [];
     for (let ty = 0; ty < CH; ty++) for (let tx = 0; tx < CH; tx++) {
       const x = G.x0 + tx, y = G.y0 + ty; if (x >= MAP || y >= MAP) continue;
@@ -417,7 +417,7 @@
       if (vault && !dirt) continue;                                                  // solid rock: stays black
       if (sky && !map.floor[i]) continue;                                            // open sky: nothing to draw
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
-      g.fillStyle = CathedralArt.isTheme(zdef.theme) ? CathedralArt.ground(zdef.theme,x,y,tone,alt) : vault ? `hsl(${226 + tone * 10}, ${9 + tone * 5}%, ${19 + tone * 7 + alt * .7}%)` : city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
+      g.fillStyle = CathedralArt.isTheme(zdef.theme) ? CathedralArt.ground(zdef.theme,x,y,tone,alt) : vault ? `hsl(${226 + tone * 10}, ${9 + tone * 5}%, ${19 + tone * 7 + alt * .7}%)` : asterion ? (dirt === 1 ? `hsl(${201 + tone * 14}, 21%, ${51 + tone * 7 + alt}%)` : dirt === 2 ? `hsl(${44 + tone * 9}, 38%, ${73 + tone * 9 + alt}%)` : `hsl(${222 + tone * 17}, ${19 + tone * 10}%, ${28 + tone * 9 + alt}%)`) : city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
         : sky ? skyGround(x, y, tone, dirt, alt)
         : orrery ? (dirt ? `hsl(${34 + tone * 7}, 19%, ${43 + tone * 8 + alt}%)` : `hsl(${232 + tone * 13}, ${17 + tone * 9}%, ${20 + tone * 10 + alt}%)`)
         : moonspore ? (dirt ? `hsl(${151 + tone * 9}, 18%, ${35 + tone * 9 + alt}%)` : `hsl(${177 + tone * 20}, ${25 + tone * 12}%, ${19 + tone * 10 + alt}%)`)
@@ -444,6 +444,10 @@
           if (ringA || ringB) { g.fillStyle = 'rgba(90,150,220,.17)'; g.beginPath(); g.moveTo(px, py); g.lineTo(px + TW / 2, py + TH / 2); g.lineTo(px, py + TH); g.lineTo(px - TW / 2, py + TH / 2); g.closePath(); g.fill();
             g.strokeStyle = 'rgba(120,210,255,.45)'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(px - 8, py + TH / 2 + 2); g.lineTo(px, py + TH / 2 - 5); g.lineTo(px + 8, py + TH / 2 + 2); g.moveTo(px, py + TH / 2 - 5); g.lineTo(px, py + TH / 2 + 8); g.stroke(); }
         }
+      } else if (asterion) {
+        g.strokeStyle=dirt===2?'rgba(119,73,156,.44)':dirt?'rgba(153,236,241,.42)':'rgba(72,91,143,.5)';g.lineWidth=1.3;
+        g.beginPath();g.moveTo(px,py);g.lineTo(px+TW/2,py+TH/2);g.lineTo(px,py+TH);g.lineTo(px-TW/2,py+TH/2);g.closePath();g.stroke();
+        if(((x*19+y*7)%11)===0){g.fillStyle='rgba(244,226,174,.45)';g.beginPath();g.arc(px,py+TH/2,2.5,0,6.283);g.fill();}
       } else if (city) {
         const at = (u, v) => [px + (u - v) * TW / 2, py + (u + v) * TH / 2];
         if (dirt === 1) {                                                              // cobbles: a 3x3 of rounded stones
@@ -693,13 +697,14 @@
     mireheart: { name: 'The Mireheart', elite: true, scale: 2.25, top: 89, col: ['#efb9ba','#536b57','#2b3430'] },
     silverwidow: { name: 'The Silver Widow', elite: true, scale: 2.1, top: 84, col: ['#e9b9ff','#77758d','#2d2d43'] },
     nightbloom: { name: 'The Nightbloom', elite: true, scale: 2.65, top: 91, col: ['#eafca1','#a878a3','#252b43'] },
+    moonwell_echo: { name: 'The Moonwell Echo', elite: true, boss: true, scale: 2.7, top: 91, col: ['#91f6e2','#7796ae','#1c2141'] },
   };
   const CATHEDRAL_KINDS = CATHEDRAL_ENEMIES.map(e => e.kind);
   for (const e of CATHEDRAL_ENEMIES) SLIME[e.kind] = { name:e.name, elite:true, boss:e.boss, scale:e.stats[3] * .72, top:82, col:[e.color,e.color,'#152431'] };
   const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
   const WYRD_KINDS = ['boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir'], SKY_KINDS = ['galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc'], DEEP_KINDS = ['draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw'], ASTRAL_KINDS = ['voidmoth', 'crystalwyrm', 'orbitbeetle', 'eclipsedryad', 'meteorgolem'], PRISM_KINDS = ['miragejackal','shardscarab','glassharrier','prismsentinel','mirrorqueen','sunshard'], ORRERY_KINDS = ['bronzemantis','gearling','orbitseer','chronoguard','pendulummatron','epochengine'];
   const MOONSPORE_KINDS = ['glowcapgrazer','silkwing','rootlurker','lanternwraith','mireheart','silverwidow','nightbloom'];
-  const VAULT_KINDS = ['thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking'], BOSS_KINDS = [...VAULT_KINDS.slice(3), ...CATHEDRAL_ENEMIES.filter(e => e.boss).map(e => e.kind)];
+  const VAULT_KINDS = ['thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking'], BOSS_KINDS = [...VAULT_KINDS.slice(3), 'moonwell_echo', ...CATHEDRAL_ENEMIES.filter(e => e.boss).map(e => e.kind)];
   // Colour a level label by how it compares with the hero: grey, normal, orange, red.
   const levelColor = level => { const d = level - (hero?.level || 1); return d >= 5 ? '#ff6b6b' : d >= 3 ? '#ffa65a' : d <= -5 ? '#9fb0a0' : '#fff4ca'; };
   function newHero() {
@@ -1329,8 +1334,8 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
-  const enemySource = s => CATHEDRAL_KINDS.includes(s.kind) ? cathedralSrc : s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : WYRD_KINDS.includes(s.kind) ? wyrdSrc : SKY_KINDS.includes(s.kind) ? skySrc : DEEP_KINDS.includes(s.kind) ? deepSrc : ASTRAL_KINDS.includes(s.kind) ? astralSrc : PRISM_KINDS.includes(s.kind) ? prismSrc : ORRERY_KINDS.includes(s.kind) ? orrerySrc : MOONSPORE_KINDS.includes(s.kind) ? moonsporeSrc : VAULT_KINDS.includes(s.kind) ? vaultSrc : slimeSrc;
+  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, moonwellSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
+  const enemySource = s => CATHEDRAL_KINDS.includes(s.kind) ? cathedralSrc : s.kind === 'moonwell_echo' ? moonwellSrc : s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : WYRD_KINDS.includes(s.kind) ? wyrdSrc : SKY_KINDS.includes(s.kind) ? skySrc : DEEP_KINDS.includes(s.kind) ? deepSrc : ASTRAL_KINDS.includes(s.kind) ? astralSrc : PRISM_KINDS.includes(s.kind) ? prismSrc : ORRERY_KINDS.includes(s.kind) ? orrerySrc : MOONSPORE_KINDS.includes(s.kind) ? moonsporeSrc : VAULT_KINDS.includes(s.kind) ? vaultSrc : slimeSrc;
   const SLIME_K = 2.1, DIE_SHOW = 1.7;                      // sprite pixel -> screen px; seconds a dead slime stays on screen
   // Test mode (window.__valhallaTestSprites): one small coloured block per enemy kind instead of the atlas PNGs. The clip
   // table is the real one's shape (same names, frame counts and rates), so every animation state still finds its frame.
@@ -1427,6 +1432,12 @@
     if (stubOn()) { moonsporeSrc = stubEnemies(MOONSPORE_KINDS, {glowcapgrazer:'#bfa',silkwing:'#cfe',rootlurker:'#ca8',lanternwraith:'#bfa',mireheart:'#eba',silverwidow:'#ebf',nightbloom:'#efa'}); return; }
     fetch('assets/moonspore.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/moonspore_${k}.png`; })))
       .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); moonsporeSrc = { meta, img }; })).catch(() => { moonsporeSrc = null; });
+  }
+  function loadMoonwellSprites() {
+    if (moonwellSrc) return;
+    if (stubOn()) { moonwellSrc = stubEnemies(['moonwell_echo'], {moonwell_echo:'#9fe'}); return; }
+    fetch('assets/moonwell.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/moonwell_echo.png`; })))
+      .then(imgs => { moonwellSrc = { meta, img: {moonwell_echo: imgs[0]} }; })).catch(() => { moonwellSrc = null; });
   }
   // Rimeveil Glacier monsters: assets/rime_<kind>.png (scripts/make_rime_sprites.py), the same clips as the Crags.
   function loadRimeSprites() {
@@ -1972,6 +1983,7 @@
     if (zdef.theme === 'prismwaste') { const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#322344');gr.addColorStop(.6,'#b17a84');gr.addColorStop(1,'#ffe2ad');g.fillStyle=gr;g.fillRect(0,0,VW,VH);return; }
     if (zdef.theme === 'orrery') { const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#171c38');gr.addColorStop(.6,'#51435b');gr.addColorStop(1,'#c79e72');g.fillStyle=gr;g.fillRect(0,0,VW,VH);return; }
     if (zdef.theme === 'moonspore') { const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#0e1c33');gr.addColorStop(.55,'#254c55');gr.addColorStop(1,'#608c75');g.fillStyle=gr;g.fillRect(0,0,VW,VH);g.fillStyle='#d9f5bb';g.beginPath();g.arc(VW*.77,VH*.19,18,0,6.283);g.fill();return; }
+    if (zdef.theme === 'asterion') { const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#111439');gr.addColorStop(.55,'#39547b');gr.addColorStop(1,'#a489ae');g.fillStyle=gr;g.fillRect(0,0,VW,VH);g.fillStyle='#fff2bd';g.shadowColor='#f4d9bb';g.shadowBlur=40;g.beginPath();g.arc(VW*.77,VH*.18,31,0,6.283);g.fill();g.shadowBlur=0;return; }
     if (zdef.theme === 'deep' || zdef.theme === 'nacre') return drawSkyDeep(g, t);
     if (zdef.theme === 'city') return drawSkyCity(g, t);
     const gr = g.createLinearGradient(0, 0, 0, VH); gr.addColorStop(0, '#5aa0e8'); gr.addColorStop(.6, '#9fd0f5'); gr.addColorStop(1, '#d4ecff');
@@ -2310,7 +2322,7 @@
     g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(mask, 0, 0, w, h); g.restore();
   }
   function buildMini() {
-    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
+    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     g.fillStyle = CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
     if (sky) { for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) { g.fillStyle = map.dirt[y * MAP + x] ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .5, k + .5); } }
     else for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = CathedralArt.isTheme(zdef.theme) ? CathedralArt.style(zdef.theme).left : deep ? '#c8c29a' : vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : moonspore ? '#a5c4a8' : orrery ? '#ad907b' : prism ? '#ead7a8' : astral ? '#d7bc84' : wyrd ? '#b89860' : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
@@ -2386,7 +2398,7 @@
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
       if (o.slimeSprites) loadSlimeSprites(o.slimeSprites);
-      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadSkySprites(); loadDeepSprites(); loadAstralSprites(); loadPrismSprites(); loadOrrerySprites(); loadMoonsporeSprites(); loadVaultSprites(); loadCathedralSprites();
+      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadSkySprites(); loadDeepSprites(); loadAstralSprites(); loadPrismSprites(); loadOrrerySprites(); loadMoonsporeSprites(); loadMoonwellSprites(); loadVaultSprites(); loadCathedralSprites();
       if (!Field._bound) {
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize);
@@ -2458,7 +2470,7 @@
     get hunterSprites() { return isHunter() ? mageSpr : null; },
     get hero() { return hero; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
-    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
+    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get moonwellSprites() { return moonwellSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
     _debug: { get effects() { return effects; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll) },
   };

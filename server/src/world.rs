@@ -11,6 +11,8 @@ use tokio::sync::{mpsc, oneshot, watch};
 
 mod ambient;
 #[cfg(test)]
+mod asterion_tests;
+#[cfg(test)]
 mod cathedral_tests;
 mod chime;
 mod consumables;
@@ -396,6 +398,7 @@ impl Slime {
             "mireheart" => (900000., 9300., 2.0, 2.25),
             "silverwidow" => (1100000., 10500., 3.0, 2.1),
             "nightbloom" => (1700000., 14500., 1.8, 2.65),
+            "moonwell_echo" => (2400000., 16500., 2.2, 2.7),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -469,6 +472,7 @@ impl Slime {
             "mireheart" => 58,
             "silverwidow" => 59,
             "nightbloom" => 60,
+            "moonwell_echo" => 60,
             _ => 2,
         }
     }
@@ -545,6 +549,7 @@ impl Slime {
             "mireheart" => 10000,
             "silverwidow" => 11500,
             "nightbloom" => 16000,
+            "moonwell_echo" => 24000,
             _ => 0,
         }
     }
@@ -624,6 +629,7 @@ impl Slime {
             "mireheart" => (1.0, 1.8, 6., 11.),
             "silverwidow" => (0.7, 1.5, 9., 12.),
             "nightbloom" => (1.2, 2.2, 5.5, 14.),
+            "moonwell_echo" => (1.0, 1.9, 6.5, 15.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -956,7 +962,11 @@ impl World {
             // Ambushers sleep until their escort's journey passes them.
             return self.dormant_enemy(id);
         }
-        let level = if crate::cathedral::enemy(&spawn.kind).is_some() {
+        let level = if self.maps[spawn.zone].final_boss == "moonwell_echo" {
+            // Every foe in the new level-60 instance holds its level, including
+            // creatures whose outdoor versions are weaker.
+            self.maps[spawn.zone].min_level
+        } else if crate::cathedral::enemy(&spawn.kind).is_some() {
             self.maps[spawn.zone]
                 .levels
                 .map_or_else(|| Slime::default_level(&spawn.kind), |l| l[0])
@@ -2531,6 +2541,28 @@ impl World {
             json!({"enemy":kind,"level":level,"skill":self.cur_skill,"killed":killed}),
         );
         if killed {
+            // A dungeon boss may complete a quest offered at the entrance city. Keep ordinary
+            // kills scoped to their own map; only the final boss reaches quests in maps with a
+            // portal into this dungeon template.
+            let mut kill_quests = self.maps[zone].quests.clone();
+            if self.is_instance(zone) && self.maps[zone].final_boss == kind {
+                let template = self.public_zone(zone);
+                for entry in self.maps.iter().filter(|m| {
+                    m.template.is_none() && m.portals.iter().any(|portal| portal.to == template)
+                }) {
+                    kill_quests.extend(
+                        entry
+                            .quests
+                            .iter()
+                            .filter(|q| {
+                                q.objectives
+                                    .iter()
+                                    .any(|o| o.kind == "kill" && o.target == kind)
+                            })
+                            .cloned(),
+                    );
+                }
+            }
             // Quest kill credit goes to the killer, and also to every living real member of their party who is near
             // the body (the people who share the XP). Elite kills also credit nearby contributors outside the
             // party, but only for quests marked `group`. Each person is credited once.
@@ -2542,12 +2574,12 @@ impl World {
                     continue;
                 }
                 if party.contains(&c.id) {
-                    quest_progress(c, &self.maps[zone].quests, "kill", &kind);
+                    quest_progress(c, &kill_quests, "kill", &kind);
                 } else if is_elite(&kind)
                     && c.point().distance(point) <= 12.
                     && contributors.contains(&c.id)
                 {
-                    for q in self.maps[zone].quests.iter().filter(|q| q.group) {
+                    for q in kill_quests.iter().filter(|q| q.group) {
                         quest_progress(c, std::slice::from_ref(q), "kill", &kind);
                     }
                 }
@@ -2557,7 +2589,7 @@ impl World {
             }
             let p = self.players.get_mut(&credit).unwrap();
             p.character.kills += 1;
-            quest_progress(&mut p.character, &self.maps[zone].quests, "kill", &kind);
+            quest_progress(&mut p.character, &kill_quests, "kill", &kind);
             // A party shares the XP (see `partyxp.rs`); alone, the killer's hero gets all of it.
             let (xp, levels) = self.share_xp(&credit_id, zone, point, xp, level, &kind);
             self.event_with(
@@ -4603,6 +4635,9 @@ mod tests {
                             o.target == "any"
                                 || o.target == "slime"
                                 || area.slimes.iter().any(|s| s.kind == o.target)
+                                || area.portals.iter().any(|p| {
+                                    w.maps[p.to].slimes.iter().any(|s| s.kind == o.target)
+                                })
                         ),
                         "bring" => assert!(item(&o.target).is_some_and(|i| i.kind == "material")),
                         "reach" => assert!(w.maps.iter().any(|m| m.name == o.target)),
@@ -4790,7 +4825,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 17);
+        assert_eq!(zone_count(&w), 19);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -5393,7 +5428,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 17);
+        assert_eq!(zone_count(&w), 19);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -6232,8 +6267,8 @@ mod tests {
         let map = &w.maps[CITY];
         assert_eq!(
             zone_count(&w),
-            17,
-            "Skaldholm is the fifth map; Moonspore is the seventeenth public map"
+            19,
+            "Skaldholm is the fifth map; the Moonwell is the nineteenth public map"
         );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
@@ -7938,7 +7973,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 17);
+        assert_eq!(zone_count(&w), 19);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));
@@ -8029,7 +8064,9 @@ mod tests {
     fn enemy_levels_roll_two_either_side_of_each_kinds_default() {
         let mut w = World::new(Store::open(std::path::Path::new(":memory:")).unwrap());
         for s in &w.slimes {
-            let default = if crate::cathedral::enemy(&s.kind).is_some() {
+            let default = if crate::cathedral::enemy(&s.kind).is_some()
+                || w.maps[s.zone].final_boss == "moonwell_echo"
+            {
                 w.maps[s.zone].min_level
             } else {
                 Slime::default_level(&s.kind)
@@ -8078,7 +8115,9 @@ mod tests {
         // With no spread every enemy sits exactly on its default.
         let w = world();
         assert!(w.slimes.iter().all(|s| s.level
-            == if crate::cathedral::enemy(&s.kind).is_some() {
+            == if crate::cathedral::enemy(&s.kind).is_some()
+                || w.maps[s.zone].final_boss == "moonwell_echo"
+            {
                 w.maps[s.zone].min_level
             } else {
                 Slime::default_level(&s.kind)

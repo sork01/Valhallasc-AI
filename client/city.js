@@ -26,7 +26,7 @@
   }
   function stoneTile(g, px, py, x, y) {
     const city = area().city; if (!city) return false;
-    if (Field.zone > 0 && (Field.zoneTheme === 'city' || Field.zoneTheme === 'nacre')) return false;     // Skaldholm's streets are painted by field.js from the zone's road list
+    if (Field.zone > 0 && (Field.zoneTheme === 'city' || Field.zoneTheme === 'nacre' || Field.zoneTheme === 'asterion')) return false;     // zone roads are painted by field.js
     const inCity=inside(x+.5,y+.5), road=!Field.zone && y>=69 && y<city.y0 && Math.abs(x+.5-36)<1.6;
     if (!inCity && !road) return false;
     if (Field.zone > 0) {
@@ -232,7 +232,7 @@
     }
   }
   // Distance from the feet to the top of each NPC's head gear (the guard's banner, the baker's hat), so the nameplate sits just above it.
-  const headTop=n=>n.art==='stone'?330:n.look?.species==='merfolk'?120:n.look?(n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101;
+  const headTop=n=>n.art==='stone'?330:n.look?.species==='merfolk'?120:n.look?(n.look.prop?145:n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101;
   // World of Warcraft nameplate: yellow name over a <Role> line, both in a heavy black outline, with the quest mark above them.
   function plate(g,value,y,size,color) {
     g.font=`${size}px "Jua", sans-serif`;g.textAlign='center';g.lineJoin='round';g.lineWidth=size>14?5:3;g.strokeStyle='#000';
@@ -259,6 +259,37 @@
     else if(hat==='feather'){poly(g,[[-19,-88],[-14,-101],[14,-101],[19,-88],[26,-86],[10,-84],[-10,-84]],hatColor,'#3a2e28',2);line(g,[[8,-100],[20,-120],[22,-112]],'#f4e8c8',4);}
     else if(hat==='hood'){poly(g,[[-21,-70],[-20,-96],[-8,-107],[8,-107],[20,-96],[21,-70],[12,-76],[-12,-76]],hatColor,'#3a3a3a',2.5);}
     else if(hat==='bonnet'){ellipse(g,0,-90,19,12,hatColor,'#8a7a60');line(g,[[-16,-78],[-18,-68]],hatColor,5);line(g,[[16,-78],[18,-68]],hatColor,5);}
+    if(L.prop==='crown'){
+      poly(g,[[-22,-100],[-16,-123],[-7,-111],[0,-132],[7,-111],[16,-123],[22,-100]],'#e7cf8e','#755a8c',2);
+      for(const x of [-14,0,14])ellipse(g,x,-105,3,4,'#90e7e5');
+    } else if(L.prop==='map'){
+      poly(g,[[16,-52],[38,-55],[40,-25],[17,-23]],'#e9ddad','#715d78',2);
+      line(g,[[20,-47],[34,-32]],'#89b8c0',2);line(g,[[32,-47],[24,-31]],'#89b8c0',2);
+    } else if(L.prop==='bells'){
+      line(g,[[24,-34],[31,-115]],'#b8a2a0',4);
+      for(let i=0;i<3;i++)ellipse(g,30+i%2*8,-117-i*10,8,6,'#e9d091','#715e82',2);
+    } else if(L.prop==='vine'){
+      line(g,[[-30,-29],[-37,-123]],'#498f72',5);
+      for(let i=0;i<5;i++)ellipse(g,-39+(i%2)*9,-119+i*18,9,5,'#88c789','#4e866e',1);
+    } else if(L.prop==='prism'){
+      line(g,[[27,-22],[27,-128]],'#6c759e',4);
+      poly(g,[[27,-140],[39,-124],[27,-109],[15,-124]],'#a2f0e6','#5e8eb7',2);
+    } else if(L.prop==='kite'){
+      line(g,[[30,-35],[36,-125]],'#d6bbab',2);
+      poly(g,[[36,-144],[47,-125],[36,-106],[25,-125]],'#f1aa9c','#9b68a4',2);
+      line(g,[[36,-106],[28,-90],[39,-74]],'#d6bbab',1.5);
+    } else if(L.prop==='key'){
+      line(g,[[28,-30],[28,-121]],'#e7d797',5);ellipse(g,28,-126,10,10,'#e7d797','#786b91',2);
+      line(g,[[26,-45],[39,-45],[39,-53]],'#e7d797',4);
+    } else if(L.prop==='lyre'){
+      poly(g,[[-39,-30],[-44,-68],[-33,-78],[-23,-68],[-28,-30]],'#c79b66','#654972',2);
+      for(let i=0;i<4;i++)line(g,[[-40+i*4,-60],[-37+i*3,-34]],'#f4eac6',1);
+    } else if(L.prop==='hammer'){
+      line(g,[[25,-35],[30,-114]],'#8d7054',5);
+      poly(g,[[17,-119],[43,-119],[43,-106],[17,-106]],'#c7b9c4','#55536e',2);
+    } else if(L.prop==='lantern'){
+      line(g,[[27,-28],[27,-126]],'#7e7287',3);ellipse(g,27,-129,8,10,'#ffe6a0','#947297',2);
+    }
   }
   function drawNpc(g,n,sx,sy,t,near) {
     g.save();g.translate(sx,sy);const L=n.look,sc=L?.scale||1,moving=!!n.moving;

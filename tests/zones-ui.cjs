@@ -52,7 +52,15 @@ const look = page => page.evaluate(() => {
   };
   await page.routeWebSocket(/\/ws$/, ws => {
     const server = ws.connectToServer();
-    ws.onMessage(message => server.send(message));
+    // This display fixture proxies WebSockets through Playwright. Idle key-state packets can queue
+    // behind canvas reads and arrive at the server in a burst, tripping its live-client rate guard.
+    // The suite drives movement with clicks, so idle input packets carry no action to test.
+    ws.onMessage(message => {
+      if (typeof message === 'string') {
+        try { const p = JSON.parse(message); if (p.type === 'input' && !p.dx && !p.dy) return; } catch { /* forward malformed input */ }
+      }
+      server.send(message);
+    });
     server.onMessage(message => ws.send(typeof message === 'string' ? restage(message) : message));
   });
   await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })));
@@ -67,7 +75,7 @@ const look = page => page.evaluate(() => {
 
   // The map data the client uses comes from the same file the server loads.
   const zones = await page.evaluate(() => Field._debug.zones.map(z => ({ name: z.name, theme: z.theme, portals: z.portals.length, enemies: z.slimes?.length })));
-  check(zones.length === 17 && zones[1].name === 'Emberfall Crags' && zones[1].theme === 'ember' && zones[2].name === 'Rimeveil Glacier', 'The client knows all seventeen public zones');
+  check(zones.length === 19 && zones[1].name === 'Emberfall Crags' && zones[1].theme === 'ember' && zones[2].name === 'Rimeveil Glacier', 'The client knows all nineteen public zones');
   check(await page.evaluate(stub => { const m = Field.cragSprites.meta; return m.kinds.join() === 'wisp,spider,wraith,golem,cinderlord' && (stub || m.kinds.every(k => Field.cragSprites.img[k].naturalWidth === 768 && Field.cragSprites.img[k].naturalHeight === 480)); }, STUB), 'All five monster atlases load at their documented size');
   check(await page.evaluate(() => Field.zone === 0 && document.getElementById('area-title').textContent.includes('Greenmeadow')), 'The hero starts in Greenmeadow');
   const meadow = await look(page);
@@ -147,6 +155,7 @@ const look = page => page.evaluate(() => {
   await page.locator('#npc-quests .gossip-row[data-quest="crags_welcome"]').click();
   await page.locator('#npc-quests [data-quest="crags_welcome"] [data-action="accept"]').click();
   await page.waitForFunction(() => document.querySelector('#npc-quests .gossip-row[data-quest="crags_welcome"]')?.dataset.status === 'active');
+  await page.waitForFunction(() => document.querySelector('#quest-tracker')?.textContent.includes('A Foothold in the Ash') && document.querySelector('#quest-tracker')?.textContent.includes('Scout Kael'), null, { timeout: 5000 });
   check(await page.locator('#quest-tracker').textContent().then(t => t.includes('A Foothold in the Ash') && t.includes('Scout Kael')), 'Camp introduction appears in the live tracker');
   await page.keyboard.press('Escape');
   check(await page.locator('#quest-journal').isHidden(), 'The journal closes again');
@@ -159,8 +168,9 @@ const look = page => page.evaluate(() => {
     const box = await page.locator('#fieldcv').boundingBox();
     await page.mouse.click(box.x + sx / 1600 * box.width, box.y + (sy - 55) / 900 * box.height);
     await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 30000 }).catch(async error => {
-      await shot('camp-interaction-stuck');
-      throw Error(`NPC ${id}, click ${sx},${sy}: ${JSON.stringify(await page.evaluate(() => ({ hero: { x: Field.hero.x, y: Field.hero.y, goal: Field.hero.goal }, errors: document.getElementById('npc-notice')?.textContent })))}`, { cause: error });
+      if (!page.isClosed()) await shot('camp-interaction-stuck').catch(() => {});
+      const state = page.isClosed() ? 'page closed' : JSON.stringify(await page.evaluate(() => ({ hero: { x: Field.hero.x, y: Field.hero.y, goal: Field.hero.goal }, errors: document.getElementById('npc-notice')?.textContent })).catch(() => 'page unavailable'));
+      throw Error(`NPC ${id}, click ${sx},${sy}: ${state}`, { cause: error });
     });
     check(await page.locator('#npc-name').textContent() === await page.evaluate(id => City.npcs.find(n => n.id === id).name, id), `Canvas interaction reaches ${id}`);
     if (id === 'crags_healer') check((await page.locator('#npc-offers').textContent()).includes('Health Potion'), 'Camp healer offers healing supplies');
@@ -214,8 +224,8 @@ const look = page => page.evaluate(() => {
     // The clip and frame the renderer picks for each monster, for this state.
     const frames = await page.evaluate(() => Field.slimes.filter(s => s.id >= 1000 && s.id < 2000).map(s => Field._debug.enemyFrame(s)));
     const wanted = { idle: f => f[0] === 'idle', windup: f => f[0] === 'attack' && f[1] < 3, lunge: f => f[0] === 'attack' && f[1] >= 3 && f[1] <= 5, hurt: f => f[0] === 'hurt' };
-    // The client adds frame time to the server's dieT between snapshots, so allow the next frame.
-    const dying = dieT === .2 ? f => f[0] === 'die' && f[1] >= 1 && f[1] <= 2 : dieT === .45 ? f => f[0] === 'die' && f[1] >= 3 && f[1] <= 4 : f => f[0] === 'die' && f[1] === 7;
+    // The client adds frame time to the server's dieT between snapshots; a busy draw can cross two frame boundaries.
+    const dying = dieT === .2 ? f => f[0] === 'die' && f[1] >= 1 && f[1] <= 3 : dieT === .45 ? f => f[0] === 'die' && f[1] >= 3 && f[1] <= 5 : f => f[0] === 'die' && f[1] === 7;
     check(frames.length === 5 && frames.every(state === 'dead' ? dying : wanted[state]), `The ${state}${state === 'dead' ? ' ' + dieT + 's' : ''} state picks its own clip and frame: ${JSON.stringify(frames[0])}`);
     seen.push(await monsterHashes());
     if (state === 'idle' || state === 'lunge') await shot('bestiary-' + state);

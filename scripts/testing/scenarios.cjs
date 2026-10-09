@@ -32,7 +32,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60, moonwell_echo: 60 };
 Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'world/cathedral.txt'), 'utf8')).map(e => [e.kind, e.level])));
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
@@ -3046,6 +3046,70 @@ const scenarios = {
       await w.action(bot,{type:'move',x:back.x,y:back.y});
       await w.waitFor(()=>w.player(bot).zone===15,15000,'Return to the Orrery');
       check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrives outside the Orrery gate');
+    },
+  },
+
+  asterion: {
+    description: 'Asterion: Glassroot gate, Spark Travel, city quests, private Moonwell, boss loot and return.',
+    startLevel: 60,
+    levelSpread: 0,
+    async run(w, check) {
+      const bot='Glasswalker', city=map.zones[16], well=map.zones[17];
+      await w.connect({bot,class:'warrior'});
+      const gate=map.zones[15].portals.find(p=>p.id==='moonspore_asterion_gate');
+      check(gate?.to===17 && city.portals.some(p=>p.to===16),'Glassroot Causeway has reciprocal gates');
+      check(city.objects.filter(o=>o.kind==='aetherhouse').length>=120 && city.npcs.filter(n=>n.route).length===10 && city.quests.length===6,'City has homes, moving people and a quest hub');
+      check(city.quests.filter(q=>q.rewardItem&&kit.items.find(i=>i.id===q.rewardItem)?.rarity==='uncommon').length>=2 && city.quests.find(q=>q.id==='asterion_descent')?.rewardItem==='accessory_amber_l60_blue','The hub pays two green pieces and a blue dungeon reward');
+      await kit.teleport(w,bot,{zone:16,x:107,y:112});
+      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===17,18000,'Enter Asterion through the gate');
+      await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),city.spawn)<2,'City arrival is away from the return gate');
+      await kit.teleport(w,bot,{npc:'travel_asterion'});
+      const travel=await kit.talkTo(w,bot,'travel_asterion');
+      check(travel.travelStops?.includes('travel_asterion') && city.npcs.find(n=>n.id==='travel_asterion').travelLinks.includes('travel_lamplight'),'Travel Master discovers the Lamplight link');
+      await kit.teleport(w,bot,{npc:'asterion_archon'});
+      await kit.talkTo(w,bot,'asterion_archon','quest:accept:asterion_welcome');
+      await w.waitFor(()=>!!quest(w,bot,'asterion_welcome'),5000,'Accept city introduction');
+      check(quest(w,bot,'asterion_welcome').counts.length===4,'Four distinct introductions appear');
+      for(const npc of ['asterion_cartographer','asterion_bellkeeper','asterion_gardener','asterion_stonewarden']){
+        await kit.teleport(w,bot,{npc});await kit.talkTo(w,bot,npc);
+      }
+      await w.waitFor(()=>quest(w,bot,'asterion_welcome').counts.every(n=>n===1),5000,'Complete introductions');
+      await kit.teleport(w,bot,{npc:'asterion_archon'});
+      await kit.talkTo(w,bot,'asterion_archon','quest:claim:asterion_welcome');
+      await w.waitFor(()=>quest(w,bot,'asterion_welcome').claimed,5000,'Claim welcome quest');
+      await kit.teleport(w,bot,{npc:'asterion_stonewarden'});
+      await kit.talkTo(w,bot,'asterion_stonewarden','quest:accept:asterion_descent');
+      await w.waitFor(()=>!!quest(w,bot,'asterion_descent'),5000,'Accept Moonwell quest');
+      await kit.teleport(w,bot,{zone:17,x:127,y:97});
+      await w.action(bot,{type:'move',x:125,y:93});
+      await w.waitFor(()=>w.player(bot).zone===18,15000,'Descend into private Moonwell');
+      await w.action(bot,{type:'stop'});
+      check(well.copies===4 && well.final_boss==='moonwell_echo' && w.views.get(bot).slimes.some(s=>s.kind==='moonwell_echo'),'Four-copy dungeon and unique boss load');
+      const other='SecondGlass';await w.connect({bot:other,class:'mage'});
+      await w.debug(other,{op:'set_level',level:60});
+      await kit.teleport(w,other,{zone:17,x:127,y:97});
+      await w.action(other,{type:'move',x:125,y:93});
+      await w.waitFor(()=>w.player(other).zone===18,15000,'Second visitor descends');
+      const firstIds=w.views.get(bot).slimes.map(s=>s.id),secondIds=w.views.get(other).slimes.map(s=>s.id);
+      check(firstIds.every(id=>!secondIds.includes(id)),'Unpartied visitors receive isolated copies');
+      const boss=w.views.get(bot).slimes.find(s=>s.kind==='moonwell_echo'&&!s.dead);
+      await w.debug(bot,{op:'kill_enemy',id:boss.id});
+      await w.waitFor(()=>quest(w,bot,'asterion_descent').counts[0]===1,5000,'Moonwell boss credits its quest');
+      check(w.views.get(bot).drops.some(d=>d.item==='moonwell_shard'),'Moonwell boss drops its unique material');
+      check(w.views.get(bot).drops.filter(d=>kit.items.some(i=>i.id===d.item&&i.rarity==='rare'&&i.requiredLevel===60)).length>=2,'Moonwell boss drops two level-60 blue pieces');
+      check(!w.views.get(other).slimes.find(s=>s.kind==='moonwell_echo').dead,'Other copy keeps its own living boss');
+      await kit.teleport(w,bot,{zone:18,x:108,y:116});
+      await w.action(bot,{type:'move',x:111,y:116});
+      await w.waitFor(()=>w.player(bot).zone===17,15000,'Cleared exit returns to city');
+      await w.action(bot,{type:'stop'});
+      await kit.teleport(w,bot,{npc:'asterion_stonewarden'});
+      await kit.talkTo(w,bot,'asterion_stonewarden','quest:claim:asterion_descent');
+      await w.waitFor(()=>quest(w,bot,'asterion_descent').claimed&&w.player(bot).inventory.some(s=>s.item==='accessory_amber_l60_blue'),5000,'Claim the dungeon quest and blue reward');
+      await w.disconnect(other);
+      await w.restart();
+      check(w.player(bot).zone===17 && quest(w,bot,'asterion_descent').claimed && w.player(bot).travelStops.includes('travel_asterion'),'Quest, travel stop and city persist after restart');
     },
   },
 

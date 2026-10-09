@@ -28866,5 +28866,12 @@
       "dexterity": 55,
       "stamina": 55
     }
+  },
+  {
+    "id": "moonwell_shard",
+    "name": "Moonwell Echo Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2400
   }
 ]

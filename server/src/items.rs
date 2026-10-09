@@ -188,6 +188,7 @@ pub fn material(kind: &str) -> &'static str {
         "mireheart" => "mireheart_seed",
         "silverwidow" => "widow_silk",
         "nightbloom" => "nightbloom_petal",
+        "moonwell_echo" => "moonwell_shard",
         _ => "slime_gel",
     }
 }
@@ -246,6 +247,7 @@ pub fn is_elite(kind: &str) -> bool {
             | "mireheart"
             | "silverwidow"
             | "nightbloom"
+            | "moonwell_echo"
     ) || is_vault_enemy(kind)
 }
 /// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.
@@ -260,7 +262,10 @@ pub fn is_boss(kind: &str) -> bool {
     if let Some(e) = crate::cathedral::enemy(kind) {
         return e.boss;
     }
-    matches!(kind, "gatewarden" | "choir" | "colossus" | "hollowking")
+    matches!(
+        kind,
+        "gatewarden" | "choir" | "colossus" | "hollowking" | "moonwell_echo"
+    )
 }
 /// The slot pools a boss drops from: one shared wing-level blue piece per pool, chosen across all classes.
 pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
@@ -305,6 +310,10 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
                 "accessory",
             ],
         ],
+        "moonwell_echo" => &[
+            &["armor", "weapon", "headgear"],
+            &["gloves", "pants", "necklace", "accessory"],
+        ],
         _ => &[],
     }
 }
@@ -324,6 +333,18 @@ pub fn boss_piece(slots: &[&str], choice: f64) -> Option<&'static Item> {
 }
 /// Cathedral bosses guarantee their own wing's exclusive blue set at its exact required level.
 pub fn boss_piece_for(kind: &str, slots: &[&str], choice: f64) -> Option<&'static Item> {
+    if kind == "moonwell_echo" {
+        let pool: Vec<_> = ITEMS
+            .iter()
+            .filter(|i| {
+                i.rarity == "rare"
+                    && i.required_level == 60
+                    && i.source.is_none()
+                    && slots.contains(&i.kind.as_str())
+            })
+            .collect();
+        return pool.get((choice * pool.len() as f64) as usize).copied();
+    }
     let Some(e) = crate::cathedral::enemy(kind) else {
         return boss_piece(slots, choice);
     };

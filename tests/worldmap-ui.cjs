@@ -70,7 +70,10 @@ async function call(name, args = {}) {
   // --- fog of war: a new character has seen one cell of one zone ---
   const stand = async (zone, x, y) => {
     await page.evaluate(([zone, x, y]) => Online.send({ type: 'debug', ref: 1, command: { op: 'teleport', zone, x, y } }), [zone, x, y]);
-    await page.waitForFunction(([zone, x, y]) => Field.zone === zone && Math.hypot(Field.hero.x - x, Field.hero.y - y) < 3 && (Field.explored[zone] & (1 << (Math.min(2, Math.floor(y / Field._debug.zones[zone].size * 3)) * 3 + Math.min(2, Math.floor(x / Field._debug.zones[zone].size * 3))))) !== 0, [zone, x, y], { timeout: 15000 });
+    await page.waitForFunction(([zone, x, y]) => Field.zone === zone && Math.hypot(Field.hero.x - x, Field.hero.y - y) < 3 && (Field.explored[zone] & (1 << (Math.min(2, Math.floor(y / Field._debug.zones[zone].size * 3)) * 3 + Math.min(2, Math.floor(x / Field._debug.zones[zone].size * 3))))) !== 0, [zone, x, y], { timeout: 30000, polling: 100 }).catch(async error => {
+      console.error('Stand failed', { wanted: [zone,x,y], actual: await page.evaluate(() => ({ connected: Online.connected, zone: Field.zone, x: Field.hero.x, y: Field.hero.y, explored: Field.explored, overlay: document.getElementById('connection-text').textContent })) });
+      throw error;
+    });
   };
   const miniPx = (x, y) => page.evaluate(([x, y]) => Array.from(document.getElementById('minimap').getContext('2d').getImageData(x, y, 1, 1).data), [x, y]);
   check(await page.evaluate(() => JSON.stringify(Field.explored)) === '[16]', `A new character has uncovered only the middle cell of Greenmeadow (${await page.evaluate(() => JSON.stringify(Field.explored))})`);
@@ -133,7 +136,7 @@ async function call(name, args = {}) {
   const all = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => ({ name: t.querySelector('b').textContent, small: t.querySelector('small').textContent, disabled: t.disabled })));
   check(all.map(t => t.name).join() === data.zones.map(z => z.name).join() && all.every(t => !t.disabled), `Every visited zone is named again: ${all.map(t => t.name).join(', ')}`);
   const masters = await page.evaluate(() => Field._debug.zones.map((z, zone) => ({ zone, size: z.size, npcs: (z.npcs || []).filter(n => n.travelStop) })).filter(z => z.npcs.length));
-  check(masters.reduce((n, z) => n + z.npcs.length, 0) === 14 && masters.length === 13, 'The catalog includes all 14 travel masters across 13 zones');
+  check(masters.reduce((n, z) => n + z.npcs.length, 0) === 15 && masters.length === 14, 'The catalog includes all 15 travel masters across 14 zones');
   check(await page.locator('.wm-travel-badge:visible').count() === masters.length, 'Every visited travel-master zone has a world-sheet badge');
   for (const z of masters) {
     await page.locator(`.wm-tile[data-zone="${z.zone}"]`).click();

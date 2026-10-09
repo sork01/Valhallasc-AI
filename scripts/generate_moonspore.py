@@ -191,13 +191,18 @@ def open_orrery_gate(orrery):
 
 def main():
     world=json.loads(MAP.read_text())
-    world['zones']=[z for z in world['zones'] if z.get('name')!=NAME]
+    later=world['zones'][ZONE:]
+    world['zones']=world['zones'][:ZONE-1]
     assert len(world['zones'])==ZONE-1
     open_orrery_gate(world['zones'][ZONE-2])
     world['zones'].append(build())
+    world['zones'].extend(later)
+    if any(z.get('name')=='Asterion' for z in later):
+        from generate_asterion import open_forest_gate
+        open_forest_gate(world['zones'][ZONE-1])
     spark_travel.ensure(world)
     MAP.write_text(json.dumps(world,indent=2)+'\n')
-    z=world['zones'][-1]
+    z=world['zones'][ZONE-1]
     print(f'{NAME}: {len(z["objects"])} objects, {len(z["slimes"])} enemies, {len(z["quests"])} quests')
 
 

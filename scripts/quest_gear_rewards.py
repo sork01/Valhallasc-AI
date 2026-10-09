@@ -78,6 +78,10 @@ REWARDS = {
     'moonspore_widow': blue(60, 'necklace'),
     'moonspore_bloom': blue(60, 'pants'),
     'moonspore_survey': blue(60, 'accessory'),
+    'asterion_lamps': green(60, 'necklace'),
+    'asterion_roots': green(60, 'pants'),
+    'asterion_charts': blue(60, 'necklace'),
+    'asterion_descent': blue(60, 'accessory'),
 }
 
 
