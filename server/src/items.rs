@@ -188,6 +188,12 @@ pub fn material(kind: &str) -> &'static str {
         "mireheart" => "mireheart_seed",
         "silverwidow" => "widow_silk",
         "nightbloom" => "nightbloom_petal",
+        "dew_moth" => "moon_dew",
+        "lumen_eel" => "lumen_scale",
+        "rootbell" => "rootbell_seed",
+        "tideglass_heron" => "tideglass_plume",
+        "hourpetal_stag" => "hourpetal_antler",
+        "moonskein_weaver" => "moonskein_thread",
         "moonwell_echo" => "moonwell_shard",
         _ => "slime_gel",
     }
@@ -247,6 +253,9 @@ pub fn is_elite(kind: &str) -> bool {
             | "mireheart"
             | "silverwidow"
             | "nightbloom"
+            | "tideglass_heron"
+            | "hourpetal_stag"
+            | "moonskein_weaver"
             | "moonwell_echo"
     ) || is_vault_enemy(kind)
 }
@@ -255,7 +264,10 @@ pub fn is_vault_enemy(kind: &str) -> bool {
     if crate::cathedral::enemy(kind).is_some() {
         return false;
     }
-    matches!(kind, "thrall" | "archer" | "acolyte") || is_boss(kind)
+    matches!(
+        kind,
+        "thrall" | "archer" | "acolyte" | "gatewarden" | "choir" | "colossus" | "hollowking"
+    )
 }
 /// The four bosses of the Undervault (the dungeon under Skaldholm). Each drops guaranteed blue gear.
 pub fn is_boss(kind: &str) -> bool {
@@ -264,7 +276,14 @@ pub fn is_boss(kind: &str) -> bool {
     }
     matches!(
         kind,
-        "gatewarden" | "choir" | "colossus" | "hollowking" | "moonwell_echo"
+        "gatewarden"
+            | "choir"
+            | "colossus"
+            | "hollowking"
+            | "tideglass_heron"
+            | "hourpetal_stag"
+            | "moonskein_weaver"
+            | "moonwell_echo"
     )
 }
 /// The slot pools a boss drops from: one shared wing-level blue piece per pool, chosen across all classes.
@@ -310,6 +329,9 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
                 "accessory",
             ],
         ],
+        "tideglass_heron" => &[&["headgear", "shoulders"]],
+        "hourpetal_stag" => &[&["weapon", "pants"]],
+        "moonskein_weaver" => &[&["gloves", "necklace", "accessory"]],
         "moonwell_echo" => &[
             &["armor", "weapon", "headgear"],
             &["gloves", "pants", "necklace", "accessory"],
@@ -333,7 +355,10 @@ pub fn boss_piece(slots: &[&str], choice: f64) -> Option<&'static Item> {
 }
 /// Cathedral bosses guarantee their own wing's exclusive blue set at its exact required level.
 pub fn boss_piece_for(kind: &str, slots: &[&str], choice: f64) -> Option<&'static Item> {
-    if kind == "moonwell_echo" {
+    if matches!(
+        kind,
+        "tideglass_heron" | "hourpetal_stag" | "moonskein_weaver" | "moonwell_echo"
+    ) {
         let pool: Vec<_> = ITEMS
             .iter()
             .filter(|i| {

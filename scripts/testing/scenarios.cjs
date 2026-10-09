@@ -32,7 +32,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60, moonwell_echo: 60 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60, dew_moth: 60, lumen_eel: 60, rootbell: 60, tideglass_heron: 60, hourpetal_stag: 60, moonskein_weaver: 60, moonwell_echo: 60 };
 Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'world/cathedral.txt'), 'utf8')).map(e => [e.kind, e.level])));
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
@@ -3086,7 +3086,8 @@ const scenarios = {
       await w.action(bot,{type:'move',x:125,y:93});
       await w.waitFor(()=>w.player(bot).zone===18,15000,'Descend into private Moonwell');
       await w.action(bot,{type:'stop'});
-      check(well.copies===4 && well.final_boss==='moonwell_echo' && w.views.get(bot).slimes.some(s=>s.kind==='moonwell_echo'),'Four-copy dungeon and unique boss load');
+      check(well.copies===4 && well.theme==='moonwell' && well.final_boss==='moonwell_echo' &&
+        ['tideglass_heron','hourpetal_stag','moonskein_weaver','moonwell_echo'].every(k=>w.views.get(bot).slimes.some(s=>s.kind===k)),'Four-copy water garden loads all four unique bosses');
       const other='SecondGlass';await w.connect({bot:other,class:'mage'});
       await w.debug(other,{op:'set_level',level:60});
       await kit.teleport(w,other,{zone:17,x:127,y:97});
@@ -3094,14 +3095,23 @@ const scenarios = {
       await w.waitFor(()=>w.player(other).zone===18,15000,'Second visitor descends');
       const firstIds=w.views.get(bot).slimes.map(s=>s.id),secondIds=w.views.get(other).slimes.map(s=>s.id);
       check(firstIds.every(id=>!secondIds.includes(id)),'Unpartied visitors receive isolated copies');
-      const boss=w.views.get(bot).slimes.find(s=>s.kind==='moonwell_echo'&&!s.dead);
-      await w.debug(bot,{op:'kill_enemy',id:boss.id});
-      await w.waitFor(()=>quest(w,bot,'asterion_descent').counts[0]===1,5000,'Moonwell boss credits its quest');
-      check(w.views.get(bot).drops.some(d=>d.item==='moonwell_shard'),'Moonwell boss drops its unique material');
-      check(w.views.get(bot).drops.filter(d=>kit.items.some(i=>i.id===d.item&&i.rarity==='rare'&&i.requiredLevel===60)).length>=2,'Moonwell boss drops two level-60 blue pieces');
+      for(const [kind,item] of [['dew_moth','moon_dew'],['lumen_eel','lumen_scale'],['rootbell','rootbell_seed']]){
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
+        check(enemy?.level===60,`${kind} is a fixed level-60 Moonwell creature`);
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===item),5000,`${kind} drops ${item}`);
+      }
+      for(const [n,kind,item] of [[0,'moonwell_echo','moonwell_shard'],[1,'tideglass_heron','tideglass_plume'],[2,'hourpetal_stag','hourpetal_antler'],[3,'moonskein_weaver','moonskein_thread']]){
+        const boss=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
+        await w.debug(bot,{op:'kill_enemy',id:boss.id});
+        await w.waitFor(()=>quest(w,bot,'asterion_descent').counts[n]===1,5000,`${kind} credits its quest`);
+        check(w.views.get(bot).drops.some(d=>d.item===item),`${kind} drops its named material`);
+        check(w.views.get(bot).drops.filter(d=>kit.items.some(i=>i.id===d.item&&i.rarity==='rare'&&i.requiredLevel===60)).length>=2+n,`${kind} adds guaranteed level-60 blue gear`);
+        check(w.views.get(bot).instance.cleared===(n===3),'The exit opens only after all four bosses');
+      }
       check(!w.views.get(other).slimes.find(s=>s.kind==='moonwell_echo').dead,'Other copy keeps its own living boss');
-      await kit.teleport(w,bot,{zone:18,x:108,y:116});
-      await w.action(bot,{type:'move',x:111,y:116});
+      await kit.teleport(w,bot,{zone:18,x:106,y:116});
+      await w.action(bot,{type:'move',x:109,y:116});
       await w.waitFor(()=>w.player(bot).zone===17,15000,'Cleared exit returns to city');
       await w.action(bot,{type:'stop'});
       await kit.teleport(w,bot,{npc:'asterion_stonewarden'});

@@ -28873,5 +28873,47 @@
     "kind": "material",
     "rarity": "common",
     "sell": 2400
+  },
+  {
+    "id": "moon_dew",
+    "name": "Moonwell Dew",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 240
+  },
+  {
+    "id": "lumen_scale",
+    "name": "Lumen Eel Scale",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 270
+  },
+  {
+    "id": "rootbell_seed",
+    "name": "Rootbell Seed",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 300
+  },
+  {
+    "id": "tideglass_plume",
+    "name": "Tideglass Plume",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1100
+  },
+  {
+    "id": "hourpetal_antler",
+    "name": "Hourpetal Antler",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1400
+  },
+  {
+    "id": "moonskein_thread",
+    "name": "Moonskein Thread",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1700
   }
 ]

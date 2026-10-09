@@ -82,11 +82,71 @@ fn moonwell_has_four_private_copies_safe_arrivals_and_a_unique_boss_drop() {
             p.id
         );
     }
-    assert!(is_boss("moonwell_echo"));
-    assert_eq!(material("moonwell_echo"), "moonwell_shard");
-    for slots in boss_slots("moonwell_echo") {
-        let piece = boss_piece_for("moonwell_echo", slots, 0.5).unwrap();
-        assert_eq!((piece.required_level, piece.rarity.as_str()), (60, "rare"));
+    for (kind, drop) in [
+        ("tideglass_heron", "tideglass_plume"),
+        ("hourpetal_stag", "hourpetal_antler"),
+        ("moonskein_weaver", "moonskein_thread"),
+        ("moonwell_echo", "moonwell_shard"),
+    ] {
+        assert!(is_boss(kind));
+        assert_eq!(material(kind), drop);
+        assert_eq!(
+            w.slimes
+                .iter()
+                .filter(|s| s.zone == WELL && s.kind == kind)
+                .count(),
+            1
+        );
+        for slots in boss_slots(kind) {
+            let piece = boss_piece_for(kind, slots, 0.5).unwrap();
+            assert_eq!((piece.required_level, piece.rarity.as_str()), (60, "rare"));
+        }
+    }
+    assert_eq!(well.slimes.iter().filter(|s| is_boss(&s.kind)).count(), 4);
+    let quest = w.maps[CITY]
+        .quests
+        .iter()
+        .find(|q| q.id == "asterion_descent")
+        .unwrap();
+    assert_eq!(quest.objectives.len(), 4);
+    assert_eq!(quest.objectives[0].target, "moonwell_echo"); // old one-count saves keep their meaning
+    assert!(!quest.ready(&QuestProgress {
+        id: quest.id.clone(),
+        counts: vec![1],
+        claimed: false,
+        completions: 0,
+    }));
+}
+
+#[test]
+fn moonwell_exit_waits_for_every_boss_even_if_echo_dies_first() {
+    let mut w = world();
+    let _rx = join(&mut w, 1, Class::Warrior);
+    w.players.get_mut(&1).unwrap().character.level = 60;
+    place(&mut w, 1, WELL, at(21., 64.));
+    for (n, kind) in [
+        "moonwell_echo",
+        "tideglass_heron",
+        "hourpetal_stag",
+        "moonskein_weaver",
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let id = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == WELL && s.kind == kind)
+            .unwrap();
+        let p = w.slimes[id].point();
+        place(&mut w, 1, WELL, at(p.x - 2., p.y));
+        w.hit_slime(id, 1, 1e9, false);
+        assert_eq!(w.instance_cleared(WELL), n == 3, "{kind}");
+        assert!(
+            w.drops
+                .iter()
+                .any(|d| d.zone == WELL && d.item.as_deref() == Some(material(kind)))
+        );
     }
 }
 

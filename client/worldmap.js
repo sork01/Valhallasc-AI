@@ -9,9 +9,9 @@
   const STAGE = { w: 100, h: 62 };
   // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm -> the Wyrdwood -> Bifrost Reach, up the Stormrift -> Ran's Deep, down the Maelstrom.
   const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:89,y:53,s:8},{x:63,y:20,s:15},{x:2,y:25,s:14},{x:2,y:13,s:10},{x:52,y:21,s:10},{x:52,y:52,s:9},{x:62,y:57,s:5}];
-  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', asterion: '#364a72', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', prismwaste: '#ad887e', orrery: '#37394e', moonspore: '#1c4244', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
-  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', asterion: '#9ec6d9', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', prismwaste: '#ead7a8', orrery: '#ad907b', moonspore: '#a5c4a8', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
-  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', asterion: '#d9e8ff', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', prismwaste: '#ffe3ac', orrery: '#f4c981', moonspore: '#c4f4af', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
+  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', asterion: '#364a72', moonwell:'#153d58', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', prismwaste: '#ad887e', orrery: '#37394e', moonspore: '#1c4244', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
+  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', asterion: '#9ec6d9', moonwell:'#a8d5cf', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', prismwaste: '#ead7a8', orrery: '#ad907b', moonspore: '#a5c4a8', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
+  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', asterion: '#d9e8ff', moonwell:'#f8e8ad', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', prismwaste: '#ffe3ac', orrery: '#f4c981', moonspore: '#c4f4af', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
   const BLURB = {
     meadow: 'Green pastures round the walled town of Alderhaven.',
     ember: 'Lava fords and ash-grey crags above Cinderwatch Camp.',
@@ -26,6 +26,7 @@
     orrery: 'A vast broken clock beyond the Prismwaste, with the Stillpoint refuge and two dangerous winding courts.',
     moonspore: 'A fallen moon feeds a luminous fungal forest. Lamplight Refuge lies below three elite courts.',
     asterion: 'Seven rings of glass-roof houses turn around a singing astrolabe. A Meeting Stone opens the Moonwell below.',
+    moonwell: 'A starlit water garden of floating petal islands and four guardians, beneath the Meeting Stone.',
     cathedral_left:'The Flooded Cloister: level 40, four bosses, a private five-player wing.',
     cathedral_right:'The Coral Reliquary: level 45, four bosses, a private five-player wing.',
     cathedral_main:'The Grand Nave: level 50, four bosses, a private five-player wing.',
@@ -51,6 +52,8 @@
     miragejackal: ['Mirage Jackal',45,'#e7b990'], shardscarab:['Shard Scarab',46,'#99e6dc'], glassharrier:['Glass Harrier',47,'#d5c5ff'], prismsentinel:['Prism Sentinel',48,'#d5e9ed'], mirrorqueen:['Mirror Queen (Elite · 3 players)',49,'#e7b8ff'], sunshard:['Sunshard (Elite · 5 players)',50,'#ffd58a'],
     bronzemantis:['Bronze Mantis',50,'#c8a66b'], gearling:['Gearling',51,'#9bc2be'], orbitseer:['Orbit Seer (ranged)',52,'#a3dce4'], chronoguard:['Chronoguard',53,'#b4a7ba'], pendulummatron:['Pendulum Matron (Elite · 3 players)',54,'#e1b5a9'], epochengine:['Epoch Engine (Elite · 5 players)',55,'#dab47d'],
     glowcapgrazer:['Glowcap Grazer',55,'#bbffae'], silkwing:['Silkwing',56,'#c7f8ee'], rootlurker:['Rootlurker',57,'#c9ae83'], lanternwraith:['Lantern Wraith (ranged)',58,'#b8ffa5'], mireheart:['Mireheart (Elite · 3 players)',58,'#efb9ba'], silverwidow:['Silver Widow (Elite · 3 players)',59,'#e9b9ff'], nightbloom:['Nightbloom (Elite · 5 players)',60,'#eafca1'],
+    dew_moth:['Dew Moth',60,'#a8d5cf'], lumen_eel:['Lumen Eel',60,'#9af2d7'], rootbell:['Rootbell',60,'#f8e8ad'],
+    tideglass_heron:['Tideglass Heron (Boss · 5 players)',60,'#a8d5cf'], hourpetal_stag:['Hourpetal Stag (Boss · 5 players)',60,'#f8e8ad'], moonskein_weaver:['Moonskein Weaver (Boss · 5 players)',60,'#f0a6be'],
     moonwell_echo:['Moonwell Echo (Boss · 5 players)',60,'#91f6e2'],
     ram: ['Stormram', 29, '#8fe0ff'], oakhorn: ['Oakhorn (Elite · 3 players)', 25, '#ff9a3a'], hrungnir: ['Hrungnir (Elite · 5 players)', 30, '#7ab4ff'],
   };
@@ -148,6 +151,9 @@
       case 'mooncaps': case 'sporelamp': case 'glowmoss': return '#c4f4af';
       case 'gloomstalk': case 'sporefern': return '#618f76';
       case 'moonstone': case 'moonwell': case 'moonaltar': return '#b5cbb8';
+      case 'moonmirror': return '#f8e8ad';
+      case 'moonlily': return '#c6e4d6';
+      case 'moonreed': return '#9af2d7';
       case 'lamphouse': return '#97b9a2';
       case 'shade_tent': return '#a5798f';
       case 'bush': return fen ? '#3f6a3a' : frost ? '#4a8a78' : ember ? '#3a2a30' : '#2f8a45';
@@ -167,6 +173,7 @@
     for (const p of z.paths || []) { g.beginPath(); p.forEach(([x, y], i) => i ? g.lineTo(x * k, y * k) : g.moveTo(x * k, y * k)); g.stroke(); }
     if (z.theme === 'meadow') { g.beginPath(); g.arc(36 * k, 36 * k, 3.5 * k, 0, 6.283); g.fill(); }
     (z.sky || []).forEach((row, y) => { for (let x = 0; x < z.size; x++) { const c = row[x]; if (c && c !== ' ') { g.fillStyle = c === '=' ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .6, k + .6); } } });   // floating islands and their bridges
+    (z.moonwellFloor || []).forEach((row,y)=>{for(let x=0;x<z.size;x++){const c=row[x];if(c&&c!==' '){g.fillStyle=c==='='?'#f8e8ad':'#a8d5cf';g.fillRect(x*k,y*k,k+.6,k+.6);}}});
     for (const [x0, y0, x1, y1] of z.rooms || []) { g.fillStyle = '#2f3347'; g.fillRect(x0 * k, y0 * k, (x1 - x0) * k, (y1 - y0) * k); }   // a dungeon's floor
     const PAVE = z.theme === 'asterion' ? {1:'#9ec6d9',2:'#edd9ad',3:'#c99bbf'} : { 1: '#b6a98c', 2: '#ece2c8', 3: '#b8765a' };
     for (const r of z.roads || []) {

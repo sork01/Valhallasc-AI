@@ -398,6 +398,13 @@ impl Slime {
             "mireheart" => (900000., 9300., 2.0, 2.25),
             "silverwidow" => (1100000., 10500., 3.0, 2.1),
             "nightbloom" => (1700000., 14500., 1.8, 2.65),
+            // Four courts of the open-water Moonwell; each guardian has a different attack rhythm.
+            "dew_moth" => (160000., 2300., 3.8, 1.45),
+            "lumen_eel" => (190000., 2900., 3.6, 1.55),
+            "rootbell" => (220000., 3100., 2.1, 1.75),
+            "tideglass_heron" => (1050000., 10500., 3.1, 2.15),
+            "hourpetal_stag" => (1300000., 12500., 2.6, 2.25),
+            "moonskein_weaver" => (1600000., 14000., 2.5, 2.35),
             "moonwell_echo" => (2400000., 16500., 2.2, 2.7),
             _ => (60., 8., 1.9, 1.),
         }
@@ -472,7 +479,8 @@ impl Slime {
             "mireheart" => 58,
             "silverwidow" => 59,
             "nightbloom" => 60,
-            "moonwell_echo" => 60,
+            "dew_moth" | "lumen_eel" | "rootbell" | "tideglass_heron" | "hourpetal_stag"
+            | "moonskein_weaver" | "moonwell_echo" => 60,
             _ => 2,
         }
     }
@@ -549,6 +557,12 @@ impl Slime {
             "mireheart" => 10000,
             "silverwidow" => 11500,
             "nightbloom" => 16000,
+            "dew_moth" => 3500,
+            "lumen_eel" => 3900,
+            "rootbell" => 4200,
+            "tideglass_heron" => 12500,
+            "hourpetal_stag" => 15500,
+            "moonskein_weaver" => 19000,
             "moonwell_echo" => 24000,
             _ => 0,
         }
@@ -629,6 +643,12 @@ impl Slime {
             "mireheart" => (1.0, 1.8, 6., 11.),
             "silverwidow" => (0.7, 1.5, 9., 12.),
             "nightbloom" => (1.2, 2.2, 5.5, 14.),
+            "dew_moth" => (0.35, 1.0, 11., 10.),
+            "lumen_eel" => (0.3, 0.9, 12., 11.),
+            "rootbell" => (0.9, 1.7, 6.5, 8.5),
+            "tideglass_heron" => (0.8, 1.45, 9., 13.),
+            "hourpetal_stag" => (1.1, 1.8, 7., 12.),
+            "moonskein_weaver" => (0.9, 2.1, 0., 14.),
             "moonwell_echo" => (1.0, 1.9, 6.5, 15.),
             _ => (0.45, 1.3, 6., 5.5),
         }
@@ -664,6 +684,8 @@ impl Slime {
             "kraken" => (13., 11., "#5a4aa8", 1.3, 3, 0.26),
             "orbitseer" => (11., 11., "#a7e7ff", 0.85, 2, 0.16),
             "lanternwraith" => (11., 9., "#c6ffb9", 0.9, 2, 0.2),
+            "moonskein_weaver" => (13., 10., "#f0a6be", 1.0, 5, 0.31),
+            "moonwell_echo" => (13., 10., "#91f6e2", 1.2, 5, 0.25),
             _ => return None,
         };
         Some(Ranged {
@@ -706,6 +728,8 @@ impl Slime {
             "epochengine" => 4.3,
             "mireheart" => 3.5,
             "nightbloom" => 4.5,
+            "hourpetal_stag" => 3.7,
+            "moonwell_echo" => 4.2,
             _ => 0.,
         }
     }
@@ -2542,10 +2566,10 @@ impl World {
         );
         if killed {
             // A dungeon boss may complete a quest offered at the entrance city. Keep ordinary
-            // kills scoped to their own map; only the final boss reaches quests in maps with a
-            // portal into this dungeon template.
+            // kills scoped to their own map; boss kills reach quests in maps with a portal into
+            // this dungeon template.
             let mut kill_quests = self.maps[zone].quests.clone();
-            if self.is_instance(zone) && self.maps[zone].final_boss == kind {
+            if self.is_instance(zone) && is_boss(&kind) {
                 let template = self.public_zone(zone);
                 for entry in self.maps.iter().filter(|m| {
                     m.template.is_none() && m.portals.iter().any(|portal| portal.to == template)
@@ -2614,15 +2638,16 @@ impl World {
             if is_boss(&kind) {
                 self.boss_loot(&credit_id, &kind, zone, point);
             }
-            let cathedral = crate::cathedral::enemy(&self.maps[zone].final_boss).is_some();
-            if (cathedral
+            let all_bosses = crate::cathedral::enemy(&self.maps[zone].final_boss).is_some()
+                || self.maps[zone].final_boss == "moonwell_echo";
+            if (all_bosses
                 && is_boss(&kind)
                 && self
                     .slimes
                     .iter()
                     .filter(|s| s.zone == zone && is_boss(&s.kind))
                     .all(|s| s.dead))
-                || (!cathedral
+                || (!all_bosses
                     && !self.maps[zone].final_boss.is_empty()
                     && self.maps[zone].final_boss == kind)
             {

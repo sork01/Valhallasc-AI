@@ -16,6 +16,7 @@ from quest_gear_rewards import add_reward
 
 ROOT = Path(__file__).resolve().parents[1]
 MAP = ROOT / 'world/map.txt'
+ITEMS = ROOT / 'world/items.txt'
 XP = json.loads((ROOT / 'world/levels.txt').read_text())
 CITY_ID, DUNGEON_ID = 17, 18
 CITY_NAME, DUNGEON_NAME = 'Asterion', 'The Moonwell'
@@ -139,7 +140,10 @@ def quests():
         q('charts','A Map That Breathes','cartographer','Survey the hazards beneath the city by bringing back their traces.',
           [bring('wraith_lantern',5,'Bring Lantern Wraith Embers'),bring('widow_silk',2,'Bring Widow Silk')],60,4300,'welcome'),
         q('descent','The Thirteenth Bell','stonewarden','Go below the Meeting Stone and silence the Nightbloom echo that fills the Moonwell.',
-          [kill('moonwell_echo',1,'Defeat the Moonwell Echo')],60,6900,'welcome',group=True,recommendedPlayers=5),
+          [kill('moonwell_echo',1,'Silence the Moonwell Echo'),
+           kill('tideglass_heron',1,'Free the Tideglass Heron'),
+           kill('hourpetal_stag',1,'Still the Hourpetal Stag'),
+           kill('moonskein_weaver',1,'Unravel the Moonskein Weaver')],60,6900,'welcome',group=True,recommendedPlayers=5),
         q('market','The Night Market Never Sleeps','merchant','Bring fresh materials for the lantern merchants.',
           [bring('moon_silk',3,'Bring Moon Silk'),bring('glowcap',3,'Bring Glowcaps')],60,2000,'welcome',True),
     ]
@@ -209,34 +213,72 @@ def city():
 
 
 def dungeon():
-    # Five halls describe a crescent that descends into the luminous root chamber.
-    rooms=[(10,50,39,78),(34,56,70,72),(61,29,94,75),(80,61,116,92),(86,85,120,121)]
+    # A chain of floating petal islands crosses the water, winding around its open central basin.
+    # The mask, rather than repeated rectangular halls, owns both the visible shore and collision.
     size=128
     import numpy as np
+    yy,xx=np.mgrid[:size,:size]
     floor=np.zeros((size,size),dtype=bool)
-    for x0,y0,x1,y1 in rooms:floor[y0:y1,x0:x1]=True
-    wall=[]
-    for y in range(4,size-4):
-        for x in range(4,size-4):
-            if not floor[y,x] and floor[y-1:y+2,x-1:x+2].any():
-                wall.append(object_('vaultwall',x+.5,y+.5,0,width=.98,depth=.98))
+    islands=[(21,64,16,13),(42,47,17,14),(68,30,16,14),(91,59,18,16),(101,91,18,15),(104,107,16,15)]
+    for x,y,rx,ry in islands:
+        theta=np.arctan2(yy-y,xx-x)
+        edge=1+.09*np.sin(theta*7+x)+.06*np.sin(theta*11+y)
+        floor|=((xx-x)/rx)**2+((yy-y)/ry)**2 < edge**2
+    routes=[[(21,64),(42,47)],[(42,47),(68,30)],[(68,30),(91,59)],[(91,59),(101,91)],[(101,91),(104,107)]]
+    bridges=np.zeros_like(floor)
+    for (ax,ay),(bx,by) in routes:
+        t=np.clip(((xx-ax)*(bx-ax)+(yy-ay)*(by-ay))/((bx-ax)**2+(by-ay)**2),0,1)
+        bridge=(xx-ax-t*(bx-ax))**2+(yy-ay-t*(by-ay))**2 < 4.5**2
+        bridges|=bridge;floor|=bridge
+    # Only the islands are solid ground; causeways gleam like traversable glass.
+    rows=[''.join('=' if bridges[y,x] else 'o' if floor[y,x] else ' ' for x in range(size)) for y in range(size)]
+    used=floor.copy();objects=[]
+    for y in range(size):
+        x=0
+        while x<size:
+            if used[y,x]:x+=1;continue
+            x1=x+1
+            while x1<min(size,x+8) and not used[y,x1]:x1+=1
+            y1=y+1
+            while y1<min(size,y+8) and not used[y1,x:x1].any():y1+=1
+            used[y:y1,x:x1]=True
+            objects.append(object_('void',(x+x1)/2,(y+y1)/2,0,width=x1-x,depth=y1-y))
+            x=x1
     mobs=[]
-    for kind,pts in [('glowcapgrazer',[(45,62),(51,65),(60,63),(70,43)]),
-                     ('rootlurker',[(73,35),(82,38),(70,52),(93,64),(99,70)]),
-                     ('lanternwraith',[(73,62),(82,63),(88,74),(102,81)]),
-                     ('silkwing',[(93,91),(103,95),(112,97)]),
-                     ('silverwidow',[(98,110)]),('moonwell_echo',[(110,112)])]:
+    for kind,pts in [('dew_moth',[(30,61),(33,55),(52,44),(57,37),(81,39),(86,48)]),
+                     ('lumen_eel',[(42,57),(59,33),(78,39),(94,72),(97,84)]),
+                     ('rootbell',[(29,51),(54,50),(73,37),(86,65),(107,88)]),
+                     ('tideglass_heron',[(42,47)]),('hourpetal_stag',[(68,30)]),
+                     ('moonskein_weaver',[(91,59)]),('moonwell_echo',[(104,107)])]:
         mobs.extend(dict(kind=kind,x=x,y=y) for x,y in pts)
-    props=[object_('brazier',x,y,.5) for x,y in [(16,53),(16,74),(40,59),(67,31),(91,88),(90,119)]]
-    zone=dict(name=DUNGEON_NAME,theme='vault',tagline='The buried moon sings below Asterion',size=size,
+    keep=[(s['x'],s['y'],6 if s['kind'] in ('tideglass_heron','hourpetal_stag','moonskein_weaver','moonwell_echo') else 2.5) for s in mobs]
+    keep += [(21,64,8),(14,64,4),(109,116,5)]
+    rng=random.Random(20261009)
+    for x,y,_,_ in islands:
+        objects.append(object_('moonmirror',x+8,y+7,.75))
+        for n in range(8):
+            a=n*math.tau/8+rng.uniform(-.2,.2);px=x+math.cos(a)*10;py=y+math.sin(a)*8
+            if floor[round(py),round(px)] and all(math.hypot(px-kx,py-ky)>kr+1 for kx,ky,kr in keep):
+                objects.append(object_('moonlily',px,py,.25,petals=5+n%3))
+    for x,y in [(26,70),(36,43),(62,23),(83,54),(102,98),(111,111)]:
+        if floor[y,x] and all(math.hypot(x-kx,y-ky)>kr+1 for kx,ky,kr in keep):objects.append(object_('moonreed',x,y,.2))
+    zone=dict(name=DUNGEON_NAME,theme='moonwell',tagline='A floating garden where moonlight pools like water',size=size,
               levels=[60,60],players=5,min_level=60,copies=4,final_boss='moonwell_echo',
-              spawn=dict(x=21,y=64),paths=[],rooms=[list(r) for r in rooms],objects=wall+props,
+              spawn=dict(x=21,y=64),paths=[],moonwellFloor=rows,objects=objects,
               slimes=mobs,npcs=[],quests=[],
               portals=[dict(id='moonwell_stairs_up',name='The Stairs Up',x=14,y=64,r=1.2,to=CITY_ID,tx=127,ty=97,look='stairs_up'),
-                       dict(id='moonwell_exit',name='The Rootway Home',x=111,y=116,r=1.2,to=CITY_ID,tx=127,ty=97,
+                       dict(id='moonwell_exit',name='The Rootway Home',x=109,y=116,r=1.2,to=CITY_ID,tx=127,ty=97,
                             after_clear=True,look='exit')])
+    for s in mobs:
+        if not floor[s['y']-2:s['y']+3,s['x']-2:s['x']+3].all():
+            x0,y0=s['x'],s['y']
+            choices=sorted(((math.hypot(x-x0,y-y0),x,y) for y in range(5,size-5) for x in range(5,size-5)
+                            if floor[y-2:y+3,x-2:x+3].all() and all(math.hypot(x-q['x'],y-q['y'])>2.2 for q in mobs if q is not s)))
+            assert choices[0][0]<5,s
+            _,s['x'],s['y']=choices[0]
     seen,_=fen.flood(zone,(21,64))
     for s in [*mobs,*zone['portals']]:assert seen[int(s['y']/.5),int(s['x']/.5)],s
+    assert all(floor[y,x] for x,y in [(21,64),(14,64),(42,47),(68,30),(91,59),(104,107),(109,116)])
     return zone
 
 
@@ -263,6 +305,14 @@ def main():
     world['zones'].extend([city(),dungeon()])
     spark_travel.ensure(world)
     MAP.write_text(json.dumps(world,indent=2)+'\n')
+    items=json.loads(ITEMS.read_text())
+    materials=[('moon_dew','Moonwell Dew',240),('lumen_scale','Lumen Eel Scale',270),
+               ('rootbell_seed','Rootbell Seed',300),('tideglass_plume','Tideglass Plume',1100),
+               ('hourpetal_antler','Hourpetal Antler',1400),('moonskein_thread','Moonskein Thread',1700)]
+    known={i['id'] for i in items}
+    for id_,name,sell in materials:
+        if id_ not in known:items.append(dict(id=id_,name=name,kind='material',rarity='common',sell=sell))
+    ITEMS.write_text(json.dumps(items,indent=2)+'\n')
     print(f'{CITY_NAME}: {len(world["zones"][16]["objects"])} objects, {len(world["zones"][16]["npcs"])} NPCs; '
           f'{DUNGEON_NAME}: {len(world["zones"][17]["slimes"])} enemies')
 
