@@ -32,7 +32,7 @@ async function talk(w, bot, npcId, offer) {
   return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
-const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60, dew_moth: 60, lumen_eel: 60, rootbell: 60, tideglass_heron: 60, hourpetal_stag: 60, moonskein_weaver: 60, moonwell_echo: 60, saltclaw: 60, stormgull: 61, glassray: 62, breakersentinel: 64, maelstromheart: 65 };
+const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60, dew_moth: 60, lumen_eel: 60, rootbell: 60, tideglass_heron: 60, hourpetal_stag: 60, moonskein_weaver: 60, moonwell_echo: 60, saltclaw: 60, stormgull: 61, glassray: 62, breakersentinel: 64, maelstromheart: 65, meadowhare: 65, sunbacksnail: 66, brushfox: 67, spadebadger: 68, honeyjaw: 69, wickerwarden: 70 };
 Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'world/cathedral.txt'), 'utf8')).map(e => [e.kind, e.level])));
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
@@ -3134,7 +3134,7 @@ const scenarios = {
       const back=area.portals.find(p=>p.id==='stormglass_asterion_gate');
       check(gate?.to===19 && back?.to===17,'Asterion and Stormglass have reciprocal gates');
       check(area.levels.join(',')==='60,65' && area.slimes.length===41 && area.quests.length===8,'The level 60–65 shore, monsters and quest hub load');
-      check(area.futureInstance?.status==='sealed' && area.futureInstance?.name==='The Eye Below' && area.portals.length===1,'The dungeon entrance is sealed and has no playable instance');
+      check(area.futureInstance?.status==='sealed' && area.futureInstance?.name==='The Eye Below' && area.portals.length===2 && area.portals.every(p=>p.to!==area.futureInstance?.zone),'The dungeon entrance is sealed and has no playable instance');
       await kit.teleport(w,bot,{zone:17,x:164,y:88});
       await w.action(bot,{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.player(bot).zone===19,15000,'Enter Stormglass');
@@ -3199,6 +3199,100 @@ const scenarios = {
       check(w.player(bot).gold===80,'One Spark Travel leg charges 20 gold');
       await w.waitFor(()=>w.player(bot).zone===19&&!w.player(bot).sparkTravel,30000,'Spark arrives at Breakwater');
       check(distance(w.player(bot),area.npcs.find(n=>n.id==='travel_breakwater'))<.2,'Spark Travel lands beside the Breakwater master');
+    },
+  },
+
+  sunward: {
+    description: 'Sunward Vale: river bridges, green woods, sealed Elder Hollow, six drops, two elite quests and Spark Travel.',
+    startLevel: 70,
+    levelSpread: 0,
+    async run(w,check) {
+      const bot='MillbridgeRunner',area=map.zones[19];
+      await w.connect({bot,class:'warrior'});
+      const gate=map.zones[18].portals.find(p=>p.id==='stormglass_sun_gate');
+      const back=area.portals.find(p=>p.id==='sun_stormglass_gate');
+      check(gate?.to===20&&back?.to===19,'Sunward Cut is reciprocal');
+      check(area.levels.join(',')==='65,70'&&area.slimes.length===42&&area.quests.length===9,'Level band, six kinds and nine quests load');
+      check(area.futureInstance?.status==='sealed'&&area.futureInstance?.name==='The Elder Hollow'&&area.portals.length===1,'The giant oak entrance is sealed');
+      check(area.theme==='sunward'&&area.objects.filter(o=>['oak_tree','birch_tree','apple_tree','willow_tree'].includes(o.kind)).length>=170&&area.objects.filter(o=>o.kind==='water').length>=40,'River, orchard and ordinary trees shape the vale');
+      await kit.teleport(w,bot,{zone:19,x:119,y:70});
+      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===20,15000,'Enter Sunward');
+      await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),area.spawn)<2,'Arrival lies in Millbridge');
+      await w.connect({bot:'MeadowWitness',class:'mage'});
+      check(w.views.get('MeadowWitness').slimes.every(s=>s.zone===0)&&w.views.get(bot).slimes.every(s=>s.zone===20),'Zone snapshots stay isolated');
+      await kit.teleport(w,bot,{npc:'travel_millbridge'});
+      const travel=await kit.talkTo(w,bot,'travel_millbridge');
+      check(travel.travelStops?.includes('travel_millbridge')&&area.npcs.find(n=>n.id==='travel_millbridge').travelLinks.includes('travel_breakwater')&&map.zones[18].npcs.find(n=>n.id==='travel_breakwater').travelLinks.includes('travel_millbridge'),'Spark stops link Millbridge and Breakwater');
+      await w.debug(bot,{op:'set_gold',gold:500});
+      await kit.teleport(w,bot,{npc:'sun_stone'});
+      const hire=await kit.talkTo(w,bot,'sun_stone','merc_priest');
+      await w.waitFor(()=>w.views.get(bot).players.some(p=>p.look.name==='Merc Priest'),5000,'Meeting Stone hire');
+      check(/Merc Priest joins your party/.test(hire.notice)&&w.player(bot).gold===250,'Meeting Stone hires a fighter');
+      await kit.talkTo(w,bot,'sun_stone','merc_dismiss');
+      await kit.teleport(w,bot,{npc:'sun_miller'});
+      await kit.talkTo(w,bot,'sun_miller','quest:accept:sun_welcome');
+      await w.waitFor(()=>!!quest(w,bot,'sun_welcome'),5000,'Accept introductions');
+      for(const npc of ['sun_medic','sun_carpenter','sun_guide']){
+        await kit.teleport(w,bot,{npc});await kit.talkTo(w,bot,npc);
+      }
+      await w.waitFor(()=>quest(w,bot,'sun_welcome').counts.every(n=>n===1),5000,'Meet Millbridge crew');
+      await kit.teleport(w,bot,{npc:'sun_miller'});
+      await kit.talkTo(w,bot,'sun_miller','quest:claim:sun_welcome');
+      await w.waitFor(()=>quest(w,bot,'sun_welcome').claimed,5000,'Claim introductions');
+      for(const [kind,material] of [['meadowhare','hare_whisker'],['sunbacksnail','sunback_shell'],['brushfox','fox_tail_tuft'],['spadebadger','badger_claw']]){
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
+        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} pays level XP`);
+        check(w.views.get(bot).drops.some(d=>d.item===material),`${kind} drops ${material}`);
+      }
+      for(const [kind,id,giver,material,reward] of [
+        ['honeyjaw','sun_honeyjaw','sun_guide','honeyjaw_comb','accessory_amber_l70_blue'],
+        ['wickerwarden','sun_warden','sun_keeper','wicker_heart','necklace_moonstone_l70_blue'],
+      ]){
+        await w.debug(bot,{op:'quest',id:kind==='honeyjaw'?'sun_foxes':'sun_badgers',action:'finish'});
+        await kit.teleport(w,bot,{npc:giver});
+        await kit.talkTo(w,bot,giver,`quest:accept:${id}`);
+        await w.waitFor(()=>!!quest(w,bot,id),5000,`${id} accepted`);
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>quest(w,bot,id).counts[0]===1,5000,`${id} kill credit`);
+        check(w.views.get(bot).drops.some(d=>d.item===material),`${kind} drops unique material`);
+        check(w.views.get(bot).drops.some(d=>kit.items.some(i=>i.id===d.item&&i.rarity==='uncommon'&&i.requiredLevel>=65)),`${kind} guarantees green gear`);
+        await kit.teleport(w,bot,{npc:giver});
+        await kit.talkTo(w,bot,giver,`quest:claim:${id}`);
+        await w.waitFor(()=>quest(w,bot,id).claimed,5000,`${id} claimed`);
+        check(w.player(bot).inventory.some(i=>i.item===reward),`${id} gives level-70 blue gear`);
+      }
+      await kit.teleport(w,bot,{npc:'sun_keeper'});
+      await kit.talkTo(w,bot,'sun_keeper','quest:accept:sun_roots');
+      await w.waitFor(()=>!!quest(w,bot,'sun_roots'),5000,'Accept Elder Hollow survey');
+      await kit.teleport(w,bot,{zone:20,x:106,y:25});
+      await w.waitFor(()=>quest(w,bot,'sun_roots').counts[0]===1,5000,'Visit sealed Elder Hollow');
+      await kit.teleport(w,bot,{npc:'sun_stone'});
+      await kit.talkTo(w,bot,'sun_stone');
+      await w.waitFor(()=>quest(w,bot,'sun_roots').counts.every(n=>n===1),5000,'Consult Meeting Stone');
+      await kit.teleport(w,bot,{npc:'sun_keeper'});
+      await kit.talkTo(w,bot,'sun_keeper','quest:claim:sun_roots');
+      await w.waitFor(()=>quest(w,bot,'sun_roots').claimed,5000,'Claim Elder Hollow survey');
+      check(area.portals.every(p=>p.to!==area.futureInstance?.zone),'The Elder Hollow remains sealed after the survey');
+      await w.restart();
+      check(w.player(bot).zone===20&&quest(w,bot,'sun_warden').claimed&&w.player(bot).travelStops.includes('travel_millbridge'),'Zone, elite quest and stop persist');
+      await kit.teleport(w,bot,{zone:20,x:13,y:106});
+      await w.action(bot,{type:'move',x:back.x,y:back.y});
+      await w.waitFor(()=>w.player(bot).zone===19,15000,'Return to Stormglass');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrival is clear');
+      await w.debug(bot,{op:'set_gold',gold:100});
+      await kit.teleport(w,bot,{npc:'travel_breakwater'});
+      const departures=await kit.talkTo(w,bot,'travel_breakwater');
+      check(departures.travel.some(d=>d.id==='travel_millbridge'&&d.cost===20),'Breakwater offers discovered Millbridge stop');
+      await w.advance(550);
+      await w.action(bot,{type:'interact',npc:'travel_breakwater',offer:'spark:travel_millbridge'});
+      await w.waitFor(()=>!!w.player(bot).sparkTravel,5000,'Spark departs');
+      await w.waitFor(()=>w.player(bot).zone===20&&!w.player(bot).sparkTravel,30000,'Spark arrives');
+      check(distance(w.player(bot),area.npcs.find(n=>n.id==='travel_millbridge'))<.2,'Spark lands at Millbridge master');
     },
   },
 

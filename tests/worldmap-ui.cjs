@@ -83,7 +83,7 @@ async function call(name, args = {}) {
   check(hidden.fogged > 0 && hidden.drawn === 0, `No enemy dot shows in the fog (${hidden.fogged} slimes are in fogged cells)`);
   await press('m');
   const first = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => ({ name: t.querySelector('b').textContent, small: t.querySelector('small').textContent, disabled: t.disabled, fog: t.dataset.fog })));
-  check(first[0].name === 'Greenmeadow' && /^Lv 2–5 · 1\/9 charted$/.test(first[0].small) && first.slice(1).every(t => t.name === 'Unexplored' && t.disabled && t.fog === 'full' && t.small === 'Not yet visited'), `Only Greenmeadow is known; the other four tiles read Unexplored (${first.map(t => t.name)})`);
+  check(first[0].name === 'Greenmeadow' && /^Lv 2–5 · 1\/9 charted$/.test(first[0].small) && first.slice(1).every(t => t.name === 'Unexplored' && t.disabled && t.fog === 'full' && t.small === 'Not yet visited'), `Only Greenmeadow is known; every other tile reads Unexplored (${first.map(t => t.name)})`);
   check(await page.evaluate(() => [...document.querySelectorAll('.wm-roads [data-road]')].every(r => r.getAttribute('visibility') === 'hidden')), 'No road is drawn to a gate nobody has seen');
   const tilePx = (zone, fx, fy) => page.evaluate(([zone, fx, fy]) => { const c = document.querySelector(`.wm-tile[data-zone="${zone}"] .wm-tile-fog`); return c.getContext('2d').getImageData(Math.round(fx * 219), Math.round(fy * 219), 1, 1).data[3]; }, [zone, fx, fy]);
   check(await tilePx(0, .5, .5) === 0 && await tilePx(0, .5, .5) < await tilePx(0, .1, .1) && await tilePx(0, .1, .1) > 200 && await tilePx(1, .5, .5) > 200, 'On the tiles the visited cell is clear and the rest is fog');
@@ -136,7 +136,7 @@ async function call(name, args = {}) {
   const all = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => ({ name: t.querySelector('b').textContent, small: t.querySelector('small').textContent, disabled: t.disabled })));
   check(all.map(t => t.name).join() === data.zones.map(z => z.name).join() && all.every(t => !t.disabled), `Every visited zone is named again: ${all.map(t => t.name).join(', ')}`);
   const masters = await page.evaluate(() => Field._debug.zones.map((z, zone) => ({ zone, size: z.size, npcs: (z.npcs || []).filter(n => n.travelStop) })).filter(z => z.npcs.length));
-  check(masters.reduce((n, z) => n + z.npcs.length, 0) === 15 && masters.length === 14, 'The catalog includes all 15 travel masters across 14 zones');
+  check(masters.reduce((n, z) => n + z.npcs.length, 0) === 17 && masters.length === 16, 'The catalog includes all 17 travel masters across 16 zones');
   check(await page.locator('.wm-travel-badge:visible').count() === masters.length, 'Every visited travel-master zone has a world-sheet badge');
   for (const z of masters) {
     await page.locator(`.wm-tile[data-zone="${z.zone}"]`).click();

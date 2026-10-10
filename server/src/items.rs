@@ -200,6 +200,12 @@ pub fn material(kind: &str) -> &'static str {
         "glassray" => "glassfin",
         "breakersentinel" => "breaker_core",
         "maelstromheart" => "stormheart",
+        "meadowhare" => "hare_whisker",
+        "sunbacksnail" => "sunback_shell",
+        "brushfox" => "fox_tail_tuft",
+        "spadebadger" => "badger_claw",
+        "honeyjaw" => "honeyjaw_comb",
+        "wickerwarden" => "wicker_heart",
         _ => "slime_gel",
     }
 }
@@ -263,6 +269,8 @@ pub fn is_elite(kind: &str) -> bool {
             | "moonskein_weaver"
             | "moonwell_echo"
             | "maelstromheart"
+            | "honeyjaw"
+            | "wickerwarden"
     ) || is_vault_enemy(kind)
 }
 /// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.
@@ -435,7 +443,15 @@ pub fn equipment_of_rarity(rarity: &str, level: u32, choice: f64) -> Option<&'st
                 && !i.starter
                 && i.source.is_none()
                 && i.required_level <= limit
-                && (level < 50 || i.required_level >= (if level >= 55 { 55 } else { 50 }))
+                && (level < 50
+                    || i.required_level
+                        >= (if level >= 65 {
+                            65
+                        } else if level >= 55 {
+                            55
+                        } else {
+                            50
+                        }))
         })
         .collect();
     pool.get((choice * pool.len() as f64) as usize).copied()
@@ -915,6 +931,7 @@ mod tests {
                         55 => 48,
                         60 => 55,
                         65 => 63,
+                        70 => 70,
                         level => panic!("unexpected gear level {level}"),
                     };
                     assert_eq!(value, expected, "{}", i.id);
@@ -1571,7 +1588,7 @@ mod tests {
         }
     }
     #[test]
-    fn moonspore_and_stormglass_drop_pools_reach_level_sixty_five_gear() {
+    fn late_zone_drop_pools_reach_level_seventy_gear() {
         for rarity in ["common", "uncommon", "rare", "epic"] {
             let pool: Vec<_> = ITEMS
                 .iter()
@@ -1580,11 +1597,11 @@ mod tests {
                         && i.rarity == rarity
                         && !i.starter
                         && i.source.is_none()
-                        && (55..=65).contains(&i.required_level)
+                        && (55..=70).contains(&i.required_level)
                 })
                 .collect();
-            assert!(!pool.is_empty(), "{rarity} has level 55/60/65 gear");
-            for enemy_level in [55, 58, 60, 62, 65] {
+            assert!(!pool.is_empty(), "{rarity} has level 55/60/65/70 gear");
+            for enemy_level in [55, 58, 60, 62, 65, 67, 70] {
                 let drops: std::collections::BTreeSet<_> = (0..pool.len())
                     .map(|n| {
                         equipment_of_rarity(
@@ -1599,7 +1616,10 @@ mod tests {
                     .collect();
                 let expected: std::collections::BTreeSet<_> = pool
                     .iter()
-                    .filter(|i| i.required_level <= max_drop_level(enemy_level))
+                    .filter(|i| {
+                        i.required_level <= max_drop_level(enemy_level)
+                            && (enemy_level < 65 || i.required_level >= 65)
+                    })
                     .map(|i| i.id.as_str())
                     .collect();
                 assert_eq!(drops, expected, "{rarity} at enemy level {enemy_level}");
@@ -1765,7 +1785,7 @@ mod tests {
                 continue;
             }
             assert!(
-                i.required_level == 1 || (i.required_level <= 65 && i.required_level % 5 == 0),
+                i.required_level == 1 || (i.required_level <= 70 && i.required_level % 5 == 0),
                 "{} needs level {}",
                 i.id,
                 i.required_level
@@ -1778,7 +1798,7 @@ mod tests {
         assert_eq!(
             used.into_iter().collect::<Vec<_>>(),
             std::iter::once(1)
-                .chain((5..=65).step_by(5))
+                .chain((5..=70).step_by(5))
                 .collect::<Vec<_>>()
         );
     }

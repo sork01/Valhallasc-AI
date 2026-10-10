@@ -91,7 +91,7 @@ test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and pare
     for (const name of ['start_world', 'stop_world', 'connect_bot', 'disconnect_bot', 'send_action', 'inspect_world', 'wait_world', 'list_scenarios', 'run_scenario']) {
       assert.ok(listed.tools.some(t => t.name === name), `Advertises ${name}`);
     }
-    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['skills', 'movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'stats', 'crags', 'bags', 'shortcuts', 'social', 'consumables', 'crags_quests', 'rimeveil', 'rime_quests', 'gloamfen', 'skaldholm', 'skaldholm_quests', 'fen_quests', 'gender', 'priest', 'hunter', 'cinderlord', 'gloomroot', 'mercenaries', 'progression_quests', 'resources', 'undervault', 'spark_travel', 'instance_pursuit', 'wyrdwood', 'wyrd_quests', 'bifrost', 'sky_quests', 'deep', 'deep_quests', 'nacrehold', 'nacre_quests', 'cathedral', 'astral', 'prismwaste', 'orrery', 'moonspore', 'asterion', 'stormglass']);
+    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['skills', 'movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'stats', 'crags', 'bags', 'shortcuts', 'social', 'consumables', 'crags_quests', 'rimeveil', 'rime_quests', 'gloamfen', 'skaldholm', 'skaldholm_quests', 'fen_quests', 'gender', 'priest', 'hunter', 'cinderlord', 'gloomroot', 'mercenaries', 'progression_quests', 'resources', 'undervault', 'spark_travel', 'instance_pursuit', 'wyrdwood', 'wyrd_quests', 'bifrost', 'sky_quests', 'deep', 'deep_quests', 'nacrehold', 'nacre_quests', 'cathedral', 'astral', 'prismwaste', 'orrery', 'moonspore', 'asterion', 'stormglass', 'sunward']);
     const first = await call('start_world');
     url = first.url;
     assert.match(url, /^http:\/\/127\.0\.0\.1:\d+\/$/);
@@ -101,8 +101,12 @@ test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and pare
     assert.equal(rejected.isError, true);
     await call('send_action', { bot: 'McpMage', action: { type: 'equip', armor: 'runic', weapon: 'crystal' } });
     await call('send_action', { bot: 'McpMage', action: { type: 'equip', slots: { hands: 'none' } } });
-    await call('wait_world', { milliseconds: 300 });
-    const slotsResult = await call('inspect_world', { bot: 'McpMage', events: 0 });
+    let slotsResult;
+    for (let attempt = 0; attempt < 20; attempt++) {
+      await call('wait_world', { milliseconds: 100 });
+      slotsResult = await call('inspect_world', { bot: 'McpMage', events: 0 });
+      if (slotsResult.snapshot.look.mageWeapon === 'none') break;
+    }
     assert.equal(slotsResult.snapshot.look.mageWeapon, 'none');
     await call('send_action', { bot: 'McpMage', action: { type: 'equip', slots: { hands: 'mage_weapon_ash' } } });
     const parallel = await Promise.all([call('inspect_world', { bot: 'McpMage', events: 0 }), call('wait_world', { milliseconds: 100 })]);

@@ -86,6 +86,10 @@ REWARDS = {
     'stormglass_gulls': green(60, 'pants'),
     'stormglass_guards': blue(65, 'necklace'),
     'stormglass_heart': blue(65, 'accessory'),
+    'sun_hares': green(65, 'necklace'),
+    'sun_snails': green(65, 'pants'),
+    'sun_honeyjaw': blue(70, 'accessory'),
+    'sun_warden': blue(70, 'necklace'),
 }
 
 

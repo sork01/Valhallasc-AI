@@ -1,0 +1,64 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "meadowhare",
+    "sunbacksnail",
+    "brushfox",
+    "spadebadger",
+    "honeyjaw",
+    "wickerwarden",
+    "sun_miller",
+    "sun_keeper",
+    "sun_travel"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 10,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 10,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 10,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "meadowhare": "1bdb59263fefa37c",
+    "sunbacksnail": "fbd09807bdba74f2",
+    "brushfox": "283bcf2d5be41d24",
+    "spadebadger": "303d1a434e8b7e15",
+    "honeyjaw": "f0f2f8f9b27e96b6",
+    "wickerwarden": "ee14c94400bf5db8",
+    "sun_miller": "a9eaaeffe06b9e8e",
+    "sun_keeper": "c736f2b0a95ac55f",
+    "sun_travel": "5bd8d82dbea287e8"
+  }
+}

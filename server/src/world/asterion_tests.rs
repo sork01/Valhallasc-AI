@@ -69,7 +69,7 @@ fn moonwell_has_four_private_copies_safe_arrivals_and_a_unique_boss_drop() {
     );
     assert_eq!(well.final_boss, "moonwell_echo");
     assert_eq!(w.instances.iter().filter(|i| i.template == WELL).count(), 4);
-    assert_eq!(w.maps.len(), 35);
+    assert_eq!(w.maps.len(), 36);
     let seen = flood(well, &blocked(well, &[]), well.spawn);
     for s in w.slimes.iter().filter(|s| s.zone == WELL) {
         assert!(reached(well, &seen, s.point()), "{}", s.kind);

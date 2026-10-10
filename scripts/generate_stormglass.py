@@ -203,6 +203,9 @@ def main():
     open_city_gate(world['zones'][16])
     world['zones'].append(build())
     world['zones'].extend(later)
+    if any(z.get('name')=='Sunward Vale' for z in later):
+        from generate_sunward import open_shore_gate
+        open_shore_gate(world['zones'][ZONE-1])
     spark_travel.ensure(world)
     MAP.write_text(json.dumps(world,indent=2)+'\n')
     items=json.loads(ITEMS.read_text())

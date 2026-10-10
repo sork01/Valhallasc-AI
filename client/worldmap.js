@@ -8,10 +8,10 @@
   const NS = 'http://www.w3.org/2000/svg';
   const STAGE = { w: 100, h: 62 };
   // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm -> the Wyrdwood -> Bifrost Reach, up the Stormrift -> Ran's Deep, down the Maelstrom.
-  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:89,y:53,s:8},{x:63,y:20,s:15},{x:2,y:25,s:14},{x:2,y:13,s:10},{x:52,y:21,s:10},{x:52,y:52,s:9},{x:62,y:57,s:5},{x:73,y:52,s:9}];
-  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', asterion: '#364a72', moonwell:'#153d58', stormglass:'#263b51', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', prismwaste: '#ad887e', orrery: '#37394e', moonspore: '#1c4244', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
-  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', asterion: '#9ec6d9', moonwell:'#a8d5cf', stormglass:'#9ebdc1', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', prismwaste: '#ead7a8', orrery: '#ad907b', moonspore: '#a5c4a8', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
-  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', asterion: '#d9e8ff', moonwell:'#f8e8ad', stormglass:'#aaf2f0', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', prismwaste: '#ffe3ac', orrery: '#f4c981', moonspore: '#c4f4af', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
+  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:89,y:53,s:8},{x:63,y:20,s:15},{x:2,y:25,s:14},{x:2,y:13,s:10},{x:52,y:21,s:10},{x:52,y:52,s:9},{x:62,y:57,s:5},{x:76.8,y:57.3,s:4.5},{x:82.5,y:53.5,s:6}];
+  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', asterion: '#364a72', moonwell:'#153d58', stormglass:'#263b51', sunward:'#5baa49', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', prismwaste: '#ad887e', orrery: '#37394e', moonspore: '#1c4244', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
+  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', asterion: '#9ec6d9', moonwell:'#a8d5cf', stormglass:'#9ebdc1', sunward:'#d8bd83', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', prismwaste: '#ead7a8', orrery: '#ad907b', moonspore: '#a5c4a8', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
+  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', asterion: '#d9e8ff', moonwell:'#f8e8ad', stormglass:'#aaf2f0', sunward:'#f8da90', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', prismwaste: '#ffe3ac', orrery: '#f4c981', moonspore: '#c4f4af', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
   const BLURB = {
     meadow: 'Green pastures round the walled town of Alderhaven.',
     ember: 'Lava fords and ash-grey crags above Cinderwatch Camp.',
@@ -28,6 +28,7 @@
     asterion: 'Seven rings of glass-roof houses turn around a singing astrolabe. A Meeting Stone opens the Moonwell below.',
     moonwell: 'A starlit water garden of floating petal islands and four guardians, beneath the Meeting Stone.',
     stormglass: 'Black sand and white lightning beyond Asterion. Breakwater Camp watches the sealed Eye Below.',
+    sunward: 'A clear river divides sunlit grass, apple rows and old oakwood. Millbridge watches the Elder Hollow beneath the roots.',
     cathedral_left:'The Flooded Cloister: level 40, four bosses, a private five-player wing.',
     cathedral_right:'The Coral Reliquary: level 45, four bosses, a private five-player wing.',
     cathedral_main:'The Grand Nave: level 50, four bosses, a private five-player wing.',
@@ -59,6 +60,10 @@
     saltclaw:['Saltclaw',60,'#d5e6d6'], stormgull:['Stormgull',61,'#f2f1db'],
     glassray:['Glassray',62,'#b7eee5'], breakersentinel:['Breaker Sentinel',64,'#d3d3c4'],
     maelstromheart:['Maelstrom Heart (Elite · 5 players)',65,'#f3efff'],
+    meadowhare:['Meadow Hare',65,'#eed4a1'],sunbacksnail:['Sunback Snail',66,'#f2ebbd'],
+    brushfox:['Brush Fox',67,'#d57b49'],spadebadger:['Spadeclaw Badger',68,'#e7e1c8'],
+    honeyjaw:['Old Honeyjaw (Elite · 3 players)',69,'#ffe497'],
+    wickerwarden:['Wicker Warden (Elite · 5 players)',70,'#fce3a2'],
     ram: ['Stormram', 29, '#8fe0ff'], oakhorn: ['Oakhorn (Elite · 3 players)', 25, '#ff9a3a'], hrungnir: ['Hrungnir (Elite · 5 players)', 30, '#7ab4ff'],
   };
   for (const e of CATHEDRAL_ENEMIES) KINDS[e.kind]=[e.name+(e.boss?' (Boss)':''),e.level,e.color];
@@ -119,7 +124,14 @@
       case 'pearllamp': return '#c8fff0';
       case 'lava': return '#ff6a2a';
       case 'ice': return '#4f93c8';
-      case 'water': return wyrd ? '#2f6f9a' : '#244f5c';
+      case 'water': return theme === 'sunward' ? '#70bcd4' : wyrd ? '#2f6f9a' : '#244f5c';
+      case 'oak_tree': case 'apple_tree': case 'willow_tree': return '#285d30';
+      case 'birch_tree': return '#538547';
+      case 'hawthorn_bush': return '#6a9d51';
+      case 'wildflowers': return '#efe49d';
+      case 'vale_cottage': case 'watermill': return '#f2d9ad';
+      case 'elder_hollow_gate': return '#f8df91';
+      case 'stone_bridge': return '#e0d3ac';
       case 'crag': return '#4a4a58';
       case 'pine': return '#1f4a3a';
       case 'beacon': return '#ff9a2e';
@@ -187,7 +199,7 @@
       else { g.beginPath(); g.arc(r.x * k, r.y * k, r.r * k, 0, 6.283); g.fill(); }
     }
     if (z.city && z.theme !== 'city' && z.theme !== 'nacre' && z.theme !== 'asterion') for (const t of [z.city, ...(z.camps || [])]) {
-      g.fillStyle = { meadow: '#d8cbb0', ember: '#88705d', frost: '#8fa6bd', fen: '#6a5238', wyrd: '#8a6a44', sky: '#cdd2f2', deep: '#4a7a82', astral: '#8fa9b2', prismwaste: '#c5a58d', orrery: '#a58a77', moonspore: '#719b83', stormglass:'#55798a' }[z.theme];
+      g.fillStyle = { meadow: '#d8cbb0', ember: '#88705d', frost: '#8fa6bd', fen: '#6a5238', wyrd: '#8a6a44', sky: '#cdd2f2', deep: '#4a7a82', astral: '#8fa9b2', prismwaste: '#c5a58d', orrery: '#a58a77', moonspore: '#719b83', stormglass:'#55798a', sunward:'#76ad56' }[z.theme];
       g.fillRect(t.x0 * k, t.y0 * k, (t.x1 - t.x0) * k, (t.y1 - t.y0) * k);
     }
     const objects = (z.objects || []).filter(o => o.kind !== 'post' && o.kind !== 'void');
@@ -196,7 +208,7 @@
       g.fillStyle = objectColour(o, z.theme);
       if (o.width) { g.fillRect((o.x - o.width / 2) * k, (o.y - o.depth / 2) * k, Math.max(1, o.width * k), Math.max(1, o.depth * k)); continue; }
       if (o.kind === 'grandfountain' || o.kind === 'fountain' || o.kind === 'meetingstone') { g.fillStyle = o.kind === 'meetingstone' ? '#59d9ff' : '#58a8d8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2, (o.r || 1) * k), 0, 6.283); g.fill(); continue; }
-      g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(1, (RADIUS[o.kind] || .8) * k), 0, 6.283); g.fill();
+      g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(1, (o.kind === 'water' ? o.r : RADIUS[o.kind] || .8) * k), 0, 6.283); g.fill();
     }
     if (z.city && z.theme !== 'city' && z.theme !== 'nacre' && z.theme !== 'asterion') for (const t of [z.city, ...(z.camps || [])]) { g.fillStyle = '#ffe9a0'; g.beginPath(); g.arc(t.plaza.x * k, t.plaza.y * k, Math.max(2, 2.4 * k), 0, 6.283); g.fill(); }
     for (const n of z.npcs || []) { g.fillStyle = '#f5d477'; g.beginPath(); g.arc(n.x * k, n.y * k, Math.max(1, .55 * k), 0, 6.283); g.fill(); }

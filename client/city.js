@@ -30,6 +30,14 @@
     const inCity=inside(x+.5,y+.5), road=!Field.zone && y>=69 && y<city.y0 && Math.abs(x+.5-36)<1.6;
     if (!inCity && !road) return false;
     if (Field.zone > 0) {
+      if (Field.zoneTheme === 'sunward') {
+        // Millbridge is a village in a meadow: keep the grass and orchard
+        // underfoot, with a small pale stone circle around the common.
+        if (Math.hypot(x+.5-city.plaza.x,y+.5-city.plaza.y)>=city.radius) return false;
+        poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],
+          `hsl(42, 29%, ${66+(x*17+y*31)%8}%)`,'#b09d76',.6);
+        return true;
+      }
       if (Field.zoneTheme === 'fen' || Field.zoneTheme === 'wyrd') {      // Lanternmere, Hollowmoot and Skuldwatch stand on timber decking
         poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],`hsl(${26+(x*7+y*3)%5}, 30%, ${27+(x*17+y*31)%7}%)`,'#3a2818',.6);
         for(const t of [.33,.66]){g.strokeStyle='rgba(20,12,6,.5)';g.lineWidth=1.4;g.beginPath();g.moveTo(px+t*44,py+t*22);g.lineTo(px-44+t*44,py+22+t*22);g.stroke();}
@@ -232,7 +240,7 @@
     }
   }
   // Distance from the feet to the top of each NPC's head gear (the guard's banner, the baker's hat), so the nameplate sits just above it.
-  const headTop=n=>n.art==='stone'?330:n.look?.species==='merfolk'?120:n.look?(n.look.prop?145:n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101;
+  const headTop=n=>n.art==='stone'?330:n.art?.startsWith('sun_')?113:n.look?.species==='merfolk'?120:n.look?(n.look.prop?145:n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101;
   // World of Warcraft nameplate: yellow name over a <Role> line, both in a heavy black outline, with the quest mark above them.
   function plate(g,value,y,size,color) {
     g.font=`${size}px "Jua", sans-serif`;g.textAlign='center';g.lineJoin='round';g.lineWidth=size>14?5:3;g.strokeStyle='#000';
@@ -299,6 +307,11 @@
     if(near){g.strokeStyle='#ffe2a2';g.lineWidth=2;g.beginPath();g.ellipse(0,0,27,12,0,0,Math.PI*2);g.stroke();}
     g.save();g.scale(sc,sc);g.translate(0,-bob);
     if(n.art==='stone'){}                      // the Meeting Stone speaks for itself: its art is the stone, drawn as an object
+    else if(n.art?.startsWith('sun_') && Field.sunwardSprites?.img[n.art]){
+      const src=Field.sunwardSprites,{frame:[w,h],clips}=src.meta,step=Math.floor(t*6)%clips.idle.n;
+      g.imageSmoothingEnabled=false;
+      g.drawImage(src.img[n.art],step*w,0,w,h,-47,-103,94,103);
+    }
     else if(L?.species==='merfolk'&&window.NacreArt)NacreArt.merfolk(g,n,t);
     else if(L)drawFolk(g,n,t,moving);
     else {

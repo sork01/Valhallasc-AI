@@ -22,7 +22,8 @@ STOPS = [
     ('The Stillpoint', 'travel_stillpoint', 44, 119, ['travel_last_shade', 'travel_lamplight']),
     ('Lamplight Refuge', 'travel_lamplight', 44, 119, ['travel_stillpoint', 'travel_asterion']),
     ('Asterion', 'travel_asterion', 90, 114, ['travel_lamplight', 'travel_breakwater']),
-    ('Breakwater Camp', 'travel_breakwater', 42, 119, ['travel_asterion']),
+    ('Breakwater Camp', 'travel_breakwater', 42, 119, ['travel_asterion', 'travel_millbridge']),
+    ('Millbridge', 'travel_millbridge', 46, 118, ['travel_breakwater']),
 ]
 
 
@@ -41,6 +42,8 @@ def ensure(world):
                 if name == 'Nacrehold':
                     master.update(name='Travel Master Auralis', role='Mermaid · Spark Travel')
                     master['look'].update(species='merfolk', female=True, tail='#81d6cc', skin='#abd4e4')
+                if name == 'Millbridge':
+                    master.update(name='Travel Master Jori', role='Millbridge courier · Spark Travel', art='sun_travel')
                 folk = area.setdefault('npcs', [])
                 old = next((i for i, n in enumerate(folk) if n['id'] == id_), None)
                 if old is None:

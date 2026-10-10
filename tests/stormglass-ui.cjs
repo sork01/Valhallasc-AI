@@ -36,10 +36,10 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
       seal:z.futureInstance,gate:zones[17].portals.find(p=>p.id==='asterion_stormglass_gate'),
       travel:z.npcs.find(n=>n.id==='travel_breakwater')};
   });
-  check(data.count===20&&data.name==='The Stormglass Shore'&&data.theme==='stormglass'&&data.levels.join(',')==='60,65','The shore and level range load');
+  check(data.count===21&&data.name==='The Stormglass Shore'&&data.theme==='stormglass'&&data.levels.join(',')==='60,65','The shore and level range load');
   check(data.kinds.length===5&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Five complete monster atlases load');
-  check(data.art&&data.map===20&&data.legend,'Original scenery and world-map legend load');
-  check(data.npcs===8&&data.quests===8&&data.spawns===41&&data.objects>=390,'Camp, quests and enemy fields load');
+  check(data.art&&data.map===21&&data.legend,'Original scenery and world-map legend load');
+  check(data.npcs===8&&data.quests===8&&data.spawns===41&&data.objects>=380,'Camp, quests and enemy fields load');
   check(data.seal?.status==='sealed'&&data.seal?.name==='The Eye Below'&&data.gate?.to===19,'The Eye is sealed and the Asterion causeway exists');
   check(data.travel?.travelLinks.includes('travel_asterion'),'The Travel Master knows Asterion');
   let debugRef=219;
@@ -57,7 +57,7 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.waitForFunction(()=>Math.hypot(Field.hero.x-30,Field.hero.y-108)<2,null,{timeout:10000});
   await page.waitForTimeout(1600);
   await page.screenshot({path:path.join(world.artifacts,'stormglass-camp.png')});
-  check(await page.evaluate(()=>Field._debug.zones[19].portals.length===1&&Field.zone===19),'The entrance has no dungeon portal');
+  check(await page.evaluate(()=>Field._debug.zones[19].portals.length===2&&Field.zone===19),'The entrance has no dungeon portal');
   await debug({op:'teleport',zone:19,x:13,y:105});
   await page.waitForFunction(()=>Math.hypot(Field.hero.x-13,Field.hero.y-105)<2,null,{timeout:10000});
   await page.evaluate(()=>Online.send({type:'move',x:7,y:105}));
