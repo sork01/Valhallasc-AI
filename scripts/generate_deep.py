@@ -249,7 +249,7 @@ def build(rng):
     spawns = []
     spawns.append({'x': round(L.BOSS[1], 2), 'y': round(L.BOSS[2], 2), 'kind': L.BOSS[0]})
     # two more elites: Hvitserk, the drowned captain, stands in the west Shallows beyond the Wreck of Naglfar (a quest: three heroes);
-    # the Ghostmaw guards the deepest free corridor and has no quest at all (three heroes)
+    # the Ghostmaw guards the deepest free corridor and has a three-hero quest
     spawns.append({'x': L.HVITSERK[0], 'y': L.HVITSERK[1], 'kind': 'hvitserk'})
     taken_cells = {c for cells in bells.values() for c in cells} | {garden}
     lair = next(c for c in sorted((c for c in depth if c not in L.BLOCK and c not in taken_cells), key=lambda c: (-depth[c], c[1], c[0]))

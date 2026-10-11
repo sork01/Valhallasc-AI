@@ -1,0 +1,45 @@
+// Private browser: live jungle, exported PixelFlow atlases and sealed temple.
+const assert=require('node:assert/strict');
+const path=require('node:path');
+const fs=require('node:fs');
+const {chromium,STUB}=require('./lib/playwright.cjs');
+const {Client}=require('@modelcontextprotocol/sdk/client/index.js');
+const {StdioClientTransport}=require('@modelcontextprotocol/sdk/client/stdio.js');
+const root=path.resolve(__dirname,'..');
+const client=new Client({name:'valhallasc-tanglecrown-ui',version:'1.0.0'});
+let browser,started=false,checks=0;
+const check=(value,message)=>{assert.ok(value,message);checks++;};
+async function call(name,args={}){const r=await client.callTool({name,arguments:args});assert.ok(!r.isError,`${name}: ${JSON.stringify(r.content)}`);return r.structuredContent;}
+(async()=>{
+  await client.connect(new StdioClientTransport({command:process.execPath,args:[path.join(root,'scripts/test-mcp.cjs')],cwd:root,stderr:'pipe'}));
+  const world=await call('start_world',{startLevel:80,levelSpread:0});started=true;
+  browser=await chromium.launch({headless:true});
+  const page=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
+  const capture=async name=>{const png=await page.evaluate(()=>document.querySelector('#fieldcv').toDataURL('image/png'));fs.writeFileSync(path.join(world.artifacts,name),Buffer.from(png.split(',')[1],'base64'));};
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  page.on('console',m=>{if(m.type()==='error'&&!/401|Failed to load resource/.test(m.text()))errors.push(m.text());});
+  await page.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false,char:null,draft:null})));
+  await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
+  await page.locator('#cls-warrior').click();await page.locator('#name').fill('TanglecrownUI');await page.locator('#go').click({timeout:60000});
+  await page.waitForFunction(()=>Online.connected&&!!Field.tanglecrownSprites?.img.crownjaguar,null,{timeout:60000});
+  const data=await page.evaluate(()=>{const zones=Field._debug.zones,z=zones[22],src=Field.tanglecrownSprites;return {count:zones.length,name:z.name,theme:z.theme,levels:z.levels,quests:z.quests.length,npcs:z.npcs.length,spawns:z.slimes.length,kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>[src.img[k].naturalWidth,src.img[k].naturalHeight]),art:['kapok_tree','strangler_fig','jungle_water','banyan_lodge','rain_crown_temple'].every(k=>!!City.art[k]),layout:WorldMap._layout.length,seal:z.futureInstance,gate:zones[21].portals.find(p=>p.id==='ribbon_tangle_gate'),travel:z.npcs.find(n=>n.id==='travel_banyan'),host:z.npcs.find(n=>n.id==='tangle_warden'),keeper:z.npcs.find(n=>n.id==='tangle_scholar')};});
+  check(data.count===27&&data.name==='The Tanglecrown'&&data.theme==='tanglecrown'&&data.levels.join(',')==='75,80','Level 75–80 zone loads');
+  check(data.kinds.length===9&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Nine PixelFlow atlases load');
+  check(data.art&&data.layout===29,'Jungle art and world map load');
+  check(data.npcs===8&&data.quests===9&&data.spawns===42,'Quest hub and six encounters load');
+  check(data.seal?.status==='sealed'&&data.seal?.name==='Temple of the Rain Crown'&&data.gate?.to===22,'Epic entrance is sealed and reachable');
+  check(data.travel?.travelLinks.includes('travel_jubilee')&&data.travel?.art==='tangle_travel'&&data.host?.art==='tangle_warden'&&data.keeper?.art==='tangle_scholar','Three distinct NPC atlases load');
+  let ref=401;const debug=async command=>check(await page.evaluate(([command,ref])=>Online.send({type:'debug',ref,command}),[command,ref++]),`Send ${command.op}`);
+  await debug({op:'teleport',zone:22,x:29,y:110});
+  await page.waitForFunction(()=>Field.zone===22&&Math.hypot(Field.hero.x-29,Field.hero.y-110)<2,null,{timeout:15000});
+  await page.waitForTimeout(1200);
+  await page.screenshot({path:path.join(world.artifacts,'tanglecrown-landing.png')});await capture('tanglecrown-landing-clean.png');
+  check(await page.evaluate(()=>Field.zoneTheme==='tanglecrown'&&City.npcs.length===8),'Banyan Landing paints in live zone');
+  await debug({op:'teleport',zone:22,x:111,y:27});
+  await page.waitForFunction(()=>Field.zone===22&&Math.hypot(Field.hero.x-111,Field.hero.y-27)<2,null,{timeout:15000});
+  await page.waitForTimeout(1500);
+  await page.screenshot({path:path.join(world.artifacts,'tanglecrown-temple.png')});await capture('tanglecrown-temple-clean.png');
+  check(await page.evaluate(()=>Field._debug.zones[22].portals.length===1&&Field.zone===22),'Temple has no playable portal yet');
+  check(errors.length===0,`No browser errors: ${errors.join('; ')}`);
+  console.log(`Tanglecrown UI: ${checks} checks; screenshots in ${world.artifacts}`);
+})().catch(e=>{console.error(e.stack);process.exitCode=1;}).finally(async()=>{await browser?.close();if(started)await call('stop_world').catch(()=>{});await client.close();});

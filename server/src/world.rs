@@ -13,6 +13,8 @@ mod ambient;
 #[cfg(test)]
 mod asterion_tests;
 #[cfg(test)]
+mod cairn_tests;
+#[cfg(test)]
 mod cathedral_tests;
 mod chime;
 mod consumables;
@@ -20,8 +22,12 @@ mod debug;
 #[cfg(test)]
 mod deep_tests;
 mod escort;
+#[cfg(test)]
+mod frostwake_tests;
 mod hold;
 mod instances;
+#[cfg(test)]
+mod lapis_tests;
 mod mercs;
 #[cfg(test)]
 mod nacre_tests;
@@ -31,6 +37,8 @@ mod ranged;
 #[cfg(test)]
 mod resource_tests;
 mod resources;
+#[cfg(test)]
+mod ribbonwild_tests;
 mod rolls;
 #[cfg(test)]
 mod sky_tests;
@@ -39,11 +47,17 @@ mod social;
 mod stormglass_tests;
 #[cfg(test)]
 mod sunward_tests;
+#[cfg(test)]
+mod tanglecrown_tests;
 mod travel;
 #[cfg(test)]
 mod vault_tests;
 #[cfg(test)]
+mod worldheart_tests;
+#[cfg(test)]
 mod wyrd_tests;
+#[cfg(test)]
+mod yearwheel_tests;
 
 pub type Peer = mpsc::Sender<Value>;
 const KING_SPAWN_MIN: f64 = 300.;
@@ -423,6 +437,58 @@ impl Slime {
             "spadebadger" => (330000., 4700., 2.1, 1.95),
             "honeyjaw" => (1600000., 14300., 1.8, 2.5),
             "wickerwarden" => (2700000., 20200., 2.3, 2.75),
+            "ribbongecko" => (290000., 3900., 4.1, 1.4),
+            "balloonbeetle" => (350000., 4400., 2.0, 1.5),
+            "paintedmacaw" => (315000., 4800., 3.7, 1.7),
+            "jesterling" => (390000., 5400., 3.0, 1.65),
+            "paradegryphon" => (1950000., 16900., 2.4, 2.65),
+            "maskcolossus" => (3200000., 23900., 1.8, 3.0),
+            "orchidmantis" => (430000., 5700., 3.6, 1.45),
+            "canopyglider" => (370000., 6100., 4.2, 1.35),
+            "poolcaiman" => (510000., 6900., 2.1, 1.8),
+            "drumgorilla" => (590000., 7600., 2.4, 1.9),
+            "jadeanaconda" => (2400000., 19500., 2.0, 2.85),
+            "crownjaguar" => (3900000., 28500., 3.2, 3.15),
+            "sapbeetle" => (470000., 6300., 2.0, 1.45),
+            "lanternhornet" => (395000., 7000., 3.9, 1.3),
+            "mosslemur" => (445000., 6700., 3.6, 1.55),
+            "barkmimic" => (610000., 7900., 2.2, 1.85),
+            "sandhopper" => (475000., 6500., 3.8, 1.35),
+            "dunefennec" => (510000., 6900., 3.4, 1.5),
+            "glassscorpion" => (590000., 7600., 2.4, 1.65),
+            "sunvulture" => (550000., 7300., 3.7, 1.6),
+            "dunecolossus" => (2800000., 22000., 1.8, 2.95),
+            "mirageroc" => (4400000., 31000., 3.1, 3.3),
+            "snowhare" => (540000., 7300., 3.8, 1.35),
+            "iceotter" => (585000., 7600., 3.5, 1.5),
+            "frostheron" => (640000., 7900., 3.3, 1.65),
+            "glaciercrab" => (720000., 8600., 2.2, 1.85),
+            "bellmammoth" => (3200000., 24000., 1.9, 3.1),
+            "auroramanta" => (3900000., 28500., 3.2, 3.25),
+            "crevasseleviathan" => (5100000., 35000., 2.8, 3.45),
+            "screeferret" => (650000., 8100., 3.8, 1.4),
+            "stoneibex" => (720000., 8600., 3.2, 1.65),
+            "slateraven" => (690000., 8400., 3.7, 1.55),
+            "ridgeadder" => (770000., 9100., 2.9, 1.75),
+            "cairnbehemoth" => (3700000., 26500., 1.7, 3.2),
+            "whitebarktitan" => (4600000., 31500., 2.0, 3.4),
+            "stormcondor" => (5600000., 37000., 3.1, 3.5),
+            "brooknewt" => (840000., 10500., 3.2, 1.5),
+            "sundarter" => (900000., 11200., 3.8, 1.6),
+            "acornmimic" => (970000., 12000., 2.5, 1.7),
+            "snowstoat" => (1020000., 12600., 4.0, 1.5),
+            "bloomtortoise" => (4700000., 33000., 1.7, 3.2),
+            "petalchimera" => (5600000., 36500., 2.7, 3.4),
+            "rainseraph" => (6800000., 42000., 3.0, 3.6),
+            "glasslion" => (5000000., 34500., 3.2, 3.3),
+            "sunwheel" => (6000000., 39000., 2.5, 3.5),
+            "firephoenix" => (7100000., 44500., 3.5, 3.7),
+            "lanternowl" => (5300000., 35500., 3.0, 3.3),
+            "harvestreaper" => (6400000., 41000., 2.5, 3.5),
+            "ambermantis" => (7600000., 47000., 3.4, 3.7),
+            "rimesaber" => (5500000., 37000., 3.5, 3.3),
+            "snowgiant" => (6900000., 43000., 1.8, 3.7),
+            "longnightwyrm" => (8100000., 49000., 2.9, 3.9),
             _ => (60., 8., 1.9, 1.),
         }
     }
@@ -509,6 +575,53 @@ impl Slime {
             "spadebadger" => 68,
             "honeyjaw" => 69,
             "wickerwarden" => 70,
+            "ribbongecko" => 70,
+            "balloonbeetle" => 71,
+            "paintedmacaw" => 72,
+            "jesterling" => 73,
+            "paradegryphon" => 74,
+            "maskcolossus" => 75,
+            "orchidmantis" => 75,
+            "canopyglider" => 76,
+            "poolcaiman" => 77,
+            "drumgorilla" => 78,
+            "jadeanaconda" => 79,
+            "crownjaguar" => 80,
+            "sapbeetle" | "lanternhornet" | "mosslemur" | "barkmimic" => 80,
+            "sandhopper" => 80,
+            "dunefennec" => 81,
+            "glassscorpion" => 82,
+            "sunvulture" => 83,
+            "dunecolossus" => 84,
+            "mirageroc" => 85,
+            "snowhare" => 85,
+            "iceotter" => 86,
+            "frostheron" => 87,
+            "glaciercrab" | "bellmammoth" => 88,
+            "auroramanta" => 89,
+            "crevasseleviathan" => 90,
+            "screeferret" => 90,
+            "stoneibex" => 91,
+            "slateraven" => 92,
+            "ridgeadder" | "cairnbehemoth" => 93,
+            "whitebarktitan" => 94,
+            "stormcondor" => 95,
+            "brooknewt" => 95,
+            "sundarter" => 96,
+            "acornmimic" => 97,
+            "snowstoat" => 98,
+            "bloomtortoise" => 95,
+            "petalchimera" => 96,
+            "rainseraph" => 97,
+            "glasslion" => 96,
+            "sunwheel" => 97,
+            "firephoenix" => 98,
+            "lanternowl" => 97,
+            "harvestreaper" => 98,
+            "ambermantis" => 99,
+            "rimesaber" => 97,
+            "snowgiant" => 98,
+            "longnightwyrm" => 99,
             _ => 2,
         }
     }
@@ -603,6 +716,58 @@ impl Slime {
             "spadebadger" => 6200,
             "honeyjaw" => 18500,
             "wickerwarden" => 32000,
+            "ribbongecko" => 7300,
+            "balloonbeetle" => 7800,
+            "paintedmacaw" => 8300,
+            "jesterling" => 8900,
+            "paradegryphon" => 27000,
+            "maskcolossus" => 41000,
+            "orchidmantis" => 9900,
+            "canopyglider" => 10500,
+            "poolcaiman" => 11200,
+            "drumgorilla" => 12100,
+            "jadeanaconda" => 36000,
+            "crownjaguar" => 54000,
+            "sapbeetle" => 12900,
+            "lanternhornet" => 13500,
+            "mosslemur" => 14100,
+            "barkmimic" => 15200,
+            "sandhopper" => 14500,
+            "dunefennec" => 15200,
+            "glassscorpion" => 16100,
+            "sunvulture" => 16900,
+            "dunecolossus" => 49000,
+            "mirageroc" => 68000,
+            "snowhare" => 17800,
+            "iceotter" => 18500,
+            "frostheron" => 19300,
+            "glaciercrab" => 20200,
+            "bellmammoth" => 74000,
+            "auroramanta" => 82000,
+            "crevasseleviathan" => 98000,
+            "screeferret" => 21000,
+            "stoneibex" => 22200,
+            "slateraven" => 21800,
+            "ridgeadder" => 23000,
+            "cairnbehemoth" => 86000,
+            "whitebarktitan" => 96000,
+            "stormcondor" => 110000,
+            "brooknewt" => 25000,
+            "sundarter" => 26500,
+            "acornmimic" => 28500,
+            "snowstoat" => 30000,
+            "bloomtortoise" => 105000,
+            "petalchimera" => 116000,
+            "rainseraph" => 130000,
+            "glasslion" => 110000,
+            "sunwheel" => 125000,
+            "firephoenix" => 140000,
+            "lanternowl" => 120000,
+            "harvestreaper" => 135000,
+            "ambermantis" => 150000,
+            "rimesaber" => 120000,
+            "snowgiant" => 140000,
+            "longnightwyrm" => 160000,
             _ => 0,
         }
     }
@@ -700,6 +865,58 @@ impl Slime {
             "spadebadger" => (0.85, 1.65, 7., 10.),
             "honeyjaw" => (1.15, 2.0, 5.5, 13.),
             "wickerwarden" => (0.9, 1.9, 7., 15.),
+            "ribbongecko" => (0.42, 1.2, 10., 9.),
+            "balloonbeetle" => (0.8, 1.4, 6., 11.),
+            "paintedmacaw" => (0.52, 1.3, 10., 10.),
+            "jesterling" => (0.62, 1.5, 8., 11.),
+            "paradegryphon" => (1.1, 2.0, 5.5, 14.),
+            "maskcolossus" => (1.25, 2.2, 5., 16.),
+            "orchidmantis" => (0.54, 1.3, 9., 11.),
+            "canopyglider" => (0.46, 1.25, 11., 10.),
+            "poolcaiman" => (0.88, 1.55, 7., 12.),
+            "drumgorilla" => (0.95, 1.7, 6.5, 12.),
+            "jadeanaconda" => (1.16, 2.05, 5.5, 15.),
+            "crownjaguar" => (1.28, 2.2, 6., 17.),
+            "sapbeetle" => (0.66, 1.45, 7., 10.),
+            "lanternhornet" => (0.4, 1.2, 10., 11.),
+            "mosslemur" => (0.5, 1.35, 10., 11.),
+            "barkmimic" => (0.9, 1.8, 6., 11.),
+            "sandhopper" => (0.55, 1.2, 10., 11.),
+            "dunefennec" => (0.55, 1.35, 9., 11.),
+            "glassscorpion" => (0.78, 1.55, 7., 12.),
+            "sunvulture" => (0.48, 1.3, 10., 12.),
+            "dunecolossus" => (1.22, 2.05, 5., 16.),
+            "mirageroc" => (1.32, 2.25, 6., 18.),
+            "snowhare" => (0.53, 1.2, 10., 11.),
+            "iceotter" => (0.55, 1.35, 9., 11.),
+            "frostheron" => (0.6, 1.5, 9., 12.),
+            "glaciercrab" => (0.82, 1.65, 7., 12.),
+            "bellmammoth" => (1.25, 2.05, 5., 16.),
+            "auroramanta" => (1.25, 2.2, 7., 18.),
+            "crevasseleviathan" => (1.36, 2.3, 6., 19.),
+            "screeferret" => (0.54, 1.25, 10., 11.),
+            "stoneibex" => (0.68, 1.55, 8., 12.),
+            "slateraven" => (0.5, 1.4, 10., 12.),
+            "ridgeadder" => (0.7, 1.55, 8., 12.),
+            "cairnbehemoth" => (1.28, 2.1, 5., 17.),
+            "whitebarktitan" => (1.32, 2.2, 5., 18.),
+            "stormcondor" => (1.36, 2.35, 7., 19.),
+            "brooknewt" => (0.58, 1.30, 9., 12.),
+            "sundarter" => (0.57, 1.40, 10., 12.),
+            "acornmimic" => (0.68, 1.55, 8., 13.),
+            "snowstoat" => (0.60, 1.45, 10., 13.),
+            "bloomtortoise" => (1.25, 2.10, 5., 17.),
+            "petalchimera" => (1.30, 2.20, 6., 18.),
+            "rainseraph" => (1.35, 2.30, 7., 19.),
+            "glasslion" => (1.27, 2.15, 6., 17.),
+            "sunwheel" => (1.32, 2.25, 6., 18.),
+            "firephoenix" => (1.37, 2.35, 8., 19.),
+            "lanternowl" => (1.27, 2.20, 7., 18.),
+            "harvestreaper" => (1.34, 2.30, 7., 19.),
+            "ambermantis" => (1.39, 2.40, 8., 20.),
+            "rimesaber" => (1.28, 2.20, 7., 18.),
+            "snowgiant" => (1.35, 2.35, 5., 19.),
+            "longnightwyrm" => (1.40, 2.45, 8., 21.),
             _ => (0.45, 1.3, 6., 5.5),
         }
     }
@@ -784,6 +1001,30 @@ impl Slime {
             "maelstromheart" => 4.5,
             "honeyjaw" => 4.0,
             "wickerwarden" => 4.8,
+            "paradegryphon" => 4.4,
+            "maskcolossus" => 5.0,
+            "jadeanaconda" => 4.7,
+            "crownjaguar" => 5.3,
+            "dunecolossus" => 5.0,
+            "mirageroc" => 5.5,
+            "bellmammoth" => 5.2,
+            "auroramanta" => 5.4,
+            "crevasseleviathan" => 5.8,
+            "cairnbehemoth" => 5.4,
+            "whitebarktitan" => 5.6,
+            "stormcondor" => 6.0,
+            "bloomtortoise" => 5.4,
+            "petalchimera" => 5.5,
+            "rainseraph" => 5.6,
+            "glasslion" => 5.7,
+            "sunwheel" => 5.8,
+            "firephoenix" => 5.9,
+            "lanternowl" => 6.0,
+            "harvestreaper" => 6.1,
+            "ambermantis" => 6.2,
+            "rimesaber" => 6.3,
+            "snowgiant" => 6.4,
+            "longnightwyrm" => 6.5,
             _ => 0.,
         }
     }
@@ -2605,7 +2846,12 @@ impl World {
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
                 | "mireheart" | "silverwidow" | "nightbloom" | "maelstromheart" | "honeyjaw"
-                | "wickerwarden" => 600.,
+                | "wickerwarden" | "paradegryphon" | "maskcolossus" | "jadeanaconda"
+                | "crownjaguar" | "dunecolossus" | "mirageroc" | "bellmammoth" | "auroramanta"
+                | "crevasseleviathan" | "cairnbehemoth" | "whitebarktitan" | "stormcondor"
+                | "bloomtortoise" | "petalchimera" | "rainseraph" | "glasslion" | "sunwheel"
+                | "firephoenix" | "lanternowl" | "harvestreaper" | "ambermantis" | "rimesaber"
+                | "snowgiant" | "longnightwyrm" => 600.,
                 "oakhorn" => 180.,
                 _ => 22.,
             };
@@ -3025,6 +3271,30 @@ impl World {
                             | "maelstromheart"
                             | "honeyjaw"
                             | "wickerwarden"
+                            | "paradegryphon"
+                            | "maskcolossus"
+                            | "jadeanaconda"
+                            | "crownjaguar"
+                            | "dunecolossus"
+                            | "mirageroc"
+                            | "bellmammoth"
+                            | "auroramanta"
+                            | "crevasseleviathan"
+                            | "cairnbehemoth"
+                            | "whitebarktitan"
+                            | "stormcondor"
+                            | "bloomtortoise"
+                            | "petalchimera"
+                            | "rainseraph"
+                            | "glasslion"
+                            | "sunwheel"
+                            | "firephoenix"
+                            | "lanternowl"
+                            | "harvestreaper"
+                            | "ambermantis"
+                            | "rimesaber"
+                            | "snowgiant"
+                            | "longnightwyrm"
                     ) || is_boss(&s.kind)
                     {
                         s.max_hp
@@ -3300,9 +3570,19 @@ impl World {
     ) {
         let mut interval = tokio::time::interval(std::time::Duration::from_millis(50));
         interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+        // With no humans online the world is unobserved: advance it at 1 Hz (enough for saves and
+        // /health) instead of simulating every enemy and building a snapshot at full rate.
+        let mut idle_ticks = 0u32;
         loop {
             tokio::select! {
-                _=interval.tick()=>{ self.step(); if self.tick.is_multiple_of(2) {snapshots.send_replace(self.snapshot());} }
+                _=interval.tick()=>{
+                    if self.humans_online()==0 {
+                        idle_ticks=idle_ticks.wrapping_add(1);
+                        if !idle_ticks.is_multiple_of(20) {continue;}
+                    }
+                    self.step();
+                    if self.tick.is_multiple_of(2) || self.humans_online()==0 {snapshots.send_replace(self.snapshot());}
+                }
                 command=commands.recv()=>match command {
                     Some(Command::Join{session,identity,peer,reply})=>{let _=reply.send(self.join_as(session,identity,peer));}
                     Some(Command::Message{session,message})=>self.message(session,message),
@@ -4908,7 +5188,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 21);
+        assert_eq!(zone_count(&w), 25);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -5511,7 +5791,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 21);
+        assert_eq!(zone_count(&w), 25);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -5774,6 +6054,30 @@ mod tests {
             "maelstromheart",
             "honeyjaw",
             "wickerwarden",
+            "paradegryphon",
+            "maskcolossus",
+            "jadeanaconda",
+            "crownjaguar",
+            "dunecolossus",
+            "mirageroc",
+            "bellmammoth",
+            "auroramanta",
+            "crevasseleviathan",
+            "cairnbehemoth",
+            "whitebarktitan",
+            "stormcondor",
+            "bloomtortoise",
+            "petalchimera",
+            "rainseraph",
+            "glasslion",
+            "sunwheel",
+            "firephoenix",
+            "lanternowl",
+            "harvestreaper",
+            "ambermantis",
+            "rimesaber",
+            "snowgiant",
+            "longnightwyrm",
         ] {
             let id = w.slimes.iter().position(|s| s.kind == kind).unwrap();
             let zone = w.slimes[id].zone;
@@ -6354,8 +6658,8 @@ mod tests {
         let map = &w.maps[CITY];
         assert_eq!(
             zone_count(&w),
-            21,
-            "Skaldholm is the fifth map; Sunward is the twenty-first public map"
+            25,
+            "Skaldholm is the fifth map; Veyrroot Heartwood is the twenty-fifth public map"
         );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
@@ -8060,7 +8364,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 21);
+        assert_eq!(zone_count(&w), 25);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));

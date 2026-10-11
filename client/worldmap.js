@@ -6,12 +6,12 @@
 (() => {
   const $ = id => document.getElementById(id);
   const NS = 'http://www.w3.org/2000/svg';
-  const STAGE = { w: 100, h: 62 };
+  const STAGE = { w: 207, h: 66 };
   // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm -> the Wyrdwood -> Bifrost Reach, up the Stormrift -> Ran's Deep, down the Maelstrom.
-  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:89,y:53,s:8},{x:63,y:20,s:15},{x:2,y:25,s:14},{x:2,y:13,s:10},{x:52,y:21,s:10},{x:52,y:52,s:9},{x:62,y:57,s:5},{x:76.8,y:57.3,s:4.5},{x:82.5,y:53.5,s:6}];
-  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', asterion: '#364a72', moonwell:'#153d58', stormglass:'#263b51', sunward:'#5baa49', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', prismwaste: '#ad887e', orrery: '#37394e', moonspore: '#1c4244', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
-  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', asterion: '#9ec6d9', moonwell:'#a8d5cf', stormglass:'#9ebdc1', sunward:'#d8bd83', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', prismwaste: '#ead7a8', orrery: '#ad907b', moonspore: '#a5c4a8', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
-  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', asterion: '#d9e8ff', moonwell:'#f8e8ad', stormglass:'#aaf2f0', sunward:'#f8da90', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', prismwaste: '#ffe3ac', orrery: '#f4c981', moonspore: '#c4f4af', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
+  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:89,y:53,s:8},{x:63,y:20,s:15},{x:2,y:25,s:14},{x:2,y:13,s:10},{x:52,y:21,s:10},{x:52,y:52,s:9},{x:62,y:57,s:5},{x:76.8,y:57.3,s:4.5},{x:82.5,y:53.5,s:6},{x:90,y:53,s:7},{x:100,y:50,s:10},{x:112,y:49,s:10},{x:123,y:50,s:8},{x:134,y:47,s:12},{x:147,y:35,s:11},{x:159,y:18,s:13},{x:176,y:1,s:28}];
+  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', asterion: '#364a72', moonwell:'#153d58', stormglass:'#263b51', sunward:'#5baa49', ribbonwild:'#d98db2', tanglecrown:'#287a5b', worldtree:'#2f9369', lapiserg:'#d3a468', frostwake:'#c8e6f1', cairnspine:'#6b7378', yearwheel:'#a6cf9b', heartwood:'#806244', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', prismwaste: '#ad887e', orrery: '#37394e', moonspore: '#1c4244', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
+  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', asterion: '#9ec6d9', moonwell:'#a8d5cf', stormglass:'#9ebdc1', sunward:'#d8bd83', ribbonwild:'#ffe3a0', tanglecrown:'#b99a62', worldtree:'#bd9662', lapiserg:'#efd59e', frostwake:'#8abfd3', cairnspine:'#b7a07b', yearwheel:'#f0d6a7', heartwood:'#b18a5f', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', prismwaste: '#ead7a8', orrery: '#ad907b', moonspore: '#a5c4a8', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
+  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', asterion: '#d9e8ff', moonwell:'#f8e8ad', stormglass:'#aaf2f0', sunward:'#f8da90', ribbonwild:'#ff86b9', tanglecrown:'#a6e5ae', worldtree:'#c8f7a7', lapiserg:'#79d5d3', frostwake:'#9af0da', cairnspine:'#f2cb89', yearwheel:'#ffe7a4', heartwood:'#ffe0a1', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', prismwaste: '#ffe3ac', orrery: '#f4c981', moonspore: '#c4f4af', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
   const BLURB = {
     meadow: 'Green pastures round the walled town of Alderhaven.',
     ember: 'Lava fords and ash-grey crags above Cinderwatch Camp.',
@@ -29,6 +29,14 @@
     moonwell: 'A starlit water garden of floating petal islands and four guardians, beneath the Meeting Stone.',
     stormglass: 'Black sand and white lightning beyond Asterion. Breakwater Camp watches the sealed Eye Below.',
     sunward: 'A clear river divides sunlit grass, apple rows and old oakwood. Millbridge watches the Elder Hollow beneath the roots.',
+    ribbonwild: 'A bright processional wheel of color courts and silk tents. The Thousandfold Pavilion waits behind its sealed mask doors.',
+    tanglecrown: 'A dense rain jungle with braided channels, giant kapok trees and root bridges. Banyan Landing watches the sealed Rain Crown Temple.',
+    worldtree: 'Veyrroot is an open city of branch rings, leaf-roof markets and hanging rooms in one enormous jungle tree.',
+    heartwood: 'The hollow heart of Veyrroot holds amber archives and the living pith. The Seed Vault remains sealed.',
+    lapiserg: 'Ochre dunes encircle three turquoise oases. Azure Wells leads to a sealed brass astrolabe beneath the sand.',
+    frostwake: 'A snow-bright shelf split by blue crevasses. Frostwake Station watches three elite territories under the aurora.',
+    cairnspine: 'Four slate switchbacks climb through giant boulders and white leafless trees. Boulderwatch faces the sealed Thunderheart Gate.',
+    yearwheel: 'The world turns through four immense seasons. Springmere, Solhaven, Harvestwatch and Rimehold circle the Equinox Crossing, each watching a sealed threshold.',
     cathedral_left:'The Flooded Cloister: level 40, four bosses, a private five-player wing.',
     cathedral_right:'The Coral Reliquary: level 45, four bosses, a private five-player wing.',
     cathedral_main:'The Grand Nave: level 50, four bosses, a private five-player wing.',
@@ -64,6 +72,27 @@
     brushfox:['Brush Fox',67,'#d57b49'],spadebadger:['Spadeclaw Badger',68,'#e7e1c8'],
     honeyjaw:['Old Honeyjaw (Elite · 3 players)',69,'#ffe497'],
     wickerwarden:['Wicker Warden (Elite · 5 players)',70,'#fce3a2'],
+    ribbongecko:['Ribbon Gecko',70,'#31c7bd'],balloonbeetle:['Balloon Beetle',71,'#b277db'],
+    paintedmacaw:['Painted Macaw',72,'#52bbdf'],jesterling:['Jesterling',73,'#d36ab3'],
+    paradegryphon:['Parade Gryphon (Elite · 3 players)',74,'#f7bb72'],
+    maskcolossus:['Masquerade Colossus (Elite · 5 players)',75,'#ae94dc'],
+    orchidmantis:['Orchid Mantis',75,'#d5ef83'],canopyglider:['Canopy Glider',76,'#59c0b5'],
+    poolcaiman:['Blackwater Caiman',77,'#6ea58c'],drumgorilla:['Drum Gorilla',78,'#c69a70'],
+    jadeanaconda:['Jade Anaconda (Elite · 3 players)',79,'#4dc098'],
+    crownjaguar:['Crown Jaguar (Elite · 5 players)',80,'#f1ce73'],
+    sapbeetle:['Sap Beetle',80,'#e3ae59'],lanternhornet:['Lantern Hornet',80,'#d7cf74'],
+    mosslemur:['Moss Lemur',80,'#c8d68a'],barkmimic:['Bark Mimic',80,'#c5a479'],
+    sandhopper:['Sandhopper',80,'#ca9958'],dunefennec:['Dune Fennec',81,'#d6a278'],glassscorpion:['Glass Scorpion',82,'#71bed0'],sunvulture:['Sun Vulture',83,'#c69b76'],
+    dunecolossus:['Dune Colossus (Elite · 3 players)',84,'#d2a274'],mirageroc:['Mirage Roc (Elite · 5 players)',85,'#8dc3c6'],
+    snowhare:['Snow Hare',85,'#c8dce4'],iceotter:['Ice Otter',86,'#86b3c5'],frostheron:['Frost Heron',87,'#b4d7e0'],glaciercrab:['Glacier Crab',88,'#66b4d0'],
+    bellmammoth:['Bell Mammoth (Elite · 3 players)',88,'#d8ab68'],auroramanta:['Aurora Manta (Elite · 4 players)',89,'#68bcb8'],crevasseleviathan:['Crevasse Leviathan (Elite · 5 players)',90,'#77c9e4'],
+    screeferret:['Scree Ferret',90,'#c4a78a'],stoneibex:['Stone Ibex',91,'#baa88c'],slateraven:['Slate Raven',92,'#828fa0'],ridgeadder:['Ridge Adder',93,'#a1ad87'],
+    cairnbehemoth:['Cairn Behemoth (Elite · 3 players)',93,'#d0b38d'],whitebarktitan:['Whitebark Titan (Elite · 4 players)',94,'#e7dfc8'],stormcondor:['Storm Condor (Elite · 5 players)',95,'#91c9c7'],
+    brooknewt:['Brook Newt',95,'#76c9ae'],sundarter:['Sun Darter',96,'#ffcf63'],acornmimic:['Acorn Mimic',97,'#c17b48'],snowstoat:['Snow Stoat',98,'#d9f5f9'],
+    bloomtortoise:['Bloom Tortoise (Elite)',95,'#9bd579'],petalchimera:['Petal Chimera (Elite)',96,'#ec91c2'],rainseraph:['Rain Seraph (Elite)',97,'#8dd9dc'],
+    glasslion:['Glass Lion (Elite)',96,'#ffc06d'],sunwheel:['Sunwheel (Elite)',97,'#ffe67d'],firephoenix:['Fire Phoenix (Elite)',98,'#f18c58'],
+    lanternowl:['Lantern Owl (Elite)',97,'#e5a76e'],harvestreaper:['Harvest Reaper (Elite)',98,'#ac6c4b'],ambermantis:['Amber Mantis (Elite)',99,'#f2b861'],
+    rimesaber:['Rime Saber (Elite)',97,'#a4d9ed'],snowgiant:['Snow Giant (Elite)',98,'#d8eff7'],longnightwyrm:['Longnight Wyrm (Elite)',99,'#9abbd9'],
     ram: ['Stormram', 29, '#8fe0ff'], oakhorn: ['Oakhorn (Elite · 3 players)', 25, '#ff9a3a'], hrungnir: ['Hrungnir (Elite · 5 players)', 30, '#7ab4ff'],
   };
   for (const e of CATHEDRAL_ENEMIES) KINDS[e.kind]=[e.name+(e.boss?' (Boss)':''),e.level,e.color];
@@ -132,6 +161,24 @@
       case 'vale_cottage': case 'watermill': return '#f2d9ad';
       case 'elder_hollow_gate': return '#f8df91';
       case 'stone_bridge': return '#e0d3ac';
+      case 'fan_topiary': return '#58c5d0';
+      case 'worldheart_trunk': case 'hollow_arch': return '#e9d78c';
+      case 'heartwood_vault': return '#ffe0a1';
+      case 'heartwood_core': return '#a5e6af';
+      case 'lapis_astrolabe': return '#f0d59c';
+      case 'lapis_oasis': return '#5dc5c4';
+      case 'lapis_date_palm': return '#6ea77a';
+      case 'hanging_pod': case 'canopy_market': case 'amber_library': return '#b8d181';
+      case 'festival_bloom': return '#f4c65e';
+      case 'ribbon_pole': case 'pinwheel': case 'confetti_lantern': return '#ef6998';
+      case 'silk_pavilion': case 'painted_stall': return '#f7d36f';
+      case 'parade_standard': case 'mask_dais': case 'grand_pavilion_gate': return '#fff0b5';
+      case 'jungle_water': case 'jade_pool': return '#48b4bb';
+      case 'kapok_tree': case 'strangler_fig': return '#1d6047';
+      case 'banana_palm': case 'giant_fern': case 'hanging_vines': return '#68b871';
+      case 'orchid_cluster': case 'glow_mushroom': return '#e3a5c2';
+      case 'banyan_lodge': case 'boardwalk_stall': case 'root_bridge': return '#c9b075';
+      case 'jaguar_totem': case 'rain_crown_temple': return '#f0d889';
       case 'crag': return '#4a4a58';
       case 'pine': return '#1f4a3a';
       case 'beacon': return '#ff9a2e';
@@ -183,6 +230,7 @@
     const z = zones[index], k = px / z.size, c = document.createElement('canvas'); c.width = c.height = px;
     const g = c.getContext('2d');
     g.fillStyle = GROUND[z.theme]; g.fillRect(0, 0, px, px);
+    if(z.theme==='yearwheel'){const half=px/2;for(const [x,y,c] of [[0,0,'#c3dfeb'],[half,0,'#c88055'],[0,half,'#8acb83'],[half,half,'#ecc274']]){g.fillStyle=c;g.fillRect(x,y,half,half);}g.fillStyle='#f5e4b4';g.beginPath();g.arc(half,half,px*.028,0,6.283);g.fill();}
     let seed = 7 + index * 131; const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
     for (let n = 0; n < 70; n++) { g.fillStyle = rnd() < .5 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.07)'; g.beginPath(); g.arc(rnd() * px, rnd() * px, (4 + rnd() * 9) * k, 0, 6.283); g.fill(); }
     g.lineCap = g.lineJoin = 'round'; g.strokeStyle = g.fillStyle = DIRT[z.theme]; g.lineWidth = 2.8 * k;
@@ -199,13 +247,13 @@
       else { g.beginPath(); g.arc(r.x * k, r.y * k, r.r * k, 0, 6.283); g.fill(); }
     }
     if (z.city && z.theme !== 'city' && z.theme !== 'nacre' && z.theme !== 'asterion') for (const t of [z.city, ...(z.camps || [])]) {
-      g.fillStyle = { meadow: '#d8cbb0', ember: '#88705d', frost: '#8fa6bd', fen: '#6a5238', wyrd: '#8a6a44', sky: '#cdd2f2', deep: '#4a7a82', astral: '#8fa9b2', prismwaste: '#c5a58d', orrery: '#a58a77', moonspore: '#719b83', stormglass:'#55798a', sunward:'#76ad56' }[z.theme];
+      g.fillStyle = { meadow: '#d8cbb0', ember: '#88705d', frost: '#8fa6bd', fen: '#6a5238', wyrd: '#8a6a44', sky: '#cdd2f2', deep: '#4a7a82', astral: '#8fa9b2', prismwaste: '#c5a58d', orrery: '#a58a77', moonspore: '#719b83', stormglass:'#55798a', sunward:'#76ad56', ribbonwild:'#e5a8c5',tanglecrown:'#65ad70',lapiserg:'#d6ad72',yearwheel:'#e9daa9' }[z.theme];
       g.fillRect(t.x0 * k, t.y0 * k, (t.x1 - t.x0) * k, (t.y1 - t.y0) * k);
     }
     const objects = (z.objects || []).filter(o => o.kind !== 'post' && o.kind !== 'void');
     for (const pass of [0, 1]) for (const o of objects) {
       if (FEATURE.has(o.kind) !== (pass === 0)) continue;
-      g.fillStyle = objectColour(o, z.theme);
+      g.fillStyle = z.theme==='yearwheel' ? (o.kind.includes('gate')?'#ffe9a6':o.kind.includes('lodge')?'#e5c3a2':o.kind.includes('pool')?'#75c8d0':['#84bd79','#e7a950','#bf6e45','#b5dce5'][(o.x<200?(o.y<200?3:0):(o.y<200?2:1))]) : objectColour(o, z.theme);
       if (o.width) { g.fillRect((o.x - o.width / 2) * k, (o.y - o.depth / 2) * k, Math.max(1, o.width * k), Math.max(1, o.depth * k)); continue; }
       if (o.kind === 'grandfountain' || o.kind === 'fountain' || o.kind === 'meetingstone') { g.fillStyle = o.kind === 'meetingstone' ? '#59d9ff' : '#58a8d8'; g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(2, (o.r || 1) * k), 0, 6.283); g.fill(); continue; }
       g.beginPath(); g.arc(o.x * k, o.y * k, Math.max(1, (o.kind === 'water' ? o.r : RADIUS[o.kind] || .8) * k), 0, 6.283); g.fill();

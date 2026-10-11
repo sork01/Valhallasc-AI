@@ -34,9 +34,9 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
       seal:z.futureInstance,gate:zones[19].portals.find(p=>p.id==='stormglass_sun_gate'),
       travel:z.npcs.find(n=>n.id==='travel_millbridge'),miller:z.npcs.find(n=>n.id==='sun_miller'),keeper:z.npcs.find(n=>n.id==='sun_keeper'),trees:z.objects.filter(o=>['oak_tree','birch_tree','apple_tree','willow_tree'].includes(o.kind)).length};
   });
-  check(data.count===21&&data.name==='Sunward Vale'&&data.theme==='sunward'&&data.levels.join(',')==='65,70','Zone 20 and levels load');
+  check(data.count===27&&data.name==='Sunward Vale'&&data.theme==='sunward'&&data.levels.join(',')==='65,70','Zone 20 and levels load');
   check(data.kinds.length===9&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Six enemy and three NPC PixelFlow atlases load');
-  check(data.art&&data.layout===21&&data.legend&&data.trees>=170,'Real trees, mill, bridges and world map catalog load');
+  check(data.art&&data.layout===29&&data.legend&&data.trees>=170,'Real trees, mill, bridges and world map catalog load');
   check(data.npcs===8&&data.quests===9&&data.spawns===42,'Camp, quest hub and encounters load');
   check(data.seal?.status==='sealed'&&data.seal?.name==='The Elder Hollow'&&data.gate?.to===20,'Instance entrance is sealed and Sunward Cut exists');
   check(data.travel?.travelLinks.includes('travel_breakwater')&&data.travel?.art==='sun_travel'&&data.miller?.art==='sun_miller'&&data.keeper?.art==='sun_keeper','Three distinct PixelFlow NPCs load');

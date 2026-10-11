@@ -1,9 +1,9 @@
-"""Builds the level 1–70 gear ladder and exclusive Undervault/Cathedral sets in world/items.txt.
+"""Builds the level 1–85 gear ladder and exclusive Undervault/Cathedral sets in world/items.txt.
 
 Run `python3 scripts/gear_levels.py`, then `node scripts/sync-world.cjs` and rebuild Rust. It is idempotent: it keeps
 every non-gear item and every original piece (an entry with no `art` key) and regenerates the rest.
 
-SETS. Required levels come in steps of five (1, 5, ... 70). Every level has a gray, a green and a blue set; purple
+SETS. Required levels come in steps of five (1, 5, ... 85). Every level has a gray, a green and a blue set; purple
 exists at every multiple of ten. A set holds, per class, a chest, headgear, shoulders,
 gloves and weapon, plus the shared (class-independent) pants, necklace and ring.
 
@@ -26,7 +26,7 @@ from cathedral_content import WINGS
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ITEMS = ROOT / 'world' / 'items.txt'
 
-LEVELS = (1, *range(5, 71, 5))
+LEVELS = (1, *range(5, 96, 5))
 RARITIES = ['common', 'uncommon', 'rare', 'epic']       # gray, green, blue, purple
 COLOUR = {'common': 'gray', 'uncommon': 'green', 'rare': 'blue', 'epic': 'purple'}
 SETS = [(level, rarity) for level in LEVELS for rarity in RARITIES if rarity != 'epic' or level % 10 == 0]
@@ -97,6 +97,11 @@ WORDS = {
     (60, 'common'): 'Sporeworn', (60, 'uncommon'): 'Moonwoven', (60, 'rare'): 'Nightbloom', (60, 'epic'): 'Mooncrowned',
     (65, 'common'): 'Saltworn', (65, 'uncommon'): 'Stormforged', (65, 'rare'): 'Eye-bound',
     (70, 'common'): 'Fieldworn', (70, 'uncommon'): 'Oakbound', (70, 'rare'): 'Sunward', (70, 'epic'): 'Elder-crowned',
+    (75, 'common'): 'Paradeworn', (75, 'uncommon'): 'Ribbonbound', (75, 'rare'): 'Jubilee',
+    (80, 'common'): 'Rootworn', (80, 'uncommon'): 'Canopybound', (80, 'rare'): 'Raincrowned', (80, 'epic'): 'Jade Sovereign',
+    (85, 'common'): 'Sandworn', (85, 'uncommon'): 'Oasisbound', (85, 'rare'): 'Astrolabe',
+    (90, 'common'): 'Snowworn', (90, 'uncommon'): 'Riftforged', (90, 'rare'): 'Aurorabound', (90, 'epic'): 'Glacier Sovereign',
+    (95, 'common'): 'Stoneworn', (95, 'uncommon'): 'Cairnforged', (95, 'rare'): 'Thunderbound',
 }
 LEVEL_HUE = {level: (index * 70) % 360 for index, level in enumerate(LEVELS)}
 RARITY_TINT = {   # hue offset, saturate, brightness

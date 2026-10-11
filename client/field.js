@@ -33,6 +33,14 @@
   const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16), t = k < 0 ? 0 : 255, p = Math.abs(k); return '#' + [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.round(v + (t - v) * p).toString(16).padStart(2, '0')).join(''); };
 
   // ---------- the map ----------
+  const yearSeason=(x,y)=>x<200?(y<200?3:0):(y<200?2:1);
+  function yearGround(x,y,tone,dirt,alt) {
+    const s=yearSeason(x,y);
+    const grass=[[116,47,42],[89,57,45],[35,54,46],[196,48,85]][s];
+    const road=[[42,41,69],[38,57,72],[28,46,60],[191,37,77]][s];
+    const [h,sat,light]=dirt?road:grass;
+    return `hsl(${h+tone*11},${sat+tone*7}%,${light+tone*10+alt}%)`;
+  }
   const PATHS = [
     [[36, 79], [36, 71], [36, 62], [33, 52], [38, 44], [36, 36], [42, 28], [50, 22], [54, 12]],
     [[36, 36], [26, 32], [16, 26], [10, 16]],
@@ -45,9 +53,9 @@
     const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
       const i = y * MAP + x, cx = x + .5, cy = y + .5;
-      map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : vault ? 51 : wyrd ? 61 : sky ? 71 : astral ? 91 : prism ? 101 : orrery ? 111 : moonspore ? 121 : zdef.theme === 'stormglass' ? 131 : zdef.theme === 'sunward' ? 141 : deep ? 81 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : vault ? 52 : wyrd ? 62 : sky ? 72 : astral ? 92 : prism ? 102 : orrery ? 112 : moonspore ? 122 : zdef.theme === 'stormglass' ? 132 : zdef.theme === 'sunward' ? 142 : deep ? 82 : 2) * .35;
+      map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : vault ? 51 : wyrd ? 61 : sky ? 71 : astral ? 91 : prism ? 101 : orrery ? 111 : moonspore ? 121 : zdef.theme === 'stormglass' ? 131 : zdef.theme === 'sunward' ? 141 : zdef.theme === 'ribbonwild' ? 151 : zdef.theme === 'tanglecrown' ? 161 : zdef.theme === 'worldtree' ? 171 : zdef.theme === 'heartwood' ? 181 : zdef.theme === 'lapiserg' ? 191 : zdef.theme === 'frostwake' ? 201 : zdef.theme === 'cairnspine' ? 211 : zdef.theme === 'yearwheel' ? 221 : deep ? 81 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : vault ? 52 : wyrd ? 62 : sky ? 72 : astral ? 92 : prism ? 102 : orrery ? 112 : moonspore ? 122 : zdef.theme === 'stormglass' ? 132 : zdef.theme === 'sunward' ? 142 : zdef.theme === 'ribbonwild' ? 152 : zdef.theme === 'tanglecrown' ? 162 : zdef.theme === 'worldtree' ? 172 : zdef.theme === 'heartwood' ? 182 : zdef.theme === 'lapiserg' ? 192 : zdef.theme === 'frostwake' ? 202 : zdef.theme === 'cairnspine' ? 212 : zdef.theme === 'yearwheel' ? 222 : deep ? 82 : 2) * .35;
       let d = 99; for (const p of paths) for (let k = 0; k < p.length - 1; k++) d = Math.min(d, segDist(cx, cy, p[k][0], p[k][1], p[k + 1][0], p[k + 1][1]));
-      if (!ember && !frost && !fen && !city && !vault && !wyrd && !sky && !astral && !prism && !orrery && !moonspore && zdef.theme !== 'stormglass' && zdef.theme !== 'sunward' && !deep) d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
+      if (!ember && !frost && !fen && !city && !vault && !wyrd && !sky && !astral && !prism && !orrery && !moonspore && zdef.theme !== 'stormglass' && zdef.theme !== 'sunward' && zdef.theme !== 'ribbonwild' && zdef.theme !== 'tanglecrown' && zdef.theme !== 'worldtree' && zdef.theme !== 'heartwood' && zdef.theme !== 'lapiserg' && zdef.theme !== 'frostwake' && zdef.theme !== 'cairnspine' && zdef.theme !== 'yearwheel' && !deep) d = Math.min(d, Math.hypot(cx - 36, cy - 36) - 2.4);
       map.dirt[i] = d < 1.15 + vnoise(cx * .5, cy * .5, 3) * .6 ? 1 : 0;
     }
     if (city || zdef.theme === 'nacre') paintRoads(zdef.roads);
@@ -408,7 +416,7 @@
     }
   }
   const WYRD_NONE = {};                                   // the Wyrdwood's scenery is drawn by client/wyrdart.js through City.art
-  const spriteSet = () => zdef.theme === 'wyrd' || zdef.theme === 'sky' || zdef.theme === 'deep' || zdef.theme === 'nacre' || zdef.theme === 'astral' || zdef.theme === 'prismwaste' || zdef.theme === 'orrery' || zdef.theme === 'moonspore' || zdef.theme === 'stormglass' || zdef.theme === 'sunward' || CathedralArt.isTheme(zdef.theme) ? WYRD_NONE : zdef.theme === 'ember' ? emberSprites : zdef.theme === 'frost' ? frostSprites : zdef.theme === 'fen' ? fenSprites : sprites;
+  const spriteSet = () => zdef.theme === 'wyrd' || zdef.theme === 'sky' || zdef.theme === 'deep' || zdef.theme === 'nacre' || zdef.theme === 'astral' || zdef.theme === 'prismwaste' || zdef.theme === 'orrery' || zdef.theme === 'moonspore' || zdef.theme === 'stormglass' || zdef.theme === 'sunward' || zdef.theme === 'ribbonwild' || zdef.theme === 'tanglecrown' || zdef.theme === 'worldtree' || zdef.theme === 'heartwood' || zdef.theme === 'lapiserg' || zdef.theme === 'frostwake' || zdef.theme === 'cairnspine' || zdef.theme === 'yearwheel' || CathedralArt.isTheme(zdef.theme) ? WYRD_NONE : zdef.theme === 'ember' ? emberSprites : zdef.theme === 'frost' ? frostSprites : zdef.theme === 'fen' ? fenSprites : sprites;
 
   // ---------- ground chunks ----------
   const chunks = new Map(); let chunkScale = 1;
@@ -416,7 +424,7 @@
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
   function renderChunk(cx, cy) {
     const G = chunkGeom(cx, cy), [c, g] = canvasOf(G.w, G.h, chunkScale);
-    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', asterion = zdef.theme === 'asterion', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
+    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', asterion = zdef.theme === 'asterion', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     const arenas = vault ? (zdef.slimes || []).filter(m => BOSS_KINDS.includes(m.kind)) : [];
     for (let ty = 0; ty < CH; ty++) for (let tx = 0; tx < CH; tx++) {
       const x = G.x0 + tx, y = G.y0 + ty; if (x >= MAP || y >= MAP) continue;
@@ -424,10 +432,19 @@
       if (vault && !dirt) continue;                                                  // solid rock: stays black
       if ((sky || moonwell) && !map.floor[i]) continue;                              // open water or sky
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
+      const ribbonHue = [344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];
       g.fillStyle = moonwell ? (dirt ? `hsl(${43+tone*9}, 45%, ${76+tone*8+alt}%)` : `hsl(${166+tone*18}, 29%, ${37+tone*8+alt}%)`) : CathedralArt.isTheme(zdef.theme) ? CathedralArt.ground(zdef.theme,x,y,tone,alt) : vault ? `hsl(${226 + tone * 10}, ${9 + tone * 5}%, ${19 + tone * 7 + alt * .7}%)` : asterion ? (dirt === 1 ? `hsl(${201 + tone * 14}, 21%, ${51 + tone * 7 + alt}%)` : dirt === 2 ? `hsl(${44 + tone * 9}, 38%, ${73 + tone * 9 + alt}%)` : `hsl(${222 + tone * 17}, ${19 + tone * 10}%, ${28 + tone * 9 + alt}%)`) : city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
         : sky ? skyGround(x, y, tone, dirt, alt)
         : orrery ? (dirt ? `hsl(${34 + tone * 7}, 19%, ${43 + tone * 8 + alt}%)` : `hsl(${232 + tone * 13}, ${17 + tone * 9}%, ${20 + tone * 10 + alt}%)`)
         : moonspore ? (dirt ? `hsl(${151 + tone * 9}, 18%, ${35 + tone * 9 + alt}%)` : `hsl(${177 + tone * 20}, ${25 + tone * 12}%, ${19 + tone * 10 + alt}%)`)
+        : worldtree ? (dirt ? `hsl(${34+tone*8}, 42%, ${46+tone*8+alt}%)` : `hsl(${142+tone*18}, 51%, ${33+tone*10+alt}%)`)
+        : heartwood ? (dirt ? `hsl(${35+tone*6}, 35%, ${45+tone*8+alt}%)` : `hsl(${31+tone*6}, 29%, ${34+tone*8+alt}%)`)
+        : lapis ? (dirt ? `hsl(${34+tone*7}, 47%, ${63+tone*8+alt}%)` : `hsl(${35+tone*11}, ${58+tone*8}%, ${57+tone*12+alt}%)`)
+        : yearwheel ? yearGround(x,y,tone,dirt,alt)
+        : cairn ? (dirt ? `hsl(${31+tone*8}, 32%, ${54+tone*7+alt}%)` : `hsl(${210+tone*9}, ${9+tone*7}%, ${38+tone*9+alt}%)`)
+        : frostwake ? (dirt ? `hsl(${197+tone*9}, 43%, ${72+tone*8+alt}%)` : `hsl(${198+tone*14}, ${23+tone*14}%, ${83+tone*10+alt}%)`)
+        : tanglecrown ? (dirt ? `hsl(${34+tone*8}, ${37+tone*7}%, ${44+tone*8+alt}%)` : `hsl(${133+tone*19}, ${48+tone*9}%, ${29+tone*11+alt}%)`)
+        : ribbonwild ? (dirt ? `hsl(${43+tone*8}, 79%, ${73+tone*5+alt}%)` : (x<49&&y>44&&y<97 ? `hsl(${103+tone*12}, ${47+tone*8}%, ${44+tone*8+alt}%)` : `hsl(${ribbonHue+tone*6}, ${52+tone*9}%, ${62+tone*9+alt}%)`))
         : sunward ? (dirt ? `hsl(${35 + tone * 9}, 43%, ${58 + tone * 8 + alt}%)` : `hsl(${100 + tone * 22}, ${47 + tone * 10}%, ${34 + tone * 13 + alt}%)`)
         : stormglass ? (dirt ? `hsl(${182 + tone * 13}, 20%, ${52 + tone * 8 + alt}%)` : `hsl(${212 + tone * 15}, ${20 + tone * 10}%, ${17 + tone * 9 + alt}%)`)
         : prism ? (dirt ? `hsl(${34 + tone * 8}, 38%, ${54 + tone * 8 + alt}%)` : `hsl(${32 + tone * 14}, ${27 + tone * 12}%, ${43 + tone * 13 + alt}%)`)
@@ -440,7 +457,11 @@
         : dirt ? `hsl(${30 + tone * 8}, ${38 + tone * 8}%, ${48 + tone * 8 + alt}%)` : `hsl(${100 + tone * 16}, ${46 + tone * 12}%, ${36 + tone * 12 + alt}%)`;
       g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill();
       const r = rngf(x * 977 + y * 131 + 7), inTile = () => { const a = r() - .5, b = r() - .5; return [px + (a - b) * TW * .4, py + TH / 2 + (a + b) * TH * .4]; };
-      if (moonwell) {
+      if (yearwheel) {
+        const season=yearSeason(x,y), colors=[['#f9b4d2','#77bd8b'],['#ffe4a0','#e3ab56'],['#f0ae63','#ab5a3e'],['#e8f7fa','#a9d7ec']][season];
+        if (dirt) {g.strokeStyle=colors[0];g.lineWidth=1.4;g.beginPath();g.moveTo(px-17,py+22);g.lineTo(px,py+14);g.lineTo(px+17,py+22);g.stroke();}
+        else if (r()<.42) {const [qx,qy]=inTile();g.fillStyle=colors[0];g.globalAlpha=.48;g.beginPath();g.ellipse(qx,qy,2.5+r()*3,1.5+r()*2,r()*3,0,6.283);g.fill();g.globalAlpha=1;}
+      } else if (moonwell) {
         if (dirt) {
           g.strokeStyle='rgba(79,152,161,.45)';g.lineWidth=2;g.beginPath();g.moveTo(px-TW/2,py+TH/2);g.lineTo(px,py);g.lineTo(px+TW/2,py+TH/2);g.stroke();
           if(r()<.25){const [qx,qy]=inTile();g.fillStyle='rgba(255,248,210,.55)';g.beginPath();g.arc(qx,qy,1.5,0,6.283);g.fill();}
@@ -511,6 +532,32 @@
       } else if (moonspore) {
         for (let k = 0; k < (dirt ? 2 : 4); k++) { const [qx,qy]=inTile();g.fillStyle=k%3?'rgba(142,194,162,.24)':'rgba(208,250,166,.46)';g.beginPath();g.ellipse(qx,qy,2+r()*3,1+r()*2,0,0,6.283);g.fill(); }
         if (r()<.1) { const [qx,qy]=inTile();g.fillStyle='#c4f4af';g.beginPath();g.arc(qx,qy,1.5,0,6.283);g.fill(); }
+      } else if (worldtree) {
+        if(dirt){g.strokeStyle='rgba(83,58,39,.4)';g.lineWidth=2;g.beginPath();g.moveTo(px-12,py+7);g.lineTo(px+13,py+18);g.stroke();}
+        else for(let k=0;k<4;k++){const [qx,qy]=inTile();g.fillStyle=k%2?'rgba(182,226,117,.32)':'rgba(37,121,77,.46)';g.beginPath();g.ellipse(qx,qy,4+r()*4,2+r()*3,r()*6.28,0,6.283);g.fill();}
+        if(r()<.13){const [qx,qy]=inTile();g.fillStyle='#f9de8e';g.beginPath();g.arc(qx,qy,2.5,0,6.283);g.fill();}
+      } else if (heartwood) {
+        const ring=Math.hypot(x+0.5-48,y+0.5-48);g.strokeStyle=ring<33?'rgba(242,200,116,.43)':'rgba(83,51,37,.5)';g.lineWidth=1.5;g.beginPath();g.moveTo(px-13,py+13);g.quadraticCurveTo(px,py+6+ring%5,px+13,py+13);g.stroke();
+        if(r()<.15){const [qx,qy]=inTile();g.fillStyle='#f9db8e';g.beginPath();g.arc(qx,qy,2,0,6.283);g.fill();}
+      } else if (cairn) {
+        for(let k=0;k<(dirt?4:6);k++){const [qx,qy]=inTile();g.fillStyle=dirt?'rgba(230,185,122,.4)':k%2?'rgba(197,191,173,.35)':'rgba(48,61,70,.42)';g.beginPath();g.ellipse(qx,qy,2+r()*4,1+r()*2,r()*6.28,0,6.283);g.fill();}
+      } else if (frostwake) {
+        for(let k=0;k<(dirt?2:4);k++){const [qx,qy]=inTile();g.fillStyle=dirt?'rgba(126,197,218,.33)':k%2?'rgba(246,255,255,.58)':'rgba(159,211,226,.30)';g.beginPath();g.ellipse(qx,qy,2+r()*5,1+r()*2,0,0,6.283);g.fill();}
+        if(!dirt&&r()<.17){const [qx,qy]=inTile();g.strokeStyle='rgba(66,133,166,.32)';g.lineWidth=1;g.beginPath();g.moveTo(qx-8,qy+3);g.lineTo(qx,qy-3);g.lineTo(qx+7,qy+4);g.stroke();}
+      } else if (lapis) {
+        for(let k=0;k<(dirt?2:4);k++){const [qx,qy]=inTile();g.fillStyle=dirt?'rgba(255,238,193,.38)':k%3?'rgba(173,109,65,.27)':'rgba(248,218,150,.37)';g.beginPath();g.ellipse(qx,qy,3+r()*6,1+r()*2,0,0,6.283);g.fill();}
+        if(!dirt&&r()<.22){const [qx,qy]=inTile();g.strokeStyle='rgba(252,225,160,.48)';g.lineWidth=1.3;g.beginPath();g.arc(qx,qy,5+r()*5,0,Math.PI*.9);g.stroke();}
+      } else if (tanglecrown) {
+        for(let k=0;k<(dirt?3:5);k++){const [qx,qy]=inTile();g.strokeStyle=dirt?'rgba(100,72,43,.3)':'rgba(24,101,66,.55)';g.lineWidth=1.5;g.beginPath();g.moveTo(qx,qy+3);g.lineTo(qx-2-r()*3,qy-4-r()*5);g.stroke();}
+        if(!dirt&&r()<.26){const [qx,qy]=inTile();g.fillStyle=r()<.5?'#ff9cca':'#d9dc79';g.beginPath();g.ellipse(qx,qy-3,3+r()*3,2+r()*2,r()*6.28,0,6.283);g.fill();}
+      } else if (ribbonwild) {
+        for(let k=0;k<(dirt?2:3);k++){
+          const [qx,qy]=inTile(),h=(k+Math.floor(r()*4))%4;
+          g.fillStyle=['#fff4ba','#ef75a8','#6fd4d3','#b48ee8'][h];
+          g.beginPath();g.ellipse(qx,qy,2+r()*2,1+r()*2,k*.7,0,6.283);g.fill();
+        }
+        if(!dirt&&x<49&&y>44&&y<97){for(let k=0;k<3;k++){const [qx,qy]=inTile();g.strokeStyle='rgba(44,116,50,.48)';g.lineWidth=1.4;g.beginPath();g.moveTo(qx,qy+2);g.lineTo(qx+(r()-.5)*6,qy-3-r()*5);g.stroke();}}
+        if(!dirt&&r()<.11){const [qx,qy]=inTile();g.fillStyle='#fff0bd';g.beginPath();g.arc(qx,qy,2.3,0,6.283);g.fill();}
       } else if (sunward) {
         for (let k=0;k<(dirt?2:5);k++){const [qx,qy]=inTile(),h=3+r()*5;g.strokeStyle=dirt?'rgba(139,103,62,.27)':'rgba(31,105,37,.52)';g.lineWidth=1.4;g.beginPath();g.moveTo(qx,qy+2);g.lineTo(qx-2-r()*3,qy-h);g.moveTo(qx,qy+2);g.lineTo(qx+2+r()*3,qy-h*.75);g.stroke();}
         if(!dirt&&r()<.15){const [qx,qy]=inTile();g.fillStyle=r()<.5?'#f7ebbd':'#eab6cf';for(let p=0;p<5;p++){const a=p*6.283/5;g.beginPath();g.ellipse(qx+Math.cos(a)*3,qy-4+Math.sin(a)*2,2.2,1.6,0,0,6.283);g.fill();}g.fillStyle='#e6bb51';g.fillRect(qx-1,qy-5,2,2);}
@@ -739,7 +786,50 @@
     spadebadger: { name: 'Spadeclaw Badger', scale: 1.9, top: 77, col: ['#e7e1c8','#969b8b','#2d3440'] },
     honeyjaw: { name: 'Old Honeyjaw', elite: true, scale: 2.65, top: 91, col: ['#ffe497','#926c45','#2e2730'] },
     wickerwarden: { name: 'The Wicker Warden', elite: true, scale: 2.8, top: 92, col: ['#fce3a2','#a98454','#312f35'] },
+    ribbongecko: { name: 'Ribbon Gecko', scale: 1.65, top: 76, col: ['#31c7bd','#237d9b','#263850'] },
+    balloonbeetle: { name: 'Balloon Beetle', scale: 1.8, top: 87, col: ['#e7a2f3','#b277db','#3d3158'] },
+    paintedmacaw: { name: 'Painted Macaw', scale: 1.75, top: 88, col: ['#f3d75d','#52bbdf','#303453'] },
+    jesterling: { name: 'Jesterling', scale: 1.7, top: 83, col: ['#f4bf78','#d36ab3','#423052'] },
+    paradegryphon: { name: 'The Parade Gryphon', elite: true, scale: 2.7, top: 93, col: ['#f7bb72','#bc7cba','#383548'] },
+    maskcolossus: { name: 'The Masquerade Colossus', elite: true, scale: 3.0, top: 94, col: ['#f5d48a','#ae94dc','#34324d'] },
+    orchidmantis: { name: 'Orchid Mantis', scale: 1.8, top: 91, col: ['#d5ef83','#80c76c','#263d39'] },
+    canopyglider: { name: 'Canopy Glider', scale: 1.85, top: 91, col: ['#c9e5a4','#59c0b5','#263d55'] },
+    poolcaiman: { name: 'Blackwater Caiman', scale: 2.0, top: 79, col: ['#b9d5a1','#6ea58c','#283f37'] },
+    drumgorilla: { name: 'Drum Gorilla', scale: 2.0, top: 92, col: ['#c69a70','#9d6e5d','#3b3540'] },
+    jadeanaconda: { name: 'The Jade Anaconda', elite: true, scale: 2.85, top: 94, col: ['#a9e3a6','#4dc098','#253c40'] },
+    crownjaguar: { name: 'The Crown Jaguar', elite: true, scale: 3.1, top: 94, col: ['#f1ce73','#ce9852','#343d39'] },
+    sapbeetle: { name: 'Sap Beetle', scale: 1.7, top: 91, col: ['#e3ae59','#a6713c','#302f36'] },
+    lanternhornet: { name: 'Lantern Hornet', scale: 1.65, top: 91, col: ['#d7cf74','#7da869','#283947'] },
+    mosslemur: { name: 'Moss Lemur', scale: 1.7, top: 91, col: ['#c8d68a','#82a872','#263f3b'] },
+    barkmimic: { name: 'Bark Mimic', scale: 2.0, top: 93, col: ['#c5a479','#8b7758','#253b40'] },
+    sandhopper: { name: 'Sandhopper', scale: 1.8, top: 91, col: ['#edca82','#ca9958','#514039'] },
+    dunefennec: { name: 'Dune Fennec', scale: 1.8, top: 91, col: ['#f4d5a3','#d6a278','#493c3b'] },
+    glassscorpion: { name: 'Glass Scorpion', scale: 1.85, top: 91, col: ['#c7e7df','#71bed0','#263f52'] },
+    sunvulture: { name: 'Sun Vulture', scale: 1.85, top: 91, col: ['#ecd5a1','#c69b76','#4a3947'] },
+    dunecolossus: { name: 'The Dune Colossus', elite: true, scale: 3.0, top: 94, col: ['#ecd1a0','#d2a274','#55434d'] },
+    mirageroc: { name: 'The Mirage Roc', elite: true, scale: 3.25, top: 94, col: ['#e9dfbb','#8dc3c6','#30485b'] },
+    snowhare: { name: 'Snow Hare', scale: 1.8, top: 91, col: ['#f0f8ed','#c8dce4','#33465e'] },
+    iceotter: { name: 'Ice Otter', scale: 1.8, top: 91, col: ['#c9ecf0','#86b3c5','#263d57'] },
+    frostheron: { name: 'Frost Heron', scale: 1.85, top: 91, col: ['#f5faf5','#b4d7e0','#31435d'] },
+    glaciercrab: { name: 'Glacier Crab', scale: 1.85, top: 91, col: ['#b7e6ec','#66b4d0','#213b60'] },
+    bellmammoth: { name: 'The Bell Mammoth', elite: true, scale: 3.1, top: 94, col: ['#e7efeb','#afc8d5','#34445f'] },
+    auroramanta: { name: 'The Aurora Manta', elite: true, scale: 3.2, top: 94, col: ['#acf1cf','#68bcb8','#243c61'] },
+    crevasseleviathan: { name: 'The Crevasse Leviathan', elite: true, scale: 3.45, top: 94, col: ['#8dd2dc','#498eb2','#132d55'] },
+    screeferret: { name: 'Scree Ferret', scale: 1.8, top: 91, col: ['#d2c0a0','#9d8c73','#312d3d'] },
+    stoneibex: { name: 'Stone Ibex', scale: 1.9, top: 91, col: ['#dbcaa5','#978d75','#2c3339'] },
+    slateraven: { name: 'Slate Raven', scale: 1.85, top: 91, col: ['#a8adbb','#657488','#1e2936'] },
+    ridgeadder: { name: 'Ridge Adder', scale: 1.85, top: 91, col: ['#d0bd80','#8ca085','#2b3034'] },
+    cairnbehemoth: { name: 'The Cairn Behemoth', elite: true, scale: 3.2, top: 94, col: ['#b8aa8d','#828178','#292c36'] },
+    whitebarktitan: { name: 'The Whitebark Titan', elite: true, scale: 3.4, top: 94, col: ['#e5dfc8','#aaa79a','#32343a'] },
+    stormcondor: { name: 'The Storm Condor', elite: true, scale: 3.5, top: 94, col: ['#c8c4af','#7b8b8c','#232c43'] },
   };
+  for (const [kind,name,col,elite] of [
+    ['brooknewt','Brook Newt','#7ac6ae'],['sundarter','Sun Darter','#f6ce60'],['acornmimic','Acorn Mimic','#c17b48'],['snowstoat','Snow Stoat','#d6f3f6'],
+    ['bloomtortoise','Bloom Tortoise','#9bd579',true],['petalchimera','Petal Chimera','#ec91c2',true],['rainseraph','Rain Seraph','#8dd9dc',true],
+    ['glasslion','Glass Lion','#ffc06d',true],['sunwheel','Sunwheel','#ffe67d',true],['firephoenix','Fire Phoenix','#f18c58',true],
+    ['lanternowl','Lantern Owl','#e5a76e',true],['harvestreaper','Harvest Reaper','#ac6c4b',true],['ambermantis','Amber Mantis','#f2b861',true],
+    ['rimesaber','Rime Saber','#a4d9ed',true],['snowgiant','Snow Giant','#d8eff7',true],['longnightwyrm','Longnight Wyrm','#9abbd9',true]
+  ]) SLIME[kind]={name,elite,scale:elite?3.1:1.8,top:91,col:[col,col,'#2b424b']};
   const CATHEDRAL_KINDS = CATHEDRAL_ENEMIES.map(e => e.kind);
   for (const e of CATHEDRAL_ENEMIES) SLIME[e.kind] = { name:e.name, elite:true, boss:e.boss, scale:e.stats[3] * .72, top:82, col:[e.color,e.color,'#152431'] };
   const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
@@ -747,6 +837,13 @@
   const MOONSPORE_KINDS = ['glowcapgrazer','silkwing','rootlurker','lanternwraith','mireheart','silverwidow','nightbloom'];
   const STORMGLASS_KINDS = ['saltclaw','stormgull','glassray','breakersentinel','maelstromheart'];
   const SUNWARD_KINDS = ['meadowhare','sunbacksnail','brushfox','spadebadger','honeyjaw','wickerwarden'];
+  const RIBBONWILD_KINDS = ['ribbongecko','balloonbeetle','paintedmacaw','jesterling','paradegryphon','maskcolossus'];
+  const TANGLECROWN_KINDS = ['orchidmantis','canopyglider','poolcaiman','drumgorilla','jadeanaconda','crownjaguar'];
+  const WORLDHEART_KINDS = ['sapbeetle','lanternhornet','mosslemur','barkmimic'];
+  const LAPIS_KINDS = ['sandhopper','dunefennec','glassscorpion','sunvulture','dunecolossus','mirageroc'];
+  const YEAR_KINDS = ['brooknewt','sundarter','acornmimic','snowstoat','bloomtortoise','petalchimera','rainseraph','glasslion','sunwheel','firephoenix','lanternowl','harvestreaper','ambermantis','rimesaber','snowgiant','longnightwyrm'];
+  const CAIRN_KINDS = ['screeferret','stoneibex','slateraven','ridgeadder','cairnbehemoth','whitebarktitan','stormcondor'];
+  const FROSTWAKE_KINDS = ['snowhare','iceotter','frostheron','glaciercrab','bellmammoth','auroramanta','crevasseleviathan'];
   const MOONWELL_KINDS = ['dew_moth','lumen_eel','rootbell','tideglass_heron','hourpetal_stag','moonskein_weaver'];
   const VAULT_KINDS = ['thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking'], BOSS_KINDS = [...VAULT_KINDS.slice(3), 'tideglass_heron','hourpetal_stag','moonskein_weaver','moonwell_echo', ...CATHEDRAL_ENEMIES.filter(e => e.boss).map(e => e.kind)];
   // Colour a level label by how it compares with the hero: grey, normal, orange, red.
@@ -1378,8 +1475,8 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
-  const enemySource = s => CATHEDRAL_KINDS.includes(s.kind) ? cathedralSrc : SUNWARD_KINDS.includes(s.kind) ? sunwardSrc : STORMGLASS_KINDS.includes(s.kind) ? stormglassSrc : s.kind === 'moonwell_echo' ? moonwellSrc : MOONWELL_KINDS.includes(s.kind) ? moonwellGardenSrc : s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : WYRD_KINDS.includes(s.kind) ? wyrdSrc : SKY_KINDS.includes(s.kind) ? skySrc : DEEP_KINDS.includes(s.kind) ? deepSrc : ASTRAL_KINDS.includes(s.kind) ? astralSrc : PRISM_KINDS.includes(s.kind) ? prismSrc : ORRERY_KINDS.includes(s.kind) ? orrerySrc : MOONSPORE_KINDS.includes(s.kind) ? moonsporeSrc : VAULT_KINDS.includes(s.kind) ? vaultSrc : slimeSrc;
+  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
+  const enemySource = s => CATHEDRAL_KINDS.includes(s.kind) ? cathedralSrc : YEAR_KINDS.includes(s.kind) ? yearSrc : CAIRN_KINDS.includes(s.kind) ? cairnSrc : FROSTWAKE_KINDS.includes(s.kind) ? frostwakeSrc : LAPIS_KINDS.includes(s.kind) ? lapisSrc : WORLDHEART_KINDS.includes(s.kind) ? worldheartSrc : TANGLECROWN_KINDS.includes(s.kind) ? tanglecrownSrc : RIBBONWILD_KINDS.includes(s.kind) ? ribbonwildSrc : SUNWARD_KINDS.includes(s.kind) ? sunwardSrc : STORMGLASS_KINDS.includes(s.kind) ? stormglassSrc : s.kind === 'moonwell_echo' ? moonwellSrc : MOONWELL_KINDS.includes(s.kind) ? moonwellGardenSrc : s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : WYRD_KINDS.includes(s.kind) ? wyrdSrc : SKY_KINDS.includes(s.kind) ? skySrc : DEEP_KINDS.includes(s.kind) ? deepSrc : ASTRAL_KINDS.includes(s.kind) ? astralSrc : PRISM_KINDS.includes(s.kind) ? prismSrc : ORRERY_KINDS.includes(s.kind) ? orrerySrc : MOONSPORE_KINDS.includes(s.kind) ? moonsporeSrc : VAULT_KINDS.includes(s.kind) ? vaultSrc : slimeSrc;
   const SLIME_K = 2.1, DIE_SHOW = 1.7;                      // sprite pixel -> screen px; seconds a dead slime stays on screen
   // Test mode (window.__valhallaTestSprites): one small coloured block per enemy kind instead of the atlas PNGs. The clip
   // table is the real one's shape (same names, frame counts and rates), so every animation state still finds its frame.
@@ -1491,6 +1588,62 @@
     fetch('assets/sunward.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/sunward_${k}.png`;
     }))).then(imgs=>{sunwardSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{sunwardSrc=null;});
+  }
+  function loadRibbonwildSprites() {
+    if (ribbonwildSrc) return;
+    const kinds=[...RIBBONWILD_KINDS,'ribbon_host','ribbon_keeper','ribbon_travel'];
+    if (stubOn()) { ribbonwildSrc=stubEnemies(kinds,{ribbongecko:'#3cc',balloonbeetle:'#b7d',paintedmacaw:'#5bd',jesterling:'#e8a',paradegryphon:'#d9b',maskcolossus:'#ad9',ribbon_host:'#e8a',ribbon_keeper:'#a9d',ribbon_travel:'#7dc'}); return; }
+    fetch('assets/ribbonwild.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/ribbonwild_${k}.png`;
+    }))).then(imgs=>{ribbonwildSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{ribbonwildSrc=null;});
+  }
+  function loadTanglecrownSprites() {
+    if (tanglecrownSrc) return;
+    const kinds=[...TANGLECROWN_KINDS,'tangle_warden','tangle_scholar','tangle_travel'];
+    if (stubOn()) { tanglecrownSrc=stubEnemies(kinds,{orchidmantis:'#ae8',canopyglider:'#7cb',poolcaiman:'#7a9',drumgorilla:'#a87',jadeanaconda:'#4b9',crownjaguar:'#da7',tangle_warden:'#5a8',tangle_scholar:'#8aa',tangle_travel:'#8ca'}); return; }
+    fetch('assets/tanglecrown.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/tanglecrown_${k}.png`;
+    }))).then(imgs=>{tanglecrownSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{tanglecrownSrc=null;});
+  }
+  function loadWorldheartSprites() {
+    if (worldheartSrc) return;
+    const kinds=[...WORLDHEART_KINDS,'heart_matriarch','heart_archivist','heart_oracle','heart_travel'];
+    if (stubOn()) { worldheartSrc=stubEnemies(kinds,{sapbeetle:'#da9',lanternhornet:'#dd9',mosslemur:'#ad9',barkmimic:'#b98',heart_matriarch:'#9c8',heart_archivist:'#9cc',heart_oracle:'#9dc',heart_travel:'#cda'}); return; }
+    fetch('assets/worldheart.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/worldheart_${k}.png`;
+    }))).then(imgs=>{worldheartSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{worldheartSrc=null;});
+  }
+  function loadLapisSprites() {
+    if (lapisSrc) return;
+    const kinds=[...LAPIS_KINDS,'lapis_keeper','lapis_cartographer','lapis_warden','lapis_seer','lapis_travel'];
+    if (stubOn()) { lapisSrc=stubEnemies(kinds,{sandhopper:'#db9',dunefennec:'#eaa',glassscorpion:'#7bc',sunvulture:'#ca9',dunecolossus:'#da9',mirageroc:'#8bd',lapis_keeper:'#8bd',lapis_cartographer:'#bab',lapis_warden:'#da9',lapis_seer:'#9bd',lapis_travel:'#8cb'}); return; }
+    fetch('assets/lapis.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/lapis_${k}.png`;
+    }))).then(imgs=>{lapisSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{lapisSrc=null;});
+  }
+  function loadFrostwakeSprites() {
+    if (frostwakeSrc) return;
+    const kinds=[...FROSTWAKE_KINDS,'frostwake_captain','frostwake_surveyor','frostwake_bellkeeper','frostwake_skywatcher','frostwake_ribkeeper','frostwake_travel'];
+    if (stubOn()) { frostwakeSrc=stubEnemies(kinds,{snowhare:'#eef',iceotter:'#9ce',frostheron:'#def',glaciercrab:'#7bd',bellmammoth:'#cdf',auroramanta:'#8dc',crevasseleviathan:'#7ae'}); return; }
+    fetch('assets/frostwake.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/frostwake_${k}.png`;
+    }))).then(imgs=>{frostwakeSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{frostwakeSrc=null;});
+  }
+  function loadCairnSprites() {
+    if (cairnSrc) return;
+    const kinds=[...CAIRN_KINDS,'cairn_warden','cairn_surveyor','cairn_stonesinger','cairn_grovekeeper','cairn_windseer','cairn_travel'];
+    if (stubOn()) { cairnSrc=stubEnemies(kinds,{screeferret:'#cba',stoneibex:'#ba9',slateraven:'#789',ridgeadder:'#9a8',cairnbehemoth:'#b9a',whitebarktitan:'#edc',stormcondor:'#8bb'}); return; }
+    fetch('assets/cairn.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/cairn_${k}.png`;
+    }))).then(imgs=>{cairnSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{cairnSrc=null;});
+  }
+  function loadYearSprites() {
+    if (yearSrc) return;
+    const kinds=[...YEAR_KINDS,...['sp','su','au','wi'].flatMap(k=>['year_'+k+'_keeper','year_'+k+'_travel'])];
+    if(stubOn()){yearSrc=stubEnemies(kinds,{});return;}
+    fetch('assets/yearwheel.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/yearwheel_${k}.png?v=seasonal3`;
+    }))).then(imgs=>{yearSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{yearSrc=null;});
   }
   function loadMoonwellSprites() {
     if (moonwellSrc) return;
@@ -2062,6 +2215,19 @@
     if (zdef.theme === 'prismwaste') { const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#322344');gr.addColorStop(.6,'#b17a84');gr.addColorStop(1,'#ffe2ad');g.fillStyle=gr;g.fillRect(0,0,VW,VH);return; }
     if (zdef.theme === 'orrery') { const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#171c38');gr.addColorStop(.6,'#51435b');gr.addColorStop(1,'#c79e72');g.fillStyle=gr;g.fillRect(0,0,VW,VH);return; }
     if (zdef.theme === 'moonspore') { const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#0e1c33');gr.addColorStop(.55,'#254c55');gr.addColorStop(1,'#608c75');g.fillStyle=gr;g.fillRect(0,0,VW,VH);g.fillStyle='#d9f5bb';g.beginPath();g.arc(VW*.77,VH*.19,18,0,6.283);g.fill();return; }
+    if (zdef.theme === 'worldtree') {const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#58b8a8');gr.addColorStop(.58,'#b2d9ad');gr.addColorStop(1,'#ebdfa4');g.fillStyle=gr;g.fillRect(0,0,VW,VH);g.fillStyle='#fff2b2';g.beginPath();g.arc(VW*.77,VH*.16,44,0,6.283);g.fill();return;}
+    if (zdef.theme === 'heartwood') {const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#283c38');gr.addColorStop(.6,'#6e6046');gr.addColorStop(1,'#c7a471');g.fillStyle=gr;g.fillRect(0,0,VW,VH);for(let i=0;i<7;i++){g.strokeStyle='rgba(245,218,147,.12)';g.lineWidth=22;g.beginPath();g.arc(VW*.5,VH*.9,130+i*93,Math.PI,Math.PI*2);g.stroke();}return;}
+    if (zdef.theme === 'yearwheel') {
+      const colors=[['#79c7b4','#b1e5c8','#f5d4de'],['#5ca9c4','#f2c67b','#ffe8ab'],['#687fa4','#db9169','#f1c078'],['#193d69','#8cb8d2','#edf8fa']][yearSeason(cam.x,cam.y)];
+      const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,colors[0]);gr.addColorStop(.58,colors[1]);gr.addColorStop(1,colors[2]);g.fillStyle=gr;g.fillRect(0,0,VW,VH);
+      g.fillStyle=colors[2];g.globalAlpha=.65;g.beginPath();g.arc(VW*.79,VH*.2,42,0,6.283);g.fill();g.globalAlpha=1;
+      for(let i=0;i<8;i++){let x=(i*257+t*7)%(VW+260)-130,y=95+i%3*71;g.fillStyle='rgba(255,255,255,.22)';g.beginPath();g.ellipse(x,y,92,18,0,0,6.283);g.fill();}return;
+    }
+    if (zdef.theme === 'cairnspine') {const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#273448');gr.addColorStop(.56,'#847e77');gr.addColorStop(1,'#d3ba92');g.fillStyle=gr;g.fillRect(0,0,VW,VH);g.fillStyle='#435262';for(let i=0;i<8;i++){let x=i*230-90,y=VH*.64;g.beginPath();g.moveTo(x-170,y+70);g.lineTo(x-40,y-80-i%3*28);g.lineTo(x+25,y-150-i%2*30);g.lineTo(x+160,y+70);g.fill();}return;}
+    if (zdef.theme === 'frostwake') {const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#193c69');gr.addColorStop(.58,'#5989ae');gr.addColorStop(1,'#d5ecf2');g.fillStyle=gr;g.fillRect(0,0,VW,VH);for(let i=0;i<6;i++){const x=i*270+t*9-240;g.strokeStyle=i%2?'rgba(137,250,195,.22)':'rgba(172,204,255,.19)';g.lineWidth=45;g.beginPath();g.moveTo(x,-30);g.bezierCurveTo(x+130,VH*.12,x-80,VH*.33,x+120,VH*.55);g.stroke();}for(let i=0;i<36;i++){const x=(i*151+t*11)%VW,y=(i*103+t*9)%VH;g.fillStyle='rgba(255,255,255,.57)';g.beginPath();g.arc(x,y,1+i%2,0,6.283);g.fill();}return;}
+    if (zdef.theme === 'lapiserg') {const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#5facc2');gr.addColorStop(.56,'#c8dfd4');gr.addColorStop(1,'#ffe5ae');g.fillStyle=gr;g.fillRect(0,0,VW,VH);g.fillStyle='#fff0ac';g.shadowColor='#ffe8b0';g.shadowBlur=42;g.beginPath();g.arc(VW*.78,VH*.23,44,0,6.283);g.fill();g.shadowBlur=0;for(let i=0;i<5;i++){const x=((i*323+t*3)%(VW+420))-210,y=VH*.64+i%2*55;g.fillStyle='rgba(190,132,85,.23)';g.beginPath();g.ellipse(x,y,210,32,0,0,6.283);g.fill();}return;}
+    if (zdef.theme === 'tanglecrown') {const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#69b6b1');gr.addColorStop(.58,'#bedac2');gr.addColorStop(1,'#f4e7b5');g.fillStyle=gr;g.fillRect(0,0,VW,VH);g.fillStyle='#fff1ae';g.shadowColor='#f4efbf';g.shadowBlur=40;g.beginPath();g.arc(VW*.76,VH*.19,37,0,6.283);g.fill();g.shadowBlur=0;for(let i=0;i<7;i++){const x=((i*277+t*4)%(VW+310))-155,y=80+(i%3)*54;g.fillStyle='rgba(50,126,96,.29)';g.beginPath();g.ellipse(x,y,126,20,0,0,6.283);g.fill();}return;}
+    if (zdef.theme === 'ribbonwild') {const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#79c9ed');gr.addColorStop(.54,'#c8b3ef');gr.addColorStop(1,'#ffe9bd');g.fillStyle=gr;g.fillRect(0,0,VW,VH);g.fillStyle='#fff4bd';g.shadowColor='#ffeaa7';g.shadowBlur=45;g.beginPath();g.arc(VW*.76,VH*.19,43,0,6.283);g.fill();g.shadowBlur=0;for(let i=0;i<8;i++){const x=((i*283+t*(5+i%3))%(VW+290))-145,y=66+(i%4)*70;g.fillStyle=['#f680ad','#ffe08b','#70d4d9','#bea1ed'][i%4];g.beginPath();g.moveTo(x,y-12);g.lineTo(x+17,y);g.lineTo(x,y+12);g.lineTo(x-17,y);g.closePath();g.fill();g.strokeStyle='rgba(255,255,255,.6)';g.beginPath();g.moveTo(x,y+12);g.lineTo(x-8,y+35);g.stroke();}return;}
     if (zdef.theme === 'sunward') { const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#69b7e8');gr.addColorStop(.6,'#b6def1');gr.addColorStop(1,'#e7f0d1');g.fillStyle=gr;g.fillRect(0,0,VW,VH);g.fillStyle='#fff1b0';g.shadowColor='#fff4c6';g.shadowBlur=48;g.beginPath();g.arc(VW*.78,VH*.18,43,0,6.283);g.fill();g.shadowBlur=0;for(let i=0;i<5;i++){const x=((i*321+t*7)%(VW+360))-180,y=65+(i%3)*77;g.fillStyle='rgba(255,255,255,.68)';g.beginPath();g.ellipse(x,y,90,19,0,0,6.283);g.ellipse(x-38,y+6,53,15,0,0,6.283);g.ellipse(x+48,y+5,59,17,0,0,6.283);g.fill();}return; }
     if (zdef.theme === 'stormglass') { const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#111b35');gr.addColorStop(.57,'#355a73');gr.addColorStop(1,'#8fb8b5');g.fillStyle=gr;g.fillRect(0,0,VW,VH);g.strokeStyle='rgba(217,250,247,.3)';g.lineWidth=4;g.beginPath();g.moveTo(1250,65);g.lineTo(1180,130);g.lineTo(1220,148);g.lineTo(1150,240);g.stroke();return; }
     if (zdef.theme === 'asterion') { const gr=g.createLinearGradient(0,0,0,VH);gr.addColorStop(0,'#111439');gr.addColorStop(.55,'#39547b');gr.addColorStop(1,'#a489ae');g.fillStyle=gr;g.fillRect(0,0,VW,VH);g.fillStyle='#fff2bd';g.shadowColor='#f4d9bb';g.shadowBlur=40;g.beginPath();g.arc(VW*.77,VH*.18,31,0,6.283);g.fill();g.shadowBlur=0;return; }
@@ -2115,7 +2281,7 @@
     if (p.look === 'exit') return VaultArt.exitPortal(g, sx, sy, t, t - clearedAt);
     if (p.look === 'maelstrom') { const d = ZONES[p.to]; return DeepArt.maelstrom(g, sx, sy, t, d?.levels ? `${d.name} · Lv ${d.levels[0]}–${d.levels[1]}` : d?.name || 'The Maelstrom', zdef.theme === 'deep'); }
     const dest = ZONES[p.to] || ZONES[0], warm = dest.theme === 'ember', cold = dest.theme === 'frost', bog = dest.theme === 'fen', gold = dest.theme === 'city', leaf = dest.theme === 'wyrd', dsky = dest.theme === 'sky', astral = dest.theme === 'astral', prism = dest.theme === 'prismwaste', orrery = dest.theme === 'orrery', moonspore = dest.theme === 'moonspore';
-    const hue = dest.theme === 'sunward' ? 103 : dest.theme === 'stormglass' ? 183 : moonspore ? 145 : orrery ? 42 : prism ? 32 : astral ? 268 : dsky ? 215 : warm ? 18 : cold ? 195 : bog ? 88 : gold ? 44 : leaf ? 28 : 165, half = 1.5;
+    const hue = dest.theme === 'worldtree' ? 116 : dest.theme === 'heartwood' ? 43 : dest.theme === 'lapiserg' ? 39 : dest.theme === 'frostwake' ? 184 : dest.theme === 'cairnspine' ? 42 : dest.theme === 'tanglecrown' ? 143 : dest.theme === 'ribbonwild' ? 327 : dest.theme === 'sunward' ? 103 : dest.theme === 'stormglass' ? 183 : moonspore ? 145 : orrery ? 42 : prism ? 32 : astral ? 268 : dsky ? 215 : warm ? 18 : cold ? 195 : bog ? 88 : gold ? 44 : leaf ? 28 : 165, half = 1.5;
     const post = (u) => {                                    // an iso column centred u world units along x
       const px = sx + u * TW / 2, py = sy + u * TH / 2, w = 17, h = 112;
       g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(px, py + 2, 30, 11, 0, 0, 6.283); g.fill();
@@ -2174,7 +2340,7 @@
     for (const o of objects) {
       if (o.kind === 'lava' || o.kind === 'water' || o.kind === 'post' || o.kind === 'void') continue;
       const [sx, sy] = w2s(o.x, o.y);
-      if (onScreen(sx, sy, 200)) { list.push({ d: o.x + o.y, o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
+      if (onScreen(sx, sy, Math.max(200, City.art[o.kind]?.box?.[3] || 0))) { list.push({ d: o.x + o.y, o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
     }
     for (const portal of zdef.portals) { if (portal.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y + (portal.look ? .3 : 0), portal, sx, sy }); }
     const escorted = id => { for (const r of remotePlayers.values()) if (r.escort && r.escort.npc === id && r.escort.owner === Online.id) return true; return false; };   // a stranded person walks with their rescuer
@@ -2404,13 +2570,15 @@
     g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(mask, 0, 0, w, h); g.restore();
   }
   function buildMini() {
-    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
-    g.fillStyle = moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : sunward ? '#5baa49' : stormglass ? '#263b51' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
+    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
+    g.fillStyle = moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
+    if (yearwheel) for(const [x,y,col] of [[0,0,'#d7edf5'],[72,0,'#bd7951'],[0,72,'#73bc77'],[72,72,'#dbb45a']]) {g.fillStyle=col;g.fillRect(x,y,72,72);}
+    if (ribbonwild) for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++){const hue=[344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];g.fillStyle=`hsl(${hue},57%,68%)`;g.fillRect(x*k,y*k,k+.5,k+.5);}
     if (sky || moonwell) { for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) { g.fillStyle = moonwell ? (map.dirt[y*MAP+x]?'#f8e8ad':'#a8d5cf') : map.dirt[y * MAP + x] ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .5, k + .5); } }
-    else for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = CathedralArt.isTheme(zdef.theme) ? CathedralArt.style(zdef.theme).left : deep ? '#c8c29a' : vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : sunward ? '#d8bd83' : stormglass ? '#9ebdc1' : moonspore ? '#a5c4a8' : orrery ? '#ad907b' : prism ? '#ead7a8' : astral ? '#d7bc84' : wyrd ? '#b89860' : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
+    else for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = CathedralArt.isTheme(zdef.theme) ? CathedralArt.style(zdef.theme).left : yearwheel ? ['#e8c498','#e9bd7d','#bf8c6b','#b8d9e9'][yearSeason(x,y)] : deep ? '#c8c29a' : vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : worldtree ? '#c19a60' : heartwood ? '#b58a5b' : frostwake ? '#8fc6d8' : cairn ? '#b49a75' : lapis ? '#efd49b' : tanglecrown ? '#b99a62' : ribbonwild ? '#ffe2a2' : sunward ? '#d8bd83' : stormglass ? '#9ebdc1' : moonspore ? '#a5c4a8' : orrery ? '#ad907b' : prism ? '#ead7a8' : astral ? '#d7bc84' : wyrd ? '#b89860' : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
     if (wyrd) { const gr = g.createLinearGradient(0, 0, 0, 144); gr.addColorStop(0, 'rgba(120,128,92,.95)'); gr.addColorStop(.42, 'rgba(120,128,92,.9)'); gr.addColorStop(.56, 'rgba(120,128,92,0)'); g.fillStyle = gr; g.fillRect(0, 0, 144, 144); for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = '#c4b290'; if (y < MAP * .5) g.fillRect(x * k, y * k, k + .5, k + .5); } }
     if (zdef.city && !city && zdef.theme !== 'nacre') for (const c of [zdef.city, ...(zdef.camps || [])]) {
-      g.fillStyle=deep ? '#4a7a82' : sky ? '#cdd2f2' : sunward ? '#76ad56' : stormglass ? '#55798a' : moonspore ? '#719b83' : orrery ? '#a58a77' : prism ? '#c5a58d' : astral ? '#8fa9b2' : wyrd ? '#8a6a44' : fen ? '#6a5238' : frost ? '#8fa6bd' : ember ? '#88705d' : '#d8cbb0'; g.fillRect(c.x0*k,c.y0*k,(c.x1-c.x0)*k,(c.y1-c.y0)*k);
+      g.fillStyle=yearwheel ? ['#a1d9a1','#ecc583','#d59468','#b7d9e8'][yearSeason(c.plaza.x,c.plaza.y)] : deep ? '#4a7a82' : sky ? '#cdd2f2' : worldtree ? '#77b475' : heartwood ? '#b18b5f' : frostwake ? '#aad9e7' : cairn ? '#bdab8e' : lapis ? '#e6bb78' : tanglecrown ? '#6dab70' : ribbonwild ? '#e9a8c7' : sunward ? '#76ad56' : stormglass ? '#55798a' : moonspore ? '#719b83' : orrery ? '#a58a77' : prism ? '#c5a58d' : astral ? '#8fa9b2' : wyrd ? '#8a6a44' : fen ? '#6a5238' : frost ? '#8fa6bd' : ember ? '#88705d' : '#d8cbb0'; g.fillRect(c.x0*k,c.y0*k,(c.x1-c.x0)*k,(c.y1-c.y0)*k);
       g.fillStyle=wyrd ? '#ffd9a0' : fen ? '#ffe08a' : frost ? '#ffd27a' : ember ? '#ffb65c' : '#68bcc6'; g.beginPath();g.arc(c.plaza.x*k,c.plaza.y*k,3,0,Math.PI*2);g.fill();
     }
     for (const o of objects) {
@@ -2419,6 +2587,14 @@
       if (orrery) { g.fillStyle = o.kind === 'clockwall' ? '#c8aa80' : o.kind === 'blackspire' ? '#778399' : o.kind === 'stillpoint' ? '#d3b683' : '#9b8693'; g.fillRect(o.x*k-.7,o.y*k-.7,1.4,1.4); continue; }
       if (moonspore) { g.fillStyle = o.kind === 'mooncaps' ? '#c4f4af' : o.kind === 'gloomstalk' ? '#426e62' : o.kind === 'lamphouse' ? '#9ac3a7' : '#83bfa1'; g.fillRect(o.x*k-.7,o.y*k-.7,1.4,1.4); continue; }
       if (zdef.theme === 'stormglass') {g.fillStyle=o.kind==='eye_arch'?'#d5f6f2':o.kind==='meetingstone'?'#59d9ff':o.kind==='stormlamp'?'#9fe8ee':'#729ba6';g.fillRect(o.x*k-.7,o.y*k-.7,1.4,1.4);continue;}
+      if (worldtree) {g.fillStyle=o.kind==='worldheart_trunk'?'#d5ae6e':o.kind==='hollow_arch'?'#e3d296':o.kind==='hanging_pod'?'#93cc83':'#5db979';g.fillRect(o.x*k-1,o.y*k-1,2,2);continue;}
+      if (heartwood) {g.fillStyle=o.kind==='heartwood_vault'?'#ffe09f':o.kind==='heartwood_core'?'#a4e5a5':'#c59a68';g.fillRect(o.x*k-1,o.y*k-1,2,2);continue;}
+      if (yearwheel) {g.fillStyle=o.kind.includes('gate')?'#ffe9b7':o.kind.includes('lodge')?'#f3e2b0':o.kind.includes('pool')?'#80dedc':['#87bf8d','#f4bb65','#d77d53','#a8dce9'][yearSeason(o.x,o.y)];g.fillRect(o.x*k-1,o.y*k-1,2,2);continue;}
+      if (cairn) {g.fillStyle=o.kind==='cairn_thunder_gate'?'#e7c180':o.kind==='cairn_dead_tree'?'#d8d3c5':o.kind==='cairn_boulder'?'#4a5661':'#a39785';g.fillRect(o.x*k-1,o.y*k-1,2,2);continue;}
+      if (frostwake) {g.fillStyle=o.kind==='frostwake_crevasse'?'#27769f':o.kind==='frostwake_frozen_pool'?'#68b7d0':o.kind==='frostwake_snow_pine'?'#438496':o.kind==='frostwake_obelisk'?'#9af1d3':'#c6e8ef';g.fillRect(o.x*k-1,o.y*k-1,2,2);continue;}
+      if (lapis) {g.fillStyle=o.kind==='lapis_astrolabe'?'#e9d2a3':o.kind==='lapis_oasis'?'#56c2c5':o.kind==='lapis_date_palm'?'#6a9c6d':'#d8ae79';g.fillRect(o.x*k-1,o.y*k-1,2,2);continue;}
+      if (tanglecrown) {g.fillStyle=o.kind==='rain_crown_temple'?'#f1d78b':o.kind==='jungle_water'||o.kind==='jade_pool'?'#59bac0':o.kind==='kapok_tree'||o.kind==='strangler_fig'?'#255d4b':o.kind==='banyan_lodge'?'#c4ab77':'#70b77c';g.fillRect(o.x*k-.9,o.y*k-.9,1.8,1.8);continue;}
+      if (ribbonwild) {g.fillStyle=o.kind==='grand_pavilion_gate'?'#fff0b5':o.kind==='silk_pavilion'?'#f6d166':o.kind==='fan_topiary'?'#52bfc9':o.kind==='parade_standard'||o.kind==='mask_dais'?'#e670a0':'#edb7cc';g.fillRect(o.x*k-.9,o.y*k-.9,1.8,1.8);continue;}
       if (sunward) {if(o.kind==='water'){g.fillStyle='#73bad0';g.beginPath();g.arc(o.x*k,o.y*k,Math.max(1.3,o.r*k),0,6.283);g.fill();continue;}g.fillStyle=o.kind==='elder_hollow_gate'?'#ffe28a':o.kind==='meetingstone'?'#59d9ff':o.kind.includes('tree')?'#316e35':o.kind==='vale_cottage'||o.kind==='watermill'?'#f0d7a2':'#8cac56';g.fillRect(o.x*k-.8,o.y*k-.8,1.6,1.6);continue;}
       if (prism) { g.fillStyle = o.kind === 'mirrorwall' ? '#e8d9ef' : o.kind === 'sunspire' ? '#ffe3ae' : o.kind === 'shade_tent' ? '#a5798f' : '#a9909a'; g.fillRect(o.x*k-.7,o.y*k-.7,1.4,1.4); continue; }
       if (astral) { g.fillStyle = o.kind === 'crystal' || o.kind === 'obelisk' ? '#a4e9e3' : o.kind === 'astraltree' ? '#244f64' : o.kind === 'starstone' ? '#637994' : o.kind === 'astrolamp' ? '#ffe2a0' : o.kind === 'starbloom' ? '#d8afe9' : '#5eaa91'; g.fillRect(o.x * k - .55, o.y * k - .55, 1.1, 1.1); continue; }
@@ -2483,7 +2659,7 @@
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
       if (o.slimeSprites) loadSlimeSprites(o.slimeSprites);
-      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadSkySprites(); loadDeepSprites(); loadAstralSprites(); loadPrismSprites(); loadOrrerySprites(); loadMoonsporeSprites(); loadStormglassSprites(); loadSunwardSprites(); loadMoonwellSprites(); loadMoonwellGardenSprites(); loadVaultSprites(); loadCathedralSprites();
+      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadSkySprites(); loadDeepSprites(); loadAstralSprites(); loadPrismSprites(); loadOrrerySprites(); loadMoonsporeSprites(); loadStormglassSprites(); loadSunwardSprites(); loadRibbonwildSprites(); loadTanglecrownSprites(); loadWorldheartSprites(); loadLapisSprites(); loadFrostwakeSprites(); loadCairnSprites(); loadYearSprites(); loadMoonwellSprites(); loadMoonwellGardenSprites(); loadVaultSprites(); loadCathedralSprites();
       if (!Field._bound) {
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize);
@@ -2555,7 +2731,7 @@
     get hunterSprites() { return isHunter() ? mageSpr : null; },
     get hero() { return hero; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
-    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
+    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
     _debug: { get effects() { return effects; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll) },
   };

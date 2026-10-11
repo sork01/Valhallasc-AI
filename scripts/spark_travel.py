@@ -23,7 +23,17 @@ STOPS = [
     ('Lamplight Refuge', 'travel_lamplight', 44, 119, ['travel_stillpoint', 'travel_asterion']),
     ('Asterion', 'travel_asterion', 90, 114, ['travel_lamplight', 'travel_breakwater']),
     ('Breakwater Camp', 'travel_breakwater', 42, 119, ['travel_asterion', 'travel_millbridge']),
-    ('Millbridge', 'travel_millbridge', 46, 118, ['travel_breakwater']),
+    ('Millbridge', 'travel_millbridge', 46, 118, ['travel_breakwater', 'travel_jubilee']),
+    ('Jubilee Crossroads', 'travel_jubilee', 42, 85, ['travel_millbridge', 'travel_banyan']),
+    ('Banyan Landing', 'travel_banyan', 36, 124, ['travel_jubilee', 'travel_veyrroot']),
+    ('Veyrroot Canopy', 'travel_veyrroot', 82, 96, ['travel_banyan', 'travel_azure_wells']),
+    ('Azure Wells', 'travel_azure_wells', 44, 135, ['travel_veyrroot', 'travel_frostwake']),
+    ('Frostwake Station', 'travel_frostwake', 46, 143, ['travel_azure_wells', 'travel_boulderwatch']),
+    ('Boulderwatch', 'travel_boulderwatch', 47, 153, ['travel_frostwake', 'travel_springmere']),
+    ('Springmere', 'travel_springmere', 84, 326, ['travel_boulderwatch', 'travel_solhaven', 'travel_rimehold']),
+    ('Solhaven', 'travel_solhaven', 328, 318, ['travel_springmere', 'travel_harvestwatch']),
+    ('Harvestwatch', 'travel_harvestwatch', 329, 80, ['travel_solhaven', 'travel_rimehold']),
+    ('Rimehold', 'travel_rimehold', 86, 80, ['travel_harvestwatch', 'travel_springmere']),
 ]
 
 
@@ -44,6 +54,21 @@ def ensure(world):
                     master['look'].update(species='merfolk', female=True, tail='#81d6cc', skin='#abd4e4')
                 if name == 'Millbridge':
                     master.update(name='Travel Master Jori', role='Millbridge courier · Spark Travel', art='sun_travel')
+                if name == 'Jubilee Crossroads':
+                    master.update(name='Travel Master Luma', role='Festival courier · Spark Travel', art='ribbon_travel')
+                if name == 'Banyan Landing':
+                    master.update(name='Travel Master Suri', role='Canopy courier · Spark Travel', art='tangle_travel')
+                if name == 'Veyrroot Canopy':
+                    master.update(name='Travel Master Lio', role='Branchwing courier · Spark Travel', art='heart_travel')
+                if name == 'Azure Wells':
+                    master.update(name='Travel Master Nadir', role='Caravan courier · Spark Travel', art='lapis_travel')
+                if name == 'Frostwake Station':
+                    master.update(name='Travel Master Eira', role='Aurora courier · Spark Travel', art='frostwake_travel')
+                if name == 'Boulderwatch':
+                    master.update(name='Travel Master Asta', role='High pass courier · Spark Travel', art='cairn_travel')
+                for stop, person, season in [('Springmere','Linn','sp'),('Solhaven','Taro','su'),('Harvestwatch','Maren','au'),('Rimehold','Eirik','wi')]:
+                    if name == stop:
+                        master.update(name='Travel Master '+person, role='Yearwheel courier · Spark Travel', art='year_'+season+'_travel')
                 folk = area.setdefault('npcs', [])
                 old = next((i for i, n in enumerate(folk) if n['id'] == id_), None)
                 if old is None:

@@ -304,6 +304,9 @@ def main():
     open_shore_gate(world['zones'][18])
     world['zones'].append(build())
     world['zones'].extend(later)
+    if any(z.get('name') == 'The Ribbonwild' for z in later):
+        from generate_ribbonwild import open_sunward_gate
+        open_sunward_gate(world['zones'][ZONE - 1])
     spark_travel.ensure(world)
     MAP.write_text(json.dumps(world, indent=2) + '\n')
     items = json.loads(ITEMS.read_text())

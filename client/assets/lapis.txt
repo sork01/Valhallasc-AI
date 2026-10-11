@@ -1,0 +1,68 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "sandhopper",
+    "dunefennec",
+    "glassscorpion",
+    "sunvulture",
+    "dunecolossus",
+    "mirageroc",
+    "lapis_keeper",
+    "lapis_cartographer",
+    "lapis_warden",
+    "lapis_seer",
+    "lapis_travel"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 10,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 10,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 10,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "sandhopper": "f95833b0835f7760",
+    "dunefennec": "f7b43366ee8358c5",
+    "glassscorpion": "ee77a206139657cc",
+    "sunvulture": "8408d0fbd3ad04e0",
+    "dunecolossus": "d510c6ff48a78d2c",
+    "mirageroc": "9d018f3556d65105",
+    "lapis_keeper": "43b377e1a0bc8794",
+    "lapis_cartographer": "af61244b322bcdde",
+    "lapis_warden": "c9fe3d1af68fed67",
+    "lapis_seer": "1c9dc5d148fef101",
+    "lapis_travel": "a92127d3650b2884"
+  }
+}

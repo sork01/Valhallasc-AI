@@ -1,0 +1,62 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "sapbeetle",
+    "lanternhornet",
+    "mosslemur",
+    "barkmimic",
+    "heart_matriarch",
+    "heart_archivist",
+    "heart_oracle",
+    "heart_travel"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 10,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 10,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 10,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "sapbeetle": "5fc8adf86c22bd16",
+    "lanternhornet": "5b4c2c28bfd37c04",
+    "mosslemur": "200c3cd6c79f6321",
+    "barkmimic": "1e53c8780a272ad3",
+    "heart_matriarch": "7c7f60627f9d41c5",
+    "heart_archivist": "30ad2eb728083731",
+    "heart_oracle": "c5d201c1e41639b7",
+    "heart_travel": "7aa49aee7bf4c409"
+  }
+}

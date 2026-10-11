@@ -18,7 +18,7 @@ pub struct Item {
     pub name: String,
     pub kind: String,
     pub rarity: String,
-    /// Character level needed to wear the piece (1 or a five-level step through 60). Wearing it earlier is refused, and
+    /// Character level needed to wear the piece (1 or a five-level step through 80). Wearing it earlier is refused, and
     /// a piece worn above the character's level (a level lost to a death) adds nothing until the level is back.
     #[serde(default = "first_level", rename = "requiredLevel")]
     pub required_level: u32,
@@ -206,6 +206,58 @@ pub fn material(kind: &str) -> &'static str {
         "spadebadger" => "badger_claw",
         "honeyjaw" => "honeyjaw_comb",
         "wickerwarden" => "wicker_heart",
+        "ribbongecko" => "ribbon_tail",
+        "balloonbeetle" => "balloon_silk",
+        "paintedmacaw" => "macaw_plume",
+        "jesterling" => "jester_bell",
+        "paradegryphon" => "gryphon_feather",
+        "maskcolossus" => "masquerade_mask",
+        "orchidmantis" => "mantis_petals",
+        "canopyglider" => "glider_membrane",
+        "poolcaiman" => "caiman_scale",
+        "drumgorilla" => "gorilla_drumskin",
+        "jadeanaconda" => "anaconda_jade",
+        "crownjaguar" => "jaguar_crown",
+        "sapbeetle" => "sapbeetle_resin",
+        "lanternhornet" => "hornet_amber",
+        "mosslemur" => "mosslemur_fur",
+        "barkmimic" => "barkmimic_chip",
+        "sandhopper" => "sandhopper_chitin",
+        "dunefennec" => "fennec_fur",
+        "glassscorpion" => "scorpion_glass",
+        "sunvulture" => "vulture_quill",
+        "dunecolossus" => "colossus_core",
+        "mirageroc" => "roc_plume",
+        "snowhare" => "snowhare_fur",
+        "iceotter" => "iceotter_pelt",
+        "frostheron" => "heron_feather",
+        "glaciercrab" => "glaciercrab_shell",
+        "bellmammoth" => "mammoth_bell",
+        "auroramanta" => "manta_aurora",
+        "crevasseleviathan" => "leviathan_fang",
+        "screeferret" => "screeferret_pelt",
+        "stoneibex" => "ibex_horn",
+        "slateraven" => "slate_raven_feather",
+        "ridgeadder" => "ridgeadder_scale",
+        "cairnbehemoth" => "behemoth_heartstone",
+        "whitebarktitan" => "whitebark_core",
+        "stormcondor" => "stormcondor_plume",
+        "brooknewt" => "newt_ribbon",
+        "sundarter" => "sundarter_scale",
+        "acornmimic" => "amber_acorn",
+        "snowstoat" => "stoat_silverfur",
+        "bloomtortoise" => "bloom_shell",
+        "petalchimera" => "chimera_petal",
+        "rainseraph" => "seraph_rainfeather",
+        "glasslion" => "glasslion_mane",
+        "sunwheel" => "sunwheel_cog",
+        "firephoenix" => "phoenix_ember",
+        "lanternowl" => "lanternowl_eye",
+        "harvestreaper" => "reaper_scythe_shard",
+        "ambermantis" => "amber_mantis_claw",
+        "rimesaber" => "rimesaber_fang",
+        "snowgiant" => "snowgiant_heart",
+        "longnightwyrm" => "longnight_scale",
         _ => "slime_gel",
     }
 }
@@ -271,6 +323,30 @@ pub fn is_elite(kind: &str) -> bool {
             | "maelstromheart"
             | "honeyjaw"
             | "wickerwarden"
+            | "paradegryphon"
+            | "maskcolossus"
+            | "jadeanaconda"
+            | "crownjaguar"
+            | "dunecolossus"
+            | "mirageroc"
+            | "bellmammoth"
+            | "auroramanta"
+            | "crevasseleviathan"
+            | "cairnbehemoth"
+            | "whitebarktitan"
+            | "stormcondor"
+            | "bloomtortoise"
+            | "petalchimera"
+            | "rainseraph"
+            | "glasslion"
+            | "sunwheel"
+            | "firephoenix"
+            | "lanternowl"
+            | "harvestreaper"
+            | "ambermantis"
+            | "rimesaber"
+            | "snowgiant"
+            | "longnightwyrm"
     ) || is_vault_enemy(kind)
 }
 /// Everything that lives in the Undervault: the trash packs and the four bosses are all elites.
@@ -445,7 +521,11 @@ pub fn equipment_of_rarity(rarity: &str, level: u32, choice: f64) -> Option<&'st
                 && i.required_level <= limit
                 && (level < 50
                     || i.required_level
-                        >= (if level >= 65 {
+                        >= (if level >= 75 {
+                            75
+                        } else if level >= 70 {
+                            70
+                        } else if level >= 65 {
                             65
                         } else if level >= 55 {
                             55

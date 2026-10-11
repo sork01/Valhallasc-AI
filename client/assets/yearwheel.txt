@@ -1,0 +1,94 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "brooknewt",
+    "sundarter",
+    "acornmimic",
+    "snowstoat",
+    "bloomtortoise",
+    "petalchimera",
+    "rainseraph",
+    "glasslion",
+    "sunwheel",
+    "firephoenix",
+    "lanternowl",
+    "harvestreaper",
+    "ambermantis",
+    "rimesaber",
+    "snowgiant",
+    "longnightwyrm",
+    "year_sp_keeper",
+    "year_su_keeper",
+    "year_au_keeper",
+    "year_wi_keeper",
+    "year_sp_travel",
+    "year_su_travel",
+    "year_au_travel",
+    "year_wi_travel"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 10,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 10,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 10,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "brooknewt": "62f9d052c00981af",
+    "sundarter": "6bb351e4380fb298",
+    "acornmimic": "e015961a6b213e02",
+    "snowstoat": "828a0f907fdd1882",
+    "bloomtortoise": "4f290323735ecad5",
+    "petalchimera": "406fe779b773f834",
+    "rainseraph": "c176a5d9d95fb1e7",
+    "glasslion": "e7cc7cd001d4a2de",
+    "sunwheel": "ab33c1ea51851609",
+    "firephoenix": "53a4882671b0c5fd",
+    "lanternowl": "1aa3c487fc7c0038",
+    "harvestreaper": "5b68e72e8c8973b5",
+    "ambermantis": "483b873b067a46ab",
+    "rimesaber": "2828af5ecaf2d752",
+    "snowgiant": "e315ce210010169a",
+    "longnightwyrm": "d2224f5848f4d5ac",
+    "year_sp_keeper": "6f27a917d80cb0dc",
+    "year_su_keeper": "ea3156d29724790f",
+    "year_au_keeper": "30226c91144c914e",
+    "year_wi_keeper": "d6485420d81ce2ea",
+    "year_sp_travel": "96925d427e410203",
+    "year_su_travel": "318c7ac2fa7b1a24",
+    "year_au_travel": "8d2c2c7c5672f557",
+    "year_wi_travel": "9307a4cade00d21b"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "snowhare",
+    "iceotter",
+    "frostheron",
+    "glaciercrab",
+    "bellmammoth",
+    "auroramanta",
+    "crevasseleviathan",
+    "frostwake_captain",
+    "frostwake_surveyor",
+    "frostwake_bellkeeper",
+    "frostwake_skywatcher",
+    "frostwake_ribkeeper",
+    "frostwake_travel"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 10,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 10,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 10,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "snowhare": "20eeb3a531d3e395",
+    "iceotter": "1325d9a929f05d23",
+    "frostheron": "fd9b8d7661387c92",
+    "glaciercrab": "a6a850f3e25436a8",
+    "bellmammoth": "009a9b678e0ad551",
+    "auroramanta": "063d4cc3a8852d30",
+    "crevasseleviathan": "71a4a5d328208695",
+    "frostwake_captain": "bf27ed8cb9300880",
+    "frostwake_surveyor": "c2347fe51279fc7e",
+    "frostwake_bellkeeper": "6c24bd9931af3c50",
+    "frostwake_skywatcher": "a5c5b843a1fe859c",
+    "frostwake_ribkeeper": "aacfb4a024b4cb41",
+    "frostwake_travel": "e5e53a1a152c3a2f"
+  }
+}

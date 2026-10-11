@@ -33,6 +33,10 @@ async function talk(w, bot, npcId, offer) {
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
 const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60, dew_moth: 60, lumen_eel: 60, rootbell: 60, tideglass_heron: 60, hourpetal_stag: 60, moonskein_weaver: 60, moonwell_echo: 60, saltclaw: 60, stormgull: 61, glassray: 62, breakersentinel: 64, maelstromheart: 65, meadowhare: 65, sunbacksnail: 66, brushfox: 67, spadebadger: 68, honeyjaw: 69, wickerwarden: 70 };
+Object.assign(DEFAULT_LEVELS, { sandhopper: 80, dunefennec: 81, glassscorpion: 82, sunvulture: 83, dunecolossus: 84, mirageroc: 85 });
+Object.assign(DEFAULT_LEVELS, { snowhare: 85, iceotter: 86, frostheron: 87, glaciercrab: 88, bellmammoth: 88, auroramanta: 89, crevasseleviathan: 90 });
+Object.assign(DEFAULT_LEVELS, { screeferret: 90, stoneibex: 91, slateraven: 92, ridgeadder: 93, cairnbehemoth: 93, whitebarktitan: 94, stormcondor: 95 });
+Object.assign(DEFAULT_LEVELS, { brooknewt: 95, sundarter: 96, acornmimic: 97, snowstoat: 98, bloomtortoise: 95, petalchimera: 96, rainseraph: 97, glasslion: 96, sunwheel: 97, firephoenix: 98, lanternowl: 97, harvestreaper: 98, ambermantis: 99, rimesaber: 97, snowgiant: 98, longnightwyrm: 99 });
 Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'world/cathedral.txt'), 'utf8')).map(e => [e.kind, e.level])));
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
@@ -2479,7 +2483,7 @@ const scenarios = {
       const down = sky.portals.find(p => p.id === 'maelstrom_down'), up = deep.portals.find(p => p.id === 'maelstrom_up');
       const NAME = "Rán's Deep";
       check(down && down.to === 8 && up && up.to === 7 && deep.name === NAME && deep.levels.join() === '35,40' && deep.size === 176 && deep.theme === 'deep', 'The Roc\'s Eyrie has a Maelstrom to zone 8, the 176-tile Ran\'s Deep of levels 35-40, which has the Maelstrom back up');
-      check(deep.city.name === 'Keelhaven' && !deep.camps && deep.npcs.length === 8 && deep.quests.length === 24, 'The zone has one hub, Keelhaven, eight people (seven and a travel master) and 24 quests');
+      check(deep.city.name === 'Keelhaven' && !deep.camps && deep.npcs.length === 8 && deep.quests.length === 25, 'The zone has one hub, Keelhaven, eight people (seven and a travel master) and 25 quests');
       check(deep.objects.filter(o => o.kind === 'reefwall').length > 300 && deep.places.filter(p => p.chain).length === 12, 'The Net is built of hundreds of coral wall pieces, and twelve tidebells stand in three chains');
       // Staging only: stand on the Eyrie beside the spout. The step into the Maelstrom is real.
       await kit.teleport(w, bot, { zone: 7, x: down.x, y: down.y + 5 });
@@ -2560,14 +2564,14 @@ const scenarios = {
   },
 
   deep_quests: {
-    description: 'Every ordinary quest of Keelhaven played in dependency order through the real accept and claim paths (talk, kill, bring, visit and the new chime objective) with exact XP and gold: each bell chain is really rung in real time (a chain rung too slowly fails and its count falls as the bells go silent); repeatable bounties pay twice; both group quests hire their fighters; the Ghostmaw has no quest; the progression quest arrives by itself.',
+    description: 'Every ordinary quest of Keelhaven played in dependency order through the real accept and claim paths (talk, kill, bring, visit and the new chime objective) with exact XP and gold: each bell chain is really rung in real time (a chain rung too slowly fails and its count falls as the bells go silent); repeatable bounties pay twice; all three group quests hire their fighters; the progression quest arrives by itself.',
     startLevel: 35, godMode: true, levelSpread: 0,
     async run(w, check) {
       const bot = 'Bellringer';
       await w.connect({ bot, class: 'warrior' });
       await kit.setupCharacter(w, bot, { level: 40, gold: 9000 });
       const defs = deep.quests, npcs = deep.npcs;
-      check(npcs.length === 8 && defs.length === 24 && defs.every(q => q.id.startsWith('deep_')), `Keelhaven holds ${npcs.length} people and ${defs.length} quests`);
+      check(npcs.length === 8 && defs.length === 25 && defs.every(q => q.id.startsWith('deep_')), `Keelhaven holds ${npcs.length} people and ${defs.length} quests`);
       const find = id => defs.find(q => q.id === id);
       const placeOf = id => deep.places.find(p => p.id === id);
       const state = id => quest(w, bot, id);
@@ -2663,7 +2667,7 @@ const scenarios = {
         return q;
       }
       // Dependency order: every ordinary quest, none of the elite quests, the capstone or the progression quest.
-      const skip = new Set(['deep_kraken', 'deep_captain', 'deep_vanguard', 'deep_onward']);
+      const skip = new Set(['deep_kraken', 'deep_captain', 'deep_ghostmaw', 'deep_vanguard', 'deep_onward']);
       const order = [], seen = new Set();
       const visit = q => { if (seen.has(q.id) || skip.has(q.id)) return; seen.add(q.id); if (q.requires && !skip.has(q.requires)) visit(find(q.requires)); order.push(q); };
       defs.forEach(visit);
@@ -2692,9 +2696,9 @@ const scenarios = {
         await w.waitFor(() => state('deep_patrol').completions === before.completions + 1, 5000, 'Patrol paid');
         check(w.player(bot).gold === before.gold + rep.rewardGold, `The repeatable patrol pays ${rep.rewardGold} gold again (round ${round + 1})`);
       }
-      // The two group quests: the giver hires exactly the missing fighters, up to the quest's party size.
+      // The three group quests: the giver hires exactly the missing fighters, up to the quest's party size.
       const mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name)).length;
-      for (const [id, size, kind, reward] of [['deep_captain', 3, 'hvitserk', 'accessory_amber_l20_blue'], ['deep_kraken', 5, 'kraken', 'necklace_moonstone_l20_purple']]) {
+      for (const [id, size, kind, reward] of [['deep_captain', 3, 'hvitserk', 'accessory_amber_l20_blue'], ['deep_ghostmaw', 3, 'ghostmaw', 'necklace_moonstone_l40_blue'], ['deep_kraken', 5, 'kraken', 'necklace_moonstone_l20_purple']]) {
         const g = find(id);
         await kit.teleport(w, bot, { npc: g.npc });
         await kit.talkTo(w, bot, g.npc, `quest:accept:${id}`);
@@ -2705,7 +2709,7 @@ const scenarios = {
         await kit.talkTo(w, bot, g.npc, 'merc_dismiss');
         await w.waitFor(() => mercs() === 0, 8000, 'Send them away');
       }
-      check(!defs.some(q => q.objectives.some(o => o.target === 'ghostmaw')) && w.snapshot.slimes.some(s => s.kind === 'ghostmaw' && s.elite), 'The Ghostmaw is an elite no quest asks for');
+      check(defs.some(q => q.id === 'deep_ghostmaw' && q.objectives.some(o => o.target === 'ghostmaw')) && w.snapshot.slimes.some(s => s.kind === 'ghostmaw' && s.elite), 'The Ghostmaw has a dedicated elite quest');
       // Persistence.
       await w.restart();
       check(['deep_welcome', 'deep_draugr', 'deep_harbour', 'deep_net', 'deep_rans', 'deep_onward'].every(id => state(id)?.claimed) && state('deep_patrol').completions === 3, 'Every claimed quest and the repeatable\'s count survive a restart');
@@ -3296,6 +3300,349 @@ const scenarios = {
     },
   },
 
+  ribbonwild: {
+    description: 'Ribbonwild: reciprocal parade gate, Jubilee hub, PixelFlow cast, two elite quests, sealed pavilion and Spark Travel.',
+    startLevel: 75,
+    levelSpread: 0,
+    async run(w,check) {
+      const bot='JubileeRunner',area=map.zones[20];
+      await w.connect({bot,class:'warrior'});
+      const gate=map.zones[19].portals.find(p=>p.id==='sun_ribbon_gate');
+      const back=area.portals.find(p=>p.id==='ribbon_sun_gate');
+      check(gate?.to===21&&back?.to===20,'The Parade Arch has reciprocal gates');
+      check(area.theme==='ribbonwild'&&area.levels.join(',')==='70,75'&&area.slimes.length===42&&area.quests.length===9,'Colorful zone, enemies and quests load');
+      check(area.futureInstance?.status==='sealed'&&area.futureInstance?.name==='The Thousandfold Pavilion'&&area.portals.length===1,'The pavilion is a sealed instance entrance');
+      await kit.teleport(w,bot,{zone:20,x:115,y:24});
+      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===21,15000,'Enter Ribbonwild');
+      await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),area.spawn)<2,'Arrival lies outside the return gate');
+      await kit.teleport(w,bot,{npc:'travel_jubilee'});
+      const travel=await kit.talkTo(w,bot,'travel_jubilee');
+      check(travel.travelStops?.includes('travel_jubilee')&&area.npcs.find(n=>n.id==='travel_jubilee').travelLinks.includes('travel_millbridge'),'Jubilee Travel Master discovers Millbridge');
+      await kit.teleport(w,bot,{npc:'ribbon_host'});
+      await kit.talkTo(w,bot,'ribbon_host','quest:accept:ribbon_welcome');
+      for(const npc of ['ribbon_medic','ribbon_tailor','ribbon_naturalist']){await kit.teleport(w,bot,{npc});await kit.talkTo(w,bot,npc);}
+      await w.waitFor(()=>quest(w,bot,'ribbon_welcome')?.counts.every(n=>n===1),5000,'Meet Jubilee crew');
+      await kit.teleport(w,bot,{npc:'ribbon_host'});
+      await kit.talkTo(w,bot,'ribbon_host','quest:claim:ribbon_welcome');
+      await w.waitFor(()=>quest(w,bot,'ribbon_welcome')?.claimed,5000,'Claim Jubilee introduction');
+      check(quest(w,bot,'ribbon_welcome')?.claimed,'Hub introduction claims');
+      for(const [kind,material] of [['ribbongecko','ribbon_tail'],['balloonbeetle','balloon_silk'],['paintedmacaw','macaw_plume'],['jesterling','jester_bell']]){
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} drop`);
+        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} grants level XP`);
+      }
+      for(const [kind,id,giver,material,reward] of [
+        ['paradegryphon','ribbon_gryphon','ribbon_naturalist','gryphon_feather','accessory_amber_l75_blue'],
+        ['maskcolossus','ribbon_colossus','ribbon_keeper','masquerade_mask','necklace_moonstone_l75_blue'],
+      ]){
+        await w.debug(bot,{op:'quest',id:kind==='paradegryphon'?'ribbon_macaws':'ribbon_jesters',action:'finish'});
+        await kit.teleport(w,bot,{npc:giver});await kit.talkTo(w,bot,giver,`quest:accept:${id}`);
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>quest(w,bot,id)?.counts[0]===1,5000,`${id} kill`);
+        check(w.views.get(bot).drops.some(d=>d.item===material),`${kind} drops named material`);
+        check(w.views.get(bot).drops.some(d=>kit.items.some(i=>i.id===d.item&&i.rarity==='uncommon'&&i.requiredLevel>=70)),`${kind} guarantees green gear`);
+        await kit.teleport(w,bot,{npc:giver});await kit.talkTo(w,bot,giver,`quest:claim:${id}`);
+        await w.waitFor(()=>quest(w,bot,id)?.claimed,5000,`${id} claimed`);
+        check(w.player(bot).inventory.some(i=>i.item===reward),`${kind} awards level-75 blue gear`);
+      }
+      await kit.teleport(w,bot,{npc:'ribbon_keeper'});
+      await kit.talkTo(w,bot,'ribbon_keeper','quest:accept:ribbon_curtain');
+      await kit.teleport(w,bot,{zone:21,x:112,y:65});
+      await w.waitFor(()=>quest(w,bot,'ribbon_curtain')?.counts[0]===1,5000,'Inspect pavilion');
+      await kit.teleport(w,bot,{npc:'ribbon_stone'});await kit.talkTo(w,bot,'ribbon_stone');
+      await w.waitFor(()=>quest(w,bot,'ribbon_curtain')?.counts.every(n=>n===1),5000,'Consult Meeting Stone');
+      check(area.portals.every(p=>p.to!==area.futureInstance?.zone),'Pavilion remains sealed');
+      await w.restart();
+      check(w.player(bot).zone===21&&quest(w,bot,'ribbon_colossus').claimed&&w.player(bot).travelStops.includes('travel_jubilee'),'Zone, elite claim and Travel Master persist');
+      await kit.teleport(w,bot,{zone:21,x:12,y:70});
+      await w.action(bot,{type:'move',x:back.x,y:back.y});
+      await w.waitFor(()=>w.player(bot).zone===20,15000,'Return to Sunward');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrives outside gate');
+    },
+  },
+
+  tanglecrown: {
+    description: 'Tanglecrown: Rootway gates, Banyan hub, six named drops, two elite quests, sealed temple and travel discovery.',
+    startLevel: 80,
+    levelSpread: 0,
+    async run(w,check) {
+      const bot='CanopyRunner',area=map.zones[21];
+      await w.connect({bot,class:'warrior'});
+      const gate=map.zones[20].portals.find(p=>p.id==='ribbon_tangle_gate');
+      const back=area.portals.find(p=>p.id==='tangle_ribbon_gate');
+      check(gate?.to===22&&back?.to===21,'The Rootway has reciprocal gates');
+      check(area.theme==='tanglecrown'&&area.levels.join(',')==='75,80'&&area.slimes.length===42&&area.quests.length===9,'Jungle zone, monsters and quests load');
+      check(area.futureInstance?.status==='sealed'&&area.futureInstance?.name==='Temple of the Rain Crown'&&area.portals.length===1,'The Rain Crown Temple is sealed');
+      await kit.teleport(w,bot,{zone:21,x:124,y:117});
+      await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===22,15000,'Enter Tanglecrown');
+      await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),area.spawn)<2,'Arrival lies outside return gate');
+      await w.connect({bot:'MeadowWitness',class:'mage'});
+      check(w.views.get('MeadowWitness').slimes.every(s=>s.zone===0)&&w.views.get(bot).slimes.every(s=>s.zone===22),'Zone snapshots stay isolated');
+      await kit.teleport(w,bot,{npc:'travel_banyan'});
+      const travel=await kit.talkTo(w,bot,'travel_banyan');
+      check(travel.travelStops?.includes('travel_banyan')&&area.npcs.find(n=>n.id==='travel_banyan').travelLinks.includes('travel_jubilee'),'Banyan master discovers Jubilee');
+      await kit.teleport(w,bot,{npc:'tangle_warden'});
+      await kit.talkTo(w,bot,'tangle_warden','quest:accept:tangle_welcome');
+      for(const npc of ['tangle_medic','tangle_botanist','tangle_tracker']){await kit.teleport(w,bot,{npc});await kit.talkTo(w,bot,npc);}
+      await w.waitFor(()=>quest(w,bot,'tangle_welcome')?.counts.every(n=>n===1),5000,'Meet landing crew');
+      await kit.teleport(w,bot,{npc:'tangle_warden'});await kit.talkTo(w,bot,'tangle_warden','quest:claim:tangle_welcome');
+      await w.waitFor(()=>quest(w,bot,'tangle_welcome')?.claimed,5000,'Claim landing introduction');
+      check(quest(w,bot,'tangle_welcome')?.claimed,'Banyan introduction claims');
+      for(const [kind,material] of [['orchidmantis','mantis_petals'],['canopyglider','glider_membrane'],['poolcaiman','caiman_scale'],['drumgorilla','gorilla_drumskin']]){
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} drop`);
+        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} grants level XP`);
+      }
+      for(const [kind,id,giver,prereq,material,reward] of [
+        ['jadeanaconda','tangle_anaconda','tangle_botanist','tangle_caimans','anaconda_jade','accessory_amber_l80_blue'],
+        ['crownjaguar','tangle_jaguar','tangle_tracker','tangle_drums','jaguar_crown','necklace_moonstone_l80_blue'],
+      ]){
+        await w.debug(bot,{op:'quest',id:prereq,action:'finish'});
+        await kit.teleport(w,bot,{npc:giver});await kit.talkTo(w,bot,giver,`quest:accept:${id}`);
+        await w.waitFor(()=>!!quest(w,bot,id),5000,`${id} accepted`);
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>quest(w,bot,id)?.counts[0]===1,5000,`${id} kill credit`);
+        check(w.views.get(bot).drops.some(d=>d.item===material),`${kind} drops named material`);
+        check(w.views.get(bot).drops.some(d=>kit.items.some(i=>i.id===d.item&&i.rarity==='uncommon'&&i.requiredLevel>=75)),`${kind} guarantees green gear`);
+        await kit.teleport(w,bot,{npc:giver});await kit.talkTo(w,bot,giver,`quest:claim:${id}`);
+        await w.waitFor(()=>quest(w,bot,id)?.claimed,5000,`${id} claimed`);
+        check(w.player(bot).inventory.some(i=>i.item===reward),`${kind} awards level-80 blue gear`);
+      }
+      await kit.teleport(w,bot,{npc:'tangle_scholar'});await kit.talkTo(w,bot,'tangle_scholar','quest:accept:tangle_temple');
+      await kit.teleport(w,bot,{zone:22,x:112,y:26});
+      await w.waitFor(()=>quest(w,bot,'tangle_temple')?.counts[0]===1,5000,'Inspect Rain Crown Temple');
+      await kit.teleport(w,bot,{npc:'tangle_stone'});await kit.talkTo(w,bot,'tangle_stone');
+      await w.waitFor(()=>quest(w,bot,'tangle_temple')?.counts.every(n=>n===1),5000,'Consult Meeting Stone');
+      check(area.portals.every(p=>p.to!==area.futureInstance?.zone),'Temple remains sealed');
+      await w.restart();
+      check(w.player(bot).zone===22&&quest(w,bot,'tangle_jaguar').claimed&&w.player(bot).travelStops.includes('travel_banyan'),'Zone, elite claim and travel stop persist');
+      await kit.teleport(w,bot,{zone:22,x:14,y:111});await w.action(bot,{type:'move',x:back.x,y:back.y});
+      await w.waitFor(()=>w.player(bot).zone===21,15000,'Return to Ribbonwild');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrives outside gate');
+    },
+  },
+  lapis: {
+    description: 'The Lapis Erg: safe gate from Veyrroot, three oases, travel, six creature drops, two elites and sealed astrolabe.',
+    startLevel: 80,
+    levelSpread: 0,
+    async run(w,check) {
+      const bot='LapisVisitor',city=map.zones[22],area=map.zones[24];
+      await w.connect({bot,class:'warrior'});
+      const gate=city.portals.find(p=>p.id==='canopy_lapis_gate'),back=area.portals.find(p=>p.id==='lapis_canopy_gate');
+      check(gate?.to===25&&back?.to===23&&city.slimes.length===0,'Veyrroot stays peaceful and desert gates are reciprocal');
+      check(area.theme==='lapiserg'&&area.levels.join(',')==='80,85'&&area.slimes.length===42&&area.objects.filter(o=>o.kind==='lapis_oasis').length===3,'Three-oasis desert and 42 enemies load');
+      check(area.quests.length===9&&area.npcs.some(n=>n.id==='travel_azure_wells')&&area.futureInstance?.status==='sealed','Quest hub, Travel Master and sealed astrolabe load');
+      await kit.teleport(w,bot,{zone:23,x:110,y:95});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===25,15000,'Enter the Lapis Erg');await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),area.spawn)<2,'Canopy gate arrives safely in the desert');
+      await w.connect({bot:'CanopyWitness',class:'mage'});
+      check(w.views.get(bot).slimes.every(s=>s.zone===25)&&w.views.get('CanopyWitness').slimes.every(s=>s.zone===0),'Desert encounters stay in the desert view');
+      await kit.teleport(w,bot,{npc:'travel_azure_wells'});
+      const travel=await kit.talkTo(w,bot,'travel_azure_wells');
+      check(travel.travelStops?.includes('travel_azure_wells')&&area.npcs.find(n=>n.id==='travel_azure_wells').travelLinks.includes('travel_veyrroot'),'Travel Master Nadir links Veyrroot');
+      await kit.teleport(w,bot,{npc:'lapis_keeper'});await kit.talkTo(w,bot,'lapis_keeper','quest:accept:lapis_welcome');
+      for(const id of ['lapis_healer','lapis_cartographer','lapis_scout']){await kit.teleport(w,bot,{npc:id});await kit.talkTo(w,bot,id);}
+      await w.waitFor(()=>quest(w,bot,'lapis_welcome')?.counts.every(n=>n===1),5000,'Meet caravan crew');
+      await kit.teleport(w,bot,{npc:'lapis_keeper'});await kit.talkTo(w,bot,'lapis_keeper','quest:claim:lapis_welcome');
+      await w.waitFor(()=>quest(w,bot,'lapis_welcome')?.claimed,5000,'Claim caravan introduction');
+      check(quest(w,bot,'lapis_welcome')?.claimed,'Oasis hub introduction claims');
+      for(const [kind,material] of [['sandhopper','sandhopper_chitin'],['dunefennec','fennec_fur'],['glassscorpion','scorpion_glass'],['sunvulture','vulture_quill'],['dunecolossus','colossus_core'],['mirageroc','roc_plume']]){
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
+        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} gives level XP and ${material}`);
+      }
+      await kit.teleport(w,bot,{zone:25,x:132,y:29});
+      check(area.portals.length===1&&area.futureInstance.name==='The Sunken Astrolabe','The astrolabe has a visible sealed entrance');
+      await w.restart();
+      check(w.player(bot).zone===25&&w.player(bot).travelStops.includes('travel_azure_wells')&&quest(w,bot,'lapis_welcome')?.claimed,'Desert position, quest and travel discovery persist');
+      await kit.teleport(w,bot,{zone:25,x:14,y:128});await w.action(bot,{type:'move',x:back.x,y:back.y});
+      await w.waitFor(()=>w.player(bot).zone===23,15000,'Return to Veyrroot');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2&&w.views.get(bot).slimes.length===0,'Return lands safely in enemy-free Veyrroot');
+    },
+  },
+  frostwake: {
+    description: 'Frostwake Shelf: Snowline gates, snow hub, seven drops, three elites and persistence.',
+    startLevel: 85,
+    levelSpread: 0,
+    async run(w,check) {
+      const bot='SnowVisitor',desert=map.zones[24],area=map.zones[25];
+      await w.connect({bot,class:'warrior'});
+      const gate=desert.portals.find(p=>p.id==='lapis_frostwake_gate'),back=area.portals.find(p=>p.id==='frostwake_lapis_gate');
+      check(gate?.to===26&&back?.to===25,'The Snowline gates are reciprocal');
+      check(area.theme==='frostwake'&&area.levels.join(',')==='85,90'&&area.slimes.length===43&&area.slimes.filter(s=>['bellmammoth','auroramanta','crevasseleviathan'].includes(s.kind)).length===3,'Level 85–90 glacier and three elites load');
+      check(area.quests.length===10&&area.npcs.some(n=>n.id==='travel_frostwake')&&area.objects.filter(o=>o.kind==='frostwake_crevasse').length>=20,'Lantern hub, Travel Master and fractured shelf load');
+      await kit.teleport(w,bot,{zone:25,x:138,y:34});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===26,15000,'Enter Frostwake');await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),area.spawn)<2,'Snowline arrives at a safe camp edge');
+      await w.connect({bot:'DesertWitness',class:'mage'});
+      check(w.views.get(bot).slimes.every(s=>s.zone===26)&&w.views.get('DesertWitness').slimes.every(s=>s.zone===0),'Glacier encounters stay in their own view');
+      await kit.teleport(w,bot,{npc:'travel_frostwake'});
+      const travel=await kit.talkTo(w,bot,'travel_frostwake');
+      check(travel.travelStops?.includes('travel_frostwake')&&area.npcs.find(n=>n.id==='travel_frostwake').travelLinks.includes('travel_azure_wells'),'Travel Master Eira links Azure Wells');
+      await kit.teleport(w,bot,{npc:'frostwake_captain'});await kit.talkTo(w,bot,'frostwake_captain','quest:accept:frostwake_welcome');
+      for(const id of ['frostwake_healer','frostwake_surveyor','frostwake_scout']){await kit.teleport(w,bot,{npc:id});await kit.talkTo(w,bot,id);}
+      await w.waitFor(()=>quest(w,bot,'frostwake_welcome')?.counts.every(n=>n===1),5000,'Meet snow crew');
+      await kit.teleport(w,bot,{npc:'frostwake_captain'});await kit.talkTo(w,bot,'frostwake_captain','quest:claim:frostwake_welcome');
+      await w.waitFor(()=>quest(w,bot,'frostwake_welcome')?.claimed,5000,'Claim snow introduction');
+      check(quest(w,bot,'frostwake_welcome')?.claimed,'The quest hub introduction claims');
+      for(const [kind,material] of [['snowhare','snowhare_fur'],['iceotter','iceotter_pelt'],['frostheron','heron_feather'],['glaciercrab','glaciercrab_shell'],['bellmammoth','mammoth_bell'],['auroramanta','manta_aurora'],['crevasseleviathan','leviathan_fang']]){
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
+        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} gives level XP and ${material}`);
+      }
+      await kit.teleport(w,bot,{zone:26,x:119,y:25});
+      await w.restart();
+      check(w.player(bot).zone===26&&w.player(bot).travelStops.includes('travel_frostwake')&&quest(w,bot,'frostwake_welcome')?.claimed,'Glacier location, quest and travel discovery persist');
+      await kit.teleport(w,bot,{zone:26,x:15,y:137});await w.action(bot,{type:'move',x:back.x,y:back.y});
+      await w.waitFor(()=>w.player(bot).zone===25,15000,'Return to Lapis Erg');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return lands safely on the desert rim');
+    },
+  },
+  cairn: {
+    description: 'Cairnspine: two High Pass gates, Boulderwatch quests, seven drops, three elites and persistence.',
+    startLevel: 90,
+    levelSpread: 0,
+    async run(w,check) {
+      const bot='CairnVisitor',shelf=map.zones[25],area=map.zones[26];
+      await w.connect({bot,class:'warrior'});
+      const gate=shelf.portals.find(p=>p.id==='frostwake_cairn_gate'),back=area.portals.find(p=>p.id==='cairn_frostwake_gate');
+      check(gate?.to===27&&back?.to===26,'The High Pass gates are reciprocal');
+      check(area.theme==='cairnspine'&&area.levels.join(',')==='90,95'&&area.slimes.length===43&&area.slimes.filter(s=>['cairnbehemoth','whitebarktitan','stormcondor'].includes(s.kind)).length===3,'Level 90–95 mountain and three elites load');
+      check(area.futureInstance?.status==='sealed'&&area.quests.length===10&&area.objects.filter(o=>o.kind==='cairn_dead_tree').length>=70,'Sealed gate, quests and bare grove load');
+      await kit.teleport(w,bot,{zone:26,x:145,y:54});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===27,15000,'Enter Cairnspine');await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),area.spawn)<2,'High Pass arrives at the hub edge');
+      await w.connect({bot:'MeadowWitness',class:'mage'});
+      check(w.views.get(bot).slimes.every(s=>s.zone===27)&&w.views.get('MeadowWitness').slimes.every(s=>s.zone===0),'Mountain encounters stay in their own view');
+      await kit.teleport(w,bot,{npc:'travel_boulderwatch'});
+      const travel=await kit.talkTo(w,bot,'travel_boulderwatch');
+      check(travel.travelStops?.includes('travel_boulderwatch')&&area.npcs.find(n=>n.id==='travel_boulderwatch').travelLinks.includes('travel_frostwake'),'Travel Master Asta links Frostwake');
+      await kit.teleport(w,bot,{npc:'cairn_warden'});await kit.talkTo(w,bot,'cairn_warden','quest:accept:cairn_welcome');
+      for(const id of ['cairn_healer','cairn_surveyor','cairn_scout']){await kit.teleport(w,bot,{npc:id});await kit.talkTo(w,bot,id);}
+      await w.waitFor(()=>quest(w,bot,'cairn_welcome')?.counts.every(n=>n===1),5000,'Meet Boulderwatch crew');
+      await kit.teleport(w,bot,{npc:'cairn_warden'});await kit.talkTo(w,bot,'cairn_warden','quest:claim:cairn_welcome');
+      await w.waitFor(()=>quest(w,bot,'cairn_welcome')?.claimed,5000,'Claim Boulderwatch introduction');
+      check(quest(w,bot,'cairn_welcome')?.claimed,'The hub introduction claims');
+      for(const [kind,material] of [['screeferret','screeferret_pelt'],['stoneibex','ibex_horn'],['slateraven','slate_raven_feather'],['ridgeadder','ridgeadder_scale'],['cairnbehemoth','behemoth_heartstone'],['whitebarktitan','whitebark_core'],['stormcondor','stormcondor_plume']]){
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
+        check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} gives level XP and ${material}`);
+      }
+      await kit.teleport(w,bot,{zone:27,x:134,y:26});
+      await w.restart();
+      check(w.player(bot).zone===27&&w.player(bot).travelStops.includes('travel_boulderwatch')&&quest(w,bot,'cairn_welcome')?.claimed,'Mountain position, quest and travel discovery persist');
+      await kit.teleport(w,bot,{zone:27,x:14,y:145});await w.action(bot,{type:'move',x:back.x,y:back.y});
+      await w.waitFor(()=>w.player(bot).zone===26,15000,'Return to Frostwake');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return lands safely on Frostwake shelf');
+    },
+  },
+  yearwheel: {
+    description: 'The Yearwheel: four seasonal hubs, sealed thresholds, reciprocal pass and twelve elite drops.',
+    startLevel: 95,
+    levelSpread: 0,
+    async run(w,check) {
+      const bot='YearVisitor',mountain=map.zones[26],area=map.zones[27];
+      await w.connect({bot,class:'warrior'});
+      const gate=mountain.portals.find(p=>p.id==='cairn_year_gate'),back=area.portals.find(p=>p.id==='year_cairn_gate');
+      check(gate?.to===28&&back?.to===27,'The Yearwheel and Cairnspine passes are reciprocal');
+      check(area.size===400&&area.levels.join(',')==='95,99'&&area.slimes.length===156&&area.quests.length===24,'The immense end zone, quests and encounters load');
+      check(area.futureInstances.length===4&&area.futureInstances.every(x=>x.status==='sealed')&&area.portals.length===1,'Four thresholds stay sealed');
+      await kit.teleport(w,bot,{zone:27,x:147,y:110});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===28,15000,'Enter the Yearwheel');await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),area.spawn)<2,'The mountain pass reaches Springmere');
+      for(const id of ['travel_springmere','travel_solhaven','travel_harvestwatch','travel_rimehold']){
+        await kit.teleport(w,bot,{npc:id});await kit.talkTo(w,bot,id);
+        await w.waitFor(()=>w.player(bot).travelStops.includes(id),5000,`${id} discovery`);
+        check(true,`${id} is discovered`);
+      }
+      for(const [kind,material] of [
+        ['brooknewt','newt_ribbon'],['sundarter','sundarter_scale'],['acornmimic','amber_acorn'],['snowstoat','stoat_silverfur'],
+        ['bloomtortoise','bloom_shell'],['petalchimera','chimera_petal'],['rainseraph','seraph_rainfeather'],
+        ['glasslion','glasslion_mane'],['sunwheel','sunwheel_cog'],['firephoenix','phoenix_ember'],
+        ['lanternowl','lanternowl_eye'],['harvestreaper','reaper_scythe_shard'],['ambermantis','amber_mantis_claw'],
+        ['rimesaber','rimesaber_fang'],['snowgiant','snowgiant_heart'],['longnightwyrm','longnight_scale']]){
+        const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
+        check(!!enemy,`${kind} is spawned`);
+        await w.debug(bot,{op:'kill_enemy',id:enemy.id});
+        await w.waitFor(()=>w.views.get(bot).drops.some(d=>d.item===material),5000,`${kind} material`);
+        check(true,`${kind} gives its unique material`);
+      }
+      await kit.teleport(w,bot,{zone:28,x:320,y:316});await w.restart();
+      check(w.player(bot).zone===28&&['travel_springmere','travel_solhaven','travel_harvestwatch','travel_rimehold'].every(id=>w.player(bot).travelStops.includes(id)),'Four travel discoveries and location persist');
+      await kit.teleport(w,bot,{zone:28,x:17,y:359});await w.action(bot,{type:'move',x:back.x,y:back.y});
+      await w.waitFor(()=>w.player(bot).zone===27,15000,'Return to Cairnspine');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return pass lands safely');
+    },
+  },
+  worldheart: {
+    description: 'Veyrroot: peaceful canopy and hollow, Travel Master, civic quests and sealed Seed Vault.',
+    startLevel: 80,
+    levelSpread: 0,
+    async run(w,check) {
+      const bot='HeartwoodVisitor',jungle=map.zones[21],outer=map.zones[22],inner=map.zones[23];
+      await w.connect({bot,class:'warrior'});
+      const gate=jungle.portals.find(p=>p.id==='tangle_worldheart_gate'),back=outer.portals.find(p=>p.id==='canopy_jungle_gate');
+      const hollow=outer.portals.find(p=>p.id==='canopy_hollow_gate'),exit=inner.portals.find(p=>p.id==='hollow_canopy_gate');
+      check(gate?.to===23&&back?.to===22&&hollow?.to===24&&exit?.to===23,'Four reciprocal city gates load');
+      check(outer.theme==='worldtree'&&inner.theme==='heartwood'&&outer.slimes.length===0&&inner.slimes.length===0,'Both inhabited city maps have no enemy spawns');
+      check(outer.quests.length===7&&inner.quests.length===2&&outer.npcs.some(n=>n.id==='travel_veyrroot'),'City quests and travel master load');
+      check(inner.futureInstance?.name==='The Seed Vault'&&inner.futureInstance?.status==='sealed'&&inner.portals.length===1,'Seed Vault is a sealed entrance');
+      await kit.teleport(w,bot,{zone:22,x:132,y:80});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.player(bot).zone===23,15000,'Enter outer canopy');await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),outer.spawn)<2,'Jungle gate lands outside return disc');
+      await w.connect({bot:'MeadowWitness',class:'mage'});
+      check(w.views.get('MeadowWitness').slimes.every(s=>s.zone===0)&&w.views.get(bot).slimes.length===0,'Canopy snapshot has no enemies');
+      await kit.teleport(w,bot,{npc:'travel_veyrroot'});
+      const travel=await kit.talkTo(w,bot,'travel_veyrroot');
+      check(travel.travelStops?.includes('travel_veyrroot')&&outer.npcs.find(n=>n.id==='travel_veyrroot').travelLinks.includes('travel_banyan'),'Travel Master Lio discovers Banyan Landing');
+      await kit.teleport(w,bot,{npc:'heart_matriarch'});await kit.talkTo(w,bot,'heart_matriarch','quest:accept:heart_welcome');
+      for(const id of ['heart_healer','heart_ranger','heart_apiarist']){await kit.teleport(w,bot,{npc:id});await kit.talkTo(w,bot,id);}
+      await w.waitFor(()=>quest(w,bot,'heart_welcome')?.counts.every(n=>n===1),5000,'Meet the canopy crew');
+      await kit.teleport(w,bot,{npc:'heart_matriarch'});await kit.talkTo(w,bot,'heart_matriarch','quest:claim:heart_welcome');
+      await w.waitFor(()=>quest(w,bot,'heart_welcome')?.claimed,5000,'Claim outer-city introduction');
+      check(quest(w,bot,'heart_welcome')?.claimed,'Outer-city introduction claims');
+      await kit.teleport(w,bot,{npc:'heart_ranger'});await kit.talkTo(w,bot,'heart_ranger','quest:accept:heart_walkways');
+      await kit.teleport(w,bot,{zone:23,x:87,y:44});
+      await kit.teleport(w,bot,{npc:'heart_lookout'});await kit.talkTo(w,bot,'heart_lookout');
+      await w.waitFor(()=>quest(w,bot,'heart_walkways')?.counts.every(n=>n===1),5000,'Tour upper branches');
+      await kit.teleport(w,bot,{npc:'heart_ranger'});await kit.talkTo(w,bot,'heart_ranger','quest:claim:heart_walkways');
+      await w.waitFor(()=>quest(w,bot,'heart_walkways')?.claimed,5000,'Claim walkway tour');
+      check(quest(w,bot,'heart_walkways')?.claimed,'Peaceful upper-branch quest claims');
+      await kit.teleport(w,bot,{zone:23,x:56,y:65});await w.action(bot,{type:'move',x:hollow.x,y:hollow.y});
+      await w.waitFor(()=>w.player(bot).zone===24,15000,'Enter heartwood');await w.action(bot,{type:'stop'});
+      check(distance(w.player(bot),inner.spawn)<2,'The Hollow Arch leads inside the trunk');
+      await kit.teleport(w,bot,{npc:'heart_archivist'});await kit.talkTo(w,bot,'heart_archivist','quest:accept:heart_rings');
+      await kit.teleport(w,bot,{zone:24,x:48,y:53});await w.waitFor(()=>quest(w,bot,'heart_rings')?.counts[0]===1,5000,'Visit living pith');
+      await kit.teleport(w,bot,{npc:'heart_oracle'});await kit.talkTo(w,bot,'heart_oracle');
+      await kit.teleport(w,bot,{npc:'heart_archivist'});await kit.talkTo(w,bot,'heart_archivist','quest:claim:heart_rings');
+      await w.waitFor(()=>quest(w,bot,'heart_rings')?.claimed,5000,'Claim heartwood rings');
+      check(quest(w,bot,'heart_rings')?.claimed,'Inside-city living rings quest claims');
+      await kit.teleport(w,bot,{npc:'heart_oracle'});await kit.talkTo(w,bot,'heart_oracle','quest:accept:heart_seed_vault');
+      await kit.teleport(w,bot,{zone:24,x:48,y:20});await w.waitFor(()=>quest(w,bot,'heart_seed_vault')?.counts[0]===1,5000,'Inspect Seed Vault');
+      await kit.teleport(w,bot,{npc:'heart_custodian'});await kit.talkTo(w,bot,'heart_custodian');
+      await kit.teleport(w,bot,{npc:'heart_oracle'});await kit.talkTo(w,bot,'heart_oracle','quest:claim:heart_seed_vault');
+      await w.waitFor(()=>quest(w,bot,'heart_seed_vault')?.claimed,5000,'Claim Seed Vault survey');
+      check(quest(w,bot,'heart_seed_vault')?.claimed,'Sealed entrance survey claims');
+      await w.restart();
+      check(w.player(bot).zone===24&&quest(w,bot,'heart_seed_vault')?.claimed&&w.player(bot).travelStops.includes('travel_veyrroot'),'Inside position, quest and travel discovery persist');
+      await kit.teleport(w,bot,{zone:24,x:48,y:80});await w.action(bot,{type:'move',x:exit.x,y:exit.y});
+      await w.waitFor(()=>w.player(bot).zone===23,15000,'Return to outer city');
+      await kit.teleport(w,bot,{zone:23,x:15,y:95});await w.action(bot,{type:'move',x:back.x,y:back.y});
+      await w.waitFor(()=>w.player(bot).zone===22,15000,'Return to jungle');
+      check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrives on a safe jungle root');
+    },
+  },
 };
 
 async function runScenario(name, world = new TestWorld()) {

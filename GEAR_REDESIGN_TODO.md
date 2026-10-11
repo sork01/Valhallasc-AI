@@ -3,6 +3,8 @@
 **Completed base pieces: 252/252.** Updated 2026-10-06T18:52:05.
 **Active/next piece:** `integration checks`.
 
+Game-wide content work is tracked in [TODO.md](TODO.md).
+
 ## User's final scope
 
 Create genuinely new armor and weapon shapes for each level: 25, 30, 35, 40, 45 and 50, for all five classes.
@@ -37,13 +39,13 @@ that visual approach. **The old recolor previews are not evidence of completed r
 ## Integration checkpoints
 
 - [x] New layer loading and allowed variants
-- [ ] Catalog maps each level/tier to its new base art
-- [ ] Matching inventory icons exported and wired
+- [x] Catalog maps each redesigned level/tier to its new base art (all 252 manifest jobs have matching catalog items)
+- [x] Matching inventory icons exported and wired (all 252 jobs have mapped item IDs in `client/assets/items.txt`)
 - [ ] Generator, Rust, actual MCP and browser/art checks
 - [x] Updated level-50 assassin preview saved to Sork’s Filedrop
 
 Latest full-set preview: [Level-50 assassin on Filedrop](https://gunning.se/filedrop/api.php?action=download&file=Valhalla_Assassin_-_Redesigned_Level_25_Full_Set_Updated_Head.png).
-All eight ordinary level-50 pieces are redesigned; Cathedral and other levels remain tracked below.
+All 252 level-25–50 and Cathedral base pieces are redesigned and tracked below.
 
 ## L25
 

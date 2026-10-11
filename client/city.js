@@ -30,6 +30,58 @@
     const inCity=inside(x+.5,y+.5), road=!Field.zone && y>=69 && y<city.y0 && Math.abs(x+.5-36)<1.6;
     if (!inCity && !road) return false;
     if (Field.zone > 0) {
+      if (Field.zoneTheme === 'worldtree') {
+        if (Math.hypot(x+.5-city.plaza.x,y+.5-city.plaza.y)>=city.radius+1) return false;
+        poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],
+          (x+y)&1?'#a98553':'#bd9c63','#406b4e',1.3);
+        line(g,[[px-24,py+16],[px+23,py+30]],'rgba(80,55,34,.3)',1.3);
+        return true;
+      }
+      if (Field.zoneTheme === 'heartwood') {
+        const ring=Math.hypot(x+.5-48,y+.5-48);
+        poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],
+          `hsl(${34+ring*.12}, 35%, ${45+((x*7+y*13)%8)}%)`,'rgba(71,48,35,.4)',.8);
+        if (Math.abs(ring%8-4)<.8) line(g,[[px-27,py+20],[px+28,py+23]],'rgba(246,211,138,.3)',2);
+        return true;
+      }
+      if (Field.zoneTheme === 'tanglecrown') {
+        if (Math.hypot(x+.5-city.plaza.x,y+.5-city.plaza.y)>=city.radius) return false;
+        poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],
+          (x+y)&1?'#bb9862':'#d0ad73','#705d3f',1.2);
+        return true;
+      }
+      if (Field.zoneTheme === 'yearwheel') {
+        if (Math.hypot(x+.5-city.plaza.x,y+.5-city.plaza.y)>=city.radius) return false;
+        const season=(x<200?(y<200?3:0):(y<200?2:1));
+        const colors=[['#b9ddae','#d6efbd','#f3b5cf'],['#efd89d','#ffe8ae','#edab61'],['#dba070','#efc583','#bd684b'],['#b9dce7','#e5f4f4','#8ec6dc']][season];
+        poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],colors[(x+y)%2],colors[2],1.3);
+        if((x*5+y*7)%6===0)ellipse(g,px,py+21,2.8,2.8,colors[2]);
+        return true;
+      }
+      if (Field.zoneTheme === 'cairnspine') {
+        if (Math.hypot(x+.5-city.plaza.x,y+.5-city.plaza.y)>=city.radius) return false;
+        poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],(x+y)&1?'#aa9a80':'#c1ac89','#5b5960',1.2);return true;
+      }
+      if (Field.zoneTheme === 'frostwake') {
+        if (Math.hypot(x+.5-city.plaza.x,y+.5-city.plaza.y)>=city.radius) return false;
+        poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],(x+y)&1?'#a9d6e2':'#c9e8ee','#5e9bb5',1.2);
+        if((x+y)%3===0)ellipse(g,px,py+22,2,2,'#e9faf7');return true;
+      }
+      if (Field.zoneTheme === 'lapiserg') {
+        if (Math.hypot(x+.5-city.plaza.x,y+.5-city.plaza.y)>=city.radius) return false;
+        poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],
+          (x+y)&1?'#e6c184':'#f0d39c','#71aaa8',1.2);
+        if ((x+y)%3===0) ellipse(g,px,py+22,2,2,'#72b9b6');
+        return true;
+      }
+      if (Field.zoneTheme === 'ribbonwild') {
+        // The market sits in painted lawns; only its central dance square is paved.
+        if (Math.hypot(x+.5-city.plaza.x,y+.5-city.plaza.y)>=city.radius) return false;
+        const colors=['#f4bdd0','#f9dea0','#a7e5df','#d2baf0'];
+        poly(g,[[px,py],[px+44,py+22],[px,py+44],[px-44,py+22]],
+          colors[(Math.floor(x/2)+Math.floor(y/2)+16)%4],'#fff0cb',.9);
+        return true;
+      }
       if (Field.zoneTheme === 'sunward') {
         // Millbridge is a village in a meadow: keep the grass and orchard
         // underfoot, with a small pale stone circle around the common.
@@ -309,6 +361,38 @@
     if(n.art==='stone'){}                      // the Meeting Stone speaks for itself: its art is the stone, drawn as an object
     else if(n.art?.startsWith('sun_') && Field.sunwardSprites?.img[n.art]){
       const src=Field.sunwardSprites,{frame:[w,h],clips}=src.meta,step=Math.floor(t*6)%clips.idle.n;
+      g.imageSmoothingEnabled=false;
+      g.drawImage(src.img[n.art],step*w,0,w,h,-47,-103,94,103);
+    }
+    else if(n.art?.startsWith('ribbon_') && Field.ribbonwildSprites?.img[n.art]){
+      const src=Field.ribbonwildSprites,{frame:[w,h],clips}=src.meta,step=Math.floor(t*6)%clips.idle.n;
+      g.imageSmoothingEnabled=false;
+      g.drawImage(src.img[n.art],step*w,0,w,h,-47,-103,94,103);
+    }
+    else if(n.art?.startsWith('tangle_') && Field.tanglecrownSprites?.img[n.art]){
+      const src=Field.tanglecrownSprites,{frame:[w,h],clips}=src.meta,step=Math.floor(t*6)%clips.idle.n;
+      g.imageSmoothingEnabled=false;
+      g.drawImage(src.img[n.art],step*w,0,w,h,-47,-103,94,103);
+    }
+    else if(n.art?.startsWith('heart_') && Field.worldheartSprites?.img[n.art]){
+      const src=Field.worldheartSprites,{frame:[w,h],clips}=src.meta,step=Math.floor(t*6)%clips.idle.n;
+      g.imageSmoothingEnabled=false;
+      g.drawImage(src.img[n.art],step*w,0,w,h,-47,-103,94,103);
+    }
+    else if(n.art?.startsWith('year_') && Field.yearSprites?.img[n.art]){
+      const src=Field.yearSprites,{frame:[w,h],clips}=src.meta,step=Math.floor(t*6)%clips.idle.n;
+      g.imageSmoothingEnabled=false;g.drawImage(src.img[n.art],step*w,0,w,h,-47,-103,94,103);
+    }
+    else if(n.art?.startsWith('cairn_') && Field.cairnSprites?.img[n.art]){
+      const src=Field.cairnSprites,{frame:[w,h],clips}=src.meta,step=Math.floor(t*6)%clips.idle.n;
+      g.imageSmoothingEnabled=false;g.drawImage(src.img[n.art],step*w,0,w,h,-47,-103,94,103);
+    }
+    else if(n.art?.startsWith('frostwake_') && Field.frostwakeSprites?.img[n.art]){
+      const src=Field.frostwakeSprites,{frame:[w,h],clips}=src.meta,step=Math.floor(t*6)%clips.idle.n;
+      g.imageSmoothingEnabled=false;g.drawImage(src.img[n.art],step*w,0,w,h,-47,-103,94,103);
+    }
+    else if(n.art?.startsWith('lapis_') && Field.lapisSprites?.img[n.art]){
+      const src=Field.lapisSprites,{frame:[w,h],clips}=src.meta,step=Math.floor(t*6)%clips.idle.n;
       g.imageSmoothingEnabled=false;
       g.drawImage(src.img[n.art],step*w,0,w,h,-47,-103,94,103);
     }

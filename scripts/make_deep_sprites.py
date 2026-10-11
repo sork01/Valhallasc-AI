@@ -13,7 +13,7 @@ recovery.
   shellback  Shellback         (L39)  a house-sized sea turtle with a drowned ship's plank growing out of its shell; pounds the ground
   kraken     The Kraken        (L40)  the elite: a great violet mantle with two yellow eyes and a ring of tentacles
   hvitserk   Hvitserk          (L37)  elite: the drowned captain of Naglfar, a draugr in a navy coat and tricorn (a quest)
-  ghostmaw   Ghostmaw          (L39)  elite: a pale, huge moray that guards the deepest corridors (no quest)
+  ghostmaw   Ghostmaw          (L39)  elite: a pale, huge moray that guards the deepest corridors (group quest)
 
 The biped and quadruped rigs of make_wyrd_sprites.py carry the draugr and the shellback; the other four are bespoke.
 `build` saves ONE new 34-frame PixelFlow sprite per kind (valhallasc_deep_<kind>_all) and refuses existing names unless --replace

@@ -290,8 +290,8 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         );
     }
     // the dungeon copies come after every file zone
-    assert_eq!(w.maps.len(), 36);
-    assert!(w.maps[21].template.is_some());
+    assert_eq!(w.maps.len(), 44);
+    assert!(w.maps[26].template.is_some());
 }
 
 // ---- the Net ------------------------------------------------------------------------------------------------------------------
@@ -555,8 +555,7 @@ fn the_kraken_credits_five_pays_an_epic_necklace_and_returns_in_five_minutes() {
 }
 
 #[test]
-fn hvitserk_credits_three_pays_a_blue_ring_and_returns_in_five_minutes_while_the_ghostmaw_waits_ten()
- {
+fn both_three_player_elites_credit_nearby_heroes_and_pay_gear() {
     let mut w = world();
     let id = w.slimes.iter().position(|s| s.kind == "hvitserk").unwrap();
     let point = w.slimes[id].point();
@@ -597,23 +596,57 @@ fn hvitserk_credits_three_pays_a_blue_ring_and_returns_in_five_minutes_while_the
     assert!(changed, "{text}");
     assert_eq!(c.quantity(&reward), 1);
     assert_eq!(c.gold, 3000);
-    // the Ghostmaw has no quest to credit, drops its tooth and comes back after ten minutes
+    // Thora's quest credits the same three nearby contributors; the Ghostmaw
+    // drops its tooth and comes back after ten minutes.
     let g = w.slimes.iter().position(|s| s.kind == "ghostmaw").unwrap();
+    let ghost_point = w.slimes[g].point();
+    let ghost_quest = quest(&w, "deep_ghostmaw");
+    for session in 1..=4 {
+        let c = &mut w.players.get_mut(&session).unwrap().character;
+        c.x = ghost_point.x + 2.;
+        c.y = ghost_point.y + 3.;
+        c.quests.push(QuestProgress {
+            id: "deep_garden".into(),
+            claimed: true,
+            completions: 1,
+            ..Default::default()
+        });
+        assert!(quest_action(c, &ghost_quest, "accept").2);
+        w.hit_slime(g, session, 1., false);
+    }
+    w.players.get_mut(&4).unwrap().character.x = ghost_point.x - 20.;
     w.hit_slime(g, 1, 1e9, false);
+    let credited: Vec<u32> = (1..=4)
+        .map(|s| {
+            w.players[&s]
+                .character
+                .quests
+                .iter()
+                .find(|p| p.id == "deep_ghostmaw")
+                .unwrap()
+                .counts[0]
+        })
+        .collect();
+    assert_eq!(credited, [1, 1, 1, 0]);
     assert_eq!(w.slimes[g].respawn, 600.);
     assert!(
         w.drops
             .iter()
             .any(|d| d.item.as_deref() == Some("ghostmaw_tooth"))
     );
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    let (text, _, changed) = quest_action(c, &ghost_quest, "claim");
+    assert!(changed, "{text}");
+    assert_eq!(c.quantity("necklace_moonstone_l40_blue"), 1);
+    assert_eq!(c.gold, 6800);
 }
 
 // ---- the questline -----------------------------------------------------------------------------------------------------------------
 #[test]
-fn the_questline_has_twenty_four_quests_with_three_chime_chains_and_the_old_objective_kinds() {
+fn the_questline_has_twenty_five_quests_with_three_chime_chains_and_the_old_objective_kinds() {
     let w = world();
     let map = &w.maps[DEEP];
-    assert_eq!(map.quests.len(), 24);
+    assert_eq!(map.quests.len(), 25);
     let mut kinds = std::collections::BTreeSet::new();
     let mut chimes = vec![];
     for q in &map.quests {
@@ -687,7 +720,7 @@ fn the_questline_has_twenty_four_quests_with_three_chime_chains_and_the_old_obje
             .filter(|q| q.repeatable)
             .all(|q| q.objectives.iter().all(|o| o.kind != "chime"))
     );
-    // the Kraken is the group quest: five heroes, hired at its giver, and an epic reward; the bells open the way to it
+    // The Kraken needs five heroes, hired at its giver, and an epic reward; the bells open the way to it.
     let kraken = quest(&w, "deep_kraken");
     assert!(kraken.group && kraken.recommended_players == 5);
     assert_eq!(
@@ -695,7 +728,7 @@ fn the_questline_has_twenty_four_quests_with_three_chime_chains_and_the_old_obje
         Some("necklace_moonstone_l20_purple")
     );
     assert_eq!(kraken.requires.as_deref(), Some("deep_rans"));
-    // each group quest has its own giver with the rental offers, so both can be taken at once
+    // Each group quest has its own giver with rental offers.
     assert!(
         npc(&w, "deep_warden")
             .offers
@@ -704,6 +737,12 @@ fn the_questline_has_twenty_four_quests_with_three_chime_chains_and_the_old_obje
     );
     assert!(
         npc(&w, "deep_halla")
+            .offers
+            .iter()
+            .any(|o| o.merc.is_some())
+    );
+    assert!(
+        npc(&w, "deep_thora")
             .offers
             .iter()
             .any(|o| o.merc.is_some())
@@ -719,7 +758,7 @@ fn the_questline_has_twenty_four_quests_with_three_chime_chains_and_the_old_obje
         assert_eq!(quest(&w, id).reward_item.as_deref(), Some(reward));
         assert!(item(reward).is_some(), "{reward}");
     }
-    // two of the three elites have a quest (Hvitserk: three heroes; the Kraken: five); the Ghostmaw has none
+    // Each elite has a separate group quest, including Thora's Ghostmaw hunt.
     let captain = quest(&w, "deep_captain");
     assert!(captain.group && captain.recommended_players == 3);
     assert_eq!(captain.objectives[0].target, "hvitserk");
@@ -728,7 +767,15 @@ fn the_questline_has_twenty_four_quests_with_three_chime_chains_and_the_old_obje
         Some("accessory_amber_l20_blue")
     );
     assert!(item("accessory_amber_l20_blue").is_some());
-    for (kind, quests) in [("hvitserk", 1), ("kraken", 1), ("ghostmaw", 0)] {
+    let ghostmaw = quest(&w, "deep_ghostmaw");
+    assert!(ghostmaw.group && ghostmaw.recommended_players == 3);
+    assert_eq!(ghostmaw.npc, "deep_thora");
+    assert_eq!(ghostmaw.requires.as_deref(), Some("deep_garden"));
+    assert_eq!(
+        ghostmaw.reward_item.as_deref(),
+        Some("necklace_moonstone_l40_blue")
+    );
+    for (kind, quests) in [("hvitserk", 1), ("kraken", 1), ("ghostmaw", 1)] {
         let n = map
             .quests
             .iter()

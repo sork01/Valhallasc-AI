@@ -32,7 +32,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
       gate:Field._debug.zones[15].portals.find(p=>p.id==='orrery_moonspore_gate'),
       travel:z.npcs.find(n=>n.id==='travel_lamplight')};
   });
-  check(data.count===21 && data.name==='The Moonspore Canopy' && data.theme==='moonspore' && data.levels.join(',')==='55,60','Zone and level range load');
+  check(data.count===27 && data.name==='The Moonspore Canopy' && data.theme==='moonspore' && data.levels.join(',')==='55,60','Zone and level range load');
   check(data.kinds.length===7 && (STUB || data.sizes.every(([w,h])=>w===768 && h===480)),'Seven complete enemy atlases load');
   check(data.art && data.map===20 && data.legend,'Scenery and world-map legend load');
   check(data.npcs===7 && data.quests===12 && data.spawns===43 && data.objects>=400,'Refuge, twelve quests and three elite courts load');

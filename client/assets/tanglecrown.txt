@@ -1,0 +1,64 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "orchidmantis",
+    "canopyglider",
+    "poolcaiman",
+    "drumgorilla",
+    "jadeanaconda",
+    "crownjaguar",
+    "tangle_warden",
+    "tangle_scholar",
+    "tangle_travel"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 10,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 10,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 10,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "orchidmantis": "da230551917a1a86",
+    "canopyglider": "019ee487c8ac88bc",
+    "poolcaiman": "88bb56bce90ee104",
+    "drumgorilla": "53817783f38bbf14",
+    "jadeanaconda": "dea8a50f0500d68b",
+    "crownjaguar": "8b6943f269089919",
+    "tangle_warden": "328ee6de84aa557f",
+    "tangle_scholar": "41d8cc10fff592c5",
+    "tangle_travel": "78fe82e4885e11e5"
+  }
+}

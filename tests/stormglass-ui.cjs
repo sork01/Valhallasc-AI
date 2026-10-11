@@ -36,7 +36,7 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
       seal:z.futureInstance,gate:zones[17].portals.find(p=>p.id==='asterion_stormglass_gate'),
       travel:z.npcs.find(n=>n.id==='travel_breakwater')};
   });
-  check(data.count===21&&data.name==='The Stormglass Shore'&&data.theme==='stormglass'&&data.levels.join(',')==='60,65','The shore and level range load');
+  check(data.count===27&&data.name==='The Stormglass Shore'&&data.theme==='stormglass'&&data.levels.join(',')==='60,65','The shore and level range load');
   check(data.kinds.length===5&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Five complete monster atlases load');
   check(data.art&&data.map===21&&data.legend,'Original scenery and world-map legend load');
   check(data.npcs===8&&data.quests===8&&data.spawns===41&&data.objects>=380,'Camp, quests and enemy fields load');

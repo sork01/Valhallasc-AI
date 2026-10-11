@@ -81,7 +81,7 @@ fn vale_gates_bridges_hub_and_all_encounters_are_reachable() {
             .find(|n| n.id == "travel_millbridge")
             .unwrap()
             .travel_links,
-        ["travel_breakwater"]
+        ["travel_breakwater", "travel_jubilee"]
     );
     assert!(
         w.maps[19]

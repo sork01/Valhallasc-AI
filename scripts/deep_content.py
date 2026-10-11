@@ -7,7 +7,7 @@ reachable and clear of scenery. Quest ids are `deep_*`, NPC ids `deep_*`.
 The zone's new mechanic is the `chime` objective ("ring the tidebells"): a chain of bronze bells stands about the zone, each one
 rings for a few seconds after a hero walks into its circle, and the objective is done when every bell of the chain rings at
 the same moment. Three quests use it (the harbour bells, the bells of the Net, the bells of Ran); everything else is the
-familiar mix of talk tours, hunts, hand-ins (`bring`) and visits, plus one group quest against the Kraken.
+familiar mix of talk tours, hunts, hand-ins (`bring`) and visits, plus group quests against all three elites.
 """
 import json
 from pathlib import Path
@@ -100,8 +100,8 @@ def keelhaven():
             look_=look('#c89a72', '#8a3a1a', 'bald', None, '#4a4543', '#8a3a1a', 1.05)),
         npc('thora', 'Thora Drownedspeaker', 'Reader of the tides', 66, 141.6, '#8a8ac8',
             'Ran keeps a net, and the Net keeps what it catches: sailors, ships, monsters, the bones of whales. The coral grew it a house, and the house grew corridors, and the corridors grew teeth. '
-            'In the middle of it, behind two doors, sits something old that Ran herself is afraid of. I read the tides, and the tides say it is waking. Learn the Net, hero, and do not go to the Court before you are ready. And if you meet a pale eel the length of a longship in the deep corridors, do not count on a quest to tell you what it is: it is the Ghostmaw, and it was old when the Net was young.',
-            look_=look('#edc5a1', '#7a6a9a', 'long', 'hood', None, None, 1.0, '#6a5a9a')),
+            'In the middle of it, behind two doors, sits something old that Ran herself is afraid of. I read the tides, and the tides say it is waking. Learn the Net, hero, and do not go to the Court before you are ready. A pale eel the length of a longship haunts the deep corridors: the Ghostmaw. Return after seeing the Abyssal Garden and I will help you gather a crew to face it.',
+            mo.offers(), look_=look('#edc5a1', '#7a6a9a', 'long', 'hood', None, None, 1.0, '#6a5a9a')),
         npc('sigmund', 'Old Sigmund Bellwright', 'Founder of the tidebells', 70, 143.4, '#d0a860',
             'I cast bronze for the Bifrost once, and when it fell I kept the metal. Tidebells, I call them: you strike one and it rings for a time, and then it goes quiet. '
             'The old harbour had a chain of them, and when every bell rang at once, the whole sea heard it and every ship knew where home was. Ring them again. Hurry, though: the first bell is silent before the last is struck, if you dawdle.',
@@ -168,6 +168,10 @@ def keelhaven():
         quest('garden', 'The Abyssal Garden', 'thora',
               'At the bottom of the Net, in a dead end that no current reaches, grows a garden of glowing anemones. Walk there, look at what Ran has been feeding, and defeat three shellbacks on the way.',
               [visit('deep_garden', 'Reach the Abyssal Garden'), kill('shellback', 3, 'Defeat Shellbacks')], 40, 1850, 'shellbacks'),
+        dict(quest('ghostmaw', 'Three Against the Ghostmaw', 'thora',
+                   'The Ghostmaw prowls the northern deep corridors: a pale moray older than the Net. Take two friends, or hire the fighters you need from me for 250 gold each. Defeat it and return with word that the passage is safe. I will give you a blue Nacreous Moonstone Necklace.',
+                   [kill('ghostmaw', 1, 'Defeat the Ghostmaw (Group · 3 players)')], 40, 3800, 'garden'),
+             group=True, recommendedPlayers=3),
         dict(quest('rans', 'The Bells of Ran', 'sigmund',
                    'The last chain is the greatest: five bells round Ran\'s Court itself, hung where the Kraken\'s long arms can hear them. Each rings for fifty seconds, and the corridors between them are the longest and the most crowded in the Net. '
                    'Walk to one, then run the ring. Sigmund gives a guaranteed pair of Vaultwalker Pants, usable by every class.',

@@ -1,0 +1,72 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "screeferret",
+    "stoneibex",
+    "slateraven",
+    "ridgeadder",
+    "cairnbehemoth",
+    "whitebarktitan",
+    "stormcondor",
+    "cairn_warden",
+    "cairn_surveyor",
+    "cairn_stonesinger",
+    "cairn_grovekeeper",
+    "cairn_windseer",
+    "cairn_travel"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 10,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "walk": {
+      "fps": 10,
+      "n": 8,
+      "row": 1,
+      "editorStart": 6
+    },
+    "attack": {
+      "fps": 10,
+      "n": 8,
+      "row": 2,
+      "editorStart": 14
+    },
+    "hurt": {
+      "fps": 10,
+      "n": 4,
+      "row": 3,
+      "editorStart": 22
+    },
+    "die": {
+      "fps": 10,
+      "n": 8,
+      "row": 4,
+      "editorStart": 26
+    }
+  },
+  "sprites": {
+    "screeferret": "4d6678bffaecef53",
+    "stoneibex": "b9e16481719da511",
+    "slateraven": "546b93f264049867",
+    "ridgeadder": "912c13d1f3ff155e",
+    "cairnbehemoth": "3921ddc883d8b692",
+    "whitebarktitan": "22a19e24ee756ab4",
+    "stormcondor": "d64ecb5b12e5b596",
+    "cairn_warden": "67d02dfa6c3f275a",
+    "cairn_surveyor": "8b873e1285c66fd8",
+    "cairn_stonesinger": "37a5052813f1f321",
+    "cairn_grovekeeper": "d9aa2861785e30a0",
+    "cairn_windseer": "e78d92e140ca8fa6",
+    "cairn_travel": "f50a8011e0fdb729"
+  }
+}
