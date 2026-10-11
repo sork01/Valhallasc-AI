@@ -34,9 +34,9 @@ fn nacre_city_is_large_safe_and_has_120_distinct_addressed_homes() {
         .collect();
     assert_eq!(names.len(), 120);
     assert_eq!(m.npcs.len(), 30);
-    assert_eq!(m.quests.len(), 9);
+    assert_eq!(m.quests.len(), 12);
     assert_eq!(w.maps.len(), 44);
-    assert_eq!(w.maps[26].template, Some(5));
+    assert_eq!(w.maps.iter().find_map(|m| m.template), Some(5));
 }
 
 #[test]
@@ -173,6 +173,11 @@ fn nacre_quests_have_valid_targets_prerequisites_and_level_table_rewards() {
                     "talk" => m.npcs.iter().any(|n| n.id == o.target),
                     "visit" => m.places.iter().any(|p| p.id == o.target),
                     "bring" => crate::items::item(&o.target).is_some(),
+                    "kill" => m
+                        .portals
+                        .iter()
+                        .any(|p| w.maps[p.to].slimes.iter().any(|s| s.kind == o.target)),
+                    "reach" => w.maps.iter().any(|area| area.name == o.target),
                     _ => false,
                 },
                 "{} {}",

@@ -31,7 +31,7 @@ class GearGeneratorTests(unittest.TestCase):
         gear.ITEMS.write_text(json.dumps(old))
         self.run_generator()
         new = {i['id']: i for i in json.loads(gear.ITEMS.read_text())}
-        self.assertEqual(len(new) - len(old), 1540)
+        self.assertEqual(len(new) - len(old), 1568)
         for i in old:
             self.assertEqual(i, new[i['id']], i['id'])
 
@@ -41,6 +41,19 @@ class GearGeneratorTests(unittest.TestCase):
         self.assertTrue(before == gear.ITEMS.read_bytes(), 'full rebuild changed the catalog')
         self.run_generator(gear.vault_only)
         self.assertTrue(before == gear.ITEMS.read_bytes(), 'vault-only rebuild changed the catalog')
+
+    def test_moonwell_catalog_has_all_class_and_shared_slots(self):
+        pieces = [i for i in self.catalog if i.get('source') == 'moonwell']
+        self.assertEqual(len(pieces), 28)
+        self.assertEqual({i['requiredLevel'] for i in pieces}, {60})
+        self.assertEqual({i['rarity'] for i in pieces}, {'rare'})
+        for cls in gear.CLASSES:
+            self.assertEqual({i['kind'] for i in pieces if i.get('class') == cls}, set(gear.CLASS_KINDS))
+        self.assertEqual({i['kind'] for i in pieces if i.get('class') is None}, set(gear.SHARED_KINDS))
+        pools = json.loads((ROOT / 'world/moonwell_gear.txt').read_text())['bossPools']
+        self.assertEqual(set(pools), {'tideglass_heron', 'hourpetal_stag', 'moonskein_weaver', 'moonwell_echo'})
+        covered = {kind for groups in pools.values() for group in groups for kind in group}
+        self.assertEqual(covered, set(gear.CLASS_KINDS + gear.SHARED_KINDS))
 
     def test_generated_colours_never_equal_the_original_or_another_set(self):
         self.run_generator()

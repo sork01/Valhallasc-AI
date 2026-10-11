@@ -1,0 +1,1569 @@
+{
+  "version": 1,
+  "drop": {
+    "chancePerKill": 0.001,
+    "eligible": "every mob, regardless of mob or player level",
+    "selection": "uniform across all 50 pieces; one success awards one copy"
+  },
+  "distribution": {
+    "method": "independent inclusive uniform integer for each listed stat range",
+    "correlations": "none",
+    "reroll": "never; values are owned by the saved copy"
+  },
+  "equip": {
+    "classes": "all five",
+    "minLevel": 1
+  },
+  "pieces": [
+    {
+      "id": "orange_01",
+      "name": "Ember Sovereign Cuirass",
+      "slot": "armor",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "flame-forged brass and black coal",
+      "rolls": {
+        "attack": [
+          38,
+          55
+        ],
+        "defense": [
+          110,
+          145
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_02",
+      "name": "Ember Sovereign Edge",
+      "slot": "weapon",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "flame-forged brass and black coal",
+      "rolls": {
+        "attack": [
+          155,
+          190
+        ],
+        "defense": [
+          22,
+          38
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_03",
+      "name": "Ember Sovereign Crown",
+      "slot": "headgear",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "flame-forged brass and black coal",
+      "rolls": {
+        "attack": [
+          28,
+          44
+        ],
+        "defense": [
+          82,
+          110
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_04",
+      "name": "Ember Sovereign Mantle",
+      "slot": "shoulders",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "flame-forged brass and black coal",
+      "rolls": {
+        "attack": [
+          36,
+          54
+        ],
+        "defense": [
+          88,
+          116
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_05",
+      "name": "Ember Sovereign Grasp",
+      "slot": "gloves",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "flame-forged brass and black coal",
+      "rolls": {
+        "attack": [
+          48,
+          68
+        ],
+        "defense": [
+          74,
+          100
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_06",
+      "name": "Verdant Crown Cuirass",
+      "slot": "armor",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "living root and emerald leaf",
+      "rolls": {
+        "attack": [
+          38,
+          55
+        ],
+        "defense": [
+          110,
+          145
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_07",
+      "name": "Verdant Crown Edge",
+      "slot": "weapon",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "living root and emerald leaf",
+      "rolls": {
+        "attack": [
+          155,
+          190
+        ],
+        "defense": [
+          22,
+          38
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_08",
+      "name": "Verdant Crown Crown",
+      "slot": "headgear",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "living root and emerald leaf",
+      "rolls": {
+        "attack": [
+          28,
+          44
+        ],
+        "defense": [
+          82,
+          110
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_09",
+      "name": "Verdant Crown Mantle",
+      "slot": "shoulders",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "living root and emerald leaf",
+      "rolls": {
+        "attack": [
+          36,
+          54
+        ],
+        "defense": [
+          88,
+          116
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_10",
+      "name": "Verdant Crown Grasp",
+      "slot": "gloves",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "living root and emerald leaf",
+      "rolls": {
+        "attack": [
+          48,
+          68
+        ],
+        "defense": [
+          74,
+          100
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_11",
+      "name": "Storm Oracle Cuirass",
+      "slot": "armor",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "forked lightning and cloud silver",
+      "rolls": {
+        "attack": [
+          38,
+          55
+        ],
+        "defense": [
+          110,
+          145
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_12",
+      "name": "Storm Oracle Edge",
+      "slot": "weapon",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "forked lightning and cloud silver",
+      "rolls": {
+        "attack": [
+          155,
+          190
+        ],
+        "defense": [
+          22,
+          38
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_13",
+      "name": "Storm Oracle Crown",
+      "slot": "headgear",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "forked lightning and cloud silver",
+      "rolls": {
+        "attack": [
+          28,
+          44
+        ],
+        "defense": [
+          82,
+          110
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_14",
+      "name": "Storm Oracle Mantle",
+      "slot": "shoulders",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "forked lightning and cloud silver",
+      "rolls": {
+        "attack": [
+          36,
+          54
+        ],
+        "defense": [
+          88,
+          116
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_15",
+      "name": "Storm Oracle Grasp",
+      "slot": "gloves",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "forked lightning and cloud silver",
+      "rolls": {
+        "attack": [
+          48,
+          68
+        ],
+        "defense": [
+          74,
+          100
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_16",
+      "name": "Abyss Singer Cuirass",
+      "slot": "armor",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "deep blue shell and singing pearl",
+      "rolls": {
+        "attack": [
+          38,
+          55
+        ],
+        "defense": [
+          110,
+          145
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_17",
+      "name": "Abyss Singer Edge",
+      "slot": "weapon",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "deep blue shell and singing pearl",
+      "rolls": {
+        "attack": [
+          155,
+          190
+        ],
+        "defense": [
+          22,
+          38
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_18",
+      "name": "Abyss Singer Crown",
+      "slot": "headgear",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "deep blue shell and singing pearl",
+      "rolls": {
+        "attack": [
+          28,
+          44
+        ],
+        "defense": [
+          82,
+          110
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_19",
+      "name": "Abyss Singer Mantle",
+      "slot": "shoulders",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "deep blue shell and singing pearl",
+      "rolls": {
+        "attack": [
+          36,
+          54
+        ],
+        "defense": [
+          88,
+          116
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_20",
+      "name": "Abyss Singer Grasp",
+      "slot": "gloves",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "deep blue shell and singing pearl",
+      "rolls": {
+        "attack": [
+          48,
+          68
+        ],
+        "defense": [
+          74,
+          100
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_21",
+      "name": "Starforged Cuirass",
+      "slot": "armor",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "dark iron with moving constellations",
+      "rolls": {
+        "attack": [
+          38,
+          55
+        ],
+        "defense": [
+          110,
+          145
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_22",
+      "name": "Starforged Edge",
+      "slot": "weapon",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "dark iron with moving constellations",
+      "rolls": {
+        "attack": [
+          155,
+          190
+        ],
+        "defense": [
+          22,
+          38
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_23",
+      "name": "Starforged Crown",
+      "slot": "headgear",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "dark iron with moving constellations",
+      "rolls": {
+        "attack": [
+          28,
+          44
+        ],
+        "defense": [
+          82,
+          110
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_24",
+      "name": "Starforged Mantle",
+      "slot": "shoulders",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "dark iron with moving constellations",
+      "rolls": {
+        "attack": [
+          36,
+          54
+        ],
+        "defense": [
+          88,
+          116
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_25",
+      "name": "Starforged Grasp",
+      "slot": "gloves",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "dark iron with moving constellations",
+      "rolls": {
+        "attack": [
+          48,
+          68
+        ],
+        "defense": [
+          74,
+          100
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_26",
+      "name": "Solar Regent Cuirass",
+      "slot": "armor",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "white gold and sunburst rays",
+      "rolls": {
+        "attack": [
+          38,
+          55
+        ],
+        "defense": [
+          110,
+          145
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_27",
+      "name": "Solar Regent Edge",
+      "slot": "weapon",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "white gold and sunburst rays",
+      "rolls": {
+        "attack": [
+          155,
+          190
+        ],
+        "defense": [
+          22,
+          38
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_28",
+      "name": "Solar Regent Crown",
+      "slot": "headgear",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "white gold and sunburst rays",
+      "rolls": {
+        "attack": [
+          28,
+          44
+        ],
+        "defense": [
+          82,
+          110
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_29",
+      "name": "Solar Regent Mantle",
+      "slot": "shoulders",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "white gold and sunburst rays",
+      "rolls": {
+        "attack": [
+          36,
+          54
+        ],
+        "defense": [
+          88,
+          116
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_30",
+      "name": "Solar Regent Grasp",
+      "slot": "gloves",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "white gold and sunburst rays",
+      "rolls": {
+        "attack": [
+          48,
+          68
+        ],
+        "defense": [
+          74,
+          100
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_31",
+      "name": "Ash Phoenix Cuirass",
+      "slot": "armor",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "charred feather and glowing cinder",
+      "rolls": {
+        "attack": [
+          38,
+          55
+        ],
+        "defense": [
+          110,
+          145
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_32",
+      "name": "Ash Phoenix Edge",
+      "slot": "weapon",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "charred feather and glowing cinder",
+      "rolls": {
+        "attack": [
+          155,
+          190
+        ],
+        "defense": [
+          22,
+          38
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_33",
+      "name": "Ash Phoenix Crown",
+      "slot": "headgear",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "charred feather and glowing cinder",
+      "rolls": {
+        "attack": [
+          28,
+          44
+        ],
+        "defense": [
+          82,
+          110
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_34",
+      "name": "Ash Phoenix Mantle",
+      "slot": "shoulders",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "charred feather and glowing cinder",
+      "rolls": {
+        "attack": [
+          36,
+          54
+        ],
+        "defense": [
+          88,
+          116
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_35",
+      "name": "Ash Phoenix Grasp",
+      "slot": "gloves",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "charred feather and glowing cinder",
+      "rolls": {
+        "attack": [
+          48,
+          68
+        ],
+        "defense": [
+          74,
+          100
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_36",
+      "name": "Moonlit Sentinel Cuirass",
+      "slot": "armor",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "pale glass and crescent silver",
+      "rolls": {
+        "attack": [
+          38,
+          55
+        ],
+        "defense": [
+          110,
+          145
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_37",
+      "name": "Moonlit Sentinel Edge",
+      "slot": "weapon",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "pale glass and crescent silver",
+      "rolls": {
+        "attack": [
+          155,
+          190
+        ],
+        "defense": [
+          22,
+          38
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_38",
+      "name": "Moonlit Sentinel Crown",
+      "slot": "headgear",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "pale glass and crescent silver",
+      "rolls": {
+        "attack": [
+          28,
+          44
+        ],
+        "defense": [
+          82,
+          110
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_39",
+      "name": "Moonlit Sentinel Mantle",
+      "slot": "shoulders",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "pale glass and crescent silver",
+      "rolls": {
+        "attack": [
+          36,
+          54
+        ],
+        "defense": [
+          88,
+          116
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_40",
+      "name": "Moonlit Sentinel Grasp",
+      "slot": "gloves",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "pale glass and crescent silver",
+      "rolls": {
+        "attack": [
+          48,
+          68
+        ],
+        "defense": [
+          74,
+          100
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_41",
+      "name": "Chronometer Cuirass",
+      "slot": "armor",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "bronze gears and amber hourglass",
+      "rolls": {
+        "attack": [
+          38,
+          55
+        ],
+        "defense": [
+          110,
+          145
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_42",
+      "name": "Chronometer Edge",
+      "slot": "weapon",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "bronze gears and amber hourglass",
+      "rolls": {
+        "attack": [
+          155,
+          190
+        ],
+        "defense": [
+          22,
+          38
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_43",
+      "name": "Chronometer Crown",
+      "slot": "headgear",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "bronze gears and amber hourglass",
+      "rolls": {
+        "attack": [
+          28,
+          44
+        ],
+        "defense": [
+          82,
+          110
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_44",
+      "name": "Chronometer Mantle",
+      "slot": "shoulders",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "bronze gears and amber hourglass",
+      "rolls": {
+        "attack": [
+          36,
+          54
+        ],
+        "defense": [
+          88,
+          116
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_45",
+      "name": "Chronometer Grasp",
+      "slot": "gloves",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "bronze gears and amber hourglass",
+      "rolls": {
+        "attack": [
+          48,
+          68
+        ],
+        "defense": [
+          74,
+          100
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_46",
+      "name": "Worldheart Cuirass",
+      "slot": "armor",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "ancient bark and sap crystal",
+      "rolls": {
+        "attack": [
+          38,
+          55
+        ],
+        "defense": [
+          110,
+          145
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_47",
+      "name": "Worldheart Edge",
+      "slot": "weapon",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "ancient bark and sap crystal",
+      "rolls": {
+        "attack": [
+          155,
+          190
+        ],
+        "defense": [
+          22,
+          38
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_48",
+      "name": "Worldheart Crown",
+      "slot": "headgear",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "ancient bark and sap crystal",
+      "rolls": {
+        "attack": [
+          28,
+          44
+        ],
+        "defense": [
+          82,
+          110
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_49",
+      "name": "Worldheart Mantle",
+      "slot": "shoulders",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "ancient bark and sap crystal",
+      "rolls": {
+        "attack": [
+          36,
+          54
+        ],
+        "defense": [
+          88,
+          116
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    },
+    {
+      "id": "orange_50",
+      "name": "Worldheart Grasp",
+      "slot": "gloves",
+      "rarity": "legendary",
+      "requiredLevel": 1,
+      "class": null,
+      "motif": "ancient bark and sap crystal",
+      "rolls": {
+        "attack": [
+          48,
+          68
+        ],
+        "defense": [
+          74,
+          100
+        ],
+        "stamina": [
+          90,
+          140
+        ],
+        "accuracy": [
+          8,
+          20
+        ],
+        "dexterity": [
+          18,
+          35
+        ]
+      }
+    }
+  ]
+}

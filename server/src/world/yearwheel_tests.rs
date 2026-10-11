@@ -30,10 +30,10 @@ fn four_seasons_hubs_travel_and_sealed_thresholds() {
         (m.name.as_str(), m.size, m.levels),
         ("The Yearwheel", 400, Some([95, 99]))
     );
-    assert!(400 * 400 > 4 * 192 * 192);
+    assert!(m.size * m.size > 4 * 192 * 192);
     assert_eq!(
         (m.npcs.len(), m.quests.len(), m.slimes.len()),
-        (28, 24, 156)
+        (28, 25, 156)
     );
     for q in &m.quests {
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);

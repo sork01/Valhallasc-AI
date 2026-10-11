@@ -103,29 +103,29 @@ The Seed Vault is a separate dungeon: Veyrroot Canopy and Heartwood remain enemy
 ## Quests and rewards
 
 - [x] `Q-GHOSTMAW` — Add a dedicated group kill quest for Rán’s Deep elite Ghostmaw, with appropriate reward and credit rules.
-- [ ] `Q-VAULT-ENTRY` — Add the Undervault story/entry quest in Skaldholm, leading players to its existing level-20 dungeon.
-- [ ] `Q-VAULT-BOSSES` — Add kill/clear objectives for Gatewarden, Choir, Colossus and Hollow King.
-- [ ] `Q-CATH-CLOISTER` — Add Flooded Cloister boss objectives and a completion reward.
-- [ ] `Q-CATH-RELIQUARY` — Add Coral Reliquary boss objectives and a completion reward.
-- [ ] `Q-CATH-NAVE` — Add Grand Nave boss objectives and a completion reward.
-- [ ] `Q-PATH-40-55` — Add automatic next-area quests for the level-40, 45, 50 and 55 transitions.
-- [ ] `Q-PATH-60-75` — Add automatic next-area quests for the level-60, 65, 70 and 75 transitions.
-- [ ] `Q-PATH-80-99` — Add automatic next-area quests for the level-80, 85, 90 and 95 transitions through the Yearwheel.
-- [ ] `Q-REWARD-SKY` — Replace the level-20 rewards on `sky_ward_vigil` (34) and `sky_ward_last` (35) with gear appropriate to those quests.
-- [ ] `Q-REWARD-DEEP` — Replace the level-20 rewards on `deep_captain` (37), `deep_net` (38), `deep_rans` (40) and `deep_kraken` (40). Preserve existing item IDs and saves.
-- [ ] `Q-CLASS-40-55` — Add class-appropriate armor/weapon/head/shoulder/glove reward choices to Astralhollow, Prismwaste and Orrery quests.
-- [ ] `Q-CLASS-60-75` — Add those reward choices to Moonspore, Stormglass, Sunward and Ribbonwild quests.
-- [ ] `Q-CLASS-80-95` — Add those reward choices to Tanglecrown, Lapis Erg, Frostwake and Cairnspine quests.
-- [ ] `Q-YEAR-ELITES` — Give the twelve Yearwheel elite quests more varied rewards than the same three level-95 blue shared pieces; keep class fairness.
+- [x] `Q-VAULT-ENTRY` — Add the Undervault story/entry quest in Skaldholm, leading players to its existing level-20 dungeon.
+- [x] `Q-VAULT-BOSSES` — Add kill/clear objectives for Gatewarden, Choir, Colossus and Hollow King.
+- [x] `Q-CATH-CLOISTER` — Add Flooded Cloister boss objectives and a completion reward.
+- [x] `Q-CATH-RELIQUARY` — Add Coral Reliquary boss objectives and a completion reward.
+- [x] `Q-CATH-NAVE` — Add Grand Nave boss objectives and a completion reward.
+- [x] `Q-PATH-40-55` — Add automatic next-area quests for the level-40, 45, 50 and 55 transitions.
+- [x] `Q-PATH-60-75` — Add automatic next-area quests for the level-60, 65, 70 and 75 transitions.
+- [x] `Q-PATH-80-99` — Add automatic next-area quests for the level-80, 85, 90 and 95 transitions through the Yearwheel.
+- [x] `Q-REWARD-SKY` — Replace the level-20 rewards on `sky_ward_vigil` (34) and `sky_ward_last` (35) with gear appropriate to those quests.
+- [x] `Q-REWARD-DEEP` — Replace the level-20 rewards on `deep_captain` (37), `deep_net` (38), `deep_rans` (40) and `deep_kraken` (40). Preserve existing item IDs and saves.
+- [x] `Q-CLASS-40-55` — Add class-appropriate armor/weapon/head/shoulder/glove reward choices to Astralhollow, Prismwaste and Orrery quests.
+- [x] `Q-CLASS-60-75` — Add those reward choices to Moonspore, Stormglass, Sunward and Ribbonwild quests.
+- [x] `Q-CLASS-80-95` — Add those reward choices to Tanglecrown, Lapis Erg, Frostwake and Cairnspine quests.
+- [x] `Q-YEAR-ELITES` — Give the twelve Yearwheel elite quests more varied rewards than the same three level-95 blue shared pieces; keep class fairness.
 
 ## Equipment systems
 
 - [ ] `G-INSTANCE-DATA` — Represent equipment copies with persistent per-item rolled stats and refinement, while preserving legacy stacked items and equipped saves. Needed for randomized orange drops and refinement.
-- [ ] `G-MERGE-RULES` — Set the rarity steps, cap and handling of differing stat rolls when two identical pieces merge. Decide whether orange gear is mergeable.
+- [x] `G-MERGE-RULES` — Set the rarity steps, cap and handling of differing stat rolls when two identical pieces merge. Decide whether orange gear is mergeable.
 - [ ] `G-MERGE-SERVER` — Consume exactly two owned copies and create one higher-rarity copy atomically; validate item identity, life, inventory and bag space on the server.
 - [ ] `G-MERGE-NPC` — Place the merge NPC, add dialogue and a clear preview/confirmation UI.
 - [ ] `G-MERGE-CHECK` — Verify success, invalid pairs, insufficient copies, full bags and save/reload in a private world.
-- [ ] `G-REFINE-RULES` — Define refinement levels, stat gains, material/gold costs, cap and interaction with merging/orange rolls.
+- [x] `G-REFINE-RULES` — Define refinement levels, stat gains, material/gold costs, cap and interaction with merging/orange rolls.
 - [ ] `G-REFINE-SERVER` — Implement authoritative per-item refinement with atomic payment and persistent upgraded stats.
 - [ ] `G-REFINE-NPC` — Add the refinement service and UI that shows cost, current rank and resulting stats.
 - [ ] `G-REFINE-CHECK` — Verify upgrades, invalid attempts, equipped items and save/reload in a private world.
@@ -134,7 +134,7 @@ The Seed Vault is a separate dungeon: Veyrroot Canopy and Heartwood remain enemy
 
 All 50 must work for every class at every level, be exceptionally strong, have distinct worn art/icons and receive randomized stats when dropped. A kill of **any mob** rolls a **0.1% total chance**, independent of mob/player level; a success chooses one of the 50 pieces. The roll and ownership are authoritative.
 
-- [ ] `O-RULES` — Define the 50 names, slots, stat ranges and roll distribution without adding class or level gates.
+- [x] `O-RULES` — Define the 50 names, slots, stat ranges and roll distribution without adding class or level gates.
 - [ ] `O-DROP` — Add the independent 0.1% per-kill roll and random choice from the 50-piece pool.
 - [ ] `O-UI` — Display orange rarity and each copy’s rolled stats consistently in bags, equipment and loot.
 - [ ] `O-01-05` — Create and wire orange pieces 01–05: catalog, distinct worn art, icon and randomized stat definition.
@@ -153,7 +153,7 @@ All 50 must work for every class at every level, be exceptionally strong, have d
 
 For each entry, replace tinted starter silhouettes with new worn layers and matching icons while preserving item IDs, stats and saves. Class entries cover armor, headgear, shoulders, gloves and weapon; shared entries cover pants, necklace and accessory. Level 55 currently reuses level-50 art.
 
-- [ ] `A55-DECIDE` — Decide whether level 55 should have its own artwork, then either plan it or record the intentional level-50 reuse.
+- [x] `A55-DECIDE` — Decide whether level 55 should have its own artwork, then either plan it or record the intentional level-50 reuse.
 
 #### Level 60
 
@@ -229,9 +229,9 @@ For each entry, replace tinted starter silhouettes with new worn layers and matc
 
 ### Dungeon and endgame gear
 
-- [ ] `G-VAULT-ART` — Give the 27 Undervault-exclusive level-20 pieces a distinct visual direction; record how its class and shared pieces differ from starter gear.
+- [x] `G-VAULT-ART` — Give the 27 Undervault-exclusive level-20 pieces a distinct visual direction; record how its class and shared pieces differ from starter gear.
 - [ ] `G-VAULT-EXPORT` — Export/wire the Undervault worn layers and matching icons without changing item IDs or existing loot.
-- [ ] `G-MOON-CATALOG` — Define a Moonwell-exclusive level-60 blue set and boss slot pools; currently Moonwell bosses give ordinary blue gear.
+- [x] `G-MOON-CATALOG` — Define a Moonwell-exclusive level-60 blue set and boss slot pools; currently Moonwell bosses give ordinary blue gear.
 - [ ] `G-MOON-ART` — Create Moonwell set worn art and icons.
 - [ ] `G-MOON-LOOT` — Switch the four Moonwell bosses to their exclusive set and verify party drops.
 - [ ] `G-YEAR-SPRING` — Define level-97 Blooming Labyrinth gear rewards.

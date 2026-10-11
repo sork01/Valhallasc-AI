@@ -12,7 +12,7 @@ fn cairnspine_routes_hub_and_pass_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("The Cairnspine", Some([90, 95]), 168)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (43, 10));
+    assert_eq!((m.slimes.len(), m.quests.len()), (43, 11));
     assert!(m.in_city(m.spawn));
     let back = m
         .portals

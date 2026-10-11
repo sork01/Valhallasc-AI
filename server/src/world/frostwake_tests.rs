@@ -12,7 +12,7 @@ fn frostwake_routes_gates_and_hub_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("Frostwake Shelf", Some([85, 90]), 160)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (43, 10));
+    assert_eq!((m.slimes.len(), m.quests.len()), (43, 11));
     assert!(m.in_city(m.spawn));
     let back = m
         .portals

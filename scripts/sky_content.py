@@ -154,7 +154,7 @@ def perch():
                    'In the Hall of the Fallen stands the second ward: the vigil lamp. Stand inside its circle for seventy-five seconds and the dead will know they are remembered. '
                    'They will not take it quietly: first the einherjar, then the skyrays that nest in the rafters. Leaving the circle pauses the count; falling loses it all. Thorgrim gives a guaranteed blue Amber Ring.',
                    [hold('sky_ward_vigil', 75, "Hold the Fallen's Vigil")], 34, 1500, 'hallgate'),
-             rewardItem='accessory_amber_l20_blue'),
+             rewardItem='accessory_amber_l30_blue'),
         quest('rocs', 'Thunder Over the Eyrie', 'warden',
               'Across the long bridge from the Hall of the Fallen lies the Roc\'s Eyrie, and the thunderrocs there dive on anything that crosses. Defeat five of them.',
               [kill('thunderroc', 5, 'Defeat Thunderrocs')], 35, 1400, 'ward_vigil'),
@@ -163,9 +163,9 @@ def perch():
               [bring('thunderroc_quill', 8, 'Bring Thunderroc Quills')], 35, 1450, 'rocs'),
         dict(quest('ward_last', 'The Last Ward', 'warden',
                    'Under the Eyrie\'s great nest stands the last ward, the one that holds the whole storm down. If it falls, the Reach falls. It needs a hero in the circle for two full minutes, and the storm will send everything it has: thunderrocs first, then prism golems, then thunderrocs again. '
-                   'Stay inside the circle and bring friends: three heroes can take turns to heal and hold. Leaving the circle pauses the count; falling loses it all. Return to Sigrun for a guaranteed epic pair of Mythic Wayfarer Pants, usable by every class.',
+                   'Stay inside the circle and bring friends: three heroes can take turns to heal and hold. Leaving the circle pauses the count; falling loses it all. Return to Sigrun for a level-35 blue pair of Wayfarer Pants, usable by every class.',
                    [hold('sky_ward_last', 120, 'Hold the Last Ward (Group · 3 players)')], 35, 3000, 'quills'),
-             group=True, rewardItem='pants_wayfarer_l20_purple', recommendedPlayers=3),
+             group=True, rewardItem='pants_wayfarer_l35_blue', recommendedPlayers=3),
         quest('patrol', 'Skywatch Patrol', 'trader',
               'Hrafn pays for every beast that falls off the edge of the Perch\'s peace. Defeat fourteen enemies anywhere in Bifrost Reach and return to him. This patrol can be repeated.',
               [kill('any', 14, 'Defeat Bifrost Reach enemies')], 31, 900, 'welcome', True),

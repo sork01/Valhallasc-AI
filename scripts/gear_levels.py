@@ -193,6 +193,7 @@ def main():
             add(out, bases, None, kind, level, rarity)
     out.extend(vault_pieces(out))
     out.extend(cathedral_pieces(out))
+    out.extend(moonwell_pieces(out))
     # Keep existing catalog order stable: migrations, item-icon cells and reviews need no reshuffle.
     order = {i['id']: n for n, i in enumerate(existing)}
     out.sort(key=lambda i: order.get(i['id'], len(order)))
@@ -256,6 +257,48 @@ def cathedral_pieces(out):
             v['source'] = f'cathedral_{name}'
             v['bonusStats'] = bonus_stats(v)
             pieces.append(ordered(v))
+    return pieces
+
+
+# Moonwell's exclusive blue catalog is defined here; its new worn art and the
+# boss-source switch are separate tasks. The placeholder uses level-60 base art.
+MOONWELL_BONUS = 1.15
+MOONWELL_NAMES = {
+    'warrior': 'Tideglass', 'mage': 'Hourpetal', 'assassin': 'Moonskein',
+    'priest': 'Stillwater', 'hunter': 'Silvercurrent',
+}
+MOONWELL_WEAPONS = {
+    'warrior': 'Tideglass Sword', 'mage': 'Hourpetal Staff',
+    'assassin': 'Moonskein Daggers', 'priest': 'Stillwater Mace',
+    'hunter': 'Silvercurrent Bow',
+}
+MOONWELL_SHARED = {'pants': 'Moonwell Waders', 'necklace': 'Lunar Tide Pendant',
+                   'accessory': 'Echo Signet'}
+
+
+def moonwell_pieces(out):
+    pieces = []
+    for i in out:
+        if i.get('source') or i['rarity'] != 'rare' or i.get('requiredLevel') != 60:
+            continue
+        if i['kind'] not in CLASS_KINDS + SHARED_KINDS:
+            continue
+        v = dict(i)
+        suffix = '_l60_blue'
+        assert i['id'].endswith(suffix), i['id']
+        v['id'] = i['id'][:-len(suffix)] + '_l60_moonwell'
+        v['variant'] = i['variant'][:-len(suffix)] + '_l60_moonwell'
+        cls = i.get('class')
+        v['name'] = (MOONWELL_WEAPONS[cls] if i['kind'] == 'weapon' else
+                     f"{MOONWELL_NAMES[cls]} {SLOT_NAMES[i['kind']]}") if cls else MOONWELL_SHARED[i['kind']]
+        v['attack'] = round(i['attack'] * MOONWELL_BONUS, 1)
+        v['defense'] = round(i['defense'] * MOONWELL_BONUS, 1)
+        v['sell'] = round(i['sell'] * MOONWELL_BONUS)
+        v['source'] = 'moonwell'
+        v['tint'] = {'hue': 165, 'saturate': 1.15, 'brightness': 1.17}
+        v['bonusStats'] = bonus_stats(v)
+        pieces.append(ordered(v))
+    assert len(pieces) == 28
     return pieces
 
 

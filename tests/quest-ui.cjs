@@ -100,6 +100,7 @@ async function call(name, args = {}) {
   await fixture.addStyleTag({ path: path.join(root, 'client/style.css') });
   await fixture.addStyleTag({ path: path.join(root, 'client/online.css') });
   await fixture.addScriptTag({ path: path.join(root, 'client/world.js') });
+  await fixture.addScriptTag({ path: path.join(root, 'client/items.js') });
   await fixture.evaluate(() => { window.Online = { connected: true }; window.Field = { hero: { dead: false }, setPaused: () => {} }; window.City = { open: false }; });
   await fixture.addScriptTag({ path: path.join(root, 'client/quests.js') });
   await fixture.evaluate(() => Quests.update([{ id: 'welcome', counts: [1, 0, 0], claimed: false, completions: 0 }, { id: 'slime_patrol', counts: [2], claimed: false, completions: 0 }, { id: 'meadow_bounty', counts: [8], claimed: false, completions: 0 }]));
@@ -116,6 +117,17 @@ async function call(name, args = {}) {
   check(await fixture.locator('.tracker-quest[data-quest="slime_patrol"] .tracker-party').textContent() === 'Party: Bob, Cat' && await fixture.locator('.tracker-quest[data-quest="meadow_bounty"] .tracker-party').count() === 0, 'The tracker lists the party mates on each quest, and only there');
   check(await fixture.evaluate(() => Quests.sharedWith({ quests: [{ id: 'slime_patrol' }, { id: 'ironhide_hunt' }, { id: 'king_challenge' }] }).join('|')) === 'Trouble at the Gate', 'sharedWith lists only quests you also have in progress');
   await fixture.evaluate(() => Quests.close(false));
+  await fixture.evaluate(() => {
+    Field.hero.look = { class: 'warrior' };
+    Online.send = message => { window.chosenQuestReward = message; return true; };
+    const q = WORLD_MAP.zones[12].quests.find(q => q.id === 'astral_welcome');
+    const container = document.createElement('div'); container.id = 'choice-fixture'; document.body.append(container);
+    Quests.update([{ id: q.id, counts: q.objectives.map(o => o.count), claimed: false, completions: 0 }]);
+    Quests.detail(q, container, () => {});
+  });
+  check(await fixture.locator('#choice-fixture [data-action="claim"][data-item]').count() === 5 && await fixture.locator('#choice-fixture [data-action="claim"]:not([data-item])').count() === 0, 'Ready class quest offers five explicit equipment choices');
+  await fixture.locator('#choice-fixture [data-action="claim"][data-item]').first().click();
+  check(await fixture.evaluate(() => chosenQuestReward.offer === `quest:claim:astral_welcome:${WORLD_MAP.zones[12].quests.find(q => q.id === 'astral_welcome').rewardChoices.warrior[0]}`), 'Chosen reward ID reaches the server in the claim action');
   check(await fixture.locator('.tracker-quest[data-quest="meadow_bounty"] .complete').textContent().then(t => t.includes('Return to Linden')), 'Completed quests display their turn-in destination');
   await fixture.screenshot({ path: path.join(world.artifacts, 'quest-tracker.png') });
   check(await page.evaluate(stub => !!Field.warriorSprites.source.parts.body && (stub || Field.beetleSprites.img.beetle.complete), STUB), 'Character and enemy artwork load');

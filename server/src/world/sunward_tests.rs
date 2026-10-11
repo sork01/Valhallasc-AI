@@ -12,7 +12,7 @@ fn vale_gates_bridges_hub_and_all_encounters_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("Sunward Vale", Some([65, 70]), 128)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (42, 9));
+    assert_eq!((m.slimes.len(), m.quests.len()), (42, 10));
     assert!(m.in_city(m.spawn));
     let out = m
         .portals

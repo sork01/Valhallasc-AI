@@ -12,7 +12,7 @@ fn shore_has_reciprocal_clear_gates_a_hub_and_a_sealed_eye() {
         (m.name.as_str(), m.levels, m.size),
         ("The Stormglass Shore", Some([60, 65]), 128)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (41, 8));
+    assert_eq!((m.slimes.len(), m.quests.len()), (41, 9));
     assert!(m.in_city(m.spawn));
     let out = m
         .portals

@@ -45,6 +45,9 @@
     reward.dataset.rarity = i.rarity; reward.dataset.item = i.id;
     container.append(reward);
   }
+  function classChoices(quest) {
+    return (quest.rewardChoices || {})[Field.hero?.look?.class] || [];
+  }
   // Party mates (not you) who have also taken this quest, with how far each one is.
   function mates(quest) {
     return (window.Social?.questMates?.(quest.id) || []).map(m => {
@@ -71,11 +74,23 @@
     }
     node.append(element('p', `Reward: ${quest.rewardXp} XP · ${quest.rewardGold} gold`, 'quest-reward'));
     gearReward(quest, node);
+    const choices = classChoices(quest);
+    if (choices.length) node.append(element('p', 'Choose one class reward:', 'quest-reward'));
+    for (const id of choices) {
+      const piece = (window.WORLD_ITEMS || []).find(i => i.id === id);
+      if (!piece) continue;
+      if (s === 'ready' && atNpc) {
+        const b = button(`Claim ${piece.name}`, () => {
+          if (Online.send({ type: 'interact', npc: quest.npc, offer: `quest:claim:${quest.id}:${id}` })) b.disabled = true;
+        });
+        b.dataset.item = id; node.append(b);
+      } else node.append(element('p', `${piece.name} · ${piece.kind} · Level ${piece.requiredLevel}`, 'quest-reward item-name'));
+    }
     if (s === 'upcoming') {
       node.append(element('p', `This quest finds you by itself at level ${quest.autoLevel}.`, 'quest-history'));
     } else if (s === 'locked') {
       node.append(element('p', `Complete “${definitions.find(q => q.id === quest.requires)?.title}” first.`));
-    } else if (atNpc && ['available', 'ready'].includes(s)) {
+    } else if (atNpc && ['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {
       const action = s === 'ready' ? 'claim' : 'accept';
       const b = button(s === 'ready' ? 'Collect reward' : state(quest)?.completions ? 'Take bounty again' : 'Accept quest', () => {
         if (Online.send({ type: 'interact', npc: quest.npc, offer: `quest:${action}:${quest.id}` })) b.disabled = true;
@@ -241,7 +256,19 @@
       node.append(element('h5', 'Rewards'), element('p', `${quest.rewardXp} experience · ${quest.rewardGold} gold`, 'quest-reward'));
       gearReward(quest, node);
       const actions = element('div', '', 'quest-actions');
-      if (['available', 'ready'].includes(s)) {
+      const choices = classChoices(quest);
+      if (choices.length) node.append(element('p', 'Choose one class reward:', 'quest-reward'));
+      for (const id of choices) {
+        const piece = (window.WORLD_ITEMS || []).find(i => i.id === id);
+        if (!piece) continue;
+        if (s === 'ready') {
+          const b = element('button', `Claim ${piece.name}`, 'gossip-button primary'); b.type = 'button';
+          b.dataset.action = 'claim'; b.dataset.item = id;
+          b.addEventListener('click', () => { if (Online.send({ type: 'interact', npc: quest.npc, offer: `quest:claim:${quest.id}:${id}` })) b.disabled = true; });
+          actions.append(b);
+        } else node.append(element('p', `${piece.name} · ${piece.kind} · Level ${piece.requiredLevel}`, 'quest-reward item-name'));
+      }
+      if (['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {
         const action = s === 'ready' ? 'claim' : 'accept';
         const b = element('button', s === 'ready' ? 'Complete Quest' : state(quest)?.completions ? 'Take bounty again' : 'Accept', 'gossip-button primary'); b.type = 'button';
         b.dataset.action = action;

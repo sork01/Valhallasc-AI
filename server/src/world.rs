@@ -1875,11 +1875,15 @@ impl World {
                 p.service_at = self.time;
                 if let Some(action) = id.strip_prefix("quest:") {
                     if let Some((action, id)) = action.split_once(':')
-                        && let Some(quest) =
-                            map.quests.iter().find(|q| q.id == id && q.npc == npc_id)
+                        && let (quest_id, choice) =
+                            id.split_once(':').map_or((id, None), |(q, c)| (q, Some(c)))
+                        && let Some(quest) = map
+                            .quests
+                            .iter()
+                            .find(|q| q.id == quest_id && q.npc == npc_id)
                     {
                         (notice, levels, quest_changed) =
-                            quest_action(&mut p.character, quest, action);
+                            quest_action_with_choice(&mut p.character, quest, action, choice);
                     }
                 } else if let Some(sale) = id.strip_prefix("sell:") {
                     if !npc.buys {
@@ -3683,6 +3687,29 @@ fn walk_with_actors(
 
 // Only called after the NPC's range, living-player and cooldown checks.
 fn quest_action(character: &mut Character, quest: &Quest, action: &str) -> (String, u32, bool) {
+    // Internal quest helpers (including private test shortcuts) choose the first legal class
+    // reward. Network claims use quest_action_with_choice and require an explicit selection.
+    let class = match character.look.class {
+        Class::Warrior => "warrior",
+        Class::Mage => "mage",
+        Class::Assassin => "assassin",
+        Class::Priest => "priest",
+        Class::Hunter => "hunter",
+    };
+    let choice = quest
+        .reward_choices
+        .get(class)
+        .and_then(|items| items.first())
+        .map(String::as_str);
+    quest_action_with_choice(character, quest, action, choice)
+}
+
+fn quest_action_with_choice(
+    character: &mut Character,
+    quest: &Quest,
+    action: &str,
+    choice: Option<&str>,
+) -> (String, u32, bool) {
     let refused = |text: &str| (text.to_owned(), 0, false);
     if !quest.unlocked(character) {
         return refused("Finish the earlier quest first.");
@@ -3725,9 +3752,27 @@ fn quest_action(character: &mut Character, quest: &Quest, action: &str) -> (Stri
             if !quest.ready(&character.quests[i]) {
                 return refused("Complete the objectives before collecting your reward.");
             }
+            let class = match character.look.class {
+                Class::Warrior => "warrior",
+                Class::Mage => "mage",
+                Class::Assassin => "assassin",
+                Class::Priest => "priest",
+                Class::Hunter => "hunter",
+            };
+            let choices = quest.reward_choices.get(class);
+            let chosen = match (choices, choice) {
+                (Some(allowed), Some(id)) if allowed.iter().any(|candidate| candidate == id) => {
+                    Some(id)
+                }
+                (Some(_), _) => {
+                    return refused("Choose one of your class rewards before claiming.");
+                }
+                (None, Some(_)) => return refused("This quest has no reward choice."),
+                (None, None) => None,
+            };
             let mut next = character.clone();
             quest.take_bring(&mut next);
-            if let Some(id) = &quest.reward_item {
+            for id in quest.reward_item.as_deref().into_iter().chain(chosen) {
                 if !next.can_collect(id) {
                     return refused("Your bags are full. Make room for the quest reward.");
                 }
@@ -3749,6 +3794,9 @@ fn quest_action(character: &mut Character, quest: &Quest, action: &str) -> (Stri
                         .as_deref()
                         .and_then(item)
                         .map_or(String::new(), |i| format!(" Received {}.", i.name))
+                        + &chosen
+                            .and_then(item)
+                            .map_or(String::new(), |i| format!(" Received {}.", i.name))
                 ),
                 levels,
                 true,
@@ -3774,6 +3822,31 @@ mod tests {
     // Fixed levels keep health, damage and XP exact; level rolls have their own tests.
     fn world() -> World {
         World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)
+    }
+    #[test]
+    fn class_quest_reward_requires_a_valid_choice_and_claims_once() {
+        let mut w = world();
+        let q = w.maps[13]
+            .quests
+            .iter()
+            .find(|q| q.id == "astral_welcome")
+            .unwrap()
+            .clone();
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, None, Some(Look::default()), tx).unwrap();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        assert!(quest_action_with_choice(c, &q, "accept", None).2);
+        c.quests.last_mut().unwrap().counts = q.objectives.iter().map(|o| o.count).collect();
+        let own = q.reward_choices["warrior"][0].as_str();
+        let other = q.reward_choices["mage"][0].as_str();
+        let before = (c.gold, c.xp, c.quantity(own));
+        assert!(!quest_action_with_choice(c, &q, "claim", None).2);
+        assert!(!quest_action_with_choice(c, &q, "claim", Some(other)).2);
+        assert_eq!((c.gold, c.xp, c.quantity(own)), before);
+        assert!(quest_action_with_choice(c, &q, "claim", Some(own)).2);
+        assert_eq!(c.quantity(own), before.2 + 1);
+        assert!(!quest_action_with_choice(c, &q, "claim", Some(own)).2);
+        assert_eq!(c.quantity(own), before.2 + 1);
     }
     // The zones a client knows: the file's zones, not the extra private copies of a dungeon.
     fn zone_count(w: &World) -> usize {
@@ -6268,7 +6341,7 @@ mod tests {
         assert_eq!(map.name, "The Moonspore Canopy");
         assert_eq!(map.levels, Some([55, 60]));
         assert_eq!(w.spawns.iter().filter(|s| s.zone == 16).count(), 43);
-        assert_eq!(map.quests.len(), 12);
+        assert_eq!(map.quests.len(), 13);
         assert!(map.portals.iter().any(|p| p.to == 15));
         assert!(w.maps[15].portals.iter().any(|p| p.to == 16));
         assert!(map.npcs.iter().any(|n| n.id == "travel_lamplight"));
@@ -6970,7 +7043,7 @@ mod tests {
     fn skaldholm_has_eleven_valid_quests_mostly_errands_between_the_maps() {
         let w = world();
         let map = &w.maps[CITY];
-        assert_eq!(map.quests.len(), 12);
+        assert_eq!(map.quests.len(), 14);
         assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 1);
         let all_npcs: Vec<(usize, &Npc)> = w
             .maps
@@ -7013,6 +7086,11 @@ mod tests {
                         assert_eq!(wanted.kind, "material", "{}", q.id);
                     }
                     "reach" => assert!(w.maps.iter().any(|m| m.name == o.target)),
+                    "kill" => assert!(
+                        map.portals
+                            .iter()
+                            .any(|p| w.maps[p.to].slimes.iter().any(|s| s.kind == o.target))
+                    ),
                     other => panic!("{} has a {other} objective", q.id),
                 }
             }

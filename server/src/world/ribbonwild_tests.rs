@@ -12,7 +12,7 @@ fn ribbonwild_gates_hub_circuit_and_entrance_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("The Ribbonwild", Some([70, 75]), 136)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (42, 9));
+    assert_eq!((m.slimes.len(), m.quests.len()), (42, 10));
     assert!(m.in_city(m.spawn));
     let out = m
         .portals

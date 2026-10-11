@@ -648,6 +648,10 @@ pub struct Quest {
     /// Guaranteed gear, granted atomically with XP and gold when there is bag space.
     #[serde(default)]
     pub reward_item: Option<String>,
+    /// Optional class-specific choice, keyed by the serialized class name. A player may claim
+    /// exactly one listed piece; the choice is checked again by the server at turn-in.
+    #[serde(default)]
+    pub reward_choices: std::collections::HashMap<String, Vec<String>>,
     /// Shared kill objectives for living, nearby contributors to an elite fight.
     #[serde(default)]
     pub group: bool,

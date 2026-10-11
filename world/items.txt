@@ -42976,5 +42976,646 @@
     "kind": "material",
     "rarity": "common",
     "sell": 20000
+  },
+  {
+    "id": "warrior_armor_crimson_l60_moonwell",
+    "name": "Tideglass Vestments",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "warrior",
+    "variant": "crimson_l60_moonwell",
+    "art": "crimson",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 10.6,
+    "defense": 42.2,
+    "bonusStats": {
+      "agility": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "warrior_headgear_crimson_l60_moonwell",
+    "name": "Tideglass Crown",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "warrior",
+    "variant": "crimson_l60_moonwell",
+    "art": "crimson",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "strength": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l60_moonwell",
+    "name": "Tideglass Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "warrior",
+    "variant": "crimson_l60_moonwell",
+    "art": "crimson",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "agility": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "warrior_gloves_crimson_l60_moonwell",
+    "name": "Tideglass Grips",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "warrior",
+    "variant": "crimson_l60_moonwell",
+    "art": "crimson",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "agility": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "warrior_weapon_sword_l60_moonwell",
+    "name": "Tideglass Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "warrior",
+    "variant": "sword_l60_moonwell",
+    "art": "sword",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 56.2,
+    "defense": 14.0,
+    "bonusStats": {
+      "dexterity": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "mage_armor_apprentice_l60_moonwell",
+    "name": "Hourpetal Vestments",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "mage",
+    "variant": "apprentice_l60_moonwell",
+    "art": "apprentice",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 7.0,
+    "defense": 28.1,
+    "bonusStats": {
+      "intellect": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "mage_headgear_apprentice_l60_moonwell",
+    "name": "Hourpetal Crown",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "mage",
+    "variant": "apprentice_l60_moonwell",
+    "art": "apprentice",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "dexterity": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l60_moonwell",
+    "name": "Hourpetal Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "mage",
+    "variant": "apprentice_l60_moonwell",
+    "art": "apprentice",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "agility": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "mage_gloves_apprentice_l60_moonwell",
+    "name": "Hourpetal Grips",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "mage",
+    "variant": "apprentice_l60_moonwell",
+    "art": "apprentice",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "agility": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "mage_weapon_ash_l60_moonwell",
+    "name": "Hourpetal Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "mage",
+    "variant": "ash_l60_moonwell",
+    "art": "ash",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 56.2,
+    "defense": 14.0,
+    "bonusStats": {
+      "intellect": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "assassin_armor_shadow_l60_moonwell",
+    "name": "Moonskein Vestments",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "assassin",
+    "variant": "shadow_l60_moonwell",
+    "art": "shadow",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 7.0,
+    "defense": 28.1,
+    "bonusStats": {
+      "stamina": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "assassin_headgear_shadow_l60_moonwell",
+    "name": "Moonskein Crown",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "assassin",
+    "variant": "shadow_l60_moonwell",
+    "art": "shadow",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "stamina": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l60_moonwell",
+    "name": "Moonskein Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "assassin",
+    "variant": "shadow_l60_moonwell",
+    "art": "shadow",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "strength": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "assassin_gloves_shadow_l60_moonwell",
+    "name": "Moonskein Grips",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "assassin",
+    "variant": "shadow_l60_moonwell",
+    "art": "shadow",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "strength": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "assassin_weapon_daggers_l60_moonwell",
+    "name": "Moonskein Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "assassin",
+    "variant": "daggers_l60_moonwell",
+    "art": "daggers",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 56.2,
+    "defense": 14.0,
+    "bonusStats": {
+      "agility": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "priest_armor_pilgrim_l60_moonwell",
+    "name": "Stillwater Vestments",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "priest",
+    "variant": "pilgrim_l60_moonwell",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 10.6,
+    "defense": 42.2,
+    "bonusStats": {
+      "intellect": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l60_moonwell",
+    "name": "Stillwater Crown",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "priest",
+    "variant": "pilgrim_l60_moonwell",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "agility": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l60_moonwell",
+    "name": "Stillwater Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "priest",
+    "variant": "pilgrim_l60_moonwell",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "intellect": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l60_moonwell",
+    "name": "Stillwater Grips",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "priest",
+    "variant": "pilgrim_l60_moonwell",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "dexterity": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "priest_weapon_mace_l60_moonwell",
+    "name": "Stillwater Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "priest",
+    "variant": "mace_l60_moonwell",
+    "art": "mace",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 56.2,
+    "defense": 14.0,
+    "bonusStats": {
+      "dexterity": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "hunter_armor_scout_l60_moonwell",
+    "name": "Silvercurrent Vestments",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "hunter",
+    "variant": "scout_l60_moonwell",
+    "art": "scout",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 10.6,
+    "defense": 42.2,
+    "bonusStats": {
+      "dexterity": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "hunter_headgear_scout_l60_moonwell",
+    "name": "Silvercurrent Crown",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "hunter",
+    "variant": "scout_l60_moonwell",
+    "art": "scout",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "strength": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "hunter_shoulders_scout_l60_moonwell",
+    "name": "Silvercurrent Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "hunter",
+    "variant": "scout_l60_moonwell",
+    "art": "scout",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "dexterity": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "hunter_gloves_scout_l60_moonwell",
+    "name": "Silvercurrent Grips",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "hunter",
+    "variant": "scout_l60_moonwell",
+    "art": "scout",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "strength": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l60_moonwell",
+    "name": "Silvercurrent Bow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "class": "hunter",
+    "variant": "shortbow_l60_moonwell",
+    "art": "shortbow",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 56.2,
+    "defense": 14.0,
+    "bonusStats": {
+      "strength": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "pants_wayfarer_l60_moonwell",
+    "name": "Moonwell Waders",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "variant": "wayfarer_l60_moonwell",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 3.6,
+    "defense": 14.0,
+    "bonusStats": {
+      "stamina": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "necklace_moonstone_l60_moonwell",
+    "name": "Lunar Tide Pendant",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "variant": "moonstone_l60_moonwell",
+    "art": "moonstone",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 28.1,
+    "defense": 7.0,
+    "bonusStats": {
+      "dexterity": 55
+    },
+    "source": "moonwell"
+  },
+  {
+    "id": "accessory_amber_l60_moonwell",
+    "name": "Echo Signet",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "variant": "amber_l60_moonwell",
+    "art": "amber",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.15,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 21.0,
+    "defense": 5.3,
+    "bonusStats": {
+      "dexterity": 55
+    },
+    "source": "moonwell"
   }
 ]

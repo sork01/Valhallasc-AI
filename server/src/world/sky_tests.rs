@@ -493,14 +493,11 @@ fn the_questline_has_twenty_two_quests_with_three_wards_and_the_old_objective_ki
             ),
         ]
     );
-    // the last ward is the group quest: three heroes, hired at its giver, and an epic reward
+    // the last ward is the group quest: three heroes, hired at its giver, and level-appropriate gear
     let last = quest(&w, "sky_ward_last");
     assert!(last.group && last.recommended_players == 3);
-    assert_eq!(
-        last.reward_item.as_deref(),
-        Some("pants_wayfarer_l20_purple")
-    );
-    assert!(item("pants_wayfarer_l20_purple").is_some());
+    assert_eq!(last.reward_item.as_deref(), Some("pants_wayfarer_l35_blue"));
+    assert!(item("pants_wayfarer_l35_blue").is_some());
     assert!(
         npc(&w, "sky_warden")
             .offers

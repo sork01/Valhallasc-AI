@@ -26,10 +26,13 @@ async function walkTo(world, bot, goal, area = map) {
 async function talk(w, bot, npcId, offer) {
   const npc = map.npcs.find(n => n.id === npcId);
   if (distance(w.player(bot), npc) > 2.5) await walkTo(w, bot, npc);
-  await w.advance(550);
-  const earlier = new Set(w.events);
-  await w.action(bot, { type: 'interact', npc: npcId, ...(offer ? { offer } : {}) });
-  return w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await w.advance(attempt ? 900 : 550);
+    const earlier = new Set(w.events);
+    await w.action(bot, { type: 'interact', npc: npcId, ...(offer ? { offer } : {}) });
+    const reply = await w.waitFor(() => w.events.find(e => !earlier.has(e) && e.bot === bot && e.type === 'dialogue' && e.npc.id === npcId), 5000, `Talk to ${npcId}`);
+    if (!offer || !reply.notice?.includes('Please wait a moment') || attempt === 2) return reply;
+  }
 }
 // Each kind's default level; every enemy rolls within two of it, and health/damage rise 12% per level above it.
 const DEFAULT_LEVELS = { green: 2, blue: 3, pink: 3, yellow: 4, beetle: 5, big: 6, wisp: 5, spider: 7, wraith: 8, golem: 10, cinderlord: 10, crab: 10, wolf: 12, yeti: 13, wyrm: 15, toad: 15, croc: 17, knight: 18, hydra: 20, gloomroot: 20, thrall: 19, archer: 19, acolyte: 20, gatewarden: 20, choir: 20, colossus: 21, hollowking: 21, boar: 21, crow: 23, troll: 25, weaver: 27, ram: 29, oakhorn: 25, hrungnir: 30, galehound: 30, prismgolem: 31, skyray: 32, einherjar: 33, thunderroc: 35, draugr: 35, angler: 36, moray: 37, siren: 38, shellback: 39, kraken: 40, hvitserk: 37, ghostmaw: 39, voidmoth: 40, crystalwyrm: 41, orbitbeetle: 42, eclipsedryad: 43, meteorgolem: 45, miragejackal: 45, shardscarab: 46, glassharrier: 47, prismsentinel: 48, mirrorqueen: 49, sunshard: 50, bronzemantis: 50, gearling: 51, orbitseer: 52, chronoguard: 53, pendulummatron: 54, epochengine: 55, glowcapgrazer: 55, silkwing: 56, rootlurker: 57, lanternwraith: 58, mireheart: 58, silverwidow: 59, nightbloom: 60, dew_moth: 60, lumen_eel: 60, rootbell: 60, tideglass_heron: 60, hourpetal_stag: 60, moonskein_weaver: 60, moonwell_echo: 60, saltclaw: 60, stormgull: 61, glassray: 62, breakersentinel: 64, maelstromheart: 65, meadowhare: 65, sunbacksnail: 66, brushfox: 67, spadebadger: 68, honeyjaw: 69, wickerwarden: 70 };

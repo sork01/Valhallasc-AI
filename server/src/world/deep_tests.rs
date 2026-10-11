@@ -725,7 +725,7 @@ fn the_questline_has_twenty_five_quests_with_three_chime_chains_and_the_old_obje
     assert!(kraken.group && kraken.recommended_players == 5);
     assert_eq!(
         kraken.reward_item.as_deref(),
-        Some("necklace_moonstone_l20_purple")
+        Some("necklace_moonstone_l40_purple")
     );
     assert_eq!(kraken.requires.as_deref(), Some("deep_rans"));
     // Each group quest has its own giver with rental offers.
@@ -752,8 +752,8 @@ fn the_questline_has_twenty_five_quests_with_three_chime_chains_and_the_old_obje
         ("deep_halla", "deep_warden")
     );
     for (id, reward) in [
-        ("deep_net", "accessory_amber_l20_vault"),
-        ("deep_rans", "pants_wayfarer_l20_vault"),
+        ("deep_net", "pants_wayfarer_l35_blue"),
+        ("deep_rans", "pants_wayfarer_l40_blue"),
     ] {
         assert_eq!(quest(&w, id).reward_item.as_deref(), Some(reward));
         assert!(item(reward).is_some(), "{reward}");
@@ -764,9 +764,9 @@ fn the_questline_has_twenty_five_quests_with_three_chime_chains_and_the_old_obje
     assert_eq!(captain.objectives[0].target, "hvitserk");
     assert_eq!(
         captain.reward_item.as_deref(),
-        Some("accessory_amber_l20_blue")
+        Some("accessory_amber_l35_blue")
     );
-    assert!(item("accessory_amber_l20_blue").is_some());
+    assert!(item("accessory_amber_l35_blue").is_some());
     let ghostmaw = quest(&w, "deep_ghostmaw");
     assert!(ghostmaw.group && ghostmaw.recommended_players == 3);
     assert_eq!(ghostmaw.npc, "deep_thora");

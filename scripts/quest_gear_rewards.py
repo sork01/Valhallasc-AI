@@ -120,18 +120,6 @@ REWARDS = {
     'yr_su_intro': green(95, 'pants'),
     'yr_au_intro': green(95, 'accessory'),
     'yr_wi_intro': green(95, 'necklace'),
-    'yr_sp_1': blue(95, 'accessory'),
-    'yr_sp_2': blue(95, 'necklace'),
-    'yr_sp_3': blue(95, 'pants'),
-    'yr_su_1': blue(95, 'accessory'),
-    'yr_su_2': blue(95, 'necklace'),
-    'yr_su_3': blue(95, 'pants'),
-    'yr_au_1': blue(95, 'accessory'),
-    'yr_au_2': blue(95, 'necklace'),
-    'yr_au_3': blue(95, 'pants'),
-    'yr_wi_1': blue(95, 'accessory'),
-    'yr_wi_2': blue(95, 'necklace'),
-    'yr_wi_3': blue(95, 'pants'),
 }
 
 
