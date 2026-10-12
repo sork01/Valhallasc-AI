@@ -443,10 +443,11 @@ impl World {
             .map(|s| (s.point(), s.r));
         let aim = target_point.map_or(Point::default(), |(t, _)| me.direction(t));
         let level = self.players[&session].character.level;
-        for skill in skills::SKILLS
+        for base in skills::SKILLS
             .iter()
             .filter(|s| s.class == class && s.level <= level)
         {
+            let skill = base.at_level(level);
             let p = &self.players[&session];
             if p.skill_cd.contains_key(&skill.id)
                 || p.character.resource() < skill.cost

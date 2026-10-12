@@ -506,11 +506,21 @@
   function restart(node, cls) { node.classList.remove(cls); void node.offsetWidth; node.classList.add(cls); }
   function levelBanner(ev) {
     if (!ev?.level) return;
-    const learned = (ev.unlocked || []).map(id => WORLD_SKILLS.find(k => k.id === id)).filter(Boolean);
+    const seen = new Map(), unlocks = ev.unlocked || [];
+    const totals = new Map(); for (const id of unlocks) totals.set(id, (totals.get(id) || 0) + 1);
+    const learned = unlocks.map(id => {
+      const k = WORLD_SKILLS.find(s => s.id === id);
+      if (!k) return null;
+      const milestones = [{ level: k.level, description: k.description }, ...(k.ranks || [])].filter(r => r.level <= ev.level);
+      const index = seen.get(id) || 0; seen.set(id, index + 1);
+      const first = Math.max(0, milestones.length - totals.get(id));
+      const earned = milestones[first + index];
+      return { k, rankNumber: earned && first + index + 1, description: earned?.description || k.description };
+    }).filter(Boolean);
     $('lu-level').textContent = `Level ${ev.level}`;
-    $('lu-skills').replaceChildren(...learned.map(k => {
+    $('lu-skills').replaceChildren(...learned.map(({ k, rankNumber, description }) => {
       const row = el('div', { class: 'lu-skill' }), glyph = el('span', { class: 'skill-icon' }); glyph.innerHTML = Skillbar.icon(k.icon);
-      row.append(glyph, el('b', { text: `New skill: ${k.name}` }), el('small', { text: k.description })); return row;
+      row.append(glyph, el('b', { text: rankNumber > 1 ? `Rank ${rankNumber}: ${k.name}` : `New skill: ${k.name}` }), el('small', { text: description })); return row;
     }));
     $('lu-hint').textContent = learned.length ? 'Press K to arrange your skills' : 'Fully healed · spend stat points in Character (E)';
     luBanner.hidden = false; restart(luBanner, 'show'); restart(luFlash, 'show');

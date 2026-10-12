@@ -35,6 +35,7 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'blink'
   await page.keyboard.press('k');
   check(await page.locator('#skill-library .skill-card').count() === 11 && await page.locator('#skill-library .skill-card.locked').count() === 0, 'Nothing is locked at level 20');
   check(await page.locator('#skill-library [data-skill="starfall"] .skill-level').textContent() === 'Lv 20', 'Each card names the level that unlocks it');
+  check(await page.locator('#skill-library [data-skill="twinbolt"] small').textContent().then(t => t.includes('Next rank 2 at level 22')), 'The library previews the next rank');
   const panel = await page.locator('.skills-panel').boundingBox(), library = await page.locator('#skill-library').boundingBox();
   check(library.x >= panel.x && library.x + library.width <= panel.x + panel.width + 1, 'The library fits inside the skills panel');
   await page.screenshot({ path: path.join(world.artifacts, 'skills-panel-level20.png') });
@@ -49,6 +50,7 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'blink'
   await page.keyboard.press('2'); await page.waitForTimeout(150);
   check(await page.evaluate(n => sent.length === n, before), 'A skill on cooldown sends nothing');
   await page.keyboard.press('3');
+  await page.waitForFunction(() => Field._debug.effects.some(e => e.kind === 'skAura'));
   await page.waitForFunction(() => Field.hero.buffs?.some(b => b.id === 'arcaneward'));
   check(await page.locator('#buff-bar [data-buff="arcaneward"]').isVisible() && Number(await page.locator('#buff-bar [data-buff="arcaneward"] i').textContent()) >= 7, 'Arcane Ward shows in the effects bar with its seconds left');
   check(await page.evaluate(() => Field._debug.effects.some(e => e.kind === 'skAura')), 'Casting a buff starts an aura effect');
@@ -90,6 +92,14 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'blink'
     return { banner: css('#levelup-banner').pointerEvents, title: +css('.lu-title').opacity, skill: +css('.lu-skill').opacity, size: parseFloat(css('.lu-title').fontSize), hud: document.getElementById('hud-lv').classList.contains('lv-pop') };
   });
   check(look.banner === 'none' && look.title === 1 && look.skill === 1 && look.size > 50 && look.hud, 'The banner is large and fully visible, never blocks the game, and the HUD level pops');
+  await page.evaluate(() => Field._debug.event({ type: 'event', kind: 'levelup', actor: Online.id, x: Field.hero.x, y: Field.hero.y, value: 1, level: 22, unlocked: ['twinbolt'] }));
+  check(await page.locator('#lu-skills .lu-skill b').textContent() === 'Rank 2: Twin Bolt', 'The banner announces a rank without treating it as a new skill');
+  await page.evaluate(() => Field._debug.event({ type: 'event', kind: 'levelup', actor: Online.id, x: Field.hero.x, y: Field.hero.y, value: 1, level: 40, unlocked: ['twinbolt', 'twinbolt'] }));
+  check(await page.locator('#lu-skills .lu-skill b').allTextContents().then(t => t.join('|') === 'New skill: Twin Bolt|Rank 2: Twin Bolt'), 'A multi-level jump distinguishes a new skill from its rank');
+  await page.evaluate(() => Field._debug.event({ type: 'event', kind: 'levelup', actor: Online.id, x: Field.hero.x, y: Field.hero.y, value: 1, level: 42, unlocked: ['twinbolt'] }));
+  check(await page.locator('#lu-skills .lu-skill b').textContent() === 'Rank 3: Twin Bolt', 'The next rotation announces rank 3');
+  await page.evaluate(() => Field._debug.event({ type: 'event', kind: 'levelup', actor: Online.id, x: Field.hero.x, y: Field.hero.y, value: 1, level: 62, unlocked: ['twinbolt'] }));
+  check(await page.locator('#lu-skills .lu-skill b').textContent() === 'Rank 4: Twin Bolt', 'The level-62 rotation announces rank 4');
   await page.screenshot({ path: path.join(world.artifacts, 'levelup-reduced-motion.png') });
   await page.waitForFunction(() => document.getElementById('levelup-banner').hidden, null, { timeout: 8000 });
   check(await page.locator('#levelup-flash').evaluate(n => !n.classList.contains('show')), 'The banner and flash leave by themselves');

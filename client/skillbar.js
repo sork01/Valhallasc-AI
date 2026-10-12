@@ -78,6 +78,15 @@
   const resourceName = () => { const k = Field.hero.resourceType || 'rage'; return k[0].toUpperCase() + k.slice(1); };
   const costText = skill => skill.cost ? `${skill.cost} ${resourceName()}` : 'Free';
   const level = () => Field.hero.level || 1;
+  const rank = skill => (skill?.ranks || []).filter(r => r.level <= level()).at(-1);
+  const nextRank = skill => (skill?.ranks || []).find(r => r.level > level());
+  const detail = skill => {
+    const current = rank(skill), next = nextRank(skill);
+    const currentNumber = (skill.ranks || []).indexOf(current) + 2;
+    const nextNumber = (skill.ranks || []).indexOf(next) + 2;
+    const cooldown = (skill.cooldown * (current?.cooldown || 1)).toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+    return `${skill.description}${current ? ` Rank ${currentNumber}: ${current.description}` : ''}${next ? ` Next rank ${nextNumber} at level ${next.level}: ${next.description}` : ''} ${costText(skill)} · ${cooldown}s cooldown.`;
+  };
   const unlocked = skill => !!skill && skill.level <= level();
   const find = id => { const skill = skills.find(s => s.id === id); return unlocked(skill) ? skill : undefined; };
   const defaults = () => { const ready = skills.filter(unlocked).slice(0, SLOTS).map(s => s.id); return Array.from({ length: SLOTS }, (_, i) => ready[i] || null); };
@@ -116,7 +125,7 @@
     const skill = find(slots[index]), b = node('button', '', 'skill-slot'); b.type = 'button'; b.dataset.slot = index + 1;
     b.dataset.skill = skill?.id || ''; b.setAttribute('aria-keyshortcuts', KEYS[index]);
     b.setAttribute('aria-label', `Slot ${KEYS[index]}: ${skill?.name || 'Empty'}${editor ? ', select to assign' : ''}`);
-    b.title = `${KEYS[index]} · ${skill?.name || 'Empty slot — assign in Skills (K)'}${skill ? '\n' + costText(skill) + ' · ' + skill.description : ''}`;
+    b.title = `${KEYS[index]} · ${skill?.name || 'Empty slot — assign in Skills (K)'}${skill ? '\n' + detail(skill) : ''}`;
     b.append(node('kbd', KEYS[index]), node('span', skill?.name || 'Empty', 'skill-name'));
     const glyph = node('span', '', 'skill-icon'); glyph.innerHTML = skill ? icon(skill.icon) : '<span aria-hidden="true">+</span>'; b.append(glyph);
     b.append(node('span', '', 'skill-cooldown'));
@@ -142,7 +151,7 @@
     $('skill-library').replaceChildren(...skills.map(skill => {
       const ready = unlocked(skill), b = node(ready ? 'button' : 'div', '', 'skill-card' + (ready ? '' : ' locked')); b.dataset.skill = skill.id;
       const glyph = node('span', '', 'skill-icon'); glyph.innerHTML = icon(skill.icon);
-      b.append(glyph, node('b', skill.name), node('small', ready ? `${skill.description} ${costText(skill)} · ${skill.cooldown}s cooldown.` : `Unlocks at level ${skill.level}. ${costText(skill)} · ${skill.description}`));
+      b.append(glyph, node('b', skill.name), node('small', ready ? detail(skill) : `Unlocks at level ${skill.level}. ${costText(skill)} · ${skill.description}`));
       if (!ready) { b.setAttribute('aria-disabled', 'true'); b.append(node('em', `Lv ${skill.level}`, 'skill-level')); return b; }
       b.type = 'button'; b.draggable = true;
       if (skill.level > 1) b.append(node('em', `Lv ${skill.level}`, 'skill-level'));

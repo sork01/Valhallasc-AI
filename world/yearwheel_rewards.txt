@@ -1,0 +1,710 @@
+{
+  "version": 1,
+  "status": "design_only_until_instance_open",
+  "dungeons": [
+    {
+      "season": "sp",
+      "dungeon": "The Blooming Labyrinth",
+      "level": 97,
+      "partySize": 5,
+      "source": "final boss personal party roll",
+      "guaranteedDrops": 2,
+      "rewardRule": "one class-valid weapon or armor choice per eligible member after first clear; boss pool includes the shared pendant",
+      "pieces": [
+        {
+          "id": "yr_sp_warrior_weapon",
+          "name": "Thornwake Iron Sword",
+          "kind": "weapon",
+          "class": "warrior",
+          "requiredLevel": 97,
+          "rarity": "epic",
+          "attack": 82.7,
+          "defense": 20.7,
+          "bonusStats": {
+            "strength": 110,
+            "stamina": 110
+          },
+          "motif": "petal steel, roots and bright jade"
+        },
+        {
+          "id": "yr_sp_warrior_armor",
+          "name": "Thornwake Crimson Armor",
+          "kind": "armor",
+          "class": "warrior",
+          "requiredLevel": 97,
+          "rarity": "epic",
+          "attack": 15.5,
+          "defense": 62.0,
+          "bonusStats": {
+            "strength": 110,
+            "stamina": 110
+          },
+          "motif": "petal steel, roots and bright jade"
+        },
+        {
+          "id": "yr_sp_mage_weapon",
+          "name": "Thornwake Ash Staff",
+          "kind": "weapon",
+          "class": "mage",
+          "requiredLevel": 97,
+          "rarity": "epic",
+          "attack": 82.7,
+          "defense": 20.7,
+          "bonusStats": {
+            "intellect": 110,
+            "stamina": 110
+          },
+          "motif": "petal steel, roots and bright jade"
+        },
+        {
+          "id": "yr_sp_mage_armor",
+          "name": "Thornwake Apprentice Robes",
+          "kind": "armor",
+          "class": "mage",
+          "requiredLevel": 97,
+          "rarity": "epic",
+          "attack": 10.3,
+          "defense": 41.4,
+          "bonusStats": {
+            "intellect": 110,
+            "stamina": 110
+          },
+          "motif": "petal steel, roots and bright jade"
+        },
+        {
+          "id": "yr_sp_assassin_weapon",
+          "name": "Thornwake Steel Daggers",
+          "kind": "weapon",
+          "class": "assassin",
+          "requiredLevel": 97,
+          "rarity": "epic",
+          "attack": 82.7,
+          "defense": 20.7,
+          "bonusStats": {
+            "agility": 110,
+            "stamina": 110
+          },
+          "motif": "petal steel, roots and bright jade"
+        },
+        {
+          "id": "yr_sp_assassin_armor",
+          "name": "Thornwake Shadow Armor",
+          "kind": "armor",
+          "class": "assassin",
+          "requiredLevel": 97,
+          "rarity": "epic",
+          "attack": 10.3,
+          "defense": 41.4,
+          "bonusStats": {
+            "agility": 110,
+            "stamina": 110
+          },
+          "motif": "petal steel, roots and bright jade"
+        },
+        {
+          "id": "yr_sp_priest_weapon",
+          "name": "Thornwake Oak Mace",
+          "kind": "weapon",
+          "class": "priest",
+          "requiredLevel": 97,
+          "rarity": "epic",
+          "attack": 82.7,
+          "defense": 20.7,
+          "bonusStats": {
+            "intellect": 110,
+            "stamina": 110
+          },
+          "motif": "petal steel, roots and bright jade"
+        },
+        {
+          "id": "yr_sp_priest_armor",
+          "name": "Thornwake Pilgrim Robes",
+          "kind": "armor",
+          "class": "priest",
+          "requiredLevel": 97,
+          "rarity": "epic",
+          "attack": 15.5,
+          "defense": 62.0,
+          "bonusStats": {
+            "intellect": 110,
+            "stamina": 110
+          },
+          "motif": "petal steel, roots and bright jade"
+        },
+        {
+          "id": "yr_sp_hunter_weapon",
+          "name": "Thornwake Hunter's Shortbow",
+          "kind": "weapon",
+          "class": "hunter",
+          "requiredLevel": 97,
+          "rarity": "epic",
+          "attack": 82.7,
+          "defense": 20.7,
+          "bonusStats": {
+            "agility": 110,
+            "stamina": 110
+          },
+          "motif": "petal steel, roots and bright jade"
+        },
+        {
+          "id": "yr_sp_hunter_armor",
+          "name": "Thornwake Scout's Jerkin",
+          "kind": "armor",
+          "class": "hunter",
+          "requiredLevel": 97,
+          "rarity": "epic",
+          "attack": 15.5,
+          "defense": 62.0,
+          "bonusStats": {
+            "agility": 110,
+            "stamina": 110
+          },
+          "motif": "petal steel, roots and bright jade"
+        },
+        {
+          "id": "yr_sp_necklace",
+          "name": "Thornwake Season Pendant",
+          "kind": "necklace",
+          "class": null,
+          "requiredLevel": 97,
+          "rarity": "epic",
+          "attack": 41.4,
+          "defense": 10.3,
+          "bonusStats": {
+            "stamina": 110,
+            "agility": 110
+          },
+          "motif": "petal steel, roots and bright jade"
+        }
+      ]
+    },
+    {
+      "season": "su",
+      "dungeon": "The Solar Crucible",
+      "level": 98,
+      "partySize": 5,
+      "source": "final boss personal party roll",
+      "guaranteedDrops": 2,
+      "rewardRule": "one class-valid weapon or armor choice per eligible member after first clear; boss pool includes the shared pendant",
+      "pieces": [
+        {
+          "id": "yr_su_warrior_weapon",
+          "name": "Sunforged Iron Sword",
+          "kind": "weapon",
+          "class": "warrior",
+          "requiredLevel": 98,
+          "rarity": "epic",
+          "attack": 86.5,
+          "defense": 21.6,
+          "bonusStats": {
+            "strength": 115,
+            "stamina": 115
+          },
+          "motif": "white gold, brass and molten amber"
+        },
+        {
+          "id": "yr_su_warrior_armor",
+          "name": "Sunforged Crimson Armor",
+          "kind": "armor",
+          "class": "warrior",
+          "requiredLevel": 98,
+          "rarity": "epic",
+          "attack": 16.2,
+          "defense": 64.9,
+          "bonusStats": {
+            "strength": 115,
+            "stamina": 115
+          },
+          "motif": "white gold, brass and molten amber"
+        },
+        {
+          "id": "yr_su_mage_weapon",
+          "name": "Sunforged Ash Staff",
+          "kind": "weapon",
+          "class": "mage",
+          "requiredLevel": 98,
+          "rarity": "epic",
+          "attack": 86.5,
+          "defense": 21.6,
+          "bonusStats": {
+            "intellect": 115,
+            "stamina": 115
+          },
+          "motif": "white gold, brass and molten amber"
+        },
+        {
+          "id": "yr_su_mage_armor",
+          "name": "Sunforged Apprentice Robes",
+          "kind": "armor",
+          "class": "mage",
+          "requiredLevel": 98,
+          "rarity": "epic",
+          "attack": 10.8,
+          "defense": 43.2,
+          "bonusStats": {
+            "intellect": 115,
+            "stamina": 115
+          },
+          "motif": "white gold, brass and molten amber"
+        },
+        {
+          "id": "yr_su_assassin_weapon",
+          "name": "Sunforged Steel Daggers",
+          "kind": "weapon",
+          "class": "assassin",
+          "requiredLevel": 98,
+          "rarity": "epic",
+          "attack": 86.5,
+          "defense": 21.6,
+          "bonusStats": {
+            "agility": 115,
+            "stamina": 115
+          },
+          "motif": "white gold, brass and molten amber"
+        },
+        {
+          "id": "yr_su_assassin_armor",
+          "name": "Sunforged Shadow Armor",
+          "kind": "armor",
+          "class": "assassin",
+          "requiredLevel": 98,
+          "rarity": "epic",
+          "attack": 10.8,
+          "defense": 43.2,
+          "bonusStats": {
+            "agility": 115,
+            "stamina": 115
+          },
+          "motif": "white gold, brass and molten amber"
+        },
+        {
+          "id": "yr_su_priest_weapon",
+          "name": "Sunforged Oak Mace",
+          "kind": "weapon",
+          "class": "priest",
+          "requiredLevel": 98,
+          "rarity": "epic",
+          "attack": 86.5,
+          "defense": 21.6,
+          "bonusStats": {
+            "intellect": 115,
+            "stamina": 115
+          },
+          "motif": "white gold, brass and molten amber"
+        },
+        {
+          "id": "yr_su_priest_armor",
+          "name": "Sunforged Pilgrim Robes",
+          "kind": "armor",
+          "class": "priest",
+          "requiredLevel": 98,
+          "rarity": "epic",
+          "attack": 16.2,
+          "defense": 64.9,
+          "bonusStats": {
+            "intellect": 115,
+            "stamina": 115
+          },
+          "motif": "white gold, brass and molten amber"
+        },
+        {
+          "id": "yr_su_hunter_weapon",
+          "name": "Sunforged Hunter's Shortbow",
+          "kind": "weapon",
+          "class": "hunter",
+          "requiredLevel": 98,
+          "rarity": "epic",
+          "attack": 86.5,
+          "defense": 21.6,
+          "bonusStats": {
+            "agility": 115,
+            "stamina": 115
+          },
+          "motif": "white gold, brass and molten amber"
+        },
+        {
+          "id": "yr_su_hunter_armor",
+          "name": "Sunforged Scout's Jerkin",
+          "kind": "armor",
+          "class": "hunter",
+          "requiredLevel": 98,
+          "rarity": "epic",
+          "attack": 16.2,
+          "defense": 64.9,
+          "bonusStats": {
+            "agility": 115,
+            "stamina": 115
+          },
+          "motif": "white gold, brass and molten amber"
+        },
+        {
+          "id": "yr_su_necklace",
+          "name": "Sunforged Season Pendant",
+          "kind": "necklace",
+          "class": null,
+          "requiredLevel": 98,
+          "rarity": "epic",
+          "attack": 43.2,
+          "defense": 10.8,
+          "bonusStats": {
+            "stamina": 115,
+            "agility": 115
+          },
+          "motif": "white gold, brass and molten amber"
+        }
+      ]
+    },
+    {
+      "season": "au",
+      "dungeon": "The Amber Archive",
+      "level": 99,
+      "partySize": 5,
+      "source": "final boss personal party roll",
+      "guaranteedDrops": 2,
+      "rewardRule": "one class-valid weapon or armor choice per eligible member after first clear; boss pool includes the shared pendant",
+      "pieces": [
+        {
+          "id": "yr_au_warrior_weapon",
+          "name": "Harvestbound Iron Sword",
+          "kind": "weapon",
+          "class": "warrior",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 90.2,
+          "defense": 22.6,
+          "bonusStats": {
+            "strength": 120,
+            "stamina": 120
+          },
+          "motif": "copper leaves, amber glass and dark leather"
+        },
+        {
+          "id": "yr_au_warrior_armor",
+          "name": "Harvestbound Crimson Armor",
+          "kind": "armor",
+          "class": "warrior",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 16.9,
+          "defense": 67.7,
+          "bonusStats": {
+            "strength": 120,
+            "stamina": 120
+          },
+          "motif": "copper leaves, amber glass and dark leather"
+        },
+        {
+          "id": "yr_au_mage_weapon",
+          "name": "Harvestbound Ash Staff",
+          "kind": "weapon",
+          "class": "mage",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 90.2,
+          "defense": 22.6,
+          "bonusStats": {
+            "intellect": 120,
+            "stamina": 120
+          },
+          "motif": "copper leaves, amber glass and dark leather"
+        },
+        {
+          "id": "yr_au_mage_armor",
+          "name": "Harvestbound Apprentice Robes",
+          "kind": "armor",
+          "class": "mage",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 11.3,
+          "defense": 45.1,
+          "bonusStats": {
+            "intellect": 120,
+            "stamina": 120
+          },
+          "motif": "copper leaves, amber glass and dark leather"
+        },
+        {
+          "id": "yr_au_assassin_weapon",
+          "name": "Harvestbound Steel Daggers",
+          "kind": "weapon",
+          "class": "assassin",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 90.2,
+          "defense": 22.6,
+          "bonusStats": {
+            "agility": 120,
+            "stamina": 120
+          },
+          "motif": "copper leaves, amber glass and dark leather"
+        },
+        {
+          "id": "yr_au_assassin_armor",
+          "name": "Harvestbound Shadow Armor",
+          "kind": "armor",
+          "class": "assassin",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 11.3,
+          "defense": 45.1,
+          "bonusStats": {
+            "agility": 120,
+            "stamina": 120
+          },
+          "motif": "copper leaves, amber glass and dark leather"
+        },
+        {
+          "id": "yr_au_priest_weapon",
+          "name": "Harvestbound Oak Mace",
+          "kind": "weapon",
+          "class": "priest",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 90.2,
+          "defense": 22.6,
+          "bonusStats": {
+            "intellect": 120,
+            "stamina": 120
+          },
+          "motif": "copper leaves, amber glass and dark leather"
+        },
+        {
+          "id": "yr_au_priest_armor",
+          "name": "Harvestbound Pilgrim Robes",
+          "kind": "armor",
+          "class": "priest",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 16.9,
+          "defense": 67.7,
+          "bonusStats": {
+            "intellect": 120,
+            "stamina": 120
+          },
+          "motif": "copper leaves, amber glass and dark leather"
+        },
+        {
+          "id": "yr_au_hunter_weapon",
+          "name": "Harvestbound Hunter's Shortbow",
+          "kind": "weapon",
+          "class": "hunter",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 90.2,
+          "defense": 22.6,
+          "bonusStats": {
+            "agility": 120,
+            "stamina": 120
+          },
+          "motif": "copper leaves, amber glass and dark leather"
+        },
+        {
+          "id": "yr_au_hunter_armor",
+          "name": "Harvestbound Scout's Jerkin",
+          "kind": "armor",
+          "class": "hunter",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 16.9,
+          "defense": 67.7,
+          "bonusStats": {
+            "agility": 120,
+            "stamina": 120
+          },
+          "motif": "copper leaves, amber glass and dark leather"
+        },
+        {
+          "id": "yr_au_necklace",
+          "name": "Harvestbound Season Pendant",
+          "kind": "necklace",
+          "class": null,
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 45.1,
+          "defense": 11.3,
+          "bonusStats": {
+            "stamina": 120,
+            "agility": 120
+          },
+          "motif": "copper leaves, amber glass and dark leather"
+        }
+      ]
+    },
+    {
+      "season": "wi",
+      "dungeon": "The Silent Solstice",
+      "level": 99,
+      "partySize": 5,
+      "source": "final boss personal party roll",
+      "guaranteedDrops": 2,
+      "rewardRule": "one class-valid weapon or armor choice per eligible member after first clear; boss pool includes the shared pendant",
+      "pieces": [
+        {
+          "id": "yr_wi_warrior_weapon",
+          "name": "Rimecrowned Iron Sword",
+          "kind": "weapon",
+          "class": "warrior",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 90.2,
+          "defense": 22.6,
+          "bonusStats": {
+            "strength": 120,
+            "stamina": 120
+          },
+          "motif": "pale ice, silver and midnight blue"
+        },
+        {
+          "id": "yr_wi_warrior_armor",
+          "name": "Rimecrowned Crimson Armor",
+          "kind": "armor",
+          "class": "warrior",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 16.9,
+          "defense": 67.7,
+          "bonusStats": {
+            "strength": 120,
+            "stamina": 120
+          },
+          "motif": "pale ice, silver and midnight blue"
+        },
+        {
+          "id": "yr_wi_mage_weapon",
+          "name": "Rimecrowned Ash Staff",
+          "kind": "weapon",
+          "class": "mage",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 90.2,
+          "defense": 22.6,
+          "bonusStats": {
+            "intellect": 120,
+            "stamina": 120
+          },
+          "motif": "pale ice, silver and midnight blue"
+        },
+        {
+          "id": "yr_wi_mage_armor",
+          "name": "Rimecrowned Apprentice Robes",
+          "kind": "armor",
+          "class": "mage",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 11.3,
+          "defense": 45.1,
+          "bonusStats": {
+            "intellect": 120,
+            "stamina": 120
+          },
+          "motif": "pale ice, silver and midnight blue"
+        },
+        {
+          "id": "yr_wi_assassin_weapon",
+          "name": "Rimecrowned Steel Daggers",
+          "kind": "weapon",
+          "class": "assassin",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 90.2,
+          "defense": 22.6,
+          "bonusStats": {
+            "agility": 120,
+            "stamina": 120
+          },
+          "motif": "pale ice, silver and midnight blue"
+        },
+        {
+          "id": "yr_wi_assassin_armor",
+          "name": "Rimecrowned Shadow Armor",
+          "kind": "armor",
+          "class": "assassin",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 11.3,
+          "defense": 45.1,
+          "bonusStats": {
+            "agility": 120,
+            "stamina": 120
+          },
+          "motif": "pale ice, silver and midnight blue"
+        },
+        {
+          "id": "yr_wi_priest_weapon",
+          "name": "Rimecrowned Oak Mace",
+          "kind": "weapon",
+          "class": "priest",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 90.2,
+          "defense": 22.6,
+          "bonusStats": {
+            "intellect": 120,
+            "stamina": 120
+          },
+          "motif": "pale ice, silver and midnight blue"
+        },
+        {
+          "id": "yr_wi_priest_armor",
+          "name": "Rimecrowned Pilgrim Robes",
+          "kind": "armor",
+          "class": "priest",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 16.9,
+          "defense": 67.7,
+          "bonusStats": {
+            "intellect": 120,
+            "stamina": 120
+          },
+          "motif": "pale ice, silver and midnight blue"
+        },
+        {
+          "id": "yr_wi_hunter_weapon",
+          "name": "Rimecrowned Hunter's Shortbow",
+          "kind": "weapon",
+          "class": "hunter",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 90.2,
+          "defense": 22.6,
+          "bonusStats": {
+            "agility": 120,
+            "stamina": 120
+          },
+          "motif": "pale ice, silver and midnight blue"
+        },
+        {
+          "id": "yr_wi_hunter_armor",
+          "name": "Rimecrowned Scout's Jerkin",
+          "kind": "armor",
+          "class": "hunter",
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 16.9,
+          "defense": 67.7,
+          "bonusStats": {
+            "agility": 120,
+            "stamina": 120
+          },
+          "motif": "pale ice, silver and midnight blue"
+        },
+        {
+          "id": "yr_wi_necklace",
+          "name": "Rimecrowned Season Pendant",
+          "kind": "necklace",
+          "class": null,
+          "requiredLevel": 99,
+          "rarity": "epic",
+          "attack": 45.1,
+          "defense": 11.3,
+          "bonusStats": {
+            "stamina": 120,
+            "agility": 120
+          },
+          "motif": "pale ice, silver and midnight blue"
+        }
+      ]
+    }
+  ]
+}

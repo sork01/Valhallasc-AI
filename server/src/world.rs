@@ -2458,6 +2458,7 @@ impl World {
             let _ = p.peer.try_send(json!({"type":"error","text":text}));
             return;
         }
+        let skill = skill.at_level(p.character.level);
         if p.character.hp <= 0. || p.dash > 0. || p.skill_cd.contains_key(id) {
             return;
         }
@@ -2470,7 +2471,7 @@ impl World {
         let actor = p.character.id.clone();
         let target = p.target;
         let melee = !matches!(
-            skill.effect,
+            &skill.effect,
             Effect::Buff { .. } | Effect::Heal { .. } | Effect::Mend { .. }
         );
         // Single-target skills fizzle without spending their cooldown.
@@ -2512,7 +2513,7 @@ impl World {
             id.to_string(),
             skill.cooldown * p.character.cooldown_multiplier(),
         );
-        if melee && !matches!(skill.effect, Effect::Dash { mult, .. } if mult == 0.) {
+        if melee && !matches!(&skill.effect, Effect::Dash { mult, .. } if *mult == 0.) {
             p.combat_left = 5.;
             p.attack = 0.0001;
             p.hit = true;

@@ -234,45 +234,50 @@ For each entry, replace tinted starter silhouettes with new worn layers and matc
 - [x] `G-MOON-CATALOG` — Define a Moonwell-exclusive level-60 blue set and boss slot pools; currently Moonwell bosses give ordinary blue gear.
 - [ ] `G-MOON-ART` — Create Moonwell set worn art and icons.
 - [ ] `G-MOON-LOOT` — Switch the four Moonwell bosses to their exclusive set and verify party drops.
-- [ ] `G-YEAR-SPRING` — Define level-97 Blooming Labyrinth gear rewards.
-- [ ] `G-YEAR-SUMMER` — Define level-98 Solar Crucible gear rewards.
-- [ ] `G-YEAR-AUTUMN` — Define level-99 Amber Archive gear rewards.
-- [ ] `G-YEAR-WINTER` — Define level-99 Silent Solstice gear rewards.
+- [x] `G-YEAR-SPRING` — Define level-97 Blooming Labyrinth gear rewards.
+- [x] `G-YEAR-SUMMER` — Define level-98 Solar Crucible gear rewards.
+- [x] `G-YEAR-AUTUMN` — Define level-99 Amber Archive gear rewards.
+- [x] `G-YEAR-WINTER` — Define level-99 Silent Solstice gear rewards.
+
+The four sealed dungeon reward sets reserve 44 item designs in [world/yearwheel_rewards.txt](world/yearwheel_rewards.txt); no sealed door or loot table is active yet.
+
 - [ ] `G95-BONUS` — Decide the level-95 attribute bonus and remove the current clamp to the level-90 value if a larger bonus is intended.
 
 ## Skills
 
 Regular skills/ranks arrive every two levels from 2 through 98, plus a level-99 class capstone. The extra preferably passive class milestones at 10, 20, …, 90 are separate rewards. Existing characters receive all ranks earned by their saved level.
 
-- [ ] `S-RANK-RULES` — Add skill-rank data, server unlock/combat rules and client rank descriptions without losing saved skillbar assignments.
-- [ ] `S-RESPACE-WARRIOR` — Spread the existing warrior kit across levels 2–20 and design which abilities gain later ranks.
-- [ ] `S-RESPACE-MAGE` — Spread the existing mage kit across levels 2–20 and design which abilities gain later ranks.
-- [ ] `S-RESPACE-ASSASSIN` — Spread the existing assassin kit across levels 2–20 and design which abilities gain later ranks.
-- [ ] `S-RESPACE-PRIEST` — Spread the existing priest kit across levels 2–20 and design which abilities gain later ranks.
-- [ ] `S-RESPACE-HUNTER` — Spread the existing hunter kit across levels 2–20 and design which abilities gain later ranks.
+- [x] `S-RANK-RULES` — Add skill-rank data, server unlock/combat rules and client rank descriptions without losing saved skillbar assignments.
+- [x] `S-RESPACE-WARRIOR` — Spread the existing warrior kit across levels 2–20 and design which abilities gain later ranks.
+- [x] `S-RESPACE-MAGE` — Spread the existing mage kit across levels 2–20 and design which abilities gain later ranks.
+- [x] `S-RESPACE-ASSASSIN` — Spread the existing assassin kit across levels 2–20 and design which abilities gain later ranks.
+- [x] `S-RESPACE-PRIEST` — Spread the existing priest kit across levels 2–20 and design which abilities gain later ranks.
+- [x] `S-RESPACE-HUNTER` — Spread the existing hunter kit across levels 2–20 and design which abilities gain later ranks.
+
+The unlock and rank layout is recorded in [docs/skill-ranks.md](docs/skill-ranks.md).
 
 ### Skill ranks, levels 22–40
 
-- [ ] `S22-40-WARRIOR` — Add warrior skill/rank unlocks at every even level from 22 through 40.
-- [ ] `S22-40-MAGE` — Add mage skill/rank unlocks at every even level from 22 through 40.
-- [ ] `S22-40-ASSASSIN` — Add assassin skill/rank unlocks at every even level from 22 through 40.
-- [ ] `S22-40-PRIEST` — Add priest skill/rank unlocks at every even level from 22 through 40.
-- [ ] `S22-40-HUNTER` — Add hunter skill/rank unlocks at every even level from 22 through 40.
+- [x] `S22-40-WARRIOR` — Add warrior skill/rank unlocks at every even level from 22 through 40.
+- [x] `S22-40-MAGE` — Add mage skill/rank unlocks at every even level from 22 through 40.
+- [x] `S22-40-ASSASSIN` — Add assassin skill/rank unlocks at every even level from 22 through 40.
+- [x] `S22-40-PRIEST` — Add priest skill/rank unlocks at every even level from 22 through 40.
+- [x] `S22-40-HUNTER` — Add hunter skill/rank unlocks at every even level from 22 through 40.
 
 ### Skill ranks, levels 42–60
 
-- [ ] `S42-60-WARRIOR` — Add warrior skill/rank unlocks at every even level from 42 through 60.
-- [ ] `S42-60-MAGE` — Add mage skill/rank unlocks at every even level from 42 through 60.
-- [ ] `S42-60-ASSASSIN` — Add assassin skill/rank unlocks at every even level from 42 through 60.
-- [ ] `S42-60-PRIEST` — Add priest skill/rank unlocks at every even level from 42 through 60.
-- [ ] `S42-60-HUNTER` — Add hunter skill/rank unlocks at every even level from 42 through 60.
+- [x] `S42-60-WARRIOR` — Add warrior skill/rank unlocks at every even level from 42 through 60.
+- [x] `S42-60-MAGE` — Add mage skill/rank unlocks at every even level from 42 through 60.
+- [x] `S42-60-ASSASSIN` — Add assassin skill/rank unlocks at every even level from 42 through 60.
+- [x] `S42-60-PRIEST` — Add priest skill/rank unlocks at every even level from 42 through 60.
+- [x] `S42-60-HUNTER` — Add hunter skill/rank unlocks at every even level from 42 through 60.
 
 ### Skill ranks, levels 62–80
 
-- [ ] `S62-80-WARRIOR` — Add warrior skill/rank unlocks at every even level from 62 through 80.
-- [ ] `S62-80-MAGE` — Add mage skill/rank unlocks at every even level from 62 through 80.
-- [ ] `S62-80-ASSASSIN` — Add assassin skill/rank unlocks at every even level from 62 through 80.
-- [ ] `S62-80-PRIEST` — Add priest skill/rank unlocks at every even level from 62 through 80.
+- [x] `S62-80-WARRIOR` — Add warrior skill/rank unlocks at every even level from 62 through 80.
+- [x] `S62-80-MAGE` — Add mage skill/rank unlocks at every even level from 62 through 80.
+- [x] `S62-80-ASSASSIN` — Add assassin skill/rank unlocks at every even level from 62 through 80.
+- [x] `S62-80-PRIEST` — Add priest skill/rank unlocks at every even level from 62 through 80.
 - [ ] `S62-80-HUNTER` — Add hunter skill/rank unlocks at every even level from 62 through 80.
 
 ### Skill ranks, levels 82–98

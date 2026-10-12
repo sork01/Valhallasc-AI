@@ -103,6 +103,50 @@ pub struct Skill {
     #[serde(default)]
     pub pulse: Option<Pulse>,
     pub effect: Effect,
+    #[serde(default)]
+    pub ranks: Vec<Rank>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct Rank {
+    pub level: u32,
+    /// Multiplies the base damage, healing or buff strength. The highest earned
+    /// rank wins; rank multipliers do not compound. Movement-only skills use 1.
+    pub power: f64,
+    /// Multiplies the base cooldown; ranks never change an ability's ID.
+    pub cooldown: f64,
+}
+
+impl Skill {
+    pub fn rank_at(&self, level: u32) -> usize {
+        1 + self.ranks.iter().take_while(|r| r.level <= level).count()
+    }
+
+    pub fn at_level(&self, level: u32) -> Self {
+        let mut skill = self.clone();
+        let rank_number = self.rank_at(level);
+        if rank_number == 1 {
+            return skill;
+        }
+        let rank = &self.ranks[rank_number - 2];
+        skill.cooldown *= rank.cooldown;
+        match &mut skill.effect {
+            Effect::Cone { mult, .. }
+            | Effect::Nova { mult, .. }
+            | Effect::Volley { mult, .. }
+            | Effect::Dash { mult, .. }
+            | Effect::Strike { mult, .. }
+            | Effect::Chain { mult, .. }
+            | Effect::Meteor { mult, .. }
+            | Effect::Mend { mult, .. } => *mult *= rank.power,
+            Effect::Buff { amount, .. } => *amount = (*amount * rank.power).min(0.8),
+            Effect::Heal { fraction } => *fraction = (*fraction * rank.power).min(1.),
+        }
+        if let Some(pulse) = &mut skill.pulse {
+            pulse.mult *= rank.power;
+        }
+        skill
+    }
 }
 
 pub static SKILLS: LazyLock<Vec<Skill>> = LazyLock::new(|| {
@@ -115,18 +159,25 @@ pub fn find(class: Class, id: &str) -> Option<&'static Skill> {
 
 /// Ids of the skills a class learns when its level rises from `from` to `to`.
 pub fn unlocked(class: Class, from: u32, to: u32) -> Vec<&'static str> {
-    SKILLS
+    let mut learned: Vec<_> = SKILLS
         .iter()
-        .filter(|s| s.class == class && s.level > from && s.level <= to)
-        .map(|s| s.id.as_str())
-        .collect()
+        .filter(|s| s.class == class)
+        .flat_map(|s| {
+            std::iter::once(s.level)
+                .chain(s.ranks.iter().map(|r| r.level))
+                .filter(move |level| *level > from && *level <= to)
+                .map(|level| (level, s.id.as_str()))
+        })
+        .collect();
+    learned.sort_by_key(|(level, _)| *level);
+    learned.into_iter().map(|(_, id)| id).collect()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    /// A class learns one skill per even level up to this level.
+    /// Every class has ranks through 60; hunter still awaits the 62–80 rotation.
     const LAST_SKILL_LEVEL: u32 = 20;
 
     #[test]
@@ -138,6 +189,7 @@ mod tests {
             Class::Priest,
             Class::Hunter,
         ] {
+            let fourth_rank = class != Class::Hunter;
             let mut levels: Vec<_> = SKILLS
                 .iter()
                 .filter(|s| s.class == class)
@@ -152,7 +204,16 @@ mod tests {
             );
             assert_eq!(unlocked(class, 1, 2).len(), 1);
             assert!(unlocked(class, 2, 3).is_empty());
-            assert_eq!(unlocked(class, 0, 99).len(), 10);
+            assert_eq!(
+                unlocked(class, 0, 99).len(),
+                if fourth_rank { 40 } else { 30 }
+            );
+            for level in (22..=(if fourth_rank { 80 } else { 60 })).step_by(2) {
+                assert_eq!(unlocked(class, level - 1, level).len(), 1);
+            }
+            if !fourth_rank {
+                assert!(unlocked(class, 60, 80).is_empty());
+            }
         }
     }
 
@@ -163,6 +224,21 @@ mod tests {
         ids.dedup();
         assert_eq!(ids.len(), SKILLS.len());
         for s in SKILLS.iter() {
+            let fourth_rank = s.class != Class::Hunter;
+            assert_eq!(s.ranks.len(), if fourth_rank { 3 } else { 2 }, "{}", s.id);
+            assert_eq!(s.ranks[0].level, s.level + 20, "{}", s.id);
+            assert_eq!(s.ranks[1].level, s.level + 40, "{}", s.id);
+            if fourth_rank {
+                assert_eq!(s.ranks[2].level, s.level + 60, "{}", s.id);
+                assert_eq!(s.rank_at(s.ranks[2].level), 4, "{}", s.id);
+            }
+            for rank in &s.ranks {
+                assert!(rank.power >= 1. && rank.power <= 1.6, "{}", s.id);
+                assert!(rank.cooldown > 0. && rank.cooldown <= 1., "{}", s.id);
+            }
+            assert_eq!(s.rank_at(s.level), 1, "{}", s.id);
+            assert_eq!(s.rank_at(s.ranks[0].level), 2, "{}", s.id);
+            assert_eq!(s.rank_at(s.ranks[1].level), 3, "{}", s.id);
             assert!(
                 s.cost > 0. && s.cost.is_finite() && s.cost <= 100.,
                 "{}",
@@ -190,6 +266,48 @@ mod tests {
                 ),
                 _ => {}
             }
+        }
+    }
+
+    #[test]
+    fn ranks_change_authoritative_effects_without_changing_skill_ids() {
+        let bolt = find(Class::Mage, "twinbolt").unwrap();
+        let before = bolt.at_level(21);
+        let after = bolt.at_level(22);
+        assert_eq!(after.id, before.id);
+        assert_eq!(before.cooldown, after.cooldown);
+        match (before.effect, after.effect) {
+            (Effect::Volley { mult: a, .. }, Effect::Volley { mult: b, .. }) => {
+                assert!((b - a * 1.2).abs() < 0.0001);
+            }
+            _ => panic!("Twin Bolt must stay a volley"),
+        }
+        let blink = find(Class::Mage, "blink").unwrap();
+        assert_eq!(blink.at_level(29).cooldown, blink.cooldown);
+        assert!((blink.at_level(30).cooldown - blink.cooldown * 0.85).abs() < 0.0001);
+        assert_eq!(blink.at_level(49).cooldown, blink.cooldown * 0.85);
+        assert!((blink.at_level(50).cooldown - blink.cooldown * 0.7).abs() < 0.0001);
+        assert_eq!(blink.at_level(69).cooldown, blink.cooldown * 0.7);
+        assert!((blink.at_level(70).cooldown - blink.cooldown * 0.55).abs() < 0.0001);
+        let ward = find(Class::Mage, "arcaneward").unwrap();
+        match ward.at_level(24).effect {
+            Effect::Buff { amount, .. } => assert!((amount - 0.48).abs() < 0.0001),
+            _ => panic!("Arcane Ward must stay a buff"),
+        }
+        match ward.at_level(44).effect {
+            Effect::Buff { amount, .. } => assert!((amount - 0.56).abs() < 0.0001),
+            _ => panic!("Arcane Ward must stay a buff"),
+        }
+        match ward.at_level(64).effect {
+            Effect::Buff { amount, .. } => assert!((amount - 0.64).abs() < 0.0001),
+            _ => panic!("Arcane Ward must stay a buff"),
+        }
+        let mend = find(Class::Priest, "mend").unwrap();
+        match (mend.at_level(61).effect, mend.at_level(62).effect) {
+            (Effect::Mend { mult: before, .. }, Effect::Mend { mult: after, .. }) => {
+                assert!((after - before * (1.6 / 1.4)).abs() < 0.0001);
+            }
+            _ => panic!("Mend must stay a party heal"),
         }
     }
 }
