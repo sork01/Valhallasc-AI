@@ -48,7 +48,7 @@ USEFUL_STATS = {
 ATTRIBUTE_BONUS = {
     5: 1, 10: 3, 15: 5, 20: 7, 25: 10, 30: 15, 35: 20,
     40: 30, 45: 35, 50: 40, 55: 48, 60: 55, 65: 63,
-    70: 70, 75: 78, 80: 85, 85: 93, 90: 100,
+    70: 70, 75: 78, 80: 85, 85: 93, 90: 100, 95: 108,
 }
 
 
@@ -144,7 +144,7 @@ def bonus_stats(i):
     """
     count = {'rare': 1, 'epic': 2}.get(i['rarity'], 0)
     digest = hashlib.sha256(i['id'].encode()).digest()
-    step = min(90, max(5, i.get('requiredLevel', 1) // 5 * 5))
+    step = min(95, max(5, i.get('requiredLevel', 1) // 5 * 5))
     amount = ATTRIBUTE_BONUS[step]
     choices = bonus_choices(i.get('class'), amount)
     return {choices.pop(digest[n] % len(choices)): amount for n in range(count)}

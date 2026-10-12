@@ -8,7 +8,7 @@
   const NS = 'http://www.w3.org/2000/svg';
   const STAGE = { w: 207, h: 66 };
   // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm -> the Wyrdwood -> Bifrost Reach, up the Stormrift -> Ran's Deep, down the Maelstrom.
-  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:89,y:53,s:8},{x:63,y:20,s:15},{x:2,y:25,s:14},{x:2,y:13,s:10},{x:52,y:21,s:10},{x:52,y:52,s:9},{x:62,y:57,s:5},{x:76.8,y:57.3,s:4.5},{x:82.5,y:53.5,s:6},{x:90,y:53,s:7},{x:100,y:50,s:10},{x:112,y:49,s:10},{x:123,y:50,s:8},{x:134,y:47,s:12},{x:147,y:35,s:11},{x:159,y:18,s:13},{x:176,y:1,s:28}];
+  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:101,y:40,s:8},{x:63,y:20,s:15},{x:2,y:25,s:14},{x:2,y:13,s:10},{x:52,y:21,s:10},{x:52,y:52,s:9},{x:62,y:57,s:5},{x:76.8,y:57.3,s:4.5},{x:82.5,y:53.5,s:6},{x:90,y:53,s:7},{x:100,y:50,s:10},{x:112,y:49,s:10},{x:123,y:50,s:8},{x:134,y:47,s:12},{x:147,y:35,s:11},{x:159,y:18,s:13},{x:176,y:1,s:28}];
   const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', asterion: '#364a72', moonwell:'#153d58', stormglass:'#263b51', sunward:'#5baa49', ribbonwild:'#d98db2', tanglecrown:'#287a5b', worldtree:'#2f9369', lapiserg:'#d3a468', frostwake:'#c8e6f1', cairnspine:'#6b7378', yearwheel:'#a6cf9b', heartwood:'#806244', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', prismwaste: '#ad887e', orrery: '#37394e', moonspore: '#1c4244', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
   const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', asterion: '#9ec6d9', moonwell:'#a8d5cf', stormglass:'#9ebdc1', sunward:'#d8bd83', ribbonwild:'#ffe3a0', tanglecrown:'#b99a62', worldtree:'#bd9662', lapiserg:'#efd59e', frostwake:'#8abfd3', cairnspine:'#b7a07b', yearwheel:'#f0d6a7', heartwood:'#b18a5f', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', prismwaste: '#ead7a8', orrery: '#ad907b', moonspore: '#a5c4a8', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
   const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', asterion: '#d9e8ff', moonwell:'#f8e8ad', stormglass:'#aaf2f0', sunward:'#f8da90', ribbonwild:'#ff86b9', tanglecrown:'#a6e5ae', worldtree:'#c8f7a7', lapiserg:'#79d5d3', frostwake:'#9af0da', cairnspine:'#f2cb89', yearwheel:'#ffe7a4', heartwood:'#ffe0a1', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', prismwaste: '#ffe3ac', orrery: '#f4c981', moonspore: '#c4f4af', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
@@ -99,6 +99,7 @@
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const kindInfo = kind => KINDS[kind] || [kind, 1, '#ff6b8a'];
   const travelMasters = z => (z.npcs || []).filter(n => n.travelStop);
+  const SEALED = { elder_hollow_gate: 'Elder Hollow', grand_pavilion_gate: 'Thousandfold Pavilion', rain_crown_temple: 'Rain Crown Temple', heartwood_vault: 'Seed Vault', lapis_astrolabe: 'Lapis Astrolabe', cairn_thunder_gate: 'Thunderheart Gate', year_bloom_gate: 'Blooming Labyrinth', year_solar_gate: 'Solar Crucible', year_amber_gate: 'Amber Archive', year_solstice_gate: 'Silent Solstice' };
   // Fog of war: the server saves which of a zone's 3x3 cells the character has stood in (Field.explored, one bitmask per
   // zone). Nothing from an unvisited cell is shown: not its ground, gates, camp, enemies or people.
   const CELLS = 9;
@@ -113,7 +114,7 @@
     return node;
   }
 
-  let zones = null, tiles = [], roadRefs = [], fogSignature = '', view = 'world', current = 0, previousFocus = null, highlight = null, timer = 0, tickTimer = 0;
+  let zones = null, graph = [], tiles = [], roadRefs = [], fogSignature = '', view = 'world', current = 0, previousFocus = null, highlight = null, timer = 0, tickTimer = 0;
   const cache = new Map();
 
   function load() {
@@ -127,7 +128,24 @@
       z.range = levels;
       z.place = LAYOUT[i] || { x: 4 + ((i - LAYOUT.length) % 4) * 24, y: 58, s: 16 };   // unplaced zones queue along the bottom edge
     });
+    // Each directed edge is a real gate. The graph also keeps the city and private dungeon branches.
+    graph = zones.map((z, i) => z.portals.filter(p => Number.isInteger(p.to) && zones[p.to] && p.to !== i).map(p => ({ to: p.to, id: p.id, x: p.x, y: p.y })));
     return zones;
+  }
+  function route(from, to) {
+    if (from === to) return [from];
+    const queue = [from], prev = new Map([[from, -1]]);
+    for (const zone of queue) for (const gate of graph[zone] || []) {
+      if (!visited(gate.to) || prev.has(gate.to)) continue;
+      prev.set(gate.to, zone);
+      if (gate.to === to) { const path = [to]; for (let n = zone; n !== -1; n = prev.get(n)) path.unshift(n); return path; }
+      queue.push(gate.to);
+    }
+    return [];
+  }
+  function routePaint(to) {
+    const path = route(window.Field.zone || 0, to), edges = new Set(path.slice(1).map((n, i) => [path[i], n].sort((a, b) => a - b).join('-')));
+    roadRefs.forEach(r => r.node.classList.toggle('wm-route-road', edges.has(r.pair)));
   }
 
   // ---------- ground ----------
@@ -276,11 +294,11 @@
     const roads = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, class: 'wm-roads', 'aria-hidden': 'true' });
     const seen = new Set();
     zones.forEach((z, i) => z.portals.forEach(p => {
-      const pair = [i, p.to].sort().join('-'); if (seen.has(pair) || !zones[p.to]) return; seen.add(pair);
+      const pair = [i, p.to].sort((a, b) => a - b).join('-'); if (seen.has(pair) || !zones[p.to]) return; seen.add(pair);
       const a = z.place, b = zones[p.to].place, [x1, y1] = edgePoint(a, b), [x2, y2] = edgePoint(b, a);
       const road = svgNode('g', { 'data-road': pair });
       const back = zones[p.to].portals.find(q => q.to === i);
-      roadRefs.push({ node: road, shown: () => known(i, p.x, p.y) || (back && known(p.to, back.x, back.y)) });
+      roadRefs.push({ node: road, pair, shown: () => known(i, p.x, p.y) || (back && known(p.to, back.x, back.y)) });
       road.append(svgNode('title', {}), svgNode('line', { x1, y1, x2, y2, class: 'wm-road-under' }), svgNode('line', { x1, y1, x2, y2, class: 'wm-road' }),
         svgNode('circle', { cx: x1, cy: y1, r: .9, class: 'wm-gate-dot' }), svgNode('circle', { cx: x2, cy: y2, r: .9, class: 'wm-gate-dot' }));
       road.firstChild.textContent = `${p.name[0].toUpperCase()}${p.name.slice(1)} joins ${z.name} and ${zones[p.to].name}`;
@@ -291,6 +309,7 @@
       const { x, y, s } = z.place, tile = el('button', '', 'wm-tile'); tile.type = 'button'; tile.dataset.zone = String(i); tile.dataset.theme = z.theme;
       Object.assign(tile.style, { left: `${x / STAGE.w * 100}%`, top: `${y / STAGE.h * 100}%`, width: `${s / STAGE.w * 100}%`, height: `${s / STAGE.h * 100}%` });
       tile.setAttribute('aria-label', `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}. Open its map`);
+      tile.dataset.branch = z.players ? 'dungeon' : ['city','nacre','asterion','worldtree','heartwood'].includes(z.theme) ? 'city' : 'wild';
       const canvas = el('canvas'); canvas.width = canvas.height = 220; copy(canvas, paint(i, 220));
       const fog = el('canvas', '', 'wm-tile-fog'); fog.width = fog.height = 220; fog.setAttribute('aria-hidden', 'true');
       const label = el('span', '', 'wm-tile-label'); label.append(el('b', z.name), el('small', rangeText(z)));
@@ -336,6 +355,7 @@
   const pos = (z, x, y) => ({ left: `${x / z.size * 100}%`, top: `${y / z.size * 100}%` });
   function renderZone(index) {
     const z = zones[index]; current = index;
+    routePaint(index);
     copy($('wm-ground'), paint(index, 768)); highlight = null; drawDots(z);
     const fg = $('wm-fog').getContext('2d'); fg.clearRect(0, 0, 768, 768); window.Field.fog.paint(fg, 768, 768, index);
     const markers = $('wm-markers'); markers.replaceChildren();
@@ -352,6 +372,12 @@
       if (!away) { gate.disabled = true; gate.dataset.unexplored = 'true'; }
       gate.addEventListener('click', () => { highlight = null; renderZone(p.to); setView('zone'); });
       markers.append(gate);
+    }
+    for (const o of z.objects || []) {
+      const name = SEALED[o.kind]; if (!name || !known(index, o.x, o.y)) continue;
+      const seal = el('span', `◆ ${name} · sealed`, 'wm-sealed');
+      seal.setAttribute('role', 'img'); seal.setAttribute('aria-label', `${name}, sealed dungeon entrance`);
+      Object.assign(seal.style, pos(z, o.x, o.y)); markers.append(seal);
     }
     for (const c of [z.city, ...(z.camps || [])].filter(Boolean)) if (known(index, c.plaza.x, c.plaza.y)) {
       const hub = el('span', c.name === z.name ? 'City centre' : c.name, 'wm-hub'); hub.dataset.hub = 'true';
@@ -373,6 +399,8 @@
     const facts = el('ul', '', 'wm-facts');
     facts.append(el('li', z.range ? (z.players ? `Dungeon for ${z.players} players of level ${z.range[0]}` : `Recommended levels ${z.range[0]}–${z.range[1]}`) : 'No enemies inside the walls'));
     facts.append(el('li', `Charted ${charted(current)} of ${CELLS} places`, 'wm-charted'));
+    const path = route(window.Field.zone || 0, current);
+    facts.append(el('li', path.length === 1 ? 'You are here' : path.length ? `Route: ${path.map(i => zones[i].name).join(' → ')}` : 'No charted portal route yet', 'wm-route-text'));
     for (const c of [z.city, ...(z.camps || [])].filter(Boolean)) if (known(current, c.plaza.x, c.plaza.y)) facts.append(el('li', `${c.name}: sanctuary${z.camps?.length ? '' : `, ${(z.quests || []).length} quest${(z.quests || []).length === 1 ? '' : 's'}`}`));
     if (z.camps?.length) facts.append(el('li', `${(z.quests || []).length} quests across ${1 + z.camps.length} hubs`));
     box.append(facts);
@@ -520,6 +548,6 @@
     show, close, get open() { return open(); }, get view() { return view; }, get zone() { return current; },
     reset() { close(false); },
     // For the tests: the layout and kind table the map was written against.
-    _layout: LAYOUT, _kinds: KINDS,
+    _layout: LAYOUT, _kinds: KINDS, get _graph() { load(); return graph; }, _route: route,
   };
 })();

@@ -162,6 +162,7 @@ impl Player {
     // Called once when hp reaches 0: the XP penalty, then a notice naming what it cost.
     fn apply_death_penalty(&mut self) {
         let (lost, levels) = self.character.lose_death_xp();
+        self.character.mounted = false;
         self.character.resource = Some(0.);
         self.combat_left = 0.;
         let text = if levels > 0 {
@@ -177,6 +178,9 @@ impl Player {
             .try_send(json!({"type":"notice","ok":false,"text":text}));
     }
     fn new(mut character: Character, peer: Peer) -> Self {
+        if !character.mount_owned || character.hp <= 0. || character.spark_travel.is_some() {
+            character.mounted = false;
+        }
         if character.hp <= 0. {
             character.resource = Some(0.);
         } else if character.look.class.resource_type() != "mana" {
@@ -227,11 +231,11 @@ impl Player {
         let c = &self.character;
         json!({"id":c.id,"look":c.look,"zone":c.zone,"x":c.x,"y":c.y,"r":PLAYER_RADIUS,"hp":c.hp,"maxHp":c.max_hp(),"level":c.level,
             "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"quests":c.quests,"inventory":c.inventory,"equipment":c.equipment,"bags":c.bags,"bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used(),"fx":self.face.x,"fy":self.face.y,
-            "attributes":c.attributes,"gearAttributes":c.gear_attributes(),"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
+            "attributes":c.attributes,"gearAttributes":c.gear_attributes(),"passiveAttributes":skills::passive_bonus(c.look.class, c.level),"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
-            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,
+            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounted":c.mounted,
             "escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
     }
     /// The sum of every active buff of one kind.
@@ -1613,6 +1617,9 @@ impl World {
         {
             (c.zone, c.x, c.y) = (door.to, door.tx, door.ty);
         }
+        if self.maps[c.zone].players > 0 {
+            c.mounted = false;
+        }
         let mut point = c.point();
         if c.spark_travel.is_none() {
             self.maps[c.zone].collide(&mut point, PLAYER_RADIUS);
@@ -1751,6 +1758,7 @@ impl World {
                     return;
                 }
                 p.character.change_resource(-20.);
+                p.character.mounted = false;
                 let dir = normalize(dx, dy);
                 p.dash_direction = if dir.x == 0. && dir.y == 0. {
                     p.face
@@ -1774,6 +1782,23 @@ impl World {
             }
             ClientMessage::UseItem { item } => {
                 self.use_item(session, &item);
+            }
+            ClientMessage::Mount { mounted } => {
+                if !mounted {
+                    p.character.mounted = false;
+                    self.save();
+                } else if !p.character.mount_owned {
+                    let _ = p.peer.try_send(json!({"type":"error","text":"Buy a horse from Stable-hand Greta in Skaldholm first."}));
+                } else if p.character.hp <= 0.
+                    || p.combat_left > 0.
+                    || p.escort.is_some()
+                    || self.maps[p.character.zone].players > 0
+                {
+                    let _ = p.peer.try_send(json!({"type":"error","text":"You can mount only while alive and out of combat in the open world."}));
+                } else {
+                    p.character.mounted = true;
+                    self.save();
+                }
             }
             ClientMessage::Equip {
                 armor,
@@ -1929,6 +1954,21 @@ impl World {
                     if offer.heal > 0. && p.character.hp >= p.character.max_hp() {
                         notice =
                     "You are already at full health. Save it for after your next adventure!".into();
+                    } else if offer.mount {
+                        if p.character.level < 50 {
+                            notice = "Riding requires level 50.".into();
+                        } else if p.character.mount_owned {
+                            notice = "You already own a riding horse. Press H to mount.".into();
+                        } else if p.character.gold < offer.cost {
+                            notice = format!("You need {} gold for a riding horse.", offer.cost);
+                        } else {
+                            p.character.gold -= offer.cost;
+                            p.character.mount_owned = true;
+                            quest_changed = true;
+                            notice =
+                                "Riding horse purchased. Press H to mount or dismount outdoors."
+                                    .into();
+                        }
                     } else if let Some(bag) = &offer.bag {
                         match p.character.purchase_bag(bag, offer.cost) {
                             Ok(capacity) => {
@@ -2027,6 +2067,7 @@ impl World {
             return;
         }
         p.combat_left = 5.;
+        p.character.mounted = false;
         p.attack = 0.0001;
         p.hit = false;
         p.cooldown = p.character.attack_cooldown() / (1. + p.buff(BuffKind::Haste));
@@ -2212,11 +2253,10 @@ impl World {
                 dir = p.character.point().direction(goal);
             }
         }
-        let mut distance = (p
-            .escort
-            .as_ref()
-            .map_or(p.character.look.class.speed(), |e| e.speed())
-            * (1. + p.buff(BuffKind::Haste))
+        let mut distance = (p.escort.as_ref().map_or(
+            p.character.look.class.speed() * if p.character.mounted { 2. } else { 1. },
+            |e| e.speed(),
+        ) * (1. + p.buff(BuffKind::Haste))
             * TICK
             * if p.attack > 0. { 0.25 } else { 1. })
         .min(travel);
@@ -2315,6 +2355,9 @@ impl World {
         let time = self.time;
         let p = self.players.get_mut(&session).unwrap();
         p.character.zone = portal.to;
+        if self.maps[portal.to].players > 0 {
+            p.character.mounted = false;
+        }
         p.character.x = arrival.x;
         p.character.y = arrival.y;
         p.portal_at = time;
@@ -2459,9 +2502,14 @@ impl World {
             return;
         }
         let skill = skill.at_level(p.character.level);
+        let capstone = skill
+            .ranks
+            .iter()
+            .any(|r| r.capstone && r.level <= p.character.level);
         if p.character.hp <= 0. || p.dash > 0. || p.skill_cd.contains_key(id) {
             return;
         }
+        p.character.mounted = false;
         if aim.x != 0. || aim.y != 0. {
             p.face = aim;
         }
@@ -2717,7 +2765,7 @@ impl World {
         self.emit_zone(
             zone,
             json!({"type":"event","kind":"skill","skill":id,"actor":actor,"x":origin.x,"y":origin.y,
-                "fx":face.x,"fy":face.y,"value":value,"crit":false,"points":points,"heal":healed}),
+                "fx":face.x,"fy":face.y,"value":value,"crit":false,"points":points,"heal":healed,"capstone":capstone}),
         );
     }
     /// Sessions of the living party members (the caster included) in the caster's zone within `range`.
@@ -3381,7 +3429,9 @@ impl World {
             return;
         }
         if p.character.hp > 0. && !self.maps[p.character.zone].in_city(p.character.point()) {
-            self.players.get_mut(&session).unwrap().combat_left = 5.;
+            let p = self.players.get_mut(&session).unwrap();
+            p.combat_left = 5.;
+            p.character.mounted = false;
         }
         let p = &self.players[&session];
         if self.god_mode
@@ -3871,6 +3921,101 @@ mod tests {
         c.x = here.x;
         c.y = here.y;
         w.interact(1, npc, offer);
+    }
+
+    #[test]
+    fn riding_horse_requires_level_and_gold_and_doubles_outdoor_speed() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.zone = 4;
+        c.gold = 50_000;
+        quest_interact(&mut w, "city_stable", Some("buy_mount"));
+        assert!(
+            !w.players[&1].character.mount_owned,
+            "level gate holds even with gold"
+        );
+        w.players.get_mut(&1).unwrap().character.level = 50;
+        w.players.get_mut(&1).unwrap().character.gold = 49_999;
+        quest_interact(&mut w, "city_stable", Some("buy_mount"));
+        assert!(
+            !w.players[&1].character.mount_owned,
+            "price is authoritative"
+        );
+        w.players.get_mut(&1).unwrap().character.gold = 50_000;
+        quest_interact(&mut w, "city_stable", Some("buy_mount"));
+        assert!(w.players[&1].character.mount_owned);
+        assert_eq!(w.players[&1].character.gold, 0);
+        w.message(1, ClientMessage::Mount { mounted: true });
+        assert!(w.players[&1].character.mounted, "city riding is allowed");
+        let start = w.maps[0].spawn;
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.zone = 0;
+        p.character.x = start.x;
+        p.character.y = start.y;
+        w.message(1, ClientMessage::Input { dx: 1., dy: 0. });
+        w.update_player(1);
+        let fast = w.players[&1].character.x - start.x;
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.x = start.x;
+        p.character.y = start.y;
+        p.character.mounted = false;
+        w.update_player(1);
+        let normal = w.players[&1].character.x - start.x;
+        assert!(
+            normal > 0. && (fast / normal - 2.).abs() < 1e-6,
+            "{fast} versus {normal}"
+        );
+        w.message(1, ClientMessage::Mount { mounted: true });
+        w.start_attack(1);
+        assert!(!w.players[&1].character.mounted, "combat dismounts");
+        let glacier_gate = w.maps[2]
+            .portals
+            .iter()
+            .find(|gate| gate.to == 4)
+            .unwrap()
+            .clone();
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.zone = 2;
+        p.character.x = glacier_gate.x;
+        p.character.y = glacier_gate.y;
+        p.combat_left = 0.;
+        w.message(1, ClientMessage::Mount { mounted: true });
+        w.use_portal(1);
+        assert_eq!(w.players[&1].character.zone, 4);
+        assert!(
+            w.players[&1].character.mounted,
+            "outdoor and city gates keep the horse"
+        );
+        let dungeon_gate = w.maps[4]
+            .portals
+            .iter()
+            .find(|gate| gate.to == 5)
+            .unwrap()
+            .clone();
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.x = dungeon_gate.x;
+        p.character.y = dungeon_gate.y;
+        p.portal_at = -99.;
+        w.use_portal(1);
+        assert!(w.is_instance(w.players[&1].character.zone));
+        assert!(
+            !w.players[&1].character.mounted,
+            "private dungeon gates dismount"
+        );
+        w.leave(1);
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, Some(token), None, tx).unwrap();
+        assert!(
+            w.players[&1].character.mount_owned,
+            "ownership survives a login"
+        );
+        assert!(
+            !w.players[&1].character.mounted,
+            "combat dismount survives a login"
+        );
     }
 
     #[test]
@@ -9349,6 +9494,41 @@ mod tests {
     }
     fn skill(w: &mut World, id: &str) {
         w.use_skill(1, id, Point { x: 1., y: 0. });
+    }
+    #[test]
+    fn reworked_high_level_skills_have_different_combat_shapes() {
+        for (class, skill_id, ahead, behind, outside) in [
+            (Class::Warrior, "earthshatter", 4., -2., 5.8),
+            (Class::Mage, "starfall", 8., -3., 15.),
+            (Class::Assassin, "thousandcuts", 2., -2., 5.),
+            (Class::Hunter, "arrowstorm", 2., -2., 6.),
+        ] {
+            let mut w = world();
+            let _rx = join(&mut w, 1, class);
+            let at = arena(&mut w, 20);
+            put(&mut w, 0, at, ahead, 0.);
+            put(&mut w, 1, at, behind, 0.);
+            put(&mut w, 2, at, outside, 0.);
+            skill(&mut w, skill_id);
+            assert!(hp_lost(&w, 0), "{skill_id} hits the intended enemy");
+            assert!(!hp_lost(&w, 2), "{skill_id} keeps its range");
+            assert_eq!(
+                hp_lost(&w, 1),
+                skill_id == "arrowstorm",
+                "{skill_id} front/back shape"
+            );
+        }
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Priest);
+        arena(&mut w, 20);
+        let p = w.players.get_mut(&1).unwrap();
+        let max = p.character.max_hp();
+        p.character.hp = max * 0.2;
+        skill(&mut w, "guardianlight");
+        assert!(
+            (w.players[&1].character.hp - max * 0.85).abs() < 1e-8,
+            "Guardian Light restores a fraction of the priest's own maximum health"
+        );
     }
     fn events(rx: &mut mpsc::Receiver<Value>, kind: &str) -> Vec<Value> {
         let mut found = vec![];

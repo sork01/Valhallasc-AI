@@ -490,6 +490,10 @@
     $('resource-text').textContent = `${kind[0].toUpperCase() + kind.slice(1)} ${Math.floor(current)} / ${max}`;
     hud.xp.style.width = (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.lv.textContent = ` ${t('lvl')} ${s.level}`; window.Quests?.setLevel(s.level);
     hud.gold.textContent = s.gold; hud.kills.textContent = s.kills; $('bag-gold').textContent = `${s.gold} gold`;
+    const mount = $('mount-toggle');
+    mount.disabled = !s.mountOwned || !!s.sparkTravel || s.hp <= 0 || (s.inCombat && !s.mounted) || !!s.players;
+    mount.textContent = s.mounted ? 'Dismount · H' : s.mountOwned ? 'Mount · H · 2× speed' : 'Horse · H';
+    mount.title = s.mountOwned ? (s.mounted ? 'Dismount' : 'Ride at twice normal travel speed (H)') : 'Buy a horse from Stable-hand Greta in Skaldholm at level 50 for 50,000 gold';
     const inCity = !!s.hub || s.area === 'Alderhaven', title = $('area-title'), away = s.zone > 0;
     if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); void title.offsetWidth; title.classList.add('show'); }
     title.querySelector('b').textContent = away ? s.area : inCity ? 'Alderhaven · Fountain Square' : t('areaName');
@@ -509,20 +513,22 @@
     const seen = new Map(), unlocks = ev.unlocked || [];
     const totals = new Map(); for (const id of unlocks) totals.set(id, (totals.get(id) || 0) + 1);
     const learned = unlocks.map(id => {
+      const passive = WORLD_PASSIVES.find(s => s.id === id);
+      if (passive) return { k: { ...passive, icon: { warrior: 'shield', mage: 'starfall', assassin: 'focus', priest: 'blessing', hunter: 'eagle' }[passive.class] }, passive: true, description: passive.description };
       const k = WORLD_SKILLS.find(s => s.id === id);
       if (!k) return null;
       const milestones = [{ level: k.level, description: k.description }, ...(k.ranks || [])].filter(r => r.level <= ev.level);
       const index = seen.get(id) || 0; seen.set(id, index + 1);
       const first = Math.max(0, milestones.length - totals.get(id));
       const earned = milestones[first + index];
-      return { k, rankNumber: earned && first + index + 1, description: earned?.description || k.description };
+      return { k, rankNumber: earned && first + index + 1, capstone: !!earned?.capstone, description: earned?.description || k.description };
     }).filter(Boolean);
     $('lu-level').textContent = `Level ${ev.level}`;
-    $('lu-skills').replaceChildren(...learned.map(({ k, rankNumber, description }) => {
+    $('lu-skills').replaceChildren(...learned.map(({ k, rankNumber, description, passive, capstone }) => {
       const row = el('div', { class: 'lu-skill' }), glyph = el('span', { class: 'skill-icon' }); glyph.innerHTML = Skillbar.icon(k.icon);
-      row.append(glyph, el('b', { text: rankNumber > 1 ? `Rank ${rankNumber}: ${k.name}` : `New skill: ${k.name}` }), el('small', { text: description })); return row;
+      row.append(glyph, el('b', { text: passive ? `New passive: ${k.name}` : capstone ? `Capstone: ${k.name}` : rankNumber > 1 ? `Rank ${rankNumber}: ${k.name}` : `New skill: ${k.name}` }), el('small', { text: description })); return row;
     }));
-    $('lu-hint').textContent = learned.length ? 'Press K to arrange your skills' : 'Fully healed · spend stat points in Character (E)';
+    $('lu-hint').textContent = learned.length ? 'Press K to view your skills and passives' : 'Fully healed · spend stat points in Character (E)';
     luBanner.hidden = false; restart(luBanner, 'show'); restart(luFlash, 'show');
     restart($('hud-lv'), 'lv-pop'); restart(document.querySelector('.bar.xp'), 'xp-flash');
     const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -674,6 +680,7 @@
     }
   });
   $('city-travel').addEventListener('click', () => Field.visitCity());
+  $('mount-toggle').addEventListener('click', () => Field.toggleMount());
   $('p-characters').addEventListener('click', async () => {
     const list = $('character-list'); list.hidden = !list.hidden;
     if (list.hidden) return;

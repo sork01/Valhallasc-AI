@@ -25840,7 +25840,14 @@
           "y": 124.7,
           "color": "#6a8a5a",
           "dialogue": "The horses were here before the city and they will be here after it. This one bites. That one kicks. You can pet the third, if you are fast.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "buy_mount",
+              "label": "Buy riding horse \u00b7 level 50 \u00b7 50,000 gold",
+              "cost": 50000,
+              "mount": true
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#edc5a1",

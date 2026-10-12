@@ -185,6 +185,7 @@ impl World {
             points,
             next: 0,
         });
+        p.character.mounted = false;
         p.stop();
         p.attack = 0.;
         p.dash = 0.;

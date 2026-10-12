@@ -24,6 +24,9 @@
 }
 .city-travel { position: absolute; right: 1.4cqw; top: 15cqw; z-index: 20; border: 1px solid #d9c492aa; border-radius: .6cqw; padding: .6cqw 1cqw; color: #ffe6ac; background: #26352fe8; font: 1cqw 'Jua', sans-serif; cursor: pointer; }
 .city-travel:hover { background: #455849; }
+.mount-toggle { display: block; margin: .3cqw 0 0 auto; border: 1px solid #d9c492aa; border-radius: .5cqw; padding: .25cqw .7cqw; background: #26352fe8; color: #ffe6ac; font: .9cqw 'Jua', sans-serif; cursor: pointer; pointer-events: auto; }
+.mount-toggle:disabled { opacity: .55; cursor: default; }
+.mount-toggle:not(:disabled):hover { background: #455849; }
 .npc-panel { width: 35cqw; max-height: 44cqw; overflow: auto; padding: 2cqw; color: #eee3cb; }
 .npc-panel h3 { margin: .3cqw 0 1cqw; font: 2.1cqw 'Jua', sans-serif; color: #f1d493; }
 .npc-panel p { font: 1.1cqw/1.6 'Jua', sans-serif; }
@@ -164,6 +167,8 @@
 .skill-card.locked { cursor: default; filter: grayscale(.9) brightness(.65); border-style: dashed; border-color: #8f9aa9; color: #aab3c2; }
 .skill-level { position: absolute; right: .6cqw; top: .3cqw; font: normal max(9px, .75cqw) 'Jua', sans-serif; color: #ffd98a; }
 .skill-card.locked .skill-level { color: #c9d3e2; }
+.passive-heading { grid-column: 1 / -1; margin: .5cqw 0 0; color: #ffe1a0; font: 1.2cqw 'Jua', sans-serif; }
+.passive-card { cursor: default; border-color: #88a68b; background: linear-gradient(130deg, #263c35, #152720); }
 .skill-card b { font: 1.15cqw 'Jua', sans-serif; }
 .skill-card small { font: .85cqw/1.35 'Jua', sans-serif; color: #c0ccdf; }
 .skill-editor-actions { display: flex; justify-content: center; gap: 1cqw; margin: 1cqw 0; }
@@ -519,6 +524,10 @@
 .wm-road-under { stroke: #0b1520; stroke-width: 1.4; stroke-linecap: round; }
 .wm-road { stroke: #f0d58a; stroke-width: .6; stroke-linecap: round; stroke-dasharray: 1.4 1.1; }
 .wm-gate-dot { fill: #7ae8c8; stroke: #0b1520; stroke-width: .3; }
+.wm-route-road .wm-road { stroke: #9fffe4; stroke-width: 1.1; stroke-dasharray: none; }
+.wm-tile[data-branch="dungeon"] { border-color: #b798d9; }
+.wm-tile[data-branch="city"] { border-color: #a7d9bf; }
+.wm-sealed { position: absolute; transform: translate(-50%,-50%); z-index: 4; padding: .15cqw .35cqw; border: .1cqw solid #c697a6; border-radius: .3cqw; background: #2c192cdd; color: #ffd0db; font: .7cqw 'Jua', sans-serif; white-space: nowrap; pointer-events: none; }
 .wm-tile { position: absolute; padding: 0; overflow: hidden; border: .25cqw solid #e5cd83; border-radius: .6cqw; background: #10141c; color: #fff4ca; cursor: pointer; box-shadow: 0 .4cqw 1.2cqw #000a; transition: transform .15s, box-shadow .15s; }
 .wm-tile:hover, .wm-tile:focus-visible { transform: scale(1.04); box-shadow: 0 0 1.6cqw #ffdc87aa, 0 .4cqw 1.2cqw #000a; z-index: 2; }
 .wm-tile:focus-visible, .wm-gate:focus-visible, .wm-kind:focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }

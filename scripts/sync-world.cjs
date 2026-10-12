@@ -8,6 +8,8 @@ const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'ut
 fs.writeFileSync(path.join(root, 'client/items.js'), "'use strict';\nwindow.WORLD_ITEMS = " + JSON.stringify(items) + ';\n');
 const skills = JSON.parse(fs.readFileSync(path.join(root, 'world/skills.txt'), 'utf8'));
 fs.writeFileSync(path.join(root, 'client/skills.js'), "'use strict';\nwindow.WORLD_SKILLS = " + JSON.stringify(skills) + ';\n');
+const passives = JSON.parse(fs.readFileSync(path.join(root, 'world/passives.txt'), 'utf8'));
+fs.writeFileSync(path.join(root, 'client/passives.js'), "'use strict';\nwindow.WORLD_PASSIVES = " + JSON.stringify(passives) + ';\n');
 const zones = map.zones || [];
 console.log(`Synced ${map.objects.length} obstacles and ${map.slimes.length} spawns` + zones.map(z => `, plus zone "${z.name}": ${z.objects.length} obstacles and ${z.slimes.length} spawns`).join('') + '. Rebuild Rust after changing the map.');
 

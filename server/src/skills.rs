@@ -1,4 +1,4 @@
-use crate::model::Class;
+use crate::model::{Attributes, Class};
 use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 
@@ -115,6 +115,8 @@ pub struct Rank {
     pub power: f64,
     /// Multiplies the base cooldown; ranks never change an ability's ID.
     pub cooldown: f64,
+    #[serde(default)]
+    pub capstone: bool,
 }
 
 impl Skill {
@@ -153,6 +155,36 @@ pub static SKILLS: LazyLock<Vec<Skill>> = LazyLock::new(|| {
     serde_json::from_str(include_str!("../../world/skills.txt")).expect("valid skill catalog")
 });
 
+#[derive(Clone, Debug, Deserialize)]
+pub struct Passive {
+    pub id: String,
+    pub class: Class,
+    pub level: u32,
+    pub bonus: Attributes,
+}
+
+pub static PASSIVES: LazyLock<Vec<Passive>> = LazyLock::new(|| {
+    serde_json::from_str(include_str!("../../world/passives.txt")).expect("valid passive catalog")
+});
+
+/// Milestone effects are derived from class and saved level, so old characters
+/// receive them on login without a character migration or client action.
+pub fn passive_bonus(class: Class, level: u32) -> Attributes {
+    let mut total = Attributes::default();
+    for passive in PASSIVES
+        .iter()
+        .filter(|p| p.class == class && p.level <= level)
+    {
+        total.strength = total.strength.saturating_add(passive.bonus.strength);
+        total.agility = total.agility.saturating_add(passive.bonus.agility);
+        total.intellect = total.intellect.saturating_add(passive.bonus.intellect);
+        total.stamina = total.stamina.saturating_add(passive.bonus.stamina);
+        total.dexterity = total.dexterity.saturating_add(passive.bonus.dexterity);
+        total.accuracy = total.accuracy.saturating_add(passive.bonus.accuracy);
+    }
+    total
+}
+
 pub fn find(class: Class, id: &str) -> Option<&'static Skill> {
     SKILLS.iter().find(|s| s.class == class && s.id == id)
 }
@@ -169,6 +201,12 @@ pub fn unlocked(class: Class, from: u32, to: u32) -> Vec<&'static str> {
                 .map(|level| (level, s.id.as_str()))
         })
         .collect();
+    learned.extend(
+        PASSIVES
+            .iter()
+            .filter(|p| p.class == class && p.level > from && p.level <= to)
+            .map(|p| (p.level, p.id.as_str())),
+    );
     learned.sort_by_key(|(level, _)| *level);
     learned.into_iter().map(|(_, id)| id).collect()
 }
@@ -177,7 +215,6 @@ pub fn unlocked(class: Class, from: u32, to: u32) -> Vec<&'static str> {
 mod tests {
     use super::*;
 
-    /// Every class has ranks through 60; hunter still awaits the 62–80 rotation.
     const LAST_SKILL_LEVEL: u32 = 20;
 
     #[test]
@@ -189,7 +226,6 @@ mod tests {
             Class::Priest,
             Class::Hunter,
         ] {
-            let fourth_rank = class != Class::Hunter;
             let mut levels: Vec<_> = SKILLS
                 .iter()
                 .filter(|s| s.class == class)
@@ -204,16 +240,22 @@ mod tests {
             );
             assert_eq!(unlocked(class, 1, 2).len(), 1);
             assert!(unlocked(class, 2, 3).is_empty());
-            assert_eq!(
-                unlocked(class, 0, 99).len(),
-                if fourth_rank { 40 } else { 30 }
-            );
-            for level in (22..=(if fourth_rank { 80 } else { 60 })).step_by(2) {
-                assert_eq!(unlocked(class, level - 1, level).len(), 1);
+            assert_eq!(unlocked(class, 0, 99).len(), 59);
+            for level in (22..=80).step_by(2) {
+                let active: Vec<_> = unlocked(class, level - 1, level)
+                    .into_iter()
+                    .filter(|id| find(class, id).is_some())
+                    .collect();
+                assert_eq!(active.len(), 1, "{class:?} level {level}");
             }
-            if !fourth_rank {
-                assert!(unlocked(class, 60, 80).is_empty());
+            for level in (82..=98).step_by(2) {
+                let active: Vec<_> = unlocked(class, level - 1, level)
+                    .into_iter()
+                    .filter(|id| find(class, id).is_some())
+                    .collect();
+                assert_eq!(active.len(), 1, "{class:?} level {level}");
             }
+            assert_eq!(unlocked(class, 98, 99).len(), 1);
         }
     }
 
@@ -224,16 +266,20 @@ mod tests {
         ids.dedup();
         assert_eq!(ids.len(), SKILLS.len());
         for s in SKILLS.iter() {
-            let fourth_rank = s.class != Class::Hunter;
-            assert_eq!(s.ranks.len(), if fourth_rank { 3 } else { 2 }, "{}", s.id);
+            assert_eq!(s.ranks.len(), 4, "{}", s.id);
             assert_eq!(s.ranks[0].level, s.level + 20, "{}", s.id);
             assert_eq!(s.ranks[1].level, s.level + 40, "{}", s.id);
-            if fourth_rank {
-                assert_eq!(s.ranks[2].level, s.level + 60, "{}", s.id);
-                assert_eq!(s.rank_at(s.ranks[2].level), 4, "{}", s.id);
-            }
+            assert_eq!(s.ranks[2].level, s.level + 60, "{}", s.id);
+            assert_eq!(s.rank_at(s.ranks[2].level), 4, "{}", s.id);
+            assert_eq!(
+                s.ranks[3].level,
+                if s.level == 20 { 99 } else { s.level + 80 },
+                "{}",
+                s.id
+            );
+            assert_eq!(s.ranks[3].capstone, s.level == 20, "{}", s.id);
             for rank in &s.ranks {
-                assert!(rank.power >= 1. && rank.power <= 1.6, "{}", s.id);
+                assert!(rank.power >= 1. && rank.power <= 2., "{}", s.id);
                 assert!(rank.cooldown > 0. && rank.cooldown <= 1., "{}", s.id);
             }
             assert_eq!(s.rank_at(s.level), 1, "{}", s.id);
@@ -266,6 +312,81 @@ mod tests {
                 ),
                 _ => {}
             }
+        }
+    }
+
+    #[test]
+    fn every_class_has_nine_distinct_authoritative_milestone_passives() {
+        let mut ids = std::collections::HashSet::new();
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
+            let class_passives: Vec<_> = PASSIVES.iter().filter(|p| p.class == class).collect();
+            assert_eq!(class_passives.len(), 9);
+            for (index, p) in class_passives.iter().enumerate() {
+                assert_eq!(p.level, (index as u32 + 1) * 10);
+                assert!(ids.insert(p.id.as_str()));
+                let before = passive_bonus(class, p.level - 1);
+                let after = passive_bonus(class, p.level);
+                assert_ne!(before, after, "{} has no server effect", p.id);
+                assert!(unlocked(class, p.level - 1, p.level).contains(&p.id.as_str()));
+            }
+        }
+    }
+
+    #[test]
+    fn saved_level_earns_passive_stats_without_spending_trained_points() {
+        let mut mage = crate::model::Character::mercenary(Class::Mage, 9, "Legacy Mage");
+        let points = mage.stat_points();
+        let before = mage.effective_attributes();
+        mage.level = 10;
+        assert_eq!(mage.effective_attributes().intellect, before.intellect + 4);
+        assert_eq!(mage.stat_points(), points + 3);
+        let serialized = serde_json::to_string(&mage).unwrap();
+        let restored: crate::model::Character = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(restored.effective_attributes(), mage.effective_attributes());
+    }
+
+    #[test]
+    fn final_even_level_rotation_scales_each_class_from_its_base_effect() {
+        for (class, id) in [
+            (Class::Warrior, "cleave"),
+            (Class::Mage, "twinbolt"),
+            (Class::Assassin, "throwingknives"),
+            (Class::Priest, "mend"),
+        ] {
+            let skill = find(class, id).unwrap();
+            let power = |level| match skill.at_level(level).effect {
+                Effect::Cone { mult, .. }
+                | Effect::Volley { mult, .. }
+                | Effect::Mend { mult, .. } => mult,
+                _ => panic!("unexpected effect for {id}"),
+            };
+            assert!((power(82) / power(2) - 1.8).abs() < 1e-9, "{id}");
+            assert!((power(81) / power(2) - 1.6).abs() < 1e-9, "{id}");
+        }
+        let hunter = find(Class::Hunter, "powershot").unwrap();
+        assert_eq!(hunter.rank_at(61), 3);
+        assert_eq!(hunter.rank_at(62), 4);
+        assert_eq!(hunter.rank_at(82), 5);
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
+            let skill = SKILLS
+                .iter()
+                .find(|s| s.class == class && s.level == 20)
+                .unwrap();
+            assert_eq!(skill.rank_at(98), 4);
+            assert_eq!(skill.rank_at(99), 5);
+            assert!(skill.ranks[3].capstone);
         }
     }
 

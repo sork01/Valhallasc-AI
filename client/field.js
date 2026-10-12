@@ -862,7 +862,7 @@
   const hubs = () => [zdef.city, ...(zdef.camps || [])].filter(Boolean);
   const hubAt = (x, y) => hubs().find(c => x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1);
   const campNear = () => hubs().reduce((a, c) => !a || Math.hypot(hero.x - c.plaza.x, hero.y - c.plaza.y) < Math.hypot(hero.x - a.plaza.x, hero.y - a.plaza.y) ? c : a, null);
-  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc }); }
+  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, inCombat:hero.inCombat }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -880,6 +880,7 @@
       e.preventDefault(); const npc = City.npcs.filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
       if (npc) talkTo(npc); return;
     }
+    if (k === 'h' && !e.repeat) { e.preventDefault(); Field.toggleMount(); return; }
     if (KEYDIR[k]) { pendingNpc = null; cityRoute = []; keys.add(k); hero.target = null; hero.goal = null; e.preventDefault(); }
     if ((k === ' ' && e.target?.tagName !== 'BUTTON') || k === 'j') { e.preventDefault(); if (!e.repeat) Field.useSkill('attack'); }
     if (k === 'shift' && isAssassin()) { e.preventDefault(); if (!e.repeat) Field.useSkill('shadowstep'); }
@@ -1129,9 +1130,18 @@
     const def = SKILL_BY_ID[ev.skill]; if (!def) return;
     const [core, glow] = SKILL_COL[ev.skill] || ['#ffffff', '#9fd0ff'], kind = def.effect.effect, own = ev.actor === Online.id, a = Math.atan2(ev.fy, ev.fx);
     const base = { x: ev.x, y: ev.y, core, glow, a, t: 0 }, pts = (ev.points || []).map(([x, y]) => ({ x, y }));
-    if (kind === 'cone') { effects.push({ ...base, kind: 'skCone', r: def.effect.reach, life: .42 }); spark(ev.x + ev.fx * 1.2, ev.y + ev.fy * 1.2, 16, [core, glow], 5, 3, .5); if (own) kick(5, .18); }
+    if (kind === 'cone') {
+      effects.push({ ...base, kind: 'skCone', r: def.effect.reach, arc: 2 * Math.acos(def.effect.dot), life: ev.skill === 'earthshatter' ? .8 : .42 });
+      if (ev.skill === 'earthshatter') {
+        const c = { x: ev.x + ev.fx * 2.4, y: ev.y + ev.fy * 2.4 };
+        effects.push({ ...base, ...c, kind: 'skNova', style: 'cracks', r: 2.1, life: .85,
+          cracks: Array.from({ length: 11 }, (_, i) => ({ a: a + (i - 5) * .13, len: 1, zig: Array.from({ length: 8 }, (_, j) => [(j + 1) / 8, (Math.random() - .5) * .18]) })) });
+      }
+      if (ev.skill === 'thousandcuts') for (let i = 0; i < 10; i++) effects.push({ ...base, kind: 'skCut', x: ev.x + ev.fx * (1 + i * .25), y: ev.y + ev.fy * (1 + i * .25), ang: a + (i - 4.5) * .21, big: false, life: .5, t: -i * .035 });
+      spark(ev.x + ev.fx * 1.2, ev.y + ev.fy * 1.2, 16, [core, glow], 5, 3, .5); if (own) kick(5, .18);
+    }
     else if (kind === 'nova') {
-      const r = ev.value, style = ['whirlwind', 'cycloneblades', 'arcanestorm'].includes(ev.skill) ? 'spiral' : ['groundslam', 'earthshatter', 'titanswrath'].includes(ev.skill) ? 'cracks' : '';
+      const r = ev.value, style = ['whirlwind', 'cycloneblades', 'arcanestorm'].includes(ev.skill) ? 'spiral' : ['groundslam', 'titanswrath'].includes(ev.skill) ? 'cracks' : ev.skill === 'arrowstorm' ? 'arrows' : '';
       const nova = { ...base, kind: 'skNova', r, style, life: (ev.skill === 'starfall' ? 1.5 : .5) + r * .05 };
       if (style === 'cracks') nova.cracks = Array.from({ length: 9 + Math.round(r) }, (_, i) => ({ a: i * 6.283 / (9 + Math.round(r)) + (Math.random() - .5) * .3, len: .75 + Math.random() * .3, zig: Array.from({ length: 8 }, (_, j) => [(j + 1) / 8, (Math.random() - .5) * .22]) }));
       if (ev.skill === 'starfall') nova.stars = Array.from({ length: 18 }, () => { const an = Math.random() * 6.283, d = Math.sqrt(Math.random()) * r * .9; return { x: ev.x + Math.cos(an) * d, y: ev.y + Math.sin(an) * d, delay: Math.random() * .8 }; });
@@ -1156,14 +1166,38 @@
     } else if (kind === 'meteor') {
       const c = pts[0] || { x: ev.x + ev.fx * 4, y: ev.y + ev.fy * 4 };
       effects.push({ ...base, kind: 'skMeteor', x: c.x, y: c.y, r: ev.value, life: 1.1 });
+      if (ev.skill === 'starfall') effects.push({ ...base, kind: 'skNova', x: c.x, y: c.y, r: ev.value, life: 1.6,
+        stars: Array.from({ length: 28 }, () => { const an = Math.random() * 6.283, d = Math.sqrt(Math.random()) * ev.value * .9; return { x: c.x + Math.cos(an) * d, y: c.y + Math.sin(an) * d, delay: Math.random() * .9 }; }) });
       setTimeout(() => { spark(c.x, c.y, 40, [core, glow, '#ffe27a'], 10, 4, 1); if (own) kick(14, .5); }, 380);
     } else if (kind === 'buff') {
       const col = BUFF_COL[def.effect.kind] || glow; effects.push({ ...base, kind: 'skAura', col, life: 1 }); spark(ev.x, ev.y, 22, [core, col], 12, 1.2, 1); floater(ev.x, ev.y, def.name, col, false);
-    } else if (kind === 'heal') { effects.push({ ...base, kind: 'skAura', col: glow, life: 1 }); spark(ev.x, ev.y, 26, [core, glow], 12, 1.2, 1.1); }
+    } else if (kind === 'heal') { effects.push({ ...base, kind: 'skAura', col: glow, life: 1 }); if (ev.skill === 'guardianlight') effects.push({ ...base, kind: 'skBeam', life: 1.2 }); spark(ev.x, ev.y, 26, [core, glow], 12, 1.2, 1.1); }
     else if (kind === 'mend') { effects.push({ ...base, kind: 'skFlash', life: .22 }); spark(ev.x, ev.y, 8, [core, glow], 6, .8, .6); }
+    if (ev.capstone) {
+      effects.push({ ...base, kind: 'skNova', r: 2.8, style: def.class === 'warrior' ? 'cracks' : 'spiral',
+        cracks: Array.from({ length: 14 }, (_, i) => ({ a: i * 6.283 / 14, len: 1, zig: Array.from({ length: 8 }, (_, j) => [(j + 1) / 8, 0]) })), life: 1.1 });
+      spark(ev.x, ev.y, 48, [core, glow, '#ffffff'], 9, 3.8, 1.1);
+      if (own) kick(12, .45);
+    }
     // Whoever else the skill reached (healed or blessed party members) gets their own glow and sparks.
     if (kind === 'mend' || kind === 'buff' || def.pulse) for (const p of pts) { effects.push({ ...base, kind: 'skAura', x: p.x, y: p.y, col: BUFF_COL[def.effect.kind] || glow, life: 1 }); spark(p.x, p.y, 16, [core, glow], 10, 1, .9); }
     if (ev.heal > 0) { floater(ev.x, ev.y, '+' + ev.heal, '#7dff9a', true); if (kind !== 'heal') spark(ev.x, ev.y, 12, ['#9dffb4', '#d8ffe0'], 10, 1, .9); }
+  }
+  // Canvas-built riding horse: shared by local and remote actors, so no extra atlas is needed.
+  function drawMount(g, actor) {
+    if (!actor.mounted || actor.dead) return;
+    const stride = actor.moving ? Math.sin(actor.walk * 2) * 7 : 0;
+    g.save();
+    g.fillStyle = 'rgba(9, 11, 15, .28)'; g.beginPath(); g.ellipse(0, 1, 42, 11, 0, 0, 6.283); g.fill();
+    g.strokeStyle = '#3b2219'; g.lineWidth = 9; g.lineCap = 'round';
+    for (const [x, phase] of [[-24, 1],[-12,-1],[17,-1],[29,1]]) { g.beginPath(); g.moveTo(x,-23); g.lineTo(x+phase*stride*.45,-1); g.stroke(); }
+    g.fillStyle = '#70422b'; g.beginPath(); g.ellipse(0,-34,38,22,-.08,0,6.283); g.fill();
+    g.beginPath(); g.moveTo(23,-43); g.lineTo(37,-68); g.lineTo(51,-64); g.lineTo(49,-39); g.closePath(); g.fill();
+    g.fillStyle = '#4d2c20'; g.beginPath(); g.moveTo(35,-64); g.lineTo(35,-79); g.lineTo(42,-68); g.moveTo(46,-63); g.lineTo(50,-77); g.lineTo(54,-63); g.fill();
+    g.strokeStyle = '#3b2219'; g.lineWidth = 5; g.beginPath(); g.moveTo(-32,-39); g.quadraticCurveTo(-54,-62,-46,-77); g.stroke();
+    g.fillStyle = '#261a16'; g.beginPath(); g.arc(45,-56,2,0,6.283); g.fill();
+    g.fillStyle = '#c9a16a'; g.fillRect(-19,-53,34,8);
+    g.restore();
   }
   // A grand level-up: a pillar of light, rays, rings and a fountain of sparks on everyone's screen; the player's own
   // client adds a screen shake, and game.js adds the flash, fanfare and banner.
@@ -1225,6 +1259,11 @@
         layers(g, [[9, '#2a1408', .8, 0], [4, e.glow, .95, 1], [1.8, '#ffffff', 1, 0]], Math.min(1, fade * 1.6), 0, () => {
           g.beginPath(); for (const c of e.cracks) { const len = Math.min(1, k * 1.1) * c.len; let px = sx, py = sy; g.moveTo(px, py); for (const [f, o] of c.zig) { if (f > len) break; const an = c.a + o; px = sx + Math.cos(an) * rx * f, py = sy + Math.sin(an) * ry * f; g.lineTo(px, py); } }
         });
+      } else if (style === 'arrows') {
+        g.globalAlpha = fade; g.strokeStyle = e.core; g.fillStyle = e.core; g.lineWidth = 3;
+        for (let i = 0; i < 24; i++) { const an = i * 6.283 / 24, x = sx + Math.cos(an) * rx * k, y = sy + Math.sin(an) * ry * k;
+          g.beginPath(); g.moveTo(x - Math.cos(an) * 24, y - Math.sin(an) * 24); g.lineTo(x, y); g.stroke();
+          g.beginPath(); g.moveTo(x, y); g.lineTo(x - Math.cos(an - .4) * 13, y - Math.sin(an - .4) * 13); g.lineTo(x - Math.cos(an + .4) * 13, y - Math.sin(an + .4) * 13); g.closePath(); g.fill(); }
       } else {
         g.globalAlpha = fade * .7; g.strokeStyle = e.core; g.lineWidth = 2;
         for (let i = 0; i < 18; i++) { const an = i * 6.283 / 18 + e.a, r0 = .55 * k, r1 = k * 1.08; g.beginPath(); g.moveTo(sx + Math.cos(an) * rx * r0, sy + Math.sin(an) * ry * r0); g.lineTo(sx + Math.cos(an) * rx * r1, sy + Math.sin(an) * ry * r1); g.stroke(); }
@@ -1236,7 +1275,7 @@
         else { const f2 = 1 - (q - 1) / .6; g.globalAlpha = f2; g.fillStyle = e.core; g.beginPath(); g.ellipse(qx, qy, 36 * (2 - f2), 17 * (2 - f2), 0, 0, 6.283); g.fill(); g.globalCompositeOperation = 'lighter'; g.fillStyle = e.glow; g.beginPath(); g.ellipse(qx, qy, 52 * (2 - f2), 24 * (2 - f2), 0, 0, 6.283); g.fill(); g.globalCompositeOperation = 'source-over'; }
       }
     } else if (e.kind === 'skCone') {
-      const sweep = Math.min(1, p * 2.2), a0 = e.a - 1.9, a1 = a0 + 3.8 * sweep;
+      const sweep = Math.min(1, p * 2.2), arc = e.arc || 3.8, a0 = e.a - arc / 2, a1 = a0 + arc * sweep;
       for (const [rr, list] of [[1, [[34, OUTLINE, .3, 0], [24, e.glow, .5, 1], [12, e.core, .95, 0], [4, '#ffffff', 1, 0]]], [.7, [[16, OUTLINE, .25, 0], [8, e.glow, .6, 1], [3, '#ffffff', .9, 0]]]]) layers(g, list, fade, p * .5, () => {
         g.beginPath(); for (let i = 0; i <= 18; i++) { const an = a0 + (a1 - a0) * i / 18, [qx, qy] = w2s(e.x + Math.cos(an) * e.r * rr, e.y + Math.sin(an) * e.r * rr, 26); i ? g.lineTo(qx, qy) : g.moveTo(qx, qy); }
       });
@@ -2396,17 +2435,17 @@
       } else if (it.remote) {
         const remote = it.remote; g.save(); g.translate(it.sx, it.sy);
         if (remote.sparkTravel) Spark.draw(g,remote,t);
-        else if (remote.sprite) remote.sprite.draw(g, remote, t);
+        else if (remote.sprite) { drawMount(g,remote); if(remote.mounted)g.translate(0,-23); remote.sprite.draw(g, remote, t); if(remote.mounted)g.translate(0,23); }
         else { g.fillStyle = '#cfb5fa'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
         g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : '#fff4ca';
         const nameText = remote.escort ? remote.look.name + ' · Escort' : remote.look.name;
         g.strokeText(nameText, 0, -128); g.fillText(nameText, 0, -128);
         g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
         g.restore();
-      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.sparkTravel) Spark.draw(g,hero,t); else if (isModular()) {
+      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.sparkTravel) Spark.draw(g,hero,t); else { drawMount(g,hero); if(hero.mounted)g.translate(0,-23); if (isModular()) {
         if (mageSpr) mageSpr.draw(g, hero, t);
         else { g.fillStyle = '#8acfff'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
-      } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } g.restore(); }
+      } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } g.restore(); }
     }
     // speech bubbles go over everything, so a tree or a roof never hides what somebody said
     bubblesLast = bubblesDrawn; bubblesDrawn = 0;
@@ -2686,6 +2725,10 @@
       if (!zdef.city) return;
       Field.clearInput(); pendingNpc=null; hero.target=null; hero.goal=null;
       cityRoute=routeTo(zone === 0 ? {x:36,y:79} : campNear()?.entry || zdef.spawn);routeTime=0;
+    },
+    toggleMount() {
+      if (!running || paused || !Online.connected || hero.dead || hero.sparkTravel || !hero.mountOwned) return;
+      Online.send({ type: 'mount', mounted: !hero.mounted });
     },
     equip(change) {
       if (!isModular()) return;

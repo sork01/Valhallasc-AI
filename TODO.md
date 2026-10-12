@@ -241,7 +241,7 @@ For each entry, replace tinted starter silhouettes with new worn layers and matc
 
 The four sealed dungeon reward sets reserve 44 item designs in [world/yearwheel_rewards.txt](world/yearwheel_rewards.txt); no sealed door or loot table is active yet.
 
-- [ ] `G95-BONUS` — Decide the level-95 attribute bonus and remove the current clamp to the level-90 value if a larger bonus is intended.
+- [x] `G95-BONUS` — Decide the level-95 attribute bonus and remove the current clamp to the level-90 value if a larger bonus is intended.
 
 ## Skills
 
@@ -278,63 +278,63 @@ The unlock and rank layout is recorded in [docs/skill-ranks.md](docs/skill-ranks
 - [x] `S62-80-MAGE` — Add mage skill/rank unlocks at every even level from 62 through 80.
 - [x] `S62-80-ASSASSIN` — Add assassin skill/rank unlocks at every even level from 62 through 80.
 - [x] `S62-80-PRIEST` — Add priest skill/rank unlocks at every even level from 62 through 80.
-- [ ] `S62-80-HUNTER` — Add hunter skill/rank unlocks at every even level from 62 through 80.
+- [x] `S62-80-HUNTER` — Add hunter skill/rank unlocks at every even level from 62 through 80.
 
 ### Skill ranks, levels 82–98
 
-- [ ] `S82-98-WARRIOR` — Add warrior skill/rank unlocks at every even level from 82 through 98.
-- [ ] `S82-98-MAGE` — Add mage skill/rank unlocks at every even level from 82 through 98.
-- [ ] `S82-98-ASSASSIN` — Add assassin skill/rank unlocks at every even level from 82 through 98.
-- [ ] `S82-98-PRIEST` — Add priest skill/rank unlocks at every even level from 82 through 98.
-- [ ] `S82-98-HUNTER` — Add hunter skill/rank unlocks at every even level from 82 through 98.
+- [x] `S82-98-WARRIOR` — Add warrior skill/rank unlocks at every even level from 82 through 98.
+- [x] `S82-98-MAGE` — Add mage skill/rank unlocks at every even level from 82 through 98.
+- [x] `S82-98-ASSASSIN` — Add assassin skill/rank unlocks at every even level from 82 through 98.
+- [x] `S82-98-PRIEST` — Add priest skill/rank unlocks at every even level from 82 through 98.
+- [x] `S82-98-HUNTER` — Add hunter skill/rank unlocks at every even level from 82 through 98.
 
 ### Ten-level class milestones
 
 
 #### Levels 10, 20, 30
 
-- [ ] `P10-30-WARRIOR` — Add distinct warrior milestone skills at 10, 20 and 30, preferably passive, with server effects and visible unlocks.
-- [ ] `P10-30-MAGE` — Add distinct mage milestone skills at 10, 20 and 30, preferably passive, with server effects and visible unlocks.
-- [ ] `P10-30-ASSASSIN` — Add distinct assassin milestone skills at 10, 20 and 30, preferably passive, with server effects and visible unlocks.
-- [ ] `P10-30-PRIEST` — Add distinct priest milestone skills at 10, 20 and 30, preferably passive, with server effects and visible unlocks.
-- [ ] `P10-30-HUNTER` — Add distinct hunter milestone skills at 10, 20 and 30, preferably passive, with server effects and visible unlocks.
+- [x] `P10-30-WARRIOR` — Add distinct warrior milestone skills at 10, 20 and 30, preferably passive, with server effects and visible unlocks.
+- [x] `P10-30-MAGE` — Add distinct mage milestone skills at 10, 20 and 30, preferably passive, with server effects and visible unlocks.
+- [x] `P10-30-ASSASSIN` — Add distinct assassin milestone skills at 10, 20 and 30, preferably passive, with server effects and visible unlocks.
+- [x] `P10-30-PRIEST` — Add distinct priest milestone skills at 10, 20 and 30, preferably passive, with server effects and visible unlocks.
+- [x] `P10-30-HUNTER` — Add distinct hunter milestone skills at 10, 20 and 30, preferably passive, with server effects and visible unlocks.
 
 #### Levels 40, 50, 60
 
-- [ ] `P40-60-WARRIOR` — Add distinct warrior milestone skills at 40, 50 and 60, preferably passive, with server effects and visible unlocks.
-- [ ] `P40-60-MAGE` — Add distinct mage milestone skills at 40, 50 and 60, preferably passive, with server effects and visible unlocks.
-- [ ] `P40-60-ASSASSIN` — Add distinct assassin milestone skills at 40, 50 and 60, preferably passive, with server effects and visible unlocks.
-- [ ] `P40-60-PRIEST` — Add distinct priest milestone skills at 40, 50 and 60, preferably passive, with server effects and visible unlocks.
-- [ ] `P40-60-HUNTER` — Add distinct hunter milestone skills at 40, 50 and 60, preferably passive, with server effects and visible unlocks.
+- [x] `P40-60-WARRIOR` — Add distinct warrior milestone skills at 40, 50 and 60, preferably passive, with server effects and visible unlocks.
+- [x] `P40-60-MAGE` — Add distinct mage milestone skills at 40, 50 and 60, preferably passive, with server effects and visible unlocks.
+- [x] `P40-60-ASSASSIN` — Add distinct assassin milestone skills at 40, 50 and 60, preferably passive, with server effects and visible unlocks.
+- [x] `P40-60-PRIEST` — Add distinct priest milestone skills at 40, 50 and 60, preferably passive, with server effects and visible unlocks.
+- [x] `P40-60-HUNTER` — Add distinct hunter milestone skills at 40, 50 and 60, preferably passive, with server effects and visible unlocks.
 
 #### Levels 70, 80, 90
 
-- [ ] `P70-90-WARRIOR` — Add distinct warrior milestone skills at 70, 80 and 90, preferably passive, with server effects and visible unlocks.
-- [ ] `P70-90-MAGE` — Add distinct mage milestone skills at 70, 80 and 90, preferably passive, with server effects and visible unlocks.
-- [ ] `P70-90-ASSASSIN` — Add distinct assassin milestone skills at 70, 80 and 90, preferably passive, with server effects and visible unlocks.
-- [ ] `P70-90-PRIEST` — Add distinct priest milestone skills at 70, 80 and 90, preferably passive, with server effects and visible unlocks.
-- [ ] `P70-90-HUNTER` — Add distinct hunter milestone skills at 70, 80 and 90, preferably passive, with server effects and visible unlocks.
+- [x] `P70-90-WARRIOR` — Add distinct warrior milestone skills at 70, 80 and 90, preferably passive, with server effects and visible unlocks.
+- [x] `P70-90-MAGE` — Add distinct mage milestone skills at 70, 80 and 90, preferably passive, with server effects and visible unlocks.
+- [x] `P70-90-ASSASSIN` — Add distinct assassin milestone skills at 70, 80 and 90, preferably passive, with server effects and visible unlocks.
+- [x] `P70-90-PRIEST` — Add distinct priest milestone skills at 70, 80 and 90, preferably passive, with server effects and visible unlocks.
+- [x] `P70-90-HUNTER` — Add distinct hunter milestone skills at 70, 80 and 90, preferably passive, with server effects and visible unlocks.
 
 ### Skill identity and final capstones
 
-- [ ] `S-REVAMP-WARRIOR` — Redesign lookalike warrior skills so their visuals, timing and mechanics are recognizable; preserve or migrate skillbar IDs.
-- [ ] `S99-WARRIOR` — Add the warrior level-99 capstone rank and its visual/UI feedback.
-- [ ] `S-REVAMP-MAGE` — Redesign lookalike mage skills so their visuals, timing and mechanics are recognizable; preserve or migrate skillbar IDs.
-- [ ] `S99-MAGE` — Add the mage level-99 capstone rank and its visual/UI feedback.
-- [ ] `S-REVAMP-ASSASSIN` — Redesign lookalike assassin skills so their visuals, timing and mechanics are recognizable; preserve or migrate skillbar IDs.
-- [ ] `S99-ASSASSIN` — Add the assassin level-99 capstone rank and its visual/UI feedback.
-- [ ] `S-REVAMP-PRIEST` — Redesign lookalike priest skills so their visuals, timing and mechanics are recognizable; preserve or migrate skillbar IDs.
-- [ ] `S99-PRIEST` — Add the priest level-99 capstone rank and its visual/UI feedback.
-- [ ] `S-REVAMP-HUNTER` — Redesign lookalike hunter skills so their visuals, timing and mechanics are recognizable; preserve or migrate skillbar IDs.
-- [ ] `S99-HUNTER` — Add the hunter level-99 capstone rank and its visual/UI feedback.
-- [ ] `S-MIGRATE-CHECK` — Verify existing high-level characters unlock the correct past ranks/passives and retain their skillbar layouts.
+- [x] `S-REVAMP-WARRIOR` — Redesign lookalike warrior skills so their visuals, timing and mechanics are recognizable; preserve or migrate skillbar IDs.
+- [x] `S99-WARRIOR` — Add the warrior level-99 capstone rank and its visual/UI feedback.
+- [x] `S-REVAMP-MAGE` — Redesign lookalike mage skills so their visuals, timing and mechanics are recognizable; preserve or migrate skillbar IDs.
+- [x] `S99-MAGE` — Add the mage level-99 capstone rank and its visual/UI feedback.
+- [x] `S-REVAMP-ASSASSIN` — Redesign lookalike assassin skills so their visuals, timing and mechanics are recognizable; preserve or migrate skillbar IDs.
+- [x] `S99-ASSASSIN` — Add the assassin level-99 capstone rank and its visual/UI feedback.
+- [x] `S-REVAMP-PRIEST` — Redesign lookalike priest skills so their visuals, timing and mechanics are recognizable; preserve or migrate skillbar IDs.
+- [x] `S99-PRIEST` — Add the priest level-99 capstone rank and its visual/UI feedback.
+- [x] `S-REVAMP-HUNTER` — Redesign lookalike hunter skills so their visuals, timing and mechanics are recognizable; preserve or migrate skillbar IDs.
+- [x] `S99-HUNTER` — Add the hunter level-99 capstone rank and its visual/UI feedback.
+- [x] `S-MIGRATE-CHECK` — Verify existing high-level characters unlock the correct past ranks/passives and retain their skillbar layouts.
 
 ## Travel and world map
 
-- [ ] `W-GRAPH` — Lay out the authoritative zone/portal graph as connected geography, including city and dungeon branches.
+- [x] `W-GRAPH` — Lay out the authoritative zone/portal graph as connected geography, including city and dungeon branches.
 - [ ] `W-ART` — Replace the detached zone display with a readable illustrated world map built from that geography.
-- [ ] `W-ROUTES` — Show actual portal connections, current position, reachable routes and distinct sealed dungeon entrances.
-- [ ] `W-CHECK` — Check world/zone map navigation and consistency after portal moves.
+- [x] `W-ROUTES` — Show actual portal connections, current position, reachable routes and distinct sealed dungeon entrances.
+- [x] `W-CHECK` — Check world/zone map navigation and consistency after portal moves.
 - [ ] `T-PORTALS-0-8` — Improve portal placement and reciprocal arrival routes in the starter through Rán’s Deep zones.
 - [ ] `T-PORTALS-9-18` — Improve portals around Nacrehold, Cathedral, Astralhollow through Moonwell.
 - [ ] `T-PORTALS-19-22` — Improve Stormglass, Sunward, Ribbonwild and Tanglecrown connections.
@@ -342,13 +342,17 @@ The unlock and rank layout is recorded in [docs/skill-ranks.md](docs/skill-ranks
 - [ ] `T-PORTALS-26-28` — Improve Frostwake, Cairnspine and all four Yearwheel approaches.
 Portal tasks must keep both directions paired, preserve IDs where possible, use natural routes near hubs/landmarks and safe reachable arrivals, and update generators and map art together.
 
-- [ ] `M-PRICE` — Set a substantial mount price and level-50 purchase offer so most new level-50 characters cannot immediately afford it.
-- [ ] `M-SPEED` — Persist mount ownership and calculate **2× normal travel speed** authoritatively when mounted.
-- [ ] `M-CLIENT` — Add mount appearance, mount/dismount control and clear speed/ownership UI; settle combat, portal and city rules.
-- [ ] `M-CHECK` — Check level/gold gates, persistence, travel speed and transitions in a private world.
+- [x] `M-PRICE` — Set a substantial mount price and level-50 purchase offer so most new level-50 characters cannot immediately afford it.
+- [x] `M-SPEED` — Persist mount ownership and calculate **2× normal travel speed** authoritatively when mounted.
+- [x] `M-CLIENT` — Add mount appearance, mount/dismount control and clear speed/ownership UI; settle combat, portal and city rules.
+- [x] `M-CHECK` — Check level/gold gates, persistence, travel speed and transitions in a private world.
 
 ## Previous gear redesign
 
 All 252 level-25–50 and Cathedral base pieces are complete. Detailed piece history is in [GEAR_REDESIGN_TODO.md](GEAR_REDESIGN_TODO.md).
 
 - [ ] `R-CHECK` — Complete its final generator, Rust, MCP and browser/art integration checks, then close the detailed checklist.
+
+## Completed in this batch (2026-10-12)
+
+Closed 20 items: level-95 gear bonus; hunter ranks through 98; five level-99 capstones; five skill identity updates; high-level unlock and skillbar migration checks; world-map graph, routes and consistency; and mount price, speed, client controls and private-world checks. The mount costs 50,000 gold at level 50, persists across login, travels at twice normal speed, and dismounts for combat. Private mount and skill checks passed; the map data and client copy match across 29 connected zones with four distinct sealed doors and no tile overlaps. The full world-map browser suite and full Rust suite were not completed in this batch.

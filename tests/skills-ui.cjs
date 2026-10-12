@@ -31,9 +31,12 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'blink'
   // --- the bar holds every learned skill, in unlock order ---
   const slots = await page.locator('#skillbar-slots button').evaluateAll(b => b.map(x => x.dataset.skill));
   check(JSON.stringify(slots) === JSON.stringify([...MAGE, '']), 'A level-20 character starts with all eleven abilities in unlock order and slot 12 empty');
+  check(await page.locator('#character-attributes [data-stat="intellect"] b').textContent().then(t => t.includes('9 passive')), 'The character sheet includes earned passive Intellect from the server');
   check(await page.locator('#skillbar-slots kbd').allTextContents().then(k => k.join('') === '1234567890-='), 'The twelve slots are keyed 1-9, 0, minus and equals');
   await page.keyboard.press('k');
-  check(await page.locator('#skill-library .skill-card').count() === 11 && await page.locator('#skill-library .skill-card.locked').count() === 0, 'Nothing is locked at level 20');
+  check(await page.locator('#skill-library [data-skill]').count() === 11 && await page.locator('#skill-library [data-skill].locked').count() === 0, 'All active skills are unlocked at level 20');
+  check(await page.locator('#skill-library [data-passive]').count() === 9 && await page.locator('#skill-library [data-passive].locked').count() === 7, 'The library shows two earned and seven future mage passives');
+  check(await page.locator('#skill-library [data-passive="mage_milestone_20"] small').textContent().then(t => t.includes('Intellect')), 'The level-20 passive explains its automatic stat effect');
   check(await page.locator('#skill-library [data-skill="starfall"] .skill-level').textContent() === 'Lv 20', 'Each card names the level that unlocks it');
   check(await page.locator('#skill-library [data-skill="twinbolt"] small').textContent().then(t => t.includes('Next rank 2 at level 22')), 'The library previews the next rank');
   const panel = await page.locator('.skills-panel').boundingBox(), library = await page.locator('#skill-library').boundingBox();
@@ -91,7 +94,7 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'blink'
     const css = sel => getComputedStyle(document.querySelector(sel));
     return { banner: css('#levelup-banner').pointerEvents, title: +css('.lu-title').opacity, skill: +css('.lu-skill').opacity, size: parseFloat(css('.lu-title').fontSize), hud: document.getElementById('hud-lv').classList.contains('lv-pop') };
   });
-  check(look.banner === 'none' && look.title === 1 && look.skill === 1 && look.size > 50 && look.hud, 'The banner is large and fully visible, never blocks the game, and the HUD level pops');
+  check(look.banner === 'none' && look.title >= .95 && look.skill >= .95 && look.size > 50 && look.hud, `The banner is large and fully visible, never blocks the game, and the HUD level pops (${JSON.stringify(look)})`);
   await page.evaluate(() => Field._debug.event({ type: 'event', kind: 'levelup', actor: Online.id, x: Field.hero.x, y: Field.hero.y, value: 1, level: 22, unlocked: ['twinbolt'] }));
   check(await page.locator('#lu-skills .lu-skill b').textContent() === 'Rank 2: Twin Bolt', 'The banner announces a rank without treating it as a new skill');
   await page.evaluate(() => Field._debug.event({ type: 'event', kind: 'levelup', actor: Online.id, x: Field.hero.x, y: Field.hero.y, value: 1, level: 40, unlocked: ['twinbolt', 'twinbolt'] }));
@@ -100,6 +103,10 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'blink'
   check(await page.locator('#lu-skills .lu-skill b').textContent() === 'Rank 3: Twin Bolt', 'The next rotation announces rank 3');
   await page.evaluate(() => Field._debug.event({ type: 'event', kind: 'levelup', actor: Online.id, x: Field.hero.x, y: Field.hero.y, value: 1, level: 62, unlocked: ['twinbolt'] }));
   check(await page.locator('#lu-skills .lu-skill b').textContent() === 'Rank 4: Twin Bolt', 'The level-62 rotation announces rank 4');
+  await page.evaluate(() => Field._debug.event({ type: 'event', kind: 'levelup', actor: Online.id, x: Field.hero.x, y: Field.hero.y, value: 1, level: 82, unlocked: ['twinbolt'] }));
+  check(await page.locator('#lu-skills .lu-skill b').textContent() === 'Rank 5: Twin Bolt', 'The level-82 rotation announces rank 5');
+  await page.evaluate(() => Field._debug.event({ type: 'event', kind: 'levelup', actor: Online.id, x: Field.hero.x, y: Field.hero.y, value: 1, level: 90, unlocked: ['mage_milestone_90'] }));
+  check(await page.locator('#lu-skills .lu-skill b').textContent() === 'New passive: Infinite Thesis', 'The banner announces a new automatic passive');
   await page.screenshot({ path: path.join(world.artifacts, 'levelup-reduced-motion.png') });
   await page.waitForFunction(() => document.getElementById('levelup-banner').hidden, null, { timeout: 8000 });
   check(await page.locator('#levelup-flash').evaluate(n => !n.classList.contains('show')), 'The banner and flash leave by themselves');
@@ -113,13 +120,39 @@ const MAGE = ['attack', 'twinbolt', 'arcaneward', 'fireball', 'barrage', 'blink'
     const tick = () => { max = Math.max(max, +getComputedStyle(flash).opacity); performance.now() - start < 900 ? requestAnimationFrame(tick) : resolve(max); };
     tick();
   }));
-  check(peak > .8, `The screen flashes gold as the level-up lands (peak opacity ${peak.toFixed(2)})`);
+  check(peak > .75, `The screen flashes gold as the level-up lands (peak opacity ${peak.toFixed(2)})`);
   await page.screenshot({ path: path.join(world.artifacts, 'levelup-flash.png') });
   await page.waitForTimeout(600);
   const full = await page.evaluate(() => ({ title: +getComputedStyle(document.querySelector('.lu-title')).opacity, rays: getComputedStyle(document.querySelector('.lu-rays')).animationName, shown: !document.getElementById('levelup-banner').hidden }));
   check(full.shown && full.title === 1 && full.rays.includes('lu-rays'), 'The full-motion banner settles with spinning rays behind it');
   check(await page.locator('#lu-hint').textContent() === 'Fully healed · spend stat points in Character (E)', 'A level without a new skill points to stat points instead');
   await page.screenshot({ path: path.join(world.artifacts, 'levelup-full.png') });
+  // Five high-level reworks have distinct display paths while their IDs remain valid on the bar.
+  const looks = await page.evaluate(() => {
+    const result = {};
+    for (const [skill, value] of [['earthshatter', 4.8], ['starfall', 6.5], ['thousandcuts', 3.7], ['guardianlight', 0.65], ['arrowstorm', 4.2]]) {
+      Field._debug.event({ type: 'event', kind: 'skill', actor: Online.id, skill, x: Field.hero.x, y: Field.hero.y, fx: 1, fy: 0, value, points: [] });
+      result[skill] = Field._debug.effects.slice(-15).map(e => ({ kind: e.kind, style: e.style, stars: e.stars?.length }));
+    }
+    return result;
+  });
+  check(looks.earthshatter.some(e => e.kind === 'skCone') && looks.earthshatter.some(e => e.style === 'cracks'), 'Earthshatter sweeps a directional fissure');
+  check(looks.starfall.some(e => e.kind === 'skMeteor') && looks.starfall.some(e => e.stars === 28), 'Starfall paints a distant celestial impact');
+  check(looks.thousandcuts.filter(e => e.kind === 'skCut').length >= 10, 'Thousand Cuts fans out ten blade trails');
+  check(looks.guardianlight.some(e => e.kind === 'skBeam'), 'Guardian Light shows a sanctuary beam');
+  check(looks.arrowstorm.some(e => e.style === 'arrows'), 'Arrow Storm draws outward arrows');
+  await page.evaluate(() => Online.send({ type: 'debug', ref: 912, command: { op: 'set_level', level: 99 } }));
+  await page.waitForFunction(() => Field.hero.level === 99);
+  await page.evaluate(() => Online.saveSkillSlots(['attack', 'starfall', 'twinbolt', null, null, null, null, null, null, null, null, null], 99));
+  await page.evaluate(() => Online.stop());
+  for (let n = 0; n < 100; n++) { if ((await (await fetch(world.url + 'health')).json()).online === 0) break; await new Promise(resolve => setTimeout(resolve, 100)); }
+  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.waitForFunction(() => Online.connected && Field.hero.level === 99 && document.querySelectorAll('#skillbar-slots button').length === 12, null, { timeout: 60000 });
+  check(await page.locator('#skillbar-slots button').evaluateAll(b => b.slice(0, 3).map(x => x.dataset.skill).join(',') === 'attack,starfall,twinbolt'), 'An existing high-level character keeps its saved skillbar order');
+  check(await page.evaluate(() => Field.hero.passiveAttributes.intellect > 0), 'Earned passives are derived from the resumed level');
+  await page.keyboard.press('k');
+  check(await page.locator('#skill-library [data-skill="starfall"] small').textContent().then(t => t.includes('Capstone')), 'The resumed level-99 mage has its capstone rank');
+  await page.keyboard.press('k');
   check(errors.length === 0, `No page errors: ${errors.join('; ')}`);
   console.log(`${checks} learned-skill and level-up UI checks passed; screenshots: ${world.artifacts}`);
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {

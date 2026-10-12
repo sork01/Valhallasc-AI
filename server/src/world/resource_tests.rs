@@ -99,12 +99,13 @@ fn mana_grows_with_level_and_intellect_and_legacy_saves_start_full() {
     c.level = 10;
     c.attributes.intellect = 3;
     c.resource = None;
-    assert_eq!(c.max_resource(), 205.);
-    assert_eq!(c.resource(), 205.);
+    // The level-10 priest milestone contributes Intellect alongside trained points.
+    assert_eq!(c.max_resource(), 225.);
+    assert_eq!(c.resource(), 225.);
     let mut old = serde_json::to_value(&*c).unwrap();
     old.as_object_mut().unwrap().remove("resource");
     let legacy: Character = serde_json::from_value(old).unwrap();
-    assert_eq!(legacy.resource(), 205.);
+    assert_eq!(legacy.resource(), 225.);
     c.resource = Some(5.);
     c.grant_xp(c.xp_need());
     assert_eq!(c.resource(), c.max_resource());

@@ -77,7 +77,7 @@ class GearGeneratorTests(unittest.TestCase):
             expected = {'rare': 1, 'epic': 2}.get(item['rarity'], 0)
             self.assertEqual(len(bonus), expected, item['id'])
             self.assertEqual(bonus, gear.bonus_stats(item), item['id'])
-            level = min(90, max(5, item.get('requiredLevel', 1) // 5 * 5))
+            level = min(95, max(5, item.get('requiredLevel', 1) // 5 * 5))
             self.assertTrue(all(value == gear.ATTRIBUTE_BONUS[level] and stat in gear.bonus_choices(item.get('class'), value)
                                 for stat, value in bonus.items()), item['id'])
 
@@ -85,7 +85,7 @@ class GearGeneratorTests(unittest.TestCase):
         expected_by_level = {
             1: 1, 5: 1, 10: 3, 15: 5, 20: 7, 25: 10, 30: 15, 35: 20,
             40: 30, 45: 35, 50: 40, 55: 48, 60: 55, 65: 63,
-            70: 70, 75: 78, 80: 85, 85: 93, 90: 100,
+            70: 70, 75: 78, 80: 85, 85: 93, 90: 100, 95: 108,
         }
         for level, expected in expected_by_level.items():
             blue = {'id': 'future_warrior_blue', 'class': 'warrior', 'rarity': 'rare', 'requiredLevel': level}

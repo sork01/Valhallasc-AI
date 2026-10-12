@@ -85,7 +85,7 @@
     const currentNumber = (skill.ranks || []).indexOf(current) + 2;
     const nextNumber = (skill.ranks || []).indexOf(next) + 2;
     const cooldown = (skill.cooldown * (current?.cooldown || 1)).toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
-    return `${skill.description}${current ? ` Rank ${currentNumber}: ${current.description}` : ''}${next ? ` Next rank ${nextNumber} at level ${next.level}: ${next.description}` : ''} ${costText(skill)} · ${cooldown}s cooldown.`;
+    return `${skill.description}${current ? ` ${current.capstone ? 'Capstone' : `Rank ${currentNumber}`}: ${current.description}` : ''}${next ? ` Next ${next.capstone ? 'capstone' : `rank ${nextNumber}`} at level ${next.level}: ${next.description}` : ''} ${costText(skill)} · ${cooldown}s cooldown.`;
   };
   const unlocked = skill => !!skill && skill.level <= level();
   const find = id => { const skill = skills.find(s => s.id === id); return unlocked(skill) ? skill : undefined; };
@@ -148,7 +148,7 @@
   }
   function render() {
     $('skillbar-slots').replaceChildren(...slots.map((_, i) => slotButton(i, false)));
-    $('skill-library').replaceChildren(...skills.map(skill => {
+    const cards = skills.map(skill => {
       const ready = unlocked(skill), b = node(ready ? 'button' : 'div', '', 'skill-card' + (ready ? '' : ' locked')); b.dataset.skill = skill.id;
       const glyph = node('span', '', 'skill-icon'); glyph.innerHTML = icon(skill.icon);
       b.append(glyph, node('b', skill.name), node('small', ready ? detail(skill) : `Unlocks at level ${skill.level}. ${costText(skill)} · ${skill.description}`));
@@ -158,7 +158,18 @@
       b.addEventListener('click', () => { slots[selected] = skill.id; save(); $('skill-library').querySelector(`[data-skill="${skill.id}"]`).focus(); });
       b.addEventListener('dragstart', event => { event.dataTransfer.setData('application/x-valhallasc-skill', JSON.stringify({ skill: skill.id })); event.dataTransfer.effectAllowed = 'copy'; });
       return b;
-    }));
+    });
+    const heading = node('h3', 'Milestone passives', 'passive-heading'); cards.push(heading);
+    for (const passive of WORLD_PASSIVES.filter(p => p.class === className)) {
+      const ready = passive.level <= level(), card = node('div', '', 'skill-card passive-card' + (ready ? '' : ' locked'));
+      card.dataset.passive = passive.id;
+      const glyph = node('span', '', 'skill-icon');
+      glyph.innerHTML = icon({ warrior: 'shield', mage: 'starfall', assassin: 'focus', priest: 'blessing', hunter: 'eagle' }[className]);
+      card.append(glyph, node('b', passive.name), node('small', passive.description), node('em', `Lv ${passive.level}`, 'skill-level'));
+      if (!ready) card.setAttribute('aria-disabled', 'true');
+      cards.push(card);
+    }
+    $('skill-library').replaceChildren(...cards);
     renderEditor();
   }
   function show() {

@@ -42222,7 +42222,7 @@
     "attack": 14.1,
     "defense": 56.4,
     "bonusStats": {
-      "agility": 100
+      "agility": 108
     }
   },
   {
@@ -42244,7 +42244,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "stamina": 100
+      "stamina": 108
     }
   },
   {
@@ -42266,7 +42266,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "agility": 100
+      "agility": 108
     }
   },
   {
@@ -42288,7 +42288,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "strength": 100
+      "strength": 108
     }
   },
   {
@@ -42310,7 +42310,7 @@
     "attack": 75.2,
     "defense": 18.8,
     "bonusStats": {
-      "agility": 100
+      "agility": 108
     }
   },
   {
@@ -42332,7 +42332,7 @@
     "attack": 9.4,
     "defense": 37.6,
     "bonusStats": {
-      "stamina": 100
+      "stamina": 108
     }
   },
   {
@@ -42354,7 +42354,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "stamina": 100
+      "stamina": 108
     }
   },
   {
@@ -42376,7 +42376,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "agility": 100
+      "agility": 108
     }
   },
   {
@@ -42398,7 +42398,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "agility": 100
+      "agility": 108
     }
   },
   {
@@ -42420,7 +42420,7 @@
     "attack": 75.2,
     "defense": 18.8,
     "bonusStats": {
-      "stamina": 100
+      "stamina": 108
     }
   },
   {
@@ -42442,7 +42442,7 @@
     "attack": 9.4,
     "defense": 37.6,
     "bonusStats": {
-      "strength": 100
+      "strength": 108
     }
   },
   {
@@ -42464,7 +42464,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "stamina": 100
+      "stamina": 108
     }
   },
   {
@@ -42486,7 +42486,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "agility": 100
+      "agility": 108
     }
   },
   {
@@ -42508,7 +42508,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "agility": 100
+      "agility": 108
     }
   },
   {
@@ -42530,7 +42530,7 @@
     "attack": 75.2,
     "defense": 18.8,
     "bonusStats": {
-      "stamina": 100
+      "stamina": 108
     }
   },
   {
@@ -42552,7 +42552,7 @@
     "attack": 14.1,
     "defense": 56.4,
     "bonusStats": {
-      "stamina": 100
+      "stamina": 108
     }
   },
   {
@@ -42574,7 +42574,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "intellect": 100
+      "intellect": 108
     }
   },
   {
@@ -42596,7 +42596,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "stamina": 100
+      "stamina": 108
     }
   },
   {
@@ -42618,7 +42618,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "stamina": 100
+      "stamina": 108
     }
   },
   {
@@ -42640,7 +42640,7 @@
     "attack": 75.2,
     "defense": 18.8,
     "bonusStats": {
-      "intellect": 100
+      "intellect": 108
     }
   },
   {
@@ -42662,7 +42662,7 @@
     "attack": 14.1,
     "defense": 56.4,
     "bonusStats": {
-      "agility": 100
+      "agility": 108
     }
   },
   {
@@ -42684,7 +42684,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "stamina": 100
+      "stamina": 108
     }
   },
   {
@@ -42706,7 +42706,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "strength": 100
+      "strength": 108
     }
   },
   {
@@ -42728,7 +42728,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "strength": 100
+      "strength": 108
     }
   },
   {
@@ -42750,7 +42750,7 @@
     "attack": 75.2,
     "defense": 18.8,
     "bonusStats": {
-      "strength": 100
+      "strength": 108
     }
   },
   {
@@ -42771,7 +42771,7 @@
     "attack": 4.7,
     "defense": 18.8,
     "bonusStats": {
-      "agility": 100
+      "agility": 108
     }
   },
   {
@@ -42792,7 +42792,7 @@
     "attack": 37.6,
     "defense": 9.4,
     "bonusStats": {
-      "agility": 100
+      "agility": 108
     }
   },
   {
@@ -42813,7 +42813,7 @@
     "attack": 28.2,
     "defense": 7.1,
     "bonusStats": {
-      "strength": 100
+      "strength": 108
     }
   },
   {

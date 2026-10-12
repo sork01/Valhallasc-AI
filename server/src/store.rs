@@ -143,6 +143,8 @@ impl Store {
             party_points: 0,
             travel_stops: vec![],
             spark_travel: None,
+            mount_owned: false,
+            mounted: false,
         };
         c.seed_inventory();
         if gm {

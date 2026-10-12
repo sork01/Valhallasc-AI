@@ -138,6 +138,7 @@ def talkers():
                look_=look('#e8b890', '#8a4a2a', 'short', None, None, '#8a4a2a')),
         person('stable', 'Stable-hand Greta', 'Stable-hand', 124.0, 128.0, '#6a8a5a',
                'The horses were here before the city and they will be here after it. This one bites. That one kicks. You can pet the third, if you are fast.',
+               offers=[dict(id='buy_mount', label='Buy riding horse · level 50 · 50,000 gold', cost=50000, mount=True)],
                look_=look('#edc5a1', '#7a5a2a', 'long', 'straw', None, None, 1.0, '#e6c870')),
         person('weaver', 'Weaver Astrid', 'Weaver', 30.0, 62.0, '#a05a8a',
                'Every house in the Lark Lane wears my wool. Not by choice: they all came back the second winter for more.',

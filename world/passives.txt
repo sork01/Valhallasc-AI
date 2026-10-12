@@ -1,0 +1,477 @@
+[
+  {
+    "id": "warrior_milestone_10",
+    "name": "Iron Constitution",
+    "class": "warrior",
+    "level": 10,
+    "description": "Always active: +4 Stamina.",
+    "bonus": {
+      "stamina": 4
+    }
+  },
+  {
+    "id": "warrior_milestone_20",
+    "name": "Veteran's Edge",
+    "class": "warrior",
+    "level": 20,
+    "description": "Always active: +5 Strength.",
+    "bonus": {
+      "strength": 5
+    }
+  },
+  {
+    "id": "warrior_milestone_30",
+    "name": "Guarded Footwork",
+    "class": "warrior",
+    "level": 30,
+    "description": "Always active: +4 Stamina, +2 Dexterity.",
+    "bonus": {
+      "stamina": 4,
+      "dexterity": 2
+    }
+  },
+  {
+    "id": "warrior_milestone_40",
+    "name": "Fortress Heart",
+    "class": "warrior",
+    "level": 40,
+    "description": "Always active: +8 Stamina.",
+    "bonus": {
+      "stamina": 8
+    }
+  },
+  {
+    "id": "warrior_milestone_50",
+    "name": "Battle Insight",
+    "class": "warrior",
+    "level": 50,
+    "description": "Always active: +7 Strength, +2 Accuracy.",
+    "bonus": {
+      "strength": 7,
+      "accuracy": 2
+    }
+  },
+  {
+    "id": "warrior_milestone_60",
+    "name": "Titan's Grip",
+    "class": "warrior",
+    "level": 60,
+    "description": "Always active: +12 Strength.",
+    "bonus": {
+      "strength": 12
+    }
+  },
+  {
+    "id": "warrior_milestone_70",
+    "name": "Unbroken March",
+    "class": "warrior",
+    "level": 70,
+    "description": "Always active: +14 Stamina.",
+    "bonus": {
+      "stamina": 14
+    }
+  },
+  {
+    "id": "warrior_milestone_80",
+    "name": "War Tempo",
+    "class": "warrior",
+    "level": 80,
+    "description": "Always active: +10 Strength, +5 Agility.",
+    "bonus": {
+      "strength": 10,
+      "agility": 5
+    }
+  },
+  {
+    "id": "warrior_milestone_90",
+    "name": "Last Bastion",
+    "class": "warrior",
+    "level": 90,
+    "description": "Always active: +18 Strength, +12 Stamina.",
+    "bonus": {
+      "strength": 18,
+      "stamina": 12
+    }
+  },
+  {
+    "id": "mage_milestone_10",
+    "name": "Arcane Study",
+    "class": "mage",
+    "level": 10,
+    "description": "Always active: +4 Intellect.",
+    "bonus": {
+      "intellect": 4
+    }
+  },
+  {
+    "id": "mage_milestone_20",
+    "name": "Steady Conduit",
+    "class": "mage",
+    "level": 20,
+    "description": "Always active: +5 Intellect, +2 Stamina.",
+    "bonus": {
+      "intellect": 5,
+      "stamina": 2
+    }
+  },
+  {
+    "id": "mage_milestone_30",
+    "name": "Mana Lattice",
+    "class": "mage",
+    "level": 30,
+    "description": "Always active: +7 Intellect.",
+    "bonus": {
+      "intellect": 7
+    }
+  },
+  {
+    "id": "mage_milestone_40",
+    "name": "Runic Shelter",
+    "class": "mage",
+    "level": 40,
+    "description": "Always active: +7 Stamina, +3 Intellect.",
+    "bonus": {
+      "stamina": 7,
+      "intellect": 3
+    }
+  },
+  {
+    "id": "mage_milestone_50",
+    "name": "Spellweaver",
+    "class": "mage",
+    "level": 50,
+    "description": "Always active: +10 Intellect.",
+    "bonus": {
+      "intellect": 10
+    }
+  },
+  {
+    "id": "mage_milestone_60",
+    "name": "Astral Reservoir",
+    "class": "mage",
+    "level": 60,
+    "description": "Always active: +10 Intellect, +5 Stamina.",
+    "bonus": {
+      "intellect": 10,
+      "stamina": 5
+    }
+  },
+  {
+    "id": "mage_milestone_70",
+    "name": "Star Reader",
+    "class": "mage",
+    "level": 70,
+    "description": "Always active: +14 Intellect.",
+    "bonus": {
+      "intellect": 14
+    }
+  },
+  {
+    "id": "mage_milestone_80",
+    "name": "Eldritch Focus",
+    "class": "mage",
+    "level": 80,
+    "description": "Always active: +13 Intellect, +5 Agility.",
+    "bonus": {
+      "intellect": 13,
+      "agility": 5
+    }
+  },
+  {
+    "id": "mage_milestone_90",
+    "name": "Infinite Thesis",
+    "class": "mage",
+    "level": 90,
+    "description": "Always active: +22 Intellect, +8 Stamina.",
+    "bonus": {
+      "intellect": 22,
+      "stamina": 8
+    }
+  },
+  {
+    "id": "assassin_milestone_10",
+    "name": "Knife Discipline",
+    "class": "assassin",
+    "level": 10,
+    "description": "Always active: +4 Agility.",
+    "bonus": {
+      "agility": 4
+    }
+  },
+  {
+    "id": "assassin_milestone_20",
+    "name": "Silent Steps",
+    "class": "assassin",
+    "level": 20,
+    "description": "Always active: +3 Dexterity, +2 Agility.",
+    "bonus": {
+      "dexterity": 3,
+      "agility": 2
+    }
+  },
+  {
+    "id": "assassin_milestone_30",
+    "name": "Keen Edge",
+    "class": "assassin",
+    "level": 30,
+    "description": "Always active: +7 Agility.",
+    "bonus": {
+      "agility": 7
+    }
+  },
+  {
+    "id": "assassin_milestone_40",
+    "name": "Shadow Poise",
+    "class": "assassin",
+    "level": 40,
+    "description": "Always active: +5 Dexterity, +4 Stamina.",
+    "bonus": {
+      "dexterity": 5,
+      "stamina": 4
+    }
+  },
+  {
+    "id": "assassin_milestone_50",
+    "name": "Death's Measure",
+    "class": "assassin",
+    "level": 50,
+    "description": "Always active: +9 Agility, +2 Accuracy.",
+    "bonus": {
+      "agility": 9,
+      "accuracy": 2
+    }
+  },
+  {
+    "id": "assassin_milestone_60",
+    "name": "Ghost's Reach",
+    "class": "assassin",
+    "level": 60,
+    "description": "Always active: +12 Agility.",
+    "bonus": {
+      "agility": 12
+    }
+  },
+  {
+    "id": "assassin_milestone_70",
+    "name": "Unseen Guard",
+    "class": "assassin",
+    "level": 70,
+    "description": "Always active: +8 Dexterity, +6 Stamina.",
+    "bonus": {
+      "dexterity": 8,
+      "stamina": 6
+    }
+  },
+  {
+    "id": "assassin_milestone_80",
+    "name": "Perfect Cut",
+    "class": "assassin",
+    "level": 80,
+    "description": "Always active: +15 Agility.",
+    "bonus": {
+      "agility": 15
+    }
+  },
+  {
+    "id": "assassin_milestone_90",
+    "name": "Night Sovereign",
+    "class": "assassin",
+    "level": 90,
+    "description": "Always active: +18 Agility, +9 Dexterity.",
+    "bonus": {
+      "agility": 18,
+      "dexterity": 9
+    }
+  },
+  {
+    "id": "priest_milestone_10",
+    "name": "Quiet Prayer",
+    "class": "priest",
+    "level": 10,
+    "description": "Always active: +4 Intellect.",
+    "bonus": {
+      "intellect": 4
+    }
+  },
+  {
+    "id": "priest_milestone_20",
+    "name": "Merciful Hands",
+    "class": "priest",
+    "level": 20,
+    "description": "Always active: +4 Intellect, +3 Stamina.",
+    "bonus": {
+      "intellect": 4,
+      "stamina": 3
+    }
+  },
+  {
+    "id": "priest_milestone_30",
+    "name": "Steadfast Faith",
+    "class": "priest",
+    "level": 30,
+    "description": "Always active: +6 Stamina, +3 Intellect.",
+    "bonus": {
+      "stamina": 6,
+      "intellect": 3
+    }
+  },
+  {
+    "id": "priest_milestone_40",
+    "name": "Radiant Wisdom",
+    "class": "priest",
+    "level": 40,
+    "description": "Always active: +9 Intellect.",
+    "bonus": {
+      "intellect": 9
+    }
+  },
+  {
+    "id": "priest_milestone_50",
+    "name": "Guardian Vow",
+    "class": "priest",
+    "level": 50,
+    "description": "Always active: +9 Stamina, +4 Intellect.",
+    "bonus": {
+      "stamina": 9,
+      "intellect": 4
+    }
+  },
+  {
+    "id": "priest_milestone_60",
+    "name": "Hallowed Voice",
+    "class": "priest",
+    "level": 60,
+    "description": "Always active: +12 Intellect.",
+    "bonus": {
+      "intellect": 12
+    }
+  },
+  {
+    "id": "priest_milestone_70",
+    "name": "Sacred Endurance",
+    "class": "priest",
+    "level": 70,
+    "description": "Always active: +13 Stamina, +5 Intellect.",
+    "bonus": {
+      "stamina": 13,
+      "intellect": 5
+    }
+  },
+  {
+    "id": "priest_milestone_80",
+    "name": "Dawn's Counsel",
+    "class": "priest",
+    "level": 80,
+    "description": "Always active: +16 Intellect.",
+    "bonus": {
+      "intellect": 16
+    }
+  },
+  {
+    "id": "priest_milestone_90",
+    "name": "Eternal Benediction",
+    "class": "priest",
+    "level": 90,
+    "description": "Always active: +19 Intellect, +11 Stamina.",
+    "bonus": {
+      "intellect": 19,
+      "stamina": 11
+    }
+  },
+  {
+    "id": "hunter_milestone_10",
+    "name": "Sure Draw",
+    "class": "hunter",
+    "level": 10,
+    "description": "Always active: +4 Agility.",
+    "bonus": {
+      "agility": 4
+    }
+  },
+  {
+    "id": "hunter_milestone_20",
+    "name": "Trail Sense",
+    "class": "hunter",
+    "level": 20,
+    "description": "Always active: +3 Agility, +3 Stamina.",
+    "bonus": {
+      "agility": 3,
+      "stamina": 3
+    }
+  },
+  {
+    "id": "hunter_milestone_30",
+    "name": "Hawk's Eye",
+    "class": "hunter",
+    "level": 30,
+    "description": "Always active: +6 Agility, +2 Accuracy.",
+    "bonus": {
+      "agility": 6,
+      "accuracy": 2
+    }
+  },
+  {
+    "id": "hunter_milestone_40",
+    "name": "Wilderness Heart",
+    "class": "hunter",
+    "level": 40,
+    "description": "Always active: +8 Stamina, +3 Agility.",
+    "bonus": {
+      "stamina": 8,
+      "agility": 3
+    }
+  },
+  {
+    "id": "hunter_milestone_50",
+    "name": "Longbow Craft",
+    "class": "hunter",
+    "level": 50,
+    "description": "Always active: +10 Agility.",
+    "bonus": {
+      "agility": 10
+    }
+  },
+  {
+    "id": "hunter_milestone_60",
+    "name": "Pathfinder's Step",
+    "class": "hunter",
+    "level": 60,
+    "description": "Always active: +9 Agility, +5 Dexterity.",
+    "bonus": {
+      "agility": 9,
+      "dexterity": 5
+    }
+  },
+  {
+    "id": "hunter_milestone_70",
+    "name": "Far Horizon",
+    "class": "hunter",
+    "level": 70,
+    "description": "Always active: +14 Agility.",
+    "bonus": {
+      "agility": 14
+    }
+  },
+  {
+    "id": "hunter_milestone_80",
+    "name": "Storm Tracker",
+    "class": "hunter",
+    "level": 80,
+    "description": "Always active: +13 Agility, +7 Stamina.",
+    "bonus": {
+      "agility": 13,
+      "stamina": 7
+    }
+  },
+  {
+    "id": "hunter_milestone_90",
+    "name": "Master of the Hunt",
+    "class": "hunter",
+    "level": 90,
+    "description": "Always active: +20 Agility, +8 Dexterity.",
+    "bonus": {
+      "agility": 20,
+      "dexterity": 8
+    }
+  }
+]

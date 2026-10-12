@@ -350,6 +350,11 @@ pub struct Character {
     /// Saved flight, so reconnecting or restarting resumes without another fare or an unsafe landing.
     #[serde(default)]
     pub spark_travel: Option<SparkTravel>,
+    /// Permanent purchase and the current riding state. Both default to false for old saves.
+    #[serde(default)]
+    pub mount_owned: bool,
+    #[serde(default)]
+    pub mounted: bool,
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -399,6 +404,8 @@ impl Character {
             party_points: 0,
             travel_stops: vec![],
             spark_travel: None,
+            mount_owned: false,
+            mounted: false,
         };
         c.seed_inventory();
         // The best potions the mercenary's level allows: health for everyone, mana for casters.
@@ -878,6 +885,9 @@ pub enum ClientMessage {
     UseItem {
         item: String,
     },
+    Mount {
+        mounted: bool,
+    },
     Equip {
         armor: Option<String>,
         weapon: Option<String>,
@@ -1079,6 +1089,8 @@ pub struct Offer {
     /// Sells the best tier of the item's family for the buyer's level, at that tier's price (potions and food).
     #[serde(default)]
     pub tiered: bool,
+    #[serde(default)]
+    pub mount: bool,
 }
 #[derive(Clone, Deserialize, Serialize)]
 pub struct Npc {

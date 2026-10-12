@@ -43,6 +43,14 @@ async function call(name, args = {}) {
   // --- the data the map was written against ---
   const data = await page.evaluate(() => ({ zones: Field._debug.zones.map(z => ({ name: z.name, kinds: [...new Set((z.slimes || []).map(s => s.kind))], portals: (z.portals || []).map(p => p.to) })), layout: WorldMap._layout.length, kinds: Object.fromEntries(Object.entries(WorldMap._kinds).map(([k, v]) => [k, v[1]])) }));
   check(data.layout >= data.zones.length, `Every one of the ${data.zones.length} zones has a place on the world sheet (${data.layout})`);
+  check(await page.evaluate(() => {
+    const graph = WorldMap._graph, seen = new Set([0]), queue = [0];
+    for (const i of queue) for (const edge of graph[i]) {
+      if (!graph[edge.to].some(back => back.to === i)) return false;
+      if (!seen.has(edge.to)) { seen.add(edge.to); queue.push(edge.to); }
+    }
+    return graph.length === Field._debug.zones.length && seen.size === graph.length;
+  }), 'The authoritative gate graph is reciprocal and connects every zone, including city and dungeon branches');
   check(data.zones.every(z => z.kinds.every(k => k in data.kinds)), 'Every enemy kind in every zone is in the map legend');
   check(Object.entries(data.kinds).every(([k, level]) => (server[k] ?? 2) === level), `The legend levels equal the server's (${Object.entries(data.kinds).filter(([k, l]) => (server[k] ?? 2) !== l).map(([k]) => k)})`);
 
@@ -136,7 +144,7 @@ async function call(name, args = {}) {
   const all = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => ({ name: t.querySelector('b').textContent, small: t.querySelector('small').textContent, disabled: t.disabled })));
   check(all.map(t => t.name).join() === data.zones.map(z => z.name).join() && all.every(t => !t.disabled), `Every visited zone is named again: ${all.map(t => t.name).join(', ')}`);
   const masters = await page.evaluate(() => Field._debug.zones.map((z, zone) => ({ zone, size: z.size, npcs: (z.npcs || []).filter(n => n.travelStop) })).filter(z => z.npcs.length));
-  check(masters.reduce((n, z) => n + z.npcs.length, 0) === 17 && masters.length === 16, 'The catalog includes all 17 travel masters across 16 zones');
+  check(masters.reduce((n, z) => n + z.npcs.length, 0) === 27 && masters.length === 23, 'The catalog includes all 27 travel masters across 23 zones');
   check(await page.locator('.wm-travel-badge:visible').count() === masters.length, 'Every visited travel-master zone has a world-sheet badge');
   for (const z of masters) {
     await page.locator(`.wm-tile[data-zone="${z.zone}"]`).click();
@@ -146,7 +154,7 @@ async function call(name, args = {}) {
   }
   check(/^Lv 5–10 · 1\/9/.test(all[1].small) && /^Lv 10–15 · 2\/9/.test(all[2].small) && /^Lv 15–20 · 1\/9/.test(all[3].small) && /^Safe city · 1\/9/.test(all[4].small) && /^Lv 20 · 5 players · 1\/9/.test(all[5].small) && /^Lv 2–5 · 1\/9/.test(all[0].small) && /^Lv 20–30 · 1\/9/.test(all[6].small), `Levels and charted counts on the tiles: ${all.map(t => t.small).join(' | ')}`);
   const roads = await page.evaluate(() => [...document.querySelectorAll('.wm-roads [data-road]')].filter(r => r.getAttribute('visibility') === 'visible').map(r => r.dataset.road).sort());
-  const expectedRoads = [...new Set(data.zones.flatMap((z,i) => z.portals.map(to => [i,to].sort().join('-'))))].sort();
+  const expectedRoads = [...new Set(data.zones.flatMap((z,i) => z.portals.map(to => [i,to].sort((a,b)=>a-b).join('-'))))].sort();
   check(roads.join() === expectedRoads.join(), `Roads appear once either end's gate has been seen (${roads})`);
   check(await page.evaluate(() => [...document.querySelectorAll('.wm-tile canvas:not(.wm-tile-fog)')].every(c => { const g = c.getContext('2d').getImageData(0, 0, 220, 220).data; const set = new Set(); for (let i = 0; i < g.length; i += 4 * 97) set.add((g[i] >> 4) + ',' + (g[i + 1] >> 4) + ',' + (g[i + 2] >> 4)); return set.size >= 6; })), 'Every tile carries drawn ground under its fog');
   await shot('map-world');
@@ -246,6 +254,15 @@ async function call(name, args = {}) {
   check(await page.evaluate(() => { const w = document.getElementById('wm-world'); return !w.hidden && !w.style.transform && getComputedStyle(w).opacity === '1'; }), 'Zooming back out ends on the full sheet');
   await press('Escape');
   check(await page.evaluate(() => Field.canAct), 'Closing the map hands the game back');
+  // Chart the private test character to inspect distant routes and the four sealed Yearwheel doors.
+  await page.evaluate(() => Online.send({ type: 'debug', ref: 812, command: { op: 'explore_all' } }));
+  await page.waitForFunction(() => Field.explored[28] === 511, null, { timeout: 10000 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await press('m'); await page.locator('.wm-tile[data-zone="28"]').click();
+  check(await page.locator('.wm-sealed').count() === 4, 'The four Yearwheel dungeon entrances have distinct sealed markers');
+  check(await page.locator('.wm-route-text').textContent().then(t => t.includes('Route:') && t.includes('The Yearwheel')), 'The selected zone lists a reachable portal route from the current position');
+  check(await page.evaluate(() => document.querySelectorAll('.wm-route-road').length === WorldMap._route(Field.zone, 28).length - 1), 'The world sheet highlights every actual portal edge of that route');
+  await page.locator('#wm-close').click();
   check(errors.length === 0, `No browser runtime errors: ${errors.join('; ')}`);
   console.log(`${checks} world map UI checks passed; screenshots: ${world.artifacts}`);
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {

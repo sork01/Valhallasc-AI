@@ -672,13 +672,38 @@ impl Character {
     }
     pub fn effective_attributes(&self) -> Attributes {
         let bonus = self.gear_attributes();
+        let passive = crate::skills::passive_bonus(self.look.class, self.level);
         Attributes {
-            strength: self.attributes.strength.saturating_add(bonus.strength),
-            agility: self.attributes.agility.saturating_add(bonus.agility),
-            intellect: self.attributes.intellect.saturating_add(bonus.intellect),
-            stamina: self.attributes.stamina.saturating_add(bonus.stamina),
-            dexterity: self.attributes.dexterity.saturating_add(bonus.dexterity),
-            accuracy: self.attributes.accuracy.saturating_add(bonus.accuracy),
+            strength: self
+                .attributes
+                .strength
+                .saturating_add(bonus.strength)
+                .saturating_add(passive.strength),
+            agility: self
+                .attributes
+                .agility
+                .saturating_add(bonus.agility)
+                .saturating_add(passive.agility),
+            intellect: self
+                .attributes
+                .intellect
+                .saturating_add(bonus.intellect)
+                .saturating_add(passive.intellect),
+            stamina: self
+                .attributes
+                .stamina
+                .saturating_add(bonus.stamina)
+                .saturating_add(passive.stamina),
+            dexterity: self
+                .attributes
+                .dexterity
+                .saturating_add(bonus.dexterity)
+                .saturating_add(passive.dexterity),
+            accuracy: self
+                .attributes
+                .accuracy
+                .saturating_add(bonus.accuracy)
+                .saturating_add(passive.accuracy),
         }
     }
     /// Keep missing HP/mana stable when an item's Stamina or Intellect changes the maxima.
@@ -1012,6 +1037,11 @@ mod tests {
                         60 => 55,
                         65 => 63,
                         70 => 70,
+                        75 => 78,
+                        80 => 85,
+                        85 => 93,
+                        90 => 100,
+                        95 => 108,
                         level => panic!("unexpected gear level {level}"),
                     };
                     assert_eq!(value, expected, "{}", i.id);
@@ -1668,7 +1698,7 @@ mod tests {
         }
     }
     #[test]
-    fn late_zone_drop_pools_reach_level_seventy_gear() {
+    fn late_zone_drop_pools_reach_level_seventy_five_gear() {
         for rarity in ["common", "uncommon", "rare", "epic"] {
             let pool: Vec<_> = ITEMS
                 .iter()
@@ -1677,10 +1707,10 @@ mod tests {
                         && i.rarity == rarity
                         && !i.starter
                         && i.source.is_none()
-                        && (55..=70).contains(&i.required_level)
+                        && (55..=95).contains(&i.required_level)
                 })
                 .collect();
-            assert!(!pool.is_empty(), "{rarity} has level 55/60/65/70 gear");
+            assert!(!pool.is_empty(), "{rarity} has level 55–95 gear");
             for enemy_level in [55, 58, 60, 62, 65, 67, 70] {
                 let drops: std::collections::BTreeSet<_> = (0..pool.len())
                     .map(|n| {
@@ -1698,7 +1728,14 @@ mod tests {
                     .iter()
                     .filter(|i| {
                         i.required_level <= max_drop_level(enemy_level)
-                            && (enemy_level < 65 || i.required_level >= 65)
+                            && i.required_level
+                                >= if enemy_level >= 70 {
+                                    70
+                                } else if enemy_level >= 65 {
+                                    65
+                                } else {
+                                    55
+                                }
                     })
                     .map(|i| i.id.as_str())
                     .collect();
@@ -1865,7 +1902,7 @@ mod tests {
                 continue;
             }
             assert!(
-                i.required_level == 1 || (i.required_level <= 70 && i.required_level % 5 == 0),
+                i.required_level == 1 || (i.required_level <= 95 && i.required_level % 5 == 0),
                 "{} needs level {}",
                 i.id,
                 i.required_level
@@ -1878,7 +1915,7 @@ mod tests {
         assert_eq!(
             used.into_iter().collect::<Vec<_>>(),
             std::iter::once(1)
-                .chain((5..=70).step_by(5))
+                .chain((5..=95).step_by(5))
                 .collect::<Vec<_>>()
         );
     }
@@ -2174,9 +2211,16 @@ mod tests {
             item("headgear_upgrade").unwrap(),
             item("accessory_upgrade").unwrap(),
         );
+        let passive = crate::skills::passive_bonus(c.look.class, c.level);
+        let passive_attack =
+            passive.strength as f64 * 2. + (passive.agility + passive.intellect) as f64 * 0.5;
+        let passive_defense = passive.strength as f64 * 0.2;
         let (attack, defense) = c.stats();
-        assert!((attack - (22. + 80. + 4. + head.attack + 2. * ring.attack)).abs() < 1e-9);
-        assert!((defense - (3. + head.defense + 2. * ring.defense)).abs() < 1e-9);
+        assert!(
+            (attack - (22. + 80. + 4. + passive_attack + head.attack + 2. * ring.attack)).abs()
+                < 1e-9
+        );
+        assert!((defense - (3. + passive_defense + head.defense + 2. * ring.defense)).abs() < 1e-9);
         assert!(c.sell_item("accessory_upgrade", 2).is_err());
         assert_eq!(c.sell_item("accessory_upgrade", 1).unwrap(), ring.sell);
         assert!(c.sell_item("accessory_upgrade", 1).is_err());
@@ -2191,8 +2235,8 @@ mod tests {
         close(
             c.stats(),
             (
-                106. + head.attack + ring.attack,
-                3. + head.defense + ring.defense,
+                106. + passive_attack + head.attack + ring.attack,
+                3. + passive_defense + head.defense + ring.defense,
             ),
         );
         c.equip_slots(&request(&[("chest", "none"), ("hands", "none")]))
@@ -2200,8 +2244,8 @@ mod tests {
         close(
             c.stats(),
             (
-                102. + head.attack + ring.attack,
-                head.defense + ring.defense,
+                102. + passive_attack + head.attack + ring.attack,
+                passive_defense + head.defense + ring.defense,
             ),
         );
         c.hp = 0.;

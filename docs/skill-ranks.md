@@ -1,4 +1,4 @@
-# Skill ranks through level 80
+# Skill ranks and milestones through level 99
 
 Each class keeps its ten existing active abilities at even levels 2–20. The names,
 IDs, icons, resource costs and skillbar assignments stay stable. At levels 22–40,
@@ -21,12 +21,29 @@ The 42–60 rotation follows the same columns in the table: Twin Bolt and Cleave
 receive rank 3 at 42, and Starfall and Titan's Wrath at 60. Rank 3 is 40% stronger
 than the base damage, healing or buff effect; Blink and Roll Away gain a 30%
 shorter cooldown than their base cooldown.
-Warrior, mage, assassin and priest receive rank 4 at levels 62–80 in the same order,
+All five classes receive rank 4 at levels 62–80 in the same order,
 again 60 levels after each ability's base unlock. Rank 4 is 60% stronger than
-the base damage, healing or buff effect. Blink has a 45% shorter base cooldown.
-Hunter still ends at rank 3 until its 62–80 task is complete.
+the base damage, healing or buff effect. Blink and Roll Away have a 45% shorter base cooldown.
+All five classes receive rank 5 at levels 82–98 for their first nine abilities.
+It is 80% stronger than the base effect; Blink and Roll Away have a 60% shorter
+cooldown. Each class's level-20 skill receives its final rank at level 99 as a
+capstone, doubling its base damage and showing a distinct cast flourish.
 Server combat uses the highest earned rank. The skill library shows its current
 rank and next unlock; the level-up banner announces a rank instead of a new
 skill. Each rank's multipliers are relative to the base skill, not compounded
-with earlier ranks. Hunter ranks at 62–80, and all five classes at
-82–98, remain separate backlog work.
+with earlier ranks. `scripts/extend_skill_ranks.py` regenerates these rows
+idempotently in `world/skills.txt`.
+
+Every class also earns a separate automatic passive at levels 10, 20, …, 90.
+The 45 distinct names and stat grants are in `scripts/generate_passives.py`,
+which writes `world/passives.txt`; `scripts/sync-world.cjs` writes the client
+catalog. The server adds earned bonuses to effective attributes, alongside
+trained and worn stats. They cost no trained points, need no skillbar slot, and
+are derived from saved class and level on login. The skill library shows earned
+and future passives, and level-up events name newly earned passives.
+
+The high-level skill identity pass changes five existing IDs without touching
+saved bar assignments: Earthshatter is a directional fissure, Starfall lands in
+a distant area, Thousand Cuts sweeps a broad blade fan, Guardian Light is an
+emergency self heal, and Arrow Storm strikes all enemies around the hunter.
+Their cooldowns, descriptions and cast effects follow these new roles.
