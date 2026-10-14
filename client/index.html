@@ -140,8 +140,16 @@
         <div class="bar resource" id="resource-bar" role="progressbar" aria-label="Class resource" aria-valuemin="0"><i id="resource-fill"></i><span id="resource-text"></span></div>
         <div class="bar xp"><i id="xp-fill"></i></div>
       </div>
+      <div class="hud-target" id="hud-target" hidden>
+        <canvas class="hud-target-face" id="hud-target-face" width="96" height="96" aria-hidden="true"></canvas>
+        <div class="hud-target-bars">
+          <p class="hud-name"><b id="hud-target-name" aria-live="polite"></b><span id="hud-target-level"></span></p>
+          <div class="bar hp" role="progressbar" aria-label="Target health" aria-valuemin="0" id="hud-target-hp"><i id="hud-target-fill"></i><span id="hud-target-text"></span></div>
+        </div>
+      </div>
     </div>
     <div id="buff-bar" class="buff-bar" role="group" aria-label="Active effects"></div>
+    <div id="pvp-duel-warning" class="pvp-duel-warning" role="status" aria-live="polite" hidden></div>
     <div class="hud hud-tr">
       <div class="minimap-wrap">
         <canvas id="minimap" width="144" height="144" aria-label="Minimap"></canvas>
@@ -223,6 +231,7 @@
           <button id="social-tab-friends" role="tab" type="button" data-tab="friends" aria-selected="true">Friends</button>
           <button id="social-tab-party" role="tab" type="button" data-tab="party" aria-selected="false">Party</button>
           <button id="social-tab-online" role="tab" type="button" data-tab="online" aria-selected="false">Online</button>
+          <button id="social-tab-pvp" role="tab" type="button" data-tab="pvp" aria-selected="false" hidden>PvP</button>
         </div>
         <form id="social-add" class="social-add">
           <input id="social-name" type="text" maxlength="16" placeholder="Player name" aria-label="Player name" autocomplete="off">
@@ -231,6 +240,32 @@
         </form>
         <p id="social-notice" class="social-notice" role="status" aria-live="polite"></p>
         <div id="social-body" class="social-body"></div>
+      </section>
+    </div>
+    <div id="trade-request" class="trade-request" hidden role="group" aria-label="Trade request">
+      <span id="trade-request-text"></span>
+      <button id="trade-accept" class="btn primary" type="button">Accept</button>
+      <button id="trade-decline" class="btn ghost" type="button">Decline</button>
+    </div>
+    <div class="pause" id="trade-panel" hidden>
+      <section class="panel trade-panel" role="dialog" aria-modal="true" aria-labelledby="trade-title">
+        <h3 id="trade-title">Trade</h3>
+        <p id="trade-status" role="status"></p>
+        <div id="trade-offers" class="trade-offers" hidden>
+          <section>
+            <h4>Your offer</h4>
+            <ul id="trade-mine"></ul>
+            <label>Item <select id="trade-item" aria-label="Item to offer"></select></label>
+            <label>Quantity <input id="trade-quantity" type="number" min="1" step="1" value="1"></label>
+            <button id="trade-set-item" class="window-tool" type="button">Set item</button>
+            <label>Gold <input id="trade-gold" type="number" min="0" step="1" value="0"></label>
+            <button id="trade-set-gold" class="window-tool" type="button">Set gold</button>
+            <p id="trade-my-ready"></p>
+          </section>
+          <section><h4 id="trade-partner-heading">Their offer</h4><ul id="trade-theirs"></ul><p id="trade-their-ready"></p></section>
+        </div>
+        <div class="trade-actions"><button id="trade-confirm" class="btn primary" type="button" hidden>Confirm trade</button><button id="trade-cancel" class="btn ghost" type="button">Cancel</button></div>
+        <p class="social-note">Changing either offer clears both confirmations. The exchange finishes only after both players confirm.</p>
       </section>
     </div>
     <div class="pause" id="pause" hidden>
@@ -386,6 +421,17 @@
 <script src="music_cairn.js"></script>
 <script src="music_yearwheel.js"></script>
 <script src="music_cathedral.js"></script>
+<script src="music_eyebelow.js"></script>
+<script src="music_elderhollow.js"></script>
+<script src="music_pavilion.js"></script>
+<script src="music_raincrown.js"></script>
+<script src="music_seedvault.js"></script>
+<script src="music_sunken.js"></script>
+<script src="music_thunderheart.js"></script>
+<script src="music_blooming_labyrinth.js"></script>
+<script src="music_solar_crucible.js"></script>
+<script src="music_amber_archive.js"></script>
+<script src="music_silent_solstice.js"></script>
 <script src="warriorview.js"></script>
 <script src="magesprite.js"></script>
 <script src="assassinsprite.js"></script>
@@ -398,11 +444,14 @@
 <script src="skills.js"></script>
 <script src="passives.js"></script>
 <script src="inventory.js"></script>
+<script src="gearservices.js"></script>
 <script src="attributes.js"></script>
 <script src="syslog.js"></script>
 <script src="online.js"></script>
 <script src="account.js"></script>
 <script src="social.js"></script>
+<script src="pvp.js"></script>
+<script src="trade.js"></script>
 <script src="rolls.js"></script>
 <script src="gm.js"></script>
 <script src="spark.js"></script>
@@ -429,6 +478,14 @@
 <script src="cairnart.js"></script>
 <script src="yearwheelart.js"></script>
 <script src="cathedralart.js"></script>
+<script src="eyebelowart.js"></script>
+<script src="elderhollowart.js"></script>
+<script src="pavilionart.js"></script>
+<script src="raincrownart.js"></script>
+<script src="seedvaultart.js"></script>
+<script src="sunkenart.js"></script>
+<script src="thunderart.js"></script>
+<script src="seasonDungeonArt.js"></script>
 <script src="quests.js"></script>
 <script src="cathedral.js"></script>
 <script src="field.js"></script>

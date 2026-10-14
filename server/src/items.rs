@@ -2,6 +2,9 @@ use crate::model::{Attributes, Character, Class, GM_NAME};
 use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 
+mod gear_services;
+pub use gear_services::GearInstance;
+
 pub const EXTRA_SLOTS: [&str; 7] = [
     "headgear",
     "shoulders",
@@ -382,6 +385,106 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
         if !e.boss {
             return &[];
         }
+        if kind == "eye_lenswarden" {
+            return &[&["headgear", "shoulders", "gloves"]];
+        }
+        if kind == "elder_gatekeeper" {
+            return &[&["headgear", "shoulders", "gloves"]];
+        }
+        if kind == "elder_matron" {
+            return &[&["weapon", "pants", "necklace"]];
+        }
+        if kind == "elder_heart" {
+            return &[
+                &["armor"],
+                &[
+                    "weapon",
+                    "headgear",
+                    "shoulders",
+                    "gloves",
+                    "pants",
+                    "necklace",
+                    "accessory",
+                ],
+            ];
+        }
+        if kind == "pavilion_mirror" {
+            return &[&["headgear", "shoulders", "gloves"]];
+        }
+        if kind == "pavilion_weaver" {
+            return &[&["weapon", "pants", "necklace"]];
+        }
+        if kind == "pavilion_sovereign" {
+            return &[&["armor", "accessory"]];
+        }
+        if kind == "rain_crown_gatekeeper" {
+            return &[&["headgear", "shoulders", "gloves"]];
+        }
+        if kind == "rain_crown_sibyl" {
+            return &[&["weapon", "pants", "necklace"]];
+        }
+        if kind == "rain_crown_sovereign" {
+            return &[&["armor", "accessory"]];
+        }
+        if kind == "seed_warden" {
+            return &[&["headgear", "shoulders", "gloves"]];
+        }
+        if kind == "seed_germinator" {
+            return &[&["weapon", "pants", "necklace"]];
+        }
+        if kind == "seed_worldseed" {
+            return &[&["armor", "accessory"]];
+        }
+        if kind == "astro_warden" {
+            return &[&["headgear", "shoulders", "gloves"]];
+        }
+        if kind == "astro_navigator" {
+            return &[&["weapon", "pants", "necklace"]];
+        }
+        if kind == "astro_axis" {
+            return &[&["armor", "accessory"]];
+        }
+        if kind == "thunder_conductor"
+            || kind == "bloom_thornkeeper"
+            || kind == "solar_ashwarden"
+            || kind == "amber_curator"
+            || kind == "solstice_watcher"
+        {
+            return &[&["headgear", "shoulders", "gloves"]];
+        }
+        if kind == "thunder_bastion"
+            || kind == "bloom_mirror"
+            || kind == "solar_heliomancer"
+            || kind == "amber_chronicle"
+            || kind == "solstice_harbinger"
+        {
+            return &[&["weapon", "pants", "necklace"]];
+        }
+        if kind == "thunder_heart"
+            || kind == "bloom_heart"
+            || kind == "solar_heart"
+            || kind == "amber_memory"
+            || kind == "solstice_heart"
+        {
+            return &[&["armor", "accessory"]];
+        }
+        if kind == "eye_undertide" {
+            return &[&["weapon", "pants", "necklace"]];
+        }
+        if kind == "eye_unblinking" {
+            return &[
+                &["armor"],
+                &[
+                    "weapon",
+                    "headgear",
+                    "shoulders",
+                    "gloves",
+                    "pants",
+                    "necklace",
+                    "accessory",
+                ],
+            ];
+        }
         return if matches!(kind, "choirmother" | "coralregent" | "hierophant") {
             &[
                 &["armor"],
@@ -454,7 +557,7 @@ pub fn boss_piece_for(kind: &str, slots: &[&str], choice: f64) -> Option<&'stati
             .filter(|i| {
                 i.rarity == "rare"
                     && i.required_level == 60
-                    && i.source.is_none()
+                    && i.source.as_deref() == Some("moonwell")
                     && slots.contains(&i.kind.as_str())
             })
             .collect();
@@ -468,7 +571,7 @@ pub fn boss_piece_for(kind: &str, slots: &[&str], choice: f64) -> Option<&'stati
         .iter()
         .filter(|i| {
             i.rarity == "rare"
-                && i.required_level == e.level
+                && i.required_level == e.level.min(95)
                 && i.source.as_deref() == Some(source)
                 && slots.contains(&i.kind.as_str())
         })
@@ -658,15 +761,22 @@ impl Character {
     /// Attribute points supplied by usable worn gear. These never spend or refund trained points.
     pub fn gear_attributes(&self) -> Attributes {
         let mut bonus = Attributes::default();
+        let mut occurrences = std::collections::BTreeMap::<&str, usize>::new();
         for i in self.worn_items().into_iter().filter(|i| {
             i.required_level <= self.level && i.class.is_none_or(|class| class == self.look.class)
         }) {
-            bonus.strength = bonus.strength.saturating_add(i.bonus_stats.strength);
-            bonus.agility = bonus.agility.saturating_add(i.bonus_stats.agility);
-            bonus.intellect = bonus.intellect.saturating_add(i.bonus_stats.intellect);
-            bonus.stamina = bonus.stamina.saturating_add(i.bonus_stats.stamina);
-            bonus.dexterity = bonus.dexterity.saturating_add(i.bonus_stats.dexterity);
-            bonus.accuracy = bonus.accuracy.saturating_add(i.bonus_stats.accuracy);
+            let occurrence = occurrences.entry(&i.id).or_default();
+            let stats = self.worn_gear_instance(&i.id, *occurrence).map_or_else(
+                || i.bonus_stats.clone(),
+                GearInstance::effective_bonus_stats,
+            );
+            *occurrence += 1;
+            bonus.strength = bonus.strength.saturating_add(stats.strength);
+            bonus.agility = bonus.agility.saturating_add(stats.agility);
+            bonus.intellect = bonus.intellect.saturating_add(stats.intellect);
+            bonus.stamina = bonus.stamina.saturating_add(stats.stamina);
+            bonus.dexterity = bonus.dexterity.saturating_add(stats.dexterity);
+            bonus.accuracy = bonus.accuracy.saturating_add(stats.accuracy);
         }
         bonus
     }
@@ -928,6 +1038,19 @@ impl Character {
                 defense += i.defense;
             }
         }
+        let mut occurrences = std::collections::BTreeMap::<&str, usize>::new();
+        for i in self
+            .worn_items()
+            .into_iter()
+            .filter(|i| i.required_level <= self.level)
+        {
+            let occurrence = occurrences.entry(&i.id).or_default();
+            if let Some(copy) = self.worn_gear_instance(&i.id, *occurrence) {
+                attack += copy.effective_attack() - i.attack;
+                defense += copy.effective_defense() - i.defense;
+            }
+            *occurrence += 1;
+        }
         (attack, defense)
     }
     pub fn sell_item(&mut self, id: &str, quantity: u32) -> Result<u32, &'static str> {
@@ -947,6 +1070,9 @@ impl Character {
             .checked_mul(quantity)
             .filter(|value| self.gold.checked_add(*value).is_some())
             .ok_or("That sale is too large.")?;
+        if is_gear(i) {
+            self.remove_loose_gear_instances(i, quantity);
+        }
         let stack = self.inventory.iter_mut().find(|s| s.item == id).unwrap();
         stack.quantity -= quantity;
         self.inventory.retain(|s| s.quantity > 0);

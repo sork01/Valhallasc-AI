@@ -5,9 +5,9 @@
   const oval=(g,x,y,rx,ry,c)=>{g.beginPath();g.ellipse(x,y,rx,ry,0,0,TAU);g.fillStyle=c;g.fill();};
   const line=(g,pts,c,w=3)=>{g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.strokeStyle=c;g.lineWidth=w;g.lineCap='round';g.lineJoin='round';g.stroke();};
   const shadow=(g,r)=>oval(g,0,5,r,r*.27,'rgba(68,45,37,.25)');
-  City.art.lapis_astrolabe={box:[1050,1060,525,970],draw(g){
+  City.art.lapis_astrolabe={box:[1050,1060,525,970],draw(g,o){
     shadow(g,270);
-    // Half of the bronze star machine remains beneath the dune; its lens seals the stair.
+    // Half of the bronze star machine remains beneath the dune; its iris opens over the stair.
     poly(g,[[-359,0],[-302,-333],[-185,-681],[0,-834],[185,-681],[302,-333],[359,0]],'#c99c69','#72544b',11);
     oval(g,0,-338,264,307,'#705855');oval(g,0,-338,235,282,'#e4bd81');oval(g,0,-338,204,249,'#326a75');
     for(let i=0;i<12;i++){const a=i*TAU/12;const x=Math.cos(a)*222,y=-338+Math.sin(a)*266;
@@ -15,7 +15,11 @@
     oval(g,0,-338,158,195,'#d7bd89');oval(g,0,-338,139,174,'#234e5d');
     for(let i=0;i<8;i++){const a=i*TAU/8;g.save();g.translate(0,-338);g.rotate(a);
       poly(g,[[-22,-153],[22,-153],[61,-27],[0,55],[-61,-27]],i%2?'#bd9469':'#e1bd84','#624e4a',5);g.restore();}
-    oval(g,0,-338,50,67,'#f8dda1');oval(g,0,-338,27,39,'#79d5d3');
+    if(o.open){
+      oval(g,0,-338,103,139,'#162f3b');oval(g,0,-338,82,116,'#071c2c');
+      for(let i=0;i<7;i++)line(g,[[-71+i*7,-260+i*18],[71-i*7,-260+i*18]],i%2?'#bba277':'#e0c78f',5);
+      oval(g,0,-391,22,27,'#87d9da');
+    }else{oval(g,0,-338,50,67,'#f8dda1');oval(g,0,-338,27,39,'#79d5d3');}
     for(let side of [-1,1]){poly(g,[[side*310,0],[side*265,-475],[side*220,-677],[side*178,-734],[side*221,-412],[side*245,0]],'#bc8a60','#6b554e',7);
       for(let j=0;j<4;j++)oval(g,side*(253+j*19),-116-j*110,6,10,'#b8e6d4');}
     poly(g,[[-185,-3],[0,62],[185,-3],[0,-66]],'#a47857','#684d43',7);

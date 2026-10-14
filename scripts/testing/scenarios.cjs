@@ -40,7 +40,9 @@ Object.assign(DEFAULT_LEVELS, { sandhopper: 80, dunefennec: 81, glassscorpion: 8
 Object.assign(DEFAULT_LEVELS, { snowhare: 85, iceotter: 86, frostheron: 87, glaciercrab: 88, bellmammoth: 88, auroramanta: 89, crevasseleviathan: 90 });
 Object.assign(DEFAULT_LEVELS, { screeferret: 90, stoneibex: 91, slateraven: 92, ridgeadder: 93, cairnbehemoth: 93, whitebarktitan: 94, stormcondor: 95 });
 Object.assign(DEFAULT_LEVELS, { brooknewt: 95, sundarter: 96, acornmimic: 97, snowstoat: 98, bloomtortoise: 95, petalchimera: 96, rainseraph: 97, glasslion: 96, sunwheel: 97, firephoenix: 98, lanternowl: 97, harvestreaper: 98, ambermantis: 99, rimesaber: 97, snowgiant: 98, longnightwyrm: 99 });
-Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, 'world/cathedral.txt'), 'utf8')).map(e => [e.kind, e.level])));
+for (const catalog of ['cathedral', 'eye_below', 'elder_hollow', 'thousandfold', 'rain_crown', 'seed_vault', 'sunken_astrolabe', 'thunderheart_gate', 'blooming_labyrinth', 'solar_crucible', 'amber_archive', 'silent_solstice']) {
+  Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, `world/${catalog}.txt`), 'utf8')).map(e => [e.kind, e.level])));
+}
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
 // XP to the next level comes from world/levels.txt, the same file the server reads; an enemy pays 45 + 5 per level.
 const levelXp = JSON.parse(fs.readFileSync(path.join(root, 'world/levels.txt'), 'utf8'));
@@ -109,6 +111,58 @@ function npcAt(n, time) {
     t -= walk;
   }
   return { x: r[0][0], y: r[0][1] };
+}
+
+async function yearwheelDungeonOpening(w, check, cfg) {
+  const {label,zone,gateId,level,entry,landing,trash,bosses,questGate,questTrials,questFinal,reward,exit} = cfg;
+  const floor=map.zones[zone-1],gate=map.zones[27].portals.find(p=>p.id===gateId);
+  check(gate?.to===zone&&!floor.sealedTemplate&&floor.slimes.length===12&&floor.final_boss===bosses[2]&&floor.portals.some(p=>p.after_clear),`${label} entrance, encounters and clear exit are active`);
+  const low=label+'Low',lead=label+'Lead',ally=label+'Ally',other=label+'Other';
+  for(const bot of [low,lead,ally,other])await w.connect({bot,class:'warrior'});
+  await w.debug(low,{op:'set_level',level:level-1});
+  await kit.teleport(w,low,{zone:28,...entry});
+  const before=w.events.length;
+  await w.action(low,{type:'move',x:gate.x,y:gate.y});
+  await w.waitFor(()=>w.events.slice(before).some(e=>e.bot===low&&e.type==='error'&&e.text.includes(`level ${level}`)),12000,'Low-level player is rejected');
+  check(w.player(low).zone===28,'Level gate holds low-level player outside');
+  await w.action(low,{type:'stop'});
+  await w.social(lead,{op:'party_invite',bot:ally});
+  await w.social(ally,{op:'party_accept',bot:lead});
+  for(const bot of [lead,ally,other]){
+    await kit.teleport(w,bot,{zone:28,...entry});
+    await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+    await w.waitFor(()=>w.player(bot).zone===zone,15000,`${bot} enters ${label}`);
+    await w.action(bot,{type:'stop'});
+  }
+  const ids=bot=>new Set(w.views.get(bot).slimes.map(e=>e.id));
+  check([...ids(lead)].every(id=>ids(ally).has(id))&&[...ids(lead)].every(id=>!ids(other).has(id)),'Party shares one private copy; outsider gets another');
+  for(const kind of [...trash,...bosses])check(w.views.get(lead).slimes.some(e=>e.kind===kind&&e.level===level),`${kind} appears at level ${level}`);
+  for(const bot of [lead,ally]){
+    await w.debug(bot,{op:'quest',id:questGate,action:'finish'});
+    await w.debug(bot,{op:'quest',id:questTrials,action:'accept'});
+  }
+  for(const kind of [trash[0],bosses[0],bosses[1]])
+    for(const foe of w.views.get(lead).slimes.filter(e=>e.kind===kind&&!e.dead))await w.debug(lead,{op:'kill_enemy',id:foe.id});
+  check(quest(w,lead,questTrials)?.counts.every((n,i)=>n===[1,1,3][i]),'Trial objectives count in private party copy');
+  await w.waitFor(()=>quest(w,ally,questTrials)?.counts.every((n,i)=>n===[1,1,3][i]),5000,'Ally receives trial credit');
+  for(const bot of [lead,ally]){
+    await w.debug(bot,{op:'quest',id:questTrials,action:'claim'});
+    await w.debug(bot,{op:'quest',id:questFinal,action:'accept'});
+  }
+  const final=w.views.get(lead).slimes.find(e=>e.kind===bosses[2]&&!e.dead);
+  await w.debug(lead,{op:'kill_enemy',id:final.id});
+  check(w.views.get(lead).instance.cleared&&quest(w,lead,questFinal)?.counts[0]===1,'Final boss clears the copy and advances quest');
+  await w.waitFor(()=>w.views.get(ally).instance.cleared&&quest(w,ally,questFinal)?.counts[0]===1,5000,'Ally receives final credit');
+  check(!w.views.get(other).instance.cleared,'Other private copy remains uncleared');
+  check(w.views.get(lead).drops.some(d=>d.item===bosses[2]+'_relic'),'Final boss drops its material');
+  await w.debug(lead,{op:'quest',id:questFinal,action:'claim'});
+  check(w.player(lead).inventory.some(i=>i.item===reward),'Final quest grants level-95 equipment');
+  await kit.teleport(w,lead,{zone,x:exit.x,y:exit.y+4});
+  await w.action(lead,{type:'move',x:exit.x,y:exit.y});
+  await w.waitFor(()=>w.player(lead).zone===28,15000,'Clear exit returns to Yearwheel');
+  check(Math.hypot(w.player(lead).x-landing.x,w.player(lead).y-landing.y)<2,'Return landing is safe');
+  await w.restart();
+  check(quest(w,lead,questFinal)?.claimed,'Final quest reward persists after restart');
 }
 
 const scenarios = {
@@ -3131,17 +3185,18 @@ const scenarios = {
   },
 
   stormglass: {
-    description: 'Stormglass Shore: reciprocal causeway, sealed Eye, Meeting Stone, monsters, quests, loot and persistence.',
+    description: 'Stormglass Shore: reciprocal causeway, open Eye Below, Meeting Stone, monsters, quests, loot and persistence.',
     startLevel: 65,
     levelSpread: 0,
     async run(w,check) {
       const bot='Wavewatcher',area=map.zones[18];
+      const claimOffer=id=>`quest:claim:${id}`+(area.quests.find(q=>q.id===id)?.rewardChoices?.warrior?.[0] ? `:${area.quests.find(q=>q.id===id).rewardChoices.warrior[0]}` : '');
       await w.connect({bot,class:'warrior'});
       const gate=map.zones[16].portals.find(p=>p.id==='asterion_stormglass_gate');
       const back=area.portals.find(p=>p.id==='stormglass_asterion_gate');
       check(gate?.to===19 && back?.to===17,'Asterion and Stormglass have reciprocal gates');
-      check(area.levels.join(',')==='60,65' && area.slimes.length===41 && area.quests.length===8,'The level 60–65 shore, monsters and quest hub load');
-      check(area.futureInstance?.status==='sealed' && area.futureInstance?.name==='The Eye Below' && area.portals.length===2 && area.portals.every(p=>p.to!==area.futureInstance?.zone),'The dungeon entrance is sealed and has no playable instance');
+      check(area.levels.join(',')==='60,65' && area.slimes.length===41 && area.quests.length===12,'The level 60–65 shore, monsters and quest hub load');
+      check(area.futureInstance?.status==='open' && area.futureInstance?.name==='The Eye Below' && area.portals.some(p=>p.to===29),'The Eye Below entrance is open');
       await kit.teleport(w,bot,{zone:17,x:164,y:88});
       await w.action(bot,{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.player(bot).zone===19,15000,'Enter Stormglass');
@@ -3157,6 +3212,7 @@ const scenarios = {
       const hire=await kit.talkTo(w,bot,'stormglass_stone','merc_priest');
       await w.waitFor(()=>w.views.get(bot).players.some(p=>p.look.name==='Merc Priest'),5000,'Meeting Stone hires a fighter');
       check(/Merc Priest joins your party/.test(hire.notice) && w.player(bot).gold===250,'The Meeting Stone hires a Priest for 250 gold without opening the dungeon');
+      await w.advance(700);
       await kit.talkTo(w,bot,'stormglass_stone','merc_dismiss');
       await w.waitFor(()=>!w.views.get(bot).players.some(p=>p.look.name==='Merc Priest'),5000,'Dismiss Meeting Stone hire');
       await kit.teleport(w,bot,{npc:'stormglass_warden'});
@@ -3167,7 +3223,7 @@ const scenarios = {
       }
       await w.waitFor(()=>quest(w,bot,'stormglass_welcome').counts.every(n=>n===1),5000,'Meet the camp crew');
       await kit.teleport(w,bot,{npc:'stormglass_warden'});
-      await kit.talkTo(w,bot,'stormglass_warden','quest:claim:stormglass_welcome');
+      await kit.talkTo(w,bot,'stormglass_warden',claimOffer('stormglass_welcome'));
       await w.waitFor(()=>quest(w,bot,'stormglass_welcome').claimed,5000,'Claim introduction');
       for(const [kind,material] of [['saltclaw','saltclaw_shell'],['stormgull','stormgull_feather'],['glassray','glassfin'],['breakersentinel','breaker_core']]){
         const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
@@ -3187,7 +3243,7 @@ const scenarios = {
       check(w.views.get(bot).drops.some(d=>d.item==='stormheart'),'Maelstrom Heart drops its material');
       check(w.views.get(bot).drops.some(d=>kit.items.some(i=>i.id===d.item&&i.rarity==='uncommon'&&i.requiredLevel>=60)),'Outdoor elite guarantees green gear');
       await kit.teleport(w,bot,{npc:'stormglass_warden'});
-      await kit.talkTo(w,bot,'stormglass_warden','quest:claim:stormglass_heart');
+      await kit.talkTo(w,bot,'stormglass_warden',claimOffer('stormglass_heart'));
       await w.waitFor(()=>quest(w,bot,'stormglass_heart').claimed,5000,'Claim elite quest');
       check(w.player(bot).inventory.some(i=>i.item==='accessory_amber_l65_blue'),'The elite quest awards level-65 blue gear');
       await w.restart();
@@ -3210,17 +3266,18 @@ const scenarios = {
   },
 
   sunward: {
-    description: 'Sunward Vale: river bridges, green woods, sealed Elder Hollow, six drops, two elite quests and Spark Travel.',
+    description: 'Sunward Vale: river bridges, green woods, open Elder Hollow, six drops, two elite quests and Spark Travel.',
     startLevel: 70,
     levelSpread: 0,
     async run(w,check) {
       const bot='MillbridgeRunner',area=map.zones[19];
+      const claimOffer=id=>`quest:claim:${id}`+(area.quests.find(q=>q.id===id)?.rewardChoices?.warrior?.[0] ? `:${area.quests.find(q=>q.id===id).rewardChoices.warrior[0]}` : '');
       await w.connect({bot,class:'warrior'});
       const gate=map.zones[18].portals.find(p=>p.id==='stormglass_sun_gate');
       const back=area.portals.find(p=>p.id==='sun_stormglass_gate');
       check(gate?.to===20&&back?.to===19,'Sunward Cut is reciprocal');
-      check(area.levels.join(',')==='65,70'&&area.slimes.length===42&&area.quests.length===9,'Level band, six kinds and nine quests load');
-      check(area.futureInstance?.status==='sealed'&&area.futureInstance?.name==='The Elder Hollow'&&area.portals.length===1,'The giant oak entrance is sealed');
+      check(area.levels.join(',')==='65,70'&&area.slimes.length===42&&area.quests.length===12,'Level band, six kinds and twelve quests load');
+      check(area.futureInstance?.status==='open'&&area.futureInstance?.name==='The Elder Hollow'&&area.portals.some(p=>p.to===30),'The giant oak entrance is open');
       check(area.theme==='sunward'&&area.objects.filter(o=>['oak_tree','birch_tree','apple_tree','willow_tree'].includes(o.kind)).length>=170&&area.objects.filter(o=>o.kind==='water').length>=40,'River, orchard and ordinary trees shape the vale');
       await kit.teleport(w,bot,{zone:19,x:119,y:70});
       await w.action(bot,{type:'move',x:gate.x,y:gate.y});
@@ -3246,7 +3303,7 @@ const scenarios = {
       }
       await w.waitFor(()=>quest(w,bot,'sun_welcome').counts.every(n=>n===1),5000,'Meet Millbridge crew');
       await kit.teleport(w,bot,{npc:'sun_miller'});
-      await kit.talkTo(w,bot,'sun_miller','quest:claim:sun_welcome');
+      await kit.talkTo(w,bot,'sun_miller',claimOffer('sun_welcome'));
       await w.waitFor(()=>quest(w,bot,'sun_welcome').claimed,5000,'Claim introductions');
       for(const [kind,material] of [['meadowhare','hare_whisker'],['sunbacksnail','sunback_shell'],['brushfox','fox_tail_tuft'],['spadebadger','badger_claw']]){
         const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead),before=totalXp(w.player(bot));
@@ -3269,7 +3326,7 @@ const scenarios = {
         check(w.views.get(bot).drops.some(d=>d.item===material),`${kind} drops unique material`);
         check(w.views.get(bot).drops.some(d=>kit.items.some(i=>i.id===d.item&&i.rarity==='uncommon'&&i.requiredLevel>=65)),`${kind} guarantees green gear`);
         await kit.teleport(w,bot,{npc:giver});
-        await kit.talkTo(w,bot,giver,`quest:claim:${id}`);
+        await kit.talkTo(w,bot,giver,claimOffer(id));
         await w.waitFor(()=>quest(w,bot,id).claimed,5000,`${id} claimed`);
         check(w.player(bot).inventory.some(i=>i.item===reward),`${id} gives level-70 blue gear`);
       }
@@ -3277,14 +3334,14 @@ const scenarios = {
       await kit.talkTo(w,bot,'sun_keeper','quest:accept:sun_roots');
       await w.waitFor(()=>!!quest(w,bot,'sun_roots'),5000,'Accept Elder Hollow survey');
       await kit.teleport(w,bot,{zone:20,x:106,y:25});
-      await w.waitFor(()=>quest(w,bot,'sun_roots').counts[0]===1,5000,'Visit sealed Elder Hollow');
+      await w.waitFor(()=>quest(w,bot,'sun_roots').counts[0]===1,5000,'Visit Elder Hollow');
       await kit.teleport(w,bot,{npc:'sun_stone'});
       await kit.talkTo(w,bot,'sun_stone');
       await w.waitFor(()=>quest(w,bot,'sun_roots').counts.every(n=>n===1),5000,'Consult Meeting Stone');
       await kit.teleport(w,bot,{npc:'sun_keeper'});
-      await kit.talkTo(w,bot,'sun_keeper','quest:claim:sun_roots');
+      await kit.talkTo(w,bot,'sun_keeper',claimOffer('sun_roots'));
       await w.waitFor(()=>quest(w,bot,'sun_roots').claimed,5000,'Claim Elder Hollow survey');
-      check(area.portals.every(p=>p.to!==area.futureInstance?.zone),'The Elder Hollow remains sealed after the survey');
+      check(area.portals.some(p=>p.to===30),'The Elder Hollow stays open after the survey');
       await w.restart();
       check(w.player(bot).zone===20&&quest(w,bot,'sun_warden').claimed&&w.player(bot).travelStops.includes('travel_millbridge'),'Zone, elite quest and stop persist');
       await kit.teleport(w,bot,{zone:20,x:13,y:106});
@@ -3304,17 +3361,18 @@ const scenarios = {
   },
 
   ribbonwild: {
-    description: 'Ribbonwild: reciprocal parade gate, Jubilee hub, PixelFlow cast, two elite quests, sealed pavilion and Spark Travel.',
+    description: 'Ribbonwild: reciprocal parade gate, Jubilee hub, PixelFlow cast, two elite quests, open pavilion and Spark Travel.',
     startLevel: 75,
     levelSpread: 0,
     async run(w,check) {
       const bot='JubileeRunner',area=map.zones[20];
+      const claimOffer=id=>`quest:claim:${id}`+(area.quests.find(q=>q.id===id)?.rewardChoices?.warrior?.[0] ? `:${area.quests.find(q=>q.id===id).rewardChoices.warrior[0]}` : '');
       await w.connect({bot,class:'warrior'});
       const gate=map.zones[19].portals.find(p=>p.id==='sun_ribbon_gate');
       const back=area.portals.find(p=>p.id==='ribbon_sun_gate');
       check(gate?.to===21&&back?.to===20,'The Parade Arch has reciprocal gates');
-      check(area.theme==='ribbonwild'&&area.levels.join(',')==='70,75'&&area.slimes.length===42&&area.quests.length===9,'Colorful zone, enemies and quests load');
-      check(area.futureInstance?.status==='sealed'&&area.futureInstance?.name==='The Thousandfold Pavilion'&&area.portals.length===1,'The pavilion is a sealed instance entrance');
+      check(area.theme==='ribbonwild'&&area.levels.join(',')==='70,75'&&area.slimes.length===42&&area.quests.length===12,'Colorful zone, enemies and quests load');
+      check(area.futureInstance?.status==='open'&&area.futureInstance?.name==='The Thousandfold Pavilion'&&area.portals.some(p=>p.to===31),'The pavilion has an open instance entrance');
       await kit.teleport(w,bot,{zone:20,x:115,y:24});
       await w.action(bot,{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.player(bot).zone===21,15000,'Enter Ribbonwild');
@@ -3328,7 +3386,7 @@ const scenarios = {
       for(const npc of ['ribbon_medic','ribbon_tailor','ribbon_naturalist']){await kit.teleport(w,bot,{npc});await kit.talkTo(w,bot,npc);}
       await w.waitFor(()=>quest(w,bot,'ribbon_welcome')?.counts.every(n=>n===1),5000,'Meet Jubilee crew');
       await kit.teleport(w,bot,{npc:'ribbon_host'});
-      await kit.talkTo(w,bot,'ribbon_host','quest:claim:ribbon_welcome');
+      await kit.talkTo(w,bot,'ribbon_host',claimOffer('ribbon_welcome'));
       await w.waitFor(()=>quest(w,bot,'ribbon_welcome')?.claimed,5000,'Claim Jubilee introduction');
       check(quest(w,bot,'ribbon_welcome')?.claimed,'Hub introduction claims');
       for(const [kind,material] of [['ribbongecko','ribbon_tail'],['balloonbeetle','balloon_silk'],['paintedmacaw','macaw_plume'],['jesterling','jester_bell']]){
@@ -3348,7 +3406,7 @@ const scenarios = {
         await w.waitFor(()=>quest(w,bot,id)?.counts[0]===1,5000,`${id} kill`);
         check(w.views.get(bot).drops.some(d=>d.item===material),`${kind} drops named material`);
         check(w.views.get(bot).drops.some(d=>kit.items.some(i=>i.id===d.item&&i.rarity==='uncommon'&&i.requiredLevel>=70)),`${kind} guarantees green gear`);
-        await kit.teleport(w,bot,{npc:giver});await kit.talkTo(w,bot,giver,`quest:claim:${id}`);
+        await kit.teleport(w,bot,{npc:giver});await kit.talkTo(w,bot,giver,claimOffer(id));
         await w.waitFor(()=>quest(w,bot,id)?.claimed,5000,`${id} claimed`);
         check(w.player(bot).inventory.some(i=>i.item===reward),`${kind} awards level-75 blue gear`);
       }
@@ -3358,7 +3416,7 @@ const scenarios = {
       await w.waitFor(()=>quest(w,bot,'ribbon_curtain')?.counts[0]===1,5000,'Inspect pavilion');
       await kit.teleport(w,bot,{npc:'ribbon_stone'});await kit.talkTo(w,bot,'ribbon_stone');
       await w.waitFor(()=>quest(w,bot,'ribbon_curtain')?.counts.every(n=>n===1),5000,'Consult Meeting Stone');
-      check(area.portals.every(p=>p.to!==area.futureInstance?.zone),'Pavilion remains sealed');
+      check(area.portals.some(p=>p.to===31),'Pavilion remains open after the survey');
       await w.restart();
       check(w.player(bot).zone===21&&quest(w,bot,'ribbon_colossus').claimed&&w.player(bot).travelStops.includes('travel_jubilee'),'Zone, elite claim and Travel Master persist');
       await kit.teleport(w,bot,{zone:21,x:12,y:70});
@@ -3374,12 +3432,13 @@ const scenarios = {
     levelSpread: 0,
     async run(w,check) {
       const bot='CanopyRunner',area=map.zones[21];
+      const claimOffer=id=>`quest:claim:${id}`+(area.quests.find(q=>q.id===id)?.rewardChoices?.warrior?.[0] ? `:${area.quests.find(q=>q.id===id).rewardChoices.warrior[0]}` : '');
       await w.connect({bot,class:'warrior'});
       const gate=map.zones[20].portals.find(p=>p.id==='ribbon_tangle_gate');
       const back=area.portals.find(p=>p.id==='tangle_ribbon_gate');
       check(gate?.to===22&&back?.to===21,'The Rootway has reciprocal gates');
-      check(area.theme==='tanglecrown'&&area.levels.join(',')==='75,80'&&area.slimes.length===42&&area.quests.length===9,'Jungle zone, monsters and quests load');
-      check(area.futureInstance?.status==='sealed'&&area.futureInstance?.name==='Temple of the Rain Crown'&&area.portals.length===1,'The Rain Crown Temple is sealed');
+      check(area.theme==='tanglecrown'&&area.levels.join(',')==='75,80'&&area.slimes.length===42&&area.quests.length===12,'Jungle zone, monsters and quests load');
+      check(area.futureInstance?.status==='open'&&area.futureInstance?.name==='Temple of the Rain Crown'&&area.portals.some(p=>p.to===32),'The Rain Crown Temple is open');
       await kit.teleport(w,bot,{zone:21,x:124,y:117});
       await w.action(bot,{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.player(bot).zone===22,15000,'Enter Tanglecrown');
@@ -3394,7 +3453,7 @@ const scenarios = {
       await kit.talkTo(w,bot,'tangle_warden','quest:accept:tangle_welcome');
       for(const npc of ['tangle_medic','tangle_botanist','tangle_tracker']){await kit.teleport(w,bot,{npc});await kit.talkTo(w,bot,npc);}
       await w.waitFor(()=>quest(w,bot,'tangle_welcome')?.counts.every(n=>n===1),5000,'Meet landing crew');
-      await kit.teleport(w,bot,{npc:'tangle_warden'});await kit.talkTo(w,bot,'tangle_warden','quest:claim:tangle_welcome');
+      await kit.teleport(w,bot,{npc:'tangle_warden'});await kit.talkTo(w,bot,'tangle_warden',claimOffer('tangle_welcome'));
       await w.waitFor(()=>quest(w,bot,'tangle_welcome')?.claimed,5000,'Claim landing introduction');
       check(quest(w,bot,'tangle_welcome')?.claimed,'Banyan introduction claims');
       for(const [kind,material] of [['orchidmantis','mantis_petals'],['canopyglider','glider_membrane'],['poolcaiman','caiman_scale'],['drumgorilla','gorilla_drumskin']]){
@@ -3415,7 +3474,7 @@ const scenarios = {
         await w.waitFor(()=>quest(w,bot,id)?.counts[0]===1,5000,`${id} kill credit`);
         check(w.views.get(bot).drops.some(d=>d.item===material),`${kind} drops named material`);
         check(w.views.get(bot).drops.some(d=>kit.items.some(i=>i.id===d.item&&i.rarity==='uncommon'&&i.requiredLevel>=75)),`${kind} guarantees green gear`);
-        await kit.teleport(w,bot,{npc:giver});await kit.talkTo(w,bot,giver,`quest:claim:${id}`);
+        await kit.teleport(w,bot,{npc:giver});await kit.talkTo(w,bot,giver,claimOffer(id));
         await w.waitFor(()=>quest(w,bot,id)?.claimed,5000,`${id} claimed`);
         check(w.player(bot).inventory.some(i=>i.item===reward),`${kind} awards level-80 blue gear`);
       }
@@ -3424,7 +3483,7 @@ const scenarios = {
       await w.waitFor(()=>quest(w,bot,'tangle_temple')?.counts[0]===1,5000,'Inspect Rain Crown Temple');
       await kit.teleport(w,bot,{npc:'tangle_stone'});await kit.talkTo(w,bot,'tangle_stone');
       await w.waitFor(()=>quest(w,bot,'tangle_temple')?.counts.every(n=>n===1),5000,'Consult Meeting Stone');
-      check(area.portals.every(p=>p.to!==area.futureInstance?.zone),'Temple remains sealed');
+      check(area.portals.some(p=>p.to===32),'Temple entrance remains open');
       await w.restart();
       check(w.player(bot).zone===22&&quest(w,bot,'tangle_jaguar').claimed&&w.player(bot).travelStops.includes('travel_banyan'),'Zone, elite claim and travel stop persist');
       await kit.teleport(w,bot,{zone:22,x:14,y:111});await w.action(bot,{type:'move',x:back.x,y:back.y});
@@ -3433,7 +3492,7 @@ const scenarios = {
     },
   },
   lapis: {
-    description: 'The Lapis Erg: safe gate from Veyrroot, three oases, travel, six creature drops, two elites and sealed astrolabe.',
+    description: 'The Lapis Erg: safe gate from Veyrroot, three oases, travel, six creature drops, two elites and open astrolabe.',
     startLevel: 80,
     levelSpread: 0,
     async run(w,check) {
@@ -3442,8 +3501,8 @@ const scenarios = {
       const gate=city.portals.find(p=>p.id==='canopy_lapis_gate'),back=area.portals.find(p=>p.id==='lapis_canopy_gate');
       check(gate?.to===25&&back?.to===23&&city.slimes.length===0,'Veyrroot stays peaceful and desert gates are reciprocal');
       check(area.theme==='lapiserg'&&area.levels.join(',')==='80,85'&&area.slimes.length===42&&area.objects.filter(o=>o.kind==='lapis_oasis').length===3,'Three-oasis desert and 42 enemies load');
-      check(area.quests.length===9&&area.npcs.some(n=>n.id==='travel_azure_wells')&&area.futureInstance?.status==='sealed','Quest hub, Travel Master and sealed astrolabe load');
-      await kit.teleport(w,bot,{zone:23,x:110,y:95});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      check(area.quests.length===12&&area.npcs.some(n=>n.id==='travel_azure_wells')&&area.futureInstance?.status==='open','Quest hub, Travel Master and open astrolabe load');
+      await kit.teleport(w,bot,{zone:23,x:118,y:95});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.player(bot).zone===25,15000,'Enter the Lapis Erg');await w.action(bot,{type:'stop'});
       check(distance(w.player(bot),area.spawn)<2,'Canopy gate arrives safely in the desert');
       await w.connect({bot:'CanopyWitness',class:'mage'});
@@ -3454,7 +3513,7 @@ const scenarios = {
       await kit.teleport(w,bot,{npc:'lapis_keeper'});await kit.talkTo(w,bot,'lapis_keeper','quest:accept:lapis_welcome');
       for(const id of ['lapis_healer','lapis_cartographer','lapis_scout']){await kit.teleport(w,bot,{npc:id});await kit.talkTo(w,bot,id);}
       await w.waitFor(()=>quest(w,bot,'lapis_welcome')?.counts.every(n=>n===1),5000,'Meet caravan crew');
-      await kit.teleport(w,bot,{npc:'lapis_keeper'});await kit.talkTo(w,bot,'lapis_keeper','quest:claim:lapis_welcome');
+      await kit.teleport(w,bot,{npc:'lapis_keeper'});await kit.talkTo(w,bot,'lapis_keeper',`quest:claim:lapis_welcome:${area.quests.find(q=>q.id==='lapis_welcome').rewardChoices.warrior[0]}`);
       await w.waitFor(()=>quest(w,bot,'lapis_welcome')?.claimed,5000,'Claim caravan introduction');
       check(quest(w,bot,'lapis_welcome')?.claimed,'Oasis hub introduction claims');
       for(const [kind,material] of [['sandhopper','sandhopper_chitin'],['dunefennec','fennec_fur'],['glassscorpion','scorpion_glass'],['sunvulture','vulture_quill'],['dunecolossus','colossus_core'],['mirageroc','roc_plume']]){
@@ -3464,7 +3523,7 @@ const scenarios = {
         check(totalXp(w.player(bot))-before===enemyXp(enemy.level),`${kind} gives level XP and ${material}`);
       }
       await kit.teleport(w,bot,{zone:25,x:132,y:29});
-      check(area.portals.length===1&&area.futureInstance.name==='The Sunken Astrolabe','The astrolabe has a visible sealed entrance');
+      check(area.portals.some(p=>p.id==='lapis_astrolabe_gate'&&p.to===34)&&area.futureInstance.name==='The Sunken Astrolabe','The astrolabe has a playable entrance');
       await w.restart();
       check(w.player(bot).zone===25&&w.player(bot).travelStops.includes('travel_azure_wells')&&quest(w,bot,'lapis_welcome')?.claimed,'Desert position, quest and travel discovery persist');
       await kit.teleport(w,bot,{zone:25,x:14,y:128});await w.action(bot,{type:'move',x:back.x,y:back.y});
@@ -3551,7 +3610,7 @@ const scenarios = {
     },
   },
   yearwheel: {
-    description: 'The Yearwheel: four seasonal hubs, sealed thresholds, reciprocal pass and twelve elite drops.',
+    description: 'The Yearwheel: four seasonal hubs and open dungeons, reciprocal pass and twelve elite drops.',
     startLevel: 95,
     levelSpread: 0,
     async run(w,check) {
@@ -3559,9 +3618,9 @@ const scenarios = {
       await w.connect({bot,class:'warrior'});
       const gate=mountain.portals.find(p=>p.id==='cairn_year_gate'),back=area.portals.find(p=>p.id==='year_cairn_gate');
       check(gate?.to===28&&back?.to===27,'The Yearwheel and Cairnspine passes are reciprocal');
-      check(area.size===400&&area.levels.join(',')==='95,99'&&area.slimes.length===156&&area.quests.length===24,'The immense end zone, quests and encounters load');
-      check(area.futureInstances.length===4&&area.futureInstances.every(x=>x.status==='sealed')&&area.portals.length===1,'Four thresholds stay sealed');
-      await kit.teleport(w,bot,{zone:27,x:147,y:110});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+      check(area.size===400&&area.levels.join(',')==='95,99'&&area.slimes.length===156&&area.quests.length===33,'The immense end zone, quests and encounters load');
+      check(area.futureInstances.length===4&&area.futureInstances.every(x=>x.status==='open')&&area.portals.length===5,'Four seasonal dungeon thresholds are open');
+      await kit.teleport(w,bot,{zone:27,x:153,y:120});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.player(bot).zone===28,15000,'Enter the Yearwheel');await w.action(bot,{type:'stop'});
       check(distance(w.player(bot),area.spawn)<2,'The mountain pass reaches Springmere');
       for(const id of ['travel_springmere','travel_solhaven','travel_harvestwatch','travel_rimehold']){
@@ -3599,8 +3658,8 @@ const scenarios = {
       const hollow=outer.portals.find(p=>p.id==='canopy_hollow_gate'),exit=inner.portals.find(p=>p.id==='hollow_canopy_gate');
       check(gate?.to===23&&back?.to===22&&hollow?.to===24&&exit?.to===23,'Four reciprocal city gates load');
       check(outer.theme==='worldtree'&&inner.theme==='heartwood'&&outer.slimes.length===0&&inner.slimes.length===0,'Both inhabited city maps have no enemy spawns');
-      check(outer.quests.length===7&&inner.quests.length===2&&outer.npcs.some(n=>n.id==='travel_veyrroot'),'City quests and travel master load');
-      check(inner.futureInstance?.name==='The Seed Vault'&&inner.futureInstance?.status==='sealed'&&inner.portals.length===1,'Seed Vault is a sealed entrance');
+      check(outer.quests.length===7&&inner.quests.length===4&&outer.npcs.some(n=>n.id==='travel_veyrroot'),'City quests and travel master load');
+      check(inner.futureInstance?.name==='The Seed Vault'&&inner.futureInstance?.status==='open'&&inner.portals.some(p=>p.to===33),'Seed Vault is an open entrance');
       await kit.teleport(w,bot,{zone:22,x:132,y:80});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.player(bot).zone===23,15000,'Enter outer canopy');await w.action(bot,{type:'stop'});
       check(distance(w.player(bot),outer.spawn)<2,'Jungle gate lands outside return disc');
@@ -3636,7 +3695,7 @@ const scenarios = {
       await kit.teleport(w,bot,{npc:'heart_custodian'});await kit.talkTo(w,bot,'heart_custodian');
       await kit.teleport(w,bot,{npc:'heart_oracle'});await kit.talkTo(w,bot,'heart_oracle','quest:claim:heart_seed_vault');
       await w.waitFor(()=>quest(w,bot,'heart_seed_vault')?.claimed,5000,'Claim Seed Vault survey');
-      check(quest(w,bot,'heart_seed_vault')?.claimed,'Sealed entrance survey claims');
+      check(quest(w,bot,'heart_seed_vault')?.claimed,'Entrance survey claims');
       await w.restart();
       check(w.player(bot).zone===24&&quest(w,bot,'heart_seed_vault')?.claimed&&w.player(bot).travelStops.includes('travel_veyrroot'),'Inside position, quest and travel discovery persist');
       await kit.teleport(w,bot,{zone:24,x:48,y:80});await w.action(bot,{type:'move',x:exit.x,y:exit.y});
@@ -3646,6 +3705,784 @@ const scenarios = {
       check(distance(w.player(bot),{x:back.tx,y:back.ty})<2,'Return arrives on a safe jungle root');
     },
   },
+
+  elder_hollow: {
+    description: 'Elder Hollow: real level gate and private entry, ordinary and boss quest credit, loot, clear exit, reward and restart.',
+    startLevel: 70, levelSpread: 0, godMode: true,
+    async run(w, check) {
+      const hero = 'ElderRunner', partner = 'RootAlly', outsider = 'OtherParty', low = 'TooYoung';
+      const vale = map.zones[19], hollow = map.zones[29];
+      const entrance = vale.portals.find(p => p.id === 'sun_elder_gate');
+      check(entrance?.to === 30 && hollow.portals[0].to === 20 && !hollow.sealedTemplate,
+        'The oak entrance and return route lead to an open private dungeon');
+      check(map.zones[38].sealedTemplate && map.zones[38].portals.length === 1,
+        'The Silent Solstice remains a sealed four-copy floor plan');
+      for (const bot of [hero, partner, outsider, low]) await w.connect({ bot, class: 'warrior' });
+      await w.debug(low, { op: 'set_level', level: 69 });
+      await kit.teleport(w, low, { zone: 20, x: 106, y: 26 });
+      const earlier = new Set(w.events);
+      await w.action(low, { type: 'move', x: entrance.x, y: entrance.y });
+      await w.waitFor(() => w.events.some(e => !earlier.has(e) && e.bot === low && e.type === 'error' && /level 70/.test(e.text)),
+        12000, 'Level gate refuses a level-69 hero');
+      await w.action(low, { type: 'stop' });
+      check(w.player(low).zone === 20, 'The rejected hero stays in Sunward Vale');
+
+      await w.social(hero, { op: 'party_invite', bot: partner });
+      await w.social(partner, { op: 'party_accept', bot: hero });
+      await w.debug(hero, { op: 'quest', id: 'sun_roots', action: 'finish' });
+      await kit.teleport(w, hero, { npc: 'sun_keeper' });
+      await kit.talkTo(w, hero, 'sun_keeper', 'quest:accept:sun_hollow_trials');
+      await w.waitFor(() => !!quest(w, hero, 'sun_hollow_trials'), 5000, 'Accept root trials');
+      const enter = async bot => {
+        await kit.teleport(w, bot, { zone: 20, x: 106, y: 26 });
+        await w.action(bot, { type: 'move', x: entrance.x, y: entrance.y });
+        await w.waitFor(() => w.player(bot).zone === 30, 15000, `${bot} enters Elder Hollow`);
+        await w.action(bot, { type: 'stop' });
+      };
+      await enter(hero); await enter(partner); await enter(outsider);
+      const ids = bot => new Set(w.views.get(bot).slimes.map(s => s.id));
+      check([...ids(hero)].every(id => ids(partner).has(id)) && [...ids(hero)].every(id => !ids(outsider).has(id)),
+        'Party members share one enemy copy and the other party sees another');
+      check(w.views.get(hero).slimes.filter(s => !s.dead).length === 12,
+        'The private floor starts with nine ordinary enemies and three bosses');
+
+      for (const kind of ['elder_thornling', 'elder_moth', 'elder_barkguard']) {
+        const enemies = w.views.get(hero).slimes.filter(s => s.kind === kind && !s.dead);
+        check(enemies.length === 3, `${kind} has three reachable encounter slots`);
+        for (const enemy of enemies) await w.debug(hero, { op: 'kill_enemy', id: enemy.id });
+        check(w.views.get(hero).drops.some(d => d.item === `${kind}_relic`),
+          `${kind} drops its own material`);
+      }
+      await w.waitFor(() => quest(w, hero, 'sun_hollow_trials')?.counts.every(n => n === 3),
+        5000, 'Entrance trial counts ordinary kills in the private copy');
+      check(!quest(w, outsider, 'sun_hollow_trials') && !w.views.get(hero).instance.cleared,
+        'The other copy receives no quest credit or early clear');
+      await w.action(hero, { type: 'move', x: hollow.portals[0].x, y: hollow.portals[0].y });
+      await w.waitFor(() => w.player(hero).zone === 20, 15000, 'Return through the entrance gate');
+      const trial = vale.quests.find(q => q.id === 'sun_hollow_trials');
+      await kit.teleport(w, hero, { npc: 'sun_keeper' });
+      await kit.talkTo(w, hero, 'sun_keeper', `quest:claim:sun_hollow_trials:${trial.rewardChoices.warrior[0]}`);
+      await w.waitFor(() => quest(w, hero, 'sun_hollow_trials')?.claimed, 5000, 'Claim root trials');
+      await w.advance(700);
+      await kit.talkTo(w, hero, 'sun_keeper', 'quest:accept:sun_hollow_heart');
+      await w.waitFor(() => !!quest(w, hero, 'sun_hollow_heart'), 5000, 'Accept Elder Heart quest');
+      await enter(hero);
+      for (const [index, kind] of ['elder_gatekeeper', 'elder_matron', 'elder_heart'].entries()) {
+        const enemy = w.views.get(hero).slimes.find(s => s.kind === kind && !s.dead);
+        await w.debug(hero, { op: 'kill_enemy', id: enemy.id });
+        check(w.views.get(hero).drops.some(d => d.item === `${kind}_relic`),
+          `${kind} drops its material through the ordinary kill path`);
+        check(w.views.get(hero).instance.cleared === (index === 2),
+          'Only the final guardian clears this party copy');
+      }
+      await w.waitFor(() => quest(w, hero, 'sun_hollow_heart')?.counts.every(n => n === 1),
+        5000, 'All three boss objectives credit the dungeon quest');
+      check(!w.views.get(outsider).instance.cleared, 'The other party copy stays uncleared');
+      await kit.teleport(w, hero, { zone: 30, x: 48, y: 15 });
+      await w.action(hero, { type: 'move', x: 48, y: 12 });
+      await w.waitFor(() => w.player(hero).zone === 20, 15000, 'Clearance opens the Crownway exit');
+      const heart = vale.quests.find(q => q.id === 'sun_hollow_heart');
+      await kit.teleport(w, hero, { npc: 'sun_keeper' });
+      await kit.talkTo(w, hero, 'sun_keeper', `quest:claim:sun_hollow_heart:${heart.rewardChoices.warrior[0]}`);
+      await w.waitFor(() => quest(w, hero, 'sun_hollow_heart')?.claimed, 5000, 'Claim Elder Heart reward');
+      check(w.player(hero).inventory.some(i => i.item === 'accessory_amber_l70_elder'),
+        'The boss quest grants the exclusive level-70 accessory');
+      await w.restart();
+      check(w.player(hero).zone === 20 && quest(w, hero, 'sun_hollow_heart')?.claimed &&
+        w.player(hero).inventory.some(i => i.item === 'accessory_amber_l70_elder'),
+        'Quest claim, reward and public return survive a private restart');
+    },
+  },
+  thousandfold_foes: {
+    description: 'Thousandfold Pavilion: open entrance, isolated enemy copies, boss clear and real material drops.',
+    startLevel: 75, levelSpread: 0, godMode: true,
+    async run(w, check) {
+      const floor = map.zones[30];
+      check(floor.name === 'The Thousandfold Pavilion' && !floor.sealedTemplate &&
+        floor.slimes.length === 12 && floor.final_boss === 'pavilion_sovereign',
+        'The open level-75 floor has twelve encounters');
+      check(map.zones[20].portals.some(p => p.id === 'ribbon_pavilion_gate' && p.to === 31),
+        'The Ribbonwild opens into the Pavilion');
+      await w.connect({ bot: 'FoldRunner', class: 'warrior' });
+      await w.connect({ bot: 'OtherFold', class: 'mage' });
+      await kit.teleport(w, 'FoldRunner', { zone: 31, x: 48, y: 83 });
+      await kit.teleport(w, 'OtherFold', { zone: 31, x: 48, y: 83 });
+      const hero = w.views.get('FoldRunner'), other = w.views.get('OtherFold');
+      check(hero.slimes.length === 12 && other.slimes.length === 12 &&
+        hero.slimes.every(s => !other.slimes.some(t => s.id === t.id)),
+        'Separate private copies have independent enemy IDs');
+      for (const kind of ['pavilion_foldling', 'pavilion_inkmoth', 'pavilion_silkguard']) {
+        const foes = w.views.get('FoldRunner').slimes.filter(s => s.kind === kind && !s.dead);
+        check(foes.length === 3 && foes.every(s => s.level === 75), `${kind} has three level-75 spawns`);
+        await w.debug('FoldRunner', { op: 'kill_enemy', id: foes[0].id });
+        check(w.views.get('FoldRunner').drops.some(d => d.item === `${kind}_relic`),
+          `${kind} drops its own material through the kill path`);
+      }
+      for (const [index, kind] of ['pavilion_mirror', 'pavilion_weaver', 'pavilion_sovereign'].entries()) {
+        const foe = w.views.get('FoldRunner').slimes.find(s => s.kind === kind && !s.dead);
+        check(!!foe && foe.level === 75, `${kind} is a level-75 boss`);
+        await w.debug('FoldRunner', { op: 'kill_enemy', id: foe.id });
+        check(w.views.get('FoldRunner').drops.some(d => d.item === `${kind}_relic`),
+          `${kind} drops its boss material`);
+        check(w.views.get('FoldRunner').instance.cleared === (index === 2),
+          'Only the last boss clears the Pavilion copy');
+      }
+      check(!w.views.get('OtherFold').instance.cleared &&
+        w.views.get('OtherFold').slimes.every(s => !s.dead),
+        'The other private copy remains uncleared with all enemies alive');
+    },
+  },
+  thousandfold_quests: {
+    description: 'Sealed Pavilion: entrance quests, party-copy boss credit, guaranteed loot, claim and restart.',
+    startLevel: 75, levelSpread: 0, godMode: true,
+    async run(w, check) {
+      const hero = 'FoldQuest', ally = 'FoldPartner', outsider = 'OtherFoldQuest';
+      const quests = map.zones[20].quests;
+      const trials = quests.find(q => q.id === 'ribbon_folds');
+      const finale = quests.find(q => q.id === 'ribbon_final');
+      check(trials?.objectives.length === 3 && finale?.objectives.length === 3 &&
+        finale.requires === 'ribbon_folds' && finale.rewardItem === 'accessory_amber_l75_blue',
+        'Two level-75 group quests chain at the Ribbonwild keykeeper');
+      for (const bot of [hero, ally, outsider]) await w.connect({ bot, class: 'warrior' });
+      await w.debug(hero, { op: 'quest', id: 'ribbon_curtain', action: 'finish' });
+      await kit.teleport(w, hero, { npc: 'ribbon_keeper' });
+      await kit.talkTo(w, hero, 'ribbon_keeper', 'quest:accept:ribbon_folds');
+      await w.waitFor(() => !!quest(w, hero, 'ribbon_folds'), 5000, 'Accept Pavilion trials');
+      check(!!quest(w, hero, 'ribbon_folds'), 'Keykeeper offers the ordinary-enemy quest');
+      await w.debug(ally, { op: 'quest', id: 'ribbon_curtain', action: 'finish' });
+      await w.debug(ally, { op: 'quest', id: 'ribbon_folds', action: 'finish' });
+      await w.debug(ally, { op: 'quest', id: 'ribbon_final', action: 'accept' });
+      await w.social(hero, { op: 'party_invite', bot: ally });
+      await w.social(ally, { op: 'party_accept', bot: hero });
+      for (const bot of [hero, ally, outsider]) await kit.teleport(w, bot, { zone: 31, x: 48, y: 83 });
+      const ids = bot => new Set(w.views.get(bot).slimes.map(s => s.id));
+      check([...ids(hero)].every(id => ids(ally).has(id)) &&
+        [...ids(hero)].every(id => !ids(outsider).has(id)),
+        'Party shares one Pavilion copy; outsider receives another');
+      for (const kind of ['pavilion_foldling', 'pavilion_inkmoth', 'pavilion_silkguard']) {
+        for (const enemy of w.views.get(hero).slimes.filter(s => s.kind === kind && !s.dead)) {
+          await w.debug(hero, { op: 'kill_enemy', id: enemy.id });
+        }
+      }
+      check(quest(w, hero, 'ribbon_folds')?.counts.every(n => n === 3) &&
+        !quest(w, outsider, 'ribbon_folds'),
+        'All nine ordinary kills count only for the accepted quest in this copy');
+      await w.debug(hero, { op: 'quest', id: 'ribbon_folds', action: 'claim' });
+      await w.debug(hero, { op: 'quest', id: 'ribbon_final', action: 'accept' });
+      for (const kind of ['pavilion_mirror', 'pavilion_weaver', 'pavilion_sovereign']) {
+        const enemy = w.views.get(hero).slimes.find(s => s.kind === kind && !s.dead);
+        await w.debug(hero, { op: 'kill_enemy', id: enemy.id });
+        check(w.views.get(hero).drops.some(d => d.item === `${kind}_relic`),
+          `${kind} drops its material through the kill path`);
+      }
+      await w.waitFor(() => quest(w, hero, 'ribbon_final')?.counts.every(n => n === 1) &&
+        quest(w, ally, 'ribbon_final')?.counts.every(n => n === 1),
+      5000, 'Party receives all Pavilion boss objectives');
+      check(quest(w, hero, 'ribbon_final')?.counts.every(n => n === 1) &&
+        quest(w, ally, 'ribbon_final')?.counts.every(n => n === 1) &&
+        !quest(w, outsider, 'ribbon_final'),
+        'All boss objectives credit living party members in this copy only');
+      check(w.views.get(hero).instance.cleared && !w.views.get(outsider).instance.cleared,
+        'The Sovereign clears only the party copy');
+      const gear = [
+        ...w.views.get(hero).drops,
+        ...w.events.filter(e => e.bot === hero && e.type === 'roll' && e.op === 'start'),
+      ].filter(d => typeof d.item === 'string' && d.item.endsWith('_l75_pavilion'));
+      check(gear.length >= 3, 'Boss kills create the three guaranteed exclusive gear drops');
+      await w.debug(hero, { op: 'quest', id: 'ribbon_final', action: 'claim' });
+      check(quest(w, hero, 'ribbon_final')?.claimed &&
+        w.player(hero).inventory.some(i => i.item === 'accessory_amber_l75_blue'),
+        'Claim grants the level-75 accessory');
+      await kit.teleport(w, hero, { zone: 21, x: 111, y: 58 });
+      await w.restart();
+      check(quest(w, hero, 'ribbon_final')?.claimed &&
+        w.player(hero).inventory.some(i => i.item === 'accessory_amber_l75_blue'),
+        'Claim and reward survive a private restart');
+    },
+  },
+  thousandfold_open: {
+    description: 'Pavilion public level gate, real travel, party isolation and clear exit.',
+    startLevel: 75, levelSpread: 0, godMode: true,
+    async run(w, check) {
+      const gate = map.zones[20].portals.find(p => p.id === 'ribbon_pavilion_gate');
+      const floor = map.zones[30];
+      check(gate?.to === 31 && !floor.sealedTemplate && floor.portals.some(p => p.after_clear),
+        'The Ribbonwild gate and post-clear exit are open');
+      for (const bot of ['FoldLead','FoldAlly','FoldOther','FoldLow']) await w.connect({bot,class:'warrior'});
+      await w.debug('FoldLow',{op:'set_level',level:74});
+      await kit.teleport(w,'FoldLow',{zone:21,x:113,y:65});
+      const before = w.events.length;
+      await w.action('FoldLow',{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(() => w.events.slice(before).some(e => e.bot === 'FoldLow' && e.type === 'error' && /level 75/.test(e.text)),12000,'Level-74 player is rejected');
+      await w.action('FoldLow',{type:'stop'});
+      check(w.player('FoldLow').zone === 21,'Low level player stays in the Ribbonwild');
+      await w.social('FoldLead',{op:'party_invite',bot:'FoldAlly'});
+      await w.social('FoldAlly',{op:'party_accept',bot:'FoldLead'});
+      for (const bot of ['FoldLead','FoldAlly','FoldOther']) {
+        await kit.teleport(w,bot,{zone:21,x:113,y:65});
+        await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+        await w.waitFor(() => w.player(bot).zone === 31,15000,`${bot} enters Pavilion`);
+        await w.action(bot,{type:'stop'});
+      }
+      const ids=bot=>new Set(w.views.get(bot).slimes.map(e=>e.id));
+      check([...ids('FoldLead')].every(id=>ids('FoldAlly').has(id)) &&
+        [...ids('FoldLead')].every(id=>!ids('FoldOther').has(id)),
+        'Party shares one private copy, outsider enters another');
+      for (const kind of ['pavilion_mirror','pavilion_weaver','pavilion_sovereign']) {
+        const foe=w.views.get('FoldLead').slimes.find(e=>e.kind===kind&&!e.dead);
+        await w.debug('FoldLead',{op:'kill_enemy',id:foe.id});
+      }
+      check(w.views.get('FoldLead').instance.cleared && !w.views.get('FoldOther').instance.cleared,
+        'Final boss clears only the party copy');
+      await kit.teleport(w,'FoldLead',{zone:31,x:48,y:15});
+      await w.action('FoldLead',{type:'move',x:48,y:12});
+      await w.waitFor(()=>w.player('FoldLead').zone===21,15000,'Clear exit returns to Ribbonwild');
+      check(Math.hypot(w.player('FoldLead').x-113,w.player('FoldLead').y-65)<2,
+        'The clear exit lands outside the Pavilion gate');
+    },
+  },
+  rain_crown_open: {
+    description: 'Rain Crown public level gate, real entry, party isolation and clear exit.',
+    startLevel: 80, levelSpread: 0, godMode: true,
+    async run(w, check) {
+      const gate=map.zones[21].portals.find(p=>p.id==='tangle_rain_gate');
+      const floor=map.zones[31];
+      check(gate?.to===32&&!floor.sealedTemplate&&floor.portals.some(p=>p.after_clear),'Rain Crown gate and exit are open');
+      for(const bot of ['RainGateLead','RainGateAlly','RainGateOther','RainGateLow']) await w.connect({bot,class:'warrior'});
+      await w.debug('RainGateLow',{op:'set_level',level:79});
+      await kit.teleport(w,'RainGateLow',{zone:22,x:120,y:30});
+      const before=w.events.length;
+      await w.action('RainGateLow',{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.events.slice(before).some(e=>e.bot==='RainGateLow'&&e.type==='error'&&/level 80/.test(e.text)),12000,'Level-79 player is rejected');
+      await w.action('RainGateLow',{type:'stop'});
+      await w.social('RainGateLead',{op:'party_invite',bot:'RainGateAlly'});
+      await w.social('RainGateAlly',{op:'party_accept',bot:'RainGateLead'});
+      for(const bot of ['RainGateLead','RainGateAlly','RainGateOther']) {
+        await kit.teleport(w,bot,{zone:22,x:120,y:30});
+        await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+        await w.waitFor(()=>w.player(bot).zone===32,15000,`${bot} enters Rain Crown`);
+        await w.action(bot,{type:'stop'});
+      }
+      const ids=bot=>new Set(w.views.get(bot).slimes.map(e=>e.id));
+      check([...ids('RainGateLead')].every(id=>ids('RainGateAlly').has(id))&&
+        [...ids('RainGateLead')].every(id=>!ids('RainGateOther').has(id)),'Party and outsider occupy separate copies');
+      for(const kind of ['rain_crown_gatekeeper','rain_crown_sibyl','rain_crown_sovereign']) {
+        const foe=w.views.get('RainGateLead').slimes.find(e=>e.kind===kind&&!e.dead);
+        await w.debug('RainGateLead',{op:'kill_enemy',id:foe.id});
+      }
+      check(w.views.get('RainGateLead').instance.cleared&&!w.views.get('RainGateOther').instance.cleared,'Boss clears only the party copy');
+      await kit.teleport(w,'RainGateLead',{zone:32,x:48,y:15});
+      await w.action('RainGateLead',{type:'move',x:48,y:12});
+      await w.waitFor(()=>w.player('RainGateLead').zone===22,15000,'Clear exit returns to jungle');
+      check(Math.hypot(w.player('RainGateLead').x-120,w.player('RainGateLead').y-30)<2,'Exit lands outside the Rain Crown gate');
+    },
+  },
+  seed_vault: {
+    description: 'Seed Vault real level gate, isolated party copies, quest credit, boss loot and clear exit.',
+    startLevel: 80, levelSpread: 0, godMode: true,
+    async run(w,check) {
+      const gate=map.zones[23].portals.find(p=>p.id==='heart_seed_gate');
+      const floor=map.zones[32], quests=map.zones[23].quests;
+      check(gate?.to===33&&!floor.sealedTemplate&&floor.slimes.length===12&&floor.final_boss==='seed_worldseed','Open Seed Vault has twelve encounters');
+      check(quests.some(q=>q.id==='heart_seed_trials')&&quests.some(q=>q.id==='heart_seed_final'),'Two linked Seed Vault quests are offered');
+      for(const bot of ['SeedLead','SeedAlly','SeedOther','SeedLow']) await w.connect({bot,class:'warrior'});
+      await w.debug('SeedLow',{op:'set_level',level:79});
+      await kit.teleport(w,'SeedLow',{zone:24,x:48,y:22});
+      const before=w.events.length;
+      await w.action('SeedLow',{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.events.slice(before).some(e=>e.bot==='SeedLow'&&e.type==='error'&&/level 80/.test(e.text)),12000,'Level-79 player is rejected');
+      await w.action('SeedLow',{type:'stop'});
+      await w.social('SeedLead',{op:'party_invite',bot:'SeedAlly'});
+      await w.social('SeedAlly',{op:'party_accept',bot:'SeedLead'});
+      for(const bot of ['SeedLead','SeedAlly','SeedOther']) {
+        await kit.teleport(w,bot,{zone:24,x:48,y:22});
+        await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+        await w.waitFor(()=>w.player(bot).zone===33,15000,`${bot} enters Seed Vault`);
+        await w.action(bot,{type:'stop'});
+      }
+      const ids=bot=>new Set(w.views.get(bot).slimes.map(e=>e.id));
+      check([...ids('SeedLead')].every(id=>ids('SeedAlly').has(id))&&
+        [...ids('SeedLead')].every(id=>!ids('SeedOther').has(id)),'Party and outsider occupy separate copies');
+      await w.debug('SeedLead',{op:'quest',id:'heart_seed_vault',action:'finish'});
+      await w.debug('SeedLead',{op:'quest',id:'heart_seed_trials',action:'accept'});
+      await w.debug('SeedAlly',{op:'quest',id:'heart_seed_vault',action:'finish'});
+      await w.debug('SeedAlly',{op:'quest',id:'heart_seed_trials',action:'accept'});
+      for(const kind of ['seed_mote','seed_warden','seed_germinator']) {
+        for(const foe of w.views.get('SeedLead').slimes.filter(e=>e.kind===kind&&!e.dead))
+          await w.debug('SeedLead',{op:'kill_enemy',id:foe.id});
+      }
+      // Trial asks for five seedlings; respawn two through the test shortcut.
+      for(let i=0;i<2;i++) {
+        const foe=w.views.get('SeedLead').slimes.find(e=>e.kind==='seed_mote'&&e.dead);
+        await w.debug('SeedLead',{op:'respawn_enemy',id:foe.id});
+        await w.debug('SeedLead',{op:'kill_enemy',id:foe.id});
+      }
+      check(quest(w,'SeedLead','heart_seed_trials')?.counts.every((n,i)=>n===[1,1,5][i]),'Trial counts boss and seedling kills');
+      check(quest(w,'SeedAlly','heart_seed_trials')?.counts.every((n,i)=>n===[1,1,5][i]),'Party member shares accepted trial credit');
+      await w.debug('SeedLead',{op:'quest',id:'heart_seed_trials',action:'claim'});
+      await w.debug('SeedLead',{op:'quest',id:'heart_seed_final',action:'accept'});
+      await w.debug('SeedAlly',{op:'quest',id:'heart_seed_trials',action:'claim'});
+      await w.debug('SeedAlly',{op:'quest',id:'heart_seed_final',action:'accept'});
+      const final=w.views.get('SeedLead').slimes.find(e=>e.kind==='seed_worldseed'&&!e.dead);
+      await w.debug('SeedLead',{op:'kill_enemy',id:final.id});
+      check(quest(w,'SeedLead','heart_seed_final')?.counts[0]===1&&w.views.get('SeedLead').instance.cleared,'Final boss completes the quest and clears the copy');
+      check(quest(w,'SeedAlly','heart_seed_final')?.counts[0]===1&&w.views.get('SeedAlly').instance.cleared,'Party member shares final credit and clear');
+      check(!w.views.get('SeedOther').instance.cleared,'Outsider copy remains uncleared');
+      check(w.views.get('SeedLead').drops.some(d=>d.item==='seed_worldseed_relic'),'Final boss drops its material');
+      await w.debug('SeedLead',{op:'quest',id:'heart_seed_final',action:'claim'});
+      check(quest(w,'SeedLead','heart_seed_final')?.claimed&&w.player('SeedLead').inventory.some(i=>i.item==='accessory_amber_l80_blue'),'Final reward is owned');
+      await kit.teleport(w,'SeedLead',{zone:33,x:48,y:15});
+      await w.action('SeedLead',{type:'move',x:48,y:12});
+      await w.waitFor(()=>w.player('SeedLead').zone===24,15000,'Clear exit returns to Heartwood');
+      await w.restart();
+      check(quest(w,'SeedLead','heart_seed_final')?.claimed,'Quest claim survives restart');
+    },
+  },
+  rain_crown: {
+    description: 'Rain Crown: private encounters, quest credit, boss loot and persistent reward.',
+    startLevel: 80, levelSpread: 0, godMode: true,
+    async run(w, check) {
+      const floor=map.zones[31], quests=map.zones[21].quests;
+      const trials=quests.find(q=>q.id==='tangle_crown_trials');
+      const finale=quests.find(q=>q.id==='tangle_crown_final');
+      check(!floor.sealedTemplate && floor.slimes.length===12 && floor.final_boss==='rain_crown_sovereign',
+        'The temple has twelve encounters and is open');
+      check(map.zones[21].portals.some(p=>p.to===32),
+        'A public portal enters the temple');
+      check(trials?.objectives.length===3 && finale?.objectives.length===3 &&
+        finale.requires==='tangle_crown_trials' && finale.rewardItem==='accessory_amber_l80_blue',
+        'Scholar offers chained trials and a fixed level-80 accessory');
+      for(const bot of ['RainLead','RainAlly','RainOther']) await w.connect({bot,class:'warrior'});
+      await w.social('RainLead',{op:'party_invite',bot:'RainAlly'});
+      await w.social('RainAlly',{op:'party_accept',bot:'RainLead'});
+      await w.debug('RainLead',{op:'quest',id:'tangle_temple',action:'finish'});
+      await w.debug('RainLead',{op:'quest',id:'tangle_crown_trials',action:'accept'});
+      await w.debug('RainAlly',{op:'quest',id:'tangle_temple',action:'finish'});
+      await w.debug('RainAlly',{op:'quest',id:'tangle_crown_trials',action:'finish'});
+      await w.debug('RainAlly',{op:'quest',id:'tangle_crown_final',action:'accept'});
+      for(const bot of ['RainLead','RainAlly','RainOther']) await kit.teleport(w,bot,{zone:32,x:48,y:83});
+      const ids=bot=>new Set(w.views.get(bot).slimes.map(e=>e.id));
+      check([...ids('RainLead')].every(id=>ids('RainAlly').has(id)) &&
+        [...ids('RainLead')].every(id=>!ids('RainOther').has(id)),
+        'Party and outsider have separate temple copies');
+      for(const kind of ['rain_crown_droplet','rain_crown_oracle','rain_crown_guard']) {
+        for(const foe of w.views.get('RainLead').slimes.filter(e=>e.kind===kind&&!e.dead))
+          await w.debug('RainLead',{op:'kill_enemy',id:foe.id});
+      }
+      check(quest(w,'RainLead','tangle_crown_trials')?.counts.every(n=>n===3),
+        'All nine ordinary kills count for the accepted trial');
+      await w.debug('RainLead',{op:'quest',id:'tangle_crown_trials',action:'claim'});
+      await w.debug('RainLead',{op:'quest',id:'tangle_crown_final',action:'accept'});
+      for(const kind of ['rain_crown_gatekeeper','rain_crown_sibyl','rain_crown_sovereign']) {
+        const foe=w.views.get('RainLead').slimes.find(e=>e.kind===kind&&!e.dead);
+        await w.debug('RainLead',{op:'kill_enemy',id:foe.id});
+        check(w.views.get('RainLead').drops.some(d=>d.item===`${kind}_relic`),`${kind} drops its material`);
+      }
+      await w.waitFor(()=>quest(w,'RainLead','tangle_crown_final')?.counts.every(n=>n===1)&&
+        quest(w,'RainAlly','tangle_crown_final')?.counts.every(n=>n===1),5000,'Party receives boss credit');
+      check(!quest(w,'RainOther','tangle_crown_final') && !w.views.get('RainOther').instance.cleared,
+        'Outsider gets no quest credit or clear');
+      check(w.views.get('RainLead').instance.cleared,'The Rain Crown clears the private copy');
+      const gear=[...w.views.get('RainLead').drops,...w.events.filter(e=>e.bot==='RainLead'&&e.type==='roll'&&e.op==='start')]
+        .filter(d=>typeof d.item==='string'&&d.item.endsWith('_l80_rain'));
+      check(gear.length>=3,'Three boss kills create exclusive level-80 gear');
+      await w.debug('RainLead',{op:'quest',id:'tangle_crown_final',action:'claim'});
+      check(quest(w,'RainLead','tangle_crown_final')?.claimed &&
+        w.player('RainLead').inventory.some(i=>i.item==='accessory_amber_l80_blue'),
+        'Final claim grants the fixed accessory');
+      await kit.teleport(w,'RainLead',{zone:22,x:110,y:30});
+      await w.restart();
+      check(quest(w,'RainLead','tangle_crown_final')?.claimed &&
+        w.player('RainLead').inventory.some(i=>i.item==='accessory_amber_l80_blue'),
+        'Quest and reward survive restart');
+    },
+  },
+
+  sunken_astrolabe: {
+    description: 'Sunken Astrolabe level gate, party copies, linked quests, boss drops, clear exit and persistence.',
+    startLevel: 85, levelSpread: 0, godMode: true,
+    async run(w,check) {
+      const gate=map.zones[24].portals.find(p=>p.id==='lapis_astrolabe_gate');
+      const floor=map.zones[33];
+      check(gate?.to===34&&!floor.sealedTemplate&&floor.slimes.length===12&&floor.final_boss==='astro_axis','Astrolabe is open with twelve encounters');
+      check(map.zones[24].quests.some(q=>q.id==='lapis_astro_trials')&&map.zones[24].quests.some(q=>q.id==='lapis_astro_final'),'Linked quests are offered');
+      for(const bot of ['AstroLead','AstroAlly','AstroOther','AstroLow']) await w.connect({bot,class:'warrior'});
+      await w.debug('AstroLow',{op:'set_level',level:84});
+      await kit.teleport(w,'AstroLow',{zone:25,x:140,y:27});
+      const before=w.events.length;
+      await w.action('AstroLow',{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.events.slice(before).some(e=>e.bot==='AstroLow'&&e.type==='error'&&/level 85/.test(e.text)),12000,'Level-84 player is rejected');
+      await w.action('AstroLow',{type:'stop'});
+      await w.social('AstroLead',{op:'party_invite',bot:'AstroAlly'});
+      await w.social('AstroAlly',{op:'party_accept',bot:'AstroLead'});
+      for(const bot of ['AstroLead','AstroAlly','AstroOther']) {
+        await kit.teleport(w,bot,{zone:25,x:140,y:27});
+        await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+        await w.waitFor(()=>w.player(bot).zone===34,15000,`${bot} enters the Astrolabe`);
+        await w.action(bot,{type:'stop'});
+      }
+      const ids=bot=>new Set(w.views.get(bot).slimes.map(e=>e.id));
+      check([...ids('AstroLead')].every(id=>ids('AstroAlly').has(id))&&
+        [...ids('AstroLead')].every(id=>!ids('AstroOther').has(id)),'Party and outsider occupy isolated copies');
+      for(const bot of ['AstroLead','AstroAlly']) {
+        await w.debug(bot,{op:'quest',id:'lapis_astrolabe',action:'finish'});
+        await w.debug(bot,{op:'quest',id:'lapis_astro_trials',action:'accept'});
+      }
+      for(const kind of ['astro_gearling','astro_warden','astro_navigator'])
+        for(const foe of w.views.get('AstroLead').slimes.filter(e=>e.kind===kind&&!e.dead))
+          await w.debug('AstroLead',{op:'kill_enemy',id:foe.id});
+      check(quest(w,'AstroLead','lapis_astro_trials')?.counts.every((n,i)=>n===[1,1,3][i]),'Trial records its kills');
+      check(quest(w,'AstroAlly','lapis_astro_trials')?.counts.every((n,i)=>n===[1,1,3][i]),'Party member shares accepted credit');
+      for(const bot of ['AstroLead','AstroAlly']) {
+        await w.debug(bot,{op:'quest',id:'lapis_astro_trials',action:'claim'});
+        await w.debug(bot,{op:'quest',id:'lapis_astro_final',action:'accept'});
+      }
+      const final=w.views.get('AstroLead').slimes.find(e=>e.kind==='astro_axis'&&!e.dead);
+      await w.debug('AstroLead',{op:'kill_enemy',id:final.id});
+      check(quest(w,'AstroLead','lapis_astro_final')?.counts[0]===1&&w.views.get('AstroLead').instance.cleared,'Final boss clears the party copy');
+      await w.waitFor(()=>quest(w,'AstroAlly','lapis_astro_final')?.counts[0]===1&&w.views.get('AstroAlly').instance.cleared,5000,'Ally final credit and clear');
+      check(true,'Ally receives final credit and clear');
+      check(!w.views.get('AstroOther').instance.cleared,'Outsider copy stays uncleared');
+      check(w.views.get('AstroLead').drops.some(d=>d.item==='astro_axis_relic'),'Final boss drops a relic');
+      await w.debug('AstroLead',{op:'quest',id:'lapis_astro_final',action:'claim'});
+      check(quest(w,'AstroLead','lapis_astro_final')?.claimed&&w.player('AstroLead').inventory.some(i=>i.item==='accessory_amber_l85_blue'),'Claim grants level-85 reward');
+      await kit.teleport(w,'AstroLead',{zone:34,x:48,y:15});
+      await w.action('AstroLead',{type:'move',x:48,y:12});
+      await w.waitFor(()=>w.player('AstroLead').zone===25,15000,'Clear exit returns to the Lapis Erg');
+      check(Math.hypot(w.player('AstroLead').x-140,w.player('AstroLead').y-17)<2,'Return landing is safe and separate from entrance');
+      await w.restart();
+      check(quest(w,'AstroLead','lapis_astro_final')?.claimed,'Quest claim persists through restart');
+    },
+  },
+  thunderheart_gate: {
+    description: 'Thunderheart Gate level gate, party copies, linked quests, boss drops, clear exit and persistence.',
+    startLevel: 95, levelSpread: 0, godMode: true,
+    async run(w,check) {
+      const gate=map.zones[26].portals.find(p=>p.id==='cairn_thunderheart_gate');
+      const floor=map.zones[34];
+      check(gate?.to===35&&!floor.sealedTemplate&&floor.slimes.length===12&&floor.final_boss==='thunder_heart','Thunderheart Gate is open with twelve encounters');
+      check(map.zones[26].quests.some(q=>q.id==='cairn_storm_trials')&&map.zones[26].quests.some(q=>q.id==='cairn_thunder_final'),'Linked quests are offered');
+      for(const bot of ['ThunderLead','ThunderAlly','ThunderOther','ThunderLow']) await w.connect({bot,class:'warrior'});
+      await w.debug('ThunderLow',{op:'set_level',level:94});
+      await kit.teleport(w,'ThunderLow',{zone:27,x:151,y:26});
+      const before=w.events.length;
+      await w.action('ThunderLow',{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.events.slice(before).some(e=>e.bot==='ThunderLow'&&e.type==='error'&&/level 95/.test(e.text)),12000,'Level-94 player is rejected');
+      await w.action('ThunderLow',{type:'stop'});
+      await w.social('ThunderLead',{op:'party_invite',bot:'ThunderAlly'});
+      await w.social('ThunderAlly',{op:'party_accept',bot:'ThunderLead'});
+      for(const bot of ['ThunderLead','ThunderAlly','ThunderOther']) {
+        await kit.teleport(w,bot,{zone:27,x:151,y:26});
+        await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+        await w.waitFor(()=>w.player(bot).zone===35,15000,`${bot} enters the Thunderheart Gate`);
+        await w.action(bot,{type:'stop'});
+      }
+      const ids=bot=>new Set(w.views.get(bot).slimes.map(e=>e.id));
+      check([...ids('ThunderLead')].every(id=>ids('ThunderAlly').has(id))&&
+        [...ids('ThunderLead')].every(id=>!ids('ThunderOther').has(id)),'Party and outsider occupy isolated copies');
+      for(const bot of ['ThunderLead','ThunderAlly']) {
+        await w.debug(bot,{op:'quest',id:'cairn_gate',action:'finish'});
+        await w.debug(bot,{op:'quest',id:'cairn_storm_trials',action:'accept'});
+      }
+      for(const kind of ['thunder_spark','thunder_conductor','thunder_bastion'])
+        for(const foe of w.views.get('ThunderLead').slimes.filter(e=>e.kind===kind&&!e.dead))
+          await w.debug('ThunderLead',{op:'kill_enemy',id:foe.id});
+      check(quest(w,'ThunderLead','cairn_storm_trials')?.counts.every((n,i)=>n===[1,1,3][i]),'Trial records its kills');
+      await w.waitFor(()=>quest(w,'ThunderAlly','cairn_storm_trials')?.counts.every((n,i)=>n===[1,1,3][i]),5000,'Party member shares accepted credit');
+      check(true,'Party member shares accepted credit');
+      for(const bot of ['ThunderLead','ThunderAlly']) {
+        await w.debug(bot,{op:'quest',id:'cairn_storm_trials',action:'claim'});
+        await w.debug(bot,{op:'quest',id:'cairn_thunder_final',action:'accept'});
+      }
+      const final=w.views.get('ThunderLead').slimes.find(e=>e.kind==='thunder_heart'&&!e.dead);
+      await w.debug('ThunderLead',{op:'kill_enemy',id:final.id});
+      check(quest(w,'ThunderLead','cairn_thunder_final')?.counts[0]===1&&w.views.get('ThunderLead').instance.cleared,'Final boss clears the party copy');
+      await w.waitFor(()=>quest(w,'ThunderAlly','cairn_thunder_final')?.counts[0]===1&&w.views.get('ThunderAlly').instance.cleared,5000,'Ally final credit and clear');
+      check(true,'Ally receives final credit and clear');
+      check(!w.views.get('ThunderOther').instance.cleared,'Outsider copy stays uncleared');
+      check(w.views.get('ThunderLead').drops.some(d=>d.item==='thunder_heart_relic'),'Final boss drops a relic');
+      await w.debug('ThunderLead',{op:'quest',id:'cairn_thunder_final',action:'claim'});
+      check(quest(w,'ThunderLead','cairn_thunder_final')?.claimed&&w.player('ThunderLead').inventory.some(i=>i.item==='accessory_amber_l95_blue'),'Claim grants level-95 reward');
+      await kit.teleport(w,'ThunderLead',{zone:35,x:70,y:15});
+      await w.action('ThunderLead',{type:'move',x:70,y:12});
+      await w.waitFor(()=>w.player('ThunderLead').zone===27,15000,'Clear exit returns to the Cairnspine');
+      check(Math.hypot(w.player('ThunderLead').x-151,w.player('ThunderLead').y-20)<2,'Return landing is safe and separate from entrance');
+      await w.restart();
+      check(quest(w,'ThunderLead','cairn_thunder_final')?.claimed,'Quest claim persists through restart');
+    },
+  },
+  thunderheart_foes: {
+    description: 'Thunderheart Gate encounters have authoritative levels, combat and materials.',
+    startLevel: 95, levelSpread: 0, godMode: true,
+    async run(w,check) {
+      const floor=map.zones[34];
+      check(!floor.sealedTemplate&&floor.slimes.length===12&&floor.final_boss==='thunder_heart','Thunderheart is open with twelve encounters');
+      check(map.zones[26].portals.some(p=>p.to===35),'Cairnspine has an inbound Thunderheart portal');
+      await w.connect({bot:'ThunderScout',class:'warrior'});
+      await kit.teleport(w,'ThunderScout',{zone:35,x:48,y:82});
+      const foe=w.views.get('ThunderScout').slimes.find(e=>e.kind==='thunder_spark'&&!e.dead);
+      check(!!foe&&foe.level===95,'Server creates level-95 lightning enemies');
+      await w.debug('ThunderScout',{op:'kill_enemy',id:foe.id});
+      check(w.views.get('ThunderScout').drops.some(d=>d.item==='thunder_spark_relic'),'Real kill path drops Thunderheart material');
+      for(const kind of ['thunder_spark','thunder_ray','thunder_guard','thunder_conductor','thunder_bastion','thunder_heart'])
+        check(w.views.get('ThunderScout').slimes.some(e=>e.kind===kind),`${kind} exists in the floor`);
+    },
+  },
+  blooming_foes: {
+    description: 'Blooming Labyrinth six level-97 enemy kinds, private copies and material drops.',
+    startLevel:97,levelSpread:0,godMode:true,
+    async run(w,check) {
+      const floor=map.zones[35];
+      check(!floor.sealedTemplate&&floor.slimes.length===12&&floor.final_boss==='bloom_heart','Blooming opens with twelve encounters');
+      check(map.zones[27].portals.some(p=>p.to===36),'Yearwheel has an inbound Blooming portal');
+      await w.connect({bot:'BloomScout',class:'warrior'});
+      await kit.teleport(w,'BloomScout',{zone:36,x:48,y:82});
+      const foe=w.views.get('BloomScout').slimes.find(e=>e.kind==='bloom_spore'&&!e.dead);
+      check(!!foe&&foe.level===97,'Server creates level-97 enemies');
+      await w.debug('BloomScout',{op:'kill_enemy',id:foe.id});
+      check(w.views.get('BloomScout').drops.some(d=>d.item==='bloom_spore_relic'),'Kill path drops Blooming material');
+      for(const kind of ['bloom_spore','bloom_moth','bloom_guard','bloom_thornkeeper','bloom_mirror','bloom_heart'])
+        check(w.views.get('BloomScout').slimes.some(e=>e.kind===kind),`${kind} exists in the private copy`);
+    },
+  },
+  blooming_quests: {
+    description: 'Blooming Labyrinth staged party quest credit, boss loot, isolated clear and persistence.',
+    startLevel:97,levelSpread:0,godMode:true,
+    async run(w,check) {
+      check(!map.zones[35].sealedTemplate&&map.zones[27].portals.some(p=>p.to===36),'Blooming entrance is open');
+      check(map.zones[27].quests.some(q=>q.id==='yr_sp_bloom_trials')&&map.zones[27].quests.some(q=>q.id==='yr_sp_bloom_final'),'Linked level-97 quests exist');
+      for(const bot of ['BloomLead','BloomAlly','BloomOther']) await w.connect({bot,class:'warrior'});
+      await w.social('BloomLead',{op:'party_invite',bot:'BloomAlly'});
+      await w.social('BloomAlly',{op:'party_accept',bot:'BloomLead'});
+      for(const bot of ['BloomLead','BloomAlly','BloomOther']) await kit.teleport(w,bot,{zone:36,x:48,y:82});
+      const ids=bot=>new Set(w.views.get(bot).slimes.map(e=>e.id));
+      check([...ids('BloomLead')].every(id=>ids('BloomAlly').has(id))&&[...ids('BloomLead')].every(id=>!ids('BloomOther').has(id)),'Party and outsider have separate copies');
+      for(const bot of ['BloomLead','BloomAlly']) {
+        await w.debug(bot,{op:'quest',id:'yr_sp_gate',action:'finish'});
+        await w.debug(bot,{op:'quest',id:'yr_sp_bloom_trials',action:'accept'});
+      }
+      for(const kind of ['bloom_spore','bloom_thornkeeper','bloom_mirror'])
+        for(const foe of w.views.get('BloomLead').slimes.filter(e=>e.kind===kind&&!e.dead))
+          await w.debug('BloomLead',{op:'kill_enemy',id:foe.id});
+      check(quest(w,'BloomLead','yr_sp_bloom_trials')?.counts.every((n,i)=>n===[1,1,3][i]),'Trial records kills');
+      await w.waitFor(()=>quest(w,'BloomAlly','yr_sp_bloom_trials')?.counts.every((n,i)=>n===[1,1,3][i]),5000,'Ally receives accepted kill credit');
+      check(true,'Ally receives accepted kill credit');
+      for(const bot of ['BloomLead','BloomAlly']) {
+        await w.debug(bot,{op:'quest',id:'yr_sp_bloom_trials',action:'claim'});
+        await w.debug(bot,{op:'quest',id:'yr_sp_bloom_final',action:'accept'});
+      }
+      const final=w.views.get('BloomLead').slimes.find(e=>e.kind==='bloom_heart'&&!e.dead);
+      await w.debug('BloomLead',{op:'kill_enemy',id:final.id});
+      check(quest(w,'BloomLead','yr_sp_bloom_final')?.counts[0]===1&&w.views.get('BloomLead').instance.cleared,'Final kill clears party copy');
+      await w.waitFor(()=>quest(w,'BloomAlly','yr_sp_bloom_final')?.counts[0]===1&&w.views.get('BloomAlly').instance.cleared,5000,'Ally final credit');
+      check(!w.views.get('BloomOther').instance.cleared,'Other copy remains uncleared');
+      check(w.views.get('BloomLead').drops.some(d=>d.item==='bloom_heart_relic'),'Final boss drops relic');
+      await w.debug('BloomLead',{op:'quest',id:'yr_sp_bloom_final',action:'claim'});
+      check(quest(w,'BloomLead','yr_sp_bloom_final')?.claimed&&w.player('BloomLead').inventory.some(i=>i.item==='necklace_moonstone_l95_blue'),'Claim awards level-95 necklace');
+      await w.restart();
+      check(quest(w,'BloomLead','yr_sp_bloom_final')?.claimed,'Claim persists after restart');
+    },
+  },
+  blooming_open: {
+    description: 'Blooming Labyrinth level gate, party isolation, return routes, boss clear and rewards.',
+    startLevel:97,levelSpread:0,godMode:true,
+    async run(w,check) {
+      const gate=map.zones[27].portals.find(p=>p.id==='year_bloom_descent');
+      const floor=map.zones[35];
+      check(gate?.to===36&&!floor.sealedTemplate&&floor.portals.some(p=>p.after_clear),'Blooming entrance and clear exit are active');
+      for(const bot of ['BloomOpenLead','BloomOpenAlly','BloomOpenOther','BloomOpenLow'])await w.connect({bot,class:'warrior'});
+      await w.debug('BloomOpenLow',{op:'set_level',level:96});
+      await kit.teleport(w,'BloomOpenLow',{zone:28,x:48,y:243});
+      const before=w.events.length;
+      await w.action('BloomOpenLow',{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.events.slice(before).some(e=>e.bot==='BloomOpenLow'&&e.type==='error'&&/level 97/.test(e.text)),12000,'Level-96 player is rejected');
+      check(w.player('BloomOpenLow').zone===28,'Level gate keeps low-level player outside');
+      await w.action('BloomOpenLow',{type:'stop'});
+      await w.social('BloomOpenLead',{op:'party_invite',bot:'BloomOpenAlly'});
+      await w.social('BloomOpenAlly',{op:'party_accept',bot:'BloomOpenLead'});
+      for(const bot of ['BloomOpenLead','BloomOpenAlly','BloomOpenOther']){
+        await kit.teleport(w,bot,{zone:28,x:48,y:243});
+        await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+        await w.waitFor(()=>w.player(bot).zone===36,15000,`${bot} enters Blooming`);
+        await w.action(bot,{type:'stop'});
+      }
+      const ids=bot=>new Set(w.views.get(bot).slimes.map(e=>e.id));
+      check([...ids('BloomOpenLead')].every(id=>ids('BloomOpenAlly').has(id))&&
+        [...ids('BloomOpenLead')].every(id=>!ids('BloomOpenOther').has(id)),'Party shares one copy; outsider gets another');
+      for(const bot of ['BloomOpenLead','BloomOpenAlly']){
+        await w.debug(bot,{op:'quest',id:'yr_sp_gate',action:'finish'});
+        await w.debug(bot,{op:'quest',id:'yr_sp_bloom_trials',action:'accept'});
+      }
+      for(const kind of ['bloom_spore','bloom_thornkeeper','bloom_mirror'])
+        for(const foe of w.views.get('BloomOpenLead').slimes.filter(e=>e.kind===kind&&!e.dead))
+          await w.debug('BloomOpenLead',{op:'kill_enemy',id:foe.id});
+      check(quest(w,'BloomOpenLead','yr_sp_bloom_trials')?.counts.every((n,i)=>n===[1,1,3][i]),'Trial objectives count in party copy');
+      await w.waitFor(()=>quest(w,'BloomOpenAlly','yr_sp_bloom_trials')?.counts.every((n,i)=>n===[1,1,3][i]),5000,'Ally gets trial credit');
+      for(const bot of ['BloomOpenLead','BloomOpenAlly']){
+        await w.debug(bot,{op:'quest',id:'yr_sp_bloom_trials',action:'claim'});
+        await w.debug(bot,{op:'quest',id:'yr_sp_bloom_final',action:'accept'});
+      }
+      const final=w.views.get('BloomOpenLead').slimes.find(e=>e.kind==='bloom_heart'&&!e.dead);
+      await w.debug('BloomOpenLead',{op:'kill_enemy',id:final.id});
+      check(w.views.get('BloomOpenLead').instance.cleared&&quest(w,'BloomOpenLead','yr_sp_bloom_final')?.counts[0]===1,'Heart kill clears copy and advances quest');
+      await w.waitFor(()=>w.views.get('BloomOpenAlly').instance.cleared&&quest(w,'BloomOpenAlly','yr_sp_bloom_final')?.counts[0]===1,5000,'Ally gets clear credit');
+      check(!w.views.get('BloomOpenOther').instance.cleared,'Other copy remains uncleared');
+      await w.debug('BloomOpenLead',{op:'quest',id:'yr_sp_bloom_final',action:'claim'});
+      check(w.player('BloomOpenLead').inventory.some(i=>i.item==='necklace_moonstone_l95_blue'),'Final reward is granted');
+      await kit.teleport(w,'BloomOpenLead',{zone:36,x:49,y:16});
+      await w.action('BloomOpenLead',{type:'move',x:49,y:12});
+      await w.waitFor(()=>w.player('BloomOpenLead').zone===28,15000,'Clear exit returns to Yearwheel');
+      check(Math.hypot(w.player('BloomOpenLead').x-48,w.player('BloomOpenLead').y-235)<2,'Return landing is safe and distinct from gate');
+      await w.restart();
+      check(quest(w,'BloomOpenLead','yr_sp_bloom_final')?.claimed,'Reward claim persists after restart');
+    },
+  },
+  solar_crucible: {
+    description: 'Solar Crucible level gate, party isolation, clear, loot, return and persistence.',
+    startLevel:98,levelSpread:0,godMode:true,
+    async run(w,check) {
+      const floor=map.zones[36];
+      const gate=map.zones[27].portals.find(p=>p.id==='year_solar_descent');
+      check(gate?.to===37&&!floor.sealedTemplate&&floor.slimes.length===12&&floor.final_boss==='solar_heart'&&floor.portals.some(p=>p.after_clear),'Solar entrance and clear exit are active');
+      check(map.zones[27].quests.some(q=>q.id==='yr_su_solar_trials')&&map.zones[27].quests.some(q=>q.id==='yr_su_solar_final'),'Linked level-98 party quests exist');
+      for(const bot of ['SolarLead','SolarAlly','SolarOther','SolarLow'])await w.connect({bot,class:'warrior'});
+      await w.debug('SolarLow',{op:'set_level',level:97});
+      await kit.teleport(w,'SolarLow',{zone:28,x:352,y:261});
+      const before=w.events.length;
+      await w.action('SolarLow',{type:'move',x:gate.x,y:gate.y});
+      await w.waitFor(()=>w.events.slice(before).some(e=>e.bot==='SolarLow'&&e.type==='error'&&/level 98/.test(e.text)),12000,'Level-97 player is rejected');
+      check(w.player('SolarLow').zone===28,'Level gate holds low-level player outside');
+      await w.action('SolarLow',{type:'stop'});
+      await w.social('SolarLead',{op:'party_invite',bot:'SolarAlly'});
+      await w.social('SolarAlly',{op:'party_accept',bot:'SolarLead'});
+      for(const bot of ['SolarLead','SolarAlly','SolarOther']){
+        await kit.teleport(w,bot,{zone:28,x:352,y:261});
+        await w.action(bot,{type:'move',x:gate.x,y:gate.y});
+        await w.waitFor(()=>w.player(bot).zone===37,15000,`${bot} enters Solar`);
+        await w.action(bot,{type:'stop'});
+      }
+      const ids=bot=>new Set(w.views.get(bot).slimes.map(e=>e.id));
+      check([...ids('SolarLead')].every(id=>ids('SolarAlly').has(id))&&[...ids('SolarLead')].every(id=>!ids('SolarOther').has(id)),'Party and outsider have separate copies');
+      for(const kind of ['solar_emberling','solar_sunmoth','solar_crucible_guard','solar_ashwarden','solar_heliomancer','solar_heart'])
+        check(w.views.get('SolarLead').slimes.some(e=>e.kind===kind&&e.level===98),`${kind} appears at level 98`);
+      const ember=w.views.get('SolarLead').slimes.find(e=>e.kind==='solar_emberling'&&!e.dead);
+      await w.debug('SolarLead',{op:'kill_enemy',id:ember.id});
+      check(w.views.get('SolarLead').drops.some(d=>d.item==='solar_emberling_relic'),'Kill drops Solar material');
+      for(const bot of ['SolarLead','SolarAlly']){
+        await w.debug(bot,{op:'quest',id:'yr_su_gate',action:'finish'});
+        await w.debug(bot,{op:'quest',id:'yr_su_solar_trials',action:'accept'});
+      }
+      check(quest(w,'SolarLead','yr_su_solar_trials')?.counts.every(n=>n===0),'Pre-accept kill did not count');
+      await w.debug('SolarLead',{op:'respawn_enemy',id:ember.id});
+      for(const kind of ['solar_emberling','solar_ashwarden','solar_heliomancer'])
+        for(const foe of w.views.get('SolarLead').slimes.filter(e=>e.kind===kind&&!e.dead))
+          await w.debug('SolarLead',{op:'kill_enemy',id:foe.id});
+      check(quest(w,'SolarLead','yr_su_solar_trials')?.counts.every((n,i)=>n===[1,1,3][i]),'Accepted trial tracks all kills');
+      await w.waitFor(()=>quest(w,'SolarAlly','yr_su_solar_trials')?.counts.every((n,i)=>n===[1,1,3][i]),5000,'Ally receives trial credit');
+      for(const bot of ['SolarLead','SolarAlly']){
+        await w.debug(bot,{op:'quest',id:'yr_su_solar_trials',action:'claim'});
+        await w.debug(bot,{op:'quest',id:'yr_su_solar_final',action:'accept'});
+      }
+      const final=w.views.get('SolarLead').slimes.find(e=>e.kind==='solar_heart'&&!e.dead);
+      await w.debug('SolarLead',{op:'kill_enemy',id:final.id});
+      check(w.views.get('SolarLead').instance.cleared&&quest(w,'SolarLead','yr_su_solar_final')?.counts[0]===1,'Heart kill clears copy and advances quest');
+      await w.waitFor(()=>w.views.get('SolarAlly').instance.cleared&&quest(w,'SolarAlly','yr_su_solar_final')?.counts[0]===1,5000,'Ally gets final credit');
+      check(!w.views.get('SolarOther').instance.cleared,'Other copy remains uncleared');
+      check(w.views.get('SolarLead').drops.some(d=>d.item==='solar_heart_relic'),'Final boss drops relic');
+      await w.debug('SolarLead',{op:'quest',id:'yr_su_solar_final',action:'claim'});
+      check(w.player('SolarLead').inventory.some(i=>i.item==='accessory_amber_l95_blue'),'Final quest grants level-95 accessory');
+      await kit.teleport(w,'SolarLead',{zone:37,x:48,y:16});
+      await w.action('SolarLead',{type:'move',x:48,y:12});
+      await w.waitFor(()=>w.player('SolarLead').zone===28,15000,'Clear exit returns to Yearwheel');
+      check(Math.hypot(w.player('SolarLead').x-346,w.player('SolarLead').y-248)<2,'Solar return landing is safe');
+      await w.restart();
+      check(quest(w,'SolarLead','yr_su_solar_final')?.claimed,'Solar quest claim persists after restart');
+    },
+  },
+  amber_archive: {
+    description:'Amber Archive level gate, party isolation, quest credit, boss clear, rewards and return.',
+    startLevel:99,levelSpread:0,godMode:true,
+    async run(w,check){await yearwheelDungeonOpening(w,check,{
+      label:'Amber',zone:38,gateId:'year_amber_descent',level:99,entry:{x:352,y:164},landing:{x:358,y:151},
+      trash:['amber_page','amber_moth','amber_sentinel'],bosses:['amber_curator','amber_chronicle','amber_memory'],
+      questGate:'yr_au_gate',questTrials:'yr_au_amber_trials',questFinal:'yr_au_amber_final',
+      reward:'necklace_moonstone_l95_blue',exit:{x:48,y:17}
+    });},
+  },
+  silent_solstice: {
+    description:'Silent Solstice level gate, party isolation, quest credit, boss clear, rewards and return.',
+    startLevel:99,levelSpread:0,godMode:true,
+    async run(w,check){await yearwheelDungeonOpening(w,check,{
+      label:'Solstice',zone:39,gateId:'year_solstice_descent',level:99,entry:{x:47,y:163},landing:{x:47,y:144},
+      trash:['solstice_flurry','solstice_owl','solstice_guard'],bosses:['solstice_watcher','solstice_harbinger','solstice_heart'],
+      questGate:'yr_wi_gate',questTrials:'yr_wi_sols_trials',questFinal:'yr_wi_sols_final',
+      reward:'accessory_amber_l95_blue',exit:{x:48,y:14}
+    });},
+  },
+  gear_services: {
+    description:'Alderhaven merge and refinement: ownership, preview, atomic payment, bags and persistence.',
+    godMode:true,
+    async run(w,check){
+      const bot='GearwrightTest',piece='warrior_weapon_sword_l5_gray';
+      await w.connect({bot,class:'warrior'});
+      await w.debug(bot,{op:'set_gold',gold:100000});
+      await w.debug(bot,{op:'give_item',item:piece,quantity:2});
+      await kit.teleport(w,bot,{npc:'gearwright'});
+      const opening=await kit.talkTo(w,bot,'gearwright');
+      check(opening.offers.includes('merge')&&opening.offers.includes('refine'),'Gearwright advertises both services');
+      await w.waitFor(()=>w.player(bot).gearInstances?.filter(g=>g.item===piece).length===2,5000,'Legacy gear copies are materialized');
+      const ids=w.player(bot).gearInstances.filter(g=>g.item===piece).map(g=>g.id);
+      const reply=async offer=>{
+        const earlier=new Set(w.events);
+        await w.action(bot,{type:'interact',npc:'gearwright',offer});
+        const answer=await w.waitFor(()=>w.events.find(e=>!earlier.has(e)&&e.bot===bot&&((e.type==='dialogue'&&e.npc?.id==='gearwright')||e.type==='error')),15000,offer);
+        if(answer.type==='error')throw Error(`${offer}: ${answer.text}`);
+        return answer;
+      };
+      const initial=JSON.stringify(w.player(bot).gearInstances);
+      const duplicate=await reply(`merge_confirm:${ids[0]}:${ids[0]}`);
+      check(duplicate.notice.includes('different')&&JSON.stringify(w.player(bot).gearInstances)===initial,'One copy cannot be merged with itself');
+      const worn=w.player(bot).gearInstances.find(g=>g.item!==piece&&g.item.includes('weapon'));
+      const mismatch=await reply(`merge_confirm:${ids[0]}:${worn.id}`);
+      check(mismatch.notice.includes('same item')&&w.player(bot).inventory.find(s=>s.item===piece).quantity===2,'Different pieces cannot merge');
+      const preview=await reply(`merge_preview:${ids[0]}:${ids[1]}`);
+      check(preview.gearPreview?.result?.rarity==='uncommon'&&preview.gearPreview.result.rank===0,'Server previews exact next rarity and rank');
+      const merged=await reply(`merge_confirm:${ids[0]}:${ids[1]}`);
+      await w.waitFor(()=>w.player(bot).inventory.find(s=>s.item===piece)?.quantity===1,5000,'Merge save');
+      const output=w.player(bot).gearInstances.find(g=>g.item===piece);
+      check(merged.notice.includes('Merged')&&output.rarity==='uncommon'&&output.id!==ids[0]&&output.id!==ids[1],'Merge consumes two and creates one copy');
+      await w.debug(bot,{op:'give_item',item:'refinement_crystal_uncommon',quantity:1});
+      const refinePreview=await reply(`refine_preview:${output.id}`);
+      check(refinePreview.gearPreview?.gold===200&&refinePreview.gearPreview?.crystals===1&&refinePreview.gearPreview?.material==='refinement_crystal_uncommon','Refinement preview gives authoritative cost and resulting stats');
+      const gold=w.player(bot).gold;
+      const refined=await reply(`refine_confirm:${output.id}`);
+      await w.waitFor(()=>w.player(bot).gearInstances.some(g=>g.id===output.id&&g.rank===1),5000,'Refinement save');
+      check(refined.notice.includes('rank 1')&&w.player(bot).gold===gold-200&&!(w.player(bot).inventory||[]).some(s=>s.item==='refinement_crystal_uncommon'),'Refinement atomically consumes gold and matching crystal');
+      const failed=await reply(`refine_confirm:${output.id}`);
+      check(failed.notice.includes('crystals')&&w.player(bot).gearInstances.find(g=>g.id===output.id).rank===1,'Missing crystals cannot advance rank');
+      const wornId=w.player(bot).gearInstances.find(g=>g.item!==piece&&g.item.includes('weapon')&&g.rarity==='common').id;
+      await w.debug(bot,{op:'give_item',item:'refinement_crystal_common',quantity:1});
+      const attack=w.player(bot).attack;
+      await reply(`refine_confirm:${wornId}`);
+      await w.waitFor(()=>w.player(bot).gearInstances.some(g=>g.id===wornId&&g.rank===1),5000,'Worn refinement');
+      check(w.player(bot).attack>attack&&w.player(bot).gearInstances.find(g=>g.id===wornId).rank===1,'Equipped gear refinement changes combat stats');
+      await w.debug(bot,{op:'give_item',item:piece,quantity:2});
+      await kit.talkTo(w,bot,'gearwright');
+      while(w.player(bot).bagUsed<w.player(bot).bagCapacity){
+        const have=new Set(w.player(bot).inventory.map(s=>s.item));
+        const fresh=kit.items.find(i=>i.kind==='material'&&!have.has(i.id));
+        await w.debug(bot,{op:'give_item',item:fresh.id,quantity:1});
+      }
+      const common=w.player(bot).gearInstances.filter(g=>g.item===piece&&g.rarity==='common').map(g=>g.id);
+      check(common.length===2&&w.player(bot).bagUsed===w.player(bot).bagCapacity,'Full bag has two matching spare copies');
+      await reply(`merge_confirm:${common[0]}:${common[1]}`);
+      await w.waitFor(()=>w.player(bot).gearInstances.filter(g=>g.item===piece&&g.rarity==='uncommon').length===2,5000,'Full-bag merge');
+      check(w.player(bot).bagUsed===w.player(bot).bagCapacity,'Merge succeeds at full capacity because its output fits');
+      await w.restart();
+      check(w.player(bot).gearInstances.some(g=>g.id===output.id&&g.rank===1)&&w.player(bot).gearInstances.some(g=>g.id===wornId&&g.rank===1),'Both refined copies survive restart');
+    },
+  },
+
 };
 
 async function runScenario(name, world = new TestWorld()) {

@@ -1,5 +1,5 @@
 'use strict';
-// The Yearwheel's four living quarters and sealed seasonal gates.
+// The Yearwheel's four living quarters and seasonal thresholds.
 (() => {
   const {poly}=City.kit,TAU=Math.PI*2;
   const ellipse=(g,x,y,w,h,c)=>{g.fillStyle=c;g.beginPath();g.ellipse(x,y,w,h,0,0,TAU);g.fill();};
@@ -31,7 +31,7 @@
   City.art.year_lantern={box:[170,300,85,265],draw(g,o){const c=p(o);shadow(g,34);line(g,[[0,0],[0,-207]],c.dark,8);poly(g,[[-34,-194],[0,-246],[34,-194],[0,-157]],c.mid,c.dark,4);ellipse(g,0,-194,14,23,c.accent);}};
   City.art.year_waymarker={box:[210,300,105,260],draw(g,o){const c=p(o);shadow(g,43);poly(g,[[-50,0],[-38,-173],[0,-253],[38,-173],[50,0]],c.dark,c.light,4);ellipse(g,0,-153,24,26,c.accent);line(g,[[-24,-63],[24,-63]],c.light,5);}};
   City.art.year_axle={box:[620,690,310,640],draw(g){shadow(g,240);ellipse(g,0,-40,202,75,'#63756a');for(let i=0;i<4;i++){const a=i*TAU/4,x=Math.cos(a)*142,y=-42+Math.sin(a)*55;ellipse(g,x,y,48,24,pal[i].accent);}poly(g,[[-112,-47],[-83,-365],[0,-568],[83,-365],[112,-47]],'#65857b','#344d54',8);ellipse(g,0,-346,85,86,'#d7eeb7');ellipse(g,0,-346,57,59,'#4e9996');for(let i=0;i<12;i++){let a=i*TAU/12;ellipse(g,Math.cos(a)*97,-346+Math.sin(a)*101,10,10,pal[Math.floor(i/3)].accent);}}};
-  // Each sealed threshold has a different silhouette, but no destination or active portal.
+  // Each threshold has its own silhouette; the map's portals determine which one admits players.
   function gate(g,o,which){const c=pal[which];shadow(g,300);ellipse(g,0,-50,268,93,c.dark);for(let s of [-1,1]){poly(g,[[s*236,0],[s*236,-473],[s*167,-659],[s*105,-475],[s*100,0]],c.mid,c.dark,10);line(g,[[s*169,-601],[s*169,-370],[s*154,-120]],c.light,12);}poly(g,[[-256,-484],[-168,-671],[0,-772],[168,-671],[256,-484],[0,-550]],c.dark,c.light,9);ellipse(g,0,-322,106,231,'#183d4b');ellipse(g,0,-322,76,195,c.accent);g.globalAlpha=.45;ellipse(g,0,-322,55,175,c.light);g.globalAlpha=1;for(let i=0;i<12;i++){let a=i*TAU/12;ellipse(g,Math.cos(a)*130,-322+Math.sin(a)*235,10,13,c.accent);}if(which===0){for(let i=0;i<14;i++){let a=i*TAU/14,x=Math.cos(a)*224,y=-535+Math.sin(a)*135;ellipse(g,x,y,18,9,'#f6a6cf');}poly(g,[[-130,-777],[0,-862],[130,-777],[0,-805]],'#f7cadc',c.dark,5);}else if(which===1){for(let s of [-1,1])for(let i=0;i<3;i++)poly(g,[[s*(249+i*28),-442+i*28],[s*(310+i*27),-468+i*29],[s*(248+i*27),-492+i*28]],'#ffdf82',c.dark,3);ellipse(g,0,-741,75,75,'#ffcf5f');}else if(which===2){for(let i=0;i<7;i++){let x=(i-3)*63;poly(g,[[x,-616],[x+41,-651],[x+14,-726],[x-30,-680]],i%2?'#da7247':'#f7ba63',c.dark,3);}ellipse(g,0,-761,52,45,'#ffd478');}else{for(let i=-3;i<=3;i++)poly(g,[[i*74,-535],[i*74+21,-622],[i*74+56,-516],[i*74+31,-554]],'#cef7ff','#679cba',4);poly(g,[[-93,-778],[0,-880],[93,-778],[0,-812]],'#f3fdff','#679cba',5);}}
   for(const [kind,i] of [['year_bloom_gate',0],['year_solar_gate',1],['year_amber_gate',2],['year_solstice_gate',3]])City.art[kind]={box:[960,970,480,915],draw(g,o){gate(g,o,i);},animate(g,o,sx,sy,t){g.save();g.globalAlpha=.12+.07*Math.sin(t*2);ellipse(g,sx,sy-322,110,233,pal[i].accent);g.restore();}};
 })();

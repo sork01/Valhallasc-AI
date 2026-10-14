@@ -3,13 +3,13 @@
 import json, math, random
 from pathlib import Path
 import generate_gloamfen as fen
-import mercenary_offers, spark_travel
+import mercenary_offers, progression_quests, spark_travel
 from quest_gear_rewards import add_reward
 ROOT=Path(__file__).resolve().parents[1]
 MAP=ROOT/'world/map.txt'; ITEMS=ROOT/'world/items.txt'
 XP=json.loads((ROOT/'world/levels.txt').read_text())
 ZONE=25; NAME='The Lapis Erg'; ARRIVAL=(14,128); RETURN=(7,128)
-OLD_GATE=(119,95); OLD_ARRIVAL=(110,95)
+OLD_GATE=(119,95); OLD_ARRIVAL=(107,102)
 ELITES={'dunecolossus','mirageroc'}
 def obj(kind,x,y,r=0,**kw):return dict(kind=kind,x=round(x,2),y=round(y,2),r=r,v=kw.pop('v',0),**kw)
 def npc(key,name,role,x,y,dialogue,offers=None,buys=False,art=None):
@@ -39,7 +39,7 @@ def build():
  east=[(56,99),(82,116),(107,110),(129,92),(111,57)]
  north=[(49,55),(65,29),(92,21),(118,22),(139,29)]
  paths=[main,west,east,north,[(34,68),(54,78),(75,90)],[(107,110),(105,81),(91,73)],[(74,45),(103,41),(118,22)]]
- objects=[obj('lapis_astrolabe',140,23,width=10,depth=7,place='lapis_vault'),
+ objects=[obj('lapis_astrolabe',140,23,r=0,place='lapis_vault',open=True),
           obj('lapis_oasis',37,116,0,v=0),obj('lapis_oasis',67,71,0,v=1),obj('lapis_oasis',116,95,0,v=2),
           obj('lapis_caravan_tent',22,119,width=4,depth=3,v=0),obj('lapis_caravan_tent',33,137,width=4,depth=3,v=1),
           obj('lapis_caravan_tent',43,128,width=4,depth=3,v=2),obj('lapis_well',29,126,1),
@@ -74,12 +74,12 @@ def build():
  folk=[
   npc('keeper','Sahra Bluewell','Oasis keeper',27,131,'The Lapis Erg has three waters. Follow the brass markers; the dunes move, but the wells do not.',art='lapis_keeper'),
   npc('healer','Nima Reedglass','Water healer',17,135,'Rest by the date palms. I keep clean water and tinctures for travelers.',[dict(id='blessing',label='Receive a healing blessing',cost=0,heal=10000),dict(id='potion',label='Buy Health Potion',cost=30,item='health_potion',tiered=True)]),
-  npc('cartographer','Ivo Starfold','Desert cartographer',40,122,'The buried astrolabe once charted a sky that has never been seen from this world.',art='lapis_cartographer'),
+  npc('cartographer','Ivo Starfold','Desert cartographer',40,122,'The buried astrolabe charts the sky below us. Its iris now opens for prepared parties.',art='lapis_cartographer'),
   npc('trader','Basma Silk','Caravan trader',36,136,'Lapis dye, dates and dune maps. I will buy what the desert gives you.',[dict(id='stew',label="Buy Traveler's Stew",cost=12,item='traveler_stew',tiered=True),dict(id='satchel',label='Buy Linen Satchel',cost=500,bag='linen_satchel')],True),
   npc('scout','Tarek Windstep','Dune scout',51,105,'The fennecs cross the north flats at dusk. The scorpions favor the glassy salt.',mercenary_offers.offers()),
   npc('warden','Ruma Sunward','Oasis warden',77,86,'The stone giant stirs beyond the mirrored pool. Bring two friends before you face it.',mercenary_offers.offers(),art='lapis_warden'),
-  npc('seer','Laleh of the Lens','Astrolabe seer',127,45,'The Sunken Astrolabe is sealed beneath its turning lenses. Its door waits for five travelers.',art='lapis_seer'),
-  npc('stone','Lapis Meeting Stone','Gather a party · hire fighters',130,38,'Gather here before approaching the sealed astrolabe.',mercenary_offers.offers(open_=True),art='stone'),
+  npc('seer','Laleh of the Lens','Astrolabe seer',127,45,'The Sunken Astrolabe is open beneath its turning lenses. Bring five travelers.',art='lapis_seer'),
+  npc('stone','Lapis Meeting Stone','Gather a party · hire fighters',130,38,'Gather here before descending into the Sunken Astrolabe.',mercenary_offers.offers(open_=True),art='stone'),
  ]
  quests=[
   quest('welcome','Three Waters','keeper','Meet the healer, cartographer and scout at Azure Wells.',[talk('healer','Meet Nima'),talk('cartographer','Meet Ivo'),talk('scout','Meet Tarek')],80,8000),
@@ -89,14 +89,16 @@ def build():
   quest('vultures','Wings over Water','keeper','Keep sun vultures from the eastern water basin.',[kill('sunvulture',6,'Defeat Sun Vultures')],83,11800,'scorpions'),
   quest('colossus','The Walking Dune','warden','Three companions should confront the dune colossus beyond the mirrored pool.',[kill('dunecolossus',1,'Defeat the Dune Colossus')],84,19000,'scorpions',group=True,recommendedPlayers=3),
   quest('roc','The Mirage Roc','seer','Five companions must face the roc above the eastern oasis.',[kill('mirageroc',1,'Defeat the Mirage Roc')],85,26000,'vultures',group=True,recommendedPlayers=5),
-  quest('astrolabe','The Buried Sky','seer','Inspect the sealed astrolabe and consult the Meeting Stone.',[visit('vault','Inspect the Sunken Astrolabe'),talk('stone','Consult the Meeting Stone')],85,14000,'vultures'),
+  quest('astrolabe','The Buried Sky','seer','Inspect the open astrolabe and consult the Meeting Stone.',[visit('vault','Inspect the Sunken Astrolabe'),talk('stone','Consult the Meeting Stone')],85,14000,'vultures'),
+  quest('astro_trials','The Meridian Wardens','seer','Defeat the first two wardens and the mechanisms that protect the Sunken Astrolabe.',[kill('astro_warden',1,'Defeat the Meridian Warden'),kill('astro_navigator',1,'Defeat the Lost Navigator'),kill('astro_gearling',3,'Defeat Brass Gearlings')],85,23000,'astrolabe',group=True,recommendedPlayers=5),
+  quest('astro_final','Axis of the Buried Sky','seer','Destroy the buried axis and bring its starlight back to Azure Wells.',[kill('astro_axis',1,'Defeat the Axis of the Buried Sky')],85,36000,'astro_trials',group=True,recommendedPlayers=5,rewardItem='accessory_amber_l85_blue'),
   quest('patrol','Follow the Blue Wells','keeper','Patrol the desert routes between the basins.',[kill('sandhopper',3,'Defeat Sandhoppers'),kill('glassscorpion',3,'Defeat Glass Scorpions')],80,7000,'welcome',True),
  ]
  zone=dict(name=NAME,theme='lapiserg',tagline='Ochre dunes, turquoise oases, date palms and a sunken brass astrolabe',size=160,levels=[80,85],spawn=dict(x=ARRIVAL[0],y=ARRIVAL[1]),paths=[[[x,y] for x,y in path] for path in paths],objects=objects,slimes=spawns,npcs=folk,
            places=[dict(id='lapis_vault',name='The Sunken Astrolabe',x=132,y=29,r=5),dict(id='lapis_mirror',name='Mirrored Oasis',x=67,y=72,r=5),dict(id='lapis_east',name='Eastern Oasis',x=112,y=92,r=5)],quests=quests,
            city=dict(name='Azure Wells',x0=10,x1=50,y0=108,y1=148,plaza=dict(x=29,y=128),radius=6,entry=dict(x=14,y=128)),
-           futureInstance=dict(name='The Sunken Astrolabe',level=85,players=5,status='sealed',x=140,y=23,description='A vast brass lens rises from the dune; a spiral stair descends beneath its sealed iris.'),
-           portals=[dict(id='lapis_canopy_gate',name='The Sunroad',x=RETURN[0],y=RETURN[1],r=1.2,to=23,tx=OLD_ARRIVAL[0],ty=OLD_ARRIVAL[1],look='lapiserg')])
+           futureInstance=dict(name='The Sunken Astrolabe',level=85,players=5,status='open',x=140,y=23,description='A vast brass lens rises from the dune; a spiral stair descends beneath its open iris.'),
+           portals=[dict(id='lapis_canopy_gate',name='The Sunroad',x=RETURN[0],y=RETURN[1],r=1.2,to=23,tx=OLD_ARRIVAL[0],ty=OLD_ARRIVAL[1],look='lapiserg'),dict(id='lapis_astrolabe_gate',name='The Sunken Astrolabe',x=140,y=26,r=1.2,to=34,tx=48,ty=82,look='sunken_astrolabe')])
  check(zone);return zone
 
 def check(zone):
@@ -104,7 +106,7 @@ def check(zone):
  for target in [*zone['npcs'],*zone['slimes'],*zone['portals'],*zone['places']]:
   assert seen[int(target['y']/.5),int(target['x']/.5)],f'unreachable: {target}'
  assert all(math.hypot(s['x']-ARRIVAL[0],s['y']-ARRIVAL[1])>=8 for s in zone['slimes'])
- assert len(zone['slimes'])==42 and len(zone['quests'])==9
+ assert len(zone['slimes'])==42 and len(zone['quests'])==11
  assert all(len('quest:accept:'+q['id'])<=32 for q in zone['quests'])
 
 def open_canopy_gate(canopy):
@@ -133,13 +135,15 @@ def main():
  world=json.loads(MAP.read_text());assert world['zones'][22]['name']=='Veyrroot Canopy'
  later=world['zones'][ZONE-1:]
  while later and later[0].get('name')==NAME:later=later[1:]
+ previous=world['zones'][ZONE-1]
  world['zones']=world['zones'][:ZONE-1]
- open_canopy_gate(world['zones'][22]);world['zones'].append(build());world['zones'].extend(later)
+ zone=build();progression_quests.keep_released_rewards_and_route_quest(previous,zone)
+ open_canopy_gate(world['zones'][22]);world['zones'].append(zone);world['zones'].extend(later)
  if any(z.get('name')=='Frostwake Shelf' for z in later):open_glacier_gate(world['zones'][24])
  spark_travel.ensure(world);MAP.write_text(json.dumps(world,indent=2)+'\n')
  items=json.loads(ITEMS.read_text())
  for key,name,sell in [('sandhopper_chitin','Sandhopper Chitin',1900),('fennec_fur','Dune Fennec Fur',2100),('scorpion_glass','Glass Scorpion Shard',2200),('vulture_quill','Sun Vulture Quill',2300),('colossus_core','Dune Colossus Core',7800),('roc_plume','Mirage Roc Plume',9200)]:
   if not any(i['id']==key for i in items):items.append(dict(id=key,name=name,kind='material',rarity='common',sell=sell))
  ITEMS.write_text(json.dumps(items,indent=2)+'\n')
- print(f'{NAME}: {len(world["zones"][24]["objects"])} objects, 42 enemies, 9 quests')
+ print(f'{NAME}: {len(world["zones"][24]["objects"])} objects, 42 enemies, {len(world["zones"][24]["quests"])} quests')
 if __name__=='__main__':main()

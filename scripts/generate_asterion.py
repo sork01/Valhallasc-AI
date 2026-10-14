@@ -196,7 +196,9 @@ def city():
     for i,o in enumerate((o for o in b.objects if o['kind']=='aetherhouse'),1):
         o['label']=f'{i} Glasswalk'
     zone=dict(name=CITY_NAME,theme='asterion',tagline='Seven concentric streets beneath a sky of living glass',size=180,
-              spawn=dict(x=ARRIVAL[0],y=ARRIVAL[1]),paths=[],roads=roads(),objects=b.objects,slimes=[],npcs=people(),
+              spawn=dict(x=ARRIVAL[0],y=ARRIVAL[1]),
+              paths=[[[HOME_GATE[0],HOME_GATE[1]],[ARRIVAL[0],ARRIVAL[1]],[90,153]]],
+              roads=roads(),objects=b.objects,slimes=[],npcs=people(),
               quests=quests(),city=dict(name=CITY_NAME,x0=10,x1=170,y0=10,y1=172,plaza=dict(x=90,y=88),radius=13,
                                          entry=dict(x=90,y=162)),
               portals=[dict(id='asterion_moonspore_gate',name='The Glassroot Causeway',x=HOME_GATE[0],y=HOME_GATE[1],r=1.2,

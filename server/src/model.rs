@@ -319,6 +319,11 @@ pub struct Character {
     pub inventory: Vec<crate::items::ItemStack>,
     #[serde(default)]
     pub equipment: std::collections::BTreeMap<String, String>,
+    /// Per-copy gear data is materialized when an item service is used. Legacy stacks remain valid.
+    #[serde(default)]
+    pub gear_instances: Vec<crate::items::GearInstance>,
+    #[serde(default)]
+    pub next_gear_id: u64,
     #[serde(default)]
     pub bags: Vec<String>,
     #[serde(default)]
@@ -394,6 +399,8 @@ impl Character {
             quests: vec![],
             inventory: vec![],
             equipment: Default::default(),
+            gear_instances: vec![],
+            next_gear_id: 1,
             bags: vec![],
             attributes: Attributes::default(),
             zone: 0,
@@ -908,6 +915,14 @@ pub enum ClientMessage {
     Social {
         command: SocialCommand,
     },
+    /// Two-player item and gold exchange (server/src/world/trade.rs).
+    Trade {
+        command: TradeCommand,
+    },
+    /// Consensual duels, open-world opt-in combat and private arena matches.
+    Pvp {
+        command: PvpCommand,
+    },
     /// A vote on a party loot roll (server/src/world/rolls.rs).
     Roll {
         id: u64,
@@ -973,6 +988,40 @@ pub enum SocialCommand {
     PartyChat {
         text: String,
     },
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
+pub enum TradeCommand {
+    Request {
+        id: String,
+    },
+    Accept {
+        id: String,
+    },
+    Decline {
+        id: String,
+    },
+    Offer {
+        items: Vec<crate::items::ItemStack>,
+        gold: u32,
+    },
+    Confirm,
+    Cancel,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
+pub enum PvpCommand {
+    Flag { enabled: bool },
+    DuelRequest { id: String },
+    DuelAccept { id: String },
+    DuelDecline { id: String },
+    DuelCancel,
+    ArenaQueue { size: usize },
+    ArenaLeave,
+    Attack { id: String },
+    Refresh,
 }
 
 #[derive(Debug, Deserialize)]
@@ -1281,6 +1330,10 @@ pub struct Map {
     /// the first copy and the world appends the rest, each with `template` set (see world/instances.rs).
     #[serde(default)]
     pub copies: u32,
+    /// A finished floor plan whose outdoor entrance is still sealed. The
+    /// server refuses inbound portals until the dungeon's OPEN task removes it.
+    #[serde(default, rename = "sealedTemplate")]
+    pub sealed_template: bool,
     /// The enemy kind whose death clears the dungeon and opens its `after_clear` portals.
     #[serde(default)]
     pub final_boss: String,
@@ -1436,6 +1489,7 @@ mod tests {
             levels: None,
             zones: vec![],
             copies: 0,
+            sealed_template: false,
             final_boss: String::new(),
             players: 0,
             min_level: 0,

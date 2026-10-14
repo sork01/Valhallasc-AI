@@ -69,14 +69,15 @@
     for(let j=0;j<5;j++){const x=j*28-56;leaf(g,x,-19-j%2*9,23,j%2?'#74c87a':'#a0d78d');oval(g,x+4,-33-j%2*8,5,4,j%2?'#ffb3c6':'#f5dd87');}
   }};
   City.art.branch_rail={box:[170,125,85,95],draw(g,o){line(g,[[-64,0],[-64,-48],[-27,-61],[28,-61],[64,-48],[64,0]],'#806346',7);for(let x of [-35,0,35])leaf(g,x,-59,17,'#64ac6a');}};
-  City.art.heartwood_vault={box:[960,1040,480,950],draw(g){
+  City.art.heartwood_vault={box:[960,1040,480,950],draw(g,o){
     shadow(g,260);
-    // A sealed iris of overlapping living bark petals, with amber seams.
+    // A living iris of bark petals, with an open amber passage when unlocked.
     for(let side of [-1,1])poly(g,[[side*300,0],[side*270,-552],[side*199,-730],[side*110,-870],[side*149,-557],[side*184,0]],'#785a43','#354b3c',9);
     oval(g,0,-423,256,345,'#3a5b4b');oval(g,0,-423,224,306,'#d2b777');oval(g,0,-423,203,282,'#315f51');
-    for(let i=0;i<8;i++){const a=i*TAU/8;g.save();g.translate(0,-423);g.rotate(a);
+    for(let i=0;i<8;i++){const a=i*TAU/8;g.save();g.translate(0,-423);g.rotate(a);if(o.open)g.translate(0,-125);
       poly(g,[[-28,-196],[25,-196],[82,-30],[10,63],[-73,-30]],i%2?'#8cad6f':'#6f9763','#d7bf81',5);g.restore();}
-    oval(g,0,-423,58,76,'#f4d99b');oval(g,0,-423,39,56,'#a8e0ad');
+    if(o.open){oval(g,0,-423,128,202,'#172d25','#f4d99b');oval(g,0,-423,96,169,'#48765a');oval(g,0,-423,61,144,'#b8d89a');}
+    else {oval(g,0,-423,58,76,'#f4d99b');oval(g,0,-423,39,56,'#a8e0ad');}
     for(let j=-5;j<=5;j++){const x=j*48;line(g,[[x,-700],[x+Math.sin(j)*12,-190]],'#568c62',4);leaf(g,x,-730,22,j%2?'#7fbf78':'#abd983');}
     for(let side of [-1,1])for(let j=0;j<4;j++)oval(g,side*(218+j*25),-161-j*124,7,12,'#f1cf7c');
   },animate(g,o,sx,sy,t){g.save();g.globalAlpha=.16+.09*Math.sin(t*1.4);oval(g,sx,sy-430,69,81,'#fff0a8');g.restore();}};

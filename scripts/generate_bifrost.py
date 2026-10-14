@@ -254,7 +254,8 @@ def build(rng):
     scatter('skyrock', 40, .45, every, margin=1.2)
     scatter('cloudpuff', 110, .3, every, margin=.8, edge_min=2.0)
     zone = {'name': L.NAME, 'theme': 'sky', 'tagline': 'Above the storm, where the rainbow bridge broke into shards', 'size': SIZE, 'levels': list(L.LEVELS),
-            'spawn': {'x': L.ARRIVAL[0], 'y': L.ARRIVAL[1]}, 'paths': [],
+            'spawn': {'x': L.ARRIVAL[0], 'y': L.ARRIVAL[1]},
+            'paths': [[[L.GATE[0], L.GATE[1]], [L.ARRIVAL[0], L.ARRIVAL[1]]]],
             'sky': sky_rows(floor, bridges),
             'places': [dict(p, **({'waves': waves[p['id']]} if p['id'] in waves else {})) for p in L.PLACES],
             'objects': objects, 'slimes': spawns, 'npcs': npcs, 'quests': quests, 'city': city,

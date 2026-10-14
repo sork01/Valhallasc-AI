@@ -75,6 +75,11 @@
 .gossip-window :focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }
 .gossip-parchment .gossip-row:focus-visible { outline: 2px solid #3a5a08; outline-offset: -2px; }
 #npc-inventory h4 { margin: 0 0 .3cqw; font: bold max(14px, 1.3cqw) Georgia, serif; color: #3a1f05; }
+#npc-inventory .gear-service-select { display:block; width:100%; margin:.25cqw 0 .45cqw; padding:.4cqw; border:1px solid #8d744d; border-radius:.25cqw; background:#fff8df; color:#30210e; font: max(13px,1cqw) Georgia,serif; }
+#npc-inventory .gear-service-select:focus-visible { outline:2px solid #557d19; }
+#npc-inventory label { display:block; margin-top:.7cqw; font-weight:bold; }
+#npc-inventory p { margin:.35cqw 0; line-height:1.4; }
+#npc-inventory .btn { margin:.55cqw .4cqw .1cqw 0; }
 .gossip-parchment .inventory-item { background: #3b230a1f; border-color: #7a5c2b; }
 .gossip-parchment .inventory-item b { color: #2b1b08; font-family: Georgia, serif; }
 .gossip-parchment .inventory-item small { color: #5b4420; font-family: Georgia, serif; }
@@ -383,6 +388,8 @@
 .social-tabs { display: flex; gap: .4cqw; border-bottom: 1px solid #b89b5c80; }
 .social-tabs button { padding: .5cqw 1.2cqw; border: 1px solid transparent; border-bottom: 0; border-radius: .4cqw .4cqw 0 0; background: none; color: #cdbf9d; font: 1.05cqw 'Jua', sans-serif; cursor: pointer; }
 .social-tabs button[aria-selected="true"] { color: #ffe9a8; background: #2b3a52; border-color: #b89b5c80; }
+.pvp-duel-warning { position: absolute; z-index: 4; left: 50%; top: 3cqw; transform: translateX(-50%); max-width: 40cqw; padding: .6cqw 1.2cqw; border: 2px solid #ffb45e; border-radius: .8cqw; background: #361c27ed; color: #ffe8ac; font: 1.3cqw 'Jua', sans-serif; text-align: center; pointer-events: none; }
+.pvp-duel-warning[hidden] { display: none; }
 .social-add { display: flex; gap: .5cqw; }
 .social-add input { min-width: 0; flex: 1; padding: .5cqw .7cqw; border: 1px solid #827252; border-radius: .3cqw; background: #0e142a; color: #fff; font: inherit; }
 .social-add button[hidden] { display: none; }
@@ -610,3 +617,21 @@
 .party-level-bar { height: .7cqw; margin: .35cqw 0; border-radius: 999px; background: #0008; border: 1px solid #b89b5c80; overflow: hidden; }
 .party-level-bar i { display: block; height: 100%; background: linear-gradient(#ffe9a0, #d9a441); transition: width .2s; }
 .spark-route { grid-column: 2 / -1; display: block; font-size: .85em; color: #315d66; white-space: normal; }
+
+/* Player trade */
+.trade-request { position:absolute; left:50%; top:5cqw; transform:translateX(-50%); z-index:52; display:flex; align-items:center; gap:.8cqw; padding:.7cqw 1cqw; border:1px solid #d9c492aa; border-radius:.6cqw; background:#1f2d29f2; color:#f6ead0; font:1cqw 'Jua',sans-serif; box-shadow:0 .4cqw 1.2cqw #0009; }
+.trade-request .btn { font-size:.9cqw; padding:.3em 1em; }
+#trade-panel { z-index:49; }
+.trade-panel { position:static; width:49cqw; max-height:48cqw; overflow:auto; padding:1.4cqw 1.8cqw; color:#eee3cb; font:1cqw 'Jua',sans-serif; }
+.trade-panel h3 { margin:0 0 .4cqw; font:2cqw 'Jua',sans-serif; color:#f1d493; }
+.trade-panel h4 { margin:.2cqw 0 .5cqw; color:#ffe6a8; }
+.trade-panel p { margin:.4cqw 0; }
+.trade-offers { display:grid; grid-template-columns:1fr 1fr; gap:1cqw; }
+.trade-offers section { display:flex; flex-direction:column; gap:.4cqw; min-width:0; padding:.8cqw; border:1px solid #d9c49255; border-radius:.5cqw; background:#142820a8; }
+.trade-offers ul { min-height:5cqw; max-height:12cqw; overflow:auto; list-style:none; padding:0; margin:0; }
+.trade-offers li { display:flex; align-items:center; justify-content:space-between; gap:.4cqw; margin:.2cqw 0; }
+.trade-offers label { display:flex; align-items:center; justify-content:space-between; gap:.5cqw; }
+.trade-offers input, .trade-offers select { width:12cqw; min-width:0; padding:.35cqw; border:1px solid #827252; border-radius:.3cqw; background:#0e142a; color:#fff; font:inherit; }
+.trade-offers .window-tool { align-self:flex-start; }
+.trade-actions { display:flex; justify-content:flex-end; gap:.5cqw; margin-top:.9cqw; }
+.trade-panel :focus-visible, .trade-request :focus-visible { outline:3px solid #ffdc87; outline-offset:2px; }

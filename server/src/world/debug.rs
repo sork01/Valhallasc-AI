@@ -230,6 +230,9 @@ impl World {
                             "Only {spare} spare {id} can be taken (worn copies stay)."
                         ));
                     }
+                    if is_gear(it) {
+                        c.remove_loose_gear_instances(it, quantity);
+                    }
                     if let Some(stack) = c.inventory.iter_mut().find(|s| s.item == id) {
                         stack.quantity -= quantity;
                     }

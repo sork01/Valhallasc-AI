@@ -86,6 +86,17 @@ def for_zone(name):
                  requires=None, repeatable=False, autoLevel=level)]
 
 
+def keep_released_rewards_and_route_quest(previous, rebuilt):
+    """Keep later quest rewards when a terrain generator rebuilds its zone."""
+    old = {q['id']: q for q in previous.get('quests', [])}
+    for quest in rebuilt['quests']:
+        for field in ('rewardItem', 'rewardChoices'):
+            if field in old.get(quest['id'], {}):
+                quest[field] = old[quest['id']][field]
+    new_ids = {q['id'] for q in rebuilt['quests']}
+    rebuilt['quests'].extend(q for q in for_zone(rebuilt['name']) if q['id'] not in new_ids)
+
+
 def main():
     raw = PATH.read_text()
     world = json.loads(raw)

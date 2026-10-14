@@ -128,7 +128,7 @@ async function call(name, args = {}) {
   check(await alice.locator('#social-body [data-list="online"]').textContent().then(t => t.includes('<u>Eve</u>')), 'A name with markup in it is displayed literally');
   check(await alice.locator('#social-body u').count() === 0, 'No element is created from a player\'s name');
   check(await alice.locator('#social-body [data-player]', { hasText: 'Bobby' }).textContent().then(t => t.includes('Friend') && t.includes('In your party')), 'The online list labels friends and party members');
-  check(await alice.locator('#social-body [data-player]', { hasText: 'Eve' }).locator('button').allTextContents().then(t => t.join() === 'Add friend,Invite'), 'A stranger offers Add friend and Invite');
+  check(await alice.locator('#social-body [data-player]', { hasText: 'Eve' }).locator('button').allTextContents().then(t => t.join() === 'Trade,Add friend,Invite'), 'A stranger offers Trade, Add friend and Invite');
   await alice.locator('#social-body [data-player]', { hasText: 'Eve' }).locator('button', { hasText: 'Invite' }).click();
   await eve.locator('#social-invites .invite-card').waitFor({ state: 'visible', timeout: 10000 });
   check(await eve.locator('#social-invites .invite-card p').textContent().then(t => t.startsWith('Alice')), 'The invited stranger sees the prompt');

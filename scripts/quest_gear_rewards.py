@@ -95,6 +95,8 @@ REWARDS = {
     'ribbon_beetles': green(70, 'pants'),
     'ribbon_gryphon': blue(75, 'accessory'),
     'ribbon_colossus': blue(75, 'necklace'),
+    'ribbon_folds': blue(75, 'pants'),
+    'ribbon_final': blue(75, 'accessory'),
     'tangle_mantises': green(75, 'necklace'),
     'tangle_gliders': green(75, 'pants'),
     'tangle_anaconda': blue(80, 'accessory'),
@@ -120,6 +122,11 @@ REWARDS = {
     'yr_su_intro': green(95, 'pants'),
     'yr_au_intro': green(95, 'accessory'),
     'yr_wi_intro': green(95, 'necklace'),
+    'cairn_thunder_final': blue(95, 'accessory'),
+    'yr_sp_bloom_final': blue(95, 'necklace'),
+    'yr_su_solar_final': blue(95, 'accessory'),
+    'yr_au_amber_final': blue(95, 'necklace'),
+    'yr_wi_sols_final': blue(95, 'accessory'),
 }
 
 

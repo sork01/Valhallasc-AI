@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Seeded, repeatable Stormglass Shore (zone 19, levels 60–65).
 
-Run after generate_asterion.py. The Eye Below is only a sealed landmark:
-there is deliberately no portal or instance map for it.
+Run after generate_asterion.py. The Eye Below entrance opens into zone 29.
 """
 import json
 import math
@@ -78,9 +77,9 @@ def people_and_quests():
             [dict(id='buy_traveler_stew', label="Buy Traveler's Stew", cost=12, item='traveler_stew', tiered=True),
              dict(id='satchel', label='Buy Linen Satchel', cost=500, bag='linen_satchel')], True),
         npc('watcher', 'Mara of the Last Light', 'Eye Below warden', 96, 34,
-            'The Eye Below is sealed. Its stone remembers five voices, but no path opens yet. Learn what stalks this shore and return when the seal is ready.'),
+            'The Eye Below has opened. Gather five at the stone, then follow the living lens beneath the shore. All three wardens must fall before the far passage wakes.'),
         npc('stone', 'The Breakwater Meeting Stone', 'Gather a party · hire fighters', 91, 27,
-            'The runes gather companions for 250 gold each. The Eye Below is sealed; this stone can still help a party face the shore.',
+            'The runes gather companions for 250 gold each. The Eye Below is open to heroes of level 65 and above. Enter together; each party receives its own descent.',
             mercenary_offers.offers(open_=True)),
     ]
     people[-1]['art'] = 'stone'
@@ -95,8 +94,17 @@ def people_and_quests():
               [bring('glassfin', 5, 'Bring Glassfins')], 62, 4400, 'gulls'),
         quest('guards', 'The Tide Remembers', 'watcher', 'Silence the old Breaker Sentinels along the northern approach.',
               [kill('breakersentinel', 5, 'Defeat Breaker Sentinels')], 64, 5200, 'rays'),
-        quest('eye', 'The Eye That Will Not Open', 'watcher', 'Inspect the sealed Eye and speak to the Meeting Stone. The descent is for a future expedition.',
+        quest('eye', 'The Eye That Will Not Open', 'watcher', 'Inspect the Eye and speak to the Meeting Stone before descending.',
               [visit('eye', 'Inspect the Eye Below'), talk('stone', 'Speak with the Meeting Stone')], 65, 6200, 'guards'),
+        quest('depth', 'The Silt Beneath', 'watcher', 'Cut through the drifters, lurkers and adepts guarding the first chambers.',
+              [kill('eye_drifter', 3, 'Defeat Silt Drifters'), kill('eye_lurker', 3, 'Defeat Glassjaw Lurkers'),
+               kill('eye_adept', 3, 'Defeat Veil Adepts')], 65, 7600, 'eye', group=True, recommendedPlayers=5),
+        quest('ward', 'The Unblinking Deep', 'watcher', 'Break every ward in your party’s private descent to open the far passage.',
+              [kill('eye_lenswarden', 1, 'Break the Lenswarden'),
+               kill('eye_undertide', 1, 'Silence the Undertide Sibyl'),
+               kill('eye_unblinking', 1, 'Close the Unblinking Eye')], 65, 14000,
+              'depth', group=True, recommendedPlayers=5,
+              rewardItem='accessory_amber_l65_eye'),
         quest('heart', 'Heart of the Storm', 'warden', 'The living storm has taken shape on the high shore. Gather five companions.',
               [kill('maelstromheart', 1, 'Defeat the Maelstrom Heart')], 65, 9500, 'guards', group=True, recommendedPlayers=5),
         quest('patrol', 'Keep the Lamps Burning', 'warden', 'Thin the creatures gathering outside camp.',
@@ -166,10 +174,12 @@ def build():
                       dict(id='stormglass_bell',name='The Tide Bell',x=92,y=36,r=3)],
               quests=quests,city=dict(name='Breakwater Camp',x0=10,x1=49,y0=96,y1=124,
                                      plaza=dict(x=30,y=108),radius=6,entry=dict(x=13,y=105)),
-              futureInstance=dict(name='The Eye Below',level=65,players=5,status='sealed',x=105,y=23,
-                                  description='A sealed five-player descent beneath the stormglass sea.'),
+              futureInstance=dict(name='The Eye Below',level=65,players=5,status='open',x=105,y=23,
+                                  description='An open five-player descent beneath the stormglass sea.'),
               portals=[dict(id='stormglass_asterion_gate',name='The Stormglass Causeway',x=RETURN[0],y=RETURN[1],r=1.2,
-                            to=17,tx=CITY_ARRIVAL[0],ty=CITY_ARRIVAL[1],look='stormglass')])
+                            to=17,tx=CITY_ARRIVAL[0],ty=CITY_ARRIVAL[1],look='stormglass'),
+                       dict(id='stormglass_eye_descent',name='The Eye Below',x=105,y=27,r=1.2,
+                            to=29,tx=48,ty=82,look='eye_below')])
     check(zone)
     return zone
 
@@ -181,7 +191,7 @@ def check(zone):
     assert all(math.hypot(s['x']-ARRIVAL[0],s['y']-ARRIVAL[1])>=8 for s in zone['slimes'])
     assert all(math.hypot(s['x']-CITY_ARRIVAL[0],s['y']-CITY_ARRIVAL[1])>=8 for s in zone['slimes'])
     for q in zone['quests']:assert len('quest:accept:'+q['id'])<=32,q['id']
-    assert len(zone['slimes'])==41 and len(zone['quests'])==8
+    assert len(zone['slimes'])==41 and len(zone['quests'])==10
 
 
 def open_city_gate(city):
@@ -211,11 +221,17 @@ def main():
     items=json.loads(ITEMS.read_text())
     for id_,name,sell in [('saltclaw_shell','Saltclaw Shell',460),('stormgull_feather','Stormgull Feather',490),
                           ('glassfin','Glassfin',530),('breaker_core','Breaker Core',600),
-                          ('stormheart','Stormheart',2200)]:
+                          ('stormheart','Stormheart',2200),
+                          ('eye_drifter_relic','Drifter Filament',650),
+                          ('eye_lurker_relic','Glassjaw Tooth',700),
+                          ('eye_adept_relic','Veil Sigil',720),
+                          ('eye_lenswarden_relic','Lenswarden Prism',2400),
+                          ('eye_undertide_relic','Undertide Pearl',2600),
+                          ('eye_unblinking_relic','Unblinking Iris',3800)]:
         if not any(i['id']==id_ for i in items):
             items.append(dict(id=id_,name=name,kind='material',rarity='common',sell=sell))
     ITEMS.write_text(json.dumps(items,indent=2)+'\n')
-    print(f'{NAME}: {len(world["zones"][18]["objects"])} objects, 41 enemies, 8 quests')
+    print(f'{NAME}: {len(world["zones"][18]["objects"])} objects, 41 enemies, 10 quests')
 
 
 if __name__=='__main__':main()

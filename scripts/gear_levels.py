@@ -194,6 +194,17 @@ def main():
     out.extend(vault_pieces(out))
     out.extend(cathedral_pieces(out))
     out.extend(moonwell_pieces(out))
+    out.extend(eye_below_pieces(out))
+    out.extend(elder_hollow_pieces(out))
+    out.extend(thousandfold_pieces(out))
+    out.extend(rain_crown_pieces(out))
+    out.extend(seed_vault_pieces(out))
+    out.extend(sunken_astrolabe_pieces(out))
+    out.extend(dungeon_pieces(out, 'thunderheart_gate', 'thunder', 'Stormbound', {'hue':205,'saturate':1.3,'brightness':1.2}))
+    out.extend(dungeon_pieces(out, 'blooming_labyrinth', 'bloom', 'Glassbloom', {'hue':315,'saturate':1.28,'brightness':1.18}))
+    out.extend(dungeon_pieces(out, 'solar_crucible', 'solar', 'Sunforged', {'hue':34,'saturate':1.35,'brightness':1.22}))
+    out.extend(dungeon_pieces(out, 'amber_archive', 'amber', 'Archivist', {'hue':42,'saturate':1.22,'brightness':1.18}))
+    out.extend(dungeon_pieces(out, 'silent_solstice', 'solstice', 'Nightglass', {'hue':207,'saturate':1.2,'brightness':1.23}))
     # Keep existing catalog order stable: migrations, item-icon cells and reviews need no reshuffle.
     order = {i['id']: n for n, i in enumerate(existing)}
     out.sort(key=lambda i: order.get(i['id'], len(order)))
@@ -299,6 +310,177 @@ def moonwell_pieces(out):
         v['bonusStats'] = bonus_stats(v)
         pieces.append(ordered(v))
     assert len(pieces) == 28
+    return pieces
+
+
+def eye_below_pieces(out):
+    """A level-65 blue set reserved for the three Eye Below bosses."""
+    pieces = []
+    for i in out:
+        if i.get('source') or i['rarity'] != 'rare' or i.get('requiredLevel') != 65:
+            continue
+        if i['kind'] not in CLASS_KINDS + SHARED_KINDS:
+            continue
+        v = dict(i)
+        suffix = '_l65_blue'
+        assert i['id'].endswith(suffix), i['id']
+        v['id'] = i['id'][:-len(suffix)] + '_l65_eye'
+        v['variant'] = i['variant'][:-len(suffix)] + '_l65_eye'
+        v['name'] = 'Deepglass ' + i['name'].split(' ', 1)[-1]
+        v['attack'] = round(i['attack'] * 1.15, 1)
+        v['defense'] = round(i['defense'] * 1.15, 1)
+        v['sell'] = round(i['sell'] * 1.15)
+        v['source'] = 'eye_below'
+        v['tint'] = {'hue': 190, 'saturate': 1.25, 'brightness': 1.12}
+        v['bonusStats'] = bonus_stats(v)
+        pieces.append(ordered(v))
+    assert len(pieces) == 28
+    return pieces
+
+
+def elder_hollow_pieces(out):
+    """A level-70 rare set reserved for the Elder Hollow bosses."""
+    pieces = []
+    for i in out:
+        if i.get('source') or i['rarity'] != 'rare' or i.get('requiredLevel') != 70:
+            continue
+        if i['kind'] not in CLASS_KINDS + SHARED_KINDS:
+            continue
+        v = dict(i)
+        suffix = '_l70_blue'
+        assert i['id'].endswith(suffix), i['id']
+        v['id'] = i['id'][:-len(suffix)] + '_l70_elder'
+        v['variant'] = i['variant'][:-len(suffix)] + '_l70_elder'
+        v['name'] = 'Oakheart ' + i['name'].split(' ', 1)[-1]
+        v['attack'] = round(i['attack'] * 1.15, 1)
+        v['defense'] = round(i['defense'] * 1.15, 1)
+        v['sell'] = round(i['sell'] * 1.15)
+        v['source'] = 'elder_hollow'
+        v['tint'] = {'hue': 105, 'saturate': 1.17, 'brightness': 1.12}
+        v['bonusStats'] = bonus_stats(v)
+        pieces.append(ordered(v))
+    assert len(pieces) == 28
+    return pieces
+
+
+def thousandfold_pieces(out):
+    """A level-75 rare set reserved for the Pavilion bosses."""
+    pieces = []
+    for i in out:
+        if i.get('source') or i['rarity'] != 'rare' or i.get('requiredLevel') != 75:
+            continue
+        if i['kind'] not in CLASS_KINDS + SHARED_KINDS:
+            continue
+        v = dict(i)
+        suffix = '_l75_blue'
+        assert i['id'].endswith(suffix), i['id']
+        v['id'] = i['id'][:-len(suffix)] + '_l75_pavilion'
+        v['variant'] = i['variant'][:-len(suffix)] + '_l75_pavilion'
+        v['name'] = 'Thousandfold ' + i['name'].split(' ', 1)[-1]
+        v['attack'] = round(i['attack'] * 1.15, 1)
+        v['defense'] = round(i['defense'] * 1.15, 1)
+        v['sell'] = round(i['sell'] * 1.15)
+        v['source'] = 'thousandfold'
+        v['tint'] = {'hue': 305, 'saturate': 1.18, 'brightness': 1.12}
+        v['bonusStats'] = bonus_stats(v)
+        pieces.append(ordered(v))
+    assert len(pieces) == 28
+    return pieces
+
+
+def rain_crown_pieces(out):
+    """A level-80 rare set reserved for the Rain Crown's three bosses."""
+    pieces = []
+    for i in out:
+        if i.get('source') or i['rarity'] != 'rare' or i.get('requiredLevel') != 80:
+            continue
+        if i['kind'] not in CLASS_KINDS + SHARED_KINDS:
+            continue
+        v = dict(i)
+        suffix = '_l80_blue'
+        assert i['id'].endswith(suffix), i['id']
+        v['id'] = i['id'][:-len(suffix)] + '_l80_rain'
+        v['variant'] = i['variant'][:-len(suffix)] + '_l80_rain'
+        v['name'] = 'Rainbound ' + i['name'].split(' ', 1)[-1]
+        v['attack'] = round(i['attack'] * 1.15, 1)
+        v['defense'] = round(i['defense'] * 1.15, 1)
+        v['sell'] = round(i['sell'] * 1.15)
+        v['source'] = 'rain_crown'
+        v['tint'] = {'hue': 145, 'saturate': 1.22, 'brightness': 1.15}
+        v['bonusStats'] = bonus_stats(v)
+        pieces.append(ordered(v))
+    assert len(pieces) == 28
+    return pieces
+
+
+def seed_vault_pieces(out):
+    """A level-80 rare set reserved for the Seed Vault bosses."""
+    pieces = []
+    for i in out:
+        if i.get('source') or i['rarity'] != 'rare' or i.get('requiredLevel') != 80:
+            continue
+        if i['kind'] not in CLASS_KINDS + SHARED_KINDS:
+            continue
+        v = dict(i)
+        suffix = '_l80_blue'
+        assert i['id'].endswith(suffix), i['id']
+        v['id'] = i['id'][:-len(suffix)] + '_l80_seed'
+        v['variant'] = i['variant'][:-len(suffix)] + '_l80_seed'
+        v['name'] = 'Worldseed ' + i['name'].split(' ', 1)[-1]
+        v['attack'] = round(i['attack'] * 1.15, 1)
+        v['defense'] = round(i['defense'] * 1.15, 1)
+        v['sell'] = round(i['sell'] * 1.15)
+        v['source'] = 'seed_vault'
+        v['tint'] = {'hue': 85, 'saturate': 1.25, 'brightness': 1.16}
+        v['bonusStats'] = bonus_stats(v)
+        pieces.append(ordered(v))
+    assert len(pieces) == 28
+    return pieces
+
+
+def sunken_astrolabe_pieces(out):
+    # Level-85 rare gear reserved for the Sunken Astrolabe bosses.
+    pieces=[]
+    for i in out:
+        if i.get('source') or i['rarity'] != 'rare' or i.get('requiredLevel') != 85:
+            continue
+        if i['kind'] not in CLASS_KINDS + SHARED_KINDS:
+            continue
+        v=dict(i);suffix='_l85_blue'
+        assert i['id'].endswith(suffix),i['id']
+        v['id']=i['id'][:-len(suffix)]+'_l85_astro'
+        v['variant']=i['variant'][:-len(suffix)]+'_l85_astro'
+        v['name']='Meridian '+i['name'].split(' ',1)[-1]
+        v['attack']=round(i['attack']*1.15,1)
+        v['defense']=round(i['defense']*1.15,1)
+        v['sell']=round(i['sell']*1.15)
+        v['source']='sunken_astrolabe'
+        v['tint']={'hue':202,'saturate':1.27,'brightness':1.17}
+        v['bonusStats']=bonus_stats(v)
+        pieces.append(ordered(v))
+    assert len(pieces)==28
+    return pieces
+
+
+def dungeon_pieces(out, source, suffix_name, prefix, tint):
+    """Exclusive level-95 set for the late private dungeons."""
+    pieces=[]
+    for i in out:
+        if i.get('source') or i['rarity']!='rare' or i.get('requiredLevel')!=95:
+            continue
+        if i['kind'] not in CLASS_KINDS+SHARED_KINDS:
+            continue
+        v=dict(i);suffix='_l95_blue'
+        assert i['id'].endswith(suffix),i['id']
+        v['id']=i['id'][:-len(suffix)]+'_l95_'+suffix_name
+        v['variant']=i['variant'][:-len(suffix)]+'_l95_'+suffix_name
+        v['name']=prefix+' '+i['name'].split(' ',1)[-1]
+        v['attack']=round(i['attack']*1.15,1)
+        v['defense']=round(i['defense']*1.15,1)
+        v['sell']=round(i['sell']*1.15)
+        v['source']=source;v['tint']=tint;v['bonusStats']=bonus_stats(v)
+        pieces.append(ordered(v))
+    assert len(pieces)==28,(source,len(pieces))
     return pieces
 
 

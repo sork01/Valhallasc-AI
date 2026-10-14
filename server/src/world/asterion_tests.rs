@@ -69,7 +69,7 @@ fn moonwell_has_four_private_copies_safe_arrivals_and_a_unique_boss_drop() {
     );
     assert_eq!(well.final_boss, "moonwell_echo");
     assert_eq!(w.instances.iter().filter(|i| i.template == WELL).count(), 4);
-    assert_eq!(w.maps.len(), 44);
+    assert_eq!(w.maps.len(), 49);
     let seen = flood(well, &blocked(well, &[]), well.spawn);
     for s in w.slimes.iter().filter(|s| s.zone == WELL) {
         assert!(reached(well, &seen, s.point()), "{}", s.kind);
@@ -103,6 +103,7 @@ fn moonwell_has_four_private_copies_safe_arrivals_and_a_unique_boss_drop() {
         for slots in boss_slots(kind) {
             let piece = boss_piece_for(kind, slots, 0.5).unwrap();
             assert_eq!((piece.required_level, piece.rarity.as_str()), (60, "rare"));
+            assert_eq!(piece.source.as_deref(), Some("moonwell"));
         }
     }
     assert_eq!(well.slimes.iter().filter(|s| is_boss(&s.kind)).count(), 4);
@@ -151,6 +152,50 @@ fn moonwell_exit_waits_for_every_boss_even_if_echo_dies_first() {
                 .any(|d| d.zone == WELL && d.item.as_deref() == Some(material(kind)))
         );
     }
+}
+
+#[test]
+fn moonwell_boss_exclusive_gear_uses_party_rolls() {
+    let mut w = world();
+    let _a = join(&mut w, 1, Class::Warrior);
+    let _b = join(&mut w, 2, Class::Priest);
+    for session in [1, 2] {
+        w.players.get_mut(&session).unwrap().character.level = 60;
+    }
+    let friend = w.players[&2].character.id.clone();
+    w.social(
+        1,
+        SocialCommand::PartyInvite {
+            id: Some(friend),
+            name: None,
+        },
+    );
+    w.social(
+        2,
+        SocialCommand::PartyAccept {
+            id: w.players[&1].character.id.clone(),
+        },
+    );
+    let boss = w
+        .slimes
+        .iter()
+        .position(|s| s.zone == WELL && s.kind == "moonwell_echo")
+        .unwrap();
+    let at = w.slimes[boss].point();
+    for session in [1, 2] {
+        place(&mut w, session, WELL, at);
+    }
+    w.hit_slime(boss, 1, 1e9, false);
+    let rolls: Vec<_> = w
+        .rolls
+        .iter()
+        .filter(|r| item(&r.item).is_some_and(|i| i.source.as_deref() == Some("moonwell")))
+        .collect();
+    assert_eq!(rolls.len(), boss_slots("moonwell_echo").len());
+    let a = &w.players[&1].character.id;
+    let b = &w.players[&2].character.id;
+    assert!(rolls.iter().all(|r| r.votes.iter().any(|(id, _)| id == a)
+        && r.votes.iter().any(|(id, _)| id == b)));
 }
 
 #[test]

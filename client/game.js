@@ -131,7 +131,7 @@
   // ---------- background music (music.js) ----------
   // Browsers only let audio start after a tap or key press, so the score begins on the first one
   // (on the title screen that is the tap that awakens the horn) and then plays on every screen.
-  let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, wmusic = null, kmusic = null, dmusic = null, nmusic = null, amusic = null, pmusic = null, omusic = null, mmusic = null, hmusic = null, tmusic = null, qmusic = null, jmusic = null, whmusic = null, lmusic = null, fwMusic = null, cairnMusic = null, yearMusic = null, cathedralMusic = [], musicZone = 0;
+  let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, wmusic = null, kmusic = null, dmusic = null, nmusic = null, amusic = null, pmusic = null, omusic = null, mmusic = null, hmusic = null, tmusic = null, qmusic = null, jmusic = null, whmusic = null, lmusic = null, fwMusic = null, cairnMusic = null, yearMusic = null, cathedralMusic = [], eyeMusic = null, elderMusic = null, pavilionMusic = null, rainMusic = null, seedMusic = null, sunkenMusic = null, thunderMusic = null, bloomMusic = null, solarMusic = null, amberMusic = null, solsticeMusic = null, musicZone = 0;
   function ensureMusic() {
     const c = audio(); if (!c || !window.createMusic) return;
     if (!music) { music = window.createMusic(c); c.addEventListener('statechange', ensureMusic); }
@@ -158,6 +158,17 @@
     if (!fwMusic && window.createFrostwakeMusic) fwMusic = window.createFrostwakeMusic(c);
     if (!cairnMusic && window.createCairnMusic) cairnMusic = window.createCairnMusic(c);
     if (!yearMusic && window.createYearwheelMusic) yearMusic = window.createYearwheelMusic(c);
+    if (!eyeMusic && window.createEyeBelowMusic) eyeMusic = window.createEyeBelowMusic(c);
+    if (!elderMusic && window.createElderHollowMusic) elderMusic = window.createElderHollowMusic(c);
+    if (!pavilionMusic && window.createPavilionMusic) pavilionMusic = window.createPavilionMusic(c);
+    if (!rainMusic && window.createRainCrownMusic) rainMusic = window.createRainCrownMusic(c);
+    if (!seedMusic && window.createSeedVaultMusic) seedMusic = window.createSeedVaultMusic(c);
+    if (!sunkenMusic && window.createSunkenMusic) sunkenMusic = window.createSunkenMusic(c);
+    if (!thunderMusic && window.createThunderMusic) thunderMusic = window.createThunderMusic(c);
+    if (!bloomMusic && window.createBloomMusic) bloomMusic = window.createBloomMusic(c);
+    if (!solarMusic && window.createSolarMusic) solarMusic = window.createSolarMusic(c);
+    if (!amberMusic && window.createAmberMusic) amberMusic = window.createAmberMusic(c);
+    if (!solsticeMusic && window.createSolsticeMusic) solsticeMusic = window.createSolsticeMusic(c);
     if (!cathedralMusic.length && window.createCathedralMusic) cathedralMusic = [0,1,2].map(i => window.createCathedralMusic(c,i));
     syncMusic();
   }
@@ -165,15 +176,15 @@
   function syncMusic() {
     if (!ac || ac.state !== 'running') return;
     // In the game each zone selects its score; Greenmeadow and Alderhaven share the folk tune.
-    const here = scene === 'game' ? (musicZone === 28 && yearMusic ? yearMusic : musicZone === 27 && cairnMusic ? cairnMusic : musicZone === 26 && fwMusic ? fwMusic : musicZone === 25 && lmusic ? lmusic : (musicZone === 23 || musicZone === 24) && whmusic ? whmusic : musicZone === 22 && jmusic ? jmusic : musicZone === 21 && qmusic ? qmusic : musicZone === 20 && tmusic ? tmusic : musicZone === 17 && hmusic ? hmusic : (musicZone === 18 || (musicZone >= 41 && musicZone <= 43) || musicZone === 16) && mmusic ? mmusic : (musicZone === 19 || (musicZone >= 29 && musicZone <= 31)) && vmusic ? vmusic : musicZone === 15 && omusic ? omusic : musicZone === 14 && pmusic ? pmusic : musicZone === 13 && amusic ? amusic : musicZone >= 10 && musicZone <= 12 && cathedralMusic[musicZone - 10] ? cathedralMusic[musicZone - 10] : musicZone === 9 && nmusic ? nmusic : musicZone === 8 && dmusic ? dmusic : musicZone === 7 && kmusic ? kmusic : musicZone === 6 && wmusic ? wmusic : musicZone === 5 ? vmusic : musicZone === 4 && smusic ? smusic : musicZone === 3 && gmusic ? gmusic : musicZone === 2 && rmusic ? rmusic : musicZone > 0 && cmusic ? cmusic : fmusic) : null;
-    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, ...cathedralMusic]) if (m && m !== here && m.running) m.stop();
+    const here = scene === 'game' ? (musicZone === 28 && yearMusic ? yearMusic : musicZone === 27 && cairnMusic ? cairnMusic : musicZone === 26 && fwMusic ? fwMusic : musicZone === 25 && lmusic ? lmusic : (musicZone === 23 || musicZone === 24) && whmusic ? whmusic : musicZone === 22 && jmusic ? jmusic : musicZone === 21 && qmusic ? qmusic : musicZone === 20 && tmusic ? tmusic : musicZone === 17 && hmusic ? hmusic : (musicZone === 18 || (musicZone >= 41 && musicZone <= 43) || musicZone === 16) && mmusic ? mmusic : musicZone === 29 && eyeMusic ? eyeMusic : musicZone === 30 && elderMusic ? elderMusic : musicZone === 31 && pavilionMusic ? pavilionMusic : musicZone === 32 && rainMusic ? rainMusic : musicZone === 33 && seedMusic ? seedMusic : musicZone === 34 && sunkenMusic ? sunkenMusic : musicZone === 35 && thunderMusic ? thunderMusic : musicZone === 36 && bloomMusic ? bloomMusic : musicZone === 37 && solarMusic ? solarMusic : musicZone === 38 && amberMusic ? amberMusic : musicZone === 39 && solsticeMusic ? solsticeMusic : (musicZone === 19 || (musicZone >= 30 && musicZone <= 33)) && vmusic ? vmusic : musicZone === 15 && omusic ? omusic : musicZone === 14 && pmusic ? pmusic : musicZone === 13 && amusic ? amusic : musicZone >= 10 && musicZone <= 12 && cathedralMusic[musicZone - 10] ? cathedralMusic[musicZone - 10] : musicZone === 9 && nmusic ? nmusic : musicZone === 8 && dmusic ? dmusic : musicZone === 7 && kmusic ? kmusic : musicZone === 6 && wmusic ? wmusic : musicZone === 5 ? vmusic : musicZone === 4 && smusic ? smusic : musicZone === 3 && gmusic ? gmusic : musicZone === 2 && rmusic ? rmusic : musicZone > 0 && cmusic ? cmusic : fmusic) : null;
+    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, ...cathedralMusic]) if (m && m !== here && m.running) m.stop();
     if (scene === 'game') { if (music && music.running) music.stop(); if (here && !here.running) here.start(); }
     else if (music && !music.running) music.start();
     applyMusicLevel(3);
   }
   function applyMusicLevel(secs = 1.5) {
     if (music) music.setLevel(save.sound ? (scene === 'splash' ? 1 : .55) * taper(save.musicVol) : 0, secs);
-    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, ...cathedralMusic]) if (m) m.setLevel(save.sound ? taper(save.musicVol) : 0, secs);
+    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, ...cathedralMusic]) if (m) m.setLevel(save.sound ? taper(save.musicVol) : 0, secs);
   }
   function unlockAudio() { const c = audio(); if (c) c.resume().then(ensureMusic).catch(() => {}); }
   ['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, unlockAudio, { capture: true }));
@@ -480,8 +491,23 @@
 
   // ---------- the field: first map (field.js) ----------
   const hud = { lv: $('hud-lv'), hp: $('hp-fill'), hpT: $('hp-text'), xp: $('xp-fill'), gold: $('hud-gold'), kills: $('hud-kills') };
+  let portraitTarget = null, portraitReady = false;
   function onHud(s) {
     hud.hp.style.width = (s.hp / s.maxHp * 100).toFixed(1) + '%'; hud.hpT.textContent = `${Math.ceil(s.hp)} / ${s.maxHp}`;
+    const target = s.target, targetBadge = $('hud-target');
+    targetBadge.hidden = !target;
+    if (target) {
+      $('hud-target-name').textContent = target.name;
+      $('hud-target-level').textContent = ` Lv ${target.level}`;
+      $('hud-target-fill').style.width = `${Math.max(0, Math.min(100, target.hp / target.maxHp * 100))}%`;
+      $('hud-target-text').textContent = `${Math.ceil(target.hp)} / ${target.maxHp}`;
+      $('hud-target-hp').setAttribute('aria-valuenow', Math.ceil(target.hp));
+      $('hud-target-hp').setAttribute('aria-valuemax', target.maxHp);
+      if (portraitTarget !== target.id || !portraitReady) {
+        portraitTarget = target.id;
+        portraitReady = Field.drawTargetPortrait(target, $('hud-target-face'));
+      }
+    } else { portraitTarget = null; portraitReady = false; }
     const resource = $('resource-bar'), kind = s.resourceType || 'rage', current = s.resource || 0, max = s.maxResource || 100;
     resource.dataset.type = kind; resource.setAttribute('aria-label', kind[0].toUpperCase() + kind.slice(1));
     resource.setAttribute('aria-valuenow', Math.floor(current)); resource.setAttribute('aria-valuemax', max);

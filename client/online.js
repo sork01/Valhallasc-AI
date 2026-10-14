@@ -70,7 +70,7 @@
           }
           characterGm = character?.gm === true; window.GM?.onSelf(character);
           callbacks.onWelcome?.(packet);
-          window.Social?.reset(); send({ type: 'social', command: { op: 'refresh' } });
+          window.Social?.reset(); window.Trade?.reset(); window.Pvp?.reset(); window.Trade?.onSnapshot(character); send({ type: 'social', command: { op: 'refresh' } }); if (character?.pvpSupported) send({ type: 'pvp', command: { op: 'refresh' } });
           $('connection-overlay').hidden = true; $('chat-input').disabled = false;
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
           log('Welcome to Greenmeadow. E: character · B/I: bags · K: skills · 1–9, 0, -, =: skillbar · Q: quests · O: friends · P: party · F: talk · Enter: chat (/p for party).');
@@ -83,6 +83,7 @@
           status(`${away || (window.City?.inside(character?.x, character?.y) ? WORLD_MAP.city.name : 'Greenmeadow')} · ${packet.online} online`, true);
           const slot = mode === 'guest' ? saved.characters.find(c => c.token === saved.current) : null;
           if (character) window.GM?.onSelf(character);
+          if (character) window.Trade?.onSnapshot(character);
           if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
           callbacks.onSnapshot?.(packet); break;
         }
@@ -93,6 +94,8 @@
         case 'notice': log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;
         case 'debug': window.GM?.onReply(packet); break;
         case 'social': window.Social?.onState(packet); break;
+        case 'trade': window.Trade?.onPacket(packet); break;
+        case 'pvp': window.Pvp?.onPacket(packet); break;
         case 'roll': window.Rolls?.onPacket(packet); break;
         case 'party': window.Social?.onParty(packet.party); break;
         case 'who': window.Social?.onWho(packet.players); break;
@@ -108,7 +111,7 @@
       clearTimeout(joinTimeout);
       if (!active || currentGeneration !== generation) return;
       clearInterval(heartbeat);
-      connected = false; characterGm = false; window.GM?.onSelf(null); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; characterGm = false; window.GM?.onSelf(null); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay('Connection lost. Reconnecting to your character…');
@@ -121,7 +124,7 @@
       $('chat').hidden = false; connect();
     },
     stop() {
-      active = false; generation++; connected = false; id = null; window.Social?.reset(); window.Rolls?.reset();
+      active = false; generation++; connected = false; id = null; window.Social?.reset(); window.Trade?.reset(); window.Pvp?.reset(); window.Rolls?.reset();
       clearTimeout(retryTimer); clearInterval(heartbeat);
       socket?.close(); socket = null;
       $('chat').hidden = true; $('connection-overlay').hidden = true;

@@ -96,6 +96,7 @@
       who.append(el('b', f.name), el('small', `Lv ${f.level} ${CLASSES[f.class] || ''} · ${f.online ? f.place : 'Offline'}`));
       row.append(who);
       if (f.online && !inParty(f.id)) row.append(button('Invite to party', `invite:${f.id}`, () => send({ op: 'party_invite', id: f.id })));
+      if (f.online) row.append(button('Trade', `trade:${f.id}`, () => window.Trade?.request(f.id)));
       row.append(button('Remove', `unfriend:${f.id}`, () => send({ op: 'friend_remove', id: f.id })));
       list.append(row);
     }
@@ -126,7 +127,13 @@
       const who = el('span', '', 'social-who');
       who.append(el('b', p.name + (p.self ? ' (you)' : '')), el('small', `Lv ${p.level} ${CLASSES[p.class] || ''} · ${p.place}`));
       row.append(who);
+      if (p.pvpFlag) row.append(el('small', 'PvP', 'social-tag'));
       if (!p.self) {
+        row.append(button('Trade', `trade:${p.id}`, () => window.Trade?.request(p.id)));
+        if (window.Pvp?.available) {
+          row.append(button('Duel', `duel:${p.id}`, () => window.Pvp?.duel(p.id)));
+          row.append(button('Target', `target:${p.id}`, () => window.Pvp?.target(p.id)));
+        }
         if (p.friend) row.append(el('small', 'Friend', 'social-tag'));
         else if (state.outgoing.some(i => i.kind === 'friend' && i.id === p.id)) row.append(el('small', 'Requested', 'social-tag'));
         else row.append(button('Add friend', `add:${p.id}`, () => send({ op: 'friend_request', id: p.id })));
@@ -154,9 +161,9 @@
     $('social-tab-friends').textContent = `Friends${state.incoming.some(i => i.kind === 'friend') ? ' •' : ''}`;
     $('social-tab-party').textContent = `Party${state.party ? ` ${state.party.members.length}/${PARTY_MAX}` : ''}${state.incoming.some(i => i.kind === 'party') ? ' •' : ''}`;
     $('social-add-friend').hidden = tab === 'party'; $('social-add-party').hidden = tab === 'friends';
-    $('social-add').hidden = tab === 'online';
+    $('social-add').hidden = tab === 'online' || tab === 'pvp';
     const body = $('social-body'); body.replaceChildren(); body.dataset.tab = tab;
-    ({ friends: renderFriends, party: renderParty, online: renderOnline })[tab](body);
+    ({ friends: renderFriends, party: renderParty, online: renderOnline, pvp: body => window.Pvp?.render(body, button, el) })[tab](body);
     tickInvites();
     const again = focused && body.querySelector(`[data-key="${CSS.escape(focused)}"]`);
     if (again) again.focus({ preventScroll: true });
@@ -204,8 +211,12 @@
     const now = performance.now();
     lapse.clear();
     for (const i of [...next.incoming, ...next.outgoing]) lapse.set(`${i.kind}:${i.id}`, now + i.left * 1000);
+    const frameChanged = shape(next.party) !== shape(state.party), questsChanged = questShape(next.party) !== questShape(state.party);
     state = { ...empty(), ...next };
-    render();
+    if (frameChanged) renderFrame();
+    else for (const m of state.party?.members || []) for (const row of document.querySelectorAll(`[data-member="${CSS.escape(m.id)}"]`)) paintHealth(row, m);
+    renderPrompts(); renderPanel();
+    if (questsChanged) window.Quests?.refresh?.();
     if (open() && tab === 'online') send({ op: 'who' });
   }
   function show(next = tab) {
@@ -254,7 +265,8 @@
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     } else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
       if (!event.target.matches?.('[role="tab"]')) return;
-      const tabs = ['friends', 'party', 'online'], next = tabs[(tabs.indexOf(tab) + (event.key === 'ArrowRight' ? 1 : 2)) % 3];
+      const tabs = window.Pvp?.available ? ['friends', 'party', 'online', 'pvp'] : ['friends', 'party', 'online'];
+      const next = tabs[(tabs.indexOf(tab) + (event.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
       event.preventDefault(); tab = next; if (tab === 'online') send({ op: 'who' }); renderPanel(); $(`social-tab-${next}`).focus();
     }
   });
@@ -275,7 +287,7 @@
   }, true);
 
   window.Social = {
-    show, close, command, get open() { return open(); },
+    show, close, command, refreshPvp() { if (open() && (tab === 'pvp' || tab === 'online')) renderPanel(); }, get open() { return open(); },
     get state() { return state; }, get roster() { return roster; },
     isPartyMember: id => inParty(id), isFriend, questMates,
     reset() { close(false); state = empty(); roster = []; lapse.clear(); render(); },

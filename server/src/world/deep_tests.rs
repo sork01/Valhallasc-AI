@@ -290,7 +290,7 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         );
     }
     // the dungeon copies come after every file zone
-    assert_eq!(w.maps.len(), 44);
+    assert_eq!(w.maps.len(), 49);
     assert!(w.maps[26].template.is_some());
 }
 

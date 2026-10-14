@@ -3,13 +3,13 @@
 import json, math, random
 from pathlib import Path
 import generate_gloamfen as fen
-import mercenary_offers, spark_travel
+import mercenary_offers, progression_quests, spark_travel
 from quest_gear_rewards import add_reward
 ROOT=Path(__file__).resolve().parents[1]
 MAP=ROOT/'world/map.txt'; ITEMS=ROOT/'world/items.txt'
 XP=json.loads((ROOT/'world/levels.txt').read_text())
 ZONE=22; NAME='The Tanglecrown'; ARRIVAL=(14,111); RETURN=(7,111)
-OLD_GATE=(129,117); OLD_ARRIVAL=(119,116)
+OLD_GATE=(129,117); OLD_ARRIVAL=(120,113)
 def obj(kind,x,y,r=0,**extra):return dict(kind=kind,x=round(x,2),y=round(y,2),r=r,v=extra.pop('v',0),**extra)
 def npc(key,name,role,x,y,dialogue,offers=None,buys=False):
  return dict(id='tangle_'+key,name=name,role=role,x=x,y=y,color='#d6f1a2',dialogue=dialogue,offers=offers or [],buys=buys,look=dict(skin='#a96c4e',hair='#263d31',style='long',hat='hood',hatColor='#3d9d74'))
@@ -26,7 +26,7 @@ def people():
  npc('botanist','Tavi Moss','Orchid botanist',40,116,'The orchid mantises mimic flowers; the gliders carry pollen above the river.'),
  npc('trader','Koro Flint','Landing provisions',17,100,'I buy field finds and keep the boardwalk supplied.',[dict(id='stew',label="Buy Traveler's Stew",cost=12,item='traveler_stew',tiered=True),dict(id='satchel',label='Buy Linen Satchel',cost=500,bag='linen_satchel')],True),
  npc('tracker','Mara Vines','Canopy tracker',42,96,'The jaguar circles the high terrace. Listen for silence before it springs.',mercenary_offers.offers()),
- npc('scholar','Oru Slate','Temple scholar',103,39,'The sealed Temple of the Rain Crown rises above the basin. Its jade eyes still watch the approach.'),
+ npc('scholar','Oru Slate','Temple scholar',103,39,'The Rain Crown is silent. Record its guardians before anyone opens the temple.'),
  npc('stone','Banyan Meeting Stone','Gather a party · hire fighters',92,48,'Gather companions for the jungle elites. The temple itself remains sealed.',mercenary_offers.offers(open_=True)),
  ]
  folk[0]['art']='tangle_warden';folk[5]['art']='tangle_scholar';folk[-1]['art']='stone'
@@ -39,6 +39,12 @@ def people():
  quest('anaconda','Coils of Jade','botanist','Three companions should confront the giant anaconda in the lower basin.',[kill('jadeanaconda',1,'Defeat the Jade Anaconda')],79,16000,'caimans',group=True,recommendedPlayers=3),
  quest('jaguar','The Crown Jaguar','tracker','Five companions are needed against the predator atop the high terrace.',[kill('crownjaguar',1,'Defeat the Crown Jaguar')],80,21000,'drums',group=True,recommendedPlayers=5),
  quest('temple','Eyes of the Rain Crown','scholar','Survey the sealed temple stairs and consult the Meeting Stone.',[visit('temple','Inspect the Rain Crown Temple'),talk('stone','Consult the Meeting Stone')],80,12000,'drums'),
+ quest('crown_trials','The Rainbound Courts','scholar','Record the three temple guardians in a private expedition.',
+       [kill('rain_crown_droplet',3,'Defeat Crowned Droplets'),kill('rain_crown_oracle',3,'Defeat Jade Rain Oracles'),kill('rain_crown_guard',3,'Defeat Monsoon Guards')],
+       80,16500,'temple',group=True,recommendedPlayers=5),
+ quest('crown_final','The Crown Remembers','scholar','Defeat the floodgate keeper, the sibyl and the Rain Crown in one private temple.',
+       [kill('rain_crown_gatekeeper',1,'Defeat the Floodgate Keeper'),kill('rain_crown_sibyl',1,'Defeat the Rain Sibyl'),kill('rain_crown_sovereign',1,'Defeat the Rain Crown')],
+       80,29000,'crown_trials',group=True,recommendedPlayers=5,rewardItem='accessory_amber_l80_blue'),
  quest('patrol','Keep the Boardwalks Safe','warden','Patrol the canopy and basin paths for travelers.',[kill('orchidmantis',3,'Defeat Orchid Mantises'),kill('poolcaiman',3,'Defeat Pool Caimans')],75,6400,'welcome',True),
  ]
  return folk,quests
@@ -58,7 +64,7 @@ def build():
  north=[(47,43),(72,27),(93,29),(110,29)]
  paths=[main,west,east,north,[(25,82),(52,72),(75,68)],[(87,96),(92,48)]]
  objects=[
-  obj('rain_crown_temple',120,23,width=11,depth=6,place='tangle_temple'),
+  obj('rain_crown_temple',120,23,open=True,place='tangle_temple'),
   obj('banyan_lodge',16,91,width=5,depth=4,v=0),obj('banyan_lodge',41,124,width=5,depth=4,v=1),
   obj('boardwalk_stall',15,121,width=3,depth=2,v=0),obj('boardwalk_stall',40,105,width=3,depth=2,v=1),
   obj('root_bridge',63,83,r=.7),obj('root_bridge',91,49,r=.7),
@@ -97,14 +103,14 @@ def build():
     spawns.append(dict(kind=kind,x=round(x,2),y=round(y,2)));break
    else:raise RuntimeError('cannot place '+kind)
  folk,quests=people()
- zone=dict(name=NAME,theme='tanglecrown',tagline='A rain-bright jungle of giant roots, braided waterways and a hidden crown temple',size=144,levels=[75,80],spawn=dict(x=ARRIVAL[0],y=ARRIVAL[1]),paths=[[[x,y] for x,y in path] for path in paths],objects=objects,slimes=spawns,npcs=folk,places=[dict(id='tangle_temple',name='Temple of the Rain Crown',x=112,y=26,r=4),dict(id='tangle_anaconda_pool',name='Jade Basin',x=53,y=57,r=5),dict(id='tangle_jaguar_terrace',name='High Jaguar Terrace',x=111,y=76,r=5)],quests=quests,city=dict(name='Banyan Landing',x0=9,x1=49,y0=90,y1=130,plaza=dict(x=29,y=110),radius=5,entry=dict(x=14,y=111)),futureInstance=dict(name='Temple of the Rain Crown',level=80,players=5,status='sealed',x=120,y=23,description='A colossal stepped temple rises through the canopy; its jade eyes seal a future five-player instance.'),portals=[dict(id='tangle_ribbon_gate',name='The Rootway',x=RETURN[0],y=RETURN[1],r=1.2,to=21,tx=OLD_ARRIVAL[0],ty=OLD_ARRIVAL[1],look='tanglecrown')])
+ zone=dict(name=NAME,theme='tanglecrown',tagline='A rain-bright jungle of giant roots, braided waterways and an open crown temple',size=144,levels=[75,80],spawn=dict(x=ARRIVAL[0],y=ARRIVAL[1]),paths=[[[x,y] for x,y in path] for path in paths],objects=objects,slimes=spawns,npcs=folk,places=[dict(id='tangle_temple',name='Temple of the Rain Crown',x=112,y=26,r=4),dict(id='tangle_anaconda_pool',name='Jade Basin',x=53,y=57,r=5),dict(id='tangle_jaguar_terrace',name='High Jaguar Terrace',x=111,y=76,r=5)],quests=quests,city=dict(name='Banyan Landing',x0=9,x1=49,y0=90,y1=130,plaza=dict(x=29,y=110),radius=5,entry=dict(x=14,y=111)),futureInstance=dict(name='Temple of the Rain Crown',level=80,players=5,status='open',x=120,y=23,description='The jade eyes open into a private level-80 temple.'),portals=[dict(id='tangle_ribbon_gate',name='The Rootway',x=RETURN[0],y=RETURN[1],r=1.2,to=21,tx=OLD_ARRIVAL[0],ty=OLD_ARRIVAL[1],look='tanglecrown'),dict(id='tangle_rain_gate',name='Temple of the Rain Crown',x=117,y=24,r=1.2,to=32,tx=48,ty=83,look='rain_crown')])
  check(zone);return zone
 def check(zone):
  seen,_=fen.flood(zone,ARRIVAL)
  for target in [*zone['npcs'],*zone['slimes'],*zone['portals'],dict(x=112,y=26),dict(x=72,y=27),dict(x=87,y=96)]:
   assert seen[int(target['y']/.5),int(target['x']/.5)],f'unreachable: {target}'
  assert all(math.hypot(s['x']-ARRIVAL[0],s['y']-ARRIVAL[1])>=8 for s in zone['slimes'])
- assert len(zone['slimes'])==42 and len(zone['quests'])==9
+ assert len(zone['slimes'])==42 and len(zone['quests'])==11
  assert all(len('quest:accept:'+q['id'])<=32 for q in zone['quests'])
 def open_ribbon_gate(ribbon):
  line=[(97,93),(110,108),OLD_GATE]
@@ -118,8 +124,10 @@ def open_ribbon_gate(ribbon):
  assert all(math.hypot(s['x']-OLD_ARRIVAL[0],s['y']-OLD_ARRIVAL[1])>=8 for s in ribbon['slimes'])
 def main():
  world=json.loads(MAP.read_text());assert world['zones'][20]['name']=='The Ribbonwild'
+ previous=world['zones'][ZONE-1]
  later=world['zones'][ZONE:];world['zones']=world['zones'][:ZONE-1]
- open_ribbon_gate(world['zones'][20]);world['zones'].append(build());world['zones'].extend(later)
+ zone=build();progression_quests.keep_released_rewards_and_route_quest(previous,zone)
+ open_ribbon_gate(world['zones'][20]);world['zones'].append(zone);world['zones'].extend(later)
  if later and later[0].get('name')=='Veyrroot Canopy':
   from generate_worldheart import open_jungle_gate
   open_jungle_gate(world['zones'][21])
@@ -128,5 +136,5 @@ def main():
  for key,name,sell in [('mantis_petals','Orchid Mantis Petals',1180),('glider_membrane','Canopy Glider Membrane',1260),('caiman_scale','Blackwater Caiman Scale',1350),('gorilla_drumskin','Drum Gorilla Hide',1480),('anaconda_jade','Jade Anaconda Scale',5600),('jaguar_crown','Crown Jaguar Crest',7200)]:
   if not any(i['id']==key for i in items):items.append(dict(id=key,name=name,kind='material',rarity='common',sell=sell))
  ITEMS.write_text(json.dumps(items,indent=2)+'\n')
- print(f'{NAME}: {len(world["zones"][21]["objects"])} objects, 42 enemies, 9 quests')
+ print(f'{NAME}: {len(world["zones"][21]["objects"])} objects, 42 enemies, 11 base quests')
 if __name__=='__main__':main()

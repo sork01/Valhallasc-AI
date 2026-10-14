@@ -1,4 +1,4 @@
-// Private browser: live jungle, exported PixelFlow atlases and sealed temple.
+// Private browser: live jungle, exported PixelFlow atlases and open temple.
 const assert=require('node:assert/strict');
 const path=require('node:path');
 const fs=require('node:fs');
@@ -23,11 +23,11 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.locator('#cls-warrior').click();await page.locator('#name').fill('TanglecrownUI');await page.locator('#go').click({timeout:60000});
   await page.waitForFunction(()=>Online.connected&&!!Field.tanglecrownSprites?.img.crownjaguar,null,{timeout:60000});
   const data=await page.evaluate(()=>{const zones=Field._debug.zones,z=zones[22],src=Field.tanglecrownSprites;return {count:zones.length,name:z.name,theme:z.theme,levels:z.levels,quests:z.quests.length,npcs:z.npcs.length,spawns:z.slimes.length,kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>[src.img[k].naturalWidth,src.img[k].naturalHeight]),art:['kapok_tree','strangler_fig','jungle_water','banyan_lodge','rain_crown_temple'].every(k=>!!City.art[k]),layout:WorldMap._layout.length,seal:z.futureInstance,gate:zones[21].portals.find(p=>p.id==='ribbon_tangle_gate'),travel:z.npcs.find(n=>n.id==='travel_banyan'),host:z.npcs.find(n=>n.id==='tangle_warden'),keeper:z.npcs.find(n=>n.id==='tangle_scholar')};});
-  check(data.count===27&&data.name==='The Tanglecrown'&&data.theme==='tanglecrown'&&data.levels.join(',')==='75,80','Level 75–80 zone loads');
+  check(data.count===40&&data.name==='The Tanglecrown'&&data.theme==='tanglecrown'&&data.levels.join(',')==='75,80','Level 75–80 zone loads');
   check(data.kinds.length===9&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Nine PixelFlow atlases load');
-  check(data.art&&data.layout===29,'Jungle art and world map load');
-  check(data.npcs===8&&data.quests===9&&data.spawns===42,'Quest hub and six encounters load');
-  check(data.seal?.status==='sealed'&&data.seal?.name==='Temple of the Rain Crown'&&data.gate?.to===22,'Epic entrance is sealed and reachable');
+  check(data.art&&data.layout>=30,'Jungle art and world map load');
+  check(data.npcs===8&&data.quests===12&&data.spawns===42,'Quest hub and six encounters load');
+  check(data.seal?.status==='open'&&data.seal?.name==='Temple of the Rain Crown'&&data.gate?.to===22,'Epic entrance is open and reachable');
   check(data.travel?.travelLinks.includes('travel_jubilee')&&data.travel?.art==='tangle_travel'&&data.host?.art==='tangle_warden'&&data.keeper?.art==='tangle_scholar','Three distinct NPC atlases load');
   let ref=401;const debug=async command=>check(await page.evaluate(([command,ref])=>Online.send({type:'debug',ref,command}),[command,ref++]),`Send ${command.op}`);
   await debug({op:'teleport',zone:22,x:29,y:110});
@@ -39,7 +39,7 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.waitForFunction(()=>Field.zone===22&&Math.hypot(Field.hero.x-111,Field.hero.y-27)<2,null,{timeout:15000});
   await page.waitForTimeout(1500);
   await page.screenshot({path:path.join(world.artifacts,'tanglecrown-temple.png')});await capture('tanglecrown-temple-clean.png');
-  check(await page.evaluate(()=>Field._debug.zones[22].portals.length===1&&Field.zone===22),'Temple has no playable portal yet');
+  check(await page.evaluate(()=>Field._debug.zones[22].portals.some(p=>p.to===32)&&Field.zone===22),'Temple has a playable portal');
   check(errors.length===0,`No browser errors: ${errors.join('; ')}`);
   console.log(`Tanglecrown UI: ${checks} checks; screenshots in ${world.artifacts}`);
 })().catch(e=>{console.error(e.stack);process.exitCode=1;}).finally(async()=>{await browser?.close();if(started)await call('stop_world').catch(()=>{});await client.close();});

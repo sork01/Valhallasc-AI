@@ -1,17 +1,17 @@
 'use strict';
 // World map (M, or the button under the minimap). Everything is drawn from window.WORLD_MAP, so a zone added to
 // world/map.txt appears with its real ground, obstacles, camp, gates and spawn points; the only hand-made part is
-// LAYOUT, where each zone sits on the world sheet (tests/worldmap-ui.cjs fails when a zone has no place).
+// LAYOUT, where each public zone sits on the world sheet. Sealed dungeon floor plans are hidden until opened.
 // The world view is a row of zone tiles joined by the gate roads; pressing a tile zooms into that zone's map.
 (() => {
   const $ = id => document.getElementById(id);
   const NS = 'http://www.w3.org/2000/svg';
   const STAGE = { w: 207, h: 66 };
   // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm -> the Wyrdwood -> Bifrost Reach, up the Stormrift -> Ran's Deep, down the Maelstrom.
-  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:101,y:40,s:8},{x:63,y:20,s:15},{x:2,y:25,s:14},{x:2,y:13,s:10},{x:52,y:21,s:10},{x:52,y:52,s:9},{x:62,y:57,s:5},{x:76.8,y:57.3,s:4.5},{x:82.5,y:53.5,s:6},{x:90,y:53,s:7},{x:100,y:50,s:10},{x:112,y:49,s:10},{x:123,y:50,s:8},{x:134,y:47,s:12},{x:147,y:35,s:11},{x:159,y:18,s:13},{x:176,y:1,s:28}];
-  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', asterion: '#364a72', moonwell:'#153d58', stormglass:'#263b51', sunward:'#5baa49', ribbonwild:'#d98db2', tanglecrown:'#287a5b', worldtree:'#2f9369', lapiserg:'#d3a468', frostwake:'#c8e6f1', cairnspine:'#6b7378', yearwheel:'#a6cf9b', heartwood:'#806244', vault: '#07080e', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', prismwaste: '#ad887e', orrery: '#37394e', moonspore: '#1c4244', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
-  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', asterion: '#9ec6d9', moonwell:'#a8d5cf', stormglass:'#9ebdc1', sunward:'#d8bd83', ribbonwild:'#ffe3a0', tanglecrown:'#b99a62', worldtree:'#bd9662', lapiserg:'#efd59e', frostwake:'#8abfd3', cairnspine:'#b7a07b', yearwheel:'#f0d6a7', heartwood:'#b18a5f', vault: '#3a3f55', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', prismwaste: '#ead7a8', orrery: '#ad907b', moonspore: '#a5c4a8', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
-  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', asterion: '#d9e8ff', moonwell:'#f8e8ad', stormglass:'#aaf2f0', sunward:'#f8da90', ribbonwild:'#ff86b9', tanglecrown:'#a6e5ae', worldtree:'#c8f7a7', lapiserg:'#79d5d3', frostwake:'#9af0da', cairnspine:'#f2cb89', yearwheel:'#ffe7a4', heartwood:'#ffe0a1', vault: '#59d9ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', prismwaste: '#ffe3ac', orrery: '#f4c981', moonspore: '#c4f4af', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
+  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:101,y:40,s:8},{x:63,y:20,s:15},{x:2,y:25,s:14},{x:2,y:13,s:10},{x:52,y:21,s:10},{x:52,y:52,s:9},{x:62,y:57,s:5},{x:76.8,y:57.3,s:4.5},{x:82.5,y:53.5,s:6},{x:90,y:53,s:7},{x:100,y:50,s:10},{x:112,y:49,s:10},{x:123,y:50,s:8},{x:134,y:47,s:12},{x:147,y:35,s:11},{x:159,y:18,s:13},{x:176,y:1,s:28},{x:76.8,y:62,s:3.5},{x:83,y:61,s:4},{x:91,y:61,s:4},{x:102,y:61,s:4},{x:124,y:60,s:4},{x:136,y:60,s:4},{x:157,y:56,s:4},{x:179,y:32,s:6},{x:187,y:35,s:6},{x:195,y:43,s:6},{x:179,y:42,s:6}];
+  const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', asterion: '#364a72', moonwell:'#153d58', stormglass:'#263b51', sunward:'#5baa49', ribbonwild:'#d98db2', tanglecrown:'#287a5b', worldtree:'#2f9369', lapiserg:'#d3a468', frostwake:'#c8e6f1', cairnspine:'#6b7378', yearwheel:'#a6cf9b', heartwood:'#806244', vault: '#07080e', eye_below: '#102b3d', elder_hollow: '#31492f', thousandfold: '#40264d', rain_crown: '#1c5251', seed_vault: '#415532', sunken_astrolabe: '#254e59', thunderheart_gate: '#273f60', blooming_labyrinth:'#36553f', solar_crucible:'#754530', amber_archive:'#735238', silent_solstice:'#3b5872', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', prismwaste: '#ad887e', orrery: '#37394e', moonspore: '#1c4244', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
+  const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', asterion: '#9ec6d9', moonwell:'#a8d5cf', stormglass:'#9ebdc1', sunward:'#d8bd83', ribbonwild:'#ffe3a0', tanglecrown:'#b99a62', worldtree:'#bd9662', lapiserg:'#efd59e', frostwake:'#8abfd3', cairnspine:'#b7a07b', yearwheel:'#f0d6a7', heartwood:'#b18a5f', vault: '#3a3f55', eye_below: '#386c78', elder_hollow: '#819965', thousandfold: '#ae779d', rain_crown: '#6aa895', seed_vault: '#b6a676', sunken_astrolabe: '#c0ac79', thunderheart_gate: '#a9cde3', blooming_labyrinth:'#deb4cd', solar_crucible:'#e9bb79', amber_archive:'#eac286', silent_solstice:'#b8d5e8', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', prismwaste: '#ead7a8', orrery: '#ad907b', moonspore: '#a5c4a8', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
+  const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', asterion: '#d9e8ff', moonwell:'#f8e8ad', stormglass:'#aaf2f0', sunward:'#f8da90', ribbonwild:'#ff86b9', tanglecrown:'#a6e5ae', worldtree:'#c8f7a7', lapiserg:'#79d5d3', frostwake:'#9af0da', cairnspine:'#f2cb89', yearwheel:'#ffe7a4', heartwood:'#ffe0a1', vault: '#59d9ff', eye_below: '#a3eee5', elder_hollow: '#d7ecaa', thousandfold: '#ffdcb4', rain_crown: '#c2f5db', seed_vault: '#f3df9a', sunken_astrolabe: '#a3e9ed', thunderheart_gate: '#d1eaff', blooming_labyrinth:'#f7c3df', solar_crucible:'#ffe0a0', amber_archive:'#f6d99d', silent_solstice:'#e6f3ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', prismwaste: '#ffe3ac', orrery: '#f4c981', moonspore: '#c4f4af', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
   const BLURB = {
     meadow: 'Green pastures round the walled town of Alderhaven.',
     ember: 'Lava fords and ash-grey crags above Cinderwatch Camp.',
@@ -27,16 +27,27 @@
     moonspore: 'A fallen moon feeds a luminous fungal forest. Lamplight Refuge lies below three elite courts.',
     asterion: 'Seven rings of glass-roof houses turn around a singing astrolabe. A Meeting Stone opens the Moonwell below.',
     moonwell: 'A starlit water garden of floating petal islands and four guardians, beneath the Meeting Stone.',
-    stormglass: 'Black sand and white lightning beyond Asterion. Breakwater Camp watches the sealed Eye Below.',
+    stormglass: 'Black sand and white lightning beyond Asterion. Breakwater Camp guards the open Eye Below.',
+    eye_below: 'A private level-65 descent through deepglass halls, three wardens and a living lens.',
+    elder_hollow: 'A private level-70 descent through living roots, three guardians and the Elder Heart.',
+    thousandfold: 'A private level-75 palace of silk galleries, living paper and three guardians.',
+    rain_crown: 'An open private level-80 jade temple with rain halls and three guardians.',
+    seed_vault: 'An open private level-80 seed chamber beneath Veyrroot, with living roots and three guardians.',
+    sunken_astrolabe: 'An open private level-85 brass observatory beneath the Lapis Erg, with a buried sky and three guardians.',
+    thunderheart_gate: 'An open private level-95 storm chamber beneath the Cairnspine, with three charged guardians.',
+    blooming_labyrinth: 'An open private level-97 maze of spring roots and glass petals, with three guardians.',
+    solar_crucible: 'An open level-98 brass forge beneath Solhaven, with three solar guardians.',
+    amber_archive: 'An open level-99 library of living records beneath Harvestwatch.',
+    silent_solstice: 'An open level-99 frozen court beneath Rimehold.',
     sunward: 'A clear river divides sunlit grass, apple rows and old oakwood. Millbridge watches the Elder Hollow beneath the roots.',
-    ribbonwild: 'A bright processional wheel of color courts and silk tents. The Thousandfold Pavilion waits behind its sealed mask doors.',
-    tanglecrown: 'A dense rain jungle with braided channels, giant kapok trees and root bridges. Banyan Landing watches the sealed Rain Crown Temple.',
+    ribbonwild: 'A bright processional wheel of color courts and silk tents. The Thousandfold Pavilion opens through its gilded mask doors.',
+    tanglecrown: 'A dense rain jungle with braided channels, giant kapok trees and root bridges. Banyan Landing guards the open Rain Crown Temple.',
     worldtree: 'Veyrroot is an open city of branch rings, leaf-roof markets and hanging rooms in one enormous jungle tree.',
-    heartwood: 'The hollow heart of Veyrroot holds amber archives and the living pith. The Seed Vault remains sealed.',
-    lapiserg: 'Ochre dunes encircle three turquoise oases. Azure Wells leads to a sealed brass astrolabe beneath the sand.',
+    heartwood: 'The hollow heart of Veyrroot holds amber archives and the living pith. The Seed Vault opens into the living roots below.',
+    lapiserg: 'Ochre dunes encircle three turquoise oases. Azure Wells leads to an open brass astrolabe beneath the sand.',
     frostwake: 'A snow-bright shelf split by blue crevasses. Frostwake Station watches three elite territories under the aurora.',
-    cairnspine: 'Four slate switchbacks climb through giant boulders and white leafless trees. Boulderwatch faces the sealed Thunderheart Gate.',
-    yearwheel: 'The world turns through four immense seasons. Springmere, Solhaven, Harvestwatch and Rimehold circle the Equinox Crossing, each watching a sealed threshold.',
+    cairnspine: 'Four slate switchbacks climb through giant boulders and white leafless trees. Boulderwatch guards the open Thunderheart Gate.',
+    yearwheel: 'The world turns through four immense seasons. Springmere, Solhaven, Harvestwatch and Rimehold circle the Equinox Crossing, The four seasonal dungeons open beneath their courts.',
     cathedral_left:'The Flooded Cloister: level 40, four bosses, a private five-player wing.',
     cathedral_right:'The Coral Reliquary: level 45, four bosses, a private five-player wing.',
     cathedral_main:'The Grand Nave: level 50, four bosses, a private five-player wing.',
@@ -99,7 +110,7 @@
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const kindInfo = kind => KINDS[kind] || [kind, 1, '#ff6b8a'];
   const travelMasters = z => (z.npcs || []).filter(n => n.travelStop);
-  const SEALED = { elder_hollow_gate: 'Elder Hollow', grand_pavilion_gate: 'Thousandfold Pavilion', rain_crown_temple: 'Rain Crown Temple', heartwood_vault: 'Seed Vault', lapis_astrolabe: 'Lapis Astrolabe', cairn_thunder_gate: 'Thunderheart Gate', year_bloom_gate: 'Blooming Labyrinth', year_solar_gate: 'Solar Crucible', year_amber_gate: 'Amber Archive', year_solstice_gate: 'Silent Solstice' };
+  const SEALED = { year_bloom_gate: 'Blooming Labyrinth', year_solar_gate: 'Solar Crucible', year_amber_gate: 'Amber Archive', year_solstice_gate: 'Silent Solstice' };
   // Fog of war: the server saves which of a zone's 3x3 cells the character has stood in (Field.explored, one bitmask per
   // zone). Nothing from an unvisited cell is shown: not its ground, gates, camp, enemies or people.
   const CELLS = 9;
@@ -207,6 +218,10 @@
       case 'spire': return wyrd ? '#d8d8c8' : fen ? '#b8c0b0' : frost ? '#8ccdf0' : '#4b3b5e';
       case 'rock': return wyrd ? '#7a7a80' : fen ? '#6b7a68' : frost ? '#7f93aa' : ember ? '#6a6672' : '#8a93a8';
       case 'rampart': return '#6f7078';
+      case 'eye_wall': return '#527c8e';
+      case 'eye_lamp': case 'eye_lens': case 'eye_rune': return '#a3eee5';
+      case 'elder_wall': return '#6e6043';
+      case 'elder_lantern': case 'elder_crown': case 'elder_seed': return '#c9e29e';
       case 'vaultwall': return '#5d6482';
       case 'pillar': return '#a3abc0';
       case 'brazier': return '#ff9a3a';
@@ -290,11 +305,11 @@
   };
   function svgNode(tag, attrs) { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); return n; }
   function buildWorld() {
-    const stage = $('wm-world'); stage.replaceChildren(); tiles = []; roadRefs = [];
+    const stage = $('wm-world'); stage.replaceChildren(); tiles = Array(zones.length).fill(null); roadRefs = [];
     const roads = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, class: 'wm-roads', 'aria-hidden': 'true' });
     const seen = new Set();
     zones.forEach((z, i) => z.portals.forEach(p => {
-      const pair = [i, p.to].sort((a, b) => a - b).join('-'); if (seen.has(pair) || !zones[p.to]) return; seen.add(pair);
+      const pair = [i, p.to].sort((a, b) => a - b).join('-'); if (z.sealedTemplate || seen.has(pair) || !zones[p.to] || zones[p.to].sealedTemplate) return; seen.add(pair);
       const a = z.place, b = zones[p.to].place, [x1, y1] = edgePoint(a, b), [x2, y2] = edgePoint(b, a);
       const road = svgNode('g', { 'data-road': pair });
       const back = zones[p.to].portals.find(q => q.to === i);
@@ -306,6 +321,7 @@
     }));
     stage.append(roads);
     zones.forEach((z, i) => {
+      if (z.sealedTemplate) return;
       const { x, y, s } = z.place, tile = el('button', '', 'wm-tile'); tile.type = 'button'; tile.dataset.zone = String(i); tile.dataset.theme = z.theme;
       Object.assign(tile.style, { left: `${x / STAGE.w * 100}%`, top: `${y / STAGE.h * 100}%`, width: `${s / STAGE.w * 100}%`, height: `${s / STAGE.h * 100}%` });
       tile.setAttribute('aria-label', `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}. Open its map`);
@@ -321,7 +337,7 @@
         tile.append(badge);
       }
       tile.addEventListener('click', () => zoomTo(i, tile));
-      stage.append(tile); tiles.push(tile);
+      stage.append(tile); tiles[i] = tile;
     });
     stage.append(el('div', 'Valhalla', 'wm-sheet-title'));
     refreshFog();
@@ -331,6 +347,7 @@
     fogSignature = JSON.stringify(window.Field.explored);
     roadRefs.forEach(r => r.node.setAttribute('visibility', r.shown() ? 'visible' : 'hidden'));
     zones.forEach((z, i) => {
+      if (z.sealedTemplate) return;
       const tile = tiles[i], g = tile.querySelector('.wm-tile-fog').getContext('2d'), unseen = !visited(i);
       g.clearRect(0, 0, 220, 220); window.Field.fog.paint(g, 220, 220, i);
       tile.disabled = unseen; tile.dataset.fog = unseen ? 'full' : 'partial';

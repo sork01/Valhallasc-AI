@@ -83,6 +83,10 @@ impl World {
             None => vec![id.to_string()],
         }
     }
+    pub(super) fn party_leader(&self, id: &str) -> Option<&str> {
+        self.party_index(id)
+            .map(|i| self.social.parties[i].leader.as_str())
+    }
     pub(super) fn party_index(&self, id: &str) -> Option<usize> {
         self.social
             .parties
@@ -419,7 +423,7 @@ impl World {
                 let c = &p.character;
                 json!({"id":c.id,"name":c.look.name,"class":c.look.class,"level":c.level,"place":self.zone_name(c.zone),
                     "self":c.id==me,"friend":friends.contains(&c.id.as_str()),"party":party.contains(&c.id.as_str()),
-                    "inParty":self.party_index(&c.id).is_some()})
+                    "inParty":self.party_index(&c.id).is_some(),"pvpFlag":p.pvp_flag})
             })
             .collect();
         players.sort_by_key(|p| p["name"].as_str().unwrap_or_default().to_lowercase());

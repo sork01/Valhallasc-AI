@@ -585,8 +585,15 @@ def open_stormrift(zone, world):
     if not any(z['name'] == S.NAME for z in world['zones']):
         return
     gx, gy = S.WYRD_GATE
+    # The summit road reaches the rift clearing from the east. Keep the
+    # approach in the map data so the field and world map draw the same route.
+    approach = [[44, 20], [31, 15], [S.WYRD_ARRIVAL[0], S.WYRD_ARRIVAL[1]], [gx, gy]]
+    zone['paths'] = [p for p in zone['paths'] if not (p[0] == [44, 20] and p[-1] == [gx, gy])] + [approach]
     zone['objects'] = [o for o in zone['objects'] if o['kind'] not in ('tree', 'pine', 'bush', 'rock', 'spire', 'post', 'bones', 'crag')
                        or math.hypot(o['x'] - gx, o['y'] - gy) > 8.0 or o.get('place')]
+    zone['objects'] = [o for o in zone['objects'] if o.get('place') or o.get('rift') or
+                       o['kind'] not in ('tree', 'pine', 'bush', 'rock', 'spire', 'post', 'bones', 'crag') or
+                       dist_to_polylines([approach], o['x'], o['y']) > o.get('r', 0) + 1.4]
     zone['objects'] = [o for o in zone['objects'] if o.get('rift') is None]
     for i in range(7):
         a = 2 * math.pi * i / 7 + .3

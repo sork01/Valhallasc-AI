@@ -6,6 +6,7 @@ import random
 from pathlib import Path
 
 import generate_gloamfen as fen
+import progression_quests
 import spark_travel
 from quest_gear_rewards import add_reward
 
@@ -152,6 +153,7 @@ def build():
               portals=[dict(id='orrery_prism_gate',name='The Hourglass Pass',x=RETURN[0],y=RETURN[1],r=1.2,
                             to=14,tx=PRISM_ARRIVAL[0],ty=PRISM_ARRIVAL[1],look='orrery')])
     check(zone)
+    zone['paths'].append([[RETURN[0], RETURN[1]], [ARRIVAL[0], ARRIVAL[1]]])
     return zone
 
 
@@ -177,6 +179,8 @@ def open_prism_gate(prism):
     if len(prism['slimes']) == 41:
         prism['slimes'].append(dict(kind='glassharrier',x=113,y=70))
     assert len(prism['slimes']) == 42
+    approach = [[95, 35], [PRISM_ARRIVAL[0], PRISM_ARRIVAL[1]], [PRISM_GATE[0], PRISM_GATE[1]]]
+    prism['paths'] = [p for p in prism['paths'] if p != approach] + [approach]
     prism['portals']=[p for p in prism['portals'] if p['id']!='prism_orrery_gate']
     prism['portals'].append(dict(id='prism_orrery_gate',name='The Hourglass Pass',x=PRISM_GATE[0],y=PRISM_GATE[1],r=1.2,
                                  to=ZONE,tx=ARRIVAL[0],ty=ARRIVAL[1],look='orrery'))
@@ -184,11 +188,13 @@ def open_prism_gate(prism):
 
 def main():
     world=json.loads(MAP.read_text())
+    previous=world['zones'][ZONE-1]
     later=world['zones'][ZONE:]
     world['zones']=world['zones'][:ZONE-1]
     assert len(world['zones'])==ZONE-1
     open_prism_gate(world['zones'][13])
-    world['zones'].append(build())
+    zone=build();progression_quests.keep_released_rewards_and_route_quest(previous,zone)
+    world['zones'].append(zone)
     world['zones'].extend(later)
     if any(z.get('name')=='The Moonspore Canopy' for z in later):
         from generate_moonspore import open_orrery_gate

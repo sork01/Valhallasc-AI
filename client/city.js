@@ -449,7 +449,7 @@
     $('npc-text').textContent=npc.dialogue;$('npc-text').hidden=!gossip;$('npc-role').hidden=!gossip;
     $('npc-notice').textContent=packet.notice;
     $('npc-gold').textContent=`Your purse: ${packet.gold} gold`;
-    $('npc-back').hidden=view.kind!=='sell';
+    $('npc-back').hidden=!['sell','merge','refine'].includes(view.kind);
     // Quests come first, then whatever the NPC sells or does.
     if(view.kind==='quest'){
       const quest=window.Quests.offered(npc.id).find(q=>q.id===view.id);
@@ -457,7 +457,7 @@
       else {view={kind:'gossip'};}
     }
     if(view.kind==='gossip')window.Quests?.npc(npc.id,$('npc-quests'),q=>show({kind:'quest',id:q.id},'[data-action="decline"]'));
-    else if(view.kind==='sell')$('npc-quests').replaceChildren();
+    else if(['sell','merge','refine'].includes(view.kind))$('npc-quests').replaceChildren();
     const offers=[];
     if(view.kind==='gossip'){
       for(const destination of packet.travel||[]){
@@ -480,12 +480,16 @@
         const b=row(iconFor(offer),tier?`Buy ${tier.name} · ${window.Inventory.effect(tier)}`:offer.label,cost?`${cost} gold`:'Free');b.dataset.offer=offer.id;
         if(tier)b.dataset.tier=tier.id;
         b.disabled=packet.gold<cost || (offer.bag && (packet.bags || []).length >= 4 && !(packet.bags || []).some(id => WORLD_ITEMS.find(i => i.id === id)?.bagSlots < WORLD_ITEMS.find(i => i.id === offer.bag)?.bagSlots));
-        b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:offer.id})) b.disabled=true;});offers.push(b);
+        b.addEventListener('click',()=>{
+          if(offer.id==='merge'||offer.id==='refine')show({kind:offer.id},'#npc-back');
+          else if(Online.send({type:'interact',npc:npc.id,offer:offer.id}))b.disabled=true;
+        });offers.push(b);
       }
     }
     $('npc-offers').replaceChildren(...offers);
     $('npc-inventory').replaceChildren();
     if(view.kind==='sell')window.Inventory?.renderShop(npc,$('npc-inventory'));
+    if(view.kind==='merge'||view.kind==='refine')window.GearServices?.render(view.kind,npc,packet,$('npc-inventory'));
     const target=focus&&$('npc-dialogue').querySelector(focus);
     (target&&!target.hidden?target:$('npc-close')).focus({preventScroll:true});
   }
@@ -498,9 +502,9 @@
     const same=current?.id===packet.npc.id;
     previousFocus=current?previousFocus:document.activeElement;current=packet.npc;
     // Selling keeps its list open between sales; every other reply (accepting, a purchase) returns to the greeting.
-    if(!same||view.kind!=='sell')view={kind:'gossip'};
+    if(!same||!['sell','merge','refine'].includes(view.kind))view={kind:'gossip'};
     Field.setPaused(true);$('npc-dialogue').hidden=false;
-    window.Inventory?.update(packet.inventory || [], packet.look, packet.equipment || {}, packet.bags || []);
+    window.Inventory?.update(packet.inventory || [], packet.look, packet.equipment || {}, packet.bags || [], packet.gearInstances || []);
     window.Quests?.update(packet.quests || []);
     lastPacket=packet;render();
   }

@@ -1,0 +1,179 @@
+[
+  {
+    "kind": "seed_mote",
+    "name": "Awakened Seedling",
+    "art": "mote",
+    "color": "#bdd77b",
+    "stats": [
+      505000,
+      6500,
+      3.4,
+      1.25
+    ],
+    "profile": [
+      0.5,
+      1.3,
+      10,
+      11
+    ],
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "boss": false,
+    "level": 80,
+    "gold": 2320,
+    "material": "seed_mote_relic",
+    "lootSource": null
+  },
+  {
+    "kind": "seed_amberwing",
+    "name": "Amberwing Moth",
+    "art": "amberwing",
+    "color": "#e8bd76",
+    "stats": [
+      455000,
+      5850,
+      3.1,
+      1.45
+    ],
+    "profile": [
+      0.7,
+      1.8,
+      0,
+      13
+    ],
+    "ranged": [
+      13,
+      10,
+      "#eacb83",
+      1,
+      2,
+      0.22
+    ],
+    "slam": 0,
+    "melee": 0,
+    "boss": false,
+    "level": 80,
+    "gold": 2320,
+    "material": "seed_amberwing_relic",
+    "lootSource": null
+  },
+  {
+    "kind": "seed_rootguard",
+    "name": "Heartroot Guard",
+    "art": "rootguard",
+    "color": "#9ac284",
+    "stats": [
+      585000,
+      7750,
+      2.55,
+      1.8
+    ],
+    "profile": [
+      0.9,
+      1.55,
+      8,
+      11
+    ],
+    "ranged": null,
+    "slam": 3.2,
+    "melee": 0,
+    "boss": false,
+    "level": 80,
+    "gold": 2320,
+    "material": "seed_rootguard_relic",
+    "lootSource": null
+  },
+  {
+    "kind": "seed_warden",
+    "name": "Warden of Rings",
+    "art": "warden",
+    "color": "#9fc67c",
+    "stats": [
+      2520000,
+      16800,
+      2.8,
+      2.1
+    ],
+    "profile": [
+      0.85,
+      1.75,
+      9,
+      12
+    ],
+    "ranged": null,
+    "slam": 4.2,
+    "melee": 0,
+    "boss": true,
+    "level": 80,
+    "gold": 9600,
+    "material": "seed_warden_relic",
+    "lootSource": "seed_vault"
+  },
+  {
+    "kind": "seed_germinator",
+    "name": "The Germinator",
+    "art": "germinator",
+    "color": "#d9c986",
+    "stats": [
+      2710000,
+      14800,
+      2.5,
+      2.2
+    ],
+    "profile": [
+      0.9,
+      2.1,
+      0,
+      14
+    ],
+    "ranged": [
+      15,
+      10,
+      "#d7e7a6",
+      1.2,
+      3,
+      0.29
+    ],
+    "slam": 0,
+    "melee": 0,
+    "boss": true,
+    "level": 80,
+    "gold": 9600,
+    "material": "seed_germinator_relic",
+    "lootSource": "seed_vault"
+  },
+  {
+    "kind": "seed_worldseed",
+    "name": "Heart of the Worldseed",
+    "art": "worldseed",
+    "color": "#e4dc9c",
+    "stats": [
+      4050000,
+      22000,
+      2.2,
+      2.75
+    ],
+    "profile": [
+      1.1,
+      2.2,
+      8,
+      16
+    ],
+    "ranged": [
+      15,
+      11,
+      "#f0e9b9",
+      1.35,
+      5,
+      0.31
+    ],
+    "slam": 4.9,
+    "melee": 5.1,
+    "boss": true,
+    "level": 80,
+    "gold": 9600,
+    "material": "seed_worldseed_relic",
+    "lootSource": "seed_vault"
+  }
+]

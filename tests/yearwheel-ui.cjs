@@ -1,4 +1,4 @@
-// Private browser captures of all four Yearwheel seasons and the sealed thresholds.
+// Private browser captures of the four Yearwheel seasons and their thresholds.
 const assert=require('node:assert/strict');
 const path=require('node:path');
 const fs=require('node:fs');
@@ -22,11 +22,11 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.locator('#cls-warrior').click();await page.locator('#name').fill('YearUI');await page.locator('#go').click({timeout:60000});
   await page.waitForFunction(()=>Online.connected&&!!Field.yearSprites?.img.longnightwyrm,null,{timeout:60000});
   const data=await page.evaluate(()=>{const z=Field._debug.zones,a=z[28],src=Field.yearSprites;return {count:z.length,name:a.name,theme:a.theme,size:a.size,levels:a.levels,npcs:a.npcs.length,quests:a.quests.length,enemies:a.slimes.length,doors:a.futureInstances,portals:a.portals.length,kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>[src.img[k].naturalWidth,src.img[k].naturalHeight]),art:['year_bloom_gate','year_solar_gate','year_amber_gate','year_solstice_gate','year_axle','year_bloomtree','year_sunpine','year_amberoak','year_frostbirch'].every(k=>!!City.art[k]),layout:WorldMap._layout.length,travel:a.npcs.filter(n=>n.travelStop)};});
-  check(data.count===29&&data.name==='The Yearwheel'&&data.theme==='yearwheel'&&data.size===400&&data.levels.join(',')==='95,99','The 400-square level 95–99 zone loads');
-  check(data.npcs===28&&data.quests===24&&data.enemies===156,'Four hubs, quests and seasonal encounters load');
-  check(data.doors.length===4&&data.doors.every(d=>d.status==='sealed')&&data.portals===1,'Four instance entrances are sealed');
+  check(data.count>=40&&data.name==='The Yearwheel'&&data.theme==='yearwheel'&&data.size===400&&data.levels.join(',')==='95,99','The 400-square level 95–99 zone loads');
+  check(data.npcs===28&&data.quests===33&&data.enemies===156,'Four hubs, quests and seasonal encounters load');
+  check(data.doors.length===4&&data.doors.every(d=>d.status==='open')&&data.portals===5,'All four seasonal dungeons are open');
   check(data.kinds.length===24&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Twenty-four PixelFlow atlases load');
-  check(data.art&&data.layout===29&&data.travel.length===4,'Seasonal scenery and travel masters load');
+  check(data.art&&data.layout===40&&data.travel.length===4,'Seasonal scenery and travel masters load');
   let ref=1001;async function stage(x,y,label){check(await page.evaluate(([x,y,ref])=>Online.send({type:'debug',ref,command:{op:'teleport',zone:28,x,y}}),[x,y,ref++]),`Stage ${label}`);await page.waitForFunction(([x,y])=>Field.zone===28&&Math.hypot(Field.hero.x-x,Field.hero.y-y)<4,[x,y],{timeout:15000});await page.waitForTimeout(900);await page.screenshot({path:path.join(world.artifacts,`yearwheel-${label}.png`)});}
   for(const [x,y,label] of [[76,324,'springmere'],[320,316,'solhaven'],[321,78,'harvestwatch'],[78,78,'rimehold'],[36,217,'blooming-labyrinth'],[340,236,'solar-crucible'],[340,139,'amber-archive'],[35,138,'silent-solstice'],[200,200,'equinox-crossing']])await stage(x,y,label);
   check(await page.evaluate(()=>Field.zoneTheme==='yearwheel'&&City.npcs.length===28),'The four-season field renders live');

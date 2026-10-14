@@ -12,7 +12,7 @@ fn tanglecrown_gates_hub_loops_and_temple_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("The Tanglecrown", Some([75, 80]), 144)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (42, 10));
+    assert_eq!((m.slimes.len(), m.quests.len()), (42, 12));
     assert!(m.in_city(m.spawn));
     let back = m
         .portals
@@ -59,7 +59,7 @@ fn tanglecrown_gates_hub_loops_and_temple_are_reachable() {
     }
     let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let zone = &raw["zones"][JUNGLE - 1];
-    assert_eq!(zone["futureInstance"]["status"], "sealed");
+    assert_eq!(zone["futureInstance"]["status"], "open");
     assert_eq!(zone["futureInstance"]["name"], "Temple of the Rain Crown");
     let objects = zone["objects"].as_array().unwrap();
     assert!(objects.iter().filter(|o| o["kind"] == "kapok_tree").count() >= 80);
@@ -71,7 +71,7 @@ fn tanglecrown_gates_hub_loops_and_temple_are_reachable() {
             >= 20
     );
     let travel = m.npcs.iter().find(|n| n.id == "travel_banyan").unwrap();
-    assert_eq!(travel.travel_links, ["travel_jubilee"]);
+    assert_eq!(travel.travel_links, ["travel_jubilee", "travel_veyrroot"]);
     assert!(
         w.maps[21]
             .npcs

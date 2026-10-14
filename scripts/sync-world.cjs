@@ -13,5 +13,18 @@ fs.writeFileSync(path.join(root, 'client/passives.js'), "'use strict';\nwindow.W
 const zones = map.zones || [];
 console.log(`Synced ${map.objects.length} obstacles and ${map.slimes.length} spawns` + zones.map(z => `, plus zone "${z.name}": ${z.objects.length} obstacles and ${z.slimes.length} spawns`).join('') + '. Rebuild Rust after changing the map.');
 
-const cathedral = JSON.parse(fs.readFileSync(path.join(root, "world/cathedral.txt"), "utf8"));
+const cathedral = [
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/cathedral.txt"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/eye_below.txt"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/elder_hollow.txt"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/thousandfold.txt"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/rain_crown.txt"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/seed_vault.txt"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/sunken_astrolabe.txt"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/blooming_labyrinth.txt"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/solar_crucible.txt"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/amber_archive.txt"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/silent_solstice.txt"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/thunderheart_gate.txt"), "utf8"))
+];
 fs.writeFileSync(path.join(root, "client/cathedral.js"), "'use strict';\nwindow.CATHEDRAL_ENEMIES = " + JSON.stringify(cathedral) + ";\n");

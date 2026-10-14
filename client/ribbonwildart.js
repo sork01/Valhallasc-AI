@@ -87,7 +87,7 @@
       oval(g,Math.cos(a)*150,Math.sin(a)*66,21,10,shade(j));}
     oval(g,0,0,31,15,'#fff0b9');
   }};
-  City.art.grand_pavilion_gate={box:[980,760,490,704],draw(g){
+  City.art.grand_pavilion_gate={box:[980,760,490,704],draw(g,o){
     shadow(g,292);
     // Three immense peaks are tied to one stage. The mask door is visibly sealed.
     poly(g,[[-268,4],[-258,-247],[260,-247],[271,4]],'#f5dba8','#5b4668',6);
@@ -100,12 +100,15 @@
       line(g,[[s*207,-229],[s*281,-181]],'#fbe7ad',4);
       for(let j=0;j<4;j++)oval(g,s*(248+j*9),-201+j*11,6,8,shade(j));
     }
-    poly(g,[[-87,4],[-87,-204],[-54,-256],[0,-279],[55,-256],[88,-204],[88,4]],'#4a315e','#fbe7ac',7);
+    poly(g,[[-87,4],[-87,-204],[-54,-256],[0,-279],[55,-256],[88,-204],[88,4]],o.open?'#251d48':'#4a315e','#fbe7ac',7);
+    if(o.open){oval(g,0,-119,58,106,'#edb0d1');oval(g,0,-119,48,96,'#50365d');}
+    else {
     oval(g,0,-162,65,83,'#ffe9ab');
     oval(g,-25,-182,17,25,'#503957');oval(g,25,-182,17,25,'#503957');
     poly(g,[[-14,-135],[0,-124],[14,-135]],'#dc799b','#8b5b82',3);
     line(g,[[-46,-84],[46,-84]],'#87537c',12);
     line(g,[[0,-68],[0,2]],'#9e7293',7);
+    }
     for(let j=-5;j<=5;j++){
       const x=j*38;
       line(g,[[x,-260],[x+Math.sin(j)*12,-297]],'#e6bb73',3);

@@ -23,7 +23,7 @@ const KINDS: [(&str, u32, &str); 16] = [
 ];
 
 #[test]
-fn four_seasons_hubs_travel_and_sealed_thresholds() {
+fn four_seasons_hubs_travel_and_spring_dungeon() {
     let w = world();
     let m = &w.maps[YEAR];
     assert_eq!(
@@ -33,7 +33,7 @@ fn four_seasons_hubs_travel_and_sealed_thresholds() {
     assert!(m.size * m.size > 4 * 192 * 192);
     assert_eq!(
         (m.npcs.len(), m.quests.len(), m.slimes.len()),
-        (28, 25, 156)
+        (28, 33, 156)
     );
     for q in &m.quests {
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
@@ -43,8 +43,29 @@ fn four_seasons_hubs_travel_and_sealed_thresholds() {
     assert_eq!(z["camps"].as_array().unwrap().len(), 3);
     let future = z["futureInstances"].as_array().unwrap();
     assert_eq!(future.len(), 4);
-    assert!(future.iter().all(|door| door["status"] == "sealed"));
-    assert_eq!(m.portals.len(), 1); // the four instance entrances do not transfer yet
+    assert_eq!(future[0]["status"], "open");
+    assert!(future.iter().all(|door| door["status"] == "open"));
+    assert_eq!(m.portals.len(), 5);
+    assert!(
+        m.portals
+            .iter()
+            .any(|p| p.id == "year_bloom_descent" && p.to == 36)
+    );
+    assert!(
+        m.portals
+            .iter()
+            .any(|p| p.id == "year_solar_descent" && p.to == 37)
+    );
+    assert!(
+        m.portals
+            .iter()
+            .any(|p| p.id == "year_amber_descent" && p.to == 38)
+    );
+    assert!(
+        m.portals
+            .iter()
+            .any(|p| p.id == "year_solstice_descent" && p.to == 39)
+    );
     let season_stops = [
         "travel_springmere",
         "travel_solhaven",

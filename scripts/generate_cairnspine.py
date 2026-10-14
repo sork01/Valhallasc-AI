@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Seeded level 90–95 Cairnspine mountain, switchbacks and sealed Thunderheart Gate."""
+"""Seeded level 90–95 Cairnspine mountain, switchbacks and open Thunderheart Gate."""
 import json,math,random
 from pathlib import Path
 import generate_gloamfen as fen
 import generate_frostwake as frost
-import mercenary_offers,spark_travel
+import mercenary_offers,spark_travel,progression_quests
 from quest_gear_rewards import add_reward
 ROOT=Path(__file__).resolve().parents[1];MAP=ROOT/'world/map.txt';ITEMS=ROOT/'world/items.txt'
 XP=json.loads((ROOT/'world/levels.txt').read_text())
@@ -32,8 +32,9 @@ def build():
  west=[(32,76),(49,61),(77,56),(100,67),(127,58),(147,43)]
  crown=[(147,43),(130,29),(109,25),(87,34),(65,25),(48,37)]
  cuts=[[(47,137),(43,108),(56,91)],[(82,132),(83,94),(100,67)],[(128,126),(133,91),(127,58)],[(77,56),(87,34),(109,25)]]
- paths=[lower,east,west,crown,*cuts]
- objects=[obj('cairn_thunder_gate',145,20,width=9,depth=6,place='cairn_thunder'),
+ gate_road=[(130,29),(139,24),(145,20)]
+ paths=[lower,east,west,crown,gate_road,*cuts]
+ objects=[obj('cairn_thunder_gate',145,20,place='cairn_thunder',open=True),
           obj('cairn_watchhall',24,134,width=4,depth=3),obj('cairn_watchhall',36,151,width=4,depth=3,v=1),
           obj('cairn_watchhall',46,145,width=4,depth=3,v=2),obj('cairn_signal',30,142,.8),
           obj('cairn_stonecircle',56,69,1.0),obj('cairn_whitegrove',109,74,1.0),
@@ -69,7 +70,7 @@ def build():
   npc('scout','Noll Farstride','Peak scout',58,119,'Ibex favor the west slopes. The dark ravens watch the upper terraces.',mercenary_offers.offers()),
   npc('stonesinger','Edda Flintvoice','Stone singer',54,74,'The behemoth answers the old cairn bells. Bring two allies before you ring them.',mercenary_offers.offers(),art='cairn_stonesinger'),
   npc('grovekeeper','Tala Whitebark','Bare grove keeper',102,83,'The leafless giant still grows. It remembers the mountain before these roads.',mercenary_offers.offers(),art='cairn_grovekeeper'),
-  npc('windseer','Oren Highwind','Summit windseer',133,53,'The condor circles the gate. Five travelers should face it before approaching the seal.',mercenary_offers.offers(),art='cairn_windseer'),
+  npc('windseer','Oren Highwind','Summit windseer',133,53,'The storm-ring is open. Gather five travelers for the Thunderheart Gate.',mercenary_offers.offers(),art='cairn_windseer'),
   npc('stone','Cairnspine Meeting Stone','Gather a party · hire fighters',131,30,'Gather here before the Thunderheart Gate.',mercenary_offers.offers(open_=True),art='stone'),
  ]
  quests=[
@@ -81,21 +82,23 @@ def build():
   quest('behemoth','The Walking Cairn','stonesinger','Three companions should face the Cairn Behemoth.',[kill('cairnbehemoth',1,'Defeat the Cairn Behemoth')],93,22000,'ravens',group=True,recommendedPlayers=3),
   quest('titan','Roots without Leaves','grovekeeper','Four companions should confront the Whitebark Titan.',[kill('whitebarktitan',1,'Defeat the Whitebark Titan')],94,27000,'adders',group=True,recommendedPlayers=4),
   quest('condor','Storm over Stone','windseer','Five companions must bring down the Storm Condor.',[kill('stormcondor',1,'Defeat the Storm Condor')],95,33000,'adders',group=True,recommendedPlayers=5),
-  quest('gate','The Thunderheart Seal','windseer','Survey the sealed summit gate and consult the Meeting Stone.',[visit('thunder','Survey the Thunderheart Gate'),talk('stone','Consult the Meeting Stone')],95,17000,'adders'),
+  quest('gate','The Thunderheart Gate','windseer','Survey the summit gate and consult the Meeting Stone before descending.',[visit('thunder','Survey the Thunderheart Gate'),talk('stone','Consult the Meeting Stone')],95,17000,'adders'),
+  quest('storm_trials','The Storm Ring','windseer','With your party, break the Conductor and Bastion and silence the outer sparks.',[kill('thunder_conductor',1,'Defeat the Storm Conductor'),kill('thunder_bastion',1,'Defeat the Thunder Bastion'),kill('thunder_spark',3,'Defeat Forked Sparks')],95,35000,'gate',group=True,recommendedPlayers=5),
+  quest('thunder_final','Heart of the Stormgate','windseer','Face the Heart of the Stormgate inside your party copy.',[kill('thunder_heart',1,'Defeat the Heart of the Stormgate')],95,52000,'storm_trials',group=True,recommendedPlayers=5),
   quest('patrol','Hold the Switchbacks','warden','Patrol the lower and upper rock roads.',[kill('screeferret',3,'Defeat Scree Ferrets'),kill('ridgeadder',3,'Defeat Ridge Adders')],90,8100,'welcome',True),
  ]
  zone=dict(name=NAME,theme='cairnspine',tagline='Slate switchbacks, giant boulders and leafless white trees',size=168,levels=[90,95],spawn=dict(x=ARRIVAL[0],y=ARRIVAL[1]),paths=[[[x,y] for x,y in p] for p in paths],objects=objects,slimes=spawns,npcs=folk,
            places=[dict(id='cairn_thunder',name='The Thunderheart Gate',x=134,y=26,r=5),dict(id='cairn_stones',name='Singing Cairn',x=55,y=74,r=5),dict(id='cairn_grove',name='Whitebark Grove',x=106,y=78,r=5)],quests=quests,
            city=dict(name='Boulderwatch',x0=9,x1=55,y0=127,y1=161,plaza=dict(x=30,y=145),radius=7,entry=dict(x=15,y=145)),
-           futureInstance=dict(name='The Thunderheart Gate',level=95,players=5,status='sealed',x=145,y=20,description='Two mountain monoliths hold a bronze storm-ring above a sealed stair into the peak.'),
-           portals=[dict(id='cairn_frostwake_gate',name='The High Pass',x=RETURN[0],y=RETURN[1],r=1.2,to=26,tx=OLD_ARRIVAL[0],ty=OLD_ARRIVAL[1],look='cairnspine')])
+           futureInstance=dict(name='The Thunderheart Gate',level=95,players=5,status='open',x=145,y=20,description='Stormlight turns within a bronze ring above a stair into the peak.'),
+           portals=[dict(id='cairn_frostwake_gate',name='The High Pass',x=RETURN[0],y=RETURN[1],r=1.2,to=26,tx=OLD_ARRIVAL[0],ty=OLD_ARRIVAL[1],look='cairnspine'),dict(id='cairn_thunderheart_gate',name='The Thunderheart Gate',x=145,y=22,r=1.2,to=35,tx=48,ty=82,look='thunderheart_gate')])
  check(zone);return zone
 
 def check(zone):
  seen,_=fen.flood(zone,ARRIVAL)
  for target in [*zone['npcs'],*zone['slimes'],*zone['portals'],*zone['places']]:assert seen[int(target['y']/.5),int(target['x']/.5)],f'unreachable: {target}'
  assert all(math.hypot(s['x']-ARRIVAL[0],s['y']-ARRIVAL[1])>=8 for s in zone['slimes'])
- assert len(zone['slimes'])==43 and len(zone['quests'])==10
+ assert len(zone['slimes'])==43 and len(zone['quests'])==12
  assert all(len('quest:accept:'+q['id'])<=32 for q in zone['quests'])
 
 def open_year_gate(mountain):
@@ -111,15 +114,18 @@ def open_year_gate(mountain):
 
 def main():
  world=json.loads(MAP.read_text());assert world['zones'][25]['name']=='Frostwake Shelf'
+ previous=world['zones'][ZONE-1]
  later=world['zones'][ZONE-1:]
  while later and later[0].get('name')==NAME:later=later[1:]
  world['zones']=world['zones'][:ZONE-1]
- frost.open_cairn_gate(world['zones'][25]);world['zones'].append(build());world['zones'].extend(later)
+ frost.open_cairn_gate(world['zones'][25]);zone=build()
+ progression_quests.keep_released_rewards_and_route_quest(previous,zone)
+ world['zones'].append(zone);world['zones'].extend(later)
  if any(z.get('name')=='The Yearwheel' for z in later):open_year_gate(world['zones'][26])
  spark_travel.ensure(world);MAP.write_text(json.dumps(world,indent=2)+'\n')
  items=json.loads(ITEMS.read_text())
  for key,name,sell in [('screeferret_pelt','Scree Ferret Pelt',2900),('ibex_horn','Stone Ibex Horn',3000),('slate_raven_feather','Slate Raven Feather',3200),('ridgeadder_scale','Ridge Adder Scale',3400),('behemoth_heartstone','Cairn Behemoth Heartstone',10000),('whitebark_core','Whitebark Titan Core',11500),('stormcondor_plume','Storm Condor Plume',14500)]:
   if not any(i['id']==key for i in items):items.append(dict(id=key,name=name,kind='material',rarity='common',sell=sell))
  ITEMS.write_text(json.dumps(items,indent=2)+'\n')
- print(f'{NAME}: {len(world["zones"][26]["objects"])} objects, 43 enemies, 10 quests')
+ print(f'{NAME}: {len(world["zones"][26]["objects"])} objects, 43 enemies, {len(world["zones"][26]["quests"])} quests')
 if __name__=='__main__':main()

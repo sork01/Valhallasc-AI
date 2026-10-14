@@ -6,6 +6,7 @@ import random
 from pathlib import Path
 
 import generate_gloamfen as fen
+import progression_quests
 import spark_travel
 from quest_gear_rewards import add_reward
 
@@ -204,10 +205,12 @@ def open_astral_gate(astral):
 
 def main():
     world=json.loads(MAP.read_text())
+    previous=world['zones'][ZONE-1]
     later=world['zones'][ZONE:]
     world['zones']=world['zones'][:ZONE-1]
     assert len(world['zones'])==ZONE-1
     zone=build()
+    progression_quests.keep_released_rewards_and_route_quest(previous,zone)
     open_astral_gate(world['zones'][12])
     world['zones'].append(zone)
     world['zones'].extend(later)

@@ -12,7 +12,7 @@ fn lapis_gates_oases_hub_and_astrolabe_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("The Lapis Erg", Some([80, 85]), 160)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (42, 10));
+    assert_eq!((m.slimes.len(), m.quests.len()), (42, 12));
     assert!(m.in_city(m.spawn));
     assert_eq!(
         w.maps[23].slimes.len(),
@@ -64,7 +64,7 @@ fn lapis_gates_oases_hub_and_astrolabe_are_reachable() {
     }
     let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let zone = &raw["zones"][ERG - 1];
-    assert_eq!(zone["futureInstance"]["status"], "sealed");
+    assert_eq!(zone["futureInstance"]["status"], "open");
     assert_eq!(zone["futureInstance"]["name"], "The Sunken Astrolabe");
     let objects = zone["objects"].as_array().unwrap();
     assert_eq!(

@@ -23,10 +23,10 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.locator('#cls-warrior').click();await page.locator('#name').fill('FrostUI');await page.locator('#go').click({timeout:60000});
   await page.waitForFunction(()=>Online.connected&&!!Field.cairnSprites?.img.stormcondor,null,{timeout:60000});
   const data=await page.evaluate(()=>{const z=Field._debug.zones,a=z[27],src=Field.cairnSprites;return {count:z.length,name:a.name,theme:a.theme,levels:a.levels,npcs:a.npcs.length,quests:a.quests.length,enemies:a.slimes.length,boulders:a.objects.filter(o=>o.kind==='cairn_boulder').length,trees:a.objects.filter(o=>o.kind==='cairn_dead_tree').length,gates:[z[26].portals.find(p=>p.id==='frostwake_cairn_gate'),a.portals.find(p=>p.id==='cairn_frostwake_gate')],kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>[src.img[k].naturalWidth,src.img[k].naturalHeight]),art:['cairn_boulder','cairn_dead_tree','cairn_watchhall','cairn_thunder_gate'].every(k=>!!City.art[k]),layout:WorldMap._layout.length,travel:a.npcs.find(n=>n.id==='travel_boulderwatch')};});
-  check(data.count===29&&data.name==='The Cairnspine'&&data.theme==='cairnspine'&&data.levels.join(',')==='90,95','Level 90–95 mountain loads');
-  check(data.npcs===10&&data.quests===10&&data.enemies===43&&data.boulders>=100&&data.trees>=70,'Hub, quests, elite territories, boulders and leafless trees load');
+  check(data.count===40&&data.name==='The Cairnspine'&&data.theme==='cairnspine'&&data.levels.join(',')==='90,95','Level 90–95 mountain loads');
+  check(data.npcs===10&&data.quests===13&&data.enemies===43&&data.boulders>=100&&data.trees>=70,'Hub, quests, elite territories, boulders and leafless trees load');
   check(data.kinds.length===13&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Thirteen PixelFlow atlases load');
-  check(data.art&&data.layout===29,'Mountain scenery and world-map placement load');
+  check(data.art&&data.layout===36,'Mountain scenery and world-map placement load');
   check(data.gates.every(Boolean)&&data.gates[0].to===27&&data.gates[1].to===26,'Reciprocal High Pass gates load');
   check(data.travel?.travelLinks.includes('travel_frostwake')&&data.travel?.art==='cairn_travel','Travel Master Asta has unique art and return service');
   let ref=701;const debug=async command=>check(await page.evaluate(([command,ref])=>Online.send({type:'debug',ref,command}),[command,ref++]),`Send ${command.op}`);

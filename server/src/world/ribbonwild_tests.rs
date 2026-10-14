@@ -12,7 +12,7 @@ fn ribbonwild_gates_hub_circuit_and_entrance_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("The Ribbonwild", Some([70, 75]), 136)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (42, 10));
+    assert_eq!((m.slimes.len(), m.quests.len()), (42, 12));
     assert!(m.in_city(m.spawn));
     let out = m
         .portals
@@ -59,7 +59,7 @@ fn ribbonwild_gates_hub_circuit_and_entrance_are_reachable() {
     }
     let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let zone = &raw["zones"][FAIR - 1];
-    assert_eq!(zone["futureInstance"]["status"], "sealed");
+    assert_eq!(zone["futureInstance"]["status"], "open");
     assert_eq!(zone["futureInstance"]["name"], "The Thousandfold Pavilion");
     let objects = zone["objects"].as_array().unwrap();
     assert!(
@@ -77,7 +77,7 @@ fn ribbonwild_gates_hub_circuit_and_entrance_are_reachable() {
             >= 50
     );
     let master = m.npcs.iter().find(|n| n.id == "travel_jubilee").unwrap();
-    assert_eq!(master.travel_links, ["travel_millbridge"]);
+    assert_eq!(master.travel_links, ["travel_millbridge", "travel_banyan"]);
     assert!(
         w.maps[20]
             .npcs

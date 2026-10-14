@@ -133,6 +133,8 @@ impl Store {
             quests: vec![],
             inventory: vec![],
             equipment: Default::default(),
+            gear_instances: vec![],
+            next_gear_id: 1,
             bags: vec![],
             attributes: Default::default(),
             zone: 0,

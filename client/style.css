@@ -191,6 +191,12 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 .hud-tl { left: 1.4cqw; top: 1.4cqw; display: flex; gap: 1cqw; align-items: center; padding: .8cqw 1.3cqw .8cqw .8cqw; border-radius: 2cqw; background: linear-gradient(rgba(16, 30, 70, .82), rgba(8, 16, 42, .86)); border: .2cqw solid rgba(245, 197, 66, .65); box-shadow: 0 .4cqw 1.4cqw rgba(0, 0, 0, .4); }
 .hud-portrait { width: 6.4cqw; height: 6.4cqw; flex: none; border-radius: 50%; border: .25cqw solid var(--gold); background: radial-gradient(circle at 50% 80%, rgba(255, 150, 50, .5), #16306a 60%, #0b1538) center / cover; }
 .hud-bars { width: 19cqw; }
+.hud-target { display: flex; align-items: center; gap: .8cqw; padding-left: 1cqw; border-left: .15cqw solid rgba(245, 197, 66, .45); }
+.hud-target[hidden] { display: none; }
+.hud-target-face { width: 6.4cqw; height: 6.4cqw; flex: none; border-radius: 50%; border: .25cqw solid #eb6971; background: radial-gradient(circle at 50% 80%, #60404b, #182348 70%); image-rendering: pixelated; }
+.hud-target-bars { width: 15cqw; }
+.hud-target .hud-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hud-target .hud-name b { font-size: 1.25cqw; }
 .hud-name { margin: 0 0 .4cqw; font-size: 1.5cqw; } .hud-name b { font-family: var(--display); font-weight: 400; color: #fff3c4; } .hud-name span { color: var(--gold); font-size: 1.2cqw; }
 .bar { position: relative; height: 1.9cqw; border-radius: 999px; background: rgba(0, 0, 0, .5); border: .15cqw solid rgba(255, 255, 255, .25); overflow: hidden; }
 .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; border-radius: 999px; transition: width .15s; }

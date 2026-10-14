@@ -91,7 +91,7 @@ test('MCP: real SDK handshake, tools, invalid actions, world lifecycle, and pare
     for (const name of ['start_world', 'stop_world', 'connect_bot', 'disconnect_bot', 'send_action', 'inspect_world', 'wait_world', 'list_scenarios', 'run_scenario']) {
       assert.ok(listed.tools.some(t => t.name === name), `Advertises ${name}`);
     }
-    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['skills', 'movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'stats', 'crags', 'bags', 'shortcuts', 'social', 'consumables', 'crags_quests', 'rimeveil', 'rime_quests', 'gloamfen', 'skaldholm', 'skaldholm_quests', 'fen_quests', 'gender', 'priest', 'hunter', 'cinderlord', 'gloomroot', 'mercenaries', 'progression_quests', 'resources', 'undervault', 'spark_travel', 'instance_pursuit', 'wyrdwood', 'wyrd_quests', 'bifrost', 'sky_quests', 'deep', 'deep_quests', 'nacrehold', 'nacre_quests', 'cathedral', 'astral', 'prismwaste', 'orrery', 'moonspore', 'asterion', 'stormglass', 'sunward', 'ribbonwild', 'tanglecrown', 'worldheart', 'lapis', 'frostwake', 'cairn', 'yearwheel']);
+    assert.deepEqual((await call('list_scenarios')).scenarios.map(s => s.name), ['skills', 'movement', 'ironhide', 'city', 'quests', 'quest_combat', 'inventory', 'stats', 'crags', 'bags', 'shortcuts', 'social', 'consumables', 'crags_quests', 'rimeveil', 'rime_quests', 'gloamfen', 'skaldholm', 'skaldholm_quests', 'fen_quests', 'gender', 'priest', 'hunter', 'cinderlord', 'gloomroot', 'mercenaries', 'progression_quests', 'resources', 'undervault', 'spark_travel', 'instance_pursuit', 'wyrdwood', 'wyrd_quests', 'bifrost', 'sky_quests', 'deep', 'deep_quests', 'nacrehold', 'nacre_quests', 'cathedral', 'astral', 'prismwaste', 'orrery', 'moonspore', 'asterion', 'stormglass', 'sunward', 'ribbonwild', 'tanglecrown', 'lapis', 'frostwake', 'cairn', 'yearwheel', 'worldheart', 'elder_hollow', 'thousandfold_foes', 'thousandfold_quests', 'thousandfold_open', 'rain_crown_open', 'seed_vault', 'rain_crown', 'sunken_astrolabe', 'thunderheart_gate', 'thunderheart_foes', 'blooming_foes', 'blooming_quests', 'blooming_open', 'solar_crucible', 'amber_archive', 'silent_solstice', 'gear_services']);
     const first = await call('start_world');
     url = first.url;
     assert.match(url, /^http:\/\/127\.0\.0\.1:\d+\/$/);
@@ -161,7 +161,10 @@ test('MCP shortcuts: every tool advertised, strict inputs, and server-side effec
     assert.equal((await raw('teleport', { bot: 'Gm', to: { npc: 'nobody' } })).isError, true);
     const leveled = await call('set_level', { bot: 'Gm', level: 20 });
     assert.equal(leveled.player.level, 20);
-    assert.equal(leveled.unlocked.length, 9, 'Levels 4-20 unlock nine skills; the level-2 skill was already known at level 3');
+    const assassinSkills = JSON.parse(fs.readFileSync(path.join(root, 'world/skills.txt'), 'utf8')).filter(s => s.class === 'assassin');
+    const assassinPassives = JSON.parse(fs.readFileSync(path.join(root, 'world/passives.txt'), 'utf8')).filter(p => p.class === 'assassin');
+    const expectedUnlocks = assassinSkills.flatMap(s => [s.level, ...(s.ranks || []).map(r => r.level)]).concat(assassinPassives.map(p => p.level)).filter(level => level > 3 && level <= 20).length;
+    assert.equal(leveled.unlocked.length, expectedUnlocks, 'Level gains report every new skill and rank from the shared catalog');
     const hurt = await call('set_health', { bot: 'Gm', hp: 5 });
     assert.ok(hurt.player.hp >= 5 && hurt.player.hp < 10, 'hp is set (natural regeneration adds a few tenths before the snapshot)');
     assert.equal((await call('set_health', { bot: 'Gm', hp: 1e9 })).player.hp, leveled.player.maxHp);

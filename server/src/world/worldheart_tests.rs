@@ -23,7 +23,7 @@ fn worldheart_gates_and_both_city_floors_are_reachable() {
             inner.slimes.len(),
             inner.quests.len()
         ),
-        (0, 7, 0, 2)
+        (0, 7, 0, 4)
     );
     assert!(outer.in_city(at(56., 88.)) && inner.in_city(inner.spawn));
     for (map, id, to) in [
@@ -31,6 +31,7 @@ fn worldheart_gates_and_both_city_floors_are_reachable() {
         (outer, "canopy_jungle_gate", 22),
         (outer, "canopy_hollow_gate", 24),
         (inner, "hollow_canopy_gate", 23),
+        (inner, "heart_seed_gate", 33),
     ] {
         let p = map.portals.iter().find(|p| p.id == id).unwrap();
         assert_eq!(p.to, to);
@@ -70,8 +71,8 @@ fn worldheart_gates_and_both_city_floors_are_reachable() {
     assert!(master.travel_links.contains(&"travel_banyan".to_string()));
     let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     assert_eq!(raw["zones"][23]["futureInstance"]["name"], "The Seed Vault");
-    assert_eq!(raw["zones"][23]["futureInstance"]["status"], "sealed");
-    assert_eq!(inner.portals.len(), 1);
+    assert_eq!(raw["zones"][23]["futureInstance"]["status"], "open");
+    assert_eq!(inner.portals.len(), 2);
 }
 
 #[test]
@@ -89,16 +90,18 @@ fn worldheart_creatures_are_reserved_for_instance_and_city_quests_are_peaceful()
         let (hp, damage, _, _) = Slime::stats(kind);
         assert!(hp > 300000. && damage > 5000.);
     }
-    for map in [&w.maps[23], &w.maps[24]] {
+    for (map, peaceful) in [(&w.maps[23], true), (&w.maps[24], false)] {
         for q in &map.quests {
             assert_eq!(q.reward_xp, xp_to_level(80) / 10, "{}", q.id);
-            assert!(
-                q.objectives
-                    .iter()
-                    .all(|o| matches!(o.kind.as_str(), "talk" | "visit")),
-                "{}",
-                q.id
-            );
+            if peaceful || matches!(q.id.as_str(), "heart_rings" | "heart_seed_vault") {
+                assert!(
+                    q.objectives
+                        .iter()
+                        .all(|o| matches!(o.kind.as_str(), "talk" | "visit")),
+                    "{}",
+                    q.id
+                );
+            }
         }
     }
     for id in ["heart_walkways", "heart_lanterns", "heart_market"] {

@@ -1,4 +1,4 @@
-// Private browser: live colorful zone, exported PixelFlow atlases and sealed pavilion.
+// Private browser: live colorful zone, exported PixelFlow atlases and open pavilion.
 const assert=require('node:assert/strict');
 const path=require('node:path');
 const fs=require('node:fs');
@@ -23,11 +23,11 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.locator('#cls-warrior').click();await page.locator('#name').fill('RibbonwildUI');await page.locator('#go').click({timeout:60000});
   await page.waitForFunction(()=>Online.connected&&!!Field.ribbonwildSprites?.img.maskcolossus,null,{timeout:60000});
   const data=await page.evaluate(()=>{const zones=Field._debug.zones,z=zones[21],src=Field.ribbonwildSprites;return {count:zones.length,name:z.name,theme:z.theme,levels:z.levels,quests:z.quests.length,npcs:z.npcs.length,spawns:z.slimes.length,kinds:src.meta.kinds,sizes:src.meta.kinds.map(k=>[src.img[k].naturalWidth,src.img[k].naturalHeight]),art:['pinwheel','fan_topiary','festival_bloom','silk_pavilion','grand_pavilion_gate'].every(k=>!!City.art[k]),layout:WorldMap._layout.length,seal:z.futureInstance,gate:zones[20].portals.find(p=>p.id==='sun_ribbon_gate'),travel:z.npcs.find(n=>n.id==='travel_jubilee'),host:z.npcs.find(n=>n.id==='ribbon_host'),keeper:z.npcs.find(n=>n.id==='ribbon_keeper')};});
-  check(data.count===27&&data.name==='The Ribbonwild'&&data.theme==='ribbonwild'&&data.levels.join(',')==='70,75','Level 70–75 zone loads');
+  check(data.count===40&&data.name==='The Ribbonwild'&&data.theme==='ribbonwild'&&data.levels.join(',')==='70,75','Level 70–75 zone loads');
   check(data.kinds.length===9&&(STUB||data.sizes.every(([w,h])=>w===768&&h===480)),'Nine PixelFlow atlases load');
-  check(data.art&&data.layout===29,'Festival art and world map load');
-  check(data.npcs===8&&data.quests===9&&data.spawns===42,'Quest hub and six encounters load');
-  check(data.seal?.status==='sealed'&&data.seal?.name==='The Thousandfold Pavilion'&&data.gate?.to===21,'Epic entrance is sealed and reachable');
+  check(data.art&&data.layout>=30,'Festival art and world map load');
+  check(data.npcs===8&&data.quests===12&&data.spawns===42,'Quest hub and six encounters load');
+  check(data.seal?.status==='open'&&data.seal?.name==='The Thousandfold Pavilion'&&data.gate?.to===21,'Epic entrance is open and reachable');
   check(data.travel?.travelLinks.includes('travel_millbridge')&&data.travel?.art==='ribbon_travel'&&data.host?.art==='ribbon_host'&&data.keeper?.art==='ribbon_keeper','Three distinct NPC atlases load');
   let ref=401;const debug=async command=>check(await page.evaluate(([command,ref])=>Online.send({type:'debug',ref,command}),[command,ref++]),`Send ${command.op}`);
   await debug({op:'teleport',zone:21,x:32,y:70});
@@ -39,7 +39,7 @@ async function call(name,args={}){const r=await client.callTool({name,arguments:
   await page.waitForFunction(()=>Field.zone===21&&Math.hypot(Field.hero.x-111,Field.hero.y-65)<2,null,{timeout:15000});
   await page.waitForTimeout(1500);
   await page.screenshot({path:path.join(world.artifacts,'ribbonwild-pavilion.png')});await capture('ribbonwild-pavilion-clean.png');
-  check(await page.evaluate(()=>Field._debug.zones[21].portals.length===1&&Field.zone===21),'Pavilion has no playable portal yet');
+  check(await page.evaluate(()=>Field._debug.zones[21].portals.some(p=>p.to===31)&&Field.zone===21),'Pavilion has a playable portal');
   check(errors.length===0,`No browser errors: ${errors.join('; ')}`);
   console.log(`Ribbonwild UI: ${checks} checks; screenshots in ${world.artifacts}`);
 })().catch(e=>{console.error(e.stack);process.exitCode=1;}).finally(async()=>{await browser?.close();if(started)await call('stop_world').catch(()=>{});await client.close();});

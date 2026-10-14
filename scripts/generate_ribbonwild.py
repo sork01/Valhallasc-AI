@@ -119,6 +119,18 @@ def people_and_quests():
               'Inspect the sealed pavilion and consult the Meeting Stone.',
               [visit('pavilion', 'Inspect the Thousandfold Pavilion'),
                talk('stone', 'Speak with the Meeting Stone')], 75, 11000, 'jesters'),
+        quest('folds', 'A Thousand Unfoldings', 'keeper',
+              'Defeat the paper, ink and silk guardians within your party copy of the Pavilion.',
+              [kill('pavilion_foldling', 3, 'Defeat Paper Foldlings'),
+               kill('pavilion_inkmoth', 3, 'Defeat Inkwing Moths'),
+               kill('pavilion_silkguard', 3, 'Defeat Silkguards')],
+              75, 15500, 'curtain', group=True, recommendedPlayers=5),
+        quest('final', 'The Last Fold', 'keeper',
+              'Defeat the Mirror Dancer and Thousandfold Weaver, then break the Sovereign’s final fold.',
+              [kill('pavilion_mirror', 1, 'Defeat the Mirror Dancer'),
+               kill('pavilion_weaver', 1, 'Defeat the Thousandfold Weaver'),
+               kill('pavilion_sovereign', 1, 'Defeat the Sovereign of the Last Fold')],
+              75, 27000, 'folds', group=True, recommendedPlayers=5),
         quest('circuit', 'Keep the Colors Turning', 'host',
               'Keep the processional ring safe for every guest.',
               [kill('ribbongecko', 3, 'Defeat Ribbon Geckos'),
@@ -150,7 +162,7 @@ def build():
              [(46, 40), (72, 67), (97, 93)],
              [(46, 93), (72, 67), (97, 38)]]
     objects = [
-        obj('grand_pavilion_gate', 120, 65, width=10, depth=5,
+        obj('grand_pavilion_gate', 120, 65, open=True,
             place='ribbon_pavilion'),
         obj('silk_pavilion', 17, 54, width=5, depth=4, v=0),
         obj('silk_pavilion', 42, 54, width=5, depth=4, v=1),
@@ -227,11 +239,13 @@ def build():
                 city=dict(name='Jubilee Crossroads',x0=9,x1=48,y0=45,y1=96,
                           plaza=dict(x=30,y=70),radius=7,entry=dict(x=12,y=70)),
                 futureInstance=dict(name='The Thousandfold Pavilion',level=75,
-                                    players=5,status='sealed',x=120,y=65,
-                                    description='An immense striped silk canopy and gilded mask doors hold a sealed five-player instance.'),
+                                    players=5,status='open',x=120,y=65,
+                                    description='The gilded mask doors open into a private level-75 Pavilion.'),
                 portals=[dict(id='ribbon_sun_gate',name='The Parade Arch',
                               x=RETURN[0],y=RETURN[1],r=1.2,to=20,
-                              tx=SUN_ARRIVAL[0],ty=SUN_ARRIVAL[1],look='ribbonwild')])
+                              tx=SUN_ARRIVAL[0],ty=SUN_ARRIVAL[1],look='ribbonwild'),
+                         dict(id='ribbon_pavilion_gate',name='The Thousandfold Pavilion',
+                              x=119,y=65,r=1.2,to=31,tx=48,ty=83,look='thousandfold')])
     check(zone)
     return zone
 
@@ -244,7 +258,7 @@ def check(zone):
     assert all(math.hypot(s['x']-ARRIVAL[0],s['y']-ARRIVAL[1])>=8 for s in zone['slimes'])
     for q in zone['quests']:
         assert len('quest:accept:'+q['id'])<=32,q['id']
-    assert len(zone['slimes'])==42 and len(zone['quests'])==9
+    assert len(zone['slimes'])==42 and len(zone['quests'])==11
 
 
 def open_sunward_gate(sunward):
@@ -292,7 +306,7 @@ def main():
         if not any(i['id']==key for i in items):
             items.append(dict(id=key,name=name,kind='material',rarity='common',sell=sell))
     ITEMS.write_text(json.dumps(items,indent=2)+'\n')
-    print(f'{NAME}: {len(world["zones"][20]["objects"])} objects, 42 enemies, 9 quests')
+    print(f'{NAME}: {len(world["zones"][20]["objects"])} objects, 42 enemies, {len(world["zones"][20]["quests"])} quests')
 
 
 if __name__=='__main__':

@@ -21,7 +21,11 @@ mod consumables;
 mod debug;
 #[cfg(test)]
 mod deep_tests;
+#[cfg(test)]
+mod elder_hollow_tests;
 mod escort;
+#[cfg(test)]
+mod eye_below_tests;
 #[cfg(test)]
 mod frostwake_tests;
 mod hold;
@@ -33,6 +37,9 @@ mod mercs;
 mod nacre_tests;
 mod partyxp;
 mod pursuit;
+mod pvp;
+#[cfg(test)]
+mod rain_crown_tests;
 mod ranged;
 #[cfg(test)]
 mod resource_tests;
@@ -41,14 +48,21 @@ mod resources;
 mod ribbonwild_tests;
 mod rolls;
 #[cfg(test)]
+mod seed_vault_tests;
+#[cfg(test)]
 mod sky_tests;
 mod social;
 #[cfg(test)]
 mod stormglass_tests;
 #[cfg(test)]
+mod sunken_astrolabe_tests;
+#[cfg(test)]
 mod sunward_tests;
 #[cfg(test)]
 mod tanglecrown_tests;
+#[cfg(test)]
+mod thousandfold_tests;
+mod trade;
 mod travel;
 #[cfg(test)]
 mod vault_tests;
@@ -146,6 +160,8 @@ struct Player {
     service_at: f64,
     bag_notice_at: f64,
     portal_at: f64,
+    /// Opt-in status is deliberately cleared on reconnect.
+    pvp_flag: bool,
     /// Personal god mode of a game master (the debug command `set_god_mode`): no damage for this player only.
     god: bool,
     /// Set on a hired mercenary: the character id of the player who hired it (see world/mercs.rs).
@@ -220,6 +236,7 @@ impl Player {
             service_at: -99.,
             bag_notice_at: -99.,
             portal_at: -99.,
+            pvp_flag: false,
             god: false,
             merc: None,
             merc_quest: None,
@@ -230,13 +247,13 @@ impl Player {
     fn snapshot(&self) -> Value {
         let c = &self.character;
         json!({"id":c.id,"look":c.look,"zone":c.zone,"x":c.x,"y":c.y,"r":PLAYER_RADIUS,"hp":c.hp,"maxHp":c.max_hp(),"level":c.level,
-            "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"quests":c.quests,"inventory":c.inventory,"equipment":c.equipment,"bags":c.bags,"bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used(),"fx":self.face.x,"fy":self.face.y,
+            "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"quests":c.quests,"inventory":c.inventory,"equipment":c.equipment,"gearInstances":c.gear_instances,"bags":c.bags,"bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used(),"fx":self.face.x,"fy":self.face.y,
             "attributes":c.attributes,"gearAttributes":c.gear_attributes(),"passiveAttributes":skills::passive_bonus(c.look.class, c.level),"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
             "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounted":c.mounted,
-            "escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
+            "pvpFlag":self.pvp_flag,"pvpSupported":true,"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
     }
     /// The sum of every active buff of one kind.
     fn buff(&self, kind: BuffKind) -> f64 {
@@ -1212,6 +1229,8 @@ pub struct World {
     pub test_commands: bool,
     // Friend requests, party invites and parties. Nothing here is persisted except `Character::friends`.
     social: social::Social,
+    trades: Vec<trade::Trade>,
+    pvp: pvp::Pvp,
     // Hold objectives in progress (world/hold.rs).
     hold: hold::Holds,
     chime: chime::Chimes,
@@ -1224,10 +1243,31 @@ impl World {
     }
     pub fn with_level_spread(store: Store, level_spread: i32) -> Self {
         let mut first = Map::default();
-        let extra = std::mem::take(&mut first.zones);
+        let mut extra = std::mem::take(&mut first.zones);
+        let arena = if extra.last().is_some_and(|m| m.name == "The Arena") {
+            extra.pop()
+        } else {
+            None
+        };
+        let arena_public = 1 + extra.len();
         let mut maps = vec![first];
         maps.extend(extra);
-        let instances = Self::make_instances(&mut maps);
+        let mut instances = Self::make_instances(&mut maps);
+        if let Some(arena) = arena {
+            // Keep every existing dungeon copy id stable. Arena copy ids follow them, while clients see its file zone id.
+            for _ in 0..8 {
+                let mut copy = arena.clone();
+                copy.template = Some(arena_public);
+                let zone = maps.len();
+                maps.push(copy);
+                instances.push(instances::Instance {
+                    zone,
+                    template: arena_public,
+                    active: false,
+                    cleared: false,
+                });
+            }
+        }
         let spawns: Vec<SlimeSpawn> = maps
             .iter()
             .enumerate()
@@ -1265,6 +1305,8 @@ impl World {
             start_level: 1,
             test_commands: false,
             social: social::Social::default(),
+            trades: vec![],
+            pvp: pvp::Pvp::default(),
             hold: hold::Holds::default(),
             chime: chime::Chimes::default(),
         };
@@ -1605,7 +1647,7 @@ impl World {
         if let Some(saved) = self.pending_saves.iter().rev().find(|p| p.id == c.id) {
             c = saved.clone();
         }
-        if c.zone >= self.maps.len() {
+        if c.zone >= self.maps.len() || self.is_arena_zone(c.zone) {
             // A zone that no longer exists sends the character back to the start.
             c.zone = 0;
             c.x = self.maps[0].spawn.x;
@@ -1668,9 +1710,13 @@ impl World {
             return self.remove_mercenary(session);
         }
         let _ = self.dismiss_mercenaries(session);
+        if let Some(id) = self.players.get(&session).map(|p| p.character.id.clone()) {
+            self.pvp_left(&id);
+        }
         if let Some(p) = self.players.remove(&session) {
             let name = p.character.look.name.clone();
             let place = self.zone_name(p.character.zone).to_owned();
+            self.trade_left(&p.character.id);
             self.social_left(&p.character.id, &name, &p.character.friends);
             self.pending_saves.push(p.character);
             self.save();
@@ -1700,6 +1746,8 @@ impl World {
                 message,
                 ClientMessage::Chat { .. }
                     | ClientMessage::Social { .. }
+                    | ClientMessage::Trade { .. }
+                    | ClientMessage::Pvp { .. }
                     | ClientMessage::Roll { .. }
                     | ClientMessage::Ping { .. }
             )
@@ -1852,6 +1900,8 @@ impl World {
             ClientMessage::Social { command } => {
                 self.social(session, command);
             }
+            ClientMessage::Trade { command } => self.trade(session, command),
+            ClientMessage::Pvp { command } => self.pvp_command(session, command),
             ClientMessage::Roll { id, choice } => self.roll_vote(session, id, choice),
             ClientMessage::Ping { nonce } => {
                 let _ = p.peer.try_send(json!({"type":"pong","nonce":nonce}));
@@ -1891,14 +1941,109 @@ impl World {
         }
         let mut notice = escort_note.unwrap_or_default();
         let mut levels = 0;
-        let mut quest_changed = false;
+        let mut quest_changed = offer_id.is_none()
+            && npc.id == "gearwright"
+            && p.character.materialize_gear_instances();
+        let mut gear_preview = serde_json::Value::Null;
         if let Some(id) = offer_id {
-            if self.time - p.service_at < 0.5 {
+            if self.time - p.service_at < 0.5
+                && !id.starts_with("merge_")
+                && !id.starts_with("refine_")
+                && !id.starts_with("prefer_copy:")
+            {
                 // Reply so a pending client button is never left disabled.
                 notice = "Please wait a moment before trying again.".into();
             } else {
                 p.service_at = self.time;
-                if let Some(action) = id.strip_prefix("quest:") {
+                if let Some(action) = id.strip_prefix("prefer_copy:") {
+                    if !npc.offers.iter().any(|o| o.id == "refine") {
+                        notice = "This townsperson cannot select gear copies.".into();
+                    } else if let Ok(id) = action.parse::<u64>() {
+                        match p.character.prefer_gear_instance(id) {
+                            Ok(()) => {
+                                quest_changed = true;
+                                notice = "That copy is selected for this equipment type.".into();
+                            }
+                            Err(text) => notice = text.into(),
+                        }
+                    } else {
+                        notice = "Invalid gear copy ID.".into();
+                    }
+                } else if let Some(action) = id.strip_prefix("merge_preview:") {
+                    if !npc.offers.iter().any(|o| o.id == "merge") {
+                        notice = "This townsperson does not merge gear.".into();
+                    } else if let Some((a, b)) = action
+                        .split_once(':')
+                        .and_then(|(a, b)| Some((a.parse::<u64>().ok()?, b.parse::<u64>().ok()?)))
+                    {
+                        match p.character.clone().preview_merge(a, b) {
+                            Ok(result) => {
+                                gear_preview =
+                                    json!({"kind":"merge","first":a,"second":b,"result":result});
+                                notice = "Review the output, then confirm the merge.".into();
+                            }
+                            Err(text) => notice = text.into(),
+                        }
+                    } else {
+                        notice = "Invalid gear copy IDs.".into();
+                    }
+                } else if let Some(action) = id.strip_prefix("merge_confirm:") {
+                    if !npc.offers.iter().any(|o| o.id == "merge") {
+                        notice = "This townsperson does not merge gear.".into();
+                    } else if let Some((a, b)) = action
+                        .split_once(':')
+                        .and_then(|(a, b)| Some((a.parse::<u64>().ok()?, b.parse::<u64>().ok()?)))
+                    {
+                        match p.character.merge_gear(a, b) {
+                            Ok(result) => {
+                                quest_changed = true;
+                                notice = format!(
+                                    "Merged into a {} {}.",
+                                    result.rarity,
+                                    item(&result.item).map_or("piece", |i| i.name.as_str())
+                                );
+                            }
+                            Err(text) => notice = text.into(),
+                        }
+                    } else {
+                        notice = "Invalid gear copy IDs.".into();
+                    }
+                } else if let Some(action) = id.strip_prefix("refine_preview:") {
+                    if !npc.offers.iter().any(|o| o.id == "refine") {
+                        notice = "This townsperson does not refine gear.".into();
+                    } else if let Ok(id) = action.parse::<u64>() {
+                        match p.character.clone().preview_refine(id) {
+                            Ok((result, gold, crystals)) => {
+                                gear_preview = json!({"kind":"refine","id":id,"result":result,"gold":gold,"crystals":crystals,"material":result.crystal()});
+                                notice =
+                                    "Review the cost and rank, then confirm refinement.".into();
+                            }
+                            Err(text) => notice = text.into(),
+                        }
+                    } else {
+                        notice = "Invalid gear copy ID.".into();
+                    }
+                } else if let Some(action) = id.strip_prefix("refine_confirm:") {
+                    if !npc.offers.iter().any(|o| o.id == "refine") {
+                        notice = "This townsperson does not refine gear.".into();
+                    } else if let Ok(id) = action.parse::<u64>() {
+                        match p.character.refine_gear(id) {
+                            Ok((result, gold, crystals)) => {
+                                quest_changed = true;
+                                notice = format!(
+                                    "Refined {} to rank {} for {} gold and {} crystals.",
+                                    item(&result.item).map_or("piece", |i| i.name.as_str()),
+                                    result.rank,
+                                    gold,
+                                    crystals
+                                );
+                            }
+                            Err(text) => notice = text.into(),
+                        }
+                    } else {
+                        notice = "Invalid gear copy ID.".into();
+                    }
+                } else if let Some(action) = id.strip_prefix("quest:") {
                     if let Some((action, id)) = action.split_once(':')
                         && let (quest_id, choice) =
                             id.split_once(':').map_or((id, None), |(q, c)| (q, Some(c)))
@@ -2049,7 +2194,7 @@ impl World {
         }
         let _ = p
             .peer
-            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         let actor = p.character.id.clone();
         let point = p.character.point();
         if levels > 0 {
@@ -2122,6 +2267,8 @@ impl World {
         }
         if self.tick.is_multiple_of(10) {
             self.update_social();
+            self.update_trades();
+            self.update_pvp();
         }
         if self.tick.is_multiple_of(100) {
             self.save();
@@ -2315,6 +2462,9 @@ impl World {
             return;
         };
         if portal.to >= self.maps.len() {
+            return;
+        }
+        if self.maps[portal.to].sealed_template {
             return;
         }
         // A dungeon's door asks for its level, whoever you are with.
@@ -2919,15 +3069,26 @@ impl World {
             json!({"enemy":kind,"level":level,"skill":self.cur_skill,"killed":killed}),
         );
         if killed {
-            // A dungeon boss may complete a quest offered at the entrance city. Keep ordinary
-            // kills scoped to their own map; boss kills reach quests in maps with a portal into
-            // this dungeon template.
+            // An instance kill can advance a quest offered at its public entrance.
+            // Sealed templates use their return portal's parent until an inbound gate opens.
             let mut kill_quests = self.maps[zone].quests.clone();
-            if self.is_instance(zone) && is_boss(&kind) {
+            if self.is_instance(zone) {
                 let template = self.public_zone(zone);
-                for entry in self.maps.iter().filter(|m| {
-                    m.template.is_none() && m.portals.iter().any(|portal| portal.to == template)
-                }) {
+                let sealed_parent = self.maps[template]
+                    .sealed_template
+                    .then(|| self.maps[template].portals.first().map(|portal| portal.to))
+                    .flatten();
+                for entry in self
+                    .maps
+                    .iter()
+                    .enumerate()
+                    .filter(|(index, m)| {
+                        m.template.is_none()
+                            && (m.portals.iter().any(|portal| portal.to == template)
+                                || sealed_parent == Some(*index))
+                    })
+                    .map(|(_, entry)| entry)
+                {
                     kill_quests.extend(
                         entry
                             .quests
@@ -2945,7 +3106,23 @@ impl World {
             // the body (the people who share the XP). Elite kills also credit nearby contributors outside the
             // party, but only for quests marked `group`. Each person is credited once.
             let contributors = self.slimes[id].contributors.clone();
-            let party = self.xp_group(&credit_id, zone, point);
+            let party = if self.is_instance(zone)
+                && !self.maps[zone].final_boss.is_empty()
+                && is_boss(&kind)
+            {
+                // Ward objectives belong to this party's copy. A living member
+                // can work another chamber without losing the clear credit.
+                self.party_mates(&credit_id)
+                    .into_iter()
+                    .filter(|id| {
+                        self.players.values().any(|p| {
+                            p.character.id == *id && p.character.zone == zone && p.character.hp > 0.
+                        })
+                    })
+                    .collect()
+            } else {
+                self.xp_group(&credit_id, zone, point)
+            };
             for (&other, player) in &mut self.players {
                 let c = &mut player.character;
                 if other == credit || other == session || c.hp <= 0. || c.zone != zone {
@@ -5407,7 +5584,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 25);
+        assert_eq!(zone_count(&w), 40);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -6010,7 +6187,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 25);
+        assert_eq!(zone_count(&w), 40);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -6877,8 +7054,8 @@ mod tests {
         let map = &w.maps[CITY];
         assert_eq!(
             zone_count(&w),
-            25,
-            "Skaldholm is the fifth map; Veyrroot Heartwood is the twenty-fifth public map"
+            34,
+            "Skaldholm is the fifth map; five sealed templates follow the Yearwheel"
         );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
@@ -8166,6 +8343,7 @@ mod tests {
             levels: None,
             zones: vec![],
             copies: 0,
+            sealed_template: false,
             final_boss: String::new(),
             players: 0,
             min_level: 0,
@@ -8588,7 +8766,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 25);
+        assert_eq!(zone_count(&w), 40);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));
@@ -8621,6 +8799,10 @@ mod tests {
             assert!(!w.maps[s.zone].in_city(s.point()));
         }
         for (zone, map) in w.maps.iter().enumerate() {
+            if map.name == "The Arena" {
+                assert!(map.portals.is_empty());
+                continue;
+            }
             assert!(!map.portals.is_empty(), "zone {zone} has no portal");
             for portal in &map.portals {
                 let target = &w.maps[portal.to];
@@ -8648,14 +8830,16 @@ mod tests {
                     "arrival from {} would trigger a portal at once",
                     portal.id
                 );
-                assert!(
-                    target
-                        .portals
-                        .iter()
-                        .any(|back| back.to == w.public_zone(zone)),
-                    "{} has no way back",
-                    portal.id
-                );
+                if !map.sealed_template {
+                    assert!(
+                        target
+                            .portals
+                            .iter()
+                            .any(|back| back.to == w.public_zone(zone)),
+                        "{} has no way back",
+                        portal.id
+                    );
+                }
             }
         }
         // No enemy starts near either arrival point.
@@ -8673,6 +8857,79 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn yearwheel_dungeon_floor_plans_have_private_copies_and_safe_return_routes() {
+        let w = world();
+        let source: serde_json::Value =
+            serde_json::from_str(include_str!("../../world/map.txt")).unwrap();
+        let expected = [
+            (36, "The Blooming Labyrinth", 28, 97),
+            (37, "The Solar Crucible", 28, 98),
+            (38, "The Amber Archive", 28, 99),
+            (39, "The Silent Solstice", 28, 99),
+        ];
+        for (zone, name, parent, level) in expected {
+            let map = &w.maps[zone];
+            assert_eq!(map.name, name);
+            assert!(!map.sealed_template);
+            assert_eq!((map.players, map.copies, map.min_level), (5, 4, level));
+            assert_eq!(
+                w.instances.iter().filter(|i| i.template == zone).count(),
+                4,
+                "{name} must have four isolated party copies"
+            );
+            assert_eq!(map.slimes.len(), 12);
+            assert_eq!(map.portals.len(), 2);
+            let back = &map.portals[0];
+            assert_eq!(back.to, parent);
+            assert!(
+                w.maps[parent].portals.iter().any(|p| p.to == zone),
+                "{name} must have an entrance from its parent"
+            );
+            let arrival = Point {
+                x: back.tx,
+                y: back.ty,
+            };
+            assert!(free_for_player(&w.maps[parent], arrival));
+            let steps = walk_steps(map, map.spawn);
+            let room_centres = source["zones"][zone - 1]["rooms"].as_array().unwrap();
+            for room in room_centres {
+                let box_ = room.as_array().unwrap();
+                let x = (box_[0].as_i64().unwrap() + box_[2].as_i64().unwrap()) / 2;
+                let y = (box_[1].as_i64().unwrap() + box_[3].as_i64().unwrap()) / 2;
+                assert!(
+                    steps.contains_key(&((x * 2) as i32, (y * 2) as i32)),
+                    "{name} room at ({x}, {y}) is unreachable with Rust collision"
+                );
+            }
+            assert!(
+                steps.contains_key(&((back.x * 2.) as i32, (back.y * 2.) as i32)),
+                "{name} return portal is unreachable"
+            );
+        }
+    }
+
+    #[test]
+    fn sealed_dungeon_rejects_an_inbound_portal_even_if_one_is_misconfigured() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        w.time = 2.;
+        let here = w.players[&1].character.point();
+        w.maps[0].portals.push(Portal {
+            id: "accidental_sealed_gate".into(),
+            name: "Accidental Sealed Gate".into(),
+            x: here.x,
+            y: here.y,
+            r: 1.,
+            to: 36,
+            tx: 48.,
+            ty: 83.,
+            after_clear: false,
+        });
+        w.use_portal(1);
+        assert_eq!(w.players[&1].character.zone, 0);
     }
 
     #[test]
@@ -8886,6 +9143,67 @@ mod tests {
                 .distance(Point { x: 40., y: 80. })
                 < 1e-6
         );
+    }
+
+    #[test]
+    fn updated_travel_links_work_in_both_directions() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Mage);
+        for (zone, id) in [
+            (6, "sky_gate"),
+            (14, "prism_orrery_gate"),
+            (16, "moonspore_asterion_gate"),
+            (19, "stormglass_sun_gate"),
+            (21, "ribbon_tangle_gate"),
+            (23, "canopy_hollow_gate"),
+            (23, "canopy_lapis_gate"),
+            (27, "cairn_year_gate"),
+        ] {
+            let gate = w.maps[zone]
+                .portals
+                .iter()
+                .find(|p| p.id == id)
+                .unwrap()
+                .clone();
+            let back = w.maps[gate.to]
+                .portals
+                .iter()
+                .find(|p| p.to == zone)
+                .unwrap()
+                .clone();
+            {
+                let p = w.players.get_mut(&1).unwrap();
+                p.character.zone = zone;
+                p.character.level = 99;
+                p.character.x = gate.x;
+                p.character.y = gate.y;
+                p.portal_at = -99.;
+            }
+            w.use_portal(1);
+            let c = &w.players[&1].character;
+            assert_eq!(c.zone, gate.to, "{id} destination");
+            assert!(
+                c.point().distance(Point {
+                    x: gate.tx,
+                    y: gate.ty
+                }) < 1e-6
+            );
+            {
+                let p = w.players.get_mut(&1).unwrap();
+                p.character.x = back.x;
+                p.character.y = back.y;
+                p.portal_at = -99.;
+            }
+            w.use_portal(1);
+            let c = &w.players[&1].character;
+            assert_eq!(c.zone, zone, "{id} return");
+            assert!(
+                c.point().distance(Point {
+                    x: back.tx,
+                    y: back.ty
+                }) < 1e-6
+            );
+        }
     }
 
     #[test]

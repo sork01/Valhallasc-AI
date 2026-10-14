@@ -12,7 +12,7 @@ XP=json.loads((ROOT/'world/levels.txt').read_text())
 OUTSIDE=23; INSIDE=24
 JUNGLE_GATE=(138,80); JUNGLE_ARRIVAL=(132,80)
 OUT_GATE=(7,95); OUT_ARRIVAL=(15,95)
-HOLLOW_GATE=(56,72); HOLLOW_ARRIVAL=(56,65)
+HOLLOW_GATE=(56,72); HOLLOW_ARRIVAL=(63,68.5)
 IN_GATE=(48,87); IN_ARRIVAL=(48,80)
 
 def obj(kind,x,y,r=0,**extra):return dict(kind=kind,x=round(x,2),y=round(y,2),r=r,v=extra.pop('v',0),**extra)
@@ -23,10 +23,11 @@ def npc(key,name,role,x,y,dialogue,offers=None,buys=False,art=None):
     return result
 def talk(key,label):return dict(kind='talk',target='heart_'+key,count=1,label=label)
 def visit(key,label):return dict(kind='visit',target='heart_'+key,count=1,label=label)
-def quest(key,title,giver,description,objectives,gold=10000,requires=None,repeatable=False):
+def kill(kind,n,label):return dict(kind='kill',target=kind,count=n,label=label)
+def quest(key,title,giver,description,objectives,gold=10000,requires=None,repeatable=False,**extra):
     return add_reward(dict(id='heart_'+key,title=title,npc='heart_'+giver,description=description,
                            objectives=objectives,level=80,rewardXp=XP[79]//10,rewardGold=gold,
-                           requires='heart_'+requires if requires else None,repeatable=repeatable))
+                           requires='heart_'+requires if requires else None,repeatable=repeatable,**extra))
 def distance(x,y,paths):
     d=1e9
     for path in paths:
@@ -100,7 +101,7 @@ def inside():
            [(24,43),(38,43),(48,48),(60,43),(73,42)],
            [(35,57),(30,70),(48,75),(67,69),(63,57)],
            [(34,28),(48,34),(62,27)]]
-    objects=[obj('heartwood_vault',48,14,0,place='heart_seed_door'),
+    objects=[obj('heartwood_vault',48,14,0,place='heart_seed_door',open=True),
              obj('heartwood_core',48,48,0),obj('hollow_lift',42,82,0),
              obj('amber_library',25,31,1.2),obj('pith_forge',70,55,1.2),
              obj('root_loom',26,65,1.1),obj('seed_chapel',72,30,1.2)]
@@ -119,20 +120,23 @@ def inside():
         npc('archivist','Oli Amberleaf','Heartwood archivist',30,35,'The tree remembers every season in amber rings. The Seed Vault is older than the city.',art='heart_archivist'),
         npc('carver','Ruva Rootsong','Living wood carver',69,61,'We coax halls from the wood. We never cut the pith.'),
         npc('oracle','Veya of the Pith','Pith oracle',49,45,'I hear a second heartbeat behind the Seed Vault door. It answers only to the old crown.',art='heart_oracle'),
-        npc('custodian','Mosslet','Seed Vault custodian',48,25,'The door opens when the tree is ready. Its inner chambers are sealed for now.'),
+        npc('custodian','Mosslet','Seed Vault custodian',48,25,'The Seed Vault is open. Gather your companions before entering its oldest chambers.'),
     ]
     quests=[
         quest('rings','What the Rings Remember','archivist','Visit the living core and speak with the oracle.',[visit('core','Read the living rings'),talk('oracle','Consult Veya')],12500),
-        quest('seed_vault','The Unopened Seed','oracle','Climb to the sealed Seed Vault and speak with its custodian.',[visit('seed_door','Inspect the Seed Vault entrance'),talk('custodian','Speak to Mosslet')],15000,'rings'),
+        quest('seed_vault','The Living Door','oracle','Climb to the Seed Vault and speak with its custodian.',[visit('seed_door','Inspect the Seed Vault entrance'),talk('custodian','Speak to Mosslet')],15000,'rings'),
+        quest('seed_trials','The Rings Awaken','custodian','Enter the Seed Vault with five companions. Defeat its first two wardens and gather five relics from the chambers.',[kill('seed_warden',1,'Defeat the Warden of Rings'),kill('seed_germinator',1,'Defeat the Germinator'),kill('seed_mote',5,'Clear awakened seedlings')],17500,'seed_vault',group=True,recommendedPlayers=5),
+        quest('seed_final','Heart of the Worldseed','oracle','Face the sleeping heart at the end of the Seed Vault.',[kill('seed_worldseed',1,'Defeat the Heart of the Worldseed')],30000,'seed_trials',group=True,recommendedPlayers=5,rewardItem='accessory_amber_l80_blue'),
     ]
-    zone=dict(name='Veyrroot Heartwood',theme='heartwood',tagline='The inhabited hollow of the world-tree: amber libraries, living rooms and a sealed seed vault',
+    zone=dict(name='Veyrroot Heartwood',theme='heartwood',tagline='The inhabited hollow of the world-tree: amber libraries, living rooms and an open seed vault',
               size=96,levels=[80,80],spawn=dict(x=IN_ARRIVAL[0],y=IN_ARRIVAL[1]),paths=[[list(p) for p in path] for path in paths],
               objects=objects,slimes=[],npcs=folk,places=[dict(id='heart_core',name='The Living Pith',x=48,y=53,r=4),
                                                         dict(id='heart_seed_door',name='The Seed Vault',x=48,y=20,r=4)],quests=quests,
               city=dict(name='Veyrroot Heartwood',x0=14,x1=82,y0=12,y1=88,plaza=dict(x=48,y=48),radius=5,entry=dict(x=48,y=80)),
-              futureInstance=dict(name='The Seed Vault',level=80,players=5,status='sealed',x=48,y=14,
-                                  description='An enormous living iris of bark and amber closes the chambers in the tree\'s heart.'),
-              portals=[dict(id='hollow_canopy_gate',name='The Hollow Arch',x=IN_GATE[0],y=IN_GATE[1],r=1.2,to=OUTSIDE,tx=HOLLOW_ARRIVAL[0],ty=HOLLOW_ARRIVAL[1],look='worldtree')])
+              futureInstance=dict(name='The Seed Vault',level=80,players=5,status='open',x=48,y=14,
+                                  description='The iris of bark and amber opens into the oldest chambers of the living tree.'),
+              portals=[dict(id='hollow_canopy_gate',name='The Hollow Arch',x=IN_GATE[0],y=IN_GATE[1],r=1.2,to=OUTSIDE,tx=HOLLOW_ARRIVAL[0],ty=HOLLOW_ARRIVAL[1],look='worldtree'),
+                       dict(id='heart_seed_gate',name='The Seed Vault',x=48,y=17,r=1.2,to=33,tx=48,ty=82,look='seed_vault')])
     check(zone);return zone
 
 def check(zone):

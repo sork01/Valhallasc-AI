@@ -4,7 +4,7 @@ import json, math, random
 from pathlib import Path
 import generate_gloamfen as fen
 import generate_cairnspine as cairn
-import mercenary_offers, spark_travel
+import mercenary_offers, progression_quests, spark_travel
 from quest_gear_rewards import add_reward
 ROOT=Path(__file__).resolve().parents[1];MAP=ROOT/'world/map.txt';ITEMS=ROOT/'world/items.txt'
 XP=json.loads((ROOT/'world/levels.txt').read_text())
@@ -99,19 +99,35 @@ def build():
   for j,(eid,giver) in enumerate(zip(s['elites'],candidates)):
    quests.append(quest(prefix+str(j+1),['The First Sign','The Second Sign','The Third Sign'][j],giver,'Gather a party and face the '+eid.replace('_',' ').title()+'.',[kill(eid,1,'Defeat '+eid.replace('_',' ').title())],min(99,s['level']+j),26000+j*8000,intro,group=True,recommendedPlayers=[3,4,5][j]))
   place='yr_'+key+'_gate';quests.append(quest(prefix+'gate','Door of the '+s['name'],lead,'Survey the sealed '+s['door']+' and report back.',[visit(place,'Survey '+s['door'])],min(99,s['level']+2),21000,intro))
+  if key=='sp':
+   quests.append(quest('yr_sp_bloom_trials','Petals of Glass',lead,'With your party, defeat the Thornkeeper and Petal Mirror in the Blooming Labyrinth.',[kill('bloom_thornkeeper',1,'Defeat the Thornkeeper'),kill('bloom_mirror',1,'Defeat the Petal Mirror'),kill('bloom_spore',3,'Defeat Glasspetal Spores')],97,37000,'yr_sp_gate',group=True,recommendedPlayers=5))
+   quests.append(quest('yr_sp_bloom_final','Heart of the Labyrinth',lead,'Break the labyrinth heart with your party.',[kill('bloom_heart',1,'Defeat the Heart of the Labyrinth')],97,55000,'yr_sp_bloom_trials',group=True,recommendedPlayers=5))
+  if key=='su':
+   quests.append(quest('yr_su_solar_trials','Forged in Daylight',lead,'With your party, defeat the Ashwarden and Heliomancer in the Solar Crucible.',[kill('solar_ashwarden',1,'Defeat the Ashwarden'),kill('solar_heliomancer',1,'Defeat the Heliomancer'),kill('solar_emberling',3,'Defeat Cinderlings')],98,41000,'yr_su_gate',group=True,recommendedPlayers=5))
+   quests.append(quest('yr_su_solar_final','The Last Ember',lead,'Quench the Heart of the Crucible with your party.',[kill('solar_heart',1,'Defeat the Heart of the Crucible')],98,61000,'yr_su_solar_trials',group=True,recommendedPlayers=5))
+  if key=='au':
+   quests.append(quest('yr_au_amber_trials','Pages of Autumn',lead,'With your party, defeat the Curator and Living Chronicle in the Amber Archive.',[kill('amber_curator',1,'Defeat the Curator'),kill('amber_chronicle',1,'Defeat the Living Chronicle'),kill('amber_page',3,'Defeat Living Pages')],99,45000,'yr_au_gate',group=True,recommendedPlayers=5))
+   quests.append(quest('yr_au_amber_final','The Last Memory',lead,'Release the final memory from the Archive with your party.',[kill('amber_memory',1,'Defeat the Last Memory')],99,65000,'yr_au_amber_trials',group=True,recommendedPlayers=5))
+  if key=='wi':
+   quests.append(quest('yr_wi_sols_trials','The Longest Watch',lead,'With your party, defeat the Frost Watcher and Harbinger in the Silent Solstice.',[kill('solstice_watcher',1,'Defeat the Frost Watcher'),kill('solstice_harbinger',1,'Defeat the Harbinger'),kill('solstice_flurry',3,'Defeat Whispering Flurries')],99,45000,'yr_wi_gate',group=True,recommendedPlayers=5))
+   quests.append(quest('yr_wi_sols_final','First Light',lead,'Break the Heart of the Longest Night with your party.',[kill('solstice_heart',1,'Defeat the Heart of the Longest Night')],99,65000,'yr_wi_sols_trials',group=True,recommendedPlayers=5))
   quests.append(quest(prefix+'patrol',s['name']+' Watch',lead,'Patrol the local road and keep its season safe.',[kill(s['ordinary'],8,'Defeat '+s['ordinary'].replace('_',' ').title())],s['level'],11000,intro,True))
   city=dict(name=s['name'],x0=hx-20,x1=hx+20,y0=hy-19,y1=hy+19,plaza=dict(x=hx,y=hy),radius=8,entry=dict(x=hx-12,y=hy))
   cities.append(city);places.append(dict(id=place,name=s['door'],x=s['gate'][0],y=s['gate'][1],r=8))
-  instances.append(dict(name=s['door'],season=key,level=min(99,s['level']+2),players=5,status='sealed',x=s['entrance'][0],y=s['entrance'][1]))
+  instances.append(dict(name=s['door'],season=key,level=min(99,s['level']+2),players=5,status='open',x=s['entrance'][0],y=s['entrance'][1]))
  zone=dict(name=NAME,theme='yearwheel',tagline='Four seasons turn around the Equinox Crossing',size=SIZE,levels=[95,99],spawn=dict(x=ARRIVAL[0],y=ARRIVAL[1]),paths=[[[x,y] for x,y in p] for p in paths],objects=objects,slimes=slimes,npcs=folk,quests=quests,city=cities[0],camps=cities[1:],places=places,futureInstances=instances,
-           portals=[dict(id='year_cairn_gate',name="Year's Ascent",x=RETURN[0],y=RETURN[1],r=1.3,to=27,tx=147,ty=112,look='yearwheel')])
+           portals=[dict(id='year_cairn_gate',name="Year's Ascent",x=RETURN[0],y=RETURN[1],r=1.3,to=27,tx=151,ty=114,look='yearwheel'),
+                    dict(id='year_bloom_descent',name='The Blooming Labyrinth',x=48,y=237,r=1.2,to=36,tx=48,ty=82,look='blooming_labyrinth'),
+                    dict(id='year_solar_descent',name='The Solar Crucible',x=352,y=256,r=1.2,to=37,tx=48,ty=82,look='solar_crucible'),
+                    dict(id='year_amber_descent',name='The Amber Archive',x=352,y=159,r=1.2,to=38,tx=48,ty=82,look='amber_archive'),
+                    dict(id='year_solstice_descent',name='The Silent Solstice',x=47,y=158,r=1.2,to=39,tx=48,ty=82,look='silent_solstice')])
  check(zone);return zone
 
 def check(zone):
  seen,_=fen.flood(zone,ARRIVAL)
  for target in [*zone['npcs'],*zone['slimes'],*zone['portals'],*zone['places']]:
   assert seen[int(target['y']/.5),int(target['x']/.5)],f'unreachable: {target}'
- assert len(zone['slimes'])==156 and len(zone['quests'])==24 and len(zone['futureInstances'])==4
+ assert len(zone['slimes'])==156 and len(zone['quests'])==32 and len(zone['futureInstances'])==4
  assert all(len('quest:accept:'+q['id'])<=32 for q in zone['quests'])
  assert all(math.hypot(s['x']-ARRIVAL[0],s['y']-ARRIVAL[1])>=8 for s in zone['slimes'])
 
@@ -119,12 +135,14 @@ def main():
  world=json.loads(MAP.read_text());assert world['zones'][26]['name']=='The Cairnspine'
  later=world['zones'][ZONE-1:]
  while later and later[0].get('name')==NAME:later=later[1:]
+ previous=world['zones'][ZONE-1]
  world['zones']=world['zones'][:ZONE-1]
- cairn.open_year_gate(world['zones'][26]);world['zones'].append(build());world['zones'].extend(later)
+ zone=build();progression_quests.keep_released_rewards_and_route_quest(previous,zone)
+ cairn.open_year_gate(world['zones'][26]);world['zones'].append(zone);world['zones'].extend(later)
  spark_travel.ensure(world);MAP.write_text(json.dumps(world,indent=2)+'\n')
  items=json.loads(ITEMS.read_text())
  for _,key,name,sell in MATERIALS:
   if not any(i['id']==key for i in items):items.append(dict(id=key,name=name,kind='material',rarity='common',sell=sell))
  ITEMS.write_text(json.dumps(items,indent=2)+'\n')
- print(f'{NAME}: {len(world["zones"][27]["objects"])} objects, 156 enemies, 24 quests, four sealed entrances')
+ print(f'{NAME}: {len(world["zones"][27]["objects"])} objects, 156 enemies, {len(world["zones"][27]["quests"])} quests, four open entrances')
 if __name__=='__main__':main()

@@ -18,8 +18,53 @@ pub struct Enemy {
     pub melee: f64,
 }
 pub static ENEMIES: LazyLock<Vec<Enemy>> = LazyLock::new(|| {
-    serde_json::from_str(include_str!("../../world/cathedral.txt"))
-        .expect("valid cathedral catalog")
+    let mut enemies: Vec<Enemy> = serde_json::from_str(include_str!("../../world/cathedral.txt"))
+        .expect("valid cathedral catalog");
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/eye_below.txt"))
+            .expect("valid Eye Below catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/elder_hollow.txt"))
+            .expect("valid Elder Hollow catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/thousandfold.txt"))
+            .expect("valid Thousandfold Pavilion catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/rain_crown.txt"))
+            .expect("valid Rain Crown catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/seed_vault.txt"))
+            .expect("valid Seed Vault catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/sunken_astrolabe.txt"))
+            .expect("valid Sunken Astrolabe catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/thunderheart_gate.txt"))
+            .expect("valid Thunderheart Gate catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/blooming_labyrinth.txt"))
+            .expect("valid Blooming Labyrinth catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/solar_crucible.txt"))
+            .expect("valid Solar Crucible catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/amber_archive.txt"))
+            .expect("valid Amber Archive catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/silent_solstice.txt"))
+            .expect("valid Silent Solstice catalog"),
+    );
+    enemies
 });
 pub fn enemy(kind: &str) -> Option<&'static Enemy> {
     ENEMIES.iter().find(|e| e.kind == kind)

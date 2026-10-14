@@ -50,7 +50,7 @@
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn;
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
-    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
+    const paths = zdef.paths || PATHS, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) {
       const i = y * MAP + x, cx = x + .5, cy = y + .5;
       map.tone[i] = vnoise(cx * .16, cy * .16, ember ? 11 : frost ? 21 : fen ? 31 : city ? 41 : vault ? 51 : wyrd ? 61 : sky ? 71 : astral ? 91 : prism ? 101 : orrery ? 111 : moonspore ? 121 : zdef.theme === 'stormglass' ? 131 : zdef.theme === 'sunward' ? 141 : zdef.theme === 'ribbonwild' ? 151 : zdef.theme === 'tanglecrown' ? 161 : zdef.theme === 'worldtree' ? 171 : zdef.theme === 'heartwood' ? 181 : zdef.theme === 'lapiserg' ? 191 : zdef.theme === 'frostwake' ? 201 : zdef.theme === 'cairnspine' ? 211 : zdef.theme === 'yearwheel' ? 221 : deep ? 81 : 1) * .65 + vnoise(cx * .55, cy * .55, ember ? 12 : frost ? 22 : fen ? 32 : city ? 42 : vault ? 52 : wyrd ? 62 : sky ? 72 : astral ? 92 : prism ? 102 : orrery ? 112 : moonspore ? 122 : zdef.theme === 'stormglass' ? 132 : zdef.theme === 'sunward' ? 142 : zdef.theme === 'ribbonwild' ? 152 : zdef.theme === 'tanglecrown' ? 162 : zdef.theme === 'worldtree' ? 172 : zdef.theme === 'heartwood' ? 182 : zdef.theme === 'lapiserg' ? 192 : zdef.theme === 'frostwake' ? 202 : zdef.theme === 'cairnspine' ? 212 : zdef.theme === 'yearwheel' ? 222 : deep ? 82 : 2) * .35;
@@ -100,7 +100,7 @@
     zone = ZONES[z] ? z : 0; zdef = ZONES[zone];
     buildMap(); chunks.clear();
     if (mini) buildMini();
-    if (hero) { pendingNpc = null; cityRoute = []; hero.target = null; hero.goal = null; }
+    if (hero) { pendingNpc = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
     floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; marker = null; slimes = []; remotePlayers.clear(); bubbles.clear();
     instanceCleared = false; clearedAt = -99;
   }
@@ -416,7 +416,7 @@
     }
   }
   const WYRD_NONE = {};                                   // the Wyrdwood's scenery is drawn by client/wyrdart.js through City.art
-  const spriteSet = () => zdef.theme === 'wyrd' || zdef.theme === 'sky' || zdef.theme === 'deep' || zdef.theme === 'nacre' || zdef.theme === 'astral' || zdef.theme === 'prismwaste' || zdef.theme === 'orrery' || zdef.theme === 'moonspore' || zdef.theme === 'stormglass' || zdef.theme === 'sunward' || zdef.theme === 'ribbonwild' || zdef.theme === 'tanglecrown' || zdef.theme === 'worldtree' || zdef.theme === 'heartwood' || zdef.theme === 'lapiserg' || zdef.theme === 'frostwake' || zdef.theme === 'cairnspine' || zdef.theme === 'yearwheel' || CathedralArt.isTheme(zdef.theme) ? WYRD_NONE : zdef.theme === 'ember' ? emberSprites : zdef.theme === 'frost' ? frostSprites : zdef.theme === 'fen' ? fenSprites : sprites;
+  const spriteSet = () => zdef.theme === 'wyrd' || zdef.theme === 'sky' || zdef.theme === 'deep' || zdef.theme === 'nacre' || zdef.theme === 'astral' || zdef.theme === 'prismwaste' || zdef.theme === 'orrery' || zdef.theme === 'moonspore' || zdef.theme === 'stormglass' || zdef.theme === 'sunward' || zdef.theme === 'ribbonwild' || zdef.theme === 'tanglecrown' || zdef.theme === 'worldtree' || zdef.theme === 'heartwood' || zdef.theme === 'lapiserg' || zdef.theme === 'frostwake' || zdef.theme === 'cairnspine' || zdef.theme === 'yearwheel' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme) ? WYRD_NONE : zdef.theme === 'ember' ? emberSprites : zdef.theme === 'frost' ? frostSprites : zdef.theme === 'fen' ? fenSprites : sprites;
 
   // ---------- ground chunks ----------
   const chunks = new Map(); let chunkScale = 1;
@@ -424,7 +424,7 @@
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
   function renderChunk(cx, cy) {
     const G = chunkGeom(cx, cy), [c, g] = canvasOf(G.w, G.h, chunkScale);
-    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', asterion = zdef.theme === 'asterion', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
+    const ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', asterion = zdef.theme === 'asterion', vault = zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
     const arenas = vault ? (zdef.slimes || []).filter(m => BOSS_KINDS.includes(m.kind)) : [];
     for (let ty = 0; ty < CH; ty++) for (let tx = 0; tx < CH; tx++) {
       const x = G.x0 + tx, y = G.y0 + ty; if (x >= MAP || y >= MAP) continue;
@@ -433,7 +433,7 @@
       if ((sky || moonwell) && !map.floor[i]) continue;                              // open water or sky
       const alt = ((x + y) & 1) ? 1.4 : -1.4, e = .7;
       const ribbonHue = [344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];
-      g.fillStyle = moonwell ? (dirt ? `hsl(${43+tone*9}, 45%, ${76+tone*8+alt}%)` : `hsl(${166+tone*18}, 29%, ${37+tone*8+alt}%)`) : CathedralArt.isTheme(zdef.theme) ? CathedralArt.ground(zdef.theme,x,y,tone,alt) : vault ? `hsl(${226 + tone * 10}, ${9 + tone * 5}%, ${19 + tone * 7 + alt * .7}%)` : asterion ? (dirt === 1 ? `hsl(${201 + tone * 14}, 21%, ${51 + tone * 7 + alt}%)` : dirt === 2 ? `hsl(${44 + tone * 9}, 38%, ${73 + tone * 9 + alt}%)` : `hsl(${222 + tone * 17}, ${19 + tone * 10}%, ${28 + tone * 9 + alt}%)`) : city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
+      g.fillStyle = zdef.theme === 'arena' ? (x < 3 || y < 3 || x > 28 || y > 28 ? '#423746' : x === 16 || y === 16 ? '#ae8456' : (x + y) % 2 ? '#6e6877' : '#777180') : moonwell ? (dirt ? `hsl(${43+tone*9}, 45%, ${76+tone*8+alt}%)` : `hsl(${166+tone*18}, 29%, ${37+tone*8+alt}%)`) : zdef.theme === 'eye_below' ? EyeBelowArt.ground(x,y,tone,alt) : zdef.theme === 'elder_hollow' ? ElderHollowArt.ground(x,y,tone,alt) : zdef.theme === 'thousandfold' ? PavilionArt.ground(x,y,tone,alt) : zdef.theme === 'rain_crown' ? RainCrownArt.ground(x,y,tone,alt) : zdef.theme === 'seed_vault' ? SeedVaultArt.ground(x,y,tone,alt) : zdef.theme === 'sunken_astrolabe' ? SunkenArt.ground(x,y,tone,alt) : zdef.theme === 'thunderheart_gate' ? ThunderArt.ground(x,y,tone,alt) : SeasonDungeonArt.isTheme(zdef.theme) ? SeasonDungeonArt.ground(zdef.theme,x,y,tone,alt) : CathedralArt.isTheme(zdef.theme) ? CathedralArt.ground(zdef.theme,x,y,tone,alt) : vault ? `hsl(${226 + tone * 10}, ${9 + tone * 5}%, ${19 + tone * 7 + alt * .7}%)` : asterion ? (dirt === 1 ? `hsl(${201 + tone * 14}, 21%, ${51 + tone * 7 + alt}%)` : dirt === 2 ? `hsl(${44 + tone * 9}, 38%, ${73 + tone * 9 + alt}%)` : `hsl(${222 + tone * 17}, ${19 + tone * 10}%, ${28 + tone * 9 + alt}%)`) : city ? (dirt === 1 ? `hsl(${32 + tone * 6}, ${9 + tone * 5}%, ${46 + tone * 7 + alt * .5}%)` : dirt === 2 ? `hsl(${42 + tone * 6}, ${24 + tone * 6}%, ${(x + y) & 1 ? 79 : 75}%)` : dirt === 3 ? `hsl(${14 + tone * 6}, ${34 + tone * 6}%, ${50 + tone * 6 + alt * .5}%)` : `hsl(${96 + tone * 14}, ${46 + tone * 10}%, ${38 + tone * 8 + alt * .8 + (((x + y) >> 1) & 1) * 1.6}%)`)
         : sky ? skyGround(x, y, tone, dirt, alt)
         : orrery ? (dirt ? `hsl(${34 + tone * 7}, 19%, ${43 + tone * 8 + alt}%)` : `hsl(${232 + tone * 13}, ${17 + tone * 9}%, ${20 + tone * 10 + alt}%)`)
         : moonspore ? (dirt ? `hsl(${151 + tone * 9}, 18%, ${35 + tone * 9 + alt}%)` : `hsl(${177 + tone * 20}, ${25 + tone * 12}%, ${19 + tone * 10 + alt}%)`)
@@ -456,6 +456,7 @@
         : ember ? (dirt ? `hsl(${22 + tone * 8}, ${20 + tone * 8}%, ${30 + tone * 8 + alt}%)` : `hsl(${12 + tone * 14}, ${10 + tone * 8}%, ${15 + tone * 11 + alt}%)`)
         : dirt ? `hsl(${30 + tone * 8}, ${38 + tone * 8}%, ${48 + tone * 8 + alt}%)` : `hsl(${100 + tone * 16}, ${46 + tone * 12}%, ${36 + tone * 12 + alt}%)`;
       g.beginPath(); g.moveTo(px, py - e); g.lineTo(px + TW / 2 + e, py + TH / 2); g.lineTo(px, py + TH + e); g.lineTo(px - TW / 2 - e, py + TH / 2); g.closePath(); g.fill();
+      if (zdef.theme === 'arena') continue;
       const r = rngf(x * 977 + y * 131 + 7), inTile = () => { const a = r() - .5, b = r() - .5; return [px + (a - b) * TW * .4, py + TH / 2 + (a + b) * TH * .4]; };
       if (yearwheel) {
         const season=yearSeason(x,y), colors=[['#f9b4d2','#77bd8b'],['#ffe4a0','#e3ab56'],['#f0ae63','#ab5a3e'],['#e8f7fa','#a9d7ec']][season];
@@ -469,6 +470,22 @@
           if(r()<.28){const [qx,qy]=inTile();g.fillStyle='rgba(189,249,223,.46)';g.beginPath();g.ellipse(qx,qy,3+r()*5,1.5+r()*2,0,0,6.283);g.fill();}
           if(r()<.13){const [qx,qy]=inTile();g.strokeStyle='rgba(225,247,216,.55)';g.lineWidth=1.3;g.beginPath();g.moveTo(qx,qy);g.lineTo(qx+4,qy-8);g.moveTo(qx,qy);g.lineTo(qx-3,qy-6);g.stroke();}
         }
+      } else if (zdef.theme === 'eye_below') {
+        EyeBelowArt.detail(g,px,py,x,y,TW,TH);
+      } else if (zdef.theme === 'elder_hollow') {
+        ElderHollowArt.detail(g,px,py,x,y,TW,TH);
+      } else if (zdef.theme === 'thousandfold') {
+        PavilionArt.detail(g,px,py,x,y,TW,TH);
+      } else if (zdef.theme === 'rain_crown') {
+        RainCrownArt.detail(g,px,py,x,y,TW,TH);
+      } else if (zdef.theme === 'seed_vault') {
+        SeedVaultArt.detail(g,px,py,x,y,TW,TH);
+      } else if (zdef.theme === 'sunken_astrolabe') {
+        SunkenArt.detail(g,px,py,x,y,TW,TH);
+      } else if (zdef.theme === 'thunderheart_gate') {
+        ThunderArt.detail(g,px,py,x,y,TW,TH);
+      } else if (SeasonDungeonArt.isTheme(zdef.theme)) {
+        SeasonDungeonArt.detail(g,zdef.theme,px,py,x,y,TW,TH);
       } else if (CathedralArt.isTheme(zdef.theme)) {
         CathedralArt.detail(g,zdef.theme,px,py,x,y,TW,TH);
       } else if (vault) {
@@ -862,7 +879,7 @@
   const hubs = () => [zdef.city, ...(zdef.camps || [])].filter(Boolean);
   const hubAt = (x, y) => hubs().find(c => x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1);
   const campNear = () => hubs().reduce((a, c) => !a || Math.hypot(hero.x - c.plaza.x, hero.y - c.plaza.y) < Math.hypot(hero.x - a.plaza.x, hero.y - a.plaza.y) ? c : a, null);
-  function emitHud(force) { onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, inCombat:hero.inCombat }); }
+  function emitHud(force) { const rival = remotePlayers.get(hero.pvpTargetId); onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, target: rival && !rival.dead ? { id: rival.id, player: true, name: rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, inCombat:hero.inCombat }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -881,14 +898,23 @@
       if (npc) talkTo(npc); return;
     }
     if (k === 'h' && !e.repeat) { e.preventDefault(); Field.toggleMount(); return; }
-    if (KEYDIR[k]) { pendingNpc = null; cityRoute = []; keys.add(k); hero.target = null; hero.goal = null; e.preventDefault(); }
+    if (KEYDIR[k]) { pendingNpc = null; cityRoute = []; keys.add(k); hero.target = null; hero.goal = null; emitHud(); e.preventDefault(); }
     if ((k === ' ' && e.target?.tagName !== 'BUTTON') || k === 'j') { e.preventDefault(); if (!e.repeat) Field.useSkill('attack'); }
     if (k === 'shift' && isAssassin()) { e.preventDefault(); if (!e.repeat) Field.useSkill('shadowstep'); }
   }
   function onKeyUp(e) { keys.delete(e.key.toLowerCase()); }
-  function pickSlime(wx, wy) {
-    let best = null, bd = 1.1;
-    for (const s of slimes) { if (s.dead) continue; const d = Math.hypot(s.x - wx, s.y - wy) - s.r * .6; if (d < bd) { bd = d; best = s; } }
+  function pickSlime(mx, my, wx, wy) {
+    let best = null, depth = -Infinity;
+    for (const s of slimes) {
+      if (s.dead) continue;
+      const [sx, sy] = w2s(s.x, s.y), b = enemyHitbox(s), k = SLIME_K * s.d.scale;
+      const left = s.dir < 0 ? -b.x1 : b.x0, right = s.dir < 0 ? -b.x0 : b.x1;
+      if (mx < sx + left * k - 9 || mx > sx + right * k + 9 || my < sy + b.y0 * k - 9 || my > sy + b.y1 * k + 9) continue;
+      if (s.x + s.y > depth) { best = s; depth = s.x + s.y; }
+    }
+    if (best) return best;
+    let distance = 1.1;
+    for (const s of slimes) { if (s.dead) continue; const d = Math.hypot(s.x - wx, s.y - wy) - s.r * .6; if (d < distance) { distance = d; best = s; } }
     return best;
   }
   function onPointerDown(e) {
@@ -899,11 +925,15 @@
     if (npc) { talkTo(npc); return; }
     pointer.down = true; cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
     const [wx, wy] = pointerWorld(e); pointer.x = wx; pointer.y = wy;
-    const s = pickSlime(wx, wy);
-    if (s) { hero.target = s; hero.goal = null; Online.send({ type: 'target', id: s.id }); } else { hero.target = null; hero.goal = { x: wx, y: wy }; Online.send({ type: 'move', x: wx, y: wy }); marker = { x: clamp(wx, .8, MAP - .8), y: clamp(wy, .8, MAP - .8), t: 0 }; }
+    const s = pickSlime(mx, my, wx, wy);
+    const rival = !s && window.Pvp?.available && [...remotePlayers.values()].filter(p => !p.dead).sort((a,b) => b.x+b.y-a.x-a.y).find(p => { const [x,y]=w2s(p.x,p.y); return Math.abs(mx-x)<34 && my>y-150 && my<y+12; });
+    if (s) { hero.pvpTargetId = null; hero.target = s; hero.goal = null; Online.send({ type: 'target', id: s.id }); }
+    else if (rival) { pointer.down = false; hero.pvpTargetId = rival.id; hero.target = null; hero.goal = null; }
+    else { hero.pvpTargetId = null; hero.target = null; hero.goal = { x: wx, y: wy }; Online.send({ type: 'move', x: wx, y: wy }); marker = { x: clamp(wx, .8, MAP - .8), y: clamp(wy, .8, MAP - .8), t: 0 }; }
+    emitHud();
   }
   function talkTo(npc) {
-    keys.clear(); pointer.down = false; hero.target = null; hero.goal = null; cityRoute = [];
+    keys.clear(); pointer.down = false; hero.target = null; hero.pvpTargetId = null; hero.goal = null; cityRoute = []; emitHud();
     if (Math.hypot(hero.x-npc.x,hero.y-npc.y) <= 2.5) Online.send({type:'interact',npc:npc.id});
     else { cityRoute = routeTo(npc, true); pendingNpc = { npc, until: tAll + Math.max(20, cityRoute.length * .6) }; routeTime = 0; }
   }
@@ -975,11 +1005,11 @@
   // The aim direction: at the selected enemy, else toward the pointer, else the way the hero already faces.
   function aim() {
     let fx = hero.fx, fy = hero.fy;
-    const point = hero.target && !hero.target.dead ? hero.target : pointer;
+    const point = remotePlayers.get(hero.pvpTargetId) || (hero.target && !hero.target.dead ? hero.target : pointer);
     if (point.x || point.y) { const dx = point.x - hero.x, dy = point.y - hero.y, n = Math.hypot(dx, dy); if (n > .3) { fx = dx / n; fy = dy / n; } }
     return [fx, fy];
   }
-  function swing() { const [fx, fy] = aim(); Online.send({ type: 'attack', fx, fy }); }
+  function swing() { if (hero.pvpTargetId && remotePlayers.has(hero.pvpTargetId)) { Online.send({ type: 'pvp', command: { op: 'attack', id: hero.pvpTargetId } }); return; } const [fx, fy] = aim(); Online.send({ type: 'attack', fx, fy }); }
   // Learned skills: the server checks level, cooldown and life; the client only names the skill and its aim.
   function castSkill(def) {
     let [fx, fy] = aim();
@@ -1024,7 +1054,7 @@
     applyActor(hero, own, initial || moved || !!hero.sparkTravel !== !!own.sparkTravel);
     if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;hero.target=null;hero.goal=null;}
     window.Attributes?.update(own);
-    window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || []);
+    window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || [], own.gearInstances || []);
     window.Quests?.setBells(own.bells || []);
     window.Quests?.update(own.quests || []);
     if (wasDead !== hero.dead) say(hero.dead ? 'death' : 'respawn');
@@ -1061,6 +1091,7 @@
       }
     }
     for (const id of remotePlayers.keys()) if (!present.has(id)) remotePlayers.delete(id);
+    if (hero.pvpTargetId && !remotePlayers.has(hero.pvpTargetId)) hero.pvpTargetId = null;
     bolts = packet.bolts.filter(inZone).map(b => ({ ...b, col: b.color }));
     ebolts = (packet.ebolts || []).filter(inZone).map(b => { const old = ebolts.find(o => o.id === b.id); return old && Math.hypot(old.x - b.x, old.y - b.y) < 2.5 ? Object.assign(old, b, { x: old.x + (b.x - old.x) * .5, y: old.y + (b.y - old.y) * .5 }) : { ...b }; });
     if (packet.instance) { if (packet.instance.cleared && !instanceCleared) { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); } instanceCleared = !!packet.instance.cleared; }
@@ -1517,6 +1548,48 @@
   let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
   const enemySource = s => CATHEDRAL_KINDS.includes(s.kind) ? cathedralSrc : YEAR_KINDS.includes(s.kind) ? yearSrc : CAIRN_KINDS.includes(s.kind) ? cairnSrc : FROSTWAKE_KINDS.includes(s.kind) ? frostwakeSrc : LAPIS_KINDS.includes(s.kind) ? lapisSrc : WORLDHEART_KINDS.includes(s.kind) ? worldheartSrc : TANGLECROWN_KINDS.includes(s.kind) ? tanglecrownSrc : RIBBONWILD_KINDS.includes(s.kind) ? ribbonwildSrc : SUNWARD_KINDS.includes(s.kind) ? sunwardSrc : STORMGLASS_KINDS.includes(s.kind) ? stormglassSrc : s.kind === 'moonwell_echo' ? moonwellSrc : MOONWELL_KINDS.includes(s.kind) ? moonwellGardenSrc : s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : WYRD_KINDS.includes(s.kind) ? wyrdSrc : SKY_KINDS.includes(s.kind) ? skySrc : DEEP_KINDS.includes(s.kind) ? deepSrc : ASTRAL_KINDS.includes(s.kind) ? astralSrc : PRISM_KINDS.includes(s.kind) ? prismSrc : ORRERY_KINDS.includes(s.kind) ? orrerySrc : MOONSPORE_KINDS.includes(s.kind) ? moonsporeSrc : VAULT_KINDS.includes(s.kind) ? vaultSrc : slimeSrc;
   const SLIME_K = 2.1, DIE_SHOW = 1.7;                      // sprite pixel -> screen px; seconds a dead slime stays on screen
+  const enemyBounds = new WeakMap();
+  function enemyHitbox(s) {
+    const src = enemySource(s), img = src?.img[s.kind];
+    if (!img) return { x0: -16, x1: 16, y0: -(s.d.top || 28), y1: 5 };
+    let b = enemyBounds.get(img);
+    if (b) return b;
+    const [fw, fh] = src.meta.frame, [ax, ay] = src.meta.anchor, row = src.meta.clips.idle.row;
+    const c = document.createElement('canvas'); c.width = fw; c.height = fh;
+    const g = c.getContext('2d', { willReadFrequently: true });
+    g.drawImage(img, 0, row * fh, fw, fh, 0, 0, fw, fh);
+    const pixels = g.getImageData(0, 0, fw, fh).data;
+    let x0 = fw, y0 = fh, x1 = -1, y1 = -1;
+    for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) if (pixels[(y * fw + x) * 4 + 3] > 16) {
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x + 1); y0 = Math.min(y0, y); y1 = Math.max(y1, y + 1);
+    }
+    b = x1 < 0 ? { x0: -16, x1: 16, y0: -28, y1: 5 } : { x0: x0 - ax, x1: x1 - ax, y0: y0 - ay, y1: y1 - ay };
+    enemyBounds.set(img, b);
+    return b;
+  }
+  function drawTargetPortrait(target, canvas) {
+    if (target.player) {
+      const g=canvas.getContext('2d'), remote=remotePlayers.get(target.id); g.clearRect(0,0,96,96);
+      if (remote?.sprite) { const sprite=remote.sprite, frame=sprite.frame('idle',MageSprite.direction(remote.fx,remote.fy),0); g.imageSmoothingEnabled=false; g.drawImage(frame,...(sprite.meta.portrait||[56,18,48,48]),0,0,96,96); return true; }
+      g.fillStyle='#352c49'; g.fillRect(0,0,96,96); g.fillStyle='#f8e0a4'; g.font='bold 50px sans-serif'; g.textAlign='center'; g.fillText(target.name.slice(0,1).toUpperCase(),48,65); return false;
+    }
+    const g = canvas.getContext('2d'), s = { kind: target.kind, d: SLIME[target.kind] }, src = enemySource(s), img = src?.img[target.kind];
+    g.clearRect(0, 0, canvas.width, canvas.height);
+    if (!img) {
+      g.fillStyle = s.d?.col?.[1] || '#be8a88';
+      g.beginPath(); g.arc(48, 50, 28, 0, Math.PI * 2); g.fill();
+      return false;
+    }
+    const b = enemyHitbox(s), [fw, fh] = src.meta.frame, [ax, ay] = src.meta.anchor;
+    const x = Math.max(0, Math.floor(b.x0 + ax)), y = Math.max(0, Math.floor(b.y0 + ay));
+    const w = Math.min(fw - x, Math.ceil(b.x1 - b.x0)), h = Math.min(fh - y, Math.ceil(b.y1 - b.y0));
+    if (w > 0 && h > 0) {
+      const scale = Math.min(78 / w, 78 / h), dw = w * scale, dh = h * scale;
+      g.imageSmoothingEnabled = false;
+      g.drawImage(img, x, src.meta.clips.idle.row * fh + y, w, h, (96 - dw) / 2, (96 - dh) / 2, dw, dh);
+    }
+    return true;
+  }
   // Test mode (window.__valhallaTestSprites): one small coloured block per enemy kind instead of the atlas PNGs. The clip
   // table is the real one's shape (same names, frame counts and rates), so every animation state still finds its frame.
   const stubEnemies = (kinds, colours) => {
@@ -2231,7 +2304,8 @@
     g.globalAlpha = 1;
   }
   function drawSky(g, t) {
-    if (zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme)) { g.fillStyle = '#03040a'; g.fillRect(0, 0, VW, VH); return; }
+    if (zdef.theme === 'arena') { g.fillStyle = '#191723'; g.fillRect(0, 0, VW, VH); return; }
+    if (zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme)) { g.fillStyle = '#03040a'; g.fillRect(0, 0, VW, VH); return; }
     if (zdef.theme === 'moonwell') {
       const water=g.createLinearGradient(0,0,0,VH);water.addColorStop(0,'#0e2945');water.addColorStop(.56,'#194f68');water.addColorStop(1,'#235e70');g.fillStyle=water;g.fillRect(0,0,VW,VH);
       const [cx,cy]=camS();
@@ -2314,6 +2388,14 @@
   }
   // A gate: two stone posts, a lintel and a swirling plane between them. The server owns the actual move.
   function drawPortal(g, p, sx, sy, t) {
+    if (p.look === 'eye_below') return EyeBelowArt.portal(g,p,sx,sy,t);
+    if (p.look === 'elder_hollow') return ElderHollowArt.portal(g,p,sx,sy,t);
+    if (p.look === 'thousandfold') return PavilionArt.portal(g,p,sx,sy,t);
+    if (p.look === 'rain_crown') return RainCrownArt.portal(g,p,sx,sy,t);
+    if (p.look === 'seed_vault') return SeedVaultArt.portal(g,p,sx,sy,t);
+    if (p.look === 'sunken_astrolabe') return SunkenArt.portal(g,p,sx,sy,t);
+    if (p.look === 'thunderheart_gate') return ThunderArt.portal(g,p,sx,sy,t);
+    if (SeasonDungeonArt.isTheme(p.look)) return SeasonDungeonArt.portal(g,p,sx,sy,t,p.look);
     if (p.look === 'cathedral') return CathedralArt.portal(g,p,sx,sy,t,ZONES[p.to] || zdef);
     if (p.look === 'stairs_down') { const d = ZONES[p.to]; return VaultArt.stairsDown(g, sx, sy, t, d?.min_level ? `Stairs to ${d.name} · Lv ${d.min_level}+` : 'Stairs down'); }
     if (p.look === 'stairs_up') return VaultArt.stairsUp(g, sx, sy, t);
@@ -2437,9 +2519,10 @@
         if (remote.sparkTravel) Spark.draw(g,remote,t);
         else if (remote.sprite) { drawMount(g,remote); if(remote.mounted)g.translate(0,-23); remote.sprite.draw(g, remote, t); if(remote.mounted)g.translate(0,23); }
         else { g.fillStyle = '#cfb5fa'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
-        g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : '#fff4ca';
-        const nameText = remote.escort ? remote.look.name + ' · Escort' : remote.look.name;
+        g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag ? '#ff9b9b' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : '#fff4ca';
+        const nameText = remote.escort ? remote.look.name + ' · Escort' : remote.look.name + (remote.pvpFlag ? ' · PvP' : '');
         g.strokeText(nameText, 0, -128); g.fillText(nameText, 0, -128);
+        if (hero.pvpTargetId === remote.id) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, 6.283); g.stroke(); }
         g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
         g.restore();
       } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.sparkTravel) Spark.draw(g,hero,t); else { drawMount(g,hero); if(hero.mounted)g.translate(0,-23); if (isModular()) {
@@ -2518,8 +2601,16 @@
     if (zdef.theme === 'sky') drawSkyWeather(g, t);
     if (zdef.theme === 'deep' || zdef.theme === 'nacre') drawDeepWeather(g, t);
     if (zdef.theme === 'city') drawBlossom(g, t);
+    if (zdef.theme === 'eye_below') EyeBelowArt.weather(g,t,VW,VH);
+    if (zdef.theme === 'elder_hollow') ElderHollowArt.weather(g,t,VW,VH);
+    if (zdef.theme === 'thousandfold') PavilionArt.weather(g,t,VW,VH);
+    if (zdef.theme === 'rain_crown') RainCrownArt.weather(g,t,VW,VH);
+    if (zdef.theme === 'seed_vault') SeedVaultArt.weather(g,t,VW,VH);
+    if (zdef.theme === 'sunken_astrolabe') SunkenArt.weather(g,t,VW,VH);
+    if (zdef.theme === 'thunderheart_gate') ThunderArt.weather(g,t,VW,VH);
+    if (SeasonDungeonArt.isTheme(zdef.theme)) SeasonDungeonArt.weather(g,zdef.theme,t,VW,VH);
     if (CathedralArt.isTheme(zdef.theme)) CathedralArt.weather(g,zdef.theme,t,VW,VH);
-    if (zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme)) { drawDarkness(g, t); drawBossBar(g); }
+    if (zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme)) { drawDarkness(g, t); drawBossBar(g); }
     if (zdef.theme === 'moonwell') drawBossBar(g);
     drawMini();
   }
@@ -2529,7 +2620,7 @@
   let darkCv = null, darkG = null;
   function drawDarkness(g, t) {
     if (!darkCv) { darkCv = document.createElement('canvas'); darkCv.width = VW; darkCv.height = VH; darkG = darkCv.getContext('2d'); }
-    const d = darkG; d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, VW, VH); d.fillStyle = CathedralArt.isTheme(zdef.theme) ? 'rgba(3,9,24,.56)' : 'rgba(3,4,10,.84)'; d.fillRect(0, 0, VW, VH);
+    const d = darkG; d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, VW, VH); d.fillStyle = zdef.theme === 'eye_below' ? 'rgba(2,15,28,.65)' : zdef.theme === 'elder_hollow' ? 'rgba(12,24,12,.57)' : zdef.theme === 'thousandfold' ? 'rgba(24,11,31,.55)' : zdef.theme === 'rain_crown' ? 'rgba(4,28,26,.59)' : zdef.theme === 'seed_vault' ? 'rgba(19,28,8,.54)' : zdef.theme === 'sunken_astrolabe' ? 'rgba(8,24,32,.55)' : zdef.theme === 'thunderheart_gate' ? 'rgba(7,19,38,.56)' : zdef.theme === 'blooming_labyrinth' ? 'rgba(14,27,17,.54)' : zdef.theme === 'solar_crucible' ? 'rgba(39,17,9,.55)' : CathedralArt.isTheme(zdef.theme) ? 'rgba(3,9,24,.56)' : 'rgba(3,4,10,.84)'; d.fillRect(0, 0, VW, VH);
     d.globalCompositeOperation = 'destination-out';
     const pool = (x, y, r, a) => {
       if (x < -r || x > VW + r || y < -r || y > VH + r) return;
@@ -2538,7 +2629,7 @@
     };
     const [hx, hy] = w2s(hero.x, hero.y); pool(hx, hy - 36, 540, .97);
     for (const o of objects) {
-      if (o.kind !== 'brazier' && o.kind !== 'torch' && o.kind !== 'cathedrallamp') continue;
+      if (o.kind !== 'brazier' && o.kind !== 'torch' && o.kind !== 'cathedrallamp' && o.kind !== 'eye_lamp' && o.kind !== 'eye_lens' && o.kind !== 'elder_lantern' && o.kind !== 'elder_crown' && o.kind !== 'elder_seed' && o.kind !== 'bloom_lamp' && o.kind !== 'bloom_altar' && o.kind !== 'solar_brazier' && o.kind !== 'solar_forge') continue;
       const [sx, sy] = w2s(o.x, o.y), fl = .9 + .1 * Math.sin(t * 7 + o.x * 3);
       pool(sx, sy - 56, (o.kind === 'brazier' ? 320 : 230) * fl, .9);
     }
@@ -2609,12 +2700,12 @@
     g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(mask, 0, 0, w, h); g.restore();
   }
   function buildMini() {
-    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
-    g.fillStyle = moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
+    const [c, g] = canvasOf(144, 144, 1), k = 144 / MAP, ember = zdef.theme === 'ember', frost = zdef.theme === 'frost', fen = zdef.theme === 'fen', city = zdef.theme === 'city' || zdef.theme === 'asterion', vault = zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme), wyrd = zdef.theme === 'wyrd', sky = zdef.theme === 'sky', astral = zdef.theme === 'astral', prism = zdef.theme === 'prismwaste', orrery = zdef.theme === 'orrery', moonspore = zdef.theme === 'moonspore', stormglass = zdef.theme === 'stormglass', sunward = zdef.theme === 'sunward', ribbonwild = zdef.theme === 'ribbonwild', tanglecrown = zdef.theme === 'tanglecrown', worldtree = zdef.theme === 'worldtree', heartwood = zdef.theme === 'heartwood', lapis = zdef.theme === 'lapiserg', frostwake = zdef.theme === 'frostwake', cairn = zdef.theme === 'cairnspine', yearwheel = zdef.theme === 'yearwheel', moonwell = zdef.theme === 'moonwell', deep = zdef.theme === 'deep' || zdef.theme === 'nacre';
+    g.fillStyle = moonwell ? '#153d58' : CathedralArt.isTheme(zdef.theme) ? '#080e20' : deep ? '#0b3550' : sky ? '#1a1838' : worldtree ? '#2d8866' : heartwood ? '#795b41' : frostwake ? '#c9e4ee' : cairn ? '#656b71' : lapis ? '#d5ac6c' : tanglecrown ? '#287a5b' : ribbonwild ? '#e58fb4' : sunward ? '#5baa49' : stormglass ? '#263b51' : zdef.theme === 'elder_hollow' ? '#192b1f' : zdef.theme === 'thousandfold' ? '#40264d' : zdef.theme === 'rain_crown' ? '#1c5251' : zdef.theme === 'seed_vault' ? '#415532' : zdef.theme === 'sunken_astrolabe' ? '#244653' : zdef.theme === 'thunderheart_gate' ? '#263e62' : zdef.theme === 'blooming_labyrinth' ? '#274531' : zdef.theme === 'solar_crucible' ? '#65402d' : moonspore ? '#1c4244' : orrery ? '#37394e' : prism ? '#ad887e' : astral ? '#39776f' : vault ? '#07080e' : city ? '#5f9b4a' : wyrd ? '#6a5430' : fen ? '#2f4a2c' : frost ? '#cfe3f0' : ember ? '#2b1f22' : '#3f9b48'; g.fillRect(0, 0, 144, 144);
     if (yearwheel) for(const [x,y,col] of [[0,0,'#d7edf5'],[72,0,'#bd7951'],[0,72,'#73bc77'],[72,72,'#dbb45a']]) {g.fillStyle=col;g.fillRect(x,y,72,72);}
     if (ribbonwild) for(let y=0;y<MAP;y++)for(let x=0;x<MAP;x++){const hue=[344,44,177,272][Math.floor(((Math.atan2(y-67,x-72)+Math.PI*2+Math.PI/4)%(Math.PI*2))/(Math.PI/2))];g.fillStyle=`hsl(${hue},57%,68%)`;g.fillRect(x*k,y*k,k+.5,k+.5);}
     if (sky || moonwell) { for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.floor[y * MAP + x]) { g.fillStyle = moonwell ? (map.dirt[y*MAP+x]?'#f8e8ad':'#a8d5cf') : map.dirt[y * MAP + x] ? '#f0c8f4' : '#8ad4b8'; g.fillRect(x * k, y * k, k + .5, k + .5); } }
-    else for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = CathedralArt.isTheme(zdef.theme) ? CathedralArt.style(zdef.theme).left : yearwheel ? ['#e8c498','#e9bd7d','#bf8c6b','#b8d9e9'][yearSeason(x,y)] : deep ? '#c8c29a' : vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : worldtree ? '#c19a60' : heartwood ? '#b58a5b' : frostwake ? '#8fc6d8' : cairn ? '#b49a75' : lapis ? '#efd49b' : tanglecrown ? '#b99a62' : ribbonwild ? '#ffe2a2' : sunward ? '#d8bd83' : stormglass ? '#9ebdc1' : moonspore ? '#a5c4a8' : orrery ? '#ad907b' : prism ? '#ead7a8' : astral ? '#d7bc84' : wyrd ? '#b89860' : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
+    else for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = CathedralArt.isTheme(zdef.theme) ? CathedralArt.style(zdef.theme).left : yearwheel ? ['#e8c498','#e9bd7d','#bf8c6b','#b8d9e9'][yearSeason(x,y)] : deep ? '#c8c29a' : zdef.theme === 'elder_hollow' ? '#597251' : zdef.theme === 'thousandfold' ? '#ae779d' : zdef.theme === 'rain_crown' ? '#6aa895' : zdef.theme === 'seed_vault' ? '#b6a676' : zdef.theme === 'sunken_astrolabe' ? '#c0ac79' : zdef.theme === 'thunderheart_gate' ? '#b6d4e6' : zdef.theme === 'blooming_labyrinth' ? '#e2b7cf' : zdef.theme === 'solar_crucible' ? '#e8ba77' : zdef.theme === 'amber_archive' ? '#eac286' : zdef.theme === 'silent_solstice' ? '#b8d5e8' : vault ? '#3a3f55' : city ? (map.dirt[y * MAP + x] === 2 ? '#ece2c8' : map.dirt[y * MAP + x] === 3 ? '#b8765a' : '#b6a98c') : worldtree ? '#c19a60' : heartwood ? '#b58a5b' : frostwake ? '#8fc6d8' : cairn ? '#b49a75' : lapis ? '#efd49b' : tanglecrown ? '#b99a62' : ribbonwild ? '#ffe2a2' : sunward ? '#d8bd83' : stormglass ? '#9ebdc1' : moonspore ? '#a5c4a8' : orrery ? '#ad907b' : prism ? '#ead7a8' : astral ? '#d7bc84' : wyrd ? '#b89860' : fen ? '#8a6a40' : frost ? '#9fb7cc' : ember ? '#6a5040' : '#c9a26a'; g.fillRect(x * k, y * k, k + .5, k + .5); }
     if (wyrd) { const gr = g.createLinearGradient(0, 0, 0, 144); gr.addColorStop(0, 'rgba(120,128,92,.95)'); gr.addColorStop(.42, 'rgba(120,128,92,.9)'); gr.addColorStop(.56, 'rgba(120,128,92,0)'); g.fillStyle = gr; g.fillRect(0, 0, 144, 144); for (let y = 0; y < MAP; y++) for (let x = 0; x < MAP; x++) if (map.dirt[y * MAP + x]) { g.fillStyle = '#c4b290'; if (y < MAP * .5) g.fillRect(x * k, y * k, k + .5, k + .5); } }
     if (zdef.city && !city && zdef.theme !== 'nacre') for (const c of [zdef.city, ...(zdef.camps || [])]) {
       g.fillStyle=yearwheel ? ['#a1d9a1','#ecc583','#d59468','#b7d9e8'][yearSeason(c.plaza.x,c.plaza.y)] : deep ? '#4a7a82' : sky ? '#cdd2f2' : worldtree ? '#77b475' : heartwood ? '#b18b5f' : frostwake ? '#aad9e7' : cairn ? '#bdab8e' : lapis ? '#e6bb78' : tanglecrown ? '#6dab70' : ribbonwild ? '#e9a8c7' : sunward ? '#76ad56' : stormglass ? '#55798a' : moonspore ? '#719b83' : orrery ? '#a58a77' : prism ? '#c5a58d' : astral ? '#8fa9b2' : wyrd ? '#8a6a44' : fen ? '#6a5238' : frost ? '#8fa6bd' : ember ? '#88705d' : '#d8cbb0'; g.fillRect(c.x0*k,c.y0*k,(c.x1-c.x0)*k,(c.y1-c.y0)*k);
@@ -2637,7 +2728,7 @@
       if (sunward) {if(o.kind==='water'){g.fillStyle='#73bad0';g.beginPath();g.arc(o.x*k,o.y*k,Math.max(1.3,o.r*k),0,6.283);g.fill();continue;}g.fillStyle=o.kind==='elder_hollow_gate'?'#ffe28a':o.kind==='meetingstone'?'#59d9ff':o.kind.includes('tree')?'#316e35':o.kind==='vale_cottage'||o.kind==='watermill'?'#f0d7a2':'#8cac56';g.fillRect(o.x*k-.8,o.y*k-.8,1.6,1.6);continue;}
       if (prism) { g.fillStyle = o.kind === 'mirrorwall' ? '#e8d9ef' : o.kind === 'sunspire' ? '#ffe3ae' : o.kind === 'shade_tent' ? '#a5798f' : '#a9909a'; g.fillRect(o.x*k-.7,o.y*k-.7,1.4,1.4); continue; }
       if (astral) { g.fillStyle = o.kind === 'crystal' || o.kind === 'obelisk' ? '#a4e9e3' : o.kind === 'astraltree' ? '#244f64' : o.kind === 'starstone' ? '#637994' : o.kind === 'astrolamp' ? '#ffe2a0' : o.kind === 'starbloom' ? '#d8afe9' : '#5eaa91'; g.fillRect(o.x * k - .55, o.y * k - .55, 1.1, 1.1); continue; }
-      if (vault) { if (o.kind === 'brazier' || o.kind === 'cathedrallamp') { g.fillStyle = '#ff9a3a'; g.fillRect(o.x * k - 1, o.y * k - 1, 2, 2); } continue; }
+      if (vault) { if (o.kind === 'eye_lamp' || o.kind === 'eye_lens' || o.kind === 'eye_rune') { g.fillStyle = '#9de9dc'; g.fillRect(o.x*k-1,o.y*k-1,2,2); } if (o.kind === 'elder_lantern' || o.kind === 'elder_crown' || o.kind === 'elder_seed') { g.fillStyle = '#d9e9a6'; g.fillRect(o.x*k-1,o.y*k-1,2,2); } if (o.kind === 'brazier' || o.kind === 'cathedrallamp') { g.fillStyle = '#ff9a3a'; g.fillRect(o.x * k - 1, o.y * k - 1, 2, 2); } continue; }
       if (deep && zdef.theme !== 'nacre') {                                                                   // coral walls as footprints, bells as gold dots, the rest as specks
         if (o.kind === 'reefwall') { g.fillStyle = '#d86a78'; g.fillRect((o.x - o.width / 2) * k, (o.y - o.depth / 2) * k, Math.max(1, o.width * k), Math.max(1, o.depth * k)); }
         else if (o.kind === 'tidebell') { g.fillStyle = '#ffd36a'; g.beginPath(); g.arc(o.x * k, o.y * k, 2, 0, 6.283); g.fill(); }
@@ -2756,6 +2847,7 @@
       return Online.send({ type: 'equip', slots: { [slot]: item } });
     },
     get remotePlayers() { return [...remotePlayers.values()]; },
+    targetPlayer(id) { if (!remotePlayers.has(id)) return false; hero.pvpTargetId = id; hero.target = null; hero.goal = null; emitHud(); return true; },
     // Shows `text` in a speech bubble over the character `id` for a few seconds (longer for longer messages).
     bubble(id, text, party = false) {
       text = String(text || '').trim(); if (!id || !text) return;
@@ -2766,6 +2858,7 @@
     bubbleBox(id) { return bubbles.get(id)?.box || null; },
     bubbleDrawn() { return bubblesLast; },
     enemyName(kind) { return SLIME[kind]?.name || null; },
+    drawTargetPortrait,
     get equipmentStats() { return equipmentStats(); },
     get warriorSprites() { return !isMage() && !isAssassin() && !isPriest() && !isHunter() ? mageSpr : null; },
     get mageSprites() { return isMage() ? mageSpr : null; },
@@ -2776,7 +2869,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
-    _debug: { get effects() { return effects; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll) },
+    _debug: { get effects() { return effects; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
   };
   window.Field = Field;
 })();

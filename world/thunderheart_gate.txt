@@ -1,0 +1,179 @@
+[
+  {
+    "kind": "thunder_spark",
+    "name": "Forked Spark",
+    "art": "spark",
+    "color": "#b9d8f2",
+    "stats": [
+      860000,
+      11200,
+      3.5,
+      1.3
+    ],
+    "profile": [
+      0.55,
+      1.25,
+      10,
+      12
+    ],
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "boss": false,
+    "level": 95,
+    "gold": 4200,
+    "material": "thunder_spark_relic",
+    "lootSource": null
+  },
+  {
+    "kind": "thunder_ray",
+    "name": "Stormglass Ray",
+    "art": "ray",
+    "color": "#8faedc",
+    "stats": [
+      770000,
+      10400,
+      3.1,
+      1.55
+    ],
+    "profile": [
+      0.65,
+      1.95,
+      0,
+      13
+    ],
+    "ranged": [
+      14,
+      11,
+      "#b9ddff",
+      1,
+      2,
+      0.23
+    ],
+    "slam": 0,
+    "melee": 0,
+    "boss": false,
+    "level": 95,
+    "gold": 4200,
+    "material": "thunder_ray_relic",
+    "lootSource": null
+  },
+  {
+    "kind": "thunder_guard",
+    "name": "Slatebound Guard",
+    "art": "guard",
+    "color": "#8f9baa",
+    "stats": [
+      990000,
+      12800,
+      2.55,
+      1.85
+    ],
+    "profile": [
+      0.95,
+      1.6,
+      9,
+      12
+    ],
+    "ranged": null,
+    "slam": 3.5,
+    "melee": 0,
+    "boss": false,
+    "level": 95,
+    "gold": 4200,
+    "material": "thunder_guard_relic",
+    "lootSource": null
+  },
+  {
+    "kind": "thunder_conductor",
+    "name": "Storm Conductor",
+    "art": "conductor",
+    "color": "#c0d1e6",
+    "stats": [
+      4200000,
+      27500,
+      2.7,
+      2.3
+    ],
+    "profile": [
+      0.9,
+      1.8,
+      10,
+      14
+    ],
+    "ranged": [
+      16,
+      11,
+      "#d7f1ff",
+      1.2,
+      3,
+      0.27
+    ],
+    "slam": 4.5,
+    "melee": 0,
+    "boss": true,
+    "level": 95,
+    "gold": 17000,
+    "material": "thunder_conductor_relic",
+    "lootSource": "thunderheart_gate"
+  },
+  {
+    "kind": "thunder_bastion",
+    "name": "The Thunder Bastion",
+    "art": "bastion",
+    "color": "#a8b6c8",
+    "stats": [
+      4600000,
+      29000,
+      2.35,
+      2.55
+    ],
+    "profile": [
+      1.0,
+      1.6,
+      9,
+      15
+    ],
+    "ranged": null,
+    "slam": 5.1,
+    "melee": 4.8,
+    "boss": true,
+    "level": 95,
+    "gold": 17000,
+    "material": "thunder_bastion_relic",
+    "lootSource": "thunderheart_gate"
+  },
+  {
+    "kind": "thunder_heart",
+    "name": "Heart of the Stormgate",
+    "art": "heart",
+    "color": "#e0e4f2",
+    "stats": [
+      6500000,
+      36500,
+      2.1,
+      3.0
+    ],
+    "profile": [
+      1.15,
+      2.25,
+      10,
+      17
+    ],
+    "ranged": [
+      17,
+      12,
+      "#e7f5ff",
+      1.4,
+      5,
+      0.32
+    ],
+    "slam": 5.5,
+    "melee": 5.5,
+    "boss": true,
+    "level": 95,
+    "gold": 17000,
+    "material": "thunder_heart_relic",
+    "lootSource": "thunderheart_gate"
+  }
+]

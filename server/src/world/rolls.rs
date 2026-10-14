@@ -23,13 +23,13 @@ pub(super) type Reward = (String, Point, u32, Option<String>, u32, Option<String
 
 pub(super) struct Roll {
     id: u64,
-    item: String,
-    zone: usize,
-    at: Point,
+    pub(super) item: String,
+    pub(super) zone: usize,
+    pub(super) at: Point,
     /// The killer, who takes the piece when everybody passes.
     owner: String,
     expires: f64,
-    votes: BTreeMap<String, Option<RollChoice>>,
+    pub(super) votes: BTreeMap<String, Option<RollChoice>>,
 }
 
 /// Green and better is rolled for; gray gear and materials are not.

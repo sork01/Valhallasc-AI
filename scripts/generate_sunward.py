@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Seeded Sunward Vale, levels 65–70. Run after generate_stormglass.py.
 
-The Elder Hollow is a deliberately sealed future instance under one ancient oak.
+The Elder Hollow is an open private instance under one ancient oak.
 The rest of the valley is a green river landscape of ordinary trees and fields.
 """
 import json
@@ -11,6 +11,7 @@ from pathlib import Path
 
 import generate_gloamfen as fen
 import mercenary_offers
+import progression_quests
 import spark_travel
 from quest_gear_rewards import add_reward
 
@@ -22,7 +23,7 @@ ZONE = 20
 ARRIVAL = (13, 106)
 RETURN = (7, 106)
 SHORE_GATE = (121, 70)
-SHORE_ARRIVAL = (113, 64)
+SHORE_ARRIVAL = (113, 65)
 NAME = 'Sunward Vale'
 
 
@@ -88,10 +89,10 @@ def people_and_quests():
              dict(id='satchel', label='Buy Linen Satchel', cost=500,
                   bag='linen_satchel')], True),
         npc('keeper', 'Rowan Alder', 'Elder Hollow keeper', 101, 29,
-            'The old oak is older than the village. Its roots form a stair, but the door below is still bound shut.',
+            'The roots have opened. Gather five companions before descending: the heart below has awakened.',
             look=dict(skin='#835e4b', hair='#d2c39b', style='long', hat='hood', hatColor='#568054')),
         npc('stone', 'Millbridge Meeting Stone', 'Gather a party · hire fighters', 91, 29,
-            'The stone gathers companions for 250 gold each. The Elder Hollow remains sealed.',
+            'The stone gathers companions for 250 gold each. The Elder Hollow is open to prepared parties.',
             mercenary_offers.offers(open_=True)),
     ]
     folk[0]['art'] = 'sun_miller'
@@ -123,9 +124,22 @@ def people_and_quests():
               [kill('wickerwarden', 1, 'Defeat the Wicker Warden')], 70, 14800,
               'badgers', group=True, recommendedPlayers=5),
         quest('roots', 'Below the Elder Crown', 'keeper',
-              'Study the sealed stair and consult the Meeting Stone. The descent awaits another expedition.',
+              'Study the root stair and consult the Meeting Stone before descending.',
               [visit('elder_hollow', 'Inspect the Elder Hollow'),
                talk('stone', 'Speak with the Meeting Stone')], 70, 9000, 'badgers'),
+        quest('hollow_trials', 'Roots That Remember', 'keeper',
+              'Clear the creatures that have taken shelter beneath the elder oak.',
+              [kill('elder_thornling', 3, 'Defeat Thornlings'),
+               kill('elder_moth', 3, 'Defeat Lantern Moths'),
+               kill('elder_barkguard', 3, 'Defeat Barkguards')],
+              70, 12400, 'roots', group=True, recommendedPlayers=5),
+        quest('hollow_heart', 'The Elder Heart', 'keeper',
+              'Defeat the three guardians and quiet the heart at the end of the roots.',
+              [kill('elder_gatekeeper', 1, 'Defeat the Knotted Gatekeeper'),
+               kill('elder_matron', 1, 'Defeat the Pollen Matron'),
+               kill('elder_heart', 1, 'Defeat the Heart of the Elder')],
+              70, 22500, 'hollow_trials', group=True, recommendedPlayers=5,
+              rewardItem='accessory_amber_l70_elder'),
         quest('patrol', 'Keep the Meadows Clear', 'miller',
               'Walk the grassland and keep the village paths clear.',
               [kill('meadowhare', 3, 'Drive off Meadow Hares'),
@@ -255,12 +269,15 @@ def build():
                           plaza=dict(x=31, y=106), radius=6,
                           entry=dict(x=13, y=106)),
                 futureInstance=dict(name='The Elder Hollow', level=70,
-                                    players=5, status='sealed', x=106, y=19,
-                                    description='A vast split oak frames a sunlit root stair to a sealed five-player descent.'),
+                                    players=5, status='open', x=106, y=19,
+                                    description='A vast split oak frames a sunlit root stair to a five-player descent.'),
                 portals=[dict(id='sun_stormglass_gate', name='The Sunward Cut',
                               x=RETURN[0], y=RETURN[1], r=1.2,
                               to=19, tx=SHORE_ARRIVAL[0], ty=SHORE_ARRIVAL[1],
-                              look='sunward')])
+                              look='sunward'),
+                         dict(id='sun_elder_gate', name='The Elder Hollow',
+                              x=106, y=22, r=1.2, to=30, tx=48, ty=83,
+                              look='elder_hollow')])
     check(zone)
     return zone
 
@@ -274,7 +291,7 @@ def check(zone):
                for s in zone['slimes'])
     for q in zone['quests']:
         assert len('quest:accept:' + q['id']) <= 32, q['id']
-    assert len(zone['slimes']) == 42 and len(zone['quests']) == 9
+    assert len(zone['slimes']) == 42 and len(zone['quests']) == 11
 
 
 def open_shore_gate(shore):
@@ -283,6 +300,8 @@ def open_shore_gate(shore):
     road = [[101, 70], [113, 70], [121, 70]]
     shore['paths'] = [p for p in shore['paths'] if p != road]
     shore['paths'].append(road)
+    landing = [[SHORE_ARRIVAL[0], SHORE_ARRIVAL[1]], [113, 70]]
+    shore['paths'] = [p for p in shore['paths'] if p != landing] + [landing]
     shore['portals'] = [p for p in shore['portals']
                         if p['id'] not in ('stormglass_wake_gate', 'stormglass_sun_gate')]
     shore['portals'].append(dict(id='stormglass_sun_gate',
@@ -299,10 +318,13 @@ def open_shore_gate(shore):
 def main():
     world = json.loads(MAP.read_text())
     assert world['zones'][18]['name'] == 'The Stormglass Shore'
+    previous = world['zones'][ZONE - 1]
     later = world['zones'][ZONE:]
     world['zones'] = world['zones'][:ZONE - 1]
     open_shore_gate(world['zones'][18])
-    world['zones'].append(build())
+    zone = build()
+    progression_quests.keep_released_rewards_and_route_quest(previous, zone)
+    world['zones'].append(zone)
     world['zones'].extend(later)
     if any(z.get('name') == 'The Ribbonwild' for z in later):
         from generate_ribbonwild import open_sunward_gate
@@ -322,9 +344,15 @@ def main():
         if not any(i['id'] == key for i in items):
             items.append(dict(id=key, name=name, kind='material',
                               rarity='common', sell=sell))
+    for enemy in __import__('elder_hollow_content').ENEMIES:
+        key = enemy['material']
+        if not any(i['id'] == key for i in items):
+            items.append(dict(id=key, name=enemy['name'] + ' Relic',
+                              kind='material', rarity='common',
+                              sell=4200 if enemy['boss'] else 1800))
     ITEMS.write_text(json.dumps(items, indent=2) + '\n')
     print(f'{NAME}: {len(world["zones"][19]["objects"])} objects, '
-          '42 enemies, 9 quests')
+          '42 enemies, 11 quests')
 
 
 if __name__ == '__main__':

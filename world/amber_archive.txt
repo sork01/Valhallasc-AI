@@ -1,0 +1,179 @@
+[
+  {
+    "kind": "amber_page",
+    "name": "Living Page",
+    "art": "page",
+    "color": "#dfb875",
+    "stats": [
+      1110000,
+      13900,
+      3.4,
+      1.3
+    ],
+    "profile": [
+      0.5,
+      1.3,
+      10,
+      13
+    ],
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "boss": false,
+    "level": 99,
+    "gold": 5500,
+    "material": "amber_page_relic",
+    "lootSource": null
+  },
+  {
+    "kind": "amber_moth",
+    "name": "Script Moth",
+    "art": "moth",
+    "color": "#d59a59",
+    "stats": [
+      960000,
+      13500,
+      3.3,
+      1.5
+    ],
+    "profile": [
+      0.7,
+      1.9,
+      0,
+      14
+    ],
+    "ranged": [
+      16,
+      11,
+      "#f9dfa6",
+      1,
+      2,
+      0.25
+    ],
+    "slam": 0,
+    "melee": 0,
+    "boss": false,
+    "level": 99,
+    "gold": 5500,
+    "material": "amber_moth_relic",
+    "lootSource": null
+  },
+  {
+    "kind": "amber_sentinel",
+    "name": "Archive Sentinel",
+    "art": "sentinel",
+    "color": "#9c7554",
+    "stats": [
+      1280000,
+      16300,
+      2.5,
+      1.9
+    ],
+    "profile": [
+      1,
+      1.6,
+      9,
+      13
+    ],
+    "ranged": null,
+    "slam": 4.0,
+    "melee": 0,
+    "boss": false,
+    "level": 99,
+    "gold": 5500,
+    "material": "amber_sentinel_relic",
+    "lootSource": null
+  },
+  {
+    "kind": "amber_curator",
+    "name": "The Curator",
+    "art": "curator",
+    "color": "#ad7445",
+    "stats": [
+      5500000,
+      35300,
+      2.5,
+      2.5
+    ],
+    "profile": [
+      0.9,
+      1.8,
+      10,
+      15
+    ],
+    "ranged": null,
+    "slam": 5.0,
+    "melee": 4.7,
+    "boss": true,
+    "level": 99,
+    "gold": 23000,
+    "material": "amber_curator_relic",
+    "lootSource": "amber_archive"
+  },
+  {
+    "kind": "amber_chronicle",
+    "name": "The Living Chronicle",
+    "art": "chronicle",
+    "color": "#eac782",
+    "stats": [
+      5100000,
+      33800,
+      2.8,
+      2.4
+    ],
+    "profile": [
+      0.8,
+      2,
+      0,
+      15
+    ],
+    "ranged": [
+      18,
+      11,
+      "#ffedbc",
+      1.25,
+      4,
+      0.29
+    ],
+    "slam": 0,
+    "melee": 0,
+    "boss": true,
+    "level": 99,
+    "gold": 23000,
+    "material": "amber_chronicle_relic",
+    "lootSource": "amber_archive"
+  },
+  {
+    "kind": "amber_memory",
+    "name": "The Last Memory",
+    "art": "memory",
+    "color": "#f1cc75",
+    "stats": [
+      8100000,
+      45000,
+      2.1,
+      3.1
+    ],
+    "profile": [
+      1.2,
+      2.3,
+      10,
+      18
+    ],
+    "ranged": [
+      19,
+      12,
+      "#fff0bf",
+      1.5,
+      5,
+      0.33
+    ],
+    "slam": 6.0,
+    "melee": 6.0,
+    "boss": true,
+    "level": 99,
+    "gold": 23000,
+    "material": "amber_memory_relic",
+    "lootSource": "amber_archive"
+  }
+]

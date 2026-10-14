@@ -3,7 +3,7 @@
   const $ = id => document.getElementById(id);
   const dragType = 'application/x-valhallasc-item';
   const slots = [['headgear', 'Headgear'], ['shoulders', 'Shoulders'], ['chest', 'Chest'], ['pants', 'Pants'], ['gloves', 'Gloves'], ['hands', 'Hands'], ['necklace', 'Necklace'], ['accessory1', 'Accessory 1'], ['accessory2', 'Accessory 2']];
-  let stacks = [], look = null, gearSlots = {}, bags = [], signature = '', layout = [], character = null, activeBag = 0, selected = null, search = '', pendingPlacement = null;
+  let stacks = [], look = null, gearSlots = {}, bags = [], gearInstances = [], signature = '', layout = [], character = null, activeBag = 0, selected = null, search = '', pendingPlacement = null;
   const bagPages = () => { let start = 0; return [{ name: 'Backpack', size: 16 }, ...bags.map(id => ({ name: definition(id)?.name || 'Bag', size: definition(id)?.bagSlots || 0 }))].map(bag => { const page = { ...bag, start }; start += bag.size; return page; }); };
   const capacity = () => bagPages().reduce((sum, b) => sum + b.size, 0);
   const definition = id => WORLD_ITEMS.find(i => i.id === id);
@@ -88,6 +88,11 @@
       }
     }
     t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', i.starter ? 'Starter gear · cannot be sold' : `Sells for ${i.sell} gold each`));
+    if (compatible(i)) {
+      const copies=gearInstances.filter(g=>g.item===i.id);
+      for(const g of copies.slice(0,3))t.append(node('small',`Copy #${g.id} · ${g.rarity} · rank ${g.rank} · ${stats({attack:g.attack*(1+g.rank*.04),defense:g.defense*(1+g.rank*.04),bonusStats:Object.fromEntries(statNames.map(k=>[k,Math.round(((g.bonusStats?.[k]||0)+(g.rolledStats?.[k]||0))*(1+g.rank*.04))]))})}`));
+      if(copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
+    }
     t.append(node('small', consumable(i) ? 'Right-click or double-click to use · Z / X on the quick slots' : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
     t.hidden = false;
     const r = anchor.getBoundingClientRect(), tr = t.getBoundingClientRect();
@@ -273,9 +278,9 @@
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(a).kind.localeCompare(definition(b).kind) || definition(a).name.localeCompare(definition(b).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
   window.Inventory = { quantity, bagQuantity, effect, render, renderShop, renderEquipped, hideTooltip,
-    update(next, nextLook, nextSlots = {}, nextBags = []) {
-      const key = JSON.stringify([next, nextLook, nextSlots, nextBags]); if (key === signature) return;
-      stacks = next; look = nextLook; gearSlots = nextSlots; bags = nextBags; signature = key;
+    update(next, nextLook, nextSlots = {}, nextBags = [], nextInstances = []) {
+      const key = JSON.stringify([next, nextLook, nextSlots, nextBags, nextInstances]); if (key === signature) return;
+      stacks = next; look = nextLook; gearSlots = nextSlots; bags = nextBags; gearInstances=nextInstances; signature = key;
       reconcile(); hideTooltip(); dispatchEvent(new Event('inventory-change')); window.City?.refreshInventory();
     },
   };

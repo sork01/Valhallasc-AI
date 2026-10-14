@@ -43617,5 +43617,7553 @@
       "dexterity": 55
     },
     "source": "moonwell"
+  },
+  {
+    "id": "eye_drifter_relic",
+    "name": "Drifter Filament",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 650
+  },
+  {
+    "id": "eye_lurker_relic",
+    "name": "Glassjaw Tooth",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 700
+  },
+  {
+    "id": "eye_adept_relic",
+    "name": "Veil Sigil",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 720
+  },
+  {
+    "id": "eye_lenswarden_relic",
+    "name": "Lenswarden Prism",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2400
+  },
+  {
+    "id": "eye_undertide_relic",
+    "name": "Undertide Pearl",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2600
+  },
+  {
+    "id": "eye_unblinking_relic",
+    "name": "Unblinking Iris",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 3800
+  },
+  {
+    "id": "warrior_armor_crimson_l65_eye",
+    "name": "Deepglass Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "warrior",
+    "variant": "crimson_l65_eye",
+    "art": "crimson",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 11.4,
+    "defense": 45.4,
+    "bonusStats": {
+      "agility": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "warrior_headgear_crimson_l65_eye",
+    "name": "Deepglass Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "warrior",
+    "variant": "crimson_l65_eye",
+    "art": "crimson",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "strength": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l65_eye",
+    "name": "Deepglass Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "warrior",
+    "variant": "crimson_l65_eye",
+    "art": "crimson",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "strength": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "warrior_gloves_crimson_l65_eye",
+    "name": "Deepglass Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "warrior",
+    "variant": "crimson_l65_eye",
+    "art": "crimson",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "dexterity": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "warrior_weapon_sword_l65_eye",
+    "name": "Deepglass Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "warrior",
+    "variant": "sword_l65_eye",
+    "art": "sword",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 60.5,
+    "defense": 15.2,
+    "bonusStats": {
+      "stamina": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "mage_armor_apprentice_l65_eye",
+    "name": "Deepglass Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "mage",
+    "variant": "apprentice_l65_eye",
+    "art": "apprentice",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 7.6,
+    "defense": 30.2,
+    "bonusStats": {
+      "stamina": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "mage_headgear_apprentice_l65_eye",
+    "name": "Deepglass Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "mage",
+    "variant": "apprentice_l65_eye",
+    "art": "apprentice",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "intellect": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l65_eye",
+    "name": "Deepglass Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "mage",
+    "variant": "apprentice_l65_eye",
+    "art": "apprentice",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "stamina": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "mage_gloves_apprentice_l65_eye",
+    "name": "Deepglass Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "mage",
+    "variant": "apprentice_l65_eye",
+    "art": "apprentice",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "agility": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "mage_weapon_ash_l65_eye",
+    "name": "Deepglass Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "mage",
+    "variant": "ash_l65_eye",
+    "art": "ash",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 60.5,
+    "defense": 15.2,
+    "bonusStats": {
+      "stamina": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "assassin_armor_shadow_l65_eye",
+    "name": "Deepglass Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "assassin",
+    "variant": "shadow_l65_eye",
+    "art": "shadow",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 7.6,
+    "defense": 30.2,
+    "bonusStats": {
+      "agility": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "assassin_headgear_shadow_l65_eye",
+    "name": "Deepglass Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "assassin",
+    "variant": "shadow_l65_eye",
+    "art": "shadow",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "stamina": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l65_eye",
+    "name": "Deepglass Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "assassin",
+    "variant": "shadow_l65_eye",
+    "art": "shadow",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "strength": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "assassin_gloves_shadow_l65_eye",
+    "name": "Deepglass Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "assassin",
+    "variant": "shadow_l65_eye",
+    "art": "shadow",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "strength": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "assassin_weapon_daggers_l65_eye",
+    "name": "Deepglass Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "assassin",
+    "variant": "daggers_l65_eye",
+    "art": "daggers",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 60.5,
+    "defense": 15.2,
+    "bonusStats": {
+      "strength": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "priest_armor_pilgrim_l65_eye",
+    "name": "Deepglass Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "priest",
+    "variant": "pilgrim_l65_eye",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 11.4,
+    "defense": 45.4,
+    "bonusStats": {
+      "agility": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l65_eye",
+    "name": "Deepglass Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "priest",
+    "variant": "pilgrim_l65_eye",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "dexterity": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l65_eye",
+    "name": "Deepglass Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "priest",
+    "variant": "pilgrim_l65_eye",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "dexterity": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l65_eye",
+    "name": "Deepglass Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "priest",
+    "variant": "pilgrim_l65_eye",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "intellect": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "priest_weapon_mace_l65_eye",
+    "name": "Deepglass Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "priest",
+    "variant": "mace_l65_eye",
+    "art": "mace",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 60.5,
+    "defense": 15.2,
+    "bonusStats": {
+      "stamina": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "hunter_armor_scout_l65_eye",
+    "name": "Deepglass Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "hunter",
+    "variant": "scout_l65_eye",
+    "art": "scout",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 11.4,
+    "defense": 45.4,
+    "bonusStats": {
+      "stamina": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "hunter_headgear_scout_l65_eye",
+    "name": "Deepglass Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "hunter",
+    "variant": "scout_l65_eye",
+    "art": "scout",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "agility": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "hunter_shoulders_scout_l65_eye",
+    "name": "Deepglass Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "hunter",
+    "variant": "scout_l65_eye",
+    "art": "scout",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "agility": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "hunter_gloves_scout_l65_eye",
+    "name": "Deepglass Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "hunter",
+    "variant": "scout_l65_eye",
+    "art": "scout",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "dexterity": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l65_eye",
+    "name": "Deepglass Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "class": "hunter",
+    "variant": "shortbow_l65_eye",
+    "art": "shortbow",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 60.5,
+    "defense": 15.2,
+    "bonusStats": {
+      "strength": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "pants_wayfarer_l65_eye",
+    "name": "Deepglass Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "variant": "wayfarer_l65_eye",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "dexterity": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "necklace_moonstone_l65_eye",
+    "name": "Deepglass Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "variant": "moonstone_l65_eye",
+    "art": "moonstone",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 30.2,
+    "defense": 7.6,
+    "bonusStats": {
+      "stamina": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "accessory_amber_l65_eye",
+    "name": "Deepglass Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "variant": "amber_l65_eye",
+    "art": "amber",
+    "tint": {
+      "hue": 190,
+      "saturate": 1.25,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 22.7,
+    "defense": 5.6,
+    "bonusStats": {
+      "stamina": 63
+    },
+    "source": "eye_below"
+  },
+  {
+    "id": "elder_thornling_relic",
+    "name": "Thornling Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1800
+  },
+  {
+    "id": "elder_moth_relic",
+    "name": "Lantern Moth Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1800
+  },
+  {
+    "id": "elder_barkguard_relic",
+    "name": "Barkguard Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 1800
+  },
+  {
+    "id": "elder_gatekeeper_relic",
+    "name": "The Knotted Gatekeeper Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4200
+  },
+  {
+    "id": "elder_matron_relic",
+    "name": "The Pollen Matron Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4200
+  },
+  {
+    "id": "elder_heart_relic",
+    "name": "Heart of the Elder Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4200
+  },
+  {
+    "id": "warrior_armor_crimson_l70_elder",
+    "name": "Oakheart Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "warrior",
+    "variant": "crimson_l70_elder",
+    "art": "crimson",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 12.2,
+    "defense": 48.6,
+    "bonusStats": {
+      "strength": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "warrior_headgear_crimson_l70_elder",
+    "name": "Oakheart Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "warrior",
+    "variant": "crimson_l70_elder",
+    "art": "crimson",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "strength": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l70_elder",
+    "name": "Oakheart Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "warrior",
+    "variant": "crimson_l70_elder",
+    "art": "crimson",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "agility": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "warrior_gloves_crimson_l70_elder",
+    "name": "Oakheart Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "warrior",
+    "variant": "crimson_l70_elder",
+    "art": "crimson",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "stamina": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "warrior_weapon_sword_l70_elder",
+    "name": "Oakheart Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "warrior",
+    "variant": "sword_l70_elder",
+    "art": "sword",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 64.9,
+    "defense": 16.2,
+    "bonusStats": {
+      "agility": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "mage_armor_apprentice_l70_elder",
+    "name": "Oakheart Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "mage",
+    "variant": "apprentice_l70_elder",
+    "art": "apprentice",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 8.2,
+    "defense": 32.4,
+    "bonusStats": {
+      "dexterity": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "mage_headgear_apprentice_l70_elder",
+    "name": "Oakheart Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "mage",
+    "variant": "apprentice_l70_elder",
+    "art": "apprentice",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "stamina": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l70_elder",
+    "name": "Oakheart Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "mage",
+    "variant": "apprentice_l70_elder",
+    "art": "apprentice",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "stamina": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "mage_gloves_apprentice_l70_elder",
+    "name": "Oakheart Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "mage",
+    "variant": "apprentice_l70_elder",
+    "art": "apprentice",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "stamina": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "mage_weapon_ash_l70_elder",
+    "name": "Oakheart Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "mage",
+    "variant": "ash_l70_elder",
+    "art": "ash",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 64.9,
+    "defense": 16.2,
+    "bonusStats": {
+      "stamina": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "assassin_armor_shadow_l70_elder",
+    "name": "Oakheart Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "assassin",
+    "variant": "shadow_l70_elder",
+    "art": "shadow",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 8.2,
+    "defense": 32.4,
+    "bonusStats": {
+      "agility": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "assassin_headgear_shadow_l70_elder",
+    "name": "Oakheart Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "assassin",
+    "variant": "shadow_l70_elder",
+    "art": "shadow",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "dexterity": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l70_elder",
+    "name": "Oakheart Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "assassin",
+    "variant": "shadow_l70_elder",
+    "art": "shadow",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "dexterity": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "assassin_gloves_shadow_l70_elder",
+    "name": "Oakheart Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "assassin",
+    "variant": "shadow_l70_elder",
+    "art": "shadow",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "strength": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "assassin_weapon_daggers_l70_elder",
+    "name": "Oakheart Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "assassin",
+    "variant": "daggers_l70_elder",
+    "art": "daggers",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 64.9,
+    "defense": 16.2,
+    "bonusStats": {
+      "strength": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "priest_armor_pilgrim_l70_elder",
+    "name": "Oakheart Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "priest",
+    "variant": "pilgrim_l70_elder",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 12.2,
+    "defense": 48.6,
+    "bonusStats": {
+      "intellect": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l70_elder",
+    "name": "Oakheart Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "priest",
+    "variant": "pilgrim_l70_elder",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "intellect": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l70_elder",
+    "name": "Oakheart Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "priest",
+    "variant": "pilgrim_l70_elder",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "stamina": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l70_elder",
+    "name": "Oakheart Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "priest",
+    "variant": "pilgrim_l70_elder",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "stamina": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "priest_weapon_mace_l70_elder",
+    "name": "Oakheart Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "priest",
+    "variant": "mace_l70_elder",
+    "art": "mace",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 64.9,
+    "defense": 16.2,
+    "bonusStats": {
+      "agility": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "hunter_armor_scout_l70_elder",
+    "name": "Oakheart Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "hunter",
+    "variant": "scout_l70_elder",
+    "art": "scout",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 12.2,
+    "defense": 48.6,
+    "bonusStats": {
+      "stamina": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "hunter_headgear_scout_l70_elder",
+    "name": "Oakheart Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "hunter",
+    "variant": "scout_l70_elder",
+    "art": "scout",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "agility": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "hunter_shoulders_scout_l70_elder",
+    "name": "Oakheart Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "hunter",
+    "variant": "scout_l70_elder",
+    "art": "scout",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "dexterity": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "hunter_gloves_scout_l70_elder",
+    "name": "Oakheart Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "hunter",
+    "variant": "scout_l70_elder",
+    "art": "scout",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "agility": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l70_elder",
+    "name": "Oakheart Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "class": "hunter",
+    "variant": "shortbow_l70_elder",
+    "art": "shortbow",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 64.9,
+    "defense": 16.2,
+    "bonusStats": {
+      "strength": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "pants_wayfarer_l70_elder",
+    "name": "Oakheart Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "variant": "wayfarer_l70_elder",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.0,
+    "defense": 16.2,
+    "bonusStats": {
+      "stamina": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "necklace_moonstone_l70_elder",
+    "name": "Oakheart Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "variant": "moonstone_l70_elder",
+    "art": "moonstone",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 32.4,
+    "defense": 8.2,
+    "bonusStats": {
+      "stamina": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "accessory_amber_l70_elder",
+    "name": "Oakheart Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "variant": "amber_l70_elder",
+    "art": "amber",
+    "tint": {
+      "hue": 105,
+      "saturate": 1.17,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 24.4,
+    "defense": 6.1,
+    "bonusStats": {
+      "dexterity": 70
+    },
+    "source": "elder_hollow"
+  },
+  {
+    "id": "pavilion_foldling_relic",
+    "name": "Paper Foldling Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2000
+  },
+  {
+    "id": "pavilion_inkmoth_relic",
+    "name": "Inkwing Moth Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2000
+  },
+  {
+    "id": "pavilion_silkguard_relic",
+    "name": "Silkguard Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2000
+  },
+  {
+    "id": "pavilion_mirror_relic",
+    "name": "Mirror Dancer Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4700
+  },
+  {
+    "id": "pavilion_weaver_relic",
+    "name": "Thousandfold Weaver Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4700
+  },
+  {
+    "id": "pavilion_sovereign_relic",
+    "name": "Sovereign of the Last Fold Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4700
+  },
+  {
+    "id": "warrior_armor_crimson_l75_pavilion",
+    "name": "Thousandfold Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "warrior",
+    "variant": "crimson_l75_pavilion",
+    "art": "crimson",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 13.0,
+    "defense": 51.9,
+    "bonusStats": {
+      "stamina": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "warrior_headgear_crimson_l75_pavilion",
+    "name": "Thousandfold Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "warrior",
+    "variant": "crimson_l75_pavilion",
+    "art": "crimson",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "strength": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l75_pavilion",
+    "name": "Thousandfold Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "warrior",
+    "variant": "crimson_l75_pavilion",
+    "art": "crimson",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "agility": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "warrior_gloves_crimson_l75_pavilion",
+    "name": "Thousandfold Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "warrior",
+    "variant": "crimson_l75_pavilion",
+    "art": "crimson",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "strength": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "warrior_weapon_sword_l75_pavilion",
+    "name": "Thousandfold Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "warrior",
+    "variant": "sword_l75_pavilion",
+    "art": "sword",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 69.2,
+    "defense": 17.2,
+    "bonusStats": {
+      "strength": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "mage_armor_apprentice_l75_pavilion",
+    "name": "Thousandfold Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "mage",
+    "variant": "apprentice_l75_pavilion",
+    "art": "apprentice",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 8.6,
+    "defense": 34.6,
+    "bonusStats": {
+      "agility": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "mage_headgear_apprentice_l75_pavilion",
+    "name": "Thousandfold Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "mage",
+    "variant": "apprentice_l75_pavilion",
+    "art": "apprentice",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "agility": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l75_pavilion",
+    "name": "Thousandfold Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "mage",
+    "variant": "apprentice_l75_pavilion",
+    "art": "apprentice",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "stamina": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "mage_gloves_apprentice_l75_pavilion",
+    "name": "Thousandfold Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "mage",
+    "variant": "apprentice_l75_pavilion",
+    "art": "apprentice",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "intellect": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "mage_weapon_ash_l75_pavilion",
+    "name": "Thousandfold Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "mage",
+    "variant": "ash_l75_pavilion",
+    "art": "ash",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 69.2,
+    "defense": 17.2,
+    "bonusStats": {
+      "stamina": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "assassin_armor_shadow_l75_pavilion",
+    "name": "Thousandfold Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "assassin",
+    "variant": "shadow_l75_pavilion",
+    "art": "shadow",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 8.6,
+    "defense": 34.6,
+    "bonusStats": {
+      "stamina": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "assassin_headgear_shadow_l75_pavilion",
+    "name": "Thousandfold Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "assassin",
+    "variant": "shadow_l75_pavilion",
+    "art": "shadow",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "agility": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l75_pavilion",
+    "name": "Thousandfold Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "assassin",
+    "variant": "shadow_l75_pavilion",
+    "art": "shadow",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "strength": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "assassin_gloves_shadow_l75_pavilion",
+    "name": "Thousandfold Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "assassin",
+    "variant": "shadow_l75_pavilion",
+    "art": "shadow",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "stamina": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "assassin_weapon_daggers_l75_pavilion",
+    "name": "Thousandfold Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "assassin",
+    "variant": "daggers_l75_pavilion",
+    "art": "daggers",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 69.2,
+    "defense": 17.2,
+    "bonusStats": {
+      "stamina": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "priest_armor_pilgrim_l75_pavilion",
+    "name": "Thousandfold Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "priest",
+    "variant": "pilgrim_l75_pavilion",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 13.0,
+    "defense": 51.9,
+    "bonusStats": {
+      "agility": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l75_pavilion",
+    "name": "Thousandfold Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "priest",
+    "variant": "pilgrim_l75_pavilion",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "stamina": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l75_pavilion",
+    "name": "Thousandfold Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "priest",
+    "variant": "pilgrim_l75_pavilion",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "intellect": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l75_pavilion",
+    "name": "Thousandfold Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "priest",
+    "variant": "pilgrim_l75_pavilion",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "agility": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "priest_weapon_mace_l75_pavilion",
+    "name": "Thousandfold Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "priest",
+    "variant": "mace_l75_pavilion",
+    "art": "mace",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 69.2,
+    "defense": 17.2,
+    "bonusStats": {
+      "agility": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "hunter_armor_scout_l75_pavilion",
+    "name": "Thousandfold Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "hunter",
+    "variant": "scout_l75_pavilion",
+    "art": "scout",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 13.0,
+    "defense": 51.9,
+    "bonusStats": {
+      "agility": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "hunter_headgear_scout_l75_pavilion",
+    "name": "Thousandfold Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "hunter",
+    "variant": "scout_l75_pavilion",
+    "art": "scout",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "stamina": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "hunter_shoulders_scout_l75_pavilion",
+    "name": "Thousandfold Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "hunter",
+    "variant": "scout_l75_pavilion",
+    "art": "scout",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "stamina": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "hunter_gloves_scout_l75_pavilion",
+    "name": "Thousandfold Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "hunter",
+    "variant": "scout_l75_pavilion",
+    "art": "scout",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "strength": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l75_pavilion",
+    "name": "Thousandfold Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "class": "hunter",
+    "variant": "shortbow_l75_pavilion",
+    "art": "shortbow",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 69.2,
+    "defense": 17.2,
+    "bonusStats": {
+      "agility": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "pants_wayfarer_l75_pavilion",
+    "name": "Thousandfold Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "variant": "wayfarer_l75_pavilion",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "agility": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "necklace_moonstone_l75_pavilion",
+    "name": "Thousandfold Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "variant": "moonstone_l75_pavilion",
+    "art": "moonstone",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 34.6,
+    "defense": 8.6,
+    "bonusStats": {
+      "stamina": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "accessory_amber_l75_pavilion",
+    "name": "Thousandfold Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "variant": "amber_l75_pavilion",
+    "art": "amber",
+    "tint": {
+      "hue": 305,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 26.0,
+    "defense": 6.4,
+    "bonusStats": {
+      "strength": 78
+    },
+    "source": "thousandfold"
+  },
+  {
+    "id": "warrior_armor_crimson_l80_rain",
+    "name": "Rainbound Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "warrior",
+    "variant": "crimson_l80_rain",
+    "art": "crimson",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 13.8,
+    "defense": 55.1,
+    "bonusStats": {
+      "strength": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "warrior_headgear_crimson_l80_rain",
+    "name": "Rainbound Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "warrior",
+    "variant": "crimson_l80_rain",
+    "art": "crimson",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l80_rain",
+    "name": "Rainbound Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "warrior",
+    "variant": "crimson_l80_rain",
+    "art": "crimson",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "strength": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "warrior_gloves_crimson_l80_rain",
+    "name": "Rainbound Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "warrior",
+    "variant": "crimson_l80_rain",
+    "art": "crimson",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "strength": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "warrior_weapon_sword_l80_rain",
+    "name": "Rainbound Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "warrior",
+    "variant": "sword_l80_rain",
+    "art": "sword",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 73.5,
+    "defense": 18.4,
+    "bonusStats": {
+      "strength": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "mage_armor_apprentice_l80_rain",
+    "name": "Rainbound Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "mage",
+    "variant": "apprentice_l80_rain",
+    "art": "apprentice",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 9.2,
+    "defense": 36.8,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "mage_headgear_apprentice_l80_rain",
+    "name": "Rainbound Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "mage",
+    "variant": "apprentice_l80_rain",
+    "art": "apprentice",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l80_rain",
+    "name": "Rainbound Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "mage",
+    "variant": "apprentice_l80_rain",
+    "art": "apprentice",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "mage_gloves_apprentice_l80_rain",
+    "name": "Rainbound Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "mage",
+    "variant": "apprentice_l80_rain",
+    "art": "apprentice",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "mage_weapon_ash_l80_rain",
+    "name": "Rainbound Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "mage",
+    "variant": "ash_l80_rain",
+    "art": "ash",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 73.5,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "assassin_armor_shadow_l80_rain",
+    "name": "Rainbound Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "assassin",
+    "variant": "shadow_l80_rain",
+    "art": "shadow",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 9.2,
+    "defense": 36.8,
+    "bonusStats": {
+      "strength": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "assassin_headgear_shadow_l80_rain",
+    "name": "Rainbound Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "assassin",
+    "variant": "shadow_l80_rain",
+    "art": "shadow",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l80_rain",
+    "name": "Rainbound Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "assassin",
+    "variant": "shadow_l80_rain",
+    "art": "shadow",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "assassin_gloves_shadow_l80_rain",
+    "name": "Rainbound Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "assassin",
+    "variant": "shadow_l80_rain",
+    "art": "shadow",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "assassin_weapon_daggers_l80_rain",
+    "name": "Rainbound Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "assassin",
+    "variant": "daggers_l80_rain",
+    "art": "daggers",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 73.5,
+    "defense": 18.4,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "priest_armor_pilgrim_l80_rain",
+    "name": "Rainbound Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "priest",
+    "variant": "pilgrim_l80_rain",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 13.8,
+    "defense": 55.1,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l80_rain",
+    "name": "Rainbound Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "priest",
+    "variant": "pilgrim_l80_rain",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l80_rain",
+    "name": "Rainbound Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "priest",
+    "variant": "pilgrim_l80_rain",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l80_rain",
+    "name": "Rainbound Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "priest",
+    "variant": "pilgrim_l80_rain",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "priest_weapon_mace_l80_rain",
+    "name": "Rainbound Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "priest",
+    "variant": "mace_l80_rain",
+    "art": "mace",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 73.5,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "hunter_armor_scout_l80_rain",
+    "name": "Rainbound Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "hunter",
+    "variant": "scout_l80_rain",
+    "art": "scout",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 13.8,
+    "defense": 55.1,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "hunter_headgear_scout_l80_rain",
+    "name": "Rainbound Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "hunter",
+    "variant": "scout_l80_rain",
+    "art": "scout",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "hunter_shoulders_scout_l80_rain",
+    "name": "Rainbound Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "hunter",
+    "variant": "scout_l80_rain",
+    "art": "scout",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "hunter_gloves_scout_l80_rain",
+    "name": "Rainbound Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "hunter",
+    "variant": "scout_l80_rain",
+    "art": "scout",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "strength": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l80_rain",
+    "name": "Rainbound Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "hunter",
+    "variant": "shortbow_l80_rain",
+    "art": "shortbow",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 73.5,
+    "defense": 18.4,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "pants_wayfarer_l80_rain",
+    "name": "Rainbound Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "variant": "wayfarer_l80_rain",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "necklace_moonstone_l80_rain",
+    "name": "Rainbound Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "variant": "moonstone_l80_rain",
+    "art": "moonstone",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 36.8,
+    "defense": 9.2,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "accessory_amber_l80_rain",
+    "name": "Rainbound Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "variant": "amber_l80_rain",
+    "art": "amber",
+    "tint": {
+      "hue": 145,
+      "saturate": 1.22,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 27.6,
+    "defense": 6.9,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "rain_crown"
+  },
+  {
+    "id": "rain_crown_droplet_relic",
+    "name": "Crowned Droplet Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2300
+  },
+  {
+    "id": "rain_crown_oracle_relic",
+    "name": "Jade Rain Oracle Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2300
+  },
+  {
+    "id": "rain_crown_guard_relic",
+    "name": "Monsoon Guard Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2300
+  },
+  {
+    "id": "rain_crown_gatekeeper_relic",
+    "name": "Keeper of the Floodgate Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 5400
+  },
+  {
+    "id": "rain_crown_sibyl_relic",
+    "name": "Sibyl of the Rain Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 5400
+  },
+  {
+    "id": "rain_crown_sovereign_relic",
+    "name": "Rain Crown Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 5400
+  },
+  {
+    "id": "warrior_armor_crimson_l80_seed",
+    "name": "Worldseed Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "warrior",
+    "variant": "crimson_l80_seed",
+    "art": "crimson",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 13.8,
+    "defense": 55.1,
+    "bonusStats": {
+      "strength": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "warrior_headgear_crimson_l80_seed",
+    "name": "Worldseed Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "warrior",
+    "variant": "crimson_l80_seed",
+    "art": "crimson",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "strength": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l80_seed",
+    "name": "Worldseed Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "warrior",
+    "variant": "crimson_l80_seed",
+    "art": "crimson",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "strength": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "warrior_gloves_crimson_l80_seed",
+    "name": "Worldseed Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "warrior",
+    "variant": "crimson_l80_seed",
+    "art": "crimson",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "warrior_weapon_sword_l80_seed",
+    "name": "Worldseed Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "warrior",
+    "variant": "sword_l80_seed",
+    "art": "sword",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 73.5,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "mage_armor_apprentice_l80_seed",
+    "name": "Worldseed Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "mage",
+    "variant": "apprentice_l80_seed",
+    "art": "apprentice",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 9.2,
+    "defense": 36.8,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "mage_headgear_apprentice_l80_seed",
+    "name": "Worldseed Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "mage",
+    "variant": "apprentice_l80_seed",
+    "art": "apprentice",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "intellect": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l80_seed",
+    "name": "Worldseed Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "mage",
+    "variant": "apprentice_l80_seed",
+    "art": "apprentice",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "mage_gloves_apprentice_l80_seed",
+    "name": "Worldseed Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "mage",
+    "variant": "apprentice_l80_seed",
+    "art": "apprentice",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "mage_weapon_ash_l80_seed",
+    "name": "Worldseed Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "mage",
+    "variant": "ash_l80_seed",
+    "art": "ash",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 73.5,
+    "defense": 18.4,
+    "bonusStats": {
+      "intellect": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "assassin_armor_shadow_l80_seed",
+    "name": "Worldseed Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "assassin",
+    "variant": "shadow_l80_seed",
+    "art": "shadow",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 9.2,
+    "defense": 36.8,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "assassin_headgear_shadow_l80_seed",
+    "name": "Worldseed Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "assassin",
+    "variant": "shadow_l80_seed",
+    "art": "shadow",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "strength": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l80_seed",
+    "name": "Worldseed Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "assassin",
+    "variant": "shadow_l80_seed",
+    "art": "shadow",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "assassin_gloves_shadow_l80_seed",
+    "name": "Worldseed Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "assassin",
+    "variant": "shadow_l80_seed",
+    "art": "shadow",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "assassin_weapon_daggers_l80_seed",
+    "name": "Worldseed Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "assassin",
+    "variant": "daggers_l80_seed",
+    "art": "daggers",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 73.5,
+    "defense": 18.4,
+    "bonusStats": {
+      "strength": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "priest_armor_pilgrim_l80_seed",
+    "name": "Worldseed Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "priest",
+    "variant": "pilgrim_l80_seed",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 13.8,
+    "defense": 55.1,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l80_seed",
+    "name": "Worldseed Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "priest",
+    "variant": "pilgrim_l80_seed",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "intellect": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l80_seed",
+    "name": "Worldseed Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "priest",
+    "variant": "pilgrim_l80_seed",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l80_seed",
+    "name": "Worldseed Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "priest",
+    "variant": "pilgrim_l80_seed",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "priest_weapon_mace_l80_seed",
+    "name": "Worldseed Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "priest",
+    "variant": "mace_l80_seed",
+    "art": "mace",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 73.5,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "hunter_armor_scout_l80_seed",
+    "name": "Worldseed Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "hunter",
+    "variant": "scout_l80_seed",
+    "art": "scout",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 13.8,
+    "defense": 55.1,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "hunter_headgear_scout_l80_seed",
+    "name": "Worldseed Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "hunter",
+    "variant": "scout_l80_seed",
+    "art": "scout",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "hunter_shoulders_scout_l80_seed",
+    "name": "Worldseed Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "hunter",
+    "variant": "scout_l80_seed",
+    "art": "scout",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "strength": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "hunter_gloves_scout_l80_seed",
+    "name": "Worldseed Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "hunter",
+    "variant": "scout_l80_seed",
+    "art": "scout",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l80_seed",
+    "name": "Worldseed Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "class": "hunter",
+    "variant": "shortbow_l80_seed",
+    "art": "shortbow",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 73.5,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "pants_wayfarer_l80_seed",
+    "name": "Worldseed Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "variant": "wayfarer_l80_seed",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 4.6,
+    "defense": 18.4,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "necklace_moonstone_l80_seed",
+    "name": "Worldseed Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "variant": "moonstone_l80_seed",
+    "art": "moonstone",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 36.8,
+    "defense": 9.2,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "accessory_amber_l80_seed",
+    "name": "Worldseed Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "variant": "amber_l80_seed",
+    "art": "amber",
+    "tint": {
+      "hue": 85,
+      "saturate": 1.25,
+      "brightness": 1.16
+    },
+    "starter": false,
+    "attack": 27.6,
+    "defense": 6.9,
+    "bonusStats": {
+      "agility": 85
+    },
+    "source": "seed_vault"
+  },
+  {
+    "id": "seed_mote_relic",
+    "name": "Awakened Seedling Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2350
+  },
+  {
+    "id": "seed_amberwing_relic",
+    "name": "Amberwing Moth Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2350
+  },
+  {
+    "id": "seed_rootguard_relic",
+    "name": "Heartroot Guard Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2350
+  },
+  {
+    "id": "seed_warden_relic",
+    "name": "Warden of Rings Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 5500
+  },
+  {
+    "id": "seed_germinator_relic",
+    "name": "Germinator Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 5500
+  },
+  {
+    "id": "seed_worldseed_relic",
+    "name": "Heart of the Worldseed Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 5500
+  },
+  {
+    "id": "astro_gearling_relic",
+    "name": "Brass Gearling Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2950
+  },
+  {
+    "id": "astro_starling_relic",
+    "name": "Fallen Starling Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2950
+  },
+  {
+    "id": "astro_sentinel_relic",
+    "name": "Orrery Sentinel Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2950
+  },
+  {
+    "id": "astro_warden_relic",
+    "name": "Meridian Warden Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 7000
+  },
+  {
+    "id": "astro_navigator_relic",
+    "name": "Lost Navigator Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 7000
+  },
+  {
+    "id": "astro_axis_relic",
+    "name": "Axis of the Buried Sky Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 7000
+  },
+  {
+    "id": "thunder_spark_relic",
+    "name": "Forked Spark Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 3700
+  },
+  {
+    "id": "thunder_ray_relic",
+    "name": "Stormglass Ray Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 3700
+  },
+  {
+    "id": "thunder_guard_relic",
+    "name": "Slatebound Guard Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 3700
+  },
+  {
+    "id": "thunder_conductor_relic",
+    "name": "Storm Conductor Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 8500
+  },
+  {
+    "id": "thunder_bastion_relic",
+    "name": "Thunder Bastion Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 8500
+  },
+  {
+    "id": "thunder_heart_relic",
+    "name": "Heart of the Stormgate Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 8500
+  },
+  {
+    "id": "warrior_armor_crimson_l85_astro",
+    "name": "Meridian Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "warrior",
+    "variant": "crimson_l85_astro",
+    "art": "crimson",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 14.6,
+    "defense": 58.4,
+    "bonusStats": {
+      "agility": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "warrior_headgear_crimson_l85_astro",
+    "name": "Meridian Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "warrior",
+    "variant": "crimson_l85_astro",
+    "art": "crimson",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "stamina": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l85_astro",
+    "name": "Meridian Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "warrior",
+    "variant": "crimson_l85_astro",
+    "art": "crimson",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "agility": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "warrior_gloves_crimson_l85_astro",
+    "name": "Meridian Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "warrior",
+    "variant": "crimson_l85_astro",
+    "art": "crimson",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "stamina": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "warrior_weapon_sword_l85_astro",
+    "name": "Meridian Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "warrior",
+    "variant": "sword_l85_astro",
+    "art": "sword",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 77.9,
+    "defense": 19.4,
+    "bonusStats": {
+      "strength": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "mage_armor_apprentice_l85_astro",
+    "name": "Meridian Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "mage",
+    "variant": "apprentice_l85_astro",
+    "art": "apprentice",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 9.8,
+    "defense": 38.9,
+    "bonusStats": {
+      "stamina": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "mage_headgear_apprentice_l85_astro",
+    "name": "Meridian Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "mage",
+    "variant": "apprentice_l85_astro",
+    "art": "apprentice",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "agility": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l85_astro",
+    "name": "Meridian Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "mage",
+    "variant": "apprentice_l85_astro",
+    "art": "apprentice",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "intellect": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "mage_gloves_apprentice_l85_astro",
+    "name": "Meridian Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "mage",
+    "variant": "apprentice_l85_astro",
+    "art": "apprentice",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "agility": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "mage_weapon_ash_l85_astro",
+    "name": "Meridian Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "mage",
+    "variant": "ash_l85_astro",
+    "art": "ash",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 77.9,
+    "defense": 19.4,
+    "bonusStats": {
+      "stamina": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "assassin_armor_shadow_l85_astro",
+    "name": "Meridian Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "assassin",
+    "variant": "shadow_l85_astro",
+    "art": "shadow",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 9.8,
+    "defense": 38.9,
+    "bonusStats": {
+      "strength": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "assassin_headgear_shadow_l85_astro",
+    "name": "Meridian Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "assassin",
+    "variant": "shadow_l85_astro",
+    "art": "shadow",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "agility": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l85_astro",
+    "name": "Meridian Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "assassin",
+    "variant": "shadow_l85_astro",
+    "art": "shadow",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "agility": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "assassin_gloves_shadow_l85_astro",
+    "name": "Meridian Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "assassin",
+    "variant": "shadow_l85_astro",
+    "art": "shadow",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "agility": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "assassin_weapon_daggers_l85_astro",
+    "name": "Meridian Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "assassin",
+    "variant": "daggers_l85_astro",
+    "art": "daggers",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 77.9,
+    "defense": 19.4,
+    "bonusStats": {
+      "strength": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "priest_armor_pilgrim_l85_astro",
+    "name": "Meridian Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "priest",
+    "variant": "pilgrim_l85_astro",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 14.6,
+    "defense": 58.4,
+    "bonusStats": {
+      "stamina": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l85_astro",
+    "name": "Meridian Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "priest",
+    "variant": "pilgrim_l85_astro",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "intellect": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l85_astro",
+    "name": "Meridian Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "priest",
+    "variant": "pilgrim_l85_astro",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "stamina": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l85_astro",
+    "name": "Meridian Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "priest",
+    "variant": "pilgrim_l85_astro",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "agility": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "priest_weapon_mace_l85_astro",
+    "name": "Meridian Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "priest",
+    "variant": "mace_l85_astro",
+    "art": "mace",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 77.9,
+    "defense": 19.4,
+    "bonusStats": {
+      "stamina": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "hunter_armor_scout_l85_astro",
+    "name": "Meridian Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "hunter",
+    "variant": "scout_l85_astro",
+    "art": "scout",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 14.6,
+    "defense": 58.4,
+    "bonusStats": {
+      "stamina": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "hunter_headgear_scout_l85_astro",
+    "name": "Meridian Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "hunter",
+    "variant": "scout_l85_astro",
+    "art": "scout",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "agility": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "hunter_shoulders_scout_l85_astro",
+    "name": "Meridian Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "hunter",
+    "variant": "scout_l85_astro",
+    "art": "scout",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "agility": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "hunter_gloves_scout_l85_astro",
+    "name": "Meridian Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "hunter",
+    "variant": "scout_l85_astro",
+    "art": "scout",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "agility": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l85_astro",
+    "name": "Meridian Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "class": "hunter",
+    "variant": "shortbow_l85_astro",
+    "art": "shortbow",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 77.9,
+    "defense": 19.4,
+    "bonusStats": {
+      "strength": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "pants_wayfarer_l85_astro",
+    "name": "Meridian Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "variant": "wayfarer_l85_astro",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "strength": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "necklace_moonstone_l85_astro",
+    "name": "Meridian Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "variant": "moonstone_l85_astro",
+    "art": "moonstone",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 38.9,
+    "defense": 9.8,
+    "bonusStats": {
+      "agility": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "accessory_amber_l85_astro",
+    "name": "Meridian Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "variant": "amber_l85_astro",
+    "art": "amber",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.27,
+      "brightness": 1.17
+    },
+    "starter": false,
+    "attack": 29.2,
+    "defense": 7.2,
+    "bonusStats": {
+      "strength": 93
+    },
+    "source": "sunken_astrolabe"
+  },
+  {
+    "id": "bloom_spore_relic",
+    "name": "Glasspetal Spore Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4000
+  },
+  {
+    "id": "bloom_moth_relic",
+    "name": "Prismwing Moth Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4000
+  },
+  {
+    "id": "bloom_guard_relic",
+    "name": "Vineglass Guardian Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4000
+  },
+  {
+    "id": "bloom_thornkeeper_relic",
+    "name": "Thornkeeper Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 9000
+  },
+  {
+    "id": "bloom_mirror_relic",
+    "name": "Petal Mirror Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 9000
+  },
+  {
+    "id": "bloom_heart_relic",
+    "name": "Heart of the Labyrinth Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 9000
+  },
+  {
+    "id": "warrior_armor_crimson_l95_thunder",
+    "name": "Stormbound Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_thunder",
+    "art": "crimson",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "warrior_headgear_crimson_l95_thunder",
+    "name": "Stormbound Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_thunder",
+    "art": "crimson",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l95_thunder",
+    "name": "Stormbound Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_thunder",
+    "art": "crimson",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "warrior_gloves_crimson_l95_thunder",
+    "name": "Stormbound Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_thunder",
+    "art": "crimson",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "warrior_weapon_sword_l95_thunder",
+    "name": "Stormbound Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "sword_l95_thunder",
+    "art": "sword",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "mage_armor_apprentice_l95_thunder",
+    "name": "Stormbound Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_thunder",
+    "art": "apprentice",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.2,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "mage_headgear_apprentice_l95_thunder",
+    "name": "Stormbound Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_thunder",
+    "art": "apprentice",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l95_thunder",
+    "name": "Stormbound Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_thunder",
+    "art": "apprentice",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "mage_gloves_apprentice_l95_thunder",
+    "name": "Stormbound Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_thunder",
+    "art": "apprentice",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "mage_weapon_ash_l95_thunder",
+    "name": "Stormbound Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "ash_l95_thunder",
+    "art": "ash",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "assassin_armor_shadow_l95_thunder",
+    "name": "Stormbound Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_thunder",
+    "art": "shadow",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.2,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "assassin_headgear_shadow_l95_thunder",
+    "name": "Stormbound Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_thunder",
+    "art": "shadow",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l95_thunder",
+    "name": "Stormbound Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_thunder",
+    "art": "shadow",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "assassin_gloves_shadow_l95_thunder",
+    "name": "Stormbound Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_thunder",
+    "art": "shadow",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "assassin_weapon_daggers_l95_thunder",
+    "name": "Stormbound Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "daggers_l95_thunder",
+    "art": "daggers",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "priest_armor_pilgrim_l95_thunder",
+    "name": "Stormbound Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_thunder",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l95_thunder",
+    "name": "Stormbound Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_thunder",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l95_thunder",
+    "name": "Stormbound Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_thunder",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l95_thunder",
+    "name": "Stormbound Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_thunder",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "priest_weapon_mace_l95_thunder",
+    "name": "Stormbound Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "mace_l95_thunder",
+    "art": "mace",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "hunter_armor_scout_l95_thunder",
+    "name": "Stormbound Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_thunder",
+    "art": "scout",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "hunter_headgear_scout_l95_thunder",
+    "name": "Stormbound Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_thunder",
+    "art": "scout",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "hunter_shoulders_scout_l95_thunder",
+    "name": "Stormbound Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_thunder",
+    "art": "scout",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "hunter_gloves_scout_l95_thunder",
+    "name": "Stormbound Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_thunder",
+    "art": "scout",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l95_thunder",
+    "name": "Stormbound Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "shortbow_l95_thunder",
+    "art": "shortbow",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "pants_wayfarer_l95_thunder",
+    "name": "Stormbound Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "wayfarer_l95_thunder",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "necklace_moonstone_l95_thunder",
+    "name": "Stormbound Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "moonstone_l95_thunder",
+    "art": "moonstone",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 43.2,
+    "defense": 10.8,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "accessory_amber_l95_thunder",
+    "name": "Stormbound Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "amber_l95_thunder",
+    "art": "amber",
+    "tint": {
+      "hue": 205,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "starter": false,
+    "attack": 32.4,
+    "defense": 8.2,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "thunderheart_gate"
+  },
+  {
+    "id": "warrior_armor_crimson_l95_bloom",
+    "name": "Glassbloom Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_bloom",
+    "art": "crimson",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "warrior_headgear_crimson_l95_bloom",
+    "name": "Glassbloom Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_bloom",
+    "art": "crimson",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l95_bloom",
+    "name": "Glassbloom Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_bloom",
+    "art": "crimson",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "warrior_gloves_crimson_l95_bloom",
+    "name": "Glassbloom Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_bloom",
+    "art": "crimson",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "warrior_weapon_sword_l95_bloom",
+    "name": "Glassbloom Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "sword_l95_bloom",
+    "art": "sword",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "mage_armor_apprentice_l95_bloom",
+    "name": "Glassbloom Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_bloom",
+    "art": "apprentice",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.2,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "mage_headgear_apprentice_l95_bloom",
+    "name": "Glassbloom Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_bloom",
+    "art": "apprentice",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l95_bloom",
+    "name": "Glassbloom Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_bloom",
+    "art": "apprentice",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "mage_gloves_apprentice_l95_bloom",
+    "name": "Glassbloom Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_bloom",
+    "art": "apprentice",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "mage_weapon_ash_l95_bloom",
+    "name": "Glassbloom Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "ash_l95_bloom",
+    "art": "ash",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "assassin_armor_shadow_l95_bloom",
+    "name": "Glassbloom Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_bloom",
+    "art": "shadow",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.2,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "assassin_headgear_shadow_l95_bloom",
+    "name": "Glassbloom Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_bloom",
+    "art": "shadow",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l95_bloom",
+    "name": "Glassbloom Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_bloom",
+    "art": "shadow",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "assassin_gloves_shadow_l95_bloom",
+    "name": "Glassbloom Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_bloom",
+    "art": "shadow",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "assassin_weapon_daggers_l95_bloom",
+    "name": "Glassbloom Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "daggers_l95_bloom",
+    "art": "daggers",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "priest_armor_pilgrim_l95_bloom",
+    "name": "Glassbloom Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_bloom",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l95_bloom",
+    "name": "Glassbloom Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_bloom",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l95_bloom",
+    "name": "Glassbloom Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_bloom",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l95_bloom",
+    "name": "Glassbloom Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_bloom",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "priest_weapon_mace_l95_bloom",
+    "name": "Glassbloom Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "mace_l95_bloom",
+    "art": "mace",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "hunter_armor_scout_l95_bloom",
+    "name": "Glassbloom Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_bloom",
+    "art": "scout",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "hunter_headgear_scout_l95_bloom",
+    "name": "Glassbloom Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_bloom",
+    "art": "scout",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "hunter_shoulders_scout_l95_bloom",
+    "name": "Glassbloom Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_bloom",
+    "art": "scout",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "hunter_gloves_scout_l95_bloom",
+    "name": "Glassbloom Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_bloom",
+    "art": "scout",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l95_bloom",
+    "name": "Glassbloom Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "shortbow_l95_bloom",
+    "art": "shortbow",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "pants_wayfarer_l95_bloom",
+    "name": "Glassbloom Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "wayfarer_l95_bloom",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "necklace_moonstone_l95_bloom",
+    "name": "Glassbloom Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "moonstone_l95_bloom",
+    "art": "moonstone",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 43.2,
+    "defense": 10.8,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "accessory_amber_l95_bloom",
+    "name": "Glassbloom Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "amber_l95_bloom",
+    "art": "amber",
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 32.4,
+    "defense": 8.2,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "blooming_labyrinth"
+  },
+  {
+    "id": "solar_emberling_relic",
+    "name": "Cinderling Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4400
+  },
+  {
+    "id": "solar_sunmoth_relic",
+    "name": "Sunmoth Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4400
+  },
+  {
+    "id": "solar_crucible_guard_relic",
+    "name": "Crucible Guard Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4400
+  },
+  {
+    "id": "solar_ashwarden_relic",
+    "name": "Ashwarden Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
+    "id": "solar_heliomancer_relic",
+    "name": "The Heliomancer Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
+    "id": "solar_heart_relic",
+    "name": "Heart of the Crucible Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
+    "id": "warrior_armor_crimson_l95_solar",
+    "name": "Sunforged Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_solar",
+    "art": "crimson",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "warrior_headgear_crimson_l95_solar",
+    "name": "Sunforged Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_solar",
+    "art": "crimson",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l95_solar",
+    "name": "Sunforged Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_solar",
+    "art": "crimson",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "warrior_gloves_crimson_l95_solar",
+    "name": "Sunforged Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_solar",
+    "art": "crimson",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "warrior_weapon_sword_l95_solar",
+    "name": "Sunforged Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "sword_l95_solar",
+    "art": "sword",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "mage_armor_apprentice_l95_solar",
+    "name": "Sunforged Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_solar",
+    "art": "apprentice",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.2,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "mage_headgear_apprentice_l95_solar",
+    "name": "Sunforged Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_solar",
+    "art": "apprentice",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l95_solar",
+    "name": "Sunforged Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_solar",
+    "art": "apprentice",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "mage_gloves_apprentice_l95_solar",
+    "name": "Sunforged Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_solar",
+    "art": "apprentice",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "mage_weapon_ash_l95_solar",
+    "name": "Sunforged Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "ash_l95_solar",
+    "art": "ash",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "assassin_armor_shadow_l95_solar",
+    "name": "Sunforged Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_solar",
+    "art": "shadow",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.2,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "assassin_headgear_shadow_l95_solar",
+    "name": "Sunforged Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_solar",
+    "art": "shadow",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l95_solar",
+    "name": "Sunforged Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_solar",
+    "art": "shadow",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "assassin_gloves_shadow_l95_solar",
+    "name": "Sunforged Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_solar",
+    "art": "shadow",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "assassin_weapon_daggers_l95_solar",
+    "name": "Sunforged Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "daggers_l95_solar",
+    "art": "daggers",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "priest_armor_pilgrim_l95_solar",
+    "name": "Sunforged Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_solar",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l95_solar",
+    "name": "Sunforged Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_solar",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l95_solar",
+    "name": "Sunforged Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_solar",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l95_solar",
+    "name": "Sunforged Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_solar",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "priest_weapon_mace_l95_solar",
+    "name": "Sunforged Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "mace_l95_solar",
+    "art": "mace",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "hunter_armor_scout_l95_solar",
+    "name": "Sunforged Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_solar",
+    "art": "scout",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "hunter_headgear_scout_l95_solar",
+    "name": "Sunforged Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_solar",
+    "art": "scout",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "hunter_shoulders_scout_l95_solar",
+    "name": "Sunforged Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_solar",
+    "art": "scout",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "hunter_gloves_scout_l95_solar",
+    "name": "Sunforged Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_solar",
+    "art": "scout",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l95_solar",
+    "name": "Sunforged Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "shortbow_l95_solar",
+    "art": "shortbow",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "pants_wayfarer_l95_solar",
+    "name": "Sunforged Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "wayfarer_l95_solar",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "necklace_moonstone_l95_solar",
+    "name": "Sunforged Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "moonstone_l95_solar",
+    "art": "moonstone",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 43.2,
+    "defense": 10.8,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "accessory_amber_l95_solar",
+    "name": "Sunforged Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "amber_l95_solar",
+    "art": "amber",
+    "tint": {
+      "hue": 34,
+      "saturate": 1.35,
+      "brightness": 1.22
+    },
+    "starter": false,
+    "attack": 32.4,
+    "defense": 8.2,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "solar_crucible"
+  },
+  {
+    "id": "amber_page_relic",
+    "name": "Living Page Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4700
+  },
+  {
+    "id": "amber_moth_relic",
+    "name": "Script Moth Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4700
+  },
+  {
+    "id": "amber_sentinel_relic",
+    "name": "Archive Sentinel Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4700
+  },
+  {
+    "id": "amber_curator_relic",
+    "name": "The Curator Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 11000
+  },
+  {
+    "id": "amber_chronicle_relic",
+    "name": "The Living Chronicle Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 11000
+  },
+  {
+    "id": "amber_memory_relic",
+    "name": "The Last Memory Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 11000
+  },
+  {
+    "id": "solstice_flurry_relic",
+    "name": "Whispering Flurry Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4700
+  },
+  {
+    "id": "solstice_owl_relic",
+    "name": "Night Owl Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4700
+  },
+  {
+    "id": "solstice_guard_relic",
+    "name": "Rime Guard Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4700
+  },
+  {
+    "id": "solstice_watcher_relic",
+    "name": "The Frost Watcher Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 11000
+  },
+  {
+    "id": "solstice_harbinger_relic",
+    "name": "Harbinger of Night Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 11000
+  },
+  {
+    "id": "solstice_heart_relic",
+    "name": "Heart of the Longest Night Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 11000
+  },
+  {
+    "id": "warrior_armor_crimson_l95_amber",
+    "name": "Archivist Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_amber",
+    "art": "crimson",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "warrior_headgear_crimson_l95_amber",
+    "name": "Archivist Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_amber",
+    "art": "crimson",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l95_amber",
+    "name": "Archivist Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_amber",
+    "art": "crimson",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "warrior_gloves_crimson_l95_amber",
+    "name": "Archivist Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_amber",
+    "art": "crimson",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "warrior_weapon_sword_l95_amber",
+    "name": "Archivist Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "sword_l95_amber",
+    "art": "sword",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "mage_armor_apprentice_l95_amber",
+    "name": "Archivist Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_amber",
+    "art": "apprentice",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.2,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "mage_headgear_apprentice_l95_amber",
+    "name": "Archivist Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_amber",
+    "art": "apprentice",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l95_amber",
+    "name": "Archivist Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_amber",
+    "art": "apprentice",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "mage_gloves_apprentice_l95_amber",
+    "name": "Archivist Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_amber",
+    "art": "apprentice",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "mage_weapon_ash_l95_amber",
+    "name": "Archivist Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "ash_l95_amber",
+    "art": "ash",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "assassin_armor_shadow_l95_amber",
+    "name": "Archivist Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_amber",
+    "art": "shadow",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.2,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "assassin_headgear_shadow_l95_amber",
+    "name": "Archivist Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_amber",
+    "art": "shadow",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l95_amber",
+    "name": "Archivist Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_amber",
+    "art": "shadow",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "assassin_gloves_shadow_l95_amber",
+    "name": "Archivist Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_amber",
+    "art": "shadow",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "assassin_weapon_daggers_l95_amber",
+    "name": "Archivist Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "daggers_l95_amber",
+    "art": "daggers",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "priest_armor_pilgrim_l95_amber",
+    "name": "Archivist Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_amber",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l95_amber",
+    "name": "Archivist Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_amber",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l95_amber",
+    "name": "Archivist Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_amber",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l95_amber",
+    "name": "Archivist Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_amber",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "priest_weapon_mace_l95_amber",
+    "name": "Archivist Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "mace_l95_amber",
+    "art": "mace",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "hunter_armor_scout_l95_amber",
+    "name": "Archivist Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_amber",
+    "art": "scout",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "hunter_headgear_scout_l95_amber",
+    "name": "Archivist Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_amber",
+    "art": "scout",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "hunter_shoulders_scout_l95_amber",
+    "name": "Archivist Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_amber",
+    "art": "scout",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "hunter_gloves_scout_l95_amber",
+    "name": "Archivist Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_amber",
+    "art": "scout",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l95_amber",
+    "name": "Archivist Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "shortbow_l95_amber",
+    "art": "shortbow",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "pants_wayfarer_l95_amber",
+    "name": "Archivist Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "wayfarer_l95_amber",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "necklace_moonstone_l95_amber",
+    "name": "Archivist Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "moonstone_l95_amber",
+    "art": "moonstone",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 43.2,
+    "defense": 10.8,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "accessory_amber_l95_amber",
+    "name": "Archivist Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "amber_l95_amber",
+    "art": "amber",
+    "tint": {
+      "hue": 42,
+      "saturate": 1.22,
+      "brightness": 1.18
+    },
+    "starter": false,
+    "attack": 32.4,
+    "defense": 8.2,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "amber_archive"
+  },
+  {
+    "id": "warrior_armor_crimson_l95_solstice",
+    "name": "Nightglass Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_solstice",
+    "art": "crimson",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "warrior_headgear_crimson_l95_solstice",
+    "name": "Nightglass Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_solstice",
+    "art": "crimson",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l95_solstice",
+    "name": "Nightglass Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_solstice",
+    "art": "crimson",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "warrior_gloves_crimson_l95_solstice",
+    "name": "Nightglass Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "crimson_l95_solstice",
+    "art": "crimson",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "warrior_weapon_sword_l95_solstice",
+    "name": "Nightglass Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "warrior",
+    "variant": "sword_l95_solstice",
+    "art": "sword",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "mage_armor_apprentice_l95_solstice",
+    "name": "Nightglass Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_solstice",
+    "art": "apprentice",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.2,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "mage_headgear_apprentice_l95_solstice",
+    "name": "Nightglass Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_solstice",
+    "art": "apprentice",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l95_solstice",
+    "name": "Nightglass Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_solstice",
+    "art": "apprentice",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "intellect": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "mage_gloves_apprentice_l95_solstice",
+    "name": "Nightglass Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "apprentice_l95_solstice",
+    "art": "apprentice",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "mage_weapon_ash_l95_solstice",
+    "name": "Nightglass Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "mage",
+    "variant": "ash_l95_solstice",
+    "art": "ash",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "assassin_armor_shadow_l95_solstice",
+    "name": "Nightglass Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_solstice",
+    "art": "shadow",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 10.8,
+    "defense": 43.2,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "assassin_headgear_shadow_l95_solstice",
+    "name": "Nightglass Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_solstice",
+    "art": "shadow",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l95_solstice",
+    "name": "Nightglass Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_solstice",
+    "art": "shadow",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "assassin_gloves_shadow_l95_solstice",
+    "name": "Nightglass Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "shadow_l95_solstice",
+    "art": "shadow",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "assassin_weapon_daggers_l95_solstice",
+    "name": "Nightglass Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "assassin",
+    "variant": "daggers_l95_solstice",
+    "art": "daggers",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "priest_armor_pilgrim_l95_solstice",
+    "name": "Nightglass Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_solstice",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l95_solstice",
+    "name": "Nightglass Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_solstice",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l95_solstice",
+    "name": "Nightglass Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_solstice",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l95_solstice",
+    "name": "Nightglass Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "pilgrim_l95_solstice",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "priest_weapon_mace_l95_solstice",
+    "name": "Nightglass Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "priest",
+    "variant": "mace_l95_solstice",
+    "art": "mace",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "hunter_armor_scout_l95_solstice",
+    "name": "Nightglass Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_solstice",
+    "art": "scout",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 16.2,
+    "defense": 64.9,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "hunter_headgear_scout_l95_solstice",
+    "name": "Nightglass Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_solstice",
+    "art": "scout",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "hunter_shoulders_scout_l95_solstice",
+    "name": "Nightglass Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_solstice",
+    "art": "scout",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "hunter_gloves_scout_l95_solstice",
+    "name": "Nightglass Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "scout_l95_solstice",
+    "art": "scout",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l95_solstice",
+    "name": "Nightglass Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "class": "hunter",
+    "variant": "shortbow_l95_solstice",
+    "art": "shortbow",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 86.5,
+    "defense": 21.6,
+    "bonusStats": {
+      "agility": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "pants_wayfarer_l95_solstice",
+    "name": "Nightglass Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "wayfarer_l95_solstice",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 5.4,
+    "defense": 21.6,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "necklace_moonstone_l95_solstice",
+    "name": "Nightglass Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "moonstone_l95_solstice",
+    "art": "moonstone",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 43.2,
+    "defense": 10.8,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "accessory_amber_l95_solstice",
+    "name": "Nightglass Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "variant": "amber_l95_solstice",
+    "art": "amber",
+    "tint": {
+      "hue": 207,
+      "saturate": 1.2,
+      "brightness": 1.23
+    },
+    "starter": false,
+    "attack": 32.4,
+    "defense": 8.2,
+    "bonusStats": {
+      "strength": 108
+    },
+    "source": "silent_solstice"
+  },
+  {
+    "id": "refinement_crystal_common",
+    "name": "Common Refinement Crystal",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 12
+  },
+  {
+    "id": "refinement_crystal_uncommon",
+    "name": "Uncommon Refinement Crystal",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 24
+  },
+  {
+    "id": "refinement_crystal_rare",
+    "name": "Rare Refinement Crystal",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 48
+  },
+  {
+    "id": "refinement_crystal_epic",
+    "name": "Epic Refinement Crystal",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 96
+  },
+  {
+    "id": "refinement_crystal_legendary",
+    "name": "Legendary Refinement Crystal",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 144
   }
 ]

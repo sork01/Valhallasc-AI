@@ -2,6 +2,8 @@
 
 Pick any task by its **ID** (for example, `I65-MAP` or `A70-MAGE`). Each checkbox is one deliverable, and its ID stays stable if the list is reordered. Use focused private checks for the chosen change. An instance entrance stays sealed until its `OPEN` task is complete.
 
+Rules for every TODO: use the `createmap` skill for all zone work; create all sprites through the PixelFlow API; create all music through the dybase2 MCP.
+
 Audit basis: `world/map.txt`, `world/items.txt`, `world/skills.txt`, gear generators and server loot rules on 2026-10-11. Already playable: Undervault (20), Drowned Cathedral wings (40/45/50), Moonwell (60).
 
 Core dependencies: each instance's `OPEN` task follows its four content tasks; randomized orange items and refinement use `G-INSTANCE-DATA`; orange pieces/drop rules use `O-RULES`; later skill ranks use `S-RANK-RULES`; world-map art/routes use `W-GRAPH`. Work on a selected task can start before a related feature is ready to release.
@@ -12,91 +14,91 @@ Each instance has a separate map, encounter, quest/reward, presentation and open
 
 ### The Eye Below — level 65, Stormglass Shore (zone 19)
 
-- [ ] `I65-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
-- [ ] `I65-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
-- [ ] `I65-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
-- [ ] `I65-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
-- [ ] `I65-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I65-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
+- [x] `I65-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
+- [x] `I65-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
+- [x] `I65-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
+- [x] `I65-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
 
 ### The Elder Hollow — level 70, Sunward Vale (zone 20)
 
-- [ ] `I70-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
-- [ ] `I70-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
-- [ ] `I70-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
-- [ ] `I70-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
-- [ ] `I70-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I70-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
+- [x] `I70-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
+- [x] `I70-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
+- [x] `I70-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
+- [x] `I70-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
 
 ### The Thousandfold Pavilion — level 75, Ribbonwild (zone 21)
 
-- [ ] `I75-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
-- [ ] `I75-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
-- [ ] `I75-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
-- [ ] `I75-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
-- [ ] `I75-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I75-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
+- [x] `I75-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
+- [x] `I75-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
+- [x] `I75-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
+- [x] `I75-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
 
 ### Temple of the Rain Crown — level 80, Tanglecrown (zone 22)
 
-- [ ] `I80T-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
-- [ ] `I80T-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
-- [ ] `I80T-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
-- [ ] `I80T-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
-- [ ] `I80T-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I80T-MAP` — Build its distinct private party map, collision, safe arrival and return route; the entrance opens under `I80T-OPEN`.
+- [x] `I80T-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
+- [x] `I80T-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
+- [x] `I80T-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
+- [x] `I80T-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
 
 ### The Seed Vault — level 80, Veyrroot Heartwood (zone 24)
 
-- [ ] `I80S-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
-- [ ] `I80S-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
-- [ ] `I80S-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
-- [ ] `I80S-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
-- [ ] `I80S-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I80S-MAP` — Build its distinct private party map, collision, safe arrival and return route; the entrance opens under `I80S-OPEN`.
+- [x] `I80S-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
+- [x] `I80S-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
+- [x] `I80S-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
+- [x] `I80S-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
 
 ### The Sunken Astrolabe — level 85, Lapis Erg (zone 25)
 
-- [ ] `I85-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
-- [ ] `I85-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
-- [ ] `I85-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
-- [ ] `I85-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
-- [ ] `I85-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I85-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
+- [x] `I85-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
+- [x] `I85-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
+- [x] `I85-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
+- [x] `I85-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
 
 ### The Thunderheart Gate — level 95, Cairnspine (zone 27)
 
-- [ ] `I95-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
-- [ ] `I95-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
-- [ ] `I95-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
-- [ ] `I95-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
-- [ ] `I95-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I95-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
+- [x] `I95-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
+- [x] `I95-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
+- [x] `I95-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
+- [x] `I95-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
 
 ### The Blooming Labyrinth — level 97, Yearwheel spring (zone 28)
 
-- [ ] `I97B-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
-- [ ] `I97B-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
-- [ ] `I97B-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
-- [ ] `I97B-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
-- [ ] `I97B-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I97B-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
+- [x] `I97B-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
+- [x] `I97B-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
+- [x] `I97B-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
+- [x] `I97B-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
 
 ### The Solar Crucible — level 98, Yearwheel summer (zone 28)
 
-- [ ] `I98S-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
-- [ ] `I98S-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
-- [ ] `I98S-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
-- [ ] `I98S-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
-- [ ] `I98S-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I98S-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
+- [x] `I98S-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
+- [x] `I98S-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
+- [x] `I98S-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
+- [x] `I98S-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
 
 ### The Amber Archive — level 99, Yearwheel autumn (zone 28)
 
-- [ ] `I99A-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
-- [ ] `I99A-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
-- [ ] `I99A-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
-- [ ] `I99A-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
-- [ ] `I99A-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I99A-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
+- [x] `I99A-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
+- [x] `I99A-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
+- [x] `I99A-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
+- [x] `I99A-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
 
 ### The Silent Solstice — level 99, Yearwheel winter (zone 28)
 
-- [ ] `I99W-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
-- [ ] `I99W-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
-- [ ] `I99W-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
-- [ ] `I99W-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
-- [ ] `I99W-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I99W-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
+- [x] `I99W-FOES` — Add its ordinary enemies and bosses, authoritative combat rules and editable monster sprites.
+- [x] `I99W-QUEST` — Add dungeon quests, boss objectives and level-appropriate loot; connect kill/clear credit to the party copy.
+- [x] `I99W-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
+- [x] `I99W-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
 
 The Seed Vault is a separate dungeon: Veyrroot Canopy and Heartwood remain enemy-free cities.
 
@@ -120,14 +122,14 @@ The Seed Vault is a separate dungeon: Veyrroot Canopy and Heartwood remain enemy
 
 ## Equipment systems
 
-- [ ] `G-INSTANCE-DATA` — Represent equipment copies with persistent per-item rolled stats and refinement, while preserving legacy stacked items and equipped saves. Needed for randomized orange drops and refinement.
+- [x] `G-INSTANCE-DATA` — Represent equipment copies with persistent per-item rolled stats and refinement, while preserving legacy stacked items and equipped saves. Needed for randomized orange drops and refinement.
 - [x] `G-MERGE-RULES` — Set the rarity steps, cap and handling of differing stat rolls when two identical pieces merge. Decide whether orange gear is mergeable.
-- [ ] `G-MERGE-SERVER` — Consume exactly two owned copies and create one higher-rarity copy atomically; validate item identity, life, inventory and bag space on the server.
-- [ ] `G-MERGE-NPC` — Place the merge NPC, add dialogue and a clear preview/confirmation UI.
-- [ ] `G-MERGE-CHECK` — Verify success, invalid pairs, insufficient copies, full bags and save/reload in a private world.
+- [x] `G-MERGE-SERVER` — Consume exactly two owned copies and create one higher-rarity copy atomically; validate item identity, life, inventory and bag space on the server.
+- [x] `G-MERGE-NPC` — Place the merge NPC, add dialogue and a clear preview/confirmation UI.
+- [x] `G-MERGE-CHECK` — Verify success, invalid pairs, insufficient copies, full bags and save/reload in a private world.
 - [x] `G-REFINE-RULES` — Define refinement levels, stat gains, material/gold costs, cap and interaction with merging/orange rolls.
-- [ ] `G-REFINE-SERVER` — Implement authoritative per-item refinement with atomic payment and persistent upgraded stats.
-- [ ] `G-REFINE-NPC` — Add the refinement service and UI that shows cost, current rank and resulting stats.
+- [x] `G-REFINE-SERVER` — Implement authoritative per-item refinement with atomic payment and persistent upgraded stats.
+- [x] `G-REFINE-NPC` — Add the refinement service and UI that shows cost, current rank and resulting stats.
 - [ ] `G-REFINE-CHECK` — Verify upgrades, invalid attempts, equipped items and save/reload in a private world.
 
 ### Fifty orange pieces
@@ -233,7 +235,7 @@ For each entry, replace tinted starter silhouettes with new worn layers and matc
 - [ ] `G-VAULT-EXPORT` — Export/wire the Undervault worn layers and matching icons without changing item IDs or existing loot.
 - [x] `G-MOON-CATALOG` — Define a Moonwell-exclusive level-60 blue set and boss slot pools; currently Moonwell bosses give ordinary blue gear.
 - [ ] `G-MOON-ART` — Create Moonwell set worn art and icons.
-- [ ] `G-MOON-LOOT` — Switch the four Moonwell bosses to their exclusive set and verify party drops.
+- [x] `G-MOON-LOOT` — Switch the four Moonwell bosses to their exclusive set and verify party drops.
 - [x] `G-YEAR-SPRING` — Define level-97 Blooming Labyrinth gear rewards.
 - [x] `G-YEAR-SUMMER` — Define level-98 Solar Crucible gear rewards.
 - [x] `G-YEAR-AUTUMN` — Define level-99 Amber Archive gear rewards.
@@ -329,18 +331,31 @@ The unlock and rank layout is recorded in [docs/skill-ranks.md](docs/skill-ranks
 - [x] `S99-HUNTER` — Add the hunter level-99 capstone rank and its visual/UI feedback.
 - [x] `S-MIGRATE-CHECK` — Verify existing high-level characters unlock the correct past ranks/passives and retain their skillbar layouts.
 
+## Combat HUD
+
+- [x] `UI-TARGET-BADGE` — Show the current target’s face and HP next to the player HP badge; update it when the target changes and clear it when there is no target.
+- [x] `UI-MONSTER-TARGETING` — Make monsters easier to target by clicking their visible bodies; clicks should not need to land below the sprite.
+
+## Player interaction and PvP
+
+- [x] `SOC-TRADE` — Let nearby players trade items and gold through a two-sided offer and confirmation flow; transfer both sides atomically on the server.
+- [x] `PVP-DUEL` — Let one player challenge another to a consensual duel, with clear accept, start and end states.
+- [x] `PVP-FLAG` — Add an opt-in PvP flag that lets flagged players fight other flagged players in the open world, with visible status and authoritative combat rules.
+- [x] `PVP-ARENA` — Add arena matches for 1v1, 2v2 and 3v3 teams, including team entry, match boundaries and a clear win condition.
+
 ## Travel and world map
 
 - [x] `W-GRAPH` — Lay out the authoritative zone/portal graph as connected geography, including city and dungeon branches.
 - [ ] `W-ART` — Replace the detached zone display with a readable illustrated world map built from that geography.
 - [x] `W-ROUTES` — Show actual portal connections, current position, reachable routes and distinct sealed dungeon entrances.
 - [x] `W-CHECK` — Check world/zone map navigation and consistency after portal moves.
-- [ ] `T-PORTALS-0-8` — Improve portal placement and reciprocal arrival routes in the starter through Rán’s Deep zones.
-- [ ] `T-PORTALS-9-18` — Improve portals around Nacrehold, Cathedral, Astralhollow through Moonwell.
-- [ ] `T-PORTALS-19-22` — Improve Stormglass, Sunward, Ribbonwild and Tanglecrown connections.
-- [ ] `T-PORTALS-23-25` — Improve the Veyrroot city/Heartwood and Lapis Erg connections.
-- [ ] `T-PORTALS-26-28` — Improve Frostwake, Cairnspine and all four Yearwheel approaches.
+- [x] `T-PORTALS-0-8` — Improve portal placement and reciprocal arrival routes in the starter through Rán’s Deep zones.
+- [x] `T-PORTALS-9-18` — Improve portals around Nacrehold, Cathedral, Astralhollow through Moonwell.
+- [x] `T-PORTALS-19-22` — Improve Stormglass, Sunward, Ribbonwild and Tanglecrown connections.
+- [x] `T-PORTALS-23-25` — Improve the Veyrroot city/Heartwood and Lapis Erg connections.
+- [x] `T-PORTALS-26-28` — Improve Frostwake, Cairnspine and all four Yearwheel approaches.
 Portal tasks must keep both directions paired, preserve IDs where possible, use natural routes near hubs/landmarks and safe reachable arrivals, and update generators and map art together.
+The route pass aligned the Stormrift, Hourglass Pass, Glassroot Causeway, Sunward Cut, Rootway, Hollow Arch, Sunroad and Year's Ascent landings with their marked approaches; all eight links keep their original portal IDs.
 
 - [x] `M-PRICE` — Set a substantial mount price and level-50 purchase offer so most new level-50 characters cannot immediately afford it.
 - [x] `M-SPEED` — Persist mount ownership and calculate **2× normal travel speed** authoritatively when mounted.

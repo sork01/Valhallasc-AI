@@ -113,12 +113,15 @@ async function talkTo(world, bot, npcId, offer) {
   if (!npc) throw Error(`Unknown NPC ${npcId}.`);
   if (dist(world.player(bot), npc) > 2.5) await walkTo(world, bot, { npc: npcId });
   // The server throttles service requests to one per half second.
-  await world.advance(550);
-  const earlier = new Set(world.events);
-  await world.action(bot, { type: 'interact', npc: npcId, ...(offer ? { offer } : {}) });
-  const reply = await world.waitFor(() => world.events.find(e => !earlier.has(e) && e.bot === bot && (e.type === 'dialogue' || e.type === 'error') && (e.type === 'error' || e.npc?.id === npcId)), 5000, `Talk to ${npcId}`);
-  if (reply.type === 'error') throw Error(reply.text);
-  return { bot, npc: npcId, offer: offer || null, notice: reply.notice, dialogue: reply.npc.dialogue, offers: reply.npc.offers.map(o => o.id), gold: reply.gold, quests: reply.quests, ...(reply.travel ? { travel: reply.travel, travelStops: reply.travelStops } : {}) };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await world.advance(attempt ? 900 : 550);
+    const earlier = new Set(world.events);
+    await world.action(bot, { type: 'interact', npc: npcId, ...(offer ? { offer } : {}) });
+    const reply = await world.waitFor(() => world.events.find(e => !earlier.has(e) && e.bot === bot && (e.type === 'dialogue' || e.type === 'error') && (e.type === 'error' || e.npc?.id === npcId)), 5000, `Talk to ${npcId}`);
+    if (reply.type === 'error') throw Error(reply.text);
+    if (offer && reply.notice?.includes('Please wait a moment') && attempt < 2) continue;
+    return { bot, npc: npcId, offer: offer || null, notice: reply.notice, dialogue: reply.npc.dialogue, offers: reply.npc.offers.map(o => o.id), gold: reply.gold, quests: reply.quests, ...(reply.travel ? { travel: reply.travel, travelStops: reply.travelStops } : {}) };
+  }
 }
 
 function aimAt(from, to) {
