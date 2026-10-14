@@ -207,7 +207,7 @@
   }));
   const orangeImages = new Map();
   const orangeImage = (variant, repaint) => {
-    if (!/^orange_0[1-9]$|^orange_10$/.test(variant)) return null;
+    if (!/^orange_(0[1-9]|[12][0-9]|3[0-5])$/.test(variant)) return null;
     let entry = orangeImages.get(variant);
     if (!entry) {
       const img = new Image(); entry = { img, ready: false }; orangeImages.set(variant, entry);
@@ -251,7 +251,10 @@
     frame(clip = 'idle', dir = 0, i = 0) {
       const C = this.meta.clips[clip]; i = Math.max(0, Math.min(C.n - 1, i)); dir = ((dir % 8) + 8) % 8;
       const key = `${clip}/${dir}/${i}`;
-      if (this.cache.has(key)) return this.cache.get(key);
+      // A frame composed before an optional orange image finishes loading must not stay cached.
+      const ready = SLOT_ORDER.map(slot => orangeImage(this.worn[slot], () => this.cache.clear()) ? '1' : '0').join('');
+      const cacheKey = `${key}/${ready}`;
+      if (this.cache.has(cacheKey)) return this.cache.get(cacheKey);
       const [fw, fh] = this.meta.frame, canvas = document.createElement('canvas'); canvas.width = fw; canvas.height = fh;
       const g = canvas.getContext('2d'), out = g.createImageData(fw, fh), nearest = new Uint16Array(fw * fh); nearest.fill(65535);
       const chosen = ['body'];
@@ -286,7 +289,7 @@
         }
       }
       if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value);
-      this.cache.set(key, canvas); return canvas;
+      this.cache.set(cacheKey, canvas); return canvas;
     }
     draw(g, h, t, scale = 1.3) {
       scale *= this.meta.displayScale || 1;

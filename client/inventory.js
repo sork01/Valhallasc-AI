@@ -52,7 +52,7 @@
   const rarityName = i => RARITY_NAMES[i?.rarity] || 'Common';
   function icon(i, emptyKind) {
     const kind = i?.kind || emptyKind;
-    if (i && /^orange_0[1-9]$|^orange_10$/.test(i.id)) return `<span class="orange-item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-image:url(assets/${i.id}.png)"></span>`;
+    if (i && /^orange_(0[1-9]|[12][0-9]|3[0-5])$/.test(i.id)) return `<span class="orange-item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-image:url(assets/${i.id}.png)"></span>`;
     // A recoloured piece (art + tint in the catalog) shows its base piece's icon through the same colour filter the worn art gets.
     const base = i?.art ? WORLD_ITEMS.find(o => o.kind === i.kind && o.class === i.class && o.variant === i.art) : null;
     const cell = i && window.ITEM_ICONS?.at[i.id] || (base && window.ITEM_ICONS?.at[base.id]);   // equipment has its own pixel icon (assets/items.png); everything else keeps the glyph

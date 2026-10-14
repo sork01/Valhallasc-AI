@@ -71,19 +71,49 @@ async function call(name,args={}){const result=await client.callTool({name,argum
     const px=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
     for(let i=0;i<px.length;i+=4)if(px[i]===242&&px[i+1]===163&&px[i+2]===71)return true;
     return false;
-  },null,{timeout:15000});
+  },null,{timeout:15000}).catch(async error=>{
+    const state=await page.evaluate(()=>({cache:Field.warriorSprites?.cache.size,
+      worn:Field.warriorSprites?.worn?.armor}));
+    throw Error(`orange_01 frame: ${error.message}; ${JSON.stringify(state)}`);
+  });
   await page.locator('[data-slot="chest"] .gear-icon').click();
   assert.match(await page.locator('#bag-details').textContent(),/Equipped/);
+  const families=[[11,[131,201,224]],[16,[101,181,182]],[21,[124,136,199]],
+                  [26,[246,197,95]],[31,[230,120,66]]];
+  for(const [number,color] of families){
+    const id=`orange_${number}`;
+    await debug({op:'give_item',item:id,quantity:1});
+    await page.waitForFunction(id=>Inventory.quantity(id)===1,id,{timeout:15000});
+    await page.waitForFunction(id=>[...document.querySelector('#field-warriorArmor').options].some(o=>o.value===id),id,{timeout:15000});
+    await page.locator('#field-warriorArmor').selectOption(id);
+    await page.waitForFunction(({id,color})=>{
+      if(Field.hero.look.warriorArmor!==id||Field.warriorSprites?.worn?.armor!==id)return false;
+      const c=Field.warriorSprites.frame('idle',0,0),px=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+      for(let i=0;i<px.length;i+=4)if(px[i]===color[0]&&px[i+1]===color[1]&&px[i+2]===color[2])return true;
+      return false;
+    },{id,color},{timeout:15000}).catch(async error=>{
+      const state=await page.evaluate(async()=>{
+        const path=`assets/${Field.hero.look.warriorArmor}.png`,response=await fetch(path);
+        const image=new Image();image.src=path;await image.decode().catch(()=>{});
+        const sprite=Field.warriorSprites,frame=sprite?.frame('idle',0,0);
+        return {look:Field.hero.look.warriorArmor,worn:sprite?.worn?.armor,
+          option:document.querySelector('#field-warriorArmor')?.value,status:response.status,
+          imageWidth:image.naturalWidth,cache:sprite?.cache.size,frameWidth:frame?.width};
+      });
+      throw Error(`${id} worn art: ${error.message}; ${JSON.stringify(state)}`);
+    });
+    assert.equal(await page.locator('[data-slot="chest"] .orange-item-art').getAttribute('data-icon'),id);
+  }
   const exported=await page.evaluate(async()=>{
     const hashes=[];
-    for(let n=1;n<=10;n++){
+    for(let n=1;n<=35;n++){
       const id=`orange_${String(n).padStart(2,'0')}`,img=new Image();img.src=`assets/${id}.png`;await img.decode();
       const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);
       hashes.push(c.toDataURL());
     }
     return hashes;
   });
-  assert.equal(new Set(exported).size,10,'Ten distinct PixelFlow exports load in browser');
+  assert.equal(new Set(exported).size,35,'Thirty-five distinct PixelFlow exports load in browser');
   assert.deepEqual(errors,[]);
   console.log('Gearwright merge and refinement browser checks passed');
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{

@@ -141,11 +141,11 @@ All 50 must work for every class at every level, be exceptionally strong, have d
 - [x] `O-UI` — Display orange rarity and each copy’s rolled stats consistently in bags, equipment and loot.
 - [x] `O-01-05` — Create and wire orange pieces 01–05: catalog, distinct worn art, icon and randomized stat definition.
 - [x] `O-06-10` — Create and wire orange pieces 06–10: catalog, distinct worn art, icon and randomized stat definition.
-- [ ] `O-11-15` — Create and wire orange pieces 11–15: catalog, distinct worn art, icon and randomized stat definition.
-- [ ] `O-16-20` — Create and wire orange pieces 16–20: catalog, distinct worn art, icon and randomized stat definition.
-- [ ] `O-21-25` — Create and wire orange pieces 21–25: catalog, distinct worn art, icon and randomized stat definition.
-- [ ] `O-26-30` — Create and wire orange pieces 26–30: catalog, distinct worn art, icon and randomized stat definition.
-- [ ] `O-31-35` — Create and wire orange pieces 31–35: catalog, distinct worn art, icon and randomized stat definition.
+- [x] `O-11-15` — Create and wire orange pieces 11–15: catalog, distinct worn art, icon and randomized stat definition.
+- [x] `O-16-20` — Create and wire orange pieces 16–20: catalog, distinct worn art, icon and randomized stat definition.
+- [x] `O-21-25` — Create and wire orange pieces 21–25: catalog, distinct worn art, icon and randomized stat definition.
+- [x] `O-26-30` — Create and wire orange pieces 26–30: catalog, distinct worn art, icon and randomized stat definition.
+- [x] `O-31-35` — Create and wire orange pieces 31–35: catalog, distinct worn art, icon and randomized stat definition.
 - [ ] `O-36-40` — Create and wire orange pieces 36–40: catalog, distinct worn art, icon and randomized stat definition.
 - [ ] `O-41-45` — Create and wire orange pieces 41–45: catalog, distinct worn art, icon and randomized stat definition.
 - [ ] `O-46-50` — Create and wire orange pieces 46–50: catalog, distinct worn art, icon and randomized stat definition.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create/export the first ten orange gear drawings through PixelFlow.
+"""Create/export orange gear drawings through PixelFlow.
 
 `preview` renders local drafts. `build` creates editable PixelFlow sprites once;
 `export` reads PixelFlow's saved cels, preserving later editor changes.
@@ -13,16 +13,22 @@ from make_crag_sprites import api
 ROOT = Path(__file__).resolve().parents[1]
 META = ROOT / 'client/assets/orange.txt'
 ASSETS = ROOT / 'client/assets'
-RULES = json.loads((ROOT / 'world/orange_rules.txt').read_text())['pieces'][:10]
+RULES = json.loads((ROOT / 'world/orange_rules.txt').read_text())['pieces']
 SIZE = 64
 PALETTES = [('#33191b', '#89512f', '#f2a347', '#ffe39a', '#e7652d'),
-            ('#183424', '#426d38', '#84b95b', '#dbf4a2', '#3fa87d')]
+            ('#183424', '#426d38', '#84b95b', '#dbf4a2', '#3fa87d'),
+            ('#182842', '#396f9a', '#83c9e0', '#ecfaff', '#f8d958'),
+            ('#162536', '#2d6380', '#65b5b6', '#d2fbef', '#b990e9'),
+            ('#14172d', '#363b70', '#7c88c7', '#e6eaff', '#e6b5ff'),
+            ('#44301c', '#bc7931', '#f6c55f', '#fff2b2', '#f6e7c1'),
+            ('#391b25', '#8e3537', '#e67842', '#ffe2a2', '#f4b16a')]
 
 
 def render(n):
     piece = RULES[n]
     slot = piece['slot']
-    dark, base, light, glint, gem = PALETTES[n // 5]
+    family = n // 5
+    dark, base, light, glint, gem = PALETTES[family]
     im = Image.new('RGBA', (SIZE, SIZE))
     d = ImageDraw.Draw(im)
     kw = dict(outline=dark, width=2)
@@ -56,10 +62,37 @@ def render(n):
             d.polygon([(x+4,22),(x+13,22),(x+14,33),(x+6,37),(x+3,32)], fill=light, **kw)
             d.polygon([(x+6,27),(x+10,24),(x+14,27),(x+10,33)], fill=gem)
             d.line([(x+4,20),(x+13,20)], fill=glint, width=2)
-    if n >= 5:
+    if family == 1:
         # Verdant Crown grows leaves and thorn tips; the outline differs from the brass family.
         for x,y in [(10,14),(49,11),(7,43),(52,47)]:
             d.polygon([(x,y),(x+5,y-4),(x+4,y+4)], fill=gem, **kw)
+    elif family == 2:  # Storm Oracle: lightning forks and charged points.
+        d.line([(29,7),(34,13),(31,18),(38,22),(34,30)], fill=gem, width=2)
+        d.line([(10,35),(15,29),(13,24),(19,19)], fill=glint, width=2)
+        d.line([(51,45),(47,40),(49,35),(44,31)], fill=gem, width=2)
+    elif family == 3:  # Abyss Singer: pearl bubbles and wave crests.
+        d.arc((6,7,56,59), 195, 345, fill=gem, width=2)
+        d.arc((12,11,52,53), 205, 345, fill=glint, width=2)
+        for x,y in [(12,16),(48,15),(8,48),(55,43)]:
+            d.ellipse((x-2,y-2,x+2,y+2), fill=glint, outline=dark)
+    elif family == 4:  # Starforged: small constellations connected in dark metal.
+        stars = [(9,13),(16,10),(48,11),(55,20),(7,45),(51,52)]
+        d.line(stars[:4], fill=gem, width=1)
+        d.line(stars[4:], fill=gem, width=1)
+        for x,y in stars:
+            d.line([(x-2,y),(x+2,y)], fill=glint, width=1)
+            d.line([(x,y-2),(x,y+2)], fill=glint, width=1)
+    elif family == 5:  # Solar Regent: sun discs and radiating rays.
+        d.ellipse((27,3,37,13), fill=gem, outline=dark, width=2)
+        for x0,y0,x1,y1 in [(32,0,32,3),(19,8,24,11),(40,11,45,8),
+                              (5,36,11,36),(53,36,59,36),(25,56,21,61),(39,56,43,61)]:
+            d.line([(x0,y0),(x1,y1)], fill=glint, width=2)
+    elif family == 6:  # Ash Phoenix: hooked feathers and small embers.
+        for x,y,sign in [(7,19,1),(49,18,-1),(5,43,1),(52,45,-1)]:
+            d.polygon([(x,y+9),(x+sign*3,y),(x+sign*8,y+6),(x+sign*5,y+4)],
+                      fill=gem, outline=dark)
+        for x,y in [(20,7),(43,10),(31,56)]:
+            d.ellipse((x,y,x+2,y+2), fill=glint)
     return im
 
 
@@ -84,13 +117,17 @@ def image_from_pixel_flow(sprite):
 
 def main():
     mode = sys.argv[1] if len(sys.argv)>1 else 'preview'
+    first = int(sys.argv[2]) if len(sys.argv)>2 else 1
+    last = int(sys.argv[3]) if len(sys.argv)>3 else len(PALETTES) * 5
+    assert 1 <= first <= last <= min(len(RULES), len(PALETTES) * 5)
+    selected = range(first-1, last)
     meta = json.loads(META.read_text()) if META.exists() else {'version':1,'sprites':{}}
     if mode == 'preview':
         dest = ROOT/'test-results/orange-preview'; dest.mkdir(parents=True,exist_ok=True)
-        for n in range(10): render(n).resize((256,256),Image.Resampling.NEAREST).save(dest/f'orange_{n+1:02}.png')
+        for n in selected: render(n).resize((256,256),Image.Resampling.NEAREST).save(dest/f'orange_{n+1:02}.png')
         print(dest)
     elif mode == 'build':
-        for n in range(10):
+        for n in selected:
             name = RULES[n]['id']
             if name in meta['sprites']: continue
             colors = ['#00000000', *PALETTES[n//5]]
@@ -106,7 +143,7 @@ def main():
             META.write_text(json.dumps(meta,indent=2)+'\n')
             print(name,sprite_id,flush=True)
     elif mode == 'export':
-        for n in range(10):
+        for n in selected:
             name = RULES[n]['id']
             sprite = api('get?sprite_id='+meta['sprites'][name])
             image_from_pixel_flow(sprite.get('sprite',sprite)).save(ASSETS/f'{name}.png')
