@@ -188,37 +188,37 @@ For each entry, replace tinted starter silhouettes with new worn layers and matc
 
 - [x] `A75-WARRIOR` — Create and wire the five level-75 warrior pieces and icons.
 - [x] `A75-MAGE` — Create and wire the five level-75 mage pieces and icons.
-- [ ] `A75-ASSASSIN` — Create and wire the five level-75 assassin pieces and icons.
-- [ ] `A75-PRIEST` — Create and wire the five level-75 priest pieces and icons.
-- [ ] `A75-HUNTER` — Create and wire the five level-75 hunter pieces and icons.
-- [ ] `A75-SHARED` — Create and wire the three shared level-75 pieces and icons.
+- [x] `A75-ASSASSIN` — Create and wire the five level-75 assassin pieces and icons.
+- [x] `A75-PRIEST` — Create and wire the five level-75 priest pieces and icons.
+- [x] `A75-HUNTER` — Create and wire the five level-75 hunter pieces and icons.
+- [x] `A75-SHARED` — Create and wire the three shared level-75 pieces and icons.
 
 #### Level 80
 
-- [ ] `A80-WARRIOR` — Create and wire the five level-80 warrior pieces and icons.
-- [ ] `A80-MAGE` — Create and wire the five level-80 mage pieces and icons.
-- [ ] `A80-ASSASSIN` — Create and wire the five level-80 assassin pieces and icons.
-- [ ] `A80-PRIEST` — Create and wire the five level-80 priest pieces and icons.
-- [ ] `A80-HUNTER` — Create and wire the five level-80 hunter pieces and icons.
-- [ ] `A80-SHARED` — Create and wire the three shared level-80 pieces and icons.
+- [x] `A80-WARRIOR` — Create and wire the five level-80 warrior pieces and icons.
+- [x] `A80-MAGE` — Create and wire the five level-80 mage pieces and icons.
+- [x] `A80-ASSASSIN` — Create and wire the five level-80 assassin pieces and icons.
+- [x] `A80-PRIEST` — Create and wire the five level-80 priest pieces and icons.
+- [x] `A80-HUNTER` — Create and wire the five level-80 hunter pieces and icons.
+- [x] `A80-SHARED` — Create and wire the three shared level-80 pieces and icons.
 
 #### Level 85
 
-- [ ] `A85-WARRIOR` — Create and wire the five level-85 warrior pieces and icons.
-- [ ] `A85-MAGE` — Create and wire the five level-85 mage pieces and icons.
-- [ ] `A85-ASSASSIN` — Create and wire the five level-85 assassin pieces and icons.
-- [ ] `A85-PRIEST` — Create and wire the five level-85 priest pieces and icons.
-- [ ] `A85-HUNTER` — Create and wire the five level-85 hunter pieces and icons.
-- [ ] `A85-SHARED` — Create and wire the three shared level-85 pieces and icons.
+- [x] `A85-WARRIOR` — Create and wire the five level-85 warrior pieces and icons.
+- [x] `A85-MAGE` — Create and wire the five level-85 mage pieces and icons.
+- [x] `A85-ASSASSIN` — Create and wire the five level-85 assassin pieces and icons.
+- [x] `A85-PRIEST` — Create and wire the five level-85 priest pieces and icons.
+- [x] `A85-HUNTER` — Create and wire the five level-85 hunter pieces and icons.
+- [x] `A85-SHARED` — Create and wire the three shared level-85 pieces and icons.
 
 #### Level 90
 
-- [ ] `A90-WARRIOR` — Create and wire the five level-90 warrior pieces and icons.
-- [ ] `A90-MAGE` — Create and wire the five level-90 mage pieces and icons.
-- [ ] `A90-ASSASSIN` — Create and wire the five level-90 assassin pieces and icons.
-- [ ] `A90-PRIEST` — Create and wire the five level-90 priest pieces and icons.
-- [ ] `A90-HUNTER` — Create and wire the five level-90 hunter pieces and icons.
-- [ ] `A90-SHARED` — Create and wire the three shared level-90 pieces and icons.
+- [x] `A90-WARRIOR` — Create and wire the five level-90 warrior pieces and icons.
+- [x] `A90-MAGE` — Create and wire the five level-90 mage pieces and icons.
+- [x] `A90-ASSASSIN` — Create and wire the five level-90 assassin pieces and icons.
+- [x] `A90-PRIEST` — Create and wire the five level-90 priest pieces and icons.
+- [x] `A90-HUNTER` — Create and wire the five level-90 hunter pieces and icons.
+- [x] `A90-SHARED` — Create and wire the three shared level-90 pieces and icons.
 
 #### Level 95
 

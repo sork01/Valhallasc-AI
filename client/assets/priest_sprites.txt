@@ -496,6 +496,134 @@
     "accessory_regearl70": {
       "png": "priest_progression_accessory_regearl70.png",
       "depth": "priest_progression_accessory_regearl70_depth.png"
+    },
+    "armor_regearl75": {
+      "png": "priest_progression_armor_regearl75.png",
+      "depth": "priest_progression_armor_regearl75_depth.png"
+    },
+    "head_regearl75": {
+      "png": "priest_progression_head_regearl75.png",
+      "depth": "priest_progression_head_regearl75_depth.png"
+    },
+    "shoulders_regearl75": {
+      "png": "priest_progression_shoulders_regearl75.png",
+      "depth": "priest_progression_shoulders_regearl75_depth.png"
+    },
+    "gloves_regearl75": {
+      "png": "priest_progression_gloves_regearl75.png",
+      "depth": "priest_progression_gloves_regearl75_depth.png"
+    },
+    "weapon_regearl75": {
+      "png": "priest_progression_weapon_regearl75.png",
+      "depth": "priest_progression_weapon_regearl75_depth.png"
+    },
+    "pants_regearl75": {
+      "png": "priest_progression_pants_regearl75.png",
+      "depth": "priest_progression_pants_regearl75_depth.png"
+    },
+    "necklace_regearl75": {
+      "png": "priest_progression_necklace_regearl75.png",
+      "depth": "priest_progression_necklace_regearl75_depth.png"
+    },
+    "accessory_regearl75": {
+      "png": "priest_progression_accessory_regearl75.png",
+      "depth": "priest_progression_accessory_regearl75_depth.png"
+    },
+    "armor_regearl80": {
+      "png": "priest_progression_armor_regearl80.png",
+      "depth": "priest_progression_armor_regearl80_depth.png"
+    },
+    "head_regearl80": {
+      "png": "priest_progression_head_regearl80.png",
+      "depth": "priest_progression_head_regearl80_depth.png"
+    },
+    "shoulders_regearl80": {
+      "png": "priest_progression_shoulders_regearl80.png",
+      "depth": "priest_progression_shoulders_regearl80_depth.png"
+    },
+    "gloves_regearl80": {
+      "png": "priest_progression_gloves_regearl80.png",
+      "depth": "priest_progression_gloves_regearl80_depth.png"
+    },
+    "weapon_regearl80": {
+      "png": "priest_progression_weapon_regearl80.png",
+      "depth": "priest_progression_weapon_regearl80_depth.png"
+    },
+    "pants_regearl80": {
+      "png": "priest_progression_pants_regearl80.png",
+      "depth": "priest_progression_pants_regearl80_depth.png"
+    },
+    "necklace_regearl80": {
+      "png": "priest_progression_necklace_regearl80.png",
+      "depth": "priest_progression_necklace_regearl80_depth.png"
+    },
+    "accessory_regearl80": {
+      "png": "priest_progression_accessory_regearl80.png",
+      "depth": "priest_progression_accessory_regearl80_depth.png"
+    },
+    "armor_regearl85": {
+      "png": "priest_progression_armor_regearl85.png",
+      "depth": "priest_progression_armor_regearl85_depth.png"
+    },
+    "head_regearl85": {
+      "png": "priest_progression_head_regearl85.png",
+      "depth": "priest_progression_head_regearl85_depth.png"
+    },
+    "shoulders_regearl85": {
+      "png": "priest_progression_shoulders_regearl85.png",
+      "depth": "priest_progression_shoulders_regearl85_depth.png"
+    },
+    "gloves_regearl85": {
+      "png": "priest_progression_gloves_regearl85.png",
+      "depth": "priest_progression_gloves_regearl85_depth.png"
+    },
+    "weapon_regearl85": {
+      "png": "priest_progression_weapon_regearl85.png",
+      "depth": "priest_progression_weapon_regearl85_depth.png"
+    },
+    "pants_regearl85": {
+      "png": "priest_progression_pants_regearl85.png",
+      "depth": "priest_progression_pants_regearl85_depth.png"
+    },
+    "necklace_regearl85": {
+      "png": "priest_progression_necklace_regearl85.png",
+      "depth": "priest_progression_necklace_regearl85_depth.png"
+    },
+    "accessory_regearl85": {
+      "png": "priest_progression_accessory_regearl85.png",
+      "depth": "priest_progression_accessory_regearl85_depth.png"
+    },
+    "armor_regearl90": {
+      "png": "priest_progression_armor_regearl90.png",
+      "depth": "priest_progression_armor_regearl90_depth.png"
+    },
+    "head_regearl90": {
+      "png": "priest_progression_head_regearl90.png",
+      "depth": "priest_progression_head_regearl90_depth.png"
+    },
+    "shoulders_regearl90": {
+      "png": "priest_progression_shoulders_regearl90.png",
+      "depth": "priest_progression_shoulders_regearl90_depth.png"
+    },
+    "gloves_regearl90": {
+      "png": "priest_progression_gloves_regearl90.png",
+      "depth": "priest_progression_gloves_regearl90_depth.png"
+    },
+    "weapon_regearl90": {
+      "png": "priest_progression_weapon_regearl90.png",
+      "depth": "priest_progression_weapon_regearl90_depth.png"
+    },
+    "pants_regearl90": {
+      "png": "priest_progression_pants_regearl90.png",
+      "depth": "priest_progression_pants_regearl90_depth.png"
+    },
+    "necklace_regearl90": {
+      "png": "priest_progression_necklace_regearl90.png",
+      "depth": "priest_progression_necklace_regearl90_depth.png"
+    },
+    "accessory_regearl90": {
+      "png": "priest_progression_accessory_regearl90.png",
+      "depth": "priest_progression_accessory_regearl90_depth.png"
     }
   },
   "gender": "male",
@@ -998,6 +1126,10 @@
     "accessory_regearl60",
     "accessory_regearl65",
     "accessory_regearl70",
+    "accessory_regearl75",
+    "accessory_regearl80",
+    "accessory_regearl85",
+    "accessory_regearl90",
     "accessory_regearnave",
     "accessory_regearreliquary",
     "armor_regearcloister",
@@ -1010,6 +1142,10 @@
     "armor_regearl60",
     "armor_regearl65",
     "armor_regearl70",
+    "armor_regearl75",
+    "armor_regearl80",
+    "armor_regearl85",
+    "armor_regearl90",
     "armor_regearnave",
     "armor_regearreliquary",
     "gloves_regearcloister",
@@ -1022,6 +1158,10 @@
     "gloves_regearl60",
     "gloves_regearl65",
     "gloves_regearl70",
+    "gloves_regearl75",
+    "gloves_regearl80",
+    "gloves_regearl85",
+    "gloves_regearl90",
     "gloves_regearnave",
     "gloves_regearreliquary",
     "head_regearcloister",
@@ -1034,6 +1174,10 @@
     "head_regearl60",
     "head_regearl65",
     "head_regearl70",
+    "head_regearl75",
+    "head_regearl80",
+    "head_regearl85",
+    "head_regearl90",
     "head_regearnave",
     "head_regearreliquary",
     "necklace_regearcloister",
@@ -1046,6 +1190,10 @@
     "necklace_regearl60",
     "necklace_regearl65",
     "necklace_regearl70",
+    "necklace_regearl75",
+    "necklace_regearl80",
+    "necklace_regearl85",
+    "necklace_regearl90",
     "necklace_regearnave",
     "necklace_regearreliquary",
     "pants_regearcloister",
@@ -1058,6 +1206,10 @@
     "pants_regearl60",
     "pants_regearl65",
     "pants_regearl70",
+    "pants_regearl75",
+    "pants_regearl80",
+    "pants_regearl85",
+    "pants_regearl90",
     "pants_regearnave",
     "pants_regearreliquary",
     "shoulders_regearcloister",
@@ -1070,6 +1222,10 @@
     "shoulders_regearl60",
     "shoulders_regearl65",
     "shoulders_regearl70",
+    "shoulders_regearl75",
+    "shoulders_regearl80",
+    "shoulders_regearl85",
+    "shoulders_regearl90",
     "shoulders_regearnave",
     "shoulders_regearreliquary",
     "weapon_regearcloister",
@@ -1082,6 +1238,10 @@
     "weapon_regearl60",
     "weapon_regearl65",
     "weapon_regearl70",
+    "weapon_regearl75",
+    "weapon_regearl80",
+    "weapon_regearl85",
+    "weapon_regearl90",
     "weapon_regearnave",
     "weapon_regearreliquary"
   ],
@@ -6660,6 +6820,1893 @@
           "offset": [
             56,
             58
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "armor_regearl75": {
+      "idle": [
+        {
+          "id": "9b6db02a052629b7",
+          "offset": [
+            58,
+            39
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "9e135e9a7cf14bc5",
+          "offset": [
+            56,
+            37
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "44a8be7ac6b57a0f",
+          "offset": [
+            49,
+            36
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "803989c2681b3a68",
+          "offset": [
+            51,
+            38
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "4b90c6d3a5c4a868",
+          "offset": [
+            39,
+            37
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "head_regearl75": {
+      "idle": [
+        {
+          "id": "8748777765dbf58c",
+          "offset": [
+            62,
+            7
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "eea5da9a69b8a2b2",
+          "offset": [
+            58,
+            5
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "3e340bb33241279c",
+          "offset": [
+            45,
+            1
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "a1adee5b7e6c5556",
+          "offset": [
+            50,
+            2
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "0ca0acf547e1643f",
+          "offset": [
+            63,
+            1
+          ],
+          "frameCount": 32,
+          "start": 0
+        },
+        {
+          "id": "82ea69f2c1443b9a",
+          "offset": [
+            3,
+            3
+          ],
+          "frameCount": 32,
+          "start": 32
+        }
+      ]
+    },
+    "shoulders_regearl75": {
+      "idle": [
+        {
+          "id": "36984d2873bb2836",
+          "offset": [
+            54,
+            38
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "a2b6c8795d7f5ecf",
+          "offset": [
+            53,
+            38
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "b143101ff611e62a",
+          "offset": [
+            51,
+            38
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "a9c6db06ed5f2317",
+          "offset": [
+            53,
+            38
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "d6ee5995c6a87a65",
+          "offset": [
+            39,
+            38
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "gloves_regearl75": {
+      "idle": [
+        {
+          "id": "a1720c3470948ca0",
+          "offset": [
+            59,
+            54
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "042a2724d8a80a55",
+          "offset": [
+            57,
+            57
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "bfaea9cdba3ce013",
+          "offset": [
+            41,
+            38
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "544b7655428b7608",
+          "offset": [
+            58,
+            57
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "74129a281fd8df4d",
+          "offset": [
+            54,
+            58
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "weapon_regearl75": {
+      "idle": [
+        {
+          "id": "7e7a796b08fdc809",
+          "offset": [
+            55,
+            37
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "1678d0ce59d4e36f",
+          "offset": [
+            50,
+            35
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "9f2afe70ae92696f",
+          "offset": [
+            16,
+            11
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "168a05237536185c",
+          "offset": [
+            52,
+            31
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "a8903b442ee1d74a",
+          "offset": [
+            48,
+            33
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "pants_regearl75": {
+      "idle": [
+        {
+          "id": "e5c47e7f35e8a60d",
+          "offset": [
+            68,
+            79
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "97c8c787d058d127",
+          "offset": [
+            63,
+            78
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "cb9266506031ad23",
+          "offset": [
+            65,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "5aeae8becb828a09",
+          "offset": [
+            68,
+            79
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "460dff3753968ef3",
+          "offset": [
+            56,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "necklace_regearl75": {
+      "idle": [
+        {
+          "id": "8d0b42f4f44fc6ee",
+          "offset": [
+            67,
+            51
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "be9652fdaaff7426",
+          "offset": [
+            66,
+            50
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "c1376c62ec13e862",
+          "offset": [
+            60,
+            50
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "d4b723163ee4f5fb",
+          "offset": [
+            68,
+            50
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "4e129c302be67891",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "accessory_regearl75": {
+      "idle": [
+        {
+          "id": "1a521a8c977ebd00",
+          "offset": [
+            58,
+            52
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "6e393a767027f28b",
+          "offset": [
+            56,
+            54
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "042781068fd154d5",
+          "offset": [
+            41,
+            41
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "20d55607eb19b1e9",
+          "offset": [
+            59,
+            55
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "e51902688958c3a7",
+          "offset": [
+            58,
+            59
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "armor_regearl80": {
+      "idle": [
+        {
+          "id": "4a9b6d35e7350542",
+          "offset": [
+            58,
+            43
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "bd677c9cf35f6261",
+          "offset": [
+            56,
+            42
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "50f3e42e30b7a21a",
+          "offset": [
+            49,
+            40
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "89efbb78308b08c1",
+          "offset": [
+            52,
+            41
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "9674f5f3968b2968",
+          "offset": [
+            43,
+            41
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "head_regearl80": {
+      "idle": [
+        {
+          "id": "af6898ac5a8a1261",
+          "offset": [
+            59,
+            7
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "be3b35de2d52d6d3",
+          "offset": [
+            55,
+            5
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "f3aeb1d8e6f76ab3",
+          "offset": [
+            43,
+            2
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "4a26138962dd105e",
+          "offset": [
+            47,
+            2
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "2244aed91c76baaf",
+          "offset": [
+            60,
+            1
+          ],
+          "frameCount": 32,
+          "start": 0
+        },
+        {
+          "id": "701c4d4f97e70cc6",
+          "offset": [
+            3,
+            4
+          ],
+          "frameCount": 32,
+          "start": 32
+        }
+      ]
+    },
+    "shoulders_regearl80": {
+      "idle": [
+        {
+          "id": "fa2c677922527e10",
+          "offset": [
+            55,
+            41
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "5f419416c1748d76",
+          "offset": [
+            54,
+            41
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "dfa0f1471d5a79ea",
+          "offset": [
+            52,
+            41
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "c6cd81b95894de8f",
+          "offset": [
+            54,
+            41
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "f1af16d59570d41f",
+          "offset": [
+            42,
+            41
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "gloves_regearl80": {
+      "idle": [
+        {
+          "id": "e6d749108d6e08ff",
+          "offset": [
+            58,
+            52
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "cdff01f9b2b94a30",
+          "offset": [
+            55,
+            56
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "794c89f98fe216f2",
+          "offset": [
+            39,
+            36
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "01a99427ae8eea13",
+          "offset": [
+            56,
+            56
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "12187a599081ac77",
+          "offset": [
+            53,
+            57
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "weapon_regearl80": {
+      "idle": [
+        {
+          "id": "a8054719a371bb0a",
+          "offset": [
+            54,
+            34
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "42665a3b63ef86bc",
+          "offset": [
+            49,
+            32
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "2f754d900af331ef",
+          "offset": [
+            13,
+            8
+          ],
+          "frameCount": 32,
+          "start": 0
+        },
+        {
+          "id": "374ec08ba85d6ef8",
+          "offset": [
+            29,
+            12
+          ],
+          "frameCount": 32,
+          "start": 32
+        }
+      ],
+      "hurt": [
+        {
+          "id": "f91a5863ef433735",
+          "offset": [
+            51,
+            29
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "7b53ccec9c0fbade",
+          "offset": [
+            47,
+            30
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "pants_regearl80": {
+      "idle": [
+        {
+          "id": "f1bc21fb838e2148",
+          "offset": [
+            68,
+            79
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "3a71187422434b89",
+          "offset": [
+            63,
+            78
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "41c2d7c8a913477c",
+          "offset": [
+            65,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "cfc9a6cc66640839",
+          "offset": [
+            68,
+            79
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "aa8c49d0f9d73d3c",
+          "offset": [
+            56,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "necklace_regearl80": {
+      "idle": [
+        {
+          "id": "2191e926b493e15e",
+          "offset": [
+            69,
+            51
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "c2d6244cc3899edd",
+          "offset": [
+            67,
+            50
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "f4901c06a7782e27",
+          "offset": [
+            60,
+            50
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "0c03aa9c6beda45c",
+          "offset": [
+            69,
+            50
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "48d8977f1d0e0dd6",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "accessory_regearl80": {
+      "idle": [
+        {
+          "id": "b3e85c92a0128871",
+          "offset": [
+            56,
+            51
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "ea7d51758a180317",
+          "offset": [
+            54,
+            53
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "3c01ff792631e9fb",
+          "offset": [
+            40,
+            40
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "8845cd26b909abd9",
+          "offset": [
+            57,
+            54
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "ee5597233bab6b26",
+          "offset": [
+            56,
+            58
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "armor_regearl85": {
+      "idle": [
+        {
+          "id": "eaf51774e5bd096e",
+          "offset": [
+            58,
+            37
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "0e3afdb4059ef8b2",
+          "offset": [
+            56,
+            36
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "69d722fbf1abb476",
+          "offset": [
+            49,
+            34
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "69eaee4f649711e3",
+          "offset": [
+            53,
+            36
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "b8fc75a5c7db25cb",
+          "offset": [
+            37,
+            35
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "head_regearl85": {
+      "idle": [
+        {
+          "id": "9a5d48173edaf665",
+          "offset": [
+            58,
+            7
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "87a9d42ee090704b",
+          "offset": [
+            54,
+            5
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "82dd55e18f0e45a6",
+          "offset": [
+            42,
+            2
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "c32ccffb78d282a5",
+          "offset": [
+            46,
+            3
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "7b54d6ce88cdd0d1",
+          "offset": [
+            59,
+            1
+          ],
+          "frameCount": 32,
+          "start": 0
+        },
+        {
+          "id": "d8c3b6985a977ffd",
+          "offset": [
+            3,
+            5
+          ],
+          "frameCount": 32,
+          "start": 32
+        }
+      ]
+    },
+    "shoulders_regearl85": {
+      "idle": [
+        {
+          "id": "974b18df73bb266e",
+          "offset": [
+            58,
+            36
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "081dca24c784868f",
+          "offset": [
+            57,
+            36
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "581d1fc579748ecd",
+          "offset": [
+            54,
+            36
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "40d8a9b77b3acdbf",
+          "offset": [
+            57,
+            36
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "6d8364b3302d695b",
+          "offset": [
+            39,
+            36
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "gloves_regearl85": {
+      "idle": [
+        {
+          "id": "63f47c41bf19c744",
+          "offset": [
+            57,
+            51
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "96f89b680ac5ab9f",
+          "offset": [
+            55,
+            55
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "5ebf3a26c8adddd7",
+          "offset": [
+            39,
+            35
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "ca2ec501b75219b3",
+          "offset": [
+            56,
+            56
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "7570e9030d104b08",
+          "offset": [
+            52,
+            56
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "weapon_regearl85": {
+      "idle": [
+        {
+          "id": "6dbd4d644fffaad7",
+          "offset": [
+            53,
+            34
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "3c383426cc0bef79",
+          "offset": [
+            48,
+            32
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "f5707cd0b296bd11",
+          "offset": [
+            13,
+            8
+          ],
+          "frameCount": 32,
+          "start": 0
+        },
+        {
+          "id": "7a63619038113df6",
+          "offset": [
+            29,
+            11
+          ],
+          "frameCount": 32,
+          "start": 32
+        }
+      ],
+      "hurt": [
+        {
+          "id": "2dd7286bc6f58461",
+          "offset": [
+            50,
+            28
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "4db26da2e14563af",
+          "offset": [
+            46,
+            29
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "pants_regearl85": {
+      "idle": [
+        {
+          "id": "f04c59a4943ca67f",
+          "offset": [
+            68,
+            79
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "8d4e0c6ed86bfbd2",
+          "offset": [
+            63,
+            78
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "2906a4d8e82858e2",
+          "offset": [
+            65,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "4e0c80be58cad6ff",
+          "offset": [
+            68,
+            79
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "a0201acf1dd9f543",
+          "offset": [
+            56,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "necklace_regearl85": {
+      "idle": [
+        {
+          "id": "1f0a4df564a7a0be",
+          "offset": [
+            68,
+            51
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "b44fa666feee7db2",
+          "offset": [
+            67,
+            50
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "7c589c481a728c8f",
+          "offset": [
+            60,
+            50
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "173fbaaf2627eba9",
+          "offset": [
+            68,
+            50
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "6a4c936f3e365060",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "accessory_regearl85": {
+      "idle": [
+        {
+          "id": "55afe771984368b6",
+          "offset": [
+            56,
+            50
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "baa035b221456068",
+          "offset": [
+            55,
+            52
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "390714b2bea8e1b2",
+          "offset": [
+            40,
+            40
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "da2206bb892791b0",
+          "offset": [
+            56,
+            53
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "e7c69290943d197c",
+          "offset": [
+            55,
+            57
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "armor_regearl90": {
+      "idle": [
+        {
+          "id": "cd19ef5cf3c07ca4",
+          "offset": [
+            60,
+            42
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "233bf58ffef82231",
+          "offset": [
+            58,
+            41
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "722571362224c8fe",
+          "offset": [
+            49,
+            39
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "0b5cdf0ad76cec72",
+          "offset": [
+            57,
+            41
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "64ce8a5058895d89",
+          "offset": [
+            41,
+            40
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "head_regearl90": {
+      "idle": [
+        {
+          "id": "f7ded04dc4754017",
+          "offset": [
+            57,
+            7
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "11f91c3e4f4215cb",
+          "offset": [
+            53,
+            5
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "1a1cae8310f6d00c",
+          "offset": [
+            41,
+            1
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "abb167909b9f3278",
+          "offset": [
+            45,
+            2
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "f7cdf6d9ab431974",
+          "offset": [
+            58,
+            1
+          ],
+          "frameCount": 32,
+          "start": 0
+        },
+        {
+          "id": "711b04c512e16bd8",
+          "offset": [
+            3,
+            3
+          ],
+          "frameCount": 32,
+          "start": 32
+        }
+      ]
+    },
+    "shoulders_regearl90": {
+      "idle": [
+        {
+          "id": "09b459f6467ee80b",
+          "offset": [
+            54,
+            38
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "5b61d64dcf3bfe3b",
+          "offset": [
+            53,
+            38
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "214913da316df23d",
+          "offset": [
+            51,
+            38
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "0e6020cec99169b7",
+          "offset": [
+            53,
+            38
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "44465b6d93f3fdd1",
+          "offset": [
+            39,
+            38
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "gloves_regearl90": {
+      "idle": [
+        {
+          "id": "e1dd4996e597ac0b",
+          "offset": [
+            57,
+            51
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "962cc33cfb4c2ec7",
+          "offset": [
+            54,
+            55
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "2f690c7169b83b69",
+          "offset": [
+            39,
+            35
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "78828b0ced4e51a6",
+          "offset": [
+            55,
+            56
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "13f6c572da937cc0",
+          "offset": [
+            52,
+            56
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "weapon_regearl90": {
+      "idle": [
+        {
+          "id": "f8840a62bdf33444",
+          "offset": [
+            53,
+            33
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "2c3518f06080a17a",
+          "offset": [
+            47,
+            31
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "a4b954c4c6294910",
+          "offset": [
+            12,
+            7
+          ],
+          "frameCount": 32,
+          "start": 0
+        },
+        {
+          "id": "05b714058a746fc6",
+          "offset": [
+            28,
+            10
+          ],
+          "frameCount": 32,
+          "start": 32
+        }
+      ],
+      "hurt": [
+        {
+          "id": "94372976233e8484",
+          "offset": [
+            50,
+            27
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "ea9f3267e22c35cd",
+          "offset": [
+            46,
+            29
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "pants_regearl90": {
+      "idle": [
+        {
+          "id": "58d0cc632a842651",
+          "offset": [
+            68,
+            79
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "15f9e4e9d9d71b8f",
+          "offset": [
+            63,
+            78
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "3cc7dcecdb902103",
+          "offset": [
+            65,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "fb4a0b765282e4ef",
+          "offset": [
+            68,
+            79
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "b83e40abc0b50de9",
+          "offset": [
+            56,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "necklace_regearl90": {
+      "idle": [
+        {
+          "id": "c3da9f6e3fed7217",
+          "offset": [
+            67,
+            51
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "18232de04b8a9cb8",
+          "offset": [
+            66,
+            50
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "579db696bb24b7f3",
+          "offset": [
+            60,
+            50
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "56e86ec0bc96f5a4",
+          "offset": [
+            68,
+            50
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "6b4ecfaf52730abf",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "accessory_regearl90": {
+      "idle": [
+        {
+          "id": "7d38830499e311d4",
+          "offset": [
+            56,
+            50
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "f45e382b3e43d166",
+          "offset": [
+            54,
+            52
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "73238d61549f522e",
+          "offset": [
+            39,
+            39
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "08a1567eb6ecd75f",
+          "offset": [
+            56,
+            53
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "113968a7ec8b535a",
+          "offset": [
+            55,
+            57
           ],
           "frameCount": 64,
           "start": 0

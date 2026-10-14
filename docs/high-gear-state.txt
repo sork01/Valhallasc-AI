@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-14T12:04:54",
+  "updated": "2026-10-14T13:30:49",
   "tasks": [
     {
       "id": "L60-warrior-armor",
@@ -2220,10 +2220,20 @@
       "kind": "armor",
       "item": "assassin_armor_shadow_l75_gray",
       "name": "Paradeworn Shadow Armor",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_armor_regearl75.png",
+        "client/assets/assassin_progression_armor_regearl75_depth.png",
+        "client/assets/assassin_f_progression_armor_regearl75.png",
+        "client/assets/assassin_f_progression_armor_regearl75_depth.png",
+        "client/assets/gear_icon_l75-assassin-armor.png",
+        "test-results/gear-redesign/L75-assassin-armor.png",
+        "test-results/gear-redesign/L75-assassin-armor-browser.json"
+      ]
     },
     {
       "id": "L75-assassin-headgear",
@@ -2232,10 +2242,20 @@
       "kind": "headgear",
       "item": "assassin_headgear_shadow_l75_gray",
       "name": "Paradeworn Shadow Brow Band",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_head_regearl75.png",
+        "client/assets/assassin_progression_head_regearl75_depth.png",
+        "client/assets/assassin_f_progression_head_regearl75.png",
+        "client/assets/assassin_f_progression_head_regearl75_depth.png",
+        "client/assets/gear_icon_l75-assassin-headgear.png",
+        "test-results/gear-redesign/L75-assassin-headgear.png",
+        "test-results/gear-redesign/L75-assassin-headgear-browser.json"
+      ]
     },
     {
       "id": "L75-assassin-shoulders",
@@ -2244,10 +2264,20 @@
       "kind": "shoulders",
       "item": "assassin_shoulders_shadow_l75_gray",
       "name": "Paradeworn Nightweave Spaulders",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_shoulders_regearl75.png",
+        "client/assets/assassin_progression_shoulders_regearl75_depth.png",
+        "client/assets/assassin_f_progression_shoulders_regearl75.png",
+        "client/assets/assassin_f_progression_shoulders_regearl75_depth.png",
+        "client/assets/gear_icon_l75-assassin-shoulders.png",
+        "test-results/gear-redesign/L75-assassin-shoulders.png",
+        "test-results/gear-redesign/L75-assassin-shoulders-browser.json"
+      ]
     },
     {
       "id": "L75-assassin-gloves",
@@ -2256,10 +2286,20 @@
       "kind": "gloves",
       "item": "assassin_gloves_shadow_l75_gray",
       "name": "Paradeworn Nightweave Claws",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_gloves_regearl75.png",
+        "client/assets/assassin_progression_gloves_regearl75_depth.png",
+        "client/assets/assassin_f_progression_gloves_regearl75.png",
+        "client/assets/assassin_f_progression_gloves_regearl75_depth.png",
+        "client/assets/gear_icon_l75-assassin-gloves.png",
+        "test-results/gear-redesign/L75-assassin-gloves.png",
+        "test-results/gear-redesign/L75-assassin-gloves-browser.json"
+      ]
     },
     {
       "id": "L75-assassin-weapon",
@@ -2268,10 +2308,20 @@
       "kind": "weapon",
       "item": "assassin_weapon_daggers_l75_gray",
       "name": "Paradeworn Steel Daggers",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_weapon_regearl75.png",
+        "client/assets/assassin_progression_weapon_regearl75_depth.png",
+        "client/assets/assassin_f_progression_weapon_regearl75.png",
+        "client/assets/assassin_f_progression_weapon_regearl75_depth.png",
+        "client/assets/gear_icon_l75-assassin-weapon.png",
+        "test-results/gear-redesign/L75-assassin-weapon.png",
+        "test-results/gear-redesign/L75-assassin-weapon-browser.json"
+      ]
     },
     {
       "id": "L75-priest-armor",
@@ -2280,10 +2330,20 @@
       "kind": "armor",
       "item": "priest_armor_pilgrim_l75_gray",
       "name": "Paradeworn Pilgrim Robes",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_armor_regearl75.png",
+        "client/assets/priest_progression_armor_regearl75_depth.png",
+        "client/assets/priest_f_progression_armor_regearl75.png",
+        "client/assets/priest_f_progression_armor_regearl75_depth.png",
+        "client/assets/gear_icon_l75-priest-armor.png",
+        "test-results/gear-redesign/L75-priest-armor.png",
+        "test-results/gear-redesign/L75-priest-armor-browser.json"
+      ]
     },
     {
       "id": "L75-priest-headgear",
@@ -2292,10 +2352,20 @@
       "kind": "headgear",
       "item": "priest_headgear_pilgrim_l75_gray",
       "name": "Paradeworn Pilgrim's Hood",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_head_regearl75.png",
+        "client/assets/priest_progression_head_regearl75_depth.png",
+        "client/assets/priest_f_progression_head_regearl75.png",
+        "client/assets/priest_f_progression_head_regearl75_depth.png",
+        "client/assets/gear_icon_l75-priest-headgear.png",
+        "test-results/gear-redesign/L75-priest-headgear.png",
+        "test-results/gear-redesign/L75-priest-headgear-browser.json"
+      ]
     },
     {
       "id": "L75-priest-shoulders",
@@ -2304,10 +2374,20 @@
       "kind": "shoulders",
       "item": "priest_shoulders_pilgrim_l75_gray",
       "name": "Paradeworn Pilgrim's Mantle",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_shoulders_regearl75.png",
+        "client/assets/priest_progression_shoulders_regearl75_depth.png",
+        "client/assets/priest_f_progression_shoulders_regearl75.png",
+        "client/assets/priest_f_progression_shoulders_regearl75_depth.png",
+        "client/assets/gear_icon_l75-priest-shoulders.png",
+        "test-results/gear-redesign/L75-priest-shoulders.png",
+        "test-results/gear-redesign/L75-priest-shoulders-browser.json"
+      ]
     },
     {
       "id": "L75-priest-gloves",
@@ -2316,10 +2396,20 @@
       "kind": "gloves",
       "item": "priest_gloves_pilgrim_l75_gray",
       "name": "Paradeworn Pilgrim's Mitts",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_gloves_regearl75.png",
+        "client/assets/priest_progression_gloves_regearl75_depth.png",
+        "client/assets/priest_f_progression_gloves_regearl75.png",
+        "client/assets/priest_f_progression_gloves_regearl75_depth.png",
+        "client/assets/gear_icon_l75-priest-gloves.png",
+        "test-results/gear-redesign/L75-priest-gloves.png",
+        "test-results/gear-redesign/L75-priest-gloves-browser.json"
+      ]
     },
     {
       "id": "L75-priest-weapon",
@@ -2328,10 +2418,20 @@
       "kind": "weapon",
       "item": "priest_weapon_mace_l75_gray",
       "name": "Paradeworn Oak Mace",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_weapon_regearl75.png",
+        "client/assets/priest_progression_weapon_regearl75_depth.png",
+        "client/assets/priest_f_progression_weapon_regearl75.png",
+        "client/assets/priest_f_progression_weapon_regearl75_depth.png",
+        "client/assets/gear_icon_l75-priest-weapon.png",
+        "test-results/gear-redesign/L75-priest-weapon.png",
+        "test-results/gear-redesign/L75-priest-weapon-browser.json"
+      ]
     },
     {
       "id": "L75-hunter-armor",
@@ -2340,10 +2440,20 @@
       "kind": "armor",
       "item": "hunter_armor_scout_l75_gray",
       "name": "Paradeworn Scout's Jerkin",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_armor_regearl75.png",
+        "client/assets/hunter_progression_armor_regearl75_depth.png",
+        "client/assets/hunter_f_progression_armor_regearl75.png",
+        "client/assets/hunter_f_progression_armor_regearl75_depth.png",
+        "client/assets/gear_icon_l75-hunter-armor.png",
+        "test-results/gear-redesign/L75-hunter-armor.png",
+        "test-results/gear-redesign/L75-hunter-armor-browser.json"
+      ]
     },
     {
       "id": "L75-hunter-headgear",
@@ -2352,10 +2462,20 @@
       "kind": "headgear",
       "item": "hunter_headgear_scout_l75_gray",
       "name": "Paradeworn Feathered Headband",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_head_regearl75.png",
+        "client/assets/hunter_progression_head_regearl75_depth.png",
+        "client/assets/hunter_f_progression_head_regearl75.png",
+        "client/assets/hunter_f_progression_head_regearl75_depth.png",
+        "client/assets/gear_icon_l75-hunter-headgear.png",
+        "test-results/gear-redesign/L75-hunter-headgear.png",
+        "test-results/gear-redesign/L75-hunter-headgear-browser.json"
+      ]
     },
     {
       "id": "L75-hunter-shoulders",
@@ -2364,10 +2484,20 @@
       "kind": "shoulders",
       "item": "hunter_shoulders_scout_l75_gray",
       "name": "Paradeworn Scout's Mantle",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_shoulders_regearl75.png",
+        "client/assets/hunter_progression_shoulders_regearl75_depth.png",
+        "client/assets/hunter_f_progression_shoulders_regearl75.png",
+        "client/assets/hunter_f_progression_shoulders_regearl75_depth.png",
+        "client/assets/gear_icon_l75-hunter-shoulders.png",
+        "test-results/gear-redesign/L75-hunter-shoulders.png",
+        "test-results/gear-redesign/L75-hunter-shoulders-browser.json"
+      ]
     },
     {
       "id": "L75-hunter-gloves",
@@ -2376,10 +2506,20 @@
       "kind": "gloves",
       "item": "hunter_gloves_scout_l75_gray",
       "name": "Paradeworn Scout's Bracers",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_gloves_regearl75.png",
+        "client/assets/hunter_progression_gloves_regearl75_depth.png",
+        "client/assets/hunter_f_progression_gloves_regearl75.png",
+        "client/assets/hunter_f_progression_gloves_regearl75_depth.png",
+        "client/assets/gear_icon_l75-hunter-gloves.png",
+        "test-results/gear-redesign/L75-hunter-gloves.png",
+        "test-results/gear-redesign/L75-hunter-gloves-browser.json"
+      ]
     },
     {
       "id": "L75-hunter-weapon",
@@ -2388,10 +2528,20 @@
       "kind": "weapon",
       "item": "hunter_weapon_shortbow_l75_gray",
       "name": "Paradeworn Hunter's Shortbow",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_weapon_regearl75.png",
+        "client/assets/hunter_progression_weapon_regearl75_depth.png",
+        "client/assets/hunter_f_progression_weapon_regearl75.png",
+        "client/assets/hunter_f_progression_weapon_regearl75_depth.png",
+        "client/assets/gear_icon_l75-hunter-weapon.png",
+        "test-results/gear-redesign/L75-hunter-weapon.png",
+        "test-results/gear-redesign/L75-hunter-weapon-browser.json"
+      ]
     },
     {
       "id": "L75-shared-pants",
@@ -2400,10 +2550,36 @@
       "kind": "pants",
       "item": "pants_wayfarer_l75_gray",
       "name": "Paradeworn Wayfarer Pants",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_pants_regearl75.png",
+        "client/assets/assassin_progression_pants_regearl75_depth.png",
+        "client/assets/assassin_f_progression_pants_regearl75.png",
+        "client/assets/assassin_f_progression_pants_regearl75_depth.png",
+        "client/assets/warrior_progression_pants_regearl75.png",
+        "client/assets/warrior_progression_pants_regearl75_depth.png",
+        "client/assets/warrior_f_progression_pants_regearl75.png",
+        "client/assets/warrior_f_progression_pants_regearl75_depth.png",
+        "client/assets/mage_progression_pants_regearl75.png",
+        "client/assets/mage_progression_pants_regearl75_depth.png",
+        "client/assets/mage_f_progression_pants_regearl75.png",
+        "client/assets/mage_f_progression_pants_regearl75_depth.png",
+        "client/assets/priest_progression_pants_regearl75.png",
+        "client/assets/priest_progression_pants_regearl75_depth.png",
+        "client/assets/priest_f_progression_pants_regearl75.png",
+        "client/assets/priest_f_progression_pants_regearl75_depth.png",
+        "client/assets/hunter_progression_pants_regearl75.png",
+        "client/assets/hunter_progression_pants_regearl75_depth.png",
+        "client/assets/hunter_f_progression_pants_regearl75.png",
+        "client/assets/hunter_f_progression_pants_regearl75_depth.png",
+        "client/assets/gear_icon_l75-shared-pants.png",
+        "test-results/gear-redesign/L75-shared-pants.png",
+        "test-results/gear-redesign/L75-shared-pants-browser.json"
+      ]
     },
     {
       "id": "L75-shared-necklace",
@@ -2412,10 +2588,36 @@
       "kind": "necklace",
       "item": "necklace_moonstone_l75_gray",
       "name": "Paradeworn Moonstone Necklace",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_necklace_regearl75.png",
+        "client/assets/assassin_progression_necklace_regearl75_depth.png",
+        "client/assets/assassin_f_progression_necklace_regearl75.png",
+        "client/assets/assassin_f_progression_necklace_regearl75_depth.png",
+        "client/assets/warrior_progression_necklace_regearl75.png",
+        "client/assets/warrior_progression_necklace_regearl75_depth.png",
+        "client/assets/warrior_f_progression_necklace_regearl75.png",
+        "client/assets/warrior_f_progression_necklace_regearl75_depth.png",
+        "client/assets/mage_progression_necklace_regearl75.png",
+        "client/assets/mage_progression_necklace_regearl75_depth.png",
+        "client/assets/mage_f_progression_necklace_regearl75.png",
+        "client/assets/mage_f_progression_necklace_regearl75_depth.png",
+        "client/assets/priest_progression_necklace_regearl75.png",
+        "client/assets/priest_progression_necklace_regearl75_depth.png",
+        "client/assets/priest_f_progression_necklace_regearl75.png",
+        "client/assets/priest_f_progression_necklace_regearl75_depth.png",
+        "client/assets/hunter_progression_necklace_regearl75.png",
+        "client/assets/hunter_progression_necklace_regearl75_depth.png",
+        "client/assets/hunter_f_progression_necklace_regearl75.png",
+        "client/assets/hunter_f_progression_necklace_regearl75_depth.png",
+        "client/assets/gear_icon_l75-shared-necklace.png",
+        "test-results/gear-redesign/L75-shared-necklace.png",
+        "test-results/gear-redesign/L75-shared-necklace-browser.json"
+      ]
     },
     {
       "id": "L75-shared-accessory",
@@ -2424,10 +2626,36 @@
       "kind": "accessory",
       "item": "accessory_amber_l75_gray",
       "name": "Paradeworn Amber Ring",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_accessory_regearl75.png",
+        "client/assets/assassin_progression_accessory_regearl75_depth.png",
+        "client/assets/assassin_f_progression_accessory_regearl75.png",
+        "client/assets/assassin_f_progression_accessory_regearl75_depth.png",
+        "client/assets/warrior_progression_accessory_regearl75.png",
+        "client/assets/warrior_progression_accessory_regearl75_depth.png",
+        "client/assets/warrior_f_progression_accessory_regearl75.png",
+        "client/assets/warrior_f_progression_accessory_regearl75_depth.png",
+        "client/assets/mage_progression_accessory_regearl75.png",
+        "client/assets/mage_progression_accessory_regearl75_depth.png",
+        "client/assets/mage_f_progression_accessory_regearl75.png",
+        "client/assets/mage_f_progression_accessory_regearl75_depth.png",
+        "client/assets/priest_progression_accessory_regearl75.png",
+        "client/assets/priest_progression_accessory_regearl75_depth.png",
+        "client/assets/priest_f_progression_accessory_regearl75.png",
+        "client/assets/priest_f_progression_accessory_regearl75_depth.png",
+        "client/assets/hunter_progression_accessory_regearl75.png",
+        "client/assets/hunter_progression_accessory_regearl75_depth.png",
+        "client/assets/hunter_f_progression_accessory_regearl75.png",
+        "client/assets/hunter_f_progression_accessory_regearl75_depth.png",
+        "client/assets/gear_icon_l75-shared-accessory.png",
+        "test-results/gear-redesign/L75-shared-accessory.png",
+        "test-results/gear-redesign/L75-shared-accessory-browser.json"
+      ]
     },
     {
       "id": "L80-warrior-armor",
@@ -2436,10 +2664,20 @@
       "kind": "armor",
       "item": "warrior_armor_crimson_l80_gray",
       "name": "Rootworn Crimson Armor",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_armor_regearl80.png",
+        "client/assets/warrior_progression_armor_regearl80_depth.png",
+        "client/assets/warrior_f_progression_armor_regearl80.png",
+        "client/assets/warrior_f_progression_armor_regearl80_depth.png",
+        "client/assets/gear_icon_l80-warrior-armor.png",
+        "test-results/gear-redesign/L80-warrior-armor.png",
+        "test-results/gear-redesign/L80-warrior-armor-browser.json"
+      ]
     },
     {
       "id": "L80-warrior-headgear",
@@ -2448,10 +2686,20 @@
       "kind": "headgear",
       "item": "warrior_headgear_crimson_l80_gray",
       "name": "Rootworn Crimson Plumed Helm",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_head_regearl80.png",
+        "client/assets/warrior_progression_head_regearl80_depth.png",
+        "client/assets/warrior_f_progression_head_regearl80.png",
+        "client/assets/warrior_f_progression_head_regearl80_depth.png",
+        "client/assets/gear_icon_l80-warrior-headgear.png",
+        "test-results/gear-redesign/L80-warrior-headgear.png",
+        "test-results/gear-redesign/L80-warrior-headgear-browser.json"
+      ]
     },
     {
       "id": "L80-warrior-shoulders",
@@ -2460,10 +2708,20 @@
       "kind": "shoulders",
       "item": "warrior_shoulders_crimson_l80_gray",
       "name": "Rootworn Crimson Pauldrons",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_shoulders_regearl80.png",
+        "client/assets/warrior_progression_shoulders_regearl80_depth.png",
+        "client/assets/warrior_f_progression_shoulders_regearl80.png",
+        "client/assets/warrior_f_progression_shoulders_regearl80_depth.png",
+        "client/assets/gear_icon_l80-warrior-shoulders.png",
+        "test-results/gear-redesign/L80-warrior-shoulders.png",
+        "test-results/gear-redesign/L80-warrior-shoulders-browser.json"
+      ]
     },
     {
       "id": "L80-warrior-gloves",
@@ -2472,10 +2730,20 @@
       "kind": "gloves",
       "item": "warrior_gloves_crimson_l80_gray",
       "name": "Rootworn Crimson Gauntlets",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_gloves_regearl80.png",
+        "client/assets/warrior_progression_gloves_regearl80_depth.png",
+        "client/assets/warrior_f_progression_gloves_regearl80.png",
+        "client/assets/warrior_f_progression_gloves_regearl80_depth.png",
+        "client/assets/gear_icon_l80-warrior-gloves.png",
+        "test-results/gear-redesign/L80-warrior-gloves.png",
+        "test-results/gear-redesign/L80-warrior-gloves-browser.json"
+      ]
     },
     {
       "id": "L80-warrior-weapon",
@@ -2484,10 +2752,20 @@
       "kind": "weapon",
       "item": "warrior_weapon_sword_l80_gray",
       "name": "Rootworn Iron Sword",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_weapon_regearl80.png",
+        "client/assets/warrior_progression_weapon_regearl80_depth.png",
+        "client/assets/warrior_f_progression_weapon_regearl80.png",
+        "client/assets/warrior_f_progression_weapon_regearl80_depth.png",
+        "client/assets/gear_icon_l80-warrior-weapon.png",
+        "test-results/gear-redesign/L80-warrior-weapon.png",
+        "test-results/gear-redesign/L80-warrior-weapon-browser.json"
+      ]
     },
     {
       "id": "L80-mage-armor",
@@ -2496,10 +2774,20 @@
       "kind": "armor",
       "item": "mage_armor_apprentice_l80_gray",
       "name": "Rootworn Apprentice Robes",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_armor_regearl80.png",
+        "client/assets/mage_progression_armor_regearl80_depth.png",
+        "client/assets/mage_f_progression_armor_regearl80.png",
+        "client/assets/mage_f_progression_armor_regearl80_depth.png",
+        "client/assets/gear_icon_l80-mage-armor.png",
+        "test-results/gear-redesign/L80-mage-armor.png",
+        "test-results/gear-redesign/L80-mage-armor-browser.json"
+      ]
     },
     {
       "id": "L80-mage-headgear",
@@ -2508,10 +2796,21 @@
       "kind": "headgear",
       "item": "mage_headgear_apprentice_l80_gray",
       "name": "Rootworn Apprentice's Hat",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "scripts/gear_shapes_high.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_head_regearl80.png",
+        "client/assets/mage_progression_head_regearl80_depth.png",
+        "client/assets/mage_f_progression_head_regearl80.png",
+        "client/assets/mage_f_progression_head_regearl80_depth.png",
+        "client/assets/gear_icon_l80-mage-headgear.png",
+        "test-results/gear-redesign/L80-mage-headgear.png",
+        "test-results/gear-redesign/L80-mage-headgear-browser.json"
+      ]
     },
     {
       "id": "L80-mage-shoulders",
@@ -2520,10 +2819,20 @@
       "kind": "shoulders",
       "item": "mage_shoulders_apprentice_l80_gray",
       "name": "Rootworn Apprentice's Capelet",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_shoulders_regearl80.png",
+        "client/assets/mage_progression_shoulders_regearl80_depth.png",
+        "client/assets/mage_f_progression_shoulders_regearl80.png",
+        "client/assets/mage_f_progression_shoulders_regearl80_depth.png",
+        "client/assets/gear_icon_l80-mage-shoulders.png",
+        "test-results/gear-redesign/L80-mage-shoulders.png",
+        "test-results/gear-redesign/L80-mage-shoulders-browser.json"
+      ]
     },
     {
       "id": "L80-mage-gloves",
@@ -2532,10 +2841,20 @@
       "kind": "gloves",
       "item": "mage_gloves_apprentice_l80_gray",
       "name": "Rootworn Apprentice's Gloves",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_gloves_regearl80.png",
+        "client/assets/mage_progression_gloves_regearl80_depth.png",
+        "client/assets/mage_f_progression_gloves_regearl80.png",
+        "client/assets/mage_f_progression_gloves_regearl80_depth.png",
+        "client/assets/gear_icon_l80-mage-gloves.png",
+        "test-results/gear-redesign/L80-mage-gloves.png",
+        "test-results/gear-redesign/L80-mage-gloves-browser.json"
+      ]
     },
     {
       "id": "L80-mage-weapon",
@@ -2544,10 +2863,21 @@
       "kind": "weapon",
       "item": "mage_weapon_ash_l80_gray",
       "name": "Rootworn Ash Staff",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "scripts/gear_shapes_high.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_weapon_regearl80.png",
+        "client/assets/mage_progression_weapon_regearl80_depth.png",
+        "client/assets/mage_f_progression_weapon_regearl80.png",
+        "client/assets/mage_f_progression_weapon_regearl80_depth.png",
+        "client/assets/gear_icon_l80-mage-weapon.png",
+        "test-results/gear-redesign/L80-mage-weapon.png",
+        "test-results/gear-redesign/L80-mage-weapon-browser.json"
+      ]
     },
     {
       "id": "L80-assassin-armor",
@@ -2556,10 +2886,20 @@
       "kind": "armor",
       "item": "assassin_armor_shadow_l80_gray",
       "name": "Rootworn Shadow Armor",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_armor_regearl80.png",
+        "client/assets/assassin_progression_armor_regearl80_depth.png",
+        "client/assets/assassin_f_progression_armor_regearl80.png",
+        "client/assets/assassin_f_progression_armor_regearl80_depth.png",
+        "client/assets/gear_icon_l80-assassin-armor.png",
+        "test-results/gear-redesign/L80-assassin-armor.png",
+        "test-results/gear-redesign/L80-assassin-armor-browser.json"
+      ]
     },
     {
       "id": "L80-assassin-headgear",
@@ -2568,10 +2908,20 @@
       "kind": "headgear",
       "item": "assassin_headgear_shadow_l80_gray",
       "name": "Rootworn Shadow Brow Band",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_head_regearl80.png",
+        "client/assets/assassin_progression_head_regearl80_depth.png",
+        "client/assets/assassin_f_progression_head_regearl80.png",
+        "client/assets/assassin_f_progression_head_regearl80_depth.png",
+        "client/assets/gear_icon_l80-assassin-headgear.png",
+        "test-results/gear-redesign/L80-assassin-headgear.png",
+        "test-results/gear-redesign/L80-assassin-headgear-browser.json"
+      ]
     },
     {
       "id": "L80-assassin-shoulders",
@@ -2580,10 +2930,20 @@
       "kind": "shoulders",
       "item": "assassin_shoulders_shadow_l80_gray",
       "name": "Rootworn Nightweave Spaulders",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_shoulders_regearl80.png",
+        "client/assets/assassin_progression_shoulders_regearl80_depth.png",
+        "client/assets/assassin_f_progression_shoulders_regearl80.png",
+        "client/assets/assassin_f_progression_shoulders_regearl80_depth.png",
+        "client/assets/gear_icon_l80-assassin-shoulders.png",
+        "test-results/gear-redesign/L80-assassin-shoulders.png",
+        "test-results/gear-redesign/L80-assassin-shoulders-browser.json"
+      ]
     },
     {
       "id": "L80-assassin-gloves",
@@ -2592,10 +2952,20 @@
       "kind": "gloves",
       "item": "assassin_gloves_shadow_l80_gray",
       "name": "Rootworn Nightweave Claws",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_gloves_regearl80.png",
+        "client/assets/assassin_progression_gloves_regearl80_depth.png",
+        "client/assets/assassin_f_progression_gloves_regearl80.png",
+        "client/assets/assassin_f_progression_gloves_regearl80_depth.png",
+        "client/assets/gear_icon_l80-assassin-gloves.png",
+        "test-results/gear-redesign/L80-assassin-gloves.png",
+        "test-results/gear-redesign/L80-assassin-gloves-browser.json"
+      ]
     },
     {
       "id": "L80-assassin-weapon",
@@ -2604,10 +2974,20 @@
       "kind": "weapon",
       "item": "assassin_weapon_daggers_l80_gray",
       "name": "Rootworn Steel Daggers",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_weapon_regearl80.png",
+        "client/assets/assassin_progression_weapon_regearl80_depth.png",
+        "client/assets/assassin_f_progression_weapon_regearl80.png",
+        "client/assets/assassin_f_progression_weapon_regearl80_depth.png",
+        "client/assets/gear_icon_l80-assassin-weapon.png",
+        "test-results/gear-redesign/L80-assassin-weapon.png",
+        "test-results/gear-redesign/L80-assassin-weapon-browser.json"
+      ]
     },
     {
       "id": "L80-priest-armor",
@@ -2616,10 +2996,20 @@
       "kind": "armor",
       "item": "priest_armor_pilgrim_l80_gray",
       "name": "Rootworn Pilgrim Robes",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_armor_regearl80.png",
+        "client/assets/priest_progression_armor_regearl80_depth.png",
+        "client/assets/priest_f_progression_armor_regearl80.png",
+        "client/assets/priest_f_progression_armor_regearl80_depth.png",
+        "client/assets/gear_icon_l80-priest-armor.png",
+        "test-results/gear-redesign/L80-priest-armor.png",
+        "test-results/gear-redesign/L80-priest-armor-browser.json"
+      ]
     },
     {
       "id": "L80-priest-headgear",
@@ -2628,10 +3018,20 @@
       "kind": "headgear",
       "item": "priest_headgear_pilgrim_l80_gray",
       "name": "Rootworn Pilgrim's Hood",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_head_regearl80.png",
+        "client/assets/priest_progression_head_regearl80_depth.png",
+        "client/assets/priest_f_progression_head_regearl80.png",
+        "client/assets/priest_f_progression_head_regearl80_depth.png",
+        "client/assets/gear_icon_l80-priest-headgear.png",
+        "test-results/gear-redesign/L80-priest-headgear.png",
+        "test-results/gear-redesign/L80-priest-headgear-browser.json"
+      ]
     },
     {
       "id": "L80-priest-shoulders",
@@ -2640,10 +3040,20 @@
       "kind": "shoulders",
       "item": "priest_shoulders_pilgrim_l80_gray",
       "name": "Rootworn Pilgrim's Mantle",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_shoulders_regearl80.png",
+        "client/assets/priest_progression_shoulders_regearl80_depth.png",
+        "client/assets/priest_f_progression_shoulders_regearl80.png",
+        "client/assets/priest_f_progression_shoulders_regearl80_depth.png",
+        "client/assets/gear_icon_l80-priest-shoulders.png",
+        "test-results/gear-redesign/L80-priest-shoulders.png",
+        "test-results/gear-redesign/L80-priest-shoulders-browser.json"
+      ]
     },
     {
       "id": "L80-priest-gloves",
@@ -2652,10 +3062,20 @@
       "kind": "gloves",
       "item": "priest_gloves_pilgrim_l80_gray",
       "name": "Rootworn Pilgrim's Mitts",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_gloves_regearl80.png",
+        "client/assets/priest_progression_gloves_regearl80_depth.png",
+        "client/assets/priest_f_progression_gloves_regearl80.png",
+        "client/assets/priest_f_progression_gloves_regearl80_depth.png",
+        "client/assets/gear_icon_l80-priest-gloves.png",
+        "test-results/gear-redesign/L80-priest-gloves.png",
+        "test-results/gear-redesign/L80-priest-gloves-browser.json"
+      ]
     },
     {
       "id": "L80-priest-weapon",
@@ -2664,10 +3084,20 @@
       "kind": "weapon",
       "item": "priest_weapon_mace_l80_gray",
       "name": "Rootworn Oak Mace",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_weapon_regearl80.png",
+        "client/assets/priest_progression_weapon_regearl80_depth.png",
+        "client/assets/priest_f_progression_weapon_regearl80.png",
+        "client/assets/priest_f_progression_weapon_regearl80_depth.png",
+        "client/assets/gear_icon_l80-priest-weapon.png",
+        "test-results/gear-redesign/L80-priest-weapon.png",
+        "test-results/gear-redesign/L80-priest-weapon-browser.json"
+      ]
     },
     {
       "id": "L80-hunter-armor",
@@ -2676,10 +3106,20 @@
       "kind": "armor",
       "item": "hunter_armor_scout_l80_gray",
       "name": "Rootworn Scout's Jerkin",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_armor_regearl80.png",
+        "client/assets/hunter_progression_armor_regearl80_depth.png",
+        "client/assets/hunter_f_progression_armor_regearl80.png",
+        "client/assets/hunter_f_progression_armor_regearl80_depth.png",
+        "client/assets/gear_icon_l80-hunter-armor.png",
+        "test-results/gear-redesign/L80-hunter-armor.png",
+        "test-results/gear-redesign/L80-hunter-armor-browser.json"
+      ]
     },
     {
       "id": "L80-hunter-headgear",
@@ -2688,10 +3128,20 @@
       "kind": "headgear",
       "item": "hunter_headgear_scout_l80_gray",
       "name": "Rootworn Feathered Headband",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_head_regearl80.png",
+        "client/assets/hunter_progression_head_regearl80_depth.png",
+        "client/assets/hunter_f_progression_head_regearl80.png",
+        "client/assets/hunter_f_progression_head_regearl80_depth.png",
+        "client/assets/gear_icon_l80-hunter-headgear.png",
+        "test-results/gear-redesign/L80-hunter-headgear.png",
+        "test-results/gear-redesign/L80-hunter-headgear-browser.json"
+      ]
     },
     {
       "id": "L80-hunter-shoulders",
@@ -2700,10 +3150,20 @@
       "kind": "shoulders",
       "item": "hunter_shoulders_scout_l80_gray",
       "name": "Rootworn Scout's Mantle",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_shoulders_regearl80.png",
+        "client/assets/hunter_progression_shoulders_regearl80_depth.png",
+        "client/assets/hunter_f_progression_shoulders_regearl80.png",
+        "client/assets/hunter_f_progression_shoulders_regearl80_depth.png",
+        "client/assets/gear_icon_l80-hunter-shoulders.png",
+        "test-results/gear-redesign/L80-hunter-shoulders.png",
+        "test-results/gear-redesign/L80-hunter-shoulders-browser.json"
+      ]
     },
     {
       "id": "L80-hunter-gloves",
@@ -2712,10 +3172,20 @@
       "kind": "gloves",
       "item": "hunter_gloves_scout_l80_gray",
       "name": "Rootworn Scout's Bracers",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_gloves_regearl80.png",
+        "client/assets/hunter_progression_gloves_regearl80_depth.png",
+        "client/assets/hunter_f_progression_gloves_regearl80.png",
+        "client/assets/hunter_f_progression_gloves_regearl80_depth.png",
+        "client/assets/gear_icon_l80-hunter-gloves.png",
+        "test-results/gear-redesign/L80-hunter-gloves.png",
+        "test-results/gear-redesign/L80-hunter-gloves-browser.json"
+      ]
     },
     {
       "id": "L80-hunter-weapon",
@@ -2724,10 +3194,20 @@
       "kind": "weapon",
       "item": "hunter_weapon_shortbow_l80_gray",
       "name": "Rootworn Hunter's Shortbow",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_weapon_regearl80.png",
+        "client/assets/hunter_progression_weapon_regearl80_depth.png",
+        "client/assets/hunter_f_progression_weapon_regearl80.png",
+        "client/assets/hunter_f_progression_weapon_regearl80_depth.png",
+        "client/assets/gear_icon_l80-hunter-weapon.png",
+        "test-results/gear-redesign/L80-hunter-weapon.png",
+        "test-results/gear-redesign/L80-hunter-weapon-browser.json"
+      ]
     },
     {
       "id": "L80-shared-pants",
@@ -2736,10 +3216,36 @@
       "kind": "pants",
       "item": "pants_wayfarer_l80_gray",
       "name": "Rootworn Wayfarer Pants",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_pants_regearl80.png",
+        "client/assets/assassin_progression_pants_regearl80_depth.png",
+        "client/assets/assassin_f_progression_pants_regearl80.png",
+        "client/assets/assassin_f_progression_pants_regearl80_depth.png",
+        "client/assets/warrior_progression_pants_regearl80.png",
+        "client/assets/warrior_progression_pants_regearl80_depth.png",
+        "client/assets/warrior_f_progression_pants_regearl80.png",
+        "client/assets/warrior_f_progression_pants_regearl80_depth.png",
+        "client/assets/mage_progression_pants_regearl80.png",
+        "client/assets/mage_progression_pants_regearl80_depth.png",
+        "client/assets/mage_f_progression_pants_regearl80.png",
+        "client/assets/mage_f_progression_pants_regearl80_depth.png",
+        "client/assets/priest_progression_pants_regearl80.png",
+        "client/assets/priest_progression_pants_regearl80_depth.png",
+        "client/assets/priest_f_progression_pants_regearl80.png",
+        "client/assets/priest_f_progression_pants_regearl80_depth.png",
+        "client/assets/hunter_progression_pants_regearl80.png",
+        "client/assets/hunter_progression_pants_regearl80_depth.png",
+        "client/assets/hunter_f_progression_pants_regearl80.png",
+        "client/assets/hunter_f_progression_pants_regearl80_depth.png",
+        "client/assets/gear_icon_l80-shared-pants.png",
+        "test-results/gear-redesign/L80-shared-pants.png",
+        "test-results/gear-redesign/L80-shared-pants-browser.json"
+      ]
     },
     {
       "id": "L80-shared-necklace",
@@ -2748,10 +3254,36 @@
       "kind": "necklace",
       "item": "necklace_moonstone_l80_gray",
       "name": "Rootworn Moonstone Necklace",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_necklace_regearl80.png",
+        "client/assets/assassin_progression_necklace_regearl80_depth.png",
+        "client/assets/assassin_f_progression_necklace_regearl80.png",
+        "client/assets/assassin_f_progression_necklace_regearl80_depth.png",
+        "client/assets/warrior_progression_necklace_regearl80.png",
+        "client/assets/warrior_progression_necklace_regearl80_depth.png",
+        "client/assets/warrior_f_progression_necklace_regearl80.png",
+        "client/assets/warrior_f_progression_necklace_regearl80_depth.png",
+        "client/assets/mage_progression_necklace_regearl80.png",
+        "client/assets/mage_progression_necklace_regearl80_depth.png",
+        "client/assets/mage_f_progression_necklace_regearl80.png",
+        "client/assets/mage_f_progression_necklace_regearl80_depth.png",
+        "client/assets/priest_progression_necklace_regearl80.png",
+        "client/assets/priest_progression_necklace_regearl80_depth.png",
+        "client/assets/priest_f_progression_necklace_regearl80.png",
+        "client/assets/priest_f_progression_necklace_regearl80_depth.png",
+        "client/assets/hunter_progression_necklace_regearl80.png",
+        "client/assets/hunter_progression_necklace_regearl80_depth.png",
+        "client/assets/hunter_f_progression_necklace_regearl80.png",
+        "client/assets/hunter_f_progression_necklace_regearl80_depth.png",
+        "client/assets/gear_icon_l80-shared-necklace.png",
+        "test-results/gear-redesign/L80-shared-necklace.png",
+        "test-results/gear-redesign/L80-shared-necklace-browser.json"
+      ]
     },
     {
       "id": "L80-shared-accessory",
@@ -2760,10 +3292,36 @@
       "kind": "accessory",
       "item": "accessory_amber_l80_gray",
       "name": "Rootworn Amber Ring",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_accessory_regearl80.png",
+        "client/assets/assassin_progression_accessory_regearl80_depth.png",
+        "client/assets/assassin_f_progression_accessory_regearl80.png",
+        "client/assets/assassin_f_progression_accessory_regearl80_depth.png",
+        "client/assets/warrior_progression_accessory_regearl80.png",
+        "client/assets/warrior_progression_accessory_regearl80_depth.png",
+        "client/assets/warrior_f_progression_accessory_regearl80.png",
+        "client/assets/warrior_f_progression_accessory_regearl80_depth.png",
+        "client/assets/mage_progression_accessory_regearl80.png",
+        "client/assets/mage_progression_accessory_regearl80_depth.png",
+        "client/assets/mage_f_progression_accessory_regearl80.png",
+        "client/assets/mage_f_progression_accessory_regearl80_depth.png",
+        "client/assets/priest_progression_accessory_regearl80.png",
+        "client/assets/priest_progression_accessory_regearl80_depth.png",
+        "client/assets/priest_f_progression_accessory_regearl80.png",
+        "client/assets/priest_f_progression_accessory_regearl80_depth.png",
+        "client/assets/hunter_progression_accessory_regearl80.png",
+        "client/assets/hunter_progression_accessory_regearl80_depth.png",
+        "client/assets/hunter_f_progression_accessory_regearl80.png",
+        "client/assets/hunter_f_progression_accessory_regearl80_depth.png",
+        "client/assets/gear_icon_l80-shared-accessory.png",
+        "test-results/gear-redesign/L80-shared-accessory.png",
+        "test-results/gear-redesign/L80-shared-accessory-browser.json"
+      ]
     },
     {
       "id": "L85-warrior-armor",
@@ -2772,10 +3330,20 @@
       "kind": "armor",
       "item": "warrior_armor_crimson_l85_gray",
       "name": "Sandworn Crimson Armor",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_armor_regearl85.png",
+        "client/assets/warrior_progression_armor_regearl85_depth.png",
+        "client/assets/warrior_f_progression_armor_regearl85.png",
+        "client/assets/warrior_f_progression_armor_regearl85_depth.png",
+        "client/assets/gear_icon_l85-warrior-armor.png",
+        "test-results/gear-redesign/L85-warrior-armor.png",
+        "test-results/gear-redesign/L85-warrior-armor-browser.json"
+      ]
     },
     {
       "id": "L85-warrior-headgear",
@@ -2784,10 +3352,20 @@
       "kind": "headgear",
       "item": "warrior_headgear_crimson_l85_gray",
       "name": "Sandworn Crimson Plumed Helm",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_head_regearl85.png",
+        "client/assets/warrior_progression_head_regearl85_depth.png",
+        "client/assets/warrior_f_progression_head_regearl85.png",
+        "client/assets/warrior_f_progression_head_regearl85_depth.png",
+        "client/assets/gear_icon_l85-warrior-headgear.png",
+        "test-results/gear-redesign/L85-warrior-headgear.png",
+        "test-results/gear-redesign/L85-warrior-headgear-browser.json"
+      ]
     },
     {
       "id": "L85-warrior-shoulders",
@@ -2796,10 +3374,20 @@
       "kind": "shoulders",
       "item": "warrior_shoulders_crimson_l85_gray",
       "name": "Sandworn Crimson Pauldrons",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_shoulders_regearl85.png",
+        "client/assets/warrior_progression_shoulders_regearl85_depth.png",
+        "client/assets/warrior_f_progression_shoulders_regearl85.png",
+        "client/assets/warrior_f_progression_shoulders_regearl85_depth.png",
+        "client/assets/gear_icon_l85-warrior-shoulders.png",
+        "test-results/gear-redesign/L85-warrior-shoulders.png",
+        "test-results/gear-redesign/L85-warrior-shoulders-browser.json"
+      ]
     },
     {
       "id": "L85-warrior-gloves",
@@ -2808,10 +3396,20 @@
       "kind": "gloves",
       "item": "warrior_gloves_crimson_l85_gray",
       "name": "Sandworn Crimson Gauntlets",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_gloves_regearl85.png",
+        "client/assets/warrior_progression_gloves_regearl85_depth.png",
+        "client/assets/warrior_f_progression_gloves_regearl85.png",
+        "client/assets/warrior_f_progression_gloves_regearl85_depth.png",
+        "client/assets/gear_icon_l85-warrior-gloves.png",
+        "test-results/gear-redesign/L85-warrior-gloves.png",
+        "test-results/gear-redesign/L85-warrior-gloves-browser.json"
+      ]
     },
     {
       "id": "L85-warrior-weapon",
@@ -2820,10 +3418,20 @@
       "kind": "weapon",
       "item": "warrior_weapon_sword_l85_gray",
       "name": "Sandworn Iron Sword",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_weapon_regearl85.png",
+        "client/assets/warrior_progression_weapon_regearl85_depth.png",
+        "client/assets/warrior_f_progression_weapon_regearl85.png",
+        "client/assets/warrior_f_progression_weapon_regearl85_depth.png",
+        "client/assets/gear_icon_l85-warrior-weapon.png",
+        "test-results/gear-redesign/L85-warrior-weapon.png",
+        "test-results/gear-redesign/L85-warrior-weapon-browser.json"
+      ]
     },
     {
       "id": "L85-mage-armor",
@@ -2832,10 +3440,20 @@
       "kind": "armor",
       "item": "mage_armor_apprentice_l85_gray",
       "name": "Sandworn Apprentice Robes",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_armor_regearl85.png",
+        "client/assets/mage_progression_armor_regearl85_depth.png",
+        "client/assets/mage_f_progression_armor_regearl85.png",
+        "client/assets/mage_f_progression_armor_regearl85_depth.png",
+        "client/assets/gear_icon_l85-mage-armor.png",
+        "test-results/gear-redesign/L85-mage-armor.png",
+        "test-results/gear-redesign/L85-mage-armor-browser.json"
+      ]
     },
     {
       "id": "L85-mage-headgear",
@@ -2844,10 +3462,21 @@
       "kind": "headgear",
       "item": "mage_headgear_apprentice_l85_gray",
       "name": "Sandworn Apprentice's Hat",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "scripts/gear_shapes_high.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_head_regearl85.png",
+        "client/assets/mage_progression_head_regearl85_depth.png",
+        "client/assets/mage_f_progression_head_regearl85.png",
+        "client/assets/mage_f_progression_head_regearl85_depth.png",
+        "client/assets/gear_icon_l85-mage-headgear.png",
+        "test-results/gear-redesign/L85-mage-headgear.png",
+        "test-results/gear-redesign/L85-mage-headgear-browser.json"
+      ]
     },
     {
       "id": "L85-mage-shoulders",
@@ -2856,10 +3485,20 @@
       "kind": "shoulders",
       "item": "mage_shoulders_apprentice_l85_gray",
       "name": "Sandworn Apprentice's Capelet",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_shoulders_regearl85.png",
+        "client/assets/mage_progression_shoulders_regearl85_depth.png",
+        "client/assets/mage_f_progression_shoulders_regearl85.png",
+        "client/assets/mage_f_progression_shoulders_regearl85_depth.png",
+        "client/assets/gear_icon_l85-mage-shoulders.png",
+        "test-results/gear-redesign/L85-mage-shoulders.png",
+        "test-results/gear-redesign/L85-mage-shoulders-browser.json"
+      ]
     },
     {
       "id": "L85-mage-gloves",
@@ -2868,10 +3507,20 @@
       "kind": "gloves",
       "item": "mage_gloves_apprentice_l85_gray",
       "name": "Sandworn Apprentice's Gloves",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_gloves_regearl85.png",
+        "client/assets/mage_progression_gloves_regearl85_depth.png",
+        "client/assets/mage_f_progression_gloves_regearl85.png",
+        "client/assets/mage_f_progression_gloves_regearl85_depth.png",
+        "client/assets/gear_icon_l85-mage-gloves.png",
+        "test-results/gear-redesign/L85-mage-gloves.png",
+        "test-results/gear-redesign/L85-mage-gloves-browser.json"
+      ]
     },
     {
       "id": "L85-mage-weapon",
@@ -2880,10 +3529,21 @@
       "kind": "weapon",
       "item": "mage_weapon_ash_l85_gray",
       "name": "Sandworn Ash Staff",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "scripts/gear_shapes_high.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_weapon_regearl85.png",
+        "client/assets/mage_progression_weapon_regearl85_depth.png",
+        "client/assets/mage_f_progression_weapon_regearl85.png",
+        "client/assets/mage_f_progression_weapon_regearl85_depth.png",
+        "client/assets/gear_icon_l85-mage-weapon.png",
+        "test-results/gear-redesign/L85-mage-weapon.png",
+        "test-results/gear-redesign/L85-mage-weapon-browser.json"
+      ]
     },
     {
       "id": "L85-assassin-armor",
@@ -2892,10 +3552,20 @@
       "kind": "armor",
       "item": "assassin_armor_shadow_l85_gray",
       "name": "Sandworn Shadow Armor",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_armor_regearl85.png",
+        "client/assets/assassin_progression_armor_regearl85_depth.png",
+        "client/assets/assassin_f_progression_armor_regearl85.png",
+        "client/assets/assassin_f_progression_armor_regearl85_depth.png",
+        "client/assets/gear_icon_l85-assassin-armor.png",
+        "test-results/gear-redesign/L85-assassin-armor.png",
+        "test-results/gear-redesign/L85-assassin-armor-browser.json"
+      ]
     },
     {
       "id": "L85-assassin-headgear",
@@ -2904,10 +3574,20 @@
       "kind": "headgear",
       "item": "assassin_headgear_shadow_l85_gray",
       "name": "Sandworn Shadow Brow Band",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_head_regearl85.png",
+        "client/assets/assassin_progression_head_regearl85_depth.png",
+        "client/assets/assassin_f_progression_head_regearl85.png",
+        "client/assets/assassin_f_progression_head_regearl85_depth.png",
+        "client/assets/gear_icon_l85-assassin-headgear.png",
+        "test-results/gear-redesign/L85-assassin-headgear.png",
+        "test-results/gear-redesign/L85-assassin-headgear-browser.json"
+      ]
     },
     {
       "id": "L85-assassin-shoulders",
@@ -2916,10 +3596,20 @@
       "kind": "shoulders",
       "item": "assassin_shoulders_shadow_l85_gray",
       "name": "Sandworn Nightweave Spaulders",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_shoulders_regearl85.png",
+        "client/assets/assassin_progression_shoulders_regearl85_depth.png",
+        "client/assets/assassin_f_progression_shoulders_regearl85.png",
+        "client/assets/assassin_f_progression_shoulders_regearl85_depth.png",
+        "client/assets/gear_icon_l85-assassin-shoulders.png",
+        "test-results/gear-redesign/L85-assassin-shoulders.png",
+        "test-results/gear-redesign/L85-assassin-shoulders-browser.json"
+      ]
     },
     {
       "id": "L85-assassin-gloves",
@@ -2928,10 +3618,20 @@
       "kind": "gloves",
       "item": "assassin_gloves_shadow_l85_gray",
       "name": "Sandworn Nightweave Claws",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_gloves_regearl85.png",
+        "client/assets/assassin_progression_gloves_regearl85_depth.png",
+        "client/assets/assassin_f_progression_gloves_regearl85.png",
+        "client/assets/assassin_f_progression_gloves_regearl85_depth.png",
+        "client/assets/gear_icon_l85-assassin-gloves.png",
+        "test-results/gear-redesign/L85-assassin-gloves.png",
+        "test-results/gear-redesign/L85-assassin-gloves-browser.json"
+      ]
     },
     {
       "id": "L85-assassin-weapon",
@@ -2940,10 +3640,20 @@
       "kind": "weapon",
       "item": "assassin_weapon_daggers_l85_gray",
       "name": "Sandworn Steel Daggers",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_weapon_regearl85.png",
+        "client/assets/assassin_progression_weapon_regearl85_depth.png",
+        "client/assets/assassin_f_progression_weapon_regearl85.png",
+        "client/assets/assassin_f_progression_weapon_regearl85_depth.png",
+        "client/assets/gear_icon_l85-assassin-weapon.png",
+        "test-results/gear-redesign/L85-assassin-weapon.png",
+        "test-results/gear-redesign/L85-assassin-weapon-browser.json"
+      ]
     },
     {
       "id": "L85-priest-armor",
@@ -2952,10 +3662,20 @@
       "kind": "armor",
       "item": "priest_armor_pilgrim_l85_gray",
       "name": "Sandworn Pilgrim Robes",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_armor_regearl85.png",
+        "client/assets/priest_progression_armor_regearl85_depth.png",
+        "client/assets/priest_f_progression_armor_regearl85.png",
+        "client/assets/priest_f_progression_armor_regearl85_depth.png",
+        "client/assets/gear_icon_l85-priest-armor.png",
+        "test-results/gear-redesign/L85-priest-armor.png",
+        "test-results/gear-redesign/L85-priest-armor-browser.json"
+      ]
     },
     {
       "id": "L85-priest-headgear",
@@ -2964,10 +3684,20 @@
       "kind": "headgear",
       "item": "priest_headgear_pilgrim_l85_gray",
       "name": "Sandworn Pilgrim's Hood",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_head_regearl85.png",
+        "client/assets/priest_progression_head_regearl85_depth.png",
+        "client/assets/priest_f_progression_head_regearl85.png",
+        "client/assets/priest_f_progression_head_regearl85_depth.png",
+        "client/assets/gear_icon_l85-priest-headgear.png",
+        "test-results/gear-redesign/L85-priest-headgear.png",
+        "test-results/gear-redesign/L85-priest-headgear-browser.json"
+      ]
     },
     {
       "id": "L85-priest-shoulders",
@@ -2976,10 +3706,20 @@
       "kind": "shoulders",
       "item": "priest_shoulders_pilgrim_l85_gray",
       "name": "Sandworn Pilgrim's Mantle",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_shoulders_regearl85.png",
+        "client/assets/priest_progression_shoulders_regearl85_depth.png",
+        "client/assets/priest_f_progression_shoulders_regearl85.png",
+        "client/assets/priest_f_progression_shoulders_regearl85_depth.png",
+        "client/assets/gear_icon_l85-priest-shoulders.png",
+        "test-results/gear-redesign/L85-priest-shoulders.png",
+        "test-results/gear-redesign/L85-priest-shoulders-browser.json"
+      ]
     },
     {
       "id": "L85-priest-gloves",
@@ -2988,10 +3728,20 @@
       "kind": "gloves",
       "item": "priest_gloves_pilgrim_l85_gray",
       "name": "Sandworn Pilgrim's Mitts",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_gloves_regearl85.png",
+        "client/assets/priest_progression_gloves_regearl85_depth.png",
+        "client/assets/priest_f_progression_gloves_regearl85.png",
+        "client/assets/priest_f_progression_gloves_regearl85_depth.png",
+        "client/assets/gear_icon_l85-priest-gloves.png",
+        "test-results/gear-redesign/L85-priest-gloves.png",
+        "test-results/gear-redesign/L85-priest-gloves-browser.json"
+      ]
     },
     {
       "id": "L85-priest-weapon",
@@ -3000,10 +3750,20 @@
       "kind": "weapon",
       "item": "priest_weapon_mace_l85_gray",
       "name": "Sandworn Oak Mace",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_weapon_regearl85.png",
+        "client/assets/priest_progression_weapon_regearl85_depth.png",
+        "client/assets/priest_f_progression_weapon_regearl85.png",
+        "client/assets/priest_f_progression_weapon_regearl85_depth.png",
+        "client/assets/gear_icon_l85-priest-weapon.png",
+        "test-results/gear-redesign/L85-priest-weapon.png",
+        "test-results/gear-redesign/L85-priest-weapon-browser.json"
+      ]
     },
     {
       "id": "L85-hunter-armor",
@@ -3012,10 +3772,20 @@
       "kind": "armor",
       "item": "hunter_armor_scout_l85_gray",
       "name": "Sandworn Scout's Jerkin",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_armor_regearl85.png",
+        "client/assets/hunter_progression_armor_regearl85_depth.png",
+        "client/assets/hunter_f_progression_armor_regearl85.png",
+        "client/assets/hunter_f_progression_armor_regearl85_depth.png",
+        "client/assets/gear_icon_l85-hunter-armor.png",
+        "test-results/gear-redesign/L85-hunter-armor.png",
+        "test-results/gear-redesign/L85-hunter-armor-browser.json"
+      ]
     },
     {
       "id": "L85-hunter-headgear",
@@ -3024,10 +3794,20 @@
       "kind": "headgear",
       "item": "hunter_headgear_scout_l85_gray",
       "name": "Sandworn Feathered Headband",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_head_regearl85.png",
+        "client/assets/hunter_progression_head_regearl85_depth.png",
+        "client/assets/hunter_f_progression_head_regearl85.png",
+        "client/assets/hunter_f_progression_head_regearl85_depth.png",
+        "client/assets/gear_icon_l85-hunter-headgear.png",
+        "test-results/gear-redesign/L85-hunter-headgear.png",
+        "test-results/gear-redesign/L85-hunter-headgear-browser.json"
+      ]
     },
     {
       "id": "L85-hunter-shoulders",
@@ -3036,10 +3816,20 @@
       "kind": "shoulders",
       "item": "hunter_shoulders_scout_l85_gray",
       "name": "Sandworn Scout's Mantle",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_shoulders_regearl85.png",
+        "client/assets/hunter_progression_shoulders_regearl85_depth.png",
+        "client/assets/hunter_f_progression_shoulders_regearl85.png",
+        "client/assets/hunter_f_progression_shoulders_regearl85_depth.png",
+        "client/assets/gear_icon_l85-hunter-shoulders.png",
+        "test-results/gear-redesign/L85-hunter-shoulders.png",
+        "test-results/gear-redesign/L85-hunter-shoulders-browser.json"
+      ]
     },
     {
       "id": "L85-hunter-gloves",
@@ -3048,10 +3838,20 @@
       "kind": "gloves",
       "item": "hunter_gloves_scout_l85_gray",
       "name": "Sandworn Scout's Bracers",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_gloves_regearl85.png",
+        "client/assets/hunter_progression_gloves_regearl85_depth.png",
+        "client/assets/hunter_f_progression_gloves_regearl85.png",
+        "client/assets/hunter_f_progression_gloves_regearl85_depth.png",
+        "client/assets/gear_icon_l85-hunter-gloves.png",
+        "test-results/gear-redesign/L85-hunter-gloves.png",
+        "test-results/gear-redesign/L85-hunter-gloves-browser.json"
+      ]
     },
     {
       "id": "L85-hunter-weapon",
@@ -3060,10 +3860,20 @@
       "kind": "weapon",
       "item": "hunter_weapon_shortbow_l85_gray",
       "name": "Sandworn Hunter's Shortbow",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_weapon_regearl85.png",
+        "client/assets/hunter_progression_weapon_regearl85_depth.png",
+        "client/assets/hunter_f_progression_weapon_regearl85.png",
+        "client/assets/hunter_f_progression_weapon_regearl85_depth.png",
+        "client/assets/gear_icon_l85-hunter-weapon.png",
+        "test-results/gear-redesign/L85-hunter-weapon.png",
+        "test-results/gear-redesign/L85-hunter-weapon-browser.json"
+      ]
     },
     {
       "id": "L85-shared-pants",
@@ -3072,10 +3882,36 @@
       "kind": "pants",
       "item": "pants_wayfarer_l85_gray",
       "name": "Sandworn Wayfarer Pants",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_pants_regearl85.png",
+        "client/assets/assassin_progression_pants_regearl85_depth.png",
+        "client/assets/assassin_f_progression_pants_regearl85.png",
+        "client/assets/assassin_f_progression_pants_regearl85_depth.png",
+        "client/assets/warrior_progression_pants_regearl85.png",
+        "client/assets/warrior_progression_pants_regearl85_depth.png",
+        "client/assets/warrior_f_progression_pants_regearl85.png",
+        "client/assets/warrior_f_progression_pants_regearl85_depth.png",
+        "client/assets/mage_progression_pants_regearl85.png",
+        "client/assets/mage_progression_pants_regearl85_depth.png",
+        "client/assets/mage_f_progression_pants_regearl85.png",
+        "client/assets/mage_f_progression_pants_regearl85_depth.png",
+        "client/assets/priest_progression_pants_regearl85.png",
+        "client/assets/priest_progression_pants_regearl85_depth.png",
+        "client/assets/priest_f_progression_pants_regearl85.png",
+        "client/assets/priest_f_progression_pants_regearl85_depth.png",
+        "client/assets/hunter_progression_pants_regearl85.png",
+        "client/assets/hunter_progression_pants_regearl85_depth.png",
+        "client/assets/hunter_f_progression_pants_regearl85.png",
+        "client/assets/hunter_f_progression_pants_regearl85_depth.png",
+        "client/assets/gear_icon_l85-shared-pants.png",
+        "test-results/gear-redesign/L85-shared-pants.png",
+        "test-results/gear-redesign/L85-shared-pants-browser.json"
+      ]
     },
     {
       "id": "L85-shared-necklace",
@@ -3084,10 +3920,36 @@
       "kind": "necklace",
       "item": "necklace_moonstone_l85_gray",
       "name": "Sandworn Moonstone Necklace",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_necklace_regearl85.png",
+        "client/assets/assassin_progression_necklace_regearl85_depth.png",
+        "client/assets/assassin_f_progression_necklace_regearl85.png",
+        "client/assets/assassin_f_progression_necklace_regearl85_depth.png",
+        "client/assets/warrior_progression_necklace_regearl85.png",
+        "client/assets/warrior_progression_necklace_regearl85_depth.png",
+        "client/assets/warrior_f_progression_necklace_regearl85.png",
+        "client/assets/warrior_f_progression_necklace_regearl85_depth.png",
+        "client/assets/mage_progression_necklace_regearl85.png",
+        "client/assets/mage_progression_necklace_regearl85_depth.png",
+        "client/assets/mage_f_progression_necklace_regearl85.png",
+        "client/assets/mage_f_progression_necklace_regearl85_depth.png",
+        "client/assets/priest_progression_necklace_regearl85.png",
+        "client/assets/priest_progression_necklace_regearl85_depth.png",
+        "client/assets/priest_f_progression_necklace_regearl85.png",
+        "client/assets/priest_f_progression_necklace_regearl85_depth.png",
+        "client/assets/hunter_progression_necklace_regearl85.png",
+        "client/assets/hunter_progression_necklace_regearl85_depth.png",
+        "client/assets/hunter_f_progression_necklace_regearl85.png",
+        "client/assets/hunter_f_progression_necklace_regearl85_depth.png",
+        "client/assets/gear_icon_l85-shared-necklace.png",
+        "test-results/gear-redesign/L85-shared-necklace.png",
+        "test-results/gear-redesign/L85-shared-necklace-browser.json"
+      ]
     },
     {
       "id": "L85-shared-accessory",
@@ -3096,10 +3958,36 @@
       "kind": "accessory",
       "item": "accessory_amber_l85_gray",
       "name": "Sandworn Amber Ring",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_accessory_regearl85.png",
+        "client/assets/assassin_progression_accessory_regearl85_depth.png",
+        "client/assets/assassin_f_progression_accessory_regearl85.png",
+        "client/assets/assassin_f_progression_accessory_regearl85_depth.png",
+        "client/assets/warrior_progression_accessory_regearl85.png",
+        "client/assets/warrior_progression_accessory_regearl85_depth.png",
+        "client/assets/warrior_f_progression_accessory_regearl85.png",
+        "client/assets/warrior_f_progression_accessory_regearl85_depth.png",
+        "client/assets/mage_progression_accessory_regearl85.png",
+        "client/assets/mage_progression_accessory_regearl85_depth.png",
+        "client/assets/mage_f_progression_accessory_regearl85.png",
+        "client/assets/mage_f_progression_accessory_regearl85_depth.png",
+        "client/assets/priest_progression_accessory_regearl85.png",
+        "client/assets/priest_progression_accessory_regearl85_depth.png",
+        "client/assets/priest_f_progression_accessory_regearl85.png",
+        "client/assets/priest_f_progression_accessory_regearl85_depth.png",
+        "client/assets/hunter_progression_accessory_regearl85.png",
+        "client/assets/hunter_progression_accessory_regearl85_depth.png",
+        "client/assets/hunter_f_progression_accessory_regearl85.png",
+        "client/assets/hunter_f_progression_accessory_regearl85_depth.png",
+        "client/assets/gear_icon_l85-shared-accessory.png",
+        "test-results/gear-redesign/L85-shared-accessory.png",
+        "test-results/gear-redesign/L85-shared-accessory-browser.json"
+      ]
     },
     {
       "id": "L90-warrior-armor",
@@ -3108,10 +3996,20 @@
       "kind": "armor",
       "item": "warrior_armor_crimson_l90_gray",
       "name": "Snowworn Crimson Armor",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_armor_regearl90.png",
+        "client/assets/warrior_progression_armor_regearl90_depth.png",
+        "client/assets/warrior_f_progression_armor_regearl90.png",
+        "client/assets/warrior_f_progression_armor_regearl90_depth.png",
+        "client/assets/gear_icon_l90-warrior-armor.png",
+        "test-results/gear-redesign/L90-warrior-armor.png",
+        "test-results/gear-redesign/L90-warrior-armor-browser.json"
+      ]
     },
     {
       "id": "L90-warrior-headgear",
@@ -3120,10 +4018,20 @@
       "kind": "headgear",
       "item": "warrior_headgear_crimson_l90_gray",
       "name": "Snowworn Crimson Plumed Helm",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_head_regearl90.png",
+        "client/assets/warrior_progression_head_regearl90_depth.png",
+        "client/assets/warrior_f_progression_head_regearl90.png",
+        "client/assets/warrior_f_progression_head_regearl90_depth.png",
+        "client/assets/gear_icon_l90-warrior-headgear.png",
+        "test-results/gear-redesign/L90-warrior-headgear.png",
+        "test-results/gear-redesign/L90-warrior-headgear-browser.json"
+      ]
     },
     {
       "id": "L90-warrior-shoulders",
@@ -3132,10 +4040,20 @@
       "kind": "shoulders",
       "item": "warrior_shoulders_crimson_l90_gray",
       "name": "Snowworn Crimson Pauldrons",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_shoulders_regearl90.png",
+        "client/assets/warrior_progression_shoulders_regearl90_depth.png",
+        "client/assets/warrior_f_progression_shoulders_regearl90.png",
+        "client/assets/warrior_f_progression_shoulders_regearl90_depth.png",
+        "client/assets/gear_icon_l90-warrior-shoulders.png",
+        "test-results/gear-redesign/L90-warrior-shoulders.png",
+        "test-results/gear-redesign/L90-warrior-shoulders-browser.json"
+      ]
     },
     {
       "id": "L90-warrior-gloves",
@@ -3144,10 +4062,20 @@
       "kind": "gloves",
       "item": "warrior_gloves_crimson_l90_gray",
       "name": "Snowworn Crimson Gauntlets",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_gloves_regearl90.png",
+        "client/assets/warrior_progression_gloves_regearl90_depth.png",
+        "client/assets/warrior_f_progression_gloves_regearl90.png",
+        "client/assets/warrior_f_progression_gloves_regearl90_depth.png",
+        "client/assets/gear_icon_l90-warrior-gloves.png",
+        "test-results/gear-redesign/L90-warrior-gloves.png",
+        "test-results/gear-redesign/L90-warrior-gloves-browser.json"
+      ]
     },
     {
       "id": "L90-warrior-weapon",
@@ -3156,10 +4084,20 @@
       "kind": "weapon",
       "item": "warrior_weapon_sword_l90_gray",
       "name": "Snowworn Iron Sword",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_weapon_regearl90.png",
+        "client/assets/warrior_progression_weapon_regearl90_depth.png",
+        "client/assets/warrior_f_progression_weapon_regearl90.png",
+        "client/assets/warrior_f_progression_weapon_regearl90_depth.png",
+        "client/assets/gear_icon_l90-warrior-weapon.png",
+        "test-results/gear-redesign/L90-warrior-weapon.png",
+        "test-results/gear-redesign/L90-warrior-weapon-browser.json"
+      ]
     },
     {
       "id": "L90-mage-armor",
@@ -3168,10 +4106,21 @@
       "kind": "armor",
       "item": "mage_armor_apprentice_l90_gray",
       "name": "Snowworn Apprentice Robes",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "scripts/gear_shapes_high.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_armor_regearl90.png",
+        "client/assets/mage_progression_armor_regearl90_depth.png",
+        "client/assets/mage_f_progression_armor_regearl90.png",
+        "client/assets/mage_f_progression_armor_regearl90_depth.png",
+        "client/assets/gear_icon_l90-mage-armor.png",
+        "test-results/gear-redesign/L90-mage-armor.png",
+        "test-results/gear-redesign/L90-mage-armor-browser.json"
+      ]
     },
     {
       "id": "L90-mage-headgear",
@@ -3180,10 +4129,21 @@
       "kind": "headgear",
       "item": "mage_headgear_apprentice_l90_gray",
       "name": "Snowworn Apprentice's Hat",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "scripts/gear_shapes_high.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_head_regearl90.png",
+        "client/assets/mage_progression_head_regearl90_depth.png",
+        "client/assets/mage_f_progression_head_regearl90.png",
+        "client/assets/mage_f_progression_head_regearl90_depth.png",
+        "client/assets/gear_icon_l90-mage-headgear.png",
+        "test-results/gear-redesign/L90-mage-headgear.png",
+        "test-results/gear-redesign/L90-mage-headgear-browser.json"
+      ]
     },
     {
       "id": "L90-mage-shoulders",
@@ -3192,10 +4152,21 @@
       "kind": "shoulders",
       "item": "mage_shoulders_apprentice_l90_gray",
       "name": "Snowworn Apprentice's Capelet",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "scripts/gear_shapes_high.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_shoulders_regearl90.png",
+        "client/assets/mage_progression_shoulders_regearl90_depth.png",
+        "client/assets/mage_f_progression_shoulders_regearl90.png",
+        "client/assets/mage_f_progression_shoulders_regearl90_depth.png",
+        "client/assets/gear_icon_l90-mage-shoulders.png",
+        "test-results/gear-redesign/L90-mage-shoulders.png",
+        "test-results/gear-redesign/L90-mage-shoulders-browser.json"
+      ]
     },
     {
       "id": "L90-mage-gloves",
@@ -3204,10 +4175,21 @@
       "kind": "gloves",
       "item": "mage_gloves_apprentice_l90_gray",
       "name": "Snowworn Apprentice's Gloves",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "scripts/gear_shapes_high.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_gloves_regearl90.png",
+        "client/assets/mage_progression_gloves_regearl90_depth.png",
+        "client/assets/mage_f_progression_gloves_regearl90.png",
+        "client/assets/mage_f_progression_gloves_regearl90_depth.png",
+        "client/assets/gear_icon_l90-mage-gloves.png",
+        "test-results/gear-redesign/L90-mage-gloves.png",
+        "test-results/gear-redesign/L90-mage-gloves-browser.json"
+      ]
     },
     {
       "id": "L90-mage-weapon",
@@ -3216,10 +4198,21 @@
       "kind": "weapon",
       "item": "mage_weapon_ash_l90_gray",
       "name": "Snowworn Ash Staff",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "scripts/gear_shapes_high.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_weapon_regearl90.png",
+        "client/assets/mage_progression_weapon_regearl90_depth.png",
+        "client/assets/mage_f_progression_weapon_regearl90.png",
+        "client/assets/mage_f_progression_weapon_regearl90_depth.png",
+        "client/assets/gear_icon_l90-mage-weapon.png",
+        "test-results/gear-redesign/L90-mage-weapon.png",
+        "test-results/gear-redesign/L90-mage-weapon-browser.json"
+      ]
     },
     {
       "id": "L90-assassin-armor",
@@ -3228,10 +4221,20 @@
       "kind": "armor",
       "item": "assassin_armor_shadow_l90_gray",
       "name": "Snowworn Shadow Armor",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_armor_regearl90.png",
+        "client/assets/assassin_progression_armor_regearl90_depth.png",
+        "client/assets/assassin_f_progression_armor_regearl90.png",
+        "client/assets/assassin_f_progression_armor_regearl90_depth.png",
+        "client/assets/gear_icon_l90-assassin-armor.png",
+        "test-results/gear-redesign/L90-assassin-armor.png",
+        "test-results/gear-redesign/L90-assassin-armor-browser.json"
+      ]
     },
     {
       "id": "L90-assassin-headgear",
@@ -3240,10 +4243,20 @@
       "kind": "headgear",
       "item": "assassin_headgear_shadow_l90_gray",
       "name": "Snowworn Shadow Brow Band",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_head_regearl90.png",
+        "client/assets/assassin_progression_head_regearl90_depth.png",
+        "client/assets/assassin_f_progression_head_regearl90.png",
+        "client/assets/assassin_f_progression_head_regearl90_depth.png",
+        "client/assets/gear_icon_l90-assassin-headgear.png",
+        "test-results/gear-redesign/L90-assassin-headgear.png",
+        "test-results/gear-redesign/L90-assassin-headgear-browser.json"
+      ]
     },
     {
       "id": "L90-assassin-shoulders",
@@ -3252,10 +4265,20 @@
       "kind": "shoulders",
       "item": "assassin_shoulders_shadow_l90_gray",
       "name": "Snowworn Nightweave Spaulders",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_shoulders_regearl90.png",
+        "client/assets/assassin_progression_shoulders_regearl90_depth.png",
+        "client/assets/assassin_f_progression_shoulders_regearl90.png",
+        "client/assets/assassin_f_progression_shoulders_regearl90_depth.png",
+        "client/assets/gear_icon_l90-assassin-shoulders.png",
+        "test-results/gear-redesign/L90-assassin-shoulders.png",
+        "test-results/gear-redesign/L90-assassin-shoulders-browser.json"
+      ]
     },
     {
       "id": "L90-assassin-gloves",
@@ -3264,10 +4287,20 @@
       "kind": "gloves",
       "item": "assassin_gloves_shadow_l90_gray",
       "name": "Snowworn Nightweave Claws",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_gloves_regearl90.png",
+        "client/assets/assassin_progression_gloves_regearl90_depth.png",
+        "client/assets/assassin_f_progression_gloves_regearl90.png",
+        "client/assets/assassin_f_progression_gloves_regearl90_depth.png",
+        "client/assets/gear_icon_l90-assassin-gloves.png",
+        "test-results/gear-redesign/L90-assassin-gloves.png",
+        "test-results/gear-redesign/L90-assassin-gloves-browser.json"
+      ]
     },
     {
       "id": "L90-assassin-weapon",
@@ -3276,10 +4309,20 @@
       "kind": "weapon",
       "item": "assassin_weapon_daggers_l90_gray",
       "name": "Snowworn Steel Daggers",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_weapon_regearl90.png",
+        "client/assets/assassin_progression_weapon_regearl90_depth.png",
+        "client/assets/assassin_f_progression_weapon_regearl90.png",
+        "client/assets/assassin_f_progression_weapon_regearl90_depth.png",
+        "client/assets/gear_icon_l90-assassin-weapon.png",
+        "test-results/gear-redesign/L90-assassin-weapon.png",
+        "test-results/gear-redesign/L90-assassin-weapon-browser.json"
+      ]
     },
     {
       "id": "L90-priest-armor",
@@ -3288,10 +4331,20 @@
       "kind": "armor",
       "item": "priest_armor_pilgrim_l90_gray",
       "name": "Snowworn Pilgrim Robes",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_armor_regearl90.png",
+        "client/assets/priest_progression_armor_regearl90_depth.png",
+        "client/assets/priest_f_progression_armor_regearl90.png",
+        "client/assets/priest_f_progression_armor_regearl90_depth.png",
+        "client/assets/gear_icon_l90-priest-armor.png",
+        "test-results/gear-redesign/L90-priest-armor.png",
+        "test-results/gear-redesign/L90-priest-armor-browser.json"
+      ]
     },
     {
       "id": "L90-priest-headgear",
@@ -3300,10 +4353,20 @@
       "kind": "headgear",
       "item": "priest_headgear_pilgrim_l90_gray",
       "name": "Snowworn Pilgrim's Hood",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_head_regearl90.png",
+        "client/assets/priest_progression_head_regearl90_depth.png",
+        "client/assets/priest_f_progression_head_regearl90.png",
+        "client/assets/priest_f_progression_head_regearl90_depth.png",
+        "client/assets/gear_icon_l90-priest-headgear.png",
+        "test-results/gear-redesign/L90-priest-headgear.png",
+        "test-results/gear-redesign/L90-priest-headgear-browser.json"
+      ]
     },
     {
       "id": "L90-priest-shoulders",
@@ -3312,10 +4375,20 @@
       "kind": "shoulders",
       "item": "priest_shoulders_pilgrim_l90_gray",
       "name": "Snowworn Pilgrim's Mantle",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_shoulders_regearl90.png",
+        "client/assets/priest_progression_shoulders_regearl90_depth.png",
+        "client/assets/priest_f_progression_shoulders_regearl90.png",
+        "client/assets/priest_f_progression_shoulders_regearl90_depth.png",
+        "client/assets/gear_icon_l90-priest-shoulders.png",
+        "test-results/gear-redesign/L90-priest-shoulders.png",
+        "test-results/gear-redesign/L90-priest-shoulders-browser.json"
+      ]
     },
     {
       "id": "L90-priest-gloves",
@@ -3324,10 +4397,20 @@
       "kind": "gloves",
       "item": "priest_gloves_pilgrim_l90_gray",
       "name": "Snowworn Pilgrim's Mitts",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_gloves_regearl90.png",
+        "client/assets/priest_progression_gloves_regearl90_depth.png",
+        "client/assets/priest_f_progression_gloves_regearl90.png",
+        "client/assets/priest_f_progression_gloves_regearl90_depth.png",
+        "client/assets/gear_icon_l90-priest-gloves.png",
+        "test-results/gear-redesign/L90-priest-gloves.png",
+        "test-results/gear-redesign/L90-priest-gloves-browser.json"
+      ]
     },
     {
       "id": "L90-priest-weapon",
@@ -3336,10 +4419,20 @@
       "kind": "weapon",
       "item": "priest_weapon_mace_l90_gray",
       "name": "Snowworn Oak Mace",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_weapon_regearl90.png",
+        "client/assets/priest_progression_weapon_regearl90_depth.png",
+        "client/assets/priest_f_progression_weapon_regearl90.png",
+        "client/assets/priest_f_progression_weapon_regearl90_depth.png",
+        "client/assets/gear_icon_l90-priest-weapon.png",
+        "test-results/gear-redesign/L90-priest-weapon.png",
+        "test-results/gear-redesign/L90-priest-weapon-browser.json"
+      ]
     },
     {
       "id": "L90-hunter-armor",
@@ -3348,10 +4441,20 @@
       "kind": "armor",
       "item": "hunter_armor_scout_l90_gray",
       "name": "Snowworn Scout's Jerkin",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_armor_regearl90.png",
+        "client/assets/hunter_progression_armor_regearl90_depth.png",
+        "client/assets/hunter_f_progression_armor_regearl90.png",
+        "client/assets/hunter_f_progression_armor_regearl90_depth.png",
+        "client/assets/gear_icon_l90-hunter-armor.png",
+        "test-results/gear-redesign/L90-hunter-armor.png",
+        "test-results/gear-redesign/L90-hunter-armor-browser.json"
+      ]
     },
     {
       "id": "L90-hunter-headgear",
@@ -3360,10 +4463,20 @@
       "kind": "headgear",
       "item": "hunter_headgear_scout_l90_gray",
       "name": "Snowworn Feathered Headband",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_head_regearl90.png",
+        "client/assets/hunter_progression_head_regearl90_depth.png",
+        "client/assets/hunter_f_progression_head_regearl90.png",
+        "client/assets/hunter_f_progression_head_regearl90_depth.png",
+        "client/assets/gear_icon_l90-hunter-headgear.png",
+        "test-results/gear-redesign/L90-hunter-headgear.png",
+        "test-results/gear-redesign/L90-hunter-headgear-browser.json"
+      ]
     },
     {
       "id": "L90-hunter-shoulders",
@@ -3372,10 +4485,20 @@
       "kind": "shoulders",
       "item": "hunter_shoulders_scout_l90_gray",
       "name": "Snowworn Scout's Mantle",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_shoulders_regearl90.png",
+        "client/assets/hunter_progression_shoulders_regearl90_depth.png",
+        "client/assets/hunter_f_progression_shoulders_regearl90.png",
+        "client/assets/hunter_f_progression_shoulders_regearl90_depth.png",
+        "client/assets/gear_icon_l90-hunter-shoulders.png",
+        "test-results/gear-redesign/L90-hunter-shoulders.png",
+        "test-results/gear-redesign/L90-hunter-shoulders-browser.json"
+      ]
     },
     {
       "id": "L90-hunter-gloves",
@@ -3384,10 +4507,20 @@
       "kind": "gloves",
       "item": "hunter_gloves_scout_l90_gray",
       "name": "Snowworn Scout's Bracers",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_gloves_regearl90.png",
+        "client/assets/hunter_progression_gloves_regearl90_depth.png",
+        "client/assets/hunter_f_progression_gloves_regearl90.png",
+        "client/assets/hunter_f_progression_gloves_regearl90_depth.png",
+        "client/assets/gear_icon_l90-hunter-gloves.png",
+        "test-results/gear-redesign/L90-hunter-gloves.png",
+        "test-results/gear-redesign/L90-hunter-gloves-browser.json"
+      ]
     },
     {
       "id": "L90-hunter-weapon",
@@ -3396,10 +4529,20 @@
       "kind": "weapon",
       "item": "hunter_weapon_shortbow_l90_gray",
       "name": "Snowworn Hunter's Shortbow",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_weapon_regearl90.png",
+        "client/assets/hunter_progression_weapon_regearl90_depth.png",
+        "client/assets/hunter_f_progression_weapon_regearl90.png",
+        "client/assets/hunter_f_progression_weapon_regearl90_depth.png",
+        "client/assets/gear_icon_l90-hunter-weapon.png",
+        "test-results/gear-redesign/L90-hunter-weapon.png",
+        "test-results/gear-redesign/L90-hunter-weapon-browser.json"
+      ]
     },
     {
       "id": "L90-shared-pants",
@@ -3408,10 +4551,36 @@
       "kind": "pants",
       "item": "pants_wayfarer_l90_gray",
       "name": "Snowworn Wayfarer Pants",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_pants_regearl90.png",
+        "client/assets/assassin_progression_pants_regearl90_depth.png",
+        "client/assets/assassin_f_progression_pants_regearl90.png",
+        "client/assets/assassin_f_progression_pants_regearl90_depth.png",
+        "client/assets/warrior_progression_pants_regearl90.png",
+        "client/assets/warrior_progression_pants_regearl90_depth.png",
+        "client/assets/warrior_f_progression_pants_regearl90.png",
+        "client/assets/warrior_f_progression_pants_regearl90_depth.png",
+        "client/assets/mage_progression_pants_regearl90.png",
+        "client/assets/mage_progression_pants_regearl90_depth.png",
+        "client/assets/mage_f_progression_pants_regearl90.png",
+        "client/assets/mage_f_progression_pants_regearl90_depth.png",
+        "client/assets/priest_progression_pants_regearl90.png",
+        "client/assets/priest_progression_pants_regearl90_depth.png",
+        "client/assets/priest_f_progression_pants_regearl90.png",
+        "client/assets/priest_f_progression_pants_regearl90_depth.png",
+        "client/assets/hunter_progression_pants_regearl90.png",
+        "client/assets/hunter_progression_pants_regearl90_depth.png",
+        "client/assets/hunter_f_progression_pants_regearl90.png",
+        "client/assets/hunter_f_progression_pants_regearl90_depth.png",
+        "client/assets/gear_icon_l90-shared-pants.png",
+        "test-results/gear-redesign/L90-shared-pants.png",
+        "test-results/gear-redesign/L90-shared-pants-browser.json"
+      ]
     },
     {
       "id": "L90-shared-necklace",
@@ -3420,10 +4589,36 @@
       "kind": "necklace",
       "item": "necklace_moonstone_l90_gray",
       "name": "Snowworn Moonstone Necklace",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_necklace_regearl90.png",
+        "client/assets/assassin_progression_necklace_regearl90_depth.png",
+        "client/assets/assassin_f_progression_necklace_regearl90.png",
+        "client/assets/assassin_f_progression_necklace_regearl90_depth.png",
+        "client/assets/warrior_progression_necklace_regearl90.png",
+        "client/assets/warrior_progression_necklace_regearl90_depth.png",
+        "client/assets/warrior_f_progression_necklace_regearl90.png",
+        "client/assets/warrior_f_progression_necklace_regearl90_depth.png",
+        "client/assets/mage_progression_necklace_regearl90.png",
+        "client/assets/mage_progression_necklace_regearl90_depth.png",
+        "client/assets/mage_f_progression_necklace_regearl90.png",
+        "client/assets/mage_f_progression_necklace_regearl90_depth.png",
+        "client/assets/priest_progression_necklace_regearl90.png",
+        "client/assets/priest_progression_necklace_regearl90_depth.png",
+        "client/assets/priest_f_progression_necklace_regearl90.png",
+        "client/assets/priest_f_progression_necklace_regearl90_depth.png",
+        "client/assets/hunter_progression_necklace_regearl90.png",
+        "client/assets/hunter_progression_necklace_regearl90_depth.png",
+        "client/assets/hunter_f_progression_necklace_regearl90.png",
+        "client/assets/hunter_f_progression_necklace_regearl90_depth.png",
+        "client/assets/gear_icon_l90-shared-necklace.png",
+        "test-results/gear-redesign/L90-shared-necklace.png",
+        "test-results/gear-redesign/L90-shared-necklace-browser.json"
+      ]
     },
     {
       "id": "L90-shared-accessory",
@@ -3432,10 +4627,36 @@
       "kind": "accessory",
       "item": "accessory_amber_l90_gray",
       "name": "Snowworn Amber Ring",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "All poses on both bodies clear; PixelFlow export, catalog/icon mapping, and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_accessory_regearl90.png",
+        "client/assets/assassin_progression_accessory_regearl90_depth.png",
+        "client/assets/assassin_f_progression_accessory_regearl90.png",
+        "client/assets/assassin_f_progression_accessory_regearl90_depth.png",
+        "client/assets/warrior_progression_accessory_regearl90.png",
+        "client/assets/warrior_progression_accessory_regearl90_depth.png",
+        "client/assets/warrior_f_progression_accessory_regearl90.png",
+        "client/assets/warrior_f_progression_accessory_regearl90_depth.png",
+        "client/assets/mage_progression_accessory_regearl90.png",
+        "client/assets/mage_progression_accessory_regearl90_depth.png",
+        "client/assets/mage_f_progression_accessory_regearl90.png",
+        "client/assets/mage_f_progression_accessory_regearl90_depth.png",
+        "client/assets/priest_progression_accessory_regearl90.png",
+        "client/assets/priest_progression_accessory_regearl90_depth.png",
+        "client/assets/priest_f_progression_accessory_regearl90.png",
+        "client/assets/priest_f_progression_accessory_regearl90_depth.png",
+        "client/assets/hunter_progression_accessory_regearl90.png",
+        "client/assets/hunter_progression_accessory_regearl90_depth.png",
+        "client/assets/hunter_f_progression_accessory_regearl90.png",
+        "client/assets/hunter_f_progression_accessory_regearl90_depth.png",
+        "client/assets/gear_icon_l90-shared-accessory.png",
+        "test-results/gear-redesign/L90-shared-accessory.png",
+        "test-results/gear-redesign/L90-shared-accessory-browser.json"
+      ]
     },
     {
       "id": "L95-warrior-armor",

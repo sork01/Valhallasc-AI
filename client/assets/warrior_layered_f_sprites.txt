@@ -528,6 +528,114 @@
     "weapon_regearl75": {
       "png": "warrior_f_progression_weapon_regearl75.png",
       "depth": "warrior_f_progression_weapon_regearl75_depth.png"
+    },
+    "pants_regearl75": {
+      "png": "warrior_f_progression_pants_regearl75.png",
+      "depth": "warrior_f_progression_pants_regearl75_depth.png"
+    },
+    "necklace_regearl75": {
+      "png": "warrior_f_progression_necklace_regearl75.png",
+      "depth": "warrior_f_progression_necklace_regearl75_depth.png"
+    },
+    "accessory_regearl75": {
+      "png": "warrior_f_progression_accessory_regearl75.png",
+      "depth": "warrior_f_progression_accessory_regearl75_depth.png"
+    },
+    "armor_regearl80": {
+      "png": "warrior_f_progression_armor_regearl80.png",
+      "depth": "warrior_f_progression_armor_regearl80_depth.png"
+    },
+    "head_regearl80": {
+      "png": "warrior_f_progression_head_regearl80.png",
+      "depth": "warrior_f_progression_head_regearl80_depth.png"
+    },
+    "shoulders_regearl80": {
+      "png": "warrior_f_progression_shoulders_regearl80.png",
+      "depth": "warrior_f_progression_shoulders_regearl80_depth.png"
+    },
+    "gloves_regearl80": {
+      "png": "warrior_f_progression_gloves_regearl80.png",
+      "depth": "warrior_f_progression_gloves_regearl80_depth.png"
+    },
+    "weapon_regearl80": {
+      "png": "warrior_f_progression_weapon_regearl80.png",
+      "depth": "warrior_f_progression_weapon_regearl80_depth.png"
+    },
+    "pants_regearl80": {
+      "png": "warrior_f_progression_pants_regearl80.png",
+      "depth": "warrior_f_progression_pants_regearl80_depth.png"
+    },
+    "necklace_regearl80": {
+      "png": "warrior_f_progression_necklace_regearl80.png",
+      "depth": "warrior_f_progression_necklace_regearl80_depth.png"
+    },
+    "accessory_regearl80": {
+      "png": "warrior_f_progression_accessory_regearl80.png",
+      "depth": "warrior_f_progression_accessory_regearl80_depth.png"
+    },
+    "armor_regearl85": {
+      "png": "warrior_f_progression_armor_regearl85.png",
+      "depth": "warrior_f_progression_armor_regearl85_depth.png"
+    },
+    "head_regearl85": {
+      "png": "warrior_f_progression_head_regearl85.png",
+      "depth": "warrior_f_progression_head_regearl85_depth.png"
+    },
+    "shoulders_regearl85": {
+      "png": "warrior_f_progression_shoulders_regearl85.png",
+      "depth": "warrior_f_progression_shoulders_regearl85_depth.png"
+    },
+    "gloves_regearl85": {
+      "png": "warrior_f_progression_gloves_regearl85.png",
+      "depth": "warrior_f_progression_gloves_regearl85_depth.png"
+    },
+    "weapon_regearl85": {
+      "png": "warrior_f_progression_weapon_regearl85.png",
+      "depth": "warrior_f_progression_weapon_regearl85_depth.png"
+    },
+    "pants_regearl85": {
+      "png": "warrior_f_progression_pants_regearl85.png",
+      "depth": "warrior_f_progression_pants_regearl85_depth.png"
+    },
+    "necklace_regearl85": {
+      "png": "warrior_f_progression_necklace_regearl85.png",
+      "depth": "warrior_f_progression_necklace_regearl85_depth.png"
+    },
+    "accessory_regearl85": {
+      "png": "warrior_f_progression_accessory_regearl85.png",
+      "depth": "warrior_f_progression_accessory_regearl85_depth.png"
+    },
+    "armor_regearl90": {
+      "png": "warrior_f_progression_armor_regearl90.png",
+      "depth": "warrior_f_progression_armor_regearl90_depth.png"
+    },
+    "head_regearl90": {
+      "png": "warrior_f_progression_head_regearl90.png",
+      "depth": "warrior_f_progression_head_regearl90_depth.png"
+    },
+    "shoulders_regearl90": {
+      "png": "warrior_f_progression_shoulders_regearl90.png",
+      "depth": "warrior_f_progression_shoulders_regearl90_depth.png"
+    },
+    "gloves_regearl90": {
+      "png": "warrior_f_progression_gloves_regearl90.png",
+      "depth": "warrior_f_progression_gloves_regearl90_depth.png"
+    },
+    "weapon_regearl90": {
+      "png": "warrior_f_progression_weapon_regearl90.png",
+      "depth": "warrior_f_progression_weapon_regearl90_depth.png"
+    },
+    "pants_regearl90": {
+      "png": "warrior_f_progression_pants_regearl90.png",
+      "depth": "warrior_f_progression_pants_regearl90_depth.png"
+    },
+    "necklace_regearl90": {
+      "png": "warrior_f_progression_necklace_regearl90.png",
+      "depth": "warrior_f_progression_necklace_regearl90_depth.png"
+    },
+    "accessory_regearl90": {
+      "png": "warrior_f_progression_accessory_regearl90.png",
+      "depth": "warrior_f_progression_accessory_regearl90_depth.png"
     }
   },
   "gender": "female",
@@ -865,6 +973,10 @@
     "accessory_regearl60",
     "accessory_regearl65",
     "accessory_regearl70",
+    "accessory_regearl75",
+    "accessory_regearl80",
+    "accessory_regearl85",
+    "accessory_regearl90",
     "accessory_regearnave",
     "accessory_regearreliquary",
     "armor_regearcloister",
@@ -878,6 +990,9 @@
     "armor_regearl65",
     "armor_regearl70",
     "armor_regearl75",
+    "armor_regearl80",
+    "armor_regearl85",
+    "armor_regearl90",
     "armor_regearnave",
     "armor_regearreliquary",
     "gloves_regearcloister",
@@ -891,6 +1006,9 @@
     "gloves_regearl65",
     "gloves_regearl70",
     "gloves_regearl75",
+    "gloves_regearl80",
+    "gloves_regearl85",
+    "gloves_regearl90",
     "gloves_regearnave",
     "gloves_regearreliquary",
     "head_regearcloister",
@@ -904,6 +1022,9 @@
     "head_regearl65",
     "head_regearl70",
     "head_regearl75",
+    "head_regearl80",
+    "head_regearl85",
+    "head_regearl90",
     "head_regearnave",
     "head_regearreliquary",
     "necklace_regearcloister",
@@ -916,6 +1037,10 @@
     "necklace_regearl60",
     "necklace_regearl65",
     "necklace_regearl70",
+    "necklace_regearl75",
+    "necklace_regearl80",
+    "necklace_regearl85",
+    "necklace_regearl90",
     "necklace_regearnave",
     "necklace_regearreliquary",
     "pants_regearcloister",
@@ -928,6 +1053,10 @@
     "pants_regearl60",
     "pants_regearl65",
     "pants_regearl70",
+    "pants_regearl75",
+    "pants_regearl80",
+    "pants_regearl85",
+    "pants_regearl90",
     "pants_regearnave",
     "pants_regearreliquary",
     "shoulders_regearcloister",
@@ -941,6 +1070,9 @@
     "shoulders_regearl65",
     "shoulders_regearl70",
     "shoulders_regearl75",
+    "shoulders_regearl80",
+    "shoulders_regearl85",
+    "shoulders_regearl90",
     "shoulders_regearnave",
     "shoulders_regearreliquary",
     "weapon_regearcloister",
@@ -954,6 +1086,9 @@
     "weapon_regearl65",
     "weapon_regearl70",
     "weapon_regearl75",
+    "weapon_regearl80",
+    "weapon_regearl85",
+    "weapon_regearl90",
     "weapon_regearnave",
     "weapon_regearreliquary"
   ],
@@ -1260,6 +1395,87 @@
     },
     "weapon_regearl75": {
       "local": "scripts/make_progression_gear.py export L75-warrior-weapon"
+    },
+    "pants_regearl75": {
+      "local": "scripts/make_progression_gear.py export L75-shared-pants"
+    },
+    "necklace_regearl75": {
+      "local": "scripts/make_progression_gear.py export L75-shared-necklace"
+    },
+    "accessory_regearl75": {
+      "local": "scripts/make_progression_gear.py export L75-shared-accessory"
+    },
+    "armor_regearl80": {
+      "local": "scripts/make_progression_gear.py export L80-warrior-armor"
+    },
+    "head_regearl80": {
+      "local": "scripts/make_progression_gear.py export L80-warrior-headgear"
+    },
+    "shoulders_regearl80": {
+      "local": "scripts/make_progression_gear.py export L80-warrior-shoulders"
+    },
+    "gloves_regearl80": {
+      "local": "scripts/make_progression_gear.py export L80-warrior-gloves"
+    },
+    "weapon_regearl80": {
+      "local": "scripts/make_progression_gear.py export L80-warrior-weapon"
+    },
+    "pants_regearl80": {
+      "local": "scripts/make_progression_gear.py export L80-shared-pants"
+    },
+    "necklace_regearl80": {
+      "local": "scripts/make_progression_gear.py export L80-shared-necklace"
+    },
+    "accessory_regearl80": {
+      "local": "scripts/make_progression_gear.py export L80-shared-accessory"
+    },
+    "armor_regearl85": {
+      "local": "scripts/make_progression_gear.py export L85-warrior-armor"
+    },
+    "head_regearl85": {
+      "local": "scripts/make_progression_gear.py export L85-warrior-headgear"
+    },
+    "shoulders_regearl85": {
+      "local": "scripts/make_progression_gear.py export L85-warrior-shoulders"
+    },
+    "gloves_regearl85": {
+      "local": "scripts/make_progression_gear.py export L85-warrior-gloves"
+    },
+    "weapon_regearl85": {
+      "local": "scripts/make_progression_gear.py export L85-warrior-weapon"
+    },
+    "pants_regearl85": {
+      "local": "scripts/make_progression_gear.py export L85-shared-pants"
+    },
+    "necklace_regearl85": {
+      "local": "scripts/make_progression_gear.py export L85-shared-necklace"
+    },
+    "accessory_regearl85": {
+      "local": "scripts/make_progression_gear.py export L85-shared-accessory"
+    },
+    "armor_regearl90": {
+      "local": "scripts/make_progression_gear.py export L90-warrior-armor"
+    },
+    "head_regearl90": {
+      "local": "scripts/make_progression_gear.py export L90-warrior-headgear"
+    },
+    "shoulders_regearl90": {
+      "local": "scripts/make_progression_gear.py export L90-warrior-shoulders"
+    },
+    "gloves_regearl90": {
+      "local": "scripts/make_progression_gear.py export L90-warrior-gloves"
+    },
+    "weapon_regearl90": {
+      "local": "scripts/make_progression_gear.py export L90-warrior-weapon"
+    },
+    "pants_regearl90": {
+      "local": "scripts/make_progression_gear.py export L90-shared-pants"
+    },
+    "necklace_regearl90": {
+      "local": "scripts/make_progression_gear.py export L90-shared-necklace"
+    },
+    "accessory_regearl90": {
+      "local": "scripts/make_progression_gear.py export L90-shared-accessory"
     }
   }
 }

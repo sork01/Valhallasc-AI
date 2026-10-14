@@ -42,7 +42,7 @@ print('252 gear redesign pieces have source art, both-body atlas parts, catalog 
 
 high = read('docs/high-gear-state.txt')['tasks']
 assert len(high) == 224
-assert all(task['done'] for task in high[:94])
+assert all(task['done'] for task in high[:196])
 completed_high = [task for task in high if task['done']]
 for task in completed_high:
     job = task['id']

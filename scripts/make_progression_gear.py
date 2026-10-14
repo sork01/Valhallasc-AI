@@ -20,6 +20,7 @@ from PIL import Image, ImageDraw
 from scipy import ndimage as ndi
 import cel_common as cc
 import gear_shapes as shape
+import gear_shapes_high
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'client/assets'
@@ -40,6 +41,10 @@ def revision(task):
     dependencies = [shape.render, shape.pose, shape.poly, shape.jewel, getattr(shape, task['kind'])]
     source = ''.join(inspect.getsource(fn) for fn in dependencies) + Path(cc.__file__).read_text()
     source += json.dumps([shape.MATS, shape.DESIGNS[task['group']]], sort_keys=True)
+    if task['className'] == 'mage' and task['kind'] == 'weapon' and shape.DESIGNS[task['group']]['index'] >= 9:
+        source += inspect.getsource(gear_shapes_high.render_mage_staff)
+    if task['className'] == 'mage' and task['kind'] == 'headgear' and shape.DESIGNS[task['group']]['index'] >= 9:
+        source += inspect.getsource(gear_shapes_high.render_mage_head)
     return hashlib.sha256(source.encode()).hexdigest()
 
 
@@ -66,7 +71,12 @@ def frames(task, cls, gender):
                     with np.load(file) as data:
                         if str(data['revision']) == fingerprint:
                             result[key] = (data['index'], data['depth']); continue
-                idx, depth = shape.render(cls, task['group'], task['kind'], gender, *key)
+                if cls == 'mage' and task['kind'] == 'headgear' and shape.DESIGNS[task['group']]['index'] >= 9:
+                    idx, depth = gear_shapes_high.render_mage_head(task['group'], gender, *key)
+                elif cls == 'mage' and task['kind'] == 'weapon' and shape.DESIGNS[task['group']]['index'] >= 9:
+                    idx, depth = gear_shapes_high.render_mage_staff(task['group'], gender, *key)
+                else:
+                    idx, depth = shape.render(cls, task['group'], task['kind'], gender, *key)
                 assert idx.any(), f'Blank {task["id"]}/{cls}/{gender}/{key}'
                 assert not np.any(idx[[0, -1], :]) and not np.any(idx[:, [0, -1]]), f'Clipped {task["id"]}/{cls}/{gender}/{key}'
                 np.savez_compressed(file, revision=fingerprint, index=idx, depth=depth)
