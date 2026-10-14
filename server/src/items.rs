@@ -4,6 +4,8 @@ use std::sync::LazyLock;
 
 mod gear_services;
 pub use gear_services::GearInstance;
+mod orange;
+pub use orange::roll_orange;
 
 pub const EXTRA_SLOTS: [&str; 7] = [
     "headgear",
@@ -116,6 +118,14 @@ pub fn equipment(class: Class, kind: &str, variant: &str) -> Option<&'static Ite
     ITEMS
         .iter()
         .find(|i| i.class == Some(class) && i.kind == kind && i.variant.as_deref() == Some(variant))
+        .or_else(|| {
+            ITEMS.iter().find(|i| {
+                i.class.is_none()
+                    && i.source.as_deref() == Some("orange_pool")
+                    && i.kind == kind
+                    && i.variant.as_deref() == Some(variant)
+            })
+        })
 }
 pub fn material(kind: &str) -> &'static str {
     if let Some(e) = crate::cathedral::enemy(kind) {
@@ -716,7 +726,7 @@ impl Character {
     }
     pub fn equipped_count(&self, i: &Item) -> u32 {
         let extras = self.equipment.values().filter(|id| *id == &i.id).count() as u32;
-        if i.class != Some(self.look.class) {
+        if i.class != Some(self.look.class) && i.source.as_deref() != Some("orange_pool") {
             return extras;
         }
         let (armor, weapon) = self.gear();

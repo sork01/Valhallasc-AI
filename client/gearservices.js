@@ -18,7 +18,7 @@
     const look=packet.look||{};
     for(const kind of ['armor','weapon']){
       const variant=look[look.class+(kind==='armor'?'Armor':'Weapon')];
-      const gear=WORLD_ITEMS.find(i=>i.kind===kind&&i.class===look.class&&i.variant===variant);
+      const gear=WORLD_ITEMS.find(i=>i.kind===kind&&(i.class===look.class||i.source==='orange_pool')&&i.variant===variant);
       if(gear)counts.set(gear.id,(counts.get(gear.id)||0)+1);
     }
     const worn=new Set();

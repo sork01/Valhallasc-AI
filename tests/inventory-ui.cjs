@@ -36,8 +36,8 @@ async function call(name, args = {}) {
     const at0 = ITEM_ICONS.at;
     const all = WORLD_ITEMS.filter(i => !['material', 'bag', 'food', 'potion'].includes(i.kind));
     // Original pieces have their own icon; a recolouring (art + tint) has none and shows its base piece through a colour filter.
-    const gear = all.filter(i => !i.art), recoloured = all.filter(i => i.art);
-    const badRecolour = recoloured.filter(i => !i.tint || !WORLD_ITEMS.some(o => o.kind === i.kind && o.class === i.class && o.variant === i.art && at0[o.id])).map(i => i.id);
+    const gear = all.filter(i => !i.art && i.source !== 'orange_pool'), recoloured = all.filter(i => i.art);
+    const badRecolour = recoloured.filter(i => !i.tint || !(at0[i.id] || WORLD_ITEMS.some(o => o.kind === i.kind && o.class === i.class && o.variant === i.art && at0[o.id]))).map(i => i.id);
     const img = new Image(); img.src = 'assets/items.png'; await img.decode();
     const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(img, 0, 0);
     const { size, at } = ITEM_ICONS, seen = new Map(), missing = [], blank = [];

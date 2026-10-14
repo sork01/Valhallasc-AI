@@ -388,6 +388,7 @@ fn a_dungeon_copy_resets_when_its_last_hero_leaves_and_a_hero_who_logged_out_ins
         z: 0.,
         value: 5,
         item: None,
+        gear: None,
         quantity: 0,
         t: 0.,
         col: "#fff",

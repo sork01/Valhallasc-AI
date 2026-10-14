@@ -206,6 +206,9 @@ impl World {
                         return Err("Bags are full (use force to ignore capacity).".into());
                     }
                     c.add_item(&id, quantity);
+                    if is_gear(it) {
+                        c.materialize_gear_instances();
+                    }
                 }
                 json!({"item":id,"owned":c.quantity(&id),"bags":c.bags,"bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used()})
             }

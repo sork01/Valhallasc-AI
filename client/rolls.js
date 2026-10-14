@@ -42,7 +42,7 @@
     const need = make('Need', 'need', packet.need ? 'Your class can wear this piece' : 'Your class cannot use this piece');
     need.disabled = !packet.need;
     buttons.append(need, make('Greed', 'greed', 'Roll for the gold value'), make('Pass', 'pass', 'Give it up'));
-    node.append(head, el('small', summary(item), 'roll-stats'), buttons);
+    node.append(head, el('small', summary(packet.gear ? {...item, ...packet.gear} : item), 'roll-stats'), buttons);
     const ends = Date.now() + packet.seconds * 1000;
     const tick = () => { time.textContent = `${Math.max(0, Math.ceil((ends - Date.now()) / 1000))}s`; };
     tick();

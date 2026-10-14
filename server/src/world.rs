@@ -1165,6 +1165,8 @@ struct Drop {
     z: f64,
     value: u32,
     item: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    gear: Option<GearInstance>,
     quantity: u32,
     t: f64,
     col: &'static str,
@@ -3166,6 +3168,9 @@ impl World {
             };
             self.gold_drop(&credit_id, zone, point, value);
             self.loot_drop(&credit_id, zone, point, material(&kind));
+            if let Some(gear) = roll_orange(|| self.random()) {
+                self.loot_drop_with_gear(&credit_id, zone, point, &gear.item.clone(), Some(gear));
+            }
             if is_boss(&kind) {
                 self.boss_loot(&credit_id, &kind, zone, point);
             }
@@ -3224,6 +3229,7 @@ impl World {
             z: 8.,
             value: 0,
             item: Some(item_id.into()),
+            gear: None,
             quantity,
             t: 0.,
             col: rarity_color(item(item_id).map_or("common", |i| i.rarity.as_str())),
@@ -7991,6 +7997,7 @@ mod tests {
             z: 0.,
             value: 7,
             item: None,
+            gear: None,
             quantity: 0,
             t: 1.,
             col: "#ffe066",

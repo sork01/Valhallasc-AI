@@ -201,15 +201,30 @@
   // A head, shoulder or glove piece is the class's own tier or the shared generic piece; pants, necklace and ring are generic only.
   const CLASS_SLOTS = ['head', 'shoulders', 'gloves'];
   const pieces = (C, look) => Object.fromEntries(Object.entries(GENERIC).map(([slot, generic]) => {
-    const allowed = [...(CLASS_SLOTS.includes(slot) ? [...(C.TIERS || []), generic] : [generic]), ...PROGRESSION];
+    const allowed = [...(CLASS_SLOTS.includes(slot) ? [...(C.TIERS || []), generic] : [generic]), ...PROGRESSION,
+      ...(window.WORLD_ITEMS || []).filter(i => i.source === 'orange_pool' && i.kind === KIND[slot]).map(i => i.variant)];
     return [slot, allowed.includes(resolve(slot, look?.[slot]).art) ? look[slot] : 'none'];
   }));
+  const orangeImages = new Map();
+  const orangeImage = (variant, repaint) => {
+    if (!/^orange_0[1-9]$|^orange_10$/.test(variant)) return null;
+    let entry = orangeImages.get(variant);
+    if (!entry) {
+      const img = new Image(); entry = { img, ready: false }; orangeImages.set(variant, entry);
+      img.onload = () => { entry.ready = true; repaint(); };
+      img.onerror = () => { entry.ready = false; };
+      img.src = `assets/${variant}.png`;
+    }
+    return entry.ready ? entry.img : null;
+  };
+  const ORANGE_POS = { armor: [-26,-77], weapon: [3,-73], head: [-26,-110], shoulders: [-26,-84], gloves: [-26,-62] };
   class MageSprite {
     constructor(source, look = {}, background = false) { this.source = source; this.background = background; this.meta = source.meta; this.cache = new Map(); this.set(look); }
     set(look) {
       this.look = { ...look }; this.cache.clear();
       // `worn` holds the catalog variants; `equipment` the drawings they use; `partTint` the recolouring of each drawn part.
       this.worn = { ...pieces(this.constructor, look), ...this.constructor.equipment(look) };
+      for (const variant of Object.values(this.worn)) orangeImage(variant, () => this.cache.clear());
       this.equipment = {}; this.partTint = new Map(); this.tintLut = new Map();
       for (const slot of SLOT_ORDER) {
         const { art, tint } = resolve(slot, this.worn[slot]);
@@ -258,6 +273,18 @@
         }
       }
       g.putImageData(out, 0, 0);
+      // Orange gear uses small editable PixelFlow drawings shared by every class and gender.
+      // The overlay is part of the cached composed frame, so remote players wear it too.
+      for (const slot of SLOT_ORDER) {
+        const img = orangeImage(this.worn[slot], () => this.cache.clear());
+        const pos = ORANGE_POS[slot];
+        if (img && pos) {
+          g.save(); g.imageSmoothingEnabled = false;
+          if (dir >= 1 && dir <= 3) { g.translate(fw, 0); g.scale(-1, 1); }
+          g.drawImage(img, this.meta.anchor[0] + pos[0], this.meta.anchor[1] + pos[1], 52, 52);
+          g.restore();
+        }
+      }
       if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value);
       this.cache.set(key, canvas); return canvas;
     }

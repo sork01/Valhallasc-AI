@@ -213,8 +213,8 @@ impl Look {
                         && (i.class == class
                             || (class.is_some()
                                 && i.class.is_none()
-                                && kind != "armor"
-                                && kind != "weapon"))
+                                && (i.source.as_deref() == Some("orange_pool")
+                                    || (kind != "armor" && kind != "weapon"))))
                 })
         };
         let own = Some(self.class);

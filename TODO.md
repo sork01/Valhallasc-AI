@@ -130,17 +130,17 @@ The Seed Vault is a separate dungeon: Veyrroot Canopy and Heartwood remain enemy
 - [x] `G-REFINE-RULES` — Define refinement levels, stat gains, material/gold costs, cap and interaction with merging/orange rolls.
 - [x] `G-REFINE-SERVER` — Implement authoritative per-item refinement with atomic payment and persistent upgraded stats.
 - [x] `G-REFINE-NPC` — Add the refinement service and UI that shows cost, current rank and resulting stats.
-- [ ] `G-REFINE-CHECK` — Verify upgrades, invalid attempts, equipped items and save/reload in a private world.
+- [x] `G-REFINE-CHECK` — Verify upgrades, invalid attempts, equipped items and save/reload in a private world.
 
 ### Fifty orange pieces
 
 All 50 must work for every class at every level, be exceptionally strong, have distinct worn art/icons and receive randomized stats when dropped. A kill of **any mob** rolls a **0.1% total chance**, independent of mob/player level; a success chooses one of the 50 pieces. The roll and ownership are authoritative.
 
 - [x] `O-RULES` — Define the 50 names, slots, stat ranges and roll distribution without adding class or level gates.
-- [ ] `O-DROP` — Add the independent 0.1% per-kill roll and random choice from the 50-piece pool.
-- [ ] `O-UI` — Display orange rarity and each copy’s rolled stats consistently in bags, equipment and loot.
-- [ ] `O-01-05` — Create and wire orange pieces 01–05: catalog, distinct worn art, icon and randomized stat definition.
-- [ ] `O-06-10` — Create and wire orange pieces 06–10: catalog, distinct worn art, icon and randomized stat definition.
+- [x] `O-DROP` — Add the independent 0.1% per-kill roll and random choice from the 50-piece pool.
+- [x] `O-UI` — Display orange rarity and each copy’s rolled stats consistently in bags, equipment and loot.
+- [x] `O-01-05` — Create and wire orange pieces 01–05: catalog, distinct worn art, icon and randomized stat definition.
+- [x] `O-06-10` — Create and wire orange pieces 06–10: catalog, distinct worn art, icon and randomized stat definition.
 - [ ] `O-11-15` — Create and wire orange pieces 11–15: catalog, distinct worn art, icon and randomized stat definition.
 - [ ] `O-16-20` — Create and wire orange pieces 16–20: catalog, distinct worn art, icon and randomized stat definition.
 - [ ] `O-21-25` — Create and wire orange pieces 21–25: catalog, distinct worn art, icon and randomized stat definition.

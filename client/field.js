@@ -2513,6 +2513,12 @@
         g.fill(); g.stroke(); g.shadowBlur = 0;
         if (item?.class) { g.fillStyle = '#112b49'; g.font = 'bold 12px sans-serif'; g.textAlign = 'center'; g.fillText(item.kind === 'weapon' ? '⚔' : '◆', 0, 3); }
         else { g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(-2.4, -1, 1.8, 0, 6.283); g.fill(); }
+        if (d.gear && hero && Math.hypot(hero.x-d.x, hero.y-d.y) < 8) {
+          const gear = d.gear, a = gear.bonusStats || {};
+          const label = `${item?.name || 'Orange gear'} · ${gear.attack} ATK · ${gear.defense} DEF · ${a.stamina || 0} STA · ${a.accuracy || 0} ACC · ${a.dexterity || 0} DEX`;
+          g.font = '12px sans-serif'; g.textAlign = 'center'; g.lineWidth = 3;
+          g.strokeStyle = '#24120b'; g.fillStyle = '#ffb65b'; g.strokeText(label, 0, -24); g.fillText(label, 0, -24);
+        }
         g.restore();
       } else if (it.remote) {
         const remote = it.remote; g.save(); g.translate(it.sx, it.sy);

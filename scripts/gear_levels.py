@@ -172,7 +172,7 @@ def main():
     gear = {'armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'}
     out, bases = [], {}
     for i in items:
-        if i['kind'] not in gear or i['rarity'] == 'gm':
+        if i['kind'] not in gear or i['rarity'] == 'gm' or i.get('source') == 'orange_pool':
             out.append(i)
             continue
         if i.get('starter'):

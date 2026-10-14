@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "sprites": {
+    "orange_01": "bd6000fba7eefbfb",
+    "orange_02": "409837bae13ca80e",
+    "orange_03": "124d69f90832bec8",
+    "orange_04": "1bdcf3568e3ca69e",
+    "orange_05": "9763080ffb70eaa3",
+    "orange_06": "034d2fd0caea2fd1",
+    "orange_07": "d3187099aeb0e3e6",
+    "orange_08": "f72e2280bf2175df",
+    "orange_09": "ca665541fe65ae76",
+    "orange_10": "bff5f9ef7511de31"
+  }
+}

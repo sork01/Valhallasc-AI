@@ -9,7 +9,7 @@
   const definition = id => WORLD_ITEMS.find(i => i.id === id);
   const slotKind = slot => ({ chest: 'armor', hands: 'weapon', accessory1: 'accessory', accessory2: 'accessory' })[slot] || slot;
   const quantity = id => stacks.find(s => s.item === id)?.quantity || 0;
-  const equippedCount = i => !i ? 0 : Object.values(gearSlots).filter(id => id === i.id).length + Number(i.class === look?.class && ['armor', 'weapon'].includes(i.kind) && look[i.class + (i.kind === 'armor' ? 'Armor' : 'Weapon')] === i.variant);
+  const equippedCount = i => !i ? 0 : Object.values(gearSlots).filter(id => id === i.id).length + Number((!i.class || i.class === look?.class) && ['armor', 'weapon'].includes(i.kind) && look?.[look.class + (i.kind === 'armor' ? 'Armor' : 'Weapon')] === i.variant);
   const bagQuantity = id => Math.max(0, quantity(id) - equippedCount(definition(id)));
   const spare = s => definition(s.item)?.starter ? 0 : bagQuantity(s.item);
   const consumable = i => i && ['food', 'potion'].includes(i.kind);
@@ -25,7 +25,7 @@
   const levelOf = i => i?.requiredLevel || 1;
   const tooLow = i => !!i && levelOf(i) > heroLevel();   // gear above the hero's level cannot be put on (the server refuses it too)
   const levelNote = i => tooLow(i) ? `Requires level ${levelOf(i)} (you are level ${heroLevel()})` : `Requires level ${levelOf(i)}`;
-  const itemAtSlot = slot => ['chest', 'hands'].includes(slot) ? WORLD_ITEMS.find(i => i.kind === slotKind(slot) && i.class === look?.class && look[i.class + (slot === 'chest' ? 'Armor' : 'Weapon')] === i.variant) : definition(gearSlots[slot]);
+  const itemAtSlot = slot => ['chest', 'hands'].includes(slot) ? WORLD_ITEMS.find(i => i.kind === slotKind(slot) && (i.class === look?.class || i.source === 'orange_pool') && look?.[look.class + (slot === 'chest' ? 'Armor' : 'Weapon')] === i.variant) : definition(gearSlots[slot]);
   const canEquip = () => Online.connected && !Field.hero?.dead;
   function node(tag, text = '', cls) { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; }
   function button(text, action, cls = 'btn ghost') { const b = node('button', text, cls); b.type = 'button'; b.addEventListener('click', action); return b; }
@@ -52,6 +52,7 @@
   const rarityName = i => RARITY_NAMES[i?.rarity] || 'Common';
   function icon(i, emptyKind) {
     const kind = i?.kind || emptyKind;
+    if (i && /^orange_0[1-9]$|^orange_10$/.test(i.id)) return `<span class="orange-item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-image:url(assets/${i.id}.png)"></span>`;
     // A recoloured piece (art + tint in the catalog) shows its base piece's icon through the same colour filter the worn art gets.
     const base = i?.art ? WORLD_ITEMS.find(o => o.kind === i.kind && o.class === i.class && o.variant === i.art) : null;
     const cell = i && window.ITEM_ICONS?.at[i.id] || (base && window.ITEM_ICONS?.at[base.id]);   // equipment has its own pixel icon (assets/items.png); everything else keeps the glyph
@@ -90,8 +91,11 @@
     t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', i.starter ? 'Starter gear · cannot be sold' : `Sells for ${i.sell} gold each`));
     if (compatible(i)) {
       const copies=gearInstances.filter(g=>g.item===i.id);
-      for(const g of copies.slice(0,3))t.append(node('small',`Copy #${g.id} · ${g.rarity} · rank ${g.rank} · ${stats({attack:g.attack*(1+g.rank*.04),defense:g.defense*(1+g.rank*.04),bonusStats:Object.fromEntries(statNames.map(k=>[k,Math.round(((g.bonusStats?.[k]||0)+(g.rolledStats?.[k]||0))*(1+g.rank*.04))]))})}`));
-      if(copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
+      for(const [index,g] of copies.entries()) {
+        if(i.source!=='orange_pool'&&index>=3)break;
+        t.append(node('small',`Copy #${g.id} · ${index<equippedCount(i)?'equipped · ':''}${g.rarity} · rank ${g.rank} · ${stats({attack:g.attack*(1+g.rank*.04),defense:g.defense*(1+g.rank*.04),bonusStats:Object.fromEntries(statNames.map(k=>[k,Math.round(((g.bonusStats?.[k]||0)+(g.rolledStats?.[k]||0))*(1+g.rank*.04))]))})}`));
+      }
+      if(i.source!=='orange_pool'&&copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
     }
     t.append(node('small', consumable(i) ? 'Right-click or double-click to use · Z / X on the quick slots' : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
     t.hidden = false;
@@ -159,13 +163,20 @@
     const container = $('bag-details'); if (!container) return;
     const i = selected && definition(selected);
     container.replaceChildren();
-    if (!i || !bagQuantity(i.id)) { container.append(node('p', 'Select an item to inspect it.', 'bag-empty-note')); return; }
+    if (!i || !quantity(i.id)) { container.append(node('p', 'Select an item to inspect it.', 'bag-empty-note')); return; }
     const heading = node('b', i.name, 'item-name'); heading.dataset.rarity = i.rarity;
-    container.append(heading, node('small', summary(i, bagQuantity(i.id))));
+    container.append(heading, node('small', summary(i, quantity(i.id))));
+    if (i.source === 'orange_pool') {
+      const worn = equippedCount(i);
+      gearInstances.filter(g => g.item === i.id).forEach((g, index) => {
+        const line = node('p', `Copy #${g.id}${index < worn ? ' · Equipped' : ' · In bags'} · Rank ${g.rank} · ${stats({attack:g.attack * (1 + g.rank * .04), defense:g.defense * (1 + g.rank * .04), bonusStats:Object.fromEntries(statNames.map(k => [k, Math.round(((g.bonusStats?.[k] || 0) + (g.rolledStats?.[k] || 0)) * (1 + g.rank * .04))]))})}`, 'orange-copy-stats');
+        container.append(line);
+      });
+    }
     if (compatible(i)) {
       const targets = slots.filter(([s]) => slotKind(s) === i.kind && itemAtSlot(s)?.id !== i.id);
       for (const [slot, label] of targets) {
-        const b = button(i.kind === 'accessory' ? `Equip · ${label}` : 'Equip', () => equip(i, slot), 'item-action'); b.dataset.action = 'equip'; b.disabled = !canEquip() || tooLow(i); container.append(b);
+        const b = button(i.kind === 'accessory' ? `Equip · ${label}` : 'Equip', () => equip(i, slot), 'item-action'); b.dataset.action = 'equip'; b.disabled = !canEquip() || tooLow(i) || !bagQuantity(i.id); container.append(b);
       }
       if (levelOf(i) > 1) container.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'bag-empty-note'));
     } else if (consumable(i)) {
@@ -268,7 +279,9 @@
       }
       card.dataset.rarity = i?.rarity || 'common'; card.dataset.empty = String(!i);
       card.querySelector('b').textContent = i?.name || 'Empty slot';
-      const glyph = card.querySelector('.gear-icon'); glyph.innerHTML = icon(i, kind); glyph.draggable = !!i; glyph.setAttribute('aria-label', `${label}: ${i?.name || 'Empty'}. Right-click to unequip.`);
+      const glyph = card.querySelector('.gear-icon'); glyph.innerHTML = icon(i, kind); glyph.draggable = !!i;
+      const wornCopy = i?.source === 'orange_pool' && gearInstances.find(g => g.item === i.id);
+      glyph.setAttribute('aria-label', `${label}: ${i?.name || 'Empty'}${wornCopy ? `, copy #${wornCopy.id}, ${stats({attack:wornCopy.attack*(1+wornCopy.rank*.04), defense:wornCopy.defense*(1+wornCopy.rank*.04), bonusStats:Object.fromEntries(statNames.map(k=>[k,Math.round(((wornCopy.bonusStats?.[k]||0)+(wornCopy.rolledStats?.[k]||0))*(1+wornCopy.rank*.04))]))})}` : ''}. Right-click to unequip.`);
       const select = card.querySelector('select'), owned = WORLD_ITEMS.filter(item => item.kind === kind && compatible(item) && quantity(item.id) > 0);
       const options = [['none', 'None'], ...owned.map(item => [legacy ? item.variant : item.id, item.name])], key = JSON.stringify(options);
       if (select.dataset.options !== key) { select.replaceChildren(...options.map(([value, name]) => { const o = node('option', name); o.value = value; return o; })); select.dataset.options = key; }

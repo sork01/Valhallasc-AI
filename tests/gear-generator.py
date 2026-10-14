@@ -31,7 +31,7 @@ class GearGeneratorTests(unittest.TestCase):
         gear.ITEMS.write_text(json.dumps(old))
         self.run_generator()
         new = {i['id']: i for i in json.loads(gear.ITEMS.read_text())}
-        self.assertEqual(len(new) - len(old), 1568)
+        self.assertEqual(len(new), len(self.catalog))
         for i in old:
             self.assertEqual(i, new[i['id']], i['id'])
 
@@ -71,7 +71,7 @@ class GearGeneratorTests(unittest.TestCase):
         self.run_generator()
         items = json.loads(gear.ITEMS.read_text())
         for item in items:
-            if item['kind'] not in gear.CLASS_KINDS + gear.SHARED_KINDS or item['rarity'] == 'gm':
+            if item['kind'] not in gear.CLASS_KINDS + gear.SHARED_KINDS or item['rarity'] == 'gm' or item.get('source') == 'orange_pool':
                 continue
             bonus = item.get('bonusStats', {})
             expected = {'rare': 1, 'epic': 2}.get(item['rarity'], 0)

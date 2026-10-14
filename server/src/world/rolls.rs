@@ -24,6 +24,7 @@ pub(super) type Reward = (String, Point, u32, Option<String>, u32, Option<String
 pub(super) struct Roll {
     id: u64,
     pub(super) item: String,
+    gear: Option<GearInstance>,
     pub(super) zone: usize,
     pub(super) at: Point,
     /// The killer, who takes the piece when everybody passes.
@@ -91,6 +92,7 @@ impl World {
             z: 8.,
             value,
             item: None,
+            gear: None,
             quantity: 0,
             t: 0.,
             col: "#ffe066",
@@ -100,15 +102,28 @@ impl World {
     /// An item from a kill. Gray gear and materials lie on the ground for any member of the party and go to the
     /// next in line when picked up; green and better is rolled for.
     pub(super) fn loot_drop(&mut self, owner: &str, zone: usize, point: Point, item_id: &str) {
+        self.loot_drop_with_gear(owner, zone, point, item_id, None);
+    }
+    pub(super) fn loot_drop_with_gear(
+        &mut self,
+        owner: &str,
+        zone: usize,
+        point: Point,
+        item_id: &str,
+        gear: Option<GearInstance>,
+    ) {
         let group = self.loot_group(owner, zone, point);
         if group.len() < 2 {
-            return self.item_drop(owner, zone, point, item_id, 1);
+            self.item_drop(owner, zone, point, item_id, 1);
+            self.drops.last_mut().unwrap().gear = gear;
+            return;
         }
         let rarity = item(item_id).map_or("common", |i| i.rarity.as_str());
         if !rollable(rarity) {
             self.item_drop(owner, zone, point, item_id, 1);
             if let Some(d) = self.drops.last_mut() {
                 d.group = group;
+                d.gear = gear;
             }
             return;
         }
@@ -136,12 +151,13 @@ impl World {
                 let _ = p
                     .peer
                     .try_send(json!({"type":"roll","op":"start","id":id,"item":item_id,
-                    "seconds":ROLL_SECONDS,"need":need}));
+                    "seconds":ROLL_SECONDS,"need":need,"gear":gear}));
             }
         }
         self.rolls.push(Roll {
             id,
             item: item_id.into(),
+            gear,
             zone,
             at: point,
             owner: owner.into(),
@@ -242,7 +258,17 @@ impl World {
             return true;
         }
         if let Some(p) = self.players.values_mut().find(|p| p.character.id == who) {
+            // Materialize old copies before adding this one, so the new copy cannot be
+            // mistaken for a missing legacy record and given catalog defaults.
+            if d.gear.is_some() {
+                p.character.materialize_gear_instances();
+            }
             p.character.add_item(id, d.quantity);
+            if let Some(mut gear) = d.gear.clone() {
+                gear.id = p.character.next_gear_id;
+                p.character.next_gear_id += 1;
+                p.character.gear_instances.push(gear);
+            }
         }
         if who != picker {
             let name = self.name_of(&who);
@@ -398,6 +424,7 @@ impl World {
         }
         if !keeps {
             self.item_drop(&recipient, roll.zone, roll.at, &roll.item, 1);
+            self.drops.last_mut().unwrap().gear = roll.gear;
         }
     }
 }
@@ -793,6 +820,64 @@ mod tests {
         // Voting again is refused: the roll is over.
         vote(&mut w, &who[2], id, RollChoice::Greed);
         assert!(heard(&mut who[2].2).iter().any(|v| v["type"] == "error"));
+    }
+
+    #[test]
+    fn orange_roll_keeps_sampled_stats_through_vote_pickup_equip_and_save() {
+        let mut w = world();
+        let mut who = party(&mut w, &["Ann", "Bob"]);
+        let at = spot(&w);
+        let mut values = [0., 0., 0.4, 0.6, 0.2, 0.8, 0.5].into_iter();
+        let sampled = roll_orange(|| values.next().unwrap()).unwrap();
+        assert_eq!(sampled.item, "orange_01");
+        w.loot_drop_with_gear(
+            &who[0].1,
+            0,
+            at,
+            &sampled.item.clone(),
+            Some(sampled.clone()),
+        );
+        let first = heard(&mut who[0].2);
+        let second = heard(&mut who[1].2);
+        let id = roll_id(&first);
+        assert_eq!(
+            first.iter().find(|v| v["op"] == "start").unwrap()["gear"]["attack"],
+            sampled.attack
+        );
+        assert_eq!(
+            second.iter().find(|v| v["op"] == "start").unwrap()["need"],
+            true
+        );
+        vote(&mut w, &who[0], id, RollChoice::Pass);
+        vote(&mut w, &who[1], id, RollChoice::Need);
+        w.update_rolls();
+        assert_eq!(
+            w.drops[0].gear.as_ref().unwrap().bonus_stats,
+            sampled.bonus_stats
+        );
+        collect_all(&mut w);
+        let c = &mut w.players.get_mut(&2).unwrap().character;
+        let copy = c
+            .gear_instances
+            .iter()
+            .find(|g| g.item == "orange_01")
+            .unwrap()
+            .clone();
+        assert_ne!(copy.id, 0);
+        assert_eq!(copy.attack, sampled.attack);
+        assert_eq!(copy.defense, sampled.defense);
+        assert_eq!(copy.bonus_stats, sampled.bonus_stats);
+        c.seed_inventory(); // The party helper switches class after joining; supply that class's starter gear.
+        let before = c.stats();
+        c.equip_slots(&BTreeMap::from([("chest".into(), "orange_01".into())]))
+            .unwrap();
+        assert!(c.gear_instance_equipped(copy.id));
+        assert!(c.stats().0 > before.0 && c.stats().1 > before.1);
+        let loaded: Character = serde_json::from_str(&serde_json::to_string(c).unwrap()).unwrap();
+        assert_eq!(
+            loaded.gear_instances.iter().find(|g| g.id == copy.id),
+            Some(&copy)
+        );
     }
 
     #[test]

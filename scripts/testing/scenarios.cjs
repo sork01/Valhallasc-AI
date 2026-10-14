@@ -4440,6 +4440,8 @@ const scenarios = {
         return answer;
       };
       const initial=JSON.stringify(w.player(bot).gearInstances);
+      const unknown=await reply('refine_confirm:99999999');
+      check(unknown.notice.includes('Unknown gear copy')&&JSON.stringify(w.player(bot).gearInstances)===initial,'Unknown copy cannot be refined or mutate owned gear');
       const duplicate=await reply(`merge_confirm:${ids[0]}:${ids[0]}`);
       check(duplicate.notice.includes('different')&&JSON.stringify(w.player(bot).gearInstances)===initial,'One copy cannot be merged with itself');
       const worn=w.player(bot).gearInstances.find(g=>g.item!==piece&&g.item.includes('weapon'));
@@ -4460,6 +4462,11 @@ const scenarios = {
       check(refined.notice.includes('rank 1')&&w.player(bot).gold===gold-200&&!(w.player(bot).inventory||[]).some(s=>s.item==='refinement_crystal_uncommon'),'Refinement atomically consumes gold and matching crystal');
       const failed=await reply(`refine_confirm:${output.id}`);
       check(failed.notice.includes('crystals')&&w.player(bot).gearInstances.find(g=>g.id===output.id).rank===1,'Missing crystals cannot advance rank');
+      await w.debug(bot,{op:'give_item',item:'refinement_crystal_uncommon',quantity:2});
+      await w.debug(bot,{op:'set_gold',gold:0});
+      const noGold=await reply(`refine_confirm:${output.id}`);
+      check(noGold.notice.includes('gold')&&w.player(bot).gearInstances.find(g=>g.id===output.id).rank===1&&w.player(bot).inventory.find(s=>s.item==='refinement_crystal_uncommon')?.quantity===2,'Insufficient gold preserves rank and crystals');
+      await w.debug(bot,{op:'set_gold',gold:100000});
       const wornId=w.player(bot).gearInstances.find(g=>g.item!==piece&&g.item.includes('weapon')&&g.rarity==='common').id;
       await w.debug(bot,{op:'give_item',item:'refinement_crystal_common',quantity:1});
       const attack=w.player(bot).attack;

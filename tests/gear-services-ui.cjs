@@ -51,6 +51,39 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.getByText(/Cost: 200 gold and 1 Uncommon Refinement Crystal/).waitFor({timeout:10000});
   await page.getByRole('button',{name:'Confirm refinement'}).click();
   await page.getByText(/Refined .* to rank 1/).waitFor({timeout:10000});
+  // Orange copies use their own editor-exported art and retain individually visible stats.
+  await page.locator('#npc-close').click();
+  await debug({op:'give_item',item:'orange_01',quantity:2});
+  await page.waitForFunction(()=>Inventory.quantity('orange_01')===2,null,{timeout:15000});
+  await page.locator('#equipment-open').click();
+  const orange=page.locator('#inventory-list [data-item="orange_01"]');
+  assert.equal(await orange.getAttribute('data-rarity'),'legendary');
+  assert.equal(await orange.locator('.orange-item-art').count(),1);
+  await orange.locator('button').click();
+  assert.equal(await page.locator('#bag-details .orange-copy-stats').count(),2);
+  assert.match(await page.locator('#bag-details').textContent(),/110 defense.*90 stamina.*8 accuracy.*18 dexterity/i);
+  await page.locator('#bag-details [data-action="equip"]').first().click();
+  await page.waitForFunction(()=>Field.hero.look.warriorArmor==='orange_01',null,{timeout:15000});
+  assert.equal(await page.locator('[data-slot="chest"] .orange-item-art').count(),1);
+  await page.waitForFunction(()=>Field.warriorSprites?.worn?.armor==='orange_01',null,{timeout:15000});
+  await page.waitForFunction(()=>{
+    const c=Field.warriorSprites?.frame('idle',0,0);if(!c)return false;
+    const px=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+    for(let i=0;i<px.length;i+=4)if(px[i]===242&&px[i+1]===163&&px[i+2]===71)return true;
+    return false;
+  },null,{timeout:15000});
+  await page.locator('[data-slot="chest"] .gear-icon').click();
+  assert.match(await page.locator('#bag-details').textContent(),/Equipped/);
+  const exported=await page.evaluate(async()=>{
+    const hashes=[];
+    for(let n=1;n<=10;n++){
+      const id=`orange_${String(n).padStart(2,'0')}`,img=new Image();img.src=`assets/${id}.png`;await img.decode();
+      const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);
+      hashes.push(c.toDataURL());
+    }
+    return hashes;
+  });
+  assert.equal(new Set(exported).size,10,'Ten distinct PixelFlow exports load in browser');
   assert.deepEqual(errors,[]);
   console.log('Gearwright merge and refinement browser checks passed');
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{
