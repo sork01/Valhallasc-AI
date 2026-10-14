@@ -104,7 +104,7 @@ mod tests {
     }
 
     #[test]
-    fn first_two_orange_pieces_equip_on_every_class() {
+    fn all_orange_pieces_equip_on_every_class_at_level_one() {
         for class in [
             Class::Warrior,
             Class::Mage,
@@ -112,20 +112,24 @@ mod tests {
             Class::Priest,
             Class::Hunter,
         ] {
-            let mut c = Character::mercenary(class, 1, "Orange Test");
-            c.add_item("orange_01", 1);
-            c.add_item("orange_02", 1);
-            c.equip_slots(&BTreeMap::from([
-                ("chest".into(), "orange_01".into()),
-                ("hands".into(), "orange_02".into()),
-            ]))
-            .unwrap();
-            assert_eq!(c.gear().0, "orange_01");
-            assert_eq!(c.gear().1, "orange_02");
-            assert_eq!(
-                c.equipped_count(super::super::item("orange_01").unwrap()),
-                1
-            );
+            for piece in &RULES.pieces {
+                let item = super::super::item(&piece.id).unwrap();
+                assert_eq!(item.required_level, 1);
+                assert!(item.class.is_none());
+                let slot = match item.kind.as_str() {
+                    "armor" => "chest",
+                    "weapon" => "hands",
+                    "headgear" => "headgear",
+                    "shoulders" => "shoulders",
+                    "gloves" => "gloves",
+                    kind => panic!("unexpected orange kind: {kind}"),
+                };
+                let mut c = Character::mercenary(class, 1, "Orange Test");
+                c.add_item(&piece.id, 1);
+                c.equip_slots(&BTreeMap::from([(slot.into(), piece.id.clone())]))
+                    .unwrap();
+                assert_eq!(c.equipped_count(item), 1, "{} {class:?}", piece.id);
+            }
         }
     }
 }

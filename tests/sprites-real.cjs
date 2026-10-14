@@ -28,7 +28,7 @@ async function enter(stub, cls, name) {
     if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null }));
   }, stub);
   const page = await context.newPage(); page.errors = []; page.on('pageerror', e => page.errors.push(e.message));
-  await page.goto(url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.goto(url, { waitUntil: 'domcontentloaded' }); await page.locator('#start').click(); await page.locator('#login-guest').click();
   await page.locator('#cls-' + cls).click(); await page.locator('#name').fill(name); await page.locator('#go').click({ timeout: 90000 });
   await page.waitForFunction(cls => Online.connected && !!valhalla[cls] && !!Field.beetleSprites && !!Field.cragSprites, cls, { timeout: 90000 });
   return page;
@@ -56,7 +56,9 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
   await startServer(path.join(dir, 'test.sqlite'));
   browser = await chromium.launch({ headless: true });
   try {
-    const classes = process.argv.slice(2).length ? process.argv.slice(2) : ['warrior', 'mage', 'assassin', 'priest', 'hunter'];
+    const redesignOnly = process.argv.includes('--redesign-only');
+    const chosen = process.argv.slice(2).filter(arg => arg !== '--redesign-only');
+    const classes = chosen.length ? chosen : ['warrior', 'mage', 'assassin', 'priest', 'hunter'];
     assert.ok(classes.every(c => ['warrior', 'mage', 'assassin', 'priest', 'hunter'].includes(c)), 'Use class names to filter the art checks');
     for (const cls of classes) {
       const page = await enter(false, cls, 'Real' + cls);
@@ -102,7 +104,7 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
       check(everything.visible > dressed.visible && everything.hash !== dressed.hash, `${cls}: all six generic pieces worn together make a bigger figure`);
       // Recoloured pieces (the catalog's `art` + `tint`): drawn as their base drawing, same silhouette, different colours,
       // and every set of the same drawing looks different from every other.
-      const recoloured = await page.evaluate(cls => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && ['armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'].includes(i.kind)).map(i => [i.kind, i.variant, i.art]), cls);
+      const recoloured = await page.evaluate(([cls, redesignOnly]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && ['armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'].includes(i.kind) && (!redesignOnly || (i.requiredLevel >= 25 && i.requiredLevel <= 50) || i.source?.startsWith('cathedral_'))).map(i => [i.kind, i.variant, i.art]), [cls, redesignOnly]);
       const baseOf = new Map(), byArt = new Map(), colourGroups = new Map();
       // Inspect each small piece on the bare figure: a robe can hide two differently coloured pants identically.
       const wear = (kind, v) => kind === 'armor' ? figure(page, cls, v, gear.weapon[0]) : kind === 'weapon' ? figure(page, cls, gear.armor[0], v) : figure(page, cls, 'none', 'none', { [kind === 'headgear' ? 'head' : kind]: v });
@@ -139,7 +141,7 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
         check(w.hash !== fDressed.hash && w.visible > 0 && (await f(gear.armor[0], gear.weapon[0], { [slot]: 'none' })).hash === fDressed.hash, `${cls} (female): the generic ${slot} piece is drawn and 'none' removes it`);
       }
       // High-level and Cathedral colours must draw on the female layers too, including every small worn slot.
-      const newPieces = await page.evaluate(cls => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && i.requiredLevel > 20).map(i => [i.kind, i.variant, i.art]), cls);
+      const newPieces = await page.evaluate(([cls, redesignOnly]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && i.requiredLevel > 20 && (!redesignOnly || (i.requiredLevel >= 25 && i.requiredLevel <= 50) || i.source?.startsWith('cathedral_'))).map(i => [i.kind, i.variant, i.art]), [cls, redesignOnly]);
       const femaleWear = (kind, v) => kind === 'armor' ? f(v, gear.weapon[0]) : kind === 'weapon' ? f(gear.armor[0], v) : f('none', 'none', { [kind === 'headgear' ? 'head' : kind]: v });
       const femaleBases = new Map(), femaleColours = new Map();
       let femaleChanged = 0, femaleSilhouette = 0;

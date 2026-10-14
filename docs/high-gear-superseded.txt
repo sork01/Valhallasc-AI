@@ -1,0 +1,81 @@
+{
+  "L60-warrior-armor-v1": {
+    "variant": "regearl60",
+    "kind": "armor",
+    "classes": {
+      "warrior": {
+        "idle": [
+          {
+            "id": "3f99429dabc089c2",
+            "offset": [
+              58,
+              44
+            ],
+            "frameCount": 48,
+            "start": 0
+          }
+        ],
+        "walk": [
+          {
+            "id": "96524fa40adabebc",
+            "offset": [
+              56,
+              42
+            ],
+            "frameCount": 64,
+            "start": 0
+          }
+        ],
+        "attack": [
+          {
+            "id": "9d966dd415bb1366",
+            "offset": [
+              54,
+              41
+            ],
+            "frameCount": 64,
+            "start": 0
+          }
+        ],
+        "hurt": [
+          {
+            "id": "6031df42bcc3f2d7",
+            "offset": [
+              53,
+              43
+            ],
+            "frameCount": 32,
+            "start": 0
+          }
+        ],
+        "die": [
+          {
+            "id": "272f40d83a5e8bfb",
+            "offset": [
+              46,
+              43
+            ],
+            "frameCount": 64,
+            "start": 0
+          }
+        ]
+      }
+    },
+    "revision": "e5ff49698dcb380cebeac23ca582f460a635c4e5fc96c3d6baede07da6f7b24d",
+    "icon": {
+      "id": "fb17363a5e754475",
+      "offset": [
+        4,
+        4
+      ],
+      "frameCount": 1
+    },
+    "files": [
+      "client/assets/warrior_progression_armor_regearl60.png",
+      "client/assets/warrior_progression_armor_regearl60_depth.png",
+      "client/assets/warrior_f_progression_armor_regearl60.png",
+      "client/assets/warrior_f_progression_armor_regearl60_depth.png",
+      "client/assets/gear_icon_l60-warrior-armor.png"
+    ]
+  }
+}

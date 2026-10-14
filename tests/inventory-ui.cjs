@@ -13,6 +13,17 @@ async function call(name, args = {}) {
   const result = await client.callTool({ name, arguments: args });
   assert.ok(!result.isError, `${name}: ${JSON.stringify(result.content)}`); return result.structuredContent;
 }
+async function reloadGuest(world) {
+  await page.evaluate(() => Online.stop());
+  let online = 1;
+  for (let n = 0; n < 100; n++) {
+    online = (await (await fetch(world.url + 'health')).json()).online;
+    if (online === 0) break;
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  assert.equal(online, 0, 'Previous guest socket disconnected before reload');
+  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+}
 (async () => {
   // This suite checks the bag UI around one real kill, not combat difficulty: pin every enemy to its default level.
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe', env: { ...getDefaultEnvironment(), VALHALLA_LEVEL_SPREAD: '0' } }));
@@ -64,9 +75,10 @@ async function call(name, args = {}) {
   await page.locator('#field-mageArmor').selectOption('apprentice');
   await page.waitForFunction(() => Field.hero.look.mageArmor === 'apprentice');
   await page.locator('#equipment-close').click();
-  // Two green slimes are almost equally near (21.62 and 21.63 units); one stands beside an Ironhide that kills a level-1 mage.
-  // Take the nearest green whose spawn has no Ironhide spawn within 9 units (home points, because the beetles wander) so the kill is the same every run.
-  const enemy = await page.evaluate(() => Field.slimes.filter(s => !s.dead && s.kind === 'green' && !Field.slimes.some(o => o.kind === 'beetle' && Math.hypot(o.hx-s.hx,o.hy-s.hy) < 9)).sort((a,b) => Math.hypot(a.x-Field.hero.x,a.y-Field.hero.y)-Math.hypot(b.x-Field.hero.x,b.y-Field.hero.y))[0]);
+  // Stage a nearby green slime with the private-world shortcut; combat, drop, pickup and sale stay real.
+  await page.evaluate(() => Online.send({type:'debug',ref:3,command:{op:'spawn_enemy',kind:'green',x:Field.hero.x+1.8,y:Field.hero.y,level:1}}));
+  await page.waitForFunction(() => Field.slimes.some(s => !s.dead && s.kind === 'green' && Math.hypot(s.x-Field.hero.x,s.y-Field.hero.y)<7));
+  const enemy = await page.evaluate(() => Field.slimes.filter(s => !s.dead && s.kind === 'green').sort((a,b) => Math.hypot(a.x-Field.hero.x,a.y-Field.hero.y)-Math.hypot(b.x-Field.hero.x,b.y-Field.hero.y))[0]);
   await page.evaluate(id => Online.send({ type: 'target', id }), enemy.id);
   await page.waitForFunction(id => Field.slimes.find(s => s.id === id).dead, enemy.id, { timeout: 30000 });
   await page.evaluate(() => Online.send({ type: 'stop' }));
@@ -79,10 +91,18 @@ async function call(name, args = {}) {
   await page.locator('#inventory-list [data-item="slime_gel"] button').click();
   check(await page.locator('#bag-details [data-action="equip"]').count() === 0, 'Materials have no equip action');
   await page.screenshot({ path: path.join(world.artifacts, 'inventory-real-loot.png') });
-  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await reloadGuest(world);
   await page.waitForFunction(() => Online.connected && Inventory.quantity('slime_gel') === 1, null, { timeout: 60000 });
   check(await page.evaluate(() => Field.hero.look.mageWeapon === 'ash'), 'Loot and gear resume after page reload');
-  await page.evaluate(() => Field.visitNpc('merchant'));
+  await page.evaluate(() => {
+    const npc=WORLD_MAP.npcs.find(n=>n.id==='merchant');
+    Online.send({type:'debug',ref:4,command:{op:'teleport',zone:0,x:npc.x,y:npc.y-2}});
+  });
+  await page.waitForFunction(() => {
+    const npc=WORLD_MAP.npcs.find(n=>n.id==='merchant');
+    return Math.hypot(Field.hero.x-npc.x,Field.hero.y-npc.y)<4;
+  });
+  await page.evaluate(() => Online.send({type:'interact',npc:'merchant'}));
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 60000 });
   check(await page.locator('#npc-offers [data-offer="satchel"]').isVisible() && await page.locator('#npc-inventory [data-item]').count() === 0, 'The merchant greets with services and keeps the sell list closed');
   await page.locator('#npc-offers [data-view="sell"]').click();
@@ -121,7 +141,7 @@ async function call(name, args = {}) {
     check(await page.locator(`[data-slot="${slot}"] .item-art`).evaluate((n, i) => n.dataset.icon === i.id && getComputedStyle(n).backgroundImage.includes('items.png') && n.style.filter.includes(`hue-rotate(${i.tint.hue}deg)`), i), `${i.name}: worn slot uses its matching recoloured icon`);
     await page.keyboard.press('Escape');
   }
-  await page.reload(); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await reloadGuest(world);
   await page.waitForFunction(() => Online.connected && Field.hero.look.mageWeapon === 'ash_l50_blue' && Field.hero.look.mageArmor === 'apprentice_l50_nave', null, { timeout: 60000 });
   check(await page.evaluate(() => Inventory.quantity('mage_weapon_ash_l50_blue') === 1 && Inventory.quantity('mage_armor_apprentice_l50_nave') === 1), 'Level-50 world gear and Cathedral gear persist through browser reload');
   await page.keyboard.press('e');

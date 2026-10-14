@@ -1122,7 +1122,9 @@ mod tests {
     }
     #[test]
     fn blue_and_purple_attribute_bonuses_are_fixed_useful_and_save_with_gear() {
-        for i in ITEMS.iter().filter(|i| is_gear(i) && i.rarity != GM_RARITY) {
+        for i in ITEMS.iter().filter(|i| {
+            is_gear(i) && i.rarity != GM_RARITY && i.source.as_deref() != Some("orange_pool")
+        }) {
             let a = &i.bonus_stats;
             let values = [
                 ("strength", a.strength),
@@ -1629,13 +1631,9 @@ mod tests {
                 assert!(!i.starter);
             }
         }
-        // An empty tier drops nothing (no legendary gear exists yet, or the roll would panic on an empty pool).
+        // Orange gear has its own independent roll, never the ordinary level-capped pool.
         let roll = roll_for("big", "legendary");
-        let pool = ITEMS
-            .iter()
-            .filter(|i| i.rarity == "legendary" && is_gear(i))
-            .count();
-        assert_eq!(roll_equipment("big", 6, roll, 0.).is_some(), pool > 0);
+        assert!(roll_equipment("big", 6, roll, 0.).is_none());
     }
     #[test]
     fn enemies_drop_gear_up_to_one_step_above_their_zone() {
@@ -2177,10 +2175,11 @@ mod tests {
             "purple vs green"
         );
         // The game master's gear is outside the ladder: it never drops and is not for sale.
-        for i in ITEMS
-            .iter()
-            .filter(|i| (i.attack > 0. || i.defense > 0.) && i.rarity != GM_RARITY)
-        {
+        for i in ITEMS.iter().filter(|i| {
+            (i.attack > 0. || i.defense > 0.)
+                && i.rarity != GM_RARITY
+                && i.source.as_deref() != Some("orange_pool")
+        }) {
             let base = match i.kind.as_str() {
                 "weapon" => 4.,
                 "armor" if matches!(i.class, Some(Class::Mage | Class::Assassin)) => 2.,

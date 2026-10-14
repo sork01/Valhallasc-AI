@@ -146,10 +146,10 @@ All 50 must work for every class at every level, be exceptionally strong, have d
 - [x] `O-21-25` — Create and wire orange pieces 21–25: catalog, distinct worn art, icon and randomized stat definition.
 - [x] `O-26-30` — Create and wire orange pieces 26–30: catalog, distinct worn art, icon and randomized stat definition.
 - [x] `O-31-35` — Create and wire orange pieces 31–35: catalog, distinct worn art, icon and randomized stat definition.
-- [ ] `O-36-40` — Create and wire orange pieces 36–40: catalog, distinct worn art, icon and randomized stat definition.
-- [ ] `O-41-45` — Create and wire orange pieces 41–45: catalog, distinct worn art, icon and randomized stat definition.
-- [ ] `O-46-50` — Create and wire orange pieces 46–50: catalog, distinct worn art, icon and randomized stat definition.
-- [ ] `O-CHECK` — Check the 50-piece pool, class/level freedom, drop probability, persistence and equip rules in focused private tests.
+- [x] `O-36-40` — Create and wire orange pieces 36–40: catalog, distinct worn art, icon and randomized stat definition.
+- [x] `O-41-45` — Create and wire orange pieces 41–45: catalog, distinct worn art, icon and randomized stat definition.
+- [x] `O-46-50` — Create and wire orange pieces 46–50: catalog, distinct worn art, icon and randomized stat definition.
+- [x] `O-CHECK` — Check the 50-piece pool, class/level freedom, drop probability, persistence and equip rules in focused private tests.
 
 ### Ordinary gear artwork, levels 60–95
 
@@ -159,35 +159,35 @@ For each entry, replace tinted starter silhouettes with new worn layers and matc
 
 #### Level 60
 
-- [ ] `A60-WARRIOR` — Create and wire the five level-60 warrior pieces and icons.
-- [ ] `A60-MAGE` — Create and wire the five level-60 mage pieces and icons.
-- [ ] `A60-ASSASSIN` — Create and wire the five level-60 assassin pieces and icons.
-- [ ] `A60-PRIEST` — Create and wire the five level-60 priest pieces and icons.
-- [ ] `A60-HUNTER` — Create and wire the five level-60 hunter pieces and icons.
-- [ ] `A60-SHARED` — Create and wire the three shared level-60 pieces and icons.
+- [x] `A60-WARRIOR` — Create and wire the five level-60 warrior pieces and icons.
+- [x] `A60-MAGE` — Create and wire the five level-60 mage pieces and icons.
+- [x] `A60-ASSASSIN` — Create and wire the five level-60 assassin pieces and icons.
+- [x] `A60-PRIEST` — Create and wire the five level-60 priest pieces and icons.
+- [x] `A60-HUNTER` — Create and wire the five level-60 hunter pieces and icons.
+- [x] `A60-SHARED` — Create and wire the three shared level-60 pieces and icons.
 
 #### Level 65
 
-- [ ] `A65-WARRIOR` — Create and wire the five level-65 warrior pieces and icons.
-- [ ] `A65-MAGE` — Create and wire the five level-65 mage pieces and icons.
-- [ ] `A65-ASSASSIN` — Create and wire the five level-65 assassin pieces and icons.
-- [ ] `A65-PRIEST` — Create and wire the five level-65 priest pieces and icons.
-- [ ] `A65-HUNTER` — Create and wire the five level-65 hunter pieces and icons.
-- [ ] `A65-SHARED` — Create and wire the three shared level-65 pieces and icons.
+- [x] `A65-WARRIOR` — Create and wire the five level-65 warrior pieces and icons.
+- [x] `A65-MAGE` — Create and wire the five level-65 mage pieces and icons.
+- [x] `A65-ASSASSIN` — Create and wire the five level-65 assassin pieces and icons.
+- [x] `A65-PRIEST` — Create and wire the five level-65 priest pieces and icons.
+- [x] `A65-HUNTER` — Create and wire the five level-65 hunter pieces and icons.
+- [x] `A65-SHARED` — Create and wire the three shared level-65 pieces and icons.
 
 #### Level 70
 
-- [ ] `A70-WARRIOR` — Create and wire the five level-70 warrior pieces and icons.
-- [ ] `A70-MAGE` — Create and wire the five level-70 mage pieces and icons.
-- [ ] `A70-ASSASSIN` — Create and wire the five level-70 assassin pieces and icons.
-- [ ] `A70-PRIEST` — Create and wire the five level-70 priest pieces and icons.
-- [ ] `A70-HUNTER` — Create and wire the five level-70 hunter pieces and icons.
-- [ ] `A70-SHARED` — Create and wire the three shared level-70 pieces and icons.
+- [x] `A70-WARRIOR` — Create and wire the five level-70 warrior pieces and icons.
+- [x] `A70-MAGE` — Create and wire the five level-70 mage pieces and icons.
+- [x] `A70-ASSASSIN` — Create and wire the five level-70 assassin pieces and icons.
+- [x] `A70-PRIEST` — Create and wire the five level-70 priest pieces and icons.
+- [x] `A70-HUNTER` — Create and wire the five level-70 hunter pieces and icons.
+- [x] `A70-SHARED` — Create and wire the three shared level-70 pieces and icons.
 
 #### Level 75
 
-- [ ] `A75-WARRIOR` — Create and wire the five level-75 warrior pieces and icons.
-- [ ] `A75-MAGE` — Create and wire the five level-75 mage pieces and icons.
+- [x] `A75-WARRIOR` — Create and wire the five level-75 warrior pieces and icons.
+- [x] `A75-MAGE` — Create and wire the five level-75 mage pieces and icons.
 - [ ] `A75-ASSASSIN` — Create and wire the five level-75 assassin pieces and icons.
 - [ ] `A75-PRIEST` — Create and wire the five level-75 priest pieces and icons.
 - [ ] `A75-HUNTER` — Create and wire the five level-75 hunter pieces and icons.
@@ -366,7 +366,7 @@ The route pass aligned the Stormrift, Hourglass Pass, Glassroot Causeway, Sunwar
 
 All 252 level-25–50 and Cathedral base pieces are complete. Detailed piece history is in [GEAR_REDESIGN_TODO.md](GEAR_REDESIGN_TODO.md).
 
-- [ ] `R-CHECK` — Complete its final generator, Rust, MCP and browser/art integration checks, then close the detailed checklist.
+- [x] `R-CHECK` — Complete its final generator, Rust, MCP and browser/art integration checks, then close the detailed checklist.
 
 ## Completed in this batch (2026-10-12)
 

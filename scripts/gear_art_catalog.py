@@ -7,13 +7,15 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / 'world/gear-art.txt'
 STATE = ROOT / 'docs/gear-redesign-state.txt'
+HIGH_STATE = ROOT / 'docs/high-gear-state.txt'
 ASSETS = ROOT / 'client/assets'
 
 
 def jobs():
     if not MANIFEST.exists(): return []
     manifest = json.loads(MANIFEST.read_text())
-    state = {t['id']: t for t in json.loads(STATE.read_text())['tasks']}
+    state = {t['id']: t for path in (STATE, HIGH_STATE) if path.exists()
+             for t in json.loads(path.read_text())['tasks']}
     return [(state[key], record) for key, record in manifest.items() if record.get('files')]
 
 

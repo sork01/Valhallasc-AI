@@ -72,8 +72,8 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.locator('[data-slot="chest"] .gear-icon').click();
   assert.match(await page.locator('#bag-details').textContent(),/Equipped/);
   const familyFrames=[];
-  for(const number of [11,16,21,26,31]){
-    const id=`orange_${number}`;
+  for(const number of [11,16,21,26,31,36,41,46]){
+    const id=`orange_${String(number).padStart(2,'0')}`;
     await debug({op:'give_item',item:id,quantity:1});
     await page.waitForFunction(id=>Inventory.quantity(id)===1,id,{timeout:15000});
     await page.waitForFunction(id=>[...document.querySelector('#field-warriorArmor').options].some(o=>o.value===id),id,{timeout:15000});
@@ -85,7 +85,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
     familyFrames.push(drawn.image);
     assert.equal(await page.locator('[data-slot="chest"] .orange-item-art').getAttribute('data-icon'),id);
   }
-  assert.equal(new Set(familyFrames).size,5,'Five families have different worn colors');
+  assert.equal(new Set(familyFrames).size,8,'Eight later families have different worn colors');
   const fitted=await page.evaluate(()=>{
     const sprite=Field.warriorSprites, prior={...Field.hero.look};
     sprite.set({...prior,warriorArmor:'orange_11',warriorWeapon:'orange_12',
@@ -100,14 +100,14 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   assert.notEqual(fitted.image,ordinaryFrame);
   const exported=await page.evaluate(async()=>{
     const hashes=[];
-    for(let n=1;n<=35;n++){
+    for(let n=1;n<=50;n++){
       const id=`orange_${String(n).padStart(2,'0')}`,img=new Image();img.src=`assets/${id}.png`;await img.decode();
       const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);
       hashes.push(c.toDataURL());
     }
     return hashes;
   });
-  assert.equal(new Set(exported).size,35,'Thirty-five distinct PixelFlow exports load in browser');
+  assert.equal(new Set(exported).size,50,'Fifty distinct PixelFlow exports load in browser');
   assert.deepEqual(errors,[]);
   console.log('Gearwright merge and refinement browser checks passed');
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{

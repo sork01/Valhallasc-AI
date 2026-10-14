@@ -21,7 +21,10 @@ PALETTES = [('#33191b', '#89512f', '#f2a347', '#ffe39a', '#e7652d'),
             ('#162536', '#2d6380', '#65b5b6', '#d2fbef', '#b990e9'),
             ('#14172d', '#363b70', '#7c88c7', '#e6eaff', '#e6b5ff'),
             ('#44301c', '#bc7931', '#f6c55f', '#fff2b2', '#f6e7c1'),
-            ('#391b25', '#8e3537', '#e67842', '#ffe2a2', '#f4b16a')]
+            ('#391b25', '#8e3537', '#e67842', '#ffe2a2', '#f4b16a'),
+            ('#19263c', '#617895', '#c0d6e5', '#f7fcff', '#a9bde9'),
+            ('#352419', '#987044', '#d7ae68', '#fff0bb', '#f5b747'),
+            ('#1d3027', '#576c39', '#a2be6d', '#e9f4bd', '#e1a850')]
 
 
 def render(n):
@@ -93,6 +96,23 @@ def render(n):
                       fill=gem, outline=dark)
         for x,y in [(20,7),(43,10),(31,56)]:
             d.ellipse((x,y,x+2,y+2), fill=glint)
+    elif family == 7:  # Moonlit Sentinel: a glass crescent around a silver star.
+        d.arc((19,3,45,29), 45, 270, fill=glint, width=3)
+        d.arc((23,6,45,26), 55, 250, fill=dark, width=2)
+        for x,y in [(9,15),(52,19),(48,51)]:
+            d.polygon([(x,y-4),(x+3,y),(x,y+4),(x-3,y)], fill=gem, outline=dark)
+    elif family == 8:  # Chronometer: bronze gear teeth and an amber hourglass.
+        d.ellipse((23,4,41,22), fill=base, outline=dark, width=2)
+        for x,y in [(31,1),(21,7),(42,7),(31,23)]:
+            d.rectangle((x,y,x+3,y+4), fill=light, outline=dark)
+        d.polygon([(28,9),(37,9),(33,13),(37,18),(28,18),(32,13)], fill=gem, outline=dark)
+        d.line([(7,51),(14,51),(14,57),(7,57)], fill=glint, width=2)
+    elif family == 9:  # Worldheart: a branching crown and sap crystal.
+        d.line([(32,20),(32,5),(23,1)], fill=dark, width=4)
+        d.line([(32,11),(41,3),(47,4)], fill=light, width=3)
+        for x,y in [(23,2),(45,4),(15,52),(49,51)]:
+            d.ellipse((x-3,y-2,x+3,y+2), fill=light, outline=dark)
+        d.polygon([(32,4),(36,10),(32,16),(28,10)], fill=gem, outline=dark)
     return im
 
 

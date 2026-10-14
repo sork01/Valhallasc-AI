@@ -195,13 +195,14 @@
     armor: hasGear(ARMOR, 'armor', look?.mageArmor) ? look.mageArmor : 'apprentice',
     weapon: hasGear(WEAPON, 'weapon', look?.mageWeapon) ? look.mageWeapon : 'ash',
   });
-  // Head, shoulder and glove pieces are worn per class: the look names a tier (or 'none'), and a class only
-  // accepts its own tier names (MageSprite.TIERS). A part the atlas does not have is simply not drawn.
+  // Head, shoulder and glove pieces use the class's tier, shared gear, or a catalog art layer.
+  // A part missing from the class atlas is simply not drawn.
   const SLOT_ORDER = ['armor', 'pants', 'shoulders', 'gloves', 'head', 'necklace', 'accessory', 'weapon'];
-  // A head, shoulder or glove piece is the class's own tier or the shared generic piece; pants, necklace and ring are generic only.
+  // Catalog art includes the later progression sets; pants, necklace and ring also have shared generic pieces.
   const CLASS_SLOTS = ['head', 'shoulders', 'gloves'];
   const pieces = (C, look) => Object.fromEntries(Object.entries(GENERIC).map(([slot, generic]) => {
     const allowed = [...(CLASS_SLOTS.includes(slot) ? [...(C.TIERS || []), generic] : [generic]), ...PROGRESSION,
+      ...(window.WORLD_ITEMS || []).filter(i => !i.source && i.kind === KIND[slot] && i.art).map(i => i.art),
       ...(window.WORLD_ITEMS || []).filter(i => i.source === 'orange_pool' && i.kind === KIND[slot]).map(i => i.variant)];
     return [slot, allowed.includes(resolve(slot, look?.[slot]).art) ? look[slot] : 'none'];
   }));
@@ -215,9 +216,12 @@
     ['#14172d', '#363b70', '#7c88c7', '#e6eaff'],
     ['#44301c', '#bc7931', '#f6c55f', '#fff2b2'],
     ['#391b25', '#8e3537', '#e67842', '#ffe2a2'],
+    ['#19263c', '#617895', '#c0d6e5', '#f7fcff'],
+    ['#352419', '#987044', '#d7ae68', '#fff0bb'],
+    ['#1d3027', '#576c39', '#a2be6d', '#e9f4bd'],
   ];
   const orangeFamily = variant => {
-    const match = /^orange_(0[1-9]|[12][0-9]|3[0-5])$/.exec(variant || '');
+    const match = /^orange_(0[1-9]|[1-4][0-9]|50)$/.exec(variant || '');
     return match ? Math.floor((Number(match[1]) - 1) / 5) : -1;
   };
   const orangeBase = (C, meta, slot) => {

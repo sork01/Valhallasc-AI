@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'client/assets'
 RAW = ROOT / 'scripts/progression_raw'
 STATE = ROOT / 'docs/gear-redesign-state.txt'
+HIGH_STATE = ROOT / 'docs/high-gear-state.txt'
 MANIFEST = ROOT / 'world/gear-art.txt'
 CLASSES = tuple(shape.MODULES)
 DIRS = cc.DIRS
@@ -43,7 +44,12 @@ def revision(task):
 
 
 def task_for(job):
-    return next(t for t in json.loads(STATE.read_text())['tasks'] if t['id'] == job)
+    for path in (STATE, HIGH_STATE):
+        if path.exists():
+            task = next((t for t in json.loads(path.read_text())['tasks'] if t['id'] == job), None)
+            if task:
+                return task
+    raise KeyError(job)
 
 
 def frames(task, cls, gender):

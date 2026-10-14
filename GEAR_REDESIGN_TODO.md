@@ -1,7 +1,7 @@
 # Gear redesign: levels 25–50 and the Drowned Cathedral
 
-**Completed base pieces: 252/252.** Updated 2026-10-06T18:52:05.
-**Active/next piece:** `integration checks`.
+**Completed base pieces: 252/252.** Integration closed 2026-10-14.
+**Active/next piece:** `complete`.
 
 Game-wide content work is tracked in [TODO.md](TODO.md).
 
@@ -41,11 +41,12 @@ that visual approach. **The old recolor previews are not evidence of completed r
 - [x] New layer loading and allowed variants
 - [x] Catalog maps each redesigned level/tier to its new base art (all 252 manifest jobs have matching catalog items)
 - [x] Matching inventory icons exported and wired (all 252 jobs have mapped item IDs in `client/assets/items.txt`)
-- [ ] Generator, Rust, actual MCP and browser/art checks
+- [x] Generator, Rust, actual MCP and browser/art checks
 - [x] Updated level-50 assassin preview saved to Sork’s Filedrop
 
 Latest full-set preview: [Level-50 assassin on Filedrop](https://gunning.se/filedrop/api.php?action=download&file=Valhalla_Assassin_-_Redesigned_Level_25_Full_Set_Updated_Head.png).
 All 252 level-25–50 and Cathedral base pieces are redesigned and tracked below.
+Final integrity audit checked all 252 source records, catalog items, icons, and male/female atlas parts. The gear generator, 37 focused Rust item tests, private Cathedral/Undervault/inventory/bags scenarios, a 64-check real-sprite browser pass, and 77 inventory UI checks passed on 2026-10-14.
 
 ## L25
 
