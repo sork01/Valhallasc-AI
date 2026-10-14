@@ -1,0 +1,1178 @@
+[
+  {
+    "level": "1\u201320",
+    "set": "Starter",
+    "classes": {
+      "warrior": [
+        "armor_crimson",
+        "pants_wayfarer",
+        "shoulders_crimson",
+        "gloves_crimson",
+        "head_crimson",
+        "necklace_moonstone",
+        "accessory_amber",
+        "weapon_sword"
+      ],
+      "mage": [
+        "armor_apprentice",
+        "pants_wayfarer",
+        "shoulders_apprentice",
+        "gloves_apprentice",
+        "head_apprentice",
+        "necklace_moonstone",
+        "accessory_amber",
+        "weapon_ash"
+      ],
+      "assassin": [
+        "armor_shadow",
+        "pants_wayfarer",
+        "shoulders_shadow",
+        "gloves_shadow",
+        "head_shadow",
+        "necklace_moonstone",
+        "accessory_amber",
+        "weapon_daggers"
+      ],
+      "priest": [
+        "armor_pilgrim",
+        "pants_wayfarer",
+        "shoulders_pilgrim",
+        "gloves_pilgrim",
+        "head_pilgrim",
+        "necklace_moonstone",
+        "accessory_amber",
+        "weapon_mace"
+      ],
+      "hunter": [
+        "armor_scout",
+        "pants_wayfarer",
+        "shoulders_scout",
+        "gloves_scout",
+        "head_scout",
+        "necklace_moonstone",
+        "accessory_amber",
+        "weapon_shortbow"
+      ]
+    }
+  },
+  {
+    "level": "1\u201320",
+    "set": "Starter upgrade",
+    "classes": {
+      "warrior": [
+        "armor_azure",
+        "pants_wayfarer",
+        "shoulders_azure",
+        "gloves_azure",
+        "head_azure",
+        "necklace_moonstone",
+        "accessory_amber",
+        "weapon_royal"
+      ],
+      "mage": [
+        "armor_runic",
+        "pants_wayfarer",
+        "shoulders_runic",
+        "gloves_runic",
+        "head_runic",
+        "necklace_moonstone",
+        "accessory_amber",
+        "weapon_crystal"
+      ],
+      "assassin": [
+        "armor_moon",
+        "pants_wayfarer",
+        "shoulders_moon",
+        "gloves_moon",
+        "head_moon",
+        "necklace_moonstone",
+        "accessory_amber",
+        "weapon_moonfang"
+      ],
+      "priest": [
+        "armor_dawn",
+        "pants_wayfarer",
+        "shoulders_dawn",
+        "gloves_dawn",
+        "head_dawn",
+        "necklace_moonstone",
+        "accessory_amber",
+        "weapon_sunmace"
+      ],
+      "hunter": [
+        "armor_warden",
+        "pants_wayfarer",
+        "shoulders_warden",
+        "gloves_warden",
+        "head_warden",
+        "necklace_moonstone",
+        "accessory_amber",
+        "weapon_wardenbow"
+      ]
+    }
+  },
+  {
+    "level": "20",
+    "set": "Undervault",
+    "classes": {
+      "warrior": [
+        "armor_regearvault",
+        "pants_regearvault",
+        "shoulders_regearvault",
+        "gloves_regearvault",
+        "head_regearvault",
+        "necklace_moonstone",
+        "accessory_regearvault",
+        "weapon_regearvault"
+      ],
+      "mage": [
+        "armor_regearvault",
+        "pants_regearvault",
+        "shoulders_regearvault",
+        "gloves_regearvault",
+        "head_regearvault",
+        "necklace_moonstone",
+        "accessory_regearvault",
+        "weapon_regearvault"
+      ],
+      "assassin": [
+        "armor_regearvault",
+        "pants_regearvault",
+        "shoulders_regearvault",
+        "gloves_regearvault",
+        "head_regearvault",
+        "necklace_moonstone",
+        "accessory_regearvault",
+        "weapon_regearvault"
+      ],
+      "priest": [
+        "armor_regearvault",
+        "pants_regearvault",
+        "shoulders_regearvault",
+        "gloves_regearvault",
+        "head_regearvault",
+        "necklace_moonstone",
+        "accessory_regearvault",
+        "weapon_regearvault"
+      ],
+      "hunter": [
+        "armor_regearvault",
+        "pants_regearvault",
+        "shoulders_regearvault",
+        "gloves_regearvault",
+        "head_regearvault",
+        "necklace_moonstone",
+        "accessory_regearvault",
+        "weapon_regearvault"
+      ]
+    }
+  },
+  {
+    "level": "25",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl25",
+        "pants_regearl25",
+        "shoulders_regearl25",
+        "gloves_regearl25",
+        "head_regearl25",
+        "necklace_regearl25",
+        "accessory_regearl25",
+        "weapon_regearl25"
+      ],
+      "mage": [
+        "armor_regearl25",
+        "pants_regearl25",
+        "shoulders_regearl25",
+        "gloves_regearl25",
+        "head_regearl25",
+        "necklace_regearl25",
+        "accessory_regearl25",
+        "weapon_regearl25"
+      ],
+      "assassin": [
+        "armor_regearl25",
+        "pants_regearl25",
+        "shoulders_regearl25",
+        "gloves_regearl25",
+        "head_regearl25",
+        "necklace_regearl25",
+        "accessory_regearl25",
+        "weapon_regearl25"
+      ],
+      "priest": [
+        "armor_regearl25",
+        "pants_regearl25",
+        "shoulders_regearl25",
+        "gloves_regearl25",
+        "head_regearl25",
+        "necklace_regearl25",
+        "accessory_regearl25",
+        "weapon_regearl25"
+      ],
+      "hunter": [
+        "armor_regearl25",
+        "pants_regearl25",
+        "shoulders_regearl25",
+        "gloves_regearl25",
+        "head_regearl25",
+        "necklace_regearl25",
+        "accessory_regearl25",
+        "weapon_regearl25"
+      ]
+    }
+  },
+  {
+    "level": "30",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl30",
+        "pants_regearl30",
+        "shoulders_regearl30",
+        "gloves_regearl30",
+        "head_regearl30",
+        "necklace_regearl30",
+        "accessory_regearl30",
+        "weapon_regearl30"
+      ],
+      "mage": [
+        "armor_regearl30",
+        "pants_regearl30",
+        "shoulders_regearl30",
+        "gloves_regearl30",
+        "head_regearl30",
+        "necklace_regearl30",
+        "accessory_regearl30",
+        "weapon_regearl30"
+      ],
+      "assassin": [
+        "armor_regearl30",
+        "pants_regearl30",
+        "shoulders_regearl30",
+        "gloves_regearl30",
+        "head_regearl30",
+        "necklace_regearl30",
+        "accessory_regearl30",
+        "weapon_regearl30"
+      ],
+      "priest": [
+        "armor_regearl30",
+        "pants_regearl30",
+        "shoulders_regearl30",
+        "gloves_regearl30",
+        "head_regearl30",
+        "necklace_regearl30",
+        "accessory_regearl30",
+        "weapon_regearl30"
+      ],
+      "hunter": [
+        "armor_regearl30",
+        "pants_regearl30",
+        "shoulders_regearl30",
+        "gloves_regearl30",
+        "head_regearl30",
+        "necklace_regearl30",
+        "accessory_regearl30",
+        "weapon_regearl30"
+      ]
+    }
+  },
+  {
+    "level": "35",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl35",
+        "pants_regearl35",
+        "shoulders_regearl35",
+        "gloves_regearl35",
+        "head_regearl35",
+        "necklace_regearl35",
+        "accessory_regearl35",
+        "weapon_regearl35"
+      ],
+      "mage": [
+        "armor_regearl35",
+        "pants_regearl35",
+        "shoulders_regearl35",
+        "gloves_regearl35",
+        "head_regearl35",
+        "necklace_regearl35",
+        "accessory_regearl35",
+        "weapon_regearl35"
+      ],
+      "assassin": [
+        "armor_regearl35",
+        "pants_regearl35",
+        "shoulders_regearl35",
+        "gloves_regearl35",
+        "head_regearl35",
+        "necklace_regearl35",
+        "accessory_regearl35",
+        "weapon_regearl35"
+      ],
+      "priest": [
+        "armor_regearl35",
+        "pants_regearl35",
+        "shoulders_regearl35",
+        "gloves_regearl35",
+        "head_regearl35",
+        "necklace_regearl35",
+        "accessory_regearl35",
+        "weapon_regearl35"
+      ],
+      "hunter": [
+        "armor_regearl35",
+        "pants_regearl35",
+        "shoulders_regearl35",
+        "gloves_regearl35",
+        "head_regearl35",
+        "necklace_regearl35",
+        "accessory_regearl35",
+        "weapon_regearl35"
+      ]
+    }
+  },
+  {
+    "level": "40",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl40",
+        "pants_regearl40",
+        "shoulders_regearl40",
+        "gloves_regearl40",
+        "head_regearl40",
+        "necklace_regearl40",
+        "accessory_regearl40",
+        "weapon_regearl40"
+      ],
+      "mage": [
+        "armor_regearl40",
+        "pants_regearl40",
+        "shoulders_regearl40",
+        "gloves_regearl40",
+        "head_regearl40",
+        "necklace_regearl40",
+        "accessory_regearl40",
+        "weapon_regearl40"
+      ],
+      "assassin": [
+        "armor_regearl40",
+        "pants_regearl40",
+        "shoulders_regearl40",
+        "gloves_regearl40",
+        "head_regearl40",
+        "necklace_regearl40",
+        "accessory_regearl40",
+        "weapon_regearl40"
+      ],
+      "priest": [
+        "armor_regearl40",
+        "pants_regearl40",
+        "shoulders_regearl40",
+        "gloves_regearl40",
+        "head_regearl40",
+        "necklace_regearl40",
+        "accessory_regearl40",
+        "weapon_regearl40"
+      ],
+      "hunter": [
+        "armor_regearl40",
+        "pants_regearl40",
+        "shoulders_regearl40",
+        "gloves_regearl40",
+        "head_regearl40",
+        "necklace_regearl40",
+        "accessory_regearl40",
+        "weapon_regearl40"
+      ]
+    }
+  },
+  {
+    "level": "40",
+    "set": "Cathedral Cloister",
+    "classes": {
+      "warrior": [
+        "armor_regearcloister",
+        "pants_regearcloister",
+        "shoulders_regearcloister",
+        "gloves_regearcloister",
+        "head_regearcloister",
+        "necklace_regearcloister",
+        "accessory_regearcloister",
+        "weapon_regearcloister"
+      ],
+      "mage": [
+        "armor_regearcloister",
+        "pants_regearcloister",
+        "shoulders_regearcloister",
+        "gloves_regearcloister",
+        "head_regearcloister",
+        "necklace_regearcloister",
+        "accessory_regearcloister",
+        "weapon_regearcloister"
+      ],
+      "assassin": [
+        "armor_regearcloister",
+        "pants_regearcloister",
+        "shoulders_regearcloister",
+        "gloves_regearcloister",
+        "head_regearcloister",
+        "necklace_regearcloister",
+        "accessory_regearcloister",
+        "weapon_regearcloister"
+      ],
+      "priest": [
+        "armor_regearcloister",
+        "pants_regearcloister",
+        "shoulders_regearcloister",
+        "gloves_regearcloister",
+        "head_regearcloister",
+        "necklace_regearcloister",
+        "accessory_regearcloister",
+        "weapon_regearcloister"
+      ],
+      "hunter": [
+        "armor_regearcloister",
+        "pants_regearcloister",
+        "shoulders_regearcloister",
+        "gloves_regearcloister",
+        "head_regearcloister",
+        "necklace_regearcloister",
+        "accessory_regearcloister",
+        "weapon_regearcloister"
+      ]
+    }
+  },
+  {
+    "level": "45",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl45",
+        "pants_regearl45",
+        "shoulders_regearl45",
+        "gloves_regearl45",
+        "head_regearl45",
+        "necklace_regearl45",
+        "accessory_regearl45",
+        "weapon_regearl45"
+      ],
+      "mage": [
+        "armor_regearl45",
+        "pants_regearl45",
+        "shoulders_regearl45",
+        "gloves_regearl45",
+        "head_regearl45",
+        "necklace_regearl45",
+        "accessory_regearl45",
+        "weapon_regearl45"
+      ],
+      "assassin": [
+        "armor_regearl45",
+        "pants_regearl45",
+        "shoulders_regearl45",
+        "gloves_regearl45",
+        "head_regearl45",
+        "necklace_regearl45",
+        "accessory_regearl45",
+        "weapon_regearl45"
+      ],
+      "priest": [
+        "armor_regearl45",
+        "pants_regearl45",
+        "shoulders_regearl45",
+        "gloves_regearl45",
+        "head_regearl45",
+        "necklace_regearl45",
+        "accessory_regearl45",
+        "weapon_regearl45"
+      ],
+      "hunter": [
+        "armor_regearl45",
+        "pants_regearl45",
+        "shoulders_regearl45",
+        "gloves_regearl45",
+        "head_regearl45",
+        "necklace_regearl45",
+        "accessory_regearl45",
+        "weapon_regearl45"
+      ]
+    }
+  },
+  {
+    "level": "45",
+    "set": "Cathedral Reliquary",
+    "classes": {
+      "warrior": [
+        "armor_regearreliquary",
+        "pants_regearreliquary",
+        "shoulders_regearreliquary",
+        "gloves_regearreliquary",
+        "head_regearreliquary",
+        "necklace_regearreliquary",
+        "accessory_regearreliquary",
+        "weapon_regearreliquary"
+      ],
+      "mage": [
+        "armor_regearreliquary",
+        "pants_regearreliquary",
+        "shoulders_regearreliquary",
+        "gloves_regearreliquary",
+        "head_regearreliquary",
+        "necklace_regearreliquary",
+        "accessory_regearreliquary",
+        "weapon_regearreliquary"
+      ],
+      "assassin": [
+        "armor_regearreliquary",
+        "pants_regearreliquary",
+        "shoulders_regearreliquary",
+        "gloves_regearreliquary",
+        "head_regearreliquary",
+        "necklace_regearreliquary",
+        "accessory_regearreliquary",
+        "weapon_regearreliquary"
+      ],
+      "priest": [
+        "armor_regearreliquary",
+        "pants_regearreliquary",
+        "shoulders_regearreliquary",
+        "gloves_regearreliquary",
+        "head_regearreliquary",
+        "necklace_regearreliquary",
+        "accessory_regearreliquary",
+        "weapon_regearreliquary"
+      ],
+      "hunter": [
+        "armor_regearreliquary",
+        "pants_regearreliquary",
+        "shoulders_regearreliquary",
+        "gloves_regearreliquary",
+        "head_regearreliquary",
+        "necklace_regearreliquary",
+        "accessory_regearreliquary",
+        "weapon_regearreliquary"
+      ]
+    }
+  },
+  {
+    "level": "50\u201355",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl50",
+        "pants_regearl50",
+        "shoulders_regearl50",
+        "gloves_regearl50",
+        "head_regearl50",
+        "necklace_regearl50",
+        "accessory_regearl50",
+        "weapon_regearl50"
+      ],
+      "mage": [
+        "armor_regearl50",
+        "pants_regearl50",
+        "shoulders_regearl50",
+        "gloves_regearl50",
+        "head_regearl50",
+        "necklace_regearl50",
+        "accessory_regearl50",
+        "weapon_regearl50"
+      ],
+      "assassin": [
+        "armor_regearl50",
+        "pants_regearl50",
+        "shoulders_regearl50",
+        "gloves_regearl50",
+        "head_regearl50",
+        "necklace_regearl50",
+        "accessory_regearl50",
+        "weapon_regearl50"
+      ],
+      "priest": [
+        "armor_regearl50",
+        "pants_regearl50",
+        "shoulders_regearl50",
+        "gloves_regearl50",
+        "head_regearl50",
+        "necklace_regearl50",
+        "accessory_regearl50",
+        "weapon_regearl50"
+      ],
+      "hunter": [
+        "armor_regearl50",
+        "pants_regearl50",
+        "shoulders_regearl50",
+        "gloves_regearl50",
+        "head_regearl50",
+        "necklace_regearl50",
+        "accessory_regearl50",
+        "weapon_regearl50"
+      ]
+    }
+  },
+  {
+    "level": "50",
+    "set": "Cathedral Nave",
+    "classes": {
+      "warrior": [
+        "armor_regearnave",
+        "pants_regearnave",
+        "shoulders_regearnave",
+        "gloves_regearnave",
+        "head_regearnave",
+        "necklace_regearnave",
+        "accessory_regearnave",
+        "weapon_regearnave"
+      ],
+      "mage": [
+        "armor_regearnave",
+        "pants_regearnave",
+        "shoulders_regearnave",
+        "gloves_regearnave",
+        "head_regearnave",
+        "necklace_regearnave",
+        "accessory_regearnave",
+        "weapon_regearnave"
+      ],
+      "assassin": [
+        "armor_regearnave",
+        "pants_regearnave",
+        "shoulders_regearnave",
+        "gloves_regearnave",
+        "head_regearnave",
+        "necklace_regearnave",
+        "accessory_regearnave",
+        "weapon_regearnave"
+      ],
+      "priest": [
+        "armor_regearnave",
+        "pants_regearnave",
+        "shoulders_regearnave",
+        "gloves_regearnave",
+        "head_regearnave",
+        "necklace_regearnave",
+        "accessory_regearnave",
+        "weapon_regearnave"
+      ],
+      "hunter": [
+        "armor_regearnave",
+        "pants_regearnave",
+        "shoulders_regearnave",
+        "gloves_regearnave",
+        "head_regearnave",
+        "necklace_regearnave",
+        "accessory_regearnave",
+        "weapon_regearnave"
+      ]
+    }
+  },
+  {
+    "level": "60",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl60",
+        "pants_regearl60",
+        "shoulders_regearl60",
+        "gloves_regearl60",
+        "head_regearl60",
+        "necklace_regearl60",
+        "accessory_regearl60",
+        "weapon_regearl60"
+      ],
+      "mage": [
+        "armor_regearl60",
+        "pants_regearl60",
+        "shoulders_regearl60",
+        "gloves_regearl60",
+        "head_regearl60",
+        "necklace_regearl60",
+        "accessory_regearl60",
+        "weapon_regearl60"
+      ],
+      "assassin": [
+        "armor_regearl60",
+        "pants_regearl60",
+        "shoulders_regearl60",
+        "gloves_regearl60",
+        "head_regearl60",
+        "necklace_regearl60",
+        "accessory_regearl60",
+        "weapon_regearl60"
+      ],
+      "priest": [
+        "armor_regearl60",
+        "pants_regearl60",
+        "shoulders_regearl60",
+        "gloves_regearl60",
+        "head_regearl60",
+        "necklace_regearl60",
+        "accessory_regearl60",
+        "weapon_regearl60"
+      ],
+      "hunter": [
+        "armor_regearl60",
+        "pants_regearl60",
+        "shoulders_regearl60",
+        "gloves_regearl60",
+        "head_regearl60",
+        "necklace_regearl60",
+        "accessory_regearl60",
+        "weapon_regearl60"
+      ]
+    }
+  },
+  {
+    "level": "60",
+    "set": "Moonwell",
+    "classes": {
+      "warrior": [
+        "armor_regearmoonwell",
+        "pants_regearmoonwell",
+        "shoulders_regearmoonwell",
+        "gloves_regearmoonwell",
+        "head_regearmoonwell",
+        "necklace_regearmoonwell",
+        "accessory_regearmoonwell",
+        "weapon_regearmoonwell"
+      ],
+      "mage": [
+        "armor_regearmoonwell",
+        "pants_regearmoonwell",
+        "shoulders_regearmoonwell",
+        "gloves_regearmoonwell",
+        "head_regearmoonwell",
+        "necklace_regearmoonwell",
+        "accessory_regearmoonwell",
+        "weapon_regearmoonwell"
+      ],
+      "assassin": [
+        "armor_regearmoonwell",
+        "pants_regearmoonwell",
+        "shoulders_regearmoonwell",
+        "gloves_regearmoonwell",
+        "head_regearmoonwell",
+        "necklace_regearmoonwell",
+        "accessory_regearmoonwell",
+        "weapon_regearmoonwell"
+      ],
+      "priest": [
+        "armor_regearmoonwell",
+        "pants_regearmoonwell",
+        "shoulders_regearmoonwell",
+        "gloves_regearmoonwell",
+        "head_regearmoonwell",
+        "necklace_regearmoonwell",
+        "accessory_regearmoonwell",
+        "weapon_regearmoonwell"
+      ],
+      "hunter": [
+        "armor_regearmoonwell",
+        "pants_regearmoonwell",
+        "shoulders_regearmoonwell",
+        "gloves_regearmoonwell",
+        "head_regearmoonwell",
+        "necklace_regearmoonwell",
+        "accessory_regearmoonwell",
+        "weapon_regearmoonwell"
+      ]
+    }
+  },
+  {
+    "level": "65",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl65",
+        "pants_regearl65",
+        "shoulders_regearl65",
+        "gloves_regearl65",
+        "head_regearl65",
+        "necklace_regearl65",
+        "accessory_regearl65",
+        "weapon_regearl65"
+      ],
+      "mage": [
+        "armor_regearl65",
+        "pants_regearl65",
+        "shoulders_regearl65",
+        "gloves_regearl65",
+        "head_regearl65",
+        "necklace_regearl65",
+        "accessory_regearl65",
+        "weapon_regearl65"
+      ],
+      "assassin": [
+        "armor_regearl65",
+        "pants_regearl65",
+        "shoulders_regearl65",
+        "gloves_regearl65",
+        "head_regearl65",
+        "necklace_regearl65",
+        "accessory_regearl65",
+        "weapon_regearl65"
+      ],
+      "priest": [
+        "armor_regearl65",
+        "pants_regearl65",
+        "shoulders_regearl65",
+        "gloves_regearl65",
+        "head_regearl65",
+        "necklace_regearl65",
+        "accessory_regearl65",
+        "weapon_regearl65"
+      ],
+      "hunter": [
+        "armor_regearl65",
+        "pants_regearl65",
+        "shoulders_regearl65",
+        "gloves_regearl65",
+        "head_regearl65",
+        "necklace_regearl65",
+        "accessory_regearl65",
+        "weapon_regearl65"
+      ]
+    }
+  },
+  {
+    "level": "70",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl70",
+        "pants_regearl70",
+        "shoulders_regearl70",
+        "gloves_regearl70",
+        "head_regearl70",
+        "necklace_regearl70",
+        "accessory_regearl70",
+        "weapon_regearl70"
+      ],
+      "mage": [
+        "armor_regearl70",
+        "pants_regearl70",
+        "shoulders_regearl70",
+        "gloves_regearl70",
+        "head_regearl70",
+        "necklace_regearl70",
+        "accessory_regearl70",
+        "weapon_regearl70"
+      ],
+      "assassin": [
+        "armor_regearl70",
+        "pants_regearl70",
+        "shoulders_regearl70",
+        "gloves_regearl70",
+        "head_regearl70",
+        "necklace_regearl70",
+        "accessory_regearl70",
+        "weapon_regearl70"
+      ],
+      "priest": [
+        "armor_regearl70",
+        "pants_regearl70",
+        "shoulders_regearl70",
+        "gloves_regearl70",
+        "head_regearl70",
+        "necklace_regearl70",
+        "accessory_regearl70",
+        "weapon_regearl70"
+      ],
+      "hunter": [
+        "armor_regearl70",
+        "pants_regearl70",
+        "shoulders_regearl70",
+        "gloves_regearl70",
+        "head_regearl70",
+        "necklace_regearl70",
+        "accessory_regearl70",
+        "weapon_regearl70"
+      ]
+    }
+  },
+  {
+    "level": "75",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl75",
+        "pants_regearl75",
+        "shoulders_regearl75",
+        "gloves_regearl75",
+        "head_regearl75",
+        "necklace_regearl75",
+        "accessory_regearl75",
+        "weapon_regearl75"
+      ],
+      "mage": [
+        "armor_regearl75",
+        "pants_regearl75",
+        "shoulders_regearl75",
+        "gloves_regearl75",
+        "head_regearl75",
+        "necklace_regearl75",
+        "accessory_regearl75",
+        "weapon_regearl75"
+      ],
+      "assassin": [
+        "armor_regearl75",
+        "pants_regearl75",
+        "shoulders_regearl75",
+        "gloves_regearl75",
+        "head_regearl75",
+        "necklace_regearl75",
+        "accessory_regearl75",
+        "weapon_regearl75"
+      ],
+      "priest": [
+        "armor_regearl75",
+        "pants_regearl75",
+        "shoulders_regearl75",
+        "gloves_regearl75",
+        "head_regearl75",
+        "necklace_regearl75",
+        "accessory_regearl75",
+        "weapon_regearl75"
+      ],
+      "hunter": [
+        "armor_regearl75",
+        "pants_regearl75",
+        "shoulders_regearl75",
+        "gloves_regearl75",
+        "head_regearl75",
+        "necklace_regearl75",
+        "accessory_regearl75",
+        "weapon_regearl75"
+      ]
+    }
+  },
+  {
+    "level": "80",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl80",
+        "pants_regearl80",
+        "shoulders_regearl80",
+        "gloves_regearl80",
+        "head_regearl80",
+        "necklace_regearl80",
+        "accessory_regearl80",
+        "weapon_regearl80"
+      ],
+      "mage": [
+        "armor_regearl80",
+        "pants_regearl80",
+        "shoulders_regearl80",
+        "gloves_regearl80",
+        "head_regearl80",
+        "necklace_regearl80",
+        "accessory_regearl80",
+        "weapon_regearl80"
+      ],
+      "assassin": [
+        "armor_regearl80",
+        "pants_regearl80",
+        "shoulders_regearl80",
+        "gloves_regearl80",
+        "head_regearl80",
+        "necklace_regearl80",
+        "accessory_regearl80",
+        "weapon_regearl80"
+      ],
+      "priest": [
+        "armor_regearl80",
+        "pants_regearl80",
+        "shoulders_regearl80",
+        "gloves_regearl80",
+        "head_regearl80",
+        "necklace_regearl80",
+        "accessory_regearl80",
+        "weapon_regearl80"
+      ],
+      "hunter": [
+        "armor_regearl80",
+        "pants_regearl80",
+        "shoulders_regearl80",
+        "gloves_regearl80",
+        "head_regearl80",
+        "necklace_regearl80",
+        "accessory_regearl80",
+        "weapon_regearl80"
+      ]
+    }
+  },
+  {
+    "level": "85",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl85",
+        "pants_regearl85",
+        "shoulders_regearl85",
+        "gloves_regearl85",
+        "head_regearl85",
+        "necklace_regearl85",
+        "accessory_regearl85",
+        "weapon_regearl85"
+      ],
+      "mage": [
+        "armor_regearl85",
+        "pants_regearl85",
+        "shoulders_regearl85",
+        "gloves_regearl85",
+        "head_regearl85",
+        "necklace_regearl85",
+        "accessory_regearl85",
+        "weapon_regearl85"
+      ],
+      "assassin": [
+        "armor_regearl85",
+        "pants_regearl85",
+        "shoulders_regearl85",
+        "gloves_regearl85",
+        "head_regearl85",
+        "necklace_regearl85",
+        "accessory_regearl85",
+        "weapon_regearl85"
+      ],
+      "priest": [
+        "armor_regearl85",
+        "pants_regearl85",
+        "shoulders_regearl85",
+        "gloves_regearl85",
+        "head_regearl85",
+        "necklace_regearl85",
+        "accessory_regearl85",
+        "weapon_regearl85"
+      ],
+      "hunter": [
+        "armor_regearl85",
+        "pants_regearl85",
+        "shoulders_regearl85",
+        "gloves_regearl85",
+        "head_regearl85",
+        "necklace_regearl85",
+        "accessory_regearl85",
+        "weapon_regearl85"
+      ]
+    }
+  },
+  {
+    "level": "90",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl90",
+        "pants_regearl90",
+        "shoulders_regearl90",
+        "gloves_regearl90",
+        "head_regearl90",
+        "necklace_regearl90",
+        "accessory_regearl90",
+        "weapon_regearl90"
+      ],
+      "mage": [
+        "armor_regearl90",
+        "pants_regearl90",
+        "shoulders_regearl90",
+        "gloves_regearl90",
+        "head_regearl90",
+        "necklace_regearl90",
+        "accessory_regearl90",
+        "weapon_regearl90"
+      ],
+      "assassin": [
+        "armor_regearl90",
+        "pants_regearl90",
+        "shoulders_regearl90",
+        "gloves_regearl90",
+        "head_regearl90",
+        "necklace_regearl90",
+        "accessory_regearl90",
+        "weapon_regearl90"
+      ],
+      "priest": [
+        "armor_regearl90",
+        "pants_regearl90",
+        "shoulders_regearl90",
+        "gloves_regearl90",
+        "head_regearl90",
+        "necklace_regearl90",
+        "accessory_regearl90",
+        "weapon_regearl90"
+      ],
+      "hunter": [
+        "armor_regearl90",
+        "pants_regearl90",
+        "shoulders_regearl90",
+        "gloves_regearl90",
+        "head_regearl90",
+        "necklace_regearl90",
+        "accessory_regearl90",
+        "weapon_regearl90"
+      ]
+    }
+  },
+  {
+    "level": "95\u201399",
+    "set": "Progression",
+    "classes": {
+      "warrior": [
+        "armor_regearl95",
+        "pants_regearl95",
+        "shoulders_regearl95",
+        "gloves_regearl95",
+        "head_regearl95",
+        "necklace_regearl95",
+        "accessory_regearl95",
+        "weapon_regearl95"
+      ],
+      "mage": [
+        "armor_regearl95",
+        "pants_regearl95",
+        "shoulders_regearl95",
+        "gloves_regearl95",
+        "head_regearl95",
+        "necklace_regearl95",
+        "accessory_regearl95",
+        "weapon_regearl95"
+      ],
+      "assassin": [
+        "armor_regearl95",
+        "pants_regearl95",
+        "shoulders_regearl95",
+        "gloves_regearl95",
+        "head_regearl95",
+        "necklace_regearl95",
+        "accessory_regearl95",
+        "weapon_regearl95"
+      ],
+      "priest": [
+        "armor_regearl95",
+        "pants_regearl95",
+        "shoulders_regearl95",
+        "gloves_regearl95",
+        "head_regearl95",
+        "necklace_regearl95",
+        "accessory_regearl95",
+        "weapon_regearl95"
+      ],
+      "hunter": [
+        "armor_regearl95",
+        "pants_regearl95",
+        "shoulders_regearl95",
+        "gloves_regearl95",
+        "head_regearl95",
+        "necklace_regearl95",
+        "accessory_regearl95",
+        "weapon_regearl95"
+      ]
+    }
+  }
+]

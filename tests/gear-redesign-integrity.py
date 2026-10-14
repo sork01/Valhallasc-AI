@@ -63,3 +63,40 @@ for task in completed_high:
             assert f'{slot}_{record["variant"]}' in metadata[name]['parts'], (job, cls, suffix)
 
 print(f'{len(completed_high)} high-level pieces have source art, both-body atlas parts, catalog and icons')
+
+dungeon = read('docs/dungeon-gear-state.txt')['tasks']
+assert len(dungeon) == 55
+for task in dungeon:
+    if not task['done']:
+        continue
+    job = task['id']
+    record = art[job]
+    assert record['kind'] == task['kind'] and record['icon']['id'], job
+    assert all((ROOT / file).is_file() for file in record['files']), job
+    item = items[task['item']]
+    assert item['source'] == {'vault': 'undervault', 'moonwell': 'moonwell'}[task['group']], job
+    assert item['art'] == record['variant'] and item['kind'] == task['kind'], job
+    assert item['id'] in icons, job
+    for cls in record['classes']:
+        assert all(record['classes'][cls][clip] for clip in ('idle', 'walk', 'attack', 'hurt', 'die')), job
+        for suffix in ('', '_f'):
+            name = f'client/assets/{names[cls]}{suffix}_sprites.txt'
+            if name not in metadata:
+                metadata[name] = read(name)
+            slot = 'head' if task['kind'] == 'headgear' else task['kind']
+            assert f'{slot}_{record["variant"]}' in metadata[name]['parts'], (job, cls, suffix)
+
+print(f'{sum(task["done"] for task in dungeon)} dungeon pieces have source art, both-body atlas parts, catalog and icons')
+
+for task in [t for t in high if t['group'] == 'L95'] + dungeon:
+    record = art[task['id']]
+    assert task['done'] and record.get('female'), task['id']
+    for cls in record['classes']:
+        assert all(record['female'][cls][clip] and all(chunk['id'] for chunk in record['female'][cls][clip])
+                   for clip in ('idle', 'walk', 'attack', 'hurt', 'die')), (task['id'], cls)
+        name = f'client/assets/{names[cls]}_f_sprites.txt'
+        meta = metadata.get(name) or read(name)
+        slot = 'head' if task['kind'] == 'headgear' else task['kind']
+        assert meta['gearSprites'][f'{slot}_{record["variant"]}'] == record['female'][cls], (task['id'], cls)
+
+print('83 new sets have editable PixelFlow records for both bodies and every animation')

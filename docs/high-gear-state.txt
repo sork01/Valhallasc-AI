@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-14T13:30:49",
+  "updated": "2026-10-14T13:49:30",
   "tasks": [
     {
       "id": "L60-warrior-armor",
@@ -4665,10 +4665,20 @@
       "kind": "armor",
       "item": "warrior_armor_crimson_l95_gray",
       "name": "Stoneworn Crimson Armor",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Inspected both-body front, side, rear, attack and death contact sheet; storm-cut cape, raised collar and plated chest fit without clipping.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_armor_regearl95.png",
+        "client/assets/warrior_progression_armor_regearl95_depth.png",
+        "client/assets/warrior_f_progression_armor_regearl95.png",
+        "client/assets/warrior_f_progression_armor_regearl95_depth.png",
+        "client/assets/gear_icon_l95-warrior-armor.png",
+        "test-results/gear-redesign/L95-warrior-armor.png",
+        "test-results/gear-redesign/L95-warrior-armor-browser.json"
+      ]
     },
     {
       "id": "L95-warrior-headgear",
@@ -4677,10 +4687,20 @@
       "kind": "headgear",
       "item": "warrior_headgear_crimson_l95_gray",
       "name": "Stoneworn Crimson Plumed Helm",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_head_regearl95.png",
+        "client/assets/warrior_progression_head_regearl95_depth.png",
+        "client/assets/warrior_f_progression_head_regearl95.png",
+        "client/assets/warrior_f_progression_head_regearl95_depth.png",
+        "client/assets/gear_icon_l95-warrior-headgear.png",
+        "test-results/gear-redesign/L95-warrior-headgear.png",
+        "test-results/gear-redesign/L95-warrior-headgear-browser.json"
+      ]
     },
     {
       "id": "L95-warrior-shoulders",
@@ -4689,10 +4709,20 @@
       "kind": "shoulders",
       "item": "warrior_shoulders_crimson_l95_gray",
       "name": "Stoneworn Crimson Pauldrons",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_shoulders_regearl95.png",
+        "client/assets/warrior_progression_shoulders_regearl95_depth.png",
+        "client/assets/warrior_f_progression_shoulders_regearl95.png",
+        "client/assets/warrior_f_progression_shoulders_regearl95_depth.png",
+        "client/assets/gear_icon_l95-warrior-shoulders.png",
+        "test-results/gear-redesign/L95-warrior-shoulders.png",
+        "test-results/gear-redesign/L95-warrior-shoulders-browser.json"
+      ]
     },
     {
       "id": "L95-warrior-gloves",
@@ -4701,10 +4731,20 @@
       "kind": "gloves",
       "item": "warrior_gloves_crimson_l95_gray",
       "name": "Stoneworn Crimson Gauntlets",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_gloves_regearl95.png",
+        "client/assets/warrior_progression_gloves_regearl95_depth.png",
+        "client/assets/warrior_f_progression_gloves_regearl95.png",
+        "client/assets/warrior_f_progression_gloves_regearl95_depth.png",
+        "client/assets/gear_icon_l95-warrior-gloves.png",
+        "test-results/gear-redesign/L95-warrior-gloves.png",
+        "test-results/gear-redesign/L95-warrior-gloves-browser.json"
+      ]
     },
     {
       "id": "L95-warrior-weapon",
@@ -4713,10 +4753,20 @@
       "kind": "weapon",
       "item": "warrior_weapon_sword_l95_gray",
       "name": "Stoneworn Iron Sword",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/warrior_progression_weapon_regearl95.png",
+        "client/assets/warrior_progression_weapon_regearl95_depth.png",
+        "client/assets/warrior_f_progression_weapon_regearl95.png",
+        "client/assets/warrior_f_progression_weapon_regearl95_depth.png",
+        "client/assets/gear_icon_l95-warrior-weapon.png",
+        "test-results/gear-redesign/L95-warrior-weapon.png",
+        "test-results/gear-redesign/L95-warrior-weapon-browser.json"
+      ]
     },
     {
       "id": "L95-mage-armor",
@@ -4725,10 +4775,20 @@
       "kind": "armor",
       "item": "mage_armor_apprentice_l95_gray",
       "name": "Stoneworn Apprentice Robes",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_armor_regearl95.png",
+        "client/assets/mage_progression_armor_regearl95_depth.png",
+        "client/assets/mage_f_progression_armor_regearl95.png",
+        "client/assets/mage_f_progression_armor_regearl95_depth.png",
+        "client/assets/gear_icon_l95-mage-armor.png",
+        "test-results/gear-redesign/L95-mage-armor.png",
+        "test-results/gear-redesign/L95-mage-armor-browser.json"
+      ]
     },
     {
       "id": "L95-mage-headgear",
@@ -4737,10 +4797,20 @@
       "kind": "headgear",
       "item": "mage_headgear_apprentice_l95_gray",
       "name": "Stoneworn Apprentice's Hat",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_head_regearl95.png",
+        "client/assets/mage_progression_head_regearl95_depth.png",
+        "client/assets/mage_f_progression_head_regearl95.png",
+        "client/assets/mage_f_progression_head_regearl95_depth.png",
+        "client/assets/gear_icon_l95-mage-headgear.png",
+        "test-results/gear-redesign/L95-mage-headgear.png",
+        "test-results/gear-redesign/L95-mage-headgear-browser.json"
+      ]
     },
     {
       "id": "L95-mage-shoulders",
@@ -4749,10 +4819,20 @@
       "kind": "shoulders",
       "item": "mage_shoulders_apprentice_l95_gray",
       "name": "Stoneworn Apprentice's Capelet",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_shoulders_regearl95.png",
+        "client/assets/mage_progression_shoulders_regearl95_depth.png",
+        "client/assets/mage_f_progression_shoulders_regearl95.png",
+        "client/assets/mage_f_progression_shoulders_regearl95_depth.png",
+        "client/assets/gear_icon_l95-mage-shoulders.png",
+        "test-results/gear-redesign/L95-mage-shoulders.png",
+        "test-results/gear-redesign/L95-mage-shoulders-browser.json"
+      ]
     },
     {
       "id": "L95-mage-gloves",
@@ -4761,10 +4841,20 @@
       "kind": "gloves",
       "item": "mage_gloves_apprentice_l95_gray",
       "name": "Stoneworn Apprentice's Gloves",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_gloves_regearl95.png",
+        "client/assets/mage_progression_gloves_regearl95_depth.png",
+        "client/assets/mage_f_progression_gloves_regearl95.png",
+        "client/assets/mage_f_progression_gloves_regearl95_depth.png",
+        "client/assets/gear_icon_l95-mage-gloves.png",
+        "test-results/gear-redesign/L95-mage-gloves.png",
+        "test-results/gear-redesign/L95-mage-gloves-browser.json"
+      ]
     },
     {
       "id": "L95-mage-weapon",
@@ -4773,10 +4863,20 @@
       "kind": "weapon",
       "item": "mage_weapon_ash_l95_gray",
       "name": "Stoneworn Ash Staff",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/mage_progression_weapon_regearl95.png",
+        "client/assets/mage_progression_weapon_regearl95_depth.png",
+        "client/assets/mage_f_progression_weapon_regearl95.png",
+        "client/assets/mage_f_progression_weapon_regearl95_depth.png",
+        "client/assets/gear_icon_l95-mage-weapon.png",
+        "test-results/gear-redesign/L95-mage-weapon.png",
+        "test-results/gear-redesign/L95-mage-weapon-browser.json"
+      ]
     },
     {
       "id": "L95-assassin-armor",
@@ -4785,10 +4885,20 @@
       "kind": "armor",
       "item": "assassin_armor_shadow_l95_gray",
       "name": "Stoneworn Shadow Armor",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_armor_regearl95.png",
+        "client/assets/assassin_progression_armor_regearl95_depth.png",
+        "client/assets/assassin_f_progression_armor_regearl95.png",
+        "client/assets/assassin_f_progression_armor_regearl95_depth.png",
+        "client/assets/gear_icon_l95-assassin-armor.png",
+        "test-results/gear-redesign/L95-assassin-armor.png",
+        "test-results/gear-redesign/L95-assassin-armor-browser.json"
+      ]
     },
     {
       "id": "L95-assassin-headgear",
@@ -4797,10 +4907,20 @@
       "kind": "headgear",
       "item": "assassin_headgear_shadow_l95_gray",
       "name": "Stoneworn Shadow Brow Band",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_head_regearl95.png",
+        "client/assets/assassin_progression_head_regearl95_depth.png",
+        "client/assets/assassin_f_progression_head_regearl95.png",
+        "client/assets/assassin_f_progression_head_regearl95_depth.png",
+        "client/assets/gear_icon_l95-assassin-headgear.png",
+        "test-results/gear-redesign/L95-assassin-headgear.png",
+        "test-results/gear-redesign/L95-assassin-headgear-browser.json"
+      ]
     },
     {
       "id": "L95-assassin-shoulders",
@@ -4809,10 +4929,20 @@
       "kind": "shoulders",
       "item": "assassin_shoulders_shadow_l95_gray",
       "name": "Stoneworn Nightweave Spaulders",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_shoulders_regearl95.png",
+        "client/assets/assassin_progression_shoulders_regearl95_depth.png",
+        "client/assets/assassin_f_progression_shoulders_regearl95.png",
+        "client/assets/assassin_f_progression_shoulders_regearl95_depth.png",
+        "client/assets/gear_icon_l95-assassin-shoulders.png",
+        "test-results/gear-redesign/L95-assassin-shoulders.png",
+        "test-results/gear-redesign/L95-assassin-shoulders-browser.json"
+      ]
     },
     {
       "id": "L95-assassin-gloves",
@@ -4821,10 +4951,20 @@
       "kind": "gloves",
       "item": "assassin_gloves_shadow_l95_gray",
       "name": "Stoneworn Nightweave Claws",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_gloves_regearl95.png",
+        "client/assets/assassin_progression_gloves_regearl95_depth.png",
+        "client/assets/assassin_f_progression_gloves_regearl95.png",
+        "client/assets/assassin_f_progression_gloves_regearl95_depth.png",
+        "client/assets/gear_icon_l95-assassin-gloves.png",
+        "test-results/gear-redesign/L95-assassin-gloves.png",
+        "test-results/gear-redesign/L95-assassin-gloves-browser.json"
+      ]
     },
     {
       "id": "L95-assassin-weapon",
@@ -4833,10 +4973,20 @@
       "kind": "weapon",
       "item": "assassin_weapon_daggers_l95_gray",
       "name": "Stoneworn Steel Daggers",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_weapon_regearl95.png",
+        "client/assets/assassin_progression_weapon_regearl95_depth.png",
+        "client/assets/assassin_f_progression_weapon_regearl95.png",
+        "client/assets/assassin_f_progression_weapon_regearl95_depth.png",
+        "client/assets/gear_icon_l95-assassin-weapon.png",
+        "test-results/gear-redesign/L95-assassin-weapon.png",
+        "test-results/gear-redesign/L95-assassin-weapon-browser.json"
+      ]
     },
     {
       "id": "L95-priest-armor",
@@ -4845,10 +4995,20 @@
       "kind": "armor",
       "item": "priest_armor_pilgrim_l95_gray",
       "name": "Stoneworn Pilgrim Robes",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_armor_regearl95.png",
+        "client/assets/priest_progression_armor_regearl95_depth.png",
+        "client/assets/priest_f_progression_armor_regearl95.png",
+        "client/assets/priest_f_progression_armor_regearl95_depth.png",
+        "client/assets/gear_icon_l95-priest-armor.png",
+        "test-results/gear-redesign/L95-priest-armor.png",
+        "test-results/gear-redesign/L95-priest-armor-browser.json"
+      ]
     },
     {
       "id": "L95-priest-headgear",
@@ -4857,10 +5017,20 @@
       "kind": "headgear",
       "item": "priest_headgear_pilgrim_l95_gray",
       "name": "Stoneworn Pilgrim's Hood",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_head_regearl95.png",
+        "client/assets/priest_progression_head_regearl95_depth.png",
+        "client/assets/priest_f_progression_head_regearl95.png",
+        "client/assets/priest_f_progression_head_regearl95_depth.png",
+        "client/assets/gear_icon_l95-priest-headgear.png",
+        "test-results/gear-redesign/L95-priest-headgear.png",
+        "test-results/gear-redesign/L95-priest-headgear-browser.json"
+      ]
     },
     {
       "id": "L95-priest-shoulders",
@@ -4869,10 +5039,20 @@
       "kind": "shoulders",
       "item": "priest_shoulders_pilgrim_l95_gray",
       "name": "Stoneworn Pilgrim's Mantle",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_shoulders_regearl95.png",
+        "client/assets/priest_progression_shoulders_regearl95_depth.png",
+        "client/assets/priest_f_progression_shoulders_regearl95.png",
+        "client/assets/priest_f_progression_shoulders_regearl95_depth.png",
+        "client/assets/gear_icon_l95-priest-shoulders.png",
+        "test-results/gear-redesign/L95-priest-shoulders.png",
+        "test-results/gear-redesign/L95-priest-shoulders-browser.json"
+      ]
     },
     {
       "id": "L95-priest-gloves",
@@ -4881,10 +5061,20 @@
       "kind": "gloves",
       "item": "priest_gloves_pilgrim_l95_gray",
       "name": "Stoneworn Pilgrim's Mitts",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_gloves_regearl95.png",
+        "client/assets/priest_progression_gloves_regearl95_depth.png",
+        "client/assets/priest_f_progression_gloves_regearl95.png",
+        "client/assets/priest_f_progression_gloves_regearl95_depth.png",
+        "client/assets/gear_icon_l95-priest-gloves.png",
+        "test-results/gear-redesign/L95-priest-gloves.png",
+        "test-results/gear-redesign/L95-priest-gloves-browser.json"
+      ]
     },
     {
       "id": "L95-priest-weapon",
@@ -4893,10 +5083,20 @@
       "kind": "weapon",
       "item": "priest_weapon_mace_l95_gray",
       "name": "Stoneworn Oak Mace",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/priest_progression_weapon_regearl95.png",
+        "client/assets/priest_progression_weapon_regearl95_depth.png",
+        "client/assets/priest_f_progression_weapon_regearl95.png",
+        "client/assets/priest_f_progression_weapon_regearl95_depth.png",
+        "client/assets/gear_icon_l95-priest-weapon.png",
+        "test-results/gear-redesign/L95-priest-weapon.png",
+        "test-results/gear-redesign/L95-priest-weapon-browser.json"
+      ]
     },
     {
       "id": "L95-hunter-armor",
@@ -4905,10 +5105,20 @@
       "kind": "armor",
       "item": "hunter_armor_scout_l95_gray",
       "name": "Stoneworn Scout's Jerkin",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_armor_regearl95.png",
+        "client/assets/hunter_progression_armor_regearl95_depth.png",
+        "client/assets/hunter_f_progression_armor_regearl95.png",
+        "client/assets/hunter_f_progression_armor_regearl95_depth.png",
+        "client/assets/gear_icon_l95-hunter-armor.png",
+        "test-results/gear-redesign/L95-hunter-armor.png",
+        "test-results/gear-redesign/L95-hunter-armor-browser.json"
+      ]
     },
     {
       "id": "L95-hunter-headgear",
@@ -4917,10 +5127,20 @@
       "kind": "headgear",
       "item": "hunter_headgear_scout_l95_gray",
       "name": "Stoneworn Feathered Headband",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_head_regearl95.png",
+        "client/assets/hunter_progression_head_regearl95_depth.png",
+        "client/assets/hunter_f_progression_head_regearl95.png",
+        "client/assets/hunter_f_progression_head_regearl95_depth.png",
+        "client/assets/gear_icon_l95-hunter-headgear.png",
+        "test-results/gear-redesign/L95-hunter-headgear.png",
+        "test-results/gear-redesign/L95-hunter-headgear-browser.json"
+      ]
     },
     {
       "id": "L95-hunter-shoulders",
@@ -4929,10 +5149,20 @@
       "kind": "shoulders",
       "item": "hunter_shoulders_scout_l95_gray",
       "name": "Stoneworn Scout's Mantle",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_shoulders_regearl95.png",
+        "client/assets/hunter_progression_shoulders_regearl95_depth.png",
+        "client/assets/hunter_f_progression_shoulders_regearl95.png",
+        "client/assets/hunter_f_progression_shoulders_regearl95_depth.png",
+        "client/assets/gear_icon_l95-hunter-shoulders.png",
+        "test-results/gear-redesign/L95-hunter-shoulders.png",
+        "test-results/gear-redesign/L95-hunter-shoulders-browser.json"
+      ]
     },
     {
       "id": "L95-hunter-gloves",
@@ -4941,10 +5171,20 @@
       "kind": "gloves",
       "item": "hunter_gloves_scout_l95_gray",
       "name": "Stoneworn Scout's Bracers",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_gloves_regearl95.png",
+        "client/assets/hunter_progression_gloves_regearl95_depth.png",
+        "client/assets/hunter_f_progression_gloves_regearl95.png",
+        "client/assets/hunter_f_progression_gloves_regearl95_depth.png",
+        "client/assets/gear_icon_l95-hunter-gloves.png",
+        "test-results/gear-redesign/L95-hunter-gloves.png",
+        "test-results/gear-redesign/L95-hunter-gloves-browser.json"
+      ]
     },
     {
       "id": "L95-hunter-weapon",
@@ -4953,10 +5193,20 @@
       "kind": "weapon",
       "item": "hunter_weapon_shortbow_l95_gray",
       "name": "Stoneworn Hunter's Shortbow",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/hunter_progression_weapon_regearl95.png",
+        "client/assets/hunter_progression_weapon_regearl95_depth.png",
+        "client/assets/hunter_f_progression_weapon_regearl95.png",
+        "client/assets/hunter_f_progression_weapon_regearl95_depth.png",
+        "client/assets/gear_icon_l95-hunter-weapon.png",
+        "test-results/gear-redesign/L95-hunter-weapon.png",
+        "test-results/gear-redesign/L95-hunter-weapon-browser.json"
+      ]
     },
     {
       "id": "L95-shared-pants",
@@ -4965,10 +5215,36 @@
       "kind": "pants",
       "item": "pants_wayfarer_l95_gray",
       "name": "Stoneworn Wayfarer Pants",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_pants_regearl95.png",
+        "client/assets/assassin_progression_pants_regearl95_depth.png",
+        "client/assets/assassin_f_progression_pants_regearl95.png",
+        "client/assets/assassin_f_progression_pants_regearl95_depth.png",
+        "client/assets/warrior_progression_pants_regearl95.png",
+        "client/assets/warrior_progression_pants_regearl95_depth.png",
+        "client/assets/warrior_f_progression_pants_regearl95.png",
+        "client/assets/warrior_f_progression_pants_regearl95_depth.png",
+        "client/assets/mage_progression_pants_regearl95.png",
+        "client/assets/mage_progression_pants_regearl95_depth.png",
+        "client/assets/mage_f_progression_pants_regearl95.png",
+        "client/assets/mage_f_progression_pants_regearl95_depth.png",
+        "client/assets/priest_progression_pants_regearl95.png",
+        "client/assets/priest_progression_pants_regearl95_depth.png",
+        "client/assets/priest_f_progression_pants_regearl95.png",
+        "client/assets/priest_f_progression_pants_regearl95_depth.png",
+        "client/assets/hunter_progression_pants_regearl95.png",
+        "client/assets/hunter_progression_pants_regearl95_depth.png",
+        "client/assets/hunter_f_progression_pants_regearl95.png",
+        "client/assets/hunter_f_progression_pants_regearl95_depth.png",
+        "client/assets/gear_icon_l95-shared-pants.png",
+        "test-results/gear-redesign/L95-shared-pants.png",
+        "test-results/gear-redesign/L95-shared-pants-browser.json"
+      ]
     },
     {
       "id": "L95-shared-necklace",
@@ -4977,10 +5253,36 @@
       "kind": "necklace",
       "item": "necklace_moonstone_l95_gray",
       "name": "Stoneworn Moonstone Necklace",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_necklace_regearl95.png",
+        "client/assets/assassin_progression_necklace_regearl95_depth.png",
+        "client/assets/assassin_f_progression_necklace_regearl95.png",
+        "client/assets/assassin_f_progression_necklace_regearl95_depth.png",
+        "client/assets/warrior_progression_necklace_regearl95.png",
+        "client/assets/warrior_progression_necklace_regearl95_depth.png",
+        "client/assets/warrior_f_progression_necklace_regearl95.png",
+        "client/assets/warrior_f_progression_necklace_regearl95_depth.png",
+        "client/assets/mage_progression_necklace_regearl95.png",
+        "client/assets/mage_progression_necklace_regearl95_depth.png",
+        "client/assets/mage_f_progression_necklace_regearl95.png",
+        "client/assets/mage_f_progression_necklace_regearl95_depth.png",
+        "client/assets/priest_progression_necklace_regearl95.png",
+        "client/assets/priest_progression_necklace_regearl95_depth.png",
+        "client/assets/priest_f_progression_necklace_regearl95.png",
+        "client/assets/priest_f_progression_necklace_regearl95_depth.png",
+        "client/assets/hunter_progression_necklace_regearl95.png",
+        "client/assets/hunter_progression_necklace_regearl95_depth.png",
+        "client/assets/hunter_f_progression_necklace_regearl95.png",
+        "client/assets/hunter_f_progression_necklace_regearl95_depth.png",
+        "client/assets/gear_icon_l95-shared-necklace.png",
+        "test-results/gear-redesign/L95-shared-necklace.png",
+        "test-results/gear-redesign/L95-shared-necklace-browser.json"
+      ]
     },
     {
       "id": "L95-shared-accessory",
@@ -4989,10 +5291,36 @@
       "kind": "accessory",
       "item": "accessory_amber_l95_gray",
       "name": "Stoneworn Amber Ring",
-      "done": false,
-      "phase": "not started",
-      "note": "",
-      "evidence": []
+      "done": true,
+      "phase": "complete",
+      "note": "Reviewed the level-95 both-body contact overview; full pose previews rendered, silhouettes are distinct from the prior tier, and every frame passed the edge check.; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.",
+      "evidence": [
+        "scripts/gear_shapes.py",
+        "world/gear-art.txt",
+        "client/assets/assassin_progression_accessory_regearl95.png",
+        "client/assets/assassin_progression_accessory_regearl95_depth.png",
+        "client/assets/assassin_f_progression_accessory_regearl95.png",
+        "client/assets/assassin_f_progression_accessory_regearl95_depth.png",
+        "client/assets/warrior_progression_accessory_regearl95.png",
+        "client/assets/warrior_progression_accessory_regearl95_depth.png",
+        "client/assets/warrior_f_progression_accessory_regearl95.png",
+        "client/assets/warrior_f_progression_accessory_regearl95_depth.png",
+        "client/assets/mage_progression_accessory_regearl95.png",
+        "client/assets/mage_progression_accessory_regearl95_depth.png",
+        "client/assets/mage_f_progression_accessory_regearl95.png",
+        "client/assets/mage_f_progression_accessory_regearl95_depth.png",
+        "client/assets/priest_progression_accessory_regearl95.png",
+        "client/assets/priest_progression_accessory_regearl95_depth.png",
+        "client/assets/priest_f_progression_accessory_regearl95.png",
+        "client/assets/priest_f_progression_accessory_regearl95_depth.png",
+        "client/assets/hunter_progression_accessory_regearl95.png",
+        "client/assets/hunter_progression_accessory_regearl95_depth.png",
+        "client/assets/hunter_f_progression_accessory_regearl95.png",
+        "client/assets/hunter_f_progression_accessory_regearl95_depth.png",
+        "client/assets/gear_icon_l95-shared-accessory.png",
+        "test-results/gear-redesign/L95-shared-accessory.png",
+        "test-results/gear-redesign/L95-shared-accessory-browser.json"
+      ]
     }
   ]
 }

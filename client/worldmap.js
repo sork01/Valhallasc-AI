@@ -2,7 +2,8 @@
 // World map (M, or the button under the minimap). Everything is drawn from window.WORLD_MAP, so a zone added to
 // world/map.txt appears with its real ground, obstacles, camp, gates and spawn points; the only hand-made part is
 // LAYOUT, where each public zone sits on the world sheet. Sealed dungeon floor plans are hidden until opened.
-// The world view is a row of zone tiles joined by the gate roads; pressing a tile zooms into that zone's map.
+// The world sheet is a connected geographic atlas: each island uses its actual zone ground,
+// and land bridges follow the authoritative portal graph. Press a region to zoom into its map.
 (() => {
   const $ = id => document.getElementById(id);
   const NS = 'http://www.w3.org/2000/svg';
@@ -110,6 +111,7 @@
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const kindInfo = kind => KINDS[kind] || [kind, 1, '#ff6b8a'];
   const travelMasters = z => (z.npcs || []).filter(n => n.travelStop);
+  const onWorldSheet = z => z && !z.sealedTemplate && z.theme !== 'arena';
   const SEALED = { year_bloom_gate: 'Blooming Labyrinth', year_solar_gate: 'Solar Crucible', year_amber_gate: 'Amber Archive', year_solstice_gate: 'Silent Solstice' };
   // Fog of war: the server saves which of a zone's 3x3 cells the character has stood in (Field.explored, one bitmask per
   // zone). Nothing from an unvisited cell is shown: not its ground, gates, camp, enemies or people.
@@ -125,7 +127,7 @@
     return node;
   }
 
-  let zones = null, graph = [], tiles = [], roadRefs = [], fogSignature = '', view = 'world', current = 0, previousFocus = null, highlight = null, timer = 0, tickTimer = 0;
+  let zones = null, graph = [], tiles = [], roadRefs = [], fogSignature = '', view = 'world', current = 0, previousFocus = null, highlight = null, timer = 0, tickTimer = 0, tileY = .54;
   const cache = new Map();
 
   function load() {
@@ -299,36 +301,92 @@
 
   // ---------- world view ----------
   const rangeText = z => z.range ? (z.range[0] === z.range[1] ? `Lv ${z.range[0]}` : `Lv ${z.range[0]}–${z.range[1]}`) + (z.players ? ` · ${z.players} players` : '') : 'Safe city';
-  const edgePoint = (a, b) => {                                     // where the road from a's centre to b's centre leaves a's square
-    const ax = a.x + a.s / 2, ay = a.y + a.s / 2, dx = b.x + b.s / 2 - ax, dy = b.y + b.s / 2 - ay, t = (a.s / 2 + .6) / Math.max(Math.abs(dx), Math.abs(dy));
+  const shortName = name => {
+    const words = name.replace(/^The /, '').replace(/ — .*/, '').split(/\s+/);
+    const choice = words.at(-1);
+    return choice.length <= 10 ? choice : choice.slice(0, 8) + '…';
+  };
+  const edgePoint = (a, b) => {                                     // where the road from a's centre to b's centre leaves its illustrated region
+    const ax = a.x + a.s / 2, ay = a.y + a.s * tileY / 2;
+    const dx = b.x + b.s / 2 - ax, dy = b.y + b.s * tileY / 2 - ay;
+    const t = 1 / Math.max(Math.abs(dx) / (a.s / 2 + .6), Math.abs(dy) / (a.s * tileY / 2 + .6));
     return [ax + dx * t, ay + dy * t];
   };
   function svgNode(tag, attrs) { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); return n; }
+  function islandPoints(place, index, pad = 0, vertical = tileY) {
+    const { x, y, s } = place, cx = x + s / 2, cy = y + s * vertical / 2, points = [];
+    for (let n = 0; n < 16; n++) {
+      const angle = n / 16 * Math.PI * 2, wobble = 1 + .075 * Math.sin(index * 7 + n * 4.7) + .055 * Math.cos(index * 3 + n * 2.9);
+      points.push([cx + Math.cos(angle) * (s / 2 + pad) * wobble,
+                   cy + Math.sin(angle) * (s / 2 + pad) * vertical * wobble]);
+    }
+    return points;
+  }
+  const pointPath = points => 'M ' + points.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join(' L ') + ' Z';
+  function islandClip(index) {
+    const square = { x: 0, y: 0, s: 100 };
+    return 'polygon(' + islandPoints(square, index, 0, 1).map(([x, y]) => `${x.toFixed(1)}% ${y.toFixed(1)}%`).join(',') + ')';
+  }
   function buildWorld() {
     const stage = $('wm-world'); stage.replaceChildren(); tiles = Array(zones.length).fill(null); roadRefs = [];
-    const roads = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, class: 'wm-roads', 'aria-hidden': 'true' });
+    tileY = stage.clientWidth / stage.clientHeight * STAGE.h / STAGE.w;
+    const atlas = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, preserveAspectRatio: 'none', class: 'wm-atlas', 'aria-hidden': 'true' });
+    const definitions = svgNode('defs', {}), sea = svgNode('pattern', { id: 'wm-sea-lines', width: 8, height: 5, patternUnits: 'userSpaceOnUse' });
+    sea.append(svgNode('path', { d: 'M .5 3 Q 2 1.5 3.5 3 T 6.5 3', stroke: '#b5dfdf', 'stroke-opacity': '.13', 'stroke-width': '.16', fill: 'none' }));
+    definitions.append(sea); atlas.append(definitions);
+    atlas.append(svgNode('rect', { x: 0, y: 0, width: STAGE.w, height: STAGE.h, fill: 'url(#wm-sea-lines)' }));
+    const landLinks = svgNode('g', { class: 'wm-land-links' });
+    const land = svgNode('g', { class: 'wm-land-shapes' });
+    atlas.append(landLinks, land);
+    const roads = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, preserveAspectRatio: 'none', class: 'wm-roads', 'aria-hidden': 'true' });
     const seen = new Set();
     zones.forEach((z, i) => z.portals.forEach(p => {
-      const pair = [i, p.to].sort((a, b) => a - b).join('-'); if (z.sealedTemplate || seen.has(pair) || !zones[p.to] || zones[p.to].sealedTemplate) return; seen.add(pair);
+      const pair = [i, p.to].sort((a, b) => a - b).join('-'); if (!onWorldSheet(z) || seen.has(pair) || !onWorldSheet(zones[p.to])) return; seen.add(pair);
       const a = z.place, b = zones[p.to].place, [x1, y1] = edgePoint(a, b), [x2, y2] = edgePoint(b, a);
       const road = svgNode('g', { 'data-road': pair });
       const back = zones[p.to].portals.find(q => q.to === i);
-      roadRefs.push({ node: road, pair, shown: () => known(i, p.x, p.y) || (back && known(p.to, back.x, back.y)) });
+      const terrain = svgNode('g', {});
+      const surface = !z.players && !zones[p.to].players;
+      if (surface) {
+        const dx = x2 - x1, dy = y2 - y1, bend = Math.min(3, Math.hypot(dx, dy) * .12);
+        const mx = (x1 + x2) / 2 - dy / Math.max(1, Math.hypot(dx, dy)) * bend;
+        const my = (y1 + y2) / 2 + dx / Math.max(1, Math.hypot(dx, dy)) * bend;
+        const path = `M ${x1} ${y1} Q ${mx.toFixed(2)} ${my.toFixed(2)} ${x2} ${y2}`;
+        terrain.append(svgNode('path', { d: path, class: 'wm-coast-link' }),
+          svgNode('path', { d: path, class: 'wm-earth-link' }));
+        landLinks.append(terrain);
+      }
+      roadRefs.push({ node: road, terrain, pair, shown: () => known(i, p.x, p.y) || (back && known(p.to, back.x, back.y)) });
       road.append(svgNode('title', {}), svgNode('line', { x1, y1, x2, y2, class: 'wm-road-under' }), svgNode('line', { x1, y1, x2, y2, class: 'wm-road' }),
         svgNode('circle', { cx: x1, cy: y1, r: .9, class: 'wm-gate-dot' }), svgNode('circle', { cx: x2, cy: y2, r: .9, class: 'wm-gate-dot' }));
       road.firstChild.textContent = `${p.name[0].toUpperCase()}${p.name.slice(1)} joins ${z.name} and ${zones[p.to].name}`;
       roads.append(road);
     }));
-    stage.append(roads);
     zones.forEach((z, i) => {
-      if (z.sealedTemplate) return;
+      if (!onWorldSheet(z) || z.players) return;
+      const coast = svgNode('path', { d: pointPath(islandPoints(z.place, i, .65)), class: 'wm-coast' });
+      const interior = svgNode('path', { d: pointPath(islandPoints(z.place, i, .22)), class: 'wm-island', fill: GROUND[z.theme] || '#6f8e73', 'data-zone': i });
+      land.append(coast, interior);
+    });
+    const compass = svgNode('g', { class: 'wm-compass', transform: 'translate(123 17)' });
+    compass.append(svgNode('circle', { r: 5.4 }), svgNode('circle', { r: 3.9 }),
+      svgNode('path', { d: 'M 0 -6.7 L 1.3 -1.3 L 6.7 0 L 1.3 1.3 L 0 6.7 L -1.3 1.3 L -6.7 0 L -1.3 -1.3 Z' }),
+      svgNode('path', { d: 'M 0 -5.5 L -1.3 -1.3 L 0 0 Z M 5.5 0 L 1.3 -1.3 L 0 0 Z M 0 5.5 L 1.3 1.3 L 0 0 Z M -5.5 0 L -1.3 1.3 L 0 0 Z', class: 'wm-compass-shadow' }));
+    const north = svgNode('text', { x: 0, y: -8, 'text-anchor': 'middle' }); north.textContent = 'N'; compass.append(north);
+    atlas.append(compass);
+    stage.append(atlas, roads);
+    zones.forEach((z, i) => {
+      if (!onWorldSheet(z)) return;
       const { x, y, s } = z.place, tile = el('button', '', 'wm-tile'); tile.type = 'button'; tile.dataset.zone = String(i); tile.dataset.theme = z.theme;
-      Object.assign(tile.style, { left: `${x / STAGE.w * 100}%`, top: `${y / STAGE.h * 100}%`, width: `${s / STAGE.w * 100}%`, height: `${s / STAGE.h * 100}%` });
+      tile.dataset.size = String(s);
+      Object.assign(tile.style, { left: `${x / STAGE.w * 100}%`, top: `${y / STAGE.h * 100}%`, width: `${s / STAGE.w * 100}%`, aspectRatio: '1' });
       tile.setAttribute('aria-label', `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}. Open its map`);
       tile.dataset.branch = z.players ? 'dungeon' : ['city','nacre','asterion','worldtree','heartwood'].includes(z.theme) ? 'city' : 'wild';
+      if (!z.players) tile.style.clipPath = islandClip(i);
       const canvas = el('canvas'); canvas.width = canvas.height = 220; copy(canvas, paint(i, 220));
       const fog = el('canvas', '', 'wm-tile-fog'); fog.width = fog.height = 220; fog.setAttribute('aria-hidden', 'true');
       const label = el('span', '', 'wm-tile-label'); label.append(el('b', z.name), el('small', rangeText(z)));
+      label.querySelector('b').dataset.short = s < 8 ? String(i) : shortName(z.name);
       const you = el('i', '', 'wm-you'); you.hidden = true; you.title = 'You are here';
       tile.append(canvas, fog, label, you);
       if (travelMasters(z).length) {
@@ -347,11 +405,16 @@
     fogSignature = JSON.stringify(window.Field.explored);
     roadRefs.forEach(r => r.node.setAttribute('visibility', r.shown() ? 'visible' : 'hidden'));
     zones.forEach((z, i) => {
-      if (z.sealedTemplate) return;
+      const island = $('wm-world').querySelector(`.wm-island[data-zone="${i}"]`);
+      if (island) island.dataset.fog = visited(i) ? 'partial' : 'full';
+    });
+    zones.forEach((z, i) => {
+      if (!onWorldSheet(z)) return;
       const tile = tiles[i], g = tile.querySelector('.wm-tile-fog').getContext('2d'), unseen = !visited(i);
       g.clearRect(0, 0, 220, 220); window.Field.fog.paint(g, 220, 220, i);
       tile.disabled = unseen; tile.dataset.fog = unseen ? 'full' : 'partial';
       tile.querySelector('b').textContent = unseen ? 'Unexplored' : z.name;
+      tile.querySelector('b').dataset.short = unseen ? '?' : z.place.s < 8 ? String(i) : shortName(z.name);
       tile.querySelector('small').textContent = unseen ? 'Not yet visited' : `${rangeText(z)} · ${charted(i)}/${CELLS} charted`;
       tile.setAttribute('aria-label', unseen ? 'Unexplored zone' : `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}, ${charted(i)} of ${CELLS} places charted${travelMasters(z).length ? `, ${travelMasters(z).length} travel master${travelMasters(z).length === 1 ? '' : 's'}` : ''}. Open its map`);
     });
@@ -516,9 +579,10 @@
   }
   function show() {
     if (!canShow()) return false;
-    load(); if (!tiles.length) buildWorld(); else if (JSON.stringify(window.Field.explored) !== fogSignature) refreshFog();
-    previousFocus = document.activeElement;
-    window.Field.setPaused(true); $('worldmap').hidden = false; setView('world');
+    load(); previousFocus = document.activeElement;
+    window.Field.setPaused(true); $('worldmap').hidden = false;
+    if (!tiles.length) buildWorld(); else if (JSON.stringify(window.Field.explored) !== fogSignature) refreshFog();
+    setView('world');
     const here = window.Field.zone || 0; (tiles[here] || tiles[0]).focus({ preventScroll: true });
     clearInterval(tickTimer); tickTimer = setInterval(tick, 250);
     return true;

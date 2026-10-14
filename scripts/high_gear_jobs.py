@@ -30,17 +30,26 @@ def initial():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('init', 'finish', 'summary'))
+    parser.add_argument('command', choices=('init', 'update', 'reopen', 'finish', 'summary'))
     parser.add_argument('job', nargs='?')
+    parser.add_argument('--phase', default='in progress')
+    parser.add_argument('--note', default='')
     parser.add_argument('--evidence', nargs='*', default=[])
     args = parser.parse_args()
     if args.command == 'init' and not STATE.exists():
         STATE.write_text(json.dumps(initial(), indent=2) + '\n')
     state = json.loads(STATE.read_text())
-    if args.command == 'finish':
+    if args.command in ('update', 'reopen', 'finish'):
         task = next(t for t in state['tasks'] if t['id'] == args.job)
-        assert args.evidence and all((ROOT / file).is_file() for file in args.evidence)
-        task.update(done=True, phase='complete', evidence=args.evidence)
+        if args.command == 'finish':
+            assert args.evidence and all((ROOT / file).is_file() for file in args.evidence)
+            task.update(done=True, phase='complete', evidence=args.evidence, note=args.note)
+        elif args.command == 'reopen':
+            assert task['done']
+            task.update(done=False, phase=args.phase, evidence=[], note=args.note)
+        else:
+            assert not task['done']
+            task.update(phase=args.phase, note=args.note)
         state['updated'] = datetime.now().isoformat(timespec='seconds')
         STATE.write_text(json.dumps(state, indent=2) + '\n')
     done = sum(task['done'] for task in state['tasks'])

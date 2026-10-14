@@ -198,11 +198,121 @@
   // Head, shoulder and glove pieces use the class's tier, shared gear, or a catalog art layer.
   // A part missing from the class atlas is simply not drawn.
   const SLOT_ORDER = ['armor', 'pants', 'shoulders', 'gloves', 'head', 'necklace', 'accessory', 'weapon'];
+  // A dungeon set needs a silhouette at field scale, not only a different tint on
+  // the same 160px equipment rig. These marks sit behind the animated figure and
+  // follow it in every pose/facing. One piece shows the origin; more pieces make
+  // the mark brighter. They are drawn from the equipped server-approved look.
+  const DUNGEON_MARKS = {
+    regearvault: { name: 'Undervault', dark: '#123840', bright: '#58f5d4' },
+    regearcloister: { name: 'Cloister', dark: '#806e39', bright: '#fff1a2' },
+    regearreliquary: { name: 'Reliquary', dark: '#681e59', bright: '#ff78c6' },
+    regearnave: { name: 'Nave', dark: '#913e16', bright: '#ffbd42' },
+    regearmoonwell: { name: 'Moonwell', dark: '#423983', bright: '#ccb6ff' },
+  };
+  const DUNGEON_PALETTES = {
+    regearvault: ['#071d25', '#164d57', '#36bcb0', '#b7fff0'],
+    regearcloister: ['#342d25', '#7e7049', '#d3bf7f', '#fff5c8'],
+    regearreliquary: ['#2a193a', '#71396e', '#ca64aa', '#ffe0ef'],
+    regearnave: ['#381d1d', '#a64425', '#ee993d', '#fff0aa'],
+    regearmoonwell: ['#22284b', '#56569a', '#aaa3db', '#f0e8ff'],
+  };
+  const dungeonPaint = art => {
+    const palette = DUNGEON_PALETTES[art].map(hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)));
+    return (r, g, b) => {
+      const level = Math.min(2.999, Math.max(0, ((r * .25 + g * .65 + b * .1) / 255 - .1) / .82 * 3));
+      const index = Math.floor(level), mix = level - index;
+      return palette[index].map((channel, k) => Math.round(channel * (1 - mix) + palette[index + 1][k] * mix));
+    };
+  };
+  function dungeonMark(equipment) {
+    const counts = {};
+    for (const art of Object.values(equipment)) if (DUNGEON_MARKS[art]) counts[art] = (counts[art] || 0) + 1;
+    const [theme, count] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0] || [];
+    return theme ? { theme, count } : null;
+  }
+  function dungeonAura(g, mark, t) {
+    const { theme, count } = mark, { dark, bright } = DUNGEON_MARKS[theme];
+    const sway = Math.sin(t * 2.3) * 1.5;
+    const diamond = (x, y, w, h, fill, stroke = bright) => {
+      g.beginPath(); g.moveTo(x, y - h); g.lineTo(x + w, y); g.lineTo(x, y + h); g.lineTo(x - w, y);
+      g.closePath(); g.fillStyle = fill; g.fill(); g.strokeStyle = stroke; g.lineWidth = 1.8; g.stroke();
+    };
+    const blade = (points, fill, stroke = bright) => {
+      g.beginPath(); points.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y));
+      g.closePath(); g.fillStyle = fill; g.fill(); g.strokeStyle = stroke; g.lineWidth = 1.7; g.stroke();
+    };
+    g.save();
+    g.globalAlpha *= Math.min(.92, .48 + count * .085);
+    // The broken circle is a common field-scale cue; each dungeon then has its
+    // own large profile so the sets cannot be mistaken for progression gear.
+    g.strokeStyle = dark; g.lineWidth = 8;
+    g.beginPath(); g.ellipse(0, -62, 36, 49, 0, .2, Math.PI * 1.81); g.stroke();
+    g.strokeStyle = bright; g.lineWidth = 2.2; g.stroke();
+    if (theme === 'regearvault') {
+      for (const side of [-1, 1]) {
+        for (let n = 0; n < 3; n++) {
+          const y = -88 + n * 20;
+          blade([[side * 10, y + 10], [side * (38 + n * 6), y - 10 + sway],
+                 [side * (49 + n * 7), y - 17 + sway], [side * (31 + n * 5), y + 7]], dark);
+          diamond(side * (43 + n * 6), y - 9 + sway, 3, 5, bright, dark);
+        }
+      }
+      diamond(0, -111 + sway, 9, 14, dark);
+    } else if (theme === 'regearcloister') {
+      for (const side of [-1, 1]) {
+        for (let n = 0; n < 4; n++) {
+          const y = -91 + n * 14;
+          blade([[side * 13, y + 18], [side * (48 + n * 5), y - 16 + sway],
+                 [side * (53 + n * 5), y - 11 + sway], [side * (27 + n * 3), y + 25]], '#dfd9b2');
+        }
+      }
+      g.beginPath(); g.ellipse(0, -122 + sway, 22, 5, 0, 0, Math.PI * 2);
+      g.fillStyle = dark; g.fill(); g.strokeStyle = bright; g.lineWidth = 2.5; g.stroke();
+    } else if (theme === 'regearreliquary') {
+      for (const side of [-1, 1]) {
+        blade([[side * 17, -106], [side * 34, -131 + sway], [side * 54, -93],
+               [side * 34, -63], [side * 20, -75]], dark);
+        diamond(side * 36, -95 + sway, 11, 20, '#a74388');
+        diamond(side * 55, -56 - sway, 7, 15, dark);
+        diamond(side * 50, -32 + sway, 5, 10, bright, dark);
+      }
+      diamond(0, -125 + sway, 8, 17, bright, dark);
+    } else if (theme === 'regearnave') {
+      for (const side of [-1, 1]) {
+        for (let n = 0; n < 5; n++) {
+          const x = side * (16 + n * 9), y = -93 + n * 10;
+          blade([[side * 13, -70], [x, y - 24 + sway], [x + side * 7, y - 7],
+                 [x + side * 5, y + 17]], n % 2 ? '#e7762d' : dark);
+        }
+      }
+      for (let n = 0; n < 9; n++) {
+        const angle = (n / 9) * Math.PI * 1.55 + Math.PI * .73;
+        const x = Math.cos(angle), y = Math.sin(angle);
+        blade([[x * 23, -113 + y * 23], [x * 33, -113 + y * 33],
+               [x * 26, -113 + y * 26]], bright, dark);
+      }
+      diamond(0, -113 + sway, 7, 9, bright, dark);
+    } else if (theme === 'regearmoonwell') {
+      g.beginPath(); g.ellipse(0, -75, 57, 65, -.2, .23, Math.PI * 1.66);
+      g.strokeStyle = dark; g.lineWidth = 12; g.stroke();
+      g.strokeStyle = bright; g.lineWidth = 3.5; g.stroke();
+      for (const side of [-1, 1]) {
+        for (let n = 0; n < 3; n++) {
+          const x = side * (36 + n * 10), y = -96 + n * 26;
+          blade([[side * 17, -75], [x, y - 19 + sway], [x + side * 6, y],
+                 [x, y + 18 + sway]], n % 2 ? '#8178bb' : dark);
+          diamond(x + side * 3, y + sway, 4, 7, bright, dark);
+        }
+      }
+      diamond(0, -135 + sway, 8, 12, bright, dark);
+    }
+    g.restore();
+  }
   // Catalog art includes the later progression sets; pants, necklace and ring also have shared generic pieces.
   const CLASS_SLOTS = ['head', 'shoulders', 'gloves'];
   const pieces = (C, look) => Object.fromEntries(Object.entries(GENERIC).map(([slot, generic]) => {
     const allowed = [...(CLASS_SLOTS.includes(slot) ? [...(C.TIERS || []), generic] : [generic]), ...PROGRESSION,
-      ...(window.WORLD_ITEMS || []).filter(i => !i.source && i.kind === KIND[slot] && i.art).map(i => i.art),
+      ...(window.WORLD_ITEMS || []).filter(i => i.kind === KIND[slot] && i.art).map(i => i.art),
       ...(window.WORLD_ITEMS || []).filter(i => i.source === 'orange_pool' && i.kind === KIND[slot]).map(i => i.variant)];
     return [slot, allowed.includes(resolve(slot, look?.[slot]).art) ? look[slot] : 'none'];
   }));
@@ -252,9 +362,10 @@
         const { art: catalogArt, tint } = resolve(slot, this.worn[slot]);
         const art = family >= 0 ? orangeBase(this.constructor, this.meta, slot) : catalogArt;
         this.equipment[slot] = art;
-        if ((family >= 0 || tint) && art !== 'none') {
+        if ((family >= 0 || tint || DUNGEON_PALETTES[art]) && art !== 'none') {
           const key = `${slot}_${art}`;
-          this.tintLut.set(key, { paint: family >= 0 ? orangePaint(family) : tintMatrix(tint), colours: new Map() });
+          const paint = family >= 0 ? orangePaint(family) : DUNGEON_PALETTES[art] ? dungeonPaint(art) : tintMatrix(tint);
+          this.tintLut.set(key, { paint, colours: new Map() });
         }
       }
       for (const slot of SLOT_ORDER) {      // a layer still being decoded appears (and the frames are rebuilt) as soon as it arrives
@@ -313,7 +424,10 @@
       const dir = MageSprite.direction(h.fx, h.fy), [ax, ay] = this.meta.anchor;
       g.save(); g.imageSmoothingEnabled = false;
       if (h.dead) g.globalAlpha *= Math.max(0, Math.min(1, (3.2 - h.deadT) / .6));
-      g.scale(scale, scale); g.drawImage(this.frame(clip, dir, i), -ax, -ay); g.restore();
+      g.scale(scale, scale);
+      const mark = !h.dead && dungeonMark(this.equipment);
+      if (mark) dungeonAura(g, mark, t);
+      g.drawImage(this.frame(clip, dir, i), -ax, -ay); g.restore();
     }
     portrait() {
       const c = document.createElement('canvas'); c.width = c.height = 128;
@@ -334,6 +448,7 @@
     }
   }
   MageSprite.GENERIC = GENERIC; MageSprite.hasGear = hasGear; MageSprite.resolveGear = resolve; MageSprite.tintMatrix = tintMatrix;
+  MageSprite.dungeonMark = dungeonMark; MageSprite.dungeonAura = dungeonAura;
   MageSprite.HAIR = HAIR; MageSprite.SKIN = SKIN; MageSprite.ARMOR = ARMOR; MageSprite.WEAPON = WEAPON;
   MageSprite.equipment = equipment; MageSprite.TIERS = ['apprentice', 'runic'];
   MageSprite.METADATA = 'assets/mage_sprites.txt';

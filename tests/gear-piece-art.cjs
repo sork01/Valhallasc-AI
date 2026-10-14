@@ -6,13 +6,13 @@ const http = require('node:http');
 const { chromium } = require('playwright');
 const root = path.resolve(__dirname, '..');
 const job = process.argv[2];
-const states = ['docs/gear-redesign-state.txt', 'docs/high-gear-state.txt']
+const states = ['docs/gear-redesign-state.txt', 'docs/high-gear-state.txt', 'docs/dungeon-gear-state.txt']
   .filter(file => fs.existsSync(path.join(root, file)))
   .flatMap(file => JSON.parse(fs.readFileSync(path.join(root, file))).tasks);
 const task = states.find(t => t.id === job); assert.ok(task, 'Provide a checklist job ID');
 const record = JSON.parse(fs.readFileSync(path.join(root, 'world/gear-art.txt')))[job]; assert.ok(record?.files, 'Export the piece first');
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt')));
-const selected = items.filter(i => i.kind === task.kind && (i.class || null) === task.className && (task.group.startsWith('L') ? !i.source && i.requiredLevel === Number(task.group.slice(1)) : i.source === 'cathedral_' + task.group));
+const selected = items.filter(i => i.kind === task.kind && (i.class || null) === task.className && (task.group.startsWith('L') ? !i.source && i.requiredLevel === Number(task.group.slice(1)) : i.source === ({ vault: 'undervault', moonwell: 'moonwell' }[task.group] || 'cathedral_' + task.group)));
 assert.ok(selected.length);
 const slot = task.kind === 'headgear' ? 'head' : task.kind;
 const originalVariant = selected[0].variant.split('_l')[0];

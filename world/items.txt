@@ -10115,7 +10115,7 @@
     "sell": 276,
     "class": "warrior",
     "variant": "crimson_l20_vault",
-    "art": "crimson",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10138,7 +10138,7 @@
     "sell": 276,
     "class": "warrior",
     "variant": "crimson_l20_vault",
-    "art": "crimson",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10161,7 +10161,7 @@
     "sell": 276,
     "class": "warrior",
     "variant": "crimson_l20_vault",
-    "art": "crimson",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10184,7 +10184,7 @@
     "sell": 276,
     "class": "warrior",
     "variant": "crimson_l20_vault",
-    "art": "crimson",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10207,7 +10207,7 @@
     "sell": 276,
     "class": "warrior",
     "variant": "sword_l20_vault",
-    "art": "sword",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10230,7 +10230,7 @@
     "sell": 276,
     "class": "mage",
     "variant": "apprentice_l20_vault",
-    "art": "apprentice",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10253,7 +10253,7 @@
     "sell": 276,
     "class": "mage",
     "variant": "apprentice_l20_vault",
-    "art": "apprentice",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10276,7 +10276,7 @@
     "sell": 276,
     "class": "mage",
     "variant": "apprentice_l20_vault",
-    "art": "apprentice",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10299,7 +10299,7 @@
     "sell": 276,
     "class": "mage",
     "variant": "apprentice_l20_vault",
-    "art": "apprentice",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10322,7 +10322,7 @@
     "sell": 276,
     "class": "mage",
     "variant": "ash_l20_vault",
-    "art": "ash",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10345,7 +10345,7 @@
     "sell": 276,
     "class": "assassin",
     "variant": "shadow_l20_vault",
-    "art": "shadow",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10368,7 +10368,7 @@
     "sell": 276,
     "class": "assassin",
     "variant": "shadow_l20_vault",
-    "art": "shadow",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10391,7 +10391,7 @@
     "sell": 276,
     "class": "assassin",
     "variant": "shadow_l20_vault",
-    "art": "shadow",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10414,7 +10414,7 @@
     "sell": 276,
     "class": "assassin",
     "variant": "shadow_l20_vault",
-    "art": "shadow",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10437,7 +10437,7 @@
     "sell": 276,
     "class": "assassin",
     "variant": "daggers_l20_vault",
-    "art": "daggers",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10460,7 +10460,7 @@
     "sell": 276,
     "class": "priest",
     "variant": "pilgrim_l20_vault",
-    "art": "pilgrim",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10483,7 +10483,7 @@
     "sell": 276,
     "class": "priest",
     "variant": "pilgrim_l20_vault",
-    "art": "pilgrim",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10506,7 +10506,7 @@
     "sell": 276,
     "class": "priest",
     "variant": "pilgrim_l20_vault",
-    "art": "pilgrim",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10529,7 +10529,7 @@
     "sell": 276,
     "class": "priest",
     "variant": "pilgrim_l20_vault",
-    "art": "pilgrim",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10552,7 +10552,7 @@
     "sell": 276,
     "class": "priest",
     "variant": "mace_l20_vault",
-    "art": "mace",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10575,7 +10575,7 @@
     "sell": 276,
     "class": "hunter",
     "variant": "scout_l20_vault",
-    "art": "scout",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10598,7 +10598,7 @@
     "sell": 276,
     "class": "hunter",
     "variant": "scout_l20_vault",
-    "art": "scout",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10621,7 +10621,7 @@
     "sell": 276,
     "class": "hunter",
     "variant": "scout_l20_vault",
-    "art": "scout",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10644,7 +10644,7 @@
     "sell": 276,
     "class": "hunter",
     "variant": "scout_l20_vault",
-    "art": "scout",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10667,7 +10667,7 @@
     "sell": 276,
     "class": "hunter",
     "variant": "shortbow_l20_vault",
-    "art": "shortbow",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10689,7 +10689,7 @@
     "requiredLevel": 20,
     "sell": 276,
     "variant": "wayfarer_l20_vault",
-    "art": "wayfarer",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -10711,7 +10711,7 @@
     "requiredLevel": 20,
     "sell": 276,
     "variant": "amber_l20_vault",
-    "art": "amber",
+    "art": "regearvault",
     "tint": {
       "hue": 150,
       "saturate": 1.3,
@@ -41154,7 +41154,7 @@
     "sell": 64,
     "class": "warrior",
     "variant": "crimson_l95_gray",
-    "art": "crimson",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41173,7 +41173,7 @@
     "sell": 64,
     "class": "warrior",
     "variant": "crimson_l95_gray",
-    "art": "crimson",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41192,7 +41192,7 @@
     "sell": 64,
     "class": "warrior",
     "variant": "crimson_l95_gray",
-    "art": "crimson",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41211,7 +41211,7 @@
     "sell": 64,
     "class": "warrior",
     "variant": "crimson_l95_gray",
-    "art": "crimson",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41230,7 +41230,7 @@
     "sell": 64,
     "class": "warrior",
     "variant": "sword_l95_gray",
-    "art": "sword",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41249,7 +41249,7 @@
     "sell": 64,
     "class": "mage",
     "variant": "apprentice_l95_gray",
-    "art": "apprentice",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41268,7 +41268,7 @@
     "sell": 64,
     "class": "mage",
     "variant": "apprentice_l95_gray",
-    "art": "apprentice",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41287,7 +41287,7 @@
     "sell": 64,
     "class": "mage",
     "variant": "apprentice_l95_gray",
-    "art": "apprentice",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41306,7 +41306,7 @@
     "sell": 64,
     "class": "mage",
     "variant": "apprentice_l95_gray",
-    "art": "apprentice",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41325,7 +41325,7 @@
     "sell": 64,
     "class": "mage",
     "variant": "ash_l95_gray",
-    "art": "ash",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41344,7 +41344,7 @@
     "sell": 64,
     "class": "assassin",
     "variant": "shadow_l95_gray",
-    "art": "shadow",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41363,7 +41363,7 @@
     "sell": 64,
     "class": "assassin",
     "variant": "shadow_l95_gray",
-    "art": "shadow",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41382,7 +41382,7 @@
     "sell": 64,
     "class": "assassin",
     "variant": "shadow_l95_gray",
-    "art": "shadow",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41401,7 +41401,7 @@
     "sell": 64,
     "class": "assassin",
     "variant": "shadow_l95_gray",
-    "art": "shadow",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41420,7 +41420,7 @@
     "sell": 64,
     "class": "assassin",
     "variant": "daggers_l95_gray",
-    "art": "daggers",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41439,7 +41439,7 @@
     "sell": 64,
     "class": "priest",
     "variant": "pilgrim_l95_gray",
-    "art": "pilgrim",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41458,7 +41458,7 @@
     "sell": 64,
     "class": "priest",
     "variant": "pilgrim_l95_gray",
-    "art": "pilgrim",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41477,7 +41477,7 @@
     "sell": 64,
     "class": "priest",
     "variant": "pilgrim_l95_gray",
-    "art": "pilgrim",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41496,7 +41496,7 @@
     "sell": 64,
     "class": "priest",
     "variant": "pilgrim_l95_gray",
-    "art": "pilgrim",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41515,7 +41515,7 @@
     "sell": 64,
     "class": "priest",
     "variant": "mace_l95_gray",
-    "art": "mace",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41534,7 +41534,7 @@
     "sell": 64,
     "class": "hunter",
     "variant": "scout_l95_gray",
-    "art": "scout",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41553,7 +41553,7 @@
     "sell": 64,
     "class": "hunter",
     "variant": "scout_l95_gray",
-    "art": "scout",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41572,7 +41572,7 @@
     "sell": 64,
     "class": "hunter",
     "variant": "scout_l95_gray",
-    "art": "scout",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41591,7 +41591,7 @@
     "sell": 64,
     "class": "hunter",
     "variant": "scout_l95_gray",
-    "art": "scout",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41610,7 +41610,7 @@
     "sell": 64,
     "class": "hunter",
     "variant": "shortbow_l95_gray",
-    "art": "shortbow",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 0.5,
@@ -41628,7 +41628,7 @@
     "requiredLevel": 95,
     "sell": 64,
     "variant": "wayfarer_l95_gray",
-    "art": "wayfarer",
+    "art": "regearl95",
     "tint": {
       "hue": 270,
       "saturate": 0.5,
@@ -41646,7 +41646,7 @@
     "requiredLevel": 95,
     "sell": 64,
     "variant": "moonstone_l95_gray",
-    "art": "moonstone",
+    "art": "regearl95",
     "tint": {
       "hue": 270,
       "saturate": 0.5,
@@ -41664,7 +41664,7 @@
     "requiredLevel": 95,
     "sell": 64,
     "variant": "amber_l95_gray",
-    "art": "amber",
+    "art": "regearl95",
     "tint": {
       "hue": 270,
       "saturate": 0.5,
@@ -41683,7 +41683,7 @@
     "sell": 400,
     "class": "warrior",
     "variant": "azure_l95_green",
-    "art": "azure",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41702,7 +41702,7 @@
     "sell": 400,
     "class": "warrior",
     "variant": "azure_l95_green",
-    "art": "azure",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41721,7 +41721,7 @@
     "sell": 400,
     "class": "warrior",
     "variant": "azure_l95_green",
-    "art": "azure",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41740,7 +41740,7 @@
     "sell": 400,
     "class": "warrior",
     "variant": "azure_l95_green",
-    "art": "azure",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41759,7 +41759,7 @@
     "sell": 400,
     "class": "warrior",
     "variant": "royal_l95_green",
-    "art": "royal",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41778,7 +41778,7 @@
     "sell": 400,
     "class": "mage",
     "variant": "runic_l95_green",
-    "art": "runic",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41797,7 +41797,7 @@
     "sell": 400,
     "class": "mage",
     "variant": "runic_l95_green",
-    "art": "runic",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41816,7 +41816,7 @@
     "sell": 400,
     "class": "mage",
     "variant": "runic_l95_green",
-    "art": "runic",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41835,7 +41835,7 @@
     "sell": 400,
     "class": "mage",
     "variant": "runic_l95_green",
-    "art": "runic",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41854,7 +41854,7 @@
     "sell": 400,
     "class": "mage",
     "variant": "crystal_l95_green",
-    "art": "crystal",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41873,7 +41873,7 @@
     "sell": 400,
     "class": "assassin",
     "variant": "moon_l95_green",
-    "art": "moon",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41892,7 +41892,7 @@
     "sell": 400,
     "class": "assassin",
     "variant": "moon_l95_green",
-    "art": "moon",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41911,7 +41911,7 @@
     "sell": 400,
     "class": "assassin",
     "variant": "moon_l95_green",
-    "art": "moon",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41930,7 +41930,7 @@
     "sell": 400,
     "class": "assassin",
     "variant": "moon_l95_green",
-    "art": "moon",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41949,7 +41949,7 @@
     "sell": 400,
     "class": "assassin",
     "variant": "moonfang_l95_green",
-    "art": "moonfang",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41968,7 +41968,7 @@
     "sell": 400,
     "class": "priest",
     "variant": "dawn_l95_green",
-    "art": "dawn",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -41987,7 +41987,7 @@
     "sell": 400,
     "class": "priest",
     "variant": "dawn_l95_green",
-    "art": "dawn",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -42006,7 +42006,7 @@
     "sell": 400,
     "class": "priest",
     "variant": "dawn_l95_green",
-    "art": "dawn",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -42025,7 +42025,7 @@
     "sell": 400,
     "class": "priest",
     "variant": "dawn_l95_green",
-    "art": "dawn",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -42044,7 +42044,7 @@
     "sell": 400,
     "class": "priest",
     "variant": "sunmace_l95_green",
-    "art": "sunmace",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -42063,7 +42063,7 @@
     "sell": 400,
     "class": "hunter",
     "variant": "warden_l95_green",
-    "art": "warden",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -42082,7 +42082,7 @@
     "sell": 400,
     "class": "hunter",
     "variant": "warden_l95_green",
-    "art": "warden",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -42101,7 +42101,7 @@
     "sell": 400,
     "class": "hunter",
     "variant": "warden_l95_green",
-    "art": "warden",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -42120,7 +42120,7 @@
     "sell": 400,
     "class": "hunter",
     "variant": "warden_l95_green",
-    "art": "warden",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -42139,7 +42139,7 @@
     "sell": 400,
     "class": "hunter",
     "variant": "wardenbow_l95_green",
-    "art": "wardenbow",
+    "art": "regearl95",
     "tint": {
       "hue": 250,
       "saturate": 1.0,
@@ -42157,7 +42157,7 @@
     "requiredLevel": 95,
     "sell": 400,
     "variant": "wayfarer_l95_green",
-    "art": "wayfarer",
+    "art": "regearl95",
     "tint": {
       "hue": 270,
       "saturate": 1.0,
@@ -42175,7 +42175,7 @@
     "requiredLevel": 95,
     "sell": 400,
     "variant": "moonstone_l95_green",
-    "art": "moonstone",
+    "art": "regearl95",
     "tint": {
       "hue": 270,
       "saturate": 1.0,
@@ -42193,7 +42193,7 @@
     "requiredLevel": 95,
     "sell": 400,
     "variant": "amber_l95_green",
-    "art": "amber",
+    "art": "regearl95",
     "tint": {
       "hue": 270,
       "saturate": 1.0,
@@ -42212,7 +42212,7 @@
     "sell": 960,
     "class": "warrior",
     "variant": "crimson_l95_blue",
-    "art": "crimson",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42234,7 +42234,7 @@
     "sell": 960,
     "class": "warrior",
     "variant": "crimson_l95_blue",
-    "art": "crimson",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42256,7 +42256,7 @@
     "sell": 960,
     "class": "warrior",
     "variant": "crimson_l95_blue",
-    "art": "crimson",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42278,7 +42278,7 @@
     "sell": 960,
     "class": "warrior",
     "variant": "crimson_l95_blue",
-    "art": "crimson",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42300,7 +42300,7 @@
     "sell": 960,
     "class": "warrior",
     "variant": "sword_l95_blue",
-    "art": "sword",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42322,7 +42322,7 @@
     "sell": 960,
     "class": "mage",
     "variant": "apprentice_l95_blue",
-    "art": "apprentice",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42344,7 +42344,7 @@
     "sell": 960,
     "class": "mage",
     "variant": "apprentice_l95_blue",
-    "art": "apprentice",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42366,7 +42366,7 @@
     "sell": 960,
     "class": "mage",
     "variant": "apprentice_l95_blue",
-    "art": "apprentice",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42388,7 +42388,7 @@
     "sell": 960,
     "class": "mage",
     "variant": "apprentice_l95_blue",
-    "art": "apprentice",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42410,7 +42410,7 @@
     "sell": 960,
     "class": "mage",
     "variant": "ash_l95_blue",
-    "art": "ash",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42432,7 +42432,7 @@
     "sell": 960,
     "class": "assassin",
     "variant": "shadow_l95_blue",
-    "art": "shadow",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42454,7 +42454,7 @@
     "sell": 960,
     "class": "assassin",
     "variant": "shadow_l95_blue",
-    "art": "shadow",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42476,7 +42476,7 @@
     "sell": 960,
     "class": "assassin",
     "variant": "shadow_l95_blue",
-    "art": "shadow",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42498,7 +42498,7 @@
     "sell": 960,
     "class": "assassin",
     "variant": "shadow_l95_blue",
-    "art": "shadow",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42520,7 +42520,7 @@
     "sell": 960,
     "class": "assassin",
     "variant": "daggers_l95_blue",
-    "art": "daggers",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42542,7 +42542,7 @@
     "sell": 960,
     "class": "priest",
     "variant": "pilgrim_l95_blue",
-    "art": "pilgrim",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42564,7 +42564,7 @@
     "sell": 960,
     "class": "priest",
     "variant": "pilgrim_l95_blue",
-    "art": "pilgrim",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42586,7 +42586,7 @@
     "sell": 960,
     "class": "priest",
     "variant": "pilgrim_l95_blue",
-    "art": "pilgrim",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42608,7 +42608,7 @@
     "sell": 960,
     "class": "priest",
     "variant": "pilgrim_l95_blue",
-    "art": "pilgrim",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42630,7 +42630,7 @@
     "sell": 960,
     "class": "priest",
     "variant": "mace_l95_blue",
-    "art": "mace",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42652,7 +42652,7 @@
     "sell": 960,
     "class": "hunter",
     "variant": "scout_l95_blue",
-    "art": "scout",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42674,7 +42674,7 @@
     "sell": 960,
     "class": "hunter",
     "variant": "scout_l95_blue",
-    "art": "scout",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42696,7 +42696,7 @@
     "sell": 960,
     "class": "hunter",
     "variant": "scout_l95_blue",
-    "art": "scout",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42718,7 +42718,7 @@
     "sell": 960,
     "class": "hunter",
     "variant": "scout_l95_blue",
-    "art": "scout",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42740,7 +42740,7 @@
     "sell": 960,
     "class": "hunter",
     "variant": "shortbow_l95_blue",
-    "art": "shortbow",
+    "art": "regearl95",
     "tint": {
       "hue": 280,
       "saturate": 1.15,
@@ -42761,7 +42761,7 @@
     "requiredLevel": 95,
     "sell": 960,
     "variant": "wayfarer_l95_blue",
-    "art": "wayfarer",
+    "art": "regearl95",
     "tint": {
       "hue": 300,
       "saturate": 1.15,
@@ -42782,7 +42782,7 @@
     "requiredLevel": 95,
     "sell": 960,
     "variant": "moonstone_l95_blue",
-    "art": "moonstone",
+    "art": "regearl95",
     "tint": {
       "hue": 300,
       "saturate": 1.15,
@@ -42803,7 +42803,7 @@
     "requiredLevel": 95,
     "sell": 960,
     "variant": "amber_l95_blue",
-    "art": "amber",
+    "art": "regearl95",
     "tint": {
       "hue": 300,
       "saturate": 1.15,
@@ -42986,7 +42986,7 @@
     "sell": 718,
     "class": "warrior",
     "variant": "crimson_l60_moonwell",
-    "art": "crimson",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43009,7 +43009,7 @@
     "sell": 718,
     "class": "warrior",
     "variant": "crimson_l60_moonwell",
-    "art": "crimson",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43032,7 +43032,7 @@
     "sell": 718,
     "class": "warrior",
     "variant": "crimson_l60_moonwell",
-    "art": "crimson",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43055,7 +43055,7 @@
     "sell": 718,
     "class": "warrior",
     "variant": "crimson_l60_moonwell",
-    "art": "crimson",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43078,7 +43078,7 @@
     "sell": 718,
     "class": "warrior",
     "variant": "sword_l60_moonwell",
-    "art": "sword",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43101,7 +43101,7 @@
     "sell": 718,
     "class": "mage",
     "variant": "apprentice_l60_moonwell",
-    "art": "apprentice",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43124,7 +43124,7 @@
     "sell": 718,
     "class": "mage",
     "variant": "apprentice_l60_moonwell",
-    "art": "apprentice",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43147,7 +43147,7 @@
     "sell": 718,
     "class": "mage",
     "variant": "apprentice_l60_moonwell",
-    "art": "apprentice",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43170,7 +43170,7 @@
     "sell": 718,
     "class": "mage",
     "variant": "apprentice_l60_moonwell",
-    "art": "apprentice",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43193,7 +43193,7 @@
     "sell": 718,
     "class": "mage",
     "variant": "ash_l60_moonwell",
-    "art": "ash",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43216,7 +43216,7 @@
     "sell": 718,
     "class": "assassin",
     "variant": "shadow_l60_moonwell",
-    "art": "shadow",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43239,7 +43239,7 @@
     "sell": 718,
     "class": "assassin",
     "variant": "shadow_l60_moonwell",
-    "art": "shadow",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43262,7 +43262,7 @@
     "sell": 718,
     "class": "assassin",
     "variant": "shadow_l60_moonwell",
-    "art": "shadow",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43285,7 +43285,7 @@
     "sell": 718,
     "class": "assassin",
     "variant": "shadow_l60_moonwell",
-    "art": "shadow",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43308,7 +43308,7 @@
     "sell": 718,
     "class": "assassin",
     "variant": "daggers_l60_moonwell",
-    "art": "daggers",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43331,7 +43331,7 @@
     "sell": 718,
     "class": "priest",
     "variant": "pilgrim_l60_moonwell",
-    "art": "pilgrim",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43354,7 +43354,7 @@
     "sell": 718,
     "class": "priest",
     "variant": "pilgrim_l60_moonwell",
-    "art": "pilgrim",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43377,7 +43377,7 @@
     "sell": 718,
     "class": "priest",
     "variant": "pilgrim_l60_moonwell",
-    "art": "pilgrim",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43400,7 +43400,7 @@
     "sell": 718,
     "class": "priest",
     "variant": "pilgrim_l60_moonwell",
-    "art": "pilgrim",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43423,7 +43423,7 @@
     "sell": 718,
     "class": "priest",
     "variant": "mace_l60_moonwell",
-    "art": "mace",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43446,7 +43446,7 @@
     "sell": 718,
     "class": "hunter",
     "variant": "scout_l60_moonwell",
-    "art": "scout",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43469,7 +43469,7 @@
     "sell": 718,
     "class": "hunter",
     "variant": "scout_l60_moonwell",
-    "art": "scout",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43492,7 +43492,7 @@
     "sell": 718,
     "class": "hunter",
     "variant": "scout_l60_moonwell",
-    "art": "scout",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43515,7 +43515,7 @@
     "sell": 718,
     "class": "hunter",
     "variant": "scout_l60_moonwell",
-    "art": "scout",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43538,7 +43538,7 @@
     "sell": 718,
     "class": "hunter",
     "variant": "shortbow_l60_moonwell",
-    "art": "shortbow",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43560,7 +43560,7 @@
     "requiredLevel": 60,
     "sell": 718,
     "variant": "wayfarer_l60_moonwell",
-    "art": "wayfarer",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43582,7 +43582,7 @@
     "requiredLevel": 60,
     "sell": 718,
     "variant": "moonstone_l60_moonwell",
-    "art": "moonstone",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,
@@ -43604,7 +43604,7 @@
     "requiredLevel": 60,
     "sell": 718,
     "variant": "amber_l60_moonwell",
-    "art": "amber",
+    "art": "regearmoonwell",
     "tint": {
       "hue": 165,
       "saturate": 1.15,

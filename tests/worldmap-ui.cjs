@@ -20,7 +20,7 @@ async function call(name, args = {}) {
   const rust = fs.readFileSync(path.join(root, 'server/src/world.rs'), 'utf8');
   const body = rust.slice(rust.indexOf('pub fn default_level'), rust.indexOf('// Gold carried by a default-level enemy'));
   const server = {}; for (const [, names, level] of body.matchAll(/((?:"\w+"\s*\|?\s*)+)=>\s*(\d+)/g)) for (const [, name] of names.matchAll(/"(\w+)"/g)) server[name] = Number(level);
-  for (const catalog of ['cathedral', 'eye_below', 'elder_hollow', 'thousandfold', 'rain_crown', 'seed_vault', 'sunken_astrolabe', 'thunderheart_gate', 'blooming_labyrinth']) {
+  for (const catalog of ['cathedral', 'eye_below', 'elder_hollow', 'thousandfold', 'rain_crown', 'seed_vault', 'sunken_astrolabe', 'thunderheart_gate', 'blooming_labyrinth', 'solar_crucible', 'amber_archive', 'silent_solstice']) {
     Object.assign(server, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, `world/${catalog}.txt`), 'utf8')).map(e => [e.kind, e.level])));
   }
   check(Object.keys(server).length >= 17, `Parsed ${Object.keys(server).length} enemy levels from world.rs`);
@@ -43,7 +43,7 @@ async function call(name, args = {}) {
   const press = async key => { await page.evaluate(() => document.activeElement?.blur?.()); await page.keyboard.press(key); };
 
   // --- the data the map was written against ---
-  const data = await page.evaluate(() => ({ zones: Field._debug.zones.map(z => ({ name: z.name, sealed: !!z.sealedTemplate, kinds: [...new Set((z.slimes || []).map(s => s.kind))], portals: (z.portals || []).map(p => p.to) })), layout: WorldMap._layout.length, kinds: Object.fromEntries(Object.entries(WorldMap._kinds).map(([k, v]) => [k, v[1]])) }));
+  const data = await page.evaluate(() => ({ zones: Field._debug.zones.map(z => ({ name: z.name, sealed: !!z.sealedTemplate || z.theme === 'arena', kinds: [...new Set((z.slimes || []).map(s => s.kind))], portals: (z.portals || []).map(p => p.to) })), layout: WorldMap._layout.length, kinds: Object.fromEntries(Object.entries(WorldMap._kinds).map(([k, v]) => [k, v[1]])) }));
   const visibleZones = data.zones.filter(z => !z.sealed);
   check(data.layout >= visibleZones.length, `Every one of the ${visibleZones.length} open zones has a place on the world sheet (${data.layout})`);
   check(await page.evaluate(() => {
@@ -52,7 +52,7 @@ async function call(name, args = {}) {
       if (!graph[edge.to].some(back => back.to === i)) return false;
       if (!seen.has(edge.to)) { seen.add(edge.to); queue.push(edge.to); }
     }
-    return graph.length === Field._debug.zones.length && seen.size === Field._debug.zones.filter(z => !z.sealedTemplate).length;
+    return graph.length === Field._debug.zones.length && seen.size === Field._debug.zones.filter(z => !z.sealedTemplate && z.theme !== 'arena').length;
   }), 'The authoritative gate graph is reciprocal and connects every open zone');
   check(data.zones.every(z => z.kinds.every(k => k in data.kinds)), 'Every enemy kind in every zone is in the map legend');
   check(Object.entries(data.kinds).every(([k, level]) => (server[k] ?? 2) === level), `The legend levels equal the server's (${Object.entries(data.kinds).filter(([k, l]) => (server[k] ?? 2) !== l).map(([k]) => k)})`);
@@ -63,6 +63,13 @@ async function call(name, args = {}) {
   check(await page.evaluate(() => { const b = document.getElementById('wm-open'); return !b.textContent.trim() && !!b.querySelector('svg circle') && b.getAttribute('aria-label').includes('(M)'); }), 'The globe is an icon with an accessible name');
   await press('m');
   check(await visible('#worldmap') && await page.evaluate(() => WorldMap.open && WorldMap.view === 'world'), 'M opens the world map on the world view');
+  check(await page.evaluate(() => {
+    const surface = Field._debug.zones.filter(z => !z.sealedTemplate && z.theme !== 'arena' && !z.players).length;
+    const atlas = document.querySelector('.wm-atlas');
+    return atlas && atlas.querySelectorAll('.wm-island').length === surface &&
+      atlas.querySelectorAll('.wm-land-links g').length > 15 &&
+      [...document.querySelectorAll('.wm-tile[data-branch="wild"]')].every(t => t.style.clipPath.startsWith('polygon('));
+  }), 'The illustrated atlas draws one land region per outdoor zone and bridges actual portal links');
   check(await page.locator('.wm-tile[data-zone="9"] .wm-travel-badge').isHidden(), 'Unvisited zones do not reveal their travel-master badge');
   check(await page.evaluate(() => !Field.canAct), 'The game is paused behind the map');
   check(await page.locator('#pause').isHidden(), 'M does not open the pause menu');
@@ -140,7 +147,7 @@ async function call(name, args = {}) {
 
   // --- visiting the other zones uncovers one cell each, and the glacier two ---
   await stand(1, 48, 86); await stand(2, 64, 118); await stand(2, 64, 52); await stand(3, 64, 9); await stand(5, 15, 111); await stand(6, 12, 150); await stand(7, 80, 144); await stand(8, 80, 160); await stand(4, 80, 150);
-  const later = await page.evaluate(() => Field._debug.zones.slice(9).map((z,i) => ({zone:i+9,...z.spawn, sealed:!!z.sealedTemplate})).filter(z => !z.sealed));
+  const later = await page.evaluate(() => Field._debug.zones.slice(9).map((z,i) => ({zone:i+9,...z.spawn, sealed:!!z.sealedTemplate || z.theme === 'arena'})).filter(z => !z.sealed));
   for (const z of later) await stand(z.zone,z.x,z.y);
   await stand(4,80,150);
   await press('m');

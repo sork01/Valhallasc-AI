@@ -1,7 +1,7 @@
 {
  "size": 48,
  "cols": 10,
- "rows": 51,
+ "rows": 60,
  "at": {
   "warrior_headgear_crimson": [
    0,
@@ -5727,6 +5727,562 @@
    7,
    50
   ],
+  "warrior_armor_crimson_l95_gray": [
+   8,
+   50
+  ],
+  "warrior_armor_azure_l95_green": [
+   8,
+   50
+  ],
+  "warrior_armor_crimson_l95_blue": [
+   8,
+   50
+  ],
+  "warrior_headgear_crimson_l95_gray": [
+   9,
+   50
+  ],
+  "warrior_headgear_azure_l95_green": [
+   9,
+   50
+  ],
+  "warrior_headgear_crimson_l95_blue": [
+   9,
+   50
+  ],
+  "warrior_shoulders_crimson_l95_gray": [
+   0,
+   51
+  ],
+  "warrior_shoulders_azure_l95_green": [
+   0,
+   51
+  ],
+  "warrior_shoulders_crimson_l95_blue": [
+   0,
+   51
+  ],
+  "warrior_gloves_crimson_l95_gray": [
+   1,
+   51
+  ],
+  "warrior_gloves_azure_l95_green": [
+   1,
+   51
+  ],
+  "warrior_gloves_crimson_l95_blue": [
+   1,
+   51
+  ],
+  "warrior_weapon_sword_l95_gray": [
+   2,
+   51
+  ],
+  "warrior_weapon_royal_l95_green": [
+   2,
+   51
+  ],
+  "warrior_weapon_sword_l95_blue": [
+   2,
+   51
+  ],
+  "mage_armor_apprentice_l95_gray": [
+   3,
+   51
+  ],
+  "mage_armor_runic_l95_green": [
+   3,
+   51
+  ],
+  "mage_armor_apprentice_l95_blue": [
+   3,
+   51
+  ],
+  "mage_headgear_apprentice_l95_gray": [
+   4,
+   51
+  ],
+  "mage_headgear_runic_l95_green": [
+   4,
+   51
+  ],
+  "mage_headgear_apprentice_l95_blue": [
+   4,
+   51
+  ],
+  "mage_shoulders_apprentice_l95_gray": [
+   5,
+   51
+  ],
+  "mage_shoulders_runic_l95_green": [
+   5,
+   51
+  ],
+  "mage_shoulders_apprentice_l95_blue": [
+   5,
+   51
+  ],
+  "mage_gloves_apprentice_l95_gray": [
+   6,
+   51
+  ],
+  "mage_gloves_runic_l95_green": [
+   6,
+   51
+  ],
+  "mage_gloves_apprentice_l95_blue": [
+   6,
+   51
+  ],
+  "mage_weapon_ash_l95_gray": [
+   7,
+   51
+  ],
+  "mage_weapon_crystal_l95_green": [
+   7,
+   51
+  ],
+  "mage_weapon_ash_l95_blue": [
+   7,
+   51
+  ],
+  "assassin_armor_shadow_l95_gray": [
+   8,
+   51
+  ],
+  "assassin_armor_moon_l95_green": [
+   8,
+   51
+  ],
+  "assassin_armor_shadow_l95_blue": [
+   8,
+   51
+  ],
+  "assassin_headgear_shadow_l95_gray": [
+   9,
+   51
+  ],
+  "assassin_headgear_moon_l95_green": [
+   9,
+   51
+  ],
+  "assassin_headgear_shadow_l95_blue": [
+   9,
+   51
+  ],
+  "assassin_shoulders_shadow_l95_gray": [
+   0,
+   52
+  ],
+  "assassin_shoulders_moon_l95_green": [
+   0,
+   52
+  ],
+  "assassin_shoulders_shadow_l95_blue": [
+   0,
+   52
+  ],
+  "assassin_gloves_shadow_l95_gray": [
+   1,
+   52
+  ],
+  "assassin_gloves_moon_l95_green": [
+   1,
+   52
+  ],
+  "assassin_gloves_shadow_l95_blue": [
+   1,
+   52
+  ],
+  "assassin_weapon_daggers_l95_gray": [
+   2,
+   52
+  ],
+  "assassin_weapon_moonfang_l95_green": [
+   2,
+   52
+  ],
+  "assassin_weapon_daggers_l95_blue": [
+   2,
+   52
+  ],
+  "priest_armor_pilgrim_l95_gray": [
+   3,
+   52
+  ],
+  "priest_armor_dawn_l95_green": [
+   3,
+   52
+  ],
+  "priest_armor_pilgrim_l95_blue": [
+   3,
+   52
+  ],
+  "priest_headgear_pilgrim_l95_gray": [
+   4,
+   52
+  ],
+  "priest_headgear_dawn_l95_green": [
+   4,
+   52
+  ],
+  "priest_headgear_pilgrim_l95_blue": [
+   4,
+   52
+  ],
+  "priest_shoulders_pilgrim_l95_gray": [
+   5,
+   52
+  ],
+  "priest_shoulders_dawn_l95_green": [
+   5,
+   52
+  ],
+  "priest_shoulders_pilgrim_l95_blue": [
+   5,
+   52
+  ],
+  "priest_gloves_pilgrim_l95_gray": [
+   6,
+   52
+  ],
+  "priest_gloves_dawn_l95_green": [
+   6,
+   52
+  ],
+  "priest_gloves_pilgrim_l95_blue": [
+   6,
+   52
+  ],
+  "priest_weapon_mace_l95_gray": [
+   7,
+   52
+  ],
+  "priest_weapon_sunmace_l95_green": [
+   7,
+   52
+  ],
+  "priest_weapon_mace_l95_blue": [
+   7,
+   52
+  ],
+  "hunter_armor_scout_l95_gray": [
+   8,
+   52
+  ],
+  "hunter_armor_warden_l95_green": [
+   8,
+   52
+  ],
+  "hunter_armor_scout_l95_blue": [
+   8,
+   52
+  ],
+  "hunter_headgear_scout_l95_gray": [
+   9,
+   52
+  ],
+  "hunter_headgear_warden_l95_green": [
+   9,
+   52
+  ],
+  "hunter_headgear_scout_l95_blue": [
+   9,
+   52
+  ],
+  "hunter_shoulders_scout_l95_gray": [
+   0,
+   53
+  ],
+  "hunter_shoulders_warden_l95_green": [
+   0,
+   53
+  ],
+  "hunter_shoulders_scout_l95_blue": [
+   0,
+   53
+  ],
+  "hunter_gloves_scout_l95_gray": [
+   1,
+   53
+  ],
+  "hunter_gloves_warden_l95_green": [
+   1,
+   53
+  ],
+  "hunter_gloves_scout_l95_blue": [
+   1,
+   53
+  ],
+  "hunter_weapon_shortbow_l95_gray": [
+   2,
+   53
+  ],
+  "hunter_weapon_wardenbow_l95_green": [
+   2,
+   53
+  ],
+  "hunter_weapon_shortbow_l95_blue": [
+   2,
+   53
+  ],
+  "pants_wayfarer_l95_gray": [
+   3,
+   53
+  ],
+  "pants_wayfarer_l95_green": [
+   3,
+   53
+  ],
+  "pants_wayfarer_l95_blue": [
+   3,
+   53
+  ],
+  "necklace_moonstone_l95_gray": [
+   4,
+   53
+  ],
+  "necklace_moonstone_l95_green": [
+   4,
+   53
+  ],
+  "necklace_moonstone_l95_blue": [
+   4,
+   53
+  ],
+  "accessory_amber_l95_gray": [
+   5,
+   53
+  ],
+  "accessory_amber_l95_green": [
+   5,
+   53
+  ],
+  "accessory_amber_l95_blue": [
+   5,
+   53
+  ],
+  "warrior_armor_crimson_l20_vault": [
+   6,
+   53
+  ],
+  "warrior_headgear_crimson_l20_vault": [
+   7,
+   53
+  ],
+  "warrior_shoulders_crimson_l20_vault": [
+   8,
+   53
+  ],
+  "warrior_gloves_crimson_l20_vault": [
+   9,
+   53
+  ],
+  "warrior_weapon_sword_l20_vault": [
+   0,
+   54
+  ],
+  "mage_armor_apprentice_l20_vault": [
+   1,
+   54
+  ],
+  "mage_headgear_apprentice_l20_vault": [
+   2,
+   54
+  ],
+  "mage_shoulders_apprentice_l20_vault": [
+   3,
+   54
+  ],
+  "mage_gloves_apprentice_l20_vault": [
+   4,
+   54
+  ],
+  "mage_weapon_ash_l20_vault": [
+   5,
+   54
+  ],
+  "assassin_armor_shadow_l20_vault": [
+   6,
+   54
+  ],
+  "assassin_headgear_shadow_l20_vault": [
+   7,
+   54
+  ],
+  "assassin_shoulders_shadow_l20_vault": [
+   8,
+   54
+  ],
+  "assassin_gloves_shadow_l20_vault": [
+   9,
+   54
+  ],
+  "assassin_weapon_daggers_l20_vault": [
+   0,
+   55
+  ],
+  "priest_armor_pilgrim_l20_vault": [
+   1,
+   55
+  ],
+  "priest_headgear_pilgrim_l20_vault": [
+   2,
+   55
+  ],
+  "priest_shoulders_pilgrim_l20_vault": [
+   3,
+   55
+  ],
+  "priest_gloves_pilgrim_l20_vault": [
+   4,
+   55
+  ],
+  "priest_weapon_mace_l20_vault": [
+   5,
+   55
+  ],
+  "hunter_armor_scout_l20_vault": [
+   6,
+   55
+  ],
+  "hunter_headgear_scout_l20_vault": [
+   7,
+   55
+  ],
+  "hunter_shoulders_scout_l20_vault": [
+   8,
+   55
+  ],
+  "hunter_gloves_scout_l20_vault": [
+   9,
+   55
+  ],
+  "hunter_weapon_shortbow_l20_vault": [
+   0,
+   56
+  ],
+  "pants_wayfarer_l20_vault": [
+   1,
+   56
+  ],
+  "accessory_amber_l20_vault": [
+   2,
+   56
+  ],
+  "warrior_armor_crimson_l60_moonwell": [
+   3,
+   56
+  ],
+  "warrior_headgear_crimson_l60_moonwell": [
+   4,
+   56
+  ],
+  "warrior_shoulders_crimson_l60_moonwell": [
+   5,
+   56
+  ],
+  "warrior_gloves_crimson_l60_moonwell": [
+   6,
+   56
+  ],
+  "warrior_weapon_sword_l60_moonwell": [
+   7,
+   56
+  ],
+  "mage_armor_apprentice_l60_moonwell": [
+   8,
+   56
+  ],
+  "mage_headgear_apprentice_l60_moonwell": [
+   9,
+   56
+  ],
+  "mage_shoulders_apprentice_l60_moonwell": [
+   0,
+   57
+  ],
+  "mage_gloves_apprentice_l60_moonwell": [
+   1,
+   57
+  ],
+  "mage_weapon_ash_l60_moonwell": [
+   2,
+   57
+  ],
+  "assassin_armor_shadow_l60_moonwell": [
+   3,
+   57
+  ],
+  "assassin_headgear_shadow_l60_moonwell": [
+   4,
+   57
+  ],
+  "assassin_shoulders_shadow_l60_moonwell": [
+   5,
+   57
+  ],
+  "assassin_gloves_shadow_l60_moonwell": [
+   6,
+   57
+  ],
+  "assassin_weapon_daggers_l60_moonwell": [
+   7,
+   57
+  ],
+  "priest_armor_pilgrim_l60_moonwell": [
+   8,
+   57
+  ],
+  "priest_headgear_pilgrim_l60_moonwell": [
+   9,
+   57
+  ],
+  "priest_shoulders_pilgrim_l60_moonwell": [
+   0,
+   58
+  ],
+  "priest_gloves_pilgrim_l60_moonwell": [
+   1,
+   58
+  ],
+  "priest_weapon_mace_l60_moonwell": [
+   2,
+   58
+  ],
+  "hunter_armor_scout_l60_moonwell": [
+   3,
+   58
+  ],
+  "hunter_headgear_scout_l60_moonwell": [
+   4,
+   58
+  ],
+  "hunter_shoulders_scout_l60_moonwell": [
+   5,
+   58
+  ],
+  "hunter_gloves_scout_l60_moonwell": [
+   6,
+   58
+  ],
+  "hunter_weapon_shortbow_l60_moonwell": [
+   7,
+   58
+  ],
+  "pants_wayfarer_l60_moonwell": [
+   8,
+   58
+  ],
+  "necklace_moonstone_l60_moonwell": [
+   9,
+   58
+  ],
+  "accessory_amber_l60_moonwell": [
+   0,
+   59
+  ],
   "warrior_armor_crimson_l55_gray": [
    5,
    13
@@ -6515,6 +7071,89 @@
   "L90-hunter-weapon": "b72fc875fa17fd5f",
   "L90-shared-pants": "8cabdba0df5a312e",
   "L90-shared-necklace": "1c8f773abe97dc6d",
-  "L90-shared-accessory": "1da13be3159b9c85"
+  "L90-shared-accessory": "1da13be3159b9c85",
+  "L95-warrior-armor": "3ebaa6300aadaf3a",
+  "L95-warrior-headgear": "02855fd55e6ebf0e",
+  "L95-warrior-shoulders": "122d142577ad627a",
+  "L95-warrior-gloves": "44eb46830a5055a5",
+  "L95-warrior-weapon": "3b2d69fc23a7c544",
+  "L95-mage-armor": "a9d8e7d4eacf0c7f",
+  "L95-mage-headgear": "740e09b3d727392b",
+  "L95-mage-shoulders": "2e3cb2dbc2d42640",
+  "L95-mage-gloves": "1d65af90d4d67a76",
+  "L95-mage-weapon": "1f9f4be6adaff63e",
+  "L95-assassin-armor": "bf445ac1c771aa56",
+  "L95-assassin-headgear": "3016bfe4753e50d0",
+  "L95-assassin-shoulders": "8cf2212822c6ad14",
+  "L95-assassin-gloves": "e7e5c621162597e0",
+  "L95-assassin-weapon": "46d7bdf9e8dccba8",
+  "L95-priest-armor": "887a10536b19efa3",
+  "L95-priest-headgear": "78dd7bf0e448def0",
+  "L95-priest-shoulders": "7e5f5b687b2a449a",
+  "L95-priest-gloves": "34e8ff6d6d7e8265",
+  "L95-priest-weapon": "016a99d492499058",
+  "L95-hunter-armor": "cffec5627fc2fc4f",
+  "L95-hunter-headgear": "bf03b0f66908da60",
+  "L95-hunter-shoulders": "86c15a3259478fdf",
+  "L95-hunter-gloves": "b7b4dc8dfe40b392",
+  "L95-hunter-weapon": "1ca41ddf0912042e",
+  "L95-shared-pants": "429b31c08825fb4b",
+  "L95-shared-necklace": "7eebf3e3b022d30a",
+  "L95-shared-accessory": "87801162e60ab571",
+  "vault-warrior-armor": "9eb1a323f7887a75",
+  "vault-warrior-headgear": "3ddd89e3107d2661",
+  "vault-warrior-shoulders": "c8d5db916f04c512",
+  "vault-warrior-gloves": "b4806526de047099",
+  "vault-warrior-weapon": "fea03626f374dd46",
+  "vault-mage-armor": "94a4e679ad865210",
+  "vault-mage-headgear": "a5568b1c907269de",
+  "vault-mage-shoulders": "e0a8f61102cd5920",
+  "vault-mage-gloves": "ca5dec85a16a8c48",
+  "vault-mage-weapon": "46c49f96729c0ea7",
+  "vault-assassin-armor": "3660e4ac729eab3e",
+  "vault-assassin-headgear": "010ecd2fb0faf413",
+  "vault-assassin-shoulders": "a33700b966d12dd8",
+  "vault-assassin-gloves": "f07cd894046d52bd",
+  "vault-assassin-weapon": "1b3c6c4c97b72815",
+  "vault-priest-armor": "45d8d815c42f9a07",
+  "vault-priest-headgear": "3df6681cd25e82e1",
+  "vault-priest-shoulders": "70509f06b456fdcb",
+  "vault-priest-gloves": "95d0fcff399beb0a",
+  "vault-priest-weapon": "9eb4cf6bfef0e2c8",
+  "vault-hunter-armor": "cea1d28522e87db7",
+  "vault-hunter-headgear": "37e14c3582d2e0d8",
+  "vault-hunter-shoulders": "b58feb0e86ee3b24",
+  "vault-hunter-gloves": "26bafc58e04c52d7",
+  "vault-hunter-weapon": "c79eab30266a1b37",
+  "vault-shared-pants": "5ec8a1d5ac6742f9",
+  "vault-shared-accessory": "3f9dfa898365dcd0",
+  "moonwell-warrior-armor": "4256cb3ced08fee5",
+  "moonwell-warrior-headgear": "8c5a587105739254",
+  "moonwell-warrior-shoulders": "6f2ed4573009dc7a",
+  "moonwell-warrior-gloves": "897abaaed34321ad",
+  "moonwell-warrior-weapon": "c7e6ae24eb15b422",
+  "moonwell-mage-armor": "21f57cce45fe0941",
+  "moonwell-mage-headgear": "d7ed95440221d2dd",
+  "moonwell-mage-shoulders": "f1dfc9955c81892f",
+  "moonwell-mage-gloves": "8121c15db0a9b643",
+  "moonwell-mage-weapon": "83469b2bc3f47838",
+  "moonwell-assassin-armor": "26f0fcd841745703",
+  "moonwell-assassin-headgear": "419a8ac3ba84925e",
+  "moonwell-assassin-shoulders": "19727d766eee3efd",
+  "moonwell-assassin-gloves": "6909cea5d6175ef1",
+  "moonwell-assassin-weapon": "c1f2de19a6c67822",
+  "moonwell-priest-armor": "77e12bdf3d541f50",
+  "moonwell-priest-headgear": "6b75611359fd6b4e",
+  "moonwell-priest-shoulders": "22ecb7ab061da8b3",
+  "moonwell-priest-gloves": "b2d449258885f723",
+  "moonwell-priest-weapon": "adecf2a323b9d9af",
+  "moonwell-hunter-armor": "0be276e45dd46380",
+  "moonwell-hunter-headgear": "f998c42471a4114e",
+  "moonwell-hunter-shoulders": "a9076792d2f8352c",
+  "moonwell-hunter-gloves": "7701d17f79a9cc12",
+  "moonwell-hunter-weapon": "9cf4bb6afb28db70",
+  "moonwell-shared-pants": "1791f4ec8d8da83d",
+  "moonwell-shared-necklace": "fa376845c978f59c",
+  "moonwell-shared-accessory": "ad140451dec0c9e8"
  }
 }

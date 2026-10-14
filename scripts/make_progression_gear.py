@@ -21,19 +21,29 @@ from scipy import ndimage as ndi
 import cel_common as cc
 import gear_shapes as shape
 import gear_shapes_high
+import dungeon_gear_shapes
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'client/assets'
 RAW = ROOT / 'scripts/progression_raw'
 STATE = ROOT / 'docs/gear-redesign-state.txt'
 HIGH_STATE = ROOT / 'docs/high-gear-state.txt'
+DUNGEON_STATE = ROOT / 'docs/dungeon-gear-state.txt'
 MANIFEST = ROOT / 'world/gear-art.txt'
 CLASSES = tuple(shape.MODULES)
 DIRS = cc.DIRS
 META = dict(warrior='warrior_layered', assassin='assassin', mage='mage', priest='priest', hunter='hunter')
 SLOT = {'headgear': 'head'}
-PALETTE = np.array([[int(h[k:k + 2], 16) for k in (1, 3, 5)] + [255 if n else 0] for n, h in enumerate(shape.PALETTE)], np.uint8)
+PALETTE_HEX = shape.PALETTE
+PALETTE = np.array([[int(h[k:k + 2], 16) for k in (1, 3, 5)] + [255 if n else 0] for n, h in enumerate(PALETTE_HEX)], np.uint8)
 BODY_CACHE = {}
+
+
+def activate(task):
+    global PALETTE_HEX, PALETTE
+    PALETTE_HEX = dungeon_gear_shapes.PALETTE if task['group'] in ('vault', 'moonwell') else shape.PALETTE
+    PALETTE = np.array([[int(h[k:k + 2], 16) for k in (1, 3, 5)] + [255 if n else 0]
+                        for n, h in enumerate(PALETTE_HEX)], np.uint8)
 
 
 def revision(task):
@@ -41,15 +51,18 @@ def revision(task):
     dependencies = [shape.render, shape.pose, shape.poly, shape.jewel, getattr(shape, task['kind'])]
     source = ''.join(inspect.getsource(fn) for fn in dependencies) + Path(cc.__file__).read_text()
     source += json.dumps([shape.MATS, shape.DESIGNS[task['group']]], sort_keys=True)
-    if task['className'] == 'mage' and task['kind'] == 'weapon' and shape.DESIGNS[task['group']]['index'] >= 9:
+    if task['group'] in ('vault', 'moonwell'):
+        source += inspect.getsource(dungeon_gear_shapes.render) + inspect.getsource(dungeon_gear_shapes.adorn)
+        source += inspect.getsource(dungeon_gear_shapes.recolor) + json.dumps(dungeon_gear_shapes.EXTRA_MATS, sort_keys=True)
+    if task['group'] not in ('vault', 'moonwell') and task['className'] == 'mage' and task['kind'] == 'weapon' and shape.DESIGNS[task['group']]['index'] >= 9:
         source += inspect.getsource(gear_shapes_high.render_mage_staff)
-    if task['className'] == 'mage' and task['kind'] == 'headgear' and shape.DESIGNS[task['group']]['index'] >= 9:
+    if task['group'] not in ('vault', 'moonwell') and task['className'] == 'mage' and task['kind'] == 'headgear' and shape.DESIGNS[task['group']]['index'] >= 9:
         source += inspect.getsource(gear_shapes_high.render_mage_head)
     return hashlib.sha256(source.encode()).hexdigest()
 
 
 def task_for(job):
-    for path in (STATE, HIGH_STATE):
+    for path in (STATE, HIGH_STATE, DUNGEON_STATE):
         if path.exists():
             task = next((t for t in json.loads(path.read_text())['tasks'] if t['id'] == job), None)
             if task:
@@ -71,7 +84,9 @@ def frames(task, cls, gender):
                     with np.load(file) as data:
                         if str(data['revision']) == fingerprint:
                             result[key] = (data['index'], data['depth']); continue
-                if cls == 'mage' and task['kind'] == 'headgear' and shape.DESIGNS[task['group']]['index'] >= 9:
+                if task['group'] in ('vault', 'moonwell'):
+                    idx, depth = dungeon_gear_shapes.render(cls, task['group'], task['kind'], gender, *key)
+                elif cls == 'mage' and task['kind'] == 'headgear' and shape.DESIGNS[task['group']]['index'] >= 9:
                     idx, depth = gear_shapes_high.render_mage_head(task['group'], gender, *key)
                 elif cls == 'mage' and task['kind'] == 'weapon' and shape.DESIGNS[task['group']]['index'] >= 9:
                     idx, depth = gear_shapes_high.render_mage_staff(task['group'], gender, *key)
@@ -156,7 +171,7 @@ def save_sprite(name, indices, fps):
     stack = np.stack(indices); yy, xx = np.nonzero(stack.any(axis=0)); x0, x1, y0, y1 = int(xx.min()), int(xx.max()) + 1, int(yy.min()), int(yy.max()) + 1
     w, h = x1 - x0, y1 - y0
     assert w * h * len(indices) <= 1048576, (name, w, h, len(indices))
-    sprite = dict(name=name, width=w, height=h, fps=fps, palette=shape.PALETTE, palette_locked=True,
+    sprite = dict(name=name, width=w, height=h, fps=fps, palette=PALETTE_HEX, palette_locked=True,
                   layers=[dict(name='equipment', visible=True, opacity=1)],
                   frames=[dict(cels=[dict(rle=rle(idx[y0:y1, x0:x1]))]) for idx in indices])
     result = api('save', dict(sprite=sprite))
@@ -212,9 +227,34 @@ def build(task):
     remember(); export(task)
 
 
+def ensure_female_sprites(task, manifest, record):
+    """Keep both-body source cels editable in PixelFlow, including shared pieces."""
+    if task['group'] not in ('L95', 'vault', 'moonwell'):
+        return
+    classes = [task['className']] if task['className'] else list(CLASSES)
+    for cls in classes:
+        module = importlib.import_module(shape.MODULES[cls])
+        raw = frames(task, cls, 'female')
+        clips = record.setdefault('female', {}).setdefault(cls, {})
+        for clip, (fps, n, _) in module.CLIPS.items():
+            indices = [raw[(clip, facing, k)][0] for facing in DIRS for k in range(n)]
+            mask = np.stack(indices).any(axis=0); yy, xx = np.nonzero(mask)
+            chunks = 2 if (xx.max() - xx.min() + 1) * (yy.max() - yy.min() + 1) * len(indices) > 1048576 else 1
+            saved_chunks = clips.setdefault(clip, [])
+            assert len(saved_chunks) <= chunks
+            for chunk in range(len(saved_chunks), chunks):
+                lo, hi = len(indices) * chunk // chunks, len(indices) * (chunk + 1) // chunks
+                saved = save_sprite(f'gear_{task["group"].lower()}_{cls}_f_{task["kind"]}_{clip}_{chunk}', indices[lo:hi], fps)
+                saved['start'] = lo
+                saved_chunks.append(saved)
+                MANIFEST.write_text(json.dumps(manifest, indent=2) + '\n')
+            print(f'{task["id"]}: {cls}/female/{clip} saved', flush=True)
+
+
 def export(task):
     manifest = json.loads(MANIFEST.read_text()); record = manifest[task['id']]
     assert record['revision'] == revision(task), 'Source changed after build: preserve editor edits and review before rebuilding'
+    ensure_female_sprites(task, manifest, record)
     files = []
     for cls, clips in record['classes'].items():
         module = importlib.import_module(shape.MODULES[cls])
@@ -222,16 +262,17 @@ def export(task):
             raw = frames(task, cls, gender); atlas = Image.new('RGBA', (1280, 6400)); depth_atlas = Image.new('RGB', (1280, 6400), (255, 255, 0))
             for ci, (clip, (_, n, _)) in enumerate(module.CLIPS.items()):
                 edited = {}
-                if gender == 'male':
-                    for saved in clips[clip]:
+                saved_by_clip = clips if gender == 'male' else record.get('female', {}).get(cls)
+                if saved_by_clip:
+                    for saved in saved_by_clip[clip]:
                         sprite, grids = load_sprite(saved)
                         for j, idx in enumerate(grids):
                             edited[saved['start'] + j] = (saved['offset'], np.array(Image.fromarray(PALETTE[idx])))
-                            assert sprite['palette'] == shape.PALETTE, 'Changed editor palette requires an explicit remap'
+                            assert sprite['palette'] == PALETTE_HEX, 'Changed editor palette requires an explicit remap'
                 for di, facing in enumerate(DIRS):
                     for k in range(n):
                         idx, dep = raw[(clip, facing, k)]; rgba = PALETTE[idx].copy(); dep = dep.copy()
-                        if gender == 'male':
+                        if saved_by_clip:
                             (x0, y0), patch = edited[di * n + k]; h, w = patch.shape[:2]
                             rgba.fill(0); rgba[y0:y0 + h, x0:x0 + w] = patch
                             added = (rgba[..., 3] > 0) & ~np.isfinite(dep)
@@ -250,7 +291,7 @@ def export(task):
             meta_path = ASSETS / (META[cls] + ('_f' if gender == 'female' else '') + '_sprites.txt')
             meta = json.loads(meta_path.read_text()); meta['parts'][part] = dict(png=prefix + '.png', depth=prefix + '_depth.png')
             meta['lazyParts'] = sorted(set(meta.get('lazyParts', [])) | {part})
-            meta.setdefault('gearSprites', {})[part] = clips if gender == 'male' else {'local': 'scripts/make_progression_gear.py export ' + task['id']}
+            meta.setdefault('gearSprites', {})[part] = clips if gender == 'male' else record.get('female', {}).get(cls) or {'local': 'scripts/make_progression_gear.py export ' + task['id']}
             meta_path.write_text(json.dumps(meta, indent=2) + '\n')
     sprite, grids = load_sprite(record['icon']); (x0, y0) = record['icon']['offset']; icon = Image.new('RGBA', (48, 48))
     icon.paste(Image.fromarray(PALETTE[grids[0]]), (x0, y0))
@@ -272,20 +313,23 @@ def main():
     node = '/home/serveperry/.nvm/versions/node/v20.20.2/bin/node'
     for job in args.job:
         task = task_for(job)
+        activate(task)
+        status_script = ('scripts/high_gear_jobs.py' if task['group'].startswith('L') and int(task['group'][1:]) >= 60 else
+                         'scripts/dungeon_gear_jobs.py' if task['group'] in ('vault', 'moonwell') else 'scripts/gear_art_status.py')
         if args.redo:
             assert args.command == 'build', '--redo is only valid with build'
             manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}
             if job in manifest:
                 del manifest[job]
                 MANIFEST.write_text(json.dumps(manifest, indent=2) + '\n')
-            subprocess.run([sys.executable, 'scripts/gear_art_status.py', 'reopen', job, '--phase', 'redesign build',
+            subprocess.run([sys.executable, status_script, 'reopen', job, '--phase', 'redesign build',
                             '--note', 'Explicit redesign requested; prior art is superseded and this piece will be visually rechecked.'], cwd=ROOT, check=True)
             task = task_for(job)
         if args.finish and task['done']:
             print(job + ': already checked off; preserving exported/editor art', flush=True)
             continue
         if args.finish:
-            subprocess.run([sys.executable, 'scripts/gear_art_status.py', 'update', job, '--phase', 'build and verification',
+            subprocess.run([sys.executable, status_script, 'update', job, '--phase', 'build and verification',
                             '--note', args.reviewed + '; next: save/export, wire, browser check, immediate checklist update.'], cwd=ROOT, check=True)
         if args.command == 'wire':
             assert json.loads(MANIFEST.read_text())[task['id']].get('files'), 'Export worn art and icon first'
@@ -305,7 +349,7 @@ def main():
             record = json.loads(MANIFEST.read_text())[job]
             evidence = ['scripts/gear_shapes.py', 'world/gear-art.txt', *record['files'],
                         'test-results/gear-redesign/' + job + '.png', 'test-results/gear-redesign/' + job + '-browser.json']
-            subprocess.run([sys.executable, 'scripts/gear_art_status.py', 'finish', job, '--evidence', *evidence,
+            subprocess.run([sys.executable, status_script, 'finish', job, '--evidence', *evidence,
                             '--note', args.reviewed + '; all frames clear on both bodies, PixelFlow round-trip, matching icon and real-client checks passed.'], cwd=ROOT, check=True)
 
 

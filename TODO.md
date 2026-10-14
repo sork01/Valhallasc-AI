@@ -222,26 +222,40 @@ For each entry, replace tinted starter silhouettes with new worn layers and matc
 
 #### Level 95
 
-- [ ] `A95-WARRIOR` — Create and wire the five level-95 warrior pieces and icons.
-- [ ] `A95-MAGE` — Create and wire the five level-95 mage pieces and icons.
-- [ ] `A95-ASSASSIN` — Create and wire the five level-95 assassin pieces and icons.
-- [ ] `A95-PRIEST` — Create and wire the five level-95 priest pieces and icons.
-- [ ] `A95-HUNTER` — Create and wire the five level-95 hunter pieces and icons.
-- [ ] `A95-SHARED` — Create and wire the three shared level-95 pieces and icons.
+- [x] `A95-WARRIOR` — Create and wire the five level-95 warrior pieces and icons.
+- [x] `A95-MAGE` — Create and wire the five level-95 mage pieces and icons.
+- [x] `A95-ASSASSIN` — Create and wire the five level-95 assassin pieces and icons.
+- [x] `A95-PRIEST` — Create and wire the five level-95 priest pieces and icons.
+- [x] `A95-HUNTER` — Create and wire the five level-95 hunter pieces and icons.
+- [x] `A95-SHARED` — Create and wire the three shared level-95 pieces and icons.
 
 ### Dungeon and endgame gear
 
 - [x] `G-VAULT-ART` — Give the 27 Undervault-exclusive level-20 pieces a distinct visual direction; record how its class and shared pieces differ from starter gear.
-- [ ] `G-VAULT-EXPORT` — Export/wire the Undervault worn layers and matching icons without changing item IDs or existing loot.
+- [x] `G-VAULT-EXPORT` — Export/wire the Undervault worn layers and matching icons without changing item IDs or existing loot.
 - [x] `G-MOON-CATALOG` — Define a Moonwell-exclusive level-60 blue set and boss slot pools; currently Moonwell bosses give ordinary blue gear.
-- [ ] `G-MOON-ART` — Create Moonwell set worn art and icons.
+- [x] `G-MOON-ART` — Create Moonwell set worn art and icons.
 - [x] `G-MOON-LOOT` — Switch the four Moonwell bosses to their exclusive set and verify party drops.
 - [x] `G-YEAR-SPRING` — Define level-97 Blooming Labyrinth gear rewards.
 - [x] `G-YEAR-SUMMER` — Define level-98 Solar Crucible gear rewards.
 - [x] `G-YEAR-AUTUMN` — Define level-99 Amber Archive gear rewards.
 - [x] `G-YEAR-WINTER` — Define level-99 Silent Solstice gear rewards.
 
-The four sealed dungeon reward sets reserve 44 item designs in [world/yearwheel_rewards.txt](world/yearwheel_rewards.txt); no sealed door or loot table is active yet.
+### Unique art for the later dungeon sets
+
+Audit on 2026-10-14: each dungeon below already drops 28 exclusive items (25 class pieces and three shared pieces), but their `art` fields still reuse starter worn layers. Each task means a distinct, immediately recognizable silhouette for its own dungeon, with worn layers for every class and both bodies in every animation, matching inventory icons, and editable PixelFlow source. Preserve item IDs, stats, loot pools and saves. Verify real-client equipment, game-scale readability against progression gear, and update the all-class gallery in Filedrop. A palette or aura alone does not complete a task.
+
+- [ ] `G-I65-ART` — Create and wire unique Eye Below gear art for its level-65 set.
+- [ ] `G-I70-ART` — Create and wire unique Elder Hollow gear art for its level-70 set.
+- [ ] `G-I75-ART` — Create and wire unique Thousandfold Pavilion gear art for its level-75 set.
+- [ ] `G-I80T-ART` — Create and wire unique Temple of the Rain Crown gear art for its level-80 set.
+- [ ] `G-I80S-ART` — Create and wire unique Seed Vault gear art for its level-80 set.
+- [ ] `G-I85-ART` — Create and wire unique Sunken Astrolabe gear art for its level-85 set.
+- [ ] `G-I95-ART` — Create and wire unique Thunderheart Gate gear art for its level-95 set.
+- [ ] `G-I97B-ART` — Create and wire unique Blooming Labyrinth gear art for its level-95 reward set.
+- [ ] `G-I98S-ART` — Create and wire unique Solar Crucible gear art for its level-95 reward set.
+- [ ] `G-I99A-ART` — Create and wire unique Amber Archive gear art for its level-95 reward set.
+- [ ] `G-I99W-ART` — Create and wire unique Silent Solstice gear art for its level-95 reward set.
 
 - [x] `G95-BONUS` — Decide the level-95 attribute bonus and remove the current clamp to the level-90 value if a larger bonus is intended.
 
@@ -346,7 +360,7 @@ The unlock and rank layout is recorded in [docs/skill-ranks.md](docs/skill-ranks
 ## Travel and world map
 
 - [x] `W-GRAPH` — Lay out the authoritative zone/portal graph as connected geography, including city and dungeon branches.
-- [ ] `W-ART` — Replace the detached zone display with a readable illustrated world map built from that geography.
+- [x] `W-ART` — Replace the detached zone display with a readable illustrated world map built from that geography.
 - [x] `W-ROUTES` — Show actual portal connections, current position, reachable routes and distinct sealed dungeon entrances.
 - [x] `W-CHECK` — Check world/zone map navigation and consistency after portal moves.
 - [x] `T-PORTALS-0-8` — Improve portal placement and reciprocal arrival routes in the starter through Rán’s Deep zones.
