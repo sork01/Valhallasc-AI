@@ -53,6 +53,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.getByText(/Refined .* to rank 1/).waitFor({timeout:10000});
   // Orange copies use their own editor-exported art and retain individually visible stats.
   await page.locator('#npc-close').click();
+  const ordinaryFrame=await page.evaluate(()=>Field.warriorSprites.frame('idle',0,0).toDataURL());
   await debug({op:'give_item',item:'orange_01',quantity:2});
   await page.waitForFunction(()=>Inventory.quantity('orange_01')===2,null,{timeout:15000});
   await page.locator('#equipment-open').click();
@@ -66,44 +67,37 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.waitForFunction(()=>Field.hero.look.warriorArmor==='orange_01',null,{timeout:15000});
   assert.equal(await page.locator('[data-slot="chest"] .orange-item-art').count(),1);
   await page.waitForFunction(()=>Field.warriorSprites?.worn?.armor==='orange_01',null,{timeout:15000});
-  await page.waitForFunction(()=>{
-    const c=Field.warriorSprites?.frame('idle',0,0);if(!c)return false;
-    const px=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
-    for(let i=0;i<px.length;i+=4)if(px[i]===242&&px[i+1]===163&&px[i+2]===71)return true;
-    return false;
-  },null,{timeout:15000}).catch(async error=>{
-    const state=await page.evaluate(()=>({cache:Field.warriorSprites?.cache.size,
-      worn:Field.warriorSprites?.worn?.armor}));
-    throw Error(`orange_01 frame: ${error.message}; ${JSON.stringify(state)}`);
-  });
+  assert.equal(await page.evaluate(()=>Field.warriorSprites.equipment.armor),'azure','Orange armor uses a fitted animated atlas layer');
+  assert.notEqual(await page.evaluate(()=>Field.warriorSprites.frame('idle',0,0).toDataURL()),ordinaryFrame);
   await page.locator('[data-slot="chest"] .gear-icon').click();
   assert.match(await page.locator('#bag-details').textContent(),/Equipped/);
-  const families=[[11,[131,201,224]],[16,[101,181,182]],[21,[124,136,199]],
-                  [26,[246,197,95]],[31,[230,120,66]]];
-  for(const [number,color] of families){
+  const familyFrames=[];
+  for(const number of [11,16,21,26,31]){
     const id=`orange_${number}`;
     await debug({op:'give_item',item:id,quantity:1});
     await page.waitForFunction(id=>Inventory.quantity(id)===1,id,{timeout:15000});
     await page.waitForFunction(id=>[...document.querySelector('#field-warriorArmor').options].some(o=>o.value===id),id,{timeout:15000});
     await page.locator('#field-warriorArmor').selectOption(id);
-    await page.waitForFunction(({id,color})=>{
-      if(Field.hero.look.warriorArmor!==id||Field.warriorSprites?.worn?.armor!==id)return false;
-      const c=Field.warriorSprites.frame('idle',0,0),px=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
-      for(let i=0;i<px.length;i+=4)if(px[i]===color[0]&&px[i+1]===color[1]&&px[i+2]===color[2])return true;
-      return false;
-    },{id,color},{timeout:15000}).catch(async error=>{
-      const state=await page.evaluate(async()=>{
-        const path=`assets/${Field.hero.look.warriorArmor}.png`,response=await fetch(path);
-        const image=new Image();image.src=path;await image.decode().catch(()=>{});
-        const sprite=Field.warriorSprites,frame=sprite?.frame('idle',0,0);
-        return {look:Field.hero.look.warriorArmor,worn:sprite?.worn?.armor,
-          option:document.querySelector('#field-warriorArmor')?.value,status:response.status,
-          imageWidth:image.naturalWidth,cache:sprite?.cache.size,frameWidth:frame?.width};
-      });
-      throw Error(`${id} worn art: ${error.message}; ${JSON.stringify(state)}`);
-    });
+    await page.waitForFunction(id=>Field.hero.look.warriorArmor===id&&Field.warriorSprites?.worn?.armor===id,id,{timeout:15000});
+    const drawn=await page.evaluate(()=>({art:Field.warriorSprites.equipment.armor,
+      image:Field.warriorSprites.frame('idle',0,0).toDataURL()}));
+    assert.equal(drawn.art,'azure',`${id} uses the class's fitted atlas armor`);
+    familyFrames.push(drawn.image);
     assert.equal(await page.locator('[data-slot="chest"] .orange-item-art').getAttribute('data-icon'),id);
   }
+  assert.equal(new Set(familyFrames).size,5,'Five families have different worn colors');
+  const fitted=await page.evaluate(()=>{
+    const sprite=Field.warriorSprites, prior={...Field.hero.look};
+    sprite.set({...prior,warriorArmor:'orange_11',warriorWeapon:'orange_12',
+      head:'orange_13',shoulders:'orange_14',gloves:'orange_15'});
+    const parts={...sprite.equipment},image=sprite.frame('idle',0,0).toDataURL();
+    sprite.set(prior);
+    return {parts,image};
+  });
+  assert.deepEqual(Object.fromEntries(['armor','weapon','head','shoulders','gloves'].map(slot=>[slot,fitted.parts[slot]])),
+    {armor:'azure',weapon:'royal',head:'azure',shoulders:'azure',gloves:'azure'},
+    'Every orange slot uses an animated warrior gear layer');
+  assert.notEqual(fitted.image,ordinaryFrame);
   const exported=await page.evaluate(async()=>{
     const hashes=[];
     for(let n=1;n<=35;n++){

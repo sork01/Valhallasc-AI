@@ -205,31 +205,53 @@
       ...(window.WORLD_ITEMS || []).filter(i => i.source === 'orange_pool' && i.kind === KIND[slot]).map(i => i.variant)];
     return [slot, allowed.includes(resolve(slot, look?.[slot]).art) ? look[slot] : 'none'];
   }));
-  const orangeImages = new Map();
-  const orangeImage = (variant, repaint) => {
-    if (!/^orange_(0[1-9]|[12][0-9]|3[0-5])$/.test(variant)) return null;
-    let entry = orangeImages.get(variant);
-    if (!entry) {
-      const img = new Image(); entry = { img, ready: false }; orangeImages.set(variant, entry);
-      img.onload = () => { entry.ready = true; repaint(); };
-      img.onerror = () => { entry.ready = false; };
-      img.src = `assets/${variant}.png`;
-    }
-    return entry.ready ? entry.img : null;
+  // Orange icons are inventory art. On a character, reuse the class's animated gear layers so the
+  // chest, helm, hands and weapon follow every pose and facing at the correct depth.
+  const ORANGE_PALETTES = [
+    ['#33191b', '#89512f', '#f2a347', '#ffe39a'],
+    ['#183424', '#426d38', '#84b95b', '#dbf4a2'],
+    ['#182842', '#396f9a', '#83c9e0', '#ecfaff'],
+    ['#162536', '#2d6380', '#65b5b6', '#d2fbef'],
+    ['#14172d', '#363b70', '#7c88c7', '#e6eaff'],
+    ['#44301c', '#bc7931', '#f6c55f', '#fff2b2'],
+    ['#391b25', '#8e3537', '#e67842', '#ffe2a2'],
+  ];
+  const orangeFamily = variant => {
+    const match = /^orange_(0[1-9]|[12][0-9]|3[0-5])$/.exec(variant || '');
+    return match ? Math.floor((Number(match[1]) - 1) / 5) : -1;
   };
-  const ORANGE_POS = { armor: [-26,-77], weapon: [3,-73], head: [-26,-110], shoulders: [-26,-84], gloves: [-26,-62] };
+  const orangeBase = (C, meta, slot) => {
+    const choices = slot === 'armor' || slot === 'weapon'
+      ? Object.keys(slot === 'armor' ? C.ARMOR : C.WEAPON).filter(name => name !== 'none')
+      : C.TIERS || [];
+    const candidates = [choices[1], choices[0], GENERIC[slot]];
+    return candidates.find(name => name && meta.parts[`${slot}_${name}`]) || 'none';
+  };
+  const orangePaint = family => {
+    const palette = ORANGE_PALETTES[family].map(rgb);
+    return (r, g, b) => {
+      const light = (r * .25 + g * .65 + b * .1) / 255;
+      const scaled = Math.min(2.999, Math.max(0, (light - .1) / .82 * 3));
+      const index = Math.floor(scaled), mix = scaled - index;
+      return palette[index].map((channel, k) => Math.round(channel * (1 - mix) + palette[index + 1][k] * mix));
+    };
+  };
   class MageSprite {
     constructor(source, look = {}, background = false) { this.source = source; this.background = background; this.meta = source.meta; this.cache = new Map(); this.set(look); }
     set(look) {
       this.look = { ...look }; this.cache.clear();
-      // `worn` holds the catalog variants; `equipment` the drawings they use; `partTint` the recolouring of each drawn part.
+      // `worn` holds catalog variants; `equipment` holds the pose-matched atlas drawings.
       this.worn = { ...pieces(this.constructor, look), ...this.constructor.equipment(look) };
-      for (const variant of Object.values(this.worn)) orangeImage(variant, () => this.cache.clear());
-      this.equipment = {}; this.partTint = new Map(); this.tintLut = new Map();
+      this.equipment = {}; this.tintLut = new Map();
       for (const slot of SLOT_ORDER) {
-        const { art, tint } = resolve(slot, this.worn[slot]);
+        const family = orangeFamily(this.worn[slot]);
+        const { art: catalogArt, tint } = resolve(slot, this.worn[slot]);
+        const art = family >= 0 ? orangeBase(this.constructor, this.meta, slot) : catalogArt;
         this.equipment[slot] = art;
-        if (tint && art !== 'none') { const key = `${slot}_${art}`; this.partTint.set(key, tint); if (!this.tintLut.has(key)) this.tintLut.set(key, { paint: tintMatrix(tint), colours: new Map() }); }
+        if ((family >= 0 || tint) && art !== 'none') {
+          const key = `${slot}_${art}`;
+          this.tintLut.set(key, { paint: family >= 0 ? orangePaint(family) : tintMatrix(tint), colours: new Map() });
+        }
       }
       for (const slot of SLOT_ORDER) {      // a layer still being decoded appears (and the frames are rebuilt) as soon as it arrives
         const part = slot + '_' + this.equipment[slot];
@@ -251,10 +273,7 @@
     frame(clip = 'idle', dir = 0, i = 0) {
       const C = this.meta.clips[clip]; i = Math.max(0, Math.min(C.n - 1, i)); dir = ((dir % 8) + 8) % 8;
       const key = `${clip}/${dir}/${i}`;
-      // A frame composed before an optional orange image finishes loading must not stay cached.
-      const ready = SLOT_ORDER.map(slot => orangeImage(this.worn[slot], () => this.cache.clear()) ? '1' : '0').join('');
-      const cacheKey = `${key}/${ready}`;
-      if (this.cache.has(cacheKey)) return this.cache.get(cacheKey);
+      if (this.cache.has(key)) return this.cache.get(key);
       const [fw, fh] = this.meta.frame, canvas = document.createElement('canvas'); canvas.width = fw; canvas.height = fh;
       const g = canvas.getContext('2d'), out = g.createImageData(fw, fh), nearest = new Uint16Array(fw * fh); nearest.fill(65535);
       const chosen = ['body'];
@@ -276,20 +295,8 @@
         }
       }
       g.putImageData(out, 0, 0);
-      // Orange gear uses small editable PixelFlow drawings shared by every class and gender.
-      // The overlay is part of the cached composed frame, so remote players wear it too.
-      for (const slot of SLOT_ORDER) {
-        const img = orangeImage(this.worn[slot], () => this.cache.clear());
-        const pos = ORANGE_POS[slot];
-        if (img && pos) {
-          g.save(); g.imageSmoothingEnabled = false;
-          if (dir >= 1 && dir <= 3) { g.translate(fw, 0); g.scale(-1, 1); }
-          g.drawImage(img, this.meta.anchor[0] + pos[0], this.meta.anchor[1] + pos[1], 52, 52);
-          g.restore();
-        }
-      }
       if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value);
-      this.cache.set(cacheKey, canvas); return canvas;
+      this.cache.set(key, canvas); return canvas;
     }
     draw(g, h, t, scale = 1.3) {
       scale *= this.meta.displayScale || 1;
