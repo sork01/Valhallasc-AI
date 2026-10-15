@@ -75,6 +75,8 @@ pub struct Case {
     pub foe: Foe,
     /// The best potion and food tier for the level may be used (the second run of `CONS-AUDIT`).
     pub consumables: bool,
+    /// The monster deals no damage, so the run measures the class's own kill speed (it cannot die before the cap).
+    pub harmless: bool,
 }
 impl Case {
     pub fn new(class: Class, level: u32) -> Self {
@@ -85,6 +87,7 @@ impl Case {
             rotation: Rotation::Skills,
             foe: Foe::Ordinary,
             consumables: false,
+            harmless: false,
         }
     }
 }
@@ -150,6 +153,8 @@ impl Summary {
         let (low, ..) = self.spread_of(|o| o.lowest_hp_fraction);
         let (p, ..) = self.spread_of(|o| o.potions_used as f64);
         let (dps, ..) = self.spread_of(|o| o.damage_taken / o.seconds.max(1.));
+        let hp = self.enemy_hp;
+        let (dealt, ..) = self.spread_of(|o| hp * (1. - o.enemy_left) / o.seconds.max(1.));
         json!({
             "class": format!("{:?}", self.case.class).to_lowercase(),
             "level": self.case.level,
@@ -157,6 +162,7 @@ impl Summary {
             "rotation": format!("{:?}", self.case.rotation).to_lowercase(),
             "foe": format!("{:?}", self.case.foe).to_lowercase(),
             "consumables": self.case.consumables,
+            "harmless": self.case.harmless,
             "enemy": self.enemy,
             "enemyLevel": self.enemy_level,
             "enemyHp": self.enemy_hp,
@@ -169,6 +175,7 @@ impl Summary {
             "damageTaken": {"median": d.round(), "min": dmin.round(), "max": dmax.round()},
             "damagePerHit": self.damage_per_hit().round(),
             "damagePerSecond": round1(dps),
+            "damageDealtPerSecond": dealt.round(),
             "lowestHpFraction": (low * 100.).round() / 100.,
             "resourceUsed": r.round(),
             "potions": p,
@@ -409,6 +416,9 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
     }
     let spawn = w.spawns[id].clone();
     w.slimes[id] = Slime::with_level(id, &spawn, case.level);
+    if case.harmless {
+        w.slimes[id].damage = 0.;
+    }
     let zone = w.slimes[id].zone;
     let home = w.slimes[id].point();
     let mut rx = join(&mut w, 1, case.class);
@@ -570,6 +580,7 @@ fn ttk_report() {
                                     other => panic!("unknown foe {other}"),
                                 },
                                 consumables: use_consumables == "1",
+                                harmless: std::env::var("TTK_HARMLESS").is_ok_and(|v| v == "1"),
                             };
                             if case.foe == Foe::Elite
                                 && pick_enemy(&world(), level, Foe::Elite).is_none()
