@@ -1,18 +1,19 @@
-//! Stormglass Shore: a reachable shared zone with a sealed future instance.
+//! Stormglass Shore: a reachable shared zone with the open entrance of the Eye Below.
 use super::wyrd_tests::{at, blocked, flood, reached, world};
 use super::*;
 
 const SHORE: usize = 19;
 
 #[test]
-fn shore_has_reciprocal_clear_gates_a_hub_and_a_sealed_eye() {
+fn shore_has_reciprocal_clear_gates_a_hub_and_the_open_eye() {
     let w = world();
     let m = &w.maps[SHORE];
     assert_eq!(
         (m.name.as_str(), m.levels, m.size),
         ("The Stormglass Shore", Some([60, 65]), 128)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (41, 9));
+    // Two more quests arrived when the Eye Below behind this zone opened.
+    assert_eq!((m.slimes.len(), m.quests.len()), (41, 11));
     assert!(m.in_city(m.spawn));
     let out = m
         .portals
@@ -64,16 +65,18 @@ fn shore_has_reciprocal_clear_gates_a_hub_and_a_sealed_eye() {
     assert!(reached(m, &seen, at(105., 27.)));
     let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let z = &raw["zones"][SHORE - 1];
-    assert_eq!(z["futureInstance"]["status"], "sealed");
+    assert_eq!(z["futureInstance"]["status"], "open");
     assert_eq!(z["futureInstance"]["name"], "The Eye Below");
-    assert_eq!(
-        z["portals"].as_array().unwrap().len(),
-        1,
-        "the dungeon has no portal yet"
+    assert!(
+        z["portals"].as_array().unwrap().len() >= 2,
+        "the gate back plus the dungeon's entrance"
     );
     assert!(m.npcs.iter().any(|n| n.id == "stormglass_stone"));
     let travel = m.npcs.iter().find(|n| n.id == "travel_breakwater").unwrap();
-    assert_eq!(travel.travel_links, ["travel_asterion"]);
+    assert_eq!(
+        travel.travel_links,
+        ["travel_asterion", "travel_millbridge"]
+    );
     assert!(
         w.maps[17]
             .npcs

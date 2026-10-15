@@ -5645,7 +5645,27 @@ mod tests {
         found.sort();
         assert_eq!(
             found,
-            vec![(5, 1), (10, 2), (15, 3), (20, 4), (22, 6), (30, 7), (35, 8)]
+            vec![
+                (5, 1),
+                (10, 2),
+                (15, 3),
+                (20, 4),
+                (22, 6),
+                (30, 7),
+                (35, 8),
+                (40, 13),
+                (45, 14),
+                (50, 15),
+                (55, 16),
+                (60, 19),
+                (65, 20),
+                (70, 21),
+                (75, 22),
+                (80, 25),
+                (85, 26),
+                (90, 27),
+                (95, 28)
+            ]
         );
     }
 
@@ -7448,10 +7468,9 @@ mod tests {
     fn skaldholm_is_a_big_enemy_free_city_with_a_hundred_houses_a_wall_and_a_gate_pair() {
         let w = world();
         let map = &w.maps[CITY];
-        assert_eq!(
-            zone_count(&w),
-            34,
-            "Skaldholm is the fifth map; five sealed templates follow the Yearwheel"
+        assert!(
+            zone_count(&w) >= 34,
+            "Skaldholm is the fifth map; every later zone is added after it"
         );
         assert_eq!(map.name, "Skaldholm");
         assert_eq!(map.size, 160);
@@ -7856,7 +7875,11 @@ mod tests {
             .iter()
             .find(|n| n.id == "city_guildmaster")
             .unwrap();
-        assert!(guild.buys && guild.offers.len() == 2);
+        // Stew plus every bag tier since the bag shop work (docs/bag-tiers.md): the Linen Satchel and ten tiers.
+        let offered = |id: &str| guild.offers.iter().any(|o| o.id == id);
+        assert!(
+            guild.buys && offered("buy_traveler_stew") && offered("satchel") && offered("bag_l90")
+        );
         assert!(
             map.npcs
                 .iter()
@@ -8147,9 +8170,17 @@ mod tests {
             quest_interact(&mut w, npc, Some(&format!("quest:claim:{quest}")));
         }
         let c = &w.players[&1].character;
+        // This chain is the talk-and-bring errands. A progression quest finds the player by itself and is handed in on
+        // arrival, and the Undervault quests (reach, kill) need the dungeon; the vault tests cover those.
+        let in_chain = |q: &Quest| {
+            !q.repeatable
+                && q.auto_level.is_none()
+                && q.objectives
+                    .iter()
+                    .all(|o| matches!(o.kind.as_str(), "talk" | "bring"))
+        };
         for q in &w.maps[CITY].quests {
-            // A progression quest finds the player by itself and is handed in on arrival, not in this chain.
-            if !q.repeatable && q.auto_level.is_none() {
+            if in_chain(q) {
                 let p = c
                     .quests
                     .iter()
@@ -8161,7 +8192,7 @@ mod tests {
         let gold: u32 = w.maps[CITY]
             .quests
             .iter()
-            .filter(|q| !q.repeatable && q.auto_level.is_none())
+            .filter(|q| in_chain(q))
             .map(|q| q.reward_gold)
             .sum();
         assert_eq!(c.gold, gold, "every reward paid once");
@@ -8175,7 +8206,7 @@ mod tests {
         let xp: u32 = w.maps[CITY]
             .quests
             .iter()
-            .filter(|q| !q.repeatable && q.auto_level.is_none())
+            .filter(|q| in_chain(q))
             .map(|q| q.reward_xp)
             .sum();
         let paid: u32 = (1..c.level).map(xp_to_level).sum::<u32>() + c.xp;
@@ -11037,7 +11068,10 @@ mod tests {
         let result = dbg(&mut w, DebugCommand::SetLevel { level: 20 }).unwrap();
         let c = ch(&w);
         assert_eq!((c.level, c.xp, c.hp), (20, 0, c.max_hp()));
-        assert_eq!(result["unlocked"].as_array().unwrap().len(), 10);
+        // Every skill, rank and passive learned from level 1 to 20 (the passives arrived with the milestone work).
+        let learned = skills::unlocked(c.look.class, 1, 20).len();
+        assert!(learned >= 10, "{learned} unlocks");
+        assert_eq!(result["unlocked"].as_array().unwrap().len(), learned);
         let up = packets(&mut rx, "event")
             .into_iter()
             .find(|e| e["kind"] == "levelup")

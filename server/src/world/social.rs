@@ -1688,7 +1688,8 @@ mod tests {
     #[test]
     fn a_priest_alone_heals_themself_and_a_prayer_reaches_up_to_five() {
         let mut w = world();
-        let pia = priest(&mut w, 1, "Pia", 10);
+        // Prayer is learned at level 16.
+        let pia = priest(&mut w, 1, "Pia", 16);
         set_hp(&mut w, &pia, 40.);
         w.use_skill(1, "mend", Point::default());
         assert!(hp(&w, &pia) > 40.);
@@ -1718,7 +1719,8 @@ mod tests {
     #[test]
     fn priest_blessings_and_pulses_reach_party_members_in_range_only() {
         let mut w = world();
-        let pia = priest(&mut w, 1, "Pia", 20);
+        // Blessing is learned at level 24 and gets its first stronger rank at 26.
+        let pia = priest(&mut w, 1, "Pia", 24);
         let ann = add(&mut w, 2, "Ann");
         let far = add(&mut w, 3, "Far");
         let stranger = add(&mut w, 4, "Sam");
@@ -1740,7 +1742,7 @@ mod tests {
         // A dead party member is never healed.
         set_hp(&mut w, &ann, 0.);
         w.players.get_mut(&1).unwrap().skill_cd.clear();
-        w.use_skill(1, "heavenswrath", Point::default());
+        w.use_skill(1, "holynova", Point::default());
         assert_eq!(hp(&w, &ann), 0.);
     }
 

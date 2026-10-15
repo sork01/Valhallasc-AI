@@ -12,7 +12,8 @@ fn vale_gates_bridges_hub_and_all_encounters_are_reachable() {
         (m.name.as_str(), m.levels, m.size),
         ("Sunward Vale", Some([65, 70]), 128)
     );
-    assert_eq!((m.slimes.len(), m.quests.len()), (42, 10));
+    // Two more quests arrived when the Elder Hollow behind this zone opened.
+    assert_eq!((m.slimes.len(), m.quests.len()), (42, 12));
     assert!(m.in_city(m.spawn));
     let out = m
         .portals
@@ -59,9 +60,12 @@ fn vale_gates_bridges_hub_and_all_encounters_are_reachable() {
     }
     let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
     let zone = &raw["zones"][VALE - 1];
-    assert_eq!(zone["futureInstance"]["status"], "sealed");
+    assert_eq!(zone["futureInstance"]["status"], "open");
     assert_eq!(zone["futureInstance"]["name"], "The Elder Hollow");
-    assert_eq!(zone["portals"].as_array().unwrap().len(), 1);
+    assert!(
+        zone["portals"].as_array().unwrap().len() >= 2,
+        "the gate back plus the dungeon's entrance"
+    );
     let objects = zone["objects"].as_array().unwrap();
     let trees = objects
         .iter()
