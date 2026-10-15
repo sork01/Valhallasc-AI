@@ -5,28 +5,28 @@ Each cell is **median kill seconds / damage per landed monster hit**. `FAIL` mea
 
 ## even, skills, ordinary, consumables=0
 
-1 seeded run(s) per case. **Provisional: the TTK-RUN target is nine seeds.**
+9 seeded run(s) per case.
 
 | Level | Enemy | Warrior | Mage | Assassin | Priest | Hunter |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: |
-| 5 | beetle | 7.9 s / 2 | 9.3 s / 3 | 5.1 s / 3 | 10.7 s / 3 | 8.5 s / 3 |
-| 10 | crab | 13.4 s / 10 | 13.6 s / 11 | 10.8 s / 11 | 14.5 s / 11 | 11.1 s / 11 |
-| 15 | toad | 24.4 s / 17 | 16.1 s / 18 | 42.1 s / 18 | 20.2 s / 17 | 18.9 s / 17 |
-| 20 | hydra | 72.5 s / 27 | 33.6 s / 32 | 120 s / 30 FAIL | 31.9 s / 31 | 33.7 s / 30 |
-| 25 | troll | 109.8 s / 15 | 56.4 s / 19 | 120 s / 19 FAIL | 38.5 s / 18 | 48.2 s / 18 |
-| 30 | galehound | 120 s / 50 FAIL | 120 s / 51 FAIL | 120 s / 60 FAIL | 41.3 s / 59 | 120 s / 59 FAIL |
-| 35 | draugr | 120 s / 92 FAIL | 120 s / 101 FAIL | 120 s / 106 FAIL | 75.1 s / 106 | 120 s / 102 FAIL |
-| 40 | voidmoth | 120 s / 108 FAIL | 120 s / 107 FAIL | 120 s / 122 FAIL | 74.4 s / 127 | 120 s / 117 FAIL |
-| 45 | meteorgolem | 120 s / 200 FAIL | 120 s / 188 FAIL | 120 s / 204 FAIL | 120 s / 231 FAIL | 120 s / 217 FAIL |
-| 50 | bronzemantis | 120 s / 285 FAIL | 120 s / 298 FAIL | 120 s / 346 FAIL | 120 s / 308 FAIL | 120 s / 293 FAIL |
-| 55 | glowcapgrazer | 120 s / 374 FAIL | 120 s / 357 FAIL | 120 s / 502 FAIL | 120 s / 459 FAIL | 120 s / 400 FAIL |
-| 60 | saltclaw | 120 s / 580 FAIL | 120 s / 482 FAIL | 120 s / 551 FAIL | 120 s / 618 FAIL | 120 s / 588 FAIL |
-| 65 | meadowhare | 120 s / 512 FAIL | 120 s / 491 FAIL | 120 s / 595 FAIL | 120 s / 684 FAIL | 120 s / 634 FAIL |
-| 70 | ribbongecko | 120 s / 553 FAIL | 120 s / 588 FAIL | 120 s / 647 FAIL | 120 s / 732 FAIL | 120 s / 689 FAIL |
-| 75 | orchidmantis | 120 s / 743 FAIL | 120 s / 728 FAIL | 120 s / 1037 FAIL | 120 s / 1150 FAIL | 120 s / 1100 FAIL |
-| 80 | sandhopper | 120 s / 819 FAIL | 120 s / 822 FAIL | 120 s / 1115 FAIL | 120 s / 1239 FAIL | 120 s / 1190 FAIL |
-| 85 | snowhare | 120 s / 866 FAIL | 120 s / 832 FAIL | 120 s / 1177 FAIL | 120 s / 1485 FAIL | 120 s / 1256 FAIL |
-| 90 | screeferret | 120 s / 1173 FAIL | 120 s / 1253 FAIL | 120 s / 1267 FAIL | 120 s / 1480 FAIL | 120 s / 1358 FAIL |
-| 95 | brooknewt | 120 s / 1290 FAIL | 120 s / 1416 FAIL | 120 s / 1333 FAIL | 120 s / 1975 FAIL | 120 s / 1424 FAIL |
+| 5 | beetle | 7.9 s / 2 | 8.6 s / 3 | 5.7 s / 3 | 10.1 s / 3 | 7.3 s / 3 |
+| 10 | crab | 11 s / 10 | 14.9 s / 11 | 12.3 s / 11 | 13.4 s / 11 | 11.1 s / 11 |
+| 15 | toad | 21.8 s / 17 | 17.3 s / 18 | 42.1 s / 18 | 19.6 s / 17 | 18.9 s / 17 |
+| 20 | hydra | 120 s / 26 FAIL | 33.6 s / 32 | 120 s / 30 FAIL | 33.6 s / 31 | 33.1 s / 30 |
+| 25 | troll | 120 s / 15 FAIL | 57.6 s / 19 | 120 s / 19 FAIL | 42.4 s / 18 | 47 s / 18 |
+| 30 | galehound | 120 s / 51 FAIL | 120 s / 51 FAIL | 120 s / 60 FAIL | 43.3 s / 59 | 120 s / 59 FAIL |
+| 35 | draugr | 120 s / 93 FAIL | 120 s / 104 FAIL | 120 s / 106 FAIL | 72.8 s / 106 | 120 s / 102 FAIL |
+| 40 | voidmoth | 120 s / 110 FAIL | 120 s / 107 FAIL | 120 s / 122 FAIL | 75.4 s / 127 | 120 s / 117 FAIL |
+| 45 | meteorgolem | 120 s / 201 FAIL | 120 s / 199 FAIL | 120 s / 207 FAIL | 120 s / 231 FAIL | 120 s / 217 FAIL |
+| 50 | bronzemantis | 120 s / 266 FAIL | 120 s / 249 FAIL | 120 s / 346 FAIL | 120 s / 301 FAIL | 120 s / 293 FAIL |
+| 55 | glowcapgrazer | 120 s / 387 FAIL | 120 s / 316 FAIL | 120 s / 502 FAIL | 120 s / 452 FAIL | 120 s / 400 FAIL |
+| 60 | saltclaw | 120 s / 512 FAIL | 120 s / 447 FAIL | 120 s / 551 FAIL | 120 s / 603 FAIL | 120 s / 588 FAIL |
+| 65 | meadowhare | 120 s / 522 FAIL | 120 s / 459 FAIL | 120 s / 595 FAIL | 120 s / 676 FAIL | 120 s / 634 FAIL |
+| 70 | ribbongecko | 120 s / 553 FAIL | 120 s / 500 FAIL | 120 s / 647 FAIL | 120 s / 738 FAIL | 120 s / 689 FAIL |
+| 75 | orchidmantis | 120 s / 816 FAIL | 120 s / 729 FAIL | 120 s / 1037 FAIL | 120 s / 1118 FAIL | 120 s / 1100 FAIL |
+| 80 | sandhopper | 120 s / 899 FAIL | 120 s / 942 FAIL | 120 s / 1115 FAIL | 120 s / 1299 FAIL | 120 s / 1190 FAIL |
+| 85 | snowhare | 120 s / 906 FAIL | 120 s / 834 FAIL | 120 s / 1177 FAIL | 120 s / 1475 FAIL | 120 s / 1256 FAIL |
+| 90 | screeferret | 120 s / 1173 FAIL | 120 s / 967 FAIL | 120 s / 1267 FAIL | 120 s / 1553 FAIL | 120 s / 1358 FAIL |
+| 95 | brooknewt | 120 s / 1498 FAIL | 120 s / 1400 FAIL | 120 s / 1333 FAIL | 120 s / 1876 FAIL | 120 s / 1424 FAIL |
 | 99 | snowstoat | 120 s / 3112 FAIL | 120 s / 2944 FAIL | 120 s / 2762 FAIL | 120 s / 3132 FAIL | 120 s / 2959 FAIL |
 
