@@ -131,7 +131,7 @@ To rebuild the zone, run `python3 scripts/generate_asterion.py`, then `node scri
 
 ## Shared world and saves
 
-Optional owner login pushes use Gotify. Create a dedicated Gotify application and set `VALHALLA_GOTIFY_URL` to its base URL and `VALHALLA_GOTIFY_TOKEN` to its application token in the service environment. Leave either unset to disable pushes. The token belongs only in the service environment; see [login notification rules](docs/login-notifications.md). Local test worlds suppress pushes.
+Optional owner login pushes go through Surv: the service sets `VALHALLA_SURV_NOTIFY_URL` (Surv's notify endpoint, `https://gunning.se/surv/api.php?action=notify`) and `VALHALLA_SURV_NOTIFY_ADDR` (`127.0.0.1:443`, which sends the request to the local Apache while the certificate is still checked for gunning.se). Surv pushes to Gotify with its own token, so the game holds no secret, and records each push in its alarm log as `[🎮 Valhalla login] Name · Class · level N · Zone`. Setting `VALHALLA_GOTIFY_URL` and `VALHALLA_GOTIFY_TOKEN` instead posts straight to a Gotify application. Leave all unset to disable pushes. See [login notification rules](docs/login-notifications.md). Local test worlds suppress pushes.
 
 The Rust server owns movement speed, map collision, AI, melee range/facing, attack cooldowns, swept projectile hits, damage, critical hits, equipment stats, XP, levels, gold pickups, deaths, and respawns. Clients send actions, never character positions, damage results, or rewards. Slimes are shared: a kill happens once, and the killer receives XP and owns its gold and item drops. This is cooperative PvE; players cannot damage each other.
 

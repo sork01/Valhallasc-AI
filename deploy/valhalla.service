@@ -10,6 +10,10 @@ Environment=VALHALLA_BIND=172.18.0.1:8080
 Environment=VALHALLA_DB=/home/serveperry/webserver/www/Valhallasc/data/valhalla.sqlite
 Environment=VALHALLA_ORIGIN=https://gunning.se
 Environment=VALHALLA_AMBIENT_PLAYERS=1
+# Login pushes go through Surv's notify endpoint, which sends them to Gotify with Surv's own token and logs them in
+# Surv's alarm log. The address pin sends the request to the local Apache while the certificate is checked for gunning.se.
+Environment=VALHALLA_SURV_NOTIFY_URL=https://gunning.se/surv/api.php?action=notify
+Environment=VALHALLA_SURV_NOTIFY_ADDR=127.0.0.1:443
 Restart=on-failure
 RestartSec=3
 TimeoutStopSec=15
