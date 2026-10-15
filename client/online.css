@@ -321,6 +321,14 @@
 .attribute-label small { display: block; font: .65cqw/1.3 Arial, sans-serif; color: #bfb7a1; margin-top: .2cqw; }
 .attribute-add { flex: none; width: 1.6cqw; height: 1.6cqw; border: 1px solid #927b49; background: linear-gradient(#5b5336, #2a2d21); color: #caffb8; font: bold 1.1cqw Arial, sans-serif; cursor: pointer; }
 .attribute-add:disabled { opacity: .35; cursor: default; }
+.attribute-recommended { margin: .55cqw 0; color: #d8cfae; font: .75cqw/1.4 Arial, sans-serif; }
+.attribute-recommended button { margin-right: .35cqw; padding: .3cqw .55cqw; border: 1px solid #b99454; background: #564527; color: #fff2c6; cursor: pointer; }
+.attribute-recommended button:disabled { opacity: .45; cursor: default; }
+.attribute-no-points { margin-left: .35cqw; }
+.attribute-preview { margin-top: .45cqw; padding: .45cqw; border: 1px solid #ae985f; background: #2d2a20; }
+.attribute-preview p { margin: .3cqw 0; }
+.stat-reset-warning { color: #8b3e2a; font-weight: bold; }
+.stat-reset-short { color: #9b3328; }
 .attribute-derived { margin: .6cqw 0 .25cqw; color: #c6d9d7; font: .75cqw/1.4 Arial, sans-serif; }
 .attribute-help { display: block; color: #a99b7d; font: .65cqw Arial, sans-serif; }
 @media (pointer: coarse) { .attribute-add, .tracker-toggle, .tracker-journal { min-width: 44px; min-height: 44px; } }

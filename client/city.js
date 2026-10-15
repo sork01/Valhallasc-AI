@@ -427,6 +427,7 @@
   }
   let current=null,previousFocus=null,view={kind:'gossip'},lastPacket=null;
   const $=id=>document.getElementById(id);
+  const node=(tag,text,cls)=>{const n=document.createElement(tag);n.textContent=text;if(cls)n.className=cls;return n;};
   // Fixed markup, never player text: small glyphs for the kinds of service an NPC offers.
   const ICONS={
     vendor:'<svg viewBox="0 0 24 24"><path d="M6 9h12l1.5 11h-15z" fill="#8a5a2b" stroke="#3b2410" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 9V7a3 3 0 0 1 6 0v2" fill="none" stroke="#3b2410" stroke-width="1.5"/></svg>',
@@ -449,7 +450,7 @@
     $('npc-text').textContent=npc.dialogue;$('npc-text').hidden=!gossip;$('npc-role').hidden=!gossip;
     $('npc-notice').textContent=packet.notice;
     $('npc-gold').textContent=`Your purse: ${packet.gold} gold`;
-    $('npc-back').hidden=!['sell','merge','refine'].includes(view.kind);
+    $('npc-back').hidden=!['sell','merge','refine','stat_reset'].includes(view.kind);
     // Quests come first, then whatever the NPC sells or does.
     if(view.kind==='quest'){
       const quest=window.Quests.offered(npc.id).find(q=>q.id===view.id);
@@ -457,7 +458,7 @@
       else {view={kind:'gossip'};}
     }
     if(view.kind==='gossip')window.Quests?.npc(npc.id,$('npc-quests'),q=>show({kind:'quest',id:q.id},'[data-action="decline"]'));
-    else if(['sell','merge','refine'].includes(view.kind))$('npc-quests').replaceChildren();
+    else if(['sell','merge','refine','stat_reset'].includes(view.kind))$('npc-quests').replaceChildren();
     const offers=[];
     if(view.kind==='gossip'){
       for(const destination of packet.travel||[]){
@@ -476,6 +477,10 @@
         return WORLD_ITEMS.filter(i=>i.family===base.family&&(i.requiredLevel||1)<=(packet.level||1)).sort((a,b)=>(b.requiredLevel||1)-(a.requiredLevel||1))[0]||base;
       };
       for(const offer of npc.offers){
+        if(offer.id==='stat_reset') {
+          const b=row('coin','Reset trained attributes',`${(packet.statResetPrice||0).toLocaleString()} gold`);
+          b.dataset.view='stat_reset';b.addEventListener('click',()=>show({kind:'stat_reset'},'#npc-back'));offers.push(b);continue;
+        }
         const tier=tierFor(offer),cost=tier?tier.price:offer.cost;
         const b=row(iconFor(offer),tier?`Buy ${tier.name} · ${window.Inventory.effect(tier)}`:offer.label,cost?`${cost} gold`:'Free');b.dataset.offer=offer.id;
         if(tier)b.dataset.tier=tier.id;
@@ -485,6 +490,16 @@
           else if(Online.send({type:'interact',npc:npc.id,offer:offer.id}))b.disabled=true;
         });offers.push(b);
       }
+    }else if(view.kind==='stat_reset'){
+      const price=packet.statResetPrice||0,refunded=packet.trainedPoints||0;
+      const heading=document.createElement('h4');heading.textContent='Reset trained attributes';offers.push(heading);
+      offers.push(node('p',`Refund ${refunded} trained point${refunded===1?'':'s'}. Your ${(packet.statPoints||0)} unspent points remain available.`, 'stat-reset-detail'));
+      offers.push(node('p',`Price: ${price.toLocaleString()} gold · Your purse: ${(packet.gold||0).toLocaleString()} gold · Previous resets: ${packet.statResets||0}`, 'stat-reset-price'));
+      offers.push(node('p','This purchase cannot be undone. Gear, skills and passive bonuses stay in place. Use Recommended in the character panel to spend the refunded points.', 'stat-reset-warning'));
+      if(refunded>0 && packet.gold<price)offers.push(node('p',`You need ${(price-packet.gold).toLocaleString()} more gold.`, 'stat-reset-short'));
+      const confirm=row('coin','Confirm stat reset',`${price.toLocaleString()} gold`);confirm.dataset.offer='stat_reset';
+      confirm.disabled=!refunded||packet.gold<price;
+      confirm.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:'stat_reset'}))confirm.disabled=true;});offers.push(confirm);
     }
     $('npc-offers').replaceChildren(...offers);
     $('npc-inventory').replaceChildren();
@@ -502,16 +517,17 @@
     const same=current?.id===packet.npc.id;
     previousFocus=current?previousFocus:document.activeElement;current=packet.npc;
     // Selling keeps its list open between sales; every other reply (accepting, a purchase) returns to the greeting.
-    if(!same||!['sell','merge','refine'].includes(view.kind))view={kind:'gossip'};
+    if(!same||!['sell','merge','refine','stat_reset'].includes(view.kind))view={kind:'gossip'};
     Field.setPaused(true);$('npc-dialogue').hidden=false;
     window.Inventory?.update(packet.inventory || [], packet.look, packet.equipment || {}, packet.bags || [], packet.gearInstances || []);
     window.Quests?.update(packet.quests || []);
+    if(packet.statPlayer)window.Attributes?.update(packet.statPlayer);
     lastPacket=packet;render();
   }
   function close(resume=true) {if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
   $('npc-close').addEventListener('click',()=>close());
   $('npc-x').addEventListener('click',()=>close());
-  $('npc-back').addEventListener('click',()=>show({kind:'gossip'},'[data-view="sell"]'));
+  $('npc-back').addEventListener('click',()=>{const previous=view.kind;show({kind:'gossip'},`[data-view="${previous}"]`);});
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });

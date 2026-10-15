@@ -2849,20 +2849,20 @@
       "offers": [
         {
           "id": "tonic",
-          "label": "Drink a tonic \u00b7 restores 60 HP",
+          "label": "Drink a tonic · restores 60 HP",
           "cost": 8,
           "heal": 60
         },
         {
           "id": "buy_health_potion",
-          "label": "Buy Health Potion \u00b7 100 HP instantly",
+          "label": "Buy Health Potion · 100 HP instantly",
           "cost": 30,
           "item": "health_potion",
           "tiered": true
         },
         {
           "id": "buy_mana_potion",
-          "label": "Buy Mana Potion \u00b7 100 mana instantly",
+          "label": "Buy Mana Potion · 100 mana instantly",
           "cost": 30,
           "item": "mana_potion",
           "tiered": true
@@ -2898,7 +2898,7 @@
       "offers": [
         {
           "id": "rest",
-          "label": "Meal & rest \u00b7 fully restores HP",
+          "label": "Meal & rest · fully restores HP",
           "cost": 5,
           "heal": 10000
         }
@@ -2915,13 +2915,13 @@
       "offers": [
         {
           "id": "bun",
-          "label": "Eat a honey bun \u00b7 restores 20 HP",
+          "label": "Eat a honey bun · restores 20 HP",
           "cost": 3,
           "heal": 20
         },
         {
           "id": "buy_traveler_stew",
-          "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
+          "label": "Buy Traveler's Stew · 100 HP and mana over 8 s",
           "cost": 12,
           "item": "traveler_stew",
           "tiered": true
@@ -2939,7 +2939,7 @@
       "offers": [
         {
           "id": "satchel",
-          "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+          "label": "Buy Linen Satchel · 6 extra bag slots",
           "cost": 500,
           "bag": "linen_satchel"
         }
@@ -2954,7 +2954,13 @@
       "y": 80,
       "color": "#cc7d83",
       "dialogue": "Welcome, adventurer! I have a little introduction to Alderhaven for you. Captain Rowan has work at the north gate, too. Open your quest journal with Q to follow your adventures.",
-      "offers": []
+      "offers": [
+        {
+          "id": "stat_reset",
+          "label": "Reset trained attributes",
+          "cost": 0
+        }
+      ]
     },
     {
       "id": "travel_alderhaven",
@@ -6247,31 +6253,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -6312,14 +6318,14 @@
             },
             {
               "id": "buy_mana_potion",
-              "label": "Buy Mana Potion \u00b7 100 mana instantly",
+              "label": "Buy Mana Potion · 100 mana instantly",
               "cost": 30,
               "item": "mana_potion",
               "tiered": true
             },
             {
               "id": "buy_health_potion",
-              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "label": "Buy Health Potion · 100 HP instantly",
               "cost": 30,
               "item": "health_potion",
               "tiered": true
@@ -6338,14 +6344,14 @@
           "offers": [
             {
               "id": "buy_traveler_stew",
-              "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
+              "label": "Buy Traveler's Stew · 100 HP and mana over 8 s",
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
             }
@@ -6609,7 +6615,7 @@
             {
               "kind": "kill",
               "target": "cinderlord",
-              "label": "Defeat the Cinderlord (Elite \u00b7 2 players)",
+              "label": "Defeat the Cinderlord (Elite · 2 players)",
               "count": 1
             }
           ],
@@ -12358,14 +12364,14 @@
             },
             {
               "id": "buy_health_potion",
-              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "label": "Buy Health Potion · 100 HP instantly",
               "cost": 30,
               "item": "health_potion",
               "tiered": true
             },
             {
               "id": "buy_mana_potion",
-              "label": "Buy Mana Potion \u00b7 100 mana instantly",
+              "label": "Buy Mana Potion · 100 mana instantly",
               "cost": 30,
               "item": "mana_potion",
               "tiered": true
@@ -12384,14 +12390,14 @@
           "offers": [
             {
               "id": "buy_traveler_stew",
-              "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
+              "label": "Buy Traveler's Stew · 100 HP and mana over 8 s",
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
             }
@@ -18036,31 +18042,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -18101,14 +18107,14 @@
             },
             {
               "id": "buy_mana_potion",
-              "label": "Buy Mana Potion \u00b7 100 mana instantly",
+              "label": "Buy Mana Potion · 100 mana instantly",
               "cost": 30,
               "item": "mana_potion",
               "tiered": true
             },
             {
               "id": "buy_health_potion",
-              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "label": "Buy Health Potion · 100 HP instantly",
               "cost": 30,
               "item": "health_potion",
               "tiered": true
@@ -18127,14 +18133,14 @@
           "offers": [
             {
               "id": "buy_traveler_stew",
-              "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
+              "label": "Buy Traveler's Stew · 100 HP and mana over 8 s",
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
             }
@@ -18517,7 +18523,7 @@
             {
               "kind": "kill",
               "target": "gloomroot",
-              "label": "Defeat the Gloomroot Colossus (Elite \u00b7 5 players)",
+              "label": "Defeat the Gloomroot Colossus (Elite · 5 players)",
               "count": 1
             }
           ],
@@ -25362,7 +25368,7 @@
           "x": 67.8,
           "y": 131.9,
           "color": "#58708f",
-          "dialogue": "Halt \u2014 no, go on through. Nobody who walked the glacier needs to explain themselves to me. Welcome to Skaldholm. No blade is drawn inside these walls and nothing with fangs has crossed the Great Gate in two hundred years. Meet the people who keep the city running, then report back to me.",
+          "dialogue": "Halt — no, go on through. Nobody who walked the glacier needs to explain themselves to me. Welcome to Skaldholm. No blade is drawn inside these walls and nothing with fangs has crossed the Great Gate in two hundred years. Meet the people who keep the city running, then report back to me.",
           "offers": [],
           "buys": false,
           "look": {
@@ -25381,7 +25387,13 @@
           "y": 23.3,
           "color": "#7b5aa0",
           "dialogue": "Skaldholm trades with every hearth between the meadow and the fen, and every one of them owes us a letter, a favour or a barrel. I keep the books. Bring me what the four lands send and the city will remember your name.",
-          "offers": [],
+          "offers": [
+            {
+              "id": "stat_reset",
+              "label": "Reset trained attributes",
+              "cost": 0
+            }
+          ],
           "buys": false,
           "look": {
             "skin": "#edc5a1",
@@ -25399,7 +25411,7 @@
           "x": 73.6,
           "y": 88.4,
           "color": "#b04a4a",
-          "dialogue": "Hear ye! I carry the city\u2019s letters to the four hearths \u2014 or I would, if my knees had not given up at the glacier. Walk them for me and every captain, warden and reeve will know Skaldholm still stands.",
+          "dialogue": "Hear ye! I carry the city’s letters to the four hearths — or I would, if my knees had not given up at the glacier. Walk them for me and every captain, warden and reeve will know Skaldholm still stands.",
           "offers": [],
           "buys": false,
           "look": {
@@ -25462,14 +25474,14 @@
           "offers": [
             {
               "id": "buy_traveler_stew",
-              "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
+              "label": "Buy Traveler's Stew · 100 HP and mana over 8 s",
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
             }
@@ -25502,14 +25514,14 @@
             },
             {
               "id": "buy_mana_potion",
-              "label": "Buy Mana Potion \u00b7 100 mana instantly",
+              "label": "Buy Mana Potion · 100 mana instantly",
               "cost": 30,
               "item": "mana_potion",
               "tiered": true
             },
             {
               "id": "buy_health_potion",
-              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "label": "Buy Health Potion · 100 HP instantly",
               "cost": 30,
               "item": "health_potion",
               "tiered": true
@@ -25566,7 +25578,7 @@
           "x": 97.0,
           "y": 123.4,
           "color": "#5a7a9a",
-          "dialogue": "The Meeting Stone has stood here since before the walls. Wanderers who part at the Great Gate find each other again beside it. Gather your friends at the stone \u2014 and if you have too few, speak to the Stone itself: it will call fighters to your side for a fee. Mind the stairs beside it. They lead down to the Undervault, where the first Skalds sealed what they could not kill. Take five, and take a healer.",
+          "dialogue": "The Meeting Stone has stood here since before the walls. Wanderers who part at the Great Gate find each other again beside it. Gather your friends at the stone — and if you have too few, speak to the Stone itself: it will call fighters to your side for a fee. Mind the stairs beside it. They lead down to the Undervault, where the first Skalds sealed what they could not kill. Take five, and take a healer.",
           "offers": [],
           "buys": false,
           "look": {
@@ -25587,35 +25599,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -25747,7 +25759,7 @@
           "x": 38.5,
           "y": 54.6,
           "color": "#9ab0c4",
-          "dialogue": "Blood, wine, glacier slush \u2014 I have got them all out of a tabard. The well water here is the softest in the city.",
+          "dialogue": "Blood, wine, glacier slush — I have got them all out of a tabard. The well water here is the softest in the city.",
           "offers": [],
           "buys": false,
           "look": {
@@ -25825,7 +25837,7 @@
           "offers": [
             {
               "id": "rest",
-              "label": "Meal & rest \u00b7 fully restores HP",
+              "label": "Meal & rest · fully restores HP",
               "cost": 5,
               "heal": 10000
             }
@@ -25858,7 +25870,7 @@
         },
         {
           "id": "city_apprentice",
-          "name": "Smith\u2019s apprentice Nils",
+          "name": "Smith’s apprentice Nils",
           "role": "Apprentice",
           "x": 37.4,
           "y": 104.6,
@@ -25902,7 +25914,7 @@
           "offers": [
             {
               "id": "buy_mount",
-              "label": "Buy riding horse \u00b7 level 50 \u00b7 50,000 gold",
+              "label": "Buy riding horse · level 50 · 50,000 gold",
               "cost": 50000,
               "mount": true
             }
@@ -26853,11 +26865,11 @@
         {
           "id": "city_apprentice_bard",
           "name": "Minstrel Pia",
-          "role": "Bard\u2019s apprentice",
+          "role": "Bard’s apprentice",
           "x": 94,
           "y": 100,
           "color": "#2f8a7a",
-          "dialogue": "La la la \u2014 oh! You heard that? I am practising. The Bard says I have a voice like a door in a gale.",
+          "dialogue": "La la la — oh! You heard that? I am practising. The Bard says I have a voice like a door in a gale.",
           "offers": [],
           "buys": false,
           "look": {
@@ -26994,7 +27006,7 @@
           "id": "city_seals",
           "title": "Letters to the Four Hearths",
           "npc": "city_herald",
-          "description": "Skaldholm has not written to its neighbours in a year. Bran\u2019s sealed greetings are for four leaders: Captain Rowan in Alderhaven, Captain Sera in Cinderwatch Camp, Warden Halvard in Rimeward Camp and Reeve Osric in Lanternmere. Speak to each of them and return to Bran.",
+          "description": "Skaldholm has not written to its neighbours in a year. Bran’s sealed greetings are for four leaders: Captain Rowan in Alderhaven, Captain Sera in Cinderwatch Camp, Warden Halvard in Rimeward Camp and Reeve Osric in Lanternmere. Speak to each of them and return to Bran.",
           "objectives": [
             {
               "kind": "talk",
@@ -27031,7 +27043,7 @@
           "id": "city_gel",
           "title": "Clear Gel for Clear Heads",
           "npc": "city_alchemist",
-          "description": "Orsolya\u2019s tonics start with slime gel, and the city\u2019s slimes are long gone. The meadow below the Crags is full of them: bring her eight Slime Gel and four Blue Slime Gel.",
+          "description": "Orsolya’s tonics start with slime gel, and the city’s slimes are long gone. The meadow below the Crags is full of them: bring her eight Slime Gel and four Blue Slime Gel.",
           "objectives": [
             {
               "kind": "bring",
@@ -27057,7 +27069,7 @@
           "id": "city_forge",
           "title": "Cinders for the Forge",
           "npc": "city_smith",
-          "description": "Brunhild\u2019s forge needs real fire. The Emberfall Crags have plenty: bring four Ember Cores from the wisps and three Magma Fangs from the spiders.",
+          "description": "Brunhild’s forge needs real fire. The Emberfall Crags have plenty: bring four Ember Cores from the wisps and three Magma Fangs from the spiders.",
           "objectives": [
             {
               "kind": "bring",
@@ -27195,7 +27207,7 @@
           "id": "city_stone",
           "title": "Runes for the Meeting Stone",
           "npc": "city_stonewarden",
-          "description": "Magnus says the stone\u2019s runes are fading. Three rare things can wake them: two Hydra Fangs from the fen island, two Wyrm Scales from the glacier summit and two Basalt Hearts from the golems of the Crags.",
+          "description": "Magnus says the stone’s runes are fading. Three rare things can wake them: two Hydra Fangs from the fen island, two Wyrm Scales from the glacier summit and two Basalt Hearts from the golems of the Crags.",
           "objectives": [
             {
               "kind": "bring",
@@ -27226,7 +27238,7 @@
           "id": "city_tribute",
           "title": "Tribute of Four Lands",
           "npc": "city_steward",
-          "description": "Halden wants the city\u2019s tribute room filled: two Ironhide Shells from the meadow, two Ash Veils from the Crags, two Rime Shells from the glacier and two Mire Crocodile Hides from the fen. Every land, one gift.",
+          "description": "Halden wants the city’s tribute room filled: two Ironhide Shells from the meadow, two Ash Veils from the Crags, two Rime Shells from the glacier and two Mire Crocodile Hides from the fen. Every land, one gift.",
           "objectives": [
             {
               "kind": "bring",
@@ -27262,7 +27274,7 @@
         },
         {
           "id": "city_order",
-          "title": "The Guild\u2019s Standing Order",
+          "title": "The Guild’s Standing Order",
           "npc": "city_guildmaster",
           "description": "The guild always needs Magma Fangs and Rime Shells for its export crates. Bring three of each; Tobias will pay again every time you do. Repeatable.",
           "objectives": [
@@ -42886,31 +42898,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -42947,14 +42959,14 @@
             },
             {
               "id": "buy_mana_potion",
-              "label": "Buy Mana Potion \u00b7 100 mana instantly",
+              "label": "Buy Mana Potion · 100 mana instantly",
               "cost": 30,
               "item": "mana_potion",
               "tiered": true
             },
             {
               "id": "buy_health_potion",
-              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "label": "Buy Health Potion · 100 HP instantly",
               "cost": 30,
               "item": "health_potion",
               "tiered": true
@@ -42980,14 +42992,14 @@
           "offers": [
             {
               "id": "buy_traveler_stew",
-              "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
+              "label": "Buy Traveler's Stew · 100 HP and mana over 8 s",
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
             }
@@ -43086,31 +43098,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -43164,14 +43176,14 @@
             },
             {
               "id": "buy_mana_potion",
-              "label": "Buy Mana Potion \u00b7 100 mana instantly",
+              "label": "Buy Mana Potion · 100 mana instantly",
               "cost": 30,
               "item": "mana_potion",
               "tiered": true
             },
             {
               "id": "buy_health_potion",
-              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "label": "Buy Health Potion · 100 HP instantly",
               "cost": 30,
               "item": "health_potion",
               "tiered": true
@@ -43197,14 +43209,14 @@
           "offers": [
             {
               "id": "buy_traveler_stew",
-              "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
+              "label": "Buy Traveler's Stew · 100 HP and mana over 8 s",
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
             }
@@ -43600,7 +43612,7 @@
             {
               "kind": "kill",
               "target": "oakhorn",
-              "label": "Defeat the Oakhorn (Elite \u00b7 3 players)",
+              "label": "Defeat the Oakhorn (Elite · 3 players)",
               "count": 1
             }
           ],
@@ -43907,7 +43919,7 @@
             {
               "kind": "kill",
               "target": "hrungnir",
-              "label": "Defeat Hrungnir (Elite \u00b7 5 players)",
+              "label": "Defeat Hrungnir (Elite · 5 players)",
               "count": 1
             }
           ],
@@ -51000,31 +51012,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -51061,14 +51073,14 @@
             },
             {
               "id": "buy_mana_potion",
-              "label": "Buy Mana Potion \u00b7 100 mana instantly",
+              "label": "Buy Mana Potion · 100 mana instantly",
               "cost": 30,
               "item": "mana_potion",
               "tiered": true
             },
             {
               "id": "buy_health_potion",
-              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "label": "Buy Health Potion · 100 HP instantly",
               "cost": 30,
               "item": "health_potion",
               "tiered": true
@@ -51094,14 +51106,14 @@
           "offers": [
             {
               "id": "buy_traveler_stew",
-              "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
+              "label": "Buy Traveler's Stew · 100 HP and mana over 8 s",
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
             }
@@ -51609,7 +51621,7 @@
             {
               "kind": "hold",
               "target": "sky_ward_last",
-              "label": "Hold the Last Ward (Group \u00b7 3 players)",
+              "label": "Hold the Last Ward (Group · 3 players)",
               "count": 120
             }
           ],
@@ -51778,7 +51790,7 @@
       ]
     },
     {
-      "name": "R\u00e1n's Deep",
+      "name": "Rán's Deep",
       "theme": "deep",
       "tagline": "Under the storm, where the sea keeps what it catches",
       "size": 176,
@@ -52021,7 +52033,7 @@
         },
         {
           "id": "deep_rans_1",
-          "name": "the Bell of R\u00e1n I",
+          "name": "the Bell of Rán I",
           "x": 47.13,
           "y": 13.82,
           "r": 2.6,
@@ -52030,7 +52042,7 @@
         },
         {
           "id": "deep_rans_2",
-          "name": "the Bell of R\u00e1n II",
+          "name": "the Bell of Rán II",
           "x": 77.0,
           "y": 13.47,
           "r": 2.6,
@@ -52039,7 +52051,7 @@
         },
         {
           "id": "deep_rans_3",
-          "name": "the Bell of R\u00e1n III",
+          "name": "the Bell of Rán III",
           "x": 77.48,
           "y": 31.63,
           "r": 2.6,
@@ -52048,7 +52060,7 @@
         },
         {
           "id": "deep_rans_4",
-          "name": "the Bell of R\u00e1n IV",
+          "name": "the Bell of Rán IV",
           "x": 111.15,
           "y": 60.9,
           "r": 2.6,
@@ -52057,7 +52069,7 @@
         },
         {
           "id": "deep_rans_5",
-          "name": "the Bell of R\u00e1n V",
+          "name": "the Bell of Rán V",
           "x": 98.31,
           "y": 79.33,
           "r": 2.6,
@@ -60982,31 +60994,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -61044,14 +61056,14 @@
             },
             {
               "id": "buy_mana_potion",
-              "label": "Buy Mana Potion \u00b7 100 mana instantly",
+              "label": "Buy Mana Potion · 100 mana instantly",
               "cost": 30,
               "item": "mana_potion",
               "tiered": true
             },
             {
               "id": "buy_health_potion",
-              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "label": "Buy Health Potion · 100 HP instantly",
               "cost": 30,
               "item": "health_potion",
               "tiered": true
@@ -61075,14 +61087,14 @@
           "offers": [
             {
               "id": "buy_traveler_stew",
-              "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
+              "label": "Buy Traveler's Stew · 100 HP and mana over 8 s",
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
             }
@@ -61108,31 +61120,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -61189,31 +61201,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -61520,7 +61532,7 @@
             {
               "kind": "kill",
               "target": "hvitserk",
-              "label": "Defeat Hvitserk the Drowned (Group \u00b7 3 players)",
+              "label": "Defeat Hvitserk the Drowned (Group · 3 players)",
               "count": 1
             }
           ],
@@ -61688,7 +61700,7 @@
             {
               "kind": "kill",
               "target": "ghostmaw",
-              "label": "Defeat the Ghostmaw (Group \u00b7 3 players)",
+              "label": "Defeat the Ghostmaw (Group · 3 players)",
               "count": 1
             }
           ],
@@ -61730,7 +61742,7 @@
             {
               "kind": "kill",
               "target": "kraken",
-              "label": "Defeat the Kraken (Group \u00b7 5 players)",
+              "label": "Defeat the Kraken (Group · 5 players)",
               "count": 1
             }
           ],
@@ -61851,8 +61863,8 @@
           "objectives": [
             {
               "kind": "reach",
-              "target": "R\u00e1n's Deep",
-              "label": "Travel to R\u00e1n's Deep",
+              "target": "Rán's Deep",
+              "label": "Travel to Rán's Deep",
               "count": 1
             }
           ],
@@ -64204,7 +64216,7 @@
         {
           "id": "nacre_envoy",
           "name": "Lyris Pearlvoice",
-          "role": "Mermaid \u00b7 City envoy",
+          "role": "Mermaid · City envoy",
           "x": 92,
           "y": 166,
           "color": "#eccb89",
@@ -64223,7 +64235,7 @@
         {
           "id": "nacre_healer",
           "name": "Nerissa Stillwater",
-          "role": "Mermaid \u00b7 Tide healer",
+          "role": "Mermaid · Tide healer",
           "x": 144,
           "y": 36,
           "color": "#81d6cc",
@@ -64236,14 +64248,14 @@
             },
             {
               "id": "buy_mana_potion",
-              "label": "Buy Mana Potion \u00b7 100 mana instantly",
+              "label": "Buy Mana Potion · 100 mana instantly",
               "cost": 30,
               "item": "mana_potion",
               "tiered": true
             },
             {
               "id": "buy_health_potion",
-              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "label": "Buy Health Potion · 100 HP instantly",
               "cost": 30,
               "item": "health_potion",
               "tiered": true
@@ -64263,21 +64275,21 @@
         {
           "id": "nacre_trader",
           "name": "Orin Shellweaver",
-          "role": "Merman \u00b7 Market keeper",
+          "role": "Merman · Market keeper",
           "x": 102,
           "y": 130,
           "color": "#e9acc8",
           "offers": [
             {
               "id": "buy_traveler_stew",
-              "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
+              "label": "Buy Traveler's Stew · 100 HP and mana over 8 s",
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
             }
@@ -64296,7 +64308,7 @@
         {
           "id": "nacre_smith",
           "name": "Thalos Reefhammer",
-          "role": "Merman \u00b7 Coral smith",
+          "role": "Merman · Coral smith",
           "x": 90,
           "y": 130,
           "color": "#eccb89",
@@ -64322,11 +64334,17 @@
         {
           "id": "nacre_archivist",
           "name": "Vaela Inkfin",
-          "role": "Mermaid \u00b7 Keeper of tides",
+          "role": "Mermaid · Keeper of tides",
           "x": 140,
           "y": 64,
           "color": "#81d6cc",
-          "offers": [],
+          "offers": [
+            {
+              "id": "stat_reset",
+              "label": "Reset trained attributes",
+              "cost": 0
+            }
+          ],
           "buys": false,
           "look": {
             "species": "merfolk",
@@ -64341,7 +64359,7 @@
         {
           "id": "nacre_gardener",
           "name": "Pelar Kelpbraid",
-          "role": "Merman \u00b7 Reef gardener",
+          "role": "Merman · Reef gardener",
           "x": 42,
           "y": 36,
           "color": "#e9acc8",
@@ -64360,7 +64378,7 @@
         {
           "id": "nacre_singer",
           "name": "Syllene Softsong",
-          "role": "Mermaid \u00b7 Conch singer",
+          "role": "Mermaid · Conch singer",
           "x": 104,
           "y": 92,
           "color": "#e9acc8",
@@ -64379,7 +64397,7 @@
         {
           "id": "nacre_warden",
           "name": "Captain Namar Deepwatch",
-          "role": "Merman \u00b7 Cathedral warden",
+          "role": "Merman · Cathedral warden",
           "x": 96,
           "y": 31,
           "color": "#ecb395",
@@ -64398,14 +64416,14 @@
         {
           "id": "nacre_innkeeper",
           "name": "Maera Warmcurrent",
-          "role": "Mermaid \u00b7 The Sleeping Nautilus",
+          "role": "Mermaid · The Sleeping Nautilus",
           "x": 52,
           "y": 136,
           "color": "#81d6cc",
           "offers": [
             {
               "id": "rest",
-              "label": "Rest in the warm current \u00b7 restores HP",
+              "label": "Rest in the warm current · restores HP",
               "cost": 5,
               "heal": 10000
             }
@@ -64424,7 +64442,7 @@
         {
           "id": "nacre_lamplighter",
           "name": "Ilo Glowfin",
-          "role": "Merman \u00b7 Pearl lamplighter",
+          "role": "Merman · Pearl lamplighter",
           "x": 156,
           "y": 112,
           "color": "#81d6cc",
@@ -64450,35 +64468,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -64505,7 +64523,7 @@
         {
           "id": "nacre_resident_0",
           "name": "Aren",
-          "role": "Merman \u00b7 Resident",
+          "role": "Merman · Resident",
           "x": 48,
           "y": 72,
           "color": "#eccb89",
@@ -64545,7 +64563,7 @@
         {
           "id": "nacre_resident_1",
           "name": "Miriel",
-          "role": "Mermaid \u00b7 Resident",
+          "role": "Mermaid · Resident",
           "x": 72,
           "y": 72,
           "color": "#8dbedc",
@@ -64577,7 +64595,7 @@
         {
           "id": "nacre_resident_2",
           "name": "Kovar",
-          "role": "Merman \u00b7 Resident",
+          "role": "Merman · Resident",
           "x": 120,
           "y": 72,
           "color": "#ecb395",
@@ -64617,7 +64635,7 @@
         {
           "id": "nacre_resident_3",
           "name": "Oceane",
-          "role": "Mermaid \u00b7 Resident",
+          "role": "Mermaid · Resident",
           "x": 144,
           "y": 72,
           "color": "#e9acc8",
@@ -64657,7 +64675,7 @@
         {
           "id": "nacre_resident_4",
           "name": "Tethis",
-          "role": "Merman \u00b7 Resident",
+          "role": "Merman · Resident",
           "x": 168,
           "y": 72,
           "color": "#81d6cc",
@@ -64689,7 +64707,7 @@
         {
           "id": "nacre_resident_5",
           "name": "Luma",
-          "role": "Mermaid \u00b7 Resident",
+          "role": "Mermaid · Resident",
           "x": 24,
           "y": 72,
           "color": "#b2b4ef",
@@ -64729,7 +64747,7 @@
         {
           "id": "nacre_resident_6",
           "name": "Soren",
-          "role": "Merman \u00b7 Resident",
+          "role": "Merman · Resident",
           "x": 48,
           "y": 120,
           "color": "#eccb89",
@@ -64769,7 +64787,7 @@
         {
           "id": "nacre_resident_7",
           "name": "Elyra",
-          "role": "Mermaid \u00b7 Resident",
+          "role": "Mermaid · Resident",
           "x": 72,
           "y": 120,
           "color": "#8dbedc",
@@ -64809,7 +64827,7 @@
         {
           "id": "nacre_resident_8",
           "name": "Brin",
-          "role": "Merman \u00b7 Resident",
+          "role": "Merman · Resident",
           "x": 120,
           "y": 120,
           "color": "#ecb395",
@@ -64849,7 +64867,7 @@
         {
           "id": "nacre_resident_9",
           "name": "Coralie",
-          "role": "Mermaid \u00b7 Resident",
+          "role": "Mermaid · Resident",
           "x": 144,
           "y": 120,
           "color": "#e9acc8",
@@ -64889,7 +64907,7 @@
         {
           "id": "nacre_resident_10",
           "name": "Damar",
-          "role": "Merman \u00b7 Resident",
+          "role": "Merman · Resident",
           "x": 168,
           "y": 120,
           "color": "#8dbedc",
@@ -64921,7 +64939,7 @@
         {
           "id": "nacre_resident_11",
           "name": "Iselle",
-          "role": "Mermaid \u00b7 Resident",
+          "role": "Mermaid · Resident",
           "x": 24,
           "y": 120,
           "color": "#ecb395",
@@ -64961,7 +64979,7 @@
         {
           "id": "nacre_resident_12",
           "name": "Kelp",
-          "role": "Merman \u00b7 Resident",
+          "role": "Merman · Resident",
           "x": 48,
           "y": 144,
           "color": "#e9acc8",
@@ -65001,7 +65019,7 @@
         {
           "id": "nacre_resident_13",
           "name": "Pearl",
-          "role": "Mermaid \u00b7 Resident",
+          "role": "Mermaid · Resident",
           "x": 72,
           "y": 144,
           "color": "#81d6cc",
@@ -65041,7 +65059,7 @@
         {
           "id": "nacre_resident_14",
           "name": "Finn",
-          "role": "Merman \u00b7 Resident",
+          "role": "Merman · Resident",
           "x": 120,
           "y": 144,
           "color": "#b2b4ef",
@@ -65081,7 +65099,7 @@
         {
           "id": "nacre_resident_15",
           "name": "Nori",
-          "role": "Mermaid \u00b7 Resident",
+          "role": "Mermaid · Resident",
           "x": 144,
           "y": 144,
           "color": "#eccb89",
@@ -65121,7 +65139,7 @@
         {
           "id": "nacre_resident_16",
           "name": "Reef",
-          "role": "Merman \u00b7 Resident",
+          "role": "Merman · Resident",
           "x": 168,
           "y": 144,
           "color": "#8dbedc",
@@ -65153,7 +65171,7 @@
         {
           "id": "nacre_resident_17",
           "name": "Mira",
-          "role": "Mermaid \u00b7 Resident",
+          "role": "Mermaid · Resident",
           "x": 24,
           "y": 144,
           "color": "#ecb395",
@@ -65193,7 +65211,7 @@
         {
           "id": "travel_nacrehold",
           "name": "Travel Master Auralis",
-          "role": "Mermaid \u00b7 Spark Travel",
+          "role": "Mermaid · Spark Travel",
           "x": 100,
           "y": 164,
           "color": "#74d7d0",
@@ -65364,7 +65382,7 @@
           "id": "nacre_districts",
           "title": "Six Verses for the Sea",
           "npc": "nacre_singer",
-          "description": "Learn the rhythm of all six residential districts for Syllene\u2019s lullaby.",
+          "description": "Learn the rhythm of all six residential districts for Syllene’s lullaby.",
           "objectives": [
             {
               "kind": "visit",
@@ -65471,7 +65489,7 @@
           "id": "nacre_lamps",
           "title": "A Pearl for Every Window",
           "npc": "nacre_lamplighter",
-          "description": "Bring three Siren Pearls from Ran\u2019s Deep to refresh the city\u2019s lamps. No creature is hunted inside the city.",
+          "description": "Bring three Siren Pearls from Ran’s Deep to refresh the city’s lamps. No creature is hunted inside the city.",
           "objectives": [
             {
               "kind": "bring",
@@ -65490,7 +65508,7 @@
           "id": "nacre_smithwork",
           "title": "Coral That Remembers Iron",
           "npc": "nacre_smith",
-          "description": "Bring Shellback Plates from Ran\u2019s Deep for Thalos\u2019s patient craft.",
+          "description": "Bring Shellback Plates from Ran’s Deep for Thalos’s patient craft.",
           "objectives": [
             {
               "kind": "bring",
@@ -65510,7 +65528,7 @@
           "id": "nacre_letters",
           "title": "A Letter in a Shell",
           "npc": "nacre_innkeeper",
-          "description": "Carry Maera\u2019s greetings to the city envoy and its gardener, then return for a warm welcome.",
+          "description": "Carry Maera’s greetings to the city envoy and its gardener, then return for a warm welcome.",
           "objectives": [
             {
               "kind": "talk",
@@ -65533,9 +65551,9 @@
         },
         {
           "id": "nacre_supplies",
-          "title": "The Tide\u2019s Standing Order",
+          "title": "The Tide’s Standing Order",
           "npc": "nacre_trader",
-          "description": "Orin always needs Drowned Coins from Ran\u2019s Deep. This order can be repeated.",
+          "description": "Orin always needs Drowned Coins from Ran’s Deep. This order can be repeated.",
           "objectives": [
             {
               "kind": "bring",
@@ -65713,7 +65731,7 @@
         },
         {
           "id": "cathedral_cloister",
-          "name": "Flooded Cloister \u2014 Level 40",
+          "name": "Flooded Cloister — Level 40",
           "x": 84,
           "y": 28,
           "r": 1.1,
@@ -65724,7 +65742,7 @@
         },
         {
           "id": "cathedral_reliquary",
-          "name": "Coral Reliquary \u2014 Level 45",
+          "name": "Coral Reliquary — Level 45",
           "x": 108,
           "y": 28,
           "r": 1.1,
@@ -65735,7 +65753,7 @@
         },
         {
           "id": "cathedral_nave",
-          "name": "Grand Nave \u2014 Level 50",
+          "name": "Grand Nave — Level 50",
           "x": 96,
           "y": 28.5,
           "r": 1.1,
@@ -65758,7 +65776,7 @@
       ]
     },
     {
-      "name": "The Drowned Cathedral \u2014 Flooded Cloister",
+      "name": "The Drowned Cathedral — Flooded Cloister",
       "theme": "cathedral_left",
       "tagline": "The left wing: drowned gardens, broken bells and the bound choir",
       "cathedralWing": "cloister",
@@ -72556,7 +72574,7 @@
       "portals": [
         {
           "id": "cathedral_cloister_return",
-          "name": "Nacrehold \u2014 Cathedral Doors",
+          "name": "Nacrehold — Cathedral Doors",
           "x": 18,
           "y": 140,
           "r": 1.1,
@@ -72581,7 +72599,7 @@
       "quests": []
     },
     {
-      "name": "The Drowned Cathedral \u2014 Coral Reliquary",
+      "name": "The Drowned Cathedral — Coral Reliquary",
       "theme": "cathedral_right",
       "tagline": "The right wing: rose-coral galleries, pearl tombs and stolen relics",
       "cathedralWing": "reliquary",
@@ -78677,7 +78695,7 @@
       "portals": [
         {
           "id": "cathedral_reliquary_return",
-          "name": "Nacrehold \u2014 Cathedral Doors",
+          "name": "Nacrehold — Cathedral Doors",
           "x": 130,
           "y": 140,
           "r": 1.1,
@@ -78702,7 +78720,7 @@
       "quests": []
     },
     {
-      "name": "The Drowned Cathedral \u2014 Grand Nave",
+      "name": "The Drowned Cathedral — Grand Nave",
       "theme": "cathedral_main",
       "tagline": "The main wing: black marble, drowned stars and the Heart of the Tide",
       "cathedralWing": "nave",
@@ -86670,7 +86688,7 @@
       "portals": [
         {
           "id": "cathedral_nave_return",
-          "name": "Nacrehold \u2014 Cathedral Doors",
+          "name": "Nacrehold — Cathedral Doors",
           "x": 90,
           "y": 172,
           "r": 1.1,
@@ -90078,11 +90096,17 @@
         {
           "id": "astral_steward",
           "name": "Seren Starwatcher",
-          "role": "Astral steward \u00b7 Quest giver",
+          "role": "Astral steward · Quest giver",
           "x": 53,
           "y": 115,
           "color": "#b9a4ff",
-          "offers": [],
+          "offers": [
+            {
+              "id": "stat_reset",
+              "label": "Reset trained attributes",
+              "cost": 0
+            }
+          ],
           "buys": false,
           "look": {
             "hair": "#d9d1ff",
@@ -90107,7 +90131,7 @@
             },
             {
               "id": "buy_health_potion",
-              "label": "Buy Health Potion \u00b7 100 HP instantly",
+              "label": "Buy Health Potion · 100 HP instantly",
               "cost": 30,
               "item": "health_potion",
               "tiered": true
@@ -90179,14 +90203,14 @@
           "offers": [
             {
               "id": "buy_traveler_stew",
-              "label": "Buy Traveler's Stew \u00b7 100 HP and mana over 8 s",
+              "label": "Buy Traveler's Stew · 100 HP and mana over 8 s",
               "cost": 12,
               "item": "traveler_stew",
               "tiered": true
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel \u00b7 6 extra bag slots",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
             }
@@ -93726,31 +93750,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -93779,31 +93803,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -97406,31 +97430,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -97459,31 +97483,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -101575,31 +101599,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -101628,31 +101652,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -102040,7 +102064,7 @@
           "id": "moonspore_caps",
           "title": "A Cure in the Cap",
           "npc": "moonspore_healer",
-          "description": "Bring intact glowcaps for Solvi\u2019s antidote.",
+          "description": "Bring intact glowcaps for Solvi’s antidote.",
           "objectives": [
             {
               "kind": "bring",
@@ -104576,7 +104600,13 @@
             "scale": 1,
             "prop": "crown"
           },
-          "offers": [],
+          "offers": [
+            {
+              "id": "stat_reset",
+              "label": "Reset trained attributes",
+              "cost": 0
+            }
+          ],
           "buys": false
         },
         {
@@ -104740,7 +104770,7 @@
         {
           "id": "asterion_stone",
           "name": "The Asterion Meeting Stone",
-          "role": "Gather a party \u00b7 hire fighters",
+          "role": "Gather a party · hire fighters",
           "x": 120.5,
           "y": 88.0,
           "color": "#9ec8dd",
@@ -104749,35 +104779,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -117678,31 +117708,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -117793,7 +117823,7 @@
         {
           "id": "stormglass_stone",
           "name": "The Breakwater Meeting Stone",
-          "role": "Gather a party \u00b7 hire fighters",
+          "role": "Gather a party · hire fighters",
           "x": 91,
           "y": 27,
           "color": "#a8dfe4",
@@ -117801,35 +117831,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -117896,7 +117926,7 @@
           "id": "stormglass_welcome",
           "title": "A Camp Against the Tide",
           "npc": "stormglass_warden",
-          "description": "Meet Breakwater Camp\u2019s physician, scout and historian.",
+          "description": "Meet Breakwater Camp’s physician, scout and historian.",
           "objectives": [
             {
               "kind": "talk",
@@ -118323,7 +118353,7 @@
           "id": "stormglass_ward",
           "title": "The Unblinking Deep",
           "npc": "stormglass_watcher",
-          "description": "Break every ward in your party\u2019s private descent to open the far passage.",
+          "description": "Break every ward in your party’s private descent to open the far passage.",
           "objectives": [
             {
               "kind": "kill",
@@ -121805,31 +121835,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -121921,7 +121951,7 @@
         {
           "id": "sun_stone",
           "name": "Millbridge Meeting Stone",
-          "role": "Gather a party \u00b7 hire fighters",
+          "role": "Gather a party · hire fighters",
           "x": 91,
           "y": 29,
           "color": "#ffe6a5",
@@ -121929,35 +121959,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -121982,7 +122012,7 @@
         {
           "id": "travel_millbridge",
           "name": "Travel Master Jori",
-          "role": "Millbridge courier \u00b7 Spark Travel",
+          "role": "Millbridge courier · Spark Travel",
           "x": 46,
           "y": 118,
           "color": "#74d7d0",
@@ -125671,35 +125701,35 @@
           "x": 38,
           "y": 79,
           "color": "#fff0b5",
-          "dialogue": "My silk keeps vanishing into the geckos\u2019 bright tails.",
+          "dialogue": "My silk keeps vanishing into the geckos’ bright tails.",
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -125791,7 +125821,7 @@
         {
           "id": "ribbon_stone",
           "name": "Jubilee Meeting Stone",
-          "role": "Gather a party \u00b7 hire fighters",
+          "role": "Gather a party · hire fighters",
           "x": 107,
           "y": 76,
           "color": "#fff0b5",
@@ -125799,35 +125829,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -125852,7 +125882,7 @@
         {
           "id": "travel_jubilee",
           "name": "Travel Master Luma",
-          "role": "Festival courier \u00b7 Spark Travel",
+          "role": "Festival courier · Spark Travel",
           "x": 42,
           "y": 85,
           "color": "#74d7d0",
@@ -126447,7 +126477,7 @@
           "id": "ribbon_final",
           "title": "The Last Fold",
           "npc": "ribbon_keeper",
-          "description": "Defeat the Mirror Dancer and Thousandfold Weaver, then break the Sovereign\u2019s final fold.",
+          "description": "Defeat the Mirror Dancer and Thousandfold Weaver, then break the Sovereign’s final fold.",
           "objectives": [
             {
               "kind": "kill",
@@ -130440,31 +130470,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -130506,7 +130536,7 @@
         {
           "id": "tangle_stone",
           "name": "Banyan Meeting Stone",
-          "role": "Gather a party \u00b7 hire fighters",
+          "role": "Gather a party · hire fighters",
           "x": 92,
           "y": 48,
           "color": "#d6f1a2",
@@ -130514,35 +130544,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -130567,7 +130597,7 @@
         {
           "id": "travel_banyan",
           "name": "Travel Master Suri",
-          "role": "Canopy courier \u00b7 Spark Travel",
+          "role": "Canopy courier · Spark Travel",
           "x": 36,
           "y": 124,
           "color": "#74d7d0",
@@ -133125,7 +133155,7 @@
         {
           "id": "heart_stone",
           "name": "Crown Meeting Stone",
-          "role": "Gather a party \u00b7 hire fighters",
+          "role": "Gather a party · hire fighters",
           "x": 68,
           "y": 77,
           "color": "#e4f7ae",
@@ -133133,35 +133163,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -133186,7 +133216,7 @@
         {
           "id": "travel_veyrroot",
           "name": "Travel Master Lio",
-          "role": "Branchwing courier \u00b7 Spark Travel",
+          "role": "Branchwing courier · Spark Travel",
           "x": 82,
           "y": 96,
           "color": "#74d7d0",
@@ -137646,31 +137676,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -137701,31 +137731,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -137768,7 +137798,7 @@
         {
           "id": "lapis_stone",
           "name": "Lapis Meeting Stone",
-          "role": "Gather a party \u00b7 hire fighters",
+          "role": "Gather a party · hire fighters",
           "x": 130,
           "y": 38,
           "color": "#b7e5dc",
@@ -137776,35 +137806,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -137829,7 +137859,7 @@
         {
           "id": "travel_azure_wells",
           "name": "Travel Master Nadir",
-          "role": "Caravan courier \u00b7 Spark Travel",
+          "role": "Caravan courier · Spark Travel",
           "x": 44,
           "y": 135,
           "color": "#74d7d0",
@@ -141799,31 +141829,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -141854,31 +141884,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -141910,31 +141940,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -141966,31 +141996,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -142014,7 +142044,7 @@
         {
           "id": "frostwake_stone",
           "name": "Frostwake Meeting Stone",
-          "role": "Gather a party \u00b7 hire fighters",
+          "role": "Gather a party · hire fighters",
           "x": 116,
           "y": 29,
           "color": "#b5daef",
@@ -142022,35 +142052,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -142075,7 +142105,7 @@
         {
           "id": "travel_frostwake",
           "name": "Travel Master Eira",
-          "role": "Aurora courier \u00b7 Spark Travel",
+          "role": "Aurora courier · Spark Travel",
           "x": 46,
           "y": 143,
           "color": "#74d7d0",
@@ -145827,31 +145857,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -145882,31 +145912,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -145938,31 +145968,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -145994,31 +146024,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -146042,7 +146072,7 @@
         {
           "id": "cairn_stone",
           "name": "Cairnspine Meeting Stone",
-          "role": "Gather a party \u00b7 hire fighters",
+          "role": "Gather a party · hire fighters",
           "x": 131,
           "y": 30,
           "color": "#d4b8aa",
@@ -146050,35 +146080,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -146103,7 +146133,7 @@
         {
           "id": "travel_boulderwatch",
           "name": "Travel Master Asta",
-          "role": "High pass courier \u00b7 Spark Travel",
+          "role": "High pass courier · Spark Travel",
           "x": 47,
           "y": 153,
           "color": "#74d7d0",
@@ -156677,35 +156707,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -156802,31 +156832,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -156857,31 +156887,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -156912,31 +156942,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -156967,35 +156997,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -157092,31 +157122,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -157147,31 +157177,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -157202,31 +157232,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -157257,35 +157287,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -157382,31 +157412,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -157437,31 +157467,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -157492,31 +157522,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -157547,35 +157577,35 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior",
               "open": true
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage",
               "open": true
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin",
               "open": true
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest",
               "open": true
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter",
               "open": true
@@ -157672,31 +157702,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -157727,31 +157757,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -157782,31 +157812,31 @@
           "offers": [
             {
               "id": "merc_warrior",
-              "label": "Hire a Warrior mercenary \u00b7 holds the line",
+              "label": "Hire a Warrior mercenary · holds the line",
               "cost": 250,
               "merc": "warrior"
             },
             {
               "id": "merc_mage",
-              "label": "Hire a Mage mercenary \u00b7 casts from range",
+              "label": "Hire a Mage mercenary · casts from range",
               "cost": 250,
               "merc": "mage"
             },
             {
               "id": "merc_assassin",
-              "label": "Hire a Assassin mercenary \u00b7 strikes fast",
+              "label": "Hire a Assassin mercenary · strikes fast",
               "cost": 250,
               "merc": "assassin"
             },
             {
               "id": "merc_priest",
-              "label": "Hire a Priest mercenary \u00b7 heals the party",
+              "label": "Hire a Priest mercenary · heals the party",
               "cost": 250,
               "merc": "priest"
             },
             {
               "id": "merc_hunter",
-              "label": "Hire a Hunter mercenary \u00b7 shoots from range",
+              "label": "Hire a Hunter mercenary · shoots from range",
               "cost": 250,
               "merc": "hunter"
             },
@@ -157829,7 +157859,7 @@
         {
           "id": "travel_springmere",
           "name": "Travel Master Linn",
-          "role": "Yearwheel courier \u00b7 Spark Travel",
+          "role": "Yearwheel courier · Spark Travel",
           "x": 84,
           "y": 326,
           "color": "#74d7d0",
@@ -157854,7 +157884,7 @@
         {
           "id": "travel_solhaven",
           "name": "Travel Master Taro",
-          "role": "Yearwheel courier \u00b7 Spark Travel",
+          "role": "Yearwheel courier · Spark Travel",
           "x": 328,
           "y": 318,
           "color": "#74d7d0",
@@ -157878,7 +157908,7 @@
         {
           "id": "travel_harvestwatch",
           "name": "Travel Master Maren",
-          "role": "Yearwheel courier \u00b7 Spark Travel",
+          "role": "Yearwheel courier · Spark Travel",
           "x": 329,
           "y": 80,
           "color": "#74d7d0",
@@ -157902,7 +157932,7 @@
         {
           "id": "travel_rimehold",
           "name": "Travel Master Eirik",
-          "role": "Yearwheel courier \u00b7 Spark Travel",
+          "role": "Yearwheel courier · Spark Travel",
           "x": 86,
           "y": 80,
           "color": "#74d7d0",

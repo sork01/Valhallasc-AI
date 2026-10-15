@@ -1879,6 +1879,12 @@ impl World {
                     let _ = p.peer.try_send(json!({"type":"error","text":text}));
                 }
             },
+            ClientMessage::AllocateRecommended => match p.character.allocate_recommended() {
+                Ok(_) => self.save(),
+                Err(text) => {
+                    let _ = p.peer.try_send(json!({"type":"error","text":text}));
+                }
+            },
             ClientMessage::Interact { npc, offer } => {
                 self.interact(session, &npc, offer.as_deref());
             }
@@ -1943,6 +1949,7 @@ impl World {
         }
         let mut notice = escort_note.unwrap_or_default();
         let mut levels = 0;
+        let mut stats_changed = false;
         let mut quest_changed = offer_id.is_none()
             && npc.id == "gearwright"
             && p.character.materialize_gear_instances();
@@ -2098,7 +2105,23 @@ impl World {
                     let Some(offer) = npc.offers.iter().find(|offer| offer.id == id) else {
                         return;
                     };
-                    if offer.heal > 0. && p.character.hp >= p.character.max_hp() {
+                    if offer.id == "stat_reset" {
+                        if p.combat_left > 0. {
+                            notice = "Leave combat before resetting stats.".into();
+                        } else {
+                            match p.character.reset_trained_stats() {
+                                Ok(refunded) => {
+                                    quest_changed = true;
+                                    stats_changed = true;
+                                    notice = format!(
+                                        "Stats reset: {refunded} points refunded. Your next reset costs {} gold.",
+                                        p.character.stat_reset_price()
+                                    );
+                                }
+                                Err(text) => notice = text,
+                            }
+                        }
+                    } else if offer.heal > 0. && p.character.hp >= p.character.max_hp() {
                         notice =
                     "You are already at full health. Save it for after your next adventure!".into();
                     } else if offer.mount {
@@ -2196,7 +2219,7 @@ impl World {
         }
         let _ = p
             .peer
-            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(p.snapshot()) } else { None },"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         let actor = p.character.id.clone();
         let point = p.character.point();
         if levels > 0 {
@@ -8089,6 +8112,199 @@ mod tests {
         assert_eq!(snapshot["statPoints"], 0);
         assert_eq!(snapshot["hitChance"], c.hit_chance());
         assert_eq!(snapshot["attack"], c.stats().0);
+    }
+    #[test]
+    fn recommended_stat_request_uses_server_class_and_saves_once() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w
+            .join(
+                1,
+                None,
+                Some(Look {
+                    class: Class::Mage,
+                    ..Look::default()
+                }),
+                tx,
+            )
+            .unwrap();
+        let token = welcome["token"].as_str().unwrap();
+        w.players.get_mut(&1).unwrap().character.level = 10;
+        w.message(1, ClientMessage::AllocateRecommended);
+        let c = &w.players[&1].character;
+        assert_eq!(c.stat_points(), 0);
+        assert!(c.attributes.intellect > c.attributes.strength);
+        assert_eq!(
+            w.store.load(token).unwrap().unwrap().attributes,
+            c.attributes
+        );
+    }
+    #[test]
+    fn paid_stat_reset_is_authoritative_repeatable_and_persistent() {
+        let mut w = world();
+        let (tx, mut rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap();
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.level = 50;
+        p.character.attributes.strength = 60;
+        p.character.attributes.stamina = 30;
+        p.character.hp = p.character.max_hp();
+        p.character.gold = 129_999;
+        let before = p.character.clone();
+        assert_eq!(before.stat_reset_price(), 130_000);
+        let mut dropped = before.clone();
+        dropped.level = 30; // A death took levels, but already trained points survived.
+        dropped.hp = 1.;
+        dropped.gold = 500_000;
+        assert_eq!(dropped.reset_trained_stats().unwrap(), 90);
+        assert_eq!(dropped.stat_points(), 90);
+        dropped.level = 31;
+        assert_eq!(dropped.stat_points(), 90);
+        dropped.level = 32;
+        assert_eq!(dropped.stat_points(), 93);
+        let dropped: Character =
+            serde_json::from_str(&serde_json::to_string(&dropped).unwrap()).unwrap();
+        assert_eq!(dropped.stat_budget_floor, 90);
+        let mut high_level = before.clone();
+        high_level.level = 99;
+        assert_eq!(high_level.stat_reset_price(), 495_050);
+        high_level.stat_resets = 4;
+        assert_eq!(high_level.stat_reset_price(), 2_475_250);
+        assert_eq!(before.stat_points(), 57);
+        quest_interact(&mut w, "guide", Some("stat_reset"));
+        assert_eq!(w.players[&1].character.attributes, before.attributes);
+        assert!(dialogue_notice(&mut rx).contains("130000 gold"));
+        assert_eq!(w.players[&1].character.gold, 129_999);
+        w.players.get_mut(&1).unwrap().character.gold = 500_000;
+        w.players.get_mut(&1).unwrap().combat_left = 4.;
+        quest_interact(&mut w, "guide", Some("stat_reset"));
+        assert_eq!(w.players[&1].character.gold, 500_000);
+        assert!(dialogue_notice(&mut rx).contains("combat"));
+        w.players.get_mut(&1).unwrap().combat_left = 0.;
+        w.players.get_mut(&1).unwrap().character.mounted = true;
+        quest_interact(&mut w, "guide", Some("stat_reset"));
+        assert_eq!(w.players[&1].character.gold, 500_000);
+        assert!(dialogue_notice(&mut rx).contains("Dismount"));
+        w.players.get_mut(&1).unwrap().character.mounted = false;
+        w.players.get_mut(&1).unwrap().character.hp = 0.;
+        quest_interact(&mut w, "guide", Some("stat_reset"));
+        assert_eq!(w.players[&1].character.gold, 500_000);
+        w.players.get_mut(&1).unwrap().character.hp = before.hp;
+        let original_gear = w.players[&1].character.equipment.clone();
+        quest_interact(&mut w, "guide", Some("stat_reset"));
+        let c = &w.players[&1].character;
+        assert_eq!(c.gold, 370_000);
+        assert_eq!(c.trained_points(), 0);
+        assert_eq!(c.stat_points(), 147);
+        assert_eq!(c.stat_resets, 1);
+        assert_eq!(c.stat_reset_price(), 260_000);
+        assert_eq!(c.hp, c.max_hp());
+        assert_eq!(c.equipment, original_gear);
+        let reset_reply = packets(&mut rx, "dialogue");
+        assert_eq!(reset_reply.last().unwrap()["statPlayer"]["statPoints"], 147);
+        let saved = w.store.load(token).unwrap().unwrap();
+        assert_eq!(
+            (saved.gold, saved.stat_resets, saved.stat_points()),
+            (370_000, 1, 147)
+        );
+        quest_interact(&mut w, "guide", Some("stat_reset"));
+        assert_eq!(w.players[&1].character.gold, 370_000);
+        assert!(dialogue_notice(&mut rx).contains("no trained points"));
+        w.message(
+            1,
+            ClientMessage::AllocateStat {
+                stat: "strength".into(),
+            },
+        );
+        quest_interact(&mut w, "guide", Some("stat_reset"));
+        assert_eq!(w.players[&1].character.gold, 110_000);
+        assert_eq!(w.players[&1].character.stat_resets, 2);
+        assert_eq!(w.players[&1].character.stat_points(), 147);
+        assert_eq!(w.store.load(token).unwrap().unwrap().stat_resets, 2);
+        for (zone, npc) in [
+            (0, "guide"),
+            (4, "city_steward"),
+            (9, "nacre_archivist"),
+            (13, "astral_steward"),
+            (17, "asterion_archon"),
+        ] {
+            assert!(
+                w.maps[zone]
+                    .npcs
+                    .iter()
+                    .any(|n| n.id == npc && n.offers.iter().any(|o| o.id == "stat_reset"))
+            );
+        }
+        assert!(
+            w.maps[1]
+                .npcs
+                .iter()
+                .all(|n| n.offers.iter().all(|o| o.id != "stat_reset"))
+        );
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        w.players.get_mut(&1).unwrap().character.attributes.strength = 1;
+        let before = (
+            w.players[&1].character.gold,
+            w.players[&1].character.stat_resets,
+        );
+        quest_interact(&mut w, "crags_supplier", Some("stat_reset"));
+        assert_eq!(
+            (
+                w.players[&1].character.gold,
+                w.players[&1].character.stat_resets
+            ),
+            before
+        );
+    }
+    #[test]
+    fn recommended_spreads_use_all_points_across_classes_levels_and_caps() {
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
+            for level in [4, 20, 50, 99] {
+                let mut w = world();
+                let (tx, _rx) = mpsc::channel(256);
+                let welcome = w
+                    .join(
+                        1,
+                        None,
+                        Some(Look {
+                            class,
+                            ..Look::default()
+                        }),
+                        tx,
+                    )
+                    .unwrap();
+                let token = welcome["token"].as_str().unwrap();
+                let c = &mut w.players.get_mut(&1).unwrap().character;
+                c.level = level;
+                c.attributes.stamina = 1;
+                c.attributes.accuracy = 19.min(level.saturating_sub(1).saturating_mul(3) / 2);
+                w.message(1, ClientMessage::AllocateRecommended);
+                let c = &w.players[&1].character;
+                assert_eq!(c.stat_points(), 0, "{class:?} level {level}");
+                assert!(c.attributes.accuracy <= 20 && c.attributes.dexterity <= 70);
+                assert_eq!(c.trained_points(), 3 * (level - 1));
+                assert_eq!(
+                    w.store.load(token).unwrap().unwrap().attributes,
+                    c.attributes
+                );
+                w.players.get_mut(&1).unwrap().character.level += 1;
+                w.message(
+                    1,
+                    ClientMessage::AllocateStat {
+                        stat: "stamina".into(),
+                    },
+                );
+                assert_eq!(w.players[&1].character.stat_points(), 2);
+                assert_eq!(w.store.load(token).unwrap().unwrap().stat_points(), 2);
+            }
+        }
     }
     #[test]
     fn misses_do_not_damage_or_reward_and_dexterity_avoids_real_damage() {

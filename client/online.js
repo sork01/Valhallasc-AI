@@ -100,7 +100,7 @@
         case 'party': window.Social?.onParty(packet.party); break;
         case 'who': window.Social?.onWho(packet.players); break;
         case 'error':
-          log(packet.text); window.Rolls?.reopen();
+          log(packet.text); window.Attributes?.error?.(); window.Rolls?.reopen();
           if (packet.code === 'auth') { acct.session = null; accountList = []; persistAccount(); }
           if (packet.fatal) { fatal = true; connected = false; overlay(packet.text, true); status('Unable to enter world', false); ws.close(); }
           break;
@@ -111,7 +111,7 @@
       clearTimeout(joinTimeout);
       if (!active || currentGeneration !== generation) return;
       clearInterval(heartbeat);
-      connected = false; characterGm = false; window.GM?.onSelf(null); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; characterGm = false; window.GM?.onSelf(null); window.Attributes?.error?.(); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay('Connection lost. Reconnecting to your character…');

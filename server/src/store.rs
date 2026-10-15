@@ -137,6 +137,8 @@ impl Store {
             next_gear_id: 1,
             bags: vec![],
             attributes: Default::default(),
+            stat_budget_floor: 0,
+            stat_resets: 0,
             zone: 0,
             friends: vec![],
             potion_ready: 0,

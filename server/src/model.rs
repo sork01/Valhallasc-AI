@@ -328,6 +328,12 @@ pub struct Character {
     pub bags: Vec<String>,
     #[serde(default)]
     pub attributes: Attributes,
+    /// Earned point budget preserved when a reset follows a death-related level loss.
+    #[serde(default)]
+    pub stat_budget_floor: u32,
+    /// Number of paid stat resets; defaults to zero for existing characters.
+    #[serde(default)]
+    pub stat_resets: u32,
     /// Index of the zone the character stands in; 0 is Greenmeadow and Alderhaven.
     #[serde(default)]
     pub zone: usize,
@@ -403,6 +409,8 @@ impl Character {
             next_gear_id: 1,
             bags: vec![],
             attributes: Attributes::default(),
+            stat_budget_floor: 0,
+            stat_resets: 0,
             zone: 0,
             friends: vec![],
             potion_ready: 0,
@@ -514,6 +522,7 @@ impl Character {
         self.level
             .saturating_sub(1)
             .saturating_mul(3)
+            .max(self.stat_budget_floor)
             .saturating_sub(
                 a.strength
                     .saturating_add(a.agility)
@@ -522,6 +531,44 @@ impl Character {
                     .saturating_add(a.dexterity)
                     .saturating_add(a.accuracy),
             )
+    }
+    pub fn trained_points(&self) -> u32 {
+        let a = &self.attributes;
+        a.strength
+            .saturating_add(a.agility)
+            .saturating_add(a.intellect)
+            .saturating_add(a.stamina)
+            .saturating_add(a.dexterity)
+            .saturating_add(a.accuracy)
+    }
+    /// A level-scaled service, with each prior reset adding one base price (up to 5x).
+    pub fn stat_reset_price(&self) -> u32 {
+        5_000_u32
+            .saturating_add(50_u32.saturating_mul(self.level.saturating_mul(self.level)))
+            .saturating_mul(self.stat_resets.saturating_add(1).min(5))
+    }
+    pub fn reset_trained_stats(&mut self) -> Result<u32, String> {
+        if self.hp <= 0. {
+            return Err("You cannot reset stats while defeated.".into());
+        }
+        if self.mounted {
+            return Err("Dismount before resetting stats.".into());
+        }
+        if self.trained_points() == 0 {
+            return Err("You have no trained points to reset.".into());
+        }
+        let price = self.stat_reset_price();
+        if self.gold < price {
+            return Err(format!("You need {price} gold to reset your stats."));
+        }
+        let refunded = self.trained_points();
+        self.gold -= price;
+        self.stat_budget_floor = self.stat_budget_floor.max(refunded);
+        self.attributes = Attributes::default();
+        self.stat_resets = self.stat_resets.saturating_add(1);
+        self.hp = self.hp.min(self.max_hp());
+        self.resource = Some(self.resource());
+        Ok(refunded)
     }
     pub fn allocate_stat(&mut self, stat: &str) -> Result<(), &'static str> {
         if self.hp <= 0. {
@@ -549,6 +596,70 @@ impl Character {
             self.hp = (self.hp + 8.).min(self.max_hp());
         }
         Ok(())
+    }
+    /// Spend only unallocated points toward the class's effective-stat spread.
+    pub fn allocate_recommended(&mut self) -> Result<Attributes, &'static str> {
+        if self.hp <= 0. {
+            return Err("You cannot train stats while defeated.");
+        }
+        let points = self.stat_points();
+        if points == 0 {
+            return Err("You have no stat points to spend.");
+        }
+        let weights: [u32; 6] = match self.look.class {
+            Class::Warrior => [40, 5, 0, 30, 10, 15],
+            Class::Mage => [0, 5, 45, 25, 10, 15],
+            Class::Assassin => [10, 40, 0, 20, 15, 15],
+            Class::Priest => [0, 5, 45, 30, 5, 15],
+            Class::Hunter => [5, 40, 0, 25, 15, 15],
+        };
+        let names = [
+            "strength",
+            "agility",
+            "intellect",
+            "stamina",
+            "dexterity",
+            "accuracy",
+        ];
+        let before = self.attributes.clone();
+        let mut next = self.clone();
+        for _ in 0..points {
+            let effective = next.effective_attributes();
+            let values = [
+                effective.strength,
+                effective.agility,
+                effective.intellect,
+                effective.stamina,
+                effective.dexterity,
+                effective.accuracy,
+            ];
+            let trained = &next.attributes;
+            let total = values.iter().copied().sum::<u32>() + next.stat_points();
+            let best = (0..names.len())
+                .filter(|&i| weights[i] > 0)
+                .filter(|&i| i != 4 || (trained.dexterity < 70 && effective.dexterity < 70))
+                .filter(|&i| i != 5 || (trained.accuracy < 20 && effective.accuracy < 20))
+                .max_by(|&a, &b| {
+                    let score = |i| total as i64 * weights[i] as i64 - values[i] as i64 * 100;
+                    score(a)
+                        .cmp(&score(b))
+                        .then_with(|| weights[a].cmp(&weights[b]))
+                        .then_with(|| b.cmp(&a))
+                })
+                .ok_or("No recommended stat can accept another point.")?;
+            next.allocate_stat(names[best])?;
+        }
+        let after = &next.attributes;
+        let spent = Attributes {
+            strength: after.strength - before.strength,
+            agility: after.agility - before.agility,
+            intellect: after.intellect - before.intellect,
+            stamina: after.stamina - before.stamina,
+            dexterity: after.dexterity - before.dexterity,
+            accuracy: after.accuracy - before.accuracy,
+        };
+        *self = next;
+        Ok(spent)
     }
     pub fn crit_chance(&self) -> f64 {
         ((if self.look.class == Class::Assassin {
@@ -904,6 +1015,7 @@ pub enum ClientMessage {
     AllocateStat {
         stat: String,
     },
+    AllocateRecommended,
     Interact {
         npc: String,
         offer: Option<String>,
