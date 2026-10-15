@@ -164,6 +164,7 @@ impl Summary {
             "characterHp": self.character_hp,
             "runs": self.runs.len(),
             "failures": self.failures(),
+            "deaths": self.runs.iter().filter(|o| o.died).count(),
             "seconds": {"median": round1(s), "min": round1(smin), "max": round1(smax)},
             "damageTaken": {"median": d.round(), "min": dmin.round(), "max": dmax.round()},
             "damagePerHit": self.damage_per_hit().round(),
@@ -721,6 +722,7 @@ fn a_summary_reports_median_and_spread_over_seeds() {
     assert!(min <= median && median <= max);
     let json = summary.to_json();
     assert_eq!(json["runs"], 3);
+    assert!(json["deaths"].as_u64().unwrap() <= json["failures"].as_u64().unwrap());
     assert_eq!(json["class"], "mage");
     assert!(json["seconds"]["median"].as_f64().unwrap() > 0.);
 }

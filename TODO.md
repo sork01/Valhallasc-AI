@@ -325,7 +325,7 @@ Measure how long it takes to kill a monster of the character's own level, every 
 
 ### First measurements (2026-10-15): what they show and how to fix it
 
-Source: `docs/consumable-audit.md` (potions, damage, income) and the kill-time harness (`bash scripts/ttk.sh`, 300 fights, three seeds, no consumables). The target for the middle bands is a normal-gear character killing its same-level ordinary monster in about 30 s without dropping under 20% HP (`docs/ttk-rules.md`). These numbers are the starting point for `TTK-RUN`, not a replacement for it: it must repeat them with nine seeds and every class.
+Reading the reports: a case that did not kill shows the cap (120 s) as its time, whether the character died or ran out of time; the `deaths` field counts the deaths. Source: `docs/consumable-audit.md` (potions, damage, income) and the kill-time harness (`bash scripts/ttk.sh`, 300 fights, three seeds, no consumables). The target for the middle bands is a normal-gear character killing its same-level ordinary monster in about 30 s without dropping under 20% HP (`docs/ttk-rules.md`). These numbers are the starting point for `TTK-RUN`, not a replacement for it: it must repeat them with nine seeds and every class.
 
 **What was measured**
 
