@@ -307,6 +307,10 @@ Snapshots refresh while bots are connected; with no connected bots inspection re
 
 Private worlds start Rust with `VALHALLA_TEST_COMMANDS=1`, so a bot may send `{"type":"debug","ref":1,"command":{"op":"set_level","level":20}}`. The server answers `{"type":"debug","ref":1,"ok":true,"tick":...,"result":{...}}` or `ok:false` with an error; any server without the variable answers every `debug` message with `ok:false` and changes nothing. The shortcut skips only the time it would take to reach a state: rewards, level-up events and skill unlocks, quest rules, loot, bag capacity, saves and zone filtering still run in the server (`server/src/world/debug.rs`). Operations: `set_level`, `give_xp`, `set_gold`, `set_resource` (amount), `set_hp`, `die`, `reset_stats`, `reset_cooldowns`, `set_god_mode`, `teleport`, `give_item`, `take_item`, `drop_item`, `quest` (accept, complete, claim, finish, reset), `kill_enemy`, `respawn_enemy`, `spawn_enemy` (kind, x, y, optional level: puts an enemy on the nearest free ground in your zone) and `summon_king`. `TestWorld.debug(bot, command)` sends one and resolves once the bot's own snapshot shows the effect. `start_world` accepts `startLevel`, `godMode` and `levelSpread` (0 pins enemy levels). Delayed effects (a meteor landing, projectiles in flight) need a longer `settleMs` on `cast_skill`. The `shortcuts` scenario exercises the lot against a real server.
 
+### Game master invisibility (rules settled, not yet implemented)
+
+The rules are in [docs/gm-invisibility.md](docs/gm-invisibility.md). The GM character will be hidden from other players and ignored by monsters: `/vis`, `/vis on|off|toggle`, `/show` (visible) and `/hide` (hidden). The default is **hidden on every login and every zone change**; the state is not saved, carries into private dungeon copies and is refused in arena matches.
+
 ## Checks
 
 ```sh

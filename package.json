@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "npm run test:gear-generator && npm run test:driver && npm run test:scenarios && npm run test:skill-ranks && npm run test:ui",
-    "test:gear-generator": "python3 tests/gear-generator.py && python3 tests/quest-rewards.py && python3 tests/quest-backfill.py",
+    "test:gear-generator": "python3 tests/gear-generator.py && python3 tests/quest-rewards.py && python3 tests/quest-backfill.py && python3 scripts/chest_zones.py --check && python3 scripts/weather_zones.py --check",
     "test:driver": "node --test tests/test-driver.cjs",
     "test:skill-ranks": "node tests/skill-ranks.cjs",
     "test:scenarios": "node scripts/test-via-mcp.cjs run all",
