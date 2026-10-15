@@ -47,6 +47,12 @@ impl World {
             .filter(|p| p.merc.is_none() && p.ambient.is_none())
             .count()
     }
+    pub(super) fn visible_humans_online(&self) -> usize {
+        self.players
+            .values()
+            .filter(|p| p.merc.is_none() && p.ambient.is_none() && !p.is_hidden())
+            .count()
+    }
     pub(super) fn session_of(&self, character: &str) -> Option<u64> {
         self.players
             .iter()

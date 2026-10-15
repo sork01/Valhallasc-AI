@@ -1,6 +1,6 @@
 # Purple set-piece drops
 
-These settle `DROP-EPIC-RULES` in [TODO.md](../TODO.md). `DROP-EPIC-SERVER` implements the roll, `DROP-EPIC-UI` shows it and `DROP-EPIC-CHECK` verifies it.
+These settle `DROP-EPIC-RULES` in [TODO.md](../TODO.md). The server and UI now use the per-copy rarity. The broader `DROP-EPIC-CHECK` remains for statistical and set-tier validation.
 
 ## The roll
 
@@ -23,7 +23,7 @@ Stat curve of the copy (the same ladder the catalog's own purple pieces use):
 | `rolled_stats` | the **second** fixed stat that `items.rs` expects of purple gear (`blue_and_purple_attribute_bonuses_are_fixed_useful_and_save_with_gear` wants exactly two) |
 | `rank` | 0 |
 
-The second stat is chosen without randomness, from the piece's own useful-stat list (the same lists the test uses): the first entry that the blue piece does not already have and that is not capped. Value is the piece's own ladder value (for example 30 at level 40). Caps hold: accuracy never exceeds 20 and dexterity never exceeds 70, so a capped entry is skipped to the next. The result is stored in `rolled_stats`, which `effective_bonus_stats` already adds to `bonus_stats`, so refinement and tooltips need no change.
+The second stat is chosen without randomness, from the piece's own useful-stat list (the same lists the test uses): the first entry that the blue piece does not already have and that is not capped. Value is the piece's own ladder value (for example 30 at level 40). Caps hold: accuracy never exceeds 20 and dexterity never exceeds 70, so a capped entry is skipped to the next. The result is stored in `rolled_stats`, which `effective_bonus_stats` already adds to `bonus_stats`. Refinement uses that sum, and tooltips show it.
 
 Class lists, in order: warrior strength, stamina, agility, accuracy, dexterity; mage and priest intellect, stamina, agility, accuracy, dexterity; assassin and hunter agility, stamina, strength, accuracy, dexterity; class-independent pieces stamina, accuracy, dexterity (stamina, strength, agility from level 75).
 

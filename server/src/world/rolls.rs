@@ -19,7 +19,15 @@ pub const SHARE_RANGE: f64 = 60.;
 
 /// What a pickup paid: (who, where they stand, gold, item, quantity, name of the member who picked the pile up
 /// when it was somebody else).
-pub(super) type Reward = (String, Point, u32, Option<String>, u32, Option<String>);
+pub(super) type Reward = (
+    String,
+    Point,
+    u32,
+    Option<String>,
+    u32,
+    Option<String>,
+    Option<String>,
+);
 
 pub(super) struct Roll {
     id: u64,
@@ -115,14 +123,25 @@ impl World {
         let group = self.loot_group(owner, zone, point);
         if group.len() < 2 {
             self.item_drop(owner, zone, point, item_id, 1);
+            if let Some(d) = self.drops.last_mut()
+                && let Some(copy) = &gear
+            {
+                d.col = rarity_color(&copy.rarity);
+            }
             self.drops.last_mut().unwrap().gear = gear;
             return;
         }
-        let rarity = item(item_id).map_or("common", |i| i.rarity.as_str());
+        let rarity = gear.as_ref().map_or_else(
+            || item(item_id).map_or("common", |i| i.rarity.as_str()),
+            |g| g.rarity.as_str(),
+        );
         if !rollable(rarity) {
             self.item_drop(owner, zone, point, item_id, 1);
             if let Some(d) = self.drops.last_mut() {
                 d.group = group;
+                if let Some(copy) = &gear {
+                    d.col = rarity_color(&copy.rarity);
+                }
                 d.gear = gear;
             }
             return;
@@ -235,7 +254,7 @@ impl World {
                 if let Some(p) = self.players.values_mut().find(|p| p.character.id == *who) {
                     p.character.gold = p.character.gold.saturating_add(share);
                 }
-                rewards.push((who.clone(), place(self, who), share, None, 0, by(who)));
+                rewards.push((who.clone(), place(self, who), share, None, 0, by(who), None));
             }
             return true;
         };
@@ -296,6 +315,10 @@ impl World {
             Some(id.clone()),
             d.quantity,
             by(&who),
+            d.gear
+                .as_ref()
+                .map(|g| g.rarity.clone())
+                .or_else(|| item(id).map(|i| i.rarity.clone())),
         ));
         true
     }
@@ -434,6 +457,9 @@ impl World {
         }
         if !keeps {
             self.item_drop(&recipient, roll.zone, roll.at, &roll.item, 1);
+            if let Some(copy) = &roll.gear {
+                self.drops.last_mut().unwrap().col = rarity_color(&copy.rarity);
+            }
             self.drops.last_mut().unwrap().gear = roll.gear;
         }
     }

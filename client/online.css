@@ -7,6 +7,9 @@
 .chat-log p { margin: .25cqw 0; overflow-wrap: anywhere; line-height: 1.35; }
 .chat-log b { color: #e9ce82; }
 .chat-log b.gm, .chat-log p.chat-gm { color: #ffd24a; text-shadow: 0 0 .5cqw #ffb30055; }
+#gm-visibility { margin-left: .55em; padding: .1em .45em; border: 1px solid #ffd24a99; border-radius: .35em; color: #ffe39a; font-size: .72em; vertical-align: middle; }
+#gm-visibility[data-hidden="true"] { background: #ffd24a26; }
+#gm-visibility[data-hidden="false"] { background: #75dcae26; border-color: #75dcae99; color: #a9f0cb; }
 .chat form { display: flex; border-top: 1px solid #a9b4dc40; }
 .chat input { min-width: 0; flex: 1; background: #0e142a; border: 0; color: white; padding: .65cqw; font: inherit; }
 .chat button { border: 0; background: #304466; color: #f1e2b0; padding: .55cqw .8cqw; font: inherit; cursor: pointer; }
@@ -431,6 +434,17 @@
 .party-frame .social-who small { display: none; }
 .party-frame .member-bar { width: 100%; height: 1cqw; }
 .loot-rolls { position: absolute; left: 50%; top: 11cqw; transform: translateX(-50%); z-index: 43; align-items: stretch; display: flex; flex-direction: column; gap: .5cqw; width: 18cqw; }
+.rare-pickup { --rare-col: #4ad66d; position: absolute; left: 50%; top: 23%; transform: translateX(-50%); z-index: 62; pointer-events: none; display: grid; gap: .25cqw; min-width: 25cqw; max-width: 70%; padding: .9cqw 2.4cqw; border: 2px solid var(--rare-col); border-radius: .8cqw; background: #10152eec; box-shadow: 0 0 1cqw var(--rare-col); color: var(--rare-col); text-align: center; }
+.rare-pickup b { font: max(18px, 2cqw) 'Lilita One', 'Jua', sans-serif; text-shadow: 0 0 .7cqw var(--rare-col); }
+.rare-pickup span { color: #fff7e8; font: max(14px, 1.3cqw) 'Jua', sans-serif; }
+.rare-pickup[data-rarity="rare"] { --rare-col: #64b5ff; box-shadow: 0 0 1.7cqw var(--rare-col); }
+.rare-pickup[data-rarity="epic"] { --rare-col: #b45cff; box-shadow: 0 0 2.5cqw var(--rare-col), inset 0 0 1cqw #b45cff66; }
+.rare-pickup[data-rarity="legendary"] { --rare-col: #ff9a2e; border-width: 3px; box-shadow: 0 0 3.5cqw var(--rare-col), inset 0 0 1.8cqw #ff9a2e77; }
+.rare-pickup.show { animation: rare-pickup-in .5s cubic-bezier(.15,1.5,.3,1) both; }
+.rare-pickup[data-rarity="legendary"].show { animation: rare-pickup-in .7s cubic-bezier(.15,1.6,.3,1) both, rare-pickup-glow 1.2s ease-in-out 3 alternate; }
+@keyframes rare-pickup-in { from { opacity: 0; transform: translateX(-50%) scale(.5); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
+@keyframes rare-pickup-glow { to { filter: brightness(1.45); } }
+@media (prefers-reduced-motion: reduce) { .rare-pickup.show, .rare-pickup[data-rarity="legendary"].show { animation: none; } }
 .roll-card { padding: .6cqw .8cqw; border: 1px solid #d9c492aa; border-radius: .6cqw; background: #1b2530f2; color: #f6ead0; font: .95cqw 'Jua', sans-serif; box-shadow: 0 .4cqw 1.2cqw #0009; }
 .roll-card[data-rarity="rare"] { border-color: #4aa3ffb0; }
 .roll-card[data-rarity="epic"] { border-color: #b45cffb0; }
@@ -460,11 +474,13 @@
 /* ---------- settings panel and Edit UI ---------- */
 #settings-panel { z-index: 40; }
 .world-clock { margin: .15cqw 0 .2cqw; color: #fff0ba; font: bold max(12px, .9cqw) 'Jua', sans-serif; text-align: center; text-shadow: 0 1px 4px #07152c; }
+.world-weather { margin: 0 0 .2cqw; color: #d9edff; font: bold max(11px, .8cqw) 'Jua', sans-serif; text-align: center; text-shadow: 0 1px 4px #07152c; }
 .settings-panel { text-align: left; min-width: 34cqw; }
 .settings-panel h3 { text-align: center; }
 .setting-row { display: grid; grid-template-columns: 11cqw 1fr 4cqw; align-items: center; gap: 1cqw; font-size: clamp(13px, 1.5cqw, 24px); }
 .setting-row output { text-align: right; color: var(--gold); font-variant-numeric: tabular-nums; }
 .setting-row input[type="range"] { width: 100%; min-width: 0; accent-color: var(--gold); cursor: pointer; }
+.setting-row select { grid-column: 2 / 4; width: 100%; padding: .3cqw; color: #fff; background: #18253e; border: 1px solid #bca16a; border-radius: .4cqw; font: inherit; }
 .setting-check { display: flex; align-items: center; gap: .8cqw; font-size: clamp(13px, 1.5cqw, 24px); cursor: pointer; }
 .setting-check input { width: 1.6cqw; height: 1.6cqw; min-width: 16px; min-height: 16px; accent-color: var(--gold); }
 .setting-check kbd { font: .9em 'Jua', sans-serif; color: #aab9cc; }

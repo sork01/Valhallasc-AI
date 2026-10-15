@@ -61,7 +61,11 @@ fn cathedral_three_wings_have_exact_levels_four_unique_bosses_and_distinct_floor
     assert_eq!(bosses.len(), 12);
     assert_ne!(raw["zones"][9]["rooms"], raw["zones"][10]["rooms"]);
     assert_ne!(raw["zones"][10]["rooms"], raw["zones"][11]["rooms"]);
-    assert_eq!(w.maps.iter().filter(|m| m.template.is_none()).count(), 21);
+    assert_eq!(
+        w.maps.iter().filter(|m| m.template.is_none()).count(),
+        raw["zones"].as_array().unwrap().len(),
+        "the base map plus every zone of the file but the arena"
+    );
 }
 
 #[test]
@@ -250,7 +254,12 @@ fn cathedral_encounters_have_materials_fixed_levels_distinct_profiles_and_guaran
             assert_eq!(s.xp, enemy_xp(s.level) * if e.boss { 12 } else { 1 });
             assert!(s.gold >= 850);
         }
-        if e.boss {
+        // Later dungeons share this enemy table with their own sets; only the Cathedral's wings are checked here.
+        if e.boss
+            && e.loot_source
+                .as_deref()
+                .is_some_and(|s| s.starts_with("cathedral_"))
+        {
             for slots in boss_slots(&e.kind) {
                 for n in 0..20 {
                     let i = boss_piece_for(&e.kind, slots, n as f64 / 20.).unwrap();

@@ -2,11 +2,11 @@
 (() => {
   // ---------- tiny persistent state ----------
   const KEY = 'valhallasc.save.v1';
-  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : 'en', sound: true, musicVol: 1, sfxVol: 1, night: 1, ui: {}, char: null, draft: null };
+  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, musicVol: 1, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, ui: {}, char: null, draft: null };
   let save = { ...defaults };
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
   const vol = v => Number.isFinite(+v) ? Math.max(0, Math.min(1, +v)) : 1;
-  save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol); save.night = vol(save.night);
+  save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol); save.night = vol(save.night); save.weather = vol(save.weather); save.weatherAudio = vol(save.weatherAudio);
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) { /* ignore */ } };
 
   // ---------- text ----------
@@ -86,7 +86,10 @@
       health: '체력', attack: '공격', defense: '방어', speed: '속도',
     },
   };
-  const t = k => (T[save.lang] || T.en)[k];
+  const t = k => {
+    const value = (T[save.lang] || T.en)[k];
+    return save.lang === 'sv' ? (Array.isArray(value) ? value.map(window.Locale.translate) : window.Locale.translate(value)) : value;
+  };
   const applyI18n = () => {
     document.documentElement.lang = save.lang;
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
@@ -128,12 +131,60 @@
     return sfxGain;
   }
 
+  // Two quiet filtered noise beds share the effects bus. They are created only after a user
+  // gesture has unlocked audio, then faded to zero inside or when weather clears.
+  let weatherSound = null, nextThunder = 0;
+  function ensureWeatherSound() {
+    if (weatherSound || !ac || ac.state !== 'running') return;
+    const c = ac, buffer = c.createBuffer(1, c.sampleRate * 2, c.sampleRate);
+    const samples = buffer.getChannelData(0);
+    for (let i = 0; i < samples.length; i++) samples[i] = Math.random() * 2 - 1;
+    const bus = c.createGain(); bus.gain.value = 0; bus.connect(sfxOut(c));
+    const make = (frequency, type) => {
+      const source = c.createBufferSource(), filter = c.createBiquadFilter(), gain = c.createGain();
+      source.buffer = buffer; source.loop = true; filter.type = type; filter.frequency.value = frequency;
+      gain.gain.value = 0; source.connect(filter).connect(gain).connect(bus); source.start();
+      return gain;
+    };
+    weatherSound = {bus,rain:make(1750,'lowpass'),wind:make(310,'bandpass')};
+  }
+  function weatherThunder(c, amount) {
+    const source = c.createBufferSource(), filter = c.createBiquadFilter(), gain = c.createGain();
+    const buffer = c.createBuffer(1, Math.round(c.sampleRate * 2.8), c.sampleRate), samples = buffer.getChannelData(0);
+    for(let i=0;i<samples.length;i++) samples[i]=(Math.random()*2-1)*(1-i/samples.length);
+    source.buffer=buffer;filter.type='lowpass';filter.frequency.value=240;
+    const now=c.currentTime;gain.gain.setValueAtTime(.0001,now);
+    gain.gain.exponentialRampToValueAtTime(amount,now+.12);
+    gain.gain.exponentialRampToValueAtTime(.0001,now+2.8);
+    source.connect(filter).connect(gain).connect(weatherSound.bus);source.start(now);source.stop(now+2.8);
+  }
+  function updateWeatherSound() {
+    if (!ac || ac.state !== 'running') return;
+    ensureWeatherSound(); if (!weatherSound) return;
+    const state = window.Weather?.state, audible = scene === 'game' && save.sound && state && !state.inside;
+    const type = audible ? state.type : 'clear';
+    const level = .06;
+    const rain = (type === 'rain' || type === 'thunderstorm') ? level : 0;
+    const wind = (type === 'wind' || type === 'sandstorm') ? level * .75 : 0;
+    const volume = audible ? taper(save.weatherAudio) * (save.musicVol > 0 ? .55 : 1) : 0;
+    const now = ac.currentTime;
+    for (const [gain,target] of [[weatherSound.bus,volume],[weatherSound.rain,rain],[weatherSound.wind,wind]]) {
+      gain.gain.cancelScheduledValues(now);gain.gain.setTargetAtTime(target,now,.45);
+    }
+    if (type === 'thunderstorm' && volume > 0 && now >= nextThunder) {
+      weatherThunder(ac,level*.8);nextThunder=now+13.7;
+    }
+  }
+  setInterval(updateWeatherSound, 250);
+  window.WeatherAudio = {get active(){return !!weatherSound;},get levels(){return weatherSound ? [weatherSound.rain.gain.value*weatherSound.bus.gain.value,weatherSound.wind.gain.value*weatherSound.bus.gain.value] : [0,0];}};
+
   // ---------- background music (music.js) ----------
   // Browsers only let audio start after a tap or key press, so the score begins on the first one
   // (on the title screen that is the tap that awakens the horn) and then plays on every screen.
   let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, wmusic = null, kmusic = null, dmusic = null, nmusic = null, amusic = null, pmusic = null, omusic = null, mmusic = null, hmusic = null, tmusic = null, qmusic = null, jmusic = null, whmusic = null, lmusic = null, fwMusic = null, cairnMusic = null, yearMusic = null, cathedralMusic = [], eyeMusic = null, elderMusic = null, pavilionMusic = null, rainMusic = null, seedMusic = null, sunkenMusic = null, thunderMusic = null, bloomMusic = null, solarMusic = null, amberMusic = null, solsticeMusic = null, musicZone = 0;
   function ensureMusic() {
     const c = audio(); if (!c || !window.createMusic) return;
+    ensureWeatherSound();
     if (!music) { music = window.createMusic(c); c.addEventListener('statechange', ensureMusic); }
     if (!fmusic && window.createFieldMusic) fmusic = window.createFieldMusic(c);
     if (!cmusic && window.createCragMusic) cmusic = window.createCragMusic(c);
@@ -511,7 +562,7 @@
     const resource = $('resource-bar'), kind = s.resourceType || 'rage', current = s.resource || 0, max = s.maxResource || 100;
     resource.dataset.type = kind; resource.setAttribute('aria-label', kind[0].toUpperCase() + kind.slice(1));
     resource.setAttribute('aria-valuenow', Math.floor(current)); resource.setAttribute('aria-valuemax', max);
-    resource.title = kind === 'energy' ? 'Energy · regenerates 10 per second, including in combat' : kind === 'rage' ? 'Rage · gained by dealing and taking damage, fades outside combat' : 'Mana · regenerates outside combat · food and mana potions restore it';
+    resource.title = kind === 'energy' ? 'Energy · regenerates 10 per second, including in combat · food and resource potions restore it' : kind === 'rage' ? 'Rage · gained by dealing and taking damage, fades outside combat · food and resource potions restore it' : 'Mana · regenerates outside combat · food and mana potions restore it';
     $('resource-fill').style.width = (current / max * 100).toFixed(1) + '%';
     $('resource-text').textContent = `${kind[0].toUpperCase() + kind.slice(1)} ${Math.floor(current)} / ${max}`;
     hud.xp.style.width = (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.lv.textContent = ` ${t('lvl')} ${s.level}`; window.Quests?.setLevel(s.level);
@@ -626,10 +677,26 @@
   };
   function onField(name, data) {
     if (SFX[name]) SFX[name](data);
+    if (name === 'rarePickup') rarePickup(data);
     if (name === 'levelup') levelBanner(data);
     if (name === 'spriteError') showToast(t((save.char?.class || 'mage') + 'Error'));
     if (name === 'death') $('dead-msg').hidden = false;
     if (name === 'respawn') $('dead-msg').hidden = true;
+  }
+  const rarePickupBox = $('rare-pickup');
+  let rarePickupTimer = 0;
+  function rarePickup(event) {
+    const item = WORLD_ITEMS.find(i => i.id === event?.item);
+    const rarity = event?.rarity || item?.rarity;
+    const labels = { uncommon: 'green', rare: 'blue', epic: 'purple', legendary: 'orange' };
+    if (!labels[rarity]) return;
+    rarePickupBox.dataset.rarity = rarity;
+    rarePickupBox.querySelector('b').textContent = `You picked up a ${labels[rarity]} item!`;
+    rarePickupBox.querySelector('span').textContent = event.name || item?.name || '';
+    rarePickupBox.hidden = false;
+    restart(rarePickupBox, 'show');
+    clearTimeout(rarePickupTimer);
+    rarePickupTimer = setTimeout(() => { rarePickupBox.hidden = true; rarePickupBox.classList.remove('show'); }, rarity === 'legendary' ? 4800 : 3200);
   }
   function enterGame() {
     const c = save.char || cfg, p = $('hud-portrait');
@@ -908,14 +975,22 @@
   }
   // Preferences shared with settings.js (volumes and the HUD layout); it never touches localStorage itself.
   window.Prefs = {
+    get lang() { return save.lang; },
     get music() { return save.musicVol; }, get sfx() { return save.sfxVol; }, get sound() { return save.sound; },
     get night() { return save.night; },
+    get weather() { return save.weather; },
+    get weatherAudio() { return save.weatherAudio; },
     get layout() { return save.ui && typeof save.ui === 'object' ? save.ui : {}; },
     set(patch) {
+      if ('lang' in patch && ['en', 'sv', 'ko'].includes(patch.lang) && patch.lang !== save.lang) {
+        save.lang = patch.lang; persist(); location.reload(); return;
+      }
       if ('musicVol' in patch) save.musicVol = vol(patch.musicVol);
       if ('sfxVol' in patch) save.sfxVol = vol(patch.sfxVol);
       if ('sound' in patch) save.sound = !!patch.sound;
       if ('night' in patch) save.night = vol(patch.night);
+      if ('weather' in patch) save.weather = vol(patch.weather);
+      if ('weatherAudio' in patch) save.weatherAudio = vol(patch.weatherAudio);
       if ('ui' in patch) save.ui = patch.ui;
       persist(); applyMusicLevel(.4);
       if (sfxGain) sfxGain.gain.value = taper(save.sfxVol);

@@ -25,6 +25,7 @@
     $('network-status').dataset.state = ready ? 'online' : 'offline';
   }
   function log(text, name, channel) {
+    if (!name) text = window.Locale?.translate(text) || text;
     const line = document.createElement('p');
     if (channel) line.className = 'chat-' + channel;
     if (name) { const label = document.createElement('b'); label.textContent = name + ': '; if (name.startsWith('[GM]')) label.className = 'gm'; line.append(label); }

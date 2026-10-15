@@ -5,3 +5,9 @@ resolver = "2"
 [profile.release]
 lto = "thin"
 strip = true
+
+# The tests simulate the whole world tick by tick; unoptimised that is several times slower (a tick takes about 100 ms
+# against 30 ms) and the dungeon suites run for tens of minutes. Debug info is kept to line tables for readable panics.
+[profile.test]
+opt-level = 2
+debug = "line-tables-only"

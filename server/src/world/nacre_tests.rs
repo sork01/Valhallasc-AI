@@ -35,7 +35,8 @@ fn nacre_city_is_large_safe_and_has_120_distinct_addressed_homes() {
     assert_eq!(names.len(), 120);
     assert_eq!(m.npcs.len(), 30);
     assert_eq!(m.quests.len(), 12);
-    assert_eq!(w.maps.len(), 49);
+    // Every dungeon added since keeps its copies after the file zones, so the count only grows.
+    assert!(w.maps.len() >= 49, "{} maps", w.maps.len());
     assert_eq!(w.maps.iter().find_map(|m| m.template), Some(5));
 }
 

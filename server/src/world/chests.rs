@@ -491,7 +491,11 @@ impl World {
         );
         self.chests.list.remove(at);
         self.chests.finish(id, true);
-        self.chest_say(zone, &format!("{name} opened the treasure chest."));
+        if self.hidden_actor(&owner) {
+            self.chest_say(zone, "A treasure chest was opened.");
+        } else {
+            self.chest_say(zone, &format!("{name} opened the treasure chest."));
+        }
         self.emit_zone(
             zone,
             json!({"type":"event","kind":"chestOpen","actor":owner,"x":point.x,"y":point.y,"value":0,"crit":false}),
@@ -527,9 +531,42 @@ impl World {
             let boss = self.maps[zone].final_boss.clone();
             let choice = self.random();
             if let Some(piece) = boss_piece_for(&boss, &CHEST_SET_SLOTS, choice) {
-                self.loot_drop(owner, zone, point, &piece.id);
+                self.set_piece_drop(owner, zone, point, piece);
             }
         }
+    }
+    /// `spawn_chest` op of the test shortcuts: a chest next to the player (or on a placed tile) for browser checks.
+    pub(super) fn debug_spawn_chest(
+        &mut self,
+        session: u64,
+        distance: Option<f64>,
+    ) -> Result<Value, String> {
+        let p = self.players.get(&session).ok_or("Unknown session.")?;
+        let (zone, here, face) = (p.character.zone, p.character.point(), p.face);
+        let at = match distance {
+            Some(d) if d.is_finite() && (0.5..=30.).contains(&d) => {
+                let mut at = Point {
+                    x: here.x + face.x * d,
+                    y: here.y + face.y * d,
+                };
+                self.maps[zone].collide(&mut at, PLAYER_RADIUS);
+                at
+            }
+            Some(_) => return Err("distance must be between 0.5 and 30 tiles.".into()),
+            None => self
+                .chest_spot(zone)
+                .ok_or("No free tile for a chest in this zone.")?,
+        };
+        let id = self.entity();
+        self.chests.list.push(Chest {
+            id,
+            zone,
+            x: at.x,
+            y: at.y,
+            left: CHEST_LIFETIME,
+            told: vec![],
+        });
+        Ok(json!({"id": id, "x": at.x, "y": at.y, "left": CHEST_LIFETIME}))
     }
     /// A dungeon copy closed or reset: its chests vanish without a message and its timer starts over.
     pub(super) fn clear_chests(&mut self, zone: usize) {
@@ -834,6 +871,35 @@ mod tests {
                 .iter()
                 .all(|d| (d.x - c.x).abs() < 1e-9 && (d.y - c.y).abs() < 1e-9)
         );
+        let chest_items: std::collections::BTreeSet<String> =
+            w.drops.iter().filter_map(|d| d.item.clone()).collect();
+        let filler: Vec<String> = ITEMS
+            .iter()
+            .filter(|i| i.kind != "bag" && !chest_items.contains(&i.id))
+            .map(|i| i.id.clone())
+            .take(w.players[&1].character.bag_capacity())
+            .collect();
+        let hero = &mut w.players.get_mut(&1).unwrap().character;
+        for id in filler {
+            if hero.bag_used() < hero.bag_capacity() {
+                hero.add_item(&id, 1);
+            }
+        }
+        assert_eq!(hero.bag_used(), hero.bag_capacity());
+        let before = w.drops.iter().filter(|d| d.item.is_some()).count();
+        for drop in &mut w.drops {
+            drop.t = 1.;
+        }
+        w.update_drops();
+        assert_eq!(
+            w.drops.iter().filter(|d| d.item.is_some()).count(),
+            before,
+            "full bags keep the chest items on the ground"
+        );
+        assert!(
+            w.players[&1].character.gold > 0,
+            "the gold is still collected"
+        );
     }
 
     #[test]
@@ -906,5 +972,125 @@ mod tests {
                 .unwrap()
                 .is_empty()
         );
+    }
+
+    #[test]
+    fn dungeon_copies_keep_chests_and_announcements_private() {
+        let mut w = world();
+        calm(&mut w);
+        let copies: Vec<usize> = w
+            .instances
+            .iter()
+            .filter(|i| i.template == 5)
+            .map(|i| i.zone)
+            .take(2)
+            .collect();
+        assert_eq!(copies.len(), 2);
+        let mut first = join(&mut w, 1, Class::Warrior);
+        let mut second = join(&mut w, 2, Class::Mage);
+        for (session, zone) in [(1, copies[0]), (2, copies[1])] {
+            let arrival = w.maps[zone].spawn;
+            place(&mut w, session, zone, arrival);
+            w.enter_instance(zone);
+        }
+        assert!(w.spawn_chest(copies[0]));
+        w.step();
+        let first_text = drain(&mut first);
+        let second_text = drain(&mut second);
+        assert!(first_text.iter().any(|v| {
+            v["text"]
+                .as_str()
+                .is_some_and(|t| t.contains("treasure chest has appeared"))
+        }));
+        assert!(!second_text.iter().any(|v| {
+            v["text"]
+                .as_str()
+                .is_some_and(|t| t.contains("treasure chest has appeared"))
+        }));
+        assert_eq!(
+            w.snapshot_for(copies[0])["chests"]
+                .as_array()
+                .unwrap()
+                .len(),
+            1
+        );
+        assert!(
+            w.snapshot_for(copies[1])["chests"]
+                .as_array()
+                .unwrap()
+                .is_empty()
+        );
+        let id = w.chests.list[0].id;
+        w.open_chest(2, id);
+        assert!(
+            drain(&mut second)
+                .iter()
+                .any(|v| v["text"] == "There is no such chest.")
+        );
+        assert_eq!(w.chests.list[0].id, id);
+        let at = at(w.chests.list[0].x, w.chests.list[0].y);
+        place(&mut w, 1, copies[0], at);
+        w.open_chest(1, id);
+        assert!(w.chests.list.is_empty());
+        assert!(drain(&mut first).iter().any(|v| {
+            v["text"]
+                .as_str()
+                .is_some_and(|t| t.contains("opened the treasure chest"))
+        }));
+        assert!(!drain(&mut second).iter().any(|v| {
+            v["text"]
+                .as_str()
+                .is_some_and(|t| t.contains("opened the treasure chest"))
+        }));
+    }
+
+    #[test]
+    fn chest_survives_an_outdoor_reconnect_and_party_shares_its_pile() {
+        let mut w = world();
+        calm(&mut w);
+        let (tx, mut first) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        let id = welcome["id"].as_str().unwrap().to_owned();
+        let mut second = join(&mut w, 2, Class::Mage);
+        let mate = w.players[&2].character.id.clone();
+        place(&mut w, 1, 0, at(60., 60.));
+        place(&mut w, 2, 0, at(61., 60.));
+        w.social(
+            1,
+            SocialCommand::PartyInvite {
+                id: Some(mate.clone()),
+                name: None,
+            },
+        );
+        w.social(2, SocialCommand::PartyAccept { id: id.clone() });
+        assert_eq!(w.party_mates(&id).len(), 2);
+        assert!(w.spawn_chest(0));
+        let chest = w.chests.list[0].clone();
+        w.leave(1);
+        let (tx, mut resumed) = mpsc::channel(256);
+        let resume = w.join(3, Some(token), None, tx).unwrap();
+        assert_eq!(resume["id"], id);
+        assert_eq!(resume["snapshot"]["chests"][0]["id"], chest.id);
+        w.step();
+        assert!(drain(&mut resumed).iter().any(|v| {
+            v["text"]
+                .as_str()
+                .is_some_and(|t| t.contains("treasure chest has appeared"))
+        }));
+        place(&mut w, 3, 0, at(chest.x, chest.y));
+        place(&mut w, 2, 0, at(chest.x + 1., chest.y));
+        w.open_chest(3, chest.id);
+        assert!(
+            w.drops
+                .iter()
+                .any(|d| d.group.contains(&id) && d.group.contains(&mate))
+        );
+        assert!(drain(&mut second).iter().any(|v| {
+            v["text"]
+                .as_str()
+                .is_some_and(|t| t.contains("opened the treasure chest"))
+        }));
+        let _ = drain(&mut first);
     }
 }

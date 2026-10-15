@@ -290,8 +290,13 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         );
     }
     // the dungeon copies come after every file zone
-    assert_eq!(w.maps.len(), 49);
-    assert!(w.maps[26].template.is_some());
+    // Every dungeon added since keeps its copies after the file zones, so the count only grows.
+    assert!(w.maps.len() >= 49, "{} maps", w.maps.len());
+    let first_copy = w.maps.iter().position(|m| m.template.is_some()).unwrap();
+    assert!(
+        first_copy > 26 && w.maps[first_copy..].iter().all(|m| m.template.is_some()),
+        "every copy follows the last file zone"
+    );
 }
 
 // ---- the Net ------------------------------------------------------------------------------------------------------------------

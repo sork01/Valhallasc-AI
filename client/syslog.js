@@ -44,7 +44,7 @@
       case 'respawn': return [['You return to life.', 'sys-heal']];
       case 'skill': return [[`You cast ${skillName(e.skill)}.`, 'sys-skill'], ...(e.heal > 0 ? [[`${skillName(e.skill)} heals you for ${e.heal}.`, 'sys-heal']] : [])];
       case 'healed': return e.value > 0 ? [[e.from === me ? `You heal yourself for ${e.value}.` : `${playerName(e.from)} heals you for ${e.value}.`, 'sys-heal']] : [];
-      case 'consume': return [[`You use ${itemName(e.item)}${e.value > 0 ? `: +${e.value} health` : ''}${e.mana > 0 ? `${e.value > 0 ? ',' : ':'} +${e.mana} mana` : ''}.`, 'sys-heal']];
+      case 'consume': return [[`You use ${itemName(e.item)}${e.value > 0 ? `: +${e.value} health` : ''}${e.mana > 0 ? `${e.value > 0 ? ',' : ':'} +${e.mana} ${e.resourceType || 'mana'}` : ''}.`, 'sys-heal']];
       case 'itemPickup': { const bag=(window.WORLD_ITEMS||[]).find(i=>i.id===e.item&&i.kind==='bag');return [[bag?`You fit ${bag.name}: +${bag.bagSlots} bag slots.`:`You pick up ${e.quantity > 1 ? e.quantity + ' × ' : ''}${e.name || itemName(e.item)}.`, 'sys-loot']]; }
       case 'shotBlocked': return [['Your shot hits a wall.', 'sys-dealt']];
       case 'pickup': return [[`You pick up ${e.value} gold.`, 'sys-loot']];

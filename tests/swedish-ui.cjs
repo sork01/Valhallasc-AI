@@ -1,0 +1,45 @@
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const {chromium} = require('./lib/playwright.cjs');
+const {Client} = require('@modelcontextprotocol/sdk/client/index.js');
+const {StdioClientTransport,getDefaultEnvironment} = require('@modelcontextprotocol/sdk/client/stdio.js');
+
+const root=path.resolve(__dirname,'..'),client=new Client({name:'valhallasc-swedish-ui',version:'1.0.0'});
+let browser,started=false,checks=0;
+const check=(value,label)=>{assert.ok(value,label);checks++;};
+async function call(name,args={}){const reply=await client.callTool({name,arguments:args});assert.ok(!reply.isError,`${name}: ${JSON.stringify(reply.content)}`);return reply.structuredContent;}
+(async()=>{
+  await client.connect(new StdioClientTransport({command:process.execPath,args:[path.join(root,'scripts/test-mcp.cjs')],cwd:root,stderr:'pipe',env:{...getDefaultEnvironment()}}));
+  const world=await call('start_world');started=true;
+  browser=await chromium.launch({headless:true});
+  const page=await browser.newPage({viewport:{width:1280,height:800},reducedMotion:'reduce'});
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.addInitScript(()=>{if(!localStorage.getItem('valhallasc.save.v1'))localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false}));});
+  await page.goto(world.url);await page.locator('#start').click();await page.locator('#login-guest').click();
+  await page.locator('#name').fill('Spraktestare');await page.locator('#go').click({timeout:60000});
+  await page.waitForFunction(()=>Online.connected,null,{timeout:60000});
+  await page.keyboard.press('Escape');await page.locator('#p-settings').click();
+  check(await page.locator('#set-language').inputValue()==='en','English is the starting language');
+  await page.locator('#set-language').selectOption('sv');
+  await page.waitForFunction(()=>document.documentElement.lang==='sv' && !!window.Locale && !!window.Prefs,null,{timeout:30000});
+  check(!errors.length,`Swedish page initializes: ${errors.join('; ')}`);
+  check(await page.evaluate(()=>JSON.parse(localStorage.getItem('valhallasc.save.v1')).lang)==='sv','Swedish persists through reload');
+  check(await page.locator('#start').isVisible(),'title remains usable in Swedish');
+  check(await page.evaluate(()=>WORLD_ITEMS.find(i=>i.id==='slime_gel').name)==='Slemgelé','item catalog uses Swedish names');
+  check(await page.evaluate(()=>WORLD_SKILLS.find(s=>s.id==='cleave').name)!=='Cleave','skill catalog uses Swedish names');
+  check(await page.evaluate(()=>WORLD_MAP.quests[0].title)!=='A Home in Alderhaven','quest catalog uses Swedish titles');
+  check(await page.evaluate(()=>WORLD_MAP.npcs[0].dialogue.startsWith('Alderhaven needs'))===false,'NPC dialogue is translated');
+  check(await page.evaluate(()=>Locale.translate('You cannot train stats while defeated.'))!=='You cannot train stats while defeated.','server refusal text is translated');
+  check(await page.evaluate(()=>Locale.translate('Your purse: 12 gold'))==='Din börs: 12 guld','dynamic gold text uses Swedish grammar');
+  check(await page.evaluate(()=>Locale.translate('You and Wren are now friends.'))==='Du och Wren är nu vänner.','dynamic server notice keeps the player name');
+  await page.locator('#start').click();await page.locator('#login-guest').click();
+  await page.waitForFunction(()=>Online.connected,null,{timeout:60000});
+  await page.keyboard.press('Escape');await page.locator('#p-settings').click();
+  check(await page.locator('#set-language').inputValue()==='sv','language selector restores Swedish');
+  check(await page.locator('#settings-title').textContent()==='Inställningar','settings menu is Swedish');
+  await page.locator('#set-language').selectOption('en');
+  await page.waitForFunction(()=>document.documentElement.lang==='en' && !!window.Prefs,null,{timeout:30000});
+  check(await page.evaluate(()=>WORLD_ITEMS.find(i=>i.id==='slime_gel').name)==='Slime Gel','switching back restores English catalog');
+  check(!errors.length,`no browser errors: ${errors.join('; ')}`);
+  console.log(`${checks} Swedish language checks passed`);
+})().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{await browser?.close();if(started)await call('stop_world').catch(()=>{});await client.close();});

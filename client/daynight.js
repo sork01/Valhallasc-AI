@@ -35,7 +35,7 @@
     if (label === lastLabel) return;
     lastLabel = label;
     const el = document.getElementById('world-clock');
-    if (el) { el.textContent = label; el.title = `World time · ${phase(h)}${isOutdoor(zone) ? '' : ' · indoor light'} · one day every 20 minutes`; }
+    if (el) { el.textContent = label; const title = `World time · ${phase(h)}${isOutdoor(zone) ? '' : ' · indoor light'} · one day every 20 minutes`; el.title = window.Locale?.translate(title) || title; }
   }
   function glowSprite() {
     if (glow) return glow;

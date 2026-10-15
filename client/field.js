@@ -100,10 +100,11 @@
   function setZone(z) {
     zone = ZONES[z] ? z : 0; zdef = ZONES[zone];
     window.DayNight?.setZone(zdef);
+    window.Weather?.setZone(zdef);
     buildMap(); chunks.clear();
     if (mini) buildMini();
-    if (hero) { pendingNpc = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
-    floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; marker = null; slimes = []; remotePlayers.clear(); bubbles.clear();
+    if (hero) { pendingNpc = null; pendingChest = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
+    floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; marker = null; slimes = []; remotePlayers.clear(); bubbles.clear();
     instanceCleared = false; clearedAt = -99;
   }
 
@@ -688,12 +689,12 @@
   // ---------- state ----------
   let cv, ctx, mini, mctx, opts, onHud = () => {}, onEvent = () => {};
   let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null;
-  let hero, slimes, drops, floaters, parts, effects, bolts, marker, cam, shake, keys, pointer, msg, hudT, tAll;
+  let hero, slimes, drops, chests, floaters, parts, effects, bolts, marker, cam, shake, keys, pointer, msg, hudT, tAll;
   const BAG_COLORS = ['#a78257','#78996f','#6396b3','#a478b2','#c38a5e','#719ba1','#9b86c3','#be9292','#d3ae68','#dfcde7'];
   const bagColor = item => BAG_COLORS[Math.max(0, Math.min(9, Math.floor((item.requiredLevel || 1) / 10)))];
   let ebolts = [], instanceCleared = false, clearedAt = -99;   // missiles shot by ranged enemies; the dungeon's exit opens when its last boss falls
   let mageSpr = null, spriteGeneration = 0;
-  let pendingNpc = null, cityRoute = [], routeTime = 0;
+  let pendingNpc = null, pendingChest = null, cityRoute = [], routeTime = 0;
   // Speech bubbles over characters that just chatted: id -> {text, until, lines}.
   const bubbles = new Map();
   let bubblesDrawn = 0, bubblesLast = 0;
@@ -873,9 +874,9 @@
     return { x: SPAWN.x, y: SPAWN.y, r: .3, hp: 120, maxHp: 120, level: 1, xp: 0, gold: 0, kills: 0, fx: 1, fy: 1, moving: false, walk: 0, atkT: 0, atkCd: 0, atkHit: false, hurtT: 0, lastHurt: -99, dead: false, deadT: 0, target: null, goal: null, vx: 0, vy: 0, roar: 0, dashT: 0, dashCd: 0, dashX: 0, dashY: 0, dashTrail: 0 };
   }
   function reset() {
-    pendingNpc = null; cityRoute = [];
+    pendingNpc = null; pendingChest = null; cityRoute = [];
     window.Quests?.reset(); window.WorldMap?.reset(); explored = [];
-    hero = newHero(); drops = []; floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
+    hero = newHero(); drops = []; chests = []; floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
     keys = new Set(); pointer = { down: false, x: 0, y: 0 };
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
@@ -923,10 +924,12 @@
   }
   function onPointerDown(e) {
     if (!running || paused || !Online.connected || hero.dead || hero.sparkTravel) return;
-    pendingNpc = null; cityRoute = [];
+    pendingNpc = null; pendingChest = null; cityRoute = [];
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
     const npc = City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-City.nameplateTop(n) && my<y+12; });
     if (npc) { talkTo(npc); return; }
+    const chest = chests.filter(c => c.expiresAt > tAll).sort((a,b) => b.x+b.y-a.x-a.y).find(c => { const [x,y]=w2s(c.x,c.y); return Math.abs(mx-x)<=27 && my>=y-37 && my<=y+7; });
+    if (chest) { openChest(chest); return; }
     pointer.down = true; cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
     const [wx, wy] = pointerWorld(e); pointer.x = wx; pointer.y = wy;
     const s = pickSlime(mx, my, wx, wy);
@@ -940,6 +943,22 @@
     keys.clear(); pointer.down = false; hero.target = null; hero.pvpTargetId = null; hero.goal = null; cityRoute = []; emitHud();
     if (Math.hypot(hero.x-npc.x,hero.y-npc.y) <= 2.5) Online.send({type:'interact',npc:npc.id});
     else { cityRoute = routeTo(npc, true); pendingNpc = { npc, until: tAll + Math.max(20, cityRoute.length * .6) }; routeTime = 0; }
+  }
+  // Stop first, so the server's position settles inside its own reach, and ask again until the chest is gone: the
+  // client may think it is in reach a moment before the server's copy of the hero is.
+  // The walk ends 1.1 tiles from the chest on the hero's side, inside both the client's and the server's reach. The
+  // first try is a straight walk (the server slides the hero along walls); a second try, after the first stalled,
+  // follows the city route to the chest and then closes in.
+  function chestRoute(chest, careful) {
+    const route = careful ? routeTo(chest, true, hero, 1.75) : [], dx = hero.x - chest.x, dy = hero.y - chest.y, d = Math.hypot(dx, dy) || 1;
+    route.push({ x: chest.x + dx / d * 1.1, y: chest.y + dy / d * 1.1 });
+    return route;
+  }
+  function askForChest(chest) { Online.send({type:'stop'}); Online.send({type:'open_chest',id:chest.id}); }
+  function openChest(chest) {
+    keys.clear(); pointer.down = false; hero.target = null; hero.pvpTargetId = null; hero.goal = null; cityRoute = []; emitHud();
+    if (Math.hypot(hero.x-chest.x,hero.y-chest.y) <= 1.95) { askForChest(chest); pendingChest = {id:chest.id, until:tAll+4, sentAt:tAll}; }
+    else { cityRoute = chestRoute(chest, false); pendingChest = {id:chest.id, until:tAll+Math.max(20,cityRoute.length*.6)}; routeTime = 0; }
   }
   // A small grid route lets the travel button walk around real map obstacles.
   // Obstacles bucketed in 4-tile cells, rebuilt when the zone's objects change, so a route across a 160-tile city tests a handful of objects per step.
@@ -956,7 +975,7 @@
     const cx = Math.floor(x / hash.H), cy = Math.floor(y / hash.H);
     return cx >= 0 && cy >= 0 && cx < hash.w && cy < hash.w ? hash.cells[cy * hash.w + cx] : objects;
   };
-  function routeTo(goal, approach = false, origin = hero) {
+  function routeTo(goal, approach = false, origin = hero, approachRange = 2) {
     const free = (x,y) => x>=1 && y>=1 && x<MAP-1 && y<MAP-1 && nearObjects(x,y).every(o => o.width ? Math.abs(x-o.x)>o.width/2+.55 || Math.abs(y-o.y)>o.depth/2+.55 : Math.hypot(x-o.x,y-o.y)>o.r+.55);
     const segmentFree = (a, b) => {
       const steps = Math.max(1, Math.ceil(Math.hypot(a.x-b.x,a.y-b.y) / .1));
@@ -980,7 +999,7 @@
       const candidates=[];
       for(let x=Math.floor(goal.x)-2;x<=Math.ceil(goal.x)+2;x++) for(let y=Math.floor(goal.y)-2;y<=Math.ceil(goal.y)+2;y++) {
         const distance=Math.hypot(x-goal.x,y-goal.y);
-        if(distance<=2 && free(x,y))candidates.push({point:[x,y],score:distance+Math.hypot(x-origin.x,y-origin.y)*.1});
+        if(distance<=approachRange && free(x,y))candidates.push({point:[x,y],score:distance+Math.hypot(x-origin.x,y-origin.y)*.1});
       }
       candidates.sort((a,b)=>a.score-b.score);if(!candidates.length)return [];end=candidates[0].point;
     }
@@ -1057,7 +1076,8 @@
     const selectedTarget = hero.target?.id;
     const wasDead = hero.dead;
     applyActor(hero, own, initial || moved || !!hero.sparkTravel !== !!own.sparkTravel);
-    if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;hero.target=null;hero.goal=null;}
+    window.Weather?.sync(packet.weather, own.x, own.y, !!own.inside);
+    if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;pendingChest=null;hero.target=null;hero.goal=null;}
     window.Attributes?.update(own);
     window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || [], own.gearInstances || []);
     window.Quests?.setBells(own.bells || []);
@@ -1101,6 +1121,8 @@
     ebolts = (packet.ebolts || []).filter(inZone).map(b => { const old = ebolts.find(o => o.id === b.id); return old && Math.hypot(old.x - b.x, old.y - b.y) < 2.5 ? Object.assign(old, b, { x: old.x + (b.x - old.x) * .5, y: old.y + (b.y - old.y) * .5 }) : { ...b }; });
     if (packet.instance) { if (packet.instance.cleared && !instanceCleared) { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); } instanceCleared = !!packet.instance.cleared; }
     drops = packet.drops.filter(inZone);
+    chests = (packet.chests || []).filter(inZone).map(c => ({...c, expiresAt:tAll+c.left}));
+    if (pendingChest && !chests.some(c => c.id === pendingChest.id)) { pendingChest = null; cityRoute = []; }
     emitHud();
   }
   function networkEvent(event) {
@@ -1113,17 +1135,26 @@
     }
     if (event.kind === 'hurt') floater(event.x, event.y, '-' + event.value, '#ff8b9b', false);
     if (event.kind === 'miss' || event.kind === 'dodge') floater(event.x, event.y, event.kind === 'miss' ? 'Miss' : 'Dodge', '#e5e5d2', false);
-    if (event.kind === 'itemPickup') { const item=WORLD_ITEMS.find(i=>i.id===event.item); floater(event.x, event.y, item?.kind==='bag'?`${item.name} · +${item.bagSlots} slots`:`+${event.quantity} ${event.name}`, item?.kind==='bag'?bagColor(item):'#64b5ff', false); if(event.actor === Online.id) say('pickup'); }
+    if (event.kind === 'itemPickup') {
+      const item = WORLD_ITEMS.find(i => i.id === event.item), rarity = event.rarity || item?.rarity;
+      floater(event.x, event.y, item?.kind === 'bag' ? `${item.name} · +${item.bagSlots} slots` : `+${event.quantity} ${event.name}`, item?.kind === 'bag' ? bagColor(item) : '#64b5ff', false);
+      if (event.actor === Online.id) {
+        say('pickup'); say('rarePickup', event);
+        const tier = { uncommon: 1, rare: 2, epic: 3, legendary: 4 }[rarity] || 0;
+        if (tier) burst(event.x, event.y, 8 + tier * 8, 4 + tier * 5, ['#ffffff', { 1: '#4ad66d', 2: '#64b5ff', 3: '#b45cff', 4: '#ff9a2e' }[tier]]);
+      }
+    }
     if (event.kind === 'shotBlocked') spark(event.x, event.y, 7, ['#f8e5b5','#d2b990','#fff4d7'], 7, 0.6, 0.45);
     if (event.kind === 'pickup') floater(event.x, event.y, '+' + event.value + ' gold', '#ffe066', false);
     if (event.kind === 'portal') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); burst(event.x, event.y, 20, 14, ['#ffd9a0', '#ff8a3a', '#7ae8c8']); }
+    if (event.kind === 'chestOpen') { if (pendingChest) { pendingChest = null; cityRoute = []; } effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:.65,grow:1.1,col:'#ffe292'}); burst(event.x,event.y,24,18,['#ffe292','#fff6cf','#d89543'],4,5); }
     if (event.kind === 'levelup') levelUpFx(event);
     if (event.kind === 'slam') { effects.push({ kind: 'slam', x: event.x, y: event.y, r: event.value, t: 0, life: .7 }); burst(event.x, event.y, 6, 26, ['#e8dcc0', '#a9a08a', '#ffb060'], 5, 10); kick(event.value > 4 ? 14 : 9, .45); }
     if (event.kind === 'cleared') { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); burst(event.x, event.y, 20, 40, ['#d4ffc8', '#9cff8f', '#ffffff'], 6, 4); effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0, life: 1.6, grow: 2.4, col: '#9cff8f' }); }
     // Food and potions: a potion lands at once with a ring and its number; a meal shows its share every second.
     if (event.kind === 'consume') {
       spark(event.x, event.y, 14, ['#9dffb4', '#d8ffe0', '#f0d9a0'], 10, 1, .9);
-      if (event.mana > 0) floater(event.x, event.y, '+' + event.mana + ' mana', '#85baff', false);
+      if (event.mana > 0) floater(event.x, event.y, '+' + event.mana + ' ' + (event.resourceType || 'mana'), '#85baff', false);
       if (event.value > 0) { effects.push({ kind: 'skAura', x: event.x, y: event.y, core: '#d9ffe0', glow: '#3fd36a', col: '#3fd36a', a: 0, t: 0, life: 1 }); floater(event.x, event.y, '+' + event.value, '#7dff9a', true); }
     }
     // A party member healed by a priest: their own number and glow, whoever cast it.
@@ -1396,6 +1427,20 @@
           if(!end || Math.hypot(end.x-npc.x,end.y-npc.y)>2.2) {cityRoute=routeTo(npc,true);routeTime=tAll;}
         }
       }
+      if (!paused && pendingChest) {
+        const chest = chests.find(c => c.id === pendingChest.id && c.expiresAt > tAll);
+        if (hero.dead || tAll > pendingChest.until || !chest) { pendingChest = null; cityRoute = []; Online.send({type:'stop'}); }
+        else if (Math.hypot(hero.x-chest.x,hero.y-chest.y) <= 1.95) {
+          cityRoute = [];
+          if (pendingChest.sentAt === undefined) pendingChest.until = Math.max(pendingChest.until, tAll + 4);
+          if (pendingChest.sentAt === undefined || tAll - pendingChest.sentAt > .6) { pendingChest.sentAt = tAll; askForChest(chest); }
+        }
+        else if (!cityRoute.length && tAll - (pendingChest.routedAt ?? -9) > .5) {
+          // Out of reach again (the hero drifted, or the first request was early): walk back to it.
+          cityRoute = chestRoute(chest, pendingChest.routedAt !== undefined); pendingChest.routedAt = tAll; routeTime = 0;
+          pendingChest.until = Math.max(pendingChest.until, tAll + 8);
+        }
+      }
       if(!paused && cityRoute.length) {
         if(hero.dead)cityRoute=[];
         else if(Math.hypot(hero.x-cityRoute[0].x,hero.y-cityRoute[0].y)<.32){cityRoute.shift();routeTime=0;}
@@ -1410,7 +1455,9 @@
     for (const f of floaters) { f.t += dt; f.z += dt * 46; } floaters = floaters.filter(f => f.t < 1.1);
     for (const e of effects) e.t += dt; effects = effects.filter(e => e.t < (e.life ?? (e.kind === 'ring' ? .9 : .32)));
     if (marker) { marker.t += dt; if (marker.t > 1.2) marker = null; }
-    const k = 1 - Math.pow(.0006, dt); cam.x += (hero.x - cam.x) * k; cam.y += (hero.y - cam.y) * k;
+    // A teleport or a zone change moves the hero far from the camera: jump there instead of gliding across the map.
+    if (Math.hypot(hero.x - cam.x, hero.y - cam.y) > 4) { cam.x = hero.x; cam.y = hero.y; }
+    else { const k = 1 - Math.pow(.0006, dt); cam.x += (hero.x - cam.x) * k; cam.y += (hero.y - cam.y) * k; }
     if (shakeT > 0) { shakeT -= dt; const k = shakeMag * Math.min(1, shakeT / .25); shakeX = (Math.random() - .5) * 2 * k; shakeY = (Math.random() - .5) * 2 * k; }
     else { shakeX = shakeY = 0; shakeMag = 0; }
     for (const b of ebolts) { b.x += b.fx * b.speed * dt; b.y += b.fy * b.speed * dt; if (b.size >= .8 && Math.random() < .5) parts.push({ x: b.x, y: b.y, z: 38, vx: (Math.random() - .5) * .6, vy: (Math.random() - .5) * .6, vz: .6, life: .28, t: 0, col: b.color, size: 2 + Math.random() * 2.4, g: 1 }); }
@@ -2392,6 +2439,17 @@
       if (b < .5) { g.fillStyle = `rgba(255,236,160,${.8 - b * 1.4})`; g.beginPath(); g.arc(sx + Math.sin(o.x * 5) * ex(o) * .4, sy - b * 28, 2.2 + b * 3, 0, 6.283); g.fill(); }
     }
   }
+  function drawChest(g, chest, sx, sy) {
+    const left = Math.max(0, Math.ceil(chest.expiresAt - tAll));
+    g.save(); g.translate(sx, sy); g.lineJoin = 'round'; g.lineWidth = 2.5; g.strokeStyle = '#2d1b17';
+    g.fillStyle = '#8f5129'; g.beginPath(); g.moveTo(-24,-22); g.lineTo(0,-29); g.lineTo(24,-22); g.lineTo(24,1); g.lineTo(0,8); g.lineTo(-24,1); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#b97837'; g.beginPath(); g.moveTo(-24,-22); g.lineTo(0,-29); g.lineTo(24,-22); g.lineTo(0,-15); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#704025'; g.beginPath(); g.moveTo(0,-15); g.lineTo(24,-22); g.lineTo(24,1); g.lineTo(0,8); g.closePath(); g.fill(); g.stroke();
+    g.strokeStyle = '#e9c56f'; g.lineWidth = 4; g.beginPath(); g.moveTo(-20,-18); g.lineTo(-20,0); g.moveTo(20,-18); g.lineTo(20,1); g.moveTo(0,-15); g.lineTo(0,7); g.stroke();
+    g.fillStyle = '#ffe08b'; g.strokeStyle = '#6b401a'; g.lineWidth = 2; g.fillRect(-5,-13,10,10); g.strokeRect(-5,-13,10,10);
+    g.font = 'bold 13px sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = '#281d20'; g.fillStyle = left <= 30 ? '#ff9a83' : '#fff1c8';
+    const label = `${Math.floor(left / 60)}:${String(left % 60).padStart(2,'0')}`; g.strokeText(label,0,-40); g.fillText(label,0,-40); g.restore();
+  }
   // A gate: two stone posts, a lintel and a swirling plane between them. The server owns the actual move.
   function drawPortal(g, p, sx, sy, t) {
     if (p.look === 'eye_below') return EyeBelowArt.portal(g,p,sx,sy,t);
@@ -2438,6 +2496,44 @@
     g.strokeText(label, sx, sy - 142); g.fillText(label, sx, sy - 142); g.restore();
   }
   function shadow(g, x, y, rx, ry, a = .28) { const [sx, sy] = w2s(x, y), shift = window.DayNight?.shadowOffset || 0; g.fillStyle = `rgba(20,30,10,${a})`; g.beginPath(); g.ellipse(sx + shift, sy + shift * .25, rx, ry, 0, 0, 6.283); g.fill(); }
+  const LOOT_PILLARS = {
+    uncommon: { color: '#4ad66d', core: '#d5ffe0', tier: 1 },
+    rare: { color: '#4aa3ff', core: '#dceeff', tier: 2 },
+    epic: { color: '#b45cff', core: '#f1dcff', tier: 3 },
+    legendary: { color: '#ff9a2e', core: '#fff0c8', tier: 4 },
+  };
+  function drawLootPillar(g, drop, item, sx, sy, t) {
+    const rarity = drop.gear?.rarity || item?.rarity, style = LOOT_PILLARS[rarity];
+    if (!drop.item || !style) return;
+    const { color, core, tier } = style, height = 54 + tier * 18, width = 10 + tier * 3;
+    const seed = Number(drop.id || 0) * 0.37, pulse = 1 + Math.sin(t * 3 + seed) * .08;
+    g.save(); g.translate(sx + 12, sy); g.globalCompositeOperation = 'lighter';
+    // A narrow, tapered shaft gives the motes a visible column without covering the drop or nearby actors.
+    const beam = g.createLinearGradient(0, -height, 0, 5);
+    beam.addColorStop(0, `${color}00`); beam.addColorStop(.35, `${color}17`);
+    beam.addColorStop(1, `${color}55`);
+    g.fillStyle = beam; g.beginPath(); g.moveTo(-width * .35, -height);
+    g.lineTo(width * pulse, 2); g.quadraticCurveTo(0, 8, -width * pulse, 2);
+    g.closePath(); g.fill();
+    g.strokeStyle = color; g.lineWidth = 1.5; g.globalAlpha = .48;
+    g.beginPath(); g.ellipse(0, 1, width * 1.3 * pulse, 5 * pulse, 0, 0, Math.PI * 2); g.stroke();
+    g.globalAlpha = 1;
+    const count = 7 + tier * 5;
+    for (let i = 0; i < count; i++) {
+      const phase = (t * (.38 + tier * .035) + i * .618034 + seed * .17) % 1;
+      const angle = i * 2.39996 + t * (1 + tier * .12) + seed;
+      const drift = (5 + tier * 2.5) * (.45 + phase * .7);
+      const x = Math.sin(angle) * drift, y = -5 - phase * height;
+      const fade = Math.sin(Math.PI * phase) * (.48 + tier * .09);
+      g.globalAlpha = fade; g.fillStyle = i % 4 === 0 ? core : color;
+      const size = (i % 5 === 0 ? 2.5 : 1.2) + tier * .22;
+      if (i % 5 === 0) {
+        g.beginPath(); g.moveTo(x, y - size * 1.7); g.lineTo(x + size * .65, y);
+        g.lineTo(x, y + size * 1.7); g.lineTo(x - size * .65, y); g.closePath(); g.fill();
+      } else { g.beginPath(); g.arc(x, y, size, 0, Math.PI * 2); g.fill(); }
+    }
+    g.restore();
+  }
   function draw(t) {
     const g = ctx, k = dpr * zoom; g.setTransform(k, 0, 0, k, 0, 0);
     drawSky(g, t);
@@ -2473,7 +2569,8 @@
     const escorted = id => { for (const r of remotePlayers.values()) if (r.escort && r.escort.npc === id && r.escort.owner === Online.id) return true; return false; };   // a stranded person walks with their rescuer
     for (const n of City.npcs) { if (n.escort && escorted(n.id)) continue; const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
     for (const s of slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, 100)) { shadow(g, s.x, s.y, 28 * s.d.scale * (1 - s.hop * .12), 11 * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
-    for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 60)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
+    for (const chest of chests) if (chest.expiresAt > tAll) { const [sx, sy] = w2s(chest.x, chest.y); if (onScreen(sx, sy, 70)) { shadow(g,chest.x,chest.y,27,9,.35); list.push({d:chest.x+chest.y,chest,sx,sy}); } }
+    for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 165)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
     { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, .32); list.push({ d: hero.sparkTravel ? Infinity : hero.x + hero.y + .001, hero, sx, sy }); }
     for (const remote of remotePlayers.values()) {
       const [sx, sy] = w2s(remote.x, remote.y);
@@ -2498,6 +2595,7 @@
         g.drawImage(spr.c, it.sx - spr.ax, it.sy - spr.ay + (o.kind === 'rock' ? 4 : 0), spr.w, spr.h); g.globalAlpha = 1;
       } else if (it.portal) { drawPortal(g, it.portal, it.sx, it.sy, t);
       } else if (it.npc) { City.drawNpc(g,it.npc,it.sx,it.sy,t,Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8);
+      } else if (it.chest) { drawChest(g,it.chest,it.sx,it.sy);
       } else if (it.s) {
         const s = it.s, src = enemySource(s); g.save(); g.translate(it.sx, it.sy); if (src) drawSlimeSprite(g, s, t); else drawSlime(g, s, t);
         const barY = src ? -(s.d.top ?? (s.kind === 'big' ? 36 : s.kind === 'beetle' ? 40 : 28)) * SLIME_K * s.d.scale : -62 * s.d.scale - s.hop * 16;
@@ -2511,6 +2609,7 @@
         g.restore();
       } else if (it.drop) {
         const d = it.drop, item = WORLD_ITEMS.find(i => i.id === d.item);
+        drawLootPillar(g, d, item, it.sx, it.sy, t);
         g.save(); g.translate(it.sx + (d.item ? 12 : -8), it.sy - d.z); g.fillStyle = item?.kind==='bag'?bagColor(item):d.col; g.strokeStyle = OL; g.lineWidth = 2.4;
         if(item?.kind==='bag') {
           g.shadowColor=bagColor(item);g.shadowBlur=13;
@@ -2519,7 +2618,7 @@
           g.fillStyle='#fff7dd';g.font='bold 10px sans-serif';g.textAlign='center';g.fillText(String(item.bagSlots),0,5);
           g.restore();continue;
         }
-        if (item && item.rarity !== 'common') { g.shadowColor = d.col; g.shadowBlur = 12; }
+        if (item && (d.gear?.rarity || item.rarity) !== 'common') { g.shadowColor = d.col; g.shadowBlur = 12; }
         g.beginPath();
         if (d.item) { g.moveTo(0,-12); g.lineTo(10,-2); g.lineTo(0,8); g.lineTo(-10,-2); g.closePath(); }
         else { g.moveTo(0, -9); g.bezierCurveTo(8, -1, 8, 6, 0, 6); g.bezierCurveTo(-8, 6, -8, -1, 0, -9); }
@@ -2527,10 +2626,10 @@
         if (item?.class) { g.fillStyle = '#112b49'; g.font = 'bold 12px sans-serif'; g.textAlign = 'center'; g.fillText(item.kind === 'weapon' ? '⚔' : '◆', 0, 3); }
         else { g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(-2.4, -1, 1.8, 0, 6.283); g.fill(); }
         if (d.gear && hero && Math.hypot(hero.x-d.x, hero.y-d.y) < 8) {
-          const gear = d.gear, a = gear.bonusStats || {};
-          const label = `${item?.name || 'Orange gear'} · ${gear.attack} ATK · ${gear.defense} DEF · ${a.stamina || 0} STA · ${a.accuracy || 0} ACC · ${a.dexterity || 0} DEX`;
+          const gear = d.gear, a = Object.fromEntries(Object.keys(gear.bonusStats || {}).map(k => [k, (gear.bonusStats?.[k] || 0) + (gear.rolledStats?.[k] || 0)]));
+          const label = `${gear.rarity === 'epic' ? 'Epic · ' : ''}${item?.name || 'Gear'} · ${gear.attack} ATK · ${gear.defense} DEF · ${a.stamina || 0} STA · ${a.accuracy || 0} ACC · ${a.dexterity || 0} DEX`;
           g.font = '12px sans-serif'; g.textAlign = 'center'; g.lineWidth = 3;
-          g.strokeStyle = '#24120b'; g.fillStyle = '#ffb65b'; g.strokeText(label, 0, -24); g.fillText(label, 0, -24);
+          g.strokeStyle = '#24120b'; g.fillStyle = gear.rarity === 'epic' ? '#b45cff' : '#ffb65b'; g.strokeText(label, 0, -24); g.fillText(label, 0, -24);
         }
         g.restore();
       } else if (it.remote) {
@@ -2544,10 +2643,10 @@
         if (hero.pvpTargetId === remote.id) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, 6.283); g.stroke(); }
         g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
         g.restore();
-      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.sparkTravel) Spark.draw(g,hero,t); else { drawMount(g,hero); if(hero.mounted)g.translate(0,-23); if (isModular()) {
+      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.gm && hero.hidden) g.globalAlpha = .35; if (hero.sparkTravel) Spark.draw(g,hero,t); else { drawMount(g,hero); if(hero.mounted)g.translate(0,-23); if (isModular()) {
         if (mageSpr) mageSpr.draw(g, hero, t);
         else { g.fillStyle = '#8acfff'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
-      } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } g.restore(); }
+      } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } if (hero.gm && hero.hidden) { g.globalAlpha = .8; g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 1, 26, 11, 0, 0, Math.PI * 2); g.stroke(); } g.restore(); }
     }
     // speech bubbles go over everything, so a tree or a roof never hides what somebody said
     bubblesLast = bubblesDrawn; bubblesDrawn = 0;
@@ -2561,6 +2660,7 @@
     }
     // Light is applied after the world and before attacks, loot labels and other combat feedback.
     window.DayNight?.draw(g, VW, VH, nightLights, w2s);
+    window.Weather?.draw(g, VW, VH, t);
     // slash arc on the ground plane (over everything: it is the axe's motion)
     for (const e of effects) if ((e.kind === 'slash' || e.kind === 'dualSlash') && (heroSpr || e.t < 0)) continue; else if (e.kind === 'slash') {
       const p = e.t / .32, a0 = e.a - 1.25, a1 = a0 + 2.5 * Math.min(1, p * 1.8);
@@ -2800,6 +2900,7 @@
     update(dt);
     City.update(serverNow());
     window.DayNight?.tick(dt);
+    window.Weather?.tick(dt, hero.x, hero.y, !!hero.inside);
     draw(now / 1000);
   }
   const Field = {
@@ -2826,8 +2927,8 @@
       running = true; paused = false; last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     },
     stop() { window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
-    clearInput() { pendingNpc=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
-    setPaused(p) { paused = p; if(p){pendingNpc=null;cityRoute=[];} Field.clearInput(); Online.send({ type: 'stop' }); },
+    clearInput() { pendingNpc=null; pendingChest=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
+    setPaused(p) { paused = p; Field.clearInput(); Online.send({ type: 'stop' }); },
     visitNpc(id) {
       if (paused || !Online.connected || hero.dead) return;
       const npc = City.npcs.find(n => n.id === id);
@@ -2891,7 +2992,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
-    _debug: { get effects() { return effects; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
+    _debug: { get chests() { return chests; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, drawLootPillar, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
   };
   window.Field = Field;
 })();

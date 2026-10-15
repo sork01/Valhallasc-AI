@@ -14,7 +14,7 @@
   const spare = s => definition(s.item)?.starter ? 0 : bagQuantity(s.item);
   const consumable = i => i && ['food', 'potion'].includes(i.kind);
   const compatible = i => i && !['material', 'bag', 'food', 'potion'].includes(i.kind) && (!i.class || i.class === look?.class);
-  const effect = i => { const restores = [i.heal ? `${i.heal} HP` : '', i.mana ? `${i.mana} mana` : ''].filter(Boolean).join(' and '); const need = (i.requiredLevel || 1) > 1 ? ` · needs level ${i.requiredLevel}` : ''; return (i.kind === 'food' ? `Restores ${restores} over ${i.duration} s · one meal at a time` : `Restores ${restores} at once · ${i.cooldown} s cooldown shared by all potions`) + need; };
+  const effect = i => { const type = window.Field?.hero?.resourceType || 'mana', amount = type === 'mana' ? i.mana : Math.round(Math.min(1, i.mana / (100 + 15 * ((i.requiredLevel || 1) - 1))) * 100); const restores = [i.heal ? `${i.heal} HP` : '', i.mana ? `${amount} ${type}` : ''].filter(Boolean).join(' and '); const need = (i.requiredLevel || 1) > 1 ? ` · needs level ${i.requiredLevel}` : ''; return (i.kind === 'food' ? `Restores ${restores} over ${i.duration} s · one meal at a time` : `Restores ${restores} at once · ${i.cooldown} s cooldown shared by all potions`) + need; };
   const useItem = i => consumable(i) && canEquip() && bagQuantity(i.id) > 0 && Field.useItem(i.id);
   const activate = i => consumable(i) ? useItem(i) : equip(i);
   const num = n => Number(n.toFixed(1));
@@ -26,6 +26,13 @@
   const tooLow = i => !!i && levelOf(i) > heroLevel();   // gear above the hero's level cannot be put on (the server refuses it too)
   const levelNote = i => tooLow(i) ? `Requires level ${levelOf(i)} (you are level ${heroLevel()})` : `Requires level ${levelOf(i)}`;
   const itemAtSlot = slot => ['chest', 'hands'].includes(slot) ? WORLD_ITEMS.find(i => i.kind === slotKind(slot) && (i.class === look?.class || i.source === 'orange_pool') && look?.[look.class + (slot === 'chest' ? 'Armor' : 'Weapon')] === i.variant) : definition(gearSlots[slot]);
+  const copiesOf = i => gearInstances.filter(g => g.item === i?.id);
+  const saleValue = (i, count = 1) => i.sell * count + (i.rarity === 'rare' ? copiesOf(i).slice(equippedCount(i), equippedCount(i) + count).filter(g => g.rarity === 'epic').length * i.sell : 0);
+  const looseCopy = i => copiesOf(i).slice(equippedCount(i)).find(g => g.rarity === 'epic') || copiesOf(i)[equippedCount(i)];
+  const wornCopy = (slot, i) => copiesOf(i)[slots.filter(([s]) => s !== slot && itemAtSlot(s)?.id === i?.id && slots.findIndex(([key]) => key === s) < slots.findIndex(([key]) => key === slot)).length];
+  const displayCopy = (i, slot) => slot ? wornCopy(slot, i) : looseCopy(i);
+  const displayRarity = (i, slot) => displayCopy(i, slot)?.rarity || i?.rarity || 'common';
+  const copyStats = g => ({ attack:g.attack * (1 + g.rank * .04), defense:g.defense * (1 + g.rank * .04), bonusStats:Object.fromEntries(statNames.map(k => [k, Math.round(((g.bonusStats?.[k] || 0) + (g.rolledStats?.[k] || 0)) * (1 + g.rank * .04))])) });
   const canEquip = () => Online.connected && !Field.hero?.dead;
   function node(tag, text = '', cls) { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; }
   function button(text, action, cls = 'btn ghost') { const b = node('button', text, cls); b.type = 'button'; b.addEventListener('click', action); return b; }
@@ -70,7 +77,8 @@
     return `<svg viewBox="0 0 64 64" aria-hidden="true" style="color:${color}" stroke="#15151a" stroke-width="2" stroke-linejoin="round">${art[glyph] || art.accessory}${badge}</svg>`;
   }
   function summary(i, count = quantity(i.id)) {
-    return `${i.name} ×${count} · ${i.rarity === 'common' ? '' : rarityName(i) + ' · '}${i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind === 'food' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · level ${levelOf(i)} · ${stats(i)}`} · ${i.starter ? 'Starter gear · cannot be sold' : `sells for ${i.sell} gold each`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
+    const copy = displayCopy(i), rarity = displayRarity(i);
+    return `${i.name} ×${count} · ${rarity === 'common' ? '' : rarityName({rarity}) + ' · '}${i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind === 'food' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · level ${levelOf(i)} · ${stats(copy ? copyStats(copy) : i)}`} · ${i.starter ? 'Starter gear · cannot be sold' : `sells for ${saleValue(i)} gold${copy ? ' for the next loose copy' : ' each'}`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
   }
   function tooltip() {
     let t = $('item-tooltip'); if (!t) { t = node('div', '', 'item-tooltip'); t.id = 'item-tooltip'; t.role = 'tooltip'; t.hidden = true; document.body.append(t); } return t;
@@ -78,10 +86,11 @@
   function hideTooltip() { if ($('item-tooltip')) $('item-tooltip').hidden = true; }
   function showTooltip(anchor, i, slot) {
     if (!i) return;
-    const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName(i)} · ${i.class || (i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : 'All classes')}`)); t.dataset.rarity = i.rarity;
+    const copy = displayCopy(i, slot), rarity = displayRarity(i, slot);
+    const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || (i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : 'All classes')}`)); t.dataset.rarity = rarity;
     if (consumable(i)) t.append(node('p', effect(i)));
     else if (i.kind === 'bag') t.append(node('p', `${i.bagSlots} extra slots · Requires level ${levelOf(i)}`));
-    else if (i.kind !== 'material') t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(i)}`));
+    else if (i.kind !== 'material') t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
     if (compatible(i) && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
     if (compatible(i) && !slot) {
@@ -92,12 +101,12 @@
         t.append(node('p', `Compared with ${current.name}: ${attack >= 0 ? '+' : ''}${attack} attack · ${defense >= 0 ? '+' : ''}${defense} defense${bonus ? ` · ${bonus}` : ''}`, 'item-comparison'));
       }
     }
-    t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', i.starter ? 'Starter gear · cannot be sold' : `Sells for ${i.sell} gold each`));
+    t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', i.starter ? 'Starter gear · cannot be sold' : `Sells for ${saleValue(i)} gold${copy ? ' for the next loose copy' : ' each'}`));
     if (compatible(i)) {
       const copies=gearInstances.filter(g=>g.item===i.id);
       for(const [index,g] of copies.entries()) {
         if(i.source!=='orange_pool'&&index>=3)break;
-        t.append(node('small',`Copy #${g.id} · ${index<equippedCount(i)?'equipped · ':''}${g.rarity} · rank ${g.rank} · ${stats({attack:g.attack*(1+g.rank*.04),defense:g.defense*(1+g.rank*.04),bonusStats:Object.fromEntries(statNames.map(k=>[k,Math.round(((g.bonusStats?.[k]||0)+(g.rolledStats?.[k]||0))*(1+g.rank*.04))]))})}`));
+        t.append(node('small',`Copy #${g.id} · ${index<equippedCount(i)?'equipped · ':''}${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}`));
       }
       if(i.source!=='orange_pool'&&copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
     }
@@ -168,12 +177,13 @@
     const i = selected && definition(selected);
     container.replaceChildren();
     if (!i || !quantity(i.id)) { container.append(node('p', 'Select an item to inspect it.', 'bag-empty-note')); return; }
-    const heading = node('b', i.name, 'item-name'); heading.dataset.rarity = i.rarity;
+    const heading = node('b', i.name, 'item-name'); heading.dataset.rarity = displayRarity(i);
     container.append(heading, node('small', summary(i, quantity(i.id))));
-    if (i.source === 'orange_pool') {
+    if (i.source === 'orange_pool' || copiesOf(i).some(g => g.rarity !== i.rarity)) {
       const worn = equippedCount(i);
       gearInstances.filter(g => g.item === i.id).forEach((g, index) => {
-        const line = node('p', `Copy #${g.id}${index < worn ? ' · Equipped' : ' · In bags'} · Rank ${g.rank} · ${stats({attack:g.attack * (1 + g.rank * .04), defense:g.defense * (1 + g.rank * .04), bonusStats:Object.fromEntries(statNames.map(k => [k, Math.round(((g.bonusStats?.[k] || 0) + (g.rolledStats?.[k] || 0)) * (1 + g.rank * .04))]))})}`, 'orange-copy-stats');
+        const line = node('p', `Copy #${g.id}${index < worn ? ' · Equipped' : ' · In bags'} · ${rarityName(g)} · Rank ${g.rank} · ${stats(copyStats(g))}`, 'orange-copy-stats');
+        line.dataset.rarity = g.rarity;
         container.append(line);
       });
     }
@@ -202,7 +212,7 @@
       const cell = node('div', '', 'bag-cell'); cell.dataset.position = index;
       dropTarget(cell, data => moveToBag(data, index));
       if (i && count) {
-        cell.classList.add('inventory-item'); cell.dataset.item = i.id; cell.dataset.rarity = i.rarity;
+        cell.classList.add('inventory-item'); cell.dataset.item = i.id; cell.dataset.rarity = displayRarity(i);
         const b = button('', () => { selected = i.id; renderDetails(); for (const n of container.querySelectorAll('.item-tile')) n.setAttribute('aria-pressed', String(n.closest('[data-item]').dataset.item === selected)); }, 'item-tile');
         b.setAttribute('aria-label', summary(i, count)); b.setAttribute('aria-pressed', String(selected === i.id));
         b.innerHTML = icon(i); b.append(node('span', String(count), 'item-stack'));
@@ -236,7 +246,7 @@
     if (focusItem) container.querySelector(`[data-item="${focusItem}"] button`)?.focus({ preventScroll: true });
   }
   function shopRow(s) {
-    const i = definition(s.item), n = node('article', '', 'inventory-item shop-item'); n.dataset.item = i.id; n.dataset.rarity = i.rarity;
+    const i = definition(s.item), n = node('article', '', 'inventory-item shop-item'); n.dataset.item = i.id; n.dataset.rarity = displayRarity(i);
     const glyph = node('span', '', 'shop-item-icon'); glyph.innerHTML = icon(i); n.append(glyph, node('b', `${i.name} ×${s.quantity}`), node('small', summary(i))); attachTooltip(n, () => i); return n;
   }
   function renderShop(npc, container) {
@@ -251,8 +261,8 @@
     for (const s of stacks) {
       const count = spare(s); if (count <= 0) continue;
       const i = definition(s.item), n = shopRow(s);
-      const b = button(`Sell 1 · ${i.sell} gold`, () => sell(`sell:${i.id}:1`, b)); b.dataset.sell = 'one'; n.append(b);
-      if (count > 1) { const b = button(`Sell ${count} · ${count * i.sell} gold`, () => sell(`sell:${i.id}:${count}`, b)); b.dataset.sell = 'stack'; n.append(b); }
+      const b = button(`Sell 1 · ${saleValue(i)} gold`, () => sell(`sell:${i.id}:1`, b)); b.dataset.sell = 'one'; n.append(b);
+      if (count > 1) { const b = button(`Sell ${count} · ${saleValue(i, count)} gold`, () => sell(`sell:${i.id}:${count}`, b)); b.dataset.sell = 'stack'; n.append(b); }
       container.append(n);
     }
     if (!stacks.some(s => spare(s) > 0)) container.append(node('p', 'No spare items to sell. Bring back loot from the meadow.'));
@@ -282,11 +292,11 @@
         });
         card.append(title, glyph, node('b', '', 'sr-only'), node('span', label, 'gear-label'), select); container.append(card);
       }
-      card.dataset.rarity = i?.rarity || 'common'; card.dataset.empty = String(!i);
+      card.dataset.rarity = displayRarity(i, slot); card.dataset.empty = String(!i);
       card.querySelector('b').textContent = i?.name || 'Empty slot';
       const glyph = card.querySelector('.gear-icon'); glyph.innerHTML = icon(i, kind); glyph.draggable = !!i;
-      const wornCopy = i?.source === 'orange_pool' && gearInstances.find(g => g.item === i.id);
-      glyph.setAttribute('aria-label', `${label}: ${i?.name || 'Empty'}${wornCopy ? `, copy #${wornCopy.id}, ${stats({attack:wornCopy.attack*(1+wornCopy.rank*.04), defense:wornCopy.defense*(1+wornCopy.rank*.04), bonusStats:Object.fromEntries(statNames.map(k=>[k,Math.round(((wornCopy.bonusStats?.[k]||0)+(wornCopy.rolledStats?.[k]||0))*(1+wornCopy.rank*.04))]))})}` : ''}. Right-click to unequip.`);
+      const equippedCopy = i && wornCopy(slot, i);
+      glyph.setAttribute('aria-label', `${label}: ${i?.name || 'Empty'}${equippedCopy ? `, ${rarityName(equippedCopy)} copy #${equippedCopy.id}, ${stats(copyStats(equippedCopy))}` : ''}. Right-click to unequip.`);
       const select = card.querySelector('select'), owned = WORLD_ITEMS.filter(item => item.kind === kind && compatible(item) && quantity(item.id) > 0);
       const options = [['none', 'None'], ...owned.map(item => [legacy ? item.variant : item.id, item.name])], key = JSON.stringify(options);
       if (select.dataset.options !== key) { select.replaceChildren(...options.map(([value, name]) => { const o = node('option', name); o.value = value; return o; })); select.dataset.options = key; }

@@ -65,7 +65,7 @@ None. The point is to search, so chests appear neither on the minimap nor on the
 
 ## Verification hooks for `CHEST-CHECK`
 
-- A test-only knob (`VALHALLA_TEST_COMMANDS=1`) shortens the interval and forces the roll, the same way the other debug commands skip only time.
+- Private Rust worlds shorten `Chests::interval` directly and call `spawn_chest` when a test needs an immediate chest. Neither changes production timing.
 - Seeded rolls over many intervals must average 10% within a stated tolerance.
 - The eligibility test runs `scripts/chest_zones.py --check` and compares the Rust-side list with the file.
 
@@ -77,4 +77,15 @@ None. The point is to search, so chests appear neither on the minimap nor on the
 - **Dungeon rooms.** `Map::rooms` now loads the `rooms` rectangles of the zone data. A dungeon chest lies inside a room that holds neither the final boss nor a living boss, and at least 8 tiles from any boss home. Moonwell has no rooms, so there only the boss distance applies.
 - **Messages.** The spawn line is sent to everyone present and once to anyone who arrives later; opening and vanishing are announced to the area. A dungeon copy that resets removes its chest silently and starts its timer again.
 - **Open request.** `{"type":"open_chest","id":N}`. Snapshots carry `chests: [{id, zone, x, y, left}]`; the copy's zone is rewritten to the template zone like every other entity.
-- **Not yet done:** the purple chance on the dungeon set piece waits for `DROP-EPIC-SERVER`; `CHEST-ART`, `CHEST-CLIENT` and the test knob that forces a roll belong to the later tasks (the unit tests shorten `Chests::interval` directly).
+- **Purple set pieces.** The dungeon chest's 6% set-piece roll goes through `set_piece_drop`, the same 5% purple roll as a boss drop (`epic-set-drops.md`).
+- **Still open:** `CHEST-ART` (the chest is drawn with canvas paths until PixelFlow art exists).
+
+## Client (`CHEST-CLIENT`)
+
+- **Drawing.** `drawChest` in `client/field.js` paints the body, a lid and gold bands, with a `m:ss` countdown above it that turns red under 30 s. The countdown is the snapshot's `left` plus the client clock, so it needs no extra messages. Nothing is shown on the minimap or world map.
+- **Clicking.** A click is on a chest when it lands within 27 px sideways of it and between 37 px above and 7 px below its base (the visible body, as for monsters); a click anywhere else is an ordinary ground click. In reach (1.95 tiles) the client sends `stop` and `open_chest`; out of reach it walks to a point 1.1 tiles from the chest and asks on arrival.
+- **Retrying.** The client's idea of its position can run ahead of the server's, so a request that answers "Move closer to open the chest." is repeated every 0.6 s while the chest still exists and the hero is within reach, and the hero is sent back toward it (straight first, then along the city route) when it has drifted away.
+- **Open effect.** The server's `chestOpen` event plays a gold ring and a burst at the chest.
+- **Camera.** The camera now jumps to the hero when it is more than 4 tiles away, so a teleport or a zone change no longer glides across the map.
+- **Test shortcut.** `{"op":"spawn_chest","distance":N}` (private worlds and the GM only) puts a chest N tiles in front of the player, or on a placed tile without `distance`. `tests/chest-ui.cjs` uses it with teleports.
+- **Browser check.** `node tests/chest-ui.cjs` (8 checks). Run it against a release binary, which the test picks up from `target/release/valhalla-server`: the debug server falls behind real time in a busy zone.

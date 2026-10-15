@@ -451,12 +451,12 @@
     "name": "Traveler's Stew",
     "kind": "food",
     "rarity": "common",
-    "sell": 3,
+    "sell": 1,
     "heal": 100,
     "duration": 8,
     "mana": 100,
     "family": "traveler_stew",
-    "price": 12,
+    "price": 3,
     "requiredLevel": 1
   },
   {
@@ -581,11 +581,11 @@
     "name": "Health Potion",
     "kind": "potion",
     "rarity": "common",
-    "sell": 8,
+    "sell": 1,
     "heal": 100,
     "cooldown": 60,
     "family": "health_potion",
-    "price": 30,
+    "price": 5,
     "requiredLevel": 1
   },
   {
@@ -9769,11 +9769,11 @@
     "name": "Mana Potion",
     "kind": "potion",
     "rarity": "common",
-    "sell": 8,
+    "sell": 1,
     "mana": 100,
     "cooldown": 60,
     "family": "mana_potion",
-    "price": 30,
+    "price": 5,
     "requiredLevel": 1
   },
   {

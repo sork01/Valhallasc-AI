@@ -16,8 +16,8 @@ RARITY = ['common', 'uncommon', 'rare', 'epic'] + ['legendary'] * 6
 # About 70% of a warrior's health (120 + 20/level) and 60% of a mana pool (100 + about 21/level) at the tier's level.
 HEAL = [100, 210, 350, 490, 630, 770, 910, 1050, 1190, 1330]
 MANA = [100, 170, 300, 430, 550, 680, 810, 930, 1060, 1190]
-POTION_PRICE = [30, 60, 110, 180, 270, 380, 520, 700, 900, 1150]
-FOOD_PRICE = [12, 25, 45, 75, 115, 165, 225, 300, 390, 500]
+POTION_PRICE = [5, 60, 110, 180, 270, 380, 520, 700, 900, 1150]
+FOOD_PRICE = [3, 25, 45, 75, 115, 165, 225, 300, 390, 500]
 PREFIX = ['', 'Greater ', 'Superior ', 'Grand ', 'Supreme ', 'Heroic ', 'Mythic ', 'Legendary ', 'Divine ', 'Eternal ']
 FOOD = ["Traveler's Stew", 'Hearty Stew', "Ranger's Feast", "Warden's Feast", "Captain's Banquet", "Champion's Banquet",
         "Hero's Banquet", "King's Banquet", "Emperor's Banquet", "Immortal's Banquet"]
@@ -44,7 +44,7 @@ def main():
     for family, spec in FAMILIES.items():
         at = next(k for k, i in enumerate(items) if i['id'] == spec['base'])
         first = items[at]
-        first.update(family=family, price=spec['price'][0], requiredLevel=1)
+        first.update(family=family, price=spec['price'][0], sell=max(1, spec['price'][0] // 4), requiredLevel=1)
         new = []
         for t in range(1, len(LEVELS)):
             item = dict(id=tier_id(family, t), name=spec['name'](t), kind=spec['kind'], rarity=RARITY[t],

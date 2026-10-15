@@ -59,6 +59,14 @@
       const hour = number(a[0]);
       return hour === null || hour < 0 || hour >= 24 ? 'Use /time <0-23.99> [freeze] or /time resume.' : { op: 'set_time', hour, freeze: a[1] === 'freeze' };
     }],
+    weather: ['<type|resume> [light|medium|heavy]', 'Set this outdoor zone\'s weather until the server restarts, or resume its schedule.', a => {
+      const kind = a[0]?.toLowerCase();
+      if (!['clear','rain','snow','fog','thunderstorm','wind','sandstorm','resume'].includes(kind)) return 'Use /weather <clear|rain|snow|fog|thunderstorm|wind|sandstorm|resume> [light|medium|heavy].';
+      return {op:'set_weather',kind,intensity:a[1]?.toLowerCase()};
+    }],
+    vis: ['[on|off|toggle]', 'Show your current visibility or change it.', a => ['on','off','toggle'].includes(a[0]) || !a.length ? { op: 'visibility', mode: a[0] || 'query' } : 'Use /vis [on|off|toggle].'],
+    show: ['', 'Become visible to other players.', () => ({ op: 'visibility', mode: 'on' })],
+    hide: ['', 'Become hidden from other players and monsters.', () => ({ op: 'visibility', mode: 'off' })],
     xp: ['<amount>', 'Grant XP (levels up as usual).', a => whole(a[0]) === null || whole(a[0]) < 0 ? 'Use /xp <amount>.' : { op: 'give_xp', amount: whole(a[0]) }],
     gold: ['<amount>', 'Set your gold.', a => whole(a[0]) === null || whole(a[0]) < 0 ? 'Use /gold <amount>.' : { op: 'set_gold', gold: whole(a[0]) }],
     hp: ['[amount]', 'Set your health (default: full). Also revives.', a => ({ op: 'set_hp', hp: a[0] === undefined ? 1e9 : (number(a[0]) ?? 1e9) })],
@@ -89,6 +97,8 @@
       case 'set_god_mode': return result.godMode ? 'god mode ON (only you)' : 'god mode off';
       case 'set_level': return `level ${result.level}`;
       case 'set_time': return `world time ${result.hour?.toFixed(2) ?? '?'}${result.hoursPerSecond ? '' : ' (frozen)'}`;
+      case 'set_weather': return `${result.type || 'clear'} weather ${result.intensity || ''}`.trim();
+      case 'visibility': return result.hidden ? 'You are hidden.' : 'You are visible.';
       case 'give_xp': return `level ${result.level}, ${result.xp} xp`;
       case 'give_item': case 'take_item': return `${result.item}: you now have ${result.owned}`;
       case 'set_gold': return `${result.gold} gold`;
@@ -102,7 +112,11 @@
 
   window.GM = {
     // The own snapshot, kept for the commands that need your zone and position (and whether god mode is on).
-    onSelf(character) { self = character?.gm ? character : null; },
+    onSelf(character) {
+      self = character?.gm ? character : null;
+      const badge = document.getElementById('gm-visibility');
+      if (badge) { badge.hidden = !self; badge.textContent = self?.hidden ? 'Hidden' : 'Visible'; badge.dataset.hidden = String(!!self?.hidden); }
+    },
     // True when the text was a game master command (so it is not sent as chat). Anyone else's slash text goes on to the
     // party and friend commands, and a command typed by a non-GM is simply not recognised here.
     command(text) {

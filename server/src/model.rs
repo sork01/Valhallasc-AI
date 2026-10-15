@@ -1166,10 +1166,23 @@ pub enum DebugCommand {
         #[serde(default)]
         freeze: bool,
     },
+    SetWeather {
+        kind: String,
+        intensity: Option<String>,
+    },
     /// Uncovers every cell of every zone, so tests of the maps and the ground need not walk them all.
     ExploreAll,
     SetGodMode {
         enabled: bool,
+    },
+    /// GM-only visibility. Private test commands cannot grant it to normal characters.
+    Visibility {
+        mode: String,
+    },
+    /// Test shortcut: puts a treasure chest `distance` tiles in front of the player (a random placed tile when absent).
+    SpawnChest {
+        #[serde(default)]
+        distance: Option<f64>,
     },
     Teleport {
         zone: usize,
@@ -1451,6 +1464,9 @@ pub struct Map {
     /// the first copy and the world appends the rest, each with `template` set (see world/instances.rs).
     #[serde(default)]
     pub copies: u32,
+    /// Whole-map indoor flag for future buildings and caves; weather and daylight stop here.
+    #[serde(default)]
+    pub interior: bool,
     /// A finished floor plan whose outdoor entrance is still sealed. The
     /// server refuses inbound portals until the dungeon's OPEN task removes it.
     #[serde(default, rename = "sealedTemplate")]
@@ -1738,6 +1754,7 @@ mod tests {
             levels: None,
             zones: vec![],
             copies: 0,
+            interior: false,
             sealed_template: false,
             final_boss: String::new(),
             players: 0,

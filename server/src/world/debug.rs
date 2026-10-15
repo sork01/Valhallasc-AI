@@ -40,6 +40,21 @@ impl World {
     ) -> Result<Value, String> {
         // A teleport to a dungeon lands in a copy of it (the party's own, else a free one) and wakes that copy.
         let command = match command {
+            DebugCommand::Visibility { mode } => return self.set_visibility(session, &mode),
+            DebugCommand::SetWeather { kind, intensity } => {
+                let zone = self
+                    .players
+                    .get(&session)
+                    .ok_or("Unknown session.")?
+                    .character
+                    .zone;
+                return self
+                    .weather
+                    .set(zone, &kind, intensity.as_deref(), daynight::unix_ms());
+            }
+            DebugCommand::SpawnChest { distance } => {
+                return self.debug_spawn_chest(session, distance);
+            }
             DebugCommand::Teleport { zone, x, y }
                 if self.maps.get(zone).is_some_and(|m| m.copies > 0) =>
             {
@@ -61,6 +76,7 @@ impl World {
                     self.store
                         .set_world_clock_epoch_ms(epoch)
                         .map_err(|e| format!("World time could not be saved: {e}"))?;
+                    self.weather.set_epoch(epoch);
                 }
                 self.world_clock = next_clock;
                 self.world_clock.snapshot()
@@ -166,6 +182,9 @@ impl World {
                 let time = self.time;
                 let p = self.players.get_mut(&session).ok_or("Unknown session.")?;
                 p.character.zone = zone;
+                if p.character.gm {
+                    p.hidden = true;
+                }
                 p.character.x = arrival.x;
                 p.character.y = arrival.y;
                 p.portal_at = time;
@@ -187,6 +206,9 @@ impl World {
                 self.maps[zone].collide(&mut arrival, PLAYER_RADIUS);
                 let time = self.time;
                 p.character.zone = zone;
+                if p.character.gm {
+                    p.hidden = true;
+                }
                 p.character.x = arrival.x;
                 p.character.y = arrival.y;
                 p.portal_at = time;
@@ -372,6 +394,9 @@ impl World {
                 self.next_king_spawn = self.time;
                 json!({"summoned":true})
             }
+            DebugCommand::Visibility { .. } => unreachable!("handled before borrowing the player"),
+            DebugCommand::SetWeather { .. } => unreachable!("handled before borrowing the player"),
+            DebugCommand::SpawnChest { .. } => unreachable!("handled before borrowing the player"),
         };
         if levels > 0 {
             let point = self.players[&session].character.point();

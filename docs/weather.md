@@ -2,6 +2,8 @@
 
 These settle `WEATHER-RULES` in [TODO.md](../TODO.md). `WEATHER-SERVER` implements the state, `WEATHER-RAIN`, `WEATHER-SNOW` and `WEATHER-OTHER` draw it, `WEATHER-INSIDE` handles doors, `WEATHER-AUDIO` and `WEATHER-UI` finish it and `WEATHER-CHECK` verifies it. It builds on the world clock in [day-night.md](day-night.md).
 
+Implementation: `scripts/weather_zones.py --write` generates both the readable zone table and `world/weather.txt`, which `server/src/world/weather.rs` embeds. Six four-minute slots form a cycle: 2–5 clear slots followed by 4–1 weather slots (weighted to 55% clear). The seed is the persistent day-night epoch. Snapshots carry `weather`, including the current type, intensity, wind variant, seconds remaining, elapsed seconds and indoor state. Yearwheel snapshots additionally carry four seasonal states; the client selects the quadrant. A GM or private test world can send `set_weather`, which adds a transient override. `client/weather.js` draws all weather types with one-second transitions (three seconds between Yearwheel seasons). `client/game.js` synthesizes rain, wind and thunder through the effects bus at a lower level than music; Settings has a separate weather sound slider. `tests/weather-ui.cjs` forces every type in a private world, checks indoor audio, shared state, the schedule across a restart, midnight visibility and canvas cost on a 4× slower CPU.
+
 ## Types
 
 `clear`, `rain`, `snow`, `fog`, `thunderstorm`, `wind` and `sandstorm`. Each has an **intensity**: `light`, `medium` or `heavy`. `clear` has none. `wind` carries a **variant** that decides what it blows: `leaves`, `ash`, `dust`, `cloud`, `stardust`, `shards`, `petals` or `snow`.

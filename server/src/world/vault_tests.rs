@@ -3,8 +3,9 @@ use super::*;
 
 const SKALD: usize = 4;
 const VAULT: usize = 5;
-/// The first private copy of the dungeon: the world appends copies after every file zone.
-const COPY: usize = 25;
+/// The zone number of the Undervault's second copy: the world appends the copies after the last file zone, so this
+/// moves whenever a zone is added (the first test asserts it).
+const COPY: usize = 40;
 
 fn world() -> World {
     World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)
@@ -107,10 +108,23 @@ fn the_undervault_is_a_five_player_dungeon_with_four_private_copies_four_bosses_
     );
     assert!(vault.city.is_none(), "no safe ground in a dungeon");
     // The world keeps three more copies after every file zone; clients are told the template's number.
-    assert_eq!(w.maps.len(), 49);
+    // Every dungeon added since keeps its copies after the file zones, so the count only grows.
+    assert!(w.maps.len() >= 49, "{} maps", w.maps.len());
     assert_eq!(
         w.instances.iter().filter(|i| i.template == VAULT).count(),
         4
+    );
+    // The copies follow every file zone, one after another; more dungeons since have moved where they start.
+    let first_copy = w
+        .instances
+        .iter()
+        .filter(|i| i.template == VAULT)
+        .nth(1)
+        .unwrap()
+        .zone;
+    assert_eq!(
+        first_copy, COPY,
+        "update COPY: the second copy now starts at zone {first_copy}"
     );
     for (n, i) in w
         .instances
@@ -120,7 +134,7 @@ fn the_undervault_is_a_five_player_dungeon_with_four_private_copies_four_bosses_
     {
         assert_eq!(
             (i.template, i.zone),
-            (VAULT, if n == 0 { VAULT } else { COPY - 1 + n })
+            (VAULT, if n == 0 { VAULT } else { first_copy - 1 + n })
         );
         assert!(!i.active && !i.cleared);
         if n > 0 {
@@ -819,8 +833,9 @@ fn every_boss_drops_shared_random_gear_and_every_nearby_party_member_rolls_once_
                 (piece.attack - blue.attack * 1.15).abs() < 0.06
                     && (piece.defense - blue.defense * 1.15).abs() < 0.06
             );
+            // The stats are the blue set's plus 15%; the name, the variant and (since the dungeon gear art pass) the art are its own.
             assert!(
-                piece.name != blue.name && piece.art == blue.art && piece.variant != blue.variant
+                piece.name != blue.name && piece.art != blue.art && piece.variant != blue.variant
             );
             for s in 1..=3 {
                 assert_eq!(starts[s - 1][n]["id"], id);

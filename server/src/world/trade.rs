@@ -50,6 +50,7 @@ impl World {
         if [left, right].iter().any(|p| {
             p.merc.is_some()
                 || p.ambient.is_some()
+                || p.is_hidden()
                 || p.character.hp <= 0.
                 || p.character.spark_travel.is_some()
         }) {
@@ -403,6 +404,50 @@ mod tests {
             ),
             (source.attack, source.defense, source.bonus_stats)
         );
+    }
+    #[test]
+    fn trade_preserves_purple_dungeon_set_piece() {
+        let piece = crate::items::ITEMS
+            .iter()
+            .find(|i| {
+                i.source.as_deref() == Some("undervault")
+                    && i.class == Some(Class::Warrior)
+                    && i.kind == "weapon"
+            })
+            .unwrap();
+        let mut alice = Character::mercenary(Class::Warrior, 20, "Alice");
+        let mut bob = Character::mercenary(Class::Warrior, 20, "Bob");
+        alice.add_item(&piece.id, 1);
+        alice.materialize_gear_instances();
+        let epic = crate::items::set_piece_copy(piece, 0.).unwrap();
+        let held = alice
+            .gear_instances
+            .iter_mut()
+            .find(|g| g.item == piece.id)
+            .unwrap();
+        let old_id = held.id;
+        *held = GearInstance {
+            id: old_id,
+            ..epic.clone()
+        };
+        move_items(
+            &mut alice,
+            &mut bob,
+            &Offer {
+                items: items(&piece.id, 1),
+                gold: 0,
+                ready: false,
+            },
+        )
+        .unwrap();
+        let received = bob
+            .gear_instances
+            .iter()
+            .find(|g| g.item == piece.id)
+            .unwrap();
+        assert_eq!(received.rarity, "epic");
+        assert_eq!(received.attack, epic.attack);
+        assert_eq!(received.rolled_stats, epic.rolled_stats);
     }
     #[test]
     fn a_confirmed_trade_exchanges_and_saves_both_characters_once() {

@@ -25,9 +25,10 @@
     if (cards.has(packet.id)) return;
     const holder = $('loot-rolls'); if (!holder) return;
     const item = window.WORLD_ITEMS?.find(i => i.id === packet.item) || { name: packet.item, rarity: 'uncommon', kind: 'gear' };
-    const node = el('div', '', 'roll-card'); node.dataset.roll = packet.id; node.dataset.rarity = item.rarity;
+    const rarity = packet.gear?.rarity || item.rarity;
+    const node = el('div', '', 'roll-card'); node.dataset.roll = packet.id; node.dataset.rarity = rarity;
     node.setAttribute('role', 'group'); node.setAttribute('aria-label', `Loot roll: ${item.name}`);
-    const name = el('b', item.name, 'roll-name'); name.style.color = COLOURS[item.rarity] || '#fff';
+    const name = el('b', item.name, 'roll-name'); name.style.color = COLOURS[rarity] || '#fff';
     const time = el('span', '', 'roll-time');
     const head = el('div', '', 'roll-head'); head.append(name, time);
     const buttons = el('div', '', 'roll-buttons');

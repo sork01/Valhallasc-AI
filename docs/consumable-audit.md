@@ -1,5 +1,13 @@
 # Consumable audit (CONS-AUDIT)
 
+## Resource fix after this measurement
+
+`CONS-FIX-MANA` keeps the existing mana-potion and meal item IDs but lets every class use their resource portion. Mage and priest still receive the catalog's flat mana amount. Warrior rage and assassin/hunter energy have a 100-point cap, so they receive `min(100%, catalog mana / (100 + 15 × (item required level − 1)))` of that cap. The level-20 potion restores about 78 rage or energy; level-1 items restore up to 100. Meals deliver the same amount over eight seconds. A full resource rejects a resource-only potion without consuming it; meals can still be used at full health when resource is missing. The C quick slot is available to every class, and descriptions show the player's actual resource and amount. The existing shared potion cooldown remains 60 seconds. Broader health, cooldown, price and tier decisions remain in `CONS-RULES` after combat damage is tuned.
+
+## Price correction after this measurement
+
+`CONS-FIX-GOLD` lowered the level-one health and mana potion prices from 30 to 5 gold and Traveler's Stew from 12 to 3 gold. At one potion per minute, the potion now costs 300 gold per hour, 45% of the audited 665-gold hourly income. The tables below retain their original measured prices as the before state. Healing amounts, cooldowns, item IDs and all later-tier prices are unchanged.
+
 How the potions and food compare with real characters. Measured on 2026-10-15 with the server's own formulas, nothing estimated by hand:
 
 - **Potion and food numbers** come from the real item catalog (`scripts/consumable_tiers.py`) against characters built by the kill-time harness (normal gear for the level, points spent as in [ttk-rules.md](ttk-rules.md)). `bash scripts/cargo.sh test --offline consumable_audit -- --ignored` writes the rows (`CONS_OUT=path.json`; code in `server/src/world/consumable_audit.rs`): 165 rows for levels 1, 10, 20 ... 90 and 99, five classes, and the even, stamina-heavy and main-stat-heavy spreads.

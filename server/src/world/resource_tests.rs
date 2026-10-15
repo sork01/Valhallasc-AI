@@ -218,9 +218,15 @@ fn food_restores_mana_at_full_health_and_potions_share_cooldown_without_wasting_
             .unwrap()
             .character
             .add_item("mana_potion", 1);
+        w.players.get_mut(&1).unwrap().character.resource = Some(100.);
         w.use_item(1, "mana_potion");
         assert_eq!(w.players[&1].character.quantity("mana_potion"), 1);
         assert_eq!(w.players[&1].potion_cd, 0.);
+        w.players.get_mut(&1).unwrap().character.resource = Some(0.);
+        w.use_item(1, "mana_potion");
+        assert_eq!(w.players[&1].character.quantity("mana_potion"), 0);
+        assert_eq!(resource(&w), 100.);
+        assert!(w.players[&1].potion_cd > 0.);
     }
 }
 #[test]

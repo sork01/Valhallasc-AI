@@ -38,7 +38,7 @@ impl World {
     pub(super) fn is_arena_zone(&self, zone: usize) -> bool {
         self.maps.get(zone).is_some_and(|m| m.name == "The Arena")
     }
-    fn pvp_busy(&self, id: &str) -> bool {
+    pub(super) fn pvp_busy(&self, id: &str) -> bool {
         self.pvp.duels.iter().any(|d| d.from == id || d.to == id)
             || self
                 .pvp
@@ -125,7 +125,11 @@ impl World {
             return Err("Leave your duel or arena queue first.".into());
         }
         let p = self.online(me).ok_or("You are offline.")?;
-        if p.character.hp <= 0. || self.is_arena_zone(p.character.zone) || p.combat_left > 0. {
+        if p.is_hidden()
+            || p.character.hp <= 0.
+            || self.is_arena_zone(p.character.zone)
+            || p.combat_left > 0.
+        {
             return Err("You cannot change your flag during combat or an arena match.".into());
         }
         let session = *self
@@ -154,6 +158,8 @@ impl World {
         let b = self.online(target).ok_or("That player is offline.")?;
         if a.merc.is_some()
             || b.merc.is_some()
+            || a.is_hidden()
+            || b.is_hidden()
             || a.ambient.is_some()
             || b.ambient.is_some()
             || a.character.spark_travel.is_some()
@@ -263,6 +269,7 @@ impl World {
         for id in &members {
             let p = self.online(id).ok_or("All teammates must be online.")?;
             if p.character.hp <= 0.
+                || p.is_hidden()
                 || p.character.zone != first.character.zone
                 || self.is_arena_zone(p.character.zone)
                 || p.character.spark_travel.is_some()
@@ -417,6 +424,8 @@ impl World {
         let me = a.character.id.clone();
         let b = self.online(target).ok_or("Target is offline.")?;
         if me == target
+            || a.is_hidden()
+            || b.is_hidden()
             || a.character.zone != b.character.zone
             || a.character.hp <= 0.
             || b.character.hp <= 0.

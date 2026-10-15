@@ -3,8 +3,10 @@ mod auth;
 mod cathedral;
 mod items;
 mod model;
+mod notify;
 mod skills;
 mod store;
+mod visibility;
 mod world;
 
 use axum::{
@@ -89,6 +91,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if world.test_commands {
         tracing::warn!("VALHALLA_TEST_COMMANDS is on: players may use debug shortcuts");
     }
+    if !world.test_commands && !world.god_mode && world.start_level == 1 {
+        world.login_notifications = notify::start_from_env();
+    }
     let (tx, rx) = mpsc::channel(1024);
     let (snap_tx, snap_rx) = watch::channel(world.snapshot());
     let (shutdown_tx, shutdown_rx) = watch::channel(false);
@@ -172,7 +177,9 @@ fn zone_view(snapshot: &Value, id: &str, zone: &mut usize) -> Option<Value> {
     if let Some(found) = zones.iter().position(listed) {
         *zone = found;
     }
-    zones.get(*zone).cloned()
+    let mut view = zones.get(*zone).cloned()?;
+    visibility::filter_view(&mut view, id);
+    Some(view)
 }
 pub(crate) fn origin_allowed(headers: &HeaderMap, configured: Option<&str>) -> bool {
     let Some(origin) = headers.get(header::ORIGIN) else {

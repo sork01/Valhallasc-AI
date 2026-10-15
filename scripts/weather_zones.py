@@ -15,6 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "docs" / "weather-zones.txt"
+DATA = ROOT / "world" / "weather.txt"
 
 # Themes whose maps are enclosed even though they are public (docs/day-night.md).
 ENCLOSED = {"orrery", "deep", "heartwood", "arena"}
@@ -48,12 +49,12 @@ THEMES = {
 
 def derive():
     world = json.loads((ROOT / "world" / "map.txt").read_text())
-    maps = [(0, "meadow", world.get("name", "Greenmeadow"), None)] + [
-        (i + 1, z.get("theme", ""), z.get("name", "?"), z.get("copies")) for i, z in enumerate(world["zones"])
+    maps = [(0, "meadow", world.get("name", "Greenmeadow"), None, world.get("interior", False))] + [
+        (i + 1, z.get("theme", ""), z.get("name", "?"), z.get("copies"), z.get("interior", False)) for i, z in enumerate(world["zones"])
     ]
     rows, missing = [], []
-    for number, theme, name, copies in maps:
-        if copies or theme in ENCLOSED or theme.startswith("cathedral") or theme in _DUNGEON_THEMES(world):
+    for number, theme, name, copies, interior in maps:
+        if copies or interior or theme in ENCLOSED or theme.startswith("cathedral") or theme in _DUNGEON_THEMES(world):
             rows.append((number, name, theme, None))
         elif theme in THEMES:
             rows.append((number, name, theme, THEMES[theme]))
@@ -85,10 +86,15 @@ def render():
 
 if __name__ == "__main__":
     text = render()
+    rows, _ = derive()
+    data = json.dumps([dict(zone=n, theme=theme, allowed=(["clear"] + rule[0]) if rule else ["clear"],
+                            variant=rule[1] if rule else None, inside=rule is None)
+                       for n, _name, theme, rule in rows], indent=2) + "\n"
     if "--write" in sys.argv:
         OUT.write_text(text)
+        DATA.write_text(data)
     elif "--check" in sys.argv:
-        if not OUT.exists() or OUT.read_text() != text:
-            sys.exit("docs/weather-zones.txt is stale: run python3 scripts/weather_zones.py --write")
+        if not OUT.exists() or OUT.read_text() != text or not DATA.exists() or DATA.read_text() != data:
+            sys.exit("weather zone outputs are stale: run python3 scripts/weather_zones.py --write")
     else:
         print(text, end="")

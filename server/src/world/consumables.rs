@@ -1,6 +1,16 @@
-//! Food restores health and mana over time. Potions restore either immediately and share a persistent cooldown.
-//! Refused uses consume nothing, including mana items used by classes without mana.
+//! Food restores health and the class resource over time. Potions restore either immediately and share a persistent cooldown.
 use super::*;
+
+/// Mana amounts are catalog units. Rage and energy have a 100-point cap, so map each tier to roughly the same
+/// share of a normally equipped mana user's pool at the item's required level. Old potion/meal stacks keep their IDs.
+pub(super) fn resource_amount(it: &Item, c: &Character) -> f64 {
+    if c.look.class.resource_type() == "mana" {
+        it.mana
+    } else {
+        (it.mana / (100. + 15. * f64::from(it.required_level.saturating_sub(1)))).min(1.)
+            * c.max_resource()
+    }
+}
 
 impl World {
     pub(super) fn use_item(&mut self, session: u64, id: &str) {
@@ -26,24 +36,22 @@ impl World {
             return refuse(p, "You do not have that item.");
         }
         let max = p.character.max_hp();
-        let mana_user = p.character.look.class.resource_type() == "mana";
         let needs_health = it.heal > 0. && p.character.hp < max;
-        let needs_mana =
-            it.mana > 0. && mana_user && p.character.resource() < p.character.max_resource();
-        if !needs_health && !needs_mana {
+        let needs_resource = it.mana > 0. && p.character.resource() < p.character.max_resource();
+        if !needs_health && !needs_resource {
             return refuse(
                 p,
-                if it.heal > 0. && (!mana_user || it.mana == 0.) {
+                if it.heal > 0. && it.mana == 0. {
                     "You are already at full health."
                 } else if it.heal > 0. {
-                    "Your health and mana are already full."
+                    "Your health and resource are already full."
                 } else {
-                    "You cannot restore any mana with this item."
+                    "Your resource is already full."
                 },
             );
         }
         let mut healed = 0.;
-        let mut restored_mana = 0.;
+        let mut restored_resource = 0.;
         if it.kind == "food" {
             if it.duration <= 0. {
                 return refuse(p, "That item cannot be used.");
@@ -70,10 +78,11 @@ impl World {
             let before = p.character.hp;
             p.character.hp = (before + it.heal).min(max);
             healed = (p.character.hp - before).round();
-            if mana_user {
+            if it.mana > 0. {
                 let before = p.character.resource();
-                p.character.change_resource(it.mana);
-                restored_mana = (p.character.resource() - before).round();
+                let amount = resource_amount(it, &p.character);
+                p.character.change_resource(amount);
+                restored_resource = (p.character.resource() - before).round();
             }
             p.potion_cd = it.cooldown;
             p.character.potion_ready = unix_now() + it.cooldown.ceil() as u64;
@@ -82,15 +91,16 @@ impl World {
             stack.quantity -= 1;
         }
         p.character.inventory.retain(|s| s.quantity > 0);
-        let (actor, point, zone) = (
+        let (actor, point, zone, resource_type) = (
             p.character.id.clone(),
             p.character.point(),
             p.character.zone,
+            p.character.look.class.resource_type(),
         );
         self.emit_zone(
             zone,
             json!({"type":"event","kind":"consume","item":id,"actor":actor,"x":point.x,"y":point.y,
-                "value":healed,"mana":restored_mana,"crit":false}),
+                "value":healed,"mana":restored_resource,"resourceType":resource_type,"crit":false}),
         );
         self.save();
     }
@@ -111,14 +121,13 @@ impl World {
             return;
         };
         let (rate, left) = (meal.amount, meal.left);
-        let mana_rate = item(&meal.id).map_or(0., |i| i.mana / i.duration);
+        let resource_rate =
+            item(&meal.id).map_or(0., |i| resource_amount(i, &p.character) / i.duration);
         let step = TICK.min(left);
         let before = p.character.hp;
         p.character.hp = (before + rate * step).min(max);
         p.food_shown += p.character.hp - before;
-        if p.character.look.class.resource_type() == "mana" {
-            p.character.change_resource(mana_rate * step);
-        }
+        p.character.change_resource(resource_rate * step);
         // Announce what arrived about once a second, and the remainder when the meal ends.
         if (left - step).max(0.).ceil() < left.ceil() && p.food_shown >= 0.5 {
             let amount = p.food_shown.round();

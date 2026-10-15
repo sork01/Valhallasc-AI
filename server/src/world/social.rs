@@ -119,7 +119,7 @@ impl World {
             }
             return self
                 .online(id)
-                .filter(|p| p.merc.is_none())
+                .filter(|p| p.merc.is_none() && !p.is_hidden())
                 .map(|p| p.character.id.clone())
                 .ok_or_else(|| "That player is not online.".into());
         }
@@ -130,6 +130,7 @@ impl World {
         let wanted = name.to_lowercase();
         let mut found = self.players.values().filter(|p| {
             p.merc.is_none()
+                && !p.is_hidden()
                 && p.character.id != me
                 && p.character.look.name.to_lowercase() == wanted
         });
@@ -150,7 +151,7 @@ impl World {
 
     // ----- state sent to clients -----
     fn friend_entry(&self, id: &str) -> Option<Value> {
-        if let Some(p) = self.online(id) {
+        if let Some(p) = self.online(id).filter(|p| !p.is_hidden()) {
             let c = &p.character;
             return Some(
                 json!({"id":c.id,"name":c.look.name,"class":c.look.class,"level":c.level,"online":true,"place":self.zone_name(c.zone)}),
@@ -363,6 +364,15 @@ impl World {
         let Some(me) = self.players.get(&session).map(|p| p.character.id.clone()) else {
             return;
         };
+        if self.players[&session].is_hidden()
+            && !matches!(
+                command,
+                SocialCommand::Refresh | SocialCommand::Who | SocialCommand::FriendRemove { .. }
+            )
+        {
+            self.tell(&me, "Show yourself before using social actions.", false);
+            return;
+        }
         let result = match command {
             SocialCommand::Refresh => {
                 self.push_social(&[&me]);
@@ -418,7 +428,7 @@ impl World {
         let mut players: Vec<Value> = self
             .players
             .values()
-            .filter(|p| p.merc.is_none())
+            .filter(|p| p.merc.is_none() && (!p.is_hidden() || p.character.id == me))
             .map(|p| {
                 let c = &p.character;
                 json!({"id":c.id,"name":c.look.name,"class":c.look.class,"level":c.level,"place":self.zone_name(c.zone),

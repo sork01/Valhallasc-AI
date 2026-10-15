@@ -80,7 +80,10 @@ fn ambient_quest_matches(target: &str, kind: &str) -> bool {
 
 impl World {
     pub(super) fn visible_online(&self) -> usize {
-        self.players.values().filter(|p| p.merc.is_none()).count()
+        self.players
+            .values()
+            .filter(|p| p.merc.is_none() && !p.is_hidden())
+            .count()
     }
 
     pub(super) fn update_ambient(&mut self) {

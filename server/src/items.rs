@@ -87,6 +87,61 @@ static INDEX: LazyLock<std::collections::HashMap<&'static str, &'static Item>> =
 pub fn item(id: &str) -> Option<&'static Item> {
     INDEX.get(id).copied()
 }
+/// Each selected dungeon set piece gets its own rarity roll.
+pub const EPIC_SET_DROP_CHANCE: f64 = 0.05;
+pub fn set_piece_copy(piece: &Item, roll: f64) -> Option<GearInstance> {
+    if roll >= EPIC_SET_DROP_CHANCE || piece.rarity != "rare" || piece.source.is_none() {
+        return None;
+    }
+    let useful: &[&str] = match piece.class {
+        Some(Class::Warrior) => &["strength", "stamina", "agility", "accuracy", "dexterity"],
+        Some(Class::Mage | Class::Priest) => {
+            &["intellect", "stamina", "agility", "accuracy", "dexterity"]
+        }
+        Some(Class::Assassin | Class::Hunter) => {
+            &["agility", "stamina", "strength", "accuracy", "dexterity"]
+        }
+        None if piece.required_level >= 75 => &["stamina", "strength", "agility"],
+        None => &["stamina", "accuracy", "dexterity"],
+    };
+    let value = [
+        piece.bonus_stats.strength,
+        piece.bonus_stats.agility,
+        piece.bonus_stats.intellect,
+        piece.bonus_stats.stamina,
+        piece.bonus_stats.dexterity,
+        piece.bonus_stats.accuracy,
+    ]
+    .into_iter()
+    .max()
+    .unwrap_or(0);
+    let mut rolled = Attributes::default();
+    for stat in useful {
+        let (current, target, cap) = match *stat {
+            "strength" => (piece.bonus_stats.strength, &mut rolled.strength, u32::MAX),
+            "stamina" => (piece.bonus_stats.stamina, &mut rolled.stamina, u32::MAX),
+            "agility" => (piece.bonus_stats.agility, &mut rolled.agility, u32::MAX),
+            "intellect" => (piece.bonus_stats.intellect, &mut rolled.intellect, u32::MAX),
+            "accuracy" => (piece.bonus_stats.accuracy, &mut rolled.accuracy, 20),
+            "dexterity" => (piece.bonus_stats.dexterity, &mut rolled.dexterity, 70),
+            _ => unreachable!(),
+        };
+        if current == 0 && value <= cap {
+            *target = value;
+            break;
+        }
+    }
+    Some(GearInstance {
+        id: 0,
+        item: piece.id.clone(),
+        rarity: "epic".into(),
+        attack: (piece.attack * 1.175 * 10.).round() / 10.,
+        defense: (piece.defense * 1.175 * 10.).round() / 10.,
+        bonus_stats: piece.bonus_stats.clone(),
+        rolled_stats: rolled,
+        rank: 0,
+    })
+}
 /// One independent bag roll per enemy defeat, including elites and dungeon bosses.
 pub const BAG_DROP_CHANCE: f64 = 0.02;
 pub fn roll_bag(enemy_level: u32, chance: f64) -> Option<&'static Item> {
@@ -974,7 +1029,7 @@ impl Character {
         for (kind, variant) in [("armor", armor), ("weapon", weapon)] {
             if variant != "none"
                 && !equipment(self.look.class, kind, variant)
-                    .is_some_and(|i| self.quantity(&i.id) > 0)
+                    .is_some_and(|i| self.quantity(&i.id) > 0 && (self.gm || i.rarity != GM_RARITY))
             {
                 return Err("You must own equipment for your class before equipping it.");
             }
@@ -1016,6 +1071,7 @@ impl Character {
                             i.kind == kind
                                 && i.class.is_none_or(|class| class == self.look.class)
                                 && self.quantity(id) > 0
+                                && (self.gm || i.rarity != GM_RARITY)
                         })
                         .ok_or("You must own compatible gear for this slot.")?,
                 )
@@ -1105,9 +1161,20 @@ impl Character {
         if quantity == 0 || quantity > available {
             return Err("You can only sell items you own. Equipped items must be kept.");
         }
-        let value = i
-            .sell
-            .checked_mul(quantity)
+        if is_gear(i) {
+            self.materialize_gear_instances();
+        }
+        let epic_copies = self
+            .gear_instances
+            .iter()
+            .filter(|g| g.item == id)
+            .skip(self.equipped_count(i) as usize)
+            .take(quantity as usize)
+            .filter(|g| i.rarity == "rare" && g.rarity == "epic")
+            .count() as u32;
+        let value = quantity
+            .checked_add(epic_copies)
+            .and_then(|count| i.sell.checked_mul(count))
             .filter(|value| self.gold.checked_add(*value).is_some())
             .ok_or("That sale is too large.")?;
         if is_gear(i) {
@@ -1134,6 +1201,95 @@ mod tests {
             .create(Look::default(), Point::default())
             .unwrap()
             .0
+    }
+    #[test]
+    fn dungeon_set_epic_copy_has_independent_threshold_and_sale_value() {
+        for piece in ITEMS.iter().filter(|i| {
+            i.rarity == "rare" && i.source.as_deref().is_some_and(|s| s != "orange_pool")
+        }) {
+            let epic = set_piece_copy(piece, 0.0499).unwrap();
+            assert!(set_piece_copy(piece, 0.05).is_none(), "{}", piece.id);
+            assert_eq!(epic.item, piece.id);
+            assert_eq!(epic.rarity, "epic");
+            assert_eq!(epic.attack, (piece.attack * 11.75).round() / 10.);
+            assert_eq!(epic.defense, (piece.defense * 11.75).round() / 10.);
+            assert_eq!(epic.bonus_stats, piece.bonus_stats);
+            let combined = epic.effective_bonus_stats();
+            let present = [
+                combined.strength,
+                combined.agility,
+                combined.intellect,
+                combined.stamina,
+                combined.dexterity,
+                combined.accuracy,
+            ];
+            assert_eq!(
+                present.into_iter().filter(|n| *n > 0).count(),
+                2,
+                "{}",
+                piece.id
+            );
+            assert!(
+                combined.accuracy <= 20 && combined.dexterity <= 70,
+                "{}",
+                piece.id
+            );
+            assert_eq!(epic.rank, 0);
+            assert_eq!(epic.crystal(), "refinement_crystal_epic");
+        }
+        let piece = ITEMS
+            .iter()
+            .find(|i| i.source.as_deref() == Some("undervault") && i.kind == "necklace")
+            .or_else(|| {
+                ITEMS
+                    .iter()
+                    .find(|i| i.source.as_deref() == Some("undervault"))
+            })
+            .unwrap();
+        let mut c = character();
+        c.add_item(&piece.id, 1);
+        c.materialize_gear_instances();
+        c.gear_instances
+            .iter_mut()
+            .find(|g| g.item == piece.id)
+            .unwrap()
+            .rarity = "epic".into();
+        let saved = serde_json::to_string(&c).unwrap();
+        let mut loaded: Character = serde_json::from_str(&saved).unwrap();
+        assert_eq!(
+            loaded
+                .gear_instances
+                .iter()
+                .find(|g| g.item == piece.id)
+                .unwrap()
+                .rarity,
+            "epic"
+        );
+        assert_eq!(loaded.sell_item(&piece.id, 1).unwrap(), piece.sell * 2);
+        let mut refining = character();
+        refining.add_item(&piece.id, 2);
+        refining.materialize_gear_instances();
+        for copy in refining
+            .gear_instances
+            .iter_mut()
+            .filter(|g| g.item == piece.id)
+        {
+            copy.rarity = "epic".into();
+        }
+        let ids: Vec<_> = refining
+            .gear_instances
+            .iter()
+            .filter(|g| g.item == piece.id)
+            .map(|g| g.id)
+            .collect();
+        assert!(refining.preview_merge(ids[0], ids[1]).is_err());
+        refining.gold = 1_000;
+        refining.add_item("refinement_crystal_epic", 1);
+        let (ranked, paid, used) = refining.refine_gear(ids[0]).unwrap();
+        assert_eq!(
+            (ranked.rarity.as_str(), ranked.rank, paid, used),
+            ("epic", 1, 800, 1)
+        );
     }
     fn attribute_attack(a: &Attributes, class: Class) -> f64 {
         a.strength as f64 * if class == Class::Warrior { 2. } else { 0.5 }
@@ -1513,6 +1669,15 @@ mod tests {
                 assert_ne!(roll_rarity(kind, n as f64 / 2000.), Some(GM_RARITY));
             }
         }
+        let mut ordinary = character();
+        ordinary.add_item("warrior_weapon_gm", 1);
+        let armor = ordinary.look.warrior_armor.clone();
+        assert!(ordinary.equip_owned(&armor, "gm").is_err());
+        assert!(
+            ordinary
+                .equip_slots(&[("hands".into(), "warrior_weapon_gm".into())].into())
+                .is_err()
+        );
     }
     #[test]
     fn potions_and_food_have_a_stronger_tier_every_ten_levels() {

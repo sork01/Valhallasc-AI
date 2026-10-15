@@ -26,12 +26,17 @@ mod debug;
 #[cfg(test)]
 mod deep_tests;
 #[cfg(test)]
+mod dormant_zone_tests;
+#[cfg(test)]
 mod elder_hollow_tests;
+#[cfg(test)]
+mod epic_drop_tests;
 mod escort;
 #[cfg(test)]
 mod eye_below_tests;
 #[cfg(test)]
 mod frostwake_tests;
+mod gm_visibility;
 mod hold;
 mod instances;
 #[cfg(test)]
@@ -72,6 +77,7 @@ mod travel;
 mod ttk;
 #[cfg(test)]
 mod vault_tests;
+mod weather;
 #[cfg(test)]
 mod worldheart_tests;
 #[cfg(test)]
@@ -170,6 +176,9 @@ struct Player {
     pvp_flag: bool,
     /// Personal god mode of a game master (the debug command `set_god_mode`): no damage for this player only.
     god: bool,
+    /// GM visibility is transient and resets on login and every zone change.
+    hidden: bool,
+    visible_zone: usize,
     /// Set on a hired mercenary: the character id of the player who hired it (see world/mercs.rs).
     merc: Option<String>,
     /// The particular group objective this fighter was hired for; Meeting Stone hires have no quest contract.
@@ -210,6 +219,8 @@ impl Player {
         }
         character.resource = Some(character.resource());
         let potion_cd = character.potion_cooldown_left();
+        let hidden = character.gm;
+        let visible_zone = character.zone;
         Self {
             character,
             peer,
@@ -244,6 +255,8 @@ impl Player {
             portal_at: -99.,
             pvp_flag: false,
             god: false,
+            hidden,
+            visible_zone,
             merc: None,
             merc_quest: None,
             ambient: None,
@@ -259,7 +272,10 @@ impl Player {
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
             "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounted":c.mounted,
-            "pvpFlag":self.pvp_flag,"pvpSupported":true,"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
+            "pvpFlag":self.pvp_flag,"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
+    }
+    fn is_hidden(&self) -> bool {
+        self.character.gm && (self.hidden || self.character.zone != self.visible_zone)
     }
     /// The sum of every active buff of one kind.
     fn buff(&self, kind: BuffKind) -> f64 {
@@ -1134,6 +1150,10 @@ impl Slime {
             y: self.y,
         }
     }
+    /// Alive, resting at its post with nothing to chase: until somebody enters its zone there is nothing to simulate.
+    fn is_dormant(&self) -> bool {
+        !self.dead && self.target.is_none() && self.state == "idle"
+    }
 }
 #[derive(Clone, Serialize)]
 struct Bolt {
@@ -1217,6 +1237,7 @@ pub struct World {
     // Failed disconnect writes are retried by the next periodic transaction.
     pending_saves: Vec<Character>,
     world_clock: daynight::WorldClock,
+    weather: weather::Weather,
     time: f64,
     tick: u64,
     rng: u64,
@@ -1236,6 +1257,7 @@ pub struct World {
     pub start_level: u32,
     // Test servers only (VALHALLA_TEST_COMMANDS=1): players may send `debug` shortcuts. Never set on the public service.
     pub test_commands: bool,
+    pub login_notifications: Option<mpsc::Sender<crate::notify::LoginNotice>>,
     // Friend requests, party invites and parties. Nothing here is persisted except `Character::friends`.
     social: social::Social,
     trades: Vec<trade::Trade>,
@@ -1306,6 +1328,7 @@ impl World {
             loot_turns: BTreeMap::new(),
             pending_saves: vec![],
             world_clock: daynight::WorldClock::new(epoch),
+            weather: weather::Weather::new(epoch),
             time: 0.,
             tick: 0,
             rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
@@ -1319,6 +1342,7 @@ impl World {
             god_mode: false,
             start_level: 1,
             test_commands: false,
+            login_notifications: None,
             social: social::Social::default(),
             trades: vec![],
             pvp: pvp::Pvp::default(),
@@ -1435,9 +1459,23 @@ impl World {
             )
             .collect()
     }
+    /// Zones with at least one hero, hired fighter or autonomous adventurer in them.
+    fn populated_zones(&self) -> Vec<bool> {
+        let mut populated = vec![false; self.maps.len()];
+        for p in self.players.values() {
+            if let Some(zone) = populated.get_mut(p.character.zone) {
+                *zone = true;
+            }
+        }
+        populated
+    }
     fn separate_enemies(&mut self) {
+        let populated = self.populated_zones();
         for id in 0..self.slimes.len() {
-            if self.slimes[id].dead || self.zone_idle(self.slimes[id].zone) {
+            if self.slimes[id].dead
+                || self.zone_idle(self.slimes[id].zone)
+                || !populated[self.slimes[id].zone]
+            {
                 continue;
             }
             let bodies = self.actor_bodies(self.slimes[id].zone, None, Some(id));
@@ -1502,15 +1540,32 @@ impl World {
         self.emit(json!({"type":"system","text":"A King Slime has emerged in Greenmeadow!"}));
     }
     fn emit(&self, value: Value) {
+        let hidden_actor = value["actor"]
+            .as_str()
+            .is_some_and(|id| self.hidden_actor(id));
         for p in self.players.values() {
+            if hidden_actor && !p.character.gm {
+                continue;
+            }
             let _ = p.peer.try_send(value.clone());
         }
     }
     // Combat and pickup events carry coordinates, so only players in that zone receive them.
     fn emit_zone(&self, zone: usize, value: Value) {
+        let hidden_actor = value["actor"]
+            .as_str()
+            .is_some_and(|id| self.hidden_actor(id));
         for p in self.players.values().filter(|p| p.character.zone == zone) {
+            if hidden_actor && !p.character.gm {
+                continue;
+            }
             let _ = p.peer.try_send(value.clone());
         }
+    }
+    fn hidden_actor(&self, id: &str) -> bool {
+        self.players
+            .values()
+            .any(|p| p.character.id == id && p.is_hidden())
     }
     fn zone_of(&self, actor: &str) -> usize {
         self.players
@@ -1533,9 +1588,17 @@ impl World {
     // nothing about another zone is ever sent to this client.
     pub fn snapshot_for(&self, zone: usize) -> Value {
         let idle = self.zone_idle(zone);
+        let zone_weather = if self.maps[zone].interior {
+            json!({"type":"clear","intensity":"none","inside":true})
+        } else {
+            self.weather
+                .view(zone, self.maps[zone].template, daynight::unix_ms())
+        };
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
+        "weather":zone_weather,
         "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
             let mut view = p.snapshot();
+            if p.character.gm { view["session"] = json!(session); }
             // The bells a hero has ringing and how long each has left (only listed while there are any).
             let bells = self.chime.view(*session);
             if !bells.is_empty() {
@@ -1565,7 +1628,7 @@ impl World {
     // Published to every connection: one complete view per zone. Each connection forwards only the view
     // that holds its own character; `tick` and `online` also sit at the top for the health route.
     pub fn snapshot(&self) -> Value {
-        json!({"tick":self.tick,"online":self.visible_online(),"humansOnline":self.humans_online(),
+        json!({"tick":self.tick,"online":self.visible_online(),"humansOnline":self.visible_humans_online(),
         "zones":(0..self.maps.len()).map(|zone| self.snapshot_for(zone)).collect::<Vec<_>>()})
     }
 
@@ -1690,15 +1753,32 @@ impl World {
         let id = c.id.clone();
         let name = c.look.name.clone();
         let place = self.zone_name(c.zone).to_owned();
+        let notice =
+            crate::notify::eligible(&c, self.test_commands, self.god_mode, self.start_level).then(
+                || crate::notify::LoginNotice {
+                    id: id.clone(),
+                    name: name.clone(),
+                    class: c.look.class,
+                    level: c.level,
+                    zone: place.clone(),
+                },
+            );
         let friends = c.friends.clone();
         self.players.insert(session, Player::new(c, peer));
-        self.social_joined(&id, &name, &friends);
+        if let (Some(queue), Some(notice)) = (&self.login_notifications, notice) {
+            let _ = queue.try_send(notice);
+        }
+        if !self.players[&session].is_hidden() {
+            self.social_joined(&id, &name, &friends);
+        }
         self.separate_enemies();
-        self.emit(json!({"type":"system","text":format!("{name} entered {place}.")}));
+        if !self.players[&session].is_hidden() {
+            self.emit(json!({"type":"system","text":format!("{name} entered {place}.")}));
+        }
         let zone = self.players[&session].character.zone;
-        Ok(
-            json!({"type":"welcome","version":1,"id":id,"token":issued,"snapshot":self.snapshot_for(zone)}),
-        )
+        let mut snapshot = self.snapshot_for(zone);
+        crate::visibility::filter_view(&mut snapshot, &id);
+        Ok(json!({"type":"welcome","version":1,"id":id,"token":issued,"snapshot":snapshot}))
     }
     /// Test servers may start new characters above level 1 (VALHALLA_START_LEVEL).
     fn with_start_level(&self, mut c: Character) -> Character {
@@ -1736,10 +1816,15 @@ impl World {
             let name = p.character.look.name.clone();
             let place = self.zone_name(p.character.zone).to_owned();
             self.trade_left(&p.character.id);
-            self.social_left(&p.character.id, &name, &p.character.friends);
+            if !p.is_hidden() {
+                self.social_left(&p.character.id, &name, &p.character.friends);
+            }
+            let was_hidden = p.is_hidden();
             self.pending_saves.push(p.character);
             self.save();
-            self.emit(json!({"type":"system","text":format!("{name} left {place}.")}));
+            if !was_hidden {
+                self.emit(json!({"type":"system","text":format!("{name} left {place}.")}));
+            }
         }
     }
     fn save(&mut self) {
@@ -1922,7 +2007,7 @@ impl World {
                 }
                 p.chat_at = self.time;
                 let name = p.character.look.name.clone();
-                let id = p.character.id.clone();
+                let id = (!p.is_hidden()).then(|| p.character.id.clone());
                 self.emit(json!({"type":"chat","name":name,"id":id,"text":text}));
             }
             ClientMessage::Social { command } => {
@@ -2292,6 +2377,7 @@ impl World {
     pub fn step(&mut self) {
         self.time += TICK;
         self.tick += 1;
+        self.hide_gms_after_zone_change();
         self.update_king_spawn();
         self.update_instances();
         self.update_ambient();
@@ -2308,10 +2394,20 @@ impl World {
         // Players pass through actors; enemies yield before their own movement.
         self.separate_enemies();
         self.pursuit.retain(&self.players);
+        let populated = self.populated_zones();
         for i in 0..self.slimes.len() {
-            if !self.zone_idle(self.slimes[i].zone) {
-                self.update_slime(i);
+            let zone = self.slimes[i].zone;
+            if self.zone_idle(zone) {
+                continue;
             }
+            if !populated[zone] && self.slimes[i].is_dormant() {
+                // Nobody is there to see it: skip the work, but draw the two numbers `update_slime` would have drawn,
+                // so seeded runs keep the exact sequence they always had.
+                let _ = self.random();
+                let _ = self.random();
+                continue;
+            }
+            self.update_slime(i);
         }
         self.update_bolts();
         self.update_enemy_bolts();
@@ -3129,6 +3225,11 @@ impl World {
         if p.character.hp <= 0. {
             return 0.;
         }
+        // A GM strike is tied to the server-owned character and its worn golden weapon.
+        // This path covers basic attacks, projectiles, and damaging skills alike.
+        let gm_strike = p.character.gm
+            && p.character.look.warrior_weapon == "gm"
+            && p.character.quantity("warrior_weapon_gm") > 0;
         let actor = p.character.id.clone();
         // A mercenary's kills, loot and quest progress are its hirer's.
         let credit = self.credit_session(session);
@@ -3140,6 +3241,7 @@ impl World {
         if s.dead || s.zone != p.character.zone {
             return 0.;
         }
+        let damage = if gm_strike { s.hp.max(damage) } else { damage };
         let p = self.players.get_mut(&session).unwrap();
         p.combat_left = 5.;
         if damage <= 0. {
@@ -3345,9 +3447,14 @@ impl World {
         for slots in boss_slots(kind) {
             let choice = self.random();
             if let Some(piece) = boss_piece_for(kind, slots, choice) {
-                self.loot_drop(owner, zone, point, &piece.id);
+                self.set_piece_drop(owner, zone, point, piece);
             }
         }
+    }
+    fn set_piece_drop(&mut self, owner: &str, zone: usize, point: Point, piece: &Item) {
+        let rarity_roll = self.random();
+        let gear = set_piece_copy(piece, rarity_roll);
+        self.loot_drop_with_gear(owner, zone, point, &piece.id, gear);
     }
     fn item_drop(&mut self, owner: &str, zone: usize, point: Point, item_id: &str, quantity: u32) {
         let id = self.entity();
@@ -3384,7 +3491,7 @@ impl World {
         if s.target.is_some_and(|session| {
             self.players
                 .get(&session)
-                .is_some_and(|p| p.character.spark_travel.is_some())
+                .is_some_and(|p| p.character.spark_travel.is_some() || p.is_hidden())
         }) {
             s.target = None;
         }
@@ -3433,6 +3540,7 @@ impl World {
                 p.character.hp > 0.
                     && p.character.zone == zone
                     && p.character.spark_travel.is_none()
+                    && !p.is_hidden()
                     && !map.in_city(p.character.point())
             })
             .map(|(id, p)| {
@@ -3451,6 +3559,7 @@ impl World {
                     p.character.hp > 0.
                         && p.character.zone == zone
                         && p.character.spark_travel.is_none()
+                        && !p.is_hidden()
                         && !map.in_city(p.character.point())
                 })
                 .map(|p| {
@@ -3586,6 +3695,7 @@ impl World {
                         .filter(|(_, p)| {
                             p.character.hp > 0.
                                 && p.character.zone == zone
+                                && !p.is_hidden()
                                 && p.character.point().distance(centre) <= slam + PLAYER_RADIUS
                         })
                         .map(|(id, _)| *id)
@@ -3750,6 +3860,7 @@ impl World {
         let p = &self.players[&session];
         if self.god_mode
             || p.god
+            || p.is_hidden()
             || p.character.hp <= 0.
             || self.maps[p.character.zone].in_city(p.character.point())
             || p.dash > 0.
@@ -3957,12 +4068,12 @@ impl World {
         if !rewards.is_empty() {
             self.save();
         }
-        for (id, p, value, item_id, quantity, by) in rewards {
+        for (id, p, value, item_id, quantity, by, rarity) in rewards {
             if let Some(item_id) = item_id {
                 self.emit_zone(
                     self.zone_of(&id),
                     json!({"type":"event","kind":"itemPickup","actor":id,"x":p.x,"y":p.y,
-                    "item":item_id,"quantity":quantity,"name":item(&item_id).map(|i| &i.name),"by":by}),
+                    "item":item_id,"quantity":quantity,"name":item(&item_id).map(|i| &i.name),"by":by,"rarity":rarity}),
                 );
             } else {
                 self.event_with("pickup", &id, p, value as f64, false, json!({"by":by}));
@@ -4224,6 +4335,116 @@ mod tests {
     // Fixed levels keep health, damage and XP exact; level rolls have their own tests.
     fn world() -> World {
         World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)
+    }
+    #[test]
+    fn login_notice_only_queues_successful_human_joins() {
+        let mut w = world();
+        assert!(w.login_notifications.is_none());
+        let (queue, mut notices) = mpsc::channel(1);
+        w.login_notifications = Some(queue);
+        let (peer, _inbox) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), peer).unwrap();
+        let notice = notices.try_recv().unwrap();
+        assert_eq!(notice.id, welcome["id"]);
+        assert_eq!(notice.level, 1);
+        assert!(
+            w.join(
+                2,
+                welcome["token"].as_str().map(str::to_owned),
+                None,
+                mpsc::channel(256).0
+            )
+            .is_err()
+        );
+        assert!(notices.try_recv().is_err());
+        w.test_commands = true;
+        w.join(3, None, Some(Look::default()), mpsc::channel(256).0)
+            .unwrap();
+        assert!(notices.try_recv().is_err());
+        // A stalled sender cannot hold up a join or the next world tick.
+        w.test_commands = false;
+        let _ = w.login_notifications.as_ref().unwrap().try_send(notice);
+        let start = std::time::Instant::now();
+        w.join(4, None, Some(Look::default()), mpsc::channel(256).0)
+            .unwrap();
+        w.step();
+        assert!(start.elapsed() < std::time::Duration::from_millis(500));
+    }
+    #[tokio::test]
+    async fn login_notifies_fake_gotify_once_across_reconnects() {
+        use std::sync::Arc;
+        use tokio::sync::Mutex;
+        type Messages = Arc<Mutex<Vec<Value>>>;
+        async fn accept(
+            axum::extract::State(messages): axum::extract::State<Messages>,
+            axum::Json(body): axum::Json<Value>,
+        ) {
+            messages.lock().await.push(body);
+        }
+        let messages: Messages = Arc::new(Mutex::new(vec![]));
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let endpoint = format!("http://{}", listener.local_addr().unwrap());
+        tokio::spawn(
+            axum::serve(
+                listener,
+                axum::Router::new()
+                    .route("/message", axum::routing::post(accept))
+                    .with_state(messages.clone()),
+            )
+            .into_future(),
+        );
+        let mut w = world();
+        w.login_notifications = crate::notify::start(endpoint, "dummy-local-token".into());
+        let welcome = w
+            .join(1, None, Some(Look::default()), mpsc::channel(256).0)
+            .unwrap();
+        let key = welcome["token"].as_str().unwrap().to_owned();
+        tokio::time::timeout(std::time::Duration::from_secs(2), async {
+            while messages.lock().await.is_empty() {
+                tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+            }
+        })
+        .await
+        .unwrap();
+        w.leave(1);
+        w.join(2, Some(key.clone()), None, mpsc::channel(256).0)
+            .unwrap();
+        w.leave(2);
+        w.test_commands = true;
+        w.join(3, Some(key), None, mpsc::channel(256).0).unwrap();
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+        let received = messages.lock().await;
+        assert_eq!(received.len(), 1);
+        assert_eq!(received[0]["title"], "🎮 Valhalla login");
+        assert_eq!(received[0]["priority"], 2);
+        assert!(
+            received[0]["message"]
+                .as_str()
+                .unwrap()
+                .contains("Warrior · level 1 · Greenmeadow")
+        );
+    }
+    #[tokio::test]
+    async fn slow_gotify_cannot_hold_up_join_or_tick() {
+        async fn slow() {
+            tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+        }
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let endpoint = format!("http://{}", listener.local_addr().unwrap());
+        tokio::spawn(
+            axum::serve(
+                listener,
+                axum::Router::new().route("/message", axum::routing::post(slow)),
+            )
+            .into_future(),
+        );
+        let mut w = world();
+        w.login_notifications = crate::notify::start(endpoint, "dummy-local-token".into());
+        let started = std::time::Instant::now();
+        w.join(1, None, Some(Look::default()), mpsc::channel(256).0)
+            .unwrap();
+        w.step();
+        assert!(started.elapsed() < std::time::Duration::from_millis(500));
     }
     #[test]
     fn class_quest_reward_requires_a_valid_choice_and_claims_once() {
@@ -5321,10 +5542,11 @@ mod tests {
             quest_interact(w, "apothecary", Some("buy_health_potion"));
             dialogue_notice(rx)
         };
-        // Level 1: the original potion for 30 gold.
+        // Level 1: the original potion, at the catalog price.
+        let first = item("health_potion").unwrap().price;
         let text = buy(&mut w, &mut rx, 1, 100);
         assert_eq!(text, "Bought Health Potion.");
-        assert_eq!(w.players[&1].character.gold, 70);
+        assert_eq!(w.players[&1].character.gold, 100 - first);
         // Level 10 and 20: the stronger tiers at their own prices.
         let text = buy(&mut w, &mut rx, 10, 100);
         assert_eq!(text, "Bought Greater Health Potion.");
@@ -8776,6 +8998,7 @@ mod tests {
             levels: None,
             zones: vec![],
             copies: 0,
+            interior: false,
             sealed_template: false,
             final_boss: String::new(),
             players: 0,
@@ -11622,6 +11845,216 @@ mod tests {
     }
 
     #[test]
+    fn gm_strike_uses_worn_weapon_and_normal_kill_path() {
+        let mut w = world();
+        let sork = w.store.sso_account("Sork").unwrap();
+        join_gm(&mut w, 1, &sork, GM_NAME).unwrap();
+        let _normal = join(&mut w, 2, Class::Warrior);
+        let strong = w
+            .slimes
+            .iter()
+            .enumerate()
+            .filter(|(_, s)| !s.dead)
+            .max_by(|a, b| a.1.hp.total_cmp(&b.1.hp))
+            .unwrap()
+            .0;
+        let zone = w.slimes[strong].zone;
+        w.players.get_mut(&1).unwrap().character.zone = zone;
+        w.players.get_mut(&2).unwrap().character.zone = zone;
+        let hp = w.slimes[strong].hp;
+        assert!(hp > 1_000_000.);
+        assert_eq!(
+            w.hit_slime(strong, 2, 0., false),
+            0.,
+            "ordinary misses remain misses"
+        );
+        assert!(!w.slimes[strong].dead);
+        let before = w.players[&1].character.xp;
+        assert_eq!(w.hit_slime(strong, 1, 0., false), hp);
+        assert!(w.slimes[strong].dead);
+        assert!(
+            w.players[&1].character.xp > before,
+            "the normal reward path pays XP"
+        );
+
+        let second = w
+            .slimes
+            .iter()
+            .position(|s| !s.dead && s.zone == zone)
+            .unwrap();
+        w.players.get_mut(&1).unwrap().character.look.warrior_weapon = "none".into();
+        assert_eq!(w.hit_slime(second, 1, 1., false), 1.);
+        assert!(
+            !w.slimes[second].dead,
+            "removing the weapon removes the strike"
+        );
+    }
+
+    #[test]
+    fn gm_strike_reaches_the_toughest_living_enemy_in_every_populated_zone() {
+        let mut w = world();
+        let sork = w.store.sso_account("Sork").unwrap();
+        join_gm(&mut w, 1, &sork, GM_NAME).unwrap();
+        let strongest: Vec<usize> = (0..w.maps.len())
+            .filter_map(|zone| {
+                w.slimes
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, s)| s.zone == zone && !s.dead)
+                    .max_by(|a, b| a.1.hp.total_cmp(&b.1.hp))
+                    .map(|(id, _)| id)
+            })
+            .collect();
+        assert!(
+            strongest.len() >= 15,
+            "include outdoor zones and dungeon copies"
+        );
+        // The 150,000-defense assertion belongs with GM-GEAR-DATA, which is still unchecked.
+        assert!(w.players[&1].character.stats().1.is_finite());
+        for id in strongest {
+            let (zone, hp) = (w.slimes[id].zone, w.slimes[id].hp);
+            assert!(hp.is_finite() && hp > 0.);
+            w.players.get_mut(&1).unwrap().character.zone = zone;
+            let dealt = w.hit_slime(id, 1, 0., false);
+            assert_eq!(dealt, hp, "zone {zone}, {}", w.slimes[id].kind);
+            assert!(w.slimes[id].dead, "zone {zone}");
+        }
+    }
+
+    #[test]
+    fn gm_visibility_is_per_viewer_transient_and_server_authorized() {
+        let mut w = world();
+        let sork = w.store.sso_account("Sork").unwrap();
+        join_gm(&mut w, 1, &sork, GM_NAME).unwrap();
+        let gm = w.players[&1].character.id.clone();
+        let mut normal = join(&mut w, 2, Class::Warrior);
+        let guest = w.players[&2].character.id.clone();
+        let raw = w.snapshot_for(0);
+        let mut normal_view = raw.clone();
+        crate::visibility::filter_view(&mut normal_view, &guest);
+        assert!(
+            normal_view["players"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|p| p["id"] != gm)
+        );
+        assert_eq!(normal_view["online"], 1);
+        assert!(!normal_view.to_string().contains(&gm));
+        let mut gm_view = raw;
+        crate::visibility::filter_view(&mut gm_view, &gm);
+        assert!(
+            gm_view["players"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|p| p["id"] == gm && p["hidden"] == true)
+        );
+        assert_eq!(gm_view["online"], 2);
+        assert!(!gm_view.to_string().contains("\"session\""));
+
+        w.message(
+            2,
+            ClientMessage::Debug {
+                reference: Some(11),
+                command: DebugCommand::Visibility { mode: "on".into() },
+            },
+        );
+        assert!(
+            drain(&mut normal)
+                .iter()
+                .any(|v| v["ref"] == 11 && v["ok"] == false)
+        );
+        assert!(w.players[&1].is_hidden());
+        assert_eq!(w.set_visibility(1, "on").unwrap()["hidden"], false);
+        let mut shown = w.snapshot_for(0);
+        crate::visibility::filter_view(&mut shown, &guest);
+        assert!(
+            shown["players"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|p| p["id"] == gm)
+        );
+        assert_eq!(w.set_visibility(1, "off").unwrap()["hidden"], true);
+        assert!(!w.players[&1].pvp_flag);
+
+        // An enemy beside only the GM does not acquire a target.
+        let enemy = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == 0 && !s.dead)
+            .unwrap();
+        let at = w.slimes[enemy].point();
+        w.players.get_mut(&1).unwrap().character.x = at.x + 1.;
+        w.players.get_mut(&1).unwrap().character.y = at.y + 1.;
+        w.players.get_mut(&2).unwrap().character.zone = 1;
+        w.slimes[enemy].target = None;
+        w.update_slime(enemy);
+        assert_ne!(w.slimes[enemy].target, Some(1));
+
+        w.players.get_mut(&1).unwrap().character.zone = 1;
+        assert!(
+            w.players[&1].is_hidden(),
+            "a zone change hides before a broadcast"
+        );
+        w.hide_gms_after_zone_change();
+        assert!(w.players[&1].hidden);
+        w.leave(1);
+        let (peer, _rx) = mpsc::channel(256);
+        let welcome = w
+            .join_as(
+                3,
+                Identity::Account {
+                    id: sork.id,
+                    gm: true,
+                    character: Some(gm.clone()),
+                    look: None,
+                },
+                peer,
+            )
+            .unwrap();
+        assert_eq!(
+            welcome["snapshot"]["players"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|p| p["id"] == gm)
+                .unwrap()["hidden"],
+            true
+        );
+    }
+
+    #[test]
+    fn pickup_event_reports_the_awarded_copys_effective_rarity() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        let p = &w.players[&1].character;
+        let (owner, zone, at) = (p.id.clone(), p.zone, p.point());
+        let base = item("warrior_weapon_royal").unwrap();
+        let gear = GearInstance {
+            id: 0,
+            item: base.id.clone(),
+            rarity: "epic".into(),
+            attack: base.attack,
+            defense: base.defense,
+            bonus_stats: base.bonus_stats.clone(),
+            rolled_stats: Default::default(),
+            rank: 0,
+        };
+        w.loot_drop_with_gear(&owner, zone, at, &base.id, Some(gear));
+        w.drops.last_mut().unwrap().t = 1.;
+        w.update_drops();
+        let packet = drain(&mut rx)
+            .into_iter()
+            .find(|v| v["kind"] == "itemPickup")
+            .unwrap();
+        assert_eq!(packet["actor"], owner);
+        assert_eq!(packet["rarity"], "epic");
+        assert_eq!(packet["item"], base.id);
+    }
+
+    #[test]
     fn the_gm_character_is_an_extra_slot_built_by_the_server() {
         let mut w = world();
         let sork = w.store.sso_account("Sork").unwrap();
@@ -11881,7 +12314,11 @@ mod tests {
         assert_eq!(have(&w, "traveler_stew"), 0, "too far away to buy");
         quest_interact(&mut w, "baker", Some("buy_traveler_stew"));
         quest_interact(&mut w, "baker", Some("buy_traveler_stew"));
-        assert_eq!((have(&w, "traveler_stew"), gold(&w)), (2, 76));
+        let (stew, potion) = (
+            item("traveler_stew").unwrap().price,
+            item("health_potion").unwrap().price,
+        );
+        assert_eq!((have(&w, "traveler_stew"), gold(&w)), (2, 100 - 2 * stew));
         quest_interact(&mut w, "baker", Some("buy_health_potion"));
         assert_eq!(
             have(&w, "health_potion"),
@@ -11889,18 +12326,21 @@ mod tests {
             "the baker does not sell potions"
         );
         quest_interact(&mut w, "apothecary", Some("buy_health_potion"));
-        assert_eq!((have(&w, "health_potion"), gold(&w)), (1, 46));
-        w.players.get_mut(&1).unwrap().character.gold = 29;
+        assert_eq!(
+            (have(&w, "health_potion"), gold(&w)),
+            (1, 100 - 2 * stew - potion)
+        );
+        w.players.get_mut(&1).unwrap().character.gold = potion - 1;
         quest_interact(&mut w, "apothecary", Some("buy_health_potion"));
         assert_eq!(
             (have(&w, "health_potion"), gold(&w)),
-            (1, 29),
-            "29 gold is not enough"
+            (1, potion - 1),
+            "one gold short is not enough"
         );
         for id in ["traveler_stew", "health_potion"] {
             let it = item(id).unwrap();
             assert!(
-                it.sell > 0 && it.sell < 12,
+                it.sell > 0 && it.sell < it.price,
                 "{id} sells for less than it costs"
             );
         }
@@ -11935,7 +12375,7 @@ mod tests {
         quest_interact(&mut w, "baker", Some("buy_traveler_stew"));
         assert_eq!(
             (have(&w, "traveler_stew"), gold(&w)),
-            (3, 88),
+            (3, 100 - stew),
             "an existing stack still grows"
         );
     }
@@ -12004,6 +12444,58 @@ mod tests {
                 .unwrap()["value"],
             10.
         );
+    }
+
+    #[test]
+    fn mana_items_restore_each_classes_resource_without_wasting_full_stacks() {
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
+            let mut w = world();
+            let mut rx = join(&mut w, 1, class);
+            stock(&mut w, "mana_potion_l20", 2);
+            stock(&mut w, "traveler_stew", 1);
+            {
+                let c = &mut w.players.get_mut(&1).unwrap().character;
+                c.level = 20;
+                c.hp = c.max_hp();
+                c.resource = Some(0.);
+            }
+            w.use_item(1, "mana_potion_l20");
+            let c = &w.players[&1].character;
+            let expected = consumables::resource_amount(item("mana_potion_l20").unwrap(), c)
+                .min(c.max_resource());
+            assert!((c.resource() - expected).abs() < 0.01, "{class:?}");
+            assert_eq!(c.quantity("mana_potion_l20"), 1);
+            let event = drain(&mut rx)
+                .into_iter()
+                .find(|m| m["kind"] == "consume")
+                .unwrap();
+            assert_eq!(event["resourceType"], class.resource_type());
+            // Existing food stacks restore the same resource over time, even when health is full.
+            w.players.get_mut(&1).unwrap().character.resource = Some(0.);
+            w.use_item(1, "traveler_stew");
+            assert_eq!(w.players[&1].character.quantity("traveler_stew"), 0);
+            for _ in 0..20 {
+                w.update_food(1);
+            }
+            assert!(w.players[&1].character.resource() > 0., "{class:?} meal");
+            let max_resource = w.players[&1].character.max_resource();
+            w.players.get_mut(&1).unwrap().character.resource = Some(max_resource);
+            w.players.get_mut(&1).unwrap().potion_cd = 0.;
+            w.use_item(1, "mana_potion_l20");
+            assert_eq!(
+                w.players[&1].character.quantity("mana_potion_l20"),
+                1,
+                "{class:?} full resource"
+            );
+            assert!(drain(&mut rx).iter().any(|m| m["type"] == "error"
+                && m["text"].as_str().unwrap_or("").contains("already full")));
+        }
     }
 
     #[test]
@@ -12078,13 +12570,14 @@ mod tests {
     }
 
     #[test]
-    fn food_stops_at_full_health_and_ends_with_the_player_and_potions_work_during_it() {
+    fn food_stops_at_full_health_and_resource_and_potions_work_during_it() {
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Warrior);
         let max = w.players[&1].character.max_hp();
         stock(&mut w, "traveler_stew", 2);
         stock(&mut w, "health_potion", 1);
         hurt_to(&mut w, max);
+        w.players.get_mut(&1).unwrap().character.resource = Some(100.);
         w.use_item(1, "traveler_stew");
         assert_eq!(have(&w, "traveler_stew"), 2, "no meal at full health");
         hurt_to(&mut w, max - 30.);

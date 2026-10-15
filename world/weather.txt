@@ -1,0 +1,426 @@
+[
+  {
+    "zone": 0,
+    "theme": "meadow",
+    "allowed": [
+      "clear",
+      "rain",
+      "fog",
+      "thunderstorm",
+      "wind"
+    ],
+    "variant": "leaves",
+    "inside": false
+  },
+  {
+    "zone": 1,
+    "theme": "ember",
+    "allowed": [
+      "clear",
+      "fog",
+      "wind"
+    ],
+    "variant": "ash",
+    "inside": false
+  },
+  {
+    "zone": 2,
+    "theme": "frost",
+    "allowed": [
+      "clear",
+      "snow",
+      "fog"
+    ],
+    "variant": null,
+    "inside": false
+  },
+  {
+    "zone": 3,
+    "theme": "fen",
+    "allowed": [
+      "clear",
+      "rain",
+      "fog",
+      "thunderstorm"
+    ],
+    "variant": null,
+    "inside": false
+  },
+  {
+    "zone": 4,
+    "theme": "city",
+    "allowed": [
+      "clear",
+      "snow",
+      "fog"
+    ],
+    "variant": null,
+    "inside": false
+  },
+  {
+    "zone": 5,
+    "theme": "vault",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 6,
+    "theme": "wyrd",
+    "allowed": [
+      "clear",
+      "rain",
+      "fog",
+      "thunderstorm",
+      "wind"
+    ],
+    "variant": "leaves",
+    "inside": false
+  },
+  {
+    "zone": 7,
+    "theme": "sky",
+    "allowed": [
+      "clear",
+      "fog",
+      "wind",
+      "thunderstorm"
+    ],
+    "variant": "cloud",
+    "inside": false
+  },
+  {
+    "zone": 8,
+    "theme": "deep",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 9,
+    "theme": "nacre",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": false
+  },
+  {
+    "zone": 10,
+    "theme": "cathedral_left",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 11,
+    "theme": "cathedral_right",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 12,
+    "theme": "cathedral_main",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 13,
+    "theme": "astral",
+    "allowed": [
+      "clear",
+      "fog",
+      "wind"
+    ],
+    "variant": "stardust",
+    "inside": false
+  },
+  {
+    "zone": 14,
+    "theme": "prismwaste",
+    "allowed": [
+      "clear",
+      "wind",
+      "sandstorm"
+    ],
+    "variant": "shards",
+    "inside": false
+  },
+  {
+    "zone": 15,
+    "theme": "orrery",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 16,
+    "theme": "moonspore",
+    "allowed": [
+      "clear",
+      "rain",
+      "fog"
+    ],
+    "variant": null,
+    "inside": false
+  },
+  {
+    "zone": 17,
+    "theme": "asterion",
+    "allowed": [
+      "clear",
+      "wind"
+    ],
+    "variant": "cloud",
+    "inside": false
+  },
+  {
+    "zone": 18,
+    "theme": "moonwell",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 19,
+    "theme": "stormglass",
+    "allowed": [
+      "clear",
+      "rain",
+      "thunderstorm",
+      "wind"
+    ],
+    "variant": "dust",
+    "inside": false
+  },
+  {
+    "zone": 20,
+    "theme": "sunward",
+    "allowed": [
+      "clear",
+      "rain",
+      "fog",
+      "wind"
+    ],
+    "variant": "leaves",
+    "inside": false
+  },
+  {
+    "zone": 21,
+    "theme": "ribbonwild",
+    "allowed": [
+      "clear",
+      "rain",
+      "wind"
+    ],
+    "variant": "petals",
+    "inside": false
+  },
+  {
+    "zone": 22,
+    "theme": "tanglecrown",
+    "allowed": [
+      "clear",
+      "rain",
+      "fog",
+      "thunderstorm"
+    ],
+    "variant": null,
+    "inside": false
+  },
+  {
+    "zone": 23,
+    "theme": "worldtree",
+    "allowed": [
+      "clear",
+      "rain",
+      "fog",
+      "wind"
+    ],
+    "variant": "leaves",
+    "inside": false
+  },
+  {
+    "zone": 24,
+    "theme": "heartwood",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 25,
+    "theme": "lapiserg",
+    "allowed": [
+      "clear",
+      "wind",
+      "sandstorm"
+    ],
+    "variant": "dust",
+    "inside": false
+  },
+  {
+    "zone": 26,
+    "theme": "frostwake",
+    "allowed": [
+      "clear",
+      "snow",
+      "fog",
+      "wind"
+    ],
+    "variant": "snow",
+    "inside": false
+  },
+  {
+    "zone": 27,
+    "theme": "cairnspine",
+    "allowed": [
+      "clear",
+      "rain",
+      "snow",
+      "fog",
+      "wind"
+    ],
+    "variant": "dust",
+    "inside": false
+  },
+  {
+    "zone": 28,
+    "theme": "yearwheel",
+    "allowed": [
+      "clear",
+      "rain",
+      "thunderstorm",
+      "wind",
+      "snow",
+      "fog"
+    ],
+    "variant": "leaves",
+    "inside": false
+  },
+  {
+    "zone": 29,
+    "theme": "eye_below",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 30,
+    "theme": "elder_hollow",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 31,
+    "theme": "thousandfold",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 32,
+    "theme": "rain_crown",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 33,
+    "theme": "seed_vault",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 34,
+    "theme": "sunken_astrolabe",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 35,
+    "theme": "thunderheart_gate",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 36,
+    "theme": "blooming_labyrinth",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 37,
+    "theme": "solar_crucible",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 38,
+    "theme": "amber_archive",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 39,
+    "theme": "silent_solstice",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 40,
+    "theme": "arena",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  }
+]

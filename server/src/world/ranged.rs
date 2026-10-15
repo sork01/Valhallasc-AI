@@ -86,6 +86,7 @@ impl World {
                     p.character.hp > 0.
                         && p.character.zone == b.zone
                         && p.character.spark_travel.is_none()
+                        && !p.is_hidden()
                 })
                 .map(|(session, p)| (segment_distance(p.character.point(), start, end), *session))
                 .filter(|(d, _)| *d < PLAYER_RADIUS + BOLT_RADIUS * b.size.max(1.))

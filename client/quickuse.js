@@ -1,9 +1,9 @@
 'use strict';
-// Quick slots: Z food, X health potion, C mana potion (mana classes). They only send
+// Quick slots: Z food, X health potion, C resource potion. They only send
 // "use this item"; the server owns ownership, the one-meal rule, the 60 s potion cooldown and the healing.
 (() => {
   const $ = id => document.getElementById(id);
-  const KINDS = [{ kind: 'food', key: 'z', name: 'Food', empty: 'No food · buy Traveler\'s Stew from Pip in Alderhaven' }, { kind: 'potion', key: 'x', name: 'Potion', empty: 'No potion · buy Health Potions from Mira Moonleaf in Alderhaven' }, { kind: 'mana', key: 'c', name: 'Mana', empty: 'No mana potion · buy from a potion merchant' }];
+  const KINDS = [{ kind: 'food', key: 'z', name: 'Food', empty: 'No food · buy Traveler\'s Stew from Pip in Alderhaven' }, { kind: 'potion', key: 'x', name: 'Potion', empty: 'No potion · buy Health Potions from Mira Moonleaf in Alderhaven' }, { kind: 'mana', key: 'c', name: 'Resource', empty: 'No resource potion · buy from a potion merchant' }];
   const best = kind => WORLD_ITEMS.filter(i => (kind === 'mana' ? i.kind === 'potion' && i.mana > 0 : i.kind === kind && (kind !== 'potion' || i.heal > 0)) && Inventory.quantity(i.id) > 0 && (i.requiredLevel || 1) <= (Field.hero.level || 1)).sort((a, b) => kind === 'mana' ? b.mana - a.mana : (b.heal || 0) - (a.heal || 0))[0];
   const node = (tag, text, cls) => { const n = document.createElement(tag); if (text) n.textContent = text; if (cls) n.className = cls; return n; };
   const slots = new Map();
@@ -29,7 +29,7 @@
   function update() {
     if (!slots.size) build();
     for (const k of KINDS) {
-      const b = slots.get(k.kind); b.hidden = k.kind === 'mana' && Field.hero.resourceType !== 'mana';
+      const b = slots.get(k.kind); b.hidden = false;
       const i = best(k.kind), [left, total] = wait(k.kind, i);
       b.dataset.item = i?.id || '';
       b.disabled = !Field.canAct || (!!i && left > 0);
@@ -45,7 +45,7 @@
   addEventListener('keydown', event => {
     if ($('scene-game').hidden || event.repeat || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target?.tagName || '') || event.ctrlKey || event.altKey || event.metaKey) return;
     const slot = KINDS.find(k => k.key === event.key.toLowerCase());
-    if (!slot || !Field.canAct || (slot.kind === 'mana' && Field.hero.resourceType !== 'mana')) return;
+    if (!slot || !Field.canAct) return;
     event.preventDefault(); use(slot.kind);
   });
   window.Quickuse = { update, use };
