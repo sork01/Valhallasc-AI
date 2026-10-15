@@ -194,7 +194,11 @@ pub fn median(sorted: &[f64]) -> f64 {
     }
 }
 
-/// The normal gear for `level`: the gray (common) set whose required level is the level rounded down to a multiple
+/// The rarity of the baseline gear: green (`uncommon`), as decided on 2026-10-15. Gray is the floor, green is what a
+/// character is expected to wear, and blue and better add on top.
+pub const BASELINE_RARITY: &str = "uncommon";
+
+/// The normal gear for `level`: the green set whose required level is the level rounded down to a multiple
 /// of 5, one piece per slot, with no source, no refinement and no orange or dungeon piece. 99 uses the 95 set.
 pub fn gear_level(level: u32) -> u32 {
     (level / 5 * 5).clamp(5, 95)
@@ -204,21 +208,31 @@ pub fn normal_gear(class: Class, level: u32) -> Vec<(&'static str, String)> {
     SLOTS
         .iter()
         .map(|&(slot, kind)| {
-            let mut found = ITEMS.iter().filter(|i| {
-                i.kind == kind
-                    && i.rarity == "common"
-                    && i.required_level == want
-                    && i.source.is_none()
-                    && !i.starter
-                    && i.class.is_none_or(|c| c == class)
-            });
-            let piece = found
-                .next()
-                .unwrap_or_else(|| panic!("no gray {kind} for {class:?} at level {want}"));
+            let green: Vec<&Item> = ITEMS
+                .iter()
+                .filter(|i| {
+                    i.kind == kind
+                        && i.rarity == BASELINE_RARITY
+                        && i.required_level == want
+                        && i.source.is_none()
+                        && !i.starter
+                        && i.class.is_none_or(|c| c == class)
+                })
+                .collect();
+            // The progression set is named `..._l<level>_green`. Older stray pieces of the same rarity (gloves_upgrade)
+            // are not in it; where a slot has no progression piece (the level-5 pants) its single green piece is used.
+            let named: Vec<&Item> = green
+                .iter()
+                .copied()
+                .filter(|i| i.id.ends_with(&format!("_l{want}_green")))
+                .collect();
+            let chosen = if named.is_empty() { &green } else { &named };
             assert!(
-                found.next().is_none(),
-                "two gray {kind} for {class:?} at level {want}"
+                chosen.len() == 1,
+                "{} green {kind} for {class:?} at level {want}",
+                chosen.len()
             );
+            let piece = chosen[0];
             (slot, piece.id.clone())
         })
         .collect()
@@ -602,7 +616,7 @@ fn ttk_report() {
 }
 
 #[test]
-fn normal_gear_is_eight_gray_pieces_that_equip_for_every_class_and_level() {
+fn normal_gear_is_eight_green_pieces_that_equip_for_every_class_and_level() {
     for class in CLASSES {
         for level in levels() {
             let gear = normal_gear(class, level);
@@ -611,7 +625,7 @@ fn normal_gear_is_eight_gray_pieces_that_equip_for_every_class_and_level() {
             build_character(&mut c, &Case::new(class, level));
             for (_, id) in &gear {
                 let i = item(id).unwrap();
-                assert_eq!(i.rarity, "common", "{id}");
+                assert_eq!(i.rarity, BASELINE_RARITY, "{id}");
                 assert_eq!(i.required_level, gear_level(level), "{id}");
                 assert!(i.source.is_none() && !i.starter, "{id}");
                 assert_eq!(c.equipped_count(i), 1, "{id} is worn at {level}");
@@ -619,7 +633,7 @@ fn normal_gear_is_eight_gray_pieces_that_equip_for_every_class_and_level() {
             assert!(
                 c.gear_instances
                     .iter()
-                    .all(|g| g.rank == 0 && g.rarity == "common")
+                    .all(|g| g.rank == 0 && g.rarity == BASELINE_RARITY)
             );
         }
     }

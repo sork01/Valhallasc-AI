@@ -5,7 +5,7 @@ These settle `TTK-RULES` in [TODO.md](../TODO.md). `TTK-HARNESS` builds the test
 ## Cases
 
 - **Levels:** 5, 10, 15 … 95 and 99, which is 20 levels. **Classes:** warrior, mage, assassin, priest, hunter. That is 100 cases per variant.
-- **Normal gear** is the level's ordinary progression set at **gray (common)** rarity in all eight slots (armor, headgear, shoulders, gloves, weapon, pants, necklace, accessory): the set whose `requiredLevel` is the character's level rounded down to a multiple of 5 (99 uses the level-95 set). It is worn with **no refinement, no merge, no set bonus, no orange or dungeon piece**. The harness takes pieces from `world/items.txt` by `requiredLevel` and `rarity`, so a catalog change moves the test with it.
+- **Normal gear** is the level's ordinary progression set at **green (uncommon)** rarity in all eight slots (decided 2026-10-15: green is the baseline a character is expected to wear; gray is the floor below it and blue and better add on top) (armor, headgear, shoulders, gloves, weapon, pants, necklace, accessory): the set whose `requiredLevel` is the character's level rounded down to a multiple of 5 (99 uses the level-95 set). It is worn with **no refinement, no merge, no set bonus, no orange or dungeon piece**. The harness takes pieces from `world/items.txt` by `requiredLevel` and `rarity`, so a catalog change moves the test with it.
 - **Skills:** the skills and ranks the class has at that level (`docs/skill-ranks.md`), on the skillbar in unlock order, with passives from `skills::passive_bonus`.
 - **Attributes:** `3 × (level − 1)` points spent three ways:
   - `even`: the Recommended spread from [recommended-stats.md](recommended-stats.md).
