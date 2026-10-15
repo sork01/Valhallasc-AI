@@ -127,6 +127,7 @@ impl World {
         self.bolts.retain(|b| b.zone != zone);
         self.enemy_bolts.retain(|b| b.zone != zone);
         self.drops.retain(|d| d.zone != zone);
+        self.clear_chests(zone);
         self.instances[index].active = false;
         self.instances[index].cleared = false;
     }

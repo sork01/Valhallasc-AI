@@ -68,3 +68,13 @@ None. The point is to search, so chests appear neither on the minimap nor on the
 - A test-only knob (`VALHALLA_TEST_COMMANDS=1`) shortens the interval and forces the roll, the same way the other debug commands skip only time.
 - Seeded rolls over many intervals must average 10% within a stated tolerance.
 - The eligibility test runs `scripts/chest_zones.py --check` and compares the Rust-side list with the file.
+
+## Implementation notes (`CHEST-SERVER`, `server/src/world/chests.rs`)
+
+- **Own random generator.** Placement and the 10% roll use `Chests::rng`, never `World::rng`, so chests cannot change a seeded fight or drop sequence. Contents are rolled with the world generator at the moment of opening.
+- **Walking grid.** Placement rasterises the map's obstacles into a one-tile grid, flood-fills the walking distance from the arrival point once per template zone and caches it. The data has no closable doors: boss-gated and sealed passages are portals and `after_clear` exits, which the flood fill never crosses. A tile also needs free cells on all four sides, so the opener can stand beside the chest.
+- **Clearances.** Monster homes, NPCs, drops, players and other chests keep 3 tiles from a chest; portals keep 7 tiles (the straight-line half of the 14-tile rule, because a portal sits next to the arrival point it is already measured from). Obstacles need only the free cell around them, not 3 tiles, because the forests would leave no candidates.
+- **Dungeon rooms.** `Map::rooms` now loads the `rooms` rectangles of the zone data. A dungeon chest lies inside a room that holds neither the final boss nor a living boss, and at least 8 tiles from any boss home. Moonwell has no rooms, so there only the boss distance applies.
+- **Messages.** The spawn line is sent to everyone present and once to anyone who arrives later; opening and vanishing are announced to the area. A dungeon copy that resets removes its chest silently and starts its timer again.
+- **Open request.** `{"type":"open_chest","id":N}`. Snapshots carry `chests: [{id, zone, x, y, left}]`; the copy's zone is rewritten to the template zone like every other entity.
+- **Not yet done:** the purple chance on the dungeon set piece waits for `DROP-EPIC-SERVER`; `CHEST-ART`, `CHEST-CLIENT` and the test knob that forces a roll belong to the later tasks (the unit tests shorten `Chests::interval` directly).

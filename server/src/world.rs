@@ -16,7 +16,10 @@ mod asterion_tests;
 mod cairn_tests;
 #[cfg(test)]
 mod cathedral_tests;
+mod chests;
 mod chime;
+#[cfg(test)]
+mod consumable_audit;
 mod consumables;
 mod daynight;
 mod debug;
@@ -65,6 +68,8 @@ mod tanglecrown_tests;
 mod thousandfold_tests;
 mod trade;
 mod travel;
+#[cfg(test)]
+mod ttk;
 #[cfg(test)]
 mod vault_tests;
 #[cfg(test)]
@@ -1238,6 +1243,8 @@ pub struct World {
     // Hold objectives in progress (world/hold.rs).
     hold: hold::Holds,
     chime: chime::Chimes,
+    // Treasure chests and their roll timers (world/chests.rs). Runtime state, never saved.
+    chests: chests::Chests,
 }
 impl World {
     // Production code reads VALHALLA_LEVEL_SPREAD in main; tests that want real random levels use this.
@@ -1317,6 +1324,9 @@ impl World {
             pvp: pvp::Pvp::default(),
             hold: hold::Holds::default(),
             chime: chime::Chimes::default(),
+            chests: chests::Chests::new(u64::from_le_bytes(
+                uuid::Uuid::new_v4().as_bytes()[8..16].try_into().unwrap(),
+            )),
         };
         for id in 0..world.spawns.len() {
             let enemy = world.fresh_enemy(id);
@@ -1537,12 +1547,13 @@ impl World {
         "bolts":self.bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
         "ebolts":self.enemy_bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
         "drops":self.drops.iter().filter(|d| d.zone == zone).collect::<Vec<_>>(),
+        "chests":self.chests.list.iter().filter(|c| c.zone == zone).collect::<Vec<_>>(),
         "online":self.visible_online()});
         if let Some(instance) = self.instance_at(zone) {
             view["instance"] = json!({"cleared":instance.cleared});
             // A private copy is told it is the template zone, so a client has one dungeon whatever copy it stands in.
             if instance.template != zone {
-                for key in ["players", "slimes", "bolts", "ebolts", "drops"] {
+                for key in ["players", "slimes", "bolts", "ebolts", "drops", "chests"] {
                     for item in view[key].as_array_mut().into_iter().flatten() {
                         item["zone"] = json!(instance.template);
                     }
@@ -1838,6 +1849,9 @@ impl World {
             }
             ClientMessage::UseItem { item } => {
                 self.use_item(session, &item);
+            }
+            ClientMessage::OpenChest { id } => {
+                self.open_chest(session, id);
             }
             ClientMessage::Mount { mounted } => {
                 if !mounted {
@@ -2285,6 +2299,7 @@ impl World {
         self.update_escorts();
         self.update_holds();
         self.update_chimes();
+        self.update_chests();
         let sessions: Vec<_> = self.players.keys().copied().collect();
         for session in sessions {
             self.update_food(session);
@@ -8748,6 +8763,7 @@ mod tests {
         let map = Map {
             name: String::new(),
             size: 96,
+            rooms: vec![],
             spawn: Point::default(),
             objects: vec![],
             slimes: vec![],

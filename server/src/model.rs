@@ -1006,6 +1006,9 @@ pub enum ClientMessage {
     Mount {
         mounted: bool,
     },
+    OpenChest {
+        id: u64,
+    },
     Equip {
         armor: Option<String>,
         weapon: Option<String>,
@@ -1461,6 +1464,9 @@ pub struct Map {
     /// The character level a dungeon's door asks for; a lower level cannot step in (0: anyone may).
     #[serde(default)]
     pub min_level: u32,
+    /// A dungeon's rooms as `[x0, y0, x1, y1]` tile rectangles (chests are only placed inside them).
+    #[serde(default)]
+    pub rooms: Vec<[f64; 4]>,
     /// Set by the world on the extra copies of a dungeon: the zone they copy.
     #[serde(skip)]
     pub template: Option<usize>,
@@ -1720,6 +1726,7 @@ mod tests {
         let map = Map {
             name: String::new(),
             size: 72,
+            rooms: vec![],
             spawn: Point::default(),
             slimes: vec![],
             npcs: vec![],
