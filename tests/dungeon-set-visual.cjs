@@ -21,8 +21,9 @@ let browser;
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto(`http://127.0.0.1:${server.address().port}/`);
   const result = await page.evaluate(async () => {
-    const sources = [null, 'undervault', 'cathedral_cloister', 'cathedral_reliquary', 'cathedral_nave', 'moonwell'];
-    const levels = [40, 20, 40, 45, 50, 60];
+    const sources = [null, 'undervault', 'cathedral_cloister', 'cathedral_reliquary', 'cathedral_nave', 'moonwell', 'eye_below', 'elder_hollow',
+      'thousandfold', 'rain_crown', 'seed_vault', 'sunken_astrolabe', 'thunderheart_gate', 'blooming_labyrinth', 'solar_crucible', 'amber_archive', 'silent_solstice'];
+    const levels = [40, 20, 40, 45, 50, 60, 65, 70, 75, 80, 80, 85, 95, 95, 95, 95, 95];
     const figures = [], values = [];
     for (let n = 0; n < sources.length; n++) {
       const source = sources[n], level = levels[n];
@@ -56,14 +57,14 @@ let browser;
     return { values, figures };
   });
   assert.equal(result.values[0].theme, null);
-  assert.equal(new Set(result.values.slice(1).map(v => v.theme)).size, 5);
+  assert.equal(new Set(result.values.slice(1).map(v => v.theme)).size, 16);
   assert.ok(result.values.slice(1).every(v => v.outer > result.values[0].outer + 100));
   assert.ok(result.values.slice(1).every(v => v.armorTint));
-  assert.equal(new Set(result.values.map(v => v.hash)).size, 6);
+  assert.equal(new Set(result.values.map(v => v.hash)).size, 17);
   assert.deepEqual(errors, []);
   const out = path.join(root, 'test-results/dungeon-marks/real-client-warrior.png');
   fs.mkdirSync(path.dirname(out), { recursive: true });
-  // A browser canvas combines the six real frames without resizing the pixels.
+  // A browser canvas combines the seventeen real frames without resizing the pixels.
   const combined = await page.evaluate(figures => {
     const c = document.createElement('canvas'); c.width = 240 * figures.length; c.height = 240;
     const g = c.getContext('2d');
@@ -72,7 +73,7 @@ let browser;
     }))).then(() => c.toDataURL('image/png').split(',')[1]);
   }, result.figures);
   fs.writeFileSync(out, Buffer.from(combined, 'base64'));
-  console.log('6 real-client dungeon look checks passed: ' + out);
+  console.log('17 real-client dungeon look checks passed: ' + out);
 })().catch(e => { console.error(e); process.exitCode = 1; }).finally(async () => {
   await browser?.close();
   await new Promise(resolve => server.close(resolve));

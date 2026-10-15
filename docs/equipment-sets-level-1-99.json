@@ -840,6 +840,62 @@
     }
   },
   {
+    "level": "65",
+    "set": "Eye Below",
+    "classes": {
+      "warrior": [
+        "armor_regeareye",
+        "pants_regeareye",
+        "shoulders_regeareye",
+        "gloves_regeareye",
+        "head_regeareye",
+        "necklace_regeareye",
+        "accessory_regeareye",
+        "weapon_regeareye"
+      ],
+      "mage": [
+        "armor_regeareye",
+        "pants_regeareye",
+        "shoulders_regeareye",
+        "gloves_regeareye",
+        "head_regeareye",
+        "necklace_regeareye",
+        "accessory_regeareye",
+        "weapon_regeareye"
+      ],
+      "assassin": [
+        "armor_regeareye",
+        "pants_regeareye",
+        "shoulders_regeareye",
+        "gloves_regeareye",
+        "head_regeareye",
+        "necklace_regeareye",
+        "accessory_regeareye",
+        "weapon_regeareye"
+      ],
+      "priest": [
+        "armor_regeareye",
+        "pants_regeareye",
+        "shoulders_regeareye",
+        "gloves_regeareye",
+        "head_regeareye",
+        "necklace_regeareye",
+        "accessory_regeareye",
+        "weapon_regeareye"
+      ],
+      "hunter": [
+        "armor_regeareye",
+        "pants_regeareye",
+        "shoulders_regeareye",
+        "gloves_regeareye",
+        "head_regeareye",
+        "necklace_regeareye",
+        "accessory_regeareye",
+        "weapon_regeareye"
+      ]
+    }
+  },
+  {
     "level": "70",
     "set": "Progression",
     "classes": {
@@ -892,6 +948,62 @@
         "necklace_regearl70",
         "accessory_regearl70",
         "weapon_regearl70"
+      ]
+    }
+  },
+  {
+    "level": "70",
+    "set": "Elder Hollow",
+    "classes": {
+      "warrior": [
+        "armor_regearelder",
+        "pants_regearelder",
+        "shoulders_regearelder",
+        "gloves_regearelder",
+        "head_regearelder",
+        "necklace_regearelder",
+        "accessory_regearelder",
+        "weapon_regearelder"
+      ],
+      "mage": [
+        "armor_regearelder",
+        "pants_regearelder",
+        "shoulders_regearelder",
+        "gloves_regearelder",
+        "head_regearelder",
+        "necklace_regearelder",
+        "accessory_regearelder",
+        "weapon_regearelder"
+      ],
+      "assassin": [
+        "armor_regearelder",
+        "pants_regearelder",
+        "shoulders_regearelder",
+        "gloves_regearelder",
+        "head_regearelder",
+        "necklace_regearelder",
+        "accessory_regearelder",
+        "weapon_regearelder"
+      ],
+      "priest": [
+        "armor_regearelder",
+        "pants_regearelder",
+        "shoulders_regearelder",
+        "gloves_regearelder",
+        "head_regearelder",
+        "necklace_regearelder",
+        "accessory_regearelder",
+        "weapon_regearelder"
+      ],
+      "hunter": [
+        "armor_regearelder",
+        "pants_regearelder",
+        "shoulders_regearelder",
+        "gloves_regearelder",
+        "head_regearelder",
+        "necklace_regearelder",
+        "accessory_regearelder",
+        "weapon_regearelder"
       ]
     }
   },
@@ -952,6 +1064,62 @@
     }
   },
   {
+    "level": "75",
+    "set": "Thousandfold Pavilion",
+    "classes": {
+      "warrior": [
+        "armor_regearpavilion",
+        "pants_regearpavilion",
+        "shoulders_regearpavilion",
+        "gloves_regearpavilion",
+        "head_regearpavilion",
+        "necklace_regearpavilion",
+        "accessory_regearpavilion",
+        "weapon_regearpavilion"
+      ],
+      "mage": [
+        "armor_regearpavilion",
+        "pants_regearpavilion",
+        "shoulders_regearpavilion",
+        "gloves_regearpavilion",
+        "head_regearpavilion",
+        "necklace_regearpavilion",
+        "accessory_regearpavilion",
+        "weapon_regearpavilion"
+      ],
+      "assassin": [
+        "armor_regearpavilion",
+        "pants_regearpavilion",
+        "shoulders_regearpavilion",
+        "gloves_regearpavilion",
+        "head_regearpavilion",
+        "necklace_regearpavilion",
+        "accessory_regearpavilion",
+        "weapon_regearpavilion"
+      ],
+      "priest": [
+        "armor_regearpavilion",
+        "pants_regearpavilion",
+        "shoulders_regearpavilion",
+        "gloves_regearpavilion",
+        "head_regearpavilion",
+        "necklace_regearpavilion",
+        "accessory_regearpavilion",
+        "weapon_regearpavilion"
+      ],
+      "hunter": [
+        "armor_regearpavilion",
+        "pants_regearpavilion",
+        "shoulders_regearpavilion",
+        "gloves_regearpavilion",
+        "head_regearpavilion",
+        "necklace_regearpavilion",
+        "accessory_regearpavilion",
+        "weapon_regearpavilion"
+      ]
+    }
+  },
+  {
     "level": "80",
     "set": "Progression",
     "classes": {
@@ -1008,6 +1176,118 @@
     }
   },
   {
+    "level": "80",
+    "set": "Rain Crown",
+    "classes": {
+      "warrior": [
+        "armor_regearrain",
+        "pants_regearrain",
+        "shoulders_regearrain",
+        "gloves_regearrain",
+        "head_regearrain",
+        "necklace_regearrain",
+        "accessory_regearrain",
+        "weapon_regearrain"
+      ],
+      "mage": [
+        "armor_regearrain",
+        "pants_regearrain",
+        "shoulders_regearrain",
+        "gloves_regearrain",
+        "head_regearrain",
+        "necklace_regearrain",
+        "accessory_regearrain",
+        "weapon_regearrain"
+      ],
+      "assassin": [
+        "armor_regearrain",
+        "pants_regearrain",
+        "shoulders_regearrain",
+        "gloves_regearrain",
+        "head_regearrain",
+        "necklace_regearrain",
+        "accessory_regearrain",
+        "weapon_regearrain"
+      ],
+      "priest": [
+        "armor_regearrain",
+        "pants_regearrain",
+        "shoulders_regearrain",
+        "gloves_regearrain",
+        "head_regearrain",
+        "necklace_regearrain",
+        "accessory_regearrain",
+        "weapon_regearrain"
+      ],
+      "hunter": [
+        "armor_regearrain",
+        "pants_regearrain",
+        "shoulders_regearrain",
+        "gloves_regearrain",
+        "head_regearrain",
+        "necklace_regearrain",
+        "accessory_regearrain",
+        "weapon_regearrain"
+      ]
+    }
+  },
+  {
+    "level": "80",
+    "set": "Seed Vault",
+    "classes": {
+      "warrior": [
+        "armor_regearseed",
+        "pants_regearseed",
+        "shoulders_regearseed",
+        "gloves_regearseed",
+        "head_regearseed",
+        "necklace_regearseed",
+        "accessory_regearseed",
+        "weapon_regearseed"
+      ],
+      "mage": [
+        "armor_regearseed",
+        "pants_regearseed",
+        "shoulders_regearseed",
+        "gloves_regearseed",
+        "head_regearseed",
+        "necklace_regearseed",
+        "accessory_regearseed",
+        "weapon_regearseed"
+      ],
+      "assassin": [
+        "armor_regearseed",
+        "pants_regearseed",
+        "shoulders_regearseed",
+        "gloves_regearseed",
+        "head_regearseed",
+        "necklace_regearseed",
+        "accessory_regearseed",
+        "weapon_regearseed"
+      ],
+      "priest": [
+        "armor_regearseed",
+        "pants_regearseed",
+        "shoulders_regearseed",
+        "gloves_regearseed",
+        "head_regearseed",
+        "necklace_regearseed",
+        "accessory_regearseed",
+        "weapon_regearseed"
+      ],
+      "hunter": [
+        "armor_regearseed",
+        "pants_regearseed",
+        "shoulders_regearseed",
+        "gloves_regearseed",
+        "head_regearseed",
+        "necklace_regearseed",
+        "accessory_regearseed",
+        "weapon_regearseed"
+      ]
+    }
+  },
+  {
     "level": "85",
     "set": "Progression",
     "classes": {
@@ -1060,6 +1340,62 @@
         "necklace_regearl85",
         "accessory_regearl85",
         "weapon_regearl85"
+      ]
+    }
+  },
+  {
+    "level": "85",
+    "set": "Sunken Astrolabe",
+    "classes": {
+      "warrior": [
+        "armor_regearastro",
+        "pants_regearastro",
+        "shoulders_regearastro",
+        "gloves_regearastro",
+        "head_regearastro",
+        "necklace_regearastro",
+        "accessory_regearastro",
+        "weapon_regearastro"
+      ],
+      "mage": [
+        "armor_regearastro",
+        "pants_regearastro",
+        "shoulders_regearastro",
+        "gloves_regearastro",
+        "head_regearastro",
+        "necklace_regearastro",
+        "accessory_regearastro",
+        "weapon_regearastro"
+      ],
+      "assassin": [
+        "armor_regearastro",
+        "pants_regearastro",
+        "shoulders_regearastro",
+        "gloves_regearastro",
+        "head_regearastro",
+        "necklace_regearastro",
+        "accessory_regearastro",
+        "weapon_regearastro"
+      ],
+      "priest": [
+        "armor_regearastro",
+        "pants_regearastro",
+        "shoulders_regearastro",
+        "gloves_regearastro",
+        "head_regearastro",
+        "necklace_regearastro",
+        "accessory_regearastro",
+        "weapon_regearastro"
+      ],
+      "hunter": [
+        "armor_regearastro",
+        "pants_regearastro",
+        "shoulders_regearastro",
+        "gloves_regearastro",
+        "head_regearastro",
+        "necklace_regearastro",
+        "accessory_regearastro",
+        "weapon_regearastro"
       ]
     }
   },
@@ -1172,6 +1508,286 @@
         "necklace_regearl95",
         "accessory_regearl95",
         "weapon_regearl95"
+      ]
+    }
+  },
+  {
+    "level": "95",
+    "set": "Thunderheart Gate",
+    "classes": {
+      "warrior": [
+        "armor_regearthunder",
+        "pants_regearthunder",
+        "shoulders_regearthunder",
+        "gloves_regearthunder",
+        "head_regearthunder",
+        "necklace_regearthunder",
+        "accessory_regearthunder",
+        "weapon_regearthunder"
+      ],
+      "mage": [
+        "armor_regearthunder",
+        "pants_regearthunder",
+        "shoulders_regearthunder",
+        "gloves_regearthunder",
+        "head_regearthunder",
+        "necklace_regearthunder",
+        "accessory_regearthunder",
+        "weapon_regearthunder"
+      ],
+      "assassin": [
+        "armor_regearthunder",
+        "pants_regearthunder",
+        "shoulders_regearthunder",
+        "gloves_regearthunder",
+        "head_regearthunder",
+        "necklace_regearthunder",
+        "accessory_regearthunder",
+        "weapon_regearthunder"
+      ],
+      "priest": [
+        "armor_regearthunder",
+        "pants_regearthunder",
+        "shoulders_regearthunder",
+        "gloves_regearthunder",
+        "head_regearthunder",
+        "necklace_regearthunder",
+        "accessory_regearthunder",
+        "weapon_regearthunder"
+      ],
+      "hunter": [
+        "armor_regearthunder",
+        "pants_regearthunder",
+        "shoulders_regearthunder",
+        "gloves_regearthunder",
+        "head_regearthunder",
+        "necklace_regearthunder",
+        "accessory_regearthunder",
+        "weapon_regearthunder"
+      ]
+    }
+  },
+  {
+    "level": "97",
+    "set": "Blooming Labyrinth",
+    "classes": {
+      "warrior": [
+        "armor_regearbloom",
+        "pants_regearbloom",
+        "shoulders_regearbloom",
+        "gloves_regearbloom",
+        "head_regearbloom",
+        "necklace_regearbloom",
+        "accessory_regearbloom",
+        "weapon_regearbloom"
+      ],
+      "mage": [
+        "armor_regearbloom",
+        "pants_regearbloom",
+        "shoulders_regearbloom",
+        "gloves_regearbloom",
+        "head_regearbloom",
+        "necklace_regearbloom",
+        "accessory_regearbloom",
+        "weapon_regearbloom"
+      ],
+      "assassin": [
+        "armor_regearbloom",
+        "pants_regearbloom",
+        "shoulders_regearbloom",
+        "gloves_regearbloom",
+        "head_regearbloom",
+        "necklace_regearbloom",
+        "accessory_regearbloom",
+        "weapon_regearbloom"
+      ],
+      "priest": [
+        "armor_regearbloom",
+        "pants_regearbloom",
+        "shoulders_regearbloom",
+        "gloves_regearbloom",
+        "head_regearbloom",
+        "necklace_regearbloom",
+        "accessory_regearbloom",
+        "weapon_regearbloom"
+      ],
+      "hunter": [
+        "armor_regearbloom",
+        "pants_regearbloom",
+        "shoulders_regearbloom",
+        "gloves_regearbloom",
+        "head_regearbloom",
+        "necklace_regearbloom",
+        "accessory_regearbloom",
+        "weapon_regearbloom"
+      ]
+    }
+  },
+  {
+    "level": "98",
+    "set": "Solar Crucible",
+    "classes": {
+      "warrior": [
+        "armor_regearsolar",
+        "pants_regearsolar",
+        "shoulders_regearsolar",
+        "gloves_regearsolar",
+        "head_regearsolar",
+        "necklace_regearsolar",
+        "accessory_regearsolar",
+        "weapon_regearsolar"
+      ],
+      "mage": [
+        "armor_regearsolar",
+        "pants_regearsolar",
+        "shoulders_regearsolar",
+        "gloves_regearsolar",
+        "head_regearsolar",
+        "necklace_regearsolar",
+        "accessory_regearsolar",
+        "weapon_regearsolar"
+      ],
+      "assassin": [
+        "armor_regearsolar",
+        "pants_regearsolar",
+        "shoulders_regearsolar",
+        "gloves_regearsolar",
+        "head_regearsolar",
+        "necklace_regearsolar",
+        "accessory_regearsolar",
+        "weapon_regearsolar"
+      ],
+      "priest": [
+        "armor_regearsolar",
+        "pants_regearsolar",
+        "shoulders_regearsolar",
+        "gloves_regearsolar",
+        "head_regearsolar",
+        "necklace_regearsolar",
+        "accessory_regearsolar",
+        "weapon_regearsolar"
+      ],
+      "hunter": [
+        "armor_regearsolar",
+        "pants_regearsolar",
+        "shoulders_regearsolar",
+        "gloves_regearsolar",
+        "head_regearsolar",
+        "necklace_regearsolar",
+        "accessory_regearsolar",
+        "weapon_regearsolar"
+      ]
+    }
+  },
+  {
+    "level": "99",
+    "set": "Amber Archive",
+    "classes": {
+      "warrior": [
+        "armor_regearamber",
+        "pants_regearamber",
+        "shoulders_regearamber",
+        "gloves_regearamber",
+        "head_regearamber",
+        "necklace_regearamber",
+        "accessory_regearamber",
+        "weapon_regearamber"
+      ],
+      "mage": [
+        "armor_regearamber",
+        "pants_regearamber",
+        "shoulders_regearamber",
+        "gloves_regearamber",
+        "head_regearamber",
+        "necklace_regearamber",
+        "accessory_regearamber",
+        "weapon_regearamber"
+      ],
+      "assassin": [
+        "armor_regearamber",
+        "pants_regearamber",
+        "shoulders_regearamber",
+        "gloves_regearamber",
+        "head_regearamber",
+        "necklace_regearamber",
+        "accessory_regearamber",
+        "weapon_regearamber"
+      ],
+      "priest": [
+        "armor_regearamber",
+        "pants_regearamber",
+        "shoulders_regearamber",
+        "gloves_regearamber",
+        "head_regearamber",
+        "necklace_regearamber",
+        "accessory_regearamber",
+        "weapon_regearamber"
+      ],
+      "hunter": [
+        "armor_regearamber",
+        "pants_regearamber",
+        "shoulders_regearamber",
+        "gloves_regearamber",
+        "head_regearamber",
+        "necklace_regearamber",
+        "accessory_regearamber",
+        "weapon_regearamber"
+      ]
+    }
+  },
+  {
+    "level": "99",
+    "set": "Silent Solstice",
+    "classes": {
+      "warrior": [
+        "armor_regearsolstice",
+        "pants_regearsolstice",
+        "shoulders_regearsolstice",
+        "gloves_regearsolstice",
+        "head_regearsolstice",
+        "necklace_regearsolstice",
+        "accessory_regearsolstice",
+        "weapon_regearsolstice"
+      ],
+      "mage": [
+        "armor_regearsolstice",
+        "pants_regearsolstice",
+        "shoulders_regearsolstice",
+        "gloves_regearsolstice",
+        "head_regearsolstice",
+        "necklace_regearsolstice",
+        "accessory_regearsolstice",
+        "weapon_regearsolstice"
+      ],
+      "assassin": [
+        "armor_regearsolstice",
+        "pants_regearsolstice",
+        "shoulders_regearsolstice",
+        "gloves_regearsolstice",
+        "head_regearsolstice",
+        "necklace_regearsolstice",
+        "accessory_regearsolstice",
+        "weapon_regearsolstice"
+      ],
+      "priest": [
+        "armor_regearsolstice",
+        "pants_regearsolstice",
+        "shoulders_regearsolstice",
+        "gloves_regearsolstice",
+        "head_regearsolstice",
+        "necklace_regearsolstice",
+        "accessory_regearsolstice",
+        "weapon_regearsolstice"
+      ],
+      "hunter": [
+        "armor_regearsolstice",
+        "pants_regearsolstice",
+        "shoulders_regearsolstice",
+        "gloves_regearsolstice",
+        "head_regearsolstice",
+        "necklace_regearsolstice",
+        "accessory_regearsolstice",
+        "weapon_regearsolstice"
       ]
     }
   }

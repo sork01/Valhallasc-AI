@@ -63,8 +63,11 @@
     }
     const glyph = kind === 'weapon' && i?.class === 'mage' ? 'staff' : kind === 'weapon' && i?.class === 'assassin' ? 'daggers' : kind === 'weapon' && i?.class === 'priest' ? 'mace' : kind === 'weapon' && i?.class === 'hunter' ? 'bow' : i?.id === 'ironhide_shell' ? 'shell' : kind;
     const palette = { slime_gel: '#88c675', blue_gel: '#6ca6ec', pink_gel: '#dd88b1', golden_gel: '#edc561', royal_jelly: '#bd84e2', traveler_stew: '#c98a4b', health_potion: '#e0476b', mana_potion: '#5488ef' };
-    const color = palette[i?.id] || palette[i?.family] || (i?.variant === 'crimson' ? '#c16b67' : { uncommon: '#6fcf86', rare: '#86acd5', epic: '#b98be6', legendary: '#f0a85a', gm: '#e8c050' }[i?.rarity] || '#ab8e68');
-    return `<svg viewBox="0 0 64 64" aria-hidden="true" style="color:${color}" stroke="#15151a" stroke-width="2" stroke-linejoin="round">${art[glyph] || art.accessory}</svg>`;
+    const bagColors = ['#a78257','#78996f','#6396b3','#a478b2','#c38a5e','#719ba1','#9b86c3','#be9292','#d3ae68','#dfcde7'];
+    const bagTier = i?.kind === 'bag' ? Math.max(0, Math.min(9, Math.floor((i.requiredLevel || 1) / 10))) : 0;
+    const color = i?.kind === 'bag' ? bagColors[bagTier] : palette[i?.id] || palette[i?.family] || (i?.variant === 'crimson' ? '#c16b67' : { uncommon: '#6fcf86', rare: '#86acd5', epic: '#b98be6', legendary: '#f0a85a', gm: '#e8c050' }[i?.rarity] || '#ab8e68');
+    const badge = i?.kind === 'bag' ? `<text x="32" y="49" text-anchor="middle" fill="#fff4d8" stroke="#3d291f" stroke-width="1" font-size="12" font-weight="bold">${i.bagSlots}</text>` : '';
+    return `<svg viewBox="0 0 64 64" aria-hidden="true" style="color:${color}" stroke="#15151a" stroke-width="2" stroke-linejoin="round">${art[glyph] || art.accessory}${badge}</svg>`;
   }
   function summary(i, count = quantity(i.id)) {
     return `${i.name} ×${count} · ${i.rarity === 'common' ? '' : rarityName(i) + ' · '}${i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind === 'food' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · level ${levelOf(i)} · ${stats(i)}`} · ${i.starter ? 'Starter gear · cannot be sold' : `sells for ${i.sell} gold each`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
@@ -77,6 +80,7 @@
     if (!i) return;
     const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName(i)} · ${i.class || (i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : 'All classes')}`)); t.dataset.rarity = i.rarity;
     if (consumable(i)) t.append(node('p', effect(i)));
+    else if (i.kind === 'bag') t.append(node('p', `${i.bagSlots} extra slots · Requires level ${levelOf(i)}`));
     else if (i.kind !== 'material') t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(i)}`));
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
     if (compatible(i) && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
@@ -218,6 +222,7 @@
         const b = button('', () => { if (!bag) { $('bag-details').replaceChildren(node('b', 'Empty bag slot', 'item-name'), node('p', 'Buy a six-slot Linen Satchel for 500 gold from Linden in Alderhaven.', 'bag-empty-note')); return; } activeBag = index; search = ''; $('bag-search').value = ''; render(container); }, 'bag-tab');
         b.innerHTML = icon(null, 'bag'); b.append(node('span', bag ? `${used}/${bag.size}` : '+')); b.dataset.bag = index; b.dataset.locked = String(!bag);
         b.setAttribute('aria-label', bag ? `${bag.name}, ${used} of ${bag.size} slots` : `Empty expansion bag slot ${index}`); b.setAttribute('aria-pressed', String(index === activeBag));
+        if(bag)b.title=`${bag.name} · ${bag.size} slots`;
         if (bag) dropTarget(b, data => { const empty = layout.slice(bag.start, bag.start + bag.size).indexOf(null); if (empty >= 0) { search = ''; $('bag-search').value = ''; activeBag = index; moveToBag(data, bag.start + empty); } });
         return b;
       }));

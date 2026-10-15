@@ -37,7 +37,8 @@ impl Store {
             "CREATE INDEX IF NOT EXISTS characters_account ON characters(account_id);
             CREATE TABLE IF NOT EXISTS accounts (id TEXT PRIMARY KEY, kind TEXT NOT NULL, username TEXT NOT NULL,
                 display TEXT NOT NULL, pw_hash TEXT, created INTEGER NOT NULL, UNIQUE(kind, username));
-            CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, account_id TEXT NOT NULL, expires INTEGER NOT NULL);",
+            CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, account_id TEXT NOT NULL, expires INTEGER NOT NULL);
+            CREATE TABLE IF NOT EXISTS world_meta (key TEXT PRIMARY KEY, value INTEGER NOT NULL);",
         )?;
         Ok(Self {
             db: Arc::new(Mutex::new(db)),
@@ -45,6 +46,24 @@ impl Store {
     }
     pub(crate) fn conn(&self) -> MutexGuard<'_, Connection> {
         self.db.lock().unwrap_or_else(|e| e.into_inner())
+    }
+    pub fn world_clock_epoch_ms(&self, now_ms: i64) -> rusqlite::Result<i64> {
+        self.conn().execute(
+            "INSERT OR IGNORE INTO world_meta(key,value) VALUES ('daynight_epoch_ms',?1)",
+            [now_ms],
+        )?;
+        self.conn().query_row(
+            "SELECT value FROM world_meta WHERE key='daynight_epoch_ms'",
+            [],
+            |row| row.get(0),
+        )
+    }
+    pub fn set_world_clock_epoch_ms(&self, epoch_ms: i64) -> rusqlite::Result<()> {
+        self.conn().execute(
+            "UPDATE world_meta SET value=?1 WHERE key='daynight_epoch_ms'",
+            [epoch_ms],
+        )?;
+        Ok(())
     }
     pub fn load(&self, token: &str) -> Result<Option<Character>, Box<dyn std::error::Error>> {
         if token.len() != 64 || !token.bytes().all(|b| b.is_ascii_hexdigit()) {
@@ -465,14 +484,14 @@ mod tests {
     fn persistence_and_invalid_keys() {
         let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();
         let (mut c, token) = s.create(Look::default(), Point { x: 36., y: 60. }).unwrap();
-        c.gold = 81;
+        c.gold = 1500;
         c.level = 20;
         c.look.equip("azure", "royal").unwrap();
         c.add_item("warrior_armor_azure", 1);
         c.add_item("warrior_weapon_royal", 1);
         c.add_item("mage_weapon_crystal", 2);
         c.add_item("slime_gel", 7);
-        c.purchase_bag("adventurer_satchel", 24).unwrap();
+        c.purchase_bag("adventurer_satchel").unwrap();
         c.add_item("necklace_upgrade", 1);
         c.equip_slots(&[("necklace".into(), "necklace_upgrade".into())].into())
             .unwrap();
@@ -484,7 +503,7 @@ mod tests {
         });
         s.save_many(std::iter::once(&c)).unwrap();
         let restored = s.load(&token).unwrap().unwrap();
-        assert_eq!(restored.gold, 57);
+        assert_eq!(restored.gold, 0);
         assert_eq!(restored.look.warrior_weapon, "royal");
         assert_eq!(restored.quests[0].counts, vec![1, 0, 1]);
         assert_eq!(restored.inventory, c.inventory);

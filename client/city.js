@@ -450,7 +450,7 @@
     $('npc-text').textContent=npc.dialogue;$('npc-text').hidden=!gossip;$('npc-role').hidden=!gossip;
     $('npc-notice').textContent=packet.notice;
     $('npc-gold').textContent=`Your purse: ${packet.gold} gold`;
-    $('npc-back').hidden=!['sell','merge','refine','stat_reset'].includes(view.kind);
+    $('npc-back').hidden=!['sell','merge','refine','bags','stat_reset'].includes(view.kind);
     // Quests come first, then whatever the NPC sells or does.
     if(view.kind==='quest'){
       const quest=window.Quests.offered(npc.id).find(q=>q.id===view.id);
@@ -458,7 +458,7 @@
       else {view={kind:'gossip'};}
     }
     if(view.kind==='gossip')window.Quests?.npc(npc.id,$('npc-quests'),q=>show({kind:'quest',id:q.id},'[data-action="decline"]'));
-    else if(['sell','merge','refine','stat_reset'].includes(view.kind))$('npc-quests').replaceChildren();
+    else if(['sell','merge','refine','bags','stat_reset'].includes(view.kind))$('npc-quests').replaceChildren();
     const offers=[];
     if(view.kind==='gossip'){
       for(const destination of packet.travel||[]){
@@ -470,6 +470,12 @@
         b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:`spark:${destination.id}`}))b.disabled=true;});offers.push(b);
       }
       if(npc.buys){const b=row('vendor','I have something to sell.');b.dataset.view='sell';b.addEventListener('click',()=>show({kind:'sell'},'#npc-back'));offers.push(b);}
+      if(npc.offers.some(offer=>offer.bag)){
+        const bagOffers=npc.offers.filter(offer=>offer.bag).map(offer=>WORLD_ITEMS.find(i=>i.id===offer.bag)).filter(Boolean).sort((a,b)=>a.requiredLevel-b.requiredLevel);
+        const next=bagOffers.find(i=>i.requiredLevel>(packet.level||1));
+        const b=row('vendor','Browse expansion bags',next?`Next: Lv ${next.requiredLevel}`:'All tiers unlocked');
+        b.dataset.view='bags';b.addEventListener('click',()=>show({kind:'bags'},'#npc-back'));offers.push(b);
+      }
       // A tiered offer (potions and food) sells the best tier of its line for the player's level, so it shows that tier.
       const tierFor=offer=>{
         const base=WORLD_ITEMS.find(i=>i.id===offer.item);
@@ -477,6 +483,7 @@
         return WORLD_ITEMS.filter(i=>i.family===base.family&&(i.requiredLevel||1)<=(packet.level||1)).sort((a,b)=>(b.requiredLevel||1)-(a.requiredLevel||1))[0]||base;
       };
       for(const offer of npc.offers){
+        if(offer.bag)continue;
         if(offer.id==='stat_reset') {
           const b=row('coin','Reset trained attributes',`${(packet.statResetPrice||0).toLocaleString()} gold`);
           b.dataset.view='stat_reset';b.addEventListener('click',()=>show({kind:'stat_reset'},'#npc-back'));offers.push(b);continue;
@@ -484,7 +491,7 @@
         const tier=tierFor(offer),cost=tier?tier.price:offer.cost;
         const b=row(iconFor(offer),tier?`Buy ${tier.name} · ${window.Inventory.effect(tier)}`:offer.label,cost?`${cost} gold`:'Free');b.dataset.offer=offer.id;
         if(tier)b.dataset.tier=tier.id;
-        b.disabled=packet.gold<cost || (offer.bag && (packet.bags || []).length >= 4 && !(packet.bags || []).some(id => WORLD_ITEMS.find(i => i.id === id)?.bagSlots < WORLD_ITEMS.find(i => i.id === offer.bag)?.bagSlots));
+        b.disabled=packet.gold<cost;
         b.addEventListener('click',()=>{
           if(offer.id==='merge'||offer.id==='refine')show({kind:offer.id},'#npc-back');
           else if(Online.send({type:'interact',npc:npc.id,offer:offer.id}))b.disabled=true;
@@ -500,6 +507,25 @@
       const confirm=row('coin','Confirm stat reset',`${price.toLocaleString()} gold`);confirm.dataset.offer='stat_reset';
       confirm.disabled=!refunded||packet.gold<price;
       confirm.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:'stat_reset'}))confirm.disabled=true;});offers.push(confirm);
+    }else if(view.kind==='bags'){
+      const bagOffers=npc.offers.filter(offer=>offer.bag).map(offer=>({offer,item:WORLD_ITEMS.find(i=>i.id===offer.bag)})).filter(x=>x.item).sort((a,b)=>a.item.requiredLevel-b.item.requiredLevel);
+      const next=bagOffers.find(({item})=>item.requiredLevel>(packet.level||1));
+      const heading=document.createElement('h4');heading.className='bag-shop-heading';heading.textContent=next?`Next tier: ${next.item.name} · level ${next.item.requiredLevel} · +${next.item.bagSlots} slots · ${next.item.price.toLocaleString()} gold`:'All bag tiers unlocked';offers.push(heading);
+      for(const {offer,item} of bagOffers){
+        const fitted=(packet.bags||[]).map(id=>WORLD_ITEMS.find(i=>i.id===id)?.bagSlots||0);
+        const replace=fitted.length<4?0:Math.min(...fitted.filter(size=>size<item.bagSlots));
+        const gain=fitted.length<4?item.bagSlots:Number.isFinite(replace)?item.bagSlots-replace:0;
+        const owned=(packet.bags||[]).filter(id=>id===item.id).length;
+        const b=row('vendor',`${item.name} · +${item.bagSlots} slots · Lv ${item.requiredLevel}`,`${item.price.toLocaleString()} gold`);
+        b.dataset.offer=offer.id;b.dataset.bag=item.id;b.dataset.locked=String((packet.level||1)<item.requiredLevel);
+        b.querySelector('.gossip-icon').textContent=`${item.bagSlots}`;
+        b.querySelector('.gossip-icon').classList.add('bag-tier-icon');
+        b.querySelector('.gossip-icon').style.setProperty('--bag-tier',String(Math.floor((item.requiredLevel||1)/10)));
+        const detail=document.createElement('small');detail.className='bag-shop-detail';
+        detail.textContent=`${owned?`Owned ×${owned} · `:''}${gain?`Adds ${gain} slots now`:'No larger than your fitted bags'}${(packet.level||1)<item.requiredLevel?` · unlocks at level ${item.requiredLevel}`:''}`;
+        b.append(detail);b.disabled=(packet.level||1)<item.requiredLevel||packet.gold<item.price||!gain;
+        b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:offer.id}))b.disabled=true;});offers.push(b);
+      }
     }
     $('npc-offers').replaceChildren(...offers);
     $('npc-inventory').replaceChildren();
@@ -517,7 +543,7 @@
     const same=current?.id===packet.npc.id;
     previousFocus=current?previousFocus:document.activeElement;current=packet.npc;
     // Selling keeps its list open between sales; every other reply (accepting, a purchase) returns to the greeting.
-    if(!same||!['sell','merge','refine','stat_reset'].includes(view.kind))view={kind:'gossip'};
+    if(!same||!['sell','merge','refine','bags','stat_reset'].includes(view.kind))view={kind:'gossip'};
     Field.setPaused(true);$('npc-dialogue').hidden=false;
     window.Inventory?.update(packet.inventory || [], packet.look, packet.equipment || {}, packet.bags || [], packet.gearInstances || []);
     window.Quests?.update(packet.quests || []);

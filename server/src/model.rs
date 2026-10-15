@@ -1157,6 +1157,12 @@ pub enum DebugCommand {
     Die,
     ResetStats,
     ResetCooldowns,
+    /// Set a shared world hour, or resume a frozen private clock from its current hour.
+    SetTime {
+        hour: Option<f64>,
+        #[serde(default)]
+        freeze: bool,
+    },
     /// Uncovers every cell of every zone, so tests of the maps and the ground need not walk them all.
     ExploreAll,
     SetGodMode {
@@ -1465,6 +1471,66 @@ impl Default for Map {
     }
 }
 impl Map {
+    /// True when a straight shot stays clear of the same solid objects that block movement.
+    pub fn line_clear(&self, start: Point, end: Point, radius: f64) -> bool {
+        if ![start.x, start.y, end.x, end.y, radius]
+            .iter()
+            .all(|v| v.is_finite())
+        {
+            return false;
+        }
+        let size = self.size as f64;
+        if [start.x, start.y, end.x, end.y]
+            .iter()
+            .any(|v| *v < 0. || *v > size)
+        {
+            return false;
+        }
+        !self.objects.iter().any(|o| {
+            if o.width > 0. && o.depth > 0. {
+                let mut lo: f64 = 0.;
+                let mut hi: f64 = 1.;
+                for (a, b, min, max) in [
+                    (
+                        start.x,
+                        end.x,
+                        o.x - o.width / 2. - radius,
+                        o.x + o.width / 2. + radius,
+                    ),
+                    (
+                        start.y,
+                        end.y,
+                        o.y - o.depth / 2. - radius,
+                        o.y + o.depth / 2. + radius,
+                    ),
+                ] {
+                    let d = b - a;
+                    if d.abs() < 1e-10 {
+                        if a < min || a > max {
+                            return false;
+                        }
+                    } else {
+                        let t1 = (min - a) / d;
+                        let t2 = (max - a) / d;
+                        lo = lo.max(t1.min(t2));
+                        hi = hi.min(t1.max(t2));
+                    }
+                }
+                lo <= hi
+            } else {
+                let dx = end.x - start.x;
+                let dy = end.y - start.y;
+                let len2 = dx * dx + dy * dy;
+                let t = if len2 < 1e-12 {
+                    0.
+                } else {
+                    ((o.x - start.x) * dx + (o.y - start.y) * dy) / len2
+                }
+                .clamp(0., 1.);
+                (start.x + t * dx - o.x).hypot(start.y + t * dy - o.y) <= o.r + radius
+            }
+        })
+    }
     pub fn in_city(&self, point: Point) -> bool {
         self.city
             .iter()
@@ -1519,6 +1585,70 @@ impl Map {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn sight_lines_stop_at_rectangular_walls_and_round_obstacles() {
+        let mut map = Map {
+            objects: vec![Obstacle {
+                x: 5.,
+                y: 5.,
+                width: 1.,
+                depth: 3.,
+                r: 0.,
+            }],
+            ..Map::default()
+        };
+        let a = Point { x: 2., y: 5. };
+        let b = Point { x: 8., y: 5. };
+        assert!(!map.line_clear(a, b, 0.05));
+        assert!(!map.line_clear(Point { x: 2., y: 3. }, Point { x: 8., y: 7. }, 0.05));
+        assert!(map.line_clear(Point { x: 2., y: 2. }, Point { x: 8., y: 2. }, 0.05));
+        assert!(
+            !map.line_clear(Point { x: 2., y: 3.48 }, Point { x: 8., y: 3.48 }, 0.05),
+            "a shot grazing a wall corner is blocked"
+        );
+        assert!(
+            map.line_clear(Point { x: 2., y: 3.40 }, Point { x: 8., y: 3.40 }, 0.05),
+            "a clear corner gap stays usable"
+        );
+        map.objects = vec![Obstacle {
+            x: 5.,
+            y: 5.,
+            width: 0.,
+            depth: 0.,
+            r: 0.7,
+        }];
+        assert!(!map.line_clear(a, b, 0.05));
+        assert!(map.line_clear(Point { x: 2., y: 3. }, Point { x: 8., y: 3. }, 0.05));
+        let world = Map::default();
+        let (dungeon, wall) = world
+            .zones
+            .iter()
+            .filter(|z| z.players > 0)
+            .find_map(|zone| {
+                zone.objects
+                    .iter()
+                    .find(|o| {
+                        o.width > 0.
+                            && o.depth > 0.
+                            && o.x > o.width / 2. + 1.
+                            && o.x + o.width / 2. + 1. < zone.size as f64
+                    })
+                    .map(|wall| (zone, wall))
+            })
+            .expect("a real dungeon wall");
+        assert!(!dungeon.line_clear(
+            Point {
+                x: wall.x - wall.width / 2. - 0.5,
+                y: wall.y
+            },
+            Point {
+                x: wall.x + wall.width / 2. + 0.5,
+                y: wall.y
+            },
+            0.05,
+        ));
+    }
 
     #[test]
     fn gender_defaults_to_male_round_trips_and_rejects_unknown_values() {

@@ -136,7 +136,7 @@ async function call(name, args = {}) {
   await page.locator('#character-list button').filter({ hasText: 'SkillMage' }).click();
   await page.waitForFunction(() => Online.connected && Field.hero.look.class === 'mage' && document.querySelector('#skillbar-slots [data-slot="9"]')?.dataset.skill === 'attack', null, { timeout: 60000 });
   check(await page.locator('#skillbar-slots [data-slot="3"]').getAttribute('data-skill') === 'attack', 'Character switching restores its saved layout');
-  // The Priest: a fourth class with its own button, a mace attack, and a bar of healing skills that unlock from level 2.
+  // The Priest: a fourth class with its own button, a mace attack, and healing skills that unlock from level 4.
   await page.keyboard.press('Escape'); await page.locator('#p-new').click();
   await page.locator('#cls-priest').click();
   check(await page.locator('#class-name').textContent() === 'PRIEST (사제)' && await page.locator('#cls-priest').getAttribute('aria-pressed') === 'true', 'The creation screen offers the Priest');
@@ -147,7 +147,7 @@ async function call(name, args = {}) {
   check(await page.locator('#skillbar-slots [data-slot="1"]').getAttribute('aria-label').then(t => /Mace Strike/.test(t || '')) , 'The priest\'s basic attack is Mace Strike');
   await page.keyboard.press('k');
   check(await page.locator('#skill-library .skill-card:not(.locked)').count() === 1 && await page.locator('#skill-library .skill-card.locked').count() === 10, 'The priest starts with its attack and sees ten locked skills');
-  check(await page.locator('#skill-library .skill-card.locked').first().textContent().then(t => /Mend/.test(t) && /2/.test(t)), 'The first skill to earn is Mend, at level 2');
+  check(await page.locator('#skill-library .skill-card.locked').first().textContent().then(t => /Mend/.test(t) && /4/.test(t)), 'The first skill to earn is Mend, at level 4');
   await page.keyboard.press('Escape');
   // The Priest wears pilgrim and dawn head, shoulder and glove pieces like every other class (it used to have none).
   await page.keyboard.press('e');
@@ -173,7 +173,7 @@ async function call(name, args = {}) {
   check(await page.locator('#skillbar-slots [data-slot="1"]').getAttribute('aria-label').then(t => /Arrow Shot/.test(t || '')), 'The hunter\u2019s basic attack is Arrow Shot');
   await page.keyboard.press('k');
   check(await page.locator('#skill-library .skill-card:not(.locked)').count() === 1 && await page.locator('#skill-library .skill-card.locked').count() === 10, 'The hunter starts with its attack and sees ten locked skills');
-  check(await page.locator('#skill-library .skill-card.locked').first().textContent().then(t => /Power Shot/.test(t) && /2/.test(t)), 'The first skill to earn is Power Shot, at level 2');
+  check(await page.locator('#skill-library .skill-card.locked').first().textContent().then(t => /Power Shot/.test(t) && /4/.test(t)), 'The first skill to earn is Power Shot, at level 4');
   await page.keyboard.press('Escape'); await page.keyboard.press('e');
   const layerFigure = () => page.evaluate(() => { const c = Field.hunterSprites.frame('idle', 0, 0), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let h = 0; for (let i = 0; i < d.length; i += 4) if (d[i + 3]) h = (h * 31 + d[i] * 3 + d[i + 1] * 5 + d[i + 2] * 7 + i) >>> 0; return h; });
   let figureHash = await layerFigure();

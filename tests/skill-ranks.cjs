@@ -8,22 +8,22 @@ const { castSkill } = require('../scripts/testing/tools.cjs');
   try {
     await world.start();
     await world.connect({ bot: 'RankMage', class: 'mage' });
-    await world.debug('RankMage', { op: 'set_level', level: 23 });
+    await world.debug('RankMage', { op: 'set_level', level: 9 });
     const first = await castSkill(world, 'RankMage', { skill: 'arcaneward', resetCooldown: true });
     assert.ok(first.cast, `base Arcane Ward casts: ${JSON.stringify(first)}`);
     await world.waitFor(() => world.summary('RankMage').buffs.some(b => b.id === 'arcaneward'), 3000, 'base ward buff');
 
-    const advance = await world.debug('RankMage', { op: 'set_level', level: 24 });
-    assert.deepEqual(advance.result.unlocked, ['arcaneward']);
+    const advance = await world.debug('RankMage', { op: 'set_level', level: 10 });
+    assert.deepEqual(advance.result.unlocked, ['arcaneward', 'mage_milestone_10']);
     const ranked = await castSkill(world, 'RankMage', { skill: 'arcaneward', resetCooldown: true });
     assert.ok(ranked.cast, 'ranked Arcane Ward casts through the same ID');
     await world.waitFor(() => world.summary('RankMage').buffs.some(b => b.id === 'arcaneward'), 3000, 'ranked ward buff');
 
-    await world.debug('RankMage', { op: 'set_level', level: 29 });
+    await world.debug('RankMage', { op: 'set_level', level: 21 });
     const baseBlink = await castSkill(world, 'RankMage', { skill: 'blink', resetCooldown: true });
     assert.ok(baseBlink.cast && baseBlink.cooldownLeft > 0, JSON.stringify(baseBlink));
-    const blinkAdvance = await world.debug('RankMage', { op: 'set_level', level: 30 });
-    assert.ok(blinkAdvance.result.unlocked.includes('blink') && blinkAdvance.result.unlocked.includes('mage_milestone_30'));
+    const blinkAdvance = await world.debug('RankMage', { op: 'set_level', level: 22 });
+    assert.ok(blinkAdvance.result.unlocked.includes('blink'));
     const rankedBlink = await castSkill(world, 'RankMage', { skill: 'blink', resetCooldown: true });
     assert.ok(rankedBlink.cast && rankedBlink.cooldownLeft < baseBlink.cooldownLeft - 0.8,
       'rank 2 reduces the authoritative cooldown');

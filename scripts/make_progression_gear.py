@@ -22,6 +22,8 @@ import cel_common as cc
 import gear_shapes as shape
 import gear_shapes_high
 import dungeon_gear_shapes
+import instance_gear_shapes
+import late_instance_gear_shapes
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'client/assets'
@@ -29,6 +31,7 @@ RAW = ROOT / 'scripts/progression_raw'
 STATE = ROOT / 'docs/gear-redesign-state.txt'
 HIGH_STATE = ROOT / 'docs/high-gear-state.txt'
 DUNGEON_STATE = ROOT / 'docs/dungeon-gear-state.txt'
+INSTANCE_STATE = ROOT / 'docs/instance-gear-state.txt'
 MANIFEST = ROOT / 'world/gear-art.txt'
 CLASSES = tuple(shape.MODULES)
 DIRS = cc.DIRS
@@ -41,7 +44,9 @@ BODY_CACHE = {}
 
 def activate(task):
     global PALETTE_HEX, PALETTE
-    PALETTE_HEX = dungeon_gear_shapes.PALETTE if task['group'] in ('vault', 'moonwell') else shape.PALETTE
+    PALETTE_HEX = (late_instance_gear_shapes.palette(task['group'])[0] if task['group'] in late_instance_gear_shapes.STYLES else
+                   instance_gear_shapes.PALETTE if task['group'] in ('eye', 'elder') else
+                   dungeon_gear_shapes.PALETTE if task['group'] in ('vault', 'moonwell') else shape.PALETTE)
     PALETTE = np.array([[int(h[k:k + 2], 16) for k in (1, 3, 5)] + [255 if n else 0]
                         for n, h in enumerate(PALETTE_HEX)], np.uint8)
 
@@ -54,15 +59,26 @@ def revision(task):
     if task['group'] in ('vault', 'moonwell'):
         source += inspect.getsource(dungeon_gear_shapes.render) + inspect.getsource(dungeon_gear_shapes.adorn)
         source += inspect.getsource(dungeon_gear_shapes.recolor) + json.dumps(dungeon_gear_shapes.EXTRA_MATS, sort_keys=True)
-    if task['group'] not in ('vault', 'moonwell') and task['className'] == 'mage' and task['kind'] == 'weapon' and shape.DESIGNS[task['group']]['index'] >= 9:
+    if task['group'] in ('eye', 'elder'):
+        source += inspect.getsource(instance_gear_shapes.render) + inspect.getsource(instance_gear_shapes.adorn)
+        source += inspect.getsource(instance_gear_shapes.recolor) + json.dumps(instance_gear_shapes.EXTRA_MATS, sort_keys=True)
+    if task['group'] in late_instance_gear_shapes.STYLES:
+        source += inspect.getsource(late_instance_gear_shapes.render)
+        source += inspect.getsource(late_instance_gear_shapes.adorn)
+        source += inspect.getsource(late_instance_gear_shapes.recolor)
+        source += inspect.getsource(late_instance_gear_shapes.palette)
+        source += json.dumps([late_instance_gear_shapes.STYLES[task['group']],
+                              late_instance_gear_shapes.ROLE_TONES,
+                              late_instance_gear_shapes.THEME_HUES[task['group']]], sort_keys=True)
+    if task['group'] not in ('vault', 'moonwell', 'eye', 'elder', *late_instance_gear_shapes.STYLES) and task['className'] == 'mage' and task['kind'] == 'weapon' and shape.DESIGNS[task['group']]['index'] >= 9:
         source += inspect.getsource(gear_shapes_high.render_mage_staff)
-    if task['group'] not in ('vault', 'moonwell') and task['className'] == 'mage' and task['kind'] == 'headgear' and shape.DESIGNS[task['group']]['index'] >= 9:
+    if task['group'] not in ('vault', 'moonwell', 'eye', 'elder', *late_instance_gear_shapes.STYLES) and task['className'] == 'mage' and task['kind'] == 'headgear' and shape.DESIGNS[task['group']]['index'] >= 9:
         source += inspect.getsource(gear_shapes_high.render_mage_head)
     return hashlib.sha256(source.encode()).hexdigest()
 
 
 def task_for(job):
-    for path in (STATE, HIGH_STATE, DUNGEON_STATE):
+    for path in (STATE, HIGH_STATE, DUNGEON_STATE, INSTANCE_STATE):
         if path.exists():
             task = next((t for t in json.loads(path.read_text())['tasks'] if t['id'] == job), None)
             if task:
@@ -86,6 +102,10 @@ def frames(task, cls, gender):
                             result[key] = (data['index'], data['depth']); continue
                 if task['group'] in ('vault', 'moonwell'):
                     idx, depth = dungeon_gear_shapes.render(cls, task['group'], task['kind'], gender, *key)
+                elif task['group'] in ('eye', 'elder'):
+                    idx, depth = instance_gear_shapes.render(cls, task['group'], task['kind'], gender, *key)
+                elif task['group'] in late_instance_gear_shapes.STYLES:
+                    idx, depth = late_instance_gear_shapes.render(cls, task['group'], task['kind'], gender, *key)
                 elif cls == 'mage' and task['kind'] == 'headgear' and shape.DESIGNS[task['group']]['index'] >= 9:
                     idx, depth = gear_shapes_high.render_mage_head(task['group'], gender, *key)
                 elif cls == 'mage' and task['kind'] == 'weapon' and shape.DESIGNS[task['group']]['index'] >= 9:
@@ -229,7 +249,7 @@ def build(task):
 
 def ensure_female_sprites(task, manifest, record):
     """Keep both-body source cels editable in PixelFlow, including shared pieces."""
-    if task['group'] not in ('L95', 'vault', 'moonwell'):
+    if task['group'] not in ('L95', 'vault', 'moonwell', 'eye', 'elder', *late_instance_gear_shapes.STYLES):
         return
     classes = [task['className']] if task['className'] else list(CLASSES)
     for cls in classes:
@@ -315,7 +335,8 @@ def main():
         task = task_for(job)
         activate(task)
         status_script = ('scripts/high_gear_jobs.py' if task['group'].startswith('L') and int(task['group'][1:]) >= 60 else
-                         'scripts/dungeon_gear_jobs.py' if task['group'] in ('vault', 'moonwell') else 'scripts/gear_art_status.py')
+                         'scripts/dungeon_gear_jobs.py' if task['group'] in ('vault', 'moonwell') else
+                         'scripts/instance_gear_jobs.py' if task['group'] in ('eye', 'elder', *late_instance_gear_shapes.STYLES) else 'scripts/gear_art_status.py')
         if args.redo:
             assert args.command == 'build', '--redo is only valid with build'
             manifest = json.loads(MANIFEST.read_text()) if MANIFEST.exists() else {}

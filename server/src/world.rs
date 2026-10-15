@@ -18,6 +18,7 @@ mod cairn_tests;
 mod cathedral_tests;
 mod chime;
 mod consumables;
+mod daynight;
 mod debug;
 #[cfg(test)]
 mod deep_tests;
@@ -1210,6 +1211,7 @@ pub struct World {
     loot_turns: BTreeMap<String, usize>,
     // Failed disconnect writes are retried by the next periodic transaction.
     pending_saves: Vec<Character>,
+    world_clock: daynight::WorldClock,
     time: f64,
     tick: u64,
     rng: u64,
@@ -1244,6 +1246,9 @@ impl World {
         Self::with_level_spread(store, LEVEL_SPREAD)
     }
     pub fn with_level_spread(store: Store, level_spread: i32) -> Self {
+        let epoch = store
+            .world_clock_epoch_ms(daynight::unix_ms())
+            .expect("world clock storage must be available");
         let mut first = Map::default();
         let mut extra = std::mem::take(&mut first.zones);
         let arena = if extra.last().is_some_and(|m| m.name == "The Arena") {
@@ -1293,6 +1298,7 @@ impl World {
             rolls: vec![],
             loot_turns: BTreeMap::new(),
             pending_saves: vec![],
+            world_clock: daynight::WorldClock::new(epoch),
             time: 0.,
             tick: 0,
             rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
@@ -1517,7 +1523,7 @@ impl World {
     // nothing about another zone is ever sent to this client.
     pub fn snapshot_for(&self, zone: usize) -> Value {
         let idle = self.zone_idle(zone);
-        let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,
+        let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
         "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
             let mut view = p.snapshot();
             // The bells a hero has ringing and how long each has left (only listed while there are any).
@@ -2140,7 +2146,7 @@ impl World {
                                     .into();
                         }
                     } else if let Some(bag) = &offer.bag {
-                        match p.character.purchase_bag(bag, offer.cost) {
+                        match p.character.purchase_bag(bag) {
                             Ok(capacity) => {
                                 notice = format!("Bag fitted! You now have {capacity} bag slots.");
                                 quest_changed = true;
@@ -2230,12 +2236,31 @@ impl World {
         }
     }
     fn start_attack(&mut self, session: u64) {
-        let Some(p) = self.players.get_mut(&session) else {
+        let Some(p) = self.players.get(&session) else {
             return;
         };
         if p.character.hp <= 0. || p.cooldown > 0. || p.dash > 0. {
             return;
         }
+        if p.character.look.class.ranged()
+            && p.target
+                .and_then(|id| self.slimes.get(id))
+                .is_some_and(|target| {
+                    !target.dead
+                        && target.zone == p.character.zone
+                        && !self.maps[target.zone].line_clear(
+                            p.character.point(),
+                            target.point(),
+                            0.05,
+                        )
+                })
+        {
+            let _ = p
+                .peer
+                .try_send(json!({"type":"error","text":"A wall blocks your shot."}));
+            return;
+        }
+        let p = self.players.get_mut(&session).unwrap();
         p.combat_left = 5.;
         p.character.mounted = false;
         p.attack = 0.0001;
@@ -2408,7 +2433,12 @@ impl World {
                 let facing = p.character.point().direction(s.point());
                 if distance - s.r <= p.character.look.class.reach() {
                     p.face = facing;
-                    auto_attack = true;
+                    auto_attack = !p.character.look.class.ranged()
+                        || self.maps[p.character.zone].line_clear(
+                            p.character.point(),
+                            s.point(),
+                            0.05,
+                        );
                 } else {
                     dir = facing;
                     travel = (distance - s.r - p.character.look.class.reach()).max(0.);
@@ -2684,7 +2714,6 @@ impl World {
         if p.character.hp <= 0. || p.dash > 0. || p.skill_cd.contains_key(id) {
             return;
         }
-        p.character.mounted = false;
         if aim.x != 0. || aim.y != 0. {
             p.face = aim;
         }
@@ -2702,14 +2731,51 @@ impl World {
             Effect::Strike { range, .. } | Effect::Chain { range, .. } => Some(*range),
             _ => None,
         };
-        if let Some(range) = single
-            && self.enemies_near(zone, origin, range, &[]).is_empty()
+        if let Some(range) = single {
+            let nearby = self.enemies_near(zone, origin, range, &[]);
+            if nearby.is_empty() {
+                let _ = self.players[&session]
+                    .peer
+                    .try_send(json!({"type":"error","text":"No enemy in range."}));
+                return;
+            }
+            if !nearby
+                .iter()
+                .any(|&i| self.maps[zone].line_clear(origin, self.slimes[i].point(), 0.05))
+            {
+                let _ = self.players[&session]
+                    .peer
+                    .try_send(json!({"type":"error","text":"A wall blocks your skill."}));
+                return;
+            }
+        }
+        if matches!(&skill.effect, Effect::Volley { .. } | Effect::Cone { .. })
+            && target.and_then(|i| self.slimes.get(i)).is_some_and(|s| {
+                !s.dead && s.zone == zone && !self.maps[zone].line_clear(origin, s.point(), 0.05)
+            })
         {
-            let p = &self.players[&session];
-            let _ = p
+            let _ = self.players[&session]
                 .peer
-                .try_send(json!({"type":"error","text":"No enemy in range."}));
+                .try_send(json!({"type":"error","text":"A wall blocks your skill."}));
             return;
+        }
+        if let Effect::Meteor { range, .. } = &skill.effect {
+            let center = target
+                .and_then(|i| self.slimes.get(i))
+                .filter(|s| !s.dead && s.zone == zone && origin.distance(s.point()) <= *range)
+                .map_or(
+                    Point {
+                        x: origin.x + face.x * range * 0.75,
+                        y: origin.y + face.y * range * 0.75,
+                    },
+                    |s| s.point(),
+                );
+            if !self.maps[zone].line_clear(origin, center, 0.05) {
+                let _ = self.players[&session]
+                    .peer
+                    .try_send(json!({"type":"error","text":"A wall blocks your skill."}));
+                return;
+            }
         }
         if let Effect::Mend { range, .. } = &skill.effect
             && self.wounded_allies(session, *range).is_empty()
@@ -2731,6 +2797,7 @@ impl World {
             let _ = p.peer.try_send(json!({"type":"error","text":text}));
             return;
         }
+        p.character.mounted = false;
         p.character.change_resource(-skill.cost);
         p.skill_cd.insert(
             id.to_string(),
@@ -2757,7 +2824,8 @@ impl World {
                         let s = &self.slimes[i];
                         let d = origin.distance(s.point());
                         let facing = origin.direction(s.point());
-                        d < 0.6 || facing.x * face.x + facing.y * face.y > *dot
+                        (d < 0.6 || facing.x * face.x + facing.y * face.y > *dot)
+                            && self.maps[zone].line_clear(origin, s.point(), 0.05)
                     })
                     .collect();
                 for i in hit {
@@ -2767,7 +2835,12 @@ impl World {
             }
             Effect::Nova { radius, mult } => {
                 value = *radius;
-                for i in self.enemies_near(zone, origin, *radius, &[]) {
+                let visible: Vec<_> = self
+                    .enemies_near(zone, origin, *radius, &[])
+                    .into_iter()
+                    .filter(|&i| self.maps[zone].line_clear(origin, self.slimes[i].point(), 0.05))
+                    .collect();
+                for i in visible {
                     let (damage, crit) = self.roll_damage(session, *mult);
                     dealt += self.hit_slime(i, session, damage, crit);
                 }
@@ -2831,7 +2904,13 @@ impl World {
             Effect::Strike { hits, mult, range } => {
                 value = *hits as f64;
                 for _ in 0..*hits {
-                    let Some(&i) = self.enemies_near(zone, origin, *range, &[]).first() else {
+                    let Some(i) = self
+                        .enemies_near(zone, origin, *range, &[])
+                        .into_iter()
+                        .find(|&i| {
+                            self.maps[zone].line_clear(origin, self.slimes[i].point(), 0.05)
+                        })
+                    else {
                         break;
                     };
                     points.push([self.slimes[i].x, self.slimes[i].y]);
@@ -2848,7 +2927,11 @@ impl World {
                 let mut hit = vec![];
                 for n in 0..*targets {
                     let reach = if n == 0 { *range } else { 4.5 };
-                    let Some(&i) = self.enemies_near(zone, from, reach, &hit).first() else {
+                    let Some(i) = self
+                        .enemies_near(zone, from, reach, &hit)
+                        .into_iter()
+                        .find(|&i| self.maps[zone].line_clear(from, self.slimes[i].point(), 0.05))
+                    else {
                         break;
                     };
                     hit.push(i);
@@ -2874,7 +2957,12 @@ impl World {
                 self.maps[zone].collide(&mut center, 0.1);
                 points.push([center.x, center.y]);
                 value = *radius;
-                for i in self.enemies_near(zone, center, *radius, &[]) {
+                let visible: Vec<_> = self
+                    .enemies_near(zone, center, *radius, &[])
+                    .into_iter()
+                    .filter(|&i| self.maps[zone].line_clear(center, self.slimes[i].point(), 0.05))
+                    .collect();
+                for i in visible {
                     let (damage, crit) = self.roll_damage(session, *mult);
                     dealt += self.hit_slime(i, session, damage, crit);
                 }
@@ -3191,6 +3279,11 @@ impl World {
             };
             self.gold_drop(&credit_id, zone, point, value);
             self.loot_drop(&credit_id, zone, point, material(&kind));
+            // A bag roll is independent of gold, materials and every gear pool.
+            let bag_roll = self.random();
+            if let Some(bag) = roll_bag(level, bag_roll) {
+                self.loot_drop(&credit_id, zone, point, &bag.id);
+            }
             if let Some(gear) = roll_orange(|| self.random()) {
                 self.loot_drop_with_gear(&credit_id, zone, point, &gear.item.clone(), Some(gear));
             }
@@ -3712,6 +3805,7 @@ impl World {
     }
     fn update_bolts(&mut self) {
         let mut bolts = std::mem::take(&mut self.bolts);
+        let mut warned = std::collections::HashSet::new();
         for b in &mut bolts {
             if !self
                 .players
@@ -3726,6 +3820,7 @@ impl World {
             b.y += b.fy * 12. * TICK;
             b.t += TICK;
             let end = Point { x: b.x, y: b.y };
+            let blocked = !self.maps[b.zone].line_clear(start, end, 0.05);
             let mut hit: Vec<_> = self
                 .slimes
                 .iter()
@@ -3734,6 +3829,7 @@ impl World {
                         && s.zone == b.zone
                         && !b.hits.contains(&s.id)
                         && segment_distance(s.point(), start, end) < s.r + 0.22
+                        && self.maps[b.zone].line_clear(start, s.point(), 0.05)
                 })
                 .map(|s| (start.distance(s.point()), s.id))
                 .collect();
@@ -3747,7 +3843,14 @@ impl World {
                 if b.blast > 0. {
                     // The explosion centres on the first enemy touched and hits everything near it.
                     let center = self.slimes[id].point();
-                    for near in self.enemies_near(b.zone, center, b.blast, &[]) {
+                    let visible: Vec<_> = self
+                        .enemies_near(b.zone, center, b.blast, &[])
+                        .into_iter()
+                        .filter(|&i| {
+                            self.maps[b.zone].line_clear(center, self.slimes[i].point(), 0.05)
+                        })
+                        .collect();
+                    for near in visible {
                         self.hit_slime(near, b.owner, b.damage, b.crit);
                     }
                 } else {
@@ -3758,6 +3861,33 @@ impl World {
                 }
             }
             self.cur_skill.clear();
+            if blocked {
+                let mut clear = 0.;
+                let mut solid = 1.;
+                for _ in 0..12 {
+                    let mid = (clear + solid) / 2.;
+                    let at = Point {
+                        x: start.x + (end.x - start.x) * mid,
+                        y: start.y + (end.y - start.y) * mid,
+                    };
+                    if self.maps[b.zone].line_clear(start, at, 0.05) {
+                        clear = mid;
+                    } else {
+                        solid = mid;
+                    }
+                }
+                let at = Point {
+                    x: start.x + (end.x - start.x) * clear,
+                    y: start.y + (end.y - start.y) * clear,
+                };
+                b.x = at.x;
+                b.y = at.y;
+                b.t = 1.;
+                if warned.insert(b.owner) {
+                    let actor = self.players[&b.owner].character.id.clone();
+                    self.event("shotBlocked", &actor, at, 0., false);
+                }
+            }
         }
         bolts.retain(|b| b.t < 0.65);
         self.bolts = bolts;
@@ -8059,7 +8189,7 @@ mod tests {
                 .unwrap()
                 .offers
                 .len(),
-            1
+            10
         );
         w.players.get_mut(&1).unwrap().character.gold = 1100;
         w.interact(1, "merchant", Some("satchel"));
@@ -8082,6 +8212,40 @@ mod tests {
         quest_interact(&mut w, "merchant", Some("satchel"));
         assert_eq!(w.players[&1].character.bags.len(), 2);
         assert_eq!(w.players[&1].character.gold, 100);
+    }
+    #[test]
+    fn seeded_bag_rolls_average_two_percent_and_a_real_kill_grants_one_band_matched_drop() {
+        let mut w = world();
+        w.rng = 7;
+        let hits = (0..100_000)
+            .filter(|_| roll_bag(34, w.random()).is_some())
+            .count();
+        assert!(
+            (1_850..=2_150).contains(&hits),
+            "{hits} bag rolls per 100,000 kills"
+        );
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let _mate = join(&mut w, 2, Class::Mage);
+        let leader = w.players[&1].character.id.clone();
+        let member = w.players[&2].character.id.clone();
+        w.social(
+            1,
+            SocialCommand::PartyInvite {
+                id: Some(member),
+                name: None,
+            },
+        );
+        w.social(2, SocialCommand::PartyAccept { id: leader });
+        w.rng = 9; // This kill's bag roll succeeds after its gold roll.
+        let expected = roll_bag(w.slimes[0].level, 0.).unwrap().id.clone();
+        w.hit_slime(0, 1, 1_000., false);
+        let bags: Vec<_> = w
+            .drops
+            .iter()
+            .filter(|d| d.item.as_deref() == Some(&expected))
+            .collect();
+        assert_eq!(bags.len(), 1, "a party kill makes one bag roll");
+        assert_eq!(bags[0].group.len(), 2, "the bag is shared with the party");
     }
     #[test]
     fn stat_training_is_authoritative_and_saves_immediately() {
@@ -8112,6 +8276,36 @@ mod tests {
         assert_eq!(snapshot["statPoints"], 0);
         assert_eq!(snapshot["hitChance"], c.hit_chance());
         assert_eq!(snapshot["attack"], c.stats().0);
+    }
+    #[test]
+    fn mage_can_unequip_starter_weapon_into_backpack() {
+        let mut w = world();
+        let (tx, _rx) = mpsc::channel(256);
+        let welcome = w
+            .join(
+                1,
+                None,
+                Some(Look {
+                    class: Class::Mage,
+                    ..Look::default()
+                }),
+                tx,
+            )
+            .unwrap();
+        let token = welcome["token"].as_str().unwrap();
+        w.message(
+            1,
+            ClientMessage::Equip {
+                armor: None,
+                weapon: None,
+                slots: [("hands".into(), "none".into())].into(),
+            },
+        );
+        assert_eq!(w.players[&1].character.look.mage_weapon, "none");
+        assert_eq!(
+            w.store.load(token).unwrap().unwrap().look.mage_weapon,
+            "none"
+        );
     }
     #[test]
     fn recommended_stat_request_uses_server_class_and_saves_once() {
@@ -9868,6 +10062,54 @@ mod tests {
         assert_eq!(w.players[&2].dash_direction.x, 1.);
     }
     #[test]
+    fn player_shots_and_targeted_skills_stop_at_a_wall() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Hunter);
+        w.maps[0].objects = vec![crate::model::Obstacle {
+            x: 32.,
+            y: 30.,
+            r: 0.,
+            width: 1.,
+            depth: 3.,
+        }];
+        for (i, s) in w.slimes.iter_mut().enumerate() {
+            s.x = 70. + i as f64 * 0.01;
+            s.y = 70.;
+        }
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.x = 30.;
+        c.y = 30.;
+        c.level = 20;
+        w.slimes[0].x = 34.;
+        w.slimes[0].y = 30.;
+        w.players.get_mut(&1).unwrap().target = Some(0);
+        let hp = w.slimes[0].hp;
+        w.start_attack(1);
+        assert_eq!(
+            w.players[&1].cooldown, 0.,
+            "blocked target costs no attack cooldown"
+        );
+        let resource = w.players[&1].character.resource();
+        w.use_skill(1, "powershot", Point { x: 1., y: 0. });
+        assert_eq!(w.players[&1].character.resource(), resource);
+        assert!(w.players[&1].skill_cd.is_empty());
+        w.players.get_mut(&1).unwrap().target = None;
+        w.players.get_mut(&1).unwrap().face = Point { x: 1., y: 0. };
+        w.strike(1);
+        for _ in 0..20 {
+            w.update_bolts();
+        }
+        assert_eq!(
+            w.slimes[0].hp, hp,
+            "untargeted bolts cannot pass through the wall"
+        );
+        assert!(w.bolts.is_empty());
+        w.maps[0].objects.clear();
+        w.players.get_mut(&1).unwrap().target = Some(0);
+        w.start_attack(1);
+        assert!(w.players[&1].cooldown > 0.);
+    }
+    #[test]
     fn duplicate_character_session_is_rejected() {
         let mut w = world();
         let (tx, _rx) = mpsc::channel(256);
@@ -10046,7 +10288,7 @@ mod tests {
         ] {
             let mut w = world();
             let _rx = join(&mut w, 1, class);
-            let at = arena(&mut w, 20);
+            let at = arena(&mut w, 40);
             put(&mut w, 0, at, ahead, 0.);
             put(&mut w, 1, at, behind, 0.);
             put(&mut w, 2, at, outside, 0.);
@@ -10061,7 +10303,7 @@ mod tests {
         }
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Priest);
-        arena(&mut w, 20);
+        arena(&mut w, 28);
         let p = w.players.get_mut(&1).unwrap();
         let max = p.character.max_hp();
         p.character.hp = max * 0.2;
@@ -10089,11 +10331,11 @@ mod tests {
         while rx.try_recv().is_ok() {}
         skill(&mut w, "cleave");
         let error = rx.try_recv().unwrap();
-        assert_eq!(error["text"], "Cleave unlocks at level 2.");
+        assert_eq!(error["text"], "Cleave unlocks at level 4.");
         assert!(!hp_lost(&w, 0) && w.players[&1].skill_cd.is_empty());
         w.use_skill(1, "twinbolt", Point { x: 1., y: 0. });
         assert_eq!(rx.try_recv().unwrap()["type"], "error");
-        w.players.get_mut(&1).unwrap().character.level = 2;
+        w.players.get_mut(&1).unwrap().character.level = 4;
         skill(&mut w, "cleave");
         assert!(hp_lost(&w, 0));
         let left = w.players[&1].skill_cd["cleave"];
@@ -10127,7 +10369,7 @@ mod tests {
     fn cone_hits_the_front_arc_and_nova_hits_everything_in_radius_only() {
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Warrior);
-        let at = arena(&mut w, 20);
+        let at = arena(&mut w, 36);
         put(&mut w, 0, at, 1.2, 0.);
         put(&mut w, 1, at, 0., 1.2);
         put(&mut w, 2, at, -1.5, 0.);
@@ -10153,17 +10395,17 @@ mod tests {
         let ups = events(&mut rx, "levelup");
         assert_eq!(ups.len(), 1);
         assert_eq!(ups[0]["level"], 2);
-        assert_eq!(ups[0]["unlocked"], json!(["twinbolt"]));
+        assert_eq!(ups[0]["unlocked"], json!([]));
         assert_eq!(ups[0]["value"], 1.);
         // A multi-level jump lists every skill passed.
         let c = &mut w.players.get_mut(&1).unwrap().character;
-        c.level = 7;
+        c.level = 9;
         let id = w.players[&1].character.id.clone();
-        w.level_up_event(&id, at, 4);
+        w.level_up_event(&id, at, 7);
         let ups = events(&mut rx, "levelup");
         assert_eq!(
             ups.last().unwrap()["unlocked"],
-            json!(["arcaneward", "fireball"])
+            json!(["twinbolt", "twinbolt", "arcaneward"])
         );
     }
     #[test]
@@ -10197,7 +10439,7 @@ mod tests {
         let open = hp(&mut w, false);
         let walled = hp(&mut w, true);
         assert!(
-            walled > 0. && (walled - (open * 0.5).round()).abs() <= 1.,
+            walled > 0. && (walled - (open * 0.4).round()).abs() <= 1.,
             "{walled} vs {open}"
         );
         for _ in 0..121 {
@@ -10205,6 +10447,7 @@ mod tests {
         }
         assert!(w.players[&1].buffs.is_empty());
         w.players.get_mut(&1).unwrap().skill_cd.clear();
+        w.players.get_mut(&1).unwrap().character.level = 32;
         skill(&mut w, "berserk");
         assert_eq!(w.players[&1].buff(BuffKind::Haste), 0.4);
         w.players.get_mut(&1).unwrap().last_hurt = -99.;
@@ -10215,24 +10458,24 @@ mod tests {
     fn evasion_and_deadly_focus_raise_dodge_and_crit() {
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Assassin);
-        arena(&mut w, 20);
+        arena(&mut w, 32);
         let base_dodge = w.players[&1].character.dodge_chance();
         skill(&mut w, "evasion");
         skill(&mut w, "deadlyfocus");
         let p = &w.players[&1];
-        assert_eq!(p.buff(BuffKind::Dodge), 0.5);
+        assert_eq!(p.buff(BuffKind::Dodge), 0.6);
         assert_eq!(p.buff(BuffKind::Crit), 0.4);
         assert!(base_dodge + p.buff(BuffKind::Dodge) <= 0.95 + base_dodge);
         // Recasting refreshes rather than stacks.
         w.players.get_mut(&1).unwrap().skill_cd.clear();
         skill(&mut w, "evasion");
-        assert_eq!(w.players[&1].buff(BuffKind::Dodge), 0.5);
+        assert_eq!(w.players[&1].buff(BuffKind::Dodge), 0.6);
     }
     #[test]
     fn healing_is_capped_and_lifesteal_returns_a_share_of_damage_dealt() {
         let mut w = world();
         let mut rx = join(&mut w, 1, Class::Warrior);
-        let at = arena(&mut w, 20);
+        let at = arena(&mut w, 28);
         let max = w.players[&1].character.max_hp();
         w.players.get_mut(&1).unwrap().character.hp = 10.;
         skill(&mut w, "secondwind");
@@ -10244,6 +10487,8 @@ mod tests {
         let beat = events(&mut rx, "skill");
         assert_eq!(beat.last().unwrap()["heal"], 1.);
         put(&mut w, 0, at, 1., 0.);
+        w.players.get_mut(&1).unwrap().character.level = 40;
+        let max = w.players[&1].character.max_hp();
         w.players.get_mut(&1).unwrap().character.hp = 5.;
         skill(&mut w, "titanswrath");
         let dealt = 1.0e6 - w.slimes[0].hp;
@@ -10274,7 +10519,7 @@ mod tests {
         assert_eq!(w.players[&1].dash, 0.);
         let _b = join(&mut w, 2, Class::Mage);
         let (m, start) = (2, w.players[&2].character.point());
-        w.players.get_mut(&2).unwrap().character.level = 10;
+        w.players.get_mut(&2).unwrap().character.level = 20;
         w.use_skill(m, "blink", Point { x: 1., y: 0. });
         for _ in 0..4 {
             w.update_player(2);
@@ -10316,7 +10561,7 @@ mod tests {
     fn knife_ring_goes_every_direction_and_each_knife_hits_alone() {
         let mut w = world();
         let _rx = join(&mut w, 1, Class::Assassin);
-        let at = arena(&mut w, 20);
+        let at = arena(&mut w, 36);
         skill(&mut w, "knifering");
         assert_eq!(w.bolts.len(), 12);
         let sum: (f64, f64) = w
@@ -10371,7 +10616,7 @@ mod tests {
     fn chain_lightning_jumps_to_distinct_enemies_and_meteor_lands_on_the_target() {
         let mut w = world();
         let mut rx = join(&mut w, 1, Class::Mage);
-        let at = arena(&mut w, 20);
+        let at = arena(&mut w, 28);
         for n in 0..6 {
             put(&mut w, n, at, 2. + n as f64 * 2., 0.);
         }

@@ -12,6 +12,8 @@ Core dependencies: each instance's `OPEN` task follows its four content tasks; r
 
 Each instance has a separate map, encounter, quest/reward, presentation and opening task. The four Yearwheel doors are four different instances.
 
+- [ ] `I-VISUAL-IDENTITY` — Redesign the interiors of every dungeon, including Undervault, Cathedral, Moonwell and later instances, so each is recognizable at a glance rather than another underground stone vault. Give each its own floor and wall materials, room shapes, landmarks, props, palette and lighting that fit its setting; keep paths, collision and combat effects readable, then compare screenshots across all dungeons in a private browser check.
+
 ### The Eye Below — level 65, Stormglass Shore (zone 19)
 
 - [x] `I65-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
@@ -245,32 +247,92 @@ For each entry, replace tinted starter silhouettes with new worn layers and matc
 
 Audit on 2026-10-14: each dungeon below already drops 28 exclusive items (25 class pieces and three shared pieces), but their `art` fields still reuse starter worn layers. Each task means a distinct, immediately recognizable silhouette for its own dungeon, with worn layers for every class and both bodies in every animation, matching inventory icons, and editable PixelFlow source. Preserve item IDs, stats, loot pools and saves. Verify real-client equipment, game-scale readability against progression gear, and update the all-class gallery in Filedrop. A palette or aura alone does not complete a task.
 
-- [ ] `G-I65-ART` — Create and wire unique Eye Below gear art for its level-65 set.
-- [ ] `G-I70-ART` — Create and wire unique Elder Hollow gear art for its level-70 set.
-- [ ] `G-I75-ART` — Create and wire unique Thousandfold Pavilion gear art for its level-75 set.
-- [ ] `G-I80T-ART` — Create and wire unique Temple of the Rain Crown gear art for its level-80 set.
-- [ ] `G-I80S-ART` — Create and wire unique Seed Vault gear art for its level-80 set.
-- [ ] `G-I85-ART` — Create and wire unique Sunken Astrolabe gear art for its level-85 set.
-- [ ] `G-I95-ART` — Create and wire unique Thunderheart Gate gear art for its level-95 set.
-- [ ] `G-I97B-ART` — Create and wire unique Blooming Labyrinth gear art for its level-95 reward set.
-- [ ] `G-I98S-ART` — Create and wire unique Solar Crucible gear art for its level-95 reward set.
-- [ ] `G-I99A-ART` — Create and wire unique Amber Archive gear art for its level-95 reward set.
-- [ ] `G-I99W-ART` — Create and wire unique Silent Solstice gear art for its level-95 reward set.
+- [x] `G-I65-ART` — Create and wire unique Eye Below gear art for its level-65 set.
+- [x] `G-I70-ART` — Create and wire unique Elder Hollow gear art for its level-70 set.
+- [x] `G-I75-ART` — Create and wire unique Thousandfold Pavilion gear art for its level-75 set.
+- [x] `G-I80T-ART` — Create and wire unique Temple of the Rain Crown gear art for its level-80 set.
+- [x] `G-I80S-ART` — Create and wire unique Seed Vault gear art for its level-80 set.
+- [x] `G-I85-ART` — Create and wire unique Sunken Astrolabe gear art for its level-85 set.
+- [x] `G-I95-ART` — Create and wire unique Thunderheart Gate gear art for its level-95 set.
+- [x] `G-I97B-ART` — Create and wire unique Blooming Labyrinth gear art for its level-95 reward set.
+- [x] `G-I98S-ART` — Create and wire unique Solar Crucible gear art for its level-95 reward set.
+- [x] `G-I99A-ART` — Create and wire unique Amber Archive gear art for its level-95 reward set.
+- [x] `G-I99W-ART` — Create and wire unique Silent Solstice gear art for its level-95 reward set.
 
 - [x] `G95-BONUS` — Decide the level-95 attribute bonus and remove the current clamp to the level-90 value if a larger bonus is intended.
 
+### Dungeon set bonuses
+
+Wearing several pieces of the same dungeon set grants escalating bonuses at **2, 4, 6 and 8** equipped pieces (eight slots: armor, headgear, shoulders, gloves, weapon, pants, necklace, accessory, so 8 is the full set). Example shape: 2 pieces give a class stat bonus (for example warrior +attack); 4 pieces lower a skill's cooldown; 6 pieces make a skill twice as powerful; 8 pieces give something even better, such as a set-defining effect. Bonuses are cumulative and class-specific. **Every dungeon set has its own perks**: a warrior's Undervault set must differ from the warrior's Moonwell set (and every other dungeon's) in which skills it touches, what the effects do and how they feel, not just in the numbers. Each set's perks should follow that dungeon's theme and boss identity. Preserve item IDs, stats, loot pools and saves.
+
+- [ ] `SET-RULES` — Define what counts as a set (each dungeon's 28 exclusive items, plus Undervault and Moonwell), how pieces are counted (distinct equipped slots, refined copies, orange pieces). **Set membership depends on the piece, not its rarity**: a piece merged up to a higher rarity, or a copy with different rolled stats or refinement, still counts toward its set, so rarity never breaks or changes a set bonus (rarity may still affect the piece's own stats), the tier structure and the power budget so 8 pieces beat mixed gear without being mandatory. Add a uniqueness rule: for each class, no two sets may share the same skill at the cooldown, doubled-power or 8-piece tier, and no two 8-piece effects may be the same mechanic. Record the full set-by-class matrix in a doc beside `docs/skill-ranks.md`.
+- [ ] `SET-SERVER` — Add authoritative set tracking: count equipped pieces per set, recompute on equip, unequip, merge, refine and login, and apply the stat, cooldown and skill-power effects in combat. Cooldown and power changes must stack correctly with skill ranks and passives.
+- [ ] `SET-UI` — Show set membership and the 2/4/6/8 tiers in item tooltips and the equipment panel: pieces worn out of the total, active tiers highlighted, inactive ones greyed with what they unlock. Add a short on-screen cue when a tier activates or drops.
+- [ ] `SET-WARRIOR` — Define the 2/4/6/8 bonuses for warriors in every dungeon set, with **different perks per set** (different skills, effects and 8-piece mechanic for Undervault, Moonwell and each later dungeon), themed to that dungeon.
+- [ ] `SET-MAGE` — Define the 2/4/6/8 bonuses for mages in every dungeon set, with **different perks per set** (different skills, effects and 8-piece mechanic for Undervault, Moonwell and each later dungeon), themed to that dungeon.
+- [ ] `SET-ASSASSIN` — Define the 2/4/6/8 bonuses for assassins in every dungeon set, with **different perks per set** (different skills, effects and 8-piece mechanic for Undervault, Moonwell and each later dungeon), themed to that dungeon.
+- [ ] `SET-PRIEST` — Define the 2/4/6/8 bonuses for priests in every dungeon set, with **different perks per set** (different skills, effects and 8-piece mechanic for Undervault, Moonwell and each later dungeon), themed to that dungeon.
+- [ ] `SET-HUNTER` — Define the 2/4/6/8 bonuses for hunters in every dungeon set, with **different perks per set** (different skills, effects and 8-piece mechanic for Undervault, Moonwell and each later dungeon), themed to that dungeon.
+- [ ] `SET-EFFECTS` — Give the 8-piece bonuses and doubled-skill (6-piece) bonuses distinct visual feedback on the skill, so players can see that a set effect is active.
+- [ ] `SET-CHECK` — Verify that no two sets give the same class identical perks (derive the matrix from the data and assert uniqueness), then check tier counting across mixed rarities (for example, 4 base pieces plus 4 merged pieces still make an 8-piece set), class gating, stacking with ranks and passives, unequip and swap behavior, save/reload, and PvP balance in focused private tests.
+
+### Purple dungeon drops
+
+Dungeon sets stay blue at base. Each dungeon-set piece that drops has a small chance (about **5%**) to drop already purple (epic), so players can find purple pieces without merging. Purple copies count toward their set like any other rarity.
+
+- [ ] `DROP-EPIC-RULES` — Settle the roll: 5% per dropped set piece (not per kill), applied to every dungeon's boss and chest drops including party drops, with the value in one named constant. Decide whether it is a purple copy of the same catalog item (the per-copy rarity from `G-INSTANCE-DATA`, with the epic stat curve and second bonus stat that `server/src/items.rs` expects) or a separate catalog entry, and whether Undervault and Moonwell are included. Purple copies still cannot merge further, and the catalog, loot pools and saves keep their item IDs.
+- [ ] `DROP-EPIC-SERVER` — Implement the authoritative independent roll on set-piece drops, with the epic stats applied to that copy. Check that outdoor and ordinary drop tables are unchanged and that a purple drop merges, refines, trades and saves like any other epic copy.
+- [ ] `DROP-EPIC-UI` — Show purple rarity on dungeon drops in the loot marker, bags, equipment and tooltips, with the set membership from `SET-UI` unchanged.
+- [ ] `DROP-EPIC-CHECK` — Verify the roll rate over many seeded drops (about 5%, not per kill), that purple pieces count for set tiers alongside blue ones, and that nothing else changes in a private world.
+
+## Bags
+
+A character has 16 base slots plus up to four expansion bags (`bag_capacity` in `server/src/items.rs`). Traders now offer ten tiers from the 6-slot Linen Satchel at level 1 through the 24-slot Sovereign Pack at level 90; the full table is in [docs/bag-tiers.md](docs/bag-tiers.md).
+
+- [x] `BAG-RULES` — Define the tier table (level, name, slots, price) from level 10 through 90 with a steeply rising price curve, whether the Linen Satchel stays as the cheap level-1 bag, and how the existing Adventurer Satchel (8) and Traveler Pack (16) in the catalog fit in or are retired. Keep the four-bag limit and the replace-the-smallest rule, and decide whether a smaller bag can still be bought once a larger one is owned. Preserve existing bag IDs and saves. Decisions: [docs/bag-tiers.md](docs/bag-tiers.md).
+- [x] `BAG-CATALOG` — Add the new bag items with names and icons, and give the trader NPCs offers for each tier they may sell. Update `scripts/generate_*.py` and sync `world/`, since each zone's trader lists its own offers. The idempotent `scripts/bag_tiers.py` pass runs from `sync-world.cjs` after every zone generator.
+- [x] `BAG-SERVER` — Enforce the level gate and price in `purchase_bag`, with a clear message when the level is too low or gold is short. Keep payment atomic, and make sure bags already owned still count after the change.
+- [x] `BAG-UI` — Show the next bag tier, its level requirement, slot count and price in the trader dialog, with locked tiers greyed out and an "owned" state. Show the extra slots gained before buying.
+- [x] `BAG-DROP-RULES` — Let bags drop from monsters at the right level: about a **2% chance per kill** of one bag, where the bag tier matches the monster's level band (a level-34 monster can drop the level-30 tier, not the level-40 one), independent of the other drop rolls and with the value in one named constant. Decide the band edges, whether elites, bosses and dungeon enemies roll it, how a party kill is shared (one roll per kill, awarded like other loot), and whether a dropped bag is bind-free or tradable (see `SOC-TRADE`). A dropped bag must not be worth more than buying one: set its sell value to match the tier. Drops never bypass the player's level gate on using the bag, if one applies. Decisions: [docs/bag-tiers.md](docs/bag-tiers.md).
+- [x] `BAG-DROP-SERVER` — Add the authoritative roll and grant. `can_collect` currently refuses `kind == "bag"` items, so decide how a dropped bag is picked up, then fit it automatically or put it in the bag grid until the player chooses. Keep the four-bag limit and the replace-the-smallest rule.
+- [x] `BAG-DROP-UI` — Show the dropped bag with its tier colour or icon on the ground and in loot messages, and show its slot count in tooltips.
+- [x] `BAG-CHECK` — Verify level and gold gates, replacing a smaller bag, the four-bag limit, save/reload, and that capacity and a full-bag drop still behave in a private world. Include the bag drop rate (about 2% per kill over many seeded kills), the level-band match and party kills. Update the existing tests that assume a 22-slot capacity from one Linen Satchel only if the rules change it.
+
+## Consumable balance
+
+Today there are three families, each with a tier every ten levels (1, 10, 20 ... 90), generated by `scripts/consumable_tiers.py`: Traveler's Stew (heals and restores mana over 8 seconds), Health Potions (heal, 60-second shared cooldown) and Mana Potions. Healing runs 100, 210, 350, 490 ... 1,330 and mana 100, 170, 300 ... 1,190, in flat numbers, with prices from 12/30 to 500/1,150 gold. Maximum HP is `class base + 20 per level + 8 per stamina` (`max_hp` in `server/src/model.rs`), so a flat potion can fall far behind a high-level character's HP pool; there is no tier above level 90 for levels 91–99.
+
+- [ ] `CONS-AUDIT` — Measure how the potions and food compare with real characters at levels 1, 10, 20 ... 99 for every class, with and without heavy stamina or intellect: potion heal as a percentage of max HP, mana restored as a percentage of max mana (mages and priests use mana, warriors use rage, so check what mana does for each class), healing per second against the damage of that level's monsters, elites and bosses, and the cost in gold of keeping a character stocked per hour. Report the table in `docs/` and name the levels where a potion is useless or too strong.
+- [ ] `CONS-RULES` — From the audit, set the balance rules: whether healing scales as a percentage of max HP, a flat number or both, the 60-second cooldown (a full potion every minute is slow at high level) versus food's 8-second hot, how food and potions stack, and price against healing and against what a level's monsters drop. Add the missing tiers for levels 91–99 (for example 95 and 99) and any extra tiers inside the ten-level steps where the audit shows a gap, then record the final curve for levels 1–99.
+- [ ] `CONS-DATA` — Update `scripts/consumable_tiers.py` and regenerate the items: new tiers with names, icons, rarity colours and prices, required levels, and the traders that sell them (each zone's NPC list in `scripts/generate_*.py`). Keep existing item IDs, stacks and quick-slot assignments.
+- [ ] `CONS-SERVER` — Apply the new rules in the server (percentage healing, cooldowns or caps if chosen) with clear rejection messages, and make sure PvP, duels and arenas follow whatever limits `CONS-RULES` sets for potions.
+- [ ] `CONS-UI` — Show the real healing and mana amounts (and percentage of max, if used) in tooltips, quick slots and the effects bar, and the cooldown on potions.
+- [ ] `CONS-CHECK` — Verify in a private world at several levels and classes that each tier heals and restores what its tooltip says, cooldown and food rules hold, prices and shop lists are right, old saves and quick slots still work, and that the balance table from the audit passes.
+
+## Kill-time testing
+
+Measure how long it takes to kill a monster of the character's own level, every 5 levels (5, 10, 15 ... 95, plus 99), for every class, wearing the **normal gear for that level** (the ordinary progression set for that level, not dungeon, orange or refined gear). This shows where fights are too fast or too slow and feeds `CONS-AUDIT`.
+
+- [ ] `TTK-RULES` — Define the test: what "normal gear" is at each level (the level's ordinary piece in every slot, base rarity, no refinement, no set bonuses), the skillbar and rank each class has at that level, the attribute allocation (an even default plus a stamina-heavy and a damage-heavy variant), the target (an ordinary monster of the same level, and also an elite if one exists at that level), whether potions and food are used, and what counts as a kill (first hit to death, with travel and cooldown waits included). Set target kill times per level band and say what is too fast or too slow.
+- [ ] `TTK-HARNESS` — Build a repeatable private-world test that creates a character of each class at the given level with that gear, spawns the monster, plays a fixed skill rotation (and a basic-attack-only run), and records time to kill, damage taken, mana or rage used, potions used and whether the character died. Run several seeded repetitions per case and report the median and spread. It must never touch the live world or real saves.
+- [ ] `TTK-RUN` — Run it for all 20 levels and five classes (100 cases per variant) and write the results as a table in `docs/`: kill time by class and level, plus the same-level monster's own damage against the character so the other side of the fight is visible.
+- [ ] `TTK-TUNE` — Fix the outliers the report shows by adjusting monster stats, skill numbers or gear stats, never by changing item IDs or saves, then re-run the affected cases. Record what was changed and why.
+- [ ] `TTK-CHECK` — Keep the harness as a regression test with the target bands from `TTK-RULES` as assertions, so a later skill, gear or monster change that makes a class too fast or too slow fails the check.
+
 ## Skills
 
-Regular skills/ranks arrive every two levels from 2 through 98, plus a level-99 class capstone. The extra preferably passive class milestones at 10, 20, …, 90 are separate rewards. Existing characters receive all ranks earned by their saved level.
+Each class learns a new active skill every four levels from 4 through 40. Rank 2 arrives at 6, 10, …, 42; further ranks continue at even levels through 98, plus a level-99 class capstone. Automatic class passives at 10, 20, …, 90 are separate rewards. Existing characters receive all skills and ranks earned by their saved level.
 
 - [x] `S-RANK-RULES` — Add skill-rank data, server unlock/combat rules and client rank descriptions without losing saved skillbar assignments.
-- [x] `S-RESPACE-WARRIOR` — Spread the existing warrior kit across levels 2–20 and design which abilities gain later ranks.
-- [x] `S-RESPACE-MAGE` — Spread the existing mage kit across levels 2–20 and design which abilities gain later ranks.
-- [x] `S-RESPACE-ASSASSIN` — Spread the existing assassin kit across levels 2–20 and design which abilities gain later ranks.
-- [x] `S-RESPACE-PRIEST` — Spread the existing priest kit across levels 2–20 and design which abilities gain later ranks.
-- [x] `S-RESPACE-HUNTER` — Spread the existing hunter kit across levels 2–20 and design which abilities gain later ranks.
+- [x] `S-RESPACE-WARRIOR` — Spread the existing warrior kit across levels 4–40 and assign later ranks.
+- [x] `S-RESPACE-MAGE` — Spread the existing mage kit across levels 4–40 and assign later ranks.
+- [x] `S-RESPACE-ASSASSIN` — Spread the existing assassin kit across levels 4–40 and assign later ranks.
+- [x] `S-RESPACE-PRIEST` — Spread the existing priest kit across levels 4–40 and assign later ranks.
+- [x] `S-RESPACE-HUNTER` — Spread the existing hunter kit across levels 4–40 and assign later ranks.
 
 The unlock and rank layout is recorded in [docs/skill-ranks.md](docs/skill-ranks.md).
+
+- [ ] `S-FLASH-CLARITY` — Make every class skill more visually striking and immediately recognizable in play: distinct cast, travel and impact effects that show its range, target area and purpose (damage, healing, protection or movement), with skill icons/descriptions that match what players see. Check readability in crowded fights and at higher ranks.
 
 ### Skill ranks, levels 22–40
 
@@ -345,6 +407,23 @@ The unlock and rank layout is recorded in [docs/skill-ranks.md](docs/skill-ranks
 - [x] `S99-HUNTER` — Add the hunter level-99 capstone rank and its visual/UI feedback.
 - [x] `S-MIGRATE-CHECK` — Verify existing high-level characters unlock the correct past ranks/passives and retain their skillbar layouts.
 
+## Treasure chests
+
+No treasure chests exist yet. Add chests that spawn at random in the open world: every **2 minutes** each eligible zone rolls a **10% chance** that a chest actually spawns, so one appears about every 20 minutes per zone. Only zones that have monsters roll; cities and enemy-free zones never do. **Chests can also appear inside dungeons**: each private party copy of a dungeon rolls on the same timer, and only that party sees it. A chest contains items that can drop in that area. When one spawns, a message tells the players there that a chest has appeared and will despawn in **3 minutes**, so they have to find it before then.
+
+- [ ] `CHEST-RULES` — Define the spawn timer, the 10% roll and the 3-minute lifetime as named constants. Decide the details:
+  - Is it one roll per zone or one per map region, and one per running dungeon copy (starting when the party enters, stopping when the copy closes)?
+  - Can a second chest spawn while one is still up?
+  - How the spawn point is picked: a reachable, walkable tile that no monster, portal, NPC or other player blocks, ideally away from the arrival point. Dungeons need a tile inside the playable rooms that a party can reach without passing a sealed or boss-gated door, and never inside a boss arena during a fight.
+  - What the contents are: a small number of rolls from the zone's own monster and material drop pool at the zone's level (the same table for ordinary gear, gold and materials), with no orange rolls beyond the normal 0.1%. In a dungeon, use that dungeon's own drops, and decide whether its exclusive set pieces can appear (and with what chance, including the purple roll), so a chest can't beat a boss kill.
+  - Who may open it: first to arrive, or anyone nearby, with a shared loot rule for parties. In a dungeon, the party shares it.
+  Record the eligibility list derived from the data (zones and dungeons with enemies), not hand-written.
+- [ ] `CHEST-SERVER` — Add the authoritative spawn loop, lifetime and despawn, the open action with range and life checks, and the loot grant, including a full-bag path so nothing is lost. Chests are runtime state, not saved; a restart clears them. Keep the timer per zone and per dungeon copy, make sure zones with no players online do not spawn chests that nobody can see, and make a dungeon copy's chests vanish when the copy closes or the party leaves.
+- [ ] `CHEST-ANNOUNCE` — Show a text message to players in the zone when a chest spawns, saying a chest has appeared and will despawn in 3 minutes. Decide whether the message also gives a direction or region hint, and whether players who arrive later see a countdown. Send a short message when it is opened or despawns.
+- [ ] `CHEST-ART` — Draw the chest sprite (closed, opening and opened states) and a glint or marker through PixelFlow, readable at game scale on every zone's ground. Add a minimap or world-map marker only if `CHEST-RULES` says so.
+- [ ] `CHEST-CLIENT` — Render chests, handle clicking to open (with the same click-the-visible-body rule as monsters), show the despawn countdown on or near the chest, and play a short effect on open.
+- [ ] `CHEST-CHECK` — Verify in a private world with the timer shortened for tests: spawn rate over many seeded rolls (about 10%), only monster zones and dungeons spawn, a dungeon chest appears only for its own party and is gone when the copy closes, a chest in one party copy does not appear in another, the announcement text, despawn after 3 minutes, loot comes from the zone's own pool, parties, full bags, and reconnecting while a chest is up.
+
 ## Stat points
 
 Today a character earns 3 stat points per level and spends them one click at a time on six attributes (strength, agility, intellect, stamina, dexterity, accuracy); accuracy is capped at 20 and dexterity at 70. Add a **Recommended** button in the attributes panel that spends the unspent points automatically on what is best for the character's class.
@@ -357,10 +436,72 @@ Today a character earns 3 stat points per level and spends them one click at a t
 - [x] `STAT-RESET-NPC` — Place the NPC in each offering city, add dialogue, and a UI that shows the current price, the points that will be refunded and a separate confirmation (it cannot be undone), with the result shown straight away in the attributes panel. Combine it with the Recommended button so a player can reset and then spend again.
 - [x] `STAT-CHECK` — Verify in a private world that a reset refunds exactly the trained points, charges the right price (and the rising price after repeat resets), is refused when gold is short, in combat, defeated or in a town that does not offer it, and survives save/reload; also verify that each class gets its recommended spread at several levels, caps are respected, points never go negative or unspent by mistake, a manual allocation after the button works, mid-way spreads continue sensibly, and everything saves and reloads.
 
+## Game master
+
+The game master is the golden `[GM]Sork` character on a GM account (`Character::gm`), who has personal god mode and the debug commands. A search of the server found no chat slash commands yet. Make the GM **invisible** by default: monsters never notice or target the GM, and players never see them, unless the GM types a command to be shown.
+
+- [ ] `GM-INVIS-RULES` — Decide what invisible means: no sprite, name, nameplate, minimap or party-list entry for others; not in the nearby-player list or the zone count; monsters ignore the GM for aggro and targeting and their area effects still do nothing to a god-mode GM; whether the GM can still see themselves (for example as a faint outline) and see other players normally; and how chat works while hidden (no chat, or chat shown without a position). Decide the command syntax (for example `/show` and `/hide`, or `/vis on|off`), that invisibility is the default on every login and zone change, and whether it carries into private dungeon copies and arena matches. Record the commands and defaults in the README.
+- [ ] `GM-INVIS-SERVER` — Implement the state authoritatively on the server: a per-character flag set only for a GM account (a client request from anyone else is refused with no information), excluded from every snapshot, event, loot, party and trade broadcast to other players, and ignored by monster target selection and aggro. Add the first chat slash-command path if none exists, with the GM check on the server. The flag is reset on login and not saved, so the GM never starts a session visible by mistake.
+- [ ] `GM-INVIS-CLIENT` — Show the GM a clear indicator that they are hidden or shown (for example a status badge), render the GM to themselves with the outline chosen in the rules, and make sure other clients never receive the hidden character's position, name or effects, so nothing can be read from the network traffic. Hide the GM's own footsteps, attack effects and chat bubble from others while hidden, or decide which effects are acceptable.
+- [ ] `GM-INVIS-CHECK` — Verify in a private world with a GM account and a normal account in the same zone: the GM is absent from the normal client's snapshots (not just visually hidden), monsters do not aggro or attack the GM, `/show` makes the GM appear for everyone and `/hide` removes them, a non-GM sending the commands changes nothing, the default after login and zone change is hidden, and nothing is saved.
+
+### Game master gear
+
+The GM currently wears three golden pieces (the Golden Robe with 12 defense, the Golden Top Hat with 4, and the Golden Sword & Shield with 10,020 attack and 10,004 defense), which are `gm` rarity and never drop. Make the GM gear **super overpowered**, so the GM kills almost anything in one hit.
+
+- [ ] `GM-GEAR-RULES` — Define "almost everything": the GM one-shots every ordinary monster, elite and boss in the open world and dungeons, with the exceptions written down (for example nothing special-cased such as a scripted invulnerable phase, training dummies or other players). Set the target as a margin over the highest-HP monster in the data, so a boss with the most HP still dies in one normal attack, and decide whether it is done through gear stats, a damage floor that scales with the target, or both. Decide the GM's effect on other players (PvP, duels and arenas should not become one-shot-the-player unless the GM explicitly opts in) and the rest of the kit: movement speed, attack speed, mana and rage, and whether every skill one-shots too or only the basic attack.
+- [ ] `GM-GEAR-DATA` — Raise the GM pieces to match the rules, with armor and headgear in the same league as the weapon today (the armor's 12 defense is tiny next to the sword's 10,004) and attribute bonuses if the stat formulas need them. Complete the set to every slot (shoulders, gloves, pants, necklace, accessories) if that is needed to reach the target, with golden art and icons made through PixelFlow. Keep the `gm` rarity (never rolled, never sold or dropped) and keep the item IDs and saves.
+- [ ] `GM-GEAR-SERVER` — Apply any special rule from `GM-GEAR-RULES` authoritatively in combat, only when the wearer is the GM character; a client or another player can never obtain it. Make sure it does not break the damage code for ordinary players (no overflow when a huge attack value multiplies against stats, no integer wrap and no NaN) and that kills still give normal credit, loot and quest progress.
+- [ ] `GM-GEAR-CHECK` — Verify in a private world that the GM kills the strongest monster of every zone and dungeon in one hit, that ordinary players and mobs behave exactly as before, that other players cannot equip or receive the GM pieces, that PvP follows the rules, and that large values do not overflow.
+
+## Day and night
+
+Add a day and night cycle to the world. **24 game hours pass in 20 real minutes**, so one game hour is 50 real seconds, noon comes every 20 minutes and the shortest night is only a few minutes long. Outdoor zones follow it; enclosed places (private dungeons, building interiors, caves) do not. `WEATHER-RULES` asks whether weather follows a world clock, so decide the clock here first.
+
+- [x] `TIME-RULES` — Define the world clock: 1,200 real seconds per 24 game hours, the game time at server start (continuous across restarts from a stored epoch, never reset to dawn), the hour boundaries for dawn, day, dusk and night, and whether every zone shares one clock or some zones have a fixed time (an eternal dusk, a permanent aurora night in Frostwake, caves and dungeons with no cycle). Decide whether the time is shown to the player (a clock or sun/moon icon), whether any systems depend on it (monster spawns or stats, shop hours, quests, loot, regeneration, rest or the inn) and keep the first version cosmetic by default so combat and tests are unaffected. Derive which zones are indoors from the data.
+- [x] `TIME-SERVER` — Make the server the one source of time: compute the game time from a stored epoch and the real clock, send the current time and its speed to each client on join and re-sync periodically so clients do not drift, and allow a private test world to set or freeze the time. The time never rolls back or restarts at a server restart.
+- [x] `TIME-RENDER` — Tint the outdoor scene through the day: warm sunrise, bright noon, orange sunset, a blue-dark night with a gentle floor so the screen stays readable, smooth blending between phases, lit windows, lamps and campfires turning on at dusk, moon and stars at night, and a sun or moon position that fits the hour. It must never hide monsters, loot, players, skill telegraphs or text, and shadows should follow the sun if the art uses them. Keep the cost low: tint with one overlay or cached gradient rather than repainting layers, and respect reduced-motion.
+- [x] `TIME-ZONES` — Give each zone's theme its own take on the cycle (the frost aurora at night, ember glow in the Crags, glowing flora in the fen and Veyrroot, a starry desert), while keeping the same readability floor, and make indoor zones and dungeons ignore the cycle. Make the transition when walking through a door smooth.
+- [x] `TIME-UI` — Show the time of day in the HUD (a small sun/moon icon with the game hour, plus a tooltip), and add a setting to reduce or turn off the night darkening for players who find it hard to see. Add a debug command for the GM to set the time (see the game master tasks).
+- [ ] `TIME-MUSIC` — Add a night variation of the zone music (calmer or slower), made through the dybase2 tools, that fades in at dusk and back at dawn, if `TIME-RULES` wants it.
+- [ ] `TIME-WEATHER` — Connect the cycle to weather: weather rules may depend on the hour (morning fog, evening storms), a rainy sky tints the day colour darker, and night rain/snow stays visible against the dark tint.
+- [ ] `TIME-CHECK` — Verify in a private world with the time forced: 24 game hours equal 20 real minutes within a small tolerance, every client shows the same hour, the time is continuous across a restart, outdoor zones follow the cycle and dungeons and interiors do not, nothing becomes unreadable at midnight in any zone (compare screenshots at several hours), and CPU with the cycle on and off stays within the render budget.
+
+## Weather
+
+The world has no weather today. Each dungeon's art file has a small `weather()` function, but it only draws drifting ambient motes inside that dungeon. Add real weather to the outdoor world, such as rain, snow and others, which changes over time. It never shows when the player is **inside**: private dungeons and their rooms, building interiors and any other enclosed zone.
+
+- [ ] `WEATHER-RULES` — Define the weather types and how they fit each zone: rain, snow, fog, thunderstorm, wind-blown leaves or ash, sandstorm and a clear sky, with each zone's allowed types set by its theme (snow in Rimeveil, Frostwake and Cairnspine, no snow in the desert or fen, sandstorms in Lapis Erg, ash in the Crags, and so on, derived from the zone data). Set how long a spell lasts, how often it changes and how strong it is, and whether weather is random per zone, follows a world clock or a day/night cycle, and whether it is synced for everyone in the zone. Define "inside": private dungeon copies, building interiors, caves and any zone flagged as enclosed (derived from the data), and what happens when the player walks through a door. Decide whether weather is cosmetic or has small gameplay effects (reduced view distance in fog, slower movement in deep snow, lightning), keeping it cosmetic by default so combat and tests are unaffected.
+- [ ] `WEATHER-SERVER` — Add an authoritative weather state per outdoor zone with the type, intensity and end time, changed by a seeded schedule so a server restart does not flip it abruptly. Send it to the clients in the zone with their snapshot and on change, and keep enclosed zones fixed at no weather. Tests and private worlds must be able to set or freeze the weather.
+- [ ] `WEATHER-RAIN` — Draw rain through the canvas (streaks, splashes on the ground, a darker sky tone), with light, medium and heavy settings and a puddle or wet-ground tint.
+- [ ] `WEATHER-SNOW` — Draw snowfall (flakes of several sizes with drifting motion, a light white overlay on the ground and a cool sky tone), with light and heavy settings.
+- [ ] `WEATHER-OTHER` — Draw the remaining types from the rules: fog, thunderstorm with lightning flashes, wind with leaves or ash, and a sandstorm. Each can fade in and out smoothly rather than appear all at once.
+- [ ] `WEATHER-INSIDE` — Make weather stop the moment a player enters an enclosed area and return when they walk out, with a smooth fade. Cover dungeons, building interiors, caves and portals, so a player standing in a doorway does not see rain indoors.
+- [ ] `WEATHER-AUDIO` — Add soft ambient weather sound (rain, wind, thunder), made through the dybase2 tools or the existing audio route, ducked under music, off indoors and with its own volume setting.
+- [ ] `WEATHER-UI` — Show the current weather in the HUD (a small icon and name, or in the zone label), add a setting to turn weather effects off or lower them for slower devices, and respect reduced-motion.
+- [ ] `WEATHER-CHECK` — Verify in a private world with the weather forced: every type appears only in the zones the rules allow, none shows in dungeons or building interiors, the transition when entering and leaving is correct, all players in a zone see the same weather, a restart keeps the schedule sensible, and the frame rate on a low-end profile stays within the render budget (measure CPU with weather on and off).
+
+## Login notifications
+
+The game has no Gotify integration today. Send a Gotify push to the server owner whenever a player logs in, so they can see who is online. The Rust server logs in through `auth.rs` (account login) and puts a character into the world in `world.rs` (`join_as`).
+
+- [ ] `NOTIFY-RULES` — Decide what a login notification is: the account login, the character entering the world (probably better, since it names the character and class), or both. Decide the content (character name, class, level and zone; the account name only if it is not private), the title with an emoji prefix, the priority (low, since it is informational), and the exclusions: the temporary ambient adventurers, mercenaries, test and private-world bots, and the GM's own character. Decide the throttling, so reconnects and a flapping connection do not spam: one push per player per cooldown window (for example 30 minutes) and an optional digest if many players join at once. Decide whether logout, first-ever login of a new account and failed logins are included.
+- [ ] `NOTIFY-SERVER` — Send the push from the server without ever blocking the game loop: queue the event and post it from a background task with a short timeout, log failures once and drop them, and never retry in a way that backs up. Read the Gotify URL and application token from the environment (never from the repository, the client or this file), and turn the feature off cleanly when they are not set. Make sure a private test world never sends anything, and that a player cannot inject text into the message (strip control characters and limit the length of the name).
+- [ ] `NOTIFY-DEPLOY` — Set the environment variables where the game server runs, check the server can reach Gotify from its container or host, and create a separate Gotify application (and token) for the game rather than reusing another service's token. Document the setup in the README without the token.
+- [ ] `NOTIFY-CHECK` — Verify against a local fake Gotify endpoint that a login sends exactly one push with the right content, that excluded characters send none, that the throttle holds under reconnects, that an unreachable or slow Gotify does not delay the login or the game tick, that the feature is off without configuration, and that no token appears in logs, commits or client files.
+
 ## Combat HUD
 
 - [x] `UI-TARGET-BADGE` — Show the current target’s face and HP next to the player HP badge; update it when the target changes and clear it when there is no target.
 - [x] `UI-MONSTER-TARGETING` — Make monsters easier to target by clicking their visible bodies; clicks should not need to land below the sprite.
+
+## Ranged combat
+
+- [x] `C-RANGED-LOS` — Prevent players from firing ranged basic attacks and targeted ranged skills through walls, buildings and other solid map obstacles. Check the path from attacker to target on the authoritative server before spending resources or starting a cooldown; blocked shots cause no damage or rewards and give clear feedback. Keep the client projectile and effect visuals consistent with the collision result. Verify straight, diagonal and corner cases against enemies and players in a private world, including dungeon walls.
+
+## Languages
+
+- [ ] `L-SWEDISH` — Add Swedish (`sv`) as a selectable, persistent game language; translate player-facing menus, HUD, skills, quests, items, NPC dialogue and system messages, and check the language switch in a private browser test.
 
 ## Player interaction and PvP
 
@@ -387,6 +528,20 @@ The route pass aligned the Stormrift, Hourglass Pass, Glassroot Causeway, Sunwar
 - [x] `M-SPEED` — Persist mount ownership and calculate **2× normal travel speed** authoritatively when mounted.
 - [x] `M-CLIENT` — Add mount appearance, mount/dismount control and clear speed/ownership UI; settle combat, portal and city rules.
 - [x] `M-CHECK` — Check level/gold gates, persistence, travel speed and transitions in a private world.
+
+## More mounts
+
+Today there is one mount: the riding horse, sold by Greta in Skaldholm at level 50 for 50,000 gold, with a 2× outdoor travel speed that dismounts on combat, aggro, Spark Travel, death or a private dungeon. Add **more mounts than the horse: a gryphon, a lizard, a raptor and a sabertooth**, each with its own look and a way to get it. Use PixelFlow for all mount sprites, and keep every existing horse save intact.
+
+- [ ] `MOUNT-RULES` — Decide, per mount: how it is obtained (shop with a level and price, quest, rare drop or dungeon reward; make them different, with the gryphon the hardest to earn), whether any mount differs in speed or ability (for example, whether the gryphon crosses water or cliffs, which would need collision and zone-edge rules) or all stay a cosmetic choice at 2× speed, and how a player owning several picks one. Define the dismount rules for each and whether mounts are tradable (see `SOC-TRADE`). Keep the horse's price and rules unchanged.
+- [ ] `MOUNT-SERVER` — Replace the single owned-horse flag with a set of owned mounts plus a selected one, migrating existing saves so every horse owner keeps their horse. Keep travel speed, dismount rules and persistence authoritative, and send the selected mount in the player snapshot.
+- [ ] `MOUNT-GRYPHON` — Create the gryphon mount sprites in every direction and gait for both bodies and all classes, with rider placement, through PixelFlow.
+- [ ] `MOUNT-LIZARD` — Create the lizard mount sprites in every direction and gait for both bodies and all classes, with rider placement, through PixelFlow.
+- [ ] `MOUNT-RAPTOR` — Create the raptor mount sprites in every direction and gait for both bodies and all classes, with rider placement, through PixelFlow.
+- [ ] `MOUNT-SABERTOOTH` — Create the sabertooth mount sprites in every direction and gait for both bodies and all classes, with rider placement, through PixelFlow.
+- [ ] `MOUNT-SOURCES` — Add the acquisition for each new mount from `MOUNT-RULES`: stable or vendor NPCs with dialogue, quests, and drop sources with their rates.
+- [ ] `MOUNT-UI` — Let the player see their owned mounts and choose which one the mount key and HUD button summon, with ownership, price and unlock hints for the ones not owned yet, and other players seeing the selected mount.
+- [ ] `MOUNT-CHECK` — Verify purchase gates, ownership and the selected mount across save/reload, that a horse owner keeps the horse, speed and dismount rules per mount, and the sprites at game scale in a real client in a private world.
 
 ## Previous gear redesign
 

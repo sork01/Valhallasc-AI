@@ -156,6 +156,7 @@
         <button id="wm-open" class="wm-open" type="button" title="World map (M)" aria-label="Open the world map (M)"><svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="16" cy="16" r="12"/><ellipse cx="16" cy="16" rx="5.2" ry="12"/><path d="M4.5 12h23M4.5 20h23M16 4v24"/></svg></button>
       </div>
       <p class="hud-stats"><span id="hud-gold">0</span> <span data-i18n="gold">gold</span> · <span id="hud-kills">0</span> <span data-i18n="slain">slimes</span></p>
+      <p id="world-clock" class="world-clock" title="World time">☀ 12:00</p>
       <button id="mount-toggle" class="mount-toggle" type="button" title="Buy a horse from Stable-hand Greta in Skaldholm at level 50" aria-label="Mount or dismount (H)" disabled>Horse · H</button>
     </div>
     <button id="equipment-open" class="inventory-open" type="button">Character · E</button>
@@ -286,6 +287,7 @@
         <h3 id="settings-title">Settings</h3>
         <label class="setting-row" for="set-music"><span>Music</span><input id="set-music" type="range" min="0" max="100" step="1"><output id="set-music-out" for="set-music"></output></label>
         <label class="setting-row" for="set-sfx"><span>Sound effects</span><input id="set-sfx" type="range" min="0" max="100" step="1"><output id="set-sfx-out" for="set-sfx"></output></label>
+        <label class="setting-row" for="set-night"><span>Night darkening</span><input id="set-night" type="range" min="0" max="100" step="1"><output id="set-night-out" for="set-night"></output></label>
         <label class="setting-check"><input id="set-sound" type="checkbox"> Sound on <kbd>M / N</kbd></label>
         <button class="btn ghost" id="set-edit-ui" type="button">Edit UI</button>
         <p class="world-menu-note">Edit UI lets you drag the skillbar, quest tracker, chat and the other panels where you want them.</p>
@@ -488,6 +490,7 @@
 <script src="seasonDungeonArt.js"></script>
 <script src="quests.js"></script>
 <script src="cathedral.js"></script>
+<script src="daynight.js"></script>
 <script src="field.js"></script>
 <script src="worldmap.js"></script>
 <script src="skillbar.js"></script>

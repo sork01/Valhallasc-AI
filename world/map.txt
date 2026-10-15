@@ -2942,6 +2942,60 @@
           "label": "Buy Linen Satchel · 6 extra bag slots",
           "cost": 500,
           "bag": "linen_satchel"
+        },
+        {
+          "id": "bag_l10",
+          "label": "Buy Adventurer Satchel · 8 extra bag slots",
+          "cost": 1500,
+          "bag": "adventurer_satchel"
+        },
+        {
+          "id": "bag_l20",
+          "label": "Buy Trail Pack · 10 extra bag slots",
+          "cost": 4000,
+          "bag": "trail_pack_l20"
+        },
+        {
+          "id": "bag_l30",
+          "label": "Buy Ranger Pack · 12 extra bag slots",
+          "cost": 9000,
+          "bag": "ranger_pack_l30"
+        },
+        {
+          "id": "bag_l40",
+          "label": "Buy Expedition Pack · 14 extra bag slots",
+          "cost": 18000,
+          "bag": "expedition_pack_l40"
+        },
+        {
+          "id": "bag_l50",
+          "label": "Buy Traveler Pack · 16 extra bag slots",
+          "cost": 35000,
+          "bag": "traveler_pack"
+        },
+        {
+          "id": "bag_l60",
+          "label": "Buy Pathfinder Pack · 18 extra bag slots",
+          "cost": 60000,
+          "bag": "pathfinder_pack_l60"
+        },
+        {
+          "id": "bag_l70",
+          "label": "Buy Warden Pack · 20 extra bag slots",
+          "cost": 100000,
+          "bag": "warden_pack_l70"
+        },
+        {
+          "id": "bag_l80",
+          "label": "Buy Hero Pack · 22 extra bag slots",
+          "cost": 160000,
+          "bag": "hero_pack_l80"
+        },
+        {
+          "id": "bag_l90",
+          "label": "Buy Sovereign Pack · 24 extra bag slots",
+          "cost": 240000,
+          "bag": "sovereign_pack_l90"
         }
       ],
       "buys": true
@@ -6354,6 +6408,60 @@
               "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true
@@ -12400,6 +12508,60 @@
               "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true
@@ -18143,6 +18305,60 @@
               "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true
@@ -25484,6 +25700,60 @@
               "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -43002,6 +43272,60 @@
               "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -43219,6 +43543,60 @@
               "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -51116,6 +51494,60 @@
               "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -61097,6 +61529,60 @@
               "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -64292,6 +64778,60 @@
               "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -90213,6 +90753,60 @@
               "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -93863,9 +94457,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -97543,9 +98191,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -101712,9 +102414,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -104739,9 +105495,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true
@@ -117788,9 +118598,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -121915,9 +122779,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -125804,9 +126722,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -130445,9 +131417,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -133120,9 +134146,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -137651,9 +138731,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -141804,9 +142938,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -145832,9 +147020,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -156807,9 +158049,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -157097,9 +158393,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -157387,9 +158737,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,
@@ -157677,9 +159081,63 @@
             },
             {
               "id": "satchel",
-              "label": "Buy Linen Satchel",
+              "label": "Buy Linen Satchel · 6 extra bag slots",
               "cost": 500,
               "bag": "linen_satchel"
+            },
+            {
+              "id": "bag_l10",
+              "label": "Buy Adventurer Satchel · 8 extra bag slots",
+              "cost": 1500,
+              "bag": "adventurer_satchel"
+            },
+            {
+              "id": "bag_l20",
+              "label": "Buy Trail Pack · 10 extra bag slots",
+              "cost": 4000,
+              "bag": "trail_pack_l20"
+            },
+            {
+              "id": "bag_l30",
+              "label": "Buy Ranger Pack · 12 extra bag slots",
+              "cost": 9000,
+              "bag": "ranger_pack_l30"
+            },
+            {
+              "id": "bag_l40",
+              "label": "Buy Expedition Pack · 14 extra bag slots",
+              "cost": 18000,
+              "bag": "expedition_pack_l40"
+            },
+            {
+              "id": "bag_l50",
+              "label": "Buy Traveler Pack · 16 extra bag slots",
+              "cost": 35000,
+              "bag": "traveler_pack"
+            },
+            {
+              "id": "bag_l60",
+              "label": "Buy Pathfinder Pack · 18 extra bag slots",
+              "cost": 60000,
+              "bag": "pathfinder_pack_l60"
+            },
+            {
+              "id": "bag_l70",
+              "label": "Buy Warden Pack · 20 extra bag slots",
+              "cost": 100000,
+              "bag": "warden_pack_l70"
+            },
+            {
+              "id": "bag_l80",
+              "label": "Buy Hero Pack · 22 extra bag slots",
+              "cost": 160000,
+              "bag": "hero_pack_l80"
+            },
+            {
+              "id": "bag_l90",
+              "label": "Buy Sovereign Pack · 24 extra bag slots",
+              "cost": 240000,
+              "bag": "sovereign_pack_l90"
             }
           ],
           "buys": true,

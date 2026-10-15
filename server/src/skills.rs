@@ -215,10 +215,10 @@ pub fn unlocked(class: Class, from: u32, to: u32) -> Vec<&'static str> {
 mod tests {
     use super::*;
 
-    const LAST_SKILL_LEVEL: u32 = 20;
+    const LAST_SKILL_LEVEL: u32 = 40;
 
     #[test]
-    fn every_class_learns_one_skill_at_each_even_level_up_to_twenty() {
+    fn every_class_learns_a_new_skill_every_four_levels_through_forty() {
         for class in [
             Class::Warrior,
             Class::Mage,
@@ -234,19 +234,24 @@ mod tests {
             levels.sort_unstable();
             assert_eq!(
                 levels,
-                (1..=LAST_SKILL_LEVEL / 2)
-                    .map(|n| n * 2)
+                (1..=LAST_SKILL_LEVEL / 4)
+                    .map(|n| n * 4)
                     .collect::<Vec<_>>()
             );
-            assert_eq!(unlocked(class, 1, 2).len(), 1);
+            assert!(unlocked(class, 1, 2).is_empty());
             assert!(unlocked(class, 2, 3).is_empty());
+            assert_eq!(unlocked(class, 3, 4).len(), 1);
             assert_eq!(unlocked(class, 0, 99).len(), 59);
-            for level in (22..=80).step_by(2) {
+            for level in (4..=80).step_by(2) {
                 let active: Vec<_> = unlocked(class, level - 1, level)
                     .into_iter()
                     .filter(|id| find(class, id).is_some())
                     .collect();
-                assert_eq!(active.len(), 1, "{class:?} level {level}");
+                assert_eq!(
+                    active.len(),
+                    if level == 42 { 2 } else { 1 },
+                    "{class:?} level {level}"
+                );
             }
             for level in (82..=98).step_by(2) {
                 let active: Vec<_> = unlocked(class, level - 1, level)
@@ -267,17 +272,18 @@ mod tests {
         assert_eq!(ids.len(), SKILLS.len());
         for s in SKILLS.iter() {
             assert_eq!(s.ranks.len(), 4, "{}", s.id);
-            assert_eq!(s.ranks[0].level, s.level + 20, "{}", s.id);
-            assert_eq!(s.ranks[1].level, s.level + 40, "{}", s.id);
-            assert_eq!(s.ranks[2].level, s.level + 60, "{}", s.id);
+            let index = s.level / 4 - 1;
+            assert_eq!(s.ranks[0].level, s.level + 2, "{}", s.id);
+            assert_eq!(s.ranks[1].level, 42 + index * 2, "{}", s.id);
+            assert_eq!(s.ranks[2].level, 62 + index * 2, "{}", s.id);
             assert_eq!(s.rank_at(s.ranks[2].level), 4, "{}", s.id);
             assert_eq!(
                 s.ranks[3].level,
-                if s.level == 20 { 99 } else { s.level + 80 },
+                if s.level == 40 { 99 } else { 82 + index * 2 },
                 "{}",
                 s.id
             );
-            assert_eq!(s.ranks[3].capstone, s.level == 20, "{}", s.id);
+            assert_eq!(s.ranks[3].capstone, s.level == 40, "{}", s.id);
             for rank in &s.ranks {
                 assert!(rank.power >= 1. && rank.power <= 2., "{}", s.id);
                 assert!(rank.cooldown > 0. && rank.cooldown <= 1., "{}", s.id);
@@ -366,8 +372,8 @@ mod tests {
                 | Effect::Mend { mult, .. } => mult,
                 _ => panic!("unexpected effect for {id}"),
             };
-            assert!((power(82) / power(2) - 1.8).abs() < 1e-9, "{id}");
-            assert!((power(81) / power(2) - 1.6).abs() < 1e-9, "{id}");
+            assert!((power(82) / power(4) - 1.8).abs() < 1e-9, "{id}");
+            assert!((power(81) / power(4) - 1.6).abs() < 1e-9, "{id}");
         }
         let hunter = find(Class::Hunter, "powershot").unwrap();
         assert_eq!(hunter.rank_at(61), 3);
@@ -382,7 +388,7 @@ mod tests {
         ] {
             let skill = SKILLS
                 .iter()
-                .find(|s| s.class == class && s.level == 20)
+                .find(|s| s.class == class && s.level == 40)
                 .unwrap();
             assert_eq!(skill.rank_at(98), 4);
             assert_eq!(skill.rank_at(99), 5);
@@ -393,8 +399,8 @@ mod tests {
     #[test]
     fn ranks_change_authoritative_effects_without_changing_skill_ids() {
         let bolt = find(Class::Mage, "twinbolt").unwrap();
-        let before = bolt.at_level(21);
-        let after = bolt.at_level(22);
+        let before = bolt.at_level(5);
+        let after = bolt.at_level(6);
         assert_eq!(after.id, before.id);
         assert_eq!(before.cooldown, after.cooldown);
         match (before.effect, after.effect) {
@@ -404,14 +410,14 @@ mod tests {
             _ => panic!("Twin Bolt must stay a volley"),
         }
         let blink = find(Class::Mage, "blink").unwrap();
-        assert_eq!(blink.at_level(29).cooldown, blink.cooldown);
-        assert!((blink.at_level(30).cooldown - blink.cooldown * 0.85).abs() < 0.0001);
+        assert_eq!(blink.at_level(21).cooldown, blink.cooldown);
+        assert!((blink.at_level(22).cooldown - blink.cooldown * 0.85).abs() < 0.0001);
         assert_eq!(blink.at_level(49).cooldown, blink.cooldown * 0.85);
         assert!((blink.at_level(50).cooldown - blink.cooldown * 0.7).abs() < 0.0001);
         assert_eq!(blink.at_level(69).cooldown, blink.cooldown * 0.7);
         assert!((blink.at_level(70).cooldown - blink.cooldown * 0.55).abs() < 0.0001);
         let ward = find(Class::Mage, "arcaneward").unwrap();
-        match ward.at_level(24).effect {
+        match ward.at_level(10).effect {
             Effect::Buff { amount, .. } => assert!((amount - 0.48).abs() < 0.0001),
             _ => panic!("Arcane Ward must stay a buff"),
         }

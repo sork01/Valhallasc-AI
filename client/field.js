@@ -46,7 +46,7 @@
     [[36, 36], [26, 32], [16, 26], [10, 16]],
   ];
   const map = { dirt: new Uint8Array(0), tone: new Float32Array(0) };
-  let objects = [];
+  let objects = [], nightLights = [];
   function buildMap() {
     MAP = zdef.size; SPAWN = zdef.spawn;
     map.dirt = new Uint8Array(MAP * MAP); map.tone = new Float32Array(MAP * MAP);
@@ -64,6 +64,7 @@
     if (sky) paintSky(zdef.sky);
     if (zdef.theme === 'moonwell') paintMoonwell(zdef.moonwellFloor);
     objects = zdef.objects.map(o => ({ ...o }));
+    nightLights = objects.filter(o => ['lamp', 'brazier', 'torch', 'campfire', 'lantern', 'house', 'inn', 'shop'].some(k => o.kind.includes(k)));
   }
   // Skaldholm's ground: the zone lists its streets (type 1 cobbles), plazas and squares (2 marble, 3 brick) as rectangles, discs and rings.
   function paintRoads(roads) {
@@ -98,6 +99,7 @@
   // Switch to another zone: new ground, obstacles and minimap. Everything tied to the old zone's coordinates goes.
   function setZone(z) {
     zone = ZONES[z] ? z : 0; zdef = ZONES[zone];
+    window.DayNight?.setZone(zdef);
     buildMap(); chunks.clear();
     if (mini) buildMini();
     if (hero) { pendingNpc = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
@@ -687,6 +689,8 @@
   let cv, ctx, mini, mctx, opts, onHud = () => {}, onEvent = () => {};
   let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null;
   let hero, slimes, drops, floaters, parts, effects, bolts, marker, cam, shake, keys, pointer, msg, hudT, tAll;
+  const BAG_COLORS = ['#a78257','#78996f','#6396b3','#a478b2','#c38a5e','#719ba1','#9b86c3','#be9292','#d3ae68','#dfcde7'];
+  const bagColor = item => BAG_COLORS[Math.max(0, Math.min(9, Math.floor((item.requiredLevel || 1) / 10)))];
   let ebolts = [], instanceCleared = false, clearedAt = -99;   // missiles shot by ranged enemies; the dungeon's exit opens when its last boss falls
   let mageSpr = null, spriteGeneration = 0;
   let pendingNpc = null, cityRoute = [], routeTime = 0;
@@ -1043,6 +1047,7 @@
   const serverNow = () => clock.ok ? clock.t + (performance.now() - clock.at) / 1000 : performance.now() / 1000;
   function applySnapshot(packet, initial = false) {
     const own = packet.players.find(p => p.id === Online.id); if (!own) return;
+    window.DayNight?.sync(packet.worldTime);
     explored = Array.isArray(own.explored) ? own.explored : null;
     if (typeof packet.time === 'number') { clock.t = packet.time; clock.at = performance.now(); clock.ok = true; }
     // The server decides the zone (a gate moved us); rebuild the ground and snap everything to the new place.
@@ -1108,7 +1113,8 @@
     }
     if (event.kind === 'hurt') floater(event.x, event.y, '-' + event.value, '#ff8b9b', false);
     if (event.kind === 'miss' || event.kind === 'dodge') floater(event.x, event.y, event.kind === 'miss' ? 'Miss' : 'Dodge', '#e5e5d2', false);
-    if (event.kind === 'itemPickup') { floater(event.x, event.y, `+${event.quantity} ${event.name}`, '#64b5ff', false); if(event.actor === Online.id) say('pickup'); }
+    if (event.kind === 'itemPickup') { const item=WORLD_ITEMS.find(i=>i.id===event.item); floater(event.x, event.y, item?.kind==='bag'?`${item.name} · +${item.bagSlots} slots`:`+${event.quantity} ${event.name}`, item?.kind==='bag'?bagColor(item):'#64b5ff', false); if(event.actor === Online.id) say('pickup'); }
+    if (event.kind === 'shotBlocked') spark(event.x, event.y, 7, ['#f8e5b5','#d2b990','#fff4d7'], 7, 0.6, 0.45);
     if (event.kind === 'pickup') floater(event.x, event.y, '+' + event.value + ' gold', '#ffe066', false);
     if (event.kind === 'portal') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); burst(event.x, event.y, 20, 14, ['#ffd9a0', '#ff8a3a', '#7ae8c8']); }
     if (event.kind === 'levelup') levelUpFx(event);
@@ -2431,7 +2437,7 @@
     const label = dest.levels ? `${dest.name} · Lv ${dest.levels[0]}–${dest.levels[1]}` : dest.name;
     g.strokeText(label, sx, sy - 142); g.fillText(label, sx, sy - 142); g.restore();
   }
-  function shadow(g, x, y, rx, ry, a = .28) { const [sx, sy] = w2s(x, y); g.fillStyle = `rgba(20,30,10,${a})`; g.beginPath(); g.ellipse(sx, sy, rx, ry, 0, 0, 6.283); g.fill(); }
+  function shadow(g, x, y, rx, ry, a = .28) { const [sx, sy] = w2s(x, y), shift = window.DayNight?.shadowOffset || 0; g.fillStyle = `rgba(20,30,10,${a})`; g.beginPath(); g.ellipse(sx + shift, sy + shift * .25, rx, ry, 0, 0, 6.283); g.fill(); }
   function draw(t) {
     const g = ctx, k = dpr * zoom; g.setTransform(k, 0, 0, k, 0, 0);
     drawSky(g, t);
@@ -2505,7 +2511,14 @@
         g.restore();
       } else if (it.drop) {
         const d = it.drop, item = WORLD_ITEMS.find(i => i.id === d.item);
-        g.save(); g.translate(it.sx + (d.item ? 12 : -8), it.sy - d.z); g.fillStyle = d.col; g.strokeStyle = OL; g.lineWidth = 2.4;
+        g.save(); g.translate(it.sx + (d.item ? 12 : -8), it.sy - d.z); g.fillStyle = item?.kind==='bag'?bagColor(item):d.col; g.strokeStyle = OL; g.lineWidth = 2.4;
+        if(item?.kind==='bag') {
+          g.shadowColor=bagColor(item);g.shadowBlur=13;
+          g.fillRect(-10,-7,20,16);g.strokeRect(-10,-7,20,16);
+          g.beginPath();g.arc(0,-7,5,Math.PI,0);g.stroke();g.shadowBlur=0;
+          g.fillStyle='#fff7dd';g.font='bold 10px sans-serif';g.textAlign='center';g.fillText(String(item.bagSlots),0,5);
+          g.restore();continue;
+        }
         if (item && item.rarity !== 'common') { g.shadowColor = d.col; g.shadowBlur = 12; }
         g.beginPath();
         if (d.item) { g.moveTo(0,-12); g.lineTo(10,-2); g.lineTo(0,8); g.lineTo(-10,-2); g.closePath(); }
@@ -2546,6 +2559,8 @@
         const [bx, by] = w2s(who.x, who.y); if (bx > -200 && bx < VW + 200 && by > -50 && by < VH + 250) drawBubble(g, b, bx, by - (who === hero ? 138 : 152), (b.until - now) / 1000);
       }
     }
+    // Light is applied after the world and before attacks, loot labels and other combat feedback.
+    window.DayNight?.draw(g, VW, VH, nightLights, w2s);
     // slash arc on the ground plane (over everything: it is the axe's motion)
     for (const e of effects) if ((e.kind === 'slash' || e.kind === 'dualSlash') && (heroSpr || e.t < 0)) continue; else if (e.kind === 'slash') {
       const p = e.t / .32, a0 = e.a - 1.25, a1 = a0 + 2.5 * Math.min(1, p * 1.8);
@@ -2784,6 +2799,7 @@
     const dt = clamp((now - last) / 1000, 0, .05); last = now;
     update(dt);
     City.update(serverNow());
+    window.DayNight?.tick(dt);
     draw(now / 1000);
   }
   const Field = {

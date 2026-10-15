@@ -1,4 +1,10 @@
-"""Add the high-level rank rotation without changing skill IDs or base effects."""
+"""Space new abilities through 40 and keep a rank reward at later even levels.
+
+The first nine abilities unlock at 4, 8, ..., 36 and gain rank 2 two
+levels later. The tenth unlocks at 40 and gains rank 2 at 42. Ranks 3 and
+4 rotate at 42–60 and 62–80; rank 5 rotates at 82–98, with the final
+ability's capstone at 99. Level 42 awards two ranks.
+"""
 import json
 from pathlib import Path
 
@@ -14,25 +20,18 @@ CAPSTONES = {
 
 def main():
     skills = json.loads(PATH.read_text())
+    by_class = {}
     for skill in skills:
-        base = skill["level"]
-        ranks = [r for r in skill["ranks"] if r["level"] <= base + 40]
-        travel = skill["id"] in ("blink", "rollaway")
-        ranks.append({"level": base + 60,
-                      "power": 1 if travel else 1.6,
-                      "cooldown": 0.55 if travel else 1,
-                      "description": "45% shorter cooldown." if travel
-                      else "60% stronger damage, healing or buff effect."})
-        if base <= 18:
-            ranks.append({"level": base + 80,
-                          "power": 1 if travel else 1.8,
-                          "cooldown": 0.4 if travel else 1,
-                          "description": "60% shorter cooldown." if travel
-                          else "80% stronger damage, healing or buff effect."})
-        else:
-            ranks.append({"level": 99, "power": 2, "cooldown": 1,
-                          "capstone": True, "description": CAPSTONES[skill["class"]]})
-        skill["ranks"] = ranks
+        index = by_class.get(skill["class"], 0)
+        assert index < 10 and len(skill["ranks"]) == 4, skill["id"]
+        by_class[skill["class"]] = index + 1
+        skill["level"] = (index + 1) * 4
+        levels = [skill["level"] + 2, 42 + index * 2,
+                  62 + index * 2, 99 if index == 9 else 82 + index * 2]
+        for rank, level in zip(skill["ranks"], levels):
+            rank["level"] = level
+        assert levels == sorted(levels), skill["id"]
+    assert by_class == {key: 10 for key in CAPSTONES}
     PATH.write_text("[\n" + ",\n".join("  " + json.dumps(s, ensure_ascii=False, separators=(",", ":")) for s in skills) + "\n]\n")
 
 

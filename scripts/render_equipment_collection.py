@@ -26,7 +26,7 @@ SLOTS = [('armor', 'armor'), ('pants', 'pants'), ('shoulders', 'shoulders'),
          ('gloves', 'gloves'), ('headgear', 'head'), ('necklace', 'necklace'),
          ('accessory', 'accessory'), ('weapon', 'weapon')]
 # The first two entries have different starter shapes. Levels 5–20 repeat these
-# two looks; level 55 repeats 50. Later boss items reuse starter art.
+# two looks; level 55 repeats 50. Later boss sets enter this list as their art is made.
 SETS = [
     ('1–20', 'Starter', 1, None, 'common'),
     ('1–20', 'Starter upgrade', 1, None, 'uncommon'),
@@ -42,8 +42,24 @@ SETS = [
     ('50', 'Cathedral Nave', 50, 'cathedral_nave', None),
     ('60', 'Progression', 60, None, 'common'),
     ('60', 'Moonwell', 60, 'moonwell', None),
-    *[(str(level), 'Progression', level, None, 'common') for level in (65, 70, 75, 80, 85, 90)],
+    ('65', 'Progression', 65, None, 'common'),
+    ('65', 'Eye Below', 65, 'eye_below', None),
+    ('70', 'Progression', 70, None, 'common'),
+    ('70', 'Elder Hollow', 70, 'elder_hollow', None),
+    ('75', 'Progression', 75, None, 'common'),
+    ('75', 'Thousandfold Pavilion', 75, 'thousandfold', None),
+    ('80', 'Progression', 80, None, 'common'),
+    ('80', 'Rain Crown', 80, 'rain_crown', None),
+    ('80', 'Seed Vault', 80, 'seed_vault', None),
+    ('85', 'Progression', 85, None, 'common'),
+    ('85', 'Sunken Astrolabe', 85, 'sunken_astrolabe', None),
+    ('90', 'Progression', 90, None, 'common'),
     ('95–99', 'Progression', 95, None, 'common'),
+    ('95', 'Thunderheart Gate', 95, 'thunderheart_gate', None),
+    ('97', 'Blooming Labyrinth', 95, 'blooming_labyrinth', None),
+    ('98', 'Solar Crucible', 95, 'solar_crucible', None),
+    ('99', 'Amber Archive', 95, 'amber_archive', None),
+    ('99', 'Silent Solstice', 95, 'silent_solstice', None),
 ]
 METADATA = {name: json.loads((ASSETS / f'{stem}_sprites.txt').read_text())
             for name, _, stem, _ in CLASSES}
@@ -54,6 +70,17 @@ DUNGEON_PALETTES = {
     'regearreliquary': ['#2a193a', '#71396e', '#ca64aa', '#ffe0ef'],
     'regearnave': ['#381d1d', '#a64425', '#ee993d', '#fff0aa'],
     'regearmoonwell': ['#22284b', '#56569a', '#aaa3db', '#f0e8ff'],
+    'regeareye': ['#1a1834', '#543775', '#a865ad', '#c6f9f6'],
+    'regearelder': ['#202d23', '#5b5734', '#8ea75e', '#e2f4a8'],
+    'regearpavilion': ['#231c20', '#70463c', '#d9c59e', '#fff5da'],
+    'regearrain': ['#102b43', '#38657e', '#80b5c3', '#e1f7ef'],
+    'regearseed': ['#183827', '#477248', '#7eba69', '#e7f6a8'],
+    'regearastro': ['#1e2944', '#715f51', '#d3ac63', '#cdeffc'],
+    'regearthunder': ['#23183c', '#6a398f', '#b188d5', '#f8e485'],
+    'regearbloom': ['#341c39', '#9a466e', '#e494b4', '#d5ffe2'],
+    'regearsolar': ['#3a1b1b', '#ad5432', '#edaa56', '#fff0ab'],
+    'regearamber': ['#38281b', '#986d39', '#d6aa5c', '#fff0bf'],
+    'regearsolstice': ['#141f3b', '#38567a', '#89b8d8', '#effbff'],
 }
 
 
@@ -138,10 +165,15 @@ def main():
     env = {**os.environ, 'NODE_PATH': '/home/serveperry/webserver/www/dybase2/node_modules'}
     subprocess.run([node, 'scripts/render_dungeon_marks.cjs'], cwd=ROOT, env=env, check=True)
     marks = {name: Image.open(ROOT / 'test-results/dungeon-marks' / (name + '.png')).convert('RGBA')
-             for name in ('regearvault', 'regearcloister', 'regearreliquary', 'regearnave', 'regearmoonwell')}
+             for name in DUNGEON_PALETTES}
     source_mark = {'undervault': 'regearvault', 'cathedral_cloister': 'regearcloister',
                    'cathedral_reliquary': 'regearreliquary', 'cathedral_nave': 'regearnave',
-                   'moonwell': 'regearmoonwell'}
+                   'moonwell': 'regearmoonwell', 'eye_below': 'regeareye', 'elder_hollow': 'regearelder',
+                   'thousandfold': 'regearpavilion', 'rain_crown': 'regearrain',
+                   'seed_vault': 'regearseed', 'sunken_astrolabe': 'regearastro',
+                   'thunderheart_gate': 'regearthunder', 'blooming_labyrinth': 'regearbloom',
+                   'solar_crucible': 'regearsolar', 'amber_archive': 'regearamber',
+                   'silent_solstice': 'regearsolstice'}
     left, col, top, row = 228, 322, 176, 286
     width, height = left + 5 * col + 30, top + len(SETS) * row + 122
     poster = Image.new('RGB', (width, height), '#101923')

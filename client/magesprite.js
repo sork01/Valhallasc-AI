@@ -208,6 +208,17 @@
     regearreliquary: { name: 'Reliquary', dark: '#681e59', bright: '#ff78c6' },
     regearnave: { name: 'Nave', dark: '#913e16', bright: '#ffbd42' },
     regearmoonwell: { name: 'Moonwell', dark: '#423983', bright: '#ccb6ff' },
+    regeareye: { name: 'Eye Below', dark: '#281a43', bright: '#95ebf4' },
+    regearelder: { name: 'Elder Hollow', dark: '#29432a', bright: '#d9ef8b' },
+    regearpavilion: { name: 'Thousandfold', dark: '#644036', bright: '#fff0cf' },
+    regearrain: { name: 'Rain Crown', dark: '#244b71', bright: '#b8f5ff' },
+    regearseed: { name: 'Seed Vault', dark: '#235338', bright: '#c0ff83' },
+    regearastro: { name: 'Astrolabe', dark: '#544a3a', bright: '#ffe0a0' },
+    regearthunder: { name: 'Thunderheart', dark: '#4a2676', bright: '#f9e582' },
+    regearbloom: { name: 'Blooming', dark: '#813a69', bright: '#ffe0f1' },
+    regearsolar: { name: 'Solar', dark: '#8c3c24', bright: '#fff0a2' },
+    regearamber: { name: 'Amber Archive', dark: '#7c542a', bright: '#ffe1a4' },
+    regearsolstice: { name: 'Solstice', dark: '#263c6e', bright: '#d9f8ff' },
   };
   const DUNGEON_PALETTES = {
     regearvault: ['#071d25', '#164d57', '#36bcb0', '#b7fff0'],
@@ -215,6 +226,17 @@
     regearreliquary: ['#2a193a', '#71396e', '#ca64aa', '#ffe0ef'],
     regearnave: ['#381d1d', '#a64425', '#ee993d', '#fff0aa'],
     regearmoonwell: ['#22284b', '#56569a', '#aaa3db', '#f0e8ff'],
+    regeareye: ['#1a1834', '#543775', '#a865ad', '#c6f9f6'],
+    regearelder: ['#202d23', '#5b5734', '#8ea75e', '#e2f4a8'],
+    regearpavilion: ['#231c20', '#70463c', '#d9c59e', '#fff5da'],
+    regearrain: ['#102b43', '#38657e', '#80b5c3', '#e1f7ef'],
+    regearseed: ['#183827', '#477248', '#7eba69', '#e7f6a8'],
+    regearastro: ['#1e2944', '#715f51', '#d3ac63', '#cdeffc'],
+    regearthunder: ['#23183c', '#6a398f', '#b188d5', '#f8e485'],
+    regearbloom: ['#341c39', '#9a466e', '#e494b4', '#d5ffe2'],
+    regearsolar: ['#3a1b1b', '#ad5432', '#edaa56', '#fff0ab'],
+    regearamber: ['#38281b', '#986d39', '#d6aa5c', '#fff0bf'],
+    regearsolstice: ['#141f3b', '#38567a', '#89b8d8', '#effbff'],
   };
   const dungeonPaint = art => {
     const palette = DUNGEON_PALETTES[art].map(hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)));
@@ -305,6 +327,114 @@
         }
       }
       diamond(0, -135 + sway, 8, 12, bright, dark);
+    } else if (theme === 'regeareye') {
+      for (const side of [-1, 1]) {
+        for (let n = 0; n < 3; n++) {
+          const x = side * (37 + n * 13), y = -113 + n * 25;
+          blade([[side * 13, -76], [x, y - 13 + sway], [x + side * 8, y],
+                 [x - side * 4, y + 16 + sway]], dark);
+        }
+      }
+      g.beginPath(); g.ellipse(0, -99 + sway, 27, 15, 0, 0, Math.PI * 2);
+      g.fillStyle = dark; g.fill(); g.strokeStyle = bright; g.lineWidth = 3; g.stroke();
+      diamond(0, -99 + sway, 8, 13, bright, dark);
+    } else if (theme === 'regearelder') {
+      for (const side of [-1, 1]) {
+        blade([[side * 15, -65], [side * 30, -116 + sway], [side * 39, -140 + sway],
+               [side * 42, -118], [side * 64, -126], [side * 52, -108],
+               [side * 48, -63], [side * 29, -43]], dark);
+        for (let n = 0; n < 3; n++) {
+          const x = side * (43 + n * 7), y = -112 + n * 24;
+          blade([[x - side * 5, y + 10], [x + side * 8, y - 10 + sway],
+                 [x + side * 14, y + sway], [x + side * 5, y + 13]], '#729a55');
+        }
+      }
+      diamond(0, -116 + sway, 7, 12, bright, dark);
+    } else if (theme === 'regearpavilion') {
+      for (const side of [-1, 1]) for (let n = 0; n < 4; n++) {
+        const x = side * (26 + n * 13);
+        blade([[side * 10, -83], [x, -135 + n * 17 + sway],
+               [x + side * 10, -122 + n * 18 + sway], [side * 19, -52]],
+              n % 2 ? '#efe3c6' : dark);
+      }
+      blade([[-18, -122], [0, -145 + sway], [18, -122], [0, -129]], bright, dark);
+    } else if (theme === 'regearrain') {
+      blade([[-55, -114], [-31, -141 + sway], [0, -126], [31, -141 + sway],
+             [55, -114], [37, -103], [-37, -103]], dark);
+      for (const side of [-1, 1]) for (let n = 0; n < 4; n++) {
+        const x = side * (25 + n * 12);
+        blade([[x, -110], [x + side * 4, -62 + n * 9 + sway],
+               [x - side * 3, -50 + n * 9], [x - side * 5, -88]], '#5297bd');
+        diamond(x, -44 + n * 10 + sway, 3, 7, bright, dark);
+      }
+    } else if (theme === 'regearseed') {
+      for (const side of [-1, 1]) {
+        blade([[side * 8, -92], [side * 26, -137 + sway], [side * 55, -127],
+               [side * 62, -79], [side * 37, -31], [side * 18, -48]], dark);
+        blade([[side * 21, -91], [side * 42, -117], [side * 50, -78],
+               [side * 35, -50]], '#69a75d');
+      }
+      diamond(0, -117 + sway, 11, 17, bright, dark);
+    } else if (theme === 'regearastro') {
+      for (const radius of [45, 60]) {
+        g.beginPath(); g.ellipse(0, -83, radius, radius * .8, -.23, 0, Math.PI * 2);
+        g.strokeStyle = radius === 45 ? bright : dark; g.lineWidth = radius === 45 ? 3 : 7; g.stroke();
+      }
+      for (let n = 0; n < 8; n++) {
+        const a = n * Math.PI / 4;
+        diamond(Math.cos(a) * 55, -83 + Math.sin(a) * 45,
+                n % 2 ? 5 : 7, n % 2 ? 8 : 12, n % 2 ? bright : dark);
+      }
+    } else if (theme === 'regearthunder') {
+      for (const side of [-1, 1]) for (let n = 0; n < 3; n++) {
+        const x = side * (21 + n * 13);
+        blade([[side * 12, -105], [x, -144 + n * 8 + sway],
+               [x - side * 7, -104], [x + side * 10, -111],
+               [x - side * 3, -42 + n * 6], [x + side * 2, -86]],
+              n === 1 ? bright : dark);
+      }
+      diamond(0, -129 + sway, 9, 13, bright, dark);
+    } else if (theme === 'regearbloom') {
+      for (let n = 0; n < 8; n++) {
+        const a = n * Math.PI / 4;
+        const x = Math.cos(a), y = Math.sin(a);
+        blade([[x * 22, -91 + y * 20], [x * 48 - y * 12, -91 + y * 48 + x * 12],
+               [x * 67, -91 + y * 60 + sway],
+               [x * 48 + y * 12, -91 + y * 48 - x * 12]],
+              n % 2 ? '#c875a6' : dark);
+      }
+      diamond(0, -91 + sway, 12, 17, bright, dark);
+    } else if (theme === 'regearsolar') {
+      for (let n = 0; n < 12; n++) {
+        const a = n * Math.PI / 6;
+        const x = Math.cos(a), y = Math.sin(a);
+        blade([[x * 30, -89 + y * 26], [x * 68 - y * 8, -89 + y * 63 + x * 8 + sway],
+               [x * 68 + y * 8, -89 + y * 63 - x * 8 + sway]],
+              n % 2 ? '#ef9c49' : dark);
+      }
+      g.beginPath(); g.ellipse(0, -89, 31, 31, 0, 0, Math.PI * 2);
+      g.fillStyle = dark; g.fill(); g.strokeStyle = bright; g.lineWidth = 3; g.stroke();
+    } else if (theme === 'regearamber') {
+      for (const side of [-1, 1]) {
+        blade([[side * 13, -125], [side * 52, -133 + sway],
+               [side * 62, -44], [side * 17, -55]], '#bb8b4b');
+        blade([[side * 20, -119], [side * 46, -124 + sway],
+               [side * 53, -53], [side * 22, -61]], dark);
+        for (let n = 0; n < 4; n++)
+          blade([[side * 23, -109 + n * 16], [side * 47, -112 + n * 16],
+                 [side * 47, -109 + n * 16], [side * 23, -106 + n * 16]], bright, dark);
+      }
+      diamond(0, -136 + sway, 8, 10, bright, dark);
+    } else if (theme === 'regearsolstice') {
+      for (const side of [-1, 1]) {
+        blade([[side * 10, -70], [side * 26, -130 + sway],
+               [side * 45, -148 + sway], [side * 58, -119],
+               [side * 41, -67], [side * 22, -36]], dark);
+        for (let n = 0; n < 3; n++)
+          diamond(side * (35 + n * 9), -112 + n * 30 + sway,
+                  5, 11, n % 2 ? bright : '#8ac2dd');
+      }
+      diamond(0, -139 + sway, 8, 15, bright, dark);
     }
     g.restore();
   }

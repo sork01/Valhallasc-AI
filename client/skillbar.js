@@ -107,7 +107,10 @@
     character = Online.currentToken; className = cls; selected = 0; skills = available();
     const saved = Online.skillSlots;
     layoutLevel = Online.skillLevel ?? 1;
-    slots = Array.isArray(saved) ? Array.from({ length: SLOTS }, (_, i) => find(saved[i])?.id || null) : defaults();
+    // Keep a saved assignment when its ability now unlocks at a later level.
+    // The slot stays unusable until the server grants the skill, then reappears
+    // in its original position without rewriting the character's layout.
+    slots = Array.isArray(saved) ? Array.from({ length: SLOTS }, (_, i) => skills.find(s => s.id === saved[i])?.id || null) : defaults();
     if (!Array.isArray(saved)) layoutLevel = level();
     learn();
   }

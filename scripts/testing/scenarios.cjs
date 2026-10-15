@@ -68,6 +68,7 @@ async function defeat(w, bot, kind) {
   }
   await w.action(bot, { type: 'target', id: enemy.id });
   await w.waitFor(() => w.snapshot.slimes.find(s => s.id === enemy.id).dead, 30000, `Defeat ${kind}`);
+  await w.waitFor(() => w.player(bot).kills === kills + 1, 5000, `Kill credit for ${kind}`);
   await w.action(bot, { type: 'stop' });
   assert.equal(w.player(bot).kills, kills + 1);
   assert.ok(w.player(bot).hp > 0, 'The bot survives real combat');
@@ -167,13 +168,13 @@ async function yearwheelDungeonOpening(w, check, cfg) {
 
 const scenarios = {
   skills: {
-    description: 'Learned skills at level 20: real casts per class, server cooldowns, buffs, projectiles, dashes and rejected requests.',
-    startLevel: 20,
+    description: 'Learned skills at level 40: real casts per class, server cooldowns, buffs, projectiles, dashes and rejected requests.',
+    startLevel: 40,
     async run(w, check) {
       await w.connect({ bot: 'Skillful', class: 'warrior' });
       await w.connect({ bot: 'Sage', class: 'mage' });
       await w.connect({ bot: 'Shade', class: 'assassin' });
-      check(['Skillful', 'Sage', 'Shade'].every(b => w.player(b).level === 20), 'Test characters start at the configured level');
+      check(['Skillful', 'Sage', 'Shade'].every(b => w.player(b).level === 40), 'Test characters start at the configured level');
       const errors = bot => w.events.filter(e => e.bot === bot && e.type === 'error').map(e => e.text);
       await cast(w, 'Skillful', 'twinbolt');
       await w.waitFor(() => errors('Skillful').length > 0, 5000, 'Class error');
@@ -190,10 +191,13 @@ const scenarios = {
       check(lost(before, front()), 'Whirlwind damages an enemy beside the warrior');
       const cd = w.player('Skillful').skillCd.whirlwind;
       check(cd > 4 && cd <= 6, 'The server starts the skill at its listed cooldown (' + cd.toFixed(2) + 's)');
+      await w.waitFor(() => w.events.some(e => e.bot === 'Skillful' && e.kind === 'skill' && e.skill === 'whirlwind'), 5000, 'Whirlwind cast event');
+      const castCount = w.events.filter(e => e.bot === 'Skillful' && e.kind === 'skill' && e.skill === 'whirlwind').length;
       await w.advance(600);
       await cast(w, 'Skillful', 'whirlwind', front());
       await w.advance(300);
-      check(w.player('Skillful').skillCd.whirlwind < cd - .5, 'A cast on cooldown is ignored instead of restarting it');
+      check(w.events.filter(e => e.bot === 'Skillful' && e.kind === 'skill' && e.skill === 'whirlwind').length === castCount && w.player('Skillful').skillCd.whirlwind <= cd,
+        'A cast on cooldown is ignored instead of restarting it');
       await cast(w, 'Skillful', 'battlecry');
       await cast(w, 'Skillful', 'shieldwall');
       await w.waitFor(() => w.player('Skillful').buffs.length === 2, 5000, 'Buffs');
@@ -220,7 +224,7 @@ const scenarios = {
       await w.waitFor(() => w.player('Shade').buffs.some(b => b.id === 'evasion'), 5000, 'Evasion');
       const from = { x: w.player('Shade').x, y: w.player('Shade').y };
       await cast(w, 'Shade', 'lunge');
-      await w.advance(500);
+      await w.waitFor(() => Math.hypot(w.player('Shade').x - from.x, w.player('Shade').y - from.y) > 2, 5000, 'Lunge movement');
       check(Math.hypot(w.player('Shade').x - from.x, w.player('Shade').y - from.y) > 2, 'Lunge carries the assassin forward');
       const events = w.events.filter(e => e.bot === 'Skillful' && e.kind === 'skill').map(e => e.skill);
       check(events.includes('whirlwind') && events.includes('battlecry'), 'Every cast is announced to the zone with its skill id');
@@ -368,7 +372,7 @@ const scenarios = {
       await w.connect({ bot: 'Observer' });
       // Level 1 here; the kills below pay enough XP to pass level 2, so the locked-skill refusal is checked first.
       await cast(w, bot, 'twinbolt');
-      await w.waitFor(() => w.events.some(e => e.bot === bot && e.type === 'error' && e.text === 'Twin Bolt unlocks at level 2.'), 5000, 'Locked skill');
+      await w.waitFor(() => w.events.some(e => e.bot === bot && e.type === 'error' && e.text === 'Twin Bolt unlocks at level 4.'), 5000, 'Locked skill');
       check(Object.keys(w.player(bot).skillCd).length === 0, 'A skill above the mage level is refused with its unlock level and costs nothing');
       const locked = await talk(w, bot, 'smith', 'quest:accept:ironhide_hunt');
       check(locked.notice.includes('earlier quest') && !quest(w, bot, 'ironhide_hunt'), 'Ironhide hunt is locked until the slime patrol is turned in');
@@ -393,7 +397,8 @@ const scenarios = {
         'Patrol turn-in awards 24 gold and 20 XP, levels the mage, and carries the remainder');
       const unlocks = skillCatalog.filter(k => k.class === 'mage' && k.level === next).map(k => k.id);
       const levelUp = w.events.find(e => e.bot === bot && e.kind === 'levelup' && e.actor === w.player(bot).id && e.level === next);
-      check(levelUp && JSON.stringify(levelUp.unlocked) === JSON.stringify(unlocks), 'The level-up event carries the new level and names the skill it unlocks');
+      check(levelUp && JSON.stringify(levelUp.unlocked) === JSON.stringify(unlocks), 'The level-up event carries the new level and its active-skill unlocks');
+      await w.debug(bot, { op: 'set_level', level: 4 });
       await cast(w, bot, 'twinbolt');
       await w.waitFor(() => w.player(bot).skillCd.twinbolt > 0, 5000, 'Twin Bolt cooldown');
       check(w.snapshot.bolts.length >= 2 || w.events.some(e => e.bot === bot && e.kind === 'skill' && e.skill === 'twinbolt'), 'Twin Bolt casts for real once unlocked');
@@ -633,7 +638,7 @@ const scenarios = {
       const me = () => w.player('Gm');
       check(me().level === 20 && me().hp === me().maxHp && setup.player.statPoints === 57, 'set_level reaches level 20 at full health with 57 stat points');
       const up = await kit.waitForEvent(w, { kind: 'levelup', bot: 'Gm' }, new Set());
-      check(up.level === 20 && up.unlocked.length === 10, 'The level-up event names the ten skills it unlocks');
+      check(up.level === 20 && up.unlocked.length === 11, 'The level-up event names five new skills, four ranks, and two passives');
       check(me().gold === 1000 + rewardGold && finished.every(id => quest(w, 'Gm', id)?.claimed), 'Finishing a quest walks its prerequisites and pays every reward once');
       check(me().quests.find(q => q.id === 'king_challenge').completions === 1, 'A finished one-time quest records one completion');
       check(me().zone === 1 && me().inventory.find(i => i.item === 'slime_gel').quantity === 12, 'The character stands in the Crags and holds the given items');
@@ -641,13 +646,17 @@ const scenarios = {
       await kit.castSkill(w, 'Gm', { skill: 'battlecry' }).then(r => check(r.cast && r.buffs.some(b => b.id === 'battlecry') && r.cooldownLeft > 20, 'cast_skill casts a skill and reports its buff and cooldown'));
       const again = await kit.castSkill(w, 'Gm', { skill: 'battlecry', settleMs: 300 });
       check(!again.cast && again.cooldownLeft > 19, 'A repeated cast is ignored while the skill is on cooldown');
-      const reset = await kit.castSkill(w, 'Gm', { skill: 'battlecry', resetCooldown: true, settleMs: 300 });
-      check(reset.cast, 'resetCooldown allows an immediate second cast');
+      const beforeReset = new Set(w.events);
+      await kit.castSkill(w, 'Gm', { skill: 'battlecry', resetCooldown: true, settleMs: 300 });
+      await w.waitFor(() => w.events.some(e => !beforeReset.has(e) && e.bot === 'Gm' && e.kind === 'skill' && e.skill === 'battlecry'), 3000, 'Second Battle Cry event');
+      check(true, 'resetCooldown allows an immediate second cast');
       await w.connect({ bot: 'Rookie', class: 'mage' });
       const locked = await kit.castSkill(w, 'Rookie', { skill: 'meteor', unlock: false, settleMs: 300 });
-      check(!locked.cast && locked.refused.some(t => /unlocks at level 14/.test(t)), 'The server refuses a skill above the level when unlock is off');
+      check(!locked.cast && locked.refused.some(t => /unlocks at level 28/.test(t)), 'The server refuses a skill above the level when unlock is off');
+      const beforeMeteor = new Set(w.events);
       const unlocked = await kit.castSkill(w, 'Rookie', { skill: 'meteor', settleMs: 300 });
-      check(unlocked.cast && unlocked.raisedLevel && w.player('Rookie').level === 14, 'unlock raises the level to the skill requirement and casts it');
+      await w.waitFor(() => w.events.some(e => !beforeMeteor.has(e) && e.bot === 'Rookie' && e.kind === 'skill' && e.skill === 'meteor'), 3000, 'Meteor cast event');
+      check(unlocked.raisedLevel && w.player('Rookie').level === 28, 'unlock raises the level to the skill requirement and casts it');
       const xpBefore = totalXp(me()), kills = me().kills;
       const slain = await kit.killEnemies(w, 'Gm', { kind: 'wisp', max: 3 });
       check(slain.count === 3 && me().kills === kills + 3 && totalXp(me()) > xpBefore, 'kill_enemies defeats enemies through the real kill path with XP');
@@ -1437,7 +1446,7 @@ const scenarios = {
       check(pia().look.class === 'priest' && pia().level === 20 && pia().maxHp === 100 + 19 * 20, 'The priest joins as a level-20 priest with 100 base health');
       check(pia().look.priestArmor === 'pilgrim' && pia().look.priestWeapon === 'mace', 'It starts in Pilgrim robes with an Oak mace');
       const learned = skillCatalog.filter(k => k.class === 'priest').map(k => k.level);
-      check(learned.length === 10 && learned.join() === '2,4,6,8,10,12,14,16,18,20', 'A priest learns one skill at every even level up to 20');
+      check(learned.length === 10 && learned.join() === '4,8,12,16,20,24,28,32,36,40', 'A priest learns one skill every four levels through 40');
       await w.social('Pia', { op: 'party_invite', bot: 'Tank' });
       await w.social('Tank', { op: 'party_accept', bot: 'Pia' });
       check(w.socialState('Pia').party?.size === 2, 'The priest and the warrior form a party');
@@ -1499,7 +1508,7 @@ const scenarios = {
       const pieces = ['hunter_headgear_scout', 'hunter_shoulders_scout', 'hunter_gloves_scout'];
       check(pieces.every(id => hana().inventory.some(s => s.item === id)), 'The three starter pieces are in the bag, unworn');
       const learned = skillCatalog.filter(k => k.class === 'hunter').map(k => k.level);
-      check(learned.length === 10 && learned.join() === '2,4,6,8,10,12,14,16,18,20', 'A hunter learns one skill at every even level up to 20');
+      check(learned.length === 10 && learned.join() === '4,8,12,16,20,24,28,32,36,40', 'A hunter learns one skill every four levels through 40');
       await w.action('Hana', { type: 'equip', slots: { headgear: pieces[0], shoulders: pieces[1], gloves: pieces[2] } });
       await w.waitFor(() => hana().look.head === 'scout' && hana().look.shoulders === 'scout' && hana().look.gloves === 'scout', 5000, 'Pieces worn');
       check(true, 'Wearing the three pieces switches on the head, shoulder and glove layers');
@@ -1761,9 +1770,9 @@ const scenarios = {
       const trickle = () => mage().maxResource * 0.03;
       check(Math.abs(mage().resource - (mage().maxResource - skillCatalog.find(s => s.id === 'twinbolt').cost)) <= trickle(), 'A valid mage cast spends its catalog mana cost (plus at most the in-combat trickle)');
       await w.debug('Mana', { op: 'set_resource', amount: 0 });
-      await cast(w, 'Mana', 'starfall');
+      await cast(w, 'Mana', 'fireball');
       await w.waitFor(() => w.events.some(e => e.bot === 'Mana' && e.type === 'error' && /Not enough mana/.test(e.text)));
-      check(!mage().skillCd.starfall && mage().resource <= trickle(), 'An exhausted cast produces no cooldown or resource spend');
+      check(!mage().skillCd.fireball && mage().resource <= trickle(), 'An exhausted cast produces no cooldown or resource spend');
       await w.action('Mana', { type: 'attack', fx: 1, fy: 0 });
       await w.waitFor(() => mage().atkCd > 0);
       check(mage().resource <= trickle(), 'Basic attacks remain free when mana is empty');

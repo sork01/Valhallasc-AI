@@ -69,7 +69,7 @@ const summarize = result => ({ ...result.result, player: result.player });
 tool('restart_world', 'Restart only the private Rust server and database, resuming connected bots. Use it to check persistence.', empty, () => current().restart());
 tool('describe_world', 'Static facts so you never read world files: zones, NPCs and their offers, portals, quests, items, skills, enemy kinds with default levels. what = overview | zones | npcs | quests | items | skills | enemies.',
   z.object({ what: z.enum(['overview', 'zones', 'npcs', 'quests', 'items', 'skills', 'enemies']).default('overview') }).strict(), ({ what }) => kit.describe(what), true);
-tool('set_level', 'Set a bot\'s level (1-100), refill health and announce the level-up with the skills it unlocks. Level 20 unlocks every class skill. Lowering also resets trained stats.',
+tool('set_level', 'Set a bot\'s level (1-100), refill health and announce the level-up with the skills it unlocks. Level 40 unlocks every class skill. Lowering also resets trained stats.',
   forBot({ level: z.number().int().min(1).max(100) }), async ({ bot, level }) => summarize(await current().debug(bot, { op: 'set_level', level })));
 tool('give_xp', 'Grant XP through the normal rules, so levels, stat points and level-up events follow.',
   forBot({ amount: z.number().int().min(0) }), async ({ bot, amount }) => summarize(await current().debug(bot, { op: 'give_xp', amount })));
@@ -125,7 +125,7 @@ tool('setup_character', 'Reach a state in one call: level, gold, items [{item,qu
 tool('wait_for_event', 'Wait up to timeout ms for a NEW event: type (event, chat, system, notice, social, who, dialogue, error, debug), optional kind (levelup, skill, hit, slimeDie, death, respawn, pickup, portal...) and bot.',
   z.object({ type: z.string().default('event'), kind: z.string().optional(), bot: bot.optional(), timeout: z.number().int().min(100).max(30000).default(10000) }).strict(),
   options => kit.waitForEvent(current(), options));
-tool('debug_command', 'Escape hatch: send one raw test-server shortcut ({op: set_level|give_xp|set_gold|set_hp|set_resource|die|reset_stats|reset_cooldowns|set_god_mode|teleport|give_item|take_item|drop_item|quest|kill_enemy|respawn_enemy|spawn_enemy|summon_king, ...fields}).',
+tool('debug_command', 'Escape hatch: send one raw test-server shortcut ({op: set_level|give_xp|set_gold|set_hp|set_resource|die|reset_stats|reset_cooldowns|set_god_mode|set_time|teleport|give_item|take_item|drop_item|quest|kill_enemy|respawn_enemy|spawn_enemy|summon_king, ...fields}).',
   forBot({ command: kit.debugSchema }), async ({ bot, command }) => summarize(await current().debug(bot, command)));
 tool('social', 'Friends and parties as a player does them. command: {op: friend_request|friend_accept|friend_decline|friend_remove|party_invite|party_accept|party_decline|party_kick|party_promote, bot|id|name} | {op: party_leave} | {op: party_chat, text} | {op: refresh} | {op: who}. Name another connected bot with `bot` (resolved to its character id); friend_request and party_invite also take a player `name`. Returns what the bot was told: notices (ok:false is a refusal), its friends/requests/party now, party chat, and for who the online roster. A party holds 5; requests lapse after 60 s.',
   forBot({ command: kit.socialSchema }), ({ bot, command }) => current().social(bot, command));

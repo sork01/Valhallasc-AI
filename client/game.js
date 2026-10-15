@@ -2,11 +2,11 @@
 (() => {
   // ---------- tiny persistent state ----------
   const KEY = 'valhallasc.save.v1';
-  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : 'en', sound: true, musicVol: 1, sfxVol: 1, ui: {}, char: null, draft: null };
+  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : 'en', sound: true, musicVol: 1, sfxVol: 1, night: 1, ui: {}, char: null, draft: null };
   let save = { ...defaults };
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
   const vol = v => Number.isFinite(+v) ? Math.max(0, Math.min(1, +v)) : 1;
-  save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol);
+  save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol); save.night = vol(save.night);
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) { /* ignore */ } };
 
   // ---------- text ----------
@@ -909,11 +909,13 @@
   // Preferences shared with settings.js (volumes and the HUD layout); it never touches localStorage itself.
   window.Prefs = {
     get music() { return save.musicVol; }, get sfx() { return save.sfxVol; }, get sound() { return save.sound; },
+    get night() { return save.night; },
     get layout() { return save.ui && typeof save.ui === 'object' ? save.ui : {}; },
     set(patch) {
       if ('musicVol' in patch) save.musicVol = vol(patch.musicVol);
       if ('sfxVol' in patch) save.sfxVol = vol(patch.sfxVol);
       if ('sound' in patch) save.sound = !!patch.sound;
+      if ('night' in patch) save.night = vol(patch.night);
       if ('ui' in patch) save.ui = patch.ui;
       persist(); applyMusicLevel(.4);
       if (sfxGain) sfxGain.gain.value = taper(save.sfxVol);

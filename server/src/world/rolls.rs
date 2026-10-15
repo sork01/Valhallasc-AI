@@ -245,7 +245,9 @@ impl World {
                 && now - p.bag_notice_at >= 5.
             {
                 p.bag_notice_at = now;
-                let text = if group.len() < 2 {
+                let text = if item(id).is_some_and(|i| i.kind == "bag") {
+                    "Nobody here can fit this bag yet. It stays on the ground until it expires."
+                } else if group.len() < 2 {
                     "Your bags are full. Sell loot or fit an extra six-slot bag from Linden. This item stays on the ground until it expires."
                 } else {
                     "Nobody in your party has bag room for this. It stays on the ground until it expires."
@@ -263,7 +265,15 @@ impl World {
             if d.gear.is_some() {
                 p.character.materialize_gear_instances();
             }
-            p.character.add_item(id, d.quantity);
+            if item(id).is_some_and(|i| i.kind == "bag") {
+                // Bags are fitted on pickup, so their level and four-slot rules
+                // remain authoritative even when a party shares the pile.
+                if p.character.fit_bag(id).is_err() {
+                    return false;
+                }
+            } else {
+                p.character.add_item(id, d.quantity);
+            }
             if let Some(mut gear) = d.gear.clone() {
                 gear.id = p.character.next_gear_id;
                 p.character.next_gear_id += 1;
@@ -768,6 +778,79 @@ mod tests {
         collect_all(&mut w);
         assert_eq!(w.players[&1].character.quantity("slime_gel"), 3);
         assert_eq!(w.players[&2].character.quantity("slime_gel"), 0);
+    }
+
+    #[test]
+    fn shared_bag_drops_fit_round_robin_and_wait_when_no_member_is_eligible() {
+        let mut w = world();
+        let who = party(&mut w, &["Ann", "Bob"]);
+        let at = spot(&w);
+        for _ in 0..2 {
+            w.loot_drop(&who[0].1, 0, at, "trail_pack_l20");
+        }
+        assert_eq!(w.drops.len(), 2);
+        assert!(
+            w.rolls.is_empty(),
+            "common bags use the ordinary shared pickup"
+        );
+        collect_all(&mut w);
+        assert!(w.drops.is_empty());
+        for (session, ..) in &who {
+            let c = &w.players[session].character;
+            assert_eq!(c.bags, vec!["trail_pack_l20"]);
+            assert_eq!(c.bag_capacity(), 26);
+            assert_eq!(
+                c.quantity("trail_pack_l20"),
+                0,
+                "the bag is fitted, not loose"
+            );
+        }
+        for (session, ..) in &who {
+            w.players.get_mut(session).unwrap().character.level = 1;
+        }
+        w.loot_drop(&who[0].1, 0, at, "trail_pack_l20");
+        collect_all(&mut w);
+        assert_eq!(w.drops.len(), 1, "a level-locked drop waits on the ground");
+        w.players.get_mut(&2).unwrap().character.level = 20;
+        collect_all(&mut w);
+        assert!(w.drops.is_empty());
+        assert_eq!(w.players[&2].character.bag_capacity(), 36);
+        assert_eq!(w.players[&1].character.bag_capacity(), 26);
+        for (session, ..) in &who {
+            let c = &mut w.players.get_mut(session).unwrap().character;
+            c.level = 20;
+            c.bags = vec!["trail_pack_l20".into(); 4];
+        }
+        w.loot_drop(&who[0].1, 0, at, "trail_pack_l20");
+        collect_all(&mut w);
+        assert_eq!(
+            w.drops.len(),
+            1,
+            "a full set with no smaller bag leaves the drop on the ground"
+        );
+        assert!(
+            who.iter()
+                .all(|(session, ..)| w.players[session].character.bag_capacity() == 56)
+        );
+    }
+    #[test]
+    fn a_bag_drop_expands_capacity_even_when_the_item_grid_is_full() {
+        let mut w = world();
+        let who = party(&mut w, &["Ann"]);
+        let at = spot(&w);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        for i in ITEMS.iter().filter(|i| i.kind != "bag") {
+            if c.bag_used() == c.bag_capacity() {
+                break;
+            }
+            c.add_item(&i.id, 1);
+        }
+        assert_eq!(c.bag_used(), 16);
+        w.loot_drop(&who[0].1, 0, at, "trail_pack_l20");
+        collect_all(&mut w);
+        assert!(w.drops.is_empty());
+        assert_eq!(w.players[&1].character.bag_capacity(), 26);
+        assert_eq!(w.players[&1].character.bag_used(), 16);
     }
 
     #[test]

@@ -3,7 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const root = path.resolve(__dirname, '..');
-const themes = ['regearvault', 'regearcloister', 'regearreliquary', 'regearnave', 'regearmoonwell'];
+const themes = ['regearvault', 'regearcloister', 'regearreliquary', 'regearnave', 'regearmoonwell', 'regeareye', 'regearelder',
+  'regearpavilion', 'regearrain', 'regearseed', 'regearastro', 'regearthunder', 'regearbloom', 'regearsolar', 'regearamber', 'regearsolstice'];
 const dest = path.join(root, 'test-results/dungeon-marks');
 (async () => {
   fs.mkdirSync(dest, { recursive: true });

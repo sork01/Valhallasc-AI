@@ -54,6 +54,17 @@ impl World {
         let point = p.character.point();
         let mut levels = 0;
         let result = match command {
+            DebugCommand::SetTime { hour, freeze } => {
+                let mut next_clock = self.world_clock.clone();
+                let epoch = next_clock.set(hour, freeze)?;
+                if let Some(epoch) = epoch {
+                    self.store
+                        .set_world_clock_epoch_ms(epoch)
+                        .map_err(|e| format!("World time could not be saved: {e}"))?;
+                }
+                self.world_clock = next_clock;
+                self.world_clock.snapshot()
+            }
             DebugCommand::SetLevel { level } => {
                 if !(1..=MAX_DEBUG_LEVEL).contains(&level) {
                     return Err(format!("Level must be 1-{MAX_DEBUG_LEVEL}."));

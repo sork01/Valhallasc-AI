@@ -55,15 +55,17 @@
   }
 
   // ---------- the volume panel ----------
-  const music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound');
+  const music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound'), night = $('set-night');
   function syncPanel() {
     music.value = Math.round(window.Prefs.music * 100); sfx.value = Math.round(window.Prefs.sfx * 100); sound.checked = window.Prefs.sound;
+    night.value = Math.round(window.Prefs.night * 100); $('set-night-out').textContent = night.value + '%';
     $('set-music-out').textContent = music.value + '%'; $('set-sfx-out').textContent = sfx.value + '%';
   }
   music.addEventListener('input', () => window.Prefs.set({ musicVol: music.value / 100 }));
   sfx.addEventListener('input', () => window.Prefs.set({ sfxVol: sfx.value / 100 }));
   sfx.addEventListener('change', () => window.Prefs.preview());     // a sample when the slider is released
   sound.addEventListener('change', () => window.Prefs.set({ sound: sound.checked }));
+  night.addEventListener('input', () => { $('set-night-out').textContent = night.value + '%'; window.Prefs.set({ night: night.value / 100 }); });
   addEventListener('prefs-change', () => { if (!panel.hidden) syncPanel(); });
 
   function show() {

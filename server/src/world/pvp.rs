@@ -482,6 +482,10 @@ impl World {
         {
             return Err("Target is out of range.".into());
         }
+        if a.character.look.class.ranged() && !self.maps[zone].line_clear(point, target_point, 0.05)
+        {
+            return Err("A wall blocks your shot.".into());
+        }
         let direction = point.direction(target_point);
         let p = self.players.get_mut(&session).unwrap();
         p.face = direction;
@@ -769,6 +773,26 @@ mod tests {
         assert_eq!(w.players[&2].character.hp, 1.);
         assert_eq!(w.players[&2].character.xp, 0);
         assert!(w.players[&2].character.hp >= 1.);
+    }
+    #[test]
+    fn ranged_pvp_refuses_a_target_behind_a_wall() {
+        let mut w = world();
+        let a = add(&mut w, 1, "Alice");
+        let b = add(&mut w, 2, "Bob");
+        w.players.get_mut(&1).unwrap().character.look.class = Class::Hunter;
+        w.pvp_command(1, PvpCommand::DuelRequest { id: b.clone() });
+        w.pvp_command(2, PvpCommand::DuelAccept { id: a });
+        w.maps[0].objects = vec![crate::model::Obstacle {
+            x: 9.5,
+            y: 8.,
+            r: 0.,
+            width: 0.2,
+            depth: 2.,
+        }];
+        let hp = w.players[&2].character.hp;
+        assert_eq!(w.pvp_attack(1, &b), Err("A wall blocks your shot.".into()));
+        assert_eq!(w.players[&1].cooldown, 0.);
+        assert_eq!(w.players[&2].character.hp, hp);
     }
     #[test]
     fn duel_range_gives_ten_seconds_to_return_before_forfeit() {

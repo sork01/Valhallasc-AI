@@ -100,3 +100,35 @@ for task in [t for t in high if t['group'] == 'L95'] + dungeon:
         assert meta['gearSprites'][f'{slot}_{record["variant"]}'] == record['female'][cls], (task['id'], cls)
 
 print('83 new sets have editable PixelFlow records for both bodies and every animation')
+
+instance = read('docs/instance-gear-state.txt')['tasks']
+assert len(instance) == 308
+instance_sources = {'eye': 'eye_below', 'elder': 'elder_hollow', 'pavilion': 'thousandfold',
+                    'rain': 'rain_crown', 'seed': 'seed_vault', 'astro': 'sunken_astrolabe',
+                    'thunder': 'thunderheart_gate', 'bloom': 'blooming_labyrinth',
+                    'solar': 'solar_crucible', 'amber': 'amber_archive',
+                    'solstice': 'silent_solstice'}
+for task in instance:
+    if not task['done']:
+        continue
+    job = task['id']
+    record = art[job]
+    assert record['kind'] == task['kind'] and record['icon']['id'], job
+    assert all((ROOT / file).is_file() for file in record['files']), job
+    item = items[task['item']]
+    assert item['source'] == instance_sources[task['group']], job
+    assert item['art'] == record['variant'] and item['id'] in icons, job
+    for cls in record['classes']:
+        for gender, sprites in (('', record['classes'][cls]),
+                                ('_f', record['female'][cls])):
+            assert all(sprites[clip] and all(part['id'] for part in sprites[clip])
+                       for clip in ('idle', 'walk', 'attack', 'hurt', 'die')), (job, cls, gender)
+            name = f'client/assets/{names[cls]}{gender}_sprites.txt'
+            if name not in metadata:
+                metadata[name] = read(name)
+            slot = 'head' if task['kind'] == 'headgear' else task['kind']
+            part = f'{slot}_{record["variant"]}'
+            assert part in metadata[name]['parts'], (job, cls, gender)
+            assert metadata[name]['gearSprites'][part] == sprites, (job, cls, gender)
+
+print(f'{sum(task["done"] for task in instance)}/308 later instance pieces have unique art, icons and both-body PixelFlow records')

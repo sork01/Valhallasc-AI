@@ -44,12 +44,12 @@ async function call(name, args = {}) {
   await mage.waitForFunction(() => Field.hero.skillCd?.twinbolt > 0);
   check(await mage.evaluate(() => Math.abs(Field.hero.resource - (Field.hero.maxResource - WORLD_SKILLS.find(s => s.id === "twinbolt").cost)) < 15), 'Keyboard skill spends mana and the HUD follows its snapshot');
   await debug(mage, { op: 'set_resource', amount: 0 });
-  await mage.waitForFunction(() => Field.hero.resource < 15 && document.querySelector('#skillbar-slots [data-skill="starfall"]').disabled);
-  check(await mage.locator('#skillbar-slots [data-skill="starfall"]').getAttribute('class').then(c => c.includes('resource-empty')), 'Insufficient mana visibly disables a ready skill');
+  await mage.waitForFunction(() => Field.hero.resource < 15 && document.querySelector('#skillbar-slots [data-skill="fireball"]').disabled);
+  check(await mage.locator('#skillbar-slots [data-skill="fireball"]').getAttribute('class').then(c => c.includes('resource-empty')), 'Insufficient mana visibly disables a ready skill');
   await mage.waitForFunction(() => !document.querySelector('#skillbar-slots [data-skill="attack"]').disabled, null, { timeout: 5000 });   // its own short cooldown may still be running
   check(await mage.locator('#skillbar-slots [data-skill="attack"]').isEnabled(), 'Basic attack remains usable at zero mana');
-  await mage.keyboard.press('-');
-  check(await mage.evaluate(() => !Field.hero.skillCd?.starfall), 'Exhausted skill key does not start a cooldown');
+  await mage.keyboard.press('4');
+  check(await mage.evaluate(() => !Field.hero.skillCd?.fireball), 'Exhausted skill key does not start a cooldown');
   await debug(mage, { op: 'give_item', item: 'mana_potion', quantity: 2 });
   await debug(mage, { op: 'give_item', item: 'health_potion', quantity: 1 });
   await mage.waitForFunction(() => Inventory.quantity('mana_potion') === 2);

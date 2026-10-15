@@ -23,8 +23,7 @@ pub struct Item {
     pub name: String,
     pub kind: String,
     pub rarity: String,
-    /// Character level needed to wear the piece (1 or a five-level step through 80). Wearing it earlier is refused, and
-    /// a piece worn above the character's level (a level lost to a death) adds nothing until the level is back.
+    /// Character level needed to wear gear or buy/fit a bag. A level loss does not remove a fitted bag.
     #[serde(default = "first_level", rename = "requiredLevel")]
     pub required_level: u32,
     pub sell: u32,
@@ -87,6 +86,16 @@ static INDEX: LazyLock<std::collections::HashMap<&'static str, &'static Item>> =
     LazyLock::new(|| ITEMS.iter().map(|i| (i.id.as_str(), i)).collect());
 pub fn item(id: &str) -> Option<&'static Item> {
     INDEX.get(id).copied()
+}
+/// One independent bag roll per enemy defeat, including elites and dungeon bosses.
+pub const BAG_DROP_CHANCE: f64 = 0.02;
+pub fn roll_bag(enemy_level: u32, chance: f64) -> Option<&'static Item> {
+    (chance < BAG_DROP_CHANCE).then(|| {
+        ITEMS
+            .iter()
+            .filter(|i| i.kind == "bag" && i.required_level <= enemy_level)
+            .max_by_key(|i| i.required_level)
+    })?
 }
 /// Kinds that are worn (everything in the catalog that is not a material, bag, food or potion).
 pub const GEAR_KINDS: [&str; 8] = [
@@ -666,40 +675,61 @@ impl Character {
     }
     pub fn can_collect(&self, id: &str) -> bool {
         item(id).is_some_and(|i| {
-            i.kind != "bag"
-                && (self.quantity(id) > self.equipped_count(i)
-                    || self.bag_used() < self.bag_capacity())
+            if i.kind == "bag" {
+                self.can_fit_bag(id).is_ok()
+            } else {
+                self.quantity(id) > self.equipped_count(i) || self.bag_used() < self.bag_capacity()
+            }
         })
     }
-    pub fn purchase_bag(&mut self, id: &str, cost: u32) -> Result<usize, &'static str> {
-        if self.hp <= 0. {
-            return Err("You cannot buy bags while defeated.");
-        }
+    /// None means an empty expansion slot; Some(index) replaces the smallest smaller bag.
+    fn bag_slot(&self, id: &str) -> Result<Option<usize>, &'static str> {
         let bag = item(id)
             .filter(|i| i.kind == "bag" && i.bag_slots > 0)
             .ok_or("Unknown bag.")?;
-        if self.gold < cost {
-            return Err("You need more gold for this bag.");
+        if self.hp <= 0. {
+            return Err("You cannot fit bags while defeated.");
+        }
+        if self.level < bag.required_level {
+            return Err("Your level is too low for this bag.");
         }
         if self.bags.len() < 4 {
-            self.bags.push(id.into());
-        } else {
-            let index = self
-                .bags
-                .iter()
-                .enumerate()
-                .filter_map(|(n, id)| {
-                    item(id)
-                        .filter(|i| i.bag_slots < bag.bag_slots)
-                        .map(|i| (n, i.bag_slots))
-                })
-                .min_by_key(|(_, size)| *size)
-                .map(|(n, _)| n)
-                .ok_or("All four expansion bag slots are filled.")?;
-            self.bags[index] = id.into();
+            return Ok(None);
         }
-        self.gold -= cost;
+        self.bags
+            .iter()
+            .enumerate()
+            .filter_map(|(n, id)| {
+                item(id)
+                    .filter(|i| i.bag_slots < bag.bag_slots)
+                    .map(|i| (n, i.bag_slots))
+            })
+            .min_by_key(|(_, size)| *size)
+            .map(|(n, _)| Some(n))
+            .ok_or("All four expansion bag slots are filled.")
+    }
+    pub fn can_fit_bag(&self, id: &str) -> Result<(), &'static str> {
+        self.bag_slot(id).map(|_| ())
+    }
+    pub fn fit_bag(&mut self, id: &str) -> Result<usize, &'static str> {
+        match self.bag_slot(id)? {
+            Some(index) => self.bags[index] = id.into(),
+            None => self.bags.push(id.into()),
+        }
         Ok(self.bag_capacity())
+    }
+    pub fn purchase_bag(&mut self, id: &str) -> Result<usize, &'static str> {
+        let price = item(id)
+            .filter(|i| i.kind == "bag" && i.bag_slots > 0)
+            .ok_or("Unknown bag.")?
+            .price;
+        self.bag_slot(id)?;
+        if self.gold < price {
+            return Err("You need more gold for this bag.");
+        }
+        let capacity = self.fit_bag(id)?;
+        self.gold -= price;
+        Ok(capacity)
     }
     /// Seconds left of the potion cooldown, from the saved wall-clock end (never more than an hour).
     pub fn potion_cooldown_left(&self) -> f64 {
@@ -1362,6 +1392,69 @@ mod tests {
         assert_eq!(c.stat_points(), before);
         c.allocate_stat("intellect").unwrap();
         assert_eq!(c.stat_points(), before - 1);
+    }
+    #[test]
+    fn recommended_stats_spend_only_unspent_points_and_respect_effective_caps() {
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
+            let mut c = character();
+            c.look.class = class;
+            c.level = 50;
+            c.attributes.accuracy = 20;
+            c.attributes.dexterity = 70;
+            c.attributes.stamina = 5;
+            let before = c.attributes.clone();
+            let hp = c.hp;
+            let points = c.stat_points();
+            let spent = c.allocate_recommended().unwrap();
+            assert_eq!(c.stat_points(), 0, "{class:?}");
+            assert_eq!(
+                spent.strength
+                    + spent.agility
+                    + spent.intellect
+                    + spent.stamina
+                    + spent.dexterity
+                    + spent.accuracy,
+                points
+            );
+            assert_eq!(c.attributes.accuracy, 20);
+            assert_eq!(c.attributes.dexterity, 70);
+            assert!(c.attributes.stamina >= before.stamina);
+            assert!(c.hp >= hp);
+            assert_eq!(
+                c.allocate_recommended(),
+                Err("You have no stat points to spend.")
+            );
+            let saved: Character =
+                serde_json::from_str(&serde_json::to_string(&c).unwrap()).unwrap();
+            assert_eq!(saved.attributes, c.attributes);
+        }
+        let mut mage = character();
+        mage.look.class = Class::Mage;
+        mage.level = 10;
+        mage.attributes.intellect = 12;
+        let old = mage.attributes.clone();
+        mage.allocate_recommended().unwrap();
+        assert!(
+            mage.attributes.intellect >= old.intellect,
+            "manual training is preserved"
+        );
+        assert!(
+            mage.attributes.stamina > 0,
+            "an intellect-heavy mage gets survival points"
+        );
+        mage.hp = 0.;
+        let saved = mage.attributes.clone();
+        assert_eq!(
+            mage.allocate_recommended(),
+            Err("You cannot train stats while defeated.")
+        );
+        assert_eq!(mage.attributes, saved);
     }
     // One roll value that lands inside a tier's band, found by walking the same bands roll_rarity uses.
     fn roll_for(kind: &str, rarity: &str) -> f64 {
@@ -2029,9 +2122,9 @@ mod tests {
         let mut used = std::collections::BTreeSet::new();
         for i in ITEMS.iter() {
             if matches!(i.kind.as_str(), "material" | "bag" | "food" | "potion") {
-                // Potions and food come in a tier every ten levels; everything else non-gear needs none.
-                let tier =
-                    i.family.is_some() && (i.required_level == 1 || i.required_level % 10 == 0);
+                // Bags and consumables come in ten-level tiers; materials have no level.
+                let tier = (i.kind == "bag" || i.family.is_some())
+                    && (i.required_level == 1 || i.required_level % 10 == 0);
                 assert!(tier || i.required_level == 1, "{} is not gear", i.id);
                 continue;
             }
@@ -2263,7 +2356,7 @@ mod tests {
         assert!(!c.can_collect("headgear_upgrade"));
         assert!(c.equip_owned("none", "none").is_err());
         assert_eq!(c.gear(), ("crimson", "sword"));
-        c.level = item("warrior_weapon_royal").unwrap().required_level;
+        c.level = item("warrior_weapon_royal").unwrap().required_level.max(10);
         c.equip_slots(&[("hands".into(), "warrior_weapon_royal".into())].into())
             .unwrap();
         assert_eq!(c.bag_used(), 16);
@@ -2271,8 +2364,8 @@ mod tests {
             c.equip_slots(&[("hands".into(), "none".into())].into())
                 .is_err()
         );
-        c.gold = 24;
-        c.purchase_bag("adventurer_satchel", 24).unwrap();
+        c.gold = 1500;
+        c.purchase_bag("adventurer_satchel").unwrap();
         assert_eq!(c.bag_capacity(), 24);
         assert_eq!(c.gold, 0);
         assert!(c.can_collect("headgear_upgrade"));
@@ -2283,22 +2376,86 @@ mod tests {
     #[test]
     fn purchases_validate_funds_life_and_four_bags_and_upgrade_the_smallest() {
         let mut c = character();
-        assert!(c.purchase_bag("traveler_pack", 60).is_err());
-        c.gold = 500;
-        assert!(c.purchase_bag("slime_gel", 1).is_err());
+        c.gold = 100_000;
+        assert_eq!(
+            c.purchase_bag("adventurer_satchel"),
+            Err("Your level is too low for this bag.")
+        );
+        assert_eq!(c.gold, 100_000);
+        c.level = 50;
+        assert!(c.purchase_bag("slime_gel").is_err());
         for _ in 0..4 {
-            c.purchase_bag("adventurer_satchel", 24).unwrap();
+            c.purchase_bag("adventurer_satchel").unwrap();
         }
         assert_eq!(c.bag_capacity(), 48);
         let gold = c.gold;
-        assert!(c.purchase_bag("adventurer_satchel", 24).is_err());
+        assert!(c.purchase_bag("adventurer_satchel").is_err());
         assert_eq!(c.gold, gold);
-        c.purchase_bag("traveler_pack", 60).unwrap();
+        c.purchase_bag("traveler_pack").unwrap();
         assert_eq!(c.bag_capacity(), 56);
         assert_eq!(c.bags.len(), 4);
         c.hp = 0.;
-        assert!(c.purchase_bag("traveler_pack", 60).is_err());
+        assert!(c.purchase_bag("traveler_pack").is_err());
         assert_eq!(c.bag_capacity(), 56);
+    }
+    #[test]
+    fn bag_tiers_and_drop_bands_match_catalog_prices() {
+        let tiers = [
+            (1, "linen_satchel", 6, 500),
+            (10, "adventurer_satchel", 8, 1_500),
+            (20, "trail_pack_l20", 10, 4_000),
+            (30, "ranger_pack_l30", 12, 9_000),
+            (40, "expedition_pack_l40", 14, 18_000),
+            (50, "traveler_pack", 16, 35_000),
+            (60, "pathfinder_pack_l60", 18, 60_000),
+            (70, "warden_pack_l70", 20, 100_000),
+            (80, "hero_pack_l80", 22, 160_000),
+            (90, "sovereign_pack_l90", 24, 240_000),
+        ];
+        assert_eq!(
+            ITEMS.iter().filter(|i| i.kind == "bag").count(),
+            tiers.len()
+        );
+        for (level, id, slots, price) in tiers {
+            let bag = item(id).unwrap();
+            assert_eq!(
+                (bag.required_level, bag.bag_slots, bag.price, bag.sell),
+                (level, slots, price, price)
+            );
+            assert_eq!(roll_bag(level, 0.).unwrap().id, id);
+            assert_eq!(
+                roll_bag(if level == 1 { 9 } else { level + 9 }, 0.)
+                    .unwrap()
+                    .id,
+                id
+            );
+        }
+        assert!(roll_bag(34, BAG_DROP_CHANCE).is_none());
+        assert!(roll_bag(34, BAG_DROP_CHANCE - f64::EPSILON).is_some());
+        assert_eq!(roll_bag(34, 0.).unwrap().id, "ranger_pack_l30");
+        assert!(roll_bag(0, 0.).is_none());
+    }
+    #[test]
+    fn bag_purchase_checks_level_gold_and_existing_fitted_capacity() {
+        let mut c = character();
+        c.gold = 1_499;
+        c.level = 10;
+        assert_eq!(
+            c.purchase_bag("adventurer_satchel"),
+            Err("You need more gold for this bag.")
+        );
+        assert_eq!((c.gold, c.bag_capacity()), (1_499, 16));
+        c.gold = 1_500;
+        assert_eq!(c.purchase_bag("adventurer_satchel"), Ok(24));
+        assert_eq!(c.gold, 0);
+        c.level = 1; // A level loss does not take away a fitted legacy or earned bag.
+        assert_eq!(c.bag_capacity(), 24);
+        assert_eq!(
+            c.can_fit_bag("adventurer_satchel"),
+            Err("Your level is too low for this bag.")
+        );
+        assert!(c.can_collect("linen_satchel"));
+        assert!(!c.can_collect("adventurer_satchel"));
     }
     #[test]
     fn nine_slots_validate_ownership_kind_class_and_accessory_copies_atomically() {

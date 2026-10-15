@@ -54,6 +54,11 @@
       return found.error || { op: 'take_item', item: found.item.id, quantity };
     }],
     level: ['<1-100>', 'Set your level (XP resets; skills unlock as usual).', a => whole(a[0]) === null ? 'Use /level <1-100>.' : { op: 'set_level', level: whole(a[0]) }],
+    time: ['<0-23.99|resume> [freeze]', 'Set the shared world hour. Freeze is temporary; resume starts the clock again.', a => {
+      if (a[0] === 'resume') return { op: 'set_time', hour: null, freeze: false };
+      const hour = number(a[0]);
+      return hour === null || hour < 0 || hour >= 24 ? 'Use /time <0-23.99> [freeze] or /time resume.' : { op: 'set_time', hour, freeze: a[1] === 'freeze' };
+    }],
     xp: ['<amount>', 'Grant XP (levels up as usual).', a => whole(a[0]) === null || whole(a[0]) < 0 ? 'Use /xp <amount>.' : { op: 'give_xp', amount: whole(a[0]) }],
     gold: ['<amount>', 'Set your gold.', a => whole(a[0]) === null || whole(a[0]) < 0 ? 'Use /gold <amount>.' : { op: 'set_gold', gold: whole(a[0]) }],
     hp: ['[amount]', 'Set your health (default: full). Also revives.', a => ({ op: 'set_hp', hp: a[0] === undefined ? 1e9 : (number(a[0]) ?? 1e9) })],
@@ -83,6 +88,7 @@
       case 'teleport': case 'goto': return `now in ${zoneNames()[result.zone] || 'zone ' + result.zone} at ${Math.round(result.x)}, ${Math.round(result.y)}`;
       case 'set_god_mode': return result.godMode ? 'god mode ON (only you)' : 'god mode off';
       case 'set_level': return `level ${result.level}`;
+      case 'set_time': return `world time ${result.hour?.toFixed(2) ?? '?'}${result.hoursPerSecond ? '' : ' (frozen)'}`;
       case 'give_xp': return `level ${result.level}, ${result.xp} xp`;
       case 'give_item': case 'take_item': return `${result.item}: you now have ${result.owned}`;
       case 'set_gold': return `${result.gold} gold`;
