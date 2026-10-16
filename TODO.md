@@ -580,6 +580,7 @@ Optional Gotify login notifications are implemented in source and remain off unt
 
 ## Travel and world map
 
+- [ ] `W-WORLD-SHAPE` — Make the world map look like a believable world, not 50 intertwined worms. Redesign the overall geography into readable regions with convincing landforms, coastlines and terrain transitions; arrange zones and route lines so their relationships are clear at a glance. Preserve the authoritative portal graph, current-location marker, reachable routes and sealed entrances, then check the full map at game scale in a private browser.
 - [x] `W-GRAPH` — Lay out the authoritative zone/portal graph as connected geography, including city and dungeon branches.
 - [x] `W-ART` — Replace the detached zone display with a readable illustrated world map built from that geography.
 - [x] `W-ROUTES` — Show actual portal connections, current position, reachable routes and distinct sealed dungeon entrances.
