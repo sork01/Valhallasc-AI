@@ -100,7 +100,7 @@ const overlap = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
   check(early < 30, `Nothing arrives at once (${early})`);
   await page.waitForFunction(() => Field.hero.buffs.some(b => b.id === 'traveler_stew' && b.kind === 'regen'));
   check(await page.locator('#buff-bar [data-buff="traveler_stew"]').count() === 1 && await page.locator('#buff-bar [data-buff="traveler_stew"]').getAttribute('title').then(t => t.includes('Traveler') && t.includes('60 HP (50% max) and 100 rage over 8 s')), 'The meal shows in the active effects bar');
-  check(await slot('food').isDisabled() && await slot('food').locator('.skill-cooldown').textContent().then(t => +t >= 1 && +t <= 8), 'The food slot counts the meal down');
+  check(await slot('food').isDisabled() && await slot('food').locator('.skill-cooldown').textContent().then(t => +t >= 1 && +t <= 30), 'The food slot counts down while the meal runs');
   await page.keyboard.press('z');
   await page.waitForFunction(() => document.querySelector('#chat-log').innerText.includes('still eating'), null, { timeout: 3000 });
   check(await page.evaluate(() => Inventory.quantity('traveler_stew')) === 1, 'A second meal is refused and kept');
@@ -113,7 +113,11 @@ const overlap = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
   check(await hp() >= 58, `The whole 60 HP arrived (${await hp()})`);
   check(spent > 7, `The meal ran for its full eight game seconds (${spent.toFixed(1)} real seconds)`);
   check(await page.locator('#buff-bar [data-buff="traveler_stew"]').count() === 0, 'The chip leaves when the meal ends');
-  check(await slot('food').isEnabled(), 'The food slot is ready again');
+  // The meal wait is shared by every meal: the slot stays closed after the eight seconds and counts the rest down.
+  check(await slot('food').isDisabled() && await slot('food').locator('.skill-cooldown').textContent().then(t => +t >= 1 && +t <= 24), 'The food slot keeps counting the shared meal cooldown after the meal ends');
+  await page.keyboard.press('z');
+  await page.waitForFunction(() => document.querySelector('#chat-log').innerText.includes('Meals are still recovering'), null, { timeout: 3000 });
+  check(await page.evaluate(() => Inventory.quantity('traveler_stew')) === 1, 'A meal pressed during the cooldown is refused and kept');
 
   // --- the bag: Use button, right-click, and refusal text ---
   await page.keyboard.press('b');
@@ -123,6 +127,12 @@ const overlap = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
   check(await page.locator('#bag-details').textContent().then(t => t.includes('60 HP (50% max) and 100 rage over 8 s')), 'The bag explains the effect');
   await page.locator('#inventory-list [data-item="traveler_stew"] button').hover();
   check(await page.locator('#item-tooltip').textContent().then(t => t.includes('60 HP (50% max) and 100 rage over 8 s') && t.includes('double-click to use')), 'The tooltip explains the effect and how to use it');
+  check(await page.locator('#inventory-list [data-item="traveler_stew"] .item-cooldown').textContent().then(t => +t >= 1 && +t <= 24), 'The bag shows the remaining meal cooldown on the stack');
+  check(await page.locator('#item-tooltip').textContent().then(t => t.includes('30 s cooldown shared by all meals')), 'The tooltip names the shared meal cooldown');
+  await debug({ op: 'reset_cooldowns' });
+  await page.waitForFunction(() => !Field.hero.mealCd);
+  check(await page.locator('#inventory-list [data-item="traveler_stew"] .item-cooldown').textContent() === '', 'The bag badge clears when the cooldown is cleared');
+  check(await page.evaluate(() => !Field.hero.mealCd), 'Clearing the cooldowns also clears the meal wait');
   await debug({ op: 'set_hp', hp: 1 });
   await page.waitForFunction(() => Field.hero.hp <= 3);
   await page.locator('#bag-details [data-action="use"]').click();
@@ -132,6 +142,9 @@ const overlap = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
   await page.screenshot({ path: path.join(world.artifacts, 'consumables-bag.png') });
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !Field.hero.buffs.some(b => b.kind === 'regen'), null, { timeout: 30000 });
+  check(await page.evaluate(() => Field.hero.mealCd > 0 && Field.hero.mealCd <= 30), 'Eating from the bag starts the shared meal cooldown on the server');
+  await debug({ op: 'reset_cooldowns' });
+  await page.waitForFunction(() => !Field.hero.mealCd, null, { timeout: 5000 });
 
   // --- nothing owned: the press is answered, not ignored ---
   await page.keyboard.press('z');

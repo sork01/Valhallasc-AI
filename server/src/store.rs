@@ -162,6 +162,7 @@ impl Store {
             zone: 0,
             friends: vec![],
             potion_ready: 0,
+            meal_ready: 0,
             explored: vec![],
             gm: false,
             party_points: 0,

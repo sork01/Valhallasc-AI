@@ -237,6 +237,8 @@
     if (music) music.setLevel(save.sound ? (scene === 'splash' ? 1 : .55) * taper(save.musicVol) : 0, secs);
     for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, ...cathedralMusic]) if (m) m.setLevel(save.sound ? taper(save.musicVol) : 0, secs);
   }
+  // Dip every field score under a short fanfare so it is heard over the music.
+  function duckMusic(secs) { for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, ...cathedralMusic]) if (m?.running && m.duck) m.duck(secs); }
   function unlockAudio() { const c = audio(); if (c) c.resume().then(ensureMusic).catch(() => {}); }
   ['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, unlockAudio, { capture: true }));
   document.addEventListener('visibilitychange', () => { if (!ac) return; if (document.hidden) ac.suspend(); else ac.resume(); });
@@ -654,10 +656,11 @@
     consume: ev => { if (ev?.value > 0) { sweep(240, 620, .16, .08, 'triangle'); tone([1175, 1568], .25, .04); } else { tone([330, 440], .18, .05, 'triangle'); } },
     // A rising whoosh, a run up the scale, then a full major chord with sparkles on top.
     levelup: () => {
-      sweep(180, 1900, .7, .09, 'sawtooth'); noiseBurst(.8, 300, 7000, .09, .8);
-      [523, 659, 784, 1047, 1319, 1568, 2093].forEach((f, i) => setTimeout(() => tone([f, f * 2], .55, .06, 'triangle'), 120 + i * 85));
-      setTimeout(() => { tone([523, 659, 784, 1047, 1319], 2, .05, 'triangle'); tone([262, 392], 2, .06, 'sine'); }, 780);
-      for (let i = 0; i < 9; i++) setTimeout(() => tone([2093 + Math.random() * 2093], .3, .025), 900 + i * 110 + Math.random() * 60);
+      duckMusic(3.2);
+      sweep(180, 1900, .7, .14, 'sawtooth'); noiseBurst(.8, 300, 7000, .13, .8);
+      [523, 659, 784, 1047, 1319, 1568, 2093].forEach((f, i) => setTimeout(() => tone([f, f * 2], .55, .1, 'triangle'), 120 + i * 85));
+      setTimeout(() => { tone([523, 659, 784, 1047, 1319], 2.2, .08, 'triangle'); tone([262, 392], 2.2, .09, 'sine'); }, 780);
+      for (let i = 0; i < 9; i++) setTimeout(() => tone([2093 + Math.random() * 2093], .3, .035), 900 + i * 110 + Math.random() * 60);
     },
     skill: ev => {
       const def = WORLD_SKILLS.find(k => k.id === ev?.skill), kind = def?.effect.effect;

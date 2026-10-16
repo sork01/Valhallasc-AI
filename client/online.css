@@ -690,3 +690,5 @@
 .trade-offers .window-tool { align-self:flex-start; }
 .trade-actions { display:flex; justify-content:flex-end; gap:.5cqw; margin-top:.9cqw; }
 .trade-panel :focus-visible, .trade-request :focus-visible { outline:3px solid #ffdc87; outline-offset:2px; }
+.inventory-item .item-cooldown { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; color: white; font: 1.4cqw 'Jua', sans-serif; text-shadow: 0 1px 3px black; }
+.inventory-item.on-cooldown .item-tile { filter: brightness(.55); }

@@ -27,7 +27,7 @@ FAMILIES = {
     'mana_potion': dict(kind='potion', base='mana_potion', name=lambda t: PREFIX[t] + 'Mana Potion', price=POTION_PRICE,
                         extra=lambda t: dict(mana=MANA[t], cooldown=60)),
     'traveler_stew': dict(kind='food', base='traveler_stew', name=lambda t: FOOD[t], price=FOOD_PRICE,
-                          extra=lambda t: dict(heal=HEAL[t], duration=8, mana=MANA[t])),
+                          extra=lambda t: dict(heal=HEAL[t], duration=8, mana=MANA[t], cooldown=30)),
 }
 
 

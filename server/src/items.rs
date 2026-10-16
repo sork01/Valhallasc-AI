@@ -858,6 +858,10 @@ impl Character {
     pub fn potion_cooldown_left(&self) -> f64 {
         self.potion_ready.saturating_sub(unix_now()).min(3600) as f64
     }
+    /// Seconds left of the shared meal cooldown, from the saved wall-clock end (never more than an hour).
+    pub fn meal_cooldown_left(&self) -> f64 {
+        self.meal_ready.saturating_sub(unix_now()).min(3600) as f64
+    }
     pub fn quantity(&self, id: &str) -> u32 {
         self.inventory
             .iter()

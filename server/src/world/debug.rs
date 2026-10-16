@@ -157,6 +157,8 @@ impl World {
                 p.dash_cd = 0.;
                 p.potion_cd = 0.;
                 p.character.potion_ready = 0;
+                p.meal_cd = 0.;
+                p.character.meal_ready = 0;
                 json!({"cleared":true})
             }
             DebugCommand::SetGodMode { enabled } => {

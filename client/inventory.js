@@ -20,8 +20,17 @@
     const heal = i.heal ? Math.max(i.heal, Math.round((hero.maxHp || 0) * .4)) : 0;
     const restores = [heal ? `up to ${heal.toLocaleString()} HP (${Math.round(heal / (hero.maxHp || heal) * 100)}% max)` : '', i.mana ? `${amount} ${type}` : ''].filter(Boolean).join(' and ');
     const need = (i.requiredLevel || 1) > 1 ? ` · needs level ${i.requiredLevel}` : '';
-    return (i.kind === 'food' ? `Restores ${restores} over ${i.duration} s · one meal at a time` : `Restores ${restores} at once · ${i.cooldown} s cooldown shared by all potions`) + need;
+    return (i.kind === 'food' ? `Restores ${restores} over ${i.duration} s · one meal at a time, ${i.cooldown || 30} s cooldown shared by all meals` : `Restores ${restores} at once · ${i.cooldown} s cooldown shared by all potions`) + need;
   };
+  // Seconds before a meal or potion can be used again; the server owns both timers and sends them with the snapshot.
+  const cooldownLeft = i => !consumable(i) ? 0 : (i.kind === 'food' ? window.Field?.hero?.mealCd : window.Field?.hero?.potionCd) || 0;
+  function tickCooldowns() {
+    for (const cell of document.querySelectorAll('#inventory-list .inventory-item')) {
+      const left = cooldownLeft(definition(cell.dataset.item)), badge = cell.querySelector('.item-cooldown');
+      if (badge) badge.textContent = left > 0 ? String(Math.ceil(left)) : '';
+      cell.classList.toggle('on-cooldown', left > 0);
+    }
+  }
   const useItem = i => consumable(i) && canEquip() && bagQuantity(i.id) > 0 && Field.useItem(i.id);
   const activate = i => consumable(i) ? useItem(i) : equip(i);
   const num = n => Number(n.toFixed(1));
@@ -239,6 +248,7 @@
         const b = button('', () => { selected = i.id; renderDetails(); for (const n of container.querySelectorAll('.item-tile')) n.setAttribute('aria-pressed', String(n.closest('[data-item]').dataset.item === selected)); }, 'item-tile');
         b.setAttribute('aria-label', summary(i, count)); b.setAttribute('aria-pressed', String(selected === i.id));
         b.innerHTML = icon(i); b.append(node('span', String(count), 'item-stack'));
+        if (consumable(i)) b.append(node('span', '', 'item-cooldown'));
         b.append(node('b', i.name, 'sr-only'), node('small', summary(i, count), 'sr-only'));
         b.addEventListener('contextmenu', event => { event.preventDefault(); selected = i.id; activate(i); renderDetails(); });
         b.addEventListener('dblclick', () => activate(i)); attachTooltip(b, () => definition(i.id));
@@ -335,7 +345,7 @@
   }
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(a).kind.localeCompare(definition(b).kind) || definition(a).name.localeCompare(definition(b).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
-  window.Inventory = { quantity, bagQuantity, effect, render, renderShop, renderEquipped, renderSets, hideTooltip,
+  window.Inventory = { cooldownLeft, tickCooldowns, quantity, bagQuantity, effect, render, renderShop, renderEquipped, renderSets, hideTooltip,
     update(next, nextLook, nextSlots = {}, nextBags = [], nextInstances = [], nextSets = {}) {
       const key = JSON.stringify([next, nextLook, nextSlots, nextBags, nextInstances, nextSets]); if (key === signature) return;
       stacks = next; look = nextLook; gearSlots = nextSlots; bags = nextBags; gearInstances=nextInstances; setCounts=nextSets; signature = key;

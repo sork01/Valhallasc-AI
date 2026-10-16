@@ -23,11 +23,12 @@
   }
   // Seconds left before the slot works again, and how long that wait was in all.
   function wait(kind, item) {
-    if (kind === 'food') { const meal = (Field.hero.buffs || []).find(b => b.kind === 'regen'); return meal ? [meal.left, meal.time] : [0, 1]; }
+    if (kind === 'food') return [Field.hero.mealCd || 0, item?.cooldown || 30];
     return [Field.hero.potionCd || 0, item?.cooldown || 60];
   }
   function update() {
     if (!slots.size) build();
+    Inventory.tickCooldowns();
     for (const k of KINDS) {
       const b = slots.get(k.kind); b.hidden = false;
       const i = best(k.kind), [left, total] = wait(k.kind, i);

@@ -64,6 +64,8 @@ mod sets;
 mod sky_tests;
 mod social;
 #[cfg(test)]
+mod solo_elite_tests;
+#[cfg(test)]
 mod stormglass_tests;
 #[cfg(test)]
 mod sunken_astrolabe_tests;
@@ -174,6 +176,8 @@ struct Player {
     buffs: Vec<Buff>,
     /// Seconds until any potion can be drunk again.
     potion_cd: f64,
+    /// Seconds until any meal can be eaten again (one timer for every meal tier).
+    meal_cd: f64,
     /// Food healing not yet announced to the client.
     food_shown: f64,
     chat_at: f64,
@@ -227,6 +231,7 @@ impl Player {
         }
         character.resource = Some(character.resource());
         let potion_cd = character.potion_cooldown_left();
+        let meal_cd = character.meal_cooldown_left();
         let hidden = character.gm;
         let visible_zone = character.zone;
         Self {
@@ -262,6 +267,7 @@ impl Player {
             set_amber: None,
             buffs: vec![],
             potion_cd,
+            meal_cd,
             food_shown: 0.,
             chat_at: -99.,
             service_at: -99.,
@@ -285,7 +291,7 @@ impl Player {
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
-            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounted":c.mounted,
+            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounted":c.mounted,
             "setCounts":c.set_counts(),"setCd":self.set_cd,
             "pvpFlag":self.pvp_flag,"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
     }
@@ -12698,8 +12704,15 @@ mod tests {
             (total - 60.).abs() <= ticks.len() as f64 * 0.5,
             "announced {total}"
         );
-        // Once it is over another can be eaten.
+        // Once it is over another still waits for the shared meal cooldown, then can be eaten.
         hurt_to(&mut w, 1.);
+        w.use_item(1, "traveler_stew");
+        assert_eq!(
+            have(&w, "traveler_stew"),
+            2,
+            "the meal cooldown is not over"
+        );
+        seconds(&mut w, 21.);
         w.use_item(1, "traveler_stew");
         assert_eq!(have(&w, "traveler_stew"), 1);
         seconds(&mut w, 8.1);
@@ -12721,6 +12734,7 @@ mod tests {
         w.use_item(1, "traveler_stew");
         seconds(&mut w, 8.1);
         assert_eq!(hp(&w), max, "capped at the maximum");
+        seconds(&mut w, 22.); // the shared meal cooldown is 30 s from the start of a meal
         // Food and a potion are different effects and may overlap.
         hurt_to(&mut w, 1.);
         w.use_item(1, "traveler_stew");
@@ -12835,6 +12849,98 @@ mod tests {
                 w.players[&1].potion_cd,
                 w.players[&1].character.potion_ready
             ),
+            (0., 0)
+        );
+    }
+    #[test]
+    fn every_meal_tier_shares_one_cooldown_that_survives_a_relog_and_is_refused_without_a_cost() {
+        let mut w = world();
+        let (tx, mut rx) = mpsc::channel(256);
+        let welcome = w.join(1, None, Some(Look::default()), tx).unwrap();
+        let token = welcome["token"].as_str().unwrap().to_owned();
+        w.players.get_mut(&1).unwrap().character.level = 10;
+        stock(&mut w, "traveler_stew", 2);
+        stock(&mut w, "traveler_stew_l10", 2);
+        hurt_to(&mut w, 1.);
+        w.use_item(1, "traveler_stew");
+        assert_eq!(
+            w.players[&1].meal_cd, 30.,
+            "the catalog sets the shared wait"
+        );
+        assert_eq!(w.snapshot_for(0)["players"][0]["mealCd"], json!(30.));
+        let ready = w.players[&1].character.meal_ready;
+        assert!(
+            (ready as i64 - unix_now() as i64 - 30).abs() <= 1,
+            "the end is saved as a wall-clock second"
+        );
+        // Once the eight-second meal is over, another tier is still refused, and so is the same tier.
+        seconds(&mut w, 9.);
+        assert!(w.players[&1].buffs.is_empty());
+        let _ = drain(&mut rx);
+        for id in ["traveler_stew_l10", "traveler_stew"] {
+            w.use_item(1, id);
+        }
+        assert_eq!(
+            (have(&w, "traveler_stew"), have(&w, "traveler_stew_l10")),
+            (1, 2),
+            "a refused meal is not consumed"
+        );
+        assert!(w.players[&1].buffs.is_empty(), "no second meal started");
+        let refusals: Vec<_> = drain(&mut rx)
+            .into_iter()
+            .filter(|m| m["type"] == "error")
+            .collect();
+        assert_eq!(refusals.len(), 2);
+        assert!(
+            refusals[0]["text"]
+                .as_str()
+                .unwrap()
+                .starts_with("Meals are still recovering")
+        );
+        // A potion has its own timer: eating does not start it and drinking does not start the meal wait.
+        stock(&mut w, "health_potion", 1);
+        w.use_item(1, "health_potion");
+        assert_eq!(
+            have(&w, "health_potion"),
+            0,
+            "a potion works during the meal wait"
+        );
+        // The wait survives a relog (the meal buff itself does not).
+        w.leave(1);
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, Some(token.clone()), None, tx).unwrap();
+        let left = w.players[&1].meal_cd;
+        assert!(
+            left > 20. && left <= 30.,
+            "still waiting after a relog: {left}"
+        );
+        w.use_item(1, "traveler_stew_l10");
+        assert_eq!(
+            have(&w, "traveler_stew_l10"),
+            2,
+            "the relog did not reset the wait"
+        );
+        // It runs out with time, then either tier works and restarts it.
+        seconds(&mut w, 30.);
+        assert_eq!(w.players[&1].meal_cd, 0.);
+        w.use_item(1, "traveler_stew_l10");
+        assert_eq!(have(&w, "traveler_stew_l10"), 1);
+        assert_eq!(w.players[&1].meal_cd, 30.);
+        // A wait that already passed while logged out does not come back.
+        w.leave(1);
+        let mut saved = w.store.load(&token).unwrap().unwrap();
+        saved.meal_ready = unix_now().saturating_sub(5);
+        w.store.save_many(std::iter::once(&saved)).unwrap();
+        let (tx, _rx) = mpsc::channel(256);
+        w.join(1, Some(token), None, tx).unwrap();
+        assert_eq!(w.players[&1].meal_cd, 0.);
+        // The test shortcut clears both halves, or a relog would bring the wait back.
+        w.players.get_mut(&1).unwrap().meal_cd = 12.;
+        w.players.get_mut(&1).unwrap().character.meal_ready = unix_now() + 12;
+        w.test_commands = true;
+        w.debug(1, None, DebugCommand::ResetCooldowns);
+        assert_eq!(
+            (w.players[&1].meal_cd, w.players[&1].character.meal_ready),
             (0., 0)
         );
     }

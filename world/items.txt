@@ -457,7 +457,8 @@
     "mana": 100,
     "family": "traveler_stew",
     "price": 3,
-    "requiredLevel": 1
+    "requiredLevel": 1,
+    "cooldown": 30
   },
   {
     "id": "traveler_stew_l10",
@@ -469,6 +470,7 @@
     "heal": 210,
     "duration": 8,
     "mana": 170,
+    "cooldown": 30,
     "family": "traveler_stew",
     "price": 25
   },
@@ -482,6 +484,7 @@
     "heal": 350,
     "duration": 8,
     "mana": 300,
+    "cooldown": 30,
     "family": "traveler_stew",
     "price": 45
   },
@@ -495,6 +498,7 @@
     "heal": 490,
     "duration": 8,
     "mana": 430,
+    "cooldown": 30,
     "family": "traveler_stew",
     "price": 75
   },
@@ -508,6 +512,7 @@
     "heal": 630,
     "duration": 8,
     "mana": 550,
+    "cooldown": 30,
     "family": "traveler_stew",
     "price": 115
   },
@@ -521,6 +526,7 @@
     "heal": 770,
     "duration": 8,
     "mana": 680,
+    "cooldown": 30,
     "family": "traveler_stew",
     "price": 165
   },
@@ -534,6 +540,7 @@
     "heal": 910,
     "duration": 8,
     "mana": 810,
+    "cooldown": 30,
     "family": "traveler_stew",
     "price": 225
   },
@@ -547,6 +554,7 @@
     "heal": 1050,
     "duration": 8,
     "mana": 930,
+    "cooldown": 30,
     "family": "traveler_stew",
     "price": 300
   },
@@ -560,6 +568,7 @@
     "heal": 1190,
     "duration": 8,
     "mana": 1060,
+    "cooldown": 30,
     "family": "traveler_stew",
     "price": 390
   },
@@ -573,6 +582,7 @@
     "heal": 1330,
     "duration": 8,
     "mana": 1190,
+    "cooldown": 30,
     "family": "traveler_stew",
     "price": 500
   },
@@ -586,6 +596,7 @@
     "heal": 1400,
     "duration": 8,
     "mana": 1260,
+    "cooldown": 30,
     "family": "traveler_stew",
     "price": 550
   },
@@ -599,6 +610,7 @@
     "heal": 1460,
     "duration": 8,
     "mana": 1320,
+    "cooldown": 30,
     "family": "traveler_stew",
     "price": 600
   },

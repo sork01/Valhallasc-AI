@@ -346,6 +346,9 @@ pub struct Character {
     /// Unix second when the potion cooldown ends. Wall-clock, so logging out or a restart cannot skip the wait.
     #[serde(default)]
     pub potion_ready: u64,
+    /// Unix second when the shared meal cooldown ends, counted from the start of the last meal. Wall-clock like `potion_ready`.
+    #[serde(default)]
+    pub meal_ready: u64,
     /// Fog of war: for each zone (indexed by zone number) a bitmask of the `FOG_GRID` x `FOG_GRID` map cells the
     /// character has stood in, bit `row * FOG_GRID + column`. The maps show only these cells.
     #[serde(default)]
@@ -418,6 +421,7 @@ impl Character {
             zone: 0,
             friends: vec![],
             potion_ready: 0,
+            meal_ready: 0,
             explored: vec![],
             gm: false,
             party_points: 0,

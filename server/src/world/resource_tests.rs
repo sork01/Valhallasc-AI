@@ -311,6 +311,8 @@ fn every_consumable_tier_matches_its_price_healing_resource_and_food_rules_for_a
             p.last_hurt = 1.0e9;
             p.potion_cd = 0.;
             p.character.potion_ready = 0;
+            p.meal_cd = 0.;
+            p.character.meal_ready = 0;
             p.buffs.clear();
             p.character.inventory.retain(|stack| {
                 item(&stack.item).is_none_or(|i| !matches!(i.kind.as_str(), "food" | "potion"))

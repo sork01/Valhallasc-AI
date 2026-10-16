@@ -69,6 +69,15 @@ impl World {
             if p.buffs.iter().any(|b| b.kind == BuffKind::Regen) {
                 return refuse(p, "You are still eating. Wait for your meal to finish.");
             }
+            if p.meal_cd > 0. {
+                let text = format!(
+                    "Meals are still recovering: {} s left.",
+                    p.meal_cd.ceil().max(1.)
+                );
+                return refuse(p, &text);
+            }
+            p.meal_cd = it.cooldown.max(it.duration);
+            p.character.meal_ready = unix_now() + p.meal_cd.ceil() as u64;
             p.buffs.push(Buff {
                 id: it.id.clone(),
                 kind: BuffKind::Regen,
@@ -121,6 +130,7 @@ impl World {
             return;
         };
         p.potion_cd = (p.potion_cd - TICK).max(0.);
+        p.meal_cd = (p.meal_cd - TICK).max(0.);
         if p.character.hp <= 0. {
             p.buffs.retain(|b| b.kind != BuffKind::Regen);
             p.food_shown = 0.;
