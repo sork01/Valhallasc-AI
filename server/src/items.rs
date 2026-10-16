@@ -1321,6 +1321,32 @@ pub fn elite_power(kind: &str) -> (f64, f64) {
         .map_or((1., 1.), |p| (p[0], p[1]))
 }
 
+/// Soft enrage of a boss from `world/enrage.txt`: `kind -> [start, ramp]`, both in seconds. After `start` seconds of
+/// fighting, the boss's damage grows by 100% every `ramp` seconds (`1 + (fight - start) / ramp`), which a party that
+/// burns the boss down never sees and a lone player who needs minutes cannot outlast (`DUNGEON-BOSS-LETHAL`).
+pub fn enrage(kind: &str) -> Option<(f64, f64)> {
+    use std::collections::BTreeMap;
+    use std::sync::OnceLock;
+    static TABLE: OnceLock<BTreeMap<String, [f64; 2]>> = OnceLock::new();
+    TABLE
+        .get_or_init(|| {
+            // Test builds may read another table (`ENRAGE_FILE=path`), so calibrating needs no rebuild.
+            #[cfg(test)]
+            if let Ok(path) = std::env::var("ENRAGE_FILE") {
+                let text = std::fs::read_to_string(&path).expect("readable ENRAGE_FILE");
+                return serde_json::from_str(&text).expect("valid ENRAGE_FILE table");
+            }
+            serde_json::from_str(include_str!("../../world/enrage.txt"))
+                .expect("valid enrage table")
+        })
+        .get(kind)
+        .map(|p| (p[0], p[1].max(0.1)))
+}
+/// The damage multiplier of `kind` after `fight` seconds of combat: 1 until its enrage starts.
+pub fn enrage_factor(kind: &str, fight: f64) -> f64 {
+    enrage(kind).map_or(1., |(start, ramp)| 1. + ((fight - start) / ramp).max(0.))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1334,6 +1360,28 @@ mod tests {
             .create(Look::default(), Point::default())
             .unwrap()
             .0
+    }
+    #[test]
+    fn a_boss_enrages_only_after_its_start_and_then_ramps_linearly() {
+        assert_eq!(enrage_factor("no_such_boss", 500.), 1.);
+        let (start, ramp) = enrage("bellkeeper").expect("bellkeeper has an enrage");
+        assert!(start > 30. && start < 180. && ramp > 0.);
+        assert_eq!(enrage_factor("bellkeeper", 0.), 1.);
+        assert_eq!(enrage_factor("bellkeeper", start), 1.);
+        assert!((enrage_factor("bellkeeper", start + ramp * 3.) - 4.).abs() < 1e-9);
+    }
+    #[test]
+    fn every_enrage_start_is_after_a_plausible_party_kill_and_before_the_fight_limit() {
+        let table: std::collections::BTreeMap<String, [f64; 2]> =
+            serde_json::from_str(include_str!("../../world/enrage.txt")).unwrap();
+        assert!(table.len() >= 40, "{} bosses", table.len());
+        for (kind, [start, ramp]) in table {
+            assert!(is_boss(&kind), "{kind} is not a boss");
+            assert!(
+                (30. ..=180.).contains(&start) && (0.1..=10.).contains(&ramp),
+                "{kind}"
+            );
+        }
     }
     #[test]
     fn dungeon_set_epic_copy_has_independent_threshold_and_sale_value() {

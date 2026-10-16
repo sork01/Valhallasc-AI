@@ -36,7 +36,8 @@ impl World {
         let s = &self.slimes[id];
         let from = s.point();
         let base = from.direction(aim);
-        let (zone, kind, level, damage) = (s.zone, s.kind.clone(), s.level, s.damage);
+        let (zone, kind, level) = (s.zone, s.kind.clone(), s.level);
+        let damage = s.damage * crate::items::enrage_factor(&s.kind, s.fight);
         let angle = base.y.atan2(base.x);
         for shot in 0..r.shots {
             let offset = if r.shots > 1 {

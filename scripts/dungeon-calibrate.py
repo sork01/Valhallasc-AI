@@ -46,6 +46,7 @@ def main():
     ap.add_argument("--table", help="JSON table merged over world/elite-power.txt")
     ap.add_argument("--kinds", default="", help="only these bosses/mobs and the packs holding them (DUNGEON_SOLO_KINDS)")
     ap.add_argument("--classes", default="", help="lone classes, comma-separated (default: all five)")
+    ap.add_argument("--enrage-file", help="soft-enrage table kind -> [start, ramp] used instead of world/enrage.txt (ENRAGE_FILE)")
     ap.add_argument("--tests", default="pack,boss,party")
     ap.add_argument("--seeds", type=int, default=2)
     ap.add_argument("--write", action="store_true", help="write the merged table to world/elite-power.txt")
@@ -67,11 +68,15 @@ def main():
     binary = test_binary()
     env = dict(os.environ, ELITE_POWER_FILE=str(power), DUNGEON_SOLO_DUNGEONS=a.dungeons,
                DUNGEON_SOLO_SEEDS=str(a.seeds), DUNGEON_SOLO_FAIL_FAST="0", DUNGEON_SOLO_KINDS=a.kinds)
+    if a.enrage_file:
+        env["ENRAGE_FILE"] = str(Path(a.enrage_file).resolve())
     wanted = a.tests.split(",")
     jobs = []  # (label, process, logfile)
     for name in wanted:
         if name == "party":
-            jobs.append(("party", [binary, TESTS[name], "--ignored", "--nocapture"], {}))
+            shards = os.cpu_count() or 4  # the party control: one process per shard of dungeons
+            for i in range(shards):
+                jobs.append((f"party/{i}", [binary, TESTS[name], "--ignored", "--nocapture"], {"DUNGEON_PARTY_SHARD": f"{i}/{shards}"}))
         else:
             for c in (a.classes.split(",") if a.classes else CLASSES):
                 jobs.append((f"{name}/{c}", [binary, TESTS[name], "--ignored", "--nocapture"], {"DUNGEON_SOLO_CLASS": c}))
@@ -116,8 +121,9 @@ def summarize(results, a):
         print(f"== lone {kind}: {survived} survived of {total} fights")
         for key, (n, s) in sorted(per.items()):
             print(f"   {key}: lone player survived {s} of {n}" + ("" if s == 0 else "   <-- TOO EASY"))
-    if "party" in results:
-        wins = [l for l in results["party"].splitlines() if l.startswith("[party5")]
+    if any(k.startswith("party/") for k in results):
+        text = "\n".join(t for k, t in results.items() if k.startswith("party/"))
+        wins = [l for l in text.splitlines() if l.startswith("[party5")]
         bad = [l for l in wins if "CANNOT WIN" in l]
         print(f"== party of five: {len(wins) - len(bad)} of {len(wins)} groups beaten")
         for l in bad if not a.verbose else wins:

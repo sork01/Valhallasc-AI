@@ -253,15 +253,17 @@ fn a_dungeon_pack_kills_a_lone_player() {
     );
 }
 
-/// A boss must kill a lone player: in every fight, in green or purple gear at the dungeon's level and in purple gear
-/// five levels above it, the character is the one who dies.
+/// A boss must kill a lone player: in every fight, in green or purple gear at the dungeon's level, the character is the
+/// one who dies. Purple gear five levels above may clear it (owner, 2026-10-16: fine), so it is only reported. Bosses
+/// a lone player can kill get a soft enrage (`world/enrage.txt`); Choir, Colossus, Hollowking, Bloom Heart and Solstice
+/// Heart have none, see `docs/dungeon-solo-report.md`.
 #[test]
 #[ignore = "slow: run scripts/dungeon-solo-parallel.sh"]
 fn a_dungeon_boss_kills_a_lone_player() {
     let (mut failed, mut done) = (vec![], 0);
     for d in dungeons() {
         for (kind, spawn) in &d.bosses {
-            for (rarity, above) in [(BASELINE_RARITY, 0), ("epic", 0), ("epic", 5)] {
+            for (rarity, above) in [(BASELINE_RARITY, 0), ("epic", 0)] {
                 for class in classes() {
                     for seed in 1..=seeds() {
                         let mut c = case(&d, class, rarity, above);

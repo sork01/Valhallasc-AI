@@ -23,7 +23,24 @@ Final run, 4 seeds, 10 dungeons, 32 packs: **a lone player survived 0 of 640 fig
 
 Six dungeons have **no pack of three or more** (Eye Below, Elder Hollow, Thousandfold Pavilion, Sunken Astrolabe, Blooming Labyrinth, Silent Solstice): only lone mobs, pairs and triples spaced more than 10 tiles apart. They were left alone. Either add real packs in `world/*.txt` or make the pairs lethal by power; the owner has to choose.
 
-## Bosses: not reachable with multipliers
+## Bosses: soft enrage (2026-10-16, second pass)
+
+Health/damage multipliers cannot do it (see the last section). A **soft enrage** can: `world/enrage.txt` maps a boss kind to `[start, ramp]` in seconds; after `start` seconds of fighting, the boss's damage is multiplied by `1 + (fight - start) / ramp` (a ramp of 0.2 is +100% per 0.2 s, so a few hits after the start end any hero). The clock (`Slime.fight`) runs while the boss has a target within 14 tiles, drains when nobody is that close and restarts when the boss returns home (`items::enrage_factor`, applied to melee, slam and ranged bolts).
+
+How the table was made: baseline of all 53 bosses (5 classes x green, purple, purple+5 x 2 seeds = 1,590 lone fights); every boss except the Undervault's Choir, Colossus and Hollowking was cleared by someone. For each of the 47 bosses with a party time, `start = ceil(1.06 x slowest party-of-five kill in 4 seeds) + 2`, `ramp = 0.2`. A slow ramp (+100% per 3 or 10 s) hardly changed anything: a lone purple hero absorbs the first enraged hits and finishes.
+
+Result on the 47 bosses (2 seeds, 1,410 lone fights): lone clears fell from 820 to 303. Green gear: 36 clears before, **0 after**. Purple at the dungeon's level: 383 before, **42 after**. Purple +5 levels: 401 before, 155 after (accepted by the owner: a hero five levels up may clear a boss; the lone-boss test now only checks green and purple at the dungeon's level). The 42 same-level purple clears are fights that end before or just after the start. The party of five in green gear wins every one of the 47 in 4 of 4 runs (final run with the real file), as it did without the enrage: it never reaches the start.
+
+Not covered, and why:
+
+- **Choir, Colossus, Hollowking** (Undervault): no lone player can kill them and they stay as they were (the lone Priest survives); a party needs 90 to 180 s, so no safe start exists.
+- **Bloom Heart and Solstice Heart**: a party of five in green gear cannot beat them in 180 s today (72 percent health left, nobody dies). Easing by health is a cliff, not a slope: x0.31 still fails, x0.27 wins in about 18 s, x0.2 in 11 s. Their stats equal Amber Archive's Amber Memory, which the party beats in 77 to 84 s, so the cause is something else (not found). They have no enrage until that is fixed.
+- **Thunder Heart** had a bimodal party time (74 to 77 s, or 172 to 180 s with nobody dead, even with the enrage running), so its start (93 s) is based on the fast mode; the slow runs look like a boss that stops engaging.
+- The harness stops a fight as hopeless after 30 s when the lone hero's pace projects past three times the limit and counts it as "survived"; such fights (about 100 of 1,410) never reach the enrage, but the hero cannot win them either.
+
+Tools: `ENRAGE_FILE=<path>` (test builds) and `scripts/dungeon-calibrate.py --enrage-file <path>`. The party check now runs one process per core.
+
+### Why multipliers alone failed (first pass)
 
 Measured with the same tools:
 

@@ -97,6 +97,8 @@ const KING_SPAWN_MAX: f64 = 600.;
 const PLAYER_RADIUS: f64 = 0.3;
 /// Every enemy rolls its level within this distance of its kind's default level.
 pub const LEVEL_SPREAD: i32 = 2;
+/// How close (tiles) a target must be to count for a boss's soft enrage clock.
+const ENRAGE_RANGE: f64 = 14.;
 /// Health and damage change by this fraction per level from the default; gold changes by 10%. XP does not scale
 /// this way: an enemy pays `enemy_xp(level)`, set by its own level alone.
 const LEVEL_HP_DAMAGE: f64 = 0.12;
@@ -371,6 +373,9 @@ struct Slime {
     set_slow: f64,
     #[serde(skip)]
     damage: f64,
+    /// Seconds spent in this fight, for the soft enrage (`items::enrage`); it drains while nobody is near.
+    #[serde(skip)]
+    fight: f64,
     #[serde(skip)]
     xp: u32,
     #[serde(skip)]
@@ -1172,6 +1177,7 @@ impl Slime {
             set_slow_left: 0.,
             set_slow: 0.,
             damage: (damage * strength).round(),
+            fight: 0.,
             xp: enemy_xp(level) * Self::xp_multiplier(&s.kind),
             gold: (Self::base_gold(&s.kind) as f64 * Self::level_scale(&s.kind, level, 0.1)).round()
                 as u32,
@@ -3679,7 +3685,16 @@ impl World {
             s.state = "chase".into();
         }
         let speed = Slime::stats(&s.kind).2;
-        let damage = s.damage;
+        // Soft enrage: the clock runs while the boss is fighting someone close by, drains when nobody is, and
+        // restarts when it lets go and returns home.
+        if matches!(s.state.as_str(), "idle" | "wander" | "return") {
+            s.fight = 0.;
+        } else if target.is_some_and(|(_, _, d)| d < ENRAGE_RANGE) {
+            s.fight += TICK;
+        } else {
+            s.fight = (s.fight - TICK).max(0.);
+        }
+        let damage = s.damage * crate::items::enrage_factor(&s.kind, s.fight);
         let mut goal = None;
         let mut movement = speed
             * TICK
