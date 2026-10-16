@@ -921,6 +921,10 @@ fn green_gear_warrior_survives_four_plain_hits_from_same_level_elites() {
         if !is_elite(&spawn.kind) || !seen.insert(spawn.kind.clone()) {
             continue;
         }
+        // Dungeon pack mobs are hardened on purpose (a pack must kill a lone player, `world/elite-power.txt`).
+        if crate::items::elite_power(&spawn.kind).1 > 2. {
+            continue;
+        }
         let level = Slime::default_level(&spawn.kind);
         let enemy = Slime::with_level(0, spawn, level);
         let mut hero = Character::mercenary(Class::Warrior, level, "Guard");

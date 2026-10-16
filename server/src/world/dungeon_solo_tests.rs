@@ -32,11 +32,28 @@ struct Dungeon {
     bosses: Vec<(String, usize)>,
 }
 
+/// `DUNGEON_SOLO_DUNGEONS=undervault,moonwell` keeps only the dungeons whose name contains one of the words (calibration).
 fn dungeons() -> Vec<Dungeon> {
+    let wanted: Vec<String> = std::env::var("DUNGEON_SOLO_DUNGEONS")
+        .unwrap_or_default()
+        .split(',')
+        .map(|w| w.trim().to_lowercase())
+        .filter(|w| !w.is_empty())
+        .collect();
+    // `DUNGEON_SOLO_KINDS=hollowking,thrall` keeps only those bosses, mobs and the packs that contain one of them.
+    let kinds: Vec<String> = std::env::var("DUNGEON_SOLO_KINDS")
+        .unwrap_or_default()
+        .split(',')
+        .map(|k| k.trim().to_string())
+        .filter(|k| !k.is_empty())
+        .collect();
     let w = world();
     let mut out = vec![];
     for (zone, map) in w.maps.iter().enumerate() {
         if map.copies == 0 || map.template.is_some() {
+            continue;
+        }
+        if !wanted.is_empty() && !wanted.iter().any(|w| map.name.to_lowercase().contains(w)) {
             continue;
         }
         let ids: Vec<usize> = (0..w.spawns.len())
@@ -82,6 +99,9 @@ fn dungeons() -> Vec<Dungeon> {
             packs.entry(g).or_default().push(mob_ids[n]);
         }
         let level = map.levels.map_or(map.min_level, |l| l[0]).max(1);
+        let kept = |kind: &str| kinds.is_empty() || kinds.iter().any(|k| k == kind);
+        let bosses: Vec<(String, usize)> = bosses.into_iter().filter(|(k, _)| kept(k)).collect();
+        let mobs: Vec<(String, usize)> = mobs.into_iter().filter(|(k, _)| kept(k)).collect();
         out.push(Dungeon {
             name: map.name.clone(),
             level,
@@ -89,6 +109,7 @@ fn dungeons() -> Vec<Dungeon> {
             packs: packs
                 .into_values()
                 .filter(|p| p.len() >= PACK_MIN)
+                .filter(|p| p.iter().any(|&i| kept(&w.spawns[i].kind)))
                 .collect(),
             bosses,
         });
@@ -102,12 +123,17 @@ fn seeds() -> u64 {
         .and_then(|v| v.parse().ok())
         .unwrap_or(2)
 }
-/// `DUNGEON_SOLO_CLASS=mage` limits the runs to one class so `scripts/dungeon-solo-parallel.sh` can run them side by side.
+/// `DUNGEON_SOLO_CLASS=mage` (or `mage,priest`) limits the runs to one class so `scripts/dungeon-solo-parallel.sh` can run them side by side.
 fn classes() -> Vec<Class> {
     let wanted = std::env::var("DUNGEON_SOLO_CLASS").unwrap_or_default();
     let picked: Vec<Class> = CLASSES
         .into_iter()
-        .filter(|c| wanted.is_empty() || format!("{c:?}").eq_ignore_ascii_case(&wanted))
+        .filter(|c| {
+            wanted.is_empty()
+                || wanted
+                    .split(',')
+                    .any(|w| format!("{c:?}").eq_ignore_ascii_case(w.trim()))
+        })
         .collect();
     assert!(!picked.is_empty(), "unknown class {wanted}");
     picked
@@ -367,37 +393,66 @@ fn a_party_of_five_beats_every_dungeon_pack_and_boss() {
     );
 }
 
-/// Do dungeon monsters actually hurt? `cargo test dungeon_probe -- --ignored --nocapture`.
+/// Do dungeon monsters actually hurt? `DUNGEON_SOLO_DUNGEONS=undervault DUNGEON_SOLO_CLASS=priest cargo test dungeon_probe -- --ignored --nocapture`
+/// prints damage, hits and health for every boss and the first mob of the chosen dungeons, in green and purple gear.
 #[test]
 #[ignore = "debug probe"]
 fn dungeon_probe() {
     for d in dungeons() {
-        if ![
-            "The Undervault",
-            "The Silent Solstice",
-            "The Drowned Cathedral — Grand Nave",
-        ]
-        .contains(&d.name.as_str())
-        {
-            continue;
+        for (kind, spawn) in d.bosses.iter().chain(d.mobs.iter().take(1)) {
+            for class in classes() {
+                for rarity in [BASELINE_RARITY, "epic"] {
+                    let mut c = case(&d, class, rarity, 0);
+                    c.target = Some(*spawn);
+                    let (out, summary) = run_once(&c, 1);
+                    eprintln!(
+                        "{} L{} {kind} vs {class:?} {rarity}: enemy hp {:.0} dmg {:.0} level {}; hero hp {:.0}; took {:.0} in {} hits, lowest {:.0}%, {}",
+                        d.name,
+                        d.level,
+                        summary.enemy_hp,
+                        summary.enemy_damage,
+                        summary.enemy_level,
+                        summary.character_hp,
+                        out.damage_taken,
+                        out.hits_taken,
+                        out.lowest_hp_fraction * 100.,
+                        describe(&out)
+                    );
+                }
+            }
         }
-        for (kind, spawn) in d.bosses.iter().take(2).chain(d.mobs.iter().take(1)) {
-            let mut c = case(&d, Class::Warrior, BASELINE_RARITY, 0);
-            c.target = Some(*spawn);
-            let (out, summary) = run_once(&c, 1);
-            eprintln!(
-                "{} L{} {kind}: enemy hp {:.0} dmg {:.0} level {}; hero hp {:.0}; took {:.0} in {} hits, lowest {:.0}%, {}",
-                d.name,
-                d.level,
-                summary.enemy_hp,
-                summary.enemy_damage,
-                summary.enemy_level,
-                summary.character_hp,
-                out.damage_taken,
-                out.hits_taken,
-                out.lowest_hp_fraction * 100.,
-                describe(&out)
-            );
-        }
+    }
+}
+
+/// Prints what each dungeon holds, for planning: `cargo test dungeon_inventory -- --ignored --nocapture`.
+#[test]
+#[ignore = "report only"]
+fn dungeon_inventory() {
+    let w = world();
+    for d in dungeons() {
+        let packs: Vec<String> = d
+            .packs
+            .iter()
+            .map(|p| {
+                let mut kinds: BTreeMap<&str, usize> = BTreeMap::new();
+                for &i in p {
+                    *kinds.entry(w.spawns[i].kind.as_str()).or_default() += 1;
+                }
+                kinds
+                    .iter()
+                    .map(|(k, n)| format!("{n}x{k}"))
+                    .collect::<Vec<_>>()
+                    .join("+")
+            })
+            .collect();
+        eprintln!(
+            "{} L{}: mobs {:?}; bosses {:?}; {} packs: {}",
+            d.name,
+            d.level,
+            d.mobs.iter().map(|m| &m.0).collect::<Vec<_>>(),
+            d.bosses.iter().map(|m| &m.0).collect::<Vec<_>>(),
+            packs.len(),
+            packs.join(", ")
+        );
     }
 }

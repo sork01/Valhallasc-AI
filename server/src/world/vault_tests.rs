@@ -1273,11 +1273,13 @@ fn a_hired_party_clears_trash_packs_faster_and_safer_than_a_lone_hero() {
             x: centre.0 - 9.,
             y: centre.1 + 4.,
         };
+        // A pack must kill a lone hero (`DUNGEON-PACK-LETHAL`); the hired five still win without a death.
         let (_, alone) = fight(&[], &ids, from, 120., 5);
         assert!(
-            alone.won && alone.deaths == 0,
-            "{name}: the stronger lone hero clears the pack ({:.0}s, {} deaths)",
+            !alone.won && alone.deaths > 0,
+            "{name}: the lone hero falls to the pack ({:.0}s, won {}, {} deaths)",
             alone.secs,
+            alone.won,
             alone.deaths
         );
         let (_, five) = fight(&FULL, &ids, from, 120., 5);
@@ -1290,14 +1292,6 @@ fn a_hired_party_clears_trash_packs_faster_and_safer_than_a_lone_hero() {
             five.secs > 12. && five.secs < 70.,
             "{name}: a pack takes a real fight, not a blink: {:.0}s",
             five.secs
-        );
-        assert!(
-            alone.secs > five.secs * 1.5 && alone.low + 0.2 < five.low,
-            "{name}: five are faster and safer (solo {:.0}s / {:.0}%, five {:.0}s / {:.0}%)",
-            alone.secs,
-            alone.low * 100.,
-            five.secs,
-            five.low * 100.
         );
         let (_, three) = fight(&["priest", "mage"], &ids, from, 160., 5);
         assert!(three.won, "{name}: three heroes with a healer still win");

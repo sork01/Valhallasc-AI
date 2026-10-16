@@ -1308,6 +1308,12 @@ pub fn elite_power(kind: &str) -> (f64, f64) {
     static POWER: OnceLock<BTreeMap<String, [f64; 2]>> = OnceLock::new();
     POWER
         .get_or_init(|| {
+            // Test builds may read another table (`ELITE_POWER_FILE=path`), so calibrating a multiplier needs no rebuild.
+            #[cfg(test)]
+            if let Ok(path) = std::env::var("ELITE_POWER_FILE") {
+                let text = std::fs::read_to_string(&path).expect("readable ELITE_POWER_FILE");
+                return serde_json::from_str(&text).expect("valid ELITE_POWER_FILE table");
+            }
             serde_json::from_str(include_str!("../../world/elite-power.txt"))
                 .expect("valid elite power table")
         })
