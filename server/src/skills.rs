@@ -120,6 +120,26 @@ pub struct Rank {
 }
 
 impl Skill {
+    /// Apply set potency after rank resolution. Only damage and healing are amplified;
+    /// target counts, movement, buff duration and resource costs stay unchanged.
+    pub fn multiply_output(&mut self, factor: f64) {
+        match &mut self.effect {
+            Effect::Cone { mult, .. }
+            | Effect::Nova { mult, .. }
+            | Effect::Volley { mult, .. }
+            | Effect::Dash { mult, .. }
+            | Effect::Strike { mult, .. }
+            | Effect::Chain { mult, .. }
+            | Effect::Meteor { mult, .. }
+            | Effect::Mend { mult, .. } => *mult *= factor,
+            Effect::Heal { fraction } => *fraction = (*fraction * factor).min(1.),
+            Effect::Buff { .. } => {}
+        }
+        if let Some(pulse) = &mut self.pulse {
+            pulse.mult *= factor;
+        }
+    }
+
     pub fn rank_at(&self, level: u32) -> usize {
         1 + self.ranks.iter().take_while(|r| r.level <= level).count()
     }

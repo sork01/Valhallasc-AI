@@ -523,12 +523,13 @@ pub fn enemy_xp(level: u32) -> u32 {
 }
 impl Character {
     pub fn max_resource(&self) -> f64 {
-        if self.look.class.resource_type() == "mana" {
+        let base = if self.look.class.resource_type() == "mana" {
             100. + self.level.saturating_sub(1) as f64 * 10.
                 + self.effective_attributes().intellect as f64 * 5.
         } else {
             100.
-        }
+        };
+        base * (1. + self.set_stat_bonus("resource"))
     }
     pub fn resource(&self) -> f64 {
         self.resource
@@ -552,7 +553,9 @@ impl Character {
         });
     }
     pub fn max_hp(&self) -> f64 {
-        self.legacy_max_hp() * player_health_scale(self.level)
+        self.legacy_max_hp()
+            * player_health_scale(self.level)
+            * (1. + self.set_stat_bonus("health"))
     }
     pub fn legacy_max_hp(&self) -> f64 {
         self.look.class.health()

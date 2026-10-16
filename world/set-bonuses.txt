@@ -1,0 +1,710 @@
+{
+  "signatures": {
+    "undervault": {
+      "name": "Hollow guard",
+      "description": "the caster gains a 4-second shield absorbing 6% of maximum health."
+    },
+    "cathedral_cloister": {
+      "name": "Undertow",
+      "description": "the nearest enemy within four tiles is pulled one tile toward the caster; bosses instead lose 20% movement speed for two seconds."
+    },
+    "cathedral_reliquary": {
+      "name": "Coral bond",
+      "description": "the lowest-health nearby party member gains a 4-second shield absorbing 5% of their maximum health."
+    },
+    "cathedral_nave": {
+      "name": "Choir pulse",
+      "description": "each party member within four tiles, including the caster, recovers 3% of their own maximum health."
+    },
+    "moonwell": {
+      "name": "Lunar draw",
+      "description": "restore 5% of the caster's maximum mana, rage or energy, capped at its ordinary maximum."
+    },
+    "eye_below": {
+      "name": "Storm fork",
+      "description": "up to two other enemies within four tiles take 12% basic-hit damage each."
+    },
+    "elder_hollow": {
+      "name": "Briar hold",
+      "description": "the nearest nonboss enemy within four tiles is rooted for 0.8 seconds; a boss is slowed by 15% for two seconds."
+    },
+    "thousandfold": {
+      "name": "Mirror return",
+      "description": "after 0.6 seconds the triggering skill repeats 20% of its damage or healing on the same valid targets, with no extra resource cost or secondary effects."
+    },
+    "rain_crown": {
+      "name": "Rain veil",
+      "description": "the caster takes 12% less ranged damage for four seconds."
+    },
+    "seed_vault": {
+      "name": "Germination",
+      "description": "a seed at the skill's target point bursts after one second, dealing 15% basic-hit damage to enemies within two tiles."
+    },
+    "sunken_astrolabe": {
+      "name": "Orbiting star",
+      "description": "a star orbits the caster for three seconds, then hits the nearest enemy within five tiles for 18% basic-hit damage; it expires harmlessly if none is in range."
+    },
+    "thunderheart_gate": {
+      "name": "Thunderbreak",
+      "description": "interrupt the nearest enemy windup within four tiles and delay its next attack by 0.5 seconds; bosses only suffer the delay."
+    },
+    "blooming_labyrinth": {
+      "name": "Spring pollen",
+      "description": "the lowest-health party member within five tiles recovers 4% of maximum health evenly over four seconds."
+    },
+    "solar_crucible": {
+      "name": "Afterglow",
+      "description": "the nearest enemy within four tiles burns for 18% basic-hit damage over three seconds."
+    },
+    "amber_archive": {
+      "name": "Stored moment",
+      "description": "the caster's next different skill used within five seconds receives a 10% reduction to that cast's cooldown."
+    },
+    "silent_solstice": {
+      "name": "Stillness",
+      "description": "the first incoming attack against the caster within two seconds deals 20% less damage; the effect then ends."
+    }
+  },
+  "entries": [
+    {
+      "source": "undervault",
+      "class": "warrior",
+      "stat": "defense",
+      "cooldownSkill": "shieldwall",
+      "doubleSkill": "cleave",
+      "triggerSkill": "charge"
+    },
+    {
+      "source": "cathedral_cloister",
+      "class": "warrior",
+      "stat": "health",
+      "cooldownSkill": "charge",
+      "doubleSkill": "whirlwind",
+      "triggerSkill": "groundslam"
+    },
+    {
+      "source": "cathedral_reliquary",
+      "class": "warrior",
+      "stat": "defense",
+      "cooldownSkill": "secondwind",
+      "doubleSkill": "earthshatter",
+      "triggerSkill": "shieldwall"
+    },
+    {
+      "source": "cathedral_nave",
+      "class": "warrior",
+      "stat": "attack",
+      "cooldownSkill": "battlecry",
+      "doubleSkill": "titanswrath",
+      "triggerSkill": "secondwind"
+    },
+    {
+      "source": "moonwell",
+      "class": "warrior",
+      "stat": "resource",
+      "cooldownSkill": "berserk",
+      "doubleSkill": "groundslam",
+      "triggerSkill": "battlecry"
+    },
+    {
+      "source": "eye_below",
+      "class": "warrior",
+      "stat": "attack",
+      "cooldownSkill": "earthshatter",
+      "doubleSkill": "cleave",
+      "triggerSkill": "charge"
+    },
+    {
+      "source": "elder_hollow",
+      "class": "warrior",
+      "stat": "health",
+      "cooldownSkill": "shieldwall",
+      "doubleSkill": "whirlwind",
+      "triggerSkill": "earthshatter"
+    },
+    {
+      "source": "thousandfold",
+      "class": "warrior",
+      "stat": "attack",
+      "cooldownSkill": "whirlwind",
+      "doubleSkill": "titanswrath",
+      "triggerSkill": "cleave"
+    },
+    {
+      "source": "rain_crown",
+      "class": "warrior",
+      "stat": "defense",
+      "cooldownSkill": "shieldwall",
+      "doubleSkill": "groundslam",
+      "triggerSkill": "berserk"
+    },
+    {
+      "source": "seed_vault",
+      "class": "warrior",
+      "stat": "health",
+      "cooldownSkill": "secondwind",
+      "doubleSkill": "cleave",
+      "triggerSkill": "charge"
+    },
+    {
+      "source": "sunken_astrolabe",
+      "class": "warrior",
+      "stat": "attack",
+      "cooldownSkill": "earthshatter",
+      "doubleSkill": "whirlwind",
+      "triggerSkill": "titanswrath"
+    },
+    {
+      "source": "thunderheart_gate",
+      "class": "warrior",
+      "stat": "attack",
+      "cooldownSkill": "charge",
+      "doubleSkill": "earthshatter",
+      "triggerSkill": "groundslam"
+    },
+    {
+      "source": "blooming_labyrinth",
+      "class": "warrior",
+      "stat": "health",
+      "cooldownSkill": "secondwind",
+      "doubleSkill": "titanswrath",
+      "triggerSkill": "battlecry"
+    },
+    {
+      "source": "solar_crucible",
+      "class": "warrior",
+      "stat": "attack",
+      "cooldownSkill": "berserk",
+      "doubleSkill": "earthshatter",
+      "triggerSkill": "whirlwind"
+    },
+    {
+      "source": "amber_archive",
+      "class": "warrior",
+      "stat": "resource",
+      "cooldownSkill": "battlecry",
+      "doubleSkill": "groundslam",
+      "triggerSkill": "secondwind"
+    },
+    {
+      "source": "silent_solstice",
+      "class": "warrior",
+      "stat": "defense",
+      "cooldownSkill": "shieldwall",
+      "doubleSkill": "cleave",
+      "triggerSkill": "earthshatter"
+    },
+    {
+      "source": "undervault",
+      "class": "mage",
+      "stat": "defense",
+      "cooldownSkill": "arcaneward",
+      "doubleSkill": "twinbolt",
+      "triggerSkill": "blink"
+    },
+    {
+      "source": "cathedral_cloister",
+      "class": "mage",
+      "stat": "health",
+      "cooldownSkill": "blink",
+      "doubleSkill": "barrage",
+      "triggerSkill": "arcanestorm"
+    },
+    {
+      "source": "cathedral_reliquary",
+      "class": "mage",
+      "stat": "defense",
+      "cooldownSkill": "arcaneward",
+      "doubleSkill": "chainlightning",
+      "triggerSkill": "meteor"
+    },
+    {
+      "source": "cathedral_nave",
+      "class": "mage",
+      "stat": "attack",
+      "cooldownSkill": "arcanestorm",
+      "doubleSkill": "starfall",
+      "triggerSkill": "twinbolt"
+    },
+    {
+      "source": "moonwell",
+      "class": "mage",
+      "stat": "resource",
+      "cooldownSkill": "lifedrain",
+      "doubleSkill": "fireball",
+      "triggerSkill": "arcaneward"
+    },
+    {
+      "source": "eye_below",
+      "class": "mage",
+      "stat": "attack",
+      "cooldownSkill": "chainlightning",
+      "doubleSkill": "meteor",
+      "triggerSkill": "barrage"
+    },
+    {
+      "source": "elder_hollow",
+      "class": "mage",
+      "stat": "health",
+      "cooldownSkill": "blink",
+      "doubleSkill": "lifedrain",
+      "triggerSkill": "fireball"
+    },
+    {
+      "source": "thousandfold",
+      "class": "mage",
+      "stat": "attack",
+      "cooldownSkill": "barrage",
+      "doubleSkill": "starfall",
+      "triggerSkill": "chainlightning"
+    },
+    {
+      "source": "rain_crown",
+      "class": "mage",
+      "stat": "defense",
+      "cooldownSkill": "arcaneward",
+      "doubleSkill": "arcanestorm",
+      "triggerSkill": "blink"
+    },
+    {
+      "source": "seed_vault",
+      "class": "mage",
+      "stat": "health",
+      "cooldownSkill": "meteor",
+      "doubleSkill": "twinbolt",
+      "triggerSkill": "fireball"
+    },
+    {
+      "source": "sunken_astrolabe",
+      "class": "mage",
+      "stat": "attack",
+      "cooldownSkill": "starfall",
+      "doubleSkill": "chainlightning",
+      "triggerSkill": "meteor"
+    },
+    {
+      "source": "thunderheart_gate",
+      "class": "mage",
+      "stat": "attack",
+      "cooldownSkill": "blink",
+      "doubleSkill": "arcanestorm",
+      "triggerSkill": "chainlightning"
+    },
+    {
+      "source": "blooming_labyrinth",
+      "class": "mage",
+      "stat": "health",
+      "cooldownSkill": "lifedrain",
+      "doubleSkill": "meteor",
+      "triggerSkill": "arcaneward"
+    },
+    {
+      "source": "solar_crucible",
+      "class": "mage",
+      "stat": "attack",
+      "cooldownSkill": "fireball",
+      "doubleSkill": "starfall",
+      "triggerSkill": "arcanestorm"
+    },
+    {
+      "source": "amber_archive",
+      "class": "mage",
+      "stat": "resource",
+      "cooldownSkill": "arcaneward",
+      "doubleSkill": "lifedrain",
+      "triggerSkill": "starfall"
+    },
+    {
+      "source": "silent_solstice",
+      "class": "mage",
+      "stat": "defense",
+      "cooldownSkill": "blink",
+      "doubleSkill": "twinbolt",
+      "triggerSkill": "arcaneward"
+    },
+    {
+      "source": "undervault",
+      "class": "assassin",
+      "stat": "defense",
+      "cooldownSkill": "evasion",
+      "doubleSkill": "flurry",
+      "triggerSkill": "shadowveil"
+    },
+    {
+      "source": "cathedral_cloister",
+      "class": "assassin",
+      "stat": "health",
+      "cooldownSkill": "lunge",
+      "doubleSkill": "cycloneblades",
+      "triggerSkill": "knifering"
+    },
+    {
+      "source": "cathedral_reliquary",
+      "class": "assassin",
+      "stat": "defense",
+      "cooldownSkill": "shadowveil",
+      "doubleSkill": "throwingknives",
+      "triggerSkill": "evasion"
+    },
+    {
+      "source": "cathedral_nave",
+      "class": "assassin",
+      "stat": "attack",
+      "cooldownSkill": "deadlyfocus",
+      "doubleSkill": "thousandcuts",
+      "triggerSkill": "flurry"
+    },
+    {
+      "source": "moonwell",
+      "class": "assassin",
+      "stat": "resource",
+      "cooldownSkill": "evasion",
+      "doubleSkill": "knifering",
+      "triggerSkill": "shadowveil"
+    },
+    {
+      "source": "eye_below",
+      "class": "assassin",
+      "stat": "attack",
+      "cooldownSkill": "throwingknives",
+      "doubleSkill": "assassinate",
+      "triggerSkill": "lunge"
+    },
+    {
+      "source": "elder_hollow",
+      "class": "assassin",
+      "stat": "health",
+      "cooldownSkill": "shadowveil",
+      "doubleSkill": "flurry",
+      "triggerSkill": "assassinate"
+    },
+    {
+      "source": "thousandfold",
+      "class": "assassin",
+      "stat": "attack",
+      "cooldownSkill": "flurry",
+      "doubleSkill": "thousandcuts",
+      "triggerSkill": "assassinate"
+    },
+    {
+      "source": "rain_crown",
+      "class": "assassin",
+      "stat": "defense",
+      "cooldownSkill": "evasion",
+      "doubleSkill": "cycloneblades",
+      "triggerSkill": "deadlyfocus"
+    },
+    {
+      "source": "seed_vault",
+      "class": "assassin",
+      "stat": "health",
+      "cooldownSkill": "knifering",
+      "doubleSkill": "throwingknives",
+      "triggerSkill": "lunge"
+    },
+    {
+      "source": "sunken_astrolabe",
+      "class": "assassin",
+      "stat": "attack",
+      "cooldownSkill": "thousandcuts",
+      "doubleSkill": "knifering",
+      "triggerSkill": "assassinate"
+    },
+    {
+      "source": "thunderheart_gate",
+      "class": "assassin",
+      "stat": "attack",
+      "cooldownSkill": "lunge",
+      "doubleSkill": "assassinate",
+      "triggerSkill": "cycloneblades"
+    },
+    {
+      "source": "blooming_labyrinth",
+      "class": "assassin",
+      "stat": "health",
+      "cooldownSkill": "evasion",
+      "doubleSkill": "assassinate",
+      "triggerSkill": "shadowveil"
+    },
+    {
+      "source": "solar_crucible",
+      "class": "assassin",
+      "stat": "attack",
+      "cooldownSkill": "deadlyfocus",
+      "doubleSkill": "thousandcuts",
+      "triggerSkill": "assassinate"
+    },
+    {
+      "source": "amber_archive",
+      "class": "assassin",
+      "stat": "resource",
+      "cooldownSkill": "shadowveil",
+      "doubleSkill": "cycloneblades",
+      "triggerSkill": "knifering"
+    },
+    {
+      "source": "silent_solstice",
+      "class": "assassin",
+      "stat": "defense",
+      "cooldownSkill": "evasion",
+      "doubleSkill": "throwingknives",
+      "triggerSkill": "shadowveil"
+    },
+    {
+      "source": "undervault",
+      "class": "priest",
+      "stat": "defense",
+      "cooldownSkill": "wardoflight",
+      "doubleSkill": "smite",
+      "triggerSkill": "holynova"
+    },
+    {
+      "source": "cathedral_cloister",
+      "class": "priest",
+      "stat": "health",
+      "cooldownSkill": "prayer",
+      "doubleSkill": "holynova",
+      "triggerSkill": "mend"
+    },
+    {
+      "source": "cathedral_reliquary",
+      "class": "priest",
+      "stat": "defense",
+      "cooldownSkill": "wardoflight",
+      "doubleSkill": "mend",
+      "triggerSkill": "prayer"
+    },
+    {
+      "source": "cathedral_nave",
+      "class": "priest",
+      "stat": "attack",
+      "cooldownSkill": "divinehymn",
+      "doubleSkill": "heavenswrath",
+      "triggerSkill": "holynova"
+    },
+    {
+      "source": "moonwell",
+      "class": "priest",
+      "stat": "resource",
+      "cooldownSkill": "blessing",
+      "doubleSkill": "searinglight",
+      "triggerSkill": "divinehymn"
+    },
+    {
+      "source": "eye_below",
+      "class": "priest",
+      "stat": "attack",
+      "cooldownSkill": "searinglight",
+      "doubleSkill": "heavenswrath",
+      "triggerSkill": "smite"
+    },
+    {
+      "source": "elder_hollow",
+      "class": "priest",
+      "stat": "health",
+      "cooldownSkill": "guardianlight",
+      "doubleSkill": "prayer",
+      "triggerSkill": "wardoflight"
+    },
+    {
+      "source": "thousandfold",
+      "class": "priest",
+      "stat": "attack",
+      "cooldownSkill": "holynova",
+      "doubleSkill": "smite",
+      "triggerSkill": "heavenswrath"
+    },
+    {
+      "source": "rain_crown",
+      "class": "priest",
+      "stat": "defense",
+      "cooldownSkill": "wardoflight",
+      "doubleSkill": "divinehymn",
+      "triggerSkill": "guardianlight"
+    },
+    {
+      "source": "seed_vault",
+      "class": "priest",
+      "stat": "health",
+      "cooldownSkill": "prayer",
+      "doubleSkill": "mend",
+      "triggerSkill": "searinglight"
+    },
+    {
+      "source": "sunken_astrolabe",
+      "class": "priest",
+      "stat": "attack",
+      "cooldownSkill": "heavenswrath",
+      "doubleSkill": "searinglight",
+      "triggerSkill": "smite"
+    },
+    {
+      "source": "thunderheart_gate",
+      "class": "priest",
+      "stat": "attack",
+      "cooldownSkill": "smite",
+      "doubleSkill": "holynova",
+      "triggerSkill": "heavenswrath"
+    },
+    {
+      "source": "blooming_labyrinth",
+      "class": "priest",
+      "stat": "health",
+      "cooldownSkill": "guardianlight",
+      "doubleSkill": "divinehymn",
+      "triggerSkill": "prayer"
+    },
+    {
+      "source": "solar_crucible",
+      "class": "priest",
+      "stat": "attack",
+      "cooldownSkill": "searinglight",
+      "doubleSkill": "heavenswrath",
+      "triggerSkill": "holynova"
+    },
+    {
+      "source": "amber_archive",
+      "class": "priest",
+      "stat": "resource",
+      "cooldownSkill": "blessing",
+      "doubleSkill": "prayer",
+      "triggerSkill": "mend"
+    },
+    {
+      "source": "silent_solstice",
+      "class": "priest",
+      "stat": "defense",
+      "cooldownSkill": "wardoflight",
+      "doubleSkill": "mend",
+      "triggerSkill": "guardianlight"
+    },
+    {
+      "source": "undervault",
+      "class": "hunter",
+      "stat": "defense",
+      "cooldownSkill": "huntersmark",
+      "doubleSkill": "powershot",
+      "triggerSkill": "multishot"
+    },
+    {
+      "source": "cathedral_cloister",
+      "class": "hunter",
+      "stat": "health",
+      "cooldownSkill": "rollaway",
+      "doubleSkill": "multishot",
+      "triggerSkill": "rainofarrows"
+    },
+    {
+      "source": "cathedral_reliquary",
+      "class": "hunter",
+      "stat": "defense",
+      "cooldownSkill": "huntersmark",
+      "doubleSkill": "piercingarrow",
+      "triggerSkill": "eaglesight"
+    },
+    {
+      "source": "cathedral_nave",
+      "class": "hunter",
+      "stat": "attack",
+      "cooldownSkill": "rapidfire",
+      "doubleSkill": "arrowstorm",
+      "triggerSkill": "powershot"
+    },
+    {
+      "source": "moonwell",
+      "class": "hunter",
+      "stat": "resource",
+      "cooldownSkill": "eaglesight",
+      "doubleSkill": "explosivearrow",
+      "triggerSkill": "rapidfire"
+    },
+    {
+      "source": "eye_below",
+      "class": "hunter",
+      "stat": "attack",
+      "cooldownSkill": "piercingarrow",
+      "doubleSkill": "powershot",
+      "triggerSkill": "multishot"
+    },
+    {
+      "source": "elder_hollow",
+      "class": "hunter",
+      "stat": "health",
+      "cooldownSkill": "rollaway",
+      "doubleSkill": "rainofarrows",
+      "triggerSkill": "huntersmark"
+    },
+    {
+      "source": "thousandfold",
+      "class": "hunter",
+      "stat": "attack",
+      "cooldownSkill": "multishot",
+      "doubleSkill": "arrowstorm",
+      "triggerSkill": "rainofarrows"
+    },
+    {
+      "source": "rain_crown",
+      "class": "hunter",
+      "stat": "defense",
+      "cooldownSkill": "eaglesight",
+      "doubleSkill": "rainofarrows",
+      "triggerSkill": "rollaway"
+    },
+    {
+      "source": "seed_vault",
+      "class": "hunter",
+      "stat": "health",
+      "cooldownSkill": "explosivearrow",
+      "doubleSkill": "multishot",
+      "triggerSkill": "piercingarrow"
+    },
+    {
+      "source": "sunken_astrolabe",
+      "class": "hunter",
+      "stat": "attack",
+      "cooldownSkill": "arrowstorm",
+      "doubleSkill": "powershot",
+      "triggerSkill": "eaglesight"
+    },
+    {
+      "source": "thunderheart_gate",
+      "class": "hunter",
+      "stat": "attack",
+      "cooldownSkill": "piercingarrow",
+      "doubleSkill": "explosivearrow",
+      "triggerSkill": "arrowstorm"
+    },
+    {
+      "source": "blooming_labyrinth",
+      "class": "hunter",
+      "stat": "health",
+      "cooldownSkill": "huntersmark",
+      "doubleSkill": "rainofarrows",
+      "triggerSkill": "rapidfire"
+    },
+    {
+      "source": "solar_crucible",
+      "class": "hunter",
+      "stat": "attack",
+      "cooldownSkill": "explosivearrow",
+      "doubleSkill": "arrowstorm",
+      "triggerSkill": "powershot"
+    },
+    {
+      "source": "amber_archive",
+      "class": "hunter",
+      "stat": "resource",
+      "cooldownSkill": "rapidfire",
+      "doubleSkill": "multishot",
+      "triggerSkill": "huntersmark"
+    },
+    {
+      "source": "silent_solstice",
+      "class": "hunter",
+      "stat": "defense",
+      "cooldownSkill": "rollaway",
+      "doubleSkill": "piercingarrow",
+      "triggerSkill": "eaglesight"
+    }
+  ]
+}

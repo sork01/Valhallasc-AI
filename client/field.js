@@ -1074,12 +1074,17 @@
     if (moved) setZone(own.zone || 0);
     const inZone = a => (a.zone || 0) === zone;
     const selectedTarget = hero.target?.id;
-    const wasDead = hero.dead;
+    const wasDead = hero.dead, oldSets = hero.setCounts || {};
     applyActor(hero, own, initial || moved || !!hero.sparkTravel !== !!own.sparkTravel);
+    if (!initial && !moved) for (const source of new Set([...Object.keys(oldSets), ...Object.keys(own.setCounts || {})])) {
+      const before = oldSets[source] || 0, after = own.setCounts?.[source] || 0;
+      for (const tier of [2, 4, 6, 8]) if ((before < tier) !== (after < tier))
+        say('setTier', { name: source.replaceAll('_', ' '), tier, active: after >= tier });
+    }
     window.Weather?.sync(packet.weather, own.x, own.y, !!own.inside);
     if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;pendingChest=null;hero.target=null;hero.goal=null;}
     window.Attributes?.update(own);
-    window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || [], own.gearInstances || []);
+    window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || [], own.gearInstances || [], own.setCounts || {});
     window.Quests?.setBells(own.bells || []);
     window.Quests?.update(own.quests || []);
     if (wasDead !== hero.dead) say(hero.dead ? 'death' : 'respawn');
@@ -1250,6 +1255,21 @@
     // Whoever else the skill reached (healed or blessed party members) gets their own glow and sparks.
     if (kind === 'mend' || kind === 'buff' || def.pulse) for (const p of pts) { effects.push({ ...base, kind: 'skAura', x: p.x, y: p.y, col: BUFF_COL[def.effect.kind] || glow, life: 1 }); spark(p.x, p.y, 16, [core, glow], 10, 1, .9); }
     if (ev.heal > 0) { floater(ev.x, ev.y, '+' + ev.heal, '#7dff9a', true); if (kind !== 'heal') spark(ev.x, ev.y, 12, ['#9dffb4', '#d8ffe0'], 10, 1, .9); }
+    if (ev.setDouble) {
+      effects.push({ ...base, kind: 'skNova', r: 2.2, life: .65, style: 'spiral' });
+      spark(ev.x, ev.y, 22, ['#ffffff', '#f6c867'], 7, 2, .7);
+    }
+    if (ev.setSignature) {
+      const sources = Object.keys(WORLD_SET_BONUSES.signatures), index = sources.indexOf(ev.setSignature);
+      const hue = index < 0 ? 45 : index * 360 / sources.length;
+      const h = hue / 60, chroma = .54, x = chroma * (1 - Math.abs(h % 2 - 1)), base =
+        h < 1 ? [chroma, x, 0] : h < 2 ? [x, chroma, 0] : h < 3 ? [0, chroma, x] :
+        h < 4 ? [0, x, chroma] : h < 5 ? [x, 0, chroma] : [chroma, 0, x];
+      const col = '#' + base.map(v => Math.round((v + .43) * 255).toString(16).padStart(2, '0')).join('');
+      effects.push({ ...base, kind: 'skAura', col, life: 1.2 });
+      spark(ev.x, ev.y, 30, [col, '#ffffff'], 10, 2.6, 1);
+      floater(ev.x, ev.y, WORLD_SET_BONUSES.signatures[ev.setSignature]?.name || 'Set bonus', col, true);
+    }
   }
   // Canvas-built riding horse: shared by local and remote actors, so no extra atlas is needed.
   function drawMount(g, actor) {

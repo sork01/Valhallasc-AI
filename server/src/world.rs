@@ -1,6 +1,7 @@
 use crate::{
     items::*,
     model::*,
+    sets as set_catalog,
     skills::{self, BuffKind, Effect},
     store::Store,
 };
@@ -58,6 +59,7 @@ mod ribbonwild_tests;
 mod rolls;
 #[cfg(test)]
 mod seed_vault_tests;
+mod sets;
 #[cfg(test)]
 mod sky_tests;
 mod social;
@@ -163,6 +165,12 @@ struct Player {
     dash_hits: Vec<usize>,
     dash_skill: String,
     skill_cd: BTreeMap<String, f64>,
+    set_cd: BTreeMap<String, f64>,
+    set_shield: f64,
+    set_shield_left: f64,
+    set_ranged_left: f64,
+    set_stillness_left: f64,
+    set_amber: Option<(String, f64)>,
     buffs: Vec<Buff>,
     /// Seconds until any potion can be drunk again.
     potion_cd: f64,
@@ -246,6 +254,12 @@ impl Player {
             dash_hits: vec![],
             dash_skill: String::new(),
             skill_cd: BTreeMap::new(),
+            set_cd: BTreeMap::new(),
+            set_shield: 0.,
+            set_shield_left: 0.,
+            set_ranged_left: 0.,
+            set_stillness_left: 0.,
+            set_amber: None,
             buffs: vec![],
             potion_cd,
             food_shown: 0.,
@@ -272,6 +286,7 @@ impl Player {
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
             "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounted":c.mounted,
+            "setCounts":c.set_counts(),"setCd":self.set_cd,
             "pvpFlag":self.pvp_flag,"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
     }
     fn is_hidden(&self) -> bool {
@@ -340,6 +355,12 @@ struct Slime {
     blink: f64,
     seed: f64,
     windup_time: f64,
+    #[serde(skip)]
+    set_root_left: f64,
+    #[serde(skip)]
+    set_slow_left: f64,
+    #[serde(skip)]
+    set_slow: f64,
     #[serde(skip)]
     damage: f64,
     #[serde(skip)]
@@ -1132,6 +1153,9 @@ impl Slime {
             blink: 2.,
             seed: id as f64,
             windup_time: Self::attack_profile(&s.kind).0,
+            set_root_left: 0.,
+            set_slow_left: 0.,
+            set_slow: 0.,
             damage: (damage * strength).round(),
             xp: enemy_xp(level) * Self::xp_multiplier(&s.kind),
             gold: (Self::base_gold(&s.kind) as f64 * Self::level_scale(&s.kind, level, 0.1)).round()
@@ -1245,6 +1269,7 @@ pub struct World {
     next_king_spawn: f64,
     // The skill whose damage is being applied right now (empty: a basic attack); hit events carry it for the system log.
     cur_skill: String,
+    set_pending: Vec<sets::Pending>,
     /// Counter for mercenary sessions.
     merc_seq: u64,
     /// Desired autonomous adventurers in each currently occupied shared zone.
@@ -1335,6 +1360,7 @@ impl World {
             next_entity: 1,
             next_king_spawn: 0.,
             cur_skill: String::new(),
+            set_pending: vec![],
             merc_seq: 0,
             ambient_targets: BTreeMap::new(),
             ambient_enabled: false,
@@ -2386,6 +2412,7 @@ impl World {
         self.update_holds();
         self.update_chimes();
         self.update_chests();
+        self.update_set_effects();
         let sessions: Vec<_> = self.players.keys().copied().collect();
         for session in sessions {
             self.update_food(session);
@@ -2445,6 +2472,22 @@ impl World {
             *left -= TICK;
             *left > 0.
         });
+        p.set_cd.retain(|_, left| {
+            *left -= TICK;
+            *left > 0.
+        });
+        p.set_shield_left = (p.set_shield_left - TICK).max(0.);
+        if p.set_shield_left <= 0. {
+            p.set_shield = 0.;
+        }
+        p.set_ranged_left = (p.set_ranged_left - TICK).max(0.);
+        p.set_stillness_left = (p.set_stillness_left - TICK).max(0.);
+        if let Some((_, left)) = &mut p.set_amber {
+            *left -= TICK;
+            if *left <= 0. {
+                p.set_amber = None;
+            }
+        }
         p.buffs.retain_mut(|b| {
             b.left -= TICK;
             b.left > 0.
@@ -2817,7 +2860,22 @@ impl World {
             let _ = p.peer.try_send(json!({"type":"error","text":text}));
             return;
         }
-        let skill = skill.at_level(p.character.level);
+        let mut skill = skill.at_level(p.character.level);
+        let set_counts = p.character.set_counts();
+        let set_rows: Vec<_> = set_catalog::rows(class)
+            .filter(|row| set_counts.get(&row.source).is_some_and(|count| *count >= 2))
+            .collect();
+        let cooldown_sets = set_rows
+            .iter()
+            .filter(|row| row.cooldown_skill == id && set_counts[&row.source] >= 4)
+            .count();
+        let power_sets = set_rows
+            .iter()
+            .filter(|row| row.double_skill == id && set_counts[&row.source] >= 6)
+            .count();
+        if power_sets > 0 {
+            skill.multiply_output(1. + power_sets as f64);
+        }
         let capstone = skill
             .ranks
             .iter()
@@ -2897,6 +2955,18 @@ impl World {
                 .try_send(json!({"type":"error","text":"Nobody nearby needs healing."}));
             return;
         }
+        let before_set_hits = if set_rows.iter().any(|row| {
+            row.source == "thousandfold" && row.trigger_skill == id && set_counts[&row.source] >= 8
+        }) {
+            self.slimes
+                .iter()
+                .enumerate()
+                .filter(|(_, s)| s.zone == zone && !s.dead)
+                .map(|(id, s)| (id, s.hp))
+                .collect::<Vec<_>>()
+        } else {
+            vec![]
+        };
         let p = self.players.get_mut(&session).unwrap();
         if p.character.resource() < skill.cost {
             let text = format!(
@@ -2910,9 +2980,19 @@ impl World {
         }
         p.character.mounted = false;
         p.character.change_resource(-skill.cost);
+        let amber = p
+            .set_amber
+            .as_ref()
+            .is_some_and(|(trigger, left)| trigger != id && *left > 0.);
+        if amber {
+            p.set_amber = None;
+        }
         p.skill_cd.insert(
             id.to_string(),
-            skill.cooldown * p.character.cooldown_multiplier(),
+            skill.cooldown
+                * p.character.cooldown_multiplier()
+                * 0.85_f64.powi(cooldown_sets as i32)
+                * if amber { 0.9 } else { 1. },
         );
         if melee && !matches!(&skill.effect, Effect::Dash { mult, .. } if *mult == 0.) {
             p.combat_left = 5.;
@@ -3136,10 +3216,12 @@ impl World {
             healed = (p.character.hp - before).round();
         }
         let origin = self.players[&session].character.point();
+        let set_signature =
+            self.apply_set_signature(session, id, origin, face, target, &before_set_hits);
         self.emit_zone(
             zone,
             json!({"type":"event","kind":"skill","skill":id,"actor":actor,"x":origin.x,"y":origin.y,
-                "fx":face.x,"fy":face.y,"value":value,"crit":false,"points":points,"heal":healed,"capstone":capstone}),
+                "fx":face.x,"fy":face.y,"value":value,"crit":false,"points":points,"heal":healed,"capstone":capstone,"setDouble":power_sets>0,"setSignature":set_signature}),
         );
     }
     /// Sessions of the living party members (the caster included) in the caster's zone within `range`.
@@ -3520,6 +3602,8 @@ impl World {
             return;
         }
         s.st -= TICK;
+        s.set_root_left = (s.set_root_left - TICK).max(0.);
+        s.set_slow_left = (s.set_slow_left - TICK).max(0.);
         s.atk_cd = (s.atk_cd - TICK).max(0.);
         s.blink -= TICK;
         if s.blink < -0.15 {
@@ -3582,7 +3666,15 @@ impl World {
         let speed = Slime::stats(&s.kind).2;
         let damage = s.damage;
         let mut goal = None;
-        let mut movement = speed * TICK;
+        let mut movement = speed
+            * TICK
+            * if s.set_root_left > 0. {
+                0.
+            } else if s.set_slow_left > 0. {
+                1. - s.set_slow
+            } else {
+                1.
+            };
         let mut hit = None;
         // Set when the windup of a ranged attack ends: where to shoot. A ground-pound lists everyone it lands on.
         let mut fire = None;
@@ -3892,6 +3984,16 @@ impl World {
         if shield > 0. {
             value = (value * (1. - shield)).round().max(1.);
         }
+        if p.set_ranged_left > 0. && !enemy.is_empty() && Slime::ranged(enemy).is_some() {
+            value = (value * 0.88).round().max(1.);
+        }
+        if p.set_stillness_left > 0. {
+            value = (value * 0.8).round().max(1.);
+            p.set_stillness_left = 0.;
+        }
+        let absorbed = value.min(p.set_shield);
+        p.set_shield -= absorbed;
+        value -= absorbed;
         let taken = value.min(p.character.hp);
         if p.character.look.class == Class::Warrior {
             p.character.change_resource(taken);

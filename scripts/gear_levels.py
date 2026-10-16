@@ -520,6 +520,17 @@ def vault_pieces(out):
             v['source'] = 'undervault'
             v['bonusStats'] = bonus_stats(v)
             pieces.append(ordered(v))
+    # The original level-20 blue necklace has no generated _l20_blue ID. Give
+    # Undervault a real eighth kind while reusing the Moonstone worn art/icon.
+    base = next(i for i in out if i['id'] == 'necklace_upgrade')
+    pendant = dict(base)
+    pendant.update(id='necklace_moonstone_l20_vault', name='Choirbone Pendant',
+                   variant='moonstone_l20_vault', art=base['variant'], tint=dict(VAULT_TINT),
+                   attack=round(base['attack'] * VAULT_BONUS, 1),
+                   defense=round(base['defense'] * VAULT_BONUS, 1),
+                   sell=round(base['sell'] * VAULT_BONUS), source='undervault')
+    pendant['bonusStats'] = bonus_stats(pendant)
+    pieces.append(ordered(pendant))
     return pieces
 
 
@@ -555,6 +566,8 @@ def vault_only():
     items.extend(vault_pieces(items))
     order = {i['id']: n for n, i in enumerate(existing)}
     items.sort(key=lambda i: order.get(i['id'], len(order)))
+    import gear_art_catalog
+    gear_art_catalog.apply(items)
     ITEMS.write_text(json.dumps(items, indent=2, ensure_ascii=False) + '\n')
     print(len(items), 'items')
 

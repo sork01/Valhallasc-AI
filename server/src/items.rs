@@ -660,6 +660,7 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
                 "shoulders",
                 "gloves",
                 "pants",
+                "necklace",
                 "accessory",
             ],
         ],
@@ -919,6 +920,40 @@ impl Character {
             .chain(equipment(class, "armor", armor))
             .chain(equipment(class, "weapon", weapon))
             .collect()
+    }
+    /// Count distinct equipment kinds, so wearing two accessories never substitutes for a missing set slot.
+    /// Catalog source identifies the set even when a copy has been merged to epic or refined.
+    pub fn set_counts(&self) -> std::collections::BTreeMap<String, usize> {
+        let mut kinds =
+            std::collections::BTreeMap::<String, std::collections::BTreeSet<String>>::new();
+        for piece in self.worn_items() {
+            let Some(source) = piece.source.as_deref() else {
+                continue;
+            };
+            if !crate::sets::is_set(source)
+                || piece.required_level > self.level
+                || piece.class.is_some_and(|class| class != self.look.class)
+            {
+                continue;
+            }
+            kinds
+                .entry(source.into())
+                .or_default()
+                .insert(piece.kind.clone());
+        }
+        kinds
+            .into_iter()
+            .map(|(source, slots)| (source, slots.len()))
+            .collect()
+    }
+
+    /// Additive percentage bonuses from active two-piece tiers; every other tier is resolved in combat.
+    pub fn set_stat_bonus(&self, stat: &str) -> f64 {
+        let counts = self.set_counts();
+        crate::sets::rows(self.look.class)
+            .filter(|row| row.stat == stat && counts.get(&row.source).is_some_and(|n| *n >= 2))
+            .count() as f64
+            * 0.05
     }
     /// Attribute points supplied by usable worn gear. These never spend or refund trained points.
     pub fn gear_attributes(&self) -> Attributes {
@@ -1215,8 +1250,10 @@ impl Character {
             *occurrence += 1;
         }
         (
-            attack * player_attack_scale(self.look.class, self.level),
-            defense,
+            attack
+                * player_attack_scale(self.look.class, self.level)
+                * (1. + self.set_stat_bonus("attack")),
+            defense * (1. + self.set_stat_bonus("defense")),
         )
     }
     pub fn sell_item(&mut self, id: &str, quantity: u32) -> Result<u32, &'static str> {
@@ -2467,7 +2504,7 @@ mod tests {
             .collect();
         assert_eq!(
             vault.len(),
-            27,
+            28,
             "every level-20 blue piece the bosses can drop"
         );
         for kind in ["green", "big", "hydra", "gloomroot", "hollowking", "thrall"] {

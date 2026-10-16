@@ -269,6 +269,121 @@ fn old_health_stacks_scale_with_high_level_health_and_final_tiers_unlock_at_95_a
         .unwrap();
     assert_eq!(meal.amount * meal.time, heal);
 }
+
+#[test]
+fn every_consumable_tier_matches_its_price_healing_resource_and_food_rules_for_all_classes() {
+    use crate::items::best_tier;
+    let levels = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99];
+    let potion_prices = [5, 60, 110, 180, 270, 380, 520, 700, 900, 1150, 1275, 1400];
+    let meal_prices = [3, 25, 45, 75, 115, 165, 225, 300, 390, 500, 550, 600];
+    for class in [
+        Class::Warrior,
+        Class::Mage,
+        Class::Assassin,
+        Class::Priest,
+        Class::Hunter,
+    ] {
+        let (mut w, _) = setup(class);
+        for (index, level) in levels.into_iter().enumerate() {
+            let health = best_tier("health_potion", level).unwrap();
+            let mana = best_tier("mana_potion", level).unwrap();
+            let meal = best_tier("traveler_stew", level).unwrap();
+            assert_eq!(
+                (
+                    health.required_level,
+                    mana.required_level,
+                    meal.required_level
+                ),
+                (level, level, level)
+            );
+            assert_eq!(
+                (health.price, mana.price, meal.price),
+                (
+                    potion_prices[index],
+                    potion_prices[index],
+                    meal_prices[index]
+                )
+            );
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.level = level;
+            p.character.hp = 1.;
+            p.character.resource = Some(0.);
+            p.last_hurt = 1.0e9;
+            p.potion_cd = 0.;
+            p.character.potion_ready = 0;
+            p.buffs.clear();
+            p.character.inventory.retain(|stack| {
+                item(&stack.item).is_none_or(|i| !matches!(i.kind.as_str(), "food" | "potion"))
+            });
+            for item in [health, mana, meal] {
+                p.character.add_item(&item.id, 2);
+            }
+            let max_hp = p.character.max_hp();
+            let max_resource = p.character.max_resource();
+            let heal = consumables::health_amount(health, &p.character);
+            let restore = consumables::resource_amount(mana, &p.character).min(max_resource);
+            let meal_resource = consumables::resource_amount(meal, &p.character).min(max_resource);
+            assert!(heal >= (max_hp * 0.4).round(), "{class:?} level {level}");
+
+            w.use_item(1, &health.id);
+            assert_eq!(
+                w.players[&1].character.hp,
+                (1. + heal).min(max_hp),
+                "health: {class:?} level {level}"
+            );
+            assert_eq!(w.players[&1].character.quantity(&health.id), 1);
+            assert_eq!(w.players[&1].potion_cd, 60.);
+            w.use_item(1, &mana.id);
+            assert_eq!(
+                w.players[&1].character.quantity(&mana.id),
+                2,
+                "the shared potion cooldown keeps the second family"
+            );
+            {
+                let p = w.players.get_mut(&1).unwrap();
+                p.potion_cd = 0.;
+                p.character.potion_ready = 0;
+            }
+            w.use_item(1, &mana.id);
+            assert!(
+                (w.players[&1].character.resource() - restore).abs() < 1e-8,
+                "resource: {class:?} level {level}"
+            );
+            assert_eq!(w.players[&1].character.quantity(&mana.id), 1);
+
+            {
+                let p = w.players.get_mut(&1).unwrap();
+                p.character.hp = 1.;
+                p.character.resource = Some(0.);
+            }
+            w.use_item(1, &meal.id);
+            assert_eq!(w.players[&1].character.hp, 1., "food is gradual");
+            assert_eq!(w.players[&1].character.quantity(&meal.id), 1);
+            w.use_item(1, &meal.id);
+            assert_eq!(
+                w.players[&1].character.quantity(&meal.id),
+                1,
+                "one active meal"
+            );
+            for _ in 0..(8. / TICK) as usize {
+                w.update_food(1);
+                w.players.get_mut(&1).unwrap().buffs.retain_mut(|buff| {
+                    buff.left -= TICK;
+                    buff.left > 0.
+                });
+            }
+            assert!(
+                (w.players[&1].character.hp - (1. + heal).min(max_hp)).abs() < 1e-6,
+                "meal health: {class:?} level {level}"
+            );
+            assert!(
+                (w.players[&1].character.resource() - meal_resource).abs() < 1e-6,
+                "meal resource: {class:?} level {level}: {} vs {meal_resource}",
+                w.players[&1].character.resource()
+            );
+        }
+    }
+}
 #[test]
 fn mana_survives_resume_while_rage_and_energy_reset_and_death_respawns_correctly() {
     for class in [

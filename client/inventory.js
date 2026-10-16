@@ -3,7 +3,7 @@
   const $ = id => document.getElementById(id);
   const dragType = 'application/x-valhallasc-item';
   const slots = [['headgear', 'Headgear'], ['shoulders', 'Shoulders'], ['chest', 'Chest'], ['pants', 'Pants'], ['gloves', 'Gloves'], ['hands', 'Hands'], ['necklace', 'Necklace'], ['accessory1', 'Accessory 1'], ['accessory2', 'Accessory 2']];
-  let stacks = [], look = null, gearSlots = {}, bags = [], gearInstances = [], signature = '', layout = [], character = null, activeBag = 0, selected = null, search = '', pendingPlacement = null;
+  let stacks = [], look = null, gearSlots = {}, bags = [], gearInstances = [], setCounts = {}, signature = '', layout = [], character = null, activeBag = 0, selected = null, search = '', pendingPlacement = null;
   const bagPages = () => { let start = 0; return [{ name: 'Backpack', size: 16 }, ...bags.map(id => ({ name: definition(id)?.name || 'Bag', size: definition(id)?.bagSlots || 0 }))].map(bag => { const page = { ...bag, start }; start += bag.size; return page; }); };
   const capacity = () => bagPages().reduce((sum, b) => sum + b.size, 0);
   const definition = id => WORLD_ITEMS.find(i => i.id === id);
@@ -42,6 +42,18 @@
   const copyStats = g => ({ attack:g.attack * (1 + g.rank * .04), defense:g.defense * (1 + g.rank * .04), bonusStats:Object.fromEntries(statNames.map(k => [k, Math.round(((g.bonusStats?.[k] || 0) + (g.rolledStats?.[k] || 0)) * (1 + g.rank * .04))])) });
   const canEquip = () => Online.connected && !Field.hero?.dead;
   function node(tag, text = '', cls) { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; }
+  const setEntry = i => i?.source && window.WORLD_SET_BONUSES?.entries.find(row => row.source === i.source && row.class === look?.class);
+  const setName = source => ({undervault:'Undervault',moonwell:'Moonwell',eye_below:'Eye Below',elder_hollow:'Elder Hollow',thousandfold:'Thousandfold Pavilion',rain_crown:'Rain Crown',seed_vault:'Seed Vault',sunken_astrolabe:'Sunken Astrolabe',thunderheart_gate:'Thunderheart Gate',blooming_labyrinth:'Blooming Labyrinth',solar_crucible:'Solar Crucible',amber_archive:'Amber Archive',silent_solstice:'Silent Solstice',cathedral_cloister:'Flooded Cloister',cathedral_reliquary:'Coral Reliquary',cathedral_nave:'Grand Nave'})[source] || source;
+  function setLines(source) {
+    const row = window.WORLD_SET_BONUSES?.entries.find(entry => entry.source === source && entry.class === look?.class);
+    if (!row) return [];
+    const count = setCounts[source] || 0, sig = WORLD_SET_BONUSES.signatures[source];
+    return [node('b', `${setName(source)} · ${count}/8`, 'set-heading'),
+      ...[[2, `+5% ${row.stat}`], [4, `${WORLD_SKILLS.find(s=>s.id===row.cooldownSkill)?.name || row.cooldownSkill}: 15% shorter cooldown`],
+        [6, `${WORLD_SKILLS.find(s=>s.id===row.doubleSkill)?.name || row.doubleSkill}: double damage or healing`],
+        [8, `${sig.name} (${WORLD_SKILLS.find(s=>s.id===row.triggerSkill)?.name || row.triggerSkill}): ${sig.description}`]]
+        .map(([tier, text]) => { const line=node('small', `${tier} pieces · ${text}`, 'set-tier'); line.dataset.active=String(count>=tier); return line; })];
+  }
   function button(text, action, cls = 'btn ghost') { const b = node('button', text, cls); b.type = 'button'; b.addEventListener('click', action); return b; }
   const art = {
     headgear: '<path d="M12 33v-9a20 20 0 0 1 40 0v9l-8 11H20z" fill="currentColor"/><path d="M18 29h28v8H18z" fill="#15171e"/><path d="M30 8h4v37h-4z" fill="#f4df99"/>',
@@ -102,6 +114,7 @@
     else if (i.kind !== 'material') t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
     if (compatible(i) && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
+    if (setEntry(i)) t.append(...setLines(i.source));
     if (compatible(i) && !slot) {
       const target = slots.find(([s]) => slotKind(s) === i.kind)?.[0], current = target && itemAtSlot(target);
       if (current && current.id !== i.id) {
@@ -188,6 +201,7 @@
     if (!i || !quantity(i.id)) { container.append(node('p', 'Select an item to inspect it.', 'bag-empty-note')); return; }
     const heading = node('b', i.name, 'item-name'); heading.dataset.rarity = displayRarity(i);
     container.append(heading, node('small', summary(i, quantity(i.id))));
+    if (setEntry(i)) container.append(...setLines(i.source));
     if (i.source === 'orange_pool' || copiesOf(i).some(g => g.rarity !== i.rarity)) {
       const worn = equippedCount(i);
       gearInstances.filter(g => g.item === i.id).forEach((g, index) => {
@@ -312,12 +326,20 @@
       select.value = i ? (legacy ? i.variant : i.id) : 'none'; card.dataset.value = select.value; select.disabled = !canEquip(); glyph.disabled = !canEquip();
     }
   }
+  function renderSets(container = $('character-sets')) {
+    if (!container) return;
+    const sources = Object.keys(setCounts).filter(source => setCounts[source] > 0 && window.WORLD_SET_BONUSES?.entries.some(row => row.source === source && row.class === look?.class));
+    container.replaceChildren(node('h4', 'Dungeon sets'));
+    if (!sources.length) { container.append(node('small', 'Equip dungeon pieces to unlock set tiers.')); return; }
+    for (const source of sources.sort()) { const card=node('article', '', 'set-card'); card.append(...setLines(source)); container.append(card); }
+  }
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(a).kind.localeCompare(definition(b).kind) || definition(a).name.localeCompare(definition(b).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
-  window.Inventory = { quantity, bagQuantity, effect, render, renderShop, renderEquipped, hideTooltip,
-    update(next, nextLook, nextSlots = {}, nextBags = [], nextInstances = []) {
-      const key = JSON.stringify([next, nextLook, nextSlots, nextBags, nextInstances]); if (key === signature) return;
-      stacks = next; look = nextLook; gearSlots = nextSlots; bags = nextBags; gearInstances=nextInstances; signature = key;
+  window.Inventory = { quantity, bagQuantity, effect, render, renderShop, renderEquipped, renderSets, hideTooltip,
+    update(next, nextLook, nextSlots = {}, nextBags = [], nextInstances = [], nextSets = {}) {
+      const key = JSON.stringify([next, nextLook, nextSlots, nextBags, nextInstances, nextSets]); if (key === signature) return;
+      stacks = next; look = nextLook; gearSlots = nextSlots; bags = nextBags; gearInstances=nextInstances; setCounts=nextSets; signature = key;
+      renderSets();
       reconcile(); hideTooltip(); dispatchEvent(new Event('inventory-change')); window.City?.refreshInventory();
     },
   };

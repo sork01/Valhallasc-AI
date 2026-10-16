@@ -677,6 +677,7 @@
   };
   function onField(name, data) {
     if (SFX[name]) SFX[name](data);
+    if (name === 'setTier') showToast(`${data.name}: ${data.tier}-piece bonus ${data.active ? 'active' : 'lost'}`);
     if (name === 'rarePickup') rarePickup(data);
     if (name === 'levelup') levelBanner(data);
     if (name === 'spriteError') showToast(t((save.char?.class || 'mage') + 'Error'));
@@ -734,6 +735,7 @@
     $('hud-portrait').style.backgroundImage = `url(${mage.portrait()})`;
     Inventory.render(document.getElementById('inventory-list'));
     Inventory.renderEquipped(document.getElementById('equipped-slots'));
+    Inventory.renderSets();
   }
   function openEquipment(view = 'both') {
     window.Skillbar?.close(false);

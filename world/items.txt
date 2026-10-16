@@ -52215,5 +52215,26 @@
     "sell": 240000,
     "price": 240000,
     "bagSlots": 24
+  },
+  {
+    "id": "necklace_moonstone_l20_vault",
+    "name": "Choirbone Pendant",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "attack": 10.8,
+    "defense": 2.8,
+    "variant": "moonstone_l20_vault",
+    "bonusStats": {
+      "accuracy": 7
+    },
+    "art": "moonstone",
+    "tint": {
+      "hue": 150,
+      "saturate": 1.3,
+      "brightness": 1.2
+    },
+    "source": "undervault"
   }
 ]

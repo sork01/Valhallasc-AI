@@ -286,6 +286,13 @@
 .item-tooltip[data-rarity="legendary"] b { color: #ff9a2e; }
 .item-tooltip[data-rarity="gm"] b { color: #ffd24a; }
 .item-tooltip small { display: block; font-size: 12px; color: #b9baa9; }
+.set-heading { display:block; margin-top:.5em; color:#f3d79c; }
+.set-tier { display:block; color:#858b8c !important; line-height:1.35; }
+.set-tier[data-active="true"] { color:#c3efb7 !important; text-shadow:0 0 .4em #75d76b55; }
+.character-sets { margin:.7cqw 0; padding:.6cqw; border:1px solid #685b42; background:#151b1c; font:.8cqw/1.4 'Jua',sans-serif; }
+.character-sets h4 { margin:0 0 .4cqw; color:#e9d39d; font:1.05cqw Georgia,serif; }
+.set-card { padding:.4cqw 0; border-top:1px solid #73654855; }
+.character-sets .set-tier { font-size:.74cqw; }
 .item-tooltip p { margin: 6px 0; }
 .item-tooltip .item-comparison { color: #9ecf9c; }
 .item-restriction { color: #e0877d; }
