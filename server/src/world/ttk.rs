@@ -78,6 +78,11 @@ pub struct Case {
     pub consumables: bool,
     /// The monster deals no damage, so the run measures the class's own kill speed (it cannot die before the cap).
     pub harmless: bool,
+    /// Rarity of the gear worn; the baseline is green.
+    pub rarity: &'static str,
+    /// Spawn index of the monster to fight instead of the one `pick_enemy` chooses (the group elites of
+    /// `ELITE-SOLO-TEST`). The monster is still levelled to `level`.
+    pub target: Option<usize>,
 }
 impl Case {
     pub fn new(class: Class, level: u32) -> Self {
@@ -89,6 +94,8 @@ impl Case {
             foe: Foe::Ordinary,
             consumables: false,
             harmless: false,
+            rarity: BASELINE_RARITY,
+            target: None,
         }
     }
 }
@@ -205,7 +212,23 @@ pub fn gear_level(level: u32) -> u32 {
     (level / 5 * 5).clamp(5, 95)
 }
 pub fn normal_gear(class: Class, level: u32) -> Vec<(&'static str, String)> {
-    let want = gear_level(level);
+    normal_gear_of(class, level, BASELINE_RARITY)
+}
+/// The progression set of `rarity` (`common`, `uncommon`, `rare` or `epic`) for `level`, built like `normal_gear`.
+pub fn normal_gear_of(class: Class, level: u32, rarity: &str) -> Vec<(&'static str, String)> {
+    let colour = match rarity {
+        "common" => "gray",
+        "uncommon" => "green",
+        "rare" => "blue",
+        "epic" => "purple",
+        other => panic!("no progression set of rarity {other}"),
+    };
+    // Gray, green and blue exist every 5 levels; purple comes in tens and stops at 90, so it uses the best set at or below.
+    let want = if rarity == "epic" {
+        (level / 10 * 10).clamp(10, 90)
+    } else {
+        gear_level(level)
+    };
     SLOTS
         .iter()
         .map(|&(slot, kind)| {
@@ -213,7 +236,7 @@ pub fn normal_gear(class: Class, level: u32) -> Vec<(&'static str, String)> {
                 .iter()
                 .filter(|i| {
                     i.kind == kind
-                        && i.rarity == BASELINE_RARITY
+                        && i.rarity == rarity
                         && i.required_level == want
                         && i.source.is_none()
                         && !i.starter
@@ -225,7 +248,7 @@ pub fn normal_gear(class: Class, level: u32) -> Vec<(&'static str, String)> {
             let named: Vec<&Item> = green
                 .iter()
                 .copied()
-                .filter(|i| i.id.ends_with(&format!("_l{want}_green")))
+                .filter(|i| i.id.ends_with(&format!("_l{want}_{colour}")))
                 .collect();
             let chosen = if named.is_empty() { &green } else { &named };
             assert!(
@@ -295,7 +318,7 @@ pub fn build_character(c: &mut Character, case: &Case) {
     c.xp = 0;
     c.attributes = Attributes::default();
     let mut equip = BTreeMap::new();
-    for (slot, id) in normal_gear(case.class, case.level) {
+    for (slot, id) in normal_gear_of(case.class, case.level, case.rarity) {
         c.add_item(&id, 1);
         equip.insert(slot.to_string(), id);
     }
@@ -334,9 +357,9 @@ fn start_point(w: &World, zone: usize, from: Point) -> Point {
 
 /// The rotation of the rules: every damaging skill whenever it is off cooldown, highest unlock level first. Buffs that
 /// raise damage are used when ready, shields and dodge below 60% health, heals below 50%.
-fn cast_skills(w: &mut World, id: usize, outcome: &mut Outcome) {
+fn cast_skills(w: &mut World, session: u64, id: usize, outcome: &mut Outcome) {
     let (class, level, hp, max_hp, point) = {
-        let c = &w.players[&1].character;
+        let c = &w.players[&session].character;
         (c.look.class, c.level, c.hp, c.max_hp(), c.point())
     };
     let target = w.slimes[id].point();
@@ -362,20 +385,20 @@ fn cast_skills(w: &mut World, id: usize, outcome: &mut Outcome) {
             },
             Effect::Heal { .. } | Effect::Mend { .. } => hp < max_hp * 0.5,
         };
-        if !in_reach || w.players[&1].skill_cd.contains_key(&s.id) {
+        if !in_reach || w.players[&session].skill_cd.contains_key(&s.id) {
             continue;
         }
-        w.use_skill(1, &s.id, aim);
-        if w.players[&1].skill_cd.contains_key(&s.id) {
+        w.use_skill(session, &s.id, aim);
+        if w.players[&session].skill_cd.contains_key(&s.id) {
             outcome.casts += 1;
             outcome.resource_used += s.cost;
         }
     }
 }
 
-fn use_consumables(w: &mut World, outcome: &mut Outcome) {
+fn use_consumables(w: &mut World, session: u64, outcome: &mut Outcome) {
     let (class, level, hp, max_hp, resource, max_resource, ready, eating) = {
-        let p = &w.players[&1];
+        let p = &w.players[&session];
         let c = &p.character;
         (
             c.look.class,
@@ -390,14 +413,14 @@ fn use_consumables(w: &mut World, outcome: &mut Outcome) {
     };
     let owned = |w: &World, family: &str| {
         crate::items::best_tier(family, level)
-            .filter(|i| w.players[&1].character.quantity(&i.id) > 0)
+            .filter(|i| w.players[&session].character.quantity(&i.id) > 0)
             .map(|i| i.id.clone())
     };
     if ready
         && hp < max_hp * 0.5
         && let Some(id) = owned(w, "health_potion")
     {
-        w.use_item(1, &id);
+        w.use_item(session, &id);
         outcome.potions_used += 1;
         return;
     }
@@ -406,7 +429,7 @@ fn use_consumables(w: &mut World, outcome: &mut Outcome) {
         && resource < max_resource * 0.25
         && let Some(id) = owned(w, "mana_potion")
     {
-        w.use_item(1, &id);
+        w.use_item(session, &id);
         outcome.potions_used += 1;
         return;
     }
@@ -414,18 +437,32 @@ fn use_consumables(w: &mut World, outcome: &mut Outcome) {
         && hp < max_hp * 0.6
         && let Some(id) = owned(w, "traveler_stew")
     {
-        w.use_item(1, &id);
+        w.use_item(session, &id);
         outcome.food_used += 1;
     }
+}
+
+thread_local! {
+    /// Seconds spent in the rotation, in `World::step` and in draining messages, and the number of steps (a timing probe).
+    pub static PHASES: std::cell::RefCell<[f64; 4]> = const { std::cell::RefCell::new([0.; 4]) };
 }
 
 /// One fight with one seed.
 pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
     let mut w = world();
     w.rng = seed;
-    let id = pick_enemy(&w, case.level, case.foe)
+    let id = case
+        .target
+        .or_else(|| pick_enemy(&w, case.level, case.foe))
         .unwrap_or_else(|| panic!("no {:?} foe for level {}", case.foe, case.level));
-    for s in w.slimes.iter_mut().filter(|s| s.id != id) {
+    // Only the target's own zone is cleared. Monsters elsewhere stay alive and dormant, which `step` skips; dead ones
+    // are updated every tick (about 6 ms per step across all zones, nearly all of a fight's cost).
+    let target_zone = w.slimes[id].zone;
+    for s in w
+        .slimes
+        .iter_mut()
+        .filter(|s| s.id != id && s.zone == target_zone)
+    {
         s.dead = true;
         s.respawn = 1e9;
     }
@@ -482,15 +519,27 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
             out.killed = true;
             break;
         }
+        let phase = std::time::Instant::now();
         if case.rotation == Rotation::Skills {
-            cast_skills(&mut w, id, &mut out);
+            cast_skills(&mut w, 1, id, &mut out);
         }
         if case.consumables {
-            use_consumables(&mut w, &mut out);
+            use_consumables(&mut w, 1, &mut out);
         }
+        let rotation_time = phase.elapsed();
         let before = w.players[&1].character.hp;
+        let phase = std::time::Instant::now();
         w.step();
+        let step_time = phase.elapsed();
+        let phase = std::time::Instant::now();
         drain(&mut rx);
+        PHASES.with(|p| {
+            let mut p = p.borrow_mut();
+            p[0] += rotation_time.as_secs_f64();
+            p[1] += step_time.as_secs_f64();
+            p[2] += phase.elapsed().as_secs_f64();
+            p[3] += 1.;
+        });
         let after = w.players[&1].character.hp;
         if after < before {
             out.damage_taken += before - after;
@@ -512,6 +561,85 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
         out.lowest_hp_fraction = 0.;
     }
     (out, summary)
+}
+
+/// A party of `members` (one real character each, all in `case.rarity` gear at `case.level`) against the monster of
+/// `case.target`: true if the monster dies within the rotation cap. The control for `ELITE-SOLO-TEST`.
+pub fn run_party_once(case: &Case, members: &[Class], seed: u64) -> bool {
+    let mut w = world();
+    w.rng = seed;
+    let id = case.target.expect("a party fights a chosen monster");
+    // Only the target's own zone is cleared. Monsters elsewhere stay alive and dormant, which `step` skips; dead ones
+    // are updated every tick (about 6 ms per step across all zones, nearly all of a fight's cost).
+    let target_zone = w.slimes[id].zone;
+    for s in w
+        .slimes
+        .iter_mut()
+        .filter(|s| s.id != id && s.zone == target_zone)
+    {
+        s.dead = true;
+        s.respawn = 1e9;
+    }
+    let spawn = w.spawns[id].clone();
+    w.slimes[id] = Slime::with_level(id, &spawn, case.level);
+    let zone = w.slimes[id].zone;
+    let home = w.slimes[id].point();
+    let mut rxs = vec![];
+    for (n, &class) in members.iter().enumerate() {
+        let session = n as u64 + 1;
+        rxs.push(join(&mut w, session, class));
+        let start = start_point(&w, zone, home);
+        let c = &mut w.players.get_mut(&session).unwrap().character;
+        c.zone = zone;
+        c.x = start.x;
+        c.y = start.y;
+        build_character(c, &Case { class, ..*case });
+    }
+    let mut out = Outcome {
+        seed,
+        seconds: 0.,
+        killed: false,
+        died: false,
+        damage_taken: 0.,
+        hits_taken: 0,
+        lowest_hp_fraction: 1.,
+        resource_used: 0.,
+        casts: 0,
+        potions_used: 0,
+        food_used: 0,
+        enemy_left: 1.,
+    };
+    for n in 0..members.len() {
+        w.message(n as u64 + 1, ClientMessage::Target { id });
+    }
+    let start_time = w.time;
+    while w.time - start_time < cap_for(case.rotation) {
+        if w.slimes[id].dead {
+            return true;
+        }
+        for n in 0..members.len() {
+            let session = n as u64 + 1;
+            if w.players[&session].character.hp <= 0. {
+                continue;
+            }
+            cast_skills(&mut w, session, id, &mut out);
+            if case.consumables {
+                use_consumables(&mut w, session, &mut out);
+            }
+        }
+        w.step();
+        for rx in rxs.iter_mut() {
+            drain(rx);
+        }
+        if members
+            .iter()
+            .enumerate()
+            .all(|(n, _)| w.players[&(n as u64 + 1)].character.hp <= 0.)
+        {
+            return false;
+        }
+    }
+    w.slimes[id].dead
 }
 
 /// Seeds 1..=`runs` of one case, summarised.
@@ -680,6 +808,8 @@ fn ttk_report() {
                                 },
                                 consumables: use_consumables == "1",
                                 harmless: std::env::var("TTK_HARMLESS").is_ok_and(|v| v == "1"),
+                                rarity: BASELINE_RARITY,
+                                target: None,
                             };
                             if case.foe == Foe::Elite
                                 && pick_enemy(&world(), level, Foe::Elite).is_none()
