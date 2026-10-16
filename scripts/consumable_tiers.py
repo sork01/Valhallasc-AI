@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Adds the tiered potions and food to world/items.txt: a new tier every ten levels (1, 10, 20 ... 90).
+"""Adds tiered potions and food to world/items.txt (1, 10 ... 90, 95, 99).
 
 Run `python3 scripts/consumable_tiers.py`, then `node scripts/sync-world.cjs` and rebuild Rust. Idempotent: the level-1 items
 (health_potion, mana_potion, traveler_stew) are kept as the first tier and given a `family` and a `price`; every other tier
@@ -11,16 +11,16 @@ import json
 import pathlib
 
 ITEMS = pathlib.Path(__file__).resolve().parents[1] / 'world' / 'items.txt'
-LEVELS = [1] + list(range(10, 100, 10))
-RARITY = ['common', 'uncommon', 'rare', 'epic'] + ['legendary'] * 6
+LEVELS = [1] + list(range(10, 100, 10)) + [95, 99]
+RARITY = ['common', 'uncommon', 'rare', 'epic'] + ['legendary'] * 8
 # About 70% of a warrior's health (120 + 20/level) and 60% of a mana pool (100 + about 21/level) at the tier's level.
-HEAL = [100, 210, 350, 490, 630, 770, 910, 1050, 1190, 1330]
-MANA = [100, 170, 300, 430, 550, 680, 810, 930, 1060, 1190]
-POTION_PRICE = [5, 60, 110, 180, 270, 380, 520, 700, 900, 1150]
-FOOD_PRICE = [3, 25, 45, 75, 115, 165, 225, 300, 390, 500]
-PREFIX = ['', 'Greater ', 'Superior ', 'Grand ', 'Supreme ', 'Heroic ', 'Mythic ', 'Legendary ', 'Divine ', 'Eternal ']
+HEAL = [60, 210, 350, 490, 630, 770, 910, 1050, 1190, 1330, 1400, 1460]
+MANA = [100, 170, 300, 430, 550, 680, 810, 930, 1060, 1190, 1260, 1320]
+POTION_PRICE = [5, 60, 110, 180, 270, 380, 520, 700, 900, 1150, 1275, 1400]
+FOOD_PRICE = [3, 25, 45, 75, 115, 165, 225, 300, 390, 500, 550, 600]
+PREFIX = ['', 'Greater ', 'Superior ', 'Grand ', 'Supreme ', 'Heroic ', 'Mythic ', 'Legendary ', 'Divine ', 'Eternal ', 'Ascendant ', 'Everlasting ']
 FOOD = ["Traveler's Stew", 'Hearty Stew', "Ranger's Feast", "Warden's Feast", "Captain's Banquet", "Champion's Banquet",
-        "Hero's Banquet", "King's Banquet", "Emperor's Banquet", "Immortal's Banquet"]
+        "Hero's Banquet", "King's Banquet", "Emperor's Banquet", "Immortal's Banquet", "Ascendant's Banquet", "Everlasting Banquet"]
 FAMILIES = {
     'health_potion': dict(kind='potion', base='health_potion', name=lambda t: PREFIX[t] + 'Health Potion', price=POTION_PRICE,
                           extra=lambda t: dict(heal=HEAL[t], cooldown=60)),
@@ -44,7 +44,8 @@ def main():
     for family, spec in FAMILIES.items():
         at = next(k for k, i in enumerate(items) if i['id'] == spec['base'])
         first = items[at]
-        first.update(family=family, price=spec['price'][0], sell=max(1, spec['price'][0] // 4), requiredLevel=1)
+        first.update(family=family, price=spec['price'][0], sell=max(1, spec['price'][0] // 4), requiredLevel=1,
+                     **spec['extra'](0))
         new = []
         for t in range(1, len(LEVELS)):
             item = dict(id=tier_id(family, t), name=spec['name'](t), kind=spec['kind'], rarity=RARITY[t],

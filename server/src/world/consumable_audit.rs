@@ -8,22 +8,29 @@ use super::ttk::{CLASSES, Case, Foe, Spread, build_character, pick_enemy};
 use super::wyrd_tests::world;
 use super::*;
 
-/// The levels of the audit: 1, then every ten levels, then 99.
+/// The levels of the audit: 1, then every ten levels, and the two new final tiers.
 pub fn audit_levels() -> Vec<u32> {
     [1].into_iter()
         .chain((1..=9).map(|n| n * 10))
-        .chain([99])
+        .chain([95, 99])
         .collect()
 }
-/// Midpoint of the target kill time of `docs/ttk-rules.md` for the level's band, plus 10 s to find the next monster.
+/// Midpoint of the authoritative target band, plus 10 s to find the next monster.
+/// Level 1 is outside the kill-time grid and retains the original 22.5 s estimate.
 pub fn seconds_per_kill(level: u32) -> f64 {
-    let mid = match level {
-        0..=20 => 22.5,
-        21..=45 => 30.,
-        46..=75 => 37.5,
-        _ => 45.,
-    };
-    mid + 10.
+    if level < 5 {
+        return 32.5;
+    }
+    let bands: Vec<Value> =
+        serde_json::from_str(include_str!("../../../world/ttk-targets.txt")).unwrap();
+    let band = bands
+        .iter()
+        .find(|b| {
+            level >= b["minLevel"].as_u64().unwrap() as u32
+                && level <= b["maxLevel"].as_u64().unwrap() as u32
+        })
+        .unwrap_or_else(|| panic!("no kill-time target for level {level}"));
+    (band["minSeconds"].as_f64().unwrap() + band["maxSeconds"].as_f64().unwrap()) / 2. + 10.
 }
 /// One enemy: damage taken per second by `defense`, and the damage of one hit.
 fn enemy_row(w: &World, id: usize, defense: f64, dodge: f64) -> Value {
@@ -88,6 +95,8 @@ fn consumable_audit() {
                 let dodge = c.dodge_chance();
                 let mana_user = class.resource_type() == "mana";
                 let max_resource = c.max_resource();
+                let health_heal = super::consumables::health_amount(health, &c);
+                let food_heal = super::consumables::health_amount(food, &c);
                 let enemies: Vec<Value> = [ordinary, elite, boss]
                     .iter()
                     .map(|&id| enemy_row(&w, id, defense, dodge))
@@ -101,18 +110,20 @@ fn consumable_audit() {
                 rows.push(json!({
                     "level": level, "class": format!("{class:?}").to_lowercase(), "spread": name,
                     "maxHp": max_hp, "maxMana": if mana_user { max_resource } else { 0. }, "defense": defense, "dodge": dodge,
-                    "potion": {"id": health.id, "heal": health.heal, "pctMaxHp": health.heal / max_hp * 100.,
-                               "price": health.price, "perSecond": health.heal / 60.},
+                    "potion": {"id": health.id, "heal": health_heal, "flat": health.heal,
+                               "pctMaxHp": health_heal / max_hp * 100.,
+                               "price": health.price, "perSecond": health_heal / health.cooldown},
                     "manaPotion": {"id": mana.id, "mana": mana.mana, "pctMaxMana": if mana_user { mana.mana / max_resource * 100. } else { 0. },
                                    "price": mana.price},
-                    "food": {"id": food.id, "heal": food.heal, "mana": food.mana, "pctMaxHp": food.heal / max_hp * 100.,
-                             "perSecond": food.heal / food.duration, "price": food.price},
+                    "food": {"id": food.id, "heal": food_heal, "flat": food.heal, "mana": food.mana,
+                             "pctMaxHp": food_heal / max_hp * 100.,
+                             "perSecond": food_heal / food.duration, "price": food.price},
                     "enemies": enemies,
                     "killsPerHour": kills_per_hour,
                     "goldPerHour": enemies[0]["gold"].as_f64().unwrap() * kills_per_hour,
                     "damagePerHour": hurt_per_hour,
-                    "potionsPerHour": hurt_per_hour / health.heal,
-                    "potionGoldPerHour": hurt_per_hour / health.heal * health.price as f64,
+                    "potionsPerHour": hurt_per_hour / health_heal,
+                    "potionGoldPerHour": hurt_per_hour / health_heal * health.price as f64,
                     "continuousPotionGoldPerHour": 60. * health.price as f64,
                 }));
             }
@@ -127,8 +138,8 @@ fn consumable_audit() {
 
 #[test]
 fn the_audit_rows_use_the_documented_levels_and_positive_numbers() {
-    assert_eq!(audit_levels().len(), 11);
+    assert_eq!(audit_levels().len(), 12);
     assert_eq!(audit_levels()[..3], [1, 10, 20]);
-    assert_eq!(audit_levels()[10], 99);
+    assert_eq!(audit_levels()[10..], [95, 99]);
     assert!(seconds_per_kill(5) < seconds_per_kill(99));
 }

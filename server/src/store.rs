@@ -141,6 +141,7 @@ impl Store {
         let mut c = Character {
             id: Uuid::new_v4().to_string(),
             hp: look.class.health(),
+            health_curve_version: 1,
             resource: None,
             look,
             x: spawn.x,
@@ -453,6 +454,11 @@ fn decode(state: &str) -> Result<Character, Box<dyn std::error::Error>> {
     // Catalog growth (new starter pieces) and the look layers reach existing saves here.
     character.grant_missing_starters();
     character.sync_look();
+    if character.health_curve_version == 0 {
+        let ratio = (character.hp / character.legacy_max_hp()).clamp(0., 1.);
+        character.hp = (character.max_hp() * ratio).round();
+        character.health_curve_version = 1;
+    }
     Ok(character)
 }
 fn hash(token: &str) -> String {
@@ -462,6 +468,26 @@ fn hash(token: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn old_saved_health_is_rescaled_once_without_reviving_the_dead() {
+        let mut old = Character::mercenary(crate::model::Class::Warrior, 50, "Veteran");
+        old.health_curve_version = 0;
+        old.hp = old.legacy_max_hp() * 0.4;
+        let saved = serde_json::to_string(&old).unwrap();
+        let upgraded = decode(&saved).unwrap();
+        assert_eq!(upgraded.health_curve_version, 1);
+        assert!((upgraded.hp / upgraded.max_hp() - 0.4).abs() < 0.001);
+        let again = decode(&serde_json::to_string(&upgraded).unwrap()).unwrap();
+        assert_eq!(
+            again.hp, upgraded.hp,
+            "a second login cannot heal the character"
+        );
+
+        old.hp = 0.;
+        let dead = decode(&serde_json::to_string(&old).unwrap()).unwrap();
+        assert_eq!(dead.hp, 0.);
+    }
     #[test]
     fn gender_is_kept_through_create_save_and_load() {
         let mut s = Store::open(std::path::Path::new(":memory:")).unwrap();

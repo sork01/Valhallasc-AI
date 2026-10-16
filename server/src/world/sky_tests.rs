@@ -1156,10 +1156,10 @@ fn duel_probe() {
 }
 
 #[test]
-fn the_last_ward_is_a_group_job_a_lone_hero_falls_again_and_again_and_a_hired_priest_carries_it() {
+fn the_last_ward_can_be_held_alone_or_with_a_hired_priest() {
     let alone = ward_fight("sky_ward_last", &["sky_quills"], 35, &[], 200.);
     assert!(
-        !alone.held && alone.deaths >= 3,
+        alone.held && alone.count >= 120 && alone.deaths == 0,
         "alone: {} s counted, {} deaths",
         alone.count,
         alone.deaths
@@ -1171,9 +1171,10 @@ fn the_last_ward_is_a_group_job_a_lone_hero_falls_again_and_again_and_a_hired_pr
         pair.count, pair.deaths
     );
     assert!(
-        pair.seconds >= 119.,
-        "a real wait, not a pull: {} s",
-        pair.seconds
+        pair.seconds >= 119. && pair.count >= 120,
+        "the full ward must be held: {} s, {} counted",
+        pair.seconds,
+        pair.count
     );
     assert!(pair.deaths <= 2, "{} deaths", pair.deaths);
 }

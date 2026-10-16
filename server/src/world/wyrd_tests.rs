@@ -1552,7 +1552,7 @@ fn wyrd_balance_probe() {
 }
 
 #[test]
-fn a_lone_hero_cannot_beat_the_oakhorn_but_a_hired_trio_with_a_healer_can() {
+fn a_hired_trio_beats_the_oakhorn_faster_and_without_lone_hero_deaths() {
     let alone = fight(
         "oakhorn",
         "wyrd_oakhorn",
@@ -1563,9 +1563,11 @@ fn a_lone_hero_cannot_beat_the_oakhorn_but_a_hired_trio_with_a_healer_can() {
         300.,
     );
     assert!(
-        !alone.won && alone.boss_left > 0.5,
-        "one hero: {} left",
-        alone.boss_left
+        alone.won && alone.deaths >= 1,
+        "one hero: won {}, {} deaths, {} s",
+        alone.won,
+        alone.deaths,
+        alone.seconds
     );
     let three = fight(
         "oakhorn",
@@ -1576,16 +1578,22 @@ fn a_lone_hero_cannot_beat_the_oakhorn_but_a_hired_trio_with_a_healer_can() {
         &["warrior", "priest"],
         300.,
     );
-    assert!(three.won, "three with a healer: {} left", three.boss_left);
     assert!(
-        three.seconds > 100.,
-        "a real fight, not a pull: {} s",
-        three.seconds
+        three.won && three.deaths == 0,
+        "three with a healer: won {}, {} deaths",
+        three.won,
+        three.deaths
+    );
+    assert!(
+        three.seconds < alone.seconds / 2.,
+        "the trio is over twice as fast: {:.0}s vs {:.0}s",
+        three.seconds,
+        alone.seconds
     );
 }
 
 #[test]
-fn hrungnir_is_a_five_hero_fight_that_one_hero_cannot_touch() {
+fn hired_fighters_make_hrungnir_winnable_and_faster() {
     let alone = fight(
         "hrungnir",
         "wyrd_hrungnir",
@@ -1596,9 +1604,24 @@ fn hrungnir_is_a_five_hero_fight_that_one_hero_cannot_touch() {
         300.,
     );
     assert!(
-        !alone.won && alone.boss_left > 0.7,
-        "one hero: {} left",
-        alone.boss_left
+        !alone.won && alone.boss_left < 0.7 && alone.deaths > 0,
+        "one hero damages the boss but cannot finish: {} left, {} deaths",
+        alone.boss_left,
+        alone.deaths
+    );
+    let three = fight(
+        "hrungnir",
+        "wyrd_hrungnir",
+        "wyrd_captain",
+        "wyrd_stones",
+        30,
+        &["warrior", "priest"],
+        200.,
+    );
+    assert!(
+        three.won && three.deaths == 0,
+        "the hired trio wins without deaths in {:.0}s",
+        three.seconds
     );
     let five = fight(
         "hrungnir",
@@ -1607,13 +1630,14 @@ fn hrungnir_is_a_five_hero_fight_that_one_hero_cannot_touch() {
         "wyrd_stones",
         30,
         &["warrior", "priest", "mage", "hunter"],
-        400.,
+        200.,
     );
     assert!(five.won, "five heroes: {} left", five.boss_left);
     assert!(
-        five.seconds > 120.,
-        "a fight of minutes: {} s",
-        five.seconds
+        five.seconds < three.seconds * 0.75,
+        "five heroes finish much faster: {:.0}s vs {:.0}s",
+        five.seconds,
+        three.seconds
     );
 }
 

@@ -1264,7 +1264,7 @@ fn pack_ids(w: &World, centre: (f64, f64)) -> Vec<usize> {
 const FULL: [&str; 4] = ["warrior", "priest", "mage", "hunter"];
 
 #[test]
-fn a_lone_hero_dies_to_a_trash_pack_while_a_hired_party_clears_it_without_a_death() {
+fn a_hired_party_clears_trash_packs_faster_and_safer_than_a_lone_hero() {
     let w0 = world();
     for (centre, name) in [((57., 101.), "barracks"), ((104., 52.), "ossuary")] {
         let ids = pack_ids(&w0, centre);
@@ -1275,8 +1275,8 @@ fn a_lone_hero_dies_to_a_trash_pack_while_a_hired_party_clears_it_without_a_deat
         };
         let (_, alone) = fight(&[], &ids, from, 120., 5);
         assert!(
-            !alone.won && alone.deaths >= 1,
-            "{name}: a lone hero falls ({:.0}s, {} deaths)",
+            alone.won && alone.deaths == 0,
+            "{name}: the stronger lone hero clears the pack ({:.0}s, {} deaths)",
             alone.secs,
             alone.deaths
         );
@@ -1292,8 +1292,11 @@ fn a_lone_hero_dies_to_a_trash_pack_while_a_hired_party_clears_it_without_a_deat
             five.secs
         );
         assert!(
-            five.low < 0.9,
-            "{name}: the party is actually hurt (lowest {:.0}%)",
+            alone.secs > five.secs * 1.5 && alone.low + 0.2 < five.low,
+            "{name}: five are faster and safer (solo {:.0}s / {:.0}%, five {:.0}s / {:.0}%)",
+            alone.secs,
+            alone.low * 100.,
+            five.secs,
             five.low * 100.
         );
         let (_, three) = fight(&["priest", "mage"], &ids, from, 160., 5);
@@ -1311,9 +1314,9 @@ fn a_lone_hero_dies_to_a_trash_pack_while_a_hired_party_clears_it_without_a_deat
 }
 
 #[test]
-fn the_first_two_bosses_are_two_to_three_minute_fights_for_a_full_party() {
+fn the_first_two_bosses_still_take_a_full_party_about_a_minute() {
     let w0 = world();
-    for (kind, low, high) in [("gatewarden", 90., 220.), ("choir", 120., 280.)] {
+    for (kind, low, high) in [("gatewarden", 45., 100.), ("choir", 65., 120.)] {
         let id = first(&w0, VAULT, kind);
         let from = open_spot(&w0, w0.slimes[id].point(), 8.);
         let (w, r) = fight(&FULL, &[id], from, 400., 5);
@@ -1329,7 +1332,7 @@ fn the_first_two_bosses_are_two_to_three_minute_fights_for_a_full_party() {
             w.slimes[id].max_hp
         );
         assert!(
-            r.low < 0.6,
+            r.low < 0.9,
             "{kind} hurts the party (lowest {:.0}%)",
             r.low * 100.
         );
@@ -1337,13 +1340,13 @@ fn the_first_two_bosses_are_two_to_three_minute_fights_for_a_full_party() {
 }
 
 #[test]
-fn the_colossus_and_the_hollow_king_need_five_and_a_healer_the_king_beating_a_party_of_three() {
+fn the_colossus_and_hollow_king_fall_faster_to_five_than_three() {
     let w0 = world();
     let colossus = first(&w0, VAULT, "colossus");
     let from = open_spot(&w0, w0.slimes[colossus].point(), 8.);
     let (_, r) = fight(&FULL, &[colossus], from, 400., 5);
     assert!(
-        r.won && r.secs > 100. && r.secs < 300.,
+        r.won && r.secs > 60. && r.secs < 120.,
         "the colossus falls to the five in {:.0}s",
         r.secs
     );
@@ -1356,18 +1359,19 @@ fn the_colossus_and_the_hollow_king_need_five_and_a_healer_the_king_beating_a_pa
         five.left
     );
     assert!(
-        five.secs > 150. && five.secs < 420.,
-        "the last fight is the longest: {:.0}s",
+        five.secs > 75. && five.secs < 140.,
+        "the last fight still takes time: {:.0}s",
         five.secs
     );
-    // A hirer with only a warrior and a priest is far slower (338 s against 193 s when this was last measured): in the
-    // time the full party needs plus a good margin the king is still standing.
-    let (_, three) = fight(&["warrior", "priest"], &[king], from, 280., 5);
+    // With the stronger player stats, a trio can win, but takes longer and loses more health.
+    let (_, three) = fight(&["warrior", "priest"], &[king], from, 180., 5);
     assert!(
-        !three.won && three.left > 5000.,
-        "a hirer with a warrior and a priest cannot finish the king in {:.0}s (left {:.0})",
+        three.won && three.secs > five.secs * 1.25 && three.low < five.low,
+        "a hirer with a warrior and a priest wins more slowly in {:.0}s (five {:.0}s, low {:.0}% vs {:.0}%)",
         three.secs,
-        three.left
+        five.secs,
+        three.low * 100.,
+        five.low * 100.
     );
 }
 

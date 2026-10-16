@@ -12,6 +12,16 @@ pub(super) fn resource_amount(it: &Item, c: &Character) -> f64 {
     }
 }
 
+/// Food and health potions keep their catalog floor, but heal at least 40% of
+/// the drinker's maximum health. This also applies to old stacks after a level-up.
+pub(super) fn health_amount(it: &Item, c: &Character) -> f64 {
+    if it.heal <= 0. {
+        0.
+    } else {
+        it.heal.max((c.max_hp() * 0.4).round())
+    }
+}
+
 impl World {
     pub(super) fn use_item(&mut self, session: u64, id: &str) {
         let Some(p) = self.players.get_mut(&session) else {
@@ -62,7 +72,7 @@ impl World {
             p.buffs.push(Buff {
                 id: it.id.clone(),
                 kind: BuffKind::Regen,
-                amount: it.heal / it.duration,
+                amount: health_amount(it, &p.character) / it.duration,
                 left: it.duration,
                 time: it.duration,
             });
@@ -76,7 +86,7 @@ impl World {
                 return refuse(p, &text);
             }
             let before = p.character.hp;
-            p.character.hp = (before + it.heal).min(max);
+            p.character.hp = (before + health_amount(it, &p.character)).min(max);
             healed = (p.character.hp - before).round();
             if it.mana > 0. {
                 let before = p.character.resource();

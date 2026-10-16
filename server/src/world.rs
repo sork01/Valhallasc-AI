@@ -5417,11 +5417,12 @@ mod tests {
     }
 
     #[test]
-    fn a_hirer_with_four_mercenaries_takes_the_gloomroot_and_one_with_two_does_not() {
+    fn four_mercenaries_take_the_gloomroot_faster_than_two() {
         // The hirer is a trained level-20 warrior; the four seats are the server's AI: a warrior, a priest, a mage and a hunter.
-        for (classes, wins) in [
-            (vec!["warrior", "priest", "mage", "hunter"], true),
-            (vec!["warrior", "priest"], false),
+        let mut outcomes = Vec::new();
+        for classes in [
+            vec!["warrior", "priest", "mage", "hunter"],
+            vec!["warrior", "priest"],
         ] {
             let mut w = world();
             w.rng = 5;
@@ -5502,18 +5503,7 @@ mod tests {
                     break;
                 }
             }
-            assert_eq!(
-                w.slimes[id].dead, wins,
-                "{classes:?}: enemy HP {} of {}, {deaths} deaths, time {:.0}",
-                w.slimes[id].hp, w.slimes[id].max_hp, w.time
-            );
-            if wins {
-                assert!(
-                    w.time >= 120.,
-                    "the fight lasts at least two minutes: {:.0} s",
-                    w.time
-                );
-                assert!(deaths <= 3, "and lose at most three: {deaths}");
+            if w.slimes[id].dead {
                 assert_eq!(
                     w.players[&1]
                         .character
@@ -5526,7 +5516,14 @@ mod tests {
                     "the hirer is credited, whoever landed the blow"
                 );
             }
+            outcomes.push((w.slimes[id].dead, w.time, deaths, w.slimes[id].hp));
         }
+        let (five, three) = (outcomes[0], outcomes[1]);
+        assert!(five.0 && five.2 <= 3, "five: {five:?}");
+        assert!(
+            !three.0 || three.1 > five.1 * 1.25,
+            "the smaller party is slower: five {five:?}, three {three:?}"
+        );
     }
 
     #[test]
@@ -8376,7 +8373,11 @@ mod tests {
             Some("headgear_upgrade")
         );
         let helm = item("headgear_upgrade").unwrap();
-        let expected: (f64, f64) = (22. + 60. + 4. + helm.attack, 3. + helm.defense);
+        let expected: (f64, f64) = (
+            (22. + 60. + 4. + helm.attack)
+                * crate::items::player_attack_scale(saved.look.class, saved.level),
+            3. + helm.defense,
+        );
         assert!(
             (saved.stats().0 - expected.0).abs() < 1e-9
                 && (saved.stats().1 - expected.1).abs() < 1e-9
@@ -12428,14 +12429,14 @@ mod tests {
         w.use_item(1, "health_potion");
         assert_eq!(
             (hp(&w), have(&w, "health_potion")),
-            (101., 2),
-            "100 HP, immediately"
+            (61., 2),
+            "60 HP, immediately"
         );
         let seen = drain(&mut rx);
         let drunk = seen.iter().find(|m| m["kind"] == "consume").unwrap();
         assert_eq!(
             (drunk["item"].as_str(), drunk["value"].as_f64()),
-            (Some("health_potion"), Some(100.))
+            (Some("health_potion"), Some(60.))
         );
         assert!(
             (w.snapshot_for(0)["players"][0]["potionCd"]
@@ -12463,7 +12464,7 @@ mod tests {
         w.use_item(1, "health_potion");
         assert_eq!(
             (hp(&w), have(&w, "health_potion")),
-            (101., 1),
+            (61., 1),
             "ready after 60 s"
         );
         // Healing stops at the maximum.
@@ -12533,7 +12534,7 @@ mod tests {
     }
 
     #[test]
-    fn food_heals_a_hundred_over_eight_seconds_and_only_one_meal_works_at_a_time() {
+    fn food_heals_sixty_over_eight_seconds_and_only_one_meal_works_at_a_time() {
         let mut w = world();
         let mut rx = join(&mut w, 1, Class::Warrior);
         stock(&mut w, "traveler_stew", 3);
@@ -12556,7 +12557,7 @@ mod tests {
         );
         seconds(&mut w, 4.);
         assert!(
-            (hp(&w) - 51.).abs() < 1.,
+            (hp(&w) - 31.).abs() < 1.,
             "half after four seconds, got {}",
             hp(&w)
         );
@@ -12573,14 +12574,14 @@ mod tests {
         ticks.extend(refused.into_iter().filter(|m| m["kind"] == "regen"));
         seconds(&mut w, 4.1);
         assert!(
-            (hp(&w) - 101.).abs() < 0.01,
-            "exactly 100 in all, got {}",
+            (hp(&w) - 61.).abs() < 0.01,
+            "exactly 60 in all, got {}",
             hp(&w)
         );
         assert!(w.players[&1].buffs.is_empty());
         seconds(&mut w, 2.);
         assert!(
-            (hp(&w) - 101.).abs() < 0.01,
+            (hp(&w) - 61.).abs() < 0.01,
             "the meal does not keep healing"
         );
         // The announced pieces add up to the meal, about once a second.
@@ -12592,7 +12593,7 @@ mod tests {
         );
         let total: f64 = ticks.iter().map(|m| m["value"].as_f64().unwrap()).sum();
         assert!(
-            (total - 100.).abs() <= ticks.len() as f64 * 0.5,
+            (total - 60.).abs() <= ticks.len() as f64 * 0.5,
             "announced {total}"
         );
         // Once it is over another can be eaten.
@@ -12600,7 +12601,7 @@ mod tests {
         w.use_item(1, "traveler_stew");
         assert_eq!(have(&w, "traveler_stew"), 1);
         seconds(&mut w, 8.1);
-        assert!((hp(&w) - 101.).abs() < 0.01);
+        assert!((hp(&w) - 61.).abs() < 0.01);
     }
 
     #[test]
@@ -12623,11 +12624,7 @@ mod tests {
         w.use_item(1, "traveler_stew");
         seconds(&mut w, 1.);
         w.use_item(1, "health_potion");
-        assert!(
-            hp(&w) > 100.,
-            "the potion lands during the meal: {}",
-            hp(&w)
-        );
+        assert!(hp(&w) > 60., "the potion lands during the meal: {}", hp(&w));
         // Dying ends the meal.
         stock(&mut w, "traveler_stew", 1);
         w.players.get_mut(&1).unwrap().character.hp = 0.;

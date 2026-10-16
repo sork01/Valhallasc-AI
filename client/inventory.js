@@ -14,7 +14,14 @@
   const spare = s => definition(s.item)?.starter ? 0 : bagQuantity(s.item);
   const consumable = i => i && ['food', 'potion'].includes(i.kind);
   const compatible = i => i && !['material', 'bag', 'food', 'potion'].includes(i.kind) && (!i.class || i.class === look?.class);
-  const effect = i => { const type = window.Field?.hero?.resourceType || 'mana', amount = type === 'mana' ? i.mana : Math.round(Math.min(1, i.mana / (100 + 15 * ((i.requiredLevel || 1) - 1))) * 100); const restores = [i.heal ? `${i.heal} HP` : '', i.mana ? `${amount} ${type}` : ''].filter(Boolean).join(' and '); const need = (i.requiredLevel || 1) > 1 ? ` · needs level ${i.requiredLevel}` : ''; return (i.kind === 'food' ? `Restores ${restores} over ${i.duration} s · one meal at a time` : `Restores ${restores} at once · ${i.cooldown} s cooldown shared by all potions`) + need; };
+  const effect = i => {
+    const hero = window.Field?.hero || {}, type = hero.resourceType || 'mana';
+    const amount = type === 'mana' ? i.mana : Math.round(Math.min(1, i.mana / (100 + 15 * ((i.requiredLevel || 1) - 1))) * (hero.maxResource || 100));
+    const heal = i.heal ? Math.max(i.heal, Math.round((hero.maxHp || 0) * .4)) : 0;
+    const restores = [heal ? `up to ${heal.toLocaleString()} HP (${Math.round(heal / (hero.maxHp || heal) * 100)}% max)` : '', i.mana ? `${amount} ${type}` : ''].filter(Boolean).join(' and ');
+    const need = (i.requiredLevel || 1) > 1 ? ` · needs level ${i.requiredLevel}` : '';
+    return (i.kind === 'food' ? `Restores ${restores} over ${i.duration} s · one meal at a time` : `Restores ${restores} at once · ${i.cooldown} s cooldown shared by all potions`) + need;
+  };
   const useItem = i => consumable(i) && canEquip() && bagQuantity(i.id) > 0 && Field.useItem(i.id);
   const activate = i => consumable(i) ? useItem(i) : equip(i);
   const num = n => Number(n.toFixed(1));
@@ -74,7 +81,9 @@
     const bagTier = i?.kind === 'bag' ? Math.max(0, Math.min(9, Math.floor((i.requiredLevel || 1) / 10))) : 0;
     const color = i?.kind === 'bag' ? bagColors[bagTier] : palette[i?.id] || palette[i?.family] || (i?.variant === 'crimson' ? '#c16b67' : { uncommon: '#6fcf86', rare: '#86acd5', epic: '#b98be6', legendary: '#f0a85a', gm: '#e8c050' }[i?.rarity] || '#ab8e68');
     const badge = i?.kind === 'bag' ? `<text x="32" y="49" text-anchor="middle" fill="#fff4d8" stroke="#3d291f" stroke-width="1" font-size="12" font-weight="bold">${i.bagSlots}</text>` : '';
-    return `<svg viewBox="0 0 64 64" aria-hidden="true" style="color:${color}" stroke="#15151a" stroke-width="2" stroke-linejoin="round">${art[glyph] || art.accessory}${badge}</svg>`;
+    const tier = consumable(i) && (i.requiredLevel || 1) >= 95 ? `<text x="51" y="55" text-anchor="middle" fill="#fff4d8" stroke="#3d291f" stroke-width="1" font-size="12" font-weight="bold">${i.requiredLevel}</text>` : '';
+    const border = consumable(i) && i.rarity !== 'common' ? `<circle cx="32" cy="32" r="29" fill="none" stroke="${{ uncommon: '#6fcf86', rare: '#86acd5', epic: '#b98be6', legendary: '#f0a85a' }[i.rarity] || '#ab8e68'}" stroke-width="3"/>` : '';
+    return `<svg viewBox="0 0 64 64" aria-hidden="true" style="color:${color}" stroke="#15151a" stroke-width="2" stroke-linejoin="round">${border}${art[glyph] || art.accessory}${badge}${tier}</svg>`;
   }
   function summary(i, count = quantity(i.id)) {
     const copy = displayCopy(i), rarity = displayRarity(i);

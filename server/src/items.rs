@@ -17,6 +17,73 @@ pub const EXTRA_SLOTS: [&str; 7] = [
     "accessory2",
 ];
 
+// Green-gear, even-stat damage calibration from the private kill-time harness. Entries are
+// warrior, mage, assassin, priest, hunter. Interpolation avoids a jump when a character levels.
+// This is part of authoritative attack power, so skills, basic attacks and the displayed stat
+// all use the same value.
+const CLASS_ATTACK_CURVE: &[(u32, [f64; 5])] = &[
+    (5, [0.98, 1.09, 0.69, 1.41, 0.95]),
+    (10, [1.15, 1.15, 0.85, 1.26, 0.93]),
+    (15, [1.13, 0.80, 1.90, 1.00, 0.94]),
+    (20, [2.27, 0.85, 2.52, 1.04, 1.04]),
+    (25, [2.19, 0.98, 2.13, 0.72, 0.92]),
+    (30, [2.31, 0.83, 2.41, 0.85, 0.89]),
+    (35, [2.22, 1.00, 2.52, 0.69, 0.83]),
+    (40, [1.89, 0.77, 2.58, 0.71, 0.89]),
+    (45, [1.60, 0.82, 2.50, 0.61, 0.78]),
+    (50, [1.56, 0.73, 2.60, 0.63, 0.77]),
+    (55, [1.77, 0.78, 2.83, 0.67, 0.81]),
+    (60, [1.94, 0.73, 3.11, 0.75, 0.86]),
+    (65, [1.74, 0.71, 2.76, 0.77, 0.93]),
+    (70, [1.79, 0.70, 3.01, 0.83, 0.98]),
+    (75, [1.86, 0.80, 3.04, 0.84, 0.95]),
+    (80, [1.94, 0.70, 3.01, 0.83, 0.91]),
+    (85, [1.86, 0.69, 2.84, 0.85, 0.93]),
+    (90, [1.70, 0.64, 2.86, 0.82, 0.91]),
+    (95, [1.44, 0.69, 2.88, 0.81, 0.94]),
+    (99, [1.56, 0.57, 2.83, 0.71, 0.93]),
+];
+
+fn class_attack_scale(class: Class, level: u32) -> f64 {
+    let index = match class {
+        Class::Warrior => 0,
+        Class::Mage => 1,
+        Class::Assassin => 2,
+        Class::Priest => 3,
+        Class::Hunter => 4,
+    };
+    let upper = CLASS_ATTACK_CURVE
+        .partition_point(|(at, _)| *at < level)
+        .min(CLASS_ATTACK_CURVE.len() - 1);
+    if upper == 0 {
+        return 1. + (CLASS_ATTACK_CURVE[0].1[index] - 1.) * (level.saturating_sub(1) as f64 / 4.);
+    }
+    let (lo_level, lo) = CLASS_ATTACK_CURVE[upper - 1];
+    let (hi_level, hi) = CLASS_ATTACK_CURVE[upper];
+    let fraction = (level.saturating_sub(lo_level) as f64 / (hi_level - lo_level) as f64).min(1.);
+    lo[index] + (hi[index] - lo[index]) * fraction
+}
+
+// Raise the five-class median against existing monster health to the target time bands.
+const PLAYER_ATTACK_CURVE: &[(u32, f64)] = &[
+    (1, 1.0),
+    (15, 1.0),
+    (20, 1.48),
+    (30, 1.62),
+    (40, 2.83),
+    (50, 5.26),
+    (60, 7.50),
+    (70, 8.19),
+    (80, 8.77),
+    (90, 9.86),
+    (99, 16.56),
+];
+
+pub(crate) fn player_attack_scale(class: Class, level: u32) -> f64 {
+    class_attack_scale(class, level)
+        * crate::model::interpolate_level_scale(PLAYER_ATTACK_CURVE, level)
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Item {
     pub id: String,
@@ -1147,7 +1214,10 @@ impl Character {
             }
             *occurrence += 1;
         }
-        (attack, defense)
+        (
+            attack * player_attack_scale(self.look.class, self.level),
+            defense,
+        )
     }
     pub fn sell_item(&mut self, id: &str, quantity: u32) -> Result<u32, &'static str> {
         let i = item(id).ok_or("Unknown item.")?;
@@ -1407,6 +1477,7 @@ mod tests {
                 let points = c.stat_points();
                 let before = c.stats();
                 let hp = c.max_hp();
+                let health_scale = hp / c.legacy_max_hp();
                 let mana = c.max_resource();
                 c.equip_slots(&slots(&[("hands", &i.id)])).unwrap();
                 assert_eq!(c.gear_attributes(), i.bonus_stats, "{} fixed bonus", i.id);
@@ -1416,8 +1487,11 @@ mod tests {
                     "gear does not spend trained points"
                 );
                 assert!(
-                    (c.stats().0 - before.0 - i.attack - attribute_attack(&i.bonus_stats, class))
-                        .abs()
+                    (c.stats().0
+                        - before.0
+                        - (i.attack + attribute_attack(&i.bonus_stats, class))
+                            * player_attack_scale(class, c.level))
+                    .abs()
                         < 1e-8,
                     "{} attack",
                     i.id
@@ -1431,7 +1505,7 @@ mod tests {
                 );
                 assert_eq!(
                     c.max_hp() - hp,
-                    i.bonus_stats.stamina as f64 * 8.,
+                    i.bonus_stats.stamina as f64 * 8. * health_scale,
                     "{} health",
                     i.id
                 );
@@ -1469,13 +1543,14 @@ mod tests {
         c.level = 20;
         c.add_item(id, 1);
         let hp = c.max_hp();
+        let health_gain = 56. * hp / c.legacy_max_hp();
         let mana = c.max_resource();
         c.hp = hp - 25.;
         c.resource = Some(mana - 15.);
         let points = c.stat_points();
         c.equip_slots(&slots(&[("gloves", id)])).unwrap();
-        assert_eq!(c.max_hp(), hp + 56.);
-        assert_eq!(c.hp, hp - 25. + 56.);
+        assert_eq!(c.max_hp(), hp + health_gain);
+        assert_eq!(c.hp, hp - 25. + health_gain);
         assert_eq!(c.max_resource(), mana + 35.);
         assert_eq!(c.resource(), mana - 15. + 35.);
         assert_eq!(c.stat_points(), points);
@@ -1498,6 +1573,8 @@ mod tests {
             let attack = c.stats().0;
             let defense = c.stats().1;
             let hp = c.max_hp();
+            let attack_gain = 3. * player_attack_scale(class, c.level);
+            let health_gain = 8. * hp / c.legacy_max_hp();
             for stat in [
                 "strength",
                 "agility",
@@ -1509,9 +1586,9 @@ mod tests {
                 c.allocate_stat(stat).unwrap();
             }
             assert_eq!(c.stat_points(), 0);
-            assert_eq!(c.stats().0, attack + 3.);
+            assert!((c.stats().0 - attack - attack_gain).abs() < 1e-9);
             assert_eq!(c.stats().1, defense + 0.2);
-            assert_eq!(c.max_hp(), hp + 8.);
+            assert_eq!(c.max_hp(), hp + health_gain);
             assert_eq!(c.hp, c.max_hp());
             assert!(c.dodge_chance() > 0. && c.hit_chance() > 0.90);
             assert!(c.attack_cooldown() < class.cooldown());
@@ -1686,9 +1763,13 @@ mod tests {
                 .iter()
                 .filter(|i| i.family.as_deref() == Some(family))
                 .collect();
-            assert_eq!(tiers.len(), 10, "{family}");
+            assert_eq!(tiers.len(), 12, "{family}");
             let levels: Vec<u32> = tiers.iter().map(|i| i.required_level).collect();
-            assert_eq!(levels, [1, 10, 20, 30, 40, 50, 60, 70, 80, 90], "{family}");
+            assert_eq!(
+                levels,
+                [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99],
+                "{family}"
+            );
             for pair in tiers.windows(2) {
                 let (a, b) = (pair[0], pair[1]);
                 assert!(
@@ -1716,7 +1797,7 @@ mod tests {
         assert_eq!(best_tier("mana_potion", 25).unwrap().id, "mana_potion_l20");
         assert_eq!(
             best_tier("traveler_stew", 100).unwrap().id,
-            "traveler_stew_l90"
+            "traveler_stew_l99"
         );
         assert!(best_tier("not_a_family", 20).is_none());
         // A mana-using mercenary of level 20 carries the level-20 potions of both lines.
@@ -2165,8 +2246,11 @@ mod tests {
             c.equip_slots(&slots(&[(slot, &i.id)])).unwrap();
             let equipped = c.stats();
             assert!(
-                (equipped.0 - naked.0 - i.attack - attribute_attack(&i.bonus_stats, c.look.class))
-                    .abs()
+                (equipped.0
+                    - naked.0
+                    - (i.attack + attribute_attack(&i.bonus_stats, c.look.class))
+                        * player_attack_scale(c.look.class, c.level))
+                .abs()
                     < 1e-8,
                 "{} attack",
                 i.id
@@ -2333,9 +2417,13 @@ mod tests {
         let base15 = c.stats();
         c.equip_slots(&slots(&[("hands", "warrior_weapon_sword_l15_blue")]))
             .unwrap();
-        assert_eq!(
-            c.stats().0,
-            base15.0 - 4. + royal.attack + attribute_attack(&royal.bonus_stats, c.look.class),
+        assert!(
+            (c.stats().0
+                - base15.0
+                - (-4. + royal.attack + attribute_attack(&royal.bonus_stats, c.look.class))
+                    * player_attack_scale(c.look.class, c.level))
+            .abs()
+                < 1e-9,
             "sword out, royal in"
         );
         assert_eq!(
@@ -2353,7 +2441,10 @@ mod tests {
         assert_eq!(c.gear().1, "sword_l15_blue");
         assert_eq!(
             c.stats(),
-            (base.0 - 4., base.1),
+            (
+                base.0 - 4. * player_attack_scale(c.look.class, c.level),
+                base.1,
+            ),
             "the sword is off and the Royal Sword is dormant"
         );
         // ... and what is already worn never blocks an unrelated change.
@@ -2674,7 +2765,10 @@ mod tests {
         let passive_defense = passive.strength as f64 * 0.2;
         let (attack, defense) = c.stats();
         assert!(
-            (attack - (22. + 80. + 4. + passive_attack + head.attack + 2. * ring.attack)).abs()
+            (attack
+                - (22. + 80. + 4. + passive_attack + head.attack + 2. * ring.attack)
+                    * player_attack_scale(c.look.class, c.level))
+            .abs()
                 < 1e-9
         );
         assert!((defense - (3. + passive_defense + head.defense + 2. * ring.defense)).abs() < 1e-9);
@@ -2692,7 +2786,8 @@ mod tests {
         close(
             c.stats(),
             (
-                106. + passive_attack + head.attack + ring.attack,
+                (106. + passive_attack + head.attack + ring.attack)
+                    * player_attack_scale(c.look.class, c.level),
                 3. + passive_defense + head.defense + ring.defense,
             ),
         );
@@ -2701,7 +2796,8 @@ mod tests {
         close(
             c.stats(),
             (
-                102. + passive_attack + head.attack + ring.attack,
+                (102. + passive_attack + head.attack + ring.attack)
+                    * player_attack_scale(c.look.class, c.level),
                 passive_defense + head.defense + ring.defense,
             ),
         );

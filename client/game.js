@@ -612,7 +612,7 @@
     clearTimeout(luTimer); luTimer = setTimeout(() => { luBanner.hidden = true; luBanner.classList.remove('show'); luFlash.classList.remove('show'); }, calm ? 3200 : 5200);
   }
   function renderBuffs(list) {
-    const key = list.map(b => b.id).join();
+    const key = `${Field.hero?.maxHp || 0}:${list.map(b => b.id).join()}`;
     if (buffBar.dataset.key !== key) {
       buffBar.dataset.key = key;
       buffBar.replaceChildren(...list.map(b => {

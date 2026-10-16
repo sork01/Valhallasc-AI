@@ -574,7 +574,11 @@ mod tests {
         c.prefer_gear_instance(copies[1]).unwrap();
         assert!(!c.gear_instance_equipped(copies[0]));
         assert!(c.gear_instance_equipped(copies[1]));
-        assert_eq!(c.stats().0, before + 10.);
+        assert!(
+            (c.stats().0 - before - 10. * crate::items::player_attack_scale(c.look.class, c.level))
+                .abs()
+                < 1e-9
+        );
         let loaded: Character = serde_json::from_str(&serde_json::to_string(&c).unwrap()).unwrap();
         assert!(loaded.gear_instance_equipped(copies[1]));
         assert_eq!(loaded.stats(), c.stats());

@@ -306,6 +306,9 @@ pub struct Character {
     pub x: f64,
     pub y: f64,
     pub hp: f64,
+    /// The old absolute HP save is rescaled once to the larger level-based health pool on load.
+    #[serde(default)]
+    pub health_curve_version: u8,
     /// Saved mana; missing legacy values start full. Energy and rage reset on joining.
     #[serde(default)]
     pub resource: Option<f64>,
@@ -394,6 +397,7 @@ impl Character {
         let mut c = Character {
             id: uuid::Uuid::new_v4().to_string(),
             hp: class.health(),
+            health_curve_version: 1,
             resource: None,
             look,
             x: 0.,
@@ -445,6 +449,41 @@ impl Character {
         c.reset_resource();
         c
     }
+}
+
+// Monster damage rises far faster than the old linear player health formula. Keep the old
+// formula as the stat/gear baseline and grow its result with level. A saved character's current
+// health is migrated proportionally on load, so reconnecting does not leave them almost dead.
+const PLAYER_HEALTH_CURVE: &[(u32, f64)] = &[
+    (1, 1.0),
+    (10, 1.0),
+    (15, 1.5),
+    (20, 3.0),
+    (30, 4.0),
+    (40, 5.0),
+    (50, 8.0),
+    (60, 11.0),
+    (70, 14.0),
+    (80, 18.0),
+    (90, 20.0),
+    (99, 36.0),
+];
+
+pub(crate) fn interpolate_level_scale(points: &[(u32, f64)], level: u32) -> f64 {
+    let upper = points
+        .partition_point(|(at, _)| *at < level)
+        .min(points.len() - 1);
+    if upper == 0 {
+        return points[0].1;
+    }
+    let (lo_level, lo) = points[upper - 1];
+    let (hi_level, hi) = points[upper];
+    let fraction = (level.saturating_sub(lo_level) as f64 / (hi_level - lo_level) as f64).min(1.);
+    lo + (hi - lo) * fraction
+}
+
+fn player_health_scale(level: u32) -> f64 {
+    interpolate_level_scale(PLAYER_HEALTH_CURVE, level)
 }
 /// Every zone is cut into this many cells a side for the fog of war: nine spots to uncover per map.
 pub const FOG_GRID: usize = 3;
@@ -513,6 +552,9 @@ impl Character {
         });
     }
     pub fn max_hp(&self) -> f64 {
+        self.legacy_max_hp() * player_health_scale(self.level)
+    }
+    pub fn legacy_max_hp(&self) -> f64 {
         self.look.class.health()
             + self.level.saturating_sub(1) as f64 * 20.
             + self.effective_attributes().stamina as f64 * 8.

@@ -452,7 +452,7 @@
     "kind": "food",
     "rarity": "common",
     "sell": 1,
-    "heal": 100,
+    "heal": 60,
     "duration": 8,
     "mana": 100,
     "family": "traveler_stew",
@@ -577,12 +577,38 @@
     "price": 500
   },
   {
+    "id": "traveler_stew_l95",
+    "name": "Ascendant's Banquet",
+    "kind": "food",
+    "rarity": "legendary",
+    "requiredLevel": 95,
+    "sell": 137,
+    "heal": 1400,
+    "duration": 8,
+    "mana": 1260,
+    "family": "traveler_stew",
+    "price": 550
+  },
+  {
+    "id": "traveler_stew_l99",
+    "name": "Everlasting Banquet",
+    "kind": "food",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 150,
+    "heal": 1460,
+    "duration": 8,
+    "mana": 1320,
+    "family": "traveler_stew",
+    "price": 600
+  },
+  {
     "id": "health_potion",
     "name": "Health Potion",
     "kind": "potion",
     "rarity": "common",
     "sell": 1,
-    "heal": 100,
+    "heal": 60,
     "cooldown": 60,
     "family": "health_potion",
     "price": 5,
@@ -695,6 +721,30 @@
     "cooldown": 60,
     "family": "health_potion",
     "price": 1150
+  },
+  {
+    "id": "health_potion_l95",
+    "name": "Ascendant Health Potion",
+    "kind": "potion",
+    "rarity": "legendary",
+    "requiredLevel": 95,
+    "sell": 318,
+    "heal": 1400,
+    "cooldown": 60,
+    "family": "health_potion",
+    "price": 1275
+  },
+  {
+    "id": "health_potion_l99",
+    "name": "Everlasting Health Potion",
+    "kind": "potion",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 350,
+    "heal": 1460,
+    "cooldown": 60,
+    "family": "health_potion",
+    "price": 1400
   },
   {
     "id": "hunter_armor_scout",
@@ -9883,6 +9933,30 @@
     "cooldown": 60,
     "family": "mana_potion",
     "price": 1150
+  },
+  {
+    "id": "mana_potion_l95",
+    "name": "Ascendant Mana Potion",
+    "kind": "potion",
+    "rarity": "legendary",
+    "requiredLevel": 95,
+    "sell": 318,
+    "mana": 1260,
+    "cooldown": 60,
+    "family": "mana_potion",
+    "price": 1275
+  },
+  {
+    "id": "mana_potion_l99",
+    "name": "Everlasting Mana Potion",
+    "kind": "potion",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 350,
+    "mana": 1320,
+    "cooldown": 60,
+    "family": "mana_potion",
+    "price": 1400
   },
   {
     "id": "warrior_armor_gm",

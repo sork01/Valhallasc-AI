@@ -9,7 +9,11 @@ classes=(warrior mage assassin priest hunter)
 pids=()
 reports=()
 for class in "${classes[@]}"; do
-  TTK_CLASSES="$class" TTK_OUT="$run_dir/$class.json" bash scripts/ttk.sh >"$run_dir/$class.log" 2>&1 &
+  if [[ -n "${TTK_TEST_BINARY:-}" ]]; then
+    TTK_CLASSES="$class" TTK_OUT="$run_dir/$class.json" "$TTK_TEST_BINARY" ttk_report --ignored --nocapture >"$run_dir/$class.log" 2>&1 &
+  else
+    TTK_CLASSES="$class" TTK_OUT="$run_dir/$class.json" bash scripts/ttk.sh >"$run_dir/$class.log" 2>&1 &
+  fi
   pids+=("$!")
   reports+=("$run_dir/$class.json")
 done

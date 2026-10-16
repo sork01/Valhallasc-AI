@@ -229,6 +229,46 @@ fn food_restores_mana_at_full_health_and_potions_share_cooldown_without_wasting_
         assert!(w.players[&1].potion_cd > 0.);
     }
 }
+
+#[test]
+fn old_health_stacks_scale_with_high_level_health_and_final_tiers_unlock_at_95_and_99() {
+    let (mut w, _) = setup(Class::Warrior);
+    assert_eq!(
+        crate::items::best_tier("health_potion", 94)
+            .unwrap()
+            .required_level,
+        90
+    );
+    assert_eq!(
+        crate::items::best_tier("health_potion", 95)
+            .unwrap()
+            .required_level,
+        95
+    );
+    assert_eq!(
+        crate::items::best_tier("health_potion", 99)
+            .unwrap()
+            .required_level,
+        99
+    );
+    let p = w.players.get_mut(&1).unwrap();
+    p.character.level = 99;
+    p.character.hp = 1.;
+    p.character.add_item("health_potion", 1);
+    p.character.add_item("traveler_stew", 1);
+    let heal = (p.character.max_hp() * 0.4).round();
+    w.use_item(1, "health_potion");
+    assert_eq!(w.players[&1].character.hp, 1. + heal);
+    assert_eq!(w.players[&1].character.quantity("health_potion"), 0);
+    w.players.get_mut(&1).unwrap().character.hp = 1.;
+    w.use_item(1, "traveler_stew");
+    let meal = w.players[&1]
+        .buffs
+        .iter()
+        .find(|b| b.kind == BuffKind::Regen)
+        .unwrap();
+    assert_eq!(meal.amount * meal.time, heal);
+}
 #[test]
 fn mana_survives_resume_while_rage_and_energy_reset_and_death_respawns_correctly() {
     for class in [

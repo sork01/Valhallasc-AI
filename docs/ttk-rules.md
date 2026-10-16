@@ -23,18 +23,19 @@ These settle `TTK-RULES` in [TODO.md](../TODO.md). `TTK-HARNESS` builds the test
 
 | Level band | Target | Too fast | Too slow |
 | --- | --- | --- | --- |
-| 5–20 | 15–30 s | under 10 s | over 45 s |
+| 5–10 | 6–15 s | under 5 s | over 20 s |
+| 15–20 | 15–30 s | under 10 s | over 45 s |
 | 25–45 | 20–40 s | under 12 s | over 60 s |
 | 50–75 | 25–50 s | under 15 s | over 75 s |
 | 80–99 | 30–60 s | under 18 s | over 90 s |
 
-The levels 5–20 band is the pacing the project already confirmed ("a mob in about 15–30 s"). Later bands allow longer fights because rotations get longer, and they are the starting point for `TTK-TUNE`.
+The level 5–10 band preserves the early fights after the owner's 2026-10-15 decision to keep every monster stat unchanged and raise player damage and health for later progression. Level 15–20 retains the confirmed 15–30 s pace. Later bands allow longer fights as rotations grow.
 
 Further rules:
 
 - The `damage` and `stamina` variants must stay within 0.6–1.6 times the `even` median (no variant breaks the band by itself).
 - The basic-attack-only run must kill within 2.5 times the target ceiling; a class that cannot kill without its skills is flagged.
-- A class whose median differs from the cross-class median at the same level by more than 1.6 times either way is flagged.
+- At each level the slowest class median must be no more than 1.3 times the fastest class median.
 - Damage taken is recorded with every case. A case where the character finishes under 20% HP is flagged even if it is inside the band.
 
 ## Report

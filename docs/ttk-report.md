@@ -10,24 +10,24 @@ Each cell is **median kill seconds / damage per landed monster hit**. `FAIL` mea
 
 | Level | Enemy | Warrior | Mage | Assassin | Priest | Hunter |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: |
-| 5 | beetle | 7.9 s / 2 | 8.6 s / 2 | 5.7 s / 2 | 8.8 s / 2 | 6.1 s / 2 |
-| 10 | crab | 10.4 s / 9 | 14.3 s / 10 | 11.8 s / 10 | 13.4 s / 10 | 10.5 s / 10 |
-| 15 | toad | 21.2 s / 15 | 16.7 s / 17 | 42 s / 16 | 19.6 s / 16 | 17.6 s / 16 |
-| 20 | hydra | 78.6 s / 25 FAIL | 32.9 s / 30 | 120 s / 29 FAIL | 32.6 s / 29 | 32.5 s / 28 |
-| 25 | troll | 120 s / 13 FAIL | 55.8 s / 17 | 120 s / 16 FAIL | 41.2 s / 16 | 45.2 s / 15 |
-| 30 | galehound | 120 s / 48 FAIL | 120 s / 49 FAIL | 120 s / 56 FAIL | 41.3 s / 56 | 120 s / 55 FAIL |
-| 35 | draugr | 120 s / 90 FAIL | 120 s / 101 FAIL | 120 s / 95 FAIL | 68.5 s / 103 | 120 s / 102 FAIL |
-| 40 | voidmoth | 120 s / 108 FAIL | 120 s / 105 FAIL | 120 s / 122 FAIL | 71.7 s / 124 | 120 s / 117 FAIL |
-| 45 | meteorgolem | 120 s / 202 FAIL | 120 s / 199 FAIL | 120 s / 207 FAIL | 120 s / 219 FAIL | 120 s / 217 FAIL |
-| 50 | bronzemantis | 120 s / 266 FAIL | 120 s / 249 FAIL | 120 s / 346 FAIL | 120 s / 297 FAIL | 120 s / 293 FAIL |
-| 55 | glowcapgrazer | 120 s / 387 FAIL | 120 s / 318 FAIL | 120 s / 502 FAIL | 120 s / 448 FAIL | 120 s / 400 FAIL |
-| 60 | saltclaw | 120 s / 512 FAIL | 120 s / 450 FAIL | 120 s / 551 FAIL | 120 s / 597 FAIL | 120 s / 588 FAIL |
-| 65 | meadowhare | 120 s / 521 FAIL | 120 s / 463 FAIL | 120 s / 595 FAIL | 120 s / 671 FAIL | 120 s / 634 FAIL |
-| 70 | ribbongecko | 120 s / 552 FAIL | 120 s / 505 FAIL | 120 s / 647 FAIL | 120 s / 734 FAIL | 120 s / 689 FAIL |
-| 75 | orchidmantis | 120 s / 815 FAIL | 120 s / 731 FAIL | 120 s / 1037 FAIL | 120 s / 1103 FAIL | 120 s / 1100 FAIL |
-| 80 | sandhopper | 120 s / 897 FAIL | 120 s / 948 FAIL | 120 s / 1115 FAIL | 120 s / 1291 FAIL | 120 s / 1190 FAIL |
-| 85 | snowhare | 120 s / 906 FAIL | 120 s / 838 FAIL | 120 s / 1177 FAIL | 120 s / 1467 FAIL | 120 s / 1256 FAIL |
-| 90 | screeferret | 120 s / 1173 FAIL | 120 s / 970 FAIL | 120 s / 1267 FAIL | 120 s / 1572 FAIL | 120 s / 1358 FAIL |
-| 95 | brooknewt | 120 s / 1498 FAIL | 120 s / 1337 FAIL | 120 s / 1333 FAIL | 120 s / 1876 FAIL | 120 s / 1424 FAIL |
-| 99 | snowstoat | 120 s / 3112 FAIL | 120 s / 2944 FAIL | 120 s / 2762 FAIL | 120 s / 3132 FAIL | 120 s / 2959 FAIL |
+| 5 | beetle | 7.9 s / 2 | 7.2 s / 2 | 7.7 s / 2 | 6.4 s / 2 | 7.3 s / 2 |
+| 10 | crab | 10.8 s / 9 | 12.8 s / 10 | 13.4 s / 10 | 10.8 s / 10 | 11.7 s / 10 |
+| 15 | toad | 19.3 s / 15 | 20.1 s / 17 | 17.6 s / 16 | 19.6 s / 16 | 19.5 s / 16 |
+| 20 | hydra | 23.8 s / 27 | 22.1 s / 30 | 20.6 s / 29 | 20.7 s / 29 | 19.6 s / 28 |
+| 25 | troll | 31.6 s / 14 | 32.1 s / 17 | 32.6 s / 16 | 35.1 s / 16 | 31.7 s / 15 |
+| 30 | galehound | 26.1 s / 54 | 32.6 s / 58 | 32.6 s / 57 | 29 s / 56 | 30.6 s / 56 |
+| 35 | draugr | 34.2 s / 101 | 32.6 s / 105 | 34.1 s / 104 | 36.7 s / 103 | 36.7 s / 103 |
+| 40 | voidmoth | 23.4 s / 121 | 30.2 s / 126 | 25.6 s / 125 | 25.1 s / 124 | 24.1 s / 124 |
+| 45 | meteorgolem | 34.3 s / 224 | 35.1 s / 229 | 34.6 s / 228 | 36.1 s / 227 | 33.5 s / 227 |
+| 50 | bronzemantis | 32.8 s / 341 | 36.6 s / 356 | 34.1 s / 357 | 35 s / 355 | 33.1 s / 355 |
+| 55 | glowcapgrazer | 34.1 s / 463 | 39.6 s / 499 | 36.6 s / 505 | 39.9 s / 504 | 36.5 s / 503 |
+| 60 | saltclaw | 28.3 s / 647 | 33.4 s / 655 | 32.1 s / 653 | 32.4 s / 652 | 33.5 s / 651 |
+| 65 | meadowhare | 32.4 s / 805 | 36 s / 828 | 36.6 s / 827 | 33.3 s / 825 | 33.5 s / 824 |
+| 70 | ribbongecko | 34.1 s / 916 | 37.7 s / 951 | 36.6 s / 950 | 32.8 s / 948 | 34.3 s / 947 |
+| 75 | orchidmantis | 44.8 s / 1294 | 44.4 s / 1400 | 46.5 s / 1398 | 45.8 s / 1397 | 48.9 s / 1396 |
+| 80 | sandhopper | 41.1 s / 1494 | 47 s / 1598 | 46.5 s / 1596 | 42.3 s / 1595 | 49.6 s / 1594 |
+| 85 | snowhare | 41.1 s / 1643 | 44.5 s / 1797 | 46.5 s / 1795 | 40.2 s / 1793 | 47.7 s / 1792 |
+| 90 | screeferret | 44.7 s / 1898 | 47.3 s / 1995 | 46.5 s / 1993 | 42.3 s / 1991 | 49.6 s / 1990 |
+| 95 | brooknewt | 46.1 s / 2581 | 36.8 s / 2594 | 41.5 s / 2591 | 37.5 s / 2590 | 41 s / 2588 |
+| 99 | snowstoat | 45 s / 3484 | 49.5 s / 3497 | 44.1 s / 3494 | 46.5 s / 3493 | 46.5 s / 3491 |
 

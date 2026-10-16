@@ -1,0 +1,7 @@
+[
+  {"minLevel": 5, "maxLevel": 10, "minSeconds": 6, "maxSeconds": 15, "tooFast": 5, "tooSlow": 20},
+  {"minLevel": 15, "maxLevel": 20, "minSeconds": 15, "maxSeconds": 30, "tooFast": 10, "tooSlow": 45},
+  {"minLevel": 25, "maxLevel": 45, "minSeconds": 20, "maxSeconds": 40, "tooFast": 12, "tooSlow": 60},
+  {"minLevel": 50, "maxLevel": 75, "minSeconds": 25, "maxSeconds": 50, "tooFast": 15, "tooSlow": 75},
+  {"minLevel": 80, "maxLevel": 99, "minSeconds": 30, "maxSeconds": 60, "tooFast": 18, "tooSlow": 90}
+]

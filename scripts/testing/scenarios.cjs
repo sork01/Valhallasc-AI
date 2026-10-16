@@ -5,6 +5,7 @@ const { TestWorld, root } = require('./driver.cjs');
 const { route } = require('./route.cjs');
 const kit = require('./tools.cjs');
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
+const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
 const crags = map.zones[0];
@@ -800,6 +801,9 @@ const scenarios = {
     description: 'Food and potions through the real server: buying from the baker and the apothecary, a 100 HP meal over eight seconds that never stacks, an instant potion with one 60 second cooldown, refusals that keep the item, and the pack surviving a restart.',
     async run(w, check) {
       await w.connect({ bot: 'Diner', class: 'warrior' });
+      const stewPrice = items.find(i => i.id === 'traveler_stew').price;
+      const potionPrice = items.find(i => i.id === 'health_potion').price;
+      const startingGold = 3 * stewPrice + 2 * potionPrice;
       const me = () => w.player('Diner');
       const owned = id => me().inventory.find(s => s.item === id)?.quantity || 0;
       const regen = () => me().buffs.find(b => b.kind === 'regen');
@@ -811,23 +815,25 @@ const scenarios = {
         return w.events.find(e => !earlier.has(e) && e.bot === 'Diner' && e.type === 'error')?.text || null;
       }
       // The shop trips are not what this checks, so the character is placed beside each counter.
-      await kit.setupCharacter(w, 'Diner', { gold: 100, teleportTo: { npc: 'baker' } });
+      await kit.setupCharacter(w, 'Diner', { gold: startingGold, teleportTo: { npc: 'baker' } });
       const bun = await kit.talkTo(w, 'Diner', 'baker', 'buy_traveler_stew');
       await w.waitFor(() => owned('traveler_stew') === 1, 3000, 'First stew');
-      check(/Bought Traveler/.test(bun.notice) && bun.gold === 88 && me().gold === 88, 'The baker sells Traveler\'s Stew for 12 gold');
+      check(/Bought Traveler/.test(bun.notice) && bun.gold === startingGold - stewPrice && me().gold === startingGold - stewPrice, 'The baker charges the catalog stew price');
       await kit.talkTo(w, 'Diner', 'baker', 'buy_traveler_stew');
       await w.waitFor(() => owned('traveler_stew') === 2, 3000, 'Second stew');
+      await kit.talkTo(w, 'Diner', 'baker', 'buy_traveler_stew');
+      await w.waitFor(() => owned('traveler_stew') === 3, 3000, 'Third stew');
       await w.advance(550);
       await w.action('Diner', { type: 'interact', npc: 'baker', offer: 'buy_health_potion' });
       await w.advance(600);
-      check(owned('health_potion') === 0 && me().gold === 76, 'The baker does not sell potions and charges nothing for the request');
+      check(owned('health_potion') === 0 && me().gold === startingGold - 3 * stewPrice, 'The baker does not sell potions and charges nothing for the request');
       await kit.teleport(w, 'Diner', { npc: 'apothecary' });
       await kit.talkTo(w, 'Diner', 'apothecary', 'buy_health_potion');
       await kit.talkTo(w, 'Diner', 'apothecary', 'buy_health_potion');
       await w.waitFor(() => owned('health_potion') === 2, 3000, 'Two potions');
-      check(me().gold === 16, 'The apothecary sells Health Potions for 30 gold each');
+      check(me().gold === 0, 'The apothecary charges the catalog potion price');
       const poor = await kit.talkTo(w, 'Diner', 'apothecary', 'buy_health_potion');
-      check(/need 30 gold/.test(poor.notice) && owned('health_potion') === 2 && me().gold === 16, 'Without 30 gold nothing is sold');
+      check(poor.notice.includes(`need ${potionPrice} gold`) && owned('health_potion') === 2 && me().gold === 0, 'Without the catalog price nothing is sold');
 
       // Nothing is wasted: full health, and things that are not food or potions.
       check(/full health/.test(await use('health_potion')) && owned('health_potion') === 2, 'A potion is refused at full health and kept');
@@ -851,16 +857,16 @@ const scenarios = {
       await w.waitFor(() => me().hp <= 3, 3000, 'Hurt for a meal');
       const ate = Date.now();
       check(await use('traveler_stew') === null, 'A meal is accepted when hurt');
-      check(owned('traveler_stew') === 1 && regen()?.id === 'traveler_stew' && regen().time === 8, 'The stew is spent and a regen effect lasting eight seconds appears');
+      check(owned('traveler_stew') === 2 && regen()?.id === 'traveler_stew' && regen().time === 8, 'The stew is spent and a regen effect lasting eight seconds appears');
       check(me().hp < 40, `Nothing arrives at once (${me().hp})`);
-      check(/still eating/.test(await use('traveler_stew')) && owned('traveler_stew') === 1 && me().buffs.filter(b => b.kind === 'regen').length === 1, 'A second meal is refused, kept, and does not stack');
+      check(/still eating/.test(await use('traveler_stew')) && owned('traveler_stew') === 2 && me().buffs.filter(b => b.kind === 'regen').length === 1, 'A second meal is refused, kept, and does not stack');
       await w.waitFor(() => !regen(), 12000, 'Meal ends');
       const took = (Date.now() - ate) / 1000;
       check(took > 7 && took < 10.5, `The meal lasts about eight seconds (${took.toFixed(1)})`);
       check(me().hp >= 98, `All 100 HP arrived, with natural regeneration on top at most (${me().hp})`);
       await w.debug('Diner', { op: 'set_hp', hp: 1e9 });
       await w.waitFor(() => me().hp === me().maxHp, 3000, 'Full health');
-      check(/full health/.test(await use('traveler_stew')) && owned('traveler_stew') === 1 && !regen(), 'Once the meal is over, a new one is judged on health and kept at full health');
+      check(await use('traveler_stew') === null && owned('traveler_stew') === 1 && !!regen(), 'At full health, a new meal can restore missing rage');
 
       // Persistence: the pack and purse survive a restart.
       const stew = owned('traveler_stew'), gold = me().gold;

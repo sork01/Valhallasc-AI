@@ -1757,7 +1757,12 @@ mod tests {
             ("pilgrim", "mace")
         );
         assert_eq!(c.max_hp(), 100. + 3. * 20.);
-        assert_eq!(c.stats().0, 20. + 4. * 4. + 4.);
+        assert!(
+            (c.stats().0
+                - (20. + 4. * 4. + 4.) * crate::items::player_attack_scale(Class::Priest, c.level))
+            .abs()
+                < 1e-9
+        );
         assert!(Class::Priest.reach() > Class::Assassin.reach());
     }
 }

@@ -1,5 +1,28 @@
 # Consumable audit (CONS-AUDIT)
 
+## Recheck after kill-time calibration (2026-10-16)
+
+The previous tables below describe the old health curve and flat-only healing. The kill-time pass raised character health sharply after level 10, so those percentages no longer describe live code. I reran the ignored `consumable_audit` Rust test against the current balance with the new consumable rules; it generated 180 rows (12 levels × five classes × three stat spreads) from the real catalog and combat formulas. The final curve and PvP decisions are in [consumables.md](consumables.md).
+
+| Level | Maximum HP across classes and spreads | Best health potion / meal, % max HP | Warrior even-spread potion HP | Potion price | Continuous potion cost / kill gold, worst spread |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 80–120 | 50–75% | 60 | 5 | 45% |
+| 10 | 300–460 | 46–70% | 210 | 60 | 34% |
+| 20 | 1,674–2,412 | 40% | 792 | 110 | 17% |
+| 30 | 3,224–4,720 | 40% | 1,517 | 180 | 28% |
+| 40 | 5,430–7,940 | 40% | 2,472 | 270 | 20% |
+| 50 | 10,672–15,456 | 40% | 4,928 | 380 | 14% |
+| 60 | 17,402–25,036 | 40% | 8,184 | 520 | 11% |
+| 70 | 26,292–38,248 | 40% | 12,208 | 700 | 8% |
+| 80 | 38,268–55,368 | 40% | 18,000 | 900 | 6% |
+| 90 | 47,480–70,320 | 40% | 22,880 | 1,150 | 5% |
+| 95 | 72,164–106,542 | 40% | 34,667 | 1,275 | 5% |
+| 99 | 93,672–137,664 | 40% | 44,813 | 1,400 | 4% |
+
+The minimum health fraction is now 40% from level 20 upward, including stamina-heavy characters. A level-99 warrior's 44,813-point potion covers about 35 seconds of the audit's 1,283 damage per second for an ordinary level-99 monster; the old 1,330-point flat potion covered about one second under the new health curve. Food delivers the same total over eight seconds. The best mana potion restores 48–73% of a mana class's pool from levels 10–99; rage and energy use the already implemented tier-scaled conversion. These rows estimate gold from same-level ordinary monsters and a target fight plus ten seconds of travel. They do not replace the measured kill-time report or cover PvP outcomes; the broad private-world check remains `CONS-CHECK`.
+
+## Original 2026-10-15 measurement (historical baseline)
+
 ## Resource fix after this measurement
 
 `CONS-FIX-MANA` keeps the existing mana-potion and meal item IDs but lets every class use their resource portion. Mage and priest still receive the catalog's flat mana amount. Warrior rage and assassin/hunter energy have a 100-point cap, so they receive `min(100%, catalog mana / (100 + 15 × (item required level − 1)))` of that cap. The level-20 potion restores about 78 rage or energy; level-1 items restore up to 100. Meals deliver the same amount over eight seconds. A full resource rejects a resource-only potion without consuming it; meals can still be used at full health when resource is missing. The C quick slot is available to every class, and descriptions show the player's actual resource and amount. The existing shared potion cooldown remains 60 seconds. Broader health, cooldown, price and tier decisions remain in `CONS-RULES` after combat damage is tuned.

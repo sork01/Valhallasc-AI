@@ -8,6 +8,7 @@
 use super::wyrd_tests::{drain, join, world};
 use super::*;
 use crate::skills::{BuffKind as Buff_, Effect, SKILLS};
+use serde::Deserialize;
 
 /// A fight that lasts longer than this is recorded as a failure ("too slow"). The skills run stops at 120 s, above the
 /// highest "too slow" line of the rules (90 s), so the verdict is the same; the basic-attack-only run may take 2.5x the
@@ -543,6 +544,90 @@ fn class_named(name: &str) -> Class {
         "priest" => Class::Priest,
         "hunter" => Class::Hunter,
         other => panic!("unknown class {other}"),
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct TargetBand {
+    min_level: u32,
+    max_level: u32,
+    min_seconds: f64,
+    max_seconds: f64,
+}
+
+fn target_band(level: u32) -> TargetBand {
+    serde_json::from_str::<Vec<TargetBand>>(include_str!("../../../world/ttk-targets.txt"))
+        .expect("kill-time target data")
+        .into_iter()
+        .find(|band| band.min_level <= level && level <= band.max_level)
+        .unwrap_or_else(|| panic!("no kill-time target for level {level}"))
+}
+
+fn assert_balanced_grid(levels: &[u32], runs: u64) {
+    for &level in levels {
+        let target = target_band(level);
+        let mut times = vec![];
+        for class in CLASSES {
+            let result = run_case(&Case::new(class, level), runs);
+            let seconds = result.seconds().0;
+            assert_eq!(result.failures(), 0, "{class:?} {level} failed to kill");
+            assert!(
+                (target.min_seconds..=target.max_seconds).contains(&seconds),
+                "{class:?} {level}: {seconds:.1}s outside {:.0}–{:.0}s",
+                target.min_seconds,
+                target.max_seconds
+            );
+            let lowest = result.spread_of(|o| o.lowest_hp_fraction).0;
+            assert!(
+                lowest >= 0.2,
+                "{class:?} {level}: fell to {:.0}% HP",
+                lowest * 100.
+            );
+            times.push(seconds);
+        }
+        times.sort_by(f64::total_cmp);
+        assert!(
+            times[4] / times[0] <= 1.3,
+            "level {level}: class kill-time spread {:.2}x ({times:?})",
+            times[4] / times[0]
+        );
+    }
+}
+
+#[test]
+fn sampled_kill_times_stay_in_band_across_classes_and_progression() {
+    assert_balanced_grid(&[5, 20, 50, 99], 1);
+}
+
+#[test]
+#[ignore = "full 100-case, nine-seed balance gate; run after combat changes"]
+fn full_kill_time_balance_gate() {
+    assert_balanced_grid(&levels(), 9);
+}
+
+#[test]
+fn green_gear_warrior_survives_four_plain_hits_from_same_level_elites() {
+    let w = world();
+    let mut seen = std::collections::BTreeSet::new();
+    for spawn in &w.spawns {
+        if !is_elite(&spawn.kind) || !seen.insert(spawn.kind.clone()) {
+            continue;
+        }
+        let level = Slime::default_level(&spawn.kind);
+        let enemy = Slime::with_level(0, spawn, level);
+        let mut hero = Character::mercenary(Class::Warrior, level, "Guard");
+        build_character(&mut hero, &Case::new(Class::Warrior, level));
+        let hit = ((enemy.damage - hero.stats().1).max(1.) * DAMAGE_TAKEN_SCALE)
+            .round()
+            .max(1.);
+        assert!(
+            hero.max_hp() / hit >= 4.,
+            "{} (level {level}): {:.0} HP, {:.0} per plain hit",
+            spawn.kind,
+            hero.max_hp(),
+            hit
+        );
     }
 }
 
