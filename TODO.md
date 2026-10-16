@@ -12,7 +12,24 @@ Core dependencies: each instance's `OPEN` task follows its four content tasks; r
 
 Each instance has a separate map, encounter, quest/reward, presentation and opening task. The four Yearwheel doors are four different instances.
 
-- [ ] `I-VISUAL-IDENTITY` — Redesign the interiors of every dungeon, including Undervault, Cathedral, Moonwell and later instances, so each is recognizable at a glance rather than another underground stone vault. Give each its own floor and wall materials, room shapes, landmarks, props, palette and lighting that fit its setting; keep paths, collision and combat effects readable, then compare screenshots across all dungeons in a private browser check.
+The former `I-VISUAL-IDENTITY` umbrella is split into one deliverable per private dungeon zone below. For each, give the interior distinctive floor and wall materials, room shapes, landmarks, props, palette and lighting. Keep paths, collision and combat effects readable, and compare its screenshot with the other dungeons in a private browser check. The Drowned Cathedral's three separately rendered wings have separate tasks.
+
+- [ ] `I-VISUAL-Z5` — Redesign The Undervault (zone 5) as a buried stronghold with its own vault masonry, chambers, machinery and lighting.
+- [ ] `I-VISUAL-Z10` — Redesign the Drowned Cathedral's Flooded Cloister (zone 10) around submerged walkways, cloister arches and water-worn religious details.
+- [ ] `I-VISUAL-Z11` — Redesign the Drowned Cathedral's Coral Reliquary (zone 11) around coral-grown relic chambers, tidal pools and luminous marine details.
+- [ ] `I-VISUAL-Z12` — Redesign the Drowned Cathedral's Grand Nave (zone 12) as a monumental drowned sanctuary with a distinct central aisle, altar and stained-glass light.
+- [ ] `I-VISUAL-Z18` — Redesign The Moonwell (zone 18) as an open-water garden of petal islands, glass causeways and moonlit reflections.
+- [ ] `I-VISUAL-Z29` — Redesign The Eye Below (zone 29) around abyssal observation chambers, lenses and deep-water light.
+- [ ] `I-VISUAL-Z30` — Redesign The Elder Hollow (zone 30) around living roots, hollow trunks, sap and canopy light.
+- [ ] `I-VISUAL-Z31` — Redesign The Thousandfold Pavilion (zone 31) around folded halls, painted screens and shifting masks.
+- [ ] `I-VISUAL-Z32` — Redesign Temple of the Rain Crown (zone 32) around ritual terraces, rain channels and storm-lit stone.
+- [ ] `I-VISUAL-Z33` — Redesign The Seed Vault (zone 33) around seed chambers, botanical structures and growing light.
+- [ ] `I-VISUAL-Z34` — Redesign The Sunken Astrolabe (zone 34) around submerged astronomical rings, bronze mechanisms and star charts.
+- [ ] `I-VISUAL-Z35` — Redesign The Thunderheart Gate (zone 35) around storm conduits, charged pylons and lightning-lit passages.
+- [ ] `I-VISUAL-Z36` — Redesign The Blooming Labyrinth (zone 36) around living flower corridors, mirrors and changing garden rooms.
+- [ ] `I-VISUAL-Z37` — Redesign The Solar Crucible (zone 37) around sun furnaces, molten materials and radiant forge chambers.
+- [ ] `I-VISUAL-Z38` — Redesign The Amber Archive (zone 38) around amber shelves, preserved memories and warm fossil light.
+- [ ] `I-VISUAL-Z39` — Redesign The Silent Solstice (zone 39) around frozen halls, snow-muted surfaces and aurora reflections.
 
 ### The Eye Below — level 65, Stormglass Shore (zone 19)
 
