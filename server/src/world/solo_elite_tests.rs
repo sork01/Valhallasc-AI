@@ -20,7 +20,11 @@ struct GroupElite {
 fn group_elites() -> Vec<GroupElite> {
     let w = world();
     let mut found: BTreeMap<String, GroupElite> = BTreeMap::new();
-    for map in &w.maps {
+    for map in w
+        .maps
+        .iter()
+        .filter(|m| m.copies == 0 && m.template.is_none())
+    {
         for q in map
             .quests
             .iter()
@@ -30,7 +34,13 @@ fn group_elites() -> Vec<GroupElite> {
                 if !(is_elite(&o.target) || is_boss(&o.target)) {
                     continue;
                 }
-                let Some(spawn) = w.spawns.iter().position(|s| s.kind == o.target) else {
+                // Only monsters that live in the open world: a dungeon's mobs and bosses are quest targets too, but
+                // they follow the rules of `dungeon_solo_tests`.
+                let Some(spawn) = w.spawns.iter().position(|s| {
+                    s.kind == o.target
+                        && w.maps[s.zone].copies == 0
+                        && w.maps[s.zone].template.is_none()
+                }) else {
                     continue;
                 };
                 let entry = found.entry(o.target.clone()).or_insert(GroupElite {
@@ -44,7 +54,12 @@ fn group_elites() -> Vec<GroupElite> {
             }
         }
     }
-    found.into_values().collect()
+    // `ELITE_SOLO_KINDS=cinderlord,kraken` limits a run to those kinds (calibrating a few elites at a time).
+    let only = std::env::var("ELITE_SOLO_KINDS").unwrap_or_default();
+    found
+        .into_values()
+        .filter(|e| only.is_empty() || only.split(',').any(|k| k == e.kind))
+        .collect()
 }
 
 const PARTY: [Class; 5] = [
@@ -65,7 +80,7 @@ fn seeds() -> u64 {
 #[test]
 fn every_group_elite_is_found_from_the_quests() {
     let list = group_elites();
-    // A floor, not an exact count: new elites only add to it.
+    // The open world only: dungeon mobs and bosses follow `dungeon_solo_tests`. A floor, not an exact count.
     assert!(list.len() >= 40, "only {} group elites found", list.len());
     for kind in [
         "cinderlord",
@@ -86,12 +101,19 @@ fn every_group_elite_is_found_from_the_quests() {
     );
 }
 
-fn solo_case(e: &GroupElite, class: Class, rarity: &'static str) -> Case {
+/// How long a lone player may fight an elite before it counts as not killed: three minutes, long enough for a patient
+/// player with potions, and the same for both rules ("too easy" and "possible").
+const SOLO_CAP_SECONDS: f64 = 180.;
+
+/// A lone character `above` levels over the elite, in `rarity` gear, with every potion and meal.
+fn solo_case(e: &GroupElite, class: Class, rarity: &'static str, above: u32) -> Case {
     Case {
         consumables: true,
         rarity,
         target: Some(e.spawn),
-        ..Case::new(class, e.level)
+        enemy_level: Some(e.level),
+        cap: Some(SOLO_CAP_SECONDS),
+        ..Case::new(class, e.level + above)
     }
 }
 
@@ -107,19 +129,36 @@ fn classes() -> Vec<Class> {
     picked
 }
 
-/// Runs every group elite against every class alone in `rarity` gear and returns the lone victories.
+/// A test that has failed once has failed: by default the lone-player tests stop at the first violation.
+/// `ELITE_SOLO_FAIL_FAST=0` collects every violation instead (used to calibrate the elites).
+fn fail_fast() -> bool {
+    std::env::var("ELITE_SOLO_FAIL_FAST").is_ok_and(|v| v != "0")
+        || std::env::var("ELITE_SOLO_FAIL_FAST").is_err()
+}
+
+/// Runs every group elite against every class alone, `above` levels over it, in `rarity` gear, and returns how many
+/// fights each elite lost to the lone player (kind -> wins).
+///
+/// `until_win` stops after the first lone win: of the whole run (the rule "nobody wins" has already failed) or, with
+/// `per_elite`, of that elite only (the rule "somebody can win" is already met).
 ///
 /// Every finished fight prints one line (run with `--nocapture`), so a long run shows its progress; a lone victory
 /// is marked `SOLO KILL`.
-fn solo_victories(rarity: &'static str) -> Vec<String> {
+fn lone_wins(
+    rarity: &'static str,
+    above: u32,
+    until_win: bool,
+    per_elite: bool,
+) -> BTreeMap<String, u32> {
     let elites = group_elites();
     let classes = classes();
     let total = elites.len() * classes.len() * seeds() as usize;
-    let (mut done, mut wins) = (0, vec![]);
+    let (mut done, mut wins) = (0, BTreeMap::new());
     for e in &elites {
+        let entry: &mut u32 = wins.entry(e.kind.clone()).or_default();
         for &class in &classes {
             for seed in 1..=seeds() {
-                let (out, _) = run_once(&solo_case(e, class, rarity), seed);
+                let (out, _) = run_once(&solo_case(e, class, rarity, above), seed);
                 done += 1;
                 let result = if out.killed {
                     format!("SOLO KILL in {:.0} s", out.seconds)
@@ -137,33 +176,60 @@ fn solo_victories(rarity: &'static str) -> Vec<String> {
                     )
                 };
                 eprintln!(
-                    "[{rarity} {done}/{total}] {} (level {}, {} players) vs lone {class:?} seed {seed}: {result}",
+                    "[{rarity}+{above} {done}/{total}] {} (level {}, {} players) vs lone {class:?} seed {seed}: {result}",
                     e.kind, e.level, e.players
                 );
-                if out.killed {
-                    wins.push(format!(
-                        "{} (level {}, {} players): a lone {class:?} won in {:.0} s, {rarity} gear",
-                        e.kind, e.level, e.players, out.seconds
-                    ));
+                *entry += u32::from(out.killed);
+                if out.killed && until_win && !per_elite {
+                    return wins;
                 }
+                if out.killed && until_win && per_elite {
+                    break;
+                }
+            }
+            if *entry > 0 && until_win && per_elite {
+                break;
             }
         }
     }
     wins
 }
 
+// The owner's rule (2026-10-16): a group elite is not for a lone player at its own level in ordinary green gear, but
+// it is soloable with good enough gear or about five levels above it.
 #[test]
-#[ignore = "slow, and red until ELITE-SOLO-FIX: run scripts/elite-solo-parallel.sh"]
-fn no_lone_player_in_green_gear_kills_a_group_elite() {
-    let wins = solo_victories(BASELINE_RARITY);
-    assert!(wins.is_empty(), "solo kills:\n{}", wins.join("\n"));
+#[ignore = "slow (about 12 minutes on 4 cores): run scripts/elite-solo-parallel.sh"]
+fn lone_player_in_green_gear_at_the_same_level_cannot_kill_a_group_elite() {
+    let easy: Vec<_> = lone_wins(BASELINE_RARITY, 0, fail_fast(), false)
+        .into_iter()
+        .filter(|&(_, wins)| wins > 0)
+        .map(|(kind, wins)| format!("{kind}: {wins} lone kills"))
+        .collect();
+    assert!(
+        easy.is_empty(),
+        "too easy for one player:\n{}",
+        easy.join("\n")
+    );
 }
 
 #[test]
-#[ignore = "slow, and red until ELITE-SOLO-FIX: run scripts/elite-solo-parallel.sh"]
-fn no_lone_player_in_purple_gear_kills_a_group_elite() {
-    let wins = solo_victories("epic");
-    assert!(wins.is_empty(), "solo kills:\n{}", wins.join("\n"));
+#[ignore = "slow (about 12 minutes on 4 cores): run scripts/elite-solo-parallel.sh"]
+fn lone_player_can_kill_every_group_elite_with_purple_gear_or_five_levels_above() {
+    // Somebody winning once is enough, so each elite stops at its first lone win.
+    let (purple, above) = (
+        lone_wins("epic", 0, true, true),
+        lone_wins(BASELINE_RARITY, 5, true, true),
+    );
+    let hopeless: Vec<_> = purple
+        .iter()
+        .filter(|&(kind, &wins)| wins == 0 && above[kind] == 0)
+        .map(|(kind, _)| kind.clone())
+        .collect();
+    assert!(
+        hopeless.is_empty(),
+        "no lone class wins in purple gear or five levels above:\n{}",
+        hopeless.join("\n")
+    );
 }
 
 /// The party control wears `ELITE_PARTY_RARITY` gear (purple by default, the best ordinary set, the same tier the
@@ -186,7 +252,7 @@ fn shard() -> (usize, usize) {
 }
 
 #[test]
-#[ignore = "slow, and red until ELITE-SOLO-FIX: run scripts/elite-party-parallel.sh"]
+#[ignore = "slow: run scripts/elite-party-parallel.sh"]
 fn a_party_of_the_recommended_size_kills_each_group_elite() {
     let (shard, shards) = shard();
     let mut failed = vec![];
@@ -199,6 +265,7 @@ fn a_party_of_the_recommended_size_kills_each_group_elite() {
             consumables: true,
             rarity: party_rarity(),
             target: Some(e.spawn),
+            cap: Some(SOLO_CAP_SECONDS),
             ..Case::new(members[0], e.level)
         };
         let kills = (1..=seeds())

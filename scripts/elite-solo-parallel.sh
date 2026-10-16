@@ -16,7 +16,7 @@ classes=(warrior mage assassin priest hunter)
 pids=()
 names=()
 for class in "${classes[@]}"; do
-  ELITE_SOLO_CLASS="$class" "$binary" solo_elite_tests::no_lone --ignored --nocapture >"$run_dir/$class.log" 2>&1 &
+  ELITE_SOLO_CLASS="$class" "$binary" ${ELITE_SOLO_TESTS:-solo_elite_tests::lone_} --ignored --nocapture >"$run_dir/$class.log" 2>&1 &
   pids+=("$!"); names+=("$class")
 done
 failed=0

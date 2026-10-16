@@ -1120,7 +1120,7 @@ const scenarios = {
       check(bogs.length === 32 && bogs.every(s => s.zone === 3) && new Set(bogs.map(s => s.kind)).size === 5
         && ['toad', 'croc', 'knight', 'hydra', 'gloomroot'].every(k => bogs.some(s => s.kind === k)), 'A fen client receives exactly the 32 fen monsters, five kinds, and nothing from the other zones');
       check(bogs.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2 && s.level >= 13) && new Set(bogs.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'Fen levels sit within two of each default (15-20) and really vary');
-      const hp = { toad: 2000, croc: 2800, knight: 3400, hydra: 5200, gloomroot: 90000 };
+      const hp = { toad: 2000, croc: 2800, knight: 3400, hydra: 5200, gloomroot: 72000 };
       check(bogs.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
       check(w.events.some(e => e.bot === bot && e.type === 'event' && e.kind === 'portal'), 'The gate announces a portal event');
       check(w.events.some(e => e.type === 'system' && e.text.includes('Gloamfen') && e.text.includes('15–20')), 'The player is told the recommended levels');
@@ -1547,28 +1547,29 @@ const scenarios = {
     },
   },
   cinderlord: {
-    description: 'Two level-10 warriors fight the Cinderlord with real damage, skills and potions, both earn quest credit and guaranteed blue gear, then equip it and retain the reward after restart.',
+    description: 'Two level-20 warriors (the level-10 elite now has 19,200 HP and needs a stronger pair than the original two level-10 warriors) fight the Cinderlord with real damage, skills and potions, both earn quest credit and guaranteed blue gear, then equip it and retain the reward after restart.',
     startLevel: 10, godMode: false, levelSpread: 0,
     async run(w, check) {
       const bots = ['Ember', 'Cinder'], qid = 'crags_cinderlord', reward = 'necklace_moonstone_l10_blue';
       for (const bot of bots) {
         await w.connect({ bot, class: 'warrior' });
-        await kit.setupCharacter(w, bot, { items: [{ item: 'health_potion' }], teleportTo: { npc: 'crags_captain' } });
-        for (let i = 0; i < 27; i++) await w.action(bot, { type: 'allocate_stat', stat: i < 20 ? 'strength' : 'accuracy' });
+        await kit.setupCharacter(w, bot, { level: 20, items: [{ item: 'health_potion', quantity: 6 }], teleportTo: { npc: 'crags_captain' } });
+        for (let i = 0; i < 57; i++) await w.action(bot, { type: 'allocate_stat', stat: i < 40 ? 'strength' : 'accuracy' });
         await w.waitFor(() => w.player(bot).statPoints === 0, 5000, 'All training spent');
         await kit.talkTo(w, bot, 'crags_captain', `quest:accept:${qid}`);
         await w.waitFor(() => !!quest(w, bot, qid));
         check(quest(w, bot, qid).counts[0] === 0, `${bot} accepts the elite quest with no kill credit`);
       }
       const elite = w.snapshot.slimes.find(s => s.kind === 'cinderlord');
-      check(elite.elite && elite.level === 10 && elite.maxHp === 2400 && elite.zone === 1, 'Exactly the new level-10 elite is present with authoritative 2400 HP');
+      check(elite.elite && elite.level === 10 && elite.maxHp === 2400 * 8 && elite.zone === 1, 'Exactly the new level-10 elite is present with authoritative 19,200 HP (2,400 x 8, world/elite-power.txt)');
       for (const [i, bot] of bots.entries()) await kit.teleport(w, bot, { zone: 1, x: elite.x + (i ? 2 : -2), y: elite.y });
       for (const bot of bots) await w.action(bot, { type: 'target', id: elite.id });
-      const current = () => w.snapshot.slimes.find(s => s.id === elite.id), began = Date.now();
-      while (!current().dead && Date.now() - began < 60000) {
+      const current = () => w.snapshot.slimes.find(s => s.id === elite.id), began = Date.now(), lowest = {};
+      while (!current().dead && Date.now() - began < 180000) {
         for (const bot of bots) {
           const p = w.player(bot);
           if (p.dead) throw Error(`${bot} died during the two-player fight`);
+          lowest[bot] = Math.min(lowest[bot] ?? p.hp, p.hp);
           for (const id of ['battlecry', 'shieldwall', 'cleave', 'whirlwind']) {
             if (!p.skillCd[id]) await w.action(bot, { type: 'skill', id, ...aimAt(w, bot, current()) });
           }
@@ -1580,7 +1581,7 @@ const scenarios = {
       for (const bot of bots) {
         await w.action(bot, { type: 'stop' });
         await w.waitFor(() => quest(w, bot, qid).counts[0] === 1);
-        check(w.player(bot).hp > 0 && w.player(bot).hp < w.player(bot).maxHp, `${bot} survives and took real damage`);
+        check(w.player(bot).hp > 0 && lowest[bot] < w.player(bot).maxHp, `${bot} survives and took real damage (lowest health ${lowest[bot]} of ${w.player(bot).maxHp})`);
         check(w.events.some(e => e.type === 'event' && e.kind === 'hit' && e.actor === w.player(bot).id), `${bot} personally damaged the Cinderlord`);
         check(quest(w, bot, qid).counts[0] === 1, `${bot} earns shared elite quest credit`);
       }
@@ -1621,7 +1622,7 @@ const scenarios = {
       check(q.group === true && q.recommendedPlayers === 5 && q.level === 20 && q.rewardItem === reward, 'The quest is a shared five-player level-20 quest with a guaranteed item');
       check(kit.items.find(i => i.id === reward).rarity === 'rare' && !kit.items.find(i => i.id === reward).class, 'The reward is a blue piece every class can wear');
       const elite = w.snapshot.slimes.find(s => s.kind === 'gloomroot');
-      check(elite.elite && elite.level === 20 && elite.maxHp === 90000 && elite.zone === 3, 'Exactly the level-20 elite is present in Gloamfen with authoritative 90000 HP');
+      check(elite.elite && elite.level === 20 && elite.maxHp === 72000 && elite.zone === 3, 'Exactly the level-20 elite is present in Gloamfen with authoritative 72000 HP (90000 x 0.8, world/elite-power.txt)');
       const place = [[-3, -3], [3, -3], [-3, 3], [3, 3], [0, 5]];
       for (const [i, bot] of bots.entries()) await kit.teleport(w, bot, { zone: 3, x: elite.x + place[i][0], y: elite.y + place[i][1] });
       for (const bot of bots) await w.action(bot, { type: 'target', id: elite.id });
@@ -2082,7 +2083,7 @@ const scenarios = {
         'A Wyrdwood client receives exactly its 67 monster slots: 14 boars, 15 crows, 14 trolls, 12 weavers, 10 rams and the two elites');
       const asleep = woods.filter(s => s.dead && s.state === 'waiting');
       check(asleep.length === 5 && asleep.filter(s => s.kind === 'crow').length === 3 && asleep.filter(s => s.kind === 'troll').length === 2, 'Five ambushers sleep (three crows, two trolls) until an escort passes');
-      const hp = { boar: 5600, crow: 4300, troll: 9500, weaver: 7600, ram: 11500, oakhorn: 60000, hrungnir: 150000 };
+      const hp = { boar: 5600, crow: 4300, troll: 9500, weaver: 7600, ram: 11500, oakhorn: 60000, hrungnir: 150000 * 0.8 };
       const living = woods.filter(s => !s.dead);
       check(living.length === 62 && living.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2) && new Set(living.map(s => s.level - DEFAULT_LEVELS[s.kind])).size >= 3, 'The 62 live monsters roll within two of each default level (21, 23, 25, 27, 29, 25, 30) and really vary');
       check(living.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
@@ -2568,7 +2569,7 @@ const scenarios = {
       for (const s of here) kinds[s.kind] = (kinds[s.kind] || 0) + 1;
       check(here.every(s => s.zone === 8) && JSON.stringify(Object.entries(kinds).sort()) === JSON.stringify([['angler', 10], ['draugr', 11], ['ghostmaw', 1], ['hvitserk', 1], ['kraken', 1], ['moray', 10], ['shellback', 9], ['siren', 10]]),
         'A Ran\'s Deep client receives exactly its 53 monster slots: 11 draugr, 10 anglers, 10 morays, 10 sirens, 9 shellbacks and the three elites');
-      const hp = { draugr: 24000, angler: 20500, moray: 27000, siren: 23500, shellback: 40000, kraken: 280000, hvitserk: 150000, ghostmaw: 190000 };
+      const hp = { draugr: 24000, angler: 20500, moray: 27000, siren: 23500, shellback: 40000, kraken: 280000, hvitserk: 150000 * 1.25, ghostmaw: 190000 };
       check(here.every(s => !s.dead) && here.every(s => Math.abs(s.level - DEFAULT_LEVELS[s.kind]) <= 2), 'Every monster is awake and rolls within two of its default level');
       check(here.every(s => s.maxHp === Math.round(hp[s.kind] * (1 + .12 * (s.level - DEFAULT_LEVELS[s.kind])))), 'Health follows each rolled level');
       check(here.filter(s => s.elite).map(s => s.kind).sort().join() === 'ghostmaw,hvitserk,kraken', 'Exactly the Kraken, Hvitserk and the Ghostmaw are elites');
@@ -2770,7 +2771,7 @@ const scenarios = {
       }
       // The three group quests: the giver hires exactly the missing fighters, up to the quest's party size.
       const mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name)).length;
-      for (const [id, size, kind, reward] of [['deep_captain', 3, 'hvitserk', 'accessory_amber_l20_blue'], ['deep_ghostmaw', 3, 'ghostmaw', 'necklace_moonstone_l40_blue'], ['deep_kraken', 5, 'kraken', 'necklace_moonstone_l20_purple']]) {
+      for (const [id, size, kind, reward] of [['deep_captain', 3, 'hvitserk', 'accessory_amber_l35_blue'], ['deep_ghostmaw', 3, 'ghostmaw', 'necklace_moonstone_l40_blue'], ['deep_kraken', 5, 'kraken', 'necklace_moonstone_l40_purple']]) {
         const g = find(id);
         await kit.teleport(w, bot, { npc: g.npc });
         await kit.talkTo(w, bot, g.npc, `quest:accept:${id}`);

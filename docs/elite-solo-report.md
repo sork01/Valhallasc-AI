@@ -133,3 +133,10 @@ choir (L20, 5p), colossus (L20, 5p), gatewarden (L20, 5p), gloomroot (L20, 5p), 
 ## Control: a party of the recommended size, purple gear, 2 seeds
 
 112 of 113 elites die to a party of the recommended size in at least one of two runs. Cannot win: hollowking (L20, 5 players). Hollowking is the Undervault's final boss; check whether a scripted phase or adds stop the harness before calling it too hard.
+
+
+## Update 2026-10-16 (evening): the owner's rule and the fix
+
+The first report above measured the original stats and a different rule ("nobody can solo a group elite"). The owner then settled the rule: a lone player at the elite's level in ordinary green gear cannot kill a group elite, but it is soloable with good gear (purple) or about five levels above it, and a party of the recommended size can beat it. Only open-world elites follow this rule (41 of them); a dungeon's mobs and bosses follow the dungeon rules in `TODO.md`. The fight limit is 180 s for lone players and parties alike.
+
+Result with the original stats (180 s limit): only the Cinderlord and, by 2 s, Hvitserk were soloable in green gear; Gloomroot and Hrungnir could not be soloed even in purple. The fix is `world/elite-power.txt`: Cinderlord x8 health and x1.1 damage, Hvitserk x1.25 health, Gloomroot x0.8 health and x0.6 damage, Hrungnir x0.8 health. All 41 elites now satisfy both lone rules, and the party control passes (a party of the recommended size beat all of them in the final checks, including two players in green gear against the Cinderlord).

@@ -1299,6 +1299,22 @@ impl Character {
     }
 }
 
+/// Extra (health, damage) multipliers per monster kind from `world/elite-power.txt`, `(1, 1)` for every kind not listed.
+/// They tune how hard a kind is without touching its base table: the group elites that a lone player in ordinary gear
+/// must not be able to kill (`ELITE-SOLO-TEST`, `docs/elite-solo-report.md`).
+pub fn elite_power(kind: &str) -> (f64, f64) {
+    use std::collections::BTreeMap;
+    use std::sync::OnceLock;
+    static POWER: OnceLock<BTreeMap<String, [f64; 2]>> = OnceLock::new();
+    POWER
+        .get_or_init(|| {
+            serde_json::from_str(include_str!("../../world/elite-power.txt"))
+                .expect("valid elite power table")
+        })
+        .get(kind)
+        .map_or((1., 1.), |p| (p[0], p[1]))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2412,9 +2428,11 @@ mod tests {
         let mut used = std::collections::BTreeSet::new();
         for i in ITEMS.iter() {
             if matches!(i.kind.as_str(), "material" | "bag" | "food" | "potion") {
-                // Bags and consumables come in ten-level tiers; materials have no level.
+                // Bags and consumables come in ten-level tiers (plus the 95 and 99 consumable tiers); materials have no level.
                 let tier = (i.kind == "bag" || i.family.is_some())
-                    && (i.required_level == 1 || i.required_level % 10 == 0);
+                    && (i.required_level == 1
+                        || i.required_level % 10 == 0
+                        || matches!(i.required_level, 95 | 99));
                 assert!(tier || i.required_level == 1, "{} is not gear", i.id);
                 continue;
             }

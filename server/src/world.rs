@@ -29,6 +29,8 @@ mod deep_tests;
 #[cfg(test)]
 mod dormant_zone_tests;
 #[cfg(test)]
+mod dungeon_solo_tests;
+#[cfg(test)]
 mod elder_hollow_tests;
 #[cfg(test)]
 mod epic_drop_tests;
@@ -391,7 +393,14 @@ struct Slime {
 }
 impl Slime {
     // Health, damage, speed and body scale of a default-level enemy.
+    /// (health, damage, speed, scale) of `kind` at its default level: the table below times the power in
+    /// `world/elite-power.txt` (see `items::elite_power`).
     fn stats(kind: &str) -> (f64, f64, f64, f64) {
+        let (hp, damage, speed, scale) = Self::base_stats(kind);
+        let (hp_power, damage_power) = crate::items::elite_power(kind);
+        (hp * hp_power, damage * damage_power, speed, scale)
+    }
+    fn base_stats(kind: &str) -> (f64, f64, f64, f64) {
         if let Some(e) = crate::cathedral::enemy(kind) {
             let [hp, damage, speed, scale] = e.stats;
             return (hp, damage, speed, scale);
@@ -4735,7 +4744,8 @@ mod tests {
         w.players.get_mut(&4).unwrap().character.hp = 0.;
         w.players.get_mut(&5).unwrap().character.x = point.x - 20.;
         w.players.get_mut(&6).unwrap().character.zone = 0;
-        w.hit_slime(id, 1, 10000., false);
+        let finishing_blow = w.slimes[id].max_hp;
+        w.hit_slime(id, 1, finishing_blow, false);
         for session in 1..=6 {
             let c = &w.players[&session].character;
             assert_eq!(
@@ -4858,6 +4868,11 @@ mod tests {
                     .position(|s| s.kind == "cinderlord")
                     .unwrap();
                 let point = w.slimes[id].point();
+                // These tests check fight mechanics (credit, hiring, survival), so they fight the original 2,400 HP / 180 damage
+                // Cinderlord. Its real difficulty is checked by `solo_elite_tests` and `world/elite-power.txt`.
+                w.slimes[id].max_hp = 2400.;
+                w.slimes[id].hp = 2400.;
+                w.slimes[id].damage = 180.;
                 for s in w.slimes.iter_mut().filter(|s| s.id != id) {
                     s.dead = true;
                     s.respawn = 10000.;
@@ -5447,6 +5462,11 @@ mod tests {
                 .position(|s| s.kind == "cinderlord")
                 .unwrap();
             let point = w.slimes[id].point();
+            // These tests check fight mechanics (credit, hiring, survival), so they fight the original 2,400 HP / 180 damage
+            // Cinderlord. Its real difficulty is checked by `solo_elite_tests` and `world/elite-power.txt`.
+            w.slimes[id].max_hp = 2400.;
+            w.slimes[id].hp = 2400.;
+            w.slimes[id].damage = 180.;
             for s in w.slimes.iter_mut().filter(|s| s.id != id) {
                 s.dead = true;
                 s.respawn = 10000.;
@@ -6881,8 +6901,8 @@ mod tests {
             (
                 "gloomroot",
                 20,
-                90000.,
-                1500.,
+                72000.,
+                900.,
                 0.85,
                 1200,
                 "gloomroot_heartwood",

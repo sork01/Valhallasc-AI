@@ -1,0 +1,6 @@
+{
+  "cinderlord": [8.0, 1.1],
+  "gloomroot": [0.8, 0.6],
+  "hrungnir": [0.8, 1.0],
+  "hvitserk": [1.25, 1.0]
+}

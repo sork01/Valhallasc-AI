@@ -83,6 +83,10 @@ pub struct Case {
     /// Spawn index of the monster to fight instead of the one `pick_enemy` chooses (the group elites of
     /// `ELITE-SOLO-TEST`). The monster is still levelled to `level`.
     pub target: Option<usize>,
+    /// The monster's level when it differs from the character's (a player five levels above the elite).
+    pub enemy_level: Option<u32>,
+    /// Seconds the fight may last before it counts as not won (default: the rotation's cap).
+    pub cap: Option<f64>,
 }
 impl Case {
     pub fn new(class: Class, level: u32) -> Self {
@@ -96,6 +100,8 @@ impl Case {
             harmless: false,
             rarity: BASELINE_RARITY,
             target: None,
+            enemy_level: None,
+            cap: None,
         }
     }
 }
@@ -467,7 +473,7 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
         s.respawn = 1e9;
     }
     let spawn = w.spawns[id].clone();
-    w.slimes[id] = Slime::with_level(id, &spawn, case.level);
+    w.slimes[id] = Slime::with_level(id, &spawn, case.enemy_level.unwrap_or(case.level));
     if case.harmless {
         w.slimes[id].damage = 0.;
     }
@@ -482,6 +488,8 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
         c.y = start.y;
         build_character(c, case);
     }
+    // A dungeon copy nobody has entered is frozen: the monsters would never move or strike.
+    w.enter_instance(zone);
     let mut out = Outcome {
         seed,
         seconds: 0.,
@@ -509,7 +517,7 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
     // The first command: attack the monster. The server walks the character in and swings on its own.
     w.message(1, ClientMessage::Target { id });
     let start_time = w.time;
-    let cap = cap_for(case.rotation);
+    let cap = case.cap.unwrap_or_else(|| cap_for(case.rotation));
     while w.time - start_time < cap {
         if w.players[&1].character.hp <= 0. {
             out.died = true;
@@ -563,38 +571,46 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
     (out, summary)
 }
 
-/// A party of `members` (one real character each, all in `case.rarity` gear at `case.level`) against the monster of
-/// `case.target`: true if the monster dies within the rotation cap. The control for `ELITE-SOLO-TEST`.
-pub fn run_party_once(case: &Case, members: &[Class], seed: u64) -> bool {
+/// One lone character against several monsters at once (a dungeon pack). The pack is `killed` when every member is
+/// dead; `enemy_left` is the share of the pack's total health still standing. The character always fights the nearest
+/// living member and picks the next target as soon as one dies.
+pub fn run_pack_once(case: &Case, ids: &[usize], seed: u64) -> Outcome {
     let mut w = world();
     w.rng = seed;
-    let id = case.target.expect("a party fights a chosen monster");
-    // Only the target's own zone is cleared. Monsters elsewhere stay alive and dormant, which `step` skips; dead ones
-    // are updated every tick (about 6 ms per step across all zones, nearly all of a fight's cost).
-    let target_zone = w.slimes[id].zone;
+    let target_zone = w.slimes[ids[0]].zone;
     for s in w
         .slimes
         .iter_mut()
-        .filter(|s| s.id != id && s.zone == target_zone)
+        .filter(|s| s.zone == target_zone && !ids.contains(&s.id))
     {
         s.dead = true;
         s.respawn = 1e9;
     }
-    let spawn = w.spawns[id].clone();
-    w.slimes[id] = Slime::with_level(id, &spawn, case.level);
-    let zone = w.slimes[id].zone;
-    let home = w.slimes[id].point();
-    let mut rxs = vec![];
-    for (n, &class) in members.iter().enumerate() {
-        let session = n as u64 + 1;
-        rxs.push(join(&mut w, session, class));
-        let start = start_point(&w, zone, home);
-        let c = &mut w.players.get_mut(&session).unwrap().character;
-        c.zone = zone;
+    for &id in ids {
+        let spawn = w.spawns[id].clone();
+        w.slimes[id] = Slime::with_level(id, &spawn, case.enemy_level.unwrap_or(case.level));
+    }
+    let centre = Point {
+        x: ids.iter().map(|&i| w.slimes[i].x).sum::<f64>() / ids.len() as f64,
+        y: ids.iter().map(|&i| w.slimes[i].y).sum::<f64>() / ids.len() as f64,
+    };
+    let home = ids
+        .iter()
+        .map(|&i| w.slimes[i].point())
+        .min_by(|a, b| a.distance(centre).total_cmp(&b.distance(centre)))
+        .unwrap();
+    let total_hp: f64 = ids.iter().map(|&i| w.slimes[i].max_hp).sum();
+    let mut rx = join(&mut w, 1, case.class);
+    let start = start_point(&w, target_zone, home);
+    {
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.zone = target_zone;
         c.x = start.x;
         c.y = start.y;
-        build_character(c, &Case { class, ..*case });
+        build_character(c, case);
     }
+    w.enter_instance(target_zone);
+    let max_hp = w.players[&1].character.max_hp();
     let mut out = Outcome {
         seed,
         seconds: 0.,
@@ -609,37 +625,200 @@ pub fn run_party_once(case: &Case, members: &[Class], seed: u64) -> bool {
         food_used: 0,
         enemy_left: 1.,
     };
-    for n in 0..members.len() {
-        w.message(n as u64 + 1, ClientMessage::Target { id });
-    }
     let start_time = w.time;
-    while w.time - start_time < cap_for(case.rotation) {
-        if w.slimes[id].dead {
-            return true;
+    let cap = case.cap.unwrap_or_else(|| cap_for(case.rotation));
+    let mut current = usize::MAX;
+    let left = |w: &World| ids.iter().map(|&i| w.slimes[i].hp.max(0.)).sum::<f64>() / total_hp;
+    while w.time - start_time < cap {
+        if w.players[&1].character.hp <= 0. {
+            out.died = true;
+            break;
         }
-        for n in 0..members.len() {
+        let me = w.players[&1].character.point();
+        let Some(near) = ids
+            .iter()
+            .copied()
+            .filter(|&i| !w.slimes[i].dead)
+            .min_by(|&a, &b| {
+                w.slimes[a]
+                    .point()
+                    .distance(me)
+                    .total_cmp(&w.slimes[b].point().distance(me))
+            })
+        else {
+            out.killed = true;
+            break;
+        };
+        if near != current || w.slimes[current].dead {
+            current = near;
+            w.message(1, ClientMessage::Target { id: near });
+        }
+        if case.rotation == Rotation::Skills {
+            cast_skills(&mut w, 1, near, &mut out);
+        }
+        if case.consumables {
+            use_consumables(&mut w, 1, &mut out);
+        }
+        let before = w.players[&1].character.hp;
+        w.step();
+        drain(&mut rx);
+        let after = w.players[&1].character.hp;
+        if after < before {
+            out.damage_taken += before - after;
+            out.hits_taken += 1;
+        }
+        out.lowest_hp_fraction = out.lowest_hp_fraction.min((after / max_hp).max(0.));
+        let elapsed = w.time - start_time;
+        if elapsed >= PROJECT_AFTER {
+            let done = 1. - left(&w);
+            if done <= 0. || elapsed / done > cap * HOPELESS_FACTOR {
+                break;
+            }
+        }
+    }
+    out.seconds = w.time - start_time;
+    out.enemy_left = left(&w).clamp(0., 1.);
+    if w.players[&1].character.hp <= 0. {
+        out.died = true;
+        out.lowest_hp_fraction = 0.;
+    }
+    out
+}
+
+/// A party of `members` (one real character each, all in `case.rarity` gear at `case.level`) against the monster of
+/// `case.target`: true if the monster dies within the rotation cap. The control for `ELITE-SOLO-TEST`.
+pub fn run_party_once(case: &Case, members: &[Class], seed: u64) -> bool {
+    let id = case.target.expect("a party fights a chosen monster");
+    run_party_pack_once(case, members, &[id], seed).killed
+}
+
+/// What a party fight came to.
+#[derive(Clone, Debug)]
+pub struct PartyOutcome {
+    /// Every monster of the group died.
+    pub killed: bool,
+    /// Members who died on the way.
+    pub deaths: usize,
+    pub seconds: f64,
+    /// The group's health still standing, as a fraction of its total.
+    pub enemy_left: f64,
+}
+
+/// A party of `members` against several monsters at once (a dungeon pack or a boss). Every living member fights the
+/// nearest living monster; the group is `killed` when every monster is dead before the cap.
+pub fn run_party_pack_once(
+    case: &Case,
+    members: &[Class],
+    ids: &[usize],
+    seed: u64,
+) -> PartyOutcome {
+    let mut w = world();
+    w.rng = seed;
+    let zone = w.slimes[ids[0]].zone;
+    for s in w
+        .slimes
+        .iter_mut()
+        .filter(|s| s.zone == zone && !ids.contains(&s.id))
+    {
+        s.dead = true;
+        s.respawn = 1e9;
+    }
+    for &id in ids {
+        let spawn = w.spawns[id].clone();
+        w.slimes[id] = Slime::with_level(id, &spawn, case.enemy_level.unwrap_or(case.level));
+    }
+    let centre = Point {
+        x: ids.iter().map(|&i| w.slimes[i].x).sum::<f64>() / ids.len() as f64,
+        y: ids.iter().map(|&i| w.slimes[i].y).sum::<f64>() / ids.len() as f64,
+    };
+    let home = ids
+        .iter()
+        .map(|&i| w.slimes[i].point())
+        .min_by(|a, b| a.distance(centre).total_cmp(&b.distance(centre)))
+        .unwrap();
+    let total_hp: f64 = ids.iter().map(|&i| w.slimes[i].max_hp).sum();
+    let mut rxs = vec![];
+    for (n, &class) in members.iter().enumerate() {
+        let session = n as u64 + 1;
+        rxs.push(join(&mut w, session, class));
+        let start = start_point(&w, zone, home);
+        let c = &mut w.players.get_mut(&session).unwrap().character;
+        c.zone = zone;
+        c.x = start.x;
+        c.y = start.y;
+        build_character(c, &Case { class, ..*case });
+    }
+    w.enter_instance(zone);
+    let mut out = Outcome {
+        seed,
+        seconds: 0.,
+        killed: false,
+        died: false,
+        damage_taken: 0.,
+        hits_taken: 0,
+        lowest_hp_fraction: 1.,
+        resource_used: 0.,
+        casts: 0,
+        potions_used: 0,
+        food_used: 0,
+        enemy_left: 1.,
+    };
+    let left = |w: &World| ids.iter().map(|&i| w.slimes[i].hp.max(0.)).sum::<f64>() / total_hp;
+    let mut aimed = vec![usize::MAX; members.len()];
+    let start_time = w.time;
+    let cap = case.cap.unwrap_or_else(|| cap_for(case.rotation));
+    let mut killed = false;
+    while w.time - start_time < cap {
+        if ids.iter().all(|&i| w.slimes[i].dead) {
+            killed = true;
+            break;
+        }
+        let mut anyone_alive = false;
+        for (n, aimed_at) in aimed.iter_mut().enumerate() {
             let session = n as u64 + 1;
             if w.players[&session].character.hp <= 0. {
                 continue;
             }
-            cast_skills(&mut w, session, id, &mut out);
+            anyone_alive = true;
+            let me = w.players[&session].character.point();
+            let Some(near) = ids
+                .iter()
+                .copied()
+                .filter(|&i| !w.slimes[i].dead)
+                .min_by(|&a, &b| {
+                    w.slimes[a]
+                        .point()
+                        .distance(me)
+                        .total_cmp(&w.slimes[b].point().distance(me))
+                })
+            else {
+                break;
+            };
+            if *aimed_at != near {
+                *aimed_at = near;
+                w.message(session, ClientMessage::Target { id: near });
+            }
+            cast_skills(&mut w, session, near, &mut out);
             if case.consumables {
                 use_consumables(&mut w, session, &mut out);
             }
+        }
+        if !anyone_alive {
+            break;
         }
         w.step();
         for rx in rxs.iter_mut() {
             drain(rx);
         }
-        if members
-            .iter()
-            .enumerate()
-            .all(|(n, _)| w.players[&(n as u64 + 1)].character.hp <= 0.)
-        {
-            return false;
-        }
     }
-    w.slimes[id].dead
+    PartyOutcome {
+        killed: killed || ids.iter().all(|&i| w.slimes[i].dead),
+        deaths: (0..members.len())
+            .filter(|&n| w.players[&(n as u64 + 1)].character.hp <= 0.)
+            .count(),
+        seconds: w.time - start_time,
+        enemy_left: left(&w).clamp(0., 1.),
+    }
 }
 
 /// Seeds 1..=`runs` of one case, summarised.
@@ -810,6 +989,8 @@ fn ttk_report() {
                                 harmless: std::env::var("TTK_HARMLESS").is_ok_and(|v| v == "1"),
                                 rarity: BASELINE_RARITY,
                                 target: None,
+                                enemy_level: None,
+                                cap: None,
                             };
                             if case.foe == Foe::Elite
                                 && pick_enemy(&world(), level, Foe::Elite).is_none()

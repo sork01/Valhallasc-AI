@@ -426,7 +426,7 @@ fn every_deep_monster_has_its_own_stats_attacks_materials_and_rewards() {
         ("siren", 23500., 520., 770, "siren_pearl"),
         ("shellback", 40000., 700., 830, "shellback_plate"),
         ("kraken", 280000., 4400., 4500, "kraken_beak"),
-        ("hvitserk", 150000., 2600., 2500, "captains_signet"),
+        ("hvitserk", 187500., 2600., 2500, "captains_signet"),
         ("ghostmaw", 190000., 3000., 3200, "ghostmaw_tooth"),
     ] {
         let spawn = SlimeSpawn {
