@@ -182,10 +182,12 @@
   // Browsers only let audio start after a tap or key press, so the score begins on the first one
   // (on the title screen that is the tap that awakens the horn) and then plays on every screen.
   let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, wmusic = null, kmusic = null, dmusic = null, nmusic = null, amusic = null, pmusic = null, omusic = null, mmusic = null, hmusic = null, tmusic = null, qmusic = null, jmusic = null, whmusic = null, lmusic = null, fwMusic = null, cairnMusic = null, yearMusic = null, cathedralMusic = [], eyeMusic = null, elderMusic = null, pavilionMusic = null, rainMusic = null, seedMusic = null, sunkenMusic = null, thunderMusic = null, bloomMusic = null, solarMusic = null, amberMusic = null, solsticeMusic = null, musicZone = 0;
+  let nightMusic = null, activeScore = null, lastNightMix = -1;
   function ensureMusic() {
     const c = audio(); if (!c || !window.createMusic) return;
     ensureWeatherSound();
     if (!music) { music = window.createMusic(c); c.addEventListener('statechange', ensureMusic); }
+    if (!nightMusic && window.createNightMusic) nightMusic = window.createNightMusic(c);
     if (!fmusic && window.createFieldMusic) fmusic = window.createFieldMusic(c);
     if (!cmusic && window.createCragMusic) cmusic = window.createCragMusic(c);
     if (!rmusic && window.createRimeMusic) rmusic = window.createRimeMusic(c);
@@ -228,17 +230,34 @@
     if (!ac || ac.state !== 'running') return;
     // In the game each zone selects its score; Greenmeadow and Alderhaven share the folk tune.
     const here = scene === 'game' ? (musicZone === 28 && yearMusic ? yearMusic : musicZone === 27 && cairnMusic ? cairnMusic : musicZone === 26 && fwMusic ? fwMusic : musicZone === 25 && lmusic ? lmusic : (musicZone === 23 || musicZone === 24) && whmusic ? whmusic : musicZone === 22 && jmusic ? jmusic : musicZone === 21 && qmusic ? qmusic : musicZone === 20 && tmusic ? tmusic : musicZone === 17 && hmusic ? hmusic : (musicZone === 18 || (musicZone >= 41 && musicZone <= 43) || musicZone === 16) && mmusic ? mmusic : musicZone === 29 && eyeMusic ? eyeMusic : musicZone === 30 && elderMusic ? elderMusic : musicZone === 31 && pavilionMusic ? pavilionMusic : musicZone === 32 && rainMusic ? rainMusic : musicZone === 33 && seedMusic ? seedMusic : musicZone === 34 && sunkenMusic ? sunkenMusic : musicZone === 35 && thunderMusic ? thunderMusic : musicZone === 36 && bloomMusic ? bloomMusic : musicZone === 37 && solarMusic ? solarMusic : musicZone === 38 && amberMusic ? amberMusic : musicZone === 39 && solsticeMusic ? solsticeMusic : (musicZone === 19 || (musicZone >= 30 && musicZone <= 33)) && vmusic ? vmusic : musicZone === 15 && omusic ? omusic : musicZone === 14 && pmusic ? pmusic : musicZone === 13 && amusic ? amusic : musicZone >= 10 && musicZone <= 12 && cathedralMusic[musicZone - 10] ? cathedralMusic[musicZone - 10] : musicZone === 9 && nmusic ? nmusic : musicZone === 8 && dmusic ? dmusic : musicZone === 7 && kmusic ? kmusic : musicZone === 6 && wmusic ? wmusic : musicZone === 5 ? vmusic : musicZone === 4 && smusic ? smusic : musicZone === 3 && gmusic ? gmusic : musicZone === 2 && rmusic ? rmusic : musicZone > 0 && cmusic ? cmusic : fmusic) : null;
+    activeScore = here;
     for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, ...cathedralMusic]) if (m && m !== here && m.running) m.stop();
     if (scene === 'game') { if (music && music.running) music.stop(); if (here && !here.running) here.start(); }
     else if (music && !music.running) music.start();
+    lastNightMix = -1;
     applyMusicLevel(3);
+    syncNightMusic(3);
   }
+  function syncNightMusic(secs = 1.2) {
+    if (!ac || ac.state !== 'running' || !nightMusic) return;
+    const mix = scene === 'game' ? (window.DayNight?.nightMix || 0) : 0;
+    if (mix > .001 && !nightMusic.running) nightMusic.start();
+    if (mix <= .001 && nightMusic.running) nightMusic.stop();
+    if (Math.abs(mix - lastNightMix) < .005) return;
+    lastNightMix = mix;
+    const volume = save.sound ? taper(save.musicVol) : 0;
+    if (activeScore) activeScore.setLevel(volume * (1 - mix), secs);
+    nightMusic.setLevel(volume * mix, secs);
+  }
+  setInterval(() => { if (scene === 'game') syncNightMusic(); }, 1000);
   function applyMusicLevel(secs = 1.5) {
     if (music) music.setLevel(save.sound ? (scene === 'splash' ? 1 : .55) * taper(save.musicVol) : 0, secs);
-    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, ...cathedralMusic]) if (m) m.setLevel(save.sound ? taper(save.musicVol) : 0, secs);
+    const volume = save.sound ? taper(save.musicVol) : 0, mix = scene === 'game' ? (window.DayNight?.nightMix || 0) : 0;
+    for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, ...cathedralMusic]) if (m) m.setLevel(volume * (m === activeScore ? 1 - mix : 1), secs);
+    if (nightMusic) nightMusic.setLevel(volume * mix, secs);
   }
   // Dip every field score under a short fanfare so it is heard over the music.
-  function duckMusic(secs) { for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, ...cathedralMusic]) if (m?.running && m.duck) m.duck(secs); }
+  function duckMusic(secs) { for (const m of [fmusic, cmusic, rmusic, gmusic, smusic, vmusic, wmusic, kmusic, dmusic, nmusic, amusic, pmusic, omusic, mmusic, hmusic, tmusic, qmusic, jmusic, whmusic, lmusic, fwMusic, cairnMusic, yearMusic, eyeMusic, elderMusic, pavilionMusic, rainMusic, seedMusic, sunkenMusic, thunderMusic, bloomMusic, solarMusic, amberMusic, solsticeMusic, nightMusic, ...cathedralMusic]) if (m?.running && m.duck) m.duck(secs); }
   function unlockAudio() { const c = audio(); if (c) c.resume().then(ensureMusic).catch(() => {}); }
   ['pointerdown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, unlockAudio, { capture: true }));
   document.addEventListener('visibilitychange', () => { if (!ac) return; if (document.hidden) ac.suspend(); else ac.resume(); });
@@ -364,6 +383,7 @@
   const view = new window.WarriorView(wcv, name => onWarrior(name));
   view.reduced = reduced;
   window.valhalla = { view, get music() { return music; }, get fmusic() { return fmusic; }, get cmusic() { return cmusic; }, get rmusic() { return rmusic; }, get gmusic() { return gmusic; }, get smusic() { return smusic; }, get vmusic() { return vmusic; }, get wmusic() { return wmusic; }, get kmusic() { return kmusic; }, get dmusic() { return dmusic; }, get nmusic() { return nmusic; }, get amusic() { return amusic; }, get pmusic() { return pmusic; }, get omusic() { return omusic; }, get mmusic() { return mmusic; }, get hmusic() { return hmusic; }, get tmusic() { return tmusic; }, get qmusic() { return qmusic; }, get jmusic() { return jmusic; }, get whmusic() { return whmusic; }, get lmusic() { return lmusic; }, get fwMusic() { return fwMusic; }, get cairnMusic() { return cairnMusic; }, get yearMusic() { return yearMusic; }, get cathedralMusic() { return cathedralMusic; }, get ctx() { return ac; } };   // debug handle (also used by the tests)
+  Object.defineProperty(window.valhalla, 'nightMusic', { get: () => nightMusic });
   if (view.ok) {
     view.load('assets/warrior.webp', 'assets/warrior_mask.png').then(() => { view.bind(); view.set(cfg); if (scene === 'create' && !modular(cfg)) view.setActive(true); }).catch(() => fallbackWarrior());
   } else fallbackWarrior();

@@ -90,5 +90,6 @@
     g.restore();
   }
   window.DayNight = { sync, setZone, tick, draw, isOutdoor, get hour() { return hour(); }, get outdoorBlend() { return outdoorBlend; },
+    get nightMix() { return clock.synced && isOutdoor(zone) ? night(hour()) : 0; },
     get shadowOffset() { return isOutdoor(zone) && hour() >= 7 && hour() <= 18 ? (12 - hour()) * 1.4 : 0; } };
 })();

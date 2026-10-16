@@ -1,4 +1,4 @@
-// The five scores are mp3 files played by music_player.js: they must load and decode with the expected length, play
+// The scores are mp3 files played by music_player.js: they must load and decode with the expected length, play
 // audibly, and in a real game the zone must pick the score (meadow tune in Greenmeadow, Ashfall Run in the Crags, Rimeveil Spiral on the glacier, Lanternmere Dusk in Gloamfen).
 // Not in npm run test:ui (the user does not want music tested there); run it by hand when the music changes.
 const assert = require('node:assert/strict');
@@ -16,6 +16,7 @@ async function call(name, args = {}) {
 }
 const SONGS = [
   { id: 'title', make: 'createMusic', seconds: 84.71, name: 'Snowbound Hearth' },
+  { id: 'night', make: 'createNightMusic', seconds: 80, name: 'Lanterns After Sundown' },
   { id: 'meadow', make: 'createFieldMusic', seconds: 43.64, name: 'Greenmeadow Wander' },
   { id: 'crags', make: 'createCragMusic', seconds: 54.86, name: 'Ashfall Run' },
   { id: 'rime', make: 'createRimeMusic', seconds: 76.8, name: 'Rimeveil Spiral' },
@@ -59,6 +60,8 @@ const SONGS = [
   await game.locator('#login-guest').click();
   await game.locator('#name').fill('Bard'); await game.locator('#go').click({ timeout: 60000 });
   await game.waitForFunction(() => Online.connected && !!valhalla.fmusic?.running, null, { timeout: 60000 });
+  await game.evaluate(() => Online.send({ type: 'debug', command: { op: 'set_time', hour: 12, freeze: true } }));
+  await game.waitForFunction(() => Math.abs(DayNight.hour - 12) < .01 && DayNight.nightMix === 0, null, { timeout: 10000 });
   check(await game.evaluate(() => !valhalla.cmusic.running && !valhalla.rmusic.running && !valhalla.gmusic.running && !valhalla.smusic.running && !valhalla.wmusic.running && !valhalla.music.running), 'In Greenmeadow only the meadow tune is running');
   await game.waitForFunction(() => valhalla.fmusic.loaded, null, { timeout: 30000 });
   check(true, 'The meadow mp3 loaded in the game');
