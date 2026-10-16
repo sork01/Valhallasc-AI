@@ -643,13 +643,75 @@
     g.gain.setValueAtTime(vol, now); g.gain.exponentialRampToValueAtTime(.0001, now + dur);
     o.connect(g).connect(sfxOut(c)); o.start(now); o.stop(now + dur + .02);
   }
+  // Short, pitched combat voices. Each family has a different pitch and waveform; distance and
+  // the shared effects bus control their level. Four enemy voices at once is the crowd ceiling.
+  const enemyVoices = new Set();
+  const familySound = kind => {
+    if (/(slime|moth|beetle|spider|scarab|mantis|crab|hornet|scorpion|widow|leech|silkwing)/.test(kind)) return 'insect';
+    if (/(wraith|ghost|draugr|thrall|skeleton|bone|hollow|reaper|harbinger|mour[n]?sister|choir|zealot)/.test(kind)) return 'undead';
+    if (/(golem|sentinel|construct|gear|engine|clock|guard|bastion|colossus|statue|warden)/.test(kind)) return 'construct';
+    if (/(root|bloom|thorn|spore|flower|dryad|wicker|bark|seed|petal|mireheart)/.test(kind)) return 'plant';
+    if (/(tide|water|eel|ray|moray|angler|siren|kraken|caiman|otter|leviathan|shell|coral|pearl|astro|rain)/.test(kind)) return 'water';
+    if (/(archer|cantor|acolyte|seer|oracle|sibyl|mage|weaver|spark|sunwheel|wisp)/.test(kind)) return 'ranged';
+    return 'beast';
+  };
+  const voiceSpec = {
+    beast:[180,95,'sawtooth'], insect:[650,160,'square'], undead:[290,75,'triangle'],
+    construct:[120,65,'square'], plant:[390,105,'triangle'], water:[480,155,'sine'], ranged:[870,240,'sine'],
+    sword:[920,370,'triangle'], mace:[185,70,'sawtooth'], dagger:[1450,540,'triangle'],
+    staff:[510,160,'sine'], bow:[340,610,'sawtooth'], arrow:[1180,240,'triangle'], spell:[690,1350,'sine'],
+  };
+  function combatVoice(family, stage, level, enemy = false, finalBoss = false, heavy = false) {
+    if (!save.sound || level <= 0) return;
+    const c = audio(); if (!c) return;
+    if (enemy && enemyVoices.size >= 4) return;
+    const [base, low, shape] = voiceSpec[family] || voiceSpec.beast;
+    const death = stage === 'death', miss = stage === 'miss';
+    const duration = death ? finalBoss ? .85 : heavy ? .58 : .43 : miss ? .12 : .19;
+    const from = (death ? base * .75 : miss ? base * 1.5 : base) * (finalBoss ? .58 : 1);
+    const to = (death ? low * .5 : miss ? base * 1.15 : low) * (finalBoss ? .58 : 1);
+    const now = c.currentTime, oscillator = c.createOscillator(), gain = c.createGain();
+    oscillator.type = shape; oscillator.frequency.setValueAtTime(from, now);
+    oscillator.frequency.exponentialRampToValueAtTime(Math.max(25, to), now + duration);
+    gain.gain.setValueAtTime(.0001, now);
+    gain.gain.exponentialRampToValueAtTime(Math.max(.0002, level * (death ? .3 : .24)), now + .018);
+    gain.gain.exponentialRampToValueAtTime(.0001, now + duration);
+    oscillator.connect(gain).connect(sfxOut(c));
+    if (enemy) { enemyVoices.add(oscillator); oscillator.onended = () => enemyVoices.delete(oscillator); }
+    oscillator.start(now); oscillator.stop(now + duration + .02);
+  }
+  const audibleLevel = (ev, own = false) => {
+    if (own) return 1;
+    const h = window.Field?.hero;
+    if (!h || !Number.isFinite(ev?.x) || !Number.isFinite(ev?.y)) return 0;
+    return Math.max(0, Math.min(.55, (15 - Math.hypot(ev.x-h.x, ev.y-h.y)) / 26));
+  };
+  const swingFamily = className => ({warrior:'sword', priest:'mace', assassin:'dagger', mage:'staff', hunter:'bow'})[className] || 'staff';
+  const lastSwingSound = new Map(), recentSwings = [];
+  function combatSwing(ev) {
+    const c = audio(); if (!c) return;
+    const actor = ev.actorId || (ev.own ? 'self' : 'other');
+    if (c.currentTime - (lastSwingSound.get(actor) ?? -1) < .09) return;
+    if (lastSwingSound.size > 128) for (const [id,at] of lastSwingSound) if (c.currentTime-at > 5) lastSwingSound.delete(id);
+    while (recentSwings.length && c.currentTime - recentSwings[0] > .15) recentSwings.shift();
+    if (!ev.own && recentSwings.length >= 3) return;
+    lastSwingSound.set(actor, c.currentTime); recentSwings.push(c.currentTime);
+    const level = audibleLevel(ev, ev.own) * (ev.own ? 1 : .7);
+    if (!level) return;
+    const family = swingFamily(ev.className);
+    combatVoice(family, 'swing', level);
+    if (family === 'bow') setTimeout(() => combatVoice('arrow', 'swing', level * .7), 170);
+    if (family === 'dagger') setTimeout(() => combatVoice('dagger', 'swing', level * .6), 80);
+  }
   const SFX = {
     shadowstep: () => noiseBurst(.16, 900, 3200, .065),
     cast: () => { sweep(330, 990, .25, .065, 'triangle'); tone([1175], .2, .025); },
-    swing: () => noiseBurst(.2, 500, 2400, .14, 1.4),
+    combatSwing,
+    enemyAttack: ev => combatVoice(familySound(ev.kind), 'attack', audibleLevel(ev) * (ev.boss ? 1.6 : ev.elite ? 1.25 : 1), true),
+    enemyDeath: ev => combatVoice(familySound(ev.kind), 'death', audibleLevel(ev) * (ev.finalBoss ? 2 : ev.boss ? 1.6 : ev.elite ? 1.25 : 1), true, !!ev.finalBoss, !!(ev.boss || ev.elite)),
+    miss: () => combatVoice('ranged', 'miss', .55),
     hit: () => { sweep(190, 70, .13, .22); noiseBurst(.07, 1800, 900, .08); sweep(420, 180, .16, .08, 'triangle'); },
     crit: () => { SFX.hit(); tone([1320, 1980], .3, .07); },
-    slimeDie: () => { sweep(520, 140, .22, .16, 'triangle'); noiseBurst(.16, 1400, 300, .1); },
     hurt: () => voice(115, .32, .32, false),
     pickup: () => tone([1568], .12, .05),
     // A potion is a quick gulp that rises; a meal is two soft low notes.
@@ -687,6 +749,7 @@
     if (name === 'death') $('dead-msg').hidden = false;
     if (name === 'respawn') $('dead-msg').hidden = true;
   }
+  if (window.__valhallaTestSprites) window.__combatAudioTest = { familySound, play:onField, active:() => enemyVoices.size, bus:() => sfxGain };
   const rarePickupBox = $('rare-pickup');
   let rarePickupTimer = 0;
   function rarePickup(event) {

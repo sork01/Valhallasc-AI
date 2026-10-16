@@ -889,6 +889,11 @@
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
   function w2s(x, y, z = 0) { const [cx, cy] = camS(), [sx, sy] = w2sRaw(x, y); return [sx - cx + VW / 2 + Math.round(shakeX), sy - cy + VH / 2 + Math.round(shakeY) - z]; }
+  function visibleCombatCue(x, y) {
+    if (Math.hypot(x-hero.x,y-hero.y) >= 15) return false;
+    const [sx,sy] = w2s(x,y);
+    return sx >= -40 && sy >= -90 && sx <= VW+40 && sy <= VH+40;
+  }
   function s2w(sx, sy) { const [cx, cy] = camS(), rx = sx - VW / 2 + cx, ry = sy - VH / 2 + cy; return [rx / TW + ry / TH, ry / TH - rx / TW]; }
   let shakeX = 0, shakeY = 0;
   function pointerWorld(e) { const r = cv.getBoundingClientRect(); return s2w((e.clientX - r.left) / r.width * VW, (e.clientY - r.top) / r.height * VH); }
@@ -1100,8 +1105,16 @@
     }
     const existing = new Map(slimes.map(s => [s.id, s]));
     slimes = packet.slimes.filter(inZone).map(data => {
-      const actor = existing.get(data.id) || { ...data }; applyActor(actor, data, initial || moved);
-      actor.d = SLIME[data.kind]; return actor;
+      const previous = existing.get(data.id);
+      const wasDead = previous?.dead, wasWindup = previous?.state === 'windup';
+      const actor = previous || { ...data }; applyActor(actor, data, initial || moved);
+      actor.d = SLIME[data.kind];
+      if (!initial && !moved && previous) {
+        const audible = visibleCombatCue(data.x,data.y);
+        if (audible && !wasDead && data.dead) say('enemyDeath', { kind:data.kind, x:data.x, y:data.y, elite:!!actor.d?.elite, boss:!!actor.d?.boss, finalBoss:zdef.final_boss === data.kind });
+        else if (audible && !data.dead && !wasWindup && data.state === 'windup') say('enemyAttack', { kind:data.kind, x:data.x, y:data.y, elite:!!actor.d?.elite, boss:!!actor.d?.boss });
+      }
+      return actor;
     });
     hero.target = selectedTarget == null ? null : slimes.find(s => s.id === selectedTarget && !s.dead) || null;
     const present = new Set();
@@ -1131,7 +1144,11 @@
     emitHud();
   }
   function networkEvent(event) {
-    if (event.actor === Online.id && !['death', 'respawn'].includes(event.kind)) say(event.crit && event.kind === 'hit' ? 'crit' : event.kind, event);
+    if (event.actor === Online.id && !['death', 'respawn', 'swing', 'cast'].includes(event.kind)) say(event.crit && event.kind === 'hit' ? 'crit' : event.kind, event);
+    if (event.kind === 'swing' || event.kind === 'cast') {
+      const actor = event.actor === Online.id ? hero : remotePlayers.get(event.actor);
+      if (actor && (event.actor === Online.id || visibleCombatCue(event.x,event.y))) say('combatSwing', { actorId:event.actor, className:actor.look?.class, x:event.x, y:event.y, own:event.actor === Online.id });
+    }
     if (event.kind === 'skill') skillFx(event);
     if (event.kind === 'hit') {
       // A little scatter keeps the numbers of a many-hit skill readable.

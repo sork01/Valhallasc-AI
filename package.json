@@ -18,6 +18,7 @@
     "test:stat": "node tests/stat-ui.cjs",
     "test:daynight": "node tests/daynight-ui.cjs",
     "test:weather": "node tests/weather-ui.cjs",
+    "test:sound": "node tests/levelup-sound.cjs && node tests/combat-sound.cjs",
     "test:swedish": "node tests/swedish-ui.cjs",
     "test:mcp": "node scripts/test-mcp.cjs",
     "world": "node scripts/sync-world.cjs",
