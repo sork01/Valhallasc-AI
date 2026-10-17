@@ -1,0 +1,2200 @@
+//! The final boss mechanics engine (docs/boss-mechanics.md, `BOSSMECH-ENGINE`): one state machine per fight that runs
+//! the data of `world/boss-mechanics.txt` against the live world. The data schema, the shapes and the fairness walk
+//! are in `crate::bossmech`; this file is the part that touches players and monsters.
+//!
+//! A fight belongs to one boss slot, and a slot belongs to one dungeon copy, so two copies never share a timer, an
+//! add or a shield. It starts when the boss is awake and fighting and ends the moment the boss dies, returns home or
+//! its copy is reset: that is the wipe or the evade, and it puts every add back to sleep and every timer back to its
+//! start (rule 6). The server alone decides every kill, shield and bar; the client only draws what `snapshot_for`
+//! sends under `bossMech`.
+//!
+//! Adds are the sleeping monsters the map already knows how to hold (spawns with `ambush: <tag>`, dead until
+//! something wakes them). A mechanic names the tag; the dungeon's data places the monsters.
+use super::*;
+use crate::bossmech::{
+    self as bm, Block, BossDef, Cover, Effect, GapAt, MarkEffect, Mechanic, Rect, Shape, Side,
+    SweepKind,
+};
+use std::collections::BTreeSet;
+use std::sync::Arc;
+
+/// An orb touches a player this close.
+const ORB_REACH: f64 = 0.6;
+/// A wall or lane hurts a player whose body overlaps it: the centre may be this far outside the band.
+const BODY: f64 = PLAYER_RADIUS;
+/// How long a held body stays held after each refresh; refreshed every tick.
+const HOLD: f64 = 0.2;
+
+pub struct BossMech {
+    /// Boss kind -> its mechanics. Tests replace it.
+    pub(super) table: BTreeMap<String, Arc<BossDef>>,
+    pub(super) fights: BTreeMap<usize, Fight>,
+    next_id: u64,
+}
+impl BossMech {
+    pub fn new() -> Self {
+        Self::with_table(bm::shipped())
+    }
+    pub fn with_table(table: BTreeMap<String, BossDef>) -> Self {
+        Self {
+            table: table.into_iter().map(|(k, v)| (k, Arc::new(v))).collect(),
+            fights: BTreeMap::new(),
+            next_id: 1,
+        }
+    }
+}
+
+/// Something running right now. Every variant knows the mechanic that started it (`mech`, an index of the boss's list).
+enum Live {
+    Zone(ZoneLive),
+    Mark(MarkLive),
+    Walls(WallsLive),
+    Break(BreakLive),
+    Gaze(GazeLive),
+}
+impl Live {
+    fn mech(&self) -> usize {
+        match self {
+            Self::Zone(z) => z.mech,
+            Self::Mark(m) => m.mech,
+            Self::Walls(w) => w.mech,
+            Self::Break(b) => b.mech,
+            Self::Gaze(g) => g.mech,
+        }
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ZPhase {
+    Cast,
+    /// Waiting between two casts of a `repeat`.
+    Gap,
+    /// Landed once; the same shape lands again after the next echo delay.
+    Echo,
+    Linger,
+}
+struct ZoneLive {
+    mech: usize,
+    id: u64,
+    areas: Vec<Shape>,
+    round: u32,
+    phase: ZPhase,
+    left: f64,
+    total: f64,
+    echo_i: usize,
+}
+struct MarkLive {
+    mech: usize,
+    id: u64,
+    targets: Vec<u64>,
+    wave: u32,
+    gap: bool,
+    left: f64,
+    total: f64,
+}
+struct WallLive {
+    side: Side,
+    /// The centre line of the band, along the axis it travels.
+    pos: f64,
+    /// Where the gap is centred, along the wall.
+    gap_at: f64,
+}
+struct WallsLive {
+    mech: usize,
+    id: u64,
+    warn_left: f64,
+    warn_total: f64,
+    walls: Vec<WallLive>,
+}
+struct BreakLive {
+    mech: usize,
+    left: f64,
+    total: f64,
+    needed: f64,
+    dealt: f64,
+}
+struct GazeLive {
+    mech: usize,
+    id: u64,
+    /// Seconds of warning left.
+    left: f64,
+    total: f64,
+    from: Point,
+    /// While the beam turns: the angle it points at and the radians it has turned so far.
+    angle: f64,
+    turned: f64,
+    /// Cover that has shielded someone during this gaze (it takes one hit per gaze).
+    shielded: BTreeSet<usize>,
+}
+struct SpokesLive {
+    mech: usize,
+    angle: f64,
+    dir: f64,
+    reverse_in: f64,
+    warn_left: f64,
+}
+struct CoverLive {
+    cover: Cover,
+    regrow: f64,
+    hits: u8,
+    broken: bool,
+    broken_for: f64,
+}
+struct Lit {
+    at: Point,
+    progress: f64,
+    lit_left: f64,
+}
+struct LitGroup {
+    mech: usize,
+    r: f64,
+    hold_for: f64,
+    lit_for: f64,
+    snuff_every: f64,
+    snuff_in: f64,
+    points: Vec<Lit>,
+}
+struct Orb {
+    at: Point,
+    target: u64,
+    life: f64,
+    speed: f64,
+    tag: String,
+    hold: f64,
+}
+struct Frozen {
+    cocoon: usize,
+    left: f64,
+    name: String,
+}
+struct BloomLive {
+    slot: usize,
+    left: f64,
+    heal: f64,
+    then: Option<String>,
+}
+struct ShieldLive {
+    tag: String,
+    adds: Vec<usize>,
+    heal_per_s: f64,
+    name: String,
+}
+
+pub(super) struct Fight {
+    boss: usize,
+    zone: usize,
+    arena: Rect,
+    clock: f64,
+    /// Per mechanic: seconds until a timed one starts again.
+    timer: Vec<f64>,
+    /// Per mechanic: the steps of a threshold block that have fired (bit `n`).
+    fired: Vec<u32>,
+    live: Vec<Live>,
+    shield: Option<ShieldLive>,
+    /// Every sleeping monster this fight woke, to put back to sleep when it ends.
+    woken: Vec<usize>,
+    /// Woken monsters that stand still and never attack (pearls, seeds, cocoons).
+    still: BTreeSet<usize>,
+    stun_left: f64,
+    vulnerable: f64,
+    lit: Vec<LitGroup>,
+    spokes: Vec<SpokesLive>,
+    cover: Vec<CoverLive>,
+    frozen: BTreeMap<u64, Frozen>,
+    orbs: Vec<Orb>,
+    blooms: Vec<BloomLive>,
+    /// The other body of a divided boss.
+    partner: Option<usize>,
+    /// Bodies that fell while the other lives, and the seconds until they rise.
+    downed: BTreeMap<usize, f64>,
+    banner: Option<(String, f64)>,
+}
+
+/// What `hit_slime` should do with a blow.
+pub(super) enum Incoming {
+    /// The monster takes this much.
+    Damage(f64),
+    /// A shield or a downed body: nothing gets through.
+    Immune,
+}
+
+impl World {
+    // -----------------------------------------------------------------------------------------------------------
+    // Hooks the rest of the world calls
+    // -----------------------------------------------------------------------------------------------------------
+
+    /// Once per tick, after the monsters have moved.
+    pub(super) fn update_boss_mechanics(&mut self) {
+        if self.boss.table.is_empty() && self.boss.fights.is_empty() {
+            return;
+        }
+        let bosses: Vec<usize> = self
+            .slimes
+            .iter()
+            .filter(|s| self.boss.table.contains_key(&s.kind))
+            .map(|s| s.id)
+            .collect();
+        let stale: Vec<usize> = self
+            .boss
+            .fights
+            .keys()
+            .copied()
+            .filter(|id| !self.boss_engaged(*id))
+            .collect();
+        for id in stale {
+            self.end_boss_fight(id);
+        }
+        for id in bosses {
+            if !self.boss_engaged(id) {
+                continue;
+            }
+            let mut fight = match self.boss.fights.remove(&id) {
+                Some(f) => f,
+                None => self.begin_boss_fight(id),
+            };
+            self.tick_boss_fight(&mut fight);
+            self.boss.fights.insert(id, fight);
+        }
+    }
+
+    /// The boss is alive, awake and fighting (not walking home), in a copy someone is in.
+    fn boss_engaged(&self, id: usize) -> bool {
+        let s = &self.slimes[id];
+        self.boss.table.contains_key(&s.kind)
+            && !s.dead
+            && !self.zone_idle(s.zone)
+            && !matches!(
+                s.state.as_str(),
+                "idle" | "wander" | "return" | "waiting" | "dead"
+            )
+    }
+
+    /// Ends a fight the way a wipe, an evade or a kill does: the sleepers sleep, the frozen walk, the timers go.
+    pub(super) fn end_boss_fight(&mut self, id: usize) {
+        let Some(fight) = self.boss.fights.remove(&id) else {
+            return;
+        };
+        for slot in fight.woken.iter().copied().chain(fight.partner) {
+            if self.spawns[slot].ambush.is_some() {
+                self.slimes[slot] = self.dormant_enemy(slot);
+            }
+        }
+        for session in fight.frozen.keys() {
+            if let Some(p) = self.players.get_mut(session) {
+                p.frozen = false;
+            }
+        }
+        self.slimes[id].set_root_left = 0.;
+    }
+
+    /// A dungeon copy was reset: no fight survives it.
+    pub(super) fn reset_boss_zone(&mut self, zone: usize) {
+        let ids: Vec<usize> = self
+            .boss
+            .fights
+            .iter()
+            .filter(|(_, f)| f.zone == zone)
+            .map(|(id, _)| *id)
+            .collect();
+        for id in ids {
+            self.end_boss_fight(id);
+        }
+    }
+
+    /// Asked by `hit_slime` before a blow lands.
+    pub(super) fn boss_incoming(&self, id: usize, damage: f64) -> Incoming {
+        let Some(fight) = self.fight_of(id) else {
+            return Incoming::Damage(damage);
+        };
+        if fight.shield.is_some() && id == fight.boss {
+            return Incoming::Immune;
+        }
+        if fight.downed.contains_key(&id) {
+            return Incoming::Immune;
+        }
+        let mut damage = damage;
+        if fight.stun_left > 0. && id == fight.boss {
+            damage *= 1. + fight.vulnerable;
+        }
+        // A body that would fall while its other half lives is left on one health and downed instead.
+        if let Some(partner) = fight.partner {
+            let other = if id == fight.boss {
+                partner
+            } else {
+                fight.boss
+            };
+            let s = &self.slimes[id];
+            if damage >= s.hp && !self.slimes[other].dead && !fight.downed.contains_key(&other) {
+                return Incoming::Damage((s.hp - 1.).max(0.));
+            }
+        }
+        Incoming::Damage(damage)
+    }
+
+    /// After a blow landed: break bars fill, a body goes down, a divided boss falls together.
+    pub(super) fn boss_after_hit(&mut self, id: usize, session: u64, dealt: f64, killed: bool) {
+        let Some(boss) = self.fight_of(id).map(|f| f.boss) else {
+            return;
+        };
+        let (other, other_down) = {
+            let fight = &self.boss.fights[&boss];
+            let other = fight.partner.map(|p| if id == boss { p } else { boss });
+            (other, other.is_some_and(|o| fight.downed.contains_key(&o)))
+        };
+        if let Some(fight) = self.boss.fights.get_mut(&boss) {
+            for live in &mut fight.live {
+                if let Live::Break(b) = live {
+                    b.dealt += dealt;
+                }
+            }
+        }
+        if killed && other_down {
+            // The second body fell while the first lay downed: both are finished.
+            let other = other.unwrap();
+            if let Some(fight) = self.boss.fights.get_mut(&boss) {
+                fight.downed.remove(&other);
+            }
+            self.hit_slime(other, session, 1e12, false);
+            return;
+        }
+        if !killed
+            && self.slimes[id].hp <= 1.
+            && let Some(other) = other
+            && !self.slimes[other].dead
+        {
+            let revive = self.split_def(boss).map_or(10., |s| s.revive_after);
+            if let Some(fight) = self.boss.fights.get_mut(&boss) {
+                fight.downed.insert(id, revive);
+            }
+            let (zone, at) = (self.slimes[id].zone, self.slimes[id].point());
+            self.mech_event(zone, "down", "", at, revive);
+        }
+    }
+
+    fn split_def(&self, boss: usize) -> Option<bm::Split> {
+        let def = self.boss.table.get(&self.slimes[boss].kind)?;
+        def.mechanics.iter().find_map(|m| match &m.block {
+            Block::Split(s) => Some(s.clone()),
+            _ => None,
+        })
+    }
+
+    /// The fight a slot belongs to: its own, or the one it is the divided partner of.
+    fn fight_of(&self, id: usize) -> Option<&Fight> {
+        self.boss
+            .fights
+            .get(&id)
+            .or_else(|| self.boss.fights.values().find(|f| f.partner == Some(id)))
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // Fight set-up and the tick
+    // -----------------------------------------------------------------------------------------------------------
+
+    fn begin_boss_fight(&mut self, id: usize) -> Fight {
+        let s = &self.slimes[id];
+        let def = self.boss.table[&s.kind].clone();
+        let zone = s.zone;
+        let arena = bm::arena_for(&self.maps[zone], Point { x: s.hx, y: s.hy });
+        let timer = def
+            .mechanics
+            .iter()
+            .map(|m| match &m.block {
+                Block::Zone(z) => z.first.unwrap_or(z.every),
+                Block::Mark(k) => k.first.unwrap_or(k.every),
+                Block::Sweep(w) => w.first.unwrap_or(w.every),
+                Block::Break(b) => b.first.unwrap_or(b.every),
+                Block::Gaze(g) => g.first.unwrap_or(g.every),
+                Block::Adds(a) => a.first.unwrap_or(a.every),
+                Block::Stasis(a) => a.first.unwrap_or(a.every),
+                _ => 0.,
+            })
+            .collect();
+        let mut lit = vec![];
+        let mut cover = vec![];
+        for (i, m) in def.mechanics.iter().enumerate() {
+            match &m.block {
+                Block::Hold(h) => lit.push(LitGroup {
+                    mech: i,
+                    r: h.r,
+                    hold_for: h.hold_for,
+                    lit_for: h.lit_for,
+                    snuff_every: h.snuff_every,
+                    snuff_in: h.snuff_every,
+                    points: h
+                        .points
+                        .iter()
+                        .map(|p| Lit {
+                            at: Point { x: p[0], y: p[1] },
+                            progress: 0.,
+                            lit_left: 0.,
+                        })
+                        .collect(),
+                }),
+                Block::Gaze(g) => cover.extend(g.cover.iter().map(|c| CoverLive {
+                    cover: *c,
+                    regrow: g.regrow,
+                    hits: 0,
+                    broken: false,
+                    broken_for: 0.,
+                })),
+                _ => {}
+            }
+        }
+        Fight {
+            boss: id,
+            zone,
+            arena,
+            clock: 0.,
+            timer,
+            fired: vec![0; def.mechanics.len()],
+            live: vec![],
+            shield: None,
+            woken: vec![],
+            still: BTreeSet::new(),
+            stun_left: 0.,
+            vulnerable: 0.,
+            lit,
+            spokes: vec![],
+            cover,
+            frozen: BTreeMap::new(),
+            orbs: vec![],
+            blooms: vec![],
+            partner: None,
+            downed: BTreeMap::new(),
+            banner: None,
+        }
+    }
+
+    /// The players a mechanic may target: awake, alive, in the zone, not in a city, not hidden, not frozen.
+    fn mech_players(&self, zone: usize) -> Vec<(u64, Point)> {
+        self.players
+            .iter()
+            .filter(|(_, p)| {
+                p.character.zone == zone
+                    && p.character.hp > 0.
+                    && p.character.spark_travel.is_none()
+                    && !p.is_hidden()
+                    && !p.frozen
+                    && !self.maps[zone].in_city(p.character.point())
+            })
+            .map(|(s, p)| (*s, p.character.point()))
+            .collect()
+    }
+
+    /// A deterministic stream of numbers for one choice, drawn from the world's own generator.
+    fn mech_rng(&mut self) -> impl FnMut() -> f64 + use<> {
+        let mut state = (self.random() * 4294967296.) as u64 ^ 0x9E37_79B9_7F4A_7C15;
+        move || {
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            (state >> 11) as f64 / (1u64 << 53) as f64
+        }
+    }
+
+    fn fresh_id(&mut self) -> u64 {
+        let id = self.boss.next_id;
+        self.boss.next_id += 1;
+        id
+    }
+
+    fn mech_event(&self, zone: usize, phase: &str, name: &str, at: Point, value: f64) {
+        self.emit_zone(
+            zone,
+            json!({"type":"event","kind":"bossmech","phase":phase,"name":name,"actor":"","x":at.x,"y":at.y,"value":value,"crit":false}),
+        );
+    }
+
+    fn tick_boss_fight(&mut self, fight: &mut Fight) {
+        let id = fight.boss;
+        let def = self.boss.table[&self.slimes[id].kind].clone();
+        fight.clock += TICK;
+        if let Some((_, left)) = &mut fight.banner {
+            *left -= TICK;
+        }
+        if fight.banner.as_ref().is_some_and(|(_, left)| *left <= 0.) {
+            fight.banner = None;
+        }
+        let share = {
+            let s = &self.slimes[id];
+            if s.max_hp > 0. { s.hp / s.max_hp } else { 0. }
+        };
+        // Stun: the boss neither moves nor strikes, and takes extra damage.
+        if fight.stun_left > 0. {
+            fight.stun_left -= TICK;
+            self.hold_still(id);
+        }
+        for slot in fight.still.iter().copied().collect::<Vec<_>>() {
+            if !self.slimes[slot].dead {
+                self.hold_still(slot);
+            }
+        }
+        self.tick_split(fight, &def);
+        for (i, m) in def.mechanics.iter().enumerate() {
+            self.tick_mechanic(fight, i, m, share);
+        }
+        let mut live = std::mem::take(&mut fight.live);
+        live.retain_mut(|l| self.tick_live(fight, &def, l));
+        live.append(&mut fight.live);
+        fight.live = live;
+        self.tick_orbs_and_frozen(fight);
+        self.tick_blooms(fight);
+        self.tick_cover(fight);
+        self.tick_shield(fight);
+    }
+
+    /// Keeps a monster where it stands for another moment: rooted, and unable to begin an attack.
+    fn hold_still(&mut self, slot: usize) {
+        let s = &mut self.slimes[slot];
+        s.set_root_left = s.set_root_left.max(HOLD);
+        s.atk_cd = s.atk_cd.max(HOLD);
+    }
+
+    fn tick_mechanic(&mut self, fight: &mut Fight, i: usize, m: &Mechanic, share: f64) {
+        let id = fight.boss;
+        let zone = fight.zone;
+        let active = m.active_at(share);
+        // Continuous blocks and thresholds first.
+        match &m.block {
+            Block::Hold(_) => {
+                self.tick_hold(fight, i);
+                return;
+            }
+            Block::Sweep(s) if matches!(s.kind, SweepKind::Spokes { .. }) => {
+                self.tick_spokes(fight, i, m, active);
+                return;
+            }
+            Block::Shield(s) => {
+                for (n, step) in s.steps.iter().enumerate() {
+                    if fight.fired[i] & (1 << n) == 0 && share <= step.hp {
+                        fight.fired[i] |= 1 << n;
+                        self.raise_shield(fight, &m.name, step, s.heal_per_s);
+                    }
+                }
+                return;
+            }
+            Block::Split(s) => {
+                if fight.fired[i] == 0 && share <= s.hp {
+                    fight.fired[i] = 1;
+                    self.divide_boss(fight, &m.name, s);
+                }
+                return;
+            }
+            _ => {}
+        }
+        if !active {
+            return;
+        }
+        // `every` is counted from one start to the next, so the timer runs while the ability is being cast too.
+        fight.timer[i] -= TICK;
+        if fight.timer[i] > 0. || fight.live.iter().any(|l| l.mech() == i) {
+            return;
+        }
+        let players = self.mech_players(zone);
+        if players.is_empty() {
+            return;
+        }
+        let at = self.slimes[id].point();
+        match &m.block {
+            Block::Zone(z) => {
+                fight.timer[i] = z.every;
+                self.start_zone(fight, i, m, z, 0);
+            }
+            Block::Mark(k) => {
+                fight.timer[i] = k.every;
+                self.start_mark(fight, i, m, k, 0, &players);
+            }
+            Block::Sweep(s) => {
+                fight.timer[i] = s.every;
+                self.start_walls(fight, i, m, s);
+            }
+            Block::Break(b) => {
+                fight.timer[i] = b.every;
+                let needed = b.bar * self.slimes[id].max_hp;
+                fight.live.push(Live::Break(BreakLive {
+                    mech: i,
+                    left: b.cast,
+                    total: b.cast,
+                    needed,
+                    dealt: 0.,
+                }));
+                self.mech_event(zone, "cast", &m.name, at, b.cast);
+                fight.banner = Some((m.name.clone(), b.cast));
+            }
+            Block::Gaze(g) => {
+                fight.timer[i] = g.every;
+                let fresh = self.fresh_id();
+                let aim = players[0].1;
+                fight.live.push(Live::Gaze(GazeLive {
+                    mech: i,
+                    id: fresh,
+                    left: g.cast,
+                    total: g.cast,
+                    from: at,
+                    angle: (aim.y - at.y).atan2(aim.x - at.x),
+                    turned: 0.,
+                    shielded: BTreeSet::new(),
+                }));
+                self.mech_event(zone, "cast", &m.name, at, g.cast);
+                fight.banner = Some((m.name.clone(), g.cast));
+            }
+            Block::Adds(a) => {
+                fight.timer[i] = a.every;
+                for slot in self.wake_adds(fight, &a.tag, a.count, a.scatter, a.still) {
+                    if let Some(b) = &a.bloom {
+                        fight.blooms.push(BloomLive {
+                            slot,
+                            left: b.after,
+                            heal: b.heal,
+                            then: b.then.clone(),
+                        });
+                    }
+                }
+                self.mech_event(zone, "cast", &m.name, at, 0.);
+                fight.banner = Some((m.name.clone(), 3.));
+            }
+            Block::Stasis(s) => {
+                fight.timer[i] = s.every;
+                self.launch_orbs(fight, &m.name, s, &players);
+                self.mech_event(zone, "cast", &m.name, at, s.life);
+                fight.banner = Some((m.name.clone(), 3.));
+            }
+            _ => {}
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // Hurting players
+    // -----------------------------------------------------------------------------------------------------------
+
+    /// Kills `session` with the named ability, or, for a god-mode player, says what would have. `false`: untouched.
+    fn mech_kill(&mut self, session: u64, ability: &str, boss: usize) -> bool {
+        let Some(p) = self.players.get(&session) else {
+            return false;
+        };
+        let zone = p.character.zone;
+        if p.character.hp <= 0.
+            || p.frozen
+            || p.is_hidden()
+            || p.character.spark_travel.is_some()
+            || self.maps[zone].in_city(p.character.point())
+        {
+            return false;
+        }
+        if bm::GOD_MODE_BLOCKS && (self.god_mode || p.god) {
+            let text = bm::death_message(ability, true);
+            let _ = p.peer.try_send(json!({"type":"system","text":text}));
+            return false;
+        }
+        let kind = self.slimes[boss].kind.clone();
+        let level = self.slimes[boss].level;
+        let point = p.character.point();
+        let actor = p.character.id.clone();
+        let p = self.players.get_mut(&session).unwrap();
+        p.combat_left = 5.;
+        p.character.mounted = false;
+        p.character.hp = 0.;
+        p.last_hurt = self.time;
+        p.hurt = 0.25;
+        p.dead_time = 0.;
+        p.attack = 0.;
+        p.buffs.clear();
+        p.stop();
+        p.apply_death_penalty();
+        let text = bm::death_message(ability, false);
+        let _ = p.peer.try_send(json!({"type":"system","text":text}));
+        self.event_with(
+            "death",
+            &actor,
+            point,
+            0.,
+            false,
+            json!({"enemy":kind,"level":level,"cause":ability}),
+        );
+        self.save();
+        true
+    }
+
+    /// A heavy hit: `share` of the victim's maximum health, ignoring defence and dodge like a kill does.
+    fn mech_heavy(&mut self, session: u64, share: f64, ability: &str, boss: usize) {
+        let Some(p) = self.players.get(&session) else {
+            return;
+        };
+        let value = (p.character.max_hp() * share).round().max(1.);
+        if value >= p.character.hp {
+            self.mech_kill(session, ability, boss);
+            return;
+        }
+        if p.frozen
+            || p.is_hidden()
+            || p.character.hp <= 0.
+            || p.character.spark_travel.is_some()
+            || self.maps[p.character.zone].in_city(p.character.point())
+        {
+            return;
+        }
+        if bm::GOD_MODE_BLOCKS && (self.god_mode || p.god) {
+            let text = bm::death_message(ability, true);
+            let _ = p.peer.try_send(json!({"type":"system","text":text}));
+            return;
+        }
+        let point = p.character.point();
+        let actor = p.character.id.clone();
+        let kind = self.slimes[boss].kind.clone();
+        let level = self.slimes[boss].level;
+        let p = self.players.get_mut(&session).unwrap();
+        p.combat_left = 5.;
+        p.character.mounted = false;
+        p.character.hp -= value;
+        p.last_hurt = self.time;
+        p.hurt = 0.25;
+        self.event_with(
+            "hurt",
+            &actor,
+            point,
+            value,
+            false,
+            json!({"enemy":kind,"level":level,"cause":ability}),
+        );
+    }
+
+    /// Applies an effect to everyone `hit` says it reaches.
+    fn land(
+        &mut self,
+        fight: &Fight,
+        name: &str,
+        effect: Effect,
+        heavy: f64,
+        hit: &dyn Fn(Point) -> bool,
+    ) {
+        let victims: Vec<u64> = self
+            .mech_players(fight.zone)
+            .into_iter()
+            .filter(|(_, at)| hit(*at))
+            .map(|(s, _)| s)
+            .collect();
+        for session in victims {
+            match effect {
+                Effect::Heavy => self.mech_heavy(session, heavy, name, fight.boss),
+                _ => {
+                    self.mech_kill(session, name, fight.boss);
+                }
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // Zones (and echoes)
+    // -----------------------------------------------------------------------------------------------------------
+
+    fn lit_discs(fight: &Fight) -> Vec<Shape> {
+        fight
+            .lit
+            .iter()
+            .flat_map(|g| {
+                g.points
+                    .iter()
+                    .filter(|l| l.lit_left > 0.)
+                    .map(|l| Shape::Circle {
+                        x: l.at.x,
+                        y: l.at.y,
+                        r: g.r,
+                        inner: 0.,
+                    })
+            })
+            .collect()
+    }
+
+    fn resolve_shapes(&mut self, fight: &Fight, spec: &bm::ShapeSpec, cast: f64) -> Vec<Shape> {
+        let players: Vec<Point> = self
+            .mech_players(fight.zone)
+            .into_iter()
+            .map(|(_, p)| p)
+            .collect();
+        let lit = Self::lit_discs(fight);
+        let mut rng = self.mech_rng();
+        let ctx = bm::Ctx {
+            map: &self.maps[fight.zone],
+            arena: fight.arena,
+            boss: self.slimes[fight.boss].point(),
+            players: &players,
+            lit: &lit,
+            cast,
+        };
+        bm::resolve(spec, &ctx, &mut rng)
+    }
+
+    fn start_zone(&mut self, fight: &mut Fight, i: usize, m: &Mechanic, z: &bm::Zone, round: u32) {
+        let areas = self.resolve_shapes(fight, &z.shape, z.cast);
+        let id = self.fresh_id();
+        fight.live.push(Live::Zone(ZoneLive {
+            mech: i,
+            id,
+            areas,
+            round,
+            phase: ZPhase::Cast,
+            left: z.cast,
+            total: z.cast,
+            echo_i: 0,
+        }));
+        let at = self.slimes[fight.boss].point();
+        self.mech_event(fight.zone, "cast", &m.name, at, z.cast);
+        fight.banner = Some((m.name.clone(), z.cast));
+    }
+
+    fn tick_zone(&mut self, fight: &mut Fight, m: &Mechanic, zl: &mut ZoneLive) -> bool {
+        let Block::Zone(z) = &m.block else {
+            return false;
+        };
+        zl.left -= TICK;
+        if zl.left > 0. {
+            return true;
+        }
+        match zl.phase {
+            ZPhase::Cast | ZPhase::Echo => {
+                let areas = zl.areas.clone();
+                let effect = z.effect;
+                self.land(fight, &m.name, effect, z.heavy, &|p| {
+                    bm::hurts(effect, &areas, p)
+                });
+                let at = self.slimes[fight.boss].point();
+                self.mech_event(fight.zone, "land", &m.name, at, 0.);
+                if zl.phase == ZPhase::Echo {
+                    zl.echo_i += 1;
+                }
+                if zl.echo_i < z.echo.len() {
+                    zl.phase = ZPhase::Echo;
+                    zl.left = z.echo[zl.echo_i];
+                    zl.total = zl.left;
+                    return true;
+                }
+                if z.linger > 0. {
+                    zl.phase = ZPhase::Linger;
+                    zl.left = z.linger;
+                    zl.total = z.linger;
+                    return true;
+                }
+                Self::next_round(zl, z)
+            }
+            ZPhase::Linger => Self::next_round(zl, z),
+            ZPhase::Gap => {
+                if self.mech_players(fight.zone).is_empty() {
+                    return false;
+                }
+                zl.areas = self.resolve_shapes(fight, &z.shape, z.cast);
+                zl.phase = ZPhase::Cast;
+                zl.left = z.cast;
+                zl.total = z.cast;
+                zl.echo_i = 0;
+                zl.id = self.fresh_id();
+                let at = self.slimes[fight.boss].point();
+                self.mech_event(fight.zone, "cast", &m.name, at, z.cast);
+                true
+            }
+        }
+    }
+
+    /// After a cast (and its echoes): the next of a `repeat`, or done.
+    fn next_round(zl: &mut ZoneLive, z: &bm::Zone) -> bool {
+        if zl.round + 1 < z.repeat {
+            zl.round += 1;
+            zl.phase = ZPhase::Gap;
+            zl.left = z.repeat_gap.max(TICK);
+            zl.total = zl.left;
+            true
+        } else {
+            false
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // Marks
+    // -----------------------------------------------------------------------------------------------------------
+
+    fn start_mark(
+        &mut self,
+        fight: &mut Fight,
+        i: usize,
+        m: &Mechanic,
+        k: &bm::Mark,
+        wave: u32,
+        players: &[(u64, Point)],
+    ) {
+        // Never everyone: at most `count`, at most MAX_MARKED, at most all but one, and at least one.
+        let n = (k.count as usize)
+            .min(bm::MAX_MARKED)
+            .min(players.len().saturating_sub(1))
+            .max(1)
+            .min(players.len());
+        let mut pool: Vec<u64> = players.iter().map(|(s, _)| *s).collect();
+        let mut rng = self.mech_rng();
+        let mut targets = vec![];
+        while targets.len() < n && !pool.is_empty() {
+            let at = ((rng() * pool.len() as f64) as usize).min(pool.len() - 1);
+            targets.push(pool.swap_remove(at));
+        }
+        let id = self.fresh_id();
+        fight.live.push(Live::Mark(MarkLive {
+            mech: i,
+            id,
+            targets,
+            wave,
+            gap: false,
+            left: k.cast,
+            total: k.cast,
+        }));
+        let at = self.slimes[fight.boss].point();
+        self.mech_event(fight.zone, "cast", &m.name, at, k.cast);
+        fight.banner = Some((m.name.clone(), k.cast));
+    }
+
+    /// Where each marked player's ring or beam is right now: it follows them to the last moment.
+    fn mark_shapes(&self, fight: &Fight, ml: &MarkLive, k: &bm::Mark) -> Vec<(u64, Vec<Shape>)> {
+        let mut out = vec![];
+        for session in &ml.targets {
+            let Some(p) = self.players.get(session).filter(|p| p.character.hp > 0.) else {
+                continue;
+            };
+            let at = p.character.point();
+            let shapes = match k.effect {
+                MarkEffect::Burst { r } => vec![Shape::Circle {
+                    x: at.x,
+                    y: at.y,
+                    r,
+                    inner: 0.,
+                }],
+                MarkEffect::Beam { bounces, width } => {
+                    bm::beam_path(self.slimes[fight.boss].point(), at, fight.arena, bounces)
+                        .windows(2)
+                        .map(|w| Shape::Lane {
+                            a: w[0],
+                            b: w[1],
+                            half: width / 2.,
+                        })
+                        .collect()
+                }
+            };
+            out.push((*session, shapes));
+        }
+        out
+    }
+
+    fn tick_mark(&mut self, fight: &mut Fight, m: &Mechanic, ml: &mut MarkLive) -> bool {
+        let Block::Mark(k) = &m.block else {
+            return false;
+        };
+        ml.left -= TICK;
+        if ml.left > 0. {
+            return true;
+        }
+        if ml.gap {
+            let players = self.mech_players(fight.zone);
+            if players.is_empty() {
+                return false;
+            }
+            let (wave, i) = (ml.wave, ml.mech);
+            self.start_mark(fight, i, m, k, wave, &players);
+            if let Some(Live::Mark(new)) = fight.live.pop() {
+                *ml = new;
+            }
+            return true;
+        }
+        // The countdown ends: every mark resolves on everyone except its own bearer.
+        for (bearer, shapes) in self.mark_shapes(fight, ml, k) {
+            let victims: Vec<u64> = self
+                .mech_players(fight.zone)
+                .into_iter()
+                .filter(|(s, at)| *s != bearer && shapes.iter().any(|sh| sh.contains(*at)))
+                .map(|(s, _)| s)
+                .collect();
+            for v in victims {
+                self.mech_kill(v, &m.name, fight.boss);
+            }
+        }
+        let at = self.slimes[fight.boss].point();
+        self.mech_event(fight.zone, "land", &m.name, at, 0.);
+        if ml.wave + 1 < k.waves {
+            ml.wave += 1;
+            ml.gap = true;
+            ml.left = k.wave_gap.max(TICK);
+            ml.total = ml.left;
+            return true;
+        }
+        false
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // Sweeps: walls and spokes
+    // -----------------------------------------------------------------------------------------------------------
+
+    fn start_walls(&mut self, fight: &mut Fight, i: usize, m: &Mechanic, s: &bm::Sweep) {
+        let SweepKind::Walls {
+            warn,
+            thickness,
+            gap,
+            walls,
+            ..
+        } = &s.kind
+        else {
+            return;
+        };
+        let a = fight.arena;
+        let mut rng = self.mech_rng();
+        let live: Vec<WallLive> = walls
+            .iter()
+            .map(|w| {
+                let (lo, hi, pos) = match w.from {
+                    Side::West => (a.y0, a.y1, a.x0 - thickness / 2.),
+                    Side::East => (a.y0, a.y1, a.x1 + thickness / 2.),
+                    Side::North => (a.x0, a.x1, a.y0 - thickness / 2.),
+                    Side::South => (a.x0, a.x1, a.y1 + thickness / 2.),
+                };
+                let room = (hi - lo - gap).max(0.);
+                let gap_at = match w.gap {
+                    GapAt::Low => lo + gap / 2. + room * 0.15,
+                    GapAt::High => hi - gap / 2. - room * 0.15,
+                    GapAt::Middle => (lo + hi) / 2.,
+                    GapAt::Random => lo + gap / 2. + rng() * room,
+                };
+                WallLive {
+                    side: w.from,
+                    pos,
+                    gap_at,
+                }
+            })
+            .collect();
+        let id = self.fresh_id();
+        // The warning shows each wall at the edge it will come from.
+        fight.live.push(Live::Walls(WallsLive {
+            mech: i,
+            id,
+            warn_left: *warn,
+            warn_total: *warn,
+            walls: live,
+        }));
+        let at = self.slimes[fight.boss].point();
+        self.mech_event(fight.zone, "cast", &m.name, at, *warn);
+        fight.banner = Some((m.name.clone(), *warn));
+    }
+
+    /// The edge a wall has passed once it has gone right across the arena.
+    fn wall_is_past(a: Rect, thickness: f64, w: &WallLive) -> bool {
+        match w.side {
+            Side::West => w.pos > a.x1 + thickness / 2.,
+            Side::East => w.pos < a.x0 - thickness / 2.,
+            Side::North => w.pos > a.y1 + thickness / 2.,
+            Side::South => w.pos < a.y0 - thickness / 2.,
+        }
+    }
+
+    /// Whether the body of a player at `p` touches the solid part of the wall (the gap is clear of it).
+    fn wall_hits(a: Rect, thickness: f64, gap: f64, w: &WallLive, p: Point) -> bool {
+        let (across, along, lo, hi) = match w.side {
+            Side::West | Side::East => (p.x, p.y, a.y0, a.y1),
+            Side::North | Side::South => (p.y, p.x, a.x0, a.x1),
+        };
+        if (across - w.pos).abs() > thickness / 2. + BODY || along < lo - BODY || along > hi + BODY
+        {
+            return false;
+        }
+        (along - w.gap_at).abs() > gap / 2. - BODY
+    }
+
+    /// The solid parts of one wall as lanes, either side of its gap (what the client draws).
+    fn wall_bands(a: Rect, thickness: f64, gap: f64, w: &WallLive) -> Vec<Shape> {
+        let (horizontal, lo, hi) = match w.side {
+            Side::West | Side::East => (false, a.y0, a.y1),
+            Side::North | Side::South => (true, a.x0, a.x1),
+        };
+        let mut parts = vec![];
+        for (s, e) in [(lo, w.gap_at - gap / 2.), (w.gap_at + gap / 2., hi)] {
+            if e - s <= 0.01 {
+                continue;
+            }
+            let (pa, pb) = if horizontal {
+                (Point { x: s, y: w.pos }, Point { x: e, y: w.pos })
+            } else {
+                (Point { x: w.pos, y: s }, Point { x: w.pos, y: e })
+            };
+            parts.push(Shape::Lane {
+                a: pa,
+                b: pb,
+                half: thickness / 2.,
+            });
+        }
+        parts
+    }
+
+    fn tick_walls(&mut self, fight: &mut Fight, m: &Mechanic, wl: &mut WallsLive) -> bool {
+        let Block::Sweep(s) = &m.block else {
+            return false;
+        };
+        let SweepKind::Walls {
+            speed,
+            thickness,
+            gap,
+            ..
+        } = &s.kind
+        else {
+            return false;
+        };
+        if wl.warn_left > 0. {
+            wl.warn_left -= TICK;
+            return true;
+        }
+        let a = fight.arena;
+        for w in &mut wl.walls {
+            let dir = match w.side {
+                Side::West | Side::North => 1.,
+                Side::East | Side::South => -1.,
+            };
+            w.pos += dir * speed * TICK;
+        }
+        let walls: Vec<(Side, f64, f64)> =
+            wl.walls.iter().map(|w| (w.side, w.pos, w.gap_at)).collect();
+        let (thickness, gap) = (*thickness, *gap);
+        let hit = |p: Point| {
+            walls.iter().any(|(side, pos, gap_at)| {
+                Self::wall_hits(
+                    a,
+                    thickness,
+                    gap,
+                    &WallLive {
+                        side: *side,
+                        pos: *pos,
+                        gap_at: *gap_at,
+                    },
+                    p,
+                )
+            })
+        };
+        self.land(fight, &m.name, Effect::Kill, 0., &hit);
+        !wl.walls.iter().all(|w| Self::wall_is_past(a, thickness, w))
+    }
+
+    fn tick_spokes(&mut self, fight: &mut Fight, i: usize, m: &Mechanic, active: bool) {
+        let Block::Sweep(sw) = &m.block else {
+            return;
+        };
+        let SweepKind::Spokes {
+            count,
+            width,
+            deg_per_s,
+            reverse_every,
+            reverse_warn,
+            length,
+        } = sw.kind.clone()
+        else {
+            return;
+        };
+        if !active {
+            fight.spokes.retain(|s| s.mech != i);
+            return;
+        }
+        let centre = fight.arena.centre();
+        if !fight.spokes.iter().any(|s| s.mech == i) {
+            let angle = self.random() * std::f64::consts::TAU;
+            fight.spokes.push(SpokesLive {
+                mech: i,
+                angle,
+                dir: 1.,
+                reverse_in: reverse_every,
+                warn_left: 0.,
+            });
+            self.mech_event(fight.zone, "cast", &m.name, centre, 0.);
+        }
+        let mut flipped = false;
+        let angle = {
+            let s = fight.spokes.iter_mut().find(|s| s.mech == i).unwrap();
+            s.angle += s.dir * deg_per_s.to_radians() * TICK;
+            if reverse_every > 0. {
+                s.reverse_in -= TICK;
+                s.warn_left = if s.reverse_in <= reverse_warn {
+                    s.reverse_in.max(0.)
+                } else {
+                    0.
+                };
+                if s.reverse_in <= 0. {
+                    s.dir = -s.dir;
+                    s.reverse_in = reverse_every;
+                    s.warn_left = 0.;
+                    flipped = true;
+                }
+            }
+            s.angle
+        };
+        if flipped {
+            self.mech_event(fight.zone, "reverse", &m.name, centre, 0.);
+        }
+        let hit = |p: Point| {
+            (0..count).any(|n| {
+                let a = angle + n as f64 * std::f64::consts::TAU / count as f64;
+                let tip = Point {
+                    x: centre.x + a.cos() * length,
+                    y: centre.y + a.sin() * length,
+                };
+                bm::segment_distance(p, centre, tip) <= width / 2. + BODY
+            })
+        };
+        self.land(fight, &m.name, Effect::Kill, 0., &hit);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // Running things
+    // -----------------------------------------------------------------------------------------------------------
+
+    /// Advances one running thing. `false`: it is finished and goes.
+    fn tick_live(&mut self, fight: &mut Fight, def: &BossDef, live: &mut Live) -> bool {
+        let m = &def.mechanics[live.mech()];
+        match live {
+            Live::Zone(zl) => self.tick_zone(fight, m, zl),
+            Live::Mark(ml) => self.tick_mark(fight, m, ml),
+            Live::Walls(wl) => self.tick_walls(fight, m, wl),
+            Live::Break(bl) => self.tick_break(fight, m, bl),
+            Live::Gaze(gl) => self.tick_gaze(fight, m, gl),
+        }
+    }
+
+    fn tick_break(&mut self, fight: &mut Fight, m: &Mechanic, bl: &mut BreakLive) -> bool {
+        let Block::Break(b) = &m.block else {
+            return false;
+        };
+        let id = fight.boss;
+        // The channel holds the boss where it is.
+        self.hold_still(id);
+        if bl.dealt >= bl.needed {
+            fight.stun_left = b.stun;
+            fight.vulnerable = b.vulnerable;
+            let at = self.slimes[id].point();
+            self.mech_event(fight.zone, "broken", &m.name, at, b.stun);
+            return false;
+        }
+        bl.left -= TICK;
+        if bl.left > 0. {
+            return true;
+        }
+        // Too slow: the wail takes everyone in the fight.
+        self.land(fight, &m.name, Effect::Kill, 0., &|_| true);
+        let at = self.slimes[id].point();
+        self.mech_event(fight.zone, "land", &m.name, at, 0.);
+        false
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // Gaze and cover
+    // -----------------------------------------------------------------------------------------------------------
+
+    /// Whether the eye at `from` sees `to`: no solid object and no standing cover in the way. The first piece of
+    /// cover that blocks it is returned in `Err`.
+    fn sight(&self, fight: &Fight, from: Point, to: Point) -> Result<(), Option<usize>> {
+        if !self.maps[fight.zone].line_clear(from, to, 0.05) {
+            return Err(None);
+        }
+        for (n, c) in fight.cover.iter().enumerate() {
+            if !c.broken
+                && bm::segment_distance(
+                    Point {
+                        x: c.cover.x,
+                        y: c.cover.y,
+                    },
+                    from,
+                    to,
+                ) <= c.cover.r
+            {
+                return Err(Some(n));
+            }
+        }
+        Ok(())
+    }
+
+    fn tick_gaze(&mut self, fight: &mut Fight, m: &Mechanic, gl: &mut GazeLive) -> bool {
+        let Block::Gaze(g) = &m.block else {
+            return false;
+        };
+        self.hold_still(fight.boss);
+        if gl.left > 0. {
+            gl.left = (gl.left - TICK).max(0.);
+            if gl.left > 0. {
+                return true;
+            }
+            if g.sweep <= 0. {
+                // One look at the end of the warning.
+                self.gaze_look(fight, gl, &m.name, None);
+                self.finish_gaze(fight, gl);
+                let at = self.slimes[fight.boss].point();
+                self.mech_event(fight.zone, "land", &m.name, at, 0.);
+                return false;
+            }
+            return true;
+        }
+        // The beam turns once round the room.
+        let step = std::f64::consts::TAU * TICK / g.sweep;
+        gl.angle += step;
+        gl.turned += step;
+        self.gaze_look(fight, gl, &m.name, Some(g.beam.to_radians()));
+        if gl.turned >= std::f64::consts::TAU {
+            self.finish_gaze(fight, gl);
+            return false;
+        }
+        true
+    }
+
+    /// Each piece of cover that shielded someone during this gaze takes one hit; two break it.
+    fn finish_gaze(&mut self, fight: &mut Fight, gl: &GazeLive) {
+        for n in &gl.shielded {
+            if let Some(c) = fight.cover.get_mut(*n) {
+                c.hits += 1;
+                if c.hits >= 2 {
+                    c.broken = true;
+                    c.broken_for = 0.;
+                }
+            }
+        }
+    }
+
+    /// One look: everyone in line of sight (inside the beam, when it turns) is struck.
+    fn gaze_look(&mut self, fight: &mut Fight, gl: &mut GazeLive, name: &str, beam: Option<f64>) {
+        let mut victims = vec![];
+        for (session, at) in self.mech_players(fight.zone) {
+            if let Some(half) = beam {
+                let mut turn = (at.y - gl.from.y).atan2(at.x - gl.from.x) - gl.angle;
+                while turn > std::f64::consts::PI {
+                    turn -= std::f64::consts::TAU;
+                }
+                while turn < -std::f64::consts::PI {
+                    turn += std::f64::consts::TAU;
+                }
+                if turn.abs() > half {
+                    continue;
+                }
+            }
+            match self.sight(fight, gl.from, at) {
+                Ok(()) => victims.push(session),
+                Err(Some(n)) => {
+                    gl.shielded.insert(n);
+                }
+                Err(None) => {}
+            }
+        }
+        for v in victims {
+            self.mech_kill(v, name, fight.boss);
+        }
+    }
+
+    fn tick_cover(&mut self, fight: &mut Fight) {
+        for c in &mut fight.cover {
+            if c.broken && c.regrow > 0. {
+                c.broken_for += TICK;
+                if c.broken_for >= c.regrow {
+                    c.broken = false;
+                    c.hits = 0;
+                    c.broken_for = 0.;
+                }
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // Shields, adds, blooms
+    // -----------------------------------------------------------------------------------------------------------
+
+    /// Wakes up to `count` sleeping monsters tagged `tag` in this dungeon copy and sends them at the party.
+    fn wake_adds(
+        &mut self,
+        fight: &mut Fight,
+        tag: &str,
+        count: u32,
+        scatter: bool,
+        still: bool,
+    ) -> Vec<usize> {
+        let zone = fight.zone;
+        let slots: Vec<usize> = (0..self.spawns.len())
+            .filter(|i| {
+                self.spawns[*i].zone == zone
+                    && self.spawns[*i].ambush.as_deref() == Some(tag)
+                    && self.slimes[*i].dead
+                    && self.slimes[*i].state == "waiting"
+            })
+            .take(count as usize)
+            .collect();
+        let players = self.mech_players(zone);
+        let mut woken = vec![];
+        for slot in slots {
+            let spawn = self.spawns[slot].clone();
+            let mut enemy = Slime::with_level(slot, &spawn, Slime::default_level(&spawn.kind));
+            let mut start = enemy.point();
+            if scatter {
+                let mut rng = self.mech_rng();
+                let ctx = bm::Ctx {
+                    map: &self.maps[zone],
+                    arena: fight.arena,
+                    boss: self.slimes[fight.boss].point(),
+                    players: &[],
+                    lit: &[],
+                    cast: 5.,
+                };
+                start = bm::random_spot(&ctx, &mut rng);
+            }
+            let bodies = self.actor_bodies(zone, None, Some(slot));
+            if let Some(point) =
+                free_actor_position(&self.maps[zone], start, enemy.r, &bodies, true)
+            {
+                (enemy.x, enemy.y, enemy.hx, enemy.hy, enemy.goal) =
+                    (point.x, point.y, point.x, point.y, point);
+            }
+            enemy.target = players
+                .iter()
+                .min_by(|a, b| {
+                    a.1.distance(enemy.point())
+                        .total_cmp(&b.1.distance(enemy.point()))
+                })
+                .map(|(s, _)| *s);
+            enemy.hunt = true;
+            enemy.state = "chase".into();
+            let at = enemy.point();
+            self.slimes[slot] = enemy;
+            fight.woken.push(slot);
+            if still {
+                fight.still.insert(slot);
+            }
+            woken.push(slot);
+            self.mech_event(zone, "add", tag, at, 0.);
+        }
+        woken
+    }
+
+    fn raise_shield(
+        &mut self,
+        fight: &mut Fight,
+        name: &str,
+        step: &bm::ShieldStep,
+        heal_per_s: f64,
+    ) {
+        let adds = self.wake_adds(fight, &step.tag, step.count, false, step.still);
+        if adds.is_empty() {
+            return;
+        }
+        fight.shield = Some(ShieldLive {
+            tag: step.tag.clone(),
+            adds,
+            heal_per_s,
+            name: name.into(),
+        });
+        let at = self.slimes[fight.boss].point();
+        self.mech_event(fight.zone, "shield", name, at, 1.);
+        fight.banner = Some((name.into(), 4.));
+    }
+
+    fn tick_shield(&mut self, fight: &mut Fight) {
+        let Some(sh) = &fight.shield else {
+            return;
+        };
+        if sh.adds.iter().all(|s| self.slimes[*s].dead) {
+            let name = sh.name.clone();
+            fight.shield = None;
+            let at = self.slimes[fight.boss].point();
+            self.mech_event(fight.zone, "shield", &name, at, 0.);
+            return;
+        }
+        if sh.heal_per_s > 0. {
+            let s = &mut self.slimes[fight.boss];
+            s.hp = (s.hp + s.max_hp * sh.heal_per_s * TICK).min(s.max_hp);
+        }
+    }
+
+    fn tick_blooms(&mut self, fight: &mut Fight) {
+        let mut due = vec![];
+        for b in &mut fight.blooms {
+            b.left -= TICK;
+        }
+        fight.blooms.retain(|b| {
+            if self.slimes[b.slot].dead {
+                return false;
+            }
+            if b.left <= 0. {
+                due.push((b.slot, b.heal, b.then.clone()));
+                return false;
+            }
+            true
+        });
+        for (slot, heal, then) in due {
+            let at = self.slimes[slot].point();
+            self.slimes[slot] = self.dormant_enemy(slot);
+            fight.still.remove(&slot);
+            let s = &mut self.slimes[fight.boss];
+            s.hp = (s.hp + s.max_hp * heal).min(s.max_hp);
+            self.mech_event(fight.zone, "bloom", "", at, heal);
+            let Some(tag) = then else {
+                continue;
+            };
+            for w in self.wake_adds(fight, &tag, 1, false, false) {
+                let bodies = self.actor_bodies(fight.zone, None, Some(w));
+                let spot = free_actor_position(
+                    &self.maps[fight.zone],
+                    at,
+                    self.slimes[w].r,
+                    &bodies,
+                    true,
+                )
+                .unwrap_or(at);
+                let s = &mut self.slimes[w];
+                (s.x, s.y, s.hx, s.hy, s.goal) = (spot.x, spot.y, spot.x, spot.y, spot);
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // Holds
+    // -----------------------------------------------------------------------------------------------------------
+
+    fn tick_hold(&mut self, fight: &mut Fight, i: usize) {
+        let players = self.mech_players(fight.zone);
+        let Some(g) = fight.lit.iter_mut().find(|g| g.mech == i) else {
+            return;
+        };
+        for l in &mut g.points {
+            let inside = players.iter().any(|(_, p)| p.distance(l.at) <= g.r);
+            if l.lit_left > 0. {
+                l.lit_left -= TICK;
+            } else if inside {
+                l.progress += TICK;
+                if l.progress >= g.hold_for {
+                    l.progress = 0.;
+                    l.lit_left = g.lit_for;
+                }
+            } else {
+                l.progress = (l.progress - TICK).max(0.);
+            }
+        }
+        if g.snuff_every > 0. {
+            g.snuff_in -= TICK;
+            if g.snuff_in <= 0. {
+                g.snuff_in = g.snuff_every;
+                if let Some(l) = g.points.iter_mut().find(|l| l.lit_left > 0.) {
+                    l.lit_left = 0.;
+                }
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // Stasis: orbs and cocoons
+    // -----------------------------------------------------------------------------------------------------------
+
+    fn launch_orbs(
+        &mut self,
+        fight: &mut Fight,
+        name: &str,
+        s: &bm::Stasis,
+        players: &[(u64, Point)],
+    ) {
+        let mut rng = self.mech_rng();
+        let mut pool: Vec<u64> = players.iter().map(|(p, _)| *p).collect();
+        for _ in 0..s.orbs {
+            if pool.is_empty() {
+                pool = players.iter().map(|(p, _)| *p).collect();
+            }
+            let at = ((rng() * pool.len() as f64) as usize).min(pool.len() - 1);
+            fight.orbs.push(Orb {
+                at: self.slimes[fight.boss].point(),
+                target: pool.swap_remove(at),
+                life: s.life,
+                speed: s.speed,
+                tag: s.tag.clone(),
+                hold: s.hold,
+            });
+        }
+        let _ = name;
+    }
+
+    fn tick_orbs_and_frozen(&mut self, fight: &mut Fight) {
+        let mut touched = vec![];
+        for orb in &mut fight.orbs {
+            orb.life -= TICK;
+            let Some(p) = self
+                .players
+                .get(&orb.target)
+                .filter(|p| p.character.hp > 0. && !p.frozen)
+            else {
+                orb.life = 0.;
+                continue;
+            };
+            let to = p.character.point();
+            let d = orb.at.distance(to);
+            if d <= ORB_REACH {
+                touched.push((orb.target, orb.tag.clone(), orb.hold));
+                orb.life = 0.;
+                continue;
+            }
+            let step = (orb.speed * TICK).min(d);
+            orb.at.x += (to.x - orb.at.x) / d * step;
+            orb.at.y += (to.y - orb.at.y) / d * step;
+        }
+        fight.orbs.retain(|o| o.life > 0.);
+        let name = self.stasis_name(fight.boss);
+        for (session, tag, hold) in touched {
+            // One sleeping cocoon of the tag becomes the amber round this player.
+            let Some(slot) = (0..self.spawns.len()).find(|i| {
+                self.spawns[*i].zone == fight.zone
+                    && self.spawns[*i].ambush.as_deref() == Some(tag.as_str())
+                    && self.slimes[*i].dead
+                    && self.slimes[*i].state == "waiting"
+            }) else {
+                continue;
+            };
+            let at = self.players[&session].character.point();
+            let spawn = self.spawns[slot].clone();
+            let mut cocoon = Slime::with_level(slot, &spawn, Slime::default_level(&spawn.kind));
+            (cocoon.x, cocoon.y, cocoon.hx, cocoon.hy, cocoon.goal) = (at.x, at.y, at.x, at.y, at);
+            cocoon.state = "idle".into();
+            self.slimes[slot] = cocoon;
+            fight.woken.push(slot);
+            fight.still.insert(slot);
+            let p = self.players.get_mut(&session).unwrap();
+            p.frozen = true;
+            p.stop();
+            p.attack = 0.;
+            fight.frozen.insert(
+                session,
+                Frozen {
+                    cocoon: slot,
+                    left: hold,
+                    name: name.clone(),
+                },
+            );
+            self.mech_event(fight.zone, "frozen", &name, at, hold);
+        }
+        // A cocoon is broken (the player walks free) or the amber closes.
+        let mut freed = vec![];
+        let mut lost = vec![];
+        for (session, f) in &mut fight.frozen {
+            f.left -= TICK;
+            if self.slimes[f.cocoon].dead {
+                freed.push(*session);
+            } else if f.left <= 0. {
+                lost.push((*session, f.cocoon, f.name.clone()));
+            }
+        }
+        for session in freed {
+            fight.frozen.remove(&session);
+            if let Some(p) = self.players.get_mut(&session) {
+                p.frozen = false;
+            }
+        }
+        for (session, cocoon, name) in lost {
+            fight.frozen.remove(&session);
+            fight.still.remove(&cocoon);
+            self.slimes[cocoon] = self.dormant_enemy(cocoon);
+            if let Some(p) = self.players.get_mut(&session) {
+                p.frozen = false;
+            }
+            self.mech_kill(session, &name, fight.boss);
+        }
+    }
+
+    fn stasis_name(&self, boss: usize) -> String {
+        self.mechanic_name(boss, |b| matches!(b, Block::Stasis(_)))
+    }
+
+    /// The name of the boss's first mechanic of a block kind.
+    fn mechanic_name(&self, boss: usize, which: impl Fn(&Block) -> bool) -> String {
+        self.boss
+            .table
+            .get(&self.slimes[boss].kind)
+            .and_then(|d| {
+                d.mechanics
+                    .iter()
+                    .find(|m| which(&m.block))
+                    .map(|m| m.name.clone())
+            })
+            .unwrap_or_default()
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // Split
+    // -----------------------------------------------------------------------------------------------------------
+
+    fn divide_boss(&mut self, fight: &mut Fight, name: &str, s: &bm::Split) {
+        let id = fight.boss;
+        let Some(partner) = self
+            .wake_adds(fight, &s.tag, 1, false, false)
+            .first()
+            .copied()
+        else {
+            return;
+        };
+        let half = (self.slimes[id].hp / 2.).ceil().max(2.);
+        let max = self.slimes[id].max_hp;
+        self.slimes[id].hp = half;
+        let near = self.slimes[id].point();
+        let bodies = self.actor_bodies(fight.zone, None, Some(partner));
+        let side = free_actor_position(
+            &self.maps[fight.zone],
+            Point {
+                x: near.x + 3.,
+                y: near.y,
+            },
+            self.slimes[partner].r,
+            &bodies,
+            true,
+        )
+        .unwrap_or(near);
+        let p = &mut self.slimes[partner];
+        p.max_hp = max;
+        p.hp = half;
+        (p.x, p.y, p.hx, p.hy, p.goal) = (side.x, side.y, side.x, side.y, side);
+        fight.partner = Some(partner);
+        self.mech_event(fight.zone, "split", name, near, 0.);
+        fight.banner = Some((name.into(), 4.));
+    }
+
+    fn tick_split(&mut self, fight: &mut Fight, def: &BossDef) {
+        let Some(partner) = fight.partner else {
+            return;
+        };
+        let Some((name, split)) = def.mechanics.iter().find_map(|m| match &m.block {
+            Block::Split(s) => Some((m.name.clone(), s.clone())),
+            _ => None,
+        }) else {
+            return;
+        };
+        let id = fight.boss;
+        // A downed body lies still; its time runs out and it rises.
+        for body in fight.downed.keys().copied().collect::<Vec<_>>() {
+            self.hold_still(body);
+            let left = fight.downed.get_mut(&body).unwrap();
+            *left -= TICK;
+            if *left > 0. {
+                continue;
+            }
+            fight.downed.remove(&body);
+            let other = if body == id { partner } else { id };
+            let s = &mut self.slimes[body];
+            s.hp = (s.max_hp / 2.).max(2.);
+            if !self.slimes[other].dead {
+                self.slimes[other].damage *= 1. + split.survivor_bonus;
+            }
+            let at = self.slimes[body].point();
+            self.mech_event(fight.zone, "rise", &name, at, split.survivor_bonus);
+        }
+        // The bridge of light between the two living bodies.
+        if split.bridge > 0.
+            && !self.slimes[id].dead
+            && !self.slimes[partner].dead
+            && fight.downed.is_empty()
+        {
+            let (a, b) = (self.slimes[id].point(), self.slimes[partner].point());
+            self.land(fight, &name, Effect::Kill, 0., &|p| {
+                bm::segment_distance(p, a, b) <= split.bridge + BODY
+            });
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // The danger query (for hired fighters and the harness)
+    // -----------------------------------------------------------------------------------------------------------
+
+    /// What would hurt `session`, standing at `at`, in the running fights of `zone`, and the soonest it lands: the
+    /// ability's name and the seconds left. A mark never counts against its own bearer. `None`: safe where they stand.
+    /// Hired mercenaries and the dungeon harness decide where to move from this (`BOSSMECH-MERC`, `BOSSMECH-HARNESS`).
+    #[allow(dead_code)] // read by BOSSMECH-MERC and BOSSMECH-HARNESS
+    pub(super) fn boss_danger(
+        &self,
+        zone: usize,
+        session: u64,
+        at: Point,
+    ) -> Option<(String, f64)> {
+        let mut soonest: Option<(String, f64)> = None;
+        let mut note = |name: &str, left: f64| {
+            if soonest.as_ref().is_none_or(|(_, l)| left < *l) {
+                soonest = Some((name.to_string(), left.max(0.)));
+            }
+        };
+        for fight in self.boss.fights.values().filter(|f| f.zone == zone) {
+            let Some(def) = self.boss.table.get(&self.slimes[fight.boss].kind) else {
+                continue;
+            };
+            for live in &fight.live {
+                let m = &def.mechanics[live.mech()];
+                match (live, &m.block) {
+                    (Live::Zone(zl), Block::Zone(z))
+                        if matches!(zl.phase, ZPhase::Cast | ZPhase::Echo) =>
+                    {
+                        if bm::hurts(z.effect, &zl.areas, at) {
+                            note(&m.name, zl.left);
+                        }
+                    }
+                    (Live::Mark(ml), Block::Mark(k)) if !ml.gap => {
+                        for (bearer, shapes) in self.mark_shapes(fight, ml, k) {
+                            if bearer != session && shapes.iter().any(|sh| sh.contains(at)) {
+                                note(&m.name, ml.left);
+                            }
+                        }
+                    }
+                    (Live::Walls(wl), Block::Sweep(s)) => {
+                        let SweepKind::Walls {
+                            speed,
+                            thickness,
+                            gap,
+                            ..
+                        } = &s.kind
+                        else {
+                            continue;
+                        };
+                        for w in &wl.walls {
+                            // How long until the wall's band reaches this point, if the point is not in the gap.
+                            let (across, along, dir) = match w.side {
+                                Side::West => (at.x, at.y, 1.),
+                                Side::East => (at.x, at.y, -1.),
+                                Side::North => (at.y, at.x, 1.),
+                                Side::South => (at.y, at.x, -1.),
+                            };
+                            if (along - w.gap_at).abs() <= gap / 2. - BODY {
+                                continue;
+                            }
+                            let ahead = (across - w.pos) * dir;
+                            if ahead >= -(thickness / 2. + BODY) {
+                                note(
+                                    &m.name,
+                                    wl.warn_left.max(0.) + (ahead - thickness / 2.).max(0.) / speed,
+                                );
+                            }
+                        }
+                    }
+                    (Live::Break(bl), _) => {
+                        note(&m.name, bl.left);
+                    }
+                    (Live::Gaze(gl), Block::Gaze(_))
+                        if gl.left > 0. && self.sight(fight, gl.from, at).is_ok() =>
+                    {
+                        note(&m.name, gl.left);
+                    }
+                    _ => {}
+                }
+            }
+            for sp in &fight.spokes {
+                let Block::Sweep(s) = &def.mechanics[sp.mech].block else {
+                    continue;
+                };
+                let SweepKind::Spokes {
+                    count,
+                    width,
+                    length,
+                    ..
+                } = s.kind
+                else {
+                    continue;
+                };
+                let centre = fight.arena.centre();
+                let hit = (0..count).any(|n| {
+                    let a = sp.angle + n as f64 * std::f64::consts::TAU / count as f64;
+                    let tip = Point {
+                        x: centre.x + a.cos() * length,
+                        y: centre.y + a.sin() * length,
+                    };
+                    bm::segment_distance(at, centre, tip) <= width / 2. + BODY
+                });
+                if hit {
+                    note(&def.mechanics[sp.mech].name, 0.);
+                }
+            }
+        }
+        soonest
+    }
+
+    // -----------------------------------------------------------------------------------------------------------
+    // What the client is told
+    // -----------------------------------------------------------------------------------------------------------
+
+    /// `bossMech` for one zone: every running fight in it, in the form `docs/boss-mechanics.md` rule 1 asks the
+    /// client to draw. Empty when nothing is running.
+    pub(super) fn boss_mech_view(&self, zone: usize) -> Vec<Value> {
+        let mut out = vec![];
+        for (id, fight) in self.boss.fights.iter().filter(|(_, f)| f.zone == zone) {
+            let Some(def) = self.boss.table.get(&self.slimes[*id].kind) else {
+                continue;
+            };
+            let mut teles: Vec<Value> = vec![];
+            let mut cast = Value::Null;
+            let mut brk = Value::Null;
+            let mut marked = vec![];
+            for live in &fight.live {
+                let m = &def.mechanics[live.mech()];
+                match (live, &m.block) {
+                    (Live::Zone(zl), Block::Zone(z)) => {
+                        if zl.phase == ZPhase::Gap {
+                            continue;
+                        }
+                        let kind = if z.effect == Effect::KillOutside {
+                            bm::Telegraph::Safe
+                        } else {
+                            bm::Telegraph::Danger
+                        };
+                        teles.push(tele_json(
+                            zl.id,
+                            &m.name,
+                            kind,
+                            &zl.areas,
+                            zl.left,
+                            zl.total,
+                            zl.phase == ZPhase::Echo,
+                        ));
+                        if zl.phase == ZPhase::Cast {
+                            cast = json!({"name":m.name,"left":zl.left,"total":zl.total});
+                        }
+                    }
+                    (Live::Mark(ml), Block::Mark(k)) => {
+                        if ml.gap {
+                            continue;
+                        }
+                        let kind = if matches!(k.effect, MarkEffect::Beam { .. }) {
+                            bm::Telegraph::Path
+                        } else {
+                            bm::Telegraph::Danger
+                        };
+                        for (bearer, shapes) in self.mark_shapes(fight, ml, k) {
+                            if let Some(p) = self.players.get(&bearer) {
+                                marked.push(p.character.id.clone());
+                            }
+                            teles.push(tele_json(
+                                ml.id, &m.name, kind, &shapes, ml.left, ml.total, false,
+                            ));
+                        }
+                        cast = json!({"name":m.name,"left":ml.left,"total":ml.total});
+                    }
+                    (Live::Walls(wl), Block::Sweep(s)) => {
+                        let SweepKind::Walls { thickness, gap, .. } = &s.kind else {
+                            continue;
+                        };
+                        let warning = wl.warn_left > 0.;
+                        let kind = if warning {
+                            bm::Telegraph::Path
+                        } else {
+                            bm::Telegraph::Danger
+                        };
+                        for w in &wl.walls {
+                            let bands = Self::wall_bands(fight.arena, *thickness, *gap, w);
+                            teles.push(tele_json(
+                                wl.id,
+                                &m.name,
+                                kind,
+                                &bands,
+                                wl.warn_left.max(0.),
+                                wl.warn_total,
+                                false,
+                            ));
+                            let (g0, g1) = (w.gap_at - gap / 2., w.gap_at + gap / 2.);
+                            let (a, b) = match w.side {
+                                Side::West | Side::East => {
+                                    (Point { x: w.pos, y: g0 }, Point { x: w.pos, y: g1 })
+                                }
+                                Side::North | Side::South => {
+                                    (Point { x: g0, y: w.pos }, Point { x: g1, y: w.pos })
+                                }
+                            };
+                            let gap_shape = Shape::Lane {
+                                a,
+                                b,
+                                half: thickness / 2.,
+                            };
+                            teles.push(tele_json(
+                                wl.id,
+                                &m.name,
+                                bm::Telegraph::Gap,
+                                &[gap_shape],
+                                0.,
+                                0.,
+                                false,
+                            ));
+                        }
+                        if warning {
+                            cast = json!({"name":m.name,"left":wl.warn_left,"total":wl.warn_total});
+                        }
+                    }
+                    (Live::Break(bl), _) => {
+                        brk = json!({"name":m.name,"left":bl.left,"total":bl.total,"dealt":bl.dealt,"needed":bl.needed});
+                        cast = json!({"name":m.name,"left":bl.left,"total":bl.total});
+                    }
+                    (Live::Gaze(gl), Block::Gaze(g)) => {
+                        let shape = if gl.left <= 0. && g.sweep > 0. {
+                            Shape::Cone {
+                                x: gl.from.x,
+                                y: gl.from.y,
+                                dir: gl.angle,
+                                half: g.beam.to_radians(),
+                                length: fight.arena.diagonal(),
+                            }
+                        } else {
+                            Shape::Circle {
+                                x: gl.from.x,
+                                y: gl.from.y,
+                                r: 0.5,
+                                inner: 0.,
+                            }
+                        };
+                        let mut t = tele_json(
+                            gl.id,
+                            &m.name,
+                            bm::Telegraph::Danger,
+                            &[shape],
+                            gl.left,
+                            gl.total,
+                            false,
+                        );
+                        t["gaze"] = json!(true);
+                        teles.push(t);
+                        if gl.left > 0. {
+                            cast = json!({"name":m.name,"left":gl.left,"total":gl.total});
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            for g in &fight.lit {
+                for l in &g.points {
+                    let shape = Shape::Circle {
+                        x: l.at.x,
+                        y: l.at.y,
+                        r: g.r,
+                        inner: 0.,
+                    };
+                    let mut t = tele_json(
+                        0,
+                        &def.mechanics[g.mech].name,
+                        bm::Telegraph::Safe,
+                        &[shape],
+                        0.,
+                        0.,
+                        false,
+                    );
+                    t["lit"] = json!(l.lit_left > 0.);
+                    t["litLeft"] = json!(l.lit_left.max(0.));
+                    t["progress"] = json!((l.progress / g.hold_for).min(1.));
+                    teles.push(t);
+                }
+            }
+            for sp in &fight.spokes {
+                let Block::Sweep(s) = &def.mechanics[sp.mech].block else {
+                    continue;
+                };
+                let SweepKind::Spokes {
+                    count,
+                    width,
+                    length,
+                    ..
+                } = s.kind
+                else {
+                    continue;
+                };
+                let centre = fight.arena.centre();
+                let shapes: Vec<Shape> = (0..count)
+                    .map(|n| {
+                        let a = sp.angle + n as f64 * std::f64::consts::TAU / count as f64;
+                        Shape::Lane {
+                            a: centre,
+                            b: Point {
+                                x: centre.x + a.cos() * length,
+                                y: centre.y + a.sin() * length,
+                            },
+                            half: width / 2.,
+                        }
+                    })
+                    .collect();
+                let mut t = tele_json(
+                    0,
+                    &def.mechanics[sp.mech].name,
+                    bm::Telegraph::Danger,
+                    &shapes,
+                    0.,
+                    0.,
+                    false,
+                );
+                t["reversing"] = json!(sp.warn_left > 0.);
+                t["reverseLeft"] = json!(sp.warn_left);
+                teles.push(t);
+            }
+            for c in &fight.cover {
+                let shape = Shape::Circle {
+                    x: c.cover.x,
+                    y: c.cover.y,
+                    r: c.cover.r,
+                    inner: 0.,
+                };
+                teles.push(json!({"id":0,"name":"cover","tele":"cover","hits":c.hits,"standing":!c.broken,"shapes":[shape.view()],"left":0,"total":0}));
+            }
+            for orb in &fight.orbs {
+                let shape = Shape::Circle {
+                    x: orb.at.x,
+                    y: orb.at.y,
+                    r: ORB_REACH,
+                    inner: 0.,
+                };
+                let mut t = tele_json(
+                    0,
+                    "orb",
+                    bm::Telegraph::Danger,
+                    &[shape],
+                    orb.life,
+                    0.,
+                    false,
+                );
+                t["orb"] = json!(true);
+                teles.push(t);
+            }
+            let ids = |sessions: Vec<&u64>| -> Vec<String> {
+                sessions
+                    .into_iter()
+                    .filter_map(|s| self.players.get(s).map(|p| p.character.id.clone()))
+                    .collect()
+            };
+            out.push(json!({
+                "boss": id,
+                "clock": fight.clock,
+                "cast": cast,
+                "break": brk,
+                "tele": teles,
+                "marked": marked,
+                "frozen": ids(fight.frozen.keys().collect()),
+                "shield": fight.shield.as_ref().map(|s| json!({
+                    "name": s.name,
+                    "tag": s.tag,
+                    "adds": s.adds.len(),
+                    "alive": s.adds.iter().filter(|a| !self.slimes[**a].dead).count(),
+                    "healPerSecond": s.heal_per_s,
+                })),
+                "stunned": fight.stun_left.max(0.),
+                "partner": fight.partner,
+                "downed": fight.downed.keys().collect::<Vec<_>>(),
+                "banner": fight.banner.as_ref().map(|(t, _)| t),
+            }));
+        }
+        out
+    }
+}
+
+fn tele_json(
+    id: u64,
+    name: &str,
+    kind: bm::Telegraph,
+    shapes: &[Shape],
+    left: f64,
+    total: f64,
+    echo: bool,
+) -> Value {
+    json!({
+        "id": id,
+        "name": name,
+        "tele": kind.word(),
+        "color": kind.color(),
+        "dashed": kind.dashed(),
+        "echo": echo,
+        "shapes": shapes.iter().map(Shape::view).collect::<Vec<_>>(),
+        "left": left,
+        "total": total,
+    })
+}
+
+#[cfg(test)]
+#[path = "boss_mechanics_tests.rs"]
+mod tests;

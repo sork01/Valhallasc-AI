@@ -117,6 +117,7 @@ impl World {
     /// Every enemy back at its post at full health, shots and loot gone, the exit closed.
     pub(super) fn reset_instance(&mut self, index: usize) {
         let zone = self.instances[index].zone;
+        self.reset_boss_zone(zone);
         for id in 0..self.spawns.len() {
             if self.spawns[id].zone == zone {
                 let enemy = self.fresh_enemy(id);

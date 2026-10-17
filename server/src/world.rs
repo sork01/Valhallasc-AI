@@ -15,6 +15,7 @@ mod bank;
 use bank::BankRequest;
 #[cfg(test)]
 mod asterion_tests;
+mod boss_mechanics;
 #[cfg(test)]
 mod cairn_tests;
 #[cfg(test)]
@@ -99,7 +100,7 @@ mod yearwheel_tests;
 pub type Peer = mpsc::Sender<Value>;
 const KING_SPAWN_MIN: f64 = 300.;
 const KING_SPAWN_MAX: f64 = 600.;
-const PLAYER_RADIUS: f64 = 0.3;
+pub(crate) const PLAYER_RADIUS: f64 = 0.3;
 /// Every enemy rolls its level within this distance of its kind's default level.
 pub const LEVEL_SPREAD: i32 = 2;
 /// How close (tiles) a target must be to count for a boss's soft enrage clock.
@@ -211,6 +212,8 @@ struct Player {
     escort: Option<escort::Escort>,
     /// The confirmation from the last `rebirth_preview` (docs/rebirth.md).
     rebirth_nonce: Option<rebirth::Nonce>,
+    /// Frozen in amber by a boss mechanic: cannot move or act, and cannot be hurt, until the cocoon is broken.
+    frozen: bool,
 }
 impl Player {
     // Called once when hp reaches 0: the XP penalty, then a notice naming what it cost.
@@ -294,6 +297,7 @@ impl Player {
             ambient: None,
             escort: None,
             rebirth_nonce: None,
+            frozen: false,
         }
     }
     fn snapshot(&self) -> Value {
@@ -304,7 +308,7 @@ impl Player {
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
-            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,"reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"rebirthTiers":c.rebirth_tiers,
+            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"frozen":self.frozen,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,"reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"rebirthTiers":c.rebirth_tiers,
             "setCounts":c.set_counts(),"setCd":self.set_cd,
             "pvpFlag":self.pvp_flag,"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
     }
@@ -1318,6 +1322,8 @@ pub struct World {
     pvp: pvp::Pvp,
     // Hold objectives in progress (world/hold.rs).
     hold: hold::Holds,
+    /// Final boss mechanics (docs/boss-mechanics.md): the table and the fights running now.
+    boss: boss_mechanics::BossMech,
     chime: chime::Chimes,
     // Treasure chests and their roll timers (world/chests.rs). Runtime state, never saved.
     chests: chests::Chests,
@@ -1402,6 +1408,7 @@ impl World {
             trades: vec![],
             pvp: pvp::Pvp::default(),
             hold: hold::Holds::default(),
+            boss: boss_mechanics::BossMech::new(),
             chime: chime::Chimes::default(),
             chests: chests::Chests::new(u64::from_le_bytes(
                 uuid::Uuid::new_v4().as_bytes()[8..16].try_into().unwrap(),
@@ -1667,6 +1674,10 @@ impl World {
         "drops":self.drops.iter().filter(|d| d.zone == zone).collect::<Vec<_>>(),
         "chests":self.chests.list.iter().filter(|c| c.zone == zone).collect::<Vec<_>>(),
         "online":self.visible_online()});
+        let boss_mech = self.boss_mech_view(zone);
+        if !boss_mech.is_empty() {
+            view["bossMech"] = json!(boss_mech);
+        }
         if let Some(instance) = self.instance_at(zone) {
             view["instance"] = json!({"cleared":instance.cleared});
             // A private copy is told it is the template zone, so a client has one dungeon whatever copy it stands in.
@@ -1900,7 +1911,7 @@ impl World {
         let Some(p) = self.players.get_mut(&session) else {
             return;
         };
-        if p.character.spark_travel.is_some()
+        if (p.character.spark_travel.is_some() || p.frozen)
             && !matches!(
                 message,
                 ClientMessage::Chat { .. }
@@ -2527,6 +2538,7 @@ impl World {
             }
             self.update_slime(i);
         }
+        self.update_boss_mechanics();
         self.update_bolts();
         self.update_enemy_bolts();
         self.update_drops();
@@ -2585,6 +2597,12 @@ impl World {
         });
         if p.character.spark_travel.is_some() {
             self.update_spark(session);
+            return;
+        }
+        if p.frozen {
+            // Frozen in amber by a boss mechanic: stands where it is until the cocoon breaks.
+            p.stop();
+            p.attack = 0.;
             return;
         }
         if p.character.hp <= 0. {
@@ -3415,11 +3433,24 @@ impl World {
             .players
             .get(&credit)
             .map_or_else(|| actor.clone(), |c| c.character.id.clone());
-        let s = &mut self.slimes[id];
-        if s.dead || s.zone != p.character.zone {
+        if self.slimes[id].dead || self.slimes[id].zone != p.character.zone {
             return 0.;
         }
-        let damage = if gm_strike { s.hp.max(damage) } else { damage };
+        let damage = if gm_strike {
+            self.slimes[id].hp.max(damage)
+        } else {
+            damage
+        };
+        // A final boss's mechanics may shield it, stun it, or hold a divided body down (world/boss_mechanics.rs).
+        let damage = match self.boss_incoming(id, damage) {
+            boss_mechanics::Incoming::Damage(d) => d,
+            boss_mechanics::Incoming::Immune => {
+                let point = self.slimes[id].point();
+                self.event("immune", &actor, point, 0., false);
+                return 0.;
+            }
+        };
+        let s = &mut self.slimes[id];
         let p = self.players.get_mut(&session).unwrap();
         p.combat_left = 5.;
         if damage <= 0. {
@@ -3468,6 +3499,7 @@ impl World {
             };
             s.state = "dead".into();
         }
+        self.boss_after_hit(id, session, dealt, killed);
         self.event_with(
             "hit",
             &actor,
@@ -4064,6 +4096,7 @@ impl World {
         let p = &self.players[&session];
         if self.god_mode
             || p.god
+            || p.frozen
             || p.is_hidden()
             || p.character.hp <= 0.
             || self.maps[p.character.zone].in_city(p.character.point())

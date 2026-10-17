@@ -5,7 +5,7 @@ pub const MAX_PLAYERS: usize = 128;
 /// Name of the administrator character (see `Character::gm`).
 pub const GM_NAME: &str = "[GM]Sork";
 
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct Point {
     pub x: f64,
     pub y: f64,

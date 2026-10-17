@@ -1,6 +1,6 @@
 # Final boss mechanics
 
-Design for the `BOSSMECH-*` tasks in [TODO.md](../TODO.md). Owner's request (2026-10-17): every final boss gets a gimmick, for example a big area attack with a five-second cast that kills anyone still in it, or a boss that turns invulnerable and spawns adds that must die to end it. Nothing here is built yet; every number is a starting value to tune with the dungeon harness (`BOSSMECH-CHECK`).
+Design for the `BOSSMECH-*` tasks in [TODO.md](../TODO.md). Owner's request (2026-10-17): every final boss gets a gimmick, for example a big area attack with a five-second cast that kills anyone still in it, or a boss that turns invulnerable and spawns adds that must die to end it. The engine is built (see below); the sixteen mechanics are not. Every number is a starting value to tune with the dungeon harness (`BOSSMECH-CHECK`).
 
 A **final boss** is the monster named in a dungeon's `final_boss`: sixteen of them. Open-world elites (Cinderlord, Gloomroot, the group elites) and the dungeons' middle bosses are not covered; say so if they should get the same treatment.
 
@@ -49,6 +49,33 @@ All of these live once in `server/src/bossmech.rs`; the engine, the client, the 
 | `hold` | Standing at a place for N seconds completes it (`world/hold.rs` already does this for wards). | Solstice |
 | `echo` | Records a cast and plays it again later at the same place. | Moonwell Echo |
 | `gaze` | A line-of-sight attack: only cover (an obstacle that blocks `Map::line_clear`) helps. | Unblinking Eye |
+
+## The engine (`BOSSMECH-ENGINE`, built 2026-10-17)
+
+The data is `world/boss-mechanics.txt`, a JSON object keyed by the final boss's monster kind; it ships as `{}` and the sixteen boss tasks fill it in. The schema, the shapes, the beam bounce and the fairness walk are pure code in `server/src/bossmech.rs`; the state machine that runs a fight is `server/src/world/boss_mechanics.rs`. The table is validated when the server starts (`bossmech::shipped()` panics on a bad entry), so a cast under its floor or a typo in a field name stops the server rather than shipping.
+
+Each boss lists `mechanics`; each has a `name` (the cast bar and "Killed by <name>"), an optional health window (`hp_max`, default 1, and `hp_min`, default 0: an escalation is a second entry with a lower `hp_max`), and a `block`:
+
+| Block | Fields | Notes |
+| --- | --- | --- |
+| `zone` | `shape`, `effect` (`kill`, `heavy`, `kill_outside`), `heavy`, `cast`, `every`, `first`, `repeat`, `repeat_gap`, `echo`, `linger` | Shapes: `circle` (with `inner` for a ring, `at` boss, target or random), `cone`, `lane`, `half`, `arena`, `islands`, `lit`. `echo` lands the same shape again after each delay and leaves a pale copy. `kill_outside` goes with `islands` and `lit` only. |
+| `shield` | `steps` (`hp`, `tag`, `count`, `still`), `heal_per_s` | Wakes sleeping monsters of `tag`; no damage reaches the boss until they are all dead. With nothing to wake there is no shield. |
+| `adds` | `tag`, `count`, `every`, `first`, `scatter`, `still`, `bloom` (`after`, `heal`, `then`) | A bloom removes the add, heals the boss and wakes one `then` add where it stood. |
+| `mark` | `count`, `every`, `first`, `cast`, `effect` (`burst` or `beam`), `waves`, `wave_gap` | At most 3, never everyone, at least one; the ring or beam follows the bearer; the bearer is never hurt by their own mark. |
+| `sweep` | `kind` `walls` (`warn`, `speed`, `thickness`, `gap`, `walls` with `from` and `gap` low, high, middle or random) or `spokes` (`count`, `width`, `deg_per_s`, `reverse_every`, `reverse_warn`, `length`) | Walls are dashed for `warn`, then red; the green gap is safe. Spokes turn about the arena's centre and are lethal to touch. |
+| `break` | `cast`, `every`, `first`, `bar`, `stun`, `vulnerable` | The boss is held still; damage from anyone fills the bar (a share of its maximum health); broken: stunned and `vulnerable` extra damage; unbroken: everyone in the fight dies. |
+| `stasis` | `every`, `first`, `orbs`, `speed`, `life`, `tag`, `hold` | Orbs seek players; a touched player is frozen (no input, no damage) in a cocoon (a sleeping monster of `tag`); kill the cocoon to free them, or they are lost after `hold`. |
+| `split` | `hp`, `tag`, `revive_after`, `survivor_bonus`, `bridge` | The boss and its partner keep half the remaining health each. A body that would fall while the other lives is left on 1 health and downed; the other falling in time finishes both, otherwise it rises with half its health and the survivor hits harder. |
+| `hold` | `points`, `r`, `hold_for`, `lit_for`, `snuff_every` | A place is lit by standing in it; lit places are the safe discs of a `lit` zone. |
+| `gaze` | `cast`, `every`, `first`, `cover`, `regrow`, `sweep`, `beam` | Everyone with a clear line (`Map::line_clear` and standing cover) is struck at the end of the cast; with `sweep` a beam turns once round the room instead. Cover cracks after one gaze that it shielded someone from, breaks after two, regrows after `regrow`. |
+
+Things worth knowing:
+  * `every` runs from one start to the next, and `validate` insists it is longer than the whole sequence (casts, repeat gaps, echoes).
+  * Adds are the sleeping monsters the map already holds (spawns with `ambush: <tag>`, state `waiting`); the dungeon's data places them, the mechanic only names the tag. A fight puts every one it woke back to sleep when it ends.
+  * A fight starts when the boss is awake and fighting and ends when it dies, walks home or its copy is reset. It belongs to one boss slot, so dungeon copies never share state.
+  * The snapshot carries `bossMech` (one entry per running fight: `cast`, `break`, `tele` with colour and shapes, `marked`, `frozen`, `shield`, `stunned`, `partner`, `banner`). Events: `bossmech` with a `phase` (`cast`, `land`, `add`, `shield`, `broken`, `bloom`, `frozen`, `split`, `down`, `rise`, `reverse`) and `immune` for a blow the shield swallowed. A death event carries `cause`.
+  * `cargo test boss_mechanics` and `cargo test bossmech` run the engine's tests; `every_shipped_boss_is_fair_and_its_tags_exist_in_the_map` reads whatever the sixteen tasks add and fails on a point with no way out in time or a tag with no sleeping monster behind it.
+  * Found while building it: the design's *Moon Lance* has a 3 s cast and kills, which is under the 5 s floor of rule 2; `BOSSMECH-MOONWELL-ECHO` has to lengthen it to 5 s or make it a heavy hit. The Flooded Cloister's boss room is 8 by 8 tiles and *Toll of the Deep* is a ring of radius 8, which fills the room: the fairness walk lets players run out of the door, but the room (or the ring) may need to change in `BOSSMECH-CHOIRMOTHER`.
 
 ## The sixteen mechanics
 
