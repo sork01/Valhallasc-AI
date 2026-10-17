@@ -13,6 +13,7 @@
     "test:trade": "node tests/trade-ui.cjs",
     "test:bank": "node tests/bank-ui.cjs",
     "test:bank-check": "node tests/bank-check.cjs",
+    "test:bank-art": "node tests/bank-art-ui.cjs",
     "test:bags": "node tests/bag-tiers-ui.cjs",
     "test:epic-drop-ui": "node tests/epic-drop-ui.cjs",
     "test:chest": "node tests/chest-ui.cjs",

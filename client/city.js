@@ -396,6 +396,10 @@
       g.imageSmoothingEnabled=false;
       g.drawImage(src.img[n.art],step*w,0,w,h,-47,-103,94,103);
     }
+    else if(n.art?.startsWith('bank_') && Field.bankSprites?.img[n.art]){
+      const src=Field.bankSprites,{frame:[w,h],clips}=src.meta,clip=(current?.id===n.id&&clips.talk)||clips.idle,step=Math.floor(t*clip.fps)%clip.n;
+      g.imageSmoothingEnabled=false;g.drawImage(src.img[n.art],step*w,clip.row*h,w,h,-47,-103,94,103);
+    }
     else if(L?.species==='merfolk'&&window.NacreArt)NacreArt.merfolk(g,n,t);
     else if(L)drawFolk(g,n,t,moving);
     else {

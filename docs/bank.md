@@ -127,3 +127,7 @@ Each also answers when the bank is empty ("The strongroom is yours. Nothing is i
 - Game master gear, a worn piece, an unknown ID, a zero or oversized quantity, a full bank, a full bag, out of range, the wrong zone, defeated, in combat, mounted and a request that names a stack twice are all refused with nothing changed.
 - A save, a reload and a legacy save with no `bank` field give the same bank (empty for the legacy one); a rebirth leaves it unchanged; deleting the character removes it.
 - Exactly the five bankers exist, one per city, and no other city has one.
+
+## Art (BANK-ART)
+
+The five bankers are drawn from `client/assets/bank_<city>.png` (one PixelFlow sprite each, ids in `client/assets/bank.txt`); the NPC's `art` field names the atlas and the prop beside the banker is part of the same picture, so no map object or collision is involved. The window icon is `bank_icon.png`. Regenerate with `python3 scripts/make_bank_sprites.py export` after editing in PixelFlow; `build` discards edits.

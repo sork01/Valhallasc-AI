@@ -3038,7 +3038,8 @@
         "style": "bun",
         "hat": "bonnet",
         "hatColor": "#8a6a2a"
-      }
+      },
+      "art": "bank_alderhaven"
     },
     {
       "id": "travel_alderhaven",
@@ -25668,7 +25669,8 @@
             "hatColor": "#5c6b82",
             "beard": "#b9b2a4",
             "scale": 1.05
-          }
+          },
+          "art": "bank_skaldholm"
         },
         {
           "id": "city_herald",
@@ -64969,7 +64971,8 @@
             "skin": "#a4dbc9",
             "hair": "#5f8f9c",
             "style": "long"
-          }
+          },
+          "art": "bank_nacrehold"
         },
         {
           "id": "nacre_gardener",
@@ -90752,7 +90755,8 @@
             "style": "braid",
             "hat": "hood",
             "hatColor": "#3d4a86"
-          }
+          },
+          "art": "bank_astralhollow"
         },
         {
           "id": "astral_healer",
@@ -105487,7 +105491,8 @@
             "hat": "feather",
             "hatColor": "#4b3a88",
             "scale": 1
-          }
+          },
+          "art": "bank_asterion"
         },
         {
           "id": "asterion_cartographer",

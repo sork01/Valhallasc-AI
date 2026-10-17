@@ -707,6 +707,7 @@
 #bank-panel { z-index: 49; }
 .bank-panel { position: static; display: flex; flex-direction: column; width: min(96cqw, max(62cqw, 700px)); max-height: 94cqh; padding: 0; overflow: hidden; border: .3cqw solid #5a4a30; border-radius: .7cqw; background: #261e15; color: #eee3cb; font: max(13px, 1cqw) 'Jua', sans-serif; box-shadow: 0 .6cqw 2cqw #000a, inset 0 0 0 1px #b99d5c55; }
 .bank-panel .gossip-titlebar h3 { margin: 0; font: bold max(14px, 1.45cqw) Georgia, 'Palatino Linotype', serif; color: #f0d59b; text-shadow: 0 2px 2px #000; text-align: center; }
+.bank-icon { width: 32px; height: 32px; margin-right: 10px; image-rendering: pixelated; flex: 0 0 auto; }
 .bank-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; padding: 12px; overflow: auto; min-height: 0; }
 .bank-side { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .bank-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }

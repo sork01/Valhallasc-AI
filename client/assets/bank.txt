@@ -1,0 +1,39 @@
+{
+  "frame": [
+    96,
+    96
+  ],
+  "anchor": [
+    48,
+    90
+  ],
+  "kinds": [
+    "bank_alderhaven",
+    "bank_skaldholm",
+    "bank_nacrehold",
+    "bank_astralhollow",
+    "bank_asterion"
+  ],
+  "clips": {
+    "idle": {
+      "fps": 6,
+      "n": 6,
+      "row": 0,
+      "editorStart": 0
+    },
+    "talk": {
+      "fps": 6,
+      "n": 6,
+      "row": 1,
+      "editorStart": 6
+    }
+  },
+  "sprites": {
+    "bank_alderhaven": "2a3189602babb176",
+    "bank_skaldholm": "f360da929bccb8aa",
+    "bank_nacrehold": "85fe564559a13f27",
+    "bank_astralhollow": "b3c7d6693615b013",
+    "bank_asterion": "83bf4086cb610c87",
+    "icon": "af16f41bb8c2bae0"
+  }
+}

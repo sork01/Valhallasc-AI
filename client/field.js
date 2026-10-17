@@ -2498,7 +2498,7 @@
   }
 
   // ---------- slimes as sprites (assets/slimes_<kind>.png + slimes.txt, drawn by tools/make_slime_sprites.py) ----------
-  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
+  let slimeSrc = null, beetleSrc = null, cragSrc = null, rimeSrc = null, fenSrc = null, wyrdSrc = null, vaultSrc = null, skySrc = null, deepSrc = null, astralSrc = null, prismSrc = null, orrerySrc = null, moonsporeSrc = null, stormglassSrc = null, sunwardSrc = null, ribbonwildSrc = null, tanglecrownSrc = null, worldheartSrc = null, lapisSrc = null, frostwakeSrc = null, cairnSrc = null, bankSrc = null, yearSrc = null, moonwellSrc = null, moonwellGardenSrc = null, cathedralSrc = null;    // {meta, img: {kind: Image}}
   const enemySource = s => CATHEDRAL_KINDS.includes(s.kind) ? cathedralSrc : YEAR_KINDS.includes(s.kind) ? yearSrc : CAIRN_KINDS.includes(s.kind) ? cairnSrc : FROSTWAKE_KINDS.includes(s.kind) ? frostwakeSrc : LAPIS_KINDS.includes(s.kind) ? lapisSrc : WORLDHEART_KINDS.includes(s.kind) ? worldheartSrc : TANGLECROWN_KINDS.includes(s.kind) ? tanglecrownSrc : RIBBONWILD_KINDS.includes(s.kind) ? ribbonwildSrc : SUNWARD_KINDS.includes(s.kind) ? sunwardSrc : STORMGLASS_KINDS.includes(s.kind) ? stormglassSrc : s.kind === 'moonwell_echo' ? moonwellSrc : MOONWELL_KINDS.includes(s.kind) ? moonwellGardenSrc : s.kind === 'beetle' ? beetleSrc : CRAG_KINDS.includes(s.kind) ? cragSrc : RIME_KINDS.includes(s.kind) ? rimeSrc : FEN_KINDS.includes(s.kind) ? fenSrc : WYRD_KINDS.includes(s.kind) ? wyrdSrc : SKY_KINDS.includes(s.kind) ? skySrc : DEEP_KINDS.includes(s.kind) ? deepSrc : ASTRAL_KINDS.includes(s.kind) ? astralSrc : PRISM_KINDS.includes(s.kind) ? prismSrc : ORRERY_KINDS.includes(s.kind) ? orrerySrc : MOONSPORE_KINDS.includes(s.kind) ? moonsporeSrc : VAULT_KINDS.includes(s.kind) ? vaultSrc : slimeSrc;
   const SLIME_K = 2.1, DIE_SHOW = 1.7;                      // sprite pixel -> screen px; seconds a dead slime stays on screen
   const enemyBounds = new WeakMap();
@@ -2701,6 +2701,14 @@
     fetch('assets/cairn.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/cairn_${k}.png`;
     }))).then(imgs=>{cairnSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{cairnSrc=null;});
+  }
+  const BANK_KINDS=['bank_alderhaven','bank_skaldholm','bank_nacrehold','bank_astralhollow','bank_asterion'];
+  function loadBankSprites() {
+    if (bankSrc) return;
+    if (stubOn()) { bankSrc=stubEnemies(BANK_KINDS,{}); return; }
+    fetch('assets/bank.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
+      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/${k}.png`;
+    }))).then(imgs=>{bankSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{bankSrc=null;});
   }
   function loadYearSprites() {
     if (yearSrc) return;
@@ -3855,7 +3863,7 @@
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
       if (o.slimeSprites) loadSlimeSprites(o.slimeSprites);
-      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadSkySprites(); loadDeepSprites(); loadAstralSprites(); loadPrismSprites(); loadOrrerySprites(); loadMoonsporeSprites(); loadStormglassSprites(); loadSunwardSprites(); loadRibbonwildSprites(); loadTanglecrownSprites(); loadWorldheartSprites(); loadLapisSprites(); loadFrostwakeSprites(); loadCairnSprites(); loadYearSprites(); loadMoonwellSprites(); loadMoonwellGardenSprites(); loadVaultSprites(); loadCathedralSprites();
+      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadSkySprites(); loadDeepSprites(); loadAstralSprites(); loadPrismSprites(); loadOrrerySprites(); loadMoonsporeSprites(); loadStormglassSprites(); loadSunwardSprites(); loadRibbonwildSprites(); loadTanglecrownSprites(); loadWorldheartSprites(); loadLapisSprites(); loadFrostwakeSprites(); loadCairnSprites(); loadBankSprites(); loadYearSprites(); loadMoonwellSprites(); loadMoonwellGardenSprites(); loadVaultSprites(); loadCathedralSprites();
       if (!Field._bound) {
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize);
@@ -3933,7 +3941,7 @@
     get hunterSprites() { return isHunter() ? mageSpr : null; },
     get hero() { return hero; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
-    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
+    get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
     _debug: { get chests() { return chests; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, drawLootPillar, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
   };
