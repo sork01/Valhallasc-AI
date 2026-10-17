@@ -55,6 +55,7 @@ mod pvp;
 #[cfg(test)]
 mod rain_crown_tests;
 mod ranged;
+mod rebirth;
 #[cfg(test)]
 mod resource_tests;
 mod resources;
@@ -206,6 +207,8 @@ struct Player {
     /// Set on a stranded person walking an escort quest's route (see world/escort.rs). Always with `merc` set to the
     /// character being escorted for, so an escort is never saved, counted as online or put in a party.
     escort: Option<escort::Escort>,
+    /// The confirmation from the last `rebirth_preview` (docs/rebirth.md).
+    rebirth_nonce: Option<rebirth::Nonce>,
 }
 impl Player {
     // Called once when hp reaches 0: the XP penalty, then a notice naming what it cost.
@@ -288,6 +291,7 @@ impl Player {
             merc_quest: None,
             ambient: None,
             escort: None,
+            rebirth_nonce: None,
         }
     }
     fn snapshot(&self) -> Value {
@@ -298,7 +302,7 @@ impl Player {
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
-            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,
+            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,"reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"rebirthTiers":c.rebirth_tiers,
             "setCounts":c.set_counts(),"setCd":self.set_cd,
             "pvpFlag":self.pvp_flag,"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
     }
@@ -1986,6 +1990,12 @@ impl World {
             }
             ClientMessage::OpenChest { id } => {
                 self.open_chest(session, id);
+            }
+            ClientMessage::RebirthPreview => {
+                self.rebirth_preview(session);
+            }
+            ClientMessage::Rebirth { nonce } => {
+                self.rebirth(session, &nonce);
             }
             ClientMessage::Mount { mounted } => {
                 if !mounted {

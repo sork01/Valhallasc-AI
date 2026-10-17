@@ -172,6 +172,7 @@ impl Store {
             mounts: vec![],
             mount: String::new(),
             mounted: false,
+            rebirth_tiers: [0; 5],
         };
         c.seed_inventory();
         if gm {

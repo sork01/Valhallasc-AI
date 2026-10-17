@@ -4,6 +4,7 @@ mod cathedral;
 mod items;
 mod model;
 mod notify;
+mod rebirth;
 mod sets;
 mod skills;
 mod store;

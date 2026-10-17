@@ -958,7 +958,7 @@ impl Character {
         score(i) > current
     }
     /// Every worn piece: the extra slots plus the class armor and weapon.
-    fn worn_items(&self) -> Vec<&'static Item> {
+    pub(crate) fn worn_items(&self) -> Vec<&'static Item> {
         let (armor, weapon) = self.gear();
         let class = self.look.class;
         self.equipment

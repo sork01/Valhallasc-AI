@@ -41,7 +41,7 @@ impl Trade {
 }
 
 impl World {
-    fn trade_index(&self, id: &str) -> Option<usize> {
+    pub(super) fn trade_index(&self, id: &str) -> Option<usize> {
         self.trades.iter().position(|t| t.side(id).is_some())
     }
     fn trade_pair_valid(&self, a: &str, b: &str) -> Result<(), String> {

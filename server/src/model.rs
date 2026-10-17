@@ -378,6 +378,10 @@ pub struct Character {
     pub mount: String,
     #[serde(default)]
     pub mounted: bool,
+    /// Rebirths done at tier 1..=5 (docs/rebirth.md). Every perk is derived from these counts, so a rebalance needs no
+    /// save migration and an old save is simply never reborn.
+    #[serde(default)]
+    pub rebirth_tiers: [u32; 5],
 }
 /// A mount: only its looks and the way it is obtained differ (docs/mounts.md), so every speed is 2.0.
 pub struct MountDef {
@@ -483,6 +487,7 @@ impl Character {
             mounts: vec![],
             mount: String::new(),
             mounted: false,
+            rebirth_tiers: [0; 5],
         };
         c.seed_inventory();
         // The best potions the mercenary's level allows: health for everyone, mana for casters.
@@ -1158,6 +1163,11 @@ pub enum ClientMessage {
     },
     SelectMount {
         mount: String,
+    },
+    /// Asks whether a rebirth is possible now and what it would do; the answer carries the nonce `Rebirth` needs.
+    RebirthPreview,
+    Rebirth {
+        nonce: String,
     },
     OpenChest {
         id: u64,
