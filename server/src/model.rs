@@ -386,6 +386,9 @@ pub struct Character {
     /// that was sold or banked is never handed out again.
     #[serde(default)]
     pub starters_granted: Vec<String>,
+    /// The character's own store, the same in the five big cities (docs/bank.md, `crate::bank`).
+    #[serde(default)]
+    pub bank: crate::bank::Bank,
 }
 /// A mount: only its looks and the way it is obtained differ (docs/mounts.md), so every speed is 2.0.
 pub struct MountDef {
@@ -493,6 +496,7 @@ impl Character {
             mounted: false,
             rebirth_tiers: [0; 5],
             starters_granted: vec![],
+            bank: Default::default(),
         };
         c.seed_inventory();
         // The best potions the mercenary's level allows: health for everyone, mana for casters.
@@ -1190,6 +1194,33 @@ pub enum ClientMessage {
     Interact {
         npc: String,
         offer: Option<String>,
+    },
+    /// The bank (docs/bank.md, server/src/world/bank.rs). Each names the banker the window was opened with.
+    BankOpen {
+        npc: String,
+    },
+    BankDeposit {
+        npc: String,
+        item: String,
+        quantity: u32,
+        /// One loose gear copy by id (then `quantity` is 1); without it the first loose copies go.
+        #[serde(default)]
+        copy: Option<u64>,
+    },
+    BankWithdraw {
+        npc: String,
+        item: String,
+        quantity: u32,
+        #[serde(default)]
+        copy: Option<u64>,
+    },
+    BankGold {
+        npc: String,
+        deposit: bool,
+        amount: u32,
+    },
+    BankExpand {
+        npc: String,
     },
     Chat {
         text: String,

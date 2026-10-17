@@ -1,5 +1,6 @@
 #![recursion_limit = "256"]
 mod auth;
+mod bank;
 mod cathedral;
 mod items;
 mod model;

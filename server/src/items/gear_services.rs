@@ -125,7 +125,15 @@ impl Character {
         let mut changed = false;
         self.next_gear_id = self
             .next_gear_id
-            .max(self.gear_instances.iter().map(|g| g.id).max().unwrap_or(0) + 1)
+            .max(
+                self.gear_instances
+                    .iter()
+                    .chain(&self.bank.gear)
+                    .map(|g| g.id)
+                    .max()
+                    .unwrap_or(0)
+                    + 1,
+            )
             .max(1);
         for stack in &self.inventory {
             let Some(catalog) = item(&stack.item).filter(|i| is_gear(i)) else {

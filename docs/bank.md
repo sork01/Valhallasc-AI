@@ -68,6 +68,22 @@ A bank balance with `bank_gold` (deposit or withdraw an amount). It is limited o
 - **Atomic:** every request is checked in full against a copy of the character and then assigned in one step, followed by one save, the way `reset_trained_stats` works. A refused request changes nothing, and because the world handles one message at a time two browsers cannot both withdraw the same item: the second finds it gone.
 - **Full:** a deposit is refused when the item needs a new cell and the bank has none; a withdrawal is refused when the item needs a new bag cell and the bags have none (`can_collect`). Neither splits a request: all of it moves or none of it.
 
+## The messages (`BANK-SERVER`)
+
+All five name the banker the window was opened with (`npc`), and the server finds that NPC in the character's zone with a `bank` offer within `BANK_RANGE`. Rules and numbers are in `server/src/bank.rs`; the request handler is `server/src/world/bank.rs`.
+
+| Message | Fields | Effect |
+| --- | --- | --- |
+| `bank_open` | `npc` | Answers with the bank; nothing changes. |
+| `bank_deposit` | `npc`, `item`, `quantity`, optional `copy` | Bags to bank. `copy` names one loose gear copy (then `quantity` is 1); without it the first loose copies go. |
+| `bank_withdraw` | `npc`, `item`, `quantity`, optional `copy` | Bank to bags, the same way. A gear copy gets a new id. |
+| `bank_gold` | `npc`, `deposit`, `amount` | Gold between the purse and the bank's balance. |
+| `bank_expand` | `npc` | Buys the next expansion with carried gold. |
+
+Every answer is one `bank` packet: `ok`, `notice`, the bank (`items`, `gear`, `gold`, `expansions`, `used`, `capacity`, `nextPrice`) and the bag side (`gold`, `inventory`, `gearInstances`, `equipment`, `bags`, `bagCapacity`). A refused request still answers with the unchanged state, so a stale window repairs itself. A refusal before the bank is reached (defeated, in combat, mounted, travelling, out of range, the wrong NPC) is an `error` packet instead. The bank is in no snapshot and not in the `dialogue` packet.
+
+A request is applied to a copy of the character, the copy is written with `Store::save_many` (as a trade does), and only then does it become the live character: if the write fails nothing has moved. The bank's gold and a copy's data are never read by any other system, and `materialize_gear_instances` keeps `next_gear_id` ahead of the banked copies' ids so an id is never given twice.
+
 ## How it meets the other systems
 
 - **Rebirth keeps the bank**, gold and expansions included. `docs/rebirth.md` lists it among the things that stay.

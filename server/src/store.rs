@@ -174,6 +174,7 @@ impl Store {
             mounted: false,
             rebirth_tiers: [0; 5],
             starters_granted: vec![],
+            bank: Default::default(),
         };
         c.seed_inventory();
         if gm {

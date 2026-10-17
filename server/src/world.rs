@@ -11,6 +11,8 @@ use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
 mod ambient;
+mod bank;
+use bank::BankRequest;
 #[cfg(test)]
 mod asterion_tests;
 #[cfg(test)]
@@ -2058,6 +2060,41 @@ impl World {
             ClientMessage::Interact { npc, offer } => {
                 self.interact(session, &npc, offer.as_deref());
             }
+            ClientMessage::BankOpen { npc } => self.bank(session, &npc, BankRequest::Open),
+            ClientMessage::BankDeposit {
+                npc,
+                item,
+                quantity,
+                copy,
+            } => self.bank(
+                session,
+                &npc,
+                BankRequest::Deposit {
+                    item,
+                    quantity,
+                    copy,
+                },
+            ),
+            ClientMessage::BankWithdraw {
+                npc,
+                item,
+                quantity,
+                copy,
+            } => self.bank(
+                session,
+                &npc,
+                BankRequest::Withdraw {
+                    item,
+                    quantity,
+                    copy,
+                },
+            ),
+            ClientMessage::BankGold {
+                npc,
+                deposit,
+                amount,
+            } => self.bank(session, &npc, BankRequest::Gold { deposit, amount }),
+            ClientMessage::BankExpand { npc } => self.bank(session, &npc, BankRequest::Expand),
             ClientMessage::Chat { text } => {
                 let text = text.trim();
                 if self.time - p.chat_at < 1. {
@@ -2275,7 +2312,9 @@ impl World {
                     let Some(offer) = npc.offers.iter().find(|offer| offer.id == id) else {
                         return;
                     };
-                    if offer.id == "stat_reset" {
+                    if offer.id == "bank" {
+                        notice = "Open the bank window to use the strongroom.".into();
+                    } else if offer.id == "stat_reset" {
                         if p.combat_left > 0. {
                             notice = "Leave combat before resetting stats.".into();
                         } else {

@@ -180,6 +180,12 @@ mod tests {
         c.kills = 4000;
         c.grant_mount("horse");
         c.travel_stops = vec!["Skaldholm".into()];
+        c.add_item("slime_gel", 4);
+        c.bank_deposit("slime_gel", 3, None).unwrap();
+        c.gold = 1434;
+        c.bank_gold(true, 200).unwrap();
+        c.bank.expansions = 2;
+        let bank = c.bank.clone();
         let bags = c.bags.clone();
         let spawn = Point { x: 12., y: 13. };
         assert_eq!(c.rebirth(spawn).unwrap(), 3);
@@ -200,6 +206,7 @@ mod tests {
         assert_eq!(c.mounts, vec!["horse".to_string()]);
         assert_eq!(c.travel_stops, vec!["Skaldholm".to_string()]);
         assert_eq!(c.bags, bags);
+        assert_eq!(c.bank, bank, "the bank is kept, gold and expansions too");
     }
 
     #[test]
