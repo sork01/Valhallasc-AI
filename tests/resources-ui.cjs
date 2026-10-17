@@ -30,7 +30,7 @@ async function call(name, args = {}) {
     const state = await page.evaluate(() => ({ resource: Field.hero.resource, max: Field.hero.maxResource, text: document.querySelector('#resource-text').textContent, label: document.querySelector('#resource-bar').getAttribute('aria-label') }));
     check(state.resource === (cls === 'warrior' ? 0 : state.max) && state.text.includes(`${Math.floor(state.resource)} / ${Math.round(state.max)}`), `${cls} HUD displays the server's amount and capacity`);
     check(state.label.toLowerCase() === kind, `${cls} resource has an accessible name`);
-    check(await page.locator('#quickuse [data-kind="mana"]').isVisible() === (kind === 'mana'), `${cls} shows the mana shortcut only when applicable`);
+    check(await page.locator('#quickuse [data-kind="mana"]').isVisible(), `${cls} shows the C resource-potion slot (it restores ${kind} for every class)`);
     const colors = await page.locator('#resource-fill').evaluate(n => getComputedStyle(n).backgroundImage);
     check(colors.includes('linear-gradient'), `${cls} resource is visibly coloured`);
     await page.keyboard.press('k');
