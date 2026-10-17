@@ -16,6 +16,22 @@ A **final boss** is the monster named in a dungeon's `final_boss`: sixteen of th
 8. **Rewards, XP and drops do not change.**
 9. **A sign explains it before the door.** Every final boss has a sign in the last room (`BOSSMECH-SIGN-ENGINE`, `BOSSMECH-SIGNS`) that says what the boss does and what to do, in words a child of about eight can read, with a picture of the telegraph in the fight's own colours. The sign's numbers come from the same constants as the mechanic, so they cannot drift.
 
+## Settled numbers (`BOSSMECH-RULES`, 2026-10-17)
+
+All of these live once in `server/src/bossmech.rs`; the engine, the client, the signs and the harness read them. They were settled as defaults while the owner was away, so each is one constant to flip.
+
+| Question | Decision |
+| --- | --- |
+| Shortest cast | Instant kill and "kill outside" 5 s, heavy hit 3 s (`INSTANT_KILL_MIN_CAST`, `HEAVY_HIT_MIN_CAST`). |
+| Reachability | Safe spot within 60% of the cast at 5.2 tiles/s, the Warrior's speed and the slowest class (a test keeps the constant equal to the slowest class). A 5 s cast allows 15.6 tiles, a 3 s cast 9.36. |
+| Telegraph colours | Red `#e0453b` hurts, blue `#3f9bea` is safe, a dashed pale-gold `#f1e3b4` line is a path about to be used, green `#4fc26b` is the gap in a moving wall. The same four on every sign. |
+| Defences against a kill | A kill ignores defence, dodge and dash invulnerability: where you stand at the end of the cast decides. A dash is still a way to cross a telegraph in time. |
+| God mode | Test and GM god mode still block mechanics, so a manual test is not cut short. The cast and telegraph still run and the log says "Would have been killed by ...". Players in a city and hidden GMs are never targeted. |
+| Death name | "Killed by <ability>" in the log and on the defeat screen; the ability name is the one on the boss's cast bar. |
+| Enrage clock | Runs through an invulnerable phase (rule 7). |
+| Marks | A marking mechanic marks at most 3 players and never everyone. |
+| Elites and middle bosses | Not covered for now; revisit after `BOSSMECH-CHECK`. |
+
 ## Building blocks
 
 `BOSSMECH-ENGINE` builds these once; the sixteen bosses only combine them.
