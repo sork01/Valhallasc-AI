@@ -23,6 +23,76 @@
   const lerpColor = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
   const rgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
 
+  // The generated rooms stay authoritative for movement. Their ordered floor rectangles give each
+  // chamber a different material without changing a wall, spawn, portal or combat footprint.
+  const FLOOR = [
+    [35, 24, 43], [31, 15, 34], [211, 17, 39], [31, 15, 34], [36, 27, 43],
+    [31, 15, 34], [39, 17, 44], [31, 15, 34], [222, 24, 42], [31, 15, 34],
+    [181, 27, 39], [31, 15, 34], [19, 32, 40], [31, 15, 34], [264, 19, 37],
+  ];
+  const roomAt = (x, y, rooms) => (rooms || []).findIndex(([x0, y0, x1, y1]) => x >= x0 && x < x1 && y >= y0 && y < y1);
+  const bossRing = (x, y, bosses) => (bosses || []).find(b => {
+    const radius = b.kind === 'hollowking' ? 6.5 : b.kind === 'colossus' ? 8.5 : 7.5;
+    const d = Math.hypot(x + .5 - b.x, y + .5 - b.y);
+    return Math.abs(d - radius) < .55 || ((b.kind === 'colossus' || b.kind === 'hollowking') && Math.abs(d - 3.8) < .55)
+      || (b.kind === 'colossus' && Math.abs(d - 5.8) < .55);
+  });
+  function ground(x, y, tone, alt, rooms, bosses) {
+    const i = roomAt(x, y, rooms), [h, s, l] = FLOOR[i] || FLOOR[1];
+    if (bossRing(x, y, bosses)) return `hsl(${i === 8 ? 192 : i === 12 ? 24 : 39}, 43%, ${52 + tone * 5 + alt}%)`;
+    const center = (bosses || []).find(b => (b.kind === 'colossus' || b.kind === 'hollowking') && Math.hypot(x + .5 - b.x, y + .5 - b.y) < 3.8);
+    if (center) return center.kind === 'colossus' ? `hsl(25, 38%, ${46 + tone * 4 + alt}%)` : `hsl(42, 33%, ${45 + tone * 4 + alt}%)`;
+    const r = rooms?.[i], edge = r && (x === r[0] || y === r[1] || x === r[2] - 1 || y === r[3] - 1);
+    const chequer = ((x + y) & 1) ? 1.5 : -1.5;
+    return `hsl(${h + tone * 5}, ${s + tone * 3}%, ${l + tone * 5 + alt + chequer + (edge ? 5 : 0)}%)`;
+  }
+  function detail(g, px, py, x, y, tw, th, rooms, bosses) {
+    const i = roomAt(x, y, rooms), r = rooms?.[i], cx = px, cy = py + th / 2;
+    g.strokeStyle = 'rgba(9,14,20,.62)'; g.lineWidth = 1.7;
+    g.beginPath(); g.moveTo(px - tw / 2, cy); g.lineTo(px, py); g.lineTo(px + tw / 2, cy); g.stroke();
+    g.strokeStyle = 'rgba(231,192,121,.2)'; g.lineWidth = 1.2;
+    g.beginPath(); g.moveTo(px - tw / 2 + 3, cy + 3); g.lineTo(px, py + th - 3); g.lineTo(px + tw / 2 - 3, cy + 3); g.stroke();
+    if (r && (x === r[0] || y === r[1] || x === r[2] - 1 || y === r[3] - 1)) {
+      g.strokeStyle = 'rgba(235,185,93,.48)'; g.lineWidth = 2.2;
+      g.beginPath(); g.moveTo(px - tw * .28, cy); g.lineTo(px, py + th * .23); g.lineTo(px + tw * .28, cy); g.stroke();
+    }
+    const boss = bossRing(x, y, bosses);
+    if (boss) {
+      g.strokeStyle = boss.kind === 'choir' ? '#8be5dc' : boss.kind === 'colossus' ? '#ffb86c' : '#e9ca81';
+      g.lineWidth = 2.8; g.beginPath(); g.moveTo(cx - 11, cy); g.lineTo(cx, cy - 7); g.lineTo(cx + 11, cy); g.moveTo(cx, cy - 7); g.lineTo(cx, cy + 9); g.stroke();
+    }
+    const forgeBoss = i === 12 && (bosses || []).find(b => b.kind === 'colossus');
+    if (forgeBoss && Math.hypot(x + .5 - forgeBoss.x, y + .5 - forgeBoss.y) < 5.8 && (x + y) % 2 === 0) {
+      g.strokeStyle = 'rgba(255,213,133,.72)'; g.lineWidth = 3;
+      g.beginPath(); g.moveTo(cx - 15, cy + 5); g.lineTo(cx, cy - 8); g.lineTo(cx + 15, cy + 5); g.stroke();
+    }
+    if (i === 2 && (x + y) % 4 === 0) { // Barracks: iron grate and rivets.
+      g.strokeStyle = 'rgba(170,189,199,.44)'; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(cx - 14, cy - 7); g.lineTo(cx + 14, cy + 7); g.moveTo(cx - 14, cy + 7); g.lineTo(cx + 14, cy - 7); g.stroke();
+      g.fillStyle = '#aa8550'; g.fillRect(cx - 2, cy - 2, 4, 4);
+    } else if (i === 6 && (x * 3 + y) % 5 === 0) { // Ossuary: pale bone mosaics.
+      g.fillStyle = 'rgba(227,214,180,.58)'; g.beginPath(); g.ellipse(cx, cy, 10, 3, -.3, 0, 6.283); g.fill();
+      g.fillStyle = '#4e514e'; g.fillRect(cx - 2, cy - 2, 4, 3);
+    } else if (i === 10 && x % 3 === 0) { // Cistern: narrow channels cross the floor.
+      g.strokeStyle = 'rgba(80,218,213,.62)'; g.lineWidth = 3;
+      g.beginPath(); g.moveTo(cx - tw * .28, cy - 8); g.lineTo(cx + tw * .28, cy + 8); g.stroke();
+    } else if (i === 12 && (x + y) % 3 === 0) { // Forge: toothed gear plates and copper pins.
+      g.strokeStyle = 'rgba(255,174,83,.65)'; g.lineWidth = 2.5;
+      g.beginPath(); g.arc(cx, cy, 9, 0, 6.283); g.stroke();
+      for (let a = 0; a < 4; a++) { const t = a * Math.PI / 2; g.fillStyle = '#d38d4e'; g.fillRect(cx + Math.cos(t) * 11 - 2, cy + Math.sin(t) * 7 - 2, 4, 4); }
+    } else if (i === 14 && (x - y) % 4 === 0) { // Throne: gold crown rays on dark basalt.
+      g.strokeStyle = 'rgba(241,198,111,.7)'; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(cx - 13, cy + 5); g.lineTo(cx - 7, cy - 7); g.lineTo(cx, cy + 1); g.lineTo(cx + 7, cy - 7); g.lineTo(cx + 13, cy + 5); g.stroke();
+    } else if ((i === 1 || i === 3 || i === 5 || i === 7 || i === 9 || i === 11 || i === 13) && (x + y) % 2 === 0) {
+      g.strokeStyle = 'rgba(240,181,92,.55)'; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(cx - 12, cy); g.lineTo(cx, cy + 4); g.lineTo(cx + 12, cy); g.stroke();
+    }
+  }
+  function minimap(x, y, rooms) {
+    return ['#9c8667','#776a5a','#778d9a','#776a5a','#c39a5f','#776a5a','#b8ac91','#776a5a',
+      '#788ca9','#776a5a','#63a7a5','#776a5a','#b77b54','#776a5a','#ad8c9d'][roomAt(x, y, rooms)] || '#776a5a';
+  }
+
   // ---- walls: a course of ashlar blocks on both visible faces, each block a little lighter or darker --------------------------------
   // `from` and `to` are the face's two ends in tile units relative to the prism's centre, `across` fixes the other coordinate.
   function blocks(g, o, along, across, length, H, base, rand, rows = 5) {
@@ -44,13 +114,20 @@
     box: [440, 520, 220, 410],
     draw(g, o) {
       const w = o.width, d = o.depth, H = 92, rand = rng((o.v || 0) * 977 + Math.round(w * 31 + d * 17) + 5);
+      const forge = o.y < 39 && o.x > 68 && o.x < 101, royal = o.y < 41 && o.x >= 105;
       g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(8, 8, (w + d) * 24, (w + d) * 11, 0, 0, 6.283); g.fill();
-      prism(g, w, d, H, '#7a8298', '#4c5368', '#333849');
-      blocks(g, o, 'x', d / 2, w, H, [76, 84, 104], rand);                // the face turned to the south-west (towards the viewer's left)
-      blocks(g, o, 'y', w / 2, d, H, [52, 58, 76], rand);                 // the face turned to the south-east
+      prism(g, w, d, H, forge ? '#af815b' : royal ? '#a29079' : '#95876f', '#4e5558', '#303a40');
+      blocks(g, o, 'x', d / 2, w, H, forge ? [113, 78, 64] : royal ? [91, 81, 98] : [87, 91, 91], rand);
+      blocks(g, o, 'y', w / 2, d, H, forge ? [70, 50, 49] : royal ? [60, 55, 70] : [56, 65, 70], rand);
+      // Brass load straps and their pins turn the masonry into a buried fortress wall.
+      for (const f of [.15, .85]) {
+        const a = iso(-w / 2 + f * w, d / 2, 5), b = iso(-w / 2 + f * w, d / 2, H - 4);
+        line(g, [a, b], '#b18b55', 4);
+        for (const z of [16, H - 16]) { const p = iso(-w / 2 + f * w, d / 2, z); ellipse(g, p[0], p[1], 3.5, 2.2, '#e1c17d', '#4e3e30'); }
+      }
       // the cap stones: a lit rim round the top
       const a = iso(-w / 2, -d / 2, H), b = iso(w / 2, -d / 2, H), c = iso(w / 2, d / 2, H), e = iso(-w / 2, d / 2, H);
-      g.strokeStyle = 'rgba(190,200,225,.55)'; g.lineWidth = 2; g.beginPath(); g.moveTo(...e); g.lineTo(...c); g.lineTo(...b); g.stroke();
+      g.strokeStyle = 'rgba(221,185,112,.75)'; g.lineWidth = 3; g.beginPath(); g.moveTo(...e); g.lineTo(...c); g.lineTo(...b); g.stroke();
       g.strokeStyle = 'rgba(22,24,36,.7)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(...a); g.lineTo(...b); g.lineTo(...c); g.lineTo(...e); g.closePath(); g.stroke();
       // damp and moss at the foot
       g.fillStyle = 'rgba(62,92,70,.32)';
@@ -73,13 +150,14 @@
     box: [200, 330, 100, 280],
     draw(g, o) {
       g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(8, 8, 70, 28, 0, 0, 6.283); g.fill();
-      const stone = [['#8a92a8', '#6d7590', '#444a62'], ['#7f879d', '#656c86', '#3e4359']][(o.v || 0) % 2];
+      const stone = o.y < 39 && o.x > 68 ? ['#aa8266', '#805d53', '#473a3e'] : o.y < 41 && o.x >= 105 ? ['#94859c', '#6d617b', '#3f3d54'] : [['#8a92a8', '#6d7590', '#444a62'], ['#7f879d', '#656c86', '#3e4359']][(o.v || 0) % 2];
       drum(g, .88, 0, 12, '#8f97ad', stone);                                        // plinth
       drum(g, .6, 12, 112, '#8a92a8', stone);                                       // shaft
       g.strokeStyle = 'rgba(20,24,38,.5)'; g.lineWidth = 2;                         // fluting
       for (const f of [-.3, 0, .3]) { const x = f * RX * .6 * 2; g.beginPath(); g.moveTo(x, -14); g.lineTo(x * .98, -112); g.stroke(); }
       drum(g, .76, 112, 124, '#9aa2b8', stone);                                     // capital
-      drum(g, .9, 124, 134, '#a3abc0', stone);
+      drum(g, .9, 124, 134, '#b5a681', stone);
+      ring(g, .64, 33, null, '#b68e55', 5); ring(g, .64, 104, null, '#b68e55', 5);
       // a ring of faint runes round the shaft
       glow(g, '#59d9ff', 6, () => { g.strokeStyle = 'rgba(120,220,255,.5)'; g.lineWidth = 1.6; g.beginPath(); g.ellipse(0, -62, .6 * RX, .6 * RY, 0, .15, Math.PI - .15); g.stroke(); });
       if ((o.v || 0) === 1) {                                                       // a crack and a broken edge
@@ -256,5 +334,5 @@
     if (e > .6) text(g, 'The Way Out', 0, -166, 17, '#d4ffc8');
     g.restore();
   }
-  window.VaultArt = { stairsDown, stairsUp, exitPortal, flame, lightPool };
+  window.VaultArt = { stairsDown, stairsUp, exitPortal, flame, lightPool, ground, detail, minimap };
 })();

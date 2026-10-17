@@ -3,11 +3,7 @@
 (() => {
   const {iso, poly, line, prism} = City.kit;
   const oval=(g,x,y,rx,ry,fill,stroke) => {g.beginPath();g.ellipse(x,y,rx,ry,0,0,6.283);g.fillStyle=fill;g.fill();if(stroke){g.strokeStyle=stroke;g.lineWidth=3;g.stroke();}};
-  City.art.pavilion_wall={box:[450,510,225,400],draw(g,o){
-    const w=o.width,d=o.depth;prism(g,w,d,96,'#cc9fc2','#654a78','#342b58');
-    for(let h=18;h<96;h+=20){const a=iso(-w/2,d/2,h),b=iso(w/2,d/2,h),c=iso(w/2,-d/2,h);line(g,[a,b,c],h===58?'#f9dc9b':'#60416b',3);}
-    if(o.v%2){const p=iso(0,d/2,51);oval(g,p[0],p[1],19,28,'#2b264f','#f3c6d8');oval(g,p[0],p[1],6,17,'#fbe2ad');}
-  }};
+  City.art.pavilion_wall={box:[450,510,225,400],draw(g,o){DungeonVisual.structure(g,o,'thousandfold');}};
   City.art.pavilion_lantern={box:[180,260,90,215],draw(g,o){
     prism(g,.4,.4,56,'#e3bc91','#80647a','#443b62');
     poly(g,[[-25,-78],[0,-111],[25,-78],[0,-64]],o.v===1?'#e9abda':'#f1d795','#705575',3);
@@ -23,12 +19,8 @@
     oval(g,0,0,79,28,'#503a68','#e9b3d2');oval(g,0,0,43,17,'#2d264f','#ffe1aa');
     for(let a=0;a<8;a++){const t=a*Math.PI/4;oval(g,Math.cos(t)*57,Math.sin(t)*19,5,5,'#f6d9aa');}
   }};
-  const ground=(x,y,tone,alt)=>`hsl(${314+tone*11},${22+tone*7}%,${21+tone*8+alt*.7+((x+y)&1)*2}%)`;
-  function detail(g,px,py,x,y,TW,TH){
-    g.strokeStyle='rgba(246,202,224,.25)';g.lineWidth=1.4;
-    g.beginPath();g.moveTo(px-TW/2,py+TH/2);g.quadraticCurveTo(px,py+TH/3,px+TW/2,py+TH/2);g.stroke();
-    if((x*13+y*7)%19===0)oval(g,px,py+TH/2,4,2,'rgba(255,219,157,.7)');
-  }
+  const ground=(x,y,tone,alt,zone)=>DungeonVisual.ground('thousandfold',x,y,tone,alt,zone);
+  const detail=(g,px,py,x,y,TW,TH,zone)=>DungeonVisual.detail(g,'thousandfold',px,py,x,y,TW,TH,zone);
   function weather(g,t,w,h){for(let i=0;i<32;i++){const x=(i*167+t*(2+i%3))%w,y=(i*89+Math.sin(t+i)*18+h)%h;oval(g,x,y,2,1,'rgba(255,222,183,.28)');}}
   function portal(g,p,sx,sy,t){
     g.save();g.translate(sx,sy);

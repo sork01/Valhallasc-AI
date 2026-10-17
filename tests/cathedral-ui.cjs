@@ -3,14 +3,14 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const { chromium, STUB } = require('./lib/playwright.cjs');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
-const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
+const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const root=path.resolve(__dirname,'..');
 const client=new Client({name:'cathedral-ui',version:'1.0.0'});
 let browser, world, checks=0;
 const check=(v,label)=>{assert.ok(v,label);checks++;};
 const call=async(name,args={})=>{const r=await client.callTool({name,arguments:args});assert.ok(!r.isError,JSON.stringify(r.content));return r.structuredContent;};
 (async()=>{
-  await client.connect(new StdioClientTransport({command:process.execPath,args:[path.join(root,'scripts/test-mcp.cjs')],cwd:root,stderr:'pipe'}));
+  await client.connect(new StdioClientTransport({command:process.execPath,args:[path.join(root,'scripts/test-mcp.cjs')],cwd:root,stderr:'pipe',env:{...getDefaultEnvironment(),VALHALLA_BINARY:process.env.VALHALLA_BINARY||path.join(root,'target/release/valhalla-server')}}));
   world=await call('start_world',{startLevel:50,levelSpread:0});
   browser=await chromium.launch({headless:true});
   const page=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
@@ -32,12 +32,12 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
     await page.mouse.click(box.x+sx/1600*box.width,box.y+sy/900*box.height);
   };
   const shot=async name=>page.screenshot({path:path.join(world.artifacts,name+'.png')});
-  const zones=await page.evaluate(()=>WORLD_MAP.zones.slice(9));
+  const zones=await page.evaluate(()=>WORLD_MAP.zones.slice(9,12));
   check(zones.length===3&&zones.map(z=>z.min_level).join()==='40,45,50','Three Cathedral wings at levels 40/45/50');
-  check(await page.evaluate(()=>new Set(CATHEDRAL_ENEMIES.filter(e=>e.boss).map(e=>e.name)).size===12),'Twelve unique named bosses');
+  check(await page.evaluate(()=>{const kinds=new Set(WORLD_MAP.zones.slice(9,12).flatMap(z=>z.slimes.map(s=>s.kind)));return new Set(CATHEDRAL_ENEMIES.filter(e=>e.boss&&kinds.has(e.kind)).map(e=>e.name)).size===12;}),'Twelve unique named bosses');
   check(new Set(zones.map(z=>JSON.stringify(z.rooms))).size===3,'All three floor plans differ');
   const art=await page.evaluate(()=>{
-    const zs=WORLD_MAP.zones.slice(9), kinds=[...new Set(zs.flatMap(z=>z.objects.map(o=>o.kind)).filter(k=>k!=='void'))];
+    const zs=WORLD_MAP.zones.slice(9,12), kinds=[...new Set(zs.flatMap(z=>z.objects.map(o=>o.kind)).filter(k=>k!=='void'))];
     return kinds.map(kind=>{
       const o=zs.flatMap(z=>z.objects).find(o=>o.kind===kind),def=City.art[kind];
       if(!def)return {kind,missing:true};
@@ -50,7 +50,8 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   for(const a of art)check(!a.missing&&a.count>100&&a.edge===0,`${a.kind}: visible architecture fits its raster`);
   const frames=await page.evaluate(()=>{
     const src=Field.cathedralSprites, meta=src.meta;
-    return CATHEDRAL_ENEMIES.map(e=>{
+    const kinds=new Set(WORLD_MAP.zones.slice(9,12).flatMap(z=>z.slimes.map(s=>s.kind)));
+    return CATHEDRAL_ENEMIES.filter(e=>kinds.has(e.kind)).map(e=>{
       const im=src.img[e.kind], c=document.createElement('canvas');c.width=im.width;c.height=im.height;const g=c.getContext('2d');g.drawImage(im,0,0);
       const signatures=[];let border=0,visible=true;
       for(const clip of Object.values(meta.clips))for(let n=0;n<clip.n;n++){
@@ -66,7 +67,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
   });
   for(const f of frames)check(f.frames===34&&f.visible&&(STUB||f.distinct>15&&f.border===0),`${f.kind}: all 34 animation frames visible, distinct and unclipped`);
   // Display-only animation fixtures; authoritative combat remains in the MCP scenario.
-  const clips=await page.evaluate(()=>CATHEDRAL_ENEMIES.flatMap(e=>{
+  const clips=await page.evaluate(()=>CATHEDRAL_ENEMIES.filter(e=>new Set(WORLD_MAP.zones.slice(9,12).flatMap(z=>z.slimes.map(s=>s.kind))).has(e.kind)).flatMap(e=>{
     const base={kind:e.kind,dead:false,hurtT:0,recT:0,hop:0,hopV:0,landT:0,blink:0,seed:0,state:'idle'};
     return [
       [{state:'windup',st:.5,windupTime:1},['attack',1]],

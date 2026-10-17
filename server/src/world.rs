@@ -1223,7 +1223,6 @@ struct Bolt {
     #[serde(skip)]
     hits: Vec<usize>,
     /// The skill that fired this bolt (empty for a basic attack), for the system log.
-    #[serde(skip)]
     skill: String,
 }
 #[derive(Clone, Serialize)]
@@ -4113,6 +4112,16 @@ impl World {
                     }
                 } else {
                     self.hit_slime(id, b.owner, b.damage, b.crit);
+                }
+                // The client paints an impact only where an authoritative bolt actually landed.
+                if !b.skill.is_empty() {
+                    let actor = &self.players[&b.owner].character.id;
+                    let at = self.slimes[id].point();
+                    self.emit_zone(
+                        b.zone,
+                        json!({"type":"event","kind":"boltImpact","skill":b.skill,
+                            "bolt":b.id,"actor":actor,"x":at.x,"y":at.y,"radius":b.blast}),
+                    );
                 }
                 if !b.pierce {
                     b.t = 1.;
@@ -10946,10 +10955,14 @@ mod tests {
     #[test]
     fn volleys_fire_the_right_bolts_and_fireball_explodes_on_neighbours() {
         let mut w = world();
-        let _rx = join(&mut w, 1, Class::Mage);
+        let mut rx = join(&mut w, 1, Class::Mage);
         let at = arena(&mut w, 20);
         skill(&mut w, "twinbolt");
         assert_eq!(w.bolts.len(), 2);
+        assert_eq!(
+            serde_json::to_value(&w.bolts[0]).unwrap()["skill"],
+            "twinbolt"
+        );
         assert!((w.bolts[0].fy + w.bolts[1].fy).abs() < 1e-9 && w.bolts[0].fy != 0.);
         w.bolts.clear();
         w.players.get_mut(&1).unwrap().skill_cd.clear();
@@ -10970,6 +10983,11 @@ mod tests {
         );
         assert!(!hp_lost(&w, 2));
         assert!(w.bolts.is_empty());
+        let impacts: Vec<_> = std::iter::from_fn(|| rx.try_recv().ok())
+            .filter(|event| event["kind"] == "boltImpact" && event["skill"] == "fireball")
+            .collect();
+        assert_eq!(impacts.len(), 1, "the landed fireball has one blast cue");
+        assert_eq!(impacts[0]["radius"], 2.0);
     }
     #[test]
     fn knife_ring_goes_every_direction_and_each_knife_hits_alone() {

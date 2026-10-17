@@ -14,22 +14,24 @@ Each instance has a separate map, encounter, quest/reward, presentation and open
 
 The former `I-VISUAL-IDENTITY` umbrella is split into one deliverable per private dungeon zone below. For each, give the interior distinctive floor and wall materials, room shapes, landmarks, props, palette and lighting. Keep paths, collision and combat effects readable, and compare its screenshot with the other dungeons in a private browser check. The Drowned Cathedral's three separately rendered wings have separate tasks.
 
-- [ ] `I-VISUAL-Z5` — Redesign The Undervault (zone 5) as a buried stronghold with its own vault masonry, chambers, machinery and lighting.
-- [ ] `I-VISUAL-Z10` — Redesign the Drowned Cathedral's Flooded Cloister (zone 10) around submerged walkways, cloister arches and water-worn religious details.
-- [ ] `I-VISUAL-Z11` — Redesign the Drowned Cathedral's Coral Reliquary (zone 11) around coral-grown relic chambers, tidal pools and luminous marine details.
-- [ ] `I-VISUAL-Z12` — Redesign the Drowned Cathedral's Grand Nave (zone 12) as a monumental drowned sanctuary with a distinct central aisle, altar and stained-glass light.
-- [ ] `I-VISUAL-Z18` — Redesign The Moonwell (zone 18) as an open-water garden of petal islands, glass causeways and moonlit reflections.
-- [ ] `I-VISUAL-Z29` — Redesign The Eye Below (zone 29) around abyssal observation chambers, lenses and deep-water light.
-- [ ] `I-VISUAL-Z30` — Redesign The Elder Hollow (zone 30) around living roots, hollow trunks, sap and canopy light.
-- [ ] `I-VISUAL-Z31` — Redesign The Thousandfold Pavilion (zone 31) around folded halls, painted screens and shifting masks.
-- [ ] `I-VISUAL-Z32` — Redesign Temple of the Rain Crown (zone 32) around ritual terraces, rain channels and storm-lit stone.
-- [ ] `I-VISUAL-Z33` — Redesign The Seed Vault (zone 33) around seed chambers, botanical structures and growing light.
-- [ ] `I-VISUAL-Z34` — Redesign The Sunken Astrolabe (zone 34) around submerged astronomical rings, bronze mechanisms and star charts.
-- [ ] `I-VISUAL-Z35` — Redesign The Thunderheart Gate (zone 35) around storm conduits, charged pylons and lightning-lit passages.
-- [ ] `I-VISUAL-Z36` — Redesign The Blooming Labyrinth (zone 36) around living flower corridors, mirrors and changing garden rooms.
-- [ ] `I-VISUAL-Z37` — Redesign The Solar Crucible (zone 37) around sun furnaces, molten materials and radiant forge chambers.
-- [ ] `I-VISUAL-Z38` — Redesign The Amber Archive (zone 38) around amber shelves, preserved memories and warm fossil light.
-- [ ] `I-VISUAL-Z39` — Redesign The Silent Solstice (zone 39) around frozen halls, snow-muted surfaces and aurora reflections.
+- [x] `I-VISUAL-Z5` — Redesign The Undervault (zone 5) as a buried stronghold with its own vault masonry, chambers, machinery and lighting. Distinct chamber floors, boss dais rings, forge gearwork, brass-banded walls and brighter vault lighting; private screenshots checked against all other dungeons with `tests/undervault-visual-ui.cjs`.
+- [x] `I-VISUAL-Z10` — Redesign the Drowned Cathedral's Flooded Cloister (zone 10) around submerged walkways, cloister arches and water-worn religious details. Raised stone routes and circular courts cross shallow teal water; pointed wall arcades, tide marks, worn chapel inlays and cooler lighting distinguish it from the other wings. Real-sprite private Cathedral browser screenshots and 168 checks passed.
+- [x] `I-VISUAL-Z11` — Redesign the Drowned Cathedral's Coral Reliquary (zone 11) around coral-grown relic chambers, tidal pools and luminous marine details. Pearl-stone routes cross teal tidal pools; each boss court has a distinct inlaid color, coral relief and glowing relic cases. Real-sprite private Cathedral browser checks and room captures passed.
+- [x] `I-VISUAL-Z12` — Redesign the Drowned Cathedral's Grand Nave (zone 12) as a monumental drowned sanctuary with a distinct central aisle, altar and stained-glass light. Dark marble side aisles, blue ceremonial paving, gold court borders, stained-glass windows and a violet altar; real-sprite private Cathedral browser checks and nave captures passed.
+- [x] `I-VISUAL-Z18` — Redesign The Moonwell (zone 18) as an open-water garden of petal islands, glass causeways and moonlit reflections. Four colored petal courts, silver island floors, pale glass routes, shoreline ripples and sky reflections; real-sprite private Moonwell browser checks and island captures passed.
+- [x] `I-VISUAL-Z29` — The Eye Below now has lens-shaped observation courts, deepglass inlays and illuminated wall apertures.
+- [x] `I-VISUAL-Z30` — The Elder Hollow now has growth-ring courts, root-veined floors and living wall recesses.
+- [x] `I-VISUAL-Z31` — The Thousandfold Pavilion now has folded-screen floor panels, fan inlays and silk gallery walls.
+- [x] `I-VISUAL-Z32` — Temple of the Rain Crown now has stepped ritual courts, rain channels and wet jade walls.
+- [x] `I-VISUAL-Z33` — The Seed Vault now has concentric seed courts, botanical floor marks and germination recesses.
+- [x] `I-VISUAL-Z34` — The Sunken Astrolabe now has bronze orbital courts, star-chart tiles and instrument walls.
+- [x] `I-VISUAL-Z35` — The Thunderheart Gate now has conductive floor circuits, pylon courts and charged wall channels.
+- [x] `I-VISUAL-Z36` — The Blooming Labyrinth now has petal-shaped courts, flower mosaics and garden walls.
+- [x] `I-VISUAL-Z37` — The Solar Crucible now has furnace-ring courts, gearwork floors and radiant forge walls.
+- [x] `I-VISUAL-Z38` — The Amber Archive now has shelf-grid courts, memory marks and amber library walls.
+- [x] `I-VISUAL-Z39` — The Silent Solstice now has icy star courts, frost cracks and aurora-lit frozen walls.
+
+All eleven later interiors keep their existing collision rooms but now use different structural silhouettes: living bark and seed roots, painted folding screens, ritual water terraces, bronze observatory mechanisms, charged conduits, flower hedges, furnace walls, amber shelves and faceted ice. Their floor materials, inlays, indoor light and backdrops differ as well. `tests/later-dungeon-visual-ui.cjs` captures an entry, court and landmark in each private zone beside five earlier dungeons for comparison.
 
 ### The Eye Below — level 65, Stormglass Shore (zone 19)
 
@@ -400,7 +402,74 @@ Each class learns a new active skill every four levels from 4 through 40. Rank 2
 
 The unlock and rank layout is recorded in [docs/skill-ranks.md](docs/skill-ranks.md).
 
-- [ ] `S-FLASH-CLARITY` — Make every class skill more visually striking and immediately recognizable in play: distinct cast, travel and impact effects that show its range, target area and purpose (damage, healing, protection or movement), with skill icons/descriptions that match what players see. Check readability in crowded fights and at higher ranks.
+### Skill effect clarity
+
+Each item below covers one active skill in `world/skills.txt`. Give it a recognizable cast, travel and impact where applicable; show its actual range, affected area and purpose; align its icon and description with the result. Check it at game scale in a crowded fight and at higher ranks without hiding combat targets. Keep these as separate checkboxes so a finished skill can be checked off on its own.
+
+#### Warrior
+
+- [x] `S-FX-CLEAVE` — Cleave: the real server cast now draws its full forward cone as a subdued ground sector with a layered gold-and-steel blade sweep and moving tip flare. Real-sprite private browser capture verified the catalog's 1.9-unit reach and 3.54-radian cone; `tests/cleave-visual-ui.cjs` saved the frame, which was uploaded to Sork FileDrop as `Valhalla_Skill_Cleave_New_Effect.png`.
+- [x] `S-FX-BATTLECRY` — Battle Cry now sends layered gold roar waves outward and keeps a gold damage-buff marker at the warrior's feet.
+- [x] `S-FX-SHIELDWALL` — Shield Wall now raises a blue outlined shield around the warrior and keeps small shield markers while active.
+- [x] `S-FX-WHIRLWIND` — Whirlwind now spins three steel arcs around the full authoritative 2.4-unit hit radius.
+- [x] `S-FX-CHARGE` — Charge now draws a directional arrow and a trail to the actor's observed position, so the marked path shortens if movement is blocked.
+- [x] `S-FX-GROUNDSLAM` — Ground Slam now fractures the ground, lifts stone shards and sends a shock ring to its 3.4-unit radius.
+- [x] `S-FX-SECONDWIND` — Second Wind now raises green restorative ribbons and a self-heal cross without suggesting an attack area.
+- [x] `S-FX-BERSERK` — Berserk now ignites red speed flames at cast and keeps a spinning red haste marker while active.
+- [x] `S-FX-EARTHSHATTER` — Earthshatter now drives a branching fissure along its 4.8-unit forward lane with a subdued sector showing the full hit cone.
+- [x] `S-FX-TITANSWRATH` — Titan's Wrath now sends a six-unit rune-ring shockwave, golden fractures and a central pillar; a green return ring appears when actual damage heals the warrior. All ten warrior effects were captured from real level-99 server casts in `tests/warrior-skill-effects-ui.cjs` with real sprites and uploaded to Sork FileDrop as `Valhalla_Warrior_Skill_<id>.png` (ten SHA-256-verified PNGs).
+
+#### Mage
+
+- [x] `S-FX-TWINBOLT` — Twin Bolt now fires two separate violet arcane bolts with individual server-confirmed impact flashes.
+- [x] `S-FX-ARCANEWARD` — Arcane Ward raises a faceted blue shell on cast and keeps a restrained shell around the mage while the shield buff lasts.
+- [x] `S-FX-FIREBALL` — Fireball has a bright traveling body and a separate two-unit fiery blast drawn only at its actual bolt hit.
+- [x] `S-FX-BARRAGE` — Arcane Barrage shows five cyan bolts in the catalog's firing fan, each with its own impact flash.
+- [x] `S-FX-BLINK` — Blink marks its departure and observed arrival with a short violet trace, without a damage ring.
+- [x] `S-FX-CHAINLIGHTNING` — Chain Lightning draws staggered, branching jumps along the server's actual target sequence.
+- [x] `S-FX-METEOR` — Meteor marks the chosen 2.6-unit landing area before its falling body and impact ring; its ground effect stays behind actors.
+- [x] `S-FX-LIFEDRAIN` — Life Drain streams rose-colored energy from the struck enemy back to the caster and shows the real healing return.
+- [x] `S-FX-ARCANESTORM` — Arcane Storm fills its five-unit area with a distinct rotating violet tempest beneath combatants.
+- [x] `S-FX-STARFALL` — Starfall marks its 6.5-unit distant field with constellations and falling stars; impacts stay beneath actors. All ten Mage effects were captured from real level-99 server casts in `tests/mage-skill-effects-ui.cjs` with real sprites. Twelve SHA-256-verified captures, including Fireball travel and Meteor warning frames, are in Sork FileDrop as `Valhalla_Mage_Skill_<id>.png`.
+
+#### Assassin
+
+- [x] `S-FX-THROWINGKNIVES` — Throwing Knives launches three visible knives along the server's actual forward fan, with sharp impact flashes.
+- [x] `S-FX-EVASION` — Evasion has a nimble side-step cast cue and restrained dodge chevrons throughout the buff.
+- [x] `S-FX-LUNGE` — Lunge traces observed movement on the floor and cuts at the actual arrival point.
+- [x] `S-FX-FLURRY` — Flurry paints each real target hit as a numbered, staggered cut; all four are visible when the target survives.
+- [x] `S-FX-SHADOWVEIL` — Shadow Veil surges upward at cast and leaves a distinct trailing haste marker throughout the buff.
+- [x] `S-FX-CYCLONEBLADES` — Cyclone Blades spins six steel daggers at its actual 2.6-unit hit radius beneath actors.
+- [x] `S-FX-ASSASSINATE` — Assassinate focuses a reticle on the struck target before a decisive heavy cut.
+- [x] `S-FX-DEADLYFOCUS` — Deadly Focus narrows a critical reticle at cast and keeps a small target mark while active.
+- [x] `S-FX-KNIFERING` — Knife Ring sends twelve visible knives outward along twelve distinct server projectile paths.
+- [x] `S-FX-THOUSANDCUTS` — Thousand Cuts fills its actual 3.7-unit forward cone with staggered shadow blades and a grounded sector. All ten Assassin effects were captured from real level-99 server casts in `tests/assassin-skill-effects-ui.cjs` with real sprites. Ten SHA-256-verified captures are in Sork FileDrop as `Valhalla_Assassin_Skill_<id>.png`.
+
+#### Priest
+
+- [x] `S-FX-MEND` — Mend connects the caster to its one actually wounded recipient with a distinct healing arc.
+- [x] `S-FX-SMITE` — Smite drops a focused holy bolt onto the enemy actually struck.
+- [x] `S-FX-WARDOFLIGHT` — Ward of Light shows its 8-unit protection circle and a persistent shield shell on the caster and recipients.
+- [x] `S-FX-PRAYER` — Prayer of Healing sends separate links and light markers to each actually healed party member.
+- [x] `S-FX-HOLYNOVA` — Holy Nova has separate gold damage and green healing waves at its real 3.4- and 6-unit radii.
+- [x] `S-FX-BLESSING` — Blessing of Might spreads through its 9-unit circle and leaves a persistent gold damage-buff mark on recipients.
+- [x] `S-FX-GUARDIANLIGHT` — Guardian Light centers a sanctuary beam and small floor seal on the caster's self-heal only.
+- [x] `S-FX-SEARINGLIGHT` — Searing Light strikes the real enemy with hot light and returns healing energy to the caster when it heals.
+- [x] `S-FX-DIVINEHYMN` — Divine Hymn sustains a 12-unit chorus ring and connects to each actually healed party member.
+- [x] `S-FX-HEAVENSWRATH` — Heaven's Wrath adds a radiant crown to distinct 5-unit enemy damage and 8-unit party healing waves. All ten Priest effects were captured from real level-99 casts in a three-player private party with real sprites by `tests/priest-skill-effects-ui.cjs`. Ten SHA-256-verified captures are in Sork FileDrop as `Valhalla_Priest_Skill_<id>.png`.
+
+#### Hunter
+
+- [x] `S-FX-POWERSHOT` — Power Shot: forceful draw, single live arrow and confirmed first-target impact.
+- [x] `S-FX-MULTISHOT` — Multi-Shot: three distinct server arrows spread through the actual fan.
+- [x] `S-FX-ROLLAWAY` — Roll Away: ground trail tracks the real roll, with an airborne landing cue and no attack slash.
+- [x] `S-FX-PIERCINGARROW` — Piercing Arrow: one live arrow continues through successive targets; two impacts from one bolt verified.
+- [x] `S-FX-HUNTERSMARK` — Hunter's Mark: focused reticle cast and persistent damage-buff reticle on the hunter.
+- [x] `S-FX-EXPLOSIVEARROW` — Explosive Arrow: live arrow flight, confirmed impact burst and true 2.2-unit floor radius.
+- [x] `S-FX-RAPIDFIRE` — Rapid Fire: speed lines and persistent haste chevrons distinct from Mark.
+- [x] `S-FX-RAINOFARROWS` — Rain of Arrows: actual target circle and staggered falling arrows across its 2.8-unit radius.
+- [x] `S-FX-EAGLESIGHT` — Eagle Sight: eye-shaped cast and persistent sight cue on the hunter.
+- [x] `S-FX-ARROWSTORM` — Arrow Storm: dense outward arrows across the true 4.2-unit hit area, including the capstone.
 
 ### Skill ranks, levels 22–40
 
@@ -665,9 +734,9 @@ Quests in `world/map.txt` carry `recommendedPlayers` (2 to 5) and `group: true` 
 Owner's rules (2026-10-16): in a dungeon a lone player may or may not beat a single mob (not a rule); a **pack** of mobs must kill a lone player; a **boss** must kill a lone player; and a **party of five** must be able to beat every pack and every boss. Tests: `server/src/world/dungeon_solo_tests.rs`, run with `bash scripts/dungeon-solo-parallel.sh` (lone players, about 50 minutes on 4 cores, `DUNGEON_SOLO_FAIL_FAST=0` collects every violation) and `bash scripts/dungeon-party-parallel.sh` (the party-of-five control, about 3 minutes). A pack is three or more mobs of a dungeon whose spawns chain within 10 tiles; a boss is any monster that appears once in its dungeon or is its final boss. The multipliers go in `world/elite-power.txt`.
 
 - [x] `DUNGEON-TESTS` — Built 2026-10-16, with the harness fix that makes dungeon monsters act at all (the harness must call `enter_instance`; an unentered dungeon copy is frozen). Baseline on the unchanged dungeons: a lone green player died in only 16 of 320 pack fights (5%; the Cathedral packs were cleared 120 of 120) and in 14 of 1,590 boss fights (0.9%; lone players killed the boss in about 45% of fights); a lone player beat 474 of 480 single mobs. Five players in green gear beat 83 of the 85 packs and bosses (only the final bosses Bloom Heart and Solstice Heart held out).
-- [ ] `DUNGEON-PACK-LETHAL` — Raise pack mob power until a pack kills a lone player at the dungeon's level (green and purple gear) in every fight, without the party of five losing. Single mobs may stay soloable. Work per dungeon (16 of them, from the Undervault to the Silent Solstice); the Cathedral wings and the Undervault have the biggest packs, the 11 later dungeons mostly have lone mobs and a few pairs and triples, so check whether they need real packs first.
-- [ ] `DUNGEON-BOSS-LETHAL` — Raise boss power until a boss kills a lone player in every fight, in green or purple gear at the dungeon's level and in purple gear five levels above, while a party of five in green gear still wins. The Undervault bosses are the one set where the lone player survives because the boss is slow, not lethal; the Cathedral wings and later dungeons let a lone player kill the boss in a third to a half of fights.
-- [ ] `DUNGEON-PARTY-CHECK` — After the two items above, run the party-of-five control until it is green for every pack and boss. Today the final bosses Bloom Heart (Blooming Labyrinth) and Solstice Heart (Silent Solstice) already beat five players in green gear, so they need easing, not hardening.
+- [x] `DUNGEON-PACK-LETHAL` — Done 2026-10-16 for the ten dungeons that have packs, with damage multipliers in `world/elite-power.txt` (Undervault x7, Drowned Cathedral x16, the six later dungeons with packs x24). 4 seeds, 32 packs: a lone player survived 0 of 640 fights and five players in green gear won 32 of 32 packs in 4 of 4 runs. Six dungeons (Eye Below, Elder Hollow, Thousandfold Pavilion, Sunken Astrolabe, Blooming Labyrinth, Silent Solstice) have no group of 3 or more mobs, so they are untouched: add real packs or make their pairs lethal (owner's choice). Details and the calibration tool (`scripts/dungeon-calibrate.py`, no rebuild per trial) are in [docs/dungeon-solo-report.md](docs/dungeon-solo-report.md). Not deployed yet (compiled in: rebuild and restart).
+- [x] `DUNGEON-BOSS-LETHAL` — Done 2026-10-16 with a soft enrage instead of multipliers (`world/enrage.txt`, `items::enrage_factor`): 47 bosses, start about 6% past the slowest party kill, then +100% damage per 0.2 s. Green lone heroes cleared 36 of 470 fights before and 0 now; purple at the dungeon's level 383 before and 42 now; purple +5 may clear (owner agreed). The party of five wins all 47 in 4 of 4 runs. Left without an enrage: Choir, Colossus, Hollowking (no lone player kills them; party needs 90-180 s) and Bloom Heart / Solstice Heart (the green party cannot beat them in 180 s, cause unknown, see [docs/dungeon-solo-report.md](docs/dungeon-solo-report.md)). Compiled in, not deployed.
+- [ ] `DUNGEON-PARTY-CHECK` — Packs (32 of 32) and the 47 enraged bosses are green in 4 of 4 runs; still open: the two final bosses Bloom Heart and Solstice Heart that the green party cannot beat in 180 s, and Thunder Heart's slow runs. After the two items above, run the party-of-five control until it is green for every pack and boss. Today the final bosses Bloom Heart (Blooming Labyrinth) and Solstice Heart (Silent Solstice) already beat five players in green gear, so they need easing, not hardening.
 
 ### Plan for hardening the dungeons (written 2026-10-16, not started)
 

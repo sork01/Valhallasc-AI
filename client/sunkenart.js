@@ -3,12 +3,7 @@
 (() => {
   const {iso,poly,line,prism}=City.kit;
   const oval=(g,x,y,rx,ry,fill,stroke)=>{g.beginPath();g.ellipse(x,y,rx,ry,0,0,Math.PI*2);g.fillStyle=fill;g.fill();if(stroke){g.strokeStyle=stroke;g.lineWidth=3;g.stroke();}};
-  City.art.astro_wall={box:[465,570,230,450],draw(g,o){
-    prism(g,o.width,o.depth,107,'#927e59','#536977','#243746');
-    const a=iso(-o.width/2,o.depth/2,68),b=iso(o.width/2,o.depth/2,68);
-    line(g,[a,b],'#e4c987',4);
-    for(let h of [22,52,82]){const p=iso(0,o.depth/2,h);oval(g,p[0],p[1],25,9,'#3e7180','#d9c78e');}
-  }};
+  City.art.astro_wall={box:[465,570,230,450],draw(g,o){DungeonVisual.structure(g,o,'sunken_astrolabe');}};
   City.art.astro_lamp={box:[170,265,85,230],draw(g,o){
     prism(g,.75,.75,65,'#b28c5b','#586a6b','#344c54');
     oval(g,0,-83,23,23,'#d8bb7c','#f2dfad');oval(g,0,-83,15,15,'#366f81');
@@ -24,11 +19,8 @@
     oval(g,0,0,82,30,'#314954','#dfc38c');oval(g,0,0,57,20,'#245c70','#f2dfab');
     for(let a=0;a<12;a++){const t=a*Math.PI/6;oval(g,Math.cos(t)*69,Math.sin(t)*25,3,4,'#ebd6a3');}
   }};
-  const ground=(x,y,tone,alt)=>`hsl(${203+tone*8},${19+tone*8}%,${20+tone*7+alt*.7+((x+y)&1)*2}%)`;
-  function detail(g,px,py,x,y,TW,TH){
-    g.strokeStyle='rgba(229,199,137,.25)';g.lineWidth=1.4;g.beginPath();g.moveTo(px-TW/2,py+TH/2);g.lineTo(px,py);g.lineTo(px+TW/2,py+TH/2);g.stroke();
-    if((x*17+y*23)%19===0)oval(g,px,py+TH/2,10,3,'rgba(143,213,220,.3)','rgba(238,208,147,.35)');
-  }
+  const ground=(x,y,tone,alt,zone)=>DungeonVisual.ground('sunken_astrolabe',x,y,tone,alt,zone);
+  const detail=(g,px,py,x,y,TW,TH,zone)=>DungeonVisual.detail(g,'sunken_astrolabe',px,py,x,y,TW,TH,zone);
   function weather(g,t,w,h){g.save();for(let i=0;i<26;i++){const x=(i*173+t*(3+i%4))%w,y=(i*127+t*(7+i%3))%h;oval(g,x,y,1.3,1.7,'rgba(249,229,172,.3)');}g.restore();}
   function portal(g,p,sx,sy,t){
     g.save();g.translate(sx,sy);poly(g,[[-66,0],[-56,-93],[-31,-149],[0,-171],[31,-149],[56,-93],[66,0]],'#725d50','#f0d496',6);

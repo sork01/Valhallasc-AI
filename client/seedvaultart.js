@@ -3,11 +3,7 @@
 (() => {
   const {iso,poly,line,prism}=City.kit;
   const oval=(g,x,y,rx,ry,fill,stroke)=>{g.beginPath();g.ellipse(x,y,rx,ry,0,0,6.283);g.fillStyle=fill;g.fill();if(stroke){g.strokeStyle=stroke;g.lineWidth=3;g.stroke();}};
-  City.art.seed_wall={box:[450,540,225,430],draw(g,o){
-    const w=o.width,d=o.depth;prism(g,w,d,105,'#887956','#506243','#293d32');
-    for(let h=17;h<105;h+=23){const a=iso(-w/2,d/2,h),b=iso(w/2,d/2,h),c=iso(w/2,-d/2,h);line(g,[a,b,c],'#bdac77',3);}
-    const p=iso(0,d/2,52);oval(g,p[0],p[1],16,23,'#52794f','#dfc987');oval(g,p[0],p[1],5,14,'#e5e2a2');
-  }};
+  City.art.seed_wall={box:[450,540,225,430],draw(g,o){DungeonVisual.structure(g,o,'seed_vault');}};
   City.art.seed_lamp={box:[190,270,95,230],draw(g,o){
     prism(g,.65,.65,58,'#967d55','#526448','#344737');
     for(let s of [-1,1])poly(g,[[0,-66],[s*26,-80],[s*13,-104]],'#5b8755','#d8c185',2);
@@ -22,11 +18,8 @@
     oval(g,0,0,82,28,'#394e35','#cbb77f');oval(g,0,0,51,17,'#243c32','#e5d29c');
     for(let a=0;a<8;a++){const t=a*Math.PI/4;oval(g,Math.cos(t)*62,Math.sin(t)*20,4,5,'#dce7a6');}
   }};
-  const ground=(x,y,tone,alt)=>`hsl(${80+tone*8},${20+tone*6}%,${19+tone*7+alt*.7+((x+y)&1)*2}%)`;
-  function detail(g,px,py,x,y,TW,TH){
-    g.strokeStyle='rgba(201,184,112,.23)';g.lineWidth=1.4;g.beginPath();g.moveTo(px-TW/2,py+TH/2);g.lineTo(px,py);g.lineTo(px+TW/2,py+TH/2);g.stroke();
-    if((x*13+y*19)%17===0)oval(g,px,py+TH/2,10,3,'rgba(193,220,137,.35)','rgba(231,218,154,.4)');
-  }
+  const ground=(x,y,tone,alt,zone)=>DungeonVisual.ground('seed_vault',x,y,tone,alt,zone);
+  const detail=(g,px,py,x,y,TW,TH,zone)=>DungeonVisual.detail(g,'seed_vault',px,py,x,y,TW,TH,zone);
   function weather(g,t,w,h){g.save();for(let i=0;i<29;i++){const x=(i*157+t*(4+i%3))%w,y=(i*109+t*(10+i%4))%h;oval(g,x,y,1.5,2.5,'rgba(225,235,163,.3)');}g.restore();}
   function portal(g,p,sx,sy,t){
     g.save();g.translate(sx,sy);poly(g,[[-56,0],[-47,-103],[-23,-151],[0,-173],[23,-151],[47,-103],[56,0]],'#465b3d','#dec88d',5);

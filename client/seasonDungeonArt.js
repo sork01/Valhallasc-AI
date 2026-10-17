@@ -14,14 +14,7 @@
     if(fill){g.fillStyle=fill;g.fill();}
     if(stroke){g.strokeStyle=stroke;g.lineWidth=width;g.stroke();}
   };
-  function wall(theme) {const c=themes[theme];return {box:[440,520,220,410],draw(g,o){
-    prism(g,o.width,o.depth,100,c.edge,c.wall,c.veil);
-    for(let h=17;h<100;h+=20){const a=iso(-o.width/2,o.depth/2,h),b=iso(o.width/2,o.depth/2,h),d=iso(o.width/2,-o.depth/2,h);line(g,[a,b,d],h===57?c.glow:c.veil,2);}
-    const p=iso(0,o.depth/2,50);ellipse(g,p[0],p[1],12,19,c.veil,c.glow,3);
-    if(theme==='solar_crucible')for(let i=-1;i<=1;i++)line(g,[[p[0]+i*9,p[1]-14],[p[0]+i*9,p[1]+13]],c.edge,2);
-    if(theme==='amber_archive')for(let i=-2;i<=2;i++)line(g,[[p[0]+i*4,p[1]-13],[p[0]+i*4,p[1]+13]],c.edge,1);
-    if(theme==='silent_solstice')for(let i=-1;i<=1;i++)line(g,[[p[0]+i*8,p[1]-15],[p[0]-i*8,p[1]+15]],c.glow,2);
-  }};}
+  function wall(theme) { return {box:[440,520,220,410],draw(g,o){DungeonVisual.structure(g,o,theme);}}; }
   function lamp(theme){const c=themes[theme];return {box:[160,250,80,210],draw(g,o){
     prism(g,.7,.7,70,c.edge,c.wall,c.veil);
     if(theme==='blooming_labyrinth'){
@@ -61,12 +54,8 @@
     ellipse(g,0,0,45,16,c.veil,c.glow,2);
     ellipse(g,0,0,13,11,c.glow);
   }};}
-  function ground(theme,x,y,tone,alt){const c=themes[theme];return `hsl(${c.floor+tone*9}, ${theme==='blooming_labyrinth'?30:43}%, ${20+tone*8+alt*.6+((x+y)&1)*2}%)`;}
-  function detail(g,theme,px,py,x,y,TW,TH){const c=themes[theme];
-    g.strokeStyle=theme==='blooming_labyrinth'?'rgba(215,244,211,.22)':theme==='silent_solstice'?'rgba(200,230,255,.23)':'rgba(255,202,119,.2)';g.lineWidth=1;
-    g.beginPath();g.moveTo(px-TW/2,py+TH/2);g.lineTo(px,py);g.lineTo(px+TW/2,py+TH/2);g.stroke();
-    if((x*11+y*7)%11===0){ellipse(g,px,py+TH/2,12,4,c.veil,c.edge,1);ellipse(g,px,py+TH/2,3,3,c.glow);}
-  }
+  const ground=(theme,x,y,tone,alt,zone)=>DungeonVisual.ground(theme,x,y,tone,alt,zone);
+  const detail=(g,theme,px,py,x,y,TW,TH,zone)=>DungeonVisual.detail(g,theme,px,py,x,y,TW,TH,zone);
   function weather(g,theme,t,w,h){const c=themes[theme];g.save();
     for(let i=0;i<36;i++){
       const x=(i*173+Math.sin(t*.3+i)*18+w)%w,y=(i*89-t*(theme==='blooming_labyrinth'?2:theme==='silent_solstice'?3:5)+h*20)%h;
