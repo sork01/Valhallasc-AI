@@ -105,6 +105,8 @@ Placed by an idempotent script that `scripts/sync-world.cjs` runs, as `scripts/s
 | Astralhollow | Ilvane Stargaler (`banker_astralhollow`) | "Every deposit is entered in the sky ledger. The stars do not forget, and neither do I." |
 | Asterion | Archon Veyl, Keeper of Weights (`banker_asterion`) | "Present what you would store. It will be weighed, named and returned to you unchanged." |
 
+Placed (`scripts/bank_npcs.py`): Alderhaven (39, 82.5) by the fountain, Skaldholm (78, 65.5), Nacrehold (98.5, 93.5), Astralhollow (61, 116), Asterion (88, 92), each at least 2.6 tiles from every NPC, 4 from every portal and 2.5 from every walked route, on clear ground. Every line ends with the quest rule ("Mind that a quest counts only what you carry, not what is in the bank."). The role of Asterion's banker is "Keeper of Weights", with the name "Archon Veyl".
+
 Each also answers when the bank is empty ("The strongroom is yours. Nothing is in it yet.") and when it is open to show the counts of cells used and free. The Swedish text for all of it is part of `BANK-NPC`.
 
 ## Verification hooks (for `BANK-SERVER` and `BANK-CHECK`)

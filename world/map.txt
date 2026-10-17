@@ -3017,6 +3017,30 @@
       ]
     },
     {
+      "id": "banker_alderhaven",
+      "name": "Brenna Coinwright",
+      "role": "Banker",
+      "x": 39,
+      "y": 82.5,
+      "color": "#c9a24b",
+      "dialogue": "Gold in your pocket is gold on the road. Leave what you cannot carry with me, and I will keep it as if it were my own. Mind that a quest counts only what you carry, not what is in the bank.",
+      "offers": [
+        {
+          "id": "bank",
+          "label": "Open the bank",
+          "cost": 0
+        }
+      ],
+      "buys": false,
+      "look": {
+        "skin": "#edc5a1",
+        "hair": "#7a4a2a",
+        "style": "bun",
+        "hat": "bonnet",
+        "hatColor": "#8a6a2a"
+      }
+    },
+    {
       "id": "travel_alderhaven",
       "name": "Travel Master",
       "role": "Spark Travel",
@@ -25618,6 +25642,32 @@
             "hat": "cap",
             "hatColor": "#4f3a6a",
             "beard": "#8a8a8a"
+          }
+        },
+        {
+          "id": "banker_skaldholm",
+          "name": "Hakon Vaultwarden",
+          "role": "Vault warden",
+          "x": 78,
+          "y": 65.5,
+          "color": "#6d7f9c",
+          "dialogue": "The hall's strongroom has held a jarl's ransom. A few spare helms will not trouble it. Mind that a quest counts only what you carry, not what is in the bank.",
+          "offers": [
+            {
+              "id": "bank",
+              "label": "Open the bank",
+              "cost": 0
+            }
+          ],
+          "buys": false,
+          "look": {
+            "skin": "#e3b895",
+            "hair": "#b9b2a4",
+            "style": "short",
+            "hat": "helm",
+            "hatColor": "#5c6b82",
+            "beard": "#b9b2a4",
+            "scale": 1.05
           }
         },
         {
@@ -64897,6 +64947,31 @@
           "dialogue": "We carved our histories on mother-of-pearl. The Drowned Cathedral once kept the Heart of the Tide. Now its bells ring without hands. Its doors are sealed; read our memorials before you ask why."
         },
         {
+          "id": "banker_nacrehold",
+          "name": "Perla Tidekeeper",
+          "role": "Mermaid · Tide banker",
+          "x": 98.5,
+          "y": 93.5,
+          "color": "#e2b7d6",
+          "dialogue": "Pearls and pennies, shells and swords. The sea keeps nothing but the bank does. Mind that a quest counts only what you carry, not what is in the bank.",
+          "offers": [
+            {
+              "id": "bank",
+              "label": "Open the bank",
+              "cost": 0
+            }
+          ],
+          "buys": false,
+          "look": {
+            "species": "merfolk",
+            "female": true,
+            "tail": "#e2b7d6",
+            "skin": "#a4dbc9",
+            "hair": "#5f8f9c",
+            "style": "long"
+          }
+        },
+        {
           "id": "nacre_gardener",
           "name": "Pelar Kelpbraid",
           "role": "Merman · Reef gardener",
@@ -90656,6 +90731,30 @@
           "dialogue": "The stars fell here before the city was built. Now the hollow is waking. Help me chart what survived the descent."
         },
         {
+          "id": "banker_astralhollow",
+          "name": "Ilvane Stargaler",
+          "role": "Astral banker",
+          "x": 61,
+          "y": 116,
+          "color": "#8fb4ff",
+          "dialogue": "Every deposit is entered in the sky ledger. The stars do not forget, and neither do I. Mind that a quest counts only what you carry, not what is in the bank.",
+          "offers": [
+            {
+              "id": "bank",
+              "label": "Open the bank",
+              "cost": 0
+            }
+          ],
+          "buys": false,
+          "look": {
+            "skin": "#d9bfa8",
+            "hair": "#9fb6e8",
+            "style": "braid",
+            "hat": "hood",
+            "hatColor": "#3d4a86"
+          }
+        },
+        {
           "id": "astral_healer",
           "name": "Ilyra Nightbloom",
           "role": "Sanctuary keeper",
@@ -105364,6 +105463,31 @@
             }
           ],
           "buys": false
+        },
+        {
+          "id": "banker_asterion",
+          "name": "Archon Veyl",
+          "role": "Keeper of Weights",
+          "x": 88,
+          "y": 92,
+          "color": "#c7b6e8",
+          "dialogue": "Present what you would store. It will be weighed, named and returned to you unchanged. Mind that a quest counts only what you carry, not what is in the bank.",
+          "offers": [
+            {
+              "id": "bank",
+              "label": "Open the bank",
+              "cost": 0
+            }
+          ],
+          "buys": false,
+          "look": {
+            "skin": "#c78e6e",
+            "hair": "#f2e7d5",
+            "style": "short",
+            "hat": "feather",
+            "hatColor": "#4b3a88",
+            "scale": 1
+          }
         },
         {
           "id": "asterion_cartographer",

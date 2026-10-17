@@ -61,14 +61,14 @@ impl World {
                 copy,
             } => next
                 .bank_deposit(&item, quantity, copy)
-                .map(|()| format!("Stored {quantity} {}.", name(&item))),
+                .map(|()| format!("Stored {quantity} {} in the bank.", name(&item))),
             BankRequest::Withdraw {
                 item,
                 quantity,
                 copy,
             } => next
                 .bank_withdraw(&item, quantity, copy)
-                .map(|()| format!("Took {quantity} {}.", name(&item))),
+                .map(|()| format!("Took {quantity} {} from the bank.", name(&item))),
             BankRequest::Gold { deposit, amount } => next.bank_gold(deposit, amount).map(|()| {
                 if deposit {
                     format!("Stored {amount} gold.")
@@ -165,6 +165,67 @@ mod tests {
         serde_json::to_string(&w.players[&1].character).unwrap()
     }
 
+    /// The zone of each big city and its banker (docs/bank.md): Alderhaven is the south of Greenmeadow.
+    const BANKERS: [(usize, &str); 5] = [
+        (0, "banker_alderhaven"),
+        (4, "banker_skaldholm"),
+        (9, "banker_nacrehold"),
+        (13, "banker_astralhollow"),
+        (17, "banker_asterion"),
+    ];
+    #[test]
+    fn exactly_five_bankers_stand_beside_their_plazas_clear_of_everything_and_nowhere_else() {
+        let w = world();
+        for (zone, map) in w.maps.iter().enumerate() {
+            let bankers: Vec<_> = map
+                .npcs
+                .iter()
+                .filter(|n| n.offers.iter().any(|o| o.id == "bank") || n.id.starts_with("banker_"))
+                .map(|n| n.id.as_str())
+                .collect();
+            let expected: Vec<_> = BANKERS
+                .iter()
+                .filter(|b| b.0 == zone)
+                .map(|b| b.1)
+                .collect();
+            assert_eq!(bankers, expected, "zone {zone} {}", map.name);
+        }
+        for (zone, id) in BANKERS {
+            let map = &w.maps[zone];
+            let banker = map.npcs.iter().find(|n| n.id == id).unwrap();
+            let at = Point {
+                x: banker.x,
+                y: banker.y,
+            };
+            assert_eq!(banker.offers.len(), 1, "{id}: only the bank");
+            assert!(
+                !banker.name.is_empty() && !banker.dialogue.is_empty() && !banker.role.is_empty()
+            );
+            assert!(
+                map.city.as_ref().unwrap().contains(at),
+                "{id} is inside its city"
+            );
+            assert!(map.line_clear(at, at, 1.2), "{id} stands on clear ground");
+            for portal in &map.portals {
+                assert!(
+                    at.distance(Point {
+                        x: portal.x,
+                        y: portal.y
+                    }) >= 4.,
+                    "{id} near {}",
+                    portal.id
+                );
+            }
+            // Every other townsperson stays well away over a whole day of walking, so no route crosses the banker.
+            for other in map.npcs.iter().filter(|n| n.id != id) {
+                for step in 0..1200 {
+                    let there = other.position_at(step as f64);
+                    assert!(at.distance(there) >= 2.4, "{id} too near {}", other.id);
+                }
+            }
+            assert!(at.distance(banker.position_at(0.)) <= BANK_RANGE);
+        }
+    }
     #[test]
     fn a_stack_gold_and_an_expansion_go_through_the_banker_and_are_saved_before_they_are_seen() {
         let (mut w, mut rx, token) = at_the_bank();
