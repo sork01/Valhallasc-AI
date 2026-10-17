@@ -53,6 +53,7 @@ const debugSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('set_level'), level: z.number().int().min(1).max(100) }).strict(),
   z.object({ op: z.literal('give_xp'), amount: z.number().int().min(0).max(4294967295) }).strict(),
   z.object({ op: z.literal('set_gold'), gold: z.number().int().min(0).max(4294967295) }).strict(),
+  z.object({ op: z.literal('give_mount'), mount: z.enum(['horse', 'raptor', 'lizard', 'sabertooth', 'gryphon']) }).strict(),
   z.object({ op: z.literal('set_resource'), amount: number.nonnegative() }).strict(),
   z.object({ op: z.literal('set_hp'), hp: number.positive() }).strict(),
   z.object({ op: z.literal('die') }).strict(),

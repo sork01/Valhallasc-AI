@@ -97,7 +97,7 @@
 .gossip-parchment .inventory-item[data-rarity="gm"] b { color: #8a6a00; }
 .gossip-parchment .shop-item-icon { background: #2a1a0acc; border-color: #5a4a30; }
 @media (pointer: coarse) { .gossip-row { min-height: 44px; } .gossip-button, .gossip-parchment .btn, .gossip-titlebar .window-close { min-height: 44px; min-width: 44px; } }
-.quest-tracker { position: absolute; right: 1.4cqw; top: 22cqw; width: 23cqw; z-index: 20; color: #f7e9c9; text-align: left; font: 1cqw/1.45 Arial, sans-serif; text-shadow: 0 1px 3px #000, 1px 0 2px #000; }
+.quest-tracker { position: absolute; right: 1.4cqw; top: 24.4cqw; width: 23cqw; z-index: 20; color: #f7e9c9; text-align: left; font: 1cqw/1.45 Arial, sans-serif; text-shadow: 0 1px 3px #000, 1px 0 2px #000; }
 .tracker-heading { display: flex; align-items: center; border-bottom: 1px solid #b89b5c80; background: linear-gradient(90deg, #182024cc, #18202420); }
 .tracker-journal, .tracker-toggle, .tracker-title { border: 0; padding: .45cqw .5cqw; background: none; color: #ffd56b; text-align: left; cursor: pointer; font: inherit; text-shadow: inherit; }
 .tracker-journal { flex: 1; font-weight: bold; }
@@ -131,7 +131,7 @@
 .social-who .member-quests { display: block; color: #9dffb2; }
 .quest-card[data-repeatable="true"] { border-color: #64b5ff80; }
 .quest-card[data-repeatable="true"] h4, .quest-card[data-repeatable="true"] .quest-state { color: #64b5ff; }
-.inventory-open { position: absolute; right: 1.4cqw; top: 18.5cqw; z-index: 20; padding: .6cqw 1cqw; border: 1px solid #a7c8ed; border-radius: .6cqw; color: #daecff; background: #183251ed; font: 1cqw 'Jua', sans-serif; cursor: pointer; }
+.inventory-open { position: absolute; right: 1.4cqw; top: 21cqw; z-index: 20; padding: .6cqw 1cqw; border: 1px solid #a7c8ed; border-radius: .6cqw; color: #daecff; background: #183251ed; font: 1cqw 'Jua', sans-serif; cursor: pointer; }
 #equipment { z-index: 47; }
 .inventory-item { padding: .7cqw; margin: .5cqw 0; border: 1px solid #a0b2b950; border-radius: .5cqw; background: #142338; text-align: left; }
 .inventory-item b, .inventory-item small { display: block; font: 1cqw/1.5 'Jua', sans-serif; }
@@ -291,6 +291,16 @@
 .set-tier[data-active="true"] { color:#c3efb7 !important; text-shadow:0 0 .4em #75d76b55; }
 .character-sets { margin:.7cqw 0; padding:.6cqw; border:1px solid #685b42; background:#151b1c; font:.8cqw/1.4 'Jua',sans-serif; }
 .character-sets h4 { margin:0 0 .4cqw; color:#e9d39d; font:1.05cqw Georgia,serif; }
+.character-mounts { margin:.7cqw 0; padding:.6cqw; border:1px solid #685b42; background:#151b1c; font:.8cqw/1.4 'Jua',sans-serif; }
+.character-mounts h4 { margin:0 0 .4cqw; color:#e9d39d; font:1.05cqw Georgia,serif; }
+.mount-help { display:block; margin-bottom:.3cqw; color:#b9baa9; font-size:.74cqw; }
+.mount-card { display:flex; justify-content:space-between; align-items:center; gap:.6cqw; padding:.4cqw 0; border-top:1px solid #73654855; }
+.mount-card[data-owned="false"] { opacity:.5; filter:grayscale(.7); }
+.mount-card[data-selected="true"] b { color:#c3efb7; }
+.mount-text { display:flex; flex-direction:column; min-width:0; }
+.mount-text small { color:#b9baa9; font-size:.74cqw; }
+.mount-select { flex:none; }
+.mount-select:disabled { opacity:.6; cursor:default; }
 .set-card { padding:.4cqw 0; border-top:1px solid #73654855; }
 .character-sets .set-tier { font-size:.74cqw; }
 .item-tooltip p { margin: 6px 0; }

@@ -880,7 +880,7 @@
   const hubs = () => [zdef.city, ...(zdef.camps || [])].filter(Boolean);
   const hubAt = (x, y) => hubs().find(c => x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1);
   const campNear = () => hubs().reduce((a, c) => !a || Math.hypot(hero.x - c.plaza.x, hero.y - c.plaza.y) < Math.hypot(hero.x - a.plaza.x, hero.y - a.plaza.y) ? c : a, null);
-  function emitHud(force) { const rival = remotePlayers.get(hero.pvpTargetId); onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, target: rival && !rival.dead ? { id: rival.id, player: true, name: rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, inCombat:hero.inCombat }); }
+  function emitHud(force) { const rival = remotePlayers.get(hero.pvpTargetId); onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, target: rival && !rival.dead ? { id: rival.id, player: true, name: rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -1085,6 +1085,7 @@
     window.Weather?.sync(packet.weather, own.x, own.y, !!own.inside);
     if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;pendingChest=null;hero.target=null;hero.goal=null;}
     window.Attributes?.update(own);
+    window.Mounts?.update(own);
     window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || [], own.gearInstances || [], own.setCounts || {});
     window.Quests?.setBells(own.bells || []);
     window.Quests?.update(own.quests || []);
@@ -1354,7 +1355,9 @@
       floater(ev.x, ev.y, WORLD_SET_BONUSES.signatures[ev.setSignature]?.name || 'Set bonus', col, true);
     }
   }
-  // Canvas-built riding horse: shared by local and remote actors, so no extra atlas is needed.
+  // Canvas-built riding horse: shared by local and remote actors, so no extra atlas is needed. Until the per-mount
+  // sprites exist (MOUNT-GRYPHON and the others), every mount is this horse body in the selected mount's coat colour.
+  const MOUNT_COATS = { horse: '#70422b', raptor: '#4f7a3a', lizard: '#8a9a3c', sabertooth: '#b98a45', gryphon: '#cdb98a' };
   function drawMount(g, actor) {
     if (!actor.mounted || actor.dead) return;
     const stride = actor.moving ? Math.sin(actor.walk * 2) * 7 : 0;
@@ -1362,7 +1365,7 @@
     g.fillStyle = 'rgba(9, 11, 15, .28)'; g.beginPath(); g.ellipse(0, 1, 42, 11, 0, 0, 6.283); g.fill();
     g.strokeStyle = '#3b2219'; g.lineWidth = 9; g.lineCap = 'round';
     for (const [x, phase] of [[-24, 1],[-12,-1],[17,-1],[29,1]]) { g.beginPath(); g.moveTo(x,-23); g.lineTo(x+phase*stride*.45,-1); g.stroke(); }
-    g.fillStyle = '#70422b'; g.beginPath(); g.ellipse(0,-34,38,22,-.08,0,6.283); g.fill();
+    g.fillStyle = MOUNT_COATS[actor.mount] || MOUNT_COATS.horse; g.beginPath(); g.ellipse(0,-34,38,22,-.08,0,6.283); g.fill();
     g.beginPath(); g.moveTo(23,-43); g.lineTo(37,-68); g.lineTo(51,-64); g.lineTo(49,-39); g.closePath(); g.fill();
     g.fillStyle = '#4d2c20'; g.beginPath(); g.moveTo(35,-64); g.lineTo(35,-79); g.lineTo(42,-68); g.moveTo(46,-63); g.lineTo(50,-77); g.lineTo(54,-63); g.fill();
     g.strokeStyle = '#3b2219'; g.lineWidth = 5; g.beginPath(); g.moveTo(-32,-39); g.quadraticCurveTo(-54,-62,-46,-77); g.stroke();

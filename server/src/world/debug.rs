@@ -106,6 +106,12 @@ impl World {
                 levels = c.grant_xp(amount);
                 json!({"level":c.level,"xp":c.xp,"levels":levels,"unlocked":skills::unlocked(c.look.class, before, c.level)})
             }
+            DebugCommand::GiveMount { mount } => {
+                if !p.character.grant_mount(&mount) {
+                    return Err(format!("Unknown mount {mount}, or it is already owned."));
+                }
+                json!({"mounts":p.character.mounts,"mount":p.character.mount})
+            }
             DebugCommand::SetGold { gold } => {
                 p.character.gold = gold;
                 json!({"gold":gold})

@@ -591,8 +591,8 @@
     hud.gold.textContent = s.gold; hud.kills.textContent = s.kills; $('bag-gold').textContent = `${s.gold} gold`;
     const mount = $('mount-toggle');
     mount.disabled = !s.mountOwned || !!s.sparkTravel || s.hp <= 0 || (s.inCombat && !s.mounted) || !!s.players;
-    mount.textContent = s.mounted ? 'Dismount · H' : s.mountOwned ? 'Mount · H · 2× speed' : 'Horse · H';
-    mount.title = s.mountOwned ? (s.mounted ? 'Dismount' : 'Ride at twice normal travel speed (H)') : 'Buy a horse from Stable-hand Greta in Skaldholm at level 50 for 50,000 gold';
+    mount.textContent = s.mounted ? 'Dismount · H' : s.mountOwned ? `${window.Mounts?.name(s.mount) || 'Mount'} · H · 2× speed` : 'Horse · H';
+    mount.title = s.mountOwned ? (s.mounted ? 'Dismount' : 'Ride the selected mount at twice normal travel speed (H). Change it in the Character window.') : 'Buy a horse from Stable-hand Greta in Skaldholm at level 50 for 50,000 gold. All mounts are listed in the Character window.';
     const inCity = !!s.hub || s.area === 'Alderhaven', title = $('area-title'), away = s.zone > 0;
     if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); void title.offsetWidth; title.classList.add('show'); }
     title.querySelector('b').textContent = away ? s.area : inCity ? 'Alderhaven · Fountain Square' : t('areaName');
@@ -818,6 +818,7 @@
     $('character-subtitle').textContent = `${c.name} · Level ${Field.hero.level} ${c.class[0].toUpperCase() + c.class.slice(1)}`;
     $('equipment-stats').textContent = `${t('attack')}: ${Number(stats.attack.toFixed(1))} · ${t('defense')}: ${Number(stats.defense.toFixed(1))}`;
     window.Attributes?.render();
+    window.Mounts?.render();
     $('hud-portrait').style.backgroundImage = `url(${mage.portrait()})`;
     Inventory.render(document.getElementById('inventory-list'));
     Inventory.renderEquipped(document.getElementById('equipped-slots'));

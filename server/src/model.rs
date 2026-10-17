@@ -1263,6 +1263,9 @@ pub enum DebugCommand {
     GiveXp {
         amount: u32,
     },
+    GiveMount {
+        mount: String,
+    },
     SetGold {
         gold: u32,
     },
