@@ -1020,7 +1020,19 @@
 
   // ---------- combat ----------
   function say(name, data) { onEvent(name, data); }
-  function floater(x, y, text, color, big) { floaters.push({ x, y, z: 30, text, color, big, t: 0 }); }
+  // The top of whoever stands at (x, y), in screen px above their feet: a floating number starts there, so a boss gets its numbers
+  // over its head and a slime over its own. `kindOf` narrows the monster search to the kind named by a hit event.
+  function headAt(x, y, kindOf) {
+    let best = null, bd = 1.6;
+    for (const s of slimes) { if (s.dead || (kindOf && s.kind !== kindOf)) continue; const d = Math.hypot(s.x - x, s.y - y); if (d < bd) { bd = d; best = s; } }
+    if (best) return Math.round((enemySource(best) ? (best.d.top ?? (best.kind === 'big' ? 36 : best.kind === 'beetle' ? 40 : 28)) * SLIME_K * best.d.scale : 62 * best.d.scale) + 8);
+    return Math.hypot(hero.x - x, hero.y - y) < 1.2 || [...remotePlayers.values()].some(r => Math.hypot(r.x - x, r.y - y) < 1.2) ? 118 : 60;
+  }
+  // kind: hit, crit, hurt, heal, miss, pickup, banner (names and notices), level; `head` overrides the start height (px).
+  function floater(x, y, text, color, big, kind = big ? 'level' : 'banner', head) {
+    DamageNumbers.spawn(floaters, { x, y, text, color, kind, head: head ?? (['hit', 'crit', 'hurt', 'heal', 'miss'].includes(kind) ? headAt(x, y, kind === 'hit' || kind === 'crit' ? currentHitKind : null) : 60) });
+  }
+  let currentHitKind = null;
   function burst(x, y, z, n, col, spd = 3, grav = 9) { for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, s = (.3 + Math.random()) * spd; parts.push({ x, y, z, vx: Math.cos(a) * s * .5, vy: Math.sin(a) * s * .5, vz: 2 + Math.random() * 5, life: .5 + Math.random() * .5, t: 0, col: Array.isArray(col) ? col[Math.floor(Math.random() * col.length)] : col, size: 2 + Math.random() * 3, g: grav }); } }
   function keyboardDirection() {
     let x = 0, y = 0;
@@ -1169,15 +1181,15 @@
       }
     }
     if (event.kind === 'hit') {
-      // A little scatter keeps the numbers of a many-hit skill readable.
-      floater(event.x + (Math.random() - .5) * .6, event.y + (Math.random() - .5) * .6, String(event.value), event.crit ? '#ffe066' : '#fff4e0', event.crit);
+      // DamageNumbers.spawn fans a run of hits out over the target's head, so the number sits on the target itself.
+      currentHitKind = event.enemy || null; floater(event.x, event.y, DamageNumbers.format(event.value), event.crit ? '#ffe066' : '#fff4e0', event.crit, event.crit ? 'crit' : 'hit'); currentHitKind = null;
       burst(event.x, event.y, 12, 7, ['#fff4e0', '#cfb5fa']);
     }
-    if (event.kind === 'hurt') floater(event.x, event.y, '-' + event.value, '#ff8b9b', false);
-    if (event.kind === 'miss' || event.kind === 'dodge') floater(event.x, event.y, event.kind === 'miss' ? 'Miss' : 'Dodge', '#e5e5d2', false);
+    if (event.kind === 'hurt') floater(event.x, event.y, '-' + DamageNumbers.format(event.value), '#ff8b9b', false, 'hurt');
+    if (event.kind === 'miss' || event.kind === 'dodge') floater(event.x, event.y, event.kind === 'miss' ? 'Miss' : 'Dodge', '#c9c9bd', false, 'miss');
     if (event.kind === 'itemPickup') {
       const item = WORLD_ITEMS.find(i => i.id === event.item), rarity = event.rarity || item?.rarity;
-      floater(event.x, event.y, item?.kind === 'bag' ? `${item.name} · +${item.bagSlots} slots` : `+${event.quantity} ${event.name}`, item?.kind === 'bag' ? bagColor(item) : '#64b5ff', false);
+      floater(event.x, event.y, item?.kind === 'bag' ? `${item.name} · +${item.bagSlots} slots` : `+${event.quantity} ${event.name}`, item?.kind === 'bag' ? bagColor(item) : '#64b5ff', false, 'pickup');
       if (event.actor === Online.id) {
         say('pickup'); say('rarePickup', event);
         const tier = { uncommon: 1, rare: 2, epic: 3, legendary: 4 }[rarity] || 0;
@@ -1185,7 +1197,7 @@
       }
     }
     if (event.kind === 'shotBlocked') spark(event.x, event.y, 7, ['#f8e5b5','#d2b990','#fff4d7'], 7, 0.6, 0.45);
-    if (event.kind === 'pickup') floater(event.x, event.y, '+' + event.value + ' gold', '#ffe066', false);
+    if (event.kind === 'pickup') floater(event.x, event.y, '+' + DamageNumbers.format(event.value) + ' gold', '#ffe066', false, 'pickup');
     if (event.kind === 'portal') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); burst(event.x, event.y, 20, 14, ['#ffd9a0', '#ff8a3a', '#7ae8c8']); }
     if (event.kind === 'chestOpen') { if (pendingChest) { pendingChest = null; cityRoute = []; } effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:.65,grow:1.1,col:'#ffe292'}); effects.push({kind:'chestOpen',x:event.x,y:event.y,t:0,life:1.3}); burst(event.x,event.y,24,18,['#ffe292','#fff6cf','#d89543'],4,5); }
     if (event.kind === 'levelup') levelUpFx(event);
@@ -1194,12 +1206,12 @@
     // Food and potions: a potion lands at once with a ring and its number; a meal shows its share every second.
     if (event.kind === 'consume') {
       spark(event.x, event.y, 14, ['#9dffb4', '#d8ffe0', '#f0d9a0'], 10, 1, .9);
-      if (event.mana > 0) floater(event.x, event.y, '+' + event.mana + ' ' + (event.resourceType || 'mana'), '#85baff', false);
-      if (event.value > 0) { effects.push({ kind: 'skAura', x: event.x, y: event.y, core: '#d9ffe0', glow: '#3fd36a', col: '#3fd36a', a: 0, t: 0, life: 1 }); floater(event.x, event.y, '+' + event.value, '#7dff9a', true); }
+      if (event.mana > 0) floater(event.x, event.y, '+' + event.mana + ' ' + (event.resourceType || 'mana'), '#85baff', false, 'heal');
+      if (event.value > 0) { effects.push({ kind: 'skAura', x: event.x, y: event.y, core: '#d9ffe0', glow: '#3fd36a', col: '#3fd36a', a: 0, t: 0, life: 1 }); floater(event.x, event.y, '+' + DamageNumbers.format(event.value), '#7dff9a', true, 'heal'); }
     }
     // A party member healed by a priest: their own number and glow, whoever cast it.
-    if (event.kind === 'healed' && event.value > 0) floater(event.x, event.y, '+' + event.value, '#7dff9a', true);
-    if (event.kind === 'regen') { floater(event.x, event.y, '+' + event.value, '#7dff9a', false); spark(event.x, event.y, 4, ['#9dffb4', '#d8ffe0'], 6, .6, .6); }
+    if (event.kind === 'healed' && event.value > 0) floater(event.x, event.y, '+' + DamageNumbers.format(event.value), '#7dff9a', true, 'heal');
+    if (event.kind === 'regen') { floater(event.x, event.y, '+' + DamageNumbers.format(event.value), '#7dff9a', false, 'heal'); spark(event.x, event.y, 4, ['#9dffb4', '#d8ffe0'], 6, .6, .6); }
     if (event.kind === 'swing') {
       const actor = event.actor === Online.id ? hero : remotePlayers.get(event.actor);
       if (actor) effects.push({ kind: actor.look.class === 'assassin' ? 'dualSlash' : 'slash', x: event.x, y: event.y, a: Math.atan2(actor.fy, actor.fx), t: -.12 });
@@ -1340,7 +1352,7 @@
       if (def.class !== 'priest') effects.push({ ...base, kind: 'skAura', x: p.x, y: p.y, col: BUFF_COL[def.effect.kind] || glow, life: 1 });
       spark(p.x, p.y, 12, [core, glow], 8, .8, .8);
     }
-    if (ev.heal > 0) { floater(ev.x, ev.y, '+' + ev.heal, '#7dff9a', true); if (kind !== 'heal') spark(ev.x, ev.y, 12, ['#9dffb4', '#d8ffe0'], 10, 1, .9); }
+    if (ev.heal > 0) { floater(ev.x, ev.y, '+' + DamageNumbers.format(ev.heal), '#7dff9a', true, 'heal'); if (kind !== 'heal') spark(ev.x, ev.y, 12, ['#9dffb4', '#d8ffe0'], 10, 1, .9); }
     if (ev.setDouble) {
       effects.push({ ...base, kind: 'skNova', r: 2.2, life: .65, style: 'spiral' });
       spark(ev.x, ev.y, 22, ['#ffffff', '#f6c867'], 7, 2, .7);
@@ -1384,7 +1396,7 @@
     ['#ffe066', '#ffffff', '#7fe9ff', '#ffb347'].forEach((col, i) => effects.push({ kind: 'ring', x: ev.x, y: ev.y, col, t: -i * .16, life: 1.2 + i * .1, grow: 1 + i * .35 }));
     spark(ev.x, ev.y, 90, golds, 24, 1.4, 2); spark(ev.x, ev.y, 50, golds, 8, 4.5, 1.5);
     floater(ev.x, ev.y, 'LEVEL UP!', '#ffe066', true);
-    floaters.push({ x: ev.x, y: ev.y, z: 78, text: `Level ${ev.level}`, color: '#ffffff', big: true, t: 0 });
+    floater(ev.x, ev.y, `Level ${ev.level}`, '#ffffff', true, 'level', 108);
     if (own) kick(13, .8);
   }
   function drawLevelFx(g, e) {
@@ -2354,7 +2366,7 @@
     }
     for (const p of parts) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vz -= p.g * dt; p.z = Math.max(0, p.z + p.vz * dt * 6); }
     parts = parts.filter(p => p.t < p.life);
-    for (const f of floaters) { f.t += dt; f.z += dt * 46; } floaters = floaters.filter(f => f.t < 1.1);
+    floaters = DamageNumbers.step(floaters, dt);
     for (const e of effects) e.t += dt; effects = effects.filter(e => e.t < (e.life ?? (e.kind === 'ring' ? .9 : .32)));
     if (marker) { marker.t += dt; if (marker.t > 1.2) marker = null; }
     // A teleport or a zone change moves the hero far from the camera: jump there instead of gliding across the map.
@@ -3694,7 +3706,15 @@
       g.restore();
     }
     for (const p of parts) { const [sx, sy] = w2s(p.x, p.y, p.z); g.globalAlpha = 1 - p.t / p.life; g.fillStyle = p.col; g.beginPath(); g.arc(sx, sy, p.size, 0, 6.283); g.fill(); } g.globalAlpha = 1;
-    for (const f of floaters) { const [sx, sy] = w2s(f.x, f.y, f.z + 30); g.globalAlpha = clamp(1.4 - f.t * 1.3, 0, 1); g.font = `${f.big ? 34 : 24}px "Lilita One", "Jua", Impact, sans-serif`; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = 'rgba(20,10,30,.9)'; g.strokeText(f.text, sx, sy); g.fillStyle = f.color; g.fillText(f.text, sx, sy); } g.globalAlpha = 1;
+    { const reduced = reducedMotion();                                   // numbers: pop, eased climb with a sideways arc, hold, late fade (DamageNumbers.pose)
+      g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
+      for (const f of floaters) {
+        const p = DamageNumbers.pose(f, reduced); if (!p.visible) continue;
+        const [sx, sy] = w2s(f.x, f.y, f.head + p.dz), size = Math.round(DamageNumbers.KINDS[f.kind].size * p.scale);
+        g.globalAlpha = p.alpha; g.font = `${size}px "Lilita One", "Jua", Impact, sans-serif`; g.lineWidth = Math.max(3, size / 5); g.strokeStyle = 'rgba(20,10,30,.9)';
+        const ty = Math.max(size + 4, sy);                              // a giant's head can be above the screen: keep its number readable
+        g.strokeText(f.text, sx + p.dx, ty); g.fillStyle = f.color; g.fillText(f.text, sx + p.dx, ty);
+      } g.globalAlpha = 1; }
     if (zdef.theme === 'frost') drawSnowfall(g, t);
     if (zdef.theme === 'fen') drawFireflies(g, t);
     if (zdef.theme === 'wyrd') drawWyrdWeather(g, t);
@@ -3943,7 +3963,7 @@
       if (!running || !Online.connected || hero.dead) return false;
       return Online.send({ type: 'use_item', item: id });
     },
-    floatHero(text, color = '#ffe066') { if (running && !hero.dead) floater(hero.x, hero.y, text, color, false); },
+    floatHero(text, color = '#ffe066') { if (running && !hero.dead) floater(hero.x, hero.y, text, color, false, 'banner', 118); },
     equipSlot(slot, item) {
       if (!running || !Online.connected || hero.dead) return false;
       return Online.send({ type: 'equip', slots: { [slot]: item } });
@@ -3971,7 +3991,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
-    _debug: { get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, drawLootPillar, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
+    _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, drawLootPillar, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
   };
   window.Field = Field;
 })();
