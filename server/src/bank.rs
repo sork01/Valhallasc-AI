@@ -50,7 +50,17 @@ impl Bank {
     pub fn next_price(&self) -> Option<u32> {
         EXPANSION_PRICES.get(self.expansions as usize).copied()
     }
-    /// What the window and the character delete confirmation show: catalog items only.
+    /// What the character delete confirmation shows: how many items (units of catalog items) and how much gold.
+    pub fn summary(&self) -> (u64, u32) {
+        let items = self
+            .items
+            .iter()
+            .filter(|s| item(&s.item).is_some())
+            .map(|s| s.quantity as u64)
+            .sum();
+        (items, self.gold)
+    }
+    /// What the window shows: catalog items only.
     pub fn view(&self) -> Value {
         let items: Vec<_> = self
             .items
@@ -63,7 +73,8 @@ impl Bank {
             .filter(|g| item(&g.item).is_some())
             .collect();
         json!({"items":items,"gear":gear,"gold":self.gold,"expansions":self.expansions,
-            "used":self.used(),"capacity":self.capacity(),"nextPrice":self.next_price()})
+            "used":self.used(),"capacity":self.capacity(),"nextPrice":self.next_price(),
+            "expansionCells":EXPANSION_CELLS,"expansionsMax":EXPANSION_PRICES.len()})
     }
     fn add(&mut self, id: &str, quantity: u32) -> Result<(), &'static str> {
         if let Some(stack) = self.items.iter_mut().find(|s| s.item == id) {
@@ -587,5 +598,42 @@ mod tests {
         c.next_gear_id = 1;
         c.materialize_gear_instances();
         assert!(c.next_gear_id > c.bank.gear.iter().map(|g| g.id).max().unwrap());
+    }
+    #[test]
+    fn the_window_gets_the_size_of_an_expansion_and_how_many_there_are() {
+        let view = Bank::default().view();
+        assert_eq!(view["expansionCells"], EXPANSION_CELLS);
+        assert_eq!(view["expansionsMax"], EXPANSION_PRICES.len());
+        assert_eq!(view["nextPrice"], EXPANSION_PRICES[0]);
+    }
+    #[test]
+    fn the_character_list_tells_the_delete_confirmation_what_the_bank_holds() {
+        let mut store = crate::store::Store::open(std::path::Path::new(":memory:")).unwrap();
+        let account = store.sso_account("Ann").unwrap();
+        let (mut c, _) = store
+            .create_for(
+                Some(&account.id),
+                crate::model::Look::default(),
+                Default::default(),
+            )
+            .unwrap();
+        assert_eq!(
+            store.account_characters(&account.id).unwrap()[0].bank,
+            (0, 0)
+        );
+        c.add_item("slime_gel", 7);
+        c.gold = 500;
+        c.bank_deposit("slime_gel", 5, None).unwrap();
+        c.bank_gold(true, 300).unwrap();
+        // An ID that has left the catalog is kept but never counted, as in the window.
+        c.bank.items.push(ItemStack {
+            item: "gone_from_the_catalog".into(),
+            quantity: 9,
+        });
+        store.save_many([&c].into_iter()).unwrap();
+        assert_eq!(
+            store.account_characters(&account.id).unwrap()[0].bank,
+            (5, 300)
+        );
     }
 }

@@ -79,7 +79,7 @@ def catalog_strings():
                     found.add(value)
     Text().feed((ROOT / 'client' / 'index.html').read_text())
     # UI text created in JavaScript (network text is translated only after it enters the UI).
-    for filename in ('game', 'account', 'city', 'quests', 'inventory', 'skillbar', 'quickuse', 'settings', 'online', 'social', 'syslog', 'attributes', 'weather', 'daynight'):
+    for filename in ('game', 'account', 'city', 'quests', 'inventory', 'skillbar', 'quickuse', 'settings', 'online', 'social', 'syslog', 'attributes', 'weather', 'daynight', 'bank'):
         source = (ROOT / 'client' / (filename + '.js')).read_text()
         for match in re.finditer(r"(?<![\\\w])(['\"])([^'\"\n]{3,180})\1", source):
             value = match[2]
@@ -148,7 +148,7 @@ def template_strings():
         source = pathlib.Path(filename).read_text().split('#[cfg(test)]')[0]
         for value in re.findall(r'"([^"\\\n]{4,220})"', source):
             add(value, r'\{[^{}]*\}')
-    for filename in ('game', 'account', 'city', 'quests', 'inventory', 'skillbar', 'quickuse', 'settings', 'online', 'social', 'syslog', 'attributes', 'weather', 'daynight'):
+    for filename in ('game', 'account', 'city', 'quests', 'inventory', 'skillbar', 'quickuse', 'settings', 'online', 'social', 'syslog', 'attributes', 'weather', 'daynight', 'bank'):
         source = (ROOT / 'client' / (filename + '.js')).read_text()
         for value in re.findall(r'`([^`\n]{4,220})`', source):
             add(value, r'\$\{[^{}]*\}')

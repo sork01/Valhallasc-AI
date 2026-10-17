@@ -71,7 +71,7 @@
           }
           characterGm = character?.gm === true; window.GM?.onSelf(character);
           callbacks.onWelcome?.(packet);
-          window.Social?.reset(); window.Trade?.reset(); window.Pvp?.reset(); window.Trade?.onSnapshot(character); send({ type: 'social', command: { op: 'refresh' } }); if (character?.pvpSupported) send({ type: 'pvp', command: { op: 'refresh' } });
+          window.Social?.reset(); window.Trade?.reset(); window.Bank?.reset(); window.Pvp?.reset(); window.Trade?.onSnapshot(character); send({ type: 'social', command: { op: 'refresh' } }); if (character?.pvpSupported) send({ type: 'pvp', command: { op: 'refresh' } });
           $('connection-overlay').hidden = true; $('chat-input').disabled = false;
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
           log('Welcome to Greenmeadow. E: character · B/I: bags · K: skills · 1–9, 0, -, =: skillbar · Q: quests · O: friends · P: party · F: talk · Enter: chat (/p for party).');
@@ -96,12 +96,13 @@
         case 'debug': window.GM?.onReply(packet); break;
         case 'social': window.Social?.onState(packet); break;
         case 'trade': window.Trade?.onPacket(packet); break;
+        case 'bank': window.Bank?.onPacket(packet); break;
         case 'pvp': window.Pvp?.onPacket(packet); break;
         case 'roll': window.Rolls?.onPacket(packet); break;
         case 'party': window.Social?.onParty(packet.party); break;
         case 'who': window.Social?.onWho(packet.players); break;
         case 'error':
-          log(packet.text); window.Attributes?.error?.(); window.Rolls?.reopen();
+          log(packet.text); window.Attributes?.error?.(); window.Rolls?.reopen(); window.Bank?.onError(packet.text);
           if (packet.code === 'auth') { acct.session = null; accountList = []; persistAccount(); }
           if (packet.fatal) { fatal = true; connected = false; overlay(packet.text, true); status('Unable to enter world', false); ws.close(); }
           break;
@@ -112,7 +113,7 @@
       clearTimeout(joinTimeout);
       if (!active || currentGeneration !== generation) return;
       clearInterval(heartbeat);
-      connected = false; characterGm = false; window.GM?.onSelf(null); window.Attributes?.error?.(); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
+      connected = false; characterGm = false; window.GM?.onSelf(null); window.Attributes?.error?.(); window.Inventory?.hideTooltip(); window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); window.WorldMap?.close(false); window.Social?.reset(); window.Trade?.reset(); window.Bank?.reset(); window.Pvp?.reset(); window.Rolls?.reset(); window.City?.close(); $('equipment').hidden = true; $('chat-input').disabled = true; callbacks.onDisconnect?.();
       if (fatal) return;
       status('Disconnected · reconnecting…', false);
       overlay('Connection lost. Reconnecting to your character…');
@@ -125,7 +126,7 @@
       $('chat').hidden = false; connect();
     },
     stop() {
-      active = false; generation++; connected = false; id = null; window.Social?.reset(); window.Trade?.reset(); window.Pvp?.reset(); window.Rolls?.reset();
+      active = false; generation++; connected = false; id = null; window.Social?.reset(); window.Trade?.reset(); window.Bank?.reset(); window.Pvp?.reset(); window.Rolls?.reset();
       clearTimeout(retryTimer); clearInterval(heartbeat);
       socket?.close(); socket = null;
       $('chat').hidden = true; $('connection-overlay').hidden = true;
@@ -154,7 +155,7 @@
       slot.skillSlots = [...slots]; if (level) slot.skillLevel = level; persistSlot();
     },
     get characters() {
-      return mode === 'account' ? accountList.map(c => ({ key: c.id, look: { ...c.look }, level: c.level, gm: c.gm === true }))
+      return mode === 'account' ? accountList.map(c => ({ key: c.id, look: { ...c.look }, level: c.level, gm: c.gm === true, bank: c.bank }))
         : saved.characters.map(c => ({ key: c.token, look: { ...c.look } }));
     },
     // ----- accounts -----

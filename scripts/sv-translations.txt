@@ -6905,5 +6905,21 @@
   "You cannot use the bank while travelling.": "Du kan inte använda banken under en resa.",
   "You do not carry that much gold.": "Du bär inte på så mycket guld.",
   "You need more gold for this expansion.": "Du behöver mer guld för den här utvidgningen.",
-  "Your bags are full. Make room first.": "Dina väskor är fulla. Gör plats först."
+  "Your bags are full. Make room first.": "Dina väskor är fulla. Gör plats först.",
+  "Bank": "Bank",
+  "Bags": "Väskor",
+  "Close": "Stäng",
+  "Close the bank": "Stäng banken",
+  "Gold in the bank:": "Guld i banken:",
+  "Amount of gold": "Summa guld",
+  "Deposit gold": "Sätt in guld",
+  "Withdraw gold": "Ta ut guld",
+  "Sort by kind, level and name": "Sortera efter sort, nivå och namn",
+  "Click an item to move it. Shift-click moves the whole stack.": "Klicka på en sak för att flytta den. Skift-klick flyttar hela högen.",
+  "Choose which copy to store.": "Välj vilket exemplar som ska läggas in.",
+  "Choose which copy to take.": "Välj vilket exemplar som ska tas ut.",
+  "Store": "Lägg in",
+  "Take": "Ta ut",
+  "Click to take · Shift-click takes all": "Klicka för att ta ut · Skift-klick tar ut allt",
+  "Click to store · Shift-click stores all": "Klicka för att lägga in · Skift-klick lägger in allt"
 }

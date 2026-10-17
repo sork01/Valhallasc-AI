@@ -115,7 +115,7 @@ fn account_json(
         // A game master's account has one more slot, for the administrator character.
         "max":MAX_ACCOUNT_CHARACTERS,
         "gm":account.is_gm(),
-        "characters":characters.iter().map(|c| json!({"id":c.id,"look":c.look,"level":c.level,"gm":c.gm})).collect::<Vec<_>>(),
+        "characters":characters.iter().map(|c| json!({"id":c.id,"look":c.look,"level":c.level,"gm":c.gm,"bank":{"items":c.bank.0,"gold":c.bank.1}})).collect::<Vec<_>>(),
     }))
     .into_response()
 }

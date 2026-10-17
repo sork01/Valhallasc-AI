@@ -49,6 +49,11 @@
   const wornCopy = (slot, i) => copiesOf(i)[slots.filter(([s]) => s !== slot && itemAtSlot(s)?.id === i?.id && slots.findIndex(([key]) => key === s) < slots.findIndex(([key]) => key === slot)).length];
   const displayCopy = (i, slot) => slot ? wornCopy(slot, i) : looseCopy(i);
   const displayRarity = (i, slot) => displayCopy(i, slot)?.rarity || i?.rarity || 'common';
+  // The colour of a cell holding `copies` of `i` (an epic copy shows first, as in the bags).
+  const bestRarity = (i, copies) => (copies.find(g => g.rarity === 'epic') || copies[0])?.rarity || i?.rarity || 'common';
+  // What the bank window needs of the bags: the loose units (worn ones stay on the hero) and the loose gear copies.
+  const looseStacks = () => stacks.map(s => ({ item: s.item, quantity: bagQuantity(s.item) })).filter(s => s.quantity > 0 && definition(s.item));
+  const looseCopies = id => copiesOf(definition(id)).slice(equippedCount(definition(id)));
   const copyStats = g => ({ attack:g.attack * (1 + g.rank * .04), defense:g.defense * (1 + g.rank * .04), bonusStats:Object.fromEntries(statNames.map(k => [k, Math.round(((g.bonusStats?.[k] || 0) + (g.rolledStats?.[k] || 0)) * (1 + g.rank * .04))])) });
   const canEquip = () => Online.connected && !Field.hero?.dead;
   function node(tag, text = '', cls) { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; }
@@ -115,9 +120,10 @@
     let t = $('item-tooltip'); if (!t) { t = node('div', '', 'item-tooltip'); t.id = 'item-tooltip'; t.role = 'tooltip'; t.hidden = true; document.body.append(t); } return t;
   }
   function hideTooltip() { if ($('item-tooltip')) $('item-tooltip').hidden = true; }
-  function showTooltip(anchor, i, slot) {
+  // `where` is set for the bank window: the item's copies and count there replace the bag lookups and the sale line.
+  function showTooltip(anchor, i, slot, where) {
     if (!i) return;
-    const copy = displayCopy(i, slot), rarity = displayRarity(i, slot);
+    const copy = where ? where.copies[0] : displayCopy(i, slot), rarity = where ? bestRarity(i, where.copies) : displayRarity(i, slot);
     const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || (i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
     if (consumable(i)) t.append(node('p', effect(i)));
     else if (licence(i)) t.append(node('p', `Grants the ${i.mount} mount · bound to you, cannot be traded or sold · needs level ${i.requiredLevel}`));
@@ -134,25 +140,26 @@
         t.append(node('p', `Compared with ${current.name}: ${attack >= 0 ? '+' : ''}${attack} attack · ${defense >= 0 ? '+' : ''}${defense} defense${bonus ? ` · ${bonus}` : ''}`, 'item-comparison'));
       }
     }
-    t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', `Sells for ${saleValue(i)} gold${copy ? ' for the next loose copy' : ' each'}`));
+    if (where) t.append(node('p', `${where.count} ${where.in}`));
+    else t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', `Sells for ${saleValue(i)} gold${copy ? ' for the next loose copy' : ' each'}`));
     if (compatible(i)) {
-      const copies=gearInstances.filter(g=>g.item===i.id);
+      const copies = where ? where.copies : gearInstances.filter(g=>g.item===i.id);
       for(const [index,g] of copies.entries()) {
         if(i.source!=='orange_pool'&&index>=3)break;
-        t.append(node('small',`Copy #${g.id} · ${index<equippedCount(i)?'equipped · ':''}${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}`));
+        t.append(node('small',`Copy #${g.id} · ${!where&&index<equippedCount(i)?'equipped · ':''}${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}`));
       }
       if(i.source!=='orange_pool'&&copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
     }
-    t.append(node('small', licence(i) ? 'Right-click or double-click to use' : consumable(i) ? 'Right-click or double-click to use · Z / X on the quick slots' : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
+    t.append(node('small', where ? where.hint : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? 'Right-click or double-click to use · Z / X on the quick slots' : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
     t.hidden = false;
     const r = anchor.getBoundingClientRect(), tr = t.getBoundingClientRect();
     t.style.left = Math.max(8, Math.min(innerWidth - tr.width - 8, r.right + 10)) + 'px';
     t.style.top = Math.max(8, Math.min(innerHeight - tr.height - 8, r.top)) + 'px';
     anchor.setAttribute('aria-describedby', t.id);
   }
-  function attachTooltip(anchor, getItem, slot) {
-    anchor.addEventListener('pointerenter', () => showTooltip(anchor, getItem(), slot));
-    anchor.addEventListener('focus', () => showTooltip(anchor, getItem(), slot));
+  function attachTooltip(anchor, getItem, slot, getWhere) {
+    anchor.addEventListener('pointerenter', () => showTooltip(anchor, getItem(), slot, getWhere?.()));
+    anchor.addEventListener('focus', () => showTooltip(anchor, getItem(), slot, getWhere?.()));
     anchor.addEventListener('pointerleave', hideTooltip); anchor.addEventListener('blur', hideTooltip);
   }
   function equip(i, slot) {
@@ -351,6 +358,12 @@
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(a).kind.localeCompare(definition(b).kind) || definition(a).name.localeCompare(definition(b).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
   window.Inventory = { cooldownLeft, tickCooldowns, quantity, bagQuantity, effect, render, renderShop, renderEquipped, renderSets, hideTooltip,
+    icon, definition, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}`,
+    // The bag side of a bank answer, which arrives before the next snapshot; the look and the set counts stay as they were.
+    updateBags(next, nextSlots = {}, nextBags = [], nextInstances = []) {
+      if (!look) return;
+      this.update(next, look, nextSlots, nextBags, nextInstances, setCounts);
+    },
     update(next, nextLook, nextSlots = {}, nextBags = [], nextInstances = [], nextSets = {}) {
       const key = JSON.stringify([next, nextLook, nextSlots, nextBags, nextInstances, nextSets]); if (key === signature) return;
       stacks = next; look = nextLook; gearSlots = nextSlots; bags = nextBags; gearInstances=nextInstances; setCounts=nextSets; signature = key;

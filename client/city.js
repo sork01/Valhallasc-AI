@@ -484,6 +484,10 @@
       };
       for(const offer of npc.offers){
         if(offer.bag)continue;
+        if(offer.id==='bank') {
+          const b=row('coin',offer.label||'Open the bank','');
+          b.dataset.offer='bank';b.addEventListener('click',()=>{if(window.Bank?.open(npc))b.disabled=true;});offers.push(b);continue;
+        }
         if(offer.id==='stat_reset') {
           const b=row('coin','Reset trained attributes',`${(packet.statResetPrice||0).toLocaleString()} gold`);
           b.dataset.view='stat_reset';b.addEventListener('click',()=>show({kind:'stat_reset'},'#npc-back'));offers.push(b);continue;

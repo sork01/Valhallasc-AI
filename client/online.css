@@ -702,3 +702,51 @@
 .trade-panel :focus-visible, .trade-request :focus-visible { outline:3px solid #ffdc87; outline-offset:2px; }
 .inventory-item .item-cooldown { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; color: white; font: 1.4cqw 'Jua', sans-serif; text-shadow: 0 1px 3px black; }
 .inventory-item.on-cooldown .item-tile { filter: brightness(.55); }
+
+/* Bank (docs/bank.md): two grids side by side, one beside the other under 760px. Sizes keep a pixel floor so a phone stays readable. */
+#bank-panel { z-index: 49; }
+.bank-panel { position: static; display: flex; flex-direction: column; width: min(96cqw, max(62cqw, 700px)); max-height: 94cqh; padding: 0; overflow: hidden; border: .3cqw solid #5a4a30; border-radius: .7cqw; background: #261e15; color: #eee3cb; font: max(13px, 1cqw) 'Jua', sans-serif; box-shadow: 0 .6cqw 2cqw #000a, inset 0 0 0 1px #b99d5c55; }
+.bank-panel .gossip-titlebar h3 { margin: 0; font: bold max(14px, 1.45cqw) Georgia, 'Palatino Linotype', serif; color: #f0d59b; text-shadow: 0 2px 2px #000; text-align: center; }
+.bank-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; padding: 12px; overflow: auto; min-height: 0; }
+.bank-side { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.bank-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.bank-head h4 { margin: 0; color: #ffe6a8; }
+.bank-head span { color: #b7a27e; font-size: max(12px, .85cqw); }
+.bank-head .bags-full { color: #eb9b76; }
+.bank-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 4px; max-height: clamp(180px, 36cqh, 420px); overflow: auto; padding: 6px; border: 1px solid #655d47; background: #080c0ebd; scrollbar-width: thin; }
+.bank-grid .item-tile { padding: 3px; }
+.bank-grid .item-stack { font-size: max(11px, .9cqw); bottom: 2px; right: 3px; }
+.bank-grid .bag-cell-empty { min-height: 46px; }
+.bank-grid .item-tile[aria-disabled="true"] { opacity: .5; }
+.bank-grid.drop-ready { outline: 2px dashed #efdb96; outline-offset: 1px; }
+.bank-gold p, .bank-expansion p, .bank-purse { margin: 0 0 4px; }
+.bank-gold b { color: #ffd866; }
+.bank-gold-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.bank-panel input[type="number"] { width: 7.5em; min-height: 36px; padding: 4px 8px; border: 1px solid #696044; border-radius: 2px; background: #0b0f11; color: #e6dfca; font: 16px 'Jua', sans-serif; }
+.bank-panel .btn { min-height: 36px; padding: .3em .9em; font-size: max(13px, 1cqw); }
+.bank-expansion { padding-top: 6px; border-top: 1px solid #675b4055; }
+.bank-tools { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; padding: 0 12px; }
+.bank-tools label { display: flex; align-items: center; gap: 8px; }
+.bank-details { margin: 8px 12px 0; padding: 8px; min-height: 3.2em; border: 1px solid #675b4044; background: #080c0e80; }
+.bank-details .item-name { display: block; font-size: max(14px, 1.1cqw); }
+.bank-details .item-name[data-rarity="common"] { color: #c4c4c4; }
+.bank-details .item-name[data-rarity="uncommon"] { color: #4ad66d; }
+.bank-details .item-name[data-rarity="rare"] { color: #64b5ff; }
+.bank-details .item-name[data-rarity="epic"] { color: #b45cff; }
+.bank-details .item-name[data-rarity="legendary"] { color: #ff9a2e; }
+.bank-copy { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; padding: 3px 6px; border: 1px solid #675b4044; }
+.bank-copy[data-rarity="uncommon"] > span { color: #4ad66d; }
+.bank-copy[data-rarity="rare"] > span { color: #64b5ff; }
+.bank-copy[data-rarity="epic"] > span { color: #b45cff; }
+.bank-copy[data-rarity="legendary"] > span { color: #ff9a2e; }
+#bank-notice { min-height: 1.5em; margin: 6px 12px 0; }
+#bank-notice[data-state="error"] { color: #ffa08e; }
+#bank-notice[data-state="ok"] { color: #bfe8a8; }
+.bank-footer { display: flex; justify-content: flex-end; padding: 8px 12px; border-top: 1px solid #7e6b4355; }
+.bank-panel :focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }
+.bank-panel[aria-busy="true"] .bank-grid { opacity: .7; }
+@media (max-width: 760px) { .bank-body { grid-template-columns: minmax(0, 1fr); } .bank-grid { max-height: clamp(120px, 24cqh, 240px); } }
+@media (pointer: coarse) { .bank-panel .btn, .bank-panel .gossip-button, .bank-panel input[type="number"], .bank-panel .window-close { min-height: 44px; } .bank-panel .window-close { min-width: 44px; } }
+/* A landscape phone is about 390px tall: drop the second Close button (the title bar has one), tighten the rest and let the body scroll. */
+@media (max-height: 520px) { .bank-footer { display: none; } .bank-body { padding: 6px; gap: 8px; } .bank-grid { max-height: none; } .bank-tools { padding: 4px 6px 0; } .bank-details { min-height: 0; margin: 4px 6px 0; padding: 4px 8px; } #bank-notice { margin: 4px 6px; } }
+.bank-panel > .gossip-titlebar, .bank-tools, .bank-details, #bank-notice, .bank-footer { flex: 0 0 auto; }

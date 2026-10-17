@@ -80,7 +80,7 @@ All five name the banker the window was opened with (`npc`), and the server find
 | `bank_gold` | `npc`, `deposit`, `amount` | Gold between the purse and the bank's balance. |
 | `bank_expand` | `npc` | Buys the next expansion with carried gold. |
 
-Every answer is one `bank` packet: `ok`, `notice`, the bank (`items`, `gear`, `gold`, `expansions`, `used`, `capacity`, `nextPrice`) and the bag side (`gold`, `inventory`, `gearInstances`, `equipment`, `bags`, `bagCapacity`). A refused request still answers with the unchanged state, so a stale window repairs itself. A refusal before the bank is reached (defeated, in combat, mounted, travelling, out of range, the wrong NPC) is an `error` packet instead. The bank is in no snapshot and not in the `dialogue` packet.
+Every answer is one `bank` packet: `ok`, `notice`, the bank (`items`, `gear`, `gold`, `expansions`, `used`, `capacity`, `nextPrice`) and the bag side (`gold`, `inventory`, `gearInstances`, `equipment`, `bags`, `bagCapacity`). A refused request still answers with the unchanged state, so a stale window repairs itself. A refusal before the bank is reached (defeated, in combat, mounted, travelling, out of range, the wrong NPC) is an `error` packet instead. The bank is in no snapshot and not in the `dialogue` packet. The bank object also carries `expansionCells` (12) and `expansionsMax` (4), so the window never repeats those numbers. The account's character list (`/session`, `/login`) gives every character a `bank` of `{items, gold}` (units of catalog items and the gold balance) for the delete confirmation.
 
 A request is applied to a copy of the character, the copy is written with `Store::save_many` (as a trade does), and only then does it become the live character: if the write fails nothing has moved. The bank's gold and a copy's data are never read by any other system, and `materialize_gear_instances` keeps `next_gear_id` ahead of the banked copies' ids so an id is never given twice.
 
@@ -108,6 +108,17 @@ Placed by an idempotent script that `scripts/sync-world.cjs` runs, as `scripts/s
 Placed (`scripts/bank_npcs.py`): Alderhaven (39, 82.5) by the fountain, Skaldholm (78, 65.5), Nacrehold (98.5, 93.5), Astralhollow (61, 116), Asterion (88, 92), each at least 2.6 tiles from every NPC, 4 from every portal and 2.5 from every walked route, on clear ground. Every line ends with the quest rule ("Mind that a quest counts only what you carry, not what is in the bank."). The role of Asterion's banker is "Keeper of Weights", with the name "Archon Veyl".
 
 Each also answers when the bank is empty ("The strongroom is yours. Nothing is in it yet.") and when it is open to show the counts of cells used and free. The Swedish text for all of it is part of `BANK-NPC`.
+
+## The window (`BANK-UI`)
+
+`client/bank.js`, opened by the banker's "Open the bank" row (the gossip window closes when the answer arrives, the world stays paused). The bank grid is on the left and the bag grid on the right (one under the other when the screen is narrow); each shows its cells used and free.
+
+- **Click** moves the number in the quantity box (1 at first), **shift-click** the whole stack, **drag** to the other grid moves the box quantity. Enter and Shift+Enter do the same from the keyboard.
+- **Gear:** an ID with one loose copy moves like any item. With several loose copies, a click lists them (rarity, rank, stats) and each has its own Store or Take button, because the copies differ; shift-click moves them all, first copies first. Worn pieces never show on the bag side.
+- **Checks in the window** repeat the server's obvious refusals (a bad quantity, a full bank or bags, game master gear, gold you do not have) so they cost no round trip; the server still decides, and its own notices show in the same line.
+- **Gold:** one box with Deposit gold and Withdraw gold. **Expansion:** the next price, the cells it adds and a button, disabled with "You need N more gold." when the purse is short.
+- **Closing:** Escape, the cross, the Close button, walking more than 3.2 tiles from the banker, dying, changing zone or disconnecting. Keys typed in the window never reach the game's shortcuts. A refusal before the bank is reached (mounted, in combat) is shown in the banker's own window.
+- **Sort** (by kind, level, name) is only how this window draws the grids; nothing is stored.
 
 ## Verification hooks (for `BANK-SERVER` and `BANK-CHECK`)
 

@@ -271,6 +271,45 @@
         <p class="social-note">Changing either offer clears both confirmations. The exchange finishes only after both players confirm.</p>
       </section>
     </div>
+    <div class="pause" id="bank-panel" hidden>
+      <section class="panel bank-panel" role="dialog" aria-modal="true" aria-labelledby="bank-title">
+        <header class="gossip-titlebar">
+          <h3 id="bank-title">Bank</h3>
+          <button class="window-close" id="bank-x" type="button" aria-label="Close the bank">×</button>
+        </header>
+        <div class="bank-body">
+          <section class="bank-side" aria-labelledby="bank-bank-heading">
+            <header class="bank-head"><h4 id="bank-bank-heading">Bank</h4><span id="bank-capacity"></span></header>
+            <div id="bank-grid" class="bank-grid"></div>
+            <div class="bank-gold">
+              <p>Gold in the bank: <b id="bank-gold"></b></p>
+              <div class="bank-gold-row">
+                <input id="bank-gold-amount" type="number" min="1" step="1" value="100" aria-label="Amount of gold">
+                <button id="bank-gold-deposit" class="btn ghost" type="button">Deposit gold</button>
+                <button id="bank-gold-withdraw" class="btn ghost" type="button">Withdraw gold</button>
+              </div>
+            </div>
+            <div class="bank-expansion">
+              <p id="bank-expand-text"></p>
+              <button id="bank-expand" class="btn ghost" type="button"></button>
+              <p id="bank-expand-short" class="bag-empty-note"></p>
+            </div>
+          </section>
+          <section class="bank-side" aria-labelledby="bank-bags-heading">
+            <header class="bank-head"><h4 id="bank-bags-heading">Bags</h4><span id="bank-bag-capacity"></span></header>
+            <div id="bank-bag-grid" class="bank-grid"></div>
+            <p id="bank-purse" class="bank-purse"></p>
+          </section>
+        </div>
+        <div class="bank-tools">
+          <label>Quantity <input id="bank-quantity" type="number" min="1" step="1" value="1"></label>
+          <button id="bank-sort" class="btn ghost" type="button" aria-pressed="false">Sort by kind, level and name</button>
+        </div>
+        <div id="bank-details" class="bank-details"></div>
+        <p id="bank-notice" role="status" aria-live="polite"></p>
+        <footer class="bank-footer"><button id="bank-close" class="gossip-button" type="button">Close</button></footer>
+      </section>
+    </div>
     <div class="pause" id="pause" hidden>
       <div class="panel pause-panel" role="dialog" aria-modal="true" aria-label="Menu">
         <h3>World Menu</h3>
@@ -470,6 +509,7 @@
 <script src="gm.js"></script>
 <script src="spark.js"></script>
 <script src="city.js"></script>
+<script src="bank.js"></script>
 <script src="cityart.js"></script>
 <script src="asterionart.js"></script>
 <script src="moonwellart.js"></script>

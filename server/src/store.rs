@@ -377,6 +377,9 @@ impl Store {
                 look: v["look"].clone(),
                 level: v["level"].as_u64().unwrap_or(1) as u32,
                 gm: v["gm"].as_bool().unwrap_or(false),
+                bank: serde_json::from_value::<crate::bank::Bank>(v["bank"].clone())
+                    .unwrap_or_default()
+                    .summary(),
             });
         }
         Ok(list)
@@ -434,6 +437,8 @@ pub struct CharacterEntry {
     pub look: serde_json::Value,
     pub level: u32,
     pub gm: bool,
+    /// Items and gold in the character's bank, for the delete confirmation.
+    pub bank: (u64, u32),
 }
 pub(crate) fn unix_now() -> i64 {
     std::time::SystemTime::now()

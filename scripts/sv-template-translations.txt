@@ -201,5 +201,15 @@
   "{0}_decline": "{0}_decline",
   "{0}px \"Jua\", sans-serif": "{0}px \"Jua\", sans-serif",
   "{0}{1}: {2} Considers worn gear, passives and points already trained.": "{0}{1}: {2} Betraktar slitna redskap, passiva och redan tränade punkter.",
-  "✓ {0} {1} for your reward": "✓ {0} {1} för din belöning"
+  "✓ {0} {1} for your reward": "✓ {0} {1} för din belöning",
+  "{0} in the bank": "{0} i banken",
+  "{0} in your bags": "{0} i dina väskor",
+  "{0} ×{1} in the bank": "{0} ×{1} i banken",
+  "{0} ×{1} in your bags": "{0} ×{1} i dina väskor",
+  "Empty bank slot {0}": "Tom bankplats {0}",
+  "Copy #{0} · {1}": "Exemplar #{0} · {1}",
+  "Expansion {0} of {1}: +{2} cells for {3} gold. It is never refunded.": "Utvidgning {0} av {1}: +{2} platser för {3} guld. Den återbetalas aldrig.",
+  "The bank is at its largest: {0} cells.": "Banken är som störst: {0} platser.",
+  "Expand the bank · {0} gold": "Utöka banken · {0} guld",
+  "Deleting {0} also deletes the bank. Items in it: {1}. Gold in it: {2}. Press Really? to confirm.": "Om du tar bort {0} försvinner också banken. Saker i den: {1}. Guld i den: {2}. Tryck på Verkligen? för att bekräfta."
 }
