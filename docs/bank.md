@@ -25,7 +25,7 @@ Anything that sits loose in the bags:
 What cannot:
 
 - **Worn pieces.** Only gear above the worn count (`equipped_count`) can go in. The worn allocation is the **first copies of an ID in `gear_instances`**, so a deposit takes copies after those and a withdrawal appends to the end; neither can shift which copy is worn.
-- **Starter gear and game master gear**, the same refusal as a trade. The starter gear would otherwise be handed out again by `seed_inventory` on the next login.
+- **Starter gear and game master gear**, the same refusal as a trade. The starter pieces would otherwise be handed out again on the next login by `grant_missing_starters` (called from the store's `decode`) whenever none is in the bags and there is room.
 - **Fitted expansion bags** (they are in `bags`, not in the bags' items).
 - **Gold above what the character carries,** and anything not in the catalog.
 
