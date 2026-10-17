@@ -55,3 +55,7 @@ New pieces carry `gm` rarity, `requiredLevel` 1 and `sell` 0, golden art and 48Ã
 - The GM hits another player with normal damage in a duel, opt-in PvP and an arena match.
 - The GM's total defense meets the target, the highest-damage monster hit floors at 1, and the largest HP and attack values do not overflow, wrap or produce NaN.
 - A mercenary hired by the GM does not one-shot.
+
+## As built (2026-10-17, `GM-GEAR-DATA`)
+
+All eight pieces are in `world/items.txt` with the defense above (total 150,004). `GM_GEAR` has eight ids and `GM_SLOTS` maps the six non-look slots; `become_gm` wears everything, and `grant_missing_gm_gear` (run when a character is loaded) gives an older GM save the new pieces once and wears each one whose slot is empty, so a piece taken off on purpose stays off. Worn art exists only in the **Warrior** atlas (the administrator is always a male Warrior): `shoulders_gm`, `gloves_gm`, `pants_gm`, `necklace_gm`, `accessory_gm`, in PixelFlow groups `gm` (with the robe, hat, blade and pauldrons) and `gm2`, lazy-loaded. The client filter (`pieces()` in `magesprite.js`) accepts the variant of any `gm`-rarity item for its slot; on any other class the layer is simply absent. The greaves sit under the robe's skirt and show only at the boots and in the walk. Icons are in `scripts/make_item_sprites.py`.

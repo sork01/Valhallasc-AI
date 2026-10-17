@@ -9980,7 +9980,7 @@
     "class": "warrior",
     "variant": "gm",
     "attack": 0.0,
-    "defense": 12.0,
+    "defense": 40000.0,
     "starter": false
   },
   {
@@ -9993,7 +9993,7 @@
     "class": "warrior",
     "variant": "gm",
     "attack": 0.0,
-    "defense": 4.0,
+    "defense": 25000.0,
     "starter": false
   },
   {
@@ -10007,6 +10007,68 @@
     "variant": "gm",
     "attack": 10020.0,
     "defense": 10004.0,
+    "starter": false
+  },
+  {
+    "id": "warrior_shoulders_gm",
+    "name": "Golden Pauldrons of the Game Master",
+    "kind": "shoulders",
+    "rarity": "gm",
+    "requiredLevel": 1,
+    "sell": 0,
+    "class": "warrior",
+    "variant": "gm",
+    "attack": 0.0,
+    "defense": 15000.0,
+    "starter": false
+  },
+  {
+    "id": "warrior_gloves_gm",
+    "name": "Golden Gauntlets of the Game Master",
+    "kind": "gloves",
+    "rarity": "gm",
+    "requiredLevel": 1,
+    "sell": 0,
+    "class": "warrior",
+    "variant": "gm",
+    "attack": 0.0,
+    "defense": 15000.0,
+    "starter": false
+  },
+  {
+    "id": "gm_pants",
+    "name": "Golden Greaves of the Game Master",
+    "kind": "pants",
+    "rarity": "gm",
+    "requiredLevel": 1,
+    "sell": 0,
+    "variant": "gm",
+    "attack": 0.0,
+    "defense": 25000.0,
+    "starter": false
+  },
+  {
+    "id": "gm_necklace",
+    "name": "Golden Amulet of the Game Master",
+    "kind": "necklace",
+    "rarity": "gm",
+    "requiredLevel": 1,
+    "sell": 0,
+    "variant": "gm",
+    "attack": 0.0,
+    "defense": 10000.0,
+    "starter": false
+  },
+  {
+    "id": "gm_accessory",
+    "name": "Golden Signet of the Game Master",
+    "kind": "accessory",
+    "rarity": "gm",
+    "requiredLevel": 1,
+    "sell": 0,
+    "variant": "gm",
+    "attack": 0.0,
+    "defense": 10000.0,
     "starter": false
   },
   {

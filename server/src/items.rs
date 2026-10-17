@@ -407,10 +407,24 @@ pub fn material(kind: &str) -> &'static str {
 }
 /// The golden gear of the administrator character. Its rarity "gm" is not in `RARITIES`, so no enemy ever rolls it.
 pub const GM_RARITY: &str = "gm";
-pub const GM_GEAR: [&str; 3] = [
+pub const GM_GEAR: [&str; 8] = [
     "warrior_armor_gm",
     "warrior_headgear_gm",
     "warrior_weapon_gm",
+    "warrior_shoulders_gm",
+    "warrior_gloves_gm",
+    "gm_pants",
+    "gm_necklace",
+    "gm_accessory",
+];
+/// The equipment slot of each GM piece that is not part of the look's armor and weapon (see `docs/gm-gear.md`).
+const GM_SLOTS: [(&str, &str); 6] = [
+    ("headgear", "warrior_headgear_gm"),
+    ("shoulders", "warrior_shoulders_gm"),
+    ("gloves", "warrior_gloves_gm"),
+    ("pants", "gm_pants"),
+    ("necklace", "gm_necklace"),
+    ("accessory1", "gm_accessory"),
 ];
 /// Rarity tiers, lowest first. The catalog colours them gray, green, blue, purple and orange.
 pub const RARITIES: [&str; 5] = ["common", "uncommon", "rare", "epic", "legendary"];
@@ -1068,22 +1082,35 @@ impl Character {
             }
         }
     }
-    /// Turns a new character into the administrator character: a male Warrior named [GM]Sork wearing the golden robe,
-    /// top hat, sword and shield. Called by the store while the character is created, never for a loaded save.
+    /// Turns a new character into the administrator character: a male Warrior named [GM]Sork wearing the whole golden
+    /// set. Called by the store while the character is created, never for a loaded save.
     pub fn become_gm(&mut self) {
         self.gm = true;
         self.look.name = GM_NAME.into();
         self.look.class = Class::Warrior;
         self.look.gender = crate::model::Gender::Male;
         self.hp = self.max_hp();
+        let _ = self.look.equip("gm", "gm");
+        self.grant_missing_gm_gear();
+    }
+    /// Gives the administrator character every golden piece it does not own yet and wears each new piece whose slot is
+    /// empty (the set grew after the first GM was created). A piece the GM took off on purpose stays off, because it
+    /// is still owned.
+    pub fn grant_missing_gm_gear(&mut self) {
+        if !self.gm {
+            return;
+        }
         for id in GM_GEAR {
-            if self.quantity(id) == 0 {
-                self.add_item(id, 1);
+            if self.quantity(id) > 0 {
+                continue;
+            }
+            self.add_item(id, 1);
+            if let Some((slot, _)) = GM_SLOTS.iter().find(|(_, piece)| *piece == id) {
+                self.equipment
+                    .entry((*slot).into())
+                    .or_insert_with(|| id.into());
             }
         }
-        let _ = self.look.equip("gm", "gm");
-        self.equipment
-            .insert("headgear".into(), "warrior_headgear_gm".into());
         self.sync_look();
     }
     /// Gives a character the starter pieces of their class that they do not own yet (new catalog entries reach
@@ -1842,7 +1869,7 @@ mod tests {
     }
     #[test]
     fn game_master_gear_never_drops_and_the_gm_rarity_cannot_be_rolled() {
-        assert_eq!(GM_GEAR.len(), 3);
+        assert_eq!(GM_GEAR.len(), 8);
         for id in GM_GEAR {
             let i = item(id).expect("in the catalog");
             assert_eq!(
@@ -1864,6 +1891,61 @@ mod tests {
         assert!(
             ordinary
                 .equip_slots(&[("hands".into(), "warrior_weapon_gm".into())].into())
+                .is_err()
+        );
+    }
+    #[test]
+    fn game_master_set_fills_every_slot_and_meets_the_defense_target() {
+        let mut gm = character();
+        gm.become_gm();
+        for (slot, id) in GM_SLOTS {
+            assert_eq!(
+                gm.equipment.get(slot).map(String::as_str),
+                Some(id),
+                "{slot}"
+            );
+        }
+        assert_eq!(gm.look.pants, "gm");
+        assert_eq!(gm.look.necklace, "gm");
+        assert_eq!(gm.look.accessory, "gm");
+        assert_eq!(
+            (gm.look.shoulders.as_str(), gm.look.gloves.as_str()),
+            ("gm", "gm")
+        );
+        let piece_defense: f64 = GM_GEAR.iter().map(|id| item(id).unwrap().defense).sum();
+        assert_eq!(piece_defense, 150_004.);
+        assert!(gm.stats().1 >= 150_000., "{}", gm.stats().1);
+        assert!(gm.look.validate().is_ok());
+    }
+    #[test]
+    fn an_older_game_master_save_receives_the_new_golden_pieces_once() {
+        let mut gm = character();
+        gm.gm = true;
+        for id in &GM_GEAR[..3] {
+            gm.add_item(id, 1);
+        }
+        let _ = gm.look.equip("gm", "gm");
+        gm.equipment
+            .insert("headgear".into(), "warrior_headgear_gm".into());
+        gm.grant_missing_gm_gear();
+        for id in GM_GEAR {
+            assert_eq!(gm.quantity(id), 1, "{id}");
+        }
+        assert_eq!(gm.equipment.len(), 6);
+        // A piece taken off on purpose is not worn again on the next load.
+        gm.equipment.remove("gloves");
+        gm.grant_missing_gm_gear();
+        assert!(!gm.equipment.contains_key("gloves"));
+        assert_eq!(gm.quantity("warrior_gloves_gm"), 1);
+        // An ordinary character is never granted the set.
+        let mut other = character();
+        other.grant_missing_gm_gear();
+        assert!(GM_GEAR.iter().all(|id| other.quantity(id) == 0));
+        // Another player can neither wear the new pieces nor show their art.
+        other.add_item("gm_pants", 1);
+        assert!(
+            other
+                .equip_slots(&[("pants".into(), "gm_pants".into())].into())
                 .is_err()
         );
     }

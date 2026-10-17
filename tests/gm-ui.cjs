@@ -72,6 +72,7 @@ async function type(page, text) {
     const look = await sork.evaluate(() => Field.hero.look);
     check(look.name === '[GM]Sork' && look.class === 'warrior' && look.gender === 'male', 'the character is [GM]Sork, a male Warrior');
     check(look.warriorArmor === 'gm' && look.warriorWeapon === 'gm' && look.head === 'gm', 'it wears the golden robe, sword and shield and the golden top hat');
+    check(['shoulders', 'gloves', 'pants', 'necklace', 'accessory'].every(slot => look[slot] === 'gm'), 'and the golden pauldrons, gauntlets, greaves, amulet and signet');
     const sprite = await sork.evaluate(() => { const S = WarriorSprite; const s = new S({ meta: { frame: [8, 8], anchor: [4, 8], clips: {}, parts: {}, ramps: { hair: ['#111111', '#222222', '#333333', '#444444'], brow: ['#111111', '#222222', '#333333', '#444444'], skin: ['#111111', '#222222', '#333333', '#444444'] } }, parts: {} }, { warriorArmor: 'gm', warriorWeapon: 'gm', head: 'gm' }); return { armor: s.equipment.armor, weapon: s.equipment.weapon, head: s.equipment.head }; });
     check(sprite.armor === 'gm' && sprite.weapon === 'gm' && sprite.head === 'gm', 'the warrior sprite accepts all three golden pieces');
 

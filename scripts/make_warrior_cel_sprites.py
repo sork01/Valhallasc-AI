@@ -18,9 +18,9 @@ import cel_common as cc
 import generic_gear as gg
 from cel_common import V, unit, rig
 
-SLOTS = {'armor': ('crimson', 'azure', 'gm'), 'shoulders': ('crimson', 'azure', 'ironhide'), 'gloves': ('crimson', 'azure', 'duelist'),
+SLOTS = {'armor': ('crimson', 'azure', 'gm'), 'shoulders': ('crimson', 'azure', 'ironhide', 'gm'), 'gloves': ('crimson', 'azure', 'duelist', 'gm'),
          'head': ('crimson', 'azure', 'ironhide', 'gm'), 'weapon': ('sword', 'royal', 'gm'),
-         'pants': ('wayfarer',), 'necklace': ('moonstone',), 'accessory': ('amber',)}
+         'pants': ('wayfarer', 'gm'), 'necklace': ('moonstone', 'gm'), 'accessory': ('amber', 'gm')}
 MATS = {
     **cc.FACE_MATS,
     **gg.GEAR_MATS,
@@ -113,6 +113,8 @@ GEAR = {
 }
 GEAR['armor']['gm'] = {'name': 'Golden Robe of the Game Master', 'defense': 12}
 GEAR['head']['gm'] = {'name': 'Golden Top Hat', 'defense': 4}
+GEAR['shoulders']['gm'] = {'name': 'Golden Pauldrons of the Game Master', 'defense': 15000}
+GEAR['gloves']['gm'] = {'name': 'Golden Gauntlets of the Game Master', 'defense': 15000}
 
 
 def disc(centre, a1, a2, rx, ry, n=14):
@@ -469,6 +471,53 @@ def render_frame(clip, facing, k):
     for i in range(8):                  # studs round the rim
         t = i * math.pi / 4 + .39
         ink.plate(disc(centre + face_n * 1.1 + (a1 * math.cos(t) + a2 * math.sin(t)) * 10, a1, a2, .9, .9, 6), 'pearl', 3, True)
+    # The rest of the golden set: pauldrons, gauntlets, greaves, an amulet and a signet (the administrator is always this
+    # male Warrior, so these exist only in the Warrior atlas, as the layers `*_gm`).
+    ink = inks['shoulders_gm']
+    for key in 'LR':
+        j = joints[key]
+        sh = j['shoulder']
+        sx = -1 if key == 'L' else 1
+        out, upv = R @ V(sx, 0, 0), R @ V(0, 0, 1)
+        ink.bone(sh - out * .6 + upv * 2.8, sh + out * 6 - upv * 1.4, 6.4, 5.8, 'gilt', -1.0, 2)
+        ink.bone(sh + out * 2.6 + upv * .8, sh + out * 8.8 - upv * 4.2, 5.6, 4.8, 'brocade', -1.15, 2)
+        ink.bone(sh + out * 5.4 - upv * 2.6, sh + out * 7 - upv * 3.8, 5.2, 5.2, 'pearl', -1.3, 2)
+        ink.plate([sh + out * 3.2 + upv * 3.8, sh + out * 5 + upv * 11.6, sh + out * 7.2 + upv * 3.6], 'gilt', 3)
+        ink.plate([sh + out * 4 + upv * 4.2, sh + out * 5 + upv * 9, sh + out * 6.2 + upv * 4.1], 'pearl', 3, True)
+        ink.bone(sh + out * 3.2 + upv * 1.2, sh + out * 3.8 + upv * .8, 1.9, 1.9, 'ruby', -1.45, 3)
+    ink = inks['gloves_gm']
+    for key in 'LR':
+        j = joints[key]
+        hand = j['hand']
+        ink.bone(cuff(j, .52), hand + (j['elbow'] - hand) * .05, 3.7, 3.3, 'gilt', -.85, 2)
+        ink.bone(cuff(j, .54), cuff(j, .4), 4.4, 4.4, 'pearl', -1.0, 2)
+        ink.bone(cuff(j, .42), cuff(j, .38), 4.6, 4.6, 'ruby', -1.05, 2)
+        ink.bone(hand - R @ V(0, 0, 1.2), hand + R @ V(0, 0, 2.2), 3.1, 2.8, 'gilt', -.95, 3)
+        ink.bone(hand + R @ V(0, 0, .3), hand + R @ V(0, 0, .9), 1.5, 1.5, 'ruby', -1.2, 3)
+    ink = inks['pants_gm']
+    for key in 'LR':
+        j = joints[key]
+        hip, knee, ankle = j['hip'], j['knee'], j['ankle']
+        ink.bone(hip, knee, 4.2, 3.7, 'gilt', -.3, 2)
+        ink.bone(knee, ankle, 3.5, 2.9, 'brocade', -.3, 2)
+        ink.bone(knee + (hip - knee) * .1, knee + (ankle - knee) * .24, 3.9, 3.9, 'pearl', -.5, 2)
+        ink.bone(ankle + (knee - ankle) * .22, ankle + (knee - ankle) * .06, 3.2, 3.3, 'ruby', -.5, 2)
+        ink.bone(hip + (knee - hip) * .4, hip + (knee - hip) * .38, 1.5, 1.5, 'ruby', -.6, 3)
+    ink = inks['necklace_gm']
+    chain = [(-3.6, 2.6, 70), (-3.9, 4.6, 66.4), (-2.6, 6.0, 63.2), (0, 6.3, 61.6), (2.6, 6.0, 63.2), (3.9, 4.6, 66.4), (3.6, 2.6, 70)]
+    for a_, b_ in zip(chain, chain[1:]):
+        ink.bone(xf(a_), xf(b_), .85, .85, 'gilt', -1.6, 2)
+    back_ = [(-3.6, 2.6, 70), (-4, -1, 70.4), (-3.2, -3.6, 70.4), (0, -4.4, 70.4), (3.2, -3.6, 70.4), (4, -1, 70.4), (3.6, 2.6, 70)]
+    for a_, b_ in zip(back_, back_[1:]):
+        ink.bone(xf(a_), xf(b_), .55, .55, 'gilt', -1.2, 1)
+    ink.plate([xf(q) for q in [(0, 6.6, 66), (3.4, 6.6, 61.4), (0, 6.6, 55.6), (-3.4, 6.6, 61.4)]], 'gilt', 2)
+    ink.plate([xf(q) for q in [(0, 6.8, 64.4), (2.3, 6.8, 61.4), (0, 6.8, 57.6), (-2.3, 6.8, 61.4)]], 'ruby', 2, True)
+    ink.plate([xf(q) for q in [(0, 6.9, 64.4), (0, 6.9, 57.6), (-2.3, 6.9, 61.4)]], 'ruby', 3, True)
+    ink = inks['accessory_gm']
+    j = joints['L']
+    hand, up = j['hand'], R @ V(0, 0, 1)
+    ink.bone(hand + up * .8, hand + up * 1.6, 2.9, 2.8, 'gilt', -1.4, 2)
+    ink.bone(hand + up * 1.5, hand + up * 2.3, 2.1, 1.7, 'ruby', -1.6, 3)
     gg.draw(inks, R, xf, joints, head)
     flash = clip in ('hurt', 'die') and k == 0
     return {part: ink.resolve(flash) for part, ink in inks.items()}
@@ -481,7 +530,7 @@ def np_cross(a, b):
 NAKED = {slot: 'none' for slot in SLOTS}
 CRIMSON = {'armor': 'crimson', 'shoulders': 'crimson', 'gloves': 'crimson', 'head': 'crimson', 'weapon': 'sword'}
 AZURE = {'armor': 'azure', 'shoulders': 'azure', 'gloves': 'azure', 'head': 'azure', 'weapon': 'royal'}
-GM = {'armor': 'gm', 'shoulders': 'none', 'gloves': 'none', 'head': 'gm', 'weapon': 'gm'}
+GM = {'armor': 'gm', 'shoulders': 'gm', 'gloves': 'gm', 'head': 'gm', 'weapon': 'gm', 'pants': 'gm', 'necklace': 'gm', 'accessory': 'gm'}
 GENERIC = {'armor': 'crimson', 'shoulders': 'ironhide', 'gloves': 'duelist', 'head': 'ironhide', 'pants': 'wayfarer',
            'necklace': 'moonstone', 'accessory': 'amber', 'weapon': 'sword'}
 SHEET = cc.Sheet(
@@ -494,7 +543,8 @@ SHEET = cc.Sheet(
             'arms': ['ref_body', 'weapon_sword', 'weapon_royal'],
             'generic': ['ref_body', 'pants_wayfarer', 'shoulders_ironhide', 'gloves_duelist', 'head_ironhide'],
             'trinkets': ['ref_body', 'necklace_moonstone', 'accessory_amber'],
-            'gm': ['ref_body', 'armor_gm', 'head_gm', 'weapon_gm']},
+            'gm': ['ref_body', 'armor_gm', 'head_gm', 'weapon_gm', 'shoulders_gm'],
+            'gm2': ['ref_body', 'gloves_gm', 'pants_gm', 'necklace_gm', 'accessory_gm']},
     default_equip={'armor': 'crimson', 'shoulders': 'none', 'gloves': 'none', 'head': 'none', 'weapon': 'sword'},
     meta={'attack': {'duration': .42, 'impact': .21}, 'portrait': [57, 15, 46, 46]},
     combos=[('naked', NAKED), ('crimson', CRIMSON), ('azure', AZURE), ('generic', GENERIC), ('gm', GM)])

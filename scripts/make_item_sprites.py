@@ -921,6 +921,60 @@ def _(p):
     p.line((12, 43), (17, 38), 3.4, R.ruby); gem(p, 11, 44, R.ruby, 2.6)
 
 
+@shoulders('warrior_shoulders_gm')
+def _(p):
+    p.poly(bez([(3, 35), (2, 15), (14, 8), (25, 14)], 12) + [(24, 38), (12, 41)], R.gilt)
+    p.poly([(4, 27), (13, 22), (24, 25), (24, 31), (12, 29), (4, 32)], R.ivory)
+    p.poly([(5, 34), (14, 30), (24, 33), (24, 39), (13, 37), (6, 40)], R.brocade)
+    p.poly([(11, 11), (14, 3), (18, 12), (15, 20)], R.gilt, tone=3)
+    gem(p, 14, 18, R.ruby, 2.5)
+    p.dots([(7, 24), (19, 22), (9, 13)], R.gilt[3])
+
+
+@glove('warrior_gloves_gm')
+def _(p):
+    hand(p, R.gilt, None)
+    for y in (13, 18):
+        p.poly(ribbon([(14.5, y), (33.7, y)], 1.4), R.brocade, tone=1, edge=False)
+    p.poly([(12, 37), (36, 37), (40, 46), (8, 46)], R.ivory)
+    p.rect(11, 38, 37, 40, R.ruby[2]); gem(p, 24, 33, R.ruby, 2.4)
+    p.dots([(16, 25), (22, 24), (28, 25)], R.gilt[3])
+
+
+@icon('gm_pants', 'pants')
+def _(p):
+    p.poly([(11, 5), (37, 5), (39, 20), (35, 45), (26, 45), (24, 22), (22, 45), (13, 45), (9, 20)], R.gilt)
+    p.poly([(11, 5), (37, 5), (37.5, 10), (10.5, 10)], R.ruby)
+    p.rect(21, 6, 27, 10, R.gilt[3]); p.rect(23, 7, 25, 9, R.ruby[1])
+    p.poly([(11, 38), (23, 38), (22, 45), (13, 45)], R.ivory, flat=True, tone=2)
+    p.poly([(25, 38), (37, 38), (35, 45), (26, 45)], R.ivory, flat=True, tone=2)
+    p.poly([(28, 23), (35, 23), (34, 31), (28, 31)], R.brocade, tone=2, flat=True)
+    p.dots([(16, 14), (32, 14), (18, 30)], R.gilt[3])
+
+
+@icon('gm_necklace', 'necklace')
+def _(p):
+    p.poly(ribbon(bez([(5, 4), (6, 30), (24, 30), (42, 4)], 24), 2.6), R.gilt, edge=True)
+    for x, y in ((8.5, 14), (11, 21), (16, 26), (32, 26), (37, 21), (39.5, 14)):
+        p.ell(x, y, 2.1, 2.1, R.ivory)
+    p.poly([(24, 29), (33, 38), (24, 48), (15, 38)], R.gilt)
+    p.poly([(24, 32), (30, 38), (24, 45), (18, 38)], R.ruby)
+    p.poly([(24, 32), (24, 45), (18, 38)], R.ruby, tone=3, edge=False)
+
+
+@icon('gm_accessory', 'accessory')
+def _(p):
+    p.ell(24, 33, 15, 13, R.gilt)
+    hole = Painter.mask([(24 + 9 * math.cos(a / 24 * math.pi), 34 + 7.5 * math.sin(a / 24 * math.pi)) for a in range(48)])
+    p.a &= ~hole
+    inner = ndi.binary_dilation(hole, iterations=1) & ~hole & p.a
+    p.rgb[inner] = R.gilt[0]
+    p.poly([(24, 2), (36, 8), (36, 20), (24, 29), (12, 20), (12, 8)], R.gilt)
+    p.poly([(24, 5), (33, 10), (33, 19), (24, 26), (15, 19), (15, 10)], R.ruby)
+    p.poly([(24, 5), (15, 10), (15, 19), (24, 26)], R.ruby, tone=3, edge=False)
+    p.dots([(19, 11), (20, 10)], R.ruby[3]); p.dots([(18, 27), (30, 27)], R.gilt[3])
+
+
 # ---------------------------------------------------------------- output
 ORDER = list(ICONS)
 

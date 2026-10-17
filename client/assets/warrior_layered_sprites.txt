@@ -1080,6 +1080,26 @@
     "accessory_regearsolstice": {
       "png": "warrior_progression_accessory_regearsolstice.png",
       "depth": "warrior_progression_accessory_regearsolstice_depth.png"
+    },
+    "shoulders_gm": {
+      "png": "warrior_layered_shoulders_gm.png",
+      "depth": "warrior_layered_shoulders_gm_depth.png"
+    },
+    "gloves_gm": {
+      "png": "warrior_layered_gloves_gm.png",
+      "depth": "warrior_layered_gloves_gm_depth.png"
+    },
+    "pants_gm": {
+      "png": "warrior_layered_pants_gm.png",
+      "depth": "warrior_layered_pants_gm_depth.png"
+    },
+    "necklace_gm": {
+      "png": "warrior_layered_necklace_gm.png",
+      "depth": "warrior_layered_necklace_gm_depth.png"
+    },
+    "accessory_gm": {
+      "png": "warrior_layered_accessory_gm.png",
+      "depth": "warrior_layered_accessory_gm_depth.png"
     }
   },
   "gender": "male",
@@ -1118,6 +1138,10 @@
       "ironhide": {
         "name": "Ironhide Pauldrons",
         "defense": 2
+      },
+      "gm": {
+        "name": "Golden Pauldrons of the Game Master",
+        "defense": 15000
       }
     },
     "gloves": {
@@ -1136,6 +1160,10 @@
       "duelist": {
         "name": "Duelist Gloves",
         "defense": 1
+      },
+      "gm": {
+        "name": "Golden Gauntlets of the Game Master",
+        "defense": 15000
       }
     },
     "head": {
@@ -1417,46 +1445,86 @@
     "warrior_cel_die_se_arms": "c6bdd309abfb285a",
     "warrior_cel_die_se_generic": "0fbf8fbad1fb4568",
     "warrior_cel_die_se_trinkets": "636dddc3ea3c4757",
-    "warrior_cel_idle_s_gm": "92bc16a9d6a70f1c",
-    "warrior_cel_idle_sw_gm": "63d2602349cc04cc",
-    "warrior_cel_idle_w_gm": "329dc8bb19d076c3",
-    "warrior_cel_idle_nw_gm": "b7b8318e8fe79ece",
-    "warrior_cel_idle_n_gm": "e38f6c6d76fbb7a5",
-    "warrior_cel_idle_ne_gm": "e21714007224fb6f",
-    "warrior_cel_idle_e_gm": "8e516595bc3193bd",
-    "warrior_cel_idle_se_gm": "ca20e18271faffcb",
-    "warrior_cel_walk_s_gm": "83b79243be9cb157",
-    "warrior_cel_walk_sw_gm": "a3709aea455e8c10",
-    "warrior_cel_walk_w_gm": "4b11b6e74cf70374",
-    "warrior_cel_walk_nw_gm": "156871138939a1b5",
-    "warrior_cel_walk_n_gm": "20ac92d070e7f74b",
-    "warrior_cel_walk_ne_gm": "7942025ab75fb259",
-    "warrior_cel_walk_e_gm": "a327e4b5b1c51ce0",
-    "warrior_cel_walk_se_gm": "a992ba700a83ad7a",
-    "warrior_cel_attack_s_gm": "dda5a49d9b86ce31",
-    "warrior_cel_attack_sw_gm": "91b3cc4f98fad03f",
-    "warrior_cel_attack_w_gm": "a8d61bff497033ae",
-    "warrior_cel_attack_nw_gm": "071dc9fed3e53170",
-    "warrior_cel_attack_n_gm": "b308172e27e33a8a",
-    "warrior_cel_attack_ne_gm": "54aafa35c038020c",
-    "warrior_cel_attack_e_gm": "d871af63033e37a4",
-    "warrior_cel_attack_se_gm": "33d521e9d3f1acf0",
-    "warrior_cel_hurt_s_gm": "69bb8be294fe2f40",
-    "warrior_cel_hurt_sw_gm": "388902bc9b89bc55",
-    "warrior_cel_hurt_w_gm": "7e820caf4d15063b",
-    "warrior_cel_hurt_nw_gm": "4894525e8ed27278",
-    "warrior_cel_hurt_n_gm": "f253ff23fc55b4f8",
-    "warrior_cel_hurt_ne_gm": "2f93a2257165a261",
-    "warrior_cel_hurt_e_gm": "cea5215da400a740",
-    "warrior_cel_hurt_se_gm": "f8bf9f3e70a540d3",
-    "warrior_cel_die_s_gm": "6c0cb777211deaaf",
-    "warrior_cel_die_sw_gm": "1fb20c4a742773c0",
-    "warrior_cel_die_w_gm": "bd04a4a31efcd1ff",
-    "warrior_cel_die_nw_gm": "db53494fd2a6325c",
-    "warrior_cel_die_n_gm": "571c05b7e6a1cb21",
-    "warrior_cel_die_ne_gm": "922d2aa7961f0664",
-    "warrior_cel_die_e_gm": "ee2a48853c2cafcc",
-    "warrior_cel_die_se_gm": "484a7ef57c5ee451"
+    "warrior_cel_idle_s_gm": "cfccd26d8c95faa7",
+    "warrior_cel_idle_sw_gm": "8c97fc901a8d501e",
+    "warrior_cel_idle_w_gm": "5d191d0908a8a8cd",
+    "warrior_cel_idle_nw_gm": "f913ad4d72de7b57",
+    "warrior_cel_idle_n_gm": "27c2bea1d53261f0",
+    "warrior_cel_idle_ne_gm": "28680b6e87577fd0",
+    "warrior_cel_idle_e_gm": "325ff5960672a664",
+    "warrior_cel_idle_se_gm": "83eea40a075deeb1",
+    "warrior_cel_walk_s_gm": "cc24ff43872709ce",
+    "warrior_cel_walk_sw_gm": "accf620c30fc4b35",
+    "warrior_cel_walk_w_gm": "39a756d95d65c293",
+    "warrior_cel_walk_nw_gm": "45345a1d9b789f9b",
+    "warrior_cel_walk_n_gm": "6329720fe22b9b23",
+    "warrior_cel_walk_ne_gm": "8f9d0828928eb89f",
+    "warrior_cel_walk_e_gm": "3ab50ecf9ef84e0e",
+    "warrior_cel_walk_se_gm": "a2b2ff87d2968a7b",
+    "warrior_cel_attack_s_gm": "9d79f082363ca125",
+    "warrior_cel_attack_sw_gm": "36571c606abd9276",
+    "warrior_cel_attack_w_gm": "0dc5c7d61ff7f213",
+    "warrior_cel_attack_nw_gm": "f3fadc5f33764ce2",
+    "warrior_cel_attack_n_gm": "c18bb7bfc98607de",
+    "warrior_cel_attack_ne_gm": "bcfcd7500082cb12",
+    "warrior_cel_attack_e_gm": "c2031b3d529ea933",
+    "warrior_cel_attack_se_gm": "12a9a03db51abee9",
+    "warrior_cel_hurt_s_gm": "645e5c124eecc5c3",
+    "warrior_cel_hurt_sw_gm": "9ccabb56004bd2bc",
+    "warrior_cel_hurt_w_gm": "085d393fc0f32275",
+    "warrior_cel_hurt_nw_gm": "190d8870f3300de6",
+    "warrior_cel_hurt_n_gm": "fa7aa67ff0b93d66",
+    "warrior_cel_hurt_ne_gm": "403ce9942c83d5b8",
+    "warrior_cel_hurt_e_gm": "19fe65a385d742a8",
+    "warrior_cel_hurt_se_gm": "a82a09db068a4d78",
+    "warrior_cel_die_s_gm": "cfe10263add7dd25",
+    "warrior_cel_die_sw_gm": "f4a0b5a70af49167",
+    "warrior_cel_die_w_gm": "980fbf19368a2ab9",
+    "warrior_cel_die_nw_gm": "4755f44b0d8c1d3e",
+    "warrior_cel_die_n_gm": "f02753aeab062678",
+    "warrior_cel_die_ne_gm": "2fe32d68effc537c",
+    "warrior_cel_die_e_gm": "b55e68eb9e9d108c",
+    "warrior_cel_die_se_gm": "89c3ae3a6da2c13d",
+    "warrior_cel_idle_s_gm2": "c7257849aafe0303",
+    "warrior_cel_idle_sw_gm2": "040641838a50dfe7",
+    "warrior_cel_idle_w_gm2": "025f97195f48249a",
+    "warrior_cel_idle_nw_gm2": "cb1cbe74d0f841f8",
+    "warrior_cel_idle_n_gm2": "2bf5245ee18cf884",
+    "warrior_cel_idle_ne_gm2": "5da171ef771de3d6",
+    "warrior_cel_idle_e_gm2": "a1fbe9b6b393849e",
+    "warrior_cel_idle_se_gm2": "a81d860179ffd448",
+    "warrior_cel_walk_s_gm2": "4405462b1311fee7",
+    "warrior_cel_walk_sw_gm2": "5091ef9f57e9bfb0",
+    "warrior_cel_walk_w_gm2": "2c0286974af4c6db",
+    "warrior_cel_walk_nw_gm2": "0b5c5d2bb5db3e6d",
+    "warrior_cel_walk_n_gm2": "ea2fa963d77bba6f",
+    "warrior_cel_walk_ne_gm2": "151d69cc3d09218b",
+    "warrior_cel_walk_e_gm2": "3ac2d5ef29e76850",
+    "warrior_cel_walk_se_gm2": "4dae3e0f5c7d10e5",
+    "warrior_cel_attack_s_gm2": "dcdd6c80c9a6eb87",
+    "warrior_cel_attack_sw_gm2": "3b399b727e52595b",
+    "warrior_cel_attack_w_gm2": "43ec0b9f4032f01e",
+    "warrior_cel_attack_nw_gm2": "6dae705f94697290",
+    "warrior_cel_attack_n_gm2": "6b85e2e77c8cfe38",
+    "warrior_cel_attack_ne_gm2": "6809957a558c9919",
+    "warrior_cel_attack_e_gm2": "6fea323e78416884",
+    "warrior_cel_attack_se_gm2": "56de29545c6a4017",
+    "warrior_cel_hurt_s_gm2": "25a0eaea5c203678",
+    "warrior_cel_hurt_sw_gm2": "000b24dcf46b76ef",
+    "warrior_cel_hurt_w_gm2": "fa05268aa1f264a4",
+    "warrior_cel_hurt_nw_gm2": "e04c855fe2e83b61",
+    "warrior_cel_hurt_n_gm2": "937595d9dca69f3b",
+    "warrior_cel_hurt_ne_gm2": "43489a8467913a7d",
+    "warrior_cel_hurt_e_gm2": "9be57a6935c86f8a",
+    "warrior_cel_hurt_se_gm2": "e0ff36a5eac42eb2",
+    "warrior_cel_die_s_gm2": "9855685fc31c6214",
+    "warrior_cel_die_sw_gm2": "b39baee914234889",
+    "warrior_cel_die_w_gm2": "1aaba50de6371e01",
+    "warrior_cel_die_nw_gm2": "fb8f1f0438d2b88c",
+    "warrior_cel_die_n_gm2": "c8944611c30225d5",
+    "warrior_cel_die_ne_gm2": "e8d7bcb79648ba5a",
+    "warrior_cel_die_e_gm2": "0dec16114f93ec8b",
+    "warrior_cel_die_se_gm2": "a6a5dd820e7283cc"
   },
   "ramps": {
     "skin": [
@@ -1636,7 +1704,7 @@
   },
   "facing": "Same eight-direction formula and foot anchor as assassin_sprites.txt",
   "style": "2D Korean RPG anime cel illustration",
-  "editing": "Three PixelFlow sprites per clip and facing (warrior_cel_<clip>_<facing>_crimson|azure|arms|generic|trinkets|gm). ref_body layers are read-only context. build --replace discards edits.",
+  "editing": "Three PixelFlow sprites per clip and facing (warrior_cel_<clip>_<facing>_crimson|azure|arms|generic|trinkets|gm|gm2). ref_body layers are read-only context. build --replace discards edits.",
   "attack": {
     "duration": 0.42,
     "impact": 0.21
@@ -1886,7 +1954,12 @@
     "weapon_regearsolar",
     "weapon_regearsolstice",
     "weapon_regearthunder",
-    "weapon_regearvault"
+    "weapon_regearvault",
+    "shoulders_gm",
+    "gloves_gm",
+    "pants_gm",
+    "necklace_gm",
+    "accessory_gm"
   ],
   "gearSprites": {
     "pants_regearl50": {

@@ -1,7 +1,7 @@
 {
  "size": 48,
  "cols": 10,
- "rows": 90,
+ "rows": 91,
  "at": {
   "warrior_headgear_crimson": [
    0,
@@ -239,7620 +239,7640 @@
    8,
    5
   ],
-  "assassin_armor_shadow_l50_gray": [
+  "warrior_shoulders_gm": [
+   9,
+   5
+  ],
+  "warrior_gloves_gm": [
    0,
    6
+  ],
+  "gm_pants": [
+   1,
+   6
+  ],
+  "gm_necklace": [
+   2,
+   6
+  ],
+  "gm_accessory": [
+   3,
+   6
+  ],
+  "assassin_armor_shadow_l50_gray": [
+   0,
+   7
   ],
   "assassin_armor_moon_l50_green": [
    0,
-   6
+   7
   ],
   "assassin_armor_shadow_l50_blue": [
    0,
-   6
+   7
   ],
   "assassin_armor_moon_l50_purple": [
    0,
-   6
+   7
   ],
   "assassin_headgear_shadow_l50_gray": [
    1,
-   6
+   7
   ],
   "assassin_headgear_moon_l50_green": [
    1,
-   6
+   7
   ],
   "assassin_headgear_shadow_l50_blue": [
    1,
-   6
+   7
   ],
   "assassin_headgear_moon_l50_purple": [
    1,
-   6
+   7
   ],
   "assassin_gloves_shadow_l50_gray": [
    2,
-   6
+   7
   ],
   "assassin_gloves_moon_l50_green": [
    2,
-   6
+   7
   ],
   "assassin_gloves_shadow_l50_blue": [
    2,
-   6
+   7
   ],
   "assassin_gloves_moon_l50_purple": [
    2,
-   6
+   7
   ],
   "pants_wayfarer_l50_gray": [
    3,
-   6
+   7
   ],
   "pants_wayfarer_l50_green": [
    3,
-   6
+   7
   ],
   "pants_wayfarer_l50_blue": [
    3,
-   6
+   7
   ],
   "pants_wayfarer_l50_purple": [
    3,
-   6
+   7
   ],
   "necklace_moonstone_l50_gray": [
    4,
-   6
+   7
   ],
   "necklace_moonstone_l50_green": [
    4,
-   6
+   7
   ],
   "necklace_moonstone_l50_blue": [
    4,
-   6
+   7
   ],
   "necklace_moonstone_l50_purple": [
    4,
-   6
+   7
   ],
   "accessory_amber_l50_gray": [
    5,
-   6
+   7
   ],
   "accessory_amber_l50_green": [
    5,
-   6
+   7
   ],
   "accessory_amber_l50_blue": [
    5,
-   6
+   7
   ],
   "accessory_amber_l50_purple": [
    5,
-   6
+   7
   ],
   "assassin_armor_shadow_l25_gray": [
    6,
-   6
+   7
   ],
   "assassin_armor_moon_l25_green": [
    6,
-   6
+   7
   ],
   "assassin_armor_shadow_l25_blue": [
    6,
-   6
+   7
   ],
   "assassin_gloves_shadow_l25_gray": [
    7,
-   6
+   7
   ],
   "assassin_gloves_moon_l25_green": [
    7,
-   6
+   7
   ],
   "assassin_gloves_shadow_l25_blue": [
    7,
-   6
+   7
   ],
   "pants_wayfarer_l25_gray": [
    8,
-   6
+   7
   ],
   "pants_wayfarer_l25_green": [
    8,
-   6
+   7
   ],
   "pants_wayfarer_l25_blue": [
    8,
-   6
+   7
   ],
   "necklace_moonstone_l25_gray": [
    9,
-   6
+   7
   ],
   "necklace_moonstone_l25_green": [
    9,
-   6
+   7
   ],
   "necklace_moonstone_l25_blue": [
    9,
-   6
+   7
   ],
   "accessory_amber_l25_gray": [
    0,
-   7
+   8
   ],
   "accessory_amber_l25_green": [
    0,
-   7
+   8
   ],
   "accessory_amber_l25_blue": [
    0,
-   7
+   8
   ],
   "warrior_armor_crimson_l25_gray": [
    1,
-   7
+   8
   ],
   "warrior_armor_azure_l25_green": [
    1,
-   7
+   8
   ],
   "warrior_armor_crimson_l25_blue": [
    1,
-   7
+   8
   ],
   "warrior_gloves_crimson_l25_gray": [
    2,
-   7
+   8
   ],
   "warrior_gloves_azure_l25_green": [
    2,
-   7
+   8
   ],
   "warrior_gloves_crimson_l25_blue": [
    2,
-   7
+   8
   ],
   "mage_armor_apprentice_l25_gray": [
    3,
-   7
+   8
   ],
   "mage_armor_runic_l25_green": [
    3,
-   7
+   8
   ],
   "mage_armor_apprentice_l25_blue": [
    3,
-   7
+   8
   ],
   "mage_gloves_apprentice_l25_gray": [
    4,
-   7
+   8
   ],
   "mage_gloves_runic_l25_green": [
    4,
-   7
+   8
   ],
   "mage_gloves_apprentice_l25_blue": [
    4,
-   7
+   8
   ],
   "priest_armor_pilgrim_l25_gray": [
    5,
-   7
+   8
   ],
   "priest_armor_dawn_l25_green": [
    5,
-   7
+   8
   ],
   "priest_armor_pilgrim_l25_blue": [
    5,
-   7
+   8
   ],
   "priest_gloves_pilgrim_l25_gray": [
    6,
-   7
+   8
   ],
   "priest_gloves_dawn_l25_green": [
    6,
-   7
+   8
   ],
   "priest_gloves_pilgrim_l25_blue": [
    6,
-   7
+   8
   ],
   "hunter_armor_scout_l25_gray": [
    7,
-   7
+   8
   ],
   "hunter_armor_warden_l25_green": [
    7,
-   7
+   8
   ],
   "hunter_armor_scout_l25_blue": [
    7,
-   7
+   8
   ],
   "hunter_gloves_scout_l25_gray": [
    8,
-   7
+   8
   ],
   "hunter_gloves_warden_l25_green": [
    8,
-   7
+   8
   ],
   "hunter_gloves_scout_l25_blue": [
    8,
-   7
+   8
   ],
   "assassin_armor_shadow_l30_gray": [
    9,
-   7
+   8
   ],
   "assassin_armor_moon_l30_green": [
    9,
-   7
+   8
   ],
   "assassin_armor_shadow_l30_blue": [
    9,
-   7
+   8
   ],
   "assassin_armor_moon_l30_purple": [
    9,
-   7
+   8
   ],
   "assassin_gloves_shadow_l30_gray": [
    0,
-   8
+   9
   ],
   "assassin_gloves_moon_l30_green": [
    0,
-   8
+   9
   ],
   "assassin_gloves_shadow_l30_blue": [
    0,
-   8
+   9
   ],
   "assassin_gloves_moon_l30_purple": [
    0,
-   8
+   9
   ],
   "warrior_armor_crimson_l30_gray": [
    1,
-   8
+   9
   ],
   "warrior_armor_azure_l30_green": [
    1,
-   8
+   9
   ],
   "warrior_armor_crimson_l30_blue": [
    1,
-   8
+   9
   ],
   "warrior_armor_azure_l30_purple": [
    1,
-   8
+   9
   ],
   "warrior_gloves_crimson_l30_gray": [
    2,
-   8
+   9
   ],
   "warrior_gloves_azure_l30_green": [
    2,
-   8
+   9
   ],
   "warrior_gloves_crimson_l30_blue": [
    2,
-   8
+   9
   ],
   "warrior_gloves_azure_l30_purple": [
    2,
-   8
+   9
   ],
   "mage_armor_apprentice_l30_gray": [
    3,
-   8
+   9
   ],
   "mage_armor_runic_l30_green": [
    3,
-   8
+   9
   ],
   "mage_armor_apprentice_l30_blue": [
    3,
-   8
+   9
   ],
   "mage_armor_runic_l30_purple": [
    3,
-   8
+   9
   ],
   "mage_gloves_apprentice_l30_gray": [
    4,
-   8
+   9
   ],
   "mage_gloves_runic_l30_green": [
    4,
-   8
+   9
   ],
   "mage_gloves_apprentice_l30_blue": [
    4,
-   8
+   9
   ],
   "mage_gloves_runic_l30_purple": [
    4,
-   8
+   9
   ],
   "priest_armor_pilgrim_l30_gray": [
    5,
-   8
+   9
   ],
   "priest_armor_dawn_l30_green": [
    5,
-   8
+   9
   ],
   "priest_armor_pilgrim_l30_blue": [
    5,
-   8
+   9
   ],
   "priest_armor_dawn_l30_purple": [
    5,
-   8
+   9
   ],
   "priest_gloves_pilgrim_l30_gray": [
    6,
-   8
+   9
   ],
   "priest_gloves_dawn_l30_green": [
    6,
-   8
+   9
   ],
   "priest_gloves_pilgrim_l30_blue": [
    6,
-   8
+   9
   ],
   "priest_gloves_dawn_l30_purple": [
    6,
-   8
+   9
   ],
   "hunter_armor_scout_l30_gray": [
    7,
-   8
+   9
   ],
   "hunter_armor_warden_l30_green": [
    7,
-   8
+   9
   ],
   "hunter_armor_scout_l30_blue": [
    7,
-   8
+   9
   ],
   "hunter_armor_warden_l30_purple": [
    7,
-   8
+   9
   ],
   "hunter_gloves_scout_l30_gray": [
    8,
-   8
+   9
   ],
   "hunter_gloves_warden_l30_green": [
    8,
-   8
+   9
   ],
   "hunter_gloves_scout_l30_blue": [
    8,
-   8
+   9
   ],
   "hunter_gloves_warden_l30_purple": [
    8,
-   8
+   9
   ],
   "pants_wayfarer_l30_gray": [
    9,
-   8
+   9
   ],
   "pants_wayfarer_l30_green": [
    9,
-   8
+   9
   ],
   "pants_wayfarer_l30_blue": [
    9,
-   8
+   9
   ],
   "pants_wayfarer_l30_purple": [
    9,
-   8
+   9
   ],
   "necklace_moonstone_l30_gray": [
    0,
-   9
+   10
   ],
   "necklace_moonstone_l30_green": [
    0,
-   9
+   10
   ],
   "necklace_moonstone_l30_blue": [
    0,
-   9
+   10
   ],
   "necklace_moonstone_l30_purple": [
    0,
-   9
+   10
   ],
   "accessory_amber_l30_gray": [
    1,
-   9
+   10
   ],
   "accessory_amber_l30_green": [
    1,
-   9
+   10
   ],
   "accessory_amber_l30_blue": [
    1,
-   9
+   10
   ],
   "accessory_amber_l30_purple": [
    1,
-   9
+   10
   ],
   "assassin_armor_shadow_l35_gray": [
    2,
-   9
+   10
   ],
   "assassin_armor_moon_l35_green": [
    2,
-   9
+   10
   ],
   "assassin_armor_shadow_l35_blue": [
    2,
-   9
+   10
   ],
   "warrior_armor_crimson_l35_gray": [
    3,
-   9
+   10
   ],
   "warrior_armor_azure_l35_green": [
    3,
-   9
+   10
   ],
   "warrior_armor_crimson_l35_blue": [
    3,
-   9
+   10
   ],
   "mage_armor_apprentice_l35_gray": [
    4,
-   9
+   10
   ],
   "mage_armor_runic_l35_green": [
    4,
-   9
+   10
   ],
   "mage_armor_apprentice_l35_blue": [
    4,
-   9
+   10
   ],
   "priest_armor_pilgrim_l35_gray": [
    5,
-   9
+   10
   ],
   "priest_armor_dawn_l35_green": [
    5,
-   9
+   10
   ],
   "priest_armor_pilgrim_l35_blue": [
    5,
-   9
+   10
   ],
   "hunter_armor_scout_l35_gray": [
    6,
-   9
+   10
   ],
   "hunter_armor_warden_l35_green": [
    6,
-   9
+   10
   ],
   "hunter_armor_scout_l35_blue": [
    6,
-   9
+   10
   ],
   "assassin_gloves_shadow_l35_gray": [
    7,
-   9
+   10
   ],
   "assassin_gloves_moon_l35_green": [
    7,
-   9
+   10
   ],
   "assassin_gloves_shadow_l35_blue": [
    7,
-   9
+   10
   ],
   "warrior_gloves_crimson_l35_gray": [
    8,
-   9
+   10
   ],
   "warrior_gloves_azure_l35_green": [
    8,
-   9
+   10
   ],
   "warrior_gloves_crimson_l35_blue": [
    8,
-   9
+   10
   ],
   "mage_gloves_apprentice_l35_gray": [
    9,
-   9
+   10
   ],
   "mage_gloves_runic_l35_green": [
    9,
-   9
+   10
   ],
   "mage_gloves_apprentice_l35_blue": [
    9,
-   9
+   10
   ],
   "priest_gloves_pilgrim_l35_gray": [
    0,
-   10
+   11
   ],
   "priest_gloves_dawn_l35_green": [
    0,
-   10
+   11
   ],
   "priest_gloves_pilgrim_l35_blue": [
    0,
-   10
+   11
   ],
   "hunter_gloves_scout_l35_gray": [
    1,
-   10
+   11
   ],
   "hunter_gloves_warden_l35_green": [
    1,
-   10
+   11
   ],
   "hunter_gloves_scout_l35_blue": [
    1,
-   10
+   11
   ],
   "pants_wayfarer_l35_gray": [
    2,
-   10
+   11
   ],
   "pants_wayfarer_l35_green": [
    2,
-   10
+   11
   ],
   "pants_wayfarer_l35_blue": [
    2,
-   10
+   11
   ],
   "necklace_moonstone_l35_gray": [
    3,
-   10
+   11
   ],
   "necklace_moonstone_l35_green": [
    3,
-   10
+   11
   ],
   "necklace_moonstone_l35_blue": [
    3,
-   10
+   11
   ],
   "accessory_amber_l35_gray": [
    4,
-   10
+   11
   ],
   "accessory_amber_l35_green": [
    4,
-   10
+   11
   ],
   "accessory_amber_l35_blue": [
    4,
-   10
+   11
   ],
   "assassin_armor_shadow_l40_gray": [
    5,
-   10
+   11
   ],
   "assassin_armor_moon_l40_green": [
    5,
-   10
+   11
   ],
   "assassin_armor_shadow_l40_blue": [
    5,
-   10
+   11
   ],
   "assassin_armor_moon_l40_purple": [
    5,
-   10
+   11
   ],
   "warrior_armor_crimson_l40_gray": [
    6,
-   10
+   11
   ],
   "warrior_armor_azure_l40_green": [
    6,
-   10
+   11
   ],
   "warrior_armor_crimson_l40_blue": [
    6,
-   10
+   11
   ],
   "warrior_armor_azure_l40_purple": [
    6,
-   10
+   11
   ],
   "mage_armor_apprentice_l40_gray": [
    7,
-   10
+   11
   ],
   "mage_armor_runic_l40_green": [
    7,
-   10
+   11
   ],
   "mage_armor_apprentice_l40_blue": [
    7,
-   10
+   11
   ],
   "mage_armor_runic_l40_purple": [
    7,
-   10
+   11
   ],
   "priest_armor_pilgrim_l40_gray": [
    8,
-   10
+   11
   ],
   "priest_armor_dawn_l40_green": [
    8,
-   10
+   11
   ],
   "priest_armor_pilgrim_l40_blue": [
    8,
-   10
+   11
   ],
   "priest_armor_dawn_l40_purple": [
    8,
-   10
+   11
   ],
   "hunter_armor_scout_l40_gray": [
    9,
-   10
+   11
   ],
   "hunter_armor_warden_l40_green": [
    9,
-   10
+   11
   ],
   "hunter_armor_scout_l40_blue": [
    9,
-   10
+   11
   ],
   "hunter_armor_warden_l40_purple": [
    9,
-   10
+   11
   ],
   "assassin_gloves_shadow_l40_gray": [
    0,
-   11
+   12
   ],
   "assassin_gloves_moon_l40_green": [
    0,
-   11
+   12
   ],
   "assassin_gloves_shadow_l40_blue": [
    0,
-   11
+   12
   ],
   "assassin_gloves_moon_l40_purple": [
    0,
-   11
+   12
   ],
   "warrior_gloves_crimson_l40_gray": [
    1,
-   11
+   12
   ],
   "warrior_gloves_azure_l40_green": [
    1,
-   11
+   12
   ],
   "warrior_gloves_crimson_l40_blue": [
    1,
-   11
+   12
   ],
   "warrior_gloves_azure_l40_purple": [
    1,
-   11
+   12
   ],
   "mage_gloves_apprentice_l40_gray": [
    2,
-   11
+   12
   ],
   "mage_gloves_runic_l40_green": [
    2,
-   11
+   12
   ],
   "mage_gloves_apprentice_l40_blue": [
    2,
-   11
+   12
   ],
   "mage_gloves_runic_l40_purple": [
    2,
-   11
+   12
   ],
   "priest_gloves_pilgrim_l40_gray": [
    3,
-   11
+   12
   ],
   "priest_gloves_dawn_l40_green": [
    3,
-   11
+   12
   ],
   "priest_gloves_pilgrim_l40_blue": [
    3,
-   11
+   12
   ],
   "priest_gloves_dawn_l40_purple": [
    3,
-   11
+   12
   ],
   "hunter_gloves_scout_l40_gray": [
    4,
-   11
+   12
   ],
   "hunter_gloves_warden_l40_green": [
    4,
-   11
+   12
   ],
   "hunter_gloves_scout_l40_blue": [
    4,
-   11
+   12
   ],
   "hunter_gloves_warden_l40_purple": [
    4,
-   11
+   12
   ],
   "pants_wayfarer_l40_gray": [
    5,
-   11
+   12
   ],
   "pants_wayfarer_l40_green": [
    5,
-   11
+   12
   ],
   "pants_wayfarer_l40_blue": [
    5,
-   11
+   12
   ],
   "pants_wayfarer_l40_purple": [
    5,
-   11
+   12
   ],
   "necklace_moonstone_l40_gray": [
    6,
-   11
+   12
   ],
   "necklace_moonstone_l40_green": [
    6,
-   11
+   12
   ],
   "necklace_moonstone_l40_blue": [
    6,
-   11
+   12
   ],
   "necklace_moonstone_l40_purple": [
    6,
-   11
+   12
   ],
   "accessory_amber_l40_gray": [
    7,
-   11
+   12
   ],
   "accessory_amber_l40_green": [
    7,
-   11
+   12
   ],
   "accessory_amber_l40_blue": [
    7,
-   11
+   12
   ],
   "accessory_amber_l40_purple": [
    7,
-   11
+   12
   ],
   "assassin_armor_shadow_l45_gray": [
    8,
-   11
+   12
   ],
   "assassin_armor_moon_l45_green": [
    8,
-   11
+   12
   ],
   "assassin_armor_shadow_l45_blue": [
    8,
-   11
+   12
   ],
   "assassin_gloves_shadow_l45_gray": [
    9,
-   11
+   12
   ],
   "assassin_gloves_moon_l45_green": [
    9,
-   11
+   12
   ],
   "assassin_gloves_shadow_l45_blue": [
    9,
-   11
+   12
   ],
   "warrior_armor_crimson_l45_gray": [
    0,
-   12
+   13
   ],
   "warrior_armor_azure_l45_green": [
    0,
-   12
+   13
   ],
   "warrior_armor_crimson_l45_blue": [
    0,
-   12
+   13
   ],
   "warrior_headgear_crimson_l45_gray": [
    1,
-   12
+   13
   ],
   "warrior_headgear_azure_l45_green": [
    1,
-   12
+   13
   ],
   "warrior_headgear_crimson_l45_blue": [
    1,
-   12
+   13
   ],
   "warrior_gloves_crimson_l45_gray": [
    2,
-   12
+   13
   ],
   "warrior_gloves_azure_l45_green": [
    2,
-   12
+   13
   ],
   "warrior_gloves_crimson_l45_blue": [
    2,
-   12
+   13
   ],
   "mage_armor_apprentice_l45_gray": [
    3,
-   12
+   13
   ],
   "mage_armor_runic_l45_green": [
    3,
-   12
+   13
   ],
   "mage_armor_apprentice_l45_blue": [
    3,
-   12
+   13
   ],
   "mage_headgear_apprentice_l45_gray": [
    4,
-   12
+   13
   ],
   "mage_headgear_runic_l45_green": [
    4,
-   12
+   13
   ],
   "mage_headgear_apprentice_l45_blue": [
    4,
-   12
+   13
   ],
   "mage_gloves_apprentice_l45_gray": [
    5,
-   12
+   13
   ],
   "mage_gloves_runic_l45_green": [
    5,
-   12
+   13
   ],
   "mage_gloves_apprentice_l45_blue": [
    5,
-   12
+   13
   ],
   "priest_armor_pilgrim_l45_gray": [
    6,
-   12
+   13
   ],
   "priest_armor_dawn_l45_green": [
    6,
-   12
+   13
   ],
   "priest_armor_pilgrim_l45_blue": [
    6,
-   12
+   13
   ],
   "priest_headgear_pilgrim_l45_gray": [
    7,
-   12
+   13
   ],
   "priest_headgear_dawn_l45_green": [
    7,
-   12
+   13
   ],
   "priest_headgear_pilgrim_l45_blue": [
    7,
-   12
+   13
   ],
   "priest_gloves_pilgrim_l45_gray": [
    8,
-   12
+   13
   ],
   "priest_gloves_dawn_l45_green": [
    8,
-   12
+   13
   ],
   "priest_gloves_pilgrim_l45_blue": [
    8,
-   12
+   13
   ],
   "hunter_armor_scout_l45_gray": [
    9,
-   12
+   13
   ],
   "hunter_armor_warden_l45_green": [
    9,
-   12
+   13
   ],
   "hunter_armor_scout_l45_blue": [
    9,
-   12
+   13
   ],
   "hunter_headgear_scout_l45_gray": [
    0,
-   13
+   14
   ],
   "hunter_headgear_warden_l45_green": [
    0,
-   13
+   14
   ],
   "hunter_headgear_scout_l45_blue": [
    0,
-   13
+   14
   ],
   "hunter_gloves_scout_l45_gray": [
    1,
-   13
+   14
   ],
   "hunter_gloves_warden_l45_green": [
    1,
-   13
+   14
   ],
   "hunter_gloves_scout_l45_blue": [
    1,
-   13
+   14
   ],
   "pants_wayfarer_l45_gray": [
    2,
-   13
+   14
   ],
   "pants_wayfarer_l45_green": [
    2,
-   13
+   14
   ],
   "pants_wayfarer_l45_blue": [
    2,
-   13
+   14
   ],
   "necklace_moonstone_l45_gray": [
    3,
-   13
+   14
   ],
   "necklace_moonstone_l45_green": [
    3,
-   13
+   14
   ],
   "necklace_moonstone_l45_blue": [
    3,
-   13
+   14
   ],
   "accessory_amber_l45_gray": [
    4,
-   13
+   14
   ],
   "accessory_amber_l45_green": [
    4,
-   13
+   14
   ],
   "accessory_amber_l45_blue": [
    4,
-   13
+   14
   ],
   "warrior_armor_crimson_l50_gray": [
    5,
-   13
+   14
   ],
   "warrior_armor_azure_l50_green": [
    5,
-   13
+   14
   ],
   "warrior_armor_crimson_l50_blue": [
    5,
-   13
+   14
   ],
   "warrior_armor_azure_l50_purple": [
    5,
-   13
+   14
   ],
   "warrior_headgear_crimson_l50_gray": [
    6,
-   13
+   14
   ],
   "warrior_headgear_azure_l50_green": [
    6,
-   13
+   14
   ],
   "warrior_headgear_crimson_l50_blue": [
    6,
-   13
+   14
   ],
   "warrior_headgear_azure_l50_purple": [
    6,
-   13
+   14
   ],
   "warrior_gloves_crimson_l50_gray": [
    7,
-   13
+   14
   ],
   "warrior_gloves_azure_l50_green": [
    7,
-   13
+   14
   ],
   "warrior_gloves_crimson_l50_blue": [
    7,
-   13
+   14
   ],
   "warrior_gloves_azure_l50_purple": [
    7,
-   13
+   14
   ],
   "mage_armor_apprentice_l50_gray": [
    8,
-   13
+   14
   ],
   "mage_armor_runic_l50_green": [
    8,
-   13
+   14
   ],
   "mage_armor_apprentice_l50_blue": [
    8,
-   13
+   14
   ],
   "mage_armor_runic_l50_purple": [
    8,
-   13
+   14
   ],
   "mage_headgear_apprentice_l50_gray": [
    9,
-   13
+   14
   ],
   "mage_headgear_runic_l50_green": [
    9,
-   13
+   14
   ],
   "mage_headgear_apprentice_l50_blue": [
    9,
-   13
+   14
   ],
   "mage_headgear_runic_l50_purple": [
    9,
-   13
+   14
   ],
   "mage_gloves_apprentice_l50_gray": [
    0,
-   14
+   15
   ],
   "mage_gloves_runic_l50_green": [
    0,
-   14
+   15
   ],
   "mage_gloves_apprentice_l50_blue": [
    0,
-   14
+   15
   ],
   "mage_gloves_runic_l50_purple": [
    0,
-   14
+   15
   ],
   "priest_armor_pilgrim_l50_gray": [
    1,
-   14
+   15
   ],
   "priest_armor_dawn_l50_green": [
    1,
-   14
+   15
   ],
   "priest_armor_pilgrim_l50_blue": [
    1,
-   14
+   15
   ],
   "priest_armor_dawn_l50_purple": [
    1,
-   14
+   15
   ],
   "priest_headgear_pilgrim_l50_gray": [
    2,
-   14
+   15
   ],
   "priest_headgear_dawn_l50_green": [
    2,
-   14
+   15
   ],
   "priest_headgear_pilgrim_l50_blue": [
    2,
-   14
+   15
   ],
   "priest_headgear_dawn_l50_purple": [
    2,
-   14
+   15
   ],
   "priest_gloves_pilgrim_l50_gray": [
    3,
-   14
+   15
   ],
   "priest_gloves_dawn_l50_green": [
    3,
-   14
+   15
   ],
   "priest_gloves_pilgrim_l50_blue": [
    3,
-   14
+   15
   ],
   "priest_gloves_dawn_l50_purple": [
    3,
-   14
+   15
   ],
   "hunter_armor_scout_l50_gray": [
    4,
-   14
+   15
   ],
   "hunter_armor_warden_l50_green": [
    4,
-   14
+   15
   ],
   "hunter_armor_scout_l50_blue": [
    4,
-   14
+   15
   ],
   "hunter_armor_warden_l50_purple": [
    4,
-   14
+   15
   ],
   "hunter_headgear_scout_l50_gray": [
    5,
-   14
+   15
   ],
   "hunter_headgear_warden_l50_green": [
    5,
-   14
+   15
   ],
   "hunter_headgear_scout_l50_blue": [
    5,
-   14
+   15
   ],
   "hunter_headgear_warden_l50_purple": [
    5,
-   14
+   15
   ],
   "hunter_gloves_scout_l50_gray": [
    6,
-   14
+   15
   ],
   "hunter_gloves_warden_l50_green": [
    6,
-   14
+   15
   ],
   "hunter_gloves_scout_l50_blue": [
    6,
-   14
+   15
   ],
   "hunter_gloves_warden_l50_purple": [
    6,
-   14
+   15
   ],
   "assassin_armor_shadow_l40_cloister": [
    7,
-   14
+   15
   ],
   "assassin_headgear_shadow_l40_cloister": [
    8,
-   14
+   15
   ],
   "assassin_gloves_shadow_l40_cloister": [
    9,
-   14
+   15
   ],
   "warrior_armor_crimson_l40_cloister": [
    0,
-   15
+   16
   ],
   "warrior_headgear_crimson_l40_cloister": [
    1,
-   15
+   16
   ],
   "warrior_gloves_crimson_l40_cloister": [
    2,
-   15
+   16
   ],
   "mage_armor_apprentice_l40_cloister": [
    3,
-   15
+   16
   ],
   "mage_headgear_apprentice_l40_cloister": [
    4,
-   15
+   16
   ],
   "mage_gloves_apprentice_l40_cloister": [
    5,
-   15
+   16
   ],
   "priest_armor_pilgrim_l40_cloister": [
    6,
-   15
+   16
   ],
   "priest_headgear_pilgrim_l40_cloister": [
    7,
-   15
+   16
   ],
   "priest_gloves_pilgrim_l40_cloister": [
    8,
-   15
+   16
   ],
   "hunter_armor_scout_l40_cloister": [
    9,
-   15
+   16
   ],
   "hunter_headgear_scout_l40_cloister": [
    0,
-   16
+   17
   ],
   "hunter_gloves_scout_l40_cloister": [
    1,
-   16
+   17
   ],
   "pants_wayfarer_l40_cloister": [
    2,
-   16
+   17
   ],
   "necklace_moonstone_l40_cloister": [
    3,
-   16
+   17
   ],
   "accessory_amber_l40_cloister": [
    4,
-   16
+   17
   ],
   "assassin_armor_shadow_l45_reliquary": [
    5,
-   16
+   17
   ],
   "assassin_headgear_shadow_l45_reliquary": [
    6,
-   16
+   17
   ],
   "assassin_gloves_shadow_l45_reliquary": [
    7,
-   16
+   17
   ],
   "warrior_armor_crimson_l45_reliquary": [
    8,
-   16
+   17
   ],
   "warrior_headgear_crimson_l45_reliquary": [
    9,
-   16
+   17
   ],
   "warrior_gloves_crimson_l45_reliquary": [
    0,
-   17
+   18
   ],
   "mage_armor_apprentice_l45_reliquary": [
    1,
-   17
+   18
   ],
   "mage_headgear_apprentice_l45_reliquary": [
    2,
-   17
+   18
   ],
   "mage_gloves_apprentice_l45_reliquary": [
    3,
-   17
+   18
   ],
   "priest_armor_pilgrim_l45_reliquary": [
    4,
-   17
+   18
   ],
   "priest_headgear_pilgrim_l45_reliquary": [
    5,
-   17
+   18
   ],
   "priest_gloves_pilgrim_l45_reliquary": [
    6,
-   17
+   18
   ],
   "hunter_armor_scout_l45_reliquary": [
    7,
-   17
+   18
   ],
   "hunter_headgear_scout_l45_reliquary": [
    8,
-   17
+   18
   ],
   "hunter_gloves_scout_l45_reliquary": [
    9,
-   17
+   18
   ],
   "pants_wayfarer_l45_reliquary": [
    0,
-   18
+   19
   ],
   "necklace_moonstone_l45_reliquary": [
    1,
-   18
+   19
   ],
   "accessory_amber_l45_reliquary": [
    2,
-   18
+   19
   ],
   "assassin_armor_shadow_l50_nave": [
    3,
-   18
+   19
   ],
   "assassin_headgear_shadow_l50_nave": [
    4,
-   18
+   19
   ],
   "assassin_gloves_shadow_l50_nave": [
    5,
-   18
+   19
   ],
   "warrior_armor_crimson_l50_nave": [
    6,
-   18
+   19
   ],
   "warrior_headgear_crimson_l50_nave": [
    7,
-   18
+   19
   ],
   "warrior_gloves_crimson_l50_nave": [
    8,
-   18
+   19
   ],
   "mage_armor_apprentice_l50_nave": [
    9,
-   18
+   19
   ],
   "mage_headgear_apprentice_l50_nave": [
    0,
-   19
+   20
   ],
   "mage_gloves_apprentice_l50_nave": [
    1,
-   19
+   20
   ],
   "priest_armor_pilgrim_l50_nave": [
    2,
-   19
+   20
   ],
   "priest_headgear_pilgrim_l50_nave": [
    3,
-   19
+   20
   ],
   "priest_gloves_pilgrim_l50_nave": [
    4,
-   19
+   20
   ],
   "hunter_armor_scout_l50_nave": [
    5,
-   19
+   20
   ],
   "hunter_headgear_scout_l50_nave": [
    6,
-   19
+   20
   ],
   "hunter_gloves_scout_l50_nave": [
    7,
-   19
+   20
   ],
   "pants_wayfarer_l50_nave": [
    8,
-   19
+   20
   ],
   "necklace_moonstone_l50_nave": [
    9,
-   19
+   20
   ],
   "accessory_amber_l50_nave": [
    0,
-   20
+   21
   ],
   "assassin_shoulders_shadow_l45_gray": [
    1,
-   20
+   21
   ],
   "assassin_shoulders_moon_l45_green": [
    1,
-   20
+   21
   ],
   "assassin_shoulders_shadow_l45_blue": [
    1,
-   20
+   21
   ],
   "warrior_shoulders_crimson_l45_gray": [
    2,
-   20
+   21
   ],
   "warrior_shoulders_azure_l45_green": [
    2,
-   20
+   21
   ],
   "warrior_shoulders_crimson_l45_blue": [
    2,
-   20
+   21
   ],
   "mage_shoulders_apprentice_l45_gray": [
    3,
-   20
+   21
   ],
   "mage_shoulders_runic_l45_green": [
    3,
-   20
+   21
   ],
   "mage_shoulders_apprentice_l45_blue": [
    3,
-   20
+   21
   ],
   "priest_shoulders_pilgrim_l45_gray": [
    4,
-   20
+   21
   ],
   "priest_shoulders_dawn_l45_green": [
    4,
-   20
+   21
   ],
   "priest_shoulders_pilgrim_l45_blue": [
    4,
-   20
+   21
   ],
   "hunter_shoulders_scout_l45_gray": [
    5,
-   20
+   21
   ],
   "hunter_shoulders_warden_l45_green": [
    5,
-   20
+   21
   ],
   "hunter_shoulders_scout_l45_blue": [
    5,
-   20
+   21
   ],
   "assassin_shoulders_shadow_l50_gray": [
    6,
-   20
+   21
   ],
   "assassin_shoulders_moon_l50_green": [
    6,
-   20
+   21
   ],
   "assassin_shoulders_shadow_l50_blue": [
    6,
-   20
+   21
   ],
   "assassin_shoulders_moon_l50_purple": [
    6,
-   20
+   21
   ],
   "warrior_shoulders_crimson_l50_gray": [
    7,
-   20
+   21
   ],
   "warrior_shoulders_azure_l50_green": [
    7,
-   20
+   21
   ],
   "warrior_shoulders_crimson_l50_blue": [
    7,
-   20
+   21
   ],
   "warrior_shoulders_azure_l50_purple": [
    7,
-   20
+   21
   ],
   "mage_shoulders_apprentice_l50_gray": [
    8,
-   20
+   21
   ],
   "mage_shoulders_runic_l50_green": [
    8,
-   20
+   21
   ],
   "mage_shoulders_apprentice_l50_blue": [
    8,
-   20
+   21
   ],
   "mage_shoulders_runic_l50_purple": [
    8,
-   20
+   21
   ],
   "priest_shoulders_pilgrim_l50_gray": [
    9,
-   20
+   21
   ],
   "priest_shoulders_dawn_l50_green": [
    9,
-   20
+   21
   ],
   "priest_shoulders_pilgrim_l50_blue": [
    9,
-   20
+   21
   ],
   "priest_shoulders_dawn_l50_purple": [
    9,
-   20
+   21
   ],
   "hunter_shoulders_scout_l50_gray": [
    0,
-   21
+   22
   ],
   "hunter_shoulders_warden_l50_green": [
    0,
-   21
+   22
   ],
   "hunter_shoulders_scout_l50_blue": [
    0,
-   21
+   22
   ],
   "hunter_shoulders_warden_l50_purple": [
    0,
-   21
+   22
   ],
   "assassin_shoulders_shadow_l40_cloister": [
    1,
-   21
+   22
   ],
   "warrior_shoulders_crimson_l40_cloister": [
    2,
-   21
+   22
   ],
   "mage_shoulders_apprentice_l40_cloister": [
    3,
-   21
+   22
   ],
   "priest_shoulders_pilgrim_l40_cloister": [
    4,
-   21
+   22
   ],
   "hunter_shoulders_scout_l40_cloister": [
    5,
-   21
+   22
   ],
   "assassin_shoulders_shadow_l45_reliquary": [
    6,
-   21
+   22
   ],
   "warrior_shoulders_crimson_l45_reliquary": [
    7,
-   21
+   22
   ],
   "mage_shoulders_apprentice_l45_reliquary": [
    8,
-   21
+   22
   ],
   "priest_shoulders_pilgrim_l45_reliquary": [
    9,
-   21
+   22
   ],
   "hunter_shoulders_scout_l45_reliquary": [
    0,
-   22
+   23
   ],
   "assassin_shoulders_shadow_l50_nave": [
    1,
-   22
+   23
   ],
   "warrior_shoulders_crimson_l50_nave": [
    2,
-   22
+   23
   ],
   "mage_shoulders_apprentice_l50_nave": [
    3,
-   22
+   23
   ],
   "priest_shoulders_pilgrim_l50_nave": [
    4,
-   22
+   23
   ],
   "hunter_shoulders_scout_l50_nave": [
    5,
-   22
+   23
   ],
   "assassin_headgear_shadow_l25_gray": [
    6,
-   22
+   23
   ],
   "assassin_headgear_moon_l25_green": [
    6,
-   22
+   23
   ],
   "assassin_headgear_shadow_l25_blue": [
    6,
-   22
+   23
   ],
   "assassin_shoulders_shadow_l25_gray": [
    7,
-   22
+   23
   ],
   "assassin_shoulders_moon_l25_green": [
    7,
-   22
+   23
   ],
   "assassin_shoulders_shadow_l25_blue": [
    7,
-   22
+   23
   ],
   "warrior_headgear_crimson_l25_gray": [
    8,
-   22
+   23
   ],
   "warrior_headgear_azure_l25_green": [
    8,
-   22
+   23
   ],
   "warrior_headgear_crimson_l25_blue": [
    8,
-   22
+   23
   ],
   "warrior_shoulders_crimson_l25_gray": [
    9,
-   22
+   23
   ],
   "warrior_shoulders_azure_l25_green": [
    9,
-   22
+   23
   ],
   "warrior_shoulders_crimson_l25_blue": [
    9,
-   22
+   23
   ],
   "mage_headgear_apprentice_l25_gray": [
    0,
-   23
+   24
   ],
   "mage_headgear_runic_l25_green": [
    0,
-   23
+   24
   ],
   "mage_headgear_apprentice_l25_blue": [
    0,
-   23
+   24
   ],
   "mage_shoulders_apprentice_l25_gray": [
    1,
-   23
+   24
   ],
   "mage_shoulders_runic_l25_green": [
    1,
-   23
+   24
   ],
   "mage_shoulders_apprentice_l25_blue": [
    1,
-   23
+   24
   ],
   "priest_headgear_pilgrim_l25_gray": [
    2,
-   23
+   24
   ],
   "priest_headgear_dawn_l25_green": [
    2,
-   23
+   24
   ],
   "priest_headgear_pilgrim_l25_blue": [
    2,
-   23
+   24
   ],
   "priest_shoulders_pilgrim_l25_gray": [
    3,
-   23
+   24
   ],
   "priest_shoulders_dawn_l25_green": [
    3,
-   23
+   24
   ],
   "priest_shoulders_pilgrim_l25_blue": [
    3,
-   23
+   24
   ],
   "hunter_headgear_scout_l25_gray": [
    4,
-   23
+   24
   ],
   "hunter_headgear_warden_l25_green": [
    4,
-   23
+   24
   ],
   "hunter_headgear_scout_l25_blue": [
    4,
-   23
+   24
   ],
   "hunter_shoulders_scout_l25_gray": [
    5,
-   23
+   24
   ],
   "hunter_shoulders_warden_l25_green": [
    5,
-   23
+   24
   ],
   "hunter_shoulders_scout_l25_blue": [
    5,
-   23
+   24
   ],
   "assassin_headgear_shadow_l30_gray": [
    6,
-   23
+   24
   ],
   "assassin_headgear_moon_l30_green": [
    6,
-   23
+   24
   ],
   "assassin_headgear_shadow_l30_blue": [
    6,
-   23
+   24
   ],
   "assassin_headgear_moon_l30_purple": [
    6,
-   23
+   24
   ],
   "assassin_shoulders_shadow_l30_gray": [
    7,
-   23
+   24
   ],
   "assassin_shoulders_moon_l30_green": [
    7,
-   23
+   24
   ],
   "assassin_shoulders_shadow_l30_blue": [
    7,
-   23
+   24
   ],
   "assassin_shoulders_moon_l30_purple": [
    7,
-   23
+   24
   ],
   "warrior_headgear_crimson_l30_gray": [
    8,
-   23
+   24
   ],
   "warrior_headgear_azure_l30_green": [
    8,
-   23
+   24
   ],
   "warrior_headgear_crimson_l30_blue": [
    8,
-   23
+   24
   ],
   "warrior_headgear_azure_l30_purple": [
    8,
-   23
+   24
   ],
   "warrior_shoulders_crimson_l30_gray": [
    9,
-   23
+   24
   ],
   "warrior_shoulders_azure_l30_green": [
    9,
-   23
+   24
   ],
   "warrior_shoulders_crimson_l30_blue": [
    9,
-   23
+   24
   ],
   "warrior_shoulders_azure_l30_purple": [
    9,
-   23
+   24
   ],
   "mage_headgear_apprentice_l30_gray": [
    0,
-   24
+   25
   ],
   "mage_headgear_runic_l30_green": [
    0,
-   24
+   25
   ],
   "mage_headgear_apprentice_l30_blue": [
    0,
-   24
+   25
   ],
   "mage_headgear_runic_l30_purple": [
    0,
-   24
+   25
   ],
   "mage_shoulders_apprentice_l30_gray": [
    1,
-   24
+   25
   ],
   "mage_shoulders_runic_l30_green": [
    1,
-   24
+   25
   ],
   "mage_shoulders_apprentice_l30_blue": [
    1,
-   24
+   25
   ],
   "mage_shoulders_runic_l30_purple": [
    1,
-   24
+   25
   ],
   "priest_headgear_pilgrim_l30_gray": [
    2,
-   24
+   25
   ],
   "priest_headgear_dawn_l30_green": [
    2,
-   24
+   25
   ],
   "priest_headgear_pilgrim_l30_blue": [
    2,
-   24
+   25
   ],
   "priest_headgear_dawn_l30_purple": [
    2,
-   24
+   25
   ],
   "priest_shoulders_pilgrim_l30_gray": [
    3,
-   24
+   25
   ],
   "priest_shoulders_dawn_l30_green": [
    3,
-   24
+   25
   ],
   "priest_shoulders_pilgrim_l30_blue": [
    3,
-   24
+   25
   ],
   "priest_shoulders_dawn_l30_purple": [
    3,
-   24
+   25
   ],
   "hunter_headgear_scout_l30_gray": [
    4,
-   24
+   25
   ],
   "hunter_headgear_warden_l30_green": [
    4,
-   24
+   25
   ],
   "hunter_headgear_scout_l30_blue": [
    4,
-   24
+   25
   ],
   "hunter_headgear_warden_l30_purple": [
    4,
-   24
+   25
   ],
   "hunter_shoulders_scout_l30_gray": [
    5,
-   24
+   25
   ],
   "hunter_shoulders_warden_l30_green": [
    5,
-   24
+   25
   ],
   "hunter_shoulders_scout_l30_blue": [
    5,
-   24
+   25
   ],
   "hunter_shoulders_warden_l30_purple": [
    5,
-   24
+   25
   ],
   "assassin_headgear_shadow_l35_gray": [
    6,
-   24
+   25
   ],
   "assassin_headgear_moon_l35_green": [
    6,
-   24
+   25
   ],
   "assassin_headgear_shadow_l35_blue": [
    6,
-   24
+   25
   ],
   "assassin_shoulders_shadow_l35_gray": [
    7,
-   24
+   25
   ],
   "assassin_shoulders_moon_l35_green": [
    7,
-   24
+   25
   ],
   "assassin_shoulders_shadow_l35_blue": [
    7,
-   24
+   25
   ],
   "warrior_headgear_crimson_l35_gray": [
    8,
-   24
+   25
   ],
   "warrior_headgear_azure_l35_green": [
    8,
-   24
+   25
   ],
   "warrior_headgear_crimson_l35_blue": [
    8,
-   24
+   25
   ],
   "warrior_shoulders_crimson_l35_gray": [
    9,
-   24
+   25
   ],
   "warrior_shoulders_azure_l35_green": [
    9,
-   24
+   25
   ],
   "warrior_shoulders_crimson_l35_blue": [
    9,
-   24
+   25
   ],
   "mage_headgear_apprentice_l35_gray": [
    0,
-   25
+   26
   ],
   "mage_headgear_runic_l35_green": [
    0,
-   25
+   26
   ],
   "mage_headgear_apprentice_l35_blue": [
    0,
-   25
+   26
   ],
   "mage_shoulders_apprentice_l35_gray": [
    1,
-   25
+   26
   ],
   "mage_shoulders_runic_l35_green": [
    1,
-   25
+   26
   ],
   "mage_shoulders_apprentice_l35_blue": [
    1,
-   25
+   26
   ],
   "priest_headgear_pilgrim_l35_gray": [
    2,
-   25
+   26
   ],
   "priest_headgear_dawn_l35_green": [
    2,
-   25
+   26
   ],
   "priest_headgear_pilgrim_l35_blue": [
    2,
-   25
+   26
   ],
   "priest_shoulders_pilgrim_l35_gray": [
    3,
-   25
+   26
   ],
   "priest_shoulders_dawn_l35_green": [
    3,
-   25
+   26
   ],
   "priest_shoulders_pilgrim_l35_blue": [
    3,
-   25
+   26
   ],
   "hunter_headgear_scout_l35_gray": [
    4,
-   25
+   26
   ],
   "hunter_headgear_warden_l35_green": [
    4,
-   25
+   26
   ],
   "hunter_headgear_scout_l35_blue": [
    4,
-   25
+   26
   ],
   "hunter_shoulders_scout_l35_gray": [
    5,
-   25
+   26
   ],
   "hunter_shoulders_warden_l35_green": [
    5,
-   25
+   26
   ],
   "hunter_shoulders_scout_l35_blue": [
    5,
-   25
+   26
   ],
   "assassin_headgear_shadow_l40_gray": [
    6,
-   25
+   26
   ],
   "assassin_headgear_moon_l40_green": [
    6,
-   25
+   26
   ],
   "assassin_headgear_shadow_l40_blue": [
    6,
-   25
+   26
   ],
   "assassin_headgear_moon_l40_purple": [
    6,
-   25
+   26
   ],
   "assassin_shoulders_shadow_l40_gray": [
    7,
-   25
+   26
   ],
   "assassin_shoulders_moon_l40_green": [
    7,
-   25
+   26
   ],
   "assassin_shoulders_shadow_l40_blue": [
    7,
-   25
+   26
   ],
   "assassin_shoulders_moon_l40_purple": [
    7,
-   25
+   26
   ],
   "warrior_headgear_crimson_l40_gray": [
    8,
-   25
+   26
   ],
   "warrior_headgear_azure_l40_green": [
    8,
-   25
+   26
   ],
   "warrior_headgear_crimson_l40_blue": [
    8,
-   25
+   26
   ],
   "warrior_headgear_azure_l40_purple": [
    8,
-   25
+   26
   ],
   "warrior_shoulders_crimson_l40_gray": [
    9,
-   25
+   26
   ],
   "warrior_shoulders_azure_l40_green": [
    9,
-   25
+   26
   ],
   "warrior_shoulders_crimson_l40_blue": [
    9,
-   25
+   26
   ],
   "warrior_shoulders_azure_l40_purple": [
    9,
-   25
+   26
   ],
   "mage_headgear_apprentice_l40_gray": [
    0,
-   26
+   27
   ],
   "mage_headgear_runic_l40_green": [
    0,
-   26
+   27
   ],
   "mage_headgear_apprentice_l40_blue": [
    0,
-   26
+   27
   ],
   "mage_headgear_runic_l40_purple": [
    0,
-   26
+   27
   ],
   "mage_shoulders_apprentice_l40_gray": [
    1,
-   26
+   27
   ],
   "mage_shoulders_runic_l40_green": [
    1,
-   26
+   27
   ],
   "mage_shoulders_apprentice_l40_blue": [
    1,
-   26
+   27
   ],
   "mage_shoulders_runic_l40_purple": [
    1,
-   26
+   27
   ],
   "priest_headgear_pilgrim_l40_gray": [
    2,
-   26
+   27
   ],
   "priest_headgear_dawn_l40_green": [
    2,
-   26
+   27
   ],
   "priest_headgear_pilgrim_l40_blue": [
    2,
-   26
+   27
   ],
   "priest_headgear_dawn_l40_purple": [
    2,
-   26
+   27
   ],
   "priest_shoulders_pilgrim_l40_gray": [
    3,
-   26
+   27
   ],
   "priest_shoulders_dawn_l40_green": [
    3,
-   26
+   27
   ],
   "priest_shoulders_pilgrim_l40_blue": [
    3,
-   26
+   27
   ],
   "priest_shoulders_dawn_l40_purple": [
    3,
-   26
+   27
   ],
   "hunter_headgear_scout_l40_gray": [
    4,
-   26
+   27
   ],
   "hunter_headgear_warden_l40_green": [
    4,
-   26
+   27
   ],
   "hunter_headgear_scout_l40_blue": [
    4,
-   26
+   27
   ],
   "hunter_headgear_warden_l40_purple": [
    4,
-   26
+   27
   ],
   "hunter_shoulders_scout_l40_gray": [
    5,
-   26
+   27
   ],
   "hunter_shoulders_warden_l40_green": [
    5,
-   26
+   27
   ],
   "hunter_shoulders_scout_l40_blue": [
    5,
-   26
+   27
   ],
   "hunter_shoulders_warden_l40_purple": [
    5,
-   26
+   27
   ],
   "assassin_headgear_shadow_l45_gray": [
    6,
-   26
+   27
   ],
   "assassin_headgear_moon_l45_green": [
    6,
-   26
+   27
   ],
   "assassin_headgear_shadow_l45_blue": [
    6,
-   26
+   27
   ],
   "assassin_weapon_daggers_l25_gray": [
    7,
-   26
+   27
   ],
   "assassin_weapon_moonfang_l25_green": [
    7,
-   26
+   27
   ],
   "assassin_weapon_daggers_l25_blue": [
    7,
-   26
+   27
   ],
   "warrior_weapon_sword_l25_gray": [
    8,
-   26
+   27
   ],
   "warrior_weapon_royal_l25_green": [
    8,
-   26
+   27
   ],
   "warrior_weapon_sword_l25_blue": [
    8,
-   26
+   27
   ],
   "mage_weapon_ash_l25_gray": [
    9,
-   26
+   27
   ],
   "mage_weapon_crystal_l25_green": [
    9,
-   26
+   27
   ],
   "mage_weapon_ash_l25_blue": [
    9,
-   26
+   27
   ],
   "priest_weapon_mace_l25_gray": [
    0,
-   27
+   28
   ],
   "priest_weapon_sunmace_l25_green": [
    0,
-   27
+   28
   ],
   "priest_weapon_mace_l25_blue": [
    0,
-   27
+   28
   ],
   "hunter_weapon_shortbow_l25_gray": [
    1,
-   27
+   28
   ],
   "hunter_weapon_wardenbow_l25_green": [
    1,
-   27
+   28
   ],
   "hunter_weapon_shortbow_l25_blue": [
    1,
-   27
+   28
   ],
   "assassin_weapon_daggers_l30_gray": [
    2,
-   27
+   28
   ],
   "assassin_weapon_moonfang_l30_green": [
    2,
-   27
+   28
   ],
   "assassin_weapon_daggers_l30_blue": [
    2,
-   27
+   28
   ],
   "assassin_weapon_moonfang_l30_purple": [
    2,
-   27
+   28
   ],
   "warrior_weapon_sword_l30_gray": [
    3,
-   27
+   28
   ],
   "warrior_weapon_royal_l30_green": [
    3,
-   27
+   28
   ],
   "warrior_weapon_sword_l30_blue": [
    3,
-   27
+   28
   ],
   "warrior_weapon_royal_l30_purple": [
    3,
-   27
+   28
   ],
   "mage_weapon_ash_l30_gray": [
    4,
-   27
+   28
   ],
   "mage_weapon_crystal_l30_green": [
    4,
-   27
+   28
   ],
   "mage_weapon_ash_l30_blue": [
    4,
-   27
+   28
   ],
   "mage_weapon_crystal_l30_purple": [
    4,
-   27
+   28
   ],
   "priest_weapon_mace_l30_gray": [
    5,
-   27
+   28
   ],
   "priest_weapon_sunmace_l30_green": [
    5,
-   27
+   28
   ],
   "priest_weapon_mace_l30_blue": [
    5,
-   27
+   28
   ],
   "priest_weapon_sunmace_l30_purple": [
    5,
-   27
+   28
   ],
   "hunter_weapon_shortbow_l30_gray": [
    6,
-   27
+   28
   ],
   "hunter_weapon_wardenbow_l30_green": [
    6,
-   27
+   28
   ],
   "hunter_weapon_shortbow_l30_blue": [
    6,
-   27
+   28
   ],
   "hunter_weapon_wardenbow_l30_purple": [
    6,
-   27
+   28
   ],
   "assassin_weapon_daggers_l35_gray": [
    7,
-   27
+   28
   ],
   "assassin_weapon_moonfang_l35_green": [
    7,
-   27
+   28
   ],
   "assassin_weapon_daggers_l35_blue": [
    7,
-   27
+   28
   ],
   "warrior_weapon_sword_l35_gray": [
    8,
-   27
+   28
   ],
   "warrior_weapon_royal_l35_green": [
    8,
-   27
+   28
   ],
   "warrior_weapon_sword_l35_blue": [
    8,
-   27
+   28
   ],
   "mage_weapon_ash_l35_gray": [
    9,
-   27
+   28
   ],
   "mage_weapon_crystal_l35_green": [
    9,
-   27
+   28
   ],
   "mage_weapon_ash_l35_blue": [
    9,
-   27
+   28
   ],
   "priest_weapon_mace_l35_gray": [
    0,
-   28
+   29
   ],
   "priest_weapon_sunmace_l35_green": [
    0,
-   28
+   29
   ],
   "priest_weapon_mace_l35_blue": [
    0,
-   28
+   29
   ],
   "hunter_weapon_shortbow_l35_gray": [
    1,
-   28
+   29
   ],
   "hunter_weapon_wardenbow_l35_green": [
    1,
-   28
+   29
   ],
   "hunter_weapon_shortbow_l35_blue": [
    1,
-   28
+   29
   ],
   "assassin_weapon_daggers_l40_gray": [
    2,
-   28
+   29
   ],
   "assassin_weapon_moonfang_l40_green": [
    2,
-   28
+   29
   ],
   "assassin_weapon_daggers_l40_blue": [
    2,
-   28
+   29
   ],
   "assassin_weapon_moonfang_l40_purple": [
    2,
-   28
+   29
   ],
   "warrior_weapon_sword_l40_gray": [
    3,
-   28
+   29
   ],
   "warrior_weapon_royal_l40_green": [
    3,
-   28
+   29
   ],
   "warrior_weapon_sword_l40_blue": [
    3,
-   28
+   29
   ],
   "warrior_weapon_royal_l40_purple": [
    3,
-   28
+   29
   ],
   "mage_weapon_ash_l40_gray": [
    4,
-   28
+   29
   ],
   "mage_weapon_crystal_l40_green": [
    4,
-   28
+   29
   ],
   "mage_weapon_ash_l40_blue": [
    4,
-   28
+   29
   ],
   "mage_weapon_crystal_l40_purple": [
    4,
-   28
+   29
   ],
   "priest_weapon_mace_l40_gray": [
    5,
-   28
+   29
   ],
   "priest_weapon_sunmace_l40_green": [
    5,
-   28
+   29
   ],
   "priest_weapon_mace_l40_blue": [
    5,
-   28
+   29
   ],
   "priest_weapon_sunmace_l40_purple": [
    5,
-   28
+   29
   ],
   "hunter_weapon_shortbow_l40_gray": [
    6,
-   28
+   29
   ],
   "hunter_weapon_wardenbow_l40_green": [
    6,
-   28
+   29
   ],
   "hunter_weapon_shortbow_l40_blue": [
    6,
-   28
+   29
   ],
   "hunter_weapon_wardenbow_l40_purple": [
    6,
-   28
+   29
   ],
   "assassin_weapon_daggers_l45_gray": [
    7,
-   28
+   29
   ],
   "assassin_weapon_moonfang_l45_green": [
    7,
-   28
+   29
   ],
   "assassin_weapon_daggers_l45_blue": [
    7,
-   28
+   29
   ],
   "warrior_weapon_sword_l45_gray": [
    8,
-   28
+   29
   ],
   "warrior_weapon_royal_l45_green": [
    8,
-   28
+   29
   ],
   "warrior_weapon_sword_l45_blue": [
    8,
-   28
+   29
   ],
   "mage_weapon_ash_l45_gray": [
    9,
-   28
+   29
   ],
   "mage_weapon_crystal_l45_green": [
    9,
-   28
+   29
   ],
   "mage_weapon_ash_l45_blue": [
    9,
-   28
+   29
   ],
   "priest_weapon_mace_l45_gray": [
    0,
-   29
+   30
   ],
   "priest_weapon_sunmace_l45_green": [
    0,
-   29
+   30
   ],
   "priest_weapon_mace_l45_blue": [
    0,
-   29
+   30
   ],
   "hunter_weapon_shortbow_l45_gray": [
    1,
-   29
+   30
   ],
   "hunter_weapon_wardenbow_l45_green": [
    1,
-   29
+   30
   ],
   "hunter_weapon_shortbow_l45_blue": [
    1,
-   29
+   30
   ],
   "assassin_weapon_daggers_l50_gray": [
    2,
-   29
+   30
   ],
   "assassin_weapon_moonfang_l50_green": [
    2,
-   29
+   30
   ],
   "assassin_weapon_daggers_l50_blue": [
    2,
-   29
+   30
   ],
   "assassin_weapon_moonfang_l50_purple": [
    2,
-   29
+   30
   ],
   "warrior_weapon_sword_l50_gray": [
    3,
-   29
+   30
   ],
   "warrior_weapon_royal_l50_green": [
    3,
-   29
+   30
   ],
   "warrior_weapon_sword_l50_blue": [
    3,
-   29
+   30
   ],
   "warrior_weapon_royal_l50_purple": [
    3,
-   29
+   30
   ],
   "mage_weapon_ash_l50_gray": [
    4,
-   29
+   30
   ],
   "mage_weapon_crystal_l50_green": [
    4,
-   29
+   30
   ],
   "mage_weapon_ash_l50_blue": [
    4,
-   29
+   30
   ],
   "mage_weapon_crystal_l50_purple": [
    4,
-   29
+   30
   ],
   "priest_weapon_mace_l50_gray": [
    5,
-   29
+   30
   ],
   "priest_weapon_sunmace_l50_green": [
    5,
-   29
+   30
   ],
   "priest_weapon_mace_l50_blue": [
    5,
-   29
+   30
   ],
   "priest_weapon_sunmace_l50_purple": [
    5,
-   29
+   30
   ],
   "hunter_weapon_shortbow_l50_gray": [
    6,
-   29
+   30
   ],
   "hunter_weapon_wardenbow_l50_green": [
    6,
-   29
+   30
   ],
   "hunter_weapon_shortbow_l50_blue": [
    6,
-   29
+   30
   ],
   "hunter_weapon_wardenbow_l50_purple": [
    6,
-   29
+   30
   ],
   "assassin_weapon_daggers_l40_cloister": [
    7,
-   29
+   30
   ],
   "warrior_weapon_sword_l40_cloister": [
    8,
-   29
+   30
   ],
   "mage_weapon_ash_l40_cloister": [
    9,
-   29
+   30
   ],
   "priest_weapon_mace_l40_cloister": [
    0,
-   30
+   31
   ],
   "hunter_weapon_shortbow_l40_cloister": [
    1,
-   30
+   31
   ],
   "assassin_weapon_daggers_l45_reliquary": [
    2,
-   30
+   31
   ],
   "warrior_weapon_sword_l45_reliquary": [
    3,
-   30
+   31
   ],
   "mage_weapon_ash_l45_reliquary": [
    4,
-   30
+   31
   ],
   "priest_weapon_mace_l45_reliquary": [
    5,
-   30
+   31
   ],
   "hunter_weapon_shortbow_l45_reliquary": [
    6,
-   30
+   31
   ],
   "assassin_weapon_daggers_l50_nave": [
    7,
-   30
+   31
   ],
   "warrior_weapon_sword_l50_nave": [
    8,
-   30
+   31
   ],
   "mage_weapon_ash_l50_nave": [
    9,
-   30
+   31
   ],
   "priest_weapon_mace_l50_nave": [
    0,
-   31
+   32
   ],
   "hunter_weapon_shortbow_l50_nave": [
    1,
-   31
+   32
   ],
   "warrior_armor_crimson_l60_gray": [
    2,
-   31
+   32
   ],
   "warrior_armor_azure_l60_green": [
    2,
-   31
+   32
   ],
   "warrior_armor_crimson_l60_blue": [
    2,
-   31
+   32
   ],
   "warrior_armor_azure_l60_purple": [
    2,
-   31
+   32
   ],
   "warrior_headgear_crimson_l60_gray": [
    3,
-   31
+   32
   ],
   "warrior_headgear_azure_l60_green": [
    3,
-   31
+   32
   ],
   "warrior_headgear_crimson_l60_blue": [
    3,
-   31
+   32
   ],
   "warrior_headgear_azure_l60_purple": [
    3,
-   31
+   32
   ],
   "warrior_shoulders_crimson_l60_gray": [
    4,
-   31
+   32
   ],
   "warrior_shoulders_azure_l60_green": [
    4,
-   31
+   32
   ],
   "warrior_shoulders_crimson_l60_blue": [
    4,
-   31
+   32
   ],
   "warrior_shoulders_azure_l60_purple": [
    4,
-   31
+   32
   ],
   "warrior_gloves_crimson_l60_gray": [
    5,
-   31
+   32
   ],
   "warrior_gloves_azure_l60_green": [
    5,
-   31
+   32
   ],
   "warrior_gloves_crimson_l60_blue": [
    5,
-   31
+   32
   ],
   "warrior_gloves_azure_l60_purple": [
    5,
-   31
+   32
   ],
   "warrior_weapon_sword_l60_gray": [
    6,
-   31
+   32
   ],
   "warrior_weapon_royal_l60_green": [
    6,
-   31
+   32
   ],
   "warrior_weapon_sword_l60_blue": [
    6,
-   31
+   32
   ],
   "warrior_weapon_royal_l60_purple": [
    6,
-   31
+   32
   ],
   "mage_armor_apprentice_l60_gray": [
    7,
-   31
+   32
   ],
   "mage_armor_runic_l60_green": [
    7,
-   31
+   32
   ],
   "mage_armor_apprentice_l60_blue": [
    7,
-   31
+   32
   ],
   "mage_armor_runic_l60_purple": [
    7,
-   31
+   32
   ],
   "mage_headgear_apprentice_l60_gray": [
    8,
-   31
+   32
   ],
   "mage_headgear_runic_l60_green": [
    8,
-   31
+   32
   ],
   "mage_headgear_apprentice_l60_blue": [
    8,
-   31
+   32
   ],
   "mage_headgear_runic_l60_purple": [
    8,
-   31
+   32
   ],
   "mage_shoulders_apprentice_l60_gray": [
    9,
-   31
+   32
   ],
   "mage_shoulders_runic_l60_green": [
    9,
-   31
+   32
   ],
   "mage_shoulders_apprentice_l60_blue": [
    9,
-   31
+   32
   ],
   "mage_shoulders_runic_l60_purple": [
    9,
-   31
+   32
   ],
   "mage_gloves_apprentice_l60_gray": [
    0,
-   32
+   33
   ],
   "mage_gloves_runic_l60_green": [
    0,
-   32
+   33
   ],
   "mage_gloves_apprentice_l60_blue": [
    0,
-   32
+   33
   ],
   "mage_gloves_runic_l60_purple": [
    0,
-   32
+   33
   ],
   "mage_weapon_ash_l60_gray": [
    1,
-   32
+   33
   ],
   "mage_weapon_crystal_l60_green": [
    1,
-   32
+   33
   ],
   "mage_weapon_ash_l60_blue": [
    1,
-   32
+   33
   ],
   "mage_weapon_crystal_l60_purple": [
    1,
-   32
+   33
   ],
   "assassin_armor_shadow_l60_gray": [
    2,
-   32
+   33
   ],
   "assassin_armor_moon_l60_green": [
    2,
-   32
+   33
   ],
   "assassin_armor_shadow_l60_blue": [
    2,
-   32
+   33
   ],
   "assassin_armor_moon_l60_purple": [
    2,
-   32
+   33
   ],
   "assassin_headgear_shadow_l60_gray": [
    3,
-   32
+   33
   ],
   "assassin_headgear_moon_l60_green": [
    3,
-   32
+   33
   ],
   "assassin_headgear_shadow_l60_blue": [
    3,
-   32
+   33
   ],
   "assassin_headgear_moon_l60_purple": [
    3,
-   32
+   33
   ],
   "assassin_shoulders_shadow_l60_gray": [
    4,
-   32
+   33
   ],
   "assassin_shoulders_moon_l60_green": [
    4,
-   32
+   33
   ],
   "assassin_shoulders_shadow_l60_blue": [
    4,
-   32
+   33
   ],
   "assassin_shoulders_moon_l60_purple": [
    4,
-   32
+   33
   ],
   "assassin_gloves_shadow_l60_gray": [
    5,
-   32
+   33
   ],
   "assassin_gloves_moon_l60_green": [
    5,
-   32
+   33
   ],
   "assassin_gloves_shadow_l60_blue": [
    5,
-   32
+   33
   ],
   "assassin_gloves_moon_l60_purple": [
    5,
-   32
+   33
   ],
   "assassin_weapon_daggers_l60_gray": [
    6,
-   32
+   33
   ],
   "assassin_weapon_moonfang_l60_green": [
    6,
-   32
+   33
   ],
   "assassin_weapon_daggers_l60_blue": [
    6,
-   32
+   33
   ],
   "assassin_weapon_moonfang_l60_purple": [
    6,
-   32
+   33
   ],
   "priest_armor_pilgrim_l60_gray": [
    7,
-   32
+   33
   ],
   "priest_armor_dawn_l60_green": [
    7,
-   32
+   33
   ],
   "priest_armor_pilgrim_l60_blue": [
    7,
-   32
+   33
   ],
   "priest_armor_dawn_l60_purple": [
    7,
-   32
+   33
   ],
   "priest_headgear_pilgrim_l60_gray": [
    8,
-   32
+   33
   ],
   "priest_headgear_dawn_l60_green": [
    8,
-   32
+   33
   ],
   "priest_headgear_pilgrim_l60_blue": [
    8,
-   32
+   33
   ],
   "priest_headgear_dawn_l60_purple": [
    8,
-   32
+   33
   ],
   "priest_shoulders_pilgrim_l60_gray": [
    9,
-   32
+   33
   ],
   "priest_shoulders_dawn_l60_green": [
    9,
-   32
+   33
   ],
   "priest_shoulders_pilgrim_l60_blue": [
    9,
-   32
+   33
   ],
   "priest_shoulders_dawn_l60_purple": [
    9,
-   32
+   33
   ],
   "priest_gloves_pilgrim_l60_gray": [
    0,
-   33
+   34
   ],
   "priest_gloves_dawn_l60_green": [
    0,
-   33
+   34
   ],
   "priest_gloves_pilgrim_l60_blue": [
    0,
-   33
+   34
   ],
   "priest_gloves_dawn_l60_purple": [
    0,
-   33
+   34
   ],
   "priest_weapon_mace_l60_gray": [
    1,
-   33
+   34
   ],
   "priest_weapon_sunmace_l60_green": [
    1,
-   33
+   34
   ],
   "priest_weapon_mace_l60_blue": [
    1,
-   33
+   34
   ],
   "priest_weapon_sunmace_l60_purple": [
    1,
-   33
+   34
   ],
   "hunter_armor_scout_l60_gray": [
    2,
-   33
+   34
   ],
   "hunter_armor_warden_l60_green": [
    2,
-   33
+   34
   ],
   "hunter_armor_scout_l60_blue": [
    2,
-   33
+   34
   ],
   "hunter_armor_warden_l60_purple": [
    2,
-   33
+   34
   ],
   "hunter_headgear_scout_l60_gray": [
    3,
-   33
+   34
   ],
   "hunter_headgear_warden_l60_green": [
    3,
-   33
+   34
   ],
   "hunter_headgear_scout_l60_blue": [
    3,
-   33
+   34
   ],
   "hunter_headgear_warden_l60_purple": [
    3,
-   33
+   34
   ],
   "hunter_shoulders_scout_l60_gray": [
    4,
-   33
+   34
   ],
   "hunter_shoulders_warden_l60_green": [
    4,
-   33
+   34
   ],
   "hunter_shoulders_scout_l60_blue": [
    4,
-   33
+   34
   ],
   "hunter_shoulders_warden_l60_purple": [
    4,
-   33
+   34
   ],
   "hunter_gloves_scout_l60_gray": [
    5,
-   33
+   34
   ],
   "hunter_gloves_warden_l60_green": [
    5,
-   33
+   34
   ],
   "hunter_gloves_scout_l60_blue": [
    5,
-   33
+   34
   ],
   "hunter_gloves_warden_l60_purple": [
    5,
-   33
+   34
   ],
   "hunter_weapon_shortbow_l60_gray": [
    6,
-   33
+   34
   ],
   "hunter_weapon_wardenbow_l60_green": [
    6,
-   33
+   34
   ],
   "hunter_weapon_shortbow_l60_blue": [
    6,
-   33
+   34
   ],
   "hunter_weapon_wardenbow_l60_purple": [
    6,
-   33
+   34
   ],
   "pants_wayfarer_l60_gray": [
    7,
-   33
+   34
   ],
   "pants_wayfarer_l60_green": [
    7,
-   33
+   34
   ],
   "pants_wayfarer_l60_blue": [
    7,
-   33
+   34
   ],
   "pants_wayfarer_l60_purple": [
    7,
-   33
+   34
   ],
   "necklace_moonstone_l60_gray": [
    8,
-   33
+   34
   ],
   "necklace_moonstone_l60_green": [
    8,
-   33
+   34
   ],
   "necklace_moonstone_l60_blue": [
    8,
-   33
+   34
   ],
   "necklace_moonstone_l60_purple": [
    8,
-   33
+   34
   ],
   "accessory_amber_l60_gray": [
    9,
-   33
+   34
   ],
   "accessory_amber_l60_green": [
    9,
-   33
+   34
   ],
   "accessory_amber_l60_blue": [
    9,
-   33
+   34
   ],
   "accessory_amber_l60_purple": [
    9,
-   33
+   34
   ],
   "warrior_armor_crimson_l65_gray": [
    0,
-   34
+   35
   ],
   "warrior_armor_azure_l65_green": [
    0,
-   34
+   35
   ],
   "warrior_armor_crimson_l65_blue": [
    0,
-   34
+   35
   ],
   "warrior_headgear_crimson_l65_gray": [
    1,
-   34
+   35
   ],
   "warrior_headgear_azure_l65_green": [
    1,
-   34
+   35
   ],
   "warrior_headgear_crimson_l65_blue": [
    1,
-   34
+   35
   ],
   "warrior_shoulders_crimson_l65_gray": [
    2,
-   34
+   35
   ],
   "warrior_shoulders_azure_l65_green": [
    2,
-   34
+   35
   ],
   "warrior_shoulders_crimson_l65_blue": [
    2,
-   34
+   35
   ],
   "warrior_gloves_crimson_l65_gray": [
    3,
-   34
+   35
   ],
   "warrior_gloves_azure_l65_green": [
    3,
-   34
+   35
   ],
   "warrior_gloves_crimson_l65_blue": [
    3,
-   34
+   35
   ],
   "warrior_weapon_sword_l65_gray": [
    4,
-   34
+   35
   ],
   "warrior_weapon_royal_l65_green": [
    4,
-   34
+   35
   ],
   "warrior_weapon_sword_l65_blue": [
    4,
-   34
+   35
   ],
   "mage_armor_apprentice_l65_gray": [
    5,
-   34
+   35
   ],
   "mage_armor_runic_l65_green": [
    5,
-   34
+   35
   ],
   "mage_armor_apprentice_l65_blue": [
    5,
-   34
+   35
   ],
   "mage_headgear_apprentice_l65_gray": [
    6,
-   34
+   35
   ],
   "mage_headgear_runic_l65_green": [
    6,
-   34
+   35
   ],
   "mage_headgear_apprentice_l65_blue": [
    6,
-   34
+   35
   ],
   "mage_shoulders_apprentice_l65_gray": [
    7,
-   34
+   35
   ],
   "mage_shoulders_runic_l65_green": [
    7,
-   34
+   35
   ],
   "mage_shoulders_apprentice_l65_blue": [
    7,
-   34
+   35
   ],
   "mage_gloves_apprentice_l65_gray": [
    8,
-   34
+   35
   ],
   "mage_gloves_runic_l65_green": [
    8,
-   34
+   35
   ],
   "mage_gloves_apprentice_l65_blue": [
    8,
-   34
+   35
   ],
   "mage_weapon_ash_l65_gray": [
    9,
-   34
+   35
   ],
   "mage_weapon_crystal_l65_green": [
    9,
-   34
+   35
   ],
   "mage_weapon_ash_l65_blue": [
    9,
-   34
+   35
   ],
   "assassin_armor_shadow_l65_gray": [
    0,
-   35
+   36
   ],
   "assassin_armor_moon_l65_green": [
    0,
-   35
+   36
   ],
   "assassin_armor_shadow_l65_blue": [
    0,
-   35
+   36
   ],
   "assassin_headgear_shadow_l65_gray": [
    1,
-   35
+   36
   ],
   "assassin_headgear_moon_l65_green": [
    1,
-   35
+   36
   ],
   "assassin_headgear_shadow_l65_blue": [
    1,
-   35
+   36
   ],
   "assassin_shoulders_shadow_l65_gray": [
    2,
-   35
+   36
   ],
   "assassin_shoulders_moon_l65_green": [
    2,
-   35
+   36
   ],
   "assassin_shoulders_shadow_l65_blue": [
    2,
-   35
+   36
   ],
   "assassin_gloves_shadow_l65_gray": [
    3,
-   35
+   36
   ],
   "assassin_gloves_moon_l65_green": [
    3,
-   35
+   36
   ],
   "assassin_gloves_shadow_l65_blue": [
    3,
-   35
+   36
   ],
   "assassin_weapon_daggers_l65_gray": [
    4,
-   35
+   36
   ],
   "assassin_weapon_moonfang_l65_green": [
    4,
-   35
+   36
   ],
   "assassin_weapon_daggers_l65_blue": [
    4,
-   35
+   36
   ],
   "priest_armor_pilgrim_l65_gray": [
    5,
-   35
+   36
   ],
   "priest_armor_dawn_l65_green": [
    5,
-   35
+   36
   ],
   "priest_armor_pilgrim_l65_blue": [
    5,
-   35
+   36
   ],
   "priest_headgear_pilgrim_l65_gray": [
    6,
-   35
+   36
   ],
   "priest_headgear_dawn_l65_green": [
    6,
-   35
+   36
   ],
   "priest_headgear_pilgrim_l65_blue": [
    6,
-   35
+   36
   ],
   "priest_shoulders_pilgrim_l65_gray": [
    7,
-   35
+   36
   ],
   "priest_shoulders_dawn_l65_green": [
    7,
-   35
+   36
   ],
   "priest_shoulders_pilgrim_l65_blue": [
    7,
-   35
+   36
   ],
   "priest_gloves_pilgrim_l65_gray": [
    8,
-   35
+   36
   ],
   "priest_gloves_dawn_l65_green": [
    8,
-   35
+   36
   ],
   "priest_gloves_pilgrim_l65_blue": [
    8,
-   35
+   36
   ],
   "priest_weapon_mace_l65_gray": [
    9,
-   35
+   36
   ],
   "priest_weapon_sunmace_l65_green": [
    9,
-   35
+   36
   ],
   "priest_weapon_mace_l65_blue": [
    9,
-   35
+   36
   ],
   "hunter_armor_scout_l65_gray": [
    0,
-   36
+   37
   ],
   "hunter_armor_warden_l65_green": [
    0,
-   36
+   37
   ],
   "hunter_armor_scout_l65_blue": [
    0,
-   36
+   37
   ],
   "hunter_headgear_scout_l65_gray": [
    1,
-   36
+   37
   ],
   "hunter_headgear_warden_l65_green": [
    1,
-   36
+   37
   ],
   "hunter_headgear_scout_l65_blue": [
    1,
-   36
+   37
   ],
   "hunter_shoulders_scout_l65_gray": [
    2,
-   36
+   37
   ],
   "hunter_shoulders_warden_l65_green": [
    2,
-   36
+   37
   ],
   "hunter_shoulders_scout_l65_blue": [
    2,
-   36
+   37
   ],
   "hunter_gloves_scout_l65_gray": [
    3,
-   36
+   37
   ],
   "hunter_gloves_warden_l65_green": [
    3,
-   36
+   37
   ],
   "hunter_gloves_scout_l65_blue": [
    3,
-   36
+   37
   ],
   "hunter_weapon_shortbow_l65_gray": [
    4,
-   36
+   37
   ],
   "hunter_weapon_wardenbow_l65_green": [
    4,
-   36
+   37
   ],
   "hunter_weapon_shortbow_l65_blue": [
    4,
-   36
+   37
   ],
   "pants_wayfarer_l65_gray": [
    5,
-   36
+   37
   ],
   "pants_wayfarer_l65_green": [
    5,
-   36
+   37
   ],
   "pants_wayfarer_l65_blue": [
    5,
-   36
+   37
   ],
   "necklace_moonstone_l65_gray": [
    6,
-   36
+   37
   ],
   "necklace_moonstone_l65_green": [
    6,
-   36
+   37
   ],
   "necklace_moonstone_l65_blue": [
    6,
-   36
+   37
   ],
   "accessory_amber_l65_gray": [
    7,
-   36
+   37
   ],
   "accessory_amber_l65_green": [
    7,
-   36
+   37
   ],
   "accessory_amber_l65_blue": [
    7,
-   36
+   37
   ],
   "warrior_armor_crimson_l70_gray": [
    8,
-   36
+   37
   ],
   "warrior_armor_azure_l70_green": [
    8,
-   36
+   37
   ],
   "warrior_armor_crimson_l70_blue": [
    8,
-   36
+   37
   ],
   "warrior_armor_azure_l70_purple": [
    8,
-   36
+   37
   ],
   "warrior_headgear_crimson_l70_gray": [
    9,
-   36
+   37
   ],
   "warrior_headgear_azure_l70_green": [
    9,
-   36
+   37
   ],
   "warrior_headgear_crimson_l70_blue": [
    9,
-   36
+   37
   ],
   "warrior_headgear_azure_l70_purple": [
    9,
-   36
+   37
   ],
   "warrior_shoulders_crimson_l70_gray": [
    0,
-   37
+   38
   ],
   "warrior_shoulders_azure_l70_green": [
    0,
-   37
+   38
   ],
   "warrior_shoulders_crimson_l70_blue": [
    0,
-   37
+   38
   ],
   "warrior_shoulders_azure_l70_purple": [
    0,
-   37
+   38
   ],
   "warrior_gloves_crimson_l70_gray": [
    1,
-   37
+   38
   ],
   "warrior_gloves_azure_l70_green": [
    1,
-   37
+   38
   ],
   "warrior_gloves_crimson_l70_blue": [
    1,
-   37
+   38
   ],
   "warrior_gloves_azure_l70_purple": [
    1,
-   37
+   38
   ],
   "warrior_weapon_sword_l70_gray": [
    2,
-   37
+   38
   ],
   "warrior_weapon_royal_l70_green": [
    2,
-   37
+   38
   ],
   "warrior_weapon_sword_l70_blue": [
    2,
-   37
+   38
   ],
   "warrior_weapon_royal_l70_purple": [
    2,
-   37
+   38
   ],
   "mage_armor_apprentice_l70_gray": [
    3,
-   37
+   38
   ],
   "mage_armor_runic_l70_green": [
    3,
-   37
+   38
   ],
   "mage_armor_apprentice_l70_blue": [
    3,
-   37
+   38
   ],
   "mage_armor_runic_l70_purple": [
    3,
-   37
+   38
   ],
   "mage_headgear_apprentice_l70_gray": [
    4,
-   37
+   38
   ],
   "mage_headgear_runic_l70_green": [
    4,
-   37
+   38
   ],
   "mage_headgear_apprentice_l70_blue": [
    4,
-   37
+   38
   ],
   "mage_headgear_runic_l70_purple": [
    4,
-   37
+   38
   ],
   "mage_shoulders_apprentice_l70_gray": [
    5,
-   37
+   38
   ],
   "mage_shoulders_runic_l70_green": [
    5,
-   37
+   38
   ],
   "mage_shoulders_apprentice_l70_blue": [
    5,
-   37
+   38
   ],
   "mage_shoulders_runic_l70_purple": [
    5,
-   37
+   38
   ],
   "mage_gloves_apprentice_l70_gray": [
    6,
-   37
+   38
   ],
   "mage_gloves_runic_l70_green": [
    6,
-   37
+   38
   ],
   "mage_gloves_apprentice_l70_blue": [
    6,
-   37
+   38
   ],
   "mage_gloves_runic_l70_purple": [
    6,
-   37
+   38
   ],
   "mage_weapon_ash_l70_gray": [
    7,
-   37
+   38
   ],
   "mage_weapon_crystal_l70_green": [
    7,
-   37
+   38
   ],
   "mage_weapon_ash_l70_blue": [
    7,
-   37
+   38
   ],
   "mage_weapon_crystal_l70_purple": [
    7,
-   37
+   38
   ],
   "assassin_armor_shadow_l70_gray": [
    8,
-   37
+   38
   ],
   "assassin_armor_moon_l70_green": [
    8,
-   37
+   38
   ],
   "assassin_armor_shadow_l70_blue": [
    8,
-   37
+   38
   ],
   "assassin_armor_moon_l70_purple": [
    8,
-   37
+   38
   ],
   "assassin_headgear_shadow_l70_gray": [
    9,
-   37
+   38
   ],
   "assassin_headgear_moon_l70_green": [
    9,
-   37
+   38
   ],
   "assassin_headgear_shadow_l70_blue": [
    9,
-   37
+   38
   ],
   "assassin_headgear_moon_l70_purple": [
    9,
-   37
+   38
   ],
   "assassin_shoulders_shadow_l70_gray": [
    0,
-   38
+   39
   ],
   "assassin_shoulders_moon_l70_green": [
    0,
-   38
+   39
   ],
   "assassin_shoulders_shadow_l70_blue": [
    0,
-   38
+   39
   ],
   "assassin_shoulders_moon_l70_purple": [
    0,
-   38
+   39
   ],
   "assassin_gloves_shadow_l70_gray": [
    1,
-   38
+   39
   ],
   "assassin_gloves_moon_l70_green": [
    1,
-   38
+   39
   ],
   "assassin_gloves_shadow_l70_blue": [
    1,
-   38
+   39
   ],
   "assassin_gloves_moon_l70_purple": [
    1,
-   38
+   39
   ],
   "assassin_weapon_daggers_l70_gray": [
    2,
-   38
+   39
   ],
   "assassin_weapon_moonfang_l70_green": [
    2,
-   38
+   39
   ],
   "assassin_weapon_daggers_l70_blue": [
    2,
-   38
+   39
   ],
   "assassin_weapon_moonfang_l70_purple": [
    2,
-   38
+   39
   ],
   "priest_armor_pilgrim_l70_gray": [
    3,
-   38
+   39
   ],
   "priest_armor_dawn_l70_green": [
    3,
-   38
+   39
   ],
   "priest_armor_pilgrim_l70_blue": [
    3,
-   38
+   39
   ],
   "priest_armor_dawn_l70_purple": [
    3,
-   38
+   39
   ],
   "priest_headgear_pilgrim_l70_gray": [
    4,
-   38
+   39
   ],
   "priest_headgear_dawn_l70_green": [
    4,
-   38
+   39
   ],
   "priest_headgear_pilgrim_l70_blue": [
    4,
-   38
+   39
   ],
   "priest_headgear_dawn_l70_purple": [
    4,
-   38
+   39
   ],
   "priest_shoulders_pilgrim_l70_gray": [
    5,
-   38
+   39
   ],
   "priest_shoulders_dawn_l70_green": [
    5,
-   38
+   39
   ],
   "priest_shoulders_pilgrim_l70_blue": [
    5,
-   38
+   39
   ],
   "priest_shoulders_dawn_l70_purple": [
    5,
-   38
+   39
   ],
   "priest_gloves_pilgrim_l70_gray": [
    6,
-   38
+   39
   ],
   "priest_gloves_dawn_l70_green": [
    6,
-   38
+   39
   ],
   "priest_gloves_pilgrim_l70_blue": [
    6,
-   38
+   39
   ],
   "priest_gloves_dawn_l70_purple": [
    6,
-   38
+   39
   ],
   "priest_weapon_mace_l70_gray": [
    7,
-   38
+   39
   ],
   "priest_weapon_sunmace_l70_green": [
    7,
-   38
+   39
   ],
   "priest_weapon_mace_l70_blue": [
    7,
-   38
+   39
   ],
   "priest_weapon_sunmace_l70_purple": [
    7,
-   38
+   39
   ],
   "hunter_armor_scout_l70_gray": [
    8,
-   38
+   39
   ],
   "hunter_armor_warden_l70_green": [
    8,
-   38
+   39
   ],
   "hunter_armor_scout_l70_blue": [
    8,
-   38
+   39
   ],
   "hunter_armor_warden_l70_purple": [
    8,
-   38
+   39
   ],
   "hunter_headgear_scout_l70_gray": [
    9,
-   38
+   39
   ],
   "hunter_headgear_warden_l70_green": [
    9,
-   38
+   39
   ],
   "hunter_headgear_scout_l70_blue": [
    9,
-   38
+   39
   ],
   "hunter_headgear_warden_l70_purple": [
    9,
-   38
+   39
   ],
   "hunter_shoulders_scout_l70_gray": [
    0,
-   39
+   40
   ],
   "hunter_shoulders_warden_l70_green": [
    0,
-   39
+   40
   ],
   "hunter_shoulders_scout_l70_blue": [
    0,
-   39
+   40
   ],
   "hunter_shoulders_warden_l70_purple": [
    0,
-   39
+   40
   ],
   "hunter_gloves_scout_l70_gray": [
    1,
-   39
+   40
   ],
   "hunter_gloves_warden_l70_green": [
    1,
-   39
+   40
   ],
   "hunter_gloves_scout_l70_blue": [
    1,
-   39
+   40
   ],
   "hunter_gloves_warden_l70_purple": [
    1,
-   39
+   40
   ],
   "hunter_weapon_shortbow_l70_gray": [
    2,
-   39
+   40
   ],
   "hunter_weapon_wardenbow_l70_green": [
    2,
-   39
+   40
   ],
   "hunter_weapon_shortbow_l70_blue": [
    2,
-   39
+   40
   ],
   "hunter_weapon_wardenbow_l70_purple": [
    2,
-   39
+   40
   ],
   "pants_wayfarer_l70_gray": [
    3,
-   39
+   40
   ],
   "pants_wayfarer_l70_green": [
    3,
-   39
+   40
   ],
   "pants_wayfarer_l70_blue": [
    3,
-   39
+   40
   ],
   "pants_wayfarer_l70_purple": [
    3,
-   39
+   40
   ],
   "necklace_moonstone_l70_gray": [
    4,
-   39
+   40
   ],
   "necklace_moonstone_l70_green": [
    4,
-   39
+   40
   ],
   "necklace_moonstone_l70_blue": [
    4,
-   39
+   40
   ],
   "necklace_moonstone_l70_purple": [
    4,
-   39
+   40
   ],
   "accessory_amber_l70_gray": [
    5,
-   39
+   40
   ],
   "accessory_amber_l70_green": [
    5,
-   39
+   40
   ],
   "accessory_amber_l70_blue": [
    5,
-   39
+   40
   ],
   "accessory_amber_l70_purple": [
    5,
-   39
+   40
   ],
   "warrior_armor_crimson_l75_gray": [
    6,
-   39
+   40
   ],
   "warrior_armor_azure_l75_green": [
    6,
-   39
+   40
   ],
   "warrior_armor_crimson_l75_blue": [
    6,
-   39
+   40
   ],
   "warrior_headgear_crimson_l75_gray": [
    7,
-   39
+   40
   ],
   "warrior_headgear_azure_l75_green": [
    7,
-   39
+   40
   ],
   "warrior_headgear_crimson_l75_blue": [
    7,
-   39
+   40
   ],
   "warrior_shoulders_crimson_l75_gray": [
    8,
-   39
+   40
   ],
   "warrior_shoulders_azure_l75_green": [
    8,
-   39
+   40
   ],
   "warrior_shoulders_crimson_l75_blue": [
    8,
-   39
+   40
   ],
   "warrior_gloves_crimson_l75_gray": [
    9,
-   39
+   40
   ],
   "warrior_gloves_azure_l75_green": [
    9,
-   39
+   40
   ],
   "warrior_gloves_crimson_l75_blue": [
    9,
-   39
+   40
   ],
   "warrior_weapon_sword_l75_gray": [
    0,
-   40
+   41
   ],
   "warrior_weapon_royal_l75_green": [
    0,
-   40
+   41
   ],
   "warrior_weapon_sword_l75_blue": [
    0,
-   40
+   41
   ],
   "mage_armor_apprentice_l75_gray": [
    1,
-   40
+   41
   ],
   "mage_armor_runic_l75_green": [
    1,
-   40
+   41
   ],
   "mage_armor_apprentice_l75_blue": [
    1,
-   40
+   41
   ],
   "mage_headgear_apprentice_l75_gray": [
    2,
-   40
+   41
   ],
   "mage_headgear_runic_l75_green": [
    2,
-   40
+   41
   ],
   "mage_headgear_apprentice_l75_blue": [
    2,
-   40
+   41
   ],
   "mage_shoulders_apprentice_l75_gray": [
    3,
-   40
+   41
   ],
   "mage_shoulders_runic_l75_green": [
    3,
-   40
+   41
   ],
   "mage_shoulders_apprentice_l75_blue": [
    3,
-   40
+   41
   ],
   "mage_gloves_apprentice_l75_gray": [
    4,
-   40
+   41
   ],
   "mage_gloves_runic_l75_green": [
    4,
-   40
+   41
   ],
   "mage_gloves_apprentice_l75_blue": [
    4,
-   40
+   41
   ],
   "mage_weapon_ash_l75_gray": [
    5,
-   40
+   41
   ],
   "mage_weapon_crystal_l75_green": [
    5,
-   40
+   41
   ],
   "mage_weapon_ash_l75_blue": [
    5,
-   40
+   41
   ],
   "assassin_armor_shadow_l75_gray": [
    6,
-   40
+   41
   ],
   "assassin_armor_moon_l75_green": [
    6,
-   40
+   41
   ],
   "assassin_armor_shadow_l75_blue": [
    6,
-   40
+   41
   ],
   "assassin_headgear_shadow_l75_gray": [
    7,
-   40
+   41
   ],
   "assassin_headgear_moon_l75_green": [
    7,
-   40
+   41
   ],
   "assassin_headgear_shadow_l75_blue": [
    7,
-   40
+   41
   ],
   "assassin_shoulders_shadow_l75_gray": [
    8,
-   40
+   41
   ],
   "assassin_shoulders_moon_l75_green": [
    8,
-   40
+   41
   ],
   "assassin_shoulders_shadow_l75_blue": [
    8,
-   40
+   41
   ],
   "assassin_gloves_shadow_l75_gray": [
    9,
-   40
+   41
   ],
   "assassin_gloves_moon_l75_green": [
    9,
-   40
+   41
   ],
   "assassin_gloves_shadow_l75_blue": [
    9,
-   40
+   41
   ],
   "assassin_weapon_daggers_l75_gray": [
    0,
-   41
+   42
   ],
   "assassin_weapon_moonfang_l75_green": [
    0,
-   41
+   42
   ],
   "assassin_weapon_daggers_l75_blue": [
    0,
-   41
+   42
   ],
   "priest_armor_pilgrim_l75_gray": [
    1,
-   41
+   42
   ],
   "priest_armor_dawn_l75_green": [
    1,
-   41
+   42
   ],
   "priest_armor_pilgrim_l75_blue": [
    1,
-   41
+   42
   ],
   "priest_headgear_pilgrim_l75_gray": [
    2,
-   41
+   42
   ],
   "priest_headgear_dawn_l75_green": [
    2,
-   41
+   42
   ],
   "priest_headgear_pilgrim_l75_blue": [
    2,
-   41
+   42
   ],
   "priest_shoulders_pilgrim_l75_gray": [
    3,
-   41
+   42
   ],
   "priest_shoulders_dawn_l75_green": [
    3,
-   41
+   42
   ],
   "priest_shoulders_pilgrim_l75_blue": [
    3,
-   41
+   42
   ],
   "priest_gloves_pilgrim_l75_gray": [
    4,
-   41
+   42
   ],
   "priest_gloves_dawn_l75_green": [
    4,
-   41
+   42
   ],
   "priest_gloves_pilgrim_l75_blue": [
    4,
-   41
+   42
   ],
   "priest_weapon_mace_l75_gray": [
    5,
-   41
+   42
   ],
   "priest_weapon_sunmace_l75_green": [
    5,
-   41
+   42
   ],
   "priest_weapon_mace_l75_blue": [
    5,
-   41
+   42
   ],
   "hunter_armor_scout_l75_gray": [
    6,
-   41
+   42
   ],
   "hunter_armor_warden_l75_green": [
    6,
-   41
+   42
   ],
   "hunter_armor_scout_l75_blue": [
    6,
-   41
+   42
   ],
   "hunter_headgear_scout_l75_gray": [
    7,
-   41
+   42
   ],
   "hunter_headgear_warden_l75_green": [
    7,
-   41
+   42
   ],
   "hunter_headgear_scout_l75_blue": [
    7,
-   41
+   42
   ],
   "hunter_shoulders_scout_l75_gray": [
    8,
-   41
+   42
   ],
   "hunter_shoulders_warden_l75_green": [
    8,
-   41
+   42
   ],
   "hunter_shoulders_scout_l75_blue": [
    8,
-   41
+   42
   ],
   "hunter_gloves_scout_l75_gray": [
    9,
-   41
+   42
   ],
   "hunter_gloves_warden_l75_green": [
    9,
-   41
+   42
   ],
   "hunter_gloves_scout_l75_blue": [
    9,
-   41
+   42
   ],
   "hunter_weapon_shortbow_l75_gray": [
    0,
-   42
+   43
   ],
   "hunter_weapon_wardenbow_l75_green": [
    0,
-   42
+   43
   ],
   "hunter_weapon_shortbow_l75_blue": [
    0,
-   42
+   43
   ],
   "pants_wayfarer_l75_gray": [
    1,
-   42
+   43
   ],
   "pants_wayfarer_l75_green": [
    1,
-   42
+   43
   ],
   "pants_wayfarer_l75_blue": [
    1,
-   42
+   43
   ],
   "necklace_moonstone_l75_gray": [
    2,
-   42
+   43
   ],
   "necklace_moonstone_l75_green": [
    2,
-   42
+   43
   ],
   "necklace_moonstone_l75_blue": [
    2,
-   42
+   43
   ],
   "accessory_amber_l75_gray": [
    3,
-   42
+   43
   ],
   "accessory_amber_l75_green": [
    3,
-   42
+   43
   ],
   "accessory_amber_l75_blue": [
    3,
-   42
+   43
   ],
   "warrior_armor_crimson_l80_gray": [
    4,
-   42
+   43
   ],
   "warrior_armor_azure_l80_green": [
    4,
-   42
+   43
   ],
   "warrior_armor_crimson_l80_blue": [
    4,
-   42
+   43
   ],
   "warrior_armor_azure_l80_purple": [
    4,
-   42
+   43
   ],
   "warrior_headgear_crimson_l80_gray": [
    5,
-   42
+   43
   ],
   "warrior_headgear_azure_l80_green": [
    5,
-   42
+   43
   ],
   "warrior_headgear_crimson_l80_blue": [
    5,
-   42
+   43
   ],
   "warrior_headgear_azure_l80_purple": [
    5,
-   42
+   43
   ],
   "warrior_shoulders_crimson_l80_gray": [
    6,
-   42
+   43
   ],
   "warrior_shoulders_azure_l80_green": [
    6,
-   42
+   43
   ],
   "warrior_shoulders_crimson_l80_blue": [
    6,
-   42
+   43
   ],
   "warrior_shoulders_azure_l80_purple": [
    6,
-   42
+   43
   ],
   "warrior_gloves_crimson_l80_gray": [
    7,
-   42
+   43
   ],
   "warrior_gloves_azure_l80_green": [
    7,
-   42
+   43
   ],
   "warrior_gloves_crimson_l80_blue": [
    7,
-   42
+   43
   ],
   "warrior_gloves_azure_l80_purple": [
    7,
-   42
+   43
   ],
   "warrior_weapon_sword_l80_gray": [
    8,
-   42
+   43
   ],
   "warrior_weapon_royal_l80_green": [
    8,
-   42
+   43
   ],
   "warrior_weapon_sword_l80_blue": [
    8,
-   42
+   43
   ],
   "warrior_weapon_royal_l80_purple": [
    8,
-   42
+   43
   ],
   "mage_armor_apprentice_l80_gray": [
    9,
-   42
+   43
   ],
   "mage_armor_runic_l80_green": [
    9,
-   42
+   43
   ],
   "mage_armor_apprentice_l80_blue": [
    9,
-   42
+   43
   ],
   "mage_armor_runic_l80_purple": [
    9,
-   42
+   43
   ],
   "mage_headgear_apprentice_l80_gray": [
    0,
-   43
+   44
   ],
   "mage_headgear_runic_l80_green": [
    0,
-   43
+   44
   ],
   "mage_headgear_apprentice_l80_blue": [
    0,
-   43
+   44
   ],
   "mage_headgear_runic_l80_purple": [
    0,
-   43
+   44
   ],
   "mage_shoulders_apprentice_l80_gray": [
    1,
-   43
+   44
   ],
   "mage_shoulders_runic_l80_green": [
    1,
-   43
+   44
   ],
   "mage_shoulders_apprentice_l80_blue": [
    1,
-   43
+   44
   ],
   "mage_shoulders_runic_l80_purple": [
    1,
-   43
+   44
   ],
   "mage_gloves_apprentice_l80_gray": [
    2,
-   43
+   44
   ],
   "mage_gloves_runic_l80_green": [
    2,
-   43
+   44
   ],
   "mage_gloves_apprentice_l80_blue": [
    2,
-   43
+   44
   ],
   "mage_gloves_runic_l80_purple": [
    2,
-   43
+   44
   ],
   "mage_weapon_ash_l80_gray": [
    3,
-   43
+   44
   ],
   "mage_weapon_crystal_l80_green": [
    3,
-   43
+   44
   ],
   "mage_weapon_ash_l80_blue": [
    3,
-   43
+   44
   ],
   "mage_weapon_crystal_l80_purple": [
    3,
-   43
+   44
   ],
   "assassin_armor_shadow_l80_gray": [
    4,
-   43
+   44
   ],
   "assassin_armor_moon_l80_green": [
    4,
-   43
+   44
   ],
   "assassin_armor_shadow_l80_blue": [
    4,
-   43
+   44
   ],
   "assassin_armor_moon_l80_purple": [
    4,
-   43
+   44
   ],
   "assassin_headgear_shadow_l80_gray": [
    5,
-   43
+   44
   ],
   "assassin_headgear_moon_l80_green": [
    5,
-   43
+   44
   ],
   "assassin_headgear_shadow_l80_blue": [
    5,
-   43
+   44
   ],
   "assassin_headgear_moon_l80_purple": [
    5,
-   43
+   44
   ],
   "assassin_shoulders_shadow_l80_gray": [
    6,
-   43
+   44
   ],
   "assassin_shoulders_moon_l80_green": [
    6,
-   43
+   44
   ],
   "assassin_shoulders_shadow_l80_blue": [
    6,
-   43
+   44
   ],
   "assassin_shoulders_moon_l80_purple": [
    6,
-   43
+   44
   ],
   "assassin_gloves_shadow_l80_gray": [
    7,
-   43
+   44
   ],
   "assassin_gloves_moon_l80_green": [
    7,
-   43
+   44
   ],
   "assassin_gloves_shadow_l80_blue": [
    7,
-   43
+   44
   ],
   "assassin_gloves_moon_l80_purple": [
    7,
-   43
+   44
   ],
   "assassin_weapon_daggers_l80_gray": [
    8,
-   43
+   44
   ],
   "assassin_weapon_moonfang_l80_green": [
    8,
-   43
+   44
   ],
   "assassin_weapon_daggers_l80_blue": [
    8,
-   43
+   44
   ],
   "assassin_weapon_moonfang_l80_purple": [
    8,
-   43
+   44
   ],
   "priest_armor_pilgrim_l80_gray": [
    9,
-   43
+   44
   ],
   "priest_armor_dawn_l80_green": [
    9,
-   43
+   44
   ],
   "priest_armor_pilgrim_l80_blue": [
    9,
-   43
+   44
   ],
   "priest_armor_dawn_l80_purple": [
    9,
-   43
+   44
   ],
   "priest_headgear_pilgrim_l80_gray": [
    0,
-   44
+   45
   ],
   "priest_headgear_dawn_l80_green": [
    0,
-   44
+   45
   ],
   "priest_headgear_pilgrim_l80_blue": [
    0,
-   44
+   45
   ],
   "priest_headgear_dawn_l80_purple": [
    0,
-   44
+   45
   ],
   "priest_shoulders_pilgrim_l80_gray": [
    1,
-   44
+   45
   ],
   "priest_shoulders_dawn_l80_green": [
    1,
-   44
+   45
   ],
   "priest_shoulders_pilgrim_l80_blue": [
    1,
-   44
+   45
   ],
   "priest_shoulders_dawn_l80_purple": [
    1,
-   44
+   45
   ],
   "priest_gloves_pilgrim_l80_gray": [
    2,
-   44
+   45
   ],
   "priest_gloves_dawn_l80_green": [
    2,
-   44
+   45
   ],
   "priest_gloves_pilgrim_l80_blue": [
    2,
-   44
+   45
   ],
   "priest_gloves_dawn_l80_purple": [
    2,
-   44
+   45
   ],
   "priest_weapon_mace_l80_gray": [
    3,
-   44
+   45
   ],
   "priest_weapon_sunmace_l80_green": [
    3,
-   44
+   45
   ],
   "priest_weapon_mace_l80_blue": [
    3,
-   44
+   45
   ],
   "priest_weapon_sunmace_l80_purple": [
    3,
-   44
+   45
   ],
   "hunter_armor_scout_l80_gray": [
    4,
-   44
+   45
   ],
   "hunter_armor_warden_l80_green": [
    4,
-   44
+   45
   ],
   "hunter_armor_scout_l80_blue": [
    4,
-   44
+   45
   ],
   "hunter_armor_warden_l80_purple": [
    4,
-   44
+   45
   ],
   "hunter_headgear_scout_l80_gray": [
    5,
-   44
+   45
   ],
   "hunter_headgear_warden_l80_green": [
    5,
-   44
+   45
   ],
   "hunter_headgear_scout_l80_blue": [
    5,
-   44
+   45
   ],
   "hunter_headgear_warden_l80_purple": [
    5,
-   44
+   45
   ],
   "hunter_shoulders_scout_l80_gray": [
    6,
-   44
+   45
   ],
   "hunter_shoulders_warden_l80_green": [
    6,
-   44
+   45
   ],
   "hunter_shoulders_scout_l80_blue": [
    6,
-   44
+   45
   ],
   "hunter_shoulders_warden_l80_purple": [
    6,
-   44
+   45
   ],
   "hunter_gloves_scout_l80_gray": [
    7,
-   44
+   45
   ],
   "hunter_gloves_warden_l80_green": [
    7,
-   44
+   45
   ],
   "hunter_gloves_scout_l80_blue": [
    7,
-   44
+   45
   ],
   "hunter_gloves_warden_l80_purple": [
    7,
-   44
+   45
   ],
   "hunter_weapon_shortbow_l80_gray": [
    8,
-   44
+   45
   ],
   "hunter_weapon_wardenbow_l80_green": [
    8,
-   44
+   45
   ],
   "hunter_weapon_shortbow_l80_blue": [
    8,
-   44
+   45
   ],
   "hunter_weapon_wardenbow_l80_purple": [
    8,
-   44
+   45
   ],
   "pants_wayfarer_l80_gray": [
    9,
-   44
+   45
   ],
   "pants_wayfarer_l80_green": [
    9,
-   44
+   45
   ],
   "pants_wayfarer_l80_blue": [
    9,
-   44
+   45
   ],
   "pants_wayfarer_l80_purple": [
    9,
-   44
+   45
   ],
   "necklace_moonstone_l80_gray": [
    0,
-   45
+   46
   ],
   "necklace_moonstone_l80_green": [
    0,
-   45
+   46
   ],
   "necklace_moonstone_l80_blue": [
    0,
-   45
+   46
   ],
   "necklace_moonstone_l80_purple": [
    0,
-   45
+   46
   ],
   "accessory_amber_l80_gray": [
    1,
-   45
+   46
   ],
   "accessory_amber_l80_green": [
    1,
-   45
+   46
   ],
   "accessory_amber_l80_blue": [
    1,
-   45
+   46
   ],
   "accessory_amber_l80_purple": [
    1,
-   45
+   46
   ],
   "warrior_armor_crimson_l85_gray": [
    2,
-   45
+   46
   ],
   "warrior_armor_azure_l85_green": [
    2,
-   45
+   46
   ],
   "warrior_armor_crimson_l85_blue": [
    2,
-   45
+   46
   ],
   "warrior_headgear_crimson_l85_gray": [
    3,
-   45
+   46
   ],
   "warrior_headgear_azure_l85_green": [
    3,
-   45
+   46
   ],
   "warrior_headgear_crimson_l85_blue": [
    3,
-   45
+   46
   ],
   "warrior_shoulders_crimson_l85_gray": [
    4,
-   45
+   46
   ],
   "warrior_shoulders_azure_l85_green": [
    4,
-   45
+   46
   ],
   "warrior_shoulders_crimson_l85_blue": [
    4,
-   45
+   46
   ],
   "warrior_gloves_crimson_l85_gray": [
    5,
-   45
+   46
   ],
   "warrior_gloves_azure_l85_green": [
    5,
-   45
+   46
   ],
   "warrior_gloves_crimson_l85_blue": [
    5,
-   45
+   46
   ],
   "warrior_weapon_sword_l85_gray": [
    6,
-   45
+   46
   ],
   "warrior_weapon_royal_l85_green": [
    6,
-   45
+   46
   ],
   "warrior_weapon_sword_l85_blue": [
    6,
-   45
+   46
   ],
   "mage_armor_apprentice_l85_gray": [
    7,
-   45
+   46
   ],
   "mage_armor_runic_l85_green": [
    7,
-   45
+   46
   ],
   "mage_armor_apprentice_l85_blue": [
    7,
-   45
+   46
   ],
   "mage_headgear_apprentice_l85_gray": [
    8,
-   45
+   46
   ],
   "mage_headgear_runic_l85_green": [
    8,
-   45
+   46
   ],
   "mage_headgear_apprentice_l85_blue": [
    8,
-   45
+   46
   ],
   "mage_shoulders_apprentice_l85_gray": [
    9,
-   45
+   46
   ],
   "mage_shoulders_runic_l85_green": [
    9,
-   45
+   46
   ],
   "mage_shoulders_apprentice_l85_blue": [
    9,
-   45
+   46
   ],
   "mage_gloves_apprentice_l85_gray": [
    0,
-   46
+   47
   ],
   "mage_gloves_runic_l85_green": [
    0,
-   46
+   47
   ],
   "mage_gloves_apprentice_l85_blue": [
    0,
-   46
+   47
   ],
   "mage_weapon_ash_l85_gray": [
    1,
-   46
+   47
   ],
   "mage_weapon_crystal_l85_green": [
    1,
-   46
+   47
   ],
   "mage_weapon_ash_l85_blue": [
    1,
-   46
+   47
   ],
   "assassin_armor_shadow_l85_gray": [
    2,
-   46
+   47
   ],
   "assassin_armor_moon_l85_green": [
    2,
-   46
+   47
   ],
   "assassin_armor_shadow_l85_blue": [
    2,
-   46
+   47
   ],
   "assassin_headgear_shadow_l85_gray": [
    3,
-   46
+   47
   ],
   "assassin_headgear_moon_l85_green": [
    3,
-   46
+   47
   ],
   "assassin_headgear_shadow_l85_blue": [
    3,
-   46
+   47
   ],
   "assassin_shoulders_shadow_l85_gray": [
    4,
-   46
+   47
   ],
   "assassin_shoulders_moon_l85_green": [
    4,
-   46
+   47
   ],
   "assassin_shoulders_shadow_l85_blue": [
    4,
-   46
+   47
   ],
   "assassin_gloves_shadow_l85_gray": [
    5,
-   46
+   47
   ],
   "assassin_gloves_moon_l85_green": [
    5,
-   46
+   47
   ],
   "assassin_gloves_shadow_l85_blue": [
    5,
-   46
+   47
   ],
   "assassin_weapon_daggers_l85_gray": [
    6,
-   46
+   47
   ],
   "assassin_weapon_moonfang_l85_green": [
    6,
-   46
+   47
   ],
   "assassin_weapon_daggers_l85_blue": [
    6,
-   46
+   47
   ],
   "priest_armor_pilgrim_l85_gray": [
    7,
-   46
+   47
   ],
   "priest_armor_dawn_l85_green": [
    7,
-   46
+   47
   ],
   "priest_armor_pilgrim_l85_blue": [
    7,
-   46
+   47
   ],
   "priest_headgear_pilgrim_l85_gray": [
    8,
-   46
+   47
   ],
   "priest_headgear_dawn_l85_green": [
    8,
-   46
+   47
   ],
   "priest_headgear_pilgrim_l85_blue": [
    8,
-   46
+   47
   ],
   "priest_shoulders_pilgrim_l85_gray": [
    9,
-   46
+   47
   ],
   "priest_shoulders_dawn_l85_green": [
    9,
-   46
+   47
   ],
   "priest_shoulders_pilgrim_l85_blue": [
    9,
-   46
+   47
   ],
   "priest_gloves_pilgrim_l85_gray": [
    0,
-   47
+   48
   ],
   "priest_gloves_dawn_l85_green": [
    0,
-   47
+   48
   ],
   "priest_gloves_pilgrim_l85_blue": [
    0,
-   47
+   48
   ],
   "priest_weapon_mace_l85_gray": [
    1,
-   47
+   48
   ],
   "priest_weapon_sunmace_l85_green": [
    1,
-   47
+   48
   ],
   "priest_weapon_mace_l85_blue": [
    1,
-   47
+   48
   ],
   "hunter_armor_scout_l85_gray": [
    2,
-   47
+   48
   ],
   "hunter_armor_warden_l85_green": [
    2,
-   47
+   48
   ],
   "hunter_armor_scout_l85_blue": [
    2,
-   47
+   48
   ],
   "hunter_headgear_scout_l85_gray": [
    3,
-   47
+   48
   ],
   "hunter_headgear_warden_l85_green": [
    3,
-   47
+   48
   ],
   "hunter_headgear_scout_l85_blue": [
    3,
-   47
+   48
   ],
   "hunter_shoulders_scout_l85_gray": [
    4,
-   47
+   48
   ],
   "hunter_shoulders_warden_l85_green": [
    4,
-   47
+   48
   ],
   "hunter_shoulders_scout_l85_blue": [
    4,
-   47
+   48
   ],
   "hunter_gloves_scout_l85_gray": [
    5,
-   47
+   48
   ],
   "hunter_gloves_warden_l85_green": [
    5,
-   47
+   48
   ],
   "hunter_gloves_scout_l85_blue": [
    5,
-   47
+   48
   ],
   "hunter_weapon_shortbow_l85_gray": [
    6,
-   47
+   48
   ],
   "hunter_weapon_wardenbow_l85_green": [
    6,
-   47
+   48
   ],
   "hunter_weapon_shortbow_l85_blue": [
    6,
-   47
+   48
   ],
   "pants_wayfarer_l85_gray": [
    7,
-   47
+   48
   ],
   "pants_wayfarer_l85_green": [
    7,
-   47
+   48
   ],
   "pants_wayfarer_l85_blue": [
    7,
-   47
+   48
   ],
   "necklace_moonstone_l85_gray": [
    8,
-   47
+   48
   ],
   "necklace_moonstone_l85_green": [
    8,
-   47
+   48
   ],
   "necklace_moonstone_l85_blue": [
    8,
-   47
+   48
   ],
   "accessory_amber_l85_gray": [
    9,
-   47
+   48
   ],
   "accessory_amber_l85_green": [
    9,
-   47
+   48
   ],
   "accessory_amber_l85_blue": [
    9,
-   47
+   48
   ],
   "warrior_armor_crimson_l90_gray": [
    0,
-   48
+   49
   ],
   "warrior_armor_azure_l90_green": [
    0,
-   48
+   49
   ],
   "warrior_armor_crimson_l90_blue": [
    0,
-   48
+   49
   ],
   "warrior_armor_azure_l90_purple": [
    0,
-   48
+   49
   ],
   "warrior_headgear_crimson_l90_gray": [
    1,
-   48
+   49
   ],
   "warrior_headgear_azure_l90_green": [
    1,
-   48
+   49
   ],
   "warrior_headgear_crimson_l90_blue": [
    1,
-   48
+   49
   ],
   "warrior_headgear_azure_l90_purple": [
    1,
-   48
+   49
   ],
   "warrior_shoulders_crimson_l90_gray": [
    2,
-   48
+   49
   ],
   "warrior_shoulders_azure_l90_green": [
    2,
-   48
+   49
   ],
   "warrior_shoulders_crimson_l90_blue": [
    2,
-   48
+   49
   ],
   "warrior_shoulders_azure_l90_purple": [
    2,
-   48
+   49
   ],
   "warrior_gloves_crimson_l90_gray": [
    3,
-   48
+   49
   ],
   "warrior_gloves_azure_l90_green": [
    3,
-   48
+   49
   ],
   "warrior_gloves_crimson_l90_blue": [
    3,
-   48
+   49
   ],
   "warrior_gloves_azure_l90_purple": [
    3,
-   48
+   49
   ],
   "warrior_weapon_sword_l90_gray": [
    4,
-   48
+   49
   ],
   "warrior_weapon_royal_l90_green": [
    4,
-   48
+   49
   ],
   "warrior_weapon_sword_l90_blue": [
    4,
-   48
+   49
   ],
   "warrior_weapon_royal_l90_purple": [
    4,
-   48
+   49
   ],
   "mage_armor_apprentice_l90_gray": [
    5,
-   48
+   49
   ],
   "mage_armor_runic_l90_green": [
    5,
-   48
+   49
   ],
   "mage_armor_apprentice_l90_blue": [
    5,
-   48
+   49
   ],
   "mage_armor_runic_l90_purple": [
    5,
-   48
+   49
   ],
   "mage_headgear_apprentice_l90_gray": [
    6,
-   48
+   49
   ],
   "mage_headgear_runic_l90_green": [
    6,
-   48
+   49
   ],
   "mage_headgear_apprentice_l90_blue": [
    6,
-   48
+   49
   ],
   "mage_headgear_runic_l90_purple": [
    6,
-   48
+   49
   ],
   "mage_shoulders_apprentice_l90_gray": [
    7,
-   48
+   49
   ],
   "mage_shoulders_runic_l90_green": [
    7,
-   48
+   49
   ],
   "mage_shoulders_apprentice_l90_blue": [
    7,
-   48
+   49
   ],
   "mage_shoulders_runic_l90_purple": [
    7,
-   48
+   49
   ],
   "mage_gloves_apprentice_l90_gray": [
    8,
-   48
+   49
   ],
   "mage_gloves_runic_l90_green": [
    8,
-   48
+   49
   ],
   "mage_gloves_apprentice_l90_blue": [
    8,
-   48
+   49
   ],
   "mage_gloves_runic_l90_purple": [
    8,
-   48
+   49
   ],
   "mage_weapon_ash_l90_gray": [
    9,
-   48
+   49
   ],
   "mage_weapon_crystal_l90_green": [
    9,
-   48
+   49
   ],
   "mage_weapon_ash_l90_blue": [
    9,
-   48
+   49
   ],
   "mage_weapon_crystal_l90_purple": [
    9,
-   48
+   49
   ],
   "assassin_armor_shadow_l90_gray": [
    0,
-   49
+   50
   ],
   "assassin_armor_moon_l90_green": [
    0,
-   49
+   50
   ],
   "assassin_armor_shadow_l90_blue": [
    0,
-   49
+   50
   ],
   "assassin_armor_moon_l90_purple": [
    0,
-   49
+   50
   ],
   "assassin_headgear_shadow_l90_gray": [
    1,
-   49
+   50
   ],
   "assassin_headgear_moon_l90_green": [
    1,
-   49
+   50
   ],
   "assassin_headgear_shadow_l90_blue": [
    1,
-   49
+   50
   ],
   "assassin_headgear_moon_l90_purple": [
    1,
-   49
+   50
   ],
   "assassin_shoulders_shadow_l90_gray": [
    2,
-   49
+   50
   ],
   "assassin_shoulders_moon_l90_green": [
    2,
-   49
+   50
   ],
   "assassin_shoulders_shadow_l90_blue": [
    2,
-   49
+   50
   ],
   "assassin_shoulders_moon_l90_purple": [
    2,
-   49
+   50
   ],
   "assassin_gloves_shadow_l90_gray": [
    3,
-   49
+   50
   ],
   "assassin_gloves_moon_l90_green": [
    3,
-   49
+   50
   ],
   "assassin_gloves_shadow_l90_blue": [
    3,
-   49
+   50
   ],
   "assassin_gloves_moon_l90_purple": [
    3,
-   49
+   50
   ],
   "assassin_weapon_daggers_l90_gray": [
    4,
-   49
+   50
   ],
   "assassin_weapon_moonfang_l90_green": [
    4,
-   49
+   50
   ],
   "assassin_weapon_daggers_l90_blue": [
    4,
-   49
+   50
   ],
   "assassin_weapon_moonfang_l90_purple": [
    4,
-   49
+   50
   ],
   "priest_armor_pilgrim_l90_gray": [
    5,
-   49
+   50
   ],
   "priest_armor_dawn_l90_green": [
    5,
-   49
+   50
   ],
   "priest_armor_pilgrim_l90_blue": [
    5,
-   49
+   50
   ],
   "priest_armor_dawn_l90_purple": [
    5,
-   49
+   50
   ],
   "priest_headgear_pilgrim_l90_gray": [
    6,
-   49
+   50
   ],
   "priest_headgear_dawn_l90_green": [
    6,
-   49
+   50
   ],
   "priest_headgear_pilgrim_l90_blue": [
    6,
-   49
+   50
   ],
   "priest_headgear_dawn_l90_purple": [
    6,
-   49
+   50
   ],
   "priest_shoulders_pilgrim_l90_gray": [
    7,
-   49
+   50
   ],
   "priest_shoulders_dawn_l90_green": [
    7,
-   49
+   50
   ],
   "priest_shoulders_pilgrim_l90_blue": [
    7,
-   49
+   50
   ],
   "priest_shoulders_dawn_l90_purple": [
    7,
-   49
+   50
   ],
   "priest_gloves_pilgrim_l90_gray": [
    8,
-   49
+   50
   ],
   "priest_gloves_dawn_l90_green": [
    8,
-   49
+   50
   ],
   "priest_gloves_pilgrim_l90_blue": [
    8,
-   49
+   50
   ],
   "priest_gloves_dawn_l90_purple": [
    8,
-   49
+   50
   ],
   "priest_weapon_mace_l90_gray": [
    9,
-   49
+   50
   ],
   "priest_weapon_sunmace_l90_green": [
    9,
-   49
+   50
   ],
   "priest_weapon_mace_l90_blue": [
    9,
-   49
+   50
   ],
   "priest_weapon_sunmace_l90_purple": [
    9,
-   49
+   50
   ],
   "hunter_armor_scout_l90_gray": [
    0,
-   50
+   51
   ],
   "hunter_armor_warden_l90_green": [
    0,
-   50
+   51
   ],
   "hunter_armor_scout_l90_blue": [
    0,
-   50
+   51
   ],
   "hunter_armor_warden_l90_purple": [
    0,
-   50
+   51
   ],
   "hunter_headgear_scout_l90_gray": [
    1,
-   50
+   51
   ],
   "hunter_headgear_warden_l90_green": [
    1,
-   50
+   51
   ],
   "hunter_headgear_scout_l90_blue": [
    1,
-   50
+   51
   ],
   "hunter_headgear_warden_l90_purple": [
    1,
-   50
+   51
   ],
   "hunter_shoulders_scout_l90_gray": [
    2,
-   50
+   51
   ],
   "hunter_shoulders_warden_l90_green": [
    2,
-   50
+   51
   ],
   "hunter_shoulders_scout_l90_blue": [
    2,
-   50
+   51
   ],
   "hunter_shoulders_warden_l90_purple": [
    2,
-   50
+   51
   ],
   "hunter_gloves_scout_l90_gray": [
    3,
-   50
+   51
   ],
   "hunter_gloves_warden_l90_green": [
    3,
-   50
+   51
   ],
   "hunter_gloves_scout_l90_blue": [
    3,
-   50
+   51
   ],
   "hunter_gloves_warden_l90_purple": [
    3,
-   50
+   51
   ],
   "hunter_weapon_shortbow_l90_gray": [
    4,
-   50
+   51
   ],
   "hunter_weapon_wardenbow_l90_green": [
    4,
-   50
+   51
   ],
   "hunter_weapon_shortbow_l90_blue": [
    4,
-   50
+   51
   ],
   "hunter_weapon_wardenbow_l90_purple": [
    4,
-   50
+   51
   ],
   "pants_wayfarer_l90_gray": [
    5,
-   50
+   51
   ],
   "pants_wayfarer_l90_green": [
    5,
-   50
+   51
   ],
   "pants_wayfarer_l90_blue": [
    5,
-   50
+   51
   ],
   "pants_wayfarer_l90_purple": [
    5,
-   50
+   51
   ],
   "necklace_moonstone_l90_gray": [
    6,
-   50
+   51
   ],
   "necklace_moonstone_l90_green": [
    6,
-   50
+   51
   ],
   "necklace_moonstone_l90_blue": [
    6,
-   50
+   51
   ],
   "necklace_moonstone_l90_purple": [
    6,
-   50
+   51
   ],
   "accessory_amber_l90_gray": [
    7,
-   50
+   51
   ],
   "accessory_amber_l90_green": [
    7,
-   50
+   51
   ],
   "accessory_amber_l90_blue": [
    7,
-   50
+   51
   ],
   "accessory_amber_l90_purple": [
    7,
-   50
+   51
   ],
   "warrior_armor_crimson_l95_gray": [
    8,
-   50
+   51
   ],
   "warrior_armor_azure_l95_green": [
    8,
-   50
+   51
   ],
   "warrior_armor_crimson_l95_blue": [
    8,
-   50
+   51
   ],
   "warrior_headgear_crimson_l95_gray": [
    9,
-   50
+   51
   ],
   "warrior_headgear_azure_l95_green": [
    9,
-   50
+   51
   ],
   "warrior_headgear_crimson_l95_blue": [
    9,
-   50
+   51
   ],
   "warrior_shoulders_crimson_l95_gray": [
    0,
-   51
+   52
   ],
   "warrior_shoulders_azure_l95_green": [
    0,
-   51
+   52
   ],
   "warrior_shoulders_crimson_l95_blue": [
    0,
-   51
+   52
   ],
   "warrior_gloves_crimson_l95_gray": [
    1,
-   51
+   52
   ],
   "warrior_gloves_azure_l95_green": [
    1,
-   51
+   52
   ],
   "warrior_gloves_crimson_l95_blue": [
    1,
-   51
+   52
   ],
   "warrior_weapon_sword_l95_gray": [
    2,
-   51
+   52
   ],
   "warrior_weapon_royal_l95_green": [
    2,
-   51
+   52
   ],
   "warrior_weapon_sword_l95_blue": [
    2,
-   51
+   52
   ],
   "mage_armor_apprentice_l95_gray": [
    3,
-   51
+   52
   ],
   "mage_armor_runic_l95_green": [
    3,
-   51
+   52
   ],
   "mage_armor_apprentice_l95_blue": [
    3,
-   51
+   52
   ],
   "mage_headgear_apprentice_l95_gray": [
    4,
-   51
+   52
   ],
   "mage_headgear_runic_l95_green": [
    4,
-   51
+   52
   ],
   "mage_headgear_apprentice_l95_blue": [
    4,
-   51
+   52
   ],
   "mage_shoulders_apprentice_l95_gray": [
    5,
-   51
+   52
   ],
   "mage_shoulders_runic_l95_green": [
    5,
-   51
+   52
   ],
   "mage_shoulders_apprentice_l95_blue": [
    5,
-   51
+   52
   ],
   "mage_gloves_apprentice_l95_gray": [
    6,
-   51
+   52
   ],
   "mage_gloves_runic_l95_green": [
    6,
-   51
+   52
   ],
   "mage_gloves_apprentice_l95_blue": [
    6,
-   51
+   52
   ],
   "mage_weapon_ash_l95_gray": [
    7,
-   51
+   52
   ],
   "mage_weapon_crystal_l95_green": [
    7,
-   51
+   52
   ],
   "mage_weapon_ash_l95_blue": [
    7,
-   51
+   52
   ],
   "assassin_armor_shadow_l95_gray": [
    8,
-   51
+   52
   ],
   "assassin_armor_moon_l95_green": [
    8,
-   51
+   52
   ],
   "assassin_armor_shadow_l95_blue": [
    8,
-   51
+   52
   ],
   "assassin_headgear_shadow_l95_gray": [
    9,
-   51
+   52
   ],
   "assassin_headgear_moon_l95_green": [
    9,
-   51
+   52
   ],
   "assassin_headgear_shadow_l95_blue": [
    9,
-   51
+   52
   ],
   "assassin_shoulders_shadow_l95_gray": [
    0,
-   52
+   53
   ],
   "assassin_shoulders_moon_l95_green": [
    0,
-   52
+   53
   ],
   "assassin_shoulders_shadow_l95_blue": [
    0,
-   52
+   53
   ],
   "assassin_gloves_shadow_l95_gray": [
    1,
-   52
+   53
   ],
   "assassin_gloves_moon_l95_green": [
    1,
-   52
+   53
   ],
   "assassin_gloves_shadow_l95_blue": [
    1,
-   52
+   53
   ],
   "assassin_weapon_daggers_l95_gray": [
    2,
-   52
+   53
   ],
   "assassin_weapon_moonfang_l95_green": [
    2,
-   52
+   53
   ],
   "assassin_weapon_daggers_l95_blue": [
    2,
-   52
+   53
   ],
   "priest_armor_pilgrim_l95_gray": [
    3,
-   52
+   53
   ],
   "priest_armor_dawn_l95_green": [
    3,
-   52
+   53
   ],
   "priest_armor_pilgrim_l95_blue": [
    3,
-   52
+   53
   ],
   "priest_headgear_pilgrim_l95_gray": [
    4,
-   52
+   53
   ],
   "priest_headgear_dawn_l95_green": [
    4,
-   52
+   53
   ],
   "priest_headgear_pilgrim_l95_blue": [
    4,
-   52
+   53
   ],
   "priest_shoulders_pilgrim_l95_gray": [
    5,
-   52
+   53
   ],
   "priest_shoulders_dawn_l95_green": [
    5,
-   52
+   53
   ],
   "priest_shoulders_pilgrim_l95_blue": [
    5,
-   52
+   53
   ],
   "priest_gloves_pilgrim_l95_gray": [
    6,
-   52
+   53
   ],
   "priest_gloves_dawn_l95_green": [
    6,
-   52
+   53
   ],
   "priest_gloves_pilgrim_l95_blue": [
    6,
-   52
+   53
   ],
   "priest_weapon_mace_l95_gray": [
    7,
-   52
+   53
   ],
   "priest_weapon_sunmace_l95_green": [
    7,
-   52
+   53
   ],
   "priest_weapon_mace_l95_blue": [
    7,
-   52
+   53
   ],
   "hunter_armor_scout_l95_gray": [
    8,
-   52
+   53
   ],
   "hunter_armor_warden_l95_green": [
    8,
-   52
+   53
   ],
   "hunter_armor_scout_l95_blue": [
    8,
-   52
+   53
   ],
   "hunter_headgear_scout_l95_gray": [
    9,
-   52
+   53
   ],
   "hunter_headgear_warden_l95_green": [
    9,
-   52
+   53
   ],
   "hunter_headgear_scout_l95_blue": [
    9,
-   52
+   53
   ],
   "hunter_shoulders_scout_l95_gray": [
    0,
-   53
+   54
   ],
   "hunter_shoulders_warden_l95_green": [
    0,
-   53
+   54
   ],
   "hunter_shoulders_scout_l95_blue": [
    0,
-   53
+   54
   ],
   "hunter_gloves_scout_l95_gray": [
    1,
-   53
+   54
   ],
   "hunter_gloves_warden_l95_green": [
    1,
-   53
+   54
   ],
   "hunter_gloves_scout_l95_blue": [
    1,
-   53
+   54
   ],
   "hunter_weapon_shortbow_l95_gray": [
    2,
-   53
+   54
   ],
   "hunter_weapon_wardenbow_l95_green": [
    2,
-   53
+   54
   ],
   "hunter_weapon_shortbow_l95_blue": [
    2,
-   53
+   54
   ],
   "pants_wayfarer_l95_gray": [
    3,
-   53
+   54
   ],
   "pants_wayfarer_l95_green": [
    3,
-   53
+   54
   ],
   "pants_wayfarer_l95_blue": [
    3,
-   53
+   54
   ],
   "necklace_moonstone_l95_gray": [
    4,
-   53
+   54
   ],
   "necklace_moonstone_l95_green": [
    4,
-   53
+   54
   ],
   "necklace_moonstone_l95_blue": [
    4,
-   53
+   54
   ],
   "accessory_amber_l95_gray": [
    5,
-   53
+   54
   ],
   "accessory_amber_l95_green": [
    5,
-   53
+   54
   ],
   "accessory_amber_l95_blue": [
    5,
-   53
+   54
   ],
   "warrior_armor_crimson_l20_vault": [
    6,
-   53
+   54
   ],
   "warrior_headgear_crimson_l20_vault": [
    7,
-   53
+   54
   ],
   "warrior_shoulders_crimson_l20_vault": [
    8,
-   53
+   54
   ],
   "warrior_gloves_crimson_l20_vault": [
    9,
-   53
+   54
   ],
   "warrior_weapon_sword_l20_vault": [
    0,
-   54
+   55
   ],
   "mage_armor_apprentice_l20_vault": [
    1,
-   54
+   55
   ],
   "mage_headgear_apprentice_l20_vault": [
    2,
-   54
+   55
   ],
   "mage_shoulders_apprentice_l20_vault": [
    3,
-   54
+   55
   ],
   "mage_gloves_apprentice_l20_vault": [
    4,
-   54
+   55
   ],
   "mage_weapon_ash_l20_vault": [
    5,
-   54
+   55
   ],
   "assassin_armor_shadow_l20_vault": [
    6,
-   54
+   55
   ],
   "assassin_headgear_shadow_l20_vault": [
    7,
-   54
+   55
   ],
   "assassin_shoulders_shadow_l20_vault": [
    8,
-   54
+   55
   ],
   "assassin_gloves_shadow_l20_vault": [
    9,
-   54
+   55
   ],
   "assassin_weapon_daggers_l20_vault": [
    0,
-   55
+   56
   ],
   "priest_armor_pilgrim_l20_vault": [
    1,
-   55
+   56
   ],
   "priest_headgear_pilgrim_l20_vault": [
    2,
-   55
+   56
   ],
   "priest_shoulders_pilgrim_l20_vault": [
    3,
-   55
+   56
   ],
   "priest_gloves_pilgrim_l20_vault": [
    4,
-   55
+   56
   ],
   "priest_weapon_mace_l20_vault": [
    5,
-   55
+   56
   ],
   "hunter_armor_scout_l20_vault": [
    6,
-   55
+   56
   ],
   "hunter_headgear_scout_l20_vault": [
    7,
-   55
+   56
   ],
   "hunter_shoulders_scout_l20_vault": [
    8,
-   55
+   56
   ],
   "hunter_gloves_scout_l20_vault": [
    9,
-   55
+   56
   ],
   "hunter_weapon_shortbow_l20_vault": [
    0,
-   56
+   57
   ],
   "pants_wayfarer_l20_vault": [
    1,
-   56
+   57
   ],
   "accessory_amber_l20_vault": [
    2,
-   56
+   57
   ],
   "warrior_armor_crimson_l60_moonwell": [
    3,
-   56
+   57
   ],
   "warrior_headgear_crimson_l60_moonwell": [
    4,
-   56
+   57
   ],
   "warrior_shoulders_crimson_l60_moonwell": [
    5,
-   56
+   57
   ],
   "warrior_gloves_crimson_l60_moonwell": [
    6,
-   56
+   57
   ],
   "warrior_weapon_sword_l60_moonwell": [
    7,
-   56
+   57
   ],
   "mage_armor_apprentice_l60_moonwell": [
    8,
-   56
+   57
   ],
   "mage_headgear_apprentice_l60_moonwell": [
    9,
-   56
+   57
   ],
   "mage_shoulders_apprentice_l60_moonwell": [
    0,
-   57
+   58
   ],
   "mage_gloves_apprentice_l60_moonwell": [
    1,
-   57
+   58
   ],
   "mage_weapon_ash_l60_moonwell": [
    2,
-   57
+   58
   ],
   "assassin_armor_shadow_l60_moonwell": [
    3,
-   57
+   58
   ],
   "assassin_headgear_shadow_l60_moonwell": [
    4,
-   57
+   58
   ],
   "assassin_shoulders_shadow_l60_moonwell": [
    5,
-   57
+   58
   ],
   "assassin_gloves_shadow_l60_moonwell": [
    6,
-   57
+   58
   ],
   "assassin_weapon_daggers_l60_moonwell": [
    7,
-   57
+   58
   ],
   "priest_armor_pilgrim_l60_moonwell": [
    8,
-   57
+   58
   ],
   "priest_headgear_pilgrim_l60_moonwell": [
    9,
-   57
+   58
   ],
   "priest_shoulders_pilgrim_l60_moonwell": [
    0,
-   58
+   59
   ],
   "priest_gloves_pilgrim_l60_moonwell": [
    1,
-   58
+   59
   ],
   "priest_weapon_mace_l60_moonwell": [
    2,
-   58
+   59
   ],
   "hunter_armor_scout_l60_moonwell": [
    3,
-   58
+   59
   ],
   "hunter_headgear_scout_l60_moonwell": [
    4,
-   58
+   59
   ],
   "hunter_shoulders_scout_l60_moonwell": [
    5,
-   58
+   59
   ],
   "hunter_gloves_scout_l60_moonwell": [
    6,
-   58
+   59
   ],
   "hunter_weapon_shortbow_l60_moonwell": [
    7,
-   58
+   59
   ],
   "pants_wayfarer_l60_moonwell": [
    8,
-   58
+   59
   ],
   "necklace_moonstone_l60_moonwell": [
    9,
-   58
+   59
   ],
   "accessory_amber_l60_moonwell": [
    0,
-   59
+   60
   ],
   "warrior_armor_crimson_l65_eye": [
    1,
-   59
+   60
   ],
   "warrior_headgear_crimson_l65_eye": [
    2,
-   59
+   60
   ],
   "warrior_shoulders_crimson_l65_eye": [
    3,
-   59
+   60
   ],
   "warrior_gloves_crimson_l65_eye": [
    4,
-   59
+   60
   ],
   "warrior_weapon_sword_l65_eye": [
    5,
-   59
+   60
   ],
   "mage_armor_apprentice_l65_eye": [
    6,
-   59
+   60
   ],
   "mage_headgear_apprentice_l65_eye": [
    7,
-   59
+   60
   ],
   "mage_shoulders_apprentice_l65_eye": [
    8,
-   59
+   60
   ],
   "mage_gloves_apprentice_l65_eye": [
    9,
-   59
+   60
   ],
   "mage_weapon_ash_l65_eye": [
    0,
-   60
+   61
   ],
   "assassin_armor_shadow_l65_eye": [
    1,
-   60
+   61
   ],
   "assassin_headgear_shadow_l65_eye": [
    2,
-   60
+   61
   ],
   "assassin_shoulders_shadow_l65_eye": [
    3,
-   60
+   61
   ],
   "assassin_gloves_shadow_l65_eye": [
    4,
-   60
+   61
   ],
   "assassin_weapon_daggers_l65_eye": [
    5,
-   60
+   61
   ],
   "priest_armor_pilgrim_l65_eye": [
    6,
-   60
+   61
   ],
   "priest_headgear_pilgrim_l65_eye": [
    7,
-   60
+   61
   ],
   "priest_shoulders_pilgrim_l65_eye": [
    8,
-   60
+   61
   ],
   "priest_gloves_pilgrim_l65_eye": [
    9,
-   60
+   61
   ],
   "priest_weapon_mace_l65_eye": [
    0,
-   61
+   62
   ],
   "hunter_armor_scout_l65_eye": [
    1,
-   61
+   62
   ],
   "hunter_headgear_scout_l65_eye": [
    2,
-   61
+   62
   ],
   "hunter_shoulders_scout_l65_eye": [
    3,
-   61
+   62
   ],
   "hunter_gloves_scout_l65_eye": [
    4,
-   61
+   62
   ],
   "hunter_weapon_shortbow_l65_eye": [
    5,
-   61
+   62
   ],
   "pants_wayfarer_l65_eye": [
    6,
-   61
+   62
   ],
   "necklace_moonstone_l65_eye": [
    7,
-   61
+   62
   ],
   "accessory_amber_l65_eye": [
    8,
-   61
+   62
   ],
   "warrior_armor_crimson_l70_elder": [
    9,
-   61
+   62
   ],
   "warrior_headgear_crimson_l70_elder": [
    0,
-   62
+   63
   ],
   "warrior_shoulders_crimson_l70_elder": [
    1,
-   62
+   63
   ],
   "warrior_gloves_crimson_l70_elder": [
    2,
-   62
+   63
   ],
   "warrior_weapon_sword_l70_elder": [
    3,
-   62
+   63
   ],
   "mage_armor_apprentice_l70_elder": [
    4,
-   62
+   63
   ],
   "mage_headgear_apprentice_l70_elder": [
    5,
-   62
+   63
   ],
   "mage_shoulders_apprentice_l70_elder": [
    6,
-   62
+   63
   ],
   "mage_gloves_apprentice_l70_elder": [
    7,
-   62
+   63
   ],
   "mage_weapon_ash_l70_elder": [
    8,
-   62
+   63
   ],
   "assassin_armor_shadow_l70_elder": [
    9,
-   62
+   63
   ],
   "assassin_headgear_shadow_l70_elder": [
    0,
-   63
+   64
   ],
   "assassin_shoulders_shadow_l70_elder": [
    1,
-   63
+   64
   ],
   "assassin_gloves_shadow_l70_elder": [
    2,
-   63
+   64
   ],
   "assassin_weapon_daggers_l70_elder": [
    3,
-   63
+   64
   ],
   "priest_armor_pilgrim_l70_elder": [
    4,
-   63
+   64
   ],
   "priest_headgear_pilgrim_l70_elder": [
    5,
-   63
+   64
   ],
   "priest_shoulders_pilgrim_l70_elder": [
    6,
-   63
+   64
   ],
   "priest_gloves_pilgrim_l70_elder": [
    7,
-   63
+   64
   ],
   "priest_weapon_mace_l70_elder": [
    8,
-   63
+   64
   ],
   "hunter_armor_scout_l70_elder": [
    9,
-   63
+   64
   ],
   "hunter_headgear_scout_l70_elder": [
    0,
-   64
+   65
   ],
   "hunter_shoulders_scout_l70_elder": [
    1,
-   64
+   65
   ],
   "hunter_gloves_scout_l70_elder": [
    2,
-   64
+   65
   ],
   "hunter_weapon_shortbow_l70_elder": [
    3,
-   64
+   65
   ],
   "pants_wayfarer_l70_elder": [
    4,
-   64
+   65
   ],
   "necklace_moonstone_l70_elder": [
    5,
-   64
+   65
   ],
   "accessory_amber_l70_elder": [
    6,
-   64
+   65
   ],
   "warrior_armor_crimson_l75_pavilion": [
    7,
-   64
+   65
   ],
   "warrior_headgear_crimson_l75_pavilion": [
    8,
-   64
+   65
   ],
   "warrior_shoulders_crimson_l75_pavilion": [
    9,
-   64
+   65
   ],
   "warrior_gloves_crimson_l75_pavilion": [
    0,
-   65
+   66
   ],
   "warrior_weapon_sword_l75_pavilion": [
    1,
-   65
+   66
   ],
   "mage_armor_apprentice_l75_pavilion": [
    2,
-   65
+   66
   ],
   "mage_headgear_apprentice_l75_pavilion": [
    3,
-   65
+   66
   ],
   "mage_shoulders_apprentice_l75_pavilion": [
    4,
-   65
+   66
   ],
   "mage_gloves_apprentice_l75_pavilion": [
    5,
-   65
+   66
   ],
   "mage_weapon_ash_l75_pavilion": [
    6,
-   65
+   66
   ],
   "assassin_armor_shadow_l75_pavilion": [
    7,
-   65
+   66
   ],
   "assassin_headgear_shadow_l75_pavilion": [
    8,
-   65
+   66
   ],
   "assassin_shoulders_shadow_l75_pavilion": [
    9,
-   65
+   66
   ],
   "assassin_gloves_shadow_l75_pavilion": [
    0,
-   66
+   67
   ],
   "assassin_weapon_daggers_l75_pavilion": [
    1,
-   66
+   67
   ],
   "priest_armor_pilgrim_l75_pavilion": [
    2,
-   66
+   67
   ],
   "priest_headgear_pilgrim_l75_pavilion": [
    3,
-   66
+   67
   ],
   "priest_shoulders_pilgrim_l75_pavilion": [
    4,
-   66
+   67
   ],
   "priest_gloves_pilgrim_l75_pavilion": [
    5,
-   66
+   67
   ],
   "priest_weapon_mace_l75_pavilion": [
    6,
-   66
+   67
   ],
   "hunter_armor_scout_l75_pavilion": [
    7,
-   66
+   67
   ],
   "hunter_headgear_scout_l75_pavilion": [
    8,
-   66
+   67
   ],
   "hunter_shoulders_scout_l75_pavilion": [
    9,
-   66
+   67
   ],
   "hunter_gloves_scout_l75_pavilion": [
    0,
-   67
+   68
   ],
   "hunter_weapon_shortbow_l75_pavilion": [
    1,
-   67
+   68
   ],
   "pants_wayfarer_l75_pavilion": [
    2,
-   67
+   68
   ],
   "necklace_moonstone_l75_pavilion": [
    3,
-   67
+   68
   ],
   "accessory_amber_l75_pavilion": [
    4,
-   67
+   68
   ],
   "warrior_armor_crimson_l80_rain": [
    5,
-   67
+   68
   ],
   "warrior_headgear_crimson_l80_rain": [
    6,
-   67
+   68
   ],
   "warrior_shoulders_crimson_l80_rain": [
    7,
-   67
+   68
   ],
   "warrior_gloves_crimson_l80_rain": [
    8,
-   67
+   68
   ],
   "warrior_weapon_sword_l80_rain": [
    9,
-   67
+   68
   ],
   "mage_armor_apprentice_l80_rain": [
    0,
-   68
+   69
   ],
   "mage_headgear_apprentice_l80_rain": [
    1,
-   68
+   69
   ],
   "mage_shoulders_apprentice_l80_rain": [
    2,
-   68
+   69
   ],
   "mage_gloves_apprentice_l80_rain": [
    3,
-   68
+   69
   ],
   "mage_weapon_ash_l80_rain": [
    4,
-   68
+   69
   ],
   "assassin_armor_shadow_l80_rain": [
    5,
-   68
+   69
   ],
   "assassin_headgear_shadow_l80_rain": [
    6,
-   68
+   69
   ],
   "assassin_shoulders_shadow_l80_rain": [
    7,
-   68
+   69
   ],
   "assassin_gloves_shadow_l80_rain": [
    8,
-   68
+   69
   ],
   "assassin_weapon_daggers_l80_rain": [
    9,
-   68
+   69
   ],
   "priest_armor_pilgrim_l80_rain": [
    0,
-   69
+   70
   ],
   "priest_headgear_pilgrim_l80_rain": [
    1,
-   69
+   70
   ],
   "priest_shoulders_pilgrim_l80_rain": [
    2,
-   69
+   70
   ],
   "priest_gloves_pilgrim_l80_rain": [
    3,
-   69
+   70
   ],
   "priest_weapon_mace_l80_rain": [
    4,
-   69
+   70
   ],
   "hunter_armor_scout_l80_rain": [
    5,
-   69
+   70
   ],
   "hunter_headgear_scout_l80_rain": [
    6,
-   69
+   70
   ],
   "hunter_shoulders_scout_l80_rain": [
    7,
-   69
+   70
   ],
   "hunter_gloves_scout_l80_rain": [
    8,
-   69
+   70
   ],
   "hunter_weapon_shortbow_l80_rain": [
    9,
-   69
+   70
   ],
   "pants_wayfarer_l80_rain": [
    0,
-   70
+   71
   ],
   "necklace_moonstone_l80_rain": [
    1,
-   70
+   71
   ],
   "accessory_amber_l80_rain": [
    2,
-   70
+   71
   ],
   "warrior_armor_crimson_l80_seed": [
    3,
-   70
+   71
   ],
   "warrior_headgear_crimson_l80_seed": [
    4,
-   70
+   71
   ],
   "warrior_shoulders_crimson_l80_seed": [
    5,
-   70
+   71
   ],
   "warrior_gloves_crimson_l80_seed": [
    6,
-   70
+   71
   ],
   "warrior_weapon_sword_l80_seed": [
    7,
-   70
+   71
   ],
   "mage_armor_apprentice_l80_seed": [
    8,
-   70
+   71
   ],
   "mage_headgear_apprentice_l80_seed": [
    9,
-   70
+   71
   ],
   "mage_shoulders_apprentice_l80_seed": [
    0,
-   71
+   72
   ],
   "mage_gloves_apprentice_l80_seed": [
    1,
-   71
+   72
   ],
   "mage_weapon_ash_l80_seed": [
    2,
-   71
+   72
   ],
   "assassin_armor_shadow_l80_seed": [
    3,
-   71
+   72
   ],
   "assassin_headgear_shadow_l80_seed": [
    4,
-   71
+   72
   ],
   "assassin_shoulders_shadow_l80_seed": [
    5,
-   71
+   72
   ],
   "assassin_gloves_shadow_l80_seed": [
    6,
-   71
+   72
   ],
   "assassin_weapon_daggers_l80_seed": [
    7,
-   71
+   72
   ],
   "priest_armor_pilgrim_l80_seed": [
    8,
-   71
+   72
   ],
   "priest_headgear_pilgrim_l80_seed": [
    9,
-   71
+   72
   ],
   "priest_shoulders_pilgrim_l80_seed": [
    0,
-   72
+   73
   ],
   "priest_gloves_pilgrim_l80_seed": [
    1,
-   72
+   73
   ],
   "priest_weapon_mace_l80_seed": [
    2,
-   72
+   73
   ],
   "hunter_armor_scout_l80_seed": [
    3,
-   72
+   73
   ],
   "hunter_headgear_scout_l80_seed": [
    4,
-   72
+   73
   ],
   "hunter_shoulders_scout_l80_seed": [
    5,
-   72
+   73
   ],
   "hunter_gloves_scout_l80_seed": [
    6,
-   72
+   73
   ],
   "hunter_weapon_shortbow_l80_seed": [
    7,
-   72
+   73
   ],
   "pants_wayfarer_l80_seed": [
    8,
-   72
+   73
   ],
   "necklace_moonstone_l80_seed": [
    9,
-   72
+   73
   ],
   "accessory_amber_l80_seed": [
    0,
-   73
+   74
   ],
   "warrior_armor_crimson_l85_astro": [
    1,
-   73
+   74
   ],
   "warrior_headgear_crimson_l85_astro": [
    2,
-   73
+   74
   ],
   "warrior_shoulders_crimson_l85_astro": [
    3,
-   73
+   74
   ],
   "warrior_gloves_crimson_l85_astro": [
    4,
-   73
+   74
   ],
   "warrior_weapon_sword_l85_astro": [
    5,
-   73
+   74
   ],
   "mage_armor_apprentice_l85_astro": [
    6,
-   73
+   74
   ],
   "mage_headgear_apprentice_l85_astro": [
    7,
-   73
+   74
   ],
   "mage_shoulders_apprentice_l85_astro": [
    8,
-   73
+   74
   ],
   "mage_gloves_apprentice_l85_astro": [
    9,
-   73
+   74
   ],
   "mage_weapon_ash_l85_astro": [
    0,
-   74
+   75
   ],
   "assassin_armor_shadow_l85_astro": [
    1,
-   74
+   75
   ],
   "assassin_headgear_shadow_l85_astro": [
    2,
-   74
+   75
   ],
   "assassin_shoulders_shadow_l85_astro": [
    3,
-   74
+   75
   ],
   "assassin_gloves_shadow_l85_astro": [
    4,
-   74
+   75
   ],
   "assassin_weapon_daggers_l85_astro": [
    5,
-   74
+   75
   ],
   "priest_armor_pilgrim_l85_astro": [
    6,
-   74
+   75
   ],
   "priest_headgear_pilgrim_l85_astro": [
    7,
-   74
+   75
   ],
   "priest_shoulders_pilgrim_l85_astro": [
    8,
-   74
+   75
   ],
   "priest_gloves_pilgrim_l85_astro": [
    9,
-   74
+   75
   ],
   "priest_weapon_mace_l85_astro": [
    0,
-   75
+   76
   ],
   "hunter_armor_scout_l85_astro": [
    1,
-   75
+   76
   ],
   "hunter_headgear_scout_l85_astro": [
    2,
-   75
+   76
   ],
   "hunter_shoulders_scout_l85_astro": [
    3,
-   75
+   76
   ],
   "hunter_gloves_scout_l85_astro": [
    4,
-   75
+   76
   ],
   "hunter_weapon_shortbow_l85_astro": [
    5,
-   75
+   76
   ],
   "pants_wayfarer_l85_astro": [
    6,
-   75
+   76
   ],
   "necklace_moonstone_l85_astro": [
    7,
-   75
+   76
   ],
   "accessory_amber_l85_astro": [
    8,
-   75
+   76
   ],
   "warrior_armor_crimson_l95_thunder": [
    9,
-   75
+   76
   ],
   "warrior_headgear_crimson_l95_thunder": [
    0,
-   76
+   77
   ],
   "warrior_shoulders_crimson_l95_thunder": [
    1,
-   76
+   77
   ],
   "warrior_gloves_crimson_l95_thunder": [
    2,
-   76
+   77
   ],
   "warrior_weapon_sword_l95_thunder": [
    3,
-   76
+   77
   ],
   "mage_armor_apprentice_l95_thunder": [
    4,
-   76
+   77
   ],
   "mage_headgear_apprentice_l95_thunder": [
    5,
-   76
+   77
   ],
   "mage_shoulders_apprentice_l95_thunder": [
    6,
-   76
+   77
   ],
   "mage_gloves_apprentice_l95_thunder": [
    7,
-   76
+   77
   ],
   "mage_weapon_ash_l95_thunder": [
    8,
-   76
+   77
   ],
   "assassin_armor_shadow_l95_thunder": [
    9,
-   76
+   77
   ],
   "assassin_headgear_shadow_l95_thunder": [
    0,
-   77
+   78
   ],
   "assassin_shoulders_shadow_l95_thunder": [
    1,
-   77
+   78
   ],
   "assassin_gloves_shadow_l95_thunder": [
    2,
-   77
+   78
   ],
   "assassin_weapon_daggers_l95_thunder": [
    3,
-   77
+   78
   ],
   "priest_armor_pilgrim_l95_thunder": [
    4,
-   77
+   78
   ],
   "priest_headgear_pilgrim_l95_thunder": [
    5,
-   77
+   78
   ],
   "priest_shoulders_pilgrim_l95_thunder": [
    6,
-   77
+   78
   ],
   "priest_gloves_pilgrim_l95_thunder": [
    7,
-   77
+   78
   ],
   "priest_weapon_mace_l95_thunder": [
    8,
-   77
+   78
   ],
   "hunter_armor_scout_l95_thunder": [
    9,
-   77
+   78
   ],
   "hunter_headgear_scout_l95_thunder": [
    0,
-   78
+   79
   ],
   "hunter_shoulders_scout_l95_thunder": [
    1,
-   78
+   79
   ],
   "hunter_gloves_scout_l95_thunder": [
    2,
-   78
+   79
   ],
   "hunter_weapon_shortbow_l95_thunder": [
    3,
-   78
+   79
   ],
   "pants_wayfarer_l95_thunder": [
    4,
-   78
+   79
   ],
   "necklace_moonstone_l95_thunder": [
    5,
-   78
+   79
   ],
   "accessory_amber_l95_thunder": [
    6,
-   78
+   79
   ],
   "warrior_armor_crimson_l95_bloom": [
    7,
-   78
+   79
   ],
   "warrior_headgear_crimson_l95_bloom": [
    8,
-   78
+   79
   ],
   "warrior_shoulders_crimson_l95_bloom": [
    9,
-   78
+   79
   ],
   "warrior_gloves_crimson_l95_bloom": [
    0,
-   79
+   80
   ],
   "warrior_weapon_sword_l95_bloom": [
    1,
-   79
+   80
   ],
   "mage_armor_apprentice_l95_bloom": [
    2,
-   79
+   80
   ],
   "mage_headgear_apprentice_l95_bloom": [
    3,
-   79
+   80
   ],
   "mage_shoulders_apprentice_l95_bloom": [
    4,
-   79
+   80
   ],
   "mage_gloves_apprentice_l95_bloom": [
    5,
-   79
+   80
   ],
   "mage_weapon_ash_l95_bloom": [
    6,
-   79
+   80
   ],
   "assassin_armor_shadow_l95_bloom": [
    7,
-   79
+   80
   ],
   "assassin_headgear_shadow_l95_bloom": [
    8,
-   79
+   80
   ],
   "assassin_shoulders_shadow_l95_bloom": [
    9,
-   79
+   80
   ],
   "assassin_gloves_shadow_l95_bloom": [
    0,
-   80
+   81
   ],
   "assassin_weapon_daggers_l95_bloom": [
    1,
-   80
+   81
   ],
   "priest_armor_pilgrim_l95_bloom": [
    2,
-   80
+   81
   ],
   "priest_headgear_pilgrim_l95_bloom": [
    3,
-   80
+   81
   ],
   "priest_shoulders_pilgrim_l95_bloom": [
    4,
-   80
+   81
   ],
   "priest_gloves_pilgrim_l95_bloom": [
    5,
-   80
+   81
   ],
   "priest_weapon_mace_l95_bloom": [
    6,
-   80
+   81
   ],
   "hunter_armor_scout_l95_bloom": [
    7,
-   80
+   81
   ],
   "hunter_headgear_scout_l95_bloom": [
    8,
-   80
+   81
   ],
   "hunter_shoulders_scout_l95_bloom": [
    9,
-   80
+   81
   ],
   "hunter_gloves_scout_l95_bloom": [
    0,
-   81
+   82
   ],
   "hunter_weapon_shortbow_l95_bloom": [
    1,
-   81
+   82
   ],
   "pants_wayfarer_l95_bloom": [
    2,
-   81
+   82
   ],
   "necklace_moonstone_l95_bloom": [
    3,
-   81
+   82
   ],
   "accessory_amber_l95_bloom": [
    4,
-   81
+   82
   ],
   "warrior_armor_crimson_l95_solar": [
    5,
-   81
+   82
   ],
   "warrior_headgear_crimson_l95_solar": [
    6,
-   81
+   82
   ],
   "warrior_shoulders_crimson_l95_solar": [
    7,
-   81
+   82
   ],
   "warrior_gloves_crimson_l95_solar": [
    8,
-   81
+   82
   ],
   "warrior_weapon_sword_l95_solar": [
    9,
-   81
+   82
   ],
   "mage_armor_apprentice_l95_solar": [
    0,
-   82
+   83
   ],
   "mage_headgear_apprentice_l95_solar": [
    1,
-   82
+   83
   ],
   "mage_shoulders_apprentice_l95_solar": [
    2,
-   82
+   83
   ],
   "mage_gloves_apprentice_l95_solar": [
    3,
-   82
+   83
   ],
   "mage_weapon_ash_l95_solar": [
    4,
-   82
+   83
   ],
   "assassin_armor_shadow_l95_solar": [
    5,
-   82
+   83
   ],
   "assassin_headgear_shadow_l95_solar": [
    6,
-   82
+   83
   ],
   "assassin_shoulders_shadow_l95_solar": [
    7,
-   82
+   83
   ],
   "assassin_gloves_shadow_l95_solar": [
    8,
-   82
+   83
   ],
   "assassin_weapon_daggers_l95_solar": [
    9,
-   82
+   83
   ],
   "priest_armor_pilgrim_l95_solar": [
    0,
-   83
+   84
   ],
   "priest_headgear_pilgrim_l95_solar": [
    1,
-   83
+   84
   ],
   "priest_shoulders_pilgrim_l95_solar": [
    2,
-   83
+   84
   ],
   "priest_gloves_pilgrim_l95_solar": [
    3,
-   83
+   84
   ],
   "priest_weapon_mace_l95_solar": [
    4,
-   83
+   84
   ],
   "hunter_armor_scout_l95_solar": [
    5,
-   83
+   84
   ],
   "hunter_headgear_scout_l95_solar": [
    6,
-   83
+   84
   ],
   "hunter_shoulders_scout_l95_solar": [
    7,
-   83
+   84
   ],
   "hunter_gloves_scout_l95_solar": [
    8,
-   83
+   84
   ],
   "hunter_weapon_shortbow_l95_solar": [
    9,
-   83
+   84
   ],
   "pants_wayfarer_l95_solar": [
    0,
-   84
+   85
   ],
   "necklace_moonstone_l95_solar": [
    1,
-   84
+   85
   ],
   "accessory_amber_l95_solar": [
    2,
-   84
+   85
   ],
   "warrior_armor_crimson_l95_amber": [
    3,
-   84
+   85
   ],
   "warrior_headgear_crimson_l95_amber": [
    4,
-   84
+   85
   ],
   "warrior_shoulders_crimson_l95_amber": [
    5,
-   84
+   85
   ],
   "warrior_gloves_crimson_l95_amber": [
    6,
-   84
+   85
   ],
   "warrior_weapon_sword_l95_amber": [
    7,
-   84
+   85
   ],
   "mage_armor_apprentice_l95_amber": [
    8,
-   84
+   85
   ],
   "mage_headgear_apprentice_l95_amber": [
    9,
-   84
+   85
   ],
   "mage_shoulders_apprentice_l95_amber": [
    0,
-   85
+   86
   ],
   "mage_gloves_apprentice_l95_amber": [
    1,
-   85
+   86
   ],
   "mage_weapon_ash_l95_amber": [
    2,
-   85
+   86
   ],
   "assassin_armor_shadow_l95_amber": [
    3,
-   85
+   86
   ],
   "assassin_headgear_shadow_l95_amber": [
    4,
-   85
+   86
   ],
   "assassin_shoulders_shadow_l95_amber": [
    5,
-   85
+   86
   ],
   "assassin_gloves_shadow_l95_amber": [
    6,
-   85
+   86
   ],
   "assassin_weapon_daggers_l95_amber": [
    7,
-   85
+   86
   ],
   "priest_armor_pilgrim_l95_amber": [
    8,
-   85
+   86
   ],
   "priest_headgear_pilgrim_l95_amber": [
    9,
-   85
+   86
   ],
   "priest_shoulders_pilgrim_l95_amber": [
    0,
-   86
+   87
   ],
   "priest_gloves_pilgrim_l95_amber": [
    1,
-   86
+   87
   ],
   "priest_weapon_mace_l95_amber": [
    2,
-   86
+   87
   ],
   "hunter_armor_scout_l95_amber": [
    3,
-   86
+   87
   ],
   "hunter_headgear_scout_l95_amber": [
    4,
-   86
+   87
   ],
   "hunter_shoulders_scout_l95_amber": [
    5,
-   86
+   87
   ],
   "hunter_gloves_scout_l95_amber": [
    6,
-   86
+   87
   ],
   "hunter_weapon_shortbow_l95_amber": [
    7,
-   86
+   87
   ],
   "pants_wayfarer_l95_amber": [
    8,
-   86
+   87
   ],
   "necklace_moonstone_l95_amber": [
    9,
-   86
+   87
   ],
   "accessory_amber_l95_amber": [
    0,
-   87
+   88
   ],
   "warrior_armor_crimson_l95_solstice": [
    1,
-   87
+   88
   ],
   "warrior_headgear_crimson_l95_solstice": [
    2,
-   87
+   88
   ],
   "warrior_shoulders_crimson_l95_solstice": [
    3,
-   87
+   88
   ],
   "warrior_gloves_crimson_l95_solstice": [
    4,
-   87
+   88
   ],
   "warrior_weapon_sword_l95_solstice": [
    5,
-   87
+   88
   ],
   "mage_armor_apprentice_l95_solstice": [
    6,
-   87
+   88
   ],
   "mage_headgear_apprentice_l95_solstice": [
    7,
-   87
+   88
   ],
   "mage_shoulders_apprentice_l95_solstice": [
    8,
-   87
+   88
   ],
   "mage_gloves_apprentice_l95_solstice": [
    9,
-   87
+   88
   ],
   "mage_weapon_ash_l95_solstice": [
    0,
-   88
+   89
   ],
   "assassin_armor_shadow_l95_solstice": [
    1,
-   88
+   89
   ],
   "assassin_headgear_shadow_l95_solstice": [
    2,
-   88
+   89
   ],
   "assassin_shoulders_shadow_l95_solstice": [
    3,
-   88
+   89
   ],
   "assassin_gloves_shadow_l95_solstice": [
    4,
-   88
+   89
   ],
   "assassin_weapon_daggers_l95_solstice": [
    5,
-   88
+   89
   ],
   "priest_armor_pilgrim_l95_solstice": [
    6,
-   88
+   89
   ],
   "priest_headgear_pilgrim_l95_solstice": [
    7,
-   88
+   89
   ],
   "priest_shoulders_pilgrim_l95_solstice": [
    8,
-   88
+   89
   ],
   "priest_gloves_pilgrim_l95_solstice": [
    9,
-   88
+   89
   ],
   "priest_weapon_mace_l95_solstice": [
    0,
-   89
+   90
   ],
   "hunter_armor_scout_l95_solstice": [
    1,
-   89
+   90
   ],
   "hunter_headgear_scout_l95_solstice": [
    2,
-   89
+   90
   ],
   "hunter_shoulders_scout_l95_solstice": [
    3,
-   89
+   90
   ],
   "hunter_gloves_scout_l95_solstice": [
    4,
-   89
+   90
   ],
   "hunter_weapon_shortbow_l95_solstice": [
    5,
-   89
+   90
   ],
   "pants_wayfarer_l95_solstice": [
    6,
-   89
+   90
   ],
   "necklace_moonstone_l95_solstice": [
    7,
-   89
+   90
   ],
   "accessory_amber_l95_solstice": [
    8,
-   89
+   90
   ],
   "warrior_armor_crimson_l55_gray": [
    5,
-   13
+   14
   ],
   "warrior_headgear_crimson_l55_gray": [
    6,
-   13
+   14
   ],
   "warrior_shoulders_crimson_l55_gray": [
    7,
-   20
+   21
   ],
   "warrior_gloves_crimson_l55_gray": [
    7,
-   13
+   14
   ],
   "warrior_weapon_sword_l55_gray": [
    3,
-   29
+   30
   ],
   "mage_armor_apprentice_l55_gray": [
    8,
-   13
+   14
   ],
   "mage_headgear_apprentice_l55_gray": [
    9,
-   13
+   14
   ],
   "mage_shoulders_apprentice_l55_gray": [
    8,
-   20
+   21
   ],
   "mage_gloves_apprentice_l55_gray": [
    0,
-   14
+   15
   ],
   "mage_weapon_ash_l55_gray": [
    4,
-   29
+   30
   ],
   "assassin_armor_shadow_l55_gray": [
    0,
-   6
+   7
   ],
   "assassin_headgear_shadow_l55_gray": [
    1,
-   6
+   7
   ],
   "assassin_shoulders_shadow_l55_gray": [
    6,
-   20
+   21
   ],
   "assassin_gloves_shadow_l55_gray": [
    2,
-   6
+   7
   ],
   "assassin_weapon_daggers_l55_gray": [
    2,
-   29
+   30
   ],
   "priest_armor_pilgrim_l55_gray": [
    1,
-   14
+   15
   ],
   "priest_headgear_pilgrim_l55_gray": [
    2,
-   14
+   15
   ],
   "priest_shoulders_pilgrim_l55_gray": [
    9,
-   20
+   21
   ],
   "priest_gloves_pilgrim_l55_gray": [
    3,
-   14
+   15
   ],
   "priest_weapon_mace_l55_gray": [
    5,
-   29
+   30
   ],
   "hunter_armor_scout_l55_gray": [
    4,
-   14
+   15
   ],
   "hunter_headgear_scout_l55_gray": [
    5,
-   14
+   15
   ],
   "hunter_shoulders_scout_l55_gray": [
    0,
-   21
+   22
   ],
   "hunter_gloves_scout_l55_gray": [
    6,
-   14
+   15
   ],
   "hunter_weapon_shortbow_l55_gray": [
    6,
-   29
+   30
   ],
   "pants_wayfarer_l55_gray": [
    3,
-   6
+   7
   ],
   "necklace_moonstone_l55_gray": [
    4,
-   6
+   7
   ],
   "accessory_amber_l55_gray": [
    5,
-   6
+   7
   ],
   "warrior_armor_azure_l55_green": [
    5,
-   13
+   14
   ],
   "warrior_headgear_azure_l55_green": [
    6,
-   13
+   14
   ],
   "warrior_shoulders_azure_l55_green": [
    7,
-   20
+   21
   ],
   "warrior_gloves_azure_l55_green": [
    7,
-   13
+   14
   ],
   "warrior_weapon_royal_l55_green": [
    3,
-   29
+   30
   ],
   "mage_armor_runic_l55_green": [
    8,
-   13
+   14
   ],
   "mage_headgear_runic_l55_green": [
    9,
-   13
+   14
   ],
   "mage_shoulders_runic_l55_green": [
    8,
-   20
+   21
   ],
   "mage_gloves_runic_l55_green": [
    0,
-   14
+   15
   ],
   "mage_weapon_crystal_l55_green": [
    4,
-   29
+   30
   ],
   "assassin_armor_moon_l55_green": [
    0,
-   6
+   7
   ],
   "assassin_headgear_moon_l55_green": [
    1,
-   6
+   7
   ],
   "assassin_shoulders_moon_l55_green": [
    6,
-   20
+   21
   ],
   "assassin_gloves_moon_l55_green": [
    2,
-   6
+   7
   ],
   "assassin_weapon_moonfang_l55_green": [
    2,
-   29
+   30
   ],
   "priest_armor_dawn_l55_green": [
    1,
-   14
+   15
   ],
   "priest_headgear_dawn_l55_green": [
    2,
-   14
+   15
   ],
   "priest_shoulders_dawn_l55_green": [
    9,
-   20
+   21
   ],
   "priest_gloves_dawn_l55_green": [
    3,
-   14
+   15
   ],
   "priest_weapon_sunmace_l55_green": [
    5,
-   29
+   30
   ],
   "hunter_armor_warden_l55_green": [
    4,
-   14
+   15
   ],
   "hunter_headgear_warden_l55_green": [
    5,
-   14
+   15
   ],
   "hunter_shoulders_warden_l55_green": [
    0,
-   21
+   22
   ],
   "hunter_gloves_warden_l55_green": [
    6,
-   14
+   15
   ],
   "hunter_weapon_wardenbow_l55_green": [
    6,
-   29
+   30
   ],
   "pants_wayfarer_l55_green": [
    3,
-   6
+   7
   ],
   "necklace_moonstone_l55_green": [
    4,
-   6
+   7
   ],
   "accessory_amber_l55_green": [
    5,
-   6
+   7
   ],
   "warrior_armor_crimson_l55_blue": [
    5,
-   13
+   14
   ],
   "warrior_headgear_crimson_l55_blue": [
    6,
-   13
+   14
   ],
   "warrior_shoulders_crimson_l55_blue": [
    7,
-   20
+   21
   ],
   "warrior_gloves_crimson_l55_blue": [
    7,
-   13
+   14
   ],
   "warrior_weapon_sword_l55_blue": [
    3,
-   29
+   30
   ],
   "mage_armor_apprentice_l55_blue": [
    8,
-   13
+   14
   ],
   "mage_headgear_apprentice_l55_blue": [
    9,
-   13
+   14
   ],
   "mage_shoulders_apprentice_l55_blue": [
    8,
-   20
+   21
   ],
   "mage_gloves_apprentice_l55_blue": [
    0,
-   14
+   15
   ],
   "mage_weapon_ash_l55_blue": [
    4,
-   29
+   30
   ],
   "assassin_armor_shadow_l55_blue": [
    0,
-   6
+   7
   ],
   "assassin_headgear_shadow_l55_blue": [
    1,
-   6
+   7
   ],
   "assassin_shoulders_shadow_l55_blue": [
    6,
-   20
+   21
   ],
   "assassin_gloves_shadow_l55_blue": [
    2,
-   6
+   7
   ],
   "assassin_weapon_daggers_l55_blue": [
    2,
-   29
+   30
   ],
   "priest_armor_pilgrim_l55_blue": [
    1,
-   14
+   15
   ],
   "priest_headgear_pilgrim_l55_blue": [
    2,
-   14
+   15
   ],
   "priest_shoulders_pilgrim_l55_blue": [
    9,
-   20
+   21
   ],
   "priest_gloves_pilgrim_l55_blue": [
    3,
-   14
+   15
   ],
   "priest_weapon_mace_l55_blue": [
    5,
-   29
+   30
   ],
   "hunter_armor_scout_l55_blue": [
    4,
-   14
+   15
   ],
   "hunter_headgear_scout_l55_blue": [
    5,
-   14
+   15
   ],
   "hunter_shoulders_scout_l55_blue": [
    0,
-   21
+   22
   ],
   "hunter_gloves_scout_l55_blue": [
    6,
-   14
+   15
   ],
   "hunter_weapon_shortbow_l55_blue": [
    6,
-   29
+   30
   ],
   "pants_wayfarer_l55_blue": [
    3,
-   6
+   7
   ],
   "necklace_moonstone_l55_blue": [
    4,
-   6
+   7
   ],
   "accessory_amber_l55_blue": [
    5,
-   6
+   7
   ]
  },
- "sprite": "d7da28faab37c9dc",
+ "sprite": "2cfcb85ef0037fbf",
  "light": "top left",
  "editing": "one PixelFlow sprite, one frame per item in `at` order; build --replace discards edits",
  "progressionSprites": {

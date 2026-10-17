@@ -454,6 +454,7 @@ fn decode(state: &str) -> Result<Character, Box<dyn std::error::Error>> {
     }
     // Catalog growth (new starter pieces) and the look layers reach existing saves here.
     character.grant_missing_starters();
+    character.grant_missing_gm_gear();
     character.sync_look();
     if character.health_curve_version == 0 {
         let ratio = (character.hp / character.legacy_max_hp()).clamp(0., 1.);

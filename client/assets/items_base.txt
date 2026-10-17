@@ -1,7 +1,7 @@
 {
  "size": 48,
  "cols": 10,
- "rows": 6,
+ "rows": 7,
  "at": {
   "warrior_headgear_crimson": [
    0,
@@ -238,9 +238,29 @@
   "warrior_weapon_gm": [
    8,
    5
+  ],
+  "warrior_shoulders_gm": [
+   9,
+   5
+  ],
+  "warrior_gloves_gm": [
+   0,
+   6
+  ],
+  "gm_pants": [
+   1,
+   6
+  ],
+  "gm_necklace": [
+   2,
+   6
+  ],
+  "gm_accessory": [
+   3,
+   6
   ]
  },
- "sprite": "d7da28faab37c9dc",
+ "sprite": "2cfcb85ef0037fbf",
  "light": "top left",
  "editing": "one PixelFlow sprite, one frame per item in `at` order; build --replace discards edits"
 }

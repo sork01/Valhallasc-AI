@@ -443,7 +443,9 @@
   const pieces = (C, look) => Object.fromEntries(Object.entries(GENERIC).map(([slot, generic]) => {
     const allowed = [...(CLASS_SLOTS.includes(slot) ? [...(C.TIERS || []), generic] : [generic]), ...PROGRESSION,
       ...(window.WORLD_ITEMS || []).filter(i => i.kind === KIND[slot] && i.art).map(i => i.art),
-      ...(window.WORLD_ITEMS || []).filter(i => i.source === 'orange_pool' && i.kind === KIND[slot]).map(i => i.variant)];
+      ...(window.WORLD_ITEMS || []).filter(i => i.source === 'orange_pool' && i.kind === KIND[slot]).map(i => i.variant),
+      // The game master's golden pieces: a class-independent item with variant gm (drawn only where the class atlas has the layer).
+      ...(window.WORLD_ITEMS || []).filter(i => i.rarity === 'gm' && i.kind === KIND[slot]).map(i => i.variant)];
     return [slot, allowed.includes(resolve(slot, look?.[slot]).art) ? look[slot] : 'none'];
   }));
   // Orange icons are inventory art. On a character, reuse the class's animated gear layers so the
@@ -578,7 +580,7 @@
     }
   }
   MageSprite.GENERIC = GENERIC; MageSprite.hasGear = hasGear; MageSprite.resolveGear = resolve; MageSprite.tintMatrix = tintMatrix;
-  MageSprite.dungeonMark = dungeonMark; MageSprite.dungeonAura = dungeonAura;
+  MageSprite.DUNGEON_PALETTES = DUNGEON_PALETTES; MageSprite.dungeonMark = dungeonMark; MageSprite.dungeonAura = dungeonAura;
   MageSprite.HAIR = HAIR; MageSprite.SKIN = SKIN; MageSprite.ARMOR = ARMOR; MageSprite.WEAPON = WEAPON;
   MageSprite.equipment = equipment; MageSprite.TIERS = ['apprentice', 'runic'];
   MageSprite.METADATA = 'assets/mage_sprites.txt';

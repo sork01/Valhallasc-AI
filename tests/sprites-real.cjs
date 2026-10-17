@@ -72,7 +72,7 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
       // other tier, and goes away again with 'none'.
       for (const slot of ['head', 'shoulders', 'gloves']) {
         if (!gear.tiers.length) { check((await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: 'crimson' })).hash === dressed.hash, `${cls}: no ${slot} layer, so a ${slot} piece changes nothing`); continue; }
-        const worn = [], slotTiers = gear.tiers.filter(t => t !== 'gm' || slot === 'head');      // the game master's set has a hat but no shoulders or gloves
+        const worn = [], slotTiers = gear.tiers;
         for (const tier of slotTiers) worn.push(await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: tier }));
         check(worn.every(w => w.hash !== dressed.hash && w.visible > 0), `${cls}: each ${slot} tier is drawn`);
         check(worn[0].hash !== worn[1].hash, `${cls}: the two ${slot} tiers look different`);
@@ -85,6 +85,16 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
         check(robe.hash !== dressed.hash && blade.hash !== dressed.hash && hat.hash !== dressed.hash, 'warrior: the golden robe, golden sword and shield and golden top hat each change the figure');
         check(new Set([gold.hash, dressed.hash, other.hash, robe.hash, blade.hash, hat.hash]).size === 6, 'warrior: the golden set is its own picture');
         check(gold.visible > dressed.visible, `warrior: the golden set is a full figure (${gold.visible} visible pixels)`);
+        // The rest of the golden set: pauldrons, gauntlets, greaves, amulet and signet are layers of the Warrior atlas only (the administrator is always a male Warrior).
+        const trim = {};
+        for (const slot of ['shoulders', 'gloves', 'pants', 'necklace', 'accessory']) {
+          trim[slot] = await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: 'gm' });
+          check(trim[slot].hash !== dressed.hash && trim[slot].visible > 0, `warrior: the golden ${slot} piece is drawn`);
+          check((await figure(page, cls, gear.armor[0], gear.weapon[0], { [slot]: 'none' })).hash === dressed.hash, `warrior: golden ${slot} 'none' removes the layer`);
+        }
+        check(new Set(Object.values(trim).map(w => w.hash)).size === 5, 'warrior: the five golden trimmings are five different pictures');
+        const everyGold = await figure(page, cls, 'gm', 'gm', { head: 'gm', shoulders: 'gm', gloves: 'gm', pants: 'gm', necklace: 'gm', accessory: 'gm' });
+        check(everyGold.hash !== gold.hash && everyGold.visible >= gold.visible, 'warrior: the whole golden set is a bigger picture than robe, hat and blade alone');
       }
       if (gear.tiers.length) {
         const all = await figure(page, cls, gear.armor[0], gear.weapon[0], { head: gear.tiers[0], shoulders: gear.tiers[0], gloves: gear.tiers[0] });
@@ -104,21 +114,34 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
       check(everything.visible > dressed.visible && everything.hash !== dressed.hash, `${cls}: all six generic pieces worn together make a bigger figure`);
       // Recoloured pieces (the catalog's `art` + `tint`): drawn as their base drawing, same silhouette, different colours,
       // and every set of the same drawing looks different from every other.
-      const recoloured = await page.evaluate(([cls, redesignOnly]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && ['armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'].includes(i.kind) && (!redesignOnly || (i.requiredLevel >= 25 && i.requiredLevel <= 50) || i.source?.startsWith('cathedral_'))).map(i => [i.kind, i.variant, i.art]), [cls, redesignOnly]);
-      const baseOf = new Map(), byArt = new Map(), colourGroups = new Map();
+      const recoloured = await page.evaluate(([cls, redesignOnly]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && !MageSprite.DUNGEON_PALETTES[i.art] && ['armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'].includes(i.kind) && (!redesignOnly || (i.requiredLevel >= 25 && i.requiredLevel <= 50) || i.source?.startsWith('cathedral_'))).map(i => [i.kind, i.variant, i.art]), [cls, redesignOnly]);
+      // Dungeon sets are painted from MageSprite.DUNGEON_PALETTES by their drawing, whatever tint the item names, so the
+      // checks below do not apply: every piece must draw on a bare figure, and every drawing must have a palette of its own.
+      const dungeon = await page.evaluate(([cls]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && MageSprite.DUNGEON_PALETTES[i.art]).map(i => [i.kind, i.variant]), [cls]);
+      const bare = (kind, v) => kind === 'armor' ? figure(page, cls, v, 'none') : kind === 'weapon' ? figure(page, cls, 'none', v) : figure(page, cls, 'none', 'none', { [kind === 'headgear' ? 'head' : kind]: v });
+      const bareNaked = naked, undrawn = [];
+      for (const [kind, variant] of dungeon) { const w = await bare(kind, variant); if (!(w.visible > 0 && w.hash !== bareNaked.hash)) undrawn.push(kind + ':' + variant); }
+      check(dungeon.length >= 50 && !undrawn.length, `${cls}: all ${dungeon.length} dungeon pieces are drawn (not drawn: ${undrawn.join(', ')})`);
+      check(new Set(Object.values(await page.evaluate(() => MageSprite.DUNGEON_PALETTES)).map(p => p.join())).size === Object.keys(await page.evaluate(() => MageSprite.DUNGEON_PALETTES)).length, `${cls}: every dungeon drawing has a palette of its own`);
+      const baseOf = new Map(), silhouetteOf = new Map(), byArt = new Map(), colourGroups = new Map();
       // Inspect each small piece on the bare figure: a robe can hide two differently coloured pants identically.
       const wear = (kind, v) => kind === 'armor' ? figure(page, cls, v, gear.weapon[0]) : kind === 'weapon' ? figure(page, cls, gear.armor[0], v) : figure(page, cls, 'none', 'none', { [kind === 'headgear' ? 'head' : kind]: v });
-      let recolourOk = 0, silhouetteOk = 0; const unchanged = [];
+      let recolourOk = 0, silhouetteOk = 0; const unchanged = [], reshaped = [];
       for (const [kind, variant, art] of recoloured) {
         const key = kind + '|' + art; if (!baseOf.has(key)) baseOf.set(key, await wear(kind, art));
         const w = await wear(kind, variant), base = baseOf.get(key);
-        recolourOk += w.hash !== base.hash; silhouetteOk += w.visible === base.visible;
+        // An art name that is not itself wearable (the level 60-95 drawings: only a catalog variant reaches them) falls back to the
+        // class's default piece, so the first variant of the drawing is the silhouette reference instead of the art name.
+        const wearable = await page.evaluate(([kind, art]) => MageSprite.hasGear({}, kind, art), [kind, art]);
+        if (!wearable && !silhouetteOf.has(key)) silhouetteOf.set(key, w.visible);
+        const reference = wearable ? base.visible : silhouetteOf.get(key);
+        recolourOk += w.hash !== base.hash; silhouetteOk += w.visible === reference; if (w.visible !== reference) reshaped.push(`${kind}:${variant} ${w.visible}/${reference}`);
         if (w.hash === base.hash) unchanged.push(kind + ':' + variant);
         byArt.set(key, (byArt.get(key) || new Set()).add(w.hash));
         const hashKey = key + '|' + w.hash; colourGroups.set(hashKey, [...(colourGroups.get(hashKey) || []), variant]);
       }
       check(recoloured.length >= 60 && recolourOk === recoloured.length, `${cls}: all ${recoloured.length} recoloured pieces draw in colours of their own (${recolourOk}; unchanged: ${unchanged.join(', ')})`);
-      check(silhouetteOk === recoloured.length, `${cls}: a recolouring keeps the drawing's silhouette (${silhouetteOk}/${recoloured.length})`);
+      check(silhouetteOk === recoloured.length, `${cls}: a recolouring keeps the drawing's silhouette (${silhouetteOk}/${recoloured.length}; reshaped: ${reshaped.join(', ')})`);
       const perArt = recoloured.reduce((m, [k, , art]) => m.set(k + '|' + art, (m.get(k + '|' + art) || 0) + 1), new Map());
       check([...byArt].every(([key, hashes]) => hashes.size === perArt.get(key)), `${cls}: no two sets of one drawing share their colours (duplicates: ${JSON.stringify([...colourGroups].filter(([, variants]) => variants.length > 1))})`);
       check(await page.evaluate(cls => valhalla[cls].portrait().length > 2000, cls), `${cls}: the portrait renders`);
@@ -141,15 +164,17 @@ const figure = (page, cls, armor, weapon, extras = {}, female = false) => page.e
         check(w.hash !== fDressed.hash && w.visible > 0 && (await f(gear.armor[0], gear.weapon[0], { [slot]: 'none' })).hash === fDressed.hash, `${cls} (female): the generic ${slot} piece is drawn and 'none' removes it`);
       }
       // High-level and Cathedral colours must draw on the female layers too, including every small worn slot.
-      const newPieces = await page.evaluate(([cls, redesignOnly]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && i.requiredLevel > 20 && (!redesignOnly || (i.requiredLevel >= 25 && i.requiredLevel <= 50) || i.source?.startsWith('cathedral_'))).map(i => [i.kind, i.variant, i.art]), [cls, redesignOnly]);
+      const newPieces = await page.evaluate(([cls, redesignOnly]) => WORLD_ITEMS.filter(i => (i.class === cls || !i.class) && i.art && !MageSprite.DUNGEON_PALETTES[i.art] && i.requiredLevel > 20 && (!redesignOnly || (i.requiredLevel >= 25 && i.requiredLevel <= 50) || i.source?.startsWith('cathedral_'))).map(i => [i.kind, i.variant, i.art]), [cls, redesignOnly]);
       const femaleWear = (kind, v) => kind === 'armor' ? f(v, gear.weapon[0]) : kind === 'weapon' ? f(gear.armor[0], v) : f('none', 'none', { [kind === 'headgear' ? 'head' : kind]: v });
-      const femaleBases = new Map(), femaleColours = new Map();
+      const femaleBases = new Map(), femaleShapes = new Map(), femaleColours = new Map();
       let femaleChanged = 0, femaleSilhouette = 0;
       for (const [kind, variant, art] of newPieces) {
         const key = kind + '|' + art;
         if (!femaleBases.has(key)) femaleBases.set(key, await femaleWear(kind, art));
         const worn = await femaleWear(kind, variant), base = femaleBases.get(key);
-        femaleChanged += worn.hash !== base.hash; femaleSilhouette += worn.visible === base.visible;
+        const wearable = await page.evaluate(([kind, art]) => MageSprite.hasGear({}, kind, art), [kind, art]);      // see the male loop: an art name that is not wearable has no base to compare with
+        if (!wearable && !femaleShapes.has(key)) femaleShapes.set(key, worn.visible);
+        femaleChanged += worn.hash !== base.hash; femaleSilhouette += worn.visible === (wearable ? base.visible : femaleShapes.get(key));
         femaleColours.set(key, (femaleColours.get(key) || new Set()).add(worn.hash));
       }
       check(newPieces.length >= 192 && femaleChanged === newPieces.length && femaleSilhouette === newPieces.length, `${cls} (female): every new tier and wing piece draws with its own colours and the base silhouette`);
