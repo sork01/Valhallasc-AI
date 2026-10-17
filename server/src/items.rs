@@ -1895,6 +1895,31 @@ mod tests {
         );
     }
     #[test]
+    fn no_ordinary_character_can_equip_any_golden_piece() {
+        for id in GM_GEAR {
+            let mut ordinary = character();
+            ordinary.add_item(id, 1);
+            let slot = GM_SLOTS.iter().find(|(_, piece)| *piece == id).map_or_else(
+                || {
+                    if id.contains("armor") {
+                        "chest"
+                    } else {
+                        "hands"
+                    }
+                },
+                |(slot, _)| slot,
+            );
+            let before = ordinary.equipment.clone();
+            assert!(
+                ordinary
+                    .equip_slots(&[(slot.into(), id.into())].into())
+                    .is_err(),
+                "{id} in {slot}"
+            );
+            assert_eq!(ordinary.equipment, before, "{id} changed the loadout");
+        }
+    }
+    #[test]
     fn game_master_set_fills_every_slot_and_meets_the_defense_target() {
         let mut gm = character();
         gm.become_gm();
@@ -1913,8 +1938,8 @@ mod tests {
             ("gm", "gm")
         );
         let piece_defense: f64 = GM_GEAR.iter().map(|id| item(id).unwrap().defense).sum();
-        assert_eq!(piece_defense, 150_004.);
-        assert!(gm.stats().1 >= 150_000., "{}", gm.stats().1);
+        assert_eq!(piece_defense, 570_004.);
+        assert!(gm.stats().1 >= 560_000., "{}", gm.stats().1);
         assert!(gm.look.validate().is_ok());
     }
     #[test]

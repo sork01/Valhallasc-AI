@@ -9980,7 +9980,7 @@
     "class": "warrior",
     "variant": "gm",
     "attack": 0.0,
-    "defense": 40000.0,
+    "defense": 160000.0,
     "starter": false
   },
   {
@@ -9993,7 +9993,7 @@
     "class": "warrior",
     "variant": "gm",
     "attack": 0.0,
-    "defense": 25000.0,
+    "defense": 100000.0,
     "starter": false
   },
   {
@@ -10019,7 +10019,7 @@
     "class": "warrior",
     "variant": "gm",
     "attack": 0.0,
-    "defense": 15000.0,
+    "defense": 60000.0,
     "starter": false
   },
   {
@@ -10032,7 +10032,7 @@
     "class": "warrior",
     "variant": "gm",
     "attack": 0.0,
-    "defense": 15000.0,
+    "defense": 60000.0,
     "starter": false
   },
   {
@@ -10044,7 +10044,7 @@
     "sell": 0,
     "variant": "gm",
     "attack": 0.0,
-    "defense": 25000.0,
+    "defense": 100000.0,
     "starter": false
   },
   {
@@ -10056,7 +10056,7 @@
     "sell": 0,
     "variant": "gm",
     "attack": 0.0,
-    "defense": 10000.0,
+    "defense": 40000.0,
     "starter": false
   },
   {
@@ -10068,7 +10068,7 @@
     "sell": 0,
     "variant": "gm",
     "attack": 0.0,
-    "defense": 10000.0,
+    "defense": 40000.0,
     "starter": false
   },
   {

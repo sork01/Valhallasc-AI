@@ -28,7 +28,7 @@ The GM (always the male Warrior created by `Character::become_gm`) wears the Gol
 
 - **Movement speed, attack speed, mana and rage:** unchanged. The GM is not special-cased beyond the strike and defense; no skill becomes free.
 - **Cooldowns:** unchanged. The one-hit rule removes the need.
-- **Damage taken:** raised through gear (below), with the existing `(damage − defense) × DAMAGE_TAKEN_SCALE` formula. Total defense must beat the highest monster damage stat (49,000 at default level, more after the 12% per level scaling) by at least 3 times so every hit floors at the 1-damage minimum: **target total defense 150,000**.
+- **Damage taken:** raised through gear (below), with the existing `(damage − defense) × DAMAGE_TAKEN_SCALE` formula. Total defense must beat the highest monster damage stat (49,000 at default level, more after the 12% per level scaling) by at least 3 times so every hit floors at the 1-damage minimum: **target total defense 150,000**. *Superseded by `GM-GEAR-CHECK` (2026-10-17): monster damage grows faster than the 12% HP rule, and the data's hardest hit is 391,200 (Amber Sentinel, level 99), so the total is now 570,004; see "As checked".*
 - Debug god mode (`set_god_mode`) stays an unrelated tool.
 
 ## Gear data (`GM-GEAR-DATA`)
@@ -59,3 +59,15 @@ New pieces carry `gm` rarity, `requiredLevel` 1 and `sell` 0, golden art and 48�
 ## As built (2026-10-17, `GM-GEAR-DATA`)
 
 All eight pieces are in `world/items.txt` with the defense above (total 150,004). `GM_GEAR` has eight ids and `GM_SLOTS` maps the six non-look slots; `become_gm` wears everything, and `grant_missing_gm_gear` (run when a character is loaded) gives an older GM save the new pieces once and wears each one whose slot is empty, so a piece taken off on purpose stays off. Worn art exists only in the **Warrior** atlas (the administrator is always a male Warrior): `shoulders_gm`, `gloves_gm`, `pants_gm`, `necklace_gm`, `accessory_gm`, in PixelFlow groups `gm` (with the robe, hat, blade and pauldrons) and `gm2`, lazy-loaded. The client filter (`pieces()` in `magesprite.js`) accepts the variant of any `gm`-rarity item for its slot; on any other class the layer is simply absent. The greaves sit under the robe's skirt and show only at the boots and in the walk. Icons are in `scripts/make_item_sprites.py`.
+
+## As checked (2026-10-17, `GM-GEAR-CHECK`)
+
+The check found that 150,004 defense did **not** meet the rule: 144 of the 1,968 spawned enemies (the Amber Archive, Solar Crucible and other level 95+ zones) hit harder than that, up to 391,200. The golden pieces were raised in `world/items.txt` (robe 160,000, top hat 100,000, shoulders 60,000, gloves 60,000, pants 100,000, necklace 40,000, accessory 40,000, sword 10,004), a total of **570,004**, and `scripts/sync-world.cjs` regenerated `client/items.js`. The test derives the hardest hit from the spawned enemies, so a stronger monster fails it until the gear is raised again. Rust tests (all mutation-checked unless noted):
+
+  * `the_game_master_takes_one_damage_from_the_hardest_hit_in_the_data`: total defense above the hardest enemy damage, and a real hit through `hurt_player_by` costs 1 HP; `f64::MAX` leaves finite health.
+  * `gm_strike_reaches_the_toughest_living_enemy_in_every_populated_zone` and `gm_strike_uses_worn_weapon_and_normal_kill_path`: the one-hit kill and the normal reward path.
+  * `only_the_game_masters_own_golden_weapon_strikes_so_mercenaries_and_players_hit_normally`: a non-GM wearing the sword hits for the rolled damage; hired fighters are built with `gm` off (mutation: dropping the flag from the strike condition fails it).
+  * `the_game_master_gets_normal_damage_against_players_in_duels_and_world_pvp`: the target keeps almost all of 10^12 health in a flagged-PvP hit and in a duel hit. Arena matches use the same `pvp_attack` path (the 1-HP duel/arena floor is unchanged).
+  * `no_ordinary_character_can_equip_any_golden_piece` (all eight pieces; mutation: removing the rarity gate fails it) and `no_golden_piece_can_be_offered_in_a_trade`.
+
+Not run: a live private-world pass through the MCP scenarios, and a deploy. The server must be rebuilt and restarted, and the client files deployed together, for the new defense values to apply.

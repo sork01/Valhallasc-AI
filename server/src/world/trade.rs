@@ -360,6 +360,19 @@ mod tests {
         }]
     }
     #[test]
+    fn no_golden_piece_can_be_offered_in_a_trade() {
+        for id in crate::items::GM_GEAR {
+            let mut gm = Character::mercenary(Class::Warrior, 20, "Gm");
+            gm.add_item(id, 3);
+            let offer = Offer {
+                items: items(id, 1),
+                gold: 0,
+                ready: false,
+            };
+            assert!(validate_offer(&gm, &offer).is_err(), "{id}");
+        }
+    }
+    #[test]
     fn trade_preserves_a_refined_copys_rolls_and_rank() {
         let id = "warrior_weapon_sword_l5_gray";
         let mut alice = Character::mercenary(Class::Warrior, 20, "Alice");

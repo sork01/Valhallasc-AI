@@ -12105,7 +12105,6 @@ mod tests {
             strongest.len() >= 15,
             "include outdoor zones and dungeon copies"
         );
-        // The 150,000-defense assertion belongs with GM-GEAR-DATA, which is still unchecked.
         assert!(w.players[&1].character.stats().1.is_finite());
         for id in strongest {
             let (zone, hp) = (w.slimes[id].zone, w.slimes[id].hp);
@@ -12115,6 +12114,144 @@ mod tests {
             assert_eq!(dealt, hp, "zone {zone}, {}", w.slimes[id].kind);
             assert!(w.slimes[id].dead, "zone {zone}");
         }
+    }
+
+    #[test]
+    fn the_game_master_takes_one_damage_from_the_hardest_hit_in_the_data() {
+        let mut w = world();
+        let sork = w.store.sso_account("Sork").unwrap();
+        join_gm(&mut w, 1, &sork, GM_NAME).unwrap();
+        let defense = w.players[&1].character.stats().1;
+        assert!(defense >= 500_000., "{defense}");
+        let (worst, kind, level, zone) = w
+            .slimes
+            .iter()
+            .map(|s| (s.damage, s.kind.clone(), s.level, s.zone))
+            .max_by(|a, b| a.0.total_cmp(&b.0))
+            .unwrap();
+        assert!(worst.is_finite() && worst > 40_000., "{worst}");
+        assert!(
+            worst < defense,
+            "{kind} L{level} hits for {worst} against {defense}"
+        );
+        // Through the real damage path: shown to the zone, off cooldown, no dodge.
+        {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.zone = zone;
+            p.visible_zone = zone;
+            p.hidden = false;
+            p.last_hurt = -10.;
+            p.character.x = 1.;
+            p.character.y = 1.;
+        }
+        while w.maps[zone].in_city(w.players[&1].character.point()) {
+            w.players.get_mut(&1).unwrap().character.x += 1.;
+        }
+        let hp = w.players[&1].character.hp;
+        let mut taken = 0.;
+        for _ in 0..40 {
+            w.players.get_mut(&1).unwrap().last_hurt = -10.;
+            w.hurt_player_by(1, worst, Point::default(), &kind, level);
+            taken = hp - w.players[&1].character.hp;
+            if taken > 0. {
+                break;
+            }
+        }
+        assert_eq!(taken, 1., "the hardest hit floors at 1 damage");
+        // A huge value does not wrap, overflow or poison the character.
+        w.players.get_mut(&1).unwrap().last_hurt = -10.;
+        w.hurt_player_by(1, f64::MAX, Point::default(), &kind, level);
+        assert!(w.players[&1].character.hp.is_finite());
+    }
+
+    #[test]
+    fn the_game_master_gets_normal_damage_against_players_in_duels_and_world_pvp() {
+        let mut w = world();
+        let sork = w.store.sso_account("Sork").unwrap();
+        join_gm(&mut w, 1, &sork, GM_NAME).unwrap();
+        let _rx = join(&mut w, 2, Class::Warrior);
+        let (gm_id, guest) = (
+            w.players[&1].character.id.clone(),
+            w.players[&2].character.id.clone(),
+        );
+        let (zone, spot) = (0, Point { x: 20., y: 20. });
+        for session in [1u64, 2] {
+            let p = w.players.get_mut(&session).unwrap();
+            p.character.zone = zone;
+            p.character.x = spot.x + session as f64 * 0.5;
+            p.character.y = spot.y;
+            p.visible_zone = zone;
+            p.hidden = false;
+        }
+        assert!(
+            !w.maps[zone].in_city(spot),
+            "the probe must stand outside the city"
+        );
+        // The guest has far more health than any hit, so a one-shot rule would show as a lost-everything hit.
+        let huge = 1.0e12;
+        let mut lost = Vec::new();
+        for mode in ["flag", "duel"] {
+            {
+                let p = w.players.get_mut(&2).unwrap();
+                p.character.hp = huge;
+                p.pvp_flag = mode == "flag";
+                w.players.get_mut(&1).unwrap().pvp_flag = mode == "flag";
+            }
+            if mode == "duel" {
+                w.pvp_command(1, PvpCommand::DuelRequest { id: guest.clone() });
+                w.pvp_command(2, PvpCommand::DuelAccept { id: gm_id.clone() });
+            }
+            for _ in 0..60 {
+                w.players.get_mut(&1).unwrap().cooldown = 0.;
+                w.pvp_command(1, PvpCommand::Attack { id: guest.clone() });
+                if w.players[&2].character.hp < huge {
+                    break;
+                }
+            }
+            lost.push(huge - w.players[&2].character.hp);
+        }
+        for (mode, taken) in ["flag", "duel"].iter().zip(&lost) {
+            assert!(*taken > 0., "{mode}: the hit landed");
+            assert!(
+                *taken < 5_000.,
+                "{mode}: the GM's PvP hit is the normal formula, not the target's health: {taken}"
+            );
+        }
+        assert!(w.players[&2].character.hp > 0.9e12);
+    }
+
+    #[test]
+    fn only_the_game_masters_own_golden_weapon_strikes_so_mercenaries_and_players_hit_normally() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let strong = w
+            .slimes
+            .iter()
+            .enumerate()
+            .filter(|(_, s)| !s.dead)
+            .max_by(|a, b| a.1.hp.total_cmp(&b.1.hp))
+            .unwrap()
+            .0;
+        let zone = w.slimes[strong].zone;
+        let hp = w.slimes[strong].hp;
+        {
+            // An ordinary character that somehow holds and wears the golden sword.
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.zone = zone;
+            c.add_item("warrior_weapon_gm", 1);
+            c.look.warrior_weapon = "gm".into();
+            assert!(!c.gm);
+        }
+        assert_eq!(
+            w.hit_slime(strong, 1, 1., false),
+            1.,
+            "no strike without the gm flag"
+        );
+        assert_eq!(w.slimes[strong].hp, hp - 1.);
+        // A hired fighter is built with the flag off, so it can never strike.
+        assert!(!Character::mercenary(Class::Warrior, 60, "Hired").gm);
+        // A client cannot raise the flag: it comes only from the account when the character is created.
+        assert!(!w.players[&1].character.gm);
     }
 
     #[test]
