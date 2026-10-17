@@ -3748,7 +3748,7 @@
     const label = `${boss.d.name} · Lv ${boss.level ?? '?'}`; g.strokeText(label, VW / 2, y); g.fillText(label, VW / 2, y);
     g.fillStyle = 'rgba(12,8,20,.85)'; g.fillRect(x - 3, y + 6, w + 6, 18); g.fillStyle = '#5a1020'; g.fillRect(x, y + 9, w, 12); g.fillStyle = f > .3 ? '#d8344a' : '#ff7a3a'; g.fillRect(x, y + 9, w * f, 12);
     g.fillStyle = 'rgba(255,255,255,.28)'; g.fillRect(x, y + 9, w * f, 3); g.strokeStyle = '#c8a45a'; g.lineWidth = 2; g.strokeRect(x - 3, y + 6, w + 6, 18);
-    g.fillStyle = '#fff4ca'; g.font = '13px "Jua", sans-serif'; g.fillText(`${Math.ceil(boss.hp).toLocaleString('en')} / ${Math.round(boss.maxHp).toLocaleString('en')}`, VW / 2, y + 20);
+    g.fillStyle = '#fff4ca'; g.font = '13px "Jua", sans-serif'; g.fillText(`${Math.min(Math.ceil(boss.hp), Math.round(boss.maxHp)).toLocaleString('en')} / ${Math.round(boss.maxHp).toLocaleString('en')}`, VW / 2, y + 20);
     g.restore();
   }
   // ---------- fog of war ----------

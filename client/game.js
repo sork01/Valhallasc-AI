@@ -565,28 +565,30 @@
   // ---------- the field: first map (field.js) ----------
   const hud = { lv: $('hud-lv'), hp: $('hp-fill'), hpT: $('hp-text'), xp: $('xp-fill'), gold: $('hud-gold'), kills: $('hud-kills') };
   let portraitTarget = null, portraitReady = false;
+  // Health and resources read as whole numbers: health rounds up while alive (never 0 while living), resources round down.
+  const wholeHp = v => Math.max(0, Math.ceil((v || 0) - 1e-9)), wholeMax = v => Math.round(v || 0), wholeRes = v => Math.max(0, Math.floor((v || 0) + 1e-9));
   function onHud(s) {
-    hud.hp.style.width = (s.hp / s.maxHp * 100).toFixed(1) + '%'; hud.hpT.textContent = `${Math.ceil(s.hp)} / ${s.maxHp}`;
+    hud.hp.style.width = (s.hp / s.maxHp * 100).toFixed(1) + '%'; hud.hpT.textContent = `${Math.min(wholeHp(s.hp), wholeMax(s.maxHp))} / ${wholeMax(s.maxHp)}`;
     const target = s.target, targetBadge = $('hud-target');
     targetBadge.hidden = !target;
     if (target) {
       $('hud-target-name').textContent = target.name;
       $('hud-target-level').textContent = ` Lv ${target.level}`;
       $('hud-target-fill').style.width = `${Math.max(0, Math.min(100, target.hp / target.maxHp * 100))}%`;
-      $('hud-target-text').textContent = `${Math.ceil(target.hp)} / ${target.maxHp}`;
-      $('hud-target-hp').setAttribute('aria-valuenow', Math.ceil(target.hp));
-      $('hud-target-hp').setAttribute('aria-valuemax', target.maxHp);
+      $('hud-target-text').textContent = `${Math.min(wholeHp(target.hp), wholeMax(target.maxHp))} / ${wholeMax(target.maxHp)}`;
+      $('hud-target-hp').setAttribute('aria-valuenow', wholeHp(target.hp));
+      $('hud-target-hp').setAttribute('aria-valuemax', wholeMax(target.maxHp));
       if (portraitTarget !== target.id || !portraitReady) {
         portraitTarget = target.id;
         portraitReady = Field.drawTargetPortrait(target, $('hud-target-face'));
       }
     } else { portraitTarget = null; portraitReady = false; }
-    const resource = $('resource-bar'), kind = s.resourceType || 'rage', current = s.resource || 0, max = s.maxResource || 100;
+    const resource = $('resource-bar'), kind = s.resourceType || 'rage', current = s.resource || 0, max = wholeMax(s.maxResource) || 100;
     resource.dataset.type = kind; resource.setAttribute('aria-label', kind[0].toUpperCase() + kind.slice(1));
-    resource.setAttribute('aria-valuenow', Math.floor(current)); resource.setAttribute('aria-valuemax', max);
+    resource.setAttribute('aria-valuenow', wholeRes(current)); resource.setAttribute('aria-valuemax', max);
     resource.title = kind === 'energy' ? 'Energy · regenerates 10 per second, including in combat · food and resource potions restore it' : kind === 'rage' ? 'Rage · gained by dealing and taking damage, fades outside combat · food and resource potions restore it' : 'Mana · regenerates outside combat · food and mana potions restore it';
     $('resource-fill').style.width = (current / max * 100).toFixed(1) + '%';
-    $('resource-text').textContent = `${kind[0].toUpperCase() + kind.slice(1)} ${Math.floor(current)} / ${max}`;
+    $('resource-text').textContent = `${kind[0].toUpperCase() + kind.slice(1)} ${Math.min(wholeRes(current), max)} / ${max}`;
     hud.xp.style.width = (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.lv.textContent = ` ${t('lvl')} ${s.level}`; window.Quests?.setLevel(s.level);
     hud.gold.textContent = s.gold; hud.kills.textContent = s.kills; $('bag-gold').textContent = `${s.gold} gold`;
     const mount = $('mount-toggle');

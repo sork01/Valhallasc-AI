@@ -28,7 +28,7 @@ async function call(name, args = {}) {
     const kind = cls === 'warrior' ? 'rage' : ['assassin', 'hunter'].includes(cls) ? 'energy' : 'mana';
     check(await page.locator('#resource-bar').getAttribute('data-type') === kind, `${cls} HUD uses ${kind}`);
     const state = await page.evaluate(() => ({ resource: Field.hero.resource, max: Field.hero.maxResource, text: document.querySelector('#resource-text').textContent, label: document.querySelector('#resource-bar').getAttribute('aria-label') }));
-    check(state.resource === (cls === 'warrior' ? 0 : state.max) && state.text.includes(`${Math.floor(state.resource)} / ${state.max}`), `${cls} HUD displays the server's amount and capacity`);
+    check(state.resource === (cls === 'warrior' ? 0 : state.max) && state.text.includes(`${Math.floor(state.resource)} / ${Math.round(state.max)}`), `${cls} HUD displays the server's amount and capacity`);
     check(state.label.toLowerCase() === kind, `${cls} resource has an accessible name`);
     check(await page.locator('#quickuse [data-kind="mana"]').isVisible() === (kind === 'mana'), `${cls} shows the mana shortcut only when applicable`);
     const colors = await page.locator('#resource-fill').evaluate(n => getComputedStyle(n).backgroundImage);
@@ -64,6 +64,12 @@ async function call(name, args = {}) {
   await mage.keyboard.press('z');
   await mage.waitForFunction(() => Field.hero.buffs.some(b => b.kind === 'regen'));
   check(await mage.evaluate(() => Field.hero.hp === Field.hero.maxHp && Inventory.quantity('traveler_stew') === 0), 'Food is usable to restore mana at full health');
+  const whole = /^(\w+ )?\d+ \/ \d+$/;   // regeneration is fractional on the server; the HUD must still read in whole numbers
+  for (let i = 0; i < 6; i++) {
+    const texts = await mage.evaluate(() => ['#hp-text', '#resource-text'].map(q => document.querySelector(q).textContent));
+    check(texts.every(t => whole.test(t)), `HUD health and resource read as whole numbers: ${texts.join(' | ')}`);
+    await mage.waitForTimeout(250);
+  }
   await mage.keyboard.press('i');
   // Tooltips are also accessible through the quick slot; check the bag's catalog description directly.
   check(await mage.evaluate(() => Inventory.effect(WORLD_ITEMS.find(i => i.id === 'mana_potion')).includes('100 mana')), 'Bag description names mana recovery');

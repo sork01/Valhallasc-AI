@@ -48,7 +48,7 @@ async function call(name, args = {}) {
   check(green.groundDistance > 1.1, `Upper sprite click is outside the old ground target radius (${green.groundDistance.toFixed(2)})`);
   check((await page.locator('#hud-target-name').textContent()).includes('Green Slime'), 'Badge shows the selected monster name');
   check(await page.evaluate(() => { const c = document.querySelector('#hud-target-face'); return [...c.getContext('2d').getImageData(0, 0, c.width, c.height).data].some((v, i) => i % 4 === 3 && v > 0); }), 'Badge paints the monster portrait');
-  check(await page.evaluate(() => document.querySelector('#hud-target-text').textContent === `${Math.ceil(Field.hero.target.hp)} / ${Field.hero.target.maxHp}`), 'Badge shows authoritative monster HP');
+  check(await page.evaluate(() => document.querySelector('#hud-target-text').textContent === `${Math.min(Math.ceil(Field.hero.target.hp), Math.round(Field.hero.target.maxHp))} / ${Math.round(Field.hero.target.maxHp)}`), 'Badge shows authoritative monster HP');
   const blueAt = await stage('blue', -4, 0);
   const blue = await clickUpperBody('blue', blueAt);
   check(blue.id !== green.id && (await page.locator('#hud-target-name').textContent()).includes('Blue Slime'), 'Selecting another monster updates the badge');

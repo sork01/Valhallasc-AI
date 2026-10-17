@@ -53,7 +53,7 @@
     const fill = row.querySelector('.member-fill'), text = row.querySelector('.member-bar em');
     const share = m.online && m.maxHp > 0 ? Math.max(0, Math.min(1, m.hp / m.maxHp)) : 0;
     fill.style.width = `${share * 100}%`;
-    text.textContent = !m.online ? '' : m.dead ? 'Defeated' : `${Math.ceil(m.hp)}/${Math.ceil(m.maxHp)}`;
+    text.textContent = !m.online ? '' : m.dead ? 'Defeated' : `${Math.min(Math.ceil(m.hp), Math.round(m.maxHp))}/${Math.round(m.maxHp)}`;
     row.dataset.dead = String(!!m.dead);
   }
   // Party level: how much of a kill's XP each member earns, and the progress to the next level.
