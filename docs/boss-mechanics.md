@@ -21,12 +21,12 @@ A **final boss** is the monster named in a dungeon's `final_boss`: sixteen of th
 
 | Block | What it does | Used by |
 | --- | --- | --- |
-| `zone` | A ground shape (circle, ring, cone, lane, half-arena) with a cast time and an effect: kill, heavy damage, or "kill unless you stand inside". | Hollowking, Hierophant, Echo, Sovereign |
-| `shield` | The boss takes no damage until a condition holds: every add dead, every object broken. | Hollowking, Coral Regent |
-| `adds` | Spawns monsters at set points, optionally with a deadline effect. | Hollowking, Worldseed |
+| `zone` | A ground shape (circle, ring, cone, lane, half-arena) with a cast time and an effect: kill, heavy damage, or "kill unless you stand inside". | Choirmother, Hierophant, Echo, Sovereign |
+| `shield` | The boss takes no damage until a condition holds: every add dead, every object broken. | Choirmother, Coral Regent |
+| `adds` | Spawns monsters at set points, optionally with a deadline effect. | Choirmother, Worldseed |
 | `mark` | A countdown debuff on chosen players that resolves at the end: a burst, a beam, a tether. | Rain Crown, Labyrinth |
 | `sweep` | Something that moves across the arena on a schedule: a wall with gaps, a rotating beam, a bouncing line. | Elder, Axis, Labyrinth |
-| `break` | A channel the party must cancel by dealing a damage threshold within a time. | Choirmother |
+| `break` | A channel the party must cancel by dealing a damage threshold within a time. | Hollowking |
 | `stasis` | A player is frozen until allies break the cocoon. | Last Memory |
 | `split` | The boss divides, with a rule that links the halves. | Crucible |
 | `hold` | Standing at a place for N seconds completes it (`world/hold.rs` already does this for wards). | Solstice |
@@ -35,19 +35,21 @@ A **final boss** is the monster named in a dungeon's `final_boss`: sixteen of th
 
 ## The sixteen mechanics
 
-### 1. Haldor, the Hollow King — The Undervault (level 20): *Crown's Fall* and *the Hollow Court*
+### 1. Haldor, the Hollow King — The Undervault (level 20): *Dirge of the Hollow*
 
-The introduction: both of the owner's examples, at a level that teaches them.
+The first dungeon is the gentlest: one mechanic, no kill-on-sight ring, no shield, and a generous margin.
 
-- **Crown's Fall.** Every 25 s Haldor lifts his crown. A red ring (radius 8 round him) fills over a **5 s cast**; anyone inside when it lands dies. Melee has to step out and back in. The telegraph is a growing circle, and the bar reads "Crown's Fall".
-- **The Hollow Court.** At 66% and 33% health Haldor is **invulnerable** behind a pale shield and four Hollow Guards (the Undervault's thrall model, weak) rise. The shield falls when all four are dead; killing them takes about 15 s for a green party. Crown's Fall keeps coming during the court.
-- Escalation: at 33% the court is six guards and Crown's Fall every 18 s.
+- Every 30 s Haldor raises his crown and **channels for 8 s** while a blue break bar sits over his head. If the party deals damage to him equal to the bar before it ends, the dirge breaks: he is stunned 6 s and takes +30% damage. If not, the dirge ends in the **Hollow Wail**, which kills everyone.
+- Tuning rule: the bar is set so a green party of five breaks it with **about 5 s to spare** (an early party is still learning), and a lone player never can. The damage counts from everyone, so no class is needed. The harness measures the number (roughly 5% of his health to start).
+- No escalation: the same dirge for the whole fight, only a little more often (every 25 s) below 30%.
 
-### 2. Elyss, Mother of the Bound Choir — Flooded Cloister (level 40): *Requiem of the Bound*
+### 2. Elyss, Mother of the Bound Choir — Flooded Cloister (level 40): *Toll of the Deep* and *the Bound Chorus*
 
-- Every 40 s Elyss raises her hands and **channels for 8 s** while a blue break bar sits over her head. If the party deals damage to her equal to the bar before it ends, the song breaks: she is stunned 6 s and takes +30% damage. If not, the song ends in the **Drowning Chorus**, which kills everyone.
-- Tuning rule: the bar is set so a green party of five breaks it with about 3 s to spare and a lone player never can. (Roughly 6% of her health today; the harness measures it.) The damage counts from everyone, so no class is needed.
-- Escalation: at 30% the channel is 6 s and comes every 25 s.
+Both of the owner's examples, at the first dungeon where a party has had practice.
+
+- **Toll of the Deep.** Every 25 s Elyss rings a drowned bell. A red ring (radius 8 round her) fills over a **5 s cast**; anyone inside when it lands dies. Melee has to step out and back in. The bar reads "Toll of the Deep".
+- **The Bound Chorus.** At 66% and 33% health Elyss is **invulnerable** behind a pale shield of song and four Bound Singers (the Cloister's Bound Cantor model, weak) rise. The shield falls when all four are dead; killing them takes about 15 s for a green party. The toll keeps coming during the chorus.
+- Escalation: at 33% the chorus is six singers and the toll comes every 18 s.
 
 ### 3. Queen Avariel, the Coral Regent — Coral Reliquary (level 45): *Pearl Shell*
 
@@ -130,11 +132,11 @@ The reverse of the king's ring: here you **must stand inside** the circle.
 Searched 2026-10-17. Each is a well known fight whose mechanic was adapted, not copied; none of the numbers come from them.
 
 - **Soak, spread, stack, towers, knockbacks, baits** (Final Fantasy XIV raids) — the vocabulary behind *Downpour*, *Static* and the "stand here" circles. [FFXIV tower and soak guide](https://boostroom.com/blog/common-wipes-explained-the-top-mistakes-players-make-in-ffxiv-raids), [Shiva (Unreal)](https://www.akhmorning.com/raids/shiva-unreal/), [Eden's Verse: Furor](https://ffxiv.consolegameswiki.com/wiki/Eden%27s_Verse:_Furor_(Savage)).
-- **Invulnerable boss with adds** (Lady Deathwhisper's mana barrier, Ragnaros submerging into Sons of Flame) — *the Hollow Court* and *Pearl Shell*. [Lady Deathwhisper](https://icy-veins.com/wotlk-classic/lady-deathwhisper-encounter-guide-strategy-abilities-loot), [Ragnaros tactics](https://warcraft.wiki.gg/wiki/Ragnaros_(tactics)).
+- **Invulnerable boss with adds** (Lady Deathwhisper's mana barrier, Ragnaros submerging into Sons of Flame) — *the Bound Chorus* and *Pearl Shell*. [Lady Deathwhisper](https://icy-veins.com/wotlk-classic/lady-deathwhisper-encounter-guide-strategy-abilities-loot), [Ragnaros tactics](https://warcraft.wiki.gg/wiki/Ragnaros_(tactics)).
 - **Walls of lava with gaps** (Sartharion's Flame Tsunami) — *Bramble Sweep*. [Sartharion](https://icy-veins.com/wotlk-classic/sartharion-encounter-guide-strategy-abilities-loot).
 - **A growing floor hazard and the choice to move** (the Lich King's Defile), **a safe place that shrinks** (Yogg-Saron's sanity wells) — behind *Rising Tide* and *The Longest Night*. [Yogg-Saron](https://icy-veins.com/wotlk-classic/yogg-saron-encounter-guide-strategy-abilities-loot), [Best Wrath raids](https://blizzardwatch.com/2022/05/03/best-wrath-lich-king-raids-dungeons/).
-- **Run out of a fissure before it blasts** (Kel'Thuzad's Shadow Fissure) and **adds that join at a health mark** (Guardians of Icecrown) — the timing of *Crown's Fall*. [Kel'Thuzad tactics](https://warcraft.wiki.gg/wiki/Kel%27Thuzad_(tactics)).
-- **A break bar** (Guild Wars 2's defiance bar) — *Requiem of the Bound*: damage, not a stun, fills it. [GW2 defiance break](https://wiki.guildwars2.com/wiki/Defiance_Break), [Snow Crows guide](https://snowcrows.com/guides/getting-started/defiance-and-cc-guide).
+- **Run out of a fissure before it blasts** (Kel'Thuzad's Shadow Fissure) and **adds that join at a health mark** (Guardians of Icecrown) — the timing of *Toll of the Deep*. [Kel'Thuzad tactics](https://warcraft.wiki.gg/wiki/Kel%27Thuzad_(tactics)).
+- **A break bar** (Guild Wars 2's defiance bar) — *Dirge of the Hollow*: damage, not a stun, fills it. [GW2 defiance break](https://wiki.guildwars2.com/wiki/Defiance_Break), [Snow Crows guide](https://snowcrows.com/guides/getting-started/defiance-and-cc-guide).
 - **Two bodies that must die together** (Ornstein and Smough, Mimiron's final phase) — *Twin Suns*. [Ornstein and Smough](https://darksouls.wiki.fextralife.com/Ornstein).
 - **A fight on two layers** (Halion's Twilight Realm) and **plates and adds that open the next step** (Spine of Deathwing) — considered; the layer swap was too heavy for the engine and the plates need a moving arena, so they were not used. [Halion](https://warcraft.wiki.gg/wiki/Halion), [Spine of Deathwing](https://www.icy-veins.com/wow/spine-of-deathwing-strategy-guide-normal-heroic).
 - **Rotating beams and lines** (Halion's Twilight Cutter) — *Orrery Spokes*.
