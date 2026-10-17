@@ -14,6 +14,7 @@ A **final boss** is the monster named in a dungeon's `final_boss`: sixteen of th
 6. **Fresh every pull.** State belongs to the dungeon copy and the fight; a wipe or an evade resets every timer, add, pearl and brazier.
 7. **The fight clock keeps running.** The soft enrage (`world/enrage.txt`) counts through an invulnerable phase, so a mechanic cannot be used to stall. Each boss's enrage start is re-derived after its mechanic is in (the mechanic adds time).
 8. **Rewards, XP and drops do not change.**
+9. **A sign explains it before the door.** Every final boss has a sign in the last room (`BOSSMECH-SIGN-ENGINE`, `BOSSMECH-SIGNS`) that says what the boss does and what to do, in words a child of about eight can read, with a picture of the telegraph in the fight's own colours. The sign's numbers come from the same constants as the mechanic, so they cannot drift.
 
 ## Building blocks
 
