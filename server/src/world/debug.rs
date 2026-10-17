@@ -106,6 +106,10 @@ impl World {
                 levels = c.grant_xp(amount);
                 json!({"level":c.level,"xp":c.xp,"levels":levels,"unlocked":skills::unlocked(c.look.class, before, c.level)})
             }
+            DebugCommand::SetRebirth { tiers } => {
+                p.character.rebirth_tiers = tiers.map(|n| n.min(1000));
+                json!({"tiers":p.character.rebirth_tiers,"perks":p.character.rebirth_perks()})
+            }
             DebugCommand::GiveMount { mount } => {
                 if !p.character.grant_mount(&mount) {
                     return Err(format!("Unknown mount {mount}, or it is already owned."));

@@ -26,6 +26,7 @@
   const inParty = id => !!state.party?.members.some(m => m.id === id);
   const isLeader = () => state.party?.leader === myId();
   const isFriend = id => state.friends.some(f => f.id === id);
+  const rebornBadge = tier => { const badge = window.Rebirth?.badge(tier); return badge ? [badge] : []; };
   const label = p => `${p.name} · Lv ${p.level} ${CLASSES[p.class] || ''}`.trim();
 
   function notice(text, ok = true) {
@@ -36,7 +37,7 @@
     const who = el('span', '', 'social-who');
     const name = el('b', m.name + (state.party.leader === m.id ? ' ★' : ''));
     name.title = state.party.leader === m.id ? 'Party leader' : '';
-    who.append(name, el('small', `Lv ${m.level} ${CLASSES[m.class] || ''} · ${m.online ? m.place : 'Offline'}`));
+    who.append(name, ...rebornBadge(m.reborn), el('small', `Lv ${m.level} ${CLASSES[m.class] || ''} · ${m.online ? m.place : 'Offline'}`));
     // In the panel, name the quests this member has in common with you.
     const shared = withActions && m.id !== myId() ? (window.Quests?.sharedWith?.(m) || []) : [];
     if (shared.length) { const line = el('small', `Same quest: ${shared.join(', ')}`, 'member-quests'); line.dataset.sharedQuests = String(shared.length); who.append(line); }
@@ -93,7 +94,7 @@
     for (const f of state.friends) {
       const row = el('li', '', 'social-row'); row.dataset.friend = f.id; row.dataset.online = String(f.online);
       const who = el('span', '', 'social-who');
-      who.append(el('b', f.name), el('small', `Lv ${f.level} ${CLASSES[f.class] || ''} · ${f.online ? f.place : 'Offline'}`));
+      who.append(el('b', f.name), ...rebornBadge(f.reborn), el('small', `Lv ${f.level} ${CLASSES[f.class] || ''} · ${f.online ? f.place : 'Offline'}`));
       row.append(who);
       if (f.online && !inParty(f.id)) row.append(button('Invite to party', `invite:${f.id}`, () => send({ op: 'party_invite', id: f.id })));
       if (f.online) row.append(button('Trade', `trade:${f.id}`, () => window.Trade?.request(f.id)));
@@ -198,7 +199,7 @@
     }
   }
   function render() { renderFrame(); renderPrompts(); renderPanel(); }
-  const shape = party => party && JSON.stringify([party.leader, party.xp, party.members.map(m => [m.id, m.online, m.dead, m.level, m.place, (m.quests || []).map(q => q.id)])]);
+  const shape = party => party && JSON.stringify([party.leader, party.xp, party.members.map(m => [m.id, m.online, m.dead, m.level, m.reborn, m.place, (m.quests || []).map(q => q.id)])]);
   // Party health arrives twice a second; update the bars in place and rebuild only when the members change.
   function updateParty(party) {
     const changed = shape(party) !== shape(state.party), quests = questShape(party) !== questShape(state.party);

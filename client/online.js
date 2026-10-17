@@ -97,12 +97,13 @@
         case 'social': window.Social?.onState(packet); break;
         case 'trade': window.Trade?.onPacket(packet); break;
         case 'bank': window.Bank?.onPacket(packet); break;
+        case 'rebirthPreview': window.Rebirth?.onPreview(packet); break;
         case 'pvp': window.Pvp?.onPacket(packet); break;
         case 'roll': window.Rolls?.onPacket(packet); break;
         case 'party': window.Social?.onParty(packet.party); break;
         case 'who': window.Social?.onWho(packet.players); break;
         case 'error':
-          log(packet.text); window.Attributes?.error?.(); window.Rolls?.reopen(); window.Bank?.onError(packet.text);
+          log(packet.text); window.Attributes?.error?.(); window.Rolls?.reopen(); window.Bank?.onError(packet.text); window.Rebirth?.onError(packet.text);
           if (packet.code === 'auth') { acct.session = null; accountList = []; persistAccount(); }
           if (packet.fatal) { fatal = true; connected = false; overlay(packet.text, true); status('Unable to enter world', false); ws.close(); }
           break;

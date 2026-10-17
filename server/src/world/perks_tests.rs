@@ -629,3 +629,147 @@ fn every_drop_roll_goes_through_the_multiplier() {
         }
     }
 }
+
+#[test]
+fn the_gryphon_egg_chance_is_multiplied_with_the_whistle() {
+    let eggs = |m: u32| {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        reborn(&mut w, top_tier(m));
+        let zone = (0..w.maps.len())
+            .find(|&z| w.is_instance(z) && w.maps[z].final_boss == "thunder_heart")
+            .unwrap();
+        w.enter_instance(zone);
+        let id = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == zone && s.kind == "thunder_heart")
+            .unwrap();
+        w.rng = 2026;
+        let mut n = 0;
+        for _ in 0..1500 {
+            w.drops.clear();
+            kill(&mut w, id, zone, 95);
+            n += w
+                .drops
+                .iter()
+                .filter(|d| d.item.as_deref() == Some("gryphon_egg"))
+                .count();
+        }
+        n
+    };
+    near(eggs(1), 1500. * 0.03, "eggs at x1");
+    near(eggs(2), 1500. * 0.06, "eggs at x2");
+    near(eggs(5), 1500. * 0.15, "eggs at x5");
+}
+
+#[test]
+fn the_snapshot_the_preview_friends_and_party_carry_what_the_panel_needs() {
+    let mut w = world();
+    let mut rx = join(&mut w, 1, Class::Warrior);
+    let _other = join(&mut w, 2, Class::Mage);
+    reborn(&mut w, [1, 0, 0, 0, 2]);
+    let snap = w.players[&1].snapshot();
+    let perks = snap["rebirthPerks"].as_array().unwrap();
+    let find = |id: &str| perks.iter().find(|p| p["id"] == id).unwrap().clone();
+    assert_eq!(find("xp")["value"], 30);
+    assert_eq!(find("xp")["cap"], 50);
+    assert_eq!(find("drops")["value"], 3);
+    assert_eq!(find("drops")["unlock"], 5);
+    assert_eq!(snap["mountTint"], 0);
+    // The preview shows what one more rebirth at the current level adds.
+    w.players.get_mut(&1).unwrap().character.level = 60;
+    drain_all(&mut rx);
+    w.message(1, ClientMessage::RebirthPreview);
+    let packet = drain_all(&mut rx)
+        .into_iter()
+        .rev()
+        .find(|v| v["type"] == "rebirthPreview")
+        .unwrap();
+    let after = |id: &str, key: &str| {
+        packet[key]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|p| p["id"] == id)
+            .unwrap()["value"]
+            .clone()
+    };
+    assert_eq!(after("xp", "perks"), 30);
+    assert_eq!(
+        after("xp", "perksAfter"),
+        40,
+        "tier 2 also counts for the XP perk"
+    );
+    assert_eq!(
+        after("gold", "perksAfter"),
+        30,
+        "the gold perk starts at tier 2 and counts all three"
+    );
+    assert_eq!(
+        after("drops", "perksAfter"),
+        3,
+        "a tier-2 rebirth never raises the drops"
+    );
+    // Friends and the party frame show the tier.
+    let (a, b) = (
+        w.players[&1].character.id.clone(),
+        w.players[&2].character.id.clone(),
+    );
+    w.social(
+        1,
+        SocialCommand::PartyInvite {
+            id: Some(b.clone()),
+            name: None,
+        },
+    );
+    w.social(2, SocialCommand::PartyAccept { id: a.clone() });
+    let party = w.party_value(0);
+    let tier = |id: &str| {
+        party["members"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|m| m["id"] == id)
+            .unwrap()["reborn"]
+            .clone()
+    };
+    assert_eq!((tier(&a), tier(&b)), (json!(5), json!(0)));
+    assert_eq!(w.friend_entry(&a).unwrap()["reborn"], 5);
+}
+
+fn drain_all(rx: &mut mpsc::Receiver<Value>) -> Vec<Value> {
+    std::iter::from_fn(|| rx.try_recv().ok()).collect()
+}
+
+#[test]
+fn a_mount_coat_can_be_chosen_only_for_a_tier_reached_and_survives_a_rebirth() {
+    let mut c = Character::mercenary(Class::Warrior, 50, "Rider");
+    assert!(c.select_mount_tint(2).is_err(), "never reborn");
+    assert!(c.select_mount_tint(0).is_ok());
+    c.rebirth_tiers = [0, 1, 0, 0, 0];
+    assert!(c.select_mount_tint(3).is_err(), "tier 3 is not reached");
+    assert!(c.select_mount_tint(1).is_err(), "tier 1 has no coat");
+    assert!(c.select_mount_tint(6).is_err());
+    c.select_mount_tint(2).unwrap();
+    assert_eq!(c.mount_tint, 2);
+    c.hp = c.max_hp();
+    c.rebirth(Point { x: 20., y: 20. }).unwrap();
+    assert_eq!(c.mount_tint, 2, "cosmetic state is kept");
+    c.select_mount_tint(0).unwrap();
+    assert_eq!(c.mount_tint, 0);
+}
+
+#[test]
+fn the_mount_coat_message_is_saved_and_a_bad_one_is_refused() {
+    let mut w = world();
+    let mut rx = join(&mut w, 1, Class::Warrior);
+    reborn(&mut w, [0, 0, 1, 0, 0]);
+    drain_all(&mut rx);
+    w.message(1, ClientMessage::SelectMountTint { tier: 5 });
+    assert_eq!(w.players[&1].character.mount_tint, 0);
+    assert!(drain_all(&mut rx).iter().any(|v| v["type"] == "error"));
+    w.message(1, ClientMessage::SelectMountTint { tier: 3 });
+    assert_eq!(w.players[&1].character.mount_tint, 3);
+    assert_eq!(w.players[&1].snapshot()["mountTint"], 3);
+}

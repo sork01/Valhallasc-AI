@@ -1,0 +1,21 @@
+{
+  "frame": [
+    96,
+    40
+  ],
+  "anchor": [
+    48,
+    20
+  ],
+  "tiers": 5,
+  "frames": 4,
+  "fps": 5,
+  "names": [
+    "bronze",
+    "silver",
+    "gold",
+    "cyan",
+    "rose"
+  ],
+  "sprite": "0a5174d5417a8647"
+}

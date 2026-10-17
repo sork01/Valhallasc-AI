@@ -150,11 +150,11 @@ impl World {
     }
 
     // ----- state sent to clients -----
-    fn friend_entry(&self, id: &str) -> Option<Value> {
+    pub(super) fn friend_entry(&self, id: &str) -> Option<Value> {
         if let Some(p) = self.online(id).filter(|p| !p.is_hidden()) {
             let c = &p.character;
             return Some(
-                json!({"id":c.id,"name":c.look.name,"class":c.look.class,"level":c.level,"online":true,"place":self.zone_name(c.zone)}),
+                json!({"id":c.id,"name":c.look.name,"class":c.look.class,"level":c.level,"online":true,"place":self.zone_name(c.zone),"reborn":c.rebirth_highest_tier()}),
             );
         }
         self.store.summary(id).map(|s| {
@@ -170,7 +170,7 @@ impl World {
                 Some(p) => {
                     let c = &p.character;
                     json!({"id":m.id,"name":m.name,"class":c.look.class,"level":c.level,"hp":c.hp.max(0.),"maxHp":c.max_hp(),
-                        "zone":c.zone,"place":self.zone_name(c.zone),"online":true,"dead":c.hp<=0.,
+                        "zone":c.zone,"place":self.zone_name(c.zone),"online":true,"dead":c.hp<=0.,"reborn":c.rebirth_highest_tier(),
                         "quests":c.quests.iter().filter(|q| !q.claimed).map(|q| json!({"id":q.id,"counts":q.counts})).collect::<Vec<_>>()})
                 }
                 None => json!({"id":m.id,"name":m.name,"class":m.class,"level":m.level,"hp":0,"maxHp":0,"zone":null,

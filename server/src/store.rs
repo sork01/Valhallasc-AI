@@ -173,6 +173,7 @@ impl Store {
             mount: String::new(),
             mounted: false,
             rebirth_tiers: [0; 5],
+            mount_tint: 0,
             starters_granted: vec![],
             bank: Default::default(),
         };

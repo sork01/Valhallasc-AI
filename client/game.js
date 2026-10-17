@@ -629,7 +629,8 @@
       const row = el('div', { class: 'lu-skill' }), glyph = el('span', { class: 'skill-icon' }); glyph.innerHTML = Skillbar.icon(k.icon);
       row.append(glyph, el('b', { text: passive ? `New passive: ${k.name}` : capstone ? `Capstone: ${k.name}` : rankNumber > 1 ? `Rank ${rankNumber}: ${k.name}` : `New skill: ${k.name}` }), el('small', { text: description })); return row;
     }));
-    $('lu-hint').textContent = learned.length ? 'Press K to view your skills and passives' : 'Fully healed · spend stat points in Character (E)';
+    const rebirthHint = window.Rebirth?.hint(ev.level);
+    $('lu-hint').textContent = rebirthHint || (learned.length ? 'Press K to view your skills and passives' : 'Fully healed · spend stat points in Character (E)');
     luBanner.hidden = false; restart(luBanner, 'show'); restart(luFlash, 'show');
     restart($('hud-lv'), 'lv-pop'); restart(document.querySelector('.bar.xp'), 'xp-flash');
     const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -739,6 +740,13 @@
     // A potion is a quick gulp that rises; a meal is two soft low notes.
     consume: ev => { if (ev?.value > 0) { sweep(240, 620, .16, .08, 'triangle'); tone([1175, 1568], .25, .04); } else { tone([330, 440], .18, .05, 'triangle'); } },
     // A rising whoosh, a run up the scale, then a full major chord with sparkles on top.
+    // A slow rising chord in a lower key than the level-up, then a bright bloom: the old life ending, the new one starting.
+    rebirth: () => {
+      duckMusic(4);
+      sweep(90, 700, 1.1, .12, 'sine'); noiseBurst(1, 200, 5000, .1, .7);
+      [262, 330, 392, 523].forEach((f, i) => setTimeout(() => tone([f, f * 2], 1.3, .08, 'triangle'), 200 + i * 220));
+      setTimeout(() => { tone([523, 659, 784, 1047], 2.6, .08, 'triangle'); tone([131, 196], 2.6, .09, 'sine'); }, 1200);
+    },
     levelup: () => {
       duckMusic(3.2);
       sweep(180, 1900, .7, .14, 'sawtooth'); noiseBurst(.8, 300, 7000, .13, .8);
@@ -767,6 +775,7 @@
     if (name === 'setTier') showToast(`${data.name}: ${data.tier}-piece bonus ${data.active ? 'active' : 'lost'}`);
     if (name === 'rarePickup') rarePickup(data);
     if (name === 'levelup') levelBanner(data);
+    if (name === 'rebirth') window.Rebirth?.celebrate(data);
     if (name === 'spriteError') showToast(t((save.char?.class || 'mage') + 'Error'));
     if (name === 'death') $('dead-msg').hidden = false;
     if (name === 'respawn') $('dead-msg').hidden = true;
@@ -821,6 +830,7 @@
     $('equipment-stats').textContent = `${t('attack')}: ${Number(stats.attack.toFixed(1))} · ${t('defense')}: ${Number(stats.defense.toFixed(1))}`;
     window.Attributes?.render();
     window.Mounts?.render();
+    window.Rebirth?.render();
     $('hud-portrait').style.backgroundImage = `url(${mage.portrait()})`;
     Inventory.render(document.getElementById('inventory-list'));
     Inventory.renderEquipped(document.getElementById('equipped-slots'));

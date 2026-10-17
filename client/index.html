@@ -135,7 +135,7 @@
     <div class="hud hud-tl">
       <div class="hud-portrait" id="hud-portrait"></div>
       <div class="hud-bars">
-        <p class="hud-name"><b id="hud-name"></b><span id="hud-lv"></span><span id="gm-visibility" hidden></span></p>
+        <p class="hud-name"><b id="hud-name"></b><span id="hud-lv"></span><span id="hud-reborn" class="hud-reborn" hidden></span><span id="gm-visibility" hidden></span></p>
         <div class="bar hp"><i id="hp-fill"></i><span id="hp-text"></span></div>
         <div class="bar resource" id="resource-bar" role="progressbar" aria-label="Class resource" aria-valuemin="0"><i id="resource-fill"></i><span id="resource-text"></span></div>
         <div class="bar xp"><i id="xp-fill"></i></div>
@@ -271,6 +271,53 @@
         <p class="social-note">Changing either offer clears both confirmations. The exchange finishes only after both players confirm.</p>
       </section>
     </div>
+    <div class="pause" id="rebirth-dialog" hidden>
+      <section class="panel rebirth-dialog" role="dialog" aria-modal="true" aria-labelledby="rebirth-title">
+        <header class="gossip-titlebar">
+          <h3 id="rebirth-title">Rebirth</h3>
+          <span id="rebirth-timer" class="rebirth-timer" aria-live="off"></span>
+        </header>
+        <div class="rebirth-body">
+          <p>You start again from level 1 and keep what you have earned. Every rebirth adds permanent perks.</p>
+          <h4>This rebirth adds</h4>
+          <ul id="rebirth-adds"></ul>
+          <div class="rebirth-columns">
+            <section>
+              <h4>What resets</h4>
+              <ul>
+                <li>Level and experience</li>
+                <li>Trained stat points and the stat reset price</li>
+                <li>Quest progress, so every quest can be done again</li>
+                <li>The fog of war on the map</li>
+                <li>You return to Greenmeadow</li>
+              </ul>
+            </section>
+            <section>
+              <h4>What stays</h4>
+              <ul>
+                <li>Friends, gold, items, the bank and your bags</li>
+                <li>Gear, mounts, Spark Travel stops and looks</li>
+                <li>Every perk you have earned</li>
+              </ul>
+            </section>
+          </div>
+          <p id="rebirth-gear" class="rebirth-gear" hidden></p>
+          <label class="rebirth-confirm-row" for="rebirth-type">Type REBIRTH to confirm
+            <input id="rebirth-type" type="text" maxlength="12" autocomplete="off" spellcheck="false" aria-describedby="rebirth-error">
+          </label>
+          <p id="rebirth-error" class="rebirth-error" role="alert"></p>
+        </div>
+        <footer class="rebirth-footer">
+          <button id="rebirth-cancel" class="btn ghost" type="button">Cancel</button>
+          <button id="rebirth-confirm" class="btn primary" type="button" disabled>Rebirth</button>
+        </footer>
+      </section>
+    </div>
+    <div id="rebirth-banner" class="rebirth-banner" role="status" aria-live="assertive" hidden>
+      <b class="rebirth-banner-title">REBORN</b>
+      <span id="rebirth-banner-tier" class="rebirth-banner-tier"></span>
+      <small class="rebirth-banner-hint">Your journey starts again, and your perks stay</small>
+    </div>
     <div class="pause" id="bank-panel" hidden>
       <section class="panel bank-panel" role="dialog" aria-modal="true" aria-labelledby="bank-title">
         <header class="gossip-titlebar">
@@ -387,6 +434,7 @@
           <section id="character-attributes" class="character-attributes" aria-label="Train character stats"></section>
           <section id="character-sets" class="character-sets" aria-label="Dungeon set bonuses"></section>
           <section id="character-mounts" class="character-mounts" aria-label="Mounts"></section>
+          <section id="character-rebirth" class="character-rebirth" aria-label="Rebirth"></section>
         </section>
         <section class="rpg-window bag-window">
           <header class="rpg-titlebar">
@@ -500,6 +548,7 @@
 <script src="gearservices.js"></script>
 <script src="attributes.js"></script>
 <script src="mounts.js"></script>
+<script src="rebirth.js"></script>
 <script src="syslog.js"></script>
 <script src="online.js"></script>
 <script src="account.js"></script>

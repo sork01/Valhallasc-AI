@@ -89,6 +89,7 @@ impl World {
             "level":c.level,"tier":c.rebirth_tier_now(),"maxTier":REBIRTH_MAX_TIER,
             "count":c.rebirth_count(),"tiers":c.rebirth_tiers,
             "gearOff":gear_off,"cellsNeeded":cells_needed,
+            "perks":c.rebirth_perks(),"perksAfter":c.rebirth_tier_now().map(|t| c.rebirth_perks_after(t)),
             "nonce":p.rebirth_nonce.as_ref().map(|n| n.value.clone()),"lifetime":NONCE_LIFETIME,
         }));
     }

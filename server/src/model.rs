@@ -382,6 +382,10 @@ pub struct Character {
     /// save migration and an old save is simply never reborn.
     #[serde(default)]
     pub rebirth_tiers: [u32; 5],
+    /// The mount coat tint a reborn character chose: 0 for none, else the rebirth tier (2 to 5) whose colour the
+    /// mount wears. Cosmetic only; it can never name a tier above the highest one reached.
+    #[serde(default)]
+    pub mount_tint: u32,
     /// Starter pieces this character has been given. Catalog growth grants only the ones not listed, so a starter piece
     /// that was sold or banked is never handed out again.
     #[serde(default)]
@@ -495,6 +499,7 @@ impl Character {
             mount: String::new(),
             mounted: false,
             rebirth_tiers: [0; 5],
+            mount_tint: 0,
             starters_granted: vec![],
             bank: Default::default(),
         };
@@ -1174,6 +1179,10 @@ pub enum ClientMessage {
     SelectMount {
         mount: String,
     },
+    /// Chooses the mount coat tint earned by a rebirth tier (2 to 5), or 0 for the plain coat.
+    SelectMountTint {
+        tier: u32,
+    },
     /// Asks whether a rebirth is possible now and what it would do; the answer carries the nonce `Rebirth` needs.
     RebirthPreview,
     Rebirth {
@@ -1347,6 +1356,10 @@ pub enum DebugCommand {
     },
     GiveXp {
         amount: u32,
+    },
+    /// Sets the rebirth counts of the character (test worlds only), to look at or exercise a perk without playing for it.
+    SetRebirth {
+        tiers: [u32; 5],
     },
     GiveMount {
         mount: String,

@@ -1100,6 +1100,7 @@
     if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;pendingChest=null;hero.target=null;hero.goal=null;}
     window.Attributes?.update(own);
     window.Mounts?.update(own);
+    window.Rebirth?.update(own);
     window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || [], own.gearInstances || [], own.setCounts || {});
     window.Quests?.setBells(own.bells || []);
     window.Quests?.update(own.quests || []);
@@ -1201,6 +1202,7 @@
     if (event.kind === 'portal') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); burst(event.x, event.y, 20, 14, ['#ffd9a0', '#ff8a3a', '#7ae8c8']); }
     if (event.kind === 'chestOpen') { if (pendingChest) { pendingChest = null; cityRoute = []; } effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:.65,grow:1.1,col:'#ffe292'}); effects.push({kind:'chestOpen',x:event.x,y:event.y,t:0,life:1.3}); burst(event.x,event.y,24,18,['#ffe292','#fff6cf','#d89543'],4,5); }
     if (event.kind === 'levelup') levelUpFx(event);
+    if (event.kind === 'rebirth') rebirthFx(event);
     if (event.kind === 'slam') { effects.push({ kind: 'slam', x: event.x, y: event.y, r: event.value, t: 0, life: .7 }); burst(event.x, event.y, 6, 26, ['#e8dcc0', '#a9a08a', '#ffb060'], 5, 10); kick(event.value > 4 ? 14 : 9, .45); }
     if (event.kind === 'cleared') { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); burst(event.x, event.y, 20, 40, ['#d4ffc8', '#9cff8f', '#ffffff'], 6, 4); effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0, life: 1.6, grow: 2.4, col: '#9cff8f' }); }
     // Food and potions: a potion lands at once with a ring and its number; a meal shows its share every second.
@@ -1379,7 +1381,7 @@
     g.fillStyle = 'rgba(9, 11, 15, .28)'; g.beginPath(); g.ellipse(0, 1, 42, 11, 0, 0, 6.283); g.fill();
     g.strokeStyle = '#3b2219'; g.lineWidth = 9; g.lineCap = 'round';
     for (const [x, phase] of [[-24, 1],[-12,-1],[17,-1],[29,1]]) { g.beginPath(); g.moveTo(x,-23); g.lineTo(x+phase*stride*.45,-1); g.stroke(); }
-    g.fillStyle = MOUNT_COATS[actor.mount] || MOUNT_COATS.horse; g.beginPath(); g.ellipse(0,-34,38,22,-.08,0,6.283); g.fill();
+    g.fillStyle = window.Rebirth?.tintColor(actor.mountTint) || MOUNT_COATS[actor.mount] || MOUNT_COATS.horse; g.beginPath(); g.ellipse(0,-34,38,22,-.08,0,6.283); g.fill();
     g.beginPath(); g.moveTo(23,-43); g.lineTo(37,-68); g.lineTo(51,-64); g.lineTo(49,-39); g.closePath(); g.fill();
     g.fillStyle = '#4d2c20'; g.beginPath(); g.moveTo(35,-64); g.lineTo(35,-79); g.lineTo(42,-68); g.moveTo(46,-63); g.lineTo(50,-77); g.lineTo(54,-63); g.fill();
     g.strokeStyle = '#3b2219'; g.lineWidth = 5; g.beginPath(); g.moveTo(-32,-39); g.quadraticCurveTo(-54,-62,-46,-77); g.stroke();
@@ -1399,10 +1401,27 @@
     floater(ev.x, ev.y, `Level ${ev.level}`, '#ffffff', true, 'level', 108);
     if (own) kick(13, .8);
   }
+  // A rebirth: a pillar and rings in the tier's colour, a fountain of sparks and a floating word; the player's own client
+  // adds a screen shake (game.js adds the banner and the fanfare).
+  function rebirthFx(ev) {
+    const tier = Math.round(ev.value) || 1, rgb = window.Rebirth.rgb(tier), col = window.Rebirth.color(tier), own = ev.actor === Online.id;
+    effects.push({ kind: 'rbPillar', x: ev.x, y: ev.y, t: 0, life: 2.6, rgb });
+    [col, '#ffffff', col].forEach((c, i) => effects.push({ kind: 'ring', x: ev.x, y: ev.y, col: c, t: -i * .2, life: 1.3 + i * .15, grow: 1 + i * .4 }));
+    spark(ev.x, ev.y, 70, [col, '#ffffff'], 20, 1.4, 2);
+    floater(ev.x, ev.y, 'REBORN!', col, true);
+    floater(ev.x, ev.y, window.Rebirth.title(tier), '#ffffff', true, 'level', 108);
+    if (own) kick(11, .7);
+  }
   function drawLevelFx(g, e) {
     const [sx, sy] = w2s(e.x, e.y), p = e.t / e.life;
     g.save(); g.globalCompositeOperation = 'lighter';
-    if (e.kind === 'luPillar') {
+    if (e.kind === 'rbPillar') {
+      const rise = Math.min(1, e.t / .3), top = 1000 * rise, fade = p < .5 ? 1 : 1 - (p - .5) / .5, w = 70 * (1 - p * .3) * (.94 + .06 * Math.sin(e.t * 30));
+      const gr = g.createLinearGradient(0, sy - top, 0, sy); gr.addColorStop(0, `rgba(${e.rgb},0)`); gr.addColorStop(.5, `rgba(${e.rgb},.45)`); gr.addColorStop(1, 'rgba(255,255,255,.9)');
+      g.globalAlpha = fade; g.fillStyle = gr; g.fillRect(sx - w / 2, sy - top, w, top);
+      const gl = g.createRadialGradient(sx, sy, 4, sx, sy, 130); gl.addColorStop(0, `rgba(${e.rgb},.8)`); gl.addColorStop(1, `rgba(${e.rgb},0)`);
+      g.fillStyle = gl; g.beginPath(); g.ellipse(sx, sy, 130, 65, 0, 0, 6.283); g.fill();
+    } else if (e.kind === 'luPillar') {
       const rise = Math.min(1, e.t / .22), top = 1000 * rise, fade = p < .55 ? 1 : 1 - (p - .55) / .45, flick = .92 + .08 * Math.sin(e.t * 38), w = 84 * (1 - p * .35) * flick;
       const gr = g.createLinearGradient(0, sy - top, 0, sy); gr.addColorStop(0, 'rgba(255,214,90,0)'); gr.addColorStop(.5, 'rgba(255,230,140,.5)'); gr.addColorStop(1, 'rgba(255,255,255,.95)');
       g.globalAlpha = fade; g.fillStyle = gr; g.fillRect(sx - w / 2, sy - top, w, top);
@@ -3586,17 +3605,19 @@
         g.restore();
       } else if (it.remote) {
         const remote = it.remote; g.save(); g.translate(it.sx, it.sy);
+        if (!remote.sparkTravel && !remote.dead) window.Rebirth?.drawAura(g, remote.reborn?.tier, remote.mounted ? 1.25 : 1);
         if (remote.sparkTravel) Spark.draw(g,remote,t);
         else if (remote.sprite) { drawMount(g,remote); if(remote.mounted)g.translate(0,-23); remote.sprite.draw(g, remote, t); if(remote.mounted)g.translate(0,23); }
         else { g.fillStyle = '#cfb5fa'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
         drawMageWardShell(g, remote, t); drawPriestBuffShell(g, remote, t); drawHunterBuffShell(g, remote, t);
-        g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag ? '#ff9b9b' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : '#fff4ca';
+        g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag ? '#ff9b9b' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : window.Rebirth?.color(remote.reborn?.tier || 0) || '#fff4ca';
         const nameText = remote.escort ? remote.look.name + ' · Escort' : remote.look.name + (remote.pvpFlag ? ' · PvP' : '');
         g.strokeText(nameText, 0, -128); g.fillText(nameText, 0, -128);
+        if (remote.reborn?.tier) { const label = window.Rebirth.title(remote.reborn.tier); g.font = '13px "Jua", sans-serif'; g.fillStyle = window.Rebirth.color(remote.reborn.tier); g.lineWidth = 3; g.strokeText(label, 0, -144); g.fillText(label, 0, -144); }
         if (hero.pvpTargetId === remote.id) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, 6.283); g.stroke(); }
         g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
         g.restore();
-      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.gm && hero.hidden) g.globalAlpha = .35; if (hero.sparkTravel) Spark.draw(g,hero,t); else { drawMount(g,hero); if(hero.mounted)g.translate(0,-23); if (isModular()) {
+      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.gm && hero.hidden) g.globalAlpha = .35; if (hero.sparkTravel) Spark.draw(g,hero,t); else { if (!hero.dead) window.Rebirth?.drawAura(g, hero.reborn?.tier, hero.mounted ? 1.25 : 1); drawMount(g,hero); if(hero.mounted)g.translate(0,-23); if (isModular()) {
         if (mageSpr) mageSpr.draw(g, hero, t);
         else { g.fillStyle = '#8acfff'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
       } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } drawMageWardShell(g, hero, t); drawPriestBuffShell(g, hero, t); drawHunterBuffShell(g, hero, t); if (hero.gm && hero.hidden) { g.globalAlpha = .8; g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 1, 26, 11, 0, 0, Math.PI * 2); g.stroke(); } g.restore(); }
@@ -3648,7 +3669,7 @@
       if (e.col) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = 1 - p; g.strokeStyle = e.col; } else g.strokeStyle = `rgba(255,224,102,${1 - p})`;
       g.lineWidth = 6 * (1 - p) + 1; g.beginPath(); g.ellipse(sx, sy, 30 + p * 120 * m, 14 + p * 56 * m, 0, 0, 6.283); g.stroke(); if (e.col) g.restore();
     }
-    for (const e of effects) if (e.kind === 'luPillar' || e.kind === 'luRays') drawLevelFx(g, e); else if (e.kind.startsWith('sk')) drawSkillFx(g, e);
+    for (const e of effects) if (e.kind === 'luPillar' || e.kind === 'luRays' || e.kind === 'rbPillar') drawLevelFx(g, e); else if (e.kind.startsWith('sk')) drawSkillFx(g, e);
     for (const b of bolts) {
       const [sx, sy] = w2s(b.x, b.y, 42), [tx, ty] = w2s(b.x - b.fx * .45, b.y - b.fy * .45, 42), [ux, uy] = projDir(b.fx, b.fy);
       const w = b.size || 9;

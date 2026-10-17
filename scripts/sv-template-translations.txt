@@ -211,5 +211,21 @@
   "Expansion {0} of {1}: +{2} cells for {3} gold. It is never refunded.": "Utvidgning {0} av {1}: +{2} platser för {3} guld. Den återbetalas aldrig.",
   "The bank is at its largest: {0} cells.": "Banken är som störst: {0} platser.",
   "Expand the bank · {0} gold": "Utöka banken · {0} guld",
-  "Deleting {0} also deletes the bank. Items in it: {1}. Gold in it: {2}. Press Really? to confirm.": "Om du tar bort {0} försvinner också banken. Saker i den: {1}. Guld i den: {2}. Tryck på Verkligen? för att bekräfta."
+  "Deleting {0} also deletes the bank. Items in it: {1}. Gold in it: {2}. Press Really? to confirm.": "Om du tar bort {0} försvinner också banken. Saker i den: {1}. Guld i den: {2}. Tryck på Verkligen? för att bekräfta.",
+  "A better rebirth is now available: tier {0} at level {1}.": "En bättre återfödelse är nu möjlig: grad {0} på nivå {1}.",
+  "A rebirth now is tier {0}. At level {1} it becomes tier {2}, with more perks.": "En återfödelse nu är grad {0}. På nivå {1} blir den grad {2}, med fler förmåner.",
+  "Cap {0}": "Tak {0}",
+  "From level {0} (tier {1})": "Från nivå {0} (grad {1})",
+  "Next rebirth: {0}": "Nästa återfödelse: {0}",
+  "Rebirth at level {0}: tier {1}": "Återfödelse på nivå {0}: grad {1}",
+  "Reborn {0}": "Återfödd {0}",
+  "The first rebirth is at level {0}.": "Den första återfödelsen sker på nivå {0}.",
+  "You need level {0} to be reborn.": "Du behöver nivå {0} för att återfödas.",
+  "{0} coat": "{0}-päls",
+  "{0} worn piece goes into your bags.": "{0} buren sak hamnar i dina väskor.",
+  "{0} worn pieces go into your bags.": "{0} burna saker hamnar i dina väskor.",
+  "{0} · {1} rebirth": "{0} · {1} återfödelse",
+  "{0} · {1} rebirths": "{0} · {1} återfödelser",
+  "{0} → {1}": "{0} → {1}",
+  "{0}s": "{0}s"
 }

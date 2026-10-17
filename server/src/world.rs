@@ -311,7 +311,7 @@ impl Player {
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
-            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"frozen":self.frozen,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,"reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"rebirthTiers":c.rebirth_tiers,
+            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"frozen":self.frozen,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,"reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"rebirthTiers":c.rebirth_tiers,"rebirthPerks":c.rebirth_perks(),"mountTint":c.mount_tint,
             "setCounts":c.set_counts(),"setCd":self.set_cd,
             "pvpFlag":self.pvp_flag,"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
     }
@@ -2031,6 +2031,12 @@ impl World {
                 }
             }
             ClientMessage::SelectMount { mount } => match p.character.select_mount(&mount) {
+                Ok(()) => self.save(),
+                Err(text) => {
+                    let _ = p.peer.try_send(json!({"type":"error","text":text}));
+                }
+            },
+            ClientMessage::SelectMountTint { tier } => match p.character.select_mount_tint(tier) {
                 Ok(()) => self.save(),
                 Err(text) => {
                     let _ = p.peer.try_send(json!({"type":"error","text":text}));

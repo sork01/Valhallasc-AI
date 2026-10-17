@@ -86,6 +86,47 @@ impl Character {
         1u32.saturating_add(perk.step.saturating_mul(count_from(self, perk)))
             .min(perk.cap.max(1))
     }
+    /// Every perk with its current value, its cap and the tier that unlocks it, for the Rebirth panel and the preview.
+    pub fn rebirth_perks(&self) -> serde_json::Value {
+        let drops = &TABLE.drop_multiplier;
+        let row = |id: &str, perk: &Perk, value: u32| serde_json::json!({"id":id,"value":value,"cap":perk.cap,"unlock":perk.unlock,"step":perk.step});
+        serde_json::json!([
+            row("xp", &TABLE.xp_percent, self.rebirth_xp_percent()),
+            row("gold", &TABLE.gold_percent, self.rebirth_gold_percent()),
+            row(
+                "bagCells",
+                &TABLE.bag_cells,
+                self.rebirth_bag_cells() as u32
+            ),
+            row("fare", &TABLE.fare_percent, self.rebirth_fare_percent()),
+            row(
+                "resetPrice",
+                &TABLE.reset_price_percent,
+                self.rebirth_reset_percent()
+            ),
+            row("drops", drops, self.drop_multiplier()),
+        ])
+    }
+    /// The same list after one more rebirth at `tier`, for the preview.
+    pub fn rebirth_perks_after(&self, tier: u32) -> serde_json::Value {
+        let mut next = self.clone();
+        if (1..=5).contains(&tier) {
+            next.rebirth_tiers[tier as usize - 1] =
+                next.rebirth_tiers[tier as usize - 1].saturating_add(1);
+        }
+        next.rebirth_perks()
+    }
+    /// Picks the mount coat tint: 0 clears it, 2 to 5 name a rebirth tier the character has reached.
+    pub fn select_mount_tint(&mut self, tier: u32) -> Result<(), String> {
+        if tier != 0 && !(2..=5).contains(&tier) {
+            return Err("There is no such mount coat.".into());
+        }
+        if tier > self.rebirth_highest_tier() {
+            return Err("You have not earned that mount coat yet.".into());
+        }
+        self.mount_tint = tier;
+        Ok(())
+    }
     pub fn boosted_xp(&self, xp: u32) -> u32 {
         plus_percent(xp, self.rebirth_xp_percent())
     }
