@@ -884,6 +884,8 @@
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
+  // The on-screen unit direction of a world direction: the ground is isometric, so a world step (fx, fy) is not drawn as (fx, fy).
+  function projDir(fx, fy) { const [x, y] = w2sRaw(fx, fy), n = Math.hypot(x, y) || 1; return [x / n, y / n]; }
   function w2s(x, y, z = 0) { const [cx, cy] = camS(), [sx, sy] = w2sRaw(x, y); return [sx - cx + VW / 2 + Math.round(shakeX), sy - cy + VH / 2 + Math.round(shakeY) - z]; }
   function visibleCombatCue(x, y) {
     if (Math.hypot(x-hero.x,y-hero.y) >= 15) return false;
@@ -1705,7 +1707,7 @@
         });
       }
     } else if (e.kind === 'skHunterDraw') {
-      const [x, y] = w2s(e.x, e.y, 58), dx = Math.cos(e.a), dy = Math.sin(e.a) * .55;
+      const [x, y] = w2s(e.x, e.y, 58), [dx, dy] = projDir(Math.cos(e.a), Math.sin(e.a));
       const side = [-dy, dx], pull = 22 * (1 - Math.min(1, p * 3));
       layers(g, [[11, OUTLINE, .5, 0], [6, e.glow, .7, 1], [2.5, e.core, 1, 0]], fade, 0, () => {
         g.beginPath(); g.moveTo(x + dx * 28 + side[0] * 25, y + dy * 28 + side[1] * 25);
@@ -1714,8 +1716,8 @@
       const count = e.count || 1;
       for (let i = 0; i < count; i++) {
         const an = e.a + (i - (count - 1) / 2) * e.spread / Math.max(1, count - 1);
-        const ax = x + Math.cos(an) * (42 + p * 48), ay = y + Math.sin(an) * .55 * (42 + p * 48);
-        g.globalAlpha = fade; drawHunterArrow(g, ax, ay, Math.cos(an), Math.sin(an) * .55,
+        const [ux, uy] = projDir(Math.cos(an), Math.sin(an)), ax = x + ux * (42 + p * 48), ay = y + uy * (42 + p * 48);
+        g.globalAlpha = fade; drawHunterArrow(g, ax, ay, ux, uy,
           e.style === 'powershot' ? 1.15 : .8, e.core);
       }
     } else if (e.kind === 'skHunterImpact') {
@@ -1777,7 +1779,7 @@
         const dist = reach * fraction, xw = e.x + Math.cos(an) * dist, yw = e.y + Math.sin(an) * dist;
         const [x, y] = w2s(xw, yw, 30 + i % 4 * 8);
         g.globalAlpha = fade * (.6 + .4 * fraction);
-        drawHunterArrow(g, x, y, Math.cos(an), Math.sin(an) * .55, i % 3 ? .56 : .7, i % 4 ? e.core : '#fff9dd');
+        { const [ux, uy] = projDir(Math.cos(an), Math.sin(an)); drawHunterArrow(g, x, y, ux, uy, i % 3 ? .56 : .7, i % 4 ? e.core : '#fff9dd'); }
       }
     } else if (e.kind === 'skHunterBuff') {
       const [x, y] = w2s(e.x, e.y, 83), size = 30 + p * 30;
@@ -1800,11 +1802,11 @@
       const n = e.count || 3, ring = e.spread >= 6.27, reach = .5 + Math.min(1, p * 2.5) * 1.2;
       for (let i = 0; i < n; i++) {
         const an = e.a + (ring ? i * 6.283 / n : (i - (n - 1) / 2) * e.spread / Math.max(1, n - 1));
-        const dx = Math.cos(an), dy = Math.sin(an), [x, y] = w2s(e.x + dx * reach, e.y + dy * reach, 48);
+        const dx = Math.cos(an), dy = Math.sin(an), [x, y] = w2s(e.x + dx * reach, e.y + dy * reach, 48), [ux, uy] = projDir(dx, dy);
         layers(g, [[5, e.glow, .55, 1], [2, e.core, .9, 0]], fade, 0, () => {
-          g.beginPath(); g.moveTo(sx + dx * 19, sy - 48 + dy * 9); g.lineTo(x, y);
+          g.beginPath(); g.moveTo(sx + ux * 19, sy - 48 + uy * 19); g.lineTo(x, y);
         });
-        g.globalAlpha = fade; drawAssassinKnife(g, x, y, dx, dy * .55, ring ? .67 : .8, e.core);
+        g.globalAlpha = fade; drawAssassinKnife(g, x, y, ux, uy, ring ? .67 : .8, e.core);
       }
     } else if (e.kind === 'skAssassinImpact') {
       const [x, y] = w2s(e.x, e.y, 43);
@@ -1901,9 +1903,9 @@
       const n = e.count || 2, spread = e.spread || .28, reach = 48 + Math.min(1, p * 3) * 90;
       for (let i = 0; i < n; i++) {
         const an = e.a + (i - (n - 1) / 2) * spread / Math.max(1, n - 1), dx = Math.cos(an), dy = Math.sin(an);
-        const [x, y] = w2s(e.x + dx * reach / 62, e.y + dy * reach / 62, 48);
+        const [x, y] = w2s(e.x + dx * reach / 62, e.y + dy * reach / 62, 48), [ux, uy] = projDir(dx, dy);
         layers(g, [[15, OUTLINE, .35, 0], [10, e.glow, .6, 1], [4, e.core, 1, 0]], fade, 0, () => {
-          g.beginPath(); g.moveTo(x - dx * 30, y - dy * 18); g.lineTo(x + dx * 12, y + dy * 8);
+          g.beginPath(); g.moveTo(x - ux * 34, y - uy * 34); g.lineTo(x + ux * 14, y + uy * 14);
         });
         g.globalAlpha = fade; g.fillStyle = '#ffffff'; g.beginPath(); g.arc(x, y, n === 2 ? 5 : 3.5, 0, 6.283); g.fill();
       }
@@ -3636,25 +3638,25 @@
     }
     for (const e of effects) if (e.kind === 'luPillar' || e.kind === 'luRays') drawLevelFx(g, e); else if (e.kind.startsWith('sk')) drawSkillFx(g, e);
     for (const b of bolts) {
-      const [sx, sy] = w2s(b.x, b.y, 42), [tx, ty] = w2s(b.x - b.fx * .45, b.y - b.fy * .45, 42);
+      const [sx, sy] = w2s(b.x, b.y, 42), [tx, ty] = w2s(b.x - b.fx * .45, b.y - b.fy * .45, 42), [ux, uy] = projDir(b.fx, b.fy);
       const w = b.size || 9;
       if (['powershot', 'multishot', 'piercingarrow', 'explosivearrow'].includes(b.skill)) {
         const power = b.skill === 'powershot', pierce = b.skill === 'piercingarrow', explosive = b.skill === 'explosivearrow';
         const color = explosive ? '#ff8a3a' : pierce ? '#8cf0bb' : power ? '#ffd27a' : '#e8c27a';
         g.save(); g.lineCap = 'round'; g.globalCompositeOperation = 'lighter';
         g.strokeStyle = color; g.globalAlpha = explosive ? .75 : .5; g.lineWidth = power ? 15 : pierce ? 12 : 9;
-        g.beginPath(); g.moveTo(tx - b.fx * (power ? 55 : 30), ty - b.fy * (power ? 28 : 15)); g.lineTo(sx, sy); g.stroke();
+        g.beginPath(); g.moveTo(tx - ux * (power ? 62 : 34), ty - uy * (power ? 62 : 34)); g.lineTo(sx, sy); g.stroke();
         g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
-        drawHunterArrow(g, sx, sy, b.fx, b.fy * .55, power ? 1.35 : explosive ? 1.15 : pierce ? 1.05 : .85, color);
-        if (explosive) { g.fillStyle = '#fff2bd'; g.beginPath(); g.arc(sx - b.fx * 24, sy - b.fy * 12, 5, 0, 6.283); g.fill(); }
+        drawHunterArrow(g, sx, sy, ux, uy, power ? 1.35 : explosive ? 1.15 : pierce ? 1.05 : .85, color);
+        if (explosive) { g.fillStyle = '#fff2bd'; g.beginPath(); g.arc(sx - ux * 27, sy - uy * 27, 5, 0, 6.283); g.fill(); }
         g.restore(); continue;
       }
       if (b.skill === 'throwingknives' || b.skill === 'knifering') {
         g.save(); g.lineCap = 'round'; g.globalCompositeOperation = 'lighter';
         g.strokeStyle = b.skill === 'knifering' ? '#d89cff' : '#c9d5e5'; g.globalAlpha = .65; g.lineWidth = 8;
-        g.beginPath(); g.moveTo(tx - b.fx * 27, ty - b.fy * 14); g.lineTo(sx, sy); g.stroke();
+        g.beginPath(); g.moveTo(tx - ux * 30, ty - uy * 30); g.lineTo(sx, sy); g.stroke();
         g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
-        drawAssassinKnife(g, sx, sy, b.fx, b.fy * .55, .85, b.skill === 'knifering' ? '#f3d8ff' : '#dfe6ee');
+        drawAssassinKnife(g, sx, sy, ux, uy, .85, b.skill === 'knifering' ? '#f3d8ff' : '#dfe6ee');
         g.restore(); continue;
       }
       if (b.skill === 'twinbolt' || b.skill === 'barrage' || b.skill === 'fireball') {
@@ -3663,15 +3665,15 @@
           const r = 17 + Math.sin(t * 24 + b.id) * 2, fire = g.createRadialGradient(sx, sy, 2, sx, sy, r * 2.8);
           fire.addColorStop(0, '#ffffff'); fire.addColorStop(.25, '#fff3c0'); fire.addColorStop(.55, '#ff6a1a'); fire.addColorStop(1, '#ff6a1a00');
           g.globalCompositeOperation = 'lighter'; g.fillStyle = fire; g.beginPath(); g.arc(sx, sy, r * 2.8, 0, 6.283); g.fill();
-          g.strokeStyle = '#ff8a3a'; g.globalAlpha = .7; g.lineWidth = 25; g.beginPath(); g.moveTo(tx - b.fx * 16, ty - b.fy * 8); g.lineTo(sx, sy); g.stroke();
+          g.strokeStyle = '#ff8a3a'; g.globalAlpha = .7; g.lineWidth = 25; g.beginPath(); g.moveTo(tx - ux * 18, ty - uy * 18); g.lineTo(sx, sy); g.stroke();
           g.fillStyle = '#fff8d9'; g.globalAlpha = 1; g.beginPath(); g.arc(sx, sy, r * .65, 0, 6.283); g.fill();
         } else {
           const cyan = b.skill === 'barrage', col = cyan ? '#46c8ff' : '#a57bff';
           g.strokeStyle = col; g.globalCompositeOperation = 'lighter'; g.globalAlpha = .5; g.lineWidth = cyan ? 16 : 21;
           g.beginPath(); g.moveTo(tx, ty); g.lineTo(sx, sy); g.stroke();
           g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; g.fillStyle = '#ffffff'; g.strokeStyle = col; g.lineWidth = 3;
-          g.beginPath(); g.moveTo(sx + b.fx * 18, sy + b.fy * 9); g.lineTo(sx - b.fy * 8, sy + b.fx * 5);
-          g.lineTo(sx - b.fx * 17, sy - b.fy * 9); g.lineTo(sx + b.fy * 8, sy - b.fx * 5); g.closePath(); g.fill(); g.stroke();
+          g.beginPath(); g.moveTo(sx + ux * 19, sy + uy * 19); g.lineTo(sx - uy * 7, sy + ux * 7);
+          g.lineTo(sx - ux * 18, sy - uy * 18); g.lineTo(sx + uy * 7, sy - ux * 7); g.closePath(); g.fill(); g.stroke();
         }
         g.restore(); continue;
       }

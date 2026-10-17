@@ -11149,6 +11149,38 @@ mod tests {
         assert!(w.players[&2].attack == 0., "blink plays no attack");
     }
     #[test]
+    fn hunter_shots_fly_along_the_line_to_the_target_in_sixteen_directions() {
+        for id in ["", "powershot", "multishot", "piercingarrow", "explosivearrow"] {
+            for k in 0..16 {
+                let mut w = world();
+                let _rx = join(&mut w, 1, Class::Hunter);
+                let at = arena(&mut w, 99);
+                let angle = k as f64 * std::f64::consts::TAU / 16.;
+                let (dx, dy) = (angle.cos(), angle.sin());
+                put(&mut w, 0, at, 4. * dx, 4. * dy);
+                let aim = Point { x: dx, y: dy };
+                if id.is_empty() {
+                    w.players.get_mut(&1).unwrap().face = aim;
+                    w.strike(1);
+                } else {
+                    w.use_skill(1, id, aim);
+                }
+                assert!(!w.bolts.is_empty(), "{id} at {k}: no bolt");
+                let middle = &w.bolts[w.bolts.len() / 2];
+                assert!(
+                    (middle.fx - dx).abs() < 1e-9 && (middle.fy - dy).abs() < 1e-9,
+                    "{id} at {k}: flies ({}, {}), the target is along ({dx}, {dy})",
+                    middle.fx,
+                    middle.fy
+                );
+                for _ in 0..40 {
+                    w.update_bolts();
+                }
+                assert!(hp_lost(&w, 0), "{id} at {k}: the arrow never reached the target");
+            }
+        }
+    }
+    #[test]
     fn volleys_fire_the_right_bolts_and_fireball_explodes_on_neighbours() {
         let mut w = world();
         let mut rx = join(&mut w, 1, Class::Mage);

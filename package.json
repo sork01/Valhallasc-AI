@@ -23,6 +23,7 @@
     "test:nightmusic": "node tests/night-music-ui.cjs",
     "test:weather": "node tests/weather-ui.cjs",
     "test:sound": "node tests/levelup-sound.cjs && node tests/combat-sound.cjs",
+    "test:arrow-aim": "node tests/hunter-arrow-aim-ui.cjs",
     "test:swedish": "node tests/swedish-ui.cjs",
     "test:mcp": "node scripts/test-mcp.cjs",
     "world": "node scripts/sync-world.cjs",
