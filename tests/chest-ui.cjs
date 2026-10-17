@@ -42,6 +42,9 @@ async function call(name, args = {}) {
   const chests = () => page.evaluate(() => Field._debug.chests.map(c => ({ id: c.id, x: c.x, y: c.y, left: c.left, expiresAt: c.expiresAt })));
   const gold = () => page.evaluate(() => Field.hero.gold ?? null);
   const log = () => page.locator('#chat-log').innerText();
+  // The painted chest atlas (CHEST-ART) is what the rest of this test looks at, not the vector fallback.
+  await page.waitForFunction(() => Field._debug.chestSprites, null, { timeout: 10000 });
+  check(await page.evaluate(() => { const c = Field._debug.chestSprites; return c.img.naturalWidth === 64 * 6 && c.img.naturalHeight === 64 * 3 && c.meta.clips.opening.n === 6; }), 'the chest atlas is loaded: three clips of 64x64 frames');
   // The hero starts in the Greenmeadow; stand still and put a chest in reach.
   await debug({ op: 'spawn_chest', distance: 1.2 });
   await page.waitForFunction(() => Field._debug.chests.length === 1, null, { timeout: 5000 });
@@ -60,6 +63,7 @@ async function call(name, args = {}) {
   });
   check(painted.wood > painted.total * 0.15, `the chest body is painted (${painted.wood} of ${painted.total} pixels are wood or gold)`);
 
+  await page.screenshot({ path: path.join(world.artifacts, 'chest-closed.png'), clip: await page.evaluate(() => { const c = Field._debug.chests[0], [sx, sy] = Field._debug.w2s(c.x, c.y), r = document.getElementById('fieldcv').getBoundingClientRect(), k = r.width / 1600; return { x: Math.max(0, r.left + (sx - 120) * k), y: Math.max(0, r.top + (sy - 110) * k), width: 240 * k, height: 160 * k }; }) });
   // Click its visible body: the hero is in reach, so the server opens it at once.
   const click = async (chest, dy = -15) => {
     const point = await page.evaluate(({ x, y, dy }) => { const [sx, sy] = Field._debug.w2s(x, y), r = document.getElementById('fieldcv').getBoundingClientRect(); return { x: r.left + sx / 1600 * r.width, y: r.top + (sy + dy) / 900 * r.height }; }, { x: chest.x, y: chest.y, dy });
@@ -82,6 +86,19 @@ async function call(name, args = {}) {
   await click(near);
   await ring;
   check(true, 'opening it plays the gold ring effect');
+  // The chest is gone from the server's list at once, but its lid swings back on the spot: once the opening clip is done the
+  // open lid shows its red lining and the pile gold above the chest's body, and a second later it has faded away.
+  await page.waitForFunction(() => Field._debug.effects.some(e => e.kind === 'chestOpen' && e.t > .55 && e.t < .9), null, { polling: 'raf', timeout: 8000 });
+  const lid = await page.evaluate(() => {
+    const e = Field._debug.effects.find(e => e.kind === 'chestOpen'), [sx, sy] = Field._debug.w2s(e.x, e.y), cv = document.getElementById('fieldcv'), k = cv.width / 1600, g = cv.getContext('2d');
+    const data = g.getImageData(Math.round((sx + 3) * k), Math.round((sy - 42) * k), Math.round(15 * k), Math.round(15 * k)).data;   // the right half, away from the hero standing on the left
+    let lining = 0;   // the lining is red with equal green and blue; wood has far less blue
+    for (let i = 0; i < data.length; i += 4) { const [r, gr, b] = [data[i], data[i + 1], data[i + 2]]; if (r > 100 && r < 190 && Math.abs(b - gr) < 12 && r > gr + 50) lining++; }
+    return { lining, total: data.length / 4 };
+  });
+  check(lid.lining > lid.total * 0.12, `the open lid shows its lining over the vanished chest (${lid.lining} of ${lid.total} pixels)`);
+  await page.waitForFunction(() => !Field._debug.effects.some(e => e.kind === 'chestOpen'), null, { timeout: 4000 });
+  check(true, 'the opened chest fades away after about a second');
   await page.waitForFunction(() => Field._debug.chests.length === 0, null, { timeout: 8000 });
   await page.waitForFunction(() => /ChestFinder opened the treasure chest/.test(document.getElementById('chat-log').textContent), null, { timeout: 5000 });
   check(true, 'clicking the body opened it and the area was told who opened it');

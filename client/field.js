@@ -1185,7 +1185,7 @@
     if (event.kind === 'shotBlocked') spark(event.x, event.y, 7, ['#f8e5b5','#d2b990','#fff4d7'], 7, 0.6, 0.45);
     if (event.kind === 'pickup') floater(event.x, event.y, '+' + event.value + ' gold', '#ffe066', false);
     if (event.kind === 'portal') { effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0 }); burst(event.x, event.y, 20, 14, ['#ffd9a0', '#ff8a3a', '#7ae8c8']); }
-    if (event.kind === 'chestOpen') { if (pendingChest) { pendingChest = null; cityRoute = []; } effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:.65,grow:1.1,col:'#ffe292'}); burst(event.x,event.y,24,18,['#ffe292','#fff6cf','#d89543'],4,5); }
+    if (event.kind === 'chestOpen') { if (pendingChest) { pendingChest = null; cityRoute = []; } effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:.65,grow:1.1,col:'#ffe292'}); effects.push({kind:'chestOpen',x:event.x,y:event.y,t:0,life:1.3}); burst(event.x,event.y,24,18,['#ffe292','#fff6cf','#d89543'],4,5); }
     if (event.kind === 'levelup') levelUpFx(event);
     if (event.kind === 'slam') { effects.push({ kind: 'slam', x: event.x, y: event.y, r: event.value, t: 0, life: .7 }); burst(event.x, event.y, 6, 26, ['#e8dcc0', '#a9a08a', '#ffb060'], 5, 10); kick(event.value > 4 ? 14 : 9, .45); }
     if (event.kind === 'cleared') { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); burst(event.x, event.y, 20, 40, ['#d4ffc8', '#9cff8f', '#ffffff'], 6, 4); effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0, life: 1.6, grow: 2.4, col: '#9cff8f' }); }
@@ -2702,6 +2702,20 @@
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/cairn_${k}.png`;
     }))).then(imgs=>{cairnSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{cairnSrc=null;});
   }
+  // The treasure chest (CHEST-ART): closed (6 frames, a glint), opening (6) and opened (2) in one 64x64 atlas. Without it
+  // (it failed to load) drawChest keeps its vector chest. It is one small file, so the tests' stub sprites do not replace it.
+  let chestSrc = null;
+  function loadChestSprites() {
+    if (chestSrc) return;
+    fetch('assets/chest.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => new Promise((res, rej) => {
+      const i = new Image(); i.onload = () => res({ meta, img: i }); i.onerror = rej; i.src = 'assets/chest.png';
+    })).then(src => { chestSrc = src; }).catch(() => { chestSrc = null; });
+  }
+  // One frame of the chest atlas with its feet on (sx, sy).
+  function drawChestFrame(g, row, n, sx, sy) {
+    const [w, h] = chestSrc.meta.frame, [ax, ay] = chestSrc.meta.anchor;
+    g.save(); g.imageSmoothingEnabled = false; g.drawImage(chestSrc.img, n * w, row * h, w, h, Math.round(sx - ax), Math.round(sy - ay), w, h); g.restore();
+  }
   const BANK_KINDS=['bank_alderhaven','bank_skaldholm','bank_nacrehold','bank_astralhollow','bank_asterion'];
   function loadBankSprites() {
     if (bankSrc) return;
@@ -3355,6 +3369,12 @@
   }
   function drawChest(g, chest, sx, sy) {
     const left = Math.max(0, Math.ceil(chest.expiresAt - tAll));
+    if (chestSrc) {
+      drawChestFrame(g, 0, reducedMotion() ? 0 : Math.floor(tAll * 6 + chest.x * 7) % 6, sx, sy);
+      g.save(); g.translate(sx, sy); g.font = 'bold 13px sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = '#281d20'; g.fillStyle = left <= 30 ? '#ff9a83' : '#fff1c8';
+      const text = `${Math.floor(left / 60)}:${String(left % 60).padStart(2,'0')}`; g.strokeText(text,0,-40); g.fillText(text,0,-40); g.restore();
+      return;
+    }
     g.save(); g.translate(sx, sy); g.lineJoin = 'round'; g.lineWidth = 2.5; g.strokeStyle = '#2d1b17';
     g.fillStyle = '#8f5129'; g.beginPath(); g.moveTo(-24,-22); g.lineTo(0,-29); g.lineTo(24,-22); g.lineTo(24,1); g.lineTo(0,8); g.lineTo(-24,1); g.closePath(); g.fill(); g.stroke();
     g.fillStyle = '#b97837'; g.beginPath(); g.moveTo(-24,-22); g.lineTo(0,-29); g.lineTo(24,-22); g.lineTo(0,-15); g.closePath(); g.fill(); g.stroke();
@@ -3602,6 +3622,12 @@
       const [sx, sy] = w2s(e.x, e.y), [ax, ay] = mageSpr.meta.anchor;
       g.save(); g.globalAlpha = Math.max(0, .35 * (1 - e.t / .32)); g.imageSmoothingEnabled = false;
       g.drawImage(mageSpr.frame('walk', e.dir, e.frame), sx - ax * 1.3, sy - ay * 1.3, 160 * 1.3, 160 * 1.3); g.restore();
+    } else if (e.kind === 'chestOpen') {
+      if (!chestSrc) continue;
+      const [sx, sy] = w2s(e.x, e.y), fade = Math.min(1, (e.life - e.t) / .4);   // the lid swings back, the pile shimmers, then it is gone
+      g.save(); g.globalAlpha = fade; g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(sx, sy, 27, 9, 0, 0, 6.283); g.fill();
+      if (e.t < .5) drawChestFrame(g, 1, Math.min(5, Math.floor(e.t * 12)), sx, sy); else drawChestFrame(g, 2, Math.floor((e.t - .5) * 4) % 2, sx, sy);
+      g.restore();
     } else if (e.kind === 'ring') {
       if (e.t < 0) continue;
       const p = e.t / (e.life ?? .9), [sx, sy] = w2s(e.x, e.y), m = e.grow || 1;
@@ -3863,7 +3889,7 @@
       if (o.sprites) loadHeroSprites(o.sprites, o.char, o.onSprites);
       if (o.warriorSprites && !isModular()) loadWarriorSprites(o.warriorSprites, o.char);
       if (o.slimeSprites) loadSlimeSprites(o.slimeSprites);
-      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadSkySprites(); loadDeepSprites(); loadAstralSprites(); loadPrismSprites(); loadOrrerySprites(); loadMoonsporeSprites(); loadStormglassSprites(); loadSunwardSprites(); loadRibbonwildSprites(); loadTanglecrownSprites(); loadWorldheartSprites(); loadLapisSprites(); loadFrostwakeSprites(); loadCairnSprites(); loadBankSprites(); loadYearSprites(); loadMoonwellSprites(); loadMoonwellGardenSprites(); loadVaultSprites(); loadCathedralSprites();
+      loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadSkySprites(); loadDeepSprites(); loadAstralSprites(); loadPrismSprites(); loadOrrerySprites(); loadMoonsporeSprites(); loadStormglassSprites(); loadSunwardSprites(); loadRibbonwildSprites(); loadTanglecrownSprites(); loadWorldheartSprites(); loadLapisSprites(); loadFrostwakeSprites(); loadCairnSprites(); loadBankSprites(); loadChestSprites(); loadYearSprites(); loadMoonwellSprites(); loadMoonwellGardenSprites(); loadVaultSprites(); loadCathedralSprites();
       if (!Field._bound) {
         Field._bound = true;
         addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize);
@@ -3943,7 +3969,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
-    _debug: { get chests() { return chests; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, drawLootPillar, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
+    _debug: { get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, drawLootPillar, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
   };
   window.Field = Field;
 })();
