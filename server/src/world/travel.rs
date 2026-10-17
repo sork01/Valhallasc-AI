@@ -96,7 +96,7 @@ impl World {
             .filter(|n| n.travel_stop.is_some() && n.id != from).map(|n| {
                 let route = self.spark_route(from, &n.id);
                 let missing: Vec<_> = route.iter().flatten().filter(|id| !c.travel_stops.contains(id)).filter_map(|id| self.travel_master(id).map(|(_, n)| n.travel_stop.clone().unwrap())).collect();
-                let cost = route.as_ref().map(|r| (r.len() as u32 - 1) * LEG_COST);
+                let cost = route.as_ref().map(|r| c.spark_fare((r.len() as u32 - 1) * LEG_COST));
                 let stops: Vec<_> = route.iter().flatten().filter_map(|id| self.travel_master(id).map(|(_, n)| n.travel_stop.clone().unwrap())).collect();
                 let reason = if route.is_none() { "No connected Spark Travel route.".into() }
                     else if !missing.is_empty() { format!("Talk to the travel master at {} first.", missing.join(", ")) }
@@ -131,7 +131,7 @@ impl World {
                     .unwrap()
             ));
         }
-        let cost = (stops.len() as u32 - 1) * LEG_COST;
+        let cost = c.spark_fare((stops.len() as u32 - 1) * LEG_COST);
         if c.gold < cost {
             return Err(format!(
                 "Spark Travel costs {cost} gold. You do not have enough."

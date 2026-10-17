@@ -41,7 +41,26 @@ fn uniform(range: [u32; 2], random: f64) -> u32 {
 
 /// Run once after every credited mob death. Each successful copy gets five independent rolls;
 /// the returned values travel with the drop through party voting and are never rolled at pickup.
-pub fn roll_orange(mut random: impl FnMut() -> f64) -> Option<GearInstance> {
+#[cfg(test)]
+pub fn roll_orange(random: impl FnMut() -> f64) -> Option<GearInstance> {
+    roll_orange_boosted(1, random)
+}
+
+/// `roll_orange` at a drop multiplier (docs/rebirth.md): the first draw, the one that decides whether anything drops,
+/// is compared with `multiplier` times the chance. At 1 it is the plain roll.
+pub fn roll_orange_boosted(
+    multiplier: u32,
+    mut random: impl FnMut() -> f64,
+) -> Option<GearInstance> {
+    let mut first = true;
+    let mut random = move || {
+        let value = random();
+        if std::mem::take(&mut first) {
+            value / f64::from(multiplier.max(1))
+        } else {
+            value
+        }
+    };
     if random() >= RULES.drop.chance_per_kill {
         return None;
     }

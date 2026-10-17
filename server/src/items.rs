@@ -5,7 +5,9 @@ use std::sync::LazyLock;
 mod gear_services;
 pub use gear_services::GearInstance;
 mod orange;
+#[cfg(test)]
 pub use orange::roll_orange;
+pub use orange::roll_orange_boosted;
 
 pub const EXTRA_SLOTS: [&str; 7] = [
     "headgear",
@@ -813,12 +815,13 @@ pub fn equipment_of_rarity(rarity: &str, level: u32, choice: f64) -> Option<&'st
 }
 impl Character {
     pub fn bag_capacity(&self) -> usize {
-        16 + self
-            .bags
-            .iter()
-            .filter_map(|id| item(id))
-            .map(|i| i.bag_slots)
-            .sum::<usize>()
+        16 + self.rebirth_bag_cells()
+            + self
+                .bags
+                .iter()
+                .filter_map(|id| item(id))
+                .map(|i| i.bag_slots)
+                .sum::<usize>()
     }
     pub fn bag_used(&self) -> usize {
         self.inventory
@@ -1361,6 +1364,7 @@ impl Character {
         let value = quantity
             .checked_add(epic_copies)
             .and_then(|count| i.sell.checked_mul(count))
+            .map(|value| self.boosted_gold(value))
             .filter(|value| self.gold.checked_add(*value).is_some())
             .ok_or("That sale is too large.")?;
         if is_gear(i) {

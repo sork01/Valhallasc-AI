@@ -119,7 +119,7 @@ impl World {
     ) -> (u32, u32) {
         let group = self.xp_group(credit, zone, point);
         if group.len() < 2 || !group.iter().any(|g| g == credit) {
-            return (xp, self.grant(credit, xp));
+            return self.grant(credit, xp).unwrap_or((xp, 0));
         }
         let before = party_level(self.party_points_of(credit));
         let strongest = group
@@ -140,9 +140,9 @@ impl World {
         let share = shared_xp(xp, level);
         let mut mine = (share, 0);
         for member in &group {
-            let levels = self.grant(member, share);
+            let (got, levels) = self.grant(member, share).unwrap_or((share, 0));
             if member == credit {
-                mine.1 = levels;
+                mine = (got, levels);
                 continue;
             }
             let at = self.online(member).map(|p| p.character.point());
@@ -151,9 +151,9 @@ impl World {
                     "partyXp",
                     member,
                     at,
-                    share as f64,
+                    got as f64,
                     false,
-                    json!({"enemy":kind,"level":enemy_level,"xp":share}),
+                    json!({"enemy":kind,"level":enemy_level,"xp":got}),
                 );
                 if levels > 0 {
                     self.level_up_event(member, at, levels);
@@ -179,12 +179,16 @@ impl World {
         }
         mine
     }
-    /// Gives `xp` to the online character `id`; returns the levels gained.
-    fn grant(&mut self, id: &str, xp: u32) -> u32 {
+    /// Gives `xp` to the online character `id`, plus their rebirth bonus; returns the XP they got and the levels
+    /// gained, or nothing for someone who is not online.
+    fn grant(&mut self, id: &str, xp: u32) -> Option<(u32, u32)> {
         self.players
             .values_mut()
             .find(|p| p.merc.is_none() && p.character.id == id)
-            .map_or(0, |p| p.character.grant_xp(xp))
+            .map(|p| {
+                let got = p.character.boosted_xp(xp);
+                (got, p.character.grant_xp(got))
+            })
     }
 }
 

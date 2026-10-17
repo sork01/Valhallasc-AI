@@ -704,9 +704,10 @@ impl Character {
     }
     /// A level-scaled service, with each prior reset adding one base price (up to 5x).
     pub fn stat_reset_price(&self) -> u32 {
-        5_000_u32
+        let price = 5_000_u32
             .saturating_add(50_u32.saturating_mul(self.level.saturating_mul(self.level)))
-            .saturating_mul(self.stat_resets.saturating_add(1).min(5))
+            .saturating_mul(self.stat_resets.saturating_add(1).min(5));
+        crate::perks::minus_percent(price, self.rebirth_reset_percent())
     }
     pub fn reset_trained_stats(&mut self) -> Result<u32, String> {
         if self.hp <= 0. {

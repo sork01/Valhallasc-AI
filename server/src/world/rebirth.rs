@@ -17,6 +17,18 @@ pub(super) struct Nonce {
 }
 
 impl World {
+    /// The drop rate multiplier of the character `id` (the credited hero of a kill, the opener of a chest), 1 when
+    /// they are not online. One multiplier reaches each kill, so a party's shared loot is never boosted twice.
+    pub(super) fn drop_multiplier_of(&self, id: &str) -> u32 {
+        self.online(id).map_or(1, |p| p.character.drop_multiplier())
+    }
+    /// A gold pile `base` for `id`, with their drop multiplier and then their rebirth gold bonus.
+    pub(super) fn pile_for(&self, id: &str, base: u32) -> u32 {
+        self.online(id).map_or(base, |p| {
+            p.character
+                .boosted_gold(base.saturating_mul(p.character.drop_multiplier()))
+        })
+    }
     /// Why this player cannot be reborn now, or None.
     fn rebirth_blocker(&self, session: u64) -> Option<String> {
         let p = self.players.get(&session)?;

@@ -1,6 +1,7 @@
 use crate::{
     items::*,
     model::*,
+    perks::{boosted_chance, copies},
     sets as set_catalog,
     skills::{self, BuffKind, Effect},
     store::Store,
@@ -53,6 +54,8 @@ mod mount_sources_tests;
 #[cfg(test)]
 mod nacre_tests;
 mod partyxp;
+#[cfg(test)]
+mod perks_tests;
 mod pursuit;
 mod pvp;
 #[cfg(test)]
@@ -3599,26 +3602,31 @@ impl World {
                 let point = self.players[&credit].character.point();
                 self.level_up_event(&credit_id, point, levels);
             }
+            // The credited hero's rebirth drop multiplier reaches every roll below (docs/rebirth.md).
+            let boost = self.drop_multiplier_of(&credit_id);
             let value = if gold > 0 {
                 gold
             } else {
                 3 + (self.random() * 4.) as u32
             };
+            let value = self.pile_for(&credit_id, value);
             self.gold_drop(&credit_id, zone, point, value);
-            self.loot_drop(&credit_id, zone, point, material(&kind));
+            self.loot_stack(&credit_id, zone, point, material(&kind), boost);
             // A bag roll is independent of gold, materials and every gear pool.
-            let bag_roll = self.random();
-            if let Some(bag) = roll_bag(level, bag_roll) {
-                self.loot_drop(&credit_id, zone, point, &bag.id);
+            for _ in 0..copies(BAG_DROP_CHANCE, boost, || self.random()) {
+                if let Some(bag) = roll_bag(level, 0.) {
+                    self.loot_drop(&credit_id, zone, point, &bag.id);
+                }
             }
             let last_boss =
                 !self.maps[zone].final_boss.is_empty() && self.maps[zone].final_boss == kind;
+            // A licence is bound to one character, so a boosted chance is one roll, never above 100%.
             if let Some((licence, chance)) = mount_licence_drop(&kind, last_boss)
-                && self.random() < chance
+                && self.random() < boosted_chance(chance, boost)
             {
                 self.loot_drop(&credit_id, zone, point, licence);
             }
-            if let Some(gear) = roll_orange(|| self.random()) {
+            if let Some(gear) = roll_orange_boosted(boost, || self.random()) {
                 self.loot_drop_with_gear(&credit_id, zone, point, &gear.item.clone(), Some(gear));
             }
             if is_boss(&kind) {
@@ -3641,7 +3649,8 @@ impl World {
             }
             if is_elite(&kind) && !self.is_instance(zone) {
                 for rarity in ["uncommon", "rare", "epic", "common", "legendary"] {
-                    if self.random() < outdoor_elite_drop_chance(rarity) {
+                    let pieces = copies(outdoor_elite_drop_chance(rarity), boost, || self.random());
+                    for _ in 0..pieces {
                         let choice = self.random();
                         if let Some(i) = equipment_of_rarity(rarity, level, choice) {
                             self.loot_drop(&credit_id, zone, point, &i.id);
@@ -3649,7 +3658,8 @@ impl World {
                     }
                 }
             } else {
-                let chance = self.random();
+                // Dividing the roll by the multiplier widens every rarity band by it.
+                let chance = self.random() / f64::from(boost);
                 let choice = self.random();
                 if let Some(i) = roll_equipment(&kind, level, chance, choice) {
                     self.loot_drop(&credit_id, zone, point, &i.id);
@@ -3661,15 +3671,20 @@ impl World {
     /// One random piece across all classes per boss slot pool. Party members roll just as for world gear;
     /// alone, the credited hero (the hirer for a mercenary kill) owns it.
     fn boss_loot(&mut self, owner: &str, kind: &str, zone: usize, point: Point) {
+        let boost = self.drop_multiplier_of(owner);
         for slots in boss_slots(kind) {
-            let choice = self.random();
-            if let Some(piece) = boss_piece_for(kind, slots, choice) {
-                self.set_piece_drop(owner, zone, point, piece);
+            // A guaranteed pool is rolled once per step of the drop multiplier.
+            for _ in 0..boost {
+                let choice = self.random();
+                if let Some(piece) = boss_piece_for(kind, slots, choice) {
+                    self.set_piece_drop(owner, zone, point, piece);
+                }
             }
         }
     }
     fn set_piece_drop(&mut self, owner: &str, zone: usize, point: Point, piece: &Item) {
-        let rarity_roll = self.random();
+        // The purple copy is decided by one draw against 5%; dividing it widens the chance by the multiplier.
+        let rarity_roll = self.random() / f64::from(self.drop_multiplier_of(owner));
         let gear = set_piece_copy(piece, rarity_roll);
         self.loot_drop_with_gear(owner, zone, point, &piece.id, gear);
     }
@@ -4557,14 +4572,18 @@ fn quest_action_with_choice(
             *character = next;
             character.quests[i].claimed = true;
             character.quests[i].completions = character.quests[i].completions.saturating_add(1);
-            character.gold = character.gold.saturating_add(quest.reward_gold);
-            let levels = character.grant_xp(quest.reward_xp);
+            let (xp, gold) = (
+                character.boosted_xp(quest.reward_xp),
+                character.boosted_gold(quest.reward_gold),
+            );
+            character.gold = character.gold.saturating_add(gold);
+            let levels = character.grant_xp(xp);
             (
                 format!(
                     "Quest complete: {}! +{} XP and +{} gold.{}",
                     quest.title,
-                    quest.reward_xp,
-                    quest.reward_gold,
+                    xp,
+                    gold,
                     quest
                         .reward_item
                         .as_deref()
@@ -11150,7 +11169,13 @@ mod tests {
     }
     #[test]
     fn hunter_shots_fly_along_the_line_to_the_target_in_sixteen_directions() {
-        for id in ["", "powershot", "multishot", "piercingarrow", "explosivearrow"] {
+        for id in [
+            "",
+            "powershot",
+            "multishot",
+            "piercingarrow",
+            "explosivearrow",
+        ] {
             for k in 0..16 {
                 let mut w = world();
                 let _rx = join(&mut w, 1, Class::Hunter);
@@ -11176,7 +11201,10 @@ mod tests {
                 for _ in 0..40 {
                     w.update_bolts();
                 }
-                assert!(hp_lost(&w, 0), "{id} at {k}: the arrow never reached the target");
+                assert!(
+                    hp_lost(&w, 0),
+                    "{id} at {k}: the arrow never reached the target"
+                );
             }
         }
     }

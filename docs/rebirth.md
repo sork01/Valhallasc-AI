@@ -1,6 +1,6 @@
 # Rebirth
 
-These settle `REBIRTH-RULES` in [TODO.md](../TODO.md). `REBIRTH-SERVER` stores the state and the `rebirth` message, `REBIRTH-PERKS` implements each perk, `REBIRTH-UI` adds the panel, `REBIRTH-ART` the looks and `REBIRTH-CHECK` verifies the loop. Nothing here is code yet; every constant below is meant to live once, in `world/rebirth.txt` (a JSON table like `world/levels.txt`) and one Rust module, and no test may repeat the numbers.
+These settle `REBIRTH-RULES` in [TODO.md](../TODO.md). `REBIRTH-SERVER` stores the state and the `rebirth` message, `REBIRTH-PERKS` implements each perk, `REBIRTH-UI` adds the panel, `REBIRTH-ART` the looks and `REBIRTH-CHECK` verifies the loop. The perks are implemented (`REBIRTH-PERKS`): the table lives once in `world/rebirth.txt`, the derivation and `copies`/`scaled` helpers in `server/src/perks.rs`, and the tests in `server/src/world/perks_tests.rs`.
 
 Owner's decisions (2026-10-17): perks **stack** across rebirths; the **drop rate boost covers everything** (changed the same day to a stacking ×2 to ×5 that includes the purple chances); quest rewards can be **earned again**. The rest was settled on 2026-10-17 from the code as it stands.
 
@@ -95,7 +95,7 @@ Gold and materials are given as **one pile or stack worth `m` times**, not `m` g
 | Purple copy of a set piece (`EPIC_SET_DROP_CHANCE`) | 5% per dropped piece | 10% | 25% |
 | Mount licences | Whistle 4%, Egg 3% | 8% and 6% | **20% and 15%** |
 | Chest | gold 1×, material 1, 2 equipment rolls, 0.1% orange, 6% dungeon set piece | gold 2×, material 2, 4 equipment rolls, 0.2%, 12% | gold 5×, material 5, 10 equipment rolls, 0.5%, 30% |
-| Chest equipment ladder (gray 62, green 30, blue 7.5, purple 0.5) | as written | purple 1%, gray 61.5% | purple 2.5%, gray 59.5% |
+| Chest equipment ladder (gray 62, green 30, blue 7.5, purple 0.5) | as written | purple 1%, gray 61.5% | purple 2.5%, gray 60% |
 
 Consequence to know about: at the cap a boss kill makes five pieces per pool, each with a 25% purple chance, so purple set pieces come about 25 times as often as today, and a chest at the cap holds ten equipment rolls. This is what the owner asked for ("includes the purple chance"); the numbers are in `world/rebirth.txt` if play shows it is too much, and the multiplier cap can be lowered there without touching code.
 

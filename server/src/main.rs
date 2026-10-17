@@ -6,6 +6,7 @@ mod cathedral;
 mod items;
 mod model;
 mod notify;
+mod perks;
 mod rebirth;
 mod sets;
 mod skills;

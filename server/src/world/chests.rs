@@ -106,10 +106,18 @@ impl Chests {
 }
 
 /// The ladder rarity for a roll in [0, 1).
+#[cfg(test)]
 fn ladder_rarity(roll: f64) -> &'static str {
+    boosted_ladder_rarity(roll, 1)
+}
+/// The ladder at drop multiplier `boost`: the purple band grows by the multiplier and the lower bands slide down to
+/// make room, so their own widths stay and gray absorbs the difference (docs/rebirth.md).
+pub(super) fn boosted_ladder_rarity(roll: f64, boost: u32) -> &'static str {
+    let purple_start = CHEST_LADDER[CHEST_LADDER.len() - 2].1;
+    let shift = (1. - purple_start) * f64::from(boost.max(1) - 1);
     CHEST_LADDER
         .iter()
-        .find(|(_, edge)| roll < *edge)
+        .find(|(_, edge)| roll < *edge - shift)
         .map_or("epic", |(rarity, _)| rarity)
 }
 fn in_room(room: &[f64; 4], p: Point) -> bool {
@@ -503,10 +511,13 @@ impl World {
         self.chest_contents(&owner, zone, point);
     }
     /// Rolls and drops what a chest holds, as an ordinary shared drop for the opener's party.
-    fn chest_contents(&mut self, owner: &str, zone: usize, point: Point) {
+    pub(super) fn chest_contents(&mut self, owner: &str, zone: usize, point: Point) {
         let (top, average_gold, kinds) = self.chest_area_profile(zone);
+        // The opener's rebirth drop multiplier reaches every roll below (docs/rebirth.md).
+        let boost = self.drop_multiplier_of(owner);
         let gold = (average_gold * CHEST_GOLD_KILLS).round() as u32;
         if gold > 0 {
+            let gold = self.pile_for(owner, gold);
             self.gold_drop(owner, zone, point, gold);
         }
         if !kinds.is_empty() {
@@ -514,24 +525,27 @@ impl World {
             let count = 3 + (self.random() * 3.) as u32;
             let material = material(&kind);
             for _ in 0..count.min(5) {
-                self.loot_drop(owner, zone, point, material);
+                self.loot_stack(owner, zone, point, material, boost);
             }
         }
-        for _ in 0..CHEST_GEAR_ROLLS {
-            let rarity = ladder_rarity(self.random());
+        for _ in 0..CHEST_GEAR_ROLLS * boost as usize {
+            let rarity = boosted_ladder_rarity(self.random(), boost);
             let choice = self.random();
             if let Some(piece) = equipment_of_rarity(rarity, top, choice) {
                 self.loot_drop(owner, zone, point, &piece.id);
             }
         }
-        if let Some(gear) = roll_orange(|| self.random()) {
+        if let Some(gear) = roll_orange_boosted(boost, || self.random()) {
             self.loot_drop_with_gear(owner, zone, point, &gear.item.clone(), Some(gear));
         }
-        if self.is_instance(zone) && self.random() < CHEST_SET_PIECE_CHANCE {
-            let boss = self.maps[zone].final_boss.clone();
-            let choice = self.random();
-            if let Some(piece) = boss_piece_for(&boss, &CHEST_SET_SLOTS, choice) {
-                self.set_piece_drop(owner, zone, point, piece);
+        if self.is_instance(zone) {
+            let pieces = copies(CHEST_SET_PIECE_CHANCE, boost, || self.random());
+            for _ in 0..pieces {
+                let boss = self.maps[zone].final_boss.clone();
+                let choice = self.random();
+                if let Some(piece) = boss_piece_for(&boss, &CHEST_SET_SLOTS, choice) {
+                    self.set_piece_drop(owner, zone, point, piece);
+                }
             }
         }
     }

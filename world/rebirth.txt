@@ -1,0 +1,8 @@
+{
+  "xpPercent": { "unlock": 1, "step": 10, "cap": 50 },
+  "goldPercent": { "unlock": 2, "step": 10, "cap": 50 },
+  "bagCells": { "unlock": 3, "step": 2, "cap": 10 },
+  "farePercent": { "unlock": 4, "step": 10, "cap": 50 },
+  "resetPricePercent": { "unlock": 4, "step": 10, "cap": 50 },
+  "dropMultiplier": { "unlock": 5, "step": 1, "cap": 5 }
+}

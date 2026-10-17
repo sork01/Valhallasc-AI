@@ -116,6 +116,24 @@ impl World {
     pub(super) fn loot_drop(&mut self, owner: &str, zone: usize, point: Point, item_id: &str) {
         self.loot_drop_with_gear(owner, zone, point, item_id, None);
     }
+    /// A stack of `quantity` of a stackable item (a material) as one ground object: a drop multiplier makes the stack
+    /// bigger instead of adding objects. Anything that is rolled for goes through `loot_drop` instead.
+    pub(super) fn loot_stack(
+        &mut self,
+        owner: &str,
+        zone: usize,
+        point: Point,
+        item_id: &str,
+        quantity: u32,
+    ) {
+        if quantity <= 1 || item(item_id).is_none_or(|i| rollable(i.rarity.as_str())) {
+            return self.loot_drop(owner, zone, point, item_id);
+        }
+        self.loot_drop(owner, zone, point, item_id);
+        if let Some(d) = self.drops.last_mut() {
+            d.quantity = quantity;
+        }
+    }
     pub(super) fn loot_drop_with_gear(
         &mut self,
         owner: &str,
