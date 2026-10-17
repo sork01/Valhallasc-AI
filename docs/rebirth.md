@@ -60,7 +60,7 @@ Totals at the cap: +50% XP, +50% gold, +10 bag cells, −50% fares, −50% stat-
 - Position: the character moves to the starting city, because a level-1 hero must not be left in a level-90 zone. Mounted state is cleared (rebirth is refused while mounted anyway).
 - Gear that needs a higher level than 1 is **taken off into the bags**, the way any gear is, because the level requirement gates wearing. If the bags cannot hold it, the rebirth is refused and the confirmation names how many cells to free.
 
-**Kept:** the account, character id, name and look; friends; fellowship points (`party_points`); gold; inventory, bags, fitted bag expansions and gear copies with their rarity and rank; mounts and the selected mount; discovered Spark Travel masters; kills; game master status; potion and meal cooldowns; every perk and the rebirth counts.
+**Kept:** the account, character id, name and look; friends; fellowship points (`party_points`); gold; inventory, the bank ([bank.md](bank.md)) with its gold and expansions, bags, fitted bag expansions and gear copies with their rarity and rank; mounts and the selected mount; discovered Spark Travel masters; kills; game master status; potion and meal cooldowns; every perk and the rebirth counts.
 
 ## Where it is offered, and when it is refused
 
