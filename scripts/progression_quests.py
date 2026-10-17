@@ -95,6 +95,8 @@ def keep_released_rewards_and_route_quest(previous, rebuilt):
                 quest[field] = old[quest['id']][field]
     new_ids = {q['id'] for q in rebuilt['quests']}
     rebuilt['quests'].extend(q for q in for_zone(rebuilt['name']) if q['id'] not in new_ids)
+    import mount_sources
+    mount_sources.patch_zone(rebuilt)
 
 
 def main():

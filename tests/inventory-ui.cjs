@@ -45,7 +45,7 @@ async function reloadGuest(world) {
   // Equipment icons: every piece of gear has its own pixel icon (assets/items.png), no two alike, and the bag/gear slots draw them.
   const icons = await page.evaluate(async () => {
     const at0 = ITEM_ICONS.at;
-    const all = WORLD_ITEMS.filter(i => !['material', 'bag', 'food', 'potion'].includes(i.kind));
+    const all = WORLD_ITEMS.filter(i => !['material', 'bag', 'food', 'potion', 'mount_licence'].includes(i.kind));
     // Original pieces have their own icon; a recolouring (art + tint) has none and shows its base piece through a colour filter.
     const gear = all.filter(i => !i.art && i.source !== 'orange_pool'), recoloured = all.filter(i => i.art);
     const badRecolour = recoloured.filter(i => !i.tint || !(at0[i.id] || WORLD_ITEMS.some(o => o.kind === i.kind && o.class === i.class && o.variant === i.art && at0[o.id]))).map(i => i.id);

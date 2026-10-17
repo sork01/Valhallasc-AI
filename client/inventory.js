@@ -11,9 +11,10 @@
   const quantity = id => stacks.find(s => s.item === id)?.quantity || 0;
   const equippedCount = i => !i ? 0 : Object.values(gearSlots).filter(id => id === i.id).length + Number((!i.class || i.class === look?.class) && ['armor', 'weapon'].includes(i.kind) && look?.[look.class + (i.kind === 'armor' ? 'Armor' : 'Weapon')] === i.variant);
   const bagQuantity = id => Math.max(0, quantity(id) - equippedCount(definition(id)));
-  const spare = s => definition(s.item)?.starter ? 0 : bagQuantity(s.item);
+  const licence = i => i?.kind === 'mount_licence';
+  const spare = s => definition(s.item)?.starter || licence(definition(s.item)) ? 0 : bagQuantity(s.item);
   const consumable = i => i && ['food', 'potion'].includes(i.kind);
-  const compatible = i => i && !['material', 'bag', 'food', 'potion'].includes(i.kind) && (!i.class || i.class === look?.class);
+  const compatible = i => i && !['material', 'bag', 'food', 'potion', 'mount_licence'].includes(i.kind) && (!i.class || i.class === look?.class);
   const effect = i => {
     const hero = window.Field?.hero || {}, type = hero.resourceType || 'mana';
     const amount = type === 'mana' ? i.mana : Math.round(Math.min(1, i.mana / (100 + 15 * ((i.requiredLevel || 1) - 1))) * (hero.maxResource || 100));
@@ -31,8 +32,8 @@
       cell.classList.toggle('on-cooldown', left > 0);
     }
   }
-  const useItem = i => consumable(i) && canEquip() && bagQuantity(i.id) > 0 && Field.useItem(i.id);
-  const activate = i => consumable(i) ? useItem(i) : equip(i);
+  const useItem = i => (consumable(i) || licence(i)) && canEquip() && bagQuantity(i.id) > 0 && Field.useItem(i.id);
+  const activate = i => consumable(i) || licence(i) ? useItem(i) : equip(i);
   const num = n => Number(n.toFixed(1));
   const statNames = ['strength', 'agility', 'intellect', 'stamina', 'dexterity', 'accuracy'];
   const bonusStats = i => statNames.filter(stat => i.bonusStats?.[stat]).map(stat => `+${i.bonusStats[stat]} ${stat}`).join(' · ');
@@ -117,8 +118,9 @@
   function showTooltip(anchor, i, slot) {
     if (!i) return;
     const copy = displayCopy(i, slot), rarity = displayRarity(i, slot);
-    const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || (i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : 'All classes')}`)); t.dataset.rarity = rarity;
+    const t = tooltip(); t.replaceChildren(node('b', i.name, 'item-name'), node('small', `${rarityName({rarity})} · ${i.class || (i.kind === 'material' ? 'Material' : consumable(i) ? 'Consumable' : licence(i) ? 'Mount licence' : 'All classes')}`)); t.dataset.rarity = rarity;
     if (consumable(i)) t.append(node('p', effect(i)));
+    else if (licence(i)) t.append(node('p', `Grants the ${i.mount} mount · bound to you, cannot be traded or sold · needs level ${i.requiredLevel}`));
     else if (i.kind === 'bag') t.append(node('p', `${i.bagSlots} extra slots · Requires level ${levelOf(i)}`));
     else if (i.kind !== 'material') t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
@@ -141,7 +143,7 @@
       }
       if(i.source!=='orange_pool'&&copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
     }
-    t.append(node('small', consumable(i) ? 'Right-click or double-click to use · Z / X on the quick slots' : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
+    t.append(node('small', licence(i) ? 'Right-click or double-click to use' : consumable(i) ? 'Right-click or double-click to use · Z / X on the quick slots' : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
     t.hidden = false;
     const r = anchor.getBoundingClientRect(), tr = t.getBoundingClientRect();
     t.style.left = Math.max(8, Math.min(innerWidth - tr.width - 8, r.right + 10)) + 'px';
@@ -225,6 +227,9 @@
         const b = button(i.kind === 'accessory' ? `Equip · ${label}` : 'Equip', () => equip(i, slot), 'item-action'); b.dataset.action = 'equip'; b.disabled = !canEquip() || tooLow(i) || !bagQuantity(i.id); container.append(b);
       }
       if (levelOf(i) > 1) container.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'bag-empty-note'));
+    } else if (licence(i)) {
+      const b = button('Use', () => useItem(i), 'item-action'); b.dataset.action = 'use'; b.disabled = !canEquip(); container.append(b);
+      container.append(node('p', `Grants the ${i.mount} mount. Bound: it cannot be traded or sold.`, 'bag-empty-note'));
     } else if (consumable(i)) {
       const b = button('Use', () => useItem(i), 'item-action'); b.dataset.action = 'use'; b.disabled = !canEquip(); container.append(b);
       container.append(node('p', effect(i), 'bag-empty-note'));

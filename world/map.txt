@@ -26186,7 +26186,7 @@
               "id": "buy_mount",
               "label": "Buy riding horse · level 50 · 50,000 gold",
               "cost": 50000,
-              "mount": true
+              "mount": "horse"
             }
           ],
           "buys": false,
@@ -131643,6 +131643,48 @@
           "offers": [],
           "buys": false,
           "art": "tangle_travel"
+        },
+        {
+          "id": "tangle_hatchling",
+          "name": "Tamsin Reedfoot",
+          "role": "Hatchling bearer, stranded",
+          "color": "#d6f1a2",
+          "dialogue": "Shh. She hatched an hour ago and she is hungry and loud. Mara said you would come: take us down the canopy road to the landing and keep the beasts off us, and I will follow at my own pace. She will remember who carried her.",
+          "offers": [],
+          "buys": false,
+          "x": 75.0,
+          "y": 68.0,
+          "look": {
+            "skin": "#a96c4e",
+            "hair": "#263d31",
+            "style": "long",
+            "hat": "hood",
+            "hatColor": "#3d9d74"
+          },
+          "escort": {
+            "quest": "tangle_banyan_4",
+            "class": "hunter",
+            "female": true,
+            "hairColor": 0,
+            "skin": 1,
+            "level": 75,
+            "speed": 2.5,
+            "route": [
+              [
+                61.0,
+                84.0
+              ],
+              [
+                52.0,
+                91.0
+              ],
+              [
+                43.0,
+                98.0
+              ]
+            ],
+            "ambush": []
+          }
         }
       ],
       "places": [
@@ -132328,6 +132370,121 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 75
+        },
+        {
+          "id": "tangle_banyan_1",
+          "title": "The Banyan Run: Thinning the Canopy",
+          "npc": "tangle_tracker",
+          "description": "Mara Vines needs the raptor trails clear before she trusts anyone with a hatchling. Cull 25 of the canopy beasts: gliders, mantises, caimans and gorillas.",
+          "objectives": [
+            {
+              "kind": "kill",
+              "target": "canopyglider",
+              "count": 6,
+              "label": "Defeat Canopy Gliders"
+            },
+            {
+              "kind": "kill",
+              "target": "orchidmantis",
+              "count": 6,
+              "label": "Defeat Orchid Mantises"
+            },
+            {
+              "kind": "kill",
+              "target": "poolcaiman",
+              "count": 6,
+              "label": "Defeat Pool Caimans"
+            },
+            {
+              "kind": "kill",
+              "target": "drumgorilla",
+              "count": 7,
+              "label": "Defeat Drum Gorillas"
+            }
+          ],
+          "level": 75,
+          "rewardXp": 7100,
+          "rewardGold": 8500,
+          "requires": "tangle_welcome",
+          "repeatable": false
+        },
+        {
+          "id": "tangle_banyan_2",
+          "title": "The Banyan Run: The Nest Offering",
+          "npc": "tangle_tracker",
+          "description": "Raptors take only fresh offerings. Bring Mara ten of the canopy's own trophies: petals, membrane, scales and drumskin.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "mantis_petals",
+              "count": 3,
+              "label": "Bring Orchid Mantis Petals"
+            },
+            {
+              "kind": "bring",
+              "target": "glider_membrane",
+              "count": 3,
+              "label": "Bring Glider Membrane"
+            },
+            {
+              "kind": "bring",
+              "target": "caiman_scale",
+              "count": 2,
+              "label": "Bring Blackwater Caiman Scales"
+            },
+            {
+              "kind": "bring",
+              "target": "gorilla_drumskin",
+              "count": 2,
+              "label": "Bring Drum Gorilla Hide"
+            }
+          ],
+          "level": 76,
+          "rewardXp": 7290,
+          "rewardGold": 9200,
+          "requires": "tangle_banyan_1",
+          "repeatable": false
+        },
+        {
+          "id": "tangle_banyan_3",
+          "title": "The Banyan Run: The Basin Warden",
+          "npc": "tangle_tracker",
+          "description": "The old raptor path crosses the Jade Anaconda's basin. Three companions should break its coils before the nest can be reached.",
+          "objectives": [
+            {
+              "kind": "kill",
+              "target": "jadeanaconda",
+              "count": 1,
+              "label": "Defeat the Jade Anaconda"
+            }
+          ],
+          "level": 79,
+          "rewardXp": 7840,
+          "rewardGold": 16000,
+          "requires": "tangle_banyan_2",
+          "repeatable": false,
+          "group": true,
+          "recommendedPlayers": 3
+        },
+        {
+          "id": "tangle_banyan_4",
+          "title": "The Banyan Run: Hatchling Home",
+          "npc": "tangle_tracker",
+          "description": "Tamsin Reedfoot is stranded with a raptor hatchling in a basket on the high boardwalk. Speak to her and walk her back to Mara Vines along the canopy road; if Tamsin falls, or you do, you must start again with her. The hatchling is yours to ride once it is safe.",
+          "objectives": [
+            {
+              "kind": "escort",
+              "target": "tangle_hatchling",
+              "count": 1,
+              "label": "Escort Tamsin and the hatchling to Mara Vines"
+            }
+          ],
+          "level": 79,
+          "rewardXp": 7840,
+          "rewardGold": 12000,
+          "requires": "tangle_banyan_3",
+          "repeatable": false,
+          "rewardMount": "raptor"
         }
       ],
       "city": {
@@ -139013,6 +139170,31 @@
           "offers": [],
           "buys": false,
           "art": "lapis_travel"
+        },
+        {
+          "id": "lapis_wrangler",
+          "name": "Zahir Dunereins",
+          "role": "Dune-wrangler",
+          "color": "#e8c98a",
+          "dialogue": "Sand lizards do not tire and do not sulk. A level-80 rider with 160,000 gold can have the best of my string; the rest can walk.",
+          "offers": [
+            {
+              "id": "buy_lizard",
+              "label": "Buy a riding lizard · level 80 · 160,000 gold",
+              "cost": 160000,
+              "mount": "lizard"
+            }
+          ],
+          "buys": false,
+          "x": 40.0,
+          "y": 134.0,
+          "look": {
+            "skin": "#b88b66",
+            "hair": "#3b2a1c",
+            "style": "short",
+            "hat": "hood",
+            "hatColor": "#c9a35a"
+          }
         }
       ],
       "places": [
@@ -147299,6 +147481,13 @@
               "label": "Send my mercenaries away",
               "cost": 0,
               "merc": "dismiss"
+            },
+            {
+              "id": "hatch_gryphon",
+              "label": "Hatch a Gryphon Egg · level 95 · 250,000 gold",
+              "cost": 250000,
+              "mount": "gryphon",
+              "needs": "gryphon_egg"
             }
           ],
           "buys": false,

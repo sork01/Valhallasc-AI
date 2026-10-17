@@ -37,6 +37,7 @@ const actionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('attack'), fx: number, fy: number }).strict(),
   z.object({ type: z.literal('dash'), dx: number.min(-1).max(1), dy: number.min(-1).max(1) }).strict(),
   z.object({ type: z.literal('mount'), mounted: z.boolean() }).strict(),
+  z.object({ type: z.literal('select_mount'), mount: z.enum(['horse', 'raptor', 'lizard', 'sabertooth', 'gryphon']) }).strict(),
   z.object({ type: z.literal('skill'), id: z.string().regex(/^[a-z]{3,20}$/), fx: number, fy: number }).strict(),
   z.object({ type: z.literal('equip'), armor: z.string().max(32).optional(), weapon: z.string().max(32).optional(), slots: z.partialRecord(z.enum(['headgear', 'shoulders', 'chest', 'pants', 'gloves', 'hands', 'necklace', 'accessory1', 'accessory2']), z.string().max(64)).optional() }).strict(),
   z.object({ type: z.literal('use_item'), item: z.string().regex(/^[a-z0-9_]{1,40}$/) }).strict(),

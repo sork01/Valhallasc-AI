@@ -60,6 +60,26 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => document.getElementById('equipment').hidden);
     assert.match(await page.locator('#mount-toggle').textContent(), /Raptor/, 'the HUD button names the selected mount');
+    // A bound licence from a drop: below its level it waits, at level 95 a double-click grants the mount.
+    await page.evaluate(() => { Online.send({ type: 'debug', ref: 905, command: { op: 'give_item', item: 'sabertooth_whistle', quantity: 1 } }); });
+    await page.waitForFunction(() => Inventory.quantity('sabertooth_whistle') === 1, null, { timeout: 10000 });
+    await page.locator('#equipment-open').click();
+    const whistle = page.locator('#inventory-list [data-item="sabertooth_whistle"]');
+    await whistle.waitFor();
+    await whistle.hover();
+    assert.match(await page.locator('.item-tooltip').textContent(), /Grants the sabertooth mount.*cannot be traded or sold/, 'the tooltip explains the licence');
+    await whistle.dblclick();
+    await page.waitForTimeout(400);
+    assert.equal(await page.evaluate(() => Field.hero.mounts.includes('sabertooth')), false, 'level 50 cannot use a level-95 whistle');
+    await page.evaluate(() => { Online.send({ type: 'debug', ref: 906, command: { op: 'set_level', level: 95 } }); });
+    await page.waitForFunction(() => Field.hero.level === 95, null, { timeout: 10000 });
+    await page.locator('#inventory-list [data-item="sabertooth_whistle"]').dblclick();
+    await page.waitForFunction(() => Field.hero.mounts.includes('sabertooth'), null, { timeout: 10000 });
+    assert.equal(await page.evaluate(() => Inventory.quantity('sabertooth_whistle')), 0, 'the whistle is used up');
+    assert.equal(await page.evaluate(() => Field.hero.mount), 'raptor', 'a later mount does not change the selection');
+    await page.waitForSelector('.mount-card[data-mount="sabertooth"][data-owned="true"]');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => document.getElementById('equipment').hidden);
     // Another player sees the rider's selected mount in the snapshot.
     const watcher = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
     watcher.on('pageerror', e => errors.push(e.message));
@@ -83,7 +103,7 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
       throw error;
     });
     assert.equal(await page.locator('#mount-toggle').isEnabled(), true, 'ownership survives reconnect');
-    assert.deepEqual(await page.evaluate(() => [Field.hero.mounts, Field.hero.mount]), [['horse', 'raptor'], 'raptor'], 'the owned set and selection survive a reload');
+    assert.deepEqual(await page.evaluate(() => [Field.hero.mounts, Field.hero.mount]), [['horse', 'raptor', 'sabertooth'], 'raptor'], 'the owned set and selection survive a reload');
     assert.deepEqual(errors, [], 'mount UI has no page errors');
     console.log('Mount purchase, mounts list, selection, remote view, control, combat dismount and browser resume checks passed');
   } finally {

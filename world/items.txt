@@ -52310,5 +52310,23 @@
       "brightness": 1.2
     },
     "source": "undervault"
+  },
+  {
+    "id": "sabertooth_whistle",
+    "name": "Sabertooth Whistle",
+    "kind": "mount_licence",
+    "rarity": "legendary",
+    "requiredLevel": 95,
+    "sell": 0,
+    "mount": "sabertooth"
+  },
+  {
+    "id": "gryphon_egg",
+    "name": "Gryphon Egg",
+    "kind": "mount_licence",
+    "rarity": "legendary",
+    "requiredLevel": 95,
+    "sell": 0,
+    "mount": "gryphon"
   }
 ]

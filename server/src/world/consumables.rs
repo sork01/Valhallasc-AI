@@ -152,10 +152,7 @@ impl World {
             return refuse(p, "You already own that mount, so the licence is kept.");
         }
         p.character.grant_mount(mount);
-        if let Some(stack) = p.character.inventory.iter_mut().find(|s| s.item == it.id) {
-            stack.quantity -= 1;
-        }
-        p.character.inventory.retain(|s| s.quantity > 0);
+        p.character.consume_item(&it.id, 1);
         let text = format!("{} gained. Press H to mount.", it.name);
         let _ = p
             .peer

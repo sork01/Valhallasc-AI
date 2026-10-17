@@ -157,6 +157,19 @@ static INDEX: LazyLock<std::collections::HashMap<&'static str, &'static Item>> =
 pub fn item(id: &str) -> Option<&'static Item> {
     INDEX.get(id).copied()
 }
+/// Mount licences drop from one kill each, on a roll of their own that is independent of gold, materials, bags and
+/// every gear pool, with no bad-luck protection (docs/mounts.md): the Whistle from the Rimesaber, the Egg from the
+/// final boss of the Thunderheart Gate.
+pub const SABERTOOTH_WHISTLE_CHANCE: f64 = 0.04;
+pub const GRYPHON_EGG_CHANCE: f64 = 0.03;
+/// The licence a kill of `kind` can drop and its chance. `final_boss` says the kill ended its dungeon.
+pub fn mount_licence_drop(kind: &str, final_boss: bool) -> Option<(&'static str, f64)> {
+    match kind {
+        "rimesaber" => Some(("sabertooth_whistle", SABERTOOTH_WHISTLE_CHANCE)),
+        "thunder_heart" if final_boss => Some(("gryphon_egg", GRYPHON_EGG_CHANCE)),
+        _ => None,
+    }
+}
 /// Each selected dungeon set piece gets its own rarity roll.
 pub const EPIC_SET_DROP_CHANCE: f64 = 0.05;
 pub fn set_piece_copy(piece: &Item, roll: f64) -> Option<GearInstance> {
@@ -885,6 +898,19 @@ impl Character {
             .find(|s| s.item == id)
             .map_or(0, |s| s.quantity)
     }
+    /// Uses up `quantity` of a loose item. False, and nothing changes, when there are fewer in the bags.
+    pub fn consume_item(&mut self, id: &str, quantity: u32) -> bool {
+        let Some(stack) = self
+            .inventory
+            .iter_mut()
+            .find(|s| s.item == id && s.quantity >= quantity)
+        else {
+            return false;
+        };
+        stack.quantity -= quantity;
+        self.inventory.retain(|s| s.quantity > 0);
+        true
+    }
     pub fn add_item(&mut self, id: &str, quantity: u32) {
         if item(id).is_none() || quantity == 0 {
             return;
@@ -1297,6 +1323,9 @@ impl Character {
         }
         if i.rarity == GM_RARITY {
             return Err("Game master gear cannot be sold.");
+        }
+        if i.kind == "mount_licence" {
+            return Err("A mount licence is bound to you and cannot be sold.");
         }
         let available = self.quantity(id).saturating_sub(self.equipped_count(i));
         if quantity == 0 || quantity > available {

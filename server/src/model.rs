@@ -379,16 +379,51 @@ pub struct Character {
     #[serde(default)]
     pub mounted: bool,
 }
-/// Every mount, with its travel speed multiplier. They differ only in looks (docs/mounts.md).
-pub const MOUNTS: [(&str, f64); 5] = [
-    ("horse", 2.),
-    ("raptor", 2.),
-    ("lizard", 2.),
-    ("sabertooth", 2.),
-    ("gryphon", 2.),
+/// A mount: only its looks and the way it is obtained differ (docs/mounts.md), so every speed is 2.0.
+pub struct MountDef {
+    pub id: &'static str,
+    pub name: &'static str,
+    /// Character level needed to get it (buy, hatch or use its licence).
+    pub level: u32,
+    pub speed: f64,
+}
+pub const MOUNTS: [MountDef; 5] = [
+    MountDef {
+        id: "horse",
+        name: "riding horse",
+        level: 50,
+        speed: 2.,
+    },
+    MountDef {
+        id: "raptor",
+        name: "raptor",
+        level: 75,
+        speed: 2.,
+    },
+    MountDef {
+        id: "lizard",
+        name: "lizard",
+        level: 80,
+        speed: 2.,
+    },
+    MountDef {
+        id: "sabertooth",
+        name: "sabertooth",
+        level: 95,
+        speed: 2.,
+    },
+    MountDef {
+        id: "gryphon",
+        name: "gryphon",
+        level: 95,
+        speed: 2.,
+    },
 ];
+pub fn mount_def(id: &str) -> Option<&'static MountDef> {
+    MOUNTS.iter().find(|m| m.id == id)
+}
 pub fn mount_speed(id: &str) -> Option<f64> {
-    MOUNTS.iter().find(|m| m.0 == id).map(|m| m.1)
+    mount_def(id).map(|m| m.speed)
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -889,6 +924,9 @@ pub struct Quest {
     /// exactly one listed piece; the choice is checked again by the server at turn-in.
     #[serde(default)]
     pub reward_choices: std::collections::HashMap<String, Vec<String>>,
+    /// A mount granted with the reward (an id in `MOUNTS`), once, when the quest is claimed.
+    #[serde(default)]
+    pub reward_mount: Option<String>,
     /// Shared kill objectives for living, nearby contributors to an elite fight.
     #[serde(default)]
     pub group: bool,
@@ -1390,8 +1428,12 @@ pub struct Offer {
     /// Sells the best tier of the item's family for the buyer's level, at that tier's price (potions and food).
     #[serde(default)]
     pub tiered: bool,
+    /// Sells this mount (an id in `MOUNTS`) once the buyer has its level and the gold, and, when `needs` names an
+    /// item (the Gryphon Egg), the item too, which is used up.
     #[serde(default)]
-    pub mount: bool,
+    pub mount: Option<String>,
+    #[serde(default)]
+    pub needs: Option<String>,
 }
 #[derive(Clone, Deserialize, Serialize)]
 pub struct Npc {

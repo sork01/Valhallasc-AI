@@ -46,6 +46,8 @@ mod instances;
 mod lapis_tests;
 mod mercs;
 #[cfg(test)]
+mod mount_sources_tests;
+#[cfg(test)]
 mod nacre_tests;
 mod partyxp;
 mod pursuit;
@@ -2282,21 +2284,34 @@ impl World {
                     } else if offer.heal > 0. && p.character.hp >= p.character.max_hp() {
                         notice =
                     "You are already at full health. Save it for after your next adventure!".into();
-                    } else if offer.mount {
-                        if p.character.level < 50 {
-                            notice = "Riding requires level 50.".into();
-                        } else if p.character.owns_mount("horse") {
-                            notice = "You already own a riding horse. Press H to mount.".into();
-                        } else if p.character.gold < offer.cost {
-                            notice = format!("You need {} gold for a riding horse.", offer.cost);
+                    } else if let Some(def) = offer.mount.as_deref().and_then(mount_def) {
+                        let c = &mut p.character;
+                        let needed = offer
+                            .needs
+                            .as_deref()
+                            .map(|id| (id, item(id).map_or("item", |i| i.name.as_str())));
+                        if c.level < def.level {
+                            notice = format!("The {} needs level {}.", def.name, def.level);
+                        } else if c.owns_mount(def.id) {
+                            notice = format!("You already own the {}. Press H to mount.", def.name);
+                        } else if needed.is_some_and(|(id, _)| c.quantity(id) == 0) {
+                            notice = format!("You need a {} for this.", needed.unwrap().1);
+                        } else if c.gold < offer.cost {
+                            notice = format!("You need {} gold for the {}.", offer.cost, def.name);
                         } else {
-                            p.character.gold -= offer.cost;
-                            p.character.grant_mount("horse");
+                            c.gold -= offer.cost;
+                            if let Some((id, _)) = needed {
+                                c.consume_item(id, 1);
+                            }
+                            c.grant_mount(def.id);
                             quest_changed = true;
-                            notice =
-                                "Riding horse purchased. Press H to mount or dismount outdoors."
-                                    .into();
+                            notice = format!(
+                                "The {} is yours. Press H to mount or dismount outdoors.",
+                                def.name
+                            );
                         }
+                    } else if offer.mount.is_some() {
+                        notice = "That mount is not for sale.".into();
                     } else if let Some(bag) = &offer.bag {
                         match p.character.purchase_bag(bag) {
                             Ok(capacity) => {
@@ -3515,6 +3530,13 @@ impl World {
             if let Some(bag) = roll_bag(level, bag_roll) {
                 self.loot_drop(&credit_id, zone, point, &bag.id);
             }
+            let last_boss =
+                !self.maps[zone].final_boss.is_empty() && self.maps[zone].final_boss == kind;
+            if let Some((licence, chance)) = mount_licence_drop(&kind, last_boss)
+                && self.random() < chance
+            {
+                self.loot_drop(&credit_id, zone, point, licence);
+            }
             if let Some(gear) = roll_orange(|| self.random()) {
                 self.loot_drop_with_gear(&credit_id, zone, point, &gear.item.clone(), Some(gear));
             }
@@ -4444,6 +4466,12 @@ fn quest_action_with_choice(
                 }
                 next.add_item(id, 1);
             }
+            let mut mount_note = String::new();
+            if let Some(def) = quest.reward_mount.as_deref().and_then(mount_def)
+                && next.grant_mount(def.id)
+            {
+                mount_note = format!(" You earned the {}! Press H to mount.", def.name);
+            }
             *character = next;
             character.quests[i].claimed = true;
             character.quests[i].completions = character.quests[i].completions.saturating_add(1);
@@ -4463,6 +4491,7 @@ fn quest_action_with_choice(
                         + &chosen
                             .and_then(item)
                             .map_or(String::new(), |i| format!(" Received {}.", i.name))
+                        + &mount_note
                 ),
                 levels,
                 true,

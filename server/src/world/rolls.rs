@@ -48,6 +48,10 @@ pub fn rollable(rarity: &str) -> bool {
 /// Whether this character may need the piece: it is gear their class can wear. The level does not matter: a piece a
 /// few levels too high is still theirs to grow into (the level only gates wearing it), so a hunter can need hunter gloves.
 pub fn can_need(c: &Character, i: &Item) -> bool {
+    // A mount licence is needed only by a character who does not own that mount yet.
+    if i.kind == "mount_licence" {
+        return i.mount.as_deref().is_some_and(|m| !c.owns_mount(m));
+    }
     is_gear(i) && i.class.is_none_or(|k| k == c.look.class)
 }
 
@@ -185,11 +189,16 @@ impl World {
             votes: members
                 .into_iter()
                 .map(|(who, need, merc)| {
-                    let vote = merc.then_some(if need {
-                        RollChoice::Need
-                    } else {
-                        RollChoice::Greed
-                    });
+                    // A hired fighter has no mount to ride, so it never competes for a licence.
+                    let vote = merc.then_some(
+                        if item(item_id).is_some_and(|i| i.kind == "mount_licence") {
+                            RollChoice::Pass
+                        } else if need {
+                            RollChoice::Need
+                        } else {
+                            RollChoice::Greed
+                        },
+                    );
                     (who, vote)
                 })
                 .collect(),
