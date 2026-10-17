@@ -25,7 +25,7 @@ Anything that sits loose in the bags:
 What cannot:
 
 - **Worn pieces.** Only gear above the worn count (`equipped_count`) can go in. The worn allocation is the **first copies of an ID in `gear_instances`**, so a deposit takes copies after those and a withdrawal appends to the end; neither can shift which copy is worn.
-- **Starter gear and game master gear**, the same refusal as a trade. The starter pieces would otherwise be handed out again on the next login by `grant_missing_starters` (called from the store's `decode`) whenever none is in the bags and there is room.
+- **Game master gear**, the same refusal as a trade. Starter gear can go in, because it can now be sold or banked for good: the character keeps a list of the starter pieces it has been given (`starters_granted`), and the catalog grant on login only hands out pieces that are not on it.
 - **Fitted expansion bags** (they are in `bags`, not in the bags' items).
 - **Gold above what the character carries,** and anything not in the catalog.
 
@@ -95,6 +95,6 @@ Each also answers when the bank is empty ("The strongroom is yours. Nothing is i
 
 - The total of every item ID and of gold, counting the bags, the bank and the worn gear, is the same after **any** sequence of requests (a long seeded random sequence, successful and refused, as an invariant test).
 - A gear copy keeps every field through a deposit and withdrawal, and its worn neighbours stay worn.
-- Starter and game master gear, a worn piece, an unknown ID, a zero or oversized quantity, a full bank, a full bag, out of range, the wrong zone, defeated, in combat, mounted and a request that names a stack twice are all refused with nothing changed.
+- Game master gear, a worn piece, an unknown ID, a zero or oversized quantity, a full bank, a full bag, out of range, the wrong zone, defeated, in combat, mounted and a request that names a stack twice are all refused with nothing changed.
 - A save, a reload and a legacy save with no `bank` field give the same bank (empty for the legacy one); a rebirth leaves it unchanged; deleting the character removes it.
 - Exactly the five bankers exist, one per city, and no other city has one.

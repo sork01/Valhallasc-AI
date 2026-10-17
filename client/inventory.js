@@ -12,7 +12,7 @@
   const equippedCount = i => !i ? 0 : Object.values(gearSlots).filter(id => id === i.id).length + Number((!i.class || i.class === look?.class) && ['armor', 'weapon'].includes(i.kind) && look?.[look.class + (i.kind === 'armor' ? 'Armor' : 'Weapon')] === i.variant);
   const bagQuantity = id => Math.max(0, quantity(id) - equippedCount(definition(id)));
   const licence = i => i?.kind === 'mount_licence';
-  const spare = s => definition(s.item)?.starter || licence(definition(s.item)) ? 0 : bagQuantity(s.item);
+  const spare = s => licence(definition(s.item)) ? 0 : bagQuantity(s.item);
   const consumable = i => i && ['food', 'potion'].includes(i.kind);
   const compatible = i => i && !['material', 'bag', 'food', 'potion', 'mount_licence'].includes(i.kind) && (!i.class || i.class === look?.class);
   const effect = i => {
@@ -134,7 +134,7 @@
         t.append(node('p', `Compared with ${current.name}: ${attack >= 0 ? '+' : ''}${attack} attack · ${defense >= 0 ? '+' : ''}${defense} defense${bonus ? ` · ${bonus}` : ''}`, 'item-comparison'));
       }
     }
-    t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', i.starter ? 'Starter gear · cannot be sold' : `Sells for ${saleValue(i)} gold${copy ? ' for the next loose copy' : ' each'}`));
+    t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', `Sells for ${saleValue(i)} gold${copy ? ' for the next loose copy' : ' each'}`));
     if (compatible(i)) {
       const copies=gearInstances.filter(g=>g.item===i.id);
       for(const [index,g] of copies.entries()) {
@@ -289,7 +289,7 @@
   }
   function renderShop(npc, container) {
     container.replaceChildren(); if (!npc.buys) return;
-    container.append(node('h4', 'Sell from your bags'), node('p', 'Equipped copies are kept. Starter gear cannot be sold.'));
+    container.append(node('h4', 'Sell from your bags'), node('p', 'Equipped copies are kept.'));
     const sell = (offer, b) => { if (Online.send({ type: 'interact', npc: npc.id, offer })) b.disabled = true; };
     const materials = stacks.filter(s => definition(s.item)?.kind === 'material');
     if (materials.length) {

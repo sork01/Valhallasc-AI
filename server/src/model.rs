@@ -382,6 +382,10 @@ pub struct Character {
     /// save migration and an old save is simply never reborn.
     #[serde(default)]
     pub rebirth_tiers: [u32; 5],
+    /// Starter pieces this character has been given. Catalog growth grants only the ones not listed, so a starter piece
+    /// that was sold or banked is never handed out again.
+    #[serde(default)]
+    pub starters_granted: Vec<String>,
 }
 /// A mount: only its looks and the way it is obtained differ (docs/mounts.md), so every speed is 2.0.
 pub struct MountDef {
@@ -488,6 +492,7 @@ impl Character {
             mount: String::new(),
             mounted: false,
             rebirth_tiers: [0; 5],
+            starters_granted: vec![],
         };
         c.seed_inventory();
         // The best potions the mercenary's level allows: health for everyone, mana for casters.

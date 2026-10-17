@@ -107,7 +107,8 @@ async function reloadGuest(world) {
   check(await page.locator('#npc-offers [data-offer="satchel"]').isVisible() && await page.locator('#npc-inventory [data-item]').count() === 0, 'The merchant greets with services and keeps the sell list closed');
   await page.locator('#npc-offers [data-view="sell"]').click();
   check(await page.locator('#npc-inventory [data-item="slime_gel"] [data-sell="one"]').isVisible(), 'Merchant presents sell controls for owned loot');
-  check(await page.locator('#npc-inventory [data-item="mage_weapon_ash"]').count() === 0, 'Starter gear is excluded from sales');
+  check(await page.locator('#npc-inventory [data-item="mage_weapon_ash"]').count() === 0, 'The worn starter staff is excluded from sales');
+  check(await page.locator('#npc-inventory [data-item="mage_headgear_apprentice"]').count() === 1, 'A spare starter piece is offered for sale');
   await page.waitForTimeout(600);
   const before = await page.evaluate(() => Field.hero.gold);
   await page.locator('#npc-inventory [data-sell="materials"]').click();

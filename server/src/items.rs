@@ -1110,6 +1110,21 @@ impl Character {
                 self.add_item(&id, 1);
             }
         }
+        self.mark_starters_granted();
+    }
+    /// Records every starter piece of this class that the character owns as given, so selling it is final.
+    fn mark_starters_granted(&mut self) {
+        let class = self.look.class;
+        let owned: Vec<_> = ITEMS
+            .iter()
+            .filter(|i| i.starter && i.class == Some(class) && self.quantity(&i.id) > 0)
+            .map(|i| i.id.clone())
+            .collect();
+        for id in owned {
+            if !self.starters_granted.contains(&id) {
+                self.starters_granted.push(id);
+            }
+        }
     }
     /// Turns a new character into the administrator character: a male Warrior named [GM]Sork wearing the whole golden
     /// set. Called by the store while the character is created, never for a loaded save.
@@ -1142,19 +1157,23 @@ impl Character {
         }
         self.sync_look();
     }
-    /// Gives a character the starter pieces of their class that they do not own yet (new catalog entries reach
-    /// existing saves this way). Starter gear cannot be sold, so a missing one was never granted. Pieces that would
-    /// overfill the bags wait for the next load.
+    /// Gives a character the starter pieces of their class that they have never been given (new catalog entries reach
+    /// existing saves this way). A piece that was given and later sold or banked is listed in `starters_granted` and
+    /// never comes back. Pieces that would overfill the bags wait for the next load.
     pub fn grant_missing_starters(&mut self) {
+        self.mark_starters_granted();
         let class = self.look.class;
         let ids: Vec<_> = ITEMS
             .iter()
-            .filter(|i| i.starter && i.class == Some(class))
+            .filter(|i| {
+                i.starter && i.class == Some(class) && !self.starters_granted.contains(&i.id)
+            })
             .map(|i| i.id.clone())
             .collect();
         for id in ids {
-            if self.quantity(&id) == 0 && self.bag_used() < self.bag_capacity() {
+            if self.bag_used() < self.bag_capacity() {
                 self.add_item(&id, 1);
+                self.starters_granted.push(id);
             }
         }
     }
@@ -1318,9 +1337,6 @@ impl Character {
     }
     pub fn sell_item(&mut self, id: &str, quantity: u32) -> Result<u32, &'static str> {
         let i = item(id).ok_or("Unknown item.")?;
-        if i.starter {
-            return Err("Starter gear cannot be sold.");
-        }
         if i.rarity == GM_RARITY {
             return Err("Game master gear cannot be sold.");
         }
@@ -1899,6 +1915,59 @@ mod tests {
             assert_eq!((i.kind.as_str(), i.sell), ("material", sell));
         }
     }
+    #[test]
+    fn spare_starter_pieces_can_be_sold_and_never_come_back() {
+        let mut c = character();
+        let spare: Vec<_> = ITEMS
+            .iter()
+            .filter(|i| i.starter && i.class == Some(c.look.class))
+            .filter(|i| c.quantity(&i.id) > c.equipped_count(i))
+            .map(|i| i.id.clone())
+            .collect();
+        assert!(spare.len() >= 3, "a new hero carries spare starter pieces");
+        let used = c.bag_used();
+        for id in &spare {
+            assert_eq!(c.sell_item(id, 1), Ok(0), "{id}");
+        }
+        assert_eq!(c.bag_used(), used - spare.len());
+        // Worn pieces are still kept.
+        let worn = ITEMS
+            .iter()
+            .find(|i| i.starter && i.class == Some(c.look.class) && c.equipped_count(i) > 0)
+            .expect("a worn starter piece");
+        assert!(c.sell_item(&worn.id, 1).is_err());
+        // A save, a reload and the grant that runs on every load bring nothing back.
+        let mut again: Character =
+            serde_json::from_str(&serde_json::to_string(&c).unwrap()).unwrap();
+        again.grant_missing_starters();
+        for id in &spare {
+            assert_eq!(again.quantity(id), 0, "{id} stays sold");
+        }
+        assert_eq!(again.bag_used(), c.bag_used());
+    }
+
+    #[test]
+    fn a_save_from_before_the_list_gets_a_missing_starter_piece_once() {
+        let mut c = character();
+        let id = ITEMS
+            .iter()
+            .find(|i| {
+                i.starter
+                    && i.class == Some(c.look.class)
+                    && c.quantity(&i.id) > c.equipped_count(i)
+            })
+            .map(|i| i.id.clone())
+            .expect("a spare starter piece");
+        c.sell_item(&id, 1).unwrap();
+        c.starters_granted.clear();
+        c.grant_missing_starters();
+        assert_eq!(c.quantity(&id), 1, "an old save is given what it lacks");
+        assert!(c.starters_granted.contains(&id));
+        c.sell_item(&id, 1).unwrap();
+        c.grant_missing_starters();
+        assert_eq!(c.quantity(&id), 0, "and only that once");
+    }
+
     #[test]
     fn game_master_gear_never_drops_and_the_gm_rarity_cannot_be_rolled() {
         assert_eq!(GM_GEAR.len(), 8);
@@ -3259,7 +3328,8 @@ mod tests {
         // Worn armor and weapon are not bag cells; the three pieces are.
         assert_eq!(h.bag_used(), 3);
         assert!(h.look.class.ranged());
-        // An older save without the new pieces gets them on load, one each.
+        // An older save (no list of given pieces) without the new pieces gets them on load, one each.
+        h.starters_granted.clear();
         h.inventory
             .retain(|s| !s.item.contains("hunter_headgear") && !s.item.contains("hunter_gloves"));
         h.grant_missing_starters();
