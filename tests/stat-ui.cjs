@@ -71,13 +71,14 @@ async function call(name, args = {}) {
   check(await page.evaluate(() => !statSent.some(a => a.type === 'interact' && a.offer === 'stat_reset')), 'Opening reset view sends no purchase');
   await page.locator('#npc-offers [data-offer="stat_reset"]').click();
   check(await page.evaluate(() => statSent.filter(a => a.type === 'interact' && a.offer === 'stat_reset' && a.npc === 'guide').length === 1), 'Separate confirmation sends the NPC offer');
-  await page.evaluate(() => { window.statPlayerSeen = null; Attributes.update = c => { statPlayerSeen = c; };
+  await page.evaluate(() => { window.statPlayersSeen = []; Attributes.update = c => { statPlayersSeen.push(c); };
     City.dialogue({npc: City.npcs.find(n => n.id === 'guide'), notice: 'Stats reset: 12 points refunded.', gold: 70000, level: 50,
       statPoints: 147, trainedPoints: 0, statResetPrice: 260000, statResets: 1,
       statPlayer: {id:'display-only', statPoints:147, attributes:{}},
       attributes: {}, inventory: [], equipment: {}, bags: [], quests: [], look: {class: 'mage', name: 'Tester'}}); });
   check(await page.locator('#npc-offers').textContent().then(t => t.includes('260,000 gold') && t.includes('147 unspent points')) && await page.locator('#npc-offers [data-offer="stat_reset"]').isDisabled(), 'Reply immediately shows rising price and refunded pool');
-  check(await page.evaluate(() => statPlayerSeen?.statPoints === 147), 'Reset reply immediately refreshes the attribute panel');
+  // Live snapshots of the private world also reach the hook, so look for the reply's own player among every call.
+  check(await page.evaluate(() => statPlayersSeen.some(c => c.id === 'display-only' && c.statPoints === 147)), 'Reset reply immediately refreshes the attribute panel');
   check(errors.length === 0, `No browser errors: ${errors.join('; ')}`);
   console.log(`${checks} stat UI checks passed`);
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
