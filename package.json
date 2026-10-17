@@ -12,6 +12,7 @@
     "test:target": "REAL_SPRITES=1 node tests/target-ui.cjs",
     "test:trade": "node tests/trade-ui.cjs",
     "test:bank": "node tests/bank-ui.cjs",
+    "test:bank-check": "node tests/bank-check.cjs",
     "test:bags": "node tests/bag-tiers-ui.cjs",
     "test:epic-drop-ui": "node tests/epic-drop-ui.cjs",
     "test:chest": "node tests/chest-ui.cjs",
