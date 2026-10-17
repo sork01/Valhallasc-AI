@@ -243,7 +243,7 @@ fn validate_offer(who: &Character, offer: &Offer) -> Result<(), String> {
             return Err("Choose each offered item once with a positive quantity.".into());
         }
         let i = item(&stack.item).ok_or("Unknown item in trade.")?;
-        if i.starter || i.rarity == GM_RARITY {
+        if i.starter || i.rarity == GM_RARITY || i.kind == "mount_licence" {
             return Err("Starter and game master gear cannot be traded.".into());
         }
         if stack.quantity

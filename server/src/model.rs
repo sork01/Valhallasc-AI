@@ -367,11 +367,28 @@ pub struct Character {
     /// Saved flight, so reconnecting or restarting resumes without another fare or an unsafe landing.
     #[serde(default)]
     pub spark_travel: Option<SparkTravel>,
-    /// Permanent purchase and the current riding state. Both default to false for old saves.
+    /// Legacy "owns the horse" flag from before there were several mounts. Old saves migrate from it
+    /// (`normalize_mounts`), and it stays true while `mounts` is not empty so older clients keep working.
     #[serde(default)]
     pub mount_owned: bool,
+    /// Owned mounts in the order they were acquired, and the selected one the mount key summons.
+    #[serde(default)]
+    pub mounts: Vec<String>,
+    #[serde(default)]
+    pub mount: String,
     #[serde(default)]
     pub mounted: bool,
+}
+/// Every mount, with its travel speed multiplier. They differ only in looks (docs/mounts.md).
+pub const MOUNTS: [(&str, f64); 5] = [
+    ("horse", 2.),
+    ("raptor", 2.),
+    ("lizard", 2.),
+    ("sabertooth", 2.),
+    ("gryphon", 2.),
+];
+pub fn mount_speed(id: &str) -> Option<f64> {
+    MOUNTS.iter().find(|m| m.0 == id).map(|m| m.1)
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -428,6 +445,8 @@ impl Character {
             travel_stops: vec![],
             spark_travel: None,
             mount_owned: false,
+            mounts: vec![],
+            mount: String::new(),
             mounted: false,
         };
         c.seed_inventory();
@@ -545,6 +564,50 @@ impl Character {
                 }
             })
             .clamp(0., self.max_resource())
+    }
+    /// Migrates the single horse flag to the mount set, drops unknown and repeated IDs, keeps the selection valid
+    /// and the legacy flag in step. Safe to run on every load.
+    pub fn normalize_mounts(&mut self) {
+        if self.mount_owned && self.mounts.is_empty() {
+            self.mounts.push("horse".into());
+        }
+        let mut seen = std::collections::HashSet::new();
+        self.mounts
+            .retain(|m| mount_speed(m).is_some() && seen.insert(m.clone()));
+        if !self.mounts.contains(&self.mount) {
+            self.mount = self.mounts.first().cloned().unwrap_or_default();
+        }
+        self.mount_owned = !self.mounts.is_empty();
+        if !self.mount_owned {
+            self.mounted = false;
+        }
+    }
+    pub fn owns_mount(&self, id: &str) -> bool {
+        self.mounts.iter().any(|m| m == id)
+    }
+    /// Adds a mount; it becomes the selected one only if it is the first. False for an unknown or owned mount.
+    pub fn grant_mount(&mut self, id: &str) -> bool {
+        if mount_speed(id).is_none() || self.owns_mount(id) {
+            return false;
+        }
+        self.mounts.push(id.into());
+        if self.mount.is_empty() {
+            self.mount = id.into();
+        }
+        self.mount_owned = true;
+        true
+    }
+    /// Picks the mount the mount key summons. Refused, with no change, for one the character does not own.
+    pub fn select_mount(&mut self, id: &str) -> Result<(), String> {
+        if !self.owns_mount(id) {
+            return Err("You do not own that mount.".into());
+        }
+        self.mount = id.into();
+        Ok(())
+    }
+    /// Travel speed multiplier while riding the selected mount.
+    pub fn mount_speed(&self) -> f64 {
+        mount_speed(&self.mount).unwrap_or(1.)
     }
     pub fn change_resource(&mut self, amount: f64) {
         self.resource = Some((self.resource() + amount).clamp(0., self.max_resource()));
@@ -1054,6 +1117,9 @@ pub enum ClientMessage {
     },
     Mount {
         mounted: bool,
+    },
+    SelectMount {
+        mount: String,
     },
     OpenChest {
         id: u64,

@@ -30,6 +30,9 @@ impl World {
         let refuse = |p: &Player, text: &str| {
             let _ = p.peer.try_send(json!({"type":"error","text":text}));
         };
+        if let Some(licence) = item(id).filter(|i| i.kind == "mount_licence") {
+            return self.use_mount_licence(session, licence);
+        }
         let Some(it) = item(id).filter(|i| {
             matches!(i.kind.as_str(), "food" | "potion") && (i.heal > 0. || i.mana > 0.)
         }) else {
@@ -121,6 +124,42 @@ impl World {
             json!({"type":"event","kind":"consume","item":id,"actor":actor,"x":point.x,"y":point.y,
                 "value":healed,"mana":restored_resource,"resourceType":resource_type,"crit":false}),
         );
+        self.save();
+    }
+
+    /// A mount licence grants its mount and is consumed. A licence that would do nothing is kept, with a notice.
+    fn use_mount_licence(&mut self, session: u64, it: &Item) {
+        let Some(p) = self.players.get_mut(&session) else {
+            return;
+        };
+        let refuse = |p: &Player, text: &str| {
+            let _ = p.peer.try_send(json!({"type":"error","text":text}));
+        };
+        let Some(mount) = it.mount.as_deref().filter(|m| mount_speed(m).is_some()) else {
+            return refuse(p, "That item cannot be used.");
+        };
+        if p.character.hp <= 0. {
+            return refuse(p, "You cannot use items while defeated.");
+        }
+        if p.character.level < it.required_level {
+            let text = format!("{} needs level {}.", it.name, it.required_level);
+            return refuse(p, &text);
+        }
+        if p.character.quantity(&it.id) == 0 {
+            return refuse(p, "You do not have that item.");
+        }
+        if p.character.owns_mount(mount) {
+            return refuse(p, "You already own that mount, so the licence is kept.");
+        }
+        p.character.grant_mount(mount);
+        if let Some(stack) = p.character.inventory.iter_mut().find(|s| s.item == it.id) {
+            stack.quantity -= 1;
+        }
+        p.character.inventory.retain(|s| s.quantity > 0);
+        let text = format!("{} gained. Press H to mount.", it.name);
+        let _ = p
+            .peer
+            .try_send(json!({"type":"notice","ok":true,"text":text}));
         self.save();
     }
 

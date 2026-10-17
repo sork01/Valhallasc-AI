@@ -225,7 +225,8 @@ impl Player {
             .try_send(json!({"type":"notice","ok":false,"text":text}));
     }
     fn new(mut character: Character, peer: Peer) -> Self {
-        if !character.mount_owned || character.hp <= 0. || character.spark_travel.is_some() {
+        character.normalize_mounts();
+        if character.hp <= 0. || character.spark_travel.is_some() {
             character.mounted = false;
         }
         if character.hp <= 0. {
@@ -295,7 +296,7 @@ impl Player {
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
             "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
-            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounted":c.mounted,
+            "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,
             "setCounts":c.set_counts(),"setCd":self.set_cd,
             "pvpFlag":self.pvp_flag,"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
     }
@@ -1988,7 +1989,7 @@ impl World {
                 if !mounted {
                     p.character.mounted = false;
                     self.save();
-                } else if !p.character.mount_owned {
+                } else if !p.character.owns_mount(&p.character.mount) {
                     let _ = p.peer.try_send(json!({"type":"error","text":"Buy a horse from Stable-hand Greta in Skaldholm first."}));
                 } else if p.character.hp <= 0.
                     || p.combat_left > 0.
@@ -2001,6 +2002,12 @@ impl World {
                     self.save();
                 }
             }
+            ClientMessage::SelectMount { mount } => match p.character.select_mount(&mount) {
+                Ok(()) => self.save(),
+                Err(text) => {
+                    let _ = p.peer.try_send(json!({"type":"error","text":text}));
+                }
+            },
             ClientMessage::Equip {
                 armor,
                 weapon,
@@ -2278,13 +2285,13 @@ impl World {
                     } else if offer.mount {
                         if p.character.level < 50 {
                             notice = "Riding requires level 50.".into();
-                        } else if p.character.mount_owned {
+                        } else if p.character.owns_mount("horse") {
                             notice = "You already own a riding horse. Press H to mount.".into();
                         } else if p.character.gold < offer.cost {
                             notice = format!("You need {} gold for a riding horse.", offer.cost);
                         } else {
                             p.character.gold -= offer.cost;
-                            p.character.mount_owned = true;
+                            p.character.grant_mount("horse");
                             quest_changed = true;
                             notice =
                                 "Riding horse purchased. Press H to mount or dismount outdoors."
@@ -2630,7 +2637,12 @@ impl World {
             }
         }
         let mut distance = (p.escort.as_ref().map_or(
-            p.character.look.class.speed() * if p.character.mounted { 2. } else { 1. },
+            p.character.look.class.speed()
+                * if p.character.mounted {
+                    p.character.mount_speed()
+                } else {
+                    1.
+                },
             |e| e.speed(),
         ) * (1. + p.buff(BuffKind::Haste))
             * TICK
@@ -4729,6 +4741,79 @@ mod tests {
             !w.players[&1].character.mounted,
             "combat dismount survives a login"
         );
+    }
+
+    #[test]
+    fn several_mounts_are_owned_selected_and_ridden_authoritatively() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Warrior);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        assert!(c.mounts.is_empty() && !c.mount_owned);
+        assert!(!c.grant_mount("dragon"), "unknown mounts are refused");
+        assert!(
+            c.select_mount("raptor").is_err(),
+            "an unowned mount cannot be chosen"
+        );
+        assert!(c.grant_mount("horse") && c.grant_mount("raptor"));
+        assert!(!c.grant_mount("raptor"), "a mount is owned once");
+        assert_eq!(
+            (c.mounts.clone(), c.mount.as_str()),
+            (vec!["horse".to_string(), "raptor".into()], "horse")
+        );
+
+        w.message(
+            1,
+            ClientMessage::SelectMount {
+                mount: "gryphon".into(),
+            },
+        );
+        assert_eq!(
+            w.players[&1].character.mount, "horse",
+            "refusal changes nothing"
+        );
+        w.message(
+            1,
+            ClientMessage::SelectMount {
+                mount: "raptor".into(),
+            },
+        );
+        assert_eq!(w.players[&1].character.mount, "raptor");
+        let snap = w.players[&1].snapshot();
+        assert_eq!(snap["mount"], "raptor");
+        assert_eq!(snap["mounts"], json!(["horse", "raptor"]));
+        assert_eq!(snap["mountOwned"], true);
+
+        w.message(1, ClientMessage::Mount { mounted: true });
+        assert!(w.players[&1].character.mounted);
+        let start = w.maps[0].spawn;
+        let ride = |w: &mut World| {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.zone = 0;
+            p.character.x = start.x;
+            p.character.y = start.y;
+            w.message(1, ClientMessage::Input { dx: 1., dy: 0. });
+            w.update_player(1);
+            w.players[&1].character.x - start.x
+        };
+        let raptor = ride(&mut w);
+        w.message(
+            1,
+            ClientMessage::SelectMount {
+                mount: "horse".into(),
+            },
+        );
+        assert!(
+            w.players[&1].character.mounted,
+            "swapping keeps the rider up"
+        );
+        let horse = ride(&mut w);
+        assert!(
+            raptor > 0. && (raptor / horse - 1.).abs() < 1e-9,
+            "one speed for every mount"
+        );
+        w.players.get_mut(&1).unwrap().character.mounted = false;
+        let walk = ride(&mut w);
+        assert!((raptor / walk - 2.).abs() < 1e-6, "{raptor} versus {walk}");
     }
 
     #[test]

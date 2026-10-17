@@ -169,6 +169,8 @@ impl Store {
             travel_stops: vec![],
             spark_travel: None,
             mount_owned: false,
+            mounts: vec![],
+            mount: String::new(),
             mounted: false,
         };
         c.seed_inventory();
@@ -456,6 +458,7 @@ fn decode(state: &str) -> Result<Character, Box<dyn std::error::Error>> {
     character.grant_missing_starters();
     character.grant_missing_gm_gear();
     character.sync_look();
+    character.normalize_mounts();
     if character.health_curve_version == 0 {
         let ratio = (character.hp / character.legacy_max_hp()).clamp(0., 1.);
         character.hp = (character.max_hp() * ratio).round();
@@ -489,6 +492,26 @@ mod tests {
         old.hp = 0.;
         let dead = decode(&serde_json::to_string(&old).unwrap()).unwrap();
         assert_eq!(dead.hp, 0.);
+    }
+    #[test]
+    fn a_legacy_horse_save_keeps_its_horse_and_a_save_without_one_gets_none() {
+        let mut old = Character::mercenary(crate::model::Class::Warrior, 50, "Rider");
+        old.mount_owned = true;
+        let mut value = serde_json::to_value(&old).unwrap();
+        let fields = value.as_object_mut().unwrap();
+        fields.remove("mounts");
+        fields.remove("mount");
+        let horse = decode(&value.to_string()).unwrap();
+        assert_eq!(horse.mounts, vec!["horse"]);
+        assert_eq!(horse.mount, "horse");
+        assert!(horse.mount_owned);
+        let again = decode(&serde_json::to_string(&horse).unwrap()).unwrap();
+        assert_eq!((again.mounts, again.mount), (horse.mounts, horse.mount));
+
+        old.mount_owned = false;
+        old.mounted = true;
+        let none = decode(&serde_json::to_string(&old).unwrap()).unwrap();
+        assert!(none.mounts.is_empty() && none.mount.is_empty() && !none.mounted);
     }
     #[test]
     fn gender_is_kept_through_create_save_and_load() {

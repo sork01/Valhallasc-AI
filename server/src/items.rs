@@ -132,6 +132,9 @@ pub struct Item {
     pub source: Option<String>,
     #[serde(default)]
     pub price: u32,
+    /// `mount_licence` items: the mount that using the item grants.
+    #[serde(default)]
+    pub mount: Option<String>,
 }
 fn first_level() -> u32 {
     1
