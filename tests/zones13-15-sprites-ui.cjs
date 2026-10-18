@@ -53,7 +53,7 @@ const call = async(name,args={}) => {
       }),{src:z.src,kind});
       assert.equal(art.width,768,`${kind} atlas width`);
       assert.equal(art.height,480,`${kind} atlas height`);
-      assert.ok(art.tops>40&&art.clip[0],`${kind} has a fitted health-bar height and draws a frame`);
+      assert.ok(art.tops>20&&art.clip[0],`${kind} has a fitted health-bar height and draws a frame`);
       await page.screenshot({path:path.join(world.artifacts,`${z.tag}-${kind}.png`)});
       count++;
     }

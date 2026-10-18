@@ -47,10 +47,17 @@
     }
   },
   "sprites": {
-    "toad": "8b12263d725df078",
-    "croc": "ee12dc9daaab1077",
-    "knight": "2d83f47e45f0f64d",
-    "hydra": "dd2eed6a51916b3d",
-    "gloomroot": "c7bd8d18c35a484c"
+    "toad": "62301637ad14d062",
+    "croc": "63dafae785d1794c",
+    "knight": "8536840e86dd5186",
+    "hydra": "a34152941af03712",
+    "gloomroot": "daea7c6103b488fb"
+  },
+  "tops": {
+    "toad": 39,
+    "croc": 38,
+    "knight": 83,
+    "hydra": 70,
+    "gloomroot": 82
   }
 }
