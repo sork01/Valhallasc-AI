@@ -55,18 +55,33 @@
     }
   },
   "sprites": {
-    "screeferret": "4d6678bffaecef53",
-    "stoneibex": "b9e16481719da511",
-    "slateraven": "546b93f264049867",
-    "ridgeadder": "912c13d1f3ff155e",
-    "cairnbehemoth": "3921ddc883d8b692",
-    "whitebarktitan": "22a19e24ee756ab4",
-    "stormcondor": "d64ecb5b12e5b596",
     "cairn_warden": "67d02dfa6c3f275a",
     "cairn_surveyor": "8b873e1285c66fd8",
     "cairn_stonesinger": "37a5052813f1f321",
     "cairn_grovekeeper": "d9aa2861785e30a0",
     "cairn_windseer": "e78d92e140ca8fa6",
-    "cairn_travel": "f50a8011e0fdb729"
+    "cairn_travel": "f50a8011e0fdb729",
+    "screeferret": "0973816328d43612",
+    "stoneibex": "ddc905ed1bdf6e4d",
+    "slateraven": "41b6eeb6b8975541",
+    "ridgeadder": "a01f6e8a78976a28",
+    "cairnbehemoth": "fa43ad9bc5d3100f",
+    "whitebarktitan": "799f05d3d9eef19c",
+    "stormcondor": "e746cb0b17d70bff"
+  },
+  "tops": {
+    "screeferret": 37,
+    "stoneibex": 58,
+    "slateraven": 63,
+    "ridgeadder": 49,
+    "cairnbehemoth": 70,
+    "whitebarktitan": 71,
+    "stormcondor": 66,
+    "cairn_warden": 82,
+    "cairn_surveyor": 83,
+    "cairn_stonesinger": 82,
+    "cairn_grovekeeper": 82,
+    "cairn_windseer": 82,
+    "cairn_travel": 82
   }
 }

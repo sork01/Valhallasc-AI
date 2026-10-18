@@ -92,3 +92,19 @@ def preview(kinds, palettes, draw, out, bg='#2c3a44', scale=2):
         for c, (clip, n) in enumerate(poses):
             sheet.alpha_composite(rgba(draw(kind, clip, n), palettes[kind].hex), (c * W, r * H))
     sheet.resize((sheet.width * 2, sheet.height * 2), Image.Resampling.NEAREST).save(out / 'poses.png')
+
+
+def mku(**groups):
+    """`mk` that nudges a repeated hex by one blue step instead of asserting (shared golds and shines across groups)."""
+    seen = set(R.BASE.values())
+    out = {}
+    for name, value in groups.items():
+        vals = [value] if isinstance(value, str) else list(value)
+        fixed = []
+        for c in vals:
+            while c.lower() in seen:
+                c = '#%02x%02x%02x' % (int(c[1:3], 16), int(c[3:5], 16), (int(c[5:7], 16) + 1) % 256)
+            seen.add(c.lower())
+            fixed.append(c)
+        out[name] = fixed[0] if isinstance(value, str) else tuple(fixed)
+    return R.mk(**out)

@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image,ImageDraw
 import make_moonspore_sprites as m
+import tanglecrown_cel_redraw as cel
 from make_crag_sprites import Palette,ellipsoid,polygon,gradient
 ROOT=Path(__file__).resolve().parents[1];ASSETS=ROOT/'client/assets'
 KINDS=['orchidmantis','canopyglider','poolcaiman','drumgorilla','jadeanaconda','crownjaguar','tangle_warden','tangle_scholar','tangle_travel']
@@ -95,7 +96,12 @@ def person(f,x,y,s,hit,role):
   paint(f,ellipsoid(x-24,y+56,11,15));line(f,(x+26,y+70),(x+26,y+14),'accent',4)
   paint(f,polygon([(x+25,y+13),(x+42,y+24),(x+25,y+34)]),('accent','light','glow'))
 DRAWERS=dict(orchidmantis=mantis,canopyglider=glider,poolcaiman=caiman,drumgorilla=gorilla,jadeanaconda=anaconda,crownjaguar=jaguar,tangle_warden=lambda f,x,y,s,h:person(f,x,y,s,h,'warden'),tangle_scholar=lambda f,x,y,s,h:person(f,x,y,s,h,'scholar'),tangle_travel=lambda f,x,y,s,h:person(f,x,y,s,h,'travel'))
+# The six enemies are the cel-shaded redraw in tanglecrown_cel_redraw.py (2026-10-18). The three NPCs keep the old
+# drawers above, so `m._old_draw` (the pre-redraw Frame pipeline) still serves them.
+PALETTES.update(cel.PALETTES)
 m.KINDS=KINDS;m.PALETTES=PALETTES;m.DRAWERS=DRAWERS;m.ROOT=ROOT;m.ASSETS=ASSETS
+from make_crag_sprites import rgba
+m.draw=lambda kind,clip,n:rgba(cel.draw(kind,clip,n),PALETTES[kind].hex) if kind in cel.KINDS else m._old_draw(kind,clip,n)
 
 def metadata(sprites):
  meta=m.metadata(sprites);meta['kinds']=KINDS;return meta
@@ -113,11 +119,14 @@ def preview():
  sheet.save(out);print(out)
 
 
-def build():
+def build(replace=False):
  path=ASSETS/'tanglecrown.txt'
- if path.exists():raise SystemExit('Tanglecrown sprites already exist; export preserves edits.')
- api=m._pf();sprites={}
- for kind in KINDS:
+ api=m._pf();sprites={};kinds=KINDS
+ if path.exists():
+  if not replace:raise SystemExit('Tanglecrown sprites already exist; export preserves edits. build --replace redoes the six enemies only.')
+  sprites=json.loads(path.read_text())['sprites'];kinds=list(cel.KINDS)
+  for kind in kinds:assert api.api('delete',{'sprite_id':sprites.pop(kind)}).get('ok')
+ for kind in kinds:
   data=m.grids(kind)
   np.savez_compressed(ROOT/'scripts'/f'tanglecrown_{kind}_raw.npz',
                       **{clip:np.stack(rows) for clip,rows in data.items()})
@@ -153,7 +162,7 @@ def export(verify=False):
 if __name__=='__main__':
  cmd=sys.argv[1] if len(sys.argv)>1 else 'preview'
  if cmd=='preview':preview()
- elif cmd=='build':build()
+ elif cmd=='build':build('--replace' in sys.argv[2:])
  elif cmd=='export':export()
  elif cmd=='verify':export(True)
- else:raise SystemExit('preview | build | export | verify')
+ else:raise SystemExit('preview | build [--replace] | export | verify')

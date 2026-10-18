@@ -53,16 +53,29 @@
     }
   },
   "sprites": {
-    "sandhopper": "f95833b0835f7760",
-    "dunefennec": "f7b43366ee8358c5",
-    "glassscorpion": "ee77a206139657cc",
-    "sunvulture": "8408d0fbd3ad04e0",
-    "dunecolossus": "d510c6ff48a78d2c",
-    "mirageroc": "9d018f3556d65105",
     "lapis_keeper": "43b377e1a0bc8794",
     "lapis_cartographer": "af61244b322bcdde",
     "lapis_warden": "c9fe3d1af68fed67",
     "lapis_seer": "1c9dc5d148fef101",
-    "lapis_travel": "a92127d3650b2884"
+    "lapis_travel": "a92127d3650b2884",
+    "sandhopper": "61c320cb61e72028",
+    "dunefennec": "37b781ea63ee9fcb",
+    "glassscorpion": "aaed33b57cc95510",
+    "sunvulture": "9932fbe90a9ae1ae",
+    "dunecolossus": "e4a4370c99875e3d",
+    "mirageroc": "a47fcd9d7bbe379c"
+  },
+  "tops": {
+    "sandhopper": 63,
+    "dunefennec": 63,
+    "glassscorpion": 53,
+    "sunvulture": 63,
+    "dunecolossus": 75,
+    "mirageroc": 72,
+    "lapis_keeper": 82,
+    "lapis_cartographer": 83,
+    "lapis_warden": 83,
+    "lapis_seer": 83,
+    "lapis_travel": 82
   }
 }

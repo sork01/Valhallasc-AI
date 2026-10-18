@@ -51,14 +51,25 @@
     }
   },
   "sprites": {
-    "orchidmantis": "da230551917a1a86",
-    "canopyglider": "019ee487c8ac88bc",
-    "poolcaiman": "88bb56bce90ee104",
-    "drumgorilla": "53817783f38bbf14",
-    "jadeanaconda": "dea8a50f0500d68b",
-    "crownjaguar": "8b6943f269089919",
     "tangle_warden": "328ee6de84aa557f",
     "tangle_scholar": "41d8cc10fff592c5",
-    "tangle_travel": "78fe82e4885e11e5"
+    "tangle_travel": "78fe82e4885e11e5",
+    "orchidmantis": "c594af0cae158f93",
+    "canopyglider": "06649274d3987365",
+    "poolcaiman": "d2a7ff1d3ca3029c",
+    "drumgorilla": "6199a28640267484",
+    "jadeanaconda": "70480d79f2bf7b69",
+    "crownjaguar": "3eab29266cd4ce79"
+  },
+  "tops": {
+    "orchidmantis": 83,
+    "canopyglider": 72,
+    "poolcaiman": 40,
+    "drumgorilla": 66,
+    "jadeanaconda": 64,
+    "crownjaguar": 68,
+    "tangle_warden": 82,
+    "tangle_scholar": 83,
+    "tangle_travel": 81
   }
 }

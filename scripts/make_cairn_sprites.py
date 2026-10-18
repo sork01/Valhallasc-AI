@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image,ImageDraw
 import make_moonspore_sprites as m
+import cairn_cel_redraw as cel
 from make_crag_sprites import Palette,ellipsoid,polygon,gradient
 ROOT=Path(__file__).resolve().parents[1];ASSETS=ROOT/'client/assets'
 KINDS=['screeferret','stoneibex','slateraven','ridgeadder','cairnbehemoth','whitebarktitan','stormcondor','cairn_warden','cairn_surveyor','cairn_stonesinger','cairn_grovekeeper','cairn_windseer','cairn_travel']
@@ -165,7 +166,12 @@ DRAWERS=dict(screeferret=ferret,stoneibex=ibex,slateraven=raven,ridgeadder=adder
              cairn_warden=lambda f,x,y,s,h:person(f,x,y,s,h,'captain'),cairn_surveyor=lambda f,x,y,s,h:person(f,x,y,s,h,'surveyor'),
              cairn_stonesinger=lambda f,x,y,s,h:person(f,x,y,s,h,'bellkeeper'),cairn_grovekeeper=lambda f,x,y,s,h:person(f,x,y,s,h,'skywatcher'),
              cairn_windseer=lambda f,x,y,s,h:person(f,x,y,s,h,'ribkeeper'),cairn_travel=lambda f,x,y,s,h:person(f,x,y,s,h,'travel'))
+# The seven enemies are the cel-shaded redraw in cairn_cel_redraw.py (2026-10-18). The NPCs keep the old drawers above, so
+# `m._old_draw` (the pre-redraw Frame pipeline) still serves them.
+PALETTES.update(cel.PALETTES)
 m.KINDS=KINDS;m.PALETTES=PALETTES;m.DRAWERS=DRAWERS;m.ROOT=ROOT;m.ASSETS=ASSETS
+from make_crag_sprites import rgba
+m.draw=lambda kind,clip,n:rgba(cel.draw(kind,clip,n),PALETTES[kind].hex) if kind in cel.KINDS else m._old_draw(kind,clip,n)
 def metadata(sprites):
  meta=m.metadata(sprites);meta['kinds']=KINDS;return meta
 def preview():
@@ -177,11 +183,14 @@ def preview():
    sheet.paste(pose,(10+col*205,28+row*220),pose)
    d.text((10+col*205,8+row*220),f'{kind} {clip}',fill='#e9f8ff')
  out=ROOT/'test-results/cairn-cast.png';out.parent.mkdir(exist_ok=True);sheet.save(out);print(out)
-def build():
+def build(replace=False):
  path=ASSETS/'cairn.txt'
- if path.exists():raise SystemExit('Cairnspine sprites already exist; export preserves edits.')
- api=m._pf();sprites={}
- for kind in KINDS:
+ api=m._pf();sprites={};kinds=KINDS
+ if path.exists():
+  if not replace:raise SystemExit('Cairnspine sprites already exist; export preserves edits. build --replace redoes the redrawn enemies only.')
+  sprites=json.loads(path.read_text())['sprites'];kinds=list(cel.KINDS)
+  for kind in kinds:assert api.api('delete',{'sprite_id':sprites.pop(kind)}).get('ok')
+ for kind in kinds:
   data=m.grids(kind)
   np.savez_compressed(ROOT/'scripts'/f'cairn_{kind}_raw.npz',**{clip:np.stack(rows) for clip,rows in data.items()})
   sid=api.create('valhallasc_cairn_'+kind+'_all',96,96,34,PALETTES[kind].hex,fps=10)
@@ -209,7 +218,7 @@ def export(verify=False):
 if __name__=='__main__':
  cmd=sys.argv[1] if len(sys.argv)>1 else 'preview'
  if cmd=='preview':preview()
- elif cmd=='build':build()
+ elif cmd=='build':build('--replace' in sys.argv[2:])
  elif cmd=='export':export()
  elif cmd=='verify':export(True)
- else:raise SystemExit('preview | build | export | verify')
+ else:raise SystemExit('preview | build [--replace] | export | verify')

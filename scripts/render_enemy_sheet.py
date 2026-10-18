@@ -34,6 +34,20 @@ ZONES = {
         ('draugr', 'Drowned Draugr', 0), ('angler', 'Lantern Angler', 0), ('moray', 'Gnashing Moray', 0),
         ('siren', 'Siren', 0), ('shellback', 'Shellback', 0), ('kraken', 'The Kraken', 1),
         ('hvitserk', 'Hvitserk the Drowned', 1), ('ghostmaw', 'Ghostmaw', 1)]),
+    22: ('tanglecrown', 'The Tanglecrown', 'Zone 22 · levels 75-80', '#1c3a2c', '#10251a', '#b8ff9a', [
+        ('orchidmantis', 'Orchid Mantis', 0), ('canopyglider', 'Canopy Glider', 0), ('poolcaiman', 'Blackwater Caiman', 0),
+        ('drumgorilla', 'Drum Gorilla', 0), ('jadeanaconda', 'The Jade Anaconda', 1), ('crownjaguar', 'The Crown Jaguar', 1)]),
+    25: ('lapis', 'The Lapis Erg', 'Zone 25 · levels 80-85', '#3a3426', '#251f16', '#8ae4ff', [
+        ('sandhopper', 'Sandhopper', 0), ('dunefennec', 'Dune Fennec', 0), ('glassscorpion', 'Glass Scorpion', 0),
+        ('sunvulture', 'Sun Vulture', 0), ('dunecolossus', 'The Dune Colossus', 1), ('mirageroc', 'The Mirage Roc', 1)]),
+    26: ('frostwake', 'Frostwake Shelf', 'Zone 26 · levels 85-90', '#1c3450', '#101f33', '#c8f4ff', [
+        ('snowhare', 'Snow Hare', 0), ('iceotter', 'Ice Otter', 0), ('frostheron', 'Frost Heron', 0),
+        ('glaciercrab', 'Glacier Crab', 0), ('bellmammoth', 'The Bell Mammoth', 1), ('auroramanta', 'The Aurora Manta', 1),
+        ('crevasseleviathan', 'The Crevasse Leviathan', 1)]),
+    27: ('cairn', 'The Cairnspine', 'Zone 27 · levels 90-95', '#34343c', '#202026', '#e8e4ff', [
+        ('screeferret', 'Scree Ferret', 0), ('stoneibex', 'Stone Ibex', 0), ('slateraven', 'Slate Raven', 0),
+        ('ridgeadder', 'Ridge Adder', 0), ('cairnbehemoth', 'The Cairn Behemoth', 1),
+        ('whitebarktitan', 'The Whitebark Titan', 1), ('stormcondor', 'The Storm Condor', 1)]),
 }
 CARD_W, CARD_H, GAP = 408, 506, 18
 

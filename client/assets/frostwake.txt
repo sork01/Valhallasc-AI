@@ -55,18 +55,33 @@
     }
   },
   "sprites": {
-    "snowhare": "20eeb3a531d3e395",
-    "iceotter": "1325d9a929f05d23",
-    "frostheron": "fd9b8d7661387c92",
-    "glaciercrab": "a6a850f3e25436a8",
-    "bellmammoth": "009a9b678e0ad551",
-    "auroramanta": "063d4cc3a8852d30",
-    "crevasseleviathan": "71a4a5d328208695",
     "frostwake_captain": "bf27ed8cb9300880",
     "frostwake_surveyor": "c2347fe51279fc7e",
     "frostwake_bellkeeper": "6c24bd9931af3c50",
     "frostwake_skywatcher": "a5c5b843a1fe859c",
     "frostwake_ribkeeper": "aacfb4a024b4cb41",
-    "frostwake_travel": "e5e53a1a152c3a2f"
+    "frostwake_travel": "e5e53a1a152c3a2f",
+    "snowhare": "d83bee0ca8bcd1f5",
+    "iceotter": "581938975e4ff2ac",
+    "frostheron": "5e14413ca4765599",
+    "glaciercrab": "820fcb8688bb845a",
+    "bellmammoth": "9d0bc32d07609dd8",
+    "auroramanta": "7b8913a0da966336",
+    "crevasseleviathan": "31d24042ea51da64"
+  },
+  "tops": {
+    "snowhare": 65,
+    "iceotter": 43,
+    "frostheron": 72,
+    "glaciercrab": 47,
+    "bellmammoth": 58,
+    "auroramanta": 71,
+    "crevasseleviathan": 67,
+    "frostwake_captain": 82,
+    "frostwake_surveyor": 83,
+    "frostwake_bellkeeper": 82,
+    "frostwake_skywatcher": 82,
+    "frostwake_ribkeeper": 82,
+    "frostwake_travel": 82
   }
 }
