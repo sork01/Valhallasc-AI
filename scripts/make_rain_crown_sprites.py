@@ -120,6 +120,11 @@ def draw(enemy, clip, n):
     return f.a
 
 
+# The six enemies are the cel-shaded redraw in rain_crown_cel_redraw.py (2026-10-18); the old drawer stays as `_old_draw`.
+import dungeon_cel  # noqa: E402
+dungeon_cel.install(globals(), 'rain_crown_cel_redraw')
+
+
 def render(kind):
     enemy = next(e for e in ENEMIES if e['kind'] == kind)
     return {clip: np.stack([draw(enemy, clip, n) for n in range(count)])
