@@ -41,5 +41,13 @@
       "n": 8,
       "row": 4
     }
+  },
+  "tops": {
+    "dew_moth": 81,
+    "lumen_eel": 64,
+    "rootbell": 76,
+    "tideglass_heron": 82,
+    "hourpetal_stag": 83,
+    "moonskein_weaver": 75
   }
 }

@@ -49,12 +49,21 @@
     }
   },
   "sprites": {
-    "glowcapgrazer": "b8b62f48309664b1",
-    "silkwing": "c553cb16d5851303",
-    "rootlurker": "a01d2622354426d9",
-    "lanternwraith": "7d604584e790f1a5",
-    "mireheart": "d1b07a19c28f467a",
-    "silverwidow": "e8ef77581e727413",
-    "nightbloom": "2ff5eb10479e37cd"
+    "glowcapgrazer": "e3ddc504b3a14a32",
+    "silkwing": "87e7c6c2f6ac5df2",
+    "rootlurker": "27a88db6858bcaba",
+    "lanternwraith": "41395b9e312803c6",
+    "mireheart": "f79370e4f257af10",
+    "silverwidow": "eef33a20cc1bf8f3",
+    "nightbloom": "89b7d47c080037ae"
+  },
+  "tops": {
+    "glowcapgrazer": 82,
+    "silkwing": 89,
+    "rootlurker": 89,
+    "lanternwraith": 81,
+    "mireheart": 87,
+    "silverwidow": 58,
+    "nightbloom": 82
   }
 }

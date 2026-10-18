@@ -11,7 +11,8 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw
-from make_crag_sprites import Frame, Palette, ellipsoid, polygon, gradient
+from make_crag_sprites import Frame, Palette, ellipsoid, polygon, gradient, rgba
+import moonwell_cel_redraw as cel
 
 ROOT=Path(__file__).resolve().parents[1]
 ASSETS=ROOT/'client/assets'
@@ -32,7 +33,14 @@ def shape(f,mask,steps=('ink','shadow','body','light'),dither=.15):
     f.paint(mask,f.p.ramp(*steps),dither=dither)
 
 
+# The art is the cel-shaded redraw in moonwell_cel_redraw.py (2026-10-18); `old_draw` below is kept for reference only.
+PAL=cel.PALETTES[KIND]
+
 def draw(clip,n):
+    return rgba(cel.draw(KIND,clip,n),PAL.hex)
+
+
+def old_draw(clip,n):
     f=Frame(PAL)
     pulse=math.sin(n*.9)
     lift=(0,1,2,1,0,1)[n] if clip=='idle' else (0,2,4,3,1,0,-1,0)[n] if clip=='walk' else 0

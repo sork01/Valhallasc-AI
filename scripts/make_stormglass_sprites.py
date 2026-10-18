@@ -14,7 +14,8 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 import make_moonspore_sprites as m
-from make_crag_sprites import Palette, ellipsoid, polygon, gradient
+import stormglass_cel_redraw as cel
+from make_crag_sprites import Palette, ellipsoid, polygon, gradient, rgba
 
 ROOT=Path(__file__).resolve().parents[1]
 ASSETS=ROOT/'client/assets'
@@ -97,7 +98,10 @@ def heart(f,x,y,s,hit):
   for side in (-1,1):line(f,(x+side*28,y+47),(x+side*41,y+31),'glow',2)
 
 DRAWERS=dict(saltclaw=crab,stormgull=gull,glassray=ray,breakersentinel=sentinel,maelstromheart=heart)
+# The art is the cel-shaded redraw in stormglass_cel_redraw.py (2026-10-18); the drawers above are kept for reference only.
+PALETTES=cel.PALETTES
 m.KINDS=KINDS;m.PALETTES=PALETTES;m.DRAWERS=DRAWERS
+m.draw=lambda kind,clip,n:rgba(cel.draw(kind,clip,n),PALETTES[kind].hex)
 m.ROOT=ROOT;m.ASSETS=ASSETS
 
 def metadata(sprites):
@@ -115,10 +119,12 @@ def preview():
 
 def pf():return m._pf()
 
-def build():
+def build(replace=False):
  path=ASSETS/'stormglass.txt'
- if path.exists():raise SystemExit('Stormglass sprites already exist; export preserves edits. Refusing replacement.')
  api=pf();sprites={}
+ if path.exists():
+  if not replace:raise SystemExit('Stormglass sprites already exist; export preserves edits. build --replace discards them.')
+  for sid in json.loads(path.read_text())['sprites'].values():assert api.api('delete',{'sprite_id':sid}).get('ok')
  for k in KINDS:
   data=m.grids(k)
   np.savez_compressed(ROOT/'scripts'/f'stormglass_{k}_raw.npz',**{clip:np.stack(rows) for clip,rows in data.items()})
@@ -148,7 +154,7 @@ def export(verify=False):
 if __name__=='__main__':
  cmd=sys.argv[1] if len(sys.argv)>1 else 'preview'
  if cmd=='preview':preview()
- elif cmd=='build':build()
+ elif cmd=='build':build('--replace' in sys.argv[2:])
  elif cmd=='export':export()
  elif cmd=='verify':export(True)
- else:raise SystemExit('preview | build | export | verify')
+ else:raise SystemExit('preview | build [--replace] | export | verify')

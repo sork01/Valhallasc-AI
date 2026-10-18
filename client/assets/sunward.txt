@@ -51,14 +51,25 @@
     }
   },
   "sprites": {
-    "meadowhare": "1bdb59263fefa37c",
-    "sunbacksnail": "fbd09807bdba74f2",
-    "brushfox": "283bcf2d5be41d24",
-    "spadebadger": "303d1a434e8b7e15",
-    "honeyjaw": "f0f2f8f9b27e96b6",
-    "wickerwarden": "ee14c94400bf5db8",
     "sun_miller": "a9eaaeffe06b9e8e",
     "sun_keeper": "c736f2b0a95ac55f",
-    "sun_travel": "5bd8d82dbea287e8"
+    "sun_travel": "5bd8d82dbea287e8",
+    "meadowhare": "dbaa2e299850e019",
+    "sunbacksnail": "333d6ab51b41c61e",
+    "brushfox": "94be11d580ca9223",
+    "spadebadger": "e165e19e3142c918",
+    "honeyjaw": "bcd12bdbd289df90",
+    "wickerwarden": "9f1bab7635da1258"
+  },
+  "tops": {
+    "meadowhare": 80,
+    "sunbacksnail": 51,
+    "brushfox": 57,
+    "spadebadger": 50,
+    "honeyjaw": 80,
+    "wickerwarden": 83,
+    "sun_miller": 83,
+    "sun_keeper": 83,
+    "sun_travel": 83
   }
 }

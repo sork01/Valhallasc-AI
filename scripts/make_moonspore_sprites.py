@@ -10,7 +10,8 @@ import sys
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
-from make_crag_sprites import AY, Frame, Palette, ellipsoid, polygon, gradient
+from make_crag_sprites import AY, Frame, Palette, ellipsoid, polygon, gradient, rgba
+import moonspore_cel_redraw as cel
 
 ROOT=Path(__file__).resolve().parents[1]
 ASSETS=ROOT/'client/assets'
@@ -127,6 +128,9 @@ def bloom(f,x,y,s,hit):
 DRAWERS={'glowcapgrazer':grazer,'silkwing':silkwing,'rootlurker':lurker,
  'lanternwraith':wraith,'mireheart':heart,'silverwidow':widow,'nightbloom':bloom}
 
+# The art is the cel-shaded redraw in moonspore_cel_redraw.py (2026-10-18); the old drawers above are kept for reference only.
+PALETTES=cel.PALETTES
+
 def pose(clip,n):
  if clip=='idle':return 0,[0,1,2,1,0,1][n],n-2
  if clip=='walk':return [0,-1,1,3,2,0,-1,0][n],[0,1,4,7,5,1,0,0][n],[0,-2,3,5,2,-3,-2,0][n]
@@ -135,6 +139,9 @@ def pose(clip,n):
  return 0,0,n
 
 def draw(kind,clip,n):
+ return rgba(cel.draw(kind,clip,n),PALETTES[kind].hex)
+
+def _old_draw(kind,clip,n):
  f=Frame(PALETTES[kind]);dx,lift,sway=pose(clip,n)
  DRAWERS[kind](f,48+dx,-lift,sway,clip=='attack' and n in (3,4,5))
  if clip=='idle':f.dots([(32+n*4,39+n%3),(33+n*4,39+n%3)],'glow')

@@ -51,14 +51,25 @@
     }
   },
   "sprites": {
-    "ribbongecko": "fc01bb35450e6499",
-    "balloonbeetle": "360e082fc17a1688",
-    "paintedmacaw": "6b671895e0c7aa7b",
-    "jesterling": "0fbaff1d76b8dc64",
-    "paradegryphon": "452d630f5fa1cc43",
-    "maskcolossus": "0edc0e65d809861e",
     "ribbon_host": "3413a27c6453acd0",
     "ribbon_keeper": "aa742e2a645055ca",
-    "ribbon_travel": "f626ddf4f43862a3"
+    "ribbon_travel": "f626ddf4f43862a3",
+    "ribbongecko": "673693aa0991c114",
+    "balloonbeetle": "36102f9060e70688",
+    "paintedmacaw": "c124a1849eabf71b",
+    "jesterling": "20ce2f22717c22b5",
+    "paradegryphon": "6c9a26b1ab6314bd",
+    "maskcolossus": "369387eec5b6aeb0"
+  },
+  "tops": {
+    "ribbongecko": 53,
+    "balloonbeetle": 75,
+    "paintedmacaw": 79,
+    "jesterling": 77,
+    "paradegryphon": 69,
+    "maskcolossus": 83,
+    "ribbon_host": 80,
+    "ribbon_keeper": 83,
+    "ribbon_travel": 81
   }
 }

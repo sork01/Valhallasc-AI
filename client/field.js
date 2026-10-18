@@ -2680,14 +2680,14 @@
     if (moonsporeSrc) return;
     if (stubOn()) { moonsporeSrc = stubEnemies(MOONSPORE_KINDS, {glowcapgrazer:'#bfa',silkwing:'#cfe',rootlurker:'#ca8',lanternwraith:'#bfa',mireheart:'#eba',silverwidow:'#ebf',nightbloom:'#efa'}); return; }
     fetch('assets/moonspore.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/moonspore_${k}.png`; })))
-      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); moonsporeSrc = { meta, img }; })).catch(() => { moonsporeSrc = null; });
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); moonsporeSrc = { meta, img }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { moonsporeSrc = null; });
   }
   function loadStormglassSprites() {
     if (stormglassSrc) return;
     if (stubOn()) { stormglassSrc=stubEnemies(STORMGLASS_KINDS,{saltclaw:'#9dc',stormgull:'#eff',glassray:'#8ef',breakersentinel:'#cca',maelstromheart:'#c9f'}); return; }
     fetch('assets/stormglass.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/stormglass_${k}.png`;
-    }))).then(imgs=>{stormglassSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{stormglassSrc=null;});
+    }))).then(imgs=>{stormglassSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{stormglassSrc=null;});
   }
   function loadSunwardSprites() {
     if (sunwardSrc) return;
@@ -2695,7 +2695,7 @@
     if (stubOn()) { sunwardSrc=stubEnemies(kinds,{meadowhare:'#ca9',sunbacksnail:'#ac9',brushfox:'#d85',spadebadger:'#aab',honeyjaw:'#b86',wickerwarden:'#db9',sun_miller:'#8ab',sun_keeper:'#8a8',sun_travel:'#acb'}); return; }
     fetch('assets/sunward.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/sunward_${k}.png`;
-    }))).then(imgs=>{sunwardSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{sunwardSrc=null;});
+    }))).then(imgs=>{sunwardSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{sunwardSrc=null;});
   }
   function loadRibbonwildSprites() {
     if (ribbonwildSrc) return;
@@ -2703,7 +2703,7 @@
     if (stubOn()) { ribbonwildSrc=stubEnemies(kinds,{ribbongecko:'#3cc',balloonbeetle:'#b7d',paintedmacaw:'#5bd',jesterling:'#e8a',paradegryphon:'#d9b',maskcolossus:'#ad9',ribbon_host:'#e8a',ribbon_keeper:'#a9d',ribbon_travel:'#7dc'}); return; }
     fetch('assets/ribbonwild.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/ribbonwild_${k}.png`;
-    }))).then(imgs=>{ribbonwildSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{ribbonwildSrc=null;});
+    }))).then(imgs=>{ribbonwildSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{ribbonwildSrc=null;});
   }
   function loadTanglecrownSprites() {
     if (tanglecrownSrc) return;
@@ -2779,14 +2779,14 @@
     if (moonwellSrc) return;
     if (stubOn()) { moonwellSrc = stubEnemies(['moonwell_echo'], {moonwell_echo:'#9fe'}); return; }
     fetch('assets/moonwell.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/moonwell_echo.png`; })))
-      .then(imgs => { moonwellSrc = { meta, img: {moonwell_echo: imgs[0]} }; })).catch(() => { moonwellSrc = null; });
+      .then(imgs => { moonwellSrc = { meta, img: {moonwell_echo: imgs[0]} }; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { moonwellSrc = null; });
   }
   function loadMoonwellGardenSprites() {
     if (moonwellGardenSrc) return;
     if (stubOn()) { moonwellGardenSrc = stubEnemies(MOONWELL_KINDS,{dew_moth:'#bde',lumen_eel:'#9ed',rootbell:'#fda',tideglass_heron:'#ade',hourpetal_stag:'#fdb',moonskein_weaver:'#eac'}); return; }
     fetch('assets/moonwell_garden.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/moonwell_${k}.png`;
-    }))).then(imgs=>{const img={};meta.kinds.forEach((k,n)=>img[k]=imgs[n]);moonwellGardenSrc={meta,img};})).catch(()=>{moonwellGardenSrc=null;});
+    }))).then(imgs=>{const img={};meta.kinds.forEach((k,n)=>img[k]=imgs[n]);moonwellGardenSrc={meta,img}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{moonwellGardenSrc=null;});
   }
   // Rimeveil Glacier monsters: assets/rime_<kind>.png (scripts/make_rime_sprites.py), the same clips as the Crags.
   function loadRimeSprites() {

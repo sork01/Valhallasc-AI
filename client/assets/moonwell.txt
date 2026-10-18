@@ -43,6 +43,9 @@
     }
   },
   "sprites": {
-    "moonwell_echo": "f1adef0186901f85"
+    "moonwell_echo": "38fdfdff9a8a8bcc"
+  },
+  "tops": {
+    "moonwell_echo": 79
   }
 }

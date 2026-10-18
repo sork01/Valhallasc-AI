@@ -24,7 +24,10 @@ def main(names):
         count = meta['clips']['idle']['n']
         tops = {}
         for kind in meta['kinds']:
-            atlas = np.array(Image.open(ASSETS / f'{name}_{kind}.png').convert('RGBA'))
+            # moonwell_garden atlases are moonwell_<kind>.png and the Echo's is moonwell_echo.png
+            path_ = next(p for p in (ASSETS / f'{name}_{kind}.png', ASSETS / f'{name.split("_")[0]}_{kind}.png',
+                                     ASSETS / f'{kind}.png') if p.exists())
+            atlas = np.array(Image.open(path_).convert('RGBA'))
             row = atlas[:h, :w * count, 3] > 0
             tops[kind] = int(ay - np.nonzero(row.any(axis=1))[0].min())
         meta['tops'] = tops

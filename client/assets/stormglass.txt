@@ -47,10 +47,17 @@
     }
   },
   "sprites": {
-    "saltclaw": "bc406f62d8ed2505",
-    "stormgull": "90106b4a5807bea7",
-    "glassray": "e80139fddf07cd00",
-    "breakersentinel": "2f8bca2a0cd75e53",
-    "maelstromheart": "d557002f726fb67e"
+    "saltclaw": "8931a504cf9d43b7",
+    "stormgull": "36843f22e678d2e1",
+    "glassray": "73f06c1b2cec1150",
+    "breakersentinel": "8b30a11154d9437d",
+    "maelstromheart": "c96d2e6b6541a05d"
+  },
+  "tops": {
+    "saltclaw": 54,
+    "stormgull": 74,
+    "glassray": 69,
+    "breakersentinel": 82,
+    "maelstromheart": 76
   }
 }

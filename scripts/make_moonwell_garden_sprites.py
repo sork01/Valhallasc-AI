@@ -11,6 +11,9 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
+import moonwell_cel_redraw as cel
+from make_crag_sprites import rgba
+
 ROOT=Path(__file__).resolve().parents[1]
 ASSETS=ROOT/'client/assets'
 KINDS=['dew_moth','lumen_eel','rootbell','tideglass_heron','hourpetal_stag','moonskein_weaver']
@@ -18,7 +21,12 @@ CLIPS=[('idle',6),('walk',8),('attack',8),('hurt',4),('die',8)]
 INK='#15263b';SILVER='#a8d5cf';MINT='#9af2d7';LILAC='#8276b5';GOLD='#f8e8ad';CORAL='#f0a6be';WATER='#367d91'
 
 
+# The art is the cel-shaded redraw in moonwell_cel_redraw.py (2026-10-18); `old_frame` below is kept for reference only.
 def frame(kind,clip,n):
+    return rgba(cel.draw(kind,clip,n),cel.PALETTES[kind].hex)
+
+
+def old_frame(kind,clip,n):
     im=Image.new('RGBA',(96,96));g=ImageDraw.Draw(im)
     phase=n*math.tau/8
     bob=round(math.sin(phase)*2) if clip in ('idle','walk') else 0

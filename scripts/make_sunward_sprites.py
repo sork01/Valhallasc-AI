@@ -13,7 +13,8 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 import make_moonspore_sprites as m
-from make_crag_sprites import Palette, ellipsoid, polygon, gradient
+import sunward_cel_redraw as cel
+from make_crag_sprites import Palette, ellipsoid, polygon, gradient, rgba
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'client/assets'
@@ -222,9 +223,14 @@ DRAWERS = dict(meadowhare=hare, sunbacksnail=snail, brushfox=fox,
                sun_miller=lambda f,x,y,s,h: villager(f,x,y,s,h,'miller'),
                sun_keeper=lambda f,x,y,s,h: villager(f,x,y,s,h,'keeper'),
                sun_travel=lambda f,x,y,s,h: villager(f,x,y,s,h,'travel'))
+# The six enemies are the cel-shaded redraw in sunward_cel_redraw.py (2026-10-18). The three villager NPCs keep the
+# old drawers above, so `m._old_draw` (the pre-redraw Frame pipeline) still serves them.
+PALETTES.update(cel.PALETTES)
 m.KINDS = KINDS
 m.PALETTES = PALETTES
 m.DRAWERS = DRAWERS
+m.draw = lambda kind, clip, n: (rgba(cel.draw(kind, clip, n), PALETTES[kind].hex) if kind in cel.KINDS
+                                else m._old_draw(kind, clip, n))
 m.ROOT = ROOT
 m.ASSETS = ASSETS
 
@@ -254,13 +260,19 @@ def preview():
     print(out)
 
 
-def build():
+def build(replace=False):
     path = ASSETS / 'sunward.txt'
-    if path.exists():
-        raise SystemExit('Sunward sprites already exist; export preserves edits.')
     api = m._pf()
     sprites = {}
-    for kind in KINDS:
+    kinds = KINDS
+    if path.exists():
+        if not replace:
+            raise SystemExit('Sunward sprites already exist; export preserves edits. build --replace redoes the six enemies only.')
+        sprites = json.loads(path.read_text())['sprites']
+        kinds = list(cel.KINDS)
+        for kind in kinds:
+            assert api.api('delete', {'sprite_id': sprites.pop(kind)}).get('ok')
+    for kind in kinds:
         data = m.grids(kind)
         np.savez_compressed(ROOT / 'scripts' / f'sunward_{kind}_raw.npz',
                             **{clip: np.stack(rows) for clip, rows in data.items()})
@@ -312,10 +324,10 @@ if __name__ == '__main__':
     if cmd == 'preview':
         preview()
     elif cmd == 'build':
-        build()
+        build('--replace' in sys.argv[2:])
     elif cmd == 'export':
         export()
     elif cmd == 'verify':
         export(True)
     else:
-        raise SystemExit('preview | build | export | verify')
+        raise SystemExit('preview | build [--replace] | export | verify')
