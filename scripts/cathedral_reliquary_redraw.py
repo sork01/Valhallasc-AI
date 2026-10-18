@@ -103,9 +103,10 @@ class Art:
         self.sy = sy
         self.lift = 0.
         self.ox = 0.
+        self.pk = 1.   # vertical scale of part positions only (radii stay), for figures too tall for the frame
 
     def g(self, x, y):
-        return (AX + self.ox + x + self.T['lean'] * y / 60, AY - y * self.sy - self.lift)
+        return (AX + self.ox + x + self.T['lean'] * y / 60, AY - y * self.sy * self.pk - self.lift)
 
     def r(self, group):
         k = 0
@@ -291,27 +292,28 @@ def relicwarden(clip, n):
     a.f.flat(ellipsoid(*a.g(10, by - 3), 2.1, 2.5)[0], 'glow1')
     a.dot(8.8, by - 1, 'shine')
     # hammer claw: raised high at rest, swung down on the strike
-    wr = (lerp(lerp(30, 22, wind), 25, strike), lerp(lerp(by + 33, 66, wind), 9, strike))
+    wr = (lerp(lerp(28, 20, wind), 21, strike), lerp(lerp(by + 33, 66, wind), 9, strike))
     ang = lerp(lerp(1.15, 1.7, wind), -.3, strike)
     op = lerp(lerp(.3, 1., wind), 0., strike)
     if clip == 'die':
-        wr, ang, op = (30 - fall * 2, by + 33 - fall * 28), 1.15 - fall * 1.4, .7
-    a.c((11, by + 8), wr, 6, 4.8, 'leg')
-    a.e(14, by + 11, 6.8, 6.8, 'gold')
-    claw(a, wr, ang, op, 8, 'plate')
+        wr, ang, op = (28 - fall * 4, by + 33 - fall * 28), 1.15 - fall * 1.4, .7
+    a.c((11, by + 8), wr, 7, 5.6, 'leg')
+    a.e(14, by + 11, 7.6, 7.6, 'gold')
+    claw(a, wr, ang, op, 9.6, 'plate')
     # helmed head with a coral crest and glowing eyes
-    hx, hy = 13, by + 16
-    a.e(hx, hy, 10, 9, 'plate')
-    for k, (dx, h, tilt) in enumerate(((-6, 8, -4), (-1, 12, -2), (4, 9, 0))):
-        a.poly([(hx + dx - 3, hy + 7), (hx + dx + tilt, hy + 7 + h), (hx + dx + 3, hy + 7)], 'bone1' if k % 2 else 'gold2')
-    a.poly([(hx - 3, hy + 3), (hx + 11, hy + 3), (hx + 11, hy - 3), (hx - 3, hy - 3)], 'ink', out=False)
+    hx, hy = 13, by + 17
+    a.e(hx, hy, 13, 11, 'plate')
+    a.e(hx - 2, hy + 5, 12, 6, 'plate', out=False)
+    for k, (dx, h, tilt) in enumerate(((-8, 9, -4), (-2, 14, -2), (4, 12, 0), (9, 7, 2))):
+        a.poly([(hx + dx - 3.4, hy + 9), (hx + dx + tilt, hy + 9 + h), (hx + dx + 3.4, hy + 9)], 'bone1' if k % 2 else 'gold2')
+    a.poly([(hx - 5, hy + 4), (hx + 13, hy + 4), (hx + 13, hy - 4), (hx - 5, hy - 4)], 'ink', out=False)
     state = T['state']
-    for dx in (1, 7.5):
+    for dx in (0, 8):
         if state == 'dead':
-            a.line((hx + dx - 2, hy + 1), (hx + dx + 2, hy - 2), 'glow1', 2)
+            a.line((hx + dx - 2.5, hy + 1.5), (hx + dx + 2.5, hy - 2), 'glow1', 2)
         else:
-            a.f.flat(ellipsoid(*a.g(hx + dx, hy), 2.6, 1.7)[0], 'iris' if state == 'angry' else 'glow1')
-            a.dot(hx + dx - 1, hy + 1, 'shine')
+            a.f.flat(ellipsoid(*a.g(hx + dx, hy), 3.4, 2.4)[0], 'iris' if state == 'angry' else 'glow1')
+            a.dot(hx + dx - 1.5, hy + 1.5, 'shine', 2)
     if clip == 'attack' and n in (3, 4, 5):
         for k in range(6):
             a.dot(25 + k * 2.2, 3 + (k % 3) * 3 + (n - 3), 'dust', 2)
@@ -422,8 +424,10 @@ def glasscantor(clip, n):
             f.a[moved] = cols[int(cid[piece][0])]
     if fall < .5:
         hx, hy = 3, 51
-        a.e(hx, hy, 8, 9, 'skin')
-        a.poly([(hx - 9, hy + 6), (hx + 1, hy + 10), (hx + 9, hy + 5), (hx + 9, hy + 12), (hx - 9, hy + 12)],
+        a.e(hx, hy, 9, 9.5, 'skin')
+        a.e(hx + 6, hy - 4, 2.4, 1.7, 'mouth', out=False)
+        a.e(hx - 3, hy - 4, 2.4, 1.7, 'mouth', out=False)
+        a.poly([(hx - 10, hy + 6), (hx + 1, hy + 11), (hx + 10, hy + 5), (hx + 10, hy + 13), (hx - 10, hy + 13)],
                'hair1', out=False)
         for sgn in (-1, 1):
             x, y = hx + 2 + sgn * 3.6, hy + 1
@@ -462,7 +466,7 @@ def coralregent(clip, n):
     sw, wind, strike, bob = T['sw'], T['wind'], T['strike'], T['bob']
     sway = math.sin(n * math.pi / 3) * 2 if clip == 'idle' else sw * 2
     by = bob * .6
-    hx, hy = 3, 57 + by
+    hx, hy = 3, 55 + by
     # long teal hair streaming behind
     a.band([(hx - 4, hy + 6), (hx - 13 + sway, hy - 8), (hx - 19 + sway * 1.5, hy - 26), (hx - 12 + sway, hy - 34),
             (hx - 4, hy - 16), (hx + 2, hy - 5)], 'hair')
@@ -481,26 +485,27 @@ def coralregent(clip, n):
         a.e(-6 + k * 3.2, 51 + by - abs(k - 2) * .8, 1.5, 1.5, 'pearl')
     a.c((-6, 49 + by), (3, 41 + by), 2.8, 2.4, 'skin')
     # head: big eyes, blush, tiny smile, fringe
-    a.e(hx, hy, 10, 10.5, 'skin')
-    a.dot(hx + 6, hy - 4, 'gown2', 3)
-    a.dot(hx - 3, hy - 4, 'gown2', 3)
-    a.eye(hx + 3, hy + 1, 3.5, iris='iris')
-    a.eye(hx + 10, hy + 1, 2.9, iris='iris')
+    a.e(hx, hy, 12.5, 12, 'skin')
+    a.e(hx + 7, hy - 5.5, 2.6, 1.8, 'gown', out=False)
+    a.e(hx - 3, hy - 5.5, 2.6, 1.8, 'gown', out=False)
+    a.eye(hx + 2.5, hy + .5, 4.6, iris='iris')
+    a.eye(hx + 11.5, hy + .5, 3.8, iris='iris')
     if T['state'] != 'hurt':
-        a.line((hx + 5, hy - 6), (hx + 8, hy - 6), 'ink', 1)
-    a.poly([(hx - 11, hy + 2), (hx - 6, hy + 11), (hx + 4, hy + 8), (hx + 12, hy + 9), (hx + 7, hy + 4),
-            (hx + 1, hy + 4)], 'hair2')
-    a.poly([(hx - 11, hy + 2), (hx - 9, hy - 8), (hx - 6, hy - 6), (hx - 7, hy + 6)], 'hair1', out=False)
+        a.line((hx + 5, hy - 7.5), (hx + 8.5, hy - 7.5), 'ink', 1)
+    a.poly([(hx - 13, hy + 3), (hx - 8, hy + 13), (hx + 3, hy + 10), (hx + 14, hy + 11), (hx + 8, hy + 4),
+            (hx + 1, hy + 5)], 'hair2')
+    a.poly([(hx - 13, hy + 3), (hx - 12, hy - 9), (hx - 8, hy - 7), (hx - 8, hy + 7)], 'hair1', out=False)
     # coral crown
-    a.poly([(hx - 8, hy + 9), (hx + 9, hy + 9), (hx + 9, hy + 12), (hx - 8, hy + 12)], 'gold1')
-    for k, (dx, h, tilt) in enumerate(((-7, 8, -3), (-2, 14, -1), (3, 16, 1), (8, 9, 3))):
-        a.poly([(hx + dx - 2.4, hy + 12), (hx + dx + tilt, hy + 12 + h), (hx + dx + 2.4, hy + 12)],
+    a.poly([(hx - 9, hy + 11), (hx + 11, hy + 11), (hx + 11, hy + 14), (hx - 9, hy + 14)], 'gold1')
+    for k, (dx, h, tilt) in enumerate(((-8, 8, -3), (-3, 12, -1), (3, 13, 1), (9, 8, 3))):
+        a.poly([(hx + dx - 2.6, hy + 14), (hx + dx + tilt, hy + 14 + h), (hx + dx + 2.6, hy + 14)],
                'coral1' if k % 2 else 'coral2')
-    a.e(hx + 1, hy + 13, 2, 2, 'pearl')
+    a.e(hx + 1, hy + 15, 2.2, 2.2, 'pearl')
     # scepter arm: drawn back in the wind-up, thrust on the strike
     hand = (lerp(lerp(20, 16, wind), 24, strike), lerp(lerp(30, 40, wind), 36, strike) + by)
-    a.c((7, 41 + by), hand, 3, 2.6, 'gown')
-    a.e(hand[0], hand[1], 3, 3, 'skin')
+    a.c((6, 43 + by), (lerp(6, hand[0], .55), lerp(43 + by, hand[1], .55) + 1), 3.2, 3.8, 'gown')
+    a.e(lerp(6, hand[0], .6), lerp(43 + by, hand[1], .6), 4.4, 3.6, 'gold')
+    a.e(hand[0], hand[1], 3.2, 3.2, 'skin')
     top = (hand[0] + 1, hand[1] + 24)
     a.c((hand[0] + 1, hand[1] - 16), top, 1.3, 1.3, 'gold')
     glow = 'glow0' if (wind + strike) > .5 or (clip == 'idle' and n % 2) else 'pearl1'
