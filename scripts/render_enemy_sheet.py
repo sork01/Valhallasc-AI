@@ -48,7 +48,67 @@ ZONES = {
         ('screeferret', 'Scree Ferret', 0), ('stoneibex', 'Stone Ibex', 0), ('slateraven', 'Slate Raven', 0),
         ('ridgeadder', 'Ridge Adder', 0), ('cairnbehemoth', 'The Cairn Behemoth', 1),
         ('whitebarktitan', 'The Whitebark Titan', 1), ('stormcondor', 'The Storm Condor', 1)]),
+    28: ('yearwheel', 'The Yearwheel', 'Zone 28 · levels 95-99', '#2c3a3a', '#1a2424', '#ffe49a', [
+        ('brooknewt', 'Brook Newt', 0), ('sundarter', 'Sun Darter', 0), ('acornmimic', 'Acorn Mimic', 0),
+        ('snowstoat', 'Snow Stoat', 0), ('bloomtortoise', 'Bloom Tortoise', 1), ('petalchimera', 'Petal Chimera', 1),
+        ('rainseraph', 'Rain Seraph', 1), ('glasslion', 'Glass Lion', 1), ('sunwheel', 'Sunwheel', 1),
+        ('firephoenix', 'Fire Phoenix', 1), ('lanternowl', 'Lantern Owl', 1), ('harvestreaper', 'Harvest Reaper', 1),
+        ('ambermantis', 'Amber Mantis', 1), ('rimesaber', 'Rime Saber', 1), ('snowgiant', 'Snow Giant', 1),
+        ('longnightwyrm', 'Longnight Wyrm', 1)]),
 }
+
+def _dungeon(zone, title, level, bg, band, accent, cast):
+    """Zones 29-39 are sealed-template dungeons whose atlases live in the shared cathedral set (cathedral_<kind>.png)."""
+    ZONES[zone] = ('cathedral', title, f'Zone {zone} · dungeon, level {level}', bg, band, accent,
+                   [(k, n, 1 if boss else 0) for k, n, boss in cast])
+
+
+_dungeon(29, 'The Eye Below', 65, '#1c3a48', '#10242e', '#9ff0e8', [
+    ('eye_drifter', 'Silt Drifter', 0), ('eye_lurker', 'Glassjaw Lurker', 0), ('eye_adept', 'Veil Adept', 0),
+    ('eye_lenswarden', 'The Lenswarden', 1), ('eye_undertide', 'The Undertide Sibyl', 1),
+    ('eye_unblinking', 'The Unblinking Eye', 1)])
+_dungeon(30, 'The Elder Hollow', 70, '#2c3a2a', '#18241a', '#c8f08a', [
+    ('elder_thornling', 'Thornling', 0), ('elder_moth', 'Lantern Moth', 0), ('elder_barkguard', 'Barkguard', 0),
+    ('elder_gatekeeper', 'The Knotted Gatekeeper', 1), ('elder_matron', 'The Pollen Matron', 1),
+    ('elder_heart', 'Heart of the Elder', 1)])
+_dungeon(31, 'The Thousandfold Pavilion', 75, '#3a2c3c', '#241a26', '#ffd0e8', [
+    ('pavilion_foldling', 'Paper Foldling', 0), ('pavilion_inkmoth', 'Inkwing Moth', 0), ('pavilion_silkguard', 'Silkguard', 0),
+    ('pavilion_mirror', 'The Mirror Dancer', 1), ('pavilion_weaver', 'The Thousandfold Weaver', 1),
+    ('pavilion_sovereign', 'Sovereign of the Last Fold', 1)])
+_dungeon(32, 'Temple of the Rain Crown', 80, '#1c3a44', '#102228', '#a8f0ff', [
+    ('rain_crown_droplet', 'Crowned Droplet', 0), ('rain_crown_oracle', 'Jade Rain Oracle', 0),
+    ('rain_crown_guard', 'Monsoon Guard', 0), ('rain_crown_gatekeeper', 'Keeper of the Floodgate', 1),
+    ('rain_crown_sibyl', 'Sibyl of the Rain', 1), ('rain_crown_sovereign', 'The Rain Crown', 1)])
+_dungeon(33, 'The Seed Vault', 80, '#3a3220', '#241e12', '#ffe08a', [
+    ('seed_mote', 'Awakened Seedling', 0), ('seed_amberwing', 'Amberwing Moth', 0), ('seed_rootguard', 'Heartroot Guard', 0),
+    ('seed_warden', 'Warden of Rings', 1), ('seed_germinator', 'The Germinator', 1),
+    ('seed_worldseed', 'Heart of the Worldseed', 1)])
+_dungeon(34, 'The Sunken Astrolabe', 85, '#1c2c4a', '#0f1a2e', '#ffe9a0', [
+    ('astro_gearling', 'Brass Gearling', 0), ('astro_starling', 'Fallen Starling', 0), ('astro_sentinel', 'Orrery Sentinel', 0),
+    ('astro_warden', 'Meridian Warden', 1), ('astro_navigator', 'The Lost Navigator', 1),
+    ('astro_axis', 'Axis of the Buried Sky', 1)])
+_dungeon(35, 'The Thunderheart Gate', 95, '#2a2c4a', '#171830', '#fff09a', [
+    ('thunder_spark', 'Forked Spark', 0), ('thunder_ray', 'Stormglass Ray', 0), ('thunder_guard', 'Slatebound Guard', 0),
+    ('thunder_conductor', 'Storm Conductor', 1), ('thunder_bastion', 'The Thunder Bastion', 1),
+    ('thunder_heart', 'Heart of the Stormgate', 1)])
+_dungeon(36, 'The Blooming Labyrinth', 97, '#3a2a3a', '#241624', '#ffb8e0', [
+    ('bloom_spore', 'Glasspetal Spore', 0), ('bloom_moth', 'Prismwing Moth', 0), ('bloom_guard', 'Vineglass Guardian', 0),
+    ('bloom_thornkeeper', 'Thornkeeper', 1), ('bloom_mirror', 'Petal Mirror', 1),
+    ('bloom_heart', 'Heart of the Labyrinth', 1)])
+_dungeon(37, 'The Solar Crucible', 98, '#4a2c1c', '#2e180e', '#ffc860', [
+    ('solar_emberling', 'Cinderling', 0), ('solar_sunmoth', 'Sunmoth', 0), ('solar_crucible_guard', 'Crucible Guard', 0),
+    ('solar_ashwarden', 'Ashwarden', 1), ('solar_heliomancer', 'The Heliomancer', 1),
+    ('solar_heart', 'Heart of the Crucible', 1)])
+_dungeon(38, 'The Amber Archive', 99, '#443220', '#2a1e10', '#ffd478', [
+    ('amber_page', 'Living Page', 0), ('amber_moth', 'Script Moth', 0), ('amber_sentinel', 'Archive Sentinel', 0),
+    ('amber_curator', 'The Curator', 1), ('amber_chronicle', 'The Living Chronicle', 1),
+    ('amber_memory', 'The Last Memory', 1)])
+_dungeon(39, 'The Silent Solstice', 99, '#26344a', '#141e2e', '#d0eaff', [
+    ('solstice_flurry', 'Whispering Flurry', 0), ('solstice_owl', 'Night Owl', 0), ('solstice_guard', 'Rime Guard', 0),
+    ('solstice_watcher', 'The Frost Watcher', 1), ('solstice_harbinger', 'Harbinger of Night', 1),
+    ('solstice_heart', 'Heart of the Longest Night', 1)])
+
+
 CARD_W, CARD_H, GAP = 408, 506, 18
 
 
@@ -63,7 +123,7 @@ def frame(atlas, row, col, scale):
 
 def sheet(zone):
     tag, title, sub, card_bg, band_bg, accent, cast = ZONES[zone]
-    cols = min(len(cast), 4) if len(cast) in (4, 8) else min(len(cast), 5) if len(cast) <= 5 else 4
+    cols = 3 if len(cast) == 6 else min(len(cast), 4) if len(cast) in (4, 8) else min(len(cast), 5) if len(cast) <= 5 else 4
     rows = (len(cast) + cols - 1) // cols
     width = cols * CARD_W + (cols + 1) * GAP
     head = 110

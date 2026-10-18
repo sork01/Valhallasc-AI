@@ -2711,7 +2711,7 @@
     if (stubOn()) { tanglecrownSrc=stubEnemies(kinds,{orchidmantis:'#ae8',canopyglider:'#7cb',poolcaiman:'#7a9',drumgorilla:'#a87',jadeanaconda:'#4b9',crownjaguar:'#da7',tangle_warden:'#5a8',tangle_scholar:'#8aa',tangle_travel:'#8ca'}); return; }
     fetch('assets/tanglecrown.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/tanglecrown_${k}.png`;
-    }))).then(imgs=>{tanglecrownSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{tanglecrownSrc=null;});
+    }))).then(imgs=>{tanglecrownSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{tanglecrownSrc=null;});
   }
   function loadWorldheartSprites() {
     if (worldheartSrc) return;
@@ -2727,7 +2727,7 @@
     if (stubOn()) { lapisSrc=stubEnemies(kinds,{sandhopper:'#db9',dunefennec:'#eaa',glassscorpion:'#7bc',sunvulture:'#ca9',dunecolossus:'#da9',mirageroc:'#8bd',lapis_keeper:'#8bd',lapis_cartographer:'#bab',lapis_warden:'#da9',lapis_seer:'#9bd',lapis_travel:'#8cb'}); return; }
     fetch('assets/lapis.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/lapis_${k}.png`;
-    }))).then(imgs=>{lapisSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{lapisSrc=null;});
+    }))).then(imgs=>{lapisSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{lapisSrc=null;});
   }
   function loadFrostwakeSprites() {
     if (frostwakeSrc) return;
@@ -2735,7 +2735,7 @@
     if (stubOn()) { frostwakeSrc=stubEnemies(kinds,{snowhare:'#eef',iceotter:'#9ce',frostheron:'#def',glaciercrab:'#7bd',bellmammoth:'#cdf',auroramanta:'#8dc',crevasseleviathan:'#7ae'}); return; }
     fetch('assets/frostwake.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/frostwake_${k}.png`;
-    }))).then(imgs=>{frostwakeSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{frostwakeSrc=null;});
+    }))).then(imgs=>{frostwakeSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{frostwakeSrc=null;});
   }
   function loadCairnSprites() {
     if (cairnSrc) return;
@@ -2743,7 +2743,7 @@
     if (stubOn()) { cairnSrc=stubEnemies(kinds,{screeferret:'#cba',stoneibex:'#ba9',slateraven:'#789',ridgeadder:'#9a8',cairnbehemoth:'#b9a',whitebarktitan:'#edc',stormcondor:'#8bb'}); return; }
     fetch('assets/cairn.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
       const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/cairn_${k}.png`;
-    }))).then(imgs=>{cairnSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{cairnSrc=null;});
+    }))).then(imgs=>{cairnSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{cairnSrc=null;});
   }
   // The treasure chest (CHEST-ART): closed (6 frames, a glint), opening (6) and opened (2) in one 64x64 atlas. Without it
   // (it failed to load) drawChest keeps its vector chest. It is one small file, so the tests' stub sprites do not replace it.
@@ -2772,8 +2772,8 @@
     const kinds=[...YEAR_KINDS,...['sp','su','au','wi'].flatMap(k=>['year_'+k+'_keeper','year_'+k+'_travel'])];
     if(stubOn()){yearSrc=stubEnemies(kinds,{});return;}
     fetch('assets/yearwheel.txt').then(r=>r.ok?r.json():Promise.reject()).then(meta=>Promise.all(meta.kinds.map(k=>new Promise((res,rej)=>{
-      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/yearwheel_${k}.png?v=seasonal3`;
-    }))).then(imgs=>{yearSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};})).catch(()=>{yearSrc=null;});
+      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/yearwheel_${k}.png?v=cel1`;
+    }))).then(imgs=>{yearSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))}; for (const k of meta.kinds) if (SLIME[k] && meta.tops?.[k]) SLIME[k].top = meta.tops[k];})).catch(()=>{yearSrc=null;});
   }
   function loadMoonwellSprites() {
     if (moonwellSrc) return;

@@ -103,7 +103,8 @@ def mku(**groups):
         fixed = []
         for c in vals:
             while c.lower() in seen:
-                c = '#%02x%02x%02x' % (int(c[1:3], 16), int(c[3:5], 16), (int(c[5:7], 16) + 1) % 256)
+                blue = int(c[5:7], 16)
+                c = '#%02x%02x%02x' % (int(c[1:3], 16), int(c[3:5], 16), blue - 1 if blue >= 128 else blue + 1)
             seen.add(c.lower())
             fixed.append(c)
         out[name] = fixed[0] if isinstance(value, str) else tuple(fixed)

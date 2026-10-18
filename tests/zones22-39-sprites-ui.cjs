@@ -12,6 +12,17 @@ const all = [
   { zone: 26, src: 'frostwakeSprites', tag: 'frostwake', kinds: ['auroramanta','bellmammoth','crevasseleviathan','frostheron','glaciercrab','iceotter','snowhare'] },
   { zone: 27, src: 'cairnSprites', tag: 'cairn', kinds: ['cairnbehemoth','ridgeadder','screeferret','slateraven','stoneibex','stormcondor','whitebarktitan'] },
   { zone: 28, src: 'yearSprites', tag: 'yearwheel', kinds: ['acornmimic','ambermantis','bloomtortoise','brooknewt','firephoenix','glasslion','harvestreaper','lanternowl','longnightwyrm','petalchimera','rainseraph','rimesaber','snowgiant','snowstoat','sundarter','sunwheel'] },
+  { zone: 29, src: 'cathedralSprites', tag: 'cathedral', kinds: ['eye_drifter','eye_lurker','eye_adept','eye_lenswarden','eye_undertide','eye_unblinking'] },
+  { zone: 30, src: 'cathedralSprites', tag: 'cathedral', kinds: ['elder_thornling','elder_moth','elder_barkguard','elder_gatekeeper','elder_matron','elder_heart'] },
+  { zone: 31, src: 'cathedralSprites', tag: 'cathedral', kinds: ['pavilion_foldling','pavilion_inkmoth','pavilion_silkguard','pavilion_mirror','pavilion_weaver','pavilion_sovereign'] },
+  { zone: 32, src: 'cathedralSprites', tag: 'cathedral', kinds: ['rain_crown_droplet','rain_crown_oracle','rain_crown_guard','rain_crown_gatekeeper','rain_crown_sibyl','rain_crown_sovereign'] },
+  { zone: 33, src: 'cathedralSprites', tag: 'cathedral', kinds: ['seed_mote','seed_amberwing','seed_rootguard','seed_warden','seed_germinator','seed_worldseed'] },
+  { zone: 34, src: 'cathedralSprites', tag: 'cathedral', kinds: ['astro_gearling','astro_starling','astro_sentinel','astro_warden','astro_navigator','astro_axis'] },
+  { zone: 35, src: 'cathedralSprites', tag: 'cathedral', kinds: ['thunder_spark','thunder_ray','thunder_guard','thunder_conductor','thunder_bastion','thunder_heart'] },
+  { zone: 36, src: 'cathedralSprites', tag: 'cathedral', kinds: ['bloom_spore','bloom_moth','bloom_guard','bloom_thornkeeper','bloom_mirror','bloom_heart'] },
+  { zone: 37, src: 'cathedralSprites', tag: 'cathedral', kinds: ['solar_emberling','solar_sunmoth','solar_crucible_guard','solar_ashwarden','solar_heliomancer','solar_heart'] },
+  { zone: 38, src: 'cathedralSprites', tag: 'cathedral', kinds: ['amber_page','amber_moth','amber_sentinel','amber_curator','amber_chronicle','amber_memory'] },
+  { zone: 39, src: 'cathedralSprites', tag: 'cathedral', kinds: ['solstice_flurry','solstice_owl','solstice_guard','solstice_watcher','solstice_harbinger','solstice_heart'] },
 ];
 // ZONES=22,25 limits the run to those zones (the new thing only).
 const only = (process.env.ZONES || '').split(',').filter(Boolean).map(Number);

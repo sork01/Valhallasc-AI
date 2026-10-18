@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image,ImageDraw
 import make_moonspore_sprites as m
+import yearwheel_cel_redraw as cel
 from make_crag_sprites import Palette,ellipsoid,polygon,gradient
 ROOT=Path(__file__).resolve().parents[1];ASSETS=ROOT/'client/assets'
 KINDS=['brooknewt','sundarter','acornmimic','snowstoat','bloomtortoise','petalchimera','rainseraph','glasslion','sunwheel','firephoenix','lanternowl','harvestreaper','ambermantis','rimesaber','snowgiant','longnightwyrm',
@@ -210,7 +211,12 @@ DRAWERS={k:v for k,v in locals().copy().items() if k in KINDS and callable(v)}
 for season in ['sp','su','au','wi']:
  DRAWERS['year_'+season+'_keeper']=lambda f,x,y,s,h,key=season:person(f,x,y,s,h,key,False)
  DRAWERS['year_'+season+'_travel']=lambda f,x,y,s,h,key=season:person(f,x,y,s,h,key,True)
+# The sixteen creatures are the cel-shaded redraw in yearwheel_cel_redraw.py (2026-10-18). The eight year_* NPCs keep the old
+# drawers above, so `m._old_draw` (the pre-redraw Frame pipeline) still serves them.
+PALETTES.update(cel.PALETTES)
 m.KINDS=KINDS;m.PALETTES=PALETTES;m.DRAWERS=DRAWERS;m.ROOT=ROOT;m.ASSETS=ASSETS
+from make_crag_sprites import rgba
+m.draw=lambda kind,clip,n:rgba(cel.draw(kind,clip,n),PALETTES[kind].hex) if kind in cel.KINDS else m._old_draw(kind,clip,n)
 # Keep the contact feet at the atlas anchor through walk and attack frames.
 _base_pose=m.pose
 def grounded_pose(clip,n):
@@ -229,12 +235,17 @@ def preview():
   sheet.paste(pose,(10+col*205,28+row*220),pose)
   d.text((10+col*205,8+row*220),kind,fill='#f5e8cd')
  out=ROOT/'test-results/yearwheel-cast.png';out.parent.mkdir(exist_ok=True);sheet.save(out);print(out)
-def build():
+def build(replace=False):
  path=ASSETS/'yearwheel.txt'
  import time
- api=m._pf();sprites={}
- if path.exists():sprites=json.loads(path.read_text())['sprites']
- for kind in KINDS:
+ api=m._pf();sprites={};kinds=KINDS
+ if path.exists():
+  sprites=json.loads(path.read_text())['sprites']
+  if replace:
+   kinds=list(cel.KINDS)
+   for kind in kinds:
+    if kind in sprites:assert api.api('delete',{'sprite_id':sprites.pop(kind)}).get('ok')
+ for kind in kinds:
   if kind in sprites:continue
   data=m.grids(kind)
   np.savez_compressed(ROOT/'scripts'/f'yearwheel_{kind}_raw.npz',**{clip:np.stack(rows) for clip,rows in data.items()})
@@ -278,8 +289,8 @@ def repair(kinds=None):
 if __name__=='__main__':
  cmd=sys.argv[1] if len(sys.argv)>1 else 'preview'
  if cmd=='preview':preview()
- elif cmd=='build':build()
+ elif cmd=='build':build('--replace' in sys.argv[2:])
  elif cmd=='export':export()
  elif cmd=='verify':export(True)
  elif cmd=='repair':repair(sys.argv[2:] or None)
- else:raise SystemExit('preview | build | export | verify | repair [creature kinds...]')
+ else:raise SystemExit('preview | build [--replace] | export | verify | repair [creature kinds...]')
