@@ -148,12 +148,6 @@
     "starseraph": "fefc71ed55fcb00a",
     "tidejudicator": "4d95fb5d35541056",
     "hierophant": "e84af5fba462af60",
-    "choirsinger": "7845af0140d8dc0a",
-    "reliquarypearl": "91349de47fa05093",
-    "seed_sprout": "491ef397204aabfc",
-    "seed_treant": "d62f4d6d1f42fc05",
-    "solar_cinder": "72ffda0af746a647",
-    "amber_cocoon": "bd1dc0877010b627",
     "eye_drifter": "96752b085e453e0b",
     "eye_lurker": "b26920ddd3956cf3",
     "eye_adept": "18a4a912b620f968",
@@ -219,7 +213,13 @@
     "solstice_guard": "b5f85657b11da09e",
     "solstice_watcher": "a8a85641f159d912",
     "solstice_harbinger": "92d77572e732046a",
-    "solstice_heart": "2036902ed7471f75"
+    "solstice_heart": "2036902ed7471f75",
+    "choirsinger": "c84037fa098e7762",
+    "reliquarypearl": "4568b6329ef8c316",
+    "seed_sprout": "39768c572c917404",
+    "seed_treant": "215216cb71475ec0",
+    "solar_cinder": "270d38184ebc19fa",
+    "amber_cocoon": "1de97986cdfe4396"
   },
   "tops": {
     "tidetemplar": 84,
@@ -305,11 +305,11 @@
     "solstice_watcher": 68,
     "solstice_harbinger": 55,
     "solstice_heart": 66,
-    "choirsinger": 75,
-    "reliquarypearl": 60,
-    "seed_sprout": 86,
-    "seed_treant": 84,
-    "solar_cinder": 87,
-    "amber_cocoon": 77
+    "choirsinger": 47,
+    "reliquarypearl": 69,
+    "seed_sprout": 59,
+    "seed_treant": 57,
+    "solar_cinder": 59,
+    "amber_cocoon": 75
   }
 }

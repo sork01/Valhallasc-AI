@@ -109,6 +109,7 @@ def draw(enemy, clip, n):
 # The six enemies are the cel-shaded redraw in seed_vault_cel_redraw.py (2026-10-18); the old drawer stays as `_old_draw`.
 import dungeon_cel  # noqa: E402
 dungeon_cel.install(globals(), 'seed_vault_cel_redraw')
+dungeon_cel.install(globals(), 'boss_helper_cel_redraw')   # the helpers of the boss mechanics
 
 
 def render(kind):

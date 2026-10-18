@@ -516,7 +516,6 @@
   },
   {
     "add": true,
-    "artFrom": "tidecantor",
     "kind": "choirsinger",
     "name": "Bound Singer",
     "level": 40,
@@ -552,7 +551,6 @@
   },
   {
     "add": true,
-    "artFrom": "pearlwidow",
     "kind": "reliquarypearl",
     "name": "Reliquary Pearl",
     "level": 45,

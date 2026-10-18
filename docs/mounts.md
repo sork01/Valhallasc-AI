@@ -45,3 +45,13 @@ Mounts are not items and cannot be traded, given or sold; ownership is a flag on
 - `MOUNT-SERVER`: add `mounts` and `mount`, keep `mount_owned` for the migration, make the speed multiplier a per-mount constant that is 2.0 for all five, send `mounts` and `mount` in the snapshot, refuse unknown IDs, and add the `mount_licence` use path.
 - `MOUNT-SOURCES`: the Raptor quest, the Dune-wrangler shop offer (`mount` field now names the mount), the Windseer hatching offer, the two licence items and drop rolls.
 - `MOUNT-CHECK`: purchase gates, bound licences, duplicate-use refusal, save/reload with a legacy horse save, per-mount sprites and one speed.
+
+## Sprites (2026-10-18)
+
+All five mounts share one pipeline, `scripts/make_mount_sprites.py` (`preview | sheet | build [--replace] | export [--local]`): the models in `scripts/mount_models.py` are drawn by the 3D toon renderer in `scripts/mount_toon.py` in the class sprites' camera and depth encoding, eight facings by two clips (`idle` 4 frames, `run` 8, which is the gait of a mounted traveller), 160x160 with anchor (80,119). PixelFlow holds one sprite per mount, clip and facing (`mount_<id>_<clip>_<facing>`, 16 per mount; `build --replace` discards editor edits, `export` keeps them); `client/assets/mount_<id>.png` + `_depth.png` and `mounts_sprites.txt` are the export.
+
+- **One sheet for every class and both bodies.** `client/mountart.js` lays the rider's `idle` frame (class sprite, depth kept by `MageSprite.frame`) into the mount's frame pixel by pixel on depth. Each mount lists `raise` (world units the rider is lifted onto the saddle), `bob` per frame (the saddle's bounce), `cut` (the rider is hidden below that world height: the legs vanish into the barrel) and `shadow`. A pixel's world height is `cos30 * (AY - y) / PX - depth / 2`.
+- **Size and seat per mount:** the models are drawn at the class's scale and multiplied (`scale`: horse 1.3, raptor 1.12, lizard 1.25, sabertooth 1.25, gryphon 1.25) so the rider fits. Gaits: quadrupeds trot on diagonal pairs, the raptor runs on two legs with its tail as a balance, the gryphon beats its wings.
+- **Rebirth tints** recolour the coat ramp (`coat` in the atlas metadata) by tone. The canvas horse of `field.js` is only the fallback while the art loads and in stub-sprite test mode.
+- **The horse was redesigned** with the others: a stout chestnut with a blaze, a thick mane and tail, a bridle and a gold-trimmed saddle on a red blanket.
+- Checks: `node tests/mount-art-ui.cjs` (needs `REAL_SPRITES=1`), `node tests/mount-ui.cjs`, `cargo test mount`.

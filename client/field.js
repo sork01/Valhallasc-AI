@@ -1105,7 +1105,7 @@
     window.Weather?.sync(packet.weather, own.x, own.y, !!own.inside);
     if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;pendingChest=null;hero.target=null;hero.goal=null;}
     window.Attributes?.update(own);
-    window.Mounts?.update(own);
+    window.Mounts?.update(own); window.MountArt?.preload(own.mount);
     window.Rebirth?.update(own);
     window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || [], own.gearInstances || [], own.setCounts || {});
     window.Quests?.setBells(own.bells || []);
@@ -1381,9 +1381,12 @@
       floater(ev.x, ev.y, WORLD_SET_BONUSES.signatures[ev.setSignature]?.name || 'Set bonus', col, true);
     }
   }
-  // Canvas-built riding horse: shared by local and remote actors, so no extra atlas is needed. Until the per-mount
-  // sprites exist (MOUNT-GRYPHON and the others), every mount is this horse body in the selected mount's coat colour.
+  // Canvas-built stand-in mount, only for an actor whose mount art has not loaded (or in test mode): the horse body in the
+  // selected mount's coat colour.
   const MOUNT_COATS = { horse: '#70422b', raptor: '#4f7a3a', lizard: '#8a9a3c', sabertooth: '#b98a45', gryphon: '#cdb98a' };
+  // A modular sprite seats its own rider in the mount's atlas art (client/mountart.js, MageSprite.draw); the canvas horse
+  // below is the fallback while that art loads and in test mode.
+  const seatedInArt = (actor, sprite) => !!(actor.mounted && !actor.dead && sprite?.frame && window.MountArt?.ready(actor.mount));
   function drawMount(g, actor) {
     if (!actor.mounted || actor.dead) return;
     const stride = actor.moving ? Math.sin(actor.walk * 2) * 7 : 0;
@@ -3636,7 +3639,7 @@
         const remote = it.remote; g.save(); g.translate(it.sx, it.sy);
         if (!remote.sparkTravel && !remote.dead) window.Rebirth?.drawAura(g, remote.reborn?.tier, remote.mounted ? 1.25 : 1);
         if (remote.sparkTravel) Spark.draw(g,remote,t);
-        else if (remote.sprite) { drawMount(g,remote); if(remote.mounted)g.translate(0,-23); remote.sprite.draw(g, remote, t); if(remote.mounted)g.translate(0,23); }
+        else if (remote.sprite) { const seated = seatedInArt(remote, remote.sprite); if(!seated)drawMount(g,remote); if(remote.mounted&&!seated)g.translate(0,-23); remote.sprite.draw(g, remote, t); if(remote.mounted&&!seated)g.translate(0,23); }
         else { g.fillStyle = '#cfb5fa'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
         drawMageWardShell(g, remote, t); drawPriestBuffShell(g, remote, t); drawHunterBuffShell(g, remote, t);
         g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag ? '#ff9b9b' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : window.Rebirth?.color(remote.reborn?.tier || 0) || '#fff4ca';
@@ -3646,7 +3649,7 @@
         if (hero.pvpTargetId === remote.id) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, 6.283); g.stroke(); }
         g.fillStyle = '#16263dcc'; g.fillRect(-25, -116, 50, 5); g.fillStyle = remote.escort ? '#ffcf5a' : '#8ee7a5'; g.fillRect(-25, -116, 50 * remote.hp / remote.maxHp, 5);
         g.restore();
-      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.gm && hero.hidden) g.globalAlpha = .35; if (hero.sparkTravel) Spark.draw(g,hero,t); else { if (!hero.dead) window.Rebirth?.drawAura(g, hero.reborn?.tier, hero.mounted ? 1.25 : 1); drawMount(g,hero); if(hero.mounted)g.translate(0,-23); if (isModular()) {
+      } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.gm && hero.hidden) g.globalAlpha = .35; if (hero.sparkTravel) Spark.draw(g,hero,t); else { if (!hero.dead) window.Rebirth?.drawAura(g, hero.reborn?.tier, hero.mounted ? 1.25 : 1); const seated = isModular() && seatedInArt(hero, mageSpr); if(!seated)drawMount(g,hero); if(hero.mounted&&!seated)g.translate(0,-23); if (isModular()) {
         if (mageSpr) mageSpr.draw(g, hero, t);
         else { g.fillStyle = '#8acfff'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
       } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } drawMageWardShell(g, hero, t); drawPriestBuffShell(g, hero, t); drawHunterBuffShell(g, hero, t); if (hero.gm && hero.hidden) { g.globalAlpha = .8; g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 1, 26, 11, 0, 0, Math.PI * 2); g.stroke(); } g.restore(); }

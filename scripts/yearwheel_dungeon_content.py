@@ -11,7 +11,7 @@ CAST = {
         ('amber_chronicle', 'The Living Chronicle', 'chronicle', '#eac782', [5100000, 33800, 2.8, 2.4], [.8, 2, 0, 15], [18, 11, '#ffedbc', 1.25, 4, .29], 0, 0, True),
         ('amber_memory', 'The Last Memory', 'memory', '#f1cc75', [8100000, 45000, 2.1, 3.1], [1.2, 2.3, 10, 18], [19, 12, '#fff0bf', 1.5, 5, .33], 6.0, 6.0, True),
         # The cocoon of Amber Stasis (docs/boss-mechanics.md): drops nothing, borrows the Archive Sentinel's art for now.
-        ('amber_cocoon', 'Amber Cocoon', 'sentinel', '#e7b45f', [162000, 0, 1, 1.6], [.9, 1.8, 0, 4], None, 0, 0, False, 'amber_sentinel'),
+        ('amber_cocoon', 'Amber Cocoon', 'sentinel', '#e7b45f', [162000, 0, 1, 1.6], [.9, 1.8, 0, 4], None, 0, 0, False, True),
     ],
     'silent_solstice': [
         ('solstice_flurry', 'Whispering Flurry', 'flurry', '#aed2dd', [1110000, 13900, 3.4, 1.3], [.5, 1.3, 10, 13], None, 0, 0, False),
@@ -30,7 +30,7 @@ def enemies(theme):
                            profile=profile, ranged=ranged, slam=slam, melee=melee,
                            boss=boss, level=99, gold=23000 if boss else 5500,
                            material=kind+'_relic', lootSource=theme if boss else None,
-                           **(dict(add=True, artFrom=borrow[0]) if borrow else {})))
+                           **(dict(add=True) if borrow else {})))
     return result
 
 def bosses(theme):

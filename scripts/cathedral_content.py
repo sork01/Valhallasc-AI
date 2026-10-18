@@ -19,8 +19,8 @@ WINGS = [
 
 # hp, damage, speed, visual scale; windup/cooldown/charge/awareness; ranged missile and slam use existing combat rules.
 def enemy(kind, name, level, hp, damage, speed, scale, profile, art, color, boss=False,
-          ranged=None, slam=0, melee=0, variant=0, add=False, art_from=None):
-    extra = dict(add=True, artFrom=art_from) if add else {}
+          ranged=None, slam=0, melee=0, variant=0, add=False):
+    extra = dict(add=True) if add else {}
     return dict(**extra, kind=kind, name=name, level=level, stats=[hp,round(damage*.65) if boss else damage,speed,scale], profile=profile,
                 art=art, color=color, boss=boss, gold=(4000 + level*40 if boss else 850 + level*8),
                 material='cathedral_'+kind, ranged=ranged, slam=slam, melee=melee, variant=variant,
@@ -44,8 +44,8 @@ ENEMIES = [
     enemy('starseraph','Astrael, the Fallen Tide Seraph',50,390000,3000,2.8,2,[.9,2.3,0,15],'seraph','#d0c9ef',True,ranged=[14,12,'#d9c4ff',1,5,.3]),
     enemy('tidejudicator','The Blind Tide Judicator',50,420000,4500,2,2.3,[1.2,2.4,7,12],'judge','#c2bbaa',True,slam=4.5),
     enemy('hierophant','High Hierophant Vael, Heart of the Tide',50,480000,3500,2.6,2.2,[1,2,9,15],'hierophant','#b392ed',True,ranged=[14,11,'#be9dff',1.25,5,.32],melee=4.8,slam=4),
-    # Sleeping adds of the final-boss mechanics (docs/boss-mechanics.md). They drop nothing; `artFrom` borrows the art
-    # of another kind until they get their own PixelFlow sprites (scripts/boss_add_art_aliases.py).
-    enemy('choirsinger','Bound Singer',40,14000,600,2.4,1.2,[.75,2.3,0,12],'cantor','#aef0e6',ranged=[11,9,'#9ff2e4',.9,2,.12],add=True,art_from='tidecantor'),
-    enemy('reliquarypearl','Reliquary Pearl',45,16000,500,1,1.5,[.9,1.8,0,8],'bell','#f6d6e3',slam=2.2,add=True,art_from='pearlwidow'),
+    # Sleeping adds of the final-boss mechanics (docs/boss-mechanics.md). They drop nothing and have
+    # their own PixelFlow art (scripts/boss_helper_cel_redraw.py).
+    enemy('choirsinger','Bound Singer',40,14000,600,2.4,1.2,[.75,2.3,0,12],'cantor','#aef0e6',ranged=[11,9,'#9ff2e4',.9,2,.12],add=True),
+    enemy('reliquarypearl','Reliquary Pearl',45,16000,500,1,1.5,[.9,1.8,0,8],'bell','#f6d6e3',slam=2.2,add=True),
 ]

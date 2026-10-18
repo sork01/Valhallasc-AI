@@ -198,7 +198,6 @@
     "melee": 0,
     "boss": false,
     "add": true,
-    "artFrom": "solar_heart",
     "level": 98,
     "gold": 5000,
     "material": "solar_cinder_relic",

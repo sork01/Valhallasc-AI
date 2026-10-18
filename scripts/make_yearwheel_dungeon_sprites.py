@@ -124,6 +124,7 @@ import dungeon_cel  # noqa: E402
 dungeon_cel.install(globals(), 'amber_cel_redraw')
 
 dungeon_cel.install(globals(), 'solstice_cel_redraw')
+dungeon_cel.install(globals(), 'boss_helper_cel_redraw')   # the Amber Cocoon
 
 
 def render(kind):

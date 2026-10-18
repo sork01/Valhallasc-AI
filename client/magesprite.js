@@ -542,6 +542,7 @@
         }
       }
       g.putImageData(out, 0, 0);
+      canvas._px = out.data; canvas._z = nearest;     // the colours and depths, for MountArt to lay the rider into a mount
       if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value);
       this.cache.set(key, canvas); return canvas;
     }
@@ -559,7 +560,16 @@
       g.scale(scale, scale);
       const mark = !h.dead && dungeonMark(this.equipment);
       if (mark) dungeonAura(g, mark, t);
-      g.drawImage(this.frame(clip, dir, i), -ax, -ay); g.restore();
+      if (h.mounted && !h.dead && window.MountArt?.ready(h.mount)) {   // seated on the saddle: the rider's idle frame laid into the mount's frame
+        const art = window.MountArt, moving = !!h.moving, mclip = art.clipFor(h.mount, moving), M = art.meta(h.mount), MC = M.clips[mclip];
+        const mi = moving ? Math.floor(h.walk) % MC.n : Math.floor(t * MC.fps) % MC.n, ri = moving ? 0 : Math.floor(t * C.idle.fps) % C.idle.n;
+        const key = `mount/${h.mount}/${h.mountTint || 0}/${mclip}/${dir}/${mi}/${ri}`;
+        let seat = this.cache.get(key);
+        if (!seat) { seat = art.compose(this.frame('idle', dir, ri), h.mount, mclip, dir, mi, h.mountTint || 0); if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value); this.cache.set(key, seat); }
+        g.fillStyle = 'rgba(9, 11, 15, .28)'; g.beginPath(); g.ellipse(0, 1, M.shadow[0], M.shadow[1], 0, 0, 6.283); g.fill();
+        g.drawImage(seat, -ax, -ay - art.SHIFT);
+      } else g.drawImage(this.frame(clip, dir, i), -ax, -ay);
+      g.restore();
     }
     portrait() {
       const c = document.createElement('canvas'); c.width = c.height = 128;

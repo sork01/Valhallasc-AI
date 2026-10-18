@@ -201,7 +201,6 @@
     "gold": 5500,
     "material": "amber_cocoon_relic",
     "lootSource": null,
-    "add": true,
-    "artFrom": "amber_sentinel"
+    "add": true
   }
 ]

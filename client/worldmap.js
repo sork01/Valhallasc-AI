@@ -7,9 +7,10 @@
 (() => {
   const $ = id => document.getElementById(id);
   const NS = 'http://www.w3.org/2000/svg';
-  const STAGE = { w: 207, h: 66 };
-  // Square tiles on the 100x62 sheet, placed so the gates read as a journey: Greenmeadow -> Crags -> Glacier -> Gloamfen / Skaldholm -> the Wyrdwood -> Bifrost Reach, up the Stormrift -> Ran's Deep, down the Maelstrom.
-  const LAYOUT = [{x:2,y:43,s:14},{x:18,y:30,s:14},{x:34,y:10,s:18},{x:12,y:4,s:18},{x:40,y:32,s:20},{x:25,y:47,s:14},{x:62,y:37,s:20},{x:54,y:2,s:18},{x:75,y:1,s:18},{x:82,y:21,s:18},{x:82,y:43,s:10},{x:92,y:43,s:8},{x:101,y:40,s:8},{x:63,y:20,s:15},{x:2,y:25,s:14},{x:2,y:13,s:10},{x:52,y:21,s:10},{x:52,y:52,s:9},{x:62,y:57,s:5},{x:76.8,y:57.3,s:4.5},{x:82.5,y:53.5,s:6},{x:90,y:53,s:7},{x:100,y:50,s:10},{x:112,y:49,s:10},{x:123,y:50,s:8},{x:134,y:47,s:12},{x:147,y:35,s:11},{x:159,y:18,s:13},{x:176,y:1,s:28},{x:76.8,y:62,s:3.5},{x:83,y:61,s:4},{x:91,y:61,s:4},{x:102,y:61,s:4},{x:124,y:60,s:4},{x:136,y:60,s:4},{x:157,y:56,s:4},{x:179,y:32,s:6},{x:187,y:35,s:6},{x:195,y:43,s:6},{x:179,y:42,s:6}];
+  const STAGE = { w: 160, h: 99 };
+  // Square tiles on the 160x99 sheet (a circle in each square is the zone's ground). The gate graph is a tree, and this is that tree laid
+  // out as a world: tiles that share a gate stand one isthmus apart, and nothing else is closer than a label's width.
+  const LAYOUT = [{x:7.6,y:80.4,s:10.9},{x:10.7,y:66.3,s:10.9},{x:3.8,y:49.9,s:13.5},{x:2.0,y:32.2,s:13.5},{x:21.0,y:42.5,s:16.0},{x:31.9,y:62.4,s:6.4},{x:21.3,y:18.3,s:18.6},{x:48.9,y:3.9,s:16.0},{x:44.5,y:33.5,s:17.3},{x:46.9,y:65.8,s:18.6},{x:63.7,y:86.4,s:6.4},{x:42.4,y:58.2,s:6.4},{x:35.1,y:73.7,s:6.4},{x:67.7,y:46.6,s:13.5},{x:71.9,y:29.5,s:13.5},{x:72.7,y:11.9,s:13.5},{x:89.9,y:9.7,s:13.5},{x:97.9,y:25.3,s:17.6},{x:119.6,y:36.8,s:6.4},{x:103.9,y:47.6,s:13.5},{x:88.4,y:56.4,s:13.5},{x:74.5,y:67.8,s:14.1},{x:89.5,y:78.8,s:14.8},{x:106.2,y:70.0,s:13.5},{x:113.1,y:86.1,s:10.9},{x:124.0,y:65.6,s:16.0},{x:142.0,y:55.1,s:16.0},{x:134.6,y:34.6,s:16.7},{x:118.6,y:2.6,s:27},{x:122.1,y:51.3,s:6.4},{x:89.4,y:45.9,s:6.4},{x:72.8,y:85.7,s:6.4},{x:80.3,y:90.6,s:6.4},{x:128.1,y:90.6,s:6.4},{x:142.2,y:79.6,s:6.4},{x:151.6,y:28.4,s:6.4},{x:151.6,y:10.6,s:6.4},{x:151.4,y:19.5,s:6.4},{x:108.4,y:2.0,s:6.4},{x:149.7,y:2.0,s:6.4},null];
   const GROUND = { meadow: '#3f9b48', ember: '#2b1f22', frost: '#cfe3f0', fen: '#2f4a2c', city: '#5f9b4a', asterion: '#364a72', moonwell:'#153d58', stormglass:'#263b51', sunward:'#5baa49', ribbonwild:'#d98db2', tanglecrown:'#287a5b', worldtree:'#2f9369', lapiserg:'#d3a468', frostwake:'#c8e6f1', cairnspine:'#6b7378', yearwheel:'#a6cf9b', heartwood:'#806244', vault: '#07080e', eye_below: '#102b3d', elder_hollow: '#31492f', thousandfold: '#40264d', rain_crown: '#1c5251', seed_vault: '#415532', sunken_astrolabe: '#254e59', thunderheart_gate: '#273f60', blooming_labyrinth:'#36553f', solar_crucible:'#754530', amber_archive:'#735238', silent_solstice:'#3b5872', wyrd: '#6a5430', sky: '#1a1838', deep: '#0b3550', nacre: '#286776', astral: '#39776f', prismwaste: '#ad887e', orrery: '#37394e', moonspore: '#1c4244', cathedral_left: '#123b38', cathedral_right: '#442c3e', cathedral_main: '#161529' };
   const DIRT = { meadow: '#c9a26a', ember: '#6a5040', frost: '#9fb7cc', fen: '#8a6a40', city: '#b6a98c', asterion: '#9ec6d9', moonwell:'#a8d5cf', stormglass:'#9ebdc1', sunward:'#d8bd83', ribbonwild:'#ffe3a0', tanglecrown:'#b99a62', worldtree:'#bd9662', lapiserg:'#efd59e', frostwake:'#8abfd3', cairnspine:'#b7a07b', yearwheel:'#f0d6a7', heartwood:'#b18a5f', vault: '#3a3f55', eye_below: '#386c78', elder_hollow: '#819965', thousandfold: '#ae779d', rain_crown: '#6aa895', seed_vault: '#b6a676', sunken_astrolabe: '#c0ac79', thunderheart_gate: '#a9cde3', blooming_labyrinth:'#deb4cd', solar_crucible:'#e9bb79', amber_archive:'#eac286', silent_solstice:'#b8d5e8', wyrd: '#b89860', sky: '#f0c8f4', deep: '#c8c29a', nacre: '#addbd3', astral: '#d7bc84', prismwaste: '#ead7a8', orrery: '#ad907b', moonspore: '#a5c4a8', cathedral_left: '#50877c', cathedral_right: '#967086', cathedral_main: '#514568' };
   const PORTAL = { meadow: '#7ae8c8', ember: '#ff8a3a', frost: '#8fd8ff', fen: '#b8e060', city: '#ffd36a', asterion: '#d9e8ff', moonwell:'#f8e8ad', stormglass:'#aaf2f0', sunward:'#f8da90', ribbonwild:'#ff86b9', tanglecrown:'#a6e5ae', worldtree:'#c8f7a7', lapiserg:'#79d5d3', frostwake:'#9af0da', cairnspine:'#f2cb89', yearwheel:'#ffe7a4', heartwood:'#ffe0a1', vault: '#59d9ff', eye_below: '#a3eee5', elder_hollow: '#d7ecaa', thousandfold: '#ffdcb4', rain_crown: '#c2f5db', seed_vault: '#f3df9a', sunken_astrolabe: '#a3e9ed', thunderheart_gate: '#d1eaff', blooming_labyrinth:'#f7c3df', solar_crucible:'#ffe0a0', amber_archive:'#f6d99d', silent_solstice:'#e6f3ff', wyrd: '#e0963a', sky: '#9fc4ff', deep: '#4fe0e8', nacre: '#b0ffe6', astral: '#c4b6ff', prismwaste: '#ffe3ac', orrery: '#f4c981', moonspore: '#c4f4af', cathedral_left: '#64daca', cathedral_right: '#f29cb4', cathedral_main: '#d5b9ff' };
@@ -127,7 +128,7 @@
     return node;
   }
 
-  let zones = null, graph = [], tiles = [], roadRefs = [], fogSignature = '', view = 'world', current = 0, previousFocus = null, highlight = null, timer = 0, tickTimer = 0, tileY = .54;
+  let zones = null, graph = [], tiles = [], nameNodes = [], roadRefs = [], fogSignature = '', view = 'world', current = 0, previousFocus = null, highlight = null, timer = 0, tickTimer = 0, tileY = .54;
   const cache = new Map();
 
   function load() {
@@ -306,10 +307,10 @@
     const choice = words.at(-1);
     return choice.length <= 10 ? choice : choice.slice(0, 8) + '…';
   };
-  const edgePoint = (a, b) => {                                     // where the road from a's centre to b's centre leaves its illustrated region
+  const edgePoint = (a, b) => {                                     // where the road from a's centre to b's centre leaves a's round ground
     const ax = a.x + a.s / 2, ay = a.y + a.s * tileY / 2;
     const dx = b.x + b.s / 2 - ax, dy = b.y + b.s * tileY / 2 - ay;
-    const t = 1 / Math.max(Math.abs(dx) / (a.s / 2 + .6), Math.abs(dy) / (a.s * tileY / 2 + .6));
+    const t = (a.s / 2 + .2) / (Math.hypot(dx, dy) || 1);
     return [ax + dx * t, ay + dy * t];
   };
   function svgNode(tag, attrs) { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); return n; }
@@ -327,54 +328,130 @@
     const square = { x: 0, y: 0, s: 100 };
     return 'polygon(' + islandPoints(square, index, 0, 1).map(([x, y]) => `${x.toFixed(1)}% ${y.toFixed(1)}%`).join(',') + ')';
   }
+  // ---- the world sheet: continents, coasts, scenery and names ----
+  // The gate graph is a tree, so the sheet lays it out as one: a west continent (Greenmeadow to the Wyrdwood), the Stormrift sea with
+  // its three island zones (Bifrost Reach, Ran's Deep, Nacrehold) and a long east continent (Astralhollow to the Yearwheel). Zones that
+  // are joined by land touch through an isthmus; the four crossings of the Stormrift are sea lanes.
+  const SEA_LANES = new Set(['6-7', '7-8', '8-9', '9-13']);
+  const NAMES = { 'Greenmeadow': 'Greenmeadow', 'Emberfall Crags': 'Emberfall', 'Rimeveil Glacier': 'Rimeveil', 'Gloamfen': 'Gloamfen', 'Skaldholm': 'Skaldholm', 'The Undervault': 'Undervault', 'Wyrdwood': 'Wyrdwood',
+    'Bifrost Reach': 'Bifrost Reach', 'Rán\'s Deep': 'Rán\'s Deep', 'Nacrehold': 'Nacrehold', 'The Drowned Cathedral — Flooded Cloister': 'Cloister', 'The Drowned Cathedral — Coral Reliquary': 'Reliquary', 'The Drowned Cathedral — Grand Nave': 'Grand Nave',
+    'Astralhollow': 'Astralhollow', 'The Prismwaste': 'Prismwaste', 'The Obsidian Orrery': 'Orrery', 'The Moonspore Canopy': 'Moonspore', 'Asterion': 'Asterion', 'The Moonwell': 'Moonwell', 'The Stormglass Shore': 'Stormglass', 'Sunward Vale': 'Sunward Vale',
+    'The Ribbonwild': 'Ribbonwild', 'The Tanglecrown': 'Tanglecrown', 'Veyrroot Canopy': 'Veyrroot', 'Veyrroot Heartwood': 'Heartwood', 'The Lapis Erg': 'Lapis Erg', 'Frostwake Shelf': 'Frostwake', 'The Cairnspine': 'Cairnspine', 'The Yearwheel': 'Yearwheel',
+    'The Eye Below': 'Eye Below', 'The Elder Hollow': 'Elder Hollow', 'The Thousandfold Pavilion': 'Pavilion', 'Temple of the Rain Crown': 'Rain Crown', 'The Seed Vault': 'Seed Vault', 'The Sunken Astrolabe': 'Astrolabe', 'The Thunderheart Gate': 'Thunderheart',
+    'The Blooming Labyrinth': 'Blooming', 'The Solar Crucible': 'Crucible', 'The Amber Archive': 'Amber Archive', 'The Silent Solstice': 'Solstice' };
+  const labelName = z => NAMES[z.name] || shortName(z.name);
+  // Names of the regions, set in the sea or across a continent (stage units).
+  const REGIONS = [{ text: 'HEARTHLANDS', area: [1, 1, 44, 99], near: [16, 97] }, { text: 'THE STORMRIFT', area: [30, 1, 100, 99], near: [56, 26] }, { text: 'STARFALL REACHES', area: [70, 1, 159, 99], near: [112, 3] }];
+  const DECOR = { ember: 'peak', cairnspine: 'peak', frost: 'snow', frostwake: 'snow', wyrd: 'pine', fen: 'reed', meadow: 'tree', sunward: 'tree', tanglecrown: 'palm', worldtree: 'palm', heartwood: 'palm', moonspore: 'shroom',
+    lapiserg: 'dune', prismwaste: 'crystal', astral: 'crystal', ribbonwild: 'flag', yearwheel: 'tree', sky: 'cloud', deep: 'coral', nacre: 'coral', asterion: 'spire', orrery: 'spire', city: 'tree' };
+  // One small scenery picture at (x, y), `u` stage units across, drawn into `g`.
+  function sceneryIcon(g, kind, x, y, u, rnd) {
+    const add = (tag, attrs) => g.append(svgNode(tag, attrs));
+    const tri = (cx, base, w, h, fill) => add('path', { d: `M ${cx - w} ${base} L ${cx} ${base - h} L ${cx + w} ${base} Z`, fill });
+    switch (kind) {
+      case 'peak': case 'snow':
+        tri(x - u * .45, y + u * .2, u * .55, u * .85, kind === 'peak' ? '#6a5750' : '#8d9db0'); tri(x + u * .2, y + u * .35, u * .7, u * 1.1, kind === 'peak' ? '#8a7467' : '#b9c9d8');
+        add('path', { d: `M ${x + u * .2 - u * .22} ${y + u * .35 - u * .82} L ${x + u * .2} ${y + u * .35 - u * 1.1} L ${x + u * .2 + u * .22} ${y + u * .35 - u * .82} Z`, fill: kind === 'peak' ? '#ff9a4a' : '#ffffff' }); break;
+      case 'pine': tri(x, y + u * .5, u * .42, u * .9, '#1e4a30'); tri(x, y + u * .1, u * .34, u * .7, '#2d6b43'); break;
+      case 'tree': add('rect', { x: x - u * .07, y: y + u * .1, width: u * .14, height: u * .35, fill: '#5a3d26' }); add('circle', { cx: x, cy: y - u * .1, r: u * .42, fill: '#2f7a3c' }); add('circle', { cx: x - u * .12, cy: y - u * .2, r: u * .2, fill: '#4aa052' }); break;
+      case 'palm': add('path', { d: `M ${x} ${y + u * .5} Q ${x + u * .12} ${y} ${x} ${y - u * .4}`, stroke: '#6a4a2a', 'stroke-width': u * .12, fill: 'none' });
+        for (const a of [-2.5, -1.7, -.9, -.2]) add('path', { d: `M ${x} ${y - u * .4} q ${Math.cos(a) * u * .45} ${Math.sin(a) * u * .3 - u * .1} ${Math.cos(a) * u * .75} ${Math.sin(a) * u * .1 + u * .3}`, stroke: '#2f9a58', 'stroke-width': u * .13, fill: 'none', 'stroke-linecap': 'round' }); break;
+      case 'reed': for (const dx of [-.3, 0, .3]) add('path', { d: `M ${x + dx * u} ${y + u * .4} q ${dx * u * .3} ${-u * .5} ${dx * u * .1} ${-u * .8}`, stroke: '#7a9a5a', 'stroke-width': u * .08, fill: 'none' }); break;
+      case 'dune': add('path', { d: `M ${x - u * .7} ${y + u * .3} Q ${x - u * .2} ${y - u * .45} ${x + u * .25} ${y + u * .05} Q ${x + u * .5} ${y + u * .25} ${x + u * .75} ${y + u * .3} Z`, fill: '#e3bd80' }); break;
+      case 'crystal': add('path', { d: `M ${x - u * .2} ${y + u * .4} L ${x - u * .3} ${y - u * .1} L ${x} ${y - u * .7} L ${x + u * .3} ${y - u * .1} L ${x + u * .2} ${y + u * .4} Z`, fill: '#c9b4ff' }); add('path', { d: `M ${x} ${y - u * .7} L ${x + u * .3} ${y - u * .1} L ${x + u * .2} ${y + u * .4} L ${x} ${y + u * .3} Z`, fill: '#9a84e0' }); break;
+      case 'shroom': add('rect', { x: x - u * .08, y: y, width: u * .16, height: u * .4, fill: '#e8e4d0' }); add('path', { d: `M ${x - u * .42} ${y + u * .05} Q ${x} ${y - u * .7} ${x + u * .42} ${y + u * .05} Z`, fill: '#8fe8b8' }); break;
+      case 'flag': add('path', { d: `M ${x} ${y + u * .45} L ${x} ${y - u * .5}`, stroke: '#ffe9a6', 'stroke-width': u * .08 }); add('path', { d: `M ${x} ${y - u * .5} L ${x + u * .55} ${y - u * .32} L ${x} ${y - u * .12} Z`, fill: '#ef6998' }); break;
+      case 'cloud': add('path', { d: `M ${x - u * .5} ${y + u * .2} a ${u * .3} ${u * .3} 0 0 1 ${u * .15} ${-u * .45} a ${u * .4} ${u * .4} 0 0 1 ${u * .65} ${u * .1} a ${u * .25} ${u * .25} 0 0 1 ${u * .1} ${u * .35} Z`, fill: '#f0f4ff', 'fill-opacity': .9 }); break;
+      case 'coral': add('path', { d: `M ${x} ${y + u * .4} L ${x} ${y - u * .2} M ${x} ${y} L ${x - u * .3} ${y - u * .4} M ${x} ${y - u * .1} L ${x + u * .3} ${y - u * .5}`, stroke: '#e0708a', 'stroke-width': u * .13, 'stroke-linecap': 'round', fill: 'none' }); break;
+      case 'spire': add('path', { d: `M ${x - u * .18} ${y + u * .45} L ${x - u * .1} ${y - u * .5} L ${x} ${y - u * .8} L ${x + u * .1} ${y - u * .5} L ${x + u * .18} ${y + u * .45} Z`, fill: '#d9e8ff' }); break;
+    }
+  }
   function buildWorld() {
-    const stage = $('wm-world'); stage.replaceChildren(); tiles = Array(zones.length).fill(null); roadRefs = [];
+    const stage = $('wm-world'); stage.replaceChildren(); tiles = Array(zones.length).fill(null); roadRefs = []; nameNodes = [];
     tileY = stage.clientWidth / stage.clientHeight * STAGE.h / STAGE.w;
     const atlas = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, preserveAspectRatio: 'none', class: 'wm-atlas', 'aria-hidden': 'true' });
-    const definitions = svgNode('defs', {}), sea = svgNode('pattern', { id: 'wm-sea-lines', width: 8, height: 5, patternUnits: 'userSpaceOnUse' });
+    const defs = svgNode('defs', {});
+    const sea = svgNode('pattern', { id: 'wm-sea-lines', width: 8, height: 5, patternUnits: 'userSpaceOnUse' });
     sea.append(svgNode('path', { d: 'M .5 3 Q 2 1.5 3.5 3 T 6.5 3', stroke: '#b5dfdf', 'stroke-opacity': '.13', 'stroke-width': '.16', fill: 'none' }));
-    definitions.append(sea); atlas.append(definitions);
-    atlas.append(svgNode('rect', { x: 0, y: 0, width: STAGE.w, height: STAGE.h, fill: 'url(#wm-sea-lines)' }));
-    const landLinks = svgNode('g', { class: 'wm-land-links' });
-    const land = svgNode('g', { class: 'wm-land-shapes' });
-    atlas.append(landLinks, land);
-    const roads = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, preserveAspectRatio: 'none', class: 'wm-roads', 'aria-hidden': 'true' });
-    const seen = new Set();
+    const region = { filterUnits: 'userSpaceOnUse', x: 0, y: 0, width: STAGE.w, height: STAGE.h };
+    // Ragged, fractal coastlines: a turbulence field pushes the edge of the land about; the beach is the same shape grown a little.
+    const rough = (id, extra = []) => {
+      const f = svgNode('filter', { id, ...region, 'color-interpolation-filters': 'sRGB' });
+      f.append(svgNode('feTurbulence', { type: 'fractalNoise', baseFrequency: '.07 .09', numOctaves: 3, seed: 11, result: 'n' }),
+        svgNode('feDisplacementMap', { in: 'SourceGraphic', in2: 'n', scale: 3.4, xChannelSelector: 'R', yChannelSelector: 'G', result: 'd' }), ...extra);
+      return f;
+    };
+    defs.append(sea, rough('wm-rough'),
+      rough('wm-beach', [svgNode('feMorphology', { in: 'd', operator: 'dilate', radius: 1.1 })]),
+      rough('wm-shallow', [svgNode('feMorphology', { in: 'd', operator: 'dilate', radius: 1.8, result: 'm' }), svgNode('feGaussianBlur', { in: 'm', stdDeviation: 2.2 })]));
+    const soft = svgNode('filter', { id: 'wm-soft', ...region }); soft.append(svgNode('feGaussianBlur', { stdDeviation: 1.5 })); defs.append(soft);
+    // The silhouette of all land: a blob under every zone, a rock under every dungeon, and an isthmus along every land link.
+    const silhouette = svgNode('g', { id: 'wm-sil' }), landLinks = svgNode('g', { class: 'wm-land-links' });
+    const seen = new Set(), roadList = [];
+    zones.forEach((z, i) => {
+      if (!onWorldSheet(z)) return;
+      const c = [z.place.x + z.place.s / 2, z.place.y + z.place.s * tileY / 2];
+      silhouette.append(z.players ? svgNode('circle', { cx: c[0], cy: c[1], r: z.place.s / 2 + 1.2 }) : svgNode('path', { d: pointPath(islandPoints(z.place, i, z.place.s * .08)) }));
+    });
     zones.forEach((z, i) => z.portals.forEach(p => {
       const pair = [i, p.to].sort((a, b) => a - b).join('-'); if (!onWorldSheet(z) || seen.has(pair) || !onWorldSheet(zones[p.to])) return; seen.add(pair);
-      const a = z.place, b = zones[p.to].place, [x1, y1] = edgePoint(a, b), [x2, y2] = edgePoint(b, a);
-      const road = svgNode('g', { 'data-road': pair });
-      const back = zones[p.to].portals.find(q => q.to === i);
-      const terrain = svgNode('g', {});
-      const surface = !z.players && !zones[p.to].players;
-      if (surface) {
-        const dx = x2 - x1, dy = y2 - y1, bend = Math.min(3, Math.hypot(dx, dy) * .12);
-        const mx = (x1 + x2) / 2 - dy / Math.max(1, Math.hypot(dx, dy)) * bend;
-        const my = (y1 + y2) / 2 + dx / Math.max(1, Math.hypot(dx, dy)) * bend;
-        const path = `M ${x1} ${y1} Q ${mx.toFixed(2)} ${my.toFixed(2)} ${x2} ${y2}`;
-        terrain.append(svgNode('path', { d: path, class: 'wm-coast-link' }),
-          svgNode('path', { d: path, class: 'wm-earth-link' }));
-        landLinks.append(terrain);
+      const a = z.place, b = zones[p.to].place, sea = SEA_LANES.has(pair);
+      const link = svgNode('g', { 'data-link': pair });
+      if (!sea) {
+        const w = z.players || zones[p.to].players ? 2.2 : Math.min(a.s, b.s) * .5;
+        link.append(svgNode('path', { d: `M ${a.x + a.s / 2} ${a.y + a.s * tileY / 2} L ${b.x + b.s / 2} ${b.y + b.s * tileY / 2}`, fill: 'none', 'stroke-width': w, 'stroke-linecap': 'round' }));
+        landLinks.append(link);
       }
-      roadRefs.push({ node: road, terrain, pair, shown: () => known(i, p.x, p.y) || (back && known(p.to, back.x, back.y)) });
-      road.append(svgNode('title', {}), svgNode('line', { x1, y1, x2, y2, class: 'wm-road-under' }), svgNode('line', { x1, y1, x2, y2, class: 'wm-road' }),
-        svgNode('circle', { cx: x1, cy: y1, r: .9, class: 'wm-gate-dot' }), svgNode('circle', { cx: x2, cy: y2, r: .9, class: 'wm-gate-dot' }));
-      road.firstChild.textContent = `${p.name[0].toUpperCase()}${p.name.slice(1)} joins ${z.name} and ${zones[p.to].name}`;
-      roads.append(road);
+      roadList.push({ z, i, p, pair, sea });
     }));
+    silhouette.append(landLinks); defs.append(silhouette);
+    const mask = svgNode('mask', { id: 'wm-landmask', maskUnits: 'userSpaceOnUse', ...{ x: 0, y: 0, width: STAGE.w, height: STAGE.h } });
+    mask.append(svgNode('use', { href: '#wm-sil', fill: '#fff', stroke: '#fff', 'stroke-width': 0, filter: 'url(#wm-rough)' })); defs.append(mask);
+    atlas.append(defs, svgNode('rect', { x: 0, y: 0, width: STAGE.w, height: STAGE.h, fill: 'url(#wm-sea-lines)' }));
+    const layer = (fill, filter, cls) => svgNode('use', { href: '#wm-sil', fill, stroke: fill, 'stroke-width': 0, filter: `url(#${filter})`, class: cls });
+    atlas.append(layer('#7fd0cf', 'wm-shallow', 'wm-shallows'), layer('#ecdcaa', 'wm-beach', 'wm-beach'), layer('#78a85e', 'wm-rough', 'wm-land-base'));
+    // Each zone's biome colour is a soft blob over the land, so one terrain melts into the next.
+    const land = svgNode('g', { class: 'wm-land-shapes', mask: 'url(#wm-landmask)' }), biomes = svgNode('g', { filter: 'url(#wm-soft)' }), scenery = svgNode('g', { class: 'wm-scenery', mask: 'url(#wm-landmask)' });
+    land.append(biomes);
     zones.forEach((z, i) => {
       if (!onWorldSheet(z) || z.players) return;
-      const coast = svgNode('path', { d: pointPath(islandPoints(z.place, i, .65)), class: 'wm-coast' });
-      const interior = svgNode('path', { d: pointPath(islandPoints(z.place, i, .22)), class: 'wm-island', fill: GROUND[z.theme] || '#6f8e73', 'data-zone': i });
-      land.append(coast, interior);
+      biomes.append(svgNode('path', { d: pointPath(islandPoints(z.place, i, z.place.s * .15)), class: 'wm-island', fill: GROUND[z.theme] || '#6f8e73', 'data-zone': i }));
+      const kind = DECOR[z.theme]; if (!kind) return;
+      const g = svgNode('g', { class: 'wm-decor', 'data-zone': i }), c = [z.place.x + z.place.s / 2, z.place.y + z.place.s * tileY / 2], R = z.place.s / 2;
+      let seed = 31 + i * 17; const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+      const toward = z.portals.filter(p => onWorldSheet(zones[p.to])).map(p => { const b = zones[p.to].place; return Math.atan2(b.y + b.s * tileY / 2 - c[1], b.x + b.s / 2 - c[0]); });
+      const count = Math.round(R * .75 + 2), size = Math.max(1.5, Math.min(2.6, R * .2));
+      for (let k = 0, tries = 0; k < count && tries < 60; tries++) {
+        const ang = rnd() * 6.2832; if (toward.some(t => Math.abs(Math.atan2(Math.sin(ang - t), Math.cos(ang - t))) < .5)) continue;
+        const rad = R * (1.02 + rnd() * .2); sceneryIcon(g, kind, c[0] + Math.cos(ang) * rad, c[1] + Math.sin(ang) * rad * tileY, size * (.8 + rnd() * .5), rnd); k++;
+      }
+      scenery.append(g);
     });
-    const compass = svgNode('g', { class: 'wm-compass', transform: 'translate(123 17)' });
-    compass.append(svgNode('circle', { r: 5.4 }), svgNode('circle', { r: 3.9 }),
-      svgNode('path', { d: 'M 0 -6.7 L 1.3 -1.3 L 6.7 0 L 1.3 1.3 L 0 6.7 L -1.3 1.3 L -6.7 0 L -1.3 -1.3 Z' }),
-      svgNode('path', { d: 'M 0 -5.5 L -1.3 -1.3 L 0 0 Z M 5.5 0 L 1.3 -1.3 L 0 0 Z M 0 5.5 L 1.3 1.3 L 0 0 Z M -5.5 0 L -1.3 1.3 L 0 0 Z', class: 'wm-compass-shadow' }));
-    const north = svgNode('text', { x: 0, y: -8, 'text-anchor': 'middle' }); north.textContent = 'N'; compass.append(north);
+    atlas.append(land, scenery);
+    const labels = svgNode('g', { class: 'wm-regions' });
+    for (const r of REGIONS) { const t = svgNode('text', { x: -50, y: -50, 'text-anchor': 'middle', 'data-region': r.text }); t.textContent = r.text; labels.append(t); }
+    atlas.append(labels);
+    const compass = svgNode('g', { class: 'wm-compass', transform: 'translate(10 10)' });
+    compass.append(svgNode('circle', { r: 4.6 }), svgNode('circle', { r: 3.3 }),
+      svgNode('path', { d: 'M 0 -5.7 L 1.1 -1.1 L 5.7 0 L 1.1 1.1 L 0 5.7 L -1.1 1.1 L -5.7 0 L -1.1 -1.1 Z' }),
+      svgNode('path', { d: 'M 0 -4.7 L -1.1 -1.1 L 0 0 Z M 4.7 0 L 1.1 -1.1 L 0 0 Z M 0 4.7 L 1.1 1.1 L 0 0 Z M -4.7 0 L -1.1 1.1 L 0 0 Z', class: 'wm-compass-shadow' }));
+    const north = svgNode('text', { x: 0, y: -6.6, 'text-anchor': 'middle' }); north.textContent = 'N'; compass.append(north);
     atlas.append(compass);
-    stage.append(atlas, roads);
+    const roads = svgNode('svg', { viewBox: `0 0 ${STAGE.w} ${STAGE.h}`, preserveAspectRatio: 'none', class: 'wm-roads', 'aria-hidden': 'true' });
+    for (const { z, i, p, pair, sea } of roadList) {
+      const a = z.place, b = zones[p.to].place, [x1, y1] = edgePoint(a, b), [x2, y2] = edgePoint(b, a);
+      const road = svgNode('g', { 'data-road': pair, class: sea ? 'wm-sea-lane' : '' });
+      const back = zones[p.to].portals.find(q => q.to === i), terrain = svgNode('g', {});
+      const len = Math.hypot(x2 - x1, y2 - y1) || 1, bend = Math.min(2.6, len * .14) * (pair.length % 2 ? 1 : -1);
+      const d = `M ${x1.toFixed(2)} ${y1.toFixed(2)} Q ${((x1 + x2) / 2 - (y2 - y1) / len * bend).toFixed(2)} ${((y1 + y2) / 2 + (x2 - x1) / len * bend).toFixed(2)} ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+      roadRefs.push({ node: road, terrain, pair, shown: () => known(i, p.x, p.y) || (back && known(p.to, back.x, back.y)) });
+      road.append(svgNode('title', {}), svgNode('path', { d, class: 'wm-road-under', fill: 'none' }), svgNode('path', { d, class: 'wm-road', fill: 'none' }),
+        svgNode('circle', { cx: x1, cy: y1, r: .75, class: 'wm-gate-dot' }), svgNode('circle', { cx: x2, cy: y2, r: .75, class: 'wm-gate-dot' }));
+      road.firstChild.textContent = `${p.name[0].toUpperCase()}${p.name.slice(1)} joins ${z.name} and ${zones[p.to].name}`;
+      roads.append(road);
+    }
+    const baked = el('canvas', '', 'wm-sea'); baked.width = STAGE.w * 10; baked.height = STAGE.h * 10; baked.hidden = true; baked.setAttribute('aria-hidden', 'true'); atlas.style.display = 'none';
+    stage.append(baked, atlas, roads);
     zones.forEach((z, i) => {
       if (!onWorldSheet(z)) return;
       const { x, y, s } = z.place, tile = el('button', '', 'wm-tile'); tile.type = 'button'; tile.dataset.zone = String(i); tile.dataset.theme = z.theme;
@@ -382,7 +459,7 @@
       Object.assign(tile.style, { left: `${x / STAGE.w * 100}%`, top: `${y / STAGE.h * 100}%`, width: `${s / STAGE.w * 100}%`, aspectRatio: '1' });
       tile.setAttribute('aria-label', `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}. Open its map`);
       tile.dataset.branch = z.players ? 'dungeon' : ['city','nacre','asterion','worldtree','heartwood'].includes(z.theme) ? 'city' : 'wild';
-      if (!z.players) tile.style.clipPath = islandClip(i);
+      if (!z.players) tile.style.clipPath = islandClip(i); else tile.title = z.name;
       const canvas = el('canvas'); canvas.width = canvas.height = 220; copy(canvas, paint(i, 220));
       const fog = el('canvas', '', 'wm-tile-fog'); fog.width = fog.height = 220; fog.setAttribute('aria-hidden', 'true');
       const label = el('span', '', 'wm-tile-label'); label.append(el('b', z.name), el('small', rangeText(z)));
@@ -397,8 +474,79 @@
       tile.addEventListener('click', () => zoomTo(i, tile));
       stage.append(tile); tiles[i] = tile;
     });
+    // Names hang beside their zone, on whichever side is free (measured, so they never sit on another zone or each other).
+    const names = zones.map((z, i) => {
+      if (!onWorldSheet(z)) return null;
+      const n = el('span', '', 'wm-name'); n.dataset.zone = String(i); n.dataset.kind = z.players ? 'dungeon' : 'zone'; n.setAttribute('aria-hidden', 'true');
+      n.append(el('b', labelName(z)), el('small', ''));
+      stage.append(n); return n;
+    });
     stage.append(el('div', 'Valhalla', 'wm-sheet-title'));
-    refreshFog();
+    nameNodes = names; refreshFog();
+  }
+  // The atlas is live SVG (ragged coasts come from filters), but filters are costly to redraw, so the sheet is baked once into a
+  // canvas and the SVG stays in the DOM, undrawn, as the structure the tests and tools read. It is baked again when the fog changes.
+  const ATLAS_CSS = '.wm-regions text{fill:#fff3cf;fill-opacity:.42;stroke:#0b2a3a;stroke-opacity:.35;stroke-width:.15;font-weight:700;font-family:Georgia,serif;letter-spacing:.5px}' +
+    '.wm-compass{fill:#eedbad;stroke:#0f3447;stroke-width:.3;opacity:.78}.wm-compass circle{fill:none;stroke:#eedbad;stroke-width:.25}.wm-compass .wm-compass-shadow{fill:#51828d}.wm-compass text{stroke:none;fill:#f6e7bd;font:bold 2.3px Georgia,serif}';
+  let bakeToken = 0;
+  function bakeAtlas() {
+    const stage = $('wm-world'), svg = stage.querySelector('.wm-atlas'), canvas = stage.querySelector('.wm-sea'); if (!svg || !canvas) return;
+    const token = ++bakeToken, clone = svg.cloneNode(true);
+    clone.removeAttribute('class'); clone.removeAttribute('style'); clone.setAttribute('xmlns', NS); clone.setAttribute('width', canvas.width); clone.setAttribute('height', canvas.height);
+    clone.querySelectorAll('.wm-island[data-fog="full"]').forEach(n => n.setAttribute('fill', '#7f9a82'));
+    const style = document.createElementNS(NS, 'style'); style.textContent = ATLAS_CSS; clone.prepend(style);
+    const img = new Image();
+    img.onload = () => { if (token !== bakeToken) return; const g = canvas.getContext('2d'); g.clearRect(0, 0, canvas.width, canvas.height); g.drawImage(img, 0, 0, canvas.width, canvas.height); canvas.hidden = false; svg.style.display = 'none'; };
+    img.onerror = () => { if (token === bakeToken) { canvas.hidden = true; svg.style.display = ''; } };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(clone));
+  }
+  function placeNames(stage, names) {
+    const px = stage.clientWidth / STAGE.w, boxes = [], circles = zones.map((z, i) => onWorldSheet(z) ? { x: z.place.x + z.place.s / 2, y: z.place.y + z.place.s * tileY / 2, r: z.place.s / 2 } : null);
+    const hits = (b, c) => { const nx = Math.max(b.x, Math.min(c.x, b.x + b.w)), ny = Math.max(b.y, Math.min(c.y, b.y + b.h)); return Math.hypot(nx - c.x, ny - c.y) < c.r * .94; };
+    const clash = (b, q, pad = .3) => b.x < q.x + q.w + pad && q.x < b.x + b.w + pad && b.y < q.y + q.h && q.y < b.y + b.h;
+    const order = zones.map((z, i) => i).filter(i => names[i] && names[i].dataset.mute !== 'yes').sort((a, b) => (zones[a].players ? 1 : 0) - (zones[b].players ? 1 : 0));   // zones choose first
+    const keep = [{ x: 0, y: 0, w: 22, h: 22 }];                                    // the compass
+    for (const i of order) {
+      const n = names[i], c = circles[i], w = n.offsetWidth / px, h = n.offsetHeight / px, g = .35;
+      const options = [];
+      for (const k of [1, 2.6]) options.push({ x: c.x - w / 2, y: c.y + c.r + g * k }, { x: c.x - w / 2, y: c.y - c.r - g * k - h }, { x: c.x + c.r + g * k, y: c.y - h / 2 }, { x: c.x - c.r - g * k - w, y: c.y - h / 2 },
+        { x: c.x + c.r * .6 * k, y: c.y + c.r * .75 }, { x: c.x - c.r * .6 * k - w, y: c.y + c.r * .75 }, { x: c.x + c.r * .6 * k, y: c.y - c.r * .75 - h }, { x: c.x - c.r * .6 * k - w, y: c.y - c.r * .75 - h });
+      if (!zones[i].players) options.push({ x: c.x - w / 2, y: c.y + c.r * .42 }, { x: c.x - w / 2, y: c.y - h / 2 });   // last resorts: on the zone's own ground
+      let best = null;
+      options.forEach((o, rank) => {
+        const b = { x: o.x, y: o.y, w, h };
+        let cost = rank * .15 + (rank >= options.length - 2 && !zones[i].players ? 4 : 0);
+        if (b.x < .6 || b.y < .4 || b.x + w > STAGE.w - .6 || b.y + h > STAGE.h - .4) cost += 50;
+        circles.forEach((other, j) => { if (other && j !== i && hits(b, other)) cost += 10; });
+        for (const q of boxes) if (clash(b, q)) cost += 12;
+        for (const q of keep) if (clash(b, q, 0)) cost += 6;
+        if (!best || cost < best.cost) best = { cost, b };
+      });
+      n.hidden = zones[i].players && best.cost >= 10;            // a dungeon name with no room appears when its tile is hovered or focused
+      if (!n.hidden) boxes.push(best.b);
+      Object.assign(n.style, { left: `${best.b.x / STAGE.w * 100}%`, top: `${best.b.y / STAGE.h * 100}%` });
+    }
+    // Region names sit in the roomiest sea near where each belongs; a name that finds no clear water is shortened, then left off.
+    const regions = [];
+    for (const r of REGIONS) {
+      let best = null, scale = 1;
+      for (const k of [1, .78]) {
+        const w = r.text.length * 2.2 * k, h = 2.8 * k; best = null;
+        for (let y = r.area[1] + 1; y < r.area[3] - 1 - h; y += 1) for (let x = r.area[0] + w / 2 + 1; x < r.area[2] - w / 2 - 1; x += 1) {
+          const b = { x: x - w / 2, y, w, h };
+          let clear = 99;
+          circles.forEach(c => { if (!c) return; const nx = Math.max(b.x, Math.min(c.x, b.x + w)), ny = Math.max(b.y, Math.min(c.y, b.y + h)); clear = Math.min(clear, Math.hypot(nx - c.x, ny - c.y) - c.r); });
+          for (const q of [...boxes, ...regions, ...keep]) { const dx = Math.max(q.x - (b.x + w), b.x - (q.x + q.w), 0), dy = Math.max(q.y - (b.y + h), b.y - (q.y + q.h), 0); clear = Math.min(clear, Math.hypot(dx, dy)); }
+          const score = Math.min(clear, 2.5) * 10 - Math.hypot(x - r.near[0], y - r.near[1]) * .12;
+          if (clear >= 1 && (!best || score > best.score)) best = { score, b };
+        }
+        scale = k; if (best) break;
+      }
+      const t = stage.querySelector(`[data-region="${r.text}"]`);
+      if (best) regions.push(best.b);
+      if (t) { t.setAttribute('visibility', best ? 'visible' : 'hidden'); t.style.fontSize = `${2.4 * scale}px`; if (best) { t.setAttribute('x', best.b.x + best.b.w / 2); t.setAttribute('y', best.b.y + best.b.h * .8); } }
+    }
+    bakeAtlas();
   }
   // Repaint everything the fog touches on the world sheet. Cheap, and only runs when the saved masks change.
   function refreshFog() {
@@ -417,7 +565,15 @@
       tile.querySelector('b').dataset.short = unseen ? '?' : z.place.s < 8 ? String(i) : shortName(z.name);
       tile.querySelector('small').textContent = unseen ? 'Not yet visited' : `${rangeText(z)} · ${charted(i)}/${CELLS} charted`;
       tile.setAttribute('aria-label', unseen ? 'Unexplored zone' : `${z.name}, ${z.range ? `levels ${z.range[0]} to ${z.range[1]}` : 'a safe city'}, ${charted(i)} of ${CELLS} places charted${travelMasters(z).length ? `, ${travelMasters(z).length} travel master${travelMasters(z).length === 1 ? '' : 's'}` : ''}. Open its map`);
+      const name = nameNodes[i];
+      if (name) {
+        name.dataset.fog = unseen ? 'full' : 'partial'; name.dataset.mute = unseen && z.players ? 'yes' : 'no';     // an unvisited dungeon has no name to give yet
+        name.querySelector('b').textContent = unseen ? 'Unexplored' : labelName(z);
+        name.querySelector('small').textContent = unseen || z.players ? '' : rangeText(z);
+      }
+      for (const decor of $('wm-world').querySelectorAll(`.wm-decor[data-zone="${i}"]`)) decor.setAttribute('visibility', unseen ? 'hidden' : 'visible');
     });
+    if (nameNodes.length) placeNames($('wm-world'), nameNodes);
   }
 
   // ---------- zone view ----------
@@ -433,6 +589,12 @@
     g.globalAlpha = 1;
   }
   const pos = (z, x, y) => ({ left: `${x / z.size * 100}%`, top: `${y / z.size * 100}%` });
+  // On the world sheet a zone is a round tile, so a hero standing in a corner of a square zone is drawn at the rim, not beyond it.
+  const youPos = (z, x, y) => {
+    let dx = x / z.size - .5, dy = y / z.size - .5; const d = Math.hypot(dx, dy);
+    if (d > .44) { dx *= .44 / d; dy *= .44 / d; }
+    return { left: `${(.5 + dx) * 100}%`, top: `${(.5 + dy) * 100}%` };
+  };
   function renderZone(index) {
     const z = zones[index]; current = index;
     routePaint(index);
@@ -524,7 +686,8 @@
     const hero = window.Field.hero, here = window.Field.zone || 0;
     zones.forEach((z, i) => {
       const you = tiles[i]?.querySelector('.wm-you'); if (!you) return;
-      you.hidden = i !== here; if (i === here) Object.assign(you.style, pos(z, hero.x, hero.y));
+      you.hidden = i !== here; if (i === here) Object.assign(you.style, youPos(z, hero.x, hero.y));
+      tiles[i].dataset.here = String(i === here); if (nameNodes[i]) nameNodes[i].dataset.here = String(i === here);
     });
     if (view !== 'zone') return;
     const z = zones[current], me = $('wm-markers').querySelector('.wm-me');
@@ -547,15 +710,16 @@
     if (!visited(index)) return;
     clearTimeout(timer); renderZone(index);
     const world = $('wm-world');
-    if (reduced() || !tile) { world.style.transition = world.style.transform = world.style.opacity = ''; setView('zone'); return; }
+    if (reduced() || !tile) { world.style.transition = world.style.transform = world.style.opacity = world.style.willChange = ''; setView('zone'); return; }
     const st = world.getBoundingClientRect(), r = tile.getBoundingClientRect();
     const scale = Math.min(st.width / r.width, st.height / r.height) * .92;
     world.style.transformOrigin = `${r.left + r.width / 2 - st.left}px ${r.top + r.height / 2 - st.top}px`;
+    world.style.willChange = 'transform, opacity';    // one raster scaled as a texture: the sheet's SVG filters would be redrawn at 8x every frame
     world.style.transition = 'transform .38s ease-in, opacity .38s ease-in';
     world.style.transform = `translate(${st.left + st.width / 2 - r.left - r.width / 2}px, ${st.top + st.height / 2 - r.top - r.height / 2}px) scale(${scale})`;
     world.style.opacity = '0';
     $('wm-body').dataset.view = 'zooming';
-    timer = setTimeout(() => { world.style.transition = world.style.transform = world.style.opacity = ''; setView('zone'); $('wm-back').focus(); }, 390);
+    timer = setTimeout(() => { world.style.transition = world.style.transform = world.style.opacity = world.style.willChange = ''; setView('zone'); $('wm-back').focus(); }, 390);
   }
   function toWorld() {
     clearTimeout(timer);
@@ -564,11 +728,11 @@
     if (!reduced() && tile) {
       const st = world.getBoundingClientRect(), r = tile.getBoundingClientRect();
       world.style.transformOrigin = `${r.left + r.width / 2 - st.left}px ${r.top + r.height / 2 - st.top}px`;
-      world.style.transition = 'none'; world.style.opacity = '0';
+      world.style.willChange = 'transform, opacity'; world.style.transition = 'none'; world.style.opacity = '0';
       world.style.transform = `translate(${st.left + st.width / 2 - r.left - r.width / 2}px, ${st.top + st.height / 2 - r.top - r.height / 2}px) scale(${Math.min(st.width / r.width, st.height / r.height) * .92})`;
       void world.offsetWidth;
       world.style.transition = 'transform .32s ease-out, opacity .32s ease-out'; world.style.transform = 'none'; world.style.opacity = '1';
-      timer = setTimeout(() => { world.style.transition = world.style.transform = world.style.opacity = ''; }, 340);
+      timer = setTimeout(() => { world.style.transition = world.style.transform = world.style.opacity = world.style.willChange = ''; }, 340);
     }
     tile?.focus({ preventScroll: true });
   }
@@ -590,7 +754,7 @@
   function close(resume = true) {
     if (!open()) return;
     clearTimeout(timer); clearInterval(tickTimer);
-    const world = $('wm-world'); world.style.transition = world.style.transform = world.style.opacity = '';
+    const world = $('wm-world'); world.style.transition = world.style.transform = world.style.opacity = world.style.willChange = '';
     $('worldmap').hidden = true; setView('world');
     if (resume) { window.Field?.setPaused(false); previousFocus?.focus?.({ preventScroll: true }); }
   }

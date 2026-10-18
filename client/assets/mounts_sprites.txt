@@ -1,0 +1,715 @@
+{
+  "frame": [
+    160,
+    160
+  ],
+  "anchor": [
+    80,
+    119
+  ],
+  "dirs": [
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "N",
+    "NE",
+    "E",
+    "SE"
+  ],
+  "depth": {
+    "encoding": "R*256+G",
+    "offset": 512,
+    "scale": 64,
+    "near": "smaller"
+  },
+  "facing": "Same eight-direction formula and foot anchor as the class atlases; row = clip.row0 + facing, frame x = i * 160",
+  "style": "Cel-shaded chibi mounts, 3D toon rendered (scripts/mount_toon.py) and edited in PixelFlow",
+  "editing": "One PixelFlow sprite per mount, clip and facing (mount_<id>_<clip>_<facing>). build --replace discards edits.",
+  "mounts": {
+    "horse": {
+      "png": "mount_horse.png",
+      "depth": "mount_horse_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.455,
+          0.0,
+          -0.455
+        ],
+        "run": [
+          -0.65,
+          1.005,
+          1.69,
+          1.005,
+          -0.65,
+          1.005,
+          1.69,
+          1.005
+        ]
+      },
+      "raise": 25,
+      "cut": 34,
+      "shadow": [
+        34,
+        9
+      ],
+      "coat": [
+        "#3a190d",
+        "#7a3c1c",
+        "#b8672f",
+        "#ee9d55"
+      ],
+      "ramps": {
+        "coat": [
+          "#3a190d",
+          "#7a3c1c",
+          "#b8672f",
+          "#ee9d55"
+        ],
+        "coat2": [
+          "#2b1710",
+          "#4c2a1b",
+          "#6b4029",
+          "#8a5a3c"
+        ],
+        "blaze": [
+          "#bda48e",
+          "#dccab6",
+          "#f1e4d4",
+          "#fff7ea"
+        ],
+        "hoof": [
+          "#17110f",
+          "#2a2019",
+          "#40342b",
+          "#5b4b3d"
+        ],
+        "nose": [
+          "#4b2b2a",
+          "#7a4a47",
+          "#a8706a",
+          "#d29a92"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "gold": [
+          "#6f4a0e",
+          "#b07c1a",
+          "#e5b02f",
+          "#ffe27d"
+        ],
+        "blanket": [
+          "#4a0f1d",
+          "#82182b",
+          "#b92a3c",
+          "#e8586a"
+        ],
+        "eye": [
+          "#150d1c",
+          "#150d1c",
+          "#150d1c",
+          "#150d1c"
+        ],
+        "white": [
+          "#f4f1ee",
+          "#f6f3f0",
+          "#f8f5f2",
+          "#fbf8f5"
+        ],
+        "iris": [
+          "#3a2208",
+          "#6b3d10",
+          "#b9741f",
+          "#f0b14a"
+        ]
+      },
+      "sprites": {
+        "mount_horse_idle_s": "37a65d12fc3c6b49",
+        "mount_horse_idle_sw": "367a2e7a4e0bde73",
+        "mount_horse_idle_w": "7129229e412bfe4f",
+        "mount_horse_idle_nw": "ca7a6080b3f77775",
+        "mount_horse_idle_n": "33f1eb99fdc3a994",
+        "mount_horse_idle_ne": "e47bcac41737fefc",
+        "mount_horse_idle_e": "4c2e5c19b39670dc",
+        "mount_horse_idle_se": "79f2b12c8d513177",
+        "mount_horse_run_s": "895375fda1255335",
+        "mount_horse_run_sw": "096681bd25518d4c",
+        "mount_horse_run_w": "d2277fb0963634d2",
+        "mount_horse_run_nw": "c6c0ded6d6eec662",
+        "mount_horse_run_n": "170c4eff228a335d",
+        "mount_horse_run_ne": "a844d53ce5632aeb",
+        "mount_horse_run_e": "9754ca5b5f40e7b0",
+        "mount_horse_run_se": "e83812f8a314c7e3"
+      }
+    },
+    "raptor": {
+      "png": "mount_raptor.png",
+      "depth": "mount_raptor_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.56,
+          0.0,
+          -0.56
+        ],
+        "run": [
+          -0.896,
+          1.163,
+          2.016,
+          1.163,
+          -0.896,
+          1.163,
+          2.016,
+          1.163
+        ]
+      },
+      "raise": 30,
+      "cut": 44,
+      "shadow": [
+        22,
+        8
+      ],
+      "coat": [
+        "#1d4a2a",
+        "#2f7a3c",
+        "#58b04c",
+        "#a4e070"
+      ],
+      "ramps": {
+        "skin": [
+          "#1d4a2a",
+          "#2f7a3c",
+          "#58b04c",
+          "#a4e070"
+        ],
+        "belly": [
+          "#9c6a22",
+          "#d09a36",
+          "#f0c860",
+          "#fff0a0"
+        ],
+        "plume": [
+          "#7a2410",
+          "#c4461c",
+          "#f07a2c",
+          "#ffc060"
+        ],
+        "plume2": [
+          "#0f3e52",
+          "#16789a",
+          "#2cc0d4",
+          "#9af0f4"
+        ],
+        "claw": [
+          "#2a2014",
+          "#4e3c24",
+          "#8a7048",
+          "#c8b078"
+        ],
+        "beak": [
+          "#7a5a14",
+          "#c8942a",
+          "#f0c84c",
+          "#fff0a0"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "gold": [
+          "#6f4a0e",
+          "#b07c1a",
+          "#e5b02f",
+          "#ffe27d"
+        ],
+        "blanket": [
+          "#0d3a44",
+          "#16707c",
+          "#2cb0b4",
+          "#7ae8e4"
+        ],
+        "eye": [
+          "#150d1c",
+          "#150d1c",
+          "#150d1c",
+          "#150d1c"
+        ],
+        "white": [
+          "#f4f1ee",
+          "#f6f3f0",
+          "#f8f5f2",
+          "#fbf8f5"
+        ],
+        "iris": [
+          "#6a1a00",
+          "#c4400a",
+          "#ff8a1c",
+          "#ffd070"
+        ]
+      },
+      "sprites": {
+        "mount_raptor_idle_s": "253bd36c64542211",
+        "mount_raptor_idle_sw": "be53d1fa14089556",
+        "mount_raptor_idle_w": "8e59f2ef23e0fd4f",
+        "mount_raptor_idle_nw": "358a3ca534553eaa",
+        "mount_raptor_idle_n": "3b13e1603515e241",
+        "mount_raptor_idle_ne": "a505a366a9810692",
+        "mount_raptor_idle_e": "d5c2a4e134927cc9",
+        "mount_raptor_idle_se": "9971546e80ade814",
+        "mount_raptor_run_s": "97e5bcd5038b4f8a",
+        "mount_raptor_run_sw": "4ca02783efeb9406",
+        "mount_raptor_run_w": "566944e509a57e2f",
+        "mount_raptor_run_nw": "54ccb3b8bf6a847b",
+        "mount_raptor_run_n": "7b01bf52f3cff182",
+        "mount_raptor_run_ne": "93c920002c6367d8",
+        "mount_raptor_run_e": "667c8a9cf9204e55",
+        "mount_raptor_run_se": "e8f7bb0cd5600a3c"
+      }
+    },
+    "lizard": {
+      "png": "mount_lizard.png",
+      "depth": "mount_lizard_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.375,
+          0.0,
+          -0.375
+        ],
+        "run": [
+          -0.375,
+          0.774,
+          1.25,
+          0.774,
+          -0.375,
+          0.774,
+          1.25,
+          0.774
+        ]
+      },
+      "raise": 15,
+      "cut": 28,
+      "shadow": [
+        38,
+        10
+      ],
+      "coat": [
+        "#4b4a1c",
+        "#837a2e",
+        "#bfa94a",
+        "#f0dc7a"
+      ],
+      "ramps": {
+        "hide": [
+          "#4b4a1c",
+          "#837a2e",
+          "#bfa94a",
+          "#f0dc7a"
+        ],
+        "belly": [
+          "#8a3d12",
+          "#c4631f",
+          "#ee9340",
+          "#ffcb7a"
+        ],
+        "stripe": [
+          "#2f2a12",
+          "#4d4520",
+          "#6b5f2c",
+          "#8a7b3a"
+        ],
+        "frill": [
+          "#7a1d12",
+          "#c13a1c",
+          "#ec6a2a",
+          "#ffb05a"
+        ],
+        "claw": [
+          "#2c2616",
+          "#50462a",
+          "#7e704a",
+          "#b0a070"
+        ],
+        "tongue": [
+          "#7a1030",
+          "#b02048",
+          "#e0507a",
+          "#ff90b0"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "gold": [
+          "#6f4a0e",
+          "#b07c1a",
+          "#e5b02f",
+          "#ffe27d"
+        ],
+        "blanket": [
+          "#5a2a08",
+          "#9a4d12",
+          "#d9892c",
+          "#ffc866"
+        ],
+        "eye": [
+          "#150d1c",
+          "#150d1c",
+          "#150d1c",
+          "#150d1c"
+        ],
+        "white": [
+          "#f4f1ee",
+          "#f6f3f0",
+          "#f8f5f2",
+          "#fbf8f5"
+        ],
+        "iris": [
+          "#6b4a00",
+          "#c78a10",
+          "#ffd23a",
+          "#fff49a"
+        ]
+      },
+      "sprites": {
+        "mount_lizard_idle_s": "46d472c1bb39bf3c",
+        "mount_lizard_idle_sw": "c1e26bfd7ecff58c",
+        "mount_lizard_idle_w": "f1362b6b6b0a78ea",
+        "mount_lizard_idle_nw": "93456a6a59d19f55",
+        "mount_lizard_idle_n": "ea916c72e7bd06b1",
+        "mount_lizard_idle_ne": "eb21c68206770bf7",
+        "mount_lizard_idle_e": "26be38513863eb73",
+        "mount_lizard_idle_se": "5f758acc5bea44b6",
+        "mount_lizard_run_s": "0a8e768dea8c5c62",
+        "mount_lizard_run_sw": "a45b364e4c54b61b",
+        "mount_lizard_run_w": "690d3fa6452d2ded",
+        "mount_lizard_run_nw": "6e2ee76cbe0b99b3",
+        "mount_lizard_run_n": "0ea78c649abdd1c8",
+        "mount_lizard_run_ne": "3af414014a448b56",
+        "mount_lizard_run_e": "b27388a75b84dab8",
+        "mount_lizard_run_se": "a6e68b7c7135956d"
+      }
+    },
+    "sabertooth": {
+      "png": "mount_sabertooth.png",
+      "depth": "mount_sabertooth_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.438,
+          0.0,
+          -0.438
+        ],
+        "run": [
+          -0.25,
+          1.625,
+          -0.25,
+          -2.125,
+          -0.25,
+          1.625,
+          -0.25,
+          -2.125
+        ]
+      },
+      "raise": 20,
+      "cut": 30,
+      "shadow": [
+        36,
+        10
+      ],
+      "coat": [
+        "#3f5472",
+        "#6f89aa",
+        "#a9c3dc",
+        "#e3f0fb"
+      ],
+      "ramps": {
+        "fur": [
+          "#3f5472",
+          "#6f89aa",
+          "#a9c3dc",
+          "#e3f0fb"
+        ],
+        "fur2": [
+          "#2c3a52",
+          "#52698a",
+          "#7e98b8",
+          "#a9c0d8"
+        ],
+        "stripe": [
+          "#141c2c",
+          "#1f2b44",
+          "#2b3b5d",
+          "#3b507c"
+        ],
+        "fang": [
+          "#9d9a8a",
+          "#cbc8b8",
+          "#ebe8d8",
+          "#fffdf0"
+        ],
+        "nose": [
+          "#52364a",
+          "#8a5c78",
+          "#c789a4",
+          "#ecb4c8"
+        ],
+        "claw": [
+          "#3c4658",
+          "#69758c",
+          "#a0acc0",
+          "#d4dcea"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "gold": [
+          "#6f4a0e",
+          "#b07c1a",
+          "#e5b02f",
+          "#ffe27d"
+        ],
+        "blanket": [
+          "#10284a",
+          "#1b4a86",
+          "#2f78c0",
+          "#69b0ea"
+        ],
+        "eye": [
+          "#150d1c",
+          "#150d1c",
+          "#150d1c",
+          "#150d1c"
+        ],
+        "white": [
+          "#f4f1ee",
+          "#f6f3f0",
+          "#f8f5f2",
+          "#fbf8f5"
+        ],
+        "iris": [
+          "#0b3a5a",
+          "#1c7fa8",
+          "#58d2e8",
+          "#b6f6ff"
+        ]
+      },
+      "sprites": {
+        "mount_sabertooth_idle_s": "6bb27c571bebf4e1",
+        "mount_sabertooth_idle_sw": "da7d308595623417",
+        "mount_sabertooth_idle_w": "ff9ee44d25d27024",
+        "mount_sabertooth_idle_nw": "32b88c959feb85d7",
+        "mount_sabertooth_idle_n": "590b3702fa931b47",
+        "mount_sabertooth_idle_ne": "7198f3f08567b955",
+        "mount_sabertooth_idle_e": "f5192a34d5a517ad",
+        "mount_sabertooth_idle_se": "95861c66a1b88654",
+        "mount_sabertooth_run_s": "d822fb40e8653f80",
+        "mount_sabertooth_run_sw": "d694b2038d924d7c",
+        "mount_sabertooth_run_w": "1926604de6f65c21",
+        "mount_sabertooth_run_nw": "0d6e0fc3dbf33cc2",
+        "mount_sabertooth_run_n": "ee2c12bef010175a",
+        "mount_sabertooth_run_ne": "ea17eda00456f7fb",
+        "mount_sabertooth_run_e": "597ec98842a84495",
+        "mount_sabertooth_run_se": "eda48fe589f4bc9a"
+      }
+    },
+    "gryphon": {
+      "png": "mount_gryphon.png",
+      "depth": "mount_gryphon_depth.png",
+      "clips": {
+        "idle": {
+          "row0": 0,
+          "n": 4,
+          "fps": 4
+        },
+        "run": {
+          "row0": 8,
+          "n": 8,
+          "fps": 11
+        }
+      },
+      "bob": {
+        "idle": [
+          0.0,
+          0.375,
+          0.0,
+          -0.375
+        ],
+        "run": [
+          0.0,
+          1.503,
+          2.125,
+          1.503,
+          0.0,
+          -1.503,
+          -2.125,
+          -1.503
+        ]
+      },
+      "raise": 25,
+      "cut": 33,
+      "shadow": [
+        34,
+        10
+      ],
+      "coat": [
+        "#6a3c10",
+        "#a8651c",
+        "#dc9a36",
+        "#ffd36e"
+      ],
+      "ramps": {
+        "fur": [
+          "#6a3c10",
+          "#a8651c",
+          "#dc9a36",
+          "#ffd36e"
+        ],
+        "plume": [
+          "#9a9488",
+          "#cdc8bc",
+          "#ece8de",
+          "#ffffff"
+        ],
+        "plume2": [
+          "#4a2c0c",
+          "#7e4c18",
+          "#b4762a",
+          "#e8a84a"
+        ],
+        "tip": [
+          "#16243e",
+          "#26406e",
+          "#3e66a6",
+          "#7aa6e8"
+        ],
+        "beak": [
+          "#8a5a08",
+          "#d49410",
+          "#ffc828",
+          "#fff08a"
+        ],
+        "talon": [
+          "#5a4a1a",
+          "#9a8030",
+          "#d8b84a",
+          "#fff0a0"
+        ],
+        "leather": [
+          "#2a1710",
+          "#4b2a1a",
+          "#7b4a2b",
+          "#a9703f"
+        ],
+        "gold": [
+          "#6f4a0e",
+          "#b07c1a",
+          "#e5b02f",
+          "#ffe27d"
+        ],
+        "blanket": [
+          "#2a0f4a",
+          "#4e1c86",
+          "#7a38c0",
+          "#b278ec"
+        ],
+        "eye": [
+          "#150d1c",
+          "#150d1c",
+          "#150d1c",
+          "#150d1c"
+        ],
+        "white": [
+          "#f4f1ee",
+          "#f6f3f0",
+          "#f8f5f2",
+          "#fbf8f5"
+        ],
+        "iris": [
+          "#6a2a00",
+          "#d06a08",
+          "#ffb41c",
+          "#fff2a0"
+        ]
+      },
+      "sprites": {
+        "mount_gryphon_idle_s": "c7e1fb0a7e221f18",
+        "mount_gryphon_idle_sw": "3064ec8506ef093a",
+        "mount_gryphon_idle_w": "e8c0c1d895536bcc",
+        "mount_gryphon_idle_nw": "ffe4454929a8facf",
+        "mount_gryphon_idle_n": "60e2fcb025fcb9a9",
+        "mount_gryphon_idle_ne": "0e9f4675b8b566e2",
+        "mount_gryphon_idle_e": "4258b99dfe3e4906",
+        "mount_gryphon_idle_se": "2bfa420d82a668ee",
+        "mount_gryphon_run_s": "92bb2ada6bd76599",
+        "mount_gryphon_run_sw": "d0c521a691fb0e0e",
+        "mount_gryphon_run_w": "1b2fc5921ad774ea",
+        "mount_gryphon_run_nw": "767673c8a6519685",
+        "mount_gryphon_run_n": "957a6642a061e120",
+        "mount_gryphon_run_ne": "2c2388e634cc746b",
+        "mount_gryphon_run_e": "7da3021473eb5cd2",
+        "mount_gryphon_run_se": "7f1a9ae91242beda"
+      }
+    }
+  }
+}

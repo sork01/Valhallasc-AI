@@ -108,7 +108,8 @@ async function call(name, args = {}) {
   const stage = await page.evaluate(() => { const r = document.getElementById('wm-world').getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; });
   const tiles = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => { const r = t.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; }));
   check(tiles.length === visibleZones.length && tiles.every(t => t.left >= stage.left && t.right <= stage.right && t.top >= stage.top && t.bottom <= stage.bottom), 'Every open-zone tile is inside the world sheet');
-  check(tiles.every((a, i) => tiles.every((b, j) => i >= j || a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top)), 'No two tiles overlap');
+  const disc = t => ({ x: (t.left + t.right) / 2, y: (t.top + t.bottom) / 2, r: (t.right - t.left) / 2 });   // a tile's ground is the round disc in its square
+  check(tiles.every((a, i) => tiles.every((b, j) => { if (i >= j) return true; const p = disc(a), q = disc(b); return Math.hypot(p.x - q.x, p.y - q.y) >= (p.r + q.r) * .98; })), 'No two tiles overlap');
   const you = await page.evaluate(() => [...document.querySelectorAll('.wm-tile')].map(t => { const y = t.querySelector('.wm-you'), r = t.getBoundingClientRect(), p = y.getBoundingClientRect(); return { shown: !y.hidden, x: (p.left + p.width / 2 - r.left) / r.width, y: (p.top + p.height / 2 - r.top) / r.height }; }));
   const spawn = await page.evaluate(() => ({ x: Field.hero.x / 96, y: Field.hero.y / 96 }));
   check(you[0].shown && you.slice(1).every(y => !y.shown) && Math.abs(you[0].x - spawn.x) < .02 && Math.abs(you[0].y - spawn.y) < .02, 'The marker is on Greenmeadow where the hero stands');
@@ -167,6 +168,32 @@ async function call(name, args = {}) {
   const expectedRoads = [...new Set(visibleZones.flatMap((z,i) => z.portals.filter(to => to < visibleZones.length).map(to => [i,to].sort((a,b)=>a-b).join('-'))))].sort();
   check(roads.join() === expectedRoads.join(), `Roads appear once either end's gate has been seen (${roads})`);
   check(await page.evaluate(() => [...document.querySelectorAll('.wm-tile canvas:not(.wm-tile-fog)')].every(c => { const g = c.getContext('2d').getImageData(0, 0, 220, 220).data; const set = new Set(); for (let i = 0; i < g.length; i += 4 * 97) set.add((g[i] >> 4) + ',' + (g[i + 1] >> 4) + ',' + (g[i + 2] >> 4)); return set.size >= 6; })), 'Every tile carries drawn ground under its fog');
+  await shot('map-world');
+
+  // --- the sheet reads as a world: names beside their zones, coasts, sea lanes, your own tile marked ---
+  const sheet = await page.evaluate(() => {
+    const rect = e => { const r = e.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; };
+    const names = [...document.querySelectorAll('.wm-name')].filter(n => !n.hidden).map(n => ({ zone: Number(n.dataset.zone), kind: n.dataset.kind, text: n.querySelector('b').textContent, ...rect(n) }));
+    const discs = [...document.querySelectorAll('.wm-tile')].map(t => { const r = t.getBoundingClientRect(); return { zone: Number(t.dataset.zone), x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, r: (r.right - r.left) / 2 }; });
+    const sea = document.querySelector('.wm-sea'), g = sea.getContext('2d').getImageData(0, 0, sea.width, sea.height).data;
+    const colours = new Set(); let land = 0, water = 0;
+    for (let i = 0; i < g.length; i += 4 * 211) { colours.add((g[i] >> 5) + ',' + (g[i + 1] >> 5) + ',' + (g[i + 2] >> 5)); if (g[i + 1] > g[i + 2] + 10 || g[i] > g[i + 2] + 10) land++; else water++; }
+    return { names, discs, baked: !sea.hidden && sea.width === 1600 && sea.height === 990, colours: colours.size, land, water, svgHidden: getComputedStyle(document.querySelector('.wm-atlas')).display === 'none',
+      lanes: [...document.querySelectorAll('.wm-roads .wm-sea-lane')].map(r => r.dataset.road).sort(), links: [...document.querySelectorAll('.wm-land-links g')].map(g => g.dataset.link),
+      here: [...document.querySelectorAll('.wm-tile[data-here="true"]')].map(t => t.dataset.zone), regions: [...document.querySelectorAll('.wm-regions text')].filter(t => t.getAttribute('visibility') === 'visible').length };
+  });
+  check(sheet.baked && sheet.svgHidden, 'The atlas is baked into a canvas once, and the live SVG stays undrawn');
+  check(sheet.colours > 25 && sheet.land > sheet.water * .35 && sheet.water > sheet.land * .25, `The baked sheet has both sea and land and many colours (${sheet.colours} colours, ${sheet.land} land samples, ${sheet.water} water)`);
+  check(JSON.stringify(sheet.lanes) === JSON.stringify(['6-7', '7-8', '8-9', '9-13']) && !sheet.links.some(l => ['6-7', '7-8', '8-9', '9-13'].includes(l)), 'The four crossings of the Stormrift are sea lanes with no land bridge');
+  check(sheet.names.length >= 30, `Most zones carry a name on the sheet (${sheet.names.length} of ${visibleZones.length})`);
+  const overlap = (a, b) => !(a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top);
+  check(sheet.names.every((a, i) => sheet.names.every((b, j) => i >= j || !overlap(a, b))), 'No two names on the sheet overlap');
+  const cover = (n, d) => Math.hypot(Math.max(n.left, Math.min(d.x, n.right)) - d.x, Math.max(n.top, Math.min(d.y, n.bottom)) - d.y) < d.r * .9;
+  check(sheet.names.filter(n => n.kind === 'dungeon').every(n => sheet.discs.every(d => d.zone === n.zone || !cover(n, d))), 'A dungeon name never sits on another zone');
+  check(sheet.names.filter(n => n.kind === 'zone').every(n => sheet.discs.filter(d => d.zone !== n.zone && cover(n, d)).length <= 1), 'A zone name covers at most one neighbour, and only its edge');
+  check(sheet.names.filter(n => n.kind === 'zone').length >= 22, `Every outdoor zone is named (${sheet.names.filter(n => n.kind === 'zone').length})`);
+  check(sheet.here.length === 1 && sheet.here[0] === '4', `Exactly one tile is marked as where you are (${sheet.here})`);
+  check(sheet.regions >= 2, `The continents and the sea are named (${sheet.regions} region names found room)`);
   await shot('map-world');
 
   // --- zooming into a zone ---
