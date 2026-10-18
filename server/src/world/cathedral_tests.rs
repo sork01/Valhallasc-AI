@@ -41,7 +41,8 @@ fn cathedral_three_wings_have_exact_levels_four_unique_bosses_and_distinct_floor
             (m.levels, m.min_level, m.players, m.copies),
             (Some([level, level]), level, 5, 4)
         );
-        assert_eq!(m.slimes.len(), 20);
+        // The sleeping helpers of the boss mechanics (tagged `ambush`) are not part of the wing's population.
+        assert_eq!(m.slimes.iter().filter(|s| s.ambush.is_none()).count(), 20);
         assert!(m.city.is_none());
         let kinds: Vec<_> = m.slimes.iter().filter(|s| is_boss(&s.kind)).collect();
         assert_eq!(kinds.len(), 4);
@@ -52,7 +53,7 @@ fn cathedral_three_wings_have_exact_levels_four_unique_bosses_and_distinct_floor
         assert!(
             w.slimes
                 .iter()
-                .filter(|s| s.zone == zone)
+                .filter(|s| s.zone == zone && w.spawns[s.id].ambush.is_none())
                 .all(|s| s.level == level && !s.dead)
         );
         assert_eq!(w.instances.iter().filter(|i| i.template == zone).count(), 4);
@@ -79,7 +80,7 @@ fn cathedral_wing_specific_enemies_never_spawn_in_other_wings_or_outdoors() {
             w.maps[zone]
                 .slimes
                 .iter()
-                .filter(|s| s.kind == kind)
+                .filter(|s| s.kind == kind && s.ambush.is_none())
                 .count(),
             4
         );
@@ -249,7 +250,7 @@ fn cathedral_encounters_have_materials_fixed_levels_distinct_profiles_and_guaran
         assert!(is_elite(&e.kind));
         assert_eq!(is_boss(&e.kind), e.boss);
         assert!(item(material(&e.kind)).is_some());
-        assert!(e.stats[0] > 20000. && e.stats[1] >= 800.);
+        assert!(e.add || (e.stats[0] > 20000. && e.stats[1] >= 800.));
         for s in w.slimes.iter().filter(|s| s.kind == e.kind) {
             assert_eq!(s.xp, enemy_xp(s.level) * if e.boss { 12 } else { 1 });
             assert!(s.gold >= 850);
@@ -370,7 +371,7 @@ fn cathedral_empty_copy_resets_bosses_loot_exit_and_shared_trash_keeps_the_wing_
         assert!(
             w.slimes
                 .iter()
-                .filter(|s| s.zone == zone)
+                .filter(|s| s.zone == zone && w.spawns[s.id].ambush.is_none())
                 .all(|s| !s.dead && s.hp == s.max_hp && s.level == w.maps[zone].min_level)
         );
         assert!(!w.drops.iter().any(|d| d.zone == zone));

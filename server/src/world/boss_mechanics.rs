@@ -22,6 +22,8 @@ use std::sync::Arc;
 const ORB_REACH: f64 = 0.6;
 /// A wall or lane hurts a player whose body overlaps it: the centre may be this far outside the band.
 const BODY: f64 = PLAYER_RADIUS;
+/// The bridge of light between a divided boss's bodies is drawn this long before it is lethal (rule 1: announced).
+const BRIDGE_WARNING: f64 = 3.;
 /// How long a held body stays held after each refresh; refreshed every tick.
 const HOLD: f64 = 0.2;
 
@@ -30,6 +32,10 @@ pub struct BossMech {
     pub(super) table: BTreeMap<String, Arc<BossDef>>,
     pub(super) fights: BTreeMap<usize, Fight>,
     next_id: u64,
+    /// Where a fighter who is not at a keyboard is running to, kept between ticks (`boss_play.rs`).
+    pub(super) plans: BTreeMap<u64, Point>,
+    /// The brazier each fighter has taken to light (`boss_play.rs`).
+    pub(super) stations: BTreeMap<u64, Point>,
     /// Seconds a break had left when it was broken, one per dirge: what the harness reads to tune a bar.
     #[cfg(test)]
     pub(super) spare: Vec<f64>,
@@ -43,6 +49,8 @@ impl BossMech {
             table: table.into_iter().map(|(k, v)| (k, Arc::new(v))).collect(),
             fights: BTreeMap::new(),
             next_id: 1,
+            plans: BTreeMap::new(),
+            stations: BTreeMap::new(),
             #[cfg(test)]
             spare: vec![],
         }
@@ -183,6 +191,21 @@ struct Frozen {
     left: f64,
     name: String,
 }
+struct RodLive {
+    at: Point,
+    dark_left: f64,
+}
+/// Static: the charge each hero carries, the seconds each is grounded, the rods and the bursts still showing.
+struct StaticLive {
+    rods: Vec<RodLive>,
+    rod_r: f64,
+    limit: u32,
+    warn_at: u32,
+    charges: BTreeMap<u64, u32>,
+    grounded: BTreeMap<u64, f64>,
+    /// A detonation still on the floor: where, how wide, seconds left.
+    bursts: Vec<(Point, f64, f64)>,
+}
 struct BloomLive {
     slot: usize,
     left: f64,
@@ -221,9 +244,26 @@ pub(super) struct Fight {
     blooms: Vec<BloomLive>,
     /// The other body of a divided boss.
     partner: Option<usize>,
+    /// Seconds the bridge of light is shown but not yet lethal after a boss divides.
+    bridge_wait: f64,
     /// Bodies that fell while the other lives, and the seconds until they rise.
     downed: BTreeMap<usize, f64>,
     banner: Option<(String, f64)>,
+    stat: Option<StaticLive>,
+}
+
+impl Fight {
+    /// Test builds: the shield's helpers still alive, for the harness trace.
+    #[cfg(test)]
+    pub(super) fn frozen_count(&self) -> usize {
+        self.frozen.len()
+    }
+    #[cfg(test)]
+    pub(super) fn shield_alive(&self, w: &World) -> Option<usize> {
+        self.shield
+            .as_ref()
+            .map(|s| s.adds.iter().filter(|a| !w.slimes[**a].dead).count())
+    }
 }
 
 /// What `hit_slime` should do with a blow.
@@ -377,6 +417,9 @@ impl World {
                 }
             }
         }
+        if id == boss && !killed && dealt > 0. {
+            self.add_static_charge(boss, session);
+        }
         if killed && other_down {
             // The second body fell while the first lay downed: both are finished.
             let other = other.unwrap();
@@ -397,6 +440,94 @@ impl World {
             }
             let (zone, at) = (self.slimes[id].zone, self.slimes[id].point());
             self.mech_event(zone, "down", "", at, revive);
+        }
+    }
+
+    /// A hero landed a blow on the boss: one more charge of Static, and a detonation at the limit.
+    fn add_static_charge(&mut self, boss: usize, session: u64) {
+        let share = {
+            let s = &self.slimes[boss];
+            if s.max_hp > 0. { s.hp / s.max_hp } else { 0. }
+        };
+        let Some(def) = self.boss.table.get(&self.slimes[boss].kind).cloned() else {
+            return;
+        };
+        let Some((name, t)) = def.mechanics.iter().find_map(|m| match &m.block {
+            Block::Static(t) if m.active_at(share) => Some((m.name.clone(), t.clone())),
+            _ => None,
+        }) else {
+            return;
+        };
+        let Some(at) = self.players.get(&session).map(|p| p.character.point()) else {
+            return;
+        };
+        let zone = self.slimes[boss].zone;
+        let Some(fight) = self.boss.fights.get_mut(&boss) else {
+            return;
+        };
+        let Some(st) = fight.stat.as_mut() else {
+            return;
+        };
+        if st.grounded.contains_key(&session) {
+            return;
+        }
+        let before = st.charges.get(&session).copied().unwrap_or(0);
+        let now = before + t.per_hit;
+        if now < t.limit {
+            st.charges.insert(session, now);
+            if before < t.warn_at && now >= t.warn_at {
+                fight.banner = Some((name, 4.));
+            }
+            return;
+        }
+        st.charges.insert(session, 0);
+        st.bursts.push((at, t.r, 0.8));
+        let victims: Vec<u64> = self
+            .mech_players(zone)
+            .into_iter()
+            .filter(|(_, p)| p.distance(at) <= t.r)
+            .map(|(s, _)| s)
+            .collect();
+        for victim in victims {
+            self.mech_kill(victim, &name, boss);
+        }
+        self.mech_event(zone, "land", &name, at, t.r);
+    }
+
+    /// Rods clear a hero who stands on a ready one; the timers of the charge, the grounding, the rods and the bursts run.
+    fn tick_static(&mut self, fight: &mut Fight, m: &Mechanic, t: &bm::Static) {
+        let players = self.mech_players(fight.zone);
+        let Some(st) = fight.stat.as_mut() else {
+            return;
+        };
+        for r in &mut st.rods {
+            r.dark_left = (r.dark_left - TICK).max(0.);
+        }
+        st.grounded.retain(|_, left| {
+            *left -= TICK;
+            *left > 0.
+        });
+        st.bursts.retain_mut(|b| {
+            b.2 -= TICK;
+            b.2 > 0.
+        });
+        st.charges
+            .retain(|s, _| players.iter().any(|(p, _)| p == s));
+        for (session, at) in &players {
+            if st.grounded.contains_key(session) {
+                continue;
+            }
+            let touched = st
+                .rods
+                .iter_mut()
+                .find(|r| r.dark_left <= 0. && r.at.distance(*at) <= st.rod_r);
+            if let Some(rod) = touched {
+                rod.dark_left = t.dark;
+                st.charges.remove(session);
+                st.grounded.insert(*session, t.immune.max(TICK));
+                let (zone, rod_at) = (fight.zone, rod.at);
+                self.mech_event(zone, "shield", &m.name, rod_at, 0.);
+            }
         }
     }
 
@@ -500,8 +631,28 @@ impl World {
             orbs: vec![],
             blooms: vec![],
             partner: None,
+            bridge_wait: 0.,
             downed: BTreeMap::new(),
             banner: None,
+            stat: def.mechanics.iter().find_map(|m| match &m.block {
+                Block::Static(t) => Some(StaticLive {
+                    rods: t
+                        .rods
+                        .iter()
+                        .map(|r| RodLive {
+                            at: Point { x: r[0], y: r[1] },
+                            dark_left: 0.,
+                        })
+                        .collect(),
+                    rod_r: t.rod_r,
+                    limit: t.limit,
+                    warn_at: t.warn_at,
+                    charges: BTreeMap::new(),
+                    grounded: BTreeMap::new(),
+                    bursts: vec![],
+                }),
+                _ => None,
+            }),
         }
     }
 
@@ -602,6 +753,12 @@ impl World {
             }
             Block::Sweep(s) if matches!(s.kind, SweepKind::Spokes { .. }) => {
                 self.tick_spokes(fight, i, m, active);
+                return;
+            }
+            Block::Static(t) => {
+                if active {
+                    self.tick_static(fight, m, t);
+                }
                 return;
             }
             Block::Shield(s) => {
@@ -1512,15 +1669,20 @@ impl World {
         still: bool,
     ) -> Vec<usize> {
         let zone = fight.zone;
-        let slots: Vec<usize> = (0..self.spawns.len())
+        // Sleepers first; when a long fight has used them all, a helper this fight woke and that has since died
+        // (a seed, a cocoon) is put to work again, so a cycle that repeats every 30 s never runs out of bodies.
+        let held: &[usize] = fight.shield.as_ref().map_or(&[], |sh| &sh.adds);
+        let mut slots: Vec<usize> = (0..self.spawns.len())
             .filter(|i| {
                 self.spawns[*i].zone == zone
                     && self.spawns[*i].ambush.as_deref() == Some(tag)
                     && self.slimes[*i].dead
-                    && self.slimes[*i].state == "waiting"
+                    && (self.slimes[*i].state == "waiting"
+                        || (fight.woken.contains(i) && !held.contains(i)))
             })
-            .take(count as usize)
             .collect();
+        slots.sort_by_key(|i| self.slimes[*i].state != "waiting");
+        slots.truncate(count as usize);
         let players = self.mech_players(zone);
         let mut woken = vec![];
         for slot in slots {
@@ -1557,7 +1719,9 @@ impl World {
             enemy.state = "chase".into();
             let at = enemy.point();
             self.slimes[slot] = enemy;
-            fight.woken.push(slot);
+            if !fight.woken.contains(&slot) {
+                fight.woken.push(slot);
+            }
             if still {
                 fight.still.insert(slot);
             }
@@ -1738,12 +1902,22 @@ impl World {
         let name = self.stasis_name(fight.boss);
         for (session, tag, hold) in touched {
             // One sleeping cocoon of the tag becomes the amber round this player.
-            let Some(slot) = (0..self.spawns.len()).find(|i| {
+            // A sleeper first; once they are used up, a cocoon of this fight that was broken is put to work again.
+            let fits = |i: &usize| {
                 self.spawns[*i].zone == fight.zone
                     && self.spawns[*i].ambush.as_deref() == Some(tag.as_str())
                     && self.slimes[*i].dead
-                    && self.slimes[*i].state == "waiting"
-            }) else {
+            };
+            let Some(slot) = (0..self.spawns.len())
+                .find(|i| fits(i) && self.slimes[*i].state == "waiting")
+                .or_else(|| {
+                    (0..self.spawns.len()).find(|i| {
+                        fits(i)
+                            && fight.woken.contains(i)
+                            && !fight.frozen.values().any(|f| f.cocoon == *i)
+                    })
+                })
+            else {
                 continue;
             };
             let at = self.players[&session].character.point();
@@ -1752,7 +1926,9 @@ impl World {
             (cocoon.x, cocoon.y, cocoon.hx, cocoon.hy, cocoon.goal) = (at.x, at.y, at.x, at.y, at);
             cocoon.state = "idle".into();
             self.slimes[slot] = cocoon;
-            fight.woken.push(slot);
+            if !fight.woken.contains(&slot) {
+                fight.woken.push(slot);
+            }
             fight.still.insert(slot);
             let p = self.players.get_mut(&session).unwrap();
             p.frozen = true;
@@ -1848,6 +2024,7 @@ impl World {
         p.hp = half;
         (p.x, p.y, p.hx, p.hy, p.goal) = (side.x, side.y, side.x, side.y, side);
         fight.partner = Some(partner);
+        fight.bridge_wait = BRIDGE_WARNING;
         self.mech_event(fight.zone, "split", name, near, 0.);
         fight.banner = Some((name.into(), 4.));
     }
@@ -1881,8 +2058,10 @@ impl World {
             let at = self.slimes[body].point();
             self.mech_event(fight.zone, "rise", &name, at, split.survivor_bonus);
         }
-        // The bridge of light between the two living bodies.
+        // The bridge of light between the two living bodies: shown at once, lethal after its warning.
+        fight.bridge_wait = (fight.bridge_wait - TICK).max(0.);
         if split.bridge > 0.
+            && fight.bridge_wait <= 0.
             && !self.slimes[id].dead
             && !self.slimes[partner].dead
             && fight.downed.is_empty()
@@ -1900,19 +2079,32 @@ impl World {
 
     /// What would hurt `session`, standing at `at`, in the running fights of `zone`, and the soonest it lands: the
     /// ability's name and the seconds left. A mark never counts against its own bearer. `None`: safe where they stand.
-    /// Hired mercenaries and the dungeon harness decide where to move from this (`BOSSMECH-MERC`, `BOSSMECH-HARNESS`).
-    #[allow(dead_code)] // read by BOSSMECH-MERC and BOSSMECH-HARNESS
+    /// A break bar counts (it asks for damage, not a move); `bot_threat` is the query for where to stand.
+    #[allow(dead_code)] // the whole-danger view: read by the tests that pin what each block reports
     pub(super) fn boss_danger(
         &self,
         zone: usize,
         session: u64,
         at: Point,
     ) -> Option<(String, f64)> {
-        let mut soonest: Option<(String, f64)> = None;
-        let mut note = |name: &str, left: f64| {
-            if soonest.as_ref().is_none_or(|(_, l)| left < *l) {
-                soonest = Some((name.to_string(), left.max(0.)));
-            }
+        self.danger_list(zone, session, at, 0.)
+            .into_iter()
+            .map(|(name, left, _)| (name, left))
+            .min_by(|a, b| a.1.total_cmp(&b.1))
+    }
+
+    /// Every ability that would hurt `session` standing at `at`: `(name, seconds until it lands, depends on where
+    /// they stand)`. `look` seconds of lookahead are added for hazards that move (spokes).
+    fn danger_list(
+        &self,
+        zone: usize,
+        session: u64,
+        at: Point,
+        look: f64,
+    ) -> Vec<(String, f64, bool)> {
+        let mut found: Vec<(String, f64, bool)> = vec![];
+        let mut note = |name: &str, left: f64, positional: bool| {
+            found.push((name.to_string(), left.max(0.), positional));
         };
         for fight in self.boss.fights.values().filter(|f| f.zone == zone) {
             let Some(def) = self.boss.table.get(&self.slimes[fight.boss].kind) else {
@@ -1932,19 +2124,20 @@ impl World {
                                 } else {
                                     zl.left
                                 },
+                                true,
                             );
                         }
                     }
                     (Live::Mark(ml), Block::Mark(k)) if !ml.gap => {
                         for (bearer, shapes) in self.mark_shapes(fight, ml, k) {
                             if bearer != session && shapes.iter().any(|sh| sh.contains(at)) {
-                                note(&m.name, ml.left);
+                                note(&m.name, ml.left, true);
                             }
                         }
                     }
                     (Live::Puddle(p), Block::Mark(_)) => {
                         if session != p.bearer && p.areas.iter().any(|shape| shape.contains(at)) {
-                            note(&m.name, 0.);
+                            note(&m.name, 0., true);
                         }
                     }
                     (Live::Walls(wl), Block::Sweep(s)) => {
@@ -1973,17 +2166,18 @@ impl World {
                                 note(
                                     &m.name,
                                     wl.warn_left.max(0.) + (ahead - thickness / 2.).max(0.) / speed,
+                                    true,
                                 );
                             }
                         }
                     }
                     (Live::Break(bl), _) => {
-                        note(&m.name, bl.left);
+                        note(&m.name, bl.left, false);
                     }
                     (Live::Gaze(gl), Block::Gaze(_))
                         if gl.left > 0. && self.sight(fight, gl.from, at).is_ok() =>
                     {
-                        note(&m.name, gl.left);
+                        note(&m.name, gl.left, true);
                     }
                     _ => {}
                 }
@@ -1996,26 +2190,72 @@ impl World {
                     count,
                     width,
                     length,
+                    deg_per_s,
                     ..
                 } = s.kind
                 else {
                     continue;
                 };
                 let centre = fight.arena.centre();
-                let hit = (0..count).any(|n| {
-                    let a = sp.angle + n as f64 * std::f64::consts::TAU / count as f64;
-                    let tip = Point {
-                        x: centre.x + a.cos() * length,
-                        y: centre.y + a.sin() * length,
-                    };
-                    bm::segment_distance(at, centre, tip) <= width / 2. + BODY
-                });
-                if hit {
-                    note(&def.mechanics[sp.mech].name, 0.);
+                // The spokes turn: look ahead along their turn so a bot leaves before a spoke arrives.
+                let mut t = 0.;
+                while t <= look + 1e-9 {
+                    let turned = sp.angle + sp.dir * deg_per_s.to_radians() * t;
+                    let hit = (0..count).any(|n| {
+                        let a = turned + n as f64 * std::f64::consts::TAU / count as f64;
+                        let tip = Point {
+                            x: centre.x + a.cos() * length,
+                            y: centre.y + a.sin() * length,
+                        };
+                        bm::segment_distance(at, centre, tip) <= width / 2. + BODY
+                    });
+                    if hit {
+                        note(&def.mechanics[sp.mech].name, t, true);
+                        break;
+                    }
+                    t += 0.25;
+                }
+            }
+            // A seeking orb that is about to touch this player, and the lethal bridge between a divided boss's bodies.
+            for orb in fight.orbs.iter().filter(|o| o.target == session) {
+                let d = orb.at.distance(at);
+                if d <= ORB_REACH + 3. {
+                    note(&self.stasis_name(fight.boss), d / orb.speed.max(0.1), true);
+                }
+            }
+            if let (Some(partner), Some(split)) = (fight.partner, self.split_def(fight.boss))
+                && split.bridge > 0.
+                && !self.slimes[fight.boss].dead
+                && !self.slimes[partner].dead
+                && fight.downed.is_empty()
+            {
+                let (a, b) = (
+                    self.slimes[fight.boss].point(),
+                    self.slimes[partner].point(),
+                );
+                if bm::segment_distance(at, a, b) <= split.bridge + BODY + 1.2 {
+                    note("Twin Suns", fight.bridge_wait, true);
                 }
             }
         }
-        soonest
+        found
+    }
+
+    /// Seconds until something that depends on where `session` stands would hurt them at `at` (a break bar, which asks
+    /// for damage and not a move, is left out); `None`: safe there. The fighters that are not at a keyboard use this
+    /// to choose where to stand (`boss_play`).
+    pub(super) fn bot_threat(
+        &self,
+        zone: usize,
+        session: u64,
+        at: Point,
+        look: f64,
+    ) -> Option<f64> {
+        self.danger_list(zone, session, at, look)
+            .into_iter()
+            .filter(|(_, _, positional)| *positional)
+            .map(|(_, left, _)| left)
+            .min_by(f64::total_cmp)
     }
 
     // -----------------------------------------------------------------------------------------------------------
@@ -2240,6 +2480,35 @@ impl World {
                 t["reverseLeft"] = json!(sp.warn_left);
                 teles.push(t);
             }
+            // The bridge of light between a divided boss's bodies: a dashed path while it warns, then red.
+            if let (Some(partner), Some(split)) = (fight.partner, self.split_def(fight.boss))
+                && split.bridge > 0.
+                && !self.slimes[fight.boss].dead
+                && !self.slimes[partner].dead
+                && fight.downed.is_empty()
+            {
+                let lane = Shape::Lane {
+                    a: self.slimes[fight.boss].point(),
+                    b: self.slimes[partner].point(),
+                    half: split.bridge,
+                };
+                let warning = fight.bridge_wait > 0.;
+                let kind = if warning {
+                    bm::Telegraph::Path
+                } else {
+                    bm::Telegraph::Danger
+                };
+                let name = self.mechanic_name(fight.boss, |b| matches!(b, Block::Split(_)));
+                teles.push(tele_json(
+                    0,
+                    &name,
+                    kind,
+                    &[lane],
+                    fight.bridge_wait,
+                    BRIDGE_WARNING,
+                    false,
+                ));
+            }
             for c in &fight.cover {
                 let shape = Shape::Circle {
                     x: c.cover.x,
@@ -2268,6 +2537,64 @@ impl World {
                 t["orb"] = json!(true);
                 teles.push(t);
             }
+            let mut stat = Value::Null;
+            if let Some(st) = &fight.stat {
+                let name = def
+                    .mechanics
+                    .iter()
+                    .find(|m| matches!(m.block, Block::Static(_)))
+                    .map_or("", |m| m.name.as_str());
+                for r in &st.rods {
+                    let shape = Shape::Circle {
+                        x: r.at.x,
+                        y: r.at.y,
+                        r: st.rod_r,
+                        inner: 0.,
+                    };
+                    let mut t = tele_json(0, name, bm::Telegraph::Safe, &[shape], 0., 0., false);
+                    t["lit"] = json!(r.dark_left <= 0.);
+                    t["litLeft"] = json!(r.dark_left);
+                    t["rod"] = json!(true);
+                    teles.push(t);
+                }
+                for (at, r, left) in &st.bursts {
+                    let shape = Shape::Circle {
+                        x: at.x,
+                        y: at.y,
+                        r: *r,
+                        inner: 0.,
+                    };
+                    teles.push(tele_json(
+                        0,
+                        name,
+                        bm::Telegraph::Danger,
+                        &[shape],
+                        *left,
+                        0.8,
+                        false,
+                    ));
+                }
+                let by_id = |m: &BTreeMap<u64, u32>| -> BTreeMap<String, u32> {
+                    m.iter()
+                        .filter_map(|(s, n)| {
+                            self.players.get(s).map(|p| (p.character.id.clone(), *n))
+                        })
+                        .collect()
+                };
+                stat = json!({
+                    "name": name,
+                    "limit": st.limit,
+                    "warnAt": st.warn_at,
+                    "radius": def.mechanics.iter().find_map(|m| match &m.block {
+                        Block::Static(t) => Some(t.r),
+                        _ => None,
+                    }),
+                    "charges": by_id(&st.charges),
+                    "grounded": st.grounded.iter().filter_map(|(s, left)| {
+                        self.players.get(s).map(|p| (p.character.id.clone(), *left))
+                    }).collect::<BTreeMap<String, f64>>(),
+                });
+            }
             let ids = |sessions: Vec<&u64>| -> Vec<String> {
                 sessions
                     .into_iter()
@@ -2290,6 +2617,7 @@ impl World {
                     "healPerSecond": s.heal_per_s,
                 })),
                 "stunned": fight.stun_left.max(0.),
+                "static": stat,
                 "partner": fight.partner,
                 "downed": fight.downed.keys().collect::<Vec<_>>(),
                 "banner": fight.banner.as_ref().map(|(t, _)| t),
@@ -2320,6 +2648,9 @@ fn tele_json(
         "total": total,
     })
 }
+
+#[path = "boss_play.rs"]
+mod play;
 
 #[cfg(test)]
 #[path = "boss_mechanics_tests.rs"]

@@ -16,6 +16,9 @@ pub struct Enemy {
     pub ranged: Option<(f64, f64, String, f64, u32, f64)>,
     pub slam: f64,
     pub melee: f64,
+    /// A sleeping helper of a final-boss mechanic (a singer, pearl, seed or cocoon): a kill gives experience only.
+    #[serde(default)]
+    pub add: bool,
 }
 pub static ENEMIES: LazyLock<Vec<Enemy>> = LazyLock::new(|| {
     let mut enemies: Vec<Enemy> = serde_json::from_str(include_str!("../../world/cathedral.txt"))

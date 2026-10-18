@@ -185,6 +185,7 @@ pub enum Block {
     Split(Split),
     Hold(Hold),
     Gaze(Gaze),
+    Static(Static),
 }
 
 /// A ground shape with a cast time and an effect.
@@ -446,6 +447,23 @@ pub struct Hold {
     /// One lit place goes out this often (0: never).
     #[serde(default)]
     pub snuff_every: f64,
+}
+
+/// Every blow a player lands on the boss adds `per_hit` charges to that player. At `limit` the player detonates: a
+/// lethal burst of radius `r` at their feet (it takes everyone near them, the bearer included). Standing on a ready
+/// rod clears the charge and gives `immune` seconds in which no charge builds; the rod is dark for `dark` seconds.
+/// The banner shows at `warn_at` charges.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Static {
+    pub limit: u32,
+    pub warn_at: u32,
+    pub per_hit: u32,
+    pub r: f64,
+    pub rods: Vec<[f64; 2]>,
+    pub rod_r: f64,
+    pub immune: f64,
+    pub dark: f64,
 }
 
 /// Line of sight: after `cast` seconds the boss sees everyone it has a clear line to. `cover` blocks it.
@@ -1154,6 +1172,31 @@ pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
                 }
                 if !(s.heal_per_s >= 0. && s.heal_per_s < 0.2) {
                     return bad(m, "heal_per_s must be in [0, 0.2)");
+                }
+            }
+            Block::Static(t) => {
+                if t.limit < 2 || t.warn_at == 0 || t.warn_at >= t.limit {
+                    return bad(
+                        m,
+                        "static needs a limit of at least 2 and a warning below it",
+                    );
+                }
+                if t.per_hit == 0 || t.per_hit >= t.limit || !positive(t.r) {
+                    return bad(
+                        m,
+                        "static needs charges per hit below the limit and a radius",
+                    );
+                }
+                if t.rods.len() < 2
+                    || !positive(t.rod_r)
+                    || !positive(t.dark)
+                    || !t.immune.is_finite()
+                    || t.immune < 0.
+                {
+                    return bad(
+                        m,
+                        "static needs at least two rods (not everyone fits on one), a rod radius and a dark time",
+                    );
                 }
             }
             Block::Adds(a) => {

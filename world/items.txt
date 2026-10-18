@@ -52328,5 +52328,47 @@
     "requiredLevel": 95,
     "sell": 0,
     "mount": "gryphon"
+  },
+  {
+    "id": "cathedral_choirsinger",
+    "name": "Bound Singer Fragment",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 180
+  },
+  {
+    "id": "cathedral_reliquarypearl",
+    "name": "Reliquary Pearl Fragment",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 180
+  },
+  {
+    "id": "seed_sprout_relic",
+    "name": "Worldseed Seed Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2350
+  },
+  {
+    "id": "seed_treant_relic",
+    "name": "Bloom Treant Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2350
+  },
+  {
+    "id": "solar_cinder_relic",
+    "name": "Cinder of the Crucible Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4400
+  },
+  {
+    "id": "amber_cocoon_relic",
+    "name": "Amber Cocoon Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 4700
   }
 ]

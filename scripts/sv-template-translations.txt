@@ -218,6 +218,7 @@
   "{0} mercenary contract(s) ended.": "{0} legosoldatskontrakt avslutades.",
   "{0} needs level {1}.": "{0} kräver nivå {1}.",
   "{0} of {1} left": "{0} av {1} kvar",
+  "{0} of {1} sparks": "{0} av {1} gnistor",
   "{0} opened the treasure chest.": "{0} öppnade skattkistan.",
   "{0} passive": "{0}-passiv",
   "{0} pieces · {1}": "{0} delar · {1}",

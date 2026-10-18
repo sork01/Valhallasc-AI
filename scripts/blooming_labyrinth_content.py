@@ -8,7 +8,7 @@ ENEMIES = [
     dict(kind='bloom_guard', name='Vineglass Guardian', art='guard', color='#94bd8e', stats=[1080000, 13700, 2.5, 1.9], profile=[1, 1.6, 9, 13], ranged=None, slam=3.7, melee=0, boss=False),
     dict(kind='bloom_thornkeeper', name='Thornkeeper', art='thornkeeper', color='#88bc75', stats=[4800000, 30500, 2.5, 2.45], profile=[.9, 1.8, 10, 15], ranged=None, slam=4.8, melee=4.5, boss=True),
     dict(kind='bloom_mirror', name='Petal Mirror', art='mirror', color='#e3a9d8', stats=[4500000, 28700, 2.8, 2.4], profile=[.8, 2.0, 10, 15], ranged=[17, 11, '#ffe6f4', 1.25, 4, .29], slam=0, melee=0, boss=True),
-    dict(kind='bloom_heart', name='Heart of the Labyrinth', art='heart', color='#f2c5dc', stats=[7000000, 39000, 2.1, 3.1], profile=[1.2, 2.3, 10, 18], ranged=[18, 12, '#f8f6df', 1.5, 5, .33], slam=5.6, melee=5.6, boss=True),
+    dict(kind='bloom_heart', name='Heart of the Labyrinth', art='heart', color='#f2c5dc', stats=[13300000, 39000, 2.1, 3.1], profile=[1.2, 2.3, 10, 18], ranged=[18, 12, '#f8f6df', 1.5, 5, .33], slam=5.6, melee=5.6, boss=True),
 ]
 for enemy in ENEMIES:
     enemy.update(level=97, gold=19000 if enemy['boss'] else 4600,

@@ -175,5 +175,61 @@
     "gold": 9600,
     "material": "seed_worldseed_relic",
     "lootSource": "seed_vault"
+  },
+  {
+    "kind": "seed_sprout",
+    "name": "Worldseed Seed",
+    "art": "mote",
+    "color": "#e9d78e",
+    "stats": [
+      60000,
+      3000,
+      1,
+      1.0
+    ],
+    "profile": [
+      0.9,
+      1.8,
+      0,
+      6
+    ],
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "boss": false,
+    "add": true,
+    "artFrom": "seed_mote",
+    "level": 80,
+    "gold": 2320,
+    "material": "seed_sprout_relic",
+    "lootSource": null
+  },
+  {
+    "kind": "seed_treant",
+    "name": "Bloom Treant",
+    "art": "rootguard",
+    "color": "#b6d98c",
+    "stats": [
+      120000,
+      7000,
+      2.4,
+      2.0
+    ],
+    "profile": [
+      0.9,
+      1.55,
+      8,
+      11
+    ],
+    "ranged": null,
+    "slam": 3.0,
+    "melee": 0,
+    "boss": false,
+    "add": true,
+    "artFrom": "seed_rootguard",
+    "level": 80,
+    "gold": 2320,
+    "material": "seed_treant_relic",
+    "lootSource": null
   }
 ]

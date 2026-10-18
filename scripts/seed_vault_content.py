@@ -21,6 +21,13 @@ ENEMIES = [
     dict(kind='seed_worldseed', name='Heart of the Worldseed', art='worldseed', color='#e4dc9c',
          stats=[4050000, 22000, 2.2, 2.75], profile=[1.1, 2.2, 8, 16],
          ranged=[15, 11, '#f0e9b9', 1.35, 5, .31], slam=4.9, melee=5.1, boss=True),
+    # Adds of Germination (docs/boss-mechanics.md): they drop nothing and borrow art until they get their own.
+    dict(kind='seed_sprout', name='Worldseed Seed', art='mote', color='#e9d78e',
+         stats=[60000, 3000, 1, 1.0], profile=[.9, 1.8, 0, 6],
+         ranged=None, slam=0, melee=0, boss=False, add=True, artFrom='seed_mote'),
+    dict(kind='seed_treant', name='Bloom Treant', art='rootguard', color='#b6d98c',
+         stats=[120000, 7000, 2.4, 2.0], profile=[.9, 1.55, 8, 11],
+         ranged=None, slam=3.0, melee=0, boss=False, add=True, artFrom='seed_rootguard'),
 ]
 
 for enemy in ENEMIES:

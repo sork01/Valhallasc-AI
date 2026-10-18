@@ -488,10 +488,10 @@ fn a_shield_rises_at_its_mark_blocks_every_blow_and_falls_when_its_adds_are_dead
     r.run(0.1);
     assert!(r.fight().shield.is_none());
     assert!(r.hit_boss(1, 5.) > 0., "the boss can be hurt again");
-    // The second mark: six singers asked for, but only one is left asleep.
+    // The second mark: six singers asked for, one is left asleep, so the four that fell are put to work again.
     r.set_boss_share(0.3);
     r.run(0.2);
-    assert_eq!(r.fight().shield.as_ref().unwrap().adds.len(), 1);
+    assert_eq!(r.fight().shield.as_ref().unwrap().adds.len(), 5);
 }
 
 #[test]
@@ -1360,7 +1360,14 @@ fn the_bridge_between_the_bodies_kills_what_stands_on_it() {
     r.put(1, mid.x, mid.y);
     let off = on_line(a, b, a.distance(b) / 2., 6.);
     r.put(2, off.x, off.y);
-    r.run(0.2);
+    // The bridge is drawn for its warning first (a dashed path), and kills only after it.
+    r.run(1.);
+    assert!(r.alive(1), "still warning");
+    assert_eq!(
+        r.view()["tele"].as_array().unwrap().last().unwrap()["tele"],
+        "dashed line"
+    );
+    r.run(2.5);
     assert!(!r.alive(1) && r.alive(2));
     assert_eq!(causes(&r.events(1)), vec!["Twin Suns".to_string()]);
 }
@@ -1686,35 +1693,60 @@ fn unfair_point(w: &World, boss: usize, def: &BossDef) -> Option<(String, Point)
     let s = &w.slimes[boss];
     let map = &w.maps[s.zone];
     let arena = bm::arena_for_boss(map, s.point(), def);
+    // The braziers a fight lights: the safe discs of a `lit` zone. Fair if ANY two of them are lit (the sign asks
+    // the party to keep two burning), so every pair is tried; a boss without braziers has one empty set.
+    let lit_sets: Vec<Vec<Shape>> = match def.mechanics.iter().find_map(|m| match &m.block {
+        Block::Hold(h) => Some(h),
+        _ => None,
+    }) {
+        Some(h) => {
+            let disc = |p: &[f64; 2]| Shape::Circle {
+                x: p[0],
+                y: p[1],
+                r: h.r,
+                inner: 0.,
+            };
+            let mut sets = vec![];
+            for a in 0..h.points.len() {
+                for b in a + 1..h.points.len() {
+                    sets.push(vec![disc(&h.points[a]), disc(&h.points[b])]);
+                }
+            }
+            sets
+        }
+        None => vec![vec![]],
+    };
     for m in &def.mechanics {
         let Block::Zone(z) = &m.block else { continue };
-        for seed in 0..20u64 {
-            let mut state = seed.wrapping_mul(0x9E37_79B9_7F4A_7C15) | 1;
-            let mut rng = move || {
-                state = state
-                    .wrapping_mul(6364136223846793005)
-                    .wrapping_add(1442695040888963407);
-                (state >> 11) as f64 / (1u64 << 53) as f64
-            };
-            let players: Vec<Point> = (0..3)
-                .map(|_| Point {
-                    x: arena.x0 + rng() * arena.width(),
-                    y: arena.y0 + rng() * arena.height(),
-                })
-                .collect();
-            let ctx = bm::Ctx {
-                map,
-                arena,
-                boss: s.point(),
-                players: &players,
-                lit: &[],
-                cast: z.cast,
-            };
-            let shapes = bm::resolve(&z.shape, &ctx, &mut rng);
-            if let Some(p) =
-                bm::first_unsafe_point(map, arena, z.cast, &|p| bm::hurts(z.effect, &shapes, p))
-            {
-                return Some((m.name.clone(), p));
+        for lit in &lit_sets {
+            for seed in 0..20u64 {
+                let mut state = seed.wrapping_mul(0x9E37_79B9_7F4A_7C15) | 1;
+                let mut rng = move || {
+                    state = state
+                        .wrapping_mul(6364136223846793005)
+                        .wrapping_add(1442695040888963407);
+                    (state >> 11) as f64 / (1u64 << 53) as f64
+                };
+                let players: Vec<Point> = (0..3)
+                    .map(|_| Point {
+                        x: arena.x0 + rng() * arena.width(),
+                        y: arena.y0 + rng() * arena.height(),
+                    })
+                    .collect();
+                let ctx = bm::Ctx {
+                    map,
+                    arena,
+                    boss: s.point(),
+                    players: &players,
+                    lit,
+                    cast: z.cast,
+                };
+                let shapes = bm::resolve(&z.shape, &ctx, &mut rng);
+                if let Some(p) =
+                    bm::first_unsafe_point(map, arena, z.cast, &|p| bm::hurts(z.effect, &shapes, p))
+                {
+                    return Some((m.name.clone(), p));
+                }
             }
         }
     }
@@ -2164,4 +2196,701 @@ fn downpour_leaves_an_eight_second_puddle_that_spares_its_bearer() {
         1,
         "the mark and its puddle send one god-mode notice"
     );
+}
+
+// --- the eight bosses of the second half (BOSSMECH-CHOIRMOTHER .. BOSSMECH-SOLSTICE-HEART) ---------------------------
+
+/// What a shipped boss's sign says, in one string.
+fn sign_words(kind: &str) -> String {
+    let all: Value = serde_json::from_str(include_str!("../../../world/boss-signs.txt")).unwrap();
+    ["what", "todo", "tip"]
+        .iter()
+        .map(|p| all[kind][*p].as_str().unwrap().to_string())
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// The mechanics of the table a `rig` loaded (it keeps the table under the Undervault king's kind), as `(name, block)`.
+fn blocks(w: &World, _shipped_kind: &str) -> Vec<(String, Block)> {
+    w.boss.table["hollowking"]
+        .mechanics
+        .iter()
+        .map(|m| (m.name.clone(), m.block.clone()))
+        .collect()
+}
+
+/// `n` places along the top of the Undervault boss room for sleepers.
+fn row(n: usize) -> Vec<(f64, f64)> {
+    (0..n).map(|i| (104. + 1.5 * i as f64, 10.)).collect()
+}
+
+#[test]
+fn elyss_tolls_a_five_second_circle_and_calls_four_then_six_singers() {
+    let mut r = rig(&shipped("choirmother"), 2);
+    let tolls: Vec<_> = blocks(&r.w, "choirmother")
+        .into_iter()
+        .filter_map(|(n, b)| match b {
+            Block::Zone(z) => Some((n, z)),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(tolls.len(), 2);
+    for (name, z) in &tolls {
+        assert_eq!(name, "Toll of the Deep");
+        assert_eq!((z.cast, z.effect), (5., Effect::Kill));
+        assert!(
+            matches!(z.shape, bm::ShapeSpec::Circle { r, inner, .. } if r == 8. && inner == 0.)
+        );
+    }
+    assert_eq!((tolls[0].1.every, tolls[1].1.every), (25., 18.));
+    let steps: Vec<_> = blocks(&r.w, "choirmother")
+        .into_iter()
+        .find_map(|(_, b)| match b {
+            Block::Shield(s) => Some(s.steps),
+            _ => None,
+        })
+        .unwrap();
+    assert_eq!(
+        steps.iter().map(|s| (s.hp, s.count)).collect::<Vec<_>>(),
+        vec![(0.66, 4), (0.33, 6)]
+    );
+    // The first toll: a hero standing by Elyss falls, one outside the circle does not.
+    let boss = r.w.slimes[r.boss].point();
+    r.put(1, boss.x + 2., boss.y);
+    let far = r.put(2, boss.x, boss.y + 14.);
+    assert!(far.distance(boss) > 8.);
+    r.run(25.2);
+    assert_eq!(r.view()["cast"]["name"], "Toll of the Deep");
+    r.run(5.);
+    assert!(!r.alive(1) && r.alive(2));
+    assert_eq!(causes(&r.events(1)), vec!["Toll of the Deep".to_string()]);
+    // The singers: four at 66%, and, once they are down, six at 33%.
+    let singers = r.sleepers("chorus", &row(10));
+    r.set_boss_share(0.65);
+    r.run(0.2);
+    let up = r.fight().shield.as_ref().expect("the chorus rises");
+    assert_eq!((up.adds.len(), up.name.as_str()), (4, "The Bound Chorus"));
+    for s in up.adds.clone() {
+        r.w.hit_slime(s, 2, 1e9, false);
+    }
+    r.run(0.2);
+    assert!(r.fight().shield.is_none());
+    r.set_boss_share(0.32);
+    r.run(0.2);
+    let up = r.fight().shield.as_ref().unwrap();
+    assert_eq!(up.adds.len(), 6);
+    assert!(up.adds.iter().all(|s| singers.contains(s)));
+    let words = sign_words("choirmother");
+    assert!(words.contains("5 seconds"), "{words}");
+}
+
+#[test]
+fn avariels_shell_heals_until_every_pearl_is_broken_and_the_last_one_brings_crabs() {
+    let mut r = rig(&shipped("coralregent"), 2);
+    let b = blocks(&r.w, "coralregent");
+    let Block::Shield(shell) = &b[0].1 else {
+        panic!("the shell comes first")
+    };
+    assert_eq!(shell.heal_per_s, 0.02);
+    assert_eq!(
+        shell
+            .steps
+            .iter()
+            .map(|s| (s.hp, s.count, s.still))
+            .collect::<Vec<_>>(),
+        vec![(0.75, 3, true), (0.5, 3, true), (0.25, 4, true)]
+    );
+    assert!(matches!(&b[1].1, Block::Adds(a) if a.tag == "shellcrab" && a.count == 2));
+    assert_eq!(b[1].0, "Reliquary Crabs");
+    r.sleepers("pearl", &row(10));
+    let crabs = r.sleepers("shellcrab", &[(104., 12.), (106., 12.)]);
+    r.set_boss_share(0.74);
+    r.run(0.2);
+    let up = r.fight().shield.as_ref().expect("the first shell");
+    assert_eq!(up.adds.len(), 3);
+    for s in &up.adds {
+        assert!(r.fight().still.contains(s), "a pearl stays where it grew");
+    }
+    let hp = r.w.slimes[r.boss].hp;
+    r.run(2.);
+    let gained = (r.w.slimes[r.boss].hp - hp) / r.max_hp();
+    assert!((gained - 0.04).abs() < 0.005, "2% a second: {gained}");
+    for s in r.fight().shield.as_ref().unwrap().adds.clone() {
+        r.w.hit_slime(s, 1, 1e9, false);
+    }
+    r.run(0.2);
+    assert!(r.fight().shield.is_none());
+    assert!(
+        crabs.iter().all(|c| r.w.slimes[*c].dead),
+        "no crabs above a quarter of her health"
+    );
+    r.set_boss_share(0.49);
+    r.run(0.2);
+    assert_eq!(r.fight().shield.as_ref().unwrap().adds.len(), 3);
+    for s in r.fight().shield.as_ref().unwrap().adds.clone() {
+        r.w.hit_slime(s, 1, 1e9, false);
+    }
+    r.run(0.2);
+    r.set_boss_share(0.24);
+    r.run(1.);
+    assert_eq!(r.fight().shield.as_ref().unwrap().adds.len(), 4);
+    assert!(
+        crabs
+            .iter()
+            .all(|c| !r.w.slimes[*c].dead && !r.fight().still.contains(c)),
+        "two crabs join, free to move"
+    );
+    let words = sign_words("coralregent");
+    assert!(words.contains("Three times"), "{words}");
+}
+
+#[test]
+fn the_worldseed_plants_three_seeds_every_thirty_seconds_that_bloom_into_treants() {
+    let mut r = rig(&shipped("seed_worldseed"), 2);
+    let b = blocks(&r.w, "seed_worldseed");
+    let counts: Vec<_> = b
+        .iter()
+        .map(|(_, m)| match m {
+            Block::Adds(a) => {
+                let bl = a.bloom.as_ref().unwrap();
+                (
+                    a.count,
+                    a.every,
+                    a.scatter,
+                    a.still,
+                    bl.after,
+                    bl.heal,
+                    bl.then.clone(),
+                )
+            }
+            _ => panic!("only seeds"),
+        })
+        .collect();
+    assert_eq!(
+        counts[0],
+        (3, 30., true, true, 12., 0.04, Some("treant".to_string()))
+    );
+    assert_eq!(counts[1].0, 5, "five at once below 35%");
+    let seeds = r.sleepers("seed", &row(3));
+    let treants = r.sleepers("treant", &[(104., 12.), (106., 12.), (108., 12.)]);
+    r.run(30.2);
+    assert!(
+        seeds.iter().all(|s| !r.w.slimes[*s].dead),
+        "three seeds are planted"
+    );
+    // Break one in time: nothing blooms from it. The other two are left to grow for 12 s.
+    r.w.hit_slime(seeds[0], 1, 1e9, false);
+    r.set_boss_share(0.5);
+    let hp = r.w.slimes[r.boss].hp;
+    r.run(12.2);
+    let gained = (r.w.slimes[r.boss].hp - hp) / r.max_hp();
+    assert!(
+        (gained - 0.08).abs() < 0.005,
+        "two seeds bloomed, 4% each: {gained}"
+    );
+    assert_eq!(
+        treants.iter().filter(|t| !r.w.slimes[**t].dead).count(),
+        2,
+        "a treant where each seed stood"
+    );
+    // The next planting finds its seeds again, even the one that was killed.
+    r.run(18.);
+    assert!(
+        seeds.iter().all(|s| !r.w.slimes[*s].dead),
+        "the broken seed is put to work again"
+    );
+    let words = sign_words("seed_worldseed");
+    assert!(
+        words.contains("30 seconds")
+            && words.contains("12 seconds")
+            && words.contains("five seeds")
+    );
+}
+
+#[test]
+fn prism_bounce_marks_one_friend_then_two_and_the_beam_bounces_more_late() {
+    let mut r = rig(&shipped("bloom_heart"), 3);
+    let marks: Vec<_> = blocks(&r.w, "bloom_heart")
+        .into_iter()
+        .map(|(_, b)| match b {
+            Block::Mark(k) => (
+                k.count,
+                k.cast,
+                k.every,
+                matches!(k.effect, MarkEffect::Beam { bounces, .. } if bounces > 0),
+            ),
+            _ => panic!("only marks"),
+        })
+        .collect();
+    assert_eq!(marks, vec![(1, 5., 18., true), (2, 5., 18., true)]);
+    r.run(18.2);
+    assert_eq!(r.view()["marked"].as_array().unwrap().len(), 1);
+    assert_eq!(
+        r.view()["tele"][0]["shapes"].as_array().unwrap().len(),
+        3,
+        "two bounces, three segments"
+    );
+    let mut r = rig(&shipped("bloom_heart"), 3);
+    r.set_boss_share(0.2);
+    r.run(18.2);
+    assert_eq!(r.view()["marked"].as_array().unwrap().len(), 2);
+    assert_eq!(
+        r.view()["tele"][0]["shapes"].as_array().unwrap().len(),
+        4,
+        "three bounces, four segments"
+    );
+    let words = sign_words("bloom_heart");
+    assert!(
+        words.contains("5 seconds") && words.contains("three times"),
+        "{words}"
+    );
+}
+
+#[test]
+fn twin_suns_divide_the_heart_at_sixty_per_cent_and_sunburst_follows() {
+    let mut r = rig(&shipped("solar_heart"), 2);
+    let b = blocks(&r.w, "solar_heart");
+    let Block::Split(s) = &b[0].1 else {
+        panic!("the split comes first")
+    };
+    assert_eq!(
+        (s.hp, s.revive_after, s.survivor_bonus, s.tag.as_str()),
+        (0.6, 10., 0.5, "cinder")
+    );
+    assert!(s.bridge > 0.);
+    let Block::Zone(z) = &b[1].1 else {
+        panic!("then the burst")
+    };
+    assert_eq!((z.cast, z.effect, z.every), (3., Effect::Heavy, 14.));
+    assert!(matches!(z.shape, bm::ShapeSpec::Cone { .. }));
+    assert!(r.w.boss.table["hollowking"].mechanics[1].active_at(0.59));
+    assert!(!r.w.boss.table["hollowking"].mechanics[1].active_at(0.61));
+    let partner = r.sleepers("cinder", &[(116., 30.)])[0];
+    r.run(5.);
+    assert!(r.fight().partner.is_none(), "whole above 60%");
+    r.set_boss_share(0.59);
+    r.run(0.2);
+    assert_eq!(r.fight().partner, Some(partner));
+    let words = sign_words("solar_heart");
+    assert!(words.contains("10 seconds"), "{words}");
+}
+
+#[test]
+fn amber_stasis_sends_two_orbs_then_three_and_holds_a_friend_ten_then_eight_seconds() {
+    let mut r = rig(&shipped("amber_memory"), 3);
+    let stasis: Vec<_> = blocks(&r.w, "amber_memory")
+        .into_iter()
+        .map(|(_, b)| match b {
+            Block::Stasis(s) => (s.orbs, s.hold, s.every, s.tag),
+            _ => panic!("only stasis"),
+        })
+        .collect();
+    assert_eq!(stasis[0], (2, 10., 25., "cocoon".to_string()));
+    assert_eq!((stasis[1].0, stasis[1].1), (3, 8.));
+    r.sleepers("cocoon", &row(6));
+    let boss = r.w.slimes[r.boss].point();
+    for s in 1..=3 {
+        r.put(s, boss.x - 4. + s as f64 * 4., boss.y + 6.);
+    }
+    r.run(25.2);
+    assert_eq!(
+        r.view()["tele"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|t| t["orb"] == true)
+            .count(),
+        2
+    );
+    r.run(6.);
+    let frozen: Vec<u64> = (1..=3).filter(|s| r.w.players[s].frozen).collect();
+    assert!(!frozen.is_empty() && frozen.len() <= 2, "{frozen:?}");
+    let words = sign_words("amber_memory");
+    assert!(
+        words.contains("10 seconds") && words.contains("three orbs") && words.contains("8 seconds"),
+        "{words}"
+    );
+}
+
+#[test]
+fn the_longest_night_lights_four_braziers_and_falls_every_forty_five_then_thirty_seconds() {
+    let r = rig(&shipped("solstice_heart"), 1);
+    let b = blocks(&r.w, "solstice_heart");
+    let holds: Vec<_> = b
+        .iter()
+        .filter_map(|(_, m)| match m {
+            Block::Hold(h) => Some((h.points.len(), h.r, h.hold_for, h.lit_for, h.snuff_every)),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(holds, vec![(4, 2.5, 3., 30., 12.), (4, 2.5, 3., 20., 12.)]);
+    let nights: Vec<_> = b
+        .iter()
+        .filter_map(|(_, m)| match m {
+            Block::Zone(z) => Some((z.cast, z.every, z.effect)),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(
+        nights,
+        vec![
+            (5., 45., Effect::KillOutside),
+            (5., 30., Effect::KillOutside)
+        ]
+    );
+    let words = sign_words("solstice_heart");
+    for needle in [
+        "45 seconds",
+        "5 seconds",
+        "3 seconds",
+        "30 seconds",
+        "12 seconds",
+    ] {
+        assert!(words.contains(needle), "{needle}: {words}");
+    }
+}
+
+// --- Static ----------------------------------------------------------------------------------------------------------
+
+const STATIC: &str = r#"{"mechanics":[
+    {"name":"Static","block":"static","hp_min":0.3,"limit":4,"warn_at":3,"per_hit":1,"r":5,"rods":[[112,12],[120,12]],"rod_r":1.8,"immune":8,"dark":12},
+    {"name":"Static","block":"static","hp_max":0.3,"limit":4,"warn_at":3,"per_hit":2,"r":5,"rods":[[112,12],[120,12]],"rod_r":1.8,"immune":8,"dark":20}]}"#;
+
+fn charge_of(r: &Rig, session: u64) -> u64 {
+    let id = r.w.players[&session].character.id.clone();
+    r.view()["static"]["charges"][&id].as_u64().unwrap_or(0)
+}
+
+#[test]
+fn every_blow_on_the_boss_adds_a_charge_and_the_limit_detonates_the_bearer_and_whoever_is_near() {
+    let mut r = rig(STATIC, 3);
+    r.run(0.2);
+    let boss = r.w.slimes[r.boss].point();
+    let me = r.put(1, boss.x, boss.y + 10.);
+    r.put(2, me.x + 2., me.y);
+    let far = r.put(3, me.x - 12., me.y);
+    assert!(far.distance(me) > 5.);
+    for n in 1..=3 {
+        assert!(r.hit_boss(1, 5.) > 0.);
+        assert_eq!(charge_of(&r, 1), n);
+    }
+    assert_eq!(
+        r.fight().banner.as_ref().map(|b| b.0.as_str()),
+        Some("Static"),
+        "warned at three"
+    );
+    assert_eq!(r.view()["static"]["limit"], 4);
+    // Blows on the boss by someone else do not charge me.
+    assert!(r.hit_boss(3, 5.) > 0.);
+    assert_eq!(charge_of(&r, 1), 3);
+    assert!(r.alive(1) && r.alive(2) && r.alive(3));
+    r.hit_boss(1, 5.);
+    assert!(!r.alive(1), "the bearer detonates");
+    assert!(!r.alive(2), "so does whoever stands within five tiles");
+    assert!(r.alive(3), "and no one else");
+    assert_eq!(charge_of(&r, 1), 0);
+    // Every death in the zone reaches everyone: both name the same ability.
+    assert_eq!(
+        causes(&r.events(3)),
+        vec!["Static".to_string(), "Static".to_string()]
+    );
+    assert!(
+        r.view()["tele"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|t| t["tele"] == "red"),
+        "the burst shows for a moment"
+    );
+}
+
+#[test]
+fn a_ready_rod_clears_the_charge_grants_eight_seconds_of_calm_and_goes_dark() {
+    let mut r = rig(STATIC, 2);
+    r.run(0.2);
+    let boss = r.w.slimes[r.boss].point();
+    r.put(1, boss.x, boss.y + 10.);
+    r.put(2, boss.x + 12., boss.y + 10.);
+    r.hit_boss(1, 5.);
+    r.hit_boss(1, 5.);
+    assert_eq!(charge_of(&r, 1), 2);
+    let rod = r.put(1, 112., 12.);
+    assert!(
+        rod.distance(Point { x: 112., y: 12. }) < 1.8,
+        "the Undervault room holds the rod's spot"
+    );
+    r.run(0.2);
+    assert_eq!(charge_of(&r, 1), 0);
+    assert!(r.view()["static"]["grounded"].as_object().unwrap().len() == 1);
+    let lit = |r: &Rig| -> Vec<bool> {
+        r.view()["tele"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|t| t["rod"] == true)
+            .map(|t| t["lit"].as_bool().unwrap())
+            .collect()
+    };
+    assert_eq!(
+        lit(&r),
+        vec![false, true],
+        "the touched rod is dark, the other ready"
+    );
+    // For eight seconds blows add nothing; after that they do again.
+    r.put(1, boss.x, boss.y + 10.);
+    r.hit_boss(1, 5.);
+    assert_eq!(charge_of(&r, 1), 0);
+    r.run(8.);
+    r.hit_boss(1, 5.);
+    assert_eq!(charge_of(&r, 1), 1);
+    // The rod is dark for twelve seconds: a second hero gains nothing from it before then.
+    r.hit_boss(2, 5.);
+    r.put(2, 112., 12.);
+    r.run(0.3);
+    assert_eq!(charge_of(&r, 2), 1, "a dark rod does nothing");
+    r.put(2, boss.x + 12., boss.y + 10.);
+    r.run(4.);
+    assert_eq!(lit(&r), vec![true, true], "back after twelve seconds");
+    r.put(2, 112., 12.);
+    r.run(0.3);
+    assert_eq!(charge_of(&r, 2), 0);
+}
+
+#[test]
+fn below_thirty_per_cent_blows_charge_twice_and_the_rods_rest_twenty_seconds() {
+    let mut r = rig(STATIC, 1);
+    r.set_boss_share(0.2);
+    r.run(0.2);
+    let boss = r.w.slimes[r.boss].point();
+    r.put(1, boss.x, boss.y + 10.);
+    r.hit_boss(1, 5.);
+    assert_eq!(charge_of(&r, 1), 2);
+    r.put(1, 112., 12.);
+    r.run(0.2);
+    r.put(1, boss.x, boss.y + 10.);
+    r.run(12.5);
+    let lit: Vec<bool> = r.view()["tele"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|t| t["rod"] == true)
+        .map(|t| t["lit"].as_bool().unwrap())
+        .collect();
+    assert_eq!(lit, vec![false, true], "still dark after twelve seconds");
+    r.run(8.);
+    let lit: Vec<bool> = r.view()["tele"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|t| t["rod"] == true)
+        .map(|t| t["lit"].as_bool().unwrap())
+        .collect();
+    assert_eq!(lit, vec![true, true]);
+}
+
+#[test]
+fn the_shipped_thunder_heart_is_static_with_four_corner_rods_and_a_sign_that_matches() {
+    let r = rig(&shipped("thunder_heart"), 1);
+    let statics: Vec<_> = blocks(&r.w, "thunder_heart")
+        .into_iter()
+        .map(|(_, b)| match b {
+            Block::Static(t) => t,
+            _ => panic!("only static"),
+        })
+        .collect();
+    assert_eq!(statics.len(), 2);
+    for t in &statics {
+        assert_eq!(
+            (t.limit, t.warn_at, t.r, t.immune, t.rods.len()),
+            (12, 8, 5., 8., 4)
+        );
+    }
+    assert_eq!((statics[0].per_hit, statics[0].dark), (1, 12.));
+    assert_eq!((statics[1].per_hit, statics[1].dark), (2, 20.));
+    let words = sign_words("thunder_heart");
+    for needle in [
+        "12 sparks",
+        "8 sparks",
+        "12 seconds",
+        "two sparks",
+        "20 seconds",
+    ] {
+        assert!(words.contains(needle), "{needle}: {words}");
+    }
+}
+
+#[test]
+fn a_static_table_with_one_rod_or_a_limit_below_its_warning_is_refused() {
+    let one = STATIC.replace("[[112,12],[120,12]]", "[[112,12]]");
+    let def: BossDef = serde_json::from_str(&one).unwrap();
+    assert!(crate::bossmech::validate("hollowking", &def).is_err());
+    let low = STATIC.replace(r#""warn_at":3"#, r#""warn_at":4"#);
+    let def: BossDef = serde_json::from_str(&low).unwrap();
+    assert!(crate::bossmech::validate("hollowking", &def).is_err());
+}
+
+#[test]
+fn helpers_do_not_drop_loot_and_a_fresh_cycle_reuses_the_ones_that_fell() {
+    let mut r = rig(&shipped("amber_memory"), 1);
+    let cocoons = r.sleepers("cocoon", &row(1));
+    let mut fight = r.w.begin_boss_fight(r.boss);
+    let first = r.w.wake_adds(&mut fight, "cocoon", 1, false, true);
+    assert_eq!(first, cocoons);
+    r.w.hit_slime(cocoons[0], 1, 1e9, false);
+    assert!(r.w.slimes[cocoons[0]].dead);
+    let again = r.w.wake_adds(&mut fight, "cocoon", 1, false, true);
+    assert_eq!(again, cocoons, "the one that fell is put to work again");
+    assert_eq!(fight.woken, cocoons, "and is listed once");
+    assert!(!r.w.slimes[cocoons[0]].dead);
+}
+
+// --- the brain of a fighter who is not at a keyboard (boss_play.rs) -------------------------------------------------------
+
+#[test]
+fn a_fighter_standing_in_a_telegraph_runs_out_of_it_and_holds_fire_one_outside_does_neither() {
+    let mut r = rig(TOLL, 2);
+    let boss = r.w.slimes[r.boss].point();
+    let inside = r.put(1, boss.x + 3., boss.y);
+    r.put(2, boss.x, boss.y + 14.);
+    r.run(2.5);
+    let play = r.w.boss_play(1).expect("a fight is running");
+    let goal = play
+        .goal
+        .expect("a hero inside the ring is told to leave it");
+    assert!(play.hold_fire, "running is not swinging");
+    assert!(
+        goal.distance(boss) > 8. + 0.5,
+        "{goal:?} is clear of the ring"
+    );
+    assert!(
+        goal.distance(inside) < 5.2 * 2.5,
+        "and within reach before it lands"
+    );
+    let calm = r.w.boss_play(2).unwrap();
+    assert_eq!((calm.goal, calm.hold_fire), (None, false));
+    // The same goal is kept while the hero runs, rather than a new nearest place every tick.
+    let again = r.w.boss_play(1).unwrap();
+    assert_eq!(again.goal, Some(goal));
+}
+
+#[test]
+fn a_fighter_who_is_marked_goes_where_the_ring_misses_their_friends() {
+    let mut r = rig(DOWNPOUR, 3);
+    let boss = r.w.slimes[r.boss].point();
+    for s in 1..=3 {
+        r.put(s, boss.x + 1. * s as f64, boss.y + 8.);
+    }
+    r.run(1.5);
+    let bearer_id = r.view()["marked"][0].as_str().unwrap().to_string();
+    let bearer = (1..=3)
+        .find(|s| r.w.players[s].character.id == bearer_id)
+        .unwrap();
+    let goal =
+        r.w.boss_play(bearer)
+            .unwrap()
+            .goal
+            .expect("the bearer moves away");
+    let nearest = |p: Point| {
+        (1..=3)
+            .filter(|s| *s != bearer)
+            .map(|s| r.at(s).distance(p))
+            .fold(f64::MAX, f64::min)
+    };
+    assert!(
+        nearest(goal) > nearest(r.at(bearer)) + 1.,
+        "{goal:?} is farther from the friends than where the bearer stands"
+    );
+    let friend = (1..=3).find(|s| *s != bearer).unwrap();
+    assert!(
+        r.w.boss_play(friend).unwrap().goal.is_some(),
+        "a friend beside the ring is told to leave it"
+    );
+}
+
+#[test]
+fn helpers_and_cocoons_are_hit_before_the_boss_and_the_weaker_half_of_a_divided_boss() {
+    // A shield's helpers, spread over the party.
+    let mut r = rig(CHORUS, 2);
+    r.sleepers("singer", &row(5));
+    r.set_boss_share(0.65);
+    r.run(0.2);
+    let adds = r.fight().shield.as_ref().unwrap().adds.clone();
+    for s in 1..=2 {
+        let t =
+            r.w.boss_play(s)
+                .unwrap()
+                .target
+                .expect("a singer is the target");
+        assert!(adds.contains(&t) && t != r.boss);
+    }
+    let (a, b) = (
+        r.w.boss_play(1).unwrap().target,
+        r.w.boss_play(2).unwrap().target,
+    );
+    assert_ne!(a, b, "two fighters take two different singers");
+    // A friend in amber: the cocoon.
+    let mut r = rig(AMBER, 3);
+    r.sleepers("cocoon", &row(3));
+    let boss = r.w.slimes[r.boss].point();
+    for s in 1..=3 {
+        r.put(s, boss.x - 4. + s as f64 * 4., boss.y + 6.);
+    }
+    r.run(4.);
+    let frozen = (1..=3)
+        .find(|s| r.w.players[s].frozen)
+        .expect("someone is frozen");
+    let cocoons: Vec<usize> = r.fight().frozen.values().map(|f| f.cocoon).collect();
+    let free = (1..=3).find(|s| !r.w.players[s].frozen).unwrap();
+    assert!(cocoons.contains(&r.w.boss_play(free).unwrap().target.unwrap()));
+    assert!(
+        r.w.boss_play(frozen).is_none(),
+        "the frozen one does nothing"
+    );
+    // A divided boss: the half with more health, so the two come down together.
+    let (mut r, partner) = split_rig();
+    r.w.slimes[partner].hp = 10.;
+    assert_eq!(r.w.boss_play(1).unwrap().target, Some(r.boss));
+    r.w.slimes[partner].hp = r.w.slimes[r.boss].hp + 1000.;
+    assert_eq!(r.w.boss_play(1).unwrap().target, Some(partner));
+}
+
+#[test]
+fn a_charged_fighter_goes_to_a_ready_rod_and_a_dark_brazier_gets_a_holder() {
+    let mut r = rig(STATIC, 2);
+    r.run(0.2);
+    let boss = r.w.slimes[r.boss].point();
+    r.put(1, boss.x, boss.y + 10.);
+    r.put(2, boss.x + 12., boss.y + 10.);
+    for _ in 0..2 {
+        r.hit_boss(1, 5.);
+    }
+    assert_eq!(
+        r.w.boss_play(1).unwrap().goal,
+        None,
+        "two charges: keep fighting"
+    );
+    r.hit_boss(1, 5.);
+    let play = r.w.boss_play(1).unwrap();
+    assert!(play.hold_fire);
+    let rod = play
+        .goal
+        .expect("three charges is the warning: go to a rod");
+    assert!(
+        [Point { x: 112., y: 12. }, Point { x: 120., y: 12. }].contains(&rod),
+        "{rod:?}"
+    );
+    // Two braziers, none lit: the two fighters take one each, the nearest to each.
+    let mut r = rig(NIGHT, 2);
+    r.put(1, 112., 30.);
+    r.put(2, 120., 30.);
+    r.run(0.2);
+    let (one, two) = (r.w.boss_play(1).unwrap(), r.w.boss_play(2).unwrap());
+    assert_eq!(
+        (one.goal, two.goal),
+        (
+            Some(Point { x: 112., y: 12. }),
+            Some(Point { x: 120., y: 12. })
+        )
+    );
+    assert!(one.hold_fire && two.hold_fire);
 }

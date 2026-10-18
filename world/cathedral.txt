@@ -241,7 +241,7 @@
     "name": "Elyss, Mother of the Bound Choir",
     "level": 40,
     "stats": [
-      330000,
+      250000,
       1495,
       2.4,
       2
@@ -513,5 +513,70 @@
     "melee": 4.8,
     "variant": 0,
     "lootSource": "cathedral_nave"
+  },
+  {
+    "add": true,
+    "artFrom": "tidecantor",
+    "kind": "choirsinger",
+    "name": "Bound Singer",
+    "level": 40,
+    "stats": [
+      14000,
+      600,
+      2.4,
+      1.2
+    ],
+    "profile": [
+      0.75,
+      2.3,
+      0,
+      12
+    ],
+    "art": "cantor",
+    "color": "#aef0e6",
+    "boss": false,
+    "gold": 1170,
+    "material": "cathedral_choirsinger",
+    "ranged": [
+      11,
+      9,
+      "#9ff2e4",
+      0.9,
+      2,
+      0.12
+    ],
+    "slam": 0,
+    "melee": 0,
+    "variant": 0,
+    "lootSource": null
+  },
+  {
+    "add": true,
+    "artFrom": "pearlwidow",
+    "kind": "reliquarypearl",
+    "name": "Reliquary Pearl",
+    "level": 45,
+    "stats": [
+      16000,
+      500,
+      1,
+      1.5
+    ],
+    "profile": [
+      0.9,
+      1.8,
+      0,
+      8
+    ],
+    "art": "bell",
+    "color": "#f6d6e3",
+    "boss": false,
+    "gold": 1210,
+    "material": "cathedral_reliquarypearl",
+    "ranged": null,
+    "slam": 2.2,
+    "melee": 0,
+    "variant": 0,
+    "lootSource": null
   }
 ]

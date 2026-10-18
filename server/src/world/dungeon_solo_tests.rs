@@ -56,8 +56,9 @@ fn dungeons() -> Vec<Dungeon> {
         if !wanted.is_empty() && !wanted.iter().any(|w| map.name.to_lowercase().contains(w)) {
             continue;
         }
+        // The sleeping helpers of a boss's mechanics (tagged `ambush`) are not part of the dungeon's packs or bosses.
         let ids: Vec<usize> = (0..w.spawns.len())
-            .filter(|&i| w.spawns[i].zone == zone)
+            .filter(|&i| w.spawns[i].zone == zone && w.spawns[i].ambush.is_none())
             .collect();
         let mut count: BTreeMap<&str, usize> = BTreeMap::new();
         for &i in &ids {

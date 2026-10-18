@@ -356,7 +356,30 @@ impl World {
                     .min_by(|a, b| a.point().distance(me).total_cmp(&b.point().distance(me)))
                     .map(|s| s.id)
             });
-        self.ai_combat(session, &mate_sessions, chosen);
+        // A boss fight asks more of a fighter than a swing: step out of a telegraph, ground a charge, hold a brazier,
+        // hit a shield's helpers first (`boss_play.rs`, the same brain the dungeon harness's bots use).
+        let play = self.boss_play(session);
+        let chosen = play.as_ref().and_then(|b| b.target).or(chosen);
+        let hold_fire = play.as_ref().is_some_and(|b| b.hold_fire);
+        self.ai_combat(
+            session,
+            &mate_sessions,
+            if hold_fire { None } else { chosen },
+        );
+        if let Some(goal) = play.as_ref().and_then(|b| b.goal) {
+            let p = self.players.get_mut(&session).unwrap();
+            p.target = None;
+            p.goal = Some(goal);
+            return;
+        }
+        if play.as_ref().is_some_and(|b| b.stay) {
+            // A wall or a spoke is on its way and this is a safe place: stand in it.
+            let p = self.players.get_mut(&session).unwrap();
+            p.target = None;
+            p.goal = None;
+            p.input = Point::default();
+            return;
+        }
         // Move: fight the chosen enemy, or keep to the hirer's side.
         let slot = {
             let mut hired: Vec<u64> = self.mercenaries_of(&self.players[&owner].character.id);

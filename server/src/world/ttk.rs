@@ -363,7 +363,7 @@ fn start_point(w: &World, zone: usize, from: Point) -> Point {
 
 /// The rotation of the rules: every damaging skill whenever it is off cooldown, highest unlock level first. Buffs that
 /// raise damage are used when ready, shields and dodge below 60% health, heals below 50%.
-fn cast_skills(w: &mut World, session: u64, id: usize, outcome: &mut Outcome) {
+fn cast_skills(w: &mut World, session: u64, id: usize, still: bool, outcome: &mut Outcome) {
     let (class, level, hp, max_hp, point) = {
         let c = &w.players[&session].character;
         (c.look.class, c.level, c.hp, c.max_hp(), c.point())
@@ -383,7 +383,7 @@ fn cast_skills(w: &mut World, session: u64, id: usize, outcome: &mut Outcome) {
             Effect::Strike { range, .. } | Effect::Chain { range, .. } => distance <= *range,
             Effect::Meteor { range, .. } => distance <= *range,
             Effect::Volley { .. } => distance <= 14.,
-            Effect::Dash { mult, .. } => *mult > 0. && distance <= 6.,
+            Effect::Dash { mult, .. } => !still && *mult > 0. && distance <= 6.,
             Effect::Buff { kind, .. } => match kind {
                 Buff_::Damage | Buff_::Haste | Buff_::Crit => distance <= 12.,
                 Buff_::Shield | Buff_::Dodge => hp < max_hp * 0.6 && distance <= 12.,
@@ -402,23 +402,68 @@ fn cast_skills(w: &mut World, session: u64, id: usize, outcome: &mut Outcome) {
     }
 }
 
-/// A boss that holds still for its mechanic (a channel, a stun) does not come to a party that stands where the fight
-/// began, so the bots walk in as players would: to a melee reach of it, stopping where they are if already close.
+/// A monster that holds still (a boss in its channel or its stun, a pearl, a seed, a cocoon) does not come to a party
+/// that stands where the fight began, so the bots walk in as players would: to a melee reach of it, stopping where they
+/// are if already close.
 fn walk_up_to_a_held_boss(w: &mut World, session: u64, id: usize) {
+    walk_up_to_held(w, session, id, false);
+}
+
+/// `anything`: also a helper of a mechanic (pearl, seed, cocoon), not only a boss with a table entry.
+fn walk_up_to_held(w: &mut World, session: u64, id: usize, anything: bool) {
     const REACH: f64 = 2.5;
     let boss = &w.slimes[id];
-    if !w.boss.table.contains_key(&boss.kind) || boss.set_root_left <= 0. {
+    if (!anything && !w.boss.table.contains_key(&boss.kind)) || boss.set_root_left <= 0. {
         return;
     }
     let target = boss.point();
-    let c = &mut w.players.get_mut(&session).unwrap().character;
-    let from = c.point();
+    let zone = boss.zone;
+    let from = w.players[&session].character.point();
     let distance = from.distance(target);
     if distance > REACH {
         let step = from.direction(target);
         let walk = (distance - REACH).min(5.2 * TICK);
-        (c.x, c.y) = (from.x + step.x * walk, from.y + step.y * walk);
+        bot_walk(w, session, zone, from, step, walk);
     }
+}
+
+/// One tick of walking at the slowest class's speed toward `goal`, stopped by walls like anyone's.
+fn walk_to(w: &mut World, session: u64, goal: Point) {
+    let c = &w.players[&session].character;
+    let (zone, from) = (c.zone, c.point());
+    let distance = from.distance(goal);
+    if distance > 0.05 {
+        let step = from.direction(goal);
+        bot_walk(w, session, zone, from, step, distance.min(5.2 * TICK));
+    }
+}
+
+fn bot_walk(w: &mut World, session: u64, zone: usize, from: Point, step: Point, walk: f64) {
+    // Straight on, else sliding along the wall on one axis: a hero rounding a pillar does not stop dead at it.
+    let moved = |dx: f64, dy: f64| {
+        let mut to = Point {
+            x: from.x + dx,
+            y: from.y + dy,
+        };
+        w.maps[zone].collide(&mut to, PLAYER_RADIUS);
+        to
+    };
+    let (dx, dy) = (step.x * walk, step.y * walk);
+    let mut best = moved(dx, dy);
+    for (ax, ay) in [(dx, 0.), (0., dy)] {
+        let alt = moved(ax, ay);
+        if alt.distance(from) > best.distance(from) {
+            best = alt;
+        }
+    }
+    let c = &mut w.players.get_mut(&session).unwrap().character;
+    (c.x, c.y) = (best.x, best.y);
+}
+
+/// `DUNGEON_BOSS_BOTS=ignore` plays the party without the mechanics' answers (`boss_play.rs`), to measure that ignoring
+/// them loses; the default plays them.
+fn boss_bots_answer() -> bool {
+    !std::env::var("DUNGEON_BOSS_BOTS").is_ok_and(|v| v == "ignore")
 }
 
 fn use_consumables(w: &mut World, session: u64, outcome: &mut Outcome) {
@@ -549,7 +594,7 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
         let phase = std::time::Instant::now();
         if case.rotation == Rotation::Skills {
             walk_up_to_a_held_boss(&mut w, 1, id);
-            cast_skills(&mut w, 1, id, &mut out);
+            cast_skills(&mut w, 1, id, false, &mut out);
         }
         if case.consumables {
             use_consumables(&mut w, 1, &mut out);
@@ -676,7 +721,7 @@ pub fn run_pack_once(case: &Case, ids: &[usize], seed: u64) -> Outcome {
         }
         if case.rotation == Rotation::Skills {
             walk_up_to_a_held_boss(&mut w, 1, near);
-            cast_skills(&mut w, 1, near, &mut out);
+            cast_skills(&mut w, 1, near, false, &mut out);
         }
         if case.consumables {
             use_consumables(&mut w, 1, &mut out);
@@ -793,9 +838,13 @@ pub fn run_party_pack_once(
     };
     let left = |w: &World| ids.iter().map(|&i| w.slimes[i].hp.max(0.)).sum::<f64>() / total_hp;
     let mut aimed = vec![usize::MAX; members.len()];
+    let mut away_since: Vec<Option<f64>> = vec![None; members.len()];
     let start_time = w.time;
     let cap = case.cap.unwrap_or_else(|| cap_for(case.rotation));
     let mut killed = false;
+    let mut falls = 0;
+    let answers = boss_bots_answer();
+    let trace = std::env::var("DUNGEON_BOSS_TRACE").is_ok();
     while w.time - start_time < cap {
         if ids.iter().all(|&i| w.slimes[i].dead) {
             killed = true;
@@ -808,26 +857,94 @@ pub fn run_party_pack_once(
                 continue;
             }
             anyone_alive = true;
+            // A fighter who fell wakes at the dungeon's door and runs back like anyone; the harness gives the run 20 s.
+            if w.players[&session].character.point().distance(home) > 40. {
+                let since = *away_since[n].get_or_insert(w.time);
+                if w.time - since >= 20. {
+                    let mut start = start_point(&w, zone, home);
+                    // not onto a telegraph that is up (a lethal bridge, a ring): the way back ends on safe ground
+                    if w.bot_threat(zone, session, start, 0.).is_some() {
+                        'search: for distance in [8., 10., 12., 6.] {
+                            for k in 0..16 {
+                                let a = k as f64 / 16. * std::f64::consts::TAU;
+                                let mut p = Point {
+                                    x: home.x + a.cos() * distance,
+                                    y: home.y + a.sin() * distance,
+                                };
+                                let wanted = p;
+                                w.maps[zone].collide(&mut p, PLAYER_RADIUS);
+                                if p.distance(wanted) < 0.01
+                                    && w.maps[zone].line_clear(home, p, 0.3)
+                                    && w.bot_threat(zone, session, p, 0.).is_none()
+                                {
+                                    start = p;
+                                    break 'search;
+                                }
+                            }
+                        }
+                    }
+                    let c = &mut w.players.get_mut(&session).unwrap().character;
+                    (c.x, c.y) = (start.x, start.y);
+                    away_since[n] = None;
+                }
+                continue;
+            }
+            away_since[n] = None;
             let me = w.players[&session].character.point();
-            let Some(near) = ids
-                .iter()
-                .copied()
-                .filter(|&i| !w.slimes[i].dead)
-                .min_by(|&a, &b| {
-                    w.slimes[a]
-                        .point()
-                        .distance(me)
-                        .total_cmp(&w.slimes[b].point().distance(me))
-                })
+            let Some(mut near) =
+                ids.iter()
+                    .copied()
+                    .filter(|&i| !w.slimes[i].dead)
+                    .min_by(|&a, &b| {
+                        w.slimes[a]
+                            .point()
+                            .distance(me)
+                            .total_cmp(&w.slimes[b].point().distance(me))
+                    })
             else {
                 break;
             };
-            if *aimed_at != near {
+            // The mechanics' answers: where to stand, what to hit first, whether to hold fire.
+            let play = if answers { w.boss_play(session) } else { None };
+            if let Some(target) = play.as_ref().and_then(|b| b.target)
+                && !w.slimes[target].dead
+            {
+                near = target;
+            }
+            let goal = play.as_ref().and_then(|b| b.goal);
+            let stay = play.as_ref().is_some_and(|b| b.stay);
+            if goal.is_some() || stay {
+                // Running somewhere: a hero with a target walks toward it, so let go of it until they are there.
+                let p = w.players.get_mut(&session).unwrap();
+                p.target = None;
+                p.goal = None;
+                *aimed_at = usize::MAX;
+            } else if *aimed_at != near || w.players[&session].target != Some(near) {
+                // (the engine drops a target now and then: say it again whenever the fighter has lost it)
                 *aimed_at = near;
                 w.message(session, ClientMessage::Target { id: near });
             }
-            walk_up_to_a_held_boss(&mut w, session, near);
-            cast_skills(&mut w, session, near, &mut out);
+            if let Some(goal) = play.as_ref().and_then(|b| b.goal) {
+                let before = w.players[&session].character.point();
+                walk_to(&mut w, session, goal);
+                if trace && n == 0 && (20.0..20.3).contains(&(w.time - start_time)) {
+                    let after = w.players[&session].character.point();
+                    let mut probe = Point {
+                        x: before.x,
+                        y: before.y - 0.26,
+                    };
+                    w.maps[w.players[&session].character.zone].collide(&mut probe, PLAYER_RADIUS);
+                    eprintln!(
+                        "  t=20 walk ({:.3},{:.3}) -> ({:.3},{:.3}) goal ({:.1},{:.1}) north-probe ({:.3},{:.3})",
+                        before.x, before.y, after.x, after.y, goal.x, goal.y, probe.x, probe.y
+                    );
+                }
+            } else if !stay {
+                walk_up_to_held(&mut w, session, near, true);
+            }
+            if !play.as_ref().is_some_and(|b| b.hold_fire) {
+                cast_skills(&mut w, session, near, stay, &mut out);
+            }
             if case.consumables {
                 use_consumables(&mut w, session, &mut out);
             }
@@ -836,15 +953,72 @@ pub fn run_party_pack_once(
             break;
         }
         w.step();
-        for rx in rxs.iter_mut() {
-            drain(rx);
+        for (n, rx) in rxs.iter_mut().enumerate() {
+            for v in drain(rx) {
+                if n == 0 && v["kind"] == "death" {
+                    falls += 1;
+                }
+                if trace && n == 0 && v["kind"] == "death" {
+                    let who: Vec<String> = (0..members.len())
+                        .map(|k| {
+                            let c = &w.players[&(k as u64 + 1)].character;
+                            format!("({:.2},{:.2})", c.x, c.y)
+                        })
+                        .collect();
+                    let threats: Vec<String> = (0..members.len())
+                        .map(|k| {
+                            let c = &w.players[&(k as u64 + 1)].character;
+                            format!(
+                                "{:?}",
+                                w.bot_threat(zone, k as u64 + 1, c.point(), 1.2)
+                                    .map(|t| (t * 10.).round() / 10.)
+                            )
+                        })
+                        .collect();
+                    eprintln!(
+                        "  t=D {} threat {} boss ({:.1},{:.1})",
+                        who.join(" "),
+                        threats.join(" "),
+                        w.slimes[ids[0]].x,
+                        w.slimes[ids[0]].y
+                    );
+                    eprintln!(
+                        "  t={:.1} death of {} cause {}",
+                        w.time - start_time,
+                        v["actor"],
+                        v["cause"]
+                    );
+                }
+            }
+        }
+        // `DUNGEON_BOSS_TRACE=1` prints the fight every five seconds: the boss's health, its shield, each fighter.
+        if trace && (((w.time - start_time) * 20.).round() as u64).is_multiple_of(100) {
+            let boss = &w.slimes[ids[0]];
+            let shield = w.boss.fights.get(&ids[0]).and_then(|f| f.shield_alive(&w));
+            let frozen = w.boss.fights.get(&ids[0]).map_or(0, |f| f.frozen_count());
+            let who: Vec<String> = (0..members.len())
+                .map(|n| {
+                    let c = &w.players[&(n as u64 + 1)].character;
+                    format!("{:.0}%@({:.0},{:.0})", c.hp / c.max_hp() * 100., c.x, c.y)
+                })
+                .collect();
+            eprintln!(
+                "  t={:.0} boss {:.0}% at ({:.0},{:.0}) state {} shield {:?} frozen {} party {}",
+                w.time - start_time,
+                boss.hp / boss.max_hp * 100.,
+                boss.x,
+                boss.y,
+                boss.state,
+                shield,
+                frozen,
+                who.join(" ")
+            );
         }
     }
     PartyOutcome {
         killed: killed || ids.iter().all(|&i| w.slimes[i].dead),
-        deaths: (0..members.len())
-            .filter(|&n| w.players[&(n as u64 + 1)].character.hp <= 0.)
-            .count(),
+        // every time a member fell, not only the ones down at the end
+        deaths: falls,
         seconds: w.time - start_time,
         enemy_left: left(&w).clamp(0., 1.),
         break_spare: w.boss.spare.clone(),

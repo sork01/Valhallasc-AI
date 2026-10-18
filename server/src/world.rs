@@ -1570,6 +1570,9 @@ impl World {
             }
             if let Some(point) =
                 free_actor_position(&self.maps[enemy.zone], candidate, enemy.r, &bodies, true)
+                // Never through a wall: the nearest free ground can lie on the far side of a thin one, and a boss
+                // pushed out of its room could not be reached or hit again.
+                && self.maps[enemy.zone].line_clear(enemy.point(), point, enemy.r.min(0.3))
             {
                 self.slimes[id].x = point.x;
                 self.slimes[id].y = point.y;
@@ -3620,6 +3623,10 @@ impl World {
             if levels > 0 {
                 let point = self.players[&credit].character.point();
                 self.level_up_event(&credit_id, point, levels);
+            }
+            // The helpers of a boss mechanic (docs/boss-mechanics.md) come back every cycle: they give no loot.
+            if crate::cathedral::enemy(&kind).is_some_and(|e| e.add) {
+                return dealt;
             }
             // The credited hero's rebirth drop multiplier reaches every roll below (docs/rebirth.md).
             let boost = self.drop_multiplier_of(&credit_id);
@@ -9954,7 +9961,7 @@ mod tests {
                 4,
                 "{name} must have four isolated party copies"
             );
-            assert_eq!(map.slimes.len(), 12);
+            assert_eq!(map.slimes.iter().filter(|s| s.ambush.is_none()).count(), 12);
             assert_eq!(map.portals.len(), 2);
             let back = &map.portals[0];
             assert_eq!(back.to, parent);

@@ -69,6 +69,7 @@
   "refine_confirm:{0}",
   "refine_preview:{0}",
   "roll-{0}",
+  "rotate(-90",
   "social-tab-{0}",
   "the rotation cast skills: {0}",
   "tracker-objective{0}",

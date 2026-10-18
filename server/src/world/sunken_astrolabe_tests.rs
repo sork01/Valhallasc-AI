@@ -227,7 +227,7 @@ fn solar_crucible_opens_with_party_quests_bosses_and_gear() {
     assert!(!map.sealed_template);
     assert_eq!((map.min_level, map.players, map.copies), (98, 5, 4));
     assert_eq!(map.final_boss, "solar_heart");
-    assert_eq!(map.slimes.len(), 12);
+    assert_eq!(map.slimes.iter().filter(|s| s.ambush.is_none()).count(), 12);
     assert_eq!(map.portals.len(), 2);
     assert!(w.maps[28].portals.iter().any(|p| p.to == 37));
     let seen = flood(map, &blocked(map, &[]), map.spawn);
@@ -310,7 +310,13 @@ fn amber_archive_and_silent_solstice_have_distinct_encounters_quests_and_loot() 
         assert!(!map.sealed_template);
         assert_eq!((map.min_level, map.players, map.copies), (99, 5, 4));
         assert_eq!(map.final_boss, bosses[2]);
-        assert_eq!((map.slimes.len(), map.portals.len()), (12, 2));
+        assert_eq!(
+            (
+                map.slimes.iter().filter(|s| s.ambush.is_none()).count(),
+                map.portals.len()
+            ),
+            (12, 2)
+        );
         assert!(map.portals[1].after_clear);
         assert!(w.maps[28].portals.iter().any(|p| p.to == zone));
         let seen = flood(map, &blocked(map, &[]), map.spawn);

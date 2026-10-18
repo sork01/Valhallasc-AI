@@ -71,6 +71,8 @@
       for (const tele of f.tele || []) drawTele(g, tele, t, w2s, roomAt, calm);
       for (const id of f.marked || []) { const p = pos(id); if (p) ring(g, w2s, p.x, p.y, 1.1, RED, t, calm); }
       for (const id of f.frozen || []) { const p = pos(id); if (p) ring(g, w2s, p.x, p.y, 1.2, AMBER, t, calm); }
+      const st = f.static;                      // Static: a hero near the limit shows the circle their blast would fill
+      if (st) for (const [id, n] of Object.entries(st.charges || {})) { const p = n >= st.warnAt ? pos(id) : null; if (p) ring(g, w2s, p.x, p.y, st.radius || 5, RED, t, calm); }
     }
     g.restore();
   }
@@ -189,6 +191,14 @@
       if (f.banner && f.banner !== f.cast?.name) label(text(f.banner), VW / 2, y + 4, 20, '#fff4ca');
       for (const id of f.marked || []) { const p = pos(id); if (p) { const [sx, sy] = w2s(p.x, p.y, 96); label(text('Marked!'), sx, sy, 15, '#ff8d80'); } }
       for (const id of f.frozen || []) { const p = pos(id); if (p) { const [sx, sy] = w2s(p.x, p.y, 96); label(text('Frozen!'), sx, sy, 15, '#ffd070'); } }
+      const st = f.static;
+      if (st) {
+        for (const [id, n] of Object.entries(st.charges || {})) {
+          const p = n > 0 ? pos(id) : null;
+          if (p) { const [sx, sy] = w2s(p.x, p.y, 96); label(fill(text('{0} of {1} sparks'), n, st.limit), sx, sy, 15, n >= st.warnAt ? '#ff8d80' : '#ffe9a0'); }
+        }
+        for (const id of Object.keys(st.grounded || {})) { const p = pos(id); if (p) { const [sx, sy] = w2s(p.x, p.y, 96); label(text('Grounded'), sx, sy, 15, '#9fd8ff'); } }
+      }
     }
     g.restore();
   }

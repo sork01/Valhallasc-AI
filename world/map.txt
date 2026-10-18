@@ -73187,6 +73187,66 @@
           "kind": "choirmother",
           "x": 60,
           "y": 24
+        },
+        {
+          "x": 70.0,
+          "y": 24.0,
+          "kind": "choirsinger",
+          "ambush": "chorus"
+        },
+        {
+          "x": 68.1,
+          "y": 29.9,
+          "kind": "choirsinger",
+          "ambush": "chorus"
+        },
+        {
+          "x": 63.1,
+          "y": 33.5,
+          "kind": "choirsinger",
+          "ambush": "chorus"
+        },
+        {
+          "x": 56.9,
+          "y": 33.5,
+          "kind": "choirsinger",
+          "ambush": "chorus"
+        },
+        {
+          "x": 51.9,
+          "y": 29.9,
+          "kind": "choirsinger",
+          "ambush": "chorus"
+        },
+        {
+          "x": 50.0,
+          "y": 24.0,
+          "kind": "choirsinger",
+          "ambush": "chorus"
+        },
+        {
+          "x": 51.9,
+          "y": 18.1,
+          "kind": "choirsinger",
+          "ambush": "chorus"
+        },
+        {
+          "x": 56.9,
+          "y": 14.5,
+          "kind": "choirsinger",
+          "ambush": "chorus"
+        },
+        {
+          "x": 63.1,
+          "y": 14.5,
+          "kind": "choirsinger",
+          "ambush": "chorus"
+        },
+        {
+          "x": 68.1,
+          "y": 18.1,
+          "kind": "choirsinger",
+          "ambush": "chorus"
         }
       ],
       "portals": [
@@ -79308,6 +79368,78 @@
           "kind": "coralregent",
           "x": 100,
           "y": 28
+        },
+        {
+          "x": 108.6,
+          "y": 30.8,
+          "kind": "reliquarypearl",
+          "ambush": "pearl"
+        },
+        {
+          "x": 105.3,
+          "y": 35.3,
+          "kind": "reliquarypearl",
+          "ambush": "pearl"
+        },
+        {
+          "x": 100.0,
+          "y": 37.0,
+          "kind": "reliquarypearl",
+          "ambush": "pearl"
+        },
+        {
+          "x": 94.7,
+          "y": 35.3,
+          "kind": "reliquarypearl",
+          "ambush": "pearl"
+        },
+        {
+          "x": 91.4,
+          "y": 30.8,
+          "kind": "reliquarypearl",
+          "ambush": "pearl"
+        },
+        {
+          "x": 91.4,
+          "y": 25.2,
+          "kind": "reliquarypearl",
+          "ambush": "pearl"
+        },
+        {
+          "x": 94.7,
+          "y": 20.7,
+          "kind": "reliquarypearl",
+          "ambush": "pearl"
+        },
+        {
+          "x": 100.0,
+          "y": 19.0,
+          "kind": "reliquarypearl",
+          "ambush": "pearl"
+        },
+        {
+          "x": 105.3,
+          "y": 20.7,
+          "kind": "reliquarypearl",
+          "ambush": "pearl"
+        },
+        {
+          "x": 108.6,
+          "y": 25.2,
+          "kind": "reliquarypearl",
+          "ambush": "pearl"
+        },
+        {
+          "x": 100.0,
+          "y": 34.0,
+          "kind": "reliccrab",
+          "ambush": "shellcrab"
+        },
+        {
+          "x": 100.0,
+          "y": 22.0,
+          "kind": "reliccrab",
+          "ambush": "shellcrab"
         }
       ],
       "portals": [
@@ -175724,6 +175856,114 @@
           "kind": "seed_worldseed",
           "x": 48,
           "y": 17
+        },
+        {
+          "x": 55.0,
+          "y": 17.0,
+          "kind": "seed_sprout",
+          "ambush": "seed"
+        },
+        {
+          "x": 52.9,
+          "y": 21.9,
+          "kind": "seed_sprout",
+          "ambush": "seed"
+        },
+        {
+          "x": 48.0,
+          "y": 24.0,
+          "kind": "seed_sprout",
+          "ambush": "seed"
+        },
+        {
+          "x": 43.1,
+          "y": 21.9,
+          "kind": "seed_sprout",
+          "ambush": "seed"
+        },
+        {
+          "x": 41.0,
+          "y": 17.0,
+          "kind": "seed_sprout",
+          "ambush": "seed"
+        },
+        {
+          "x": 43.1,
+          "y": 12.1,
+          "kind": "seed_sprout",
+          "ambush": "seed"
+        },
+        {
+          "x": 48.0,
+          "y": 12.0,
+          "kind": "seed_sprout",
+          "ambush": "seed"
+        },
+        {
+          "x": 52.9,
+          "y": 12.1,
+          "kind": "seed_sprout",
+          "ambush": "seed"
+        },
+        {
+          "x": 54.7,
+          "y": 19.2,
+          "kind": "seed_treant",
+          "ambush": "treant"
+        },
+        {
+          "x": 53.0,
+          "y": 23.9,
+          "kind": "seed_treant",
+          "ambush": "treant"
+        },
+        {
+          "x": 48.0,
+          "y": 22.0,
+          "kind": "seed_treant",
+          "ambush": "treant"
+        },
+        {
+          "x": 43.0,
+          "y": 23.9,
+          "kind": "seed_treant",
+          "ambush": "treant"
+        },
+        {
+          "x": 41.3,
+          "y": 19.2,
+          "kind": "seed_treant",
+          "ambush": "treant"
+        },
+        {
+          "x": 39.9,
+          "y": 14.4,
+          "kind": "seed_treant",
+          "ambush": "treant"
+        },
+        {
+          "x": 43.0,
+          "y": 10.1,
+          "kind": "seed_treant",
+          "ambush": "treant"
+        },
+        {
+          "x": 48.0,
+          "y": 9.5,
+          "kind": "seed_treant",
+          "ambush": "treant"
+        },
+        {
+          "x": 53.0,
+          "y": 10.1,
+          "kind": "seed_treant",
+          "ambush": "treant"
+        },
+        {
+          "x": 56.1,
+          "y": 14.4,
+          "kind": "seed_treant",
+          "ambush": "treant"
         }
       ],
       "npcs": [],
@@ -188621,6 +188861,12 @@
           "kind": "solar_heart",
           "x": 48,
           "y": 17
+        },
+        {
+          "x": 51.8,
+          "y": 18.4,
+          "kind": "solar_cinder",
+          "ambush": "cinder"
         }
       ],
       "npcs": [],
@@ -192138,6 +192384,42 @@
           "kind": "amber_memory",
           "x": 48,
           "y": 22
+        },
+        {
+          "x": 53.2,
+          "y": 25.0,
+          "kind": "amber_cocoon",
+          "ambush": "cocoon"
+        },
+        {
+          "x": 48.0,
+          "y": 28.0,
+          "kind": "amber_cocoon",
+          "ambush": "cocoon"
+        },
+        {
+          "x": 42.8,
+          "y": 25.0,
+          "kind": "amber_cocoon",
+          "ambush": "cocoon"
+        },
+        {
+          "x": 42.8,
+          "y": 19.0,
+          "kind": "amber_cocoon",
+          "ambush": "cocoon"
+        },
+        {
+          "x": 48.0,
+          "y": 16.0,
+          "kind": "amber_cocoon",
+          "ambush": "cocoon"
+        },
+        {
+          "x": 53.2,
+          "y": 19.0,
+          "kind": "amber_cocoon",
+          "ambush": "cocoon"
         }
       ],
       "npcs": [],

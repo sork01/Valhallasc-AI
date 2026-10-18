@@ -1,6 +1,6 @@
 # Final boss mechanics
 
-Design for the `BOSSMECH-*` tasks in [TODO.md](../TODO.md). Owner's request (2026-10-17): every final boss gets a gimmick, for example a big area attack with a five-second cast that kills anyone still in it, or a boss that turns invulnerable and spawns adds that must die to end it. The engine and eight of the sixteen boss mechanics are built (see below). Every number is a starting value to tune with the dungeon harness (`BOSSMECH-CHECK`).
+Design for the `BOSSMECH-*` tasks in [TODO.md](../TODO.md). Owner's request (2026-10-17): every final boss gets a gimmick, for example a big area attack with a five-second cast that kills anyone still in it, or a boss that turns invulnerable and spawns adds that must die to end it. The engine and all sixteen boss mechanics are built (see below). Every number is a starting value to tune with the dungeon harness (`BOSSMECH-CHECK`).
 
 A **final boss** is the monster named in a dungeon's `final_boss`: sixteen of them. Open-world elites (Cinderlord, Gloomroot, the group elites) and the dungeons' middle bosses are not covered; say so if they should get the same treatment.
 
@@ -67,6 +67,7 @@ Each boss lists `mechanics`; each has a `name` (the cast bar and "Killed by <nam
 | `stasis` | `every`, `first`, `orbs`, `speed`, `life`, `tag`, `hold` | Orbs seek players; a touched player is frozen (no input, no damage) in a cocoon (a sleeping monster of `tag`); kill the cocoon to free them, or they are lost after `hold`. |
 | `split` | `hp`, `tag`, `revive_after`, `survivor_bonus`, `bridge` | The boss and its partner keep half the remaining health each. A body that would fall while the other lives is left on 1 health and downed; the other falling in time finishes both, otherwise it rises with half its health and the survivor hits harder. |
 | `hold` | `points`, `r`, `hold_for`, `lit_for`, `snuff_every` | A place is lit by standing in it; lit places are the safe discs of a `lit` zone. |
+| `static` | `limit`, `warn_at`, `per_hit`, `r`, `rods`, `rod_r`, `immune`, `dark` | Every blow a hero lands on the boss adds `per_hit` charges to that hero; at `limit` they detonate (kill within `r` of them, themselves included). Standing on a ready rod clears the charge, gives `immune` seconds in which none builds, and darkens the rod for `dark` seconds. A banner at `warn_at`. The charges, the rods and the detonation show in the snapshot (`static`, rod teles with `rod: true`). At least two rods. |
 | `gaze` | `cast`, `every`, `first`, `cover`, `regrow`, `sweep`, `beam` | Everyone with a clear line (`Map::line_clear` and standing cover) is struck at the end of the cast; with `sweep` a beam turns once round the room instead. Cover cracks after one gaze that it shielded someone from, breaks after two, regrows after `regrow`. |
 
 Things worth knowing:
@@ -100,7 +101,31 @@ A sign stands before each of the sixteen final bosses. The engine is done; the r
   * **Swedish** is by hand: `build_swedish.py` now harvests the keys `what`, `todo` and `tip` of the world files, so each line of a sign needs its Swedish when it is written.
   * **Tests:** Rust `server/src/world/boss_signs_tests.rs` (sixteen signs and nowhere else, validation with a mutation per field, no jargon words, placement rules, snapshot gating, reading, chests keep clear, mutation-checked by removing the chest clearance) and `npm run test:bosssign` (`tests/bosssign-ui.cjs`: drawn, F, click-and-walk, the four ways to close, reload, phone size, no sign elsewhere, Swedish).
   * **Numbers on a sign** are plain text; `the_sign_before_haldor_says_what_the_dirge_really_does` (boss mechanics tests) checks that "8 seconds" is the dirge's `cast`, so the words cannot drift from the table. Each boss task adds the same kind of check for the numbers its sign names.
-  * **Not yet:** the other 15 real texts (the first, Haldor's, is written), the sign art.
+  * **Not yet:** the sign art (all sixteen texts are written).
+
+## Helpers of the mechanics: sleepers, art and loot (2026-10-18)
+
+Six monsters exist only to serve a mechanic: the **Bound Singer** (`choirsinger`, Flooded Cloister), the **Reliquary Pearl** (`reliquarypearl`, Coral Reliquary), the **Worldseed Seed** (`seed_sprout`) and **Bloom Treant** (`seed_treant`), **Cinder of the Crucible** (`solar_cinder`) and the **Amber Cocoon** (`amber_cocoon`). They are catalog enemies marked `"add": true` with an `artFrom` kind, in the dungeons' content scripts (`cathedral_content.py`, `seed_vault_content.py`, `solar_crucible_content.py`, `yearwheel_dungeon_content.py`).
+
+  * **Placed, asleep:** `scripts/place_boss_adds.py` adds the sleeping spawns (tag in `ambush`) round each boss and checks that every `hold` point and every `static` rod of the table stands on free, reachable ground in the boss's room. It is idempotent and runs after the dungeon generators (`generate_sealed_dungeon_maps.py` rebuilds zones 29 to 39 without them), then `node scripts/sync-world.cjs`. Counts: 10 singers (4 then 6), 10 pearls (3 + 3 + 4) and 2 Reliquary Crabs, 8 seeds and 10 treants, 1 Cinder, 6 cocoons.
+  * **Used again:** a long fight can use up the sleepers (Germination plants every 30 s). `wake_adds` takes sleepers first, then a helper of the same fight that has since died; Amber Stasis does the same for cocoons. A helper that fell is listed once in `fight.woken` and is put back to sleep when the fight ends.
+  * **Drop nothing:** a kill of an `add` gives experience and nothing else (no gold, material, bag, licence or gear roll), so a recycled seed cannot be farmed.
+  * **Art:** they borrow the sprite of `artFrom` (`scripts/boss_add_art_aliases.py` writes the aliases into `client/assets/cathedral.txt`; rerun it after any `make_*_sprites.py export`). **Own PixelFlow art for each is still to do.**
+  * **Tests that count a dungeon's monsters** skip the sleepers (`ambush` is set).
+
+## The brain of a fighter who is not at a keyboard (`BOSSMECH-MERC`, `BOSSMECH-HARNESS`)
+
+`server/src/world/boss_play.rs`, one brain for the hired mercenaries (`merc_think`) and the dungeon harness's bots (`ttk.rs`): `World::boss_play(session)` returns `BossPlay { goal, target, hold_fire, stay }` from the fight's own state, never touching the player. The harness answers it by walking and choosing a target; a mercenary by setting its goal and target. The rules, in order:
+
+  1. **Telegraphs.** `bot_threat` is the soonest positional danger at a place (the danger query without a break bar's "deal damage", plus a seeking orb and the lethal bridge between a divided boss's bodies). A fighter on the edge of one (within half a tile) runs to the nearest safe place to the boss, with a margin, keeps that place until it is reached, and holds fire (a dash toward the boss would undo the step). While a telegraph is up and the fighter is outside it, it **stays out** until it has landed (walking back to the target put the party on the ring's edge at the landing).
+  2. **Walls and spokes** are dodged by a search through space and time (half-tile cells, quarter-second steps, a step may not cut through a band, a 0.5 tile margin): `Ok(None)` means "stay here, this is safe".
+  3. **A mark.** A bearer goes where the ring or the bouncing beam misses their friends; a friend beside a ring leaves it.
+  4. **Static.** A hero with `warn_at` charges walks to the nearest ready rod and holds fire.
+  5. **Braziers.** While fewer than three burn (or are being lit), the nearest free fighter takes the nearest dark one, keeps the claim until it burns, and holds fire.
+  6. **Divided boss.** Hit the body with more health left, from its far side, away from the bridge.
+  7. **Targets before the boss.** A friend's cocoon, a shield's helpers (spread over the party by rank), a seed, any helper of the fight within 7 tiles, then the boss.
+
+Harness switches: `DUNGEON_BOSS_BOTS=ignore` plays the party without the brain (to measure that ignoring loses), `DUNGEON_BOSS_TRACE=1` prints the fight every 5 s and each fall with its cause. The party check now counts **falls** (every time a member went down), and a fighter who fell is put back at the fight after 20 s (the run back). Found while building it: a bot whose target the engine had cleared stood still for the whole fight (the old Bloom Heart and Solstice Heart "cannot beat" notes were this), and the enemy-separation push could shove a boss through a one-tile dungeon wall (`separate_enemies` now refuses a move through a wall).
 
 ## The sixteen mechanics
 
@@ -132,10 +157,14 @@ Both of the owner's examples, at the first dungeon where a party has had practic
 - **The Bound Chorus.** At 66% and 33% health Elyss is **invulnerable** behind a pale shield of song and four Bound Singers (the Cloister's Bound Cantor model, weak) rise. The shield falls when all four are dead; killing them takes about 15 s for a green party. The toll keeps coming during the chorus.
 - Escalation: at 33% the chorus is six singers and the toll comes every 18 s.
 
+**Built 2026-10-18 (`BOSSMECH-CHOIRMOTHER`).** *Toll of the Deep* is a `zone` circle of radius 8 round Elyss, kill, 5 s cast, every 25 s (every 18 s below 33%). *The Bound Chorus* is a `shield` with two steps (66%: 4 singers, 33%: 6) over ten sleeping Bound Singers (`choirsinger`, 14,000 health each). The Cloister's boss room is 28 by 28, so the ring leaves room to run (the 8 by 8 corridor the engine notes mention is a path, not the arena). Elyss's health went from 330,000 to 250,000 with the mechanics in (a win takes about 70 to 80 s). Sign, hand-written Swedish and a diagram (the red ring with four singers waiting) are in; a test keeps the sign's "5 seconds" equal to the cast.
+
 ### 3. Queen Avariel, the Coral Regent — Coral Reliquary (level 45): *Pearl Shell*
 
 - At 75%, 50% and 25% Avariel closes into a **pearl shell**: invulnerable, and she **heals 2% of her health per second** while it stands. Three Reliquary Pearls grow at marked spots round the room (stationary monsters, about 4% of her health each, each with a small pulse of damage to anyone adjacent). The shell opens when all three are broken.
 - Escalation: at 25% there are four pearls and two Reliquary Crabs.
+
+**Built 2026-10-18 (`BOSSMECH-CORALREGENT`).** *Pearl Shell* is a `shield` with three steps (75%, 50%, 25%: 3, 3 and 4 pearls, all held still) and `heal_per_s` 0.02, over ten sleeping Reliquary Pearls (`reliquarypearl`, 16,000 health, 4% of hers). *Reliquary Crabs* is an `adds` block that wakes the two sleeping Reliquary Crabs (`reliccrab`, tag `shellcrab`) when her health is at or below 25%. They are not part of the shield (the shell opens when the pearls are gone) and are free to move. The pearls' "small pulse" is not built: a held monster cannot strike.
 
 ### 4. High Hierophant Vael, Heart of the Tide — Grand Nave (level 50): *Rising Tide*
 
@@ -188,6 +217,8 @@ The reverse of the king's ring: here you **must stand inside** the circle.
 - Every 30 s three **seeds** are planted at random spots and grow for **12 s**, shown as a bar over each. A seed that blooms becomes a **Bloom Treant** (strong, 3% of the boss's health) and **heals the Worldseed 4%**. Each seed has about 1.5% of the boss's health, so the party has to split to burst them before they bloom.
 - Escalation: at 35% five seeds at once.
 
+**Built 2026-10-18 (`BOSSMECH-WORLDSEED`).** *Germination* is an `adds` block: three seeds (five below 35%) every 30 s, scattered, held still, each blooming after 12 s into a Bloom Treant (`seed_treant`, 120,000 health = 3% of the Heart) and healing it 4%. A seed (`seed_sprout`, 60,000 = 1.5%) broken in time blooms into nothing. Eight sleeping seeds and ten treants stand in the boss room, and a seed or treant that fell is woken again, so every 30 s cycle finds its bodies.
+
 ### 11. Axis of the Buried Sky — Sunken Astrolabe (level 85): *Orrery Spokes*
 
 - Three **brass spokes** (lanes 1.6 wide, from the Axis to the wall) rotate round it at 20°/s, each 120° from the next. A spoke is lethal to touch. Players run with the rotation, or stand in the gap, which moves at under 3 tiles/s at 8 tiles out.
@@ -201,26 +232,36 @@ The reverse of the king's ring: here you **must stand inside** the circle.
 - Every damaging **skill or hit you land adds one Static charge**. At 12 charges you detonate: a lethal burst (radius 5) at your feet. A **Grounding Rod** (four, in the corners) clears all your charge and gives 8 s of immunity to Static; after use a rod is dark for 12 s. So the party has to leave the boss every ~10 s to ground, and cannot all use one rod.
 - A banner at 8 charges and a crackle on the hero warn. Escalation: at 30% charge comes in twos and the rods go dark 20 s.
 
+**Built 2026-10-18 (`BOSSMECH-THUNDER-HEART`), with the new `static` block.** *Static*: 12 charges detonate a hero (kill within 5 tiles), a banner and a red ring at 8, one charge per blow (two below 30%), four Grounding Rods in the corners (radius 1.8, 8 s immune, dark 12 s, 20 s below 30%). The rods are drawn as blue circles (grey while dark), the charges as "n of 12 sparks" over each hero. The detonation is the player's own doing and the charge count is the warning, so rule 2's cast floor does not apply to it; a hero who stops hitting is never in danger. `tests/bossmech-static-ui.cjs` watches it in a real browser.
+
 ### 13. Heart of the Labyrinth — The Blooming Labyrinth (level 97): *Prism Bounce*
 
 - Every 18 s the Heart **marks a player** with a gem. After **4 s** it fires a lethal beam at where the player stands, and the beam **bounces off the arena walls twice**: all three segments are drawn as dashed lines for the whole countdown. The marked player has to line the bounces up so they miss the others.
 - Escalation: at 30% two marks and three bounces.
 - Note: this Heart already beats five players in green gear (`DUNGEON-PARTY-CHECK`); ease its health before the mechanic goes in.
 
+**Built 2026-10-18 (`BOSSMECH-BLOOM-HEART`).** *Prism Bounce* is a `mark` with a beam: one friend, 5 s (the shared floor, not 4), two bounces, every 18 s; below 30% two friends and three bounces. The Heart's health went from 7.0M to 13.3M and an enrage start of 114 s was added: the harness bug that hid how easy it was is fixed, and at the old health a party won in 47 s, before the mechanic mattered.
+
 ### 14. Heart of the Crucible — The Solar Crucible (level 98): *Twin Suns*
 
 - At 60% the Heart **splits** into Sol (fire: cone bursts) and Cinder (ash: ring bursts), on opposite sides, each with half the remaining health. While both live, a **lethal bridge of sunlight** joins them along the line between the bodies and moves when they do.
 - If one dies and the other lives for **more than 10 s**, the dead one rises again with half its health and the survivor gains +50% damage. The party must burst both within 10 s of each other.
+
+**Built 2026-10-18 (`BOSSMECH-SOLAR-HEART`).** *Twin Suns*: at 60% a sleeping Cinder (`solar_cinder`, the ash half, art borrowed from the Heart) wakes beside Sol, both with half the remaining health; revival after 10 s with +50% damage; the bridge of light is drawn as a dashed path for 3 s (`BRIDGE_WARNING`) and is lethal after that. Sol's *Sunburst* is a heavy cone (60% of a hero's health, 3 s cast, every 14 s); Cinder's rings are its own ground-pound. The Heart's health went from 7.6M to 6.0M (some wins took 162 s, near the cap).
 
 ### 15. The Last Memory — The Amber Archive (level 99): *Amber Stasis*
 
 - Every 25 s two **amber orbs** seek random players. A player they hit is **frozen in amber**: no movement, no skills, no damage taken. The cocoon is an object with about 2% of the boss's health: allies must **break it within 10 s**, or the amber closes and the player is lost. While frozen the player is a target that cannot dodge, so the next attack decides it.
 - Escalation: at 30% three orbs, and the cocoon holds for 8 s.
 
+**Built 2026-10-18 (`BOSSMECH-AMBER-MEMORY`).** *Amber Stasis*: two seeking orbs (speed 4.5, a hero can outrun them), 10 s to break the cocoon (`amber_cocoon`, 162,000 health = 2%), every 25 s; below 30%: three orbs and 8 s. Six sleeping cocoons, woken again when freed. The bots dodge orbs and, when a friend is frozen, hit the cocoon first.
+
 ### 16. Heart of the Longest Night — The Silent Solstice (level 99): *The Longest Night*
 
 - Every 45 s **Night falls**: after a **5 s warning** the arena goes dark and the cold kills anyone caught outside a **lit brazier's circle** within 6 s. Four braziers stand round the room; one is lit by a player **holding it for 3 s** (the `hold` block), and stays lit 30 s. The Heart sends flurries to snuff one every 12 s. So the party has to keep at least two braziers lit while it fights.
 - Escalation: at 30% Night falls every 30 s and the braziers burn 20 s.
+
+**Built 2026-10-18 (`BOSSMECH-SOLSTICE-HEART`).** *The Longest Night*: a 5 s kill-outside warning every 45 s (30 s below 30%), four braziers at (42,14), (54,14), (42,21), (54,21), radius 2.5, held for 3 s, burning 30 s (20 s below 30%), one snuffed every 12 s. The Heart's health went from 8.1M to 11.2M with an enrage start of 113 s (the party now holds braziers instead of racing).
 
 ## Where the ideas come from
 

@@ -50,5 +50,56 @@
       {"name": "Orrery Spokes", "block": "sweep", "hp_min": 0.3, "kind": {"shape": "spokes", "count": 3, "width": 1.6, "deg_per_s": 20, "reverse_every": 12, "reverse_warn": 2, "length": 10}},
       {"name": "Orrery Spokes", "block": "sweep", "hp_max": 0.3, "kind": {"shape": "spokes", "count": 4, "width": 1.6, "deg_per_s": 21, "reverse_every": 12, "reverse_warn": 2, "length": 10}}
     ]
+  },
+  "choirmother": {
+    "mechanics": [
+      {"name": "Toll of the Deep", "block": "zone", "hp_min": 0.33, "shape": {"kind": "circle", "r": 8}, "effect": "kill", "cast": 5, "every": 25},
+      {"name": "Toll of the Deep", "block": "zone", "hp_max": 0.33, "shape": {"kind": "circle", "r": 8}, "effect": "kill", "cast": 5, "every": 18},
+      {"name": "The Bound Chorus", "block": "shield", "steps": [{"hp": 0.66, "tag": "chorus", "count": 4}, {"hp": 0.33, "tag": "chorus", "count": 6}]}
+    ]
+  },
+  "coralregent": {
+    "mechanics": [
+      {"name": "Pearl Shell", "block": "shield", "heal_per_s": 0.02, "steps": [{"hp": 0.75, "tag": "pearl", "count": 3, "still": true}, {"hp": 0.5, "tag": "pearl", "count": 3, "still": true}, {"hp": 0.25, "tag": "pearl", "count": 4, "still": true}]},
+      {"name": "Reliquary Crabs", "block": "adds", "hp_max": 0.25, "tag": "shellcrab", "count": 2, "every": 600, "first": 0.5}
+    ]
+  },
+  "seed_worldseed": {
+    "mechanics": [
+      {"name": "Germination", "block": "adds", "hp_min": 0.35, "tag": "seed", "count": 3, "every": 30, "scatter": true, "still": true, "bloom": {"after": 12, "heal": 0.04, "then": "treant"}},
+      {"name": "Germination", "block": "adds", "hp_max": 0.35, "tag": "seed", "count": 5, "every": 30, "scatter": true, "still": true, "bloom": {"after": 12, "heal": 0.04, "then": "treant"}}
+    ]
+  },
+  "bloom_heart": {
+    "mechanics": [
+      {"name": "Prism Bounce", "block": "mark", "hp_min": 0.3, "count": 1, "every": 18, "cast": 5, "effect": {"kind": "beam", "bounces": 2, "width": 1.6}},
+      {"name": "Prism Bounce", "block": "mark", "hp_max": 0.3, "count": 2, "every": 18, "cast": 5, "effect": {"kind": "beam", "bounces": 3, "width": 1.6}}
+    ]
+  },
+  "solar_heart": {
+    "mechanics": [
+      {"name": "Twin Suns", "block": "split", "hp": 0.6, "tag": "cinder", "revive_after": 10, "survivor_bonus": 0.5, "bridge": 0.8},
+      {"name": "Sunburst", "block": "zone", "hp_max": 0.6, "shape": {"kind": "cone", "half_angle": 25, "length": 16}, "effect": "heavy", "heavy": 0.6, "cast": 3, "every": 14}
+    ]
+  },
+  "amber_memory": {
+    "mechanics": [
+      {"name": "Amber Stasis", "block": "stasis", "hp_min": 0.3, "every": 25, "orbs": 2, "speed": 4.5, "life": 12, "tag": "cocoon", "hold": 10},
+      {"name": "Amber Stasis", "block": "stasis", "hp_max": 0.3, "every": 25, "orbs": 3, "speed": 4.5, "life": 12, "tag": "cocoon", "hold": 8}
+    ]
+  },
+  "solstice_heart": {
+    "mechanics": [
+      {"name": "Braziers", "block": "hold", "hp_min": 0.3, "points": [[42, 14], [54, 14], [42, 21], [54, 21]], "r": 2.5, "hold_for": 3, "lit_for": 30, "snuff_every": 12},
+      {"name": "Braziers", "block": "hold", "hp_max": 0.3, "points": [[42, 14], [54, 14], [42, 21], [54, 21]], "r": 2.5, "hold_for": 3, "lit_for": 20, "snuff_every": 12},
+      {"name": "The Longest Night", "block": "zone", "hp_min": 0.3, "shape": {"kind": "lit"}, "effect": "kill_outside", "cast": 5, "every": 45, "linger": 1},
+      {"name": "The Longest Night", "block": "zone", "hp_max": 0.3, "shape": {"kind": "lit"}, "effect": "kill_outside", "cast": 5, "every": 30, "linger": 1}
+    ]
+  },
+  "thunder_heart": {
+    "mechanics": [
+      {"name": "Static", "block": "static", "hp_min": 0.3, "limit": 12, "warn_at": 8, "per_hit": 1, "r": 5, "rods": [[62, 11], [78, 11], [62, 24], [78, 24]], "rod_r": 1.8, "immune": 8, "dark": 12},
+      {"name": "Static", "block": "static", "hp_max": 0.3, "limit": 12, "warn_at": 8, "per_hit": 2, "r": 5, "rods": [[62, 11], [78, 11], [62, 24], [78, 24]], "rod_r": 1.8, "immune": 8, "dark": 20}
+    ]
   }
 }

@@ -175,5 +175,33 @@
     "gold": 23000,
     "material": "amber_memory_relic",
     "lootSource": "amber_archive"
+  },
+  {
+    "kind": "amber_cocoon",
+    "name": "Amber Cocoon",
+    "art": "sentinel",
+    "color": "#e7b45f",
+    "stats": [
+      162000,
+      0,
+      1,
+      1.6
+    ],
+    "profile": [
+      0.9,
+      1.8,
+      0,
+      4
+    ],
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "boss": false,
+    "level": 99,
+    "gold": 5500,
+    "material": "amber_cocoon_relic",
+    "lootSource": null,
+    "add": true,
+    "artFrom": "amber_sentinel"
   }
 ]

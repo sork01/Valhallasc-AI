@@ -10,7 +10,7 @@ fn seed_vault_has_safe_open_routes_boss_rewards_and_quests() {
     assert!(!map.sealed_template);
     assert_eq!((map.min_level, map.players, map.copies), (80, 5, 4));
     assert_eq!(map.final_boss, "seed_worldseed");
-    assert_eq!(map.slimes.len(), 12);
+    assert_eq!(map.slimes.iter().filter(|s| s.ambush.is_none()).count(), 12);
     assert_eq!(map.portals.len(), 2);
     assert!(map.portals.iter().any(|p| p.after_clear));
     assert!(w.maps[24].portals.iter().any(|p| p.to == 33));

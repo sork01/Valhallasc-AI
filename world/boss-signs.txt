@@ -12,23 +12,21 @@
   },
   "choirmother": {
     "title": "Elyss, Mother of the Bound Choir",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "Elyss rings a bell. A red circle fills for 5 seconds. Anyone inside is knocked out.",
+    "todo": "Step out of the red circle before it is full.",
+    "tip": "Twice, singers shield Elyss. Beat every singer and the shield breaks. When she is nearly beaten, the bell rings faster.",
     "colors": [
-      "red",
-      "blue"
+      "red"
     ],
     "x": 87.5,
     "y": 19.5
   },
   "coralregent": {
     "title": "Queen Avariel, the Coral Regent",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "Three times, Avariel hides in a shell. The shell heals her and nothing can hurt her.",
+    "todo": "Break all the pearls in the room. The shell opens when they are gone.",
+    "tip": "Be quick, or she heals too much. At the last shell, crabs join in. Stay together.",
     "colors": [
-      "red",
       "blue"
     ],
     "x": 122.5,
@@ -108,12 +106,11 @@
   },
   "seed_worldseed": {
     "title": "Heart of the Worldseed",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "Seeds grow in the room every 30 seconds. After 12 seconds each one grows into a tree guard. It also heals the boss.",
+    "todo": "Split up and break each seed before it grows.",
+    "tip": "Seeds are quick to break. When the Heart is nearly beaten, five seeds grow at once.",
     "colors": [
-      "red",
-      "blue"
+      "red"
     ],
     "x": 34.5,
     "y": 36.5
@@ -131,60 +128,58 @@
   },
   "thunder_heart": {
     "title": "Heart of the Stormgate",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "Every hit you land gives you a spark. At 12 sparks, a red circle knocks out everyone near you.",
+    "todo": "Stand on a blue rod in a corner to clear your sparks. Then go back and hit again.",
+    "tip": "Rods rest 12 seconds, so take turns. You get a warning at 8 sparks. Near the end, hits give two sparks and rods rest 20 seconds.",
     "colors": [
-      "red",
-      "blue"
+      "blue",
+      "red"
     ],
     "x": 47.5,
     "y": 17.5
   },
   "bloom_heart": {
     "title": "Heart of the Labyrinth",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "The Heart marks a friend. After 5 seconds a beam shoots through them. The beam bounces off the walls.",
+    "todo": "If marked, aim the beam away from friends. Everyone else, stay off the dashed lines.",
+    "tip": "Every line is drawn on the floor first. Near the end, two friends are marked. The beam then bounces three times.",
     "colors": [
-      "red",
-      "blue"
+      "path",
+      "red"
     ],
     "x": 65.5,
     "y": 36.5
   },
   "solar_heart": {
     "title": "Heart of the Crucible",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "The Heart splits into Sol and Cinder. A red line of light joins them. It knocks out anyone it touches.",
+    "todo": "Stay off the red line. Hit both until they fall at almost the same time.",
+    "tip": "If one falls first, it gets up again after 10 seconds. The other one grows stronger. So finish both together.",
     "colors": [
-      "red",
-      "blue"
+      "red"
     ],
     "x": 27.5,
     "y": 28.5
   },
   "amber_memory": {
     "title": "The Last Memory",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "Amber orbs float after friends. An orb that touches you traps you in amber. You cannot move.",
+    "todo": "Friends: break the amber cocoon quickly. Run from the orbs if you can.",
+    "tip": "Free a friend within 10 seconds, or the amber closes. Near the end, three orbs come and you have 8 seconds.",
     "colors": [
-      "red",
-      "blue"
+      "red"
     ],
     "x": 44.5,
     "y": 44.5
   },
   "solstice_heart": {
     "title": "Heart of the Longest Night",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "Every 45 seconds night falls. After 5 seconds, the cold knocks out anyone in the dark.",
+    "todo": "Stand in the blue circle of a lit brazier. Hold an unlit one for 3 seconds to light it.",
+    "tip": "A brazier burns 30 seconds. Cold winds snuff one every 12 seconds. When the Heart is nearly beaten, night falls every 30 seconds.",
     "colors": [
-      "red",
-      "blue"
+      "blue",
+      "red"
     ],
     "x": 43.5,
     "y": 38.5
