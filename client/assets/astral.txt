@@ -47,10 +47,17 @@
     }
   },
   "sprites": {
-    "voidmoth": "7c44349822235334",
-    "crystalwyrm": "61dabb919b3c7501",
-    "orbitbeetle": "95495527dc710c39",
-    "eclipsedryad": "c58657eb201c7774",
-    "meteorgolem": "ec19b250dce1e043"
+    "voidmoth": "16f1579889ca68a9",
+    "crystalwyrm": "c4dbc00ed0a20cc4",
+    "orbitbeetle": "c779c03de017e0e6",
+    "eclipsedryad": "2d35cbaf0e90a3a6",
+    "meteorgolem": "3b03b821e34145c5"
+  },
+  "tops": {
+    "voidmoth": 88,
+    "crystalwyrm": 60,
+    "orbitbeetle": 70,
+    "eclipsedryad": 89,
+    "meteorgolem": 79
   }
 }

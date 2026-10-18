@@ -48,11 +48,19 @@
     }
   },
   "sprites": {
-    "miragejackal": "dc01bbc3b401c2e0",
-    "shardscarab": "26e0e7e384e79757",
-    "glassharrier": "88e464f4208ca355",
-    "prismsentinel": "67fad38f7774636a",
-    "mirrorqueen": "f3f1a7abad63b61d",
-    "sunshard": "64ce62234b1a938e"
+    "miragejackal": "ab495b6f6c94cfd8",
+    "shardscarab": "c05b3daeb5b65907",
+    "glassharrier": "c2ebb6c77c341029",
+    "prismsentinel": "5bbb3705addd934f",
+    "mirrorqueen": "69aa988de5edb6ea",
+    "sunshard": "ccd6ace7e306eda5"
+  },
+  "tops": {
+    "miragejackal": 63,
+    "shardscarab": 54,
+    "glassharrier": 84,
+    "prismsentinel": 83,
+    "mirrorqueen": 86,
+    "sunshard": 80
   }
 }

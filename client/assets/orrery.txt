@@ -48,11 +48,19 @@
     }
   },
   "sprites": {
-    "bronzemantis": "aeab4b144c9e10c8",
-    "gearling": "70119c76923b1bfa",
-    "orbitseer": "8f7f850e15d3869d",
-    "chronoguard": "ceabcbb027d02fd1",
-    "pendulummatron": "28a0c668d7560565",
-    "epochengine": "397690248507ca24"
+    "bronzemantis": "050356fb6d3aea4b",
+    "gearling": "318099f6d34b4d51",
+    "orbitseer": "5726cc1f3018212a",
+    "chronoguard": "4e130c65b6c01473",
+    "pendulummatron": "59cfa36f3dbe0b3d",
+    "epochengine": "0555827ea490fee9"
+  },
+  "tops": {
+    "bronzemantis": 81,
+    "gearling": 66,
+    "orbitseer": 71,
+    "chronoguard": 82,
+    "pendulummatron": 79,
+    "epochengine": 83
   }
 }

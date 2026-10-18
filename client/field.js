@@ -2662,19 +2662,19 @@
     if (astralSrc) return;
     if (stubOn()) { astralSrc = stubEnemies(ASTRAL_KINDS, { voidmoth: '#a8f', crystalwyrm: '#6ef', orbitbeetle: '#fa4', eclipsedryad: '#8d6', meteorgolem: '#b9f' }); return; }
     fetch('assets/astral.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/astral_${k}.png`; })))
-      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); astralSrc = { meta, img }; })).catch(() => { astralSrc = null; });
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); astralSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { astralSrc = null; });
   }
   function loadPrismSprites() {
     if (prismSrc) return;
     if (stubOn()) { prismSrc = stubEnemies(PRISM_KINDS, {miragejackal:'#c9a',shardscarab:'#7dc',glassharrier:'#a9e',prismsentinel:'#ace',mirrorqueen:'#d8f',sunshard:'#fc9'}); return; }
     fetch('assets/prism.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/prism_${k}.png`; })))
-      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); prismSrc = { meta, img }; })).catch(() => { prismSrc = null; });
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); prismSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { prismSrc = null; });
   }
   function loadOrrerySprites() {
     if (orrerySrc) return;
     if (stubOn()) { orrerySrc = stubEnemies(ORRERY_KINDS, {bronzemantis:'#ca6',gearling:'#9cb',orbitseer:'#ade',chronoguard:'#bac',pendulummatron:'#eaa',epochengine:'#db8'}); return; }
     fetch('assets/orrery.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/orrery_${k}.png`; })))
-      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); orrerySrc = { meta, img }; })).catch(() => { orrerySrc = null; });
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); orrerySrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { orrerySrc = null; });
   }
   function loadMoonsporeSprites() {
     if (moonsporeSrc) return;
