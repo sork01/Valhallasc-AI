@@ -12,6 +12,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 import cathedral_content as C
+import cathedral_cloister_redraw as Z10
 from make_crag_sprites import (AX, AY, CLIPS, H, W, Frame, Palette, api, capsule, ellipsoid, polygon, rgba)
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,6 +22,8 @@ PREFIX = 'valhallasc_cathedral_'
 KINDS = [e['kind'] for e in C.ENEMIES]
 
 def palette(e):
+    if e['kind'] in Z10.KINDS:
+        return Z10.PALETTES[e['kind']]
     rgb = tuple(int(e['color'][i:i+2],16) for i in (1,3,5))
     colors = {}
     for n,f in enumerate([.22,.4,.65,.88,1.08]):
@@ -33,6 +36,8 @@ def palette(e):
 PALETTES = {e['kind']:palette(e) for e in C.ENEMIES}
 
 def draw(e,clip,n):
+    if e['kind'] in Z10.KINDS:
+        return Z10.draw(e['kind'],clip,n)
     p=PALETTES[e['kind']]; f=Frame(p); art=e['art']; boss=e['boss']
     sw=math.sin(n*math.pi/4); lean=0; lift=math.sin(n*math.pi/3)*1.1
     if clip=='walk': lean=sw*2; lift=abs(sw)*4
@@ -208,15 +213,16 @@ def ids():
     return json.loads(meta.read_text()).get('sprites', {}) if meta.exists() else {}
 
 
-def build(kinds, replace=False):
+def build(kinds, replace=False, preserve_existing=False):
     meta_path = ASSETS / 'cathedral.txt'
     meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
     known = meta.get('sprites', {})
     clash = [k for k in kinds if k in known]
-    if clash and not replace:
+    if clash and not replace and not preserve_existing:
         raise SystemExit(f'{clash} already exist (ids in cathedral.txt). Use export to preserve edits; --replace discards them.')
-    for kind in clash:
-        api('delete', {'sprite_id': known[kind]})
+    if not preserve_existing:
+        for kind in clash:
+            api('delete', {'sprite_id': known[kind]})
     made = {}
     for kind in kinds:
         frames = render(kind)
@@ -225,7 +231,8 @@ def build(kinds, replace=False):
             raise SystemExit(f'{kind} touches the canvas edge: {bad}')
         palette = build_drawers()[kind][1].hex
         np.savez_compressed(RAW / f'cathedral_{kind}_raw.npz', **frames)
-        sid = api('create', {'name': PREFIX + kind + '_all', 'width': W, 'height': H,
+        name = PREFIX + ('z10_redraw_' if kind in Z10.KINDS and (preserve_existing or replace) else '') + kind + '_all'
+        sid = api('create', {'name': name, 'width': W, 'height': H,
                             'frames': sum(count for _, count in CLIPS.values()),
                             'layers': 1, 'fps': 10, 'palette': palette, 'persist': True,
                             'ops': [{'op': 'set_layer', 'layer': 0, 'name': kind}]})['sprite_id']
@@ -276,8 +283,8 @@ def export(kinds):
             sheet.resize((sheet.width * 3 // 2, H * 3 // 2), Image.Resampling.NEAREST).save(dest / f'{kind}_{clip}.png')
         atlas.save(ASSETS / f'cathedral_{kind}.png', optimize=True)
         tops[kind] = AY - atlas.crop((0, 0, 6 * W, H)).getbbox()[1]
-    old = meta.get('kinds', [])
-    meta = {'frame': [W, H], 'anchor': [AX, AY], 'kinds': [k for k in KINDS if k in set(old) | set(kinds)],
+    # Other dungeon sprite generators share this manifest; keep every saved kind.
+    meta = {'frame': [W, H], 'anchor': [AX, AY], 'kinds': list(saved),
             'clips': clips, 'sprites': saved, 'tops': tops}
     meta_path.write_text(json.dumps(meta, indent=2) + '\n')
     print('Exported', ', '.join(kinds), 'to client/assets/cathedral_<kind>.png and cathedral.txt')
@@ -304,7 +311,7 @@ if __name__ == '__main__':
     command = sys.argv[1] if len(sys.argv) > 1 else 'preview'
     names = [a for a in sys.argv[2:] if a in drawers] or list(drawers)
     if command == 'build':
-        build(names, '--replace' in sys.argv)
+        build(names, '--replace' in sys.argv, '--preserve-existing' in sys.argv)
     elif command == 'export':
         export(names)
     elif command == 'verify':

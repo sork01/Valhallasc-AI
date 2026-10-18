@@ -2799,7 +2799,8 @@
     if (cathedralSrc) return;
     if (stubOn()) { cathedralSrc = stubEnemies(CATHEDRAL_KINDS,Object.fromEntries(CATHEDRAL_ENEMIES.map(e => [e.kind,e.color]))); return; }
     fetch('assets/cathedral.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res,rej) => {
-      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/cathedral_${k}.png`;
+      const artKind=CATHEDRAL_ENEMIES.find(e=>e.kind===k)?.artFrom || k;
+      const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=`assets/cathedral_${artKind}.png`;
     }))).then(imgs => {
       cathedralSrc={meta,img:Object.fromEntries(meta.kinds.map((k,n)=>[k,imgs[n]]))};
       for (const kind of meta.kinds) if (meta.tops?.[kind]) SLIME[kind].top=meta.tops[kind];
