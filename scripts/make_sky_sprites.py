@@ -646,6 +646,10 @@ DRAWERS = {k: (globals()[fn], globals()[pal]) for k, (fn, pal) in _PAIRS.items()
 for _kind, _pair in DRAWERS.items():
     assert len(_pair[1].hex) <= 255
 
+# Cel-shaded redraw (2026-10-18): the drawers above are the old art; build/export/verify use the new one.
+import sky_cel_redraw
+DRAWERS = sky_cel_redraw.DRAWERS
+
 
 def render(kind):
     draw, _ = DRAWERS[kind]

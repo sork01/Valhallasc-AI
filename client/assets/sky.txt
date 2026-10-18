@@ -47,10 +47,17 @@
     }
   },
   "sprites": {
-    "galehound": "b8aeb04056e8e38d",
-    "prismgolem": "08fb4079be8bba4b",
-    "skyray": "b98daf0edf66f874",
-    "einherjar": "6c2b6038226889d5",
-    "thunderroc": "d0b14465aa37eb25"
+    "galehound": "6d5cf7b281374693",
+    "prismgolem": "f14c439c4371063e",
+    "skyray": "a06176aa5f7453a3",
+    "einherjar": "76225da74618c01c",
+    "thunderroc": "55be297c758f1e60"
+  },
+  "tops": {
+    "galehound": 63,
+    "prismgolem": 82,
+    "skyray": 63,
+    "einherjar": 80,
+    "thunderroc": 75
   }
 }
