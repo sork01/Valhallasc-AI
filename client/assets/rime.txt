@@ -46,9 +46,15 @@
     }
   },
   "sprites": {
-    "crab": "5896e2afc6153db4",
-    "wolf": "9743bd64bd1aeba6",
-    "yeti": "d5f25e1b4791a39f",
-    "wyrm": "ed0a6d52316af108"
+    "crab": "ba38273ce296d517",
+    "wolf": "5bad6f5a073b88f7",
+    "yeti": "b813182e8e4bd2d2",
+    "wyrm": "6e6118b24d23d38e"
+  },
+  "tops": {
+    "crab": 46,
+    "wolf": 62,
+    "yeti": 82,
+    "wyrm": 88
   }
 }

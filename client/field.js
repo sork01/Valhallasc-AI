@@ -2620,14 +2620,14 @@
     if (cragSrc) return;
     if (stubOn()) { cragSrc = stubEnemies(CRAG_KINDS, { wisp: '#6ef', spider: '#555', wraith: '#a6f', golem: '#e83', cinderlord: '#fa4' }); return; }
     fetch('assets/crags.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/crags_${k}.png`; })))
-      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); cragSrc = { meta, img }; })).catch(() => { cragSrc = null; });
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); cragSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { cragSrc = null; });
   }
   // Gloamfen monsters: assets/fen_<kind>.png (scripts/make_fen_sprites.py), the same clips again.
   function loadFenSprites() {
     if (fenSrc) return;
     if (stubOn()) { fenSrc = stubEnemies(FEN_KINDS, { toad: '#7c4', croc: '#5a3', knight: '#8ca', hydra: '#a6c', gloomroot: '#4fa' }); return; }
     fetch('assets/fen.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/fen_${k}.png`; })))
-      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); fenSrc = { meta, img }; })).catch(() => { fenSrc = null; });
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); fenSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { fenSrc = null; });
   }
   // Undervault monsters: assets/vault_<kind>.png (scripts/make_vault_sprites.py), the same clips again. Until an atlas loads
   // (or when none exists) enemySource is null and the procedural slime body is drawn.
@@ -2635,28 +2635,28 @@
     if (vaultSrc) return;
     if (stubOn()) { vaultSrc = stubEnemies(VAULT_KINDS, { thrall: '#cba', archer: '#dc8', acolyte: '#a7f', gatewarden: '#fd8', choir: '#8df', colossus: '#9cf', hollowking: '#9f8' }); return; }
     fetch('assets/vault.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/vault_${k}.png`; })))
-      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); vaultSrc = { meta, img }; })).catch(() => { vaultSrc = null; });
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); vaultSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { vaultSrc = null; });
   }
   // Wyrdwood monsters: assets/wyrd_<kind>.png (scripts/make_wyrd_sprites.py), the same clips again.
   function loadWyrdSprites() {
     if (wyrdSrc) return;
     if (stubOn()) { wyrdSrc = stubEnemies(WYRD_KINDS, { boar: '#a64', crow: '#446', troll: '#6a5', weaver: '#a6e', ram: '#9cf', oakhorn: '#e83', hrungnir: '#8af' }); return; }
     fetch('assets/wyrd.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/wyrd_${k}.png`; })))
-      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); wyrdSrc = { meta, img }; })).catch(() => { wyrdSrc = null; });
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); wyrdSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { wyrdSrc = null; });
   }
   // Bifrost Reach monsters: assets/sky_<kind>.png (scripts/make_sky_sprites.py), the same clips again.
   function loadSkySprites() {
     if (skySrc) return;
     if (stubOn()) { skySrc = stubEnemies(SKY_KINDS, { galehound: '#9bd', prismgolem: '#a9f', skyray: '#58c', einherjar: '#8cd', thunderroc: '#fc6' }); return; }
     fetch('assets/sky.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/sky_${k}.png`; })))
-      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); skySrc = { meta, img }; })).catch(() => { skySrc = null; });
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); skySrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { skySrc = null; });
   }
   // Ran's Deep monsters: assets/deep_<kind>.png (scripts/make_deep_sprites.py), the same clips again.
   function loadDeepSprites() {
     if (deepSrc) return;
     if (stubOn()) { deepSrc = stubEnemies(DEEP_KINDS, { draugr: '#6aa', angler: '#7fe', moray: '#bd5', siren: '#e8d', shellback: '#7a8', kraken: '#a7e', hvitserk: '#cb4', ghostmaw: '#dff' }); return; }
     fetch('assets/deep.txt').then(r => r.ok ? r.json() : Promise.reject()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/deep_${k}.png`; })))
-      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); deepSrc = { meta, img }; })).catch(() => { deepSrc = null; });
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); deepSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { deepSrc = null; });
   }
   function loadAstralSprites() {
     if (astralSrc) return;
@@ -2793,7 +2793,7 @@
     if (rimeSrc) return;
     if (stubOn()) { rimeSrc = stubEnemies(RIME_KINDS, { crab: '#6bd', wolf: '#cde', yeti: '#fff', wyrm: '#4ae' }); return; }
     fetch('assets/rime.txt').then(r => r.json()).then(meta => Promise.all(meta.kinds.map(k => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = `assets/rime_${k}.png`; })))
-      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); rimeSrc = { meta, img }; })).catch(() => { rimeSrc = null; });
+      .then(imgs => { const img = {}; meta.kinds.forEach((k, n) => img[k] = imgs[n]); rimeSrc = { meta, img }; for (const k of meta.kinds) if (meta.tops?.[k]) SLIME[k].top = meta.tops[k]; })).catch(() => { rimeSrc = null; });
   }
   function loadCathedralSprites() {
     if (cathedralSrc) return;

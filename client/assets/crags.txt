@@ -47,10 +47,17 @@
     }
   },
   "sprites": {
-    "wisp": "019ef97089e68b84",
-    "spider": "c56d8ca744b3276e",
-    "wraith": "109a09ba62bb49ec",
-    "golem": "8e8a0a196dc625b5",
-    "cinderlord": "e73cf244cb32ce77"
+    "wisp": "fd0afdfe7b3ee253",
+    "spider": "9819492cb5c33f19",
+    "wraith": "9a502a20b669e176",
+    "golem": "f4e022ffcfb5b24f",
+    "cinderlord": "58433dbc7f28eee8"
+  },
+  "tops": {
+    "wisp": 74,
+    "spider": 59,
+    "wraith": 87,
+    "golem": 76,
+    "cinderlord": 87
   }
 }

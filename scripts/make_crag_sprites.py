@@ -945,6 +945,12 @@ DRAWERS = {'wisp': (wisp, WISP), 'spider': (spider, SPIDER), 'wraith': (wraith, 
 for _kind, _pair in list(DRAWERS.items()):
     assert len(_pair[1].hex) <= 255
 
+if __name__ == '__main__':
+    # Cel-shaded redraw (2026-10-18): the drawers above are the old art; the script's own commands use the new one.
+    # Only in __main__, because crags_cel_redraw imports this module's toolkit back.
+    import crags_cel_redraw
+    DRAWERS = crags_cel_redraw.DRAWERS
+
 
 def render(kind):
     draw, _ = DRAWERS[kind]
