@@ -13,6 +13,7 @@ from PIL import Image, ImageDraw
 
 import cathedral_content as C
 import cathedral_cloister_redraw as Z10
+import cathedral_reliquary_redraw as Z11
 from make_crag_sprites import (AX, AY, CLIPS, H, W, Frame, Palette, api, capsule, ellipsoid, polygon, rgba)
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +23,8 @@ PREFIX = 'valhallasc_cathedral_'
 KINDS = [e['kind'] for e in C.ENEMIES]
 
 def palette(e):
+    if e['kind'] in Z11.KINDS:
+        return Z11.PALETTES[e['kind']]
     if e['kind'] in Z10.KINDS:
         return Z10.PALETTES[e['kind']]
     rgb = tuple(int(e['color'][i:i+2],16) for i in (1,3,5))
@@ -36,6 +39,8 @@ def palette(e):
 PALETTES = {e['kind']:palette(e) for e in C.ENEMIES}
 
 def draw(e,clip,n):
+    if e['kind'] in Z11.KINDS:
+        return Z11.draw(e['kind'],clip,n)
     if e['kind'] in Z10.KINDS:
         return Z10.draw(e['kind'],clip,n)
     p=PALETTES[e['kind']]; f=Frame(p); art=e['art']; boss=e['boss']
@@ -231,7 +236,8 @@ def build(kinds, replace=False, preserve_existing=False):
             raise SystemExit(f'{kind} touches the canvas edge: {bad}')
         palette = build_drawers()[kind][1].hex
         np.savez_compressed(RAW / f'cathedral_{kind}_raw.npz', **frames)
-        name = PREFIX + ('z10_redraw_' if kind in Z10.KINDS and (preserve_existing or replace) else '') + kind + '_all'
+        tag = 'z11_redraw_' if kind in Z11.KINDS else 'z10_redraw_' if kind in Z10.KINDS else ''
+        name = PREFIX + (tag if preserve_existing or replace else '') + kind + '_all'
         sid = api('create', {'name': name, 'width': W, 'height': H,
                             'frames': sum(count for _, count in CLIPS.values()),
                             'layers': 1, 'fps': 10, 'palette': palette, 'persist': True,
