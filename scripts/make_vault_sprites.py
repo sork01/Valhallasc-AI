@@ -1311,6 +1311,12 @@ def colossus(clip, n):
 # Rendering and PixelFlow plumbing (same contract as scripts/make_crag_sprites.py)
 # ----------------------------------------------------------------------------------------------
 def build_drawers():
+    # Cel-shaded redraw (2026-10-18): the drawers above are the old art, kept for reference.
+    import vault_cel_redraw
+    return dict(vault_cel_redraw.DRAWERS)
+
+
+def _old_build_drawers():
     out = {}
     for kind in KINDS:
         draw = globals().get(kind)

@@ -49,12 +49,21 @@
     }
   },
   "sprites": {
-    "thrall": "9ff40724f5de0a32",
-    "archer": "f101f3238e807bd6",
-    "acolyte": "6a087bf9303da826",
-    "gatewarden": "97cfc659fab59bb0",
-    "choir": "40f8d7334eed4d08",
-    "colossus": "47a6eb52a7d5033b",
-    "hollowking": "9b83a979e4cc4d8e"
+    "thrall": "e635e2c7bae16ec1",
+    "archer": "39c33957abc7b8a7",
+    "acolyte": "a6c0354646530d2c",
+    "gatewarden": "78ed7f80073fb351",
+    "choir": "d909ffc021883166",
+    "colossus": "105f0d600bec805b",
+    "hollowking": "2811c940c413fed9"
+  },
+  "tops": {
+    "thrall": 69,
+    "archer": 71,
+    "acolyte": 79,
+    "gatewarden": 83,
+    "choir": 85,
+    "colossus": 79,
+    "hollowking": 82
   }
 }
