@@ -850,6 +850,7 @@
   ]) SLIME[kind]={name,elite,scale:elite?3.1:1.8,top:91,col:[col,col,'#2b424b']};
   const CATHEDRAL_KINDS = CATHEDRAL_ENEMIES.map(e => e.kind);
   for (const e of CATHEDRAL_ENEMIES) SLIME[e.kind] = { name:e.name, elite:true, boss:e.boss, scale:e.stats[3] * .72, top:82, col:[e.color,e.color,'#152431'] };
+  if (window.Locale?.language === 'sv') for (const d of Object.values(SLIME)) d.name = Locale.translate(d.name); // nameplates, log lines and the boss bar read these
   const CRAG_KINDS = ['wisp', 'spider', 'wraith', 'golem', 'cinderlord'], RIME_KINDS = ['crab', 'wolf', 'yeti', 'wyrm'], FEN_KINDS = ['toad', 'croc', 'knight', 'hydra', 'gloomroot'];
   const WYRD_KINDS = ['boar', 'crow', 'troll', 'weaver', 'ram', 'oakhorn', 'hrungnir'], SKY_KINDS = ['galehound', 'prismgolem', 'skyray', 'einherjar', 'thunderroc'], DEEP_KINDS = ['draugr', 'angler', 'moray', 'siren', 'shellback', 'kraken', 'hvitserk', 'ghostmaw'], ASTRAL_KINDS = ['voidmoth', 'crystalwyrm', 'orbitbeetle', 'eclipsedryad', 'meteorgolem'], PRISM_KINDS = ['miragejackal','shardscarab','glassharrier','prismsentinel','mirrorqueen','sunshard'], ORRERY_KINDS = ['bronzemantis','gearling','orbitseer','chronoguard','pendulummatron','epochengine'];
   const MOONSPORE_KINDS = ['glowcapgrazer','silkwing','rootlurker','lanternwraith','mireheart','silverwidow','nightbloom'];

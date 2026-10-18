@@ -14,9 +14,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 data = (ROOT / 'client/sv-data.js').read_text()
 text = json.loads(re.search(r'window\.SV_TEXT = (.*);\nwindow\.SV_TEMPLATES', data, re.S)[1])
-templates = dict(json.loads(re.search(r'window\.SV_TEMPLATES = (.*);\n$', data, re.S)[1]))
+templates = dict(json.loads(re.search(r'window\.SV_TEMPLATES = (.*);\nwindow\.SV_PHRASES', data, re.S)[1]))
 # What the window shows that is not translated on purpose: the key hint is a symbol and a number, and a name is a name.
 SKIP = {'REBIRTH', '--rebirth-rgb', 'III'}
+# Names and loanwords the player sees unchanged, and script text that is not shown, are listed in these hand-written files.
+SKIP |= set(json.loads((ROOT / 'scripts/sv-keep.txt').read_text())) | set(json.loads((ROOT / 'scripts/sv-ignore.txt').read_text()))
 # What the page's own script turns into text: a number and the word gold (locale.js), and the two places a stack can be,
 # which only ever appear after a number and are translated as the templates "{0} in the bank" and "{0} in your bags".
 COMPOSED = {}

@@ -220,7 +220,7 @@ const seed = lang => `if (!localStorage.getItem('valhallasc.save.v1')) localStor
     const svText = await sv.evaluate(() => document.getElementById('bank-panel').innerText + '\n' + document.getElementById('item-tooltip').innerText + '\n' + [...document.querySelectorAll('#bank-panel [aria-label]')].map(n => n.getAttribute('aria-label')).join('\n'));
     for (const english of ['Deposit gold', 'Withdraw gold', 'Gold in the bank', 'Sort by kind', 'Click an item', 'Expand the bank', 'Expansion 1', 'It is never refunded', 'in the bank', 'Empty bank slot', 'Click to take', 'Close the bank', 'Choose a quantity'])
       assert.ok(!svText.includes(english), `"${english}" is translated in Swedish`);
-    for (const swedish of ['Sätt in guld', 'Ta ut guld', 'Guld i banken', 'Utvidgning 1 av 4', 'Stäng', 'Klicka för att ta ut', 'i banken'])
+    for (const swedish of ['Sätt in guld', 'Ta ut guld', 'Guld i banken', 'Utökning 1 av 4', 'Stäng', 'Klicka för att ta ut', 'i banken'])
       assert.ok(svText.includes(swedish), `"${swedish}" is shown in Swedish`);
     await sv.close();
 

@@ -1,59 +1,69 @@
 #!/usr/bin/env python3
-"""Build the checked-in Swedish client catalog; run manually when English copy changes.
+"""Assemble client/sv-data.js from the hand-written Swedish files. No translation service is used.
 
-The translation service is used at build time only. No game text or player data is sent
-from the browser. Existing translations are retained so reruns need only new strings.
+Hand-written files (all JSON, all written by hand; see docs/swedish-glossary.md for the word choices):
+  scripts/sv-translations.txt           exact English text -> Swedish
+  scripts/sv-template-translations.txt  English template with {0}, {1}... -> Swedish template
+  scripts/sv-phrase-translations.txt    short English phrases with numbers ({0}) that the client replaces inside longer
+                                        composed lines, as "Rank {0}:" or "{0}s cooldown." (numbers only, never names)
+  scripts/sv-keep.txt                   texts that stay as they are (names, loanwords)
+  scripts/sv-ignore.txt                 harvested strings that are not player-facing text
+
+Run `python3 scripts/build_swedish.py` to write client/sv-data.js; it fails with a list when the harvested English
+has no Swedish, a template changes its placeholders, a Swedish text is the English text, or a text looks like code.
+`--check` runs the same checks without writing. New strings go into the hand-written files, never into sv-data.js.
 """
-import concurrent.futures
 import glob
 import html.parser
 import json
 import pathlib
 import re
-import time
-import urllib.parse
-import urllib.request
+import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-CACHE = ROOT / 'scripts' / 'sv-translations.txt'
+TEXT_FILE = ROOT / 'scripts' / 'sv-translations.txt'
+TEMPLATE_FILE = ROOT / 'scripts' / 'sv-template-translations.txt'
+PHRASE_FILE = ROOT / 'scripts' / 'sv-phrase-translations.txt'
+KEEP_FILE = ROOT / 'scripts' / 'sv-keep.txt'
+IGNORE_FILE = ROOT / 'scripts' / 'sv-ignore.txt'
 OUTPUT = ROOT / 'client' / 'sv-data.js'
-TEMPLATE_CACHE = ROOT / 'scripts' / 'sv-template-translations.txt'
 KEYS = {'name', 'title', 'description', 'label', 'dialogue', 'role'}
-ITEM_WORDS = {
-    'Health Potion':'hälsodryck', 'Mana Potion':'manadryck', 'Slime Gel':'slemgelé',
-    "Apprentice's":'lärlingens', "Pilgrim's":'pilgrimens', "Scout's":'spejarens', "Hunter's":'jägarens', "Traveler's":'resenärens',
-    'Ironhide':'järnhud', 'Moonveil':'månslöja', 'Nightweave':'nattsväv', 'Wildwarden':'vildväktare', 'Wayfarer':'vandrare',
-    'Tempered':'härdad', 'Weathered':'väderbiten', 'Gilded':'förgylld', 'Battered':'sliten', 'Reinforced':'förstärkt',
-    'Exalted':'upphöjd', 'Faded':'bleknad', 'Veteran':'veteran', 'Radiant':'strålande', 'Ancient':'uråldrig',
-    'Runed':'runristad', 'Hardened':'härdad', 'Heroic':'hjältemodig', 'Mythic':'mytisk', 'Legendary':'legendarisk',
-    'Divine':'gudomlig', 'Eternal':'evig', 'Grand':'stor', 'Supreme':'överlägsen', 'Greater':'större', 'Superior':'överlägsen',
-    'Crimson':'karmosinröd', 'Azure':'azurblå', 'Blue':'blå', 'Pink':'rosa', 'Golden':'gyllene', 'Royal':'kunglig',
-    'Shadow':'skugga', 'Moon':'måne', 'Sun':'sol', 'Iron':'järn', 'Steel':'stål', 'Oak':'ek', 'Ash':'aska',
-    'Armor':'rustning', 'Robes':'rockar', 'Vestments':'skrudar', 'Jerkin':'väst', 'Coat':'rock', 'Cuirass':'bröstharnesk',
-    'Pauldrons':'axelskydd', 'Spaulders':'axelskydd', 'Mantle':'mantel', 'Capelet':'kort kappa',
-    'Gauntlets':'handskar', 'Gloves':'handskar', 'Mitts':'vantar', 'Claws':'klor', 'Grips':'grepp', 'Bracers':'armskydd',
-    'Helm':'hjälm', 'Hat':'hatt', 'Hood':'huva', 'Headband':'pannband', 'Brow Band':'pannband',
-    'Diadem':'diadem', 'Circlet':'diadem', 'Crown':'krona', 'Pants':'byxor', 'Necklace':'halsband', 'Ring':'ring',
-    'Sword':'svärd', 'Staff':'stav', 'Mace':'stridsklubba', 'Daggers':'dolkar', 'Shortbow':'kortbåge', 'Longbow':'långbåge',
-    'Bow':'båge', 'Shield':'sköld', 'Shell':'skal', 'Heart':'hjärta', 'Core':'kärna', 'Fang':'huggtand',
-    'Scale':'fjäll', 'Pelt':'päls', 'Horn':'horn', 'Hide':'skinn', 'Gauntlet':'handske', 'Gel':'gelé',
-    'Jelly':'gelé', 'Stew':'gryta', 'Feast':'festmåltid', 'Banquet':'bankett', 'Satchel':'väska', 'Pack':'packning',
-    'Amber':'bärnsten', 'Moonstone':'månsten', 'Crystal':'kristall', 'Feathered':'fjäderprydd', 'Winged':'bevingad',
-    'Plumed':'fjäderprydd', 'Simple':'enkel', 'Plain':'enkel', 'Drowned':'dränkt', 'Worn':'sliten',
-    'Wolfhood':'varghuva', 'Bone':'ben', 'Fletching':'pilfjädring', 'Hollow':'ihålig', 'Chime':'klocka',
-    'Tusk':'bete', 'Shard':'skärva', 'Wing':'vinge', 'Quill':'fjäderpenna', 'Lure':'lockbete',
-    'Pearl':'pärla', 'Beak':'näbb', 'Greatsword':'storsvärd', 'Relic':'relik', 'Leggings':'benkläder',
-    'Signet':'sigillring', 'Bark':'bark', 'Carapace':'ryggsköld', 'Pinions':'vingpennor', 'Lens':'lins',
-    'Ember':'glöd', 'Seed':'frö', 'Echo':'eko', 'Dew':'dagg', 'Plume':'fjäder', 'Antler':'horn',
-    'Claw':'klo', 'Comb':'kam', 'Tail':'svans', 'Bell':'klocka', 'Resin':'kåda', 'Fur':'päls',
-    'Chip':'flisa', 'Feather':'fjäder', 'Heartstone':'hjärtsten', 'Cog':'kugghjul', 'Eye':'öga',
-    'Filament':'tråd', 'Edge':'egg', 'Roc':'rok', 'Newt':'vattensalamander', 'Moth':'mal',
-    'Guard':'väktare', 'Sovereign':'härskare', 'Oracle':'orakel', 'Sentinel':'väktare',
-}
+# Client modules whose strings reach the player. Art, music and the GM console are left out.
+CLIENT_FILES = ('game', 'account', 'city', 'quests', 'inventory', 'skillbar', 'quickuse', 'settings', 'online', 'social',
+                'syslog', 'attributes', 'weather', 'daynight', 'bank', 'rebirth', 'bossmech', 'mounts', 'trade', 'pvp',
+                'rolls', 'gearservices', 'worldmap', 'field', 'spark')
+INTERNAL = ('INSERT ', 'ALTER ', 'PRAGMA ', 'SELECT ', 'CREATE ', 'UPDATE ', 'DELETE ', 'Bearer ', 'HTTP ', 'SIGTERM ', 'VALHALLA_')
+# A template may leave out a placeholder only where Swedish needs no plural ending the English one builds.
+MAY_DROP = {'A treasure chest has appeared! It will vanish in {0} minute{1}.': {'{1}'}}
+CODE_WORDS = re.compile(r'\b(function|const|undefined|null|addEventListener|querySelector)\b|=>|\|\||&&|\?\.|\);')
 
 
-def catalog_strings():
+def is_text(value):
+    """Heuristic: the harvest also picks up ids, css, event names and message types; those are not text."""
+    t = value.strip()
+    if not re.search(r'[A-Za-z]{3}', t):
+        return False
+    if re.fullmatch(r'[a-z][A-Za-z0-9_.:\-]*', t):
+        return False
+    if re.match(r'(rgba?|hsla?|url|polygon|translate|hue-rotate)\(', t) or t.startswith(('--', '#', '.', '_', ',')):
+        return False
+    if re.fullmatch(r'[a-z0-9\-_ ]+', t) and '-' in t:
+        return False
+    if re.fullmatch(r'[a-z\-]+:\{?\d?\}?[:\d\{\}]*', t):
+        return False
+    return '{0}px' not in t and 'sans-serif' not in t
+
+
+def rust_source(path):
+    """The part of a Rust file that runs on the server (everything before its tests module)."""
+    source = pathlib.Path(path).read_text()
+    return re.split(r'#\[cfg\(test\)\]\s*(?:#\[[^\]]*\]\s*)*mod \w+\s*\{', source)[0]
+
+
+def harvest():
+    """Return (texts, templates): the English the player can see, as the build finds it."""
     found = set()
+
     def walk(value):
         if isinstance(value, dict):
             for key, child in value.items():
@@ -68,68 +78,21 @@ def catalog_strings():
             walk(json.loads(pathlib.Path(filename).read_text()))
         except json.JSONDecodeError:
             pass
+
     class Text(html.parser.HTMLParser):
         def handle_data(self, data):
             data = data.strip()
-            if re.search(r'[A-Za-z]{3}', data) and len(data) < 250:
+            if re.search(r'[A-Za-z]{3}', data) and len(data) < 700:
                 found.add(data)
+
         def handle_starttag(self, tag, attrs):
             for key, value in attrs:
                 if key in ('title', 'placeholder', 'aria-label') and value and re.search(r'[A-Za-z]{3}', value):
                     found.add(value)
     Text().feed((ROOT / 'client' / 'index.html').read_text())
-    # UI text created in JavaScript (network text is translated only after it enters the UI).
-    for filename in ('game', 'account', 'city', 'quests', 'inventory', 'skillbar', 'quickuse', 'settings', 'online', 'social', 'syslog', 'attributes', 'weather', 'daynight', 'bank'):
-        source = (ROOT / 'client' / (filename + '.js')).read_text()
-        for match in re.finditer(r"(?<![\\\w])(['\"])([^'\"\n]{3,180})\1", source):
-            value = match[2]
-            if re.search(r'[A-Za-z]{3}', value) and not re.search(r'[<>{}=\\/;+\$]', value) and not value.startswith(('#', '.', 'http')):
-                found.add(value)
-    # Literal server notices and refusal reasons are rendered by the client. Keep SQL,
-    # authorization headers and internal diagnostics out of the public translation file.
-    internal = ('INSERT ', 'ALTER ', 'PRAGMA ', 'SELECT ', 'CREATE ', 'UPDATE ', 'DELETE ', 'Bearer ', 'HTTP ', 'SIGTERM ', 'VALHALLA_')
-    for filename in glob.glob(str(ROOT / 'server' / 'src' / '**' / '*.rs'), recursive=True):
-        if '_tests.rs' in filename:
-            continue
-        source = pathlib.Path(filename).read_text().split('#[cfg(test)]')[0]
-        for value in re.findall(r'"([^"\\\n]{4,180})"', source):
-            if re.match(r'[A-Z][A-Za-z ]{3}', value) and ' ' in value and not re.search(r'[{}\\/<>:=]', value) and not value.startswith(internal):
-                found.add(value)
-    return sorted(v for v in found if v.strip() and not v.isascii() or v.strip() and re.search(r'[A-Za-z]{3}', v))
+    templates = set()
 
-
-def translate_batch(batch):
-    marker = '\n~|~\n'
-    payload = marker.join(batch)
-    url = 'https://translate.googleapis.com/translate_a/single?' + urllib.parse.urlencode({'client': 'gtx', 'sl': 'en', 'tl': 'sv', 'dt': 't', 'q': payload})
-    for attempt in range(4):
-        try:
-            with urllib.request.urlopen(url, timeout=20) as response:
-                translated = ''.join(segment[0] for segment in json.load(response)[0])
-            parts = [part.strip() for part in translated.split('~|~')]
-            if len(parts) == len(batch):
-                return dict(zip(batch, parts))
-        except Exception:
-            time.sleep(1 + attempt * 2)
-    # A changed separator must not shift translations onto the wrong source strings.
-    return {}
-
-
-def item_fallback(cache):
-    for item in json.loads((ROOT / 'world' / 'items.txt').read_text()):
-        name = item['name']
-        if cache.get(name) != name:
-            continue
-        translated = name
-        for english, swedish in sorted(ITEM_WORDS.items(), key=lambda entry: -len(entry[0])):
-            translated = re.sub(r'(?<!\w)' + re.escape(english) + r'(?!\w)', swedish, translated)
-        if translated != name:
-            cache[name] = translated[0].upper() + translated[1:]
-
-
-def template_strings():
-    found = set()
-    def add(value, pattern):
+    def add_template(value, pattern):
         if not re.search(r'[A-Za-z]{3}', value) or re.search(r'[<>=;/\\]', value):
             return
         parts = re.split(pattern, value)
@@ -141,61 +104,104 @@ def template_strings():
             return
         if normalized.startswith(('login:', 'register:', 'sso:', 'quest:', 'refinement_')):
             return
-        found.add(normalized)
+        templates.add(normalized)
+    for name in CLIENT_FILES:
+        source = (ROOT / 'client' / (name + '.js')).read_text()
+        for match in re.finditer(r"(?<![\\\w])(['\"])((?:\\.|(?!\1)[^\\\n]){3,260})\1", source):
+            value = re.sub(r"\\u([0-9a-fA-F]{4})", lambda m: chr(int(m[1], 16)), re.sub(r"\\(['\"])", r'\1', match[2]))
+            if not re.search(r'[A-Za-z]{3}', value) or re.search(r'[{}<>$]', value) or value.startswith(('#', '.', 'http', '--', '/')):
+                continue
+            # A string with code characters counts only when it reads as a sentence: it starts with a capital and has a space.
+            if re.search(r'[=;+/]|\(\)|\.\w+\(', value) and not (re.match(r'[A-Z]', value) and ' ' in value):
+                continue
+            found.add(value)
+        for value in re.findall(r'`([^`\n]{4,220})`', source):
+            add_template(value, r'\$\{[^{}]*\}')
     for filename in glob.glob(str(ROOT / 'server' / 'src' / '**' / '*.rs'), recursive=True):
         if '_tests.rs' in filename:
             continue
-        source = pathlib.Path(filename).read_text().split('#[cfg(test)]')[0]
+        source = rust_source(filename)
+        for value in re.findall(r'"([^"\\\n]{4,180})"', source):
+            if re.match(r'[A-Z][A-Za-z ]{3}', value) and ' ' in value and not re.search(r'[{}\\/<>:=]', value) and not value.startswith(INTERNAL):
+                found.add(value)
         for value in re.findall(r'"([^"\\\n]{4,220})"', source):
-            add(value, r'\{[^{}]*\}')
-    for filename in ('game', 'account', 'city', 'quests', 'inventory', 'skillbar', 'quickuse', 'settings', 'online', 'social', 'syslog', 'attributes', 'weather', 'daynight', 'bank'):
-        source = (ROOT / 'client' / (filename + '.js')).read_text()
-        for value in re.findall(r'`([^`\n]{4,220})`', source):
-            add(value, r'\$\{[^{}]*\}')
-    return sorted(found)
+            add_template(value, r'\{[^{}]*\}')
+    return sorted(v for v in found if v.strip() and is_text(v)), sorted(t for t in templates if is_text(t))
 
 
-def template_batch(batch):
-    marked = [re.sub(r'\{(\d+)\}', lambda m: 'ZXQ' + m[1] + 'ZX', source) for source in batch]
-    result = translate_batch(marked)
-    return {source: re.sub(r'ZXQ(\d+)ZX', lambda m: '{' + m[1] + '}', result[text])
-            for source, text in zip(batch, marked) if text in result and all('{' + str(i) + '}' in re.sub(r'ZXQ(\d+)ZX', lambda m: '{' + m[1] + '}', result[text]) for i in range(source.count('{')))}
+def load(path, default):
+    return json.loads(path.read_text()) if path.exists() else default
+
+
+def problems(text, templates, keep, ignore, texts, template_sources, phrases=None):
+    """Every way the hand-written files can be wrong, as readable lines."""
+    out = []
+    covered = set(text) | set(templates) | keep | ignore
+    for source in texts:
+        if source not in covered:
+            out.append(f'no Swedish for text: {source!r}')
+    for source in template_sources:
+        if source not in covered:
+            out.append(f'no Swedish for template: {source!r}')
+    for source, swedish in list(text.items()) + list(templates.items()):
+        if source == swedish:
+            out.append(f'Swedish equals English (list it in sv-keep.txt if it is a name): {source!r}')
+        if not swedish.strip():
+            out.append(f'empty Swedish: {source!r}')
+        if CODE_WORDS.search(swedish):
+            out.append(f'looks like code: {source!r}')
+        want = set(re.findall(r'\{\d+\}', source))
+        have = set(re.sub(r':t\}', '}', x) for x in re.findall(r'\{\d+(?::t)?\}', swedish))
+        if have - want or (want - have - MAY_DROP.get(source, set())):
+            out.append(f'placeholders differ: {source!r} -> {swedish!r}')
+    for source, swedish in (phrases or {}).items():
+        if source == swedish or not swedish.strip():
+            out.append(f'bad phrase: {source!r} -> {swedish!r}')
+        if sorted(re.findall(r'\{\d+\}', source)) != sorted(re.findall(r'\{\d+\}', swedish)):
+            out.append(f'phrase placeholders differ: {source!r} -> {swedish!r}')
+    for source in text:
+        if re.search(r'\{\d+\}', source):
+            out.append(f'a template is in sv-translations.txt: {source!r}')
+    for source in templates:
+        if not re.search(r'\{\d+\}', source):
+            out.append(f'a plain text is in sv-template-translations.txt: {source!r}')
+    for source in keep & (set(text) | set(templates)):
+        out.append(f'listed as kept and translated: {source!r}')
+    return out
+
+
+def assemble(text, templates, phrases):
+    """The text of client/sv-data.js for the hand-written files."""
+    dump = lambda value: json.dumps(value, ensure_ascii=False, separators=(',', ':'))
+    longest_first = lambda table: sorted(table.items(), key=lambda pair: -len(pair[0]))
+    return ("'use strict';\nwindow.SV_TEXT = " + json.dumps(text, ensure_ascii=False, separators=(',', ':'), sort_keys=True) + ';\n'
+            'window.SV_TEMPLATES = ' + dump(longest_first(templates)) + ';\n'
+            'window.SV_PHRASES = ' + dump(longest_first(phrases)) + ';\n')
 
 
 def main():
-    cache = json.loads(CACHE.read_text()) if CACHE.exists() else {}
-    sources = catalog_strings()
-    cache = {source: target for source, target in cache.items() if source in sources}
-    pending = [s for s in sources if s not in cache]
-    batches = []
-    current = []
-    for s in pending:
-        if len(current) >= 12 or sum(len(x) for x in current) + len(s) > 1400:
-            batches.append(current); current = []
-        current.append(s)
-    if current:
-        batches.append(current)
-    print(f'{len(pending)} strings in {len(batches)} batches', flush=True)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
-        for result in pool.map(translate_batch, batches):
-            cache.update(result)
-    item_fallback(cache)
-    CACHE.write_text(json.dumps(cache, ensure_ascii=False, indent=2) + '\n')
-    template_cache = json.loads(TEMPLATE_CACHE.read_text()) if TEMPLATE_CACHE.exists() else {}
-    sources = template_strings()
-    template_cache = {source: target for source, target in template_cache.items() if source in sources}
-    pending_templates = [s for s in sources if s not in template_cache]
-    groups = [pending_templates[i:i + 10] for i in range(0, len(pending_templates), 10)]
-    print(f'{len(pending_templates)} new templates in {len(groups)} batches', flush=True)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
-        for result in pool.map(template_batch, groups):
-            template_cache.update(result)
-    TEMPLATE_CACHE.write_text(json.dumps(template_cache, ensure_ascii=False, indent=2) + '\n')
-    output = "'use strict';\nwindow.SV_TEXT = " + json.dumps(cache, ensure_ascii=False, separators=(',', ':')) + ';\n'
-    output += 'window.SV_TEMPLATES = ' + json.dumps(sorted(template_cache.items(), key=lambda pair: -len(pair[0])), ensure_ascii=False, separators=(',', ':')) + ';\n'
+    check_only = '--check' in sys.argv
+    text = load(TEXT_FILE, {})
+    templates = load(TEMPLATE_FILE, {})
+    phrases = load(PHRASE_FILE, {})
+    keep = set(load(KEEP_FILE, []))
+    ignore = set(load(IGNORE_FILE, []))
+    texts, template_sources = harvest()
+    errors = problems(text, templates, keep, ignore, texts, template_sources, phrases)
+    if errors:
+        print('\n'.join(errors[:200]))
+        print(f'{len(errors)} problems; nothing written')
+        return 1
+    stale = [s for s in list(text) + list(templates) if s not in set(texts) | set(template_sources)]
+    if check_only:
+        print(f'ok: {len(texts)} texts, {len(template_sources)} templates harvested; {len(text)} + {len(templates)} translated; '
+              f'{len(stale)} entries the harvest does not see (kept: server and script strings)')
+        return 0
+    output = assemble(text, templates, phrases)
     OUTPUT.write_text(output)
-    print(f'wrote {len(cache)} translations; {len(pending) - len([s for s in pending if s in cache])} missing', flush=True)
+    print(f'wrote {len(text)} texts and {len(templates)} templates to {OUTPUT.relative_to(ROOT)}')
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

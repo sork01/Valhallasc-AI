@@ -322,7 +322,7 @@
         card = node('article', '', 'equipped-slot'); card.dataset.slot = slot;
         const select = node('select'); select.id = legacy ? 'field-' + look.class + (slot === 'chest' ? 'Armor' : 'Weapon') : 'field-' + slot; select.setAttribute('aria-label', label);
         select.addEventListener('change', () => { if (legacy) Field.equip({ [look.class + (slot === 'chest' ? 'Armor' : 'Weapon')]: select.value }); else Field.equipSlot(slot, select.value); select.value = card.dataset.value; });
-        const title = node('label', label.toUpperCase(), 'sr-only'); title.htmlFor = select.id;
+        const title = node('label', (window.Locale ? Locale.translate(label) : label).toUpperCase(), 'sr-only'); title.htmlFor = select.id;
         const glyph = button('', () => { if (itemAtSlot(slot)) { selected = itemAtSlot(slot).id; renderDetails(); } select.focus(); try { select.showPicker?.(); } catch (_) {} }, 'gear-icon');
         attachTooltip(glyph, () => itemAtSlot(slot), slot);
         glyph.addEventListener('contextmenu', event => { event.preventDefault(); unequip(slot); });
