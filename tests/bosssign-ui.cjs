@@ -1,6 +1,7 @@
-// The boss sign on the screen (BOSSMECH-SIGN-ENGINE), in a real browser against a real private server. No shipped boss has a
-// mechanic yet, so the world loads a one-boss table of its own (VALHALLA_BOSSMECH_FILE, honoured only with test commands) that
-// gives the Undervault's king a harmless break bar; a dungeon whose boss has no mechanic shows no sign. This checks what the
+// The boss sign on the screen (BOSSMECH-SIGN-ENGINE), in a real browser against a real private server. The world loads a
+// one-boss table of its own (VALHALLA_BOSSMECH_FILE, honoured only with test commands) that gives the Undervault's king a
+// harmless break bar, so the test does not depend on the shipped numbers; a dungeon whose boss has no mechanic shows no sign.
+// This checks what the
 // player sees: the sign is drawn where the server says, F or a click reads it (walking up first), the window shows the
 // server's words and the picture strip, Esc, the cross, the Close button and walking away close it, a reload reads it again,
 // it fits a phone-sized screen, no other zone has one, and the new texts exist in Swedish.

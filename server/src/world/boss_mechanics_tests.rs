@@ -1675,3 +1675,123 @@ fn every_shipped_boss_is_fair_and_its_tags_exist_in_the_map() {
         }
     }
 }
+
+// --- the shipped bosses ------------------------------------------------------------------------------------------
+// One section per `BOSSMECH-*` boss, reading the data the server ships (`world/boss-mechanics.txt`).
+
+/// A shipped boss's definition as the JSON text `rig` takes.
+fn shipped(kind: &str) -> String {
+    let all: Value =
+        serde_json::from_str(include_str!("../../../world/boss-mechanics.txt")).unwrap();
+    all[kind].to_string()
+}
+
+/// The two dirges of Haldor, the Hollow King (`BOSSMECH-HOLLOWKING`): `(cast, every, bar, stun, vulnerable)`.
+fn dirges(w: &World) -> Vec<(f64, f64, f64, f64, f64)> {
+    w.boss.table["hollowking"]
+        .mechanics
+        .iter()
+        .map(|m| match &m.block {
+            Block::Break(b) => (b.cast, b.every, b.bar, b.stun, b.vulnerable),
+            other => panic!("Haldor has only dirges, found {other:?}"),
+        })
+        .collect()
+}
+
+#[test]
+fn haldors_dirge_is_a_break_every_thirty_seconds_and_every_twenty_five_below_thirty_percent() {
+    let r = rig(&shipped("hollowking"), 1);
+    let d = dirges(&r.w);
+    assert_eq!(d.len(), 2, "one dirge, one escalation, nothing else");
+    // The same song: 8 s to answer, the same bar, a 6 s rest and +30% damage after a break.
+    assert_eq!(d[0].0, 8.);
+    assert_eq!(
+        (d[0].0, d[0].2, d[0].3, d[0].4),
+        (d[1].0, d[1].2, d[1].3, d[1].4)
+    );
+    assert_eq!((d[0].3, d[0].4), (6., 0.3));
+    assert_eq!((d[0].1, d[1].1), (30., 25.));
+    let m = &r.w.boss.table["hollowking"].mechanics;
+    assert!(m[0].active_at(1.) && m[0].active_at(0.31) && !m[0].active_at(0.3));
+    assert!(m[1].active_at(0.3) && m[1].active_at(0.01) && !m[1].active_at(0.31));
+    assert_eq!(m[0].name, "Dirge of the Hollow");
+}
+
+#[test]
+fn haldor_sings_on_the_thirtieth_second_and_again_thirty_later_then_faster_below_thirty_percent() {
+    let mut r = rig(&shipped("hollowking"), 2);
+    r.run(29.);
+    assert_eq!(
+        r.fight().live.len(),
+        0,
+        "no dirge before the thirtieth second"
+    );
+    r.run(1.5);
+    assert_eq!(r.fight().live.len(), 1);
+    let needed = r.view()["break"]["needed"].as_f64().unwrap();
+    assert!((needed - r.max_hp() * dirges(&r.w)[0].2).abs() < 1e-6);
+    // The party answers; nobody dies, he rests, and the next song starts thirty seconds after the first.
+    r.hit_boss(1, needed);
+    r.run(0.2);
+    assert!(r.view()["stunned"].as_f64().unwrap() > 5.);
+    assert!(r.alive(1) && r.alive(2));
+    r.run(27.);
+    assert_eq!(r.fight().live.len(), 0, "27.7 s after the first song began");
+    r.run(3.);
+    assert_eq!(
+        r.fight().live.len(),
+        1,
+        "the second song, 30 s after the first"
+    );
+    r.hit_boss(2, needed);
+    r.run(0.2);
+    // Below 30% the interval is 25 s, counted from the moment that window opens.
+    r.set_boss_share(0.25);
+    r.run(24.);
+    assert_eq!(r.fight().live.len(), 0);
+    r.run(2.);
+    assert_eq!(r.fight().live.len(), 1, "the quicker dirge");
+    assert!(r.alive(1) && r.alive(2));
+}
+
+#[test]
+fn nobody_hitting_back_during_haldors_dirge_ends_in_the_wail() {
+    let mut r = rig(&shipped("hollowking"), 3);
+    r.run(30.5);
+    assert!(r.alive(1) && r.alive(2) && r.alive(3), "the song has 8 s");
+    r.run(8.);
+    assert!(!r.alive(1) && !r.alive(2) && !r.alive(3));
+    assert_eq!(
+        causes(&r.events(1)),
+        vec!["Dirge of the Hollow".to_string(); 3],
+        "each death names the song"
+    );
+}
+
+#[test]
+fn the_sign_before_haldor_says_what_the_dirge_really_does() {
+    let w = world();
+    let sign = &w.signs["hollowking"];
+    let d = dirges(&w);
+    // The numbers on the sign are the mechanic's own.
+    assert!(
+        sign.what.contains(&format!("{} seconds", d[0].0)),
+        "the song lasts {} s: {}",
+        d[0].0,
+        sign.what
+    );
+    assert_eq!(sign.colors, vec!["red".to_string()]);
+    // The three parts, in the words of the bar the player sees (the break bar is gold) and the low-health line.
+    assert!(sign.todo.contains("gold bar"));
+    assert!(sign.tip.contains("nearly beaten"));
+    // Plain words and short sentences: a child of about eight reads it.
+    for text in [&sign.what, &sign.todo, &sign.tip] {
+        assert!(text.len() <= 150, "{text}");
+        for sentence in text.split(['.', '!']).filter(|s| !s.trim().is_empty()) {
+            assert!(
+                sentence.split_whitespace().count() <= 12,
+                "over twelve words: {sentence}"
+            );
+        }
+    }
+}

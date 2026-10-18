@@ -30,6 +30,9 @@ pub struct BossMech {
     pub(super) table: BTreeMap<String, Arc<BossDef>>,
     pub(super) fights: BTreeMap<usize, Fight>,
     next_id: u64,
+    /// Seconds a break had left when it was broken, one per dirge: what the harness reads to tune a bar.
+    #[cfg(test)]
+    pub(super) spare: Vec<f64>,
 }
 impl BossMech {
     pub fn new() -> Self {
@@ -40,6 +43,8 @@ impl BossMech {
             table: table.into_iter().map(|(k, v)| (k, Arc::new(v))).collect(),
             fights: BTreeMap::new(),
             next_id: 1,
+            #[cfg(test)]
+            spare: vec![],
         }
     }
 }
@@ -1277,6 +1282,8 @@ impl World {
         // The channel holds the boss where it is.
         self.hold_still(id);
         if bl.dealt >= bl.needed {
+            #[cfg(test)]
+            self.boss.spare.push(bl.left);
             fight.stun_left = b.stun;
             fight.vulnerable = b.vulnerable;
             let at = self.slimes[id].point();

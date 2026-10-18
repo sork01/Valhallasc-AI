@@ -360,10 +360,22 @@ fn a_party_of_five_beats_every_dungeon_pack_and_boss() {
                 .iter()
                 .map(|r| {
                     format!(
-                        "{:.0} s, {} died, enemy at {:.0}%",
+                        "{:.0} s, {} died, enemy at {:.0}%{}",
                         r.seconds,
                         r.deaths,
-                        r.enemy_left * 100.
+                        r.enemy_left * 100.,
+                        if r.break_spare.is_empty() {
+                            String::new()
+                        } else {
+                            format!(
+                                ", breaks with {} s to spare",
+                                r.break_spare
+                                    .iter()
+                                    .map(|s| format!("{s:.1}"))
+                                    .collect::<Vec<_>>()
+                                    .join("/")
+                            )
+                        }
                     )
                 })
                 .collect::<Vec<_>>()

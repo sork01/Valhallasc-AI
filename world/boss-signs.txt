@@ -1,12 +1,11 @@
 {
   "hollowking": {
     "title": "Haldor, the Hollow King",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "Haldor sings a sad song for 8 seconds. When it ends, everyone is knocked out.",
+    "todo": "Hit Haldor with everything you have until the gold bar is full. Then the song stops!",
+    "tip": "Everyone's hits fill the bar. Then Haldor rests and your hits hurt more. When he is nearly beaten, he sings faster. Do not give up!",
     "colors": [
-      "red",
-      "blue"
+      "red"
     ],
     "x": 93.5,
     "y": 13.5

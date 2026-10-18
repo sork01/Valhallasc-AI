@@ -402,6 +402,25 @@ fn cast_skills(w: &mut World, session: u64, id: usize, outcome: &mut Outcome) {
     }
 }
 
+/// A boss that holds still for its mechanic (a channel, a stun) does not come to a party that stands where the fight
+/// began, so the bots walk in as players would: to a melee reach of it, stopping where they are if already close.
+fn walk_up_to_a_held_boss(w: &mut World, session: u64, id: usize) {
+    const REACH: f64 = 2.5;
+    let boss = &w.slimes[id];
+    if !w.boss.table.contains_key(&boss.kind) || boss.set_root_left <= 0. {
+        return;
+    }
+    let target = boss.point();
+    let c = &mut w.players.get_mut(&session).unwrap().character;
+    let from = c.point();
+    let distance = from.distance(target);
+    if distance > REACH {
+        let step = from.direction(target);
+        let walk = (distance - REACH).min(5.2 * TICK);
+        (c.x, c.y) = (from.x + step.x * walk, from.y + step.y * walk);
+    }
+}
+
 fn use_consumables(w: &mut World, session: u64, outcome: &mut Outcome) {
     let (class, level, hp, max_hp, resource, max_resource, ready, eating) = {
         let p = &w.players[&session];
@@ -529,6 +548,7 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
         }
         let phase = std::time::Instant::now();
         if case.rotation == Rotation::Skills {
+            walk_up_to_a_held_boss(&mut w, 1, id);
             cast_skills(&mut w, 1, id, &mut out);
         }
         if case.consumables {
@@ -555,7 +575,8 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
         }
         out.lowest_hp_fraction = out.lowest_hp_fraction.min((after / max_hp).max(0.));
         let elapsed = w.time - start_time;
-        if elapsed >= PROJECT_AFTER {
+        // A boss with a mechanic can end the fight at any moment (its wail), so the projection says nothing yet.
+        if elapsed >= PROJECT_AFTER && !w.boss.table.contains_key(&w.slimes[id].kind) {
             let done = 1. - w.slimes[id].hp / w.slimes[id].max_hp;
             if done <= 0. || elapsed / done > cap * HOPELESS_FACTOR {
                 break;
@@ -654,6 +675,7 @@ pub fn run_pack_once(case: &Case, ids: &[usize], seed: u64) -> Outcome {
             w.message(1, ClientMessage::Target { id: near });
         }
         if case.rotation == Rotation::Skills {
+            walk_up_to_a_held_boss(&mut w, 1, near);
             cast_skills(&mut w, 1, near, &mut out);
         }
         if case.consumables {
@@ -669,7 +691,11 @@ pub fn run_pack_once(case: &Case, ids: &[usize], seed: u64) -> Outcome {
         }
         out.lowest_hp_fraction = out.lowest_hp_fraction.min((after / max_hp).max(0.));
         let elapsed = w.time - start_time;
-        if elapsed >= PROJECT_AFTER {
+        if elapsed >= PROJECT_AFTER
+            && !ids
+                .iter()
+                .any(|&i| w.boss.table.contains_key(&w.slimes[i].kind))
+        {
             let done = 1. - left(&w);
             if done <= 0. || elapsed / done > cap * HOPELESS_FACTOR {
                 break;
@@ -702,6 +728,8 @@ pub struct PartyOutcome {
     pub seconds: f64,
     /// The group's health still standing, as a fraction of its total.
     pub enemy_left: f64,
+    /// Seconds each broken channel had left (`BossMech::spare`).
+    pub break_spare: Vec<f64>,
 }
 
 /// A party of `members` against several monsters at once (a dungeon pack or a boss). Every living member fights the
@@ -798,6 +826,7 @@ pub fn run_party_pack_once(
                 *aimed_at = near;
                 w.message(session, ClientMessage::Target { id: near });
             }
+            walk_up_to_a_held_boss(&mut w, session, near);
             cast_skills(&mut w, session, near, &mut out);
             if case.consumables {
                 use_consumables(&mut w, session, &mut out);
@@ -818,6 +847,7 @@ pub fn run_party_pack_once(
             .count(),
         seconds: w.time - start_time,
         enemy_left: left(&w).clamp(0., 1.),
+        break_spare: w.boss.spare.clone(),
     }
 }
 

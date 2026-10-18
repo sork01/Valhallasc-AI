@@ -33,10 +33,10 @@ Result on the 47 bosses (2 seeds, 1,410 lone fights): lone clears fell from 820 
 
 Not covered, and why:
 
-- **Choir, Colossus, Hollowking** (Undervault): no lone player can kill them and they stay as they were (the lone Priest survives); a party needs 90 to 180 s, so no safe start exists.
+- **Choir, Colossus, Hollowking** (Undervault; Hollowking now has the Dirge of the Hollow, see `docs/boss-mechanics.md`: a lone hero dies at the first song or the next, 0 of 144 lived): no lone player can kill them and they stay as they were (the lone Priest survives); a party needs 90 to 180 s, so no safe start exists.
 - **Bloom Heart and Solstice Heart**: a party of five in green gear cannot beat them in 180 s today (72 percent health left, nobody dies). Easing by health is a cliff, not a slope: x0.31 still fails, x0.27 wins in about 18 s, x0.2 in 11 s. Their stats equal Amber Archive's Amber Memory, which the party beats in 77 to 84 s, so the cause is something else (not found). They have no enrage until that is fixed.
 - **Thunder Heart** had a bimodal party time (74 to 77 s, or 172 to 180 s with nobody dead, even with the enrage running), so its start (93 s) is based on the fast mode; the slow runs look like a boss that stops engaging.
-- The harness stops a fight as hopeless after 30 s when the lone hero's pace projects past three times the limit and counts it as "survived"; such fights (about 100 of 1,410) never reach the enrage, but the hero cannot win them either.
+- (Since 2026-10-18 a boss with a `world/boss-mechanics.txt` entry is exempt, because its wail can end the fight at any moment.) The harness stops a fight as hopeless after 30 s when the lone hero's pace projects past three times the limit and counts it as "survived"; such fights (about 100 of 1,410) never reach the enrage, but the hero cannot win them either.
 
 Tools: `ENRAGE_FILE=<path>` (test builds) and `scripts/dungeon-calibrate.py --enrage-file <path>`. The party check now runs one process per core.
 

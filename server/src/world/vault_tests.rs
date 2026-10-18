@@ -1357,15 +1357,16 @@ fn the_colossus_and_hollow_king_fall_faster_to_five_than_three() {
         "the last fight still takes time: {:.0}s",
         five.secs
     );
-    // With the stronger player stats, a trio can win, but takes longer and loses more health.
+    // A trio that wins is slower. Since Haldor's Dirge of the Hollow (`BOSSMECH-HOLLOWKING`) it must also deal the
+    // bar's damage in 8 s every 25 to 30 s, which a real party does with seconds to spare and a trio only sometimes:
+    // missing one ends the fight, so a trio that loses is as it should be. Health lost no longer separates the two
+    // (the king stands still and rests through every dirge, so the five are hurt about as much as the three).
     let (_, three) = fight(&["warrior", "priest"], &[king], from, 180., 5);
     assert!(
-        three.won && three.secs > five.secs * 1.25 && three.low < five.low,
-        "a hirer with a warrior and a priest wins more slowly in {:.0}s (five {:.0}s, low {:.0}% vs {:.0}%)",
+        !three.won || three.secs > five.secs * 1.25,
+        "a hirer with a warrior and a priest wins more slowly or not at all: {:.0}s (five {:.0}s)",
         three.secs,
-        five.secs,
-        three.low * 100.,
-        five.low * 100.
+        five.secs
     );
 }
 
