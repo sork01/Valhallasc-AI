@@ -49,12 +49,21 @@
     }
   },
   "sprites": {
-    "boar": "41a3eab8b98bf1b7",
-    "crow": "022d3bf063e4f01d",
-    "troll": "165b0f00cd55a7a4",
-    "weaver": "1c4d164a2cf97539",
-    "ram": "84a62a17cf044049",
-    "oakhorn": "221af4bc261566b4",
-    "hrungnir": "02156c37a7226787"
+    "boar": "ea4b8b54549af551",
+    "crow": "be9b4f3aeae92b67",
+    "troll": "0c06e3a6c26a6b0a",
+    "weaver": "48f4308891f285da",
+    "ram": "f90f6997816a8ef7",
+    "oakhorn": "b1150a62ee7151d0",
+    "hrungnir": "b52981453374ab5f"
+  },
+  "tops": {
+    "boar": 47,
+    "crow": 74,
+    "troll": 84,
+    "weaver": 82,
+    "ram": 44,
+    "oakhorn": 71,
+    "hrungnir": 85
   }
 }

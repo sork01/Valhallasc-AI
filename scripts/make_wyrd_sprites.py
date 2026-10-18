@@ -1179,6 +1179,10 @@ DRAWERS = {k: pair for k, pair in {'boar': (globals().get('boar'), globals().get
 for _kind, _pair in DRAWERS.items():
     assert len(_pair[1].hex) <= 255
 
+# Cel-shaded redraw (2026-10-18): the drawers above are the old art; build/export/verify use the new one.
+import wyrd_cel_redraw
+DRAWERS = wyrd_cel_redraw.DRAWERS
+
 
 def render(kind):
     draw, _ = DRAWERS[kind]
