@@ -27,10 +27,10 @@ PHRASE_FILE = ROOT / 'scripts' / 'sv-phrase-translations.txt'
 KEEP_FILE = ROOT / 'scripts' / 'sv-keep.txt'
 IGNORE_FILE = ROOT / 'scripts' / 'sv-ignore.txt'
 OUTPUT = ROOT / 'client' / 'sv-data.js'
-KEYS = {'name', 'title', 'description', 'label', 'dialogue', 'role'}
+KEYS = {'name', 'title', 'description', 'label', 'dialogue', 'role', 'what', 'todo', 'tip'}
 # Client modules whose strings reach the player. Art, music and the GM console are left out.
 CLIENT_FILES = ('game', 'account', 'city', 'quests', 'inventory', 'skillbar', 'quickuse', 'settings', 'online', 'social',
-                'syslog', 'attributes', 'weather', 'daynight', 'bank', 'rebirth', 'bossmech', 'mounts', 'trade', 'pvp',
+                'syslog', 'attributes', 'weather', 'daynight', 'bank', 'rebirth', 'bossmech', 'bosssign', 'mounts', 'trade', 'pvp',
                 'rolls', 'gearservices', 'worldmap', 'field', 'spark')
 INTERNAL = ('INSERT ', 'ALTER ', 'PRAGMA ', 'SELECT ', 'CREATE ', 'UPDATE ', 'DELETE ', 'Bearer ', 'HTTP ', 'SIGTERM ', 'VALHALLA_')
 # A template may leave out a placeholder only where Swedish needs no plural ending the English one builds.

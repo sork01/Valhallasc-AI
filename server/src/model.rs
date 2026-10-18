@@ -1191,6 +1191,10 @@ pub enum ClientMessage {
     OpenChest {
         id: u64,
     },
+    /// Reads the sign before a final boss (server/src/world/boss_signs.rs); `sign` is the boss's kind.
+    SignRead {
+        sign: String,
+    },
     Equip {
         armor: Option<String>,
         weapon: Option<String>,

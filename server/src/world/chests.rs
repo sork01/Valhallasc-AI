@@ -120,12 +120,12 @@ pub(super) fn boosted_ladder_rarity(roll: f64, boost: u32) -> &'static str {
         .find(|(_, edge)| roll < *edge - shift)
         .map_or("epic", |(rarity, _)| rarity)
 }
-fn in_room(room: &[f64; 4], p: Point) -> bool {
+pub(super) fn in_room(room: &[f64; 4], p: Point) -> bool {
     p.x >= room[0] && p.x < room[2] + 1. && p.y >= room[1] && p.y < room[3] + 1.
 }
 
 /// A one-tile grid of the map: `true` where a walking character cannot stand.
-fn blocked_grid(map: &Map) -> Vec<bool> {
+pub(super) fn blocked_grid(map: &Map) -> Vec<bool> {
     let n = map.size as usize;
     let mut grid = vec![false; n * n];
     let margin = 1.2;
@@ -172,7 +172,7 @@ fn blocked_grid(map: &Map) -> Vec<bool> {
     grid
 }
 /// Walking distance in tiles from `from` over the free cells of `grid` (four-way steps).
-fn distance_field(map: &Map, grid: &[bool], from: Point) -> Vec<u16> {
+pub(super) fn distance_field(map: &Map, grid: &[bool], from: Point) -> Vec<u16> {
     let n = map.size as usize;
     let mut dist = vec![u16::MAX; n * n];
     let (fx, fy) = ((from.x as usize).min(n - 1), (from.y as usize).min(n - 1));
@@ -363,7 +363,13 @@ impl World {
             .iter()
             .filter(|r| bosses.iter().any(|b| in_room(r, *b)))
             .collect();
-        let npcs: Vec<Point> = map.npcs.iter().map(|n| n.position_at(self.time)).collect();
+        let mut npcs: Vec<Point> = map.npcs.iter().map(|n| n.position_at(self.time)).collect();
+        // A boss sign is as unwelcome a neighbour as a townsperson (BOSSMECH-SIGN-ENGINE).
+        npcs.extend(
+            self.signs
+                .get(&map.final_boss)
+                .map(|d| Point { x: d.x, y: d.y }),
+        );
         let players: Vec<Point> = self
             .players
             .values()

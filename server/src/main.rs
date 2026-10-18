@@ -2,6 +2,7 @@
 mod auth;
 mod bank;
 mod bossmech;
+mod bosssign;
 mod cathedral;
 mod items;
 mod model;

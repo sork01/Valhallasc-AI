@@ -17,6 +17,9 @@ use bank::BankRequest;
 #[cfg(test)]
 mod asterion_tests;
 mod boss_mechanics;
+mod boss_signs;
+#[cfg(test)]
+mod boss_signs_tests;
 #[cfg(test)]
 mod cairn_tests;
 #[cfg(test)]
@@ -1327,6 +1330,8 @@ pub struct World {
     hold: hold::Holds,
     /// Final boss mechanics (docs/boss-mechanics.md): the table and the fights running now.
     boss: boss_mechanics::BossMech,
+    /// The signs before the final bosses (`world/boss-signs.txt`), keyed by the boss's kind.
+    signs: BTreeMap<String, crate::bosssign::SignDef>,
     chime: chime::Chimes,
     // Treasure chests and their roll timers (world/chests.rs). Runtime state, never saved.
     chests: chests::Chests,
@@ -1412,6 +1417,7 @@ impl World {
             pvp: pvp::Pvp::default(),
             hold: hold::Holds::default(),
             boss: boss_mechanics::BossMech::new(),
+            signs: crate::bosssign::shipped(),
             chime: chime::Chimes::default(),
             chests: chests::Chests::new(u64::from_le_bytes(
                 uuid::Uuid::new_v4().as_bytes()[8..16].try_into().unwrap(),
@@ -1680,6 +1686,10 @@ impl World {
         let boss_mech = self.boss_mech_view(zone);
         if !boss_mech.is_empty() {
             view["bossMech"] = json!(boss_mech);
+        }
+        let signs = self.signs_view(zone);
+        if !signs.is_empty() {
+            view["signs"] = json!(signs);
         }
         if let Some(instance) = self.instance_at(zone) {
             view["instance"] = json!({"cleared":instance.cleared});
@@ -2006,6 +2016,9 @@ impl World {
             }
             ClientMessage::OpenChest { id } => {
                 self.open_chest(session, id);
+            }
+            ClientMessage::SignRead { sign } => {
+                self.sign_read(session, &sign);
             }
             ClientMessage::RebirthPreview => {
                 self.rebirth_preview(session);

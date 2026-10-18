@@ -318,6 +318,17 @@
       <span id="rebirth-banner-tier" class="rebirth-banner-tier"></span>
       <small class="rebirth-banner-hint">Your journey starts again, and your perks stay</small>
     </div>
+    <div id="sign-panel" class="sign-panel" role="dialog" aria-labelledby="sign-title" hidden>
+      <header class="sign-head">
+        <h3 id="sign-title"></h3>
+        <button class="window-close" id="sign-x" type="button" aria-label="Close the sign">×</button>
+      </header>
+      <div id="sign-pictures" class="sign-pictures"></div>
+      <section class="sign-part" data-part="what"><h4>What it does</h4><p id="sign-what"></p></section>
+      <section class="sign-part" data-part="todo"><h4>What to do</h4><p id="sign-todo"></p></section>
+      <section class="sign-part" data-part="tip"><h4>Good to know</h4><p id="sign-tip"></p></section>
+      <footer class="sign-foot"><button id="sign-close" class="gossip-button" type="button">Close</button></footer>
+    </div>
     <div class="pause" id="bank-panel" hidden>
       <section class="panel bank-panel" role="dialog" aria-modal="true" aria-labelledby="bank-title">
         <header class="gossip-titlebar">
@@ -597,6 +608,7 @@
 <script src="weather.js"></script>
 <script src="damagenumbers.js"></script>
 <script src="bossmech.js"></script>
+<script src="bosssign.js"></script>
 <script src="field.js"></script>
 <script src="worldmap.js"></script>
 <script src="skillbar.js"></script>

@@ -104,7 +104,7 @@
     buildMap(); chunks.clear();
     if (mini) buildMini();
     if (hero) { pendingNpc = null; pendingChest = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
-    floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; marker = null; slimes = []; remotePlayers.clear(); bubbles.clear();
+    floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; signs = []; marker = null; slimes = []; remotePlayers.clear(); bubbles.clear();
     instanceCleared = false; clearedAt = -99;
   }
 
@@ -685,7 +685,7 @@
   // ---------- state ----------
   let cv, ctx, mini, mctx, opts, onHud = () => {}, onEvent = () => {};
   let running = false, paused = false, raf = 0, last = 0, zoom = 1, dpr = 1, cssW = 1600, cssH = 900, miniBase = null;
-  let hero, slimes, drops, chests, floaters, parts, effects, bolts, marker, cam, shake, keys, pointer, msg, hudT, tAll;
+  let hero, slimes, drops, chests, signs = [], floaters, parts, effects, bolts, marker, cam, shake, keys, pointer, msg, hudT, tAll;
   const BAG_COLORS = ['#a78257','#78996f','#6396b3','#a478b2','#c38a5e','#719ba1','#9b86c3','#be9292','#d3ae68','#dfcde7'];
   const bagColor = item => BAG_COLORS[Math.max(0, Math.min(9, Math.floor((item.requiredLevel || 1) / 10)))];
   let ebolts = [], instanceCleared = false, clearedAt = -99;   // missiles shot by ranged enemies; the dungeon's exit opens when its last boss falls
@@ -873,7 +873,7 @@
   function reset() {
     pendingNpc = null; pendingChest = null; cityRoute = [];
     window.Quests?.reset(); window.WorldMap?.reset(); explored = [];
-    hero = newHero(); drops = []; chests = []; floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
+    hero = newHero(); drops = []; chests = []; signs = []; floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
     keys = new Set(); pointer = { down: false, x: 0, y: 0 };
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
@@ -903,7 +903,7 @@
     if (e.defaultPrevented || !running || paused || hero.sparkTravel || !Online.connected || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '')) return;
     const k = e.key.toLowerCase();
     if (k === 'f' && !e.repeat && !hero.dead) {
-      e.preventDefault(); const npc = City.npcs.filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
+      e.preventDefault(); const npc = [...City.npcs, ...signs].filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
       if (npc) talkTo(npc); return;
     }
     if (k === 'h' && !e.repeat) { e.preventDefault(); Field.toggleMount(); return; }
@@ -926,12 +926,15 @@
     for (const s of slimes) { if (s.dead) continue; const d = Math.hypot(s.x - wx, s.y - wy) - s.r * .6; if (d < distance) { distance = d; best = s; } }
     return best;
   }
+  const SIGN_W = 28, SIGN_TOP = 70;   // the clickable body of a boss sign, in screen pixels
   function onPointerDown(e) {
     if (!running || paused || !Online.connected || hero.dead || hero.sparkTravel) return;
     pendingNpc = null; pendingChest = null; cityRoute = [];
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
     const npc = City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-City.nameplateTop(n) && my<y+12; });
     if (npc) { talkTo(npc); return; }
+    const sign = signs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<=SIGN_W && my>=y-SIGN_TOP && my<=y+10; });
+    if (sign) { talkTo(sign); return; }
     const chest = chests.filter(c => c.expiresAt > tAll).sort((a,b) => b.x+b.y-a.x-a.y).find(c => { const [x,y]=w2s(c.x,c.y); return Math.abs(mx-x)<=27 && my>=y-37 && my<=y+7; });
     if (chest) { openChest(chest); return; }
     pointer.down = true; cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
@@ -943,9 +946,11 @@
     else { hero.pvpTargetId = null; hero.target = null; hero.goal = { x: wx, y: wy }; Online.send({ type: 'move', x: wx, y: wy }); marker = { x: clamp(wx, .8, MAP - .8), y: clamp(wy, .8, MAP - .8), t: 0 }; }
     emitHud();
   }
+  // A boss sign is read with its own message; every townsperson is spoken to with `interact`.
+  const askNpc = npc => Online.send(npc.sign ? {type:'sign_read',sign:npc.id} : {type:'interact',npc:npc.id});
   function talkTo(npc) {
     keys.clear(); pointer.down = false; hero.target = null; hero.pvpTargetId = null; hero.goal = null; cityRoute = []; emitHud();
-    if (Math.hypot(hero.x-npc.x,hero.y-npc.y) <= 2.5) Online.send({type:'interact',npc:npc.id});
+    if (Math.hypot(hero.x-npc.x,hero.y-npc.y) <= 2.5) askNpc(npc);
     else { cityRoute = routeTo(npc, true); pendingNpc = { npc, until: tAll + Math.max(20, cityRoute.length * .6) }; routeTime = 0; }
   }
   // Stop first, so the server's position settles inside its own reach, and ask again until the chest is gone: the
@@ -1154,6 +1159,7 @@
     if (packet.instance) { if (packet.instance.cleared && !instanceCleared) { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); } instanceCleared = !!packet.instance.cleared; }
     drops = packet.drops.filter(inZone);
     chests = (packet.chests || []).filter(inZone).map(c => ({...c, expiresAt:tAll+c.left}));
+    signs = (packet.signs || []).map(s => ({ ...s, sign: true }));   // the boss signs (BOSSMECH-SIGN-ENGINE): read like a townsperson
     if (pendingChest && !chests.some(c => c.id === pendingChest.id)) { pendingChest = null; cityRoute = []; }
     emitHud();
   }
@@ -2358,7 +2364,7 @@
       if (!paused && pendingNpc) {
         const {npc,until}=pendingNpc;
         if(hero.dead || tAll>until) {pendingNpc=null;cityRoute=[];Online.send({type:'stop'});}
-        else if(Math.hypot(hero.x-npc.x,hero.y-npc.y)<=2.5) {pendingNpc=null;cityRoute=[];Online.send({type:'interact',npc:npc.id});}
+        else if(Math.hypot(hero.x-npc.x,hero.y-npc.y)<=2.5) {pendingNpc=null;cityRoute=[];askNpc(npc);}
         else if(npc.route && tAll-routeTime>1) {                       // a walker has moved on: take a fresh route to where it is now
           const end=cityRoute[cityRoute.length-1];
           if(!end || Math.hypot(end.x-npc.x,end.y-npc.y)>2.2) {cityRoute=routeTo(npc,true);routeTime=tAll;}
@@ -3404,6 +3410,21 @@
       if (b < .5) { g.fillStyle = `rgba(255,236,160,${.8 - b * 1.4})`; g.beginPath(); g.arc(sx + Math.sin(o.x * 5) * ex(o) * .4, sy - b * 28, 2.2 + b * 3, 0, 6.283); g.fill(); }
     }
   }
+  // A boss sign (BOSSMECH-SIGN-ENGINE): a wooden board on a post with a gold "!" that glints, so it is noticed. The
+  // words are not here; the server sends them when the sign is read. Pixel art through PixelFlow is still to come.
+  function drawSign(g, sign, sx, sy, near) {
+    const glint = reducedMotion() ? .5 : .5 + .5 * Math.sin(tAll * 3 + sign.x);
+    g.save(); g.translate(sx, sy); g.lineJoin = 'round'; g.lineWidth = 2.5; g.strokeStyle = '#2b1b12';
+    g.fillStyle = '#6b4526'; g.fillRect(-4, -34, 8, 34); g.strokeRect(-4, -34, 8, 34);
+    g.fillStyle = '#a26d3a'; g.beginPath(); g.roundRect(-26, -66, 52, 34, 4); g.fill(); g.stroke();
+    g.strokeStyle = '#7a4d27'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(-24, -54); g.lineTo(24, -54); g.moveTo(-24, -44); g.lineTo(24, -44); g.stroke();
+    g.fillStyle = '#3a2412'; for (const x of [-21, 21]) for (const y of [-62, -37]) g.fillRect(x - 1.5, y - 1.5, 3, 3);
+    g.font = 'bold 32px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 4; g.strokeStyle = '#2b1b12'; g.fillStyle = '#ffd866';
+    g.strokeText('!', 0, -49); g.fillText('!', 0, -49);
+    if (glint > .75) { g.globalAlpha = (glint - .75) * 3; g.fillStyle = '#fff6cf'; g.beginPath(); g.arc(14, -60, 3.2, 0, 7); g.fill(); g.globalAlpha = 1; }
+    if (near) { g.font = 'bold 13px sans-serif'; g.lineWidth = 3; g.strokeStyle = '#281d20'; g.fillStyle = '#fff1c8'; g.strokeText('F · Read', 0, -78); g.fillText('F · Read', 0, -78); }
+    g.restore();
+  }
   function drawChest(g, chest, sx, sy) {
     const left = Math.max(0, Math.ceil(chest.expiresAt - tAll));
     if (chestSrc) {
@@ -3546,6 +3567,7 @@
     for (const n of City.npcs) { if (n.escort && escorted(n.id)) continue; const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
     for (const s of slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, 100)) { shadow(g, s.x, s.y, 28 * s.d.scale * (1 - s.hop * .12), 11 * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
     for (const chest of chests) if (chest.expiresAt > tAll) { const [sx, sy] = w2s(chest.x, chest.y); if (onScreen(sx, sy, 70)) { shadow(g,chest.x,chest.y,27,9,.35); list.push({d:chest.x+chest.y,chest,sx,sy}); } }
+    for (const sign of signs) { const [sx, sy] = w2s(sign.x, sign.y); if (onScreen(sx, sy, 90)) { shadow(g, sign.x, sign.y, 22, 8, .3); list.push({ d: sign.x + sign.y, sign, sx, sy }); } }
     for (const d of drops) { const [sx, sy] = w2s(d.x, d.y); if (onScreen(sx, sy, 165)) list.push({ d: d.x + d.y, drop: d, sx, sy }); }
     { const [sx, sy] = w2s(hero.x, hero.y); shadow(g, hero.x, hero.y, 30, 12, .32); list.push({ d: hero.sparkTravel ? Infinity : hero.x + hero.y + .001, hero, sx, sy }); }
     for (const remote of remotePlayers.values()) {
@@ -3572,6 +3594,7 @@
       } else if (it.portal) { drawPortal(g, it.portal, it.sx, it.sy, t);
       } else if (it.npc) { City.drawNpc(g,it.npc,it.sx,it.sy,t,Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8);
       } else if (it.chest) { drawChest(g,it.chest,it.sx,it.sy);
+      } else if (it.sign) { drawSign(g,it.sign,it.sx,it.sy,Math.hypot(hero.x-it.sign.x,hero.y-it.sign.y)<2.8);
       } else if (it.s) {
         const s = it.s, src = enemySource(s); g.save(); g.translate(it.sx, it.sy); if (src) drawSlimeSprite(g, s, t); else drawSlime(g, s, t);
         const barY = src ? -(s.d.top ?? (s.kind === 'big' ? 36 : s.kind === 'beetle' ? 40 : 28)) * SLIME_K * s.d.scale : -62 * s.d.scale - s.hop * 16;
@@ -4021,7 +4044,7 @@
     get assassinSprites() { return isAssassin() ? mageSpr : null; },
     get priestSprites() { return isPriest() ? mageSpr : null; },
     get hunterSprites() { return isHunter() ? mageSpr : null; },
-    get hero() { return hero; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
+    get hero() { return hero; }, get signs() { return signs; }, get slimes() { return slimes; }, get meadowPaths() { return PATHS; },
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,

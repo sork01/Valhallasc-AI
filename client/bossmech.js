@@ -185,6 +185,7 @@
 
   window.BossMech = {
     update, reset, drawFloor, drawHud, onEvent, setCause,
+    colors: { red: RED, blue: BLUE, path: GOLD, green: GREEN },   // the four telegraph colours, shared with the boss signs
     get active() { return fights.length > 0; }, get fights() { return fights; }, get cause() { return cause; },
     _polygons: polygons, _left: left,
   };
