@@ -6961,5 +6961,10 @@
   "You return to Greenmeadow": "Du återvänder till Greenmeadow",
   "You start again from level 1 and keep what you have earned. Every rebirth adds permanent perks.": "Du börjar om från nivå 1 och behåller det du har tjänat. Varje återfödelse ger permanenta förmåner.",
   "Your journey starts again, and your perks stay": "Din resa börjar om, och dina förmåner blir kvar",
-  "Rebirth is now possible": "Återfödelse är nu möjlig"
+  "Rebirth is now possible": "Återfödelse är nu möjlig",
+  "Invulnerable": "Osårbar",
+  "Stunned": "Bedövad",
+  "Marked!": "Märkt!",
+  "Frozen!": "Fastfrusen!",
+  "Deal damage to stop it!": "Skada den för att stoppa den!"
 }

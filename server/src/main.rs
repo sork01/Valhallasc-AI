@@ -95,6 +95,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     world.test_commands = std::env::var("VALHALLA_TEST_COMMANDS").is_ok_and(|v| v == "1");
     if world.test_commands {
         tracing::warn!("VALHALLA_TEST_COMMANDS is on: players may use debug shortcuts");
+        if let Ok(path) = std::env::var("VALHALLA_BOSSMECH_FILE") {
+            match world.load_boss_table_file(&path) {
+                Ok(()) => {
+                    tracing::warn!("VALHALLA_BOSSMECH_FILE is on: boss mechanics come from {path}")
+                }
+                Err(e) => panic!("VALHALLA_BOSSMECH_FILE: {e}"),
+            }
+        }
     }
     if !world.test_commands && !world.god_mode && world.start_level == 1 {
         world.login_notifications = notify::start_from_env();

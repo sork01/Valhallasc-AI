@@ -38,9 +38,9 @@
       case 'miss': return [['Your attack missed.', 'sys-dealt']];
       case 'slimeDie': return [[`${who(e.enemy, e.level)} was defeated. +${e.xp} XP.`, 'sys-xp']];
       case 'partyXp': return [[`${who(e.enemy, e.level)} was defeated by your party. +${e.xp} XP.`, 'sys-xp']];
-      case 'hurt': return [[`${e.enemy ? who(e.enemy, e.level) : 'Something'} hits you for ${e.value}.`, 'sys-taken']];
+      case 'hurt': return [[`${e.cause || (e.enemy ? who(e.enemy, e.level) : 'Something')} hits you for ${e.value}.`, 'sys-taken']];
       case 'dodge': return [[`You dodge an attack${e.enemy ? ` from ${who(e.enemy, e.level)}` : ''}.`, 'sys-taken']];
-      case 'death': return [[`You were slain${e.enemy ? ` by ${who(e.enemy, e.level)}` : ''}.`, 'sys-taken']];
+      case 'death': if (e.cause) return [[`You were killed by ${e.cause}.`, 'sys-taken']]; return [[`You were slain${e.enemy ? ` by ${who(e.enemy, e.level)}` : ''}.`, 'sys-taken']];
       case 'respawn': return [['You return to life.', 'sys-heal']];
       case 'skill': return [[`You cast ${skillName(e.skill)}.`, 'sys-skill'], ...(e.heal > 0 ? [[`${skillName(e.skill)} heals you for ${e.heal}.`, 'sys-heal']] : [])];
       case 'healed': return e.value > 0 ? [[e.from === me ? `You heal yourself for ${e.value}.` : `${playerName(e.from)} heals you for ${e.value}.`, 'sys-heal']] : [];

@@ -726,7 +726,20 @@
     if (family === 'bow') setTimeout(() => combatVoice('arrow', 'swing', level * .7), 170);
     if (family === 'dagger') setTimeout(() => combatVoice('dagger', 'swing', level * .6), 80);
   }
+  // Boss mechanics (BOSSMECH-CLIENT): four short cues written in dybase2 (project "Valhalla Boss Mechanic Cues"), played through
+  // the effects bus. A telegraph starts with `warn`, lands with `land`; `shield` and `broken` mark the shield going up and falling.
+  const bossCueBuffers = {};
+  const BOSS_CUES = { cast: ['warn', .5], reverse: ['warn', .4], land: ['land', .6], shield: ['shield', .45], frozen: ['shield', .35], broken: ['broken', .5], down: ['land', .4], split: ['land', .4], rise: ['broken', .4] };
+  function bossMechSound(event) {
+    const cue = BOSS_CUES[event?.phase];
+    if (!cue || !save.sound) return;
+    if (window.__valhallaTestSprites) (window.__bossCueLog ||= []).push(cue[0]);
+    const c = audio(); if (!c) return;
+    const buffer = bossCueBuffers[cue[0]] ||= fetch(`assets/sfx_boss_${cue[0]}.mp3`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).catch(() => null);
+    buffer.then(b => { if (!b || !save.sound) return; const source = c.createBufferSource(), gain = c.createGain(); gain.gain.value = cue[1]; source.buffer = b; source.connect(gain); gain.connect(sfxOut(c)); source.start(); });
+  }
   const SFX = {
+    bossMech: bossMechSound,
     shadowstep: () => noiseBurst(.16, 900, 3200, .065),
     cast: () => { sweep(330, 990, .25, .065, 'triangle'); tone([1175], .2, .025); },
     combatSwing,

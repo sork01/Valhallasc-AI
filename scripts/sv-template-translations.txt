@@ -227,5 +227,9 @@
   "{0} · {1} rebirth": "{0} · {1} återfödelse",
   "{0} · {1} rebirths": "{0} · {1} återfödelser",
   "{0} → {1}": "{0} → {1}",
-  "{0}s": "{0}s"
+  "{0}s": "{0}s",
+  "{0} of {1} left": "{0} av {1} kvar",
+  "Killed by {0}": "Dödad av {0}",
+  "Would have been killed by {0}": "Hade blivit dödad av {0}",
+  "You were killed by {0}.": "Du dödades av {0}."
 }

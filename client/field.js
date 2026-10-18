@@ -1104,7 +1104,7 @@
     window.Inventory?.update(own.inventory || [], own.look, own.equipment || {}, own.bags || [], own.gearInstances || [], own.setCounts || {});
     window.Quests?.setBells(own.bells || []);
     window.Quests?.update(own.quests || []);
-    if (wasDead !== hero.dead) say(hero.dead ? 'death' : 'respawn');
+    if (wasDead !== hero.dead) { say(hero.dead ? 'death' : 'respawn'); if (!hero.dead) window.BossMech?.setCause(''); }
     if (initial || moved) { cam.x = hero.x; cam.y = hero.y; }
     const signature = JSON.stringify(own.look);
     if (signature !== lastLook) {
@@ -1148,6 +1148,7 @@
     for (const id of remotePlayers.keys()) if (!present.has(id)) remotePlayers.delete(id);
     if (hero.pvpTargetId && !remotePlayers.has(hero.pvpTargetId)) hero.pvpTargetId = null;
     bolts = packet.bolts.filter(inZone).map(b => ({ ...b, col: b.color }));
+    window.BossMech?.update(packet.bossMech);
     ebolts = (packet.ebolts || []).filter(inZone).map(b => { const old = ebolts.find(o => o.id === b.id); return old && Math.hypot(old.x - b.x, old.y - b.y) < 2.5 ? Object.assign(old, b, { x: old.x + (b.x - old.x) * .5, y: old.y + (b.y - old.y) * .5 }) : { ...b }; });
     if (packet.instance) { if (packet.instance.cleared && !instanceCleared) { clearedAt = performance.now() / 1000; instanceCleared = true; if (mini) buildMini(); } instanceCleared = !!packet.instance.cleared; }
     drops = packet.drops.filter(inZone);
@@ -1156,6 +1157,8 @@
     emitHud();
   }
   function networkEvent(event) {
+    window.BossMech?.onEvent(event, Online.id);
+    if (event.kind === 'bossmech') say('bossMech', event);
     if (event.actor === Online.id && !['death', 'respawn', 'swing', 'cast'].includes(event.kind)) say(event.crit && event.kind === 'hit' ? 'crit' : event.kind, event);
     if (event.kind === 'swing' || event.kind === 'cast') {
       const actor = event.actor === Online.id ? hero : remotePlayers.get(event.actor);
@@ -3520,6 +3523,7 @@
     if (zdef.theme === 'wyrd') drawBridges(g, t);
     if (zdef.theme === 'sky') drawWardRings(g, t);
     if (zdef.theme === 'deep') drawChimeRings(g, t);
+    window.BossMech?.drawFloor(g, t, bossMechView());
     // ground decals: splats, target marker, slash, shadows
     for (const who of [hero, ...remotePlayers.values()]) drawBuffRings(g, who, t);
     for (const e of effects) if (e.kind === 'splat') { const [sx, sy] = w2s(e.x, e.y), a = clamp(1 - (e.t - 3) / 3, 0, 1) * .5; g.fillStyle = e.col; g.globalAlpha = a; g.beginPath(); g.ellipse(sx, sy, 26 * e.s, 12 * e.s, 0, 0, 6.283); g.fill(); g.globalAlpha = 1; }
@@ -3753,8 +3757,16 @@
     if (CathedralArt.isTheme(zdef.theme)) CathedralArt.weather(g,zdef.theme,t,VW,VH);
     if (zdef.theme === 'vault' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme)) { drawDarkness(g, t); drawBossBar(g); }
     if (zdef.theme === 'moonwell') drawBossBar(g);
+    window.BossMech?.drawHud(g, VW, VH, t, bossMechView());
     drawMini();
   }
+  // What the boss-mechanics drawing needs from the field: the projection, the room a point is in, and where a character or boss stands.
+  const bossMechView = () => ({
+    w2s,
+    roomAt: (x, y) => (zdef.rooms || []).find(([x0, y0, x1, y1]) => x >= x0 && x < x1 && y >= y0 && y < y1) || null,
+    pos: id => id === Online.id ? hero : remotePlayers.get(id) || null,
+    boss: id => slimes.find(s => s.id === id) || null,
+  });
   // ---------- the Undervault's darkness and its boss bar ----------
   // The vault has no sky: a dark veil covers the screen and every light cuts a pool out of it (the hero, torches, braziers, the
   // stairs and the exit, missiles in flight).

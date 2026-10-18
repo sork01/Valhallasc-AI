@@ -170,7 +170,7 @@
     <button id="city-travel" class="city-travel" type="button">Visit Alderhaven ↓</button>
     <section id="quest-tracker" class="quest-tracker" aria-label="Quest objectives"></section>
     <p class="hud-hint" data-i18n="fieldHint">Click to move or attack · WASD to walk · Space to swing · Esc for menu</p>
-    <div class="dead-msg" id="dead-msg" hidden><b data-i18n="defeated">Defeated!</b><span data-i18n="defeatedSub">You wake up back at the start…</span></div>
+    <div class="dead-msg" id="dead-msg" hidden><b data-i18n="defeated">Defeated!</b><span data-i18n="defeatedSub">You wake up back at the start…</span><span id="dead-cause" hidden></span></div>
 
     <div class="pause" id="quest-journal" hidden>
       <section class="panel npc-panel quest-panel" role="dialog" aria-modal="true" aria-labelledby="quest-title">
@@ -596,6 +596,7 @@
 <script src="daynight.js"></script>
 <script src="weather.js"></script>
 <script src="damagenumbers.js"></script>
+<script src="bossmech.js"></script>
 <script src="field.js"></script>
 <script src="worldmap.js"></script>
 <script src="skillbar.js"></script>

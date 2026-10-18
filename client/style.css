@@ -217,6 +217,7 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 .area-title span { font-size: 1.8cqw; color: #fff3c4; text-shadow: 0 .1cqw .3cqw #000; }
 @keyframes areaIn { 0% { opacity: 0; transform: translateX(-50%) translateY(-1cqw); } 12%, 75% { opacity: 1; transform: translateX(-50%); } 100% { opacity: 0; } }
 .dead-msg { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; background: radial-gradient(rgba(60, 0, 10, .2), rgba(20, 0, 8, .6)); pointer-events: none; }
+.dead-msg #dead-cause { margin-top: 1.2cqw; font-size: 2.8cqw; color: #ffd9a0; text-shadow: 0 .3cqw 0 #4a0a14; } .dead-msg #dead-cause[hidden] { display: none; }
 .dead-msg b { font-family: var(--display); font-weight: 400; font-size: 6cqw; color: #ff8a8a; text-shadow: 0 .4cqw 0 #4a0a14, 0 0 2cqw rgba(255, 80, 80, .6); } .dead-msg span { font-size: 2cqw; }
 .pause { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(4, 8, 24, .6); z-index: 5; }
 .pause-panel { position: static; display: flex; flex-direction: column; gap: 1cqw; padding: 2.4cqw 4cqw; text-align: center; min-width: 26cqw; }

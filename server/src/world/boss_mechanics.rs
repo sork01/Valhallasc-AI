@@ -219,6 +219,19 @@ pub(super) enum Incoming {
 }
 
 impl World {
+    /// Test servers only (`VALHALLA_TEST_COMMANDS=1` and `VALHALLA_BOSSMECH_FILE`): replaces the shipped table with the one in
+    /// `path`, so a browser can watch a mechanic that no shipped boss has yet. The file obeys the same rules as the shipped one.
+    pub fn load_boss_table_file(&mut self, path: &str) -> Result<(), String> {
+        let text = std::fs::read_to_string(path).map_err(|e| format!("{path}: {e}"))?;
+        let table: BTreeMap<String, BossDef> =
+            serde_json::from_str(&text).map_err(|e| format!("{path}: {e}"))?;
+        for (kind, def) in &table {
+            bm::validate(kind, def)?;
+        }
+        self.boss = BossMech::with_table(table);
+        Ok(())
+    }
+
     // -----------------------------------------------------------------------------------------------------------
     // Hooks the rest of the world calls
     // -----------------------------------------------------------------------------------------------------------

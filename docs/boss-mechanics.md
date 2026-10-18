@@ -77,6 +77,18 @@ Things worth knowing:
   * `cargo test boss_mechanics` and `cargo test bossmech` run the engine's tests; `every_shipped_boss_is_fair_and_its_tags_exist_in_the_map` reads whatever the sixteen tasks add and fails on a point with no way out in time or a tag with no sleeping monster behind it.
   * Found while building it: the design's *Moon Lance* has a 3 s cast and kills, which is under the 5 s floor of rule 2; `BOSSMECH-MOONWELL-ECHO` has to lengthen it to 5 s or make it a heavy hit. The Flooded Cloister's boss room is 8 by 8 tiles and *Toll of the Deep* is a ring of radius 8, which fills the room: the fairness walk lets players run out of the door, but the room (or the ring) may need to change in `BOSSMECH-CHOIRMOTHER`.
 
+## The client (`BOSSMECH-CLIENT`, built 2026-10-18)
+
+`client/bossmech.js` (`window.BossMech`) draws what the snapshot's `bossMech` says and nothing else; `field.js` feeds it (`update` in `applySnapshot`, `drawFloor` after the ground decals, `drawHud` before the minimap, `onEvent` for the death cause).
+
+  * **Floor:** every shape is projected as a polygon (circle, ring with the even-odd rule, cone, lane, half-arena cut to the room that holds its point, room rectangle). Red hurts (it fills in as the cast runs, a circle grows from its centre, it flashes in the last second), blue is safe (a brazier being lit gets a bright arc), a dashed pale-gold outline is a path about to be used, green is a wall's gap, an echo is a pale dashed copy. Cover pillars, orbs, the gaze's source eye, and rings under marked (red) and frozen (amber) players.
+  * **Screen:** the cast bar (ability name, red fill, countdown), the break bar ("Deal damage to stop it!"), the shield counter ("Invulnerable", the name, "n of m left") with a bubble round the boss, "Stunned" over the boss, "Marked!" and "Frozen!" over players, and the banner unless it only repeats the cast name. Drawing units match the field's 1600-wide canvas; the bar is `min(360, width - 40)` wide.
+  * **Death:** "Killed by <ability>" under "Defeated!" (`#dead-cause`), "You were killed by <ability>." in the system tab, a heavy hit's `cause` replaces the monster name in the hit line.
+  * **Sound:** four cues from the dybase2 project `c0e0eb6be0aa5149` ("Valhalla Boss Mechanic Cues"), `client/assets/sfx_boss_{warn,land,shield,broken}.mp3`, played by `bossMechSound` in `game.js` for the `bossmech` event phases (`cast` and `reverse` warn, `land` land, `shield` and `frozen` shield, `broken` and `rise` broken, `down` and `split` land). To change one, edit the project, render the bar (`render_audio` with `from_bar`/`bars`), and re-encode (96 kbps mono, high-pass 25 Hz, peak about -1 dB).
+  * **Swedish** is written by hand (`sv-data.js` and the two caches under `scripts/`). Canvas text goes through `Locale.translate`; an ability's name, its banner and its Swedish come from the boss's own task.
+  * **Render cost:** no filters, no blur, no per-frame allocation beyond a shape's points; reduced motion removes the pulse, the dash crawl and the flash.
+  * **Test:** `npm run test:bossmech` (`tests/bossmech-ui.cjs`). The private server loads a test table through `VALHALLA_BOSSMECH_FILE` (only with `VALHALLA_TEST_COMMANDS=1`, `World::load_boss_table_file`, validated like the shipped one), so a browser can watch a real fight on a plain slime.
+
 ## The sixteen mechanics
 
 ### 1. Haldor, the Hollow King — The Undervault (level 20): *Dirge of the Hollow*
