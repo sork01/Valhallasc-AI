@@ -144,6 +144,12 @@ fn one_u() -> u32 {
 #[derive(Clone, Debug, Deserialize)]
 pub struct BossDef {
     pub mechanics: Vec<Mechanic>,
+    /// Use the smallest authored room containing the boss when a larger room overlaps it.
+    #[serde(default)]
+    pub inner_arena: bool,
+    /// Encounter bounds for a boss in a map without authored rooms.
+    #[serde(default)]
+    pub arena: Option<[f64; 4]>,
 }
 
 /// One named ability. `name` is what the cast bar shows and what a death says ("Killed by <name>").
@@ -200,6 +206,9 @@ pub struct Zone {
     pub repeat: u32,
     #[serde(default)]
     pub repeat_gap: f64,
+    /// On a repeated half-room cast, fold the opposite side of the same crease.
+    #[serde(default)]
+    pub alternate: bool,
     /// After it lands, the same shape lands again after each of these delays, with a pale copy kept on the floor.
     #[serde(default)]
     pub echo: Vec<f64>,
@@ -309,6 +318,9 @@ pub struct Mark {
     pub waves: u32,
     #[serde(default)]
     pub wave_gap: f64,
+    /// Seconds a burst's red puddle remains dangerous after it lands.
+    #[serde(default)]
+    pub linger: f64,
 }
 #[derive(Clone, Debug, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
@@ -531,6 +543,29 @@ pub fn arena_for(map: &Map, at: Point) -> Rect {
         }
     }
     best.map_or(whole, |(_, r)| r)
+}
+
+/// A smaller boss chamber nested inside a larger authored room can be the encounter arena.
+pub fn arena_for_boss(map: &Map, at: Point, def: &BossDef) -> Rect {
+    if let Some([x0, y0, x1, y1]) = def.arena {
+        return Rect { x0, y0, x1, y1 };
+    }
+    if !def.inner_arena {
+        return arena_for(map, at);
+    }
+    map.rooms
+        .iter()
+        .filter(|r| at.x >= r[0] && at.x <= r[2] && at.y >= r[1] && at.y <= r[3])
+        .min_by(|a, b| ((a[2] - a[0]) * (a[3] - a[1])).total_cmp(&((b[2] - b[0]) * (b[3] - b[1]))))
+        .map_or_else(
+            || arena_for(map, at),
+            |r| Rect {
+                x0: r[0],
+                y0: r[1],
+                x1: r[2],
+                y1: r[3],
+            },
+        )
 }
 
 /// A shape on the floor, in map coordinates.
@@ -914,7 +949,7 @@ fn random_half(ctx: &Ctx, min_share: f64, rng: &mut dyn FnMut() -> f64) -> Shape
         };
         let share = half_share(ctx.arena, &half);
         // Both sides must be worth standing on and fighting from, and the hurt one a real threat.
-        if share <= 1. - min_share && share >= 0.2 {
+        if share <= 1. - min_share && share >= min_share {
             return half;
         }
         best = half;
@@ -1016,6 +1051,16 @@ pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
     if def.mechanics.is_empty() {
         return Err(format!("{kind}: no mechanics"));
     }
+    if let Some([x0, y0, x1, y1]) = def.arena
+        && (def.inner_arena
+            || ![x0, y0, x1, y1].iter().all(|v| v.is_finite())
+            || x0 >= x1
+            || y0 >= y1)
+    {
+        return Err(format!(
+            "{kind}: arena bounds are invalid or conflict with inner_arena"
+        ));
+    }
     let positive = |v: f64| v.is_finite() && v > 0.;
     for m in &def.mechanics {
         if m.name.trim().is_empty() {
@@ -1032,10 +1077,22 @@ pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
                 if z.repeat == 0 || z.repeat > 4 {
                     return bad(m, "repeat must be 1 to 4");
                 }
-                // `every` runs from start to start, so a whole sequence (casts, gaps, echoes) must fit inside it.
+                if z.alternate && (z.repeat < 2 || !matches!(z.shape, ShapeSpec::Half { .. })) {
+                    return bad(m, "alternating sides need a repeated half-room zone");
+                }
+                if !z.linger.is_finite()
+                    || z.linger < 0.
+                    || (z.linger > 0. && z.effect == Effect::Heavy)
+                {
+                    return bad(
+                        m,
+                        "linger must be nonnegative and cannot repeat a heavy hit",
+                    );
+                }
+                // `every` runs from start to start, so a whole sequence (casts, echoes, lingering and gaps) fits.
                 let rounds = z.repeat as f64;
-                let length =
-                    rounds * (z.cast + z.echo.iter().sum::<f64>()) + (rounds - 1.) * z.repeat_gap;
+                let length = rounds * (z.cast + z.echo.iter().sum::<f64>() + z.linger)
+                    + (rounds - 1.) * z.repeat_gap;
                 if !positive(z.every) || z.every <= length {
                     return bad(
                         m,
@@ -1124,6 +1181,15 @@ pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
                 }
                 if k.waves > 1 && !positive(k.wave_gap) {
                     return bad(m, "waves need a gap");
+                }
+                if !k.linger.is_finite()
+                    || k.linger < 0.
+                    || (k.linger > 0. && !matches!(k.effect, MarkEffect::Burst { .. }))
+                {
+                    return bad(
+                        m,
+                        "only burst marks may leave a nonnegative puddle duration",
+                    );
                 }
                 match k.effect {
                     MarkEffect::Burst { r } if !positive(r) => {
@@ -1545,7 +1611,17 @@ mod tests {
             1,
         );
         assert!(validate("b", &parse(&window)).is_err());
-        assert!(validate("b", &BossDef { mechanics: vec![] }).is_err());
+        assert!(
+            validate(
+                "b",
+                &BossDef {
+                    mechanics: vec![],
+                    inner_arena: false,
+                    arena: None
+                }
+            )
+            .is_err()
+        );
     }
 
     #[test]

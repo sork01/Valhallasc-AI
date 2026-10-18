@@ -53,6 +53,7 @@ impl BossMech {
 enum Live {
     Zone(ZoneLive),
     Mark(MarkLive),
+    Puddle(PuddleLive),
     Walls(WallsLive),
     Break(BreakLive),
     Gaze(GazeLive),
@@ -62,6 +63,7 @@ impl Live {
         match self {
             Self::Zone(z) => z.mech,
             Self::Mark(m) => m.mech,
+            Self::Puddle(p) => p.mech,
             Self::Walls(w) => w.mech,
             Self::Break(b) => b.mech,
             Self::Gaze(g) => g.mech,
@@ -87,6 +89,7 @@ struct ZoneLive {
     left: f64,
     total: f64,
     echo_i: usize,
+    reported: BTreeSet<u64>,
 }
 struct MarkLive {
     mech: usize,
@@ -96,6 +99,14 @@ struct MarkLive {
     gap: bool,
     left: f64,
     total: f64,
+}
+struct PuddleLive {
+    mech: usize,
+    id: u64,
+    bearer: u64,
+    areas: Vec<Shape>,
+    left: f64,
+    reported: BTreeSet<u64>,
 }
 struct WallLive {
     side: Side,
@@ -413,7 +424,7 @@ impl World {
         let s = &self.slimes[id];
         let def = self.boss.table[&s.kind].clone();
         let zone = s.zone;
-        let arena = bm::arena_for(&self.maps[zone], Point { x: s.hx, y: s.hy });
+        let arena = bm::arena_for_boss(&self.maps[zone], Point { x: s.hx, y: s.hy }, &def);
         let timer = def
             .mechanics
             .iter()
@@ -449,13 +460,23 @@ impl World {
                         })
                         .collect(),
                 }),
-                Block::Gaze(g) => cover.extend(g.cover.iter().map(|c| CoverLive {
-                    cover: *c,
-                    regrow: g.regrow,
-                    hits: 0,
-                    broken: false,
-                    broken_for: 0.,
-                })),
+                Block::Gaze(g) => {
+                    for c in &g.cover {
+                        // Low-health variants describe the same physical pillars. Keep their damage when the
+                        // variant changes instead of stacking a fresh, invisible copy behind each broken one.
+                        if !cover.iter().any(|p: &CoverLive| {
+                            p.cover.x == c.x && p.cover.y == c.y && p.cover.r == c.r
+                        }) {
+                            cover.push(CoverLive {
+                                cover: *c,
+                                regrow: g.regrow,
+                                hits: 0,
+                                broken: false,
+                                broken_for: 0.,
+                            });
+                        }
+                    }
+                }
                 _ => {}
             }
         }
@@ -855,6 +876,7 @@ impl World {
             left: z.cast,
             total: z.cast,
             echo_i: 0,
+            reported: BTreeSet::new(),
         }));
         let at = self.slimes[fight.boss].point();
         self.mech_event(fight.zone, "cast", &m.name, at, z.cast);
@@ -866,6 +888,14 @@ impl World {
             return false;
         };
         zl.left -= TICK;
+        if zl.phase == ZPhase::Linger {
+            for (session, at) in self.mech_players(fight.zone) {
+                if bm::hurts(z.effect, &zl.areas, at) && zl.reported.insert(session) {
+                    self.mech_kill(session, &m.name, fight.boss);
+                }
+            }
+            return zl.left > 0. || Self::next_round(zl, z);
+        }
         if zl.left > 0. {
             return true;
         }
@@ -873,6 +903,12 @@ impl World {
             ZPhase::Cast | ZPhase::Echo => {
                 let areas = zl.areas.clone();
                 let effect = z.effect;
+                let hit: BTreeSet<u64> = self
+                    .mech_players(fight.zone)
+                    .into_iter()
+                    .filter(|(_, p)| bm::hurts(effect, &areas, *p))
+                    .map(|(session, _)| session)
+                    .collect();
                 self.land(fight, &m.name, effect, z.heavy, &|p| {
                     bm::hurts(effect, &areas, p)
                 });
@@ -891,20 +927,37 @@ impl World {
                     zl.phase = ZPhase::Linger;
                     zl.left = z.linger;
                     zl.total = z.linger;
+                    zl.reported = hit;
                     return true;
                 }
                 Self::next_round(zl, z)
             }
-            ZPhase::Linger => Self::next_round(zl, z),
+            ZPhase::Linger => unreachable!("lingering zones are handled above"),
             ZPhase::Gap => {
                 if self.mech_players(fight.zone).is_empty() {
                     return false;
                 }
-                zl.areas = self.resolve_shapes(fight, &z.shape, z.cast);
+                zl.areas = if z.alternate && zl.round % 2 == 1 {
+                    zl.areas
+                        .iter()
+                        .map(|shape| match *shape {
+                            Shape::Half { x, y, nx, ny } => Shape::Half {
+                                x,
+                                y,
+                                nx: -nx,
+                                ny: -ny,
+                            },
+                            other => other,
+                        })
+                        .collect()
+                } else {
+                    self.resolve_shapes(fight, &z.shape, z.cast)
+                };
                 zl.phase = ZPhase::Cast;
                 zl.left = z.cast;
                 zl.total = z.cast;
                 zl.echo_i = 0;
+                zl.reported.clear();
                 zl.id = self.fresh_id();
                 let at = self.slimes[fight.boss].point();
                 self.mech_event(fight.zone, "cast", &m.name, at, z.cast);
@@ -1026,8 +1079,18 @@ impl World {
                 .filter(|(s, at)| *s != bearer && shapes.iter().any(|sh| sh.contains(*at)))
                 .map(|(s, _)| s)
                 .collect();
-            for v in victims {
+            for &v in &victims {
                 self.mech_kill(v, &m.name, fight.boss);
+            }
+            if k.linger > 0. {
+                fight.live.push(Live::Puddle(PuddleLive {
+                    mech: ml.mech,
+                    id: self.fresh_id(),
+                    bearer,
+                    areas: shapes,
+                    left: k.linger,
+                    reported: victims.into_iter().collect(),
+                }));
             }
         }
         let at = self.slimes[fight.boss].point();
@@ -1040,6 +1103,19 @@ impl World {
             return true;
         }
         false
+    }
+
+    fn tick_puddle(&mut self, fight: &Fight, m: &Mechanic, puddle: &mut PuddleLive) -> bool {
+        puddle.left -= TICK;
+        for (session, at) in self.mech_players(fight.zone) {
+            if session != puddle.bearer
+                && puddle.areas.iter().any(|shape| shape.contains(at))
+                && puddle.reported.insert(session)
+            {
+                self.mech_kill(session, &m.name, fight.boss);
+            }
+        }
+        puddle.left > 0.
     }
 
     // -----------------------------------------------------------------------------------------------------------
@@ -1223,11 +1299,14 @@ impl World {
             self.mech_event(fight.zone, "cast", &m.name, centre, 0.);
         }
         let mut flipped = false;
+        let mut warning = false;
         let angle = {
             let s = fight.spokes.iter_mut().find(|s| s.mech == i).unwrap();
             s.angle += s.dir * deg_per_s.to_radians() * TICK;
             if reverse_every > 0. {
+                let before = s.reverse_in;
                 s.reverse_in -= TICK;
+                warning = before > reverse_warn && s.reverse_in <= reverse_warn;
                 s.warn_left = if s.reverse_in <= reverse_warn {
                     s.reverse_in.max(0.)
                 } else {
@@ -1242,6 +1321,9 @@ impl World {
             }
             s.angle
         };
+        if warning {
+            self.mech_event(fight.zone, "cast", &m.name, centre, reverse_warn);
+        }
         if flipped {
             self.mech_event(fight.zone, "reverse", &m.name, centre, 0.);
         }
@@ -1268,6 +1350,7 @@ impl World {
         match live {
             Live::Zone(zl) => self.tick_zone(fight, m, zl),
             Live::Mark(ml) => self.tick_mark(fight, m, ml),
+            Live::Puddle(p) => self.tick_puddle(fight, m, p),
             Live::Walls(wl) => self.tick_walls(fight, m, wl),
             Live::Break(bl) => self.tick_break(fight, m, bl),
             Live::Gaze(gl) => self.tick_gaze(fight, m, gl),
@@ -1839,10 +1922,17 @@ impl World {
                 let m = &def.mechanics[live.mech()];
                 match (live, &m.block) {
                     (Live::Zone(zl), Block::Zone(z))
-                        if matches!(zl.phase, ZPhase::Cast | ZPhase::Echo) =>
+                        if matches!(zl.phase, ZPhase::Cast | ZPhase::Echo | ZPhase::Linger) =>
                     {
                         if bm::hurts(z.effect, &zl.areas, at) {
-                            note(&m.name, zl.left);
+                            note(
+                                &m.name,
+                                if zl.phase == ZPhase::Linger {
+                                    0.
+                                } else {
+                                    zl.left
+                                },
+                            );
                         }
                     }
                     (Live::Mark(ml), Block::Mark(k)) if !ml.gap => {
@@ -1850,6 +1940,11 @@ impl World {
                             if bearer != session && shapes.iter().any(|sh| sh.contains(at)) {
                                 note(&m.name, ml.left);
                             }
+                        }
+                    }
+                    (Live::Puddle(p), Block::Mark(_)) => {
+                        if session != p.bearer && p.areas.iter().any(|shape| shape.contains(at)) {
+                            note(&m.name, 0.);
                         }
                     }
                     (Live::Walls(wl), Block::Sweep(s)) => {
@@ -1982,6 +2077,17 @@ impl World {
                             ));
                         }
                         cast = json!({"name":m.name,"left":ml.left,"total":ml.total});
+                    }
+                    (Live::Puddle(p), Block::Mark(_)) => {
+                        teles.push(tele_json(
+                            p.id,
+                            &m.name,
+                            bm::Telegraph::Danger,
+                            &p.areas,
+                            0.,
+                            0.,
+                            false,
+                        ));
                     }
                     (Live::Walls(wl), Block::Sweep(s)) => {
                         let SweepKind::Walls { thickness, gap, .. } = &s.kind else {

@@ -90,6 +90,14 @@
       g.globalAlpha = tele.standing ? .9 : .35; g.lineWidth = 3; g.strokeStyle = tele.standing ? (tele.hits ? '#d9c28a' : '#9fc3e0') : '#6c7480';
       if (!tele.standing) g.setLineDash([6, 6]);
       g.stroke(); g.setLineDash([]);
+      if (tele.standing && tele.shapes[0]?.t === 'circle') {
+        const s = tele.shapes[0], [bx, by] = w2s(s.x, s.y), [tx, ty] = w2s(s.x, s.y, 52);
+        g.globalAlpha = .9; g.lineWidth = 8; g.strokeStyle = tele.hits ? '#a9896b' : '#688b9b';
+        g.beginPath(); g.moveTo(bx, by); g.lineTo(tx, ty); g.stroke();
+        g.lineWidth = 2; g.strokeStyle = tele.hits ? '#f0d191' : '#b6e7e3';
+        g.beginPath(); g.ellipse(tx, ty, 8, 13, 0, 0, Math.PI * 2); g.stroke();
+        if (tele.hits) { g.beginPath(); g.moveTo(tx - 4, ty - 9); g.lineTo(tx + 3, ty); g.lineTo(tx - 2, ty + 10); g.stroke(); }
+      }
       return;
     }
     const colour = tele.color || (tele.tele === 'blue' ? BLUE : tele.tele === 'green gap' ? GREEN : tele.tele === 'dashed line' ? GOLD : RED);
@@ -107,6 +115,20 @@
     g.globalAlpha = (echo ? .45 : .9) * urgent; g.lineWidth = tele.tele === 'dashed line' ? 3 : 2.5; g.strokeStyle = colour;
     if (tele.dashed || echo) { g.setLineDash([12, 8]); g.lineDashOffset = calm ? 0 : -t * 30; }
     g.stroke(); g.setLineDash([]); g.lineDashOffset = 0;
+    if (tele.reversing && tele.reverseLeft > 0) {
+      const lane = tele.shapes[0], hub = lane?.t === 'lane' ? { x: lane.x1, y: lane.y1 } : null;
+      if (hub) {
+        const [sx, sy] = w2s(hub.x, hub.y, 40);
+        g.save(); g.globalAlpha = 1; g.strokeStyle = GOLD; g.lineWidth = 3;
+        g.beginPath(); g.arc(sx, sy, 13, 0, Math.PI * 2); g.stroke();
+        for (let n = 0; n < 8; n++) {
+          const a = n * Math.PI / 4;
+          g.beginPath(); g.moveTo(sx + 16 * Math.cos(a), sy + 16 * Math.sin(a));
+          g.lineTo(sx + 23 * Math.cos(a), sy + 23 * Math.sin(a)); g.stroke();
+        }
+        g.restore();
+      }
+    }
     if (tele.tele === 'blue' && tele.progress > 0 && !tele.lit) {   // a brazier being lit: a bright arc round it
       const s = tele.shapes[0], n = Math.max(2, Math.round(40 * tele.progress)), pts = [];
       for (let i = 0; i <= n; i++) { const a = -Math.PI / 2 + i / 40 * Math.PI * 2; pts.push([s.x + Math.cos(a) * s.r, s.y + Math.sin(a) * s.r]); }

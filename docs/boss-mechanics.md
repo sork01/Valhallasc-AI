@@ -1,6 +1,6 @@
 # Final boss mechanics
 
-Design for the `BOSSMECH-*` tasks in [TODO.md](../TODO.md). Owner's request (2026-10-17): every final boss gets a gimmick, for example a big area attack with a five-second cast that kills anyone still in it, or a boss that turns invulnerable and spawns adds that must die to end it. The engine is built (see below); the sixteen mechanics are not. Every number is a starting value to tune with the dungeon harness (`BOSSMECH-CHECK`).
+Design for the `BOSSMECH-*` tasks in [TODO.md](../TODO.md). Owner's request (2026-10-17): every final boss gets a gimmick, for example a big area attack with a five-second cast that kills anyone still in it, or a boss that turns invulnerable and spawns adds that must die to end it. The engine and eight of the sixteen boss mechanics are built (see below). Every number is a starting value to tune with the dungeon harness (`BOSSMECH-CHECK`).
 
 A **final boss** is the monster named in a dungeon's `final_boss`: sixteen of them. Open-world elites (Cinderlord, Gloomroot, the group elites) and the dungeons' middle bosses are not covered; say so if they should get the same treatment.
 
@@ -54,14 +54,14 @@ All of these live once in `server/src/bossmech.rs`; the engine, the client, the 
 
 The data is `world/boss-mechanics.txt`, a JSON object keyed by the final boss's monster kind; it ships as `{}` and the sixteen boss tasks fill it in. The schema, the shapes, the beam bounce and the fairness walk are pure code in `server/src/bossmech.rs`; the state machine that runs a fight is `server/src/world/boss_mechanics.rs`. The table is validated when the server starts (`bossmech::shipped()` panics on a bad entry), so a cast under its floor or a typo in a field name stops the server rather than shipping.
 
-Each boss lists `mechanics`; each has a `name` (the cast bar and "Killed by <name>"), an optional health window (`hp_max`, default 1, and `hp_min`, default 0: an escalation is a second entry with a lower `hp_max`), and a `block`:
+Each boss lists `mechanics`; each has a `name` (the cast bar and "Killed by <name>"), an optional health window (`hp_max`, default 1, and `hp_min`, default 0: an escalation is a second entry with a lower `hp_max`), and a `block`. A boss with `inner_arena: true` uses the smallest authored room containing it for floor shapes when rooms overlap; Vael's 12-by-12 chamber sits inside a much larger nave room, and the three 2.5-tile safe circles must cover that chamber within the five-second warning. A boss in a map with no rooms can specify `arena: [x0, y0, x1, y1]`; the Moonwell Echo's bounds cover its final platform instead of the whole 128-tile map.
 
 | Block | Fields | Notes |
 | --- | --- | --- |
-| `zone` | `shape`, `effect` (`kill`, `heavy`, `kill_outside`), `heavy`, `cast`, `every`, `first`, `repeat`, `repeat_gap`, `echo`, `linger` | Shapes: `circle` (with `inner` for a ring, `at` boss, target or random), `cone`, `lane`, `half`, `arena`, `islands`, `lit`. `echo` lands the same shape again after each delay and leaves a pale copy. `kill_outside` goes with `islands` and `lit` only. |
+| `zone` | `shape`, `effect` (`kill`, `heavy`, `kill_outside`), `heavy`, `cast`, `every`, `first`, `repeat`, `repeat_gap`, `alternate`, `echo`, `linger` | Shapes: `circle` (with `inner` for a ring, `at` boss, target or random), `cone`, `lane`, `half`, `arena`, `islands`, `lit`. `alternate` makes a repeated half-room cast strike the opposite side of its crease. `echo` lands the same shape again after each delay and leaves a pale copy. `linger` keeps the landed shape dangerous until it fades. `kill_outside` goes with `islands` and `lit` only. |
 | `shield` | `steps` (`hp`, `tag`, `count`, `still`), `heal_per_s` | Wakes sleeping monsters of `tag`; no damage reaches the boss until they are all dead. With nothing to wake there is no shield. |
 | `adds` | `tag`, `count`, `every`, `first`, `scatter`, `still`, `bloom` (`after`, `heal`, `then`) | A bloom removes the add, heals the boss and wakes one `then` add where it stood. |
-| `mark` | `count`, `every`, `first`, `cast`, `effect` (`burst` or `beam`), `waves`, `wave_gap` | At most 3, never everyone, at least one; the ring or beam follows the bearer; the bearer is never hurt by their own mark. |
+| `mark` | `count`, `every`, `first`, `cast`, `effect` (`burst` or `beam`), `waves`, `wave_gap`, `linger` | At most 3, never everyone, at least one; the ring or beam follows the bearer; the bearer is never hurt by their own mark. A burst can leave a red puddle for `linger` seconds; the bearer is also safe from their own puddle. |
 | `sweep` | `kind` `walls` (`warn`, `speed`, `thickness`, `gap`, `walls` with `from` and `gap` low, high, middle or random) or `spokes` (`count`, `width`, `deg_per_s`, `reverse_every`, `reverse_warn`, `length`) | Walls are dashed for `warn`, then red; the green gap is safe. Spokes turn about the arena's centre and are lethal to touch. |
 | `break` | `cast`, `every`, `first`, `bar`, `stun`, `vulnerable` | The boss is held still; damage from anyone fills the bar (a share of its maximum health); broken: stunned and `vulnerable` extra damage; unbroken: everyone in the fight dies. |
 | `stasis` | `every`, `first`, `orbs`, `speed`, `life`, `tag`, `hold` | Orbs seek players; a touched player is frozen (no input, no damage) in a cocoon (a sleeping monster of `tag`); kill the cocoon to free them, or they are lost after `hold`. |
@@ -145,31 +145,43 @@ The reverse of the king's ring: here you **must stand inside** the circle.
 - Islands are spread so that none is more than 60% of the cast away from any point; they appear in new places each time.
 - Escalation: at 30% there are two islands and the flood comes twice in a row, with the islands moving between the floods.
 
+**Built 2026-10-18.** The 5-second, 2.5-tile island casts run in Vael's nested 12-by-12 chamber (`inner_arena`), so every walkable point reaches safety in time. The landed flood remains dangerous for its 4-second linger. The second cast uses two newly chosen islands. The sign has a three-island picture, matching numbers and hand-written Swedish.
+
 ### 5. The Moonwell Echo — The Moonwell (level 60): *Echo*
 
 - Every 15 s she casts a **Moon Lance**: a red lane across the room, **3 s** to land, lethal. A pale copy of the lane stays on the floor, and **3 s after the first one lands the same lane lands again.** Her slam ring does the same: it lands round her, then again round the same spot after she has moved.
 - The lesson is not to step back into where it just was. Escalation: at 40% the echo comes after 2 s and the echo itself echoes once more.
 
+**Built 2026-10-18.** Moon Lance and the ring each record their landing shape, then strike the same place after 3 seconds, or twice at 2-second gaps below 40%. The lethal Moon Lance warns for **5 seconds**: its proposed 3 seconds conflicted with the shared instant-kill cast floor. The `arena` bounds cover the Moonwell's final platform instead of the full map, which has no authored rooms. The sign and its lane-and-ring picture explain the repeats in English and Swedish.
+
 ### 6. The Unblinking Eye — The Eye Below (level 65): *Unblinking Gaze*
 
 - The lid opens; after a **5 s warning** the Eye sees everything: **anyone in its line of sight dies**. Only cover helps. Six lens pillars stand in the room; a pillar shields everyone behind it, **cracks after one gaze and breaks after two**, and regrows after 45 s, so the party rotates cover while fighting.
-- Needs `eye_pillar` obstacles added to the boss room (the room has none today). Line of sight uses `Map::line_clear`.
+- Six lens bases are placed by the Eye Below generator in the boss room. The live cover circles sit on those exact centres; `Map::line_clear` still checks the stone walls, while the gaze checks the lenses separately so a broken lens stops shielding without blocking movement.
 - Escalation: at 30% the gaze comes every 15 s and **sweeps** across the room as a rotating beam: hide, then move round the pillar.
+
+**Built 2026-10-18.** The Eye warns for 5 seconds every 25 seconds. Each of the six lenses can shield players twice before breaking and regrows after 45 seconds. Below 30% it warns every 15 seconds and turns a beam through one full circle in 6 seconds. The generator, live cover view, sign picture and hand-written Swedish use the same six positions.
 
 ### 7. Heart of the Elder — The Elder Hollow (level 70): *Bramble Sweep*
 
 - Every 20 s two **walls of thorns** (3 tiles thick) rise at opposite edges, shown as dashed lines for **4 s**, then sweep across at 4 tiles/s. Each wall has one **gap** (4 tiles wide) marked in green; the second wall's gap is on the opposite side, so the party has to cross the room between the walls. A wall kills anything it touches.
 - Escalation: at 40% the walls come from both axes at once, with the gaps lined up on one cell of a grid.
 
+**Built 2026-10-18.** Two opposite 4-tile gaps cross the room after a 4-second dashed warning; below 40%, four walls approach from both axes with their gaps aligned at the centre. The sign pictures the walls and green gaps and has hand-written Swedish.
+
 ### 8. Sovereign of the Last Fold — Thousandfold Pavilion (level 75): *Fold*
 
 - A **crease line** appears through the arena at a random angle; one half is shaded red. After a **5 s warning** that half **folds flat**: anyone on it dies. It unfolds after 3 s. The safe half is never smaller than 40% of the room. Every 22 s.
 - Escalation: at 33% a second fold follows the first (a quarter of the room, then the opposite half), and the crease can pass through the boss.
 
+**Built 2026-10-18.** The red half has a 5-second warning and stays dangerous for 3 seconds after landing. Below 33%, the next fold strikes the opposite side of the same crease; both sides leave at least 40% of the arena safe when struck. The sign shows its dashed crease and red half, in English and hand-written Swedish.
+
 ### 9. The Rain Crown — Temple of the Rain Crown (level 80): *Downpour*
 
 - Every 25 s a **storm cloud** marks up to three players (never everyone) with a ring (radius 4) that follows them for **5 s** and then bursts as **lethal rain**. Marked players must **spread out and away** from everyone else; unmarked players must stay out of every ring. Rain puddles linger 8 s.
 - Escalation: at 40% the marks come in two waves, the second 3 s after the first lands.
+
+**Built 2026-10-18.** Up to three players carry a 4-tile red ring for 5 seconds; each burst leaves a visible, dangerous puddle for 8 seconds. A bearer is safe from their own burst and puddle. Below 40%, the second wave starts 3 seconds after the first lands. The sign shows the three marks, the puddle time and hand-written Swedish.
 
 ### 10. Heart of the Worldseed — The Seed Vault (level 80): *Germination*
 
@@ -180,7 +192,9 @@ The reverse of the king's ring: here you **must stand inside** the circle.
 
 - Three **brass spokes** (lanes 1.6 wide, from the Axis to the wall) rotate round it at 20°/s, each 120° from the next. A spoke is lethal to touch. Players run with the rotation, or stand in the gap, which moves at under 3 tiles/s at 8 tiles out.
 - The spokes **reverse** every 12 s after a **2 s** warning (a gear symbol and a sound).
-- Escalation: at 30% there are four spokes at 28°/s.
+- Escalation: at 30% there are four spokes at 21°/s. The proposed 28°/s gives 3.91 tiles/s at 8 tiles, contradicting the under-3 limit above; 21°/s gives 2.93 tiles/s.
+
+**Built 2026-10-18.** Three 1.6-tile spokes turn at 20°/s, then four at 21°/s below 30%. They reverse every 12 seconds. For the final 2 seconds a gear icon appears over the hub and a warning cue plays. The sign sketches the spokes and has hand-written Swedish.
 
 ### 12. Heart of the Stormgate — The Thunderheart Gate (level 95): *Static*
 

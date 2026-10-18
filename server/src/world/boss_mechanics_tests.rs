@@ -840,6 +840,13 @@ fn spokes_turn_kill_on_touch_reverse_after_a_warning_and_escalate_below_thirty_p
     // At 4 s of the 6 the gear warning shows; at 6 s it turns the other way.
     r.run(1.2);
     assert_eq!(r.view()["tele"][0]["reversing"], true);
+    assert!(
+        r.events(2).iter().any(|e| e["kind"] == "bossmech"
+            && e["phase"] == "cast"
+            && e["name"] == "Orrery Spokes"
+            && e["value"] == 2.),
+        "the two-second reversal warning also sounds before the turn"
+    );
     r.put(2, 108., 36.);
     r.run(1.5);
     let a2 = angle(&r);
@@ -858,6 +865,75 @@ fn spokes_turn_kill_on_touch_reverse_after_a_warning_and_escalate_below_thirty_p
     );
     assert_eq!(shapes[0]["shapes"].as_array().unwrap().len(), 4);
 }
+
+#[test]
+fn shipped_eye_cover_and_axis_spokes_match_their_dungeon_rooms() {
+    let w = world();
+    let eye = w
+        .slimes
+        .iter()
+        .find(|s| s.kind == "eye_unblinking")
+        .unwrap();
+    let axis = w.slimes.iter().find(|s| s.kind == "astro_axis").unwrap();
+    let cover = [
+        (43., 20.),
+        (53., 20.),
+        (42., 25.),
+        (54., 25.),
+        (43., 30.),
+        (53., 30.),
+    ];
+    let eye_def = &w.boss.table["eye_unblinking"];
+    assert_eq!(eye_def.mechanics.len(), 2);
+    for (late, m) in eye_def.mechanics.iter().enumerate() {
+        let Block::Gaze(g) = &m.block else {
+            panic!("the Eye needs a gaze")
+        };
+        assert_eq!(g.cast, 5.);
+        assert_eq!(g.every, if late == 0 { 25. } else { 15. });
+        assert_eq!(g.regrow, 45.);
+        assert_eq!(g.sweep > 0., late == 1);
+        assert_eq!(g.cover.len(), 6);
+        for (c, (x, y)) in g.cover.iter().zip(cover) {
+            assert_eq!((c.x, c.y), (x, y));
+            assert!(
+                w.maps[eye.zone]
+                    .objects
+                    .iter()
+                    .any(|o| o.r == 0. && o.x == x && o.y == y)
+            );
+            assert!(bm::arena_for(&w.maps[eye.zone], eye.point()).contains(Point { x, y }));
+        }
+    }
+    let axis_def = &w.boss.table["astro_axis"];
+    assert_eq!(axis_def.mechanics.len(), 2);
+    for (late, m) in axis_def.mechanics.iter().enumerate() {
+        let Block::Sweep(s) = &m.block else {
+            panic!("the Axis needs turning spokes")
+        };
+        let SweepKind::Spokes {
+            count,
+            width,
+            deg_per_s,
+            reverse_every,
+            reverse_warn,
+            length,
+        } = s.kind
+        else {
+            panic!("the Axis needs spokes")
+        };
+        assert_eq!(count, if late == 0 { 3 } else { 4 });
+        assert_eq!(width, 1.6);
+        assert_eq!(deg_per_s, if late == 0 { 20. } else { 21. });
+        assert_eq!((reverse_every, reverse_warn), (12., 2.));
+        assert_eq!(length, 10.);
+        assert!(
+            deg_per_s.to_radians() * 8. < 3.,
+            "the gap stays under 3 tiles/s at 8 tiles"
+        );
+    }
+    assert_eq!(bm::arena_for(&w.maps[axis.zone], axis.point()).width(), 20.);
+}
 /// The signed turn from angle `a` to angle `b`, in -pi..pi.
 fn turned(a: f64, b: f64) -> f64 {
     (b - a + std::f64::consts::PI).rem_euclid(std::f64::consts::TAU) - std::f64::consts::PI
@@ -869,6 +945,41 @@ fn s_f(v: &Value, k: &str) -> f64 {
 // --- gaze ----------------------------------------------------------------------------------------------------------
 
 const GAZE: &str = r#"{"mechanics":[{"name":"Unblinking Gaze","block":"gaze","cast":5,"every":8,"first":1,"regrow":20,"cover":[{"x":116,"y":24,"r":1.2}]}]}"#;
+
+#[test]
+fn gaze_cover_is_one_physical_pillar_across_health_phases() {
+    let both = r#"{"mechanics":[
+        {"name":"Unblinking Gaze","block":"gaze","hp_min":0.3,"cast":5,"every":8,"first":1,"regrow":45,"cover":[{"x":116,"y":24,"r":1.2}]},
+        {"name":"Unblinking Gaze","block":"gaze","hp_max":0.3,"cast":5,"every":8,"first":1,"regrow":45,"sweep":6,"beam":12,"cover":[{"x":116,"y":24,"r":1.2}]}
+    ]}"#;
+    let mut r = rig(both, 1);
+    let boss = r.w.slimes[r.boss].point();
+    r.open_spot(1, boss.x, boss.y + 18.);
+    r.run(6.2);
+    let pillars: Vec<_> = r.view()["tele"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|t| t["tele"] == "cover")
+        .cloned()
+        .collect();
+    assert_eq!(pillars.len(), 1, "health phases must share one lens");
+    assert_eq!(pillars[0]["hits"], 1, "the first gaze cracks it");
+    r.set_boss_share(0.25);
+    r.run(0.1);
+    let pillars: Vec<_> = r.view()["tele"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|t| t["tele"] == "cover")
+        .cloned()
+        .collect();
+    assert_eq!(pillars.len(), 1);
+    assert_eq!(
+        pillars[0]["hits"], 1,
+        "the crack persists into the late phase"
+    );
+}
 
 #[test]
 fn only_cover_helps_against_a_gaze_and_cover_cracks_breaks_and_regrows() {
@@ -1574,7 +1685,7 @@ fn step_runs_the_engine_with_the_monsters_ai_and_the_snapshot_carries_the_fight(
 fn unfair_point(w: &World, boss: usize, def: &BossDef) -> Option<(String, Point)> {
     let s = &w.slimes[boss];
     let map = &w.maps[s.zone];
-    let arena = bm::arena_for(map, s.point());
+    let arena = bm::arena_for_boss(map, s.point(), def);
     for m in &def.mechanics {
         let Block::Zone(z) = &m.block else { continue };
         for seed in 0..20u64 {
@@ -1794,4 +1905,263 @@ fn the_sign_before_haldor_says_what_the_dirge_really_does() {
             );
         }
     }
+}
+
+#[test]
+fn five_shipped_bosses_keep_their_phases_and_child_readable_signs() {
+    let w = world();
+    let cases = [
+        ("hierophant", 2, "5 seconds", "Rising Tide"),
+        ("moonwell_echo", 4, "3 seconds", "Moon Lance"),
+        ("elder_heart", 2, "4 second", "Bramble Sweep"),
+        ("pavilion_sovereign", 2, "5 seconds", "Fold"),
+        ("rain_crown_sovereign", 2, "5 seconds", "Downpour"),
+    ];
+    for (kind, count, number, first_name) in cases {
+        let def = &w.boss.table[kind];
+        let sign = &w.signs[kind];
+        assert_eq!(def.mechanics.len(), count, "{kind} phase count");
+        assert_eq!(def.mechanics[0].name, first_name);
+        assert!(def.mechanics[0].active_at(1.));
+        assert!(!def.mechanics[0].active_at(0.01));
+        assert!(def.mechanics[1].active_at(0.01));
+        assert!(
+            sign.what.contains(number),
+            "{kind} sign must state its timing"
+        );
+        assert!(
+            sign.tip.contains("nearly beaten"),
+            "{kind} sign must explain escalation"
+        );
+        for part in [&sign.what, &sign.todo, &sign.tip] {
+            for sentence in part.split(['.', '!']).filter(|s| !s.trim().is_empty()) {
+                assert!(
+                    sentence.split_whitespace().count() <= 12,
+                    "{kind}: {sentence}"
+                );
+            }
+        }
+    }
+    let hierophant = &w.boss.table["hierophant"];
+    assert!(hierophant.inner_arena);
+    for (i, expected) in [(0, 3), (1, 2)] {
+        let Block::Zone(z) = &hierophant.mechanics[i].block else {
+            panic!("Rising Tide is a zone")
+        };
+        assert!(
+            matches!(z.shape, bm::ShapeSpec::Islands { count, r } if count == expected && r == 2.5)
+        );
+        assert_eq!((z.cast, z.linger), (5., 4.));
+    }
+    let Block::Zone(high_tide) = &hierophant.mechanics[1].block else {
+        unreachable!()
+    };
+    assert_eq!(high_tide.repeat, 2);
+    assert_eq!(w.signs["hierophant"].colors, ["red", "blue"]);
+
+    let echo = &w.boss.table["moonwell_echo"];
+    assert_eq!(echo.arena, Some([97., 99., 112., 114.]));
+    for (i, delays) in [
+        (0, vec![3.]),
+        (1, vec![2., 2.]),
+        (2, vec![3.]),
+        (3, vec![2., 2.]),
+    ] {
+        let Block::Zone(z) = &echo.mechanics[i].block else {
+            panic!("Echo attacks are zones")
+        };
+        assert_eq!(z.echo, delays);
+        assert_eq!(z.cast, 5., "a lethal cast needs the full warning");
+    }
+    assert_eq!(w.signs["moonwell_echo"].colors, ["red", "path"]);
+
+    let elder = &w.boss.table["elder_heart"];
+    for (i, walls) in [(0, 2), (1, 4)] {
+        let Block::Sweep(s) = &elder.mechanics[i].block else {
+            panic!("Bramble Sweep moves walls")
+        };
+        let bm::SweepKind::Walls {
+            warn,
+            speed,
+            gap,
+            walls: entries,
+            ..
+        } = &s.kind
+        else {
+            unreachable!()
+        };
+        assert_eq!((*warn, *speed, *gap, entries.len()), (4., 4., 4., walls));
+    }
+    assert_eq!(w.signs["elder_heart"].colors, ["red", "path", "green"]);
+
+    let pavilion = &w.boss.table["pavilion_sovereign"];
+    for (i, repeats) in [(0, 1), (1, 2)] {
+        let Block::Zone(z) = &pavilion.mechanics[i].block else {
+            panic!("Fold is a zone")
+        };
+        assert!(matches!(z.shape, bm::ShapeSpec::Half { min_share } if min_share == 0.4));
+        assert_eq!((z.cast, z.linger, z.repeat), (5., 3., repeats));
+    }
+    let Block::Zone(second_fold) = &pavilion.mechanics[1].block else {
+        unreachable!()
+    };
+    assert!(second_fold.alternate);
+    assert_eq!(w.signs["pavilion_sovereign"].colors, ["red", "path"]);
+    assert!(
+        w.signs["pavilion_sovereign"]
+            .tip
+            .contains("back over the line")
+    );
+
+    let crown = &w.boss.table["rain_crown_sovereign"];
+    for (i, waves) in [(0, 1), (1, 2)] {
+        let Block::Mark(m) = &crown.mechanics[i].block else {
+            panic!("Downpour marks players")
+        };
+        assert_eq!((m.count, m.cast, m.waves), (3, 5., waves));
+        assert_eq!(m.linger, 8.);
+        assert!(matches!(m.effect, bm::MarkEffect::Burst { r } if r == 4.));
+    }
+    assert_eq!(w.signs["rain_crown_sovereign"].colors, ["red"]);
+    assert!(w.signs["rain_crown_sovereign"].tip.contains("8 seconds"));
+}
+
+#[test]
+fn five_shipped_bosses_start_their_real_telegraphs_in_both_health_phases() {
+    for (kind, start, high_shapes, low_shapes, name) in [
+        ("hierophant", 35., 3, 2, "Rising Tide"),
+        ("moonwell_echo", 15., 1, 1, "Moon Lance"),
+        ("elder_heart", 20., 4, 8, "Bramble Sweep"),
+        ("pavilion_sovereign", 22., 1, 1, "Fold"),
+        ("rain_crown_sovereign", 25., 2, 2, "Downpour"),
+    ] {
+        for (share, shapes) in [(1., high_shapes), (0.2, low_shapes)] {
+            let mut r = rig(&shipped(kind), 3);
+            r.set_boss_share(share);
+            r.run(start + 0.3);
+            let view = r.view();
+            assert_eq!(view["cast"]["name"], name, "{kind} at {share} health");
+            let shown = if kind == "hierophant" {
+                view["tele"][0]["shapes"].as_array().unwrap().len()
+            } else {
+                view["tele"].as_array().unwrap().len()
+            };
+            assert_eq!(shown, shapes, "{kind} at {share} health");
+        }
+    }
+}
+
+#[test]
+fn landed_floor_hazards_stay_dangerous_until_they_fade() {
+    let mut r = rig(
+        r#"{"mechanics":[{"name":"Fold","block":"zone","shape":{"kind":"circle","r":8},"effect":"kill","cast":5,"every":30,"first":1,"linger":3}]}"#,
+        2,
+    );
+    let boss = r.w.slimes[r.boss].point();
+    r.run(6.2);
+    assert!(r.alive(2), "outside the first landing");
+    let inside = r.put(2, boss.x + 1., boss.y);
+    assert!(inside.distance(boss) < 8.);
+    assert_eq!(r.view()["tele"][0]["tele"], "red");
+    assert_eq!(
+        r.w.boss_danger(r.zone, 2, inside).map(|(_, left)| left),
+        Some(0.)
+    );
+    r.run(0.1);
+    assert!(
+        !r.alive(2),
+        "the folded floor remains dangerous for three seconds"
+    );
+    let mut r = rig(
+        r#"{"mechanics":[{"name":"Fold","block":"zone","shape":{"kind":"circle","r":8},"effect":"kill","cast":5,"every":30,"first":1,"linger":3}]}"#,
+        1,
+    );
+    r.w.god_mode = true;
+    let boss = r.w.slimes[r.boss].point();
+    r.put(1, boss.x + 1., boss.y);
+    r.run(9.2);
+    assert_eq!(
+        r.events(1)
+            .iter()
+            .filter(|e| e["text"] == "Would have been killed by Fold")
+            .count(),
+        1,
+        "a lingering hazard sends one god-mode notice per landing"
+    );
+}
+
+#[test]
+fn the_second_pavilion_fold_strikes_the_other_side_of_the_same_crease() {
+    let mut r = rig(&shipped("pavilion_sovereign"), 2);
+    r.w.god_mode = true;
+    r.set_boss_share(0.2);
+    r.run(22.2);
+    let first = r.view()["tele"][0]["shapes"][0].clone();
+    assert_eq!(first["t"], "half");
+    r.run(11.2);
+    let second = r.view()["tele"][0]["shapes"][0].clone();
+    assert_eq!(second["t"], "half");
+    assert_eq!(
+        (first["x"].clone(), first["y"].clone()),
+        (second["x"].clone(), second["y"].clone())
+    );
+    assert!((first["nx"].as_f64().unwrap() + second["nx"].as_f64().unwrap()).abs() < 1e-9);
+    assert!((first["ny"].as_f64().unwrap() + second["ny"].as_f64().unwrap()).abs() < 1e-9);
+}
+
+#[test]
+fn downpour_leaves_an_eight_second_puddle_that_spares_its_bearer() {
+    let mut r = rig(&shipped("rain_crown_sovereign"), 2);
+    r.run(25.2);
+    let bearer_id = r.view()["marked"][0].as_str().unwrap().to_string();
+    let bearer = if r.w.players[&1].character.id == bearer_id {
+        1
+    } else {
+        2
+    };
+    let other = 3 - bearer;
+    let centre = r.put(bearer, 112., 20.);
+    r.put(other, 122., 36.);
+    r.run(5.1);
+    assert!(r.alive(bearer) && r.alive(other));
+    assert_eq!(
+        r.view()["tele"][0]["tele"],
+        "red",
+        "the puddle stays visible"
+    );
+    let near = r.put(other, centre.x + 1.5, centre.y);
+    assert!(near.distance(centre) < 4.);
+    assert_eq!(
+        r.w.boss_danger(r.zone, other, near).map(|(_, left)| left),
+        Some(0.)
+    );
+    assert_eq!(r.w.boss_danger(r.zone, bearer, centre), None);
+    r.run(0.1);
+    assert!(!r.alive(other) && r.alive(bearer));
+    r.run(8.);
+    assert!(
+        r.view()["tele"].as_array().unwrap().is_empty(),
+        "the puddle dries up"
+    );
+    let mut r = rig(&shipped("rain_crown_sovereign"), 2);
+    r.w.god_mode = true;
+    r.run(25.2);
+    let bearer_id = r.view()["marked"][0].as_str().unwrap().to_string();
+    let bearer = if r.w.players[&1].character.id == bearer_id {
+        1
+    } else {
+        2
+    };
+    let other = 3 - bearer;
+    let centre = r.put(bearer, 112., 20.);
+    r.put(other, centre.x + 1., centre.y);
+    r.run(8.);
+    assert_eq!(
+        r.events(other)
+            .iter()
+            .filter(|e| e["text"] == "Would have been killed by Downpour")
+            .count(),
+        1,
+        "the mark and its puddle send one god-mode notice"
+    );
 }

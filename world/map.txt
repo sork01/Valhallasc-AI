@@ -163748,6 +163748,48 @@
           "y": 79,
           "r": 0,
           "v": 0
+        },
+        {
+          "kind": "eye_lens_pillar",
+          "x": 43,
+          "y": 20,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "eye_lens_pillar",
+          "x": 53,
+          "y": 20,
+          "r": 0,
+          "v": 1
+        },
+        {
+          "kind": "eye_lens_pillar",
+          "x": 42,
+          "y": 25,
+          "r": 0,
+          "v": 2
+        },
+        {
+          "kind": "eye_lens_pillar",
+          "x": 54,
+          "y": 25,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "eye_lens_pillar",
+          "x": 43,
+          "y": 30,
+          "r": 0,
+          "v": 1
+        },
+        {
+          "kind": "eye_lens_pillar",
+          "x": 53,
+          "y": 30,
+          "r": 0,
+          "v": 2
         }
       ],
       "slimes": [

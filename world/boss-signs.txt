@@ -36,9 +36,9 @@
   },
   "hierophant": {
     "title": "High Hierophant Vael, Heart of the Tide",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "Blue circles appear for 5 seconds before the floor floods. Anyone outside them is knocked out.",
+    "todo": "Stand in a blue circle until the water is gone.",
+    "tip": "The circles move each time. When Vael is nearly beaten, two floods come close together.",
     "colors": [
       "red",
       "blue"
@@ -48,21 +48,21 @@
   },
   "moonwell_echo": {
     "title": "The Moonwell Echo",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "A red line fires after 5 seconds, then again 3 seconds later. The red ring repeats too.",
+    "todo": "Step away from red. Do not step back too soon.",
+    "tip": "When she is nearly beaten, each blast repeats twice. They land 2 seconds apart.",
     "colors": [
       "red",
-      "blue"
+      "path"
     ],
     "x": 91.5,
     "y": 86.5
   },
   "eye_unblinking": {
     "title": "The Unblinking Eye",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "The Eye looks across the room after 5 seconds. Anyone it sees is knocked out.",
+    "todo": "Hide behind a blue lens pillar until the gaze ends.",
+    "tip": "A pillar cracks, then breaks after two gazes. It returns after 45 seconds. When nearly beaten, the Eye sweeps a red beam every 15 seconds.",
     "colors": [
       "red",
       "blue"
@@ -72,36 +72,36 @@
   },
   "elder_heart": {
     "title": "Heart of the Elder",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "Two red thorn walls cross the room after a 4 second warning. Green gaps are safe.",
+    "todo": "Run through the green gaps as the walls pass.",
+    "tip": "When the Heart is nearly beaten, walls cross both ways. Watch for the gaps.",
     "colors": [
       "red",
-      "blue"
+      "path",
+      "green"
     ],
     "x": 27.5,
     "y": 30.5
   },
   "pavilion_sovereign": {
     "title": "Sovereign of the Last Fold",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "The red half of the room folds after 5 seconds. Anyone there is knocked out.",
+    "todo": "Cross the dashed line into the clear half.",
+    "tip": "When it is nearly beaten, it folds twice. Cross back over the line.",
     "colors": [
       "red",
-      "blue"
+      "path"
     ],
     "x": 68.5,
     "y": 27.5
   },
   "rain_crown_sovereign": {
     "title": "The Rain Crown",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "Red rain circles follow up to three players for 5 seconds. The rain knocks out anyone else inside.",
+    "todo": "If marked, move away from friends. Everyone else, avoid red circles.",
+    "tip": "Red puddles stay for 8 seconds. When the Crown is nearly beaten, rain falls twice. The second falls 3 seconds after the first.",
     "colors": [
-      "red",
-      "blue"
+      "red"
     ],
     "x": 53.5,
     "y": 36.5
@@ -120,12 +120,11 @@
   },
   "astro_axis": {
     "title": "Axis of the Buried Sky",
-    "what": "This boss has a special trick.",
-    "todo": "Watch the floor. The colours show what is about to happen.",
-    "tip": "Red hurts. Blue is safe. Stay together and help each other.",
+    "what": "Three red spokes turn round the Axis. Touching one knocks you out.",
+    "todo": "Stand between the spokes. Move with the open gap.",
+    "tip": "A gold gear warns you 2 seconds before they reverse. When the Axis is nearly beaten, four spokes turn faster.",
     "colors": [
-      "red",
-      "blue"
+      "red"
     ],
     "x": 32.5,
     "y": 32.5

@@ -4,5 +4,51 @@
       {"name": "Dirge of the Hollow", "block": "break", "hp_min": 0.3, "cast": 8, "every": 30, "bar": 0.035, "stun": 6, "vulnerable": 0.3},
       {"name": "Dirge of the Hollow", "block": "break", "hp_max": 0.3, "cast": 8, "every": 25, "bar": 0.035, "stun": 6, "vulnerable": 0.3}
     ]
+  },
+  "hierophant": {
+    "inner_arena": true,
+    "mechanics": [
+      {"name": "Rising Tide", "block": "zone", "hp_min": 0.3, "shape": {"kind": "islands", "count": 3, "r": 2.5}, "effect": "kill_outside", "cast": 5, "every": 35, "linger": 4},
+      {"name": "Rising Tide", "block": "zone", "hp_max": 0.3, "shape": {"kind": "islands", "count": 2, "r": 2.5}, "effect": "kill_outside", "cast": 5, "every": 35, "repeat": 2, "repeat_gap": 4, "linger": 4}
+    ]
+  },
+  "moonwell_echo": {
+    "arena": [97, 99, 112, 114],
+    "mechanics": [
+      {"name": "Moon Lance", "block": "zone", "hp_min": 0.4, "shape": {"kind": "lane", "width": 2}, "effect": "kill", "cast": 5, "every": 15, "echo": [3]},
+      {"name": "Moon Lance", "block": "zone", "hp_max": 0.4, "shape": {"kind": "lane", "width": 2}, "effect": "kill", "cast": 5, "every": 15, "echo": [2, 2]},
+      {"name": "Echoing Slam", "block": "zone", "hp_min": 0.4, "shape": {"kind": "circle", "r": 5}, "effect": "kill", "cast": 5, "every": 30, "first": 22.5, "echo": [3]},
+      {"name": "Echoing Slam", "block": "zone", "hp_max": 0.4, "shape": {"kind": "circle", "r": 5}, "effect": "kill", "cast": 5, "every": 30, "first": 22.5, "echo": [2, 2]}
+    ]
+  },
+  "eye_unblinking": {
+    "mechanics": [
+      {"name": "Unblinking Gaze", "block": "gaze", "hp_min": 0.3, "cast": 5, "every": 25, "regrow": 45, "cover": [{"x": 43, "y": 20, "r": 1.1}, {"x": 53, "y": 20, "r": 1.1}, {"x": 42, "y": 25, "r": 1.1}, {"x": 54, "y": 25, "r": 1.1}, {"x": 43, "y": 30, "r": 1.1}, {"x": 53, "y": 30, "r": 1.1}]},
+      {"name": "Unblinking Gaze", "block": "gaze", "hp_max": 0.3, "cast": 5, "every": 15, "regrow": 45, "sweep": 6, "beam": 12, "cover": [{"x": 43, "y": 20, "r": 1.1}, {"x": 53, "y": 20, "r": 1.1}, {"x": 42, "y": 25, "r": 1.1}, {"x": 54, "y": 25, "r": 1.1}, {"x": 43, "y": 30, "r": 1.1}, {"x": 53, "y": 30, "r": 1.1}]}
+    ]
+  },
+  "elder_heart": {
+    "mechanics": [
+      {"name": "Bramble Sweep", "block": "sweep", "hp_min": 0.4, "every": 20, "kind": {"shape": "walls", "warn": 4, "speed": 4, "thickness": 3, "gap": 4, "walls": [{"from": "west", "gap": "low"}, {"from": "east", "gap": "high"}]}},
+      {"name": "Bramble Sweep", "block": "sweep", "hp_max": 0.4, "every": 20, "kind": {"shape": "walls", "warn": 4, "speed": 4, "thickness": 3, "gap": 4, "walls": [{"from": "west", "gap": "middle"}, {"from": "east", "gap": "middle"}, {"from": "north", "gap": "middle"}, {"from": "south", "gap": "middle"}]}}
+    ]
+  },
+  "pavilion_sovereign": {
+    "mechanics": [
+      {"name": "Fold", "block": "zone", "hp_min": 0.33, "shape": {"kind": "half", "min_share": 0.4}, "effect": "kill", "cast": 5, "every": 22, "linger": 3},
+      {"name": "Fold", "block": "zone", "hp_max": 0.33, "shape": {"kind": "half", "min_share": 0.4}, "effect": "kill", "cast": 5, "every": 22, "repeat": 2, "repeat_gap": 3, "alternate": true, "linger": 3}
+    ]
+  },
+  "rain_crown_sovereign": {
+    "mechanics": [
+      {"name": "Downpour", "block": "mark", "hp_min": 0.4, "count": 3, "every": 25, "cast": 5, "effect": {"kind": "burst", "r": 4}, "linger": 8},
+      {"name": "Downpour", "block": "mark", "hp_max": 0.4, "count": 3, "every": 25, "cast": 5, "effect": {"kind": "burst", "r": 4}, "waves": 2, "wave_gap": 3, "linger": 8}
+    ]
+  },
+  "astro_axis": {
+    "mechanics": [
+      {"name": "Orrery Spokes", "block": "sweep", "hp_min": 0.3, "kind": {"shape": "spokes", "count": 3, "width": 1.6, "deg_per_s": 20, "reverse_every": 12, "reverse_warn": 2, "length": 10}},
+      {"name": "Orrery Spokes", "block": "sweep", "hp_max": 0.3, "kind": {"shape": "spokes", "count": 4, "width": 1.6, "deg_per_s": 21, "reverse_every": 12, "reverse_warn": 2, "length": 10}}
+    ]
   }
 }

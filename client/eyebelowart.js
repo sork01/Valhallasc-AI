@@ -24,6 +24,11 @@
     ellipse(g,0,-91,9,36,'#152939');
     for(let x of [-46,46]) ellipse(g,x,-91,5,8,'#f1cf91');
   }};
+  City.art.eye_lens_pillar={box:[110,80,55,65],draw(g) {
+    // The standing lens is drawn from the live boss snapshot; this base remains after it breaks.
+    prism(g,.65,.65,8,'#6f8991','#375663','#203c4b');
+    ellipse(g,0,-10,19,7,'#214756','#a4d9d4',2);
+  }};
   City.art.eye_rune={box:[210,100,105,80],draw(g) {
     ellipse(g,0,0,80,27,'#20516a','#9ad9d8',3);
     ellipse(g,0,0,45,16,'#102b42','#f1d28e',2);

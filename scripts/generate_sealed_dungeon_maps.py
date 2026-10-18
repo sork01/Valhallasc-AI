@@ -177,6 +177,11 @@ def build(plan):
                             dict(kind='eye_lamp', x=x+6, y=y-6, r=0, v=(n+1)%3)]
         objects += [dict(kind='eye_lens', x=48, y=21, r=0, v=0),
                     dict(kind='eye_rune', x=48, y=79, r=0, v=0)]
+        # The gaze table uses these six exact centres as breakable cover. The
+        # scenery is a low base; bossMech paints each live/cracked lens above it.
+        objects += [dict(kind='eye_lens_pillar', x=x, y=y, r=0, v=n % 3)
+                    for n, (x, y) in enumerate([(43, 20), (53, 20), (42, 25),
+                                                 (54, 25), (43, 30), (53, 30)])]
     elif elder:
         points = [(48, 65), (42, 64), (28, 53), (68, 53), (48, 38),
                   (32, 39), (64, 39), (37, 25), (59, 25)]
@@ -445,7 +450,7 @@ def main():
     for zone, plan in zip(zones, PLANS):
         check(zone, plan, world['zones'][plan['parent'] - 1])
     world['zones'] = world['zones'][:FIRST - 1] + zones + existing
-    MAP.write_text(json.dumps(world, indent=2) + '\n')
+    MAP.write_text(json.dumps(world, indent=2, ensure_ascii=False) + '\n')
     if args.previews:
         for zone, plan in zip(zones, PLANS):
             print(preview(zone, plan, args.previews))

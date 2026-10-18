@@ -92,6 +92,7 @@
   "{0}, ${z.range ? ",
   "{0}: a mechanic has no name",
   "{0}: a sign shows one to {1} colours",
+  "{0}: arena bounds are invalid or conflict with inner_arena",
   "{0}: colour {1} is shown twice",
   "{0}: no mechanics",
   "{0}: sanctuary${z.camps?.length ? '' : ",
