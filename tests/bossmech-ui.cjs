@@ -12,7 +12,10 @@ const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextpr
 
 const root = path.resolve(__dirname, '..');
 const release = path.join(root, 'target/release/valhalla-server');
-const binary = process.env.VALHALLA_BINARY || (fs.existsSync(release) ? release : undefined);
+const debug = path.join(root, 'target/debug/valhalla-server');
+// The newer of the two builds: the release binary is the live service's and is only rebuilt at a deploy, so it is often the stale one.
+const newest = [release, debug].filter(f => fs.existsSync(f)).sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs)[0];
+const binary = process.env.VALHALLA_BINARY || newest;
 const dir = fs.mkdtempSync(path.join(root, 'test-results', 'bossmech-'));
 const table = path.join(dir, 'boss-mechanics.txt');
 fs.writeFileSync(table, JSON.stringify({
