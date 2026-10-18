@@ -53,7 +53,7 @@
     "archer": "39c33957abc7b8a7",
     "acolyte": "a6c0354646530d2c",
     "gatewarden": "78ed7f80073fb351",
-    "choir": "d909ffc021883166",
+    "choir": "71caf73e7d1b1b51",
     "colossus": "105f0d600bec805b",
     "hollowking": "2811c940c413fed9"
   },

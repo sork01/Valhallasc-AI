@@ -50,13 +50,23 @@
     }
   },
   "sprites": {
-    "draugr": "22b6ea8f0ae660a8",
-    "angler": "af8cc28597c45be9",
-    "moray": "46305bdb1cafe380",
-    "siren": "d66a31a525a4feed",
-    "shellback": "820c52e9fb7585aa",
-    "kraken": "b1ab100b46e59fea",
-    "hvitserk": "3af48ed590a03d05",
-    "ghostmaw": "e9c012c716196e80"
+    "draugr": "dcb96423502b2fdb",
+    "angler": "4b232709b55021ab",
+    "moray": "4d4baf4ecd280218",
+    "siren": "883c943f806553c2",
+    "shellback": "69b4c8ea8a971fb8",
+    "kraken": "1c2ba4fe984d117e",
+    "hvitserk": "2f1a0a41ed5b1e9c",
+    "ghostmaw": "167b214f07044242"
+  },
+  "tops": {
+    "draugr": 80,
+    "angler": 70,
+    "moray": 45,
+    "siren": 81,
+    "shellback": 50,
+    "kraken": 64,
+    "hvitserk": 80,
+    "ghostmaw": 45
   }
 }

@@ -292,8 +292,9 @@ def choir(clip, n):
     sway = math.sin(n * math.pi / 3) * 1.8 if clip == 'idle' else sw * 2
     # long hair streaming behind and a gown that dissolves into wisps
     hx, hy = 2 + sway * .3, 55
-    a.band([(hx - 13, hy + 6), (hx + 6, hy + 8), (hx + 8, hy - 20), (hx + 4 - sway, hy - 36), (hx - 8 - sway, hy - 30),
-            (hx - 18, hy - 16)], 'hair')
+    a.c((hx - 6, hy + 2), (hx - 16 - sway, hy - 24), 9, 1.6, 'hair')
+    a.c((hx - 1, hy), (hx - 6 - sway, hy - 28), 7, 1.4, 'hair')
+    a.e(hx - 2, hy - 1, 15.4, 14, 'hair')
     rag = [-1, 1, 0, -1, 1][n % 5]
     hem = [(-21, 2), (-16, 9 + rag), (-12, 1), (-7, 10), (-2, 2), (4, 10 - rag), (9, 1), (14, 9), (19, 2)]
     gown = [(-9, 47), (9, 47), (15, 32), (21 + sway, 12)] + [(22 + sway * .5, 3), (-22 + sway * .5, 3), (-21, 12), (-15, 32)]
