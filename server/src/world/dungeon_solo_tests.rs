@@ -413,8 +413,6 @@ fn a_party_of_five_beats_every_dungeon_pack_and_boss() {
 /// fighters have no gear and play themselves through `merc_think` and `boss_play`. Each final boss is fought by both parties
 /// on the same seeds; the hired party must win at least half the runs and never fewer than the bot party minus one.
 /// `DUNGEON_SOLO_DUNGEONS` / `DUNGEON_SOLO_KINDS` / `DUNGEON_SOLO_SEEDS` limit it.
-/// Final bosses the hired party is known to beat less often than a human one (see the comment where it is used).
-const KNOWN_SHORT: [&str; 1] = ["solar_heart"];
 
 #[test]
 #[ignore = "slow: one fight per boss per seed per party"]
@@ -460,24 +458,18 @@ fn a_hired_party_of_five_beats_every_final_boss_about_as_often_as_a_human_party(
                 .collect::<Vec<_>>()
                 .join("; ");
             let short = h * 2 < seeds() || h + 1 < p;
-            // Known: a fallen hired fighter wakes at the door and runs back alone into a fight that has moved on (Solar
-            // Heart's bridge of light kills it on arrival, again and again). `BOSSMECH-DEATH` (the dead stay down until the
-            // fight ends) removes the loop; re-check this list then.
-            let bad = short && !KNOWN_SHORT.contains(&kind.as_str());
             eprintln!(
                 "[hired5] {} L{} {kind}: hired won {h} of {}, bot party {p} ({detail}){}",
                 d.name,
                 d.level,
                 seeds(),
-                if bad {
+                if short {
                     "  <-- HIRED PARTY FALLS SHORT"
-                } else if short {
-                    "  (known short, see KNOWN_SHORT)"
                 } else {
                     ""
                 }
             );
-            if bad {
+            if short {
                 failed.push(format!("{kind}: hired {h}, bots {p} of {}", seeds()));
             }
         }

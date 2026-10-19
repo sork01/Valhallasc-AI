@@ -26,6 +26,8 @@ const BODY: f64 = PLAYER_RADIUS;
 const BRIDGE_WARNING: f64 = 3.;
 /// How long a held body stays held after each refresh; refreshed every tick.
 const HOLD: f64 = 0.2;
+/// New spokes turn this long, dashed, before they hurt.
+const SPOKES_ARM: f64 = 3.;
 
 pub struct BossMech {
     /// Boss kind -> its mechanics. Tests replace it.
@@ -58,6 +60,10 @@ impl BossMech {
             #[cfg(test)]
             spare: vec![],
         }
+    }
+    /// A final boss fight is running in `zone` (a dungeon copy): whoever falls there stays down until it ends.
+    pub(super) fn fight_in(&self, zone: usize) -> bool {
+        self.fights.values().any(|f| f.zone == zone)
     }
 }
 
@@ -160,6 +166,9 @@ struct SpokesLive {
     dir: f64,
     reverse_in: f64,
     warn_left: f64,
+    /// Seconds the new spokes are shown (dashed) and turn but do not hurt yet: they begin at a random angle, possibly
+    /// right where the party stands, and rule 1 says a lethal thing is announced first.
+    arm: f64,
 }
 struct CoverLive {
     cover: Cover,
@@ -898,6 +907,7 @@ impl World {
         p.last_hurt = self.time;
         p.hurt = 0.25;
         p.dead_time = 0.;
+        p.fallen = true;
         p.attack = 0.;
         p.buffs.clear();
         p.stop();
@@ -1456,14 +1466,16 @@ impl World {
                 dir: 1.,
                 reverse_in: reverse_every,
                 warn_left: 0.,
+                arm: SPOKES_ARM,
             });
             self.mech_event(fight.zone, "cast", &m.name, centre, 0.);
         }
         let mut flipped = false;
         let mut warning = false;
-        let angle = {
+        let (angle, armed) = {
             let s = fight.spokes.iter_mut().find(|s| s.mech == i).unwrap();
             s.angle += s.dir * deg_per_s.to_radians() * TICK;
+            s.arm = (s.arm - TICK).max(0.);
             if reverse_every > 0. {
                 let before = s.reverse_in;
                 s.reverse_in -= TICK;
@@ -1480,7 +1492,7 @@ impl World {
                     flipped = true;
                 }
             }
-            s.angle
+            (s.angle, s.arm <= 0.)
         };
         if warning {
             self.mech_event(fight.zone, "cast", &m.name, centre, reverse_warn);
@@ -1498,7 +1510,9 @@ impl World {
                 bm::segment_distance(p, centre, tip) <= width / 2. + BODY
             })
         };
-        self.land(fight, &m.name, Effect::Kill, 0., &hit);
+        if armed {
+            self.land(fight, &m.name, Effect::Kill, 0., &hit);
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------------
@@ -2205,14 +2219,15 @@ impl World {
                 let mut t = 0.;
                 while t <= look + 1e-9 {
                     let turned = sp.angle + sp.dir * deg_per_s.to_radians() * t;
-                    let hit = (0..count).any(|n| {
-                        let a = turned + n as f64 * std::f64::consts::TAU / count as f64;
-                        let tip = Point {
-                            x: centre.x + a.cos() * length,
-                            y: centre.y + a.sin() * length,
-                        };
-                        bm::segment_distance(at, centre, tip) <= width / 2. + BODY
-                    });
+                    let hit = t >= sp.arm
+                        && (0..count).any(|n| {
+                            let a = turned + n as f64 * std::f64::consts::TAU / count as f64;
+                            let tip = Point {
+                                x: centre.x + a.cos() * length,
+                                y: centre.y + a.sin() * length,
+                            };
+                            bm::segment_distance(at, centre, tip) <= width / 2. + BODY
+                        });
                     if hit {
                         note(&def.mechanics[sp.mech].name, t, true);
                         break;
@@ -2474,10 +2489,14 @@ impl World {
                 let mut t = tele_json(
                     0,
                     &def.mechanics[sp.mech].name,
-                    bm::Telegraph::Danger,
+                    if sp.arm > 0. {
+                        bm::Telegraph::Path
+                    } else {
+                        bm::Telegraph::Danger
+                    },
                     &shapes,
-                    0.,
-                    0.,
+                    sp.arm,
+                    if sp.arm > 0. { SPOKES_ARM } else { 0. },
                     false,
                 );
                 t["reversing"] = json!(sp.warn_left > 0.);

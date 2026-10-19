@@ -1095,7 +1095,7 @@
     if (moved) setZone(own.zone || 0);
     const inZone = a => (a.zone || 0) === zone;
     const selectedTarget = hero.target?.id;
-    const wasDead = hero.dead, oldSets = hero.setCounts || {};
+    const wasDead = hero.dead, wasFallen = !!hero.fallen, oldSets = hero.setCounts || {};
     applyActor(hero, own, initial || moved || !!hero.sparkTravel !== !!own.sparkTravel);
     if (!initial && !moved) for (const source of new Set([...Object.keys(oldSets), ...Object.keys(own.setCounts || {})])) {
       const before = oldSets[source] || 0, after = own.setCounts?.[source] || 0;
@@ -1111,6 +1111,7 @@
     window.Quests?.setBells(own.bells || []);
     window.Quests?.update(own.quests || []);
     if (wasDead !== hero.dead) { say(hero.dead ? 'death' : 'respawn'); if (!hero.dead) window.BossMech?.setCause(''); }
+    if (wasFallen !== !!hero.fallen) say(hero.fallen ? 'fallen' : 'rallied');
     if (initial || moved) { cam.x = hero.x; cam.y = hero.y; }
     const signature = JSON.stringify(own.look);
     if (signature !== lastLook) {
@@ -2906,7 +2907,7 @@
     const m = warSpr.meta, [fw, fh] = m.frame, [ax, ay] = m.anchor, [clip, i] = warFrame(h, t), c = m.clips[clip];
     const gx = (h.fx - h.fy) / Math.SQRT2, gy = (h.fx + h.fy) / Math.SQRT2, dir = ((Math.round(-Math.atan2(gx, gy) / (Math.PI / 4)) % 8) + 8) % 8;   // 0 = facing the camera
     g.save();
-    if (h.dead) g.globalAlpha = clamp((3.2 - h.deadT) / .6, 0, 1);
+    if (h.dead && !h.fallen) g.globalAlpha = clamp((3.2 - h.deadT) / .6, 0, 1);
     g.imageSmoothingEnabled = false; g.scale(WAR_K, WAR_K);
     g.drawImage(warSpr.sheet, i * fw, (c.row0 + dir) * fh, fw, fh, -ax, -ay, fw, fh);
     g.restore();

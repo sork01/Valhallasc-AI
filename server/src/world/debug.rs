@@ -134,6 +134,7 @@ impl World {
                 let c = &mut p.character;
                 c.hp = hp.min(c.max_hp());
                 p.dead_time = 0.;
+                p.fallen = false;
                 json!({"hp":c.hp,"maxHp":c.max_hp()})
             }
             DebugCommand::Die => {
@@ -142,6 +143,7 @@ impl World {
                 }
                 p.character.hp = 0.;
                 p.dead_time = 0.;
+                p.fallen = self.boss.fight_in(p.character.zone);
                 p.attack = 0.;
                 p.buffs.clear();
                 p.stop();

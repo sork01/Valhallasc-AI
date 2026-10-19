@@ -139,6 +139,11 @@ impl World {
         } else {
             None
         };
+        // A kill zone that is up (the dark of the Longest Night) is no time to walk off safe ground to light a brazier.
+        let zone_up = fight
+            .live
+            .iter()
+            .any(|l| matches!(l, Live::Zone(z) if z.phase != ZPhase::Linger || z.left > 0.));
         if let Some(spot) = flee {
             play.goal = Some(spot);
             play.hold_fire = true;
@@ -150,7 +155,7 @@ impl World {
             .spread_spot(zone, fight, def, session, me, &mates)
             .is_none()
             && Self::rod_goal(fight, session, me).is_none()
-            && brazier.is_none()
+            && (brazier.is_none() || zone_up)
         {
             // A telegraph is up and this place is outside it: stay out until it has landed.
             play.stay = true;
@@ -188,14 +193,46 @@ impl World {
         let boss = self.slimes[fight.boss].point();
         let reach = (bm::SLOWEST_PLAYER_SPEED * left.max(0.5) + 1.).min(16.);
         let arena = fight.arena;
+        // (a thin line: a hero pressed against a wall fails the full-width test in every direction and would be left
+        // with nowhere to run)
+        let open_at =
+            |p: Point| self.free_ground(zone, p) && self.maps[zone].line_clear(me, p, 0.05);
         let open = |p: Point| {
             p.x >= arena.x0 + 0.5
                 && p.x <= arena.x1 - 0.5
                 && p.y >= arena.y0 + 0.5
                 && p.y <= arena.y1 - 0.5
-                && self.free_ground(zone, p)
-                && self.maps[zone].line_clear(me, p, PLAYER_RADIUS)
+                && open_at(p)
         };
+        // Against a dark that kills outside the braziers' light the way out is a burning brazier, which a ring of samples
+        // misses when it is far off: go to the nearest one that is still lit when the dark falls and that can be reached in
+        // time. (The dead no longer come back to try again, so a fighter left in the dark is a fighter lost.)
+        let mut lights: Vec<Point> = fight
+            .lit
+            .iter()
+            .flat_map(|g| g.points.iter().map(move |l| (l, g.r)))
+            .filter(|(l, _)| l.lit_left > left)
+            .flat_map(|(l, r)| {
+                // a brazier is a solid prop: stand beside it, well inside its light
+                [0.5, 0.75].into_iter().flat_map(move |k| {
+                    (0..12).map(move |i| {
+                        let a = f64::from(i) / 12. * std::f64::consts::TAU;
+                        Point {
+                            x: l.at.x + r * k * a.cos(),
+                            y: l.at.y + r * k * a.sin(),
+                        }
+                    })
+                })
+            })
+            .filter(|p| p.distance(me) <= bm::SLOWEST_PLAYER_SPEED * left * 0.9 && open_at(*p))
+            .collect();
+        lights.sort_by(|a, b| a.distance(me).total_cmp(&b.distance(me)));
+        if let Some(at) = lights
+            .into_iter()
+            .find(|at| self.bot_threat(zone, session, *at, LOOK).is_none())
+        {
+            return Some(at);
+        }
         let mut longest: Option<(f64, f64, Point)> = None;
         let mut found: Option<(f64, Point)> = None;
         let mut found_ring: Option<f64> = None;

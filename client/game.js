@@ -42,7 +42,7 @@
       hunterArmorNames: ['Simple cloth', 'Scout\u2019s Jerkin', 'Wildwarden Coat'], hunterWeaponNames: ['Empty hands', 'Hunter\u2019s Shortbow', 'Wildwarden Longbow'],
       areaName: 'Greenmeadow Field', gold: 'gold', slain: 'enemies', paused: 'Paused', resume: 'Resume',
       fieldHint: 'Click to move or attack · WASD to walk · Space to swing · Esc for menu',
-      defeated: 'Defeated!', defeatedSub: 'You wake up back at the start…', lvl: 'Lv',
+      defeated: 'Defeated!', defeatedSub: 'You wake up back at the start…', defeatedWait: 'You have fallen. Wait for the fight to end.', lvl: 'Lv',
       name: 'Name', namePh: 'Your name', random: 'Random name',
       hairBeard: 'Hair & Beard', skin: 'Skin', armor: 'Armor', armorNames: ['Crimson', 'Azure', 'Verdant'], runes: 'Runes',
       tip: 'Tip: click the Warrior’s axe, mug, head, beard or fish!',
@@ -79,7 +79,7 @@
       hunterArmorNames: ['기본 옷', '정찰병의 조끼', '와일드워든 코트'], hunterWeaponNames: ['맨손', '사냥꾼의 단궁', '와일드워든 장궁'],
       areaName: '푸른 초원', gold: '골드', slain: '적', paused: '일시정지', resume: '계속하기',
       fieldHint: '클릭: 이동·공격 · WASD: 걷기 · 스페이스: 휘두르기 · Esc: 메뉴',
-      defeated: '쓰러졌다!', defeatedSub: '시작 지점에서 깨어납니다…', lvl: 'Lv',
+      defeated: '쓰러졌다!', defeatedSub: '시작 지점에서 깨어납니다…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', lvl: 'Lv',
       name: '이름', namePh: '이름 입력', random: '무작위 이름',
       hairBeard: '머리·수염', skin: '피부', armor: '갑옷', armorNames: ['진홍', '청람', '초록'], runes: '룬',
       tip: '팁: 워리어의 도끼, 맥주잔, 머리, 수염, 물고기를 눌러 보세요!',
@@ -818,6 +818,11 @@
     const labels = { uncommon: 'green', rare: 'blue', epic: 'purple', legendary: 'orange' };
     if (!labels[rarity]) return;
     rarePickupBox.dataset.rarity = rarity;
+    // Down in a boss fight: the line says to wait for the fight instead of promising to wake at the start.
+    if (name === 'fallen' || name === 'rallied' || name === 'respawn') {
+      const wait = name === 'fallen';
+      $('dead-wait').hidden = !wait; $('dead-sub').hidden = wait;
+    }
     rarePickupBox.querySelector('b').textContent = `You picked up a ${labels[rarity]} item!`;
     rarePickupBox.querySelector('span').textContent = event.name || item?.name || '';
     rarePickupBox.hidden = false;

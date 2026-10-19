@@ -774,49 +774,61 @@ fn a_wall_from_the_north_and_one_from_the_east_each_have_their_own_gap() {
 }
 
 const SPOKES: &str = r#"{"mechanics":[
-    {"name":"Orrery Spokes","block":"sweep","hp_min":0.3,"kind":{"shape":"spokes","count":3,"width":1.6,"deg_per_s":20,"reverse_every":6,"reverse_warn":2,"length":12}},
-    {"name":"Orrery Spokes","block":"sweep","hp_max":0.3,"kind":{"shape":"spokes","count":4,"width":1.6,"deg_per_s":28,"reverse_every":6,"reverse_warn":2,"length":12}}]}"#;
+    {"name":"Orrery Spokes","block":"sweep","hp_min":0.3,"kind":{"shape":"spokes","count":3,"width":1.6,"deg_per_s":20,"reverse_every":9,"reverse_warn":2,"length":12}},
+    {"name":"Orrery Spokes","block":"sweep","hp_max":0.3,"kind":{"shape":"spokes","count":4,"width":1.6,"deg_per_s":28,"reverse_every":9,"reverse_warn":2,"length":12}}]}"#;
 
 #[test]
 fn spokes_turn_kill_on_touch_reverse_after_a_warning_and_escalate_below_thirty_per_cent() {
     let mut r = rig(SPOKES, 2);
     r.run(0.5);
-    let view = r.view();
-    let spokes = view["tele"][0]["shapes"].as_array().unwrap().clone();
-    assert_eq!(spokes.len(), 3);
-    let tip = |s: &Value| Point {
-        x: s["x2"].as_f64().unwrap(),
-        y: s["y2"].as_f64().unwrap(),
-    };
-    let centre = Point {
-        x: s_f(&spokes[0], "x1"),
-        y: s_f(&spokes[0], "y1"),
-    };
-    assert_eq!(centre, r.arena.centre());
     // Standing on a spoke is death; standing mid-way between two is not (yet). The room has pillars, so look along
     // the spoke for a free spot that is really on it, and between the spokes for one that is really clear.
-    let angle0 = (tip(&spokes[0]).y - centre.y).atan2(tip(&spokes[0]).x - centre.x);
-    let free = |r: &Rig, p: Point| {
-        let mut q = p;
-        r.w.maps[r.zone].collide(&mut q, PLAYER_RADIUS);
-        q.distance(p) < 1e-6
+    let place = |r: &mut Rig| -> (Point, Point) {
+        let view = r.view();
+        let spokes = view["tele"][0]["shapes"].as_array().unwrap().clone();
+        assert_eq!(spokes.len(), 3);
+        let tip = |s: &Value| Point {
+            x: s["x2"].as_f64().unwrap(),
+            y: s["y2"].as_f64().unwrap(),
+        };
+        let centre = Point {
+            x: s_f(&spokes[0], "x1"),
+            y: s_f(&spokes[0], "y1"),
+        };
+        assert_eq!(centre, r.arena.centre());
+        let angle0 = (tip(&spokes[0]).y - centre.y).atan2(tip(&spokes[0]).x - centre.x);
+        let free = |r: &Rig, p: Point| {
+            let mut q = p;
+            r.w.maps[r.zone].collide(&mut q, PLAYER_RADIUS);
+            q.distance(p) < 1e-6
+        };
+        let at_angle = |a: f64, d: f64| Point {
+            x: centre.x + a.cos() * d,
+            y: centre.y + a.sin() * d,
+        };
+        let on = (50..110)
+            .map(|n| at_angle(angle0, n as f64 / 10.))
+            .find(|p| free(r, *p))
+            .expect("a free spot on the spoke");
+        r.put(1, on.x, on.y);
+        let between = (50..110)
+            .map(|n| at_angle(angle0 + std::f64::consts::PI / 3., n as f64 / 10.))
+            .find(|p| free(r, *p))
+            .expect("a free spot between spokes");
+        r.put(2, between.x, between.y);
+        assert_eq!(r.at(2), between);
+        (on, between)
     };
-    let at_angle = |a: f64, d: f64| Point {
-        x: centre.x + a.cos() * d,
-        y: centre.y + a.sin() * d,
-    };
-    let on = (50..110)
-        .map(|n| at_angle(angle0, n as f64 / 10.))
-        .find(|p| free(&r, *p))
-        .expect("a free spot on the spoke");
-    r.put(1, on.x, on.y);
-    let between = (50..110)
-        .map(|n| at_angle(angle0 + std::f64::consts::PI / 3., n as f64 / 10.))
-        .find(|p| free(&r, *p))
-        .expect("a free spot between spokes");
-    r.put(2, between.x, between.y);
-    assert_eq!(r.at(2), between);
+    // New spokes are shown dashed and turn for three seconds before they hurt: nobody dies on the spot where they appear.
+    assert_eq!(r.view()["tele"][0]["tele"], "dashed line");
+    assert!((r.view()["tele"][0]["left"].as_f64().unwrap() - 2.5).abs() < 0.1);
+    place(&mut r);
     r.run(0.1);
+    assert!(r.alive(1) && r.alive(2), "the spokes are not lethal yet");
+    r.run(2.3);
+    let (on, between) = place(&mut r);
+    r.run(0.2);
+    assert_eq!(r.view()["tele"][0]["tele"], "red", "armed");
     assert!(
         !r.alive(1) && r.alive(2),
         "on {on:?} between {between:?} hp {} {} spokes {}",
@@ -837,7 +849,7 @@ fn spokes_turn_kill_on_touch_reverse_after_a_warning_and_escalate_below_thirty_p
         (turned(a0, a1).to_degrees() - 60.).abs() < 1.5,
         "20 degrees a second, whichever side of the atan2 wrap"
     );
-    // At 4 s of the 6 the gear warning shows; at 6 s it turns the other way.
+    // At 7 s of the 9 the gear warning shows; at 9 s it turns the other way.
     r.run(1.2);
     assert_eq!(r.view()["tele"][0]["reversing"], true);
     assert!(
@@ -848,7 +860,7 @@ fn spokes_turn_kill_on_touch_reverse_after_a_warning_and_escalate_below_thirty_p
         "the two-second reversal warning also sounds before the turn"
     );
     r.put(2, 108., 36.);
-    r.run(1.5);
+    r.run(1.8);
     let a2 = angle(&r);
     r.run(1.0);
     let a3 = angle(&r);
@@ -2903,4 +2915,214 @@ fn a_charged_fighter_goes_to_a_ready_rod_and_a_dark_brazier_gets_a_holder() {
         )
     );
     assert!(one.hold_fire && two.hold_fire);
+}
+
+// --- the fallen stay down (BOSSMECH-DEATH) ---------------------------------------------------------------------------
+
+/// Two heroes next to the king, who stands and chases (no blows), and a fight already running.
+fn fallen_rig() -> Rig {
+    let mut r = rig(CHORUS, 2);
+    let boss = r.w.slimes[r.boss].point();
+    r.put(1, boss.x, boss.y + 3.);
+    r.put(2, boss.x + 2., boss.y + 3.);
+    for _ in 0..20 {
+        r.w.step();
+    }
+    assert!(r.w.boss.fights.contains_key(&r.boss), "the fight is on");
+    r
+}
+fn steps(r: &mut Rig, seconds: f64) {
+    for _ in 0..(seconds / TICK).round() as usize {
+        r.w.step();
+    }
+}
+/// Kills `session` by an enemy's blow, the way a fight does.
+fn fell(r: &mut Rig, session: u64) {
+    let at = r.at(session);
+    r.w.hurt_player(session, 1e9, at);
+    assert!(!r.alive(session));
+}
+
+#[test]
+fn a_hero_who_falls_in_a_boss_fight_stays_down_while_it_lasts() {
+    let mut r = fallen_rig();
+    fell(&mut r, 2);
+    steps(&mut r, 20.);
+    assert!(
+        !r.alive(2),
+        "twenty seconds on: still down, not at the door"
+    );
+    assert!(r.alive(1) && r.w.boss.fights.contains_key(&r.boss));
+    assert!(r.w.players[&2].fallen);
+    let mine = r.w.players[&2].snapshot();
+    assert_eq!(
+        (mine["dead"].as_bool(), mine["fallen"].as_bool()),
+        (Some(true), Some(true))
+    );
+    assert!(
+        r.at(2).distance(r.w.maps[r.zone].spawn) > 5.,
+        "it did not move them to the door"
+    );
+    assert_eq!(r.w.players[&1].snapshot()["fallen"], false);
+}
+
+#[test]
+fn the_fallen_wake_at_the_door_when_the_boss_dies() {
+    let mut r = fallen_rig();
+    fell(&mut r, 2);
+    steps(&mut r, 5.);
+    assert!(!r.alive(2));
+    r.hit_boss(1, 1e12);
+    steps(&mut r, 1.);
+    assert!(r.w.slimes[r.boss].dead && r.w.boss.fights.is_empty());
+    assert!(
+        !r.alive(2),
+        "the usual three seconds start when the fight ends"
+    );
+    steps(&mut r, 3.);
+    assert!(r.alive(2), "the kill ended the fight");
+    assert!(!r.w.players[&2].fallen);
+    assert!(r.at(2).distance(r.w.maps[r.zone].spawn) < 5.);
+}
+
+#[test]
+fn the_fallen_wake_when_the_party_is_wiped_and_the_boss_walks_home() {
+    let mut r = fallen_rig();
+    fell(&mut r, 2);
+    steps(&mut r, 5.);
+    fell(&mut r, 1);
+    steps(&mut r, 0.5);
+    assert!(
+        r.w.boss.fights.is_empty(),
+        "nobody left to fight: the boss lets go"
+    );
+    assert!(
+        !r.alive(1) && !r.alive(2),
+        "nobody wakes before the last one is ready: the first cannot pull the boss back onto the rest"
+    );
+    steps(&mut r, 3.);
+    assert!(r.alive(1) && r.alive(2), "both wake together");
+}
+
+#[test]
+fn a_fallen_hero_is_not_held_by_a_fight_that_never_ends() {
+    let mut r = fallen_rig();
+    fell(&mut r, 2);
+    r.w.players.get_mut(&2).unwrap().dead_time = FALLEN_HOLD_MAX - 1.;
+    steps(&mut r, 0.5);
+    assert!(!r.alive(2));
+    steps(&mut r, 4.);
+    assert!(
+        r.alive(2) && r.w.boss.fights.contains_key(&r.boss),
+        "the cap let them go"
+    );
+}
+
+#[test]
+fn a_hero_who_falls_before_the_boss_wakes_gets_up_as_before() {
+    let mut r = rig(CHORUS, 1);
+    r.w.slimes[r.boss].state = "idle".into();
+    r.w.slimes[r.boss].target = None;
+    fell(&mut r, 1);
+    steps(&mut r, 4.);
+    assert!(r.w.boss.fights.is_empty());
+    assert!(r.alive(1), "no fight, so the old three seconds");
+}
+
+#[test]
+fn leaving_the_game_while_fallen_works_and_the_copy_resets() {
+    let mut r = fallen_rig();
+    fell(&mut r, 2);
+    steps(&mut r, 3.);
+    r.w.leave(2);
+    r.w.leave(1);
+    steps(&mut r, 0.2);
+    assert!(r.w.boss.fights.is_empty() && r.w.players.is_empty());
+}
+
+#[test]
+fn a_hired_fighter_who_falls_stays_down_too() {
+    use crate::world::ttk::hire_mercenaries;
+    let mut r = rig(CHORUS, 1);
+    let boss = r.w.slimes[r.boss].point();
+    let at = r.put(1, boss.x, boss.y + 3.);
+    hire_mercenaries(&mut r.w, &[Class::Mage, Class::Priest], r.zone, at);
+    for _ in 0..20 {
+        r.w.step();
+    }
+    assert!(r.w.boss.fights.contains_key(&r.boss), "the fight is on");
+    let merc =
+        r.w.players
+            .iter()
+            .find(|(_, p)| p.merc.is_some())
+            .map(|(s, _)| *s)
+            .unwrap();
+    fell(&mut r, merc);
+    steps(&mut r, 15.);
+    assert!(!r.alive(merc), "the hired fighter lies where they fell");
+    assert!(r.w.players[&merc].fallen);
+    assert!(r.alive(1));
+    // the hirer falls as well and the other hired fighter with them: nobody is left, the boss lets go, all wake
+    let others: Vec<u64> = r.w.players.keys().copied().collect();
+    for s in others {
+        fell(&mut r, s);
+    }
+    steps(&mut r, 0.5);
+    assert!(
+        r.w.boss.fights.is_empty(),
+        "nobody left to fight: the boss lets go"
+    );
+    assert!(
+        r.w.players.values().all(|p| p.character.hp <= 0.),
+        "nobody wakes before the last one is ready"
+    );
+    steps(&mut r, 3.);
+    assert!(
+        r.w.players.values().all(|p| p.character.hp > 0.),
+        "and then everyone wakes together"
+    );
+}
+
+// --- the fighters who are not at a keyboard, now that a death lasts (BOSSMECH-DEATH) -----------------------------------------
+
+#[test]
+fn a_fighter_far_from_the_light_runs_to_a_burning_brazier_when_the_dark_is_coming() {
+    let mut r = rig(NIGHT, 2);
+    r.put(1, 112., 12.);
+    r.put(2, 116., 30.);
+    r.run(3.4);
+    assert_eq!(r.view()["tele"][0]["lit"], true, "one brazier burns");
+    r.run(6.);
+    assert!(r.view()["cast"].is_object(), "the dark is on its way");
+    let play = r.w.boss_play(2).expect("a fighter in a fight");
+    let goal = play.goal.expect("the way out of the dark");
+    assert!(
+        goal.distance(Point { x: 112., y: 12. }) < 2.5,
+        "the goal is inside the burning brazier's light, got {goal:?}"
+    );
+    assert!(play.hold_fire);
+    // and at that goal nothing hurts
+    assert!(r.w.bot_threat(r.zone, 2, goal, 0.).is_none());
+}
+
+#[test]
+fn a_fighter_standing_in_the_light_stays_there_while_the_dark_is_up_instead_of_going_to_light_another()
+ {
+    let mut r = rig(NIGHT, 2);
+    r.put(1, 112., 12.);
+    r.put(2, 113.8, 12.);
+    r.run(3.4);
+    r.run(6.);
+    assert!(r.view()["cast"].is_object(), "the dark is on its way");
+    assert!(
+        r.w.bot_threat(r.zone, 2, r.at(2), 0.).is_none(),
+        "inside the light"
+    );
+    let play = r.w.boss_play(2).expect("a fighter in a fight");
+    assert!(
+        play.goal.is_none(),
+        "no walk out into the dark: {:?}",
+        play.goal
+    );
+    assert!(play.stay);
 }

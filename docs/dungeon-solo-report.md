@@ -55,7 +55,7 @@ Tools: `ENRAGE_FILE=<path>` (test builds) and `scripts/dungeon-calibrate.py --en
 | Elder Heart | 4/4 | 4/4 | Solstice Heart | 4/4 | 4/4 |
 | Pavilion Sovereign | 4/4 | 4/4 | Rain Crown | 4/4 | 4/4 |
 
-Fifteen of sixteen meet the rule. **Solar Heart** does not (1 of 4; 2 of 8 in a longer run) and is listed in `KNOWN_SHORT` in the test. Cause, from the fight trace: a hired fighter who falls wakes at the door, runs 40 to 60 tiles back alone and arrives into bodies that have moved; Twin Suns' bridge of light (lethal within 1.1 of the line between the bodies, which chase) kills the whole party again and again, and a wiped party ends the run (36 to 49 s, boss at 1 to 14 percent). `BOSSMECH-DEATH` (the dead stay down until the fight ends) removes the run-in loop: re-run this table after it.
+Fifteen of sixteen meet the rule. **Solar Heart** does not (1 of 4; 2 of 8 in a longer run) and is listed in `KNOWN_SHORT` in the test. Cause, from the fight trace: a hired fighter who falls wakes at the door, runs 40 to 60 tiles back alone and arrives into bodies that have moved; Twin Suns' bridge of light (lethal within 1.1 of the line between the bodies, which chase) kills the whole party again and again, and a wiped party ends the run (36 to 49 s, boss at 1 to 14 percent). `BOSSMECH-DEATH` (the dead stay down until the fight ends) removed the run-in loop; the re-run is in the last section (Solar Heart 3 of 4).
 
 What the check changed:
 
@@ -72,3 +72,22 @@ Measured with the same tools:
 - Priests out-heal every boss in the sim (hero health 2.0k to 9.9k, boss hits of 6k to 8k nominal).
 
 So **no health/damage pair makes a boss kill a lone purple+5 player while a green party of five still wins**. A mechanic is needed (for example a soft enrage: after N seconds the boss's damage ramps, which a party's burn-down beats and a lone fighter cannot), or the rule has to say "a lone player cannot kill it within 180 s" instead of "the boss kills a lone player". Boss and mob power for bosses is unchanged.
+
+## The fallen stay down (2026-10-19, `BOSSMECH-DEATH`)
+
+A hero or hired fighter who dies while a final boss fight runs stays down until it ends (boss dead, or nobody left and the boss walks home), then wakes at the door 3.2 s later, together with everyone else who is down. The harness no longer puts a fallen bot back after 20 s, and `KNOWN_SHORT` is gone from the hired-party test. Rule 10 of `docs/boss-mechanics.md`.
+
+Same seeds, four each, the shipped table:
+
+- **Bot party of five, all sixteen: 4 of 4** (falls only on Solar Heart 1-2, Eye Below 1-2, Bloom Heart 0-2). Times unchanged from the party table in the sections above.
+- **Hired party, all sixteen: meets the rule** (wins at least half and not fewer than the bot party minus one): 14 bosses 4 of 4, Thunder Heart 3 of 4, Solar Heart 3 of 4 (it was 1 of 4 with the run-back).
+- **A lone player still dies** to every boss (`a_dungeon_boss_kills_a_lone_player`, two seeds, green and purple): ok. A death now ends a lone fight at once, so the enrage starts were left as they are (a re-derivation would only tighten them; the party wins still sit inside `1.06 x slowest win + 2`).
+
+What the permanent death exposed (neither was visible while the fallen came back):
+
+| Boss | Before the fix | Cause | Fix |
+| --- | --- | --- | --- |
+| Solstice Heart | 0 of 4, all five fell at the first Night | a fighter pressed against a wall passed no full-width line test, so the flee search found nothing; a brazier 15 tiles off was missed by a ring of 24 angles; fighters on safe ground walked off to light another brazier while the dark was up | the nearest burning brazier is the goal, thin line test, no walking off while a kill zone is up: 4 of 4, 0 falls |
+| Axis | hired 2 of 4, four dead in the first tick | new spokes begin at a random angle and were lethal at once | new spokes are dashed and harmless for 3 s (`SPOKES_ARM`): hired 4 of 4 |
+
+Fall counts of the hired party, per boss (four seeds): Hollowking 0, Choirmother 0-3, Coral Regent 0, Hierophant 0-3, Moonwell Echo 0, Eye Below 0-4, Elder Heart 0-4, Pavilion 0-4, Rain Crown 0, Worldseed 0-4, Axis 0-3, Thunder Heart 0-9, Bloom Heart 0-3, Solar Heart 1-9, Amber Memory 0, Solstice Heart 0-4.

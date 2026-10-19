@@ -556,7 +556,7 @@
       else if (h.moving) { clip = 'walk'; i = Math.floor(h.walk) % C.walk.n; }
       const dir = MageSprite.direction(h.fx, h.fy), [ax, ay] = this.meta.anchor;
       g.save(); g.imageSmoothingEnabled = false;
-      if (h.dead) g.globalAlpha *= Math.max(0, Math.min(1, (3.2 - h.deadT) / .6));
+      if (h.dead && !h.fallen) g.globalAlpha *= Math.max(0, Math.min(1, (3.2 - h.deadT) / .6));
       g.scale(scale, scale);
       const mark = !h.dead && dungeonMark(this.equipment);
       if (mark) dungeonAura(g, mark, t);

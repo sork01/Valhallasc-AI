@@ -120,6 +120,8 @@ const DAMAGE_TAKEN_SCALE: f64 = 0.25;
 /// A player cannot take another portal for this long after arriving. Arrival points sit outside every gate, so this only
 /// guards against bouncing; it must stay below the walk from an arrival point to its gate (about 0.65 s).
 const PORTAL_DELAY: f64 = 0.5;
+/// The longest a fallen hero is held down by a boss fight that has not ended (`BOSSMECH-DEATH`), seconds.
+const FALLEN_HOLD_MAX: f64 = 600.;
 /// Who is joining: an anonymous guest (a server-issued key, or a look for a new character) or a logged-in account
 /// (a character it owns, or a look for a new one). The account id comes from a checked login session.
 pub enum Identity {
@@ -175,6 +177,8 @@ struct Player {
     last_hurt: f64,
     combat_left: f64,
     dead_time: f64,
+    /// Down in a zone where a final boss fight is running: stays down until it ends (`BOSSMECH-DEATH`).
+    fallen: bool,
     dash: f64,
     dash_cd: f64,
     dash_direction: Point,
@@ -272,6 +276,7 @@ impl Player {
             last_hurt: -99.,
             combat_left: 0.,
             dead_time: 0.,
+            fallen: false,
             dash: 0.,
             dash_cd: 0.,
             dash_direction: Point::default(),
@@ -312,7 +317,7 @@ impl Player {
             "xp":c.xp,"xpNeed":c.xp_need(),"gold":c.gold,"kills":c.kills,"quests":c.quests,"inventory":c.inventory,"equipment":c.equipment,"gearInstances":c.gear_instances,"bags":c.bags,"bagCapacity":c.bag_capacity(),"bagUsed":c.bag_used(),"fx":self.face.x,"fy":self.face.y,
             "attributes":c.attributes,"gearAttributes":c.gear_attributes(),"passiveAttributes":skills::passive_bonus(c.look.class, c.level),"statPoints":c.stat_points(),"attack":c.stats().0,"defense":c.stats().1,"critChance":c.crit_chance(),"attackCooldown":c.attack_cooldown(),"cooldownReduction":1.-c.cooldown_multiplier(),"dodgeChance":c.dodge_chance(),"hitChance":c.hit_chance(),
             "moving":self.moving,"walk":self.walk,"atkT":self.attack,"atkCd":self.cooldown,"hurtT":self.hurt,
-            "dead":c.hp<=0.,"deadT":self.dead_time,"dashT":self.dash,"dashCd":self.dash_cd,
+            "dead":c.hp<=0.,"deadT":self.dead_time,"fallen":c.hp<=0. && self.fallen,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
             "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"frozen":self.frozen,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,"reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"rebirthTiers":c.rebirth_tiers,"rebirthPerks":c.rebirth_perks(),"mountTint":c.mount_tint,
             "setCounts":c.set_counts(),"setCd":self.set_cd,
@@ -2634,7 +2639,16 @@ impl World {
             p.moving = false;
             p.dead_time += TICK;
             p.stop();
-            if p.dead_time >= 3.2 {
+            // Whoever fell while a final boss fight ran in this zone lies there until it ends: the boss dies, or the
+            // party is beaten and the boss walks home. Then the usual three seconds start for everyone together, so
+            // the first to wake cannot pull the boss back onto the rest. The cap keeps a fight that never ends from
+            // stranding anyone.
+            if p.fallen && (!self.boss.fight_in(p.character.zone) || p.dead_time >= FALLEN_HOLD_MAX)
+            {
+                p.fallen = false;
+                p.dead_time = 0.;
+            }
+            if p.dead_time >= 3.2 && !p.fallen {
                 let map = &self.maps[p.character.zone];
                 let mut point = p.ambient.as_ref().map_or(map.spawn, ambient::Ambient::hub);
                 map.collide(&mut point, PLAYER_RADIUS);
@@ -2644,6 +2658,7 @@ impl World {
                 p.character.reset_resource();
                 p.combat_left = 0.;
                 p.dead_time = 0.;
+                p.fallen = false;
                 p.attack = 0.;
                 p.cooldown = 0.;
                 if let Some(brain) = p.ambient.as_mut() {
@@ -4192,6 +4207,7 @@ impl World {
         let dead = p.character.hp <= 0.;
         if dead {
             p.dead_time = 0.;
+            p.fallen = self.boss.fight_in(p.character.zone);
             p.attack = 0.;
             p.buffs.clear();
             p.stop();

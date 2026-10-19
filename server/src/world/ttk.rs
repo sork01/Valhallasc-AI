@@ -806,7 +806,7 @@ pub fn run_hired_party_pack_once(
 
 /// Rents `mercs` for the hirer (session 1) at the Meeting Stone, then sets the hirer at `start` in `zone` with the hired
 /// fighters on free ground beside them.
-fn hire_mercenaries(w: &mut World, mercs: &[Class], zone: usize, start: Point) {
+pub(super) fn hire_mercenaries(w: &mut World, mercs: &[Class], zone: usize, start: Point) {
     let stone_zone = w
         .maps
         .iter()
@@ -941,7 +941,6 @@ fn party_pack_fight(
     };
     let left = |w: &World| ids.iter().map(|&i| w.slimes[i].hp.max(0.)).sum::<f64>() / total_hp;
     let mut aimed = vec![usize::MAX; members.len()];
-    let mut away_since: Vec<Option<f64>> = vec![None; members.len()];
     let start_time = w.time;
     let cap = case.cap.unwrap_or_else(|| cap_for(case.rotation));
     let mut killed = false;
@@ -1007,39 +1006,6 @@ fn party_pack_fight(
                 continue;
             }
             anyone_alive = true;
-            // A fighter who fell wakes at the dungeon's door and runs back like anyone; the harness gives the run 20 s.
-            if w.players[&session].character.point().distance(home) > 40. {
-                let since = *away_since[n].get_or_insert(w.time);
-                if w.time - since >= 20. {
-                    let mut start = start_point(&w, zone, home);
-                    // not onto a telegraph that is up (a lethal bridge, a ring): the way back ends on safe ground
-                    if w.bot_threat(zone, session, start, 0.).is_some() {
-                        'search: for distance in [8., 10., 12., 6.] {
-                            for k in 0..16 {
-                                let a = k as f64 / 16. * std::f64::consts::TAU;
-                                let mut p = Point {
-                                    x: home.x + a.cos() * distance,
-                                    y: home.y + a.sin() * distance,
-                                };
-                                let wanted = p;
-                                w.maps[zone].collide(&mut p, PLAYER_RADIUS);
-                                if p.distance(wanted) < 0.01
-                                    && w.maps[zone].line_clear(home, p, 0.3)
-                                    && w.bot_threat(zone, session, p, 0.).is_none()
-                                {
-                                    start = p;
-                                    break 'search;
-                                }
-                            }
-                        }
-                    }
-                    let c = &mut w.players.get_mut(&session).unwrap().character;
-                    (c.x, c.y) = (start.x, start.y);
-                    away_since[n] = None;
-                }
-                continue;
-            }
-            away_since[n] = None;
             let me = w.players[&session].character.point();
             let Some(mut near) =
                 ids.iter()
