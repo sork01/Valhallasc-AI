@@ -411,6 +411,40 @@ impl World {
         }
     }
 
+    /// The mercenaries' play for a fighter who is not a mercenary: the test harness's hirer and party use it, so every
+    /// fighter in a fight plays by the same code. Fights `chosen` (or what the boss brain says) with the class's skills
+    /// through `ai_combat`, steps out of telegraphs, holds fire when asked, and leaves walking and swinging to the engine.
+    #[cfg(test)]
+    pub(super) fn auto_play(&mut self, session: u64, mate_sessions: &[u64], chosen: Option<usize>) {
+        let play = self.boss_play(session);
+        let chosen = play.as_ref().and_then(|b| b.target).or(chosen);
+        let hold_fire = play.as_ref().is_some_and(|b| b.hold_fire);
+        self.ai_combat(
+            session,
+            mate_sessions,
+            if hold_fire { None } else { chosen },
+        );
+        let Some(p) = self.players.get_mut(&session) else {
+            return;
+        };
+        if let Some(goal) = play.as_ref().and_then(|b| b.goal) {
+            p.target = None;
+            p.goal = Some(goal);
+        } else if play.as_ref().is_some_and(|b| b.stay) {
+            p.target = None;
+            p.goal = None;
+            p.input = Point::default();
+        } else if let Some(id) = chosen {
+            if p.target != Some(id) {
+                p.target = Some(id);
+                p.goal = None;
+                p.input = Point::default();
+            }
+        } else {
+            p.target = None;
+        }
+    }
+
     /// Combat decisions shared by hired mercenaries and independent adventurers. Movement and ownership stay separate.
     pub(super) fn ai_combat(&mut self, session: u64, mate_sessions: &[u64], chosen: Option<usize>) {
         let Some(p) = self.players.get(&session) else {

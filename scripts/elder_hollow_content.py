@@ -17,7 +17,7 @@ ENEMIES = [
          stats=[1750000, 10200, 2.5, 2.1], profile=[.9, 2.0, 0, 14],
          ranged=[14, 10, '#f3d59c', 1.1, 3, .28], slam=0, melee=0, boss=True),
     dict(kind='elder_heart', name='Heart of the Elder', art='heart', color='#b5d18d',
-         stats=[2750000, 15500, 2.0, 2.8], profile=[1.1, 2.1, 7, 16],
+         stats=[4700000, 15500, 2.0, 2.8], profile=[1.1, 2.1, 7, 16],
          ranged=[14, 11, '#d3f2a8', 1.2, 5, .3], slam=4.5, melee=4.7, boss=True),
 ]
 

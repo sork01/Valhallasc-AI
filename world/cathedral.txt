@@ -241,7 +241,7 @@
     "name": "Elyss, Mother of the Bound Choir",
     "level": 40,
     "stats": [
-      250000,
+      290000,
       1495,
       2.4,
       2
@@ -363,7 +363,7 @@
     "name": "Queen Avariel, the Coral Regent",
     "level": 45,
     "stats": [
-      400000,
+      450000,
       1950,
       2.6,
       2.1
@@ -485,7 +485,7 @@
     "name": "High Hierophant Vael, Heart of the Tide",
     "level": 50,
     "stats": [
-      480000,
+      1600000,
       2275,
       2.6,
       2.2

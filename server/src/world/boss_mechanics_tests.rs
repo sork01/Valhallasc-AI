@@ -1384,6 +1384,201 @@ fn the_bridge_between_the_bodies_kills_what_stands_on_it() {
     assert_eq!(causes(&r.events(1)), vec!["Twin Suns".to_string()]);
 }
 
+#[test]
+fn a_body_that_rises_brings_the_bridge_back_with_its_warning() {
+    let json = SUNS.replace(r#""bridge":0"#, r#""bridge":1"#);
+    let mut r = rig(&json, 2);
+    let partner = r.sleepers("cinder", &[(116., 30.)])[0];
+    r.set_boss_share(0.58);
+    r.run(0.1);
+    let (a, b) = (r.w.slimes[r.boss].point(), r.w.slimes[partner].point());
+    let mid = Point {
+        x: (a.x + b.x) / 2.,
+        y: (a.y + b.y) / 2.,
+    };
+    // the boss falls alone: no bridge while it lies there
+    r.w.hit_slime(r.boss, 1, 1e9, false);
+    assert!(r.fight().downed.contains_key(&r.boss));
+    r.put(1, mid.x, mid.y);
+    r.run(9.9);
+    assert!(r.alive(1), "no bridge while a body is down");
+    r.run(0.5);
+    assert!(r.fight().downed.is_empty(), "it has risen");
+    r.run(1.);
+    assert!(r.alive(1), "the bridge is warned again before it kills");
+    r.run(3.);
+    assert!(!r.alive(1), "and kills after the warning");
+}
+
+#[test]
+fn a_fighter_behind_one_body_walks_round_the_bridge_to_reach_the_other() {
+    let json = SUNS.replace(r#""bridge":0"#, r#""bridge":0.8"#);
+    let mut r = rig(&json, 2);
+    let partner = r.sleepers("cinder", &[(116., 30.)])[0];
+    r.set_boss_share(0.58);
+    r.run(0.1);
+    // the fighter stands beyond the boss, the partner is the body with more health: the far side of the partner is
+    // across the whole bridge
+    r.w.slimes[partner].hp = r.w.slimes[r.boss].hp * 2.;
+    let (a, b) = (r.w.slimes[r.boss].point(), r.w.slimes[partner].point());
+    let dir = Point {
+        x: (b.x - a.x) / a.distance(b),
+        y: (b.y - a.y) / a.distance(b),
+    };
+    let me = r.put(1, a.x - dir.x * 3., a.y - dir.y * 3.);
+    r.put(2, a.x - dir.x * 5., a.y - dir.y * 5.);
+    let goal = r.w.boss_play(1).and_then(|p| p.goal);
+    let goal = goal.expect("a place to go");
+    let through = (0..=20).any(|i| {
+        let f = f64::from(i) / 20.;
+        let p = Point {
+            x: me.x + (goal.x - me.x) * f,
+            y: me.y + (goal.y - me.y) * f,
+        };
+        crate::bossmech::segment_distance(p, a, b) <= 1.1
+    });
+    assert!(
+        !through,
+        "the way from {me:?} to {goal:?} does not cross the bridge {a:?} {b:?}"
+    );
+}
+
+const MERGE: &str = r#"{"mechanics":[{"name":"Twin Suns","block":"split","hp":0.6,"tag":"cinder","revive_after":10,"survivor_bonus":0.5,"bridge":1,"merge_hp":0.25,"merge_defense":0.5}]}"#;
+
+#[test]
+fn when_a_twin_falls_the_two_join_into_one_boss_on_a_quarter_health_with_more_defense() {
+    let mut r = rig(MERGE, 2);
+    let partner = r.sleepers("cinder", &[(116., 30.)])[0];
+    r.set_boss_share(0.58);
+    r.run(0.1);
+    assert_eq!(r.fight().partner, Some(partner));
+    let max = r.max_hp();
+    // the Cinder falls first
+    r.w.hit_slime(partner, 1, 1e9, false);
+    r.run(0.1);
+    assert!(r.fight().downed.is_empty(), "nobody lies down");
+    assert!(r.w.slimes[partner].dead, "the Cinder is gone");
+    assert!(!r.w.slimes[r.boss].dead);
+    let hp = r.w.slimes[r.boss].hp;
+    assert!(
+        (hp - max * 0.25).abs() <= 2.,
+        "the Heart carries on with a quarter of its health, got {hp} of {max}"
+    );
+    // more defense: a blow does half
+    let blow = max * 0.01;
+    let before = r.w.slimes[r.boss].hp;
+    r.w.hit_slime(r.boss, 1, blow, false);
+    let lost = before - r.w.slimes[r.boss].hp;
+    assert!(
+        (lost - blow * 0.5).abs() < 2.,
+        "half the blow lands, lost {lost} of {blow}"
+    );
+    // and the bridge is gone with the Cinder: only the Heart remains, so there is no line to stand on
+    assert_eq!(r.fight().merged, Some(0.5));
+    assert!(r.w.slimes[partner].dead);
+}
+
+#[test]
+fn when_the_heart_itself_is_the_twin_that_falls_the_two_join_just_the_same() {
+    let mut r = rig(MERGE, 2);
+    let partner = r.sleepers("cinder", &[(116., 30.)])[0];
+    r.set_boss_share(0.58);
+    r.run(0.1);
+    let max = r.max_hp();
+    r.w.hit_slime(r.boss, 1, 1e9, false);
+    r.run(0.1);
+    assert!(r.w.slimes[partner].dead && !r.w.slimes[r.boss].dead);
+    assert!((r.w.slimes[r.boss].hp - max * 0.25).abs() <= 2.);
+}
+
+const CRUMBLE: &str = r#"{"mechanics":[{"name":"Gaze","block":"gaze","cast":5,"every":30,"cover":[{"x":5,"y":5,"r":1}],"regrow":45}]}"#;
+
+#[test]
+fn an_enraged_boss_loses_its_cover_for_good() {
+    let mut r = rig(CRUMBLE, 1);
+    r.run(0.1);
+    assert!(
+        r.w.boss
+            .fights
+            .values()
+            .all(|f| !f.cover.is_empty() && f.cover.iter().all(|c| !c.broken)),
+        "the pillars stand while the boss is calm"
+    );
+    // (the rig's boss is the Hollow King, which has an enrage entry)
+    let start = crate::items::enrage("hollowking")
+        .expect("an enrage entry")
+        .0;
+    r.w.slimes[r.boss].fight = start + 1.;
+    r.run(0.2);
+    assert!(
+        r.w.boss
+            .fights
+            .values()
+            .all(|f| f.cover.iter().all(|c| c.broken)),
+        "the pillars crumble when it enrages"
+    );
+    r.run(60.);
+    assert!(
+        r.w.boss
+            .fights
+            .values()
+            .all(|f| f.cover.iter().all(|c| c.broken)),
+        "and do not grow back"
+    );
+}
+
+#[test]
+fn against_twins_that_join_a_fighter_hits_the_nearer_body_not_the_one_with_more_health() {
+    let mut r = rig(MERGE, 2);
+    let partner = r.sleepers("cinder", &[(116., 30.)])[0];
+    r.set_boss_share(0.58);
+    r.run(0.1);
+    // the far body has much more health, but the fighter stands by the other
+    r.w.slimes[partner].hp = r.w.slimes[r.boss].hp * 3.;
+    let near = r.w.slimes[r.boss].point();
+    r.put(1, near.x - 3., near.y);
+    r.put(2, near.x - 4., near.y);
+    let target = r.w.boss_play(1).and_then(|p| p.target);
+    assert_eq!(target, Some(r.boss), "the nearer body is the one to hit");
+}
+
+#[test]
+fn a_bridge_that_hurts_leaves_a_fighter_who_steps_off_and_kills_one_who_stays() {
+    let json = SUNS.replace(r#""bridge":0"#, r#""bridge":1,"bridge_hit":0.6"#);
+    let mut r = rig(&json, 3);
+    let partner = r.sleepers("cinder", &[(116., 30.)])[0];
+    r.set_boss_share(0.58);
+    r.run(0.1);
+    let (a, b) = (r.w.slimes[r.boss].point(), r.w.slimes[partner].point());
+    let mid = Point {
+        x: (a.x + b.x) / 2.,
+        y: (a.y + b.y) / 2.,
+    };
+    r.put(1, mid.x, mid.y);
+    let off = on_line(a, b, a.distance(b) / 2., 6.);
+    r.put(2, off.x, off.y);
+    r.put(3, mid.x, mid.y);
+    r.run(2.9);
+    assert!(r.alive(1) && r.alive(3), "still warning");
+    r.run(0.5);
+    let hp = |r: &Rig, s: u64| r.w.players[&s].character.hp / r.w.players[&s].character.max_hp();
+    assert!(r.alive(1), "one touch is survived");
+    assert!(
+        (hp(&r, 1) - 0.4).abs() < 0.05,
+        "it takes 60% of their health, left {}",
+        hp(&r, 1)
+    );
+    assert!((hp(&r, 2) - 1.).abs() < 1e-9, "off the line nothing hurts");
+    // one steps off the line before the next hit, the other stays
+    r.put(3, off.x + 1., off.y);
+    r.run(1.2);
+    assert!(r.alive(3), "the one who stepped off lives");
+    assert!(
+        !r.alive(1),
+        "the one who stayed on it falls to the second hit"
+    );
+}
+
 trait IsDamage {
     fn is_damage(&self) -> bool;
 }
@@ -2483,8 +2678,11 @@ fn twin_suns_divide_the_heart_at_sixty_per_cent_and_sunburst_follows() {
     r.set_boss_share(0.59);
     r.run(0.2);
     assert_eq!(r.fight().partner, Some(partner));
+    // the sign says the joined Heart keeps "a quarter" of its health: that is the table's merge share
+    assert_eq!(s.merge_hp, 0.25);
+    assert!(s.merge_defense < 1., "and it is harder to hurt");
     let words = sign_words("solar_heart");
-    assert!(words.contains("10 seconds"), "{words}");
+    assert!(words.contains("a quarter of its health"), "{words}");
 }
 
 #[test]

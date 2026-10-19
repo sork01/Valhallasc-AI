@@ -24,6 +24,8 @@ const ORB_REACH: f64 = 0.6;
 const BODY: f64 = PLAYER_RADIUS;
 /// The bridge of light between a divided boss's bodies is drawn this long before it is lethal (rule 1: announced).
 const BRIDGE_WARNING: f64 = 3.;
+/// Seconds between the hits of a bridge that hurts instead of killing (`Split::bridge_hit`).
+const BRIDGE_TICK: f64 = 1.;
 /// How long a held body stays held after each refresh; refreshed every tick.
 const HOLD: f64 = 0.2;
 /// New spokes turn this long, dashed, before they hurt.
@@ -259,8 +261,12 @@ pub(super) struct Fight {
     partner: Option<usize>,
     /// Seconds the bridge of light is shown but not yet lethal after a boss divides.
     bridge_wait: f64,
+    /// Seconds until a bridge that hurts hits again.
+    bridge_tick: f64,
     /// Bodies that fell while the other lives, and the seconds until they rise.
     downed: BTreeMap<usize, f64>,
+    /// The twins have joined into one boss that takes this share of every blow (`Split::merge_defense`).
+    merged: Option<f64>,
     banner: Option<(String, f64)>,
     stat: Option<StaticLive>,
 }
@@ -398,6 +404,11 @@ impl World {
         if fight.stun_left > 0. && id == fight.boss {
             damage *= 1. + fight.vulnerable;
         }
+        if let Some(defense) = fight.merged
+            && id == fight.boss
+        {
+            damage *= defense;
+        }
         // A body that would fall while its other half lives is left on one health and downed instead.
         if let Some(partner) = fight.partner {
             let other = if id == fight.boss {
@@ -447,6 +458,24 @@ impl World {
             && let Some(other) = other
             && !self.slimes[other].dead
         {
+            if let Some(split) = self.split_def(boss).filter(|s| s.merge_hp > 0.) {
+                // The twins join again: the Cinder goes back to sleep and the Heart carries on alone on a fixed share
+                // of its health, with more defense.
+                let (zone, at) = (self.slimes[boss].zone, self.slimes[boss].point());
+                if let Some(cinder) = self.boss.fights.get(&boss).and_then(|f| f.partner) {
+                    self.slimes[cinder] = self.dormant_enemy(cinder);
+                }
+                let s = &mut self.slimes[boss];
+                s.hp = (s.max_hp * split.merge_hp).max(2.);
+                if let Some(fight) = self.boss.fights.get_mut(&boss) {
+                    fight.merged = Some(split.merge_defense);
+                    fight.downed.clear();
+                    fight.bridge_wait = 0.;
+                    fight.banner = Some(("Twin Suns".into(), 4.));
+                }
+                self.mech_event(zone, "rise", "Twin Suns", at, 0.);
+                return;
+            }
             let revive = self.split_def(boss).map_or(10., |s| s.revive_after);
             if let Some(fight) = self.boss.fights.get_mut(&boss) {
                 fight.downed.insert(id, revive);
@@ -645,7 +674,9 @@ impl World {
             blooms: vec![],
             partner: None,
             bridge_wait: 0.,
+            bridge_tick: 0.,
             downed: BTreeMap::new(),
+            merged: None,
             banner: None,
             stat: def.mechanics.iter().find_map(|m| match &m.block {
                 Block::Static(t) => Some(StaticLive {
@@ -1661,7 +1692,15 @@ impl World {
     }
 
     fn tick_cover(&mut self, fight: &mut Fight) {
+        // Once the boss enrages the pillars crumble for good: a gaze nobody can hide from ends the fight.
+        let boss = &self.slimes[fight.boss];
+        let enraged = crate::items::enrage_factor(&boss.kind, boss.fight) > 1.;
         for c in &mut fight.cover {
+            if enraged {
+                c.broken = true;
+                c.regrow = 0.;
+                continue;
+            }
             if c.broken && c.regrow > 0. {
                 c.broken_for += TICK;
                 if c.broken_for >= c.regrow {
@@ -2067,6 +2106,9 @@ impl World {
                 continue;
             }
             fight.downed.remove(&body);
+            // The bridge of light is back with the body, so it is announced again like the first time (a party that
+            // stood on the line while one body lay still was killed the instant it rose).
+            fight.bridge_wait = BRIDGE_WARNING;
             let other = if body == id { partner } else { id };
             let s = &mut self.slimes[body];
             s.hp = (s.max_hp / 2.).max(2.);
@@ -2085,9 +2127,16 @@ impl World {
             && fight.downed.is_empty()
         {
             let (a, b) = (self.slimes[id].point(), self.slimes[partner].point());
-            self.land(fight, &name, Effect::Kill, 0., &|p| {
-                bm::segment_distance(p, a, b) <= split.bridge + BODY
-            });
+            let on_it = |p: Point| bm::segment_distance(p, a, b) <= split.bridge + BODY;
+            if split.bridge_hit > 0. {
+                fight.bridge_tick -= TICK;
+                if fight.bridge_tick <= 0. {
+                    fight.bridge_tick = BRIDGE_TICK;
+                    self.land(fight, &name, Effect::Heavy, split.bridge_hit, &on_it);
+                }
+            } else {
+                self.land(fight, &name, Effect::Kill, 0., &on_it);
+            }
         }
     }
 
@@ -2196,6 +2245,33 @@ impl World {
                         if gl.left > 0. && self.sight(fight, gl.from, at).is_ok() =>
                     {
                         note(&m.name, gl.left, true);
+                    }
+                    // The beam is turning: it reaches this point when its centre is within `beam` of it, unless it
+                    // has already passed (the rest of the turn is too short to come round again) or cover is in the way.
+                    (Live::Gaze(gl), Block::Gaze(g))
+                        if gl.left <= 0.
+                            && g.sweep > 0.
+                            && self.sight(fight, gl.from, at).is_ok() =>
+                    {
+                        let tau = std::f64::consts::TAU;
+                        let half = g.beam.to_radians();
+                        let mut ahead = (at.y - gl.from.y).atan2(at.x - gl.from.x) - gl.angle;
+                        while ahead > std::f64::consts::PI {
+                            ahead -= tau;
+                        }
+                        while ahead < -std::f64::consts::PI {
+                            ahead += tau;
+                        }
+                        let travel = if ahead.abs() <= half {
+                            0.
+                        } else if ahead > 0. {
+                            ahead - half
+                        } else {
+                            ahead + tau - half
+                        };
+                        if travel <= tau - gl.turned {
+                            note(&m.name, travel / (tau / g.sweep), true);
+                        }
                     }
                     _ => {}
                 }

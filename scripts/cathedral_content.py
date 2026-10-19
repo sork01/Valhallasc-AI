@@ -35,15 +35,15 @@ ENEMIES = [
     enemy('bellkeeper','Orrin, the Sunken Bellkeeper',40,240000,3000,2.2,2,[1.1,2.1,7,11],'bell','#70cbbc',True,slam=3.8),
     enemy('mournsister','Sister Veyra of the Stillwater',40,260000,2000,2.5,1.8,[.9,2.6,0,14],'cantor','#a3d9e5',True,ranged=[12,9,'#a3e6ff',1.1,3,.36],variant=2),
     enemy('rootabbot','Abbot Thorne, the Kelpbound',40,300000,3400,1.9,2.2,[1.15,2.3,6,11],'root','#7aaa75',True,slam=4.2),
-    enemy('choirmother','Elyss, Mother of the Bound Choir',40,250000,2300,2.4,2,[1,2.2,0,14],'choir','#74e8db',True,ranged=[13,10,'#72f4e0',1.2,5,.28],variant=3),
+    enemy('choirmother','Elyss, Mother of the Bound Choir',40,290000,2300,2.4,2,[1,2.2,0,14],'choir','#74e8db',True,ranged=[13,10,'#72f4e0',1.2,5,.28],variant=3),
     enemy('pearlwidow','Neritha, the Pearl Widow',45,300000,2900,3.1,2,[.65,1.6,10,12],'spider','#f1b4c7',True,variant=4),
     enemy('glasscantor','Ilyr, Cantor of Shattered Glass',45,330000,2400,2.5,1.9,[.8,2.2,0,14],'glass','#e5a4de',True,ranged=[13,14,'#ffa8de',.8,5,.38]),
     enemy('relicwarden','Sarkhos, Warden of the Reliquary',45,350000,3800,2.3,2.1,[1,2,8,12],'crab','#df957c',True,slam=3.5,variant=5),
-    enemy('coralregent','Queen Avariel, the Coral Regent',45,400000,3000,2.6,2.1,[.9,1.9,8.5,14],'regent','#ec8db9',True,ranged=[13,10,'#ffb9d5',1,3,.24],melee=4.5,slam=3.2),
+    enemy('coralregent','Queen Avariel, the Coral Regent',45,450000,3000,2.6,2.1,[.9,1.9,8.5,14],'regent','#ec8db9',True,ranged=[13,10,'#ffb9d5',1,3,.24],melee=4.5,slam=3.2),
     enemy('chainmarshal','Vargast, Marshal of the Drowned Chains',50,370000,4100,2.6,2.1,[1,1.8,9,12],'chain','#909daf',True,slam=3.6),
     enemy('starseraph','Astrael, the Fallen Tide Seraph',50,390000,3000,2.8,2,[.9,2.3,0,15],'seraph','#d0c9ef',True,ranged=[14,12,'#d9c4ff',1,5,.3]),
     enemy('tidejudicator','The Blind Tide Judicator',50,420000,4500,2,2.3,[1.2,2.4,7,12],'judge','#c2bbaa',True,slam=4.5),
-    enemy('hierophant','High Hierophant Vael, Heart of the Tide',50,480000,3500,2.6,2.2,[1,2,9,15],'hierophant','#b392ed',True,ranged=[14,11,'#be9dff',1.25,5,.32],melee=4.8,slam=4),
+    enemy('hierophant','High Hierophant Vael, Heart of the Tide',50,1600000,3500,2.6,2.2,[1,2,9,15],'hierophant','#b392ed',True,ranged=[14,11,'#be9dff',1.25,5,.32],melee=4.8,slam=4),
     # Sleeping adds of the final-boss mechanics (docs/boss-mechanics.md). They drop nothing and have
     # their own PixelFlow art (scripts/boss_helper_cel_redraw.py).
     enemy('choirsinger','Bound Singer',40,14000,600,2.4,1.2,[.75,2.3,0,12],'cantor','#aef0e6',ranged=[11,9,'#9ff2e4',.9,2,.12],add=True),

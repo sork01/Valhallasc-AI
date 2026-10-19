@@ -17,7 +17,7 @@ ENEMIES = [
          stats=[1450000, 9200, 2.4, 2.2], profile=[.9, 2.2, 0, 14],
          ranged=[14, 10, '#a2fff0', 1.1, 3, .3], slam=0, melee=0, boss=True),
     dict(kind='eye_unblinking', name='The Unblinking Eye', art='eye', color='#f0ca8d',
-         stats=[2200000, 14000, 2.0, 2.7], profile=[1.1, 2.0, 6, 16],
+         stats=[4200000, 14000, 2.0, 2.7], profile=[1.1, 2.0, 6, 16],
          ranged=[14, 11, '#f4d4a2', 1.2, 5, .3], slam=4.2, melee=4.5, boss=True),
 ]
 

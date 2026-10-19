@@ -149,7 +149,8 @@ impl World {
             play.hold_fire = true;
         } else if fight.live.iter().any(|l| match l {
             Live::Zone(z) => z.phase != ZPhase::Linger || z.left > 0.,
-            Live::Mark(_) | Live::Puddle(_) => true,
+            // (a gaze: in cover is where to be until the look, or the whole turn of the beam, is over)
+            Live::Mark(_) | Live::Puddle(_) | Live::Gaze(_) => true,
             _ => false,
         }) && self
             .spread_spot(zone, fight, def, session, me, &mates)
@@ -189,6 +190,21 @@ impl World {
     /// nothing is safe (two walls with their gaps on opposite sides), the place that stays safe longest: the next
     /// tick moves on from it again.
     fn flee_spot(&self, zone: usize, fight: &Fight, session: u64, me: Point) -> Option<Point> {
+        // A route the fighter's whole body fits through first (a thin line grazes the edge of a pillar, and the body
+        // snags there for the rest of the cast: the Eye's party died one step short of cover), the thin line only when
+        // nothing else is open (a hero pressed against a wall).
+        self.flee_spot_wide(zone, fight, session, me, PLAYER_RADIUS)
+            .or_else(|| self.flee_spot_wide(zone, fight, session, me, 0.05))
+    }
+
+    fn flee_spot_wide(
+        &self,
+        zone: usize,
+        fight: &Fight,
+        session: u64,
+        me: Point,
+        width: f64,
+    ) -> Option<Point> {
         let left = self.bot_threat(zone, session, me, LOOK)?;
         let boss = self.slimes[fight.boss].point();
         let reach = (bm::SLOWEST_PLAYER_SPEED * left.max(0.5) + 1.).min(16.);
@@ -196,7 +212,7 @@ impl World {
         // (a thin line: a hero pressed against a wall fails the full-width test in every direction and would be left
         // with nowhere to run)
         let open_at =
-            |p: Point| self.free_ground(zone, p) && self.maps[zone].line_clear(me, p, 0.05);
+            |p: Point| self.free_ground(zone, p) && self.maps[zone].line_clear(me, p, width);
         let open = |p: Point| {
             p.x >= arena.x0 + 0.5
                 && p.x <= arena.x1 - 0.5
@@ -421,6 +437,48 @@ impl World {
             x: at.x + away.x * reach,
             y: at.y + away.y * reach,
         };
+        // A fighter on the near side walks round the end of the corridor, not through it: a straight line to the far
+        // side crosses the bridge, and the step back out of it is how the Heart's hirer died at every first split.
+        let corridor = bridge + PLAYER_RADIUS + 0.6;
+        let crosses = |p: Point, q: Point| {
+            (0..=10).any(|i| {
+                let f = f64::from(i) / 10.;
+                let x = Point {
+                    x: p.x + (q.x - p.x) * f,
+                    y: p.y + (q.y - p.y) * f,
+                };
+                bm::segment_distance(x, at, from) <= corridor
+            })
+        };
+        if crosses(me, station) {
+            let across = Point {
+                x: -away.y,
+                y: away.x,
+            };
+            // The corners beside each end of the corridor: the best is one that is clear to reach and from which the
+            // station is clear, else the nearest clear one (the next tick picks the corner beside the other end).
+            let mut best: Option<((bool, f64), Point)> = None;
+            for end in [at, from] {
+                for side in [1., -1.] {
+                    let w = Point {
+                        x: end.x + across.x * side * (corridor + 1.2),
+                        y: end.y + across.y * side * (corridor + 1.2),
+                    };
+                    if w.distance(me) <= 0.8 || crosses(me, w) {
+                        continue;
+                    }
+                    let rank = (crosses(w, station), me.distance(w) + w.distance(station));
+                    if best
+                        .is_none_or(|(r, _)| rank.partial_cmp(&r) == Some(std::cmp::Ordering::Less))
+                    {
+                        best = Some((rank, w));
+                    }
+                }
+            }
+            if let Some((_, w)) = best {
+                return Some(w);
+            }
+        }
         (station.distance(me) > 0.8).then_some(station)
     }
 
@@ -774,6 +832,19 @@ impl World {
         if let Some(partner) = fight.partner {
             let open = |s: &usize| alive(s) && !fight.downed.contains_key(s);
             let hp = |s: &usize| self.slimes[*s].hp;
+            // Twins that join when one falls need no balancing (there is no window to keep): hit the nearer body, so
+            // a fighter who must stand by a body is never sent across the arena between two that chase.
+            if self.split_def(fight.boss).is_some_and(|s| s.merge_hp > 0.) {
+                return [fight.boss, partner]
+                    .into_iter()
+                    .filter(open)
+                    .min_by(|a, b| {
+                        self.slimes[*a]
+                            .point()
+                            .distance(me)
+                            .total_cmp(&self.slimes[*b].point().distance(me))
+                    });
+            }
             // Stay on the half already chosen until the other has a fifth more health: the one with more health left is
             // the one to hit so the two come down together, but a choice made again with every blow sends the whole party
             // back and forth across the bridge of light.

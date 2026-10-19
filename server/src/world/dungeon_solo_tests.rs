@@ -148,22 +148,37 @@ fn case(d: &Dungeon, class: Class, rarity: &'static str, above: u32) -> Case {
         ..Case::new(class, d.level + above)
     }
 }
+/// Mean damage per second of each class over `runs`, e.g. `warrior 812, priest 140`: every party test reports it.
+fn dps_by_class(runs: &[PartyOutcome]) -> String {
+    let mut sums: BTreeMap<String, (f64, f64)> = BTreeMap::new();
+    for (class, dps) in runs.iter().flat_map(|r| &r.dps) {
+        let e = sums.entry(format!("{class:?}").to_lowercase()).or_default();
+        e.0 += dps;
+        e.1 += 1.;
+    }
+    sums.iter()
+        .map(|(class, (sum, n))| format!("{class} {:.0}", sum / n))
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
 fn describe(out: &Outcome) -> String {
+    let dps = format!("{:.0} dps", out.damage / out.seconds.max(1.));
     if out.killed {
         format!(
-            "CLEARED in {:.0} s, lowest health {:.0}%",
+            "CLEARED in {:.0} s, lowest health {:.0}%, {dps}",
             out.seconds,
             out.lowest_hp_fraction * 100.
         )
     } else if out.died {
         format!(
-            "died after {:.0} s, enemy at {:.0}%",
+            "died after {:.0} s, enemy at {:.0}%, {dps}",
             out.seconds,
             out.enemy_left * 100.
         )
     } else {
         format!(
-            "survived {:.0} s, enemy at {:.0}%",
+            "survived {:.0} s, enemy at {:.0}%, {dps}",
             out.seconds,
             out.enemy_left * 100.
         )
@@ -383,10 +398,11 @@ fn a_party_of_five_beats_every_dungeon_pack_and_boss() {
                 .join("; ");
             let bad = wins * 2 < seeds();
             eprintln!(
-                "[party5 {rarity}] {} L{} {what}: five players won {wins} of {} runs ({detail}){}",
+                "[party5 {rarity}] {} L{} {what}: five players won {wins} of {} runs ({detail}); dps {}{}",
                 d.name,
                 d.level,
                 seeds(),
+                dps_by_class(&runs),
                 if bad {
                     "  <-- PARTY OF FIVE CANNOT WIN"
                 } else {
@@ -408,15 +424,14 @@ fn a_party_of_five_beats_every_dungeon_pack_and_boss() {
     );
 }
 
-/// `BOSSMECH-MERC`: the same fight with a hired party. The hirer (a warrior in green gear at the dungeon's level) rents a
-/// priest, a mage, a hunter and an assassin at Skaldholm's Meeting Stone (250 gold each, the real offers); the hired
-/// fighters have no gear and play themselves through `merc_think` and `boss_play`. Each final boss is fought by both parties
-/// on the same seeds; the hired party must win at least half the runs and never fewer than the bot party minus one.
+/// `BOSSMECH-MERC`: a hired party against every final boss. The hirer (a warrior in green gear at the dungeon's level) rents a
+/// priest, a mage, a hunter and an assassin at Skaldholm's Meeting Stone (250 gold each, the real offers); all five play by the
+/// mercenaries' code (`auto_play`). The hired five must win at least half the runs (no bot party any more: owner, 2026-10-19:
+/// test with the five hired fighters only). Each line lists the seconds of every run and the DPS of each class.
 /// `DUNGEON_SOLO_DUNGEONS` / `DUNGEON_SOLO_KINDS` / `DUNGEON_SOLO_SEEDS` limit it.
-
 #[test]
-#[ignore = "slow: one fight per boss per seed per party"]
-fn a_hired_party_of_five_beats_every_final_boss_about_as_often_as_a_human_party() {
+#[ignore = "slow: one fight per boss per seed"]
+fn a_hired_party_of_five_beats_every_final_boss() {
     let table = world().boss.table.keys().cloned().collect::<Vec<_>>();
     let mercs = [Class::Priest, Class::Mage, Class::Hunter, Class::Assassin];
     let mut failed = vec![];
@@ -433,13 +448,7 @@ fn a_hired_party_of_five_beats_every_final_boss_about_as_often_as_a_human_party(
             let hired: Vec<_> = (1..=seeds())
                 .map(|seed| run_hired_party_pack_once(&case, Class::Warrior, &mercs, &ids, seed))
                 .collect();
-            let human: Vec<_> = (1..=seeds())
-                .map(|seed| run_party_pack_once(&case, &PARTY, &ids, seed))
-                .collect();
-            let (h, p) = (
-                hired.iter().filter(|r| r.killed).count() as u64,
-                human.iter().filter(|r| r.killed).count() as u64,
-            );
+            let h = hired.iter().filter(|r| r.killed).count() as u64;
             let detail = hired
                 .iter()
                 .map(|r| {
@@ -457,12 +466,13 @@ fn a_hired_party_of_five_beats_every_final_boss_about_as_often_as_a_human_party(
                 })
                 .collect::<Vec<_>>()
                 .join("; ");
-            let short = h * 2 < seeds() || h + 1 < p;
+            let short = h * 2 < seeds();
             eprintln!(
-                "[hired5] {} L{} {kind}: hired won {h} of {}, bot party {p} ({detail}){}",
+                "[hired5] {} L{} {kind}: hired won {h} of {} ({detail}); dps {}{}",
                 d.name,
                 d.level,
                 seeds(),
+                dps_by_class(&hired),
                 if short {
                     "  <-- HIRED PARTY FALLS SHORT"
                 } else {
@@ -470,13 +480,139 @@ fn a_hired_party_of_five_beats_every_final_boss_about_as_often_as_a_human_party(
                 }
             );
             if short {
-                failed.push(format!("{kind}: hired {h}, bots {p} of {}", seeds()));
+                failed.push(format!("{kind}: hired {h} of {}", seeds()));
             }
         }
     }
     assert!(
         failed.is_empty(),
-        "a hired party must keep up with a human one:\n{}",
+        "a hired party must beat every final boss:\n{}",
+        failed.join("\n")
+    );
+}
+
+/// `BOSSMECH-MERC-ALONE` (owner, 2026-10-19): four hired fighters must not be able to kill a boss without the hirer, so the
+/// player cannot sit back. The fix is in the encounter (the soft enrage in `world/enrage.txt`), not in the mercenaries: a
+/// hirer who fell does not stop them. Each final boss is fought on the same seeds by the hired party (hirer swinging),
+/// by the four mercenaries with the hirer idle in the room and with the hirer down (no bot party: the five hired fighters
+/// are the test party); the line lists the seconds of each win (`-` for a loss) and the DPS of each class, so a start for
+/// the enrage can be read off: later than the slowest hired win, earlier than the fastest mercenary-only win. The rule: the mercenaries win 0 runs alone. Measure the
+/// raw times with the enrage off (`ENRAGE_FILE=<a file holding {}>`). `DUNGEON_MERC_ALONE_ALL=1` adds every other boss and
+/// every pack of the chosen dungeons (reported only). `DUNGEON_SOLO_DUNGEONS` / `_KINDS` / `_SEEDS` limit it.
+#[test]
+#[ignore = "slow: four fights per boss per seed"]
+fn four_mercenaries_alone_never_beat_a_final_boss() {
+    let table = world().boss.table.keys().cloned().collect::<Vec<_>>();
+    let all = std::env::var("DUNGEON_MERC_ALONE_ALL").is_ok_and(|v| v == "1");
+    let mercs = [Class::Priest, Class::Mage, Class::Hunter, Class::Assassin];
+    let mut failed = vec![];
+    for d in dungeons() {
+        let mut targets: Vec<(String, Vec<usize>, bool)> = d
+            .bosses
+            .iter()
+            .filter(|(k, _)| all || table.contains(k))
+            .map(|(k, spawn)| (k.clone(), vec![*spawn], table.contains(k)))
+            .collect();
+        if all {
+            targets.extend(
+                d.packs
+                    .iter()
+                    .enumerate()
+                    .map(|(n, ids)| (format!("pack {n}"), ids.clone(), false)),
+            );
+        }
+        for (what, ids, final_boss) in targets {
+            let case = Case {
+                consumables: true,
+                rarity: BASELINE_RARITY,
+                enemy_level: Some(d.level),
+                cap: Some(CAP_SECONDS),
+                ..Case::new(PARTY[0], d.level)
+            };
+            let run = |role: HirerRole| -> Vec<PartyOutcome> {
+                (1..=seeds())
+                    .map(|seed| {
+                        run_hired_party_with_role(&case, Class::Warrior, role, &mercs, &ids, seed)
+                    })
+                    .collect()
+            };
+            let times = |runs: &[PartyOutcome]| {
+                runs.iter()
+                    .map(|r| {
+                        if r.killed {
+                            format!("{:.0}", r.seconds)
+                        } else {
+                            "-".to_string()
+                        }
+                    })
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            };
+            let hired = run(HirerRole::Fights);
+            let idle = run(HirerRole::Idle);
+            let down = run(HirerRole::Down);
+            let wins = |runs: &[PartyOutcome]| runs.iter().filter(|r| r.killed).count();
+            let falls = |runs: &[PartyOutcome]| {
+                runs.iter().map(|r| r.deaths as f64).sum::<f64>() / runs.len().max(1) as f64
+            };
+            let bad = wins(&idle) > 0 || wins(&down) > 0;
+            eprintln!(
+                "[merc-alone] {} L{} {what}: hired {} of {} [{}] | mercs alone, hirer idle {} [{}], hirer down {} [{}] | falls per fight: hired five {:.1}, hirer idle {:.1}, hirer down {:.1} | dps: hired five ({}); mercenaries alone ({}){}",
+                d.name,
+                d.level,
+                wins(&hired),
+                seeds(),
+                times(&hired),
+                wins(&idle),
+                times(&idle),
+                wins(&down),
+                times(&down),
+                falls(&hired),
+                falls(&idle),
+                falls(&down),
+                dps_by_class(&hired),
+                dps_by_class(&down),
+                if bad {
+                    "  <-- THE MERCENARIES WIN ALONE"
+                } else {
+                    ""
+                }
+            );
+            // Four fighters do 4/5 of the work: if they do win, they take at least a fifth longer than the hired five.
+            let mean_win = |runs: &[PartyOutcome]| {
+                let won: Vec<f64> = runs
+                    .iter()
+                    .filter(|r| r.killed)
+                    .map(|r| r.seconds)
+                    .collect();
+                (!won.is_empty()).then(|| won.iter().sum::<f64>() / won.len() as f64)
+            };
+            if let (Some(h), Some(a)) = (
+                mean_win(&hired),
+                mean_win(&idle)
+                    .into_iter()
+                    .chain(mean_win(&down))
+                    .reduce(f64::min),
+            ) && a < h * 1.2
+                && final_boss
+            {
+                failed.push(format!(
+                    "{what}: the mercenaries alone win in {a:.0} s, under 1.2 x the hired party's {h:.0} s"
+                ));
+            }
+            if bad && final_boss {
+                failed.push(format!(
+                    "{what}: idle hirer {}, down hirer {} of {}",
+                    wins(&idle),
+                    wins(&down),
+                    seeds()
+                ));
+            }
+        }
+    }
+    assert!(
+        failed.is_empty(),
+        "four mercenaries must not win without the hirer:\n{}",
         failed.join("\n")
     );
 }

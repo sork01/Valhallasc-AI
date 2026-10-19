@@ -132,10 +132,6 @@ pub fn death_message(ability: &str, would_have: bool) -> String {
 // ---------------------------------------------------------------------------------------------------------------
 // The data: `world/boss-mechanics.txt`, keyed by the final boss's monster kind.
 // ---------------------------------------------------------------------------------------------------------------
-
-fn one() -> f64 {
-    1.
-}
 fn one_u() -> u32 {
     1
 }
@@ -434,6 +430,21 @@ pub struct Split {
     /// Half-width of the lethal bridge between the two bodies; 0 for none.
     #[serde(default)]
     pub bridge: f64,
+    /// When a body falls while the other lives the two join again into one boss left on this share of its maximum
+    /// health, instead of the fallen one lying down and rising (0: the downed body rises as `revive_after` says).
+    #[serde(default)]
+    pub merge_hp: f64,
+    /// The joined boss takes this share of every blow (0.5 is half: more defense). Only with `merge_hp`.
+    #[serde(default = "one")]
+    pub merge_defense: f64,
+    /// The bridge hits whoever stands on it for this share of their health once a second instead of killing at once
+    /// (0: it kills). A step off it survives; standing on it does not.
+    #[serde(default)]
+    pub bridge_hit: f64,
+}
+
+fn one() -> f64 {
+    1.
 }
 
 /// Places that a player lights by standing in them for `hold_for` seconds; a lit place stays lit `lit_for`.
@@ -1339,10 +1350,13 @@ pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
                     || !positive(s.revive_after)
                     || s.survivor_bonus < 0.
                     || s.bridge < 0.
+                    || !(0. ..1.).contains(&s.bridge_hit)
+                    || !(0. ..1.).contains(&s.merge_hp)
+                    || !(s.merge_defense > 0. && s.merge_defense <= 1.)
                 {
                     return bad(
                         m,
-                        "a split needs hp in (0, 1), a partner tag and a revive time",
+                        "a split needs hp in (0, 1), a partner tag, a revive time, a merge health in [0, 1) and a merge defense in (0, 1]",
                     );
                 }
             }

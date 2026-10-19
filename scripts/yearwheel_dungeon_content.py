@@ -9,7 +9,7 @@ CAST = {
         ('amber_sentinel', 'Archive Sentinel', 'sentinel', '#9c7554', [1280000, 16300, 2.5, 1.9], [1, 1.6, 9, 13], None, 4.0, 0, False),
         ('amber_curator', 'The Curator', 'curator', '#ad7445', [5500000, 35300, 2.5, 2.5], [.9, 1.8, 10, 15], None, 5.0, 4.7, True),
         ('amber_chronicle', 'The Living Chronicle', 'chronicle', '#eac782', [5100000, 33800, 2.8, 2.4], [.8, 2, 0, 15], [18, 11, '#ffedbc', 1.25, 4, .29], 0, 0, True),
-        ('amber_memory', 'The Last Memory', 'memory', '#f1cc75', [8100000, 45000, 2.1, 3.1], [1.2, 2.3, 10, 18], [19, 12, '#fff0bf', 1.5, 5, .33], 6.0, 6.0, True),
+        ('amber_memory', 'The Last Memory', 'memory', '#f1cc75', [15000000, 45000, 2.1, 3.1], [1.2, 2.3, 10, 18], [19, 12, '#fff0bf', 1.5, 5, .33], 6.0, 6.0, True),
         # The cocoon of Amber Stasis (docs/boss-mechanics.md): drops nothing, borrows the Archive Sentinel's art for now.
         ('amber_cocoon', 'Amber Cocoon', 'sentinel', '#e7b45f', [162000, 0, 1, 1.6], [.9, 1.8, 0, 4], None, 0, 0, False, True),
     ],
@@ -19,7 +19,7 @@ CAST = {
         ('solstice_guard', 'Rime Guard', 'guard', '#718aa1', [1280000, 16300, 2.5, 1.9], [1, 1.6, 9, 13], None, 4.0, 0, False),
         ('solstice_watcher', 'The Frost Watcher', 'watcher', '#7397b7', [5500000, 35300, 2.5, 2.5], [.9, 1.8, 10, 15], None, 5.0, 4.7, True),
         ('solstice_harbinger', 'Harbinger of Night', 'harbinger', '#b6cee0', [5100000, 33800, 2.8, 2.4], [.8, 2, 0, 15], [18, 11, '#edf6ff', 1.25, 4, .29], 0, 0, True),
-        ('solstice_heart', 'Heart of the Longest Night', 'heart', '#d5e4ed', [11200000, 45000, 2.1, 3.1], [1.2, 2.3, 10, 18], [19, 12, '#f2faff', 1.5, 5, .33], 6.0, 6.0, True),
+        ('solstice_heart', 'Heart of the Longest Night', 'heart', '#d5e4ed', [13600000, 45000, 2.1, 3.1], [1.2, 2.3, 10, 18], [19, 12, '#f2faff', 1.5, 5, .33], 6.0, 6.0, True),
     ],
 }
 

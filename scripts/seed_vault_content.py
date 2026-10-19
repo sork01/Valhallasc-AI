@@ -19,7 +19,7 @@ ENEMIES = [
          stats=[2710000, 14800, 2.5, 2.2], profile=[.9, 2.1, 0, 14],
          ranged=[15, 10, '#d7e7a6', 1.2, 3, .29], slam=0, melee=0, boss=True),
     dict(kind='seed_worldseed', name='Heart of the Worldseed', art='worldseed', color='#e4dc9c',
-         stats=[4050000, 22000, 2.2, 2.75], profile=[1.1, 2.2, 8, 16],
+         stats=[6600000, 22000, 2.2, 2.75], profile=[1.1, 2.2, 8, 16],
          ranged=[15, 11, '#f0e9b9', 1.35, 5, .31], slam=4.9, melee=5.1, boss=True),
     # Adds of Germination (docs/boss-mechanics.md): they drop nothing and have their own art (boss_helper_cel_redraw.py).
     dict(kind='seed_sprout', name='Worldseed Seed', art='mote', color='#e9d78e',

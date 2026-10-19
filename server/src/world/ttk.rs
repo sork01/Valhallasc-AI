@@ -123,6 +123,8 @@ pub struct Outcome {
     pub food_used: u32,
     /// The monster's health left when the fight ended, as a fraction of its maximum.
     pub enemy_left: f64,
+    /// Damage the character dealt (`damage / seconds` is its DPS).
+    pub damage: f64,
 }
 
 #[derive(Clone, Debug)]
@@ -567,6 +569,7 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
         potions_used: 0,
         food_used: 0,
         enemy_left: 1.,
+        damage: 0.,
     };
     let summary = Summary {
         case: *case,
@@ -629,6 +632,7 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
         }
     }
     out.seconds = w.time - start_time;
+    out.damage = w.damage_log.get(&1).copied().unwrap_or(0.);
     out.enemy_left = (w.slimes[id].hp / w.slimes[id].max_hp).clamp(0., 1.);
     if w.players[&1].character.hp <= 0. {
         out.died = true;
@@ -690,6 +694,7 @@ pub fn run_pack_once(case: &Case, ids: &[usize], seed: u64) -> Outcome {
         potions_used: 0,
         food_used: 0,
         enemy_left: 1.,
+        damage: 0.,
     };
     let start_time = w.time;
     let cap = case.cap.unwrap_or_else(|| cap_for(case.rotation));
@@ -748,6 +753,7 @@ pub fn run_pack_once(case: &Case, ids: &[usize], seed: u64) -> Outcome {
         }
     }
     out.seconds = w.time - start_time;
+    out.damage = w.damage_log.get(&1).copied().unwrap_or(0.);
     out.enemy_left = left(&w).clamp(0., 1.);
     if w.players[&1].character.hp <= 0. {
         out.died = true;
@@ -778,6 +784,8 @@ pub struct PartyOutcome {
     /// Times the hired party was set down in sight of the boss after ten idle seconds behind a wall (a hirer who steps
     /// round the corner; the harness walks in straight lines).
     pub unstuck: u32,
+    /// Damage per second each fighter dealt over the fight, by class (a party with two of a class lists both).
+    pub dps: Vec<(Class, f64)>,
 }
 
 /// A party of `members` against several monsters at once (a dungeon pack or a boss). Every living member fights the
@@ -788,7 +796,7 @@ pub fn run_party_pack_once(
     ids: &[usize],
     seed: u64,
 ) -> PartyOutcome {
-    party_pack_fight(case, members, &[], ids, seed)
+    party_pack_fight(case, members, &[], HirerRole::Fights, ids, seed)
 }
 
 /// The hirer (`hirer`, driven like any member) with `mercs` rented at Skaldholm's Meeting Stone through the real offers
@@ -801,7 +809,53 @@ pub fn run_hired_party_pack_once(
     ids: &[usize],
     seed: u64,
 ) -> PartyOutcome {
-    party_pack_fight(case, &[hirer], mercs, ids, seed)
+    party_pack_fight(case, &[hirer], mercs, HirerRole::Fights, ids, seed)
+}
+
+/// What the hirer does in a hired-party fight (`BOSSMECH-MERC-ALONE`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HirerRole {
+    /// Fights like any member (the `BOSSMECH-MERC` check).
+    Fights,
+    /// Stands in the room within sight of the boss and does nothing: no target, no skill, no step, no potion.
+    Idle,
+    /// Is down for the whole fight (a hirer who fell, or a player who left the keyboard and was killed).
+    Down,
+}
+
+/// The same fight as `run_hired_party_pack_once`, but the hirer plays `role`. The party starts five tiles from the
+/// boss in the two roles that leave the hirer out, so the boss has someone to pick on and the mercenaries can answer.
+pub fn run_hired_party_with_role(
+    case: &Case,
+    hirer: Class,
+    role: HirerRole,
+    mercs: &[Class],
+    ids: &[usize],
+    seed: u64,
+) -> PartyOutcome {
+    party_pack_fight(case, &[hirer], mercs, role, ids, seed)
+}
+
+/// A clear, walkable spot 4 to 7 tiles from `boss` that no telegraph covers, in `zone`.
+fn seat_near_boss(w: &World, zone: usize, boss: Point) -> Option<Point> {
+    for distance in [5., 6., 7., 4.] {
+        for k in 0..16 {
+            let a = k as f64 / 16. * std::f64::consts::TAU;
+            let mut p = Point {
+                x: boss.x + a.cos() * distance,
+                y: boss.y + a.sin() * distance,
+            };
+            let wanted = p;
+            w.maps[zone].collide(&mut p, PLAYER_RADIUS);
+            if p.distance(wanted) < 0.01
+                && w.maps[zone].line_clear(boss, p, 0.3)
+                && w.bot_threat(zone, 1, p, 0.).is_none()
+            {
+                return Some(p);
+            }
+        }
+    }
+    None
 }
 
 /// Rents `mercs` for the hirer (session 1) at the Meeting Stone, then sets the hirer at `start` in `zone` with the hired
@@ -882,6 +936,7 @@ fn party_pack_fight(
     case: &Case,
     members: &[Class],
     mercs: &[Class],
+    role: HirerRole,
     ids: &[usize],
     seed: u64,
 ) -> PartyOutcome {
@@ -922,6 +977,13 @@ fn party_pack_fight(
         build_character(c, &Case { class, ..*case });
         if n == 0 && !mercs.is_empty() {
             hire_mercenaries(&mut w, mercs, zone, start);
+            if role != HirerRole::Fights
+                && let Some(p) = seat_near_boss(&w, zone, home)
+            {
+                let c = &mut w.players.get_mut(&1).unwrap().character;
+                (c.x, c.y) = (p.x, p.y);
+                seat_hired(&mut w, zone, p);
+            }
         }
     }
     w.enter_instance(zone);
@@ -938,7 +1000,16 @@ fn party_pack_fight(
         potions_used: 0,
         food_used: 0,
         enemy_left: 1.,
+        damage: 0.,
     };
+    let classes: Vec<(u64, Class)> = w
+        .players
+        .iter()
+        .map(|(s, p)| (*s, p.character.look.class))
+        .collect();
+    // Every fighter plays by the mercenaries' code (`auto_play`: the same skills, potions, telegraph steps and boss brain);
+    // `DUNGEON_PARTY_BRAIN=harness` brings back the harness's own rotation for a comparison.
+    let auto_brain = !std::env::var("DUNGEON_PARTY_BRAIN").is_ok_and(|v| v == "harness");
     let left = |w: &World| ids.iter().map(|&i| w.slimes[i].hp.max(0.)).sum::<f64>() / total_hp;
     let mut aimed = vec![usize::MAX; members.len()];
     let start_time = w.time;
@@ -969,43 +1040,39 @@ fn party_pack_fight(
             }
             let hirer = w.players[&1].character.point();
             let target = ids.iter().copied().find(|&i| !w.slimes[i].dead);
-            if w.time - idle_since >= 10.
+            if role == HirerRole::Fights
+                && w.time - idle_since >= 10.
                 && w.players[&1].character.hp > 0.
                 && let Some(t) = target
                 && !w.maps[zone].line_clear(hirer, w.slimes[t].point(), 0.3)
             {
                 let boss = w.slimes[t].point();
-                'seat: for distance in [5., 6., 7., 4.] {
-                    for k in 0..16 {
-                        let a = k as f64 / 16. * std::f64::consts::TAU;
-                        let mut p = Point {
-                            x: boss.x + a.cos() * distance,
-                            y: boss.y + a.sin() * distance,
-                        };
-                        let wanted = p;
-                        w.maps[zone].collide(&mut p, PLAYER_RADIUS);
-                        if p.distance(wanted) < 0.01
-                            && w.maps[zone].line_clear(boss, p, 0.3)
-                            && w.bot_threat(zone, 1, p, 0.).is_none()
-                        {
-                            let c = &mut w.players.get_mut(&1).unwrap().character;
-                            (c.x, c.y) = (p.x, p.y);
-                            seat_hired(&mut w, zone, p);
-                            unstuck += 1;
-                            idle_since = w.time;
-                            break 'seat;
-                        }
-                    }
+                if let Some(p) = seat_near_boss(&w, zone, boss) {
+                    let c = &mut w.players.get_mut(&1).unwrap().character;
+                    (c.x, c.y) = (p.x, p.y);
+                    seat_hired(&mut w, zone, p);
+                    unstuck += 1;
+                    idle_since = w.time;
                 }
             }
         }
         let mut anyone_alive = false;
         for (n, aimed_at) in aimed.iter_mut().enumerate() {
             let session = n as u64 + 1;
+            if role == HirerRole::Down && session == 1 {
+                // Down for the whole fight: a wake-up at the door (before the fight holds the body) is undone.
+                let p = w.players.get_mut(&1).unwrap();
+                p.character.hp = 0.;
+                p.dead_time = 0.;
+                p.fallen = true;
+            }
             if w.players[&session].character.hp <= 0. {
                 continue;
             }
             anyone_alive = true;
+            if role == HirerRole::Idle && session == 1 {
+                continue;
+            }
             let me = w.players[&session].character.point();
             let Some(mut near) =
                 ids.iter()
@@ -1020,6 +1087,11 @@ fn party_pack_fight(
             else {
                 break;
             };
+            if auto_brain {
+                let mates: Vec<u64> = w.players.keys().copied().collect();
+                w.auto_play(session, &mates, Some(near));
+                continue;
+            }
             // The mechanics' answers: where to stand, what to hit first, whether to hold fire.
             let play = if answers { w.boss_play(session) } else { None };
             if let Some(target) = play.as_ref().and_then(|b| b.target)
@@ -1249,6 +1321,13 @@ fn party_pack_fight(
         enemy_left: left(&w).clamp(0., 1.),
         break_spare: w.boss.spare.clone(),
         unstuck,
+        dps: classes
+            .iter()
+            .map(|(s, c)| {
+                let damage = w.damage_log.get(s).copied().unwrap_or(0.);
+                (*c, damage / (w.time - start_time).max(1.))
+            })
+            .collect(),
     }
 }
 

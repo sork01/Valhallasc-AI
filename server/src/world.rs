@@ -464,7 +464,7 @@ impl Slime {
             "gatewarden" => (80000., 1000., 2.4, 1.9),
             "choir" => (100000., 600., 2.3, 1.6),
             "colossus" => (110000., 1300., 1.9, 2.3),
-            "hollowking" => (130000., 900., 2.6, 2.1),
+            "hollowking" => (160000., 900., 2.6, 2.1),
             // The Wyrdwood (levels 21-29): a charging boar, a feather-shooting crow, a ground-pounding troll,
             // a thread-bolt witch and a very fast ram. Oakhorn (three heroes) and Hrungnir (five) are its elites.
             "boar" => (5600., 165., 3.4, 1.35),
@@ -1309,6 +1309,9 @@ pub struct World {
     time: f64,
     tick: u64,
     rng: u64,
+    /// Damage each session has dealt to monsters (test builds: the harness reports damage per second per class).
+    #[cfg(test)]
+    damage_log: BTreeMap<u64, f64>,
     next_entity: u64,
     next_king_spawn: f64,
     // The skill whose damage is being applied right now (empty: a basic attack); hit events carry it for the system log.
@@ -1405,6 +1408,8 @@ impl World {
             time: 0.,
             tick: 0,
             rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
+            #[cfg(test)]
+            damage_log: BTreeMap::new(),
             next_entity: 1,
             next_king_spawn: 0.,
             cur_skill: String::new(),
@@ -3499,6 +3504,10 @@ impl World {
             return 0.;
         }
         let dealt = damage.min(s.hp);
+        #[cfg(test)]
+        {
+            *self.damage_log.entry(session).or_default() += dealt;
+        }
         if p.character.look.class == Class::Warrior {
             p.character.change_resource(dealt * 0.5);
         }

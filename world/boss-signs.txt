@@ -60,7 +60,7 @@
     "title": "The Unblinking Eye",
     "what": "The Eye looks across the room after 5 seconds. Anyone it sees is knocked out.",
     "todo": "Hide behind a blue lens pillar until the gaze ends.",
-    "tip": "A pillar cracks, then breaks after two gazes. It returns after 45 seconds. When nearly beaten, the Eye sweeps a red beam every 15 seconds.",
+    "tip": "A pillar breaks after two gazes and returns in 45 seconds. At the end the Eye sweeps a red beam. If the fight drags on, the pillars crumble for good.",
     "colors": [
       "red",
       "blue"
@@ -152,9 +152,9 @@
   },
   "solar_heart": {
     "title": "Heart of the Crucible",
-    "what": "The Heart splits into Sol and Cinder. A red line of light joins them. It knocks out anyone it touches.",
-    "todo": "Stay off the red line. Hit both until they fall at almost the same time.",
-    "tip": "If one falls first, it gets up again after 10 seconds. The other one grows stronger. So finish both together.",
+    "what": "The Heart splits into Sol and Cinder. A red line of light joins them. It burns hard anyone who stands on it.",
+    "todo": "Stay off the red line. Hit them until one falls.",
+    "tip": "When one falls, they become one Heart again. It has a quarter of its health left, but your blows hurt it less.",
     "colors": [
       "red"
     ],

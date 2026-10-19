@@ -19,7 +19,7 @@ ENEMIES = [
          stats=[2600000, 14300, 2.5, 2.2], profile=[.9, 2.1, 0, 14],
          ranged=[15, 10, '#b7efde', 1.2, 3, .28], slam=0, melee=0, boss=True),
     dict(kind='rain_crown_sovereign', name='The Rain Crown', art='sovereign', color='#d4eab2',
-         stats=[3900000, 21000, 2.2, 2.75], profile=[1.1, 2.2, 8, 16],
+         stats=[5900000, 21000, 2.2, 2.75], profile=[1.1, 2.2, 8, 16],
          ranged=[15, 11, '#c9f7dc', 1.35, 5, .32], slam=4.8, melee=5.0, boss=True),
 ]
 

@@ -1,8 +1,8 @@
 {
   "hollowking": {
     "mechanics": [
-      {"name": "Dirge of the Hollow", "block": "break", "hp_min": 0.3, "cast": 8, "every": 30, "bar": 0.035, "stun": 6, "vulnerable": 0.3},
-      {"name": "Dirge of the Hollow", "block": "break", "hp_max": 0.3, "cast": 8, "every": 25, "bar": 0.035, "stun": 6, "vulnerable": 0.3}
+      {"name": "Dirge of the Hollow", "block": "break", "hp_min": 0.3, "cast": 8, "every": 30, "bar": 0.0285, "stun": 6, "vulnerable": 0.3},
+      {"name": "Dirge of the Hollow", "block": "break", "hp_max": 0.3, "cast": 8, "every": 25, "bar": 0.0285, "stun": 6, "vulnerable": 0.3}
     ]
   },
   "hierophant": {
@@ -78,7 +78,7 @@
   },
   "solar_heart": {
     "mechanics": [
-      {"name": "Twin Suns", "block": "split", "hp": 0.6, "tag": "cinder", "revive_after": 10, "survivor_bonus": 0.5, "bridge": 0.8},
+      {"name": "Twin Suns", "block": "split", "hp": 0.6, "tag": "cinder", "revive_after": 10, "survivor_bonus": 0.5, "bridge": 0.8, "merge_hp": 0.25, "merge_defense": 0.35, "bridge_hit": 0.6},
       {"name": "Sunburst", "block": "zone", "hp_max": 0.6, "shape": {"kind": "cone", "half_angle": 25, "length": 16}, "effect": "heavy", "heavy": 0.6, "cast": 3, "every": 14}
     ]
   },

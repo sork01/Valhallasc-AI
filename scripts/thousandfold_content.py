@@ -17,7 +17,7 @@ ENEMIES = [
          stats=[2050000, 12100, 2.5, 2.2], profile=[.85, 2.05, 0, 14],
          ranged=[14, 10, '#c7b9fb', 1.15, 3, .28], slam=0, melee=0, boss=True),
     dict(kind='pavilion_sovereign', name='Sovereign of the Last Fold', art='sovereign', color='#efcaad',
-         stats=[3200000, 18200, 2.1, 2.75], profile=[1.1, 2.15, 7, 16],
+         stats=[5600000, 18200, 2.1, 2.75], profile=[1.1, 2.15, 7, 16],
          ranged=[14, 11, '#f5d2be', 1.25, 5, .3], slam=4.6, melee=4.8, boss=True),
 ]
 

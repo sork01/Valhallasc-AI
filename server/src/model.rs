@@ -513,15 +513,9 @@ impl Character {
         {
             c.add_item(&i.id, 3);
         }
-        let points = level.saturating_sub(1) * 3;
-        let stamina = points / 4;
-        let main = points - stamina;
-        c.attributes.stamina = stamina;
-        match class {
-            Class::Warrior => c.attributes.strength = main,
-            Class::Mage | Class::Priest => c.attributes.intellect = main,
-            Class::Assassin | Class::Hunter => c.attributes.agility = main,
-        }
+        // The spread an ordinary player gets from "recommended", and no gear: a hired fighter is no better than a hero in
+        // green armour (it used to put 75% of its points into the damage stat, which out-damaged geared players).
+        let _ = c.allocate_recommended();
         c.hp = c.max_hp();
         c.reset_resource();
         c
