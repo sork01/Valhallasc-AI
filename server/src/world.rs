@@ -74,6 +74,8 @@ mod resources;
 mod ribbonwild_tests;
 mod rolls;
 #[cfg(test)]
+mod rotation_tests;
+#[cfg(test)]
 mod seed_vault_tests;
 mod sets;
 #[cfg(test)]

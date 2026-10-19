@@ -56,8 +56,128 @@ fn source_key(cur_skill: &str) -> String {
     }
 }
 
-/// One run: `class` at `level` for `seconds` after its first hit on the dummy.
+/// How a skill takes part in a rotation.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub enum Slot {
+    /// Never cast.
+    Off,
+    /// Cast whenever it is ready, in reach and affordable; when it is ready but not affordable, the skills below it
+    /// still get their turn.
+    Cast,
+    /// As `Cast`, but when it is ready and in reach yet not affordable nothing below it is cast, so the resource builds
+    /// up for it.
+    Hold,
+}
+/// A priority list: the first skill that can be cast is cast, every tick. The basic attack runs underneath on its own.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct Rotation {
+    pub order: Vec<(String, Slot)>,
+}
+impl Rotation {
+    /// The same rotation with the skills that are off moved to the end in id order, so equal rotations compare equal.
+    pub fn canonical(&self) -> Self {
+        let mut live: Vec<_> = self
+            .order
+            .iter()
+            .filter(|(_, slot)| *slot != Slot::Off)
+            .cloned()
+            .collect();
+        let mut off: Vec<_> = self
+            .order
+            .iter()
+            .filter(|(_, slot)| *slot == Slot::Off)
+            .cloned()
+            .collect();
+        off.sort();
+        live.extend(off);
+        Self { order: live }
+    }
+}
+
+/// The skills a rotation can use against a dummy: everything that deals damage or raises it. Heals, shields, dodge and
+/// regeneration do nothing here, and a movement-only dash deals nothing.
+pub fn usable_skills(class: Class, level: u32) -> Vec<String> {
+    use crate::skills::{BuffKind, Effect};
+    SKILLS
+        .iter()
+        .filter(|s| s.class == class && s.level <= level)
+        .filter(|s| match &s.effect {
+            Effect::Heal { .. } | Effect::Mend { .. } => false,
+            Effect::Buff { kind, .. } => {
+                matches!(kind, BuffKind::Damage | BuffKind::Haste | BuffKind::Crit)
+            }
+            Effect::Dash { mult, .. } => *mult > 0.,
+            _ => true,
+        })
+        .map(|s| s.id.clone())
+        .collect()
+}
+
+/// One tick of a rotation: walks the priority list and casts what the list allows.
+fn play_rotation(w: &mut World, session: u64, id: usize, rotation: &Rotation) {
+    use crate::skills::{BuffKind, Effect};
+    let (me, level) = {
+        let c = &w.players[&session].character;
+        (c.point(), c.level)
+    };
+    let (target, radius) = (w.slimes[id].point(), w.slimes[id].r);
+    let distance = me.distance(target);
+    let aim = me.direction(target);
+    for (skill_id, slot) in &rotation.order {
+        if *slot == Slot::Off {
+            continue;
+        }
+        let base = SKILLS.iter().find(|s| &s.id == skill_id).unwrap();
+        let skill = base.at_level(level);
+        let p = &w.players[&session];
+        if p.dash > 0. {
+            return;
+        }
+        if p.skill_cd.contains_key(&skill.id) {
+            continue;
+        }
+        let in_reach = match &skill.effect {
+            Effect::Cone { reach, .. } => distance - radius <= *reach,
+            Effect::Nova { radius: r, .. } => distance - radius <= *r,
+            Effect::Strike { range, .. } | Effect::Chain { range, .. } => {
+                distance - radius <= *range
+            }
+            Effect::Meteor { range, .. } => distance <= *range,
+            Effect::Volley { .. } => distance <= 9.,
+            Effect::Dash { .. } => distance <= 6.,
+            Effect::Buff { kind, .. } => {
+                matches!(kind, BuffKind::Damage | BuffKind::Haste | BuffKind::Crit)
+                    && distance < 10.
+                    && !p.buffs.iter().any(|b| b.kind == *kind)
+            }
+            Effect::Heal { .. } | Effect::Mend { .. } => false,
+        };
+        if !in_reach {
+            continue;
+        }
+        if p.character.resource() < skill.cost {
+            if *slot == Slot::Hold {
+                return;
+            }
+            continue;
+        }
+        w.use_skill(session, &skill.id, aim);
+    }
+}
+
+/// One run with the mercenaries' rotation: `class` at `level` for `seconds` after its first hit on the dummy.
 pub fn run_once(class: Class, level: u32, seed: u64, seconds: f64) -> DpsRun {
+    run_with(class, level, seed, seconds, None)
+}
+
+/// One run; `rotation` None plays the mercenaries' code (`auto_play`).
+pub fn run_with(
+    class: Class,
+    level: u32,
+    seed: u64,
+    seconds: f64,
+    rotation: Option<&Rotation>,
+) -> DpsRun {
     let mut w = world();
     w.rng = seed;
     let case = Case::new(class, level);
@@ -124,7 +244,10 @@ pub fn run_once(class: Class, level: u32, seed: u64, seconds: f64) -> DpsRun {
             w.players[&1].character.hp > 0.,
             "{class:?} level {level} died against a harmless dummy"
         );
-        w.auto_play(1, &[], Some(id));
+        match rotation {
+            Some(r) => play_rotation(&mut w, 1, id, r),
+            None => w.auto_play(1, &[], Some(id)),
+        }
         let before = w.time;
         w.step();
         drain(&mut rx);
