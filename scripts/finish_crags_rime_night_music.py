@@ -2,6 +2,7 @@
 """High-pass, fold the tails, level-match and export two zone night scores."""
 import math
 import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -66,5 +67,10 @@ def export(zone, title, seconds):
           f'full {len(audio)/RATE:.3f}s')
 
 
+selected = set(sys.argv[1:])
+if selected and selected - {score[0] for score in SCORES}:
+    raise SystemExit(f'Unknown score: {", ".join(sorted(selected - {score[0] for score in SCORES}))}')
 for score in SCORES:
+    if selected and score[0] not in selected:
+        continue
     export(*score)
