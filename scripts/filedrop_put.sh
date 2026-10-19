@@ -2,7 +2,7 @@
 # Put a file in Sork's FileDrop (written as www-data with its meta sidecar): filedrop_put.sh <file> "<Original Name.ext>" <mime>
 set -e
 F="$1"; NAME="$2"; MIME="${3:-image/png}"
-B=$(basename "$F"); SZ=$(stat -c %s "$F"); TS=$(date '+%Y-%m-%d %H:%M:%S')
+B=$(basename "$F" | tr -s " \t" "__" | tr -cd "a-zA-Z0-9._-" | sed "s/\.\.*/./g"); SZ=$(stat -c %s "$F"); TS=$(date '+%Y-%m-%d %H:%M:%S')
 D=$(mktemp -d); chmod 755 "$D"; cp "$F" "$D/$B"
 printf '{\n    "original_name": "%s",\n    "type": "%s",\n    "uploaded_at": "%s",\n    "size": %s\n}\n' "$NAME" "${MIME//\//\\/}" "$TS" "$SZ" > "$D/$B.meta.json"
 chmod 644 "$D"/*
