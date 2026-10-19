@@ -36,6 +36,8 @@ mod deep_tests;
 #[cfg(test)]
 mod dormant_zone_tests;
 #[cfg(test)]
+mod dps_tests;
+#[cfg(test)]
 mod dungeon_solo_tests;
 #[cfg(test)]
 mod elder_hollow_tests;
@@ -1312,6 +1314,12 @@ pub struct World {
     /// Damage each session has dealt to monsters (test builds: the harness reports damage per second per class).
     #[cfg(test)]
     damage_log: BTreeMap<u64, f64>,
+    /// Test builds: damage and hits per session and source (a skill id, `set_bonus`, or empty for a basic attack), and
+    /// the casts that paid their cost (`DPS-HARNESS`).
+    #[cfg(test)]
+    damage_by_source: BTreeMap<(u64, String), (f64, u32)>,
+    #[cfg(test)]
+    casts_by_skill: BTreeMap<(u64, String), u32>,
     next_entity: u64,
     next_king_spawn: f64,
     // The skill whose damage is being applied right now (empty: a basic attack); hit events carry it for the system log.
@@ -1410,6 +1418,10 @@ impl World {
             rng: u64::from_le_bytes(uuid::Uuid::new_v4().as_bytes()[..8].try_into().unwrap()),
             #[cfg(test)]
             damage_log: BTreeMap::new(),
+            #[cfg(test)]
+            damage_by_source: BTreeMap::new(),
+            #[cfg(test)]
+            casts_by_skill: BTreeMap::new(),
             next_entity: 1,
             next_king_spawn: 0.,
             cur_skill: String::new(),
@@ -3139,6 +3151,13 @@ impl World {
         }
         p.character.mounted = false;
         p.character.change_resource(-skill.cost);
+        #[cfg(test)]
+        {
+            *self
+                .casts_by_skill
+                .entry((session, id.to_string()))
+                .or_default() += 1;
+        }
         let amber = p
             .set_amber
             .as_ref()
@@ -3507,6 +3526,12 @@ impl World {
         #[cfg(test)]
         {
             *self.damage_log.entry(session).or_default() += dealt;
+            let entry = self
+                .damage_by_source
+                .entry((session, self.cur_skill.clone()))
+                .or_default();
+            entry.0 += dealt;
+            entry.1 += 1;
         }
         if p.character.look.class == Class::Warrior {
             p.character.change_resource(dealt * 0.5);
