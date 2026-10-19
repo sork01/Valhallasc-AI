@@ -246,26 +246,33 @@ fn best_hunter() {
     report(Class::Hunter);
 }
 
-/// Plays the saved best rotations again (`DPS_ROTATIONS_DIR` holds the `<class>.json` files of a search, `DPS_LEVEL` the
-/// level, default 99) and prints each class's median DPS on the validation seeds, so a change to the class attack curve
-/// can be measured without searching again. `DPS_CLASSES` limits the classes.
+/// Plays the saved best rotations again and prints each class's median DPS on the validation seeds, so a change to the
+/// class attack curve can be measured without searching again. `DPS_ROTATIONS_DIR` holds the `<class>.json` files of a
+/// search, `DPS_ROTATION_LEVEL` is the level whose rotation is played (default 99), `DPS_LEVELS` the levels it is played
+/// at (default 99; a rotation found at 99 is a good, not a proven best, rotation at the levels below) and `DPS_CLASSES`
+/// limits the classes. Lines look like `REPLAY 40 warrior 9876`.
 #[test]
 #[ignore = "replay; DPS_ROTATIONS_DIR=test-results/best-rotation-XXXX"]
 fn replay_best_rotations() {
     let dir = std::env::var("DPS_ROTATIONS_DIR").expect("DPS_ROTATIONS_DIR");
-    let level: u32 = std::env::var("DPS_LEVEL")
+    let list = |var: &str, default: &str| -> Vec<String> {
+        std::env::var(var)
+            .ok()
+            .filter(|v| !v.trim().is_empty())
+            .unwrap_or_else(|| default.to_string())
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .collect()
+    };
+    let rotation_level: u64 = std::env::var("DPS_ROTATION_LEVEL")
         .ok()
         .and_then(|v| v.parse().ok())
         .unwrap_or(99);
-    let wanted: Vec<String> = std::env::var("DPS_CLASSES")
-        .ok()
-        .map(|v| v.split(',').map(str::to_string).collect())
-        .unwrap_or_else(|| {
-            ["warrior", "mage", "assassin", "priest", "hunter"]
-                .map(String::from)
-                .to_vec()
-        });
-    for name in wanted {
+    let measured: Vec<u32> = list("DPS_LEVELS", "99")
+        .iter()
+        .map(|v| v.parse().unwrap())
+        .collect();
+    for name in list("DPS_CLASSES", "warrior,mage,assassin,priest,hunter") {
         let class = match name.as_str() {
             "warrior" => Class::Warrior,
             "mage" => Class::Mage,
@@ -279,8 +286,8 @@ fn replay_best_rotations() {
                 .unwrap();
         let found = rows
             .iter()
-            .find(|r| r["level"] == level)
-            .unwrap_or_else(|| panic!("no level {level} for {name}"));
+            .find(|r| r["level"] == rotation_level)
+            .unwrap_or_else(|| panic!("no level {rotation_level} for {name}"));
         let rotation = Rotation {
             order: found["rotation"]
                 .as_array()
@@ -296,8 +303,10 @@ fn replay_best_rotations() {
                 })
                 .collect(),
         };
-        let runs = validate(class, level, MEASURE_SECONDS, Some(&rotation));
-        eprintln!("REPLAY {name} {level}: {:.0} dps", median_dps(&runs));
+        for &level in &measured {
+            let runs = validate(class, level, MEASURE_SECONDS, Some(&rotation));
+            eprintln!("REPLAY {level} {name} {:.0}", median_dps(&runs));
+        }
     }
 }
 
