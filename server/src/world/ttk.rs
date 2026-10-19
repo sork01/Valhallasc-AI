@@ -585,6 +585,10 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
     w.message(1, ClientMessage::Target { id });
     let start_time = w.time;
     let cap = case.cap.unwrap_or_else(|| cap_for(case.rotation));
+    // `TTK_BRAIN=mercenary` plays the kill-time grid (an ordinary monster picked by level) with the mercenaries' own code,
+    // like the party fights, instead of the harness rotation. Off by default: the bands were tuned with the harness
+    // rotation, and the mercenary one is faster at some levels (warrior 20: 10.3 s against the 15 s minimum).
+    let brain = case.target.is_none() && std::env::var("TTK_BRAIN").is_ok_and(|v| v == "mercenary");
     while w.time - start_time < cap {
         if w.players[&1].character.hp <= 0. {
             out.died = true;
@@ -596,8 +600,12 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
         }
         let phase = std::time::Instant::now();
         if case.rotation == Rotation::Skills {
-            walk_up_to_a_held_boss(&mut w, 1, id);
-            cast_skills(&mut w, 1, id, false, &mut out);
+            if brain {
+                w.auto_play(1, &[], Some(id));
+            } else {
+                walk_up_to_a_held_boss(&mut w, 1, id);
+                cast_skills(&mut w, 1, id, false, &mut out);
+            }
         }
         if case.consumables {
             use_consumables(&mut w, 1, &mut out);
@@ -633,6 +641,19 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
     }
     out.seconds = w.time - start_time;
     out.damage = w.damage_log.get(&1).copied().unwrap_or(0.);
+    if brain {
+        // `auto_play` casts on its own, so the casts and the resource they cost are read from the server's tally.
+        for ((session, skill), casts) in &w.casts_by_skill {
+            if *session == 1 {
+                out.casts += casts;
+                out.resource_used += *casts as f64
+                    * SKILLS
+                        .iter()
+                        .find(|s| &s.id == skill)
+                        .map_or(0., |s| s.cost);
+            }
+        }
+    }
     out.enemy_left = (w.slimes[id].hp / w.slimes[id].max_hp).clamp(0., 1.);
     if w.players[&1].character.hp <= 0. {
         out.died = true;

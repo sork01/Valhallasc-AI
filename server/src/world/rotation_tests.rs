@@ -246,6 +246,61 @@ fn best_hunter() {
     report(Class::Hunter);
 }
 
+/// Plays the saved best rotations again (`DPS_ROTATIONS_DIR` holds the `<class>.json` files of a search, `DPS_LEVEL` the
+/// level, default 99) and prints each class's median DPS on the validation seeds, so a change to the class attack curve
+/// can be measured without searching again. `DPS_CLASSES` limits the classes.
+#[test]
+#[ignore = "replay; DPS_ROTATIONS_DIR=test-results/best-rotation-XXXX"]
+fn replay_best_rotations() {
+    let dir = std::env::var("DPS_ROTATIONS_DIR").expect("DPS_ROTATIONS_DIR");
+    let level: u32 = std::env::var("DPS_LEVEL")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(99);
+    let wanted: Vec<String> = std::env::var("DPS_CLASSES")
+        .ok()
+        .map(|v| v.split(',').map(str::to_string).collect())
+        .unwrap_or_else(|| {
+            ["warrior", "mage", "assassin", "priest", "hunter"]
+                .map(String::from)
+                .to_vec()
+        });
+    for name in wanted {
+        let class = match name.as_str() {
+            "warrior" => Class::Warrior,
+            "mage" => Class::Mage,
+            "assassin" => Class::Assassin,
+            "priest" => Class::Priest,
+            "hunter" => Class::Hunter,
+            other => panic!("unknown class {other}"),
+        };
+        let rows: Vec<Value> =
+            serde_json::from_str(&std::fs::read_to_string(format!("{dir}/{name}.json")).unwrap())
+                .unwrap();
+        let found = rows
+            .iter()
+            .find(|r| r["level"] == level)
+            .unwrap_or_else(|| panic!("no level {level} for {name}"));
+        let rotation = Rotation {
+            order: found["rotation"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|s| {
+                    let slot = match s["slot"].as_str().unwrap() {
+                        "off" => Slot::Off,
+                        "hold" => Slot::Hold,
+                        _ => Slot::Cast,
+                    };
+                    (s["id"].as_str().unwrap().to_string(), slot)
+                })
+                .collect(),
+        };
+        let runs = validate(class, level, MEASURE_SECONDS, Some(&rotation));
+        eprintln!("REPLAY {name} {level}: {:.0} dps", median_dps(&runs));
+    }
+}
+
 #[test]
 fn a_held_skill_is_cast_where_the_mercenary_rotation_starves_it() {
     // At level 40 the assassin's cheap skills eat all its energy and Thousand Cuts (50) is never cast.
