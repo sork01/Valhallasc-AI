@@ -194,6 +194,10 @@ def main():
         return 1
     stale = [s for s in list(text) + list(templates) if s not in set(texts) | set(template_sources)]
     if check_only:
+        # sv-data.js is generated: a hand edit, or a source file changed without a rebuild, is stale.
+        if not OUTPUT.exists() or OUTPUT.read_text() != assemble(text, templates, phrases):
+            print('client/sv-data.js is stale: run `python3 scripts/build_swedish.py` and commit it')
+            return 1
         print(f'ok: {len(texts)} texts, {len(template_sources)} templates harvested; {len(text)} + {len(templates)} translated; '
               f'{len(stale)} entries the harvest does not see (kept: server and script strings)')
         return 0

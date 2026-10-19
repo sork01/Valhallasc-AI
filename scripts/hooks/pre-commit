@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Swedish gate. Every text the player can see needs Swedish that an agent wrote BY HAND in scripts/sv-*.txt (never a
+# translation service, never a machine translation pasted in; docs/swedish-glossary.md has the word choices), and
+# client/sv-data.js must be what `python3 scripts/build_swedish.py` assembles from those files.
+# Runs only when a commit touches something the build reads. Install: `bash scripts/hooks/install.sh`.
+cd "$(git rev-parse --show-toplevel)" || exit 1
+if git diff --cached --name-only | grep -qE '^(client/.*\.(js|html)|world/.*\.txt|server/src/.*\.rs|scripts/sv-.*\.txt|scripts/build_swedish\.py)$'; then
+  if ! python3 scripts/build_swedish.py --check; then
+    cat >&2 <<'MSG'
+
+Commit stopped: the Swedish check failed (list above).
+  * Missing text: write the Swedish yourself in scripts/sv-translations.txt (templates with {0} in
+    sv-template-translations.txt, names and loanwords in sv-keep.txt, non-text in sv-ignore.txt). Never use a translator.
+  * Then run `python3 scripts/build_swedish.py` and stage client/sv-data.js.
+MSG
+    exit 1
+  fi
+fi
