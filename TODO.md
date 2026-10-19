@@ -615,6 +615,33 @@ Add a day and night cycle to the world. **24 game hours pass in 20 real minutes*
 - [x] `TIME-WEATHER` — Connect the cycle to weather: weather rules may depend on the hour (morning fog, evening storms), a rainy sky tints the day colour darker, and night rain/snow stays visible against the dark tint. Hour weights are checked in Rust; `client/weather.js` paints after the day/night tint, and the private browser test compares rain and snow against clear at midnight.
 - [x] `TIME-CHECK` — Verify in a private world with the time forced: 24 game hours equal 20 real minutes within a small tolerance, every client shows the same hour, the time is continuous across a restart, outdoor zones follow the cycle and dungeons and interiors do not, nothing becomes unreadable at midnight in any zone (compare screenshots at several hours), and CPU with the cycle on and off stays within the render budget. Done 2026-10-16: `tests/daynight-check.cjs` (67 checks): two clients agree on the hour, the clock runs 0.02 game hours per real second (24 h = 1,200 s), every outdoor zone keeps a readable midnight (brightness 61-147 against 72-190 at noon) and every enclosed zone is unchanged, the tint costs no more than 1.35x the untinted main-thread time. The restart continuity half is the Rust test in `world/daynight.rs` (stored epoch survives a reopen).
 
+### Zone-specific night music
+
+Replace the shared *Lanterns After Sundown* track one outdoor zone at a time. For each zone task below, load its existing daytime score's editable project through the dybase2 MCP, make a calmer night remix that keeps recognizable themes, render and loop the new MP3, and connect it to that zone's night mix. Keep the current 18:00–20:00 dusk and 05:00–07:00 dawn crossfades, saved music volume and mute, and enclosed-zone behavior. Use a focused private audio check for each completed zone; unfinished zones retain the shared night track. Use only Sork-60 pads and leads.
+
+- [ ] `TIME-NIGHT-ROUTING` — Select the night score by outdoor zone, with the existing shared score as a fallback until each zone remix is ready. Load a zone's night MP3 only when its night mix needs it; preserve the title and enclosed-zone scores.
+- [ ] `TIME-NIGHT-Z0` — Load Greenmeadow's meadow score in dybase2 and add its chill night remix to Greenmeadow (zone 0, including Alderhaven).
+- [ ] `TIME-NIGHT-Z1` — Load the Emberfall Crags score in dybase2 and add its chill night remix to Emberfall Crags (zone 1).
+- [ ] `TIME-NIGHT-Z2` — Load the Rimeveil score in dybase2 and add its chill night remix to Rimeveil Glacier (zone 2).
+- [ ] `TIME-NIGHT-Z3` — Load the Gloamfen score in dybase2 and add its chill night remix to Gloamfen (zone 3).
+- [ ] `TIME-NIGHT-Z4` — Load the Skaldholm city score in dybase2 and add its chill night remix to Skaldholm (zone 4).
+- [ ] `TIME-NIGHT-Z6` — Load the Wyrdwood score in dybase2 and add its chill night remix to Wyrdwood (zone 6).
+- [ ] `TIME-NIGHT-Z7` — Load the Bifrost Reach score in dybase2 and add its chill night remix to Bifrost Reach (zone 7).
+- [ ] `TIME-NIGHT-Z9` — Load the Nacrehold score in dybase2 and add its chill night remix to Nacrehold (zone 9).
+- [ ] `TIME-NIGHT-Z13` — Load the Astralhollow score in dybase2 and add its chill night remix to Astralhollow (zone 13).
+- [ ] `TIME-NIGHT-Z14` — Load the Prismwaste score in dybase2 and add its chill night remix to the Prismwaste (zone 14).
+- [ ] `TIME-NIGHT-Z16` — Load the Moonspore score in dybase2 and add its chill night remix to the Moonspore Canopy (zone 16).
+- [ ] `TIME-NIGHT-Z17` — Load the Asterion score in dybase2 and add its chill night remix to Asterion (zone 17).
+- [ ] `TIME-NIGHT-Z19` — Load Stormglass Shore's *Where the Breakers Sing* daytime project in dybase2 and add its chill night remix to zone 19. The daytime score uses project `2c200357fd474fbb`; its former vault-score routing was fixed separately.
+- [ ] `TIME-NIGHT-Z20` — Load the Sunward Vale score in dybase2 and add its chill night remix to Sunward Vale (zone 20).
+- [ ] `TIME-NIGHT-Z21` — Load the Ribbonwild score in dybase2 and add its chill night remix to the Ribbonwild (zone 21).
+- [ ] `TIME-NIGHT-Z22` — Load the Tanglecrown score in dybase2 and add its chill night remix to the Tanglecrown (zone 22).
+- [ ] `TIME-NIGHT-Z23` — Load the Veyrroot Canopy score in dybase2 and add its chill night remix to Veyrroot Canopy (zone 23); the enclosed Heartwood keeps its existing score.
+- [ ] `TIME-NIGHT-Z25` — Load the Lapis Erg score in dybase2 and add its chill night remix to the Lapis Erg (zone 25).
+- [ ] `TIME-NIGHT-Z26` — Load the Frostwake score in dybase2 and add its chill night remix to Frostwake Shelf (zone 26).
+- [ ] `TIME-NIGHT-Z27` — Load the Cairnspine score in dybase2 and add its chill night remix to the Cairnspine (zone 27).
+- [ ] `TIME-NIGHT-Z28` — Load the Yearwheel score in dybase2 and add its chill night remix to the Yearwheel (zone 28), retaining the score's seasonal identity.
+
 ## Weather
 
 The world has no weather today. Each dungeon's art file has a small `weather()` function, but it only draws drifting ambient motes inside that dungeon. Add real weather to the outdoor world, such as rain, snow and others, which changes over time. It never shows when the player is **inside**: private dungeons and their rooms, building interiors and any other enclosed zone.
