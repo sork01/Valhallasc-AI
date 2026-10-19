@@ -630,6 +630,20 @@ Replace the shared *Lanterns After Sundown* track one outdoor zone at a time. **
 - [ ] `TIME-NIGHT-Z9` — Load the Nacrehold score in dybase2 and add its chill night remix to Nacrehold (zone 9).
 - [ ] `TIME-NIGHT-Z13` — Load the Astralhollow score in dybase2 and add its chill night remix to Astralhollow (zone 13).
 - [ ] `TIME-NIGHT-Z14` — Load the Prismwaste score in dybase2 and add its chill night remix to the Prismwaste (zone 14).
+
+**Night rhythm repair (owner report, 2026-10-19):** All ten shipped night songs feel off beat. For each task below, inspect the editable dybase2 project at its actual tempo and meter; correct misplaced drum, bass, chord and melody notes against the intended beat grid, including section starts and instrument latency. Quantize where appropriate, keep only deliberate and consistent swing or syncopation, and preserve a different Chillhop breakbeat for each song. Audition the entire arrangement against a metronome and check the rendered loop seam. Then rerender the game MP3 and upload the corrected full-length MP3 to FileDrop. Do not work on older copies or drafts.
+
+- [ ] `TIME-NIGHT-RHYTHM-Z0` — Fix the timing of Greenmeadow's *Fireflies on the Path* (zone 0, dybase2 `6c52c389c99ed898`).
+- [ ] `TIME-NIGHT-RHYTHM-Z1` — Fix the timing of Emberfall Crags' *Embers Beneath the Ridge* (zone 1, dybase2 `90d3be446ee5a58f`).
+- [ ] `TIME-NIGHT-RHYTHM-Z2` — Fix the timing of Rimeveil's *Stars Beneath the Ice* (zone 2, dybase2 `4091d2184af5bf68`).
+- [ ] `TIME-NIGHT-RHYTHM-Z3` — Fix the timing of Gloamfen's *Lights Across the Mere* (zone 3, dybase2 `631d2ccf54a0ea32`).
+- [ ] `TIME-NIGHT-RHYTHM-Z4` — Fix the timing of Skaldholm's *The Last Lantern* (zone 4, dybase2 `32550162e477d9e7`).
+- [ ] `TIME-NIGHT-RHYTHM-Z6` — Fix the timing of Wyrdwood's *Lanterns Under the Ash* (zone 6, dybase2 `a2ac7b7ae8fa8ad8`).
+- [ ] `TIME-NIGHT-RHYTHM-Z7` — Fix the timing of Bifrost Reach's *Stars Above the Rift* (zone 7, dybase2 `f8d95f2b7456bee1`).
+- [ ] `TIME-NIGHT-RHYTHM-Z9` — Fix the timing of Nacrehold's *Pearls Beneath the Moon* (zone 9, dybase2 `f0c6df77cbbaed17`).
+- [ ] `TIME-NIGHT-RHYTHM-Z13` — Fix the timing of Astralhollow's *Garden of Distant Stars* (zone 13, dybase2 `c452ba1d09acef9f`).
+- [ ] `TIME-NIGHT-RHYTHM-Z14` — Fix the timing of Prismwaste's *Saltglass Afterglow* (zone 14, dybase2 `5f35d1f41f52775f`).
+
 - [ ] `TIME-NIGHT-Z16` — Load the Moonspore score in dybase2 and add its chill night remix to the Moonspore Canopy (zone 16).
 - [ ] `TIME-NIGHT-Z17` — Load the Asterion score in dybase2 and add its chill night remix to Asterion (zone 17).
 - [ ] `TIME-NIGHT-Z19` — Load Stormglass Shore's *Where the Breakers Sing* daytime project in dybase2 and add its chill night remix to zone 19. The daytime score uses project `2c200357fd474fbb`; its former vault-score routing was fixed separately.

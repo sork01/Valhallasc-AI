@@ -95,8 +95,9 @@ const flatten=(bars,beatsPerBar,offset=0)=>bars.flatMap((bar,i)=>bar.map(([pitch
   try { await call('remove_track',{track:'Drums',...A}); } catch { /* already removed on a resumed run */ }
   for(const track of ['Bells','Pad','Bass','Sparkle','Lead','Strings'])
     await call('clear_bars',{track,from_bar:33,bars:12,...A});
-  for(const [track,preset] of [['Pad','Glass Pad'],['Lead','Whistle'],['Strings','Juno Strings']])
+  for(const [track,preset] of [['Pad','Glass Pad'],['Strings','Juno Strings']])
     await call('set_instrument',{track,instrument:'sork60',preset,...A});
+  await call('set_instrument',{track:'Lead',instrument:'dexed',preset:'WHISTLE FLUTE',...A});
   for(const [track,volume_db,pan] of [['Bells',-18,-.25],['Pad',-22,0],['Bass',-14,0],['Sparkle',-20,.3],['Lead',-22,.1],['Strings',-20,-.1]])
     await call('set_mix',{track,volume_db,pan,...A});
   const chords=[

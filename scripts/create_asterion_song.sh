@@ -21,7 +21,7 @@ const project=await call('create_project',{name:'Valhalla Asterion - Seven Rings
 const id=project.project_id;
 const A={project_id:id};
 for(const t of [
-  ['Moon drums','axiom8','Techno',-19],
+  ['Moon drums','axiom8','Chillhop',-19],
   ['Deep pulse','sorkbass2','Fingered',-12],
   ['Glass wheel','sork60','Arp Sequence',-18],
   ['City strings','sork60','Juno Strings',-16],

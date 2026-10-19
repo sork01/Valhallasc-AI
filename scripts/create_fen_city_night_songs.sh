@@ -28,8 +28,9 @@ const phrase=(bars,meter,offset=0)=>bars.flatMap((bar,i)=>bar.map(([pitch,at,len
   await call('set_time_signature',{numerator:4,denominator:4,...A});
   await call('set_key',{key:'D dorian',...A});
   try { await call('remove_track',{track:'Bubbles',...A}); } catch { /* already removed */ }
-  for(const [track,preset] of [['Pad','Mellow Pad'],['Flute','Whistle'],['Strings','Juno Strings']])
+  for(const [track,preset] of [['Pad','Mellow Pad'],['Strings','Juno Strings']])
     await call('set_instrument',{track,instrument:'sork60',preset,...A});
+  await call('set_instrument',{track:'Flute',instrument:'dexed',preset:'WHISTLE FLUTE',...A});
   for(const [track,volume_db,pan] of [['Lanterns',-11,-.25],['Pad',-27,0],['Bass',-4,0],['Flute',-19,.15],['Fireflies',-21,.3],['Strings',-18,-.1],['Drums',-4,0]])
     await call('set_mix',{track,volume_db,pan,...A});
   const chords=[

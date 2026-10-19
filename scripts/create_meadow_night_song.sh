@@ -25,10 +25,10 @@ await call('rename_project',{name:'Valhalla Greenmeadow Night - Fireflies on the
 await call('set_tempo',{bpm:100,...A});
 for(const [track,preset] of [
   ['Kantele','Clavinet'],
-  ['Flute','Whistle'],
   ['Harp','Clavinet'],
   ['Strings','Mellow Pad'],
 ]) await call('set_instrument',{track,instrument:'sork60',preset,...A});
+await call('set_instrument',{track:'Flute',instrument:'dexed',preset:'WHISTLE FLUTE',...A});
 for(const [track,volume_db,pan] of [
   ['Kantele',3,.1],
   ['Flute',-22,.1],
