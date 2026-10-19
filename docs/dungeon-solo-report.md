@@ -40,6 +40,29 @@ Not covered, and why:
 
 Tools: `ENRAGE_FILE=<path>` (test builds) and `scripts/dungeon-calibrate.py --enrage-file <path>`. The party check now runs one process per core.
 
+## Hired party of five against the sixteen final bosses (2026-10-19, `BOSSMECH-MERC` / `BOSSMECH-CHECK`)
+
+`cargo test a_hired_party -- --ignored --nocapture` (`DUNGEON_SOLO_SEEDS=4`, about 11 minutes): the hirer is a warrior in green gear at the dungeon's level; at Skaldholm's Meeting Stone, through the real offers (250 gold each), they hire a priest, a mage, a hunter and an assassin. The hired fighters have no gear (level attributes and starting potions) and play themselves (`merc_think`, `boss_play`). The same seeds are fought by the bot party of five (the control above). A boss counts as won only if it dies within 180 s; falls do not matter. The rule: the hired party wins at least half the seeds and never fewer than the bot party minus one.
+
+| Boss | Hired | Bots | Boss | Hired | Bots |
+| --- | --- | --- | --- | --- | --- |
+| Hollowking | 4/4 | 4/4 | Seed Vault Worldseed | 4/4 | 4/4 |
+| Choirmother | 4/4 | 4/4 | Sunken Astrolabe Axis | 3/4 | 4/4 |
+| Coral Regent | 4/4 | 4/4 | Thunder Heart | 4/4 | 4/4 |
+| Hierophant | 4/4 | 4/4 | Bloom Heart | 4/4 | 4/4 |
+| Moonwell Echo | 4/4 | 4/4 | **Solar Heart** | **1/4** | 4/4 |
+| Eye Below | 3/4 | 4/4 | Amber Memory | 4/4 | 4/4 |
+| Elder Heart | 4/4 | 4/4 | Solstice Heart | 4/4 | 4/4 |
+| Pavilion Sovereign | 4/4 | 4/4 | Rain Crown | 4/4 | 4/4 |
+
+Fifteen of sixteen meet the rule. **Solar Heart** does not (1 of 4; 2 of 8 in a longer run) and is listed in `KNOWN_SHORT` in the test. Cause, from the fight trace: a hired fighter who falls wakes at the door, runs 40 to 60 tiles back alone and arrives into bodies that have moved; Twin Suns' bridge of light (lethal within 1.1 of the line between the bodies, which chase) kills the whole party again and again, and a wiped party ends the run (36 to 49 s, boss at 1 to 14 percent). `BOSSMECH-DEATH` (the dead stay down until the fight ends) removes the run-in loop: re-run this table after it.
+
+What the check changed:
+
+- **The harness** (`ttk.rs`, `run_hired_party_pack_once`): only the hirer is driven; the party is not beaten while a hired fighter lives (the first version stopped as soon as the hirer fell). A hirer who has been idle 10 s with no line of sight to the boss is set down in sight of it with the hired fighters beside them ("stepped round a wall" in the output): bodies and bots walk in straight lines and a wall between them was a stalemate no human would keep.
+- **The brain** (`boss_play.rs`): against a divided boss each fighter kept re-choosing the half with more health after every blow, so the whole party changed sides of the bridge every second or two (trace: target 1197, 1198, 1197...). A fighter now stays on the half they chose until the other has a fifth more health (`BossMech.halves`). The bot party on Solar Heart: 8 of 8 before and after (62 to 88 s); a side-of-body station instead of the far side was tried and made the bots worse (5 of 8), so it was dropped.
+- Eye Below and the Astrolabe each lose one seed to the hired party (3 of 4): the hired fighters fall more (10 falls in the worst run) but still kill the boss three times in four.
+
 ### Why multipliers alone failed (first pass)
 
 Measured with the same tools:

@@ -36,6 +36,9 @@ pub struct BossMech {
     pub(super) plans: BTreeMap<u64, Point>,
     /// The brazier each fighter has taken to light (`boss_play.rs`).
     pub(super) stations: BTreeMap<u64, Point>,
+    /// The half of a divided boss each fighter is working on, kept between ticks so the party does not change sides of
+    /// the lethal bridge with every blow (`boss_play.rs`).
+    pub(super) halves: BTreeMap<u64, usize>,
     /// Seconds a break had left when it was broken, one per dirge: what the harness reads to tune a bar.
     #[cfg(test)]
     pub(super) spare: Vec<f64>,
@@ -51,6 +54,7 @@ impl BossMech {
             next_id: 1,
             plans: BTreeMap::new(),
             stations: BTreeMap::new(),
+            halves: BTreeMap::new(),
             #[cfg(test)]
             spare: vec![],
         }

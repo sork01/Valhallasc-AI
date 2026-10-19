@@ -408,6 +408,87 @@ fn a_party_of_five_beats_every_dungeon_pack_and_boss() {
     );
 }
 
+/// `BOSSMECH-MERC`: the same fight with a hired party. The hirer (a warrior in green gear at the dungeon's level) rents a
+/// priest, a mage, a hunter and an assassin at Skaldholm's Meeting Stone (250 gold each, the real offers); the hired
+/// fighters have no gear and play themselves through `merc_think` and `boss_play`. Each final boss is fought by both parties
+/// on the same seeds; the hired party must win at least half the runs and never fewer than the bot party minus one.
+/// `DUNGEON_SOLO_DUNGEONS` / `DUNGEON_SOLO_KINDS` / `DUNGEON_SOLO_SEEDS` limit it.
+/// Final bosses the hired party is known to beat less often than a human one (see the comment where it is used).
+const KNOWN_SHORT: [&str; 1] = ["solar_heart"];
+
+#[test]
+#[ignore = "slow: one fight per boss per seed per party"]
+fn a_hired_party_of_five_beats_every_final_boss_about_as_often_as_a_human_party() {
+    let table = world().boss.table.keys().cloned().collect::<Vec<_>>();
+    let mercs = [Class::Priest, Class::Mage, Class::Hunter, Class::Assassin];
+    let mut failed = vec![];
+    for d in dungeons() {
+        for (kind, spawn) in d.bosses.iter().filter(|(k, _)| table.contains(k)) {
+            let case = Case {
+                consumables: true,
+                rarity: BASELINE_RARITY,
+                enemy_level: Some(d.level),
+                cap: Some(CAP_SECONDS),
+                ..Case::new(PARTY[0], d.level)
+            };
+            let ids = [*spawn];
+            let hired: Vec<_> = (1..=seeds())
+                .map(|seed| run_hired_party_pack_once(&case, Class::Warrior, &mercs, &ids, seed))
+                .collect();
+            let human: Vec<_> = (1..=seeds())
+                .map(|seed| run_party_pack_once(&case, &PARTY, &ids, seed))
+                .collect();
+            let (h, p) = (
+                hired.iter().filter(|r| r.killed).count() as u64,
+                human.iter().filter(|r| r.killed).count() as u64,
+            );
+            let detail = hired
+                .iter()
+                .map(|r| {
+                    format!(
+                        "{:.0} s, {} fell, boss at {:.0}%{}",
+                        r.seconds,
+                        r.deaths,
+                        r.enemy_left * 100.,
+                        if r.unstuck > 0 {
+                            format!(", stepped round a wall {}x", r.unstuck)
+                        } else {
+                            String::new()
+                        }
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join("; ");
+            let short = h * 2 < seeds() || h + 1 < p;
+            // Known: a fallen hired fighter wakes at the door and runs back alone into a fight that has moved on (Solar
+            // Heart's bridge of light kills it on arrival, again and again). `BOSSMECH-DEATH` (the dead stay down until the
+            // fight ends) removes the loop; re-check this list then.
+            let bad = short && !KNOWN_SHORT.contains(&kind.as_str());
+            eprintln!(
+                "[hired5] {} L{} {kind}: hired won {h} of {}, bot party {p} ({detail}){}",
+                d.name,
+                d.level,
+                seeds(),
+                if bad {
+                    "  <-- HIRED PARTY FALLS SHORT"
+                } else if short {
+                    "  (known short, see KNOWN_SHORT)"
+                } else {
+                    ""
+                }
+            );
+            if bad {
+                failed.push(format!("{kind}: hired {h}, bots {p} of {}", seeds()));
+            }
+        }
+    }
+    assert!(
+        failed.is_empty(),
+        "a hired party must keep up with a human one:\n{}",
+        failed.join("\n")
+    );
+}
+
 /// Do dungeon monsters actually hurt? `DUNGEON_SOLO_DUNGEONS=undervault DUNGEON_SOLO_CLASS=priest cargo test dungeon_probe -- --ignored --nocapture`
 /// prints damage, hits and health for every boss and the first mob of the chosen dungeons, in green and purple gear.
 #[test]

@@ -32,8 +32,23 @@ impl World {
         let Some((play, plan, station)) = self.think(session) else {
             self.boss.plans.remove(&session);
             self.boss.stations.remove(&session);
+            self.boss.halves.remove(&session);
             return None;
         };
+        match play.target {
+            Some(t)
+                if self
+                    .boss
+                    .fights
+                    .values()
+                    .any(|f| f.partner.is_some() && (f.boss == t || f.partner == Some(t))) =>
+            {
+                self.boss.halves.insert(session, t);
+            }
+            _ => {
+                self.boss.halves.remove(&session);
+            }
+        }
         match plan {
             Some(g) => {
                 self.boss.plans.insert(session, g);
@@ -720,11 +735,27 @@ impl World {
             return Some(helper);
         }
         if let Some(partner) = fight.partner {
+            let open = |s: &usize| alive(s) && !fight.downed.contains_key(s);
+            let hp = |s: &usize| self.slimes[*s].hp;
+            // Stay on the half already chosen until the other has a fifth more health: the one with more health left is
+            // the one to hit so the two come down together, but a choice made again with every blow sends the whole party
+            // back and forth across the bridge of light.
+            if let Some(kept) = self
+                .boss
+                .halves
+                .get(&session)
+                .copied()
+                .filter(|h| (*h == fight.boss || *h == partner) && open(h))
+                && let Some(other) = [fight.boss, partner].into_iter().find(|s| *s != kept)
+                && (!open(&other) || hp(&other) <= hp(&kept) * 1.2)
+            {
+                return Some(kept);
+            }
             return [fight.boss, partner]
                 .into_iter()
-                .filter(|s| alive(s) && !fight.downed.contains_key(s))
+                .filter(open)
                 // the one with more health left, so the two come down together
-                .max_by(|a, b| self.slimes[*a].hp.total_cmp(&self.slimes[*b].hp));
+                .max_by(|a, b| hp(a).total_cmp(&hp(b)));
         }
         None
     }

@@ -775,6 +775,9 @@ pub struct PartyOutcome {
     pub enemy_left: f64,
     /// Seconds each broken channel had left (`BossMech::spare`).
     pub break_spare: Vec<f64>,
+    /// Times the hired party was set down in sight of the boss after ten idle seconds behind a wall (a hirer who steps
+    /// round the corner; the harness walks in straight lines).
+    pub unstuck: u32,
 }
 
 /// A party of `members` against several monsters at once (a dungeon pack or a boss). Every living member fights the
@@ -782,6 +785,103 @@ pub struct PartyOutcome {
 pub fn run_party_pack_once(
     case: &Case,
     members: &[Class],
+    ids: &[usize],
+    seed: u64,
+) -> PartyOutcome {
+    party_pack_fight(case, members, &[], ids, seed)
+}
+
+/// The hirer (`hirer`, driven like any member) with `mercs` rented at Skaldholm's Meeting Stone through the real offers
+/// (250 gold each, the hirer's level, no gear but the starting potions), against a dungeon boss or pack. The mercenaries
+/// play themselves (`merc_think`, `boss_play`); `deaths` counts every fall, theirs too.
+pub fn run_hired_party_pack_once(
+    case: &Case,
+    hirer: Class,
+    mercs: &[Class],
+    ids: &[usize],
+    seed: u64,
+) -> PartyOutcome {
+    party_pack_fight(case, &[hirer], mercs, ids, seed)
+}
+
+/// Rents `mercs` for the hirer (session 1) at the Meeting Stone, then sets the hirer at `start` in `zone` with the hired
+/// fighters on free ground beside them.
+fn hire_mercenaries(w: &mut World, mercs: &[Class], zone: usize, start: Point) {
+    let stone_zone = w
+        .maps
+        .iter()
+        .position(|m| m.npcs.iter().any(|n| n.id == "city_meetingstone"))
+        .expect("a Meeting Stone");
+    let stone = w.maps[stone_zone]
+        .npcs
+        .iter()
+        .find(|n| n.id == "city_meetingstone")
+        .unwrap()
+        .clone();
+    {
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.gold = 250 * mercs.len() as u32 + 1000;
+        c.zone = stone_zone;
+        c.x = stone.x;
+        c.y = stone.y + 1.;
+    }
+    for class in mercs {
+        w.time += 0.6;
+        let name = format!("{class:?}").to_lowercase();
+        w.interact(1, "city_meetingstone", Some(&format!("merc_{name}")));
+    }
+    assert_eq!(
+        w.players.values().filter(|p| p.merc.is_some()).count(),
+        mercs.len(),
+        "every mercenary was hired"
+    );
+    {
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.zone = zone;
+        c.x = start.x;
+        c.y = start.y;
+    }
+    seat_hired(w, zone, start);
+}
+
+/// Puts every hired fighter on free ground round `at`, in `zone`, at full health.
+fn seat_hired(w: &mut World, zone: usize, at: Point) {
+    let hired: Vec<u64> = w
+        .players
+        .iter()
+        .filter(|(_, p)| p.merc.is_some())
+        .map(|(s, _)| *s)
+        .collect();
+    let mut taken: Vec<Point> = vec![at];
+    for session in hired {
+        let spot = (0..200)
+            .map(|k| {
+                let a = k as f64 * 2.4;
+                let r = 1.4 + k as f64 * 0.05;
+                Point {
+                    x: at.x + a.cos() * r,
+                    y: at.y + a.sin() * r,
+                }
+            })
+            .find(|&p| {
+                let mut q = p;
+                w.maps[zone].collide(&mut q, PLAYER_RADIUS);
+                q.distance(p) < 0.01 && taken.iter().all(|t| t.distance(p) >= 0.9)
+            })
+            .expect("room beside the hirer for a mercenary");
+        taken.push(spot);
+        let c = &mut w.players.get_mut(&session).unwrap().character;
+        c.zone = zone;
+        c.x = spot.x;
+        c.y = spot.y;
+        c.hp = c.max_hp();
+    }
+}
+
+fn party_pack_fight(
+    case: &Case,
+    members: &[Class],
+    mercs: &[Class],
     ids: &[usize],
     seed: u64,
 ) -> PartyOutcome {
@@ -820,6 +920,9 @@ pub fn run_party_pack_once(
         c.x = start.x;
         c.y = start.y;
         build_character(c, &Case { class, ..*case });
+        if n == 0 && !mercs.is_empty() {
+            hire_mercenaries(&mut w, mercs, zone, start);
+        }
     }
     w.enter_instance(zone);
     let mut out = Outcome {
@@ -843,12 +946,59 @@ pub fn run_party_pack_once(
     let cap = case.cap.unwrap_or_else(|| cap_for(case.rotation));
     let mut killed = false;
     let mut falls = 0;
+    let mut unstuck = 0;
+    let mut last_left = 1.;
+    let mut idle_since = w.time;
+    let mut merc_down: Vec<(u64, bool)> = w
+        .players
+        .iter()
+        .filter(|(_, p)| p.merc.is_some())
+        .map(|(s, _)| (*s, false))
+        .collect();
     let answers = boss_bots_answer();
     let trace = std::env::var("DUNGEON_BOSS_TRACE").is_ok();
     while w.time - start_time < cap {
         if ids.iter().all(|&i| w.slimes[i].dead) {
             killed = true;
             break;
+        }
+        if !mercs.is_empty() {
+            let now_left = left(&w);
+            if (last_left - now_left).abs() > 0.0005 {
+                last_left = now_left;
+                idle_since = w.time;
+            }
+            let hirer = w.players[&1].character.point();
+            let target = ids.iter().copied().find(|&i| !w.slimes[i].dead);
+            if w.time - idle_since >= 10.
+                && w.players[&1].character.hp > 0.
+                && let Some(t) = target
+                && !w.maps[zone].line_clear(hirer, w.slimes[t].point(), 0.3)
+            {
+                let boss = w.slimes[t].point();
+                'seat: for distance in [5., 6., 7., 4.] {
+                    for k in 0..16 {
+                        let a = k as f64 / 16. * std::f64::consts::TAU;
+                        let mut p = Point {
+                            x: boss.x + a.cos() * distance,
+                            y: boss.y + a.sin() * distance,
+                        };
+                        let wanted = p;
+                        w.maps[zone].collide(&mut p, PLAYER_RADIUS);
+                        if p.distance(wanted) < 0.01
+                            && w.maps[zone].line_clear(boss, p, 0.3)
+                            && w.bot_threat(zone, 1, p, 0.).is_none()
+                        {
+                            let c = &mut w.players.get_mut(&1).unwrap().character;
+                            (c.x, c.y) = (p.x, p.y);
+                            seat_hired(&mut w, zone, p);
+                            unstuck += 1;
+                            idle_since = w.time;
+                            break 'seat;
+                        }
+                    }
+                }
+            }
         }
         let mut anyone_alive = false;
         for (n, aimed_at) in aimed.iter_mut().enumerate() {
@@ -949,10 +1099,109 @@ pub fn run_party_pack_once(
                 use_consumables(&mut w, session, &mut out);
             }
         }
-        if !anyone_alive {
+        // A hirer who fell stays down (like a bot that fell); the party is only beaten when the hired fighters are too.
+        let hired_alive = w
+            .players
+            .values()
+            .any(|p| p.merc.is_some() && p.character.hp > 0.);
+        if !anyone_alive && !hired_alive {
             break;
         }
         w.step();
+        if trace
+            && std::env::var("DUNGEON_MERC_TRACE").is_ok()
+            && w.boss.fights.contains_key(&ids[0])
+        {
+            let t = w.time - start_time;
+            if (28. ..37.).contains(&t) && ((t * 20.).round() as u64).is_multiple_of(5) {
+                let hired: Vec<u64> = w
+                    .players
+                    .iter()
+                    .filter(|(_, p)| p.merc.is_some())
+                    .map(|(s, _)| *s)
+                    .collect();
+                for session in hired {
+                    let p = &w.players[&session];
+                    let (at, goal, target) = (p.character.point(), p.goal, p.target);
+                    let play = w.boss_play(session);
+                    let bodies: Vec<(f64, f64)> = w
+                        .slimes
+                        .iter()
+                        .filter(|s| {
+                            s.zone == zone
+                                && !s.dead
+                                && (s.id == ids[0] || s.kind == "solar_cinder")
+                        })
+                        .map(|s| (s.x.round(), s.y.round()))
+                        .collect();
+                    let line = if bodies.len() == 2 {
+                        Some(
+                            (crate::bossmech::segment_distance(
+                                at,
+                                Point {
+                                    x: bodies[0].0,
+                                    y: bodies[0].1,
+                                },
+                                Point {
+                                    x: bodies[1].0,
+                                    y: bodies[1].1,
+                                },
+                            ) * 10.)
+                                .round()
+                                / 10.,
+                        )
+                    } else {
+                        None
+                    };
+                    eprintln!(
+                        "  t={t:.2} bodies {bodies:?} line-dist {line:?} merc {:?} at ({:.1},{:.1}) goal {:?} target {:?} play goal {:?} hold {} stay {} ptarget {:?}",
+                        w.players[&session].character.look.class,
+                        at.x,
+                        at.y,
+                        goal.map(|g| (g.x.round(), g.y.round())),
+                        target,
+                        play.as_ref()
+                            .and_then(|b| b.goal)
+                            .map(|g| (g.x.round(), g.y.round())),
+                        play.as_ref().is_some_and(|b| b.hold_fire),
+                        play.as_ref().is_some_and(|b| b.stay),
+                        play.as_ref().and_then(|b| b.target),
+                    );
+                }
+            }
+        }
+        for (session, was_down) in merc_down.iter_mut() {
+            let down = w.players.get(session).is_none_or(|p| p.character.hp <= 0.);
+            if down && !*was_down {
+                falls += 1;
+                if trace && let Some(p) = w.players.get(session) {
+                    let boss = w.slimes[ids[0]].point();
+                    let partner = w
+                        .slimes
+                        .iter()
+                        .find(|s| s.kind == "solar_cinder" && s.zone == zone && !s.dead)
+                        .map(|s| s.point());
+                    eprintln!(
+                        "  t={:.1} merc {:?} down at ({:.1},{:.1}); boss ({:.1},{:.1}) partner {:?} off the line {:?}",
+                        w.time - start_time,
+                        p.character.look.class,
+                        p.character.x,
+                        p.character.y,
+                        boss.x,
+                        boss.y,
+                        partner.map(|q| (q.x.round(), q.y.round())),
+                        partner.map(|q| (crate::bossmech::segment_distance(
+                            p.character.point(),
+                            boss,
+                            q
+                        ) * 10.)
+                            .round()
+                            / 10.)
+                    );
+                }
+            }
+            *was_down = down;
+        }
         for (n, rx) in rxs.iter_mut().enumerate() {
             for v in drain(rx) {
                 if n == 0 && v["kind"] == "death" {
@@ -996,14 +1245,24 @@ pub fn run_party_pack_once(
             let boss = &w.slimes[ids[0]];
             let shield = w.boss.fights.get(&ids[0]).and_then(|f| f.shield_alive(&w));
             let frozen = w.boss.fights.get(&ids[0]).map_or(0, |f| f.frozen_count());
-            let who: Vec<String> = (0..members.len())
-                .map(|n| {
-                    let c = &w.players[&(n as u64 + 1)].character;
-                    format!("{:.0}%@({:.0},{:.0})", c.hp / c.max_hp() * 100., c.x, c.y)
+            let mut sessions: Vec<u64> = w.players.keys().copied().collect();
+            sessions.sort_unstable();
+            let who: Vec<String> = sessions
+                .iter()
+                .map(|s| {
+                    let p = &w.players[s];
+                    let c = &p.character;
+                    format!(
+                        "{}{:.0}%@({:.0},{:.0})",
+                        if p.merc.is_some() { "m" } else { "" },
+                        c.hp / c.max_hp() * 100.,
+                        c.x,
+                        c.y
+                    )
                 })
                 .collect();
             eprintln!(
-                "  t={:.0} boss {:.0}% at ({:.0},{:.0}) state {} shield {:?} frozen {} party {}",
+                "  t={:.0} boss {:.0}% at ({:.0},{:.0}) state {} shield {:?} frozen {} clear {} party {}",
                 w.time - start_time,
                 boss.hp / boss.max_hp * 100.,
                 boss.x,
@@ -1011,6 +1270,7 @@ pub fn run_party_pack_once(
                 boss.state,
                 shield,
                 frozen,
+                w.maps[zone].line_clear(w.players[&1].character.point(), boss.point(), 0.3),
                 who.join(" ")
             );
         }
@@ -1022,6 +1282,7 @@ pub fn run_party_pack_once(
         seconds: w.time - start_time,
         enemy_left: left(&w).clamp(0., 1.),
         break_spare: w.boss.spare.clone(),
+        unstuck,
     }
 }
 

@@ -2850,8 +2850,18 @@ fn helpers_and_cocoons_are_hit_before_the_boss_and_the_weaker_half_of_a_divided_
     let (mut r, partner) = split_rig();
     r.w.slimes[partner].hp = 10.;
     assert_eq!(r.w.boss_play(1).unwrap().target, Some(r.boss));
+    // A small lead does not move the fighter (the choice made again with every blow sent a whole party back and forth across
+    // the bridge of light); a lead of more than a fifth does.
     r.w.slimes[partner].hp = r.w.slimes[r.boss].hp + 1000.;
+    assert_eq!(r.w.boss_play(1).unwrap().target, Some(r.boss));
+    r.w.slimes[partner].hp = r.w.slimes[r.boss].hp * 1.25;
     assert_eq!(r.w.boss_play(1).unwrap().target, Some(partner));
+    r.w.slimes[r.boss].hp = r.w.slimes[partner].hp * 1.1;
+    assert_eq!(
+        r.w.boss_play(1).unwrap().target,
+        Some(partner),
+        "ten percent behind: stay on the half already chosen"
+    );
 }
 
 #[test]
