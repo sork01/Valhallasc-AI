@@ -10,6 +10,7 @@ CLASSES = ('warrior', 'mage', 'assassin', 'priest', 'hunter')
 CLASS_KINDS = ('armor', 'headgear', 'shoulders', 'gloves', 'weapon')
 SHARED_KINDS = ('pants', 'necklace', 'accessory')
 SOURCES = {
+    'keel': 'longship',
     'eye': 'eye_below', 'elder': 'elder_hollow', 'pavilion': 'thousandfold',
     'rain': 'rain_crown', 'seed': 'seed_vault', 'astro': 'sunken_astrolabe',
     'thunder': 'thunderheart_gate', 'bloom': 'blooming_labyrinth',
@@ -31,7 +32,7 @@ def initial():
                 tasks.append(dict(id=f'{group}-{cls or "shared"}-{kind}', group=group,
                                   className=cls, kind=kind, item=item['id'], name=item['name'],
                                   done=False, phase='not started', note='', evidence=[]))
-    assert len(tasks) == 336
+    assert len(tasks) == len(SOURCES) * 28
     return dict(updated=datetime.now().isoformat(timespec='seconds'), tasks=tasks)
 
 

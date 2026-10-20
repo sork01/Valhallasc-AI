@@ -363,16 +363,28 @@
     2.52,
     1.0
   ],
-  "barrow_scarab": [
+  "barrow_hound": [
     1.0,
     5.0
   ],
-  "barrow_hound": [
+  "barrow_scarab": [
     1.0,
     5.0
   ],
   "barrow_spinner": [
     1.0,
     5.0
+  ],
+  "keel_lantern": [
+    1,
+    8
+  ],
+  "keel_deckhand": [
+    1,
+    8
+  ],
+  "keel_crab": [
+    1,
+    8
   ]
 }

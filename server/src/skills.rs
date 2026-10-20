@@ -100,6 +100,25 @@ pub struct Skill {
     pub cost: f64,
     #[serde(default)]
     pub lifesteal: f64,
+    /// Seconds a player hit by this skill in a duel, arena or flagged fight cannot move, attack or cast. Monsters are
+    /// not stunned by it.
+    #[serde(default)]
+    pub stun: f64,
+    /// Seconds a player hit by this skill in a PvP fight cannot move (it can still attack and cast, except dashes).
+    #[serde(default)]
+    pub root: f64,
+    /// Share of the healing a player hit by this skill in a PvP fight loses (0.5 = half), for `wound_time` seconds. It
+    /// covers skills, lifesteal, potions, food and set bonuses; natural regeneration is untouched.
+    #[serde(default)]
+    pub wound: f64,
+    #[serde(default)]
+    pub wound_time: f64,
+    /// A shield on the caster that soaks up this share of its maximum health in damage from players (PvP fights only; monsters
+    /// ignore it) for `absorb_time` seconds.
+    #[serde(default)]
+    pub absorb: f64,
+    #[serde(default)]
+    pub absorb_time: f64,
     #[serde(default)]
     pub pulse: Option<Pulse>,
     pub effect: Effect,

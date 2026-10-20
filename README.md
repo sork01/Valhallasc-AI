@@ -543,3 +543,13 @@ A private party dungeon below Bifrost Reach, with three guardians, three quests,
 Bridgeward level-30 loot, original PixelFlow enemies and a 3/4 chamber score.
 See [docs/skybridge.md](docs/skybridge.md) for generator commands, focused
 validation and the private-copy migration required before deployment.
+
+### The Drowned Longship — level 35 (2026-10-20)
+
+A five-person private wreck west of Keelhaven in Rán’s Deep (public zone 43).
+Its pointed hull, split cargo hatch, gangplank and copper ribs have their own
+collision and rendering. Six nautical foes guard three encounters; 28 original
+Keelbound equipment pieces use copper, navy sailcloth, rope and coral on both
+hero bodies. Editable PixelFlow sprites and a 6/8 dybase2 score accompany it.
+See [docs/longship.md](docs/longship.md) for generation, validation and the
+private-copy migration required before a server deployment.

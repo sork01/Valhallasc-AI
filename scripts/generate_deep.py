@@ -626,7 +626,7 @@ def main():
         raise SystemExit("Ran's Deep has problems:\n  " + '\n  '.join(problems))
     raw = PATH.read_text()
     world = json.loads(raw)
-    assert json.dumps(world, indent=2) + '\n' == raw, 'map.txt is not in the canonical 2-space JSON layout'
+    assert json.dumps(world, indent=2, ensure_ascii=False) + '\n' == raw, 'map.txt is not in the canonical 2-space JSON layout'
     names = [z['name'] for z in world['zones']]
     assert names[:7] == ['Emberfall Crags', 'Rimeveil Glacier', 'Gloamfen', 'Skaldholm', 'The Undervault', 'Wyrdwood', 'Bifrost Reach'], f'unexpected zones {names}'
     later = world['zones'][8:]
@@ -634,9 +634,11 @@ def main():
     if any(z['name'] == 'Nacrehold' for z in later):
         from generate_nacrehold import open_tideway
         open_tideway(zone)
+    from generate_longship import install_parent
+    install_parent(world)
     open_maelstrom(world['zones'][6], world)
     spark_travel.ensure(world)
-    PATH.write_text(json.dumps(world, indent=2) + '\n')
+    PATH.write_text(json.dumps(world, indent=2, ensure_ascii=False) + '\n')
     new = add_materials()
     kinds = {}
     for sl in zone['slimes']:

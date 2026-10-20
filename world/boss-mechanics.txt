@@ -1,4 +1,41 @@
 {
+  "keel_captain": {
+    "arena": [
+      48,
+      20,
+      80,
+      40
+    ],
+    "mechanics": [
+      {
+        "name": "Anchorfall",
+        "block": "zone",
+        "hp_min": 0.35,
+        "shape": {
+          "kind": "lane",
+          "width": 4
+        },
+        "effect": "kill",
+        "cast": 5,
+        "every": 22
+      },
+      {
+        "name": "Anchorfall",
+        "block": "zone",
+        "hp_max": 0.35,
+        "shape": {
+          "kind": "lane",
+          "width": 6
+        },
+        "effect": "kill",
+        "cast": 5,
+        "every": 18,
+        "echo": [
+          3
+        ]
+      }
+    ]
+  },
   "barrow_fatebound": {
     "arena": [40, 6, 72, 30],
     "mechanics": [

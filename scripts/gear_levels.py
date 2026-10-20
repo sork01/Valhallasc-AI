@@ -196,6 +196,7 @@ def main():
     out.extend(moonwell_pieces(out))
     out.extend(eye_below_pieces(out))
     out.extend(nornroot_pieces(out))
+    out.extend(longship_pieces(out))
     out.extend(skybridge_pieces(out))
     out.extend(elder_hollow_pieces(out))
     out.extend(thousandfold_pieces(out))
@@ -312,6 +313,25 @@ def moonwell_pieces(out):
         v['bonusStats'] = bonus_stats(v)
         pieces.append(ordered(v))
     assert len(pieces) == 28
+    return pieces
+
+
+def longship_pieces(out):
+    """28 bespoke Keelbound pieces, original geometry/palette, existing L35 blue budgets +15%."""
+    pieces=[]
+    prefixes={'warrior':'Copperwake','mage':'Wheelkeeper','assassin':'Brinehook','priest':'Bellwatch','hunter':'Harpooner'}
+    weapons={'warrior':'Keelbound Boarding Cutlass','mage':'Keelbound Wheelstaff','assassin':'Keelbound Boarding Hooks','priest':'Keelbound Diving Bell','hunter':'Keelbound Harpoon Bow'}
+    shared={'pants':'Keelbound Rope Gaiters','necklace':'Keelbound Anchor Pendant','accessory':'Keelbound Porthole Ring'}
+    for i in out:
+        if i.get('source') or i['rarity']!='rare' or i.get('requiredLevel')!=35 or i['kind'] not in CLASS_KINDS+SHARED_KINDS: continue
+        v=dict(i);suffix='_l35_blue'
+        for key in ('id','variant'):
+            assert v[key].endswith(suffix);v[key]=v[key][:-len(suffix)]+'_l35_keel'
+        cls=i.get('class');kind=i['kind']
+        v['name']=(weapons[cls] if kind=='weapon' else 'Keelbound '+prefixes[cls]+' '+SLOT_NAMES[kind]) if cls else shared[kind]
+        for key in ('attack','defense'):v[key]=round(i[key]*1.15,1)
+        v['sell']=round(i['sell']*1.15);v['source']='longship';v['art']='regearkeel';v.pop('tint',None);v['bonusStats']=bonus_stats(v);pieces.append(ordered(v))
+    assert len(pieces)==28
     return pieces
 
 
@@ -639,7 +659,11 @@ def nornroot_only():
 
 if __name__ == '__main__':
     import sys
-    if '--nornroot-only' in sys.argv:
+    if '--longship-only' in sys.argv:
+        existing=json.loads(ITEMS.read_text());new={i['id']:i for i in longship_pieces(existing)}
+        out=[new.pop(i['id'],i) for i in existing];out.extend(new.values());ITEMS.write_text(json.dumps(out,indent=2,ensure_ascii=False)+'\n')
+        print('28 Keelbound pieces refreshed')
+    elif '--nornroot-only' in sys.argv:
         nornroot_only()
     else:
         vault_only() if '--vault-only' in sys.argv else main()

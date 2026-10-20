@@ -41,7 +41,7 @@ Object.assign(DEFAULT_LEVELS, { sandhopper: 80, dunefennec: 81, glassscorpion: 8
 Object.assign(DEFAULT_LEVELS, { snowhare: 85, iceotter: 86, frostheron: 87, glaciercrab: 88, bellmammoth: 88, auroramanta: 89, crevasseleviathan: 90 });
 Object.assign(DEFAULT_LEVELS, { screeferret: 90, stoneibex: 91, slateraven: 92, ridgeadder: 93, cairnbehemoth: 93, whitebarktitan: 94, stormcondor: 95 });
 Object.assign(DEFAULT_LEVELS, { brooknewt: 95, sundarter: 96, acornmimic: 97, snowstoat: 98, bloomtortoise: 95, petalchimera: 96, rainseraph: 97, glasslion: 96, sunwheel: 97, firephoenix: 98, lanternowl: 97, harvestreaper: 98, ambermantis: 99, rimesaber: 97, snowgiant: 98, longnightwyrm: 99 });
-for (const catalog of ['skybridge', 'nornroot', 'cathedral', 'eye_below', 'elder_hollow', 'thousandfold', 'rain_crown', 'seed_vault', 'sunken_astrolabe', 'thunderheart_gate', 'blooming_labyrinth', 'solar_crucible', 'amber_archive', 'silent_solstice']) {
+for (const catalog of ['longship', 'skybridge', 'nornroot', 'cathedral', 'eye_below', 'elder_hollow', 'thousandfold', 'rain_crown', 'seed_vault', 'sunken_astrolabe', 'thunderheart_gate', 'blooming_labyrinth', 'solar_crucible', 'amber_archive', 'silent_solstice']) {
   Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, `world/${catalog}.txt`), 'utf8')).map(e => [e.kind, e.level])));
 }
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
@@ -4536,3 +4536,5 @@ async function runScenario(name, world = new TestWorld()) {
 }
 
 module.exports = { scenarios, runScenario, walkTo };
+
+scenarios.longship = require("./longship-scenario.cjs")(kit, map);

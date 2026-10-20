@@ -102,9 +102,16 @@ impl World {
         let basic = self.set_basic_damage(session);
         let mut applied = true;
         match source.as_str() {
-            "nornroot" => {
+            "longship" => {
                 let c = &mut self.players.get_mut(&session).unwrap().character;
-                c.hp = (c.hp + c.max_hp() * 0.04).min(c.max_hp());
+                c.hp = (c.hp + c.max_hp() * 0.03).min(c.max_hp());
+                c.change_resource(c.max_resource() * 0.03);
+            }
+            "nornroot" => {
+                let p = self.players.get_mut(&session).unwrap();
+                let factor = p.heal_factor();
+                let c = &mut p.character;
+                c.hp = (c.hp + c.max_hp() * 0.04 * factor).min(c.max_hp());
             }
             "skybridge" => {
                 if let Some(id) = self.set_target(zone, origin, 4., &[]) {
@@ -153,8 +160,9 @@ impl World {
             "cathedral_nave" => {
                 for target in self.allies_near(session, 4.) {
                     let p = self.players.get_mut(&target).unwrap();
-                    p.character.hp =
-                        (p.character.hp + p.character.max_hp() * 0.03).min(p.character.max_hp());
+                    p.character.hp = (p.character.hp
+                        + p.character.max_hp() * 0.03 * p.heal_factor())
+                    .min(p.character.max_hp());
                 }
             }
             "moonwell" => {
@@ -387,8 +395,8 @@ impl World {
                         .get_mut(&target)
                         .filter(|p| p.character.hp > 0. && p.character.zone == zone)
                     {
-                        p.character.hp =
-                            (p.character.hp + rate * TICK.min(left)).min(p.character.max_hp());
+                        p.character.hp = (p.character.hp + rate * TICK.min(left) * p.heal_factor())
+                            .min(p.character.max_hp());
                         if left > TICK {
                             still.push(Pending::Pollen {
                                 owner,

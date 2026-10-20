@@ -447,6 +447,20 @@ impl World {
 
     /// Combat decisions shared by hired mercenaries and independent adventurers. Movement and ownership stay separate.
     pub(super) fn ai_combat(&mut self, session: u64, mate_sessions: &[u64], chosen: Option<usize>) {
+        let target = chosen
+            .and_then(|id| self.slimes.get(id))
+            .map(|s| (s.point(), s.r));
+        self.ai_combat_at(session, mate_sessions, target);
+    }
+
+    /// `ai_combat` against a target given by position and body radius: a monster, or a player in a duel, arena or
+    /// flagged fight (the duel matrix drives both duelists with this).
+    pub(super) fn ai_combat_at(
+        &mut self,
+        session: u64,
+        mate_sessions: &[u64],
+        target_point: Option<(Point, f64)>,
+    ) {
         let Some(p) = self.players.get(&session) else {
             return;
         };
@@ -501,9 +515,6 @@ impl World {
             };
             (own, (near(8.), near(14.)))
         };
-        let target_point = chosen
-            .and_then(|id| self.slimes.get(id))
-            .map(|s| (s.point(), s.r));
         let aim = target_point.map_or(Point::default(), |(t, _)| me.direction(t));
         let level = self.players[&session].character.level;
         for base in skills::SKILLS
@@ -515,6 +526,7 @@ impl World {
             if p.skill_cd.contains_key(&skill.id)
                 || p.character.resource() < skill.cost
                 || p.dash > 0.
+                || p.stun > 0.
             {
                 continue;
             }

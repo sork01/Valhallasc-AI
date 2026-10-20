@@ -38,6 +38,8 @@ mod dormant_zone_tests;
 #[cfg(test)]
 mod dps_tests;
 #[cfg(test)]
+mod duel_tests;
+#[cfg(test)]
 mod dungeon_solo_tests;
 #[cfg(test)]
 mod elder_hollow_tests;
@@ -53,6 +55,8 @@ mod hold;
 mod instances;
 #[cfg(test)]
 mod lapis_tests;
+#[cfg(test)]
+mod longship_tests;
 mod mercs;
 #[cfg(test)]
 mod mount_sources_tests;
@@ -193,6 +197,20 @@ struct Player {
     dash_speed: f64,
     dash_mult: f64,
     dash_hits: Vec<usize>,
+    dash_foe_hits: Vec<u64>,
+    /// Seconds left of a stun from a skill in a PvP fight (`pvp_hit`): no moving, attacking or casting.
+    stun: f64,
+    /// Seconds left of a root from a skill in a PvP fight: no moving, but attacks and casts (dashes excepted) work.
+    root: f64,
+    /// Share of healing received that is lost while `wound_left` runs (see `Skill::wound`).
+    wound: f64,
+    wound_left: f64,
+    /// Seconds left in which this player counts as in a PvP fight (a blow dealt or taken, `pvp_hit`): healing is
+    /// scaled by `PVP_DAMAGE_SCALE`, as damage is.
+    pvp_fight: f64,
+    /// Damage from players still to be soaked up by a ward (`Skill::absorb`) while `absorb_left` runs.
+    absorb: f64,
+    absorb_left: f64,
     dash_skill: String,
     skill_cd: BTreeMap<String, f64>,
     set_cd: BTreeMap<String, f64>,
@@ -291,6 +309,14 @@ impl Player {
             dash_speed: 15.,
             dash_mult: 0.,
             dash_hits: vec![],
+            dash_foe_hits: vec![],
+            stun: 0.,
+            root: 0.,
+            wound: 0.,
+            wound_left: 0.,
+            pvp_fight: 0.,
+            absorb: 0.,
+            absorb_left: 0.,
             dash_skill: String::new(),
             skill_cd: BTreeMap::new(),
             set_cd: BTreeMap::new(),
@@ -329,7 +355,7 @@ impl Player {
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
             "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"frozen":self.frozen,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,"reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"rebirthTiers":c.rebirth_tiers,"rebirthPerks":c.rebirth_perks(),"mountTint":c.mount_tint,
             "setCounts":c.set_counts(),"setCd":self.set_cd,
-            "pvpFlag":self.pvp_flag,"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
+            "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"wound":if self.wound_left > 0. { self.wound } else { 0. },"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
     }
     fn is_hidden(&self) -> bool {
         self.character.gm && (self.hidden || self.character.zone != self.visible_zone)
@@ -341,6 +367,30 @@ impl Player {
             .filter(|b| b.kind == kind)
             .map(|b| b.amount)
             .sum()
+    }
+    /// What is left of the healing this player receives: 1, or less while a wound from a PvP skill lasts, and scaled
+    /// by `PVP_DAMAGE_SCALE` in a PvP fight.
+    fn heal_factor(&self) -> f64 {
+        let wound = if self.wound_left > 0. {
+            (1. - self.wound).clamp(0., 1.)
+        } else {
+            1.
+        };
+        wound
+            * if self.pvp_fight > 0. {
+                pvp::PVP_DAMAGE_SCALE
+            } else {
+                1.
+            }
+    }
+    /// `heal_factor` for a heal cast by `caster`: a priest's own healing is scaled once more in a PvP fight.
+    fn heal_factor_by(&self, caster: Class) -> f64 {
+        self.heal_factor()
+            * if self.pvp_fight > 0. && caster == Class::Priest {
+                pvp::PVP_PRIEST_HEAL_SCALE
+            } else {
+                1.
+            }
     }
     fn stop(&mut self) {
         self.input = Point::default();
@@ -1246,6 +1296,11 @@ impl Slime {
         !self.dead && self.target.is_none() && self.state == "idle"
     }
 }
+/// What a single-target skill hit: a monster or (in a duel, an arena or flagged PvP) a player.
+enum Mark {
+    Slime(usize),
+    Player(u64),
+}
 #[derive(Clone, Serialize)]
 struct Bolt {
     id: u64,
@@ -1268,6 +1323,9 @@ struct Bolt {
     blast: f64,
     #[serde(skip)]
     hits: Vec<usize>,
+    /// Players this bolt has already hurt (only a skill's bolt hurts players, see `foes_near`).
+    #[serde(skip)]
+    foe_hits: Vec<u64>,
     /// The skill that fired this bolt (empty for a basic attack), for the system log.
     skill: String,
 }
@@ -2013,7 +2071,9 @@ impl World {
                 p.goal = None;
                 p.input = Point::default();
             }
-            ClientMessage::Attack { fx, fy } if fx.is_finite() && fy.is_finite() => {
+            ClientMessage::Attack { fx, fy }
+                if fx.is_finite() && fy.is_finite() && p.stun <= 0. =>
+            {
                 let face = normalize(fx, fy);
                 if face.x != 0. || face.y != 0. {
                     p.face = face;
@@ -2637,6 +2697,19 @@ impl World {
         let p = self.players.get_mut(&session).unwrap();
         p.cooldown = (p.cooldown - TICK).max(0.);
         p.hurt = (p.hurt - TICK).max(0.);
+        for timer in [
+            &mut p.stun,
+            &mut p.root,
+            &mut p.wound_left,
+            &mut p.pvp_fight,
+            &mut p.absorb_left,
+        ] {
+            *timer = if *timer - TICK < 1e-9 {
+                0.
+            } else {
+                *timer - TICK
+            };
+        }
         p.dash_cd = (p.dash_cd - TICK).max(0.);
         p.skill_cd.retain(|_, left| {
             *left -= TICK;
@@ -2743,6 +2816,12 @@ impl World {
                 quest.sync_bring(&mut p.character);
             }
         }
+        if p.stun > 0. {
+            // Stunned: stands where it is, like a player frozen in amber.
+            p.stop();
+            p.attack = 0.;
+            return;
+        }
         let mut strike = false;
         if p.attack > 0. {
             p.attack += TICK;
@@ -2808,6 +2887,9 @@ impl World {
             * if p.attack > 0. { 0.25 } else { 1. })
         .min(travel);
         let mut dash_sweep = false;
+        if p.root > 0. {
+            distance = 0.;
+        }
         if p.dash > 0. {
             dir = p.dash_direction;
             distance = p.dash_speed * p.dash.min(TICK);
@@ -2984,6 +3066,7 @@ impl World {
                 pierce: false,
                 blast: 0.,
                 hits: vec![],
+                foe_hits: vec![],
                 skill: String::new(),
             });
             return;
@@ -3019,6 +3102,23 @@ impl World {
         );
     }
     /// Enemies in the player's zone within `radius` of `at` (measured to the enemy's edge), nearest first.
+    /// Of a monster and a player a single-target skill could take, the one nearer to `from` (the monster on a tie).
+    fn nearer(&self, from: Point, slime: Option<usize>, foe: Option<u64>) -> Option<Mark> {
+        match (slime, foe) {
+            (Some(i), Some(f)) => {
+                if from.distance(self.slimes[i].point())
+                    <= from.distance(self.players[&f].character.point())
+                {
+                    Some(Mark::Slime(i))
+                } else {
+                    Some(Mark::Player(f))
+                }
+            }
+            (Some(i), None) => Some(Mark::Slime(i)),
+            (None, Some(f)) => Some(Mark::Player(f)),
+            (None, None) => None,
+        }
+    }
     fn enemies_near(&self, zone: usize, at: Point, radius: f64, skip: &[usize]) -> Vec<usize> {
         let mut found: Vec<_> = self
             .slimes
@@ -3074,6 +3174,18 @@ impl World {
         if p.character.hp <= 0. || p.dash > 0. || p.skill_cd.contains_key(id) {
             return;
         }
+        if p.stun > 0. {
+            let _ = p
+                .peer
+                .try_send(json!({"type":"error","text":"You are stunned."}));
+            return;
+        }
+        if p.root > 0. && matches!(&skill.effect, Effect::Dash { .. }) {
+            let _ = p
+                .peer
+                .try_send(json!({"type":"error","text":"You are rooted."}));
+            return;
+        }
         if aim.x != 0. || aim.y != 0. {
             p.face = aim;
         }
@@ -3093,7 +3205,8 @@ impl World {
         };
         if let Some(range) = single {
             let nearby = self.enemies_near(zone, origin, range, &[]);
-            if nearby.is_empty() {
+            let foes = self.foes_near(session, origin, range, &[]);
+            if nearby.is_empty() && foes.is_empty() {
                 let _ = self.players[&session]
                     .peer
                     .try_send(json!({"type":"error","text":"No enemy in range."}));
@@ -3102,6 +3215,9 @@ impl World {
             if !nearby
                 .iter()
                 .any(|&i| self.maps[zone].line_clear(origin, self.slimes[i].point(), 0.05))
+                && !foes.iter().any(|f| {
+                    self.maps[zone].line_clear(origin, self.players[f].character.point(), 0.05)
+                })
             {
                 let _ = self.players[&session]
                     .peer
@@ -3221,6 +3337,17 @@ impl World {
                     let (damage, crit) = self.roll_damage(session, *mult);
                     dealt += self.hit_slime(i, session, damage, crit);
                 }
+                for f in self.foes_near(session, origin, *reach, &[]) {
+                    let at = self.players[&f].character.point();
+                    let d = origin.distance(at);
+                    let facing = origin.direction(at);
+                    if (d < 0.6 || facing.x * face.x + facing.y * face.y > *dot)
+                        && self.maps[zone].line_clear(origin, at, 0.05)
+                    {
+                        let (damage, crit) = self.roll_damage(session, *mult);
+                        dealt += self.pvp_hit(session, f, damage, crit);
+                    }
+                }
             }
             Effect::Nova { radius, mult } => {
                 value = *radius;
@@ -3232,6 +3359,13 @@ impl World {
                 for i in visible {
                     let (damage, crit) = self.roll_damage(session, *mult);
                     dealt += self.hit_slime(i, session, damage, crit);
+                }
+                for f in self.foes_near(session, origin, *radius, &[]) {
+                    let at = self.players[&f].character.point();
+                    if self.maps[zone].line_clear(origin, at, 0.05) {
+                        let (damage, crit) = self.roll_damage(session, *mult);
+                        dealt += self.pvp_hit(session, f, damage, crit);
+                    }
                 }
             }
             Effect::Volley {
@@ -3272,6 +3406,7 @@ impl World {
                         pierce: *pierce,
                         blast: *blast,
                         hits: vec![],
+                        foe_hits: vec![],
                         skill: id.to_string(),
                     });
                 }
@@ -3284,6 +3419,7 @@ impl World {
                 p.dash_speed = *speed;
                 p.dash_mult = *mult;
                 p.dash_hits.clear();
+                p.dash_foe_hits.clear();
                 p.dash_skill = id.to_string();
                 p.attack = 0.;
                 p.hurt = 0.;
@@ -3293,18 +3429,36 @@ impl World {
             Effect::Strike { hits, mult, range } => {
                 value = *hits as f64;
                 for _ in 0..*hits {
-                    let Some(i) = self
+                    let slime = self
                         .enemies_near(zone, origin, *range, &[])
                         .into_iter()
                         .find(|&i| {
                             self.maps[zone].line_clear(origin, self.slimes[i].point(), 0.05)
-                        })
-                    else {
-                        break;
-                    };
-                    points.push([self.slimes[i].x, self.slimes[i].y]);
-                    let (damage, crit) = self.roll_damage(session, *mult);
-                    dealt += self.hit_slime(i, session, damage, crit);
+                        });
+                    let foe = self
+                        .foes_near(session, origin, *range, &[])
+                        .into_iter()
+                        .find(|f| {
+                            self.maps[zone].line_clear(
+                                origin,
+                                self.players[f].character.point(),
+                                0.05,
+                            )
+                        });
+                    match self.nearer(origin, slime, foe) {
+                        Some(Mark::Slime(i)) => {
+                            points.push([self.slimes[i].x, self.slimes[i].y]);
+                            let (damage, crit) = self.roll_damage(session, *mult);
+                            dealt += self.hit_slime(i, session, damage, crit);
+                        }
+                        Some(Mark::Player(f)) => {
+                            let at = self.players[&f].character.point();
+                            points.push([at.x, at.y]);
+                            let (damage, crit) = self.roll_damage(session, *mult);
+                            dealt += self.pvp_hit(session, f, damage, crit);
+                        }
+                        None => break,
+                    }
                 }
             }
             Effect::Chain {
@@ -3314,20 +3468,40 @@ impl World {
             } => {
                 let mut from = origin;
                 let mut hit = vec![];
+                let mut hit_foes = vec![];
                 for n in 0..*targets {
                     let reach = if n == 0 { *range } else { 4.5 };
-                    let Some(i) = self
+                    let slime = self
                         .enemies_near(zone, from, reach, &hit)
                         .into_iter()
-                        .find(|&i| self.maps[zone].line_clear(from, self.slimes[i].point(), 0.05))
-                    else {
-                        break;
-                    };
-                    hit.push(i);
-                    from = self.slimes[i].point();
-                    points.push([from.x, from.y]);
-                    let (damage, crit) = self.roll_damage(session, *mult);
-                    dealt += self.hit_slime(i, session, damage, crit);
+                        .find(|&i| self.maps[zone].line_clear(from, self.slimes[i].point(), 0.05));
+                    let foe = self
+                        .foes_near(session, from, reach, &hit_foes)
+                        .into_iter()
+                        .find(|f| {
+                            self.maps[zone].line_clear(
+                                from,
+                                self.players[f].character.point(),
+                                0.05,
+                            )
+                        });
+                    match self.nearer(from, slime, foe) {
+                        Some(Mark::Slime(i)) => {
+                            hit.push(i);
+                            from = self.slimes[i].point();
+                            points.push([from.x, from.y]);
+                            let (damage, crit) = self.roll_damage(session, *mult);
+                            dealt += self.hit_slime(i, session, damage, crit);
+                        }
+                        Some(Mark::Player(f)) => {
+                            hit_foes.push(f);
+                            from = self.players[&f].character.point();
+                            points.push([from.x, from.y]);
+                            let (damage, crit) = self.roll_damage(session, *mult);
+                            dealt += self.pvp_hit(session, f, damage, crit);
+                        }
+                        None => break,
+                    }
                 }
             }
             Effect::Meteor {
@@ -3338,7 +3512,13 @@ impl World {
                 let aimed = target
                     .and_then(|i| self.slimes.get(i))
                     .filter(|s| !s.dead && s.zone == zone && origin.distance(s.point()) <= *range)
-                    .map(|s| s.point());
+                    .map(|s| s.point())
+                    // Against players there is no target to name: the nearest foe in range is the aim.
+                    .or_else(|| {
+                        self.foes_near(session, origin, *range, &[])
+                            .first()
+                            .map(|f| self.players[f].character.point())
+                    });
                 let mut center = aimed.unwrap_or(Point {
                     x: origin.x + face.x * range * 0.75,
                     y: origin.y + face.y * range * 0.75,
@@ -3354,6 +3534,13 @@ impl World {
                 for i in visible {
                     let (damage, crit) = self.roll_damage(session, *mult);
                     dealt += self.hit_slime(i, session, damage, crit);
+                }
+                for f in self.foes_near(session, center, *radius, &[]) {
+                    let at = self.players[&f].character.point();
+                    if self.maps[zone].line_clear(center, at, 0.05) {
+                        let (damage, crit) = self.roll_damage(session, *mult);
+                        dealt += self.pvp_hit(session, f, damage, crit);
+                    }
                 }
             }
             Effect::Buff {
@@ -3383,6 +3570,11 @@ impl World {
                         points.push([at.x, at.y]);
                     }
                 }
+                if skill.absorb > 0. {
+                    let p = self.players.get_mut(&session).unwrap();
+                    p.absorb = p.character.max_hp() * skill.absorb;
+                    p.absorb_left = skill.absorb_time;
+                }
                 value = *time;
             }
             Effect::Mend {
@@ -3397,8 +3589,9 @@ impl World {
             Effect::Heal { fraction } => {
                 let p = self.players.get_mut(&session).unwrap();
                 let before = p.character.hp;
-                p.character.hp =
-                    (before + p.character.max_hp() * fraction).min(p.character.max_hp());
+                p.character.hp = (before
+                    + p.character.max_hp() * fraction * p.heal_factor_by(class))
+                .min(p.character.max_hp());
                 healed = (p.character.hp - before).round();
             }
         }
@@ -3410,7 +3603,8 @@ impl World {
         if skill.lifesteal > 0. && dealt > 0. {
             let p = self.players.get_mut(&session).unwrap();
             let before = p.character.hp;
-            p.character.hp = (before + dealt * skill.lifesteal).min(p.character.max_hp());
+            p.character.hp = (before + dealt * skill.lifesteal * p.heal_factor_by(class))
+                .min(p.character.max_hp());
             healed = (p.character.hp - before).round();
         }
         let origin = self.players[&session].character.point();
@@ -3459,6 +3653,7 @@ impl World {
     /// Returns the healed players' positions for the skill's visual effect.
     fn heal_players(&mut self, caster: u64, sessions: &[u64], mult: f64) -> Vec<[f64; 2]> {
         let amount = (self.players[&caster].character.stats().0 * mult).round();
+        let caster_class = self.players[&caster].character.look.class;
         let from = self.players[&caster].character.id.clone();
         let mut points = vec![];
         self.assist_combat(caster, sessions);
@@ -3467,7 +3662,8 @@ impl World {
                 continue;
             };
             let before = p.character.hp;
-            p.character.hp = (before + amount).min(p.character.max_hp());
+            p.character.hp =
+                (before + amount * p.heal_factor_by(caster_class)).min(p.character.max_hp());
             let (gained, at, id, zone) = (
                 (p.character.hp - before).round(),
                 p.character.point(),
@@ -3493,6 +3689,14 @@ impl World {
             self.hit_slime(i, session, damage, crit);
             if let Some(p) = self.players.get_mut(&session) {
                 p.dash_hits.push(i);
+            }
+        }
+        let skip_foes = self.players[&session].dash_foe_hits.clone();
+        for f in self.foes_near(session, point, 0.9, &skip_foes) {
+            let (damage, crit) = self.roll_damage(session, mult);
+            self.pvp_hit(session, f, damage, crit);
+            if let Some(p) = self.players.get_mut(&session) {
+                p.dash_foe_hits.push(f);
             }
         }
         self.cur_skill.clear();
@@ -4352,6 +4556,54 @@ impl World {
                 }
                 if !b.pierce {
                     b.t = 1.;
+                }
+            }
+            // Only a skill's bolt hurts players: a basic ranged attack is the PvP blow of `pvp_attack`.
+            if !b.skill.is_empty() && b.t < 1. {
+                let mut foes: Vec<_> = self
+                    .players
+                    .iter()
+                    .filter(|(s, p)| {
+                        !b.foe_hits.contains(s)
+                            && p.character.zone == b.zone
+                            && segment_distance(p.character.point(), start, end)
+                                < PLAYER_RADIUS + 0.22
+                            && self.maps[b.zone].line_clear(start, p.character.point(), 0.05)
+                            && self.pvp_legal(b.owner, **s)
+                    })
+                    .map(|(s, p)| (start.distance(p.character.point()), *s))
+                    .collect();
+                foes.sort_by(|a, c| a.0.total_cmp(&c.0).then(a.1.cmp(&c.1)));
+                if !b.pierce {
+                    foes.truncate(1);
+                }
+                for (_, f) in foes {
+                    b.foe_hits.push(f);
+                    let at = self.players[&f].character.point();
+                    if b.blast > 0. {
+                        for near in self.foes_near(b.owner, at, b.blast, &[]) {
+                            let spot = self.players[&near].character.point();
+                            if self.maps[b.zone].line_clear(at, spot, 0.05) {
+                                self.pvp_hit(b.owner, near, b.damage, b.crit);
+                            }
+                        }
+                        for near in self.enemies_near(b.zone, at, b.blast, &[]) {
+                            if self.maps[b.zone].line_clear(at, self.slimes[near].point(), 0.05) {
+                                self.hit_slime(near, b.owner, b.damage, b.crit);
+                            }
+                        }
+                    } else {
+                        self.pvp_hit(b.owner, f, b.damage, b.crit);
+                    }
+                    let actor = &self.players[&b.owner].character.id;
+                    self.emit_zone(
+                        b.zone,
+                        json!({"type":"event","kind":"boltImpact","skill":b.skill,
+                            "bolt":b.id,"actor":actor,"x":at.x,"y":at.y,"radius":b.blast}),
+                    );
+                    if !b.pierce {
+                        b.t = 1.;
+                    }
                 }
             }
             self.cur_skill.clear();
@@ -6460,7 +6712,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 43);
+        assert_eq!(zone_count(&w), 44);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -7063,7 +7315,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 43);
+        assert_eq!(zone_count(&w), 44);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -9917,7 +10169,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 43);
+        assert_eq!(zone_count(&w), 44);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));

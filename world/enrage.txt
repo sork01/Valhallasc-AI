@@ -428,5 +428,17 @@
   "barrow_threadkeeper": [
     90,
     0.2
+  ],
+  "keel_cargomaw": [
+    85,
+    0.2
+  ],
+  "keel_bosun": [
+    95,
+    0.2
+  ],
+  "keel_captain": [
+    64,
+    0.2
   ]
 }

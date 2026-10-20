@@ -98,7 +98,7 @@ impl World {
                 return refuse(p, &text);
             }
             let before = p.character.hp;
-            p.character.hp = (before + health_amount(it, &p.character)).min(max);
+            p.character.hp = (before + health_amount(it, &p.character) * p.heal_factor()).min(max);
             healed = (p.character.hp - before).round();
             if it.mana > 0. {
                 let before = p.character.resource();
@@ -181,7 +181,7 @@ impl World {
             item(&meal.id).map_or(0., |i| resource_amount(i, &p.character) / i.duration);
         let step = TICK.min(left);
         let before = p.character.hp;
-        p.character.hp = (before + rate * step).min(max);
+        p.character.hp = (before + rate * step * p.heal_factor()).min(max);
         p.food_shown += p.character.hp - before;
         p.character.change_resource(resource_rate * step);
         // Announce what arrived about once a second, and the remainder when the meal ends.

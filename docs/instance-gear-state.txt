@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-20T14:43:00",
+  "updated": "2026-10-20T16:02:44",
   "tasks": [
     {
       "id": "eye-warrior-armor",
@@ -7967,6 +7967,482 @@
         "client/assets/gear_icon_span-shared-accessory.png",
         "test-results/gear-redesign/span-shared-accessory.png",
         "test-results/gear-redesign/span-shared-accessory-browser.json"
+      ]
+    },
+    {
+      "id": "keel-warrior-armor",
+      "group": "keel",
+      "className": "warrior",
+      "kind": "armor",
+      "item": "warrior_armor_crimson_l35_keel",
+      "name": "Keelbound Copperwake Vestments",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-warrior-armor.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-warrior-headgear",
+      "group": "keel",
+      "className": "warrior",
+      "kind": "headgear",
+      "item": "warrior_headgear_crimson_l35_keel",
+      "name": "Keelbound Copperwake Crown",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-warrior-headgear.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-warrior-shoulders",
+      "group": "keel",
+      "className": "warrior",
+      "kind": "shoulders",
+      "item": "warrior_shoulders_crimson_l35_keel",
+      "name": "Keelbound Copperwake Mantle",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-warrior-shoulders.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-warrior-gloves",
+      "group": "keel",
+      "className": "warrior",
+      "kind": "gloves",
+      "item": "warrior_gloves_crimson_l35_keel",
+      "name": "Keelbound Copperwake Grips",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-warrior-gloves.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-warrior-weapon",
+      "group": "keel",
+      "className": "warrior",
+      "kind": "weapon",
+      "item": "warrior_weapon_sword_l35_keel",
+      "name": "Keelbound Boarding Cutlass",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-warrior-weapon.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-mage-armor",
+      "group": "keel",
+      "className": "mage",
+      "kind": "armor",
+      "item": "mage_armor_apprentice_l35_keel",
+      "name": "Keelbound Wheelkeeper Vestments",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-mage-armor.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-mage-headgear",
+      "group": "keel",
+      "className": "mage",
+      "kind": "headgear",
+      "item": "mage_headgear_apprentice_l35_keel",
+      "name": "Keelbound Wheelkeeper Crown",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-mage-headgear.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-mage-shoulders",
+      "group": "keel",
+      "className": "mage",
+      "kind": "shoulders",
+      "item": "mage_shoulders_apprentice_l35_keel",
+      "name": "Keelbound Wheelkeeper Mantle",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-mage-shoulders.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-mage-gloves",
+      "group": "keel",
+      "className": "mage",
+      "kind": "gloves",
+      "item": "mage_gloves_apprentice_l35_keel",
+      "name": "Keelbound Wheelkeeper Grips",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-mage-gloves.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-mage-weapon",
+      "group": "keel",
+      "className": "mage",
+      "kind": "weapon",
+      "item": "mage_weapon_ash_l35_keel",
+      "name": "Keelbound Wheelstaff",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-mage-weapon.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-assassin-armor",
+      "group": "keel",
+      "className": "assassin",
+      "kind": "armor",
+      "item": "assassin_armor_shadow_l35_keel",
+      "name": "Keelbound Brinehook Vestments",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-assassin-armor.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-assassin-headgear",
+      "group": "keel",
+      "className": "assassin",
+      "kind": "headgear",
+      "item": "assassin_headgear_shadow_l35_keel",
+      "name": "Keelbound Brinehook Crown",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-assassin-headgear.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-assassin-shoulders",
+      "group": "keel",
+      "className": "assassin",
+      "kind": "shoulders",
+      "item": "assassin_shoulders_shadow_l35_keel",
+      "name": "Keelbound Brinehook Mantle",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-assassin-shoulders.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-assassin-gloves",
+      "group": "keel",
+      "className": "assassin",
+      "kind": "gloves",
+      "item": "assassin_gloves_shadow_l35_keel",
+      "name": "Keelbound Brinehook Grips",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-assassin-gloves.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-assassin-weapon",
+      "group": "keel",
+      "className": "assassin",
+      "kind": "weapon",
+      "item": "assassin_weapon_daggers_l35_keel",
+      "name": "Keelbound Boarding Hooks",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-assassin-weapon.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-priest-armor",
+      "group": "keel",
+      "className": "priest",
+      "kind": "armor",
+      "item": "priest_armor_pilgrim_l35_keel",
+      "name": "Keelbound Bellwatch Vestments",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-priest-armor.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-priest-headgear",
+      "group": "keel",
+      "className": "priest",
+      "kind": "headgear",
+      "item": "priest_headgear_pilgrim_l35_keel",
+      "name": "Keelbound Bellwatch Crown",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-priest-headgear.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-priest-shoulders",
+      "group": "keel",
+      "className": "priest",
+      "kind": "shoulders",
+      "item": "priest_shoulders_pilgrim_l35_keel",
+      "name": "Keelbound Bellwatch Mantle",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-priest-shoulders.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-priest-gloves",
+      "group": "keel",
+      "className": "priest",
+      "kind": "gloves",
+      "item": "priest_gloves_pilgrim_l35_keel",
+      "name": "Keelbound Bellwatch Grips",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-priest-gloves.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-priest-weapon",
+      "group": "keel",
+      "className": "priest",
+      "kind": "weapon",
+      "item": "priest_weapon_mace_l35_keel",
+      "name": "Keelbound Diving Bell",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-priest-weapon.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-hunter-armor",
+      "group": "keel",
+      "className": "hunter",
+      "kind": "armor",
+      "item": "hunter_armor_scout_l35_keel",
+      "name": "Keelbound Harpooner Vestments",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-hunter-armor.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-hunter-headgear",
+      "group": "keel",
+      "className": "hunter",
+      "kind": "headgear",
+      "item": "hunter_headgear_scout_l35_keel",
+      "name": "Keelbound Harpooner Crown",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-hunter-headgear.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-hunter-shoulders",
+      "group": "keel",
+      "className": "hunter",
+      "kind": "shoulders",
+      "item": "hunter_shoulders_scout_l35_keel",
+      "name": "Keelbound Harpooner Mantle",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-hunter-shoulders.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-hunter-gloves",
+      "group": "keel",
+      "className": "hunter",
+      "kind": "gloves",
+      "item": "hunter_gloves_scout_l35_keel",
+      "name": "Keelbound Harpooner Grips",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-hunter-gloves.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-hunter-weapon",
+      "group": "keel",
+      "className": "hunter",
+      "kind": "weapon",
+      "item": "hunter_weapon_shortbow_l35_keel",
+      "name": "Keelbound Harpoon Bow",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-hunter-weapon.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-shared-pants",
+      "group": "keel",
+      "className": null,
+      "kind": "pants",
+      "item": "pants_wayfarer_l35_keel",
+      "name": "Keelbound Rope Gaiters",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-shared-pants.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-shared-necklace",
+      "group": "keel",
+      "className": null,
+      "kind": "necklace",
+      "item": "necklace_moonstone_l35_keel",
+      "name": "Keelbound Anchor Pendant",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-shared-necklace.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "keel-shared-accessory",
+      "group": "keel",
+      "className": null,
+      "kind": "accessory",
+      "item": "accessory_amber_l35_keel",
+      "name": "Keelbound Porthole Ring",
+      "done": true,
+      "phase": "complete",
+      "note": "Original hull/anchor/sail geometry and material palette; PixelFlow male/female five clips saved/exported; visible outlines/colours verified on all ten hero rigs.",
+      "evidence": [
+        "test-results/longship-redesign/gear-browser.json",
+        "client/assets/gear_icon_keel-shared-accessory.png",
+        "scripts/keel_gear_shapes.py",
+        "world/gear-art.txt"
       ]
     }
   ]

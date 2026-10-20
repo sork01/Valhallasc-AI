@@ -19,6 +19,7 @@ const zones = map.zones || [];
 console.log(`Synced ${map.objects.length} obstacles and ${map.slimes.length} spawns` + zones.map(z => `, plus zone "${z.name}": ${z.objects.length} obstacles and ${z.slimes.length} spawns`).join('') + '. Rebuild Rust after changing the map.');
 
 const cathedral = [
+  ...JSON.parse(fs.readFileSync(path.join(root, "world/longship.txt"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(root, "world/nornroot.txt"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(root, "world/skybridge.txt"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(root, "world/cathedral.txt"), "utf8")),

@@ -108,7 +108,13 @@
     "span_caster",
     "span_warden",
     "span_weaver",
-    "span_archon"
+    "span_archon",
+    "keel_crab",
+    "keel_deckhand",
+    "keel_lantern",
+    "keel_cargomaw",
+    "keel_bosun",
+    "keel_captain"
   ],
   "clips": {
     "idle": {
@@ -243,7 +249,13 @@
     "span_caster": "3af0fa48afd1b30c",
     "span_warden": "549e6058571a2f7b",
     "span_weaver": "63c4c158488c41b3",
-    "span_archon": "191212fbe85fe47c"
+    "span_archon": "191212fbe85fe47c",
+    "keel_crab": "c56de92686212091",
+    "keel_deckhand": "eeb9cb4c79d8945f",
+    "keel_lantern": "1806195cd517b44e",
+    "keel_cargomaw": "da01fea0e62149f9",
+    "keel_bosun": "516da622c3f6559b",
+    "keel_captain": "78a307dae4671b58"
   },
   "tops": {
     "tidetemplar": 84,
@@ -346,6 +358,12 @@
     "span_caster": 57,
     "span_warden": 58,
     "span_weaver": 59,
-    "span_archon": 58
+    "span_archon": 58,
+    "keel_crab": 52,
+    "keel_deckhand": 52,
+    "keel_lantern": 71,
+    "keel_cargomaw": 69,
+    "keel_bosun": 54,
+    "keel_captain": 53
   }
 }

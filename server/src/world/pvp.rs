@@ -5,6 +5,18 @@ const REQUEST_TIME: f64 = 45.;
 const DUEL_RANGE: f64 = 25.;
 const DUEL_RETURN_TIME: f64 = 10.;
 const ARENA_TIME: f64 = 300.;
+/// Every blow that lands on a player (basic attack, skill, bolt) is scaled by this on top of `DAMAGE_TAKEN_SCALE`, so a
+/// duel lasts longer than the same fight against a monster. Healing in a PvP fight is scaled by it too, or halving the
+/// damage would double what healing is worth.
+pub(super) const PVP_DAMAGE_SCALE: f64 = 0.5;
+/// A hunter's blows on players deal this much more (owner, 2026-10-20: +25%, then another +10%), applied to the damage
+/// before defence.
+const PVP_HUNTER_DAMAGE: f64 = 1.35;
+/// Seconds after a blow dealt or taken in which a player's healing is scaled the same way (`Player::heal_factor`).
+const PVP_FIGHT_TIME: f64 = 10.;
+/// A priest's own healing in a PvP fight is scaled by this on top of `PVP_DAMAGE_SCALE` (owner, 2026-10-20), so it comes to
+/// a quarter: the priest's sustain, not the damage cut, kept it unbeaten.
+pub(super) const PVP_PRIEST_HEAL_SCALE: f64 = 0.5;
 
 #[derive(Default)]
 pub(super) struct Pvp {
@@ -433,6 +445,7 @@ impl World {
             || b.character.spark_travel.is_some()
             || a.cooldown > 0.
             || a.dash > 0.
+            || a.stun > 0.
         {
             return Err("Target is unavailable.".into());
         }
@@ -444,7 +457,6 @@ impl World {
         {
             return Err("PvP cannot take place in a sanctuary.".into());
         }
-        let arena = self.pvp.matches.iter().position(|m| m.zone == zone);
         let duel = self
             .pvp
             .duels
@@ -459,22 +471,11 @@ impl World {
                 return Err("Return to the duel area before attacking.".into());
             }
         }
-        let legal = if let Some(i) = arena {
-            let m = &self.pvp.matches[i];
-            m.teams.iter().any(|team| team.contains(&me))
-                && !m
-                    .teams
-                    .iter()
-                    .any(|team| team.contains(&me) && team.iter().any(|id| id == target))
-        } else if duel.is_some() {
-            true
-        } else {
-            a.pvp_flag
-                && b.pvp_flag
-                && !self.maps[zone].in_city(point)
-                && !self.maps[zone].in_city(target_point)
-                && !self.party_mates(&me).iter().any(|id| id == target)
-        };
+        let legal = self
+            .players
+            .iter()
+            .find(|(_, p)| p.character.id == target)
+            .is_some_and(|(d, _)| self.pvp_legal(session, *d));
         if !legal {
             return Err("PvP requires a duel, opposing arena teams, or two flagged players outside a sanctuary.".into());
         }
@@ -509,6 +510,105 @@ impl World {
             .find(|(_, p)| p.character.id == target)
             .unwrap()
             .0;
+        self.pvp_hit(session, defender_session, damage, crit);
+        Ok(())
+    }
+    /// Whether `attacker` may hurt `defender` right now: opposing arena teams, the partner of a duel inside its ring, or
+    /// two flagged players who are not party mates. Never in a sanctuary (the arena excepted), never a mercenary,
+    /// ambient adventurer, hidden or fallen player. Basic attacks and skills share this rule.
+    pub(super) fn pvp_legal(&self, attacker: u64, defender: u64) -> bool {
+        let (Some(a), Some(b)) = (self.players.get(&attacker), self.players.get(&defender)) else {
+            return false;
+        };
+        if attacker == defender
+            || a.merc.is_some()
+            || b.merc.is_some()
+            || a.ambient.is_some()
+            || b.ambient.is_some()
+            || a.is_hidden()
+            || b.is_hidden()
+            || a.character.zone != b.character.zone
+            || a.character.hp <= 0.
+            || b.character.hp <= 0.
+            || a.character.spark_travel.is_some()
+            || b.character.spark_travel.is_some()
+        {
+            return false;
+        }
+        let (me, target) = (&a.character.id, &b.character.id);
+        let zone = a.character.zone;
+        let (here, there) = (a.character.point(), b.character.point());
+        if !self.is_arena_zone(zone)
+            && (self.maps[zone].in_city(here) || self.maps[zone].in_city(there))
+        {
+            return false;
+        }
+        if let Some(m) = self.pvp.matches.iter().find(|m| m.zone == zone) {
+            return m.teams.iter().any(|team| team.contains(me))
+                && !m
+                    .teams
+                    .iter()
+                    .any(|team| team.contains(me) && team.contains(target));
+        }
+        if let Some(d) = self
+            .pvp
+            .duels
+            .iter()
+            .find(|d| (d.from == *me && d.to == *target) || (d.from == *target && d.to == *me))
+        {
+            return d.zone == zone
+                && here.distance(d.center) <= DUEL_RANGE
+                && there.distance(d.center) <= DUEL_RANGE;
+        }
+        a.pvp_flag && b.pvp_flag && !self.party_mates(me).iter().any(|id| id == target)
+    }
+    /// The sessions `session` may hurt with a skill within `radius` of `at` (their body counts as `PLAYER_RADIUS`),
+    /// nearest first: the players' counterpart of `enemies_near`.
+    pub(super) fn foes_near(&self, session: u64, at: Point, radius: f64, skip: &[u64]) -> Vec<u64> {
+        if self.pvp.duels.is_empty()
+            && self.pvp.matches.is_empty()
+            && !self.players.get(&session).is_some_and(|p| p.pvp_flag)
+        {
+            return vec![];
+        }
+        let mut found: Vec<_> = self
+            .players
+            .iter()
+            .filter(|(s, p)| {
+                !skip.contains(s)
+                    && at.distance(p.character.point()) - PLAYER_RADIUS < radius
+                    && self.pvp_legal(session, **s)
+            })
+            .map(|(s, p)| (at.distance(p.character.point()), *s))
+            .collect();
+        found.sort_by(|a, b| a.0.total_cmp(&b.0).then(a.1.cmp(&b.1)));
+        found.into_iter().map(|(_, s)| s).collect()
+    }
+    /// One blow of `damage` from `attacker` to `defender` (a basic attack, a skill or a bolt): dodge, defence, shield,
+    /// the 1 health floor of duels and arenas, and the end of the duel, match or world fight. Returns the health the
+    /// defender lost; 0 when the blow is not legal, misses or is dodged.
+    pub(super) fn pvp_hit(&mut self, attacker: u64, defender: u64, damage: f64, crit: bool) -> f64 {
+        if !self.pvp_legal(attacker, defender) {
+            return 0.;
+        }
+        let session = attacker;
+        let defender_session = defender;
+        let damage = if self.players[&attacker].character.look.class == Class::Hunter {
+            damage * PVP_HUNTER_DAMAGE
+        } else {
+            damage
+        };
+        let me = self.players[&attacker].character.id.clone();
+        let target = self.players[&defender].character.id.clone();
+        let zone = self.players[&attacker].character.zone;
+        let target_point = self.players[&defender].character.point();
+        let arena = self.pvp.matches.iter().position(|m| m.zone == zone);
+        let duel = self
+            .pvp
+            .duels
+            .iter()
+            .position(|d| (d.from == me && d.to == target) || (d.from == target && d.to == me));
+        let mut taken_total = 0.;
         let dodge = self.players[&defender_session].character.dodge_chance()
             + self.players[&defender_session].buff(BuffKind::Dodge);
         let dodged = damage > 0. && self.random() < dodge.min(0.95);
@@ -517,12 +617,21 @@ impl World {
         let value = if damage <= 0. || dodged {
             0.
         } else {
-            (((damage - p.character.stats().1).max(1.) * DAMAGE_TAKEN_SCALE)
+            (((damage - p.character.stats().1).max(1.) * DAMAGE_TAKEN_SCALE * PVP_DAMAGE_SCALE)
                 .round()
                 .max(1.)
                 * (1. - shield))
                 .round()
                 .max(1.)
+        };
+        // A ward soaks up what lands before it reaches the health; the blow still counts as landed.
+        let landed = value > 0.;
+        let value = if landed && p.absorb_left > 0. && p.absorb > 0. {
+            let soaked = value.min(p.absorb);
+            p.absorb -= soaked;
+            value - soaked
+        } else {
+            value
         };
         if value > 0. {
             let hp = if arena.is_some() || duel.is_some() {
@@ -531,12 +640,91 @@ impl World {
                 (p.character.hp - value).max(0.)
             };
             let taken = p.character.hp - hp;
+            taken_total = taken;
             p.character.hp = hp;
             p.hurt = 0.25;
             p.combat_left = 5.;
             p.character.mounted = false;
             if p.character.look.class == Class::Warrior {
                 p.character.change_resource(taken);
+            }
+        }
+        if landed {
+            for session in [attacker, defender_session] {
+                if let Some(p) = self.players.get_mut(&session) {
+                    p.pvp_fight = PVP_FIGHT_TIME;
+                }
+            }
+            // A skill that stuns, roots or wounds (cuts the healing of) the player it hurts: not when the blow missed or
+            // was dodged.
+            let class = self.players[&attacker].character.look.class;
+            let (stun, root, wound, wound_time) = skills::find(class, &self.cur_skill)
+                .map_or((0., 0., 0., 0.), |s| {
+                    (s.stun, s.root, s.wound, s.wound_time)
+                });
+            if stun > 0. || root > 0. || wound > 0. {
+                let p = self.players.get_mut(&defender_session).unwrap();
+                let (stunned, rooted, wounded) = (
+                    p.stun <= 0. && stun > 0.,
+                    p.root <= 0. && root > 0.,
+                    p.wound_left <= 0. && wound > 0.,
+                );
+                p.stun = p.stun.max(stun);
+                p.root = p.root.max(root);
+                if wound > 0. {
+                    p.wound = if p.wound_left > 0. {
+                        p.wound.max(wound)
+                    } else {
+                        wound
+                    };
+                    p.wound_left = p.wound_left.max(wound_time);
+                }
+                if stun > 0. {
+                    p.stop();
+                    p.attack = 0.;
+                }
+                if stunned {
+                    self.tell(
+                        &target,
+                        format!("You are stunned for {stun} seconds."),
+                        false,
+                    );
+                }
+                if rooted {
+                    self.tell(
+                        &target,
+                        format!("You are rooted for {root} seconds."),
+                        false,
+                    );
+                }
+                if wounded {
+                    self.tell(
+                        &target,
+                        format!(
+                            "Your healing is reduced by {}% for {wound_time} seconds.",
+                            (wound * 100.).round()
+                        ),
+                        false,
+                    );
+                }
+            }
+        }
+        if taken_total > 0. {
+            // Damage dealt feeds a warrior's rage here as it does against monsters (`hit_slime`).
+            if let Some(p) = self.players.get_mut(&session)
+                && p.character.look.class == Class::Warrior
+            {
+                p.character.change_resource(taken_total * 0.5);
+            }
+            #[cfg(test)]
+            {
+                *self.damage_log.entry(session).or_default() += taken_total;
+                let entry = self
+                    .damage_by_source
+                    .entry((session, self.cur_skill.clone()))
+                    .or_default();
+                entry.0 += taken_total;
+                entry.1 += 1;
             }
         }
         let defeated = value > 0.
@@ -595,7 +783,7 @@ impl World {
                 self.save();
             }
         }
-        Ok(())
+        taken_total
     }
     fn pvp_finish_duel(&mut self, i: usize, winner: Option<String>) {
         let d = self.pvp.duels.remove(i);
@@ -604,6 +792,13 @@ impl World {
             |id| format!("{} wins the duel!", self.name_of(&id)),
         );
         for id in [&d.from, &d.to] {
+            if let Some(p) = self.players.values_mut().find(|p| p.character.id == *id) {
+                p.stun = 0.;
+                p.root = 0.;
+                p.wound_left = 0.;
+                p.pvp_fight = 0.;
+                p.absorb_left = 0.;
+            }
             self.tell(id, text.clone(), true);
         }
         self.pvp_sync();
@@ -622,6 +817,11 @@ impl World {
                 p.character.hp = p.character.max_hp();
                 p.character.reset_resource();
                 p.cooldown = 0.;
+                p.stun = 0.;
+                p.root = 0.;
+                p.wound_left = 0.;
+                p.pvp_fight = 0.;
+                p.absorb_left = 0.;
                 p.combat_left = 0.;
                 p.stop();
                 let _ = p
@@ -743,11 +943,26 @@ impl World {
 #[cfg(test)]
 mod tests {
     use super::*;
+    thread_local! {
+        /// The players' message queues, kept open so stepping the world does not drop anybody; `tick` empties them.
+        static RECEIVERS: std::cell::RefCell<Vec<mpsc::Receiver<Value>>> = const { std::cell::RefCell::new(Vec::new()) };
+    }
+    fn tick(w: &mut World, steps: usize) {
+        for _ in 0..steps {
+            w.step();
+            RECEIVERS.with(|r| {
+                for rx in r.borrow_mut().iter_mut() {
+                    while rx.try_recv().is_ok() {}
+                }
+            });
+        }
+    }
     fn world() -> World {
         World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)
     }
     fn add(w: &mut World, session: u64, name: &str) -> String {
-        let (tx, _rx) = mpsc::channel(128);
+        let (tx, rx) = mpsc::channel(4096);
+        RECEIVERS.with(|r| r.borrow_mut().push(rx));
         let welcome = w
             .join(
                 session,
@@ -955,5 +1170,505 @@ mod tests {
             w.update_pvp();
             assert!(w.pvp.queue.is_empty(), "changed parties leave the queue");
         }
+    }
+
+    /// Three mages in a row at level 40: 1 casts, 2 is next to it, 3 stands behind 2.
+    fn mages() -> (World, [String; 3]) {
+        let mut w = world();
+        let ids = [
+            add(&mut w, 1, "Alice"),
+            add(&mut w, 2, "Bob"),
+            add(&mut w, 3, "Cara"),
+        ];
+        for session in 1..=3 {
+            let c = &mut w.players.get_mut(&session).unwrap().character;
+            c.look.class = Class::Mage;
+            c.level = 40;
+            c.hp = c.max_hp();
+            c.reset_resource();
+        }
+        w.players.get_mut(&1).unwrap().character.attributes.accuracy = 20;
+        (w, ids)
+    }
+    fn hp(w: &World, session: u64) -> f64 {
+        w.players[&session].character.hp
+    }
+    #[test]
+    fn skills_hurt_the_duel_partner_and_nobody_else() {
+        for skill in ["arcanestorm", "chainlightning", "meteor", "lifedrain"] {
+            let (mut w, ids) = mages();
+            w.pvp_command(1, PvpCommand::DuelRequest { id: ids[1].clone() });
+            w.pvp_command(2, PvpCommand::DuelAccept { id: ids[0].clone() });
+            let max = [hp(&w, 2), hp(&w, 3)];
+            w.use_skill(1, skill, Point { x: 1., y: 0. });
+            assert!(hp(&w, 2) < max[0], "{skill} did not hurt the partner");
+            assert!(hp(&w, 2) >= 1., "{skill} took the partner below 1 health");
+            assert_eq!(hp(&w, 3), max[1], "{skill} hurt a bystander");
+        }
+    }
+    #[test]
+    fn skills_hurt_nobody_without_a_duel_an_arena_or_two_flags() {
+        let (mut w, _) = mages();
+        let max = hp(&w, 2);
+        w.use_skill(1, "arcanestorm", Point { x: 1., y: 0. });
+        assert_eq!(hp(&w, 2), max, "no consent at all");
+        w.players.get_mut(&1).unwrap().pvp_flag = true;
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        w.use_skill(1, "arcanestorm", Point { x: 1., y: 0. });
+        assert_eq!(hp(&w, 2), max, "only the caster was flagged");
+        w.players.get_mut(&2).unwrap().pvp_flag = true;
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        w.use_skill(1, "arcanestorm", Point { x: 1., y: 0. });
+        assert!(hp(&w, 2) < max, "both flagged");
+        assert_eq!(hp(&w, 3), max, "the unflagged bystander");
+    }
+    #[test]
+    fn a_skill_bolt_hurts_a_duelist_but_a_basic_bolt_does_not() {
+        let (mut w, ids) = mages();
+        w.pvp_command(1, PvpCommand::DuelRequest { id: ids[1].clone() });
+        w.pvp_command(2, PvpCommand::DuelAccept { id: ids[0].clone() });
+        let max = hp(&w, 2);
+        w.players.get_mut(&1).unwrap().face = Point { x: 1., y: 0. };
+        w.strike(1);
+        assert!(!w.bolts.is_empty());
+        for _ in 0..30 {
+            w.update_bolts();
+        }
+        assert_eq!(hp(&w, 2), max, "the basic bolt is not a PvP blow");
+        w.bolts.clear();
+        w.use_skill(1, "twinbolt", Point { x: 1., y: 0. });
+        assert!(!w.bolts.is_empty());
+        for _ in 0..30 {
+            w.update_bolts();
+        }
+        assert!(hp(&w, 2) < max, "the skill bolt landed");
+        assert_eq!(hp(&w, 3), max);
+    }
+    #[test]
+    fn a_skill_cannot_take_a_duelist_below_one_health_and_ends_the_duel() {
+        let (mut w, ids) = mages();
+        w.pvp_command(1, PvpCommand::DuelRequest { id: ids[1].clone() });
+        w.pvp_command(2, PvpCommand::DuelAccept { id: ids[0].clone() });
+        w.players.get_mut(&2).unwrap().character.hp = 2.;
+        w.use_skill(1, "arcanestorm", Point { x: 1., y: 0. });
+        assert_eq!(hp(&w, 2), 1.);
+        assert!(w.pvp.duels.is_empty(), "the duel ended");
+    }
+    #[test]
+    fn skills_cannot_hurt_a_party_mate_in_world_pvp() {
+        let (mut w, ids) = mages();
+        w.message(
+            1,
+            ClientMessage::Social {
+                command: SocialCommand::PartyInvite {
+                    id: Some(ids[1].clone()),
+                    name: None,
+                },
+            },
+        );
+        w.message(
+            2,
+            ClientMessage::Social {
+                command: SocialCommand::PartyAccept { id: ids[0].clone() },
+            },
+        );
+        assert!(w.party_mates(&ids[0]).contains(&ids[1]));
+        w.players.get_mut(&1).unwrap().pvp_flag = true;
+        w.players.get_mut(&2).unwrap().pvp_flag = true;
+        let max = hp(&w, 2);
+        w.use_skill(1, "arcanestorm", Point { x: 1., y: 0. });
+        assert_eq!(hp(&w, 2), max);
+    }
+    #[test]
+    fn arena_skills_reach_the_other_team_and_never_the_own() {
+        let mut w = world();
+        let ids: Vec<_> = (1..=4)
+            .map(|n| add(&mut w, n as u64, &format!("Hero{n}")))
+            .collect();
+        for (leader, member) in [(0usize, 1usize), (2, 3)] {
+            w.message(
+                (leader + 1) as u64,
+                ClientMessage::Social {
+                    command: SocialCommand::PartyInvite {
+                        id: Some(ids[member].clone()),
+                        name: None,
+                    },
+                },
+            );
+            w.message(
+                (member + 1) as u64,
+                ClientMessage::Social {
+                    command: SocialCommand::PartyAccept {
+                        id: ids[leader].clone(),
+                    },
+                },
+            );
+        }
+        w.pvp_command(1, PvpCommand::ArenaQueue { size: 2 });
+        w.pvp_command(3, PvpCommand::ArenaQueue { size: 2 });
+        assert_eq!(w.pvp.matches.len(), 1);
+        assert!(!w.pvp_legal(1, 2), "an ally");
+        assert!(!w.pvp_legal(1, 1), "oneself");
+        assert!(w.pvp_legal(1, 3) && w.pvp_legal(1, 4), "the other team");
+        assert!(
+            w.foes_near(1, w.players[&1].character.point(), 1000., &[])
+                .len()
+                == 2
+        );
+    }
+    /// The mages of `mages()` with player 1 turned into `class` at level 40.
+    fn stunner(class: Class) -> (World, [String; 3]) {
+        let (mut w, ids) = mages();
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.look.class = class;
+        c.reset_resource();
+        c.change_resource(100.);
+        // A sturdy target, so one stunning blow does not end the duel (which would free the stun).
+        let c = &mut w.players.get_mut(&2).unwrap().character;
+        c.level = 99;
+        c.hp = c.max_hp();
+        w.pvp_command(1, PvpCommand::DuelRequest { id: ids[1].clone() });
+        w.pvp_command(2, PvpCommand::DuelAccept { id: ids[0].clone() });
+        (w, ids)
+    }
+    #[test]
+    fn warrior_assassin_and_hunter_each_have_a_three_second_stun_skill_of_about_fifteen_seconds() {
+        for (class, id) in [
+            (Class::Warrior, "earthshatter"),
+            (Class::Assassin, "knifering"),
+            (Class::Hunter, "rainofarrows"),
+        ] {
+            let skill = skills::find(class, id).unwrap();
+            assert_eq!(skill.stun, 3., "{id}");
+            assert!(
+                (12. ..=15.).contains(&skill.cooldown),
+                "{id}: {}",
+                skill.cooldown
+            );
+        }
+        let stunners: Vec<_> = skills::SKILLS.iter().filter(|s| s.stun > 0.).collect();
+        assert_eq!(stunners.len(), 3, "only those three stun");
+        let storm = skills::find(Class::Mage, "arcanestorm").unwrap();
+        assert_eq!((storm.root, storm.stun), (3., 0.));
+        assert!((12. ..=15.).contains(&storm.cooldown));
+        let rooters: Vec<_> = skills::SKILLS.iter().filter(|s| s.root > 0.).collect();
+        assert_eq!(rooters.len(), 1, "only Arcane Storm roots");
+    }
+    #[test]
+    fn a_stunning_skill_holds_the_player_it_hits_for_three_seconds() {
+        for (class, id) in [
+            (Class::Warrior, "earthshatter"),
+            (Class::Assassin, "knifering"),
+            (Class::Hunter, "rainofarrows"),
+        ] {
+            let (mut w, _) = stunner(class);
+            for _ in 0..40 {
+                w.players.get_mut(&1).unwrap().character.attributes.accuracy = 100;
+                w.use_skill(1, id, Point { x: 1., y: 0. });
+                tick(&mut w, 40);
+                if w.players[&2].stun > 0. || w.pvp.duels.is_empty() {
+                    break;
+                }
+                w.players.get_mut(&1).unwrap().skill_cd.clear();
+                let c = &mut w.players.get_mut(&1).unwrap().character;
+                c.reset_resource();
+                c.change_resource(100.);
+                w.players.get_mut(&2).unwrap().character.hp = w.players[&2].character.max_hp();
+            }
+            let stun = w.players[&2].stun;
+            assert!(stun > 0. && stun <= 3., "{id}: stun {stun}");
+            assert_eq!(w.players[&3].stun, 0., "a bystander is not stunned");
+            let at = w.players[&2].character.point();
+            w.message(
+                2,
+                ClientMessage::Move {
+                    x: at.x + 5.,
+                    y: at.y,
+                },
+            );
+            w.players.get_mut(&2).unwrap().skill_cd.clear();
+            w.use_skill(2, "arcanestorm", Point { x: -1., y: 0. });
+            assert!(w.players[&2].skill_cd.is_empty(), "no cast while stunned");
+            w.players.get_mut(&2).unwrap().cooldown = 0.;
+            assert!(
+                w.pvp_attack(2, &w.players[&1].character.id.clone())
+                    .is_err()
+            );
+            for _ in 0..30 {
+                w.step();
+            }
+            assert_eq!(
+                w.players[&2].character.point(),
+                at,
+                "{id}: no walking while stunned"
+            );
+            tick(&mut w, 40);
+            assert_eq!(w.players[&2].stun, 0., "the stun wears off");
+        }
+    }
+    #[test]
+    fn skills_without_a_stun_and_the_end_of_a_duel_leave_no_stun() {
+        let (mut w, _) = stunner(Class::Warrior);
+        w.players.get_mut(&1).unwrap().character.attributes.accuracy = 100;
+        w.use_skill(1, "cleave", Point { x: 1., y: 0. });
+        assert_eq!(w.players[&2].stun, 0., "cleave does not stun");
+        w.players.get_mut(&2).unwrap().stun = 2.;
+        w.pvp_command(1, PvpCommand::DuelCancel);
+        assert_eq!(
+            w.players[&2].stun, 0.,
+            "the duel's end frees a stunned duelist"
+        );
+    }
+    #[test]
+    fn a_blow_on_a_player_is_scaled_by_the_pvp_damage_scale() {
+        let (mut w, _) = mages();
+        w.players.get_mut(&2).unwrap().character.hp = w.players[&2].character.max_hp();
+        w.players.get_mut(&1).unwrap().pvp_flag = true;
+        w.players.get_mut(&2).unwrap().pvp_flag = true;
+        let defence = w.players[&2].character.stats().1;
+        let damage = 4000.;
+        let before = hp(&w, 2);
+        let mut lost = 0.;
+        for _ in 0..20 {
+            let taken = w.pvp_hit(1, 2, damage, false);
+            if taken > 0. {
+                lost = taken;
+                break;
+            }
+        }
+        let expected = ((damage - defence) * DAMAGE_TAKEN_SCALE * PVP_DAMAGE_SCALE).round();
+        assert_eq!(lost, expected);
+        // Less than the same blow would take off the player in a fight against a monster.
+        let from_a_monster = ((damage - defence) * DAMAGE_TAKEN_SCALE).round();
+        assert!(lost < from_a_monster, "{lost} against {from_a_monster}");
+        assert_eq!(before - hp(&w, 2), expected);
+    }
+    #[test]
+    fn a_rooting_skill_stops_walking_and_dashes_but_not_attacks_or_casts() {
+        let (mut w, ids) = stunner(Class::Mage);
+        // Player 2 is a level 99 mage too (blink is a dash), standing next to player 1.
+        w.players.get_mut(&1).unwrap().character.attributes.accuracy = 100;
+        for _ in 0..40 {
+            w.use_skill(1, "arcanestorm", Point { x: 1., y: 0. });
+            if w.players[&2].root > 0. {
+                break;
+            }
+            w.players.get_mut(&1).unwrap().skill_cd.clear();
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.reset_resource();
+            w.players.get_mut(&2).unwrap().character.hp = w.players[&2].character.max_hp();
+        }
+        let root = w.players[&2].root;
+        assert!(root > 0. && root <= 3., "root {root}");
+        assert_eq!(w.players[&2].stun, 0., "a root is not a stun");
+        assert_eq!(w.players[&3].root, 0.);
+        let at = w.players[&2].character.point();
+        w.message(
+            2,
+            ClientMessage::Move {
+                x: at.x + 5.,
+                y: at.y,
+            },
+        );
+        w.message(2, ClientMessage::Input { dx: 1., dy: 0. });
+        tick(&mut w, 20);
+        assert_eq!(
+            w.players[&2].character.point(),
+            at,
+            "no walking while rooted"
+        );
+        w.players.get_mut(&2).unwrap().skill_cd.clear();
+        w.use_skill(2, "blink", Point { x: 1., y: 0. });
+        assert!(
+            !w.players[&2].skill_cd.contains_key("blink"),
+            "no dash while rooted"
+        );
+        assert_eq!(w.players[&2].character.point(), at);
+        w.use_skill(2, "twinbolt", Point { x: -1., y: 0. });
+        assert!(
+            w.players[&2].skill_cd.contains_key("twinbolt"),
+            "casting still works"
+        );
+        w.players.get_mut(&2).unwrap().cooldown = 0.;
+        assert!(w.pvp_attack(2, &ids[0]).is_ok(), "attacking still works");
+        tick(&mut w, 40);
+        assert_eq!(w.players[&2].root, 0., "the root wears off");
+        w.message(
+            2,
+            ClientMessage::Move {
+                x: at.x + 2.,
+                y: at.y,
+            },
+        );
+        tick(&mut w, 20);
+        assert!(w.players[&2].character.point() != at, "free to walk again");
+    }
+    #[test]
+    fn warrior_assassin_mage_and_hunter_each_have_a_long_skill_that_halves_healing_for_ten_seconds()
+    {
+        for (class, id) in [
+            (Class::Warrior, "titanswrath"),
+            (Class::Assassin, "thousandcuts"),
+            (Class::Mage, "starfall"),
+            (Class::Hunter, "arrowstorm"),
+        ] {
+            let skill = skills::find(class, id).unwrap();
+            assert_eq!((skill.wound, skill.wound_time), (0.5, 10.), "{id}");
+            assert!(skill.cooldown >= 28., "{id}: {} s", skill.cooldown);
+        }
+        let all: Vec<_> = skills::SKILLS.iter().filter(|s| s.wound > 0.).collect();
+        assert_eq!(all.len(), 4, "the priest has none");
+        assert!(all.iter().all(|s| s.class != Class::Priest));
+    }
+    #[test]
+    fn a_wounding_skill_cuts_the_healing_of_the_player_it_hits_and_wears_off() {
+        let (mut w, _) = stunner(Class::Warrior);
+        w.players.get_mut(&1).unwrap().character.attributes.accuracy = 100;
+        for _ in 0..40 {
+            w.use_skill(1, "titanswrath", Point { x: 1., y: 0. });
+            if w.players[&2].wound_left > 0. {
+                break;
+            }
+            w.players.get_mut(&1).unwrap().skill_cd.clear();
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.reset_resource();
+            c.change_resource(100.);
+            w.players.get_mut(&2).unwrap().character.hp = w.players[&2].character.max_hp();
+        }
+        let p = &w.players[&2];
+        assert_eq!(p.wound, 0.5);
+        // Half from the wound, and the PvP scale because the blow that wounded also started a fight.
+        assert_eq!(p.heal_factor(), 0.5 * PVP_DAMAGE_SCALE);
+        assert!(p.wound_left > 9. && p.wound_left <= 10., "{}", p.wound_left);
+        assert_eq!(w.players[&3].wound_left, 0., "a bystander");
+        tick(&mut w, 205);
+        assert_eq!(w.players[&2].wound_left, 0., "wears off");
+        assert_eq!(w.players[&2].heal_factor(), 1.);
+    }
+    #[test]
+    fn a_wound_halves_skill_heals_lifesteal_and_potions() {
+        // Second Wind heals 40% of the maximum health.
+        let heal_gain = |wounded: bool| {
+            let (mut w, _) = mages();
+            let c = &mut w.players.get_mut(&2).unwrap().character;
+            c.look.class = Class::Warrior;
+            c.level = 40;
+            c.reset_resource();
+            c.change_resource(100.);
+            c.hp = c.max_hp() * 0.2;
+            if wounded {
+                let p = w.players.get_mut(&2).unwrap();
+                p.wound = 0.5;
+                p.wound_left = 10.;
+            }
+            let before = hp(&w, 2);
+            w.use_skill(2, "secondwind", Point { x: 1., y: 0. });
+            hp(&w, 2) - before
+        };
+        let (free, cut) = (heal_gain(false), heal_gain(true));
+        assert!(free > 0.);
+        assert!((cut - free / 2.).abs() < 1., "{cut} against {free}");
+        // A health potion.
+        let potion = |wounded: bool| {
+            let (mut w, _) = mages();
+            let id = crate::items::best_tier("health_potion", 40)
+                .unwrap()
+                .id
+                .clone();
+            let p = w.players.get_mut(&2).unwrap();
+            p.character.add_item(&id, 1);
+            p.character.hp = p.character.max_hp() * 0.2;
+            if wounded {
+                p.wound = 0.5;
+                p.wound_left = 10.;
+            }
+            let before = hp(&w, 2);
+            w.use_item(2, &id);
+            hp(&w, 2) - before
+        };
+        let (free, cut) = (potion(false), potion(true));
+        assert!(free > 0.);
+        assert!((cut - free / 2.).abs() < 1., "{cut} against {free}");
+    }
+    #[test]
+    fn healing_is_scaled_like_damage_while_in_a_pvp_fight() {
+        let (mut w, _) = stunner(Class::Warrior);
+        {
+            let c = &mut w.players.get_mut(&2).unwrap().character;
+            c.look.class = Class::Warrior;
+            c.reset_resource();
+            c.change_resource(100.);
+        }
+        assert_eq!(w.players[&2].heal_factor(), 1., "no fight yet");
+        for _ in 0..40 {
+            if w.pvp_hit(1, 2, 400., false) > 0. {
+                break;
+            }
+        }
+        for session in [1, 2] {
+            let p = &w.players[&session];
+            assert!(p.pvp_fight > 9. && p.pvp_fight <= 10., "{}", p.pvp_fight);
+            assert_eq!(p.heal_factor(), PVP_DAMAGE_SCALE);
+        }
+        assert_eq!(w.players[&3].heal_factor(), 1., "a bystander heals in full");
+        // Second Wind (40% of the maximum) heals PVP_DAMAGE_SCALE as much as outside a fight.
+        let max = w.players[&2].character.max_hp();
+        let gain = |w: &mut World| {
+            let p = w.players.get_mut(&2).unwrap();
+            p.character.hp = max * 0.2;
+            p.skill_cd.clear();
+            p.character.change_resource(100.);
+            w.use_skill(2, "secondwind", Point { x: -1., y: 0. });
+            hp(w, 2) - max * 0.2
+        };
+        let scaled = gain(&mut w);
+        w.players.get_mut(&2).unwrap().pvp_fight = 0.;
+        let free = gain(&mut w);
+        assert!(free > 0.);
+        assert!(
+            (scaled - free * PVP_DAMAGE_SCALE).abs() < 1.,
+            "{scaled} against {free}"
+        );
+        w.players.get_mut(&2).unwrap().pvp_fight = PVP_FIGHT_TIME;
+        tick(&mut w, 205);
+        // The duel may have ended meanwhile, which clears the flag; either way it is gone after ten seconds.
+        assert_eq!(w.players[&2].heal_factor(), 1.);
+        // The end of a duel clears it at once.
+        let (mut w, _) = stunner(Class::Warrior);
+        for _ in 0..40 {
+            if w.pvp_hit(1, 2, 400., false) > 0. {
+                break;
+            }
+        }
+        assert!(w.players[&2].pvp_fight > 0.);
+        w.pvp_command(1, PvpCommand::DuelCancel);
+        assert_eq!(w.players[&2].heal_factor(), 1.);
+    }
+    #[test]
+    fn a_hunter_deals_a_quarter_more_to_players_and_nobody_else_does() {
+        let taken = |class: Class| {
+            let (mut w, _) = mages();
+            w.players.get_mut(&1).unwrap().character.look.class = class;
+            w.players.get_mut(&1).unwrap().pvp_flag = true;
+            w.players.get_mut(&2).unwrap().pvp_flag = true;
+            for _ in 0..40 {
+                let before = hp(&w, 2);
+                if w.pvp_hit(1, 2, 4000., false) > 0. {
+                    return (before - hp(&w, 2), w.players[&2].character.stats().1);
+                }
+            }
+            panic!("never landed");
+        };
+        let (hunter, defence) = taken(Class::Hunter);
+        let (warrior, _) = taken(Class::Warrior);
+        assert_eq!(
+            hunter,
+            ((4000. * PVP_HUNTER_DAMAGE - defence) * DAMAGE_TAKEN_SCALE * PVP_DAMAGE_SCALE).round()
+        );
+        assert_eq!(
+            warrior,
+            ((4000. - defence) * DAMAGE_TAKEN_SCALE * PVP_DAMAGE_SCALE).round()
+        );
+        assert!(hunter > warrior);
     }
 }

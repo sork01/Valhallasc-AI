@@ -53596,5 +53596,548 @@
       "stamina": 15
     },
     "source": "skybridge"
+  },
+  {
+    "id": "keel_crab_relic",
+    "name": "Copperclaw Scavenger Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 140
+  },
+  {
+    "id": "keel_deckhand_relic",
+    "name": "Drowned Deckhand Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 140
+  },
+  {
+    "id": "keel_lantern_relic",
+    "name": "Bilge Lantern Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 140
+  },
+  {
+    "id": "keel_cargomaw_relic",
+    "name": "Gullveig, the Cargo Maw Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 620
+  },
+  {
+    "id": "keel_bosun_relic",
+    "name": "Bosun Brinehook Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 620
+  },
+  {
+    "id": "keel_captain_relic",
+    "name": "Captain Svala Nineknots Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 620
+  },
+  {
+    "id": "warrior_armor_crimson_l35_keel",
+    "name": "Keelbound Copperwake Vestments",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "warrior",
+    "variant": "crimson_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 6.4,
+    "defense": 26.0,
+    "bonusStats": {
+      "strength": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "warrior_headgear_crimson_l35_keel",
+    "name": "Keelbound Copperwake Crown",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "warrior",
+    "variant": "crimson_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "dexterity": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l35_keel",
+    "name": "Keelbound Copperwake Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "warrior",
+    "variant": "crimson_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "stamina": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "warrior_gloves_crimson_l35_keel",
+    "name": "Keelbound Copperwake Grips",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "warrior",
+    "variant": "crimson_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "dexterity": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "warrior_weapon_sword_l35_keel",
+    "name": "Keelbound Boarding Cutlass",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "warrior",
+    "variant": "sword_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 34.6,
+    "defense": 8.6,
+    "bonusStats": {
+      "dexterity": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "mage_armor_apprentice_l35_keel",
+    "name": "Keelbound Wheelkeeper Vestments",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "mage",
+    "variant": "apprentice_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "dexterity": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "mage_headgear_apprentice_l35_keel",
+    "name": "Keelbound Wheelkeeper Crown",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "mage",
+    "variant": "apprentice_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "intellect": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l35_keel",
+    "name": "Keelbound Wheelkeeper Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "mage",
+    "variant": "apprentice_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "dexterity": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "mage_gloves_apprentice_l35_keel",
+    "name": "Keelbound Wheelkeeper Grips",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "mage",
+    "variant": "apprentice_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "accuracy": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "mage_weapon_ash_l35_keel",
+    "name": "Keelbound Wheelstaff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "mage",
+    "variant": "ash_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 34.6,
+    "defense": 8.6,
+    "bonusStats": {
+      "accuracy": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "assassin_armor_shadow_l35_keel",
+    "name": "Keelbound Brinehook Vestments",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "assassin",
+    "variant": "shadow_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 4.4,
+    "defense": 17.2,
+    "bonusStats": {
+      "stamina": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "assassin_headgear_shadow_l35_keel",
+    "name": "Keelbound Brinehook Crown",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "assassin",
+    "variant": "shadow_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "accuracy": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l35_keel",
+    "name": "Keelbound Brinehook Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "assassin",
+    "variant": "shadow_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "stamina": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "assassin_gloves_shadow_l35_keel",
+    "name": "Keelbound Brinehook Grips",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "assassin",
+    "variant": "shadow_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "strength": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "assassin_weapon_daggers_l35_keel",
+    "name": "Keelbound Boarding Hooks",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "assassin",
+    "variant": "daggers_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 34.6,
+    "defense": 8.6,
+    "bonusStats": {
+      "accuracy": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "priest_armor_pilgrim_l35_keel",
+    "name": "Keelbound Bellwatch Vestments",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "priest",
+    "variant": "pilgrim_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 6.4,
+    "defense": 26.0,
+    "bonusStats": {
+      "intellect": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l35_keel",
+    "name": "Keelbound Bellwatch Crown",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "priest",
+    "variant": "pilgrim_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "stamina": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l35_keel",
+    "name": "Keelbound Bellwatch Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "priest",
+    "variant": "pilgrim_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "agility": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l35_keel",
+    "name": "Keelbound Bellwatch Grips",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "priest",
+    "variant": "pilgrim_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "intellect": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "priest_weapon_mace_l35_keel",
+    "name": "Keelbound Diving Bell",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "priest",
+    "variant": "mace_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 34.6,
+    "defense": 8.6,
+    "bonusStats": {
+      "intellect": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "hunter_armor_scout_l35_keel",
+    "name": "Keelbound Harpooner Vestments",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "hunter",
+    "variant": "scout_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 6.4,
+    "defense": 26.0,
+    "bonusStats": {
+      "agility": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "hunter_headgear_scout_l35_keel",
+    "name": "Keelbound Harpooner Crown",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "hunter",
+    "variant": "scout_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "accuracy": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "hunter_shoulders_scout_l35_keel",
+    "name": "Keelbound Harpooner Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "hunter",
+    "variant": "scout_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "agility": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "hunter_gloves_scout_l35_keel",
+    "name": "Keelbound Harpooner Grips",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "hunter",
+    "variant": "scout_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "stamina": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l35_keel",
+    "name": "Keelbound Harpoon Bow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "class": "hunter",
+    "variant": "shortbow_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 34.6,
+    "defense": 8.6,
+    "bonusStats": {
+      "strength": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "pants_wayfarer_l35_keel",
+    "name": "Keelbound Rope Gaiters",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "variant": "wayfarer_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 2.2,
+    "defense": 8.6,
+    "bonusStats": {
+      "dexterity": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "necklace_moonstone_l35_keel",
+    "name": "Keelbound Anchor Pendant",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "variant": "moonstone_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 17.2,
+    "defense": 4.4,
+    "bonusStats": {
+      "dexterity": 20
+    },
+    "source": "longship"
+  },
+  {
+    "id": "accessory_amber_l35_keel",
+    "name": "Keelbound Porthole Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "variant": "amber_l35_keel",
+    "art": "regearkeel",
+    "starter": false,
+    "attack": 13.0,
+    "defense": 3.2,
+    "bonusStats": {
+      "accuracy": 20
+    },
+    "source": "longship"
   }
 ]
