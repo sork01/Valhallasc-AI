@@ -718,12 +718,12 @@
     clearTimeout(timer); renderZone(index);
     const world = $('wm-world');
     if (reduced() || !tile) { world.style.transition = world.style.transform = world.style.opacity = world.style.willChange = ''; setView('zone'); return; }
-    const st = world.getBoundingClientRect(), r = tile.getBoundingClientRect();
+    const st = world.getBoundingClientRect(), r = tile.getBoundingClientRect(), k = st.width / (world.offsetWidth || st.width);   // k: the window's UI scale
     const scale = Math.min(st.width / r.width, st.height / r.height) * .92;
-    world.style.transformOrigin = `${r.left + r.width / 2 - st.left}px ${r.top + r.height / 2 - st.top}px`;
+    world.style.transformOrigin = `${(r.left + r.width / 2 - st.left) / k}px ${(r.top + r.height / 2 - st.top) / k}px`;
     world.style.willChange = 'transform, opacity';    // one raster scaled as a texture: the sheet's SVG filters would be redrawn at 8x every frame
     world.style.transition = 'transform .38s ease-in, opacity .38s ease-in';
-    world.style.transform = `translate(${st.left + st.width / 2 - r.left - r.width / 2}px, ${st.top + st.height / 2 - r.top - r.height / 2}px) scale(${scale})`;
+    world.style.transform = `translate(${(st.left + st.width / 2 - r.left - r.width / 2) / k}px, ${(st.top + st.height / 2 - r.top - r.height / 2) / k}px) scale(${scale})`;
     world.style.opacity = '0';
     $('wm-body').dataset.view = 'zooming';
     timer = setTimeout(() => { world.style.transition = world.style.transform = world.style.opacity = world.style.willChange = ''; setView('zone'); $('wm-back').focus(); }, 390);
@@ -733,10 +733,10 @@
     const world = $('wm-world'), tile = tiles[current];
     setView('world');
     if (!reduced() && tile) {
-      const st = world.getBoundingClientRect(), r = tile.getBoundingClientRect();
-      world.style.transformOrigin = `${r.left + r.width / 2 - st.left}px ${r.top + r.height / 2 - st.top}px`;
+      const st = world.getBoundingClientRect(), r = tile.getBoundingClientRect(), k = st.width / (world.offsetWidth || st.width);
+      world.style.transformOrigin = `${(r.left + r.width / 2 - st.left) / k}px ${(r.top + r.height / 2 - st.top) / k}px`;
       world.style.willChange = 'transform, opacity'; world.style.transition = 'none'; world.style.opacity = '0';
-      world.style.transform = `translate(${st.left + st.width / 2 - r.left - r.width / 2}px, ${st.top + st.height / 2 - r.top - r.height / 2}px) scale(${Math.min(st.width / r.width, st.height / r.height) * .92})`;
+      world.style.transform = `translate(${(st.left + st.width / 2 - r.left - r.width / 2) / k}px, ${(st.top + st.height / 2 - r.top - r.height / 2) / k}px) scale(${Math.min(st.width / r.width, st.height / r.height) * .92})`;
       void world.offsetWidth;
       world.style.transition = 'transform .32s ease-out, opacity .32s ease-out'; world.style.transform = 'none'; world.style.opacity = '1';
       timer = setTimeout(() => { world.style.transition = world.style.transform = world.style.opacity = world.style.willChange = ''; }, 340);

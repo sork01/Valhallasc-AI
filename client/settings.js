@@ -2,18 +2,35 @@
 /* Settings panel (music and effects volume) and the "Edit UI" mode, where the HUD pieces can be dragged.
    Layout is stored per device as {id: {x, y}} offsets in stage-width percent (cqw) from each element's
    default spot, applied with the CSS `translate` property so it composes with the elements' own transforms.
+   UI size: one global factor (Prefs.uiScale) scales every HUD piece and window with the CSS `scale` property, about the
+   corner each piece is anchored to, so nothing drifts. Each window also has a corner grip that resizes just that window
+   (Prefs.winScale, a factor on top of the global one). `scale` never changes layout, so the stage maths stays as it was.
    Preferences are read and written only through window.Prefs (game.js owns localStorage). */
 (() => {
   const $ = id => document.getElementById(id);
+  // [id, name, selector, transform-origin]: the origin is the corner the piece is anchored to. A piece centred with
+  // translateX(-50%) uses x=0: the shift is applied before the scale, which leaves its centre where it was.
   const ITEMS = [
-    ['frame', 'Character frame', '.hud-tl'], ['buffs', 'Active effects', '#buff-bar'], ['party', 'Party', '#party-frame'],
-    ['map', 'Minimap', '.hud-tr'], ['travel', 'Travel button', '#city-travel'], ['quests', 'Quest tracker', '#quest-tracker'],
-    ['character', 'Character button', '#equipment-open'], ['bags', 'Bags button', '#inventory-open'], ['social', 'Social button', '#social-open'],
-    ['skillbar', 'Skillbar', '#skillbar'], ['quickuse', 'Food and potion slots', '#quickuse'], ['chat', 'Chat', '#chat'], ['hint', 'Controls hint', '.hud-hint'],
+    ['frame', 'Character frame', '.hud-tl', '0 0'], ['buffs', 'Active effects', '#buff-bar', '0 0'], ['party', 'Party', '#party-frame', '0 0'],
+    ['map', 'Minimap', '.hud-tr', '100% 0'], ['travel', 'Travel button', '#city-travel', '100% 0'], ['quests', 'Quest tracker', '#quest-tracker', '100% 0'],
+    ['character', 'Character button', '#equipment-open', '100% 0'], ['bags', 'Bags button', '#inventory-open', '100% 100%'], ['social', 'Social button', '#social-open', '100% 100%'],
+    ['skillbar', 'Skillbar', '#skillbar', '0 100%'], ['quickuse', 'Food and potion slots', '#quickuse', '0 100%'], ['chat', 'Chat', '#chat', '0 100%'], ['hint', 'Controls hint', '.hud-hint', '0 100%'],
+  ];
+  // Scaled with the UI but not movable.
+  const EXTRA = [['#loot-rolls', '0 0'], ['#social-invites', '0 0'], ['#pvp-duel-warning', '0 0'], ['#network-status', '0 0'], ['#rare-pickup', '0 0'], ['#toast', '0 100%']];
+  // [overlay id, window selector or null for the overlay itself, name, origin, resizable]
+  const WINDOWS = [
+    ['pause', '.pause-panel', 'World Menu', '50% 50%', false], ['settings-panel', '.settings-panel', 'Settings', '50% 50%', false],
+    ['quest-journal', '.quest-panel', 'Quest journal', '50% 50%', true], ['npc-dialogue', '.gossip-window', 'Conversation', '50% 50%', true],
+    ['worldmap', '.wm-panel', 'World map', '50% 50%', true], ['social-panel', '.social-panel', 'Social', '50% 50%', true],
+    ['trade-panel', '.trade-panel', 'Trade', '50% 50%', true], ['rebirth-dialog', '.rebirth-dialog', 'Rebirth', '50% 50%', true],
+    ['bank-panel', '.bank-panel', 'Bank', '50% 50%', true], ['skills-panel', '.skills-panel', 'Skills', '50% 50%', true],
+    ['equipment', '.equipment-workspace', 'Character and bags', '50% 50%', true], ['sign-panel', null, 'Sign', '0 0', true],
   ];
   const stage = $('stage'), panel = $('settings-panel'), bar = $('layout-bar');
   const els = new Map(ITEMS.map(([id, name, selector]) => [id, document.querySelector(selector)]));
-  for (const [id, name] of ITEMS) { const el = els.get(id); if (el) { el.dataset.ui = id; el.dataset.uiName = name; } }
+  for (const [id, name, , origin] of ITEMS) { const el = els.get(id); if (el) { el.dataset.ui = id; el.dataset.uiName = name; el.style.transformOrigin = origin; } }
+  for (const [selector, origin] of EXTRA) { const el = document.querySelector(selector); if (el) el.style.transformOrigin = origin; }
   const layout = {};
   let editing = false, selected = null, layer = null, drag = null;
   const handles = new Map();
@@ -54,14 +71,102 @@
     if (editing) syncHandles();
   }
 
+  // ---------- UI size and window sizes ----------
+  const UI_MIN = .6, UI_MAX = 1.5, WIN_MIN = .5;
+  const wins = WINDOWS.map(([overlay, selector, name, origin, resizable]) => {
+    const root = $(overlay), el = selector ? root?.querySelector(selector) : root;
+    if (el) el.style.transformOrigin = origin;
+    return { id: overlay, name, el, resizable, grip: null };
+  }).filter(w => w.el);
+  const winScale = {};
+  const uiScale = () => window.Prefs.uiScale;
+  const fitScale = w => { const s = stage.getBoundingClientRect(), width = w.el.offsetWidth, height = w.el.offsetHeight; return width && height ? Math.max(WIN_MIN, Math.min(s.width / width, s.height / height) * .98) : Infinity; };
+  const windowScale = w => Math.max(WIN_MIN, Math.min(uiScale() * (winScale[w.id] || 1), fitScale(w)));
+  function loadWindowScales() {
+    for (const id of Object.keys(winScale)) delete winScale[id];
+    for (const w of wins) { const v = +window.Prefs.winScale[w.id]; if (Number.isFinite(v) && v > 0) winScale[w.id] = Math.max(.4, Math.min(3, v)); }
+  }
+  function placeGrip(w) {
+    if (!w.grip) return;
+    const r = w.el.getBoundingClientRect(), s = stage.getBoundingClientRect();
+    w.grip.hidden = editing || !r.width || !r.height;
+    if (w.grip.hidden) return;
+    const g = w.grip.offsetWidth || 16;
+    w.grip.style.left = Math.min(r.right, s.right) - s.left - g - 3 + 'px'; w.grip.style.top = Math.min(r.bottom, s.bottom) - s.top - g - 3 + 'px';
+  }
+  function applyWindow(w) {
+    const k = windowScale(w);
+    w.el.style.scale = Math.abs(k - 1) < .005 ? '' : String(Math.round(k * 1000) / 1000);
+    placeGrip(w);
+  }
+  function applyScale() {
+    const k = uiScale();
+    for (const [id] of ITEMS) { const el = els.get(id); if (el) el.style.scale = Math.abs(k - 1) < .005 ? '' : String(k); }
+    for (const [selector] of EXTRA) { const el = document.querySelector(selector); if (el) el.style.scale = Math.abs(k - 1) < .005 ? '' : String(k); }
+    for (const w of wins) applyWindow(w);
+  }
+  function storeWindows() {
+    const out = {}; for (const [id, v] of Object.entries(winScale)) if (Math.abs(v - 1) > .005) out[id] = Math.round(v * 1000) / 1000;
+    window.Prefs.set({ winScale: out });
+  }
+  // Set a window's size as a factor of the global scale; the factor is capped so the window still fits the stage.
+  function sizeWindow(w, factor, save = true) {
+    const cap = fitScale(w) / uiScale();
+    const f = Math.max(WIN_MIN / uiScale(), Math.min(factor, cap, 3));
+    if (Math.abs(f - 1) < .005) delete winScale[w.id]; else winScale[w.id] = f;
+    applyWindow(w); if (save) storeWindows();
+  }
+  function clearWindow(w) { delete winScale[w.id]; applyWindow(w); storeWindows(); }
+  function makeGrip(w) {
+    const g = document.createElement('div');
+    g.className = 'win-grip'; g.tabIndex = 0; g.setAttribute('role', 'button'); g.hidden = true;
+    g.title = `Drag to resize · double-click for the normal size`;
+    g.setAttribute('aria-label', `Resize ${w.name}: arrow keys change the size, 0 resets it`);
+    let drag = null;
+    g.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      e.preventDefault(); e.stopPropagation();
+      const r = w.el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      drag = { pointer: e.pointerId, cx, cy, start: Math.hypot(e.clientX - cx, e.clientY - cy) || 1, size: windowScale(w) };
+      g.setPointerCapture(e.pointerId); g.classList.add('dragging');
+    });
+    g.addEventListener('pointermove', e => {
+      if (!drag || drag.pointer !== e.pointerId) return;
+      // The window grows about its centre, so the grip follows the pointer when the distance from the centre scales with it.
+      sizeWindow(w, drag.size * Math.hypot(e.clientX - drag.cx, e.clientY - drag.cy) / drag.start / uiScale(), false);
+    });
+    const end = e => { if (!drag || drag.pointer !== e.pointerId) return; drag = null; g.classList.remove('dragging'); storeWindows(); };
+    g.addEventListener('pointerup', end); g.addEventListener('pointercancel', end);
+    g.addEventListener('dblclick', () => clearWindow(w));
+    g.addEventListener('keydown', e => {
+      const step = { ArrowRight: .05, ArrowUp: .05, ArrowLeft: -.05, ArrowDown: -.05 }[e.key];
+      if (step === undefined && e.key !== '0') return;
+      e.preventDefault(); e.stopPropagation();
+      if (e.key === '0') clearWindow(w); else sizeWindow(w, (winScale[w.id] || 1) + step * (e.shiftKey ? 3 : 1));
+    });
+    return g;
+  }
+  let gripLayer = null;
+  function initWindows() {
+    gripLayer = document.createElement('div'); gripLayer.className = 'win-grips'; stage.append(gripLayer);
+    const watch = new ResizeObserver(entries => { for (const entry of entries) { const w = wins.find(x => x.el === entry.target); if (w) applyWindow(w); } });
+    for (const w of wins) {
+      if (w.resizable) { w.grip = makeGrip(w); gripLayer.append(w.grip); }
+      watch.observe(w.el);
+    }
+    new ResizeObserver(() => applyScale()).observe(stage);
+  }
+  function resetWindows() { for (const w of wins) { delete winScale[w.id]; applyWindow(w); } storeWindows(); }
+
   // ---------- the volume panel ----------
-  const music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound'), night = $('set-night'), weather = $('set-weather'), weatherAudio = $('set-weather-audio'), language = $('set-language');
+  const music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound'), night = $('set-night'), weather = $('set-weather'), weatherAudio = $('set-weather-audio'), language = $('set-language'), size = $('set-uiscale');
   function syncPanel() {
     language.value = window.Prefs.lang;
     music.value = Math.round(window.Prefs.music * 100); sfx.value = Math.round(window.Prefs.sfx * 100); sound.checked = window.Prefs.sound;
     night.value = Math.round(window.Prefs.night * 100); $('set-night-out').textContent = night.value + '%';
     weather.value = Math.round(window.Prefs.weather * 100); $('set-weather-out').textContent = weather.value + '%';
     weatherAudio.value = Math.round(window.Prefs.weatherAudio * 100); $('set-weather-audio-out').textContent = weatherAudio.value + '%';
+    size.value = Math.round(uiScale() * 100); $('set-uiscale-out').textContent = size.value + '%';
     $('set-music-out').textContent = music.value + '%'; $('set-sfx-out').textContent = sfx.value + '%';
   }
   music.addEventListener('input', () => window.Prefs.set({ musicVol: music.value / 100 }));
@@ -72,6 +177,8 @@
   night.addEventListener('input', () => { $('set-night-out').textContent = night.value + '%'; window.Prefs.set({ night: night.value / 100 }); });
   weather.addEventListener('input', () => { $('set-weather-out').textContent = weather.value + '%'; window.Prefs.set({ weather: weather.value / 100 }); });
   weatherAudio.addEventListener('input', () => { $('set-weather-audio-out').textContent = weatherAudio.value + '%'; window.Prefs.set({ weatherAudio: weatherAudio.value / 100 }); });
+  size.addEventListener('input', () => { $('set-uiscale-out').textContent = size.value + '%'; window.Prefs.set({ uiScale: size.value / 100 }); applyScale(); refresh(); });
+  $('set-win-reset').addEventListener('click', resetWindows);
   addEventListener('prefs-change', () => { if (!panel.hidden) syncPanel(); });
 
   function show() {
@@ -119,7 +226,7 @@
   function startEdit() {
     if (editing) return;
     editing = true; panel.hidden = true; $('pause').hidden = true;
-    stage.classList.add('ui-editing'); bar.hidden = false;
+    stage.classList.add('ui-editing'); bar.hidden = false; for (const w of wins) placeGrip(w);
     layer = document.createElement('div'); layer.className = 'layout-layer'; stage.append(layer);
     for (const [id, name] of ITEMS) if (els.get(id)) { const h = makeHandle(id, name); handles.set(id, h); layer.append(h); }
     syncHandles(); select(null);
@@ -128,7 +235,7 @@
   function stopEdit(toPanel = true) {
     if (!editing) return;
     editing = false; drag = null; store();
-    stage.classList.remove('ui-editing'); bar.hidden = true; layer.remove(); layer = null; handles.clear(); selected = null;
+    stage.classList.remove('ui-editing'); bar.hidden = true; for (const w of wins) placeGrip(w); layer.remove(); layer = null; handles.clear(); selected = null;
     if (toPanel) { panel.hidden = false; syncPanel(); $('set-edit-ui').focus({ preventScroll: true }); }
   }
   function reset() {
@@ -154,7 +261,7 @@
       nudge(handle.dataset.id, e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0, e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0);
     } else if (!bar.contains(e.target) && e.key !== 'Tab') e.stopImmediatePropagation();
   }, true);
-  addEventListener('resize', () => { if (editing) syncHandles(); refresh(); });
+  addEventListener('resize', () => { if (editing) syncHandles(); refresh(); applyScale(); });
 
   $('p-settings').addEventListener('click', show);
   $('set-back').addEventListener('click', () => close());
@@ -162,6 +269,6 @@
   $('layout-done').addEventListener('click', () => stopEdit());
   $('layout-reset').addEventListener('click', reset);
 
-  window.Settings = { show, close, refresh, startEdit, stopEdit, reset, get active() { return !panel.hidden || editing; }, get editing() { return editing; }, get layout() { return layout; } };
-  refresh();
+  window.Settings = { show, close, refresh, startEdit, stopEdit, reset, applyScale, resetWindows, sizeWindow: (id, factor) => { const w = wins.find(x => x.id === id); if (w) sizeWindow(w, factor); }, get windowScales() { return winScale; }, get active() { return !panel.hidden || editing; }, get editing() { return editing; }, get layout() { return layout; } };
+  loadWindowScales(); initWindows(); applyScale(); refresh();
 })();

@@ -2,7 +2,7 @@
 (() => {
   // ---------- tiny persistent state ----------
   const KEY = 'valhallasc.save.v1';
-  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, musicVol: 1, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, ui: {}, char: null, draft: null };
+  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, musicVol: 1, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, ui: {}, uiScale: 1, winScale: {}, char: null, draft: null };
   let save = { ...defaults };
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
   const vol = v => Number.isFinite(+v) ? Math.max(0, Math.min(1, +v)) : 1;
@@ -1152,6 +1152,8 @@
     get weather() { return save.weather; },
     get weatherAudio() { return save.weatherAudio; },
     get layout() { return save.ui && typeof save.ui === 'object' ? save.ui : {}; },
+    get uiScale() { return Number.isFinite(+save.uiScale) ? Math.max(.6, Math.min(1.5, +save.uiScale)) : 1; },
+    get winScale() { return save.winScale && typeof save.winScale === 'object' ? save.winScale : {}; },
     set(patch) {
       if ('lang' in patch && ['en', 'sv', 'ko'].includes(patch.lang) && patch.lang !== save.lang) {
         save.lang = patch.lang; persist(); location.reload(); return;
@@ -1163,6 +1165,8 @@
       if ('weather' in patch) save.weather = vol(patch.weather);
       if ('weatherAudio' in patch) save.weatherAudio = vol(patch.weatherAudio);
       if ('ui' in patch) save.ui = patch.ui;
+      if ('uiScale' in patch && Number.isFinite(+patch.uiScale)) save.uiScale = Math.max(.6, Math.min(1.5, +patch.uiScale));
+      if ('winScale' in patch) save.winScale = patch.winScale;
       persist(); applyMusicLevel(.4);
       if (sfxGain) sfxGain.gain.value = taper(save.sfxVol);
       dispatchEvent(new Event('prefs-change'));

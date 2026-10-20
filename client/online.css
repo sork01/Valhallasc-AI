@@ -821,3 +821,11 @@
 .sign-panel :focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }
 @media (pointer: coarse) { .sign-panel .gossip-button, .sign-panel .window-close { min-height: 44px; min-width: 44px; } }
 @media (max-height: 520px) { .sign-panel { gap: 4px; padding: 6px 12px; font-size: 15px; } .sign-pictures { padding: 4px; } .sign-pictures svg { width: 48px; height: 30px; } .sign-foot { display: none; } }
+
+/* ---------- window resize grips (settings.js) ---------- */
+.win-grips { position: absolute; inset: 0; z-index: 53; pointer-events: none; }
+.win-grip { position: absolute; box-sizing: border-box; width: max(18px, 1.7cqw); height: max(18px, 1.7cqw); pointer-events: auto; cursor: nwse-resize; touch-action: none; opacity: .6;
+  border-right: max(3px, .3cqw) solid #ffd866; border-bottom: max(3px, .3cqw) solid #ffd866; border-radius: 0 0 .5cqw 0; filter: drop-shadow(0 0 2px #000); }
+.win-grip:hover, .win-grip:focus-visible, .win-grip.dragging { opacity: 1; }
+.win-grip:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+@media (pointer: coarse) { .win-grip { width: 34px; height: 34px; } }

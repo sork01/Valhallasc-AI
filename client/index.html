@@ -386,6 +386,7 @@
       <section class="panel pause-panel settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
         <h3 id="settings-title">Settings</h3>
         <label class="setting-row" for="set-language"><span>Language</span><select id="set-language"><option value="en">English</option><option value="sv">Svenska</option><option value="ko">한국어</option></select></label>
+        <label class="setting-row" for="set-uiscale"><span>UI size</span><input id="set-uiscale" type="range" min="60" max="150" step="5"><output id="set-uiscale-out" for="set-uiscale"></output></label>
         <label class="setting-row" for="set-music"><span>Music</span><input id="set-music" type="range" min="0" max="100" step="1"><output id="set-music-out" for="set-music"></output></label>
         <label class="setting-row" for="set-sfx"><span>Sound effects</span><input id="set-sfx" type="range" min="0" max="100" step="1"><output id="set-sfx-out" for="set-sfx"></output></label>
         <label class="setting-row" for="set-night"><span>Night darkening</span><input id="set-night" type="range" min="0" max="100" step="1"><output id="set-night-out" for="set-night"></output></label>
@@ -394,6 +395,8 @@
         <label class="setting-check"><input id="set-sound" type="checkbox"> Sound on <kbd>M / N</kbd></label>
         <button class="btn ghost" id="set-edit-ui" type="button">Edit UI</button>
         <p class="world-menu-note">Edit UI lets you drag the skillbar, quest tracker, chat and the other panels where you want them.</p>
+        <button class="btn ghost" id="set-win-reset" type="button">Reset window sizes</button>
+        <p class="world-menu-note">UI size scales the whole interface. Drag the corner grip of a window to resize it; double-click the grip to reset it.</p>
         <button class="btn primary" id="set-back" type="button">Back to menu</button>
       </section>
     </div>
