@@ -12,7 +12,7 @@ const states = ['docs/gear-redesign-state.txt', 'docs/high-gear-state.txt', 'doc
 const task = states.find(t => t.id === job); assert.ok(task, 'Provide a checklist job ID');
 const record = JSON.parse(fs.readFileSync(path.join(root, 'world/gear-art.txt')))[job]; assert.ok(record?.files, 'Export the piece first');
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt')));
-const sourceFor = { vault: 'undervault', moonwell: 'moonwell', eye: 'eye_below', elder: 'elder_hollow', pavilion: 'thousandfold', rain: 'rain_crown', seed: 'seed_vault', astro: 'sunken_astrolabe', thunder: 'thunderheart_gate', bloom: 'blooming_labyrinth', solar: 'solar_crucible', amber: 'amber_archive', solstice: 'silent_solstice' };
+const sourceFor = { vault: 'undervault', moonwell: 'moonwell', eye: 'eye_below', elder: 'elder_hollow', pavilion: 'thousandfold', rain: 'rain_crown', seed: 'seed_vault', astro: 'sunken_astrolabe', thunder: 'thunderheart_gate', bloom: 'blooming_labyrinth', solar: 'solar_crucible', amber: 'amber_archive', solstice: 'silent_solstice', span: 'skybridge' };
 const selected = items.filter(i => i.kind === task.kind && (i.class || null) === task.className && (task.group.startsWith('L') ? !i.source && i.requiredLevel === Number(task.group.slice(1)) : i.source === (sourceFor[task.group] || 'cathedral_' + task.group)));
 assert.ok(selected.length);
 const slot = task.kind === 'headgear' ? 'head' : task.kind;

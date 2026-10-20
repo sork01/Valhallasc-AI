@@ -48,6 +48,7 @@ DESIGNS = {
     'solar': dict(index=3, hem=18, cape=42, collar=17, spikes=4),
     'amber': dict(index=1, hem=29, cape=34, collar=12, spikes=1),
     'solstice': dict(index=0, hem=22, cape=40, collar=15, spikes=2),
+    'span': dict(index=1, hem=26, cape=32, collar=12, spikes=3),
     'cloister': dict(index=6, hem=21, cape=42, collar=6, spikes=0),
     'reliquary': dict(index=7, hem=32, cape=15, collar=10, spikes=3),
     'nave': dict(index=8, hem=15, cape=44, collar=15, spikes=4),

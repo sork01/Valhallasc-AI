@@ -12,6 +12,7 @@ import subprocess
 import sys
 
 import gear_art_catalog
+import os
 import instance_gear_jobs
 import late_instance_gear_shapes
 import make_progression_gear as gear
@@ -23,7 +24,8 @@ NODE = '/home/serveperry/.nvm/versions/node/v20.20.2/bin/node'
 def run(command, log):
     log.write('\n$ ' + ' '.join(command) + '\n')
     log.flush()
-    result = subprocess.run(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
+    env = dict(os.environ, NODE_PATH='/home/serveperry/webserver/www/dybase2/node_modules')
+    result = subprocess.run(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, env=env)
     if result.returncode:
         tail = '\n'.join(Path(log.name).read_text().splitlines()[-25:])
         raise RuntimeError(f'{command[0]} failed ({result.returncode}):\n{tail}')

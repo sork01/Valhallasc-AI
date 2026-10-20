@@ -27,8 +27,8 @@ CORRIDORS = [[53, 82, 60, 94], [20, 73, 56, 80], [20, 60, 27, 78],
              [62, 44, 93, 51], [53, 27, 60, 42]]
 
 
-def obj(kind, x, y, **kw):
-    return dict(kind=kind, x=x, y=y, r=0, v=0, **kw)
+def obj(kind, x, y, r=0, v=0, **kw):
+    return dict(kind=kind, x=x, y=y, r=r, v=v, **kw)
 
 
 def build():
@@ -57,7 +57,35 @@ def build():
         for x in (x0+2, x1-2):
             objects.append(obj('span_brazier', x, y0+3))
         objects.append(obj('span_prism', (x0+x1)/2, y0+2))
-    objects += [obj('span_arch', 56, 8), obj('span_obelisk', 14, 44), obj('span_obelisk', 98, 44)]
+    # The Seven Arches of the Shattered Span
+    objects += [
+        obj('span_arch', 56, 95),          # Arch 1: The Rainbow Threshold Arch
+        obj('span_arch', 56, 84),          # Arch 2: The Watcher's Span Arch
+        obj('span_broken_arch', 56, 48),   # Arch 3: The Shattered Arch over the Chasm
+        obj('span_arch', 23, 62),          # Arch 4: The Western Toll Arch
+        obj('span_arch', 89, 62),          # Arch 5: The Eastern Spectrum Arch
+        obj('span_arch', 56, 30),          # Arch 6: The Grand Causeway Arch
+        obj('span_arch', 56, 8),           # Arch 7: The Celestial Keystone Arch
+    ]
+    # Bridge piers & buttresses
+    for px, py in [(44, 90), (68, 90), (40, 68), (72, 68), (12, 42), (34, 42), (78, 42), (100, 42), (40, 7), (72, 7)]:
+        objects.append(obj('span_pier', px, py))
+    # Bridge parapets / balustrades along open causeways
+    for bx, by in [(52, 88), (61, 88), (52, 34), (61, 34), (36, 74), (44, 74), (68, 74), (76, 74), (51, 57), (61, 57)]:
+        objects.append(obj('span_balustrade', bx, by))
+    # Levitating bridge masonry & crystal fragments floating out in the void
+    objects += [
+        obj('span_floating_shard', 40, 48, v=0),
+        obj('span_floating_shard', 72, 48, v=1),
+        obj('span_floating_shard', 38, 44, v=2),
+        obj('span_floating_shard', 74, 44, v=0),
+    ]
+    # Runic Asgardian obelisks framing the arches
+    objects += [
+        obj('span_obelisk', 14, 44), obj('span_obelisk', 98, 44),
+        obj('span_obelisk', 51, 95), obj('span_obelisk', 61, 95),
+        obj('span_obelisk', 45, 9), obj('span_obelisk', 67, 9)
+    ]
     spawns = []
     for cx, cy in [(56, 76), (29, 76), (83, 76), (56, 47)]:
         for kind, dx, dy in [('span_lynx', -3, 1), ('span_sentinel', 3, 1), ('span_caster', 0, -2)]:
@@ -74,7 +102,14 @@ def build():
                     look=look('#e0b48e', '#d6e4f0', 'short', 'helm', hat_color='#5888a8'))], quests=[], city=None,
                 rooms=ROOMS+CORRIDORS, paths=[[[56, 99], [56, 76], [23, 76], [23, 47],
                                             [56, 47], [89, 47], [89, 76]], [[56, 47], [56, 18]]],
-                places=[dict(id='span_threshold', name='The Rainbow Threshold', x=56, y=99, r=4)],
+                places=[
+                    dict(id='span_threshold', name='The Rainbow Threshold', x=56, y=99, r=4),
+                    dict(id='span_watch', name="The Watcher's Span", x=56, y=76, r=4),
+                    dict(id='span_west_toll', name='The Western Toll-Gate', x=23, y=53, r=4),
+                    dict(id='span_east_light', name='The Prism Redoubt', x=89, y=53, r=4),
+                    dict(id='span_shattered_chasm', name='The Shattered Chasm', x=56, y=47, r=4),
+                    dict(id='span_high_sanctum', name="The Archon's High Keystone", x=56, y=18, r=4),
+                ],
                 portals=[dict(id='span_return', name='Bifrost Reach', x=49, y=99, r=1.2,
                               to=PARENT, tx=LANDING[0], ty=LANDING[1], look=THEME),
                          dict(id='span_clear', name='The Mended Arch', x=56, y=10, r=1.2,

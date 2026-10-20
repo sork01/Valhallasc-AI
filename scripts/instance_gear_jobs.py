@@ -14,7 +14,7 @@ SOURCES = {
     'rain': 'rain_crown', 'seed': 'seed_vault', 'astro': 'sunken_astrolabe',
     'thunder': 'thunderheart_gate', 'bloom': 'blooming_labyrinth',
     'solar': 'solar_crucible', 'amber': 'amber_archive',
-    'solstice': 'silent_solstice',
+    'solstice': 'silent_solstice', 'span': 'skybridge',
 }
 
 
@@ -31,7 +31,7 @@ def initial():
                 tasks.append(dict(id=f'{group}-{cls or "shared"}-{kind}', group=group,
                                   className=cls, kind=kind, item=item['id'], name=item['name'],
                                   done=False, phase='not started', note='', evidence=[]))
-    assert len(tasks) == 308
+    assert len(tasks) == 336
     return dict(updated=datetime.now().isoformat(timespec='seconds'), tasks=tasks)
 
 

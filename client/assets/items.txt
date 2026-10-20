@@ -1,7 +1,7 @@
 {
  "size": 48,
  "cols": 10,
- "rows": 94,
+ "rows": 97,
  "at": {
   "warrior_headgear_crimson": [
    0,
@@ -7647,6 +7647,118 @@
    6,
    93
   ],
+  "warrior_armor_crimson_l30_span": [
+   7,
+   93
+  ],
+  "warrior_headgear_crimson_l30_span": [
+   8,
+   93
+  ],
+  "warrior_shoulders_crimson_l30_span": [
+   9,
+   93
+  ],
+  "warrior_gloves_crimson_l30_span": [
+   0,
+   94
+  ],
+  "warrior_weapon_sword_l30_span": [
+   1,
+   94
+  ],
+  "mage_armor_apprentice_l30_span": [
+   2,
+   94
+  ],
+  "mage_headgear_apprentice_l30_span": [
+   3,
+   94
+  ],
+  "mage_shoulders_apprentice_l30_span": [
+   4,
+   94
+  ],
+  "mage_gloves_apprentice_l30_span": [
+   5,
+   94
+  ],
+  "mage_weapon_ash_l30_span": [
+   6,
+   94
+  ],
+  "assassin_armor_shadow_l30_span": [
+   7,
+   94
+  ],
+  "assassin_headgear_shadow_l30_span": [
+   8,
+   94
+  ],
+  "assassin_shoulders_shadow_l30_span": [
+   9,
+   94
+  ],
+  "assassin_gloves_shadow_l30_span": [
+   0,
+   95
+  ],
+  "assassin_weapon_daggers_l30_span": [
+   1,
+   95
+  ],
+  "priest_armor_pilgrim_l30_span": [
+   2,
+   95
+  ],
+  "priest_headgear_pilgrim_l30_span": [
+   3,
+   95
+  ],
+  "priest_shoulders_pilgrim_l30_span": [
+   4,
+   95
+  ],
+  "priest_gloves_pilgrim_l30_span": [
+   5,
+   95
+  ],
+  "priest_weapon_mace_l30_span": [
+   6,
+   95
+  ],
+  "hunter_armor_scout_l30_span": [
+   7,
+   95
+  ],
+  "hunter_headgear_scout_l30_span": [
+   8,
+   95
+  ],
+  "hunter_shoulders_scout_l30_span": [
+   9,
+   95
+  ],
+  "hunter_gloves_scout_l30_span": [
+   0,
+   96
+  ],
+  "hunter_weapon_shortbow_l30_span": [
+   1,
+   96
+  ],
+  "pants_wayfarer_l30_span": [
+   2,
+   96
+  ],
+  "necklace_moonstone_l30_span": [
+   3,
+   96
+  ],
+  "accessory_amber_l30_span": [
+   4,
+   96
+  ],
   "warrior_armor_crimson_l55_gray": [
    5,
    14
@@ -8826,6 +8938,34 @@
   "solstice-hunter-weapon": "e5f1f4f73b2ac1c6",
   "solstice-shared-pants": "3a5ca8cacf1a2f50",
   "solstice-shared-necklace": "026d6281b5b952a0",
-  "solstice-shared-accessory": "7cc8d2b56816f431"
+  "solstice-shared-accessory": "7cc8d2b56816f431",
+  "span-warrior-armor": "bd215727dfca8431",
+  "span-warrior-headgear": "ec88a000c9690168",
+  "span-warrior-shoulders": "b5374830defde730",
+  "span-warrior-gloves": "137d5205bf8d1ea5",
+  "span-warrior-weapon": "54dcb108eb68b3c3",
+  "span-mage-armor": "c885bf795e5372fa",
+  "span-mage-headgear": "332f840a5a24249f",
+  "span-mage-shoulders": "ed5de1b5b7242db6",
+  "span-mage-gloves": "29a75453ba133f75",
+  "span-mage-weapon": "8f9e60b51f2da47d",
+  "span-assassin-armor": "02ba899e1ab3c8ab",
+  "span-assassin-headgear": "f1ccdb6e175e44f7",
+  "span-assassin-shoulders": "52e7327d103ef081",
+  "span-assassin-gloves": "b5c4be00f4de2c64",
+  "span-assassin-weapon": "599ea5e6ef0c2ec6",
+  "span-priest-armor": "7370510b4c020087",
+  "span-priest-headgear": "9f9f694413eb604d",
+  "span-priest-shoulders": "7b7bbfb08270f2a4",
+  "span-priest-gloves": "652f8a674616f52e",
+  "span-priest-weapon": "41766307796ebbbd",
+  "span-hunter-armor": "87f061dfad06b2d4",
+  "span-hunter-headgear": "d06f7c059b0e051d",
+  "span-hunter-shoulders": "d285198afd99990e",
+  "span-hunter-gloves": "dfe14cbcef059781",
+  "span-hunter-weapon": "5319fe4f236d4ff8",
+  "span-shared-pants": "5b939b9f41ae4ab3",
+  "span-shared-necklace": "369d85d49dbed70e",
+  "span-shared-accessory": "59360fa2949f43b2"
  }
 }

@@ -37,6 +37,9 @@ STYLES = {
     'solstice': dict(hue=219, back=[(5, 69), (15, 81), (28, 81), (21, 68), (33, 53), (19, 40), (8, 47)],
                      crown=[(-19, 10), (-14, 25), (-7, 28), (0, 17), (7, 28), (14, 25), (19, 10), (0, 6)],
                      weapon=[(-17, 12), (-12, 25), (1, 28), (13, 20), (7, 9), (0, 5)], shoulder=(26, 20)),
+    'span': dict(hue=205, back=[(5, 68), (15, 80), (26, 76), (22, 63), (30, 48), (8, 45)],
+                 crown=[(-18, 14), (-12, 26), (-4, 21), (0, 28), (4, 21), (12, 26), (18, 14), (0, 8)],
+                 weapon=[(-15, 12), (-11, 25), (0, 28), (11, 25), (15, 12), (0, 6)], shoulder=(24, 15)),
 }
 ROLES = ('cloth', 'metal', 'trim', 'gem', 'leather', 'veil')
 ROLE_TONES = {
@@ -57,6 +60,7 @@ THEME_HUES = {
     'solar': (15, 25, 43, 48, 20, 7),
     'amber': (28, 31, 26, 18, 22, 37),
     'solstice': (225, 207, 199, 180, 230, 214),
+    'span': (215, 208, 45, 190, 220, 198),
 }
 PALETTES = {}
 
@@ -127,6 +131,12 @@ def adorn(ink, theme, cls, kind, p, R, xf, joints, head):
                            xf((sx * 29, -11, 42)), xf((sx * 11, -8, 39))], veil, 3)
                 ink.plate([xf((sx * 14, -9, 69)), xf((sx * 26, -12, 70)),
                            xf((sx * 26, -12, 48)), xf((sx * 14, -9, 46))], trim, 3, True)
+        elif theme == 'span':
+            for sx in (-1, 1):
+                ink.plate([xf((sx * 4, 7.3, 62)), xf((sx * 11, 7.1, 65)),
+                           xf((sx * 9, 7.2, 53)), xf((sx * 3, 7.4, 52))], gem, 3)
+                ink.plate([xf((sx * 8, -8, 68)), xf((sx * 22, -11, 80)),
+                           xf((sx * 25, -11, 68)), xf((sx * 10, -8, 56))], veil, 2)
     elif kind == 'headgear':
         H, hd = head['H'], head['hd'] - 8.3
         ink.poly([H(x, y) for x, y in spec['crown']], color[metal][3], hd)
@@ -140,6 +150,10 @@ def adorn(ink, theme, cls, kind, p, R, xf, joints, head):
         elif theme == 'amber':
             for sx in (-1, 1):
                 ink.poly([H(sx * 10, 15), H(sx * 17, 28), H(sx * 19, 14)], color[trim][3], hd - .1)
+        elif theme == 'span':
+            for sx in (-1, 1):
+                ink.poly([H(sx * 10, 15), H(sx * 18, 29), H(sx * 21, 19), H(sx * 12, 9)], color[veil][2], hd - .1)
+                ink.poly([H(sx * 4, 18), H(sx * 11, 26), H(sx * 8, 16)], color[gem][3], hd - .15)
     elif kind == 'shoulders':
         reach, high = spec['shoulder']
         for sx, key in ((-1, 'L'), (1, 'R')):
@@ -149,9 +163,14 @@ def adorn(ink, theme, cls, kind, p, R, xf, joints, head):
                        sh + out * 5 - up * 5], metal, 3)
             ink.plate([sh + out * 6 + up * 6, sh + out * (reach - 5) + up * (high - 2),
                        sh + out * (reach - 6) - up * 2], gem, 3, True)
-            if theme in ('thunder', 'solar', 'solstice'):
+            if theme in ('thunder', 'solar', 'solstice', 'span'):
                 ink.bone(sh + out * 8 + up * 4, sh + out * (reach - 1) + up * (high + 3),
                          1.4, .8, trim, -2, 3)
+            if theme == 'span':
+                for n in range(3):
+                    ink.plate([sh + out * (4 + n * 4) + up * (3 + n * 2),
+                               sh + out * (7 + n * 4) + up * (7 + n * 2),
+                               sh + out * (6 + n * 4) - up * 1], gem, 3, True)
     elif kind == 'gloves':
         width = 4 + list(STYLES).index(theme) % 3
         for key in 'LR':
@@ -176,6 +195,13 @@ def adorn(ink, theme, cls, kind, p, R, xf, joints, head):
                 for sx in (-1, 1):
                     ink.bone(hand + up * 11, hand + up * 23 + side * sx * 10,
                              1.0, .8, trim, -2, 3)
+            if theme == 'span':
+                for sx in (-1, 1):
+                    ink.plate([hand + up * 14 + side * sx * 5,
+                               hand + up * 24 + side * sx * 7,
+                               hand + up * 19 + side * sx * 2], veil, 3)
+                    ink.bone(hand + up * 10, hand + up * 22 + side * sx * 5,
+                             1.1, .7, gem, -1.8, 3)
     elif kind == 'pants':
         reach = 4 + list(STYLES).index(theme) % 4
         for key in 'LR':
@@ -185,6 +211,11 @@ def adorn(ink, theme, cls, kind, p, R, xf, joints, head):
                 c = knee + line * (2 + n * 4)
                 ink.plate([c - side * reach, c + line * (3 + n),
                            c + side * reach, c - line * 2], metal, 3)
+        if theme == 'span':
+            for key in 'LR':
+                knee, ankle = joints[key]['knee'], joints[key]['ankle']
+                line = unit(ankle - knee)
+                ink.bone(knee + line * 3, knee + line * 12, 1.3, .9, gem, -2, 3)
     elif kind in ('necklace', 'accessory'):
         c = xf((0, 7.6, 58)) if kind == 'necklace' else joints['L']['hand'] + R @ V(0, 3.5, 1.6)
         radius = 6 if kind == 'accessory' else 4

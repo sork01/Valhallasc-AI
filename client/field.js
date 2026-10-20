@@ -3332,8 +3332,9 @@
   }
   function drawSky(g, t) {
     if (zdef.theme === 'arena') { g.fillStyle = '#191723'; g.fillRect(0, 0, VW, VH); return; }
+    if (zdef.theme === 'skybridge') { SkybridgeArt.backdrop(g, VW, VH, t); return; }
     if (DungeonVisual.styles[zdef.theme]) { DungeonVisual.backdrop(g,zdef.theme,VW,VH,t); return; }
-    if (zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme)) { g.fillStyle = '#03040a'; g.fillRect(0, 0, VW, VH); return; }
+    if (zdef.theme === 'nornroot' || zdef.theme === 'vault' || CathedralArt.isTheme(zdef.theme)) { g.fillStyle = '#03040a'; g.fillRect(0, 0, VW, VH); return; }
     if (zdef.theme === 'moonwell') {
       const water=g.createLinearGradient(0,0,0,VH);water.addColorStop(0,'#0e2945');water.addColorStop(.56,'#194f68');water.addColorStop(1,'#235e70');g.fillStyle=water;g.fillRect(0,0,VW,VH);
       const [cx,cy]=camS();

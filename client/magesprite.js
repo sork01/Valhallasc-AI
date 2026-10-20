@@ -219,6 +219,7 @@
     regearsolar: { name: 'Solar', dark: '#8c3c24', bright: '#fff0a2' },
     regearamber: { name: 'Amber Archive', dark: '#7c542a', bright: '#ffe1a4' },
     regearsolstice: { name: 'Solstice', dark: '#263c6e', bright: '#d9f8ff' },
+    regearspan: { name: 'Shattered Span', dark: '#1c2e4a', bright: '#7fe5ff' },
   };
   const DUNGEON_PALETTES = {
     regearvault: ['#071d25', '#164d57', '#36bcb0', '#b7fff0'],
@@ -237,6 +238,7 @@
     regearsolar: ['#3a1b1b', '#ad5432', '#edaa56', '#fff0ab'],
     regearamber: ['#38281b', '#986d39', '#d6aa5c', '#fff0bf'],
     regearsolstice: ['#141f3b', '#38567a', '#89b8d8', '#effbff'],
+    regearspan: ['#0d1b2a', '#27496d', '#68d8d6', '#f0f3f4'],
   };
   const dungeonPaint = art => {
     const palette = DUNGEON_PALETTES[art].map(hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)));
@@ -435,6 +437,15 @@
                   5, 11, n % 2 ? bright : '#8ac2dd');
       }
       diamond(0, -139 + sway, 8, 15, bright, dark);
+    } else if (theme === 'regearspan') {
+      for (const side of [-1, 1]) {
+        for (let n = 0; n < 4; n++) {
+          const x = side * (14 + n * 8), y = -95 + n * 12;
+          blade([[side * 12, -72], [x, y - 22 + sway], [x + side * 6, y - 6], [x + side * 4, y + 16]], n % 2 ? '#68d8d6' : dark);
+          diamond(side * (24 + n * 7), y - 12 + sway, 4, 8, bright, dark);
+        }
+      }
+      diamond(0, -126 + sway, 10, 18, bright, dark);
     }
     g.restore();
   }

@@ -81,6 +81,7 @@ DUNGEON_PALETTES = {
     'regearsolar': ['#3a1b1b', '#ad5432', '#edaa56', '#fff0ab'],
     'regearamber': ['#38281b', '#986d39', '#d6aa5c', '#fff0bf'],
     'regearsolstice': ['#141f3b', '#38567a', '#89b8d8', '#effbff'],
+    'regearspan': ['#0d1b2a', '#27496d', '#68d8d6', '#f0f3f4'],
 }
 
 
@@ -173,7 +174,7 @@ def main():
                    'seed_vault': 'regearseed', 'sunken_astrolabe': 'regearastro',
                    'thunderheart_gate': 'regearthunder', 'blooming_labyrinth': 'regearbloom',
                    'solar_crucible': 'regearsolar', 'amber_archive': 'regearamber',
-                   'silent_solstice': 'regearsolstice'}
+                   'silent_solstice': 'regearsolstice', 'skybridge': 'regearspan'}
     left, col, top, row = 228, 322, 176, 286
     width, height = left + 5 * col + 30, top + len(SETS) * row + 122
     poster = Image.new('RGB', (width, height), '#101923')

@@ -203170,7 +203170,217 @@
         {
           "kind": "span_arch",
           "x": 56,
+          "y": 95,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_arch",
+          "x": 56,
+          "y": 84,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_broken_arch",
+          "x": 56,
+          "y": 48,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_arch",
+          "x": 23,
+          "y": 62,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_arch",
+          "x": 89,
+          "y": 62,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_arch",
+          "x": 56,
+          "y": 30,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_arch",
+          "x": 56,
           "y": 8,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_pier",
+          "x": 44,
+          "y": 90,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_pier",
+          "x": 68,
+          "y": 90,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_pier",
+          "x": 40,
+          "y": 68,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_pier",
+          "x": 72,
+          "y": 68,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_pier",
+          "x": 12,
+          "y": 42,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_pier",
+          "x": 34,
+          "y": 42,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_pier",
+          "x": 78,
+          "y": 42,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_pier",
+          "x": 100,
+          "y": 42,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_pier",
+          "x": 40,
+          "y": 7,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_pier",
+          "x": 72,
+          "y": 7,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_balustrade",
+          "x": 52,
+          "y": 88,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_balustrade",
+          "x": 61,
+          "y": 88,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_balustrade",
+          "x": 52,
+          "y": 34,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_balustrade",
+          "x": 61,
+          "y": 34,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_balustrade",
+          "x": 36,
+          "y": 74,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_balustrade",
+          "x": 44,
+          "y": 74,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_balustrade",
+          "x": 68,
+          "y": 74,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_balustrade",
+          "x": 76,
+          "y": 74,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_balustrade",
+          "x": 51,
+          "y": 57,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_balustrade",
+          "x": 61,
+          "y": 57,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_floating_shard",
+          "x": 40,
+          "y": 48,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_floating_shard",
+          "x": 72,
+          "y": 48,
+          "r": 0,
+          "v": 1
+        },
+        {
+          "kind": "span_floating_shard",
+          "x": 38,
+          "y": 44,
+          "r": 0,
+          "v": 2
+        },
+        {
+          "kind": "span_floating_shard",
+          "x": 74,
+          "y": 44,
           "r": 0,
           "v": 0
         },
@@ -203185,6 +203395,34 @@
           "kind": "span_obelisk",
           "x": 98,
           "y": 44,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_obelisk",
+          "x": 51,
+          "y": 95,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_obelisk",
+          "x": 61,
+          "y": 95,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_obelisk",
+          "x": 45,
+          "y": 9,
+          "r": 0,
+          "v": 0
+        },
+        {
+          "kind": "span_obelisk",
+          "x": 67,
+          "y": 9,
           "r": 0,
           "v": 0
         }
@@ -203421,6 +203659,41 @@
           "name": "The Rainbow Threshold",
           "x": 56,
           "y": 99,
+          "r": 4
+        },
+        {
+          "id": "span_watch",
+          "name": "The Watcher's Span",
+          "x": 56,
+          "y": 76,
+          "r": 4
+        },
+        {
+          "id": "span_west_toll",
+          "name": "The Western Toll-Gate",
+          "x": 23,
+          "y": 53,
+          "r": 4
+        },
+        {
+          "id": "span_east_light",
+          "name": "The Prism Redoubt",
+          "x": 89,
+          "y": 53,
+          "r": 4
+        },
+        {
+          "id": "span_shattered_chasm",
+          "name": "The Shattered Chasm",
+          "x": 56,
+          "y": 47,
+          "r": 4
+        },
+        {
+          "id": "span_high_sanctum",
+          "name": "The Archon's High Keystone",
+          "x": 56,
+          "y": 18,
           "r": 4
         }
       ],
