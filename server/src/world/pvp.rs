@@ -1716,10 +1716,10 @@ mod tests {
         panic!("never landed");
     }
     #[test]
-    fn arcane_ward_soaks_a_fifth_of_the_maximum_health_then_the_rest_lands() {
+    fn arcane_ward_soaks_seven_percent_of_the_maximum_health_then_the_rest_lands() {
         let (mut w, ward) = warded();
         let max = w.players[&2].character.max_hp();
-        assert!((ward - max * 0.2).abs() < 1e-6, "{ward} of {max}");
+        assert!((ward - max * 0.07).abs() < 1e-6, "{ward} of {max}");
         let left = w.players[&2].absorb_left;
         assert!(left > 9. && left <= 10., "{left}");
         // A blow smaller than the ward is soaked whole.
@@ -1784,7 +1784,7 @@ mod tests {
             w.players[&2].character.max_hp(),
             "the ward took it all"
         );
-        assert!(w.players[&2].absorb < w.players[&2].character.max_hp() * 0.2);
+        assert!(w.players[&2].absorb < w.players[&2].character.max_hp() * 0.07);
     }
     #[test]
     fn monsters_ignore_the_ward() {

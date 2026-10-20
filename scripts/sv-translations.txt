@@ -4919,7 +4919,7 @@
   "Supreme Mana Potion": "Suverän manadryck",
   "Sure Draw": "Säker dragning",
   "Surface stars are beautiful. We have lanternfish.": "Ytans stjärnor är vackra. Vi har lyktfiskar.",
-  "Surround yourself with a ward that absorbs 40% of damage for 8 seconds. In a PvP fight it also soaks up the next 20% of your maximum health in damage for 10 seconds.": "Omslut dig med en skyddsvård som absorberar 40 % av skadan i 8 sekunder. I en PvP-strid tar den dessutom upp skada motsvarande 20 % av din maxhälsa i 10 sekunder.",
+  "Surround yourself with a ward that absorbs 40% of damage for 8 seconds. In a PvP fight it also soaks up the next 7% of your maximum health in damage for 10 seconds.": "Omslut dig med en skyddsvård som absorberar 40 % av skadan i 8 sekunder. I en PvP-strid tar den dessutom upp skada motsvarande 7 % av din maxhälsa i 10 sekunder.",
   "Survey The Amber Archive": "Utforska Amber Archive",
   "Survey The Blooming Labyrinth": "Utforska Blooming Labyrinth",
   "Survey The Silent Solstice": "Utforska Silent Solstice",
