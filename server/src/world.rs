@@ -3929,7 +3929,10 @@ impl World {
                 self.loot_drop(&credit_id, zone, point, licence);
             }
             let blackhour = self.maps[zone].final_boss == "null_hour";
-            if !blackhour && let Some(gear) = roll_orange_boosted(boost, || self.random()) {
+            let hero_level = self.players.get(&credit).map_or(1, |p| p.character.level);
+            if !blackhour
+                && let Some(gear) = roll_orange_boosted(boost, hero_level, || self.random())
+            {
                 self.loot_drop_with_gear(&credit_id, zone, point, &gear.item.clone(), Some(gear));
             }
             if is_boss(&kind) {

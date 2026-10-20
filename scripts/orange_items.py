@@ -13,9 +13,10 @@ catalog_path = ROOT / 'world/items.txt'
 catalog = json.loads(catalog_path.read_text())
 catalog = [item for item in catalog if item.get('source') != 'orange_pool']
 for piece in rules['pieces']:
-    assert piece['class'] is None and piece['requiredLevel'] == 1
+    assert piece['class'] is None and piece['requiredLevel'] >= 10
     catalog.append(dict(id=piece['id'], name=piece['name'], kind=piece['slot'],
-                        rarity='legendary', requiredLevel=1, sell=500,
+                        rarity='legendary', requiredLevel=piece['requiredLevel'],
+                        sell=round(500 * (0.16 * piece['requiredLevel'] + 0.8)),
                         attack=piece['rolls']['attack'][0],
                         defense=piece['rolls']['defense'][0],
                         bonusStats={key: piece['rolls'][key][0]

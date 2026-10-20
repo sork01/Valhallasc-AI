@@ -548,8 +548,9 @@ impl World {
                 self.loot_drop(owner, zone, point, &piece.id);
             }
         }
+        let hero_level = self.online(owner).map_or(1, |p| p.character.level);
         if self.maps[zone].final_boss != "null_hour"
-            && let Some(gear) = roll_orange_boosted(boost, || self.random())
+            && let Some(gear) = roll_orange_boosted(boost, hero_level, || self.random())
         {
             self.loot_drop_with_gear(owner, zone, point, &gear.item.clone(), Some(gear));
         }

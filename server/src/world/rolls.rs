@@ -964,7 +964,7 @@ mod tests {
         let mut who = party(&mut w, &["Ann", "Bob"]);
         let at = spot(&w);
         let mut values = [0., 0., 0.4, 0.6, 0.2, 0.8, 0.5].into_iter();
-        let sampled = roll_orange(|| values.next().unwrap()).unwrap();
+        let sampled = roll_orange(10, || values.next().unwrap()).unwrap();
         assert_eq!(sampled.item, "orange_01");
         w.loot_drop_with_gear(
             &who[0].1,
@@ -1004,6 +1004,7 @@ mod tests {
         assert_eq!(copy.defense, sampled.defense);
         assert_eq!(copy.bonus_stats, sampled.bonus_stats);
         c.seed_inventory(); // The party helper switches class after joining; supply that class's starter gear.
+        c.level = 10; // orange_01 is a level 10 piece
         let before = c.stats();
         c.equip_slots(&BTreeMap::from([("chest".into(), "orange_01".into())]))
             .unwrap();

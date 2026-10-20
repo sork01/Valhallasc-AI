@@ -51321,906 +51321,6 @@
     "sell": 144
   },
   {
-    "id": "orange_01",
-    "name": "Ember Sovereign Cuirass",
-    "kind": "armor",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 38,
-    "defense": 110,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_01",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_02",
-    "name": "Ember Sovereign Edge",
-    "kind": "weapon",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 155,
-    "defense": 22,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_02",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_03",
-    "name": "Ember Sovereign Crown",
-    "kind": "headgear",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 28,
-    "defense": 82,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_03",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_04",
-    "name": "Ember Sovereign Mantle",
-    "kind": "shoulders",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 36,
-    "defense": 88,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_04",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_05",
-    "name": "Ember Sovereign Grasp",
-    "kind": "gloves",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 48,
-    "defense": 74,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_05",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_06",
-    "name": "Verdant Crown Cuirass",
-    "kind": "armor",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 38,
-    "defense": 110,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_06",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_07",
-    "name": "Verdant Crown Edge",
-    "kind": "weapon",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 155,
-    "defense": 22,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_07",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_08",
-    "name": "Verdant Crown Crown",
-    "kind": "headgear",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 28,
-    "defense": 82,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_08",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_09",
-    "name": "Verdant Crown Mantle",
-    "kind": "shoulders",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 36,
-    "defense": 88,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_09",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_10",
-    "name": "Verdant Crown Grasp",
-    "kind": "gloves",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 48,
-    "defense": 74,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_10",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_11",
-    "name": "Storm Oracle Cuirass",
-    "kind": "armor",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 38,
-    "defense": 110,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_11",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_12",
-    "name": "Storm Oracle Edge",
-    "kind": "weapon",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 155,
-    "defense": 22,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_12",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_13",
-    "name": "Storm Oracle Crown",
-    "kind": "headgear",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 28,
-    "defense": 82,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_13",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_14",
-    "name": "Storm Oracle Mantle",
-    "kind": "shoulders",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 36,
-    "defense": 88,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_14",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_15",
-    "name": "Storm Oracle Grasp",
-    "kind": "gloves",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 48,
-    "defense": 74,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_15",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_16",
-    "name": "Abyss Singer Cuirass",
-    "kind": "armor",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 38,
-    "defense": 110,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_16",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_17",
-    "name": "Abyss Singer Edge",
-    "kind": "weapon",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 155,
-    "defense": 22,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_17",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_18",
-    "name": "Abyss Singer Crown",
-    "kind": "headgear",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 28,
-    "defense": 82,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_18",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_19",
-    "name": "Abyss Singer Mantle",
-    "kind": "shoulders",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 36,
-    "defense": 88,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_19",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_20",
-    "name": "Abyss Singer Grasp",
-    "kind": "gloves",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 48,
-    "defense": 74,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_20",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_21",
-    "name": "Starforged Cuirass",
-    "kind": "armor",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 38,
-    "defense": 110,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_21",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_22",
-    "name": "Starforged Edge",
-    "kind": "weapon",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 155,
-    "defense": 22,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_22",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_23",
-    "name": "Starforged Crown",
-    "kind": "headgear",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 28,
-    "defense": 82,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_23",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_24",
-    "name": "Starforged Mantle",
-    "kind": "shoulders",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 36,
-    "defense": 88,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_24",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_25",
-    "name": "Starforged Grasp",
-    "kind": "gloves",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 48,
-    "defense": 74,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_25",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_26",
-    "name": "Solar Regent Cuirass",
-    "kind": "armor",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 38,
-    "defense": 110,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_26",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_27",
-    "name": "Solar Regent Edge",
-    "kind": "weapon",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 155,
-    "defense": 22,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_27",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_28",
-    "name": "Solar Regent Crown",
-    "kind": "headgear",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 28,
-    "defense": 82,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_28",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_29",
-    "name": "Solar Regent Mantle",
-    "kind": "shoulders",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 36,
-    "defense": 88,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_29",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_30",
-    "name": "Solar Regent Grasp",
-    "kind": "gloves",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 48,
-    "defense": 74,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_30",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_31",
-    "name": "Ash Phoenix Cuirass",
-    "kind": "armor",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 38,
-    "defense": 110,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_31",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_32",
-    "name": "Ash Phoenix Edge",
-    "kind": "weapon",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 155,
-    "defense": 22,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_32",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_33",
-    "name": "Ash Phoenix Crown",
-    "kind": "headgear",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 28,
-    "defense": 82,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_33",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_34",
-    "name": "Ash Phoenix Mantle",
-    "kind": "shoulders",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 36,
-    "defense": 88,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_34",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_35",
-    "name": "Ash Phoenix Grasp",
-    "kind": "gloves",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 48,
-    "defense": 74,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_35",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_36",
-    "name": "Moonlit Sentinel Cuirass",
-    "kind": "armor",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 38,
-    "defense": 110,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_36",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_37",
-    "name": "Moonlit Sentinel Edge",
-    "kind": "weapon",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 155,
-    "defense": 22,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_37",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_38",
-    "name": "Moonlit Sentinel Crown",
-    "kind": "headgear",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 28,
-    "defense": 82,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_38",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_39",
-    "name": "Moonlit Sentinel Mantle",
-    "kind": "shoulders",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 36,
-    "defense": 88,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_39",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_40",
-    "name": "Moonlit Sentinel Grasp",
-    "kind": "gloves",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 48,
-    "defense": 74,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_40",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_41",
-    "name": "Chronometer Cuirass",
-    "kind": "armor",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 38,
-    "defense": 110,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_41",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_42",
-    "name": "Chronometer Edge",
-    "kind": "weapon",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 155,
-    "defense": 22,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_42",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_43",
-    "name": "Chronometer Crown",
-    "kind": "headgear",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 28,
-    "defense": 82,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_43",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_44",
-    "name": "Chronometer Mantle",
-    "kind": "shoulders",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 36,
-    "defense": 88,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_44",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_45",
-    "name": "Chronometer Grasp",
-    "kind": "gloves",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 48,
-    "defense": 74,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_45",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_46",
-    "name": "Worldheart Cuirass",
-    "kind": "armor",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 38,
-    "defense": 110,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_46",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_47",
-    "name": "Worldheart Edge",
-    "kind": "weapon",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 155,
-    "defense": 22,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_47",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_48",
-    "name": "Worldheart Crown",
-    "kind": "headgear",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 28,
-    "defense": 82,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_48",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_49",
-    "name": "Worldheart Mantle",
-    "kind": "shoulders",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 36,
-    "defense": 88,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_49",
-    "source": "orange_pool"
-  },
-  {
-    "id": "orange_50",
-    "name": "Worldheart Grasp",
-    "kind": "gloves",
-    "rarity": "legendary",
-    "requiredLevel": 1,
-    "sell": 500,
-    "attack": 48,
-    "defense": 74,
-    "bonusStats": {
-      "stamina": 90,
-      "accuracy": 8,
-      "dexterity": 18
-    },
-    "class": null,
-    "variant": "orange_50",
-    "source": "orange_pool"
-  },
-  {
     "id": "trail_pack_l20",
     "name": "Trail Pack",
     "kind": "bag",
@@ -54710,5 +53810,905 @@
     "kind": "material",
     "rarity": "common",
     "sell": 14000
+  },
+  {
+    "id": "orange_01",
+    "name": "Ember Sovereign Cuirass",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 10,
+    "sell": 1200,
+    "attack": 3,
+    "defense": 11,
+    "bonusStats": {
+      "stamina": 3,
+      "accuracy": 3,
+      "dexterity": 3
+    },
+    "class": null,
+    "variant": "orange_01",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_02",
+    "name": "Ember Sovereign Edge",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 10,
+    "sell": 1200,
+    "attack": 15,
+    "defense": 4,
+    "bonusStats": {
+      "stamina": 3,
+      "accuracy": 3,
+      "dexterity": 3
+    },
+    "class": null,
+    "variant": "orange_02",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_03",
+    "name": "Ember Sovereign Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 10,
+    "sell": 1200,
+    "attack": 1,
+    "defense": 4,
+    "bonusStats": {
+      "stamina": 3,
+      "accuracy": 3,
+      "dexterity": 3
+    },
+    "class": null,
+    "variant": "orange_03",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_04",
+    "name": "Ember Sovereign Mantle",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 10,
+    "sell": 1200,
+    "attack": 1,
+    "defense": 4,
+    "bonusStats": {
+      "stamina": 3,
+      "accuracy": 3,
+      "dexterity": 3
+    },
+    "class": null,
+    "variant": "orange_04",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_05",
+    "name": "Ember Sovereign Grasp",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 10,
+    "sell": 1200,
+    "attack": 1,
+    "defense": 4,
+    "bonusStats": {
+      "stamina": 3,
+      "accuracy": 3,
+      "dexterity": 3
+    },
+    "class": null,
+    "variant": "orange_05",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_06",
+    "name": "Verdant Crown Cuirass",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 20,
+    "sell": 2000,
+    "attack": 5,
+    "defense": 19,
+    "bonusStats": {
+      "stamina": 8,
+      "accuracy": 8,
+      "dexterity": 8
+    },
+    "class": null,
+    "variant": "orange_06",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_07",
+    "name": "Verdant Crown Edge",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 20,
+    "sell": 2000,
+    "attack": 25,
+    "defense": 6,
+    "bonusStats": {
+      "stamina": 8,
+      "accuracy": 8,
+      "dexterity": 8
+    },
+    "class": null,
+    "variant": "orange_07",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_08",
+    "name": "Verdant Crown Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 20,
+    "sell": 2000,
+    "attack": 2,
+    "defense": 6,
+    "bonusStats": {
+      "stamina": 8,
+      "accuracy": 8,
+      "dexterity": 8
+    },
+    "class": null,
+    "variant": "orange_08",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_09",
+    "name": "Verdant Crown Mantle",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 20,
+    "sell": 2000,
+    "attack": 2,
+    "defense": 6,
+    "bonusStats": {
+      "stamina": 8,
+      "accuracy": 8,
+      "dexterity": 8
+    },
+    "class": null,
+    "variant": "orange_09",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_10",
+    "name": "Verdant Crown Grasp",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 20,
+    "sell": 2000,
+    "attack": 2,
+    "defense": 6,
+    "bonusStats": {
+      "stamina": 8,
+      "accuracy": 8,
+      "dexterity": 8
+    },
+    "class": null,
+    "variant": "orange_10",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_11",
+    "name": "Storm Oracle Cuirass",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 30,
+    "sell": 2800,
+    "attack": 7,
+    "defense": 26,
+    "bonusStats": {
+      "stamina": 17,
+      "accuracy": 17,
+      "dexterity": 17
+    },
+    "class": null,
+    "variant": "orange_11",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_12",
+    "name": "Storm Oracle Edge",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 30,
+    "sell": 2800,
+    "attack": 35,
+    "defense": 9,
+    "bonusStats": {
+      "stamina": 17,
+      "accuracy": 17,
+      "dexterity": 17
+    },
+    "class": null,
+    "variant": "orange_12",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_13",
+    "name": "Storm Oracle Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 30,
+    "sell": 2800,
+    "attack": 2,
+    "defense": 9,
+    "bonusStats": {
+      "stamina": 17,
+      "accuracy": 17,
+      "dexterity": 17
+    },
+    "class": null,
+    "variant": "orange_13",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_14",
+    "name": "Storm Oracle Mantle",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 30,
+    "sell": 2800,
+    "attack": 2,
+    "defense": 9,
+    "bonusStats": {
+      "stamina": 17,
+      "accuracy": 17,
+      "dexterity": 17
+    },
+    "class": null,
+    "variant": "orange_14",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_15",
+    "name": "Storm Oracle Grasp",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 30,
+    "sell": 2800,
+    "attack": 2,
+    "defense": 9,
+    "bonusStats": {
+      "stamina": 17,
+      "accuracy": 17,
+      "dexterity": 17
+    },
+    "class": null,
+    "variant": "orange_15",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_16",
+    "name": "Abyss Singer Cuirass",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 40,
+    "sell": 3600,
+    "attack": 8,
+    "defense": 34,
+    "bonusStats": {
+      "stamina": 34,
+      "accuracy": 19,
+      "dexterity": 34
+    },
+    "class": null,
+    "variant": "orange_16",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_17",
+    "name": "Abyss Singer Edge",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 40,
+    "sell": 3600,
+    "attack": 45,
+    "defense": 11,
+    "bonusStats": {
+      "stamina": 34,
+      "accuracy": 19,
+      "dexterity": 34
+    },
+    "class": null,
+    "variant": "orange_17",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_18",
+    "name": "Abyss Singer Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 40,
+    "sell": 3600,
+    "attack": 3,
+    "defense": 11,
+    "bonusStats": {
+      "stamina": 34,
+      "accuracy": 19,
+      "dexterity": 34
+    },
+    "class": null,
+    "variant": "orange_18",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_19",
+    "name": "Abyss Singer Mantle",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 40,
+    "sell": 3600,
+    "attack": 3,
+    "defense": 11,
+    "bonusStats": {
+      "stamina": 34,
+      "accuracy": 19,
+      "dexterity": 34
+    },
+    "class": null,
+    "variant": "orange_19",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_20",
+    "name": "Abyss Singer Grasp",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 40,
+    "sell": 3600,
+    "attack": 3,
+    "defense": 11,
+    "bonusStats": {
+      "stamina": 34,
+      "accuracy": 19,
+      "dexterity": 34
+    },
+    "class": null,
+    "variant": "orange_20",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_21",
+    "name": "Starforged Cuirass",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 50,
+    "sell": 4400,
+    "attack": 10,
+    "defense": 41,
+    "bonusStats": {
+      "stamina": 45,
+      "accuracy": 19,
+      "dexterity": 45
+    },
+    "class": null,
+    "variant": "orange_21",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_22",
+    "name": "Starforged Edge",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 50,
+    "sell": 4400,
+    "attack": 55,
+    "defense": 14,
+    "bonusStats": {
+      "stamina": 45,
+      "accuracy": 19,
+      "dexterity": 45
+    },
+    "class": null,
+    "variant": "orange_22",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_23",
+    "name": "Starforged Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 50,
+    "sell": 4400,
+    "attack": 3,
+    "defense": 14,
+    "bonusStats": {
+      "stamina": 45,
+      "accuracy": 19,
+      "dexterity": 45
+    },
+    "class": null,
+    "variant": "orange_23",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_24",
+    "name": "Starforged Mantle",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 50,
+    "sell": 4400,
+    "attack": 3,
+    "defense": 14,
+    "bonusStats": {
+      "stamina": 45,
+      "accuracy": 19,
+      "dexterity": 45
+    },
+    "class": null,
+    "variant": "orange_24",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_25",
+    "name": "Starforged Grasp",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 50,
+    "sell": 4400,
+    "attack": 3,
+    "defense": 14,
+    "bonusStats": {
+      "stamina": 45,
+      "accuracy": 19,
+      "dexterity": 45
+    },
+    "class": null,
+    "variant": "orange_25",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_26",
+    "name": "Solar Regent Cuirass",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 60,
+    "sell": 5200,
+    "attack": 12,
+    "defense": 49,
+    "bonusStats": {
+      "stamina": 62,
+      "accuracy": 19,
+      "dexterity": 62
+    },
+    "class": null,
+    "variant": "orange_26",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_27",
+    "name": "Solar Regent Edge",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 60,
+    "sell": 5200,
+    "attack": 65,
+    "defense": 16,
+    "bonusStats": {
+      "stamina": 62,
+      "accuracy": 19,
+      "dexterity": 62
+    },
+    "class": null,
+    "variant": "orange_27",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_28",
+    "name": "Solar Regent Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 60,
+    "sell": 5200,
+    "attack": 4,
+    "defense": 16,
+    "bonusStats": {
+      "stamina": 62,
+      "accuracy": 19,
+      "dexterity": 62
+    },
+    "class": null,
+    "variant": "orange_28",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_29",
+    "name": "Solar Regent Mantle",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 60,
+    "sell": 5200,
+    "attack": 4,
+    "defense": 16,
+    "bonusStats": {
+      "stamina": 62,
+      "accuracy": 19,
+      "dexterity": 62
+    },
+    "class": null,
+    "variant": "orange_29",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_30",
+    "name": "Solar Regent Grasp",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 60,
+    "sell": 5200,
+    "attack": 4,
+    "defense": 16,
+    "bonusStats": {
+      "stamina": 62,
+      "accuracy": 19,
+      "dexterity": 62
+    },
+    "class": null,
+    "variant": "orange_30",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_31",
+    "name": "Ash Phoenix Cuirass",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 70,
+    "sell": 6000,
+    "attack": 14,
+    "defense": 56,
+    "bonusStats": {
+      "stamina": 79,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_31",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_32",
+    "name": "Ash Phoenix Edge",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 70,
+    "sell": 6000,
+    "attack": 75,
+    "defense": 19,
+    "bonusStats": {
+      "stamina": 79,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_32",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_33",
+    "name": "Ash Phoenix Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 70,
+    "sell": 6000,
+    "attack": 5,
+    "defense": 19,
+    "bonusStats": {
+      "stamina": 79,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_33",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_34",
+    "name": "Ash Phoenix Mantle",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 70,
+    "sell": 6000,
+    "attack": 5,
+    "defense": 19,
+    "bonusStats": {
+      "stamina": 79,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_34",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_35",
+    "name": "Ash Phoenix Grasp",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 70,
+    "sell": 6000,
+    "attack": 5,
+    "defense": 19,
+    "bonusStats": {
+      "stamina": 79,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_35",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_36",
+    "name": "Moonlit Sentinel Cuirass",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 80,
+    "sell": 6800,
+    "attack": 16,
+    "defense": 64,
+    "bonusStats": {
+      "stamina": 96,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_36",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_37",
+    "name": "Moonlit Sentinel Edge",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 80,
+    "sell": 6800,
+    "attack": 85,
+    "defense": 21,
+    "bonusStats": {
+      "stamina": 96,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_37",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_38",
+    "name": "Moonlit Sentinel Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 80,
+    "sell": 6800,
+    "attack": 5,
+    "defense": 21,
+    "bonusStats": {
+      "stamina": 96,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_38",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_39",
+    "name": "Moonlit Sentinel Mantle",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 80,
+    "sell": 6800,
+    "attack": 5,
+    "defense": 21,
+    "bonusStats": {
+      "stamina": 96,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_39",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_40",
+    "name": "Moonlit Sentinel Grasp",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 80,
+    "sell": 6800,
+    "attack": 5,
+    "defense": 21,
+    "bonusStats": {
+      "stamina": 96,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_40",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_41",
+    "name": "Chronometer Cuirass",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 90,
+    "sell": 7600,
+    "attack": 18,
+    "defense": 71,
+    "bonusStats": {
+      "stamina": 113,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_41",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_42",
+    "name": "Chronometer Edge",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 90,
+    "sell": 7600,
+    "attack": 95,
+    "defense": 24,
+    "bonusStats": {
+      "stamina": 113,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_42",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_43",
+    "name": "Chronometer Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 90,
+    "sell": 7600,
+    "attack": 6,
+    "defense": 24,
+    "bonusStats": {
+      "stamina": 113,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_43",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_44",
+    "name": "Chronometer Mantle",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 90,
+    "sell": 7600,
+    "attack": 6,
+    "defense": 24,
+    "bonusStats": {
+      "stamina": 113,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_44",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_45",
+    "name": "Chronometer Grasp",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 90,
+    "sell": 7600,
+    "attack": 6,
+    "defense": 24,
+    "bonusStats": {
+      "stamina": 113,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_45",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_46",
+    "name": "Worldheart Cuirass",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 8320,
+    "attack": 19,
+    "defense": 78,
+    "bonusStats": {
+      "stamina": 129,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_46",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_47",
+    "name": "Worldheart Edge",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 8320,
+    "attack": 103,
+    "defense": 26,
+    "bonusStats": {
+      "stamina": 129,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_47",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_48",
+    "name": "Worldheart Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 8320,
+    "attack": 6,
+    "defense": 26,
+    "bonusStats": {
+      "stamina": 129,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_48",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_49",
+    "name": "Worldheart Mantle",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 8320,
+    "attack": 6,
+    "defense": 26,
+    "bonusStats": {
+      "stamina": 129,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_49",
+    "source": "orange_pool"
+  },
+  {
+    "id": "orange_50",
+    "name": "Worldheart Grasp",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 8320,
+    "attack": 6,
+    "defense": 26,
+    "bonusStats": {
+      "stamina": 129,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_50",
+    "source": "orange_pool"
   }
 ]

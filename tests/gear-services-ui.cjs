@@ -54,6 +54,8 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   // Orange copies use their own editor-exported art and retain individually visible stats.
   await page.locator('#npc-close').click();
   const ordinaryFrame=await page.evaluate(()=>Field.warriorSprites.frame('idle',0,0).toDataURL());
+  await debug({op:'set_level',level:99}); // every orange piece has a required level (10..99)
+  await page.waitForFunction(()=>Field.hero.level===99,null,{timeout:15000});
   await debug({op:'give_item',item:'orange_01',quantity:2});
   await page.waitForFunction(()=>Inventory.quantity('orange_01')===2,null,{timeout:15000});
   await page.locator('#equipment-open').click();
@@ -62,7 +64,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   assert.equal(await orange.locator('.orange-item-art').count(),1);
   await orange.locator('button').click();
   assert.equal(await page.locator('#bag-details .orange-copy-stats').count(),2);
-  assert.match(await page.locator('#bag-details').textContent(),/110 defense.*90 stamina.*8 accuracy.*18 dexterity/i);
+  assert.match(await page.locator('#bag-details').textContent(),/11 defense.*3 stamina.*3 accuracy.*3 dexterity/i);
   await page.locator('#bag-details [data-action="equip"]').first().click();
   await page.waitForFunction(()=>Field.hero.look.warriorArmor==='orange_01',null,{timeout:15000});
   assert.equal(await page.locator('[data-slot="chest"] .orange-item-art').count(),1);

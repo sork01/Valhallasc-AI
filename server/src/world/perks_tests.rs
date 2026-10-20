@@ -157,7 +157,7 @@ fn the_multiplier_widens_every_ordinary_gear_band_and_the_orange_chance() {
         let mut x = 0.3;
         for _ in 0..200_000 {
             let mut first = true;
-            let drew = roll_orange_boosted(m, || {
+            let drew = roll_orange_boosted(m, 99, || {
                 x = (x + 0.618_033_988_749_895) % 1.;
                 if std::mem::take(&mut first) { x } else { 0.5 }
             });

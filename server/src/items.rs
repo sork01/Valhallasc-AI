@@ -2813,6 +2813,10 @@ mod tests {
                 assert_eq!(i.rarity, "epic");
                 continue;
             }
+            // The orange pieces follow their own ladder (ten levels from 10 to 99; see items/orange.rs).
+            if i.source.as_deref() == Some("orange_pool") {
+                continue;
+            }
             if matches!(i.kind.as_str(), "material" | "bag" | "food" | "potion") {
                 // Bags and consumables come in ten-level tiers (plus the 95 and 99 consumable tiers); materials have no level.
                 let tier = (i.kind == "bag" || i.family.is_some())
