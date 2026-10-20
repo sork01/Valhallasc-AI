@@ -3600,7 +3600,8 @@ impl World {
             let wounded = self.wounded_allies(session, pulse.range);
             points.extend(self.heal_players(session, &wounded, pulse.mult));
         }
-        if skill.lifesteal > 0. && dealt > 0. {
+        // Lifesteal heals nothing while the caster is in a PvP fight (a blow on a player starts it).
+        if skill.lifesteal > 0. && dealt > 0. && self.players[&session].pvp_fight <= 0. {
             let p = self.players.get_mut(&session).unwrap();
             let before = p.character.hp;
             p.character.hp = (before + dealt * skill.lifesteal * p.heal_factor_by(class))

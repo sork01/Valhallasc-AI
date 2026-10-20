@@ -9,9 +9,9 @@ const ARENA_TIME: f64 = 300.;
 /// duel lasts longer than the same fight against a monster. Healing in a PvP fight is scaled by it too, or halving the
 /// damage would double what healing is worth.
 pub(super) const PVP_DAMAGE_SCALE: f64 = 0.5;
-/// A hunter's blows on players deal this much more (owner, 2026-10-20: +25%, then another +10%), applied to the damage
-/// before defence.
-const PVP_HUNTER_DAMAGE: f64 = 1.35;
+/// A hunter's blows on players deal this much more (owner, 2026-10-20: +25%, then +10%, then another +20%), applied to
+/// the damage before defence.
+const PVP_HUNTER_DAMAGE: f64 = 1.55;
 /// Seconds after a blow dealt or taken in which a player's healing is scaled the same way (`Player::heal_factor`).
 const PVP_FIGHT_TIME: f64 = 10.;
 /// A priest's own healing in a PvP fight is scaled by this on top of `PVP_DAMAGE_SCALE` (owner, 2026-10-20), so it comes to
@@ -1659,6 +1659,10 @@ mod tests {
             }
             panic!("never landed");
         };
+        assert_eq!(
+            PVP_HUNTER_DAMAGE, 1.55,
+            "owner, 2026-10-20: +25%, +10%, +20%"
+        );
         let (hunter, defence) = taken(Class::Hunter);
         let (warrior, _) = taken(Class::Warrior);
         assert_eq!(
@@ -1826,5 +1830,39 @@ mod tests {
         w.players.get_mut(&2).unwrap().pvp_fight = PVP_FIGHT_TIME;
         assert_eq!(w.players[&2].heal_factor_by(Class::Priest), 0.25);
         assert_eq!(w.players[&2].heal_factor_by(Class::Mage), 0.5);
+    }
+    #[test]
+    fn lifesteal_heals_nothing_in_a_pvp_fight() {
+        let mut all: Vec<_> = skills::SKILLS
+            .iter()
+            .filter(|s| s.lifesteal > 0.)
+            .map(|s| s.id.as_str())
+            .collect();
+        all.sort();
+        assert_eq!(all, ["lifedrain", "searinglight", "titanswrath"]);
+        for (class, id) in [
+            (Class::Mage, "lifedrain"),
+            (Class::Priest, "searinglight"),
+            (Class::Warrior, "titanswrath"),
+        ] {
+            let (mut w, _) = stunner(class);
+            w.players.get_mut(&1).unwrap().character.attributes.accuracy = 100;
+            let low = w.players[&1].character.max_hp() * 0.3;
+            w.players.get_mut(&1).unwrap().character.hp = low;
+            let max = hp(&w, 2);
+            for _ in 0..40 {
+                w.use_skill(1, id, Point { x: 1., y: 0. });
+                if hp(&w, 2) < max || w.players[&2].absorb > 0. {
+                    break;
+                }
+                w.players.get_mut(&1).unwrap().skill_cd.clear();
+                let c = &mut w.players.get_mut(&1).unwrap().character;
+                c.reset_resource();
+                c.change_resource(100.);
+            }
+            assert!(hp(&w, 2) < max, "{id} hurt the partner");
+            assert!(w.players[&1].pvp_fight > 0., "{id}: the fight began");
+            assert_eq!(hp(&w, 1), low, "{id} healed in a PvP fight");
+        }
     }
 }
