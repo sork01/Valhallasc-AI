@@ -14,9 +14,11 @@ pub(super) const PVP_DAMAGE_SCALE: f64 = 0.5;
 const PVP_HUNTER_DAMAGE: f64 = 1.55;
 /// Seconds after a blow dealt or taken in which a player's healing is scaled the same way (`Player::heal_factor`).
 const PVP_FIGHT_TIME: f64 = 10.;
-/// A priest's own healing in a PvP fight is scaled by this on top of `PVP_DAMAGE_SCALE` (owner, 2026-10-20), so it comes to
-/// a quarter: the priest's sustain, not the damage cut, kept it unbeaten.
-pub(super) const PVP_PRIEST_HEAL_SCALE: f64 = 0.5;
+/// A priest's own healing in a PvP fight is scaled by this on top of `PVP_DAMAGE_SCALE` (owner, 2026-10-20): the priest's
+/// sustain, not its damage, kept it unbeaten (0.5 healed a whole health bar per duel and won every duel from level 50;
+/// the sweep of 0.0, 0.12, 0.18, 0.25 and 0.5 put 0.12 to 0.15 at about an even match; wiki
+/// `10_projects:valhallasc_pvp_duel_matrix_20261020`).
+pub(super) const PVP_PRIEST_HEAL_SCALE: f64 = 0.13;
 
 #[derive(Default)]
 pub(super) struct Pvp {
@@ -1794,7 +1796,7 @@ mod tests {
         assert_eq!(w.players[&2].absorb, ward, "the ward is untouched");
     }
     #[test]
-    fn a_priests_own_healing_is_a_quarter_in_a_pvp_fight_and_everyone_elses_a_half() {
+    fn a_priests_own_healing_is_scaled_again_in_a_pvp_fight_and_everyone_elses_a_half() {
         let by = |class: Class, fight: bool| {
             let (mut w, _) = stunner(Class::Warrior);
             let c = &mut w.players.get_mut(&2).unwrap().character;
@@ -1821,14 +1823,20 @@ mod tests {
         assert!((gain - 0.65).abs() < 0.01, "{gain}");
         let (f, gain) = by(Class::Priest, true);
         assert_eq!(f, PVP_DAMAGE_SCALE * PVP_PRIEST_HEAL_SCALE);
-        assert!((gain - 0.65 * 0.25).abs() < 0.01, "{gain}");
+        assert!(
+            (gain - 0.65 * PVP_DAMAGE_SCALE * PVP_PRIEST_HEAL_SCALE).abs() < 0.01,
+            "{gain}"
+        );
         let (f, gain) = by(Class::Warrior, true);
         assert_eq!(f, PVP_DAMAGE_SCALE);
         assert!((gain - 0.40 * 0.5).abs() < 0.01, "{gain}");
         // A priest healing someone else (heal_players) is scaled by the caster's class too.
         let (mut w, _) = stunner(Class::Warrior);
         w.players.get_mut(&2).unwrap().pvp_fight = PVP_FIGHT_TIME;
-        assert_eq!(w.players[&2].heal_factor_by(Class::Priest), 0.25);
+        assert_eq!(
+            w.players[&2].heal_factor_by(Class::Priest),
+            PVP_DAMAGE_SCALE * PVP_PRIEST_HEAL_SCALE
+        );
         assert_eq!(w.players[&2].heal_factor_by(Class::Mage), 0.5);
     }
     #[test]

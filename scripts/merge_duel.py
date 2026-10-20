@@ -79,7 +79,7 @@ def main():
       'Assassin Thousand Cuts (28 s), Mage Starfall (36 s) and Hunter Arrow Storm (30 s). A status needs a blow that lands (a dodge or miss applies nothing), '
       'does not stack (the longer wins) and ends with the duel. **Healing is scaled by the same 0.5** for a player in a PvP fight (a blow dealt or taken in the last 10 s; '
       'it clears when the duel ends), or halving the damage would double what healing is worth. **A hunter\'s blows on players deal 55% more** (owner, 2026-10-20: +25%, then +10%, then +20%). '
-      '**A priest\'s own healing is scaled once more by 0.5** in a PvP fight (a quarter in all). '
+      '**A priest\'s own healing is scaled once more by 0.13** in a PvP fight (0.065 in all). '
       '**Lifesteal (Titan\'s Wrath, Life Drain, Searing Light) heals nothing** while the caster is in a PvP fight. '
       '**Mage Arcane Ward (28 s)** also soaks up the next 20% of the mage\'s maximum health in damage from players for 10 s.')
     w('- Rotation: **the mercenaries\' own code** (`World::ai_combat_at`, the body of `ai_combat`): every skill when ready, affordable and in '
