@@ -34,6 +34,13 @@ pub struct Side {
     pub casts: BTreeMap<String, u32>,
     /// Health left at the end, as a fraction of the maximum.
     pub hp_left: f64,
+    /// Maximum health, attack and defence at the start (`Character::stats`), to read the damage and healing against.
+    pub max_hp: f64,
+    pub attack: f64,
+    pub defence: f64,
+    /// Health regained over the duel, from the books: end health - start health + damage taken (overheal is lost, so
+    /// this is a floor).
+    pub healed: f64,
 }
 #[derive(Clone, Debug)]
 pub struct DuelRun {
@@ -130,6 +137,7 @@ pub fn run_duel(a: Class, b: Class, level: u32, seed: u64, a_left: bool) -> Duel
     };
     let classes = if a_left { [a, b] } else { [b, a] };
     let mut rx = [join(&mut w, 1, classes[0]), join(&mut w, 2, classes[1])];
+    let mut starts = [(0., 0., 0.); 2];
     for (i, session) in [1u64, 2].into_iter().enumerate() {
         let case = Case::new(classes[i], level);
         let p = w.players.get_mut(&session).unwrap();
@@ -139,6 +147,9 @@ pub fn run_duel(a: Class, b: Class, level: u32, seed: u64, a_left: bool) -> Duel
         p.character.x = at.x;
         p.character.y = at.y;
         build_character(&mut p.character, &case);
+        let slot = if (i == 0) == a_left { 0 } else { 1 };
+        let (attack, defence) = p.character.stats();
+        starts[slot] = (p.character.max_hp(), attack, defence);
     }
     let ids = [1u64, 2].map(|s| w.players[&s].character.id.clone());
     w.pvp_command(1, PvpCommand::DuelRequest { id: ids[1].clone() });
@@ -194,6 +205,15 @@ pub fn run_duel(a: Class, b: Class, level: u32, seed: u64, a_left: bool) -> Duel
             }
         }
     }
+    for slot in 0..2 {
+        let (max_hp, attack, defence) = starts[slot];
+        let taken: f64 = sides[1 - slot].by_source.values().map(|v| v.0).sum();
+        let side = &mut sides[slot];
+        side.max_hp = max_hp;
+        side.attack = attack;
+        side.defence = defence;
+        side.healed = (side.hp_left * max_hp - max_hp + taken).max(0.);
+    }
     let winner = winner_session.map(slot_of_session);
     DuelRun {
         winner,
@@ -223,6 +243,10 @@ pub fn row(level: u32, seed: u64, a_left: bool, run: &DuelRun) -> Value {
             "swings": s.swings,
             "hits": hits,
             "hpLeft": round2(s.hp_left),
+            "maxHp": s.max_hp.round(),
+            "attack": s.attack.round(),
+            "defence": s.defence.round(),
+            "healed": s.healed.round(),
             "sources": sources,
             "casts": s.casts,
         })
