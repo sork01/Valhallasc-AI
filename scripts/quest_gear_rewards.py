@@ -25,6 +25,8 @@ def blue(level, slot):
 
 
 REWARDS = {
+    'barrow_amber': 'pants_wayfarer_l25_norn',
+    'barrow_threads': 'accessory_amber_l25_norn',
     'slime_patrol': green(1, 'necklace'),
     'ironhide_hunt': green(5, 'pants'),
     'king_challenge': blue(5, 'accessory'),

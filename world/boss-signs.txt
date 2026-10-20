@@ -1,4 +1,26 @@
 {
+  "barrow_fatebound": {
+    "title": "The Unwritten King",
+    "what": "The king pulls a red ring of thread tight after 5 seconds. Anyone in the ring is knocked out.",
+    "todo": "Stand in the clear middle, or move beyond the red ring.",
+    "tip": "When the king is nearly beaten, the ring snaps again 3 seconds later. Stay off red until both snaps are over.",
+    "colors": [
+      "red"
+    ],
+    "x": 47.5,
+    "y": 41.5
+  },
+  "span_archon": {
+    "title": "Bifrost Archon Vaelor",
+    "what": "Vaelor aims a wide red cone of rainbow light for 5 seconds. Anyone inside is knocked out.",
+    "todo": "Step to the side or behind Vaelor before the red cone fills.",
+    "tip": "When Vaelor is nearly beaten, the cone widens and flashes a second time 3 seconds later.",
+    "colors": [
+      "red"
+    ],
+    "x": 47.5,
+    "y": 41.5
+  },
   "hollowking": {
     "title": "Haldor, the Hollow King",
     "what": "Haldor sings a sad song for 8 seconds. When it ends, everyone is knocked out.",

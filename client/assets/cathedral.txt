@@ -96,7 +96,19 @@
     "seed_sprout",
     "seed_treant",
     "solar_cinder",
-    "amber_cocoon"
+    "amber_cocoon",
+    "barrow_scarab",
+    "barrow_hound",
+    "barrow_spinner",
+    "barrow_doorward",
+    "barrow_threadkeeper",
+    "barrow_fatebound",
+    "span_lynx",
+    "span_sentinel",
+    "span_caster",
+    "span_warden",
+    "span_weaver",
+    "span_archon"
   ],
   "clips": {
     "idle": {
@@ -219,7 +231,19 @@
     "seed_sprout": "39768c572c917404",
     "seed_treant": "215216cb71475ec0",
     "solar_cinder": "270d38184ebc19fa",
-    "amber_cocoon": "1de97986cdfe4396"
+    "amber_cocoon": "1de97986cdfe4396",
+    "barrow_scarab": "a12a73ac8dcf45b4",
+    "barrow_hound": "dbaf498b20365275",
+    "barrow_spinner": "72f19ac8cc4528cd",
+    "barrow_doorward": "9b04131dffdb3f64",
+    "barrow_threadkeeper": "f0818193eda48cb0",
+    "barrow_fatebound": "3b0c808a6676665e",
+    "span_lynx": "954c192fb7c3451a",
+    "span_sentinel": "91a65206f5a3b545",
+    "span_caster": "3af0fa48afd1b30c",
+    "span_warden": "549e6058571a2f7b",
+    "span_weaver": "63c4c158488c41b3",
+    "span_archon": "191212fbe85fe47c"
   },
   "tops": {
     "tidetemplar": 84,
@@ -310,6 +334,18 @@
     "seed_sprout": 59,
     "seed_treant": 57,
     "solar_cinder": 59,
-    "amber_cocoon": 75
+    "amber_cocoon": 75,
+    "barrow_scarab": 50,
+    "barrow_hound": 40,
+    "barrow_spinner": 57,
+    "barrow_doorward": 57,
+    "barrow_threadkeeper": 58,
+    "barrow_fatebound": 57,
+    "span_lynx": 45,
+    "span_sentinel": 68,
+    "span_caster": 57,
+    "span_warden": 58,
+    "span_weaver": 59,
+    "span_archon": 58
   }
 }

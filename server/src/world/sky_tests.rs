@@ -135,7 +135,8 @@ fn bifrost_reach_is_a_sky_zone_with_five_kinds_one_hub_three_wards_and_a_gate_pa
         .find(|n| n.travel_stop.is_some())
         .expect("a travel master");
     assert_eq!(master.id, "travel_perch");
-    assert_eq!(map.npcs.len(), 8, "seven people and the travel master");
+    let perch_npcs: Vec<_> = map.npcs.iter().filter(|n| !n.id.starts_with("span_")).collect();
+    assert_eq!(perch_npcs.len(), 8, "seven people and the travel master");
     // the gate pair: the Wyrdwood's Stormrift up, and the Perch's down, each arrival clear of every gate and of enemies
     let up = w.maps[WYRD]
         .portals
@@ -423,10 +424,11 @@ fn every_bifrost_monster_has_its_own_stats_attacks_materials_and_rewards() {
 fn the_questline_has_twenty_two_quests_with_three_wards_and_the_old_objective_kinds() {
     let w = world();
     let map = &w.maps[SKY];
-    assert_eq!(map.quests.len(), 22);
+    let quests: Vec<_> = map.quests.iter().filter(|q| !q.id.starts_with("span_")).collect();
+    assert_eq!(quests.len(), 22);
     let mut kinds = std::collections::BTreeSet::new();
     let mut holds = vec![];
-    for q in &map.quests {
+    for q in &quests {
         assert!(npc_exists(map, &q.npc), "{} giver {}", q.id, q.npc);
         assert_eq!(
             q.reward_xp,

@@ -68,7 +68,7 @@ def sync():
     items = json.loads(item_path.read_text())
     changed, traders = apply(world, items)
     if changed:
-        map_path.write_text(json.dumps(world, indent=2) + '\n')
+        map_path.write_text(json.dumps(world, indent=2, ensure_ascii=False) + '\n')
         item_path.write_text(json.dumps(items, indent=2, ensure_ascii=False) + '\n')
     return changed, traders
 

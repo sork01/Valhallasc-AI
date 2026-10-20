@@ -268,7 +268,7 @@ async function call(name, args = {}) {
     z.theme === ['eye_below', 'elder_hollow', 'thousandfold', 'rain_crown', 'seed_vault', 'sunken_astrolabe','thunderheart_gate','blooming_labyrinth','solar_crucible','amber_archive','silent_solstice'][i] &&
     z.portals.length === 2 && z.portals[0] === [19, 20, 21, 22, 24, 25, 27, 28, 28, 28, 28][i]));
   await page.keyboard.press('m');
-  assert.equal(await page.locator('.wm-tile').count(), 40);
+  assert.equal(await page.locator('.wm-tile').count(), 42);
   assert.equal(await page.locator('.wm-tile[data-zone="29"], .wm-tile[data-zone="30"], .wm-tile[data-zone="31"], .wm-tile[data-zone="32"], .wm-tile[data-zone="33" ], .wm-tile[data-zone="34" ]').count(), 6);
   assert.equal(await page.locator('.wm-tile[data-zone="35"]').count(),1);
   assert.equal(await page.locator('.wm-tile[data-zone="36"]').count(),1);

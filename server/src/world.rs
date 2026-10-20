@@ -58,6 +58,10 @@ mod mercs;
 mod mount_sources_tests;
 #[cfg(test)]
 mod nacre_tests;
+#[cfg(test)]
+mod nornroot_tests;
+#[cfg(test)]
+mod skybridge_tests;
 mod partyxp;
 #[cfg(test)]
 mod perks_tests;
@@ -1379,18 +1383,18 @@ impl World {
             .world_clock_epoch_ms(daynight::unix_ms())
             .expect("world clock storage must be available");
         let mut first = Map::default();
-        let mut extra = std::mem::take(&mut first.zones);
-        let arena = if extra.last().is_some_and(|m| m.name == "The Arena") {
-            extra.pop()
-        } else {
-            None
-        };
-        let arena_public = 1 + extra.len();
+        let extra = std::mem::take(&mut first.zones);
+        // Public file zones keep their indices even when new dungeons follow the arena.
+        // The arena file map is an inert template; its eight playable copies follow dungeon copies.
+        let arena = extra
+            .iter()
+            .enumerate()
+            .find(|(_, m)| m.name == "The Arena")
+            .map(|(n, m)| (n + 1, m.clone()));
         let mut maps = vec![first];
         maps.extend(extra);
         let mut instances = Self::make_instances(&mut maps);
-        if let Some(arena) = arena {
-            // Keep every existing dungeon copy id stable. Arena copy ids follow them, while clients see its file zone id.
+        if let Some((arena_public, arena)) = arena {
             for _ in 0..8 {
                 let mut copy = arena.clone();
                 copy.template = Some(arena_public);
@@ -6456,7 +6460,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 40);
+        assert_eq!(zone_count(&w), 43);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -7059,7 +7063,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 40);
+        assert_eq!(zone_count(&w), 43);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -9913,7 +9917,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 40);
+        assert_eq!(zone_count(&w), 43);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));

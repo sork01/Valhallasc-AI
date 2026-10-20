@@ -67,6 +67,14 @@ pub static ENEMIES: LazyLock<Vec<Enemy>> = LazyLock::new(|| {
         serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/silent_solstice.txt"))
             .expect("valid Silent Solstice catalog"),
     );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/nornroot.txt"))
+            .expect("valid Nornroot Barrow catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/skybridge.txt"))
+            .expect("valid Shattered Span catalog"),
+    );
     enemies
 });
 pub fn enemy(kind: &str) -> Option<&'static Enemy> {

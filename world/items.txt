@@ -52370,5 +52370,1371 @@
     "kind": "material",
     "rarity": "common",
     "sell": 4700
+  },
+  {
+    "id": "barrow_scarab_relic",
+    "name": "Graveamber Scarab Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 80
+  },
+  {
+    "id": "barrow_hound_relic",
+    "name": "Threadbound Hound Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 80
+  },
+  {
+    "id": "barrow_spinner_relic",
+    "name": "Spindle Shade Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 80
+  },
+  {
+    "id": "barrow_doorward_relic",
+    "name": "Arn, the Amber Doorward Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 400
+  },
+  {
+    "id": "barrow_threadkeeper_relic",
+    "name": "Vessa, Keeper of Threads Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 400
+  },
+  {
+    "id": "barrow_fatebound_relic",
+    "name": "The Unwritten King Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 400
+  },
+  {
+    "id": "warrior_armor_crimson_l25_norn",
+    "name": "Fatewoven Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "warrior",
+    "variant": "crimson_l25_norn",
+    "art": "crimson",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "stamina": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "warrior_headgear_crimson_l25_norn",
+    "name": "Fatewoven Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "warrior",
+    "variant": "crimson_l25_norn",
+    "art": "crimson",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "agility": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l25_norn",
+    "name": "Fatewoven Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "warrior",
+    "variant": "crimson_l25_norn",
+    "art": "crimson",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "stamina": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "warrior_gloves_crimson_l25_norn",
+    "name": "Fatewoven Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "warrior",
+    "variant": "crimson_l25_norn",
+    "art": "crimson",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "stamina": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "warrior_weapon_sword_l25_norn",
+    "name": "Fatewoven Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "warrior",
+    "variant": "sword_l25_norn",
+    "art": "sword",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 26.0,
+    "defense": 6.4,
+    "bonusStats": {
+      "strength": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "mage_armor_apprentice_l25_norn",
+    "name": "Fatewoven Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "mage",
+    "variant": "apprentice_l25_norn",
+    "art": "apprentice",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.2,
+    "defense": 13.0,
+    "bonusStats": {
+      "agility": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "mage_headgear_apprentice_l25_norn",
+    "name": "Fatewoven Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "mage",
+    "variant": "apprentice_l25_norn",
+    "art": "apprentice",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "accuracy": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l25_norn",
+    "name": "Fatewoven Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "mage",
+    "variant": "apprentice_l25_norn",
+    "art": "apprentice",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "agility": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "mage_gloves_apprentice_l25_norn",
+    "name": "Fatewoven Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "mage",
+    "variant": "apprentice_l25_norn",
+    "art": "apprentice",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "agility": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "mage_weapon_ash_l25_norn",
+    "name": "Fatewoven Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "mage",
+    "variant": "ash_l25_norn",
+    "art": "ash",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 26.0,
+    "defense": 6.4,
+    "bonusStats": {
+      "stamina": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "assassin_armor_shadow_l25_norn",
+    "name": "Fatewoven Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "assassin",
+    "variant": "shadow_l25_norn",
+    "art": "shadow",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 3.2,
+    "defense": 13.0,
+    "bonusStats": {
+      "agility": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "assassin_headgear_shadow_l25_norn",
+    "name": "Fatewoven Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "assassin",
+    "variant": "shadow_l25_norn",
+    "art": "shadow",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "stamina": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l25_norn",
+    "name": "Fatewoven Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "assassin",
+    "variant": "shadow_l25_norn",
+    "art": "shadow",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "strength": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "assassin_gloves_shadow_l25_norn",
+    "name": "Fatewoven Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "assassin",
+    "variant": "shadow_l25_norn",
+    "art": "shadow",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "dexterity": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "assassin_weapon_daggers_l25_norn",
+    "name": "Fatewoven Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "assassin",
+    "variant": "daggers_l25_norn",
+    "art": "daggers",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 26.0,
+    "defense": 6.4,
+    "bonusStats": {
+      "accuracy": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "priest_armor_pilgrim_l25_norn",
+    "name": "Fatewoven Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "priest",
+    "variant": "pilgrim_l25_norn",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "accuracy": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l25_norn",
+    "name": "Fatewoven Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "priest",
+    "variant": "pilgrim_l25_norn",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "dexterity": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l25_norn",
+    "name": "Fatewoven Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "priest",
+    "variant": "pilgrim_l25_norn",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "agility": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l25_norn",
+    "name": "Fatewoven Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "priest",
+    "variant": "pilgrim_l25_norn",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "dexterity": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "priest_weapon_mace_l25_norn",
+    "name": "Fatewoven Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "priest",
+    "variant": "mace_l25_norn",
+    "art": "mace",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 26.0,
+    "defense": 6.4,
+    "bonusStats": {
+      "agility": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "hunter_armor_scout_l25_norn",
+    "name": "Fatewoven Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "hunter",
+    "variant": "scout_l25_norn",
+    "art": "scout",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 4.8,
+    "defense": 19.4,
+    "bonusStats": {
+      "accuracy": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "hunter_headgear_scout_l25_norn",
+    "name": "Fatewoven Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "hunter",
+    "variant": "scout_l25_norn",
+    "art": "scout",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "accuracy": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "hunter_shoulders_scout_l25_norn",
+    "name": "Fatewoven Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "hunter",
+    "variant": "scout_l25_norn",
+    "art": "scout",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "stamina": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "hunter_gloves_scout_l25_norn",
+    "name": "Fatewoven Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "hunter",
+    "variant": "scout_l25_norn",
+    "art": "scout",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "strength": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l25_norn",
+    "name": "Fatewoven Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "class": "hunter",
+    "variant": "shortbow_l25_norn",
+    "art": "shortbow",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 26.0,
+    "defense": 6.4,
+    "bonusStats": {
+      "dexterity": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "pants_wayfarer_l25_norn",
+    "name": "Fatewoven Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "variant": "wayfarer_l25_norn",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 1.6,
+    "defense": 6.4,
+    "bonusStats": {
+      "stamina": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "necklace_moonstone_l25_norn",
+    "name": "Fatewoven Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "variant": "moonstone_l25_norn",
+    "art": "moonstone",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 13.0,
+    "defense": 3.2,
+    "bonusStats": {
+      "stamina": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "accessory_amber_l25_norn",
+    "name": "Fatewoven Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "variant": "amber_l25_norn",
+    "art": "amber",
+    "tint": {
+      "hue": 272,
+      "saturate": 1.18,
+      "brightness": 1.12
+    },
+    "starter": false,
+    "attack": 9.8,
+    "defense": 2.4,
+    "bonusStats": {
+      "accuracy": 10
+    },
+    "source": "nornroot"
+  },
+  {
+    "id": "span_lynx_relic",
+    "name": "Prism Lynx Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 110
+  },
+  {
+    "id": "span_sentinel_relic",
+    "name": "Bifrost Sentinel Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 110
+  },
+  {
+    "id": "span_caster_relic",
+    "name": "Arcane Refractor Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 110
+  },
+  {
+    "id": "span_warden_relic",
+    "name": "Torstein, Keeper of the Toll Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 520
+  },
+  {
+    "id": "span_weaver_relic",
+    "name": "Sunniva, the Spectrum Weaver Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 520
+  },
+  {
+    "id": "span_archon_relic",
+    "name": "Bifrost Archon Vaelor Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 520
+  },
+  {
+    "id": "warrior_armor_crimson_l30_span",
+    "name": "Bridgeward Crimson Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "warrior",
+    "variant": "crimson_l30_span",
+    "art": "crimson",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 5.6,
+    "defense": 22.7,
+    "bonusStats": {
+      "dexterity": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "warrior_headgear_crimson_l30_span",
+    "name": "Bridgeward Crimson Plumed Helm",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "warrior",
+    "variant": "crimson_l30_span",
+    "art": "crimson",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "dexterity": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "warrior_shoulders_crimson_l30_span",
+    "name": "Bridgeward Crimson Pauldrons",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "warrior",
+    "variant": "crimson_l30_span",
+    "art": "crimson",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "accuracy": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "warrior_gloves_crimson_l30_span",
+    "name": "Bridgeward Crimson Gauntlets",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "warrior",
+    "variant": "crimson_l30_span",
+    "art": "crimson",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "stamina": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "warrior_weapon_sword_l30_span",
+    "name": "Bridgeward Iron Sword",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "warrior",
+    "variant": "sword_l30_span",
+    "art": "sword",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 30.2,
+    "defense": 7.6,
+    "bonusStats": {
+      "accuracy": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "mage_armor_apprentice_l30_span",
+    "name": "Bridgeward Apprentice Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "mage",
+    "variant": "apprentice_l30_span",
+    "art": "apprentice",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "agility": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "mage_headgear_apprentice_l30_span",
+    "name": "Bridgeward Apprentice's Hat",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "mage",
+    "variant": "apprentice_l30_span",
+    "art": "apprentice",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "accuracy": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "mage_shoulders_apprentice_l30_span",
+    "name": "Bridgeward Apprentice's Capelet",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "mage",
+    "variant": "apprentice_l30_span",
+    "art": "apprentice",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "agility": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "mage_gloves_apprentice_l30_span",
+    "name": "Bridgeward Apprentice's Gloves",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "mage",
+    "variant": "apprentice_l30_span",
+    "art": "apprentice",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "dexterity": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "mage_weapon_ash_l30_span",
+    "name": "Bridgeward Ash Staff",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "mage",
+    "variant": "ash_l30_span",
+    "art": "ash",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 30.2,
+    "defense": 7.6,
+    "bonusStats": {
+      "agility": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "assassin_armor_shadow_l30_span",
+    "name": "Bridgeward Shadow Armor",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "assassin",
+    "variant": "shadow_l30_span",
+    "art": "shadow",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 3.8,
+    "defense": 15.2,
+    "bonusStats": {
+      "accuracy": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "assassin_headgear_shadow_l30_span",
+    "name": "Bridgeward Shadow Brow Band",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "assassin",
+    "variant": "shadow_l30_span",
+    "art": "shadow",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "agility": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "assassin_shoulders_shadow_l30_span",
+    "name": "Bridgeward Nightweave Spaulders",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "assassin",
+    "variant": "shadow_l30_span",
+    "art": "shadow",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "dexterity": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "assassin_gloves_shadow_l30_span",
+    "name": "Bridgeward Nightweave Claws",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "assassin",
+    "variant": "shadow_l30_span",
+    "art": "shadow",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "agility": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "assassin_weapon_daggers_l30_span",
+    "name": "Bridgeward Steel Daggers",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "assassin",
+    "variant": "daggers_l30_span",
+    "art": "daggers",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 30.2,
+    "defense": 7.6,
+    "bonusStats": {
+      "dexterity": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "priest_armor_pilgrim_l30_span",
+    "name": "Bridgeward Pilgrim Robes",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "priest",
+    "variant": "pilgrim_l30_span",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 5.6,
+    "defense": 22.7,
+    "bonusStats": {
+      "intellect": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "priest_headgear_pilgrim_l30_span",
+    "name": "Bridgeward Pilgrim's Hood",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "priest",
+    "variant": "pilgrim_l30_span",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "stamina": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "priest_shoulders_pilgrim_l30_span",
+    "name": "Bridgeward Pilgrim's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "priest",
+    "variant": "pilgrim_l30_span",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "intellect": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "priest_gloves_pilgrim_l30_span",
+    "name": "Bridgeward Pilgrim's Mitts",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "priest",
+    "variant": "pilgrim_l30_span",
+    "art": "pilgrim",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "stamina": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "priest_weapon_mace_l30_span",
+    "name": "Bridgeward Oak Mace",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "priest",
+    "variant": "mace_l30_span",
+    "art": "mace",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 30.2,
+    "defense": 7.6,
+    "bonusStats": {
+      "stamina": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "hunter_armor_scout_l30_span",
+    "name": "Bridgeward Scout's Jerkin",
+    "kind": "armor",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "hunter",
+    "variant": "scout_l30_span",
+    "art": "scout",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 5.6,
+    "defense": 22.7,
+    "bonusStats": {
+      "accuracy": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "hunter_headgear_scout_l30_span",
+    "name": "Bridgeward Feathered Headband",
+    "kind": "headgear",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "hunter",
+    "variant": "scout_l30_span",
+    "art": "scout",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "agility": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "hunter_shoulders_scout_l30_span",
+    "name": "Bridgeward Scout's Mantle",
+    "kind": "shoulders",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "hunter",
+    "variant": "scout_l30_span",
+    "art": "scout",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "accuracy": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "hunter_gloves_scout_l30_span",
+    "name": "Bridgeward Scout's Bracers",
+    "kind": "gloves",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "hunter",
+    "variant": "scout_l30_span",
+    "art": "scout",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "strength": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "hunter_weapon_shortbow_l30_span",
+    "name": "Bridgeward Hunter's Shortbow",
+    "kind": "weapon",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "class": "hunter",
+    "variant": "shortbow_l30_span",
+    "art": "shortbow",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 30.2,
+    "defense": 7.6,
+    "bonusStats": {
+      "stamina": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "pants_wayfarer_l30_span",
+    "name": "Bridgeward Wayfarer Pants",
+    "kind": "pants",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "variant": "wayfarer_l30_span",
+    "art": "wayfarer",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 1.8,
+    "defense": 7.6,
+    "bonusStats": {
+      "stamina": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "necklace_moonstone_l30_span",
+    "name": "Bridgeward Moonstone Necklace",
+    "kind": "necklace",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "variant": "moonstone_l30_span",
+    "art": "moonstone",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 15.2,
+    "defense": 3.8,
+    "bonusStats": {
+      "stamina": 15
+    },
+    "source": "skybridge"
+  },
+  {
+    "id": "accessory_amber_l30_span",
+    "name": "Bridgeward Amber Ring",
+    "kind": "accessory",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "variant": "amber_l30_span",
+    "art": "amber",
+    "tint": {
+      "hue": 195,
+      "saturate": 1.24,
+      "brightness": 1.15
+    },
+    "starter": false,
+    "attack": 11.4,
+    "defense": 2.9,
+    "bonusStats": {
+      "stamina": 15
+    },
+    "source": "skybridge"
   }
 ]

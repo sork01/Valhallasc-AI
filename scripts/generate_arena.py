@@ -18,11 +18,9 @@ def main():
     if existing is None:
         zones.append(ARENA)
     else:
-        if existing != len(zones) - 1:
-            raise SystemExit('Arena must be the final file zone to preserve saved zone ids')
         zones[existing] = ARENA
     MAP.write_text(json.dumps(world, indent=2) + '\n')
-    print(f'Arena is file zone {len(zones)}; entry is by queue only.')
+    print(f'Arena is file zone {next(i for i,z in enumerate(zones,1) if z["name"] == ARENA["name"])}; entry is by queue only.')
 
 if __name__ == '__main__':
     main()

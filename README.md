@@ -528,3 +528,17 @@ Solar Crucible (zone 37), Amber Archive (38) and Silent Solstice (39) now open f
 Alda Copperhand, the gearwright at (36,91) in Alderhaven, offers merge and refinement. `scripts/gear_services_catalog.py` adds her and five matching crystal materials. A legacy stack becomes stable per-copy data at her first dialogue. Each copy stores its catalog ID, current rarity, rank, rank-zero attack/defense, fixed bonus stats and rolled stats. The server accepts two explicit, unequipped IDs of the same item and rarity, consumes both and creates one next-rarity copy; epic and orange cannot merge. The output gets 117.5% of each inputs' average stats and keeps the lower rank. A chosen copy can be moved to the front of that catalog item's equipped allocation. Refinement ranks 1–5 add 4% of rank-zero stats per rank and cost `100 × rank² × rarity factor` gold plus `rank` matching crystals. Both actions use cloned character state and save on success; failed requests leave inventory, gold and copies intact. `client/gearservices.js` shows the selected copies, server preview, payment and a separate confirmation. The old catalog-ID inventory/equipment and bag layouts remain readable.
 
 Regenerate catalogs, gear, Yearwheel, dungeon maps, late quests and gearwright data, then run `node scripts/sync-world.cjs` and rebuild Rust. Focused checks: `bash scripts/cargo.sh test yearwheel`, `bash scripts/cargo.sh test sunken_astrolabe_tests`, `bash scripts/cargo.sh test gear_services`, `bash scripts/cargo.sh test world::trade::tests`; private MCP scenarios `solar_crucible`, `amber_archive`, `silent_solstice`, `gear_services`; real-art `tests/sealed-dungeon-maps-ui.cjs --season-only` and `tests/gear-services-ui.cjs`. The map, item catalog and generated client files are byte-stable under this regeneration chain. These changes are local until a separate deployment is requested.
+
+### Nornroot Barrow — level 25 (2026-10-20)
+
+A private party dungeon beneath Wyrdwood’s Norn Stones, with three guardians,
+three quests, Fatewoven level-25 loot, original PixelFlow enemies and a 5/4
+chamber score. See [docs/nornroot.md](docs/nornroot.md) for generator commands,
+focused validation and the private-copy migration required before deployment.
+
+### The Shattered Span — level 30 (2026-10-20)
+
+A private party dungeon below Bifrost Reach, with three guardians, three quests,
+Bridgeward level-30 loot, original PixelFlow enemies and a 3/4 chamber score.
+See [docs/skybridge.md](docs/skybridge.md) for generator commands, focused
+validation and the private-copy migration required before deployment.

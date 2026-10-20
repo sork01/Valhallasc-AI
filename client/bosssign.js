@@ -29,6 +29,16 @@
         for (const [x, y] of [[14, 12], [42, 13], [32, 30]]) art.append(svg('circle', { cx: x, cy: y, r: 8, fill: blue, 'fill-opacity': .8, stroke: blue, 'stroke-width': 2 }));
         return art;
       }
+      if (sign === 'barrow_fatebound') {
+        art.append(svg('circle', { cx:32, cy:20, r:13, fill:'none', stroke:hex, 'stroke-width':9, 'stroke-opacity':.75 }));
+        art.append(svg('circle', { cx:32, cy:20, r:4, fill:'#e8d5a3', 'fill-opacity':.8 }));
+        return art;
+      }
+      if (sign === 'span_archon') {
+        art.append(svg('polygon', { points: '12,20 56,5 56,35', fill: hex, 'fill-opacity': .68, stroke: hex, 'stroke-width': 2 }));
+        art.append(svg('circle', { cx: 12, cy: 20, r: 5, fill: '#fff4c8', stroke: '#7ddfff', 'stroke-width': 2 }));
+        return art;
+      }
       if (sign === 'moonwell_echo') {
         art.append(svg('line', { x1: 4, y1: 7, x2: 60, y2: 32, stroke: hex, 'stroke-width': 8, 'stroke-opacity': .7 }));
         art.append(svg('line', { x1: 4, y1: 7, x2: 60, y2: 32, stroke: path, 'stroke-width': 2, 'stroke-dasharray': '5 4' }));

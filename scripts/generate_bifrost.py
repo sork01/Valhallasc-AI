@@ -389,7 +389,7 @@ def add_materials():
     new = [m for m in MATERIALS if m[0] not in have]
     for k, (id_, name, sell) in enumerate(new):
         items.insert(at + k, {'id': id_, 'name': name, 'kind': 'material', 'rarity': 'common', 'sell': sell})
-    ITEMS.write_text(json.dumps(items, indent=2))
+    ITEMS.write_text(json.dumps(items, indent=2, ensure_ascii=False) + '\n')
     return len(new)
 
 
@@ -409,7 +409,7 @@ def main():
         raise SystemExit('Bifrost Reach has problems:\n  ' + '\n  '.join(problems))
     raw = PATH.read_text()
     world = json.loads(raw)
-    assert json.dumps(world, indent=2) + '\n' == raw, 'map.txt is not in the canonical 2-space JSON layout'
+    assert json.dumps(world, indent=2, ensure_ascii=False) + '\n' == raw, 'map.txt is not in the canonical 2-space JSON layout'
     names = [z['name'] for z in world['zones']]
     assert names[:6] == ['Emberfall Crags', 'Rimeveil Glacier', 'Gloamfen', 'Skaldholm', 'The Undervault', 'Wyrdwood'], f'unexpected zones {names}'
     # a rebuild keeps every later zone (Ran's Deep) and puts Bifrost Reach back in the same place
@@ -420,7 +420,9 @@ def main():
     wyrd.open_stormrift(world['zones'][5], world)
     generate_deep.open_maelstrom(world['zones'][6], world)
     spark_travel.ensure(world)
-    PATH.write_text(json.dumps(world, indent=2) + '\n')
+    import generate_skybridge
+    generate_skybridge.install_parent(world)
+    PATH.write_text(json.dumps(world, indent=2, ensure_ascii=False) + '\n')
     new = add_materials()
     kinds = {}
     for sl in zone['slimes']:

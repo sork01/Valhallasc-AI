@@ -898,7 +898,11 @@ mod tests {
         let mut w = world();
         let _a = add(&mut w, 1, "Alice");
         assert!(w.pvp_queue(&w.players[&1].character.id.clone(), 2).is_err());
-        assert!(w.maps[40].name != "The Arena");
+        assert_eq!(w.maps[40].name, "The Arena");
+        assert!(
+            w.instance_at(40).is_none(),
+            "public arena template stays inert"
+        );
         assert!(w.is_arena_zone(w.maps.len() - 1));
     }
     #[test]

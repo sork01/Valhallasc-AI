@@ -195,6 +195,8 @@ def main():
     out.extend(cathedral_pieces(out))
     out.extend(moonwell_pieces(out))
     out.extend(eye_below_pieces(out))
+    out.extend(nornroot_pieces(out))
+    out.extend(skybridge_pieces(out))
     out.extend(elder_hollow_pieces(out))
     out.extend(thousandfold_pieces(out))
     out.extend(rain_crown_pieces(out))
@@ -307,6 +309,56 @@ def moonwell_pieces(out):
         v['sell'] = round(i['sell'] * MOONWELL_BONUS)
         v['source'] = 'moonwell'
         v['tint'] = {'hue': 165, 'saturate': 1.15, 'brightness': 1.17}
+        v['bonusStats'] = bonus_stats(v)
+        pieces.append(ordered(v))
+    assert len(pieces) == 28
+    return pieces
+
+
+def nornroot_pieces(out):
+    """Exclusive 28-piece level-25 blue set, 15% above the ordinary ladder."""
+    pieces = []
+    for i in out:
+        if i.get('source') or i['rarity'] != 'rare' or i.get('requiredLevel') != 25:
+            continue
+        if i['kind'] not in CLASS_KINDS + SHARED_KINDS:
+            continue
+        v = dict(i)
+        suffix = '_l25_blue'
+        assert v['id'].endswith(suffix), v['id']
+        for key in ['id', 'variant']:
+            v[key] = v[key][:-len(suffix)] + '_l25_norn'
+        v['name'] = 'Fatewoven ' + i['name'].split(' ', 1)[-1]
+        v['attack'] = round(i['attack'] * 1.15, 1)
+        v['defense'] = round(i['defense'] * 1.15, 1)
+        v['sell'] = round(i['sell'] * 1.15)
+        v['source'] = 'nornroot'
+        v['tint'] = {'hue': 272, 'saturate': 1.18, 'brightness': 1.12}
+        v['bonusStats'] = bonus_stats(v)
+        pieces.append(ordered(v))
+    assert len(pieces) == 28
+    return pieces
+
+
+def skybridge_pieces(out):
+    """Exclusive 28-piece level-30 blue set, 15% above the ordinary ladder."""
+    pieces = []
+    for i in out:
+        if i.get('source') or i['rarity'] != 'rare' or i.get('requiredLevel') != 30:
+            continue
+        if i['kind'] not in CLASS_KINDS + SHARED_KINDS:
+            continue
+        v = dict(i)
+        suffix = '_l30_blue'
+        assert v['id'].endswith(suffix), v['id']
+        for key in ['id', 'variant']:
+            v[key] = v[key][:-len(suffix)] + '_l30_span'
+        v['name'] = 'Bridgeward ' + i['name'].split(' ', 1)[-1]
+        v['attack'] = round(i['attack'] * 1.15, 1)
+        v['defense'] = round(i['defense'] * 1.15, 1)
+        v['sell'] = round(i['sell'] * 1.15)
+        v['source'] = 'skybridge'
+        v['tint'] = {'hue': 195, 'saturate': 1.24, 'brightness': 1.15}
         v['bonusStats'] = bonus_stats(v)
         pieces.append(ordered(v))
     assert len(pieces) == 28

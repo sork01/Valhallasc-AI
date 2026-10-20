@@ -107,6 +107,14 @@ _dungeon(39, 'The Silent Solstice', 99, '#26344a', '#141e2e', '#d0eaff', [
     ('solstice_flurry', 'Whispering Flurry', 0), ('solstice_owl', 'Night Owl', 0), ('solstice_guard', 'Rime Guard', 0),
     ('solstice_watcher', 'The Frost Watcher', 1), ('solstice_harbinger', 'Harbinger of Night', 1),
     ('solstice_heart', 'Heart of the Longest Night', 1)])
+_dungeon(41, 'Nornroot Barrow', 25, '#3a2c44', '#22182a', '#ffd88a', [
+    ('barrow_scarab', 'Graveamber Scarab', 0), ('barrow_hound', 'Threadbound Hound', 0), ('barrow_spinner', 'Spindle Shade', 0),
+    ('barrow_doorward', 'Arn, the Amber Doorward', 1), ('barrow_threadkeeper', 'Vessa, Keeper of Threads', 1),
+    ('barrow_fatebound', 'The Unwritten King', 1)])
+_dungeon(42, 'The Shattered Span', 30, '#1c2844', '#10172c', '#8fe8ff', [
+    ('span_lynx', 'Glassfang Lynx', 0), ('span_sentinel', 'Bifrost Sentinel', 0), ('span_caster', 'Prismatic Caster', 0),
+    ('span_warden', 'Torstein, Keeper of the Toll', 1), ('span_weaver', 'Sunniva, the Spectrum Weaver', 1),
+    ('span_archon', 'Vaelor, Bifrost Archon', 1)])
 
 
 CARD_W, CARD_H, GAP = 408, 506, 18

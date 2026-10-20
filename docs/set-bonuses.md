@@ -37,6 +37,8 @@ full set mandatory for every encounter.
 
 | Set source | Dungeon | Signature, triggered by the class skill in the last column |
 | --- | --- | --- |
+| `nornroot` | Nornroot Barrow | **Second thread:** the caster recovers 4% of maximum health. |
+| `skybridge` | The Shattered Span | **Prism arc:** the nearest enemy within four tiles takes 16% basic-hit damage. |
 | `undervault` | Undervault | **Hollow guard:** the caster gains a 4-second shield absorbing 6% of maximum health. |
 | `cathedral_cloister` | Flooded Cloister | **Undertow:** the nearest enemy within four tiles is pulled one tile toward the caster; bosses instead lose 20% movement speed for two seconds. |
 | `cathedral_reliquary` | Coral Reliquary | **Coral bond:** the lowest-health nearby party member gains a 4-second shield absorbing 5% of their maximum health. |
@@ -65,6 +67,8 @@ Signature damage and control target enemies only.
 
 | Source | 2 pieces | 4-piece cooldown | 6-piece double | 8-piece trigger |
 | --- | --- | --- | --- | --- |
+| `nornroot` | +5% health | `shieldwall` | `cleave` | `battlecry` |
+| `skybridge` | +5% attack | `groundslam` | `whirlwind` | `charge` |
 | `undervault` | +5% defense | `shieldwall` | `cleave` | `charge` |
 | `cathedral_cloister` | +5% health | `charge` | `whirlwind` | `groundslam` |
 | `cathedral_reliquary` | +5% defense | `secondwind` | `earthshatter` | `shieldwall` |
@@ -86,6 +90,8 @@ Signature damage and control target enemies only.
 
 | Source | 2 pieces | 4-piece cooldown | 6-piece double | 8-piece trigger |
 | --- | --- | --- | --- | --- |
+| `nornroot` | +5% health | `blink` | `twinbolt` | `fireball` |
+| `skybridge` | +5% attack | `chainlightning` | `fireball` | `blink` |
 | `undervault` | +5% defense | `arcaneward` | `twinbolt` | `blink` |
 | `cathedral_cloister` | +5% health | `blink` | `barrage` | `arcanestorm` |
 | `cathedral_reliquary` | +5% defense | `arcaneward` | `chainlightning` | `meteor` |
@@ -107,6 +113,8 @@ Signature damage and control target enemies only.
 
 | Source | 2 pieces | 4-piece cooldown | 6-piece double | 8-piece trigger |
 | --- | --- | --- | --- | --- |
+| `nornroot` | +5% health | `evasion` | `flurry` | `lunge` |
+| `skybridge` | +5% attack | `cycloneblades` | `flurry` | `evasion` |
 | `undervault` | +5% defense | `evasion` | `flurry` | `shadowveil` |
 | `cathedral_cloister` | +5% health | `lunge` | `cycloneblades` | `knifering` |
 | `cathedral_reliquary` | +5% defense | `shadowveil` | `throwingknives` | `evasion` |
@@ -128,6 +136,8 @@ Signature damage and control target enemies only.
 
 | Source | 2 pieces | 4-piece cooldown | 6-piece double | 8-piece trigger |
 | --- | --- | --- | --- | --- |
+| `nornroot` | +5% health | `wardoflight` | `smite` | `prayer` |
+| `skybridge` | +5% attack | `blessing` | `holynova` | `smite` |
 | `undervault` | +5% defense | `wardoflight` | `smite` | `holynova` |
 | `cathedral_cloister` | +5% health | `prayer` | `holynova` | `mend` |
 | `cathedral_reliquary` | +5% defense | `wardoflight` | `mend` | `prayer` |
@@ -149,6 +159,8 @@ Signature damage and control target enemies only.
 
 | Source | 2 pieces | 4-piece cooldown | 6-piece double | 8-piece trigger |
 | --- | --- | --- | --- | --- |
+| `nornroot` | +5% health | `rollaway` | `powershot` | `huntersmark` |
+| `skybridge` | +5% attack | `rapidfire` | `piercingarrow` | `rollaway` |
 | `undervault` | +5% defense | `huntersmark` | `powershot` | `multishot` |
 | `cathedral_cloister` | +5% health | `rollaway` | `multishot` | `rainofarrows` |
 | `cathedral_reliquary` | +5% defense | `huntersmark` | `piercingarrow` | `eaglesight` |
@@ -166,9 +178,9 @@ Signature damage and control target enemies only.
 | `amber_archive` | +5% resource | `rapidfire` | `multishot` | `huntersmark` |
 | `silent_solstice` | +5% defense | `rollaway` | `piercingarrow` | `eaglesight` |
 
-There are 16 sources and ten skills per class. A literal rule forbidding a
-skill from appearing at the same tier in any two sets is impossible for 16
-sets. Uniqueness therefore means that each class has 16 distinct ordered
+There are 17 sources and ten skills per class. A literal rule forbidding a
+skill from appearing at the same tier in any two sets is impossible for 17
+sets. Uniqueness therefore means that each class has 17 distinct ordered
 combinations of cooldown skill, doubled skill and trigger skill. Every
 signature also has a different mechanic. The generator and Rust catalog test
 assert these rules from the matrix.

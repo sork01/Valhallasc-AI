@@ -631,7 +631,7 @@ def main():
         raise SystemExit('The Wyrdwood layout has problems:\n  ' + '\n  '.join(problems))
     raw = PATH.read_text()
     world = json.loads(raw)
-    assert json.dumps(world, indent=2) + '\n' == raw, 'map.txt is not in the canonical 2-space JSON layout'
+    assert json.dumps(world, indent=2, ensure_ascii=False) + '\n' == raw, 'map.txt is not in the canonical 2-space JSON layout'
     names = [z['name'] for z in world['zones']]
     assert names[:5] == ['Emberfall Crags', 'Rimeveil Glacier', 'Gloamfen', 'Skaldholm', 'The Undervault'], f'unexpected zones {names}'
     # a rebuild keeps every later zone (Bifrost Reach) and puts the Wyrdwood back in the same place
@@ -643,7 +643,9 @@ def main():
     skald = world['zones'][3]
     assert any(p['id'] == 'wyrd_gate' for p in skald['portals']), 'run generate_skaldholm.py first: Skaldholm has no East Gate'
     spark_travel.ensure(world)
-    PATH.write_text(json.dumps(world, indent=2) + '\n')
+    import generate_nornroot
+    generate_nornroot.install_parent(world)
+    PATH.write_text(json.dumps(world, indent=2, ensure_ascii=False) + '\n')
     new = add_materials()
     kinds = {}
     for sl in zone['slimes']:

@@ -1,5 +1,13 @@
 {
   "signatures": {
+    "nornroot": {
+      "name": "Second thread",
+      "description": "the caster recovers 4% of maximum health."
+    },
+    "skybridge": {
+      "name": "Prism arc",
+      "description": "the nearest enemy within four tiles takes 16% basic-hit damage."
+    },
     "undervault": {
       "name": "Hollow guard",
       "description": "the caster gains a 4-second shield absorbing 6% of maximum health."
@@ -66,6 +74,22 @@
     }
   },
   "entries": [
+    {
+      "source": "nornroot",
+      "class": "warrior",
+      "stat": "health",
+      "cooldownSkill": "shieldwall",
+      "doubleSkill": "cleave",
+      "triggerSkill": "battlecry"
+    },
+    {
+      "source": "skybridge",
+      "class": "warrior",
+      "stat": "attack",
+      "cooldownSkill": "groundslam",
+      "doubleSkill": "whirlwind",
+      "triggerSkill": "charge"
+    },
     {
       "source": "undervault",
       "class": "warrior",
@@ -193,6 +217,22 @@
       "cooldownSkill": "shieldwall",
       "doubleSkill": "cleave",
       "triggerSkill": "earthshatter"
+    },
+    {
+      "source": "nornroot",
+      "class": "mage",
+      "stat": "health",
+      "cooldownSkill": "blink",
+      "doubleSkill": "twinbolt",
+      "triggerSkill": "fireball"
+    },
+    {
+      "source": "skybridge",
+      "class": "mage",
+      "stat": "attack",
+      "cooldownSkill": "chainlightning",
+      "doubleSkill": "fireball",
+      "triggerSkill": "blink"
     },
     {
       "source": "undervault",
@@ -323,6 +363,22 @@
       "triggerSkill": "arcaneward"
     },
     {
+      "source": "nornroot",
+      "class": "assassin",
+      "stat": "health",
+      "cooldownSkill": "evasion",
+      "doubleSkill": "flurry",
+      "triggerSkill": "lunge"
+    },
+    {
+      "source": "skybridge",
+      "class": "assassin",
+      "stat": "attack",
+      "cooldownSkill": "cycloneblades",
+      "doubleSkill": "flurry",
+      "triggerSkill": "evasion"
+    },
+    {
       "source": "undervault",
       "class": "assassin",
       "stat": "defense",
@@ -451,6 +507,22 @@
       "triggerSkill": "shadowveil"
     },
     {
+      "source": "nornroot",
+      "class": "priest",
+      "stat": "health",
+      "cooldownSkill": "wardoflight",
+      "doubleSkill": "smite",
+      "triggerSkill": "prayer"
+    },
+    {
+      "source": "skybridge",
+      "class": "priest",
+      "stat": "attack",
+      "cooldownSkill": "blessing",
+      "doubleSkill": "holynova",
+      "triggerSkill": "smite"
+    },
+    {
       "source": "undervault",
       "class": "priest",
       "stat": "defense",
@@ -577,6 +649,22 @@
       "cooldownSkill": "wardoflight",
       "doubleSkill": "mend",
       "triggerSkill": "guardianlight"
+    },
+    {
+      "source": "nornroot",
+      "class": "hunter",
+      "stat": "health",
+      "cooldownSkill": "rollaway",
+      "doubleSkill": "powershot",
+      "triggerSkill": "huntersmark"
+    },
+    {
+      "source": "skybridge",
+      "class": "hunter",
+      "stat": "attack",
+      "cooldownSkill": "rapidfire",
+      "doubleSkill": "piercingarrow",
+      "triggerSkill": "rollaway"
     },
     {
       "source": "undervault",

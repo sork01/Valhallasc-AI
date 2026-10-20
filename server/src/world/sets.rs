@@ -102,6 +102,17 @@ impl World {
         let basic = self.set_basic_damage(session);
         let mut applied = true;
         match source.as_str() {
+            "nornroot" => {
+                let c = &mut self.players.get_mut(&session).unwrap().character;
+                c.hp = (c.hp + c.max_hp() * 0.04).min(c.max_hp());
+            }
+            "skybridge" => {
+                if let Some(id) = self.set_target(zone, origin, 4., &[]) {
+                    self.set_hit(session, id, basic * 0.16);
+                } else {
+                    applied = false;
+                }
+            }
             "undervault" => {
                 let p = self.players.get_mut(&session).unwrap();
                 p.set_shield = p.set_shield.max(p.character.max_hp() * 0.06);

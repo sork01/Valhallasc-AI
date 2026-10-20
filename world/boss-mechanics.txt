@@ -1,4 +1,18 @@
 {
+  "barrow_fatebound": {
+    "arena": [40, 6, 72, 30],
+    "mechanics": [
+      {"name": "Spindle Snare", "block": "zone", "hp_min": 0.35, "shape": {"kind": "circle", "r": 9, "inner": 3}, "effect": "kill", "cast": 5, "every": 22},
+      {"name": "Spindle Snare", "block": "zone", "hp_max": 0.35, "shape": {"kind": "circle", "r": 10, "inner": 2.5}, "effect": "kill", "cast": 5, "every": 18, "echo": [3]}
+    ]
+  },
+  "span_archon": {
+    "arena": [40, 6, 72, 30],
+    "mechanics": [
+      {"name": "Shattered Prism", "block": "zone", "hp_min": 0.35, "shape": {"kind": "cone", "half_angle": 35, "length": 16}, "effect": "kill", "cast": 5, "every": 22},
+      {"name": "Shattered Prism", "block": "zone", "hp_max": 0.35, "shape": {"kind": "cone", "half_angle": 42, "length": 18}, "effect": "kill", "cast": 5, "every": 18, "echo": [3]}
+    ]
+  },
   "hollowking": {
     "mechanics": [
       {"name": "Dirge of the Hollow", "block": "break", "hp_min": 0.3, "cast": 8, "every": 30, "bar": 0.0285, "stun": 6, "vulnerable": 0.3},

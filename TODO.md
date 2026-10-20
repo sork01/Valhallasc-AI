@@ -33,6 +33,30 @@ The former `I-VISUAL-IDENTITY` umbrella is split into one deliverable per privat
 
 All eleven later interiors keep their existing collision rooms but now use different structural silhouettes: living bark and seed roots, painted folding screens, ritual water terraces, bronze observatory mechanisms, charged conduits, flower hedges, furnace walls, amber shelves and faceted ice. Their floor materials, inlays, indoor light and backdrops differ as well. `tests/later-dungeon-visual-ui.cjs` captures an entry, court and landmark in each private zone beside five earlier dungeons for comparison.
 
+### Level 25 dungeon — Wyrdwood (zone 6)
+
+- [ ] `I25-MAP` — Build a distinct level-25 private party dungeon with collision, safe arrival and a return route. Place its sealed entrance on Wyrdwood's level-25 quest route, clear of nearby enemies and other portals.
+- [ ] `I25-FOES` — Add ordinary enemies, bosses, authoritative combat rules and editable monster sprites appropriate to level 25.
+- [ ] `I25-QUEST` — Add Wyrdwood entry and dungeon quests, boss objectives and level-appropriate rewards; credit kills and clears to the correct party copy.
+- [ ] `I25-SCENE` — Give the interior and entrance their own visual identity, music and client rendering.
+- [ ] `I25-OPEN` — After the four tasks above, open the Wyrdwood entrance and verify the level gate, party isolation, travel, boss clear and rewards in a private world.
+
+### Level 30 dungeon — Bifrost Reach (zone 7)
+
+- [x] `I30-MAP` — Build a distinct level-30 private party dungeon with collision, safe arrival and a return route. Place its sealed entrance in Bifrost Reach, reachable from the Wyrdwood arrival without crossing higher-level enemies.
+- [x] `I30-FOES` — Add ordinary enemies, bosses, authoritative combat rules and editable monster sprites appropriate to level 30.
+- [x] `I30-QUEST` — Add Bifrost Reach entry and dungeon quests, boss objectives and level-appropriate rewards; credit kills and clears to the correct party copy.
+- [x] `I30-SCENE` — Give the interior and entrance their own visual identity, music and client rendering.
+- [x] `I30-OPEN` — After the four tasks above, open the Bifrost Reach entrance and verify the level gate, party isolation, travel, boss clear and rewards in a private world.
+
+### Level 35 dungeon — Rán's Deep (zone 8)
+
+- [ ] `I35-MAP` — Build a distinct level-35 private party dungeon with collision, safe arrival and a return route. Place its sealed entrance in Rán's Deep, reachable from the Bifrost Reach arrival without crossing higher-level enemies.
+- [ ] `I35-FOES` — Add ordinary enemies, bosses, authoritative combat rules and editable monster sprites appropriate to level 35.
+- [ ] `I35-QUEST` — Add Rán's Deep entry and dungeon quests, boss objectives and level-appropriate rewards; credit kills and clears to the correct party copy.
+- [ ] `I35-SCENE` — Give the interior and entrance their own visual identity, music and client rendering.
+- [ ] `I35-OPEN` — After the four tasks above, open the Rán's Deep entrance and verify the level gate, party isolation, travel, boss clear and rewards in a private world.
+
 ### The Eye Below — level 65, Stormglass Shore (zone 19)
 
 - [x] `I65-MAP` — Build its distinct private party map, collision, safe arrival and return route. Keep the entrance sealed.
