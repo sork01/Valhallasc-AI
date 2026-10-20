@@ -103,8 +103,10 @@ impl World {
         let mut applied = true;
         match source.as_str() {
             "longship" => {
-                let c = &mut self.players.get_mut(&session).unwrap().character;
-                c.hp = (c.hp + c.max_hp() * 0.03).min(c.max_hp());
+                let p = self.players.get_mut(&session).unwrap();
+                let factor = p.heal_factor();
+                let c = &mut p.character;
+                c.hp = (c.hp + c.max_hp() * 0.03 * factor).min(c.max_hp());
                 c.change_resource(c.max_resource() * 0.03);
             }
             "nornroot" => {
