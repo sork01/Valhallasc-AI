@@ -153,7 +153,7 @@
   "solar_heart": {
     "title": "Heart of the Crucible",
     "what": "The Heart splits into Sol and Cinder. A red line of light joins them. It burns hard anyone who stands on it.",
-    "todo": "Stay off the red line. Hit them until one falls.",
+    "todo": "Hit hard for 10 seconds when the bar shows. Too slow, and it grows angry. Stay off the red line. Hit them until one falls.",
     "tip": "When one falls, they become one Heart again. It has a quarter of its health left, but your blows hurt it less.",
     "colors": [
       "red"

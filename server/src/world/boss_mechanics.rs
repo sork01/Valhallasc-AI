@@ -28,6 +28,8 @@ const BRIDGE_WARNING: f64 = 3.;
 const BRIDGE_TICK: f64 = 1.;
 /// How long a held body stays held after each refresh; refreshed every tick.
 const HOLD: f64 = 0.2;
+/// Charges the soft enrage of a static boss puts on every hero (owner, 2026-10-20), short of the limit.
+const ENRAGE_STACKS: u32 = 11;
 /// New spokes turn this long, dashed, before they hurt.
 const SPOKES_ARM: f64 = 3.;
 
@@ -220,6 +222,8 @@ struct StaticLive {
     grounded: BTreeMap<u64, f64>,
     /// A detonation still on the floor: where, how wide, seconds left.
     bursts: Vec<(Point, f64, f64)>,
+    /// The boss's enrage has loaded its stacks onto everyone (once per fight).
+    enraged: bool,
 }
 struct BloomLive {
     slot: usize,
@@ -267,6 +271,10 @@ pub(super) struct Fight {
     downed: BTreeMap<usize, f64>,
     /// The twins have joined into one boss that takes this share of every blow (`Split::merge_defense`).
     merged: Option<f64>,
+    /// The boss's soft enrage has begun (`items::enrage`): its gaze starts at once and its cover is gone.
+    enraged: bool,
+    /// A failed burst phase began the enrage: the boss's clock never falls below this (0 = not forced).
+    enrage_floor: f64,
     banner: Option<(String, f64)>,
     stat: Option<StaticLive>,
 }
@@ -276,6 +284,10 @@ impl Fight {
     #[cfg(test)]
     pub(super) fn frozen_count(&self) -> usize {
         self.frozen.len()
+    }
+    #[cfg(test)]
+    pub(super) fn live_gaze(&self) -> bool {
+        self.live.iter().any(|l| matches!(l, Live::Gaze(_)))
     }
     #[cfg(test)]
     pub(super) fn shield_alive(&self, w: &World) -> Option<usize> {
@@ -539,9 +551,24 @@ impl World {
     /// Rods clear a hero who stands on a ready one; the timers of the charge, the grounding, the rods and the bursts run.
     fn tick_static(&mut self, fight: &mut Fight, m: &Mechanic, t: &bm::Static) {
         let players = self.mech_players(fight.zone);
+        let boss = &self.slimes[fight.boss];
+        let enraged = crate::items::enrage_factor(&boss.kind, boss.fight) > 1.;
         let Some(st) = fight.stat.as_mut() else {
             return;
         };
+        if enraged && !st.enraged {
+            // The enrage loads every hero that is not grounded with `ENRAGE_STACKS`, short of the limit: the next
+            // blow on the boss detonates them unless a rod clears the charge first.
+            st.enraged = true;
+            for (session, _) in &players {
+                if !st.grounded.contains_key(session) {
+                    let now = st.charges.get(session).copied().unwrap_or(0) + ENRAGE_STACKS;
+                    st.charges
+                        .insert(*session, now.min(t.limit.saturating_sub(1)));
+                }
+            }
+            fight.banner = Some((m.name.clone(), 4.));
+        }
         for r in &mut st.rods {
             r.dark_left = (r.dark_left - TICK).max(0.);
         }
@@ -677,6 +704,8 @@ impl World {
             bridge_tick: 0.,
             downed: BTreeMap::new(),
             merged: None,
+            enraged: false,
+            enrage_floor: 0.,
             banner: None,
             stat: def.mechanics.iter().find_map(|m| match &m.block {
                 Block::Static(t) => Some(StaticLive {
@@ -694,6 +723,7 @@ impl World {
                     charges: BTreeMap::new(),
                     grounded: BTreeMap::new(),
                     bursts: vec![],
+                    enraged: false,
                 }),
                 _ => None,
             }),
@@ -754,6 +784,10 @@ impl World {
             let s = &self.slimes[id];
             if s.max_hp > 0. { s.hp / s.max_hp } else { 0. }
         };
+        if fight.enrage_floor > 0. {
+            let s = &mut self.slimes[id];
+            s.fight = s.fight.max(fight.enrage_floor);
+        }
         // Stun: the boss neither moves nor strikes, and takes extra damage.
         if fight.stun_left > 0. {
             fight.stun_left -= TICK;
@@ -803,6 +837,10 @@ impl World {
                 if active {
                     self.tick_static(fight, m, t);
                 }
+                return;
+            }
+            Block::Break(b) if b.at.is_some() => {
+                self.tick_burst(fight, i, m, b);
                 return;
             }
             Block::Shield(s) => {
@@ -1563,13 +1601,43 @@ impl World {
         }
     }
 
+    /// A burst phase (`Break::at`): once, when the boss's health, with its divided partner's, first falls to `at`, the
+    /// party has `cast` seconds to deal `bar` of the boss's maximum health to either body.
+    fn tick_burst(&mut self, fight: &mut Fight, i: usize, m: &Mechanic, b: &bm::Break) {
+        let Some(at) = b.at else {
+            return;
+        };
+        if fight.fired[i] != 0 {
+            return;
+        }
+        let s = &self.slimes[fight.boss];
+        let partner = fight.partner.map_or(0., |p| self.slimes[p].hp.max(0.));
+        if s.max_hp <= 0. || (s.hp + partner) / s.max_hp > at {
+            return;
+        }
+        fight.fired[i] = 1;
+        let needed = b.bar * s.max_hp;
+        let point = s.point();
+        fight.live.push(Live::Break(BreakLive {
+            mech: i,
+            left: b.cast,
+            total: b.cast,
+            needed,
+            dealt: 0.,
+        }));
+        self.mech_event(fight.zone, "cast", &m.name, point, b.cast);
+        fight.banner = Some((m.name.clone(), b.cast));
+    }
+
     fn tick_break(&mut self, fight: &mut Fight, m: &Mechanic, bl: &mut BreakLive) -> bool {
         let Block::Break(b) = &m.block else {
             return false;
         };
         let id = fight.boss;
-        // The channel holds the boss where it is.
-        self.hold_still(id);
+        // The channel holds the boss where it is (a burst phase does not: the boss fights on).
+        if !b.enrage {
+            self.hold_still(id);
+        }
         if bl.dealt >= bl.needed {
             #[cfg(test)]
             self.boss.spare.push(bl.left);
@@ -1582,6 +1650,16 @@ impl World {
         bl.left -= TICK;
         if bl.left > 0. {
             return true;
+        }
+        if b.enrage {
+            // Too slow: the enrage begins now and the boss's clock cannot fall back below its start.
+            let kind = self.slimes[id].kind.clone();
+            if let Some((start, _)) = crate::items::enrage(&kind) {
+                fight.enrage_floor = start;
+            }
+            let at = self.slimes[id].point();
+            self.mech_event(fight.zone, "land", &m.name, at, 0.);
+            return false;
         }
         // Too slow: the wail takes everyone in the fight.
         self.land(fight, &m.name, Effect::Kill, 0., &|_| true);
@@ -1695,6 +1773,17 @@ impl World {
         // Once the boss enrages the pillars crumble for good: a gaze nobody can hide from ends the fight.
         let boss = &self.slimes[fight.boss];
         let enraged = crate::items::enrage_factor(&boss.kind, boss.fight) > 1.;
+        if enraged && !fight.enraged {
+            // With no cover left there is no safe spot, so the next gaze does not wait for its turn: it begins on the
+            // next tick (a timer already at zero fires, a gaze already being cast runs on).
+            fight.enraged = true;
+            let def = &self.boss.table[&self.slimes[fight.boss].kind];
+            for (i, m) in def.mechanics.iter().enumerate() {
+                if matches!(m.block, Block::Gaze(_)) {
+                    fight.timer[i] = 0.;
+                }
+            }
+        }
         for c in &mut fight.cover {
             if enraged {
                 c.broken = true;

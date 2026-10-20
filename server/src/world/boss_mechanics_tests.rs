@@ -160,6 +160,13 @@ impl Rig {
     fn hit_boss(&mut self, session: u64, damage: f64) -> f64 {
         self.w.hit_slime(self.boss, session, damage, false)
     }
+    fn fight_mut(&mut self) -> &mut Fight {
+        self.w
+            .boss
+            .fights
+            .get_mut(&self.boss)
+            .expect("a fight is running")
+    }
     fn fight(&self) -> &Fight {
         self.w
             .boss
@@ -1528,6 +1535,25 @@ fn an_enraged_boss_loses_its_cover_for_good() {
 }
 
 #[test]
+fn an_enraged_boss_looks_at_once_with_no_cover_to_hide_behind() {
+    let mut r = rig(CRUMBLE, 1);
+    r.run(0.1);
+    assert!(
+        !r.w.boss.fights.values().any(|f| f.live_gaze()),
+        "no gaze yet: the first one is 30 s away"
+    );
+    let start = crate::items::enrage("hollowking")
+        .expect("an enrage entry")
+        .0;
+    r.w.slimes[r.boss].fight = start + 1.;
+    r.run(0.3);
+    assert!(
+        r.w.boss.fights.values().all(|f| f.live_gaze()),
+        "the gaze begins as soon as the boss enrages"
+    );
+}
+
+#[test]
 fn against_twins_that_join_a_fighter_hits_the_nearer_body_not_the_one_with_more_health() {
     let mut r = rig(MERGE, 2);
     let partner = r.sleepers("cinder", &[(116., 30.)])[0];
@@ -2685,6 +2711,79 @@ fn twin_suns_divide_the_heart_at_sixty_per_cent_and_sunburst_follows() {
     assert!(words.contains("a quarter of its health"), "{words}");
 }
 
+const SURGE: &str = r#"{"mechanics":[{"name":"Surge","block":"break","at":0.7,"cast":10,"every":600,"bar":0.1,"stun":0,"vulnerable":0,"enrage":true}]}"#;
+
+fn surging(r: &Rig) -> bool {
+    r.w.boss
+        .fights
+        .values()
+        .any(|f| f.live.iter().any(|l| matches!(l, Live::Break(_))))
+}
+
+#[test]
+fn a_burst_phase_begins_once_at_its_share_and_a_party_too_slow_starts_the_enrage() {
+    let mut r = rig(SURGE, 1);
+    r.run(2.);
+    assert!(!surging(&r), "not before the boss is down to 70%");
+    r.set_boss_share(0.69);
+    r.run(0.3);
+    assert!(surging(&r), "the window opens at 70%");
+    assert_eq!(r.fight().enrage_floor, 0., "and nothing is enraged yet");
+    r.run(9.);
+    assert!(surging(&r), "ten seconds are ten seconds");
+    r.run(1.5);
+    assert!(!surging(&r));
+    let (start, _) = crate::items::enrage("hollowking").expect("an enrage entry");
+    assert_eq!(r.fight().enrage_floor, start, "too slow: the enrage begins");
+    assert!(r.w.slimes[r.boss].fight >= start);
+    assert!(r.alive(1), "and nobody is killed for it");
+    r.run(40.);
+    assert!(r.w.slimes[r.boss].fight >= start, "it does not fall back");
+    r.set_boss_share(0.69);
+    r.run(1.);
+    assert!(!surging(&r), "the burst comes once");
+}
+
+#[test]
+fn a_party_that_deals_the_bar_in_time_keeps_the_enrage_away() {
+    let mut r = rig(SURGE, 1);
+    r.set_boss_share(0.69);
+    r.run(0.3);
+    assert!(surging(&r));
+    let blow = r.max_hp() * 0.11;
+    r.w.hit_slime(r.boss, 1, blow, false);
+    r.run(0.5);
+    assert!(!surging(&r), "the window closes with the bar dealt");
+    r.run(12.);
+    assert_eq!(r.fight().enrage_floor, 0., "no enrage");
+}
+
+#[test]
+fn solars_surge_comes_before_the_split_and_the_sign_says_ten_seconds() {
+    let r = rig(&shipped("solar_heart"), 1);
+    let b = blocks(&r.w, "solar_heart");
+    let Block::Break(surge) = &b[2].1 else {
+        panic!("the surge is the third block")
+    };
+    let Block::Split(split) = &b[0].1 else {
+        panic!("the split is the first block")
+    };
+    assert!(surge.enrage);
+    let at = surge.at.expect("a share");
+    assert!(
+        (at - surge.bar - split.hp).abs() < 1e-9,
+        "the bar takes the boss from the surge to exactly the split: {at} - {} vs {}",
+        surge.bar,
+        split.hp
+    );
+    assert!(at > split.hp, "the burst comes before the split");
+    let words = sign_words("solar_heart");
+    assert!(
+        words.contains(&format!("{} seconds", surge.cast)),
+        "{words}"
+    );
+}
+
 #[test]
 fn amber_stasis_sends_two_orbs_then_three_and_holds_a_friend_ten_then_eight_seconds() {
     let mut r = rig(&shipped("amber_memory"), 3);
@@ -2812,6 +2911,32 @@ fn every_blow_on_the_boss_adds_a_charge_and_the_limit_detonates_the_bearer_and_w
             .any(|t| t["tele"] == "red"),
         "the burst shows for a moment"
     );
+}
+
+#[test]
+fn the_enrage_loads_every_ungrounded_hero_up_to_the_limit_once() {
+    let mut r = rig(STATIC, 2);
+    r.run(0.2);
+    let boss = r.w.slimes[r.boss].point();
+    r.put(1, boss.x, boss.y + 10.);
+    r.put(2, boss.x + 12., boss.y + 10.);
+    r.fight_mut().stat.as_mut().unwrap().grounded.insert(2, 30.);
+    assert_eq!(charge_of(&r, 1), 0);
+    let start = crate::items::enrage("hollowking")
+        .expect("an enrage entry")
+        .0;
+    r.w.slimes[r.boss].fight = start + 1.;
+    r.run(0.3);
+    assert_eq!(
+        charge_of(&r, 1),
+        3,
+        "11 stacks stop one short of the limit of 4"
+    );
+    assert_eq!(charge_of(&r, 2), 0, "a grounded hero is spared");
+    // a charge cleared afterwards stays cleared: the stacks come once
+    r.fight_mut().stat.as_mut().unwrap().charges.clear();
+    r.run(1.);
+    assert_eq!(charge_of(&r, 1), 0);
 }
 
 #[test]

@@ -400,6 +400,13 @@ pub struct Break {
     pub stun: f64,
     /// Extra damage the boss takes while stunned (0.3 is +30%).
     pub vulnerable: f64,
+    /// A burst phase instead of a repeating break: it begins once, when the boss's health (with its divided partner's)
+    /// first falls to this share, and `cast` is the time to deal `bar`.
+    #[serde(default)]
+    pub at: Option<f64>,
+    /// Too slow does not kill: the soft enrage (`items::enrage`) begins and stays on.
+    #[serde(default)]
+    pub enrage: bool,
 }
 
 /// Seeking orbs freeze whoever they touch until allies break the cocoon, or until `hold` seconds are up.
@@ -1310,6 +1317,18 @@ pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
                     }
                 }
             },
+            Block::Break(b) if b.enrage => {
+                if !b.at.is_some_and(|at| at > 0. && at < 1.)
+                    || !positive(b.cast)
+                    || !(b.bar > 0. && b.bar < 1.)
+                    || !(b.stun >= 0. && b.vulnerable >= 0. && b.vulnerable <= 2.)
+                {
+                    return bad(
+                        m,
+                        "a burst phase needs a health share in (0, 1), a window, a bar share in (0, 1) and a non-negative stun",
+                    );
+                }
+            }
             Block::Break(b) => {
                 if !cast_is_long_enough(Effect::Kill, b.cast)
                     || !positive(b.every)

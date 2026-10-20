@@ -271,6 +271,12 @@ The reverse of the king's ring: here you **must stand inside** the circle.
 
 **Built 2026-10-18 (`BOSSMECH-SOLSTICE-HEART`).** *The Longest Night*: a 5 s kill-outside warning every 45 s (30 s below 30%), four braziers at (42,14), (54,14), (42,21), (54,21), radius 2.5, held for 3 s, burning 30 s (20 s below 30%), one snuffed every 12 s. The Heart's health went from 8.1M to 11.2M with an enrage start of 113 s (the party now holds braziers instead of racing).
 
+**Changed 2026-10-20 (`BOSSMECH-RECAL-99`, owner).** The soft enrage only multiplies a boss's own attacks, and its clock runs only while a target is within 14 tiles, so a fight paced by a mechanic ignores it. Three bosses got an enrage rule of their own:
+- *Unblinking Eye*: at its enrage the gaze starts at once (`Fight.enraged`, `tick_cover`), on top of the cover that already crumbles for good; start 120 s.
+- *Static* (Thunder Heart): the enrage loads every hero that is not grounded with 11 charges, capped one under the limit (`ENRAGE_STACKS`, once per fight), so the next blow on the boss detonates them unless a rod clears the charge; start 86 s (95 s changed nothing: the clock lags the displayed time).
+- *Solar Surge* (Solar Heart): the `break` block takes `at` (a burst phase that begins once when the boss's health, with its partner's, falls to that share) and `enrage` (too slow starts the enrage and holds the boss's clock at its start, `Fight.enrage_floor`; no one is killed and the boss is not held still). Solar Heart: at 80% the party has 10 s to deal 20% of the maximum health, which ends exactly on the 60% split. Hired five 4 of 6, four mercenaries alone 0 of 12. The cone's damage is not scaled by the enrage (tried and removed).
+Wiki `10_projects:valhallasc_bossmech_recal_99_20261020`.
+
 ## Where the ideas come from
 
 Searched 2026-10-17. Each is a well known fight whose mechanic was adapted, not copied; none of the numbers come from them.

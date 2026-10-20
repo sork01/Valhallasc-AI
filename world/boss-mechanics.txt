@@ -79,7 +79,8 @@
   "solar_heart": {
     "mechanics": [
       {"name": "Twin Suns", "block": "split", "hp": 0.6, "tag": "cinder", "revive_after": 10, "survivor_bonus": 0.5, "bridge": 0.8, "merge_hp": 0.25, "merge_defense": 0.35, "bridge_hit": 0.6},
-      {"name": "Sunburst", "block": "zone", "hp_max": 0.6, "shape": {"kind": "cone", "half_angle": 25, "length": 16}, "effect": "heavy", "heavy": 0.6, "cast": 3, "every": 14}
+      {"name": "Sunburst", "block": "zone", "hp_max": 0.6, "shape": {"kind": "cone", "half_angle": 25, "length": 16}, "effect": "heavy", "heavy": 0.6, "cast": 3, "every": 14},
+      {"name": "Solar Surge", "block": "break", "at": 0.8, "cast": 10, "every": 600, "bar": 0.2, "stun": 0, "vulnerable": 0, "enrage": true}
     ]
   },
   "amber_memory": {
