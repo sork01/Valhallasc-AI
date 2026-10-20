@@ -425,9 +425,10 @@ fn every_deep_monster_has_its_own_stats_attacks_materials_and_rewards() {
         ("moray", 27000., 540., 720, "moray_tooth"),
         ("siren", 23500., 520., 770, "siren_pearl"),
         ("shellback", 40000., 700., 830, "shellback_plate"),
-        ("kraken", 280000., 4400., 4500, "kraken_beak"),
-        ("hvitserk", 187500., 2600., 2500, "captains_signet"),
-        ("ghostmaw", 190000., 3000., 3200, "ghostmaw_tooth"),
+        // Kraken, Hvitserk and Ghostmaw carry their health multiplier from `world/elite-power.txt`.
+        ("kraken", 386400., 4400., 4500, "kraken_beak"),
+        ("hvitserk", 231000., 2600., 2500, "captains_signet"),
+        ("ghostmaw", 383800., 3000., 3200, "ghostmaw_tooth"),
     ] {
         let spawn = SlimeSpawn {
             ambush: None,

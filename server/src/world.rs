@@ -1036,6 +1036,17 @@ impl Slime {
     /// fly at once (spread across `spread` radians). The shot is released when the windup ends, so a hero who walks
     /// out of the line in that moment is missed.
     fn ranged(kind: &str) -> Option<Ranged> {
+        if let Some((range, speed, color, size, shots, spread, _)) = crate::items::boss_ranged(kind)
+        {
+            return Some(Ranged {
+                range: *range,
+                speed: *speed,
+                color: color.as_str(),
+                size: *size,
+                shots: *shots,
+                spread: *spread,
+            });
+        }
         if let Some(e) = crate::cathedral::enemy(kind) {
             return e
                 .ranged
@@ -1078,6 +1089,9 @@ impl Slime {
     }
     /// A ranged kind that also fights toe to toe: it shoots only from farther than this.
     fn melee_inside(kind: &str) -> f64 {
+        if let Some((.., melee)) = crate::items::boss_ranged(kind) {
+            return *melee;
+        }
         if let Some(e) = crate::cathedral::enemy(kind) {
             return e.melee;
         }

@@ -284,6 +284,8 @@ fn a_dungeon_boss_kills_a_lone_player() {
                     for seed in 1..=seeds() {
                         let mut c = case(&d, class, rarity, above);
                         c.target = Some(*spawn);
+                        // The lone player must die, so no fight is cut short as hopeless.
+                        c.run_to_end = true;
                         let (out, _) = run_once(&c, seed);
                         done += 1;
                         eprintln!(

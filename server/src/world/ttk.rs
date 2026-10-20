@@ -87,6 +87,10 @@ pub struct Case {
     pub enemy_level: Option<u32>,
     /// Seconds the fight may last before it counts as not won (default: the rotation's cap).
     pub cap: Option<f64>,
+    /// Fight to the cap or the character's death. Off, a fight whose progress projects past `HOPELESS_FACTOR` caps is
+    /// stopped as soon as it is clear it cannot be won, which reports a lone player as alive who the boss's enrage
+    /// would kill a little later (`dungeon_solo_tests`).
+    pub run_to_end: bool,
 }
 impl Case {
     pub fn new(class: Class, level: u32) -> Self {
@@ -102,6 +106,7 @@ impl Case {
             target: None,
             enemy_level: None,
             cap: None,
+            run_to_end: false,
         }
     }
 }
@@ -632,7 +637,10 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
         out.lowest_hp_fraction = out.lowest_hp_fraction.min((after / max_hp).max(0.));
         let elapsed = w.time - start_time;
         // A boss with a mechanic can end the fight at any moment (its wail), so the projection says nothing yet.
-        if elapsed >= PROJECT_AFTER && !w.boss.table.contains_key(&w.slimes[id].kind) {
+        if elapsed >= PROJECT_AFTER
+            && !case.run_to_end
+            && !w.boss.table.contains_key(&w.slimes[id].kind)
+        {
             let done = 1. - w.slimes[id].hp / w.slimes[id].max_hp;
             if done <= 0. || elapsed / done > cap * HOPELESS_FACTOR {
                 break;
@@ -1526,6 +1534,7 @@ fn ttk_report() {
                                 target: None,
                                 enemy_level: None,
                                 cap: None,
+                                run_to_end: false,
                             };
                             if case.foe == Foe::Elite
                                 && pick_enemy(&world(), level, Foe::Elite).is_none()

@@ -91,3 +91,14 @@ What the permanent death exposed (neither was visible while the fallen came back
 | Axis | hired 2 of 4, four dead in the first tick | new spokes begin at a random angle and were lethal at once | new spokes are dashed and harmless for 3 s (`SPOKES_ARM`): hired 4 of 4 |
 
 Fall counts of the hired party, per boss (four seeds): Hollowking 0, Choirmother 0-3, Coral Regent 0, Hierophant 0-3, Moonwell Echo 0, Eye Below 0-4, Elder Heart 0-4, Pavilion 0-4, Rain Crown 0, Worldseed 0-4, Axis 0-3, Thunder Heart 0-9, Bloom Heart 0-3, Solar Heart 1-9, Amber Memory 0, Solstice Heart 0-4.
+
+## Recalibration after the class balance (2026-10-20)
+
+The class balance (`DPS-BALANCE-99`, `DPS-BALANCE-40-95`) raised mage, priest and hunter damage about 50% from level 40, so about 30 non-final bosses fell to a lone character in purple gear. Fix, in order:
+
+- **Health** (`world/elite-power.txt`, x1.33 to x3.86) brings each non-final boss to 69-75 s for the hired five (`BOSS-LENGTH-MID`). Time rises faster than health (`chainmarshal` x4.83 gave 14 s to 92 s), so it took two passes with factor x (70 / measured)^(1/1.2). `choir` and `colossus` are not scaled (documented exceptions); `gatewarden` is scaled (x1.39) but gets no ranged attack.
+- **Enrage starts** (`world/enrage.txt`): `ceil(1.06 x slowest hired win) + 2`, 76-80 s; `pavilion_weaver` is 62 s, because a lone purple priest kills it in 75 s like the hired five (starts of 64 s or more let her live).
+- **Ranged attacks** (`world/boss-ranged.txt`): a ranged hero used to stay outside the enrage range (14 tiles) and never be reached. Every non-final boss now shoots from range; fans have an odd number of shots, because with an even number none flies straight and a hero standing still was never hit (the hunter took 0 damage in 180 s from the four-shot bosses).
+- **Harness**: `Case.run_to_end` stops the "hopeless" early exit in `a_dungeon_boss_kills_a_lone_player`; it used to report a player as alive whom the enrage would have killed a little later.
+- **Packs**: priest cleared the Coral Reliquary pack (tidetemplar, tidecantor, reliccrab, now damage x20) and the Rain Crown pack (droplet, guard, oracle, now x30); the party of five still wins them.
+- Result: 700 lone boss fights (35 bosses x 5 classes x green/purple x 2 seeds), 0 survivors; the hired five win 4 of 4 on all 37 non-final bosses; the old dungeons' packs all kill the lone player. Open: the new Nornroot Barrow and Shattered Span packs.

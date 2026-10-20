@@ -1400,13 +1400,15 @@ pub fn elite_power(kind: &str) -> (f64, f64) {
         .map_or((1., 1.), |p| (p[0], p[1]))
 }
 
-/// Soft enrage of a boss from `world/enrage.txt`: `kind -> [start, ramp]`, both in seconds. After `start` seconds of
-/// fighting, the boss's damage grows by 100% every `ramp` seconds (`1 + (fight - start) / ramp`), which a party that
-/// burns the boss down never sees and a lone player who needs minutes cannot outlast (`DUNGEON-BOSS-LETHAL`).
-pub fn enrage(kind: &str) -> Option<(f64, f64)> {
+/// Soft enrage of a boss from `world/enrage.txt`: `kind -> [start, ramp]` (or `[start, ramp, cap]`), in seconds. After
+/// `start` seconds of fighting, the boss's damage grows by 100% every `ramp` seconds (`1 + (fight - start) / ramp`),
+/// which a party that burns the boss down never sees and a lone player who needs minutes cannot outlast
+/// (`DUNGEON-BOSS-LETHAL`). The optional `cap` is the most the factor can reach: the open-world elites use `3.0`, so
+/// their damage triples once the enrage begins and stays there.
+fn enrage_entry(kind: &str) -> Option<&'static Vec<f64>> {
     use std::collections::BTreeMap;
     use std::sync::OnceLock;
-    static TABLE: OnceLock<BTreeMap<String, [f64; 2]>> = OnceLock::new();
+    static TABLE: OnceLock<BTreeMap<String, Vec<f64>>> = OnceLock::new();
     TABLE
         .get_or_init(|| {
             // Test builds may read another table (`ENRAGE_FILE=path`), so calibrating needs no rebuild.
@@ -1419,11 +1421,39 @@ pub fn enrage(kind: &str) -> Option<(f64, f64)> {
                 .expect("valid enrage table")
         })
         .get(kind)
-        .map(|p| (p[0], p[1].max(0.1)))
+}
+pub fn enrage(kind: &str) -> Option<(f64, f64)> {
+    enrage_entry(kind).map(|p| (p[0], p[1].max(0.1)))
 }
 /// The damage multiplier of `kind` after `fight` seconds of combat: 1 until its enrage starts.
 pub fn enrage_factor(kind: &str, fight: f64) -> f64 {
-    enrage(kind).map_or(1., |(start, ramp)| 1. + ((fight - start) / ramp).max(0.))
+    enrage_entry(kind).map_or(1., |p| {
+        let factor = 1. + ((fight - p[0]) / p[1].max(0.1)).max(0.);
+        p.get(2).map_or(factor, |cap| factor.min(*cap))
+    })
+}
+
+/// A boss's ranged attack from `world/boss-ranged.txt`: `kind -> [range, speed, colour, size, shots, spread, melee]`
+/// (the fields of `Slime::ranged` and `Slime::melee_inside`). It takes precedence over the encounter catalog, so a boss
+/// that a ranged hero could kite outside its reach shoots, and the fan always has an odd number of shots: with an even
+/// number none flies straight and a hero standing still in the gap is never hit.
+pub fn boss_ranged(kind: &str) -> Option<&'static (f64, f64, String, f64, u32, f64, f64)> {
+    use std::collections::BTreeMap;
+    use std::sync::OnceLock;
+    static TABLE: OnceLock<BTreeMap<String, (f64, f64, String, f64, u32, f64, f64)>> =
+        OnceLock::new();
+    TABLE
+        .get_or_init(|| {
+            // Test builds may read another table (`BOSS_RANGED_FILE=path`), so calibrating needs no rebuild.
+            #[cfg(test)]
+            if let Ok(path) = std::env::var("BOSS_RANGED_FILE") {
+                let text = std::fs::read_to_string(&path).expect("readable BOSS_RANGED_FILE");
+                return serde_json::from_str(&text).expect("valid BOSS_RANGED_FILE table");
+            }
+            serde_json::from_str(include_str!("../../world/boss-ranged.txt"))
+                .expect("valid boss ranged table")
+        })
+        .get(kind)
 }
 
 #[cfg(test)]
@@ -1450,12 +1480,51 @@ mod tests {
         assert!((enrage_factor("bellkeeper", start + ramp * 3.) - 4.).abs() < 1e-9);
     }
     #[test]
+    fn every_boss_ranged_attack_is_a_boss_with_an_odd_fan() {
+        let table: std::collections::BTreeMap<String, (f64, f64, String, f64, u32, f64, f64)> =
+            serde_json::from_str(include_str!("../../world/boss-ranged.txt")).unwrap();
+        assert!(table.len() >= 20, "{} bosses", table.len());
+        for (kind, (range, speed, _, size, shots, spread, melee)) in table {
+            assert!(is_boss(&kind), "{kind} is not a boss");
+            assert!(
+                shots % 2 == 1,
+                "{kind}: an even fan leaves a gap at the target"
+            );
+            assert!(
+                range > melee && speed > 0. && size > 0. && spread > 0.,
+                "{kind}"
+            );
+        }
+    }
+    #[test]
+    fn an_elite_enrage_triples_its_damage_at_180_s_and_stops_there() {
+        assert_eq!(enrage_factor("kraken", 179.), 1.);
+        assert_eq!(enrage_factor("kraken", 180.), 1.);
+        assert!(enrage_factor("kraken", 180.1) > 1. && enrage_factor("kraken", 180.1) < 3.);
+        assert_eq!(enrage_factor("kraken", 181.), 3.);
+        assert_eq!(enrage_factor("kraken", 900.), 3.);
+        // A boss has no cap: its damage keeps growing.
+        assert!(enrage_factor("bellkeeper", 500.) > 3.);
+    }
+    #[test]
+    fn every_open_world_elite_enrages_at_180_s_and_the_instance_bosses_keep_their_own() {
+        for kind in ["big", "cinderlord", "gloomroot", "kraken", "longnightwyrm"] {
+            assert_eq!(enrage(kind), Some((180., 0.2)), "{kind}");
+        }
+        assert_ne!(enrage("moonwell_echo").map(|e| e.0), Some(180.));
+    }
+    #[test]
     fn every_enrage_start_is_after_a_plausible_party_kill_and_before_the_fight_limit() {
-        let table: std::collections::BTreeMap<String, [f64; 2]> =
+        let table: std::collections::BTreeMap<String, Vec<f64>> =
             serde_json::from_str(include_str!("../../world/enrage.txt")).unwrap();
         assert!(table.len() >= 40, "{} bosses", table.len());
-        for (kind, [start, ramp]) in table {
-            assert!(is_boss(&kind), "{kind} is not a boss");
+        for (kind, entry) in table {
+            let (start, ramp) = (entry[0], entry[1]);
+            // Bosses, plus the open-world elites (180 s, `world/enrage.txt`).
+            assert!(
+                is_boss(&kind) || is_elite(&kind),
+                "{kind} is not a boss or an elite"
+            );
             assert!(
                 (30. ..=180.).contains(&start) && (0.1..=10.).contains(&ramp),
                 "{kind}"
