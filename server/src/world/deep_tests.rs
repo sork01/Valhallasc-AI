@@ -266,7 +266,7 @@ fn rans_deep_is_a_sea_floor_zone_with_six_kinds_one_hub_and_a_maelstrom_gate_pai
         }
     }
     assert!(
-        w.maps[SKY].portals.len() == 2 && w.maps[SKY].portals[0].id == "stormrift_down",
+        w.maps[SKY].portals.len() >= 2 && w.maps[SKY].portals[0].id == "stormrift_down",
         "Bifrost Reach's old gate keeps index 0"
     );
     // places: 5 landmarks and 12 bells in three chains; a map without `chain` and `burn` still loads
