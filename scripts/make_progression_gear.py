@@ -25,6 +25,7 @@ import dungeon_gear_shapes
 import instance_gear_shapes
 import late_instance_gear_shapes
 import keel_gear_shapes
+import null_gear_shapes
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'client/assets'
@@ -45,7 +46,8 @@ BODY_CACHE = {}
 
 def activate(task):
     global PALETTE_HEX, PALETTE
-    PALETTE_HEX = (keel_gear_shapes.PALETTE if task['group'] == 'keel' else
+    PALETTE_HEX = (null_gear_shapes.PALETTE if task['group'] == 'null' else
+                   keel_gear_shapes.PALETTE if task['group'] == 'keel' else
                    late_instance_gear_shapes.palette(task['group'])[0] if task['group'] in late_instance_gear_shapes.STYLES else
                    instance_gear_shapes.PALETTE if task['group'] in ('eye', 'elder') else
                    dungeon_gear_shapes.PALETTE if task['group'] in ('vault', 'moonwell') else shape.PALETTE)
@@ -77,6 +79,7 @@ def revision(task):
     if task['group'] not in ('vault', 'moonwell', 'eye', 'elder', *late_instance_gear_shapes.STYLES) and task['className'] == 'mage' and task['kind'] == 'headgear' and shape.DESIGNS[task['group']]['index'] >= 9:
         source += inspect.getsource(gear_shapes_high.render_mage_head)
     if task['group'] == 'keel': source += Path(keel_gear_shapes.__file__).read_text()
+    if task['group'] == 'null': source += Path(null_gear_shapes.__file__).read_text()
     return hashlib.sha256(source.encode()).hexdigest()
 
 
@@ -90,7 +93,8 @@ def task_for(job):
 
 
 def frames(task, cls, gender):
-    directory = RAW / task['id'] / f'{cls}-{gender}'
+    raw_root = ROOT / 'scripts/blackhour_raw' if task['group'] == 'null' else RAW
+    directory = raw_root / task['id'] / f'{cls}-{gender}'
     directory.mkdir(parents=True, exist_ok=True)
     module = importlib.import_module(shape.MODULES[cls])
     result = {}
@@ -103,7 +107,9 @@ def frames(task, cls, gender):
                     with np.load(file) as data:
                         if str(data['revision']) == fingerprint:
                             result[key] = (data['index'], data['depth']); continue
-                if task['group'] == 'keel':
+                if task['group'] == 'null':
+                    idx, depth = null_gear_shapes.render(cls, 'null', task['kind'], gender, *key)
+                elif task['group'] == 'keel':
                     idx, depth = keel_gear_shapes.render(cls, 'keel', task['kind'], gender, *key)
                 elif task['group'] in ('vault', 'moonwell'):
                     idx, depth = dungeon_gear_shapes.render(cls, task['group'], task['kind'], gender, *key)
@@ -254,7 +260,7 @@ def build(task):
 
 def ensure_female_sprites(task, manifest, record):
     """Keep both-body source cels editable in PixelFlow, including shared pieces."""
-    if task['group'] not in ('L95', 'vault', 'moonwell', 'eye', 'elder', 'keel', *late_instance_gear_shapes.STYLES):
+    if task['group'] not in ('L95', 'vault', 'moonwell', 'eye', 'elder', 'keel', 'null', *late_instance_gear_shapes.STYLES):
         return
     classes = [task['className']] if task['className'] else list(CLASSES)
     for cls in classes:

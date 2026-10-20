@@ -1,5 +1,9 @@
 {
   "signatures": {
+    "blackhour": {
+      "name": "Cold restart",
+      "description": "the caster gains a 4-second shield absorbing 5% of maximum health and recovers 2% of maximum resource."
+    },
     "longship": {
       "name": "Bilge pump",
       "description": "the caster recovers 3% of maximum health and 3% of maximum resource."
@@ -78,6 +82,14 @@
     }
   },
   "entries": [
+    {
+      "source": "blackhour",
+      "class": "warrior",
+      "stat": "attack",
+      "cooldownSkill": "titanswrath",
+      "doubleSkill": "earthshatter",
+      "triggerSkill": "whirlwind"
+    },
     {
       "source": "longship",
       "class": "warrior",
@@ -229,6 +241,14 @@
       "cooldownSkill": "shieldwall",
       "doubleSkill": "cleave",
       "triggerSkill": "earthshatter"
+    },
+    {
+      "source": "blackhour",
+      "class": "mage",
+      "stat": "attack",
+      "cooldownSkill": "meteor",
+      "doubleSkill": "barrage",
+      "triggerSkill": "starfall"
     },
     {
       "source": "longship",
@@ -383,6 +403,14 @@
       "triggerSkill": "arcaneward"
     },
     {
+      "source": "blackhour",
+      "class": "assassin",
+      "stat": "attack",
+      "cooldownSkill": "thousandcuts",
+      "doubleSkill": "cycloneblades",
+      "triggerSkill": "assassinate"
+    },
+    {
       "source": "longship",
       "class": "assassin",
       "stat": "defense",
@@ -535,6 +563,14 @@
       "triggerSkill": "shadowveil"
     },
     {
+      "source": "blackhour",
+      "class": "priest",
+      "stat": "health",
+      "cooldownSkill": "heavenswrath",
+      "doubleSkill": "searinglight",
+      "triggerSkill": "divinehymn"
+    },
+    {
       "source": "longship",
       "class": "priest",
       "stat": "defense",
@@ -685,6 +721,14 @@
       "cooldownSkill": "wardoflight",
       "doubleSkill": "mend",
       "triggerSkill": "guardianlight"
+    },
+    {
+      "source": "blackhour",
+      "class": "hunter",
+      "stat": "attack",
+      "cooldownSkill": "arrowstorm",
+      "doubleSkill": "multishot",
+      "triggerSkill": "piercingarrow"
     },
     {
       "source": "longship",

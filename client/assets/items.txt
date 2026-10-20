@@ -1,7 +1,7 @@
 {
  "size": 48,
  "cols": 10,
- "rows": 100,
+ "rows": 103,
  "at": {
   "warrior_headgear_crimson": [
    0,
@@ -7871,6 +7871,118 @@
    2,
    99
   ],
+  "null_warrior_armor": [
+   3,
+   99
+  ],
+  "null_warrior_headgear": [
+   4,
+   99
+  ],
+  "null_warrior_shoulders": [
+   5,
+   99
+  ],
+  "null_warrior_gloves": [
+   6,
+   99
+  ],
+  "null_warrior_weapon": [
+   7,
+   99
+  ],
+  "null_mage_armor": [
+   8,
+   99
+  ],
+  "null_mage_headgear": [
+   9,
+   99
+  ],
+  "null_mage_shoulders": [
+   0,
+   100
+  ],
+  "null_mage_gloves": [
+   1,
+   100
+  ],
+  "null_mage_weapon": [
+   2,
+   100
+  ],
+  "null_assassin_armor": [
+   3,
+   100
+  ],
+  "null_assassin_headgear": [
+   4,
+   100
+  ],
+  "null_assassin_shoulders": [
+   5,
+   100
+  ],
+  "null_assassin_gloves": [
+   6,
+   100
+  ],
+  "null_assassin_weapon": [
+   7,
+   100
+  ],
+  "null_priest_armor": [
+   8,
+   100
+  ],
+  "null_priest_headgear": [
+   9,
+   100
+  ],
+  "null_priest_shoulders": [
+   0,
+   101
+  ],
+  "null_priest_gloves": [
+   1,
+   101
+  ],
+  "null_priest_weapon": [
+   2,
+   101
+  ],
+  "null_hunter_armor": [
+   3,
+   101
+  ],
+  "null_hunter_headgear": [
+   4,
+   101
+  ],
+  "null_hunter_shoulders": [
+   5,
+   101
+  ],
+  "null_hunter_gloves": [
+   6,
+   101
+  ],
+  "null_hunter_weapon": [
+   7,
+   101
+  ],
+  "null_pants": [
+   8,
+   101
+  ],
+  "null_necklace": [
+   9,
+   101
+  ],
+  "null_accessory": [
+   0,
+   102
+  ],
   "warrior_armor_crimson_l55_gray": [
    5,
    14
@@ -9106,6 +9218,34 @@
   "keel-hunter-weapon": "3f69d713284a7613",
   "keel-shared-pants": "18cf8160a7440bcb",
   "keel-shared-necklace": "f725253038ccb8f3",
-  "keel-shared-accessory": "e15d5f21d463f81e"
+  "keel-shared-accessory": "e15d5f21d463f81e",
+  "null-warrior-armor": "2cf16ee5a7ae954a",
+  "null-warrior-headgear": "63f76b4451080407",
+  "null-warrior-shoulders": "a7362f581a10e0f6",
+  "null-warrior-gloves": "c8c32c0bfe30371d",
+  "null-warrior-weapon": "5d390a0220214e84",
+  "null-mage-armor": "facd26596fa03532",
+  "null-mage-headgear": "f020a82b35c1a096",
+  "null-mage-shoulders": "b55f8561b4a9f011",
+  "null-mage-gloves": "5985cdb60de560c2",
+  "null-mage-weapon": "903f1b63af256e36",
+  "null-assassin-armor": "4a955d8224264bd2",
+  "null-assassin-headgear": "cb223aa424256f9e",
+  "null-assassin-shoulders": "d961f4d2c4420ea6",
+  "null-assassin-gloves": "ef6dc48d345721c8",
+  "null-assassin-weapon": "db5c903511a490b2",
+  "null-priest-armor": "3fe8049c911cbfd9",
+  "null-priest-headgear": "1dd8d883b3b8e261",
+  "null-priest-shoulders": "4bf727c07a6b681d",
+  "null-priest-gloves": "39bb5541e87fd1d6",
+  "null-priest-weapon": "79ae0eef85f415bb",
+  "null-hunter-armor": "277d6838f85114c8",
+  "null-hunter-headgear": "08bb7c0ee6f6e559",
+  "null-hunter-shoulders": "01320a2e9cc67774",
+  "null-hunter-gloves": "0f1769522315754b",
+  "null-hunter-weapon": "97aab23bce89be64",
+  "null-shared-pants": "08c5258cebf3c131",
+  "null-shared-necklace": "ae7834ac5d156eb1",
+  "null-shared-accessory": "1e11db18a63af99b"
  }
 }

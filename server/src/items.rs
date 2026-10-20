@@ -558,13 +558,25 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
         if !e.boss {
             return &[];
         }
-        if kind == "keel_cargomaw" || kind == "barrow_doorward" || kind == "span_warden" {
+        if kind == "null_bell"
+            || kind == "keel_cargomaw"
+            || kind == "barrow_doorward"
+            || kind == "span_warden"
+        {
             return &[&["headgear", "shoulders", "gloves"]];
         }
-        if kind == "keel_bosun" || kind == "barrow_threadkeeper" || kind == "span_weaver" {
+        if kind == "null_conductor"
+            || kind == "keel_bosun"
+            || kind == "barrow_threadkeeper"
+            || kind == "span_weaver"
+        {
             return &[&["weapon", "pants", "necklace", "accessory"]];
         }
-        if kind == "keel_captain" || kind == "barrow_fatebound" || kind == "span_archon" {
+        if kind == "null_hour"
+            || kind == "keel_captain"
+            || kind == "barrow_fatebound"
+            || kind == "span_archon"
+        {
             return &[
                 &["armor"],
                 &[
@@ -761,11 +773,16 @@ pub fn boss_piece_for(kind: &str, slots: &[&str], choice: f64) -> Option<&'stati
         return boss_piece(slots, choice);
     };
     let source = e.loot_source.as_deref()?;
+    let (rarity, level) = if source == "blackhour" {
+        ("epic", 99)
+    } else {
+        ("rare", e.level.min(95))
+    };
     let pool: Vec<_> = ITEMS
         .iter()
         .filter(|i| {
-            i.rarity == "rare"
-                && i.required_level == e.level.min(95)
+            i.rarity == rarity
+                && i.required_level == level
                 && i.source.as_deref() == Some(source)
                 && slots.contains(&i.kind.as_str())
         })
@@ -1548,7 +1565,13 @@ mod tests {
                 "{kind} is not a boss or an elite"
             );
             assert!(
-                (30. ..=180.).contains(&start) && (0.1..=10.).contains(&ramp),
+                (30. ..=if kind.starts_with("null_") {
+                    720.
+                } else {
+                    180.
+                })
+                    .contains(&start)
+                    && (0.1..=10.).contains(&ramp),
                 "{kind}"
             );
         }
@@ -1716,7 +1739,7 @@ mod tests {
                         80 => 85,
                         85 => 93,
                         90 => 100,
-                        95 => 108,
+                        95 | 99 => 108,
                         level => panic!("unexpected gear level {level}"),
                     };
                     assert_eq!(value, expected, "{}", i.id);
@@ -2784,6 +2807,12 @@ mod tests {
     fn gear_levels_come_in_steps_of_five_and_use_every_step() {
         let mut used = std::collections::BTreeSet::new();
         for i in ITEMS.iter() {
+            // The exclusive Foundry set is an intentional level-99 capstone, not ordinary ladder gear.
+            if i.source.as_deref() == Some("blackhour") {
+                assert_eq!(i.required_level, 99);
+                assert_eq!(i.rarity, "epic");
+                continue;
+            }
             if matches!(i.kind.as_str(), "material" | "bag" | "food" | "potion") {
                 // Bags and consumables come in ten-level tiers (plus the 95 and 99 consumable tiers); materials have no level.
                 let tier = (i.kind == "bag" || i.family.is_some())

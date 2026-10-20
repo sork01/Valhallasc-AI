@@ -16,6 +16,8 @@ mod bank;
 use bank::BankRequest;
 #[cfg(test)]
 mod asterion_tests;
+#[cfg(test)]
+mod blackhour_tests;
 mod boss_mechanics;
 mod boss_signs;
 #[cfg(test)]
@@ -3926,7 +3928,8 @@ impl World {
             {
                 self.loot_drop(&credit_id, zone, point, licence);
             }
-            if let Some(gear) = roll_orange_boosted(boost, || self.random()) {
+            let blackhour = self.maps[zone].final_boss == "null_hour";
+            if !blackhour && let Some(gear) = roll_orange_boosted(boost, || self.random()) {
                 self.loot_drop_with_gear(&credit_id, zone, point, &gear.item.clone(), Some(gear));
             }
             if is_boss(&kind) {
@@ -3947,7 +3950,22 @@ impl World {
             {
                 self.clear_instance(zone, point);
             }
-            if is_elite(&kind) && !self.is_instance(zone) {
+            if blackhour {
+                // Only purple Nullforged equipment drops here. Boss pools above
+                // are guaranteed; ordinary foes have an independent 10% roll.
+                if !is_boss(&kind) {
+                    for _ in 0..copies(0.10, boost, || self.random()) {
+                        let pool: Vec<_> = ITEMS
+                            .iter()
+                            .filter(|i| i.source.as_deref() == Some("blackhour"))
+                            .collect();
+                        let choice = self.random();
+                        if let Some(piece) = pool.get((choice * pool.len() as f64) as usize) {
+                            self.loot_drop(&credit_id, zone, point, &piece.id);
+                        }
+                    }
+                }
+            } else if is_elite(&kind) && !self.is_instance(zone) {
                 for rarity in ["uncommon", "rare", "epic", "common", "legendary"] {
                     let pieces = copies(outdoor_elite_drop_chance(rarity), boost, || self.random());
                     for _ in 0..pieces {
@@ -6713,7 +6731,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 44);
+        assert_eq!(zone_count(&w), 45);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -7316,7 +7334,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 44);
+        assert_eq!(zone_count(&w), 45);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -10170,7 +10188,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 44);
+        assert_eq!(zone_count(&w), 45);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));

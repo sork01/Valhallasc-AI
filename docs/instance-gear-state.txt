@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-20T16:02:44",
+  "updated": "2026-10-20T21:07:08",
   "tasks": [
     {
       "id": "eye-warrior-armor",
@@ -8443,6 +8443,482 @@
         "client/assets/gear_icon_keel-shared-accessory.png",
         "scripts/keel_gear_shapes.py",
         "world/gear-art.txt"
+      ]
+    },
+    {
+      "id": "null-warrior-armor",
+      "group": "null",
+      "className": "warrior",
+      "kind": "armor",
+      "item": "null_warrior_armor",
+      "name": "Nullforged Shiftbreaker Vestments",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-warrior-armor.png"
+      ]
+    },
+    {
+      "id": "null-warrior-headgear",
+      "group": "null",
+      "className": "warrior",
+      "kind": "headgear",
+      "item": "null_warrior_headgear",
+      "name": "Nullforged Shiftbreaker Crown",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-warrior-headgear.png"
+      ]
+    },
+    {
+      "id": "null-warrior-shoulders",
+      "group": "null",
+      "className": "warrior",
+      "kind": "shoulders",
+      "item": "null_warrior_shoulders",
+      "name": "Nullforged Shiftbreaker Mantle",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-warrior-shoulders.png"
+      ]
+    },
+    {
+      "id": "null-warrior-gloves",
+      "group": "null",
+      "className": "warrior",
+      "kind": "gloves",
+      "item": "null_warrior_gloves",
+      "name": "Nullforged Shiftbreaker Grips",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-warrior-gloves.png"
+      ]
+    },
+    {
+      "id": "null-warrior-weapon",
+      "group": "null",
+      "className": "warrior",
+      "kind": "weapon",
+      "item": "null_warrior_weapon",
+      "name": "Nullforged Split-Tooth Greatblade",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-warrior-weapon.png"
+      ]
+    },
+    {
+      "id": "null-mage-armor",
+      "group": "null",
+      "className": "mage",
+      "kind": "armor",
+      "item": "null_mage_armor",
+      "name": "Nullforged Voidcoil Vestments",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-mage-armor.png"
+      ]
+    },
+    {
+      "id": "null-mage-headgear",
+      "group": "null",
+      "className": "mage",
+      "kind": "headgear",
+      "item": "null_mage_headgear",
+      "name": "Nullforged Voidcoil Crown",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-mage-headgear.png"
+      ]
+    },
+    {
+      "id": "null-mage-shoulders",
+      "group": "null",
+      "className": "mage",
+      "kind": "shoulders",
+      "item": "null_mage_shoulders",
+      "name": "Nullforged Voidcoil Mantle",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-mage-shoulders.png"
+      ]
+    },
+    {
+      "id": "null-mage-gloves",
+      "group": "null",
+      "className": "mage",
+      "kind": "gloves",
+      "item": "null_mage_gloves",
+      "name": "Nullforged Voidcoil Grips",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-mage-gloves.png"
+      ]
+    },
+    {
+      "id": "null-mage-weapon",
+      "group": "null",
+      "className": "mage",
+      "kind": "weapon",
+      "item": "null_mage_weapon",
+      "name": "Nullforged Open-Coil Staff",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-mage-weapon.png"
+      ]
+    },
+    {
+      "id": "null-assassin-armor",
+      "group": "null",
+      "className": "assassin",
+      "kind": "armor",
+      "item": "null_assassin_armor",
+      "name": "Nullforged Ratchetshade Vestments",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-assassin-armor.png"
+      ]
+    },
+    {
+      "id": "null-assassin-headgear",
+      "group": "null",
+      "className": "assassin",
+      "kind": "headgear",
+      "item": "null_assassin_headgear",
+      "name": "Nullforged Ratchetshade Crown",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-assassin-headgear.png"
+      ]
+    },
+    {
+      "id": "null-assassin-shoulders",
+      "group": "null",
+      "className": "assassin",
+      "kind": "shoulders",
+      "item": "null_assassin_shoulders",
+      "name": "Nullforged Ratchetshade Mantle",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-assassin-shoulders.png"
+      ]
+    },
+    {
+      "id": "null-assassin-gloves",
+      "group": "null",
+      "className": "assassin",
+      "kind": "gloves",
+      "item": "null_assassin_gloves",
+      "name": "Nullforged Ratchetshade Grips",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-assassin-gloves.png"
+      ]
+    },
+    {
+      "id": "null-assassin-weapon",
+      "group": "null",
+      "className": "assassin",
+      "kind": "weapon",
+      "item": "null_assassin_weapon",
+      "name": "Nullforged Twin Ratchet Sickles",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-assassin-weapon.png"
+      ]
+    },
+    {
+      "id": "null-priest-armor",
+      "group": "null",
+      "className": "priest",
+      "kind": "armor",
+      "item": "null_priest_armor",
+      "name": "Nullforged Deadlight Vestments",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-priest-armor.png"
+      ]
+    },
+    {
+      "id": "null-priest-headgear",
+      "group": "null",
+      "className": "priest",
+      "kind": "headgear",
+      "item": "null_priest_headgear",
+      "name": "Nullforged Deadlight Crown",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-priest-headgear.png"
+      ]
+    },
+    {
+      "id": "null-priest-shoulders",
+      "group": "null",
+      "className": "priest",
+      "kind": "shoulders",
+      "item": "null_priest_shoulders",
+      "name": "Nullforged Deadlight Mantle",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-priest-shoulders.png"
+      ]
+    },
+    {
+      "id": "null-priest-gloves",
+      "group": "null",
+      "className": "priest",
+      "kind": "gloves",
+      "item": "null_priest_gloves",
+      "name": "Nullforged Deadlight Grips",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-priest-gloves.png"
+      ]
+    },
+    {
+      "id": "null-priest-weapon",
+      "group": "null",
+      "className": "priest",
+      "kind": "weapon",
+      "item": "null_priest_weapon",
+      "name": "Nullforged Black Censer",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-priest-weapon.png"
+      ]
+    },
+    {
+      "id": "null-hunter-armor",
+      "group": "null",
+      "className": "hunter",
+      "kind": "armor",
+      "item": "null_hunter_armor",
+      "name": "Nullforged Induction Vestments",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-hunter-armor.png"
+      ]
+    },
+    {
+      "id": "null-hunter-headgear",
+      "group": "null",
+      "className": "hunter",
+      "kind": "headgear",
+      "item": "null_hunter_headgear",
+      "name": "Nullforged Induction Crown",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-hunter-headgear.png"
+      ]
+    },
+    {
+      "id": "null-hunter-shoulders",
+      "group": "null",
+      "className": "hunter",
+      "kind": "shoulders",
+      "item": "null_hunter_shoulders",
+      "name": "Nullforged Induction Mantle",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-hunter-shoulders.png"
+      ]
+    },
+    {
+      "id": "null-hunter-gloves",
+      "group": "null",
+      "className": "hunter",
+      "kind": "gloves",
+      "item": "null_hunter_gloves",
+      "name": "Nullforged Induction Grips",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-hunter-gloves.png"
+      ]
+    },
+    {
+      "id": "null-hunter-weapon",
+      "group": "null",
+      "className": "hunter",
+      "kind": "weapon",
+      "item": "null_hunter_weapon",
+      "name": "Nullforged Forked Induction Bow",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-hunter-weapon.png"
+      ]
+    },
+    {
+      "id": "null-shared-pants",
+      "group": "null",
+      "className": null,
+      "kind": "pants",
+      "item": "null_pants",
+      "name": "Nullforged Furnace Greaves",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-shared-pants.png"
+      ]
+    },
+    {
+      "id": "null-shared-necklace",
+      "group": "null",
+      "className": null,
+      "kind": "necklace",
+      "item": "null_necklace",
+      "name": "Nullforged Missing-Hour Pendant",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-shared-necklace.png"
+      ]
+    },
+    {
+      "id": "null-shared-accessory",
+      "group": "null",
+      "className": null,
+      "kind": "accessory",
+      "item": "null_accessory",
+      "name": "Nullforged Hollow-Axle Signet",
+      "done": true,
+      "phase": "complete",
+      "note": "Original black iron/violet/cyan geometry; both body previews reviewed, all-pose bounds, PixelFlow round trip and real Chromium shape/palette/equip checks passed.",
+      "evidence": [
+        "scripts/null_gear_shapes.py",
+        "world/gear-art.txt",
+        "test-results/blackhour-redesign/gear-browser.json",
+        "client/assets/gear_icon_null-shared-accessory.png"
       ]
     }
   ]

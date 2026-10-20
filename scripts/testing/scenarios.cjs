@@ -41,7 +41,7 @@ Object.assign(DEFAULT_LEVELS, { sandhopper: 80, dunefennec: 81, glassscorpion: 8
 Object.assign(DEFAULT_LEVELS, { snowhare: 85, iceotter: 86, frostheron: 87, glaciercrab: 88, bellmammoth: 88, auroramanta: 89, crevasseleviathan: 90 });
 Object.assign(DEFAULT_LEVELS, { screeferret: 90, stoneibex: 91, slateraven: 92, ridgeadder: 93, cairnbehemoth: 93, whitebarktitan: 94, stormcondor: 95 });
 Object.assign(DEFAULT_LEVELS, { brooknewt: 95, sundarter: 96, acornmimic: 97, snowstoat: 98, bloomtortoise: 95, petalchimera: 96, rainseraph: 97, glasslion: 96, sunwheel: 97, firephoenix: 98, lanternowl: 97, harvestreaper: 98, ambermantis: 99, rimesaber: 97, snowgiant: 98, longnightwyrm: 99 });
-for (const catalog of ['longship', 'skybridge', 'nornroot', 'cathedral', 'eye_below', 'elder_hollow', 'thousandfold', 'rain_crown', 'seed_vault', 'sunken_astrolabe', 'thunderheart_gate', 'blooming_labyrinth', 'solar_crucible', 'amber_archive', 'silent_solstice']) {
+for (const catalog of ['blackhour', 'longship', 'skybridge', 'nornroot', 'cathedral', 'eye_below', 'elder_hollow', 'thousandfold', 'rain_crown', 'seed_vault', 'sunken_astrolabe', 'thunderheart_gate', 'blooming_labyrinth', 'solar_crucible', 'amber_archive', 'silent_solstice']) {
   Object.assign(DEFAULT_LEVELS, Object.fromEntries(JSON.parse(fs.readFileSync(path.join(root, `world/${catalog}.txt`), 'utf8')).map(e => [e.kind, e.level])));
 }
 // Kill XP depends on each enemy's rolled level and a quest reward may cross a level, so compare lifetime XP.
@@ -3634,8 +3634,8 @@ const scenarios = {
       await w.connect({bot,class:'warrior'});
       const gate=mountain.portals.find(p=>p.id==='cairn_year_gate'),back=area.portals.find(p=>p.id==='year_cairn_gate');
       check(gate?.to===28&&back?.to===27,'The Yearwheel and Cairnspine passes are reciprocal');
-      check(area.size===400&&area.levels.join(',')==='95,99'&&area.slimes.length===156&&area.quests.length===33,'The immense end zone, quests and encounters load');
-      check(area.futureInstances.length===4&&area.futureInstances.every(x=>x.status==='open')&&area.portals.length===5,'Four seasonal dungeon thresholds are open');
+      check(area.size===400&&area.levels.join(',')==='95,99'&&area.slimes.length===156&&area.quests.length===36,'The immense end zone, quests and encounters load');
+      check(area.futureInstances.length===4&&area.futureInstances.every(x=>x.status==='open')&&area.portals.length===6,'Four seasonal dungeon thresholds and the Foundry are open');
       await kit.teleport(w,bot,{zone:27,x:153,y:120});await w.action(bot,{type:'move',x:gate.x,y:gate.y});
       await w.waitFor(()=>w.player(bot).zone===28,15000,'Enter the Yearwheel');await w.action(bot,{type:'stop'});
       check(distance(w.player(bot),area.spawn)<2,'The mountain pass reaches Springmere');
@@ -4538,3 +4538,4 @@ async function runScenario(name, world = new TestWorld()) {
 module.exports = { scenarios, runScenario, walkTo };
 
 scenarios.longship = require("./longship-scenario.cjs")(kit, map);
+scenarios.blackhour = require('./blackhour-scenario.cjs')(kit,map);

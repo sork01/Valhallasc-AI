@@ -197,6 +197,7 @@ def main():
     out.extend(eye_below_pieces(out))
     out.extend(nornroot_pieces(out))
     out.extend(longship_pieces(out))
+    out.extend(blackhour_pieces(out))
     out.extend(skybridge_pieces(out))
     out.extend(elder_hollow_pieces(out))
     out.extend(thousandfold_pieces(out))
@@ -313,6 +314,29 @@ def moonwell_pieces(out):
         v['bonusStats'] = bonus_stats(v)
         pieces.append(ordered(v))
     assert len(pieces) == 28
+    return pieces
+
+
+def blackhour_pieces(out):
+    """Original level-99 epic set, using the existing rarity curve and dungeon bonus."""
+    pieces=[]
+    titles={'warrior':'Shiftbreaker','mage':'Voidcoil','assassin':'Ratchetshade','priest':'Deadlight','hunter':'Induction'}
+    weapons={'warrior':'Nullforged Split-Tooth Greatblade','mage':'Nullforged Open-Coil Staff',
+             'assassin':'Nullforged Twin Ratchet Sickles','priest':'Nullforged Black Censer',
+             'hunter':'Nullforged Forked Induction Bow'}
+    shared={'pants':'Nullforged Furnace Greaves','necklace':'Nullforged Missing-Hour Pendant','accessory':'Nullforged Hollow-Axle Signet'}
+    for i in out:
+        if i.get('source') or i['rarity']!='rare' or i.get('requiredLevel')!=95 or i['kind'] not in CLASS_KINDS+SHARED_KINDS:continue
+        cls,kind=i.get('class'),i['kind'];v=dict(i)
+        v.update(id='null_'+(cls+'_' if cls else '')+kind,variant=i['variant'][:-len('_l95_blue')]+'_l99_null',
+                 requiredLevel=99,rarity='epic',source='blackhour',art='regearnull',starter=False)
+        v['name']=(weapons[cls] if kind=='weapon' else 'Nullforged '+titles[cls]+' '+SLOT_NAMES[kind]) if cls else shared[kind]
+        # Blue L95 -> purple, then L99's same linear budget and the 15% dungeon bonus.
+        scale=TIER_STEP*((.16*99+.8)/LEVEL_FACTOR[95])*1.15
+        for key in ('attack','defense'):v[key]=round(i[key]*scale,1)
+        v['sell']=round(i['sell']*2*1.15);v.pop('tint',None);v['bonusStats']=bonus_stats(v)
+        pieces.append(ordered(v))
+    assert len(pieces)==28
     return pieces
 
 
@@ -659,7 +683,11 @@ def nornroot_only():
 
 if __name__ == '__main__':
     import sys
-    if '--longship-only' in sys.argv:
+    if '--blackhour-only' in sys.argv:
+        existing=json.loads(ITEMS.read_text());new={i['id']:i for i in blackhour_pieces(existing)}
+        out=[new.pop(i['id'],i) for i in existing];out.extend(new.values());ITEMS.write_text(json.dumps(out,indent=2,ensure_ascii=False)+'\n')
+        print('28 Nullforged epic pieces refreshed')
+    elif '--longship-only' in sys.argv:
         existing=json.loads(ITEMS.read_text());new={i['id']:i for i in longship_pieces(existing)}
         out=[new.pop(i['id'],i) for i in existing];out.extend(new.values());ITEMS.write_text(json.dumps(out,indent=2,ensure_ascii=False)+'\n')
         print('28 Keelbound pieces refreshed')

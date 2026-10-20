@@ -51,7 +51,7 @@ mod tests {
             .filter_map(|item| item.source.as_deref())
             .filter(|source| *source != "orange_pool")
             .collect();
-        assert_eq!(sources.len(), 19);
+        assert_eq!(sources.len(), 20);
         assert_eq!(CATALOG.entries.len(), sources.len() * 5);
         assert_eq!(CATALOG.signatures.len(), sources.len());
         for class in [

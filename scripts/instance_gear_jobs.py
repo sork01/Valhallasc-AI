@@ -10,6 +10,7 @@ CLASSES = ('warrior', 'mage', 'assassin', 'priest', 'hunter')
 CLASS_KINDS = ('armor', 'headgear', 'shoulders', 'gloves', 'weapon')
 SHARED_KINDS = ('pants', 'necklace', 'accessory')
 SOURCES = {
+    'null': 'blackhour',
     'keel': 'longship',
     'eye': 'eye_below', 'elder': 'elder_hollow', 'pavilion': 'thousandfold',
     'rain': 'rain_crown', 'seed': 'seed_vault', 'astro': 'sunken_astrolabe',

@@ -535,13 +535,22 @@ impl World {
             }
         }
         for _ in 0..CHEST_GEAR_ROLLS * boost as usize {
+            if self.maps[zone].final_boss == "null_hour" {
+                let choice = self.random();
+                if let Some(piece) = boss_piece_for("null_hour", &CHEST_SET_SLOTS, choice) {
+                    self.loot_drop(owner, zone, point, &piece.id);
+                }
+                continue;
+            }
             let rarity = boosted_ladder_rarity(self.random(), boost);
             let choice = self.random();
             if let Some(piece) = equipment_of_rarity(rarity, top, choice) {
                 self.loot_drop(owner, zone, point, &piece.id);
             }
         }
-        if let Some(gear) = roll_orange_boosted(boost, || self.random()) {
+        if self.maps[zone].final_boss != "null_hour"
+            && let Some(gear) = roll_orange_boosted(boost, || self.random())
+        {
             self.loot_drop_with_gear(owner, zone, point, &gear.item.clone(), Some(gear));
         }
         if self.is_instance(zone) {

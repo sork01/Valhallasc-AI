@@ -114,7 +114,13 @@
     "keel_lantern",
     "keel_cargomaw",
     "keel_bosun",
-    "keel_captain"
+    "keel_captain",
+    "null_hauler",
+    "null_breaker",
+    "null_coil",
+    "null_bell",
+    "null_conductor",
+    "null_hour"
   ],
   "clips": {
     "idle": {
@@ -255,7 +261,13 @@
     "keel_lantern": "1806195cd517b44e",
     "keel_cargomaw": "da01fea0e62149f9",
     "keel_bosun": "516da622c3f6559b",
-    "keel_captain": "78a307dae4671b58"
+    "keel_captain": "78a307dae4671b58",
+    "null_hauler": "b09199744a951698",
+    "null_breaker": "c7d17f6c605432f8",
+    "null_coil": "27def242bbbbe5a4",
+    "null_bell": "ea1994b72d8fd997",
+    "null_conductor": "5ab4713e1a8a05fc",
+    "null_hour": "b43118cf23ca300c"
   },
   "tops": {
     "tidetemplar": 84,
@@ -364,6 +376,12 @@
     "keel_lantern": 71,
     "keel_cargomaw": 69,
     "keel_bosun": 54,
-    "keel_captain": 53
+    "keel_captain": 53,
+    "null_hauler": 72,
+    "null_breaker": 61,
+    "null_coil": 61,
+    "null_bell": 75,
+    "null_conductor": 68,
+    "null_hour": 72
   }
 }

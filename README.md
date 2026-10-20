@@ -44,6 +44,14 @@ Players open `http://<server-LAN-address>:8080/`. Allow that port in the server'
 
 ## Play
 
+The level-99 **Black Hour Foundry** is a five-player challenge beneath Yearwheel's
+Equinox Crossing, with giant clockwork enemies, exclusive purple Nullforged
+equipment and a dark industrial techno score. Content, balance checks,
+rebuild commands and saved-instance migration notes: [docs/blackhour.md](docs/blackhour.md).
+The source entrance is open. Public activation requires a separate server
+deployment and saved-instance migration; development does not restart the service.
+
+
 - Click ground to walk; click an enemy to chase and keep attacking.
 - **Spark Travel:** speak to the travel master in Alderhaven, Cinderwatch Camp, Rimeward Camp, Lanternmere, Skaldholm, Hollowmoot, Skuldwatch and Heimdall's Perch to discover that stop for your character. Choose a destination in the master's dialogue. Every intermediate master must also be discovered. Each leg costs 20 gold: Alderhaven → Cinderwatch → Rimeward costs 40 gold. The glacier network branches toward Lanternmere and Skaldholm; Skaldholm continues to Hollowmoot and on to Skuldwatch (a flight inside the Wyrdwood is a straight line over the river). You become an animated spark, fly over terrain at three times your class's walking speed, pass every intermediate master, and land at the destination without attracting enemies. The full fare is charged at departure; disconnects and server restarts resume the paid flight.
 - **Riding horse:** Stable-hand Greta in Skaldholm sells a permanent horse at level 50 for 50,000 gold. Press **H** or the HUD button to mount or dismount. Riding doubles normal outdoor travel speed, including in cities. Attacking, casting, Shadowstep, taking enemy aggro, starting Spark Travel, dying or entering a private dungeon dismounts you. Outdoor gates keep you mounted; ownership survives reconnects and restarts.

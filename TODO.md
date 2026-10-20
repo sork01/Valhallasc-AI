@@ -145,6 +145,15 @@ All eleven later interiors keep their existing collision rooms but now use diffe
 - [x] `I99W-SCENE` — Draw the interior and entrance transition, create its music and wire client rendering.
 - [x] `I99W-OPEN` — After the four tasks above, activate the entrance and verify level gate, party isolation, travel, boss clear and rewards in a private world.
 
+### The Black Hour Foundry — level 99, Yearwheel midnight (zone 28)
+
+- [x] `I99F-RULES` — Defined in docs/blackhour.md: five level-99 fighters in complete ordinary L95 blue gear, measured through the actual hired-fighter brain, with >=120/180/300-second pack/side/final targets; a green party must fail the final. Source entrance opens after validation; deployment is separate.
+- [x] `I99F-MAP` — Appended public zone 44 with four private copies, a safe Equinox Crossing entrance/return and physical clock rim, flywheels and furnace sump. Generator repeats byte-for-byte; Python flood and actual Rust collision checks pass. Yearwheel rebuilds reapply the gate.
+- [x] `I99F-FOES` — Added three giant ordinary kinds and three bosses, original editable 96×96 PixelFlow atlases and authoritative attacks/materials. Blue-party checks: four packs 124.7–155.6 s, side bosses 204.0–231.3 s, final 386.4–571.2 s. All four green final parties wipe; measured per-boss enrage accepted. Bounds/round-trip and actual ordinary purple/material kill-path checks pass.
+- [x] `I99F-LOOT` — Added 28 exclusive L99 epic Nullforged pieces, original asymmetric shapes/palette and 438 editable PixelFlow records for both hero bodies. Bosses/chests and ordinary equipment rolls produce purple Nullforged only; entry/two boss quests and copy credit pass Rust checks. All 80 fitted layers pass real Chromium shape/palette/pose checks; 2,051 older icon entries retain their pixels and positions. Private protocol reward/claim persistence passes.
+- [x] `I99F-SCENE` — Added clock-rim terrain, seasonal seals, giant bell/turbine/clock scenery, custom portal, exact floor minimap/world map, readable final-boss sign and original 132-BPM dark industrial techno. Real Chromium verifies art, music decoding/routing, volume/mute and Yearwheel return. Audio levels/seam measured; full listening review remains unverified (docs/blackhour.md).
+- [x] `I99F-OPEN` — Source entrance open after focused Rust, private MCP, stub/real Chromium and blue/green combat checks. Verified collision, both exits, level/party isolation, saved claims/rewards, purple loot, real gear/enemy art, map/sign and music controls. Migration and evidence documented in docs/blackhour.md. Not deployed; public DB/service untouched.
+
 The Seed Vault is a separate dungeon: Veyrroot Canopy and Heartwood remain enemy-free cities.
 
 ## Quests and rewards

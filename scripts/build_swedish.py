@@ -182,6 +182,9 @@ def assemble(text, templates, phrases):
 def main():
     check_only = '--check' in sys.argv
     text = load(TEXT_FILE, {})
+    foundry_text = load(ROOT / 'scripts/sv-blackhour-translations.txt', {})
+    assert not (text.keys() & foundry_text.keys()), 'duplicate Foundry translations'
+    text.update(foundry_text)
     templates = load(TEMPLATE_FILE, {})
     phrases = load(PHRASE_FILE, {})
     keep = set(load(KEEP_FILE, []))

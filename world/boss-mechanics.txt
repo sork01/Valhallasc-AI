@@ -1,4 +1,13 @@
 {
+  "null_hour": {
+    "arena": [62, 9, 98, 45],
+    "mechanics": [
+      {"name":"Midnight Press","block":"zone","hp_min":0.35,"shape":{"kind":"lane","width":4},"effect":"kill","cast":5,"every":26},
+      {"name":"Midnight Press","block":"zone","hp_max":0.35,"shape":{"kind":"lane","width":5},"effect":"kill","cast":5,"every":22,"echo":[3]},
+      {"name":"Furnace Halo","block":"zone","hp_min":0.35,"shape":{"kind":"circle","r":10,"inner":4},"effect":"kill","cast":5,"every":37},
+      {"name":"Furnace Halo","block":"zone","hp_max":0.35,"shape":{"kind":"circle","r":11,"inner":3.5},"effect":"kill","cast":5,"every":31}
+    ]
+  },
   "keel_captain": {
     "arena": [
       48,

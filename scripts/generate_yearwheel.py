@@ -139,6 +139,8 @@ def main():
  world['zones']=world['zones'][:ZONE-1]
  zone=build();progression_quests.keep_released_rewards_and_route_quest(previous,zone)
  cairn.open_year_gate(world['zones'][26]);world['zones'].append(zone);world['zones'].extend(later)
+ from generate_blackhour import install_parent
+ install_parent(world)
  spark_travel.ensure(world);MAP.write_text(json.dumps(world,indent=2)+'\n')
  items=json.loads(ITEMS.read_text())
  for _,key,name,sell in MATERIALS:

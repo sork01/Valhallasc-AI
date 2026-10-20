@@ -825,7 +825,7 @@ pub fn run_party_pack_once(
     ids: &[usize],
     seed: u64,
 ) -> PartyOutcome {
-    party_pack_fight(case, members, &[], HirerRole::Fights, ids, seed)
+    party_pack_fight(case, members, &[], HirerRole::Fights, ids, seed, false)
 }
 
 /// The hirer (`hirer`, driven like any member) with `mercs` rented at Skaldholm's Meeting Stone through the real offers
@@ -838,7 +838,21 @@ pub fn run_hired_party_pack_once(
     ids: &[usize],
     seed: u64,
 ) -> PartyOutcome {
-    party_pack_fight(case, &[hirer], mercs, HirerRole::Fights, ids, seed)
+    party_pack_fight(case, &[hirer], mercs, HirerRole::Fights, ids, seed, false)
+}
+
+/// A full equipment-tier party driven by the actual hired-fighter brain.
+/// Only the test fixture changes gear; live mercenaries keep their ordinary equipment.
+pub fn run_geared_hired_party(case: &Case, ids: &[usize], seed: u64) -> PartyOutcome {
+    party_pack_fight(
+        case,
+        &[Class::Warrior],
+        &[Class::Mage, Class::Assassin, Class::Priest, Class::Hunter],
+        HirerRole::Fights,
+        ids,
+        seed,
+        true,
+    )
 }
 
 /// What the hirer does in a hired-party fight (`BOSSMECH-MERC-ALONE`).
@@ -862,7 +876,7 @@ pub fn run_hired_party_with_role(
     ids: &[usize],
     seed: u64,
 ) -> PartyOutcome {
-    party_pack_fight(case, &[hirer], mercs, role, ids, seed)
+    party_pack_fight(case, &[hirer], mercs, role, ids, seed, false)
 }
 
 /// A clear, walkable spot 4 to 7 tiles from `boss` that no telegraph covers, in `zone`.
@@ -968,10 +982,30 @@ fn party_pack_fight(
     role: HirerRole,
     ids: &[usize],
     seed: u64,
+    equip_hired: bool,
 ) -> PartyOutcome {
     let mut w = world();
     w.rng = seed;
     let zone = w.slimes[ids[0]].zone;
+    // The new equipment-tier fixture simulates only its selected encounter.
+    // Preserve the real map, combat and hired AI, but avoid stepping thousands
+    // of unrelated actors for these deliberately long fights. FULL_WORLD is
+    // available for an independent control using the untrimmed world.
+    let local_ids;
+    let ids = if equip_hired && std::env::var("BLACKHOUR_FULL_WORLD").is_err() {
+        let spawns: Vec<_> = ids.iter().map(|&id| w.spawns[id].clone()).collect();
+        w.slimes = spawns
+            .iter()
+            .enumerate()
+            .map(|(id, spawn)| Slime::with_level(id, spawn, case.enemy_level.unwrap_or(case.level)))
+            .collect();
+        w.spawns = spawns;
+        w.next_king_spawn = f64::INFINITY;
+        local_ids = (0..w.slimes.len()).collect::<Vec<_>>();
+        local_ids.as_slice()
+    } else {
+        ids
+    };
     for s in w
         .slimes
         .iter_mut()
@@ -1006,6 +1040,12 @@ fn party_pack_fight(
         build_character(c, &Case { class, ..*case });
         if n == 0 && !mercs.is_empty() {
             hire_mercenaries(&mut w, mercs, zone, start);
+            if equip_hired {
+                for p in w.players.values_mut().filter(|p| p.merc.is_some()) {
+                    let class = p.character.look.class;
+                    build_character(&mut p.character, &Case { class, ..*case });
+                }
+            }
             if role != HirerRole::Fights
                 && let Some(p) = seat_near_boss(&w, zone, home)
             {

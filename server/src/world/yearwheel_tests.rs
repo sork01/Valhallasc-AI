@@ -33,7 +33,7 @@ fn four_seasons_hubs_travel_and_spring_dungeon() {
     assert!(m.size * m.size > 4 * 192 * 192);
     assert_eq!(
         (m.npcs.len(), m.quests.len(), m.slimes.len()),
-        (28, 33, 156)
+        (30, 36, 156)
     );
     for q in &m.quests {
         assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);
@@ -45,7 +45,7 @@ fn four_seasons_hubs_travel_and_spring_dungeon() {
     assert_eq!(future.len(), 4);
     assert_eq!(future[0]["status"], "open");
     assert!(future.iter().all(|door| door["status"] == "open"));
-    assert_eq!(m.portals.len(), 5);
+    assert_eq!(m.portals.len(), 6);
     assert!(
         m.portals
             .iter()

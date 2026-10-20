@@ -54139,5 +54139,576 @@
       "accuracy": 20
     },
     "source": "longship"
+  },
+  {
+    "id": "null_warrior_armor",
+    "name": "Nullforged Shiftbreaker Vestments",
+    "kind": "armor",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "warrior",
+    "variant": "crimson_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 19.8,
+    "defense": 79.3,
+    "bonusStats": {
+      "stamina": 108,
+      "agility": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_warrior_headgear",
+    "name": "Nullforged Shiftbreaker Crown",
+    "kind": "headgear",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "warrior",
+    "variant": "crimson_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "stamina": 108,
+      "agility": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_warrior_shoulders",
+    "name": "Nullforged Shiftbreaker Mantle",
+    "kind": "shoulders",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "warrior",
+    "variant": "crimson_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "stamina": 108,
+      "strength": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_warrior_gloves",
+    "name": "Nullforged Shiftbreaker Grips",
+    "kind": "gloves",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "warrior",
+    "variant": "crimson_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "agility": 108,
+      "strength": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_warrior_weapon",
+    "name": "Nullforged Split-Tooth Greatblade",
+    "kind": "weapon",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "warrior",
+    "variant": "sword_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 105.7,
+    "defense": 26.4,
+    "bonusStats": {
+      "stamina": 108,
+      "agility": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_mage_armor",
+    "name": "Nullforged Voidcoil Vestments",
+    "kind": "armor",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "mage",
+    "variant": "apprentice_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 13.2,
+    "defense": 52.8,
+    "bonusStats": {
+      "agility": 108,
+      "stamina": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_mage_headgear",
+    "name": "Nullforged Voidcoil Crown",
+    "kind": "headgear",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "mage",
+    "variant": "apprentice_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "stamina": 108,
+      "agility": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_mage_shoulders",
+    "name": "Nullforged Voidcoil Mantle",
+    "kind": "shoulders",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "mage",
+    "variant": "apprentice_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "agility": 108,
+      "stamina": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_mage_gloves",
+    "name": "Nullforged Voidcoil Grips",
+    "kind": "gloves",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "mage",
+    "variant": "apprentice_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "intellect": 108,
+      "agility": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_mage_weapon",
+    "name": "Nullforged Open-Coil Staff",
+    "kind": "weapon",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "mage",
+    "variant": "ash_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 105.7,
+    "defense": 26.4,
+    "bonusStats": {
+      "agility": 108,
+      "stamina": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_assassin_armor",
+    "name": "Nullforged Ratchetshade Vestments",
+    "kind": "armor",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "assassin",
+    "variant": "shadow_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 13.2,
+    "defense": 52.8,
+    "bonusStats": {
+      "strength": 108,
+      "stamina": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_assassin_headgear",
+    "name": "Nullforged Ratchetshade Crown",
+    "kind": "headgear",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "assassin",
+    "variant": "shadow_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "agility": 108,
+      "stamina": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_assassin_shoulders",
+    "name": "Nullforged Ratchetshade Mantle",
+    "kind": "shoulders",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "assassin",
+    "variant": "shadow_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "agility": 108,
+      "stamina": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_assassin_gloves",
+    "name": "Nullforged Ratchetshade Grips",
+    "kind": "gloves",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "assassin",
+    "variant": "shadow_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "stamina": 108,
+      "agility": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_assassin_weapon",
+    "name": "Nullforged Twin Ratchet Sickles",
+    "kind": "weapon",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "assassin",
+    "variant": "daggers_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 105.7,
+    "defense": 26.4,
+    "bonusStats": {
+      "stamina": 108,
+      "strength": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_priest_armor",
+    "name": "Nullforged Deadlight Vestments",
+    "kind": "armor",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "priest",
+    "variant": "pilgrim_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 19.8,
+    "defense": 79.3,
+    "bonusStats": {
+      "agility": 108,
+      "stamina": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_priest_headgear",
+    "name": "Nullforged Deadlight Crown",
+    "kind": "headgear",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "priest",
+    "variant": "pilgrim_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "intellect": 108,
+      "agility": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_priest_shoulders",
+    "name": "Nullforged Deadlight Mantle",
+    "kind": "shoulders",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "priest",
+    "variant": "pilgrim_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "stamina": 108,
+      "agility": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_priest_gloves",
+    "name": "Nullforged Deadlight Grips",
+    "kind": "gloves",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "priest",
+    "variant": "pilgrim_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "intellect": 108,
+      "stamina": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_priest_weapon",
+    "name": "Nullforged Black Censer",
+    "kind": "weapon",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "priest",
+    "variant": "mace_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 105.7,
+    "defense": 26.4,
+    "bonusStats": {
+      "stamina": 108,
+      "agility": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_hunter_armor",
+    "name": "Nullforged Induction Vestments",
+    "kind": "armor",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "hunter",
+    "variant": "scout_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 19.8,
+    "defense": 79.3,
+    "bonusStats": {
+      "agility": 108,
+      "stamina": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_hunter_headgear",
+    "name": "Nullforged Induction Crown",
+    "kind": "headgear",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "hunter",
+    "variant": "scout_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "stamina": 108,
+      "agility": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_hunter_shoulders",
+    "name": "Nullforged Induction Mantle",
+    "kind": "shoulders",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "hunter",
+    "variant": "scout_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "agility": 108,
+      "stamina": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_hunter_gloves",
+    "name": "Nullforged Induction Grips",
+    "kind": "gloves",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "hunter",
+    "variant": "scout_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "stamina": 108,
+      "strength": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_hunter_weapon",
+    "name": "Nullforged Forked Induction Bow",
+    "kind": "weapon",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "class": "hunter",
+    "variant": "shortbow_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 105.7,
+    "defense": 26.4,
+    "bonusStats": {
+      "stamina": 108,
+      "agility": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_pants",
+    "name": "Nullforged Furnace Greaves",
+    "kind": "pants",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "variant": "wayfarer_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 6.6,
+    "defense": 26.4,
+    "bonusStats": {
+      "strength": 108,
+      "agility": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_necklace",
+    "name": "Nullforged Missing-Hour Pendant",
+    "kind": "necklace",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "variant": "moonstone_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 52.8,
+    "defense": 13.2,
+    "bonusStats": {
+      "agility": 108,
+      "stamina": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_accessory",
+    "name": "Nullforged Hollow-Axle Signet",
+    "kind": "accessory",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "variant": "amber_l99_null",
+    "art": "regearnull",
+    "starter": false,
+    "attack": 39.6,
+    "defense": 10.0,
+    "bonusStats": {
+      "stamina": 108,
+      "strength": 108
+    },
+    "source": "blackhour"
+  },
+  {
+    "id": "null_hauler_relic",
+    "name": "Kilnback Hauler Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 3200
+  },
+  {
+    "id": "null_breaker_relic",
+    "name": "Pendulum Breaker Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 3200
+  },
+  {
+    "id": "null_coil_relic",
+    "name": "Coil Cathedral Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 3200
+  },
+  {
+    "id": "null_bell_relic",
+    "name": "Vark, the Twelve-Ton Bell Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 14000
+  },
+  {
+    "id": "null_conductor_relic",
+    "name": "Iona, Mistress of the Dead Current Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 14000
+  },
+  {
+    "id": "null_hour_relic",
+    "name": "The Thirteenth Hour Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 14000
   }
 ]

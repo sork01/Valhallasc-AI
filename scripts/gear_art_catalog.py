@@ -29,7 +29,7 @@ def matches(item, task):
         return not item.get('source') and item.get('requiredLevel') == int(task['group'][1:])
     if task['group'] in ('vault', 'moonwell'):
         return item.get('source') == {'vault': 'undervault', 'moonwell': 'moonwell'}[task['group']]
-    if task['group'] in ('keel', 'span', 'eye', 'elder', 'pavilion', 'rain', 'seed', 'astro', 'thunder',
+    if task['group'] in ('null', 'keel', 'span', 'eye', 'elder', 'pavilion', 'rain', 'seed', 'astro', 'thunder',
                          'bloom', 'solar', 'amber', 'solstice'):
         from instance_gear_jobs import SOURCES
         return item.get('source') == SOURCES[task['group']]

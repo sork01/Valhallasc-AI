@@ -102,6 +102,13 @@ impl World {
         let basic = self.set_basic_damage(session);
         let mut applied = true;
         match source.as_str() {
+            "blackhour" => {
+                let p = self.players.get_mut(&session).unwrap();
+                p.set_shield = p.set_shield.max(p.character.max_hp() * 0.05);
+                p.set_shield_left = 4.;
+                p.character
+                    .change_resource(p.character.max_resource() * 0.02);
+            }
             "longship" => {
                 let p = self.players.get_mut(&session).unwrap();
                 let factor = p.heal_factor();

@@ -386,5 +386,29 @@
   "keel_lantern": [
     1,
     8
+  ],
+  "null_hauler": [
+    18,
+    1
+  ],
+  "null_breaker": [
+    18,
+    1
+  ],
+  "null_coil": [
+    18,
+    1
+  ],
+  "null_bell": [
+    15,
+    1
+  ],
+  "null_conductor": [
+    15,
+    1
+  ],
+  "null_hour": [
+    8.5,
+    1
   ]
 }
