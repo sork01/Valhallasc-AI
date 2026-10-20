@@ -22,10 +22,7 @@ fn skybridge_data_and_actual_collision_are_reachable() {
     assert!(!m.sealed_template && m.interior);
     assert_eq!(w.maps[40].name, "The Arena", "older public IDs stay fixed");
     assert_eq!(w.maps[41].name, "Nornroot Barrow", "Nornroot stays at 41");
-    assert_eq!(
-        w.instances.iter().filter(|i| i.template == SPAN).count(),
-        4
-    );
+    assert_eq!(w.instances.iter().filter(|i| i.template == SPAN).count(), 4);
     assert!(pursuit::grid_matches_collision(m, PLAYER_RADIUS));
     let seen = flood(m, &blocked(m, &[]), m.spawn);
     for s in w.slimes.iter().filter(|s| s.zone == SPAN) {

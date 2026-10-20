@@ -60,8 +60,6 @@ mod mount_sources_tests;
 mod nacre_tests;
 #[cfg(test)]
 mod nornroot_tests;
-#[cfg(test)]
-mod skybridge_tests;
 mod partyxp;
 #[cfg(test)]
 mod perks_tests;
@@ -84,6 +82,8 @@ mod seed_vault_tests;
 mod sets;
 #[cfg(test)]
 mod sky_tests;
+#[cfg(test)]
+mod skybridge_tests;
 mod social;
 #[cfg(test)]
 mod solo_elite_tests;
