@@ -53,6 +53,8 @@ mod hold;
 mod instances;
 #[cfg(test)]
 mod lapis_tests;
+#[cfg(test)]
+mod longship_tests;
 mod mercs;
 #[cfg(test)]
 mod mount_sources_tests;
@@ -6460,7 +6462,7 @@ mod tests {
     #[test]
     fn rimeveil_zone_data_has_four_kinds_in_their_bands_with_levels_ten_to_fifteen() {
         let w = world();
-        assert_eq!(zone_count(&w), 43);
+        assert_eq!(zone_count(&w), 44);
         let map = &w.maps[2];
         assert_eq!(map.name, "Rimeveil Glacier");
         assert_eq!(map.levels, Some([10, 15]));
@@ -7063,7 +7065,7 @@ mod tests {
     #[test]
     fn gloamfen_zone_data_has_four_kinds_with_levels_fifteen_to_twenty_and_a_gate_pair() {
         let w = world();
-        assert_eq!(zone_count(&w), 43);
+        assert_eq!(zone_count(&w), 44);
         let map = &w.maps[3];
         assert_eq!(map.name, "Gloamfen");
         assert_eq!(map.levels, Some([15, 20]));
@@ -9917,7 +9919,7 @@ mod tests {
     #[test]
     fn zone_data_is_valid_and_portals_connect_clear_arrival_points() {
         let w = world();
-        assert_eq!(zone_count(&w), 43);
+        assert_eq!(zone_count(&w), 44);
         assert_eq!(w.spawns.len(), w.slimes.len());
         assert_eq!(w.maps[1].name, "Emberfall Crags");
         assert_eq!(w.maps[1].levels, Some([5, 10]));

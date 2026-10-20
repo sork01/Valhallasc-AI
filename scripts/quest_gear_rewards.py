@@ -25,6 +25,8 @@ def blue(level, slot):
 
 
 REWARDS = {
+    'keel_cargo': 'pants_wayfarer_l35_keel',
+    'keel_rigging': 'accessory_amber_l35_keel',
     'barrow_amber': 'pants_wayfarer_l25_norn',
     'barrow_threads': 'accessory_amber_l25_norn',
     'slime_patrol': green(1, 'necklace'),

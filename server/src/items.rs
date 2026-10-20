@@ -558,13 +558,13 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
         if !e.boss {
             return &[];
         }
-        if kind == "barrow_doorward" || kind == "span_warden" {
+        if kind == "keel_cargomaw" || kind == "barrow_doorward" || kind == "span_warden" {
             return &[&["headgear", "shoulders", "gloves"]];
         }
-        if kind == "barrow_threadkeeper" || kind == "span_weaver" {
+        if kind == "keel_bosun" || kind == "barrow_threadkeeper" || kind == "span_weaver" {
             return &[&["weapon", "pants", "necklace", "accessory"]];
         }
-        if kind == "barrow_fatebound" || kind == "span_archon" {
+        if kind == "keel_captain" || kind == "barrow_fatebound" || kind == "span_archon" {
             return &[
                 &["armor"],
                 &[

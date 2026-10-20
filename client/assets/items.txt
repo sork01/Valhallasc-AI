@@ -1,7 +1,7 @@
 {
  "size": 48,
  "cols": 10,
- "rows": 97,
+ "rows": 100,
  "at": {
   "warrior_headgear_crimson": [
    0,
@@ -7759,6 +7759,118 @@
    4,
    96
   ],
+  "warrior_armor_crimson_l35_keel": [
+   5,
+   96
+  ],
+  "warrior_headgear_crimson_l35_keel": [
+   6,
+   96
+  ],
+  "warrior_shoulders_crimson_l35_keel": [
+   7,
+   96
+  ],
+  "warrior_gloves_crimson_l35_keel": [
+   8,
+   96
+  ],
+  "warrior_weapon_sword_l35_keel": [
+   9,
+   96
+  ],
+  "mage_armor_apprentice_l35_keel": [
+   0,
+   97
+  ],
+  "mage_headgear_apprentice_l35_keel": [
+   1,
+   97
+  ],
+  "mage_shoulders_apprentice_l35_keel": [
+   2,
+   97
+  ],
+  "mage_gloves_apprentice_l35_keel": [
+   3,
+   97
+  ],
+  "mage_weapon_ash_l35_keel": [
+   4,
+   97
+  ],
+  "assassin_armor_shadow_l35_keel": [
+   5,
+   97
+  ],
+  "assassin_headgear_shadow_l35_keel": [
+   6,
+   97
+  ],
+  "assassin_shoulders_shadow_l35_keel": [
+   7,
+   97
+  ],
+  "assassin_gloves_shadow_l35_keel": [
+   8,
+   97
+  ],
+  "assassin_weapon_daggers_l35_keel": [
+   9,
+   97
+  ],
+  "priest_armor_pilgrim_l35_keel": [
+   0,
+   98
+  ],
+  "priest_headgear_pilgrim_l35_keel": [
+   1,
+   98
+  ],
+  "priest_shoulders_pilgrim_l35_keel": [
+   2,
+   98
+  ],
+  "priest_gloves_pilgrim_l35_keel": [
+   3,
+   98
+  ],
+  "priest_weapon_mace_l35_keel": [
+   4,
+   98
+  ],
+  "hunter_armor_scout_l35_keel": [
+   5,
+   98
+  ],
+  "hunter_headgear_scout_l35_keel": [
+   6,
+   98
+  ],
+  "hunter_shoulders_scout_l35_keel": [
+   7,
+   98
+  ],
+  "hunter_gloves_scout_l35_keel": [
+   8,
+   98
+  ],
+  "hunter_weapon_shortbow_l35_keel": [
+   9,
+   98
+  ],
+  "pants_wayfarer_l35_keel": [
+   0,
+   99
+  ],
+  "necklace_moonstone_l35_keel": [
+   1,
+   99
+  ],
+  "accessory_amber_l35_keel": [
+   2,
+   99
+  ],
   "warrior_armor_crimson_l55_gray": [
    5,
    14
@@ -8966,6 +9078,34 @@
   "span-hunter-weapon": "5319fe4f236d4ff8",
   "span-shared-pants": "5b939b9f41ae4ab3",
   "span-shared-necklace": "369d85d49dbed70e",
-  "span-shared-accessory": "59360fa2949f43b2"
+  "span-shared-accessory": "59360fa2949f43b2",
+  "keel-warrior-armor": "da25a6f3a8785ac8",
+  "keel-warrior-headgear": "017e29d3db5a7f50",
+  "keel-warrior-shoulders": "7b32253f9464767f",
+  "keel-warrior-gloves": "4f23b184aaaf61ff",
+  "keel-warrior-weapon": "40a76b3d12a04c2e",
+  "keel-mage-armor": "34e2f555251ac193",
+  "keel-mage-headgear": "788b19da18845bc6",
+  "keel-mage-shoulders": "c7d0ec020006217a",
+  "keel-mage-gloves": "5d4ea90f680a6030",
+  "keel-mage-weapon": "d8e3599d04340dea",
+  "keel-assassin-armor": "79617735aea56331",
+  "keel-assassin-headgear": "bfd6cc42ebc5ac50",
+  "keel-assassin-shoulders": "8259eaaeebc50a15",
+  "keel-assassin-gloves": "6b070c0267fc9db7",
+  "keel-assassin-weapon": "7fed77dee797244e",
+  "keel-priest-armor": "f2e58ec4f601cdc5",
+  "keel-priest-headgear": "59f5989055ace1eb",
+  "keel-priest-shoulders": "66dc4061968c11a0",
+  "keel-priest-gloves": "0fc776151003d072",
+  "keel-priest-weapon": "72a1018381141a0d",
+  "keel-hunter-armor": "fd838eb798311bfa",
+  "keel-hunter-headgear": "b72ec78d2539d80b",
+  "keel-hunter-shoulders": "cf32855730a6f5c5",
+  "keel-hunter-gloves": "f81013fe0284c2b4",
+  "keel-hunter-weapon": "3f69d713284a7613",
+  "keel-shared-pants": "18cf8160a7440bcb",
+  "keel-shared-necklace": "f725253038ccb8f3",
+  "keel-shared-accessory": "e15d5f21d463f81e"
  }
 }

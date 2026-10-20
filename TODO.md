@@ -51,11 +51,11 @@ All eleven later interiors keep their existing collision rooms but now use diffe
 
 ### Level 35 dungeon — Rán's Deep (zone 8)
 
-- [ ] `I35-MAP` — Build a distinct level-35 private party dungeon with collision, safe arrival and a return route. Place its sealed entrance in Rán's Deep, reachable from the Bifrost Reach arrival without crossing higher-level enemies.
-- [ ] `I35-FOES` — Add ordinary enemies, bosses, authoritative combat rules and editable monster sprites appropriate to level 35.
-- [ ] `I35-QUEST` — Add Rán's Deep entry and dungeon quests, boss objectives and level-appropriate rewards; credit kills and clears to the correct party copy.
-- [ ] `I35-SCENE` — Give the interior and entrance their own visual identity, music and client rendering.
-- [ ] `I35-OPEN` — After the four tasks above, open the Rán's Deep entrance and verify the level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I35-MAP` — Build a distinct level-35 private party dungeon with collision, safe arrival and a return route. Place its sealed entrance in Rán's Deep, reachable from the Bifrost Reach arrival without crossing higher-level enemies.
+- [x] `I35-FOES` — Add ordinary enemies, bosses, authoritative combat rules and editable monster sprites appropriate to level 35.
+- [x] `I35-QUEST` — Add Rán's Deep entry and dungeon quests, boss objectives and level-appropriate rewards; credit kills and clears to the correct party copy.
+- [x] `I35-SCENE` — Give the interior and entrance their own visual identity, music and client rendering.
+- [x] `I35-OPEN` — After the four tasks above, open the Rán's Deep entrance and verify the level gate, party isolation, travel, boss clear and rewards in a private world.
 
 ### The Eye Below — level 65, Stormglass Shore (zone 19)
 
@@ -945,3 +945,5 @@ All 252 level-25–50 and Cathedral base pieces are complete. Detailed piece his
 ## Completed in this batch (2026-10-12)
 
 Closed 20 items: level-95 gear bonus; hunter ranks through 98; five level-99 capstones; five skill identity updates; high-level unlock and skillbar migration checks; world-map graph, routes and consistency; and mount price, speed, client controls and private-world checks. The mount costs 50,000 gold at level 50, persists across login, travels at twice normal speed, and dismounts for combat. Private mount and skill checks passed; the map data and client copy match across 29 connected zones with four distinct sealed doors and no tile overlaps. The full world-map browser suite and full Rust suite were not completed in this batch.
+
+Level-35 Longship completion evidence and pending server deployment: docs/longship.md. Original ship geometry, 28 newly shaped/coloured PixelFlow gear pieces, six enemy sprites, 6/8 score without a foreground lead; full-song listening remains unverified.

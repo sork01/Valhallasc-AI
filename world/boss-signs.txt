@@ -205,5 +205,16 @@
     ],
     "x": 43.5,
     "y": 38.5
+  },
+  "keel_captain": {
+    "title": "Captain Svala Nineknots",
+    "what": "Svala drags her anchor along a red strip after 5 seconds. Anyone on the strip is knocked out.",
+    "todo": "Step to either side of the red strip before the anchor falls.",
+    "tip": "When Svala is nearly beaten, the strip widens and the anchor pulls again 3 seconds later. Stay off red for both pulls.",
+    "colors": [
+      "red"
+    ],
+    "x": 72,
+    "y": 43
   }
 }

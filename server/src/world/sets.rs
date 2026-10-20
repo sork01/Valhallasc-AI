@@ -102,6 +102,11 @@ impl World {
         let basic = self.set_basic_damage(session);
         let mut applied = true;
         match source.as_str() {
+            "longship" => {
+                let c = &mut self.players.get_mut(&session).unwrap().character;
+                c.hp = (c.hp + c.max_hp() * 0.03).min(c.max_hp());
+                c.change_resource(c.max_resource() * 0.03);
+            }
             "nornroot" => {
                 let c = &mut self.players.get_mut(&session).unwrap().character;
                 c.hp = (c.hp + c.max_hp() * 0.04).min(c.max_hp());

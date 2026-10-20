@@ -33,7 +33,7 @@ def run(command, log):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('group', choices=tuple(late_instance_gear_shapes.STYLES))
+    parser.add_argument('group', choices=('keel', *late_instance_gear_shapes.STYLES))
     args = parser.parse_args()
     group = args.group
     tasks = [task for task in json.loads(instance_gear_jobs.STATE.read_text())['tasks']
