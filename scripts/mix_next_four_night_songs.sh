@@ -8,8 +8,8 @@ import {StdioClientTransport} from '@modelcontextprotocol/sdk/client/stdio.js';
 const scores=[
   ['moonspore','294d9f52ebb469b4', [['Root pulse',2],['Moonlit leaves',-22],['Spore drops',-12],['Lantern song',-19],['Night breakbeat',-4]]],
   ['asterion','aede47903c7017fe', [['Deep pulse',3],['Glass wheel',0],['City strings',-20],['Sky choir',-15],['Brass procession',-10],['Thirteen bells',-35],['Night breakbeat',-4]]],
-  ['stormglass','7cfe6a386dd3266f', [['Undertow bass',3],['Sea mist',-21],['Glass current',3],['Breaker strings',-13],['Storm bell',-36],['Night breakbeat',-4]]],
-  ['sunward','d33fdacfd0720334', [['Hillside flute',-13],['Plucked strings',-10],['Millwheel marimba',-15],['Warm strings',-25],['Walking bass',3],['Night breakbeat',-4]]],
+  ['stormglass','7cfe6a386dd3266f', [['Undertow bass',2],['Sea mist',-19],['Glass current',3],['Storm bell',-36],['Night breakbeat',-4],['Chillhop hi-hat',-10]]],
+  ['sunward','d33fdacfd0720334', [['Plucked strings',-10],['Millwheel marimba',-15],['Warm strings',-25],['Walking bass',3],['Night breakbeat',-4],['Chillhop hi-hat',-10]]],
 ];
 const c=new Client({name:'valhallasc-next-four-night-mix',version:'1'});
 await c.connect(new StdioClientTransport({command:process.execPath,args:['--import','tsx','mcp/server.mjs'],cwd:process.cwd(),stderr:'inherit',env:{...process.env,DYB2_MCP_USER:'codex'}}));

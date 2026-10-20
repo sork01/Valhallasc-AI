@@ -12,8 +12,6 @@ const n=(pitch,beat,beats,velocity=57)=>({pitch,beat,beats,velocity});
 for(const [zone,id,track,bars] of [
   ['moonspore','294d9f52ebb469b4','Lantern song',[[18,[n('C5',.5,.7),n('A4',1.5,.4),n('G4',2,.65)]]]],
   ['asterion','aede47903c7017fe','Brass procession',[[18,[n('E5',.5,.6),n('B4',2,1)]]]],
-  ['stormglass','7cfe6a386dd3266f','Breaker strings',[[17,[n('A5',.5,.65),n('G5',1.75,.6),n('E5',3,.7)]],[18,[n('E5',.5,.7),n('D5',2,1)]]]],
-  ['sunward','d33fdacfd0720334','Hillside flute',[[18,[n('D5',.5,.7),n('B4',2,1)]]]],
 ]){
   await call('open_project',{project_id:id});
   for(const [start_bar,notes] of bars)await call('write_notes',{project_id:id,track,start_bar,bars:1,notes,name:'Night answer in harmony'});

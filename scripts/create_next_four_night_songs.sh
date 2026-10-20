@@ -110,8 +110,9 @@ for(const spec of specs) {
   await call(c,'set_key',{...A,key:spec.key});
   for(const t of day.tracks.filter(t=>t.instrument)) await call(c,'clear_bars',{...A,track:t.name});
   if(spec.oldDrum&&day.tracks.some(t=>t.name===spec.oldDrum)) await call(c,'remove_track',{...A,track:spec.oldDrum});
-  for(const [track,instrument,preset] of spec.instruments) await call(c,'set_instrument',{...A,track,instrument,preset});
-  for(const [track,volume_db,pan] of spec.mix) await call(c,'set_mix',{...A,track,volume_db,pan});
+  const noLead=['stormglass','sunward'].includes(spec.zone);
+  for(const [track,instrument,preset] of spec.instruments) if(!noLead||track!==spec.lead) await call(c,'set_instrument',{...A,track,instrument,preset});
+  for(const [track,volume_db,pan] of spec.mix) if(!noLead||track!==spec.lead) await call(c,'set_mix',{...A,track,volume_db,pan});
   for(const [parameter,value] of [['env.attack',.08],['env.release',.45]]) await call(c,'automate',{...A,track:spec.pad,parameter,points:[{bar:1,value},{bar:33,value}]});
   if(spec.other==='Sky choir') for(const [parameter,value] of [['env.attack',.08],['env.release',.5]]) await call(c,'automate',{...A,track:spec.other,parameter,points:[{bar:1,value},{bar:33,value}]});
   const chords=spec.cycles.flat();
@@ -127,17 +128,22 @@ for(const spec of specs) {
   });
   for(const [track,notes,name] of [[spec.bass,bass,'Steady night steps'],[spec.pluck,pluck,'Night reflections'],...(spec.bell?[[spec.bell,bell,'Distant landmark bells']]:[]),...(spec.other?[[spec.other,other,'Passing night colour']]:[])])
     await call(c,'write_notes',{...A,track,start_bar:1,bars:32,notes,name});
-  for(let section=0;section<4;section++) await call(c,'write_notes',{...A,track:spec.lead,start_bar:section*8+1,bars:8,notes:line(spec,chords,section),name:sectionNames[section]});
+  if(noLead&&day.tracks.some(t=>t.name===spec.lead)) await call(c,'remove_track',{...A,track:spec.lead});
+  if(!noLead) for(let section=0;section<4;section++) await call(c,'write_notes',{...A,track:spec.lead,start_bar:section*8+1,bars:8,notes:line(spec,chords,section),name:sectionNames[section]});
   if(!day.tracks.some(t=>t.name==='Night breakbeat')) await call(c,'add_track',{...A,name:'Night breakbeat',instrument:'axiom8',preset:'Hip-hop',volume_db:-12});
-  else await call(c,'clear_bars',{...A,track:'Night breakbeat'});
+  else {await call(c,'clear_bars',{...A,track:'Night breakbeat'});await call(c,'set_preset',{...A,track:'Night breakbeat',preset:'Hip-hop'});}
+  if(!day.tracks.some(t=>t.name==='Chillhop hi-hat')) await call(c,'add_track',{...A,name:'Chillhop hi-hat',instrument:'axiom8',preset:'Chillhop',volume_db:-10});
+  else {await call(c,'clear_bars',{...A,track:'Chillhop hi-hat'});await call(c,'set_preset',{...A,track:'Chillhop hi-hat',preset:'Chillhop'});}
   const steps=spec.beats*4;
   for(let section=0;section<4;section++) {
     const b=spec.drum;
     const kick=b.kick;
     const hat=section===0?b.hat.filter((_,i)=>i%2===0):section===3?b.hat.filter((_,i)=>i%2===1):b.hat;
     await call(c,'write_drums',{...A,track:'Night breakbeat',start_bar:section*8+1,bars:8,
-      pattern:{kick:drumRow(steps,kick,[0]),snare:drumRow(steps,b.snare),hat:drumRow(steps,hat),clap:drumRow(steps,section===1?b.rim:[])},
+      pattern:{kick:drumRow(steps,kick,[0]),snare:drumRow(steps,b.snare),clap:drumRow(steps,section===1?b.rim:[])},
       swing:0,velocity:section===0?spec.drumVelocity-5:section===3?spec.drumVelocity-3:spec.drumVelocity,name:`${sectionNames[section]} break`});
+    await call(c,'write_drums',{...A,track:'Chillhop hi-hat',start_bar:section*8+1,bars:8,
+      pattern:{hat:drumRow(steps,hat)},swing:0,velocity:section===0?spec.drumVelocity-5:section===3?spec.drumVelocity-3:spec.drumVelocity,name:`${sectionNames[section]} Chillhop hats`});
   }
   for(const [index,name] of spec.markers.entries()) await call(c,'add_marker',{...A,name,at_bar:index*8+1});
   const a=await call(c,'analyse_song',A);

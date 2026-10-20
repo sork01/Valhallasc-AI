@@ -37,16 +37,23 @@ for(const s of specs){if(process.env.ZONES&&!process.env.ZONES.split(',').includ
  const A={project_id:s.id};const day=await call('open_project',A);if(day.project_id!==s.id)throw Error(`${s.zone}: wrong editable copy`);
  await call('rename_project',{...A,name:s.title});await call('set_tempo',{...A,bpm:s.bpm});await call('set_key',{...A,key:s.key});
  for(const t of day.tracks.filter(t=>t.instrument))await call('clear_bars',{...A,track:t.name});
- await call('remove_track',{...A,track:s.oldDrum});
- for(const [track,instrument,preset]of s.instruments)await call('set_instrument',{...A,track,instrument,preset});
- for(const [track,volume_db,pan]of s.mix)await call('set_mix',{...A,track,volume_db,pan});
+ if(day.tracks.some(t=>t.name===s.oldDrum))await call('remove_track',{...A,track:s.oldDrum});
+ for(const [track,instrument,preset]of s.instruments)if(track!==s.lead)await call('set_instrument',{...A,track,instrument,preset});
+ for(const [track,volume_db,pan]of s.mix)if(track!==s.lead)await call('set_mix',{...A,track,volume_db,pan});
  for(const [parameter,value]of [['env.attack',.08],['env.release',.45]])await call('automate',{...A,track:s.pad,parameter,points:[{bar:1,value},{bar:33,value}]});
  const chords=s.cycles.flat();await call('write_chords',{...A,track:s.pad,start_bar:1,bars:32,progression:chords.join(' '),style:'block',register:54,velocity:41,name:'Night harmony'});
  const bass=[],keys=[],bell=[];for(let i=0;i<32;i++){const at=i*4,t=s.tones[chords[i]];bass.push(note(s.roots[chords[i]],at,1.5,i%8===0?59:54),note(s.roots[chords[i]],at+(s.zone==='ribbonwild'?2.75:2.5),.65,41));keys.push(note(t[1],at+.5,.4,49),note(t[2],at+2.5,.45,44));if(i%4===0)bell.push(note(t[3],at,.5,35))}
  for(const [track,notes,name]of [[s.bass,bass,'Night steps'],[s.keys,keys,'After-dark reflections'],[s.bell,bell,'Distant lights']])await call('write_notes',{...A,track,start_bar:1,bars:32,notes,name});
- for(let k=0;k<4;k++)await call('write_notes',{...A,track:s.lead,start_bar:k*8+1,bars:8,notes:melody(s,chords,k),name:s.markers[k]});
- await call('add_track',{...A,name:'Night breakbeat',instrument:'axiom8',preset:'Hip-hop',volume_db:-12});
- for(let k=0;k<4;k++)await call('write_drums',{...A,track:'Night breakbeat',start_bar:k*8+1,bars:8,pattern:{kick:row([...new Set([...s.kick,s.zone==='ribbonwild'?11:10,s.zone==='ribbonwild'?11:10])],[0]),snare:row(s.snare),hat:row(k===0?s.hat.filter((_,j)=>j%2===0):s.hat),clap:row(k===2?s.rim:[])},swing:0,velocity:s.velocity-(k===0?5:k===3?3:0),name:`${s.markers[k]} break`});
+ if(day.tracks.some(t=>t.name===s.lead))await call('remove_track',{...A,track:s.lead});
+ if(!day.tracks.some(t=>t.name==='Night breakbeat'))await call('add_track',{...A,name:'Night breakbeat',instrument:'axiom8',preset:'Hip-hop',volume_db:-12});
+ else {await call('clear_bars',{...A,track:'Night breakbeat'});await call('set_preset',{...A,track:'Night breakbeat',preset:'Hip-hop'});}
+ if(!day.tracks.some(t=>t.name==='Chillhop hi-hat'))await call('add_track',{...A,name:'Chillhop hi-hat',instrument:'axiom8',preset:'Chillhop',volume_db:-10});
+ else {await call('clear_bars',{...A,track:'Chillhop hi-hat'});await call('set_preset',{...A,track:'Chillhop hi-hat',preset:'Chillhop'});}
+ for(let k=0;k<4;k++){
+  const velocity=s.velocity-(k===0?5:k===3?3:0),hats=k===0?s.hat.filter((_,j)=>j%2===0):s.hat;
+  await call('write_drums',{...A,track:'Night breakbeat',start_bar:k*8+1,bars:8,pattern:{kick:row([...new Set([...s.kick,s.zone==='ribbonwild'?11:10,s.zone==='ribbonwild'?11:10])],[0]),snare:row(s.snare),clap:row(k===2?s.rim:[])},swing:0,velocity,name:`${s.markers[k]} break`});
+  await call('write_drums',{...A,track:'Chillhop hi-hat',start_bar:k*8+1,bars:8,pattern:{hat:row(hats)},swing:0,velocity,name:`${s.markers[k]} Chillhop hats`});
+ }
  for(const [k,name]of s.markers.entries())await call('add_marker',{...A,name,at_bar:k*8+1});
  const a=await call('analyse_song',A);if(a.problems?.length)throw Error(`${s.zone}: ${a.problems.join('; ')}`);
  console.log(JSON.stringify({zone:s.zone,id:s.id,source:s.source,title:s.title,bpm:s.bpm,seconds:128*60/s.bpm,warnings:a.warnings}));

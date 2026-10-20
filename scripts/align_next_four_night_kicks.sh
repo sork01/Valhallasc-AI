@@ -16,10 +16,17 @@ for(const [zone,project_id,steps,kick,snare,hat,rim,velocity] of [
   ['sunward','d33fdacfd0720334',16,[0,10],[4,12],[2,6,10,14],[15],54],
 ]){
   await call('open_project',{project_id});
+  await call('set_preset',{project_id,track:'Night breakbeat',preset:'Hip-hop'});
   await call('clear_bars',{project_id,track:'Night breakbeat'});
+  const project=await call('get_project',{project_id});
+  if(!project.tracks.some(t=>t.name==='Chillhop hi-hat'))await call('add_track',{project_id,name:'Chillhop hi-hat',instrument:'axiom8',preset:'Chillhop',volume_db:-10});
+  else {await call('clear_bars',{project_id,track:'Chillhop hi-hat'});await call('set_preset',{project_id,track:'Chillhop hi-hat',preset:'Chillhop'});}
   for(let section=0;section<4;section++)await call('write_drums',{project_id,track:'Night breakbeat',start_bar:section*8+1,bars:8,
-    pattern:{kick:row(steps,kick,[0]),snare:row(steps,snare),hat:row(steps,section===0?hat.filter((_,i)=>i%2===0):section===3?hat.filter((_,i)=>i%2===1):hat),clap:row(steps,section===1?rim:[])},
+    pattern:{kick:row(steps,kick,[0]),snare:row(steps,snare),clap:row(steps,section===1?rim:[])},
     swing:0,velocity:section===0?velocity-5:section===3?velocity-3:velocity,name:['Dusk break','Lantern theme break','Night answer break','Before dawn break'][section]});
+  for(let section=0;section<4;section++)await call('write_drums',{project_id,track:'Chillhop hi-hat',start_bar:section*8+1,bars:8,
+    pattern:{hat:row(steps,section===0?hat.filter((_,i)=>i%2===0):section===3?hat.filter((_,i)=>i%2===1):hat)},
+    swing:0,velocity:section===0?velocity-5:section===3?velocity-3:velocity,name:`${['Dusk','Lantern theme','Night answer','Before dawn'][section]} Chillhop hats`});
   const a=await call('analyse_song',{project_id});
   if(a.problems?.length)throw Error(`${zone}: ${a.problems.join('; ')}`);
   console.log('ALIGNED',zone,project_id);
