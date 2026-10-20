@@ -1645,7 +1645,7 @@ mod tests {
         assert_eq!(w.players[&2].heal_factor(), 1.);
     }
     #[test]
-    fn a_hunter_deals_a_quarter_more_to_players_and_nobody_else_does() {
+    fn a_hunter_deals_more_to_players_and_nobody_else_does() {
         let taken = |class: Class| {
             let (mut w, _) = mages();
             w.players.get_mut(&1).unwrap().character.look.class = class;
@@ -1670,5 +1670,161 @@ mod tests {
             ((4000. - defence) * DAMAGE_TAKEN_SCALE * PVP_DAMAGE_SCALE).round()
         );
         assert!(hunter > warrior);
+    }
+    /// The mage of `stunner`: player 2 (level 99, in a duel with 1) casts Arcane Ward; its shield buff is dropped so
+    /// only the ward's own soak is measured. Returns the world and the ward's size.
+    fn warded() -> (World, f64) {
+        let (mut w, _) = stunner(Class::Warrior);
+        {
+            let c = &mut w.players.get_mut(&2).unwrap().character;
+            c.reset_resource();
+            c.change_resource(100.);
+        }
+        w.use_skill(2, "arcaneward", Point { x: 1., y: 0. });
+        let p = w.players.get_mut(&2).unwrap();
+        assert!(!p.buffs.is_empty(), "the ward was cast");
+        p.buffs.clear();
+        let ward = p.absorb;
+        (w, ward)
+    }
+    /// What a blow of `damage` takes from player 2 once it lands, with no shield buff.
+    fn blow(w: &World, damage: f64) -> f64 {
+        (((damage - w.players[&2].character.stats().1).max(1.)
+            * DAMAGE_TAKEN_SCALE
+            * PVP_DAMAGE_SCALE)
+            .round()
+            .max(1.))
+        .round()
+    }
+    /// Hits 2 until the blow lands (not dodged); returns the health 2 lost.
+    fn land(w: &mut World, damage: f64) -> f64 {
+        w.players.get_mut(&1).unwrap().character.attributes.accuracy = 100;
+        let before = (hp(w, 2), w.players[&2].pvp_fight);
+        for _ in 0..80 {
+            let soak = w.players[&2].absorb;
+            w.pvp_hit(1, 2, damage, false);
+            if hp(w, 2) < before.0 || w.players[&2].absorb < soak {
+                return before.0 - hp(w, 2);
+            }
+        }
+        panic!("never landed");
+    }
+    #[test]
+    fn arcane_ward_soaks_a_fifth_of_the_maximum_health_then_the_rest_lands() {
+        let (mut w, ward) = warded();
+        let max = w.players[&2].character.max_hp();
+        assert!((ward - max * 0.2).abs() < 1e-6, "{ward} of {max}");
+        let left = w.players[&2].absorb_left;
+        assert!(left > 9. && left <= 10., "{left}");
+        // A blow smaller than the ward is soaked whole.
+        let small = blow(&w, 2000.);
+        assert!(small > 0. && small < ward);
+        assert_eq!(land(&mut w, 2000.), 0.);
+        assert!((w.players[&2].absorb - (ward - small)).abs() < 1e-6);
+        // One bigger than what is left takes the ward down and lands the rest.
+        let rest = ward - small;
+        let mut damage = 2000.;
+        while blow(&w, damage) <= rest {
+            damage *= 2.;
+        }
+        let big = blow(&w, damage);
+        let landed = land(&mut w, damage);
+        assert!(
+            (landed - (big - rest)).abs() < 1e-6,
+            "{landed} against {}",
+            big - rest
+        );
+        assert_eq!(w.players[&2].absorb, 0.);
+        // Nothing is left to soak the next one.
+        assert_eq!(land(&mut w, 2000.), small);
+    }
+    #[test]
+    fn arcane_ward_expires_after_ten_seconds_and_ends_with_the_duel() {
+        let (mut w, ward) = warded();
+        tick(&mut w, 205);
+        assert_eq!(w.players[&2].absorb_left, 0.);
+        let hit = blow(&w, 2000.);
+        assert_eq!(land(&mut w, 2000.), hit, "an expired ward soaks nothing");
+        assert!(ward > hit);
+        let (mut w, _) = warded();
+        assert!(w.players[&2].absorb_left > 0.);
+        w.pvp_command(1, PvpCommand::DuelCancel);
+        assert_eq!(w.players[&2].absorb_left, 0., "the duel ended");
+    }
+    #[test]
+    fn a_blow_the_ward_soaks_completely_still_counts_as_landed() {
+        let (mut w, _) = warded();
+        assert_eq!(w.players[&2].pvp_fight, 0.);
+        assert_eq!(land(&mut w, 2000.), 0.);
+        assert!(w.players[&2].pvp_fight > 9., "the fight began");
+        assert!(w.players[&1].pvp_fight > 9.);
+        // A stunning skill still stuns through the ward.
+        let (mut w, _) = warded();
+        w.players.get_mut(&1).unwrap().character.attributes.accuracy = 100;
+        for _ in 0..40 {
+            w.use_skill(1, "earthshatter", Point { x: 1., y: 0. });
+            tick(&mut w, 5);
+            if w.players[&2].stun > 0. {
+                break;
+            }
+            w.players.get_mut(&1).unwrap().skill_cd.clear();
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.reset_resource();
+            c.change_resource(100.);
+        }
+        assert!(w.players[&2].stun > 0., "stunned");
+        assert_eq!(
+            hp(&w, 2),
+            w.players[&2].character.max_hp(),
+            "the ward took it all"
+        );
+        assert!(w.players[&2].absorb < w.players[&2].character.max_hp() * 0.2);
+    }
+    #[test]
+    fn monsters_ignore_the_ward() {
+        let (mut w, ward) = warded();
+        w.time += 10.;
+        let before = hp(&w, 2);
+        w.hurt_player_by(2, 4000., Point { x: 0., y: 0. }, "", 40);
+        assert!(hp(&w, 2) < before, "the monster hurt the mage");
+        assert_eq!(w.players[&2].absorb, ward, "the ward is untouched");
+    }
+    #[test]
+    fn a_priests_own_healing_is_a_quarter_in_a_pvp_fight_and_everyone_elses_a_half() {
+        let by = |class: Class, fight: bool| {
+            let (mut w, _) = stunner(Class::Warrior);
+            let c = &mut w.players.get_mut(&2).unwrap().character;
+            c.look.class = class;
+            // Level 28 is the first of both skills and below their ranks (a rank multiplies the heal).
+            c.level = 28;
+            c.reset_resource();
+            c.change_resource(100.);
+            let max = c.max_hp();
+            c.hp = max * 0.1;
+            let p = w.players.get_mut(&2).unwrap();
+            p.pvp_fight = if fight { PVP_FIGHT_TIME } else { 0. };
+            let factor = p.heal_factor_by(class);
+            let id = if class == Class::Priest {
+                "guardianlight"
+            } else {
+                "secondwind"
+            };
+            w.use_skill(2, id, Point { x: 1., y: 0. });
+            (factor, (hp(&w, 2) - max * 0.1) / max)
+        };
+        let (f, gain) = by(Class::Priest, false);
+        assert_eq!(f, 1.);
+        assert!((gain - 0.65).abs() < 0.01, "{gain}");
+        let (f, gain) = by(Class::Priest, true);
+        assert_eq!(f, PVP_DAMAGE_SCALE * PVP_PRIEST_HEAL_SCALE);
+        assert!((gain - 0.65 * 0.25).abs() < 0.01, "{gain}");
+        let (f, gain) = by(Class::Warrior, true);
+        assert_eq!(f, PVP_DAMAGE_SCALE);
+        assert!((gain - 0.40 * 0.5).abs() < 0.01, "{gain}");
+        // A priest healing someone else (heal_players) is scaled by the caster's class too.
+        let (mut w, _) = stunner(Class::Warrior);
+        w.players.get_mut(&2).unwrap().pvp_fight = PVP_FIGHT_TIME;
+        assert_eq!(w.players[&2].heal_factor_by(Class::Priest), 0.25);
+        assert_eq!(w.players[&2].heal_factor_by(Class::Mage), 0.5);
     }
 }
