@@ -50,8 +50,8 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await page.keyboard.press('n');
   await page.waitForFunction(() => Math.abs(valhalla.veyrrootNightMusic.output.gain.value - .64) < .03, null, { timeout: 10000 });
 
-  await debug(page, { op: 'teleport', zone: 25, x: 14, y: 128 });
-  await page.waitForFunction(() => Field.zone === 25 && valhalla.activeNightMusic === valhalla.nightMusic && valhalla.nightMusic.running && !valhalla.veyrrootNightMusic.running, null, { timeout: 15000 });
+  await debug(page, { op: 'teleport', zone: 26, x: 14, y: 128 });
+  await page.waitForFunction(() => Field.zone === 26 && valhalla.activeNightMusic === valhalla.frostwakeNightMusic && valhalla.frostwakeNightMusic.running && !valhalla.veyrrootNightMusic.running, null, { timeout: 15000 });
   await debug(page, { op: 'teleport', zone: 24, x: 48, y: 80 });
   await page.waitForFunction(() => Field.zone === 24 && DayNight.nightMix === 0 && !valhalla.nightMusic.running, null, { timeout: 15000 });
   await debug(page, { op: 'teleport', zone: 23, x: 15, y: 95 });
@@ -60,7 +60,7 @@ const debug = (page, command) => page.evaluate(c => Online.send({ type: 'debug',
   await debug(page, { op: 'set_time', hour: 12, freeze: true });
   await page.waitForFunction(() => DayNight.nightMix === 0 && !valhalla.veyrrootNightMusic.running && valhalla.whmusic.running, null, { timeout: 15000 });
   assert.deepEqual(errors, [], 'no browser errors');
-  console.log('Veyrroot remix routes only outdoors, decodes, crossfades, honors saved volume and mute, yields to fallback, and stays out of Heartwood');
+  console.log('Veyrroot remix routes only outdoors, decodes, crossfades, honors saved volume and mute, routes to Frostwake after travel, and stays out of Heartwood');
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
   await browser?.close();
   if (started) await call('stop_world').catch(() => {});

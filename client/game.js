@@ -182,7 +182,7 @@
   // Browsers only let audio start after a tap or key press, so the score begins on the first one
   // (on the title screen that is the tap that awakens the horn) and then plays on every screen.
   let music = null, fmusic = null, cmusic = null, rmusic = null, gmusic = null, smusic = null, vmusic = null, wmusic = null, kmusic = null, dmusic = null, nmusic = null, amusic = null, pmusic = null, omusic = null, mmusic = null, hmusic = null, tmusic = null, qmusic = null, jmusic = null, whmusic = null, lmusic = null, fwMusic = null, cairnMusic = null, yearMusic = null, cathedralMusic = [], eyeMusic = null, elderMusic = null, pavilionMusic = null, rainMusic = null, seedMusic = null, sunkenMusic = null, thunderMusic = null, bloomMusic = null, solarMusic = null, amberMusic = null, solsticeMusic = null, musicZone = 0;
-  let nightMusic = null, meadowNightMusic = null, cragsNightMusic = null, rimeNightMusic = null, fenNightMusic = null, cityNightMusic = null, moonsporeNightMusic = null, asterionNightMusic = null, stormglassNightMusic = null, sunwardNightMusic = null, ribbonwildNightMusic = null, tanglecrownNightMusic = null, veyrrootNightMusic = null, frostwakeNightMusic = null, cairnNightMusic = null, yearwheelNightMusic = null, activeNightMusic = null, stormglassMusic = null, activeScore = null, lastNightMix = -1;
+  let nightMusic = null, meadowNightMusic = null, cragsNightMusic = null, rimeNightMusic = null, fenNightMusic = null, cityNightMusic = null, wyrdNightMusic = null, skyNightMusic = null, nacreNightMusic = null, astralNightMusic = null, prismNightMusic = null, moonsporeNightMusic = null, asterionNightMusic = null, stormglassNightMusic = null, sunwardNightMusic = null, ribbonwildNightMusic = null, tanglecrownNightMusic = null, veyrrootNightMusic = null, lapisNightMusic = null, frostwakeNightMusic = null, cairnNightMusic = null, yearwheelNightMusic = null, activeNightMusic = null, stormglassMusic = null, activeScore = null, lastNightMix = -1;
   const nightScores = new Map(); // completed outdoor remixes; other zones use nightMusic
   function ensureMusic() {
     const c = audio(); if (!c || !window.createMusic) return;
@@ -194,13 +194,19 @@
     if (!rimeNightMusic && window.createRimeNightMusic) { rimeNightMusic = window.createRimeNightMusic(c); nightScores.set(2, rimeNightMusic); }
     if (!fenNightMusic && window.createFenNightMusic) { fenNightMusic = window.createFenNightMusic(c); nightScores.set(3, fenNightMusic); }
     if (!cityNightMusic && window.createCityNightMusic) { cityNightMusic = window.createCityNightMusic(c); nightScores.set(4, cityNightMusic); }
-    if (!veyrrootNightMusic && window.createVeyrrootNightMusic) { veyrrootNightMusic = window.createVeyrrootNightMusic(c); nightScores.set(23, veyrrootNightMusic); }
-    if (!tanglecrownNightMusic && window.createTanglecrownNightMusic) { tanglecrownNightMusic = window.createTanglecrownNightMusic(c); nightScores.set(22, tanglecrownNightMusic); }
-    if (!ribbonwildNightMusic && window.createRibbonwildNightMusic) { ribbonwildNightMusic = window.createRibbonwildNightMusic(c); nightScores.set(21, ribbonwildNightMusic); }
-    if (!sunwardNightMusic && window.createSunwardNightMusic) { sunwardNightMusic = window.createSunwardNightMusic(c); nightScores.set(20, sunwardNightMusic); }
-    if (!stormglassNightMusic && window.createStormglassNightMusic) { stormglassNightMusic = window.createStormglassNightMusic(c); nightScores.set(19, stormglassNightMusic); }
-    if (!asterionNightMusic && window.createAsterionNightMusic) { asterionNightMusic = window.createAsterionNightMusic(c); nightScores.set(17, asterionNightMusic); }
+    if (!wyrdNightMusic && window.createWyrdNightMusic) { wyrdNightMusic = window.createWyrdNightMusic(c); nightScores.set(6, wyrdNightMusic); }
+    if (!skyNightMusic && window.createSkyNightMusic) { skyNightMusic = window.createSkyNightMusic(c); nightScores.set(7, skyNightMusic); }
+    if (!nacreNightMusic && window.createNacreNightMusic) { nacreNightMusic = window.createNacreNightMusic(c); nightScores.set(9, nacreNightMusic); }
+    if (!astralNightMusic && window.createAstralNightMusic) { astralNightMusic = window.createAstralNightMusic(c); nightScores.set(13, astralNightMusic); }
+    if (!prismNightMusic && window.createPrismNightMusic) { prismNightMusic = window.createPrismNightMusic(c); nightScores.set(14, prismNightMusic); }
     if (!moonsporeNightMusic && window.createMoonsporeNightMusic) { moonsporeNightMusic = window.createMoonsporeNightMusic(c); nightScores.set(16, moonsporeNightMusic); }
+    if (!asterionNightMusic && window.createAsterionNightMusic) { asterionNightMusic = window.createAsterionNightMusic(c); nightScores.set(17, asterionNightMusic); }
+    if (!stormglassNightMusic && window.createStormglassNightMusic) { stormglassNightMusic = window.createStormglassNightMusic(c); nightScores.set(19, stormglassNightMusic); }
+    if (!sunwardNightMusic && window.createSunwardNightMusic) { sunwardNightMusic = window.createSunwardNightMusic(c); nightScores.set(20, sunwardNightMusic); }
+    if (!ribbonwildNightMusic && window.createRibbonwildNightMusic) { ribbonwildNightMusic = window.createRibbonwildNightMusic(c); nightScores.set(21, ribbonwildNightMusic); }
+    if (!tanglecrownNightMusic && window.createTanglecrownNightMusic) { tanglecrownNightMusic = window.createTanglecrownNightMusic(c); nightScores.set(22, tanglecrownNightMusic); }
+    if (!veyrrootNightMusic && window.createVeyrrootNightMusic) { veyrrootNightMusic = window.createVeyrrootNightMusic(c); nightScores.set(23, veyrrootNightMusic); }
+    if (!lapisNightMusic && window.createLapisNightMusic) { lapisNightMusic = window.createLapisNightMusic(c); nightScores.set(25, lapisNightMusic); }
     if (!frostwakeNightMusic && window.createFrostwakeNightMusic) { frostwakeNightMusic = window.createFrostwakeNightMusic(c); nightScores.set(26, frostwakeNightMusic); }
     if (!cairnNightMusic && window.createCairnNightMusic) { cairnNightMusic = window.createCairnNightMusic(c); nightScores.set(27, cairnNightMusic); }
     if (!yearwheelNightMusic && window.createYearwheelNightMusic) { yearwheelNightMusic = window.createYearwheelNightMusic(c); nightScores.set(28, yearwheelNightMusic); }
@@ -408,13 +414,19 @@
   Object.defineProperty(window.valhalla, 'rimeNightMusic', { get: () => rimeNightMusic });
   Object.defineProperty(window.valhalla, 'fenNightMusic', { get: () => fenNightMusic });
   Object.defineProperty(window.valhalla, 'cityNightMusic', { get: () => cityNightMusic });
-  Object.defineProperty(window.valhalla, 'veyrrootNightMusic', { get: () => veyrrootNightMusic });
-  Object.defineProperty(window.valhalla, 'tanglecrownNightMusic', { get: () => tanglecrownNightMusic });
-  Object.defineProperty(window.valhalla, 'ribbonwildNightMusic', { get: () => ribbonwildNightMusic });
-  Object.defineProperty(window.valhalla, 'sunwardNightMusic', { get: () => sunwardNightMusic });
-  Object.defineProperty(window.valhalla, 'stormglassNightMusic', { get: () => stormglassNightMusic });
-  Object.defineProperty(window.valhalla, 'asterionNightMusic', { get: () => asterionNightMusic });
+  Object.defineProperty(window.valhalla, 'wyrdNightMusic', { get: () => wyrdNightMusic });
+  Object.defineProperty(window.valhalla, 'skyNightMusic', { get: () => skyNightMusic });
+  Object.defineProperty(window.valhalla, 'nacreNightMusic', { get: () => nacreNightMusic });
+  Object.defineProperty(window.valhalla, 'astralNightMusic', { get: () => astralNightMusic });
+  Object.defineProperty(window.valhalla, 'prismNightMusic', { get: () => prismNightMusic });
   Object.defineProperty(window.valhalla, 'moonsporeNightMusic', { get: () => moonsporeNightMusic });
+  Object.defineProperty(window.valhalla, 'asterionNightMusic', { get: () => asterionNightMusic });
+  Object.defineProperty(window.valhalla, 'stormglassNightMusic', { get: () => stormglassNightMusic });
+  Object.defineProperty(window.valhalla, 'sunwardNightMusic', { get: () => sunwardNightMusic });
+  Object.defineProperty(window.valhalla, 'ribbonwildNightMusic', { get: () => ribbonwildNightMusic });
+  Object.defineProperty(window.valhalla, 'tanglecrownNightMusic', { get: () => tanglecrownNightMusic });
+  Object.defineProperty(window.valhalla, 'veyrrootNightMusic', { get: () => veyrrootNightMusic });
+  Object.defineProperty(window.valhalla, 'lapisNightMusic', { get: () => lapisNightMusic });
   Object.defineProperty(window.valhalla, 'frostwakeNightMusic', { get: () => frostwakeNightMusic });
   Object.defineProperty(window.valhalla, 'cairnNightMusic', { get: () => cairnNightMusic });
   Object.defineProperty(window.valhalla, 'yearwheelNightMusic', { get: () => yearwheelNightMusic });

@@ -2,6 +2,7 @@
 """Export loop-folded game MP3s and natural-ending full tracks for two night remixes."""
 import math
 import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -64,5 +65,10 @@ def export(zone, title, seconds):
           f'seam {np.max(np.abs(loop[0]-loop[-1])):.6f}; full {len(audio)/RATE:.3f}s')
 
 
+selected = set(sys.argv[1:])
+if selected - {score[0] for score in SCORES}:
+    raise SystemExit(f'Unknown score: {", ".join(sorted(selected - {score[0] for score in SCORES}))}')
 for score in SCORES:
+    if selected and score[0] not in selected:
+        continue
     export(*score)

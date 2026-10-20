@@ -27,18 +27,27 @@ for channel in range(2):
     loop[-n:, channel] += (mid[channel] - loop[-1, channel]) * (np.arange(n) / n)
 loop[0] = mid
 loop[-1] = mid
-target_rms = 10 ** (-24 / 20)
+# Keep transients below the peak ceiling without flattening their tops.
+def soft_limit(samples):
+    magnitude = np.abs(samples)
+    excess = np.maximum(magnitude - .75, 0)
+    curved = .75 + .15 * (1 - np.exp(-excess / .15))
+    return np.sign(samples) * np.where(magnitude > .75, curved, magnitude)
+
+
+# The 128 kbps encode drops about 0.45 dB; target -24 dB after decoding.
+target_rms = 10 ** (-23.55 / 20)
 low, high = 0.0, target_rms / math.sqrt(float(np.mean(loop.mean(axis=1) ** 2))) * 2
 for _ in range(20):
     gain = (low + high) / 2
-    trial = np.clip(loop * gain, -.9, .9)
+    trial = soft_limit(loop * gain)
     if math.sqrt(float(np.mean(trial.mean(axis=1) ** 2))) < target_rms:
         low = gain
     else:
         high = gain
 gain = (low + high) / 2
-loop = np.clip(loop * gain, -.9, .9)
-audio = np.clip(audio * gain, -.9, .9)
+loop = soft_limit(loop * gain)
+audio = soft_limit(audio * gain)
 assert np.max(np.abs(loop)) <= .901
 folded = Path('/tmp/valhallasc-meadow-night-loop.wav')
 wavfile.write(folded, RATE, loop.astype(np.float32))
