@@ -1068,6 +1068,38 @@
     "accessory_regearsolstice": {
       "png": "assassin_progression_accessory_regearsolstice.png",
       "depth": "assassin_progression_accessory_regearsolstice_depth.png"
+    },
+    "armor_fatewoven": {
+      "png": "assassin_nornroot_armor.png",
+      "depth": "assassin_nornroot_armor_depth.png"
+    },
+    "pants_fatewoven": {
+      "png": "assassin_nornroot_pants.png",
+      "depth": "assassin_nornroot_pants_depth.png"
+    },
+    "shoulders_fatewoven": {
+      "png": "assassin_nornroot_shoulders.png",
+      "depth": "assassin_nornroot_shoulders_depth.png"
+    },
+    "gloves_fatewoven": {
+      "png": "assassin_nornroot_gloves.png",
+      "depth": "assassin_nornroot_gloves_depth.png"
+    },
+    "head_fatewoven": {
+      "png": "assassin_nornroot_head.png",
+      "depth": "assassin_nornroot_head_depth.png"
+    },
+    "necklace_fatewoven": {
+      "png": "assassin_nornroot_necklace.png",
+      "depth": "assassin_nornroot_necklace_depth.png"
+    },
+    "accessory_fatewoven": {
+      "png": "assassin_nornroot_accessory.png",
+      "depth": "assassin_nornroot_accessory_depth.png"
+    },
+    "weapon_fatewoven": {
+      "png": "assassin_nornroot_weapon.png",
+      "depth": "assassin_nornroot_weapon_depth.png"
     }
   },
   "gender": "male",
@@ -1514,6 +1546,7 @@
     46
   ],
   "lazyParts": [
+    "accessory_fatewoven",
     "accessory_regearamber",
     "accessory_regearastro",
     "accessory_regearbloom",
@@ -1544,6 +1577,7 @@
     "accessory_regearsolstice",
     "accessory_regearthunder",
     "accessory_regearvault",
+    "armor_fatewoven",
     "armor_regearamber",
     "armor_regearastro",
     "armor_regearbloom",
@@ -1574,6 +1608,7 @@
     "armor_regearsolstice",
     "armor_regearthunder",
     "armor_regearvault",
+    "gloves_fatewoven",
     "gloves_regearamber",
     "gloves_regearastro",
     "gloves_regearbloom",
@@ -1604,6 +1639,7 @@
     "gloves_regearsolstice",
     "gloves_regearthunder",
     "gloves_regearvault",
+    "head_fatewoven",
     "head_regearamber",
     "head_regearastro",
     "head_regearbloom",
@@ -1634,6 +1670,7 @@
     "head_regearsolstice",
     "head_regearthunder",
     "head_regearvault",
+    "necklace_fatewoven",
     "necklace_regearamber",
     "necklace_regearastro",
     "necklace_regearbloom",
@@ -1663,6 +1700,7 @@
     "necklace_regearsolar",
     "necklace_regearsolstice",
     "necklace_regearthunder",
+    "pants_fatewoven",
     "pants_regearamber",
     "pants_regearastro",
     "pants_regearbloom",
@@ -1693,6 +1731,7 @@
     "pants_regearsolstice",
     "pants_regearthunder",
     "pants_regearvault",
+    "shoulders_fatewoven",
     "shoulders_regearamber",
     "shoulders_regearastro",
     "shoulders_regearbloom",
@@ -1723,6 +1762,7 @@
     "shoulders_regearsolstice",
     "shoulders_regearthunder",
     "shoulders_regearvault",
+    "weapon_fatewoven",
     "weapon_regearamber",
     "weapon_regearastro",
     "weapon_regearbloom",
@@ -15648,5 +15688,15 @@
         }
       ]
     }
+  },
+  "gearSources": {
+    "armor_fatewoven": "scripts/nornroot_gear_shapes.py",
+    "pants_fatewoven": "scripts/nornroot_gear_shapes.py",
+    "shoulders_fatewoven": "scripts/nornroot_gear_shapes.py",
+    "gloves_fatewoven": "scripts/nornroot_gear_shapes.py",
+    "head_fatewoven": "scripts/nornroot_gear_shapes.py",
+    "necklace_fatewoven": "scripts/nornroot_gear_shapes.py",
+    "accessory_fatewoven": "scripts/nornroot_gear_shapes.py",
+    "weapon_fatewoven": "scripts/nornroot_gear_shapes.py"
   }
 }

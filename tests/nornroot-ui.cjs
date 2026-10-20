@@ -31,6 +31,17 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
     await page.locator('#fieldcv').screenshot({path:path.join(world.artifacts,`nornroot-${name}-${STUB?'stub':'real'}.png`)});
   };
   await debug({op:'set_level',level:25});await debug({op:'explore_all'});
+  await page.waitForFunction(()=>Field.hero.level===25);
+  await page.locator('#levelup-banner').waitFor({state:'hidden'});
+  const gear=await page.evaluate(()=>WORLD_ITEMS.filter(i=>i.source==='nornroot'&&(!i.class||i.class==='warrior')).map(i=>({id:i.id,slot:({armor:'chest',weapon:'hands',accessory:'accessory1'})[i.kind]||i.kind})));
+  assert.equal(gear.length,8);
+  for(const piece of gear){
+    await debug({op:'give_item',item:piece.id,quantity:1});
+    await page.waitForFunction(id=>Field.hero.inventory?.some(s=>s.item===id),piece.id);
+  }
+  await page.evaluate(gear=>Online.send({type:'equip',slots:Object.fromEntries(gear.map(p=>[p.slot,p.id]))}),gear);
+  await page.waitForFunction(()=>Field.hero.setCounts?.nornroot===8);
+  if(!STUB)await page.waitForFunction(()=>Field.warriorSprites?.equipment?.armor==='fatewoven'&&Field.warriorSprites?.source?.parts?.weapon_fatewoven);
   await teleport(6,84,71);await shot('entrance');
   await page.evaluate(()=>Online.send({type:'move',x:84,y:66}));
   await page.waitForFunction(()=>Field.zone===41,null,{timeout:15000});
@@ -46,10 +57,12 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
       if(i.width===768&&i.height===480&&meta.sprites[kind]&&meta.tops[kind])n++;
     }return n;
   }),6,'All six editable enemy atlases decode');
-  for(const [name,x,y] of [['threshold',56,99],['amber-court',25,58],['thread-court',87,58],['loom',56,28]]){
+  for(const [name,x,y] of [['threshold',56,99],['amber-court',25,58],['thread-court',87,58],['loom',60,13]]){
     await teleport(41,x,y);await shot(name);
   }
-  await teleport(41,56,35);
+  const sign=await page.evaluate(()=>Field.signs.find(s=>s.id==='barrow_fatebound'));
+  assert.ok(sign,'The server provides the final boss sign');
+  await teleport(41,sign.x,sign.y);
   await page.evaluate(()=>Online.send({type:'sign_read',sign:'barrow_fatebound'}));
   await page.locator('#sign-panel').waitFor({state:'visible'});
   assert.match(await page.locator('#sign-panel').innerText(),/clear middle/);

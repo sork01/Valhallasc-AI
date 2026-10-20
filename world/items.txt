@@ -52422,12 +52422,7 @@
     "sell": 331,
     "class": "warrior",
     "variant": "crimson_l25_norn",
-    "art": "crimson",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 4.8,
     "defense": 19.4,
@@ -52445,12 +52440,7 @@
     "sell": 331,
     "class": "warrior",
     "variant": "crimson_l25_norn",
-    "art": "crimson",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52468,12 +52458,7 @@
     "sell": 331,
     "class": "warrior",
     "variant": "crimson_l25_norn",
-    "art": "crimson",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52491,12 +52476,7 @@
     "sell": 331,
     "class": "warrior",
     "variant": "crimson_l25_norn",
-    "art": "crimson",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52514,12 +52494,7 @@
     "sell": 331,
     "class": "warrior",
     "variant": "sword_l25_norn",
-    "art": "sword",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 26.0,
     "defense": 6.4,
@@ -52537,12 +52512,7 @@
     "sell": 331,
     "class": "mage",
     "variant": "apprentice_l25_norn",
-    "art": "apprentice",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 3.2,
     "defense": 13.0,
@@ -52560,12 +52530,7 @@
     "sell": 331,
     "class": "mage",
     "variant": "apprentice_l25_norn",
-    "art": "apprentice",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52583,12 +52548,7 @@
     "sell": 331,
     "class": "mage",
     "variant": "apprentice_l25_norn",
-    "art": "apprentice",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52606,12 +52566,7 @@
     "sell": 331,
     "class": "mage",
     "variant": "apprentice_l25_norn",
-    "art": "apprentice",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52629,12 +52584,7 @@
     "sell": 331,
     "class": "mage",
     "variant": "ash_l25_norn",
-    "art": "ash",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 26.0,
     "defense": 6.4,
@@ -52652,12 +52602,7 @@
     "sell": 331,
     "class": "assassin",
     "variant": "shadow_l25_norn",
-    "art": "shadow",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 3.2,
     "defense": 13.0,
@@ -52675,12 +52620,7 @@
     "sell": 331,
     "class": "assassin",
     "variant": "shadow_l25_norn",
-    "art": "shadow",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52698,12 +52638,7 @@
     "sell": 331,
     "class": "assassin",
     "variant": "shadow_l25_norn",
-    "art": "shadow",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52721,12 +52656,7 @@
     "sell": 331,
     "class": "assassin",
     "variant": "shadow_l25_norn",
-    "art": "shadow",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52744,12 +52674,7 @@
     "sell": 331,
     "class": "assassin",
     "variant": "daggers_l25_norn",
-    "art": "daggers",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 26.0,
     "defense": 6.4,
@@ -52767,12 +52692,7 @@
     "sell": 331,
     "class": "priest",
     "variant": "pilgrim_l25_norn",
-    "art": "pilgrim",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 4.8,
     "defense": 19.4,
@@ -52790,12 +52710,7 @@
     "sell": 331,
     "class": "priest",
     "variant": "pilgrim_l25_norn",
-    "art": "pilgrim",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52813,12 +52728,7 @@
     "sell": 331,
     "class": "priest",
     "variant": "pilgrim_l25_norn",
-    "art": "pilgrim",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52836,12 +52746,7 @@
     "sell": 331,
     "class": "priest",
     "variant": "pilgrim_l25_norn",
-    "art": "pilgrim",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52859,12 +52764,7 @@
     "sell": 331,
     "class": "priest",
     "variant": "mace_l25_norn",
-    "art": "mace",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 26.0,
     "defense": 6.4,
@@ -52882,12 +52782,7 @@
     "sell": 331,
     "class": "hunter",
     "variant": "scout_l25_norn",
-    "art": "scout",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 4.8,
     "defense": 19.4,
@@ -52905,12 +52800,7 @@
     "sell": 331,
     "class": "hunter",
     "variant": "scout_l25_norn",
-    "art": "scout",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52928,12 +52818,7 @@
     "sell": 331,
     "class": "hunter",
     "variant": "scout_l25_norn",
-    "art": "scout",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52951,12 +52836,7 @@
     "sell": 331,
     "class": "hunter",
     "variant": "scout_l25_norn",
-    "art": "scout",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -52974,12 +52854,7 @@
     "sell": 331,
     "class": "hunter",
     "variant": "shortbow_l25_norn",
-    "art": "shortbow",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 26.0,
     "defense": 6.4,
@@ -52996,12 +52871,7 @@
     "requiredLevel": 25,
     "sell": 331,
     "variant": "wayfarer_l25_norn",
-    "art": "wayfarer",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 1.6,
     "defense": 6.4,
@@ -53018,12 +52888,7 @@
     "requiredLevel": 25,
     "sell": 331,
     "variant": "moonstone_l25_norn",
-    "art": "moonstone",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 13.0,
     "defense": 3.2,
@@ -53040,12 +52905,7 @@
     "requiredLevel": 25,
     "sell": 331,
     "variant": "amber_l25_norn",
-    "art": "amber",
-    "tint": {
-      "hue": 272,
-      "saturate": 1.18,
-      "brightness": 1.12
-    },
+    "art": "fatewoven",
     "starter": false,
     "attack": 9.8,
     "defense": 2.4,

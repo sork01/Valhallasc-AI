@@ -283,6 +283,9 @@ fn a_dungeon_boss_kills_a_lone_player() {
                 for class in classes() {
                     for seed in 1..=seeds() {
                         let mut c = case(&d, class, rarity, above);
+                        // A future enrage cannot be predicted from the first 30 seconds' damage.
+                        // Observe the complete boss fight before judging whether the lone player dies.
+                        c.run_to_end = true;
                         c.target = Some(*spawn);
                         // The lone player must die, so no fight is cut short as hopeless.
                         c.run_to_end = true;

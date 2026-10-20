@@ -420,5 +420,13 @@
   "span_archon": [
     98,
     0.2
+  ],
+  "barrow_doorward": [
+    80,
+    0.2
+  ],
+  "barrow_threadkeeper": [
+    90,
+    0.2
   ]
 }

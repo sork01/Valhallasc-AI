@@ -105,8 +105,8 @@ pub struct Item {
     pub bonus_stats: Attributes,
     pub class: Option<Class>,
     pub variant: Option<String>,
-    /// The drawn piece this one is a recolouring of (its `variant` names the recolouring itself). Unset for the
-    /// original pieces. The client paints the base art with the `tint` the catalog carries.
+    /// The equipment atlas key. Catalog variants can share a fitted drawing;
+    /// the client recolours it only when the catalog also supplies a tint.
     pub art: Option<String>,
     #[serde(default)]
     pub starter: bool,
@@ -1453,15 +1453,17 @@ pub fn enrage_factor(kind: &str, fight: f64) -> f64 {
     })
 }
 
+/// Range, speed, colour, size, fan count, spread and melee reach of a boss projectile.
+pub type BossRangedProfile = (f64, f64, String, f64, u32, f64, f64);
+
 /// A boss's ranged attack from `world/boss-ranged.txt`: `kind -> [range, speed, colour, size, shots, spread, melee]`
 /// (the fields of `Slime::ranged` and `Slime::melee_inside`). It takes precedence over the encounter catalog, so a boss
 /// that a ranged hero could kite outside its reach shoots, and the fan always has an odd number of shots: with an even
 /// number none flies straight and a hero standing still in the gap is never hit.
-pub fn boss_ranged(kind: &str) -> Option<&'static (f64, f64, String, f64, u32, f64, f64)> {
+pub fn boss_ranged(kind: &str) -> Option<&'static BossRangedProfile> {
     use std::collections::BTreeMap;
     use std::sync::OnceLock;
-    static TABLE: OnceLock<BTreeMap<String, (f64, f64, String, f64, u32, f64, f64)>> =
-        OnceLock::new();
+    static TABLE: OnceLock<BTreeMap<String, BossRangedProfile>> = OnceLock::new();
     TABLE
         .get_or_init(|| {
             // Test builds may read another table (`BOSS_RANGED_FILE=path`), so calibrating needs no rebuild.
@@ -1501,7 +1503,7 @@ mod tests {
     }
     #[test]
     fn every_boss_ranged_attack_is_a_boss_with_an_odd_fan() {
-        let table: std::collections::BTreeMap<String, (f64, f64, String, f64, u32, f64, f64)> =
+        let table: std::collections::BTreeMap<String, BossRangedProfile> =
             serde_json::from_str(include_str!("../../world/boss-ranged.txt")).unwrap();
         assert!(table.len() >= 20, "{} bosses", table.len());
         for (kind, (range, speed, _, size, shots, spread, melee)) in table {
@@ -2465,8 +2467,8 @@ mod tests {
                 i.id
             );
             if let Some(art) = &i.art {
-                // Level-25+ art names refer to dedicated progression atlases, not an item variant.
-                if art.starts_with("regear") {
+                // Original fitted sets name dedicated atlases rather than an item variant.
+                if art.starts_with("regear") || art == "fatewoven" {
                     let slot = if i.kind == "headgear" {
                         "head"
                     } else {

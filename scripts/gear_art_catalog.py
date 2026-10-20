@@ -10,19 +10,21 @@ STATE = ROOT / 'docs/gear-redesign-state.txt'
 HIGH_STATE = ROOT / 'docs/high-gear-state.txt'
 DUNGEON_STATE = ROOT / 'docs/dungeon-gear-state.txt'
 INSTANCE_STATE = ROOT / 'docs/instance-gear-state.txt'
+NORNROOT_STATE = ROOT / 'docs/nornroot-gear-state.txt'
 ASSETS = ROOT / 'client/assets'
 
 
 def jobs():
     if not MANIFEST.exists(): return []
     manifest = json.loads(MANIFEST.read_text())
-    state = {t['id']: t for path in (STATE, HIGH_STATE, DUNGEON_STATE, INSTANCE_STATE) if path.exists()
+    state = {t['id']: t for path in (STATE, HIGH_STATE, DUNGEON_STATE, INSTANCE_STATE, NORNROOT_STATE) if path.exists()
              for t in json.loads(path.read_text())['tasks']}
     return [(state[key], record) for key, record in manifest.items() if record.get('files')]
 
 
 def matches(item, task):
     if item['kind'] != task['kind'] or item.get('class') != task['className']: return False
+    if task['group'] == 'nornroot': return item.get('source') == 'nornroot'
     if task['group'].startswith('L'):
         return not item.get('source') and item.get('requiredLevel') == int(task['group'][1:])
     if task['group'] in ('vault', 'moonwell'):
@@ -74,7 +76,7 @@ def append_icons(refresh_base=False):
         if previous and previous['id'] in at:
             at[item['id']] = at[previous['id']]
     image.save(ASSETS / 'items.png', optimize=True)
-    meta = {**original, 'rows': rows, 'at': at, 'progressionSprites': {task['id']: record['icon']['id'] for task, record in completed}}
+    meta = {**original, 'rows': rows, 'at': at, 'progressionSprites': {task['id']: record['icon']['id'] for task, record in completed if record['icon'].get('id')}}
     (ASSETS / 'items.txt').write_text(json.dumps(meta, indent=1) + '\n')
     (ROOT / 'client/itemicons.js').write_text("'use strict';\n// Original equipment icons plus individually exported progression gear.\nwindow.ITEM_ICONS = " + json.dumps(dict(size=size, cols=cols, rows=rows, at=at), separators=(',', ':')) + ';\n')
 

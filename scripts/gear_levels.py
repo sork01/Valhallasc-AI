@@ -333,7 +333,10 @@ def nornroot_pieces(out):
         v['defense'] = round(i['defense'] * 1.15, 1)
         v['sell'] = round(i['sell'] * 1.15)
         v['source'] = 'nornroot'
-        v['tint'] = {'hue': 272, 'saturate': 1.18, 'brightness': 1.12}
+        # Fatewoven has original fitted geometry and its own painted palette.
+        # Keep existing item IDs, variants and combat budgets for saved gear.
+        v['art'] = 'fatewoven'
+        v.pop('tint', None)
         v['bonusStats'] = bonus_stats(v)
         pieces.append(ordered(v))
     assert len(pieces) == 28
@@ -624,6 +627,19 @@ def vault_only():
     print(len(items), 'items')
 
 
+def nornroot_only():
+    """Refresh Nornroot art without regenerating unrelated equipment budgets."""
+    existing = json.loads(ITEMS.read_text())
+    replacements = {i['id']: i for i in nornroot_pieces(existing)}
+    assert len(replacements) == 28
+    items = [replacements.get(i['id'], i) for i in existing]
+    ITEMS.write_text(json.dumps(items, indent=2, ensure_ascii=False) + '\n')
+    print('28 Nornroot pieces refreshed; other equipment preserved')
+
+
 if __name__ == '__main__':
     import sys
-    vault_only() if '--vault-only' in sys.argv else main()
+    if '--nornroot-only' in sys.argv:
+        nornroot_only()
+    else:
+        vault_only() if '--vault-only' in sys.argv else main()

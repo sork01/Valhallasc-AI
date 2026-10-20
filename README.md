@@ -532,7 +532,8 @@ Regenerate catalogs, gear, Yearwheel, dungeon maps, late quests and gearwright d
 ### Nornroot Barrow — level 25 (2026-10-20)
 
 A private party dungeon beneath Wyrdwood’s Norn Stones, with three guardians,
-three quests, Fatewoven level-25 loot, original PixelFlow enemies and a 5/4
+three quests, Fatewoven level-25 loot with original fitted equipment shapes,
+a root-and-loom interior, original PixelFlow enemies and a 5/4
 chamber score. See [docs/nornroot.md](docs/nornroot.md) for generator commands,
 focused validation and the private-copy migration required before deployment.
 

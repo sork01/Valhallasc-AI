@@ -362,5 +362,17 @@
   "relicwarden": [
     2.52,
     1.0
+  ],
+  "barrow_scarab": [
+    1.0,
+    5.0
+  ],
+  "barrow_hound": [
+    1.0,
+    5.0
+  ],
+  "barrow_spinner": [
+    1.0,
+    5.0
   ]
 }

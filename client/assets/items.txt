@@ -1,7 +1,7 @@
 {
  "size": 48,
  "cols": 10,
- "rows": 91,
+ "rows": 94,
  "at": {
   "warrior_headgear_crimson": [
    0,
@@ -7534,6 +7534,118 @@
   "accessory_amber_l95_solstice": [
    8,
    90
+  ],
+  "warrior_armor_crimson_l25_norn": [
+   9,
+   90
+  ],
+  "warrior_headgear_crimson_l25_norn": [
+   0,
+   91
+  ],
+  "warrior_shoulders_crimson_l25_norn": [
+   1,
+   91
+  ],
+  "warrior_gloves_crimson_l25_norn": [
+   2,
+   91
+  ],
+  "warrior_weapon_sword_l25_norn": [
+   3,
+   91
+  ],
+  "mage_armor_apprentice_l25_norn": [
+   4,
+   91
+  ],
+  "mage_headgear_apprentice_l25_norn": [
+   5,
+   91
+  ],
+  "mage_shoulders_apprentice_l25_norn": [
+   6,
+   91
+  ],
+  "mage_gloves_apprentice_l25_norn": [
+   7,
+   91
+  ],
+  "mage_weapon_ash_l25_norn": [
+   8,
+   91
+  ],
+  "assassin_armor_shadow_l25_norn": [
+   9,
+   91
+  ],
+  "assassin_headgear_shadow_l25_norn": [
+   0,
+   92
+  ],
+  "assassin_shoulders_shadow_l25_norn": [
+   1,
+   92
+  ],
+  "assassin_gloves_shadow_l25_norn": [
+   2,
+   92
+  ],
+  "assassin_weapon_daggers_l25_norn": [
+   3,
+   92
+  ],
+  "priest_armor_pilgrim_l25_norn": [
+   4,
+   92
+  ],
+  "priest_headgear_pilgrim_l25_norn": [
+   5,
+   92
+  ],
+  "priest_shoulders_pilgrim_l25_norn": [
+   6,
+   92
+  ],
+  "priest_gloves_pilgrim_l25_norn": [
+   7,
+   92
+  ],
+  "priest_weapon_mace_l25_norn": [
+   8,
+   92
+  ],
+  "hunter_armor_scout_l25_norn": [
+   9,
+   92
+  ],
+  "hunter_headgear_scout_l25_norn": [
+   0,
+   93
+  ],
+  "hunter_shoulders_scout_l25_norn": [
+   1,
+   93
+  ],
+  "hunter_gloves_scout_l25_norn": [
+   2,
+   93
+  ],
+  "hunter_weapon_shortbow_l25_norn": [
+   3,
+   93
+  ],
+  "pants_wayfarer_l25_norn": [
+   4,
+   93
+  ],
+  "necklace_moonstone_l25_norn": [
+   5,
+   93
+  ],
+  "accessory_amber_l25_norn": [
+   6,
+   93
   ],
   "warrior_armor_crimson_l55_gray": [
    5,

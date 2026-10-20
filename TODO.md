@@ -35,11 +35,11 @@ All eleven later interiors keep their existing collision rooms but now use diffe
 
 ### Level 25 dungeon — Wyrdwood (zone 6)
 
-- [ ] `I25-MAP` — Build a distinct level-25 private party dungeon with collision, safe arrival and a return route. Place its sealed entrance on Wyrdwood's level-25 quest route, clear of nearby enemies and other portals.
-- [ ] `I25-FOES` — Add ordinary enemies, bosses, authoritative combat rules and editable monster sprites appropriate to level 25.
-- [ ] `I25-QUEST` — Add Wyrdwood entry and dungeon quests, boss objectives and level-appropriate rewards; credit kills and clears to the correct party copy.
-- [ ] `I25-SCENE` — Give the interior and entrance their own visual identity, music and client rendering.
-- [ ] `I25-OPEN` — After the four tasks above, open the Wyrdwood entrance and verify the level gate, party isolation, travel, boss clear and rewards in a private world.
+- [x] `I25-MAP` — Nornroot Barrow is public zone 41 with four private party copies, collision and safe arrivals. Its Wyrdwood entrance is at (84, 66), beside the Norn Stones road; return arrival (84, 71).
+- [x] `I25-FOES` — Built twelve ordinary foes across three original kinds and three guardians, with six editable 34-frame PixelFlow sprites. Focused lone-player and hired-party balance checks pass; tuning is in world/elite-power.txt and world/enrage.txt.
+- [x] `I25-QUEST` — Added the Last Witness entry quest and separate party quests for Arn and Vessa, with correct copy credit, class-neutral rewards and an exclusive 28-piece level-25 Fatewoven loot set.
+- [x] `I25-SCENE` — Original root-and-loom architecture, end-grain courts, woven paths, amber cocoon burials and 28 newly shaped Fatewoven pieces replace the first generic stone/recolour pass. All ten hero rigs and the real dungeon render pass focused browser checks. The editable dybase2 5/4 chamber score has no foreground lead; music controls and real artwork pass private browser checks. Full-song listening remains unverified.
+- [x] `I25-OPEN` — Entrance, ordinary return and all-guardian clear exit work. Five focused Rust tests, 17 private MCP checks, solo/party balance and stub/real browser checks pass. Final pack damage and side-guardian enrage tuning await a server release; see docs/nornroot.md.
 
 ### Level 30 dungeon — Bifrost Reach (zone 7)
 
