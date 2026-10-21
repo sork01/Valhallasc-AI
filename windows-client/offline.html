@@ -1,0 +1,18 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Valhalla Rumble</title>
+<style>
+  html, body { height: 100%; margin: 0; background: #0a1230; color: #f5e9c8; font: 18px/1.5 Georgia, serif; }
+  body { display: grid; place-items: center; text-align: center; }
+  main { max-width: 32em; padding: 2em; }
+  h1 { color: #f5c542; font-weight: normal; }
+  button { font: inherit; padding: .5em 1.6em; background: #f5c542; color: #0a1230; border: 0; border-radius: 6px; cursor: pointer; }
+  small { display: block; margin-top: 1.5em; opacity: .6; }
+</style>
+<main>
+  <h1>Cannot reach the world</h1>
+  <p>Check your internet connection and try again.</p>
+  <button onclick="location.href='https://gunning.se/Valhallasc/'">Try again</button>
+  <small id="why"></small>
+</main>
+<script>document.getElementById('why').textContent = new URLSearchParams(location.search).get('reason') || '';</script>

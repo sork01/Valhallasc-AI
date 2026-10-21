@@ -1,0 +1,41 @@
+{
+  "name": "valhallasc-windows-client",
+  "productName": "Valhalla Rumble",
+  "version": "1.0.0",
+  "description": "Windows client for Valhalla Rumble: a window around https://gunning.se/Valhallasc/",
+  "main": "main.js",
+  "author": "sork01",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --x64"
+  },
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "se.gunning.valhallasc",
+    "productName": "Valhalla Rumble",
+    "artifactName": "Valhalla-Rumble-Setup-${version}.${ext}",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["main.js", "offline.html", "package.json"],
+    "compression": "normal",
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "build/icon.png",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Valhalla Rumble",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
+    }
+  }
+}
