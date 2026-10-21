@@ -8,6 +8,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+### Music (owner's request, 2026-10-21)
+
+- [ ] `TIME-NIGHT-Z0-NEW` — Change the Greenmeadow (zone 0) night song: write a new one to replace the current night score for zone 0 (`nightScores` in `client/game.js`). Read `docs/musical-style.md` first and use the `createsong` recipe (dybase2 MCP, Sork-60 pads and synth leads, no foreground lead in a night song, no Axiom-8 `Hip-hop` hi-hat, loop fold, -24 dB mono RMS, 128 kbps loop at `client/assets/`). Ask the owner which direction the new song should take (mood, tempo, key) before writing it, and offer the full natural-ending MP3 for FileDrop instead of uploading it.
+
 ### Arena gauntlet quests (owner's request, 2026-10-21)
 
 At level 20 and every ten levels after (20, 30, ... 90 and 99), the player gets a quest for the Arena (zone 40). The quest teleports the player to the Arena, where they face mercenaries one at a time, one of each class (warrior, mage, assassin, priest, hunter), so five fights. When a fight ends the player is restored to full health and mana, and a countdown runs before the next match. Winning all five completes the quest. Turning it in pays a blue weapon for that level, experience and gold.
