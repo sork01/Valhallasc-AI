@@ -74,7 +74,8 @@
           window.Social?.reset(); window.Trade?.reset(); window.Bank?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Trade?.onSnapshot(character); send({ type: 'social', command: { op: 'refresh' } }); if (character?.pvpSupported) send({ type: 'pvp', command: { op: 'refresh' } });
           $('connection-overlay').hidden = true; $('chat-input').disabled = false;
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
-          log('Welcome to Greenmeadow. E: character · B/I: bags · K: skills · 1–9, 0, -, =: skillbar · Q: quests · O: friends · P: party · F: talk · Enter: chat (/p for party).');
+          const L = (a, all) => Keys.label(a, all), T = window.Locale?.translate || (x => x), word = text => T(text).toLowerCase();
+          log(`${T('Welcome to Greenmeadow.')} ${L('character', false)}: ${word('Character')} · ${L('bags').replace(' / ', '/')}: ${word('Bags')} · ${L('skills', false)}: ${word('Skills')} · ${Keys.skillRange()}: ${word('Skillbar')} · ${L('quests', false)}: ${word('Quests')} · ${L('friends', false)}: ${word('Friends')} · ${L('party', false)}: ${word('Party')} · ${L('talk', false)}: ${word('Talk or read')} · ${L('chat', false)}: ${word('Chat')}. ${T('Type /p to talk to your party.')}`);
           break;
         }
         case 'snapshot': {
@@ -222,7 +223,7 @@
   });
   addEventListener('keydown', event => {
     // A button left focused by a mouse click must not swallow Enter (it would re-press the button instead of opening the chat box).
-    if (event.key === 'Enter' && active && connected && !event.target.isContentEditable && !/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)) {
+    if (Keys.is(event, 'chat') && active && connected && !Keys.typing(event)) {
       event.preventDefault(); document.activeElement?.blur?.(); $('chat-input').focus();
     }
   });

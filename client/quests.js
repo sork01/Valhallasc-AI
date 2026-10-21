@@ -117,7 +117,7 @@
     active.sort((a, b) => Number(b.id === tracked) - Number(a.id === tracked) || Number(status(b) === 'ready') - Number(status(a) === 'ready'));
     const tracker = $('quest-tracker');
     const header = element('div', '', 'tracker-heading');
-    const journal = button(`Quests (${active.length}) · Q`, show); journal.className = 'tracker-journal';
+    const journal = button(`Quests (${active.length}) · ${window.Keys ? Keys.label('quests', false) : 'Q'}`, show); journal.className = 'tracker-journal';
     const toggle = button(collapsed ? '+' : '−', () => { collapsed = !collapsed; render(); $('quest-tracker').querySelector('.tracker-toggle').focus(); }); toggle.className = 'tracker-toggle';
     toggle.setAttribute('aria-label', collapsed ? 'Expand quest tracker' : 'Collapse quest tracker'); toggle.setAttribute('aria-expanded', String(!collapsed));
     header.append(journal, toggle); tracker.replaceChildren(header);

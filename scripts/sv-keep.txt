@@ -249,6 +249,8 @@
   "Emberfall Crags",
   "Emberforge",
   "Ena Dew",
+  "End",
+  "Esc",
   "Eydis Mapwright",
   "Eye Below",
   "Finn",
@@ -311,6 +313,7 @@
   "Hettie Cobb",
   "High Jaguar Terrace",
   "Hollowmoot",
+  "Home",
   "Honeywood Clearing",
   "Hrafn Skyfarer",
   "Hrolf Bonegate",
@@ -659,5 +662,6 @@
   "[GM]Sork",
   "{0} attack",
   "{0} · {1} online",
-  "{0}{1} → {2}"
+  "{0}{1} → {2}",
+  "↵ Enter"
 ]

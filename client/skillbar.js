@@ -1,7 +1,9 @@
 'use strict';
 (() => {
   const $ = id => document.getElementById(id);
-  const SLOTS = 12, KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='];
+  const SLOTS = 12, SLOT_ACTIONS = Array.from({ length: SLOTS }, (_, i) => 'skill' + (i + 1));
+  // The key printed on a slot: its first key in the key map, or nothing when the slot is unbound.
+  const slotKey = i => { const k = Keys.label(SLOT_ACTIONS[i], false); return k === 'unbound' ? '' : k; };
   const icons = {
     attack: '<path d="m9 27 17-17 5-2-2 5-17 17M7 21l10 10M6 31l5-5"/>',
     arrow: '<path d="M6 30 29 7M29 7h-8m8 0v8M6 30l-1-6m1 6 6 1M9 27l-2-5m6 8-1-6"/>',
@@ -126,10 +128,10 @@
   }
   function slotButton(index, editor) {
     const skill = find(slots[index]), b = node('button', '', 'skill-slot'); b.type = 'button'; b.dataset.slot = index + 1;
-    b.dataset.skill = skill?.id || ''; b.setAttribute('aria-keyshortcuts', KEYS[index]);
-    b.setAttribute('aria-label', `Slot ${KEYS[index]}: ${skill?.name || 'Empty'}${editor ? ', select to assign' : ''}`);
-    b.title = `${KEYS[index]} · ${skill?.name || 'Empty slot — assign in Skills (K)'}${skill ? '\n' + detail(skill) : ''}`;
-    b.append(node('kbd', KEYS[index]), node('span', skill?.name || 'Empty', 'skill-name'));
+    b.dataset.skill = skill?.id || ''; b.setAttribute('aria-keyshortcuts', slotKey(index));
+    b.setAttribute('aria-label', `Slot ${slotKey(index) || index + 1}: ${skill?.name || 'Empty'}${editor ? ', select to assign' : ''}`);
+    b.title = `${slotKey(index) || index + 1} · ${skill?.name || `Empty slot — assign in Skills (${Keys.label('skills', false)})`}${skill ? '\n' + detail(skill) : ''}`;
+    b.append(node('kbd', slotKey(index)), node('span', skill?.name || 'Empty', 'skill-name'));
     const glyph = node('span', '', 'skill-icon'); glyph.innerHTML = skill ? icon(skill.icon) : '<span aria-hidden="true">+</span>'; b.append(glyph);
     b.append(node('span', '', 'skill-cooldown'));
     if (editor) { b.setAttribute('aria-pressed', String(selected === index)); }
@@ -199,16 +201,17 @@
   });
   addEventListener('keydown', event => {
     if ($('scene-game').hidden || event.repeat || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target?.tagName || '') || event.ctrlKey || event.altKey || event.metaKey) return;
-    const key = event.key.toLowerCase();
+    const slot = SLOT_ACTIONS.indexOf(Keys.which(event, SLOT_ACTIONS));
     if (open()) {
-      if (key === 'escape' || key === 'k') { event.preventDefault(); close(); }
-      else if (key === 'e' || key === 'i' || key === 'b') close(false); // The equipment handler opens its panel.
-      else if (KEYS.includes(key)) { event.preventDefault(); selected = KEYS.indexOf(key); renderEditor(); }
+      if (event.key === 'Escape' || Keys.is(event, 'menu') || Keys.is(event, 'skills')) { event.preventDefault(); close(); }
+      else if (Keys.is(event, 'character') || Keys.is(event, 'bags')) close(false); // The equipment handler opens its panel.
+      else if (slot >= 0) { event.preventDefault(); selected = slot; renderEditor(); }
       return;
     }
-    if (key === 'k') { event.preventDefault(); show(); }
-    else if (KEYS.includes(key) && Field.canAct) { event.preventDefault(); const skill = find(slots[KEYS.indexOf(key)]); if (skill) Field.useSkill(skill.id); }
+    if (Keys.is(event, 'skills')) { event.preventDefault(); show(); }
+    else if (slot >= 0 && Field.canAct) { event.preventDefault(); const skill = find(slots[slot]); if (skill) Field.useSkill(skill.id); }
   });
+  addEventListener('keymap-change', () => { if (character) render(); });
   window.Skillbar = { show, close, icon, get open() { return open(); }, update() {
     sync();
     for (const b of $('skillbar-slots').children) {

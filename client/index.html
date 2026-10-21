@@ -390,12 +390,24 @@
         <label class="setting-row" for="set-night"><span>Night darkening</span><input id="set-night" type="range" min="0" max="100" step="1"><output id="set-night-out" for="set-night"></output></label>
         <label class="setting-row" for="set-weather"><span>Weather effects</span><input id="set-weather" type="range" min="0" max="100" step="1"><output id="set-weather-out" for="set-weather"></output></label>
         <label class="setting-row" for="set-weather-audio"><span>Weather sound</span><input id="set-weather-audio" type="range" min="0" max="100" step="1"><output id="set-weather-audio-out" for="set-weather-audio"></output></label>
-        <label class="setting-check"><input id="set-sound" type="checkbox"> Sound on <kbd>M / N</kbd></label>
+        <label class="setting-check" id="set-sound-row"><input id="set-sound" type="checkbox"> Sound on <kbd>M / N</kbd></label>
+        <button class="btn ghost" id="set-keys" type="button">Keyboard</button>
+        <p class="world-menu-note">Keyboard lets you choose which key does what.</p>
         <button class="btn ghost" id="set-edit-ui" type="button">Edit UI</button>
         <p class="world-menu-note">Edit UI lets you drag the skillbar, quest tracker, chat and the other panels where you want them.</p>
         <button class="btn ghost" id="set-win-reset" type="button">Reset window sizes</button>
         <p class="world-menu-note">UI size scales the whole interface. Drag the corner grip of a window to resize it; double-click the grip to reset it.</p>
         <button class="btn primary" id="set-back" type="button">Back to menu</button>
+      </section>
+    </div>
+    <div class="pause" id="keys-panel" hidden>
+      <section class="panel pause-panel settings-panel keys-panel" role="dialog" aria-modal="true" aria-labelledby="keys-title">
+        <h3 id="keys-title">Keyboard</h3>
+        <p class="world-menu-note">Click a key box, then press the new key. Backspace clears the box and Esc cancels. A key that another action uses is moved to this one.</p>
+        <p class="world-menu-note keys-message" id="keys-message" role="status" aria-live="polite"></p>
+        <div class="keys-list" id="keys-list"></div>
+        <button class="btn ghost" id="keys-reset-all" type="button">Reset all keys</button>
+        <button class="btn primary" id="keys-back" type="button">Back to settings</button>
       </section>
     </div>
     <div id="levelup-flash" class="levelup-flash" aria-hidden="true"></div>
@@ -583,6 +595,7 @@
 <script src="passives.js"></script>
 <script src="sv-data.js"></script>
 <script src="locale.js"></script>
+<script src="keymap.js"></script>
 <script src="inventory.js"></script>
 <script src="gearservices.js"></script>
 <script src="attributes.js"></script>

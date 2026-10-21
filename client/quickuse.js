@@ -3,10 +3,11 @@
 // "use this item"; the server owns ownership, the one-meal rule, the 60 s potion cooldown and the healing.
 (() => {
   const $ = id => document.getElementById(id);
-  const KINDS = [{ kind: 'food', key: 'z', name: 'Food', empty: 'No food · buy Traveler\'s Stew from Pip in Alderhaven' }, { kind: 'potion', key: 'x', name: 'Potion', empty: 'No potion · buy Health Potions from Mira Moonleaf in Alderhaven' }, { kind: 'mana', key: 'c', name: 'Resource', empty: 'No resource potion · buy from a potion merchant' }];
+  const KINDS = [{ kind: 'food', action: 'quickFood', name: 'Food', empty: 'No food · buy Traveler\'s Stew from Pip in Alderhaven' }, { kind: 'potion', action: 'quickPotion', name: 'Potion', empty: 'No potion · buy Health Potions from Mira Moonleaf in Alderhaven' }, { kind: 'mana', action: 'quickMana', name: 'Resource', empty: 'No resource potion · buy from a potion merchant' }];
   const best = kind => WORLD_ITEMS.filter(i => (kind === 'mana' ? i.kind === 'potion' && i.mana > 0 : i.kind === kind && (kind !== 'potion' || i.heal > 0)) && Inventory.quantity(i.id) > 0 && (i.requiredLevel || 1) <= (Field.hero.level || 1)).sort((a, b) => kind === 'mana' ? b.mana - a.mana : (b.heal || 0) - (a.heal || 0))[0];
   const node = (tag, text, cls) => { const n = document.createElement(tag); if (text) n.textContent = text; if (cls) n.className = cls; return n; };
   const slots = new Map();
+  const keyOf = k => { const key = Keys.label(k.action, false); return key === 'unbound' ? '' : key; };
   function use(kind) {
     const i = best(kind);
     if (!i) { Field.floatHero(kind === 'food' ? 'No food' : 'No potion', '#ffb0a0'); return false; }
@@ -14,9 +15,9 @@
   }
   function build() {
     for (const k of KINDS) {
-      const b = node('button', '', 'skill-slot quick-slot'); b.type = 'button'; b.dataset.kind = k.kind; b.dataset.item = ''; b.setAttribute('aria-keyshortcuts', k.key.toUpperCase());
+      const b = node('button', '', 'skill-slot quick-slot'); b.type = 'button'; b.dataset.kind = k.kind; b.dataset.item = ''; b.setAttribute('aria-keyshortcuts', keyOf(k));
       const glyph = node('span', '', 'skill-icon'); glyph.innerHTML = Skillbar.icon(k.kind === 'mana' ? 'potion' : k.kind);
-      b.append(node('kbd', k.key.toUpperCase()), glyph, node('span', k.name, 'skill-name'), node('span', '', 'quick-count'), node('span', '', 'skill-cooldown'));
+      b.append(node('kbd', keyOf(k)), glyph, node('span', k.name, 'skill-name'), node('span', '', 'quick-count'), node('span', '', 'skill-cooldown'));
       b.addEventListener('click', () => use(k.kind));
       slots.set(k.kind, b); $('quickuse').append(b);
     }
@@ -39,13 +40,14 @@
       b.querySelector('.skill-cooldown').textContent = i && left > 0 ? Math.ceil(left) : '';
       b.querySelector('.quick-count').textContent = i ? Inventory.quantity(i.id) : '';
       b.querySelector('.skill-name').textContent = i ? i.name : k.name;
-      b.setAttribute('aria-label', i ? `${k.name} slot ${k.key.toUpperCase()}: ${i.name} ×${Inventory.quantity(i.id)}` : `${k.name} slot ${k.key.toUpperCase()}: empty`);
-      b.title = i ? `${k.key.toUpperCase()} · ${i.name} ×${Inventory.quantity(i.id)}\n${Inventory.effect(i)}` : k.empty;
+      b.querySelector('kbd').textContent = keyOf(k); b.setAttribute('aria-keyshortcuts', keyOf(k));
+      b.setAttribute('aria-label', i ? `${k.name} slot ${keyOf(k)}: ${i.name} ×${Inventory.quantity(i.id)}` : `${k.name} slot ${keyOf(k)}: empty`);
+      b.title = i ? `${keyOf(k)} · ${i.name} ×${Inventory.quantity(i.id)}\n${Inventory.effect(i)}` : k.empty;
     }
   }
   addEventListener('keydown', event => {
     if ($('scene-game').hidden || event.repeat || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target?.tagName || '') || event.ctrlKey || event.altKey || event.metaKey) return;
-    const slot = KINDS.find(k => k.key === event.key.toLowerCase());
+    const slot = KINDS.find(k => Keys.is(event, k.action));
     if (!slot || !Field.canAct) return;
     event.preventDefault(); use(slot.kind);
   });

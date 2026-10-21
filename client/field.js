@@ -909,20 +909,22 @@
   function pointerWorld(e) { const r = cv.getBoundingClientRect(); return s2w((e.clientX - r.left) / r.width * VW, (e.clientY - r.top) / r.height * VH); }
 
   // ---------- input ----------
-  const KEYDIR = { w: [0, -1], arrowup: [0, -1], s: [0, 1], arrowdown: [0, 1], a: [-1, 0], arrowleft: [-1, 0], d: [1, 0], arrowright: [1, 0] };
+  // Held keys are kept as codes; a code's direction is looked up in the key map each tick, so a rebind takes effect at once.
+  const DIRS = { moveUp: [0, -1], moveDown: [0, 1], moveLeft: [-1, 0], moveRight: [1, 0] };
+  const heldDirection = code => Keys.actionsFor(code).map(a => DIRS[a]).find(Boolean);
   function onKeyDown(e) {
-    if (e.defaultPrevented || !running || paused || hero.sparkTravel || !Online.connected || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '')) return;
-    const k = e.key.toLowerCase();
-    if (k === 'f' && !e.repeat && !hero.dead) {
+    if (e.defaultPrevented || !running || paused || hero.sparkTravel || !Online.connected || Keys.typing(e)) return;
+    const code = Keys.codeOf(e);
+    if (Keys.is(e, 'talk') && !e.repeat && !hero.dead) {
       e.preventDefault(); const npc = [...City.npcs, ...signs].filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
       if (npc) talkTo(npc); return;
     }
-    if (k === 'h' && !e.repeat) { e.preventDefault(); Field.toggleMount(); return; }
-    if (KEYDIR[k]) { pendingNpc = null; cityRoute = []; keys.add(k); hero.target = null; hero.goal = null; emitHud(); e.preventDefault(); }
-    if ((k === ' ' && e.target?.tagName !== 'BUTTON') || k === 'j') { e.preventDefault(); if (!e.repeat) Field.useSkill('attack'); }
-    if (k === 'shift' && isAssassin()) { e.preventDefault(); if (!e.repeat) Field.useSkill('shadowstep'); }
+    if (Keys.is(e, 'mount') && !e.repeat) { e.preventDefault(); Field.toggleMount(); return; }
+    if (!e.ctrlKey && !e.altKey && !e.metaKey && heldDirection(code)) { pendingNpc = null; cityRoute = []; keys.add(code); hero.target = null; hero.goal = null; emitHud(); e.preventDefault(); }
+    if (Keys.is(e, 'attack') && !(code === 'Space' && e.target?.tagName === 'BUTTON')) { e.preventDefault(); if (!e.repeat) Field.useSkill('attack'); }
+    if (Keys.is(e, 'dash') && isAssassin()) { e.preventDefault(); if (!e.repeat) Field.useSkill('shadowstep'); }
   }
-  function onKeyUp(e) { keys.delete(e.key.toLowerCase()); }
+  function onKeyUp(e) { keys.delete(Keys.codeOf(e)); }
   function pickSlime(mx, my, wx, wy) {
     let best = null, depth = -Infinity;
     for (const s of slimes) {
@@ -1065,7 +1067,7 @@
   function burst(x, y, z, n, col, spd = 3, grav = 9) { for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, s = (.3 + Math.random()) * spd; parts.push({ x, y, z, vx: Math.cos(a) * s * .5, vy: Math.sin(a) * s * .5, vz: 2 + Math.random() * 5, life: .5 + Math.random() * .5, t: 0, col: Array.isArray(col) ? col[Math.floor(Math.random() * col.length)] : col, size: 2 + Math.random() * 3, g: grav }); } }
   function keyboardDirection() {
     let x = 0, y = 0;
-    for (const key of keys) { const d = KEYDIR[key]; if (d) { x += d[0]; y += d[1]; } }
+    for (const code of keys) { const d = heldDirection(code); if (d) { x += d[0]; y += d[1]; } }
     const wx = (x + y) / 2, wy = (y - x) / 2, n = Math.hypot(wx, wy) || 1;
     return [wx / n, wy / n];
   }

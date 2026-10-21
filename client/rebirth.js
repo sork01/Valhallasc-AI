@@ -156,7 +156,7 @@
     if (hinted < 0) hinted = tier;
     if (tier <= hinted) return '';
     hinted = tier;
-    const text = tier === 1 ? `Rebirth is now possible: open Character (E)` : `A better rebirth is now available: tier ${NUMERAL[tier]} at level ${levelOf(tier)}.`;
+    const text = tier === 1 ? `Rebirth is now possible: open Character (${Keys.label('character', false)})` : `A better rebirth is now available: tier ${NUMERAL[tier]} at level ${levelOf(tier)}.`;
     window.SystemLog?.add(text, 'notice');
     return text;
   }

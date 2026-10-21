@@ -836,3 +836,15 @@
 .panel-grip:hover, .panel-grip:focus-visible, .panel-grip.dragging { opacity: 1; }
 .panel-grip:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 @media (pointer: coarse) { .panel-grip { width: 34px; height: 34px; opacity: .7; } }
+/* Keyboard screen (UI-KEYMAP): one row per action, two key boxes and a reset; the list scrolls inside the panel. */
+#keys-panel { z-index: 40; }
+.keys-panel { width: 46cqw; max-height: 94%; min-height: 0; }
+.keys-panel .keys-message { min-height: 1.3em; color: var(--gold); }
+.keys-list { display: grid; gap: .35cqw; overflow-y: auto; min-height: 0; padding-right: .6cqw; }
+.keys-list h4 { margin: .8cqw 0 .1cqw; font-family: var(--display); font-weight: 400; font-size: clamp(13px, 1.6cqw, 26px); color: var(--gold); }
+.key-row { display: grid; grid-template-columns: 1fr 8cqw 8cqw 5.5cqw; align-items: center; gap: .6cqw; font-size: clamp(12px, 1.35cqw, 22px); }
+.key-cell, .key-reset { min-width: 0; padding: .3cqw .5cqw; color: #fff; background: #18253e; border: 1px solid #bca16a; border-radius: .4cqw; font: inherit; cursor: pointer; }
+.key-cell.capturing { color: #18253e; background: #ffdc87; }
+.key-reset { color: #dfc9a0; border-color: #6c5d3d; }
+.key-reset:disabled { opacity: .35; cursor: default; }
+@media (pointer: coarse) { .key-cell, .key-reset { min-height: 44px; min-width: 44px; } }

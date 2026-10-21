@@ -29,7 +29,7 @@
       body.append(el('p', 'For 2v2 or 3v3, form a party of exactly that size. The leader queues the team.', 'social-note'));
       for (const size of [1, 2, 3]) body.append(button(`Queue ${size}v${size}`, `arena-${size}`, () => send({ op: 'arena_queue', size })));
     }
-    body.append(el('p', 'Select an opponent in the world or the Online list, then press Space or J to attack.', 'social-note'));
+    body.append(el('p', `Select an opponent in the world or the Online list, then press ${Keys.label('attack')} to attack.`, 'social-note'));
   }
   window.Pvp = {
     send, render,

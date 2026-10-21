@@ -20,7 +20,7 @@
     if (key === signature && host.childElementCount) return;
     signature = key;
     host.replaceChildren(node('h4', 'Mounts'));
-    host.append(node('small', owned.length ? 'H and the Mount button summon the selected mount. All mounts ride at 2× speed.' : 'Own a mount to ride at 2× speed (H).', 'mount-help'));
+    host.append(node('small', owned.length ? `${Keys.label('mount', false)} and the Mount button summon the selected mount. All mounts ride at 2× speed.` : `Own a mount to ride at 2× speed (${Keys.label('mount', false)}).`, 'mount-help'));
     for (const m of MOUNTS) {
       const has = owned.includes(m.id), card = node('article', '', 'mount-card');
       card.dataset.mount = m.id; card.dataset.owned = has; card.dataset.selected = has && m.id === selected;

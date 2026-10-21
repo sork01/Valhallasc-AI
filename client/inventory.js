@@ -1,5 +1,7 @@
 'use strict';
 (() => {
+  // The key map loads before this file in the game; a test fixture that loads this file alone gets the shipped keys.
+  const keyOf = (action, all = true) => window.Keys ? Keys.label(action, all) : { bags: 'B / I', quickFood: 'Z', quickPotion: 'X' }[action];
   const $ = id => document.getElementById(id);
   const dragType = 'application/x-valhallasc-item';
   const slots = [['headgear', 'Headgear'], ['shoulders', 'Shoulders'], ['chest', 'Chest'], ['pants', 'Pants'], ['gloves', 'Gloves'], ['hands', 'Hands'], ['necklace', 'Necklace'], ['accessory1', 'Accessory 1'], ['accessory2', 'Accessory 2']];
@@ -152,7 +154,7 @@
       }
       if(i.source!=='orange_pool'&&copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
     }
-    t.append(node('small', where ? where.hint : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? 'Right-click or double-click to use · Z / X on the quick slots' : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
+    t.append(node('small', where ? where.hint : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? `Right-click or double-click to use · ${keyOf('quickFood', false)} / ${keyOf('quickPotion', false)} on the quick slots` : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
     t.hidden = false;
     const r = anchor.getBoundingClientRect(), tr = t.getBoundingClientRect();
     t.style.left = Math.max(8, Math.min(innerWidth - tr.width - 8, r.right + 10)) + 'px';
@@ -288,7 +290,7 @@
     if ($('bag-capacity')) $('bag-capacity').textContent = `${layout.filter(Boolean).length}/${capacity()} slots · ${layout.filter(id => !id).length} free`;
     if ($('bag-gold')) $('bag-gold').textContent = `${Field.hero?.gold || 0} gold`;
     if ($('bag-capacity')) $('bag-capacity').classList.toggle('bags-full', !layout.includes(null));
-    if ($('inventory-open')) $('inventory-open').title = `Bags · ${layout.filter(Boolean).length} stacks · B / I`;
+    if ($('inventory-open')) $('inventory-open').title = `Bags · ${layout.filter(Boolean).length} stacks · ${keyOf('bags')}`;
     renderDetails();
     if (focusItem) container.querySelector(`[data-item="${focusItem}"] button`)?.focus({ preventScroll: true });
   }

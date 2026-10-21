@@ -272,10 +272,62 @@
   // toMenu: go back to the World Menu; false: just shut everything (the caller is closing the menus itself).
   function close(toMenu = true) {
     if (editing) stopEdit(false);
+    if (!keysPanel.hidden) { closeKeys(false); if (toMenu) { $('pause').hidden = false; $('p-settings').focus({ preventScroll: true }); } return; }
     if (panel.hidden) return;
     panel.hidden = true;
     if (toMenu) { $('pause').hidden = false; $('p-settings').focus({ preventScroll: true }); }
   }
+
+  // ---------- the keyboard screen (keymap.js holds the bindings) ----------
+  const keysPanel = $('keys-panel');
+  let cancelCapture = null;
+  const say = text => { $('keys-message').textContent = text; };
+  function endCapture() { cancelCapture?.(); cancelCapture = null; }
+  function renderKeys(focusAction, focusSlot) {
+    const list = $('keys-list'); let group = '';
+    list.replaceChildren();
+    for (const [g, id, name] of Keys.ACTIONS) {
+      if (g !== group) { group = g; const h = document.createElement('h4'); h.textContent = g; list.append(h); }
+      const row = document.createElement('div'), label = document.createElement('span');
+      row.className = 'key-row'; row.dataset.action = id; label.id = 'key-name-' + id; label.textContent = name; row.append(label);
+      Keys.slots(id).forEach((code, slot) => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'key-cell'; b.id = `key-${id}-${slot}`; b.dataset.slot = slot;
+        b.textContent = code ? Keys.name(code) : '—';
+        b.setAttribute('aria-labelledby', `${label.id} ${b.id}`);
+        b.addEventListener('click', () => beginCapture(id, slot, b));
+        row.append(b);
+      });
+      const reset = document.createElement('button'); reset.type = 'button'; reset.className = 'key-reset'; reset.textContent = 'Reset'; reset.disabled = Keys.isDefault(id);
+      reset.addEventListener('click', () => { endCapture(); Keys.reset(id); say(''); renderKeys(); });
+      row.append(reset); list.append(row);
+    }
+    if (focusAction) $(`key-${focusAction}-${focusSlot}`)?.focus({ preventScroll: false });
+  }
+  function beginCapture(id, slot, button) {
+    endCapture(); say(''); button.textContent = 'Press a key…'; button.classList.add('capturing');
+    cancelCapture = Keys.capture(code => {
+      cancelCapture = null;
+      if (code === undefined) { renderKeys(id, slot); return; }                    // Esc: nothing changes
+      if (code === null) { Keys.clear(id, slot); renderKeys(id, slot); return; }
+      const result = Keys.bind(id, slot, code);
+      if (!result.ok) say(result.why || 'This key cannot be used');
+      else {
+        const nameOf = action => Keys.ACTIONS.find(a => a[1] === action)[2], key = Keys.name(code), mine = nameOf(id), other = result.swapped && nameOf(result.swapped);
+        say(result.swapped ? `${key} moved from ${other} to ${mine}` : `${mine} is now ${key}`);
+      }
+      renderKeys(id, slot);
+    });
+  }
+  function showKeys() { panel.hidden = true; keysPanel.hidden = false; say(''); renderKeys(); $('keys-back').focus({ preventScroll: true }); }
+  function closeKeys(toSettings = true) {
+    endCapture(); if (keysPanel.hidden) return;
+    keysPanel.hidden = true;
+    if (toSettings) { panel.hidden = false; syncPanel(); $('set-keys').focus({ preventScroll: true }); }
+  }
+  $('set-keys').addEventListener('click', showKeys);
+  $('keys-back').addEventListener('click', () => closeKeys());
+  $('keys-reset-all').addEventListener('click', () => { endCapture(); Keys.resetAll(); say(''); renderKeys(); });
+  addEventListener('keymap-change', () => { if (!keysPanel.hidden && !cancelCapture) renderKeys(); });
 
   // ---------- Edit UI ----------
   function syncHandle(id) {
@@ -330,10 +382,10 @@
 
   // While editing the game must not see any key; Esc finishes and arrows move the focused handle.
   addEventListener('keydown', e => {
-    if (!editing && panel.hidden) return;
+    if (Keys.capturing || (!editing && panel.hidden && keysPanel.hidden)) return;
     if (e.key === 'Escape') {
       e.preventDefault(); e.stopImmediatePropagation();
-      if (editing) stopEdit(); else close();
+      if (editing) stopEdit(); else if (!keysPanel.hidden) closeKeys(); else close();
       return;
     }
     if (!editing) return;

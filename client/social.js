@@ -173,7 +173,7 @@
   function renderFrame() {
     const frame = $('party-frame'), party = state.party;
     frame.hidden = !party; if (!party) { frame.replaceChildren(); return; }
-    const head = button(`Party ${party.members.length}/${party.max} · Lv ${party.xp?.level || 1} · P`, 'frame-open', () => show('party'), 'party-head');
+    const head = button(`Party ${party.members.length}/${party.max} · Lv ${party.xp?.level || 1} · ${Keys.label('party', false)}`, 'frame-open', () => show('party'), 'party-head');
     const list = el('ul', '', 'social-list');
     list.append(...party.members.map(m => member(m, false)));
     frame.replaceChildren(head, list);
@@ -274,17 +274,17 @@
   // This listener is registered before the game's own (online.js precedes game.js), so an open panel keeps every key.
   addEventListener('keydown', event => {
     if ($('scene-game').hidden || event.repeat || event.ctrlKey || event.altKey || event.metaKey) return;
-    const key = event.key.toLowerCase(), typing = /^(INPUT|TEXTAREA|SELECT)$/.test(event.target?.tagName || '');
+    const typing = Keys.typing(event), friends = Keys.is(event, 'friends'), party = Keys.is(event, 'party');
     if (open()) {
-      if (typing && key !== 'escape') return;
+      if (typing && event.key !== 'Escape') return;
       event.preventDefault(); event.stopImmediatePropagation();
-      if (key === 'escape') close();
-      else if (key === 'o') toggle('friends');
-      else if (key === 'p') toggle('party');
+      if (event.key === 'Escape' || Keys.is(event, 'menu')) close();
+      else if (friends) toggle('friends');
+      else if (party) toggle('party');
       return;
     }
-    if (typing || (key !== 'o' && key !== 'p')) return;
-    event.preventDefault(); show(key === 'o' ? 'friends' : 'party');
+    if (typing || (!friends && !party)) return;
+    event.preventDefault(); show(friends ? 'friends' : 'party');
   }, true);
 
   window.Social = {

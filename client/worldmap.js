@@ -775,7 +775,7 @@
   // Registered before game.js, so an open map keeps every key and M never reaches the other panels.
   addEventListener('keydown', event => {
     if ($('scene-game').hidden || event.ctrlKey || event.altKey || event.metaKey) return;
-    const key = event.key.toLowerCase(), typing = /^(INPUT|TEXTAREA|SELECT)$/.test(event.target?.tagName || '');
+    const key = event.key.toLowerCase(), typing = Keys.typing(event);
     if (open()) {
       if (key === 'tab') {                                          // keep focus inside the panel
         const buttons = [...$('worldmap').querySelectorAll('button:not(:disabled)')].filter(b => b.offsetParent);
@@ -789,10 +789,10 @@
       event.preventDefault();
       if (event.repeat) return;
       if (key === 'escape' || key === 'backspace') back();
-      else if (key === 'm') close();
+      else if (Keys.is(event, 'map')) close();
       return;
     }
-    if (key !== 'm' || event.repeat || typing) return;            // N is the sound toggle in the field
+    if (!Keys.is(event, 'map') || event.repeat || typing) return;   // the other sound key mutes in the field
     if (show()) { event.preventDefault(); event.stopImmediatePropagation(); }
   }, true);
 

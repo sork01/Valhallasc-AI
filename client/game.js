@@ -286,10 +286,10 @@
   let toastT = 0;
   function showToast(msg) { toast.textContent = msg; toast.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove('show'), 1600); }
   addEventListener('keydown', e => {                      // M = mute / unmute all sound (in the field: N, because M is the world map)
-    const k = e.key.toLowerCase(); if (k !== 'm' && k !== 'n') return;
+    if (!Keys.is(e, 'sound')) return;
     if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
-    if (k === 'm' && scene === 'game' && !window.Settings?.active) return;   // in the field M opens the world map; N always mutes
-    save.sound = !save.sound; persist(); applyMusicLevel(.6); dispatchEvent(new Event('prefs-change')); showToast(save.sound ? t('soundOn') : t('soundOff'));
+    if (Keys.is(e, 'map') && scene === 'game' && !window.Settings?.active) return;   // in the field the map key opens the world map; the other sound key always mutes
+    save.sound = !save.sound; persist(); applyMusicLevel(.6); dispatchEvent(new Event('prefs-change')); showToast(t(save.sound ? 'soundOn' : 'soundOff').replace('(N)', `(${Keys.label('sound', false)})`));
   });
   function blip(freq = 660, dur = .08, vol = .05) {
     if (!save.sound) return;
@@ -637,8 +637,9 @@
     $('bag-gold').textContent = `${s.gold} gold`;
     const mount = $('mount-toggle');
     mount.disabled = !s.mountOwned || !!s.sparkTravel || s.hp <= 0 || (s.inCombat && !s.mounted) || !!s.players;
-    mount.textContent = s.mounted ? 'Dismount · H' : s.mountOwned ? `${window.Mounts?.name(s.mount) || 'Mount'} · H · 2× speed` : 'Horse · H';
-    mount.title = s.mountOwned ? (s.mounted ? 'Dismount' : 'Ride the selected mount at twice normal travel speed (H). Change it in the Character window.') : 'Buy a horse from Stable-hand Greta in Skaldholm at level 50 for 500,000 gold. All mounts are listed in the Character window.';
+    const mountKey = Keys.label('mount', false);
+    mount.textContent = s.mounted ? `Dismount · ${mountKey}` : s.mountOwned ? `${window.Mounts?.name(s.mount) || 'Mount'} · ${mountKey} · 2× speed` : `Horse · ${mountKey}`;
+    mount.title = s.mountOwned ? (s.mounted ? 'Dismount' : `Ride the selected mount at twice normal travel speed (${mountKey}). Change it in the Character window.`) : 'Buy a horse from Stable-hand Greta in Skaldholm at level 50 for 500,000 gold. All mounts are listed in the Character window.';
     const inCity = !!s.hub || s.area === 'Alderhaven', title = $('area-title'), away = s.zone > 0;
     if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); void title.offsetWidth; title.classList.add('show'); }
     title.querySelector('b').textContent = away ? s.area : inCity ? 'Alderhaven · Fountain Square' : t('areaName');
@@ -674,7 +675,7 @@
       row.append(glyph, el('b', { text: passive ? `New passive: ${k.name}` : capstone ? `Capstone: ${k.name}` : rankNumber > 1 ? `Rank ${rankNumber}: ${k.name}` : `New skill: ${k.name}` }), el('small', { text: description })); return row;
     }));
     const rebirthHint = window.Rebirth?.hint(ev.level);
-    $('lu-hint').textContent = rebirthHint || (learned.length ? 'Press K to view your skills and passives' : 'Fully healed · spend stat points in Character (E)');
+    $('lu-hint').textContent = rebirthHint || (learned.length ? `Press ${Keys.label('skills', false)} to view your skills and passives` : `Fully healed · spend stat points in Character (${Keys.label('character', false)})`);
     luBanner.hidden = false; restart(luBanner, 'show'); restart(luFlash, 'show');
     restart($('hud-lv'), 'lv-pop'); restart(document.querySelector('.bar.xp'), 'xp-flash');
     const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -914,21 +915,21 @@
   }
   addEventListener('keydown', e => {
     if (scene !== 'game' || e.defaultPrevented || e.repeat) return;
-    const key = e.key.toLowerCase(), gearKey = key === 'e' || key === 'i' || key === 'b';
+    const isEsc = e.key === 'Escape' || Keys.is(e, 'menu'), isChar = Keys.is(e, 'character'), isBags = Keys.is(e, 'bags'), gearKey = isChar || isBags;
     const closesEquipment = !$('equipment').hidden && gearKey && e.target?.tagName === 'SELECT';
-    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '') && key !== 'escape' && !closesEquipment) return;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '') && !isEsc && !closesEquipment) return;
     if (window.Skillbar?.open || window.Settings?.active) return;
     if (window.Quests?.open) {
-      if (gearKey || key === 'k') { e.preventDefault(); Quests.close(false); if (gearKey) openEquipment(key === 'e' ? 'both' : 'bags'); else Skillbar.show(); }
-      else if (key === 'escape' || key === 'q') { e.preventDefault(); Quests.close(); }
+      if (gearKey || Keys.is(e, 'skills')) { e.preventDefault(); Quests.close(false); if (gearKey) openEquipment(isChar ? 'both' : 'bags'); else Skillbar.show(); }
+      else if (isEsc || Keys.is(e, 'quests')) { e.preventDefault(); Quests.close(); }
       return;
     }
-    if (key === 'q') { e.preventDefault(); window.Quests?.show(); return; }
-    if (City.open && key === 'escape') { e.preventDefault(); City.close(); return; }
-    if (key === 'escape') { e.preventDefault(); if (!$('equipment').hidden) setPause(false); else setPause($('pause').hidden); }
+    if (Keys.is(e, 'quests')) { e.preventDefault(); window.Quests?.show(); return; }
+    if (City.open && isEsc) { e.preventDefault(); City.close(); return; }
+    if (isEsc) { e.preventDefault(); if (!$('equipment').hidden) setPause(false); else setPause($('pause').hidden); }
     if (gearKey) {
       e.preventDefault();
-      const view = key === 'e' ? 'both' : 'bags';
+      const view = isChar ? 'both' : 'bags';
       if ($('equipment').hidden) openEquipment(view);
       else if (document.querySelector('.equipment-workspace').dataset.view !== view) openEquipment(view);
       else setPause(false);
@@ -1144,6 +1145,8 @@
     get layout() { return !save.uiSet && !has(save.ui) ? DEFAULT_UI : save.ui && typeof save.ui === 'object' ? save.ui : {}; },
     // 80% until the player moves the slider (uiScaleSet): a saved 1 from before the default changed is not a choice.
     get uiScale() { return save.uiScaleSet && Number.isFinite(+save.uiScale) ? Math.max(.6, Math.min(1.5, +save.uiScale)) : .8; },
+    // Key bindings the player changed ({action: [code, code]}); keymap.js merges them over the shipped keys.
+    get keys() { return save.keys && typeof save.keys === 'object' ? save.keys : {}; },
     get winScale() { return save.winScale && typeof save.winScale === 'object' ? save.winScale : {}; },
     get panelSize() { return !save.panelSizeSet && !has(save.panelSize) ? DEFAULT_PANEL_SIZE : save.panelSize && typeof save.panelSize === 'object' ? save.panelSize : {}; },
     set(patch) {
@@ -1159,6 +1162,7 @@
       if ('ui' in patch) { save.ui = patch.ui || {}; save.uiSet = !!patch.ui; } // null = back to the shipped arrangement
       if ('uiScale' in patch && Number.isFinite(+patch.uiScale)) { save.uiScale = Math.max(.6, Math.min(1.5, +patch.uiScale)); save.uiScaleSet = true; }
       if ('winScale' in patch) save.winScale = patch.winScale;
+      if ('keys' in patch) save.keys = patch.keys && typeof patch.keys === 'object' ? patch.keys : {};
       if ('panelSize' in patch) { save.panelSize = patch.panelSize || {}; save.panelSizeSet = !!patch.panelSize; }
       persist(); applyMusicLevel(.4);
       if (sfxGain) sfxGain.gain.value = taper(save.sfxVol);

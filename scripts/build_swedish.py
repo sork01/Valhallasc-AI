@@ -31,7 +31,7 @@ KEYS = {'name', 'title', 'description', 'label', 'dialogue', 'role', 'what', 'to
 # Client modules whose strings reach the player. Art, music and the GM console are left out.
 CLIENT_FILES = ('game', 'account', 'city', 'quests', 'inventory', 'skillbar', 'quickuse', 'settings', 'online', 'social',
                 'syslog', 'attributes', 'weather', 'daynight', 'bank', 'rebirth', 'bossmech', 'bosssign', 'mounts', 'trade', 'pvp',
-                'rolls', 'gearservices', 'worldmap', 'field', 'spark')
+                'rolls', 'gearservices', 'worldmap', 'field', 'spark', 'keymap')
 INTERNAL = ('INSERT ', 'ALTER ', 'PRAGMA ', 'SELECT ', 'CREATE ', 'UPDATE ', 'DELETE ', 'Bearer ', 'HTTP ', 'SIGTERM ', 'VALHALLA_')
 # A template may leave out a placeholder only where Swedish needs no plural ending the English one builds.
 MAY_DROP = {'A treasure chest has appeared! It will vanish in {0} minute{1}.': {'{1}'}}
