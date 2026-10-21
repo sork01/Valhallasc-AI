@@ -4038,13 +4038,18 @@ impl World {
         let angle = self.random() * std::f64::consts::TAU;
         let zone = self.slimes[id].zone;
         let dungeon = self.instance_at(zone).map(|i| i.template);
-        let bodies = self.actor_bodies(zone, None, Some(id));
         // A respawning enemy rolls a fresh level; kings come from the shared timer instead.
         let respawn_level = {
             let s = &self.slimes[id];
             (s.dead && s.kind != "big" && s.respawn - TICK <= 0.).then(|| s.kind.clone())
         }
         .map(|kind| self.roll_level(&kind));
+        // The bodies are scanned over every monster in the world; a dead one needs them only on the tick it respawns.
+        let bodies = if self.slimes[id].dead && respawn_level.is_none() {
+            Vec::new()
+        } else {
+            self.actor_bodies(zone, None, Some(id))
+        };
         let map = &self.maps[zone];
         let s = &mut self.slimes[id];
         if s.target.is_some_and(|session| {
