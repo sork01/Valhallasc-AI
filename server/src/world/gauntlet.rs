@@ -163,6 +163,15 @@ impl World {
         })
     }
 
+    /// A fight start or a result: the big centre line (kind `quest`), which the client also writes to the chat log.
+    fn announce(&self, id: &str, text: impl Into<String>) {
+        if let Some(p) = self.online(id) {
+            let _ = p
+                .peer
+                .try_send(json!({"type":"announce","kind":"quest","text":text.into()}));
+        }
+    }
+
     /// The hero asks a giver to enter the Arena. The reply is a notice.
     pub(super) fn gauntlet_interact(&mut self, session: u64, npc_id: &str) {
         let id = self
@@ -363,10 +372,9 @@ impl World {
         run.opponent = None;
         run.fallen = None;
         run.until = self.time + COUNTDOWN;
-        self.tell(
+        self.announce(
             &id,
             format!("Fight {won} of {FIGHTS} won. Health and mana restored; the next one starts in {COUNTDOWN:.0} seconds."),
-            true,
         );
         self.pvp_sync();
         true
@@ -413,7 +421,7 @@ impl World {
         }
         let id = p.character.id.clone();
         if !text.is_empty() {
-            self.tell(&id, text, completed);
+            self.announce(&id, text);
         }
         self.save();
         self.pvp_sync();
@@ -450,10 +458,9 @@ impl World {
         run.opponent = Some(session);
         run.fallen = None;
         run.until = self.time + FIGHT_TIME;
-        self.tell(
+        self.announce(
             &owner_id,
             format!("Fight {fight} of {FIGHTS}: {name}. Defeat it before time runs out."),
-            true,
         );
         self.pvp_sync();
     }
