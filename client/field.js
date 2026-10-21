@@ -701,6 +701,7 @@
   let ebolts = [], instanceCleared = false, clearedAt = -99;   // missiles shot by ranged enemies; the dungeon's exit opens when its last boss falls
   let mageSpr = null, spriteGeneration = 0;
   let pendingNpc = null, pendingChest = null, cityRoute = [], routeTime = 0;
+  const routeMotion = { x: 0, y: 0, t: 0, v: 5.5 };   // the hero's recent speed over ground, for the route follower's look-ahead
   // Speech bubbles over characters that just chatted: id -> {text, until, lines}.
   const bubbles = new Map();
   let bubblesDrawn = 0, bubblesLast = 0;
@@ -994,16 +995,17 @@
     const cx = Math.floor(x / hash.H), cy = Math.floor(y / hash.H);
     return cx >= 0 && cy >= 0 && cx < hash.w && cy < hash.w ? hash.cells[cy * hash.w + cx] : objects;
   };
+  // True when a body with `margin` clearance can walk the straight line a-b past every object.
+  function segmentFree(a, b, margin = .3) {
+    const steps = Math.max(1, Math.ceil(Math.hypot(a.x-b.x,a.y-b.y) / .1));
+    for (let i=0;i<=steps;i++) {
+      const x=a.x+(b.x-a.x)*i/steps, y=a.y+(b.y-a.y)*i/steps;
+      if(nearObjects(x,y).some(o => o.width ? Math.abs(x-o.x)<o.width/2+margin-1e-6 && Math.abs(y-o.y)<o.depth/2+margin-1e-6 : Math.hypot(x-o.x,y-o.y)<o.r+margin-1e-6)) return false;
+    }
+    return true;
+  }
   function routeTo(goal, approach = false, origin = hero, approachRange = 2) {
     const free = (x,y) => x>=1 && y>=1 && x<MAP-1 && y<MAP-1 && nearObjects(x,y).every(o => o.width ? Math.abs(x-o.x)>o.width/2+.55 || Math.abs(y-o.y)>o.depth/2+.55 : Math.hypot(x-o.x,y-o.y)>o.r+.55);
-    const segmentFree = (a, b) => {
-      const steps = Math.max(1, Math.ceil(Math.hypot(a.x-b.x,a.y-b.y) / .1));
-      for (let i=0;i<=steps;i++) {
-        const x=a.x+(b.x-a.x)*i/steps, y=a.y+(b.y-a.y)*i/steps;
-        if(nearObjects(x,y).some(o => o.width ? Math.abs(x-o.x)<o.width/2+.3-1e-6 && Math.abs(y-o.y)<o.depth/2+.3-1e-6 : Math.hypot(x-o.x,y-o.y)<o.r+.3-1e-6)) return false;
-      }
-      return true;
-    };
     // Loot can leave a player against a tree, with its rounded cell blocked.
     // Connect the real position to a nearby clear cell before searching the grid.
     const sources=[];
@@ -1029,7 +1031,18 @@
     if(!prev.has(key(end)))return [];
     const path=[];for(let p=end;p&&key(p)!==key(start);p=prev.get(key(p)))path.unshift({x:p[0],y:p[1]});
     if(Math.hypot(start[0]-origin.x,start[1]-origin.y)>.32)path.unshift({x:start[0],y:start[1]});
-    return path;
+    return pullRoute(path, origin);
+  }
+  // The grid path has a waypoint on every tile. Keep only the ones a straight, clear walk cannot skip (the same .55 clearance
+  // as the grid cells), so a long street is one move and the server is not told a new goal every 0.2 s.
+  function pullRoute(path, origin) {
+    const out=[];let anchor={x:origin.x,y:origin.y},i=0;
+    while(i<path.length) {
+      let far=i;
+      for(let j=i+1;j<path.length&&j<=i+24;j++) { if(segmentFree(anchor,path[j],.55)) far=j; else break; }
+      out.push(path[far]);anchor=path[far];i=far+1;
+    }
+    return out;
   }
   function onPointerMove(e) { if (pointer.down) { const [wx, wy] = pointerWorld(e); pointer.x = wx; pointer.y = wy; } }
   function onPointerUp() { pointer.down = false; }
@@ -2400,8 +2413,18 @@
       }
       if(!paused && cityRoute.length) {
         if(hero.dead)cityRoute=[];
-        else if(Math.hypot(hero.x-cityRoute[0].x,hero.y-cityRoute[0].y)<.32){cityRoute.shift();routeTime=0;}
-        else if(tAll-routeTime>.35){Online.send({type:'move',...cityRoute[0]});routeTime=tAll;}
+        else {
+          // Judge progress by where the server has the hero: the drawn sprite eases toward it and trails by about speed/14 tiles, so
+          // waiting for the sprite made the server stand still at every waypoint until the sprite caught up. The next waypoint goes
+          // out speed x .45 s early (snapshots are up to .1 s old, plus a slow frame and the trip back), so the server never runs
+          // dry, but only when the straight line to it clears the objects.
+          const sx=Number.isFinite(hero.nx)?hero.nx:hero.x, sy=Number.isFinite(hero.ny)?hero.ny:hero.y, m=routeMotion;
+          if(tAll-m.t>=.25){const moved=Math.hypot(sx-m.x,sy-m.y);if(moved>0)m.v=clamp(moved/(tAll-m.t),3,30);m.x=sx;m.y=sy;m.t=tAll;}
+          const ahead=clamp(m.v*.45,.9,6);let advanced=false;
+          while(cityRoute.length>1&&Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<ahead&&segmentFree({x:sx,y:sy},cityRoute[1],.45)){cityRoute.shift();advanced=true;}
+          if(cityRoute.length===1&&(Math.hypot(sx-cityRoute[0].x,sy-cityRoute[0].y)<.32||Math.hypot(hero.x-cityRoute[0].x,hero.y-cityRoute[0].y)<.32)){cityRoute.shift();advanced=true;}
+          if(cityRoute.length&&(advanced||tAll-routeTime>.35)){Online.send({type:'move',...cityRoute[0]});routeTime=tAll;}
+        }
       }
       interpolate(hero, dt); for (const remote of remotePlayers.values()) interpolate(remote, dt);
       for (const slime of slimes) { interpolate(slime, dt); if (slime.dead) slime.dieT += dt; }
