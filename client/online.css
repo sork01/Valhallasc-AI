@@ -2,8 +2,8 @@
 .network-status { display: inline-block; max-width: 12cqw; margin: .6cqw 0 0; padding: .3cqw 1cqw; box-sizing: border-box; border: 1px solid #e5cd8370; border-radius: 2cqw; color: #eee3bf; background: #10182ee8; font: max(10px, .85cqw) 'Jua', sans-serif; text-align: center; white-space: normal; pointer-events: none; }
 .network-status[data-state="online"] { color: #b2efb4; }
 .network-status[data-state="offline"] { color: #ffd7a3; }
-.chat { position: absolute; bottom: .6cqw; left: 1.4cqw; width: min(28cqw, max(14cqw, calc((46.2cqw - 28.05cqw * var(--ui, .8)) / var(--ui, .8)))); z-index: 20; border: 1px solid #a9b4dc50; border-radius: .8cqw; overflow: hidden; color: #f1ecda; background: #10182ec9; font: .9cqw sans-serif; }
-.chat-log { height: 7cqw; overflow: auto; padding: .55cqw .8cqw; }
+.chat { position: absolute; bottom: .6cqw; left: 1.4cqw; width: var(--pw, min(28cqw, max(14cqw, calc((46.2cqw - 28.05cqw * var(--ui, .8)) / var(--ui, .8))))); z-index: 20; border: 1px solid #a9b4dc50; border-radius: .8cqw; overflow: hidden; color: #f1ecda; background: #10182ec9; font: .9cqw sans-serif; }
+.chat-log { height: var(--ph, 7cqw); overflow: auto; padding: .55cqw .8cqw; }
 .chat-log p { margin: .25cqw 0; overflow-wrap: anywhere; line-height: 1.35; }
 .chat-log b { color: #e9ce82; }
 .chat-log b.gm, .chat-log p.chat-gm { color: #ffd24a; text-shadow: 0 0 .5cqw #ffb30055; }
@@ -97,12 +97,13 @@
 .gossip-parchment .inventory-item[data-rarity="gm"] b { color: #8a6a00; }
 .gossip-parchment .shop-item-icon { background: #2a1a0acc; border-color: #5a4a30; }
 @media (pointer: coarse) { .gossip-row { min-height: 44px; } .gossip-button, .gossip-parchment .btn, .gossip-titlebar .window-close { min-height: 44px; min-width: 44px; } }
-.quest-tracker { position: absolute; left: 1.4cqw; top: calc(10.8cqw + 3.6cqw * var(--ui, .8)); width: 23cqw; z-index: 20; color: #f7e9c9; text-align: left; font: 1cqw/1.45 Arial, sans-serif; text-shadow: 0 1px 3px #000, 1px 0 2px #000; }
+.quest-tracker { position: absolute; left: 1.4cqw; top: calc(10.8cqw + 3.6cqw * var(--ui, .8)); width: var(--pw, 23cqw); z-index: 20; color: #f7e9c9; text-align: left; font: 1cqw/1.45 Arial, sans-serif; text-shadow: 0 1px 3px #000, 1px 0 2px #000; }
 .tracker-heading { display: flex; align-items: center; border-bottom: 1px solid #b89b5c80; background: linear-gradient(90deg, #182024cc, #18202420); }
 .tracker-journal, .tracker-toggle, .tracker-title { border: 0; padding: .45cqw .5cqw; background: none; color: #ffd56b; text-align: left; cursor: pointer; font: inherit; text-shadow: inherit; }
+.quest-tracker[data-sized] .tracker-list { height: var(--ph); }
 .tracker-journal { flex: 1; font-weight: bold; }
 .tracker-toggle { font-size: 1.25cqw; }
-.tracker-list { max-height: 24cqw; overflow: auto; padding: .4cqw .2cqw; background: linear-gradient(90deg, #111b2270, #111b2210); }
+.tracker-list { max-height: var(--ph, 24cqw); overflow: auto; padding: .4cqw .2cqw; background: linear-gradient(90deg, #111b2270, #111b2210); }
 .tracker-quest { margin: 0 0 .65cqw; }
 .tracker-title { display: block; color: #ffdf80; font-size: .95cqw; font-weight: bold; }
 .tracker-objective { display: block; padding: .1cqw .5cqw .1cqw 1.4cqw; color: #e5e1d6; font-size: .85cqw; }
@@ -822,8 +823,15 @@
 
 /* ---------- window resize grips (settings.js) ---------- */
 .win-grips { position: absolute; inset: 0; z-index: 53; pointer-events: none; }
-.win-grip { position: absolute; box-sizing: border-box; width: max(18px, 1.7cqw); height: max(18px, 1.7cqw); pointer-events: auto; cursor: nwse-resize; touch-action: none; opacity: .6;
+.win-grip { position: absolute; box-sizing: border-box; width: max(18px, 1.7cqw); height: max(18px, 1.7cqw); pointer-events: auto; cursor: nwse-resize; touch-action: none; opacity: .8;
   border-right: max(3px, .3cqw) solid #ffd866; border-bottom: max(3px, .3cqw) solid #ffd866; border-radius: 0 0 .5cqw 0; filter: drop-shadow(0 0 2px #000); }
 .win-grip:hover, .win-grip:focus-visible, .win-grip.dragging { opacity: 1; }
 .win-grip:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 @media (pointer: coarse) { .win-grip { width: 34px; height: 34px; } }
+/* ---------- width and height grips of the quest tracker and chat (settings.js) ---------- */
+.panel-grip { position: absolute; box-sizing: border-box; width: max(18px, 1.7cqw); height: max(18px, 1.7cqw); pointer-events: auto; touch-action: none; opacity: .45; cursor: nwse-resize;
+  border-right: max(3px, .3cqw) solid #ffd866; border-bottom: max(3px, .3cqw) solid #ffd866; border-radius: 0 0 .5cqw 0; filter: drop-shadow(0 0 2px #000); }
+.panel-grip.top { cursor: nesw-resize; border-bottom: 0; border-top: max(3px, .3cqw) solid #ffd866; border-radius: 0 .5cqw 0 0; }
+.panel-grip:hover, .panel-grip:focus-visible, .panel-grip.dragging { opacity: 1; }
+.panel-grip:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+@media (pointer: coarse) { .panel-grip { width: 34px; height: 34px; opacity: .7; } }

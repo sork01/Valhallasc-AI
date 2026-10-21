@@ -3,7 +3,7 @@
    Layout is stored per device as {id: {x, y}} offsets in stage-width percent (cqw) from each element's
    default spot, applied with the CSS `translate` property so it composes with the elements' own transforms.
    UI size: one global factor (Prefs.uiScale) scales every HUD piece and window with the CSS `scale` property, about the
-   corner each piece is anchored to, so nothing drifts. Each window also has a corner grip that resizes just that window
+   corner each piece is anchored to, so nothing drifts. Each window also has a corner grip that resizes just that window (the quest tracker and chat get width and height grips, Prefs.panelSize)
    (Prefs.winScale, a factor on top of the global one). `scale` never changes layout, so the stage maths stays as it was.
    Preferences are read and written only through window.Prefs (game.js owns localStorage). */
 (() => {
@@ -69,6 +69,7 @@
     loadLayout();
     for (const [id] of ITEMS) { paint(id); if (layout[id]) { const r = range(id); if (r) place(id, layout[id].x, layout[id].y, r); } }
     if (editing) syncHandles();
+    placePanelGrips();
   }
 
   // ---------- UI size and window sizes ----------
@@ -105,6 +106,7 @@
     for (const [id] of ITEMS) { const el = els.get(id); if (el) el.style.scale = Math.abs(k - 1) < .005 ? '' : String(k); }
     for (const [selector] of EXTRA) { const el = document.querySelector(selector); if (el) el.style.scale = Math.abs(k - 1) < .005 ? '' : String(k); }
     for (const w of wins) applyWindow(w);
+    placePanelGrips();
   }
   function storeWindows() {
     const out = {}; for (const [id, v] of Object.entries(winScale)) if (Math.abs(v - 1) > .005) out[id] = Math.round(v * 1000) / 1000;
@@ -157,7 +159,89 @@
     }
     new ResizeObserver(() => applyScale()).observe(stage);
   }
-  function resetWindows() { for (const w of wins) { delete winScale[w.id]; applyWindow(w); } storeWindows(); }
+  function resetWindows() { for (const w of wins) { delete winScale[w.id]; applyWindow(w); } storeWindows(); resetPanels(); }
+
+  // ---------- width and height of the quest tracker and the chat ----------
+  // These two are lists, so they get a real width and height (the list scrolls inside) instead of the window zoom. Sizes are
+  // stored in cqw of the layout box (Prefs.panelSize {id: {w, h}}), applied as --pw / --ph, and h is the height of the list.
+  // The grip lives in the grip layer, not inside the piece: quests.js rebuilds the tracker's children on every update.
+  const PANELS = [
+    { id: 'quests', name: 'Quest tracker', top: false, w: [12, 60], h: [4, 50], body: el => el.querySelector('.tracker-list') },
+    { id: 'chat', name: 'Chat', top: true, w: [14, 60], h: [3.5, 45], body: el => [...el.querySelectorAll('.chat-log')].find(x => !x.hidden) },
+  ].map(p => ({ ...p, el: els.get(p.id), grip: null, size: null })).filter(p => p.el);
+  const cq = () => stage.offsetWidth / 100;
+  const panelScale = p => p.el.getBoundingClientRect().width / (p.el.offsetWidth || 1) || 1;
+  function paintPanel(p) {
+    if (!p.size) { p.el.style.removeProperty('--pw'); p.el.style.removeProperty('--ph'); delete p.el.dataset.sized; return; }
+    p.el.style.setProperty('--pw', p.size.w + 'cqw'); p.el.style.setProperty('--ph', p.size.h + 'cqw'); p.el.dataset.sized = '1';
+  }
+  function placePanelGrip(p) {
+    if (!p.grip) return;
+    const r = p.el.getBoundingClientRect(), s = stage.getBoundingClientRect(), body = p.body(p.el);
+    p.grip.hidden = editing || !r.width || !r.height || !body || !body.offsetHeight;
+    if (p.grip.hidden) return;
+    const g = p.grip.offsetWidth || 18;
+    p.grip.style.left = Math.min(r.right, s.right) - s.left - g - 3 + 'px';
+    p.grip.style.top = (p.top ? Math.max(r.top, s.top) - s.top + 3 : Math.min(r.bottom, s.bottom) - s.top - g - 3) + 'px';
+  }
+  const placePanelGrips = () => { for (const p of PANELS) placePanelGrip(p); };
+  // Set a size; a size that would push the piece out of the stage is refused (the previous one stays).
+  function sizePanel(p, w, h, save = true) {
+    const before = p.size, lim = (v, [lo, hi]) => round(Math.max(lo, Math.min(hi, v)));
+    p.size = { w: lim(w, p.w), h: lim(h, p.h) }; paintPanel(p);
+    const r = p.el.getBoundingClientRect(), s = stage.getBoundingClientRect();
+    if (r.right > s.right + 1 || r.bottom > s.bottom + 1 || r.top < s.top - 1 || r.left < s.left - 1) { p.size = before; paintPanel(p); }
+    placePanelGrip(p); if (save) storePanels();
+  }
+  const currentPanel = p => ({ w: p.el.offsetWidth / cq(), h: (p.body(p.el)?.offsetHeight || 0) / cq() });
+  function storePanels() {
+    const out = {}; for (const p of PANELS) if (p.size) out[p.id] = { ...p.size };
+    window.Prefs.set({ panelSize: out });
+  }
+  function clearPanel(p) { p.size = null; paintPanel(p); placePanelGrip(p); storePanels(); }
+  function loadPanels() {
+    for (const p of PANELS) {
+      const v = window.Prefs.panelSize[p.id];
+      p.size = v && Number.isFinite(+v.w) && Number.isFinite(+v.h) ? { w: Math.max(p.w[0], Math.min(p.w[1], +v.w)), h: Math.max(p.h[0], Math.min(p.h[1], +v.h)) } : null;
+      paintPanel(p);
+    }
+  }
+  function makePanelGrip(p) {
+    const g = document.createElement('div');
+    g.className = 'panel-grip' + (p.top ? ' top' : ''); g.tabIndex = 0; g.setAttribute('role', 'button'); g.hidden = true; g.dataset.panel = p.id;
+    g.title = 'Drag to change the width and height · double-click for the normal size';
+    g.setAttribute('aria-label', `Resize ${p.name}: arrow keys change the width and height, 0 resets it`);
+    let drag = null;
+    g.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      e.preventDefault(); e.stopPropagation();
+      drag = { pointer: e.pointerId, x: e.clientX, y: e.clientY, k: panelScale(p) * cq(), start: currentPanel(p) };
+      g.setPointerCapture(e.pointerId); g.classList.add('dragging');
+    });
+    g.addEventListener('pointermove', e => {
+      if (!drag || drag.pointer !== e.pointerId) return;
+      sizePanel(p, drag.start.w + (e.clientX - drag.x) / drag.k, drag.start.h + (p.top ? drag.y - e.clientY : e.clientY - drag.y) / drag.k, false);
+    });
+    const end = e => { if (!drag || drag.pointer !== e.pointerId) return; drag = null; g.classList.remove('dragging'); storePanels(); };
+    g.addEventListener('pointerup', end); g.addEventListener('pointercancel', end);
+    g.addEventListener('dblclick', () => clearPanel(p));
+    g.addEventListener('keydown', e => {
+      const step = (e.shiftKey ? 3 : 1), grow = p.top ? 'ArrowUp' : 'ArrowDown', shrink = p.top ? 'ArrowDown' : 'ArrowUp';
+      const d = { ArrowRight: [step, 0], ArrowLeft: [-step, 0], [grow]: [0, step], [shrink]: [0, -step] }[e.key];
+      if (!d && e.key !== '0') return;
+      e.preventDefault(); e.stopPropagation();
+      if (e.key === '0') clearPanel(p); else { const c = p.size || currentPanel(p); sizePanel(p, c.w + d[0], c.h + d[1]); }
+    });
+    return g;
+  }
+  function initPanels() {
+    const watch = new ResizeObserver(placePanelGrips);
+    for (const p of PANELS) { p.grip = makePanelGrip(p); gripLayer.append(p.grip); watch.observe(p.el); }
+    loadPanels(); placePanelGrips();
+    // The tracker's list is rebuilt on every update and the chat swaps its log between tabs: look again when they change.
+    for (const p of PANELS) new MutationObserver(placePanelGrips).observe(p.el, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
+  }
+  function resetPanels() { for (const p of PANELS) { p.size = null; paintPanel(p); } placePanelGrips(); storePanels(); }
 
   // ---------- the volume panel ----------
   const music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound'), night = $('set-night'), weather = $('set-weather'), weatherAudio = $('set-weather-audio'), language = $('set-language'), size = $('set-uiscale');
@@ -227,7 +311,7 @@
   function startEdit() {
     if (editing) return;
     editing = true; panel.hidden = true; $('pause').hidden = true;
-    stage.classList.add('ui-editing'); bar.hidden = false; for (const w of wins) placeGrip(w);
+    stage.classList.add('ui-editing'); bar.hidden = false; for (const w of wins) placeGrip(w); placePanelGrips();
     layer = document.createElement('div'); layer.className = 'layout-layer'; stage.append(layer);
     for (const [id, name] of ITEMS) if (els.get(id)) { const h = makeHandle(id, name); handles.set(id, h); layer.append(h); }
     syncHandles(); select(null);
@@ -236,7 +320,7 @@
   function stopEdit(toPanel = true) {
     if (!editing) return;
     editing = false; drag = null; store();
-    stage.classList.remove('ui-editing'); bar.hidden = true; for (const w of wins) placeGrip(w); layer.remove(); layer = null; handles.clear(); selected = null;
+    stage.classList.remove('ui-editing'); bar.hidden = true; for (const w of wins) placeGrip(w); placePanelGrips(); layer.remove(); layer = null; handles.clear(); selected = null;
     if (toPanel) { panel.hidden = false; syncPanel(); $('set-edit-ui').focus({ preventScroll: true }); }
   }
   function reset() {
@@ -270,6 +354,6 @@
   $('layout-done').addEventListener('click', () => stopEdit());
   $('layout-reset').addEventListener('click', reset);
 
-  window.Settings = { show, close, refresh, startEdit, stopEdit, reset, applyScale, resetWindows, sizeWindow: (id, factor) => { const w = wins.find(x => x.id === id); if (w) sizeWindow(w, factor); }, get windowScales() { return winScale; }, get active() { return !panel.hidden || editing; }, get editing() { return editing; }, get layout() { return layout; } };
-  loadWindowScales(); initWindows(); applyScale(); refresh();
+  window.Settings = { show, close, refresh, startEdit, stopEdit, reset, applyScale, resetWindows, resetPanels, get panelSizes() { return Object.fromEntries(PANELS.map(p => [p.id, p.size])); }, sizeWindow: (id, factor) => { const w = wins.find(x => x.id === id); if (w) sizeWindow(w, factor); }, get windowScales() { return winScale; }, get active() { return !panel.hidden || editing; }, get editing() { return editing; }, get layout() { return layout; } };
+  loadWindowScales(); initWindows(); initPanels(); applyScale(); refresh();
 })();

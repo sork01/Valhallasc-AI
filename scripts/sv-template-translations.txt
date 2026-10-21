@@ -89,6 +89,7 @@
   "Requires level {0} (you are level {1})": "Kräver nivå {0} (du är nivå {1})",
   "Requires {0}": "Kräver {0}",
   "Resize {0}: arrow keys change the size, 0 resets it": "Ändra storlek på {0}: piltangenterna ändrar storleken, 0 återställer den",
+  "Resize {0}: arrow keys change the width and height, 0 resets it": "Ändra storlek på {0}: piltangenterna ändrar bredd och höjd, 0 återställer den",
   "Restores {0} at once · {1} s cooldown shared by all potions": "Återställer {0} direkt · {1} s nedkylning som delas av alla drycker",
   "Restores {0} over {1} s · one meal at a time": "Återställer {0} över {1} s · en måltid åt gången",
   "Restores {0} over {1} s · one meal at a time, {2} s cooldown shared by all meals": "Återställer {0} över {1} s · en måltid åt gången, {2} s nedkylning som delas av alla måltider",
