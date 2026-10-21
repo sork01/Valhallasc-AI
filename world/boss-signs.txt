@@ -4,7 +4,7 @@
     "what":"The Midnight Press marks a red strip for 5 seconds. The Furnace Halo marks a red ring. Both knock out anyone on red.",
     "todo":"Step beside the strip. For the ring, stand in its clear middle or beyond its edge. Stay off every red mark.",
     "tip":"Near the end the strip widens and strikes again 3 seconds later. Watch both warnings during this long fight.",
-    "colors":["red"],"x":84.5,"y":59.5
+    "colors":["red"],"x":105.5,"y":65.5
   },
   "barrow_fatebound": {
     "title": "The Unwritten King",
