@@ -422,5 +422,201 @@
   "span_caster": [
     1.0,
     8.0
+  ],
+  "voidmoth": [
+    2.0,
+    1.0
+  ],
+  "crystalwyrm": [
+    1.9,
+    1.0
+  ],
+  "orbitbeetle": [
+    1.8,
+    1.0
+  ],
+  "eclipsedryad": [
+    1.7,
+    1.0
+  ],
+  "meteorgolem": [
+    1.5,
+    1.0
+  ],
+  "shardscarab": [
+    1.54,
+    1.0
+  ],
+  "glassharrier": [
+    1.58,
+    1.0
+  ],
+  "prismsentinel": [
+    1.63,
+    1.0
+  ],
+  "bronzemantis": [
+    1.71,
+    1.0
+  ],
+  "gearling": [
+    1.68,
+    1.0
+  ],
+  "orbitseer": [
+    1.64,
+    1.0
+  ],
+  "chronoguard": [
+    1.61,
+    1.0
+  ],
+  "glowcapgrazer": [
+    1.54,
+    1.0
+  ],
+  "silkwing": [
+    1.59,
+    1.0
+  ],
+  "rootlurker": [
+    1.64,
+    1.0
+  ],
+  "lanternwraith": [
+    1.68,
+    1.0
+  ],
+  "saltclaw": [
+    1.78,
+    1.0
+  ],
+  "stormgull": [
+    1.76,
+    1.0
+  ],
+  "glassray": [
+    1.75,
+    1.0
+  ],
+  "breakersentinel": [
+    1.72,
+    1.0
+  ],
+  "meadowhare": [
+    1.7,
+    1.0
+  ],
+  "sunbacksnail": [
+    1.67,
+    1.0
+  ],
+  "brushfox": [
+    1.64,
+    1.0
+  ],
+  "spadebadger": [
+    1.62,
+    1.0
+  ],
+  "ribbongecko": [
+    1.56,
+    1.0
+  ],
+  "balloonbeetle": [
+    1.49,
+    1.0
+  ],
+  "paintedmacaw": [
+    1.41,
+    1.0
+  ],
+  "jesterling": [
+    1.34,
+    1.0
+  ],
+  "orchidmantis": [
+    1.19,
+    1.0
+  ],
+  "canopyglider": [
+    1.25,
+    1.0
+  ],
+  "poolcaiman": [
+    1.31,
+    1.0
+  ],
+  "drumgorilla": [
+    1.36,
+    1.0
+  ],
+  "sandhopper": [
+    1.48,
+    1.0
+  ],
+  "dunefennec": [
+    1.47,
+    1.0
+  ],
+  "glassscorpion": [
+    1.45,
+    1.0
+  ],
+  "sunvulture": [
+    1.44,
+    1.0
+  ],
+  "snowhare": [
+    1.41,
+    1.0
+  ],
+  "iceotter": [
+    1.4,
+    1.0
+  ],
+  "frostheron": [
+    1.38,
+    1.0
+  ],
+  "glaciercrab": [
+    1.37,
+    1.0
+  ],
+  "screeferret": [
+    1.34,
+    1.0
+  ],
+  "stoneibex": [
+    1.37,
+    1.0
+  ],
+  "slateraven": [
+    1.39,
+    1.0
+  ],
+  "ridgeadder": [
+    1.42,
+    1.0
+  ],
+  "brooknewt": [
+    1.47,
+    1.0
+  ],
+  "sundarter": [
+    1.44,
+    1.0
+  ],
+  "acornmimic": [
+    1.41,
+    1.0
+  ],
+  "snowstoat": [
+    1.38,
+    1.0
+  ],
+  "miragejackal": [
+    1.5,
+    1.0
   ]
 }

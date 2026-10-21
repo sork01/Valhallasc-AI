@@ -26,6 +26,8 @@ fn cap_for(rotation: Rotation) -> f64 {
         Rotation::BasicOnly => MAX_SECONDS,
     }
 }
+/// From this level the kill-time grid is played with the mercenaries' rotation (see `run_once`).
+const MERCENARY_FROM_LEVEL: u32 = 40;
 /// How far from the monster the character starts, in tiles. Walking in is part of the clock.
 const START_DISTANCE: f64 = 8.;
 pub const CLASSES: [Class; 5] = [
@@ -616,10 +618,18 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
     w.message(1, ClientMessage::Target { id });
     let start_time = w.time;
     let cap = case.cap.unwrap_or_else(|| cap_for(case.rotation));
-    // `TTK_BRAIN=mercenary` plays the kill-time grid (an ordinary monster picked by level) with the mercenaries' own code,
-    // like the party fights, instead of the harness rotation. Off by default: the bands were tuned with the harness
-    // rotation, and the mercenary one is faster at some levels (warrior 20: 10.3 s against the 15 s minimum).
-    let brain = case.target.is_none() && std::env::var("TTK_BRAIN").is_ok_and(|v| v == "mercenary");
+    // The kill-time grid (an ordinary monster picked by level) is played with the mercenaries' own code from level
+    // `MERCENARY_FROM_LEVEL`, like the party fights; below it the harness rotation stays, because the class curve there
+    // was tuned with it (the mercenary one is faster at some levels: warrior 20 takes 10.3 s against the 15 s minimum).
+    // From there up the harness rotation starves the assassin of energy (65-98 s) and measures the rotation, not the
+    // class. `TTK_BRAIN=mercenary` or `TTK_BRAIN=harness` forces one for every level.
+    let brain = case.target.is_none()
+        && case.foe == Foe::Ordinary
+        && match std::env::var("TTK_BRAIN").as_deref() {
+            Ok("mercenary") => true,
+            Ok("harness") => false,
+            _ => case.level >= MERCENARY_FROM_LEVEL,
+        };
     while w.time - start_time < cap {
         if w.players[&1].character.hp <= 0. {
             out.died = true;
