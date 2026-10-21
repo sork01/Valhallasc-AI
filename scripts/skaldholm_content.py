@@ -86,7 +86,7 @@ def key_people():
                'The Meeting Stone has stood here since before the walls. Wanderers who part at the Great Gate find each other again beside it. Gather your friends at the stone — and if you have too few, speak to the Stone itself: it will call fighters to your side for a fee. Mind the stairs beside it. They lead down to the Undervault, where the first Skalds sealed what they could not kill. Take five, and take a healer.',
                look_=look('#e0b48e', '#e8e8e8', 'short', None, None, '#e8e8e8')),
         person('meetingstone', 'The Meeting Stone', 'Gather your party', 101.7, 119.7, '#59d9ff',
-               'The runes brighten as you near. A voice that is not a voice offers you company: fighters of every calling answer the Stone for 250 gold apiece, and fight at your side until you dismiss them, leave your party or log out. A party holds five. The stairs beside the Stone lead down to the Undervault, a dungeon made for five heroes of level 20.',
+               'The runes brighten as you near. A voice that is not a voice offers you company: fighters of every calling answer the Stone for a fee that grows with your level, and fight at your side until you dismiss them, leave your party or log out. A party holds five. The stairs beside the Stone lead down to the Undervault, a dungeon made for five heroes of level 20.',
                mercenary_offers.offers(open_=True), art='stone'),
     ]
 

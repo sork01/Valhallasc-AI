@@ -1660,13 +1660,13 @@ const scenarios = {
     },
   },
   mercenaries: {
-    description: 'The two elite-quest givers rent mercenaries for 250 gold each: only with an unfinished quest taken, up to the players it wants, joining the party and the world, their kills paying the hirer, and the contract ending when its objective is complete.',
+    description: 'The two elite-quest givers rent mercenaries for a price that rises with the hirer level (1200 gold each at level 20): only with an unfinished quest taken, up to the players it wants, joining the party and the world, their kills paying the hirer, and the contract ending when its objective is complete.',
     startLevel: 20, godMode: true, levelSpread: 0,
     async run(w, check) {
       const bot = 'Hirer', mercs = () => w.snapshot.players.filter(p => /^Merc /.test(p.look.name));
       await w.connect({ bot, class: 'warrior' });
-      await kit.setupCharacter(w, bot, { gold: 3000 });
-      await w.debug(bot, { op: 'set_gold', gold: 3000 });
+      await kit.setupCharacter(w, bot, { gold: 6000 });
+      await w.debug(bot, { op: 'set_gold', gold: 6000 });
       // Two-player quest in the Crags: one mercenary of any class.
       await kit.teleport(w, bot, { npc: 'crags_captain' });
       let reply = await kit.talkTo(w, bot, 'crags_captain', 'merc_mage');
@@ -1676,10 +1676,10 @@ const scenarios = {
       await w.waitFor(() => !!quest(w, bot, 'crags_cinderlord'));
       reply = await kit.talkTo(w, bot, 'crags_captain', 'merc_priest');
       await w.waitFor(() => mercs().length === 1);
-      check(/Merc Priest joins your party/.test(reply.notice) && w.player(bot).gold === 2750, 'A Priest is hired for 250 gold');
+      check(/Merc Priest joins your party/.test(reply.notice) && /for 1200 gold/.test(reply.notice) && w.player(bot).gold === 4800, 'A level-20 Priest is hired for 1200 gold');
       check(mercs()[0].look.class === 'priest' && mercs()[0].level === 20, 'The mercenary is a level-20 Priest in the world');
       reply = await kit.talkTo(w, bot, 'crags_captain', 'merc_warrior');
-      check(/wants 2 fighters/.test(reply.notice) && mercs().length === 1 && w.player(bot).gold === 2750, 'A two-player quest hires only one');
+      check(/wants 2 fighters/.test(reply.notice) && mercs().length === 1 && w.player(bot).gold === 4800, 'A two-player quest hires only one');
       await kit.talkTo(w, bot, 'crags_captain', 'merc_dismiss');
       await w.waitFor(() => mercs().length === 0);
       check(true, 'Sending them away removes the mercenary');
@@ -1689,10 +1689,11 @@ const scenarios = {
       await kit.teleport(w, bot, { npc: 'fen_reeve' });
       await kit.talkTo(w, bot, 'fen_reeve', 'quest:accept:fen_gloomroot');
       await w.waitFor(() => !!quest(w, bot, 'fen_gloomroot'));
+      await w.debug(bot, { op: 'set_gold', gold: 6000 });
       const purse = w.player(bot).gold;
       for (const c of ['priest', 'mage', 'hunter', 'warrior']) await kit.talkTo(w, bot, 'fen_reeve', 'merc_' + c);
       await w.waitFor(() => mercs().length === 4);
-      check(mercs().map(m => m.look.class).sort().join() === 'hunter,mage,priest,warrior' && w.player(bot).gold === purse - 1000, 'Four chosen classes are hired for 1000 gold');
+      check(mercs().map(m => m.look.class).sort().join() === 'hunter,mage,priest,warrior' && w.player(bot).gold === purse - 4800, 'Four chosen classes are hired for 4 x 1200 gold');
       reply = await kit.talkTo(w, bot, 'fen_reeve', 'merc_priest');
       check(/already has 5/.test(reply.notice) && mercs().length === 4, 'A fifth seat is refused: the party is full');
       // They follow into the arena and the kill is the hirer's.
@@ -1857,12 +1858,12 @@ const scenarios = {
       check(w.player(bot).zone === 4 && /level 19/.test(refusal.text), 'A level-19 hero is told to come back at level 20 and stays in Skaldholm');
       await kit.teleport(w, bot, { zone: 4, x: 100, y: 128 });       // off the stairs: at level 20 the door would take them in at once
       await kit.setupCharacter(w, bot, { level: 20 });
-      await w.debug(bot, { op: 'set_gold', gold: 3000 });
+      await w.debug(bot, { op: 'set_gold', gold: 6000 });
       for (let i = 0; i < 3; i++) await w.debug(bot, { op: 'give_item', item: 'linen_satchel', quantity: 1 });   // room for five pieces
-      // The Meeting Stone hires a full party for 250 gold each, with no quest.
+      // The Meeting Stone hires a full party for 1200 gold each at level 20, with no quest.
       let reply = await kit.talkTo(w, bot, 'city_meetingstone', 'merc_priest');
-      await w.waitFor(() => w.player(bot).gold === 2750, 5000, 'The 250 gold is paid');
-      check(/Merc Priest joins your party/.test(reply.notice) && w.player(bot).gold === 2750, 'The Stone hires a Priest for 250 gold with no quest');
+      await w.waitFor(() => w.player(bot).gold === 4800, 5000, 'The 1200 gold is paid');
+      check(/Merc Priest joins your party/.test(reply.notice) && w.player(bot).gold === 4800, 'The Stone hires a Priest for 1200 gold with no quest');
       for (const c of ['warrior', 'mage', 'hunter']) await kit.talkTo(w, bot, 'city_meetingstone', 'merc_' + c);
       await w.waitFor(() => mercs().length === 4, 10000, 'Four mercenaries');
       reply = await kit.talkTo(w, bot, 'city_meetingstone', 'merc_assassin');
@@ -2830,10 +2831,11 @@ const scenarios = {
       await w.waitFor(() => w.player(bot).gold === gold - 500);
       check(w.player(bot).gold === gold - 500 && w.player(bot).bagCapacity === 22, 'The market sells the authoritative six-slot satchel for 500 gold');
       await kit.teleport(w, bot, { npc: 'nacre_stone' });
+      await w.debug(bot, { op: 'set_gold', gold: 10000 });
       const g = w.player(bot).gold;
       await kit.talkTo(w, bot, 'nacre_stone', 'merc_priest');
-      await w.waitFor(() => view(bot).players.some(p => /^Merc /.test(p.look.name)) && w.player(bot).gold === g - 250);
-      check(w.player(bot).gold === g - 250 && view(bot).players.some(p => /^Merc /.test(p.look.name) && p.look.class === 'priest'), 'The Meeting Stone hires a priest for 250 gold');
+      await w.waitFor(() => view(bot).players.some(p => /^Merc /.test(p.look.name)) && w.player(bot).gold === g - 5000);
+      check(w.player(bot).gold === g - 5000 && view(bot).players.some(p => /^Merc /.test(p.look.name) && p.look.class === 'priest'), 'The Meeting Stone hires a level-40 priest for 5000 gold');
       await kit.talkTo(w, bot, 'nacre_stone', 'merc_dismiss');
       await w.waitFor(() => !view(bot).players.some(p => /^Merc /.test(p.look.name)));
       check(!view(bot).players.some(p => /^Merc /.test(p.look.name)), 'The stone dismisses hired companions');
@@ -3223,11 +3225,11 @@ const scenarios = {
       await kit.teleport(w,bot,{npc:'travel_breakwater'});
       const travel=await kit.talkTo(w,bot,'travel_breakwater');
       check(travel.travelStops?.includes('travel_breakwater') && area.npcs.find(n=>n.id==='travel_breakwater').travelLinks.includes('travel_asterion') && map.zones[16].npcs.find(n=>n.id==='travel_asterion').travelLinks.includes('travel_breakwater'),'Spark Travel links Breakwater and Asterion');
-      await w.debug(bot,{op:'set_gold',gold:500});
+      await w.debug(bot,{op:'set_gold',gold:40000});
       await kit.teleport(w,bot,{npc:'stormglass_stone'});
       const hire=await kit.talkTo(w,bot,'stormglass_stone','merc_priest');
       await w.waitFor(()=>w.views.get(bot).players.some(p=>p.look.name==='Merc Priest'),5000,'Meeting Stone hires a fighter');
-      check(/Merc Priest joins your party/.test(hire.notice) && w.player(bot).gold===250,'The Meeting Stone hires a Priest for 250 gold without opening the dungeon');
+      check(/Merc Priest joins your party/.test(hire.notice) && w.player(bot).gold===7000,'The Meeting Stone hires a level-65 Priest for 33000 gold without opening the dungeon');
       await w.advance(700);
       await kit.talkTo(w,bot,'stormglass_stone','merc_dismiss');
       await w.waitFor(()=>!w.views.get(bot).players.some(p=>p.look.name==='Merc Priest'),5000,'Dismiss Meeting Stone hire');
@@ -3305,11 +3307,11 @@ const scenarios = {
       await kit.teleport(w,bot,{npc:'travel_millbridge'});
       const travel=await kit.talkTo(w,bot,'travel_millbridge');
       check(travel.travelStops?.includes('travel_millbridge')&&area.npcs.find(n=>n.id==='travel_millbridge').travelLinks.includes('travel_breakwater')&&map.zones[18].npcs.find(n=>n.id==='travel_breakwater').travelLinks.includes('travel_millbridge'),'Spark stops link Millbridge and Breakwater');
-      await w.debug(bot,{op:'set_gold',gold:500});
+      await w.debug(bot,{op:'set_gold',gold:45000});
       await kit.teleport(w,bot,{npc:'sun_stone'});
       const hire=await kit.talkTo(w,bot,'sun_stone','merc_priest');
       await w.waitFor(()=>w.views.get(bot).players.some(p=>p.look.name==='Merc Priest'),5000,'Meeting Stone hire');
-      check(/Merc Priest joins your party/.test(hire.notice)&&w.player(bot).gold===250,'Meeting Stone hires a fighter');
+      check(/Merc Priest joins your party/.test(hire.notice)&&w.player(bot).gold===7000,'Meeting Stone hires a level-70 fighter for 38000 gold');
       await kit.talkTo(w,bot,'sun_stone','merc_dismiss');
       await kit.teleport(w,bot,{npc:'sun_miller'});
       await kit.talkTo(w,bot,'sun_miller','quest:accept:sun_welcome');

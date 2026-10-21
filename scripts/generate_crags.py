@@ -48,7 +48,7 @@ def quest_hub():
     npcs = [
         npc('crags_captain', 'Captain Sera', 'Cinderwatch commander', 44, 82, '#b66c50',
             'Welcome to Cinderwatch Camp. Meet our crew, then push north through the lava fords. Wisps haunt the lowlands; spiders, wraiths and golems guard the higher crags. Return here to report your victories. '
-            'No partner for the Cinderlord? Once you have taken that quest I can hire you a sword-arm of any class for 250 gold, who will fight beside you in your party until the job is done.',
+            'No partner for the Cinderlord? Once you have taken that quest I can hire you a sword-arm of any class for a fee that grows with your level, who will fight beside you in your party until the job is done.',
             mo.offers()),
         npc('crags_scout', 'Scout Kael', 'Trail scout', 51, 78.5, '#79916d',
             'Follow the winding ash trail through each ford. I need help clearing Cinder Wisps and Magma Spiders before our supply runners can pass.'),

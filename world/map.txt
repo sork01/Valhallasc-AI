@@ -6328,7 +6328,7 @@
           "x": 44,
           "y": 82,
           "color": "#b66c50",
-          "dialogue": "Welcome to Cinderwatch Camp. Meet our crew, then push north through the lava fords. Wisps haunt the lowlands; spiders, wraiths and golems guard the higher crags. Return here to report your victories. No partner for the Cinderlord? Once you have taken that quest I can hire you a sword-arm of any class for 250 gold, who will fight beside you in your party until the job is done.",
+          "dialogue": "Welcome to Cinderwatch Camp. Meet our crew, then push north through the lava fords. Wisps haunt the lowlands; spiders, wraiths and golems guard the higher crags. Return here to report your victories. No partner for the Cinderlord? Once you have taken that quest I can hire you a sword-arm of any class for a fee that grows with your level, who will fight beside you in your party until the job is done.",
           "offers": [
             {
               "id": "merc_warrior",
@@ -18225,7 +18225,7 @@
           "x": 78,
           "y": 16.5,
           "color": "#7a6aa8",
-          "dialogue": "Lanternmere keeps its lanterns lit all night, and every night the dark fen takes a few more. Toads on the west bank, crocodiles along the south shore, drowned knights among the ruins in the east, and something with many heads out on the island. Speak to everyone in town, then report to me. The Gloomroot in the south-east corner takes five. Once you have taken that quest I can hire you the fighters you lack: choose any classes, 250 gold each, and they join your party until the job is done.",
+          "dialogue": "Lanternmere keeps its lanterns lit all night, and every night the dark fen takes a few more. Toads on the west bank, crocodiles along the south shore, drowned knights among the ruins in the east, and something with many heads out on the island. Speak to everyone in town, then report to me. The Gloomroot in the south-east corner takes five. Once you have taken that quest I can hire you the fighters you lack: choose any classes, for a fee that grows with your level, and they join your party until the job is done.",
           "offers": [
             {
               "id": "merc_warrior",
@@ -25917,7 +25917,7 @@
           "x": 101.7,
           "y": 119.7,
           "color": "#59d9ff",
-          "dialogue": "The runes brighten as you near. A voice that is not a voice offers you company: fighters of every calling answer the Stone for 250 gold apiece, and fight at your side until you dismiss them, leave your party or log out. A party holds five. The stairs beside the Stone lead down to the Undervault, a dungeon made for five heroes of level 20.",
+          "dialogue": "The runes brighten as you near. A voice that is not a voice offers you company: fighters of every calling answer the Stone for a fee that grows with your level, and fight at your side until you dismiss them, leave your party or log out. A party holds five. The stairs beside the Stone lead down to the Undervault, a dungeon made for five heroes of level 20.",
           "offers": [
             {
               "id": "merc_warrior",
@@ -43195,7 +43195,7 @@
           "x": 33,
           "y": 140.2,
           "color": "#8a6a3a",
-          "dialogue": "Welcome to Hollowmoot, friend. We live in the roots of the Elder Ash because the Ash has always looked after us, and now it is the Ash that needs looking after. The boars are rotten with red blight, the crows have crowded Gallows Hill, and the great Oakhorn, the grove's own guardian, has gone mad with a thread through its heart. Meet my people, then come to me: there is work for every level you have. For the Oakhorn itself I can hire you the fighters you lack, 250 gold each.",
+          "dialogue": "Welcome to Hollowmoot, friend. We live in the roots of the Elder Ash because the Ash has always looked after us, and now it is the Ash that needs looking after. The boars are rotten with red blight, the crows have crowded Gallows Hill, and the great Oakhorn, the grove's own guardian, has gone mad with a thread through its heart. Meet my people, then come to me: there is work for every level you have. For the Oakhorn itself I can hire you the fighters you lack, for a fee that grows with your level.",
           "offers": [
             {
               "id": "merc_warrior",
@@ -43449,7 +43449,7 @@
           "x": 79,
           "y": 84.9,
           "color": "#58708f",
-          "dialogue": "You crossed the bridge with your toes still on? Good. Skuldwatch is the last light between the Wyrdwood and the Highmoor, and the light is going out: our beacons are dark, the trolls take their toll in kind and the storm has begun to answer to something. Meet my officers and I will find work for every level you have. The giant on the summit I cannot ask you to face alone: take the quest, and I will hire the fighters you lack, 250 gold each.",
+          "dialogue": "You crossed the bridge with your toes still on? Good. Skuldwatch is the last light between the Wyrdwood and the Highmoor, and the light is going out: our beacons are dark, the trolls take their toll in kind and the storm has begun to answer to something. Meet my officers and I will find work for every level you have. The giant on the summit I cannot ask you to face alone: take the quest, and I will hire the fighters you lack, for a fee that grows with your level.",
           "offers": [
             {
               "id": "merc_warrior",
@@ -51565,7 +51565,7 @@
           "x": 80,
           "y": 131.6,
           "color": "#9ab4d8",
-          "dialogue": "You came up through the Stormrift on your own two feet, which is more than the last three did. Welcome to Heimdall's Perch, hero. Heimdall watched the Bifrost from this rock until the bridge shattered, and the shards have been falling upward ever since: they float, they glow, and everything that lives among them has gone strange. Meet my people, then come to me, and I will find work for every level you have. The last ward I cannot ask you to hold alone: take the quest and I will hire you the fighters you lack, 250 gold each.",
+          "dialogue": "You came up through the Stormrift on your own two feet, which is more than the last three did. Welcome to Heimdall's Perch, hero. Heimdall watched the Bifrost from this rock until the bridge shattered, and the shards have been falling upward ever since: they float, they glow, and everything that lives among them has gone strange. Meet my people, then come to me, and I will find work for every level you have. The last ward I cannot ask you to hold alone: take the quest and I will hire you the fighters you lack, for a fee that grows with your level.",
           "offers": [
             {
               "id": "merc_warrior",
@@ -61743,7 +61743,7 @@
           "x": 80,
           "y": 150.6,
           "color": "#6aa8c8",
-          "dialogue": "You rode the Maelstrom down and arrived with your lungs still your own: Ran does not take everyone, and she must like you. Welcome to Keelhaven, hero. We are what is left of the fleet that sailed out under the Bifrost the day it broke: forty hulls came down, and we turned them over to make roofs. The air under them is borrowed, so do not shout. Meet my people, then come to me, and I will find work for every level you have. The Kraken in Ran's Court I cannot ask you to face alone: take the quest and I will hire you the fighters you lack, 250 gold each.",
+          "dialogue": "You rode the Maelstrom down and arrived with your lungs still your own: Ran does not take everyone, and she must like you. Welcome to Keelhaven, hero. We are what is left of the fleet that sailed out under the Bifrost the day it broke: forty hulls came down, and we turned them over to make roofs. The air under them is borrowed, so do not shout. Meet my people, then come to me, and I will find work for every level you have. The Kraken in Ran's Court I cannot ask you to face alone: take the quest and I will hire you the fighters you lack, for a fee that grows with your level.",
           "offers": [
             {
               "id": "merc_warrior",
@@ -62409,7 +62409,7 @@
           "id": "deep_captain",
           "title": "Three Against the Drowned Captain",
           "npc": "deep_halla",
-          "description": "Hvitserk Black-Coat captained the Naglfar when she sank, and he never left the deck: he stands in the west Shallows, north of the wreck, with his axe in his fist and his whole crew behind him in the mud. He swings like a ship coming about. Do not go alone: bring two friends, or take the quest and I will hire you the fighters you lack, 250 gold each. Return to me for a level-35 blue Amber Ring, usable by every class.",
+          "description": "Hvitserk Black-Coat captained the Naglfar when she sank, and he never left the deck: he stands in the west Shallows, north of the wreck, with his axe in his fist and his whole crew behind him in the mud. He swings like a ship coming about. Do not go alone: bring two friends, or take the quest and I will hire you the fighters you lack, for a fee that grows with your level. Return to me for a level-35 blue Amber Ring, usable by every class.",
           "objectives": [
             {
               "kind": "kill",
@@ -62577,7 +62577,7 @@
           "id": "deep_ghostmaw",
           "title": "Three Against the Ghostmaw",
           "npc": "deep_thora",
-          "description": "The Ghostmaw prowls the northern deep corridors: a pale moray older than the Net. Take two friends, or hire the fighters you need from me for 250 gold each. Defeat it and return with word that the passage is safe. I will give you a blue Nacreous Moonstone Necklace.",
+          "description": "The Ghostmaw prowls the northern deep corridors: a pale moray older than the Net. Take two friends, or hire the fighters you need from me for a fee that grows with your level. Defeat it and return with word that the passage is safe. I will give you a blue Nacreous Moonstone Necklace.",
           "objectives": [
             {
               "kind": "kill",
@@ -65555,7 +65555,7 @@
             "hair": "#ebdbbd",
             "style": "short"
           },
-          "dialogue": "The sea-blue runes offer companions of every calling for 250 gold each, up to five in your party. The sealed Drowned Cathedral stands beside you. Its expedition has not opened yet.",
+          "dialogue": "The sea-blue runes offer companions of every calling for a fee that grows with your level, up to five in your party. The sealed Drowned Cathedral stands beside you. Its expedition has not opened yet.",
           "art": "stone"
         },
         {
@@ -119372,7 +119372,7 @@
           "x": 91,
           "y": 27,
           "color": "#a8dfe4",
-          "dialogue": "The runes gather companions for 250 gold each. The Eye Below is open to heroes of level 65 and above. Enter together; each party receives its own descent.",
+          "dialogue": "The runes gather companions for a fee that grows with your level. The Eye Below is open to heroes of level 65 and above. Enter together; each party receives its own descent.",
           "offers": [
             {
               "id": "merc_warrior",
@@ -123554,7 +123554,7 @@
           "x": 91,
           "y": 29,
           "color": "#ffe6a5",
-          "dialogue": "The stone gathers companions for 250 gold each. The Elder Hollow is open to prepared parties.",
+          "dialogue": "The stone gathers companions for a fee that grows with your level. The Elder Hollow is open to prepared parties.",
           "offers": [
             {
               "id": "merc_warrior",

@@ -92,7 +92,7 @@ def people_and_quests():
             'The roots have opened. Gather five companions before descending: the heart below has awakened.',
             look=dict(skin='#835e4b', hair='#d2c39b', style='long', hat='hood', hatColor='#568054')),
         npc('stone', 'Millbridge Meeting Stone', 'Gather a party · hire fighters', 91, 29,
-            'The stone gathers companions for 250 gold each. The Elder Hollow is open to prepared parties.',
+            'The stone gathers companions for a fee that grows with your level. The Elder Hollow is open to prepared parties.',
             mercenary_offers.offers(open_=True)),
     ]
     folk[0]['art'] = 'sun_miller'

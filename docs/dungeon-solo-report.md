@@ -42,7 +42,7 @@ Tools: `ENRAGE_FILE=<path>` (test builds) and `scripts/dungeon-calibrate.py --en
 
 ## Hired party of five against the sixteen final bosses (2026-10-19, `BOSSMECH-MERC` / `BOSSMECH-CHECK`)
 
-`cargo test a_hired_party -- --ignored --nocapture` (`DUNGEON_SOLO_SEEDS=4`, about 11 minutes): the hirer is a warrior in green gear at the dungeon's level; at Skaldholm's Meeting Stone, through the real offers (250 gold each), they hire a priest, a mage, a hunter and an assassin. The hired fighters have no gear (level attributes and starting potions) and play themselves (`merc_think`, `boss_play`). The same seeds are fought by the bot party of five (the control above). A boss counts as won only if it dies within 180 s; falls do not matter. The rule: the hired party wins at least half the seeds and never fewer than the bot party minus one.
+`cargo test a_hired_party -- --ignored --nocapture` (`DUNGEON_SOLO_SEEDS=4`, about 11 minutes): the hirer is a warrior in green gear at the dungeon's level; at Skaldholm's Meeting Stone, through the real offers (`merc_price` of the hirer's level, 1200 gold each at level 20), they hire a priest, a mage, a hunter and an assassin. The hired fighters have no gear (level attributes and starting potions) and play themselves (`merc_think`, `boss_play`). The same seeds are fought by the bot party of five (the control above). A boss counts as won only if it dies within 180 s; falls do not matter. The rule: the hired party wins at least half the seeds and never fewer than the bot party minus one.
 
 | Boss | Hired | Bots | Boss | Hired | Bots |
 | --- | --- | --- | --- | --- | --- |

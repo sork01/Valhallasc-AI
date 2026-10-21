@@ -496,7 +496,7 @@
           const b=row('coin','Reset trained attributes',`${(packet.statResetPrice||0).toLocaleString()} gold`);
           b.dataset.view='stat_reset';b.addEventListener('click',()=>show({kind:'stat_reset'},'#npc-back'));offers.push(b);continue;
         }
-        const tier=tierFor(offer),cost=tier?tier.price:offer.cost;
+        const tier=tierFor(offer),cost=tier?tier.price:offer.merc&&offer.merc!=='dismiss'&&packet.mercPrice?packet.mercPrice:offer.cost;
         const b=row(iconFor(offer),tier?`Buy ${tier.name} · ${window.Inventory.effect(tier)}`:offer.label,cost?`${cost} gold`:'Free');b.dataset.offer=offer.id;
         if(tier)b.dataset.tier=tier.id;
         b.disabled=packet.gold<cost;

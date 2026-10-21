@@ -1,5 +1,5 @@
 //! Mercenaries. The giver of a group quest (a quest with `group` and `recommendedPlayers`, today the Cinderlord and
-//! Gloomroot elites) rents fighters for `MERC_COST` gold each, up to the number of players the quest wants. A mercenary is
+//! Gloomroot elites) rents fighters for `merc_price(hirer level)` gold each, up to the number of players the quest wants. A mercenary is
 //! an ordinary `Player` (so enemies fight it, a priest's mends reach it, it shows in the party and on every client)
 //! whose input is decided here instead of by a socket: it joins its hirer's party, follows them, helps whatever they or
 //! their party are fighting, uses its class's skills sensibly, drinks a potion when hurt, and is never saved.
@@ -7,8 +7,40 @@
 //! It leaves when its hired objective is ready, its instance is cleared, its hirer logs out/leaves the party, or it is sent away.
 use super::*;
 
-/// Gold for one mercenary, whatever its class.
-pub const MERC_COST: u32 = 250;
+/// (hirer level, gold for one mercenary): about five of that level's ordinary kills' gold (median `base_gold` of the
+/// enemies whose default level falls in the decade, 2026-10-21), smoothed so it never falls, and 250 at level 1 as before.
+/// Four fighters for one run therefore cost a real share of what the level earns, up to ~450,000 at level 99.
+const MERC_PRICE_ANCHORS: [(u32, u32); 11] = [
+    (1, 250),
+    (10, 400),
+    (20, 1_200),
+    (30, 2_500),
+    (40, 5_000),
+    (50, 15_000),
+    (60, 28_000),
+    (70, 38_000),
+    (80, 55_000),
+    (90, 90_000),
+    (99, 115_000),
+];
+
+/// Gold for one mercenary at the hirer's level, whatever its class (linear between the anchors, to the nearest 50).
+/// The dialogue, the gold check and the payment all use this one function.
+pub fn merc_price(level: u32) -> u32 {
+    let level = level.clamp(1, 99);
+    let at = MERC_PRICE_ANCHORS
+        .iter()
+        .position(|&(l, _)| l >= level)
+        .unwrap_or(MERC_PRICE_ANCHORS.len() - 1);
+    let (hi_l, hi_g) = MERC_PRICE_ANCHORS[at];
+    if at == 0 || hi_l == level {
+        return hi_g;
+    }
+    let (lo_l, lo_g) = MERC_PRICE_ANCHORS[at - 1];
+    let t = f64::from(level - lo_l) / f64::from(hi_l - lo_l);
+    let gold = f64::from(lo_g) + t * (f64::from(hi_g) - f64::from(lo_g));
+    (gold / 50.).round() as u32 * 50
+}
 /// Mercenary sessions live far above every socket's counter, so the two can never collide.
 pub(super) const MERC_BASE: u64 = 1 << 62;
 /// A mercenary farther than this from its hirer (or in another zone) is carried to their side.
@@ -117,7 +149,7 @@ impl World {
         let Some(p) = self.players.get(&session) else {
             return;
         };
-        let _ = p.peer.try_send(json!({"type":"dialogue","npc":npc_json,"notice":notice,"gold":p.character.gold,"level":p.character.level,"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+        let _ = p.peer.try_send(json!({"type":"dialogue","npc":npc_json,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":merc_price(p.character.level),"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         self.save();
     }
 
@@ -175,10 +207,11 @@ impl World {
                 "{title} wants {wanted} fighters and your party already has {party}."
             ));
         }
-        if c.gold < MERC_COST {
-            return Err(format!("A mercenary costs {MERC_COST} gold."));
-        }
         let level = c.level;
+        let price = merc_price(level);
+        if c.gold < price {
+            return Err(format!("A mercenary costs {price} gold."));
+        }
         let (zone, point) = (c.zone, c.point());
         let mut name = format!("Merc {}", class_title(class));
         let same = self
@@ -207,9 +240,9 @@ impl World {
         merc.merc = Some(owner);
         merc.merc_quest = contract;
         self.players.insert(merc_session, merc);
-        self.players.get_mut(&session).unwrap().character.gold -= MERC_COST;
+        self.players.get_mut(&session).unwrap().character.gold -= price;
         Ok(format!(
-            "{name} joins your party for {MERC_COST} gold. The party is now {}/{wanted}.",
+            "{name} joins your party for {price} gold. The party is now {}/{wanted}.",
             party + 1
         ))
     }
@@ -562,5 +595,25 @@ impl World {
                 self.use_skill(session, &skill.id, aim);
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod price_tests {
+    use super::merc_price;
+
+    #[test]
+    fn the_price_rises_with_the_hirers_level_and_never_falls() {
+        assert_eq!(merc_price(1), 250);
+        assert_eq!(merc_price(10), 400);
+        assert_eq!(merc_price(15), 800);
+        assert_eq!(merc_price(99), 115_000);
+        assert_eq!((merc_price(0), merc_price(150)), (250, 115_000));
+        for level in 1..99 {
+            assert!(merc_price(level + 1) >= merc_price(level), "level {level}");
+            assert_eq!(merc_price(level) % 50, 0, "level {level}");
+        }
+        // Renting four fighters is never pocket change: at 50 it costs more than the horse.
+        assert!(4 * merc_price(50) > 50_000);
     }
 }

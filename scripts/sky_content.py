@@ -77,7 +77,7 @@ def perch():
         npc('warden', 'Shieldmaiden Sigrun Cloudwatcher', 'Warden of the Perch', 80, 131.6, '#9ab4d8',
             'You came up through the Stormrift on your own two feet, which is more than the last three did. Welcome to Heimdall\'s Perch, hero. '
             'Heimdall watched the Bifrost from this rock until the bridge shattered, and the shards have been falling upward ever since: they float, they glow, and everything that lives among them has gone strange. '
-            'Meet my people, then come to me, and I will find work for every level you have. The last ward I cannot ask you to hold alone: take the quest and I will hire you the fighters you lack, 250 gold each.',
+            'Meet my people, then come to me, and I will find work for every level you have. The last ward I cannot ask you to hold alone: take the quest and I will hire you the fighters you lack, for a fee that grows with your level.',
             mo.offers(), look_=look('#e0b48e', '#d8c070', 'long', 'helm', None, None, 1.0, '#c0d0e8')),
         npc('healer', 'Eira the Windhealer', 'Healer of the Perch', 67, 133.2, '#8ad0c0',
             'Sit down before the wind takes you. My blessing is free and my potions cheap: up here a hero is hurt more by falling than by fighting, and nobody has yet fallen twice. '

@@ -73,7 +73,7 @@ def hollowmoot():
         npc('warden', 'Moot-Warden Bjorn Oakhand', 'Warden of the Moot', 33, 140.2, '#8a6a3a',
             'Welcome to Hollowmoot, friend. We live in the roots of the Elder Ash because the Ash has always looked after us, and now it is the Ash that needs looking after. '
             'The boars are rotten with red blight, the crows have crowded Gallows Hill, and the great Oakhorn, the grove\'s own guardian, has gone mad with a thread through its heart. '
-            'Meet my people, then come to me: there is work for every level you have. For the Oakhorn itself I can hire you the fighters you lack, 250 gold each.',
+            'Meet my people, then come to me: there is work for every level you have. For the Oakhorn itself I can hire you the fighters you lack, for a fee that grows with your level.',
             mo.offers(), look_=look('#e0b48e', '#8a5a34', 'short', None, None, '#8a5a34', 1.05)),
         npc('healer', 'Hedgewife Groa', 'Healer of Hollowmoot', 16, 143.2, '#5f8a62',
             'Sit, sit. My blessing costs nothing and my potions little. If you go into the boarwood, wear something you do not mind losing: the red blight comes out of their tusks and it does not wash.',
@@ -165,7 +165,7 @@ def skuldwatch():
     npcs = [
         npc('captain', 'Warder-Captain Thyra Ironbrow', 'Captain of the Skuld Watch', 79, 84.9, '#58708f',
             'You crossed the bridge with your toes still on? Good. Skuldwatch is the last light between the Wyrdwood and the Highmoor, and the light is going out: our beacons are dark, the trolls take their toll in kind and the storm has begun to answer to something. '
-            'Meet my officers and I will find work for every level you have. The giant on the summit I cannot ask you to face alone: take the quest, and I will hire the fighters you lack, 250 gold each.',
+            'Meet my officers and I will find work for every level you have. The giant on the summit I cannot ask you to face alone: take the quest, and I will hire the fighters you lack, for a fee that grows with your level.',
             mo.offers(), look_=look('#e0b48e', '#7a3a2a', 'long', 'helm', None, None, 1.0, '#8a97a6')),
         npc('beacon', 'Beaconkeeper Hakon', 'Keeper of the three fires', 101, 89.2, '#d9833a',
             'Three beacons, three fires: the West, the Ridge and the Storm. They have been dark since the first thread snapped, and a dark beacon is a lie told to every ship and every farm for a day\'s ride. Light them and the Watch can see again.',

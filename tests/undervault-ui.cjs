@@ -84,6 +84,7 @@ const look = (page, [x0, y0, x1, y1] = [.15, .2, .85, .8]) => page.evaluate(([x0
   await click(stone.x, stone.y, -150);
   await page.locator('#npc-dialogue').waitFor({ state: 'visible', timeout: 15000 });
   check(await page.locator('#npc-name').textContent() === 'The Meeting Stone' && await page.locator('#npc-dialogue .gossip-row').count() >= 6, 'A click on the monolith opens the Stone: five classes and a dismissal');
+  check(/1200 gold/.test(await page.locator('#npc-dialogue .gossip-row', { hasText: 'Priest mercenary' }).innerText()), 'The offer row shows the level-20 price, 1200 gold');
   await page.locator('#npc-dialogue .gossip-row', { hasText: 'Priest mercenary' }).click();
   await page.waitForFunction(() => /Merc Priest joins your party/.test(document.getElementById('npc-notice').textContent), null, { timeout: 15000 });
   check(await page.evaluate(() => Field.remotePlayers.some(p => p.look.name === 'Merc Priest')), 'The hired Priest stands beside the hero');

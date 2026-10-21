@@ -75,7 +75,7 @@ def content():
         npc('lamplighter', 'Ilo Glowfin', 'Merman · Pearl lamplighter', 156, 112,
             dialogue='The lamps are living pearls; I sing them awake. A little siren pearl helps a tired lamp remember its light.'),
         npc('stone', 'The Nacre Meeting Stone', 'Gather your party', STONE[0] + 1.7, STONE[1] + 1.7,
-            offers=merc.offers(open_=True), dialogue='The sea-blue runes offer companions of every calling for 250 gold each, up to five in your party. The sealed Drowned Cathedral stands beside you. Its expedition has not opened yet.', art='stone'),
+            offers=merc.offers(open_=True), dialogue='The sea-blue runes offer companions of every calling for a fee that grows with your level, up to five in your party. The sealed Drowned Cathedral stands beside you. Its expedition has not opened yet.', art='stone'),
     ]
     # Quiet swimmers on the clear street grid; quest givers and shopkeepers stay still.
     names = ['Aren', 'Miriel', 'Kovar', 'Oceane', 'Tethis', 'Luma', 'Soren', 'Elyra', 'Brin', 'Coralie', 'Damar', 'Iselle', 'Kelp', 'Pearl', 'Finn', 'Nori', 'Reef', 'Mira']

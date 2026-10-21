@@ -79,7 +79,7 @@ def people_and_quests():
         npc('watcher', 'Mara of the Last Light', 'Eye Below warden', 96, 34,
             'The Eye Below has opened. Gather five at the stone, then follow the living lens beneath the shore. All three wardens must fall before the far passage wakes.'),
         npc('stone', 'The Breakwater Meeting Stone', 'Gather a party · hire fighters', 91, 27,
-            'The runes gather companions for 250 gold each. The Eye Below is open to heroes of level 65 and above. Enter together; each party receives its own descent.',
+            'The runes gather companions for a fee that grows with your level. The Eye Below is open to heroes of level 65 and above. Enter together; each party receives its own descent.',
             mercenary_offers.offers(open_=True)),
     ]
     people[-1]['art'] = 'stone'

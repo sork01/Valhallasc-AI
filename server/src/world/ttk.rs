@@ -829,7 +829,7 @@ pub fn run_party_pack_once(
 }
 
 /// The hirer (`hirer`, driven like any member) with `mercs` rented at Skaldholm's Meeting Stone through the real offers
-/// (250 gold each, the hirer's level, no gear but the starting potions), against a dungeon boss or pack. The mercenaries
+/// (`merc_price` gold each, the hirer's level, no gear but the starting potions), against a dungeon boss or pack. The mercenaries
 /// play themselves (`merc_think`, `boss_play`); `deaths` counts every fall, theirs too.
 pub fn run_hired_party_pack_once(
     case: &Case,
@@ -917,7 +917,7 @@ pub(super) fn hire_mercenaries(w: &mut World, mercs: &[Class], zone: usize, star
         .clone();
     {
         let c = &mut w.players.get_mut(&1).unwrap().character;
-        c.gold = 250 * mercs.len() as u32 + 1000;
+        c.gold = super::mercs::merc_price(c.level) * mercs.len() as u32 + 1000;
         c.zone = stone_zone;
         c.x = stone.x;
         c.y = stone.y + 1.;

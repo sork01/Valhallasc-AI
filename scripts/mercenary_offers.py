@@ -1,5 +1,5 @@
-"""The mercenary offers a group-quest giver carries (server: world/mercs.rs). Each rents one fighter of a class for 250
-gold, up to the number of players the quest wants; the last one ends every contract. Used by generate_crags.py and
+"""The mercenary offers a group-quest giver carries (server: world/mercs.rs). Each rents one fighter of a class for
+`merc_price(hirer level)` gold (the server ignores `cost` here and the client shows the packet's `mercPrice`), up to the number of players the quest wants; the last one ends every contract. Used by generate_crags.py and
 generate_gloamfen.py so both givers read the same."""
 COST = 250
 CLASSES = ['warrior', 'mage', 'assassin', 'priest', 'hunter']

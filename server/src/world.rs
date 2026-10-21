@@ -2581,7 +2581,7 @@ impl World {
         }
         let _ = p
             .peer
-            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(p.snapshot()) } else { None },"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(p.snapshot()) } else { None },"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         let actor = p.character.id.clone();
         let point = p.character.point();
         if levels > 0 {
@@ -5740,7 +5740,7 @@ mod tests {
         drain(&mut rx);
         // Too poor.
         let text = hire(&mut w, &mut rx, 1, "crags_captain", "mage");
-        assert!(text.contains("250 gold"), "{text}");
+        assert!(text.contains("400 gold"), "{text}");
         w.players.get_mut(&1).unwrap().character.gold = 600;
         let text = hire(&mut w, &mut rx, 1, "crags_captain", "mage");
         assert!(text.contains("Merc Mage joins your party"), "{text}");
@@ -5754,7 +5754,7 @@ mod tests {
             (Class::Mage, 10, "Merc Mage")
         );
         assert!(merc.character.hp > 0. && merc.character.attributes.intellect > 0);
-        assert_eq!(w.players[&1].character.gold, 350);
+        assert_eq!(w.players[&1].character.gold, 200);
         let owner = w.players[&1].character.id.clone();
         assert_eq!(
             w.party_mates(&owner).len(),
@@ -5764,7 +5764,7 @@ mod tests {
         // A two-player quest is full at two.
         let text = hire(&mut w, &mut rx, 1, "crags_captain", "warrior");
         assert!(text.contains("wants 2 fighters"), "{text}");
-        assert_eq!((w.players[&1].character.gold, mercs_of(&w).len()), (350, 1));
+        assert_eq!((w.players[&1].character.gold, mercs_of(&w).len()), (200, 1));
         // The mercenary is not a player: not counted online, not in the who list, not saved.
         assert_eq!(w.snapshot()["online"], 1);
         let merc_id = mercs_of(&w)[0].character.id.clone();
@@ -5775,6 +5775,7 @@ mod tests {
         w.interact(1, "crags_captain", Some("merc_dismiss"));
         assert!(dialogue_notice(&mut rx).contains("ended"));
         assert!(mercs_of(&w).is_empty());
+        assert_eq!(w.players[&1].character.gold, 200, "no refund on dismissal");
         assert_eq!(w.party_mates(&owner).len(), 1);
         // Another giver's offers do nothing for this quest.
         let text = hire(&mut w, &mut rx, 1, "crags_scout", "mage");

@@ -79,7 +79,7 @@ def keelhaven():
         npc('warden', 'Skipper Ylva Saltbeard', 'Harbourmistress of Keelhaven', 80, 131.6, '#6aa8c8',
             'You rode the Maelstrom down and arrived with your lungs still your own: Ran does not take everyone, and she must like you. Welcome to Keelhaven, hero. '
             'We are what is left of the fleet that sailed out under the Bifrost the day it broke: forty hulls came down, and we turned them over to make roofs. The air under them is borrowed, so do not shout. '
-            'Meet my people, then come to me, and I will find work for every level you have. The Kraken in Ran\'s Court I cannot ask you to face alone: take the quest and I will hire you the fighters you lack, 250 gold each.',
+            'Meet my people, then come to me, and I will find work for every level you have. The Kraken in Ran\'s Court I cannot ask you to face alone: take the quest and I will hire you the fighters you lack, for a fee that grows with your level.',
             mo.offers(), look_=look('#d8a07a', '#c8863a', 'long', 'helm', None, '#c8863a', 1.0, '#6a8aa0')),
         npc('healer', 'Brynja the Tidehealer', 'Healer of Keelhaven', 67, 133.2, '#7ad0b8',
             'Sit down and breathe. My blessing is free and my potions cheap: down here a hero is hurt more by pressure than by teeth, and it is the teeth that get the sympathy. '
@@ -142,7 +142,7 @@ def keelhaven():
               [visit('deep_chapel', 'Reach the Drowned Chapel'), kill('draugr', 3, 'Defeat Drowned Draugr')], 37, 1550, 'coins'),
         dict(quest('captain', 'Three Against the Drowned Captain', 'halla',
                    'Hvitserk Black-Coat captained the Naglfar when she sank, and he never left the deck: he stands in the west Shallows, north of the wreck, with his axe in his fist and his whole crew behind him in the mud. '
-                   'He swings like a ship coming about. Do not go alone: bring two friends, or take the quest and I will hire you the fighters you lack, 250 gold each. Return to me for a level-35 blue Amber Ring, usable by every class.',
+                   'He swings like a ship coming about. Do not go alone: bring two friends, or take the quest and I will hire you the fighters you lack, for a fee that grows with your level. Return to me for a level-35 blue Amber Ring, usable by every class.',
                    [kill('hvitserk', 1, 'Defeat Hvitserk the Drowned (Group · 3 players)')], 37, 3000, 'longship'),
              group=True, rewardItem='accessory_amber_l35_blue', recommendedPlayers=3),
         dict(quest('net', 'The Bells of the Net', 'sigmund',
@@ -169,7 +169,7 @@ def keelhaven():
               'At the bottom of the Net, in a dead end that no current reaches, grows a garden of glowing anemones. Walk there, look at what Ran has been feeding, and defeat three shellbacks on the way.',
               [visit('deep_garden', 'Reach the Abyssal Garden'), kill('shellback', 3, 'Defeat Shellbacks')], 40, 1850, 'shellbacks'),
         dict(quest('ghostmaw', 'Three Against the Ghostmaw', 'thora',
-                   'The Ghostmaw prowls the northern deep corridors: a pale moray older than the Net. Take two friends, or hire the fighters you need from me for 250 gold each. Defeat it and return with word that the passage is safe. I will give you a blue Nacreous Moonstone Necklace.',
+                   'The Ghostmaw prowls the northern deep corridors: a pale moray older than the Net. Take two friends, or hire the fighters you need from me for a fee that grows with your level. Defeat it and return with word that the passage is safe. I will give you a blue Nacreous Moonstone Necklace.',
                    [kill('ghostmaw', 1, 'Defeat the Ghostmaw (Group · 3 players)')], 40, 3800, 'garden'),
              group=True, recommendedPlayers=3),
         dict(quest('rans', 'The Bells of Ran', 'sigmund',

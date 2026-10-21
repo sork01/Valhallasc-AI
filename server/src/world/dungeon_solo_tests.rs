@@ -430,7 +430,7 @@ fn a_party_of_five_beats_every_dungeon_pack_and_boss() {
 }
 
 /// `BOSSMECH-MERC`: a hired party against every final boss. The hirer (a warrior in green gear at the dungeon's level) rents a
-/// priest, a mage, a hunter and an assassin at Skaldholm's Meeting Stone (250 gold each, the real offers); all five play by the
+/// priest, a mage, a hunter and an assassin at Skaldholm's Meeting Stone (`merc_price` gold each, the real offers); all five play by the
 /// mercenaries' code (`auto_play`). The hired five must win at least half the runs (no bot party any more: owner, 2026-10-19:
 /// test with the five hired fighters only). Each line lists the seconds of every run and the DPS of each class.
 /// `DUNGEON_SOLO_DUNGEONS` / `DUNGEON_SOLO_KINDS` / `DUNGEON_SOLO_SEEDS` limit it.
