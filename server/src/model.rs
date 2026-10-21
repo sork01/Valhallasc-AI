@@ -952,6 +952,9 @@ pub struct Quest {
     /// nobody has to be found to take it. The giver is still where it is handed in.
     #[serde(default)]
     pub auto_level: Option<u32>,
+    /// The lowest character level that may take the quest; 0 lets anyone.
+    #[serde(default)]
+    pub min_level: u32,
 }
 #[derive(Clone, Deserialize)]
 pub struct QuestObjective {
@@ -1650,6 +1653,9 @@ pub struct Portal {
     /// Only usable once the instance it stands in has been cleared (its final boss is down).
     #[serde(default)]
     pub after_clear: bool,
+    /// Id of a quest the character must have completed before this door opens.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub needs_quest: Option<String>,
 }
 #[derive(Clone, Deserialize)]
 pub struct Map {

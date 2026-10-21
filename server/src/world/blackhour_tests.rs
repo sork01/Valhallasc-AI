@@ -3,6 +3,22 @@ use super::ttk::*;
 use super::wyrd_tests::{at, blocked, flood, join, place, reached, world};
 use super::*;
 const ZONE: usize = 44;
+const YEARWHEEL: usize = 28;
+
+/// The Foundry's key quest, finished: what the door wants.
+fn key_quest_done(w: &mut World, id: u64) {
+    w.players
+        .get_mut(&id)
+        .unwrap()
+        .character
+        .quests
+        .push(QuestProgress {
+            id: "null_keys".into(),
+            counts: vec![1; 4],
+            claimed: true,
+            completions: 1,
+        });
+}
 
 #[test]
 fn blackhour_press_warns_and_spares_players_who_step_aside() {
@@ -188,6 +204,12 @@ fn blackhour_gate_private_copies_epic_loot_and_clear() {
     enter(&mut w, 1);
     assert_eq!(w.players[&1].character.zone, 28);
     w.players.get_mut(&1).unwrap().character.level = 99;
+    // Level 99 is not enough: the door wants the finished key quest.
+    enter(&mut w, 1);
+    assert_eq!(w.players[&1].character.zone, 28, "no quest, no door");
+    for id in 1..=3 {
+        key_quest_done(&mut w, id);
+    }
     let ally = w.players[&2].character.id.clone();
     w.social(
         1,
@@ -257,7 +279,7 @@ fn blackhour_gate_private_copies_epic_loot_and_clear() {
             .character
             .quests
             .iter()
-            .filter(|q| q.id.starts_with("null_"))
+            .filter(|q| q.id.starts_with("null_") && q.id != "null_keys")
             .all(|q| q.counts == vec![1])
     );
     assert!(
@@ -265,7 +287,7 @@ fn blackhour_gate_private_copies_epic_loot_and_clear() {
             .character
             .quests
             .iter()
-            .filter(|q| q.id.starts_with("null_"))
+            .filter(|q| q.id.starts_with("null_") && q.id != "null_keys")
             .all(|q| q.counts == vec![1])
     );
     assert_eq!(
@@ -456,4 +478,182 @@ fn blackhour_blue_and_green_encounter_bands() {
         "the selected Foundry fights and rarities must exist"
     );
     assert!(failed.is_empty(), "{}", failed.join("\n"));
+}
+
+/// Walks a hero through a Yearwheel door, as the player would.
+fn through(w: &mut World, id: u64, door: &str) {
+    let p = w.maps[YEARWHEEL]
+        .portals
+        .iter()
+        .find(|p| p.id == door)
+        .unwrap()
+        .clone();
+    place(w, id, YEARWHEEL, at(p.x, p.y));
+    w.time += 2.;
+    w.use_portal(id);
+}
+
+#[test]
+fn blackhour_door_opens_only_after_the_four_hour_shards_are_handed_in() {
+    let mut w = world();
+    let _receivers: Vec<_> = (1..=2).map(|id| join(&mut w, id, Class::Warrior)).collect();
+    for id in 1..=2 {
+        w.players.get_mut(&id).unwrap().character.level = 99;
+    }
+    let ally = w.players[&2].character.id.clone();
+    w.social(
+        1,
+        SocialCommand::PartyInvite {
+            id: Some(ally),
+            name: None,
+        },
+    );
+    w.social(
+        2,
+        SocialCommand::PartyAccept {
+            id: w.players[&1].character.id.clone(),
+        },
+    );
+    let quest = w
+        .maps
+        .iter()
+        .flat_map(|m| m.quests.iter())
+        .find(|q| q.id == "null_keys")
+        .unwrap()
+        .clone();
+    assert_eq!(quest.min_level, 99);
+    assert_eq!(quest.objectives.len(), 4);
+    // Obtainable at level 99 only.
+    w.players.get_mut(&1).unwrap().character.level = 98;
+    assert!(
+        !quest_action(
+            &mut w.players.get_mut(&1).unwrap().character,
+            &quest,
+            "accept"
+        )
+        .2
+    );
+    w.players.get_mut(&1).unwrap().character.level = 99;
+    assert!(
+        quest_action(
+            &mut w.players.get_mut(&1).unwrap().character,
+            &quest,
+            "accept"
+        )
+        .2
+    );
+    // The follow-up quest inside the Foundry waits for it.
+    let entry = w
+        .maps
+        .iter()
+        .flat_map(|m| m.quests.iter())
+        .find(|q| q.id == "null_entry")
+        .unwrap();
+    assert!(!entry.unlocked(&w.players[&1].character));
+    // Hero 2 never took the quest: the four bosses drop nothing for them.
+    for (n, (boss, shard)) in hour_shards::SHARDS.iter().enumerate() {
+        let door = [
+            "year_bloom_descent",
+            "year_solar_descent",
+            "year_amber_descent",
+            "year_solstice_descent",
+        ][n];
+        for id in 1..=2 {
+            through(&mut w, id, door);
+        }
+        let zone = w.players[&1].character.zone;
+        assert_ne!(zone, YEARWHEEL, "{door} leads into the dungeon");
+        assert_eq!(zone, w.players[&2].character.zone);
+        let id = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == zone && s.kind == *boss)
+            .unwrap_or_else(|| panic!("{boss} stands in its dungeon"));
+        let point = w.slimes[id].point();
+        for s in 1..=2 {
+            place(&mut w, s, zone, point);
+        }
+        w.drops.clear();
+        w.hit_slime(id, 1, 1e12, false);
+        let mine = w.players[&1].character.id.clone();
+        let theirs = w.players[&2].character.id.clone();
+        let shards: Vec<_> = w
+            .drops
+            .iter()
+            .filter(|d| d.item.as_deref() == Some(*shard))
+            .collect();
+        assert_eq!(
+            shards.len(),
+            1,
+            "{boss}: one shard, for the hero on the quest"
+        );
+        assert_eq!(shards[0].owner, mine);
+        assert!(!shards[0].open_to(&theirs), "{boss}: the shard is private");
+        // The hero walks over it; it is in the bag and counts for the quest.
+        for d in &mut w.drops {
+            d.t = 1.;
+        }
+        w.update_drops();
+        assert_eq!(w.players[&1].character.quantity(shard), 1, "{boss}");
+        assert_eq!(w.players[&2].character.quantity(shard), 0, "{boss}");
+        // A second kill while the shard is held drops no second one.
+        let mut probe = w.players[&1].character.clone();
+        quest.sync_bring(&mut probe);
+        let counts = &probe
+            .quests
+            .iter()
+            .find(|q| q.id == "null_keys")
+            .unwrap()
+            .counts;
+        assert_eq!(counts.iter().sum::<u32>() as usize, n + 1, "{boss} counts");
+        w.hour_shard_drops(boss, zone, point, &mine, std::slice::from_ref(&mine));
+        assert!(w.drops.iter().all(|d| d.item.as_deref() != Some(*shard)));
+        // Leave through the dungeon's own way out so the next door is the Yearwheel's.
+        let back = w.maps[zone].portals.first().unwrap().clone();
+        for id in 1..=2 {
+            place(&mut w, id, zone, at(back.x, back.y));
+            w.time += 2.;
+            w.use_portal(id);
+            assert_eq!(w.players[&id].character.zone, YEARWHEEL, "{boss} way out");
+        }
+    }
+    // All four in the bag, but the quest is not handed in yet: the door stays shut.
+    through(&mut w, 1, "year_blackhour");
+    assert_eq!(w.players[&1].character.zone, YEARWHEEL);
+    let c = &mut w.players.get_mut(&1).unwrap().character;
+    let (_, _, ok) = {
+        let r = quest_action(c, &quest, "claim");
+        (r.0, r.1, r.2)
+    };
+    assert!(ok, "four shards are enough to claim");
+    for (_, shard) in hour_shards::SHARDS {
+        assert_eq!(c.quantity(shard), 0, "handed in");
+    }
+    assert!(entry_unlocked(&w, 1));
+    through(&mut w, 1, "year_blackhour");
+    assert_ne!(w.players[&1].character.zone, YEARWHEEL, "the door opens");
+    // The party mate who never did the quest is still turned away.
+    through(&mut w, 2, "year_blackhour");
+    assert_eq!(w.players[&2].character.zone, YEARWHEEL);
+}
+
+fn entry_unlocked(w: &World, id: u64) -> bool {
+    w.maps
+        .iter()
+        .flat_map(|m| m.quests.iter())
+        .find(|q| q.id == "null_entry")
+        .unwrap()
+        .unlocked(&w.players[&id].character)
+}
+
+#[test]
+fn hour_shards_cannot_be_sold_or_traded() {
+    for (_, shard) in hour_shards::SHARDS {
+        let i = item(shard).unwrap();
+        assert!(is_quest_item(i), "{shard}");
+        let mut c = Character::mercenary(Class::Warrior, 99, "Probe");
+        c.add_item(shard, 1);
+        assert!(c.sell_item(shard, 1).is_err(), "{shard}");
+        assert_eq!(c.quantity(shard), 1);
+    }
 }

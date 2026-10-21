@@ -69,5 +69,15 @@
   "Torv Coilbreaker": "Torv Spolbrytare",
   "Vark, the Twelve-Ton Bell": "Vark, tolvtonsklockan",
   "Vark, the Twelve-Ton Bell Relic": "Relik från Vark, tolvtonsklockan",
-  "the caster gains a 4-second shield absorbing 5% of maximum health and recovers 2% of maximum resource.": "kastaren får en sköld i 4 sekunder som absorberar 5% av maximal hälsa och återfår 2% av maximal resurs."
+  "the caster gains a 4-second shield absorbing 5% of maximum health and recovers 2% of maximum resource.": "kastaren får en sköld i 4 sekunder som absorberar 5% av maximal hälsa och återfår 2% av maximal resurs.",
+  "Four Hours Returned": "Fyra timmar återlämnade",
+  "Sigrun Ashminute can open the way to the Black Hour Foundry only when the four seasons give back the hours they keep. Bring her a shard from the last guardian of each: Bloom Heart in the Blooming Labyrinth, Solar Heart in the Solar Crucible, Amber Memory in the Amber Archive and Solstice Heart in the Silent Solstice. The shards fall only for heroes who have taken this quest.": "Sigrun Askminut kan öppna vägen till Svarta timmens gjuteri först när de fyra årstiderna ger tillbaka timmarna de håller kvar. Hämta en skärva från den sista väktaren i varje: Bloom Heart i Blooming Labyrinth, Solar Heart i Solar Crucible, Amber Memory i Amber Archive och Solstice Heart i Silent Solstice. Skärvorna faller bara för hjältar som har antagit det här uppdraget.",
+  "Shard of the Bloomed Hour": "Skärva av den blommande timmen",
+  "Shard of the Solar Hour": "Skärva av solens timme",
+  "Shard of the Amber Hour": "Skärva av bärnstenstimmen",
+  "Shard of the Silent Hour": "Skärva av den tysta timmen",
+  "Bring the Shard of the Bloomed Hour": "Hämta skärvan av den blommande timmen",
+  "Bring the Shard of the Solar Hour": "Hämta skärvan av solens timme",
+  "Bring the Shard of the Amber Hour": "Hämta skärvan av bärnstenstimmen",
+  "Bring the Shard of the Silent Hour": "Hämta skärvan av den tysta timmen"
 }

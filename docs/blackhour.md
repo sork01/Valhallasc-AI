@@ -61,6 +61,35 @@ With the current 45 file zones, the existing extra dungeon copies 44–100 move
 to 45–101. The Foundry's extra copies are 102–104, and Arena copies 105–112.
 Recheck against the actual running release before any saved-character migration.
 
+## Entry quest: Four Hours Returned (2026-10-21)
+
+The Yearwheel door (`year_blackhour`, `needs_quest: null_keys`) stays shut until the
+character has completed **Four Hours Returned** (`null_keys`). Server-side, in
+`use_portal`, for every hero separately (a party mate with the quest does not carry
+one without it). The quest is given by Sigrun Ashminute (`null_guide`) and can only
+be accepted at level 99 (`Quest.min_level`, `minLevel` in map.txt; accepted check in
+`quest_action_with_choice`, locked card in `client/quests.js`). Four `bring`
+objectives, one shard each; the quest pays 30,000 gold and level-99 XP. `null_entry`
+(The Missing Minute) now `requires` it.
+
+Shards are quest items (`kind: material`, `sell: 0`, `items::is_quest_item`: not sold
+to a merchant, not traded). Each final boss lets its shard fall, 100%, as a private
+ground drop (`world/hour_shards.rs`) for every real hero of the fight who holds the
+quest unclaimed and has no such shard in the bag or on the ground:
+
+| Dungeon | Final boss | Shard |
+| --- | --- | --- |
+| The Blooming Labyrinth | `bloom_heart` | Shard of the Bloomed Hour |
+| The Solar Crucible | `solar_heart` | Shard of the Solar Hour |
+| The Amber Archive | `amber_memory` | Shard of the Amber Hour |
+| The Silent Solstice | `solstice_heart` | Shard of the Silent Hour |
+
+A hero who sells nothing but loses a shard (drops it, banks it) simply earns it again
+from the next kill. Generator: `scripts/generate_blackhour.py --open` (items, quest,
+door). Tests: `blackhour_door_opens_only_after_the_four_hour_shards_are_handed_in`,
+`hour_shards_cannot_be_sold_or_traded`; the older gate test grants the finished
+quest first. The map hash below predates this quest.
+
 ## Rebuild and focused validation
 
 ```sh

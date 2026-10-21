@@ -425,6 +425,10 @@ pub fn material(kind: &str) -> &'static str {
 }
 /// The golden gear of the administrator character. Its rarity "gm" is not in `RARITIES`, so no enemy ever rolls it.
 pub const GM_RARITY: &str = "gm";
+/// A material worth nothing to a merchant is a quest item (the Foundry's hour shards): it can be neither sold nor traded.
+pub fn is_quest_item(i: &Item) -> bool {
+    i.kind == "material" && i.sell == 0
+}
 pub const GM_GEAR: [&str; 8] = [
     "warrior_armor_gm",
     "warrior_headgear_gm",
@@ -1382,6 +1386,9 @@ impl Character {
         }
         if i.kind == "mount_licence" {
             return Err("A mount licence is bound to you and cannot be sold.");
+        }
+        if is_quest_item(i) {
+            return Err("A quest item cannot be sold.");
         }
         let available = self.quantity(id).saturating_sub(self.equipped_count(i));
         if quantity == 0 || quantity > available {

@@ -161402,6 +161402,44 @@
           "autoLevel": 95
         },
         {
+          "id": "null_keys",
+          "title": "Four Hours Returned",
+          "npc": "null_guide",
+          "description": "Sigrun Ashminute can open the way to the Black Hour Foundry only when the four seasons give back the hours they keep. Bring her a shard from the last guardian of each: Bloom Heart in the Blooming Labyrinth, Solar Heart in the Solar Crucible, Amber Memory in the Amber Archive and Solstice Heart in the Silent Solstice. The shards fall only for heroes who have taken this quest.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "hour_shard_bloom",
+              "count": 1,
+              "label": "Bring the Shard of the Bloomed Hour"
+            },
+            {
+              "kind": "bring",
+              "target": "hour_shard_solar",
+              "count": 1,
+              "label": "Bring the Shard of the Solar Hour"
+            },
+            {
+              "kind": "bring",
+              "target": "hour_shard_amber",
+              "count": 1,
+              "label": "Bring the Shard of the Amber Hour"
+            },
+            {
+              "kind": "bring",
+              "target": "hour_shard_silent",
+              "count": 1,
+              "label": "Bring the Shard of the Silent Hour"
+            }
+          ],
+          "rewardGold": 30000,
+          "minLevel": 99,
+          "level": 99,
+          "rewardXp": 12060,
+          "repeatable": false,
+          "requires": null
+        },
+        {
           "id": "null_entry",
           "title": "The Missing Minute",
           "npc": "null_guide",
@@ -161415,10 +161453,10 @@
             }
           ],
           "rewardGold": 24000,
+          "requires": "null_keys",
           "level": 99,
           "rewardXp": 12060,
-          "repeatable": false,
-          "requires": null
+          "repeatable": false
         },
         {
           "id": "null_bell",
@@ -161666,7 +161704,8 @@
           "to": 44,
           "tx": 80,
           "ty": 143,
-          "look": "blackhour"
+          "look": "blackhour",
+          "needs_quest": "null_keys"
         }
       ]
     },

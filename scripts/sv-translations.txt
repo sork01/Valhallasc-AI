@@ -6376,5 +6376,9 @@
   "up to two other enemies within four tiles take 12% basic-hit damage each.": "upp till två andra fiender inom fyra rutor tar 12 % av grundträffens skada vardera.",
   "use this item": "använd det här föremålet",
   "← World": "← Värld",
-  "☀ Clear": "☀ Klart"
+  "☀ Clear": "☀ Klart",
+  "A quest item cannot be sold.": "Ett uppdragsföremål kan inte säljas.",
+  "Quest items cannot be traded.": "Uppdragsföremål kan inte handlas.",
+  "Quest item · cannot be sold": "Uppdragsföremål · kan inte säljas",
+  "Quest item · hand it in for its quest": "Uppdragsföremål · lämna in det för uppdraget"
 }

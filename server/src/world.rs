@@ -54,6 +54,7 @@ mod eye_below_tests;
 mod frostwake_tests;
 mod gm_visibility;
 mod hold;
+mod hour_shards;
 mod instances;
 #[cfg(test)]
 mod lapis_tests;
@@ -2423,7 +2424,9 @@ impl World {
                             let stacks = next.inventory.clone();
                             let mut total = Ok(0_u32);
                             for stack in stacks {
-                                if item(&stack.item).is_some_and(|i| i.kind == "material") {
+                                if item(&stack.item)
+                                    .is_some_and(|i| i.kind == "material" && !is_quest_item(i))
+                                {
                                     match next.sell_item(&stack.item, stack.quantity) {
                                         Ok(value) => total = total.map(|sum| sum + value),
                                         Err(text) => {
@@ -2952,6 +2955,29 @@ impl World {
             return;
         }
         if self.maps[portal.to].sealed_template {
+            return;
+        }
+        // Some doors stay shut until a quest is done, whoever you are with.
+        if let Some(id) = &portal.needs_quest
+            && !p
+                .character
+                .quests
+                .iter()
+                .any(|q| &q.id == id && q.completions > 0)
+        {
+            let title = self
+                .maps
+                .iter()
+                .flat_map(|m| m.quests.iter())
+                .find(|q| &q.id == id)
+                .map_or(id.as_str(), |q| q.title.as_str());
+            let text = format!(
+                "{} is shut to you. Complete the quest “{title}” to open it.",
+                self.maps[portal.to].name
+            );
+            let p = self.players.get_mut(&session).unwrap();
+            p.portal_at = self.time;
+            let _ = p.peer.try_send(json!({"type":"error","text":text}));
             return;
         }
         // A dungeon's door asks for its level, whoever you are with.
@@ -3944,6 +3970,7 @@ impl World {
             if is_boss(&kind) {
                 self.boss_loot(&credit_id, &kind, zone, point);
             }
+            self.hour_shard_drops(&kind, zone, point, &credit_id, &party);
             let all_bosses = crate::cathedral::enemy(&self.maps[zone].final_boss).is_some()
                 || self.maps[zone].final_boss == "moonwell_echo";
             if (all_bosses
@@ -4882,6 +4909,16 @@ fn quest_action_with_choice(
     }
     if action == "accept" && quest.auto_level.is_some() {
         return refused("This quest finds you by itself when you are ready for it.");
+    }
+    if action == "accept" && character.level < quest.min_level {
+        return (
+            format!(
+                "This quest is for heroes of level {} and above. You are level {}.",
+                quest.min_level, character.level
+            ),
+            0,
+            false,
+        );
     }
     let prior = character.quests.iter().position(|q| q.id == quest.id);
     match action {
@@ -10365,6 +10402,7 @@ mod tests {
             tx: 48.,
             ty: 83.,
             after_clear: false,
+            needs_quest: None,
         });
         w.use_portal(1);
         assert_eq!(w.players[&1].character.zone, 0);

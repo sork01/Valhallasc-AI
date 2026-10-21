@@ -44,6 +44,8 @@
   const levelNote = i => tooLow(i) ? `Requires level ${levelOf(i)} (you are level ${heroLevel()})` : `Requires level ${levelOf(i)}`;
   const itemAtSlot = slot => ['chest', 'hands'].includes(slot) ? WORLD_ITEMS.find(i => i.kind === slotKind(slot) && (i.class === look?.class || i.source === 'orange_pool') && look?.[look.class + (slot === 'chest' ? 'Armor' : 'Weapon')] === i.variant) : definition(gearSlots[slot]);
   const copiesOf = i => gearInstances.filter(g => g.item === i?.id);
+  // A material no merchant pays for is a quest item: it can be neither sold nor traded.
+  const questItem = i => i.kind === 'material' && i.sell === 0;
   const saleValue = (i, count = 1) => i.sell * count + (i.rarity === 'rare' ? copiesOf(i).slice(equippedCount(i), equippedCount(i) + count).filter(g => g.rarity === 'epic').length * i.sell : 0);
   const looseCopy = i => copiesOf(i).slice(equippedCount(i)).find(g => g.rarity === 'epic') || copiesOf(i)[equippedCount(i)];
   const wornCopy = (slot, i) => copiesOf(i)[slots.filter(([s]) => s !== slot && itemAtSlot(s)?.id === i?.id && slots.findIndex(([key]) => key === s) < slots.findIndex(([key]) => key === slot)).length];
@@ -114,7 +116,7 @@
   }
   function summary(i, count = quantity(i.id)) {
     const copy = displayCopy(i), rarity = displayRarity(i);
-    return `${i.name} ×${count} · ${rarity === 'common' ? '' : rarityName({rarity}) + ' · '}${i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind === 'food' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · level ${levelOf(i)} · ${stats(copy ? copyStats(copy) : i)}`} · ${i.starter ? 'Starter gear · cannot be sold' : `sells for ${saleValue(i)} gold${copy ? ' for the next loose copy' : ' each'}`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
+    return `${i.name} ×${count} · ${rarity === 'common' ? '' : rarityName({rarity}) + ' · '}${i.kind === 'material' ? 'Material' : consumable(i) ? `${i.kind === 'food' ? 'Food' : 'Potion'} · ${effect(i)}` : `${i.class || 'All classes'} · ${i.kind} · level ${levelOf(i)} · ${stats(copy ? copyStats(copy) : i)}`} · ${i.starter ? 'Starter gear · cannot be sold' : questItem(i) ? 'Quest item · cannot be sold' : `sells for ${saleValue(i)} gold${copy ? ' for the next loose copy' : ' each'}`}${equippedCount(i) ? ` · Equipped ×${equippedCount(i)}` : ''}`;
   }
   function tooltip() {
     let t = $('item-tooltip'); if (!t) { t = node('div', '', 'item-tooltip'); t.id = 'item-tooltip'; t.role = 'tooltip'; t.hidden = true; document.body.append(t); } return t;
@@ -141,7 +143,7 @@
       }
     }
     if (where) t.append(node('p', `${where.count} ${where.in}`));
-    else t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', `Sells for ${saleValue(i)} gold${copy ? ' for the next loose copy' : ' each'}`));
+    else t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', questItem(i) ? 'Quest item · cannot be sold' : `Sells for ${saleValue(i)} gold${copy ? ' for the next loose copy' : ' each'}`));
     if (compatible(i)) {
       const copies = where ? where.copies : gearInstances.filter(g=>g.item===i.id);
       for(const [index,g] of copies.entries()) {
@@ -150,7 +152,7 @@
       }
       if(i.source!=='orange_pool'&&copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
     }
-    t.append(node('small', where ? where.hint : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? 'Right-click or double-click to use · Z / X on the quick slots' : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
+    t.append(node('small', where ? where.hint : licence(i) ? 'Right-click or double-click to use' : consumable(i) ? 'Right-click or double-click to use · Z / X on the quick slots' : slot ? 'Right-click to unequip · Drag into a bag' : compatible(i) ? 'Right-click to equip · Drag onto a gear slot' : questItem(i) ? 'Quest item · hand it in for its quest' : i.kind === 'material' ? 'Sell to Linden or Bram in Alderhaven' : 'Keep or sell to a merchant'));
     t.hidden = false;
     const r = anchor.getBoundingClientRect(), tr = t.getBoundingClientRect();
     t.style.left = Math.max(8, Math.min(innerWidth - tr.width - 8, r.right + 10)) + 'px';
@@ -304,8 +306,8 @@
       const b = button(`Sell all materials · ${value} gold`, () => sell('sell:materials', b)); b.dataset.sell = 'materials'; container.append(b);
     }
     for (const s of stacks) {
-      const count = spare(s); if (count <= 0) continue;
-      const i = definition(s.item), n = shopRow(s);
+      const count = spare(s), i = definition(s.item); if (count <= 0 || questItem(i)) continue;
+      const n = shopRow(s);
       const b = button(`Sell 1 · ${saleValue(i)} gold`, () => sell(`sell:${i.id}:1`, b)); b.dataset.sell = 'one'; n.append(b);
       if (count > 1) { const b = button(`Sell ${count} · ${saleValue(i, count)} gold`, () => sell(`sell:${i.id}:${count}`, b)); b.dataset.sell = 'stack'; n.append(b); }
       container.append(n);

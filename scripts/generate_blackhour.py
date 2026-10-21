@@ -14,6 +14,12 @@ from skaldholm_content import look
 ROOT=Path(__file__).resolve().parents[1]
 NAME,THEME,ZONE,PARENT,SIZE='The Black Hour Foundry','blackhour',44,28,160
 GATE,LANDING,ARRIVAL=(208,200),(214,200),(80,143)
+# The door stays shut until this quest is done: one shard from each seasonal dungeon's final boss (server/src/world/hour_shards.rs).
+KEY_QUEST='null_keys'
+SHARDS=[('hour_shard_bloom','Shard of the Bloomed Hour','The Blooming Labyrinth','Bloom Heart'),
+        ('hour_shard_solar','Shard of the Solar Hour','The Solar Crucible','Solar Heart'),
+        ('hour_shard_amber','Shard of the Amber Hour','The Amber Archive','Amber Memory'),
+        ('hour_shard_silent','Shard of the Silent Hour','The Silent Solstice','Solstice Heart')]
 PACKS=[(55,125),(35,98),(125,98),(105,125)]
 ROOMS=[[63,133,97,153],[15,65,55,107],[105,65,145,107],[55,7,105,47]]
 
@@ -89,7 +95,7 @@ def install_parent(world):
     z['objects']=[o for o in z['objects'] if not(o['kind']!='year_axle' and
         (fen.dist_to_trail(line,o['x'],o['y'])<3+o.get('r',0) or math.hypot(o['x']-212,o['y']-205)<6+o.get('r',0)))]
     z['portals']=[p for p in z['portals'] if p['id']!='year_blackhour']+[
-        dict(id='year_blackhour',name=NAME,x=GATE[0],y=GATE[1],r=1.3,to=ZONE,tx=ARRIVAL[0],ty=ARRIVAL[1],look=THEME)]
+        dict(id='year_blackhour',name=NAME,x=GATE[0],y=GATE[1],r=1.3,to=ZONE,tx=ARRIVAL[0],ty=ARRIVAL[1],look=THEME,needs_quest=KEY_QUEST)]
     z['npcs']=[n for n in z['npcs'] if not n['id'].startswith('null_')]+[
         dict(id='null_guide',name='Sigrun Ashminute',role='Keeper of the missing hour',x=212,y=205,color='#b58be9',offers=offers(open_=True),
              dialogue='Below the Equinox axle lies the Black Hour Foundry. Five fighters in full blue equipment can survive its long shifts. Green equipment will not carry a party through. Silence Vark and return the missing minute.',look=look('#d4af9d','#77638a','braid','hood',hat_color='#45334f')),
@@ -97,10 +103,12 @@ def install_parent(world):
              dialogue='Iona turned the four seasons into one dead current. Break her circuit with your party. Beyond her, the Thirteenth Hour still turns. Its warnings are written before the clock hall.',look=look('#be9d96','#79b8b5','short',None,None,'#293f4a'))]
     levels=json.loads((ROOT/'world/levels.txt').read_text())
     xp=(levels[98] if len(levels)>98 else levels[-1]+(99-len(levels))*2300)//10
-    quests=[dict(id='null_entry',title='The Missing Minute',npc='null_guide',description='Enter the Black Hour Foundry and speak to Eydis, the Missing Minute.',objectives=[dict(kind='talk',target='null_witness',count=1,label='Speak to Eydis')],rewardGold=24000),
+    quests=[dict(id=KEY_QUEST,title='Four Hours Returned',npc='null_guide',description='Sigrun Ashminute can open the way to the Black Hour Foundry only when the four seasons give back the hours they keep. Bring her a shard from the last guardian of each: Bloom Heart in the Blooming Labyrinth, Solar Heart in the Solar Crucible, Amber Memory in the Amber Archive and Solstice Heart in the Silent Solstice. The shards fall only for heroes who have taken this quest.',
+            objectives=[dict(kind='bring',target=i,count=1,label='Bring the '+n) for i,n,_,_ in SHARDS],rewardGold=30000,minLevel=99),
+        dict(id='null_entry',title='The Missing Minute',npc='null_guide',description='Enter the Black Hour Foundry and speak to Eydis, the Missing Minute.',objectives=[dict(kind='talk',target='null_witness',count=1,label='Speak to Eydis')],rewardGold=24000,requires=KEY_QUEST),
         dict(id='null_bell',title='End the Endless Shift',npc='null_guide',description='Defeat Vark, the Twelve-Ton Bell, with your party.',objectives=[dict(kind='kill',target='null_bell',count=1,label='Defeat Vark')],group=True,recommendedPlayers=5,rewardGold=65000,rewardItem='null_pants',rewardCount=1),
         dict(id='null_current',title='Break the Dead Current',npc='null_rigger',description='Defeat Iona, Mistress of the Dead Current, with your party.',objectives=[dict(kind='kill',target='null_conductor',count=1,label='Defeat Iona')],group=True,recommendedPlayers=5,rewardGold=65000,rewardItem='null_accessory',rewardCount=1)]
-    for q in quests:q.update(level=99,rewardXp=xp,repeatable=False,requires=None)
+    for q in quests:q.update(level=99,rewardXp=xp,repeatable=False);q.setdefault('requires',None)
     z['quests']=[q for q in z['quests'] if not q['id'].startswith('null_')]+quests
 
 def check(w):
@@ -131,6 +139,8 @@ def main():
         path=ROOT/'world/items.txt';items=json.loads(path.read_text());have={i['id'] for i in items}
         for e in ENEMIES:
             if e['material'] not in have:items.append(dict(id=e['material'],name=e['name']+' Relic',kind='material',rarity='common',sell=14000 if e['boss'] else 3200))
+        for i,n,_,_ in SHARDS:
+            if i not in have:items.append(dict(id=i,name=n,kind='material',rarity='common',sell=0))
         path.write_text(json.dumps(items,indent=2,ensure_ascii=False)+'\n')
     print('Black Hour Foundry: clock rim, flywheels and suspended clock; all targets reachable')
 if __name__=='__main__':main()

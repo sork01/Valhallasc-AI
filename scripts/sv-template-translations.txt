@@ -280,5 +280,8 @@
   "{0}v{1} match in progress. Defeat the whole opposing team.": "Match {0} mot {1} pågår. Besegra hela motståndarlaget.",
   "{0}{1} joins {2} and {3}": "{0}{1} förbinder {2} och {3}",
   "◆ {0} · sealed": "◆ {0} · förseglad",
-  "✓ {0} {1} for your reward": "✓ {0} {1} för din belöning"
+  "✓ {0} {1} for your reward": "✓ {0} {1} för din belöning",
+  "This quest is for heroes of level {0} and above.": "Det här uppdraget är för hjältar på nivå {0} och uppåt.",
+  "This quest is for heroes of level {0} and above. You are level {1}.": "Det här uppdraget är för hjältar på nivå {0} och uppåt. Du är nivå {1}.",
+  "{0} is shut to you. Complete the quest “{1}” to open it.": "Vägen till {0:t} är stängd. Slutför uppdraget ”{1:t}” för att öppna den."
 }

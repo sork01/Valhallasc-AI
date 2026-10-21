@@ -19,6 +19,7 @@
     if (p?.claimed && !quest.repeatable) return 'completed';
     if (quest.autoLevel) return 'upcoming'; // a progression quest is accepted by the server, never offered
     if (quest.requires && !(state({ id: quest.requires })?.completions > 0)) return 'locked';
+    if (quest.minLevel && heroLevel < quest.minLevel) return 'locked';
     return 'available';
   }
   const words = { ready: 'Ready to turn in', active: 'In progress', completed: 'Completed', locked: 'Locked', upcoming: 'Comes at a later level', available: 'Available' };
@@ -89,7 +90,8 @@
     if (s === 'upcoming') {
       node.append(element('p', `This quest finds you by itself at level ${quest.autoLevel}.`, 'quest-history'));
     } else if (s === 'locked') {
-      node.append(element('p', `Complete “${definitions.find(q => q.id === quest.requires)?.title}” first.`));
+      const early = quest.requires && !(state({ id: quest.requires })?.completions > 0);
+      node.append(element('p', early ? `Complete “${definitions.find(q => q.id === quest.requires)?.title}” first.` : `This quest is for heroes of level ${quest.minLevel} and above.`));
     } else if (atNpc && ['available', 'ready'].includes(s) && !(s === 'ready' && choices.length)) {
       const action = s === 'ready' ? 'claim' : 'accept';
       const b = button(s === 'ready' ? 'Collect reward' : state(quest)?.completions ? 'Take bounty again' : 'Accept quest', () => {

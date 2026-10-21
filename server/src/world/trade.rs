@@ -246,6 +246,9 @@ fn validate_offer(who: &Character, offer: &Offer) -> Result<(), String> {
         if i.starter || i.rarity == GM_RARITY || i.kind == "mount_licence" {
             return Err("Starter and game master gear cannot be traded.".into());
         }
+        if is_quest_item(i) {
+            return Err("Quest items cannot be traded.".into());
+        }
         if stack.quantity
             > who
                 .quantity(&stack.item)

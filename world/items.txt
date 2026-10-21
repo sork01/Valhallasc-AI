@@ -54710,5 +54710,33 @@
     "class": null,
     "variant": "orange_50",
     "source": "orange_pool"
+  },
+  {
+    "id": "hour_shard_bloom",
+    "name": "Shard of the Bloomed Hour",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "hour_shard_solar",
+    "name": "Shard of the Solar Hour",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "hour_shard_amber",
+    "name": "Shard of the Amber Hour",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "hour_shard_silent",
+    "name": "Shard of the Silent Hour",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
   }
 ]
