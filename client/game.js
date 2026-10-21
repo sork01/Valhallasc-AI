@@ -645,7 +645,12 @@
     if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); void title.offsetWidth; title.classList.add('show'); }
     title.querySelector('b').textContent = away ? s.area : inCity ? 'Alderhaven · Fountain Square' : t('areaName');
     title.querySelector('span').textContent = away ? (s.hub ? `${s.hub} · Sanctuary · quests · supplies` : s.players ? `Dungeon · ${s.players} players · level ${s.levels[0]} · ${s.tagline || 'private to your party'}` : s.levels ? `Recommended levels ${s.levels[0]}–${s.levels[1]} · stay close to the gate` : (s.tagline || 'Unexplored lands')) : inCity ? 'Sanctuary · shops · townspeople' : '푸른 초원';
-    renderBuffs(s.buffs || []);
+    const statuses = [
+      { id: 'stun', left: s.stun, time: 3, name: 'Stunned', icon: 'starfall', description: 'Cannot move, attack or cast.' },
+      { id: 'root', left: s.root, time: 3, name: 'Rooted', icon: 'storm', description: 'Cannot move or dash.' },
+      { id: 'wound', left: s.woundLeft, time: 10, name: 'Wounded', icon: 'cuts', description: 'Healing received is reduced by 50%.' },
+    ].filter(b => b.left > 0 && s.hp > 0).map(b => ({ ...b, kind: 'status' }));
+    renderBuffs([...(s.buffs || []), ...statuses]);
     if ((s.zone || 0) !== musicZone) { musicZone = s.zone || 0; syncMusic(); }
     $('city-travel').hidden = !s.sparkTravel && (inCity || (away && !s.camp));
     $('city-travel').disabled = !!s.sparkTravel;
@@ -687,12 +692,22 @@
     if (buffBar.dataset.key !== key) {
       buffBar.dataset.key = key;
       buffBar.replaceChildren(...list.map(b => {
-        const food = WORLD_ITEMS.find(k => k.id === b.id), def = WORLD_SKILLS.find(k => k.id === b.id) || (food && { name: food.name, icon: 'food', description: Inventory.effect(food) });
-        const chip = el('span', { class: 'buff-chip', 'data-buff': b.id, 'data-kind': b.kind, title: `${def?.name || b.id}: ${def?.description || ''}` }), glyph = el('span', { class: 'skill-icon' });
-        glyph.innerHTML = Skillbar.icon(def?.icon || 'attack'); chip.append(glyph, el('i')); return chip;
+        const food = WORLD_ITEMS.find(k => k.id === b.id), def = b.kind === 'status' ? b : WORLD_SKILLS.find(k => k.id === b.id) || (food && { name: food.name, icon: 'food', description: Inventory.effect(food) });
+        const translate = window.Locale?.translate || (text => text);
+        const name = translate(def?.name || b.id);
+        const description = translate(def?.description || '');
+        const chip = el('span', { class: 'buff-chip', 'data-buff': b.id, 'data-kind': b.kind, title: `${name}: ${description}` }), glyph = el('span', { class: 'skill-icon' });
+        glyph.innerHTML = Skillbar.icon(def?.icon || 'attack'); chip.append(glyph);
+        if (b.kind === 'status') chip.append(el('b', { text: b.name }));
+        chip.append(el('i')); return chip;
       }));
     }
-    for (const chip of buffBar.children) { const b = list.find(x => x.id === chip.dataset.buff); if (b) { chip.querySelector('i').textContent = Math.ceil(b.left); chip.style.setProperty('--left', Math.max(0, Math.min(1, b.left / b.time))); } }
+    for (const chip of buffBar.children) { const b = list.find(x => x.id === chip.dataset.buff); if (b) {
+      const seconds = Math.ceil(b.left), label = b.kind === 'status' ? `${b.name} · ${seconds}s` : '';
+      chip.querySelector('i').textContent = b.kind === 'status' ? `${seconds}s` : seconds;
+      if (label) chip.setAttribute('aria-label', label);
+      chip.style.setProperty('--left', Math.max(0, Math.min(1, b.left / b.time)));
+    } }
   }
   function noiseBurst(dur, f0, f1, vol, q = 1.2, type = 'bandpass') {
     if (!save.sound) return;

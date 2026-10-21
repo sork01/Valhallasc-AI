@@ -1334,6 +1334,31 @@ mod tests {
         (w, ids)
     }
     #[test]
+    fn player_status_snapshot_carries_remaining_effect_times() {
+        let (mut w, _) = stunner(Class::Assassin);
+        let p = w.players.get_mut(&2).unwrap();
+        p.stun = 2.5;
+        p.root = 1.5;
+        p.wound = 0.5;
+        p.wound_left = 8.5;
+        p.absorb = 120.;
+        p.absorb_left = 6.5;
+        let s = p.snapshot();
+        assert_eq!(s["stun"], 2.5);
+        assert_eq!(s["root"], 1.5);
+        assert_eq!(s["wound"], 0.5);
+        assert_eq!(s["woundLeft"], 8.5);
+        assert_eq!(s["absorb"], 120.);
+        assert_eq!(s["absorbLeft"], 6.5);
+        p.wound_left = 0.;
+        p.absorb_left = 0.;
+        let s = p.snapshot();
+        assert_eq!(s["wound"], 0.);
+        assert_eq!(s["woundLeft"], 0.);
+        assert_eq!(s["absorb"], 0.);
+        assert_eq!(s["absorbLeft"], 0.);
+    }
+    #[test]
     fn warrior_assassin_and_hunter_each_have_a_three_second_stun_skill_of_about_fifteen_seconds() {
         for (class, id) in [
             (Class::Warrior, "earthshatter"),

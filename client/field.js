@@ -892,7 +892,7 @@
   const hubs = () => [zdef.city, ...(zdef.camps || [])].filter(Boolean);
   const hubAt = (x, y) => hubs().find(c => x >= c.x0 && x <= c.x1 && y >= c.y0 && y <= c.y1);
   const campNear = () => hubs().reduce((a, c) => !a || Math.hypot(hero.x - c.plaza.x, hero.y - c.plaza.y) < Math.hypot(hero.x - a.plaza.x, hero.y - a.plaza.y) ? c : a, null);
-  function emitHud(force) { const rival = remotePlayers.get(hero.pvpTargetId); onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, target: rival && !rival.dead ? { id: rival.id, player: true, name: rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat }); }
+  function emitHud(force) { const rival = remotePlayers.get(hero.pvpTargetId); onHud({ hp: hero.hp, maxHp: hero.maxHp, resource: hero.resource, maxResource: hero.maxResource, resourceType: hero.resourceType, xp: hero.xp, xpNeed: hero.xpNeed || 100, level: hero.level, gold: hero.gold, kills: hero.kills, target: rival && !rival.dead ? { id: rival.id, player: true, name: rival.look?.name || 'Player', level: rival.level, hp: rival.hp, maxHp: rival.maxHp } : hero.target && !hero.target.dead ? { id: hero.target.id, kind: hero.target.kind, name: hero.target.d.name, level: hero.target.level, hp: hero.target.hp, maxHp: hero.target.maxHp } : null, msg, area: zone > 0 ? zdef.name : City.inside(hero.x, hero.y) ? WORLD_MAP.city.name : 'Greenmeadow', zone, camp: campNear()?.name, tagline: zdef.tagline, hub: hubAt(hero.x, hero.y)?.name ?? null, levels: zdef.levels, players: zdef.players, buffs: hero.buffs || [], stun: hero.stun || 0, root: hero.root || 0, wound: hero.wound || 0, woundLeft: hero.woundLeft || 0, sparkTravel:hero.sparkTravel, traveling: cityRoute.length > 0 && !pendingNpc, mounted:hero.mounted, mountOwned:hero.mountOwned, mount:hero.mount, inCombat:hero.inCombat }); }
 
   // ---------- coordinates ----------
   const camS = () => { const [x, y] = w2sRaw(cam.x, cam.y); return [Math.round(x), Math.round(y)]; };   // whole pixels: fractional offsets make big blits resample (slow)
@@ -1089,6 +1089,18 @@
   const classSprite = look => (look.class === 'mage' ? MageSprite : look.class === 'assassin' ? AssassinSprite : look.class === 'priest' ? PriestSprite : look.class === 'hunter' ? HunterSprite : WarriorSprite).variant(look);
   function applyActor(actor, packet, snap = false) {
     const x = actor.x, y = actor.y;
+    // Snapshot transitions drive one short cue per impact, for the victim and every observer.
+    if (packet.stun !== undefined) {
+      const wardBefore = mageWardActive(actor), wardAfter = mageWardActive(packet);
+      if (snap) actor.stunHitAt = actor.wardHitAt = actor.wardBreakAt = -99;
+      else {
+        if (packet.stun > 0 && (!(actor.stun > 0) || packet.stun > actor.stun + .15)) actor.stunHitAt = tAll;
+        if (!packet.dead && wardBefore && (packet.hp < actor.hp ||
+          (packet.absorb < actor.absorb && packet.absorbLeft > 0))) actor.wardHitAt = tAll;
+        if (!packet.dead && ((wardBefore && !wardAfter) ||
+          (actor.absorb > 0 && !(packet.absorb > 0)))) actor.wardBreakAt = tAll;
+      }
+    }
     Object.assign(actor, packet); actor.nx = packet.x; actor.ny = packet.y;
     if (!snap && Math.hypot(x - packet.x, y - packet.y) < 4) { actor.x = x; actor.y = y; }
   }
@@ -1995,11 +2007,11 @@
         layers(g, [[8, e.glow, .55, 1], [3, e.core, 1, 0]], fade, 0, () => { g.beginPath(); g.moveTo(x + Math.cos(an) * 6, y + Math.sin(an) * 6); g.lineTo(x + Math.cos(an) * r, y + Math.sin(an) * r); });
       }
     } else if (e.kind === 'skMageWard') {
-      const rise = 1 - Math.pow(1 - Math.min(1, p * 3), 3), [x, y] = w2s(e.x, e.y, 72);
-      g.globalAlpha = fade * .12; g.fillStyle = e.glow; g.beginPath(); g.ellipse(x, y, 58 * rise, 86 * rise, 0, 0, 6.283); g.fill();
-      layers(g, [[16, OUTLINE, .3, 0], [9, e.glow, .65, 1], [3, e.core, .95, 0]], fade, 0, () => {
-        g.beginPath(); for (let i = 0; i <= 8; i++) { const an = i * 6.283 / 8, px = x + Math.cos(an) * 60 * rise, py = y + Math.sin(an) * 83 * rise; i ? g.lineTo(px, py) : g.moveTo(px, py); }
-      });
+      const calm = reducedMotion(), [x, y] = w2s(e.x, e.y);
+      g.save(); g.translate(x, y); g.globalAlpha = fade * .65;
+      const grow = calm ? 1 : .8 + p * .3;
+      g.translate(0, -72); g.scale(grow, grow); g.translate(0, 72);
+      g.drawImage(mageWardArt().mist, -112, -220, 224, 320); g.restore();
     } else if (e.kind === 'skMageBlink') {
       const who = e.actor === Online.id ? hero : remotePlayers.get(e.actor), to = who || { x: e.x, y: e.y };
       const [bx, by] = w2s(e.x, e.y, 6), [tx, ty] = w2s(to.x, to.y, 6), moved = Math.hypot(tx - bx, ty - by) > 8;
@@ -2317,15 +2329,120 @@
       }
     });
   }
+  function mageWardActive(who) {
+    return who.look?.class === 'mage' && !who.dead &&
+      (who.absorb > 0 || who.buffs?.some(b => b.id === 'arcaneward' && b.left > 0));
+  }
+  // Faceted ice and soft frost, inspired by the owner's 1159378-ice-barrier.jpg reference.
+  // Rasterize the paths/gradients once; an active ward costs six small image blits per frame.
+  let wardIceArt = null;
+  const WARD_ICE = [
+    [-2.58, .8, -.16], [-1.6, .86, .14], [-.48, .76, -.2], [.72, .55, -.3], [2.48, .56, .28],
+  ];
+  function mageWardArt() {
+    if (wardIceArt) return wardIceArt;
+    const canvas = (w, h) => { const c = document.createElement('canvas'); c.width = w * 2; c.height = h * 2; return c; };
+    const crystal = flash => {
+      const c = canvas(96, 128), a = c.getContext('2d'); a.scale(2, 2); a.translate(48, 32);
+      const face = (col, points) => { a.fillStyle = flash ? '#f0fcff' : col; a.beginPath();
+        points.forEach(([x, y], i) => i ? a.lineTo(x, y) : a.moveTo(x, y)); a.closePath(); a.fill(); };
+      // Three long icicles underneath a broad, broken ice cap. Cool dark faces keep them readable on grass.
+      face('#3677b0', [[-25,-5],[-7,4],[-21,53]]);
+      face('#a3dfff', [[-25,-5],[-16,7],[-21,53]]);
+      face('#528fc7', [[-7,2],[14,8],[2,35]]);
+      face('#d1efff', [[-7,2],[2,9],[2,35]]);
+      face('#3472a7', [[12,5],[30,3],[17,56]]);
+      face('#91caff', [[12,5],[21,15],[17,56]]);
+      face('#c5eaff', [[-27,-8],[-9,-20],[-4,-5]]);
+      face('#7fb7e3', [[-9,-20],[21,-11],[-4,-5]]);
+      face('#eefbff', [[-27,-8],[-4,-5],[-21,4]]);
+      face('#b5e6ff', [[-4,-5],[21,-11],[30,5]]);
+      face('#6098c7', [[-21,4],[-4,-5],[8,11]]);
+      face('#e3f8ff', [[-4,-5],[30,5],[8,11]]);
+      a.strokeStyle = '#ecfaff'; a.globalAlpha = .75; a.lineWidth = .9;
+      a.beginPath(); a.moveTo(-27,-8); a.lineTo(-9,-20); a.lineTo(21,-11); a.lineTo(30,5); a.stroke();
+      return c;
+    };
+    const mist = canvas(224, 320), a = mist.getContext('2d'); a.scale(2, 2); a.translate(112, 148);
+    a.save(); a.scale(92, 119);
+    const frost = a.createRadialGradient(0, 0, .58, 0, 0, 1.15);
+    frost.addColorStop(0, '#8bd8ff00'); frost.addColorStop(.32, '#65baff13');
+    frost.addColorStop(.6, '#88d5ff37'); frost.addColorStop(1, '#65baff00');
+    a.fillStyle = frost; a.fillRect(-1.2, -1.2, 2.4, 2.4); a.restore();
+    // A faint, continuous oval holds the barrier together between the scattered ice chunks.
+    // Soft bands are baked into the same mist image, so this adds no per-frame work.
+    for (const [width, color] of [[14, '#85d2ff12'], [5, '#a4e3ff20'], [1.4, '#d6f3ff38']]) {
+      a.strokeStyle = color; a.lineWidth = width;
+      a.beginPath(); a.ellipse(0, 0, 81, 112, 0, 0, Math.PI * 2); a.stroke();
+    }
+    // Uneven wisps soften the silhouette without a solid bubble or an animated filter.
+    for (let i = 0; i < 15; i++) {
+      const angle = i * Math.PI * 2 / 15, x = Math.cos(angle) * 78, y = Math.sin(angle) * 100;
+      a.save(); a.translate(x, y); a.rotate(angle + Math.PI / 2); a.scale(12 + i % 3 * 3, 28 + i % 4 * 5);
+      const glow = a.createRadialGradient(0, 0, 0, 0, 0, 1);
+      glow.addColorStop(0, '#90d9ff27'); glow.addColorStop(1, '#74c6ff00');
+      a.fillStyle = glow; a.fillRect(-1, -1, 2, 2); a.restore();
+    }
+    wardIceArt = { ice: crystal(false), flash: crystal(true), mist };
+    return wardIceArt;
+  }
   function drawMageWardShell(g, who, t) {
-    if (who.look?.class !== 'mage' || who.dead || !who.buffs?.some(b => b.id === 'arcaneward')) return;
-    const pulse = .65 + .2 * Math.sin(t * 5);
-    g.save(); g.globalCompositeOperation = 'lighter';
-    g.globalAlpha = .06 * pulse; g.fillStyle = '#7a9bff'; g.beginPath(); g.ellipse(0, -68, 58, 82, 0, 0, 6.283); g.fill();
-    g.globalAlpha = .55 * pulse; g.strokeStyle = '#cce7ff'; g.lineWidth = 2.5;
-    g.beginPath(); for (let i = 0; i <= 8; i++) { const a = i * 6.283 / 8, x = Math.cos(a) * 59, y = -68 + Math.sin(a) * 83; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke();
-    g.globalAlpha = .32 * pulse; g.strokeStyle = '#8baeff'; g.lineWidth = 1.5;
-    for (let i = 0; i < 4; i++) { const a = i * 1.571 + t * .28; g.beginPath(); g.moveTo(Math.cos(a) * 46, -68 + Math.sin(a) * 65); g.lineTo(Math.cos(a + .35) * 58, -68 + Math.sin(a + .35) * 82); g.stroke(); }
+    if (who.dead || who.look?.class !== 'mage') return;
+    const active = mageWardActive(who), broken = tAll - (who.wardBreakAt ?? -99);
+    if (!active && broken >= .55) return;
+    const calm = reducedMotion(), hit = Math.max(0, 1 - (tAll - (who.wardHitAt ?? -99)) / .28);
+    const soak = clamp((who.absorb || 0) / Math.max(1, who.maxHp * (SKILL_BY_ID.arcaneward.absorb || .07)), 0, 1);
+    const art = mageWardArt(), turn = calm ? 0 : t * .12;
+    g.save();
+    if (active) {
+      g.globalAlpha = .75 + hit * .25; g.drawImage(art.mist, -112, -220, 224, 320);
+      for (const [angle, size, tilt] of WARD_ICE) {
+        const phase = angle + turn, x = Math.cos(phase) * 72, y = -75 + Math.sin(phase) * 83;
+        const bob = calm ? 0 : Math.sin(t * 1.6 + angle * 3) * 2;
+        g.save(); g.translate(x, y + bob); g.rotate(tilt + (calm ? 0 : Math.sin(t + angle) * .06));
+        g.scale(size, size); g.globalAlpha = .74 + soak * .22;
+        g.drawImage(art.ice, -48, -32, 96, 128);
+        if (hit > 0) { g.globalAlpha = hit * .85; g.drawImage(art.flash, -48, -32, 96, 128); }
+        g.restore();
+      }
+    }
+    if (broken >= 0 && broken < .55) {
+      const p = calm ? .35 : broken / .55;
+      g.globalAlpha = 1 - broken / .55;
+      for (const [angle, size, tilt] of WARD_ICE) {
+        const phase = angle + turn;
+        g.save(); g.translate(Math.cos(phase) * (80 + p * 38), -75 + Math.sin(phase) * (92 + p * 38));
+        g.rotate(tilt + p * Math.sin(angle) * 1.5); g.scale(size * .55, size * .55);
+        g.drawImage(art.ice, -48, -32, 96, 128); g.restore();
+      }
+    }
+    g.restore();
+  }
+  function drawMageWardSoak(g, who) {
+    const soak = clamp(who.absorb / Math.max(1, who.maxHp * (SKILL_BY_ID.arcaneward.absorb || .07)), 0, 1);
+    g.fillStyle = '#111a35'; g.fillRect(-31, 19, 62, 9); g.fillStyle = '#91dbff'; g.fillRect(-29, 21, 58 * soak, 5);
+    g.font = '13px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = '#111a35'; g.fillStyle = '#dcf6ff';
+    const label = window.Locale?.translate(`Ward: ${Math.ceil(who.absorb)}`) || `Ward: ${Math.ceil(who.absorb)}`;
+    g.strokeText(label, 0, 43); g.fillText(label, 0, 43);
+  }
+  function drawPlayerStun(g, who, t) {
+    if (who.dead || !(who.stun > 0)) return;
+    const calm = reducedMotion(), turn = calm ? 0 : t * 2.8;
+    g.save(); g.strokeStyle = '#ffe9a2'; g.lineWidth = 2; g.fillStyle = '#ffe181';
+    g.globalAlpha = .8; g.beginPath(); g.ellipse(0, -154, 34, 10, 0, 0, Math.PI * 2); g.stroke();
+    for (let n = 0; n < 3; n++) {
+      const a = turn + n * Math.PI * 2 / 3, x = Math.cos(a) * 34, y = -154 + Math.sin(a) * 10;
+      g.beginPath(); for (let i = 0; i < 10; i++) { const b = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 3 : 8;
+        i ? g.lineTo(x + Math.cos(b) * r, y + Math.sin(b) * r) : g.moveTo(x + Math.cos(b) * r, y + Math.sin(b) * r); }
+      g.closePath(); g.strokeStyle = '#3a2e4b'; g.lineWidth = 3; g.stroke(); g.fill();
+    }
+    const hit = tAll - (who.stunHitAt ?? -99);
+    if (hit >= 0 && hit < .3) {
+      const r = calm ? 47 : 38 + hit * 80;
+      g.globalAlpha = 1 - hit / .3; g.strokeStyle = '#fff8d3'; g.lineWidth = 3;
+      for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4;
+        g.beginPath(); g.moveTo(Math.cos(a) * r, -154 + Math.sin(a) * r * .5); g.lineTo(Math.cos(a) * (r + 12), -154 + Math.sin(a) * (r + 12) * .5); g.stroke(); }
+    }
     g.restore();
   }
   function drawPriestBuffShell(g, who, t) {
@@ -3684,7 +3801,7 @@
         if (remote.sparkTravel) Spark.draw(g,remote,t);
         else if (remote.sprite) { const seated = seatedInArt(remote, remote.sprite); if(!seated)drawMount(g,remote); if(remote.mounted&&!seated)g.translate(0,-23); remote.sprite.draw(g, remote, t); if(remote.mounted&&!seated)g.translate(0,23); }
         else { g.fillStyle = '#cfb5fa'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
-        drawMageWardShell(g, remote, t); drawPriestBuffShell(g, remote, t); drawHunterBuffShell(g, remote, t);
+        drawMageWardShell(g, remote, t); drawPriestBuffShell(g, remote, t); drawHunterBuffShell(g, remote, t); drawPlayerStun(g, remote, t);
         g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag ? '#ff9b9b' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : window.Rebirth?.color(remote.reborn?.tier || 0) || '#fff4ca';
         const nameText = remote.escort ? remote.look.name + ' · Escort' : remote.look.name + (remote.pvpFlag ? ' · PvP' : '');
         g.strokeText(nameText, 0, -128); g.fillText(nameText, 0, -128);
@@ -3695,7 +3812,13 @@
       } else if (it.hero) { g.save(); g.translate(it.sx, it.sy); if (hero.gm && hero.hidden) g.globalAlpha = .35; if (hero.sparkTravel) Spark.draw(g,hero,t); else { if (!hero.dead) window.Rebirth?.drawAura(g, hero.reborn?.tier, hero.mounted ? 1.25 : 1); const seated = isModular() && seatedInArt(hero, mageSpr); if(!seated)drawMount(g,hero); if(hero.mounted&&!seated)g.translate(0,-23); if (isModular()) {
         if (mageSpr) mageSpr.draw(g, hero, t);
         else { g.fillStyle = '#8acfff'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
-      } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } drawMageWardShell(g, hero, t); drawPriestBuffShell(g, hero, t); drawHunterBuffShell(g, hero, t); if (hero.gm && hero.hidden) { g.globalAlpha = .8; g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 1, 26, 11, 0, 0, Math.PI * 2); g.stroke(); } g.restore(); }
+      } else { if (!warSpr && hero.hurtT > 0 && Math.floor(hero.hurtT * 40) % 2) g.globalAlpha = .6; if (warSpr) drawWarriorSprite(g, hero, t); else if (heroSpr) drawHeroSprite(g, hero, t); else { g.scale(1.3, 1.3); drawHero(g, hero, t); } } } drawMageWardShell(g, hero, t); drawPriestBuffShell(g, hero, t); drawHunterBuffShell(g, hero, t); drawPlayerStun(g, hero, t); if (hero.gm && hero.hidden) { g.globalAlpha = .8; g.strokeStyle = '#ffd24a'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 1, 26, 11, 0, 0, Math.PI * 2); g.stroke(); } g.restore(); }
+    }
+    // Keep the soak readout legible even when another actor stands in front of the warded fighter.
+    for (const who of [hero, ...remotePlayers.values()]) {
+      if (who.dead || !(who.absorb > 0) || who.look?.class !== 'mage') continue;
+      const [sx, sy] = w2s(who.x, who.y); if (!onScreen(sx, sy, 160)) continue;
+      g.save(); g.translate(sx, sy); drawMageWardSoak(g, who); g.restore();
     }
     // speech bubbles go over everything, so a tree or a roof never hides what somebody said
     bubblesLast = bubblesDrawn; bubblesDrawn = 0;
@@ -4096,7 +4219,7 @@
     get explored() { return explored; }, fog: { grid: FOG, seen, paint: paintFog, cell: fogCell },
     get beetleSprites() { return beetleSrc; }, get cragSprites() { return cragSrc; }, get rimeSprites() { return rimeSrc; }, get fenSprites() { return fenSrc; }, get wyrdSprites() { return wyrdSrc; }, get skySprites() { return skySrc; }, get deepSprites() { return deepSrc; }, get astralSprites() { return astralSrc; }, get prismSprites() { return prismSrc; }, get orrerySprites() { return orrerySrc; }, get moonsporeSprites() { return moonsporeSrc; }, get stormglassSprites() { return stormglassSrc; }, get sunwardSprites() { return sunwardSrc; }, get ribbonwildSprites() { return ribbonwildSrc; }, get tanglecrownSprites() { return tanglecrownSrc; }, get worldheartSprites() { return worldheartSrc; }, get lapisSprites() { return lapisSrc; }, get frostwakeSprites() { return frostwakeSrc; }, get cairnSprites() { return cairnSrc; }, get bankSprites() { return bankSrc; }, get yearSprites() { return yearSrc; }, get moonwellSprites() { return moonwellSrc; }, get moonwellGardenSprites() { return moonwellGardenSrc; }, get cathedralSprites() { return cathedralSrc; }, get vaultSprites() { return vaultSrc; },
     get zone() { return zone; }, get zoneName() { return zdef.name; }, get zoneTheme() { return zdef.theme; }, place: id => (zdef.places || []).find(p => p.id === id) || null,
-    _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, drawLootPillar, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
+    _debug: { get floaters() { return floaters; }, get chests() { return chests; }, get chestSprites() { return chestSrc; }, get drops() { return drops; }, get pendingChest() { return pendingChest; }, get cityRoute() { return cityRoute; }, get effects() { return effects; }, get bolts() { return bolts; }, get ebolts() { return ebolts; }, get cleared() { return instanceCleared; }, event: networkEvent, get objects() { return objects; }, get zones() { return ZONES; }, w2s, s2w, routeTo, drawLootPillar, drawFrame: draw, drawPlayerStun, drawMageWardShell, enemyFrame: s => slimeFrame(s, tAll), enemyHitbox },
   };
   window.Field = Field;
 })();

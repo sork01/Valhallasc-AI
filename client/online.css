@@ -405,6 +405,10 @@
 .buff-chip .skill-icon { position: absolute; inset: 14% 14% 24%; z-index: 1; }
 .buff-chip i { position: absolute; z-index: 2; left: 0; right: 0; bottom: .1cqw; font: normal max(9px, .9cqw) 'Jua', sans-serif; text-align: center; color: #fff; text-shadow: 0 1px 2px #000; }
 .buff-chip[data-kind="damage"] { --buff: #ff9a3a; border-color: #ff9a3a; } .buff-chip[data-kind="shield"] { --buff: #59a8ff; border-color: #59a8ff; }
+.buff-chip[data-kind="status"] { --buff: #ffb877; border-color: #ffb877; width: 6.5cqw; }
+.buff-chip[data-kind="status"] .skill-icon { inset: 12% auto 12% 4%; width: 2.2cqw; }
+.buff-chip[data-kind="status"] b { position: absolute; z-index: 2; left: 2.3cqw; right: .2cqw; top: .55cqw; font: normal max(9px, .85cqw) 'Jua', sans-serif; text-align: center; }
+.buff-chip[data-kind="status"] i { left: 2.3cqw; }
 .buff-chip[data-kind="haste"] { --buff: #ffe45a; border-color: #ffe45a; } .buff-chip[data-kind="dodge"] { --buff: #b9a8ff; border-color: #b9a8ff; } .buff-chip[data-kind="crit"] { --buff: #ff5c7a; border-color: #ff5c7a; }
 
 /* ---- Friends and party ---- */

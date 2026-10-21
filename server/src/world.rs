@@ -361,7 +361,7 @@ impl Player {
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
             "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"frozen":self.frozen,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,"reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"rebirthTiers":c.rebirth_tiers,"rebirthPerks":c.rebirth_perks(),"mountTint":c.mount_tint,
             "setCounts":c.set_counts(),"setCd":self.set_cd,
-            "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"wound":if self.wound_left > 0. { self.wound } else { 0. },"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
+            "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
     }
     fn is_hidden(&self) -> bool {
         self.character.gm && (self.hidden || self.character.zone != self.visible_zone)
@@ -2488,7 +2488,10 @@ impl World {
                         if c.level < def.level {
                             notice = format!("The {} needs level {}.", def.name, def.level);
                         } else if c.owns_mount(def.id) {
-                            notice = format!("You already own the {}. Press ‹mount› to mount.", def.name);
+                            notice = format!(
+                                "You already own the {}. Press ‹mount› to mount.",
+                                def.name
+                            );
                         } else if needed.is_some_and(|(id, _)| c.quantity(id) == 0) {
                             notice = format!("You need a {} for this.", needed.unwrap().1);
                         } else if c.gold < offer.cost {
