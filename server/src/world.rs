@@ -130,6 +130,9 @@ const ENRAGE_RANGE: f64 = 14.;
 const LEVEL_HP_DAMAGE: f64 = 0.12;
 /// Fights ran too fast, so every hit a player lands and every hit a player takes is cut to this share.
 const DAMAGE_DEALT_SCALE: f64 = 0.25;
+/// Gold an enemy drops, as a fraction of its `Slime.gold` (owner, 2026-10-21: half). Applied where the kill pays, so the
+/// catalogue and spawn values stay as authored. Chests, quests and sales are not scaled.
+const MOB_GOLD_SCALE: f64 = 0.5;
 const DAMAGE_TAKEN_SCALE: f64 = 0.25;
 /// A player cannot take another portal for this long after arriving. Arrival points sit outside every gate, so this only
 /// guards against bouncing; it must stay below the walk from an arrival point to its gate (about 0.65 s).
@@ -3773,7 +3776,10 @@ impl World {
         let point = s.point();
         let killed = s.hp <= 0.;
         let xp = s.xp;
-        let gold = s.gold;
+        let gold = match s.gold {
+            0 => 0,
+            g => ((g as f64 * MOB_GOLD_SCALE).round() as u32).max(1),
+        };
         let zone = s.zone;
         let kind = s.kind.clone();
         let level = s.level;
@@ -10454,7 +10460,11 @@ mod tests {
         w.slimes[id] = Slime::with_level(id, &w.spawns[id].clone(), 7);
         w.hit_slime(id, 1, 5000., false);
         assert_eq!(w.players[&1].character.xp, 80);
-        assert_eq!(w.drops.iter().find(|d| d.item.is_none()).unwrap().value, 12);
+        assert_eq!(
+            w.drops.iter().find(|d| d.item.is_none()).unwrap().value,
+            6,
+            "a kill drops half the rolled gold"
+        );
     }
 
     #[test]
