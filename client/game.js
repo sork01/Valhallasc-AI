@@ -8,7 +8,7 @@
   const vol = v => Number.isFinite(+v) ? Math.max(0, Math.min(1, +v)) : 1;
   save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol); save.night = vol(save.night); save.weather = vol(save.weather); save.weatherAudio = vol(save.weatherAudio);
   // Sork's own arrangement (2026-10-21) is what a player gets until they move something (uiSet / panelSizeSet): offsets in cqw from the stylesheet positions, sizes in cqw.
-  const DEFAULT_UI = { map: { x: 1.4, y: -1.4 }, travel: { x: 1.33, y: -2.26 }, bags: { x: 1.37, y: 0.49 }, social: { x: 1.42, y: 0.66 }, quickuse: { x: 6.46, y: 1.55 }, chat: { x: -1.28, y: 0.53 }, frame: { x: -1.4, y: -1.4 }, party: { x: 61.04, y: 17.53 }, buffs: { x: -1.24, y: -2.79 }, quests: { x: -1.4, y: -2.48 } };
+  const DEFAULT_UI = { map: { x: 1.4, y: -1.4 }, travel: { x: 1.33, y: -2.26 }, bags: { x: 1.37, y: 0.49 }, social: { x: 1.42, y: 0.66 }, chat: { x: -1.28, y: 0.53 }, frame: { x: -1.4, y: -1.4 }, party: { x: 61.04, y: 17.53 }, buffs: { x: -1.24, y: -2.79 }, quests: { x: -1.4, y: -2.48 } };
   const DEFAULT_PANEL_SIZE = { quests: { w: 19.61, h: 31.28 }, chat: { w: 34.36, h: 7.95 } };
   const has = o => !!o && typeof o === 'object' && Object.keys(o).length > 0; // a layout saved before the flags existed counts as chosen
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) { /* ignore */ } };

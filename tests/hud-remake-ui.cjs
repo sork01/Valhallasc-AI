@@ -74,7 +74,7 @@ const errors = [];
 
   // --- the layout migrates: Edit UI saves only the pieces that exist ---
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-edit-ui').click();
-  check(await page.locator('.layout-handle').count() === 11, 'Edit UI offers eleven pieces');
+  check(await page.locator('.layout-handle').count() === 10, 'Edit UI offers ten pieces (the food and potion bar is part of the skillbar)');
   await page.locator('#layout-done').click(); await page.locator('#set-back').click(); await page.locator('#p-resume').click();
   const ui = (await stored(page)).ui || {};
   check(!('character' in ui) && !('hint' in ui) && 'bags' in ui, `Saved layout dropped the removed pieces: ${JSON.stringify(ui)}`);
@@ -108,7 +108,7 @@ const errors = [];
     check(near(r.tracker.l, st.l + 1.4 * u) && r.tracker.t >= r.frame.b - 1, `${label}: the quest tracker is on the left, under the character frame (${JSON.stringify({ tracker: r.tracker, frame: r.frame, st })})`);
     check(near(r.chat.l, st.l + 1.4 * u) && near(r.chat.b, st.b - .6 * u), `${label}: chat is in the bottom left corner`);
     check(near(r.skill.b, st.b - .6 * u) && near((r.skill.l + r.skill.r) / 2, (st.l + st.r) / 2, .5), `${label}: the skillbar is centred at the very bottom`);
-    check(near(r.quick.l, r.skill.l, .4) && r.quick.b <= r.skill.t + 1 && r.skill.t - r.quick.b < 1.6 * u, `${label}: food and potions sit on the left end of the skillbar (${r.quick.l.toFixed(0)} vs ${r.skill.l.toFixed(0)}, gap ${(r.skill.t - r.quick.b).toFixed(0)})`);
+    check(near(r.quick.l, r.skill.l + 6.46 * u, .5) && r.quick.b <= r.skill.t + 1 && r.skill.t - r.quick.b < 1.6 * u, `${label}: food and potions sit on the skillbar's top edge, 6.46 cqw in (${r.quick.l.toFixed(0)} vs ${r.skill.l.toFixed(0)}, gap ${(r.skill.t - r.quick.b).toFixed(0)})`);
     check(near(r.bags.r, st.r - 1.5 * u) && near(r.bags.b, st.b - .6 * u), `${label}: the bags button is in the bottom right corner`);
     check(near(r.social.r, r.bags.r, .3) && r.social.b <= r.bags.t + 1 && r.bags.t - r.social.b < 1.2 * u, `${label}: the social button is just above it (gap ${(r.bags.t - r.social.b).toFixed(0)})`);
     check(near(r.map.r, st.r - 1.4 * u) && near(r.map.t, st.t + 1.4 * u), `${label}: the minimap is in the top right corner`);
@@ -127,13 +127,16 @@ const errors = [];
   await phone.waitForFunction(() => /^Greenmeadow · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
   const pm = await rect(phone, '#minimap'), ps = await rect(phone, '#network-status'), pst = await rect(phone, '#stage');
   check(ps.t >= pm.b - 1 && ps.l >= pst.l && ps.r <= pst.r + 1 && ps.w <= pm.w + 2, `At 844x390 the pill stays under the minimap and inside the stage (${JSON.stringify(ps)})`);
+  // The food and potion bar is anchored to the skillbar, so it follows it on a small stage too.
+  const pq = await rect(phone, '#quickuse'), pb = await rect(phone, '#skillbar');
+  check(pq.b <= pb.t + 1 && pb.t - pq.b < 0.02 * pst.w && Math.abs(pq.l - pb.l - 0.0646 * pst.w) < 0.012 * pst.w, `At 844x390 the food and potion bar sits on the skillbar (${JSON.stringify({ pq, pb })})`);
   // A visitor who never moved anything gets Sork's arrangement; Reset goes back to it, and a layout of one's own is kept.
   check(await phone.evaluate(() => JSON.stringify(Prefs.layout.party) === '{"x":61.04,"y":17.53}' && Prefs.layout.quests.y === -2.48 && Prefs.panelSize.chat.w === 34.36 && Prefs.panelSize.quests.h === 31.28), 'A fresh visitor gets the shipped layout and panel sizes');
   check(await phone.evaluate(() => document.getElementById('chat').style.getPropertyValue('--pw') !== '' || getComputedStyle(document.getElementById('chat')).getPropertyValue('--pw') !== ''), 'The default chat width is applied');
   await phone.evaluate(() => { Settings.startEdit(); Settings.layout.bags = { x: 0, y: 0 }; Prefs.set({ ui: { map: { x: 2, y: 2 } } }); Settings.refresh(); });
   check(await phone.evaluate(() => Object.keys(Prefs.layout).join() === 'map'), 'A layout the player saved replaces the shipped one');
   await phone.evaluate(() => { Settings.stopEdit(); Settings.reset(); });
-  check(await phone.evaluate(() => Object.keys(Prefs.layout).length === 10 && Settings.layout.party.x === 61.04), 'Reset returns to the shipped layout');
+  check(await phone.evaluate(() => Object.keys(Prefs.layout).length === 9 && Settings.layout.party.x === 61.04), 'Reset returns to the shipped layout');
   await phone.screenshot({ path: path.join(world.artifacts, 'hud-remake-844x390.png') });
   await phone.close();
   check(errors.length === 0, `No page errors: ${errors.join(' | ')}`);

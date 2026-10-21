@@ -14,7 +14,7 @@
     ['frame', 'Character frame', '.hud-tl', '0 0'], ['buffs', 'Active effects', '#buff-bar', '0 0'], ['party', 'Party', '#party-frame', '0 0'],
     ['map', 'Minimap', '.hud-tr', '100% 0'], ['travel', 'Travel button', '#city-travel', '100% 0'], ['quests', 'Quest tracker', '#quest-tracker', '0 0'],
     ['bags', 'Bags button', '#inventory-open', '100% 100%'], ['social', 'Social button', '#social-open', '100% 100%'],
-    ['skillbar', 'Skillbar', '#skillbar', '0 100%'], ['quickuse', 'Food and potion slots', '#quickuse', '0 100%'], ['chat', 'Chat', '#chat', '0 100%'],
+    ['skillbar', 'Skillbar', '#skillbar', '0 100%'], ['chat', 'Chat', '#chat', '0 100%'],
   ];
   // Scaled with the UI but not movable.
   const EXTRA = [['#loot-rolls', '0 0'], ['#social-invites', '0 0'], ['#pvp-duel-warning', '0 0'], ['#rare-pickup', '0 0'], ['#toast', '0 100%']];
