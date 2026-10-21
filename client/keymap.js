@@ -174,6 +174,25 @@
     const slotIds = Object.keys(DEFAULTS).filter(id => /^skill\d+$/.test(id));
     put('skillbar', slotIds, () => { const bar = document.getElementById('skillbar'), a = slotIds.every(isDefault) ? 'Skillbar, keys 1 to 9, 0, minus and equals' : 'Skillbar'; if (bar && bar.getAttribute('aria-label') !== a) bar.setAttribute('aria-label', a); });
   }
+  // Texts the server and the world data write (they cannot know the player's keys) name a key as ‹action›, as in "Press ‹mount› to
+  // mount.". It is replaced where the text lands on the page, after Locale (loaded first, so its observer runs first) has
+  // translated it. Text that arrived before a rebind keeps the key it was written with.
+  const TOKEN = /‹(\w+)›/g;
+  const fill = text => text.replace(TOKEN, (whole, id) => DEFAULTS[id] ? (window.Locale ? Locale.translate(first(id)) : first(id)) : whole);
+  function fillNode(node) {
+    if (node.nodeType === 3) { if (node.nodeValue.includes('‹')) node.nodeValue = fill(node.nodeValue); return; }
+    if (node.nodeType !== 1) return;
+    const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+    for (let t = walker.nextNode(); t; t = walker.nextNode()) if (t.nodeValue.includes('‹')) t.nodeValue = fill(t.nodeValue);
+    for (const el of [node, ...node.querySelectorAll('[title],[aria-label],[placeholder]')]) for (const a of ['title', 'aria-label', 'placeholder']) { const v = el.getAttribute?.(a); if (v?.includes('‹')) el.setAttribute(a, fill(v)); }
+  }
+  new MutationObserver(records => {
+    for (const r of records) {
+      if (r.type === 'characterData') fillNode(r.target);
+      else if (r.type === 'attributes') fillNode(r.target);
+      else r.addedNodes.forEach(fillNode);
+    }
+  }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['title', 'aria-label', 'placeholder'] });
   addEventListener('load', applyHints); addEventListener('keymap-change', applyHints);
 
   window.Keys = { skillRange, ACTIONS, SLOTS, is, which, codeOf, actionsFor, typing, label, name, slots, isDefault, bind, clear, reset, resetAll, capture, holders, get capturing() { return capturing; } };

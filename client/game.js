@@ -27,7 +27,7 @@
       equipment: 'Character (E)', gender: 'Body', male: 'Male', female: 'Female', hair: 'Hair', weapon: 'Staff', mageTip: 'Click the Mage to cast. Robes and staffs can be changed in the field with E.',
       mageLoading: 'Summoning the Mage…', mageError: 'Mage sprites could not load. Select Mage again to retry.',
       mageArmorNames: ['Simple cloth', 'Apprentice', 'Runic'], mageWeaponNames: ['Empty hands', 'Ash staff', 'Crystal staff'],
-      assassinDesc: 'A swift duelist with twin blades and deadly critical strikes. Shadowstep through danger with Shift.',
+      assassinDesc: 'A swift duelist with twin blades and deadly critical strikes. Shadowstep through danger with ‹dash›.',
       blades: 'Blades', assassinTip: 'Click the Assassin to slash. Change outfits and blades in the field with E.',
       assassinLoading: 'Calling the Assassin…', assassinError: 'Assassin sprites could not load. Select Assassin again to retry.',
       assassinArmorNames: ['Simple cloth', 'Nightweave', 'Moonveil'], assassinWeaponNames: ['Empty hands', 'Twin daggers', 'Moonfang'],
@@ -58,7 +58,7 @@
       equipment: '장비 (E)', gender: '체형', male: '남성', female: '여성', hair: '머리', weapon: '지팡이', mageTip: '마법사를 눌러 주문을 시전하세요. 필드에서 E 키로 장비를 바꿀 수 있습니다.',
       mageLoading: '마법사 소환 중…', mageError: '마법사를 불러오지 못했습니다. 다시 선택해 주세요.',
       mageArmorNames: ['기본 옷', '견습 로브', '룬 로브'], mageWeaponNames: ['맨손', '나무 지팡이', '수정 지팡이'],
-      assassinDesc: '쌍검과 치명타를 사용하는 민첩한 암살자. Shift 키로 위험을 뚫고 질주하세요.',
+      assassinDesc: '쌍검과 치명타를 사용하는 민첩한 암살자. ‹dash› 키로 위험을 뚫고 질주하세요.',
       blades: '쌍검', assassinTip: '암살자를 눌러 베기를 시전하세요. 필드에서 E 키로 장비를 바꿀 수 있습니다.',
       assassinLoading: '암살자 소환 중…', assassinError: '암살자를 불러오지 못했습니다. 다시 선택해 주세요.',
       assassinArmorNames: ['기본 옷', '밤의 의복', '달의 장막'], assassinWeaponNames: ['맨손', '쌍단검', '달송곳니'],
@@ -82,6 +82,7 @@
     const value = (T[save.lang] || T.en)[k];
     return save.lang === 'sv' ? (Array.isArray(value) ? value.map(window.Locale.translate) : window.Locale.translate(value)) : value;
   };
+  addEventListener('keymap-change', () => applyI18n());
   const applyI18n = () => {
     document.documentElement.lang = save.lang;
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });

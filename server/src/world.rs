@@ -2488,7 +2488,7 @@ impl World {
                         if c.level < def.level {
                             notice = format!("The {} needs level {}.", def.name, def.level);
                         } else if c.owns_mount(def.id) {
-                            notice = format!("You already own the {}. Press H to mount.", def.name);
+                            notice = format!("You already own the {}. Press ‹mount› to mount.", def.name);
                         } else if needed.is_some_and(|(id, _)| c.quantity(id) == 0) {
                             notice = format!("You need a {} for this.", needed.unwrap().1);
                         } else if c.gold < offer.cost {
@@ -2501,7 +2501,7 @@ impl World {
                             c.grant_mount(def.id);
                             quest_changed = true;
                             notice = format!(
-                                "The {} is yours. Press H to mount or dismount outdoors.",
+                                "The {} is yours. Press ‹mount› to mount or dismount outdoors.",
                                 def.name
                             );
                         }
@@ -2800,7 +2800,7 @@ impl World {
                 .explore_in(public, self.maps[p.character.zone].size);
             for title in sync_progression(&mut p.character, &self.maps) {
                 let _ = p.peer.try_send(json!({"type":"system","text":format!(
-                    "A new quest has found you: {title}. Follow it in your journal (Q)."
+                    "A new quest has found you: {title}. Follow it in your journal (‹quests›)."
                 )}));
             }
             for place in sync_visits(&mut p.character, &self.maps) {
@@ -4940,7 +4940,7 @@ fn quest_action_with_choice(
             quest.sync_bring(character);
             (
                 format!(
-                    "Quest accepted: {}. Follow it in your journal (Q).",
+                    "Quest accepted: {}. Follow it in your journal (‹quests›).",
                     quest.title
                 ),
                 0,
@@ -4985,7 +4985,7 @@ fn quest_action_with_choice(
             if let Some(def) = quest.reward_mount.as_deref().and_then(mount_def)
                 && next.grant_mount(def.id)
             {
-                mount_note = format!(" You earned the {}! Press H to mount.", def.name);
+                mount_note = format!(" You earned the {}! Press ‹mount› to mount.", def.name);
             }
             *character = next;
             character.quests[i].claimed = true;

@@ -28,7 +28,7 @@ is('Tempered Apprentice\'s Gloves', 'Härdade lärlingshandskar');
 is('Defeat the Floodgate Keeper', 'Besegra Slussvaktaren');
 // templates; a player's name is never translated, a {0:t} piece is
 is('You and Fog are now friends.', 'Du och Fog är nu vänner.');
-is('A new quest has found you: Onward to the Crags. Follow it in your journal (Q).', 'Ett nytt uppdrag har hittat dig: Vidare till Crags. Följ det i din journal (Q).');
+is('A new quest has found you: Onward to the Crags. Follow it in your journal (‹quests›).', 'Ett nytt uppdrag har hittat dig: Vidare till Crags. Följ det i din journal (‹quests›).');
 is('Wind entered Greenmeadow.', 'Wind gick in i Greenmeadow.');
 is('Sells for 5 gold each', 'Säljs för 5 guld styck');
 is('You hit Green Slime for 12 (critical) with Hugg.', 'Du träffar Green Slime för 12 (kritiskt) med Hugg.');

@@ -153,7 +153,7 @@ impl World {
         }
         p.character.grant_mount(mount);
         p.character.consume_item(&it.id, 1);
-        let text = format!("{} gained. Press H to mount.", it.name);
+        let text = format!("{} gained. Press ‹mount› to mount.", it.name);
         let _ = p
             .peer
             .try_send(json!({"type":"notice","ok":true,"text":text}));

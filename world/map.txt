@@ -2876,7 +2876,7 @@
       "x": 31,
       "y": 88,
       "color": "#ac7650",
-      "dialogue": "I can replace and fit basic starter gear for free. Hunt enemies for rare upgrades, and bring me spare equipment or materials to sell. Open your inventory with I.",
+      "dialogue": "I can replace and fit basic starter gear for free. Hunt enemies for rare upgrades, and bring me spare equipment or materials to sell. Open your inventory with ‹bags›.",
       "offers": [
         {
           "id": "fitting",
@@ -3007,7 +3007,7 @@
       "x": 38,
       "y": 80,
       "color": "#cc7d83",
-      "dialogue": "Welcome, adventurer! I have a little introduction to Alderhaven for you. Captain Rowan has work at the north gate, too. Open your quest journal with Q to follow your adventures.",
+      "dialogue": "Welcome, adventurer! I have a little introduction to Alderhaven for you. Captain Rowan has work at the north gate, too. Open your quest journal with ‹quests› to follow your adventures.",
       "offers": [
         {
           "id": "stat_reset",

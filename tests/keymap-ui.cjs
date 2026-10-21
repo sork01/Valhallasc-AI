@@ -1,7 +1,7 @@
 // Key map (UI-KEYMAP) in a real browser. Rebind keys on the Keyboard screen (Settings), then play with them: the old key does nothing, the
 // new key works, hints and tooltips read the new key, a taken key is swapped, typing in chat triggers nothing, and everything is still
 // there after a reload. Client-only. MUTATE=1 serves a keymap.js whose labels ignore the player's choices, MUTATE=2 one whose handlers
-// do (the Keyboard screen and labels still work): both runs must fail.
+// do (the Keyboard screen and labels still work), MUTATE=3 one that never fills the ‹action› placeholders: all three runs must fail.
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
@@ -33,7 +33,7 @@ async function hold(page, key, ms) {
   page.on('pageerror', e => errors.push(e.message));
   if (process.env.MUTATE) await page.route('**/keymap.js', async route => {
     const src = fs.readFileSync(path.join(root, 'client/keymap.js'), 'utf8');
-    const body = process.env.MUTATE === '2' ? src.replace('return bindings(action).includes(codeOf(event));', 'return DEFAULTS[action].includes(codeOf(event));') : src.replace('const list = Array.isArray(own) ? own.filter', 'const list = false ? own.filter');
+    const body = process.env.MUTATE === '3' ? src.replace('else r.addedNodes.forEach(fillNode);', '') : process.env.MUTATE === '2' ? src.replace('return bindings(action).includes(codeOf(event));', 'return DEFAULTS[action].includes(codeOf(event));') : src.replace('const list = Array.isArray(own) ? own.filter', 'const list = false ? own.filter');
     assert.notEqual(body, src, 'the mutation applied');
     await route.fulfill({ body, contentType: 'text/javascript' });
   });
@@ -125,6 +125,14 @@ async function hold(page, key, ms) {
   check(/· G$/.test(hints.tracker), `The quest tracker reads G (${hints.tracker})`);
   check(hints.bags === 'Open bags (P / I)' && hints.social === 'Friends and party (O)' && hints.skills === 'Y' && hints.slot === 'V' && hints.slotTitle === 'V', `Hints follow the new keys: ${JSON.stringify(hints)}`);
 
+  // --- texts written by the server and the world data name a key as ‹action› and get the player's key where they land ---
+  await page.evaluate(() => Keys.bind('mount', 0, 'KeyT'));
+  await page.evaluate(() => SystemLog.add('You already own the Horse. Press ‹mount› to mount. Follow it in your journal (‹quests›).', 'notice'));
+  check(await page.locator('#system-log p').last().textContent() === 'You already own the Horse. Press T to mount. Follow it in your journal (G).', 'A notice names the keys the player uses');
+  check(await page.evaluate(() => JSON.stringify(WORLD_MAP).includes('journal with ‹quests›')), 'The NPC dialogue data carries the placeholder');
+  await page.evaluate(() => { document.getElementById('class-desc').dataset.i18n = 'assassinDesc'; Keys.bind('dash', 0, 'KeyV'); });
+  check((await page.locator('#class-desc').textContent()).endsWith('Shadowstep through danger with V.'), `The Assassin blurb follows Shadow Step's key (${await page.locator('#class-desc').textContent()})`);
+
   // --- it persists ---
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('valhallasc.save.v1')).keys);
   check(stored.quests[0] === 'KeyG' && stored.party[0] === 'KeyU' && stored.moveLeft[0] === 'KeyR' && !('friends' in stored), `Only the changed actions are stored: ${JSON.stringify(Object.keys(stored))}`);
@@ -156,6 +164,10 @@ async function hold(page, key, ms) {
   await sv.waitForFunction(() => document.getElementById('wm-open').getAttribute('title') === 'Världskarta (X)', null, { timeout: 5000 });
   const swedish = await sv.evaluate(() => ({ map: document.getElementById('wm-open').getAttribute('title'), friends: document.getElementById('social-open').getAttribute('aria-label'), bags: document.getElementById('inventory-open').getAttribute('aria-label'), chat: document.getElementById('chat-input').placeholder }));
   check(swedish.friends === 'Vänner och grupp (Mellanslag)' && swedish.bags === 'Öppna väskor (U / I)', `The Swedish hints follow the keys: ${JSON.stringify(swedish)}`);
+  await sv.evaluate(() => { document.getElementById('class-desc').dataset.i18n = 'assassinDesc'; Keys.bind('mount', 0, 'Space'); Keys.bind('dash', 0, 'KeyV'); const p = document.createElement('p'); p.id = 'tok'; p.textContent = 'You already own the Horse. Press ‹mount› to mount.'; document.body.append(p); });
+  await sv.waitForFunction(() => /Tryck på Mellanslag för att sitta upp/.test(document.getElementById('tok').textContent), null, { timeout: 5000 });
+  check(true, 'A Swedish notice gets the key too, key name translated');
+  check(/på V\.$/.test(await sv.locator('#class-desc').textContent()), `The Swedish blurb follows Shadow Step's key (${await sv.locator('#class-desc').textContent()})`);
   await sv.close();
   check(errors.length === 0, `No page errors: ${errors.join(' | ')}`);
   console.log(`keymap-ui: ${checks} checks passed`);
