@@ -1,6 +1,6 @@
 //! Arena gauntlet quests (`docs/arena-quests.md`): the quest data, a whole run of five fights and its reward, the ways a
 //! run ends without one, and that an opponent is nobody's player but the hero's foe.
-use super::gauntlet::FIGHTS;
+use super::gauntlet::{FIGHTS, opponent_character};
 use super::ttk::{Case, build_character};
 use super::wyrd_tests::{drain, join, world};
 use super::*;
@@ -359,5 +359,47 @@ fn an_opponent_closes_in_and_fights_back() {
                 .distance(o.character.point())
                 < start
         );
+    }
+}
+
+#[test]
+fn every_opponent_wears_a_full_green_set_of_its_level() {
+    for class in [
+        Class::Warrior,
+        Class::Mage,
+        Class::Assassin,
+        Class::Priest,
+        Class::Hunter,
+    ] {
+        for level in [20, 30, 40, 50, 60, 70, 80, 90, 99] {
+            let c = opponent_character(class, level, "Arena Test");
+            let want = (level / 5 * 5).clamp(5, 95);
+            let worn = c.worn_items();
+            let green: Vec<_> = worn
+                .iter()
+                .filter(|i| {
+                    i.rarity == "uncommon"
+                        && i.required_level == want
+                        && i.class.is_none_or(|k| k == class)
+                })
+                .collect();
+            assert_eq!(
+                green.len(),
+                8,
+                "{class:?} at {level}: {:?}",
+                worn.iter().map(|i| &i.id).collect::<Vec<_>>()
+            );
+            assert_eq!(
+                (c.level, c.hp, c.stat_points()),
+                (level, c.max_hp(), 0),
+                "{class:?} at {level}"
+            );
+            assert!(
+                c.inventory
+                    .iter()
+                    .all(|s| item(&s.item).is_some_and(|i| i.kind != "potion")),
+                "no potions"
+            );
+        }
     }
 }

@@ -6408,5 +6408,6 @@
   "Arena Assassin": "Arenalönnmördare",
   "Arena Priest": "Arenapräst",
   "Arena Hunter": "Arenajägare",
-  "Leave the gauntlet": "Lämna prövningen"
+  "Leave the gauntlet": "Lämna prövningen",
+  " · Opponent": " · Motståndare"
 }

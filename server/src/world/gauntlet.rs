@@ -83,6 +83,25 @@ fn green_gear(class: Class, level: u32) -> Vec<(&'static str, String)> {
         .collect()
 }
 
+/// An opponent: `class` at `level` in plain green gear with its attribute points spent, at full health and resource.
+pub(super) fn opponent_character(class: Class, level: u32, name: &str) -> Character {
+    let mut character = Character::mercenary(class, level, name);
+    character.inventory.clear();
+    character.attributes = Attributes::default();
+    let mut equip = BTreeMap::new();
+    for (slot, id) in green_gear(class, level) {
+        character.add_item(&id, 1);
+        equip.insert(slot.to_string(), id);
+    }
+    let _ = character.equip_slots(&equip);
+    if character.stat_points() > 0 {
+        let _ = character.allocate_recommended();
+    }
+    character.hp = character.max_hp();
+    character.reset_resource();
+    character
+}
+
 /// The distance `pvp_attack` allows for a class.
 fn attack_range(class: Class) -> f64 {
     class.reach().max(if class.ranged() { 8. } else { 1.8 })
@@ -399,20 +418,7 @@ impl World {
         let (owner, level, zone, class) = (run.owner, run.level, run.zone, run.order[run.won]);
         let (fight, owner_id) = (run.won + 1, self.players[&owner].character.id.clone());
         let name = format!("Arena {}", class_title(class));
-        let mut character = Character::mercenary(class, level, &name);
-        character.inventory.clear();
-        character.attributes = Attributes::default();
-        let mut equip = BTreeMap::new();
-        for (slot, id) in green_gear(class, level) {
-            character.add_item(&id, 1);
-            equip.insert(slot.to_string(), id);
-        }
-        let _ = character.equip_slots(&equip);
-        if character.stat_points() > 0 {
-            let _ = character.allocate_recommended();
-        }
-        character.hp = character.max_hp();
-        character.reset_resource();
+        let mut character = opponent_character(class, level, &name);
         character.zone = zone;
         let mut spot = OPPONENT_SPOT;
         self.maps[zone].collide(&mut spot, PLAYER_RADIUS);

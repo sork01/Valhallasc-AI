@@ -65,8 +65,8 @@ How to read it: scripted play loses outright to at least one class at nearly eve
 a 0% pair cell, not noise), so a run of five is rarely won by a script. A person plays better than the script (kiting, dashes,
 potions, picking skills by the situation, the healing between fights is already counted) and the quests ask for exactly that,
 but the numbers say the five-fight run is hard for every class. If the owner wants it easier, the knobs are the opponents'
-level and gear only (PvP balancing stays closed): for example blue-less gear one tier lower, or the opponent level one below
-the quest's. To measure a change, run `bash scripts/duel-parallel.sh` with the new opponent setup.
+level and gear only (PvP balancing stays closed): for example the previous green set (five levels lower, `green_gear` in
+`gauntlet.rs`), or the opponent's level one step below the quest's. To measure a change, run `bash scripts/duel-parallel.sh` with the new opponent setup.
 
 ## How it works
 
@@ -88,6 +88,11 @@ the quest's. To measure a change, run `bash scripts/duel-parallel.sh` with the n
 ## Checks
 
 - Rust: `bash scripts/cargo.sh test gauntlet` (data of all 45 quests, a whole run with the reward, lost/timed-out/forfeited/
-  logged-out runs, the pair-only legality, private rings, one trial per level).
-- Browser: `tests/gauntlet-ui.cjs` (offer button, banner, countdown, attack, hand-in).
+  logged-out runs, the pair-only legality, private rings, one trial per level, the opponent walking up and fighting, and a
+  full green set for every class at all nine levels).
+- Browser: `tests/gauntlet-ui.cjs` (refusal and accept at the giver, offer button, banner, countdown, the opponent marked in the
+  snapshot, walking up and hitting it with the attack key, forfeit, the turn-in through the gossip window). Needs the
+  worktree's `target/debug/valhalla-server` (the MCP launcher drops `VALHALLA_BINARY`), `NODE_PATH` with the dybase2 modules
+  and `PLAYWRIGHT_BROWSERS_PATH` with chromium-headless-shell.
+- Not done: an MCP scenario (`node scripts/test-via-mcp.cjs run gauntlet`) for levels 20 and 99.
 - Swedish: `python3 scripts/build_swedish.py --check`.

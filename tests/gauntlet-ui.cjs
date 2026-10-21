@@ -1,5 +1,5 @@
-// A real client takes an arena trial: the giver's offer, the banner and its countdown, the opponent appearing and being
-// targeted, forfeiting, and handing the won quest in. Needs VALHALLA_BINARY (a build with the gauntlet) and
+// A real client takes an arena trial: the giver's offer, the banner and its countdown, the opponent appearing, being marked
+// as an opponent, targeted and hit with the attack key, forfeiting, and handing a finished trial in for its weapon. Needs VALHALLA_BINARY (a build with the gauntlet) and
 // PLAYWRIGHT_BROWSERS_PATH with chromium-headless-shell.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -57,10 +57,34 @@ async function call(name, args = {}) {
   await page.waitForFunction(id => Field.remotePlayers.some(p => p.id === id), opponent.id, { timeout: 15000 });
   check(await page.evaluate(id => Pvp.canAttack(id, false), opponent.id), 'The hero may attack the opponent');
   check((await page.locator('#gauntlet-line').textContent()).includes(opponent.name), 'The banner names the opponent');
+  check(await page.evaluate(id => Field.remotePlayers.find(p => p.id === id)?.gauntlet === true, opponent.id), 'The snapshot marks the opponent for its nameplate');
+  // Walk up to it and swing with the attack key: its health must drop.
+  await page.evaluate(id => Field.targetPlayer(id), opponent.id);
+  let hit = false;
+  for (let i = 0; i < 100 && !hit; i++) {
+    const near = await page.evaluate(id => {
+      const o = Field.remotePlayers.find(p => p.id === id); if (!o) return null;
+      if (o.hp < o.maxHp) return 'hit';
+      const d = Math.hypot(o.x - Field.hero.x, o.y - Field.hero.y);
+      if (d > 1.4) Online.send({ type: 'move', x: o.x, y: o.y });
+      return d <= 1.4 ? 'close' : 'far';
+    }, opponent.id);
+    if (near === 'hit') hit = true;
+    else { if (near === 'close') await page.keyboard.press('Space'); await page.waitForTimeout(300); }
+  }
+  check(hit, 'Attacking the opponent with the attack key takes its health down');
   // Forfeit: back at the giver, the progress reset, the banner gone.
   await page.locator('#gauntlet-leave').click();
   await page.waitForFunction(() => Field.hero.zone === 4 && !Pvp.state.gauntlet, null, { timeout: 15000 });
   check(await page.locator('#gauntlet-banner').isHidden(), 'The banner goes away when the run ends');
+  // A finished trial is handed in at the giver for the class weapon, experience and gold.
+  await page.evaluate(() => Online.send({ type: 'debug', command: { op: 'quest', id: 'arena_skald_20', action: 'complete' } }));
+  await page.evaluate(() => Field.visitNpc('city_steward'));
+  await dialogue.waitFor({ state: 'visible' });
+  await dialogue.locator('.gossip-row[data-quest="arena_skald_20"]').click();
+  await dialogue.locator('[data-action="claim"][data-item]').click();
+  await page.waitForFunction(() => document.querySelector('#npc-dialogue').textContent.includes('Quest complete: Arena Trial: Initiate'));
+  check((await dialogue.innerText()).includes('Received'), 'The turn-in pays the weapon');
   assert.deepEqual(errors, [], 'No browser errors');
   console.log(`gauntlet-ui: ${checks} checks passed`);
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
