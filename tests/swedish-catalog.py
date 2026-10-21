@@ -19,6 +19,9 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 import build_swedish as build  # noqa: E402
 
 text = json.loads(build.TEXT_FILE.read_text())
+foundry = json.loads((ROOT / 'scripts' / 'sv-blackhour-translations.txt').read_text())  # merged into the catalog by build_swedish.main()
+assert not (text.keys() & foundry.keys()), 'duplicate Foundry translations'
+text.update(foundry)
 templates = json.loads(build.TEMPLATE_FILE.read_text())
 keep = set(json.loads(build.KEEP_FILE.read_text()))
 ignore = set(json.loads(build.IGNORE_FILE.read_text()))
