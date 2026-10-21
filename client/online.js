@@ -93,6 +93,7 @@
         case 'dialogue': window.City?.dialogue(packet); break;
         case 'chat': window.Field?.bubble(packet.id, packet.text, packet.channel === 'party'); log(packet.text, packet.channel === 'party' ? `[Party] ${packet.name}` : packet.name, packet.channel); break;
         case 'system': log(packet.text); break;
+        case 'announce': log(packet.text); window.Announce?.show(packet.text, packet.kind); break;
         case 'notice': log(packet.text, null, packet.ok === false ? 'refused' : 'notice'); window.Social?.onNotice(packet); break;
         case 'debug': window.GM?.onReply(packet); break;
         case 'social': window.Social?.onState(packet); break;

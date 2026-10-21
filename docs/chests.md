@@ -59,6 +59,8 @@ A chest holds **one gold pile, one material stack, two equipment rolls and one o
 - On open: "<name> opened the treasure chest." On despawn with nobody opening it: "The treasure chest has vanished."
 - Players arriving later see the chest in their snapshot with its remaining seconds, and receive the spawn message once.
 
+**Delivery (`UI-ANNOUNCE`, 2026-10-21):** these lines no longer travel as `system` packets. They are `{"type":"announce","kind":"treasure","text":...}`; `client/announce.js` shows them as a big line about 25% down the stage (three at most, fading by themselves, `pointer-events: none`), and `online.js` writes the same text to the chat log and the System tab once. The King Slime emergence uses kind `boss`; the arena gauntlet fight start and result use kind `quest`. Check `tests/announce-ui.cjs`.
+
 ## World-map marker
 
 None. The point is to search, so chests appear neither on the minimap nor on the world map.

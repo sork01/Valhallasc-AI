@@ -1717,7 +1717,7 @@ impl World {
         enemy.x = point.x;
         enemy.y = point.y;
         self.slimes[id] = enemy;
-        self.emit(json!({"type":"system","text":"A King Slime has emerged in Greenmeadow!"}));
+        self.emit(json!({"type":"announce","kind":"boss","text":"A King Slime has emerged in Greenmeadow!"}));
     }
     fn emit(&self, value: Value) {
         let hidden_actor = value["actor"]

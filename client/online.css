@@ -454,7 +454,7 @@
 .party-frame .social-who small { display: none; }
 .party-frame .member-bar { width: 100%; height: 1cqw; }
 .loot-rolls { position: absolute; left: 50%; top: 11cqw; transform: translateX(-50%); z-index: 43; align-items: stretch; display: flex; flex-direction: column; gap: .5cqw; width: 18cqw; }
-.rare-pickup { --rare-col: #4ad66d; position: absolute; left: 50%; top: 23%; transform: translateX(-50%); z-index: 62; pointer-events: none; display: grid; gap: .25cqw; min-width: 25cqw; max-width: 70%; padding: .9cqw 2.4cqw; border: 2px solid var(--rare-col); border-radius: .8cqw; background: #10152eec; box-shadow: 0 0 1cqw var(--rare-col); color: var(--rare-col); text-align: center; }
+.rare-pickup { --rare-col: #4ad66d; position: absolute; left: 50%; top: 12%; transform: translateX(-50%); z-index: 62; pointer-events: none; display: grid; gap: .25cqw; min-width: 25cqw; max-width: 70%; padding: .9cqw 2.4cqw; border: 2px solid var(--rare-col); border-radius: .8cqw; background: #10152eec; box-shadow: 0 0 1cqw var(--rare-col); color: var(--rare-col); text-align: center; }
 .rare-pickup b { font: max(18px, 2cqw) 'Lilita One', 'Jua', sans-serif; text-shadow: 0 0 .7cqw var(--rare-col); }
 .rare-pickup span { color: #fff7e8; font: max(14px, 1.3cqw) 'Jua', sans-serif; }
 .rare-pickup[data-rarity="rare"] { --rare-col: #64b5ff; box-shadow: 0 0 1.7cqw var(--rare-col); }
@@ -852,3 +852,13 @@
 .key-reset { color: #dfc9a0; border-color: #6c5d3d; }
 .key-reset:disabled { opacity: .35; cursor: default; }
 @media (pointer: coarse) { .key-cell, .key-reset { min-height: 44px; min-width: 44px; } }
+
+/* Big centre announcements (announce.js): about 25% down, stacked, fading by themselves, never taking clicks. */
+.announce { position: absolute; left: 0; width: 100%; top: 25%; z-index: 63; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: .6cqw; }
+.announce-line { --ann-col: #f2d27a; margin: 0; max-width: 80%; padding: .7cqw 2.6cqw; border: 2px solid var(--ann-col); border-radius: .8cqw; background: #10152ed9; box-shadow: 0 0 1.4cqw var(--ann-col); color: #fff7e8; text-align: center; font: max(18px, 2.4cqw) 'Lilita One', 'Jua', sans-serif; text-shadow: 0 .15cqw .4cqw #000, 0 0 .8cqw var(--ann-col); opacity: 1; transition: opacity .7s ease; animation: announce-in .45s cubic-bezier(.15,1.4,.3,1) both; }
+.announce-line[data-kind="boss"] { --ann-col: #ff6a5a; }
+.announce-line[data-kind="quest"] { --ann-col: #64b5ff; }
+.announce-line[data-kind="info"] { --ann-col: #cfd6e6; }
+.announce-line.out { opacity: 0; }
+@keyframes announce-in { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .announce-line { animation: none; transition: none; } }

@@ -274,7 +274,9 @@ impl World {
                             "A treasure chest has appeared! It will vanish in {minutes} minute{}.",
                             if minutes == 1 { "" } else { "s" }
                         );
-                        let _ = p.peer.try_send(json!({"type":"system","text":text}));
+                        let _ = p
+                            .peer
+                            .try_send(json!({"type":"announce","kind":"treasure","text":text}));
                     }
                 }
             }
@@ -302,7 +304,9 @@ impl World {
     }
     fn chest_say(&self, zone: usize, text: &str) {
         for p in self.players.values().filter(|p| p.character.zone == zone) {
-            let _ = p.peer.try_send(json!({"type":"system","text":text}));
+            let _ = p
+                .peer
+                .try_send(json!({"type":"announce","kind":"treasure","text":text}));
         }
     }
     /// Creates a chest in `zone` on a placed tile; false when no tile fit (the roll is skipped and logged).
@@ -768,6 +772,38 @@ mod tests {
             (rate - CHEST_SPAWN_CHANCE).abs() < 0.03,
             "{spawned}/{rolls} = {rate}"
         );
+    }
+
+    #[test]
+    fn chest_lines_travel_as_announcements_not_system_lines() {
+        let mut w = world();
+        calm(&mut w);
+        let mut rx = join(&mut w, 1, Class::Warrior);
+        place(&mut w, 1, 0, at(60., 60.));
+        assert!(w.spawn_chest(0));
+        w.step();
+        let got = drain(&mut rx);
+        let spawn = got
+            .iter()
+            .find(|v| {
+                v["text"]
+                    .as_str()
+                    .is_some_and(|t| t.contains("treasure chest has appeared"))
+            })
+            .expect("the spawn line");
+        assert_eq!(spawn["type"], "announce");
+        assert_eq!(spawn["kind"], "treasure");
+        w.chests.list[0].left = 0.2;
+        for _ in 0..8 {
+            w.step();
+        }
+        let got = drain(&mut rx);
+        let vanished = got
+            .iter()
+            .find(|v| v["text"] == "The treasure chest has vanished.")
+            .expect("the vanish line");
+        assert_eq!(vanished["type"], "announce");
+        assert!(!got.iter().any(|v| v["type"] == "system"));
     }
 
     #[test]
