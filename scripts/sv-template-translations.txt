@@ -315,5 +315,9 @@
   "Fight {0} of {1} won. Health and mana restored; the next one starts in {2} seconds.": "Strid {0} av {1} vunnen. Hälsa och mana återställda; nästa börjar om {2} sekunder.",
   "Arena gauntlet · Fight {0} of {1}": "Arenaprövning · Strid {0} av {1}",
   "Next: {0} · starts in {1}s": "Nästa: {0:t} · börjar om {1} s",
-  "{0} · {1}s left": "{0:t} · {1} s kvar"
+  "{0} · {1}s left": "{0:t} · {1} s kvar",
+  "A party holds {0}. Remove {1} members first.": "En grupp rymmer {0}. Ta först bort {1} medlemmar.",
+  "The party is now a raid of up to {0}.": "Gruppen är nu en raid på upp till {0}.",
+  "{0} departs: the raid contract ends outside the raid.": "{0} lämnar: raidkontraktet gäller bara i raiden.",
+  "{0} needs exactly {1} fighters, hired ones included. Your group has {2}.": "{0} kräver exakt {1} kämpar, legosoldater inräknade. Din grupp har {2}."
 }

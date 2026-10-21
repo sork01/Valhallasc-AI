@@ -6495,5 +6495,17 @@
   "Warm Stones, Old Lies": "Varma stenar, gamla lögner",
   "Yrsa feeds air into the mountain. Silence the living bellows before the last chain cracks.": "Yrsa blåser in luft i berget. Tysta den levande blåsbälgen innan den sista kedjan brister.",
   "Yrsa, the Living Bellows": "Yrsa, den levande blåsbälgen",
-  "Yrsa, the Living Bellows Relic": "Relik från Yrsa, den levande blåsbälgen"
+  "Yrsa, the Living Bellows Relic": "Relik från Yrsa, den levande blåsbälgen",
+  "Back to a party of 5": "Tillbaka till en grupp på 5",
+  "Leave raid": "Lämna raiden",
+  "Make a raid of 10": "Gör om till en raid på 10",
+  "Only the party leader can start a raid contract.": "Bara gruppledaren kan starta ett raidkontrakt.",
+  "Remove members until five are left": "Ta bort medlemmar tills fem är kvar",
+  "The raid contract": "Raidkontraktet",
+  "The raid is a party again.": "Raiden är en grupp igen.",
+  "The raid cannot become a party while someone is inside it.": "Raiden kan inte bli en grupp medan någon är inne i den.",
+  "Your group is not a raid.": "Din grupp är ingen raid.",
+  "Your party is already a raid.": "Din grupp är redan en raid.",
+  "Your raid is full": "Din raid är full",
+  "That raid is full": "Den raiden är full"
 }

@@ -186,6 +186,16 @@ impl World {
                     o.open && o.merc.as_deref() == Some(class_title(class).to_lowercase().as_str())
                 })
             });
+        // The quartermaster at a raid door: hires every free seat of a raid group, no quest asked.
+        let raid_contract = self.maps[c.zone]
+            .npcs
+            .iter()
+            .find(|n| n.id == npc_id)
+            .is_some_and(|n| {
+                n.offers.iter().any(|o| {
+                    o.raid && o.merc.as_deref() == Some(class_title(class).to_lowercase().as_str())
+                })
+            });
         let (wanted, title, contract) = match quest {
             Some((_, _, _, true)) => {
                 return Err(
@@ -193,6 +203,7 @@ impl World {
                 );
             }
             Some((wanted, title, id, false)) => (wanted, title, Some(id)),
+            None if raid_contract => (social::RAID_MAX, "The raid contract".to_owned(), None),
             None if open => (social::PARTY_MAX, "The Meeting Stone".to_owned(), None),
             None => {
                 return Err(
@@ -201,6 +212,15 @@ impl World {
             }
         };
         let owner = c.id.clone();
+        // A raid contract turns the leader's (or a lone hirer's) group into a raid; a member signs only for a raid.
+        if raid_contract
+            && self
+                .party_leader(&owner)
+                .is_some_and(|leader| leader != owner)
+            && !self.party_is_raid(&owner)
+        {
+            return Err("Only the party leader can start a raid contract.".into());
+        }
         let party = self.party_mates(&owner).len();
         if party >= wanted {
             return Err(format!(
@@ -231,7 +251,7 @@ impl World {
         self.maps[zone].collide(&mut arrival, PLAYER_RADIUS);
         character.x = arrival.x;
         character.y = arrival.y;
-        self.party_add_mercenary(&owner, &character)?;
+        self.party_add_mercenary_as(&owner, &character, raid_contract)?;
         let merc_session = MERC_BASE + self.merc_seq;
         self.merc_seq += 1;
         // Nobody reads a mercenary's socket: a closed channel makes every send a harmless no-op.
@@ -239,6 +259,7 @@ impl World {
         let mut merc = Player::new(character, tx);
         merc.merc = Some(owner);
         merc.merc_quest = contract;
+        merc.merc_raid = raid_contract.then_some(zone);
         self.players.insert(merc_session, merc);
         self.players.get_mut(&session).unwrap().character.gold -= price;
         Ok(format!(
@@ -303,6 +324,18 @@ impl World {
                                 .is_none_or(|q| q.ready(progress))
                     })
             });
+            // A raid contract's fighters follow their hirer only to the raid: anywhere else they are let go.
+            let left_raid = p
+                .merc_raid
+                .is_some_and(|door| hirer.zone != door && !self.maps[hirer.zone].raid);
+            if left_raid {
+                let name = p.character.look.name.clone();
+                let _ = self.players[&owner].peer.try_send(
+                    json!({"type":"system","text":format!("{name} departs: the raid contract ends outside the raid.")}),
+                );
+                self.remove_mercenary(session);
+                continue;
+            }
             let cleared =
                 self.instance_cleared(p.character.zone) || self.instance_cleared(hirer.zone);
             if objective_done || cleared {

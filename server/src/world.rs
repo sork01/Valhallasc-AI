@@ -252,6 +252,9 @@ struct Player {
     merc: Option<String>,
     /// The particular group objective this fighter was hired for; Meeting Stone hires have no quest contract.
     merc_quest: Option<String>,
+    /// Set on a fighter hired by a raid contract: the zone of the raid door. The contract ends when the hirer is
+    /// neither there nor inside a raid.
+    merc_raid: Option<usize>,
     /// A temporary autonomous adventurer in an occupied shared zone.
     ambient: Option<ambient::Ambient>,
     /// Set on a stranded person walking an escort quest's route (see world/escort.rs). Always with `merc` set to the
@@ -353,6 +356,7 @@ impl Player {
             visible_zone,
             merc: None,
             merc_quest: None,
+            merc_raid: None,
             ambient: None,
             escort: None,
             gauntlet: false,
@@ -3025,6 +3029,21 @@ impl World {
             p.portal_at = self.time;
             let _ = p.peer.try_send(json!({"type":"error","text":text}));
             return;
+        }
+        // A raid's door asks for a full group, mercenaries counted: fewer cannot win, and a party holds no more.
+        if self.maps[portal.to].raid {
+            let group = self.party_mates(&p.character.id).len();
+            if group != social::RAID_MAX {
+                let text = format!(
+                    "{} needs exactly {} fighters, hired ones included. Your group has {group}.",
+                    self.maps[portal.to].name,
+                    social::RAID_MAX
+                );
+                let p = self.players.get_mut(&session).unwrap();
+                p.portal_at = self.time;
+                let _ = p.peer.try_send(json!({"type":"error","text":text}));
+                return;
+            }
         }
         // A dungeon's door leads to a private copy: the party's own, or a free one.
         if self.maps[portal.to].copies > 0 {
@@ -9864,6 +9883,7 @@ mod tests {
             final_boss: String::new(),
             players: 0,
             min_level: 0,
+            raid: false,
             template: None,
         };
         let blocker = Point { x: 21.9, y: 20.5 };

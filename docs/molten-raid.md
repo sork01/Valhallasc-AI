@@ -218,6 +218,22 @@ recompute it from the slowest measured Eldmarr win (`ceil(1.5 Ã— slowest / 60) Ã
   (proposed, so a disconnect does not lose the night).
 * **Death.** The fallen stay down while a boss fight runs (section 5).
 
+### 6.1 What `RAID-PARTY` built (2026-10-21)
+
+* `Party.raid` and `social::RAID_MAX` (10); `party_raid` (leader only). Turning it off needs five or fewer members and
+  nobody inside a raid zone. Pending invites count against the party's own cap.
+* `Map.raid` marks the raid zone and its copies. `use_portal` refuses a group that is not exactly ten (mercenaries
+  counted) with the count in the message; a lone hero with no party is simply a group of one, so it is refused too.
+* Raid contract: an NPC offer with `raid: true` and a class (`merc_warrior`, ...) hires one fighter per click up to ten
+  minus the group, at `merc_price`, with no quest. The leader (or a lone hirer) signs and the group becomes a raid; a
+  member signs only for a group that already is one. Its fighters carry `Player.merc_raid` = the door's zone and are
+  let go once the hirer is neither in that zone nor in a raid zone. The NPC and the portal come with `RAID-MAP`.
+* Loot in a raid zone: items (rolls, the gray round robin) are for humans only; one human gets the piece at once; a
+  mercenary's kill belongs to its hirer; gold still splits among everyone and a mercenary's share is destroyed.
+* XP: unchanged. The owner pointed out that level 99 is the highest level, so XP is moot in the raid.
+* Open for `RAID-MAP`: the quartermaster and door in `map.txt`, the raid-zone `FALLEN_HOLD_MAX`, whether the nine
+  contract fighters should be dismissed when the group wipes.
+
 ## 7. The zone and the copy ids (derived, recheck at release)
 
 Public zone 46, a sealed template with **three** copies: the template is copy 0 and

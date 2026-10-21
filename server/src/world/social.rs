@@ -7,6 +7,8 @@
 use super::*;
 
 pub const PARTY_MAX: usize = 5;
+/// A party its leader has turned into a raid holds this many, humans and mercenaries together.
+pub const RAID_MAX: usize = 10;
 pub const FRIENDS_MAX: usize = 50;
 const INVITE_LIFETIME: f64 = 60.;
 /// A member who disconnects keeps their party seat this long, so a dropped connection that reconnects is not a kick.
@@ -51,6 +53,13 @@ struct Member {
 struct Party {
     leader: String,
     members: Vec<Member>,
+    /// A raid holds up to `RAID_MAX` members instead of `PARTY_MAX`. Everything else about it is a party.
+    raid: bool,
+}
+impl Party {
+    fn cap(&self) -> usize {
+        if self.raid { RAID_MAX } else { PARTY_MAX }
+    }
 }
 #[derive(Default)]
 pub struct Social {
@@ -177,7 +186,7 @@ impl World {
                     "place":null,"online":false,"dead":false,"quests":[]}),
             })
             .collect();
-        json!({"leader":party.leader,"max":PARTY_MAX,"members":members,"xp":self.party_xp_value(&party.leader)})
+        json!({"leader":party.leader,"max":party.cap(),"raid":party.raid,"members":members,"xp":self.party_xp_value(&party.leader)})
     }
     fn social_state(&self, id: &str) -> Value {
         let Some(p) = self.online(id) else {
@@ -404,6 +413,7 @@ impl World {
             }
             SocialCommand::PartyKick { id } => self.party_kick(&me, &id),
             SocialCommand::PartyPromote { id } => self.party_promote(&me, &id),
+            SocialCommand::PartyRaid { on } => self.party_raid(&me, on),
             SocialCommand::PartyChat { text } => self.party_chat(session, &me, &text),
         };
         if let Err(text) = result {
@@ -611,9 +621,10 @@ impl World {
             .iter()
             .filter(|i| i.kind == InviteKind::Party && i.from == me)
             .count();
-        if size + pending >= PARTY_MAX {
-            return Err(if size >= PARTY_MAX {
-                format!("Your party is full ({PARTY_MAX}/{PARTY_MAX}).")
+        let cap = mine.map_or(PARTY_MAX, |i| self.social.parties[i].cap());
+        if size + pending >= cap {
+            return Err(if size >= cap {
+                self.full_text(mine, "Your")
             } else {
                 "Your open invites already fill the party.".into()
             });
@@ -660,8 +671,8 @@ impl World {
                 if self.social.parties[i].leader != from {
                     return Err(format!("{their} is no longer the party leader."));
                 }
-                if self.social.parties[i].members.len() >= PARTY_MAX {
-                    return Err(format!("That party is full ({PARTY_MAX}/{PARTY_MAX})."));
+                if self.social.parties[i].members.len() >= self.social.parties[i].cap() {
+                    return Err(self.full_text(Some(i), "That"));
                 }
                 self.social.parties[i].members.push(me_member);
                 i
@@ -670,6 +681,7 @@ impl World {
                 self.social.parties.push(Party {
                     leader: from.to_owned(),
                     members: vec![inviter, me_member],
+                    raid: false,
                 });
                 self.social.parties.len() - 1
             }
@@ -741,10 +753,25 @@ impl World {
         self.push_social(&ids);
     }
     /// Seats a hired mercenary in `owner`'s party (making one with them when they have none).
+    #[cfg(test)]
     pub(super) fn party_add_mercenary(
         &mut self,
         owner: &str,
         merc: &Character,
+    ) -> Result<(), String> {
+        self.party_add_mercenary_as(owner, merc, false)
+    }
+    /// Whether `id`'s party is a raid.
+    pub(super) fn party_is_raid(&self, id: &str) -> bool {
+        self.party_index(id)
+            .is_some_and(|i| self.social.parties[i].raid)
+    }
+    /// `party_add_mercenary`; a raid contract also makes the group a raid, so it can take the free seats.
+    pub(super) fn party_add_mercenary_as(
+        &mut self,
+        owner: &str,
+        merc: &Character,
+        raid_contract: bool,
     ) -> Result<(), String> {
         let member = |id: &str, c: &Character| Member {
             id: id.to_owned(),
@@ -753,10 +780,15 @@ impl World {
             level: c.level,
         };
         let merc_member = member(&merc.id, merc);
+        let raid_zone = self.maps[merc.zone].raid || raid_contract;
         let index = match self.party_index(owner) {
             Some(i) => {
-                if self.social.parties[i].members.len() >= PARTY_MAX {
-                    return Err(format!("Your party is full ({PARTY_MAX}/{PARTY_MAX})."));
+                // A hire inside a raid (a solo hirer's party starts there) makes the group a raid.
+                if raid_zone {
+                    self.social.parties[i].raid = true;
+                }
+                if self.social.parties[i].members.len() >= self.social.parties[i].cap() {
+                    return Err(self.full_text(Some(i), "Your"));
                 }
                 self.social.parties[i].members.push(merc_member);
                 i
@@ -768,11 +800,62 @@ impl World {
                 self.social.parties.push(Party {
                     leader: owner.to_owned(),
                     members: vec![me, merc_member],
+                    raid: raid_zone,
                 });
                 self.social.parties.len() - 1
             }
         };
         self.push_party_members(index);
+        Ok(())
+    }
+    /// "Your party is full (5/5)." / "That raid is full (10/10)."
+    fn full_text(&self, party: Option<usize>, whose: &str) -> String {
+        let (word, cap) = match party.map(|i| &self.social.parties[i]) {
+            Some(p) if p.raid => ("raid", RAID_MAX),
+            _ => ("party", PARTY_MAX),
+        };
+        format!("{whose} {word} is full ({cap}/{cap}).")
+    }
+    /// The leader turns the party into a raid (ten seats) or back into a party (five or fewer members, and nobody
+    /// inside a raid, where the door counted them).
+    fn party_raid(&mut self, me: &str, on: bool) -> Result<(), String> {
+        let i = self.party_index(me).ok_or("You are not in a party.")?;
+        if self.social.parties[i].leader != me {
+            return Err("Only the party leader can do that.".into());
+        }
+        let party = &self.social.parties[i];
+        if party.raid == on {
+            return Err(if on {
+                "Your party is already a raid.".into()
+            } else {
+                "Your group is not a raid.".into()
+            });
+        }
+        if !on {
+            if party.members.len() > PARTY_MAX {
+                return Err(format!(
+                    "A party holds {PARTY_MAX}. Remove {} members first.",
+                    party.members.len() - PARTY_MAX
+                ));
+            }
+            let inside = party.members.iter().any(|m| {
+                self.online(&m.id)
+                    .is_some_and(|p| self.maps[p.character.zone].raid)
+            });
+            if inside {
+                return Err("The raid cannot become a party while someone is inside it.".into());
+            }
+        }
+        self.social.parties[i].raid = on;
+        let text = if on {
+            format!("The party is now a raid of up to {RAID_MAX}.")
+        } else {
+            "The raid is a party again.".to_owned()
+        };
+        for m in self.social.parties[i].members.clone() {
+            self.tell(&m.id, text.clone(), true);
+        }
+        self.push_party_members(i);
         Ok(())
     }
     fn party_member_of(&self, me: &str, target: &str) -> Result<usize, String> {
@@ -1276,6 +1359,223 @@ mod tests {
         assert_eq!(party_of(&w, &leader).unwrap().len(), PARTY_MAX);
         assert_eq!(w.social.parties.len(), 1);
         let _ = heard(&mut sixth);
+    }
+
+    #[test]
+    fn a_leader_turns_a_party_into_a_raid_of_ten_and_back_into_a_party_of_five() {
+        let mut w = world();
+        let mut leader = add(&mut w, 1, "Lead");
+        let mut crew: Vec<Player> = (2..=12)
+            .map(|s| add(&mut w, s, &format!("Mem{s}")))
+            .collect();
+        for m in crew.iter().take(4) {
+            say(&mut w, &leader, invite_by_id(m));
+            say(&mut w, m, accept_party(&leader));
+        }
+        // The fifth seat was the last: the sixth is told to wait, and only the leader can make a raid.
+        say(&mut w, &leader, invite_by_id(&crew[4]));
+        refused(&mut leader, "Your party is full (5/5)");
+        say(&mut w, &crew[0], SocialCommand::PartyRaid { on: true });
+        refused(&mut crew[0], "Only the party leader");
+        say(&mut w, &leader, SocialCommand::PartyRaid { on: true });
+        let state = latest_state(&mut crew[3]);
+        assert_eq!(state["party"]["raid"], true);
+        assert_eq!(state["party"]["max"], 10);
+        say(&mut w, &leader, SocialCommand::PartyRaid { on: true });
+        refused(&mut leader, "already a raid");
+        for m in crew.iter().take(9).skip(4) {
+            say(&mut w, &leader, invite_by_id(m));
+            say(&mut w, m, accept_party(&leader));
+        }
+        assert_eq!(party_of(&w, &leader).unwrap().len(), RAID_MAX);
+        say(&mut w, &leader, invite_by_id(&crew[9]));
+        refused(&mut leader, "Your raid is full (10/10)");
+        // Ten cannot become a party of five; five can.
+        say(&mut w, &leader, SocialCommand::PartyRaid { on: false });
+        refused(&mut leader, "Remove 5 members");
+        for m in crew.iter().take(9).skip(4) {
+            say(&mut w, m, SocialCommand::PartyLeave);
+        }
+        assert_eq!(party_of(&w, &leader).unwrap().len(), PARTY_MAX);
+        say(&mut w, &leader, SocialCommand::PartyRaid { on: false });
+        let state = latest_state(&mut crew[3]);
+        assert_eq!(state["party"]["raid"], false);
+        assert_eq!(state["party"]["max"], 5);
+        say(&mut w, &leader, SocialCommand::PartyRaid { on: false });
+        refused(&mut leader, "not a raid");
+        say(&mut w, &leader, invite_by_id(&crew[9]));
+        refused(&mut leader, "Your party is full (5/5)");
+    }
+
+    #[test]
+    fn a_raid_cannot_shrink_back_while_one_of_its_members_is_inside_a_raid_zone() {
+        let mut w = world();
+        let mut leader = add(&mut w, 1, "Lead");
+        let bob = add(&mut w, 2, "Bob");
+        say(&mut w, &leader, invite_by_id(&bob));
+        say(&mut w, &bob, accept_party(&leader));
+        say(&mut w, &leader, SocialCommand::PartyRaid { on: true });
+        let zone = w.players[&2].character.zone;
+        w.maps[zone].raid = true;
+        say(&mut w, &leader, SocialCommand::PartyRaid { on: false });
+        refused(&mut leader, "inside it");
+        w.maps[zone].raid = false;
+        say(&mut w, &leader, SocialCommand::PartyRaid { on: false });
+        assert!(!w.social.parties[0].raid);
+    }
+
+    /// Dungeon `template` (and its copies) marked as a raid, and the portal that leads into it: (zone, x, y).
+    fn raid_door(w: &mut World, template: usize) -> (usize, Point) {
+        for (i, m) in w.maps.iter_mut().enumerate() {
+            if i == template || m.template == Some(template) {
+                m.raid = true;
+            }
+        }
+        let (zone, portal) = w
+            .maps
+            .iter()
+            .enumerate()
+            .find_map(|(z, m)| {
+                m.portals
+                    .iter()
+                    .find(|p| p.to == template)
+                    .map(|p| (z, p.clone()))
+            })
+            .expect("a door into the dungeon");
+        (
+            zone,
+            Point {
+                x: portal.x,
+                y: portal.y,
+            },
+        )
+    }
+
+    #[test]
+    fn a_raid_door_lets_in_exactly_ten_fighters_hired_ones_included() {
+        let mut w = world();
+        let (zone, door) = raid_door(&mut w, 5);
+        let need = w.maps[5].min_level.max(1);
+        let mut crew: Vec<Player> = (1..=10)
+            .map(|s| add(&mut w, s, &format!("Raider{s}")))
+            .collect();
+        for session in 1..=10 {
+            w.players.get_mut(&session).unwrap().character.level = need;
+        }
+        let (head, rest) = crew.split_first_mut().unwrap();
+        say(&mut w, head, invite_by_id(&rest[0]));
+        say(&mut w, &rest[0], accept_party(head));
+        say(&mut w, head, SocialCommand::PartyRaid { on: true });
+        for m in rest.iter().take(8).skip(1) {
+            say(&mut w, head, invite_by_id(m));
+            say(&mut w, m, accept_party(head));
+        }
+        assert_eq!(party_of(&w, head).unwrap().len(), 9);
+        let step = |w: &mut World| {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.zone = zone;
+            p.character.x = door.x;
+            p.character.y = door.y;
+            w.time += 5.;
+            w.use_portal(1);
+            w.players[&1].character.zone
+        };
+        // Nine are too few, and the refusal says how many there are.
+        assert_eq!(step(&mut w), zone);
+        let said = heard(head);
+        assert!(
+            said.iter().any(|v| v["type"] == "error"
+                && v["text"].as_str().unwrap().contains("exactly 10")
+                && v["text"].as_str().unwrap().contains("Your group has 9")),
+            "{said:?}"
+        );
+        // The tenth joins; now the door opens onto a copy of the raid.
+        say(&mut w, head, invite_by_id(&rest[8]));
+        say(&mut w, &rest[8], accept_party(head));
+        let inside = step(&mut w);
+        assert_ne!(inside, zone);
+        assert!(w.maps[inside].raid);
+        // A party of five has no business at a raid door, with or without a flag.
+        let mut small = world();
+        let (zone, door) = raid_door(&mut small, 5);
+        let mut solo = add(&mut small, 1, "Solo");
+        small.players.get_mut(&1).unwrap().character.level = need;
+        let p = small.players.get_mut(&1).unwrap();
+        p.character.zone = zone;
+        p.character.x = door.x;
+        p.character.y = door.y;
+        small.time += 5.;
+        small.use_portal(1);
+        assert_eq!(small.players[&1].character.zone, zone);
+        assert!(
+            heard(&mut solo).iter().any(|v| v["type"] == "error"
+                && v["text"].as_str().unwrap().contains("Your group has 1"))
+        );
+    }
+
+    #[test]
+    fn a_raid_contract_hires_the_free_seats_and_ends_when_the_hirer_leaves_the_raid() {
+        let mut w = world();
+        let _hero = add(&mut w, 1, "Hirer");
+        let stone_zone = w
+            .maps
+            .iter()
+            .position(|m| m.npcs.iter().any(|n| n.id == "city_meetingstone"))
+            .expect("a Meeting Stone");
+        // A quartermaster: the Meeting Stone's offers as a raid contract.
+        let mut quartermaster = w.maps[stone_zone]
+            .npcs
+            .iter()
+            .find(|n| n.id == "city_meetingstone")
+            .unwrap()
+            .clone();
+        quartermaster.id = "test_quartermaster".into();
+        for o in &mut quartermaster.offers {
+            o.open = false;
+            o.raid = true;
+        }
+        let (qx, qy) = (quartermaster.x, quartermaster.y);
+        w.maps[stone_zone].npcs.push(quartermaster);
+        {
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.gold = super::mercs::merc_price(c.level) * 12;
+            c.zone = stone_zone;
+            c.x = qx;
+            c.y = qy + 1.;
+        }
+        let classes = ["warrior", "mage", "priest", "hunter", "assassin"];
+        let hired = |w: &World| w.players.values().filter(|p| p.merc.is_some()).count();
+        for n in 0..11 {
+            w.time += 0.6;
+            w.interact(
+                1,
+                "test_quartermaster",
+                Some(&format!("merc_{}", classes[n % 5])),
+            );
+        }
+        assert_eq!(
+            hired(&w),
+            9,
+            "nine seats are free beside the hirer, and the eleventh hire was refused"
+        );
+        assert!(
+            w.social.parties[0].raid,
+            "the contract made the group a raid"
+        );
+        assert_eq!(w.social.parties[0].members.len(), RAID_MAX);
+        // Anywhere but the door and the raid, the contract is over.
+        let elsewhere = (0..w.maps.len())
+            .find(|&z| z != stone_zone && !w.maps[z].raid)
+            .unwrap();
+        // Inside a raid they stay.
+        w.maps[elsewhere].raid = true;
+        w.players.get_mut(&1).unwrap().character.zone = elsewhere;
+        w.update_mercenaries();
+        assert_eq!(hired(&w), 9);
+        w.maps[elsewhere].raid = false;
+        w.update_mercenaries();
+        assert_eq!(hired(&w), 0, "outside the raid the fighters are let go");
+        assert!(w.social.parties.is_empty());
     }
 
     #[test]
