@@ -58,7 +58,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.waitForFunction(()=>Field.hero.level===99,null,{timeout:15000});
   await debug({op:'give_item',item:'orange_01',quantity:2});
   await page.waitForFunction(()=>Inventory.quantity('orange_01')===2,null,{timeout:15000});
-  await page.locator('#equipment-open').click();
+  await page.keyboard.press('e');
   const orange=page.locator('#inventory-list [data-item="orange_01"]');
   assert.equal(await orange.getAttribute('data-rarity'),'legendary');
   assert.equal(await orange.locator('.orange-item-art').count(),1);

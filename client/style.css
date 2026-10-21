@@ -9,6 +9,16 @@
   --cute: "Jua", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* Scrollbars: a gilded bar in a dark inset groove, the same trim as the HUD frames (a window can recolour it through the --sb-* variables). */
+:root { --sb-track: #0b1328; --sb-thumb-a: #e2c373; --sb-thumb-b: #a47c30; --sb-edge: #4a3512; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: var(--sb-track); border-radius: 6px; box-shadow: inset 0 0 3px #000d, inset 0 0 0 1px #0005; }
+::-webkit-scrollbar-thumb { background: linear-gradient(90deg, var(--sb-thumb-a), var(--sb-thumb-b)); border: 2px solid var(--sb-track); border-radius: 6px; background-clip: padding-box; box-shadow: inset 0 0 0 1px var(--sb-edge); min-height: 28px; min-width: 28px; }
+::-webkit-scrollbar-thumb:horizontal { background: linear-gradient(180deg, var(--sb-thumb-a), var(--sb-thumb-b)); background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-image: linear-gradient(90deg, #fff0b8, var(--sb-thumb-a)); }
+::-webkit-scrollbar-thumb:horizontal:hover { background-image: linear-gradient(180deg, #fff0b8, var(--sb-thumb-a)); }
+::-webkit-scrollbar-corner { background: transparent; }
+@supports not selector(::-webkit-scrollbar) { * { scrollbar-width: thin; scrollbar-color: var(--sb-thumb-b) var(--sb-track); } }
 [hidden] { display: none !important; }
 html, body { height: 100%; margin: 0; background: var(--ink); overflow: hidden; }
 body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
@@ -209,8 +219,6 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 .bar span { position: absolute; inset: 0; display: grid; place-items: center; font-size: 1.15cqw; text-shadow: 0 .1cqw .2cqw #000; }
 .hud-tr { right: 1.4cqw; top: 1.4cqw; text-align: right; }
 #minimap { display: block; width: 12cqw; height: 12cqw; border-radius: 1.2cqw; border: .25cqw solid rgba(245, 197, 66, .7); box-shadow: 0 .4cqw 1.4cqw rgba(0, 0, 0, .4); }
-.hud-stats { margin: .6cqw 0 0; font-size: 1.3cqw; padding: .3cqw 1cqw; border-radius: 999px; background: rgba(8, 16, 42, .82); display: inline-block; }
-.hud-hint { position: absolute; left: 50%; bottom: 1.2cqw; transform: translateX(-50%); margin: 0; font-size: 1.2cqw; padding: .4cqw 1.4cqw; border-radius: 999px; background: rgba(8, 16, 42, .72); white-space: nowrap; pointer-events: none; opacity: .9; }
 .area-title { position: absolute; left: 50%; top: 9cqw; transform: translateX(-50%); text-align: center; pointer-events: none; opacity: 0; }
 .area-title.show { animation: areaIn 4.2s ease both; }
 .area-title b { display: block; font-family: var(--display); font-weight: 400; font-size: 4cqw; color: #fff8dc; -webkit-text-stroke: .3cqw #6d4a0a; paint-order: stroke fill; text-shadow: 0 .3cqw 0 #3b2a08, 0 0 2cqw rgba(255, 220, 120, .7); }

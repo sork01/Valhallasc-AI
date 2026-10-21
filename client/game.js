@@ -16,32 +16,26 @@
       back: 'Back', toTitle: 'Back to Title', newChar: 'New Character',
       ccTitle: 'Assemble Your Warband!', forged: 'Forged in Battle!',
       warriorDesc: 'A brave sword-and-shield vanguard. High health, strong melee attacks, and armor ready for the front lines.',
-      warriorHint: 'Click to move or attack · WASD to walk · Space to swing · 1–9 skills · E character · B bags · F talk · Esc for menu',
       arms: 'Weapons', warriorTip: 'Click the Warrior to swing. Change armor and weapons in the field with E.',
       warriorLoading: 'Calling the Warrior…', warriorError: 'Warrior sprites could not load. Select Warrior again to retry.',
       warriorArmorNames: ['Simple cloth', 'Crimson guard', 'Azure guard'], warriorWeaponNames: ['Empty hands', 'Sword & shield', 'Royal sword & shield'],
       mageDesc: 'A rune caster with powerful ranged spells. Equip robes and staffs to change your look and strength.',
-      mageHint: 'Click to move or cast · WASD to walk · Space to cast · 1–9 skills · E character · B bags · F talk · Esc for menu',
       equipment: 'Character (E)', gender: 'Body', male: 'Male', female: 'Female', hair: 'Hair', weapon: 'Staff', mageTip: 'Click the Mage to cast. Robes and staffs can be changed in the field with E.',
       mageLoading: 'Summoning the Mage…', mageError: 'Mage sprites could not load. Select Mage again to retry.',
       mageArmorNames: ['Simple cloth', 'Apprentice', 'Runic'], mageWeaponNames: ['Empty hands', 'Ash staff', 'Crystal staff'],
       assassinDesc: 'A swift duelist with twin blades and deadly critical strikes. Shadowstep through danger with Shift.',
-      assassinHint: 'Click to move or attack · WASD to walk · Space to slash · Shift to shadowstep · 1–9 skills · E character · B bags · F talk · Esc for menu',
       blades: 'Blades', assassinTip: 'Click the Assassin to slash. Change outfits and blades in the field with E.',
       assassinLoading: 'Calling the Assassin…', assassinError: 'Assassin sprites could not load. Select Assassin again to retry.',
       assassinArmorNames: ['Simple cloth', 'Nightweave', 'Moonveil'], assassinWeaponNames: ['Empty hands', 'Twin daggers', 'Moonfang'],
       priestDesc: 'A golden-haired healer in ivory and crimson robes. Mend and ward your party, then smite what is left standing with a mace and holy light.',
-      priestHint: 'Click to move or attack · WASD to walk · Space to strike · 1–9 skills (Mend heals your most wounded ally) · E character · B bags · F talk · Esc for menu',
       maces: 'Mace', priestTip: 'Click the Priest to strike. Change robes and maces in the field with E.',
       priestLoading: 'Calling the Priest…', priestError: 'Priest sprites could not load. Select Priest again to retry.',
       priestArmorNames: ['Simple cloth', 'Pilgrim robes', 'Dawnweave'], priestWeaponNames: ['Empty hands', 'Oak mace', 'Sunbreaker'],
       hunterDesc: 'A ranger in a feathered headband with a bow and a quiver. Pick enemies off from far away, roll clear of trouble and rain arrows on whatever is left.',
-      hunterHint: 'Click to move or attack · WASD to walk · Space to shoot · 1–9 skills · E character · B bags · F talk · Esc for menu',
       bows: 'Bows', hunterTip: 'Click the Hunter to loose an arrow. Change coats and bows in the field with E.',
       hunterLoading: 'Calling the Hunter…', hunterError: 'Hunter sprites could not load. Select Hunter again to retry.',
       hunterArmorNames: ['Simple cloth', 'Scout\u2019s Jerkin', 'Wildwarden Coat'], hunterWeaponNames: ['Empty hands', 'Hunter\u2019s Shortbow', 'Wildwarden Longbow'],
       areaName: 'Greenmeadow Field', gold: 'gold', slain: 'enemies', paused: 'Paused', resume: 'Resume',
-      fieldHint: 'Click to move or attack · WASD to walk · Space to swing · Esc for menu',
       defeated: 'Defeated!', defeatedSub: 'You wake up back at the start…', defeatedWait: 'You have fallen. Wait for the fight to end.', lvl: 'Lv',
       name: 'Name', namePh: 'Your name', random: 'Random name',
       hairBeard: 'Hair & Beard', skin: 'Skin', armor: 'Armor', armorNames: ['Crimson', 'Azure', 'Verdant'], runes: 'Runes',
@@ -53,32 +47,26 @@
       back: '뒤로', toTitle: '타이틀로', newChar: '새 캐릭터',
       ccTitle: '워밴드를 결성하라!', forged: '전투로 단련되어!',
       warriorDesc: '검과 방패를 든 용감한 선봉장. 높은 체력과 강력한 근접 공격으로 최전선을 지킵니다.',
-      warriorHint: '클릭: 이동·공격 · WASD: 걷기 · 스페이스: 베기 · E: 장비 · F: 대화 · 1–9: 스킬 · Esc: 메뉴',
       arms: '무기', warriorTip: '워리어를 눌러 검을 휘두르세요. 필드에서 E 키로 갑옷과 무기를 바꿀 수 있습니다.',
       warriorLoading: '워리어 소환 중…', warriorError: '워리어를 불러오지 못했습니다. 다시 선택해 주세요.',
       warriorArmorNames: ['기본 옷', '진홍 갑옷', '청람 갑옷'], warriorWeaponNames: ['맨손', '검과 방패', '왕실 검과 방패'],
       mageDesc: '강력한 원거리 주문을 사용하는 마법사. 로브와 지팡이를 바꾸면 외형과 능력이 달라집니다.',
-      mageHint: '클릭: 이동·시전 · WASD: 걷기 · 스페이스: 시전 · E: 장비 · F: 대화 · 1–9: 스킬 · Esc: 메뉴',
       equipment: '장비 (E)', gender: '체형', male: '남성', female: '여성', hair: '머리', weapon: '지팡이', mageTip: '마법사를 눌러 주문을 시전하세요. 필드에서 E 키로 장비를 바꿀 수 있습니다.',
       mageLoading: '마법사 소환 중…', mageError: '마법사를 불러오지 못했습니다. 다시 선택해 주세요.',
       mageArmorNames: ['기본 옷', '견습 로브', '룬 로브'], mageWeaponNames: ['맨손', '나무 지팡이', '수정 지팡이'],
       assassinDesc: '쌍검과 치명타를 사용하는 민첩한 암살자. Shift 키로 위험을 뚫고 질주하세요.',
-      assassinHint: '클릭: 이동·공격 · WASD: 걷기 · 스페이스: 베기 · Shift: 그림자 질주 · E: 장비 · F: 대화 · 1–9: 스킬 · Esc: 메뉴',
       blades: '쌍검', assassinTip: '암살자를 눌러 베기를 시전하세요. 필드에서 E 키로 장비를 바꿀 수 있습니다.',
       assassinLoading: '암살자 소환 중…', assassinError: '암살자를 불러오지 못했습니다. 다시 선택해 주세요.',
       assassinArmorNames: ['기본 옷', '밤의 의복', '달의 장막'], assassinWeaponNames: ['맨손', '쌍단검', '달송곳니'],
       priestDesc: '상아색과 진홍색 로브를 걸친 금발의 치유 사제. 파티를 치유하고 보호하며, 철퇴와 성스러운 빛으로 적을 응징합니다.',
-      priestHint: '클릭: 이동·공격 · WASD: 걷기 · 스페이스: 타격 · E: 장비 · F: 대화 · 1–9: 스킬 (첫 스킬은 치유) · Esc: 메뉴',
       maces: '철퇴', priestTip: '사제를 눌러 철퇴를 휘두르세요. 필드에서 E 키로 장비를 바꿀 수 있습니다.',
       priestLoading: '사제 소환 중…', priestError: '사제를 불러오지 못했습니다. 다시 선택해 주세요.',
       priestArmorNames: ['기본 옷', '순례자의 로브', '새벽의 제복'], priestWeaponNames: ['맨손', '참나무 철퇴', '태양 파쇄자'],
       hunterDesc: '깃털 머리띠를 두른 활과 화살통의 사냥꾼. 멀리서 적을 쓰러뜨리고, 위험에서 굴러 벗어나며, 화살비를 퍼붓습니다.',
-      hunterHint: '클릭: 이동·공격 · WASD: 걷기 · 스페이스: 사격 · E: 장비 · F: 대화 · 1–9: 스킬 · Esc: 메뉴',
       bows: '활', hunterTip: '사냥꾼을 눌러 화살을 쏘세요. 필드에서 E 키로 장비를 바꿀 수 있습니다.',
       hunterLoading: '사냥꾼 소환 중…', hunterError: '사냥꾼을 불러오지 못했습니다. 다시 선택해 주세요.',
       hunterArmorNames: ['기본 옷', '정찰병의 조끼', '와일드워든 코트'], hunterWeaponNames: ['맨손', '사냥꾼의 단궁', '와일드워든 장궁'],
       areaName: '푸른 초원', gold: '골드', slain: '적', paused: '일시정지', resume: '계속하기',
-      fieldHint: '클릭: 이동·공격 · WASD: 걷기 · 스페이스: 휘두르기 · Esc: 메뉴',
       defeated: '쓰러졌다!', defeatedSub: '시작 지점에서 깨어납니다…', defeatedWait: '쓰러졌습니다. 전투가 끝날 때까지 기다리세요.', lvl: 'Lv',
       name: '이름', namePh: '이름 입력', random: '무작위 이름',
       hairBeard: '머리·수염', skin: '피부', armor: '갑옷', armorNames: ['진홍', '청람', '초록'], runes: '룬',
@@ -615,7 +603,7 @@
   });
 
   // ---------- the field: first map (field.js) ----------
-  const hud = { lv: $('hud-lv'), hp: $('hp-fill'), hpT: $('hp-text'), xp: $('xp-fill'), gold: $('hud-gold'), kills: $('hud-kills') };
+  const hud = { lv: $('hud-lv'), hp: $('hp-fill'), hpT: $('hp-text'), xp: $('xp-fill') };
   let portraitTarget = null, portraitReady = false;
   // Health and resources read as whole numbers: health rounds up while alive (never 0 while living), resources round down.
   const wholeHp = v => Math.max(0, Math.ceil((v || 0) - 1e-9)), wholeMax = v => Math.round(v || 0), wholeRes = v => Math.max(0, Math.floor((v || 0) + 1e-9));
@@ -642,7 +630,7 @@
     $('resource-fill').style.width = (current / max * 100).toFixed(1) + '%';
     $('resource-text').textContent = `${kind[0].toUpperCase() + kind.slice(1)} ${Math.min(wholeRes(current), max)} / ${max}`;
     hud.xp.style.width = (s.xp / s.xpNeed * 100).toFixed(1) + '%'; hud.lv.textContent = ` ${t('lvl')} ${s.level}`; window.Quests?.setLevel(s.level);
-    hud.gold.textContent = s.gold; hud.kills.textContent = s.kills; $('bag-gold').textContent = `${s.gold} gold`;
+    $('bag-gold').textContent = `${s.gold} gold`;
     const mount = $('mount-toggle');
     mount.disabled = !s.mountOwned || !!s.sparkTravel || s.hp <= 0 || (s.inCombat && !s.mounted) || !!s.players;
     mount.textContent = s.mounted ? 'Dismount · H' : s.mountOwned ? `${window.Mounts?.name(s.mount) || 'Mount'} · H · 2× speed` : 'Horse · H';
@@ -876,7 +864,6 @@
     } else { p.style.backgroundImage = 'url(assets/warrior.webp)'; p.style.backgroundSize = '250% auto'; p.style.backgroundPosition = '57% 8%'; }
     $('hud-name').textContent = c.name; $('pause').hidden = true; $('equipment').hidden = true; $('dead-msg').hidden = true;
     $('p-equipment').hidden = !modular(c);
-    document.querySelector('.hud-hint').textContent = t(modular(c) ? c.class + 'Hint' : 'fieldHint');
     Field.start({ canvas: $('fieldcv'), mini: $('minimap'), char: c, opts: OPT, onHud, onEvent: onField,
       onCharacter: look => {
         save.char = { ...look }; persist(); $('hud-name').textContent = look.name;
@@ -958,7 +945,6 @@
     if (!list.children.length) list.textContent = 'Your character will appear here after connecting.';
   });
   $('p-equipment').addEventListener('click', () => openEquipment());
-  $('equipment-open').addEventListener('click', () => openEquipment());
   $('inventory-open').addEventListener('click', () => openEquipment('bags'));
   $('bag-expand').addEventListener('click', () => { setPause(false); Field.visitNpc('merchant'); });
   $('bags-close').addEventListener('click', () => setPause(false));

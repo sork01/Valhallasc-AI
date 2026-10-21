@@ -25,7 +25,7 @@ async function enter(browser, world, name, errors, record = false) {
 const debug = (page, command) => page.evaluate(command => Online.send({ type: 'debug', ref: 1, command }), command);
 const level = (page, n) => debug(page, { op: 'set_level', level: n }).then(() => page.waitForFunction(n => Field.hero.level === n, n, { timeout: 10000 }));
 async function openPanel(page) {
-  await page.locator('#equipment-open').click();
+  await page.keyboard.press('e');
   await page.waitForSelector('#character-rebirth .rebirth-perk');
 }
 async function closePanel(page) { await page.keyboard.press('Escape'); await page.waitForFunction(() => document.getElementById('equipment').hidden); }

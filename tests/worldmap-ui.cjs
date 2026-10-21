@@ -59,7 +59,7 @@ async function call(name, args = {}) {
 
   // --- opening and closing ---
   check(!await visible('#worldmap') && await visible('#wm-open'), 'The map is closed and a globe button is on the minimap');
-  check(await page.evaluate(() => { const hit = (a, b) => !(a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top), r = id => document.querySelector(id).getBoundingClientRect(), m = r('#wm-open'); const mini = r('#minimap'); return ['#city-travel', '#equipment-open', '#hud-portrait', '.hud-stats'].every(id => !hit(m, r(id))) && hit(m, mini) && m.width < mini.width / 3 && m.width > 20 && m.left >= 0 && m.right <= innerWidth; }), 'The globe is small, stuck to the minimap corner and overlaps no other control');
+  check(await page.evaluate(() => { const hit = (a, b) => !(a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top), r = id => document.querySelector(id).getBoundingClientRect(), m = r('#wm-open'); const mini = r('#minimap'); return ['#city-travel', '#hud-portrait', '#network-status'].every(id => !hit(m, r(id))) && hit(m, mini) && m.width < mini.width / 3 && m.width > 20 && m.left >= 0 && m.right <= innerWidth; }), 'The globe is small, stuck to the minimap corner and overlaps no other control');
   check(await page.evaluate(() => { const b = document.getElementById('wm-open'); return !b.textContent.trim() && !!b.querySelector('svg circle') && b.getAttribute('aria-label').includes('(M)'); }), 'The globe is an icon with an accessible name');
   await press('m');
   check(await visible('#worldmap') && await page.evaluate(() => WorldMap.open && WorldMap.view === 'world'), 'M opens the world map on the world view');

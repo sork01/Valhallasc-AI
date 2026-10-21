@@ -1,0 +1,109 @@
+// HUD remake (UI-HUD-REMAKE) in a real browser: the gold/enemies line, the Character button and the controls hint are gone, the zone and
+// online count sit under the minimap and follow a zone change and a second player, and a layout saved with the removed pieces still loads.
+// The scrollbars use the gilded in-game theme. Client-only; nothing here touches gameplay state.
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const { chromium } = require('./lib/playwright.cjs');
+const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
+const { StdioClientTransport, getDefaultEnvironment } = require('@modelcontextprotocol/sdk/client/stdio.js');
+const root = path.resolve(__dirname, '..');
+const client = new Client({ name: 'valhallasc-hud-remake', version: '1.0.0' });
+let browser, started = false, checks = 0;
+const check = (value, message) => { assert.ok(value, message); checks++; };
+async function call(name, args = {}) {
+  const result = await client.callTool({ name, arguments: args });
+  assert.ok(!result.isError, `${name}: ${JSON.stringify(result.content)}`); return result.structuredContent;
+}
+const KEY = 'valhallasc.save.v1';
+const stored = page => page.evaluate(k => JSON.parse(localStorage.getItem(k) || '{}'), KEY);
+const rect = (page, selector) => page.locator(selector).evaluate(n => { const r = n.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom, w: r.width, h: r.height }; });
+const text = page => page.locator('#network-status').textContent();
+async function enter(browser, url, name, viewport, seed) {
+  const page = await browser.newPage({ viewport, reducedMotion: 'reduce' });
+  page.on('pageerror', e => errors.push(`${name}: ${e.message}`));
+  await page.addInitScript(seed => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('valhallasc.save.v1', JSON.stringify(seed)); } }, seed);
+  await page.goto(url); await page.locator('#start').click(); await page.locator('#login-guest').click();
+  await page.locator('#cls-mage').click(); await page.locator('#name').fill(name); await page.locator('#go').click({ timeout: 60000 });
+  await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
+  return page;
+}
+const errors = [];
+(async () => {
+  await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, stderr: 'pipe', env: { ...getDefaultEnvironment() } }));
+  const world = await call('start_world'); started = true;
+  browser = await chromium.launch({ headless: true });
+  // A layout saved before the remake still names the removed pieces: it must load, and the next save drops them.
+  const seed = { lang: 'en', sound: false, char: null, draft: null, ui: { character: { x: -4, y: 3 }, hint: { x: 2, y: -2 }, bags: { x: -3, y: -2 } } };
+  const page = await enter(browser, world.url, 'Hudder', { width: 1440, height: 900 }, seed);
+
+  // --- the removed pieces ---
+  for (const sel of ['#equipment-open', '.hud-hint', '.hud-stats', '#hud-gold', '#hud-kills', '[data-ui="character"]', '[data-ui="hint"]'])
+    check(await page.locator(sel).count() === 0, `${sel} is gone`);
+  check(!/ gold · \d+ (enemies|slimes)/.test(await page.locator('.hud-tr').innerText()), 'The gold and enemies line is not in the top right');
+  check(await page.evaluate(() => Prefs.layout.character !== undefined), 'The old layout was read without an error');
+  check(await page.locator('#inventory-open').isVisible() && await page.locator('#social-open').isVisible(), 'Bags and Social stay');
+  await page.keyboard.press('e');
+  check(await page.locator('#equipment').isVisible(), 'E still opens the character window');
+  check(await page.locator('#bag-gold').textContent().then(t => /^\d+ gold$/.test(t)), 'Gold is shown in the bags window');
+  await page.keyboard.press('Escape');
+
+  // --- zone and online count under the minimap ---
+  const place = async () => { const m = await rect(page, '#minimap'), s = await rect(page, '#network-status'); return { m, s }; };
+  await page.waitForFunction(() => /^Greenmeadow · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
+  let { m, s } = await place();
+  check(s.t >= m.b - 1 && s.t - m.b < 40, `The pill sits right under the minimap (${m.b.toFixed(0)} -> ${s.t.toFixed(0)})`);
+  check(Math.abs(s.r - m.r) < 2 && s.l >= m.l - 2, 'It is right-aligned with the minimap and no wider than it');
+  check(await page.locator('.hud-tr #network-status').count() === 1 && await page.locator('#network-status').count() === 1, 'There is one pill, inside the minimap column');
+  const horse = await rect(page, '#mount-toggle'), travel = await rect(page, '#city-travel');
+  check(travel.t >= horse.b - 1, `Visit button clears the minimap column (${horse.b.toFixed(0)} -> ${travel.t.toFixed(0)})`);
+  const top = await rect(page, '#stage');
+  check(s.t > top.t + 10, 'Nothing is left at the top centre');
+  check(await text(page) === 'Greenmeadow · 1 online', `One player online reads "${await text(page)}"`);
+  const second = await enter(browser, world.url, 'Visitor', { width: 1440, height: 900 }, { lang: 'en', sound: false, char: null, draft: null });
+  await page.waitForFunction(() => document.getElementById('network-status').textContent === 'Greenmeadow · 2 online', null, { timeout: 10000 });
+  check(true, 'A second player makes it 2 online');
+  await second.close();
+  await page.waitForFunction(() => document.getElementById('network-status').textContent === 'Greenmeadow · 1 online', null, { timeout: 15000 });
+  check(true, 'The count drops again when they leave');
+  const home = await page.evaluate(() => ({ x: Field.hero.x, y: Field.hero.y })), crags = await page.evaluate(() => WORLD_MAP.zones[0].spawn);
+  await page.evaluate(spot => Online.send({ type: 'debug', ref: 950, command: { op: 'teleport', zone: 1, x: spot.x, y: spot.y } }), crags);
+  await page.waitForFunction(() => /^Emberfall Crags · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
+  check(true, 'The zone name follows a zone change');
+  await page.evaluate(spot => Online.send({ type: 'debug', ref: 951, command: { op: 'teleport', zone: 0, x: spot.x, y: spot.y } }), home);
+  await page.waitForFunction(() => /^Greenmeadow · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
+
+  // --- the layout migrates: Edit UI saves only the pieces that exist ---
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-edit-ui').click();
+  check(await page.locator('.layout-handle').count() === 11, 'Edit UI offers eleven pieces');
+  await page.locator('#layout-done').click(); await page.locator('#set-back').click(); await page.locator('#p-resume').click();
+  const ui = (await stored(page)).ui || {};
+  check(!('character' in ui) && !('hint' in ui) && 'bags' in ui, `Saved layout dropped the removed pieces: ${JSON.stringify(ui)}`);
+
+  // --- scrollbars ---
+  const bars = await page.evaluate(() => {
+    const probe = document.createElement('div'); probe.id = 'sbprobe';
+    probe.style.cssText = 'position:fixed;left:0;top:0;width:100px;height:60px;overflow:scroll'; probe.innerHTML = '<div style="width:400px;height:400px"></div>';
+    document.body.append(probe);
+    const thumb = getComputedStyle(probe, '::-webkit-scrollbar-thumb'), track = getComputedStyle(probe, '::-webkit-scrollbar-track'), whole = getComputedStyle(probe, '::-webkit-scrollbar');
+    const out = { width: whole.width, thumbBg: thumb.backgroundImage, thumbRadius: thumb.borderTopLeftRadius, trackBg: track.backgroundColor, scrollbarWidth: getComputedStyle(probe).scrollbarWidth, bar: probe.offsetWidth - probe.clientWidth };
+    probe.remove(); return out;
+  });
+  check(bars.scrollbarWidth === 'auto', `No standards scrollbar property overrides the theme (${bars.scrollbarWidth})`);
+  check(/gradient/.test(bars.thumbBg) && parseFloat(bars.thumbRadius) > 2, `Thumb is a rounded gradient (${bars.thumbBg.slice(0, 40)}, ${bars.thumbRadius})`);
+  check(bars.trackBg !== 'rgba(0, 0, 0, 0)', `Track has its own colour (${bars.trackBg})`);
+  check(await page.evaluate(() => ['.chat-log', '.tracker-list', '#quest-list', '.social-body', '.wm-side', '.gossip-parchment'].every(sel => { const n = document.querySelector(sel); return !n || getComputedStyle(n).scrollbarWidth === 'auto'; })), 'No panel keeps the browser default thin bar');
+  const log = page.locator('#chat-log');
+  await page.evaluate(() => { for (let i = 0; i < 30; i++) { const p = document.createElement('p'); p.textContent = 'line ' + i; document.getElementById('chat-log').append(p); } });
+  await page.screenshot({ path: path.join(world.artifacts, 'hud-remake-1440.png') });
+  check(await log.evaluate(n => n.scrollHeight > n.clientHeight), 'The chat log scrolls');
+
+  // --- phone width ---
+  const phone = await enter(browser, world.url, 'Phoner', { width: 844, height: 390 }, { lang: 'en', sound: false, char: null, draft: null });
+  await phone.waitForFunction(() => /^Greenmeadow · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
+  const pm = await rect(phone, '#minimap'), ps = await rect(phone, '#network-status'), pst = await rect(phone, '#stage');
+  check(ps.t >= pm.b - 1 && ps.l >= pst.l && ps.r <= pst.r + 1 && ps.w <= pm.w + 2, `At 844x390 the pill stays under the minimap and inside the stage (${JSON.stringify(ps)})`);
+  await phone.screenshot({ path: path.join(world.artifacts, 'hud-remake-844x390.png') });
+  await phone.close();
+  check(errors.length === 0, `No page errors: ${errors.join(' | ')}`);
+  console.log(`hud-remake-ui: ${checks} checks passed`);
+})().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => { await browser?.close(); if (started) await call('stop_world').catch(() => {}); await client.close().catch(() => {}); });

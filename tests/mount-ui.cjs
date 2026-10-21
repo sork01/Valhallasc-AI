@@ -33,7 +33,7 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
     await page.keyboard.press('Space');
     await page.waitForFunction(() => !Field.hero.mounted, null, { timeout: 10000 });
     // The Mounts list: five rows, the horse owned and selected, the rest greyed with their unlock hints.
-    await page.locator('#equipment-open').click();
+    await page.keyboard.press('e');
     await page.waitForSelector('#character-mounts .mount-card');
     assert.equal(await page.locator('#character-mounts .mount-card').count(), 5, 'every mount is listed');
     assert.equal(await page.locator('.mount-card[data-mount="horse"]').getAttribute('data-selected'), 'true', 'the horse owner has it selected');
@@ -63,7 +63,7 @@ const { TestWorld } = require('../scripts/testing/driver.cjs');
     // A bound licence from a drop: below its level it waits, at level 95 a double-click grants the mount.
     await page.evaluate(() => { Online.send({ type: 'debug', ref: 905, command: { op: 'give_item', item: 'sabertooth_whistle', quantity: 1 } }); });
     await page.waitForFunction(() => Inventory.quantity('sabertooth_whistle') === 1, null, { timeout: 10000 });
-    await page.locator('#equipment-open').click();
+    await page.keyboard.press('e');
     const whistle = page.locator('#inventory-list [data-item="sabertooth_whistle"]');
     await whistle.waitFor();
     await whistle.hover();

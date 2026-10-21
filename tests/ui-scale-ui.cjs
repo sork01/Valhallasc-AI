@@ -31,7 +31,7 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
 
   // --- the global slider ---
-  const anchored = { skillbar: 'cx b', bags: 'r b', quests: 'r t', frame: 'l t', chat: 'l b', quickuse: 'l b', map: 'r t', hint: 'cx b' };
+  const anchored = { skillbar: 'cx b', bags: 'r b', quests: 'r t', frame: 'l t', chat: 'l b', quickuse: 'l b', map: 'r t' };
   const base = {}; for (const id of Object.keys(anchored)) base[id] = await rect(page, `[data-ui="${id}"]`);
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
   check(await page.locator('#set-uiscale').inputValue() === '100', 'UI size starts at 100%');
