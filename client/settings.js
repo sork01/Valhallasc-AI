@@ -17,7 +17,7 @@
     ['skillbar', 'Skillbar', '#skillbar', '0 100%'], ['quickuse', 'Food and potion slots', '#quickuse', '0 100%'], ['chat', 'Chat', '#chat', '0 100%'], ['hint', 'Controls hint', '.hud-hint', '0 100%'],
   ];
   // Scaled with the UI but not movable.
-  const EXTRA = [['#loot-rolls', '0 0'], ['#social-invites', '0 0'], ['#pvp-duel-warning', '0 0'], ['#network-status', '0 0'], ['#rare-pickup', '0 0'], ['#toast', '0 100%']];
+  const EXTRA = [['#loot-rolls', '0 0'], ['#social-invites', '0 0'], ['#pvp-duel-warning', '0 0'], ['#gauntlet-banner', '0 0'], ['#network-status', '0 0'], ['#rare-pickup', '0 0'], ['#toast', '0 100%']];
   // [overlay id, window selector or null for the overlay itself, name, origin, resizable]
   const WINDOWS = [
     ['pause', '.pause-panel', 'World Menu', '50% 50%', false], ['settings-panel', '.settings-panel', 'Settings', '50% 50%', false],

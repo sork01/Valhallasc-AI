@@ -423,6 +423,10 @@
 .social-tabs button[aria-selected="true"] { color: #ffe9a8; background: #2b3a52; border-color: #b89b5c80; }
 .pvp-duel-warning { position: absolute; z-index: 4; left: 50%; top: 3cqw; transform: translateX(-50%); max-width: 40cqw; padding: .6cqw 1.2cqw; border: 2px solid #ffb45e; border-radius: .8cqw; background: #361c27ed; color: #ffe8ac; font: 1.3cqw 'Jua', sans-serif; text-align: center; pointer-events: none; }
 .pvp-duel-warning[hidden] { display: none; }
+.gauntlet-banner { position: absolute; z-index: 4; left: 50%; top: 7cqw; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: .3cqw; min-width: 22cqw; max-width: 40cqw; padding: .6cqw 1.2cqw; border: 2px solid #ffb45e; border-radius: .8cqw; background: #361c27ed; color: #ffe8ac; font: 1.3cqw 'Jua', sans-serif; text-align: center; }
+.gauntlet-banner strong { font-size: 1.6cqw; }
+.gauntlet-banner button { margin-top: .2cqw; font-size: 1.1cqw; }
+.gauntlet-banner[hidden] { display: none !important; }
 .social-add { display: flex; gap: .5cqw; }
 .social-add input { min-width: 0; flex: 1; padding: .5cqw .7cqw; border: 1px solid #827252; border-radius: .3cqw; background: #0e142a; color: #fff; font: inherit; }
 .social-add button[hidden] { display: none; }

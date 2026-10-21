@@ -58,7 +58,7 @@ pub(super) fn class_named(name: &str) -> Option<Class> {
         _ => return None,
     })
 }
-fn class_title(class: Class) -> &'static str {
+pub(super) fn class_title(class: Class) -> &'static str {
     match class {
         Class::Warrior => "Warrior",
         Class::Mage => "Mage",
@@ -102,7 +102,7 @@ impl World {
     fn mercenaries_of(&self, owner: &str) -> Vec<u64> {
         self.players
             .iter()
-            .filter(|(_, p)| p.merc.as_deref() == Some(owner) && p.escort.is_none())
+            .filter(|(_, p)| p.merc.as_deref() == Some(owner) && p.escort.is_none() && !p.gauntlet)
             .map(|(session, _)| *session)
             .collect()
     }
@@ -277,7 +277,7 @@ impl World {
         let mercs: Vec<u64> = self
             .players
             .iter()
-            .filter(|(_, p)| p.merc.is_some() && p.escort.is_none())
+            .filter(|(_, p)| p.merc.is_some() && p.escort.is_none() && !p.gauntlet)
             .map(|(session, _)| *session)
             .collect();
         for session in mercs {

@@ -64,12 +64,17 @@ impl World {
                 .matches
                 .iter()
                 .any(|m| m.teams.iter().flatten().any(|p| p == id))
+            || self.gauntlets.iter().any(|r| {
+                self.players
+                    .get(&r.owner)
+                    .is_some_and(|p| p.character.id == id)
+            })
     }
-    fn pvp_sync(&self) {
-        for p in self
+    pub(super) fn pvp_sync(&self) {
+        for (session, p) in self
             .players
-            .values()
-            .filter(|p| p.merc.is_none() && p.ambient.is_none())
+            .iter()
+            .filter(|(_, p)| p.merc.is_none() && p.ambient.is_none())
         {
             let id = &p.character.id;
             let requests: Vec<Value> = self.pvp.requests.iter().filter(|d| d.to == *id)
@@ -94,7 +99,7 @@ impl World {
                 .map(|q| q.size);
             let arena = self.pvp.matches.iter().find(|m| m.teams.iter().flatten().any(|a| a == id))
                 .map(|m| json!({"size":m.teams[0].len(),"teams":m.teams,"ends":(m.ends-self.time).max(0.).ceil()}));
-            let _ = p.peer.try_send(json!({"type":"pvp","flag":p.pvp_flag,"requests":requests,"duel":duel,"queue":queue,"arena":arena}));
+            let _ = p.peer.try_send(json!({"type":"pvp","flag":p.pvp_flag,"requests":requests,"duel":duel,"queue":queue,"arena":arena,"gauntlet":self.gauntlet_view(*session)}));
         }
     }
     pub(super) fn pvp_command(&mut self, session: u64, command: PvpCommand) {
@@ -408,6 +413,15 @@ impl World {
         })
     }
     fn pvp_arena_leave(&mut self, me: &str) -> Result<(), String> {
+        if let Some(session) = self.session_of(me)
+            && self.gauntlets.iter().any(|r| r.owner == session)
+        {
+            self.gauntlet_abort(
+                session,
+                "You left the gauntlet. Talk to the giver to try again.",
+            );
+            return Ok(());
+        }
         let queued = self
             .pvp
             .queue
@@ -522,6 +536,12 @@ impl World {
         let (Some(a), Some(b)) = (self.players.get(&attacker), self.players.get(&defender)) else {
             return false;
         };
+        // An arena gauntlet: the hero and that hero's own opponent, nobody else.
+        if self.gauntlet_pair(attacker, defender) {
+            return a.character.hp > 0.
+                && b.character.hp > 0.
+                && a.character.zone == b.character.zone;
+        }
         if attacker == defender
             || a.merc.is_some()
             || b.merc.is_some()
@@ -569,6 +589,7 @@ impl World {
     pub(super) fn foes_near(&self, session: u64, at: Point, radius: f64, skip: &[u64]) -> Vec<u64> {
         if self.pvp.duels.is_empty()
             && self.pvp.matches.is_empty()
+            && self.gauntlets.is_empty()
             && !self.players.get(&session).is_some_and(|p| p.pvp_flag)
         {
             return vec![];
@@ -610,6 +631,7 @@ impl World {
             .duels
             .iter()
             .position(|d| (d.from == me && d.to == target) || (d.from == target && d.to == me));
+        let gauntlet = self.gauntlet_pair(attacker, defender);
         let mut taken_total = 0.;
         let dodge = self.players[&defender_session].character.dodge_chance()
             + self.players[&defender_session].buff(BuffKind::Dodge);
@@ -636,7 +658,7 @@ impl World {
             value
         };
         if value > 0. {
-            let hp = if arena.is_some() || duel.is_some() {
+            let hp = if arena.is_some() || duel.is_some() || gauntlet {
                 (p.character.hp - value).max(1.)
             } else {
                 (p.character.hp - value).max(0.)
@@ -731,7 +753,7 @@ impl World {
         }
         let defeated = value > 0.
             && self.players[&defender_session].character.hp
-                <= if arena.is_some() || duel.is_some() {
+                <= if arena.is_some() || duel.is_some() || gauntlet {
                     1.
                 } else {
                     0.
@@ -763,6 +785,8 @@ impl World {
                 }
             } else if let Some(i) = duel {
                 self.pvp_finish_duel(i, Some(me));
+            } else if gauntlet {
+                self.gauntlet_fall(defender_session);
             } else {
                 let p = self.players.get_mut(&defender_session).unwrap();
                 p.dead_time = 0.;

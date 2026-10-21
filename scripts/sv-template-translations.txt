@@ -283,5 +283,11 @@
   "✓ {0} {1} for your reward": "✓ {0} {1} för din belöning",
   "This quest is for heroes of level {0} and above.": "Det här uppdraget är för hjältar på nivå {0} och uppåt.",
   "This quest is for heroes of level {0} and above. You are level {1}.": "Det här uppdraget är för hjältar på nivå {0} och uppåt. Du är nivå {1}.",
-  "{0} is shut to you. Complete the quest “{1}” to open it.": "Vägen till {0:t} är stängd. Slutför uppdraget ”{1:t}” för att öppna den."
+  "{0} is shut to you. Complete the quest “{1}” to open it.": "Vägen till {0:t} är stängd. Slutför uppdraget ”{1:t}” för att öppna den.",
+  "Fight {0} of {1}: {2}. Defeat it before time runs out.": "Strid {0} av {1}: {2:t}. Besegra den innan tiden tar slut.",
+  "The gauntlet begins: {0} fights, one against each class. The first starts in {1} seconds.": "Prövningen börjar: {0} strider, en mot varje klass. Den första börjar om {1} sekunder.",
+  "Fight {0} of {1} won. Health and mana restored; the next one starts in {2} seconds.": "Strid {0} av {1} vunnen. Hälsa och mana återställda; nästa börjar om {2} sekunder.",
+  "Arena gauntlet · Fight {0} of {1}": "Arenaprövning · Strid {0} av {1}",
+  "Next: {0} · starts in {1}s": "Nästa: {0:t} · börjar om {1} s",
+  "{0} · {1}s left": "{0:t} · {1} s kvar"
 }
