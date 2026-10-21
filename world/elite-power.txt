@@ -365,15 +365,15 @@
   ],
   "barrow_hound": [
     1.0,
-    5.0
+    7.0
   ],
   "barrow_scarab": [
     1.0,
-    5.0
+    7.0
   ],
   "barrow_spinner": [
     1.0,
-    5.0
+    7.0
   ],
   "keel_crab": [
     1,
@@ -410,5 +410,17 @@
   "null_hour": [
     8.5,
     1
+  ],
+  "span_lynx": [
+    1.0,
+    8.0
+  ],
+  "span_sentinel": [
+    1.0,
+    8.0
+  ],
+  "span_caster": [
+    1.0,
+    8.0
   ]
 }
