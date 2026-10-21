@@ -524,6 +524,31 @@ thread_local! {
     pub static PHASES: std::cell::RefCell<[f64; 4]> = const { std::cell::RefCell::new([0.; 4]) };
 }
 
+/// Keeps only the monsters of `zone` (ids renumbered, `spawns` in step) and returns the new id of each old one
+/// (`usize::MAX` for a dropped one). A fight in one zone does not need the other ~1,900 monsters of the world, and
+/// every step scans all of them several times; the map, the zone's monsters and their order stay the same. Seeded
+/// outcomes differ from a full world's (sleeping monsters draw random numbers), so compare against runs made with
+/// this trim, or set `TTK_FULL_WORLD=1` for the untrimmed world.
+fn trim_to_zone(w: &mut World, zone: usize) -> Vec<usize> {
+    let mut map = vec![usize::MAX; w.slimes.len()];
+    if std::env::var("TTK_FULL_WORLD").is_ok() {
+        return (0..w.slimes.len()).collect();
+    }
+    let (mut slimes, mut spawns) = (vec![], vec![]);
+    for (old, s) in std::mem::take(&mut w.slimes).into_iter().enumerate() {
+        if s.zone == zone {
+            let mut s = s;
+            map[old] = slimes.len();
+            s.id = slimes.len();
+            spawns.push(w.spawns[old].clone());
+            slimes.push(s);
+        }
+    }
+    w.slimes = slimes;
+    w.spawns = spawns;
+    map
+}
+
 /// One fight with one seed.
 pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
     let mut w = world();
@@ -532,9 +557,10 @@ pub fn run_once(case: &Case, seed: u64) -> (Outcome, Summary) {
         .target
         .or_else(|| pick_enemy(&w, case.level, case.foe))
         .unwrap_or_else(|| panic!("no {:?} foe for level {}", case.foe, case.level));
+    let target_zone = w.slimes[id].zone;
+    let id = trim_to_zone(&mut w, target_zone)[id];
     // Only the target's own zone is cleared. Monsters elsewhere stay alive and dormant, which `step` skips; dead ones
     // are updated every tick (about 6 ms per step across all zones, nearly all of a fight's cost).
-    let target_zone = w.slimes[id].zone;
     for s in w
         .slimes
         .iter_mut()
@@ -677,6 +703,8 @@ pub fn run_pack_once(case: &Case, ids: &[usize], seed: u64) -> Outcome {
     let mut w = world();
     w.rng = seed;
     let target_zone = w.slimes[ids[0]].zone;
+    let trimmed = trim_to_zone(&mut w, target_zone);
+    let ids = &ids.iter().map(|&id| trimmed[id]).collect::<Vec<_>>();
     for s in w
         .slimes
         .iter_mut()
@@ -1004,7 +1032,9 @@ fn party_pack_fight(
         local_ids = (0..w.slimes.len()).collect::<Vec<_>>();
         local_ids.as_slice()
     } else {
-        ids
+        let trimmed = trim_to_zone(&mut w, zone);
+        local_ids = ids.iter().map(|&id| trimmed[id]).collect::<Vec<_>>();
+        local_ids.as_slice()
     };
     for s in w
         .slimes
