@@ -1490,9 +1490,18 @@ fn target_band(level: u32) -> TargetBand {
         .unwrap_or_else(|| panic!("no kill-time target for level {level}"))
 }
 
+/// Levels up to this one are noisy (the hunter's kill time ranges 4.2-8.5 s between seeds at level 5): the grid takes at
+/// least `NOISY_RUNS` seeds there and allows `NOISY_SPREAD` between the fastest and slowest class (`TTK-5-SPREAD`).
+const NOISY_LEVEL: u32 = 10;
+const NOISY_RUNS: u64 = 9;
+const NOISY_SPREAD: f64 = 1.4;
+
 fn assert_balanced_grid(levels: &[u32], runs: u64) {
     for &level in levels {
         let target = target_band(level);
+        let noisy = level <= NOISY_LEVEL;
+        let runs = if noisy { runs.max(NOISY_RUNS) } else { runs };
+        let max_spread = if noisy { NOISY_SPREAD } else { 1.3 };
         let mut times = vec![];
         for class in CLASSES {
             let result = run_case(&Case::new(class, level), runs);
@@ -1514,7 +1523,7 @@ fn assert_balanced_grid(levels: &[u32], runs: u64) {
         }
         times.sort_by(f64::total_cmp);
         assert!(
-            times[4] / times[0] <= 1.3,
+            times[4] / times[0] <= max_spread,
             "level {level}: class kill-time spread {:.2}x ({times:?})",
             times[4] / times[0]
         );
