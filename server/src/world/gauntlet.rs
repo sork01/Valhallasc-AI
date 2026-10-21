@@ -24,6 +24,20 @@ const CLASSES: [Class; FIGHTS] = [
     Class::Priest,
     Class::Hunter,
 ];
+/// An opponent has this share of the health its level and gear give it: every blow that lands on it is worth
+/// `1 / OPPONENT_HEALTH` times as much (owner, 2026-10-21: "30% easier to win the arena"). Test builds read
+/// `GAUNTLET_OPPONENT_HEALTH` to measure other values without a rebuild.
+const OPPONENT_HEALTH: f64 = 0.7;
+pub(super) fn opponent_health() -> f64 {
+    #[cfg(test)]
+    if let Some(v) = std::env::var("GAUNTLET_OPPONENT_HEALTH")
+        .ok()
+        .and_then(|v| v.parse::<f64>().ok())
+    {
+        return v;
+    }
+    OPPONENT_HEALTH
+}
 /// The worn slots of a plain level-appropriate set: the equipment slot and the catalog kind that fills it.
 const SLOTS: [(&str, &str); 8] = [
     ("chest", "armor"),
@@ -445,7 +459,7 @@ impl World {
     }
 
     /// One tick of the opponent: close in, swing, and let the mercenaries' skill code cast (the duel matrix's driver).
-    fn gauntlet_play(&mut self, me: u64, foe: u64) {
+    pub(super) fn gauntlet_play(&mut self, me: u64, foe: u64) {
         let (class, hp, here, has_goal) = {
             let p = &self.players[&me];
             let c = &p.character;

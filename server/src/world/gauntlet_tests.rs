@@ -403,3 +403,88 @@ fn every_opponent_wears_a_full_green_set_of_its_level() {
         }
     }
 }
+
+#[test]
+fn an_opponent_has_seventy_percent_of_the_health_a_player_would() {
+    let mut w = world();
+    let mut rx = hero(&mut w, 1, Class::Warrior, 40, SKALD, "city_steward");
+    offer(&mut w, 1, "city_steward", "quest:accept:arena_skald_40");
+    offer(&mut w, 1, "city_steward", "gauntlet");
+    let opponent = until_opponent(&mut w, &mut rx, 1);
+    // The same blow on the same body, once as an opponent and once as an ordinary player.
+    let loss = |w: &mut World| -> f64 {
+        for _ in 0..80 {
+            let max = w.players[&opponent].character.max_hp();
+            w.players.get_mut(&opponent).unwrap().character.hp = max;
+            w.pvp_hit(1, opponent, 400., false);
+            let hp = w.players[&opponent].character.hp;
+            if hp < max {
+                return max - hp;
+            }
+        }
+        panic!("every blow was dodged");
+    };
+    let scaled = loss(&mut w);
+    w.players.get_mut(&opponent).unwrap().gauntlet = false;
+    let plain = loss(&mut w);
+    assert!(plain > 10., "a blow big enough to measure: {plain}");
+    assert!(
+        (scaled - plain / 0.7).abs() <= 1.5,
+        "opponent lost {scaled}, a player {plain}"
+    );
+}
+
+/// One class against the five opponents of a run, driven by the mercenaries' brain on both sides, `seeds` times: how many
+/// runs were won and how many fights of each kind were won. Prints one line; `GAUNTLET_SEEDS` sets the number of runs.
+fn measure(class: Class, level: u32) -> String {
+    let seeds: u64 = std::env::var("GAUNTLET_SEEDS")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(6);
+    let (mut passed, mut fights, mut won_fights) = (0, 0, 0);
+    for seed in 1..=seeds {
+        let mut w = world();
+        w.rng = seed;
+        let mut rx = hero(&mut w, 1, class, level, SKALD, "city_steward");
+        let quest = format!("arena_skald_{level}");
+        w.players.get_mut(&1).unwrap().character.level = level.max(20);
+        offer(&mut w, 1, "city_steward", &format!("quest:accept:{quest}"));
+        offer(&mut w, 1, "city_steward", "gauntlet");
+        assert_eq!(
+            w.gauntlets.len(),
+            1,
+            "the run did not start for {class:?} at {level}"
+        );
+        let mut won_seen = 0;
+        for _ in 0..60_000 {
+            w.step();
+            drain(&mut rx);
+            let Some(run) = w.gauntlets.first() else {
+                break;
+            };
+            won_seen = run.won;
+            if let Some(opponent) = run.opponent {
+                w.gauntlet_play(1, opponent);
+            }
+        }
+        let ready = counts(&w, 1, &quest) == [5];
+        passed += ready as u32;
+        // Fights won: a won run is five; a lost run stopped at the wins it had when it ended.
+        let wins = if ready { 5 } else { won_seen as u32 };
+        won_fights += wins;
+        fights += if ready { 5 } else { wins + 1 };
+    }
+    format!("RATE level {level} {class:?}: runs {passed}/{seeds}, fights {won_fights}/{fights}")
+}
+macro_rules! rates {
+    ($($name:ident: $level:expr),*) => {$(
+        #[test]
+        #[ignore]
+        fn $name() {
+            for class in [Class::Warrior, Class::Mage, Class::Assassin, Class::Priest, Class::Hunter] {
+                println!("{}", measure(class, $level));
+            }
+        }
+    )*};
+}
+rates!(rates_20: 20, rates_30: 30, rates_40: 40, rates_50: 50, rates_60: 60, rates_70: 70, rates_80: 80, rates_90: 90, rates_99: 99);

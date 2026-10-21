@@ -22,7 +22,7 @@ pays a blue weapon of the hero's class for that level, experience and gold.
 - **Fights:** a 10 s countdown before the first fight and between fights; one opponent at a time, one of each class in a random
   order each run. An opponent is that class at the quest's level (the level of the quest, not the hero's) in plain green
   progression gear (the set of the level rounded down to a multiple of 5; 99 uses the 95 set), attributes spent by
-  `allocate_recommended`, no potions, named `Arena <Class>` ("Arena Warrior" and so on) and drawn with the ordinary class art.
+  `allocate_recommended`, no potions, **with 70% of the health they would have** (owner, 2026-10-21: "30% easier"), named `Arena <Class>` ("Arena Warrior" and so on) and drawn with the ordinary class art.
 - **PvP rules apply**: every blow goes through `pvp_hit` (`PVP_DAMAGE_SCALE` 0.5, the Hunter bonus, stun/root/wound, the Mage's
   ward, the priest's heal scale, the `pvp_fight` lifesteal block). Opponents are driven by the duel matrix's driver
   (`gauntlet_play`: close in, basic blow, `ai_combat_at`). Fights stop at one health like duels: nobody dies, no corpse run, no
@@ -38,35 +38,47 @@ pays a blue weapon of the hero's class for that level, experience and gold.
   level-95 piece), `rewardXp` = `levels.txt[level-1]/10`, and the gold of the hardest solo quest of that level
   (20: 1200, 30: 1200, 40: 2400, 50: 2500, 60: 5000, 70: 9000, 80: 15000, 90: 18000, 99: 30000; table in
   `scripts/arena_quests.py`). The opponents drop no loot, XP or gold.
-- **Not tuned:** no win-rate target. PvP balancing is closed (owner, 2026-10-20), so the knobs are the opponents' level and gear
-  only. The measured win rates are in the next section.
+- **Tuned once:** no win-rate target, but the owner asked for 30% easier after the first measurement (opponent health 70%).
+  PvP balancing is closed (owner, 2026-10-20), so the knobs are the opponents' health, level and gear only. The measured win
+  rates are in the next section.
 
 ## Measured win rates (scripted play, no target)
 
-There is no win-rate target (owner, 2026-10-21): this is what the existing duel matrix says, for the owner to react to. An
-opponent is built exactly like a duelist of the matrix (the class at the quest's level in plain green progression gear,
-`allocate_recommended`, no potions) and driven by the same code, so `docs/duel-report.md` is the measurement. Each cell is
-"win rate over a fight against a random class / chance of winning all five fights in a row", for a hero played by the same
-scripted brain (the mirror match counts as 50%). Eight duels per pair and level: each cell is about +-17 points.
+There is no win-rate target (owner, 2026-10-21): these are numbers for the owner to react to. They come from the gauntlet
+itself, not from the duel matrix: `cargo test -- --ignored --nocapture rates_` (the `rates_<level>` tests in
+`gauntlet_tests.rs`, `GAUNTLET_SEEDS` runs per class and level, default 6; `GAUNTLET_OPPONENT_HEALTH` sets the opponents'
+health without a rebuild) plays whole runs through the real quest code with the hero driven by the mercenaries' brain
+(`gauntlet_play`, the same driver as the opponents, no potions, no kiting). Each cell is "chance of winning all five fights /
+chance of winning one fight", 6 runs per class and level (30 per level, 54 per class), so a level or class row is about +-9 points.
 
-| Level | Warrior | Mage | Assassin | Priest | Hunter |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 20 | 70% / 0% | 10% / 0% | 90% / 50% | 30% / 0% | 50% / 0% |
-| 30 | 78% / 19% | 10% / 0% | 82% / 31% | 30% / 0% | 50% / 0% |
-| 40 | 88% / 44% | 15% / 0% | 27% / 0% | 70% / 5% | 50% / 0% |
-| 50 | 60% / 4% | 45% / 1% | 25% / 0% | 77% / 23% | 42% / 0% |
-| 60 | 63% / 0% | 85% / 38% | 42% / 0% | 22% / 0% | 38% / 0% |
-| 70 | 55% / 4% | 80% / 29% | 50% / 1% | 45% / 1% | 20% / 0% |
-| 80 | 50% / 1% | 70% / 10% | 55% / 0% | 35% / 0% | 40% / 0% |
-| 90 | 50% / 1% | 60% / 0% | 48% / 0% | 48% / 2% | 45% / 0% |
-| 99 | 65% / 7% | 40% / 0% | 37% / 0% | 55% / 4% | 52% / 1% |
+**First measurement (opponents at full health)**: a whole run was won 3% of the time (7 of 270 runs) and a single fight 47%.
+Scripted play lost outright to at least one class at nearly every level. **The owner then asked for it to be 30% easier**
+(2026-10-21), done as opponents with 30% less health (`OPPONENT_HEALTH` 0.7 in `gauntlet.rs`: every blow that lands on an
+opponent counts for 1 / 0.7 as much; PvP formulas and the opponents' damage are untouched). Measured effect: a whole run
+61% (165 of 270) and a single fight 90%. That is a bigger change in win rate than 30%, because a fight is decided by a damage
+race. Intermediate values (0.85, 0.9) were not measured.
 
-How to read it: scripted play loses outright to at least one class at nearly every level (a Mage or Hunter pass rate of 0% is
-a 0% pair cell, not noise), so a run of five is rarely won by a script. A person plays better than the script (kiting, dashes,
-potions, picking skills by the situation, the healing between fights is already counted) and the quests ask for exactly that,
-but the numbers say the five-fight run is hard for every class. If the owner wants it easier, the knobs are the opponents'
-level and gear only (PvP balancing stays closed): for example the previous green set (five levels lower, `green_gear` in
-`gauntlet.rs`), or the opponent's level one step below the quest's. To measure a change, run `bash scripts/duel-parallel.sh` with the new opponent setup.
+| | Health 100% (before) | Health 70% (now) |
+| --- | ---: | ---: |
+| **All 45 cells** | 3% / 47% | 61% / 90% |
+| Level 20 | 7% / 50% | 27% / 70% |
+| Level 30 | 0% / 36% | 40% / 78% |
+| Level 40 | 0% / 44% | 77% / 95% |
+| Level 50 | 7% / 58% | 77% / 95% |
+| Level 60 | 3% / 44% | 57% / 89% |
+| Level 70 | 0% / 46% | 53% / 89% |
+| Level 80 | 3% / 50% | 67% / 92% |
+| Level 90 | 0% / 43% | 77% / 95% |
+| Level 99 | 3% / 46% | 77% / 95% |
+| Warrior | 4% / 56% | 76% / 95% |
+| Mage | 0% / 29% | 63% / 90% |
+| Assassin | 4% / 46% | 43% / 85% |
+| Priest | 2% / 44% | 56% / 88% |
+| Hunter | 4% / 54% | 69% / 92% |
+
+Scripted play is not a person: kiting, dashes, potions and picking skills by the situation make a real player better, so the
+real pass rate is higher. The knobs, if the owner wants to move it again, are `OPPONENT_HEALTH` and the opponents' level and
+gear (PvP balancing stays closed).
 
 ## How it works
 

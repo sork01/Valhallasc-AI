@@ -648,6 +648,12 @@ impl World {
                 .round()
                 .max(1.)
         };
+        // An arena opponent has less health than its level gives it (`gauntlet::opponent_health`).
+        let value = if value > 0. && p.gauntlet {
+            (value / gauntlet::opponent_health()).round()
+        } else {
+            value
+        };
         // A ward soaks up what lands before it reaches the health; the blow still counts as landed.
         let landed = value > 0.;
         let value = if landed && p.absorb_left > 0. && p.absorb > 0. {
