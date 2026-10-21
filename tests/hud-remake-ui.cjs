@@ -97,8 +97,8 @@ const errors = [];
   await page.screenshot({ path: path.join(world.artifacts, 'hud-remake-1440.png') });
   check(await log.evaluate(n => n.scrollHeight > n.clientHeight), 'The chat log scrolls');
 
-  // --- the layout: 80% by default, then the same arrangement at 100% ---
-  const lay = await enter(browser, world.url, 'Layouter', { width: 1440, height: 900 }, { lang: 'en', sound: false, char: null, draft: null });
+  // --- the stylesheet arrangement (a player who chose the plain layout): 80% by default, then the same arrangement at 100% ---
+  const lay = await enter(browser, world.url, 'Layouter', { width: 1440, height: 900 }, { lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} });
   await lay.waitForFunction(() => /online$/.test(document.getElementById('network-status').textContent));
   check(await lay.evaluate(() => Prefs.uiScale) === .8, 'UI size defaults to 80%');
   const arrange = async label => {
@@ -127,6 +127,13 @@ const errors = [];
   await phone.waitForFunction(() => /^Greenmeadow · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
   const pm = await rect(phone, '#minimap'), ps = await rect(phone, '#network-status'), pst = await rect(phone, '#stage');
   check(ps.t >= pm.b - 1 && ps.l >= pst.l && ps.r <= pst.r + 1 && ps.w <= pm.w + 2, `At 844x390 the pill stays under the minimap and inside the stage (${JSON.stringify(ps)})`);
+  // A visitor who never moved anything gets Sork's arrangement; Reset goes back to it, and a layout of one's own is kept.
+  check(await phone.evaluate(() => JSON.stringify(Prefs.layout.party) === '{"x":61.04,"y":17.53}' && Prefs.layout.quests.y === -2.48 && Prefs.panelSize.chat.w === 34.36 && Prefs.panelSize.quests.h === 31.28), 'A fresh visitor gets the shipped layout and panel sizes');
+  check(await phone.evaluate(() => document.getElementById('chat').style.getPropertyValue('--pw') !== '' || getComputedStyle(document.getElementById('chat')).getPropertyValue('--pw') !== ''), 'The default chat width is applied');
+  await phone.evaluate(() => { Settings.startEdit(); Settings.layout.bags = { x: 0, y: 0 }; Prefs.set({ ui: { map: { x: 2, y: 2 } } }); Settings.refresh(); });
+  check(await phone.evaluate(() => Object.keys(Prefs.layout).join() === 'map'), 'A layout the player saved replaces the shipped one');
+  await phone.evaluate(() => { Settings.stopEdit(); Settings.reset(); });
+  check(await phone.evaluate(() => Object.keys(Prefs.layout).length === 10 && Settings.layout.party.x === 61.04), 'Reset returns to the shipped layout');
   await phone.screenshot({ path: path.join(world.artifacts, 'hud-remake-844x390.png') });
   await phone.close();
   check(errors.length === 0, `No page errors: ${errors.join(' | ')}`);

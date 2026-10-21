@@ -7,6 +7,10 @@
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
   const vol = v => Number.isFinite(+v) ? Math.max(0, Math.min(1, +v)) : 1;
   save.musicVol = vol(save.musicVol); save.sfxVol = vol(save.sfxVol); save.night = vol(save.night); save.weather = vol(save.weather); save.weatherAudio = vol(save.weatherAudio);
+  // Sork's own arrangement (2026-10-21) is what a player gets until they move something (uiSet / panelSizeSet): offsets in cqw from the stylesheet positions, sizes in cqw.
+  const DEFAULT_UI = { map: { x: 1.4, y: -1.4 }, travel: { x: 1.33, y: -2.26 }, bags: { x: 1.37, y: 0.49 }, social: { x: 1.42, y: 0.66 }, quickuse: { x: 6.46, y: 1.55 }, chat: { x: -1.28, y: 0.53 }, frame: { x: -1.4, y: -1.4 }, party: { x: 61.04, y: 17.53 }, buffs: { x: -1.24, y: -2.79 }, quests: { x: -1.4, y: -2.48 } };
+  const DEFAULT_PANEL_SIZE = { quests: { w: 19.61, h: 31.28 }, chat: { w: 34.36, h: 7.95 } };
+  const has = o => !!o && typeof o === 'object' && Object.keys(o).length > 0; // a layout saved before the flags existed counts as chosen
   const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) { /* ignore */ } };
 
   // ---------- text ----------
@@ -1137,11 +1141,11 @@
     get night() { return save.night; },
     get weather() { return save.weather; },
     get weatherAudio() { return save.weatherAudio; },
-    get layout() { return save.ui && typeof save.ui === 'object' ? save.ui : {}; },
+    get layout() { return !save.uiSet && !has(save.ui) ? DEFAULT_UI : save.ui && typeof save.ui === 'object' ? save.ui : {}; },
     // 80% until the player moves the slider (uiScaleSet): a saved 1 from before the default changed is not a choice.
     get uiScale() { return save.uiScaleSet && Number.isFinite(+save.uiScale) ? Math.max(.6, Math.min(1.5, +save.uiScale)) : .8; },
     get winScale() { return save.winScale && typeof save.winScale === 'object' ? save.winScale : {}; },
-    get panelSize() { return save.panelSize && typeof save.panelSize === 'object' ? save.panelSize : {}; },
+    get panelSize() { return !save.panelSizeSet && !has(save.panelSize) ? DEFAULT_PANEL_SIZE : save.panelSize && typeof save.panelSize === 'object' ? save.panelSize : {}; },
     set(patch) {
       if ('lang' in patch && ['en', 'sv', 'ko'].includes(patch.lang) && patch.lang !== save.lang) {
         save.lang = patch.lang; persist(); location.reload(); return;
@@ -1152,10 +1156,10 @@
       if ('night' in patch) save.night = vol(patch.night);
       if ('weather' in patch) save.weather = vol(patch.weather);
       if ('weatherAudio' in patch) save.weatherAudio = vol(patch.weatherAudio);
-      if ('ui' in patch) save.ui = patch.ui;
+      if ('ui' in patch) { save.ui = patch.ui || {}; save.uiSet = !!patch.ui; } // null = back to the shipped arrangement
       if ('uiScale' in patch && Number.isFinite(+patch.uiScale)) { save.uiScale = Math.max(.6, Math.min(1.5, +patch.uiScale)); save.uiScaleSet = true; }
       if ('winScale' in patch) save.winScale = patch.winScale;
-      if ('panelSize' in patch) save.panelSize = patch.panelSize;
+      if ('panelSize' in patch) { save.panelSize = patch.panelSize || {}; save.panelSizeSet = !!patch.panelSize; }
       persist(); applyMusicLevel(.4);
       if (sfxGain) sfxGain.gain.value = taper(save.sfxVol);
       dispatchEvent(new Event('prefs-change'));

@@ -241,7 +241,7 @@
     // The tracker's list is rebuilt on every update and the chat swaps its log between tabs: look again when they change.
     for (const p of PANELS) new MutationObserver(placePanelGrips).observe(p.el, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
   }
-  function resetPanels() { for (const p of PANELS) { p.size = null; paintPanel(p); } placePanelGrips(); storePanels(); }
+  function resetPanels() { window.Prefs.set({ panelSize: null }); loadPanels(); placePanelGrips(); }
 
   // ---------- the volume panel ----------
   const music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound'), night = $('set-night'), weather = $('set-weather'), weatherAudio = $('set-weather-audio'), language = $('set-language'), size = $('set-uiscale');
@@ -324,9 +324,7 @@
     if (toPanel) { panel.hidden = false; syncPanel(); $('set-edit-ui').focus({ preventScroll: true }); }
   }
   function reset() {
-    for (const id of Object.keys(layout)) { delete layout[id]; paint(id); }
-    for (const [id] of ITEMS) paint(id);
-    syncHandles(); store();
+    window.Prefs.set({ ui: null }); refresh();
   }
   function nudge(id, dx, dy) { const o = offset(id); place(id, o.x + dx, o.y + dy); store(); }
 
