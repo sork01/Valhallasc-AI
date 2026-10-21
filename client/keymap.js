@@ -62,10 +62,13 @@
     return !!el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
   }
   // Whether this key event is the action: no Ctrl/Alt/Meta, not while the capture of a new key is running.
+  // A character typed on the old keys is the old action's, whatever its physical key (Swedish: '=' is Shift+0 and '-' is Slash).
+  const legacyClaim = event => Object.keys(LEGACY).find(id => LEGACY[id] === event.key && isDefault(id)) || null;
   function is(event, action) {
     if (capturing || event.ctrlKey || event.altKey || event.metaKey) return false;
-    if (bindings(action).includes(codeOf(event))) return true;
-    return isDefault(action) && LEGACY[action] === event.key;
+    const claim = legacyClaim(event);
+    if (claim) return claim === action;
+    return bindings(action).includes(codeOf(event));
   }
   // Every action this key is bound to (a held movement key looks up its direction here).
   function actionsFor(code) { return ACTIONS.filter(([, id]) => bindings(id).includes(code)).map(([, id]) => id); }
@@ -89,26 +92,28 @@
     return keys.length ? (all ? keys.join(' / ') : keys[0]) : 'unbound';
   }
 
-  // What changes when `code` becomes a key of `action`: the other action that holds it (it gives it up).
-  const holder = (code, action) => ACTIONS.map(a => a[1]).find(id => id !== action && bindings(id).includes(code)) || null;
+  // Every other action that holds `code` (it gives it up when `action` takes it).
+  const holders = (code, action) => ACTIONS.map(a => a[1]).filter(id => id !== action && bindings(id).includes(code));
+  // Whether `code` may be a key of `action`: the same rule bind() applies to a pressed key and to a key handed over in a swap.
+  const allowed = (action, code) => !(FORBIDDEN.test(code) && !(code === 'Escape' && action === 'menu')) && !(code === 'Enter' && action !== 'chat');
   function save(map) { window.Prefs.set({ keys: map }); dispatchEvent(new Event('keymap-change')); }
   // Bind `code` into one slot of an action. A key another action holds is taken from it (swap); the result says which.
   function bind(action, slot, code) {
     if (!DEFAULTS[action] || !(slot >= 0 && slot < SLOTS)) return { ok: false };
-    if (FORBIDDEN.test(code) && !(code === 'Escape' && action === 'menu')) return { ok: false, why: 'This key cannot be used' };
-    if (code === 'Enter' && action !== 'chat') return { ok: false, why: 'This key cannot be used' };
-    const next = { ...overrides() }, mine = slots(action), other = holder(code, action);
+    if (!allowed(action, code)) return { ok: false, why: 'This key cannot be used' };
+    const next = { ...overrides() }, mine = slots(action), others = holders(code, action);
     const old = mine[slot];
     if (mine.includes(code)) mine[mine.indexOf(code)] = null;           // the same key twice in one action moves
     mine[slot] = code;
     next[action] = mine;
-    let swapped = null;
-    if (other) {                                                         // the other action gets what this slot held (or loses the key)
-      const theirs = slots(other).map(c => c === code ? (old && !mine.includes(old) && old !== code ? old : null) : c);
-      next[other] = theirs; swapped = other;
+    // A key held by one other action swaps: that action gets what this slot held, if it may have it. A key held by several (M is
+    // the map and a sound key) just leaves all of them. Nothing else ever ends up holding a key it could not have chosen.
+    for (const other of others) {
+      const give = others.length === 1 && old && !mine.includes(old) && allowed(other, old) ? old : null;
+      next[other] = slots(other).map(c => c === code ? give : c);
     }
     save(next);
-    return { ok: true, swapped };
+    return { ok: true, swapped: others[0] || null };
   }
   function clear(action, slot) { const next = { ...overrides() }, mine = slots(action); mine[slot] = null; next[action] = mine; save(next); }
   function reset(action) { const next = { ...overrides() }; delete next[action]; save(Object.keys(next).length ? next : null); }
@@ -171,5 +176,5 @@
   }
   addEventListener('load', applyHints); addEventListener('keymap-change', applyHints);
 
-  window.Keys = { skillRange, ACTIONS, SLOTS, is, which, codeOf, actionsFor, typing, label, name, slots, isDefault, bind, clear, reset, resetAll, capture, holder, get capturing() { return capturing; } };
+  window.Keys = { skillRange, ACTIONS, SLOTS, is, which, codeOf, actionsFor, typing, label, name, slots, isDefault, bind, clear, reset, resetAll, capture, holders, get capturing() { return capturing; } };
 })();

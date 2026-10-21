@@ -20,7 +20,7 @@
   const EXTRA = [['#loot-rolls', '0 0'], ['#social-invites', '0 0'], ['#pvp-duel-warning', '0 0'], ['#rare-pickup', '0 0'], ['#toast', '0 100%']];
   // [overlay id, window selector or null for the overlay itself, name, origin, resizable]
   const WINDOWS = [
-    ['pause', '.pause-panel', 'World Menu', '50% 50%', false], ['settings-panel', '.settings-panel', 'Settings', '50% 50%', false],
+    ['pause', '.pause-panel', 'World Menu', '50% 50%', false], ['settings-panel', '.settings-panel', 'Settings', '50% 50%', false], ['keys-panel', '.keys-panel', 'Keyboard', '50% 50%', false],
     ['quest-journal', '.quest-panel', 'Quest journal', '50% 50%', true], ['npc-dialogue', '.gossip-window', 'Conversation', '50% 50%', true],
     ['worldmap', '.wm-panel', 'World map', '50% 50%', true], ['social-panel', '.social-panel', 'Social', '50% 50%', true],
     ['trade-panel', '.trade-panel', 'Trade', '50% 50%', true], ['rebirth-dialog', '.rebirth-dialog', 'Rebirth', '50% 50%', true],

@@ -16,7 +16,7 @@ Client only (`client/keymap.js`, the Keyboard screen in `settings.js`, check `te
 Esc always closes/opens like before (the `menu` action only adds a key), Tab and the focus traps, Enter/Esc/arrows inside dialogs and the Edit UI nudging and grip keys. Never bindable: Tab, Ctrl/Alt/Meta, CapsLock, F5/F11/F12, Backspace/Delete (they clear a box), Escape (cancels the capture), Enter except for chat.
 
 ## Keyboard screen
-Settings → Keyboard: one row per action, two key boxes, a per-row Reset, Reset all keys. Click a box, press the key. A key another action holds is **swapped**: the other action gets the key this slot had (or loses it) and the message names it. Esc cancels, Backspace clears.
+Settings → Keyboard: one row per action, two key boxes, a per-row Reset, Reset all keys. Click a box, press the key. A key another action holds is **swapped**: the other action gets the key this slot had, unless it may not have it (Escape, Enter outside chat) and then it loses the key; a key held by several actions (M is the map and a sound key) leaves all of them. The message names the first one. Esc cancels, Backspace clears.
 
 ## Hints that follow the keys
 Dynamic: tracker/party/mount/skill-slot/quick-slot labels and titles, the welcome line, level-up hint, bags tooltip, sound toast, pvp and mount help, rebirth notice, and (in `keymap.js` `applyHints`) the static `index.html` aria-labels, titles and kbd tags. `applyHints` rewrites a hint only once its action was changed, so the shipped text and its Swedish stay untouched for everyone else. Standalone-loaded scripts (test fixtures) fall back to the shipped keys.

@@ -1,6 +1,7 @@
 // Key map (UI-KEYMAP) in a real browser. Rebind keys on the Keyboard screen (Settings), then play with them: the old key does nothing, the
 // new key works, hints and tooltips read the new key, a taken key is swapped, typing in chat triggers nothing, and everything is still
-// there after a reload. Client-only. MUTATE=1 serves a keymap.js that ignores the player's choices: the run must then fail.
+// there after a reload. Client-only. MUTATE=1 serves a keymap.js whose labels ignore the player's choices, MUTATE=2 one whose handlers
+// do (the Keyboard screen and labels still work): both runs must fail.
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
@@ -31,7 +32,9 @@ async function hold(page, key, ms) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   page.on('pageerror', e => errors.push(e.message));
   if (process.env.MUTATE) await page.route('**/keymap.js', async route => {
-    const body = fs.readFileSync(path.join(root, 'client/keymap.js'), 'utf8').replace('const list = Array.isArray(own) ? own.filter', 'const list = false ? own.filter');
+    const src = fs.readFileSync(path.join(root, 'client/keymap.js'), 'utf8');
+    const body = process.env.MUTATE === '2' ? src.replace('return bindings(action).includes(codeOf(event));', 'return DEFAULTS[action].includes(codeOf(event));') : src.replace('const list = Array.isArray(own) ? own.filter', 'const list = false ? own.filter');
+    assert.notEqual(body, src, 'the mutation applied');
     await route.fulfill({ body, contentType: 'text/javascript' });
   });
   await page.addInitScript(() => { if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); } });
@@ -51,6 +54,15 @@ async function hold(page, key, ms) {
   // --- rebind on the Keyboard screen ---
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click(); await page.locator('#set-keys').click();
   check(await visible(page, '#keys-panel') && !(await visible(page, '#settings-panel')), 'The Keyboard screen opens from Settings');
+  // a short phone screen: the panel fits, the last row scrolls into view and takes a click
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.locator('.key-row').last().scrollIntoViewIfNeeded();
+  const small = await page.evaluate(() => { const p = document.querySelector('.keys-panel').getBoundingClientRect(), l = document.querySelector('.key-row:last-child').getBoundingClientRect(), hit = document.elementFromPoint(p.left + p.width / 2, p.top + p.height / 2); return { top: p.top, bottom: p.bottom, lastIn: l.top >= p.top - 1 && l.bottom <= p.bottom + 1, hits: !!hit?.closest('.keys-panel') }; });
+  check(small.top >= 0 && small.bottom <= 390 && small.lastIn && small.hits, `At 844x390 the Keyboard panel fits and its last row is reachable: ${JSON.stringify(small)}`);
+  await page.locator('.key-row').last().locator('.key-cell').first().click();
+  check(await page.locator('.key-row').last().locator('.key-cell').first().textContent() === 'Press a key…', 'The last row takes a click');
+  await page.keyboard.press('Escape');
+  await page.setViewportSize({ width: 1440, height: 900 });
   const rows = await page.locator('.key-row').count(), actions = await page.evaluate(() => Keys.ACTIONS.length);
   check(rows === actions && actions >= 30, `One row per action (${rows} of ${actions})`);
   const cell = (action, slot) => page.locator(`#key-${action}-${slot}`);
@@ -120,6 +132,20 @@ async function hold(page, key, ms) {
   const after = await page.evaluate(() => ({ quests: Keys.label('quests'), party: Keys.label('party'), left: Keys.label('moveLeft'), attack: Keys.label('attack') }));
   check(after.quests === 'G' && after.party === 'U' && after.left === 'R / ←' && after.attack === 'Space / J', `The choices survive a reload: ${JSON.stringify(after)}`);
   await page.evaluate(() => Keys.resetAll());
+  // swaps never hand a key to an action that may not have it, and a key two actions share leaves both
+  await page.evaluate(() => Keys.bind('menu', 0, 'KeyQ'));
+  check(await page.evaluate(() => Keys.slots('menu')[0] === 'KeyQ' && !Keys.slots('quests').includes('Escape') && Keys.actionsFor('Escape').length === 0), 'Menu took Q: Quests does not get Escape in the swap');
+  await page.evaluate(() => Keys.resetAll());
+  await page.evaluate(() => Keys.bind('chat', 0, 'KeyQ'));
+  check(await page.evaluate(() => !Keys.slots('quests').includes('Enter')), 'Chat took Q: Quests does not get Enter in the swap');
+  await page.evaluate(() => Keys.resetAll());
+  check(await page.evaluate(() => JSON.stringify(Keys.actionsFor('KeyM')) === '["map","sound"]'), 'Map and sound share M as shipped');
+  await page.evaluate(() => Keys.bind('quests', 0, 'KeyM'));
+  check(await page.evaluate(() => JSON.stringify(Keys.actionsFor('KeyM')) === '["quests"]'), 'Quests took M: map and sound both gave it up');
+  await page.evaluate(() => Keys.resetAll());
+  // the shipped '-' and '=' still answer by character: Swedish '=' is Shift+0 and '-' is the Slash key
+  const legacy = await page.evaluate(() => { const ids = Array.from({ length: 12 }, (_, i) => 'skill' + (i + 1)), ev = (code, key, shiftKey = false) => new KeyboardEvent('keydown', { code, key, shiftKey }); return [Keys.which(ev('Digit0', '=', true), ids), Keys.which(ev('Slash', '-'), ids), Keys.which(ev('Digit0', '0'), ids), Keys.which(ev('Minus', '-'), ids), Keys.which(ev('Equal', '='), ids)]; });
+  check(JSON.stringify(legacy) === '["skill12","skill11","skill10","skill11","skill12"]', `Slots 11 and 12 keep answering to - and =: ${JSON.stringify(legacy)}`);
   check(await page.evaluate(() => Keys.label('quests') === 'Q' && Keys.label('party') === 'P' && JSON.stringify(Prefs.keys) === '{}'), 'Reset all returns every key to its shipped value');
   // --- Swedish: the rewritten hints are translated, key names included ---
   const sv = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
