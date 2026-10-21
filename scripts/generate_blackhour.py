@@ -132,6 +132,8 @@ def main():
         if old is None:assert len(w['zones'])==ZONE-1;w['zones'].append(z)
         else:w['zones'][ZONE-1]=z
         install_parent(w)
+        from generate_emberwake import install_parent as install_emberwake
+        install_emberwake(w)
     check(w)
     if not a.check:
         path.write_text(json.dumps(w,indent=2,ensure_ascii=False)+'\n')

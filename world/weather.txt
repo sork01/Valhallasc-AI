@@ -422,5 +422,52 @@
     ],
     "variant": null,
     "inside": true
+  },
+  {
+    "zone": 41,
+    "theme": "nornroot",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 42,
+    "theme": "skybridge",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 43,
+    "theme": "longship",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 44,
+    "theme": "blackhour",
+    "allowed": [
+      "clear"
+    ],
+    "variant": null,
+    "inside": true
+  },
+  {
+    "zone": 45,
+    "theme": "emberwake",
+    "allowed": [
+      "clear",
+      "fog",
+      "wind"
+    ],
+    "variant": "ash",
+    "inside": false
   }
 ]

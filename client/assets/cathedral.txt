@@ -120,7 +120,14 @@
     "null_coil",
     "null_bell",
     "null_conductor",
-    "null_hour"
+    "null_hour",
+    "ew_ashback",
+    "ew_glasswing",
+    "ew_slagjaw",
+    "ew_cinderhorn",
+    "ew_chainmaw",
+    "ew_bellows",
+    "ew_crown"
   ],
   "clips": {
     "idle": {
@@ -267,7 +274,14 @@
     "null_coil": "27def242bbbbe5a4",
     "null_bell": "ea1994b72d8fd997",
     "null_conductor": "5ab4713e1a8a05fc",
-    "null_hour": "b43118cf23ca300c"
+    "null_hour": "b43118cf23ca300c",
+    "ew_ashback": "a849e2ae9ba603b0",
+    "ew_glasswing": "2b04c156614d4f2e",
+    "ew_slagjaw": "bbe03698e0ef272b",
+    "ew_cinderhorn": "d4c66d1eb185f731",
+    "ew_chainmaw": "9b4aefc7bf83f7df",
+    "ew_bellows": "e4e211cff75a6ee6",
+    "ew_crown": "fc20c92203450ba5"
   },
   "tops": {
     "tidetemplar": 84,
@@ -382,6 +396,13 @@
     "null_coil": 61,
     "null_bell": 75,
     "null_conductor": 68,
-    "null_hour": 72
+    "null_hour": 72,
+    "ew_ashback": 50,
+    "ew_glasswing": 68,
+    "ew_slagjaw": 49,
+    "ew_cinderhorn": 61,
+    "ew_chainmaw": 54,
+    "ew_bellows": 78,
+    "ew_crown": 80
   }
 }

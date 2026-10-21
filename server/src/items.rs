@@ -476,8 +476,8 @@ pub fn rarity_color(rarity: &str) -> &'static str {
     }
 }
 pub fn is_elite(kind: &str) -> bool {
-    if crate::cathedral::enemy(kind).is_some() {
-        return true;
+    if let Some(e) = crate::cathedral::enemy(kind) {
+        return e.elite;
     }
     matches!(
         kind,

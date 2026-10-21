@@ -618,5 +618,33 @@
   "miragejackal": [
     1.5,
     1.0
+  ],
+  "ew_ashback": [
+    1.47,
+    1.0
+  ],
+  "ew_glasswing": [
+    1.44,
+    1.0
+  ],
+  "ew_slagjaw": [
+    1.41,
+    1.0
+  ],
+  "ew_cinderhorn": [
+    1.38,
+    1.0
+  ],
+  "ew_chainmaw": [
+    1.14,
+    1.0
+  ],
+  "ew_bellows": [
+    1,
+    1
+  ],
+  "ew_crown": [
+    1,
+    1
   ]
 }

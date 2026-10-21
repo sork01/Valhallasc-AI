@@ -1,0 +1,198 @@
+[
+  {
+    "kind": "ew_ashback",
+    "name": "Ashback Salamander",
+    "level": 95,
+    "stats": [
+      840000,
+      10500,
+      3.2,
+      1.5
+    ],
+    "color": "#e99055",
+    "elite": false,
+    "outdoor": true,
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      8.5
+    ],
+    "boss": false,
+    "gold": 28000,
+    "material": "ew_ashback_relic",
+    "ranged": null,
+    "slam": 0,
+    "melee": 1
+  },
+  {
+    "kind": "ew_glasswing",
+    "name": "Obsidian Glasswing",
+    "level": 96,
+    "stats": [
+      900000,
+      11200,
+      3.8,
+      1.6
+    ],
+    "color": "#a4b9cf",
+    "elite": false,
+    "outdoor": true,
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      8.5
+    ],
+    "boss": false,
+    "gold": 28000,
+    "material": "ew_glasswing_relic",
+    "ranged": [
+      12,
+      10,
+      "#f29d54",
+      0.7,
+      1,
+      0
+    ],
+    "slam": 0,
+    "melee": 1
+  },
+  {
+    "kind": "ew_slagjaw",
+    "name": "Slagjaw Burrower",
+    "level": 97,
+    "stats": [
+      970000,
+      12000,
+      2.5,
+      1.7
+    ],
+    "color": "#dca16b",
+    "elite": false,
+    "outdoor": true,
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      8.5
+    ],
+    "boss": false,
+    "gold": 28000,
+    "material": "ew_slagjaw_relic",
+    "ranged": null,
+    "slam": 0,
+    "melee": 1
+  },
+  {
+    "kind": "ew_cinderhorn",
+    "name": "Cinderhorn Ram",
+    "level": 98,
+    "stats": [
+      1020000,
+      12600,
+      4.0,
+      1.5
+    ],
+    "color": "#cd785b",
+    "elite": false,
+    "outdoor": true,
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      8.5
+    ],
+    "boss": false,
+    "gold": 28000,
+    "material": "ew_cinderhorn_relic",
+    "ranged": null,
+    "slam": 0,
+    "melee": 1
+  },
+  {
+    "kind": "ew_chainmaw",
+    "name": "Chainmaw, the First Shackle",
+    "level": 97,
+    "stats": [
+      5500000,
+      37000,
+      3.0,
+      3.3
+    ],
+    "color": "#f2b16a",
+    "elite": true,
+    "outdoor": true,
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      8.5
+    ],
+    "boss": false,
+    "gold": 140000,
+    "material": "ew_chainmaw_relic",
+    "ranged": null,
+    "slam": 4.8,
+    "melee": 1
+  },
+  {
+    "kind": "ew_bellows",
+    "name": "Yrsa, the Living Bellows",
+    "level": 99,
+    "stats": [
+      6900000,
+      43000,
+      2.0,
+      3.7
+    ],
+    "color": "#88cbd3",
+    "elite": true,
+    "outdoor": true,
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      8.5
+    ],
+    "boss": false,
+    "gold": 140000,
+    "material": "ew_bellows_relic",
+    "ranged": [
+      12,
+      10,
+      "#f29d54",
+      0.7,
+      1,
+      0
+    ],
+    "slam": 0,
+    "melee": 1
+  },
+  {
+    "kind": "ew_crown",
+    "name": "The Uncrowned Ember",
+    "level": 99,
+    "stats": [
+      8100000,
+      49000,
+      2.9,
+      3.9
+    ],
+    "color": "#eab776",
+    "elite": true,
+    "outdoor": true,
+    "profile": [
+      0.7,
+      1.4,
+      7,
+      8.5
+    ],
+    "boss": false,
+    "gold": 140000,
+    "material": "ew_crown_relic",
+    "ranged": null,
+    "slam": 4.8,
+    "melee": 1
+  }
+]

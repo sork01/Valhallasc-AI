@@ -46,6 +46,8 @@ mod dungeon_solo_tests;
 #[cfg(test)]
 mod elder_hollow_tests;
 #[cfg(test)]
+mod emberwake_tests;
+#[cfg(test)]
 mod epic_drop_tests;
 mod escort;
 #[cfg(test)]
@@ -1231,8 +1233,8 @@ impl Slime {
     }
     /// Dungeon enemies keep one level (the Undervault is tuned for exactly level 20 heroes).
     fn fixed_level(kind: &str) -> bool {
-        if crate::cathedral::enemy(kind).is_some() {
-            return true;
+        if let Some(e) = crate::cathedral::enemy(kind) {
+            return !e.outdoor;
         }
         matches!(
             kind,
@@ -3850,6 +3852,7 @@ impl World {
                 _ if self.spawns[id].ambush.is_some() => 1e9,
                 "big" => 0.,
                 "cinderlord" => 180.,
+                "ew_chainmaw" | "ew_bellows" | "ew_crown" => 600.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
                 | "mireheart" | "silverwidow" | "nightbloom" | "maelstromheart" | "honeyjaw"
@@ -4415,6 +4418,7 @@ impl World {
                             | "snowgiant"
                             | "longnightwyrm"
                     ) || is_boss(&s.kind)
+                        || s.kind.starts_with("ew_") && is_elite(&s.kind)
                     {
                         s.max_hp
                     } else {

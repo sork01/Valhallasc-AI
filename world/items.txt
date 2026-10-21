@@ -54738,5 +54738,54 @@
     "kind": "material",
     "rarity": "common",
     "sell": 0
+  },
+  {
+    "id": "ew_ashback_relic",
+    "name": "Ashback Salamander Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2500
+  },
+  {
+    "id": "ew_glasswing_relic",
+    "name": "Obsidian Glasswing Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2500
+  },
+  {
+    "id": "ew_slagjaw_relic",
+    "name": "Slagjaw Burrower Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2500
+  },
+  {
+    "id": "ew_cinderhorn_relic",
+    "name": "Cinderhorn Ram Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2500
+  },
+  {
+    "id": "ew_chainmaw_relic",
+    "name": "Chainmaw, the First Shackle Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
+    "id": "ew_bellows_relic",
+    "name": "Yrsa, the Living Bellows Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
+    "id": "ew_crown_relic",
+    "name": "The Uncrowned Ember Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
   }
 ]

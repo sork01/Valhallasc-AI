@@ -561,3 +561,12 @@ Keelbound equipment pieces use copper, navy sailcloth, rope and coral on both
 hero bodies. Editable PixelFlow sprites and a 6/8 dybase2 score accompany it.
 See [docs/longship.md](docs/longship.md) for generation, validation and the
 private-copy migration required before a server deployment.
+
+### Emberwake Caldera — levels 95–99
+
+A public volcanic approach beyond Asterion, with a basalt causeway over a
+physical molten river, four ordinary enemy kinds, three elites and five
+quests leading to Eldmarr's sealed Nine-Chain Door. Seven original editable
+PixelFlow sprites and separate dub-techno day/night scores accompany it.
+See [docs/emberwake.md](docs/emberwake.md) for generation, focused checks,
+the raid-party dependency and the private-copy migration before release.
