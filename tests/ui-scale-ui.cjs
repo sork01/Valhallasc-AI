@@ -31,10 +31,14 @@ const near = (a, b, tol = 1.5) => Math.abs(a - b) <= tol;
   await page.waitForFunction(() => Online.connected && !!Field.mageSprites, null, { timeout: 60000 });
 
   // --- the global slider ---
-  const anchored = { skillbar: 'cx b', bags: 'r b', quests: 'r t', frame: 'l t', chat: 'l b', quickuse: 'l b', map: 'r t' };
+  const anchored = { skillbar: 'cx b', bags: 'r b', quests: 'l', frame: 'l t', map: 'r t' };
   const base = {}; for (const id of Object.keys(anchored)) base[id] = await rect(page, `[data-ui="${id}"]`);
   await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
-  check(await page.locator('#set-uiscale').inputValue() === '100', 'UI size starts at 100%');
+  check(await page.locator('#set-uiscale').inputValue() === '80', 'UI size starts at 80%');
+  check((await stored(page)).uiScaleSet !== true, 'The default is not stored as a choice');
+  await page.locator('#set-uiscale').fill('100'); await page.locator('#set-back').click(); await page.locator('#p-resume').click();
+  for (const id of Object.keys(anchored)) base[id] = await rect(page, `[data-ui="${id}"]`); // the checks below measure from 100%
+  await page.keyboard.press('Escape'); await page.locator('#p-settings').click();
   await page.locator('#set-uiscale').fill('150');
   check(await page.locator('#set-uiscale-out').textContent() === '150%', 'The slider shows its percentage');
   check((await stored(page)).uiScale === 1.5, 'The size is saved on this device');

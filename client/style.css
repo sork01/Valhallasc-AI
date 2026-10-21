@@ -191,7 +191,7 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 .confirm:focus-visible { outline: 3px solid var(--cyan); outline-offset: 4px; }
 @keyframes confirm { 0%, 100% { box-shadow: 0 .3cqw 0 #5c3f08, 0 0 1.2cqw rgba(255, 210, 90, .4); } 50% { box-shadow: 0 .3cqw 0 #5c3f08, 0 0 2.6cqw rgba(255, 210, 90, .9); } }
 
-.toast { position: absolute; left: 1.4cqw; bottom: 3.4cqw; margin: 0; padding: .4cqw 1.1cqw; font-size: 1.25cqw; color: #fff; border-radius: 999px; background: rgba(8, 16, 42, .85);
+.toast { position: absolute; left: 1.4cqw; bottom: calc(1.2cqw + 11.5cqw * var(--ui, .8)); margin: 0; padding: .4cqw 1.1cqw; font-size: 1.25cqw; color: #fff; border-radius: 999px; background: rgba(8, 16, 42, .85);
   border: .15cqw solid rgba(245, 197, 66, .6); opacity: 0; transform: translateY(.6cqw); transition: opacity .25s, transform .25s; pointer-events: none; z-index: 6; }
 .toast.show { opacity: 1; transform: none; }
 

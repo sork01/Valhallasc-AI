@@ -2,7 +2,7 @@
 .network-status { display: inline-block; max-width: 12cqw; margin: .6cqw 0 0; padding: .3cqw 1cqw; box-sizing: border-box; border: 1px solid #e5cd8370; border-radius: 2cqw; color: #eee3bf; background: #10182ee8; font: max(10px, .85cqw) 'Jua', sans-serif; text-align: center; white-space: normal; pointer-events: none; }
 .network-status[data-state="online"] { color: #b2efb4; }
 .network-status[data-state="offline"] { color: #ffd7a3; }
-.chat { position: absolute; bottom: 10.5cqw; left: 1.4cqw; width: 28cqw; z-index: 20; border: 1px solid #a9b4dc50; border-radius: .8cqw; overflow: hidden; color: #f1ecda; background: #10182ec9; font: .9cqw sans-serif; }
+.chat { position: absolute; bottom: .6cqw; left: 1.4cqw; width: min(28cqw, max(14cqw, calc((46.2cqw - 28.05cqw * var(--ui, .8)) / var(--ui, .8)))); z-index: 20; border: 1px solid #a9b4dc50; border-radius: .8cqw; overflow: hidden; color: #f1ecda; background: #10182ec9; font: .9cqw sans-serif; }
 .chat-log { height: 7cqw; overflow: auto; padding: .55cqw .8cqw; }
 .chat-log p { margin: .25cqw 0; overflow-wrap: anywhere; line-height: 1.35; }
 .chat-log b { color: #e9ce82; }
@@ -25,7 +25,7 @@
   .chat input { font-size: 16px; }
   .chat button { min-width: 44px; min-height: 44px; }
 }
-.city-travel { position: absolute; right: 1.4cqw; top: 21.5cqw; z-index: 20; border: 1px solid #d9c492aa; border-radius: .6cqw; padding: .6cqw 1cqw; color: #ffe6ac; background: #26352fe8; font: 1cqw 'Jua', sans-serif; cursor: pointer; }
+.city-travel { position: absolute; right: 1.4cqw; top: calc(2.2cqw + 19.9cqw * var(--ui, .8)); z-index: 20; border: 1px solid #d9c492aa; border-radius: .6cqw; padding: .6cqw 1cqw; color: #ffe6ac; background: #26352fe8; font: 1cqw 'Jua', sans-serif; cursor: pointer; }
 .city-travel:hover { background: #455849; }
 .mount-toggle { display: block; margin: .3cqw 0 0 auto; border: 1px solid #d9c492aa; border-radius: .5cqw; padding: .25cqw .7cqw; background: #26352fe8; color: #ffe6ac; font: .9cqw 'Jua', sans-serif; cursor: pointer; pointer-events: auto; }
 .mount-toggle:disabled { opacity: .55; cursor: default; }
@@ -97,7 +97,7 @@
 .gossip-parchment .inventory-item[data-rarity="gm"] b { color: #8a6a00; }
 .gossip-parchment .shop-item-icon { background: #2a1a0acc; border-color: #5a4a30; }
 @media (pointer: coarse) { .gossip-row { min-height: 44px; } .gossip-button, .gossip-parchment .btn, .gossip-titlebar .window-close { min-height: 44px; min-width: 44px; } }
-.quest-tracker { position: absolute; right: 1.4cqw; top: 24.4cqw; width: 23cqw; z-index: 20; color: #f7e9c9; text-align: left; font: 1cqw/1.45 Arial, sans-serif; text-shadow: 0 1px 3px #000, 1px 0 2px #000; }
+.quest-tracker { position: absolute; left: 1.4cqw; top: calc(10.8cqw + 3.6cqw * var(--ui, .8)); width: 23cqw; z-index: 20; color: #f7e9c9; text-align: left; font: 1cqw/1.45 Arial, sans-serif; text-shadow: 0 1px 3px #000, 1px 0 2px #000; }
 .tracker-heading { display: flex; align-items: center; border-bottom: 1px solid #b89b5c80; background: linear-gradient(90deg, #182024cc, #18202420); }
 .tracker-journal, .tracker-toggle, .tracker-title { border: 0; padding: .45cqw .5cqw; background: none; color: #ffd56b; text-align: left; cursor: pointer; font: inherit; text-shadow: inherit; }
 .tracker-journal { flex: 1; font-weight: bold; }
@@ -150,7 +150,7 @@
 .equipment-workspace :focus-visible { outline: 3px solid #ffdc87; outline-offset: 3px; }
 @media (pointer: coarse) { .inventory-item .btn { min-height: 44px; } }
 
-.skillbar { position: absolute; bottom: 3.8cqw; left: 50%; transform: translateX(-50%); z-index: 21; display: flex; align-items: stretch; gap: .6cqw; padding: .6cqw; border: 1px solid #c9ad73; border-radius: 1cqw; background: linear-gradient(#25334df0, #0c1428f5); box-shadow: 0 .4cqw 1.5cqw #0008; }
+.skillbar { position: absolute; bottom: .6cqw; left: 50%; transform: translateX(-50%); z-index: 21; display: flex; align-items: stretch; gap: .6cqw; padding: .6cqw; border: 1px solid #c9ad73; border-radius: 1cqw; background: linear-gradient(#25334df0, #0c1428f5); box-shadow: 0 .4cqw 1.5cqw #0008; }
 .skillbar-slots { display: flex; justify-content: center; gap: .35cqw; }
 .skill-slot { position: relative; width: clamp(34px, 3.9cqw, 64px); height: clamp(42px, 4.7cqw, 74px); flex: none; overflow: hidden; border: 1px solid #8f9aa975; border-radius: .45cqw; background: #0d1a2c; color: #a7b7ca; cursor: pointer; font-family: 'Jua', sans-serif; padding: .25cqw; }
 .skill-slot[data-skill]:not([data-skill=""]) { border-color: #cfb179; background: radial-gradient(ellipse at 50% 35%, #4a586e, #15243d 80%); color: #ffe1a0; }
@@ -272,7 +272,7 @@
 .bag-footer { display: flex; justify-content: space-between; gap: .5cqw; padding: .6cqw .1cqw; font: .75cqw 'Jua', sans-serif; color: #b6a98c; }
 .bag-gold { color: #e3c363; }
 .bag-instructions { margin: 0; color: #a8997b; font: .65cqw/1.4 'Jua', sans-serif; }
-.bags-open { position: absolute; right: 1.5cqw; bottom: 3.8cqw; z-index: 21; width: 4.8cqw; height: 5.1cqw; border: 2px solid #a88e5e; border-radius: .3cqw; background: linear-gradient(#4b4333, #171c1b); color: #e6cd98; cursor: pointer; font: 2.3cqw Georgia, serif; box-shadow: 0 .3cqw .8cqw #0009; }
+.bags-open { position: absolute; right: 1.5cqw; bottom: .6cqw; z-index: 21; width: 4.8cqw; height: 5.1cqw; border: 2px solid #a88e5e; border-radius: .3cqw; background: linear-gradient(#4b4333, #171c1b); color: #e6cd98; cursor: pointer; font: 2.3cqw Georgia, serif; box-shadow: 0 .3cqw .8cqw #0009; }
 .bags-open svg { width: 75%; height: 75%; margin-top: .6cqw; }
 .bags-open kbd { position: absolute; left: .3cqw; top: .2cqw; font: .8cqw 'Jua', sans-serif; }
 .item-tooltip { position: fixed; z-index: 1000; width: max-content; max-width: min(310px, 50vw); padding: 12px 15px; border: 1px solid #aa9870; border-radius: 4px; background: #090d13f5; color: #e8dfcd; box-shadow: 0 5px 22px #000b; pointer-events: none; font: 13px/1.5 'Jua', sans-serif; }
@@ -407,7 +407,7 @@
 .buff-chip[data-kind="haste"] { --buff: #ffe45a; border-color: #ffe45a; } .buff-chip[data-kind="dodge"] { --buff: #b9a8ff; border-color: #b9a8ff; } .buff-chip[data-kind="crit"] { --buff: #ff5c7a; border-color: #ff5c7a; }
 
 /* ---- Friends and party ---- */
-.social-open { position: absolute; right: 6.9cqw; bottom: 3.8cqw; z-index: 21; width: 4.8cqw; height: 5.1cqw; border: 2px solid #a88e5e; border-radius: .3cqw; background: linear-gradient(#4b4333, #171c1b); color: #e6cd98; cursor: pointer; box-shadow: 0 .3cqw .8cqw #0009; }
+.social-open { position: absolute; right: 1.5cqw; bottom: calc(1cqw + 5.1cqw * var(--ui, .8)); z-index: 21; width: 4.8cqw; height: 5.1cqw; border: 2px solid #a88e5e; border-radius: .3cqw; background: linear-gradient(#4b4333, #171c1b); color: #e6cd98; cursor: pointer; box-shadow: 0 .3cqw .8cqw #0009; }
 .social-open svg { width: 75%; height: 75%; margin-top: .6cqw; }
 .social-open kbd { position: absolute; left: .3cqw; top: .2cqw; font: .8cqw 'Jua', sans-serif; }
 .social-open:hover, .social-open[aria-expanded="true"] { filter: brightness(1.2); }
@@ -442,7 +442,7 @@
 .member-fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(#a6f0b5, #4fb871); }
 .social-row[data-dead="true"] .member-fill { background: #8a4b4b; }
 .member-bar em { position: absolute; inset: 0; display: grid; place-items: center; font: normal .75cqw/1 'Jua', sans-serif; color: #fff; text-shadow: 0 1px 2px #000; }
-.party-frame { position: absolute; left: 1.4cqw; top: 15.2cqw; width: 17cqw; z-index: 20; color: #f1ecda; font: .9cqw 'Jua', sans-serif; }
+.party-frame { position: absolute; left: calc(2.4cqw + 28.7cqw * var(--ui, .8)); top: 1.4cqw; width: 17cqw; z-index: 20; color: #f1ecda; font: .9cqw 'Jua', sans-serif; }
 .party-head { width: 100%; padding: .35cqw .6cqw; border: 0; border-bottom: 1px solid #b89b5c80; background: linear-gradient(90deg, #182024cc, #18202420); color: #ffd56b; font: inherit; text-align: left; cursor: pointer; text-shadow: 0 1px 3px #000; }
 .party-frame .social-list { gap: .25cqw; margin-top: .3cqw; }
 .party-frame .social-row { padding: .3cqw .5cqw; background: #101a2ccc; flex-wrap: wrap; gap: .2cqw .5cqw; }
@@ -523,7 +523,7 @@
 .stage.ui-editing #buff-bar:empty { min-width: 8cqw; min-height: 3.4cqw; }
 
 /* Food and potion quick slots, left of the skillbar's row, below the chat. */
-.quickuse { position: absolute; bottom: 3.8cqw; left: 1.4cqw; z-index: 21; display: flex; gap: .35cqw; padding: .6cqw; border: 1px solid #c9ad73; border-radius: 1cqw; background: linear-gradient(#25334df0, #0c1428f5); box-shadow: 0 .4cqw 1.5cqw #0008; }
+.quickuse { position: absolute; bottom: calc(1cqw + 6cqw * var(--ui, .8)); left: calc(50% - 28.05cqw * var(--ui, .8)); z-index: 21; display: flex; gap: .35cqw; padding: .6cqw; border: 1px solid #c9ad73; border-radius: 1cqw; background: linear-gradient(#25334df0, #0c1428f5); box-shadow: 0 .4cqw 1.5cqw #0008; }
 .quick-slot[data-item=""] { border-color: #8f9aa975; background: #0d1a2c; color: #65748b; }
 .quick-slot[data-item]:not([data-item=""]) { border-color: #cfb179; background: radial-gradient(ellipse at 50% 35%, #4a586e, #15243d 80%); color: #ffe1a0; }
 .quick-slot[data-kind="food"]:not([data-item=""]) { color: #f2c27b; }
@@ -561,7 +561,7 @@
 /* ---- World map (M) ---- */
 #minimap { cursor: pointer; pointer-events: auto; }
 .minimap-wrap { position: relative; width: 12cqw; height: 12cqw; margin-left: auto; }
-.wm-open { position: absolute; left: -1cqw; top: -1cqw; width: 3cqw; height: 3cqw; padding: .3cqw; display: grid; place-items: center; border: .2cqw solid #e5cd83; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #3a79a3, #14304a 70%); color: #d6ecff; cursor: pointer; pointer-events: auto; box-shadow: 0 .3cqw .8cqw #000a; }
+.wm-open { position: absolute; left: -1cqw; top: .8cqw; width: 3cqw; height: 3cqw; padding: .3cqw; display: grid; place-items: center; border: .2cqw solid #e5cd83; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #3a79a3, #14304a 70%); color: #d6ecff; cursor: pointer; pointer-events: auto; box-shadow: 0 .3cqw .8cqw #000a; }
 .wm-open svg { width: 100%; height: 100%; }
 .wm-open:hover, .wm-open:focus-visible { color: #fff; box-shadow: 0 0 1cqw #ffdc87, 0 .3cqw .8cqw #000a; }
 .wm-open:focus-visible { outline: 3px solid #ffdc87; outline-offset: 2px; }

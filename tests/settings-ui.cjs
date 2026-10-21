@@ -120,9 +120,9 @@ const stageRect = page => rect(page, '#stage');
   check(Math.abs((chat1.l - chat0.l) - stage.w * 1.25 / 100) < 1 && Math.abs((chat1.t - chat0.t) - stage.w * .25 / 100) < 1, 'Arrow keys nudge the focused handle; Shift moves four times as far');
   // move a button and an empty frame too
   const tracker0 = await rect(page, '#quest-tracker');
-  await page.mouse.move(tracker0.l + 10, tracker0.t + 10); await page.mouse.down(); await page.mouse.move(tracker0.l - 90, tracker0.t + 60, { steps: 5 }); await page.mouse.up();
+  await page.mouse.move(tracker0.l + 10, tracker0.t + 10); await page.mouse.down(); await page.mouse.move(tracker0.l + 110, tracker0.t + 60, { steps: 5 }); await page.mouse.up();
   const tracker1 = await rect(page, '#quest-tracker');
-  check(Math.abs((tracker1.l - tracker0.l) + 100) < 1.5 && Math.abs((tracker1.t - tracker0.t) - 50) < 1.5, 'The quest tracker moves');
+  check(Math.abs((tracker1.l - tracker0.l) - 100) < 1.5 && Math.abs((tracker1.t - tracker0.t) - 50) < 1.5, 'The quest tracker moves');
   const chatBefore = await stored(page);
   // finish with Esc: returns to Settings, not the World Menu, and the world stays paused
   await page.keyboard.press('Escape');

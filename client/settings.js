@@ -12,7 +12,7 @@
   // translateX(-50%) uses x=0: the shift is applied before the scale, which leaves its centre where it was.
   const ITEMS = [
     ['frame', 'Character frame', '.hud-tl', '0 0'], ['buffs', 'Active effects', '#buff-bar', '0 0'], ['party', 'Party', '#party-frame', '0 0'],
-    ['map', 'Minimap', '.hud-tr', '100% 0'], ['travel', 'Travel button', '#city-travel', '100% 0'], ['quests', 'Quest tracker', '#quest-tracker', '100% 0'],
+    ['map', 'Minimap', '.hud-tr', '100% 0'], ['travel', 'Travel button', '#city-travel', '100% 0'], ['quests', 'Quest tracker', '#quest-tracker', '0 0'],
     ['bags', 'Bags button', '#inventory-open', '100% 100%'], ['social', 'Social button', '#social-open', '100% 100%'],
     ['skillbar', 'Skillbar', '#skillbar', '0 100%'], ['quickuse', 'Food and potion slots', '#quickuse', '0 100%'], ['chat', 'Chat', '#chat', '0 100%'],
   ];
@@ -101,6 +101,7 @@
   }
   function applyScale() {
     const k = uiScale();
+    stage.style.setProperty('--ui', String(k)); // CSS that lines one piece up with another reads the scale from here
     for (const [id] of ITEMS) { const el = els.get(id); if (el) el.style.scale = Math.abs(k - 1) < .005 ? '' : String(k); }
     for (const [selector] of EXTRA) { const el = document.querySelector(selector); if (el) el.style.scale = Math.abs(k - 1) < .005 ? '' : String(k); }
     for (const w of wins) applyWindow(w);

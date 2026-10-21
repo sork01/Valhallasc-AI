@@ -97,6 +97,31 @@ const errors = [];
   await page.screenshot({ path: path.join(world.artifacts, 'hud-remake-1440.png') });
   check(await log.evaluate(n => n.scrollHeight > n.clientHeight), 'The chat log scrolls');
 
+  // --- the layout: 80% by default, then the same arrangement at 100% ---
+  const lay = await enter(browser, world.url, 'Layouter', { width: 1440, height: 900 }, { lang: 'en', sound: false, char: null, draft: null });
+  await lay.waitForFunction(() => /online$/.test(document.getElementById('network-status').textContent));
+  check(await lay.evaluate(() => Prefs.uiScale) === .8, 'UI size defaults to 80%');
+  const arrange = async label => {
+    await lay.waitForTimeout(150);
+    const r = {}; for (const [k, sel] of Object.entries({ stage: '#stage', frame: '.hud-tl', tracker: '#quest-tracker', chat: '#chat', skill: '#skillbar', quick: '#quickuse', bags: '#inventory-open', social: '#social-open', map: '#minimap', globe: '#wm-open', pill: '#network-status' })) r[k] = await rect(lay, sel);
+    const u = r.stage.w / 100, st = r.stage, near = (x, y, tol = 1.2) => Math.abs(x - y) <= tol * u;
+    check(near(r.tracker.l, st.l + 1.4 * u) && r.tracker.t >= r.frame.b - 1, `${label}: the quest tracker is on the left, under the character frame (${JSON.stringify({ tracker: r.tracker, frame: r.frame, st })})`);
+    check(near(r.chat.l, st.l + 1.4 * u) && near(r.chat.b, st.b - .6 * u), `${label}: chat is in the bottom left corner`);
+    check(near(r.skill.b, st.b - .6 * u) && near((r.skill.l + r.skill.r) / 2, (st.l + st.r) / 2, .5), `${label}: the skillbar is centred at the very bottom`);
+    check(near(r.quick.l, r.skill.l, .4) && r.quick.b <= r.skill.t + 1 && r.skill.t - r.quick.b < 1.6 * u, `${label}: food and potions sit on the left end of the skillbar (${r.quick.l.toFixed(0)} vs ${r.skill.l.toFixed(0)}, gap ${(r.skill.t - r.quick.b).toFixed(0)})`);
+    check(near(r.bags.r, st.r - 1.5 * u) && near(r.bags.b, st.b - .6 * u), `${label}: the bags button is in the bottom right corner`);
+    check(near(r.social.r, r.bags.r, .3) && r.social.b <= r.bags.t + 1 && r.bags.t - r.social.b < 1.2 * u, `${label}: the social button is just above it (gap ${(r.bags.t - r.social.b).toFixed(0)})`);
+    check(near(r.map.r, st.r - 1.4 * u) && near(r.map.t, st.t + 1.4 * u), `${label}: the minimap is in the top right corner`);
+    check(r.globe.t >= st.t + 1.5 * u && r.globe.l >= st.l && r.globe.b <= r.map.b, `${label}: the world map button is fully on screen (top ${(r.globe.t - st.t).toFixed(0)})`);
+    const boxes = ['frame', 'tracker', 'chat', 'skill', 'quick', 'bags', 'social', 'map', 'pill'], hit = (a, b) => !(a.r <= b.l + 1 || b.r <= a.l + 1 || a.b <= b.t + 1 || b.b <= a.t + 1);
+    const clash = []; for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) if (hit(r[boxes[i]], r[boxes[j]])) clash.push(boxes[i] + '/' + boxes[j]);
+    check(clash.length === 0, `${label}: no HUD pieces overlap (${clash.join(', ') || 'none'})`);
+    await lay.screenshot({ path: path.join(world.artifacts, `hud-layout-${label.replace('%', '')}.png`) });
+  };
+  await arrange('80%');
+  await lay.keyboard.press('Escape'); await lay.locator('#p-settings').click(); await lay.locator('#set-uiscale').fill('100'); await lay.locator('#set-back').click(); await lay.locator('#p-resume').click();
+  await arrange('100%');
+
   // --- phone width ---
   const phone = await enter(browser, world.url, 'Phoner', { width: 844, height: 390 }, { lang: 'en', sound: false, char: null, draft: null });
   await phone.waitForFunction(() => /^Greenmeadow · \d+ online$/.test(document.getElementById('network-status').textContent), null, { timeout: 10000 });
