@@ -3013,6 +3013,11 @@
           "id": "stat_reset",
           "label": "Reset trained attributes",
           "cost": 0
+        },
+        {
+          "id": "gauntlet",
+          "label": "Enter the Arena",
+          "cost": 0
         }
       ]
     },
@@ -3233,6 +3238,339 @@
       "rewardGold": 25,
       "requires": "slime_patrol",
       "repeatable": true
+    },
+    {
+      "id": "arena_alder_20",
+      "title": "Arena Trial: Initiate",
+      "npc": "guide",
+      "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+      "objectives": [
+        {
+          "kind": "gauntlet",
+          "target": "L20",
+          "label": "Win five Arena fights",
+          "count": 5
+        }
+      ],
+      "level": 20,
+      "rewardXp": 650,
+      "rewardGold": 1200,
+      "requires": null,
+      "repeatable": false,
+      "rewardChoices": {
+        "warrior": [
+          "warrior_weapon_sword_l20_blue"
+        ],
+        "mage": [
+          "mage_weapon_ash_l20_blue"
+        ],
+        "assassin": [
+          "assassin_weapon_daggers_l20_blue"
+        ],
+        "priest": [
+          "priest_weapon_mace_l20_blue"
+        ],
+        "hunter": [
+          "hunter_weapon_shortbow_l20_blue"
+        ]
+      },
+      "minLevel": 20
+    },
+    {
+      "id": "arena_alder_30",
+      "title": "Arena Trial: Challenger",
+      "npc": "guide",
+      "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+      "objectives": [
+        {
+          "kind": "gauntlet",
+          "target": "L30",
+          "label": "Win five Arena fights",
+          "count": 5
+        }
+      ],
+      "level": 30,
+      "rewardXp": 1320,
+      "rewardGold": 1200,
+      "requires": null,
+      "repeatable": false,
+      "rewardChoices": {
+        "warrior": [
+          "warrior_weapon_sword_l30_blue"
+        ],
+        "mage": [
+          "mage_weapon_ash_l30_blue"
+        ],
+        "assassin": [
+          "assassin_weapon_daggers_l30_blue"
+        ],
+        "priest": [
+          "priest_weapon_mace_l30_blue"
+        ],
+        "hunter": [
+          "hunter_weapon_shortbow_l30_blue"
+        ]
+      },
+      "minLevel": 30
+    },
+    {
+      "id": "arena_alder_40",
+      "title": "Arena Trial: Contender",
+      "npc": "guide",
+      "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+      "objectives": [
+        {
+          "kind": "gauntlet",
+          "target": "L40",
+          "label": "Win five Arena fights",
+          "count": 5
+        }
+      ],
+      "level": 40,
+      "rewardXp": 2210,
+      "rewardGold": 2400,
+      "requires": null,
+      "repeatable": false,
+      "rewardChoices": {
+        "warrior": [
+          "warrior_weapon_sword_l40_blue"
+        ],
+        "mage": [
+          "mage_weapon_ash_l40_blue"
+        ],
+        "assassin": [
+          "assassin_weapon_daggers_l40_blue"
+        ],
+        "priest": [
+          "priest_weapon_mace_l40_blue"
+        ],
+        "hunter": [
+          "hunter_weapon_shortbow_l40_blue"
+        ]
+      },
+      "minLevel": 40
+    },
+    {
+      "id": "arena_alder_50",
+      "title": "Arena Trial: Gladiator",
+      "npc": "guide",
+      "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+      "objectives": [
+        {
+          "kind": "gauntlet",
+          "target": "L50",
+          "label": "Win five Arena fights",
+          "count": 5
+        }
+      ],
+      "level": 50,
+      "rewardXp": 3330,
+      "rewardGold": 2500,
+      "requires": null,
+      "repeatable": false,
+      "rewardChoices": {
+        "warrior": [
+          "warrior_weapon_sword_l50_blue"
+        ],
+        "mage": [
+          "mage_weapon_ash_l50_blue"
+        ],
+        "assassin": [
+          "assassin_weapon_daggers_l50_blue"
+        ],
+        "priest": [
+          "priest_weapon_mace_l50_blue"
+        ],
+        "hunter": [
+          "hunter_weapon_shortbow_l50_blue"
+        ]
+      },
+      "minLevel": 50
+    },
+    {
+      "id": "arena_alder_60",
+      "title": "Arena Trial: Veteran",
+      "npc": "guide",
+      "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+      "objectives": [
+        {
+          "kind": "gauntlet",
+          "target": "L60",
+          "label": "Win five Arena fights",
+          "count": 5
+        }
+      ],
+      "level": 60,
+      "rewardXp": 4670,
+      "rewardGold": 5000,
+      "requires": null,
+      "repeatable": false,
+      "rewardChoices": {
+        "warrior": [
+          "warrior_weapon_sword_l60_blue"
+        ],
+        "mage": [
+          "mage_weapon_ash_l60_blue"
+        ],
+        "assassin": [
+          "assassin_weapon_daggers_l60_blue"
+        ],
+        "priest": [
+          "priest_weapon_mace_l60_blue"
+        ],
+        "hunter": [
+          "hunter_weapon_shortbow_l60_blue"
+        ]
+      },
+      "minLevel": 60
+    },
+    {
+      "id": "arena_alder_70",
+      "title": "Arena Trial: Champion",
+      "npc": "guide",
+      "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+      "objectives": [
+        {
+          "kind": "gauntlet",
+          "target": "L70",
+          "label": "Win five Arena fights",
+          "count": 5
+        }
+      ],
+      "level": 70,
+      "rewardXp": 6240,
+      "rewardGold": 9000,
+      "requires": null,
+      "repeatable": false,
+      "rewardChoices": {
+        "warrior": [
+          "warrior_weapon_sword_l70_blue"
+        ],
+        "mage": [
+          "mage_weapon_ash_l70_blue"
+        ],
+        "assassin": [
+          "assassin_weapon_daggers_l70_blue"
+        ],
+        "priest": [
+          "priest_weapon_mace_l70_blue"
+        ],
+        "hunter": [
+          "hunter_weapon_shortbow_l70_blue"
+        ]
+      },
+      "minLevel": 70
+    },
+    {
+      "id": "arena_alder_80",
+      "title": "Arena Trial: Warlord",
+      "npc": "guide",
+      "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+      "objectives": [
+        {
+          "kind": "gauntlet",
+          "target": "L80",
+          "label": "Win five Arena fights",
+          "count": 5
+        }
+      ],
+      "level": 80,
+      "rewardXp": 8030,
+      "rewardGold": 15000,
+      "requires": null,
+      "repeatable": false,
+      "rewardChoices": {
+        "warrior": [
+          "warrior_weapon_sword_l80_blue"
+        ],
+        "mage": [
+          "mage_weapon_ash_l80_blue"
+        ],
+        "assassin": [
+          "assassin_weapon_daggers_l80_blue"
+        ],
+        "priest": [
+          "priest_weapon_mace_l80_blue"
+        ],
+        "hunter": [
+          "hunter_weapon_shortbow_l80_blue"
+        ]
+      },
+      "minLevel": 80
+    },
+    {
+      "id": "arena_alder_90",
+      "title": "Arena Trial: Legend",
+      "npc": "guide",
+      "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+      "objectives": [
+        {
+          "kind": "gauntlet",
+          "target": "L90",
+          "label": "Win five Arena fights",
+          "count": 5
+        }
+      ],
+      "level": 90,
+      "rewardXp": 10050,
+      "rewardGold": 18000,
+      "requires": null,
+      "repeatable": false,
+      "rewardChoices": {
+        "warrior": [
+          "warrior_weapon_sword_l90_blue"
+        ],
+        "mage": [
+          "mage_weapon_ash_l90_blue"
+        ],
+        "assassin": [
+          "assassin_weapon_daggers_l90_blue"
+        ],
+        "priest": [
+          "priest_weapon_mace_l90_blue"
+        ],
+        "hunter": [
+          "hunter_weapon_shortbow_l90_blue"
+        ]
+      },
+      "minLevel": 90
+    },
+    {
+      "id": "arena_alder_99",
+      "title": "Arena Trial: Immortal",
+      "npc": "guide",
+      "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+      "objectives": [
+        {
+          "kind": "gauntlet",
+          "target": "L99",
+          "label": "Win five Arena fights",
+          "count": 5
+        }
+      ],
+      "level": 99,
+      "rewardXp": 12060,
+      "rewardGold": 30000,
+      "requires": null,
+      "repeatable": false,
+      "rewardChoices": {
+        "warrior": [
+          "warrior_weapon_sword_l95_blue"
+        ],
+        "mage": [
+          "mage_weapon_ash_l95_blue"
+        ],
+        "assassin": [
+          "assassin_weapon_daggers_l95_blue"
+        ],
+        "priest": [
+          "priest_weapon_mace_l95_blue"
+        ],
+        "hunter": [
+          "hunter_weapon_shortbow_l95_blue"
+        ]
+      },
+      "minLevel": 99
     }
   ],
   "name": "Greenmeadow",
@@ -25633,6 +25971,11 @@
               "id": "stat_reset",
               "label": "Reset trained attributes",
               "cost": 0
+            },
+            {
+              "id": "gauntlet",
+              "label": "Enter the Arena",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -27700,6 +28043,339 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 20
+        },
+        {
+          "id": "arena_skald_20",
+          "title": "Arena Trial: Initiate",
+          "npc": "city_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L20",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 20,
+          "rewardXp": 650,
+          "rewardGold": 1200,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l20_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l20_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l20_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l20_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l20_blue"
+            ]
+          },
+          "minLevel": 20
+        },
+        {
+          "id": "arena_skald_30",
+          "title": "Arena Trial: Challenger",
+          "npc": "city_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L30",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 30,
+          "rewardXp": 1320,
+          "rewardGold": 1200,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l30_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l30_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l30_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l30_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l30_blue"
+            ]
+          },
+          "minLevel": 30
+        },
+        {
+          "id": "arena_skald_40",
+          "title": "Arena Trial: Contender",
+          "npc": "city_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L40",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 2400,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l40_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l40_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l40_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l40_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l40_blue"
+            ]
+          },
+          "minLevel": 40
+        },
+        {
+          "id": "arena_skald_50",
+          "title": "Arena Trial: Gladiator",
+          "npc": "city_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L50",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 50,
+          "rewardXp": 3330,
+          "rewardGold": 2500,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l50_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l50_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l50_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l50_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l50_blue"
+            ]
+          },
+          "minLevel": 50
+        },
+        {
+          "id": "arena_skald_60",
+          "title": "Arena Trial: Veteran",
+          "npc": "city_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L60",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 5000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l60_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l60_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l60_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l60_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l60_blue"
+            ]
+          },
+          "minLevel": 60
+        },
+        {
+          "id": "arena_skald_70",
+          "title": "Arena Trial: Champion",
+          "npc": "city_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L70",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 70,
+          "rewardXp": 6240,
+          "rewardGold": 9000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l70_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l70_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l70_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l70_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l70_blue"
+            ]
+          },
+          "minLevel": 70
+        },
+        {
+          "id": "arena_skald_80",
+          "title": "Arena Trial: Warlord",
+          "npc": "city_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L80",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 15000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l80_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l80_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l80_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l80_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l80_blue"
+            ]
+          },
+          "minLevel": 80
+        },
+        {
+          "id": "arena_skald_90",
+          "title": "Arena Trial: Legend",
+          "npc": "city_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L90",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 90,
+          "rewardXp": 10050,
+          "rewardGold": 18000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l90_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l90_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l90_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l90_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l90_blue"
+            ]
+          },
+          "minLevel": 90
+        },
+        {
+          "id": "arena_skald_99",
+          "title": "Arena Trial: Immortal",
+          "npc": "city_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L99",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 99,
+          "rewardXp": 12060,
+          "rewardGold": 30000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l95_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l95_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l95_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l95_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l95_blue"
+            ]
+          },
+          "minLevel": 99
         }
       ],
       "city": {
@@ -65355,6 +66031,11 @@
               "id": "stat_reset",
               "label": "Reset trained attributes",
               "cost": 0
+            },
+            {
+              "id": "gauntlet",
+              "label": "Enter the Arena",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -66725,6 +67406,339 @@
           "rewardItem": "accessory_amber_l50_blue",
           "group": true,
           "recommendedPlayers": 5
+        },
+        {
+          "id": "arena_nacre_20",
+          "title": "Arena Trial: Initiate",
+          "npc": "nacre_archivist",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L20",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 20,
+          "rewardXp": 650,
+          "rewardGold": 1200,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l20_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l20_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l20_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l20_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l20_blue"
+            ]
+          },
+          "minLevel": 20
+        },
+        {
+          "id": "arena_nacre_30",
+          "title": "Arena Trial: Challenger",
+          "npc": "nacre_archivist",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L30",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 30,
+          "rewardXp": 1320,
+          "rewardGold": 1200,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l30_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l30_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l30_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l30_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l30_blue"
+            ]
+          },
+          "minLevel": 30
+        },
+        {
+          "id": "arena_nacre_40",
+          "title": "Arena Trial: Contender",
+          "npc": "nacre_archivist",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L40",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 2400,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l40_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l40_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l40_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l40_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l40_blue"
+            ]
+          },
+          "minLevel": 40
+        },
+        {
+          "id": "arena_nacre_50",
+          "title": "Arena Trial: Gladiator",
+          "npc": "nacre_archivist",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L50",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 50,
+          "rewardXp": 3330,
+          "rewardGold": 2500,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l50_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l50_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l50_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l50_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l50_blue"
+            ]
+          },
+          "minLevel": 50
+        },
+        {
+          "id": "arena_nacre_60",
+          "title": "Arena Trial: Veteran",
+          "npc": "nacre_archivist",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L60",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 5000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l60_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l60_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l60_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l60_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l60_blue"
+            ]
+          },
+          "minLevel": 60
+        },
+        {
+          "id": "arena_nacre_70",
+          "title": "Arena Trial: Champion",
+          "npc": "nacre_archivist",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L70",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 70,
+          "rewardXp": 6240,
+          "rewardGold": 9000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l70_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l70_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l70_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l70_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l70_blue"
+            ]
+          },
+          "minLevel": 70
+        },
+        {
+          "id": "arena_nacre_80",
+          "title": "Arena Trial: Warlord",
+          "npc": "nacre_archivist",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L80",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 15000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l80_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l80_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l80_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l80_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l80_blue"
+            ]
+          },
+          "minLevel": 80
+        },
+        {
+          "id": "arena_nacre_90",
+          "title": "Arena Trial: Legend",
+          "npc": "nacre_archivist",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L90",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 90,
+          "rewardXp": 10050,
+          "rewardGold": 18000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l90_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l90_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l90_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l90_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l90_blue"
+            ]
+          },
+          "minLevel": 90
+        },
+        {
+          "id": "arena_nacre_99",
+          "title": "Arena Trial: Immortal",
+          "npc": "nacre_archivist",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L99",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 99,
+          "rewardXp": 12060,
+          "rewardGold": 30000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l95_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l95_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l95_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l95_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l95_blue"
+            ]
+          },
+          "minLevel": 99
         }
       ],
       "futureInstance": {
@@ -91275,6 +92289,11 @@
               "id": "stat_reset",
               "label": "Reset trained attributes",
               "cost": 0
+            },
+            {
+              "id": "gauntlet",
+              "label": "Enter the Arena",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -92161,6 +93180,339 @@
           "requires": null,
           "repeatable": false,
           "autoLevel": 40
+        },
+        {
+          "id": "arena_astral_20",
+          "title": "Arena Trial: Initiate",
+          "npc": "astral_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L20",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 20,
+          "rewardXp": 650,
+          "rewardGold": 1200,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l20_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l20_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l20_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l20_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l20_blue"
+            ]
+          },
+          "minLevel": 20
+        },
+        {
+          "id": "arena_astral_30",
+          "title": "Arena Trial: Challenger",
+          "npc": "astral_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L30",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 30,
+          "rewardXp": 1320,
+          "rewardGold": 1200,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l30_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l30_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l30_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l30_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l30_blue"
+            ]
+          },
+          "minLevel": 30
+        },
+        {
+          "id": "arena_astral_40",
+          "title": "Arena Trial: Contender",
+          "npc": "astral_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L40",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 2400,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l40_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l40_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l40_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l40_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l40_blue"
+            ]
+          },
+          "minLevel": 40
+        },
+        {
+          "id": "arena_astral_50",
+          "title": "Arena Trial: Gladiator",
+          "npc": "astral_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L50",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 50,
+          "rewardXp": 3330,
+          "rewardGold": 2500,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l50_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l50_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l50_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l50_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l50_blue"
+            ]
+          },
+          "minLevel": 50
+        },
+        {
+          "id": "arena_astral_60",
+          "title": "Arena Trial: Veteran",
+          "npc": "astral_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L60",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 5000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l60_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l60_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l60_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l60_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l60_blue"
+            ]
+          },
+          "minLevel": 60
+        },
+        {
+          "id": "arena_astral_70",
+          "title": "Arena Trial: Champion",
+          "npc": "astral_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L70",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 70,
+          "rewardXp": 6240,
+          "rewardGold": 9000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l70_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l70_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l70_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l70_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l70_blue"
+            ]
+          },
+          "minLevel": 70
+        },
+        {
+          "id": "arena_astral_80",
+          "title": "Arena Trial: Warlord",
+          "npc": "astral_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L80",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 15000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l80_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l80_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l80_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l80_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l80_blue"
+            ]
+          },
+          "minLevel": 80
+        },
+        {
+          "id": "arena_astral_90",
+          "title": "Arena Trial: Legend",
+          "npc": "astral_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L90",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 90,
+          "rewardXp": 10050,
+          "rewardGold": 18000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l90_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l90_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l90_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l90_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l90_blue"
+            ]
+          },
+          "minLevel": 90
+        },
+        {
+          "id": "arena_astral_99",
+          "title": "Arena Trial: Immortal",
+          "npc": "astral_steward",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L99",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 99,
+          "rewardXp": 12060,
+          "rewardGold": 30000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l95_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l95_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l95_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l95_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l95_blue"
+            ]
+          },
+          "minLevel": 99
         }
       ],
       "city": {
@@ -106016,6 +107368,11 @@
               "id": "stat_reset",
               "label": "Reset trained attributes",
               "cost": 0
+            },
+            {
+              "id": "gauntlet",
+              "label": "Enter the Arena",
+              "cost": 0
             }
           ],
           "buys": false
@@ -109304,6 +110661,339 @@
           "rewardGold": 2000,
           "requires": "asterion_welcome",
           "repeatable": true
+        },
+        {
+          "id": "arena_aster_20",
+          "title": "Arena Trial: Initiate",
+          "npc": "asterion_archon",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L20",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 20,
+          "rewardXp": 650,
+          "rewardGold": 1200,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l20_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l20_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l20_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l20_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l20_blue"
+            ]
+          },
+          "minLevel": 20
+        },
+        {
+          "id": "arena_aster_30",
+          "title": "Arena Trial: Challenger",
+          "npc": "asterion_archon",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L30",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 30,
+          "rewardXp": 1320,
+          "rewardGold": 1200,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l30_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l30_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l30_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l30_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l30_blue"
+            ]
+          },
+          "minLevel": 30
+        },
+        {
+          "id": "arena_aster_40",
+          "title": "Arena Trial: Contender",
+          "npc": "asterion_archon",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L40",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 40,
+          "rewardXp": 2210,
+          "rewardGold": 2400,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l40_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l40_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l40_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l40_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l40_blue"
+            ]
+          },
+          "minLevel": 40
+        },
+        {
+          "id": "arena_aster_50",
+          "title": "Arena Trial: Gladiator",
+          "npc": "asterion_archon",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L50",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 50,
+          "rewardXp": 3330,
+          "rewardGold": 2500,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l50_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l50_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l50_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l50_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l50_blue"
+            ]
+          },
+          "minLevel": 50
+        },
+        {
+          "id": "arena_aster_60",
+          "title": "Arena Trial: Veteran",
+          "npc": "asterion_archon",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L60",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 60,
+          "rewardXp": 4670,
+          "rewardGold": 5000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l60_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l60_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l60_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l60_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l60_blue"
+            ]
+          },
+          "minLevel": 60
+        },
+        {
+          "id": "arena_aster_70",
+          "title": "Arena Trial: Champion",
+          "npc": "asterion_archon",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L70",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 70,
+          "rewardXp": 6240,
+          "rewardGold": 9000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l70_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l70_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l70_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l70_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l70_blue"
+            ]
+          },
+          "minLevel": 70
+        },
+        {
+          "id": "arena_aster_80",
+          "title": "Arena Trial: Warlord",
+          "npc": "asterion_archon",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L80",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 80,
+          "rewardXp": 8030,
+          "rewardGold": 15000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l80_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l80_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l80_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l80_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l80_blue"
+            ]
+          },
+          "minLevel": 80
+        },
+        {
+          "id": "arena_aster_90",
+          "title": "Arena Trial: Legend",
+          "npc": "asterion_archon",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L90",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 90,
+          "rewardXp": 10050,
+          "rewardGold": 18000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l90_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l90_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l90_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l90_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l90_blue"
+            ]
+          },
+          "minLevel": 90
+        },
+        {
+          "id": "arena_aster_99",
+          "title": "Arena Trial: Immortal",
+          "npc": "asterion_archon",
+          "description": "Prove yourself in the Arena. Choose \"Enter the Arena\" and face one fighter of every class, one after the other. You are healed between the fights, and a lost run costs you nothing. Come back here once you have beaten all five.",
+          "objectives": [
+            {
+              "kind": "gauntlet",
+              "target": "L99",
+              "label": "Win five Arena fights",
+              "count": 5
+            }
+          ],
+          "level": 99,
+          "rewardXp": 12060,
+          "rewardGold": 30000,
+          "requires": null,
+          "repeatable": false,
+          "rewardChoices": {
+            "warrior": [
+              "warrior_weapon_sword_l95_blue"
+            ],
+            "mage": [
+              "mage_weapon_ash_l95_blue"
+            ],
+            "assassin": [
+              "assassin_weapon_daggers_l95_blue"
+            ],
+            "priest": [
+              "priest_weapon_mace_l95_blue"
+            ],
+            "hunter": [
+              "hunter_weapon_shortbow_l95_blue"
+            ]
+          },
+          "minLevel": 99
         }
       ],
       "city": {

@@ -145,7 +145,13 @@ impl World {
 
     fn ambient_levels(&self, zone: usize) -> [u32; 2] {
         self.maps[zone].levels.unwrap_or_else(|| {
-            let levels: Vec<u32> = self.maps[zone].quests.iter().map(|q| q.level).collect();
+            // An arena trial is for heroes of any later level: it says nothing about who lives in the zone.
+            let levels: Vec<u32> = self.maps[zone]
+                .quests
+                .iter()
+                .filter(|q| q.gauntlet_level().is_none())
+                .map(|q| q.level)
+                .collect();
             [
                 levels.iter().copied().min().unwrap_or(1),
                 levels.iter().copied().max().unwrap_or(5),
@@ -300,7 +306,8 @@ impl World {
             .quests
             .iter()
             .filter(|q| {
-                q.level <= level + 2
+                q.gauntlet_level().is_none()
+                    && q.level <= level + 2
                     && q.objectives.len() == 1
                     && q.objectives[0].kind == "kill"
                     && giver.is_none_or(|id| q.npc == id)

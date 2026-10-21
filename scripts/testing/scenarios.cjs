@@ -4541,3 +4541,4 @@ module.exports = { scenarios, runScenario, walkTo };
 
 scenarios.longship = require("./longship-scenario.cjs")(kit, map);
 scenarios.blackhour = require('./blackhour-scenario.cjs')(kit,map);
+scenarios.gauntlet = require('./gauntlet-scenario.cjs')(kit, map);

@@ -963,6 +963,14 @@ pub struct QuestObjective {
     pub count: u32,
 }
 impl Quest {
+    /// The level of an arena gauntlet quest (`docs/arena-quests.md`): its one objective is `gauntlet` with the target
+    /// `L<level>`, and the count is the number of fights.
+    pub fn gauntlet_level(&self) -> Option<u32> {
+        self.objectives
+            .iter()
+            .find(|o| o.kind == "gauntlet")
+            .and_then(|o| o.target.strip_prefix('L')?.parse().ok())
+    }
     /// Whether any objective asks the player to hand in items ("bring").
     pub fn has_bring(&self) -> bool {
         self.objectives.iter().any(|o| o.kind == "bring")

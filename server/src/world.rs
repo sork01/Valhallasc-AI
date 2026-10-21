@@ -52,6 +52,9 @@ mod escort;
 mod eye_below_tests;
 #[cfg(test)]
 mod frostwake_tests;
+mod gauntlet;
+#[cfg(test)]
+mod gauntlet_tests;
 mod gm_visibility;
 mod hold;
 mod hour_shards;
@@ -252,6 +255,9 @@ struct Player {
     /// Set on a stranded person walking an escort quest's route (see world/escort.rs). Always with `merc` set to the
     /// character being escorted for, so an escort is never saved, counted as online or put in a party.
     escort: Option<escort::Escort>,
+    /// Set on the opponent of an arena gauntlet run (see world/gauntlet.rs). Always with `merc` set to the hero's
+    /// character id, so an opponent is never saved, counted as online or put in a party.
+    gauntlet: bool,
     /// The confirmation from the last `rebirth_preview` (docs/rebirth.md).
     rebirth_nonce: Option<rebirth::Nonce>,
     /// Frozen in amber by a boss mechanic: cannot move or act, and cannot be hurt, until the cocoon is broken.
@@ -347,6 +353,7 @@ impl Player {
             merc_quest: None,
             ambient: None,
             escort: None,
+            gauntlet: false,
             rebirth_nonce: None,
             frozen: false,
         }
@@ -361,7 +368,7 @@ impl Player {
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
             "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"frozen":self.frozen,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,"reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"rebirthTiers":c.rebirth_tiers,"rebirthPerks":c.rebirth_perks(),"mountTint":c.mount_tint,
             "setCounts":c.set_counts(),"setCd":self.set_cd,
-            "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner}))})
+            "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet})
     }
     fn is_hidden(&self) -> bool {
         self.character.gm && (self.hidden || self.character.zone != self.visible_zone)
@@ -1411,6 +1418,8 @@ pub struct World {
     set_pending: Vec<sets::Pending>,
     /// Counter for mercenary sessions.
     merc_seq: u64,
+    /// Live arena gauntlet runs (world/gauntlet.rs), in memory only.
+    gauntlets: Vec<gauntlet::Run>,
     /// Desired autonomous adventurers in each currently occupied shared zone.
     ambient_targets: BTreeMap<usize, usize>,
     pub ambient_enabled: bool,
@@ -1511,6 +1520,7 @@ impl World {
             cur_skill: String::new(),
             set_pending: vec![],
             merc_seq: 0,
+            gauntlets: vec![],
             ambient_targets: BTreeMap::new(),
             ambient_enabled: false,
             level_spread,
@@ -1997,6 +2007,7 @@ impl World {
             return self.remove_mercenary(session);
         }
         let _ = self.dismiss_mercenaries(session);
+        self.gauntlet_abort(session, "");
         if let Some(id) = self.players.get(&session).map(|p| p.character.id.clone()) {
             self.pvp_left(&id);
         }
@@ -2278,6 +2289,9 @@ impl World {
         if let Some(what) = offer_id.and_then(|id| self.merc_offer(session, npc_id, id)) {
             return self.merc_interact(session, npc_id, &what);
         }
+        if offer_id == Some("gauntlet") {
+            return self.gauntlet_interact(session, npc_id);
+        }
         // A stranded person joins whoever has taken their escort quest.
         let escort_note = self.try_start_escort(session, npc_id);
         let p = self.players.get_mut(&session).unwrap();
@@ -2412,8 +2426,22 @@ impl World {
                             .iter()
                             .find(|q| q.id == quest_id && q.npc == npc_id)
                     {
-                        (notice, levels, quest_changed) =
-                            quest_action_with_choice(&mut p.character, quest, action, choice);
+                        // One arena trial per level, whichever giver offers it.
+                        let taken_elsewhere = action == "accept"
+                            && quest.gauntlet_level().is_some_and(|level| {
+                                self.maps.iter().flat_map(|m| &m.quests).any(|q| {
+                                    q.id != quest.id
+                                        && q.gauntlet_level() == Some(level)
+                                        && p.character.quests.iter().any(|g| g.id == q.id)
+                                })
+                            });
+                        if taken_elsewhere {
+                            notice =
+                                "You have already taken the arena trial for this level.".into();
+                        } else {
+                            (notice, levels, quest_changed) =
+                                quest_action_with_choice(&mut p.character, quest, action, choice);
+                        }
                     }
                 } else if let Some(sale) = id.strip_prefix("sell:") {
                     if !npc.buys {
@@ -2648,6 +2676,7 @@ impl World {
         self.update_instances();
         self.update_ambient();
         self.update_mercenaries();
+        self.update_gauntlets();
         self.update_escorts();
         self.update_holds();
         self.update_chimes();
@@ -6609,6 +6638,7 @@ mod tests {
                                 .iter()
                                 .any(|n| n.id == o.target && n.escort.is_some())
                         ),
+                        "gauntlet" => assert!(q.gauntlet_level().is_some()),
                         _ => panic!("unsupported objective"),
                     }
                 }
@@ -8567,7 +8597,13 @@ mod tests {
     fn skaldholm_has_eleven_valid_quests_mostly_errands_between_the_maps() {
         let w = world();
         let map = &w.maps[CITY];
-        assert_eq!(map.quests.len(), 14);
+        // The arena trials (`gauntlet`) are the steward's, not the city's errands: world/gauntlet_tests.rs checks them.
+        let errands: Vec<&Quest> = map
+            .quests
+            .iter()
+            .filter(|q| q.gauntlet_level().is_none())
+            .collect();
+        assert_eq!(errands.len(), 14);
         assert_eq!(map.quests.iter().filter(|q| q.repeatable).count(), 1);
         let all_npcs: Vec<(usize, &Npc)> = w
             .maps
@@ -8576,7 +8612,7 @@ mod tests {
             .flat_map(|(z, m)| m.npcs.iter().map(move |n| (z, n)))
             .collect();
         let (mut roots, mut far_talk, mut bring_quests) = (0, std::collections::BTreeSet::new(), 0);
-        for q in &map.quests {
+        for q in errands.iter().copied() {
             assert!(q.id.starts_with("city_") && q.npc.starts_with("city_"));
             assert!((11..=20).contains(&q.level), "{} level {}", q.id, q.level);
             assert_eq!(q.reward_xp, xp_to_level(q.level) / 10, "{}", q.id);

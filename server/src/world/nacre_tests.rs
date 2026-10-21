@@ -179,6 +179,7 @@ fn nacre_quests_have_valid_targets_prerequisites_and_level_table_rewards() {
                         .iter()
                         .any(|p| w.maps[p.to].slimes.iter().any(|s| s.kind == o.target)),
                     "reach" => w.maps.iter().any(|area| area.name == o.target),
+                    "gauntlet" => q.gauntlet_level().is_some(),
                     _ => false,
                 },
                 "{} {}",

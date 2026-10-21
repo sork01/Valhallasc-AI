@@ -6,6 +6,7 @@ const root = path.resolve(__dirname, '..');
 execFileSync('python3', [path.join(__dirname, 'bag_tiers.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'stat_reset_npcs.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'bank_npcs.py')], { cwd: root, stdio: 'pipe' });
+execFileSync('python3', [path.join(__dirname, 'arena_quests.py')], { cwd: root, stdio: 'pipe' });
 execFileSync('python3', [path.join(__dirname, 'set_bonuses.py')], { cwd: root, stdio: 'pipe' });
 const map = JSON.parse(fs.readFileSync(path.join(root, 'world/map.txt'), 'utf8'));
 const items = JSON.parse(fs.readFileSync(path.join(root, 'world/items.txt'), 'utf8'));

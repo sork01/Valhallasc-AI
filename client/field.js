@@ -3802,8 +3802,8 @@
         else if (remote.sprite) { const seated = seatedInArt(remote, remote.sprite); if(!seated)drawMount(g,remote); if(remote.mounted&&!seated)g.translate(0,-23); remote.sprite.draw(g, remote, t); if(remote.mounted&&!seated)g.translate(0,23); }
         else { g.fillStyle = '#cfb5fa'; g.font = '24px sans-serif'; g.textAlign = 'center'; g.fillText('✦', 0, -40); }
         drawMageWardShell(g, remote, t); drawPriestBuffShell(g, remote, t); drawHunterBuffShell(g, remote, t); drawPlayerStun(g, remote, t);
-        g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag ? '#ff9b9b' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : window.Rebirth?.color(remote.reborn?.tier || 0) || '#fff4ca';
-        const nameText = remote.escort ? remote.look.name + ' · Escort' : remote.look.name + (remote.pvpFlag ? ' · PvP' : '');
+        g.font = '18px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = '#151c35'; g.fillStyle = remote.pvpFlag || remote.gauntlet ? '#ff9b9b' : remote.escort ? '#ffd24a' : window.Social?.isPartyMember(remote.id) ? '#9dffb2' : window.Rebirth?.color(remote.reborn?.tier || 0) || '#fff4ca';
+        const nameText = remote.gauntlet ? remote.look.name + ' · Opponent' : remote.escort ? remote.look.name + ' · Escort' : remote.look.name + (remote.pvpFlag ? ' · PvP' : '');
         g.strokeText(nameText, 0, -128); g.fillText(nameText, 0, -128);
         if (remote.reborn?.tier) { const label = window.Rebirth.title(remote.reborn.tier); g.font = '13px "Jua", sans-serif'; g.fillStyle = window.Rebirth.color(remote.reborn.tier); g.lineWidth = 3; g.strokeText(label, 0, -144); g.fillText(label, 0, -144); }
         if (hero.pvpTargetId === remote.id) { g.strokeStyle = '#ffe066'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(0, 2, 30, 12, 0, 0, 6.283); g.stroke(); }
