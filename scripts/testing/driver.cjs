@@ -45,6 +45,12 @@ const actionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('chat'), text: z.string().min(1).max(240) }).strict(),
   z.object({ type: z.literal('social'), command: socialSchema }).strict(),
   z.object({ type: z.literal('roll'), id: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER), choice: z.enum(['need', 'greed', 'pass']) }).strict(),
+  // The PvP packet the client sends; only the commands a scenario needs (the basic blow, leaving a trial, asking for the state).
+  z.object({ type: z.literal('pvp'), command: z.discriminatedUnion('op', [
+    z.object({ op: z.literal('attack'), id: z.string().max(64) }).strict(),
+    z.object({ op: z.literal('arena_leave') }).strict(),
+    z.object({ op: z.literal('refresh') }).strict(),
+  ]) }).strict(),
   z.object({ type: z.literal('ping'), nonce: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER) }).strict(),
 ]);
 // Test-server shortcuts (server/src/world/debug.rs). The private worlds start Rust with VALHALLA_TEST_COMMANDS=1;

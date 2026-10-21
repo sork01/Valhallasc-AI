@@ -106,5 +106,5 @@ gear (PvP balancing stays closed).
   snapshot, walking up and hitting it with the attack key, forfeit, the turn-in through the gossip window). Needs the
   worktree's `target/debug/valhalla-server` (the MCP launcher drops `VALHALLA_BINARY`), `NODE_PATH` with the dybase2 modules
   and `PLAYWRIGHT_BROWSERS_PATH` with chromium-headless-shell.
-- Not done: an MCP scenario (`node scripts/test-via-mcp.cjs run gauntlet`) for levels 20 and 99.
+- MCP: `node scripts/test-via-mcp.cjs run gauntlet` (24 checks, ~35 s, mutation-checked). Two heroes, levels 20 and 99, in separate runs at once: accept at the Skaldholm steward, the same level refused from a second giver, the offer, the countdown, the opponent named and marked at the quest's level in a separate ring, a landed basic blow (the driver's new `pvp` action: `attack`, `arena_leave`, `refresh`), leaving (back at the giver, full health, 0 of 5), the weapon turn-in (level 99 pays the level-95 blue piece) and a restart. It does not win fights (starter-gear heroes lose at level 99, and grinding is not wanted): winning a whole run is covered by the Rust tests.
 - Swedish: `python3 scripts/build_swedish.py --check`.
