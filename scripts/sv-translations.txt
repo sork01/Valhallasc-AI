@@ -6505,7 +6505,5 @@
   "The raid is a party again.": "Raiden är en grupp igen.",
   "The raid cannot become a party while someone is inside it.": "Raiden kan inte bli en grupp medan någon är inne i den.",
   "Your group is not a raid.": "Din grupp är ingen raid.",
-  "Your party is already a raid.": "Din grupp är redan en raid.",
-  "Your raid is full": "Din raid är full",
-  "That raid is full": "Den raiden är full"
+  "Your party is already a raid.": "Din grupp är redan en raid."
 }

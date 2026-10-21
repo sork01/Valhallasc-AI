@@ -319,5 +319,10 @@
   "A party holds {0}. Remove {1} members first.": "En grupp rymmer {0}. Ta först bort {1} medlemmar.",
   "The party is now a raid of up to {0}.": "Gruppen är nu en raid på upp till {0}.",
   "{0} departs: the raid contract ends outside the raid.": "{0} lämnar: raidkontraktet gäller bara i raiden.",
-  "{0} needs exactly {1} fighters, hired ones included. Your group has {2}.": "{0} kräver exakt {1} kämpar, legosoldater inräknade. Din grupp har {2}."
+  "{0} needs exactly {1} fighters, hired ones included. Your group has {2}.": "{0} kräver exakt {1} kämpar, legosoldater inräknade. Din grupp har {2}.",
+  "Your party is full ({0}/{1}).": "Din grupp är full ({0}/{1}).",
+  "That party is full ({0}/{1}).": "Den gruppen är full ({0}/{1}).",
+  "Your raid is full ({0}/{1}).": "Din raid är full ({0}/{1}).",
+  "That raid is full ({0}/{1}).": "Den raiden är full ({0}/{1}).",
+  "{0} is a dungeon for {1} fighters at most. Your group has {2}.": "{0} är en dungeon för högst {1} kämpar. Din grupp har {2}."
 }

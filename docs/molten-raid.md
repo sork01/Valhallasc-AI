@@ -224,6 +224,9 @@ recompute it from the slowest measured Eldmarr win (`ceil(1.5 Ã— slowest / 60) Ã
   nobody inside a raid zone. Pending invites count against the party's own cap.
 * `Map.raid` marks the raid zone and its copies. `use_portal` refuses a group that is not exactly ten (mercenaries
   counted) with the count in the message; a lone hero with no party is simply a group of one, so it is refused too.
+* A five-player dungeon's door (any zone with copies that is not a raid) refuses a group of more than five, with the
+  count in the message, so a raid cannot walk into a dungeon balanced for five. Copies inherit `Map.raid` because
+  `make_instances` clones the whole map (a test pins it).
 * Raid contract: an NPC offer with `raid: true` and a class (`merc_warrior`, ...) hires one fighter per click up to ten
   minus the group, at `merc_price`, with no quest. The leader (or a lone hirer) signs and the group becomes a raid; a
   member signs only for a group that already is one. Its fighters carry `Player.merc_raid` = the door's zone and are

@@ -1424,13 +1424,8 @@ mod tests {
         assert!(!w.social.parties[0].raid);
     }
 
-    /// Dungeon `template` (and its copies) marked as a raid, and the portal that leads into it: (zone, x, y).
-    fn raid_door(w: &mut World, template: usize) -> (usize, Point) {
-        for (i, m) in w.maps.iter_mut().enumerate() {
-            if i == template || m.template == Some(template) {
-                m.raid = true;
-            }
-        }
+    /// The zone with a portal into dungeon `template`, and where that portal stands.
+    fn door_into(w: &World, template: usize) -> (usize, Point) {
         let (zone, portal) = w
             .maps
             .iter()
@@ -1450,26 +1445,85 @@ mod tests {
             },
         )
     }
+    /// Dungeon `template` (and its copies) marked as a raid, and the portal that leads into it.
+    fn raid_door(w: &mut World, template: usize) -> (usize, Point) {
+        for (i, m) in w.maps.iter_mut().enumerate() {
+            if i == template || m.template == Some(template) {
+                m.raid = true;
+            }
+        }
+        door_into(w, template)
+    }
+    /// `count` joined players (sessions 1..=count) at `level`; the first leads a raid and `seated` of them are in it.
+    fn raid_of(w: &mut World, count: usize, seated: usize, level: u32) -> Vec<Player> {
+        let mut crew: Vec<Player> = (1..=count)
+            .map(|s| add(w, s as u64, &format!("Raider{s}")))
+            .collect();
+        for session in 1..=count as u64 {
+            w.players.get_mut(&session).unwrap().character.level = level;
+        }
+        let (head, rest) = crew.split_first_mut().unwrap();
+        say(w, head, invite_by_id(&rest[0]));
+        say(w, &rest[0], accept_party(head));
+        say(w, head, SocialCommand::PartyRaid { on: true });
+        for m in rest.iter().skip(1).take(seated.saturating_sub(2)) {
+            say(w, head, invite_by_id(m));
+            say(w, m, accept_party(head));
+        }
+        crew
+    }
+
+    #[test]
+    fn a_raid_cannot_use_a_five_player_dungeons_door_but_five_of_it_can() {
+        let mut w = world();
+        let (zone, door) = door_into(&w, 5);
+        let need = w.maps[5].min_level.max(1);
+        let mut crew = raid_of(&mut w, 10, 10, need);
+        assert_eq!(party_of(&w, &crew[0]).unwrap().len(), RAID_MAX);
+        let step = |w: &mut World| {
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.zone = zone;
+            p.character.x = door.x;
+            p.character.y = door.y;
+            w.time += 5.;
+            w.use_portal(1);
+            w.players[&1].character.zone
+        };
+        assert_eq!(step(&mut w), zone, "ten do not go in");
+        let said = heard(&mut crew[0]);
+        assert!(
+            said.iter().any(|v| v["type"] == "error"
+                && v["text"].as_str().unwrap().contains("5 fighters at most")
+                && v["text"].as_str().unwrap().contains("Your group has 10")),
+            "{said:?}"
+        );
+        // Five of them (still a raid party) may.
+        for m in crew.iter().skip(5) {
+            say(&mut w, m, SocialCommand::PartyLeave);
+        }
+        assert_eq!(party_of(&w, &crew[0]).unwrap().len(), PARTY_MAX);
+        assert_ne!(step(&mut w), zone, "five go in");
+    }
+
+    #[test]
+    fn dungeon_copies_inherit_the_raid_flag_from_their_template() {
+        let w = world();
+        let mut maps = vec![w.maps[5].clone()];
+        maps[0].raid = true;
+        maps[0].copies = 3;
+        maps[0].template = None;
+        let instances = World::make_instances(&mut maps);
+        assert_eq!((maps.len(), instances.len()), (3, 3));
+        assert!(maps.iter().all(|m| m.raid), "every copy is a raid zone");
+    }
 
     #[test]
     fn a_raid_door_lets_in_exactly_ten_fighters_hired_ones_included() {
         let mut w = world();
         let (zone, door) = raid_door(&mut w, 5);
         let need = w.maps[5].min_level.max(1);
-        let mut crew: Vec<Player> = (1..=10)
-            .map(|s| add(&mut w, s, &format!("Raider{s}")))
-            .collect();
-        for session in 1..=10 {
-            w.players.get_mut(&session).unwrap().character.level = need;
-        }
+        let mut crew = raid_of(&mut w, 10, 9, need);
         let (head, rest) = crew.split_first_mut().unwrap();
-        say(&mut w, head, invite_by_id(&rest[0]));
-        say(&mut w, &rest[0], accept_party(head));
-        say(&mut w, head, SocialCommand::PartyRaid { on: true });
-        for m in rest.iter().take(8).skip(1) {
-            say(&mut w, head, invite_by_id(m));
-            say(&mut w, m, accept_party(head));
-        }
         assert_eq!(party_of(&w, head).unwrap().len(), 9);
         let step = |w: &mut World| {
             let p = w.players.get_mut(&1).unwrap();

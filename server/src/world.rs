@@ -3045,6 +3045,21 @@ impl World {
                 return;
             }
         }
+        // A five-player dungeon is balanced for five: a raid (more than a party holds) belongs in a raid zone only.
+        if self.maps[portal.to].copies > 0 && !self.maps[portal.to].raid {
+            let group = self.party_mates(&p.character.id).len();
+            if group > social::PARTY_MAX {
+                let text = format!(
+                    "{} is a dungeon for {} fighters at most. Your group has {group}.",
+                    self.maps[portal.to].name,
+                    social::PARTY_MAX
+                );
+                let p = self.players.get_mut(&session).unwrap();
+                p.portal_at = self.time;
+                let _ = p.peer.try_send(json!({"type":"error","text":text}));
+                return;
+            }
+        }
         // A dungeon's door leads to a private copy: the party's own, or a free one.
         if self.maps[portal.to].copies > 0 {
             match self.instance_for(session, portal.to) {
