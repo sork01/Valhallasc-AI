@@ -407,6 +407,10 @@ pub struct Break {
     /// Too slow does not kill: the soft enrage (`items::enrage`) begins and stays on.
     #[serde(default)]
     pub enrage: bool,
+    /// Too slow does not kill everyone: one random hero who is not grounded is loaded to the Static limit and
+    /// detonates where they stand (needs a `static` block; mutually exclusive with `enrage`).
+    #[serde(default)]
+    pub overload: bool,
 }
 
 /// Seeking orbs freeze whoever they touch until allies break the cocoon, or until `hold` seconds are up.
@@ -514,9 +518,16 @@ pub struct Cover {
 
 /// The shipped table (`world/boss-mechanics.txt`). The sixteen bosses are added one task at a time.
 pub fn shipped() -> BTreeMap<String, BossDef> {
+    // Test builds may read another table (`BOSSMECH_TABLE_FILE=path`), so tuning a burst phase needs no rebuild.
+    #[cfg(test)]
+    let text = std::env::var("BOSSMECH_TABLE_FILE").map_or_else(
+        |_| include_str!("../../world/boss-mechanics.txt").to_string(),
+        |path| std::fs::read_to_string(path).expect("readable BOSSMECH_TABLE_FILE"),
+    );
+    #[cfg(not(test))]
+    let text = include_str!("../../world/boss-mechanics.txt").to_string();
     let table: BTreeMap<String, BossDef> =
-        serde_json::from_str(include_str!("../../world/boss-mechanics.txt"))
-            .expect("valid boss mechanics table");
+        serde_json::from_str(&text).expect("valid boss mechanics table");
     for (kind, def) in &table {
         validate(kind, def).expect("boss mechanics table obeys the rules");
     }
@@ -1317,7 +1328,22 @@ pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
                     }
                 }
             },
-            Block::Break(b) if b.enrage => {
+            Block::Break(b) if b.enrage || b.overload => {
+                if b.enrage && b.overload {
+                    return bad(m, "a burst phase either enrages or overloads, not both");
+                }
+                if b.overload
+                    && (!cast_is_long_enough(Effect::Kill, b.cast)
+                        || !def
+                            .mechanics
+                            .iter()
+                            .any(|o| matches!(o.block, Block::Static(_))))
+                {
+                    return bad(
+                        m,
+                        "an overload kills a hero, so its window is at least the floor, and the boss needs a static block",
+                    );
+                }
                 if !b.at.is_some_and(|at| at > 0. && at < 1.)
                     || !positive(b.cast)
                     || !(b.bar > 0. && b.bar < 1.)

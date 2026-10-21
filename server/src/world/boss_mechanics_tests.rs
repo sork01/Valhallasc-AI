@@ -2861,6 +2861,88 @@ fn the_longest_night_lights_four_braziers_and_falls_every_forty_five_then_thirty
 
 // --- Static ----------------------------------------------------------------------------------------------------------
 
+const OVERLOAD: &str = r#"{"mechanics":[
+    {"name":"Static","block":"static","limit":4,"warn_at":3,"per_hit":1,"r":5,"rods":[[112,12],[120,12]],"rod_r":1.8,"immune":8,"dark":12},
+    {"name":"Storm Surge","block":"break","at":0.7,"cast":8,"every":600,"bar":0.1,"stun":0,"vulnerable":0,"overload":true}]}"#;
+
+#[test]
+fn an_overload_burst_dealt_in_time_hurts_nobody() {
+    let mut r = rig(OVERLOAD, 3);
+    r.run(0.2);
+    let boss = r.w.slimes[r.boss].point();
+    let a = r.put(1, boss.x, boss.y + 10.);
+    r.put(2, a.x + 2., a.y);
+    r.put(3, a.x - 14., a.y);
+    r.set_boss_share(0.69);
+    r.run(0.3);
+    assert!(surging(&r), "the window opens at 70%");
+    let blow = r.max_hp() * 0.11;
+    r.w.hit_slime(r.boss, 1, blow, false);
+    r.run(10.);
+    assert!(!surging(&r));
+    assert!((1..=3).all(|s| r.alive(s)), "the bar was dealt");
+}
+
+#[test]
+fn an_overload_burst_dealt_too_slowly_detonates_one_random_hero_and_whoever_stands_near() {
+    let mut deaths = std::collections::BTreeSet::new();
+    for seed in 1..=12u64 {
+        let mut r = rig(OVERLOAD, 3);
+        r.w.rng = seed * 7919;
+        r.run(0.2);
+        let boss = r.w.slimes[r.boss].point();
+        // 1 and 2 stand together, 3 alone and far away.
+        let a = r.put(1, boss.x, boss.y + 10.);
+        r.put(2, a.x + 2., a.y);
+        r.put(3, a.x - 14., a.y);
+        r.set_boss_share(0.69);
+        r.run(0.3);
+        assert!(surging(&r));
+        r.run(7.);
+        assert!(
+            (1..=3).all(|s| r.alive(s)),
+            "nobody falls inside the window"
+        );
+        r.run(1.5);
+        assert!(!surging(&r));
+        let dead: Vec<u64> = (1..=3).filter(|&s| !r.alive(s)).collect();
+        assert!(
+            dead == vec![3] || dead == vec![1, 2],
+            "one bearer, whoever is within five tiles of them: {dead:?}"
+        );
+        deaths.insert(dead);
+        assert_eq!(r.fight().enrage_floor, 0., "no enrage either");
+    }
+    assert_eq!(deaths.len(), 2, "any hero can be picked: {deaths:?}");
+}
+
+#[test]
+fn an_overload_never_picks_a_grounded_hero_and_a_burst_needs_a_static_block() {
+    let mut r = rig(OVERLOAD, 1);
+    r.run(0.2);
+    let rod = r.fight().stat.as_ref().expect("a static fight").rods[0].at;
+    r.set_boss_share(0.69);
+    r.run(0.3);
+    assert!(surging(&r));
+    // Grounded for eight seconds from here, so still grounded when the eight-second window runs out.
+    r.put(1, rod.x, rod.y);
+    r.run(8.5);
+    assert!(!surging(&r));
+    assert!(r.alive(1), "the only hero stood on a rod and was grounded");
+    let no_static: BossDef = serde_json::from_str(&OVERLOAD.replace(
+        "{\"name\":\"Static\",\"block\":\"static\",\"limit\":4,\"warn_at\":3,\"per_hit\":1,\"r\":5,\"rods\":[[112,12],[120,12]],\"rod_r\":1.8,\"immune\":8,\"dark\":12},",
+        "",
+    ))
+    .unwrap();
+    assert!(bm::validate("x", &no_static).is_err());
+    let short = OVERLOAD.replace("\"cast\":8", "\"cast\":2");
+    let short: BossDef = serde_json::from_str(&short).unwrap();
+    assert!(bm::validate("x", &short).is_err(), "a kill needs the floor");
+    let both = OVERLOAD.replace("\"overload\":true", "\"overload\":true,\"enrage\":true");
+    let both: BossDef = serde_json::from_str(&both).unwrap();
+    assert!(bm::validate("x", &both).is_err());
+}
+
 const STATIC: &str = r#"{"mechanics":[
     {"name":"Static","block":"static","hp_min":0.3,"limit":4,"warn_at":3,"per_hit":1,"r":5,"rods":[[112,12],[120,12]],"rod_r":1.8,"immune":8,"dark":12},
     {"name":"Static","block":"static","hp_max":0.3,"limit":4,"warn_at":3,"per_hit":2,"r":5,"rods":[[112,12],[120,12]],"rod_r":1.8,"immune":8,"dark":20}]}"#;
@@ -3028,9 +3110,9 @@ fn the_shipped_thunder_heart_is_static_with_four_corner_rods_and_a_sign_that_mat
     let r = rig(&shipped("thunder_heart"), 1);
     let statics: Vec<_> = blocks(&r.w, "thunder_heart")
         .into_iter()
-        .map(|(_, b)| match b {
-            Block::Static(t) => t,
-            _ => panic!("only static"),
+        .filter_map(|(_, b)| match b {
+            Block::Static(t) => Some(t),
+            _ => None,
         })
         .collect();
     assert_eq!(statics.len(), 2);
@@ -3042,6 +3124,17 @@ fn the_shipped_thunder_heart_is_static_with_four_corner_rods_and_a_sign_that_mat
     }
     assert_eq!((statics[0].per_hit, statics[0].dark), (1, 12.));
     assert_eq!((statics[1].per_hit, statics[1].dark), (2, 20.));
+    // Three overload bursts: 8 s to deal 7% of the health, each with the sign's words about them.
+    let surges: Vec<_> = blocks(&r.w, "thunder_heart")
+        .into_iter()
+        .filter_map(|(_, b)| match b {
+            Block::Break(b) => Some(b),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(surges.len(), 3);
+    assert!(surges.iter().all(|b| b.overload && !b.enrage));
+    assert!(surges.iter().all(|b| (b.cast, b.bar) == (8., 0.07)));
     let words = sign_words("thunder_heart");
     for needle in [
         "12 sparks",
@@ -3049,6 +3142,7 @@ fn the_shipped_thunder_heart_is_static_with_four_corner_rods_and_a_sign_that_mat
         "12 seconds",
         "two sparks",
         "20 seconds",
+        "Storm Surge bar",
     ] {
         assert!(words.contains(needle), "{needle}: {words}");
     }

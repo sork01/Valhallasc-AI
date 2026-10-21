@@ -548,6 +548,49 @@ impl World {
         self.mech_event(zone, "land", &name, at, t.r);
     }
 
+    /// A failed overload burst (`Break::overload`): one hero who is not grounded, picked at random, is loaded to the
+    /// Static limit and detonates where they stand, taking everyone within the burst radius with them.
+    fn overload(&mut self, fight: &mut Fight, name: &str) {
+        let boss = fight.boss;
+        let Some(def) = self.boss.table.get(&self.slimes[boss].kind).cloned() else {
+            return;
+        };
+        let Some(r) = def.mechanics.iter().find_map(|m| match &m.block {
+            Block::Static(t) => Some(t.r),
+            _ => None,
+        }) else {
+            return;
+        };
+        let zone = fight.zone;
+        let players = self.mech_players(zone);
+        let grounded = |s: &u64| {
+            fight
+                .stat
+                .as_ref()
+                .is_some_and(|st| st.grounded.contains_key(s))
+        };
+        let chosen: Vec<(u64, Point)> = players
+            .iter()
+            .copied()
+            .filter(|(s, _)| !grounded(s))
+            .collect();
+        if chosen.is_empty() {
+            return;
+        }
+        let mut rng = self.mech_rng();
+        let (session, at) = chosen[((rng() * chosen.len() as f64) as usize).min(chosen.len() - 1)];
+        if let Some(st) = fight.stat.as_mut() {
+            st.charges.insert(session, 0);
+            st.bursts.push((at, r, 0.8));
+        }
+        for (victim, p) in players {
+            if p.distance(at) <= r {
+                self.mech_kill(victim, name, boss);
+            }
+        }
+        self.mech_event(zone, "land", name, at, r);
+    }
+
     /// Rods clear a hero who stands on a ready one; the timers of the charge, the grounding, the rods and the bursts run.
     fn tick_static(&mut self, fight: &mut Fight, m: &Mechanic, t: &bm::Static) {
         let players = self.mech_players(fight.zone);
@@ -1635,7 +1678,7 @@ impl World {
         };
         let id = fight.boss;
         // The channel holds the boss where it is (a burst phase does not: the boss fights on).
-        if !b.enrage {
+        if !b.enrage && !b.overload {
             self.hold_still(id);
         }
         if bl.dealt >= bl.needed {
@@ -1659,6 +1702,10 @@ impl World {
             }
             let at = self.slimes[id].point();
             self.mech_event(fight.zone, "land", &m.name, at, 0.);
+            return false;
+        }
+        if b.overload {
+            self.overload(fight, &m.name);
             return false;
         }
         // Too slow: the wail takes everyone in the fight.

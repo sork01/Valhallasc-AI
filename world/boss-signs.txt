@@ -158,7 +158,7 @@
   "thunder_heart": {
     "title": "Heart of the Stormgate",
     "what": "Every hit you land gives you a spark. At 12 sparks, a red circle knocks out everyone near you.",
-    "todo": "Stand on a blue rod in a corner to clear your sparks. Then go back and hit again.",
+    "todo": "Stand on a blue rod to clear your sparks, then hit again. When the Storm Surge bar shows, hit hard, or one player at random gets 12 sparks.",
     "tip": "Rods rest 12 seconds, so take turns. You get a warning at 8 sparks. Near the end, hits give two sparks and rods rest 20 seconds.",
     "colors": [
       "blue",

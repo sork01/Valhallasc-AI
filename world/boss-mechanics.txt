@@ -160,7 +160,10 @@
   "thunder_heart": {
     "mechanics": [
       {"name": "Static", "block": "static", "hp_min": 0.3, "limit": 12, "warn_at": 8, "per_hit": 1, "r": 5, "rods": [[62, 11], [78, 11], [62, 24], [78, 24]], "rod_r": 1.8, "immune": 8, "dark": 12},
-      {"name": "Static", "block": "static", "hp_max": 0.3, "limit": 12, "warn_at": 8, "per_hit": 2, "r": 5, "rods": [[62, 11], [78, 11], [62, 24], [78, 24]], "rod_r": 1.8, "immune": 8, "dark": 20}
+      {"name": "Static", "block": "static", "hp_max": 0.3, "limit": 12, "warn_at": 8, "per_hit": 2, "r": 5, "rods": [[62, 11], [78, 11], [62, 24], [78, 24]], "rod_r": 1.8, "immune": 8, "dark": 20},
+      {"name": "Storm Surge", "block": "break", "at": 0.8, "cast": 8, "every": 600, "bar": 0.07, "stun": 0, "vulnerable": 0, "overload": true},
+      {"name": "Storm Surge", "block": "break", "at": 0.55, "cast": 8, "every": 600, "bar": 0.07, "stun": 0, "vulnerable": 0, "overload": true},
+      {"name": "Storm Surge", "block": "break", "at": 0.3, "cast": 8, "every": 600, "bar": 0.07, "stun": 0, "vulnerable": 0, "overload": true}
     ]
   }
 }

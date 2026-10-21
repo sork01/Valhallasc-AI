@@ -16,7 +16,7 @@
     0.2
   ],
   "choirmother": [
-    100,
+    95,
     0.2
   ],
   "pearlwidow": [
