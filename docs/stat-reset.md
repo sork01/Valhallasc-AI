@@ -18,7 +18,7 @@ the reset count is saved with the character.
 | 50 | 130,000 | 260,000 | 650,000 |
 | 99 | 495,050 | 990,100 | 2,475,250 |
 
-The first level 50 reset costs 130,000 gold, 2.6 times the 50,000 gold mount
+The first level 50 reset costs 130,000 gold, a quarter of the 500,000 gold mount
 and about 50–60 ordinary level 50 enemy payouts before item sales. At level 99,
 495,050 gold is about 16 ordinary snowstoat payouts. It is a deliberate choice
 even for a developed character. The service

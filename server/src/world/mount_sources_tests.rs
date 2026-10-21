@@ -56,7 +56,7 @@ fn the_catalog_holds_two_bound_licences_and_the_horse_offer_names_its_mount() {
         .find(|n| n.id == "city_stable")
         .unwrap();
     assert_eq!(greta.offers[0].mount.as_deref(), Some("horse"));
-    assert_eq!(greta.offers[0].cost, 50_000);
+    assert_eq!(greta.offers[0].cost, 500_000);
 }
 
 #[test]

@@ -12,7 +12,7 @@ Each uses a different route, and the later the mount the harder it is. A charact
 
 | Mount | Route | Level | Cost and effort |
 | --- | --- | ---: | --- |
-| Horse | Shop: Stable-hand Greta, Skaldholm (unchanged) | 50 | 50,000 gold |
+| Horse | Shop: Stable-hand Greta, Skaldholm (unchanged) | 50 | 500,000 gold |
 | Raptor | Quest chain in the Tanglecrown: *The Banyan Run*, four steps given by Mara Vines (Canopy tracker) | 75 | No gold fee. Kill 25 canopy monsters, bring 10 of the zone's materials, win one elite fight and escort a hatchling back. One-time, class-neutral. |
 | Lizard | Shop: a new Dune-wrangler NPC in the Lapis Erg hub (beside Basma Silk) | 80 | 160,000 gold (the price of a level-80 Hero Pack, the same wealth tier as the horse at its level) |
 | Sabertooth | Rare drop: a **Sabertooth Whistle** from the Rimesaber, the level-97 elite of the Yearwheel's winter court | 95 | 4% per Rimesaber kill; a 5.5-million-HP elite, so it needs a group and a long fight |

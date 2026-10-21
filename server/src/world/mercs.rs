@@ -613,7 +613,5 @@ mod price_tests {
             assert!(merc_price(level + 1) >= merc_price(level), "level {level}");
             assert_eq!(merc_price(level) % 50, 0, "level {level}");
         }
-        // Renting four fighters is never pocket change: at 50 it costs more than the horse.
-        assert!(4 * merc_price(50) > 50_000);
     }
 }

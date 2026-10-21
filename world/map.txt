@@ -26236,8 +26236,8 @@
           "offers": [
             {
               "id": "buy_mount",
-              "label": "Buy riding horse · level 50 · 50,000 gold",
-              "cost": 50000,
+              "label": "Buy riding horse · level 50 · 500,000 gold",
+              "cost": 500000,
               "mount": "horse"
             }
           ],

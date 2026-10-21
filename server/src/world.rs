@@ -5162,20 +5162,20 @@ mod tests {
         let token = welcome["token"].as_str().unwrap().to_owned();
         let c = &mut w.players.get_mut(&1).unwrap().character;
         c.zone = 4;
-        c.gold = 50_000;
+        c.gold = 500_000;
         quest_interact(&mut w, "city_stable", Some("buy_mount"));
         assert!(
             !w.players[&1].character.mount_owned,
             "level gate holds even with gold"
         );
         w.players.get_mut(&1).unwrap().character.level = 50;
-        w.players.get_mut(&1).unwrap().character.gold = 49_999;
+        w.players.get_mut(&1).unwrap().character.gold = 499_999;
         quest_interact(&mut w, "city_stable", Some("buy_mount"));
         assert!(
             !w.players[&1].character.mount_owned,
             "price is authoritative"
         );
-        w.players.get_mut(&1).unwrap().character.gold = 50_000;
+        w.players.get_mut(&1).unwrap().character.gold = 500_000;
         quest_interact(&mut w, "city_stable", Some("buy_mount"));
         assert!(w.players[&1].character.mount_owned);
         assert_eq!(w.players[&1].character.gold, 0);

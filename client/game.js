@@ -646,7 +646,7 @@
     const mount = $('mount-toggle');
     mount.disabled = !s.mountOwned || !!s.sparkTravel || s.hp <= 0 || (s.inCombat && !s.mounted) || !!s.players;
     mount.textContent = s.mounted ? 'Dismount · H' : s.mountOwned ? `${window.Mounts?.name(s.mount) || 'Mount'} · H · 2× speed` : 'Horse · H';
-    mount.title = s.mountOwned ? (s.mounted ? 'Dismount' : 'Ride the selected mount at twice normal travel speed (H). Change it in the Character window.') : 'Buy a horse from Stable-hand Greta in Skaldholm at level 50 for 50,000 gold. All mounts are listed in the Character window.';
+    mount.title = s.mountOwned ? (s.mounted ? 'Dismount' : 'Ride the selected mount at twice normal travel speed (H). Change it in the Character window.') : 'Buy a horse from Stable-hand Greta in Skaldholm at level 50 for 500,000 gold. All mounts are listed in the Character window.';
     const inCity = !!s.hub || s.area === 'Alderhaven', title = $('area-title'), away = s.zone > 0;
     if (title.dataset.area !== s.area) { title.dataset.area = s.area; title.classList.remove('show'); void title.offsetWidth; title.classList.add('show'); }
     title.querySelector('b').textContent = away ? s.area : inCity ? 'Alderhaven · Fountain Square' : t('areaName');
