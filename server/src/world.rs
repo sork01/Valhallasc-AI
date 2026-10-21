@@ -10107,7 +10107,8 @@ mod tests {
                 .count(),
             1
         );
-        assert_eq!(w.drops[0].value, 30);
+        // Authored 30 gold, halved by MOB_GOLD_SCALE.
+        assert_eq!(w.drops[0].value, 15);
         for _ in 0..500 {
             w.time += TICK;
             w.update_king_spawn();
@@ -10850,7 +10851,8 @@ mod tests {
                 .count(),
             1
         );
-        assert_eq!(w.drops[0].value, 10);
+        // Authored 10 gold, halved by MOB_GOLD_SCALE.
+        assert_eq!(w.drops[0].value, 5);
         w.slimes[id].respawn = TICK;
         w.update_slime(id);
         assert!(!w.slimes[id].dead);
