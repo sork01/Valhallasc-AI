@@ -236,7 +236,10 @@ recompute it from the slowest measured Eldmarr win (`ceil(1.5 Ã— slowest / 60) Ã
 * XP: unchanged. The owner pointed out that level 99 is the highest level, so XP is moot in the raid.
 * Decided by the owner (2026-10-21): on a wipe the contract fighters wake with the group and stay; a solo hirer with nine
   hires is a fully supported route, with no cap on its drops.
-* Open for `RAID-MAP`: the quartermaster and door in `map.txt` and the raid-zone `FALLEN_HOLD_MAX`.
+* Decided by the owner (2026-10-21): raid-zone `FALLEN_HOLD_MAX` is 2,400 s (recompute from the slowest measured Eldmarr
+  win if that changes); the contract charges the normal `merc_price(level)` per fighter, so nine cost about 1,035,000
+  gold at level 99 (a deliberate gold sink).
+* Open for `RAID-MAP`: the quartermaster and door in `map.txt`.
 
 ## 7. The zone and the copy ids (derived, recheck at release)
 
