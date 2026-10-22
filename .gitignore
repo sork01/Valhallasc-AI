@@ -19,3 +19,6 @@ CLAUDE.md
 
 /scripts/*_raw/
 /scripts/progression_raw
+
+# Reproducible raid sprite build caches.
+scripts/eye_below_cf_*_raw.npz

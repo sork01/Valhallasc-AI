@@ -230646,7 +230646,208 @@
           "v": 9
         }
       ],
-      "slimes": [],
+      "slimes": [
+        {
+          "kind": "cf_brute",
+          "x": 143.5,
+          "y": 275.5
+        },
+        {
+          "kind": "cf_sentry",
+          "x": 146.5,
+          "y": 275.5
+        },
+        {
+          "kind": "cf_crawler",
+          "x": 143.5,
+          "y": 278.5
+        },
+        {
+          "kind": "cf_caster",
+          "x": 146.5,
+          "y": 278.5
+        },
+        {
+          "kind": "cf_brute",
+          "x": 271.98753882025017,
+          "y": 243.0249223594996
+        },
+        {
+          "kind": "cf_sentry",
+          "x": 273.3291796067501,
+          "y": 240.34164078649988
+        },
+        {
+          "kind": "cf_crawler",
+          "x": 274.6708203932499,
+          "y": 237.65835921350012
+        },
+        {
+          "kind": "cf_caster",
+          "x": 276.01246117974983,
+          "y": 234.9750776405004
+        },
+        {
+          "kind": "cf_brute",
+          "x": 218.5,
+          "y": 192.5
+        },
+        {
+          "kind": "cf_sentry",
+          "x": 221.5,
+          "y": 192.5
+        },
+        {
+          "kind": "cf_crawler",
+          "x": 218.5,
+          "y": 195.5
+        },
+        {
+          "kind": "cf_caster",
+          "x": 221.5,
+          "y": 195.5
+        },
+        {
+          "kind": "cf_brute",
+          "x": 109.5,
+          "y": 206.5
+        },
+        {
+          "kind": "cf_sentry",
+          "x": 112.5,
+          "y": 206.5
+        },
+        {
+          "kind": "cf_crawler",
+          "x": 109.5,
+          "y": 209.5
+        },
+        {
+          "kind": "cf_caster",
+          "x": 112.5,
+          "y": 209.5
+        },
+        {
+          "kind": "cf_brute",
+          "x": 42.80324604061957,
+          "y": 163.26571742127388
+        },
+        {
+          "kind": "cf_sentry",
+          "x": 43.60108201353986,
+          "y": 159.75523914042464
+        },
+        {
+          "kind": "cf_crawler",
+          "x": 44.39891798646014,
+          "y": 156.24476085957536
+        },
+        {
+          "kind": "cf_caster",
+          "x": 45.19675395938043,
+          "y": 152.73428257872612
+        },
+        {
+          "kind": "cf_brute",
+          "x": 278.0,
+          "y": 88.0
+        },
+        {
+          "kind": "cf_sentry",
+          "x": 278.0,
+          "y": 84.0
+        },
+        {
+          "kind": "cf_crawler",
+          "x": 278.0,
+          "y": 80.0
+        },
+        {
+          "kind": "cf_caster",
+          "x": 278.0,
+          "y": 76.0
+        },
+        {
+          "kind": "cf_brute",
+          "x": 143.5,
+          "y": 297.5
+        },
+        {
+          "kind": "cf_sentry",
+          "x": 146.5,
+          "y": 297.5
+        },
+        {
+          "kind": "cf_crawler",
+          "x": 143.5,
+          "y": 300.5
+        },
+        {
+          "kind": "cf_caster",
+          "x": 146.5,
+          "y": 300.5
+        },
+        {
+          "kind": "cf_brute",
+          "x": 220.5,
+          "y": 217.5
+        },
+        {
+          "kind": "cf_sentry",
+          "x": 223.5,
+          "y": 217.5
+        },
+        {
+          "kind": "cf_crawler",
+          "x": 220.5,
+          "y": 220.5
+        },
+        {
+          "kind": "cf_caster",
+          "x": 223.5,
+          "y": 220.5
+        },
+        {
+          "kind": "cf_brute",
+          "x": 108.5,
+          "y": 175.5
+        },
+        {
+          "kind": "cf_sentry",
+          "x": 111.5,
+          "y": 175.5
+        },
+        {
+          "kind": "cf_crawler",
+          "x": 108.5,
+          "y": 178.5
+        },
+        {
+          "kind": "cf_caster",
+          "x": 111.5,
+          "y": 178.5
+        },
+        {
+          "kind": "cf_brute",
+          "x": 208.5,
+          "y": 100.5
+        },
+        {
+          "kind": "cf_sentry",
+          "x": 211.5,
+          "y": 100.5
+        },
+        {
+          "kind": "cf_crawler",
+          "x": 208.5,
+          "y": 103.5
+        },
+        {
+          "kind": "cf_caster",
+          "x": 211.5,
+          "y": 103.5
+        }
+      ],
       "npcs": [
         {
           "id": "cf_quartermaster",
@@ -231529,61 +231730,121 @@
           "id": 1,
           "x": 145,
           "y": 277,
-          "mandatory": true
+          "mandatory": true,
+          "kinds": [
+            "cf_brute",
+            "cf_sentry",
+            "cf_crawler",
+            "cf_caster"
+          ]
         },
         {
           "id": 2,
           "x": 274,
           "y": 239,
-          "mandatory": true
+          "mandatory": true,
+          "kinds": [
+            "cf_brute",
+            "cf_sentry",
+            "cf_crawler",
+            "cf_caster"
+          ]
         },
         {
           "id": 3,
           "x": 220,
           "y": 194,
-          "mandatory": true
+          "mandatory": true,
+          "kinds": [
+            "cf_brute",
+            "cf_sentry",
+            "cf_crawler",
+            "cf_caster"
+          ]
         },
         {
           "id": 4,
           "x": 111,
           "y": 208,
-          "mandatory": true
+          "mandatory": true,
+          "kinds": [
+            "cf_brute",
+            "cf_sentry",
+            "cf_crawler",
+            "cf_caster"
+          ]
         },
         {
           "id": 5,
           "x": 44,
           "y": 158,
-          "mandatory": true
+          "mandatory": true,
+          "kinds": [
+            "cf_brute",
+            "cf_sentry",
+            "cf_crawler",
+            "cf_caster"
+          ]
         },
         {
           "id": 6,
           "x": 278,
           "y": 82,
-          "mandatory": true
+          "mandatory": true,
+          "kinds": [
+            "cf_brute",
+            "cf_sentry",
+            "cf_crawler",
+            "cf_caster"
+          ]
         },
         {
           "id": 7,
           "x": 145,
           "y": 299,
-          "mandatory": false
+          "mandatory": false,
+          "kinds": [
+            "cf_brute",
+            "cf_sentry",
+            "cf_crawler",
+            "cf_caster"
+          ]
         },
         {
           "id": 8,
           "x": 222,
           "y": 219,
-          "mandatory": false
+          "mandatory": false,
+          "kinds": [
+            "cf_brute",
+            "cf_sentry",
+            "cf_crawler",
+            "cf_caster"
+          ]
         },
         {
           "id": 9,
           "x": 110,
           "y": 177,
-          "mandatory": false
+          "mandatory": false,
+          "kinds": [
+            "cf_brute",
+            "cf_sentry",
+            "cf_crawler",
+            "cf_caster"
+          ]
         },
         {
           "id": 10,
           "x": 210,
           "y": 102,
-          "mandatory": false
+          "mandatory": false,
+          "kinds": [
+            "cf_brute",
+            "cf_sentry",
+            "cf_crawler",
+            "cf_caster"
+          ]
         }
       ],
       "places": [

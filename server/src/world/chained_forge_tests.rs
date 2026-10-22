@@ -32,7 +32,10 @@ fn chained_forge_floor_collision_halls_portals_and_three_copies() {
     );
     assert!(m.raid && m.interior && m.sealed_template);
     assert_eq!(w.weather.view(ZONE, None, 0)["inside"], true);
-    assert!(m.slimes.is_empty(), "encounters belong to RAID-PACKS/BOSS");
+    assert!(
+        m.slimes.iter().all(|s| !is_boss(&s.kind)),
+        "bosses belong to their own tasks"
+    );
     let grid = blocked(m, &[]);
     let descent = flood(m, &grid, at(62., 290.));
     let muster = flood(m, &grid, m.spawn);

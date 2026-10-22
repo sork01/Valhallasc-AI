@@ -24,6 +24,9 @@ pub struct Enemy {
     pub elite: bool,
     #[serde(default)]
     pub outdoor: bool,
+    /// An elite pack enemy in the ten-fighter raid, with its own purple roll.
+    #[serde(default, rename = "raidPack")]
+    pub raid_pack: bool,
 }
 fn default_elite() -> bool {
     true
@@ -94,6 +97,10 @@ pub static ENEMIES: LazyLock<Vec<Enemy>> = LazyLock::new(|| {
     enemies.extend(
         serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/emberwake.txt"))
             .expect("valid Emberwake catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/chained_forge.txt"))
+            .expect("valid Chained Forge catalog"),
     );
     enemies
 });

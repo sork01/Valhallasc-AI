@@ -7983,6 +7983,18 @@
    0,
    102
   ],
+  "cfpack_pants": [
+   1,
+   102
+  ],
+  "cfpack_necklace": [
+   2,
+   102
+  ],
+  "cfpack_accessory": [
+   3,
+   102
+  ],
   "warrior_armor_crimson_l55_gray": [
    5,
    14
@@ -9246,6 +9258,9 @@
   "null-hunter-weapon": "97aab23bce89be64",
   "null-shared-pants": "08c5258cebf3c131",
   "null-shared-necklace": "ae7834ac5d156eb1",
-  "null-shared-accessory": "1e11db18a63af99b"
+  "null-shared-accessory": "1e11db18a63af99b",
+  "cfpack-shared-pants": "3b70ba263f3ee877",
+  "cfpack-shared-necklace": "f6d2602aa8d96800",
+  "cfpack-shared-accessory": "fd5670ed52f8ea8b"
  }
 }

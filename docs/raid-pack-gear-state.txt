@@ -1,0 +1,49 @@
+{
+  "tasks": [
+    {
+      "id": "cfpack-shared-pants",
+      "group": "cfpack",
+      "className": null,
+      "kind": "pants",
+      "item": "cfpack_pants",
+      "name": "Cinderwork Kiln Gaiters",
+      "done": true,
+      "phase": "done",
+      "evidence": [
+        "tests/raid-pack-gear-art.cjs: original silhouette/palette guard, all ten rigs, all 8160 poses; test-results/raid-packs/gear-browser/gear-browser.json",
+        "Mutation --mutation-original fails the unchanged-silhouette guard.",
+        "tests/raid-packs-ui.cjs: 17 real-client checks; test-results/driver-rzK4qF/raid-pack-desktop.png and raid-pack-mobile.png."
+      ]
+    },
+    {
+      "id": "cfpack-shared-necklace",
+      "group": "cfpack",
+      "className": null,
+      "kind": "necklace",
+      "item": "cfpack_necklace",
+      "name": "Cinderwork Crucible Pendant",
+      "done": true,
+      "phase": "done",
+      "evidence": [
+        "tests/raid-pack-gear-art.cjs: original silhouette/palette guard, all ten rigs, all 8160 poses; test-results/raid-packs/gear-browser/gear-browser.json",
+        "Mutation --mutation-original fails the unchanged-silhouette guard.",
+        "tests/raid-packs-ui.cjs: 17 real-client checks; test-results/driver-rzK4qF/raid-pack-desktop.png and raid-pack-mobile.png."
+      ]
+    },
+    {
+      "id": "cfpack-shared-accessory",
+      "group": "cfpack",
+      "className": null,
+      "kind": "accessory",
+      "item": "cfpack_accessory",
+      "name": "Cinderwork Clamp Ring",
+      "done": true,
+      "phase": "done",
+      "evidence": [
+        "tests/raid-pack-gear-art.cjs: original silhouette/palette guard, all ten rigs, all 8160 poses; test-results/raid-packs/gear-browser/gear-browser.json",
+        "Mutation --mutation-original fails the unchanged-silhouette guard.",
+        "tests/raid-packs-ui.cjs: 17 real-client checks; test-results/driver-rzK4qF/raid-pack-desktop.png and raid-pack-mobile.png."
+      ]
+    }
+  ]
+}

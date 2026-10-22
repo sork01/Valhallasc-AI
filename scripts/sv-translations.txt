@@ -6538,5 +6538,16 @@
   "Rally 7": "Samlingsplats 7",
   "Rally 8": "Samlingsplats 8",
   "Rally 9": "Samlingsplats 9",
-  "Rally 10": "Samlingsplats 10"
+  "Rally 10": "Samlingsplats 10",
+  "Slaghammer Brute": "Slägghuggare",
+  "Ventspitter Crawler": "Ventilspottande krypare",
+  "Crucible Channeler": "Degelkanaliserare",
+  "Obsidian Bulwark": "Obsidianbastion",
+  "Cinderwork Kiln Gaiters": "Glödsmedens ugnsdamasker",
+  "Cinderwork Crucible Pendant": "Glödsmedens degelhänge",
+  "Cinderwork Clamp Ring": "Glödsmedens klämring",
+  "Slaghammer Brute Relic": "Slägghuggare – relik",
+  "Ventspitter Crawler Relic": "Ventilspottande krypare – relik",
+  "Crucible Channeler Relic": "Degelkanaliserare – relik",
+  "Obsidian Bulwark Relic": "Obsidianbastion – relik"
 }

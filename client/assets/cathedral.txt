@@ -127,7 +127,11 @@
     "ew_cinderhorn",
     "ew_chainmaw",
     "ew_bellows",
-    "ew_crown"
+    "ew_crown",
+    "cf_brute",
+    "cf_crawler",
+    "cf_caster",
+    "cf_sentry"
   ],
   "clips": {
     "idle": {
@@ -281,7 +285,11 @@
     "ew_cinderhorn": "d4c66d1eb185f731",
     "ew_chainmaw": "9b4aefc7bf83f7df",
     "ew_bellows": "e4e211cff75a6ee6",
-    "ew_crown": "fc20c92203450ba5"
+    "ew_crown": "fc20c92203450ba5",
+    "cf_brute": "7a916892cb14946b",
+    "cf_crawler": "e9bc0b1055785a8a",
+    "cf_caster": "1bf6771b70493090",
+    "cf_sentry": "3fd51f9acdc3ac6c"
   },
   "tops": {
     "tidetemplar": 84,
@@ -403,6 +411,10 @@
     "ew_cinderhorn": 61,
     "ew_chainmaw": 54,
     "ew_bellows": 78,
-    "ew_crown": 80
+    "ew_crown": 80,
+    "cf_brute": 59,
+    "cf_crawler": 64,
+    "cf_caster": 84,
+    "cf_sentry": 69
   }
 }

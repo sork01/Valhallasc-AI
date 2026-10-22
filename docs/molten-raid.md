@@ -116,8 +116,9 @@ four enemies** (the Foundry has three; one more so ten fighters have targets):
 optional**, in alcoves, on bridges and in side forges. Optional packs are never
 behind a lock that needs the whole pack dead (decision 16); a pack that is sneaked
 past or pulled one at a time still gives the same kill time per pack. All ten carry
-the purple chance. Three elites (two with a quest, one without) and one new music
-style, as the owner's rule says for any new zone.
+the purple chance. **Owner correction (2026-10-22): every pack enemy is a
+dungeon elite; there are no separate special elites or elite quests.** Music
+remains RAID-MUSIC.
 
 ### Full-run length (estimate, fighting time only)
 
@@ -145,6 +146,11 @@ real figure comes from `RAID-CHECK`.
 
 ## 5. Kill-time targets and measurement
 
+**Owner update, 2026-10-22: pack clear-time calibration is deferred. Leave the
+packs overpowered; the owner has a fix in mind for later.** The earlier pack
+numbers below are planning targets, not acceptance gates for RAID-PACKS.
+Boss timings remain later tasks.
+
 All times are for **the hirer plus nine mercenaries**, the real `auto_play` brain,
 in full orange gear (decision 14); skilled humans may be faster and that is
 accepted. Ten fighters deal about twice the damage of five, so four times the time
@@ -164,8 +170,8 @@ Why 70 s for the Wardens and not the Foundry's 204–231 s: 70 s is the rule for
 each, which is Eldmarr's floor. The Foundry's longer times came from a blue-gear
 fixture with its own mechanics, not from a tuning target.
 
-Records per fight, from at least 16 seeds: median, fastest, slowest, falls, DPS per
-class. A win is the actual kill. Controls with the same fixture: ten minus two
+Records per future boss fight, from at least 16 seeds: median, fastest, slowest,
+falls, DPS per class. A win is the actual kill. Controls with the same fixture: ten minus two
 fighters must lose or take at least 1.25 times the median; a lone player at level 99
 must die to every pack and every Warden (`a_dungeon_pack_kills_a_lone_player` and
 the boss equivalent); four mercenaries alone must lose
@@ -358,9 +364,10 @@ reopens this after `RAID-CHECK`; C would need "already has it" defined as the
 character holding a Chainforged piece of that slot equipped, in the bags or in the
 bank (by item id) and reads three inventories per drop.
 
-**Purple at 3%.** An independent roll per ordinary enemy killed, a level-99 piece from
-the existing purple ladder for a class present, through `copies()`/`loot_stack`/
-`pile_for` so rebirth still applies. Expected purple per clear: 10 packs × 4 = 40
+**Purple at 3%.** An independent roll per pack enemy killed. **Owner correction
+(2026-10-22): unique original, class-neutral level-99 pieces** from the Cinderwork
+pool in section 16. The existing `copies()` and raid loot path preserve rebirth
+and human-only Need/Greed/Pass. Expected purple per clear: 10 packs × 4 = 40
 enemies → about **1.2**; the six mandatory packs only → about 0.7 (counted per enemy).
 
 **Economy.** A level-99 hire costs `merc_price(99)` = 115,000 gold, so nine
@@ -393,8 +400,9 @@ by hand.
 ## 11. What each task must measure, and with what
 
 `RAID-MAP`: reachable-floor count by the section 3 method, plus walk times between
-halls. `RAID-PACKS`: per-kind kill time with the section 5 fixture, and a lone player
-must die. Each boss task: its own ten-fighter times (median, fastest, slowest), the ten
+halls. `RAID-PACKS`: elite, collision, loot and rendering checks; deliberately
+overpowered per the owner's 2026-10-22 instruction, with clear-time calibration
+deferred. A lone player must die. Each boss task: its own ten-fighter times (median, fastest, slowest), the ten
 minus two control, the lone-player rule, the mechanic's fairness test, the enrage
 start. `RAID-ORANGE`: the orange sums per class and slot, the clears-to-set model
 re-run on the real tables. `RAID-CHECK`: the final at 900 s or more with the
@@ -566,3 +574,101 @@ This follow-up changes client rendering only; source is retained on
 Session wrap-up: the owner invoked the `finish` skill to commit and push the
 prepared source on `feat/raid-approach` and the main TODO pointer. The source stays
 isolated from the served checkout. Wiki: `10_projects:valhallasc_chained_forge_map_20261022`.
+
+
+## 16. RAID-PACKS — implementation and owner corrections (2026-10-22)
+
+The owner's corrections in this task supersede section 4's outdoor-style elite
+rule: **this is a dungeon. All 40 enemies in its ten four-enemy packs are elites;
+there are no three special elites or elite side quests.** The ten bosses are
+separate tasks. All packs remain level 99, six mandatory and four optional.
+
+Four original kinds: Slaghammer Brute (hammer slam), Ventspitter Crawler
+(three-shot fan), Crucible Channeler (five-shot magma fan), Obsidian Bulwark
+(melee). Their catalog is `world/chained_forge.txt`, generated from
+`scripts/chained_forge_content.py`; `raidPack: true` identifies the dedicated
+purple-roll path independently of the elite flag. Tuning remains exclusively in
+`world/elite-power.txt`. Every kind fully heals after an evade and has no respawn
+inside the active instance, as other dungeon packs do.
+
+**Owner correction: purple mob drops must be unique and class-neutral.** The
+ordinary progression and Nullforged pools are not the mob's purple rewards.
+Cinderwork Kiln Gaiters, Cinderwork Crucible Pendant and Cinderwork Clamp Ring
+are three original level-99 purple pieces, wearable by all five classes. They use
+the existing level-99 purple stat budget with original louvred gaiters, open
+crucible pendant and square clamp-ring geometry fitted to all ten body rigs.
+They have no set bonus and never join the ordinary equipment pool. The 3% roll
+is independent of materials and normal gray/green/blue equipment, multiplied by
+rebirth through `copies`, and uses the existing humans-only raid loot path. The
+ordinary purple and orange rolls are suppressed in this raid. At the base rate,
+40 kills yield **1.2 purple pieces per full pack clear on average**, 0.72 for six
+mandatory packs; this is per enemy, not per pack. Boss orange tables remain for
+RAID-ORANGE.
+
+Measurement fixture: the real quartermaster hires nine contract fighters, giving
+two of every class including the Warrior hirer. All use the existing `auto_play`
+brain, points and consumables. The approved interim equipment is Worldheart's
+five orange slots plus Nullforged purple pants, necklace and two rings: **nine
+worn pieces, no cloak** (the separate cloak branch is not merged here). These are
+fixture items, not the new mob drop pool. Repeat measurements after Chainforged
+and the cloak work are integrated.
+
+
+### Owner update: deliberately overpowered
+
+After the diagnostic fights, the owner said: **"don't worry so much about the
+time to clear a pack. just make the packs overpowered. i have a fix in mind for
+later"** (2026-10-22). Clear-time calibration stopped at that instruction. The
+500–620-second target and a guaranteed win for the hired ten are deferred; no
+later fix has been guessed or implemented here.
+
+All four kinds use **`[140, 90]` health/damage multipliers** in
+`world/elite-power.txt`. These deliberately strong settings can overwhelm the
+geared hired ten. Earlier tuning logs are experiments, not accepted clear-time
+promises. Rebalance only when implementing the owner's later fix.
+
+| Kind | Behavior | Level-99 health after tuning | Authored damage × multiplier |
+| --- | --- | ---: | ---: |
+| Slaghammer Brute | melee-range hammer slam | 179,200,000 | 16,300 × 90 |
+| Ventspitter Crawler | three-shot ranged fan | 134,400,000 | 13,500 × 90 |
+| Crucible Channeler | five-shot ranged fan | 155,400,000 | 13,900 × 90 |
+| Obsidian Bulwark | melee pressure | 179,200,000 | 16,300 × 90 |
+
+Damage values precede the engine's global damage scale, armor and wards. Each
+pack contains one of each kind. Bridge sites 2, 5 and 6 use lines along their
+walkable floor; other sites use a three-tile square. They use normal dungeon AI,
+without boss scripts.
+
+The optional ignored diagnostic `raid_pack_measure_encounters` defaults to one
+seed, reports raw kills/falls/DPS/time, and imposes no pack time band or ten-player
+win gate. `RAID_PACK_FIGHTS=pack1,pack2`, `RAID_PACK_SEEDS`,
+`RAID_PACK_COUNT=1|8|10` and `RAID_PACK_CLASS` select a fixture. The lone-player
+control must still die. `raid_pack_careless_ten_without_defense_or_healing_lose`
+checks a group using basic attacks without defensive skills or consumables.
+Use the RAID build cache and one scratch test executable; never replace it
+while a diagnostic is active. No further timing runs are needed for this task.
+
+Encounter compaction preserves local authored collision, with a full-map
+control available via `RAID_PACK_FULL_MAP=1`. Full terrain is restored before a
+fallen fighter can wake outside the retained area. The equipment index preserves
+original first-match catalog selection, checked across every class/kind/variant.
+
+
+### Final verification
+
+Only the new content was tested; no full suite, release or public restart.
+Seven focused `raid_pack` tests, six `chained_forge` tests, gear-level and set
+catalog checks pass. Brief fixed-fixture controls kill a lone fighter in all
+five classes; the Priest is also checked at both bridge sites, and all ten
+basic-only fighters fall in the careless control. No further clear-time sweep.
+Clippy with warnings denied, fmt, changed JS/Python syntax, Swedish and two
+byte-stable generator rebuilds pass.
+
+The final optimized private server passes MCP `raid_packs` (copy isolation,
+actual material kills, unique loot fixtures and persistence; report
+`test-results/driver-QoJ0vb/report.json`) and **17 real-client checks** at desktop
+and mobile sizes (`test-results/driver-9AAGHn/raid-pack-desktop.png` and
+`raid-pack-mobile.png`). All **8,160 gear poses** pass across ten body rigs;
+substituting the old gear art fails the silhouette guard. Consolidated evidence:
+`test-results/raid-packs/verification.json`. Generator commands and source remain
+in the isolated raid worktree on `feat/raid-approach`; nothing is deployed.

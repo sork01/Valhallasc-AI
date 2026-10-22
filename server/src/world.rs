@@ -81,6 +81,8 @@ mod pursuit;
 mod pvp;
 mod raid;
 #[cfg(test)]
+mod raid_pack_tests;
+#[cfg(test)]
 mod rain_crown_tests;
 mod ranged;
 mod rebirth;
@@ -4100,6 +4102,16 @@ impl World {
                     self.loot_drop(&credit_id, zone, point, &bag.id);
                 }
             }
+            // Ordinary raid packs have their own independent purple roll.
+            // Materials, normal equipment and the humans-only loot path remain shared.
+            if self.maps[zone].raid && crate::cathedral::enemy(&kind).is_some_and(|e| e.raid_pack) {
+                for _ in 0..copies(RAID_EPIC_DROP_CHANCE, boost, || self.random()) {
+                    let choice = self.random();
+                    if let Some(piece) = raid_pack_piece(choice) {
+                        self.loot_drop(&credit_id, zone, point, &piece.id);
+                    }
+                }
+            }
             let last_boss =
                 !self.maps[zone].final_boss.is_empty() && self.maps[zone].final_boss == kind;
             // A licence is bound to one character, so a boosted chance is one roll, never above 100%.
@@ -4111,6 +4123,7 @@ impl World {
             let blackhour = self.maps[zone].final_boss == "null_hour";
             let hero_level = self.players.get(&credit).map_or(1, |p| p.character.level);
             if !blackhour
+                && !self.maps[zone].raid
                 && let Some(gear) = roll_orange_boosted(boost, hero_level, || self.random())
             {
                 self.loot_drop_with_gear(&credit_id, zone, point, &gear.item.clone(), Some(gear));
@@ -4163,7 +4176,9 @@ impl World {
                 // Dividing the roll by the multiplier widens every rarity band by it.
                 let chance = self.random() / f64::from(boost);
                 let choice = self.random();
-                if let Some(i) = roll_equipment(&kind, level, chance, choice) {
+                if let Some(i) = roll_equipment(&kind, level, chance, choice)
+                    && !(self.maps[zone].raid && matches!(i.rarity.as_str(), "epic" | "legendary"))
+                {
                     self.loot_drop(&credit_id, zone, point, &i.id);
                 }
             }
@@ -4538,7 +4553,8 @@ impl World {
                             | "snowgiant"
                             | "longnightwyrm"
                     ) || is_boss(&s.kind)
-                        || s.kind.starts_with("ew_") && is_elite(&s.kind)
+                        || (s.kind.starts_with("ew_") || s.kind.starts_with("cf_"))
+                            && is_elite(&s.kind)
                     {
                         s.max_hp
                     } else {

@@ -54787,5 +54787,87 @@
     "kind": "material",
     "rarity": "common",
     "sell": 10000
+  },
+  {
+    "id": "cf_brute_relic",
+    "name": "Slaghammer Brute Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2500
+  },
+  {
+    "id": "cf_crawler_relic",
+    "name": "Ventspitter Crawler Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2500
+  },
+  {
+    "id": "cf_caster_relic",
+    "name": "Crucible Channeler Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2500
+  },
+  {
+    "id": "cf_sentry_relic",
+    "name": "Obsidian Bulwark Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 2500
+  },
+  {
+    "id": "cfpack_pants",
+    "name": "Cinderwork Kiln Gaiters",
+    "kind": "pants",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "attack": 6.6,
+    "defense": 26.4,
+    "source": "chained_forge_packs",
+    "class": null,
+    "variant": "regearcfpack",
+    "art": "regearcfpack",
+    "bonusStats": {
+      "stamina": 108,
+      "strength": 108
+    }
+  },
+  {
+    "id": "cfpack_necklace",
+    "name": "Cinderwork Crucible Pendant",
+    "kind": "necklace",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "attack": 52.8,
+    "defense": 13.2,
+    "source": "chained_forge_packs",
+    "class": null,
+    "variant": "regearcfpack",
+    "art": "regearcfpack",
+    "bonusStats": {
+      "strength": 108,
+      "stamina": 108
+    }
+  },
+  {
+    "id": "cfpack_accessory",
+    "name": "Cinderwork Clamp Ring",
+    "kind": "accessory",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "attack": 39.6,
+    "defense": 10.0,
+    "source": "chained_forge_packs",
+    "class": null,
+    "variant": "regearcfpack",
+    "art": "regearcfpack",
+    "bonusStats": {
+      "strength": 108,
+      "agility": 108
+    }
   }
 ]

@@ -579,3 +579,19 @@ to the later RAID-OPEN release. File zone 46 adds two private copies and shifts
 old private-copy ids; see `docs/molten-raid.md` before deploying. Focused checks:
 `cargo test chained_forge`, MCP scenario `chained_forge`, and
 `REAL_SPRITES=1 node tests/chained-forge-ui.cjs`.
+
+
+The raid now has **ten packs of four level-99 dungeon elites**, four original
+kinds and no separate elite encounters or side quests. **The owner asked for
+overpowered packs; clear-time tuning is deferred to a later fix.** Its independent 3% purple
+mob roll awards unique class-neutral Cinderwork pants, necklace or ring; bosses
+and their orange drops remain later tasks. `chained_forge_content.py` owns the
+pack catalog and loot pieces, while `elite-power.txt` owns combat tuning.
+Enemy art: `python3 scripts/make_chained_forge_sprites.py preview|build|export|verify`,
+then `python3 scripts/zone_tops.py cathedral`. Gear jobs:
+`cfpack-shared-pants`, `cfpack-shared-necklace`, `cfpack-shared-accessory` through
+`make_progression_gear.py`; use `export` for existing PixelFlow records.
+Focused checks: Rust filter `raid_pack`, private MCP `raid_packs`,
+`tests/raid-packs-ui.cjs` (real sprites), and `tests/raid-pack-gear-art.cjs`.
+The entrance stays sealed until RAID-OPEN. Details and approved interim fixture:
+[docs/molten-raid.md](docs/molten-raid.md#16-raid-packs--implementation-and-owner-corrections-2026-10-22).

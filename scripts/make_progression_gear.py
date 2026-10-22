@@ -26,6 +26,7 @@ import instance_gear_shapes
 import late_instance_gear_shapes
 import keel_gear_shapes
 import null_gear_shapes
+import raid_pack_gear_shapes
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'client/assets'
@@ -46,7 +47,8 @@ BODY_CACHE = {}
 
 def activate(task):
     global PALETTE_HEX, PALETTE
-    PALETTE_HEX = (null_gear_shapes.PALETTE if task['group'] == 'null' else
+    PALETTE_HEX = (raid_pack_gear_shapes.PALETTE if task['group'] == 'cfpack' else
+                   null_gear_shapes.PALETTE if task['group'] == 'null' else
                    keel_gear_shapes.PALETTE if task['group'] == 'keel' else
                    late_instance_gear_shapes.palette(task['group'])[0] if task['group'] in late_instance_gear_shapes.STYLES else
                    instance_gear_shapes.PALETTE if task['group'] in ('eye', 'elder') else
@@ -79,12 +81,13 @@ def revision(task):
     if task['group'] not in ('vault', 'moonwell', 'eye', 'elder', *late_instance_gear_shapes.STYLES) and task['className'] == 'mage' and task['kind'] == 'headgear' and shape.DESIGNS[task['group']]['index'] >= 9:
         source += inspect.getsource(gear_shapes_high.render_mage_head)
     if task['group'] == 'keel': source += Path(keel_gear_shapes.__file__).read_text()
+    if task['group'] == 'cfpack': source += Path(raid_pack_gear_shapes.__file__).read_text()
     if task['group'] == 'null': source += Path(null_gear_shapes.__file__).read_text()
     return hashlib.sha256(source.encode()).hexdigest()
 
 
 def task_for(job):
-    for path in (STATE, HIGH_STATE, DUNGEON_STATE, INSTANCE_STATE):
+    for path in (STATE, HIGH_STATE, DUNGEON_STATE, INSTANCE_STATE, ROOT / 'docs/raid-pack-gear-state.txt'):
         if path.exists():
             task = next((t for t in json.loads(path.read_text())['tasks'] if t['id'] == job), None)
             if task:
@@ -107,7 +110,9 @@ def frames(task, cls, gender):
                     with np.load(file) as data:
                         if str(data['revision']) == fingerprint:
                             result[key] = (data['index'], data['depth']); continue
-                if task['group'] == 'null':
+                if task['group'] == 'cfpack':
+                    idx, depth = raid_pack_gear_shapes.render(cls, 'cfpack', task['kind'], gender, *key)
+                elif task['group'] == 'null':
                     idx, depth = null_gear_shapes.render(cls, 'null', task['kind'], gender, *key)
                 elif task['group'] == 'keel':
                     idx, depth = keel_gear_shapes.render(cls, 'keel', task['kind'], gender, *key)
@@ -260,7 +265,7 @@ def build(task):
 
 def ensure_female_sprites(task, manifest, record):
     """Keep both-body source cels editable in PixelFlow, including shared pieces."""
-    if task['group'] not in ('L95', 'vault', 'moonwell', 'eye', 'elder', 'keel', 'null', *late_instance_gear_shapes.STYLES):
+    if task['group'] not in ('L95', 'vault', 'moonwell', 'eye', 'elder', 'keel', 'null', 'cfpack', *late_instance_gear_shapes.STYLES):
         return
     classes = [task['className']] if task['className'] else list(CLASSES)
     for cls in classes:
@@ -324,6 +329,13 @@ def export(task):
             meta['lazyParts'] = sorted(set(meta.get('lazyParts', [])) | {part})
             meta.setdefault('gearSprites', {})[part] = clips if gender == 'male' else record.get('female', {}).get(cls) or {'local': 'scripts/make_progression_gear.py export ' + task['id']}
             meta_path.write_text(json.dumps(meta, indent=2) + '\n')
+            if task['group'] == 'cfpack':
+                import base64
+                from sprite_bounds import bounds_name, part_bounds
+                bounds_path = bounds_name(meta_path)
+                bounds = json.loads(bounds_path.read_text())
+                bounds['parts'][part] = base64.b64encode(part_bounds(ASSETS / meta['parts'][part]['png'], meta)).decode()
+                bounds_path.write_text(json.dumps(bounds, separators=(',', ':')) + '\n')
     sprite, grids = load_sprite(record['icon']); (x0, y0) = record['icon']['offset']; icon = Image.new('RGBA', (48, 48))
     icon.paste(Image.fromarray(PALETTE[grids[0]]), (x0, y0))
     icon_path = ASSETS / ('gear_icon_' + task['id'].lower() + '.png'); icon.save(icon_path); files.append(str(icon_path.relative_to(ROOT)))

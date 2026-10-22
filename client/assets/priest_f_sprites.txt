@@ -1196,6 +1196,18 @@
     "accessory_regearnull": {
       "png": "priest_f_progression_accessory_regearnull.png",
       "depth": "priest_f_progression_accessory_regearnull_depth.png"
+    },
+    "pants_regearcfpack": {
+      "png": "priest_f_progression_pants_regearcfpack.png",
+      "depth": "priest_f_progression_pants_regearcfpack_depth.png"
+    },
+    "necklace_regearcfpack": {
+      "png": "priest_f_progression_necklace_regearcfpack.png",
+      "depth": "priest_f_progression_necklace_regearcfpack_depth.png"
+    },
+    "accessory_regearcfpack": {
+      "png": "priest_f_progression_accessory_regearcfpack.png",
+      "depth": "priest_f_progression_accessory_regearcfpack_depth.png"
     }
   },
   "gender": "female",
@@ -1491,6 +1503,7 @@
     "accessory_regearamber",
     "accessory_regearastro",
     "accessory_regearbloom",
+    "accessory_regearcfpack",
     "accessory_regearcloister",
     "accessory_regearelder",
     "accessory_regeareye",
@@ -1627,6 +1640,7 @@
     "necklace_regearamber",
     "necklace_regearastro",
     "necklace_regearbloom",
+    "necklace_regearcfpack",
     "necklace_regearcloister",
     "necklace_regearelder",
     "necklace_regeareye",
@@ -1660,6 +1674,7 @@
     "pants_regearamber",
     "pants_regearastro",
     "pants_regearbloom",
+    "pants_regearcfpack",
     "pants_regearcloister",
     "pants_regearelder",
     "pants_regeareye",
@@ -9995,6 +10010,177 @@
           "offset": [
             57,
             59
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "pants_regearcfpack": {
+      "idle": [
+        {
+          "id": "a37898e1ad873f51",
+          "offset": [
+            65,
+            79
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "441d29dedf24126e",
+          "offset": [
+            60,
+            77
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "52a97e661690d760",
+          "offset": [
+            63,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "580ed220cdb100ab",
+          "offset": [
+            65,
+            79
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "a95e868c380efa6e",
+          "offset": [
+            54,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "necklace_regearcfpack": {
+      "idle": [
+        {
+          "id": "20ca6ce7750fadfe",
+          "offset": [
+            66,
+            50
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "c06f859672dbd1e8",
+          "offset": [
+            65,
+            49
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "9e80719e226c4e02",
+          "offset": [
+            57,
+            48
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "d8f8ae130514a8bb",
+          "offset": [
+            66,
+            50
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "21b206f1a5f0fa4d",
+          "offset": [
+            52,
+            49
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "accessory_regearcfpack": {
+      "idle": [
+        {
+          "id": "92e2122367eecef9",
+          "offset": [
+            57,
+            49
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "b4e571c49ac960c2",
+          "offset": [
+            55,
+            51
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "ebbcdd0c27e101de",
+          "offset": [
+            38,
+            39
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "4ba997454f45442e",
+          "offset": [
+            58,
+            52
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "ff0fa7924e171660",
+          "offset": [
+            55,
+            56
           ],
           "frameCount": 64,
           "start": 0

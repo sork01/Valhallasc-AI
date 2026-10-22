@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The Chained Forge: sealed level-99 raid floor. No enemies until RAID-PACKS/BOSS.
+"""The Chained Forge: sealed level-99 raid floor. Elite packs; bosses are added by their own tasks.
 
 python3 scripts/generate_chained_forge.py [--check | --open]
 Rebuild preserves an opened entrance; --open is reserved for RAID-OPEN.
@@ -223,12 +223,27 @@ def main():
         if old:
             for key in ('slimes','quests'):z[key]=old.get(key,[])
             z['npcs'] += [n for n in old['npcs'] if n['id']!='cf_quartermaster']
+        from chained_forge_content import install
+        install(z)
         if old:w['zones'][ZONE-1]=z
         else:
             assert len(w['zones'])==ZONE-1
             w['zones'].append(z)
         install_parent(w)
     check(w)
-    if not args.check:path.write_text(json.dumps(w,indent=2,ensure_ascii=False)+'\n')
+    if not args.check:
+        path.write_text(json.dumps(w,indent=2,ensure_ascii=False)+'\n')
+        from chained_forge_content import ENEMIES
+        catalog=ROOT/'world/chained_forge.txt'
+        previous=json.loads(catalog.read_text()) if catalog.exists() else []
+        owned={e['kind'] for e in ENEMIES}
+        catalog.write_text(json.dumps([e for e in previous if e['kind'] not in owned]+ENEMIES,indent=2,ensure_ascii=False)+'\n')
+        path=ROOT/'world/items.txt';items=json.loads(path.read_text());have={i['id'] for i in items}
+        for e in ENEMIES:
+            if e['material'] not in have:
+                items.append(dict(id=e['material'],name=e['name']+' Relic',kind='material',rarity='common',sell=10000 if e['elite'] else 2500))
+        from chained_forge_content import gear_items
+        items=[i for i in items if i.get('source')!='chained_forge_packs']+gear_items()
+        path.write_text(json.dumps(items,indent=2,ensure_ascii=False)+'\n')
 
 if __name__=='__main__':main()

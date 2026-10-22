@@ -231,6 +231,35 @@ pub fn normal_gear(class: Class, level: u32) -> Vec<(&'static str, String)> {
 }
 /// The progression set of `rarity` (`common`, `uncommon`, `rare` or `epic`) for `level`, built like `normal_gear`.
 pub fn normal_gear_of(class: Class, level: u32, rarity: &str) -> Vec<(&'static str, String)> {
+    if rarity == "raid_interim" {
+        assert_eq!(level, 99);
+        return SLOTS
+            .iter()
+            .copied()
+            .chain([("accessory2", "accessory")])
+            .map(|(slot, kind)| {
+                let orange = matches!(
+                    kind,
+                    "armor" | "weapon" | "headgear" | "shoulders" | "gloves"
+                );
+                let piece = ITEMS
+                    .iter()
+                    .find(|i| {
+                        i.kind == kind
+                            && i.required_level == 99
+                            && i.rarity == if orange { "legendary" } else { "epic" }
+                            && (if orange {
+                                i.source.as_deref() == Some("orange_pool")
+                            } else {
+                                i.source.as_deref() == Some("blackhour")
+                            })
+                            && i.class.is_none_or(|c| c == class)
+                    })
+                    .expect("approved interim raid slot");
+                (slot, piece.id.clone())
+            })
+            .collect();
+    }
     let colour = match rarity {
         "common" => "gray",
         "uncommon" => "green",
@@ -893,6 +922,32 @@ pub fn run_geared_hired_party(case: &Case, ids: &[usize], seed: u64) -> PartyOut
     )
 }
 
+/// Approved raid fixture: real quartermaster contracts, two of every class.
+/// `count` scopes the ten-minus-two and lone controls; all wear the same gear.
+pub fn run_raid_hired_party(case: &Case, ids: &[usize], seed: u64, count: usize) -> PartyOutcome {
+    assert!((1..=10).contains(&count));
+    let mercs = [
+        Class::Mage,
+        Class::Assassin,
+        Class::Priest,
+        Class::Hunter,
+        Class::Warrior,
+        Class::Mage,
+        Class::Assassin,
+        Class::Priest,
+        Class::Hunter,
+    ];
+    party_pack_fight(
+        case,
+        &[case.class],
+        &mercs[..count - 1],
+        HirerRole::Fights,
+        ids,
+        seed,
+        true,
+    )
+}
+
 /// What the hirer does in a hired-party fight (`BOSSMECH-MERC-ALONE`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum HirerRole {
@@ -942,15 +997,21 @@ fn seat_near_boss(w: &World, zone: usize, boss: Point) -> Option<Point> {
 /// Rents `mercs` for the hirer (session 1) at the Meeting Stone, then sets the hirer at `start` in `zone` with the hired
 /// fighters on free ground beside them.
 pub(super) fn hire_mercenaries(w: &mut World, mercs: &[Class], zone: usize, start: Point) {
+    let raid = w.maps[zone].raid;
+    let stone_id = if raid {
+        "cf_quartermaster"
+    } else {
+        "city_meetingstone"
+    };
     let stone_zone = w
         .maps
         .iter()
-        .position(|m| m.npcs.iter().any(|n| n.id == "city_meetingstone"))
+        .position(|m| m.npcs.iter().any(|n| n.id == stone_id))
         .expect("a Meeting Stone");
     let stone = w.maps[stone_zone]
         .npcs
         .iter()
-        .find(|n| n.id == "city_meetingstone")
+        .find(|n| n.id == stone_id)
         .unwrap()
         .clone();
     {
@@ -963,7 +1024,7 @@ pub(super) fn hire_mercenaries(w: &mut World, mercs: &[Class], zone: usize, star
     for class in mercs {
         w.time += 0.6;
         let name = format!("{class:?}").to_lowercase();
-        w.interact(1, "city_meetingstone", Some(&format!("merc_{name}")));
+        w.interact(1, stone_id, Some(&format!("merc_{name}")));
     }
     assert_eq!(
         w.players.values().filter(|p| p.merc.is_some()).count(),
@@ -1067,6 +1128,26 @@ fn party_pack_fight(
         .map(|&i| w.slimes[i].point())
         .min_by(|a, b| a.distance(centre).total_cmp(&b.distance(centre)))
         .unwrap();
+    // Raid fixtures retain exact collision around the encounter, avoiding scans
+    // of hundreds of distant lava rectangles on every movement substep. An
+    // assertion below proves no actor queries outside the retained region.
+    // RAID_PACK_FULL_MAP provides the independent untrimmed geometry control.
+    let mut raid_full_objects = None;
+    let mut raid_region = if w.maps[zone].raid && std::env::var("RAID_PACK_FULL_MAP").is_err() {
+        let region = (home.x - 45., home.y - 45., home.x + 45., home.y + 45.);
+        raid_full_objects = Some(w.maps[zone].objects.clone());
+        w.maps[zone].objects.retain(|o| {
+            let rx = (o.width * 0.5).max(o.r) + 2.;
+            let ry = (o.depth * 0.5).max(o.r) + 2.;
+            o.x + rx >= region.0
+                && o.y + ry >= region.1
+                && o.x - rx <= region.2
+                && o.y - ry <= region.3
+        });
+        Some(region)
+    } else {
+        None
+    };
     let total_hp: f64 = ids.iter().map(|&i| w.slimes[i].max_hp).sum();
     let mut rxs = vec![];
     for (n, &class) in members.iter().enumerate() {
@@ -1118,7 +1199,8 @@ fn party_pack_fight(
         .collect();
     // Every fighter plays by the mercenaries' code (`auto_play`: the same skills, potions, telegraph steps and boss brain);
     // `DUNGEON_PARTY_BRAIN=harness` brings back the harness's own rotation for a comparison.
-    let auto_brain = !std::env::var("DUNGEON_PARTY_BRAIN").is_ok_and(|v| v == "harness");
+    let auto_brain = case.rotation != Rotation::BasicOnly
+        && !std::env::var("DUNGEON_PARTY_BRAIN").is_ok_and(|v| v == "harness");
     let left = |w: &World| ids.iter().map(|&i| w.slimes[i].hp.max(0.)).sum::<f64>() / total_hp;
     let mut aimed = vec![usize::MAX; members.len()];
     let start_time = w.time;
@@ -1137,6 +1219,12 @@ fn party_pack_fight(
     let answers = boss_bots_answer();
     let trace = std::env::var("DUNGEON_BOSS_TRACE").is_ok();
     while w.time - start_time < cap {
+        // Restore the full terrain before a fallen fighter can wake at a rally
+        // outside the encounter. The compact map is only for confined combat.
+        if raid_region.is_some() && w.players.values().any(|p| p.character.hp <= 0.) {
+            w.maps[zone].objects = raid_full_objects.take().unwrap();
+            raid_region = None;
+        }
         if ids.iter().all(|&i| w.slimes[i].dead) {
             killed = true;
             break;
@@ -1177,6 +1265,12 @@ fn party_pack_fight(
             }
             if w.players[&session].character.hp <= 0. {
                 continue;
+            }
+            if w.maps[zone].raid
+                && case.rotation == Rotation::BasicOnly
+                && w.players[&session].character.point().distance(home) > 40.
+            {
+                continue; // A fallen human woke at the disconnected muster; this attempt is over for them.
             }
             anyone_alive = true;
             if role == HirerRole::Idle && session == 1 {
@@ -1239,7 +1333,7 @@ fn party_pack_fight(
             } else if !stay {
                 walk_up_to_held(&mut w, session, near, true);
             }
-            if !play.as_ref().is_some_and(|b| b.hold_fire) {
+            if case.rotation != Rotation::BasicOnly && !play.as_ref().is_some_and(|b| b.hold_fire) {
                 cast_skills(&mut w, session, near, stay, &mut out);
             }
             if case.consumables {
@@ -1253,6 +1347,16 @@ fn party_pack_fight(
             .any(|p| p.merc.is_some() && p.character.hp > 0.);
         if !anyone_alive && !hired_alive {
             break;
+        }
+        if let Some((x0, y0, x1, y1)) = raid_region {
+            assert!(
+                w.players.values().all(|p| p.character.hp <= 0.
+                    || (p.character.x > x0 + 5.
+                        && p.character.y > y0 + 5.
+                        && p.character.x < x1 - 5.
+                        && p.character.y < y1 - 5.)),
+                "raid fighter left retained collision region"
+            );
         }
         w.step();
         if trace
