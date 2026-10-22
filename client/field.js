@@ -3714,6 +3714,9 @@
       g.drawImage(getChunk(chx, chy).c, dx, dy, G.w, G.h);
     }
     g.imageSmoothingEnabled = true;
+    if (zdef.theme === 'emberwake' || zdef.theme === 'chained_forge') {
+      EmberwakeArt.moltenMotion(g,VW,VH,t,zdef,cx-sxo,cy-syo,TW,TH,reducedMotion());
+    }
     City.drawPlaza(g, w2s);
     if (zdef.theme === 'ember') drawLava(g, t);
     if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward') drawWater(g, t);

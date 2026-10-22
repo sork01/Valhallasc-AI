@@ -548,6 +548,32 @@ receipts are in `test-results/chained-forge-map/filedrop-upload.json`.
 
 ### Molten exterior follow-up (owner, 2026-10-22)
 
+Animated lava follow-up (2026-10-22): Emberwake and the Chained Forge now share
+`EmberwakeArt.moltenMotion`, drawn above the cached terrain and below actors and
+combat telegraphs. Sparse warm glints drift slowly across hot fissures; small
+bubbles swell, rise slightly, then flatten and fade as they pop. There are no
+sparks or flashes. Positions and phases are derived from world coordinates and
+the existing frame clock, so moving the camera does not move the effect relative
+to the lava. Anchors exclude the river banks and the raid's authoritative floor
+mask, including bridges. The minimap and world map retain their static terrain.
+
+Four-tile anchor chunks are generated on demand with a bounded 192-entry cache
+per zone. The existing texture caches are unchanged; there is no new animation
+loop or per-frame texture generation. No visible anchors means no canvas calls;
+reduced motion returns immediately with no overlay. Client files are served from
+disk, so this change needs no server build or restart.
+
+Focused real-sprite validation: `tests/lava-motion-ui.cjs` passes 18 assertions
+against a private server. Paired actual field frames change 911–963 pixels in
+the sampled views, with a maximum channel change of 26/255; reduced-motion
+frames have zero overlay changes. Sixty sampled overlay frames per zone show
+no pixels on walkable ground or outside the river, at most three simultaneous
+bubbles, and exact matching pixels after a camera shift. The sampled cached
+overlay cost is approximately 0.02–0.05 ms/frame in headless Chromium (800×500).
+`MUTATE=1` disables the overlay in the test browser and fails at the first
+actual-field pixel assertion (zero changed pixels). JavaScript syntax and diff
+whitespace checks pass. Report and screenshots: `test-results/driver-YGaP7o/`.
+
 The owner requested that all unwalkable space look like Emberwake's molten river.
 `ChainedForgeArt.background` now paints a continuous isometric molten surface in
 world coordinates, using the same `EmberwakeArt.moltenColor` sampler as the river:

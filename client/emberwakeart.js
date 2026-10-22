@@ -78,6 +78,63 @@
     g.transform(TW/2,TH/2,-TW/2,TH/2,-G.ox,-G.oy);g.imageSmoothingEnabled=true;
     g.drawImage(texture.canvas,0,texture.ymin,z.size,texture.height);g.restore();
   }
+  // Sparse motion above the cached terrain. Cache world anchors, never animated
+  // textures; both zones use the same clock, fissures and collision footprint.
+  const motionCache=new WeakMap(),MOTION_CHUNK=4;
+  function motionChunk(z,cx,cy){
+    let cache=motionCache.get(z);
+    if(!cache){cache={chunks:new Map(),pieces:z.objects.filter(o=>o.kind==='ew_lava')};motionCache.set(z,cache);}
+    const key=cx+','+cy;
+    if(cache.chunks.has(key))return cache.chunks.get(key);
+    const points=[];
+    for(let i=0;i<5;i++){
+      const seed=hash(cx*7+i,cy*11-i),x=(cx+.08+hash(cx*13+i,cy*3)*.84)*MOTION_CHUNK,
+        y=(cy+.08+hash(cx*3,cy*13+i)*.84)*MOTION_CHUNK;
+      if(z.theme==='chained_forge'){
+        // Leave the cooled bank and every bridge clear, including floor corners.
+        let bank=false;
+        for(let iy=Math.floor(y)-1;iy<=Math.floor(y)+1;iy++)for(let ix=Math.floor(x)-1;ix<=Math.floor(x)+1;ix++){
+          if(z.forgeFloor?.[iy]?.[ix]==='='&&Math.hypot(Math.max(ix-x,0,x-ix-1),Math.max(iy-y,0,y-iy-1))<1)bank=true;
+        }
+        if(bank)continue;
+      }else if(!cache.pieces.some(o=>o.r-Math.hypot(x-o.x,y-o.y)>1))continue;
+      // Glints belong in the hot fissures, not on the dark crust plates.
+      if(moltenColor(x,y)[0]<200)continue;
+      points.push({x,y,seed});
+    }
+    cache.chunks.set(key,points);
+    if(cache.chunks.size>192)cache.chunks.delete(cache.chunks.keys().next().value);
+    return points;
+  }
+  function moltenMotion(g,w,h,t,z,cx,cy,tw=88,th=44,calm=false){
+    if(calm)return;
+    const ox=w/2-cx,oy=h/2-cy;
+    const x0=Math.floor(((cx-w/2)/tw+(cy-h/2)/th)/MOTION_CHUNK),
+      x1=Math.floor(((cx+w/2)/tw+(cy+h/2)/th)/MOTION_CHUNK),
+      y0=Math.floor(((cy-h/2)/th-(cx+w/2)/tw)/MOTION_CHUNK),
+      y1=Math.floor(((cy+h/2)/th-(cx-w/2)/tw)/MOTION_CHUNK);
+    let saved=false;
+    for(let iy=y0;iy<=y1;iy++)for(let ix=x0;ix<=x1;ix++){
+      const left=(ix-iy-1)*MOTION_CHUNK*tw/2+ox,top=(ix+iy)*MOTION_CHUNK*th/2+oy;
+      if(left>w+20||left+MOTION_CHUNK*tw< -20||top>h+20||top+MOTION_CHUNK*th< -20)continue;
+      for(const p of motionChunk(z,ix,iy)){
+        const phase=p.seed*TAU,drift=Math.sin(t*.24+phase)*.12,
+          sx=(p.x-p.y+drift)*tw/2+ox,sy=(p.x+p.y+drift)*th/2+oy;
+        if(sx< -20||sx>w+20||sy< -12||sy>h+12)continue;
+        if(!saved){g.save();g.lineCap='round';saved=true;}
+        g.globalAlpha=.09+.05*Math.sin(t*.37+phase);g.strokeStyle='#efa565';g.lineWidth=1.3;
+        g.beginPath();g.moveTo(sx-11,sy+1);g.quadraticCurveTo(sx-2,sy-3,sx+12,sy-1);g.stroke();
+        if(p.seed<.68)continue;
+        const age=(t+p.seed*31)%(13+p.seed*9);
+        if(age>2.6)continue;
+        const rise=Math.min(1,age/2),pop=Math.max(0,(age-2)/.6),radius=1.4+rise*3+pop*2;
+        g.globalAlpha=pop?(.28*(1-pop)):(.28*Math.sin(rise*Math.PI/2));
+        g.strokeStyle='#f5b879';g.lineWidth=1.1;
+        g.beginPath();g.ellipse(sx,sy-rise*2,radius,radius*(pop?.35:.62),0,0,TAU);g.stroke();
+      }
+    }
+    if(saved)g.restore();
+  }
   City.art.ew_lantern={box:[150,260,75,220],draw(g){
     beam(g,[[0,6],[0,-145],[20,-155]],10);
     poly(g,[[8,-153],[31,-153],[34,-105],[5,-105]],C.iron,C.ink,3);
@@ -144,5 +201,5 @@
     for(let s of [-1,1])chain(g,s*60,-115,5);
     g.font='15px "Jua",sans-serif';g.textAlign='center';g.strokeStyle=C.ink;g.lineWidth=4;g.fillStyle=C.pale;const name=window.Locale?.translate(p.name)||p.name;g.strokeText(name,0,-192);g.fillText(name,0,-192);g.restore();
   }
-  window.EmberwakeArt={ground,detail,background,portal,molten,moltenColor};
+  window.EmberwakeArt={ground,detail,background,portal,molten,moltenColor,moltenMotion};
 })();
