@@ -685,3 +685,55 @@ fn dungeon_inventory() {
         );
     }
 }
+
+/// Cloak release calibration: the real hired five, full-gear hirer, ordinary hired gear.
+/// Four shards keep one test executable and separate logs; raid timings remain deferred.
+#[test]
+#[ignore = "scoped cloak release measurements; use scratch ELITE_POWER_FILE and ENRAGE_FILE"]
+fn cloak_recal_measure_hired_encounters() {
+    let (shard, shards): (usize, usize) = std::env::var("CLOAK_RECAL_SHARD")
+        .ok()
+        .and_then(|v| {
+            let (i, n) = v.split_once('/')?;
+            Some((i.parse().ok()?, n.parse().ok()?))
+        })
+        .unwrap_or((0, 1));
+    let table = world().boss.table.keys().cloned().collect::<Vec<_>>();
+    let mercs = [Class::Priest, Class::Mage, Class::Hunter, Class::Assassin];
+    for (index, d) in dungeons().into_iter().enumerate() {
+        if index % shards != shard || d.name == "The Chained Forge" {
+            continue;
+        }
+        let mut targets: Vec<(String, Vec<usize>, bool)> = d
+            .bosses
+            .iter()
+            .map(|(k, spawn)| (k.clone(), vec![*spawn], table.contains(k)))
+            .collect();
+        targets.extend(
+            d.packs
+                .iter()
+                .enumerate()
+                .map(|(n, ids)| (format!("pack {n}"), ids.clone(), false)),
+        );
+        for (kind, ids, final_boss) in targets {
+            let case = Case {
+                consumables: true,
+                rarity: BASELINE_RARITY,
+                enemy_level: Some(d.level),
+                cap: Some(CAP_SECONDS),
+                ..Case::new(Class::Warrior, d.level)
+            };
+            let runs: Vec<_> = (1..=seeds())
+                .map(|seed| run_hired_party_pack_once(&case, Class::Warrior, &mercs, &ids, seed))
+                .collect();
+            println!(
+                "CLOAK_RECAL {}",
+                json!({
+                    "dungeon":d.name,"level":d.level,"kind":kind,"final":final_boss,
+                    "runs":runs.iter().map(|r|json!({"killed":r.killed,"seconds":r.seconds,"deaths":r.deaths})).collect::<Vec<_>>(),
+                    "dps":dps_by_class(&runs),
+                })
+            );
+        }
+    }
+}

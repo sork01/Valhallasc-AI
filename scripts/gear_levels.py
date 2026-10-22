@@ -168,7 +168,7 @@ def finish(i, level, rarity):
 
 def main():
     existing = json.loads(ITEMS.read_text())
-    items = [i for i in existing if 'art' not in i or i.get('source') == 'orange_pool']
+    items = [i for i in existing if 'art' not in i or i.get('source') in ('orange_pool', 'chained_forge_packs')]
     gear = {'armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'}
     out, bases = [], {}
     for i in items:

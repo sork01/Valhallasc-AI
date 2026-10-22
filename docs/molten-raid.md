@@ -720,3 +720,14 @@ character panel, dismissal, exit, and Swedish. Evidence:
 Clippy with warnings denied, fmt, JS syntax and Swedish checks pass. Clear-time
 calibration remains deferred. Source is in the isolated raid worktree, not
 committed or deployed in this follow-up.
+
+## Combined release integration (2026-10-22)
+
+The cloak branch adds the tenth worn slot to every full-gear fixture. The
+interim raid fixture now wears six Worldheart pieces (the original five plus
+the class-neutral cloak), Nullforged pants and necklace, and two rings: ten
+pieces total, with each ring slot listed once. Actual hired fighters receive
+their ordinary level-appropriate green cloak unless a full-gear measurement
+explicitly replaces it. Pack multipliers remain `[140, 90]`; the owner deferred
+pack timing calibration. Inspect now displays the same effective raid attack
+as Character. The unfinished raid entrance remains sealed.

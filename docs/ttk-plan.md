@@ -35,3 +35,13 @@ PvP and healing as a fraction of max HP also change with the larger player stats
 The 2026-10-15 decision (raise players, leave monsters alone) no longer fits from level 40: the class balance (`DPS-BALANCE-40-95`) made every class kill in 9-22 s against a 25-30 s minimum. The owner chose to raise monster health rather than lower player attack. The 48 ordinary monsters of Astralhollow to the Yearwheel have health multipliers of 1.19-2.0 in `world/elite-power.txt` (anchors at every fifth level, linear between them by default level). The grid is played with the mercenaries' rotation from level 40 (`MERCENARY_FROM_LEVEL` in `ttk.rs`), because the harness rotation starves the assassin. Levels 5-35 keep the harness rotation and unchanged monsters. Longer fights run out of mana and energy, so kill time grows faster than health; recalibrate with a scratch `ELITE_POWER_FILE` and `TTK_LEVELS=... TTK_RUNS=3 scripts/ttk.sh`.
 
 Levels 5-10 are noisy (the level-5 hunter ranges 4.2-8.5 s between seeds), so the grid takes nine seeds there and allows a 1.4x class spread (`NOISY_RUNS`, `NOISY_SPREAD` in `ttk.rs`); every other level keeps 1.3x.
+
+
+## Combined cloak release (2026-10-22)
+
+The owner requested immediate deployment before the lengthy cloak recalibration.
+GEAR-CLOAK-RECAL remains open. The pre-cloak baseline covers 95 cases / 285 fights
+at levels 10–99 across all five classes, with no failed kills. Full progression
+fixtures now wear ten slots (cloak and both rings); actual hired fighters receive
+a green cloak from level 5. No monster power, enrage or PvP tables were retuned
+for cloaks, and raid pack timing stays deferred.

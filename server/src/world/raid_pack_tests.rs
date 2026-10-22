@@ -77,16 +77,16 @@ fn raid_pack_spawns_are_all_dungeon_elites_with_no_side_quests() {
 }
 
 #[test]
-fn raid_pack_interim_fixture_has_nine_slots_and_two_rings() {
+fn raid_pack_interim_fixture_has_ten_slots_cloak_and_two_rings() {
     for class in CLASSES {
         let slots = normal_gear_of(class, 99, "raid_interim");
-        assert_eq!(slots.len(), 9);
+        assert_eq!(slots.len(), 10);
         assert_eq!(
             slots
                 .iter()
                 .filter(|(_, id)| item(id).unwrap().rarity == "legendary")
                 .count(),
-            5
+            6
         );
         assert!(slots.iter().any(|(s, _)| *s == "accessory2"));
         let mut c = Character::mercenary(class, 99, "Fixture");
@@ -97,8 +97,9 @@ fn raid_pack_interim_fixture_has_nine_slots_and_two_rings() {
                 ..Case::new(class, 99)
             },
         );
-        assert_eq!(c.equipment.len(), 7); // armor and weapon live in Look; seven extra slots
+        assert_eq!(c.equipment.len(), 8); // armor and weapon live in Look; eight extra slots
         assert!(c.equipment.contains_key("accessory2"));
+        assert!(c.equipment.contains_key("cloak"));
     }
 }
 

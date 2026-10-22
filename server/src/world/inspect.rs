@@ -26,7 +26,10 @@ impl World {
     /// master, a stranger out of range and an unknown id cannot be told apart.
     fn inspect_view(&self, asker: &str, target: &str) -> Value {
         let refused = json!({"type":"inspect","id":target,"ok":false,"reason":"unavailable"});
-        let (Some(a), Some(b)) = (self.online(asker), self.online(target)) else {
+        let (Some(a), Some((&target_session, b))) = (
+            self.online(asker),
+            self.players.iter().find(|(_, p)| p.character.id == target),
+        ) else {
             return refused;
         };
         if asker == target || b.is_hidden() {
@@ -59,7 +62,8 @@ impl World {
                     "usable":i.required_level <= c.level && i.class.is_none_or(|k| k == c.look.class)})
             })
             .collect();
-        let (attack, defense) = c.stats();
+        let (_, defense) = c.stats();
+        let attack = self.raid_attack_power(target_session);
         let hired = b.merc.is_some();
         let real = !hired && b.ambient.is_none();
         json!({"type":"inspect","id":target,"ok":true,"name":c.look.name,"look":c.look,"level":c.level,

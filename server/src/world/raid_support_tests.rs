@@ -1,5 +1,5 @@
 //! Raid strength: presence, actual combat and authoritative display, without long fights.
-use super::wyrd_tests::{at, join, place, world};
+use super::wyrd_tests::{at, drain, join, place, world};
 use super::*;
 
 const ZONE: usize = 46;
@@ -190,5 +190,35 @@ fn raid_support_boosts_attack_based_healing() {
     assert_eq!(
         w.players[&2].character.hp,
         (1. + (base * 5.5).round()).min(w.players[&2].character.max_hp())
+    );
+}
+
+#[test]
+fn raid_support_inspect_shows_the_same_effective_attack_and_cloak() {
+    let (mut w, mut peers) = crew(10);
+    let cloak = crate::items::ITEMS
+        .iter()
+        .find(|i| i.kind == "cloak" && i.required_level == 99)
+        .unwrap();
+    w.players
+        .get_mut(&2)
+        .unwrap()
+        .character
+        .equipment
+        .insert("cloak".into(), cloak.id.clone());
+    let target = w.players[&2].character.id.clone();
+    drain(&mut peers[0]);
+    w.inspect(1, &target);
+    let reply = drain(&mut peers[0])
+        .into_iter()
+        .find(|p| p["type"] == "inspect")
+        .unwrap();
+    assert_eq!(reply["stats"]["attack"], w.raid_attack_power(2));
+    assert!(
+        reply["slots"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|s| s["slot"] == "cloak")
     );
 }

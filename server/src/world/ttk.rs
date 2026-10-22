@@ -41,7 +41,7 @@ pub const CLASSES: [Class; 5] = [
 pub fn levels() -> Vec<u32> {
     (1..=19).map(|n| n * 5).chain([99]).collect()
 }
-/// The eight worn slots of the rules: the equipment-slot name and the catalog kind that fills it.
+/// The ten worn slots of the rules: the equipment-slot name and the catalog kind that fills it.
 const SLOTS: [(&str, &str); 10] = [
     ("chest", "armor"),
     ("headgear", "headgear"),
@@ -238,11 +238,10 @@ pub fn normal_gear_of(class: Class, level: u32, rarity: &str) -> Vec<(&'static s
         return SLOTS
             .iter()
             .copied()
-            .chain([("accessory2", "accessory")])
             .map(|(slot, kind)| {
                 let orange = matches!(
                     kind,
-                    "armor" | "weapon" | "headgear" | "shoulders" | "gloves"
+                    "armor" | "weapon" | "headgear" | "shoulders" | "gloves" | "cloak"
                 );
                 let piece = ITEMS
                     .iter()
@@ -1756,19 +1755,31 @@ fn ttk_report() {
 }
 
 #[test]
-fn normal_gear_is_eight_green_pieces_that_equip_for_every_class_and_level() {
+fn normal_gear_is_ten_green_pieces_that_equip_for_every_class_and_level() {
     for class in CLASSES {
         for level in levels() {
             let gear = normal_gear(class, level);
-            assert_eq!(gear.len(), 8, "{class:?} {level}");
+            assert_eq!(gear.len(), 10, "{class:?} {level}");
             let mut c = Character::mercenary(class, level, "Gear");
             build_character(&mut c, &Case::new(class, level));
             for (_, id) in &gear {
                 let i = item(id).unwrap();
                 assert_eq!(i.rarity, BASELINE_RARITY, "{id}");
-                assert_eq!(i.required_level, gear_level(level), "{id}");
+                assert_eq!(
+                    i.required_level,
+                    if i.kind == "cloak" && level == 99 {
+                        99
+                    } else {
+                        gear_level(level)
+                    },
+                    "{id}"
+                );
                 assert!(i.source.is_none() && !i.starter, "{id}");
-                assert_eq!(c.equipped_count(i), 1, "{id} is worn at {level}");
+                assert_eq!(
+                    c.equipped_count(i),
+                    if i.kind == "accessory" { 2 } else { 1 },
+                    "{id} is worn at {level}"
+                );
             }
             assert!(
                 c.gear_instances

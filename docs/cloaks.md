@@ -1,7 +1,9 @@
 # Cloaks
 
 `GEAR-CLOAK`, 2026-10-22. Prepared in `.tools/cloak-worktree` on
-`feat/gear-cloak`. Do not release until `GEAR-CLOAK-RECAL` is complete.
+`feat/gear-cloak`. The owner requested immediate combined deployment on
+2026-10-22 with very little limit remaining. `GEAR-CLOAK-RECAL` is deferred,
+not certified; the pre-cloak baseline is recorded in the combined release receipts.
 
 The tenth equipment slot is `cloak`, with a matching `Look.cloak` field. All
 100 cloaks are class-neutral and work on male and female Warriors, Mages,
@@ -106,3 +108,5 @@ hides only the existing rotate-device curtain to inspect the 390x844 panel;
 this feature does not enable portrait gameplay. Every original item is
 unchanged. Removing the added offers/choices restores the original map exactly.
 Receipts and reviewed images are in `test-results/cloaks/`.
+
+Combined-release integration on 2026-10-22 preserves all raid-pack drops during full catalogue regeneration, retains both feature sets in every rig's lazy parts and bounds, and appends cloak icon cells after the raid icons. Raid full-gear fixtures have ten slots, including a Worldheart cloak and two rings, with no duplicated slot. Recalibration receipts are being recorded in `test-results/combined-release/`.
