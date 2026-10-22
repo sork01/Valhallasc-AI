@@ -225,6 +225,8 @@ pub fn set_piece_copy(piece: &Item, roll: f64) -> Option<GearInstance> {
         bonus_stats: piece.bonus_stats.clone(),
         rolled_stats: rolled,
         rank: 0,
+        trade_until: 0,
+        trade_with: vec![],
     })
 }
 /// One independent bag roll per enemy defeat, including elites and dungeon bosses.

@@ -17,7 +17,17 @@ pub struct GearInstance {
     pub rolled_stats: Attributes,
     #[serde(default)]
     pub rank: u8,
+    /// Wall-clock Unix seconds until which a rolled class piece may be handed to `trade_with`.
+    /// Zero means the piece is bound like every other class piece.
+    #[serde(default)]
+    pub trade_until: u64,
+    /// Character ids that took part in the roll that awarded this copy.
+    #[serde(default)]
+    pub trade_with: Vec<String>,
 }
+
+/// How long the winner of a Need/Greed/Pass roll may hand a class piece on to the other voters.
+pub const ROLL_TRADE_WINDOW_SECS: u64 = 2 * 60 * 60;
 
 fn round_one(value: f64) -> f64 {
     (value * 10.).round() / 10.
@@ -61,7 +71,7 @@ fn rarity_factor(rarity: &str) -> Option<u32> {
     }
 }
 impl GearInstance {
-    fn new(id: u64, catalog: &Item) -> Self {
+    pub fn new(id: u64, catalog: &Item) -> Self {
         Self {
             id,
             item: catalog.id.clone(),
@@ -71,7 +81,22 @@ impl GearInstance {
             bonus_stats: catalog.bonus_stats.clone(),
             rolled_stats: Attributes::default(),
             rank: 0,
+            trade_until: 0,
+            trade_with: vec![],
         }
+    }
+    /// Opens the two-hour hand-off window for the other voters of the roll that awarded this copy.
+    pub fn open_trade_window(&mut self, voters: Vec<String>, now: u64) {
+        self.trade_until = now + ROLL_TRADE_WINDOW_SECS;
+        self.trade_with = voters;
+    }
+    pub fn clear_trade_window(&mut self) {
+        self.trade_until = 0;
+        self.trade_with.clear();
+    }
+    /// Whether the window is open for `receiver` at `now` (Unix seconds).
+    pub fn tradeable_to(&self, receiver: &str, now: u64) -> bool {
+        self.trade_until > now && self.trade_with.iter().any(|id| id == receiver)
     }
     pub fn effective_attack(&self) -> f64 {
         round_one(self.attack * (1. + self.rank as f64 * 0.04))
@@ -169,6 +194,17 @@ impl Character {
             .take(worn)
             .any(|copy| copy.id == id)
     }
+    /// Class pieces are bound to their owner. `item_id` is gear of a class; the copies returned are the
+    /// loose ones whose roll window is open for `receiver`, in ledger order.
+    pub fn tradeable_copies(&self, item_id: &str, receiver: &str, now: u64) -> Vec<&GearInstance> {
+        let worn = item(item_id).map_or(0, |i| self.equipped_count(i)) as usize;
+        self.gear_instances
+            .iter()
+            .filter(|g| g.item == item_id)
+            .skip(worn)
+            .filter(|g| g.tradeable_to(receiver, now))
+            .collect()
+    }
     pub fn worn_gear_instance(&self, item_id: &str, occurrence: usize) -> Option<&GearInstance> {
         self.gear_instances
             .iter()
@@ -208,6 +244,8 @@ impl Character {
             bonus_stats: merge_stats(&a.bonus_stats, &b.bonus_stats),
             rolled_stats: merge_stats(&a.rolled_stats, &b.rolled_stats),
             rank: a.rank.min(b.rank),
+            trade_until: 0,
+            trade_with: vec![],
         })
     }
     pub fn preview_merge(&mut self, first: u64, second: u64) -> Result<GearInstance, &'static str> {
@@ -252,6 +290,7 @@ impl Character {
             .ok_or("This gear is already at rank 5.")?;
         let mut result = current.clone();
         result.rank += 1;
+        result.clear_trade_window();
         Ok((result, gold, crystals))
     }
     pub fn refine_gear(&mut self, id: u64) -> Result<(GearInstance, u32, u32), &'static str> {

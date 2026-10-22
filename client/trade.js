@@ -17,6 +17,20 @@
     }
     return Math.max(0, stack.quantity - worn);
   };
+  // Class gear is bound to its owner; a rolled copy can be handed to a voter of its roll for two hours (the server decides).
+  const bound = i => !!i.class && !['material', 'bag', 'food', 'potion', 'mount_licence'].includes(i.kind);
+  const windowCopies = id => {
+    const stack = character?.inventory?.find(s => s.item === id), partner = state?.partner?.id;
+    const worn = (stack?.quantity || 0) - available(id), now = Date.now() / 1000;
+    return (character?.gearInstances || []).filter(g => g.item === id).slice(worn)
+      .filter(g => g.tradeUntil > now && (g.tradeWith || []).includes(partner));
+  };
+  // How many of `id` the picker may offer right now.
+  const tradeable = id => { const i = catalog.get(id); return i && bound(i) ? windowCopies(id).length : available(id); };
+  const timeLeft = seconds => {
+    const minutes = Math.max(1, Math.ceil(seconds / 60)), h = Math.floor(minutes / 60);
+    return h ? `${h} h ${minutes % 60} min` : `${minutes} min`;
+  };
   function renderItems(id, offer, own) {
     const list = $(id); list.replaceChildren();
     for (const stack of offer?.items || []) {
@@ -56,12 +70,22 @@
     const selected = $('trade-item').value;
     $('trade-item').replaceChildren();
     for (const stack of character?.inventory || []) {
-      const count = available(stack.item);
+      const count = available(stack.item), i = catalog.get(stack.item);
       if (!count) continue;
-      const option = make('option', `${label(stack.item)} (${count})`); option.value = stack.item; $('trade-item').append(option);
+      const open = tradeable(stack.item);
+      if (i && bound(i) && !open) {
+        const option = make('option', `${label(stack.item)} (bound)`); option.value = stack.item; option.disabled = true;
+        option.title = 'Class gear is bound to its owner. It can only be sold.'; $('trade-item').append(option); continue;
+      }
+      const option = make('option', `${label(stack.item)} (${open})`); option.value = stack.item; $('trade-item').append(option);
+      if (i && bound(i)) {
+        const until = Math.min(...windowCopies(stack.item).map(g => g.tradeUntil));
+        option.title = `Tradeable for ${timeLeft(until - Date.now() / 1000)} with the party of the roll`;
+      }
     }
-    if ([...$('trade-item').options].some(o => o.value === selected)) $('trade-item').value = selected;
-    $('trade-set-item').disabled = !$('trade-item').options.length;
+    if ([...$('trade-item').options].some(o => o.value === selected && !o.disabled)) $('trade-item').value = selected;
+    else $('trade-item').selectedIndex = [...$('trade-item').options].findIndex(o => !o.disabled);
+    $('trade-set-item').disabled = ![...$('trade-item').options].some(o => !o.disabled);
   }
   function close() {
     const wasOpen = !$('trade-panel').hidden;
@@ -100,7 +124,7 @@
   $('trade-confirm').addEventListener('click', () => send({ op: 'confirm' }));
   $('trade-set-item').addEventListener('click', () => {
     const id = $('trade-item').value, quantity = Number($('trade-quantity').value);
-    if (!id || !Number.isSafeInteger(quantity) || quantity < 1 || quantity > available(id)) {
+    if (!id || !Number.isSafeInteger(quantity) || quantity < 1 || quantity > tradeable(id)) {
       $('trade-status').textContent = 'Choose an item quantity you can trade.'; return;
     }
     const items = draft.items.filter(s => s.item !== id);
@@ -121,7 +145,7 @@
   });
   window.Trade = { request, onPacket, onSnapshot(c) {
     character = c;
-    const key = JSON.stringify([c?.inventory, c?.equipment, c?.gold, c?.look]);
+    const key = JSON.stringify([c?.inventory, c?.equipment, c?.gold, c?.look, c?.gearInstances]);
     if (key !== characterKey) { characterKey = key; if (state?.state === 'open') render(); }
   }, reset() { close(); character = null; characterKey = ''; }, get state() { return state; } };
 })();

@@ -15,7 +15,7 @@
   function summary(i) {
     const bonus = Object.entries(i.bonusStats || {}).filter(([, value]) => value).map(([stat, value]) => `+${value} ${stat}`);
     const stats = [i.attack ? `+${num(i.attack)} attack` : '', i.defense ? `${num(i.defense)} defense` : '', ...bonus].filter(Boolean).join(' · ');
-    return `${i.class || 'All classes'} · ${i.kind} · level ${i.requiredLevel || 1}${stats ? ` · ${stats}` : ''}`;
+    return `${i.class || 'All classes'} · ${i.kind} · level ${i.requiredLevel || 1}${stats ? ` · ${stats}` : ''}${i.class ? ' · Bound on pickup' : ''}`;
   }
   function remove(id) {
     const card = cards.get(id); if (!card) return;

@@ -95,6 +95,8 @@ pub fn roll_orange_boosted(
         },
         rolled_stats: Attributes::default(),
         rank: 0,
+        trade_until: 0,
+        trade_with: vec![],
     })
 }
 

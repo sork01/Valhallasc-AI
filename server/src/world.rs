@@ -13109,6 +13109,8 @@ mod tests {
             bonus_stats: base.bonus_stats.clone(),
             rolled_stats: Default::default(),
             rank: 0,
+            trade_until: 0,
+            trade_with: vec![],
         };
         w.loot_drop_with_gear(&owner, zone, at, &base.id, Some(gear));
         w.drops.last_mut().unwrap().t = 1.;

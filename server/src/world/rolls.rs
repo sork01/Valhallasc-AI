@@ -474,20 +474,39 @@ impl World {
         } else {
             text
         };
+        // Class gear is bound to its owner; a rolled piece may be handed on once, to a voter of this roll.
+        let window = !keeps && item(&roll.item).is_some_and(|i| is_gear(i) && i.class.is_some());
+        let hand_off =
+            format!("{item_name} can be handed to the other players of this roll for two hours.");
         for (who, ..) in &rolled {
             if let Some(p) = self.players.values().find(|p| p.character.id == *who) {
                 let _ = p
                     .peer
                     .try_send(json!({"type":"roll","op":"end","id":roll.id}));
                 let _ = p.peer.try_send(json!({"type":"system","text":text}));
+                if window {
+                    let _ = p.peer.try_send(json!({"type":"system","text":hand_off}));
+                }
             }
         }
         if !keeps {
+            let mut gear = roll.gear;
+            if window && let Some(base) = item(&roll.item) {
+                let voters = roll
+                    .votes
+                    .keys()
+                    .filter(|v| **v != recipient && !self.merc_id(v))
+                    .cloned()
+                    .collect();
+                let mut copy = gear.take().unwrap_or_else(|| GearInstance::new(0, base));
+                copy.open_trade_window(voters, unix_now());
+                gear = Some(copy);
+            }
             self.item_drop(&recipient, roll.zone, roll.at, &roll.item, 1);
-            if let Some(copy) = &roll.gear {
+            if let Some(copy) = &gear {
                 self.drops.last_mut().unwrap().col = rarity_color(&copy.rarity);
             }
-            self.drops.last_mut().unwrap().gear = roll.gear;
+            self.drops.last_mut().unwrap().gear = gear;
         }
     }
 }
@@ -956,6 +975,69 @@ mod tests {
         // Voting again is refused: the roll is over.
         vote(&mut w, &who[2], id, RollChoice::Greed);
         assert!(heard(&mut who[2].2).iter().any(|v| v["type"] == "error"));
+    }
+
+    #[test]
+    fn a_rolled_class_piece_opens_a_two_hour_hand_off_for_the_other_voters_only() {
+        let mut w = world();
+        let mut who = party(&mut w, &["Ann", "Bob", "Cat"]);
+        let at = spot(&w);
+        let piece = green_for(Class::Mage);
+        w.loot_drop(&who[0].1, 0, at, &piece.id);
+        let id = roll_id(&heard(&mut who[0].2));
+        heard(&mut who[1].2);
+        heard(&mut who[2].2);
+        vote(&mut w, &who[0], id, RollChoice::Greed);
+        vote(&mut w, &who[1], id, RollChoice::Need);
+        vote(&mut w, &who[2], id, RollChoice::Pass);
+        w.update_rolls();
+        let said: Vec<String> = heard(&mut who[2].2)
+            .into_iter()
+            .filter(|v| v["type"] == "system")
+            .map(|v| v["text"].as_str().unwrap().to_owned())
+            .collect();
+        assert!(
+            said.iter()
+                .any(|t| t.contains("can be handed to the other players of this roll")),
+            "{said:?}"
+        );
+        assert_eq!(w.drops[0].gear.as_ref().unwrap().trade_with.len(), 2);
+        collect_all(&mut w);
+        let bob = &w.players[&2].character;
+        let copy = bob
+            .gear_instances
+            .iter()
+            .find(|g| g.item == piece.id)
+            .expect("the winner holds a ledger copy");
+        let now = unix_now();
+        assert!(copy.trade_until > now + 7_000 && copy.trade_until <= now + 7_200);
+        let mut voters = copy.trade_with.clone();
+        voters.sort();
+        let mut expected = vec![who[0].1.clone(), who[2].1.clone()];
+        expected.sort();
+        assert_eq!(voters, expected);
+        assert!(copy.tradeable_to(&who[0].1, now));
+        assert!(!copy.tradeable_to(&who[1].1, now), "not back to the winner");
+        assert!(!copy.tradeable_to(&who[0].1, copy.trade_until));
+    }
+
+    #[test]
+    fn a_solo_pickup_of_class_gear_gets_no_hand_off_window() {
+        let mut w = world();
+        let mut who = party(&mut w, &["Ann"]);
+        let at = spot(&w);
+        let piece = green_for(Class::Warrior);
+        w.loot_drop(&who[0].1, 0, at, &piece.id);
+        heard(&mut who[0].2);
+        collect_all(&mut w);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.materialize_gear_instances();
+        assert!(
+            c.gear_instances
+                .iter()
+                .filter(|g| g.item == piece.id)
+                .all(|g| g.trade_until == 0 && g.trade_with.is_empty())
+        );
     }
 
     #[test]

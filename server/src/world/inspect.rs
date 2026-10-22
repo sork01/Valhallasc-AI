@@ -210,6 +210,8 @@ mod tests {
                 },
                 rolled_stats: Attributes::default(),
                 rank: 2,
+                trade_until: 0,
+                trade_with: vec![],
             });
         }
         let at = open_spot(&w);

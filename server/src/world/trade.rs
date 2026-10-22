@@ -185,6 +185,8 @@ impl World {
                 gold,
                 ready: false,
             },
+            &other,
+            unix_now(),
         )?;
         let side = self.trades[i].side(me).unwrap();
         self.trades[i].offers[side] = Offer {
@@ -205,7 +207,12 @@ impl World {
         let t = self.trades[i].clone();
         self.trade_pair_valid(&t.from, &t.to)?;
         let side = t.side(me).unwrap();
-        validate_offer(&self.online(me).unwrap().character, &t.offers[side])?;
+        validate_offer(
+            &self.online(me).unwrap().character,
+            &t.offers[side],
+            t.other(me),
+            unix_now(),
+        )?;
         self.trades[i].offers[side].ready = true;
         if !self.trades[i].offers[1 - side].ready {
             self.push_trade(i);
@@ -213,7 +220,7 @@ impl World {
         }
         let a = self.online(&t.from).unwrap().character.clone();
         let b = self.online(&t.to).unwrap().character.clone();
-        match settle_trade(&a, &b, &t.offers[0], &t.offers[1]) {
+        match settle_trade(&a, &b, &t.offers[0], &t.offers[1], unix_now()) {
             Ok((next_a, next_b)) => {
                 self.store
                     .save_many([&next_a, &next_b].into_iter())
@@ -239,7 +246,9 @@ impl World {
     }
 }
 
-fn validate_offer(who: &Character, offer: &Offer) -> Result<(), String> {
+/// `receiver` is the other side's character id and `now` the wall clock in Unix seconds: a class piece is
+/// bound to its owner, except a rolled copy inside its hand-off window to a voter of that roll.
+fn validate_offer(who: &Character, offer: &Offer, receiver: &str, now: u64) -> Result<(), String> {
     if offer.items.len() > MAX_OFFER_STACKS {
         return Err("A trade can offer up to twelve item stacks.".into());
     }
@@ -265,6 +274,15 @@ fn validate_offer(who: &Character, offer: &Offer) -> Result<(), String> {
         {
             return Err("You cannot trade items you do not own or have equipped.".into());
         }
+        if is_gear(i)
+            && i.class.is_some()
+            && who.tradeable_copies(&i.id, receiver, now).len() < stack.quantity as usize
+        {
+            return Err(format!(
+                "{} is class gear, bound to its owner. It can only be sold.",
+                i.name
+            ));
+        }
     }
     Ok(())
 }
@@ -273,9 +291,10 @@ fn settle_trade(
     b: &Character,
     ao: &Offer,
     bo: &Offer,
+    now: u64,
 ) -> Result<(Character, Character), String> {
-    validate_offer(a, ao)?;
-    validate_offer(b, bo)?;
+    validate_offer(a, ao, &b.id, now)?;
+    validate_offer(b, bo, &a.id, now)?;
     let mut next_a = a.clone();
     let mut next_b = b.clone();
     next_a.gold = a
@@ -288,8 +307,8 @@ fn settle_trade(
         .checked_sub(bo.gold)
         .and_then(|g| g.checked_add(ao.gold))
         .ok_or("Gold amount is too large.")?;
-    move_items(&mut next_a, &mut next_b, ao)?;
-    move_items(&mut next_b, &mut next_a, bo)?;
+    move_items(&mut next_a, &mut next_b, ao, &b.id, now)?;
+    move_items(&mut next_b, &mut next_a, bo, &a.id, now)?;
     if next_a.bag_used() > next_a.bag_capacity() || next_b.bag_used() > next_b.bag_capacity() {
         return Err("The trade would overfill a player's bags.".into());
     }
@@ -299,17 +318,22 @@ fn move_items(
     giver: &mut Character,
     receiver: &mut Character,
     offer: &Offer,
+    receiver_id: &str,
+    now: u64,
 ) -> Result<(), String> {
     for s in &offer.items {
         if item(&s.item).is_some_and(is_gear) {
             giver.materialize_gear_instances();
             receiver.materialize_gear_instances();
             let worn = item(&s.item).map_or(0, |i| giver.equipped_count(i)) as usize;
+            // A class piece moves only as a copy whose window is open for the receiver.
+            let bound = item(&s.item).is_some_and(|i| i.class.is_some());
             let moved: Vec<_> = giver
                 .gear_instances
                 .iter()
                 .filter(|g| g.item == s.item)
                 .skip(worn)
+                .filter(|g| !bound || g.tradeable_to(receiver_id, now))
                 .take(s.quantity as usize)
                 .cloned()
                 .collect();
@@ -320,6 +344,7 @@ fn move_items(
             giver.gear_instances.retain(|g| !ids.contains(&g.id));
             for mut copy in moved {
                 copy.id = receiver.next_gear_id;
+                copy.clear_trade_window();
                 receiver.next_gear_id += 1;
                 receiver.gear_instances.push(copy);
             }
@@ -350,6 +375,7 @@ fn move_items(
 #[cfg(test)]
 mod tests {
     use super::*;
+    const NOW: u64 = 1_000_000;
     fn world() -> World {
         World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)
     }
@@ -381,7 +407,7 @@ mod tests {
                 gold: 0,
                 ready: false,
             };
-            assert!(validate_offer(&gm, &offer).is_err(), "{id}");
+            assert!(validate_offer(&gm, &offer, "bob", NOW).is_err(), "{id}");
         }
     }
     #[test]
@@ -399,6 +425,7 @@ mod tests {
         copy.rarity = "rare".into();
         copy.rank = 3;
         copy.rolled_stats.strength = 7;
+        copy.open_trade_window(vec!["bob".into()], NOW);
         let source = copy.clone();
         move_items(
             &mut alice,
@@ -408,6 +435,8 @@ mod tests {
                 gold: 0,
                 ready: false,
             },
+            "bob",
+            NOW,
         )
         .unwrap();
         assert_eq!(alice.quantity(id), 0);
@@ -455,6 +484,7 @@ mod tests {
             id: old_id,
             ..epic.clone()
         };
+        held.open_trade_window(vec!["bob".into()], NOW);
         move_items(
             &mut alice,
             &mut bob,
@@ -463,6 +493,8 @@ mod tests {
                 gold: 0,
                 ready: false,
             },
+            "bob",
+            NOW,
         )
         .unwrap();
         let received = bob
@@ -474,6 +506,189 @@ mod tests {
         assert_eq!(received.attack, epic.attack);
         assert_eq!(received.rolled_stats, epic.rolled_stats);
     }
+    /// One catalog piece per class and rarity, so every class and every rarity present is covered.
+    fn class_pieces() -> Vec<&'static Item> {
+        let mut seen = std::collections::BTreeSet::new();
+        ITEMS
+            .iter()
+            .filter(|i| {
+                is_gear(i)
+                    && i.class.is_some()
+                    && !i.starter
+                    && i.rarity != GM_RARITY
+                    && !is_quest_item(i)
+                    && seen.insert((format!("{:?}", i.class), i.rarity.clone()))
+            })
+            .collect()
+    }
+    fn offer(id: &str, quantity: u32) -> Offer {
+        Offer {
+            items: items(id, quantity),
+            gold: 0,
+            ready: false,
+        }
+    }
+    #[test]
+    fn class_gear_of_every_class_and_rarity_cannot_be_offered() {
+        let pieces = class_pieces();
+        assert!(
+            pieces.len() >= 10,
+            "{} class/rarity combinations",
+            pieces.len()
+        );
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
+            assert!(pieces.iter().any(|i| i.class == Some(class)), "{class:?}");
+        }
+        for i in pieces {
+            let mut alice = Character::mercenary(Class::Warrior, 20, "Alice");
+            alice.add_item(&i.id, 2);
+            alice.materialize_gear_instances();
+            let error = validate_offer(&alice, &offer(&i.id, 1), "bob", NOW).unwrap_err();
+            assert!(error.contains("bound to its owner"), "{}: {error}", i.id);
+        }
+    }
+    #[test]
+    fn neutral_gear_materials_and_potions_still_trade() {
+        let neutral = ITEMS
+            .iter()
+            .find(|i| {
+                is_gear(i)
+                    && i.class.is_none()
+                    && !i.starter
+                    && i.rarity != GM_RARITY
+                    && !is_quest_item(i)
+            })
+            .expect("a class-neutral piece");
+        let mut alice = Character::mercenary(Class::Warrior, 20, "Alice");
+        let potion = ITEMS.iter().find(|i| i.kind == "potion").unwrap();
+        for id in [neutral.id.as_str(), "slime_gel", potion.id.as_str()] {
+            alice.add_item(id, 1);
+            validate_offer(&alice, &offer(id, 1), "bob", NOW)
+                .unwrap_or_else(|e| panic!("{id}: {e}"));
+        }
+        let bob = Character::mercenary(Class::Mage, 20, "Bob");
+        let (next_a, next_b) =
+            settle_trade(&alice, &bob, &offer(&neutral.id, 1), &Offer::default(), NOW).unwrap();
+        assert_eq!(
+            (next_a.quantity(&neutral.id), next_b.quantity(&neutral.id)),
+            (0, 1)
+        );
+    }
+    #[test]
+    fn a_hand_built_offer_of_a_bound_piece_is_refused_at_settle() {
+        let piece = class_pieces()[0];
+        let mut alice = Character::mercenary(Class::Warrior, 20, "Alice");
+        let bob = Character::mercenary(Class::Warrior, 20, "Bob");
+        alice.add_item(&piece.id, 1);
+        // Offered by either side, with or without the other side's counter offer.
+        assert!(settle_trade(&alice, &bob, &offer(&piece.id, 1), &Offer::default(), NOW).is_err());
+        assert!(settle_trade(&bob, &alice, &Offer::default(), &offer(&piece.id, 1), NOW).is_err());
+        assert_eq!(alice.quantity(&piece.id), 1);
+    }
+    #[test]
+    fn a_rolled_piece_can_be_handed_to_a_voter_once_inside_two_hours() {
+        let piece = class_pieces()[0];
+        let mut alice = Character::mercenary(Class::Warrior, 20, "Alice");
+        let bob = Character::mercenary(Class::Warrior, 20, "Bob");
+        let cat = Character::mercenary(Class::Warrior, 20, "Cat");
+        alice.add_item(&piece.id, 1);
+        alice.materialize_gear_instances();
+        alice
+            .gear_instances
+            .iter_mut()
+            .find(|g| g.item == piece.id)
+            .unwrap()
+            .open_trade_window(vec![bob.id.clone()], NOW);
+        // Nobody but a voter of the roll may receive it.
+        assert!(validate_offer(&alice, &offer(&piece.id, 1), &cat.id, NOW).is_err());
+        assert!(settle_trade(&alice, &cat, &offer(&piece.id, 1), &Offer::default(), NOW).is_err());
+        // The last second of the window still works; the first after it does not.
+        let end = NOW + 7_200;
+        validate_offer(&alice, &offer(&piece.id, 1), &bob.id, end - 1).unwrap();
+        assert!(validate_offer(&alice, &offer(&piece.id, 1), &bob.id, end).is_err());
+        let (a, b) =
+            settle_trade(&alice, &bob, &offer(&piece.id, 1), &Offer::default(), NOW).unwrap();
+        assert_eq!((a.quantity(&piece.id), b.quantity(&piece.id)), (0, 1));
+        let received = b
+            .gear_instances
+            .iter()
+            .find(|g| g.item == piece.id)
+            .unwrap();
+        assert_eq!((received.trade_until, received.trade_with.len()), (0, 0));
+        // One hand-off only: the receiver cannot pass it on, to the giver or anyone else.
+        for to in [&alice.id, &cat.id] {
+            assert!(validate_offer(&b, &offer(&piece.id, 1), to, NOW).is_err());
+        }
+    }
+    #[test]
+    fn the_hand_off_window_survives_a_save_and_is_judged_by_the_wall_clock() {
+        let piece = class_pieces()[0];
+        let mut alice = Character::mercenary(Class::Warrior, 20, "Alice");
+        alice.add_item(&piece.id, 1);
+        alice.materialize_gear_instances();
+        alice
+            .gear_instances
+            .iter_mut()
+            .find(|g| g.item == piece.id)
+            .unwrap()
+            .open_trade_window(vec!["bob".into()], NOW);
+        let loaded: Character =
+            serde_json::from_str(&serde_json::to_string(&alice).unwrap()).unwrap();
+        validate_offer(&loaded, &offer(&piece.id, 1), "bob", NOW + 3_600).unwrap();
+        assert!(validate_offer(&loaded, &offer(&piece.id, 1), "bob", NOW + 7_200).is_err());
+        // An old save has neither field and loads as a bound piece.
+        let mut json: serde_json::Value = serde_json::to_value(&alice).unwrap();
+        for g in json["gearInstances"].as_array_mut().unwrap() {
+            g.as_object_mut().unwrap().remove("tradeUntil");
+            g.as_object_mut().unwrap().remove("tradeWith");
+        }
+        let old: Character = serde_json::from_value(json).unwrap();
+        assert!(validate_offer(&old, &offer(&piece.id, 1), "bob", NOW).is_err());
+    }
+    #[test]
+    fn selling_refining_and_merging_clear_the_window() {
+        let piece = class_pieces()[0];
+        let mut alice = Character::mercenary(Class::Warrior, 20, "Alice");
+        alice.add_item(&piece.id, 3);
+        alice.materialize_gear_instances();
+        for g in alice
+            .gear_instances
+            .iter_mut()
+            .filter(|g| g.item == piece.id)
+        {
+            g.open_trade_window(vec!["bob".into()], NOW);
+        }
+        let id = alice
+            .gear_instances
+            .iter()
+            .find(|g| g.item == piece.id)
+            .unwrap()
+            .id;
+        let (refined, ..) = alice.preview_refine(id).unwrap();
+        assert_eq!((refined.trade_until, refined.trade_with.len()), (0, 0));
+        let other = alice
+            .gear_instances
+            .iter()
+            .find(|g| g.item == piece.id && g.id != id)
+            .unwrap()
+            .id;
+        let merged = alice.preview_merge(id, other).unwrap();
+        assert_eq!((merged.trade_until, merged.trade_with.len()), (0, 0));
+        let sold_before = alice.quantity(&piece.id);
+        alice.sell_item(&piece.id, 1).unwrap();
+        assert_eq!(
+            alice.quantity(&piece.id),
+            sold_before - 1,
+            "selling a class piece still works"
+        );
+    }
+
     #[test]
     fn a_confirmed_trade_exchanges_and_saves_both_characters_once() {
         let mut w = world();
@@ -544,7 +759,9 @@ mod tests {
                 &Offer {
                     items: items("warrior_weapon_sword", 1),
                     ..Offer::default()
-                }
+                },
+                "bob",
+                NOW
             )
             .is_err()
         );
@@ -556,7 +773,9 @@ mod tests {
                 &Offer {
                     items: items("warrior_weapon_royal", 1),
                     ..Offer::default()
-                }
+                },
+                "bob",
+                NOW
             )
             .is_err()
         );
@@ -566,7 +785,9 @@ mod tests {
                 &Offer {
                     items: items("slime_gel", 2),
                     ..Offer::default()
-                }
+                },
+                "bob",
+                NOW
             )
             .is_err()
         );
@@ -576,7 +797,9 @@ mod tests {
                 &Offer {
                     gold: 6,
                     ..Offer::default()
-                }
+                },
+                "bob",
+                NOW
             )
             .is_err()
         );
@@ -586,7 +809,9 @@ mod tests {
                 &Offer {
                     items: items("slime_gel", 1).into_iter().cycle().take(2).collect(),
                     ..Offer::default()
-                }
+                },
+                "bob",
+                NOW
             )
             .is_err()
         );
@@ -609,7 +834,8 @@ mod tests {
                     items: items("slime_gel", 1),
                     ..Offer::default()
                 },
-                &Offer::default()
+                &Offer::default(),
+                NOW
             )
             .is_err()
         );

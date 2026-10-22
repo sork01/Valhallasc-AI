@@ -16,6 +16,7 @@
   const licence = i => i?.kind === 'mount_licence';
   const spare = s => licence(definition(s.item)) ? 0 : bagQuantity(s.item);
   const consumable = i => i && ['food', 'potion'].includes(i.kind);
+  const classGear = i => !!i?.class && !i.starter && !['material', 'bag', 'food', 'potion', 'mount_licence'].includes(i.kind);
   const compatible = i => i && !['material', 'bag', 'food', 'potion', 'mount_licence'].includes(i.kind) && (!i.class || i.class === look?.class);
   const effect = i => {
     const hero = window.Field?.hero || {}, type = hero.resourceType || 'mana';
@@ -143,6 +144,11 @@
         const bonus = statNames.map(stat => ({ stat, delta: (i.bonusStats?.[stat] || 0) - (current.bonusStats?.[stat] || 0) })).filter(v => v.delta).map(v => `${v.delta > 0 ? '+' : ''}${v.delta} ${v.stat}`).join(' · ');
         t.append(node('p', `Compared with ${current.name}: ${attack >= 0 ? '+' : ''}${attack} attack · ${defense >= 0 ? '+' : ''}${defense} defense${bonus ? ` · ${bonus}` : ''}`, 'item-comparison'));
       }
+    }
+    if (classGear(i)) {
+      const left = Math.max(0, ...(where ? where.copies : copiesOf(i)).map(g => (g.tradeUntil || 0) - Date.now() / 1000)), minutes = Math.ceil(left / 60);
+      const time = minutes >= 60 ? `${Math.floor(minutes / 60)} h ${minutes % 60} min` : `${minutes} min`;
+      t.append(node('p', left > 0 ? `Bound on pickup · tradeable for ${time} with the party of the roll` : 'Bound on pickup · it can only be sold', 'item-bound'));
     }
     if (where) t.append(node('p', `${where.count} ${where.in}`));
     else t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', questItem(i) ? 'Quest item · cannot be sold' : `Sells for ${saleValue(i)} gold${copy ? ' for the next loose copy' : ' each'}`));
