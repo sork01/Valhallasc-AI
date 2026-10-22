@@ -3,7 +3,7 @@
 // requests. Names are other players' text, so everything is built with textContent, never innerHTML.
 (() => {
   const $ = id => document.getElementById(id);
-  const PARTY_MAX = 5;
+  const PARTY_MAX = 5; // A party holds five; a raid's leader makes it ten (the server sends `max`).
   const empty = () => ({ friends: [], incoming: [], outgoing: [], party: null, friendsMax: 50 });
   let state = empty(), roster = [], tab = 'friends', previousFocus = null;
   // Invites carry seconds left; remember when each lapses on this machine's clock.
@@ -111,10 +111,18 @@
     if (!party) {
       body.append(el('p', 'You are not in a party. Invite a player by name, from the Friends tab, or from the Online tab. A party holds up to 5.', 'social-note'));
     } else {
-      body.append(sectionTitle(`Party (${party.members.length}/${party.max})`), fellowship(party.xp));
+      body.append(sectionTitle(`${party.raid ? 'Raid' : 'Party'} (${party.members.length}/${party.max})`), fellowship(party.xp));
       const list = el('ul', '', 'social-list'); list.dataset.list = 'party';
       list.append(...party.members.map(m => member(m, true)));
-      body.append(list, button('Leave party', 'leave', () => send({ op: 'party_leave' }), 'window-tool danger'));
+      body.append(list);
+      // Only the leader can turn the party into a raid of ten (and back, once five or fewer are left).
+      if (isLeader()) {
+        const tooMany = party.raid && party.members.length > PARTY_MAX;
+        const toggle = button(party.raid ? 'Back to a party of 5' : 'Make a raid of 10', 'raid', () => send({ op: 'party_raid', on: !party.raid }));
+        toggle.disabled = tooMany; if (tooMany) toggle.title = 'Remove members until five are left';
+        body.append(toggle);
+      }
+      body.append(button(party.raid ? 'Leave raid' : 'Leave party', 'leave', () => send({ op: 'party_leave' }), 'window-tool danger'));
       if (!isLeader()) body.append(el('p', 'Only the leader can invite, promote or remove members.', 'social-note'));
     }
     const outgoing = state.outgoing.filter(i => i.kind === 'party');
@@ -139,7 +147,7 @@
         else if (state.outgoing.some(i => i.kind === 'friend' && i.id === p.id)) row.append(el('small', 'Requested', 'social-tag'));
         else row.append(button('Add friend', `add:${p.id}`, () => send({ op: 'friend_request', id: p.id })));
         const seated = inParty(p.id), taken = p.inParty && !seated;
-        const full = (state.party?.members.length || 1) >= PARTY_MAX;
+        const full = (state.party?.members.length || 1) >= (state.party?.max || PARTY_MAX);
         if (seated) row.append(el('small', 'In your party', 'social-tag'));
         else if (taken) row.append(el('small', 'In a party', 'social-tag'));
         else if (state.party && !isLeader()) row.append(el('small', '', 'social-tag'));
@@ -160,7 +168,7 @@
       t.setAttribute('aria-selected', String(t.dataset.tab === tab)); t.tabIndex = t.dataset.tab === tab ? 0 : -1;
     }
     $('social-tab-friends').textContent = `Friends${state.incoming.some(i => i.kind === 'friend') ? ' •' : ''}`;
-    $('social-tab-party').textContent = `Party${state.party ? ` ${state.party.members.length}/${PARTY_MAX}` : ''}${state.incoming.some(i => i.kind === 'party') ? ' •' : ''}`;
+    $('social-tab-party').textContent = `${state.party?.raid ? 'Raid' : 'Party'}${state.party ? ` ${state.party.members.length}/${state.party.max || PARTY_MAX}` : ''}${state.incoming.some(i => i.kind === 'party') ? ' •' : ''}`;
     $('social-add-friend').hidden = tab === 'party'; $('social-add-party').hidden = tab === 'friends';
     $('social-add').hidden = tab === 'online' || tab === 'pvp';
     const body = $('social-body'); body.replaceChildren(); body.dataset.tab = tab;
@@ -173,7 +181,9 @@
   function renderFrame() {
     const frame = $('party-frame'), party = state.party;
     frame.hidden = !party; if (!party) { frame.replaceChildren(); return; }
-    const head = button(`Party ${party.members.length}/${party.max} · Lv ${party.xp?.level || 1} · ${Keys.label('party', false)}`, 'frame-open', () => show('party'), 'party-head');
+    const head = button(`${party.raid ? 'Raid' : 'Party'} ${party.members.length}/${party.max} · Lv ${party.xp?.level || 1} · ${Keys.label('party', false)}`, 'frame-open', () => show('party'), 'party-head');
+    // Past five the rows shrink to one line each, so ten members take no more room than the frame has.
+    frame.dataset.compact = party.members.length > PARTY_MAX ? '1' : '0';
     const list = el('ul', '', 'social-list');
     list.append(...party.members.map(m => member(m, false)));
     frame.replaceChildren(head, list);
@@ -199,7 +209,7 @@
     }
   }
   function render() { renderFrame(); renderPrompts(); renderPanel(); }
-  const shape = party => party && JSON.stringify([party.leader, party.xp, party.members.map(m => [m.id, m.online, m.dead, m.level, m.reborn, m.place, (m.quests || []).map(q => q.id)])]);
+  const shape = party => party && JSON.stringify([party.leader, party.raid, party.max, party.xp, party.members.map(m => [m.id, m.online, m.dead, m.level, m.reborn, m.place, (m.quests || []).map(q => q.id)])]);
   // Party health arrives twice a second; update the bars in place and rebuild only when the members change.
   function updateParty(party) {
     const changed = shape(party) !== shape(state.party), quests = questShape(party) !== questShape(state.party);

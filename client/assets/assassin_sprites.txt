@@ -1216,6 +1216,18 @@
     "cloak_ember": {
       "png": "assassin_cloak_ember.png",
       "depth": "assassin_cloak_ember_depth.png"
+    },
+    "pants_regearcfpack": {
+      "png": "assassin_progression_pants_regearcfpack.png",
+      "depth": "assassin_progression_pants_regearcfpack_depth.png"
+    },
+    "necklace_regearcfpack": {
+      "png": "assassin_progression_necklace_regearcfpack.png",
+      "depth": "assassin_progression_necklace_regearcfpack_depth.png"
+    },
+    "accessory_regearcfpack": {
+      "png": "assassin_progression_accessory_regearcfpack.png",
+      "depth": "assassin_progression_accessory_regearcfpack_depth.png"
     }
   },
   "gender": "male",
@@ -1937,7 +1949,10 @@
     "weapon_regearsolstice",
     "weapon_regearspan",
     "weapon_regearthunder",
-    "weapon_regearvault"
+    "weapon_regearvault",
+    "accessory_regearcfpack",
+    "necklace_regearcfpack",
+    "pants_regearcfpack"
   ],
   "gearSprites": {
     "armor_regearl50": {
@@ -17419,6 +17434,177 @@
         ],
         "frameCount": 64
       }
+    },
+    "pants_regearcfpack": {
+      "idle": [
+        {
+          "id": "eaaa4d9cf83ab488",
+          "offset": [
+            65,
+            79
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "63c95c540d40f741",
+          "offset": [
+            60,
+            77
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "3baa05954b82c238",
+          "offset": [
+            63,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "7df0c2630ac192fa",
+          "offset": [
+            66,
+            79
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "fdc6e42c7842c892",
+          "offset": [
+            54,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "necklace_regearcfpack": {
+      "idle": [
+        {
+          "id": "ccd0eaf0a0d14c5a",
+          "offset": [
+            65,
+            50
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "53dd838f48a2cdd3",
+          "offset": [
+            60,
+            49
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "f6f753420dab86e9",
+          "offset": [
+            56,
+            49
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "d06e85c2749107d4",
+          "offset": [
+            66,
+            50
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "52b0a47a1cd8aac4",
+          "offset": [
+            52,
+            49
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "accessory_regearcfpack": {
+      "idle": [
+        {
+          "id": "6cc62574427a11dc",
+          "offset": [
+            58,
+            57
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "1160df11221ebf7b",
+          "offset": [
+            57,
+            55
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "1be955222c5fe40e",
+          "offset": [
+            37,
+            38
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "a1b60c6d2e8d8883",
+          "offset": [
+            57,
+            51
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "94f6b071ea448d16",
+          "offset": [
+            55,
+            56
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
     }
   },
   "gearSources": {

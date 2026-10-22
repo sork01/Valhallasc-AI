@@ -44,6 +44,7 @@ Always the same word, in every window:
 | cooldown | nedkylning | mount / mount licence | riddjur / riddjurslicens |
 | bag / backpack | väska / ryggsäck | bank | bank |
 | gold / level / XP | guld / nivå / XP | Need / Greed / Pass | Behov / Girighet / Passa |
+| raid (a party of ten) | raid | | |
 
 Rules that came up:
 

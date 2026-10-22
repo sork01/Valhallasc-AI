@@ -292,7 +292,7 @@
     }
   }
   // Distance from the feet to the top of each NPC's head gear (the guard's banner, the baker's hat), so the nameplate sits just above it.
-  const headTop=n=>n.art==='stone'?330:n.art?.startsWith('sun_')?113:n.look?.species==='merfolk'?120:n.look?(n.look.prop?145:n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101;
+  const headTop=n=>n.art==='stone'?330:n.art==='scenery'?90:n.art?.startsWith('sun_')?113:n.look?.species==='merfolk'?120:n.look?(n.look.prop?145:n.look.hat?(n.look.hat==='straw'||n.look.hat==='feather'?112:108):98)*(n.look.scale||1)+4:n.id==='gatekeeper'?125:n.id==='baker'?114:101;
   // World of Warcraft nameplate: yellow name over a <Role> line, both in a heavy black outline, with the quest mark above them.
   function plate(g,value,y,size,color) {
     g.font=`${size}px "Jua", sans-serif`;g.textAlign='center';g.lineJoin='round';g.lineWidth=size>14?5:3;g.strokeStyle='#000';
@@ -358,7 +358,7 @@
     ellipse(g,0,1,21*sc,9*sc,'#233d3833');
     if(near){g.strokeStyle='#ffe2a2';g.lineWidth=2;g.beginPath();g.ellipse(0,0,27,12,0,0,Math.PI*2);g.stroke();}
     g.save();g.scale(sc,sc);g.translate(0,-bob);
-    if(n.art==='stone'){}                      // the Meeting Stone speaks for itself: its art is the stone, drawn as an object
+    if(n.art==='stone'||n.art==='scenery'){}    // a speaking stone or tablet is drawn as an object
     else if(n.art?.startsWith('sun_') && Field.sunwardSprites?.img[n.art]){
       const src=Field.sunwardSprites,{frame:[w,h],clips}=src.meta,step=Math.floor(t*6)%clips.idle.n;
       g.imageSmoothingEnabled=false;

@@ -310,6 +310,8 @@ def main():
     if any(z.get('name')=='The Stormglass Shore' for z in later):
         from generate_stormglass import open_city_gate
         open_city_gate(world['zones'][CITY_ID-1])
+    from generate_emberwake import install_parent as install_emberwake
+    install_emberwake(world)
     spark_travel.ensure(world)
     MAP.write_text(json.dumps(world,indent=2)+'\n')
     items=json.loads(ITEMS.read_text())

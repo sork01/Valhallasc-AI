@@ -246,8 +246,8 @@ fn cathedral_encounters_have_materials_fixed_levels_distinct_profiles_and_guaran
     let w = world();
     for e in crate::cathedral::ENEMIES.iter() {
         assert_eq!(Slime::default_level(&e.kind), e.level);
-        assert!(Slime::fixed_level(&e.kind));
-        assert!(is_elite(&e.kind));
+        assert_eq!(Slime::fixed_level(&e.kind), !e.outdoor);
+        assert_eq!(is_elite(&e.kind), e.elite);
         assert_eq!(is_boss(&e.kind), e.boss);
         assert!(item(material(&e.kind)).is_some());
         // The strength and gold floors are the Cathedral's (level 40 up); the level 25 and 30 dungeons are lighter.

@@ -27,6 +27,8 @@ mod boss_signs_tests;
 mod cairn_tests;
 #[cfg(test)]
 mod cathedral_tests;
+#[cfg(test)]
+mod chained_forge_tests;
 mod chests;
 mod chime;
 #[cfg(test)]
@@ -46,6 +48,8 @@ mod duel_tests;
 mod dungeon_solo_tests;
 #[cfg(test)]
 mod elder_hollow_tests;
+#[cfg(test)]
+mod emberwake_tests;
 #[cfg(test)]
 mod epic_drop_tests;
 mod escort;
@@ -76,6 +80,11 @@ mod partyxp;
 mod perks_tests;
 mod pursuit;
 mod pvp;
+mod raid;
+#[cfg(test)]
+mod raid_pack_tests;
+#[cfg(test)]
+mod raid_support_tests;
 #[cfg(test)]
 mod rain_crown_tests;
 mod ranged;
@@ -144,6 +153,7 @@ const DAMAGE_TAKEN_SCALE: f64 = 0.25;
 const PORTAL_DELAY: f64 = 0.5;
 /// The longest a fallen hero is held down by a boss fight that has not ended (`BOSSMECH-DEATH`), seconds.
 const FALLEN_HOLD_MAX: f64 = 600.;
+const RAID_FALLEN_HOLD_MAX: f64 = 2400.;
 /// Who is joining: an anonymous guest (a server-issued key, or a look for a new character) or a logged-in account
 /// (a character it owns, or a look for a new one). The account id comes from a checked login session.
 pub enum Identity {
@@ -253,6 +263,9 @@ struct Player {
     merc: Option<String>,
     /// The particular group objective this fighter was hired for; Meeting Stone hires have no quest contract.
     merc_quest: Option<String>,
+    /// Set on a fighter hired by a raid contract: the zone of the raid door. The contract ends when the hirer is
+    /// neither there nor inside a raid.
+    merc_raid: Option<usize>,
     /// A temporary autonomous adventurer in an occupied shared zone.
     ambient: Option<ambient::Ambient>,
     /// Set on a stranded person walking an escort quest's route (see world/escort.rs). Always with `merc` set to the
@@ -355,6 +368,7 @@ impl Player {
             visible_zone,
             merc: None,
             merc_quest: None,
+            merc_raid: None,
             ambient: None,
             escort: None,
             gauntlet: false,
@@ -1235,8 +1249,8 @@ impl Slime {
     }
     /// Dungeon enemies keep one level (the Undervault is tuned for exactly level 20 heroes).
     fn fixed_level(kind: &str) -> bool {
-        if crate::cathedral::enemy(kind).is_some() {
-            return true;
+        if let Some(e) = crate::cathedral::enemy(kind) {
+            return !e.outdoor;
         }
         matches!(
             kind,
@@ -1484,6 +1498,10 @@ impl World {
                     template: arena_public,
                     active: false,
                     cleared: false,
+                    rally: None,
+                    grace_until: 0.,
+                    empty_since: None,
+                    members: vec![],
                 });
             }
         }
@@ -1794,7 +1812,7 @@ impl World {
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
         "weather":zone_weather,
         "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
-            let mut view = p.snapshot();
+            let mut view = self.raid_support(*session).snapshot(p);
             if p.character.gm { view["session"] = json!(session); }
             // What the portrait menu needs to explain a disabled Trade or Duel. Always listed: the client merges
             // each snapshot over the last, so a flag that vanished would stay set.
@@ -2308,6 +2326,7 @@ impl World {
         }
         // A stranded person joins whoever has taken their escort quest.
         let escort_note = self.try_start_escort(session, npc_id);
+        let raid_support = self.raid_support(session);
         let p = self.players.get_mut(&session).unwrap();
         let map = &self.maps[p.character.zone];
         let Some(npc) = map.npcs.iter().find(|npc| npc.id == npc_id) else {
@@ -2632,7 +2651,7 @@ impl World {
         }
         let _ = p
             .peer
-            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(p.snapshot()) } else { None },"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(raid_support.snapshot(p)) } else { None },"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         let actor = p.character.id.clone();
         let point = p.character.point();
         if levels > 0 {
@@ -2688,6 +2707,7 @@ impl World {
         self.hide_gms_after_zone_change();
         self.update_king_spawn();
         self.update_instances();
+        self.update_raid_wipes();
         self.update_ambient();
         self.update_mercenaries();
         self.update_gauntlets();
@@ -2807,14 +2827,27 @@ impl World {
             // party is beaten and the boss walks home. Then the usual three seconds start for everyone together, so
             // the first to wake cannot pull the boss back onto the rest. The cap keeps a fight that never ends from
             // stranding anyone.
-            if p.fallen && (!self.boss.fight_in(p.character.zone) || p.dead_time >= FALLEN_HOLD_MAX)
+            if p.fallen
+                && (!self.boss.fight_in(p.character.zone)
+                    || p.dead_time
+                        >= if self.maps[p.character.zone].raid {
+                            RAID_FALLEN_HOLD_MAX
+                        } else {
+                            FALLEN_HOLD_MAX
+                        })
             {
                 p.fallen = false;
                 p.dead_time = 0.;
             }
             if p.dead_time >= 3.2 && !p.fallen {
                 let map = &self.maps[p.character.zone];
-                let mut point = p.ambient.as_ref().map_or(map.spawn, ambient::Ambient::hub);
+                let rally = self
+                    .instances
+                    .iter()
+                    .find(|i| i.zone == p.character.zone)
+                    .and_then(|i| i.rally)
+                    .unwrap_or(map.spawn);
+                let mut point = p.ambient.as_ref().map_or(rally, ambient::Ambient::hub);
                 map.collide(&mut point, PLAYER_RADIUS);
                 p.character.x = point.x;
                 p.character.y = point.y;
@@ -3000,7 +3033,7 @@ impl World {
         if portal.to >= self.maps.len() {
             return;
         }
-        if self.maps[portal.to].sealed_template {
+        if self.maps[portal.to].sealed_template && self.public_zone(p.character.zone) != portal.to {
             return;
         }
         // Some doors stay shut until a quest is done, whoever you are with.
@@ -3037,6 +3070,72 @@ impl World {
             p.portal_at = self.time;
             let _ = p.peer.try_send(json!({"type":"error","text":text}));
             return;
+        }
+        // A raid's door asks for a full group, mercenaries counted: fewer cannot win, and a party holds no more.
+        let muster = portal.muster
+            && self.maps[portal.to].raid
+            && self.maps[portal.to].places.iter().any(|place| {
+                place.id == "cf_muster"
+                    && Point {
+                        x: portal.tx,
+                        y: portal.ty,
+                    }
+                    .distance(Point {
+                        x: place.x,
+                        y: place.y,
+                    }) <= place.r
+            });
+        if self.maps[portal.to].raid && !muster {
+            let group = self.party_mates(&p.character.id).len();
+            if group != social::RAID_MAX {
+                let text = format!(
+                    "{} needs exactly {} fighters, hired ones included. Your group has {group}.",
+                    self.maps[portal.to].name,
+                    social::RAID_MAX
+                );
+                let p = self.players.get_mut(&session).unwrap();
+                p.portal_at = self.time;
+                let _ = p.peer.try_send(json!({"type":"error","text":text}));
+                return;
+            }
+        }
+        let mut raid_gate_crew = Vec::new();
+        // The inner gate checks the actual gathering, not distant names on the party list.
+        if self.maps[p.character.zone].raid && self.maps[portal.to].raid && !muster {
+            let mates = self.party_mates(&p.character.id);
+            raid_gate_crew = self
+                .players
+                .iter()
+                .filter(|(_, q)| {
+                    mates.contains(&q.character.id)
+                        && q.character.zone == p.character.zone
+                        && q.character.hp > 0.
+                        && q.character.level >= need
+                        && q.character.point().distance(here) <= 20.
+                })
+                .map(|(session, _)| *session)
+                .collect();
+            if raid_gate_crew.len() != social::RAID_MAX {
+                let p = self.players.get_mut(&session).unwrap();
+                p.portal_at = self.time;
+                let _ = p.peer.try_send(json!({"type":"error","text":"Gather ten living level-99 fighters in the muster chamber first."}));
+                return;
+            }
+        }
+        // A five-player dungeon is balanced for five: a raid (more than a party holds) belongs in a raid zone only.
+        if self.maps[portal.to].copies > 0 && !self.maps[portal.to].raid {
+            let group = self.party_mates(&p.character.id).len();
+            if group > social::PARTY_MAX {
+                let text = format!(
+                    "{} is a dungeon for {} fighters at most. Your group has {group}.",
+                    self.maps[portal.to].name,
+                    social::PARTY_MAX
+                );
+                let p = self.players.get_mut(&session).unwrap();
+                p.portal_at = self.time;
+                let _ = p.peer.try_send(json!({"type":"error","text":text}));
+                return;
+            }
         }
         // A dungeon's door leads to a private copy: the party's own, or a free one.
         if self.maps[portal.to].copies > 0 {
@@ -3092,6 +3191,19 @@ impl World {
             None => format!("You step through {} into {name}.", portal.name),
         };
         let _ = p.peer.try_send(json!({"type":"system","text":text}));
+        // Gathered humans and hired fighters cross together, so nobody is stranded behind the gate.
+        for mate in raid_gate_crew.into_iter().filter(|mate| *mate != session) {
+            let p = self.players.get_mut(&mate).unwrap();
+            p.character.zone = portal.to;
+            p.character.x = arrival.x;
+            p.character.y = arrival.y;
+            p.character.mounted = false;
+            p.portal_at = time;
+            p.stop();
+            p.attack = 0.;
+            p.dash = 0.;
+            let _ = p.peer.try_send(json!({"type":"system","text":text}));
+        }
         self.separate_enemies();
         self.event("portal", &actor, arrival, 0., false);
         self.save();
@@ -3099,7 +3211,7 @@ impl World {
     /// One attack roll: the server alone decides misses, crits and damage (buffs included).
     fn roll_damage(&mut self, session: u64, mult: f64) -> (f64, bool) {
         let p = &self.players[&session];
-        let base = p.character.stats().0 * (1. + p.buff(BuffKind::Damage)) * mult;
+        let base = self.raid_attack_power(session) * (1. + p.buff(BuffKind::Damage)) * mult;
         let crit_chance = (p.character.crit_chance() + p.buff(BuffKind::Crit)).min(1.);
         let hit_chance = p.character.hit_chance();
         let crit = self.random() < crit_chance;
@@ -3730,7 +3842,7 @@ impl World {
     /// Heals each session for `mult` times the caster's attack power and announces it with a `healed` event.
     /// Returns the healed players' positions for the skill's visual effect.
     fn heal_players(&mut self, caster: u64, sessions: &[u64], mult: f64) -> Vec<[f64; 2]> {
-        let amount = (self.players[&caster].character.stats().0 * mult).round();
+        let amount = (self.raid_attack_power(caster) * mult).round();
         let caster_class = self.players[&caster].character.look.class;
         let from = self.players[&caster].character.id.clone();
         let mut points = vec![];
@@ -3781,6 +3893,14 @@ impl World {
     }
     /// Returns the health the enemy actually lost.
     fn hit_slime(&mut self, id: usize, session: u64, damage: f64, crit: bool) -> f64 {
+        if let Some(i) = self
+            .instances
+            .iter_mut()
+            .find(|i| i.zone == self.slimes[id].zone)
+        {
+            i.grace_until = 0.;
+        }
+
         let Some(p) = self.players.get(&session) else {
             return 0.;
         };
@@ -3864,6 +3984,7 @@ impl World {
                 _ if self.spawns[id].ambush.is_some() => 1e9,
                 "big" => 0.,
                 "cinderlord" => 180.,
+                "ew_chainmaw" | "ew_bellows" | "ew_crown" => 600.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
                 "ghostmaw" | "mirrorqueen" | "sunshard" | "pendulummatron" | "epochengine"
                 | "mireheart" | "silverwidow" | "nightbloom" | "maelstromheart" | "honeyjaw"
@@ -3998,6 +4119,16 @@ impl World {
                     self.loot_drop(&credit_id, zone, point, &bag.id);
                 }
             }
+            // Ordinary raid packs have their own independent purple roll.
+            // Materials, normal equipment and the humans-only loot path remain shared.
+            if self.maps[zone].raid && crate::cathedral::enemy(&kind).is_some_and(|e| e.raid_pack) {
+                for _ in 0..copies(RAID_EPIC_DROP_CHANCE, boost, || self.random()) {
+                    let choice = self.random();
+                    if let Some(piece) = raid_pack_piece(choice) {
+                        self.loot_drop(&credit_id, zone, point, &piece.id);
+                    }
+                }
+            }
             let last_boss =
                 !self.maps[zone].final_boss.is_empty() && self.maps[zone].final_boss == kind;
             // A licence is bound to one character, so a boosted chance is one roll, never above 100%.
@@ -4009,6 +4140,7 @@ impl World {
             let blackhour = self.maps[zone].final_boss == "null_hour";
             let hero_level = self.players.get(&credit).map_or(1, |p| p.character.level);
             if !blackhour
+                && !self.maps[zone].raid
                 && let Some(gear) = roll_orange_boosted(boost, hero_level, || self.random())
             {
                 self.loot_drop_with_gear(&credit_id, zone, point, &gear.item.clone(), Some(gear));
@@ -4061,7 +4193,9 @@ impl World {
                 // Dividing the roll by the multiplier widens every rarity band by it.
                 let chance = self.random() / f64::from(boost);
                 let choice = self.random();
-                if let Some(i) = roll_equipment(&kind, level, chance, choice) {
+                if let Some(i) = roll_equipment(&kind, level, chance, choice)
+                    && !(self.maps[zone].raid && matches!(i.rarity.as_str(), "epic" | "legendary"))
+                {
                     self.loot_drop(&credit_id, zone, point, &i.id);
                 }
             }
@@ -4172,6 +4306,10 @@ impl World {
             }
             s.hop_v = 0.;
         }
+        let raid_grace = self
+            .instances
+            .iter()
+            .any(|i| i.zone == zone && i.grace_until > self.time);
         let nearest = self
             .players
             .iter()
@@ -4209,7 +4347,10 @@ impl World {
                     )
                 })
         });
-        let target = target.filter(|(_, _, d)| hunting || *d < 9.).or(nearest);
+        let target = target
+            .filter(|(_, _, d)| hunting || *d < 9.)
+            .or(nearest)
+            .filter(|_| !raid_grace);
         if s.state != "return"
             && s.state != "windup"
             && s.state != "lunge"
@@ -4429,6 +4570,8 @@ impl World {
                             | "snowgiant"
                             | "longnightwyrm"
                     ) || is_boss(&s.kind)
+                        || (s.kind.starts_with("ew_") || s.kind.starts_with("cf_"))
+                            && is_elite(&s.kind)
                     {
                         s.max_hp
                     } else {
@@ -4541,11 +4684,13 @@ impl World {
             );
             return;
         }
+        let raid_taken = self.raid_support(session).taken_multiplier();
         let p = self.players.get_mut(&session).unwrap();
         let shield = p.buff(BuffKind::Shield).min(0.8);
-        let mut value = ((damage - p.character.stats().1).max(1.) * DAMAGE_TAKEN_SCALE)
-            .round()
-            .max(1.);
+        let mut value =
+            ((damage - p.character.stats().1).max(1.) * DAMAGE_TAKEN_SCALE * raid_taken)
+                .round()
+                .max(1.);
         if shield > 0. {
             value = (value * (1. - shield)).round().max(1.);
         }
@@ -9874,6 +10019,7 @@ mod tests {
             final_boss: String::new(),
             players: 0,
             min_level: 0,
+            raid: false,
             template: None,
         };
         let blocker = Point { x: 21.9, y: 20.5 };
@@ -10455,6 +10601,7 @@ mod tests {
             tx: 48.,
             ty: 83.,
             after_clear: false,
+            muster: false,
             needs_quest: None,
         });
         w.use_portal(1);

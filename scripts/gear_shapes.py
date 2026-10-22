@@ -21,6 +21,7 @@ PALETTE, COLOR = cc.palette_of(MATS)
 MODULES = dict(assassin='make_assassin_cel_sprites', warrior='make_warrior_cel_sprites',
                mage='make_mage_cel_sprites', priest='make_priest_sprites', hunter='make_hunter_cel_sprites')
 DESIGNS = {
+    'cfpack': dict(index=0, hem=0, cape=0, collar=0, spikes=0),
     'null': dict(index=0, hem=20, cape=0, collar=0, spikes=0),
     'keel': dict(index=0, hem=22, cape=0, collar=0, spikes=0),
     'L25': dict(index=0, hem=30, cape=0, collar=3, spikes=1),

@@ -1340,6 +1340,10 @@ pub enum SocialCommand {
     PartyPromote {
         id: String,
     },
+    /// The leader turns the party into a raid (up to ten members) or back into a party of five.
+    PartyRaid {
+        on: bool,
+    },
     PartyChat {
         text: String,
     },
@@ -1516,6 +1520,10 @@ pub struct Offer {
     /// A mercenary offer that needs no quest: it only asks for gold and a free seat in a party of five (the Meeting Stone).
     #[serde(default)]
     pub open: bool,
+    /// A mercenary offer that hires every free seat of a raid group (the quartermaster at a raid door): no quest, the
+    /// usual price each, and the fighters follow only into the raid.
+    #[serde(default)]
+    pub raid: bool,
     /// Sells the best tier of the item's family for the buyer's level, at that tier's price (potions and food).
     #[serde(default)]
     pub tiered: bool,
@@ -1680,6 +1688,9 @@ pub struct Portal {
     pub to: usize,
     pub tx: f64,
     pub ty: f64,
+    /// An entrance into a raid's isolated muster chamber; the inner gate still needs ten fighters.
+    #[serde(default)]
+    pub muster: bool,
     /// Only usable once the instance it stands in has been cleared (its final boss is down).
     #[serde(default)]
     pub after_clear: bool,
@@ -1734,6 +1745,10 @@ pub struct Map {
     /// The character level a dungeon's door asks for; a lower level cannot step in (0: anyone may).
     #[serde(default)]
     pub min_level: u32,
+    /// A raid: the door asks for a group of exactly `social::RAID_MAX` fighters (mercenaries count) and the
+    /// mercenaries in it never roll for loot (see world/social.rs and world/rolls.rs).
+    #[serde(default)]
+    pub raid: bool,
     /// A dungeon's rooms as `[x0, y0, x1, y1]` tile rectangles (chests are only placed inside them).
     #[serde(default)]
     pub rooms: Vec<[f64; 4]>,
@@ -2013,6 +2028,7 @@ mod tests {
             final_boss: String::new(),
             players: 0,
             min_level: 0,
+            raid: false,
             template: None,
             objects: vec![Obstacle {
                 x: 5.,

@@ -73,11 +73,12 @@
     host.replaceChildren(header, grid, actions,
       node('p', `Hit ${percent(c.hitChance)} · Dodge ${percent(c.dodgeChance)} · Crit ${percent(c.critChance)} · Attack every ${Number((c.attackCooldown || 0).toFixed(2))}s`, 'attribute-derived'),
       node('small', '3 points per level · ★ Class specialty · A city steward can reset trained points for gold', 'attribute-help'));
+    if (c.raidSupport) host.append(node('p', `Raid strength: +${c.raidSupport.attackPercent}% attack · ${c.raidSupport.damageReductionPercent}% damage reduction (${c.raidSupport.others} allies)`, 'attribute-derived raid-strength'));
   }
   window.Attributes = {
     render,
     update(c) {
-      const key = JSON.stringify([c.id, c.level, c.attributes, c.gearAttributes, c.passiveAttributes, c.statPoints, c.dead, c.look.class, c.hitChance, c.dodgeChance, c.critChance, c.attackCooldown]);
+      const key = JSON.stringify([c.id, c.level, c.attributes, c.gearAttributes, c.passiveAttributes, c.statPoints, c.dead, c.look.class, c.hitChance, c.dodgeChance, c.critChance, c.attackCooldown, c.raidSupport]);
       character = c; if (signature === key) return; signature = key; pending = false; previewOpen = false; render();
       dispatchEvent(new Event('character-stats-change'));
     },

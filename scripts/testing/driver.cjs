@@ -25,6 +25,7 @@ const socialSchema = z.discriminatedUnion('op', [
   z.object({ op: z.literal('party_leave') }).strict(),
   z.object({ op: z.literal('party_kick'), ...target }).strict(),
   z.object({ op: z.literal('party_promote'), ...target }).strict(),
+  z.object({ op: z.literal('party_raid'), on: z.boolean() }).strict(),
   z.object({ op: z.literal('party_chat'), text: z.string().min(1).max(240) }).strict(),
 ]);
 // The same actions accepted by ClientMessage; no arbitrary state setters or joins.

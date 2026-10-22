@@ -335,7 +335,13 @@ impl World {
         }
         if !self.chests.grids.contains_key(&template) {
             let grid = blocked_grid(&self.maps[template]);
-            let field = distance_field(&self.maps[template], &grid, self.maps[template].spawn);
+            let map = &self.maps[template];
+            let start = map
+                .places
+                .iter()
+                .find(|p| map.raid && p.id == "cf_checkpoint_1")
+                .map_or(map.spawn, |p| Point { x: p.x, y: p.y });
+            let field = distance_field(map, &grid, start);
             self.chests.grids.insert(template, grid);
             self.chests.fields.insert(template, field);
         }

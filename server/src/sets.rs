@@ -49,7 +49,7 @@ mod tests {
         let sources: BTreeSet<_> = ITEMS
             .iter()
             .filter_map(|item| item.source.as_deref())
-            .filter(|source| *source != "orange_pool")
+            .filter(|source| !matches!(*source, "orange_pool" | "chained_forge_packs"))
             .collect();
         assert_eq!(sources.len(), 20);
         assert_eq!(CATALOG.entries.len(), sources.len() * 5);

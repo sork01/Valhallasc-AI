@@ -24,6 +24,7 @@ ENCLOSED = {"orrery", "deep", "heartwood", "arena"}
 THEMES = {
     "meadow": (["rain", "fog", "thunderstorm", "wind"], "leaves"),
     "ember": (["fog", "wind"], "ash"),
+    "emberwake": (["fog", "wind"], "ash"),
     "frost": (["snow", "fog"], None),
     "fen": (["rain", "fog", "thunderstorm"], None),
     "city": (["snow", "fog"], None),  # Skaldholm, beyond the glacier

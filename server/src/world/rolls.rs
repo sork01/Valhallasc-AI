@@ -76,6 +76,27 @@ impl World {
         }
         group
     }
+    /// The people who share an item drop in a raid, and the one who keeps it if nobody wants it. Only humans roll
+    /// there: a mercenary's seat adds nothing to the contest, so a lone human gets the item at once and a kill
+    /// made by a mercenary belongs to its hirer.
+    fn raid_loot_group(&self, owner: &str, zone: usize, point: Point) -> (String, Vec<String>) {
+        let humans: Vec<String> = self
+            .loot_group(owner, zone, point)
+            .into_iter()
+            .filter(|id| !self.merc_id(id))
+            .collect();
+        let keeper = self
+            .players
+            .values()
+            .find(|p| p.character.id == owner)
+            .and_then(|p| p.merc.clone())
+            .unwrap_or_else(|| owner.to_owned());
+        let keeper = match humans.first() {
+            Some(first) if !humans.contains(&keeper) => first.clone(),
+            _ => keeper,
+        };
+        (keeper, humans)
+    }
     /// Whether this character id is a hired mercenary (it collects nothing: its share is forfeited).
     fn merc_id(&self, id: &str) -> bool {
         self.players
@@ -142,7 +163,12 @@ impl World {
         item_id: &str,
         gear: Option<GearInstance>,
     ) {
-        let group = self.loot_group(owner, zone, point);
+        let (owner, group) = if self.maps[zone].raid {
+            self.raid_loot_group(owner, zone, point)
+        } else {
+            (owner.to_owned(), self.loot_group(owner, zone, point))
+        };
+        let owner = owner.as_str();
         if group.len() < 2 {
             self.item_drop(owner, zone, point, item_id, 1);
             if let Some(d) = self.drops.last_mut()
@@ -284,6 +310,17 @@ impl World {
                 rewards.push((who.clone(), place(self, who), share, None, 0, by(who), None));
             }
             return true;
+        };
+        // In a raid only humans take turns at items: a mercenary's turn would forfeit the piece.
+        let group = if self.maps[d.zone].raid {
+            let humans: Vec<String> = group.into_iter().filter(|g| !self.merc_id(g)).collect();
+            if humans.is_empty() {
+                vec![picker.clone()]
+            } else {
+                humans
+            }
+        } else {
+            group
         };
         let Some(who) = self.next_taker(&group, id) else {
             let now = self.time;
@@ -1180,6 +1217,88 @@ mod tests {
             .map(|s| w.players[s].character.quantity("slime_gel"))
             .sum();
         assert_eq!(gel, 4);
+    }
+
+    #[test]
+    fn in_a_raid_a_lone_human_gets_the_piece_at_once_but_a_party_still_rolls_against_the_mercenary()
+    {
+        let mut w = world();
+        let who = party(&mut w, &["Ann"]);
+        hire_priest(&mut w, &who[0].1, 1);
+        let at = spot(&w);
+        let piece = green_for(Class::Warrior);
+        // Outside a raid the mercenary takes part: a roll opens even though only one human is in it.
+        w.loot_drop(&who[0].1, 0, at, &piece.id);
+        assert_eq!(
+            w.rolls.len(),
+            1,
+            "the control: a party of five keeps its roll"
+        );
+        w.rolls.clear();
+        w.drops.clear();
+        // Inside a raid it does not: the one human is awarded the piece without a wait.
+        w.maps[0].raid = true;
+        w.loot_drop(&who[0].1, 0, at, &piece.id);
+        assert!(w.rolls.is_empty());
+        assert_eq!(owned_by(&w, &who[0].1).len(), 1);
+        // A kill made by the mercenary belongs to its hirer.
+        w.drops.clear();
+        let merc = w.players[&7_000_000].character.id.clone();
+        w.loot_drop(&merc, 0, at, &piece.id);
+        assert!(w.rolls.is_empty());
+        assert_eq!(owned_by(&w, &who[0].1).len(), 1);
+    }
+
+    #[test]
+    fn in_a_raid_the_humans_roll_among_themselves_and_no_mercenary_is_a_voter() {
+        let mut w = world();
+        let who = party(&mut w, &["Ann", "Bob"]);
+        hire_priest(&mut w, &who[0].1, 1);
+        w.maps[0].raid = true;
+        let at = spot(&w);
+        let piece = green_for(Class::Warrior);
+        w.loot_drop(&who[0].1, 0, at, &piece.id);
+        assert_eq!(w.rolls.len(), 1);
+        let votes = &w.rolls[0].votes;
+        assert_eq!(votes.len(), 2, "Ann and Bob only");
+        assert!(votes.keys().all(|id| !w.merc_id(id)));
+        assert!(
+            votes.values().all(|v| v.is_none()),
+            "nobody has answered for them"
+        );
+        let id = w.rolls[0].id;
+        vote(&mut w, &who[0], id, RollChoice::Greed);
+        vote(&mut w, &who[1], id, RollChoice::Pass);
+        w.update_rolls();
+        assert!(w.rolls.is_empty());
+        assert_eq!(owned_by(&w, &who[0].1).len(), 1, "Ann wins what Bob passes");
+    }
+
+    #[test]
+    fn in_a_raid_gray_items_go_round_robin_among_humans_and_gold_still_loses_the_mercenarys_share()
+    {
+        let mut w = world();
+        let who = party(&mut w, &["Ann", "Bob"]);
+        hire_priest(&mut w, &who[0].1, 1);
+        w.maps[0].raid = true;
+        let at = spot(&w);
+        for _ in 0..6 {
+            w.loot_drop(&who[0].1, 0, at, "slime_gel");
+        }
+        collect_all(&mut w);
+        let gel: u32 = [1, 2]
+            .iter()
+            .map(|s| w.players[s].character.quantity("slime_gel"))
+            .sum();
+        assert_eq!(gel, 6, "no turn is lost to the mercenary");
+        let before = gold_of(&w, 1) + gold_of(&w, 2);
+        w.gold_drop(&who[0].1, 0, at, 12);
+        collect_all(&mut w);
+        assert_eq!(
+            gold_of(&w, 1) + gold_of(&w, 2) - before,
+            8,
+            "gold splits three ways as ever"
+        );
     }
 
     /// A green piece of this kind that only the given class can use.

@@ -7983,6 +7983,18 @@
    0,
    102
   ],
+  "cfpack_pants": [
+   1,
+   102
+  ],
+  "cfpack_necklace": [
+   2,
+   102
+  ],
+  "cfpack_accessory": [
+   3,
+   102
+  ],
   "warrior_armor_crimson_l55_gray": [
    5,
    14
@@ -8320,403 +8332,403 @@
    7
   ],
   "cloak_l5_common": [
-   1,
+   4,
    102
   ],
   "cloak_l5_uncommon": [
-   1,
+   4,
    102
   ],
   "cloak_l5_rare": [
-   1,
+   4,
    102
   ],
   "cloak_l10_common": [
-   1,
+   4,
    102
   ],
   "cloak_l10_uncommon": [
-   1,
+   4,
    102
   ],
   "cloak_l10_rare": [
-   1,
+   4,
    102
   ],
   "cloak_l10_epic": [
-   1,
+   4,
    102
   ],
   "cloak_l15_common": [
-   1,
+   4,
    102
   ],
   "cloak_l15_uncommon": [
-   1,
+   4,
    102
   ],
   "cloak_l15_rare": [
-   1,
+   4,
    102
   ],
   "cloak_l20_common": [
-   1,
+   4,
    102
   ],
   "cloak_l20_uncommon": [
-   1,
+   4,
    102
   ],
   "cloak_l20_rare": [
-   1,
+   4,
    102
   ],
   "cloak_l20_epic": [
-   1,
+   4,
    102
   ],
   "cloak_undervault": [
-   1,
+   4,
    102
   ],
   "cloak_l25_common": [
-   2,
+   5,
    102
   ],
   "cloak_l25_uncommon": [
-   2,
+   5,
    102
   ],
   "cloak_l25_rare": [
-   2,
+   5,
    102
   ],
   "cloak_l30_common": [
-   2,
+   5,
    102
   ],
   "cloak_l30_uncommon": [
-   2,
+   5,
    102
   ],
   "cloak_l30_rare": [
-   2,
+   5,
    102
   ],
   "cloak_l30_epic": [
-   2,
+   5,
    102
   ],
   "cloak_l35_common": [
-   2,
+   5,
    102
   ],
   "cloak_l35_uncommon": [
-   2,
+   5,
    102
   ],
   "cloak_l35_rare": [
-   2,
+   5,
    102
   ],
   "cloak_l40_common": [
-   2,
+   5,
    102
   ],
   "cloak_l40_uncommon": [
-   2,
+   5,
    102
   ],
   "cloak_l40_rare": [
-   2,
+   5,
    102
   ],
   "cloak_l40_epic": [
-   2,
+   5,
    102
   ],
   "cloak_cathedral_cloister": [
-   2,
+   5,
    102
   ],
   "cloak_skybridge": [
-   2,
+   5,
    102
   ],
   "cloak_nornroot": [
-   2,
+   5,
    102
   ],
   "cloak_longship": [
-   2,
+   5,
    102
   ],
   "cloak_l45_common": [
-   3,
+   6,
    102
   ],
   "cloak_l45_uncommon": [
-   3,
+   6,
    102
   ],
   "cloak_l45_rare": [
-   3,
+   6,
    102
   ],
   "cloak_l50_common": [
-   3,
+   6,
    102
   ],
   "cloak_l50_uncommon": [
-   3,
+   6,
    102
   ],
   "cloak_l50_rare": [
-   3,
+   6,
    102
   ],
   "cloak_l50_epic": [
-   3,
+   6,
    102
   ],
   "cloak_l55_common": [
-   3,
+   6,
    102
   ],
   "cloak_l55_uncommon": [
-   3,
+   6,
    102
   ],
   "cloak_l55_rare": [
-   3,
+   6,
    102
   ],
   "cloak_l60_common": [
-   3,
+   6,
    102
   ],
   "cloak_l60_uncommon": [
-   3,
+   6,
    102
   ],
   "cloak_l60_rare": [
-   3,
+   6,
    102
   ],
   "cloak_l60_epic": [
-   3,
+   6,
    102
   ],
   "cloak_cathedral_reliquary": [
-   3,
+   6,
    102
   ],
   "cloak_cathedral_nave": [
-   3,
+   6,
    102
   ],
   "cloak_moonwell": [
-   3,
+   6,
    102
   ],
   "cloak_l65_common": [
-   4,
+   7,
    102
   ],
   "cloak_l65_uncommon": [
-   4,
+   7,
    102
   ],
   "cloak_l65_rare": [
-   4,
+   7,
    102
   ],
   "cloak_l70_common": [
-   4,
+   7,
    102
   ],
   "cloak_l70_uncommon": [
-   4,
+   7,
    102
   ],
   "cloak_l70_rare": [
-   4,
+   7,
    102
   ],
   "cloak_l70_epic": [
-   4,
+   7,
    102
   ],
   "cloak_l75_common": [
-   4,
+   7,
    102
   ],
   "cloak_l75_uncommon": [
-   4,
+   7,
    102
   ],
   "cloak_l75_rare": [
-   4,
+   7,
    102
   ],
   "cloak_l80_common": [
-   4,
+   7,
    102
   ],
   "cloak_l80_uncommon": [
-   4,
+   7,
    102
   ],
   "cloak_l80_rare": [
-   4,
+   7,
    102
   ],
   "cloak_l80_epic": [
-   4,
+   7,
    102
   ],
   "cloak_eye_below": [
-   4,
+   7,
    102
   ],
   "cloak_elder_hollow": [
-   4,
+   7,
    102
   ],
   "cloak_thousandfold": [
-   4,
+   7,
    102
   ],
   "cloak_rain_crown": [
-   4,
+   7,
    102
   ],
   "cloak_seed_vault": [
-   4,
+   7,
    102
   ],
   "cloak_l85_common": [
-   5,
+   8,
    102
   ],
   "cloak_l85_uncommon": [
-   5,
+   8,
    102
   ],
   "cloak_l85_rare": [
-   5,
+   8,
    102
   ],
   "cloak_l90_common": [
-   5,
+   8,
    102
   ],
   "cloak_l90_uncommon": [
-   5,
+   8,
    102
   ],
   "cloak_l90_rare": [
-   5,
+   8,
    102
   ],
   "cloak_l90_epic": [
-   5,
+   8,
    102
   ],
   "cloak_l95_common": [
-   5,
+   8,
    102
   ],
   "cloak_l95_uncommon": [
-   5,
+   8,
    102
   ],
   "cloak_l95_rare": [
-   5,
+   8,
    102
   ],
   "cloak_l99_common": [
-   5,
+   8,
    102
   ],
   "cloak_l99_uncommon": [
-   5,
+   8,
    102
   ],
   "cloak_l99_rare": [
-   5,
+   8,
    102
   ],
   "cloak_l99_epic": [
-   5,
+   8,
    102
   ],
   "cloak_sunken_astrolabe": [
-   5,
+   8,
    102
   ],
   "cloak_blackhour": [
-   5,
+   8,
    102
   ],
   "cloak_thunderheart_gate": [
-   5,
+   8,
    102
   ],
   "cloak_blooming_labyrinth": [
-   5,
+   8,
    102
   ],
   "cloak_solar_crucible": [
-   5,
+   8,
    102
   ],
   "cloak_amber_archive": [
-   5,
+   8,
    102
   ],
   "cloak_silent_solstice": [
-   5,
+   8,
    102
   ],
   "orange_cloak_01": [
-   5,
+   8,
    102
   ],
   "orange_cloak_02": [
-   5,
+   8,
    102
   ],
   "orange_cloak_03": [
-   5,
+   8,
    102
   ],
   "orange_cloak_04": [
-   5,
+   8,
    102
   ],
   "orange_cloak_05": [
-   5,
+   8,
    102
   ],
   "orange_cloak_06": [
-   5,
+   8,
    102
   ],
   "orange_cloak_07": [
-   5,
+   8,
    102
   ],
   "orange_cloak_08": [
-   5,
+   8,
    102
   ],
   "orange_cloak_09": [
-   5,
+   8,
    102
   ],
   "orange_cloak_10": [
-   5,
+   8,
    102
   ]
  },
@@ -9646,6 +9658,9 @@
   "null-hunter-weapon": "97aab23bce89be64",
   "null-shared-pants": "08c5258cebf3c131",
   "null-shared-necklace": "ae7834ac5d156eb1",
-  "null-shared-accessory": "1e11db18a63af99b"
+  "null-shared-accessory": "1e11db18a63af99b",
+  "cfpack-shared-pants": "3b70ba263f3ee877",
+  "cfpack-shared-necklace": "f6d2602aa8d96800",
+  "cfpack-shared-accessory": "fd5670ed52f8ea8b"
  }
 }

@@ -18,7 +18,7 @@ def build():
     document = DOC.read_text()
     items = json.loads((ROOT / "world/items.txt").read_text())
     skills = json.loads((ROOT / "world/skills.txt").read_text())
-    sources = {i["source"] for i in items if i.get("source") not in (None, "orange_pool")}
+    sources = {i["source"] for i in items if i.get("source") not in (None, "orange_pool", "chained_forge_packs")}
     pieces = Counter(i.get("source") for i in items if i["kind"] != "cloak")
     assert all(pieces[source] == 28 for source in sources), "each dungeon set needs 28 catalog pieces"
     levels = {i["source"]: i["requiredLevel"] for i in items if i.get("source") in sources}

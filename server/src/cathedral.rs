@@ -19,6 +19,17 @@ pub struct Enemy {
     /// A sleeping helper of a final-boss mechanic (a singer, pearl, seed or cocoon): a kill gives experience only.
     #[serde(default)]
     pub add: bool,
+    /// Shared catalog also supports outdoor enemies without dungeon rarity rules.
+    #[serde(default = "default_elite")]
+    pub elite: bool,
+    #[serde(default)]
+    pub outdoor: bool,
+    /// An elite pack enemy in the ten-fighter raid, with its own purple roll.
+    #[serde(default, rename = "raidPack")]
+    pub raid_pack: bool,
+}
+fn default_elite() -> bool {
+    true
 }
 pub static ENEMIES: LazyLock<Vec<Enemy>> = LazyLock::new(|| {
     let mut enemies: Vec<Enemy> = serde_json::from_str(include_str!("../../world/cathedral.txt"))
@@ -82,6 +93,14 @@ pub static ENEMIES: LazyLock<Vec<Enemy>> = LazyLock::new(|| {
     enemies.extend(
         serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/blackhour.txt"))
             .expect("valid Black Hour Foundry catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/emberwake.txt"))
+            .expect("valid Emberwake catalog"),
+    );
+    enemies.extend(
+        serde_json::from_str::<Vec<Enemy>>(include_str!("../../world/chained_forge.txt"))
+            .expect("valid Chained Forge catalog"),
     );
     enemies
 });

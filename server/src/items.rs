@@ -269,18 +269,32 @@ pub fn best_tier(family: &str, level: u32) -> Option<&'static Item> {
         .filter(|i| i.family.as_deref() == Some(family) && i.required_level <= level)
         .max_by_key(|i| i.required_level)
 }
-pub fn equipment(class: Class, kind: &str, variant: &str) -> Option<&'static Item> {
-    ITEMS
+// Ten raid fighters ask for their worn stats many times per tick. Preserve
+// first-match catalog semantics without rescanning all gear for every stat.
+type EquipmentMap = std::collections::HashMap<(&'static str, &'static str), &'static Item>;
+static EQUIPMENT_INDEX: LazyLock<[EquipmentMap; 5]> = LazyLock::new(|| {
+    let mut maps: [EquipmentMap; 5] = std::array::from_fn(|_| EquipmentMap::new());
+    for i in ITEMS.iter() {
+        if let (Some(class), Some(variant)) = (i.class, i.variant.as_deref()) {
+            maps[class as usize].entry((&i.kind, variant)).or_insert(i);
+        }
+    }
+    for i in ITEMS
         .iter()
-        .find(|i| i.class == Some(class) && i.kind == kind && i.variant.as_deref() == Some(variant))
-        .or_else(|| {
-            ITEMS.iter().find(|i| {
-                i.class.is_none()
-                    && i.source.as_deref() == Some("orange_pool")
-                    && i.kind == kind
-                    && i.variant.as_deref() == Some(variant)
-            })
-        })
+        .filter(|i| i.class.is_none() && i.source.as_deref() == Some("orange_pool"))
+    {
+        if let Some(variant) = i.variant.as_deref() {
+            for map in &mut maps {
+                map.entry((&i.kind, variant)).or_insert(i);
+            }
+        }
+    }
+    maps
+});
+pub fn equipment(class: Class, kind: &str, variant: &str) -> Option<&'static Item> {
+    EQUIPMENT_INDEX[class as usize]
+        .get(&(kind, variant))
+        .copied()
 }
 pub fn material(kind: &str) -> &'static str {
     if let Some(e) = crate::cathedral::enemy(kind) {
@@ -470,6 +484,21 @@ pub fn base_drop_chance(rarity: &str) -> f64 {
         _ => 0.,
     }
 }
+/// Independent raid-pack roll, in addition to normal materials and equipment.
+pub const RAID_EPIC_DROP_CHANCE: f64 = 0.03;
+/// Original class-neutral purple gear found only on ordinary raid enemies.
+pub fn raid_pack_piece(choice: f64) -> Option<&'static Item> {
+    let pool: Vec<_> = ITEMS
+        .iter()
+        .filter(|i| {
+            i.source.as_deref() == Some("chained_forge_packs")
+                && i.rarity == "epic"
+                && i.required_level == 99
+                && i.class.is_none()
+        })
+        .collect();
+    pool.get((choice * pool.len() as f64) as usize).copied()
+}
 /// Colour of the drop marker on the ground; the client CSS uses the same five.
 pub fn rarity_color(rarity: &str) -> &'static str {
     match rarity {
@@ -482,8 +511,8 @@ pub fn rarity_color(rarity: &str) -> &'static str {
     }
 }
 pub fn is_elite(kind: &str) -> bool {
-    if crate::cathedral::enemy(kind).is_some() {
-        return true;
+    if let Some(e) = crate::cathedral::enemy(kind) {
+        return e.elite;
     }
     matches!(
         kind,
@@ -2848,8 +2877,11 @@ mod tests {
     fn gear_levels_come_in_steps_of_five_and_use_every_step() {
         let mut used = std::collections::BTreeSet::new();
         for i in ITEMS.iter() {
-            // The exclusive Foundry set is an intentional level-99 capstone, not ordinary ladder gear.
-            if i.source.as_deref() == Some("blackhour") {
+            // Exclusive dungeon/raid purple pieces are level-99 capstones outside the ladder.
+            if matches!(
+                i.source.as_deref(),
+                Some("blackhour" | "chained_forge_packs")
+            ) {
                 assert_eq!(i.required_level, 99);
                 assert_eq!(i.rarity, "epic");
                 continue;

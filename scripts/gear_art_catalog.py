@@ -17,13 +17,14 @@ ASSETS = ROOT / 'client/assets'
 def jobs():
     if not MANIFEST.exists(): return []
     manifest = json.loads(MANIFEST.read_text())
-    state = {t['id']: t for path in (STATE, HIGH_STATE, DUNGEON_STATE, INSTANCE_STATE, NORNROOT_STATE) if path.exists()
+    state = {t['id']: t for path in (STATE, HIGH_STATE, DUNGEON_STATE, INSTANCE_STATE, NORNROOT_STATE, ROOT / 'docs/raid-pack-gear-state.txt') if path.exists()
              for t in json.loads(path.read_text())['tasks']}
     return [(state[key], record) for key, record in manifest.items() if record.get('files') and key in state]
 
 
 def matches(item, task):
     if item['kind'] != task['kind'] or item.get('class') != task['className']: return False
+    if task['group'] == 'cfpack': return item.get('source') == 'chained_forge_packs'
     if task['group'] == 'nornroot': return item.get('source') == 'nornroot'
     if task['group'].startswith('L'):
         return not item.get('source') and item.get('requiredLevel') == int(task['group'][1:])

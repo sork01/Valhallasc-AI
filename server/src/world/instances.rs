@@ -15,6 +15,10 @@ pub(super) struct Instance {
     pub active: bool,
     /// The final boss is down: `after_clear` portals work.
     pub cleared: bool,
+    pub rally: Option<Point>,
+    pub grace_until: f64,
+    pub empty_since: Option<f64>,
+    pub members: Vec<String>,
 }
 
 impl World {
@@ -31,6 +35,10 @@ impl World {
                 template,
                 active: false,
                 cleared: false,
+                rally: None,
+                grace_until: 0.,
+                empty_since: None,
+                members: vec![],
             });
             for _ in 1..copies {
                 let mut copy = maps[template].clone();
@@ -42,6 +50,10 @@ impl World {
                     template,
                     active: false,
                     cleared: false,
+                    rally: None,
+                    grace_until: 0.,
+                    empty_since: None,
+                    members: vec![],
                 });
             }
         }
@@ -86,6 +98,18 @@ impl World {
                 return Ok(q.character.zone);
             }
         }
+        if let Some(i) = self.instances.iter().find(|i| {
+            i.template == template
+                && i.active
+                && self.maps[i.zone].raid
+                && i.members.contains(&me.id)
+                && !self
+                    .players
+                    .values()
+                    .any(|p| p.character.zone == i.zone && p.merc.is_none())
+        }) {
+            return Ok(i.zone);
+        }
         self.instances
             .iter()
             .find(|i| i.template == template && !i.active)
@@ -107,13 +131,36 @@ impl World {
     pub(super) fn update_instances(&mut self) {
         for index in 0..self.instances.len() {
             let zone = self.instances[index].zone;
-            if self.instances[index].active
-                && !self.players.values().any(|p| p.character.zone == zone)
-            {
+            if !self.instances[index].active {
+                continue;
+            }
+            let humans: Vec<String> = self
+                .players
+                .values()
+                .filter(|p| p.character.zone == zone && p.merc.is_none() && p.ambient.is_none())
+                .map(|p| p.character.id.clone())
+                .collect();
+            if !humans.is_empty() {
+                self.instances[index].empty_since = None;
+                for id in humans {
+                    let mates = self.party_mates(&id);
+                    for mate in mates {
+                        if !self.instances[index].members.contains(&mate) {
+                            self.instances[index].members.push(mate);
+                        }
+                    }
+                }
+            } else if self.maps[zone].raid {
+                let since = *self.instances[index].empty_since.get_or_insert(self.time);
+                if self.time - since >= 1200. {
+                    self.reset_instance(index);
+                }
+            } else if !self.players.values().any(|p| p.character.zone == zone) {
                 self.reset_instance(index);
             }
         }
     }
+
     /// Every enemy back at its post at full health, shots and loot gone, the exit closed.
     pub(super) fn reset_instance(&mut self, index: usize) {
         let zone = self.instances[index].zone;
@@ -131,6 +178,10 @@ impl World {
         self.clear_chests(zone);
         self.instances[index].active = false;
         self.instances[index].cleared = false;
+        self.instances[index].rally = None;
+        self.instances[index].grace_until = 0.;
+        self.instances[index].empty_since = None;
+        self.instances[index].members.clear();
     }
     /// The final boss fell: open the exit and tell everyone inside.
     pub(super) fn clear_instance(&mut self, zone: usize, at: Point) {

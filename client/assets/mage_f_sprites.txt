@@ -1216,6 +1216,18 @@
     "cloak_ember": {
       "png": "mage_f_cloak_ember.png",
       "depth": "mage_f_cloak_ember_depth.png"
+    },
+    "pants_regearcfpack": {
+      "png": "mage_f_progression_pants_regearcfpack.png",
+      "depth": "mage_f_progression_pants_regearcfpack_depth.png"
+    },
+    "necklace_regearcfpack": {
+      "png": "mage_f_progression_necklace_regearcfpack.png",
+      "depth": "mage_f_progression_necklace_regearcfpack_depth.png"
+    },
+    "accessory_regearcfpack": {
+      "png": "mage_f_progression_accessory_regearcfpack.png",
+      "depth": "mage_f_progression_accessory_regearcfpack_depth.png"
     }
   },
   "gender": "female",
@@ -1782,7 +1794,10 @@
     "weapon_regearsolstice",
     "weapon_regearspan",
     "weapon_regearthunder",
-    "weapon_regearvault"
+    "weapon_regearvault",
+    "accessory_regearcfpack",
+    "necklace_regearcfpack",
+    "pants_regearcfpack"
   ],
   "gearSprites": {
     "pants_regearl50": {
@@ -10226,6 +10241,177 @@
         ],
         "frameCount": 64
       }
+    },
+    "pants_regearcfpack": {
+      "idle": [
+        {
+          "id": "c68cb9470e48204e",
+          "offset": [
+            65,
+            79
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "2c3437593ec004b8",
+          "offset": [
+            59,
+            77
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "00822340d6c4f4ab",
+          "offset": [
+            64,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "9d40a45adea8d76c",
+          "offset": [
+            65,
+            79
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "57d377fa8225d91a",
+          "offset": [
+            54,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "necklace_regearcfpack": {
+      "idle": [
+        {
+          "id": "17965ea034f98f42",
+          "offset": [
+            65,
+            50
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "3fa0625ea301aa09",
+          "offset": [
+            62,
+            49
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "1f52b02f6addad4b",
+          "offset": [
+            59,
+            49
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "fd959943979fd225",
+          "offset": [
+            66,
+            50
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "658c5a6d8562c08c",
+          "offset": [
+            52,
+            49
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "accessory_regearcfpack": {
+      "idle": [
+        {
+          "id": "91560866c58513bd",
+          "offset": [
+            59,
+            59
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "4d2786d75a15c616",
+          "offset": [
+            58,
+            56
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "9a42c52d35b7f98b",
+          "offset": [
+            40,
+            39
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "b69e83229f981045",
+          "offset": [
+            57,
+            50
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "0623bb8c4061538f",
+          "offset": [
+            55,
+            56
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
     }
   },
   "gearSources": {

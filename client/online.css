@@ -455,6 +455,10 @@
 .party-frame { position: absolute; left: calc(2.4cqw + 28.7cqw * var(--ui, .8)); top: 1.4cqw; width: 17cqw; z-index: 20; color: #f1ecda; font: .9cqw 'Jua', sans-serif; }
 .party-head { width: 100%; padding: .35cqw .6cqw; border: 0; border-bottom: 1px solid #b89b5c80; background: linear-gradient(90deg, #182024cc, #18202420); color: #ffd56b; font: inherit; text-align: left; cursor: pointer; text-shadow: 0 1px 3px #000; }
 .party-frame .social-list { gap: .25cqw; margin-top: .3cqw; }
+.party-frame[data-compact="1"] .social-list { gap: .15cqw; }
+.party-frame[data-compact="1"] .social-row { flex-wrap: nowrap; padding: .2cqw .5cqw; }
+.party-frame[data-compact="1"] .social-who b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.party-frame[data-compact="1"] .member-bar { width: 6.5cqw; height: 1.1cqw; }
 .party-frame .social-row { padding: .3cqw .5cqw; background: #101a2ccc; flex-wrap: wrap; gap: .2cqw .5cqw; }
 .party-frame .social-who small { display: none; }
 .party-frame .member-bar { width: 100%; height: 1cqw; }

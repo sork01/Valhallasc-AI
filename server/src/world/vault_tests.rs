@@ -5,7 +5,7 @@ const SKALD: usize = 4;
 const VAULT: usize = 5;
 /// The zone number of the Undervault's second copy: the world appends the copies after the last file zone, so this
 /// moves whenever a zone is added (the first test asserts it).
-const COPY: usize = 45;
+const COPY: usize = 47;
 
 fn world() -> World {
     World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0)
