@@ -4209,6 +4209,8 @@
     bubbleDrawn() { return bubblesLast; },
     enemyName(kind) { return SLIME[kind]?.name || null; },
     drawTargetPortrait,
+    // The class sprite for any look, loaded like a remote player's (the inspect window draws it).
+    loadSprite: look => classSprite(look).load(look, { background: true }),
     get equipmentStats() { return equipmentStats(); },
     get warriorSprites() { return !isMage() && !isAssassin() && !isPriest() && !isHunter() ? mageSpr : null; },
     get mageSprites() { return isMage() ? mageSpr : null; },

@@ -1256,6 +1256,10 @@ pub enum ClientMessage {
     Pvp {
         command: PvpCommand,
     },
+    /// Asks for the read-only gear and stat sheet of a nearby character (server/src/world/inspect.rs).
+    Inspect {
+        id: String,
+    },
     /// A vote on a party loot roll (server/src/world/rolls.rs).
     Roll {
         id: u64,

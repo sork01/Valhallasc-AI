@@ -70,6 +70,11 @@ impl World {
                     .is_some_and(|p| p.character.id == id)
             })
     }
+    /// True while no duel challenge is waiting and no duel runs (the inspect tests read it).
+    #[cfg(test)]
+    pub(super) fn no_duel_pending(&self) -> bool {
+        self.pvp.requests.is_empty() && self.pvp.duels.is_empty()
+    }
     pub(super) fn pvp_sync(&self) {
         for (session, p) in self
             .players
@@ -180,7 +185,6 @@ impl World {
             || a.is_hidden()
             || b.is_hidden()
             || a.ambient.is_some()
-            || b.ambient.is_some()
             || a.character.spark_travel.is_some()
             || b.character.spark_travel.is_some()
             || a.character.hp <= 0.
@@ -192,6 +196,11 @@ impl World {
             || self.maps[b.character.zone].in_city(b.character.point())
         {
             return Err("Both players must be alive and nearby outside a sanctuary.".into());
+        }
+        // An adventurer takes part in no duel: the challenge is answered at once and nothing is queued.
+        if b.ambient.is_some() {
+            self.ambient_declines(me, target, true);
+            return Ok(());
         }
         let zone = a.character.zone;
         let center = a.character.point();

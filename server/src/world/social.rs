@@ -68,7 +68,7 @@ impl World {
         self.online(id)
             .map_or_else(|| "Someone".into(), |p| p.character.look.name.clone())
     }
-    fn is_friend(&self, a: &str, b: &str) -> bool {
+    pub(super) fn is_friend(&self, a: &str, b: &str) -> bool {
         self.online(a)
             .is_some_and(|p| p.character.friends.iter().any(|f| f == b))
     }

@@ -45,11 +45,15 @@ impl World {
         self.trades.iter().position(|t| t.side(id).is_some())
     }
     fn trade_pair_valid(&self, a: &str, b: &str) -> Result<(), String> {
+        self.trade_pair_checks(a, b, false)
+    }
+    /// `adventurer_ok` lets an adventurer pass, for the one request that they then decline.
+    fn trade_pair_checks(&self, a: &str, b: &str, adventurer_ok: bool) -> Result<(), String> {
         let left = self.online(a).ok_or("A player went offline.")?;
         let right = self.online(b).ok_or("A player went offline.")?;
         if [left, right].iter().any(|p| {
             p.merc.is_some()
-                || p.ambient.is_some()
+                || (p.ambient.is_some() && !adventurer_ok)
                 || p.is_hidden()
                 || p.character.hp <= 0.
                 || p.character.spark_travel.is_some()
@@ -126,7 +130,12 @@ impl World {
         if self.trade_index(me).is_some() || self.trade_index(other).is_some() {
             return Err("One of you is already trading.".into());
         }
-        self.trade_pair_valid(me, other)?;
+        let adventurer = self.online(other).is_some_and(|p| p.ambient.is_some());
+        self.trade_pair_checks(me, other, adventurer)?;
+        if adventurer {
+            self.ambient_declines(me, other, false);
+            return Ok(());
+        }
         self.trades.push(Trade {
             from: me.into(),
             to: other.into(),
