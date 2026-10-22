@@ -66,7 +66,7 @@ fn sunken_astrolabe_has_safe_open_routes_quests_and_boss_loot() {
         .filter(|i| i.source.as_deref() == Some("sunken_astrolabe"))
         .map(|i| i.id.as_str())
         .collect();
-    assert_eq!(all_pieces.len(), 28);
+    assert_eq!(all_pieces.len(), 29);
     let mut reachable = std::collections::BTreeSet::new();
     for kind in ["astro_warden", "astro_navigator", "astro_axis"] {
         for slots in boss_slots(kind) {
@@ -144,7 +144,7 @@ fn thunderheart_foes_and_open_gate_are_authoritative() {
         .filter(|i| i.source.as_deref() == Some("thunderheart_gate"))
         .map(|i| i.id.as_str())
         .collect();
-    assert_eq!(all_pieces.len(), 28);
+    assert_eq!(all_pieces.len(), 29);
     let mut reachable = std::collections::BTreeSet::new();
     for kind in ["thunder_conductor", "thunder_bastion", "thunder_heart"] {
         for slots in boss_slots(kind) {
@@ -200,7 +200,7 @@ fn blooming_labyrinth_opens_with_party_quests_and_level_97_bosses() {
         .filter(|i| i.source.as_deref() == Some("blooming_labyrinth"))
         .map(|i| i.id.as_str())
         .collect();
-    assert_eq!(all_pieces.len(), 28);
+    assert_eq!(all_pieces.len(), 29);
     let mut reachable = std::collections::BTreeSet::new();
     for kind in ["bloom_thornkeeper", "bloom_mirror", "bloom_heart"] {
         assert_eq!(Slime::default_level(kind), 97);
@@ -258,7 +258,7 @@ fn solar_crucible_opens_with_party_quests_bosses_and_gear() {
         .filter(|i| i.source.as_deref() == Some("solar_crucible"))
         .map(|i| i.id.as_str())
         .collect();
-    assert_eq!(all_pieces.len(), 28);
+    assert_eq!(all_pieces.len(), 29);
     let mut reachable = std::collections::BTreeSet::new();
     for kind in ["solar_ashwarden", "solar_heliomancer", "solar_heart"] {
         assert_eq!(Slime::default_level(kind), 98);
@@ -341,7 +341,7 @@ fn amber_archive_and_silent_solstice_have_distinct_encounters_quests_and_loot() 
             .filter(|i| i.source.as_deref() == Some(theme))
             .map(|i| i.id.as_str())
             .collect();
-        assert_eq!(all_pieces.len(), 28);
+        assert_eq!(all_pieces.len(), 29);
         let mut reachable = std::collections::BTreeSet::new();
         for kind in bosses {
             assert_eq!(Slime::default_level(kind), 99);

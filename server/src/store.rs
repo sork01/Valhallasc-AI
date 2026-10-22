@@ -137,6 +137,7 @@ impl Store {
         look.gloves = defaults.gloves;
         look.pants = defaults.pants;
         look.necklace = defaults.necklace;
+        look.cloak = defaults.cloak;
         look.accessory = defaults.accessory;
         let mut c = Character {
             id: Uuid::new_v4().to_string(),

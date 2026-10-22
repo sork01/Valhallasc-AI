@@ -110,6 +110,7 @@
     const parts = {};
     for (const part of Object.keys(meta.parts)) {
       const frame = part === 'body' ? solid(ax - 3, ay - 14, 6, 14, row => row < 4 ? hair : skin, 1000)
+        : part.startsWith('cloak_') ? solid(ax - 5, ay - 11, 10, 10, () => colour(part), 1500)
         : part.startsWith('armor_') ? solid(ax - 3, ay - 9, 6, 6, () => colour(part), 500)
         : part.startsWith('head_') ? solid(ax - 3, ay - 17, 6, 3, () => colour(part), 480)
         : part.startsWith('shoulders_') ? solid(ax - 5, ay - 12, 10, 2, () => colour(part), 470)
@@ -124,7 +125,7 @@
   }
   // The class-independent pieces (scripts/generic_gear.py) are rarely worn, so their atlases are decoded only when a
   // look asks for them: `source.ensure(part)` starts the load once and resolves when the frames are in `source.parts`.
-  const GENERIC = { head: 'ironhide', shoulders: 'ironhide', gloves: 'duelist', pants: 'wayfarer', necklace: 'moonstone', accessory: 'amber' };
+  const GENERIC = { head: 'ironhide', shoulders: 'ironhide', gloves: 'duelist', pants: 'wayfarer', necklace: 'moonstone', accessory: 'amber', cloak: 'travel' };
   const LAZY = new Set(Object.entries(GENERIC).map(([slot, variant]) => `${slot}_${variant}`));
   async function loadBounds(url, meta) {
     try {
@@ -169,7 +170,7 @@
   // The catalog names every worn piece by a unique variant. An original piece is drawn as itself; a recolouring (items
   // with `art` and `tint`, built by scripts/gear_levels.py) is its base drawing painted with the tint, which uses the
   // terms of the CSS filters the inventory icon gets: hue-rotate degrees, saturate, brightness.
-  const KIND = { armor: 'armor', weapon: 'weapon', head: 'headgear', shoulders: 'shoulders', gloves: 'gloves', pants: 'pants', necklace: 'necklace', accessory: 'accessory' };
+  const KIND = { armor: 'armor', weapon: 'weapon', head: 'headgear', shoulders: 'shoulders', gloves: 'gloves', pants: 'pants', necklace: 'necklace', accessory: 'accessory', cloak: 'cloak' };
   let catalog = null, catalogSize = -1;
   const gearIndex = () => {
     const items = window.WORLD_ITEMS || [];
@@ -197,7 +198,7 @@
   });
   // Head, shoulder and glove pieces use the class's tier, shared gear, or a catalog art layer.
   // A part missing from the class atlas is simply not drawn.
-  const SLOT_ORDER = ['armor', 'pants', 'shoulders', 'gloves', 'head', 'necklace', 'accessory', 'weapon'];
+  const SLOT_ORDER = ['cloak', 'armor', 'pants', 'shoulders', 'gloves', 'head', 'necklace', 'accessory', 'weapon'];
   // A dungeon set needs a silhouette at field scale, not only a different tint on
   // the same 160px equipment rig. These marks sit behind the animated figure and
   // follow it in every pose/facing. One piece shows the origin; more pieces make
@@ -573,7 +574,7 @@
       if (mark) dungeonAura(g, mark, t);
       if (h.mounted && !h.dead && window.MountArt?.ready(h.mount)) {   // seated on the saddle: the rider's idle frame laid into the mount's frame
         const art = window.MountArt, moving = !!h.moving, mclip = art.clipFor(h.mount, moving), M = art.meta(h.mount), MC = M.clips[mclip];
-        const mi = moving ? Math.floor(h.walk) % MC.n : Math.floor(t * MC.fps) % MC.n, ri = moving ? 0 : Math.floor(t * C.idle.fps) % C.idle.n;
+        const mi = moving ? Math.floor(h.walk) % MC.n : Math.floor(t * MC.fps) % MC.n, ri = moving && this.equipment.cloak !== 'none' ? Math.floor(h.walk) % C.idle.n : moving ? 0 : Math.floor(t * C.idle.fps) % C.idle.n;
         const key = `mount/${h.mount}/${h.mountTint || 0}/${mclip}/${dir}/${mi}/${ri}`;
         let seat = this.cache.get(key);
         if (!seat) { seat = art.compose(this.frame('idle', dir, ri), h.mount, mclip, dir, mi, h.mountTint || 0); if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value); this.cache.set(key, seat); }

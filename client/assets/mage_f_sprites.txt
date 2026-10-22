@@ -1196,6 +1196,26 @@
     "accessory_regearnull": {
       "png": "mage_f_progression_accessory_regearnull.png",
       "depth": "mage_f_progression_accessory_regearnull_depth.png"
+    },
+    "cloak_travel": {
+      "png": "mage_f_cloak_travel.png",
+      "depth": "mage_f_cloak_travel_depth.png"
+    },
+    "cloak_hooded": {
+      "png": "mage_f_cloak_hooded.png",
+      "depth": "mage_f_cloak_hooded_depth.png"
+    },
+    "cloak_mantle": {
+      "png": "mage_f_cloak_mantle.png",
+      "depth": "mage_f_cloak_mantle_depth.png"
+    },
+    "cloak_clasp": {
+      "png": "mage_f_cloak_clasp.png",
+      "depth": "mage_f_cloak_clasp_depth.png"
+    },
+    "cloak_ember": {
+      "png": "mage_f_cloak_ember.png",
+      "depth": "mage_f_cloak_ember_depth.png"
     }
   },
   "gender": "female",
@@ -1555,6 +1575,11 @@
     "armor_regearspan",
     "armor_regearthunder",
     "armor_regearvault",
+    "cloak_clasp",
+    "cloak_ember",
+    "cloak_hooded",
+    "cloak_mantle",
+    "cloak_travel",
     "gloves_fatewoven",
     "gloves_regearamber",
     "gloves_regearastro",
@@ -9991,6 +10016,216 @@
           "start": 0
         }
       ]
+    },
+    "cloak_travel": {
+      "idle": {
+        "id": "860eefee4269c496",
+        "offset": [
+          59,
+          50
+        ],
+        "frameCount": 48
+      },
+      "walk": {
+        "id": "d06a0e95be30d79b",
+        "offset": [
+          54,
+          50
+        ],
+        "frameCount": 64
+      },
+      "attack": {
+        "id": "755070ac18178138",
+        "offset": [
+          58,
+          50
+        ],
+        "frameCount": 64
+      },
+      "hurt": {
+        "id": "18284ae4e7107536",
+        "offset": [
+          57,
+          50
+        ],
+        "frameCount": 32
+      },
+      "die": {
+        "id": "91cde756173fe5b6",
+        "offset": [
+          51,
+          50
+        ],
+        "frameCount": 64
+      }
+    },
+    "cloak_hooded": {
+      "idle": {
+        "id": "4e30eaf30c192bfc",
+        "offset": [
+          56,
+          45
+        ],
+        "frameCount": 48
+      },
+      "walk": {
+        "id": "ce10a33e9edc9593",
+        "offset": [
+          49,
+          47
+        ],
+        "frameCount": 64
+      },
+      "attack": {
+        "id": "1ea16e576aa66ec2",
+        "offset": [
+          55,
+          44
+        ],
+        "frameCount": 64
+      },
+      "hurt": {
+        "id": "12ada979263d9e1c",
+        "offset": [
+          56,
+          42
+        ],
+        "frameCount": 32
+      },
+      "die": {
+        "id": "c82449ffb623d365",
+        "offset": [
+          44,
+          43
+        ],
+        "frameCount": 64
+      }
+    },
+    "cloak_mantle": {
+      "idle": {
+        "id": "dd854bfca7169d88",
+        "offset": [
+          53,
+          50
+        ],
+        "frameCount": 48
+      },
+      "walk": {
+        "id": "bb7d612d80cd1eb2",
+        "offset": [
+          45,
+          50
+        ],
+        "frameCount": 64
+      },
+      "attack": {
+        "id": "34d6e1e64982fdd2",
+        "offset": [
+          51,
+          50
+        ],
+        "frameCount": 64
+      },
+      "hurt": {
+        "id": "9cb31962d4cc3481",
+        "offset": [
+          54,
+          50
+        ],
+        "frameCount": 32
+      },
+      "die": {
+        "id": "e5d05d4a5022eb4b",
+        "offset": [
+          45,
+          50
+        ],
+        "frameCount": 64
+      }
+    },
+    "cloak_clasp": {
+      "idle": {
+        "id": "8f06dc5786094587",
+        "offset": [
+          55,
+          50
+        ],
+        "frameCount": 48
+      },
+      "walk": {
+        "id": "841b4d8fb4a8ebd7",
+        "offset": [
+          48,
+          50
+        ],
+        "frameCount": 64
+      },
+      "attack": {
+        "id": "14b583716561d04d",
+        "offset": [
+          54,
+          50
+        ],
+        "frameCount": 64
+      },
+      "hurt": {
+        "id": "74b50c64c0ef28e5",
+        "offset": [
+          55,
+          50
+        ],
+        "frameCount": 32
+      },
+      "die": {
+        "id": "6af4fd8a6651ecd1",
+        "offset": [
+          51,
+          50
+        ],
+        "frameCount": 64
+      }
+    },
+    "cloak_ember": {
+      "idle": {
+        "id": "0cac1855dce1683b",
+        "offset": [
+          52,
+          50
+        ],
+        "frameCount": 48
+      },
+      "walk": {
+        "id": "a446c066c67abd50",
+        "offset": [
+          45,
+          50
+        ],
+        "frameCount": 64
+      },
+      "attack": {
+        "id": "68302569c8432db7",
+        "offset": [
+          50,
+          50
+        ],
+        "frameCount": 64
+      },
+      "hurt": {
+        "id": "4bcb335f71a7cb25",
+        "offset": [
+          53,
+          50
+        ],
+        "frameCount": 32
+      },
+      "die": {
+        "id": "f9330c4e01c96b1a",
+        "offset": [
+          46,
+          50
+        ],
+        "frameCount": 64
+      }
     }
   },
   "gearSources": {

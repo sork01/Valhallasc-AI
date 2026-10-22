@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the 50-piece orange design manifest, not runtime drops or art."""
+"""Generate the orange design manifest, preserving the fifty original IDs."""
 import json
 from pathlib import Path
 
@@ -54,7 +54,7 @@ def purple_budget(slot, level):
 def rolls(slot, level):
     attack, defense = purple_budget(slot, level)
     bonus = ATTRIBUTE_BONUS[level] * ORANGE_OVER_PURPLE
-    return dict(attack=span(attack * ORANGE_OVER_PURPLE), defense=span(defense * ORANGE_OVER_PURPLE),
+    return dict(attack=[0, 0] if slot == "cloak" else span(attack * ORANGE_OVER_PURPLE), defense=[0, 0] if slot == "cloak" else span(defense * ORANGE_OVER_PURPLE),
                 stamina=span(bonus), accuracy=span(min(bonus, ACCURACY_CAP), ACCURACY_CAP),
                 dexterity=span(min(bonus, DEXTERITY_CAP), DEXTERITY_CAP))
 
@@ -64,7 +64,7 @@ def check_ladder(pieces):
     by_slot = {}
     for piece in pieces:
         level = piece['requiredLevel']
-        attack, defense = purple_budget(piece['slot'], level)
+        attack, defense = (0, 0) if piece['slot'] == 'cloak' else purple_budget(piece['slot'], level)
         assert piece['rolls']['attack'][0] >= round(attack, 1) and piece['rolls']['defense'][0] >= round(defense, 1), piece['id']
         assert piece['rolls']['accuracy'][1] <= ACCURACY_CAP and piece['rolls']['dexterity'][1] <= DEXTERITY_CAP
         by_slot.setdefault(piece['slot'], []).append(piece)
@@ -88,11 +88,16 @@ def build():
                                slot=slot, rarity='legendary', requiredLevel=level, **{'class': None},
                                motif=motif, rolls=rolls(slot, level)))
     assert len(pieces) == 50
+    from cloak_catalog import ORANGE_NAMES
+    for family, (name, _) in enumerate(ORANGE_NAMES):
+        level = FAMILY_LEVELS[family]
+        pieces.append(dict(id=f'orange_cloak_{family+1:02}', name=name, slot='cloak', rarity='legendary',
+                           requiredLevel=level, **{'class':None}, motif=FAMILIES[family][1], rolls=rolls('cloak',level)))
     check_ladder(pieces)
-    assert len({p['name'] for p in pieces}) == 50
+    assert len({p['name'] for p in pieces}) == 60
     return dict(version=1, drop=dict(chancePerKill=0.001, eligible='every mob; a piece is found only by a player at most 5 levels below its requiredLevel',
                                      levelWindow=5,
-                                     selection='uniform across all 50 pieces; one success awards one copy'),
+                                     selection='uniform across all 60 pieces; one success awards one copy'),
                 distribution=dict(method='independent inclusive uniform integer for each listed stat range',
                                   correlations='none', reroll='never; values are owned by the saved copy'),
                 equip=dict(classes='all five', minLevel='the piece requiredLevel'), pieces=pieces)
@@ -101,4 +106,4 @@ def build():
 if __name__ == '__main__':
     path = ROOT / 'world/orange_rules.txt'
     path.write_text(json.dumps(build(), indent=2) + '\n')
-    print(path, '50 pieces')
+    print(path, '60 pieces')

@@ -13,7 +13,8 @@ from make_crag_sprites import api
 ROOT = Path(__file__).resolve().parents[1]
 META = ROOT / 'client/assets/orange.txt'
 ASSETS = ROOT / 'client/assets'
-RULES = json.loads((ROOT / 'world/orange_rules.txt').read_text())['pieces']
+# Cloak animations/icons use make_cloak_sprites.py and retain their own editor records.
+RULES = [p for p in json.loads((ROOT / 'world/orange_rules.txt').read_text())['pieces'] if p['slot'] != 'cloak']
 SIZE = 64
 PALETTES = [('#33191b', '#89512f', '#f2a347', '#ffe39a', '#e7652d'),
             ('#183424', '#426d38', '#84b95b', '#dbf4a2', '#3fa87d'),

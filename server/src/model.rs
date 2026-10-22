@@ -146,6 +146,7 @@ pub struct Look {
     /// their own.
     pub pants: String,
     pub necklace: String,
+    pub cloak: String,
     pub accessory: String,
 }
 /// Variant names of the class-independent pieces, per look field. Keep in step with scripts/generic_gear.py.
@@ -172,6 +173,7 @@ impl Default for Look {
             gloves: "none".into(),
             pants: "none".into(),
             necklace: "none".into(),
+            cloak: "none".into(),
             accessory: "none".into(),
         }
     }
@@ -186,6 +188,7 @@ impl Look {
             &mut self.gloves,
             &mut self.pants,
             &mut self.necklace,
+            &mut self.cloak,
             &mut self.accessory,
         ] {
             *piece = "none".into();
@@ -232,6 +235,7 @@ impl Look {
             || !known(own, "gloves", &self.gloves)
             || !known(None, "pants", &self.pants)
             || !known(None, "necklace", &self.necklace)
+            || !known(None, "cloak", &self.cloak)
             || !known(None, "accessory", &self.accessory)
         {
             return Err("Invalid equipment.");
@@ -504,6 +508,20 @@ impl Character {
             bank: Default::default(),
         };
         c.seed_inventory();
+        if let Some(piece) = crate::items::ITEMS
+            .iter()
+            .filter(|i| {
+                i.kind == "cloak"
+                    && i.rarity == "uncommon"
+                    && i.source.is_none()
+                    && i.required_level <= level
+            })
+            .max_by_key(|i| i.required_level)
+        {
+            c.add_item(&piece.id, 1);
+            c.equipment.insert("cloak".into(), piece.id.clone());
+            c.sync_look();
+        }
         // The best potions the mercenary's level allows: health for everyone, mana for casters.
         if let Some(i) = crate::items::best_tier("health_potion", level) {
             c.add_item(&i.id, 3);
@@ -513,8 +531,8 @@ impl Character {
         {
             c.add_item(&i.id, 3);
         }
-        // The spread an ordinary player gets from "recommended", and no gear: a hired fighter is no better than a hero in
-        // green armour (it used to put 75% of its points into the damage stat, which out-damaged geared players).
+        // Use the player's recommended spread, including the starter equipment and level-appropriate cloak.
+        // The old fixed 75% damage-stat spread out-damaged geared players.
         let _ = c.allocate_recommended();
         c.hp = c.max_hp();
         c.reset_resource();

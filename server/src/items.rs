@@ -2,6 +2,8 @@ use crate::model::{Attributes, Character, Class, GM_NAME};
 use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 
+#[cfg(test)]
+mod cloak_tests;
 mod gear_services;
 pub use gear_services::GearInstance;
 mod orange;
@@ -9,7 +11,7 @@ mod orange;
 pub use orange::roll_orange;
 pub use orange::roll_orange_boosted;
 
-pub const EXTRA_SLOTS: [&str; 7] = [
+pub const EXTRA_SLOTS: [&str; 8] = [
     "headgear",
     "shoulders",
     "pants",
@@ -17,6 +19,7 @@ pub const EXTRA_SLOTS: [&str; 7] = [
     "necklace",
     "accessory1",
     "accessory2",
+    "cloak",
 ];
 
 // Green-gear, even-stat damage calibration from the private kill-time harness. Entries are
@@ -240,7 +243,7 @@ pub fn roll_bag(enemy_level: u32, chance: f64) -> Option<&'static Item> {
     })?
 }
 /// Kinds that are worn (everything in the catalog that is not a material, bag, food or potion).
-pub const GEAR_KINDS: [&str; 8] = [
+pub const GEAR_KINDS: [&str; 9] = [
     "armor",
     "weapon",
     "headgear",
@@ -249,6 +252,7 @@ pub const GEAR_KINDS: [&str; 8] = [
     "pants",
     "necklace",
     "accessory",
+    "cloak",
 ];
 pub fn is_gear(i: &Item) -> bool {
     GEAR_KINDS.contains(&i.kind.as_str())
@@ -576,7 +580,7 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
             || kind == "barrow_threadkeeper"
             || kind == "span_weaver"
         {
-            return &[&["weapon", "pants", "necklace", "accessory"]];
+            return &[&["weapon", "pants", "necklace", "cloak", "accessory"]];
         }
         if kind == "null_hour"
             || kind == "keel_captain"
@@ -592,6 +596,7 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
                     "gloves",
                     "pants",
                     "necklace",
+                    "cloak",
                     "accessory",
                 ],
             ];
@@ -603,7 +608,7 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
             return &[&["headgear", "shoulders", "gloves"]];
         }
         if kind == "elder_matron" {
-            return &[&["weapon", "pants", "necklace"]];
+            return &[&["weapon", "pants", "necklace", "cloak"]];
         }
         if kind == "elder_heart" {
             return &[
@@ -615,6 +620,7 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
                     "gloves",
                     "pants",
                     "necklace",
+                    "cloak",
                     "accessory",
                 ],
             ];
@@ -623,7 +629,7 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
             return &[&["headgear", "shoulders", "gloves"]];
         }
         if kind == "pavilion_weaver" {
-            return &[&["weapon", "pants", "necklace"]];
+            return &[&["weapon", "pants", "necklace", "cloak"]];
         }
         if kind == "pavilion_sovereign" {
             return &[&["armor", "accessory"]];
@@ -632,7 +638,7 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
             return &[&["headgear", "shoulders", "gloves"]];
         }
         if kind == "rain_crown_sibyl" {
-            return &[&["weapon", "pants", "necklace"]];
+            return &[&["weapon", "pants", "necklace", "cloak"]];
         }
         if kind == "rain_crown_sovereign" {
             return &[&["armor", "accessory"]];
@@ -641,7 +647,7 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
             return &[&["headgear", "shoulders", "gloves"]];
         }
         if kind == "seed_germinator" {
-            return &[&["weapon", "pants", "necklace"]];
+            return &[&["weapon", "pants", "necklace", "cloak"]];
         }
         if kind == "seed_worldseed" {
             return &[&["armor", "accessory"]];
@@ -650,7 +656,7 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
             return &[&["headgear", "shoulders", "gloves"]];
         }
         if kind == "astro_navigator" {
-            return &[&["weapon", "pants", "necklace"]];
+            return &[&["weapon", "pants", "necklace", "cloak"]];
         }
         if kind == "astro_axis" {
             return &[&["armor", "accessory"]];
@@ -669,7 +675,7 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
             || kind == "amber_chronicle"
             || kind == "solstice_harbinger"
         {
-            return &[&["weapon", "pants", "necklace"]];
+            return &[&["weapon", "pants", "necklace", "cloak"]];
         }
         if kind == "thunder_heart"
             || kind == "bloom_heart"
@@ -680,7 +686,7 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
             return &[&["armor", "accessory"]];
         }
         if kind == "eye_undertide" {
-            return &[&["weapon", "pants", "necklace"]];
+            return &[&["weapon", "pants", "necklace", "cloak"]];
         }
         if kind == "eye_unblinking" {
             return &[
@@ -692,6 +698,7 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
                     "gloves",
                     "pants",
                     "necklace",
+                    "cloak",
                     "accessory",
                 ],
             ];
@@ -706,13 +713,16 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
                     "gloves",
                     "pants",
                     "necklace",
+                    "cloak",
                     "accessory",
                 ],
             ]
         } else {
             match kind {
                 "bellkeeper" | "pearlwidow" | "chainmarshal" => &[&["headgear", "shoulders"]],
-                "mournsister" | "glasscantor" | "starseraph" => &[&["gloves", "pants", "necklace"]],
+                "mournsister" | "glasscantor" | "starseraph" => {
+                    &[&["gloves", "pants", "necklace", "cloak"]]
+                }
                 "rootabbot" | "relicwarden" | "tidejudicator" => &[&["weapon", "accessory"]],
                 _ => &[],
             }
@@ -731,15 +741,16 @@ pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
                 "gloves",
                 "pants",
                 "necklace",
+                "cloak",
                 "accessory",
             ],
         ],
         "tideglass_heron" => &[&["headgear", "shoulders"]],
         "hourpetal_stag" => &[&["weapon", "pants"]],
-        "moonskein_weaver" => &[&["gloves", "necklace", "accessory"]],
+        "moonskein_weaver" => &[&["gloves", "necklace", "cloak", "accessory"]],
         "moonwell_echo" => &[
             &["armor", "weapon", "headgear"],
-            &["gloves", "pants", "necklace", "accessory"],
+            &["gloves", "pants", "necklace", "cloak", "accessory"],
         ],
         _ => &[],
     }
@@ -985,7 +996,17 @@ impl Character {
     /// Whether `i` beats what this character wears in its slot (attack plus defense; an empty slot loses to any
     /// stat, and for rings the weaker of the two counts). Mercenaries use it to decide whether to need a piece.
     pub fn is_upgrade(&self, i: &Item) -> bool {
-        let score = |x: &Item| x.attack + x.defense;
+        let score = |x: &Item| {
+            x.attack
+                + x.defense
+                + if x.kind == "cloak" {
+                    let a = &x.bonus_stats;
+                    (a.strength + a.agility + a.intellect + a.stamina + a.accuracy + a.dexterity)
+                        as f64
+                } else {
+                    0.
+                }
+        };
         let worn = |slot: &str| {
             self.equipment
                 .get(slot)
@@ -1028,7 +1049,8 @@ impl Character {
             let Some(source) = piece.source.as_deref() else {
                 continue;
             };
-            if !crate::sets::is_set(source)
+            if piece.kind == "cloak"
+                || !crate::sets::is_set(source)
                 || piece.required_level > self.level
                 || piece.class.is_some_and(|class| class != self.look.class)
             {
@@ -1247,11 +1269,13 @@ impl Character {
             .unwrap_or_else(|| "none".into());
         let (head, shoulders, gloves) = (worn("headgear"), worn("shoulders"), worn("gloves"));
         let (pants, necklace) = (worn("pants"), worn("necklace"));
+        let cloak = worn("cloak");
         self.look.head = head;
         self.look.shoulders = shoulders;
         self.look.gloves = gloves;
         self.look.pants = pants;
         self.look.necklace = necklace;
+        self.look.cloak = cloak;
         self.look.accessory = accessory;
     }
     pub fn equip_owned(&mut self, armor: &str, weapon: &str) -> Result<(), &'static str> {
@@ -2505,7 +2529,7 @@ mod tests {
             );
             if let Some(art) = &i.art {
                 // Original fitted sets name dedicated atlases rather than an item variant.
-                if art.starts_with("regear") || art == "fatewoven" {
+                if art.starts_with("regear") || art == "fatewoven" || i.kind == "cloak" {
                     let slot = if i.kind == "headgear" {
                         "head"
                     } else {
@@ -2543,8 +2567,8 @@ mod tests {
                 .collect();
             assert_eq!(
                 pieces.len(),
-                28,
-                "{source}: five class slots and three shared slots"
+                29,
+                "{source}: five class slots, three shared set slots and an outside-set cloak"
             );
             let mut reachable = std::collections::BTreeSet::new();
             for e in crate::cathedral::ENEMIES
@@ -2560,6 +2584,9 @@ mod tests {
                         assert_eq!(i.source.as_deref(), Some(source));
                         assert_eq!(i.rarity, "rare");
                         reachable.insert(i.id.as_str());
+                        if i.kind == "cloak" {
+                            continue;
+                        }
                         let base_id = i.id.replace(
                             &format!("_l{level}_{}", &source[10..]),
                             &format!("_l{level}_blue"),
@@ -2930,8 +2957,8 @@ mod tests {
             .collect();
         assert_eq!(
             vault.len(),
-            28,
-            "every level-20 blue piece the bosses can drop"
+            29,
+            "every level-20 blue piece the bosses can drop, including the cloak"
         );
         for kind in ["green", "big", "hydra", "gloomroot", "hollowking", "thrall"] {
             for n in 0..4000 {

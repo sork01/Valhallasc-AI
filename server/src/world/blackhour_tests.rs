@@ -170,7 +170,7 @@ fn blackhour_data_and_actual_collision() {
         .iter()
         .filter(|i| i.source.as_deref() == Some("blackhour"))
         .collect();
-    assert_eq!(gear.len(), 28);
+    assert_eq!(gear.len(), 29);
     assert!(
         gear.iter()
             .all(|i| i.rarity == "epic" && i.required_level == 99)
@@ -373,6 +373,7 @@ fn blackhour_chests_and_cold_restart_use_epic_equipment() {
         "weapon",
         "pants",
         "necklace",
+        "cloak",
         "accessory",
     ] {
         let i = ITEMS

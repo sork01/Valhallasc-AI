@@ -168,7 +168,7 @@ def finish(i, level, rarity):
 
 def main():
     existing = json.loads(ITEMS.read_text())
-    items = [i for i in existing if 'art' not in i]
+    items = [i for i in existing if 'art' not in i or i.get('source') == 'orange_pool']
     gear = {'armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'}
     out, bases = [], {}
     for i in items:
@@ -191,6 +191,7 @@ def main():
                 add(out, bases, cls, kind, level, rarity)
         for kind in SHARED_KINDS:
             add(out, bases, None, kind, level, rarity)
+    out = [i for i in out if i['kind'] != 'cloak' or i.get('source') == 'orange_pool']
     out.extend(vault_pieces(out))
     out.extend(cathedral_pieces(out))
     out.extend(moonwell_pieces(out))
@@ -209,6 +210,8 @@ def main():
     out.extend(dungeon_pieces(out, 'solar_crucible', 'solar', 'Sunforged', {'hue':34,'saturate':1.35,'brightness':1.22}))
     out.extend(dungeon_pieces(out, 'amber_archive', 'amber', 'Archivist', {'hue':42,'saturate':1.22,'brightness':1.18}))
     out.extend(dungeon_pieces(out, 'silent_solstice', 'solstice', 'Nightglass', {'hue':207,'saturate':1.2,'brightness':1.23}))
+    import cloak_catalog
+    out = cloak_catalog.apply(out)
     # Keep existing catalog order stable: migrations, item-icon cells and reviews need no reshuffle.
     order = {i['id']: n for n, i in enumerate(existing)}
     out.sort(key=lambda i: order.get(i['id'], len(order)))
@@ -663,6 +666,8 @@ def vault_only():
     existing = json.loads(ITEMS.read_text())
     items = [i for i in existing if i.get('source') != 'undervault']
     items.extend(vault_pieces(items))
+    import cloak_catalog
+    items = cloak_catalog.apply(items)
     order = {i['id']: n for n, i in enumerate(existing)}
     items.sort(key=lambda i: order.get(i['id'], len(order)))
     import gear_art_catalog

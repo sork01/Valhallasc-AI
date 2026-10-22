@@ -39,7 +39,7 @@ pub(super) fn opponent_health() -> f64 {
     OPPONENT_HEALTH
 }
 /// The worn slots of a plain level-appropriate set: the equipment slot and the catalog kind that fills it.
-const SLOTS: [(&str, &str); 8] = [
+const SLOTS: [(&str, &str); 10] = [
     ("chest", "armor"),
     ("headgear", "headgear"),
     ("shoulders", "shoulders"),
@@ -47,7 +47,9 @@ const SLOTS: [(&str, &str); 8] = [
     ("hands", "weapon"),
     ("pants", "pants"),
     ("necklace", "necklace"),
+    ("cloak", "cloak"),
     ("accessory1", "accessory"),
+    ("accessory2", "accessory"),
 ];
 
 pub(super) struct Run {
@@ -75,6 +77,11 @@ fn green_gear(class: Class, level: u32) -> Vec<(&'static str, String)> {
     SLOTS
         .iter()
         .filter_map(|&(slot, kind)| {
+            let want = if kind == "cloak" && level >= 99 {
+                99
+            } else {
+                want
+            };
             let pieces: Vec<&Item> = ITEMS
                 .iter()
                 .filter(|i| {

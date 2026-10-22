@@ -223,6 +223,7 @@
 .equipped-slot[data-slot="gloves"] { grid-area: 2 / 3; }
 .equipped-slot[data-slot="accessory1"] { grid-area: 3 / 3; }
 .equipped-slot[data-slot="accessory2"] { grid-area: 4 / 3; }
+.equipped-slot[data-slot="cloak"] { grid-area: 5 / 1; }
 .equipped-slot[data-slot="hands"] { grid-area: 5 / 2; }
 .gear-icon, .item-tile { display: block; position: relative; width: 100%; height: 100%; border: 2px solid #a88e5e; border-radius: 3px; padding: .25cqw; background: radial-gradient(ellipse at 40% 25%, #43412f, #111515 83%); color: #e1d6bf; box-shadow: inset 0 0 0 1px #000c, inset 0 0 1cqw #0006; cursor: pointer; }
 .gear-icon { width: 3.25cqw; height: 3.25cqw; margin: 0 auto; }

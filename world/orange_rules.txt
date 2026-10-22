@@ -4,7 +4,7 @@
     "chancePerKill": 0.001,
     "eligible": "every mob; a piece is found only by a player at most 5 levels below its requiredLevel",
     "levelWindow": 5,
-    "selection": "uniform across all 50 pieces; one success awards one copy"
+    "selection": "uniform across all 60 pieces; one success awards one copy"
   },
   "distribution": {
     "method": "independent inclusive uniform integer for each listed stat range",
@@ -1551,6 +1551,316 @@
         "defense": [
           26,
           28
+        ],
+        "stamina": [
+          129,
+          139
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "orange_cloak_01",
+      "name": "Ember Sovereign Cloak",
+      "slot": "cloak",
+      "rarity": "legendary",
+      "requiredLevel": 10,
+      "class": null,
+      "motif": "flame-forged brass and black coal",
+      "rolls": {
+        "attack": [
+          0,
+          0
+        ],
+        "defense": [
+          0,
+          0
+        ],
+        "stamina": [
+          3,
+          4
+        ],
+        "accuracy": [
+          3,
+          4
+        ],
+        "dexterity": [
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "id": "orange_cloak_02",
+      "name": "Verdant Crown Cloak",
+      "slot": "cloak",
+      "rarity": "legendary",
+      "requiredLevel": 20,
+      "class": null,
+      "motif": "living root and emerald leaf",
+      "rolls": {
+        "attack": [
+          0,
+          0
+        ],
+        "defense": [
+          0,
+          0
+        ],
+        "stamina": [
+          8,
+          9
+        ],
+        "accuracy": [
+          8,
+          9
+        ],
+        "dexterity": [
+          8,
+          9
+        ]
+      }
+    },
+    {
+      "id": "orange_cloak_03",
+      "name": "Storm Oracle Cloak",
+      "slot": "cloak",
+      "rarity": "legendary",
+      "requiredLevel": 30,
+      "class": null,
+      "motif": "forked lightning and cloud silver",
+      "rolls": {
+        "attack": [
+          0,
+          0
+        ],
+        "defense": [
+          0,
+          0
+        ],
+        "stamina": [
+          17,
+          18
+        ],
+        "accuracy": [
+          17,
+          18
+        ],
+        "dexterity": [
+          17,
+          18
+        ]
+      }
+    },
+    {
+      "id": "orange_cloak_04",
+      "name": "Abyss Singer Cloak",
+      "slot": "cloak",
+      "rarity": "legendary",
+      "requiredLevel": 40,
+      "class": null,
+      "motif": "deep blue shell and singing pearl",
+      "rolls": {
+        "attack": [
+          0,
+          0
+        ],
+        "defense": [
+          0,
+          0
+        ],
+        "stamina": [
+          34,
+          37
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          34,
+          37
+        ]
+      }
+    },
+    {
+      "id": "orange_cloak_05",
+      "name": "Starforged Cloak",
+      "slot": "cloak",
+      "rarity": "legendary",
+      "requiredLevel": 50,
+      "class": null,
+      "motif": "dark iron with moving constellations",
+      "rolls": {
+        "attack": [
+          0,
+          0
+        ],
+        "defense": [
+          0,
+          0
+        ],
+        "stamina": [
+          45,
+          49
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          45,
+          49
+        ]
+      }
+    },
+    {
+      "id": "orange_cloak_06",
+      "name": "Solar Regent Cloak",
+      "slot": "cloak",
+      "rarity": "legendary",
+      "requiredLevel": 60,
+      "class": null,
+      "motif": "white gold and sunburst rays",
+      "rolls": {
+        "attack": [
+          0,
+          0
+        ],
+        "defense": [
+          0,
+          0
+        ],
+        "stamina": [
+          62,
+          67
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          62,
+          67
+        ]
+      }
+    },
+    {
+      "id": "orange_cloak_07",
+      "name": "Ash Phoenix Cloak",
+      "slot": "cloak",
+      "rarity": "legendary",
+      "requiredLevel": 70,
+      "class": null,
+      "motif": "charred feather and glowing cinder",
+      "rolls": {
+        "attack": [
+          0,
+          0
+        ],
+        "defense": [
+          0,
+          0
+        ],
+        "stamina": [
+          79,
+          86
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "orange_cloak_08",
+      "name": "Moonlit Sentinel Cloak",
+      "slot": "cloak",
+      "rarity": "legendary",
+      "requiredLevel": 80,
+      "class": null,
+      "motif": "pale glass and crescent silver",
+      "rolls": {
+        "attack": [
+          0,
+          0
+        ],
+        "defense": [
+          0,
+          0
+        ],
+        "stamina": [
+          96,
+          104
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "orange_cloak_09",
+      "name": "Chronometer Cloak",
+      "slot": "cloak",
+      "rarity": "legendary",
+      "requiredLevel": 90,
+      "class": null,
+      "motif": "bronze gears and amber hourglass",
+      "rolls": {
+        "attack": [
+          0,
+          0
+        ],
+        "defense": [
+          0,
+          0
+        ],
+        "stamina": [
+          113,
+          122
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "orange_cloak_10",
+      "name": "Worldheart Cloak",
+      "slot": "cloak",
+      "rarity": "legendary",
+      "requiredLevel": 99,
+      "class": null,
+      "motif": "ancient bark and sap crystal",
+      "rolls": {
+        "attack": [
+          0,
+          0
+        ],
+        "defense": [
+          0,
+          0
         ],
         "stamina": [
           129,

@@ -3,7 +3,7 @@
 // ids, and draws whatever the last `bank` answer said. It never edits its own copy of the bank.
 (() => {
   const $ = id => document.getElementById(id);
-  const GEAR = new Set(['armor', 'weapon', 'headgear', 'shoulders', 'pants', 'gloves', 'necklace', 'accessory']);
+  const GEAR = new Set(['armor', 'weapon', 'headgear', 'shoulders', 'pants', 'gloves', 'necklace', 'accessory', 'cloak']);
   const dragType = 'application/x-valhallasc-bank';
   const RANGE = 2.8 + .4;      // the server's reach plus a margin, so a rounding difference never closes the window
   const MOST_GOLD = 4294967295;

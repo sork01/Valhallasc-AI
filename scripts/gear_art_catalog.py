@@ -19,7 +19,7 @@ def jobs():
     manifest = json.loads(MANIFEST.read_text())
     state = {t['id']: t for path in (STATE, HIGH_STATE, DUNGEON_STATE, INSTANCE_STATE, NORNROOT_STATE) if path.exists()
              for t in json.loads(path.read_text())['tasks']}
-    return [(state[key], record) for key, record in manifest.items() if record.get('files')]
+    return [(state[key], record) for key, record in manifest.items() if record.get('files') and key in state]
 
 
 def matches(item, task):
@@ -79,6 +79,9 @@ def append_icons(refresh_base=False):
     meta = {**original, 'rows': rows, 'at': at, 'progressionSprites': {task['id']: record['icon']['id'] for task, record in completed if record['icon'].get('id')}}
     (ASSETS / 'items.txt').write_text(json.dumps(meta, indent=1) + '\n')
     (ROOT / 'client/itemicons.js').write_text("'use strict';\n// Original equipment icons plus individually exported progression gear.\nwindow.ITEM_ICONS = " + json.dumps(dict(size=size, cols=cols, rows=rows, at=at), separators=(',', ':')) + ';\n')
+
+    import cloak_catalog
+    cloak_catalog.append_icons()
 
 
 def wire():

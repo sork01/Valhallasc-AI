@@ -59,7 +59,7 @@ fn nornroot_data_and_actual_collision_are_reachable() {
             .iter()
             .filter(|i| i.source.as_deref() == Some("nornroot"))
             .count(),
-        28
+        29
     );
     let quests: Vec<_> = w.maps[WYRD]
         .quests
@@ -213,6 +213,7 @@ fn nornroot_fatewoven_set_heals_only_its_wearer_and_has_a_timer() {
         "weapon",
         "pants",
         "necklace",
+        "cloak",
         "accessory",
     ] {
         let piece = ITEMS

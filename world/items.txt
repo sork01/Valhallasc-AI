@@ -53812,6 +53812,2165 @@
     "sell": 14000
   },
   {
+    "id": "hour_shard_bloom",
+    "name": "Shard of the Bloomed Hour",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "hour_shard_solar",
+    "name": "Shard of the Solar Hour",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "hour_shard_amber",
+    "name": "Shard of the Amber Hour",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "hour_shard_silent",
+    "name": "Shard of the Silent Hour",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "cloak_l5_common",
+    "name": "Weathered Travel Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 5,
+    "sell": 6,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l5_common",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 1
+    },
+    "family": "cloak_common",
+    "price": 24,
+    "tint": {
+      "hue": 13,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l5_uncommon",
+    "name": "Sturdy Travel Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 5,
+    "sell": 40,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l5_uncommon",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 1
+    },
+    "family": "cloak_uncommon",
+    "price": 160,
+    "tint": {
+      "hue": 36,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l5_rare",
+    "name": "Gilded Travel Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 5,
+    "sell": 96,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l5_rare",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "accuracy": 1
+    },
+    "tint": {
+      "hue": 59,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 384
+  },
+  {
+    "id": "cloak_l10_common",
+    "name": "Ashen Travel Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 10,
+    "sell": 10,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l10_common",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 2
+    },
+    "family": "cloak_common",
+    "price": 40,
+    "tint": {
+      "hue": 60,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l10_uncommon",
+    "name": "Emberwoven Travel Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 10,
+    "sell": 60,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l10_uncommon",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 3
+    },
+    "family": "cloak_uncommon",
+    "price": 240,
+    "tint": {
+      "hue": 83,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l10_rare",
+    "name": "Runed Travel Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 10,
+    "sell": 144,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l10_rare",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "accuracy": 3
+    },
+    "tint": {
+      "hue": 106,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 576
+  },
+  {
+    "id": "cloak_l10_epic",
+    "name": "Sovereign Travel Cloak",
+    "kind": "cloak",
+    "rarity": "epic",
+    "requiredLevel": 10,
+    "sell": 288,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l10_epic",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "accuracy": 3,
+      "dexterity": 3
+    },
+    "tint": {
+      "hue": 129,
+      "saturate": 1.4,
+      "brightness": 1.24
+    }
+  },
+  {
+    "id": "cloak_l15_common",
+    "name": "Frostworn Travel Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 15,
+    "sell": 13,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l15_common",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 4
+    },
+    "family": "cloak_common",
+    "price": 52,
+    "tint": {
+      "hue": 107,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l15_uncommon",
+    "name": "Winterguard Travel Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 15,
+    "sell": 80,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l15_uncommon",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 4
+    },
+    "family": "cloak_uncommon",
+    "price": 320,
+    "tint": {
+      "hue": 130,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l15_rare",
+    "name": "Icebound Travel Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 15,
+    "sell": 192,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l15_rare",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "accuracy": 5
+    },
+    "tint": {
+      "hue": 153,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 768
+  },
+  {
+    "id": "cloak_l20_common",
+    "name": "Bogworn Travel Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 20,
+    "sell": 16,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l20_common",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 5
+    },
+    "family": "cloak_common",
+    "price": 64,
+    "tint": {
+      "hue": 154,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l20_uncommon",
+    "name": "Mosswoven Travel Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 20,
+    "sell": 100,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l20_uncommon",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 6
+    },
+    "family": "cloak_uncommon",
+    "price": 400,
+    "tint": {
+      "hue": 177,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l20_rare",
+    "name": "Moonlit Travel Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 240,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l20_rare",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "dexterity": 7
+    },
+    "tint": {
+      "hue": 200,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 960
+  },
+  {
+    "id": "cloak_l20_epic",
+    "name": "Mythic Travel Cloak",
+    "kind": "cloak",
+    "rarity": "epic",
+    "requiredLevel": 20,
+    "sell": 480,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l20_epic",
+    "art": "travel",
+    "starter": false,
+    "bonusStats": {
+      "accuracy": 7,
+      "dexterity": 7
+    },
+    "tint": {
+      "hue": 223,
+      "saturate": 1.4,
+      "brightness": 1.24
+    }
+  },
+  {
+    "id": "cloak_l25_common",
+    "name": "Brambleworn Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 25,
+    "sell": 19,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l25_common",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 7
+    },
+    "family": "cloak_common",
+    "price": 76,
+    "tint": {
+      "hue": 201,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l25_uncommon",
+    "name": "Thornwoven Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 25,
+    "sell": 120,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l25_uncommon",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 9
+    },
+    "family": "cloak_uncommon",
+    "price": 480,
+    "tint": {
+      "hue": 224,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l25_rare",
+    "name": "Fatebound Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 288,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l25_rare",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "accuracy": 10
+    },
+    "tint": {
+      "hue": 247,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 1152
+  },
+  {
+    "id": "cloak_l30_common",
+    "name": "Windworn Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 30,
+    "sell": 22,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l30_common",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 11
+    },
+    "family": "cloak_common",
+    "price": 88,
+    "tint": {
+      "hue": 248,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l30_uncommon",
+    "name": "Galesworn Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 30,
+    "sell": 140,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l30_uncommon",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 13
+    },
+    "family": "cloak_uncommon",
+    "price": 560,
+    "tint": {
+      "hue": 271,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l30_rare",
+    "name": "Prismatic Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 336,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l30_rare",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "dexterity": 15
+    },
+    "tint": {
+      "hue": 294,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 1344
+  },
+  {
+    "id": "cloak_l30_epic",
+    "name": "Stormcrowned Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "epic",
+    "requiredLevel": 30,
+    "sell": 672,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l30_epic",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 15,
+      "dexterity": 15
+    },
+    "tint": {
+      "hue": 317,
+      "saturate": 1.4,
+      "brightness": 1.24
+    }
+  },
+  {
+    "id": "cloak_l35_common",
+    "name": "Saltworn Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 35,
+    "sell": 26,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l35_common",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 14
+    },
+    "family": "cloak_common",
+    "price": 104,
+    "tint": {
+      "hue": 295,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l35_uncommon",
+    "name": "Tidewoven Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 35,
+    "sell": 160,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l35_uncommon",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 17
+    },
+    "family": "cloak_uncommon",
+    "price": 640,
+    "tint": {
+      "hue": 318,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l35_rare",
+    "name": "Maelstrom Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 384,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l35_rare",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "dexterity": 20
+    },
+    "tint": {
+      "hue": 341,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 1536
+  },
+  {
+    "id": "cloak_l40_common",
+    "name": "Drowned Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 40,
+    "sell": 29,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l40_common",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 22
+    },
+    "family": "cloak_common",
+    "price": 116,
+    "tint": {
+      "hue": 342,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l40_uncommon",
+    "name": "Pearlbound Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 40,
+    "sell": 180,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l40_uncommon",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 26
+    },
+    "family": "cloak_uncommon",
+    "price": 720,
+    "tint": {
+      "hue": 5,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l40_rare",
+    "name": "Nacreous Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 40,
+    "sell": 432,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l40_rare",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 30
+    },
+    "tint": {
+      "hue": 28,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 1728
+  },
+  {
+    "id": "cloak_l40_epic",
+    "name": "Tidesovereign Hooded Cloak",
+    "kind": "cloak",
+    "rarity": "epic",
+    "requiredLevel": 40,
+    "sell": 864,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l40_epic",
+    "art": "hooded",
+    "starter": false,
+    "bonusStats": {
+      "dexterity": 30,
+      "stamina": 30
+    },
+    "tint": {
+      "hue": 51,
+      "saturate": 1.4,
+      "brightness": 1.24
+    }
+  },
+  {
+    "id": "cloak_l45_common",
+    "name": "Coralworn Long Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 45,
+    "sell": 32,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l45_common",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 25
+    },
+    "family": "cloak_common",
+    "price": 128,
+    "tint": {
+      "hue": 29,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l45_uncommon",
+    "name": "Reefguard Long Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 45,
+    "sell": 200,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l45_uncommon",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 30
+    },
+    "family": "cloak_uncommon",
+    "price": 800,
+    "tint": {
+      "hue": 52,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l45_rare",
+    "name": "Abyssal Long Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 45,
+    "sell": 480,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l45_rare",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "dexterity": 35
+    },
+    "tint": {
+      "hue": 75,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 1920
+  },
+  {
+    "id": "cloak_l50_common",
+    "name": "Timeworn Long Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 50,
+    "sell": 35,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l50_common",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 29
+    },
+    "family": "cloak_common",
+    "price": 140,
+    "tint": {
+      "hue": 76,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l50_uncommon",
+    "name": "Starwoven Long Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 50,
+    "sell": 220,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l50_uncommon",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 34
+    },
+    "family": "cloak_uncommon",
+    "price": 880,
+    "tint": {
+      "hue": 99,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l50_rare",
+    "name": "Empyrean Long Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 50,
+    "sell": 528,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l50_rare",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 40
+    },
+    "tint": {
+      "hue": 122,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 2112
+  },
+  {
+    "id": "cloak_l50_epic",
+    "name": "Ascendant Long Cloak",
+    "kind": "cloak",
+    "rarity": "epic",
+    "requiredLevel": 50,
+    "sell": 1056,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l50_epic",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "dexterity": 40,
+      "stamina": 40
+    },
+    "tint": {
+      "hue": 145,
+      "saturate": 1.4,
+      "brightness": 1.24
+    }
+  },
+  {
+    "id": "cloak_l55_common",
+    "name": "Clockworn Long Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 55,
+    "sell": 38,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l55_common",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 35
+    },
+    "family": "cloak_common",
+    "price": 152,
+    "tint": {
+      "hue": 123,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l55_uncommon",
+    "name": "Hourwoven Long Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 55,
+    "sell": 240,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l55_uncommon",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 41
+    },
+    "family": "cloak_uncommon",
+    "price": 960,
+    "tint": {
+      "hue": 146,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l55_rare",
+    "name": "Epochbound Long Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 55,
+    "sell": 576,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l55_rare",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 48
+    },
+    "tint": {
+      "hue": 169,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 2304
+  },
+  {
+    "id": "cloak_l60_common",
+    "name": "Sporeworn Long Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 60,
+    "sell": 42,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l60_common",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 40
+    },
+    "family": "cloak_common",
+    "price": 168,
+    "tint": {
+      "hue": 170,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l60_uncommon",
+    "name": "Moonwoven Long Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 60,
+    "sell": 260,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l60_uncommon",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 47
+    },
+    "family": "cloak_uncommon",
+    "price": 1040,
+    "tint": {
+      "hue": 193,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l60_rare",
+    "name": "Nightbloom Long Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 624,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l60_rare",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "dexterity": 55
+    },
+    "tint": {
+      "hue": 216,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 2496
+  },
+  {
+    "id": "cloak_l60_epic",
+    "name": "Mooncrowned Long Cloak",
+    "kind": "cloak",
+    "rarity": "epic",
+    "requiredLevel": 60,
+    "sell": 1248,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l60_epic",
+    "art": "mantle",
+    "starter": false,
+    "bonusStats": {
+      "dexterity": 55,
+      "stamina": 55
+    },
+    "tint": {
+      "hue": 239,
+      "saturate": 1.4,
+      "brightness": 1.24
+    }
+  },
+  {
+    "id": "cloak_l65_common",
+    "name": "Brineworn Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 65,
+    "sell": 45,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l65_common",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 46
+    },
+    "family": "cloak_common",
+    "price": 180,
+    "tint": {
+      "hue": 217,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l65_uncommon",
+    "name": "Stormwoven Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 65,
+    "sell": 280,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l65_uncommon",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 54
+    },
+    "family": "cloak_uncommon",
+    "price": 1120,
+    "tint": {
+      "hue": 240,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l65_rare",
+    "name": "Eye-bound Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 672,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l65_rare",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 63
+    },
+    "tint": {
+      "hue": 263,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 2688
+  },
+  {
+    "id": "cloak_l70_common",
+    "name": "Fieldworn Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 70,
+    "sell": 48,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l70_common",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 51
+    },
+    "family": "cloak_common",
+    "price": 192,
+    "tint": {
+      "hue": 264,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l70_uncommon",
+    "name": "Oakbound Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 70,
+    "sell": 300,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l70_uncommon",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 60
+    },
+    "family": "cloak_uncommon",
+    "price": 1200,
+    "tint": {
+      "hue": 287,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l70_rare",
+    "name": "Sunward Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 720,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l70_rare",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "dexterity": 70
+    },
+    "tint": {
+      "hue": 310,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 2880
+  },
+  {
+    "id": "cloak_l70_epic",
+    "name": "Elder-crowned Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "epic",
+    "requiredLevel": 70,
+    "sell": 1440,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l70_epic",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 70,
+      "dexterity": 70
+    },
+    "tint": {
+      "hue": 333,
+      "saturate": 1.4,
+      "brightness": 1.24
+    }
+  },
+  {
+    "id": "cloak_l75_common",
+    "name": "Paradeworn Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 75,
+    "sell": 51,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l75_common",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 56
+    },
+    "family": "cloak_common",
+    "price": 204,
+    "tint": {
+      "hue": 311,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l75_uncommon",
+    "name": "Ribbonbound Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 75,
+    "sell": 320,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l75_uncommon",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 66
+    },
+    "family": "cloak_uncommon",
+    "price": 1280,
+    "tint": {
+      "hue": 334,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l75_rare",
+    "name": "Jubilee Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 768,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l75_rare",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "agility": 78
+    },
+    "tint": {
+      "hue": 357,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 3072
+  },
+  {
+    "id": "cloak_l80_common",
+    "name": "Rootworn Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 80,
+    "sell": 54,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l80_common",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 62
+    },
+    "family": "cloak_common",
+    "price": 216,
+    "tint": {
+      "hue": 358,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l80_uncommon",
+    "name": "Canopybound Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 80,
+    "sell": 340,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l80_uncommon",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 72
+    },
+    "family": "cloak_uncommon",
+    "price": 1360,
+    "tint": {
+      "hue": 21,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l80_rare",
+    "name": "Raincrowned Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 816,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l80_rare",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "strength": 85
+    },
+    "tint": {
+      "hue": 44,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 3264
+  },
+  {
+    "id": "cloak_l80_epic",
+    "name": "Jade Sovereign Clasped Cloak",
+    "kind": "cloak",
+    "rarity": "epic",
+    "requiredLevel": 80,
+    "sell": 1632,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l80_epic",
+    "art": "clasp",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 85,
+      "agility": 85
+    },
+    "tint": {
+      "hue": 67,
+      "saturate": 1.4,
+      "brightness": 1.24
+    }
+  },
+  {
+    "id": "cloak_l85_common",
+    "name": "Sandworn Ember Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 85,
+    "sell": 58,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l85_common",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 67
+    },
+    "family": "cloak_common",
+    "price": 232,
+    "tint": {
+      "hue": 45,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l85_uncommon",
+    "name": "Oasisbound Ember Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 85,
+    "sell": 360,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l85_uncommon",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 79
+    },
+    "family": "cloak_uncommon",
+    "price": 1440,
+    "tint": {
+      "hue": 68,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l85_rare",
+    "name": "Astrolabe Ember Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 864,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l85_rare",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 93
+    },
+    "tint": {
+      "hue": 91,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 3456
+  },
+  {
+    "id": "cloak_l90_common",
+    "name": "Snowworn Ember Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 90,
+    "sell": 61,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l90_common",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 72
+    },
+    "family": "cloak_common",
+    "price": 244,
+    "tint": {
+      "hue": 92,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l90_uncommon",
+    "name": "Riftwoven Ember Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 90,
+    "sell": 380,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l90_uncommon",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 85
+    },
+    "family": "cloak_uncommon",
+    "price": 1520,
+    "tint": {
+      "hue": 115,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l90_rare",
+    "name": "Aurorabound Ember Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 90,
+    "sell": 912,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l90_rare",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "strength": 100
+    },
+    "tint": {
+      "hue": 138,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 3648
+  },
+  {
+    "id": "cloak_l90_epic",
+    "name": "Glacier Sovereign Ember Cloak",
+    "kind": "cloak",
+    "rarity": "epic",
+    "requiredLevel": 90,
+    "sell": 1824,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l90_epic",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 100,
+      "strength": 100
+    },
+    "tint": {
+      "hue": 161,
+      "saturate": 1.4,
+      "brightness": 1.24
+    }
+  },
+  {
+    "id": "cloak_l95_common",
+    "name": "Stoneworn Ember Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 95,
+    "sell": 64,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l95_common",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 78
+    },
+    "family": "cloak_common",
+    "price": 256,
+    "tint": {
+      "hue": 139,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l95_uncommon",
+    "name": "Cairnwoven Ember Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 95,
+    "sell": 400,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l95_uncommon",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 92
+    },
+    "family": "cloak_uncommon",
+    "price": 1600,
+    "tint": {
+      "hue": 162,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l95_rare",
+    "name": "Thunderbound Ember Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 960,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l95_rare",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 108
+    },
+    "tint": {
+      "hue": 185,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 3840
+  },
+  {
+    "id": "cloak_l99_common",
+    "name": "Seasonworn Ember Cloak",
+    "kind": "cloak",
+    "rarity": "common",
+    "requiredLevel": 99,
+    "sell": 67,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l99_common",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 83
+    },
+    "family": "cloak_common",
+    "price": 268,
+    "tint": {
+      "hue": 186,
+      "saturate": 0.45,
+      "brightness": 0.82
+    }
+  },
+  {
+    "id": "cloak_l99_uncommon",
+    "name": "Yearwoven Ember Cloak",
+    "kind": "cloak",
+    "rarity": "uncommon",
+    "requiredLevel": 99,
+    "sell": 416,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l99_uncommon",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 97
+    },
+    "family": "cloak_uncommon",
+    "price": 1664,
+    "tint": {
+      "hue": 209,
+      "saturate": 0.9,
+      "brightness": 1
+    }
+  },
+  {
+    "id": "cloak_l99_rare",
+    "name": "Everlasting Ember Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 99,
+    "sell": 998,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l99_rare",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "agility": 114
+    },
+    "tint": {
+      "hue": 232,
+      "saturate": 1.2,
+      "brightness": 1.12
+    },
+    "family": "cloak_rare",
+    "price": 3992
+  },
+  {
+    "id": "cloak_l99_epic",
+    "name": "Worldcrowned Ember Cloak",
+    "kind": "cloak",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 1997,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_l99_epic",
+    "art": "ember",
+    "starter": false,
+    "bonusStats": {
+      "stamina": 114,
+      "strength": 114
+    },
+    "tint": {
+      "hue": 255,
+      "saturate": 1.4,
+      "brightness": 1.24
+    }
+  },
+  {
+    "id": "cloak_undervault",
+    "name": "Choirbone Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 20,
+    "sell": 276,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_undervault",
+    "art": "travel",
+    "starter": false,
+    "source": "undervault",
+    "bonusStats": {
+      "accuracy": 7
+    },
+    "tint": {
+      "hue": 19,
+      "saturate": 1.28,
+      "brightness": 1.15
+    }
+  },
+  {
+    "id": "cloak_cathedral_cloister",
+    "name": "Stillwater Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 40,
+    "sell": 497,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_cathedral_cloister",
+    "art": "hooded",
+    "starter": false,
+    "source": "cathedral_cloister",
+    "bonusStats": {
+      "stamina": 30
+    },
+    "tint": {
+      "hue": 56,
+      "saturate": 1.28,
+      "brightness": 1.1529999999999998
+    }
+  },
+  {
+    "id": "cloak_cathedral_reliquary",
+    "name": "Pearl Widow Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 45,
+    "sell": 552,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_cathedral_reliquary",
+    "art": "mantle",
+    "starter": false,
+    "source": "cathedral_reliquary",
+    "bonusStats": {
+      "dexterity": 35
+    },
+    "tint": {
+      "hue": 93,
+      "saturate": 1.28,
+      "brightness": 1.156
+    }
+  },
+  {
+    "id": "cloak_cathedral_nave",
+    "name": "Hierophant Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 50,
+    "sell": 607,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_cathedral_nave",
+    "art": "mantle",
+    "starter": false,
+    "source": "cathedral_nave",
+    "bonusStats": {
+      "stamina": 40
+    },
+    "tint": {
+      "hue": 130,
+      "saturate": 1.28,
+      "brightness": 1.1589999999999998
+    }
+  },
+  {
+    "id": "cloak_moonwell",
+    "name": "Lunar Tide Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 60,
+    "sell": 718,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_moonwell",
+    "art": "mantle",
+    "starter": false,
+    "source": "moonwell",
+    "bonusStats": {
+      "dexterity": 55
+    },
+    "tint": {
+      "hue": 167,
+      "saturate": 1.28,
+      "brightness": 1.162
+    }
+  },
+  {
+    "id": "cloak_eye_below",
+    "name": "Watchful Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 65,
+    "sell": 773,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_eye_below",
+    "art": "clasp",
+    "starter": false,
+    "source": "eye_below",
+    "bonusStats": {
+      "stamina": 63
+    },
+    "tint": {
+      "hue": 204,
+      "saturate": 1.28,
+      "brightness": 1.1649999999999998
+    }
+  },
+  {
+    "id": "cloak_elder_hollow",
+    "name": "Elderwood Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 70,
+    "sell": 828,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_elder_hollow",
+    "art": "clasp",
+    "starter": false,
+    "source": "elder_hollow",
+    "bonusStats": {
+      "stamina": 70
+    },
+    "tint": {
+      "hue": 241,
+      "saturate": 1.28,
+      "brightness": 1.168
+    }
+  },
+  {
+    "id": "cloak_thousandfold",
+    "name": "Thousandfold Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 75,
+    "sell": 883,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_thousandfold",
+    "art": "clasp",
+    "starter": false,
+    "source": "thousandfold",
+    "bonusStats": {
+      "stamina": 78
+    },
+    "tint": {
+      "hue": 278,
+      "saturate": 1.28,
+      "brightness": 1.1709999999999998
+    }
+  },
+  {
+    "id": "cloak_rain_crown",
+    "name": "Rain Crown Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_rain_crown",
+    "art": "clasp",
+    "starter": false,
+    "source": "rain_crown",
+    "bonusStats": {
+      "agility": 85
+    },
+    "tint": {
+      "hue": 315,
+      "saturate": 1.28,
+      "brightness": 1.174
+    }
+  },
+  {
+    "id": "cloak_seed_vault",
+    "name": "Seedkeeper Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 80,
+    "sell": 938,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_seed_vault",
+    "art": "clasp",
+    "starter": false,
+    "source": "seed_vault",
+    "bonusStats": {
+      "stamina": 85
+    },
+    "tint": {
+      "hue": 352,
+      "saturate": 1.28,
+      "brightness": 1.1769999999999998
+    }
+  },
+  {
+    "id": "cloak_sunken_astrolabe",
+    "name": "Sunken Star Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 85,
+    "sell": 994,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_sunken_astrolabe",
+    "art": "ember",
+    "starter": false,
+    "source": "sunken_astrolabe",
+    "bonusStats": {
+      "agility": 93
+    },
+    "tint": {
+      "hue": 29,
+      "saturate": 1.28,
+      "brightness": 1.18
+    }
+  },
+  {
+    "id": "cloak_skybridge",
+    "name": "Spanbound Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 30,
+    "sell": 386,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_skybridge",
+    "art": "hooded",
+    "starter": false,
+    "source": "skybridge",
+    "bonusStats": {
+      "stamina": 15
+    },
+    "tint": {
+      "hue": 66,
+      "saturate": 1.28,
+      "brightness": 1.1829999999999998
+    }
+  },
+  {
+    "id": "cloak_nornroot",
+    "name": "Fatewoven Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 25,
+    "sell": 331,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_nornroot",
+    "art": "hooded",
+    "starter": false,
+    "source": "nornroot",
+    "bonusStats": {
+      "stamina": 10
+    },
+    "tint": {
+      "hue": 103,
+      "saturate": 1.28,
+      "brightness": 1.186
+    }
+  },
+  {
+    "id": "cloak_longship",
+    "name": "Keelbound Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 35,
+    "sell": 442,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_longship",
+    "art": "hooded",
+    "starter": false,
+    "source": "longship",
+    "bonusStats": {
+      "dexterity": 20
+    },
+    "tint": {
+      "hue": 140,
+      "saturate": 1.28,
+      "brightness": 1.1889999999999998
+    }
+  },
+  {
+    "id": "cloak_blackhour",
+    "name": "Nullforged Cloak",
+    "kind": "cloak",
+    "rarity": "epic",
+    "requiredLevel": 99,
+    "sell": 2208,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_blackhour",
+    "art": "ember",
+    "starter": false,
+    "source": "blackhour",
+    "bonusStats": {
+      "agility": 108,
+      "stamina": 108
+    },
+    "tint": {
+      "hue": 177,
+      "saturate": 1.28,
+      "brightness": 1.192
+    }
+  },
+  {
+    "id": "cloak_thunderheart_gate",
+    "name": "Stormbound Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_thunderheart_gate",
+    "art": "ember",
+    "starter": false,
+    "source": "thunderheart_gate",
+    "bonusStats": {
+      "strength": 108
+    },
+    "tint": {
+      "hue": 214,
+      "saturate": 1.28,
+      "brightness": 1.1949999999999998
+    }
+  },
+  {
+    "id": "cloak_blooming_labyrinth",
+    "name": "Glassbloom Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_blooming_labyrinth",
+    "art": "ember",
+    "starter": false,
+    "source": "blooming_labyrinth",
+    "bonusStats": {
+      "stamina": 108
+    },
+    "tint": {
+      "hue": 251,
+      "saturate": 1.28,
+      "brightness": 1.198
+    }
+  },
+  {
+    "id": "cloak_solar_crucible",
+    "name": "Sunforged Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_solar_crucible",
+    "art": "ember",
+    "starter": false,
+    "source": "solar_crucible",
+    "bonusStats": {
+      "strength": 108
+    },
+    "tint": {
+      "hue": 288,
+      "saturate": 1.28,
+      "brightness": 1.2009999999999998
+    }
+  },
+  {
+    "id": "cloak_amber_archive",
+    "name": "Archivist Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_amber_archive",
+    "art": "ember",
+    "starter": false,
+    "source": "amber_archive",
+    "bonusStats": {
+      "stamina": 108
+    },
+    "tint": {
+      "hue": 325,
+      "saturate": 1.28,
+      "brightness": 1.204
+    }
+  },
+  {
+    "id": "cloak_silent_solstice",
+    "name": "Nightglass Cloak",
+    "kind": "cloak",
+    "rarity": "rare",
+    "requiredLevel": 95,
+    "sell": 1104,
+    "attack": 0,
+    "defense": 0,
+    "class": null,
+    "variant": "cloak_silent_solstice",
+    "art": "ember",
+    "starter": false,
+    "source": "silent_solstice",
+    "bonusStats": {
+      "strength": 108
+    },
+    "tint": {
+      "hue": 2,
+      "saturate": 1.28,
+      "brightness": 1.2069999999999999
+    }
+  },
+  {
     "id": "orange_01",
     "name": "Ember Sovereign Cuirass",
     "kind": "armor",
@@ -54712,31 +56871,243 @@
     "source": "orange_pool"
   },
   {
-    "id": "hour_shard_bloom",
-    "name": "Shard of the Bloomed Hour",
-    "kind": "material",
-    "rarity": "common",
-    "sell": 0
+    "id": "orange_cloak_01",
+    "name": "Ember Sovereign Cloak",
+    "kind": "cloak",
+    "rarity": "legendary",
+    "requiredLevel": 10,
+    "sell": 1200,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "stamina": 3,
+      "accuracy": 3,
+      "dexterity": 3
+    },
+    "class": null,
+    "variant": "orange_cloak_01",
+    "source": "orange_pool",
+    "art": "ember",
+    "tint": {
+      "hue": 17,
+      "saturate": 1.5,
+      "brightness": 1.2
+    }
   },
   {
-    "id": "hour_shard_solar",
-    "name": "Shard of the Solar Hour",
-    "kind": "material",
-    "rarity": "common",
-    "sell": 0
+    "id": "orange_cloak_02",
+    "name": "Verdant Crown Cloak",
+    "kind": "cloak",
+    "rarity": "legendary",
+    "requiredLevel": 20,
+    "sell": 2000,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "stamina": 8,
+      "accuracy": 8,
+      "dexterity": 8
+    },
+    "class": null,
+    "variant": "orange_cloak_02",
+    "source": "orange_pool",
+    "art": "ember",
+    "tint": {
+      "hue": 54,
+      "saturate": 1.5,
+      "brightness": 1.2
+    }
   },
   {
-    "id": "hour_shard_amber",
-    "name": "Shard of the Amber Hour",
-    "kind": "material",
-    "rarity": "common",
-    "sell": 0
+    "id": "orange_cloak_03",
+    "name": "Storm Oracle Cloak",
+    "kind": "cloak",
+    "rarity": "legendary",
+    "requiredLevel": 30,
+    "sell": 2800,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "stamina": 17,
+      "accuracy": 17,
+      "dexterity": 17
+    },
+    "class": null,
+    "variant": "orange_cloak_03",
+    "source": "orange_pool",
+    "art": "ember",
+    "tint": {
+      "hue": 91,
+      "saturate": 1.5,
+      "brightness": 1.2
+    }
   },
   {
-    "id": "hour_shard_silent",
-    "name": "Shard of the Silent Hour",
-    "kind": "material",
-    "rarity": "common",
-    "sell": 0
+    "id": "orange_cloak_04",
+    "name": "Abyss Singer Cloak",
+    "kind": "cloak",
+    "rarity": "legendary",
+    "requiredLevel": 40,
+    "sell": 3600,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "stamina": 34,
+      "accuracy": 19,
+      "dexterity": 34
+    },
+    "class": null,
+    "variant": "orange_cloak_04",
+    "source": "orange_pool",
+    "art": "ember",
+    "tint": {
+      "hue": 128,
+      "saturate": 1.5,
+      "brightness": 1.2
+    }
+  },
+  {
+    "id": "orange_cloak_05",
+    "name": "Starforged Cloak",
+    "kind": "cloak",
+    "rarity": "legendary",
+    "requiredLevel": 50,
+    "sell": 4400,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "stamina": 45,
+      "accuracy": 19,
+      "dexterity": 45
+    },
+    "class": null,
+    "variant": "orange_cloak_05",
+    "source": "orange_pool",
+    "art": "ember",
+    "tint": {
+      "hue": 165,
+      "saturate": 1.5,
+      "brightness": 1.2
+    }
+  },
+  {
+    "id": "orange_cloak_06",
+    "name": "Solar Regent Cloak",
+    "kind": "cloak",
+    "rarity": "legendary",
+    "requiredLevel": 60,
+    "sell": 5200,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "stamina": 62,
+      "accuracy": 19,
+      "dexterity": 62
+    },
+    "class": null,
+    "variant": "orange_cloak_06",
+    "source": "orange_pool",
+    "art": "ember",
+    "tint": {
+      "hue": 202,
+      "saturate": 1.5,
+      "brightness": 1.2
+    }
+  },
+  {
+    "id": "orange_cloak_07",
+    "name": "Ash Phoenix Cloak",
+    "kind": "cloak",
+    "rarity": "legendary",
+    "requiredLevel": 70,
+    "sell": 6000,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "stamina": 79,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_cloak_07",
+    "source": "orange_pool",
+    "art": "ember",
+    "tint": {
+      "hue": 239,
+      "saturate": 1.5,
+      "brightness": 1.2
+    }
+  },
+  {
+    "id": "orange_cloak_08",
+    "name": "Moonlit Sentinel Cloak",
+    "kind": "cloak",
+    "rarity": "legendary",
+    "requiredLevel": 80,
+    "sell": 6800,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "stamina": 96,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_cloak_08",
+    "source": "orange_pool",
+    "art": "ember",
+    "tint": {
+      "hue": 276,
+      "saturate": 1.5,
+      "brightness": 1.2
+    }
+  },
+  {
+    "id": "orange_cloak_09",
+    "name": "Chronometer Cloak",
+    "kind": "cloak",
+    "rarity": "legendary",
+    "requiredLevel": 90,
+    "sell": 7600,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "stamina": 113,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_cloak_09",
+    "source": "orange_pool",
+    "art": "ember",
+    "tint": {
+      "hue": 313,
+      "saturate": 1.5,
+      "brightness": 1.2
+    }
+  },
+  {
+    "id": "orange_cloak_10",
+    "name": "Worldheart Cloak",
+    "kind": "cloak",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 8320,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "stamina": 129,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "orange_cloak_10",
+    "source": "orange_pool",
+    "art": "ember",
+    "tint": {
+      "hue": 350,
+      "saturate": 1.5,
+      "brightness": 1.2
+    }
   }
 ]
