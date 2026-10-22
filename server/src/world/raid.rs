@@ -1,7 +1,66 @@
-//! Raid-only recovery. Encounters and helpers remain owned by the boss engine.
+//! Raid strength and recovery. Encounters and helpers remain owned by the boss engine.
 use super::*;
 
+#[derive(Clone, Copy, Default)]
+pub(super) struct RaidSupport {
+    enabled: bool,
+    pub(super) others: usize,
+}
+
+impl RaidSupport {
+    pub(super) fn attack_multiplier(self) -> f64 {
+        1. + self.others as f64 * 0.5
+    }
+
+    pub(super) fn taken_multiplier(self) -> f64 {
+        1. - self.others as f64 * 0.01
+    }
+
+    pub(super) fn snapshot(self, player: &Player) -> Value {
+        let mut view = player.snapshot();
+        if self.enabled {
+            view["attack"] = json!(player.character.stats().0 * self.attack_multiplier());
+            view["raidSupport"] = json!({
+                "others":self.others,
+                "attackPercent":self.others * 50,
+                "damageReductionPercent":self.others,
+            });
+        }
+        view
+    }
+}
+
+fn participant(player: &Player) -> bool {
+    player.ambient.is_none() && player.escort.is_none() && !player.gauntlet && !player.is_hidden()
+}
+
 impl World {
+    /// Presence in this exact raid copy counts, including fallen fighters and
+    /// hired mercenaries. Party membership, distance and another copy do not.
+    pub(super) fn raid_support(&self, session: u64) -> RaidSupport {
+        let Some(player) = self.players.get(&session) else {
+            return RaidSupport::default();
+        };
+        let zone = player.character.zone;
+        if !self.maps[zone].raid || !participant(player) {
+            return RaidSupport::default();
+        }
+        let others = self
+            .players
+            .iter()
+            .filter(|(other, p)| **other != session && p.character.zone == zone && participant(p))
+            .count()
+            .min(social::RAID_MAX - 1);
+        RaidSupport {
+            enabled: true,
+            others,
+        }
+    }
+
+    pub(super) fn raid_attack_power(&self, session: u64) -> f64 {
+        self.players[&session].character.stats().0 * self.raid_support(session).attack_multiplier()
+    }
+
     /// Capture a wipe before ordinary respawn or the boss's return erases the encounter.
     pub(super) fn update_raid_wipes(&mut self) {
         let zones: Vec<usize> = self

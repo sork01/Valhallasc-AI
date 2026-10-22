@@ -1140,6 +1140,7 @@
     const selectedTarget = hero.target?.id;
     const wasDead = hero.dead, wasFallen = !!hero.fallen, oldSets = hero.setCounts || {};
     applyActor(hero, own, initial || moved || !!hero.sparkTravel !== !!own.sparkTravel);
+    hero.raidSupport = own.raidSupport || null;
     if (!initial && !moved) for (const source of new Set([...Object.keys(oldSets), ...Object.keys(own.setCounts || {})])) {
       const before = oldSets[source] || 0, after = own.setCounts?.[source] || 0;
       for (const tier of [2, 4, 6, 8]) if ((before < tier) !== (after < tier))

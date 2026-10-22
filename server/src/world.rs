@@ -83,6 +83,8 @@ mod raid;
 #[cfg(test)]
 mod raid_pack_tests;
 #[cfg(test)]
+mod raid_support_tests;
+#[cfg(test)]
 mod rain_crown_tests;
 mod ranged;
 mod rebirth;
@@ -1803,7 +1805,7 @@ impl World {
         let mut view = json!({"type":"snapshot","tick":self.tick,"time":self.time,"worldTime":self.world_clock.snapshot(),
         "weather":zone_weather,
         "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
-            let mut view = p.snapshot();
+            let mut view = self.raid_support(*session).snapshot(p);
             if p.character.gm { view["session"] = json!(session); }
             // The bells a hero has ringing and how long each has left (only listed while there are any).
             let bells = self.chime.view(*session);
@@ -2310,6 +2312,7 @@ impl World {
         }
         // A stranded person joins whoever has taken their escort quest.
         let escort_note = self.try_start_escort(session, npc_id);
+        let raid_support = self.raid_support(session);
         let p = self.players.get_mut(&session).unwrap();
         let map = &self.maps[p.character.zone];
         let Some(npc) = map.npcs.iter().find(|npc| npc.id == npc_id) else {
@@ -2634,7 +2637,7 @@ impl World {
         }
         let _ = p
             .peer
-            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(p.snapshot()) } else { None },"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(raid_support.snapshot(p)) } else { None },"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         let actor = p.character.id.clone();
         let point = p.character.point();
         if levels > 0 {
@@ -3194,7 +3197,7 @@ impl World {
     /// One attack roll: the server alone decides misses, crits and damage (buffs included).
     fn roll_damage(&mut self, session: u64, mult: f64) -> (f64, bool) {
         let p = &self.players[&session];
-        let base = p.character.stats().0 * (1. + p.buff(BuffKind::Damage)) * mult;
+        let base = self.raid_attack_power(session) * (1. + p.buff(BuffKind::Damage)) * mult;
         let crit_chance = (p.character.crit_chance() + p.buff(BuffKind::Crit)).min(1.);
         let hit_chance = p.character.hit_chance();
         let crit = self.random() < crit_chance;
@@ -3825,7 +3828,7 @@ impl World {
     /// Heals each session for `mult` times the caster's attack power and announces it with a `healed` event.
     /// Returns the healed players' positions for the skill's visual effect.
     fn heal_players(&mut self, caster: u64, sessions: &[u64], mult: f64) -> Vec<[f64; 2]> {
-        let amount = (self.players[&caster].character.stats().0 * mult).round();
+        let amount = (self.raid_attack_power(caster) * mult).round();
         let caster_class = self.players[&caster].character.look.class;
         let from = self.players[&caster].character.id.clone();
         let mut points = vec![];
@@ -4667,11 +4670,13 @@ impl World {
             );
             return;
         }
+        let raid_taken = self.raid_support(session).taken_multiplier();
         let p = self.players.get_mut(&session).unwrap();
         let shield = p.buff(BuffKind::Shield).min(0.8);
-        let mut value = ((damage - p.character.stats().1).max(1.) * DAMAGE_TAKEN_SCALE)
-            .round()
-            .max(1.);
+        let mut value =
+            ((damage - p.character.stats().1).max(1.) * DAMAGE_TAKEN_SCALE * raid_taken)
+                .round()
+                .max(1.);
         if shield > 0. {
             value = (value * (1. - shield)).round().max(1.);
         }

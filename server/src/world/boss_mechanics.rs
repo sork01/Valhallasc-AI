@@ -1043,7 +1043,9 @@ impl World {
         let Some(p) = self.players.get(&session) else {
             return;
         };
-        let value = (p.character.max_hp() * share).round().max(1.);
+        let value = (p.character.max_hp() * share * self.raid_support(session).taken_multiplier())
+            .round()
+            .max(1.);
         if value >= p.character.hp {
             self.mech_kill(session, ability, boss);
             return;

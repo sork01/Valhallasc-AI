@@ -3543,3 +3543,20 @@ fn a_fighter_standing_in_the_light_stays_there_while_the_dark_is_up_instead_of_g
     );
     assert!(play.stay);
 }
+#[test]
+fn raid_support_reduces_heavy_hits_but_does_not_prevent_explicit_mechanic_kills() {
+    let (mut w, _peers) = crate::world::raid_support_tests::crew(10);
+    let boss = w
+        .slimes
+        .iter()
+        .position(|s| s.zone == 46 && s.kind == "cf_brute")
+        .unwrap();
+    let before = w.players[&1].character.hp;
+    w.mech_heavy(1, 0.5, "Raid test", boss);
+    assert_eq!(
+        before - w.players[&1].character.hp,
+        (before * 0.5 * 0.91).round()
+    );
+    assert!(w.mech_kill(1, "Raid test", boss));
+    assert_eq!(w.players[&1].character.hp, 0.);
+}

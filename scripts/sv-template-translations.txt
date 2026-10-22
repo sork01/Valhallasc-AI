@@ -324,5 +324,6 @@
   "That party is full ({0}/{1}).": "Den gruppen är full ({0}/{1}).",
   "Your raid is full ({0}/{1}).": "Din raid är full ({0}/{1}).",
   "That raid is full ({0}/{1}).": "Den raiden är full ({0}/{1}).",
-  "{0} is a dungeon for {1} fighters at most. Your group has {2}.": "{0} är en dungeon för högst {1} kämpar. Din grupp har {2}."
+  "{0} is a dungeon for {1} fighters at most. Your group has {2}.": "{0} är en dungeon för högst {1} kämpar. Din grupp har {2}.",
+  "Raid strength: +{0}% attack · {1}% damage reduction ({2} allies)": "Raidstyrka: +{0}% attack · {1}% skademinskning ({2} allierade)"
 }

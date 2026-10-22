@@ -595,3 +595,11 @@ Focused checks: Rust filter `raid_pack`, private MCP `raid_packs`,
 `tests/raid-packs-ui.cjs` (real sprites), and `tests/raid-pack-gear-art.cjs`.
 The entrance stays sealed until RAID-OPEN. Details and approved interim fixture:
 [docs/molten-raid.md](docs/molten-raid.md#16-raid-packs--implementation-and-owner-corrections-2026-10-22).
+
+
+Raid strength grants every human and mercenary +50% attack and 1% damage
+reduction per other fighter in the same raid copy (maximum nine others: 5.5×
+attack and 9% reduction). It updates on presence changes and appears in the
+character panel. Solo heroes and ordinary dungeons get no bonus. Focused checks:
+Rust `raid_support`, browser `tests/raid-support-ui.cjs`; details in
+`docs/molten-raid.md` section 17. Pack clear-time tuning remains deferred.

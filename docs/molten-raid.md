@@ -672,3 +672,51 @@ and mobile sizes (`test-results/driver-9AAGHn/raid-pack-desktop.png` and
 substituting the old gear art fails the silhouette guard. Consolidated evidence:
 `test-results/raid-packs/verification.json`. Generator commands and source remain
 in the isolated raid worktree on `feat/raid-approach`; nothing is deployed.
+
+
+## 17. Raid strength (owner request, 2026-10-22)
+
+The owner requested **+1% damage-taken reduction and +50% extra attack for each
+other fighter in the instance**, and explicitly confirmed that **mercenaries
+count too**. This is implemented for the raid template and each private raid
+copy. Each human and hired fighter receives the bonus individually:
+
+| Fighters present | Other fighters | Extra attack | Total attack | Incoming damage multiplier |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 0 | 0% | 1× | 1.00× |
+| 2 | 1 | +50% | 1.5× | 0.99× |
+| 5 | 4 | +200% | 3× | 0.96× |
+| 10 | 9 | **+450%** | **5.5×** | **0.91×** |
+
+Presence is determined by the authoritative runtime zone id, before copy ids are
+mapped back to the public template in snapshots. Other copies, outdoor zones,
+ordinary dungeons, ambient actors, escorts, gauntlet actors and hidden GMs do not
+contribute. A fighter counts themselves zero times. The bonus is capped at nine
+others, has no distance restriction, and counts fallen fighters who remain
+inside. Entering, exiting, disconnecting or dismissing hired fighters changes
+it automatically; party members outside the copy contribute nothing.
+
+`server/src/world/raid.rs` computes this from current actors. The bonus never
+modifies saved gear, attributes or the character's base stats. Basic attacks,
+damaging skills and attack-based set effects use the boosted attack power.
+Attack-based healing uses that same power; fixed percentage-of-health heals do
+not change. The incoming multiplier combines with armor, shields and other
+normal reductions before absorption. Boss heavy hits also receive the reduction;
+explicit instant-kill mechanics still kill.
+
+Snapshots expose the effective attack and a `raidSupport` breakdown. The
+character panel displays the other-fighter count and both bonuses, including
+Swedish. The client explicitly clears `hero.raidSupport` when leaving: its
+normal actor merge keeps old optional fields unless they are cleared.
+
+Validation: six focused `raid_support` Rust tests cover real quartermaster
+contracts, same-copy presence, fallen members, removal, non-raid exclusion,
+caps, seeded attack rolls, actual incoming hits, shields, attack-based healing,
+snapshots and boss heavy/instant-kill paths. `tests/raid-support-ui.cjs` passes
+**20 private browser checks**: nine real hires and their live percentages,
+mercenaries receiving the same bonus, another copy staying solo, desktop/mobile
+character panel, dismissal, exit, and Swedish. Evidence:
+`test-results/driver-OVjunQ/raid-support-ui.json` and the desktop/mobile PNGs.
+Clippy with warnings denied, fmt, JS syntax and Swedish checks pass. Clear-time
+calibration remains deferred. Source is in the isolated raid worktree, not
+committed or deployed in this follow-up.
