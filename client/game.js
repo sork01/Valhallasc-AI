@@ -804,6 +804,12 @@
   }
   const SFX = {
     bossMech: bossMechSound,
+    forgeProc: ev => {
+      const base = {warrior:110, mage:440, assassin:220, priest:660, hunter:330}[ev.weapon] || 220;
+      const gain = audibleLevel(ev, ev.actor === Online.id) * .055;
+      sweep(base * 2, base, .18, gain, 'triangle');
+      tone([base * 3, base * 4], .16, gain * .55);
+    },
     shadowstep: () => noiseBurst(.16, 900, 3200, .065),
     cast: () => { sweep(330, 990, .25, .065, 'triangle'); tone([1175], .2, .025); },
     combatSwing,
@@ -900,11 +906,20 @@
     const at = $('area-title'); at.classList.remove('show'); void at.offsetWidth; at.classList.add('show');
   }
   function leaveGame() { window.Settings?.close(false); if (window.Field) Field.stop(); }
-  let equipmentFocus = null;
+  let equipmentFocus = null, equipmentArtPending = null;
   function setPause(on) { window.Settings?.close(false); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Inventory.hideTooltip(); const wasEquipment = !$('equipment').hidden; $('equipment').hidden = true; $('pause').hidden = !on; Field.setPaused(on); if (on) $('p-resume').focus({ preventScroll: true }); else if (wasEquipment && equipmentFocus?.isConnected && !equipmentFocus.closest('[hidden]')) equipmentFocus.focus({ preventScroll: true }); }
   function renderEquipment() {
     const c = save.char, mage = c && currentSprite(c); if (!c || !mage) return;
-    mage.set(c); const canvas = $('equipmentcv'); canvas.width = 320; canvas.height = 420;
+    mage.set(c);
+    const artKey=JSON.stringify(c),missing=Object.entries(mage.equipment).filter(([slot,art])=>art&&art!=='none'&&!mage.source.parts[slot+'_'+art]).map(([slot,art])=>slot+'_'+art);
+    if(missing.length&&equipmentArtPending!==artKey){
+      equipmentArtPending=artKey;
+      Promise.all(missing.map(part=>mage.source.ensure(part))).then(()=>{
+        if(equipmentArtPending===artKey)equipmentArtPending=null;
+        if(!$('equipment').hidden&&JSON.stringify(save.char)===artKey&&missing.every(part=>mage.source.parts[part]))renderEquipment();
+      }).catch(()=>{if(equipmentArtPending===artKey)equipmentArtPending=null;});
+    }
+    const canvas = $('equipmentcv'); canvas.width = 320; canvas.height = 420;
     const g = canvas.getContext('2d'); g.translate(160, 365); mage.draw(g, { fx: 1, fy: 1, walk: 0 }, 0, 2.8);
     const stats = Field.equipmentStats;
     $('character-subtitle').textContent = `${c.name} · Level ${Field.hero.level} ${c.class[0].toUpperCase() + c.class.slice(1)}`;

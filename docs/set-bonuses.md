@@ -37,6 +37,7 @@ full set mandatory for every encounter.
 
 | Set source | Dungeon | Signature, triggered by the class skill in the last column |
 | --- | --- | --- |
+| `chained_forge` | The Chained Forge | **Unbroken resolve:** the caster gains a 4-second shield absorbing 4% of maximum health and recovers 3% of maximum resource. |
 | `blackhour` | The Black Hour Foundry | **Cold restart:** the caster gains a 4-second shield absorbing 5% of maximum health and recovers 2% of maximum resource. |
 | `longship` | The Drowned Longship | **Bilge pump:** the caster recovers 3% of maximum health and 3% of maximum resource. |
 | `nornroot` | Nornroot Barrow | **Second thread:** the caster recovers 4% of maximum health. |
@@ -69,6 +70,7 @@ Signature damage and control target enemies only.
 
 | Source | 2 pieces | 4-piece cooldown | 6-piece double | 8-piece trigger |
 | --- | --- | --- | --- | --- |
+| `chained_forge` | +5% attack | `battlecry` | `cleave` | `earthshatter` |
 | `blackhour` | +5% attack | `titanswrath` | `earthshatter` | `whirlwind` |
 | `longship` | +5% defense | `secondwind` | `whirlwind` | `battlecry` |
 | `nornroot` | +5% health | `shieldwall` | `cleave` | `battlecry` |
@@ -94,6 +96,7 @@ Signature damage and control target enemies only.
 
 | Source | 2 pieces | 4-piece cooldown | 6-piece double | 8-piece trigger |
 | --- | --- | --- | --- | --- |
+| `chained_forge` | +5% attack | `arcaneward` | `fireball` | `arcanestorm` |
 | `blackhour` | +5% attack | `meteor` | `barrage` | `starfall` |
 | `longship` | +5% defense | `arcaneward` | `barrage` | `lifedrain` |
 | `nornroot` | +5% health | `blink` | `twinbolt` | `fireball` |
@@ -119,6 +122,7 @@ Signature damage and control target enemies only.
 
 | Source | 2 pieces | 4-piece cooldown | 6-piece double | 8-piece trigger |
 | --- | --- | --- | --- | --- |
+| `chained_forge` | +5% attack | `evasion` | `flurry` | `knifering` |
 | `blackhour` | +5% attack | `thousandcuts` | `cycloneblades` | `assassinate` |
 | `longship` | +5% defense | `shadowveil` | `throwingknives` | `deadlyfocus` |
 | `nornroot` | +5% health | `evasion` | `flurry` | `lunge` |
@@ -144,6 +148,7 @@ Signature damage and control target enemies only.
 
 | Source | 2 pieces | 4-piece cooldown | 6-piece double | 8-piece trigger |
 | --- | --- | --- | --- | --- |
+| `chained_forge` | +5% health | `mend` | `smite` | `prayer` |
 | `blackhour` | +5% health | `heavenswrath` | `searinglight` | `divinehymn` |
 | `longship` | +5% defense | `guardianlight` | `searinglight` | `prayer` |
 | `nornroot` | +5% health | `wardoflight` | `smite` | `prayer` |
@@ -169,6 +174,7 @@ Signature damage and control target enemies only.
 
 | Source | 2 pieces | 4-piece cooldown | 6-piece double | 8-piece trigger |
 | --- | --- | --- | --- | --- |
+| `chained_forge` | +5% attack | `eaglesight` | `powershot` | `arrowstorm` |
 | `blackhour` | +5% attack | `arrowstorm` | `multishot` | `piercingarrow` |
 | `longship` | +5% defense | `rollaway` | `explosivearrow` | `huntersmark` |
 | `nornroot` | +5% health | `rollaway` | `powershot` | `huntersmark` |

@@ -7,6 +7,7 @@ mod cloak_tests;
 mod gear_services;
 pub use gear_services::GearInstance;
 mod orange;
+pub mod raid_rewards;
 #[cfg(test)]
 pub use orange::roll_orange;
 pub use orange::roll_orange_boosted;
@@ -593,6 +594,71 @@ pub fn is_boss(kind: &str) -> bool {
 }
 /// The slot pools a boss drops from: one shared wing-level blue piece per pool, chosen across all classes.
 pub fn boss_slots(kind: &str) -> &'static [&'static [&'static str]] {
+    match kind {
+        "cf_kettil" => {
+            return &[
+                &["armor", "headgear", "cloak"],
+                &["armor", "headgear", "cloak"],
+            ];
+        }
+        "cf_ysolt" => {
+            return &[
+                &["shoulders", "gloves", "pants"],
+                &["shoulders", "gloves", "pants"],
+            ];
+        }
+        "cf_hallgrim" => {
+            return &[
+                &["necklace", "accessory", "armor"],
+                &["necklace", "accessory", "armor"],
+            ];
+        }
+        "cf_sigrun" => {
+            return &[
+                &["headgear", "cloak", "shoulders"],
+                &["headgear", "cloak", "shoulders"],
+            ];
+        }
+        "cf_dagfinn" => {
+            return &[
+                &["gloves", "pants", "necklace"],
+                &["gloves", "pants", "necklace"],
+            ];
+        }
+        "cf_thorbjorg" => {
+            return &[
+                &["accessory", "armor", "headgear"],
+                &["accessory", "armor", "headgear"],
+            ];
+        }
+        "cf_ragnhild" => {
+            return &[
+                &["cloak", "shoulders", "gloves"],
+                &["cloak", "shoulders", "gloves"],
+            ];
+        }
+        "cf_orm" => {
+            return &[
+                &["pants", "necklace", "accessory"],
+                &["pants", "necklace", "accessory"],
+            ];
+        }
+        "cf_hildr" => {
+            return &[
+                &["armor", "headgear", "shoulders"],
+                &["armor", "headgear", "shoulders"],
+            ];
+        }
+        "cf_eldmarr" => {
+            return &[
+                &["gloves", "pants", "cloak"],
+                &["gloves", "pants", "cloak"],
+                &["weapon"],
+                &["weapon"],
+            ];
+        }
+        _ => {}
+    }
     if let Some(e) = crate::cathedral::enemy(kind) {
         if !e.boss {
             return &[];
@@ -800,6 +866,9 @@ pub fn boss_piece(slots: &[&str], choice: f64) -> Option<&'static Item> {
 }
 /// Cathedral bosses guarantee their own wing's exclusive blue set at its exact required level.
 pub fn boss_piece_for(kind: &str, slots: &[&str], choice: f64) -> Option<&'static Item> {
+    if raid_rewards::boss(kind).is_some() {
+        return raid_rewards::piece_for(kind, slots, choice);
+    }
     if matches!(
         kind,
         "tideglass_heron" | "hourpetal_stag" | "moonskein_weaver" | "moonwell_echo"

@@ -27,6 +27,7 @@ import late_instance_gear_shapes
 import keel_gear_shapes
 import null_gear_shapes
 import raid_pack_gear_shapes
+import chainforged_shapes
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'client/assets'
@@ -47,7 +48,8 @@ BODY_CACHE = {}
 
 def activate(task):
     global PALETTE_HEX, PALETTE
-    PALETTE_HEX = (raid_pack_gear_shapes.PALETTE if task['group'] == 'cfpack' else
+    PALETTE_HEX = (chainforged_shapes.palette_for(task) if task['group'] == 'chainforged' else
+                   raid_pack_gear_shapes.PALETTE if task['group'] == 'cfpack' else
                    null_gear_shapes.PALETTE if task['group'] == 'null' else
                    keel_gear_shapes.PALETTE if task['group'] == 'keel' else
                    late_instance_gear_shapes.palette(task['group'])[0] if task['group'] in late_instance_gear_shapes.STYLES else
@@ -59,7 +61,7 @@ def activate(task):
 
 def revision(task):
     # A change to hats must not invalidate a completed armor piece or its editor edits.
-    dependencies = [shape.render, shape.pose, shape.poly, shape.jewel, getattr(shape, task['kind'])]
+    dependencies = [shape.render, shape.pose, shape.poly, shape.jewel, getattr(shape, task['kind'], shape.render)]
     source = ''.join(inspect.getsource(fn) for fn in dependencies) + Path(cc.__file__).read_text()
     source += json.dumps([shape.MATS, shape.DESIGNS[task['group']]], sort_keys=True)
     if task['group'] in ('vault', 'moonwell'):
@@ -81,13 +83,23 @@ def revision(task):
     if task['group'] not in ('vault', 'moonwell', 'eye', 'elder', *late_instance_gear_shapes.STYLES) and task['className'] == 'mage' and task['kind'] == 'headgear' and shape.DESIGNS[task['group']]['index'] >= 9:
         source += inspect.getsource(gear_shapes_high.render_mage_head)
     if task['group'] == 'keel': source += Path(keel_gear_shapes.__file__).read_text()
+    if task['group'] == 'chainforged':
+        source += Path(chainforged_shapes.__file__).read_text()
+        if task['className']=='priest' or task['kind']=='pants':
+            source += (ROOT / 'scripts/chainforged_priest_shapes.py').read_text()
+        if task['className']=='mage' or task['kind']=='pants':
+            source += (ROOT / 'scripts/chainforged_mage_shapes.py').read_text()
+        if task['className']=='hunter' or task['kind']=='pants':
+            source += (ROOT / 'scripts/chainforged_hunter_shapes.py').read_text()
+        if task['className']=='assassin' or task['kind']=='pants':
+            source += (ROOT / 'scripts/chainforged_assassin_shapes.py').read_text()
     if task['group'] == 'cfpack': source += Path(raid_pack_gear_shapes.__file__).read_text()
     if task['group'] == 'null': source += Path(null_gear_shapes.__file__).read_text()
     return hashlib.sha256(source.encode()).hexdigest()
 
 
 def task_for(job):
-    for path in (STATE, HIGH_STATE, DUNGEON_STATE, INSTANCE_STATE, ROOT / 'docs/raid-pack-gear-state.txt'):
+    for path in (STATE, HIGH_STATE, DUNGEON_STATE, INSTANCE_STATE, ROOT / 'docs/raid-pack-gear-state.txt', ROOT / 'docs/raid-reward-gear-state.txt'):
         if path.exists():
             task = next((t for t in json.loads(path.read_text())['tasks'] if t['id'] == job), None)
             if task:
@@ -110,7 +122,9 @@ def frames(task, cls, gender):
                     with np.load(file) as data:
                         if str(data['revision']) == fingerprint:
                             result[key] = (data['index'], data['depth']); continue
-                if task['group'] == 'cfpack':
+                if task['group'] == 'chainforged':
+                    idx, depth = chainforged_shapes.render(cls, 'chainforged', task['kind'], gender, *key)
+                elif task['group'] == 'cfpack':
                     idx, depth = raid_pack_gear_shapes.render(cls, 'cfpack', task['kind'], gender, *key)
                 elif task['group'] == 'null':
                     idx, depth = null_gear_shapes.render(cls, 'null', task['kind'], gender, *key)
@@ -265,7 +279,7 @@ def build(task):
 
 def ensure_female_sprites(task, manifest, record):
     """Keep both-body source cels editable in PixelFlow, including shared pieces."""
-    if task['group'] not in ('L95', 'vault', 'moonwell', 'eye', 'elder', 'keel', 'null', 'cfpack', *late_instance_gear_shapes.STYLES):
+    if task['group'] not in ('L95', 'vault', 'moonwell', 'eye', 'elder', 'keel', 'null', 'cfpack', 'chainforged', *late_instance_gear_shapes.STYLES):
         return
     classes = [task['className']] if task['className'] else list(CLASSES)
     for cls in classes:
@@ -329,7 +343,7 @@ def export(task):
             meta['lazyParts'] = sorted(set(meta.get('lazyParts', [])) | {part})
             meta.setdefault('gearSprites', {})[part] = clips if gender == 'male' else record.get('female', {}).get(cls) or {'local': 'scripts/make_progression_gear.py export ' + task['id']}
             meta_path.write_text(json.dumps(meta, indent=2) + '\n')
-            if task['group'] == 'cfpack':
+            if task['group'] in ('cfpack', 'chainforged'):
                 import base64
                 from sprite_bounds import bounds_name, part_bounds
                 bounds_path = bounds_name(meta_path)
