@@ -3172,7 +3172,6 @@
   "Move closer to open the chest.": "Gå närmare för att öppna kistan.",
   "Move within four steps of each other to trade.": "Kom inom fyra steg från varandra för att handla.",
   "Multi-Shot": "Flerskott",
-  "Multiplayer alpha 0.985.1": "Flerspelaralfa 0.985.1",
   "Murder on Gallows Hill": "Mord på Gallows Hill",
   "Music": "Musik",
   "My bees still work the Moonpetal Glade, south of town. Odd, that. Everything else in the wood has gone wyrd, but the bees only hum louder. I would not put it past them to know something we do not.": "Mina bin arbetar fortfarande i Moonpetal-gläntan, söder om staden. Konstigt, det där. Allt annat i skogen har blivit wyrd, men bina surrar bara högre. Det skulle inte förvåna mig om de vet något vi inte vet.",
