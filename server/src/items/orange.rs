@@ -33,7 +33,7 @@ struct Ranges {
 static RULES: LazyLock<Rules> = LazyLock::new(|| {
     let rules: Rules = serde_json::from_str(include_str!("../../../world/orange_rules.txt"))
         .expect("valid orange rules");
-    assert_eq!(rules.pieces.len(), 50);
+    assert_eq!(rules.pieces.len(), 60);
     rules
 });
 
@@ -112,12 +112,19 @@ mod tests {
     #[test]
     fn independent_probability_uniform_piece_and_inclusive_stats() {
         assert!(roll_orange(TOP, || 0.001).is_none());
-        for n in 0..50 {
-            let mut values = [0., (n as f64 + 0.5) / 50., 0., 0., 0., 0., 0.].into_iter();
+        for n in 0..60 {
+            let mut values = [0., (n as f64 + 0.5) / 60., 0., 0., 0., 0., 0.].into_iter();
             let copy = roll_orange(TOP, || values.next().unwrap()).unwrap();
-            assert_eq!(copy.item, format!("orange_{:02}", n + 1));
+            assert_eq!(
+                copy.item,
+                if n < 50 {
+                    format!("orange_{:02}", n + 1)
+                } else {
+                    format!("orange_cloak_{:02}", n - 49)
+                }
+            );
             assert_eq!(copy.rarity, "legendary");
-            assert!(copy.attack > 0. && copy.defense > 0.);
+            assert_eq!(copy.attack > 0. && copy.defense > 0., n < 50);
         }
         let mut values = [
             0.,
@@ -182,11 +189,11 @@ mod tests {
             }
         }
         // Boundaries: level 5 reaches the level 10 family, level 15 the level 20 family, level 94 the top one.
-        assert_eq!(pool(5).count(), 5);
-        assert_eq!(pool(14).count(), 5);
-        assert_eq!(pool(15).count(), 10);
-        assert_eq!(pool(93).count(), 45);
-        assert_eq!(pool(94).count(), 50);
+        assert_eq!(pool(5).count(), 6);
+        assert_eq!(pool(14).count(), 6);
+        assert_eq!(pool(15).count(), 12);
+        assert_eq!(pool(93).count(), 54);
+        assert_eq!(pool(94).count(), 60);
         // The random sequence is the same at every level (a pick is drawn even with nothing to pick).
         let mut draws = 0;
         assert!(
@@ -208,9 +215,15 @@ mod tests {
 
     #[test]
     fn every_piece_has_a_level_and_stats_between_purple_and_the_next_family() {
-        let levels: Vec<u32> = RULES.pieces.iter().map(|p| p.required_level).collect();
+        let levels: Vec<u32> = RULES
+            .pieces
+            .iter()
+            .take(50)
+            .map(|p| p.required_level)
+            .collect();
         for (n, piece) in RULES.pieces.iter().enumerate() {
-            assert_eq!(piece.required_level, FAMILY_LEVELS[n / 5], "{}", piece.id);
+            let family = if n < 50 { n / 5 } else { n - 50 };
+            assert_eq!(piece.required_level, FAMILY_LEVELS[family], "{}", piece.id);
             let item = super::super::item(&piece.id).unwrap();
             assert_eq!(item.required_level, piece.required_level, "{}", piece.id);
             let (stat, base) = match item.kind.as_str() {
@@ -227,8 +240,9 @@ mod tests {
                 (total * 0.2, total * 0.8)
             };
             assert!(
-                f64::from(piece.rolls.attack[0]) >= attack.floor()
-                    && f64::from(piece.rolls.defense[0]) >= defense.floor(),
+                item.kind == "cloak"
+                    || (f64::from(piece.rolls.attack[0]) >= attack.floor()
+                        && f64::from(piece.rolls.defense[0]) >= defense.floor()),
                 "{} does not beat the purple of its level",
                 piece.id
             );
@@ -238,20 +252,27 @@ mod tests {
                 "{}",
                 piece.id
             );
-            for r in [
+            for (index, r) in [
                 piece.rolls.attack,
                 piece.rolls.defense,
                 piece.rolls.stamina,
                 piece.rolls.accuracy,
                 piece.rolls.dexterity,
-            ] {
-                assert!(r[0] < r[1], "{} has an empty roll range", piece.id);
+            ]
+            .into_iter()
+            .enumerate()
+            {
+                if item.kind == "cloak" && index < 2 {
+                    assert_eq!(r, [0, 0]);
+                } else {
+                    assert!(r[0] < r[1], "{} has an empty roll range", piece.id);
+                }
             }
         }
         assert!(levels.windows(2).all(|w| w[0] <= w[1]));
         // The same slot grows with the level: the best roll of one family is under the next family's best.
         for slot in 0..5 {
-            let run: Vec<&Piece> = RULES.pieces.iter().skip(slot).step_by(5).collect();
+            let run: Vec<&Piece> = RULES.pieces.iter().take(50).skip(slot).step_by(5).collect();
             for pair in run.windows(2) {
                 let (low, high) = (&pair[0].rolls, &pair[1].rolls);
                 assert!(low.attack[1] <= high.attack[1] && low.defense[1] <= high.defense[1]);
@@ -279,6 +300,7 @@ mod tests {
                     "headgear" => "headgear",
                     "shoulders" => "shoulders",
                     "gloves" => "gloves",
+                    "cloak" => "cloak",
                     kind => panic!("unexpected orange kind: {kind}"),
                 };
                 let wear = BTreeMap::from([(slot.into(), piece.id.clone())]);

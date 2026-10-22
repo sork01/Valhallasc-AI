@@ -62,7 +62,7 @@ fn longship_data_and_actual_collision_are_reachable() {
             .iter()
             .filter(|i| i.source.as_deref() == Some("longship"))
             .count(),
-        28
+        29
     );
     let quests: Vec<_> = w.maps[DEEP]
         .quests
@@ -216,6 +216,7 @@ fn longship_keelbound_set_heals_only_its_wearer_and_has_a_timer() {
         "weapon",
         "pants",
         "necklace",
+        "cloak",
         "accessory",
     ] {
         let piece = ITEMS

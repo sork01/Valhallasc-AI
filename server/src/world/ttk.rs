@@ -42,7 +42,7 @@ pub fn levels() -> Vec<u32> {
     (1..=19).map(|n| n * 5).chain([99]).collect()
 }
 /// The eight worn slots of the rules: the equipment-slot name and the catalog kind that fills it.
-const SLOTS: [(&str, &str); 8] = [
+const SLOTS: [(&str, &str); 10] = [
     ("chest", "armor"),
     ("headgear", "headgear"),
     ("shoulders", "shoulders"),
@@ -50,7 +50,9 @@ const SLOTS: [(&str, &str); 8] = [
     ("hands", "weapon"),
     ("pants", "pants"),
     ("necklace", "necklace"),
+    ("cloak", "cloak"),
     ("accessory1", "accessory"),
+    ("accessory2", "accessory"),
 ];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -247,6 +249,11 @@ pub fn normal_gear_of(class: Class, level: u32, rarity: &str) -> Vec<(&'static s
     SLOTS
         .iter()
         .map(|&(slot, kind)| {
+            let want = if kind == "cloak" && level >= 99 {
+                99
+            } else {
+                want
+            };
             let green: Vec<&Item> = ITEMS
                 .iter()
                 .filter(|i| {

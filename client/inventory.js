@@ -4,7 +4,7 @@
   const keyOf = (action, all = true) => window.Keys ? Keys.label(action, all) : { bags: 'B / I', quickFood: 'Z', quickPotion: 'X' }[action];
   const $ = id => document.getElementById(id);
   const dragType = 'application/x-valhallasc-item';
-  const slots = [['headgear', 'Headgear'], ['shoulders', 'Shoulders'], ['chest', 'Chest'], ['pants', 'Pants'], ['gloves', 'Gloves'], ['hands', 'Hands'], ['necklace', 'Necklace'], ['accessory1', 'Accessory 1'], ['accessory2', 'Accessory 2']];
+  const slots = [['headgear', 'Headgear'], ['shoulders', 'Shoulders'], ['chest', 'Chest'], ['pants', 'Pants'], ['gloves', 'Gloves'], ['hands', 'Hands'], ['necklace', 'Necklace'], ['cloak', 'Cloak'], ['accessory1', 'Accessory 1'], ['accessory2', 'Accessory 2']];
   let stacks = [], look = null, gearSlots = {}, bags = [], gearInstances = [], setCounts = {}, signature = '', layout = [], character = null, activeBag = 0, selected = null, search = '', pendingPlacement = null;
   const bagPages = () => { let start = 0; return [{ name: 'Backpack', size: 16 }, ...bags.map(id => ({ name: definition(id)?.name || 'Bag', size: definition(id)?.bagSlots || 0 }))].map(bag => { const page = { ...bag, start }; start += bag.size; return page; }); };
   const capacity = () => bagPages().reduce((sum, b) => sum + b.size, 0);
@@ -61,7 +61,7 @@
   const copyStats = g => ({ attack:g.attack * (1 + g.rank * .04), defense:g.defense * (1 + g.rank * .04), bonusStats:Object.fromEntries(statNames.map(k => [k, Math.round(((g.bonusStats?.[k] || 0) + (g.rolledStats?.[k] || 0)) * (1 + g.rank * .04))])) });
   const canEquip = () => Online.connected && !Field.hero?.dead;
   function node(tag, text = '', cls) { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; }
-  const setEntry = i => i?.source && window.WORLD_SET_BONUSES?.entries.find(row => row.source === i.source && row.class === look?.class);
+  const setEntry = i => i?.kind !== 'cloak' && i?.source && window.WORLD_SET_BONUSES?.entries.find(row => row.source === i.source && row.class === look?.class);
   const setName = source => ({undervault:'Undervault',moonwell:'Moonwell',eye_below:'Eye Below',elder_hollow:'Elder Hollow',thousandfold:'Thousandfold Pavilion',rain_crown:'Rain Crown',seed_vault:'Seed Vault',sunken_astrolabe:'Sunken Astrolabe',thunderheart_gate:'Thunderheart Gate',blooming_labyrinth:'Blooming Labyrinth',solar_crucible:'Solar Crucible',amber_archive:'Amber Archive',silent_solstice:'Silent Solstice',cathedral_cloister:'Flooded Cloister',cathedral_reliquary:'Coral Reliquary',cathedral_nave:'Grand Nave'})[source] || source;
   function setLines(source) {
     const row = window.WORLD_SET_BONUSES?.entries.find(entry => entry.source === source && entry.class === look?.class);
@@ -85,6 +85,7 @@
     mace: '<path d="m18 56 18-28" stroke="#b78a4e" stroke-width="6"/><circle cx="42" cy="19" r="11" fill="currentColor"/><path d="M42 4v30M27 19h30" stroke="#ecf3ff" stroke-width="3"/>',
     staff: '<path d="m20 56 16-36" stroke="#b78a4e" stroke-width="6"/><path d="m34 6 12 12-9 14-12-12z" fill="currentColor"/><path d="m34 10 2 14 7-6" fill="#ecf3ff"/>',
     daggers: '<path d="m9 49 16-31 11-6-3 12-18 31m14-6 16-31 11-6-3 12-18 31" fill="#dce5ef"/><path d="m10 38 14 6m10-6 14 6M9 53l8-13m12 13 8-13" stroke="currentColor" stroke-width="4"/>',
+    cloak: '<path d="m23 10 9-4 9 4 12 42-21 6-21-6z" fill="currentColor"/><path d="m23 10 9 7 9-7M32 17v33" fill="none" stroke="#e7d1a6" stroke-width="3"/>',
     necklace: '<path d="M13 12c0 31 38 31 38 0" fill="none" stroke="#d8b96a" stroke-width="5"/><path d="m32 30 10 10-10 14-10-14z" fill="currentColor"/><path d="m32 33 2 13 5-6" fill="#e6f6ff"/>',
     accessory: '<ellipse cx="32" cy="37" rx="16" ry="15" fill="none" stroke="#cda45b" stroke-width="7"/><path d="m32 9 12 12-12 12-12-12z" fill="currentColor"/><path d="m32 12 2 12 7-3" fill="#fff6c8"/>',
     material: '<path d="M13 39c-9-12 0-28 11-27 8-11 29-4 25 9 13 6 12 26-1 30-11 12-34 4-35-12z" fill="currentColor"/><ellipse cx="25" cy="24" rx="5" ry="7" fill="#ffffff8a"/><path d="m22 44 15 3" stroke="#ffffff44" stroke-width="4" stroke-linecap="round"/>',

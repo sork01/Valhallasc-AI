@@ -57,7 +57,7 @@ fn skybridge_data_and_actual_collision_are_reachable() {
             .iter()
             .filter(|i| i.source.as_deref() == Some("skybridge"))
             .count(),
-        28
+        29
     );
     let quests: Vec<_> = w.maps[BIFROST]
         .quests
@@ -227,6 +227,7 @@ fn skybridge_bridgeward_set_hits_nearest_enemy_and_has_a_timer() {
         "weapon",
         "pants",
         "necklace",
+        "cloak",
         "accessory",
     ] {
         let piece = ITEMS

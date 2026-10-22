@@ -44,16 +44,16 @@ class GearGeneratorTests(unittest.TestCase):
 
     def test_moonwell_catalog_has_all_class_and_shared_slots(self):
         pieces = [i for i in self.catalog if i.get('source') == 'moonwell']
-        self.assertEqual(len(pieces), 28)
+        self.assertEqual(len(pieces), 29)
         self.assertEqual({i['requiredLevel'] for i in pieces}, {60})
         self.assertEqual({i['rarity'] for i in pieces}, {'rare'})
         for cls in gear.CLASSES:
             self.assertEqual({i['kind'] for i in pieces if i.get('class') == cls}, set(gear.CLASS_KINDS))
-        self.assertEqual({i['kind'] for i in pieces if i.get('class') is None}, set(gear.SHARED_KINDS))
+        self.assertEqual({i['kind'] for i in pieces if i.get('class') is None}, set(gear.SHARED_KINDS) | {'cloak'})
         pools = json.loads((ROOT / 'world/moonwell_gear.txt').read_text())['bossPools']
         self.assertEqual(set(pools), {'tideglass_heron', 'hourpetal_stag', 'moonskein_weaver', 'moonwell_echo'})
         covered = {kind for groups in pools.values() for group in groups for kind in group}
-        self.assertEqual(covered, set(gear.CLASS_KINDS + gear.SHARED_KINDS))
+        self.assertEqual(covered, set(gear.CLASS_KINDS + gear.SHARED_KINDS) | {'cloak'})
 
     def test_generated_colours_never_equal_the_original_or_another_set(self):
         self.run_generator()

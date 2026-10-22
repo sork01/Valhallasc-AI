@@ -68,3 +68,5 @@ Rules that came up:
 - `node tests/swedish-ui.cjs` and `node tests/swedish-layout-ui.cjs` (`SHOT_DIR=<dir>` saves a screenshot of every window):
   the language switch, then nine windows at 1440x900 and on an 844x390 touch phone, in English and Swedish, failing on a
   box that overflows only in Swedish and on English words left on screen.
+
+Cloak → Mantel (en mantel, manteln, mantlar). Class-neutral tenth equipment slot.

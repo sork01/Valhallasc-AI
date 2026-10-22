@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {chromium}=require('playwright');
 const root=path.resolve(__dirname,'..'),out=path.join(root,'test-results/longship-redesign');fs.mkdirSync(out,{recursive:true});
 const stems={warrior:'warrior_layered',mage:'mage',assassin:'assassin',priest:'priest',hunter:'hunter'};
-const items=JSON.parse(fs.readFileSync(path.join(root,'world/items.txt'))).filter(i=>i.source==='longship');
+const items=JSON.parse(fs.readFileSync(path.join(root,'world/items.txt'))).filter(i=>i.source==='longship'&&i.kind!=='cloak');
 assert.equal(items.length,28);assert.ok(items.every(i=>i.art==='regearkeel'&&!i.tint));
 const server=http.createServer((req,res)=>{
  const u=new URL(req.url,'http://localhost');

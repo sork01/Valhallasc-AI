@@ -139121,5 +139121,2290 @@
       "client/assets/hunter_f_progression_accessory_regearnull_depth.png",
       "client/assets/gear_icon_null-shared-accessory.png"
     ]
+  },
+  "CLOAK-TRAVEL": {
+    "variant": "travel",
+    "kind": "cloak",
+    "classes": {
+      "warrior-male": {
+        "idle": {
+          "id": "38ca9a5352d96699",
+          "offset": [
+            59,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "32c8e2733c72defa",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "c815d083edfcba3e",
+          "offset": [
+            57,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "2112979539a3c5a6",
+          "offset": [
+            57,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "8153520cccd90993",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "warrior-female": {
+        "idle": {
+          "id": "aa11e42efa0fdd0b",
+          "offset": [
+            59,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "3721d32124217dbb",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "9c0893d489383e8a",
+          "offset": [
+            57,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "cfd5df68566d5969",
+          "offset": [
+            57,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "4d0cb18ed231fd99",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "assassin-male": {
+        "idle": {
+          "id": "ad60f9bbb58e8fce",
+          "offset": [
+            59,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "84daab5e8c5b3518",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "b7909e7d3643e74f",
+          "offset": [
+            58,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "59aec81eb68ea544",
+          "offset": [
+            57,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "559cf483fbf04fb5",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "assassin-female": {
+        "idle": {
+          "id": "8d5ac88f8738108f",
+          "offset": [
+            59,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "ada118a8d3092690",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "fc9bcb97bd7af7bb",
+          "offset": [
+            58,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "ae4fad28b0ef842c",
+          "offset": [
+            57,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "6156d5fe49322384",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "mage-male": {
+        "idle": {
+          "id": "adf495cb2b71769b",
+          "offset": [
+            59,
+            50
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "ea4adda7ab1c401c",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "2343cdef5820d7ae",
+          "offset": [
+            58,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "bcf84164dc5b82d0",
+          "offset": [
+            57,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "cee307db5bfc1a40",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "mage-female": {
+        "idle": {
+          "id": "860eefee4269c496",
+          "offset": [
+            59,
+            50
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "d06a0e95be30d79b",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "755070ac18178138",
+          "offset": [
+            58,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "18284ae4e7107536",
+          "offset": [
+            57,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "91cde756173fe5b6",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "priest-male": {
+        "idle": {
+          "id": "39c481f49a14e30e",
+          "offset": [
+            59,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "b163805c13dee08e",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "ab65a6518c6863ac",
+          "offset": [
+            58,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "50e0c280e3ad9071",
+          "offset": [
+            57,
+            49
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "86244ecac6deb080",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "priest-female": {
+        "idle": {
+          "id": "84153e7dc3eb97ce",
+          "offset": [
+            59,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "c73d45d2281a3538",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "b5ba205d79cb166b",
+          "offset": [
+            58,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "b0337d94d7ac7744",
+          "offset": [
+            57,
+            49
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "fce0c76017b94bbd",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "hunter-male": {
+        "idle": {
+          "id": "514f07d236453088",
+          "offset": [
+            59,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "f041ea1d86dd1e3a",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "beda4f1612d13814",
+          "offset": [
+            59,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "626587f9d3013335",
+          "offset": [
+            57,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "7f7772f394bdbd78",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "hunter-female": {
+        "idle": {
+          "id": "011546b5a8353bce",
+          "offset": [
+            59,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "30a03a0e489e90e0",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "85786cc4ea42a8f3",
+          "offset": [
+            59,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "cec488a933ff78be",
+          "offset": [
+            57,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "80c80c6f65fa4b8b",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      }
+    },
+    "icon": {
+      "id": "6832a36de851834f",
+      "offset": [
+        8,
+        4
+      ],
+      "frameCount": 1
+    },
+    "files": [
+      "client/assets/warrior_layered_cloak_travel.png",
+      "client/assets/warrior_layered_cloak_travel_depth.png",
+      "client/assets/warrior_layered_f_cloak_travel.png",
+      "client/assets/warrior_layered_f_cloak_travel_depth.png",
+      "client/assets/assassin_cloak_travel.png",
+      "client/assets/assassin_cloak_travel_depth.png",
+      "client/assets/assassin_f_cloak_travel.png",
+      "client/assets/assassin_f_cloak_travel_depth.png",
+      "client/assets/mage_cloak_travel.png",
+      "client/assets/mage_cloak_travel_depth.png",
+      "client/assets/mage_f_cloak_travel.png",
+      "client/assets/mage_f_cloak_travel_depth.png",
+      "client/assets/priest_cloak_travel.png",
+      "client/assets/priest_cloak_travel_depth.png",
+      "client/assets/priest_f_cloak_travel.png",
+      "client/assets/priest_f_cloak_travel_depth.png",
+      "client/assets/hunter_cloak_travel.png",
+      "client/assets/hunter_cloak_travel_depth.png",
+      "client/assets/hunter_f_cloak_travel.png",
+      "client/assets/hunter_f_cloak_travel_depth.png",
+      "client/assets/gear_icon_cloak_travel.png"
+    ]
+  },
+  "CLOAK-HOODED": {
+    "variant": "hooded",
+    "kind": "cloak",
+    "classes": {
+      "warrior-male": {
+        "idle": {
+          "id": "c8969db749240154",
+          "offset": [
+            56,
+            45
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "2d5a0a10b49fdc84",
+          "offset": [
+            50,
+            46
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "1e2e073efc9af14c",
+          "offset": [
+            55,
+            44
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "0a818ae5af3a8e01",
+          "offset": [
+            56,
+            42
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "0ff296e6a81580a4",
+          "offset": [
+            44,
+            43
+          ],
+          "frameCount": 64
+        }
+      },
+      "warrior-female": {
+        "idle": {
+          "id": "9db42bc50ec412b4",
+          "offset": [
+            56,
+            45
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "a639539863a69a7b",
+          "offset": [
+            50,
+            46
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "db751d39710d5068",
+          "offset": [
+            55,
+            44
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "7ba8e75f3a178bae",
+          "offset": [
+            56,
+            42
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "3bcf8aef13d82464",
+          "offset": [
+            44,
+            43
+          ],
+          "frameCount": 64
+        }
+      },
+      "assassin-male": {
+        "idle": {
+          "id": "ef15a5c3765ec823",
+          "offset": [
+            56,
+            45
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "8059d8ce7cee1194",
+          "offset": [
+            50,
+            47
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "b9452cc1bcb92def",
+          "offset": [
+            54,
+            44
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "e9cf53ada7d2fc49",
+          "offset": [
+            56,
+            42
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "23ef6f71d457a0d3",
+          "offset": [
+            44,
+            43
+          ],
+          "frameCount": 64
+        }
+      },
+      "assassin-female": {
+        "idle": {
+          "id": "062bc1ad698a34b3",
+          "offset": [
+            56,
+            45
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "e6965a9135b04bb4",
+          "offset": [
+            50,
+            47
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "0fd90e3e349dcb21",
+          "offset": [
+            54,
+            44
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "42da160a2c0eadb9",
+          "offset": [
+            56,
+            42
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "a9099477a130e676",
+          "offset": [
+            44,
+            43
+          ],
+          "frameCount": 64
+        }
+      },
+      "mage-male": {
+        "idle": {
+          "id": "224c65584d005325",
+          "offset": [
+            56,
+            45
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "3a8b728e1bd8d67d",
+          "offset": [
+            49,
+            47
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "baf88b6b74d6647a",
+          "offset": [
+            55,
+            44
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "8926f280c98eb2bc",
+          "offset": [
+            56,
+            42
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "a6ea20bdec9b834b",
+          "offset": [
+            44,
+            43
+          ],
+          "frameCount": 64
+        }
+      },
+      "mage-female": {
+        "idle": {
+          "id": "4e30eaf30c192bfc",
+          "offset": [
+            56,
+            45
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "ce10a33e9edc9593",
+          "offset": [
+            49,
+            47
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "1ea16e576aa66ec2",
+          "offset": [
+            55,
+            44
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "12ada979263d9e1c",
+          "offset": [
+            56,
+            42
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "c82449ffb623d365",
+          "offset": [
+            44,
+            43
+          ],
+          "frameCount": 64
+        }
+      },
+      "priest-male": {
+        "idle": {
+          "id": "3a0a57319da11826",
+          "offset": [
+            56,
+            45
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "30c053d1894d9d00",
+          "offset": [
+            50,
+            45
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "4df974262681a6da",
+          "offset": [
+            54,
+            45
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "5142df49ac43b1ce",
+          "offset": [
+            56,
+            42
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "ccff46705d1f2dfa",
+          "offset": [
+            44,
+            43
+          ],
+          "frameCount": 64
+        }
+      },
+      "priest-female": {
+        "idle": {
+          "id": "61c42386a8dcf3e3",
+          "offset": [
+            56,
+            45
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "2d9fa3a76366862e",
+          "offset": [
+            50,
+            45
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "25a249280e02694e",
+          "offset": [
+            54,
+            45
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "67f41bbe93d74872",
+          "offset": [
+            56,
+            42
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "2d2039e4bf4994fb",
+          "offset": [
+            44,
+            43
+          ],
+          "frameCount": 64
+        }
+      },
+      "hunter-male": {
+        "idle": {
+          "id": "89e968b475f91232",
+          "offset": [
+            56,
+            45
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "9a2a154151678a90",
+          "offset": [
+            50,
+            47
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "c190e58b4d88e20a",
+          "offset": [
+            55,
+            43
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "83023ef4d8663068",
+          "offset": [
+            56,
+            42
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "a7c1168abc777d42",
+          "offset": [
+            44,
+            43
+          ],
+          "frameCount": 64
+        }
+      },
+      "hunter-female": {
+        "idle": {
+          "id": "fea0815e314c9c9b",
+          "offset": [
+            56,
+            45
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "f2e0fe0441d8c567",
+          "offset": [
+            50,
+            47
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "8ca49ff1f151c8d8",
+          "offset": [
+            55,
+            43
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "ac345be9516367a2",
+          "offset": [
+            56,
+            42
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "074de555e41ab040",
+          "offset": [
+            44,
+            43
+          ],
+          "frameCount": 64
+        }
+      }
+    },
+    "icon": {
+      "id": "daaa4aac119e3035",
+      "offset": [
+        9,
+        4
+      ],
+      "frameCount": 1
+    },
+    "files": [
+      "client/assets/warrior_layered_cloak_hooded.png",
+      "client/assets/warrior_layered_cloak_hooded_depth.png",
+      "client/assets/warrior_layered_f_cloak_hooded.png",
+      "client/assets/warrior_layered_f_cloak_hooded_depth.png",
+      "client/assets/assassin_cloak_hooded.png",
+      "client/assets/assassin_cloak_hooded_depth.png",
+      "client/assets/assassin_f_cloak_hooded.png",
+      "client/assets/assassin_f_cloak_hooded_depth.png",
+      "client/assets/mage_cloak_hooded.png",
+      "client/assets/mage_cloak_hooded_depth.png",
+      "client/assets/mage_f_cloak_hooded.png",
+      "client/assets/mage_f_cloak_hooded_depth.png",
+      "client/assets/priest_cloak_hooded.png",
+      "client/assets/priest_cloak_hooded_depth.png",
+      "client/assets/priest_f_cloak_hooded.png",
+      "client/assets/priest_f_cloak_hooded_depth.png",
+      "client/assets/hunter_cloak_hooded.png",
+      "client/assets/hunter_cloak_hooded_depth.png",
+      "client/assets/hunter_f_cloak_hooded.png",
+      "client/assets/hunter_f_cloak_hooded_depth.png",
+      "client/assets/gear_icon_cloak_hooded.png"
+    ]
+  },
+  "CLOAK-MANTLE": {
+    "variant": "mantle",
+    "kind": "cloak",
+    "classes": {
+      "warrior-male": {
+        "idle": {
+          "id": "99e007fa5c485400",
+          "offset": [
+            52,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "0b18d84e259c79cc",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "1839eed4b2042572",
+          "offset": [
+            51,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "e0c04d3b776e0145",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "b12e3c72cfae864e",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "warrior-female": {
+        "idle": {
+          "id": "454ccc7d9cf77205",
+          "offset": [
+            52,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "1bc09b934a3e4cf3",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "881e2e0d75212ab0",
+          "offset": [
+            51,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "3f4cd58209a8ca6b",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "c816ecef00f881a6",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "assassin-male": {
+        "idle": {
+          "id": "7c23afe1b7126a43",
+          "offset": [
+            53,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "67dfa5be3069179d",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "97a2e31e32ead6c4",
+          "offset": [
+            50,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "7fa43305c4e6e34a",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "6134d7d84eb926e2",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "assassin-female": {
+        "idle": {
+          "id": "fba7ac15a35375ce",
+          "offset": [
+            53,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "ed55a8e881ff6cbe",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "7d57b8fb25af281e",
+          "offset": [
+            50,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "6ccc5a3e0a597129",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "0547ccd7c8d221a9",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "mage-male": {
+        "idle": {
+          "id": "7464e6401b3e2d62",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "2f555f537f522c73",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "34623c1141272d8e",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "79fd40f440e39639",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "3789125f84c239f6",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "mage-female": {
+        "idle": {
+          "id": "dd854bfca7169d88",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "bb7d612d80cd1eb2",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "34d6e1e64982fdd2",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "9cb31962d4cc3481",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "e5d05d4a5022eb4b",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "priest-male": {
+        "idle": {
+          "id": "7770e70b90ba708d",
+          "offset": [
+            53,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "f25ad789a773bcb5",
+          "offset": [
+            47,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "bd2f2e0ae23b92af",
+          "offset": [
+            50,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "703bacc0f7d2099c",
+          "offset": [
+            53,
+            49
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "f6d5306c26232bf3",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "priest-female": {
+        "idle": {
+          "id": "c79216fe60f0d47b",
+          "offset": [
+            53,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "98ab2c807c128146",
+          "offset": [
+            47,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "4115cd073248abeb",
+          "offset": [
+            50,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "ef4c07342d74b6c2",
+          "offset": [
+            53,
+            49
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "1e1bac1a9772b979",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "hunter-male": {
+        "idle": {
+          "id": "f2fcf2634a03a9b9",
+          "offset": [
+            52,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "fc8cb447b0faa010",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "b0da329a96e43acc",
+          "offset": [
+            51,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "4c3eb6627e7f248b",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "415c58ab58a9082e",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "hunter-female": {
+        "idle": {
+          "id": "12054e80a40d1b49",
+          "offset": [
+            52,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "78038c5b43a3fd3b",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "f1e81b43b4c32d76",
+          "offset": [
+            51,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "63bc01a2fe865f9a",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "b9daf8d714cb708f",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        }
+      }
+    },
+    "icon": {
+      "id": "b1b87ae7c797f292",
+      "offset": [
+        8,
+        4
+      ],
+      "frameCount": 1
+    },
+    "files": [
+      "client/assets/warrior_layered_cloak_mantle.png",
+      "client/assets/warrior_layered_cloak_mantle_depth.png",
+      "client/assets/warrior_layered_f_cloak_mantle.png",
+      "client/assets/warrior_layered_f_cloak_mantle_depth.png",
+      "client/assets/assassin_cloak_mantle.png",
+      "client/assets/assassin_cloak_mantle_depth.png",
+      "client/assets/assassin_f_cloak_mantle.png",
+      "client/assets/assassin_f_cloak_mantle_depth.png",
+      "client/assets/mage_cloak_mantle.png",
+      "client/assets/mage_cloak_mantle_depth.png",
+      "client/assets/mage_f_cloak_mantle.png",
+      "client/assets/mage_f_cloak_mantle_depth.png",
+      "client/assets/priest_cloak_mantle.png",
+      "client/assets/priest_cloak_mantle_depth.png",
+      "client/assets/priest_f_cloak_mantle.png",
+      "client/assets/priest_f_cloak_mantle_depth.png",
+      "client/assets/hunter_cloak_mantle.png",
+      "client/assets/hunter_cloak_mantle_depth.png",
+      "client/assets/hunter_f_cloak_mantle.png",
+      "client/assets/hunter_f_cloak_mantle_depth.png",
+      "client/assets/gear_icon_cloak_mantle.png"
+    ]
+  },
+  "CLOAK-CLASP": {
+    "variant": "clasp",
+    "kind": "cloak",
+    "classes": {
+      "warrior-male": {
+        "idle": {
+          "id": "7c0f59ad685412c0",
+          "offset": [
+            55,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "1596f77707875369",
+          "offset": [
+            48,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "6e871c4aa7f53416",
+          "offset": [
+            54,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "3afdd9488d2f4d18",
+          "offset": [
+            55,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "4eb9d4a6d3debb2e",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "warrior-female": {
+        "idle": {
+          "id": "c46b444312064b67",
+          "offset": [
+            55,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "a47a941aacced32e",
+          "offset": [
+            48,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "af8ecca95003d417",
+          "offset": [
+            54,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "bebafe7822a1a280",
+          "offset": [
+            55,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "2db6aae79c09564a",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "assassin-male": {
+        "idle": {
+          "id": "f6d6df32907b1cfd",
+          "offset": [
+            55,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "7bc5c8e8c75b3095",
+          "offset": [
+            48,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "30adaed287b235ab",
+          "offset": [
+            52,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "5ca3c25a5d108010",
+          "offset": [
+            55,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "babdd45a363440f5",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "assassin-female": {
+        "idle": {
+          "id": "1ea659025ea726fd",
+          "offset": [
+            55,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "0b5f54011145a061",
+          "offset": [
+            48,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "6f95138122d1a724",
+          "offset": [
+            52,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "ef4ca2c4b71fea60",
+          "offset": [
+            55,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "3be847762a2b6e77",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "mage-male": {
+        "idle": {
+          "id": "047d0a16abec6365",
+          "offset": [
+            55,
+            50
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "3ceab539bf95499f",
+          "offset": [
+            48,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "3bcd09953d662873",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "c3b5eb963e335a36",
+          "offset": [
+            55,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "009701feb9453b4e",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "mage-female": {
+        "idle": {
+          "id": "8f06dc5786094587",
+          "offset": [
+            55,
+            50
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "841b4d8fb4a8ebd7",
+          "offset": [
+            48,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "14b583716561d04d",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "74b50c64c0ef28e5",
+          "offset": [
+            55,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "6af4fd8a6651ecd1",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "priest-male": {
+        "idle": {
+          "id": "8d8d6618ffb1180b",
+          "offset": [
+            55,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "1f6a0f0b84c66c63",
+          "offset": [
+            49,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "d53d05ef92e5bc88",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "6f39858658d0e4ed",
+          "offset": [
+            54,
+            49
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "5aac9f9420162f65",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "priest-female": {
+        "idle": {
+          "id": "26c4e029250d4c31",
+          "offset": [
+            55,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "031c9e4f904c3a04",
+          "offset": [
+            49,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "003e5a957c7bdb4a",
+          "offset": [
+            54,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "2bdc519ac95576f3",
+          "offset": [
+            54,
+            49
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "f1d11c4477595824",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "hunter-male": {
+        "idle": {
+          "id": "475224ede667979f",
+          "offset": [
+            54,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "92ec1afd84f9aeaa",
+          "offset": [
+            48,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "a68c03cb616a50e4",
+          "offset": [
+            54,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "a6651e078ea5fcb9",
+          "offset": [
+            55,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "df9dc120823b7ad2",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "hunter-female": {
+        "idle": {
+          "id": "1bcf7813527262ea",
+          "offset": [
+            54,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "1257dca68d6b5251",
+          "offset": [
+            48,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "1f3974d67fbf59c5",
+          "offset": [
+            54,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "c7497ca29e4cc57a",
+          "offset": [
+            55,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "8ee8d678622e6c30",
+          "offset": [
+            51,
+            50
+          ],
+          "frameCount": 64
+        }
+      }
+    },
+    "icon": {
+      "id": "049caca4ca684e22",
+      "offset": [
+        7,
+        4
+      ],
+      "frameCount": 1
+    },
+    "files": [
+      "client/assets/warrior_layered_cloak_clasp.png",
+      "client/assets/warrior_layered_cloak_clasp_depth.png",
+      "client/assets/warrior_layered_f_cloak_clasp.png",
+      "client/assets/warrior_layered_f_cloak_clasp_depth.png",
+      "client/assets/assassin_cloak_clasp.png",
+      "client/assets/assassin_cloak_clasp_depth.png",
+      "client/assets/assassin_f_cloak_clasp.png",
+      "client/assets/assassin_f_cloak_clasp_depth.png",
+      "client/assets/mage_cloak_clasp.png",
+      "client/assets/mage_cloak_clasp_depth.png",
+      "client/assets/mage_f_cloak_clasp.png",
+      "client/assets/mage_f_cloak_clasp_depth.png",
+      "client/assets/priest_cloak_clasp.png",
+      "client/assets/priest_cloak_clasp_depth.png",
+      "client/assets/priest_f_cloak_clasp.png",
+      "client/assets/priest_f_cloak_clasp_depth.png",
+      "client/assets/hunter_cloak_clasp.png",
+      "client/assets/hunter_cloak_clasp_depth.png",
+      "client/assets/hunter_f_cloak_clasp.png",
+      "client/assets/hunter_f_cloak_clasp_depth.png",
+      "client/assets/gear_icon_cloak_clasp.png"
+    ]
+  },
+  "CLOAK-EMBER": {
+    "variant": "ember",
+    "kind": "cloak",
+    "classes": {
+      "warrior-male": {
+        "idle": {
+          "id": "62ca8326d8fb773e",
+          "offset": [
+            52,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "82f65cc13585be95",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "553bf6178b2e75c6",
+          "offset": [
+            51,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "b2436266e51a6a10",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "c2ecf4cf81ac790e",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "warrior-female": {
+        "idle": {
+          "id": "37613eb75a643126",
+          "offset": [
+            52,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "f84ef8c12651f7fd",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "b853c58e50f27139",
+          "offset": [
+            51,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "faa91a8bcbeb25e6",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "d6d5a5ad6e50c599",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "assassin-male": {
+        "idle": {
+          "id": "4af6eb4fcaeb7261",
+          "offset": [
+            52,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "7b4ec737402700fa",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "09b3d9e0a350d485",
+          "offset": [
+            48,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "891b6ac19d94c81e",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "b5bb48947ed1c3cb",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "assassin-female": {
+        "idle": {
+          "id": "97d1826b29a3e145",
+          "offset": [
+            52,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "c137230d2b24bc7e",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "20307e12d68f44b2",
+          "offset": [
+            48,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "2a38cc32c01d4fa5",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "c59b5ac91016489f",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "mage-male": {
+        "idle": {
+          "id": "69e941736fe29b19",
+          "offset": [
+            52,
+            50
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "f32ddeab1713cb87",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "adce8261794226e6",
+          "offset": [
+            50,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "18293013be00baf4",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "33624a99697ae110",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "mage-female": {
+        "idle": {
+          "id": "0cac1855dce1683b",
+          "offset": [
+            52,
+            50
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "a446c066c67abd50",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "68302569c8432db7",
+          "offset": [
+            50,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "4bcb335f71a7cb25",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "f9330c4e01c96b1a",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "priest-male": {
+        "idle": {
+          "id": "3e7e960f7fffa725",
+          "offset": [
+            52,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "400e57d40f241c1f",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "8ad5d64ab87edc32",
+          "offset": [
+            49,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "2202052c49421d2e",
+          "offset": [
+            53,
+            49
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "f501e41c670553b1",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "priest-female": {
+        "idle": {
+          "id": "5be613404a81cdd2",
+          "offset": [
+            52,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "f57beaa64c6981cb",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "6b97a7b2b8d75db0",
+          "offset": [
+            49,
+            50
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "8fd4713579615f88",
+          "offset": [
+            53,
+            49
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "bac34a0665d4619f",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "hunter-male": {
+        "idle": {
+          "id": "f2c2ab7ceb0c3c6d",
+          "offset": [
+            51,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "8421386a4729751a",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "c94f4b1899ef7639",
+          "offset": [
+            50,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "ff91cbec89938eed",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "b36323b4e5340d20",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        }
+      },
+      "hunter-female": {
+        "idle": {
+          "id": "41bb5e7b30bd2c31",
+          "offset": [
+            51,
+            51
+          ],
+          "frameCount": 48
+        },
+        "walk": {
+          "id": "2ba47b0c3acddded",
+          "offset": [
+            45,
+            50
+          ],
+          "frameCount": 64
+        },
+        "attack": {
+          "id": "564a07c55943dd6a",
+          "offset": [
+            50,
+            51
+          ],
+          "frameCount": 64
+        },
+        "hurt": {
+          "id": "227f328162e4848e",
+          "offset": [
+            53,
+            50
+          ],
+          "frameCount": 32
+        },
+        "die": {
+          "id": "e52667809a5e229d",
+          "offset": [
+            46,
+            50
+          ],
+          "frameCount": 64
+        }
+      }
+    },
+    "icon": {
+      "id": "76f4bc5f59ee4e29",
+      "offset": [
+        7,
+        4
+      ],
+      "frameCount": 1
+    },
+    "files": [
+      "client/assets/warrior_layered_cloak_ember.png",
+      "client/assets/warrior_layered_cloak_ember_depth.png",
+      "client/assets/warrior_layered_f_cloak_ember.png",
+      "client/assets/warrior_layered_f_cloak_ember_depth.png",
+      "client/assets/assassin_cloak_ember.png",
+      "client/assets/assassin_cloak_ember_depth.png",
+      "client/assets/assassin_f_cloak_ember.png",
+      "client/assets/assassin_f_cloak_ember_depth.png",
+      "client/assets/mage_cloak_ember.png",
+      "client/assets/mage_cloak_ember_depth.png",
+      "client/assets/mage_f_cloak_ember.png",
+      "client/assets/mage_f_cloak_ember_depth.png",
+      "client/assets/priest_cloak_ember.png",
+      "client/assets/priest_cloak_ember_depth.png",
+      "client/assets/priest_f_cloak_ember.png",
+      "client/assets/priest_f_cloak_ember_depth.png",
+      "client/assets/hunter_cloak_ember.png",
+      "client/assets/hunter_cloak_ember_depth.png",
+      "client/assets/hunter_f_cloak_ember.png",
+      "client/assets/hunter_f_cloak_ember_depth.png",
+      "client/assets/gear_icon_cloak_ember.png"
+    ]
   }
 }
