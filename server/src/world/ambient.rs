@@ -1,7 +1,9 @@
 //! Temporary adventurers in shared maps occupied by real players. They use the normal Player combat and movement
 //! code, but have no account, socket, save, party seat or dungeon access.
 use super::*;
+use serde::Deserialize;
 use std::collections::VecDeque;
+use std::sync::LazyLock;
 
 const NAMES: &str = include_str!("../../../world/ambient_names.txt");
 const CLASSES: [Class; 5] = [
@@ -11,28 +13,52 @@ const CLASSES: [Class; 5] = [
     Class::Priest,
     Class::Hunter,
 ];
-const FIELD_CHAT: [&str; 10] = [
-    "taking the long way around this time",
-    "bags are nearly full again",
-    "one more pull, then back to town",
-    "the view out here is worth the walk",
-    "that was closer than it looked",
-    "need to mend this gear soon",
-    "anyone seen the big one today?",
-    "going to try the eastern trail",
-    "these things keep coming back",
-    "just checking the map a moment",
-];
-const TOWN_CHAT: [&str; 8] = [
-    "selling a few things, then heading out",
-    "anyone know a good route from here?",
-    "finally made it back in one piece",
-    "taking a breather before the next run",
-    "I should have packed more potions",
-    "the market is busy today",
-    "need to sort these bags first",
-    "heading out again in a minute",
-];
+/// Chat timing, in seconds: the first line comes 3-5 minutes after an adventurer appears, later ones 6-10 minutes apart,
+/// and a zone hears at most one ambient line per `CHAT_ZONE_GAP`.
+const CHAT_FIRST: f64 = 180.;
+const CHAT_FIRST_SPREAD: f64 = 120.;
+const CHAT_GAP: f64 = 360.;
+const CHAT_GAP_SPREAD: f64 = 240.;
+const CHAT_ZONE_GAP: f64 = 60.;
+
+/// What adventurers say, by place (world/ambient-chat.txt).
+#[derive(Deserialize)]
+struct ChatLines {
+    field: Vec<String>,
+    town: Vec<String>,
+}
+
+static CHAT: LazyLock<ChatLines> = LazyLock::new(|| {
+    serde_json::from_str(include_str!("../../../world/ambient-chat.txt"))
+        .expect("valid ambient chat lines")
+});
+
+/// A shuffled bag of line numbers: nothing repeats until the whole list has been used, and the first line of a fresh
+/// bag is never the one said last.
+#[derive(Default)]
+struct LineBag {
+    left: Vec<usize>,
+    last: Option<usize>,
+}
+
+impl LineBag {
+    fn draw(&mut self, len: usize, mut random: impl FnMut() -> f64) -> usize {
+        if self.left.is_empty() {
+            self.left = (0..len).collect();
+            for i in (1..len).rev() {
+                self.left
+                    .swap(i, ((random() * (i + 1) as f64) as usize).min(i));
+            }
+            // `pop` takes the end of the vector, so that is the first line of the new bag.
+            if len > 1 && self.left.last() == self.last.as_ref() {
+                self.left.swap(0, len - 1);
+            }
+        }
+        let line = self.left.pop().unwrap();
+        self.last = Some(line);
+        line
+    }
+}
 
 pub(super) struct Ambient {
     phase: AmbientPhase,
@@ -46,6 +72,8 @@ pub(super) struct Ambient {
     hub_handled: bool,
     next_think: f64,
     next_chat: f64,
+    field_lines: LineBag,
+    town_lines: LineBag,
     last_point: Point,
     stuck_for: f64,
 }
@@ -414,7 +442,9 @@ impl World {
             hub_wait: 0.,
             hub_handled: false,
             next_think: self.time + self.random(),
-            next_chat: self.time + 45. + self.random() * 75.,
+            next_chat: self.time + CHAT_FIRST + self.random() * CHAT_FIRST_SPREAD,
+            field_lines: LineBag::default(),
+            town_lines: LineBag::default(),
             last_point: point,
             stuck_for: 0.,
         });
@@ -599,18 +629,47 @@ impl World {
                     && other.character.point().distance(me) < 18.
             });
         if chat_due {
-            let lines: &[&str] = if self.maps[zone].in_city(me) {
-                &TOWN_CHAT
+            let capped = self.ambient_chat_at.get(&zone).copied();
+            if let Some(at) = capped.filter(|at| at + CHAT_ZONE_GAP > self.time) {
+                // Someone spoke in this zone a moment ago: wait for the next slot instead of talking over them.
+                let retry = at + CHAT_ZONE_GAP + self.random() * CHAT_ZONE_GAP;
+                self.players
+                    .get_mut(&session)
+                    .unwrap()
+                    .ambient
+                    .as_mut()
+                    .unwrap()
+                    .next_chat = retry;
             } else {
-                &FIELD_CHAT
-            };
-            let line = lines[(self.random() * lines.len() as f64) as usize];
-            let next_chat = self.time + 120. + self.random() * 120.;
-            let p = self.players.get_mut(&session).unwrap();
-            p.ambient.as_mut().unwrap().next_chat = next_chat;
-            let name = p.character.look.name.clone();
-            let id = p.character.id.clone();
-            self.emit_zone(zone, json!({"type":"chat","name":name,"id":id,"text":line}));
+                let town = self.maps[zone].in_city(me);
+                let lines = if town { &CHAT.town } else { &CHAT.field };
+                let brain = self
+                    .players
+                    .get_mut(&session)
+                    .unwrap()
+                    .ambient
+                    .as_mut()
+                    .unwrap();
+                let mut bag = std::mem::take(if town {
+                    &mut brain.town_lines
+                } else {
+                    &mut brain.field_lines
+                });
+                let line = lines[bag.draw(lines.len(), || self.random())].clone();
+                let next_chat = self.time + CHAT_GAP + self.random() * CHAT_GAP_SPREAD;
+                let p = self.players.get_mut(&session).unwrap();
+                let brain = p.ambient.as_mut().unwrap();
+                *(if town {
+                    &mut brain.town_lines
+                } else {
+                    &mut brain.field_lines
+                }) = bag;
+                brain.next_chat = next_chat;
+                let name = p.character.look.name.clone();
+                let id = p.character.id.clone();
+                self.ambient_chat_at.insert(zone, self.time);
+                self.emit_zone(zone, json!({"type":"chat","name":name,"id":id,"text":line}));
+            }
         }
         if self.tick.is_multiple_of(10) && target.is_some() {
             self.ai_combat(session, &[session], target);
@@ -840,6 +899,78 @@ mod tests {
             .values()
             .filter(|p| p.ambient.is_some() && p.character.zone == zone)
             .collect()
+    }
+
+    #[test]
+    fn chat_lines_are_short_unique_and_plentiful() {
+        for (place, lines, floor) in [("field", &CHAT.field, 130), ("town", &CHAT.town, 80)] {
+            assert!(lines.len() >= floor, "{place} has {} lines", lines.len());
+            assert_eq!(
+                lines.iter().collect::<HashSet<_>>().len(),
+                lines.len(),
+                "{place} repeats a line"
+            );
+            for line in lines {
+                assert!(
+                    !line.trim().is_empty() && line.chars().count() <= 90,
+                    "{place}: {line:?}"
+                );
+            }
+        }
+        let all: HashSet<_> = CHAT.field.iter().chain(&CHAT.town).collect();
+        assert!(all.len() >= 200 + 18 - 4, "two lists share too many lines");
+    }
+
+    #[test]
+    fn a_line_bag_never_repeats_until_the_list_is_used_up() {
+        let mut seed = 99u64;
+        let mut random = move || {
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+            (seed >> 32) as f64 / 4294967296.
+        };
+        let mut bag = LineBag::default();
+        let mut previous = None;
+        for _ in 0..40 {
+            let mut round = HashSet::new();
+            for _ in 0..7 {
+                let line = bag.draw(7, &mut random);
+                assert!(line < 7 && round.insert(line), "repeated inside a round");
+                assert_ne!(Some(line), previous, "repeated across a round boundary");
+                previous = Some(line);
+            }
+        }
+    }
+
+    #[test]
+    fn adventurers_speak_rarely_and_a_zone_hears_one_at_a_time() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1);
+        let mut said: Vec<(f64, String)> = Vec::new();
+        // Twenty-five minutes at 20 ticks a second; the human stays put and the adventurers wander near the hub.
+        for _ in 0..30_000 {
+            w.step();
+            while let Ok(packet) = rx.try_recv() {
+                if packet["type"] == "chat" {
+                    said.push((w.time, packet["name"].as_str().unwrap().to_string()));
+                }
+            }
+        }
+        assert!(said.len() >= 3, "too quiet to test anything: {said:?}");
+        let first = 180.; // owner: first line after 3-5 minutes
+        assert!(said.iter().all(|(t, _)| *t >= first), "{said:?}");
+        for pair in said.windows(2) {
+            assert!(pair[1].0 - pair[0].0 >= 59.9, "{said:?}");
+        }
+        let mut by_name: BTreeMap<&str, Vec<f64>> = BTreeMap::new();
+        for (t, name) in &said {
+            by_name.entry(name).or_default().push(*t);
+        }
+        for times in by_name.values() {
+            for pair in times.windows(2) {
+                assert!(pair[1] - pair[0] >= 359.9, "{said:?}");
+            }
+        }
+        assert!(said.len() <= 6 * (1500 / 360 + 1), "{} lines", said.len());
     }
 
     #[test]

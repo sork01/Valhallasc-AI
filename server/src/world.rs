@@ -1422,6 +1422,8 @@ pub struct World {
     gauntlets: Vec<gauntlet::Run>,
     /// Desired autonomous adventurers in each currently occupied shared zone.
     ambient_targets: BTreeMap<usize, usize>,
+    /// When each zone last heard an ambient adventurer speak.
+    ambient_chat_at: BTreeMap<usize, f64>,
     pub ambient_enabled: bool,
     level_spread: i32,
     // Test servers only (VALHALLA_GOD_MODE=1): enemies still fight, but players take no damage.
@@ -1522,6 +1524,7 @@ impl World {
             merc_seq: 0,
             gauntlets: vec![],
             ambient_targets: BTreeMap::new(),
+            ambient_chat_at: BTreeMap::new(),
             ambient_enabled: false,
             level_spread,
             god_mode: false,
