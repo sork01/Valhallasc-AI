@@ -1003,13 +1003,18 @@ impl Character {
     }
     /// Every worn piece: the extra slots plus the class armor and weapon.
     pub(crate) fn worn_items(&self) -> Vec<&'static Item> {
+        self.worn_slots().into_iter().map(|(_, i)| i).collect()
+    }
+    /// `worn_items` with the slot each piece sits in, in the same order: counting repeats of an item along this
+    /// list picks the same ledger copy as `gear_attributes` does.
+    pub(crate) fn worn_slots(&self) -> Vec<(&str, &'static Item)> {
         let (armor, weapon) = self.gear();
         let class = self.look.class;
         self.equipment
-            .values()
-            .filter_map(|id| item(id))
-            .chain(equipment(class, "armor", armor))
-            .chain(equipment(class, "weapon", weapon))
+            .iter()
+            .filter_map(|(slot, id)| item(id).map(|i| (slot.as_str(), i)))
+            .chain(equipment(class, "armor", armor).map(|i| ("chest", i)))
+            .chain(equipment(class, "weapon", weapon).map(|i| ("hands", i)))
             .collect()
     }
     /// Count distinct equipment kinds, so wearing two accessories never substitutes for a missing set slot.

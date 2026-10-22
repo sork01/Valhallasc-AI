@@ -60,6 +60,20 @@ impl LineBag {
     }
 }
 
+/// What an adventurer says when asked to trade or duel: they never do either. `{0}` is the adventurer's name.
+const TRADE_DECLINES: [&str; 4] = [
+    "{0} declined your trade request: \"Sorry, I am not trading today.\"",
+    "{0} declined your trade request: \"My bags are fine as they are.\"",
+    "{0} declined your trade request: \"Maybe another time.\"",
+    "{0} declined your trade request: \"I am in the middle of something.\"",
+];
+const DUEL_DECLINES: [&str; 4] = [
+    "{0} declined your duel: \"Not today, I am saving my strength.\"",
+    "{0} declined your duel: \"I have no quarrel with you.\"",
+    "{0} declined your duel: \"Ask me when I am less tired.\"",
+    "{0} declined your duel: \"Let us keep the peace.\"",
+];
+
 pub(super) struct Ambient {
     phase: AmbientPhase,
     hub: Point,
@@ -107,6 +121,24 @@ fn ambient_quest_matches(target: &str, kind: &str) -> bool {
 }
 
 impl World {
+    /// An adventurer answers a trade or duel request at once and opens nothing: no trade window, no challenge.
+    /// The line varies with the pair and the tick, without drawing from the world's random stream.
+    pub(super) fn ambient_declines(&self, from: &str, adventurer: &str, duel: bool) {
+        let lines = if duel {
+            &DUEL_DECLINES
+        } else {
+            &TRADE_DECLINES
+        };
+        let seed = from
+            .bytes()
+            .chain(adventurer.bytes())
+            .map(usize::from)
+            .sum::<usize>()
+            + self.tick as usize / 7;
+        let text = lines[seed % lines.len()].replace("{0}", &self.name_of(adventurer));
+        self.tell(from, text, false);
+    }
+
     pub(super) fn visible_online(&self) -> usize {
         self.players
             .values()

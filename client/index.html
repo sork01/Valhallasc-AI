@@ -147,6 +147,12 @@
           <div class="bar hp" role="progressbar" aria-label="Target health" aria-valuemin="0" id="hud-target-hp"><i id="hud-target-fill"></i><span id="hud-target-text"></span></div>
         </div>
       </div>
+      <div class="portrait-menu" id="portrait-menu" role="menu" aria-label="Player actions" hidden>
+        <p class="pm-name" aria-hidden="true"></p>
+        <button type="button" role="menuitem" data-act="trade" aria-disabled="false"><span class="pm-label">Trade</span><small class="pm-reason"></small></button>
+        <button type="button" role="menuitem" data-act="duel" aria-disabled="false"><span class="pm-label">Duel</span><small class="pm-reason"></small></button>
+        <button type="button" role="menuitem" data-act="inspect" aria-disabled="false"><span class="pm-label">Inspect</span><small class="pm-reason"></small></button>
+      </div>
     </div>
     <div id="buff-bar" class="buff-bar" role="group" aria-label="Active effects"></div>
     <div id="pvp-duel-warning" class="pvp-duel-warning" role="status" aria-live="polite" hidden></div>
@@ -249,6 +255,30 @@
       <span id="trade-request-text"></span>
       <button id="trade-accept" class="btn primary" type="button">Accept</button>
       <button id="trade-decline" class="btn ghost" type="button">Decline</button>
+    </div>
+    <div class="pause" id="inspect-panel" hidden>
+      <section class="rpg-window inspect-window" role="dialog" aria-modal="true" aria-labelledby="inspect-title">
+        <header class="rpg-titlebar">
+          <span class="window-emblem" aria-hidden="true">♜</span>
+          <h3 id="inspect-title">Inspect</h3>
+          <button class="window-close" id="inspect-close" type="button" aria-label="Close inspect window">×</button>
+        </header>
+        <p id="inspect-subtitle" class="character-subtitle"></p>
+        <p id="inspect-note" class="inspect-note" role="status"></p>
+        <div id="inspect-body" class="inspect-body" hidden>
+          <div class="paper-doll inspect-doll">
+            <div class="portrait-plinth" aria-hidden="true"></div>
+            <canvas id="inspect-cv" aria-label="Inspected character"></canvas>
+            <div id="inspect-slots" class="inspect-slots"></div>
+          </div>
+          <div class="inspect-sheet">
+            <dl id="inspect-stats" class="inspect-list"></dl>
+            <h4>Attributes</h4>
+            <dl id="inspect-attributes" class="inspect-list"></dl>
+            <section id="inspect-sets" class="character-sets" hidden></section>
+          </div>
+        </div>
+      </section>
     </div>
     <div class="pause" id="trade-panel" hidden>
       <section class="panel trade-panel" role="dialog" aria-modal="true" aria-labelledby="trade-title">
@@ -610,6 +640,8 @@
 <script src="social.js"></script>
 <script src="pvp.js"></script>
 <script src="trade.js"></script>
+<script src="portrait-menu.js"></script>
+<script src="inspect.js"></script>
 <script src="rolls.js"></script>
 <script src="gm.js"></script>
 <script src="spark.js"></script>

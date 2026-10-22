@@ -315,5 +315,13 @@
   "Fight {0} of {1} won. Health and mana restored; the next one starts in {2} seconds.": "Strid {0} av {1} vunnen. Hälsa och mana återställda; nästa börjar om {2} sekunder.",
   "Arena gauntlet · Fight {0} of {1}": "Arenaprövning · Strid {0} av {1}",
   "Next: {0} · starts in {1}s": "Nästa: {0:t} · börjar om {1} s",
-  "{0} · {1}s left": "{0:t} · {1} s kvar"
+  "{0} · {1}s left": "{0:t} · {1} s kvar",
+  "{0} declined your trade request: \"Sorry, I am not trading today.\"": "{0} avböjde din handelsförfrågan: \"Förlåt, jag handlar inte i dag.\"",
+  "{0} declined your trade request: \"My bags are fine as they are.\"": "{0} avböjde din handelsförfrågan: \"Mina väskor är bra som de är.\"",
+  "{0} declined your trade request: \"Maybe another time.\"": "{0} avböjde din handelsförfrågan: \"Kanske en annan gång.\"",
+  "{0} declined your trade request: \"I am in the middle of something.\"": "{0} avböjde din handelsförfrågan: \"Jag har precis fullt upp.\"",
+  "{0} declined your duel: \"Not today, I am saving my strength.\"": "{0} avböjde din duell: \"Inte i dag, jag sparar mina krafter.\"",
+  "{0} declined your duel: \"I have no quarrel with you.\"": "{0} avböjde din duell: \"Jag har ingen fejd med dig.\"",
+  "{0} declined your duel: \"Ask me when I am less tired.\"": "{0} avböjde din duell: \"Fråga mig när jag är mindre trött.\"",
+  "{0} declined your duel: \"Let us keep the peace.\"": "{0} avböjde din duell: \"Låt oss hålla freden.\""
 }

@@ -628,6 +628,7 @@
         portraitReady = Field.drawTargetPortrait(target, $('hud-target-face'));
       }
     } else { portraitTarget = null; portraitReady = false; }
+    window.PortraitMenu?.target(target || null, { sanctuary: !!s.hub || s.area === 'Alderhaven' });
     const resource = $('resource-bar'), kind = s.resourceType || 'rage', current = s.resource || 0, max = wholeMax(s.maxResource) || 100;
     resource.dataset.type = kind; resource.setAttribute('aria-label', kind[0].toUpperCase() + kind.slice(1));
     resource.setAttribute('aria-valuenow', wholeRes(current)); resource.setAttribute('aria-valuemax', max);

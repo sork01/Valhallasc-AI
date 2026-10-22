@@ -13,6 +13,7 @@ use tokio::sync::{mpsc, oneshot, watch};
 
 mod ambient;
 mod bank;
+mod inspect;
 use bank::BankRequest;
 #[cfg(test)]
 mod asterion_tests;
@@ -236,6 +237,8 @@ struct Player {
     /// Food healing not yet announced to the client.
     food_shown: f64,
     chat_at: f64,
+    /// When this connection last asked to inspect someone (rate limit, see world/inspect.rs).
+    inspect_at: f64,
     service_at: f64,
     bag_notice_at: f64,
     portal_at: f64,
@@ -342,6 +345,7 @@ impl Player {
             meal_cd,
             food_shown: 0.,
             chat_at: -99.,
+            inspect_at: -99.,
             service_at: -99.,
             bag_notice_at: -99.,
             portal_at: -99.,
@@ -368,7 +372,7 @@ impl Player {
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
             "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"frozen":self.frozen,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,"reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"rebirthTiers":c.rebirth_tiers,"rebirthPerks":c.rebirth_perks(),"mountTint":c.mount_tint,
             "setCounts":c.set_counts(),"setCd":self.set_cd,
-            "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet})
+            "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"inspectSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet})
     }
     fn is_hidden(&self) -> bool {
         self.character.gm && (self.hidden || self.character.zone != self.visible_zone)
@@ -1792,6 +1796,11 @@ impl World {
         "players":self.players.iter().filter(|(_, p)| p.character.zone == zone).map(|(session, p)| {
             let mut view = p.snapshot();
             if p.character.gm { view["session"] = json!(session); }
+            // What the portrait menu needs to explain a disabled Trade or Duel. Always listed: the client merges
+            // each snapshot over the last, so a flag that vanished would stay set.
+            view["hired"] = json!(p.merc.is_some());
+            view["pvpBusy"] = json!(self.pvp_busy(&p.character.id));
+            view["tradeBusy"] = json!(self.trade_index(&p.character.id).is_some());
             // The bells a hero has ringing and how long each has left (only listed while there are any).
             let bells = self.chime.view(*session);
             if !bells.is_empty() {
@@ -2054,6 +2063,7 @@ impl World {
                     | ClientMessage::Social { .. }
                     | ClientMessage::Trade { .. }
                     | ClientMessage::Pvp { .. }
+                    | ClientMessage::Inspect { .. }
                     | ClientMessage::Roll { .. }
                     | ClientMessage::Ping { .. }
             )
@@ -2275,6 +2285,7 @@ impl World {
             }
             ClientMessage::Trade { command } => self.trade(session, command),
             ClientMessage::Pvp { command } => self.pvp_command(session, command),
+            ClientMessage::Inspect { id } => self.inspect(session, &id),
             ClientMessage::Roll { id, choice } => self.roll_vote(session, id, choice),
             ClientMessage::Ping { nonce } => {
                 let _ = p.peer.try_send(json!({"type":"pong","nonce":nonce}));
