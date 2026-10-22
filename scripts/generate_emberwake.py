@@ -144,6 +144,8 @@ def main():
             assert w['zones'][ZONE-1]['name']==NAME
             w['zones'][ZONE-1]=build()
         install_parent(w)
+        from generate_chained_forge import install_parent as install_forge
+        install_forge(w)
     check(w)
     if a.check:return
     path.write_text(json.dumps(w,indent=2,ensure_ascii=False)+'\n')

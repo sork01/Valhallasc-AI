@@ -570,3 +570,12 @@ quests leading to Eldmarr's sealed Nine-Chain Door. Seven original editable
 PixelFlow sprites and separate dub-techno day/night scores accompany it.
 See [docs/emberwake.md](docs/emberwake.md) for generation, focused checks,
 the raid-party dependency and the private-copy migration before release.
+
+The sealed Chained Forge raid floor is generated with
+`python3 scripts/generate_chained_forge.py` (or `--check` to validate existing data),
+after `generate_emberwake.py`. Run `node scripts/sync-world.cjs` and rebuild the
+server afterward. The generator preserves an already-open seal; `--open` belongs
+to the later RAID-OPEN release. File zone 46 adds two private copies and shifts
+old private-copy ids; see `docs/molten-raid.md` before deploying. Focused checks:
+`cargo test chained_forge`, MCP scenario `chained_forge`, and
+`REAL_SPRITES=1 node tests/chained-forge-ui.cjs`.

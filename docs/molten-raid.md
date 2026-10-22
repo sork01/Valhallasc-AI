@@ -437,3 +437,132 @@ RMS, 128 kbps; offer the MP3 for FileDrop, do not upload unasked.
 `world/instances.rs` (`make_instances`), `world.rs` (instance order, `FALLEN_HOLD_MAX`),
 `items.rs` (`boss_slots`, `boss_piece_for`, `EXTRA_SLOTS`), `world/chests.rs`
 (`blocked_grid`).
+
+## 15. RAID-MAP implementation (2026-10-22)
+
+Source is in `.tools/emberwake-worktree`, branch `feat/raid-approach`. The entrance
+remains sealed. No production files or database have been changed by this task.
+
+`python3 scripts/generate_chained_forge.py` appends file zone **46**, a 320 × 320
+indoor raid with three copies, level 99 and ten fighters. The byte-stable generator
+writes an exact collision complement and the matching `forgeFloor` art mask.
+It preserves later zones, existing encounters/quests and an already-open entrance;
+`--open` is reserved for RAID-OPEN. `generate_emberwake.py` reapplies the raid door
+and quartermaster directions after rebuilding the approach. Pipeline tail:
+`generate_blackhour.py` → `generate_emberwake.py` → `generate_chained_forge.py` →
+`place_boss_adds.py` / `place_boss_signs.py` when encounters exist → `sync-world.cjs`
+→ rebuild Rust.
+
+The plan has **32,102 floor cells**, including the isolated 575-cell muster chamber;
+31,527 belong to the connected main descent. There are ten distinct courts joined
+by basalt galleries and narrow iron bridges over the molten forge. Workshop landmarks, chain pylons, lights, molten falls, vents and numbered rally
+marks give the courts their identities. Static lava lies below the floor and is impassable; there
+are no invisible damage volumes. Moving hazards and their warnings belong to the
+individual boss tasks. The floor reserves ten four-enemy pack sites (six mandatory,
+four in side forges); actual enemies, elites, quests, enemy-name entries and their
+art belong to RAID-PACKS and RAID-BOSS, so this task adds no placeholder monsters.
+
+| Hall | Centre | Approach length / 5.2 tiles per second |
+| --- | --- | --- |
+| The First Link | 84, 272 | 5.57 s |
+| The Iron Lung | 209, 272 | 24.12 s |
+| The Three Anvils | 270, 204 | 22.57 s |
+| The Numbered Forge | 164, 201 | 20.66 s |
+| The Divided Crucible | 55, 201 | 21.13 s |
+| The Brand Gallery | 52, 117 | 16.77 s |
+| The Cinder Floor | 156, 121 | 20.38 s |
+| The Quenching Wells | 268, 122 | 21.91 s |
+| The Last Chain | 266, 43 | 15.88 s |
+| The Promised Table | 111, 43 | 30.24 s |
+
+These are geometric estimates along the authored routes, totalling 199.23 s,
+excluding fights, looting and regrouping. The private MCP walkthrough records
+actual wall-clock walking times for every leg.
+
+**Inside-only hiring.** The external Nine-Chain Door leads to a physically separate
+muster chamber; the level-99 restriction and seal apply there too. Entering that
+chamber does not require a complete group. Quartermaster Halla signs raid contracts
+inside it at the normal price (nine cost 1,035,000 gold). The inner gate requires
+exactly ten living level-99 group members gathered within 20 tiles and transfers
+all ten together. Its solid surroundings prevent walking around it. This preserves
+the outdoor cap of four hires. Contract fighters are dismissed when their owner
+returns outdoors. Interior debug validation can exercise this gate while the
+external entrance remains sealed; no public debug flags are enabled.
+
+**Recovery.** A raid fighter stays fallen for at most 2,400 seconds during an active
+boss fight; ordinary dungeons keep 600 seconds. On a complete wipe, only the active
+boss is restored to full health and its mechanics engine returns awakened helpers
+to sleep. Killed bosses and packs stay dead. Everyone, including contract fighters,
+wakes at that hall's rally mark, contracts retained, with 60 seconds free of
+automatic enemy aggression; attacking ends that grace early. Empty raid copies
+reserve progress for 20 minutes and can be reclaimed by their previous group;
+other dungeons retain their immediate empty reset. Raid chest placement starts its
+reachability search on the descent, so the separate muster does not hide the
+entire dungeon from the chest system.
+
+**Client.** `client/chainedforgeart.js` registers original code-native scenery with
+`City.art`, floor shading, iron seams, lava-bank edges, background, portals and
+hall landmarks. `field.js` uses the authoritative floor mask for the ground and
+minimap; the world atlas has a tile and floor renderer, hidden while sealed.
+The raid is enclosed (`DayNight.nightMix === 0`). Music is silent until RAID-MUSIC
+adds the industrial techno scores; the approach retains its own music.
+Hand-written Swedish covers the hall names, quartermaster, directions and recovery.
+
+**Migration before release.** There are now 47 file zones. Existing dungeon extras
+are 47–106, raid extras 107–108, Arena copies 109–116; total runtime maps 117.
+`vault_tests.rs::COPY` is 47. Relative to the deployed world without Emberwake,
+old extra ids shift by +2 and Arena copies by +4. Derive the final mapping from
+the running binary and saved character zones before RAID-OPEN. No live DB has
+been inspected or migrated here.
+
+
+RAID-MAP validation completed 2026-10-22: six focused Rust checks and five related
+Emberwake/raid contract/portal checks pass. Clippy (`--all-targets --profile test --
+-D warnings`), fmt, changed JavaScript/Python syntax, the Swedish build check and
+generator stability/preservation checks pass. The real-sprite Chromium check passes
+32 assertions with no page errors or missing raid assets, including both screen
+sizes for every hall and a paired comparison of the actual field render with its
+scenery removed. Screenshots: `test-results/driver-7ZhAat`.
+The private MCP scenario passes 22 checks: the external seal,
+inside-only contracts and their price, copy isolation, the ten-fighter gate, walking
+every hall, and safe return/dismissal. Measured walking totals **215.50 s**
+(3.59 min); per-leg times are in
+`test-results/chained-forge-map/walk-times.txt`, and its raw world report is
+`test-results/driver-JJC71D/report.json`. This is a floor-plan check;
+RAID-PACKS, the ten boss tasks, loot, weapons and music remain separate tasks.
+No full suite, live migration or deployment was performed.
+
+At the owner's request, all twenty hall screenshots (desktop and mobile), the
+muster chamber and the zone overview were uploaded to Sork's FileDrop: **22 PNGs**,
+9,113,088 bytes. Every uploaded file and metadata sidecar was checked; the SHA-256
+receipts are in `test-results/chained-forge-map/filedrop-upload.json`.
+
+
+### Molten exterior follow-up (owner, 2026-10-22)
+
+The owner requested that all unwalkable space look like Emberwake's molten river.
+`ChainedForgeArt.background` now paints a continuous isometric molten surface in
+world coordinates, using the same `EmberwakeArt.moltenColor` sampler as the river:
+glowing orange/yellow fissures, irregular dark crust plates and cooled shores
+beside the authoritative floor mask. It replaces the earlier striped background.
+Eight-tile texture chunks have sampling gutters and a 96-entry cache, so the large
+raid does not allocate one full-map lava image. The texture stays attached to the
+world through movement and zoom, including outside the map boundary.
+
+`tests/chained-forge-lava-ui.cjs` passes six focused real-client assertions. The
+actual outside surface contains both bright fissures and dark crust, all 5,162
+camera-shift samples match, and the refactored Emberwake river differs from the
+previous renderer by zero channels across 63,198 painted pixels. Replacing the
+new renderer with a flat backdrop makes the test fail (no bright fissures).
+Desktop and mobile screenshots cover the muster chamber, bridge, throne and outer
+edge. Reports: `test-results/chained-forge-map/molten-render-result.txt` and
+`molten-render-mutation.log`; screenshots: `test-results/driver-L1DzQS/`.
+At the owner's standing screenshot request, eight updated PNG previews were added
+to Sork's FileDrop and verified by SHA-256 and metadata; receipt:
+`test-results/chained-forge-map/molten-filedrop-upload.json`.
+This follow-up changes client rendering only; source is retained on
+`feat/raid-approach` in the raid worktree, with no deployment.
+
+Session wrap-up: the owner invoked the `finish` skill to commit and push the
+prepared source on `feat/raid-approach` and the main TODO pointer. The source stays
+isolated from the served checkout. Wiki: `10_projects:valhallasc_chained_forge_map_20261022`.

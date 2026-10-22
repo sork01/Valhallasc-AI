@@ -33,7 +33,7 @@ module.exports=(kit,map)=>({
     check(JSON.stringify(seal).includes('sealed'),'The Nine-Chain Door explains that the raid is sealed');
     await kit.talkTo(w,bot,'ew_echo');
     await w.waitFor(()=>q('ew_voice')?.counts[0]===1,5000,'Hear Eldmarr');
-    check(!area.portals.some(p=>p.id==='ew_raid'),'There is no traversable raid portal before RAID-OPEN');
+    check(area.portals.some(p=>p.id==='ew_raid'&&map.zones[p.to-1].sealedTemplate),'The raid portal remains sealed before RAID-OPEN');
     for(const kind of ['ew_ashback','ew_glasswing','ew_slagjaw','ew_cinderhorn']){
       const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
       await w.debug(bot,{op:'kill_enemy',id:enemy.id});

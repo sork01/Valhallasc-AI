@@ -24,6 +24,33 @@
     const ix=Math.floor(x),iy=Math.floor(y),u=smooth(x-ix),v=smooth(y-iy);
     return mix(mix(hash(ix,iy),hash(ix+1,iy),u),mix(hash(ix,iy+1),hash(ix+1,iy+1),u),v);
   }
+  // Shared molten crust, fissures and cooled banks, sampled in world coordinates.
+  function moltenColor(x,y,edge=Infinity){
+    const drift=noise(x*.31,y*.47),warp=noise(x*.74+19,y*.49-31);
+    const u=(x+warp*2.6+noise(x*1.1,y*1.3)*.7)/1.8,v=(y+drift*2.5+noise(x*1.4+9,y*.9)*.7)/1.4;
+    const ix=Math.floor(u),iy=Math.floor(v);
+    let first=1e9,second=1e9,seed=0;
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+      const gx=ix+dx,gy=iy+dy,h=hash(gx,gy);
+      const sx=gx+.16+h*.68,sy=gy+.16+hash(gx+83,gy-29)*.68;
+      const d=(u-sx)**2+(v-sy)**2;
+      if(d<first){second=first;first=d;seed=h;}else if(d<second)second=d;
+    }
+    const gap=Math.sqrt(second)-Math.sqrt(first);
+    const crust=seed>.22&&gap>.105+warp*.075;
+    const bank=Math.max(0,Math.min(1,(.72+noise(x*2,y*2)*.65-edge)*1.8));
+    let r,g,b;
+    if(crust){
+      const rim=Math.exp(-gap*9),grain=noise(x*8,y*8);
+      r=34+grain*22+rim*145;g=29+grain*16+rim*32;b=31+grain*14;
+    }else{
+      const heat=Math.max(0,Math.min(1,.28+drift*.55+Math.exp(-gap*18)*.32));
+      r=239+heat*16;g=71+heat*155;b=7+heat*91;
+    }
+    const grain=noise(x*6+80,y*6-21);
+    return [mix(r,29+grain*19,bank),mix(g,27+grain*15,bank),mix(b,30+grain*13,bank),
+      Math.round(255*smooth(Math.max(0,Math.min(1,edge*2.4))))];
+  }
   function moltenTexture(z){
     if(moltenCache.has(z))return moltenCache.get(z);
     const pieces=z.objects.filter(o=>o.kind==='ew_lava'),resolution=12;
@@ -40,33 +67,7 @@
       let edge=-Infinity;
       for(const o of nearby)edge=Math.max(edge,o.r-Math.hypot(x-o.x,y-o.y));
       if(edge<=0)continue;
-      const drift=noise(x*.31,y*.47),warp=noise(x*.74+19,y*.49-31);
-      const u=(x+warp*2.6+noise(x*1.1,y*1.3)*.7)/1.8,v=(y+drift*2.5+noise(x*1.4+9,y*.9)*.7)/1.4;
-      const ix=Math.floor(u),iy=Math.floor(v);
-      let first=1e9,second=1e9,seed=0;
-      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
-        const gx=ix+dx,gy=iy+dy,h=hash(gx,gy);
-        const sx=gx+.16+h*.68,sy=gy+.16+hash(gx+83,gy-29)*.68;
-        const d=(u-sx)**2+(v-sy)**2;
-        if(d<first){second=first;first=d;seed=h;}else if(d<second)second=d;
-      }
-      const gap=Math.sqrt(second)-Math.sqrt(first);
-      const crust=seed>.22&&gap>.105+warp*.075;
-      const bank=Math.max(0,Math.min(1,(.72+noise(x*2,y*2)*.65-edge)*1.8));
-      let r,g,b;
-      if(crust){
-        const rim=Math.exp(-gap*9),grain=noise(x*8,y*8);
-        r=34+grain*22+rim*145;g=29+grain*16+rim*32;b=31+grain*14;
-      }else{
-        const heat=Math.max(0,Math.min(1,.28+drift*.55+Math.exp(-gap*18)*.32));
-        r=239+heat*16;g=71+heat*155;b=7+heat*91;
-      }
-      const grain=noise(x*6+80,y*6-21);
-      const k=(py*c.width+px)*4;
-      pixels.data[k]=mix(r,29+grain*19,bank);
-      pixels.data[k+1]=mix(g,27+grain*15,bank);
-      pixels.data[k+2]=mix(b,30+grain*13,bank);
-      pixels.data[k+3]=Math.round(255*smooth(Math.max(0,Math.min(1,edge*2.4))));
+      pixels.data.set(moltenColor(x,y,edge),(py*c.width+px)*4);
     }
     ctx.putImageData(pixels,0,0);const result={canvas:c,ymin,height:ymax-ymin};moltenCache.set(z,result);return result;
   }
@@ -143,5 +144,5 @@
     for(let s of [-1,1])chain(g,s*60,-115,5);
     g.font='15px "Jua",sans-serif';g.textAlign='center';g.strokeStyle=C.ink;g.lineWidth=4;g.fillStyle=C.pale;const name=window.Locale?.translate(p.name)||p.name;g.strokeText(name,0,-192);g.fillText(name,0,-192);g.restore();
   }
-  window.EmberwakeArt={ground,detail,background,portal,molten};
+  window.EmberwakeArt={ground,detail,background,portal,molten,moltenColor};
 })();

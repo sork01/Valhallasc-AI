@@ -11,7 +11,7 @@ async function main() {
   const positional = options.filter(o => o !== '--registered');
   const [command = 'run', name = 'all', ...extra] = positional;
   if (extra.length || !['list', 'run'].includes(command)) throw Error('Usage: node scripts/test-via-mcp.cjs [--registered] list | run <scenario|all>');
-  let launch = { command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root };
+  let launch = { command: process.execPath, args: [path.join(root, 'scripts/test-mcp.cjs')], cwd: root, env: { ...process.env } };
   if (registered) {
     const configuration = JSON.parse(execFileSync('codex', ['mcp', 'get', 'valhallasc-testing', '--json'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }));
     if (!configuration.enabled || configuration.transport.type !== 'stdio') throw Error('valhallasc-testing must be enabled and use stdio.');

@@ -20,7 +20,7 @@ fn emberwake_map_gates_and_outdoor_catalog() {
     let seen = flood(m, &grid, at(22., 137.));
     for p in &m.portals {
         assert!(reached(m, &seen, at(p.x, p.y)));
-        assert_eq!(p.to, 17);
+        assert!(p.to == 17 || p.to == 46);
     }
     for n in &m.npcs {
         assert!(reached(m, &seen, at(n.x, n.y)), "{}", n.id);
@@ -34,7 +34,11 @@ fn emberwake_map_gates_and_outdoor_catalog() {
     assert_eq!(m.slimes.iter().filter(|s| is_elite(&s.kind)).count(), 3);
     assert_eq!(m.quests.iter().filter(|q| q.group).count(), 2);
     assert!(m.npcs.iter().any(|n| n.id == "ew_seal"));
-    assert!(m.portals.iter().all(|p| p.id != "ew_raid"));
+    assert!(
+        m.portals
+            .iter()
+            .any(|p| p.id == "ew_raid" && w.maps[p.to].sealed_template)
+    );
     let mut lava = at(30., 86.);
     m.collide(&mut lava, PLAYER_RADIUS);
     assert!(lava.distance(at(30., 86.)) > 0.1);

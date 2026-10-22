@@ -26,6 +26,8 @@ mod boss_signs_tests;
 mod cairn_tests;
 #[cfg(test)]
 mod cathedral_tests;
+#[cfg(test)]
+mod chained_forge_tests;
 mod chests;
 mod chime;
 #[cfg(test)]
@@ -77,6 +79,7 @@ mod partyxp;
 mod perks_tests;
 mod pursuit;
 mod pvp;
+mod raid;
 #[cfg(test)]
 mod rain_crown_tests;
 mod ranged;
@@ -145,6 +148,7 @@ const DAMAGE_TAKEN_SCALE: f64 = 0.25;
 const PORTAL_DELAY: f64 = 0.5;
 /// The longest a fallen hero is held down by a boss fight that has not ended (`BOSSMECH-DEATH`), seconds.
 const FALLEN_HOLD_MAX: f64 = 600.;
+const RAID_FALLEN_HOLD_MAX: f64 = 2400.;
 /// Who is joining: an anonymous guest (a server-issued key, or a look for a new character) or a logged-in account
 /// (a character it owns, or a look for a new one). The account id comes from a checked login session.
 pub enum Identity {
@@ -1484,6 +1488,10 @@ impl World {
                     template: arena_public,
                     active: false,
                     cleared: false,
+                    rally: None,
+                    grace_until: 0.,
+                    empty_since: None,
+                    members: vec![],
                 });
             }
         }
@@ -2680,6 +2688,7 @@ impl World {
         self.hide_gms_after_zone_change();
         self.update_king_spawn();
         self.update_instances();
+        self.update_raid_wipes();
         self.update_ambient();
         self.update_mercenaries();
         self.update_gauntlets();
@@ -2799,14 +2808,27 @@ impl World {
             // party is beaten and the boss walks home. Then the usual three seconds start for everyone together, so
             // the first to wake cannot pull the boss back onto the rest. The cap keeps a fight that never ends from
             // stranding anyone.
-            if p.fallen && (!self.boss.fight_in(p.character.zone) || p.dead_time >= FALLEN_HOLD_MAX)
+            if p.fallen
+                && (!self.boss.fight_in(p.character.zone)
+                    || p.dead_time
+                        >= if self.maps[p.character.zone].raid {
+                            RAID_FALLEN_HOLD_MAX
+                        } else {
+                            FALLEN_HOLD_MAX
+                        })
             {
                 p.fallen = false;
                 p.dead_time = 0.;
             }
             if p.dead_time >= 3.2 && !p.fallen {
                 let map = &self.maps[p.character.zone];
-                let mut point = p.ambient.as_ref().map_or(map.spawn, ambient::Ambient::hub);
+                let rally = self
+                    .instances
+                    .iter()
+                    .find(|i| i.zone == p.character.zone)
+                    .and_then(|i| i.rally)
+                    .unwrap_or(map.spawn);
+                let mut point = p.ambient.as_ref().map_or(rally, ambient::Ambient::hub);
                 map.collide(&mut point, PLAYER_RADIUS);
                 p.character.x = point.x;
                 p.character.y = point.y;
@@ -2992,7 +3014,7 @@ impl World {
         if portal.to >= self.maps.len() {
             return;
         }
-        if self.maps[portal.to].sealed_template {
+        if self.maps[portal.to].sealed_template && self.public_zone(p.character.zone) != portal.to {
             return;
         }
         // Some doors stay shut until a quest is done, whoever you are with.
@@ -3031,7 +3053,20 @@ impl World {
             return;
         }
         // A raid's door asks for a full group, mercenaries counted: fewer cannot win, and a party holds no more.
-        if self.maps[portal.to].raid {
+        let muster = portal.muster
+            && self.maps[portal.to].raid
+            && self.maps[portal.to].places.iter().any(|place| {
+                place.id == "cf_muster"
+                    && Point {
+                        x: portal.tx,
+                        y: portal.ty,
+                    }
+                    .distance(Point {
+                        x: place.x,
+                        y: place.y,
+                    }) <= place.r
+            });
+        if self.maps[portal.to].raid && !muster {
             let group = self.party_mates(&p.character.id).len();
             if group != social::RAID_MAX {
                 let text = format!(
@@ -3042,6 +3077,29 @@ impl World {
                 let p = self.players.get_mut(&session).unwrap();
                 p.portal_at = self.time;
                 let _ = p.peer.try_send(json!({"type":"error","text":text}));
+                return;
+            }
+        }
+        let mut raid_gate_crew = Vec::new();
+        // The inner gate checks the actual gathering, not distant names on the party list.
+        if self.maps[p.character.zone].raid && self.maps[portal.to].raid && !muster {
+            let mates = self.party_mates(&p.character.id);
+            raid_gate_crew = self
+                .players
+                .iter()
+                .filter(|(_, q)| {
+                    mates.contains(&q.character.id)
+                        && q.character.zone == p.character.zone
+                        && q.character.hp > 0.
+                        && q.character.level >= need
+                        && q.character.point().distance(here) <= 20.
+                })
+                .map(|(session, _)| *session)
+                .collect();
+            if raid_gate_crew.len() != social::RAID_MAX {
+                let p = self.players.get_mut(&session).unwrap();
+                p.portal_at = self.time;
+                let _ = p.peer.try_send(json!({"type":"error","text":"Gather ten living level-99 fighters in the muster chamber first."}));
                 return;
             }
         }
@@ -3114,6 +3172,19 @@ impl World {
             None => format!("You step through {} into {name}.", portal.name),
         };
         let _ = p.peer.try_send(json!({"type":"system","text":text}));
+        // Gathered humans and hired fighters cross together, so nobody is stranded behind the gate.
+        for mate in raid_gate_crew.into_iter().filter(|mate| *mate != session) {
+            let p = self.players.get_mut(&mate).unwrap();
+            p.character.zone = portal.to;
+            p.character.x = arrival.x;
+            p.character.y = arrival.y;
+            p.character.mounted = false;
+            p.portal_at = time;
+            p.stop();
+            p.attack = 0.;
+            p.dash = 0.;
+            let _ = p.peer.try_send(json!({"type":"system","text":text}));
+        }
         self.separate_enemies();
         self.event("portal", &actor, arrival, 0., false);
         self.save();
@@ -3803,6 +3874,14 @@ impl World {
     }
     /// Returns the health the enemy actually lost.
     fn hit_slime(&mut self, id: usize, session: u64, damage: f64, crit: bool) -> f64 {
+        if let Some(i) = self
+            .instances
+            .iter_mut()
+            .find(|i| i.zone == self.slimes[id].zone)
+        {
+            i.grace_until = 0.;
+        }
+
         let Some(p) = self.players.get(&session) else {
             return 0.;
         };
@@ -4195,6 +4274,10 @@ impl World {
             }
             s.hop_v = 0.;
         }
+        let raid_grace = self
+            .instances
+            .iter()
+            .any(|i| i.zone == zone && i.grace_until > self.time);
         let nearest = self
             .players
             .iter()
@@ -4232,7 +4315,10 @@ impl World {
                     )
                 })
         });
-        let target = target.filter(|(_, _, d)| hunting || *d < 9.).or(nearest);
+        let target = target
+            .filter(|(_, _, d)| hunting || *d < 9.)
+            .or(nearest)
+            .filter(|_| !raid_grace);
         if s.state != "return"
             && s.state != "windup"
             && s.state != "lunge"
@@ -10480,6 +10566,7 @@ mod tests {
             tx: 48.,
             ty: 83.,
             after_clear: false,
+            muster: false,
             needs_quest: None,
         });
         w.use_portal(1);

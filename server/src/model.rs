@@ -1666,6 +1666,9 @@ pub struct Portal {
     pub to: usize,
     pub tx: f64,
     pub ty: f64,
+    /// An entrance into a raid's isolated muster chamber; the inner gate still needs ten fighters.
+    #[serde(default)]
+    pub muster: bool,
     /// Only usable once the instance it stands in has been cleared (its final boss is down).
     #[serde(default)]
     pub after_clear: bool,

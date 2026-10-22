@@ -4544,3 +4544,5 @@ scenarios.blackhour = require('./blackhour-scenario.cjs')(kit,map);
 scenarios.gauntlet = require('./gauntlet-scenario.cjs')(kit, map);
 
 scenarios.emberwake = require('./emberwake-scenario.cjs')(kit,map);
+
+scenarios.chained_forge = require('./chained-forge-scenario.cjs')(kit,map);
