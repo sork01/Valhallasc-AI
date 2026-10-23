@@ -216,6 +216,7 @@ mod tests {
                 rank: 2,
                 trade_until: 0,
                 trade_with: vec![],
+                wear: 0,
             });
         }
         let at = open_spot(&w);

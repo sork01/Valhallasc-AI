@@ -97,6 +97,7 @@ pub fn roll_orange_boosted(
         rank: 0,
         trade_until: 0,
         trade_with: vec![],
+        wear: 0,
     })
 }
 

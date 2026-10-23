@@ -1,4 +1,4 @@
-use super::{Item, is_gear, item};
+use super::{GM_RARITY, Item, is_gear, item};
 use crate::model::{Attributes, Character};
 use serde::{Deserialize, Serialize};
 
@@ -24,7 +24,25 @@ pub struct GearInstance {
     /// Character ids that took part in the roll that awarded this copy.
     #[serde(default)]
     pub trade_with: Vec<String>,
+    /// Durability lost, 0 (new) to `WEAR_MAX` (broken). Stored as wear so that a copy saved before durability existed
+    /// loads at full condition. Only a death wears gear; a smith repairs it (docs/durability.md).
+    #[serde(default)]
+    pub wear: u8,
 }
+
+/// What a death did to the worn gear: pieces that lost durability, and pieces that are broken afterwards.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct DeathWear {
+    pub worn: u32,
+    pub broken: u32,
+}
+
+/// Wear is a percentage of the piece's durability; a broken piece has all of it.
+pub const WEAR_MAX: u8 = 100;
+/// One death wears every worn piece by a tenth of its durability, whatever its level or rarity.
+pub const WEAR_PER_DEATH: u8 = 10;
+/// Repairing a piece from broken to new costs this share of its sale value.
+pub const REPAIR_PRICE_SHARE: f64 = 0.25;
 
 /// How long the winner of a Need/Greed/Pass roll may hand a class piece on to the other voters.
 pub const ROLL_TRADE_WINDOW_SECS: u64 = 2 * 60 * 60;
@@ -83,7 +101,16 @@ impl GearInstance {
             rank: 0,
             trade_until: 0,
             trade_with: vec![],
+            wear: 0,
         }
+    }
+    /// Durability left, 100 for a new piece and 0 for a broken one.
+    pub fn durability(&self) -> u8 {
+        WEAR_MAX.saturating_sub(self.wear)
+    }
+    /// A broken piece stays worn but gives no attack, defense or attributes.
+    pub fn broken(&self) -> bool {
+        self.durability() == 0
     }
     /// Opens the two-hour hand-off window for the other voters of the roll that awarded this copy.
     pub fn open_trade_window(&mut self, voters: Vec<String>, now: u64) {
@@ -211,6 +238,110 @@ impl Character {
             .filter(|copy| copy.item == item_id)
             .nth(occurrence)
     }
+    /// Whether the worn copy that `gear_attributes` pairs with occurrence `occurrence` of `item_id` is broken.
+    pub fn worn_broken(&self, item_id: &str, occurrence: usize) -> bool {
+        self.worn_gear_instance(item_id, occurrence)
+            .is_some_and(GearInstance::broken)
+    }
+    /// Ledger position of the copy each worn piece uses, in `worn_items` order: repeats of one item take successive
+    /// copies, as in `gear_attributes`. A piece with no ledger copy yet has `None`.
+    fn worn_copy_positions(&self) -> Vec<(&'static Item, Option<usize>)> {
+        let mut seen = std::collections::BTreeMap::<&str, usize>::new();
+        self.worn_items()
+            .into_iter()
+            .map(|piece| {
+                let nth = seen.entry(&piece.id).or_default();
+                let at = self
+                    .gear_instances
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, g)| g.item == piece.id)
+                    .nth(*nth)
+                    .map(|(at, _)| at);
+                *nth += 1;
+                (piece, at)
+            })
+            .collect()
+    }
+    /// A death: every worn piece loses `WEAR_PER_DEATH` of its durability. Starter and game master gear never wears,
+    /// and a piece that is already broken stays worn and broken.
+    pub fn wear_worn_gear(&mut self) -> DeathWear {
+        self.materialize_gear_instances();
+        let mut out = DeathWear::default();
+        for (piece, at) in self.worn_copy_positions() {
+            if piece.starter || piece.rarity == GM_RARITY {
+                continue;
+            }
+            let Some(copy) = at.map(|at| &mut self.gear_instances[at]) else {
+                continue;
+            };
+            if !copy.broken() {
+                out.worn += 1;
+            }
+            copy.wear = copy.wear.saturating_add(WEAR_PER_DEATH).min(WEAR_MAX);
+            out.broken += u32::from(copy.broken());
+        }
+        out
+    }
+    /// What a smith charges to bring this copy back to full durability: a share of its sale value (a rare piece merged to
+    /// epic sells for twice), scaled by the wear, never less than one gold for a damaged copy.
+    pub fn repair_price(&self, copy: &GearInstance) -> u32 {
+        let Some(catalog) = item(&copy.item).filter(|_| copy.wear > 0) else {
+            return 0;
+        };
+        let merged = u64::from(catalog.rarity == "rare" && copy.rarity == "epic");
+        let value = u64::from(catalog.sell) * (1 + merged);
+        let price =
+            (value as f64 * REPAIR_PRICE_SHARE * f64::from(copy.wear) / f64::from(WEAR_MAX)).ceil();
+        (price as u64).clamp(1, u64::from(u32::MAX)) as u32
+    }
+    /// Every damaged copy with its repair price, for the smith's window.
+    pub fn repair_quote(&self) -> Vec<(u64, u32)> {
+        self.gear_instances
+            .iter()
+            .filter(|g| g.wear > 0)
+            .map(|g| (g.id, self.repair_price(g)))
+            .collect()
+    }
+    /// Repairs one copy (`only`) or every damaged copy, for gold. All or nothing, checked on a clone like the other
+    /// gear services; the caller checks range and combat. Returns (copies repaired, gold paid).
+    pub fn repair_gear(&mut self, only: Option<u64>) -> Result<(u32, u32), &'static str> {
+        if self.hp <= 0. {
+            return Err("You cannot repair gear while defeated.");
+        }
+        if self.mounted {
+            return Err("Dismount before repairing gear.");
+        }
+        let mut next = self.clone();
+        next.materialize_gear_instances();
+        if only.is_some_and(|id| next.gear_instances.iter().all(|g| g.id != id)) {
+            return Err("Unknown gear copy.");
+        }
+        let due: Vec<usize> = next
+            .gear_instances
+            .iter()
+            .enumerate()
+            .filter(|(_, g)| g.wear > 0 && only.is_none_or(|id| g.id == id))
+            .map(|(at, _)| at)
+            .collect();
+        if due.is_empty() {
+            return Err("Nothing needs repair.");
+        }
+        let total: u64 = due
+            .iter()
+            .map(|at| u64::from(next.repair_price(&next.gear_instances[*at])))
+            .sum();
+        if u64::from(next.gold) < total {
+            return Err("You cannot afford that repair.");
+        }
+        next.gold -= total as u32;
+        for at in &due {
+            next.gear_instances[*at].wear = 0;
+        }
+        next.preserve_vitals_after_equipping(self);
+        *self = next;
+        Ok((due.len() as u32, total as u32))
+    }
     fn merge_output(&self, first: u64, second: u64) -> Result<GearInstance, &'static str> {
         if self.hp <= 0. {
             return Err("You cannot merge gear while defeated.");
@@ -246,6 +377,7 @@ impl Character {
             rank: a.rank.min(b.rank),
             trade_until: 0,
             trade_with: vec![],
+            wear: 0,
         })
     }
     pub fn preview_merge(&mut self, first: u64, second: u64) -> Result<GearInstance, &'static str> {
@@ -290,6 +422,7 @@ impl Character {
             .ok_or("This gear is already at rank 5.")?;
         let mut result = current.clone();
         result.rank += 1;
+        result.wear = 0;
         result.clear_trade_window();
         Ok((result, gold, crystals))
     }
@@ -362,6 +495,7 @@ impl Character {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::items::player_attack_scale;
     use crate::model::Class;
 
     const PIECE: &str = "warrior_weapon_sword_l5_gray";
@@ -629,5 +763,235 @@ mod tests {
         let loaded: Character = serde_json::from_str(&serde_json::to_string(&c).unwrap()).unwrap();
         assert!(loaded.gear_instance_equipped(copies[1]));
         assert_eq!(loaded.stats(), c.stats());
+    }
+
+    // ----- durability (docs/durability.md) -----
+    // A rare necklace worth 240 gold with +7 dexterity, and a blue sword with 4.7 attack.
+    const NECKLACE: &str = "necklace_upgrade";
+    const BLUE_SWORD: &str = "warrior_weapon_sword_l1_blue";
+    fn necklace_on() -> Character {
+        let mut c = character();
+        // A mercenary wears a cloak; start from a bare character.
+        c.equipment.clear();
+        c.add_item(NECKLACE, 1);
+        c.equipment.insert("necklace".into(), NECKLACE.into());
+        c.materialize_gear_instances();
+        c
+    }
+    fn wear_of(c: &Character, id: &str) -> u8 {
+        c.gear_instances.iter().find(|g| g.item == id).unwrap().wear
+    }
+    fn set_wear(c: &mut Character, id: &str, wear: u8) {
+        c.gear_instances
+            .iter_mut()
+            .find(|g| g.item == id)
+            .unwrap()
+            .wear = wear;
+    }
+    #[test]
+    fn a_copy_saved_before_durability_loads_new() {
+        let mut saved = serde_json::to_value(GearInstance::new(7, item(PIECE).unwrap())).unwrap();
+        saved.as_object_mut().unwrap().remove("wear");
+        let copy: GearInstance = serde_json::from_value(saved).unwrap();
+        assert_eq!(
+            (copy.wear, copy.durability(), copy.broken()),
+            (0, 100, false)
+        );
+    }
+    #[test]
+    fn a_death_takes_a_tenth_and_ten_deaths_break_a_piece_that_stays_worn() {
+        let mut c = necklace_on();
+        for death in 1..=9u8 {
+            let wear = c.wear_worn_gear();
+            assert_eq!(wear_of(&c, NECKLACE), death * 10);
+            assert_eq!((wear.worn, wear.broken), (1, 0), "death {death}");
+        }
+        let wear = c.wear_worn_gear();
+        assert_eq!((wear.worn, wear.broken), (1, 1));
+        let copy = c
+            .gear_instances
+            .iter()
+            .find(|g| g.item == NECKLACE)
+            .unwrap();
+        assert_eq!((copy.durability(), copy.broken()), (0, true));
+        // Still worn, never lost, and further deaths take nothing more.
+        assert_eq!(
+            c.equipment.get("necklace").map(String::as_str),
+            Some(NECKLACE)
+        );
+        let wear = c.wear_worn_gear();
+        assert_eq!((wear.worn, wear.broken), (0, 1));
+        assert_eq!(wear_of(&c, NECKLACE), WEAR_MAX);
+    }
+    #[test]
+    fn starter_and_game_master_gear_never_wears() {
+        let mut c = character();
+        c.equipment.clear();
+        let starter = crate::items::ITEMS
+            .iter()
+            .find(|i| i.starter && i.kind == "weapon" && i.class == Some(Class::Warrior))
+            .unwrap();
+        c.add_item(&starter.id, 1);
+        c.look
+            .equip(
+                c.gear().0.to_string().as_str(),
+                starter.variant.as_deref().unwrap(),
+            )
+            .unwrap();
+        c.materialize_gear_instances();
+        assert_eq!(c.wear_worn_gear(), DeathWear::default());
+        assert!(c.gear_instances.iter().all(|g| g.wear == 0));
+        let mut gm = character();
+        gm.equipment.clear();
+        gm.become_gm();
+        gm.materialize_gear_instances();
+        assert!(gm.worn_items().iter().any(|i| i.rarity == GM_RARITY));
+        assert_eq!(gm.wear_worn_gear(), DeathWear::default());
+        assert!(gm.gear_instances.iter().all(|g| g.wear == 0));
+    }
+    #[test]
+    fn a_broken_piece_gives_no_attribute_attack_or_set_credit_but_a_worn_one_does() {
+        let mut c = necklace_on();
+        let dexterity = c.gear_attributes().dexterity;
+        set_wear(&mut c, NECKLACE, 90);
+        assert_eq!(
+            c.gear_attributes().dexterity,
+            dexterity,
+            "full stats above 0 durability"
+        );
+        set_wear(&mut c, NECKLACE, WEAR_MAX);
+        assert_eq!(
+            c.gear_attributes().dexterity,
+            dexterity - 7,
+            "zero stats at 0"
+        );
+
+        let mut c = character();
+        c.equipment.clear();
+        c.add_item(BLUE_SWORD, 1);
+        let armor = c.gear().0.to_string();
+        c.look.equip(&armor, "sword_l1_blue").unwrap();
+        c.materialize_gear_instances();
+        let (attack, defense) = c.stats();
+        set_wear(&mut c, BLUE_SWORD, 90);
+        assert_eq!(c.stats(), (attack, defense));
+        set_wear(&mut c, BLUE_SWORD, WEAR_MAX);
+        let (broken_attack, broken_defense) = c.stats();
+        let catalog = item(BLUE_SWORD).unwrap();
+        // The attack total is scaled by the class curve; the defense total is not.
+        let scale = player_attack_scale(c.look.class, c.level);
+        // The sword's attribute bonus feeds attack too (a warrior: strength x2, agility and intellect x0.5).
+        let bonus = &catalog.bonus_stats;
+        let fed = f64::from(bonus.strength) * 2.
+            + f64::from(bonus.agility) * 0.5
+            + f64::from(bonus.intellect) * 0.5;
+        assert!(
+            (attack - broken_attack - (catalog.attack + fed) * scale).abs() < 1e-6,
+            "{attack} {broken_attack} {scale}"
+        );
+        // Strength also gives 0.2 defense per point.
+        assert!(
+            (defense - broken_defense - catalog.defense - f64::from(bonus.strength) * 0.2).abs()
+                < 1e-9
+        );
+    }
+    #[test]
+    fn a_smith_charges_a_quarter_of_the_sale_value_scaled_by_the_wear() {
+        let mut c = necklace_on();
+        set_wear(&mut c, NECKLACE, 40);
+        let copy = c
+            .gear_instances
+            .iter()
+            .find(|g| g.item == NECKLACE)
+            .unwrap()
+            .clone();
+        assert_eq!(c.repair_price(&copy), 24, "240 x 25% x 40%");
+        let mut epic = copy.clone();
+        epic.rarity = "epic".into();
+        epic.wear = WEAR_MAX;
+        assert_eq!(
+            c.repair_price(&epic),
+            120,
+            "a rare piece merged to epic sells for twice"
+        );
+        let mut tiny = copy;
+        tiny.item = PIECE.into();
+        tiny.wear = 1;
+        assert_eq!(
+            c.repair_price(&tiny),
+            1,
+            "a damaged copy costs at least one gold"
+        );
+        assert_eq!(
+            c.repair_price(&GearInstance::new(1, item(PIECE).unwrap())),
+            0
+        );
+        c.gold = 100;
+        assert_eq!(c.repair_gear(None), Ok((1, 24)));
+        assert_eq!((c.gold, wear_of(&c, NECKLACE)), (76, 0));
+    }
+    #[test]
+    fn a_repair_is_refused_without_gold_when_defeated_mounted_or_unneeded_and_changes_nothing() {
+        let mut c = necklace_on();
+        assert_eq!(c.repair_gear(None), Err("Nothing needs repair."));
+        set_wear(&mut c, NECKLACE, 40);
+        c.gold = 23;
+        let before = serde_json::to_string(&c).unwrap();
+        assert_eq!(c.repair_gear(None), Err("You cannot afford that repair."));
+        assert_eq!(c.repair_gear(Some(999_999)), Err("Unknown gear copy."));
+        c.gold = 1_000;
+        c.mounted = true;
+        assert_eq!(c.repair_gear(None), Err("Dismount before repairing gear."));
+        c.mounted = false;
+        c.hp = 0.;
+        assert_eq!(
+            c.repair_gear(None),
+            Err("You cannot repair gear while defeated.")
+        );
+        c.hp = c.max_hp();
+        c.gold = 23;
+        assert_eq!(serde_json::to_string(&c).unwrap().len(), before.len());
+        assert_eq!(wear_of(&c, NECKLACE), 40);
+        c.gold = 1_000;
+        let id = c
+            .gear_instances
+            .iter()
+            .find(|g| g.item == NECKLACE)
+            .unwrap()
+            .id;
+        assert_eq!(c.repair_gear(Some(id)), Ok((1, 24)));
+        assert_eq!(c.repair_gear(Some(id)), Err("Nothing needs repair."));
+    }
+    #[test]
+    fn merging_and_refining_restore_full_durability() {
+        let mut c = character();
+        c.add_item(PIECE, 2);
+        c.materialize_gear_instances();
+        for g in c.gear_instances.iter_mut().filter(|g| g.item == PIECE) {
+            g.wear = 50;
+        }
+        let ids: Vec<_> = c
+            .gear_instances
+            .iter()
+            .filter(|g| g.item == PIECE)
+            .map(|g| g.id)
+            .collect();
+        let merged = c.merge_gear(ids[0], ids[1]).unwrap();
+        assert_eq!(merged.wear, 0);
+        c.add_item("refinement_crystal_common", 5);
+        let mut c = character();
+        c.add_item(PIECE, 1);
+        c.add_item("refinement_crystal_common", 5);
+        c.materialize_gear_instances();
+        set_wear(&mut c, PIECE, 60);
+        let id = c
+            .gear_instances
+            .iter()
+            .find(|g| g.item == PIECE)
+            .unwrap()
+            .id;
+        let (refined, _, _) = c.refine_gear(id).unwrap();
+        assert_eq!((refined.rank, refined.wear), (1, 0));
+        assert_eq!(wear_of(&c, PIECE), 0);
     }
 }

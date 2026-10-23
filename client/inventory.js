@@ -59,6 +59,12 @@
   // What the bank window needs of the bags: the loose units (worn ones stay on the hero) and the loose gear copies.
   const looseStacks = () => stacks.map(s => ({ item: s.item, quantity: bagQuantity(s.item) })).filter(s => s.quantity > 0 && definition(s.item));
   const looseCopies = id => copiesOf(definition(id)).slice(equippedCount(definition(id)));
+  // Durability (docs/durability.md): a copy from a server without it has no wear and counts as new. Only the worn copies
+  // lose durability, and a broken one stays worn but gives no stats.
+  const durabilityOf = g => Math.max(0, 100 - (g?.wear || 0));
+  const conditionState = g => !g?.wear ? 'new' : durabilityOf(g) <= 0 ? 'broken' : durabilityOf(g) <= 30 ? 'low' : 'worn';
+  const wearNote = g => g?.wear ? ` · ${durabilityOf(g)}% durability` : '';
+  const conditionText = g => durabilityOf(g) <= 0 ? 'Broken · no stats until repaired' : `Durability ${durabilityOf(g)}%`;
   const copyStats = g => ({ attack:g.attack * (1 + g.rank * .04), defense:g.defense * (1 + g.rank * .04), bonusStats:Object.fromEntries(statNames.map(k => [k, Math.round(((g.bonusStats?.[k] || 0) + (g.rolledStats?.[k] || 0)) * (1 + g.rank * .04))])) });
   const canEquip = () => Online.connected && !Field.hero?.dead;
   function node(tag, text = '', cls) { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; }
@@ -151,13 +157,17 @@
       const time = minutes >= 60 ? `${Math.floor(minutes / 60)} h ${minutes % 60} min` : `${minutes} min`;
       t.append(node('p', left > 0 ? `Bound on pickup · tradeable for ${time} with the party of the roll` : 'Bound on pickup · it can only be sold', 'item-bound'));
     }
+    const conditionCopy = where ? where.copies?.[0] : displayCopy(i, slot);
+    if (conditionState(conditionCopy) !== 'new') {
+      const line = node('p', conditionText(conditionCopy), 'item-durability'); line.dataset.state = conditionState(conditionCopy); t.append(line);
+    }
     if (where) t.append(node('p', `${where.count} ${where.in}`));
     else t.append(node('p', `${bagQuantity(i.id)} in bags · ${equippedCount(i)} equipped`), node('small', questItem(i) ? 'Quest item · cannot be sold' : `Sells for ${saleValue(i)} gold${copy ? ' for the next loose copy' : ' each'}`));
     if (compatible(i)) {
       const copies = where ? where.copies : gearInstances.filter(g=>g.item===i.id);
       for(const [index,g] of copies.entries()) {
         if(i.source!=='orange_pool'&&index>=3)break;
-        t.append(node('small',`Copy #${g.id} · ${!where&&index<equippedCount(i)?'equipped · ':''}${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}`));
+        t.append(node('small',`Copy #${g.id} · ${!where&&index<equippedCount(i)?'equipped · ':''}${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`));
       }
       if(i.source!=='orange_pool'&&copies.length>3)t.append(node('small',`and ${copies.length-3} more copies`));
     }
@@ -349,10 +359,12 @@
         card.append(title, glyph, node('b', '', 'sr-only'), node('span', label, 'gear-label'), select); container.append(card);
       }
       card.dataset.rarity = displayRarity(i, slot); card.dataset.empty = String(!i);
+      const worn = i && wornCopy(slot, i);
+      card.dataset.condition = conditionState(worn); card.style.setProperty('--dur', String(durabilityOf(worn)));
       card.querySelector('b').textContent = i?.name || 'Empty slot';
       const glyph = card.querySelector('.gear-icon'); glyph.innerHTML = icon(i, kind); glyph.draggable = !!i;
       const equippedCopy = i && wornCopy(slot, i);
-      glyph.setAttribute('aria-label', `${label}: ${i?.name || 'Empty'}${equippedCopy ? `, ${rarityName(equippedCopy)} copy #${equippedCopy.id}, ${stats(copyStats(equippedCopy))}` : ''}. Right-click to unequip.`);
+      glyph.setAttribute('aria-label', `${label}: ${i?.name || 'Empty'}${equippedCopy ? `, ${rarityName(equippedCopy)} copy #${equippedCopy.id}, ${stats(copyStats(equippedCopy))}${conditionState(equippedCopy) !== 'new' ? `, ${conditionText(equippedCopy)}` : ''}` : ''}. Right-click to unequip.`);
       const select = card.querySelector('select'), owned = WORLD_ITEMS.filter(item => item.kind === kind && compatible(item) && quantity(item.id) > 0);
       const options = [['none', 'None'], ...owned.map(item => [legacy ? item.variant : item.id, item.name])], key = JSON.stringify(options);
       if (select.dataset.options !== key) { select.replaceChildren(...options.map(([value, name]) => { const o = node('option', name); o.value = value; return o; })); select.dataset.options = key; }
@@ -369,7 +381,7 @@
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(a).kind.localeCompare(definition(b).kind) || definition(a).name.localeCompare(definition(b).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
   window.Inventory = { icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, effect, render, renderShop, renderEquipped, renderSets, hideTooltip,
-    icon, definition, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}`,
+    icon, definition, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
     // The bag side of a bank answer, which arrives before the next snapshot; the look and the set counts stay as they were.
     updateBags(next, nextSlots = {}, nextBags = [], nextInstances = []) {
       if (!look) return;

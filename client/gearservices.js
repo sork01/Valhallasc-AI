@@ -35,7 +35,33 @@
     if(copies.some(g=>String(g.id)===String(value)))control.value=String(value);
     return control;
   }
+  // Smith's window: every damaged copy with its condition and server-quoted price, one Repair button each and Repair all.
+  function renderRepair(npc,packet,container){
+    const quote=new Map((packet.repairQuote||[]).map(([id,price])=>[id,price]));
+    const copies=(packet.gearInstances||[]).filter(g=>quote.has(g.id)),worn=equippedIds(packet);
+    const total=[...quote.values()].reduce((sum,price)=>sum+price,0);
+    const elements=[make('h4','Repair gear'),make('p','Dying wears every piece you wear down by a tenth. A broken piece gives no stats until it is repaired. A smith charges a quarter of the piece\'s sale value for a full repair.')];
+    if(!copies.length){elements.push(make('p','Nothing needs repair.'));container.replaceChildren(...elements);return;}
+    const send=offer=>Online.send({type:'interact',npc:npc.id,offer});
+    for(const g of copies){
+      const left=Math.max(0,100-(g.wear||0)),price=quote.get(g.id);
+      const row=make('div','','repair-row');row.dataset.copy=String(g.id);row.dataset.state=left<=0?'broken':left<=30?'low':'worn';
+      const state=left<=0?'Broken':`Durability ${left}%`;
+      const name=make('span',`${item(g.item)?.name||g.item} · ${g.rarity}${worn.has(g.id)?' · equipped':''} · ${state}`,'repair-name');
+      const button=make('button',`Repair · ${price.toLocaleString()} gold`,'btn ghost');button.type='button';button.dataset.action='repair';
+      button.disabled=packet.gold<price;
+      button.addEventListener('click',()=>{button.disabled=true;send(`repair:${g.id}`);});
+      row.append(name,button);elements.push(row);
+    }
+    const all=make('button',`Repair all · ${total.toLocaleString()} gold`,'btn');all.type='button';all.dataset.action='repair_all';
+    all.disabled=packet.gold<total;
+    all.addEventListener('click',()=>{all.disabled=true;send('repair_all');});
+    elements.push(all);
+    if(packet.gold<total)elements.push(make('p',`You need ${(total-packet.gold).toLocaleString()} more gold to repair everything.`));
+    container.replaceChildren(...elements);
+  }
   function render(kind,npc,packet,container){
+    if(kind==='repair')return renderRepair(npc,packet,container);
     const copies=packet.gearInstances||[],worn=equippedIds(packet),preview=packet.gearPreview||{};
     const heading=make('h4',kind==='merge'?'Merge equipment':'Refine equipment');
     const intro=make('p',kind==='merge'?'Choose two spare copies with the same item and rarity. The output keeps the lower rank. Epic and orange copies cannot merge.':'Choose any owned copy, including one you wear. Each rank adds 4% of its rank-zero stats, up to rank 5.');
