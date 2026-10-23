@@ -35,7 +35,7 @@
   const number = '(\\d+(?:[.,]\\d+)?)';
   const phrases = (window.SV_PHRASES || []).map(([english, swedish]) => {
     const parts = english.split(/\{\d+\}/g).map(escape);
-    const first = /^\w/.test(english) ? '(?<![\\w])' : '', last = /\w$/.test(english) ? '(?![\\w])' : '';
+    const first = /^\w/.test(english) ? '\\b' : '', last = /\w$/.test(english) ? '(?![\\w])' : '';
     return [new RegExp(first + parts.join(number) + last, 'g'), swedish.replace(/\{(\d+)\}/g, (_, i) => '$' + (+i + 1))];
   });
   // A piece caught by a template ({0}) is translated only when the Swedish template asks for it ({0:t}), or when it is a
@@ -56,9 +56,20 @@
   const rephrase = value => phrases.reduce((text, [pattern, swedish]) => text.replace(pattern, swedish), value);
   // A composed line (parts joined with " · ", sentences, line breaks) is translated part by part. A single part is never
   // looked up as a whole here, so a name that equals a dictionary word stays as it is.
-  const SEPARATORS = /((?<=[.!?])\s+| · |\n)/;
+  // Splits into [part, separator, part, ...]. A sentence break keeps its punctuation in the part before it; written without
+  // a lookbehind, which is a syntax error that stops this whole script on Safari before 16.4.
+  const SEPARATORS = /([.!?])\s+| · |\n/g;
+  const splitSegments = text => {
+    const out = []; let last = 0, match;
+    SEPARATORS.lastIndex = 0;
+    while ((match = SEPARATORS.exec(text))) {
+      const start = match[1] ? match.index + 1 : match.index, end = match.index + match[0].length;
+      out.push(text.slice(last, start), text.slice(start, end)); last = end;
+    }
+    out.push(text.slice(last)); return out;
+  };
   const segment = text => {
-    const phrased = rephrase(text), parts = phrased.split(SEPARATORS);
+    const phrased = rephrase(text), parts = splitSegments(phrased);
     if (parts.length < 3) return phrased;
     return parts.map((part, index) => {
       const bare = part.trim(), own = index % 2 || !bare ? null : lookup(bare) || rephrase(bare);
