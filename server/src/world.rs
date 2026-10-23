@@ -60,6 +60,9 @@ mod frostwake_tests;
 mod gauntlet;
 #[cfg(test)]
 mod gauntlet_tests;
+mod gm_test;
+#[cfg(test)]
+mod gm_test_tests;
 mod gm_visibility;
 mod hold;
 mod hour_shards;
@@ -1502,6 +1505,7 @@ impl World {
                     grace_until: 0.,
                     empty_since: None,
                     members: vec![],
+                    tuning: Default::default(),
                 });
             }
         }
@@ -4245,6 +4249,7 @@ impl World {
         let angle = self.random() * std::f64::consts::TAU;
         let zone = self.slimes[id].zone;
         let dungeon = self.instance_at(zone).map(|i| i.template);
+        let (pack_damage, enrage_scale) = self.tuned(zone, &self.slimes[id].kind);
         // A respawning enemy rolls a fresh level; kings come from the shared timer instead.
         let respawn_level = {
             let s = &self.slimes[id];
@@ -4369,7 +4374,9 @@ impl World {
         } else {
             s.fight = (s.fight - TICK).max(0.);
         }
-        let damage = s.damage * crate::items::enrage_factor(&s.kind, s.fight);
+        let damage = s.damage
+            * pack_damage
+            * crate::items::enrage_factor_scaled(&s.kind, s.fight, enrage_scale);
         let mut goal = None;
         let mut movement = speed
             * TICK

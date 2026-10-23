@@ -6686,5 +6686,15 @@
   "Slaghammer Brute Relic": "Slägghuggare – relik",
   "Ventspitter Crawler Relic": "Ventilspottande krypare – relik",
   "Crucible Channeler Relic": "Degelkanaliserare – relik",
-  "Obsidian Bulwark Relic": "Obsidianbastion – relik"
+  "Obsidian Bulwark Relic": "Obsidianbastion – relik",
+  "Enter a dungeon copy first; the multipliers belong to it.": "Gå först in i en kopia av en dungeon; multiplikatorerna hör till den.",
+  "Finish the gauntlet or duel first.": "Avsluta först gauntleten eller duellen.",
+  "Leave the dungeon first; the run returns you to where you start it.": "Lämna dungeonen först; gauntleten för dig tillbaka dit du startar den.",
+  "No gear set of that colour exists at this level.": "Det finns ingen utrustningsuppsättning i den färgen på den här nivån.",
+  "Start a gauntlet run first; the multipliers belong to it.": "Starta först en gauntlet; multiplikatorerna hör till den.",
+  "That is not a dungeon the menu can enter.": "Det är ingen dungeon som menyn kan gå in i.",
+  "The Arena is full right now.": "Arenan är full just nu.",
+  "The clock runs only while a boss fights someone within 14 tiles; skip moves a boss that is fighting.": "Klockan går bara medan en boss slåss mot någon inom 14 rutor; hoppet flyttar en boss som slåss.",
+  "This dungeon has no final boss placed.": "Den här dungeonen har ingen slutboss utplacerad.",
+  "You are not in a dungeon copy.": "Du är inte i en kopia av en dungeon."
 }

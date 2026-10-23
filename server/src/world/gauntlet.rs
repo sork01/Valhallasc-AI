@@ -17,7 +17,7 @@ const COUNTDOWN: f64 = 10.;
 const FIGHT_TIME: f64 = 300.;
 const HERO_SPOT: Point = Point { x: 9., y: 16. };
 const OPPONENT_SPOT: Point = Point { x: 23., y: 16. };
-const CLASSES: [Class; FIGHTS] = [
+pub(super) const CLASSES: [Class; FIGHTS] = [
     Class::Warrior,
     Class::Mage,
     Class::Assassin,
@@ -81,12 +81,30 @@ pub(super) struct Run {
     pub(super) until: f64,
     /// Set by `pvp_hit` when a fighter reaches the one health floor; settled at the next tick.
     pub(super) fallen: Option<u64>,
+    /// The share of health and of damage the opponents get in this run (a game master's test run changes them).
+    pub(super) opponent_health: f64,
+    pub(super) opponent_damage: f64,
 }
 
 /// The progression set of green pieces for `level` (the set of the level rounded down to a multiple of 5, 99 uses 95),
 /// one per slot, as the duel matrix and the kill-time grid dress an ordinary character.
 fn green_gear(class: Class, level: u32) -> Vec<(&'static str, String)> {
-    let want = (level / 5 * 5).clamp(5, 95);
+    gear_set(class, level, "uncommon")
+}
+
+/// `green_gear` in another rarity (`uncommon`, `rare` or `epic`): purple exists only at the tens from 10 to 90, so a level
+/// snaps down to one of those. Used by the game master's test menu as well.
+pub(super) fn gear_set(class: Class, level: u32, rarity: &str) -> Vec<(&'static str, String)> {
+    let want = if rarity == "epic" {
+        (level / 10 * 10).clamp(10, 90)
+    } else {
+        (level / 5 * 5).clamp(5, 95)
+    };
+    let colour = match rarity {
+        "epic" => "purple",
+        "rare" => "blue",
+        _ => "green",
+    };
     SLOTS
         .iter()
         .filter_map(|&(slot, kind)| {
@@ -99,7 +117,7 @@ fn green_gear(class: Class, level: u32) -> Vec<(&'static str, String)> {
                 .iter()
                 .filter(|i| {
                     i.kind == kind
-                        && i.rarity == "uncommon"
+                        && i.rarity == rarity
                         && i.required_level == want
                         && i.source.is_none()
                         && !i.starter
@@ -109,7 +127,7 @@ fn green_gear(class: Class, level: u32) -> Vec<(&'static str, String)> {
             let named: Vec<&Item> = pieces
                 .iter()
                 .copied()
-                .filter(|i| i.id.ends_with(&format!("_l{want}_green")))
+                .filter(|i| i.id.ends_with(&format!("_l{want}_{colour}")))
                 .collect();
             let chosen = if named.is_empty() { &pieces } else { &named };
             chosen.first().map(|piece| (slot, piece.id.clone()))
@@ -263,6 +281,22 @@ impl World {
         for i in (1..FIGHTS).rev() {
             order.swap(i, (self.random() * (i + 1) as f64) as usize % (i + 1));
         }
+        Ok(self.gauntlet_launch(session, quest_id, level, arena, returns, order, 0))
+    }
+
+    /// Moves the hero into the private Arena copy `arena` and starts the countdown of fight `won + 1`. An empty `quest_id`
+    /// is a game master's test run: it reads and writes no quest.
+    #[allow(clippy::too_many_arguments)]
+    pub(super) fn gauntlet_launch(
+        &mut self,
+        session: u64,
+        quest_id: String,
+        level: u32,
+        arena: usize,
+        returns: (usize, f64, f64),
+        order: [Class; FIGHTS],
+        won: usize,
+    ) -> String {
         let p = self.players.get_mut(&session).unwrap();
         p.character.zone = arena;
         p.character.x = HERO_SPOT.x;
@@ -286,15 +320,17 @@ impl World {
             zone: arena,
             returns,
             order,
-            won: 0,
+            won,
             opponent: None,
             until: self.time + COUNTDOWN,
             fallen: None,
+            opponent_health: opponent_health(),
+            opponent_damage: opponent_damage(),
         });
         self.save();
-        Ok(format!(
+        format!(
             "The gauntlet begins: {FIGHTS} fights, one against each class. The first starts in {COUNTDOWN:.0} seconds."
-        ))
+        )
     }
 
     /// Once per tick: spawn the next opponent, settle a finished fight, drive the opponent.
@@ -374,7 +410,11 @@ impl World {
                 i,
                 true,
                 true,
-                "All five opponents are down. The quest is ready to hand in.",
+                if self.gauntlets[i].quest.is_empty() {
+                    "All five opponents are down. (Test run: no quest.)"
+                } else {
+                    "All five opponents are down. The quest is ready to hand in."
+                },
             );
             return false;
         }

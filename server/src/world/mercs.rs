@@ -153,6 +153,50 @@ impl World {
         self.save();
     }
 
+    /// Puts a new mercenary of `class` and `level` next to `point` in `zone` and into `owner`'s party: the part of a hire
+    /// that comes after the NPC, the quest and the price have been checked. Returns its name.
+    #[allow(clippy::too_many_arguments)]
+    pub(super) fn place_mercenary(
+        &mut self,
+        owner: &str,
+        class: Class,
+        level: u32,
+        zone: usize,
+        point: Point,
+        raid_contract: bool,
+        contract: Option<String>,
+    ) -> Result<String, String> {
+        let mut name = format!("Merc {}", class_title(class));
+        let same = self
+            .players
+            .values()
+            .filter(|p| p.merc.is_some() && p.character.look.name.starts_with(&name))
+            .count();
+        if same > 0 {
+            name = format!("{name} {}", same + 1);
+        }
+        let mut character = Character::mercenary(class, level, &name);
+        character.zone = zone;
+        let mut arrival = Point {
+            x: point.x + 1.5,
+            y: point.y + 1.5,
+        };
+        self.maps[zone].collide(&mut arrival, PLAYER_RADIUS);
+        character.x = arrival.x;
+        character.y = arrival.y;
+        self.party_add_mercenary_as(owner, &character, raid_contract)?;
+        let merc_session = MERC_BASE + self.merc_seq;
+        self.merc_seq += 1;
+        // Nobody reads a mercenary's socket: a closed channel makes every send a harmless no-op.
+        let (tx, _rx) = mpsc::channel(1);
+        let mut merc = Player::new(character, tx);
+        merc.merc = Some(owner.to_owned());
+        merc.merc_quest = contract;
+        merc.merc_raid = raid_contract.then_some(zone);
+        self.players.insert(merc_session, merc);
+        Ok(name)
+    }
+
     fn hire_mercenary(
         &mut self,
         session: u64,
@@ -233,34 +277,8 @@ impl World {
             return Err(format!("A mercenary costs {price} gold."));
         }
         let (zone, point) = (c.zone, c.point());
-        let mut name = format!("Merc {}", class_title(class));
-        let same = self
-            .players
-            .values()
-            .filter(|p| p.merc.is_some() && p.character.look.name.starts_with(&name))
-            .count();
-        if same > 0 {
-            name = format!("{name} {}", same + 1);
-        }
-        let mut character = Character::mercenary(class, level, &name);
-        character.zone = zone;
-        let mut arrival = Point {
-            x: point.x + 1.5,
-            y: point.y + 1.5,
-        };
-        self.maps[zone].collide(&mut arrival, PLAYER_RADIUS);
-        character.x = arrival.x;
-        character.y = arrival.y;
-        self.party_add_mercenary_as(&owner, &character, raid_contract)?;
-        let merc_session = MERC_BASE + self.merc_seq;
-        self.merc_seq += 1;
-        // Nobody reads a mercenary's socket: a closed channel makes every send a harmless no-op.
-        let (tx, _rx) = mpsc::channel(1);
-        let mut merc = Player::new(character, tx);
-        merc.merc = Some(owner);
-        merc.merc_quest = contract;
-        merc.merc_raid = raid_contract.then_some(zone);
-        self.players.insert(merc_session, merc);
+        let name =
+            self.place_mercenary(&owner, class, level, zone, point, raid_contract, contract)?;
         self.players.get_mut(&session).unwrap().character.gold -= price;
         Ok(format!(
             "{name} joins your party for {price} gold. The party is now {}/{wanted}.",

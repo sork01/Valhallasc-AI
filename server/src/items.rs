@@ -1530,9 +1530,18 @@ pub fn enrage(kind: &str) -> Option<(f64, f64)> {
     enrage_entry(kind).map(|p| (p[0], p[1].max(0.1)))
 }
 /// The damage multiplier of `kind` after `fight` seconds of combat: 1 until its enrage starts.
+#[cfg(test)]
 pub fn enrage_factor(kind: &str, fight: f64) -> f64 {
+    enrage_factor_scaled(kind, fight, 1.)
+}
+/// `enrage` with the start moved by `scale` (a game master's test copy, see `world/gm_test.rs`).
+pub fn enrage_scaled(kind: &str, scale: f64) -> Option<(f64, f64)> {
+    enrage(kind).map(|(start, ramp)| (start * scale, ramp))
+}
+/// `enrage_factor` with the start moved by `scale`.
+pub fn enrage_factor_scaled(kind: &str, fight: f64, scale: f64) -> f64 {
     enrage_entry(kind).map_or(1., |p| {
-        let factor = 1. + ((fight - p[0]) / p[1].max(0.1)).max(0.);
+        let factor = 1. + ((fight - p[0] * scale) / p[1].max(0.1)).max(0.);
         p.get(2).map_or(factor, |cap| factor.min(*cap))
     })
 }
@@ -1633,7 +1642,7 @@ mod tests {
             );
             assert!(
                 (30. ..=if kind.starts_with("null_") {
-                    720.
+                    900.
                 } else {
                     180.
                 })

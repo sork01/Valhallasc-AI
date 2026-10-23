@@ -85,6 +85,24 @@
       a.length === 2 && /^(accept|complete|claim|finish|reset)$/.test(a[1]) ? { op: 'quest', id: a[0], action: a[1] } : 'Use /quest <id> <accept|complete|claim|finish|reset>.'],
     king: ['', 'Summon the King Slime now.', () => ({ op: 'summon_king' })],
     die: ['', 'Be defeated (with the normal death penalty).', () => ({ op: 'die' })],
+    dungeon: ['<zone> [door|boss|pack N] [level] [green|blue|purple] [mercs] | reset | enrage [skip]', 'Test a dungeon: enter a copy of it at its door, final boss or a pack (any gate), optionally at its level, in a full gear set and with four hired fighters; reset the copy; read or skip the enrage clock.', a => {
+      if (a[0] === 'reset') return { op: 'gm_dungeon_reset' };
+      if (a[0] === 'enrage') return a[1] && a[1] !== 'skip' ? 'Use /dungeon enrage [skip].' : { op: 'gm_enrage', action: a[1] || 'status' };
+      const zone = findZone(a[0]);
+      if (zone === null || zone < 1) return 'Name a dungeon (zone number or part of its name), or use reset / enrage.';
+      const rest = a.slice(1), at = rest.find(w => /^(door|boss|pack)$/.test(w)) || 'door', gear = rest.find(w => /^(green|blue|purple)$/.test(w));
+      const pack = at === 'pack' ? Math.max(1, whole(rest[rest.indexOf('pack') + 1]) ?? 1) - 1 : 0;
+      return { op: 'gm_dungeon_enter', zone, at, pack, level: rest.includes('level'), gear: gear || null, mercs: rest.includes('mercs') };
+    }],
+    gauntlet: ['<level> [fight 1-5]', 'Start an arena gauntlet at a quest level and fight, without the quest (it never touches a quest).', a => {
+      const level = whole(a[0]), fight = a[1] === undefined ? 1 : whole(a[1]);
+      return level === null || fight === null ? 'Use /gauntlet <level> [fight 1-5].' : { op: 'gm_gauntlet', level, fight };
+    }],
+    tune: ['<pack_damage|boss_health|enrage_start|opponent_health|opponent_damage> <x> | reset', 'Change a test multiplier of your dungeon copy or gauntlet run (memory only; reset clears them all).', a => {
+      if (a[0] === 'reset') return { op: 'gm_tune', key: 'reset', value: 0 };
+      return !/^(pack_damage|boss_health|enrage_start|opponent_health|opponent_damage)$/.test(a[0] || '') || number(a[1]) === null ? 'Use /tune <pack_damage|boss_health|enrage_start|opponent_health|opponent_damage> <multiplier> or /tune reset.' : { op: 'gm_tune', key: a[0], value: number(a[1]) };
+    }],
+    gmtest: ['', 'Open the GM test menu (dungeons, arena gauntlet, difficulty multipliers).', () => ({ op: 'gm_test_info' })],
   };
 
   function help() {
@@ -106,6 +124,12 @@
       case 'set_resource': return `${Math.round(result.resource)} / ${Math.round(result.maxResource)}`;
       case 'spawn_enemy': return `enemy ${result.id} (${result.kind}, level ${result.level}) at ${Math.round(result.x)}, ${Math.round(result.y)}`;
       case 'kill_enemy': return `enemy ${result.id} (${result.kind}) defeated`;
+      case 'gm_dungeon_enter': return `in a copy of ${zoneNames()[result.zone] || 'zone ' + result.zone} (${result.at}) at ${Math.round(result.x)}, ${Math.round(result.y)}, level ${result.level}${result.gear ? ', ' + result.gear + ' gear' : ''}${result.mercs ? ', ' + result.mercs + ' hired' : ''}`;
+      case 'gm_dungeon_reset': return 'copy reset';
+      case 'gm_enrage': return result.bosses?.length ? result.bosses.map(b => `${b.kind} ${Math.round(b.fight)}/${Math.round(b.start ?? 0)} s${b.engaged ? '' : ' (idle)'}`).join(', ') : 'no boss in this copy';
+      case 'gm_gauntlet': return `gauntlet level ${result.level}, fight ${result.fight} (${result.class})`;
+      case 'gm_tune': return `dungeon ${JSON.stringify(result.dungeon)}, gauntlet ${JSON.stringify(result.gauntlet)}`;
+      case 'gm_test_info': return 'test menu opened';
       default: return 'done';
     }
   }
@@ -115,6 +139,8 @@
     onSelf(character) {
       self = character?.gm ? character : null;
       const badge = document.getElementById('gm-visibility');
+      const open = document.getElementById('gmtest-open');
+      if (open) open.hidden = !self;
       if (badge) { badge.hidden = !self; badge.textContent = self?.hidden ? 'Hidden' : 'Visible'; badge.dataset.hidden = String(!!self?.hidden); }
     },
     // True when the text was a game master command (so it is not sent as chat). Anyone else's slash text goes on to the
@@ -127,15 +153,26 @@
       if (!entry) return false;
       const built = entry[2](args);
       if (typeof built === 'string') { say(`/${name}: ${built}`); return true; }
+      if (name === 'gmtest') { window.GMTest?.open(); return true; }
       const id = ++ref;
       if (!window.Online.send({ type: 'debug', ref: id, command: built })) { say('Not connected.'); return true; }
       pending.set(id, { name, op: built.op });
       return true;
     },
+    // For the test menu window: send one debug command and get the whole reply packet back (no chat line unless `log`).
+    request(command, { log = false } = {}) {
+      return new Promise(resolve => {
+        const id = ++ref;
+        if (!window.Online?.send({ type: 'debug', ref: id, command })) return resolve({ ok: false, error: 'Not connected.' });
+        pending.set(id, { name: command.op, op: command.op, done: resolve, log });
+      });
+    },
     onReply(packet) {
       const asked = pending.get(packet.ref);
       pending.delete(packet.ref);
       if (!asked) return;
+      asked.done?.(packet);
+      if (asked.done && !asked.log) return;
       say(packet.ok ? `/${asked.name}: ${brief(asked.op, packet.result || {})}` : `/${asked.name}: ${packet.error || 'refused'}`);
     },
   };

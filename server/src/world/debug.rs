@@ -52,6 +52,31 @@ impl World {
                     .weather
                     .set(zone, &kind, intensity.as_deref(), daynight::unix_ms());
             }
+            DebugCommand::GmTestInfo => return self.gm_test_info(session),
+            DebugCommand::GmDungeonEnter {
+                zone,
+                at,
+                pack,
+                level,
+                gear,
+                mercs,
+            } => {
+                return self.gm_dungeon_enter(
+                    session,
+                    zone,
+                    &at,
+                    pack,
+                    level,
+                    gear.as_deref(),
+                    mercs,
+                );
+            }
+            DebugCommand::GmDungeonReset => return self.gm_dungeon_reset(session),
+            DebugCommand::GmEnrage { action } => return self.gm_enrage(session, &action),
+            DebugCommand::GmGauntlet { level, fight } => {
+                return self.gm_gauntlet(session, level, fight);
+            }
+            DebugCommand::GmTune { key, value } => return self.gm_tune(session, &key, value),
             DebugCommand::SpawnChest { distance } => {
                 return self.debug_spawn_chest(session, distance);
             }
@@ -411,6 +436,12 @@ impl World {
             DebugCommand::Visibility { .. } => unreachable!("handled before borrowing the player"),
             DebugCommand::SetWeather { .. } => unreachable!("handled before borrowing the player"),
             DebugCommand::SpawnChest { .. } => unreachable!("handled before borrowing the player"),
+            DebugCommand::GmTestInfo
+            | DebugCommand::GmDungeonEnter { .. }
+            | DebugCommand::GmDungeonReset
+            | DebugCommand::GmEnrage { .. }
+            | DebugCommand::GmGauntlet { .. }
+            | DebugCommand::GmTune { .. } => unreachable!("handled before borrowing the player"),
         };
         if levels > 0 {
             let point = self.players[&session].character.point();

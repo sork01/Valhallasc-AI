@@ -665,5 +665,6 @@
   "{0} attack",
   "{0} · {1} online",
   "{0}{1} → {2}",
-  "↵ Enter"
+  "↵ Enter",
+  "Test"
 ]

@@ -19,6 +19,8 @@ pub(super) struct Instance {
     pub grace_until: f64,
     pub empty_since: Option<f64>,
     pub members: Vec<String>,
+    /// A game master's in-memory test multipliers for this copy (`gm_test.rs`); reset with the copy.
+    pub tuning: super::gm_test::Tuning,
 }
 
 impl World {
@@ -39,6 +41,7 @@ impl World {
                 grace_until: 0.,
                 empty_since: None,
                 members: vec![],
+                tuning: Default::default(),
             });
             for _ in 1..copies {
                 let mut copy = maps[template].clone();
@@ -54,6 +57,7 @@ impl World {
                     grace_until: 0.,
                     empty_since: None,
                     members: vec![],
+                    tuning: Default::default(),
                 });
             }
         }
@@ -164,6 +168,17 @@ impl World {
     /// Every enemy back at its post at full health, shots and loot gone, the exit closed.
     pub(super) fn reset_instance(&mut self, index: usize) {
         let zone = self.instances[index].zone;
+        self.respawn_instance_zone(zone);
+        self.instances[index].active = false;
+        self.instances[index].cleared = false;
+        self.instances[index].rally = None;
+        self.instances[index].grace_until = 0.;
+        self.instances[index].empty_since = None;
+        self.instances[index].members.clear();
+        self.instances[index].tuning = Default::default();
+    }
+    /// The enemy half of `reset_instance`: every enemy back at its post, shots, loot and chests gone.
+    pub(super) fn respawn_instance_zone(&mut self, zone: usize) {
         self.reset_boss_zone(zone);
         for id in 0..self.spawns.len() {
             if self.spawns[id].zone == zone {
@@ -176,12 +191,6 @@ impl World {
         self.enemy_bolts.retain(|b| b.zone != zone);
         self.drops.retain(|d| d.zone != zone);
         self.clear_chests(zone);
-        self.instances[index].active = false;
-        self.instances[index].cleared = false;
-        self.instances[index].rally = None;
-        self.instances[index].grace_until = 0.;
-        self.instances[index].empty_since = None;
-        self.instances[index].members.clear();
     }
     /// The final boss fell: open the exit and tell everyone inside.
     pub(super) fn clear_instance(&mut self, zone: usize, at: Point) {

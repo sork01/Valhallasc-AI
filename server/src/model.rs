@@ -1478,6 +1478,40 @@ pub enum DebugCommand {
         level: Option<u32>,
     },
     SummonKing,
+    /// The game master's test menu (`world/gm_test.rs`): the dungeons, the gauntlet quest levels and the current tuning.
+    GmTestInfo,
+    /// Enters a copy of a dungeon at its door, its final boss or a pack, optionally at the dungeon's level, in a full
+    /// gear set (`green`, `blue`, `purple`) and with four hired fighters.
+    GmDungeonEnter {
+        zone: usize,
+        at: String,
+        #[serde(default)]
+        pack: usize,
+        #[serde(default)]
+        level: bool,
+        #[serde(default)]
+        gear: Option<String>,
+        #[serde(default)]
+        mercs: bool,
+    },
+    /// Resets the dungeon copy the game master stands in, without leaving it.
+    GmDungeonReset,
+    /// `status` shows the enrage clocks of the bosses in this copy, `skip` moves them to their enrage start.
+    GmEnrage {
+        action: String,
+    },
+    /// Starts an arena gauntlet at a quest level without the quest, at fight 1 to 5.
+    GmGauntlet {
+        level: u32,
+        fight: usize,
+    },
+    /// Sets one test multiplier (`pack_damage`, `boss_health`, `enrage_start`, `opponent_health`, `opponent_damage`) for
+    /// this dungeon copy or gauntlet run, or `reset` clears them. In memory only.
+    GmTune {
+        key: String,
+        #[serde(default)]
+        value: f64,
+    },
 }
 
 #[derive(Debug, Deserialize)]

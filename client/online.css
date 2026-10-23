@@ -902,3 +902,16 @@
 .inspect-list { display: grid; grid-template-columns: 1fr auto; gap: .3cqw 1cqw; margin: 0; }
 .inspect-list dt { color: #cdbf9f; } .inspect-list dd { margin: 0; text-align: right; }
 @media (max-width: 700px) { .inspect-body { grid-template-columns: 1fr; } .inspect-window { width: 96%; } }
+
+/* GM test menu (client/gmtest.js): a plain window, only reachable by the GM character. */
+.gmtest-open { margin-left: .4em; padding: .1em .45em; border: 1px solid #ffd24a99; border-radius: .35em; background: #ffd24a26; color: #ffe39a; font: inherit; font-size: .72em; vertical-align: middle; cursor: pointer; pointer-events: auto; }
+.gmtest-window { width: min(34rem, 94%); max-height: 92%; display: flex; flex-direction: column; }
+.gmtest-body { overflow: auto; padding: .6rem .8rem .8rem; display: grid; gap: .7rem; }
+.gmtest-section { display: grid; gap: .4rem; min-width: 0; }
+.gmtest-section h4 { margin: 0; }
+.gmtest-row { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; min-width: 0; }
+.gmtest-row select, .gmtest-row .btn { min-width: 0; max-width: 100%; }
+.gmtest-row input[type="range"] { flex: 1 1 8rem; min-width: 0; }
+.gmtest-row label:first-child { flex: 0 0 8.5rem; }
+.gmtest-status { margin: 0; min-height: 1.4em; font-size: .85em; }
+.gmtest-status[data-bad="true"] { color: #ff9a8a; }

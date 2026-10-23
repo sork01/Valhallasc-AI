@@ -595,7 +595,7 @@ impl World {
     fn tick_static(&mut self, fight: &mut Fight, m: &Mechanic, t: &bm::Static) {
         let players = self.mech_players(fight.zone);
         let boss = &self.slimes[fight.boss];
-        let enraged = crate::items::enrage_factor(&boss.kind, boss.fight) > 1.;
+        let enraged = self.tuned_enrage_factor(boss.zone, &boss.kind, boss.fight) > 1.;
         let Some(st) = fight.stat.as_mut() else {
             return;
         };
@@ -1699,7 +1699,9 @@ impl World {
         if b.enrage {
             // Too slow: the enrage begins now and the boss's clock cannot fall back below its start.
             let kind = self.slimes[id].kind.clone();
-            if let Some((start, _)) = crate::items::enrage(&kind) {
+            if let Some((start, _)) =
+                crate::items::enrage_scaled(&kind, self.tuned(fight.zone, &kind).1)
+            {
                 fight.enrage_floor = start;
             }
             let at = self.slimes[id].point();
@@ -1821,7 +1823,7 @@ impl World {
     fn tick_cover(&mut self, fight: &mut Fight) {
         // Once the boss enrages the pillars crumble for good: a gaze nobody can hide from ends the fight.
         let boss = &self.slimes[fight.boss];
-        let enraged = crate::items::enrage_factor(&boss.kind, boss.fight) > 1.;
+        let enraged = self.tuned_enrage_factor(boss.zone, &boss.kind, boss.fight) > 1.;
         if enraged && !fight.enraged {
             // With no cover left there is no safe spot, so the next gaze does not wait for its turn: it begins on the
             // next tick (a timer already at zero fires, a gaze already being cast runs on).
