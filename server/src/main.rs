@@ -128,6 +128,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     let router = Router::new()
         .route("/health", get(health))
+        .route("/online", get(online))
         .nest_service(
             "/api",
             auth::router(accounts, app.allowed_origin.clone(), app.snapshots.clone()),
@@ -178,6 +179,13 @@ async fn health(State(app): State<App>) -> impl IntoResponse {
     let snapshot = app.snapshots.borrow();
     axum::Json(
         json!({"status":"ok","version":1,"tick":snapshot["tick"],"online":snapshot["humansOnline"],"visibleOnline":snapshot["online"],"capacity":MAX_PLAYERS}),
+    )
+}
+/// Who is online, for the public vronline page: name, class, level and place only.
+async fn online(State(app): State<App>) -> impl IntoResponse {
+    let snapshot = app.snapshots.borrow();
+    axum::Json(
+        json!({"online":snapshot["humansOnline"],"capacity":MAX_PLAYERS,"players":snapshot["roster"]}),
     )
 }
 // One zone's complete snapshot: the one listing this player, else the last zone they were in.

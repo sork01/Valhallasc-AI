@@ -1876,7 +1876,7 @@ impl World {
     // Published to every connection: one complete view per zone. Each connection forwards only the view
     // that holds its own character; `tick` and `online` also sit at the top for the health route.
     pub fn snapshot(&self) -> Value {
-        json!({"tick":self.tick,"online":self.visible_online(),"humansOnline":self.visible_humans_online(),
+        json!({"tick":self.tick,"online":self.visible_online(),"humansOnline":self.visible_humans_online(),"roster":self.online_roster(),
         "zones":(0..self.maps.len()).map(|zone| self.snapshot_for(zone)).collect::<Vec<_>>()})
     }
 

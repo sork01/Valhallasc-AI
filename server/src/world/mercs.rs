@@ -85,6 +85,23 @@ impl World {
             .filter(|p| p.merc.is_none() && p.ambient.is_none() && !p.is_hidden())
             .count()
     }
+    /// The public "who is online" list: real, visible players only (no hired fighters, ambient adventurers or hidden
+    /// GMs), with class, level and place. Served by `/online`.
+    pub(super) fn online_roster(&self) -> Vec<Value> {
+        let mut roster: Vec<Value> = self
+            .players
+            .values()
+            .filter(|p| p.merc.is_none() && p.ambient.is_none() && !p.is_hidden())
+            .map(|p| {
+                let c = &p.character;
+                let size = self.maps[c.zone].size.max(1) as f64;
+                json!({"name":c.look.name,"class":class_title(c.look.class),"level":c.level,
+                    "zone":self.zone_name(c.zone),"x":c.x.round(),"y":c.y.round(),"size":size,"dead":c.hp<=0.})
+            })
+            .collect();
+        roster.sort_by_key(|p| p["name"].as_str().unwrap_or_default().to_lowercase());
+        roster
+    }
     pub(super) fn session_of(&self, character: &str) -> Option<u64> {
         self.players
             .iter()

@@ -1029,6 +1029,14 @@ mod tests {
         assert_eq!(w.humans_online(), 1);
         assert_eq!(w.visible_online(), bots.len() + 1);
         assert_eq!(w.snapshot()["humansOnline"], 1);
+        // The public roster lists the one human only, never the adventurers.
+        let roster = w.snapshot()["roster"].as_array().unwrap().clone();
+        assert_eq!(roster.len(), 1);
+        for key in ["name", "class", "level", "zone", "x", "y", "size"] {
+            assert!(!roster[0][key].is_null(), "{key}");
+        }
+        assert_eq!(roster[0]["zone"], "Greenmeadow");
+        assert!(roster[0].get("id").is_none() && roster[0].get("inventory").is_none());
         assert_eq!(
             w.snapshot_for(0)["players"].as_array().unwrap().len(),
             bots.len() + 1
