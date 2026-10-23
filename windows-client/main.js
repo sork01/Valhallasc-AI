@@ -58,7 +58,14 @@ function create() {
     if (input.key === 'F11') { win.setFullScreen(!win.isFullScreen()); e.preventDefault(); }
     else if (input.key === 'F5' || (input.control && input.key.toLowerCase() === 'r')) { win.loadURL(GAME_URL); e.preventDefault(); }
   });
-  win.on('close', () => saveState(win));
+  // The sign-in lives in localStorage and the SSO cookie; write both to disk so a quit right after
+  // signing in does not lose the session.
+  win.on('close', () => {
+    saveState(win);
+    const s = win.webContents.session;
+    s.flushStorageData();
+    s.cookies.flushStore().catch(() => {});
+  });
   win.loadURL(GAME_URL);
 }
 
