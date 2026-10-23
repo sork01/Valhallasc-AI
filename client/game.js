@@ -451,12 +451,13 @@
   const viewKey = c => c.class + (c.gender === 'female' ? 'F' : '');
   const currentSprite = c => spriteViews[viewKey(c)];
   const magecv = $('magecv'); magecv.width = 300; magecv.height = 394;
+  window.addEventListener('spriteprogress', e => { const s = $('mage-status'); if (!s.hidden && s.dataset.base) s.textContent = `${window.Locale?.translate?.(s.dataset.base) ?? s.dataset.base} ${e.detail[0]}/${e.detail[1]}`; });
   async function ensureMage(type = cfg.class, gender = cfg.gender) {
     const key = viewKey({ class: type, gender }), here = () => viewKey(cfg) === key, playing = () => scene === 'game' && !!save.char && viewKey(save.char) === key;
     if (spriteViews[key]) return spriteViews[key];
     if (spritePromises[key]) return spritePromises[key];
     const look = playing() ? save.char : cfg;
-    $('mage-status').textContent = t(type + 'Loading'); $('mage-status').hidden = !here();
+    $('mage-status').dataset.base = $('mage-status').textContent = t(type + 'Loading'); $('mage-status').hidden = !here();
     spritePromises[key] = spriteClass({ class: type, gender }).load(look).then(sprite => {
       spriteViews[key] = sprite;
       if (here()) { sprite.set(playing() ? save.char : cfg); $('mage-status').hidden = true; }

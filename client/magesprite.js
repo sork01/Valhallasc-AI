@@ -57,8 +57,26 @@
     if (c.width < w || c.height < h) { c.width = Math.max(c.width, w); c.height = Math.max(c.height, h); }
     const g = c.ctx || (c.ctx = c.getContext('2d', { willReadFrequently: true }));
     g.globalCompositeOperation = 'copy';
+    if (WEBKIT) return wholeReader(c, g);
     return (image, sx, sy, sw, sh) => { g.drawImage(image, sx, sy, sw, sh, 0, 0, sw, sh); return g.getImageData(0, 0, sw, sh).data; };
   };
+  // Safari and every iOS browser (WebKit) ignore willReadFrequently: the canvas stays on the GPU and each of the ~10,000
+  // small readbacks of a class stalls the pipeline, so "Calling the Priest..." never ended on an iPhone. There the atlas is
+  // read back once (about 33 MB, kept only while its part is cut up) and each frame is copied out of that array.
+  const WEBKIT = navigator.vendor === 'Apple Computer, Inc.';
+  function wholeReader(c, g) {
+    let source = null, data = null, iw = 0;
+    return (image, sx, sy, sw, sh) => {
+      if (source !== image) {
+        iw = image.width; const ih = image.height;
+        if (c.width < iw || c.height < ih) { c.width = Math.max(c.width, iw); c.height = Math.max(c.height, ih); }
+        g.clearRect(0, 0, iw, ih); g.drawImage(image, 0, 0); data = g.getImageData(0, 0, iw, ih).data; source = image;
+      }
+      const out = new Uint8ClampedArray(sw * sh * 4);
+      for (let y = 0; y < sh; y++) { const from = ((sy + y) * iw + sx) * 4; out.set(data.subarray(from, from + sw * 4), y * sw * 4); }
+      return out;
+    };
+  }
   // Slow path for a set without a bounds sidecar (scripts/sprite_bounds.py): find the opaque box of one cell.
   function scanBounds(pixels, fw, fh) {
     const alpha = new Uint32Array(pixels.buffer, pixels.byteOffset, fw * fh);
@@ -152,6 +170,7 @@
         const images = await (next || loadImages(meta.parts[names[k]]));
         next = k + 1 < names.length && !job.background ? loadImages(meta.parts[names[k + 1]]) : null;
         parts[names[k]] = await decodePart(meta, boundsOf(names[k]), images, job.slicer);
+        if (!job.background) window.dispatchEvent(new CustomEvent('spriteprogress', { detail: [k + 1, names.length] }));
       }
     } catch (error) { next?.then(images => images.forEach(image => image.close()), () => {}); throw error; }
     const ensure = (part, background = false) => {
