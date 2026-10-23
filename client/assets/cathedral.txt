@@ -134,7 +134,9 @@
     "cf_sentry",
     "cf_kettil",
     "cf_ysolt",
-    "cf_hallgrim"
+    "cf_hallgrim",
+    "cf_sigrun",
+    "cf_ingot"
   ],
   "clips": {
     "idle": {
@@ -295,7 +297,9 @@
     "cf_sentry": "3fd51f9acdc3ac6c",
     "cf_kettil": "9c84ec5e867830e6",
     "cf_ysolt": "89bd4bd3a01c81f5",
-    "cf_hallgrim": "9e589b01e2eb66f8"
+    "cf_hallgrim": "9e589b01e2eb66f8",
+    "cf_sigrun": "d226346b24398667",
+    "cf_ingot": "3ffbfc5e3127b1ee"
   },
   "tops": {
     "tidetemplar": 84,
@@ -424,6 +428,8 @@
     "cf_sentry": 69,
     "cf_kettil": 57,
     "cf_ysolt": 71,
-    "cf_hallgrim": 56
+    "cf_hallgrim": 56,
+    "cf_sigrun": 60,
+    "cf_ingot": 38
   }
 }

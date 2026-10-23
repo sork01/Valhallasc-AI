@@ -813,7 +813,11 @@ impl World {
             let mut left: Vec<usize> = shield.adds.iter().copied().filter(alive).collect();
             left.sort_unstable();
             if !left.is_empty() {
-                return Some(left[rank % left.len()]);
+                return Some(if shield.ordered.is_some() {
+                    left[0]
+                } else {
+                    left[rank % left.len()]
+                });
             }
         }
         let mut seeds: Vec<usize> = fight.blooms.iter().map(|b| b.slot).filter(alive).collect();

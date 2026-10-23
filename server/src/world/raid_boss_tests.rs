@@ -295,8 +295,8 @@ fn raid_boss_casts_reset_on_evade_and_do_not_leak_into_other_copies() {
         assert!(r.w.boss_mech_view(copy).is_empty());
         assert_eq!(
             r.w.signs_view(copy).len(),
-            3,
-            "each raid copy has all three Warden signs"
+            4,
+            "each raid copy has all four Warden signs"
         );
         r.w.slimes[r.boss].state = "return".into();
         r.run(0.1);
@@ -391,7 +391,7 @@ fn raid_boss_measure_first_three() {
         .ok()
         .and_then(|s| serde_json::from_value(json!(s)).ok())
         .unwrap_or(Class::Warrior);
-    for kind in ["cf_kettil", "cf_ysolt", "cf_hallgrim"] {
+    for kind in ["cf_kettil", "cf_ysolt", "cf_hallgrim", "cf_sigrun"] {
         if !wanted.is_empty() && !wanted.split(',').any(|s| s == kind) {
             continue;
         }
@@ -526,4 +526,226 @@ fn raid_boss_kettil_odd_crew_has_one_trio_with_all_three_leash_lines() {
         .map(|s| s.as_str().unwrap())
         .collect();
     assert_eq!(assigned.len(), 9);
+}
+
+fn sigrun_ingots(r: &Rig) -> Vec<usize> {
+    r.view()["tele"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|t| t["ingot"].is_number())
+        .map(|t| t["target"].as_u64().unwrap() as usize)
+        .collect()
+}
+
+#[test]
+fn raid_boss_sigrun_only_lowest_ingot_takes_damage_and_brain_follows_it() {
+    let mut r = Rig::new("cf_sigrun", 10);
+    r.run(0.1);
+    let ingots = sigrun_ingots(&r);
+    assert_eq!(ingots.len(), 6);
+    assert_eq!(r.view()["cast"]["total"], 25.);
+    let boss_hp = r.w.slimes[r.boss].hp;
+    assert_eq!(r.w.hit_slime(r.boss, 1, 1e12, false), 0.);
+    for slot in &ingots[1..] {
+        assert_eq!(
+            r.w.hit_slime(*slot, 1, 1e12, false),
+            0.,
+            "later numbers are immune"
+        );
+    }
+    assert_eq!(r.w.slimes[r.boss].hp, boss_hp);
+    for slot in ingots {
+        for session in 1..=10 {
+            assert_eq!(
+                r.w.boss_play(session).unwrap().target,
+                Some(slot),
+                "every fighter shares the authoritative target"
+            );
+        }
+        assert!(r.w.hit_slime(slot, 1, 1e12, false) > 0.);
+        assert!(r.w.slimes[slot].dead);
+        r.run(0.1);
+        if !sigrun_ingots(&r).is_empty() {
+            assert!(
+                r.view()["cast"]["left"].as_f64().unwrap() > 24.8,
+                "next number gets a full warning"
+            );
+        }
+    }
+    assert!(r.view()["shield"].is_null());
+    assert!(r.w.hit_slime(r.boss, 1, 1., false) > 0.);
+    assert!(r.w.drops.is_empty(), "helper kills pay no loot");
+}
+
+#[test]
+fn raid_boss_sigrun_deadline_explodes_once_only_in_her_court() {
+    let mut r = Rig::new("cf_sigrun", 10);
+    r._rx.push(join(&mut r.w, 11, Class::Warrior));
+    let c = &mut r.w.players.get_mut(&11).unwrap().character;
+    c.zone = r.zone;
+    c.x = 270.;
+    c.y = 204.;
+    let outsider_hp = c.hp;
+    r.w.players.get_mut(&2).unwrap().god = true;
+    let hp = r.hp(1);
+    r.run(24.8);
+    assert_eq!(r.hp(1), hp, "no early shock");
+    r.run(0.5);
+    assert!(
+        r.hp(1) < hp && r.hp(1) > 0.,
+        "a failed number deals a heavy hit"
+    );
+    assert_eq!(r.hp(2), hp, "GM/test god mode blocks the shock");
+    assert_eq!(r.hp(11), outsider_hp, "other hall is untouched");
+    let after = r.hp(1);
+    assert_eq!(
+        sigrun_ingots(&r).len(),
+        5,
+        "failed ingot shatters without a reward"
+    );
+    r.run(5.);
+    assert_eq!(
+        r.hp(1),
+        after,
+        "shock is applied once, with a fresh deadline next"
+    );
+    assert!(r.w.drops.is_empty());
+    // A mixture of overheated and killed helpers still reforges in authored order.
+    let all: Vec<_> =
+        r.w.spawns
+            .iter()
+            .enumerate()
+            .filter(|(_, s)| s.zone == 46 && s.kind == "cf_ingot")
+            .map(|(id, _)| id)
+            .collect();
+    for slot in sigrun_ingots(&r) {
+        r.w.hit_slime(slot, 1, 1e12, false);
+        r.run(0.1);
+    }
+    r.w.slimes[r.boss].hp = r.w.slimes[r.boss].max_hp * 0.4;
+    r.run(0.1);
+    assert_eq!(
+        sigrun_ingots(&r),
+        all,
+        "overheated number 1 must not reorder the next wave"
+    );
+}
+
+#[test]
+fn raid_boss_sigrun_reforges_at_forty_percent_and_resets_helpers_per_copy() {
+    let mut r = Rig::new("cf_sigrun", 10);
+    r.run(0.1);
+    let original = sigrun_ingots(&r);
+    for slot in &original {
+        r.w.hit_slime(*slot, 1, 1e12, false);
+        r.run(0.1);
+    }
+    assert!(r.view()["shield"].is_null());
+    let hp = r.w.slimes[r.boss].max_hp;
+    r.w.slimes[r.boss].hp = hp * 0.4;
+    r.run(0.1);
+    assert_eq!(
+        sigrun_ingots(&r),
+        original,
+        "second wave reuses all six numbered moulds"
+    );
+    assert!(
+        original
+            .iter()
+            .all(|slot| r.w.slimes[*slot].hp == r.w.slimes[*slot].max_hp)
+    );
+    let copy =
+        r.w.instances
+            .iter()
+            .find(|i| i.template == 46 && i.zone != 46)
+            .unwrap()
+            .zone;
+    assert!(r.w.boss_mech_view(copy).is_empty());
+    assert!(
+        r.w.slimes
+            .iter()
+            .filter(|s| s.zone == copy && s.kind == "cf_ingot")
+            .all(|s| s.dead && s.state == "waiting")
+    );
+    r.w.slimes[r.boss].state = "return".into();
+    r.run(0.1);
+    assert!(r.w.boss_mech_view(r.zone).is_empty());
+    assert!(
+        original
+            .iter()
+            .all(|slot| r.w.slimes[*slot].dead && r.w.slimes[*slot].state == "waiting")
+    );
+    r.w.slimes[r.boss].hp = hp;
+    r.w.slimes[r.boss].state = "chase".into();
+    r.run(0.1);
+    assert_eq!(sigrun_ingots(&r).len(), 6);
+    assert!(r.view()["cast"]["left"].as_f64().unwrap() > 24.8);
+}
+
+#[test]
+fn raid_boss_sigrun_sign_numbers_reachability_loot_and_schema_match() {
+    let mut r = Rig::new("cf_sigrun", 1);
+    let def = &r.w.boss.table["cf_sigrun"];
+    let bm::Block::Shield(sh) = &def.mechanics[0].block else {
+        panic!()
+    };
+    let ordered = sh.ordered.as_ref().unwrap();
+    assert_eq!(ordered.deadline, 25.);
+    assert_eq!(ordered.heavy, 0.9);
+    assert_eq!(sh.steps.iter().map(|s| s.hp).collect::<Vec<_>>(), [1., 0.4]);
+    assert!(sh.steps.iter().all(|s| s.count == 6 && s.still));
+    let sign = &r.w.signs["cf_sigrun"];
+    crate::bosssign::validate("cf_sigrun", sign).unwrap();
+    assert!(sign.todo.contains("25 seconds") && sign.todo.contains("All ten"));
+    assert!(sign.tip.contains("40%"));
+    let [x0, y0, x1, y1] = def.arena.unwrap();
+    let ingots: Vec<_> =
+        r.w.spawns
+            .iter()
+            .filter(|s| s.zone == 46 && s.kind == "cf_ingot")
+            .collect();
+    assert_eq!(ingots.len(), 6);
+    for y in y0 as i32..y1 as i32 {
+        for x in x0 as i32..x1 as i32 {
+            let at = Point {
+                x: x as f64 + 0.5,
+                y: y as f64 + 0.5,
+            };
+            let mut free = at;
+            r.w.maps[46].collide(&mut free, PLAYER_RADIUS);
+            if at.distance(free) > 1e-6 {
+                continue;
+            }
+            for spawn in &ingots {
+                let goal = Point {
+                    x: spawn.x,
+                    y: spawn.y,
+                };
+                assert!(at.distance(goal) < bm::max_run_distance(ordered.deadline));
+                assert!(r.w.maps[46].line_clear(at, goal, PLAYER_RADIUS));
+            }
+        }
+    }
+    let mut broken = (**def).clone();
+    let bm::Block::Shield(sh) = &mut broken.mechanics[0].block else {
+        panic!()
+    };
+    sh.ordered.as_mut().unwrap().deadline = 2.;
+    assert!(bm::validate("cf_sigrun", &broken).is_err());
+    for boost in [1, 3] {
+        r.w.players.get_mut(&1).unwrap().character.rebirth_tiers = [0, 0, 0, 0, boost - 1];
+        r.w.slimes[r.boss].dead = false;
+        r.w.slimes[r.boss].hp = r.w.slimes[r.boss].max_hp;
+        r.w.drops.clear();
+        r.w.hit_slime(r.boss, 1, 1e12, false);
+        let pieces: Vec<_> = r.w.drops.iter().filter_map(|d| d.gear.as_ref()).collect();
+        assert_eq!(pieces.len(), 2 * boost as usize);
+        assert!(
+            pieces
+                .iter()
+                .all(|g| g.rarity == "legendary" && item(&g.item).unwrap().kind != "weapon")
+        );
+    }
+    assert!(r.w.maps[46].sealed_template);
 }

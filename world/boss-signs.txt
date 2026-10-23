@@ -264,5 +264,17 @@
       "blue",
       "red"
     ]
+  },
+  "cf_sigrun": {
+    "x": 199.98,
+    "y": 196.5,
+    "title": "Sigrun Slagmother",
+    "what": "Six numbered ingots shield Sigrun. Only the lowest number still standing can be hurt.",
+    "todo": "All ten friends hit ingot 1, then 2, up to 6. Each new number gives you 25 seconds. Too slow? It bursts and hurts the whole group.",
+    "tip": "Break all six to hurt Sigrun. When she has 40% health left, she makes six more. The red ring shows the number to hit.",
+    "colors": [
+      "red",
+      "path"
+    ]
   }
 }

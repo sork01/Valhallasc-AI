@@ -231414,13 +231414,6 @@
           "v": 3
         },
         {
-          "kind": "cf_vent",
-          "x": 177.0,
-          "y": 213.0,
-          "r": 0,
-          "v": 3
-        },
-        {
           "kind": "cf_rally",
           "x": 91.844,
           "y": 207.714,
@@ -231762,20 +231755,6 @@
           "y": 199.5,
           "r": 0,
           "v": 3
-        },
-        {
-          "kind": "cf_lantern",
-          "x": 180.0,
-          "y": 201.25,
-          "r": 0,
-          "v": 3
-        },
-        {
-          "kind": "cf_lantern",
-          "x": 152.75,
-          "y": 204.75,
-          "r": 0,
-          "v": 4
         },
         {
           "kind": "cf_lantern",
@@ -232224,6 +232203,47 @@
           "kind": "cf_hallgrim",
           "x": 270,
           "y": 204
+        },
+        {
+          "kind": "cf_sigrun",
+          "x": 164,
+          "y": 201
+        },
+        {
+          "kind": "cf_ingot",
+          "x": 171.0,
+          "y": 201.0,
+          "ambush": "cf_sigrun_ingot"
+        },
+        {
+          "kind": "cf_ingot",
+          "x": 167.5,
+          "y": 207.062,
+          "ambush": "cf_sigrun_ingot"
+        },
+        {
+          "kind": "cf_ingot",
+          "x": 160.5,
+          "y": 207.062,
+          "ambush": "cf_sigrun_ingot"
+        },
+        {
+          "kind": "cf_ingot",
+          "x": 157.0,
+          "y": 201.0,
+          "ambush": "cf_sigrun_ingot"
+        },
+        {
+          "kind": "cf_ingot",
+          "x": 160.5,
+          "y": 194.938,
+          "ambush": "cf_sigrun_ingot"
+        },
+        {
+          "kind": "cf_ingot",
+          "x": 167.5,
+          "y": 194.938,
+          "ambush": "cf_sigrun_ingot"
         }
       ],
       "npcs": [
