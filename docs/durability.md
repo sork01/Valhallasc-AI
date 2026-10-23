@@ -18,7 +18,9 @@ Decisions were made in two rounds on 2026-10-22 (recorded in TODO.md under `DEAT
   every rarity including orange and class-neutral. **Starter and game master gear never wear** (`Item.starter`,
   rarity `gm`).
 - **Mercenaries and ambient adventurers have no durability.** Only the hirer's own gear wears. The kill-time and boss harnesses
-  keep full condition because a fresh `World` is built per fight and no harness keeps one character through ten deaths.
+  build a fresh `World` per fight, so wear cannot carry from one fight to the next; no switch turns wear off, so a fixture that
+  keeps its non-mercenary hirer through ten deaths inside one fight would see broken gear (not seen; the `HirerRole::Down`
+  fixture sets hp directly and never reaches the death rule). Add an opt-out only if a measurement shows it.
 - **Condition travels with the copy.** The bank and a trade keep the wear. **Merge and refine restore the result to full.**
 - **Saved characters need no migration**: the field is `wear` (0 = new, 100 = broken, `#[serde(default)]`), so an old copy
   loads at full durability. The client shows durability as `100 - wear` and treats a missing field as full.
@@ -48,7 +50,10 @@ Decisions were made in two rounds on 2026-10-22 (recorded in TODO.md under `DEAT
   tooltip, and a bar under each worn slot in the character window (`data-condition` on `.equipped-slot`).
 - The smith's repair view is `GearServices.render('repair', ...)` in `client/gearservices.js`, opened from the gossip row
   (`client/city.js`).
+- The bags button shows an `!` badge (`#inventory-open[data-gear]`, `low` below 30%, `broken` at 0) while any worn piece is
+  low or broken: the low-durability hint, with no new HUD piece.
 - The Inspect window is not changed (the whitelist packet carries no wear).
+- The GM test menu hands out the gauntlet gear sets (`gear_set`: ordinary rarities, not rarity `gm`), so deaths during GM dungeon tests wear and can break that gear; repair it at a smith or hand the set out again.
 
 ## Checks
 

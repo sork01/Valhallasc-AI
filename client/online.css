@@ -930,3 +930,6 @@
 .repair-row .repair-name { flex: 1 1 10em; min-width: 0; overflow-wrap: anywhere; }
 .repair-row[data-state="broken"] .repair-name { color: #ff6b6b; }
 .repair-row[data-state="low"] .repair-name { color: #ff9a3c; }
+
+.bags-open[data-gear="low"]::after, .bags-open[data-gear="broken"]::after { content: '!'; position: absolute; right: -.5cqw; top: -.6cqw; width: 1.6cqw; height: 1.6cqw; border-radius: 50%; display: grid; place-items: center; font: 700 1.1cqw sans-serif; color: #1b1306; background: #ff9a3c; pointer-events: none; }
+.bags-open[data-gear="broken"]::after { background: #ff4d4d; color: #fff; }

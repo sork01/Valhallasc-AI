@@ -53,10 +53,12 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   assert.equal(await slot.evaluate(el=>el.style.getPropertyValue('--dur')),'90');
   await slot.locator('.gear-icon').hover();
   await page.waitForFunction(()=>/Durability 90%/.test(document.querySelector('.item-tooltip,#item-tooltip,[role="tooltip"]')?.textContent||''),null,{timeout:10000});
+  assert.equal(await page.locator('#inventory-open').getAttribute('data-gear'),'ok');
   for(let n=0;n<6;n++)await die(); // 70% worn
   await page.waitForFunction(()=>document.querySelector('[data-slot="necklace"]')?.dataset.condition==='low',null,{timeout:15000});
   for(let n=0;n<3;n++)await die();
   await page.waitForFunction(()=>document.querySelector('[data-slot="necklace"]')?.dataset.condition==='broken',null,{timeout:15000});
+  assert.equal(await page.locator('#inventory-open').getAttribute('data-gear'),'broken','the bags button warns while a worn piece is broken');
   await slot.locator('.gear-icon').hover();
   await page.waitForFunction(()=>/Broken/.test(document.querySelector('.item-tooltip,#item-tooltip,[role="tooltip"]')?.textContent||''),null,{timeout:10000});
   assert.equal(await page.evaluate(()=>Field.hero.equipment.necklace),'necklace_upgrade','a broken piece stays worn');
@@ -79,6 +81,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.locator('#npc-close').click();
   await page.keyboard.press('e');
   await page.waitForFunction(()=>document.querySelector('[data-slot="necklace"]')?.dataset.condition==='new',null,{timeout:15000});
+  assert.equal(await page.locator('#inventory-open').getAttribute('data-gear'),'ok','repairing clears the warning');
   assert.deepEqual(errors,[]);
   console.log('durability-ui: ok');
 })().then(async()=>{await browser?.close();if(started)await call('stop_world').catch(()=>{});await client.close();process.exit(0);},

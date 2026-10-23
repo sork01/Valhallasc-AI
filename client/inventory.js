@@ -371,6 +371,14 @@
       select.value = i ? (legacy ? i.variant : i.id) : 'none'; card.dataset.value = select.value; select.disabled = !canEquip(); glyph.disabled = !canEquip();
     }
   }
+  // Low-durability hint with no new HUD piece: the bags button carries a badge while a worn piece is low or broken.
+  function renderGearWarning() {
+    const button = $('inventory-open'); if (!button) return;
+    const states = slots.map(([slot]) => { const i = itemAtSlot(slot); return i ? conditionState(wornCopy(slot, i)) : 'new'; });
+    const worst = states.includes('broken') ? 'broken' : states.includes('low') ? 'low' : 'ok';
+    button.dataset.gear = worst;
+    button.title = worst === 'broken' ? 'A worn piece is broken. Repair it at a smith.' : worst === 'low' ? 'A worn piece is nearly broken. Repair it at a smith.' : '';
+  }
   function renderSets(container = $('character-sets')) {
     if (!container) return;
     const sources = Object.keys(setCounts).filter(source => setCounts[source] > 0 && window.WORLD_SET_BONUSES?.entries.some(row => row.source === source && row.class === look?.class));
@@ -390,7 +398,7 @@
     update(next, nextLook, nextSlots = {}, nextBags = [], nextInstances = [], nextSets = {}) {
       const key = JSON.stringify([next, nextLook, nextSlots, nextBags, nextInstances, nextSets]); if (key === signature) return;
       stacks = next; look = nextLook; gearSlots = nextSlots; bags = nextBags; gearInstances=nextInstances; setCounts=nextSets; signature = key;
-      renderSets();
+      renderSets(); renderGearWarning();
       reconcile(); hideTooltip(); dispatchEvent(new Event('inventory-change')); window.City?.refreshInventory();
     },
   };

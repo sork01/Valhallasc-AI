@@ -6698,17 +6698,19 @@
   "This dungeon has no final boss placed.": "Den här dungeonen har ingen slutboss utplacerad.",
   "You are not in a dungeon copy.": "Du är inte i en kopia av en dungeon.",
   "Broken": "Trasig",
-  "Broken · no stats until repaired": "Trasig · ger inga värden förrän den repareras",
+  "Broken · no stats until repaired": "Trasig · ger ingenting förrän den repareras",
   "Dismount before repairing gear.": "Sitt av innan du reparerar utrustning.",
-  "Dying wears every piece you wear down by a tenth. A broken piece gives no stats until it is repaired. A smith charges a quarter of the piece's sale value for a full repair.": "Varje gång du dör slits alla föremål du bär ner med en tiondel. Ett trasigt föremål ger inga värden förrän det är reparerat. En smed tar en fjärdedel av föremålets säljvärde för en hel reparation.",
+  "Dying wears every piece you wear down by a tenth. A broken piece gives no stats until it is repaired. A smith charges a quarter of the piece's sale value for a full repair.": "Varje gång du dör slits alla föremål du bär ner med en tiondel. Ett trasigt föremål ger ingenting förrän det är reparerat. En smed tar en fjärdedel av föremålets säljvärde för en hel reparation.",
   "Leave combat before repairing gear.": "Lämna striden innan du reparerar utrustning.",
   "Nothing needs repair.": "Inget behöver repareras.",
   "Nothing to repair": "Inget att reparera",
   "Repair gear": "Reparera utrustning",
-  "Repair worn gear": "Reparera bärd utrustning",
+  "Repair worn gear": "Reparera skadad utrustning",
   "This townsperson does not repair gear.": "Den här stadsbon reparerar inte utrustning.",
   "You cannot afford that repair.": "Du har inte råd med den reparationen.",
   "You cannot repair gear while defeated.": "Du kan inte reparera utrustning medan du är besegrad.",
   "You died.": "Du dog.",
-  "Your gear lost durability. Repair it at a smith.": "Din utrustning har tappat hållbarhet. Reparera den hos en smed."
+  "Your gear lost durability. Repair it at a smith.": "Din utrustning har tappat hållbarhet. Reparera den hos en smed.",
+  "A worn piece is broken. Repair it at a smith.": "Ett föremål du bär är trasigt. Reparera det hos en smed.",
+  "A worn piece is nearly broken. Repair it at a smith.": "Ett föremål du bär är nästan trasigt. Reparera det hos en smed."
 }
