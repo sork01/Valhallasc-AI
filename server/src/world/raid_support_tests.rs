@@ -39,7 +39,7 @@ fn raid_support_counts_real_contracts_and_updates_on_copy_exit_and_disconnect() 
         let bonus = w.raid_support(*session);
         assert_eq!(bonus.others, 9, "humans and mercenaries receive the bonus");
         assert_eq!(bonus.attack_multiplier(), 5.5);
-        assert!((bonus.taken_multiplier() - 0.91).abs() < 1e-12);
+        assert!((bonus.taken_multiplier() - 0.55).abs() < 1e-12);
     }
     let merc = *w.players.keys().find(|s| **s != 1).unwrap();
     place(&mut w, merc, ZONE, at(110., 24.));
@@ -118,7 +118,7 @@ fn raid_support_scales_seeded_attack_rolls_and_snapshot_without_changing_saved_s
     assert_eq!(hero["attack"], base * 5.5);
     assert_eq!(
         hero["raidSupport"],
-        json!({"others":9,"attackPercent":450,"damageReductionPercent":9})
+        json!({"others":9,"attackPercent":450,"damageReductionPercent":45})
     );
     assert_eq!(
         w.players[&1].character.stats().0,
@@ -163,7 +163,7 @@ fn raid_support_reduces_real_monster_hits_and_stacks_with_shield() {
         w.hurt_player_by(1, damage, at(145., 277.), "cf_brute", 99);
         before - w.players[&1].character.hp
     };
-    assert_eq!(hit(&mut w), 910.);
+    assert_eq!(hit(&mut w), 550.);
     w.players.get_mut(&1).unwrap().buffs.push(Buff {
         id: "test_shield".into(),
         kind: BuffKind::Shield,
@@ -171,7 +171,7 @@ fn raid_support_reduces_real_monster_hits_and_stacks_with_shield() {
         left: 30.,
         time: 30.,
     });
-    assert_eq!(hit(&mut w), 455.);
+    assert_eq!(hit(&mut w), 275.);
     w.players.get_mut(&1).unwrap().buffs.clear();
     for (session, p) in &mut w.players {
         if *session != 1 {

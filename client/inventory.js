@@ -63,7 +63,7 @@
   const canEquip = () => Online.connected && !Field.hero?.dead;
   function node(tag, text = '', cls) { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; }
   const setEntry = i => i?.kind !== 'cloak' && i?.source && window.WORLD_SET_BONUSES?.entries.find(row => row.source === i.source && row.class === look?.class);
-  const setName = source => ({undervault:'Undervault',moonwell:'Moonwell',eye_below:'Eye Below',elder_hollow:'Elder Hollow',thousandfold:'Thousandfold Pavilion',rain_crown:'Rain Crown',seed_vault:'Seed Vault',sunken_astrolabe:'Sunken Astrolabe',thunderheart_gate:'Thunderheart Gate',blooming_labyrinth:'Blooming Labyrinth',solar_crucible:'Solar Crucible',amber_archive:'Amber Archive',silent_solstice:'Silent Solstice',cathedral_cloister:'Flooded Cloister',cathedral_reliquary:'Coral Reliquary',cathedral_nave:'Grand Nave'})[source] || source;
+  const setName = source => ({chained_forge:'Chainforged',undervault:'Undervault',moonwell:'Moonwell',eye_below:'Eye Below',elder_hollow:'Elder Hollow',thousandfold:'Thousandfold Pavilion',rain_crown:'Rain Crown',seed_vault:'Seed Vault',sunken_astrolabe:'Sunken Astrolabe',thunderheart_gate:'Thunderheart Gate',blooming_labyrinth:'Blooming Labyrinth',solar_crucible:'Solar Crucible',amber_archive:'Amber Archive',silent_solstice:'Silent Solstice',cathedral_cloister:'Flooded Cloister',cathedral_reliquary:'Coral Reliquary',cathedral_nave:'Grand Nave'})[source] || source;
   function setLines(source) {
     const row = window.WORLD_SET_BONUSES?.entries.find(entry => entry.source === source && entry.class === look?.class);
     if (!row) return [];
@@ -138,6 +138,8 @@
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
     if (compatible(i) && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
     if (setEntry(i)) t.append(...setLines(i.source));
+    const weaponFeature = window.RaidRewards?.tooltip(i);
+    if (weaponFeature) t.append(node('p', weaponFeature, 'weapon-feature'));
     if (compatible(i) && !slot) {
       const target = slots.find(([s]) => slotKind(s) === i.kind)?.[0], current = target && itemAtSlot(target);
       if (current && current.id !== i.id) {

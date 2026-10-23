@@ -691,6 +691,13 @@ impl World {
         } else {
             value
         };
+        let value = if p.forge_ward_left > 0. && p.forge_ward > 0. {
+            let soaked = value.min(p.forge_ward);
+            p.forge_ward -= soaked;
+            value - soaked
+        } else {
+            value
+        };
         if value > 0. {
             let hp = if arena.is_some() || duel.is_some() || gauntlet {
                 (p.character.hp - value).max(1.)
@@ -842,6 +849,9 @@ impl World {
                 );
                 self.save();
             }
+        }
+        if !defeated {
+            self.signature_hit(attacker, signature::Target::Player(defender), taken_total);
         }
         taken_total
     }

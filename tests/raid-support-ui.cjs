@@ -32,12 +32,12 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
  for(const [n,cls] of classes.entries()){
   await interact('merc_'+cls);
   await page.waitForFunction(n=>Field.hero.raidSupport?.others===n+1,n,{timeout:10000});
-  check(await page.evaluate(({n,base})=>Field.hero.attack===base*(1+(n+1)*.5)&&Field.hero.raidSupport.damageReductionPercent===n+1,{n,base}),'Mercenary '+(n+1)+' updates actual attack and reduction');
+  check(await page.evaluate(({n,base})=>Field.hero.attack===base*(1+(n+1)*.5)&&Field.hero.raidSupport.damageReductionPercent===(n+1)*5,{n,base}),'Mercenary '+(n+1)+' updates actual attack and reduction');
  }
  check(await page.evaluate(()=>Field.remotePlayers.length===9&&Field.remotePlayers.every(p=>p.raidSupport?.others===9)),'All nine mercenaries receive the full bonus too');
  await page.keyboard.press('e');await page.locator('#equipment').waitFor({state:'visible'});
  await page.locator('.raid-strength').waitFor();
- check((await page.locator('.raid-strength').textContent()).includes('+450% attack · 9% damage reduction (9 allies)'),'Character UI shows the full raid bonus');
+ check((await page.locator('.raid-strength').textContent()).includes('+450% attack · 45% damage reduction (9 allies)'),'Character UI shows the full raid bonus');
  await page.locator('.raid-strength').scrollIntoViewIfNeeded();
  await page.screenshot({path:path.join(world.artifacts,'raid-support-desktop.png')});
  await page.setViewportSize({width:844,height:390});await page.locator('.raid-strength').scrollIntoViewIfNeeded();
@@ -58,7 +58,7 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
  check(await page.evaluate(base=>Field.hero.attack===base,base),'Leaving the raid restores base attack');
  check(await page.locator('.raid-strength').count()===0,'The raid-only UI disappears outside');
  const sw=await browser.newPage();await sw.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'sv',sound:false})));await sw.goto(world.url);
- check(await sw.evaluate(()=>Locale.translate('Raid strength: +450% attack · 9% damage reduction (9 allies)')==='Raidstyrka: +450% attack · 9% skademinskning (9 allierade)'),'Swedish raid bonus text');await sw.close();
+ check(await sw.evaluate(()=>Locale.translate('Raid strength: +450% attack · 45% damage reduction (9 allies)')==='Raidstyrka: +450% attack · 45% skademinskning (9 allierade)'),'Swedish raid bonus text');await sw.close();
  check(errors.length===0,JSON.stringify(errors));
  fs.writeFileSync(path.join(world.artifacts,'raid-support-ui.json'),JSON.stringify({checks,base,fullAttack:base*5.5,errors},null,2));
  console.log(JSON.stringify({passed:true,checks,artifacts:world.artifacts}));

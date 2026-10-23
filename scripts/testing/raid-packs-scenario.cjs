@@ -8,7 +8,7 @@ module.exports=(kit,map)=>({
   await kit.teleport(w,hero,{zone:46,x:30,y:303});
   await kit.teleport(w,hero,{zone:46,x:84,y:272});
   await w.connect({bot:other,class:'warrior'});await kit.teleport(w,other,{zone:46,x:84,y:272});
-  const enemies=w.views.get(hero).slimes;
+  const enemies=w.views.get(hero).slimes.filter(s=>['cf_brute','cf_crawler','cf_caster','cf_sentry'].includes(s.kind));
   check(enemies.length===40,'Ten real four-enemy packs');
   check(enemies.every(s=>s.elite),'Every pack enemy is a dungeon elite');
   check(new Set(enemies.map(s=>s.kind)).size===4,'Four ordinary raid kinds');

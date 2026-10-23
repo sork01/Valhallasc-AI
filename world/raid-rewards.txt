@@ -1,0 +1,981 @@
+{
+  "version": 1,
+  "source": "chained_forge",
+  "pieces": [
+    {
+      "id": "chainforged_warrior_armor",
+      "name": "Chainforged Warrior Furnace Harness",
+      "slot": "armor",
+      "requiredLevel": 99,
+      "class": "warrior",
+      "rolls": {
+        "attack": [
+          22,
+          23
+        ],
+        "defense": [
+          86,
+          92
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_warrior_headgear",
+      "name": "Chainforged Warrior Vent Crown",
+      "slot": "headgear",
+      "requiredLevel": 99,
+      "class": "warrior",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_warrior_shoulders",
+      "name": "Chainforged Warrior Anvil Pauldrons",
+      "slot": "shoulders",
+      "requiredLevel": 99,
+      "class": "warrior",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_warrior_gloves",
+      "name": "Chainforged Warrior Ratchet Gauntlets",
+      "slot": "gloves",
+      "requiredLevel": 99,
+      "class": "warrior",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_warrior_weapon",
+      "name": "Chainsplitter",
+      "slot": "weapon",
+      "requiredLevel": 99,
+      "class": "warrior",
+      "rolls": {
+        "attack": [
+          113,
+          123
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_mage_armor",
+      "name": "Chainforged Mage Furnace Harness",
+      "slot": "armor",
+      "requiredLevel": 99,
+      "class": "mage",
+      "rolls": {
+        "attack": [
+          22,
+          23
+        ],
+        "defense": [
+          86,
+          92
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_mage_headgear",
+      "name": "Chainforged Mage Vent Crown",
+      "slot": "headgear",
+      "requiredLevel": 99,
+      "class": "mage",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_mage_shoulders",
+      "name": "Chainforged Mage Anvil Pauldrons",
+      "slot": "shoulders",
+      "requiredLevel": 99,
+      "class": "mage",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_mage_gloves",
+      "name": "Chainforged Mage Ratchet Gauntlets",
+      "slot": "gloves",
+      "requiredLevel": 99,
+      "class": "mage",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_mage_weapon",
+      "name": "Cinderwake Staff",
+      "slot": "weapon",
+      "requiredLevel": 99,
+      "class": "mage",
+      "rolls": {
+        "attack": [
+          113,
+          123
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_assassin_armor",
+      "name": "Chainforged Assassin Furnace Harness",
+      "slot": "armor",
+      "requiredLevel": 99,
+      "class": "assassin",
+      "rolls": {
+        "attack": [
+          22,
+          23
+        ],
+        "defense": [
+          86,
+          92
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_assassin_headgear",
+      "name": "Chainforged Assassin Cinder Hood",
+      "slot": "headgear",
+      "requiredLevel": 99,
+      "class": "assassin",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_assassin_shoulders",
+      "name": "Chainforged Assassin Anvil Pauldrons",
+      "slot": "shoulders",
+      "requiredLevel": 99,
+      "class": "assassin",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_assassin_gloves",
+      "name": "Chainforged Assassin Ratchet Gauntlets",
+      "slot": "gloves",
+      "requiredLevel": 99,
+      "class": "assassin",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_assassin_weapon",
+      "name": "Twin Embertongs",
+      "slot": "weapon",
+      "requiredLevel": 99,
+      "class": "assassin",
+      "rolls": {
+        "attack": [
+          113,
+          123
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_priest_armor",
+      "name": "Chainforged Priest Furnace Harness",
+      "slot": "armor",
+      "requiredLevel": 99,
+      "class": "priest",
+      "rolls": {
+        "attack": [
+          22,
+          23
+        ],
+        "defense": [
+          86,
+          92
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_priest_headgear",
+      "name": "Chainforged Priest Vent Crown",
+      "slot": "headgear",
+      "requiredLevel": 99,
+      "class": "priest",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_priest_shoulders",
+      "name": "Chainforged Priest Anvil Pauldrons",
+      "slot": "shoulders",
+      "requiredLevel": 99,
+      "class": "priest",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_priest_gloves",
+      "name": "Chainforged Priest Ratchet Gauntlets",
+      "slot": "gloves",
+      "requiredLevel": 99,
+      "class": "priest",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_priest_weapon",
+      "name": "Bellows Censer",
+      "slot": "weapon",
+      "requiredLevel": 99,
+      "class": "priest",
+      "rolls": {
+        "attack": [
+          113,
+          123
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_hunter_armor",
+      "name": "Chainforged Hunter Furnace Harness",
+      "slot": "armor",
+      "requiredLevel": 99,
+      "class": "hunter",
+      "rolls": {
+        "attack": [
+          22,
+          23
+        ],
+        "defense": [
+          86,
+          92
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_hunter_headgear",
+      "name": "Chainforged Hunter Vent Crown",
+      "slot": "headgear",
+      "requiredLevel": 99,
+      "class": "hunter",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_hunter_shoulders",
+      "name": "Chainforged Hunter Anvil Pauldrons",
+      "slot": "shoulders",
+      "requiredLevel": 99,
+      "class": "hunter",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_hunter_gloves",
+      "name": "Chainforged Hunter Ratchet Gauntlets",
+      "slot": "gloves",
+      "requiredLevel": 99,
+      "class": "hunter",
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_hunter_weapon",
+      "name": "Chainbow",
+      "slot": "weapon",
+      "requiredLevel": 99,
+      "class": "hunter",
+      "rolls": {
+        "attack": [
+          113,
+          123
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_pants",
+      "name": "Chainforged Shackle Greaves",
+      "slot": "pants",
+      "requiredLevel": 99,
+      "class": null,
+      "rolls": {
+        "attack": [
+          8,
+          9
+        ],
+        "defense": [
+          29,
+          31
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_necklace",
+      "name": "Chainforged Broken Link",
+      "slot": "necklace",
+      "requiredLevel": 99,
+      "class": null,
+      "rolls": {
+        "attack": [
+          57,
+          62
+        ],
+        "defense": [
+          14,
+          15
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_accessory",
+      "name": "Chainforged Crucible Seal",
+      "slot": "accessory",
+      "requiredLevel": 99,
+      "class": null,
+      "rolls": {
+        "attack": [
+          43,
+          46
+        ],
+        "defense": [
+          11,
+          12
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    },
+    {
+      "id": "chainforged_cloak",
+      "name": "Chainforged Nine-chain Cloak",
+      "slot": "cloak",
+      "requiredLevel": 99,
+      "class": null,
+      "rolls": {
+        "attack": [
+          0,
+          0
+        ],
+        "defense": [
+          0,
+          0
+        ],
+        "stamina": [
+          142,
+          153
+        ],
+        "accuracy": [
+          19,
+          20
+        ],
+        "dexterity": [
+          67,
+          70
+        ]
+      }
+    }
+  ],
+  "bosses": [
+    {
+      "kind": "cf_kettil",
+      "slots": [
+        "armor",
+        "headgear",
+        "cloak"
+      ],
+      "drops": 2,
+      "weapons": 0
+    },
+    {
+      "kind": "cf_ysolt",
+      "slots": [
+        "shoulders",
+        "gloves",
+        "pants"
+      ],
+      "drops": 2,
+      "weapons": 0
+    },
+    {
+      "kind": "cf_hallgrim",
+      "slots": [
+        "necklace",
+        "accessory",
+        "armor"
+      ],
+      "drops": 2,
+      "weapons": 0
+    },
+    {
+      "kind": "cf_sigrun",
+      "slots": [
+        "headgear",
+        "cloak",
+        "shoulders"
+      ],
+      "drops": 2,
+      "weapons": 0
+    },
+    {
+      "kind": "cf_dagfinn",
+      "slots": [
+        "gloves",
+        "pants",
+        "necklace"
+      ],
+      "drops": 2,
+      "weapons": 0
+    },
+    {
+      "kind": "cf_thorbjorg",
+      "slots": [
+        "accessory",
+        "armor",
+        "headgear"
+      ],
+      "drops": 2,
+      "weapons": 0
+    },
+    {
+      "kind": "cf_ragnhild",
+      "slots": [
+        "cloak",
+        "shoulders",
+        "gloves"
+      ],
+      "drops": 2,
+      "weapons": 0
+    },
+    {
+      "kind": "cf_orm",
+      "slots": [
+        "pants",
+        "necklace",
+        "accessory"
+      ],
+      "drops": 2,
+      "weapons": 0
+    },
+    {
+      "kind": "cf_hildr",
+      "slots": [
+        "armor",
+        "headgear",
+        "shoulders"
+      ],
+      "drops": 2,
+      "weapons": 0
+    },
+    {
+      "kind": "cf_eldmarr",
+      "slots": [
+        "gloves",
+        "pants",
+        "cloak"
+      ],
+      "drops": 2,
+      "weapons": 2
+    }
+  ],
+  "weapons": [
+    {
+      "item": "chainforged_warrior_weapon",
+      "class": "warrior",
+      "replaces": "earthshatter",
+      "name": "Slagshatter"
+    },
+    {
+      "item": "chainforged_mage_weapon",
+      "class": "mage",
+      "replaces": "arcaneward",
+      "name": "Cinder Ward"
+    },
+    {
+      "item": "chainforged_assassin_weapon",
+      "class": "assassin",
+      "replaces": "knifering",
+      "name": "Ember Ring"
+    },
+    {
+      "item": "chainforged_priest_weapon",
+      "class": "priest",
+      "replaces": "mend",
+      "name": "Bellows Mend"
+    },
+    {
+      "item": "chainforged_hunter_weapon",
+      "class": "hunter",
+      "replaces": "arrowstorm",
+      "name": "Chain Storm"
+    }
+  ]
+}

@@ -1,10 +1,14 @@
 {
   "null_hour": {
-    "title":"The Thirteenth Hour",
-    "what":"The Midnight Press marks a red strip for 5 seconds. The Furnace Halo marks a red ring. Both knock out anyone on red.",
-    "todo":"Step beside the strip. For the ring, stand in its clear middle or beyond its edge. Stay off every red mark.",
-    "tip":"Near the end the strip widens and strikes again 3 seconds later. Watch both warnings during this long fight.",
-    "colors":["red"],"x":105.5,"y":65.5
+    "title": "The Thirteenth Hour",
+    "what": "The Midnight Press marks a red strip for 5 seconds. The Furnace Halo marks a red ring. Both knock out anyone on red.",
+    "todo": "Step beside the strip. For the ring, stand in its clear middle or beyond its edge. Stay off every red mark.",
+    "tip": "Near the end the strip widens and strikes again 3 seconds later. Watch both warnings during this long fight.",
+    "colors": [
+      "red"
+    ],
+    "x": 105.5,
+    "y": 65.5
   },
   "barrow_fatebound": {
     "title": "The Unwritten King",
@@ -223,5 +227,42 @@
     ],
     "x": 72,
     "y": 43
+  },
+  "cf_kettil": {
+    "x": 62,
+    "y": 290,
+    "title": "Kettil Linkbearer",
+    "what": "A chain joins you to a friend. When it pulls tight, stay close or it hurts you both.",
+    "todo": "Follow your chain number to its blue anvil. Hold it together. Break chain 1, then 2, then 3, then 4, then 5.",
+    "tip": "You have 9 seconds to get ready. Stay within 6 steps of your friend until your chain breaks.",
+    "colors": [
+      "path",
+      "blue"
+    ]
+  },
+  "cf_ysolt": {
+    "x": 171.99,
+    "y": 274.89,
+    "title": "Ysolt Bellowsmaid",
+    "what": "The arrow shows which way the wind will push you. The red edge is hot lava.",
+    "todo": "Go to a blue iron post before the 10 seconds end. Only 3 friends fit at each post. Use all four posts.",
+    "tip": "The wind changes direction each time. Read the arrow and the number at your post.",
+    "colors": [
+      "path",
+      "blue",
+      "red"
+    ]
+  },
+  "cf_hallgrim": {
+    "x": 278.35,
+    "y": 235.31,
+    "title": "Hallgrim Anvilhand",
+    "what": "Three hammers fall on the blue anvils after 8 seconds. Each anvil needs at least 3 friends.",
+    "todo": "Split into three groups. Put 3 or more friends at every blue anvil. A group that is too small falls.",
+    "tip": "If one anvil is short, the shock hurts everyone. One friend can help whichever group needs them.",
+    "colors": [
+      "blue",
+      "red"
+    ]
   }
 }

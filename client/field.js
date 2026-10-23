@@ -1221,6 +1221,19 @@
       if (actor && (event.actor === Online.id || visibleCombatCue(event.x,event.y))) say('combatSwing', { actorId:event.actor, className:actor.look?.class, x:event.x, y:event.y, own:event.actor === Online.id });
     }
     if (event.kind === 'skill') skillFx(event);
+    if (event.kind === 'forgeProc') {
+      effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0, life: .55, grow: .65, col: '#ff963d', still: reducedMotion() });
+      if (event.weapon === 'mage' && event.effect === 'proc') effects.push({ kind: 'forgeOrb', actor: event.actor, x: event.x, y: event.y, t: 0, life: 6 });
+      if (event.effect === 'skill' && ['warrior', 'assassin'].includes(event.weapon)) {
+        const count = event.weapon === 'assassin' ? 3 : 1;
+        for (let n = 0; n < count; n++) {
+          const step = event.weapon === 'warrior' ? 2 : -n * 1.5;
+          effects.push({kind:'forgeGround', actor:event.actor, x:event.x + event.fx * step, y:event.y + event.fy * step, t:0, life:4});
+        }
+      }
+      if (!reducedMotion()) spark(event.x, event.y, 8, ['#ff963d', '#ffe6a5'], 4, .7, .35);
+      if (event.actor !== Online.id && visibleCombatCue(event.x,event.y)) say('forgeProc', event);
+    }
     if (event.kind === 'boltImpact') {
       const [core, glow] = SKILL_COL[event.skill] || ['#ffffff', '#9fd0ff'];
       const base = { x: event.x, y: event.y, core, glow, t: 0 };
@@ -2435,6 +2448,13 @@
     g.font = '13px "Jua", sans-serif'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = '#111a35'; g.fillStyle = '#dcf6ff';
     const label = window.Locale?.translate(`Ward: ${Math.ceil(who.absorb)}`) || `Ward: ${Math.ceil(who.absorb)}`;
     g.strokeText(label, 0, 43); g.fillText(label, 0, 43);
+  }
+  function drawEmberWardSoak(g, who) {
+    const soak=clamp(who.emberWard/Math.max(1,who.maxHp*.03),0,1),y=who.absorb>0?54:19;
+    g.fillStyle='#381c17';g.fillRect(-31,y,62,9);g.fillStyle='#ff9745';g.fillRect(-29,y+2,58*soak,5);
+    g.font='13px "Jua", sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='#381c17';g.fillStyle='#ffe5b5';
+    const label=window.Locale?.translate(`Ember ward: ${Math.ceil(who.emberWard)}`)||`Ember ward: ${Math.ceil(who.emberWard)}`;
+    g.strokeText(label,0,y+24);g.fillText(label,0,y+24);
   }
   function drawPlayerStun(g, who, t) {
     if (who.dead || !(who.stun > 0)) return;
@@ -3834,9 +3854,12 @@
     }
     // Keep the soak readout legible even when another actor stands in front of the warded fighter.
     for (const who of [hero, ...remotePlayers.values()]) {
-      if (who.dead || !(who.absorb > 0) || who.look?.class !== 'mage') continue;
+      if (who.dead || (!(who.absorb > 0) && !(who.emberWard > 0))) continue;
       const [sx, sy] = w2s(who.x, who.y); if (!onScreen(sx, sy, 160)) continue;
-      g.save(); g.translate(sx, sy); drawMageWardSoak(g, who); g.restore();
+      g.save(); g.translate(sx, sy);
+      if(who.absorb>0&&who.look?.class==='mage')drawMageWardSoak(g, who);
+      if(who.emberWard>0)drawEmberWardSoak(g,who);
+      g.restore();
     }
     // speech bubbles go over everything, so a tree or a roof never hides what somebody said
     bubblesLast = bubblesDrawn; bubblesDrawn = 0;
@@ -3879,9 +3902,22 @@
       g.save(); g.globalAlpha = fade; g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(sx, sy, 27, 9, 0, 0, 6.283); g.fill();
       if (e.t < .5) drawChestFrame(g, 1, Math.min(5, Math.floor(e.t * 12)), sx, sy); else drawChestFrame(g, 2, Math.floor((e.t - .5) * 4) % 2, sx, sy);
       g.restore();
+    } else if (e.kind === 'forgeOrb') {
+      const actor = e.actor === Online.id ? hero : remotePlayers.get(e.actor);
+      if (!actor || actor.dead || !actor.signatureWeapon) continue;
+      const phase = reducedMotion() ? .8 : e.t * 3;
+      const [sx, sy] = w2s(actor.x + Math.cos(phase) * .8, actor.y + Math.sin(phase) * .8, 75);
+      g.save(); g.fillStyle='#ff8d37'; g.beginPath(); g.arc(sx,sy,7,0,Math.PI*2); g.fill();
+      g.fillStyle='#fff0ae'; g.beginPath(); g.arc(sx-1,sy-2,3,0,Math.PI*2); g.fill(); g.restore();
+    } else if (e.kind === 'forgeGround') {
+      const [sx,sy]=w2s(e.x,e.y);g.save();g.globalAlpha=.4*Math.min(1,(e.life-e.t)*2);
+      g.fillStyle='#e35b23';g.beginPath();g.ellipse(sx,sy,58,26,0,0,Math.PI*2);g.fill();
+      g.strokeStyle='#ffc477';g.lineWidth=2;g.beginPath();
+      for(let n=0;n<5;n++){const x=sx-36+n*18;g.moveTo(x,sy+7);g.lineTo(x+5,sy-7);}
+      g.stroke();g.restore();
     } else if (e.kind === 'ring') {
       if (e.t < 0) continue;
-      const p = e.t / (e.life ?? .9), [sx, sy] = w2s(e.x, e.y), m = e.grow || 1;
+      const p = e.still ? .25 : e.t / (e.life ?? .9), [sx, sy] = w2s(e.x, e.y), m = e.grow || 1;
       if (e.col) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = 1 - p; g.strokeStyle = e.col; } else g.strokeStyle = `rgba(255,224,102,${1 - p})`;
       g.lineWidth = 6 * (1 - p) + 1; g.beginPath(); g.ellipse(sx, sy, 30 + p * 120 * m, 14 + p * 56 * m, 0, 0, 6.283); g.stroke(); if (e.col) g.restore();
     }

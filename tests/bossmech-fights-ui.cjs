@@ -64,7 +64,7 @@ async function call(name, args = {}) {
   const report = [];
 
   for (const kind of kinds) {
-    const zone = map.zones.findIndex(z => z.final_boss === kind) + 1;
+    const zone = map.zones.findIndex(z => z.final_boss === kind || (z.raid && z.slimes.some(s => s.kind === kind))) + 1;
     check(zone > 0, `${kind} has a dungeon`);
     const boss = map.zones[zone - 1].slimes.find(s => s.kind === kind);
     check(boss, `${kind} is placed in zone ${zone}`);

@@ -62,7 +62,7 @@
     wrath: '<path d="M10 3l4 14M18 3v18M26 3l-4 14M6 28h24M10 24h16"/>',
   };
   const icon = kind => `<svg viewBox="0 0 36 36" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${icons[kind]}</svg>`;
-  let slots = [], skills = [], character = null, className = '', selected = 0, previousFocus = null, layoutLevel = 1, seenLevel = 0;
+  let slots = [], skills = [], character = null, className = '', selected = 0, previousFocus = null, layoutLevel = 1, seenLevel = 0, signatureWeapon = null;
   const open = () => !$('skills-panel').hidden;
   function node(tag, text, cls) {
     const n = document.createElement(tag); if (text) n.textContent = text; if (cls) n.className = cls; return n;
@@ -75,7 +75,7 @@
       description: cls === 'mage' ? 'Cast a bolt at your target or in your aim direction.' : cls === 'hunter' ? 'Loose an arrow at your target or in your aim direction.' : 'Strike enemies within reach in your aim direction.' },
     ...(cls === 'assassin' ? [{ id: 'shadowstep', name: 'Shadowstep', icon: 'shadowstep', cooldown: 1.2, level: 1,
       cost: 20, description: 'Dash in your movement direction, or forward while standing still.' }] : []),
-    ...WORLD_SKILLS.filter(s => s.class === cls).sort((a, b) => a.level - b.level)];
+    ...WORLD_SKILLS.filter(s => s.class === cls).sort((a, b) => a.level - b.level).map(s => window.RaidRewards?.skill(s, Field.hero.signatureWeapon) || s)];
   }
   const resourceName = () => { const k = Field.hero.resourceType || 'rage'; return k[0].toUpperCase() + k.slice(1); };
   const costText = skill => skill.cost ? `${skill.cost} ${resourceName()}` : 'Free';
@@ -105,8 +105,9 @@
   function sync() {
     if (!Online.connected || !Online.currentToken) return;
     const cls = Field.hero.look?.class;
+    if (character === Online.currentToken && className === cls && signatureWeapon !== Field.hero.signatureWeapon) { signatureWeapon = Field.hero.signatureWeapon; skills = available(); render(); }
     if (character === Online.currentToken && className === cls) { if (seenLevel !== level()) learn(); return; }
-    character = Online.currentToken; className = cls; selected = 0; skills = available();
+    character = Online.currentToken; className = cls; signatureWeapon = Field.hero.signatureWeapon; selected = 0; skills = available();
     const saved = Online.skillSlots;
     layoutLevel = Online.skillLevel ?? 1;
     // Keep a saved assignment when its ability now unlocks at a later level.

@@ -233,6 +233,23 @@ pub fn normal_gear(class: Class, level: u32) -> Vec<(&'static str, String)> {
 }
 /// The progression set of `rarity` (`common`, `uncommon`, `rare` or `epic`) for `level`, built like `normal_gear`.
 pub fn normal_gear_of(class: Class, level: u32, rarity: &str) -> Vec<(&'static str, String)> {
+    if rarity == "raid_chainforged" {
+        assert_eq!(level, 99);
+        return SLOTS
+            .iter()
+            .map(|&(slot, kind)| {
+                let item = ITEMS
+                    .iter()
+                    .find(|i| {
+                        i.kind == kind
+                            && i.source.as_deref() == Some("chained_forge")
+                            && i.class.is_none_or(|c| c == class)
+                    })
+                    .expect("chainforged_fixture_slot");
+                (slot, item.id.clone())
+            })
+            .collect();
+    }
     if rarity == "raid_interim" {
         assert_eq!(level, 99);
         return SLOTS

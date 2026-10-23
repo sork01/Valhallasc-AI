@@ -1,5 +1,9 @@
 {
   "signatures": {
+    "chained_forge": {
+      "name": "Unbroken resolve",
+      "description": "the caster gains a 4-second shield absorbing 4% of maximum health and recovers 3% of maximum resource."
+    },
     "blackhour": {
       "name": "Cold restart",
       "description": "the caster gains a 4-second shield absorbing 5% of maximum health and recovers 2% of maximum resource."
@@ -82,6 +86,14 @@
     }
   },
   "entries": [
+    {
+      "source": "chained_forge",
+      "class": "warrior",
+      "stat": "attack",
+      "cooldownSkill": "battlecry",
+      "doubleSkill": "cleave",
+      "triggerSkill": "earthshatter"
+    },
     {
       "source": "blackhour",
       "class": "warrior",
@@ -241,6 +253,14 @@
       "cooldownSkill": "shieldwall",
       "doubleSkill": "cleave",
       "triggerSkill": "earthshatter"
+    },
+    {
+      "source": "chained_forge",
+      "class": "mage",
+      "stat": "attack",
+      "cooldownSkill": "arcaneward",
+      "doubleSkill": "fireball",
+      "triggerSkill": "arcanestorm"
     },
     {
       "source": "blackhour",
@@ -403,6 +423,14 @@
       "triggerSkill": "arcaneward"
     },
     {
+      "source": "chained_forge",
+      "class": "assassin",
+      "stat": "attack",
+      "cooldownSkill": "evasion",
+      "doubleSkill": "flurry",
+      "triggerSkill": "knifering"
+    },
+    {
       "source": "blackhour",
       "class": "assassin",
       "stat": "attack",
@@ -563,6 +591,14 @@
       "triggerSkill": "shadowveil"
     },
     {
+      "source": "chained_forge",
+      "class": "priest",
+      "stat": "health",
+      "cooldownSkill": "mend",
+      "doubleSkill": "smite",
+      "triggerSkill": "prayer"
+    },
+    {
       "source": "blackhour",
       "class": "priest",
       "stat": "health",
@@ -721,6 +757,14 @@
       "cooldownSkill": "wardoflight",
       "doubleSkill": "mend",
       "triggerSkill": "guardianlight"
+    },
+    {
+      "source": "chained_forge",
+      "class": "hunter",
+      "stat": "attack",
+      "cooldownSkill": "eaglesight",
+      "doubleSkill": "powershot",
+      "triggerSkill": "arrowstorm"
     },
     {
       "source": "blackhour",

@@ -120,5 +120,83 @@
     "ranged": null,
     "slam": 0,
     "melee": 1
+  },
+  {
+    "kind": "cf_kettil",
+    "name": "Kettil Linkbearer",
+    "level": 99,
+    "stats": [
+      1000000,
+      11000,
+      2.0,
+      1.8
+    ],
+    "profile": [
+      1.05,
+      2.4,
+      12,
+      22
+    ],
+    "boss": true,
+    "elite": true,
+    "outdoor": false,
+    "gold": 150000,
+    "material": "cf_kettil_relic",
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "color": "#bd9c68"
+  },
+  {
+    "kind": "cf_ysolt",
+    "name": "Ysolt Bellowsmaid",
+    "level": 99,
+    "stats": [
+      1000000,
+      11000,
+      2.0,
+      1.8
+    ],
+    "profile": [
+      1.05,
+      2.4,
+      12,
+      22
+    ],
+    "boss": true,
+    "elite": true,
+    "outdoor": false,
+    "gold": 150000,
+    "material": "cf_ysolt_relic",
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "color": "#7ccbd3"
+  },
+  {
+    "kind": "cf_hallgrim",
+    "name": "Hallgrim Anvilhand",
+    "level": 99,
+    "stats": [
+      1000000,
+      11000,
+      2.0,
+      1.8
+    ],
+    "profile": [
+      1.05,
+      2.4,
+      12,
+      22
+    ],
+    "boss": true,
+    "elite": true,
+    "outdoor": false,
+    "gold": 150000,
+    "material": "cf_hallgrim_relic",
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "color": "#ed9c65"
   }
 ]

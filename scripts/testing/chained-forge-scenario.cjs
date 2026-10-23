@@ -36,7 +36,7 @@ module.exports=(kit,map)=>({
     times.push({hall:h.id,seconds:(Date.now()-began)/1000});
     require('node:fs').writeFileSync(require('node:path').join(w.runDir,'chained-forge-walk-times.txt'),JSON.stringify(times,null,2));
   }
-  check(area.slimes.length===40,'RAID-PACKS populates the reserved sites; bosses remain separate tasks');
+  check(area.slimes.filter(s=>['cf_brute','cf_crawler','cf_caster','cf_sentry'].includes(s.kind)).length===40,'RAID-PACKS populates forty pack actors beside the Warden encounters');
   await kit.teleport(w,bot,{zone:46,x:30,y:303});
   await w.action(bot,{type:'move',x:22,y:303});await w.waitFor(()=>w.player(bot).zone===45,15000,'Raid exit');
   await w.action(bot,{type:'stop'});

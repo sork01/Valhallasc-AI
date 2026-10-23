@@ -2020,9 +2020,9 @@ fn every_shipped_boss_is_fair_and_its_tags_exist_in_the_map() {
             .find(|s| &s.kind == kind)
             .unwrap_or_else(|| panic!("{kind} has no spawn"));
         let map = &w.maps[boss.zone];
-        assert_eq!(
-            &map.final_boss, kind,
-            "{kind} must be a dungeon's final boss"
+        assert!(
+            map.raid || &map.final_boss == kind,
+            "{kind} must be a final boss or a raid Warden"
         );
         assert_eq!(
             unfair_point(&w, boss.id, def),
@@ -3555,7 +3555,7 @@ fn raid_support_reduces_heavy_hits_but_does_not_prevent_explicit_mechanic_kills(
     w.mech_heavy(1, 0.5, "Raid test", boss);
     assert_eq!(
         before - w.players[&1].character.hp,
-        (before * 0.5 * 0.91).round()
+        (before * 0.5 * 0.55).round()
     );
     assert!(w.mech_kill(1, "Raid test", boss));
     assert_eq!(w.players[&1].character.hp, 0.);

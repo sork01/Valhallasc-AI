@@ -7,6 +7,7 @@
   const ARMOR = { none: { name: 'Simple cloth', defense: 0 }, apprentice: { name: 'Apprentice robes', defense: 2 }, runic: { name: 'Runic vestments', defense: 5 } };
   const WEAPON = { none: { name: 'Empty hands', attack: 0 }, ash: { name: 'Ash staff', attack: 4 }, crystal: { name: 'Crystal staff', attack: 9 } };
   const sources = new Map();
+  const forgeReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)');
   // ---- Loading ------------------------------------------------------------------------------------------------
   // Decoding an atlas is main-thread work, so it is cut into slices of about SLICE_MS that yield to the page, and a
   // load is either foreground (your own character: starts at once) or background (everyone else: one at a time, and
@@ -535,6 +536,7 @@
       if (this.cache.has(key)) return this.cache.get(key);
       const [fw, fh] = this.meta.frame, canvas = document.createElement('canvas'); canvas.width = fw; canvas.height = fh;
       const g = canvas.getContext('2d'), out = g.createImageData(fw, fh), nearest = new Uint16Array(fw * fh); nearest.fill(65535);
+      const forge = this.equipment.weapon === 'regearchainforged' ? new Uint8ClampedArray(out.data.length) : null;
       const chosen = ['body'];
       for (const slot of SLOT_ORDER) if (this.equipment[slot] && this.equipment[slot] !== 'none' && this.source.parts[slot + '_' + this.equipment[slot]]) chosen.push(slot + '_' + this.equipment[slot]);
       for (const part of chosen) {
@@ -551,9 +553,16 @@
             if (!painted) { painted = [...lut.paint(f.pixels[src], f.pixels[src + 1], f.pixels[src + 2]), 255]; lut.colours.set(packed, painted); }
             out.data.set(painted, dst * 4);
           } else out.data.set(tint ? [...tint, 255] : f.pixels.subarray(src, src + 4), dst * 4);
+          if (part === 'weapon_regearchainforged' && f.pixels[src] > 150 && f.pixels[src] > f.pixels[src + 2] * 1.4) {
+            forge.set([255, 138, 46, 230], dst * 4);
+          }
         }
       }
       g.putImageData(out, 0, 0);
+      if (this.equipment.weapon === 'regearchainforged') {
+        const glow = document.createElement('canvas'); glow.width = fw; glow.height = fh;
+        glow.getContext('2d').putImageData(new ImageData(forge, fw, fh), 0, 0); canvas._forge = glow;
+      }
       canvas._px = out.data; canvas._z = nearest;     // the colours and depths, for MountArt to lay the rider into a mount
       if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value);
       this.cache.set(key, canvas); return canvas;
@@ -580,7 +589,16 @@
         if (!seat) { seat = art.compose(this.frame('idle', dir, ri), h.mount, mclip, dir, mi, h.mountTint || 0); if (this.cache.size >= 96) this.cache.delete(this.cache.keys().next().value); this.cache.set(key, seat); }
         g.fillStyle = 'rgba(9, 11, 15, .28)'; g.beginPath(); g.ellipse(0, 1, M.shadow[0], M.shadow[1], 0, 0, 6.283); g.fill();
         g.drawImage(seat, -ax, -ay - art.SHIFT);
-      } else g.drawImage(this.frame(clip, dir, i), -ax, -ay);
+      } else {
+        const frame = this.frame(clip, dir, i);
+        g.drawImage(frame, -ax, -ay);
+        if (frame._forge) {
+          g.save(); g.globalCompositeOperation = 'screen';
+          const still = h.dead || forgeReduced?.matches;
+          g.globalAlpha *= still ? .22 : .22 + .14 * Math.sin(t * Math.PI * 5);
+          g.drawImage(frame._forge, -ax, -ay); g.restore();
+        }
+      }
       g.restore();
     }
     portrait() {
