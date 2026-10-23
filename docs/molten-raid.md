@@ -437,6 +437,17 @@ noise hits; warehouse reverb; Sork-60 pads only, Chillhop hats only, SorkCrush f
 distortion. State the instruments to the owner before writing, loop-fold, -24 dB mono
 RMS, 128 kbps; offer the MP3 for FileDrop, do not upload unasked.
 
+**RAID-MUSIC implemented 2026-10-23 (client only):** *Nine Chains Below*, 152 BPM,
+and Eldmarr's *The Table He Was Promised*, 160 BPM, both F-sharp minor, 4/4,
+64 bars. Corrected mixes are saved as dybase2 projects `001bb0c3080f4534` and
+`cbee414e186d8bf9`; game loops decode at -23.99/-23.98 dB mono RMS, with no
+clipping. The existing server `bossMech` state selects the final variant only
+while the living `cf_eldmarr` is fighting. Twenty private browser checks pass,
+and disabling that switch in the private response fails the expected assertion.
+The final encounter is still a later task, so its packets are replayed for this
+music check. The raid stays sealed; no server restart is needed. Full score,
+export recipe, measurements and listening limitation: [raid-music.md](raid-music.md).
+
 ## 14. Reading list used
 
 `docs/blackhour.md`, `docs/boss-mechanics.md`, `docs/orange.md`, `docs/ttk-plan.md`,
