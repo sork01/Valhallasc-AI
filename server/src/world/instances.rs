@@ -197,7 +197,22 @@ impl World {
         let Some(i) = self.instances.iter_mut().find(|i| i.zone == zone) else {
             return;
         };
+        if i.cleared {
+            return;
+        }
         i.cleared = true;
+        if self.maps[zone].final_boss == "cf_eldmarr" {
+            self.emit(json!({"type":"announce","kind":"boss","text":"Eldmarr has fallen. The nine chains are silent; the Chained Forge is free."}));
+            let id = self.entity();
+            self.chests.list.push(chests::Chest {
+                id,
+                zone,
+                x: 111.,
+                y: 29.,
+                left: 1800.,
+                told: vec![],
+            });
+        }
         let text = format!(
             "{} is cleared. A portal opens where the last foe fell.",
             self.maps[zone].name

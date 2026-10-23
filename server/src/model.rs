@@ -1708,6 +1708,9 @@ pub struct Portal {
     /// Id of a quest the character must have completed before this door opens.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub needs_quest: Option<String>,
+    /// A copy-local lift unlocks when this boss is dead; reset restores the boss.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub needs_boss: Option<String>,
 }
 #[derive(Clone, Deserialize)]
 pub struct Map {

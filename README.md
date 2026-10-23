@@ -611,3 +611,9 @@ Anvilhand (three anvils needing three fighters each). Regenerate them through
 `make_chained_forge_boss_sprites.py preview|build|export|verify`. Focused checks:
 Rust `raid_boss`, private real-client `tests/raid-bosses-ui.cjs`. See
 [docs/raid-bosses.md](docs/raid-bosses.md) for exact rules, fixtures and measurements.
+
+Wardens five through nine add Two Valves and Dagfinn's copy-local shortcut lift,
+Brand Relay, Four on the Floor, Water Carriers and Mirror Plate. They use the
+same generator and original sprite maker. Focused checks: Rust `raid_warden`,
+`tests/raid-bosses-5-9-ui.cjs` with real sprites; exact rules and the owner's
+accepted faster clear times are in [docs/raid-bosses-5-9.md](docs/raid-bosses-5-9.md).

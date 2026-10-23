@@ -682,5 +682,29 @@
   "cf_ingot": [
     25,
     1
+  ],
+  "cf_dagfinn": [
+    650,
+    6
+  ],
+  "cf_thorbjorg": [
+    650,
+    6
+  ],
+  "cf_ragnhild": [
+    650,
+    6
+  ],
+  "cf_orm": [
+    650,
+    6
+  ],
+  "cf_hildr": [
+    650,
+    6
+  ],
+  "cf_eldmarr": [
+    4500,
+    6
   ]
 }

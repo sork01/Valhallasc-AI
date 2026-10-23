@@ -93,6 +93,13 @@ impl World {
             target: self.play_target(fight, session, me, &mates),
             ..BossPlay::default()
         };
+        if let Some(answer) = self.eldmarr_play(fight, def, session) {
+            let plan = answer.goal;
+            return Some((answer, plan, None));
+        }
+        if let Some(answer) = self.forge_boss_play(fight, def, session) {
+            return Some((answer, None, None));
+        }
         if let Some(answer) = self.raid_boss_play(fight, def, session) {
             return Some((answer, None, None));
         }

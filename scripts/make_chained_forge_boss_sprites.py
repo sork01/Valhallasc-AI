@@ -18,6 +18,7 @@ PALETTES={k:mk(
     glass=('#17526a','#329eb0','#8de0e3'),
     mouth=('#261623','#502735','#945447'),
     iris='#ffdb8e',nose='#261825',blush='#ce7b68',fang=('#9b96aa','#e8e0cd')) for k in KINDS}
+PALETTES['cf_hildr']=mk(iron=('#202e38','#3c5662','#7895a2','#c7d8dd'),brass=('#5b3527','#a0693a','#dba95d','#ffe1a0'),fire=('#792a35','#c24835','#fa984c','#fff3b5'),skin=('#815249','#bf886a','#edc8a0'),cloth=('#30283e','#62425b','#ae6678'),hair=('#281e27','#674538','#b1885b'),glass=('#4d536b','#a4b1cc','#f5f7fe'),mouth=('#261623','#502735','#945447'),iris='#ffdb8e',nose='#261825',blush='#ce7b68',fang=('#9b96aa','#e8e0cd'))
 R.PALETTES.update(PALETTES)
 
 def draw(e,clip,n):
@@ -26,7 +27,38 @@ def draw(e,clip,n):
         for j in range(6):
             a.e(x+math.sin(j*.8+n*.25)*2,y-j*length/6,3.4 if j%2 else 2,2 if j%2 else 3.5,'brass')
             a.e(x+math.sin(j*.8+n*.25)*2,y-j*length/6,1.3,1.2,'iron',out=False)
-    if k=='cf_kettil':
+    if k=='cf_eldmarr':
+        # Basalt fire giant: a broken nine-link crown, furnace ribs, flame beard,
+        # stone mantle and the huge cleaver forged for his promised place.
+        def mantle(c):
+            a.band([(-28,c.top+5),(-30,c.top+23),(-21,c.top+31),(-9,c.top+19),
+                    (10,c.top+19),(22,c.top+31),(30,c.top+23),(28,c.top+5)],'iron')
+            for side in [-1,1]:
+                for j in range(4):
+                    a.c((side*(13+j*3),c.top+8),(side*(16+j*3),c.top+21+j*2),1.2,1,'fire')
+                chain(side*26,c.top+5,24)
+        def face(c):
+            x,y=c.hx,c.hy
+            a.band([(x-13,y-2),(x-12,y-14),(x-6,y-21),(x,y-17),(x+6,y-21),(x+13,y-13),(x+14,y-2)],'fire')
+            for dx in [-8,-3,3,8]:a.c((x+dx,y-4),(x+dx*.6,y-15),1.6,1,'brass')
+            for j in range(9):
+                xx=x-15+j*3.7
+                a.c((xx,y+9),(xx+(j-4)*.7,y+16+(j%3)*2),1.5,1,'iron')
+                a.e(xx+(j-4)*.7,y+17+(j%3)*2,1.3,1.8,'fire',out=False)
+            a.band([(x-14,y+8),(x+13,y+8),(x+11,y+12),(x-12,y+12)],'brass')
+            a.band([(-12,c.top-4),(12,c.top-4),(15,c.top-22),(-15,c.top-22)],'iron')
+            for row in range(3):
+                a.c((-10,c.top-8-row*5),(10,c.top-7-row*5),1.7,1.7,'fire')
+            a.c((0,c.top-5),(0,c.top-22),2,2,'brass')
+        def cleaver(c):
+            x,y=c.near;x-=4
+            a.c((x-3,y-13),(x+1,y+25),2.8,2.8,'brass')
+            a.band([(x-8,y+7),(x+12,y+10),(x+14,y+31),(x+2,y+38),(x-10,y+32)],'iron')
+            a.band([(x+7,y+12),(x+11,y+14),(x+11,y+29),(x+1,y+34),(x-5,y+30),(x-6,y+27)],'fire')
+            a.c((x-7,y+9),(x+10,y+12),1.2,1.2,'brass')
+        C.humanoid(a,'iron','fire',w=18,legh=12,th=23,hr=(13,12),armw=6,
+                   hand='iron',foot='iron',pk=.83,pre=mantle,post=face,weapon=cleaver,blush=None)
+    elif k=='cf_kettil':
         def behind(c):
             for side in [-1,1]:
                 chain(side*22,c.top+9,27)
@@ -86,6 +118,81 @@ def draw(e,clip,n):
             if clip=='attack': a.c((x+10,y+23),(x+12,y+10),1.8,1,'fire')
         C.humanoid(a,'cloth','skin',w=16,legh=14,th=24,hr=(12,11),armw=5,
                    hand='brass',foot='iron',pk=.83,pre=furnace,post=face,weapon=ladle,blush=None)
+    elif k in ('cf_dagfinn','cf_thorbjorg','cf_ragnhild','cf_orm','cf_hildr'):
+        def regalia(c):
+            y=c.top
+            if k=='cf_dagfinn':
+                # Twin toothed valve wheels behind broad forge shoulders.
+                for side in [-1,1]:
+                    x=side*23
+                    a.e(x,y+9,11,11,'brass');a.e(x,y+9,7,7,'iron')
+                    for j in range(6):
+                        t=j*math.tau/6
+                        a.c((x,y+9),(x+10*math.cos(t),y+9+10*math.sin(t)),1.3,1.3,'brass')
+            elif k=='cf_thorbjorg':
+                # Three chimney braids and hanging red-hot brand cages.
+                for x in [-20,0,20]:
+                    a.c((x*.5,y+6),(x,y+31),3.5,2.5,'hair')
+                    a.e(x,y+34,6,9,'brass');a.e(x,y+35,3,6,'fire')
+            elif k=='cf_ragnhild':
+                # Four organ pipes and a high, asymmetrical sound collar.
+                for j,x in enumerate([-24,-16,16,24]):
+                    a.c((x,y+4),(x,y+22+(j%2)*8),3.5,3.5,'iron')
+                    a.e(x,y+23+(j%2)*8,3,2,'glass')
+                a.band([(-24,y+4),(-14,y+19),(14,y+19),(24,y+4)],'cloth')
+            elif k=='cf_orm':
+                # Huge round cooling tank with cyan sight glass and two water tubes.
+                a.e(0,y+9,26,21,'iron');a.e(0,y+12,20,15,'brass')
+                a.e(-17,y+18,5,12,'glass');a.e(17,y+18,5,12,'glass')
+                for x in [-23,23]: a.c((x,y+3),(x,y-11),3,3,'iron')
+            else:
+                # Fractured mirror halo, white armour, and a broken final chain.
+                for j in range(7):
+                    t=math.pi*j/6
+                    x=math.cos(t)*25; yy=y+8+math.sin(t)*30
+                    a.band([(x-5,yy),(x,yy+10),(x+5,yy),(x,yy-7)],'glass')
+                for side in [-1,1]:chain(side*23,y+6,16)
+        def face(c):
+            x,y=c.hx,c.hy
+            if k=='cf_dagfinn':
+                a.band([(x-12,y+7),(x-10,y+20),(x,y+28),(x+10,y+20),(x+12,y+7)],'hair')
+                a.c((x-10,y-2),(x+10,y-2),2,2,'brass')
+            elif k=='cf_thorbjorg':
+                a.band([(x-13,y+10),(x-14,y-8),(x-5,y-15),(x+12,y-8),(x+14,y+10),(x+7,y+14),(x+8,y)],'hair')
+                for dx in [-7,0,7]:a.e(x+dx,y-5,2,3,'fire')
+            elif k=='cf_ragnhild':
+                a.band([(x-14,y+5),(x-9,y+14),(x+10,y+16),(x+14,y+5),(x+9,y-2),(x-8,y-2)],'iron')
+                a.c((x-8,y+7),(x+8,y+7),2.4,2.4,'glass')
+                a.band([(x-11,y+10),(x-10,y+20),(x-3,y+17)],'cloth')
+            elif k=='cf_orm':
+                a.e(x,y+1,15,14,'brass');a.e(x,y+3,11,10,'iron')
+                a.e(x-5,y+5,4,5,'glass');a.e(x+5,y+5,4,5,'glass')
+                a.c((x,y-2),(x+2,y-15),3,3,'iron')
+            else:
+                a.band([(x-13,y+8),(x-9,y+20),(x+9,y+20),(x+13,y+8),(x+7,y+3),(x-7,y+3)],'glass')
+                a.e(x-5,y+10,3,2,'iron');a.e(x+5,y+10,3,2,'iron')
+                a.c((x-6,y+19),(x+7,y+5),1,1,'brass')
+        def tool(c):
+            x,y=c.near
+            if k=='cf_dagfinn':
+                for side in [-1,1]:
+                    a.c((x,y-12),(x+side*9,y+23),2,2,'iron')
+                    a.c((x+side*9,y+23),(x+side*3,y+30),2.4,2.4,'brass')
+            elif k=='cf_thorbjorg':
+                a.c((x,y-12),(x,y+23),2.8,2.8,'hair')
+                a.e(x,y+26,9,10,'brass');a.e(x,y+27,5,7,'fire')
+            elif k=='cf_ragnhild':
+                a.c((x,y-8),(x+3,y+24),2.5,2.5,'brass')
+                a.e(x+3,y+26,9,6,'iron');a.c((x-3,y+26),(x+8,y+26),2,2,'glass')
+            elif k=='cf_orm':
+                a.band([(x-8,y-6),(x-9,y+19),(x,y+26),(x+9,y+19),(x+8,y-6)],'iron')
+                a.e(x,y+15,5,8,'glass');a.c((x-7,y+23),(x+7,y+23),2,2,'brass')
+            else:
+                a.band([(x-12,y-5),(x-12,y+20),(x,y+31),(x+12,y+20),(x+12,y-5),(x,y-10)],'brass')
+                a.band([(x-8,y-2),(x-8,y+17),(x,y+25),(x+8,y+17),(x+8,y-2)],'glass')
+                a.c((x-6,y+20),(x+7,y+1),1.2,1.2,'iron')
+        C.humanoid(a,'glass' if k=='cf_hildr' else 'cloth','skin',w=16,legh=14,th=22,hr=(12,11),armw=5,
+                   hand='brass',foot='iron',pk=.83,pre=regalia,post=face,weapon=tool,blush=None)
     elif k=='cf_ingot':
         bob=math.sin(n*math.tau/7)*.6
         y=16+bob

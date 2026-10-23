@@ -166,6 +166,263 @@
       {"name": "Storm Surge", "block": "break", "at": 0.3, "cast": 8, "every": 600, "bar": 0.07, "stun": 0, "vulnerable": 0, "overload": true}
     ]
   },
+  "cf_eldmarr": {
+    "arena": [
+      95,
+      28,
+      127,
+      58
+    ],
+    "mechanics": [
+      {
+        "name": "The Forge Floor",
+        "block": "crack",
+        "stand": 3,
+        "cast": 8,
+        "lava": 40,
+        "cell": 2,
+        "hp_min": 0.66
+      },
+      {
+        "name": "Rising Heat",
+        "block": "heat",
+        "fill": 30,
+        "cool": 0.12,
+        "cast": 5,
+        "blast": 5,
+        "move_every": 30,
+        "capacity": 3,
+        "r": 2,
+        "points": [
+          [
+            103,
+            38
+          ],
+          [
+            119,
+            38
+          ],
+          [
+            103,
+            48
+          ],
+          [
+            119,
+            48
+          ]
+        ],
+        "hp_min": 0.33,
+        "hp_max": 0.66
+      },
+      {
+        "name": "A Seat for Everyone",
+        "block": "seats",
+        "cast": 9,
+        "every": 40,
+        "first": 12,
+        "r": 1.2,
+        "points": [
+          [
+            116.0,
+            43.0
+          ],
+          [
+            115.045,
+            45.939
+          ],
+          [
+            112.545,
+            47.755
+          ],
+          [
+            109.455,
+            47.755
+          ],
+          [
+            106.955,
+            45.939
+          ],
+          [
+            106.0,
+            43.0
+          ],
+          [
+            106.955,
+            40.061
+          ],
+          [
+            109.455,
+            38.245
+          ],
+          [
+            112.545,
+            38.245
+          ],
+          [
+            115.045,
+            40.061
+          ]
+        ],
+        "hp_max": 0.33
+      }
+    ]
+  },
+  "cf_dagfinn": {
+    "arena": [
+      39,
+      186,
+      71,
+      216
+    ],
+    "mechanics": [
+      {
+        "name": "Two Valves",
+        "block": "valves",
+        "at": [
+          0.7,
+          0.4
+        ],
+        "cast": 10,
+        "duration": 25,
+        "points": [
+          [
+            49,
+            201
+          ],
+          [
+            61,
+            201
+          ]
+        ],
+        "r": 3,
+        "need": 3,
+        "hold": 20
+      }
+    ]
+  },
+  "cf_thorbjorg": {
+    "arena": [
+      36,
+      102,
+      68,
+      132
+    ],
+    "mechanics": [
+      {
+        "name": "Brand Relay",
+        "block": "relay",
+        "cast": 8,
+        "first": 10,
+        "every": 50,
+        "duration": 32,
+        "count": 3,
+        "fuse": 8,
+        "immunity": 6,
+        "touch": 1.2,
+        "blast": 5
+      }
+    ]
+  },
+  "cf_ragnhild": {
+    "arena": [
+      140,
+      106,
+      172,
+      136
+    ],
+    "mechanics": [
+      {
+        "name": "Four on the Floor",
+        "block": "grid",
+        "cast": 5,
+        "first": 10,
+        "every": 18,
+        "bpm": 150,
+        "heavy": 0.9
+      }
+    ]
+  },
+  "cf_orm": {
+    "arena": [
+      252,
+      107,
+      284,
+      137
+    ],
+    "mechanics": [
+      {
+        "name": "Water Carriers",
+        "block": "carry",
+        "points": [
+          [
+            275.0,
+            122.0
+          ],
+          [
+            273.663,
+            126.114
+          ],
+          [
+            270.163,
+            128.657
+          ],
+          [
+            265.837,
+            128.657
+          ],
+          [
+            262.337,
+            126.114
+          ],
+          [
+            261.0,
+            122.0
+          ],
+          [
+            262.337,
+            117.886
+          ],
+          [
+            265.837,
+            115.343
+          ],
+          [
+            270.163,
+            115.343
+          ],
+          [
+            273.663,
+            117.886
+          ]
+        ],
+        "r": 1,
+        "throw_r": 3,
+        "need": 6,
+        "window": 5,
+        "quenched": 15,
+        "speed": 0.6
+      }
+    ]
+  },
+  "cf_hildr": {
+    "arena": [
+      250,
+      28,
+      282,
+      58
+    ],
+    "mechanics": [
+      {
+        "name": "Mirror Plate",
+        "block": "reflect",
+        "cast": 5,
+        "first": 15,
+        "every": 40,
+        "duration": 8,
+        "heavy": 0.9
+      }
+    ]
+  },
   "cf_sigrun": {
     "arena": [
       148,

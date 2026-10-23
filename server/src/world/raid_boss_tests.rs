@@ -295,8 +295,8 @@ fn raid_boss_casts_reset_on_evade_and_do_not_leak_into_other_copies() {
         assert!(r.w.boss_mech_view(copy).is_empty());
         assert_eq!(
             r.w.signs_view(copy).len(),
-            4,
-            "each raid copy has all four Warden signs"
+            9,
+            "each raid copy has all nine Warden signs"
         );
         r.w.slimes[r.boss].state = "return".into();
         r.run(0.1);
@@ -391,7 +391,18 @@ fn raid_boss_measure_first_three() {
         .ok()
         .and_then(|s| serde_json::from_value(json!(s)).ok())
         .unwrap_or(Class::Warrior);
-    for kind in ["cf_kettil", "cf_ysolt", "cf_hallgrim", "cf_sigrun"] {
+    for kind in [
+        "cf_kettil",
+        "cf_ysolt",
+        "cf_hallgrim",
+        "cf_sigrun",
+        "cf_dagfinn",
+        "cf_thorbjorg",
+        "cf_ragnhild",
+        "cf_orm",
+        "cf_hildr",
+        "cf_eldmarr",
+    ] {
         if !wanted.is_empty() && !wanted.split(',').any(|s| s == kind) {
             continue;
         }
@@ -407,7 +418,7 @@ fn raid_boss_measure_first_three() {
             foe: Foe::Elite,
             rarity: "raid_chainforged",
             target: Some(id),
-            cap: Some(1200.),
+            cap: Some(if kind == "cf_eldmarr" { 2400. } else { 1200. }),
             run_to_end: true,
             consumables: true,
             ..Case::new(class, 99)
@@ -749,3 +760,6 @@ fn raid_boss_sigrun_sign_numbers_reachability_loot_and_schema_match() {
     }
     assert!(r.w.maps[46].sealed_template);
 }
+
+#[path = "forge_warden_tests.rs"]
+mod forge_wardens;
