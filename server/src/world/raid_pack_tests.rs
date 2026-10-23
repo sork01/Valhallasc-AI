@@ -38,7 +38,7 @@ fn raid_pack_equipment_index_keeps_catalog_selection() {
 fn raid_pack_spawns_are_all_dungeon_elites_with_no_side_quests() {
     let w = world();
     let m = &w.maps[ZONE];
-    assert!(m.sealed_template && m.raid);
+    assert!(!m.sealed_template && m.raid);
     let ordinary: Vec<_> = m
         .slimes
         .iter()
@@ -46,12 +46,12 @@ fn raid_pack_spawns_are_all_dungeon_elites_with_no_side_quests() {
         .collect();
     assert_eq!(ordinary.len(), 40);
     assert!(m.slimes.len() >= ordinary.len());
-    assert!(m.slimes.iter().all(|s| is_elite(&s.kind)));
+    assert!(ordinary.iter().all(|s| is_elite(&s.kind)));
     assert!(ordinary.iter().all(|s| !is_boss(&s.kind)));
     let kinds: BTreeSet<_> = ordinary.iter().map(|s| s.kind.as_str()).collect();
     assert_eq!(kinds.len(), 4);
     let seen = flood(m, &blocked(m, &[]), at(62., 290.));
-    for s in &m.slimes {
+    for s in &ordinary {
         assert!(reached(m, &seen, at(s.x, s.y)), "{}", s.kind);
         let p = at(s.x, s.y);
         let mut q = p;

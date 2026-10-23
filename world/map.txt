@@ -225376,7 +225376,7 @@
           "x": 130,
           "y": 24,
           "color": "#697184",
-          "dialogue": "Nine Wardens hold nine chains. Beyond them waits Eldmarr, the Ember-Lord. The raid is sealed. When the seal is lifted, gather your ten fighters in the muster chamber.",
+          "dialogue": "Nine Wardens hold nine chains. Beyond them waits Eldmarr, the Ember-Lord. Enter the muster chamber and gather ten fighters with Quartermaster Halla.",
           "offers": [],
           "look": {
             "skin": "#c69a7b",
@@ -225615,7 +225615,7 @@
       "copies": 3,
       "raid": true,
       "interior": true,
-      "sealedTemplate": true,
+      "sealedTemplate": false,
       "final_boss": "cf_eldmarr",
       "spawn": {
         "x": 30,

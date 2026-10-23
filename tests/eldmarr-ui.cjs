@@ -72,7 +72,7 @@ const check=(ok,message)=>{assert.ok(ok,message);checks++;};
  check(await page.evaluate(()=>Field._debug.chests?.some(c=>c.x===111&&c.y===29)),'Final kill creates the reward chest');
  check(await page.evaluate(()=>Field._debug.cleared),'The actual final kill clears the copy and unlocks its exit');
  const cards=await page.locator('#loot-rolls .roll-card').count();check(cards>=4,'Final kill offers orange armour and signature weapon rolls');
- check(await page.evaluate(()=>WORLD_MAP.zones[45].sealedTemplate),'Public entrance remains sealed');
+ check(await page.evaluate(()=>!WORLD_MAP.zones[45].sealedTemplate),'Public entrance is open');
  const sign=JSON.parse(fs.readFileSync(path.join(root,'world/boss-signs.txt'))).cf_eldmarr;
  await put(null,{x:sign.x,y:sign.y});await send({type:'sign_read',sign:'cf_eldmarr'});await page.locator('#sign-panel').waitFor({state:'visible'});
  check((await page.locator('#sign-panel').textContent()).includes(sign.todo),'Sign explains all three actual mechanics');

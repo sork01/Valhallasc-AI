@@ -4548,3 +4548,5 @@ scenarios.emberwake = require('./emberwake-scenario.cjs')(kit,map);
 scenarios.chained_forge = require('./chained-forge-scenario.cjs')(kit,map);
 
 scenarios.raid_packs = require('./raid-packs-scenario.cjs')(kit,map);
+
+scenarios.raid_release = require('./raid-release-scenario.cjs')(kit, map);

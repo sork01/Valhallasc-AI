@@ -37,7 +37,7 @@ fn emberwake_map_gates_and_outdoor_catalog() {
     assert!(
         m.portals
             .iter()
-            .any(|p| p.id == "ew_raid" && w.maps[p.to].sealed_template)
+            .any(|p| p.id == "ew_raid" && !w.maps[p.to].sealed_template)
     );
     let mut lava = at(30., 86.);
     m.collide(&mut lava, PLAYER_RADIUS);

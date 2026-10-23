@@ -95,7 +95,7 @@ const check=(value,message)=>{assert.ok(value,message);checks++;};
   check((await page.locator('#sign-panel').textContent()).includes(h.boss==='cf_kettil'?'chain':h.boss==='cf_ysolt'?'wind':'anvil'),h.boss+' sign explains its actual mechanic');
   await page.screenshot({path:path.join(world.runDir,h.boss+'-sign.png')});await page.keyboard.press('Escape');
  }
- check(await page.evaluate(()=>WORLD_MAP.zones[45].sealedTemplate),'Raid entrance remains sealed');
+ check(await page.evaluate(()=>!WORLD_MAP.zones[45].sealedTemplate),'Raid entrance is open');
  const sw=await browser.newPage();await sw.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'sv',sound:false})));await sw.goto(world.url);
  check(await sw.evaluate(()=>Locale.translate('Taut Chain')==='Sträckt kedja'&&Locale.translate('Gale of the Bellows')==='Bälgens stormvind'&&Locale.translate('Hammerfall')==='Hammarslag'),'Hand-written Swedish ability names');await sw.close();
  check(errors.length===0,JSON.stringify(errors));

@@ -133,7 +133,7 @@ const call = async (name, args = {}) => {
   await page.keyboard.press('Shift'); await travel(46, 35, 303); await selected(false);
   await page.waitForFunction(() => Math.abs(valhalla.raidMusic.output.gain.value - .09) < .002);
   check(true, 'Reload preserves the saved volume');
-  check(await page.evaluate(() => WORLD_MAP.zones[45].sealedTemplate), 'The public raid entrance stays sealed');
+  check(await page.evaluate(() => !WORLD_MAP.zones[45].sealedTemplate), 'The public raid entrance is open');
   check(errors.length === 0, 'No browser errors: ' + JSON.stringify(errors));
   check(bad.length === 0, 'No missing raid audio assets');
   const result = { passed: true, checks, artifacts: world.artifacts,

@@ -1,4 +1,4 @@
-//! RAID-MAP only. Existing enemies are fixtures; no raid encounters are introduced here.
+//! Chained Forge release: real collision, open muster, ten-fighter gate and copy recovery.
 use super::wyrd_tests::{at, blocked, flood, join, place, reached, world};
 use super::*;
 const ZONE: usize = 46;
@@ -30,11 +30,11 @@ fn chained_forge_floor_collision_halls_portals_and_three_copies() {
         (m.name.as_str(), m.size, m.min_level, m.players, m.copies),
         ("The Chained Forge", 320, 99, 10, 3)
     );
-    assert!(m.raid && m.interior && m.sealed_template);
+    assert!(m.raid && m.interior && !m.sealed_template);
     assert_eq!(w.weather.view(ZONE, None, 0)["inside"], true);
     assert!(
-        m.slimes.iter().all(|s| !is_boss(&s.kind)),
-        "bosses belong to their own tasks"
+        m.slimes.iter().filter(|s| is_boss(&s.kind)).count() == 10,
+        "all nine Wardens and Eldmarr ship together"
     );
     let grid = blocked(m, &[]);
     let descent = flood(m, &grid, at(62., 290.));
@@ -146,9 +146,18 @@ fn chained_forge_floor_collision_halls_portals_and_three_copies() {
     assert_eq!(w.maps.len(), 117);
 }
 #[test]
-fn chained_forge_muster_is_sealed_then_hires_and_gates_ten_living_fighters() {
+fn chained_forge_open_muster_preserves_seal_level_and_ten_fighter_gates() {
     let mut w = world();
     let _rx = join(&mut w, 1, Class::Warrior);
+    assert!(
+        !w.maps[ZONE].sealed_template,
+        "the released entrance is open"
+    );
+    for m in &mut w.maps {
+        if m.raid {
+            m.sealed_template = true;
+        }
+    }
     w.players.get_mut(&1).unwrap().character.level = 99;
     place(&mut w, 1, 45, at(133., 24.));
     w.time = 10.;

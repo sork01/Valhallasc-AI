@@ -1,6 +1,6 @@
 // New zone only: real movement, both gates, quests, kill drops and persistence.
 module.exports=(kit,map)=>({
-  description:'Emberwake Caldera: walk from Asterion to the sealed raid door, quests, outdoor loot and return.',
+  description:'Emberwake Caldera: walk from Asterion to the raid door, quests, outdoor loot and return.',
   startLevel:99,levelSpread:0,godMode:true,
   async run(w,check){
     const bot='EmberWalker',area=map.zones[44];
@@ -30,10 +30,10 @@ module.exports=(kit,map)=>({
     for(const [x,y]of area.paths[0].slice(1))await kit.walkTo(w,bot,{x,y},120000);
     check(w.player(bot).zone===45&&Math.hypot(w.player(bot).x-133,w.player(bot).y-26)<2,'The whole chain road can be walked to the raid door');
     const seal=await kit.talkTo(w,bot,'ew_seal');
-    check(JSON.stringify(seal).includes('sealed'),'The Nine-Chain Door explains that the raid is sealed');
+    check(JSON.stringify(seal).includes('Quartermaster Halla'),'The Nine-Chain Door explains how to assemble ten fighters');
     await kit.talkTo(w,bot,'ew_echo');
     await w.waitFor(()=>q('ew_voice')?.counts[0]===1,5000,'Hear Eldmarr');
-    check(area.portals.some(p=>p.id==='ew_raid'&&map.zones[p.to-1].sealedTemplate),'The raid portal remains sealed before RAID-OPEN');
+    check(area.portals.some(p=>p.id==='ew_raid'&&!map.zones[p.to-1].sealedTemplate),'The raid portal is open');
     for(const kind of ['ew_ashback','ew_glasswing','ew_slagjaw','ew_cinderhorn']){
       const enemy=w.views.get(bot).slimes.find(s=>s.kind===kind&&!s.dead);
       await w.debug(bot,{op:'kill_enemy',id:enemy.id});

@@ -101,7 +101,7 @@ const check=(value,message)=>{assert.ok(value,message);checks++;};
   }
   results.push({kind,pixels,labels,cast:state.cast,tele:state.tele});
  }
- check(await page.evaluate(()=>WORLD_MAP.zones[45].sealedTemplate),'Entrance remains sealed');
+ check(await page.evaluate(()=>!WORLD_MAP.zones[45].sealedTemplate),'Entrance is open');
  const sv=await browser.newPage();await sv.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'sv',sound:false})));await sv.goto(world.url);
  check(await sv.evaluate(()=>['Two Valves','Brand Relay','Four on the Floor','Water Carriers','Mirror Plate','HOLD FIRE','Valve {0}','Water: {0}/{1}'].every(s=>Locale.translate(s)!==s)),'Hand-written Swedish covers all five mechanics, counters and hold-fire instruction');await sv.close();
  check(!errors.length,JSON.stringify(errors));fs.writeFileSync(path.join(world.runDir,'wardens-5-9-ui.json'),JSON.stringify({checks,real:!STUB,results,errors},null,2));console.log(JSON.stringify({passed:true,checks,artifacts:world.runDir}));

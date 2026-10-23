@@ -413,7 +413,7 @@ fn eldmarr_court_paths_warning_budget_and_sign_match_the_shipped_fight() {
             && sign.todo.contains("5 seconds")
             && sign.tip.contains("9 seconds")
     );
-    assert!(r.w.maps[46].sealed_template);
+    assert!(!r.w.maps[46].sealed_template);
     assert_eq!(r.w.maps[46].final_boss, "cf_eldmarr");
     let rule = crate::items::raid_rewards::boss("cf_eldmarr").unwrap();
     assert!(rule.drops > 0);

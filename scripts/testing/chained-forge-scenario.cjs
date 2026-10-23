@@ -1,13 +1,13 @@
-// RAID-MAP only: the live seal stays on; debug stages the private crew inside it.
+// RAID-MAP only: the released door opens into the physically separated muster.
 module.exports=(kit,map)=>({
- description:'The Chained Forge floor: sealed door, inside-only contracts, ten-fighter gate, all ten halls and safe return.',
+ description:'The Chained Forge floor: open door, inside-only contracts, ten-fighter gate, all ten halls and safe return.',
  startLevel:99,levelSpread:0,godMode:true,
  async run(w,check){
   const bot='ForgeWalker',area=map.zones[45];
   await w.connect({bot,class:'warrior'});
   await kit.teleport(w,bot,{zone:45,x:133,y:27});
   await w.action(bot,{type:'move',x:133,y:24});await w.advance(1600);await w.action(bot,{type:'stop'});
-  check(w.player(bot).zone===45,'The authored raid door remains sealed');
+  check(w.player(bot).zone===46,'The authored raid door admits a level-99 player to muster');
   await kit.teleport(w,bot,{zone:46,x:30,y:303});
   check(w.views.get(bot).instance?.template===46||w.player(bot).zone===46,'Private staging enters a raid copy');
   await w.debug(bot,{op:'set_gold',gold:2000000});

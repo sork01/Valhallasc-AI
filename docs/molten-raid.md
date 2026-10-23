@@ -802,3 +802,98 @@ Dagfinn, Thorbjörg, Ragnhild, Orm and Hildr are implemented in isolated `feat/r
 ## Eldmarr implementation (2026-10-23)
 
 `RAID-BOSS-FINAL` is built on `feat/raid-eldmarr`, above Wardens 5–9 and main. See `docs/raid-eldmarr.md` for the three authoritative mechanics, phase gates, two breathing windows, final combination, editable art, Swedish, hired responses and clear rewards. The seat warning is nine seconds so every assigned plate meets the shared reachability budget. The owner will perform timing/win-rate evaluation; the 900-second target and eight-fighter loss are unmeasured, and initial health/enrage remain provisional. The public entrance stays sealed.
+
+
+## Raid opening and integrated checks (2026-10-23)
+
+The owner requested all three remaining tasks: EASE-DUNGEONS-ARENA,
+RAID-CHECK and RAID-OPEN. The difficulty changes were already included in the
+2026-10-23 durability/first-Wardens release; their unchecked task was stale.
+The opening release integrates Wardens 5–9 and Eldmarr with current main.
+It adds no file zone and shifts no private-copy IDs: 47 file zones, existing
+extras 47–106, raid copies 46/107/108, Arena copies 109–116.
+
+The outer Emberwake door now admits level-99 players to the physically separate
+muster chamber. The inner gate still requires exactly ten living fighters.
+Quartermaster Halla supplies up to nine normal-price contracts inside muster;
+leaving dismisses them. The gatekeeper's English and hand-written Swedish now
+explain how to gather the company. Later generator runs preserve the open state.
+
+### Measurement handoff supersedes the old release timing recipe
+
+The owner's latest testing instruction is to leave timing and win-rate evaluation
+to him. This release checks mechanics and integration only; it performs no
+repeated encounter timing, multi-seed sweep or balance controls. Opening is
+explicitly requested by the current task. Existing health and enrage values are
+preserved, including Eldmarr's provisional 4.5-billion health and 1,320-second
+soft-enrage start. His >=900-second floor, ten-fighter completion and eight-fighter
+control remain **unmeasured and uncertified**. Pack calibration remains deferred.
+These are owner evaluation items, not claims established by the integration test.
+No historical timing below is a fresh measurement of the combined release.
+
+| Encounter | Historical hired-ten median | Historical enrage start | Evidence |
+| --- | ---: | ---: | --- |
+| Kettil | 290.38 s | 315 s | `raid-bosses.md` |
+| Ysolt | 275.57 s | 310 s | `raid-bosses.md` |
+| Hallgrim | 273.43 s | 311 s | `raid-bosses.md` |
+| Sigrun | 278.50 s | 305 s | `raid-boss-4.md` |
+| Dagfinn | 210.25 s | 227 s | `raid-bosses-5-9.md` |
+| Thorbjörg | 328.40 s | 375 s | `raid-bosses-5-9.md` |
+| Ragnhild | 188.68 s | 210 s | `raid-bosses-5-9.md` |
+| Orm | 88.45 s | 98 s | `raid-bosses-5-9.md` |
+| Hildr | 202.90 s | 219 s | `raid-bosses-5-9.md` |
+| Eldmarr | Owner evaluation pending | 1,320 s provisional | `raid-eldmarr.md` |
+| Four pack kinds | Owner evaluation deferred | None | `raid_pack_measure_encounters` remains ignored |
+
+The first nine Wardens' historical smaller-party controls are recorded in their
+implementation reports. `RAID_BOSSES=cf_eldmarr` selects the optional report
+`raid_boss_measure_first_three` for the owner's later evaluation. All full-orange
+fixtures use ten slots including cloak and both rings.
+
+### Reproduce integration checks
+
+`node scripts/test-via-mcp.cjs run raid_release` uses a private server/database:
+enter the actual public door, verify the solo inner-gate refusal, hire nine,
+cross the ten-fighter gate, walk actual collision into the first hall, observe a
+real Warden cast, finish the boss with a debug fixture kill, verify orange rewards
+and return safely. Debug kills keep this focused test from becoming a balance run.
+`tests/raid-party-ui.cjs` checks the compact ten-row frame and group controls;
+`tests/eldmarr-ui.cjs` checks real-sprite casts through the final phases and clear.
+Focused Rust filters cover the map/gates, raid social/loot rules, Wardens,
+Eldmarr and raid strength. The map test also simulates a sealed template to retain
+coverage of seal enforcement after the production door opens.
+
+Generated world/catalog/sign/client sources must remain byte-identical after a
+repeat generator/sync/Swedish pass. Release proof and logs are under
+`test-results/raid-release/` in the release checkout. Public verification uses
+health and static asset fetches only; it creates no guest characters.
+
+
+### Accepted focused results
+
+- 77 distinct Rust checks pass across the mechanics/map batch and the focused
+  follow-up for party, loot and corrected legacy expectations. One optional timing
+  harness remains ignored. Existing mechanics tests are not rerun as balance sweeps.
+- MCP `raid_release`: 12 checks; `raid_packs`: 14 checks, including actual material
+  kills, private-copy isolation and purple-gear persistence. SDK handshake and
+  listing advertise all 80 scenarios, including the new release scenario.
+- Real sprites: 17 party UI checks (`driver-0TAPTF`), 31 Eldmarr checks
+  (`driver-QHielE`), 32 map/open-atlas checks (`driver-tW6TYj`). The final screenshot
+  shows ten distinct occupied plates and the compact ten-row raid frame.
+- Clippy with warnings denied, formatting, changed JS/Python syntax, nine
+  byte-stable generated sources and the embedded difficulty settings pass.
+- The original all-enemies pack assertions incorrectly counted sleeping ingot
+  helpers as living pack elites; pack checks now select the four actual pack
+  kinds. Sign-count coverage now includes Eldmarr's tenth sign. The map check
+  requires all ten bosses and the open release state while retaining explicit
+  seal/level/ten-living-fighter refusal checks.
+- An extra legacy SDK lifecycle smoke exceeded its 30-second deadline under
+  concurrent compilation; it also runs an unrelated movement scenario. The direct
+  SDK handshake/list and both focused raid MCP scenarios pass. This timeout is
+  not claimed to be a successful check or a raid regression.
+
+The orange catalog is byte-equivalent by item ID to main's already deployed
+orange definitions. The opening adds boss materials, with no orange backfill.
+
+The full `npm run test:swedish` release gate passes: catalog validation, 21 locale
+checks, 15 language UI checks and 36 desktop/mobile window-layout checks.

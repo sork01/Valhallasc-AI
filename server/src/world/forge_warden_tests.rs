@@ -381,7 +381,7 @@ fn raid_warden_five_new_encounters_reset_and_have_real_orange_rewards() {
         let mut r = Rig::new(kind, 1);
         crate::bosssign::validate(kind, &r.w.signs[kind]).unwrap();
         bm::validate(kind, &r.w.boss.table[kind]).unwrap();
-        assert!(r.w.maps[46].sealed_template);
+        assert!(!r.w.maps[46].sealed_template);
         r.run(16.);
         r.w.slimes[r.boss].state = "return".into();
         r.run(0.1);

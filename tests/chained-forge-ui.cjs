@@ -58,10 +58,10 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
  });check(changed>2000,'Raid scenery visibly changes the actual field render: '+changed+' pixels');
  await page.setViewportSize({width:1440,height:900});
  await page.evaluate(()=>WorldMap.show());
- check(await page.evaluate(()=>WORLD_MAP.zones[45].sealedTemplate),'The published entrance remains sealed');
- check(await page.locator('.wm-tile[data-zone="46"]').count()===0,'Sealed raid is hidden on the world atlas');
+ check(await page.evaluate(()=>!WORLD_MAP.zones[45].sealedTemplate),'The published entrance is open');
+ check(await page.locator('.wm-tile[data-zone="46"]').count()===1,'Open raid is visible on the world atlas');
  check(await page.evaluate(()=>WorldMap._layout.length===Field._debug.zones.length),'Every file zone has an atlas placement');
- await page.screenshot({path:path.join(world.artifacts,'chained-forge-atlas-sealed.png')});
+ await page.screenshot({path:path.join(world.artifacts,'chained-forge-atlas-open.png')});
  await page.keyboard.press('Escape');
  // Probe localization in a fresh Swedish document, as language is fixed on load.
  const sw=await browser.newPage();await sw.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'sv',sound:false})));await sw.goto(world.url);

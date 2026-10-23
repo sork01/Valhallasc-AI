@@ -90,7 +90,7 @@ const check=(value,message)=>{assert.ok(value,message);checks++;};
  check(words.includes('25 seconds')&&words.includes('40%')&&words.includes('All ten'),'Sign explains numbers, deadline and escalation');
  await page.screenshot({path:path.join(world.runDir,'sigrun-sign-desktop.png')});
  await page.setViewportSize({width:844,height:390});await page.screenshot({path:path.join(world.runDir,'sigrun-sign-phone.png')});await page.keyboard.press('Escape');
- check(await page.evaluate(()=>WORLD_MAP.zones[45].sealedTemplate),'Public raid entrance remains sealed');
+ check(await page.evaluate(()=>!WORLD_MAP.zones[45].sealedTemplate),'Public raid entrance is open');
  const sw=await browser.newPage();await sw.addInitScript(()=>localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'sv',sound:false})));await sw.goto(world.url);
  check(await sw.evaluate(()=>Locale.translate('Ingot Order')==='Tackornas ordning'&&Locale.translate('Ingot {0}')==='Tacka {0}'&&Locale.translate('Hit this one!')==='Slå på den här!'),'Hand-written Swedish ability and numbered instructions');await sw.close();
  check(errors.length===0,JSON.stringify(errors));

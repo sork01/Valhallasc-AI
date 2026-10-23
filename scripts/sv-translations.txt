@@ -3540,6 +3540,7 @@
   "Nightweave": "Nattväv",
   "Nightweave Claws": "Nattvävda klor",
   "Nightweave Spaulders": "Nattvävda axelskydd",
+  "Nine Wardens hold nine chains. Beyond them waits Eldmarr, the Ember-Lord. Enter the muster chamber and gather ten fighters with Quartermaster Halla.": "Nio väktare håller nio kedjor. Bortom dem väntar Eldmarr, glödherren. Gå in i samlingssalen och samla tio kämpar med kvartermästare Halla.",
   "Nine Wardens hold nine chains. Beyond them waits Eldmarr, the Ember-Lord. The door is sealed.": "Nio väktare håller nio kedjor. Bortom dem väntar Eldmarr, glödens herre. Porten är förseglad.",
   "Nine Wardens hold nine chains. Beyond them waits Eldmarr, the Ember-Lord. The raid is sealed. When the seal is lifted, gather your ten fighters in the muster chamber.": "Nio väktare håller nio kedjor. Bortom dem väntar Eldmarr, glödherren. Raiden är förseglad. När förseglingen bryts samlar ni era tio kämpar i samlingssalen.",
   "Nine chains. One broken promise.": "Nio kedjor. Ett brutet löfte.",

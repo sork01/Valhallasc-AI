@@ -1,6 +1,6 @@
 // Only the new pack content; direct private fixtures avoid progression/grinding.
 module.exports=(kit,map)=>({
- description:'Raid packs: sealed door, isolated 40 elite spawns, materials, unique shared purple gear and persistence.',
+ description:'Raid packs: open door, isolated 40 elite spawns, materials, unique shared purple gear and persistence.',
  startLevel:99,levelSpread:0,godMode:true,
  async run(w,check){
   const hero='CinderScout',other='CinderWitness',area=map.zones[45];
@@ -12,7 +12,7 @@ module.exports=(kit,map)=>({
   check(enemies.length===40,'Ten real four-enemy packs');
   check(enemies.every(s=>s.elite),'Every pack enemy is a dungeon elite');
   check(new Set(enemies.map(s=>s.kind)).size===4,'Four ordinary raid kinds');
-  check(area.sealedTemplate,'Public entrance remains sealed');
+  check(!area.sealedTemplate,'Public entrance is open');
   check(w.views.get(other).slimes.every(s=>!enemies.some(e=>e.id===s.id)),'Another group has separate pack actors');
   for(const kind of ['cf_brute','cf_crawler','cf_caster','cf_sentry']){
    const s=w.views.get(hero).slimes.find(s=>s.kind===kind&&!s.dead);
@@ -22,7 +22,7 @@ module.exports=(kit,map)=>({
    check(true,'Actual kill pays '+kind+' material');
   }
   check(area.quests.length===0,'No special elites or elite side quests');
-  check(w.views.get(other).slimes.every(s=>!s.dead),'Other copy retains every enemy');
+  check(w.views.get(other).slimes.filter(s=>['cf_brute','cf_crawler','cf_caster','cf_sentry'].includes(s.kind)).every(s=>!s.dead),'Other copy retains every pack enemy');
   // Fixed fixtures inspect gear once each. Never farm the 3% roll.
   const fs=require('node:fs'),path=require('node:path');
   const pieces=JSON.parse(fs.readFileSync(path.join(__dirname,'../../world/items.txt'))).filter(i=>i.source==='chained_forge_packs');

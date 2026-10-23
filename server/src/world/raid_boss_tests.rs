@@ -295,8 +295,8 @@ fn raid_boss_casts_reset_on_evade_and_do_not_leak_into_other_copies() {
         assert!(r.w.boss_mech_view(copy).is_empty());
         assert_eq!(
             r.w.signs_view(copy).len(),
-            9,
-            "each raid copy has all nine Warden signs"
+            10,
+            "each raid copy has all nine Warden signs and Eldmarr"
         );
         r.w.slimes[r.boss].state = "return".into();
         r.run(0.1);
@@ -758,7 +758,7 @@ fn raid_boss_sigrun_sign_numbers_reachability_loot_and_schema_match() {
                 .all(|g| g.rarity == "legendary" && item(&g.item).unwrap().kind != "weapon")
         );
     }
-    assert!(r.w.maps[46].sealed_template);
+    assert!(!r.w.maps[46].sealed_template);
 }
 
 #[path = "forge_warden_tests.rs"]

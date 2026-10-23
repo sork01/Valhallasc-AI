@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""The Chained Forge: sealed level-99 raid floor. Elite packs; bosses are added by their own tasks.
+"""The Chained Forge: level-99 raid floor, elite packs and all ten bosses.
 
 python3 scripts/generate_chained_forge.py [--check | --open]
-Rebuild preserves an opened entrance; --open is reserved for RAID-OPEN.
+Rebuild preserves the released open entrance; --open explicitly opens the seal.
 """
 import argparse
 import json
@@ -180,7 +180,7 @@ def install_parent(w):
         if n['id']=='ew_stone':n['dialogue']='Gather here before the Nine-Chain Door. Outdoor companies still hold five fighters. Raid contracts are signed with Quartermaster Halla in the muster chamber beyond the door.'
         if n['id']=='ew_seal':
             n['x'],n['y']=130,24
-            n['dialogue']='Nine Wardens hold nine chains. Beyond them waits Eldmarr, the Ember-Lord. The raid is sealed. When the seal is lifted, gather your ten fighters in the muster chamber.'
+            n['dialogue']=('Nine Wardens hold nine chains. Beyond them waits Eldmarr, the Ember-Lord. Enter the muster chamber and gather ten fighters with Quartermaster Halla.' if not w['zones'][ZONE-1]['sealedTemplate'] else 'Nine Wardens hold nine chains. Beyond them waits Eldmarr, the Ember-Lord. The raid is sealed. When the seal is lifted, gather your ten fighters in the muster chamber.')
 
 def check(w):
     z=w['zones'][ZONE-1];mask=np.array([[c=='=' for c in row] for row in z['forgeFloor']])
