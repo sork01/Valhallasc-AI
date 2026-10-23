@@ -38,6 +38,19 @@ pub(super) fn opponent_health() -> f64 {
     }
     OPPONENT_HEALTH
 }
+/// An opponent's blows on the hero are worth this share of what its level and gear give it (owner, 2026-10-23: "ease up
+/// the arena quests by 50%"). Test builds read `GAUNTLET_OPPONENT_DAMAGE` to measure other values without a rebuild.
+const OPPONENT_DAMAGE: f64 = 0.5;
+pub(super) fn opponent_damage() -> f64 {
+    #[cfg(test)]
+    if let Some(v) = std::env::var("GAUNTLET_OPPONENT_DAMAGE")
+        .ok()
+        .and_then(|v| v.parse::<f64>().ok())
+    {
+        return v;
+    }
+    OPPONENT_DAMAGE
+}
 /// The worn slots of a plain level-appropriate set: the equipment slot and the catalog kind that fills it.
 const SLOTS: [(&str, &str); 10] = [
     ("chest", "armor"),

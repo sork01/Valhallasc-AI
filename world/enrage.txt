@@ -16,7 +16,7 @@
     0.2
   ],
   "choirmother": [
-    95,
+    119,
     0.2
   ],
   "pearlwidow": [
@@ -32,7 +32,7 @@
     0.2
   ],
   "coralregent": [
-    93,
+    116,
     0.2
   ],
   "chainmarshal": [
@@ -48,7 +48,7 @@
     0.2
   ],
   "hierophant": [
-    96,
+    120,
     0.2
   ],
   "tideglass_heron": [
@@ -120,7 +120,7 @@
     0.2
   ],
   "thunder_heart": [
-    86,
+    108,
     0.2
   ],
   "bloom_thornkeeper": [
@@ -140,7 +140,7 @@
     0.2
   ],
   "solar_heart": [
-    100,
+    125,
     0.2
   ],
   "amber_curator": [
@@ -152,7 +152,7 @@
     0.2
   ],
   "amber_memory": [
-    106,
+    132,
     0.2
   ],
   "solstice_watcher": [
@@ -164,43 +164,43 @@
     0.2
   ],
   "eye_unblinking": [
-    120,
+    150,
     0.2
   ],
   "elder_heart": [
-    111,
+    139,
     0.2
   ],
   "pavilion_sovereign": [
-    108,
+    135,
     0.2
   ],
   "rain_crown_sovereign": [
-    110,
+    138,
     0.2
   ],
   "seed_worldseed": [
-    103,
+    129,
     0.2
   ],
   "astro_axis": [
-    100,
+    125,
     0.2
   ],
   "bloom_heart": [
-    100,
+    125,
     0.2
   ],
   "solstice_heart": [
-    101,
+    126,
     0.2
   ],
   "hollowking": [
-    102,
+    128,
     0.2
   ],
   "moonwell_echo": [
-    100,
+    125,
     0.2
   ],
   "big": [
@@ -414,11 +414,11 @@
     3.0
   ],
   "barrow_fatebound": [
-    98,
+    122,
     0.2
   ],
   "span_archon": [
-    98,
+    122,
     0.2
   ],
   "barrow_doorward": [
@@ -438,7 +438,7 @@
     0.2
   ],
   "keel_captain": [
-    64,
+    80,
     0.2
   ],
   "null_bell": [
@@ -450,7 +450,7 @@
     0.2
   ],
   "null_hour": [
-    608,
+    760,
     0.2
   ],
   "span_warden": [

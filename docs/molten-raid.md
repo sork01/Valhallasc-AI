@@ -174,8 +174,8 @@ Records per future boss fight, from at least 16 seeds: median, fastest, slowest,
 falls, DPS per class. A win is the actual kill. Controls with the same fixture: ten minus two
 fighters must lose or take at least 1.25 times the median; a lone player at level 99
 must die to every pack and every Warden (`a_dungeon_pack_kills_a_lone_player` and
-the boss equivalent); four mercenaries alone must lose
-(`four_mercenaries_alone_never_beat_a_final_boss`, scaled to the raid). Enrage per
+the boss equivalent); the old rule that four mercenaries alone must lose was removed by the owner on
+2026-10-23 (`merc_alone_party_times_report` only prints times). Enrage per
 boss: `ceil(1.06 × slowest ten-fighter win) + 2`, judged from raw times with the
 enrage off (`ENRAGE_FILE=<{}>`), as in the other dungeons.
 

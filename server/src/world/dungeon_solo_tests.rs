@@ -496,21 +496,18 @@ fn a_hired_party_of_five_beats_every_final_boss() {
     );
 }
 
-/// `BOSSMECH-MERC-ALONE` (owner, 2026-10-19): four hired fighters must not be able to kill a boss without the hirer, so the
-/// player cannot sit back. The fix is in the encounter (the soft enrage in `world/enrage.txt`), not in the mercenaries: a
-/// hirer who fell does not stop them. Each final boss is fought on the same seeds by the hired party (hirer swinging),
-/// by the four mercenaries with the hirer idle in the room and with the hirer down (no bot party: the five hired fighters
-/// are the test party); the line lists the seconds of each win (`-` for a loss) and the DPS of each class, so a start for
-/// the enrage can be read off: later than the slowest hired win, earlier than the fastest mercenary-only win. The rule: the mercenaries win 0 runs alone. Measure the
-/// raw times with the enrage off (`ENRAGE_FILE=<a file holding {}>`). `DUNGEON_MERC_ALONE_ALL=1` adds every other boss and
-/// every pack of the chosen dungeons (reported only). `DUNGEON_SOLO_DUNGEONS` / `_KINDS` / `_SEEDS` limit it.
+/// Party time report: each boss is fought on the same seeds by the hired party (hirer swinging), by the four mercenaries
+/// with the hirer idle in the room and with the hirer down; the line lists the seconds of each win (`-` for a loss), the
+/// falls and the DPS of each class, so an enrage start can be read off. Report only: the old rule that four mercenaries
+/// alone must lose (`BOSSMECH-MERC-ALONE`) was removed by the owner on 2026-10-23. Measure the raw times with the
+/// enrage off (`ENRAGE_FILE=<a file holding {}>`). `DUNGEON_MERC_ALONE_ALL=1` adds every other boss and every pack of the
+/// chosen dungeons. `DUNGEON_SOLO_DUNGEONS` / `_KINDS` / `_SEEDS` limit it.
 #[test]
 #[ignore = "slow: four fights per boss per seed"]
-fn four_mercenaries_alone_never_beat_a_final_boss() {
+fn merc_alone_party_times_report() {
     let table = world().boss.table.keys().cloned().collect::<Vec<_>>();
     let all = std::env::var("DUNGEON_MERC_ALONE_ALL").is_ok_and(|v| v == "1");
     let mercs = [Class::Priest, Class::Mage, Class::Hunter, Class::Assassin];
-    let mut failed = vec![];
     for d in dungeons() {
         let mut targets: Vec<(String, Vec<usize>, bool)> = d
             .bosses
@@ -526,7 +523,7 @@ fn four_mercenaries_alone_never_beat_a_final_boss() {
                     .map(|(n, ids)| (format!("pack {n}"), ids.clone(), false)),
             );
         }
-        for (what, ids, final_boss) in targets {
+        for (what, ids, _final_boss) in targets {
             let case = Case {
                 consumables: true,
                 rarity: BASELINE_RARITY,
@@ -560,9 +557,8 @@ fn four_mercenaries_alone_never_beat_a_final_boss() {
             let falls = |runs: &[PartyOutcome]| {
                 runs.iter().map(|r| r.deaths as f64).sum::<f64>() / runs.len().max(1) as f64
             };
-            let bad = wins(&idle) > 0 || wins(&down) > 0;
             eprintln!(
-                "[merc-alone] {} L{} {what}: hired {} of {} [{}] | mercs alone, hirer idle {} [{}], hirer down {} [{}] | falls per fight: hired five {:.1}, hirer idle {:.1}, hirer down {:.1} | dps: hired five ({}); mercenaries alone ({}){}",
+                "[merc-alone] {} L{} {what}: hired {} of {} [{}] | mercs alone, hirer idle {} [{}], hirer down {} [{}] | falls per fight: hired five {:.1}, hirer idle {:.1}, hirer down {:.1} | dps: hired five ({}); mercenaries alone ({})",
                 d.name,
                 d.level,
                 wins(&hired),
@@ -576,50 +572,10 @@ fn four_mercenaries_alone_never_beat_a_final_boss() {
                 falls(&idle),
                 falls(&down),
                 dps_by_class(&hired),
-                dps_by_class(&down),
-                if bad {
-                    "  <-- THE MERCENARIES WIN ALONE"
-                } else {
-                    ""
-                }
+                dps_by_class(&down)
             );
-            // Four fighters do 4/5 of the work: if they do win, they take at least a fifth longer than the hired five.
-            let mean_win = |runs: &[PartyOutcome]| {
-                let won: Vec<f64> = runs
-                    .iter()
-                    .filter(|r| r.killed)
-                    .map(|r| r.seconds)
-                    .collect();
-                (!won.is_empty()).then(|| won.iter().sum::<f64>() / won.len() as f64)
-            };
-            if let (Some(h), Some(a)) = (
-                mean_win(&hired),
-                mean_win(&idle)
-                    .into_iter()
-                    .chain(mean_win(&down))
-                    .reduce(f64::min),
-            ) && a < h * 1.2
-                && final_boss
-            {
-                failed.push(format!(
-                    "{what}: the mercenaries alone win in {a:.0} s, under 1.2 x the hired party's {h:.0} s"
-                ));
-            }
-            if bad && final_boss {
-                failed.push(format!(
-                    "{what}: idle hirer {}, down hirer {} of {}",
-                    wins(&idle),
-                    wins(&down),
-                    seeds()
-                ));
-            }
         }
     }
-    assert!(
-        failed.is_empty(),
-        "four mercenaries must not win without the hirer:\n{}",
-        failed.join("\n")
-    );
 }
 
 /// Do dungeon monsters actually hurt? `DUNGEON_SOLO_DUNGEONS=undervault DUNGEON_SOLO_CLASS=priest cargo test dungeon_probe -- --ignored --nocapture`

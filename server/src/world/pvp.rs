@@ -645,6 +645,7 @@ impl World {
         let dodge = self.players[&defender_session].character.dodge_chance()
             + self.players[&defender_session].buff(BuffKind::Dodge);
         let dodged = damage > 0. && self.random() < dodge.min(0.95);
+        let from_opponent = self.players.get(&attacker).is_some_and(|a| a.gauntlet);
         let p = self.players.get_mut(&defender_session).unwrap();
         let shield = p.buff(BuffKind::Shield).min(0.8);
         let value = if damage <= 0. || dodged {
@@ -660,6 +661,12 @@ impl World {
         // An arena opponent has less health than its level gives it (`gauntlet::opponent_health`).
         let value = if value > 0. && p.gauntlet {
             (value / gauntlet::opponent_health()).round()
+        } else {
+            value
+        };
+        // An arena opponent's blows are worth less too (`gauntlet::opponent_damage`).
+        let value = if value > 0. && from_opponent {
+            (value * gauntlet::opponent_damage()).round().max(1.)
         } else {
             value
         };
