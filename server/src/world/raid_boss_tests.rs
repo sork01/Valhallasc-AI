@@ -401,6 +401,7 @@ fn raid_boss_measure_first_three() {
         "cf_ragnhild",
         "cf_orm",
         "cf_hildr",
+        "cf_eldmarr",
     ] {
         if !wanted.is_empty() && !wanted.split(',').any(|s| s == kind) {
             continue;
@@ -417,7 +418,7 @@ fn raid_boss_measure_first_three() {
             foe: Foe::Elite,
             rarity: "raid_chainforged",
             target: Some(id),
-            cap: Some(1200.),
+            cap: Some(if kind == "cf_eldmarr" { 2400. } else { 1200. }),
             run_to_end: true,
             consumables: true,
             ..Case::new(class, 99)

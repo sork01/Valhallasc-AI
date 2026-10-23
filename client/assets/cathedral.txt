@@ -141,7 +141,8 @@
     "cf_thorbjorg",
     "cf_ragnhild",
     "cf_orm",
-    "cf_hildr"
+    "cf_hildr",
+    "cf_eldmarr"
   ],
   "clips": {
     "idle": {
@@ -309,7 +310,8 @@
     "cf_thorbjorg": "4fe09a98cf914345",
     "cf_ragnhild": "65352991436624dc",
     "cf_orm": "4fc1695f6a54fcd3",
-    "cf_hildr": "73339fa7bca515c0"
+    "cf_hildr": "73339fa7bca515c0",
+    "cf_eldmarr": "5a4edb5546051b4e"
   },
   "tops": {
     "tidetemplar": 84,
@@ -445,6 +447,7 @@
     "cf_thorbjorg": 69,
     "cf_ragnhild": 60,
     "cf_orm": 60,
-    "cf_hildr": 72
+    "cf_hildr": 72,
+    "cf_eldmarr": 57
   }
 }

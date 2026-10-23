@@ -4227,8 +4227,9 @@ impl World {
                 self.boss_loot(&credit_id, &kind, zone, point);
             }
             self.hour_shard_drops(&kind, zone, point, &credit_id, &party);
-            let all_bosses = crate::cathedral::enemy(&self.maps[zone].final_boss).is_some()
-                || self.maps[zone].final_boss == "moonwell_echo";
+            let all_bosses = !self.maps[zone].raid
+                && (crate::cathedral::enemy(&self.maps[zone].final_boss).is_some()
+                    || self.maps[zone].final_boss == "moonwell_echo");
             if (all_bosses
                 && is_boss(&kind)
                 && self

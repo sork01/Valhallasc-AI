@@ -800,7 +800,7 @@
   // Boss mechanics (BOSSMECH-CLIENT): four short cues written in dybase2 (project "Valhalla Boss Mechanic Cues"), played through
   // the effects bus. A telegraph starts with `warn`, lands with `land`; `shield` and `broken` mark the shield going up and falling.
   const bossCueBuffers = {};
-  const BOSS_CUES = { heave: ['land', .35], chain_broken: ['broken', .35], cast: ['warn', .5], reverse: ['warn', .4], land: ['land', .6], shield: ['shield', .45], frozen: ['shield', .35], broken: ['broken', .5], down: ['land', .4], split: ['land', .4], rise: ['broken', .4] };
+  const BOSS_CUES = { chains: ['broken', .65], heat: ['land', .6], seats: ['land', .6], heave: ['land', .35], chain_broken: ['broken', .35], cast: ['warn', .5], reverse: ['warn', .4], land: ['land', .6], shield: ['shield', .45], frozen: ['shield', .35], broken: ['broken', .5], down: ['land', .4], split: ['land', .4], rise: ['broken', .4] };
   function bossMechSound(event) {
     const cue = BOSS_CUES[event?.phase];
     if (!cue || !save.sound) return;

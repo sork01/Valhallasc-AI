@@ -288,6 +288,7 @@ pub(super) struct Fight {
     enrage_floor: f64,
     banner: Option<(String, f64)>,
     stat: Option<StaticLive>,
+    eld: Option<eldmarr::Eldmarr>,
 }
 
 impl Fight {
@@ -415,6 +416,11 @@ impl World {
     /// Asked by `hit_slime` before a blow lands.
     pub(super) fn boss_incoming(&self, id: usize, damage: f64) -> Incoming {
         let Some(fight) = self.fight_of(id) else {
+            // The opening hit can precede the first mechanics tick. It must not skip the fight.
+            let s = &self.slimes[id];
+            if s.kind == "cf_eldmarr" && self.boss.table.contains_key(&s.kind) {
+                return Incoming::Damage(damage.min((s.hp - s.max_hp * 0.66).max(0.)));
+            }
             return Incoming::Damage(damage);
         };
         if let Some(sh) = &fight.shield
@@ -428,6 +434,7 @@ impl World {
         if fight.downed.contains_key(&id) {
             return Incoming::Immune;
         }
+        let damage = self.eldmarr_cap_damage(fight, id, damage);
         let mut damage =
             self.forge_cap_damage(fight, id, damage) * self.forge_incoming_scale(fight, id);
         if fight.stun_left > 0. && id == fight.boss {
@@ -755,6 +762,7 @@ impl World {
         }
         Fight {
             boss: id,
+            eld: eldmarr::Eldmarr::from_def(&def),
             zone,
             arena,
             clock: 0.,
@@ -861,6 +869,7 @@ impl World {
             let s = &mut self.slimes[id];
             s.fight = s.fight.max(fight.enrage_floor);
         }
+        self.tick_eldmarr(fight, &def, share);
         // Stun: the boss neither moves nor strikes, and takes extra damage.
         if fight.stun_left > 0. {
             fight.stun_left -= TICK;
@@ -898,6 +907,7 @@ impl World {
         let active = m.active_at(share);
         // Continuous blocks and thresholds first.
         match &m.block {
+            Block::Crack(_) | Block::Heat(_) | Block::Seats(_) => return,
             Block::Valves(_) | Block::Carry(_) => {
                 self.tick_forge_continuous(fight, i, m, share);
                 return;
@@ -2431,6 +2441,9 @@ impl World {
             let Some(def) = self.boss.table.get(&self.slimes[fight.boss].kind) else {
                 continue;
             };
+            if let Some((name, left)) = self.eldmarr_danger(fight, def, session, at, look) {
+                note(&name, left, true);
+            }
             for live in &fight.live {
                 let m = &def.mechanics[live.mech()];
                 match (live, &m.block) {
@@ -2997,6 +3010,7 @@ impl World {
             }
             self.raid_cast_view(fight, def, &mut teles, &mut cast);
             self.forge_cast_view(fight, def, &mut teles, &mut cast);
+            self.eldmarr_view(fight, def, &mut teles, &mut cast);
             let ids = |sessions: Vec<&u64>| -> Vec<String> {
                 sessions
                     .into_iter()
@@ -3006,6 +3020,7 @@ impl World {
             out.push(json!({
                 "boss": id,
                 "clock": fight.clock,
+                "throne": fight.eld.as_ref().map(|e| { let mut v=e.view(); v["arena"]=json!([fight.arena.x0,fight.arena.y0,fight.arena.x1,fight.arena.y1]); v }),
                 "cast": cast,
                 "break": brk,
                 "tele": teles,
@@ -3064,6 +3079,9 @@ mod raid_bosses;
 #[cfg(test)]
 #[path = "raid_boss_tests.rs"]
 mod raid_tests;
+
+#[path = "eldmarr.rs"]
+mod eldmarr;
 
 #[path = "forge_wardens.rs"]
 mod forge_wardens;

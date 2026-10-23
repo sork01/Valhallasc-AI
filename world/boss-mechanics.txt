@@ -166,6 +166,107 @@
       {"name": "Storm Surge", "block": "break", "at": 0.3, "cast": 8, "every": 600, "bar": 0.07, "stun": 0, "vulnerable": 0, "overload": true}
     ]
   },
+  "cf_eldmarr": {
+    "arena": [
+      95,
+      28,
+      127,
+      58
+    ],
+    "mechanics": [
+      {
+        "name": "The Forge Floor",
+        "block": "crack",
+        "stand": 3,
+        "cast": 8,
+        "lava": 40,
+        "cell": 2,
+        "hp_min": 0.66
+      },
+      {
+        "name": "Rising Heat",
+        "block": "heat",
+        "fill": 30,
+        "cool": 0.12,
+        "cast": 5,
+        "blast": 5,
+        "move_every": 30,
+        "capacity": 3,
+        "r": 2,
+        "points": [
+          [
+            103,
+            38
+          ],
+          [
+            119,
+            38
+          ],
+          [
+            103,
+            48
+          ],
+          [
+            119,
+            48
+          ]
+        ],
+        "hp_min": 0.33,
+        "hp_max": 0.66
+      },
+      {
+        "name": "A Seat for Everyone",
+        "block": "seats",
+        "cast": 9,
+        "every": 40,
+        "first": 12,
+        "r": 1.2,
+        "points": [
+          [
+            116.0,
+            43.0
+          ],
+          [
+            115.045,
+            45.939
+          ],
+          [
+            112.545,
+            47.755
+          ],
+          [
+            109.455,
+            47.755
+          ],
+          [
+            106.955,
+            45.939
+          ],
+          [
+            106.0,
+            43.0
+          ],
+          [
+            106.955,
+            40.061
+          ],
+          [
+            109.455,
+            38.245
+          ],
+          [
+            112.545,
+            38.245
+          ],
+          [
+            115.045,
+            40.061
+          ]
+        ],
+        "hp_max": 0.33
+      }
+    ]
+  },
   "cf_dagfinn": {
     "arena": [
       39,

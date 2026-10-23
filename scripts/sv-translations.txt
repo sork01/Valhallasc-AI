@@ -6860,5 +6860,22 @@
   "Wait on a tile marked 2 beside a tile marked 1. After beat 1, step onto that cleared tile before beat 2. Every new cue changes the numbers.": "Vänta på en platta med siffran 2 bredvid en platta med siffran 1. Efter slag 1 går du till den säkra plattan före slag 2. Siffrorna ändras vid varje ny förvarning.",
   "Water Carriers": "Vattenbärare",
   "Stay inside the numbered floor": "Stanna på det numrerade golvet",
-  "Stay off the red divide. If either valve is unfinished after 25 seconds, everyone falls. Beating Dagfinn opens the lift back to the entrance.": "Undvik den röda klyftan. Om någon ventil inte är klar efter 25 sekunder faller alla. När Dagfinn besegras öppnas hissen tillbaka till ingången."
+  "Stay off the red divide. If either valve is unfinished after 25 seconds, everyone falls. Beating Dagfinn opens the lift back to the entrance.": "Undvik den röda klyftan. Om någon ventil inte är klar efter 25 sekunder faller alla. När Dagfinn besegras öppnas hissen tillbaka till ingången.",
+  "A Seat for Everyone": "En plats åt alla",
+  "A Seat for Everyone: each plate saves 1 friend. Take your number in 9 seconds. Below 8%, all three dangers return faster. Seats pause and clear Heat.": "En plats åt alla: varje platta räddar 1 vän. Ta ditt nummer inom 9 sekunder. Under 8 % kommer alla tre farorna snabbare. Sittplatserna pausar och tömmer hettan.",
+  "Cold Well": "Kallbrunn",
+  "Cracking Floor": "Golvet spricker",
+  "Eldmarr has fallen. The nine chains are silent; the Chained Forge is free.": "Eldmarr har fallit. De nio kedjorna har tystnat. Kedjesmedjan är fri.",
+  "Eldmarr, the Ember-Lord": "Eldmarr, glödherren",
+  "Eldmarr, the Ember-Lord Relic": "Glödherren Eldmarrs relik",
+  "Next Cold Well": "Nästa kallbrunn",
+  "Nine Chains Break — Eldmarr Unbound": "Nio kedjor brister — Eldmarr är fri",
+  "Return to the throne hall": "Gå tillbaka till tronsalen",
+  "Rising Heat": "Stigande hetta",
+  "Rising Heat: blue wells cool 3 friends each and move every 30 seconds. Full heat gives 5 seconds to cool or explode within 5 steps.": "Stigande hetta: varje blå brunn svalkar 3 vänner. De flyttas var 30:e sekund. Vid full hetta har du 5 sekunder att svalna, annars exploderar du inom 5 steg.",
+  "Six Chains Break — The Promised Table": "Sex kedjor brister — Det utlovade bordet",
+  "The Forge Floor": "Smedjans golv",
+  "The Forge Floor: move after 3 seconds on one tile. Cracks warn for 8 seconds, then burn for 40. Rest for 10 seconds at 66% and 33%.": "Smedjans golv: flytta dig efter 3 sekunder på samma ruta. Sprickor varnar i 8 sekunder och brinner sedan i 40. Vila i 10 sekunder vid 66 % och 33 %.",
+  "The Forge Takes a Breath": "Smedjan hämtar andan",
+  "Three Chains Break — Rising Heat": "Tre kedjor brister — Stigande hetta"
 }

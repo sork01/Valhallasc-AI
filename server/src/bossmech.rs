@@ -190,6 +190,9 @@ pub enum Block {
     Grid(Grid),
     Carry(Carry),
     Reflect(Reflect),
+    Crack(Crack),
+    Heat(Heat),
+    Seats(Seats),
 }
 
 /// A standing leash: all fighters form pairs (one trio for an odd crew),
@@ -291,6 +294,39 @@ pub struct Reflect {
     pub every: f64,
     pub duration: f64,
     pub heavy: f64,
+}
+
+/// Eldmarr's persistent floor remembers actual cells stood on by living actors.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Crack {
+    pub stand: f64,
+    pub cast: f64,
+    pub lava: f64,
+    pub cell: f64,
+}
+/// Time-driven heat, with bounded cooling and a visible detonation fuse.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Heat {
+    pub fill: f64,
+    pub cool: f64,
+    pub cast: f64,
+    pub blast: f64,
+    pub move_every: f64,
+    pub capacity: usize,
+    pub r: f64,
+    pub points: Vec<[f64; 2]>,
+}
+/// Unlike safe islands, each throne plate can shelter exactly one living actor.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Seats {
+    pub cast: f64,
+    pub every: f64,
+    pub first: f64,
+    pub r: f64,
+    pub points: Vec<[f64; 2]>,
 }
 
 /// A ground shape with a cast time and an effect.
@@ -1231,6 +1267,25 @@ pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
             "{kind}: arena bounds are invalid or conflict with inner_arena"
         ));
     }
+    let eld_counts = [
+        def.mechanics
+            .iter()
+            .filter(|m| matches!(m.block, Block::Crack(_)))
+            .count(),
+        def.mechanics
+            .iter()
+            .filter(|m| matches!(m.block, Block::Heat(_)))
+            .count(),
+        def.mechanics
+            .iter()
+            .filter(|m| matches!(m.block, Block::Seats(_)))
+            .count(),
+    ];
+    if eld_counts.iter().any(|n| *n > 0) && eld_counts != [1, 1, 1] {
+        return Err(format!(
+            "{kind}: Eldmarr needs exactly one crack, heat and seats block"
+        ));
+    }
     let positive = |v: f64| v.is_finite() && v > 0.;
     for m in &def.mechanics {
         if m.name.trim().is_empty() {
@@ -1696,6 +1751,56 @@ pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
                     return bad(
                         m,
                         "reflect needs a full warning, a finite pause and a heavy hit",
+                    );
+                }
+            }
+            Block::Crack(c) => {
+                if !positive(c.stand)
+                    || !positive(c.cell)
+                    || !positive(c.lava)
+                    || !cast_is_long_enough(Effect::Kill, c.cast)
+                {
+                    return bad(
+                        m,
+                        "crack needs finite dwell/cell/lava and a full lethal warning",
+                    );
+                }
+            }
+            Block::Heat(h) => {
+                if h.points.len() != 4
+                    || !finite_points(&h.points)
+                    || h.capacity != 3
+                    || !positive(h.fill)
+                    || !positive(h.cool)
+                    || !positive(h.r)
+                    || !positive(h.blast)
+                    || !positive(h.move_every)
+                    || h.move_every < 10.
+                    || !cast_is_long_enough(Effect::Kill, h.cast)
+                {
+                    return bad(
+                        m,
+                        "heat needs four three-person wells and a full detonation warning",
+                    );
+                }
+            }
+            Block::Seats(s) => {
+                if s.points.len() != 10
+                    || !finite_points(&s.points)
+                    || !positive(s.r)
+                    || !positive(s.first)
+                    || !positive(s.every)
+                    || s.every <= s.cast
+                    || !cast_is_long_enough(Effect::KillOutside, s.cast)
+                    || s.points.iter().enumerate().any(|(i, a)| {
+                        s.points[..i]
+                            .iter()
+                            .any(|b| (a[0] - b[0]).hypot(a[1] - b[1]) <= 2. * s.r)
+                    })
+                {
+                    return bad(
+                        m,
+                        "seats need ten separate one-person plates and a full lethal warning",
                     );
                 }
             }

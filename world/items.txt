@@ -57802,6 +57802,13 @@
     "sell": 10000
   },
   {
+    "id": "cf_eldmarr_relic",
+    "name": "Eldmarr, the Ember-Lord Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
     "id": "cfpack_pants",
     "name": "Cinderwork Kiln Gaiters",
     "kind": "pants",

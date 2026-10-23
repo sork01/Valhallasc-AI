@@ -27,7 +27,38 @@ def draw(e,clip,n):
         for j in range(6):
             a.e(x+math.sin(j*.8+n*.25)*2,y-j*length/6,3.4 if j%2 else 2,2 if j%2 else 3.5,'brass')
             a.e(x+math.sin(j*.8+n*.25)*2,y-j*length/6,1.3,1.2,'iron',out=False)
-    if k=='cf_kettil':
+    if k=='cf_eldmarr':
+        # Basalt fire giant: a broken nine-link crown, furnace ribs, flame beard,
+        # stone mantle and the huge cleaver forged for his promised place.
+        def mantle(c):
+            a.band([(-28,c.top+5),(-30,c.top+23),(-21,c.top+31),(-9,c.top+19),
+                    (10,c.top+19),(22,c.top+31),(30,c.top+23),(28,c.top+5)],'iron')
+            for side in [-1,1]:
+                for j in range(4):
+                    a.c((side*(13+j*3),c.top+8),(side*(16+j*3),c.top+21+j*2),1.2,1,'fire')
+                chain(side*26,c.top+5,24)
+        def face(c):
+            x,y=c.hx,c.hy
+            a.band([(x-13,y-2),(x-12,y-14),(x-6,y-21),(x,y-17),(x+6,y-21),(x+13,y-13),(x+14,y-2)],'fire')
+            for dx in [-8,-3,3,8]:a.c((x+dx,y-4),(x+dx*.6,y-15),1.6,1,'brass')
+            for j in range(9):
+                xx=x-15+j*3.7
+                a.c((xx,y+9),(xx+(j-4)*.7,y+16+(j%3)*2),1.5,1,'iron')
+                a.e(xx+(j-4)*.7,y+17+(j%3)*2,1.3,1.8,'fire',out=False)
+            a.band([(x-14,y+8),(x+13,y+8),(x+11,y+12),(x-12,y+12)],'brass')
+            a.band([(-12,c.top-4),(12,c.top-4),(15,c.top-22),(-15,c.top-22)],'iron')
+            for row in range(3):
+                a.c((-10,c.top-8-row*5),(10,c.top-7-row*5),1.7,1.7,'fire')
+            a.c((0,c.top-5),(0,c.top-22),2,2,'brass')
+        def cleaver(c):
+            x,y=c.near;x-=4
+            a.c((x-3,y-13),(x+1,y+25),2.8,2.8,'brass')
+            a.band([(x-8,y+7),(x+12,y+10),(x+14,y+31),(x+2,y+38),(x-10,y+32)],'iron')
+            a.band([(x+7,y+12),(x+11,y+14),(x+11,y+29),(x+1,y+34),(x-5,y+30),(x-6,y+27)],'fire')
+            a.c((x-7,y+9),(x+10,y+12),1.2,1.2,'brass')
+        C.humanoid(a,'iron','fire',w=18,legh=12,th=23,hr=(13,12),armw=6,
+                   hand='iron',foot='iron',pk=.83,pre=mantle,post=face,weapon=cleaver,blush=None)
+    elif k=='cf_kettil':
         def behind(c):
             for side in [-1,1]:
                 chain(side*22,c.top+9,27)

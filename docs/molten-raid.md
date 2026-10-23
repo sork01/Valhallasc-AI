@@ -311,7 +311,7 @@ changes at each, and nine chains that break in threes (banner and sound at 66%, 
 | --- | --- | --- | --- | --- |
 | 1 | 100–66% | **The Forge Floor** | A cell stood on for 3 s cracks and becomes lava 8 s later, until it cools after 40 s. The group must keep moving and use the whole hall; a camper is the only loser. | `crack` (new) |
 | 2 | 66–33% | **Rising Heat** | Every hero's Heat meter rises over time (not from hits); four Cold Wells each cool three heroes at a time and move every 30 s. At full, the hero detonates (kill within 5 tiles). | `heat` (new) |
-| 3 | 33–0% | **A Seat for Everyone** | Every 40 s, after a 5 s warning, only the ten seat plates (radius 1.2, one hero each) are safe; the rest of the hall kills. With a hero down there is a spare seat. | `seats` (`kill_outside` with a per-plate capacity, new) |
+| 3 | 33–0% | **A Seat for Everyone** | Every 40 s, after a 9 s warning, only the ten seat plates (radius 1.2, one hero each) are safe; the rest of the hall kills. With a hero down there is a spare seat. | `seats` (`kill_outside` with a per-plate capacity, new) |
 | Enrage | below 8% | all three at 1.25 times the tempo (a later phase may combine earlier ones) | |
 
 Breathing: two safe windows between phases, no cast longer than the telegraph rule
@@ -798,3 +798,7 @@ Sigrun and her six numbered ingots are built in isolated `feat/raid-boss-4`. The
 ## 20. Wardens five through nine
 
 Dagfinn, Thorbjörg, Ragnhild, Orm and Hildr are implemented in isolated `feat/raid-bosses-5-9`. [raid-bosses-5-9.md](raid-bosses-5-9.md) records their authoritative rules, hired responses, original art, signs, rewards and focused validation. Dagfinn opens a copy-local lift; the owner's later decision supersedes the old proposal to lower lava levels. Eldmarr and the public entrance remain separate tasks.
+
+## Eldmarr implementation (2026-10-23)
+
+`RAID-BOSS-FINAL` is built on `feat/raid-eldmarr`, above Wardens 5–9 and main. See `docs/raid-eldmarr.md` for the three authoritative mechanics, phase gates, two breathing windows, final combination, editable art, Swedish, hired responses and clear rewards. The seat warning is nine seconds so every assigned plate meets the shared reachability budget. The owner will perform timing/win-rate evaluation; the 900-second target and eight-fighter loss are unmeasured, and initial health/enrage remain provisional. The public entrance stays sealed.

@@ -68,6 +68,24 @@
     const { w2s, roomAt, pos } = opts, calm = reduced();
     g.save();
     for (const f of fights) {
+      if (f.throne?.arena) {
+        const throne=f.throne, [x0,y0,x1,y1]=throne.arena, cx=(x0+x1)/2, cy=(y0+y1)/2;
+        // Nine fixed chains tell the story even with reduced motion. Broken links
+        // remain as stumps; the forge's colour changes at each health gate.
+        const phaseColours=['','#dd7950','#ffb455','#d9ae77','#ff7048'];
+        path(g,polygons({t:'rect',x0,y0,x1,y1},null),w2s);
+        g.globalAlpha=.06;g.fillStyle=phaseColours[throne.phase];g.fill();
+        for(let i=0;i<9;i++){
+          const a=i/9*Math.PI*2, broken=i<throne.broken;
+          const start=broken?.77:.28;
+          g.strokeStyle=broken?'#986d52':'#f1c88b';g.globalAlpha=broken?.55:.8;g.lineWidth=3;
+          for(let k=0;k<5;k++){
+            const r=(start+(1-start)*k/5)*12, [sx,sy]=w2s(cx+Math.cos(a)*r,cy+Math.sin(a)*r);
+            g.beginPath();g.ellipse(sx,sy,4,2.5,a,0,Math.PI*2);g.stroke();
+          }
+        }
+        g.globalAlpha=1;
+      }
       for (const tele of f.tele || []) drawTele(g, tele, t, w2s, roomAt, calm);
       for (const id of f.marked || []) { const p = pos(id); if (p) ring(g, w2s, p.x, p.y, 1.1, RED, t, calm); }
       for (const id of f.frozen || []) { const p = pos(id); if (p) ring(g, w2s, p.x, p.y, 1.2, AMBER, t, calm); }
@@ -142,7 +160,11 @@
       g.globalAlpha = 1; g.lineWidth = tele.current ? 4 : 2;
       g.strokeStyle = tele.current ? GOLD : '#a6dcff'; g.fillStyle = '#354755';
       // Iron posts and anvils remain distinct at game scale.
-      if (tele.capacity && !tele.need) {
+      if (tele.seat) {
+        // A seat plate has a backrest; it must not look like a cooling post.
+        g.fillRect(sx-11,sy-17,22,14);g.strokeRect(sx-11,sy-17,22,14);
+        g.fillRect(sx-12,sy-5,24,8);g.strokeRect(sx-12,sy-5,24,8);
+      } else if (tele.capacity && !tele.need) {
         g.fillRect(sx - 5, sy - 24, 10, 22); g.strokeRect(sx - 5, sy - 24, 10, 22);
         g.beginPath(); g.ellipse(sx, sy - 24, 8, 4, 0, 0, Math.PI * 2); g.fill(); g.stroke();
       } else {
@@ -238,6 +260,18 @@
       }
       for (const id of f.marked || []) { const p = pos(id); if (p) { const [sx, sy] = w2s(p.x, p.y, 96); label(text('Marked!'), sx, sy, 15, '#ff8d80'); } }
       for (const id of f.frozen || []) { const p = pos(id); if (p) { const [sx, sy] = w2s(p.x, p.y, 96); label(text('Frozen!'), sx, sy, 15, '#ffd070'); } }
+      if(f.throne){
+        label(fill(text('Chains broken: {0}/9'),f.throne.broken),VW/2,y+27,15,'#ffe2a0');
+        for(const tele of f.tele||[]){
+          if(typeof tele.heat!=='number')continue;
+          const p=pos(tele.bearer);if(!p)continue;
+          const [sx,sy]=w2s(p.x,p.y,132), heat=Math.round(tele.heat*100);
+          g.globalAlpha=1;g.fillStyle='#251724';g.fillRect(sx-24,sy-9,48,7);
+          g.fillStyle=heat>=80?RED:AMBER;g.fillRect(sx-24,sy-9,48*tele.heat,7);
+          label(fill(text('Heat: {0}%'),heat),sx,sy-14,13,heat>=80?'#ffaf85':'#ffe4bc');
+          if(tele.heatFuse!=null)label(fill(text('Cool down! {0}s'),left(tele).toFixed(1)),sx,sy-31,14,'#ffaf85');
+        }
+      }
       const st = f.static;
       if (st) {
         for (const [id, n] of Object.entries(st.charges || {})) {
