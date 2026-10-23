@@ -2176,7 +2176,9 @@ impl World {
                 p.dash_cd = 1.2 * p.character.cooldown_multiplier();
                 p.attack = 0.;
                 p.hurt = 0.;
-                p.stop();
+                // Shadowstep interrupts walking, but keeps the enemy selected for autoattack.
+                p.input = Point::default();
+                p.goal = None;
                 let id = p.character.id.clone();
                 let point = p.character.point();
                 self.event("shadowstep", &id, point, 0., false);
@@ -3687,7 +3689,9 @@ impl World {
                 p.dash_skill = id.to_string();
                 p.attack = 0.;
                 p.hurt = 0.;
-                p.stop();
+                // A movement skill cancels walking, but autoattack must resume on the selected enemy.
+                p.input = Point::default();
+                p.goal = None;
                 value = speed * time;
             }
             Effect::Strike { hits, mult, range } => {
@@ -11636,6 +11640,141 @@ mod tests {
     }
     fn skill(w: &mut World, id: &str) {
         w.use_skill(1, id, Point { x: 1., y: 0. });
+    }
+    #[test]
+    fn autoattack_resumes_after_every_class_skill() {
+        for def in skills::SKILLS.iter() {
+            let (class, id) = (def.class, def.id.as_str());
+            let mut w = world();
+            let mut rx = join(&mut w, 1, class);
+            let at = arena(&mut w, 99);
+            let c = &mut w.players.get_mut(&1).unwrap().character;
+            c.hp = c.max_hp() * 0.4; // Healing skills must have someone to heal.
+            w.maps[0].objects.clear();
+            put(&mut w, 0, at, if class.ranged() { 4. } else { 1.2 }, 0.);
+            w.message(1, ClientMessage::Target { id: 0 });
+            w.update_player(1);
+            assert!(w.players[&1].cooldown > 0., "{id}: autoattack started");
+            // Cast during the basic attack, then release every key. No second skill or click.
+            w.message(
+                1,
+                ClientMessage::Skill {
+                    id: id.into(),
+                    fx: 1.,
+                    fy: 0.,
+                },
+            );
+            w.message(1, ClientMessage::Input { dx: 0., dy: 0. });
+            assert!(
+                w.players[&1].skill_cd.contains_key(id),
+                "{id}: cast succeeded"
+            );
+            while rx.try_recv().is_ok() {}
+            for _ in 0..80 {
+                w.update_player(1);
+            }
+            let shots = events(&mut rx, if class.ranged() { "cast" } else { "swing" }).len();
+            assert!(
+                shots >= 2,
+                "{id}: expected repeated basic attacks after the skill, got {shots}"
+            );
+            assert_eq!(w.players[&1].target, Some(0), "{id}: target kept");
+        }
+    }
+    #[test]
+    fn movement_skills_keep_autoattack_target_until_manually_cancelled() {
+        for (class, id) in [
+            (Class::Hunter, "rollaway"),
+            (Class::Mage, "blink"),
+            (Class::Warrior, "charge"),
+            (Class::Assassin, "lunge"),
+            (Class::Assassin, "shadowstep"),
+        ] {
+            for cancel in [
+                ClientMessage::Stop,
+                ClientMessage::Input { dx: 1., dy: 0. },
+                ClientMessage::Move { x: 60., y: 60. },
+            ] {
+                let mut w = world();
+                let mut rx = join(&mut w, 1, class);
+                let at = arena(&mut w, 99);
+                w.maps[0].objects.clear();
+                put(&mut w, 0, at, 4., 0.);
+                w.message(1, ClientMessage::Target { id: 0 });
+                if id == "shadowstep" {
+                    w.message(1, ClientMessage::Dash { dx: 1., dy: 0. });
+                } else {
+                    skill(&mut w, id);
+                }
+                assert!(w.players[&1].dash > 0., "{id}: skill started");
+                assert_eq!(w.players[&1].target, Some(0), "{id}: target kept");
+                assert!(w.players[&1].goal.is_none());
+                assert_eq!(w.players[&1].input.x, 0.);
+                while rx.try_recv().is_ok() {}
+                w.message(1, cancel);
+                for _ in 0..30 {
+                    w.update_player(1);
+                }
+                assert!(
+                    w.players[&1].target.is_none(),
+                    "{id}: manual cancellation wins"
+                );
+                assert!(
+                    w.bolts.is_empty(),
+                    "{id}: no unwanted basic arrows after cancellation"
+                );
+                assert!(
+                    events(&mut rx, if class.ranged() { "cast" } else { "swing" }).is_empty(),
+                    "{id}: no basic attacks after cancellation"
+                );
+            }
+        }
+    }
+    #[test]
+    fn assassin_shadowstep_resumes_autoattack() {
+        let mut w = world();
+        let mut rx = join(&mut w, 1, Class::Assassin);
+        let at = arena(&mut w, 99);
+        w.maps[0].objects.clear();
+        put(&mut w, 0, at, 1.2, 0.);
+        w.message(1, ClientMessage::Target { id: 0 });
+        w.update_player(1);
+        w.message(1, ClientMessage::Dash { dx: 1., dy: 0. });
+        assert!(w.players[&1].dash > 0.);
+        while rx.try_recv().is_ok() {}
+        for _ in 0..80 {
+            w.update_player(1);
+        }
+        assert_eq!(w.players[&1].target, Some(0));
+        assert!(
+            events(&mut rx, "swing").len() >= 2,
+            "Shadowstep must resume repeated basic attacks"
+        );
+    }
+    #[test]
+    fn hunter_rollaway_never_acquires_an_unselected_or_dead_target() {
+        let mut w = world();
+        let _rx = join(&mut w, 1, Class::Hunter);
+        let at = arena(&mut w, 99);
+        w.maps[0].objects.clear();
+        put(&mut w, 0, at, 4., 0.);
+        skill(&mut w, "rollaway");
+        for _ in 0..30 {
+            w.update_player(1);
+        }
+        assert!(
+            w.bolts.is_empty(),
+            "rolling without a target starts no attack"
+        );
+        w.message(1, ClientMessage::Target { id: 0 });
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        skill(&mut w, "rollaway");
+        w.slimes[0].dead = true;
+        for _ in 0..30 {
+            w.update_player(1);
+        }
+        assert!(w.players[&1].target.is_none(), "dead target is dropped");
+        assert!(w.bolts.is_empty(), "no basic arrows at a dead target");
     }
     #[test]
     fn reworked_high_level_skills_have_different_combat_shapes() {
