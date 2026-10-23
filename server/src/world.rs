@@ -288,19 +288,26 @@ struct Player {
     frozen: bool,
 }
 impl Player {
-    // Called once when hp reaches 0: the XP penalty, then a notice naming what it cost.
+    // Called once when hp reaches 0: a death wears the worn gear down (docs/durability.md) and costs no XP. Mercenaries
+    // and ambient adventurers have no durability. The notice says what happened to the gear.
     fn apply_death_penalty(&mut self) {
-        let (lost, levels) = self.character.lose_death_xp();
+        let wear = if self.merc.is_some() || self.ambient.is_some() {
+            DeathWear::default()
+        } else {
+            self.character.wear_worn_gear()
+        };
         self.character.mounted = false;
         self.character.resource = Some(0.);
         self.combat_left = 0.;
-        let text = if levels > 0 {
+        let text = if wear.broken > 0 {
             format!(
-                "You lost {lost} XP and dropped to level {}.",
-                self.character.level
+                "Your gear lost durability. Broken pieces: {}. Repair them at a smith.",
+                wear.broken
             )
+        } else if wear.worn > 0 {
+            "Your gear lost durability. Repair it at a smith.".to_owned()
         } else {
-            format!("You lost {lost} XP.")
+            "You died.".to_owned()
         };
         let _ = self
             .peer
@@ -2368,7 +2375,7 @@ impl World {
         let mut levels = 0;
         let mut stats_changed = false;
         let mut quest_changed = offer_id.is_none()
-            && npc.id == "gearwright"
+            && (npc.id == "gearwright" || npc.offers.iter().any(|o| o.id == "repair"))
             && p.character.materialize_gear_instances();
         let mut gear_preview = serde_json::Value::Null;
         if let Some(id) = offer_id {
@@ -2376,6 +2383,7 @@ impl World {
                 && !id.starts_with("merge_")
                 && !id.starts_with("refine_")
                 && !id.starts_with("prefer_copy:")
+                && !id.starts_with("repair")
             {
                 // Reply so a pending client button is never left disabled.
                 notice = "Please wait a moment before trying again.".into();
@@ -2394,6 +2402,29 @@ impl World {
                         }
                     } else {
                         notice = "Invalid gear copy ID.".into();
+                    }
+                } else if id == "repair_all" || id.starts_with("repair:") {
+                    if !npc.offers.iter().any(|o| o.id == "repair") {
+                        notice = "This townsperson does not repair gear.".into();
+                    } else if p.combat_left > 0. {
+                        notice = "Leave combat before repairing gear.".into();
+                    } else {
+                        let only = id.strip_prefix("repair:").map(str::parse::<u64>);
+                        match only {
+                            Some(Err(_)) => notice = "Invalid gear copy ID.".into(),
+                            _ => match p.character.repair_gear(only.and_then(Result::ok)) {
+                                Ok((pieces, gold)) => {
+                                    quest_changed = true;
+                                    stats_changed = true;
+                                    notice = if pieces == 1 {
+                                        format!("Repaired one piece for {gold} gold.")
+                                    } else {
+                                        format!("Repaired {pieces} pieces for {gold} gold.")
+                                    };
+                                }
+                                Err(text) => notice = text.into(),
+                            },
+                        }
                     }
                 } else if let Some(action) = id.strip_prefix("merge_preview:") {
                     if !npc.offers.iter().any(|o| o.id == "merge") {
@@ -2670,7 +2701,7 @@ impl World {
         }
         let _ = p
             .peer
-            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(raid_support.snapshot(p)) } else { None },"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(raid_support.snapshot(p)) } else { None },"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"repairQuote":p.character.repair_quote(),"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         let actor = p.character.id.clone();
         let point = p.character.point();
         if levels > 0 {
@@ -13299,6 +13330,7 @@ mod tests {
             rank: 0,
             trade_until: 0,
             trade_with: vec![],
+            wear: 0,
         };
         w.loot_drop_with_gear(&owner, zone, at, &base.id, Some(gear));
         w.drops.last_mut().unwrap().t = 1.;
@@ -13488,50 +13520,127 @@ mod tests {
         assert!(w.god_mode);
     }
 
+    // ----- durability (docs/durability.md) -----
+    fn wear_necklace(w: &mut World, wear: u8) {
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.add_item("necklace_upgrade", 1);
+        c.equipment
+            .insert("necklace".into(), "necklace_upgrade".into());
+        c.materialize_gear_instances();
+        c.gear_instances
+            .iter_mut()
+            .find(|g| g.item == "necklace_upgrade")
+            .unwrap()
+            .wear = wear;
+    }
+    fn necklace_wear(w: &World) -> u8 {
+        ch(w)
+            .gear_instances
+            .iter()
+            .find(|g| g.item == "necklace_upgrade")
+            .unwrap()
+            .wear
+    }
+    fn notices(rx: &mut mpsc::Receiver<Value>) -> Vec<String> {
+        packets(rx, "notice")
+            .iter()
+            .filter_map(|v| v["text"].as_str().map(str::to_owned))
+            .collect()
+    }
+
     #[test]
-    fn dying_costs_a_third_of_the_level_and_can_lower_it() {
+    fn dying_wears_the_worn_gear_and_costs_no_xp_or_level() {
         let (mut w, mut rx) = debug_world();
-        dbg(&mut w, DebugCommand::SetLevel { level: 5 }).unwrap();
-        let need = ch(&w).xp_need();
-        w.players.get_mut(&1).unwrap().character.xp = need / 2;
+        dbg(&mut w, DebugCommand::SetLevel { level: 20 }).unwrap();
+        w.players.get_mut(&1).unwrap().character.xp = 10;
+        wear_necklace(&mut w, 0);
         drain(&mut rx);
         dbg(&mut w, DebugCommand::Die).unwrap();
-        assert_eq!((ch(&w).level, ch(&w).xp), (5, need / 2 - need / 3));
-        let text = drain(&mut rx)
-            .iter()
-            .find(|v| v["type"] == "notice")
-            .map(|v| v["text"].to_string())
-            .unwrap();
-        assert!(text.contains(&format!("{} XP", need / 3)), "{text}");
-
-        // Not enough on the bar: the rest comes out of the previous level.
+        assert_eq!((ch(&w).level, ch(&w).xp), (20, 10), "a death takes no XP");
+        assert_eq!(necklace_wear(&w), 10);
+        let text = notices(&mut rx).join("|");
+        assert!(text.contains("lost durability"), "{text}");
+        assert!(!text.contains("XP"), "{text}");
+        // An empty bar at level 1 loses nothing either.
         dbg(&mut w, DebugCommand::SetHp { hp: 1e9 }).unwrap();
-        w.players.get_mut(&1).unwrap().character.xp = 10;
+        dbg(&mut w, DebugCommand::SetLevel { level: 1 }).unwrap();
+        w.players.get_mut(&1).unwrap().character.xp = 0;
         dbg(&mut w, DebugCommand::Die).unwrap();
-        let c = ch(&w);
-        assert_eq!(c.level, 4);
-        assert_eq!(c.xp, c.xp_need() - (need / 3 - 10));
-        assert!(
-            drain(&mut rx)
-                .iter()
-                .any(|v| v["text"].as_str().is_some_and(|t| t.contains("level 4")))
+        assert_eq!((ch(&w).level, ch(&w).xp), (1, 0));
+        assert_eq!(necklace_wear(&w), 20);
+    }
+
+    #[test]
+    fn the_tenth_death_names_the_broken_pieces_and_they_stay_worn() {
+        let (mut w, mut rx) = debug_world();
+        wear_necklace(&mut w, 90);
+        drain(&mut rx);
+        dbg(&mut w, DebugCommand::Die).unwrap();
+        assert_eq!(necklace_wear(&w), 100);
+        let text = notices(&mut rx).join("|");
+        assert!(text.contains("Broken pieces: 1"), "{text}");
+        assert_eq!(
+            ch(&w).equipment.get("necklace").map(String::as_str),
+            Some("necklace_upgrade")
         );
     }
 
     #[test]
-    fn death_penalty_stops_at_level_one_with_no_xp() {
+    fn mercenaries_and_adventurers_have_no_durability() {
         let (mut w, _rx) = debug_world();
+        wear_necklace(&mut w, 0);
+        w.players.get_mut(&1).unwrap().merc = Some("owner".into());
+        dbg(&mut w, DebugCommand::Die).unwrap();
+        assert_eq!(necklace_wear(&w), 0);
+    }
+
+    #[test]
+    fn a_hub_smith_repairs_for_gold_but_not_in_combat_and_others_do_not() {
+        let (mut w, mut rx) = debug_world();
+        wear_necklace(&mut w, 40);
         let c = &mut w.players.get_mut(&1).unwrap().character;
-        c.level = 1;
-        c.xp = 20;
-        assert_eq!(c.lose_death_xp(), (33, 0));
-        assert_eq!((c.level, c.xp), (1, 0));
-        c.level = 2;
-        c.xp = 0;
-        let (_, levels) = c.lose_death_xp();
-        assert_eq!(levels, 1);
-        assert_eq!(c.level, 1);
-        assert_eq!(c.xp, c.xp_need() - 66);
+        c.gold = 100;
+        c.x = 31.;
+        c.y = 88.;
+        w.players.get_mut(&1).unwrap().combat_left = 5.;
+        drain(&mut rx);
+        w.interact(1, "smith", Some("repair_all"));
+        assert_eq!((necklace_wear(&w), ch(&w).gold), (40, 100));
+        let packet = packets(&mut rx, "dialogue").pop().unwrap();
+        assert_eq!(packet["notice"], "Leave combat before repairing gear.");
+        assert_eq!(packet["repairQuote"][0][1], 24, "{packet}");
+
+        w.players.get_mut(&1).unwrap().combat_left = 0.;
+        w.time += 1.;
+        w.interact(1, "smith", Some("repair_all"));
+        assert_eq!((necklace_wear(&w), ch(&w).gold), (0, 76));
+        let packet = packets(&mut rx, "dialogue").pop().unwrap();
+        assert_eq!(packet["notice"], "Repaired one piece for 24 gold.");
+
+        // A townsperson without the offer refuses.
+        wear_necklace(&mut w, 40);
+        let c = &mut w.players.get_mut(&1).unwrap().character;
+        c.x = 30.;
+        c.y = 78.5;
+        w.time += 1.;
+        w.interact(1, "healer", Some("repair_all"));
+        assert_eq!(necklace_wear(&w), 40);
+        let packet = packets(&mut rx, "dialogue").pop().unwrap();
+        assert_eq!(packet["notice"], "This townsperson does not repair gear.");
+    }
+
+    #[test]
+    fn every_hub_smith_offers_repair() {
+        let w = world();
+        for (zone, npc) in [
+            (0, "smith"),
+            (4, "city_smith"),
+            (9, "nacre_smith"),
+            (17, "asterion_smith"),
+        ] {
+            let found = w.maps[zone].npcs.iter().find(|n| n.id == npc).unwrap();
+            assert!(found.offers.iter().any(|o| o.id == "repair"), "{npc}");
+        }
     }
 
     // ----- food and potions -----

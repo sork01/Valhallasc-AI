@@ -91,6 +91,7 @@ pub fn copy(piece: &Item, mut random: impl FnMut() -> f64) -> GearInstance {
         rank: 0,
         trade_until: 0,
         trade_with: vec![],
+        wear: 0,
     }
 }
 

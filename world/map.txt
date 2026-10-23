@@ -2904,6 +2904,11 @@
           "item": "cloak_l5_rare",
           "tiered": true,
           "cost": 384
+        },
+        {
+          "id": "repair",
+          "label": "Repair worn gear",
+          "cost": 0
         }
       ],
       "buys": true
@@ -26214,6 +26219,11 @@
               "label": "Replace and fit starter gear",
               "cost": 0,
               "gear": true
+            },
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -66327,6 +66337,11 @@
               "label": "Replace and fit starter gear",
               "cost": 0,
               "gear": true
+            },
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
             }
           ],
           "buys": false,
@@ -108404,6 +108419,11 @@
               "label": "Replace and fit starter gear",
               "cost": 0,
               "gear": true
+            },
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
             }
           ],
           "buys": false

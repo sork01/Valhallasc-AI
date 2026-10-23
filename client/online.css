@@ -915,3 +915,21 @@
 .gmtest-row label:first-child { flex: 0 0 8.5rem; }
 .gmtest-status { margin: 0; min-height: 1.4em; font-size: .85em; }
 .gmtest-status[data-bad="true"] { color: #ff9a8a; }
+
+/* Gear durability (docs/durability.md): a bar under each worn slot and a line on the tooltip. */
+.equipped-slot::after { content: ''; position: absolute; left: .5cqw; right: .5cqw; bottom: -.1cqw; height: .3cqw; border-radius: 2px; display: none; pointer-events: none; background: linear-gradient(90deg, var(--cond, #e0c46a) calc(var(--dur, 100) * 1%), #0009 0); }
+.equipped-slot[data-condition="worn"]::after, .equipped-slot[data-condition="low"]::after, .equipped-slot[data-condition="broken"]::after { display: block; }
+.equipped-slot[data-condition="worn"] { --cond: #e0c46a; }
+.equipped-slot[data-condition="low"] { --cond: #ff9a3c; }
+.equipped-slot[data-condition="broken"] { --cond: #ff4d4d; }
+.equipped-slot[data-condition="broken"] .gear-icon { border-color: #ff4d4d; opacity: .6; }
+.item-durability { font-size: 12px; line-height: 1.35; color: #e0c46a; }
+.item-durability[data-state="low"] { color: #ff9a3c; }
+.item-durability[data-state="broken"] { color: #ff6b6b; font-weight: 700; }
+.repair-row { display: flex; align-items: center; gap: .6em; flex-wrap: wrap; margin: .3em 0; }
+.repair-row .repair-name { flex: 1 1 10em; min-width: 0; overflow-wrap: anywhere; }
+.repair-row[data-state="broken"] .repair-name { color: #ff6b6b; }
+.repair-row[data-state="low"] .repair-name { color: #ff9a3c; }
+
+.bags-open[data-gear="low"]::after, .bags-open[data-gear="broken"]::after { content: '!'; position: absolute; right: -.5cqw; top: -.6cqw; width: 1.6cqw; height: 1.6cqw; border-radius: 50%; display: grid; place-items: center; font: 700 1.1cqw sans-serif; color: #1b1306; background: #ff9a3c; pointer-events: none; }
+.bags-open[data-gear="broken"]::after { background: #ff4d4d; color: #fff; }

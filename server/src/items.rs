@@ -5,7 +5,7 @@ use std::sync::LazyLock;
 #[cfg(test)]
 mod cloak_tests;
 mod gear_services;
-pub use gear_services::GearInstance;
+pub use gear_services::{DeathWear, GearInstance};
 mod orange;
 pub mod raid_rewards;
 #[cfg(test)]
@@ -231,6 +231,7 @@ pub fn set_piece_copy(piece: &Item, roll: f64) -> Option<GearInstance> {
         rank: 0,
         trade_until: 0,
         trade_with: vec![],
+        wear: 0,
     })
 }
 /// One independent bag roll per enemy defeat, including elites and dungeon bosses.
@@ -1143,8 +1144,12 @@ impl Character {
     pub fn set_counts(&self) -> std::collections::BTreeMap<String, usize> {
         let mut kinds =
             std::collections::BTreeMap::<String, std::collections::BTreeSet<String>>::new();
+        let mut occurrences = std::collections::BTreeMap::<&str, usize>::new();
         for piece in self.worn_items() {
-            let Some(source) = piece.source.as_deref() else {
+            let occurrence = occurrences.entry(&piece.id).or_default();
+            let broken = self.worn_broken(&piece.id, *occurrence);
+            *occurrence += 1;
+            let Some(source) = piece.source.as_deref().filter(|_| !broken) else {
                 continue;
             };
             if piece.kind == "cloak"
@@ -1183,7 +1188,14 @@ impl Character {
             let occurrence = occurrences.entry(&i.id).or_default();
             let stats = self.worn_gear_instance(&i.id, *occurrence).map_or_else(
                 || i.bonus_stats.clone(),
-                GearInstance::effective_bonus_stats,
+                |copy| {
+                    // A broken piece is still worn but gives nothing.
+                    if copy.broken() {
+                        Attributes::default()
+                    } else {
+                        copy.effective_bonus_stats()
+                    }
+                },
             );
             *occurrence += 1;
             bonus.strength = bonus.strength.saturating_add(stats.strength);
@@ -1496,8 +1508,14 @@ impl Character {
         {
             let occurrence = occurrences.entry(&i.id).or_default();
             if let Some(copy) = self.worn_gear_instance(&i.id, *occurrence) {
-                attack += copy.effective_attack() - i.attack;
-                defense += copy.effective_defense() - i.defense;
+                if copy.broken() {
+                    // The catalog values were added above and in `Look::stats`; a broken piece takes them back.
+                    attack -= i.attack;
+                    defense -= i.defense;
+                } else {
+                    attack += copy.effective_attack() - i.attack;
+                    defense += copy.effective_defense() - i.defense;
+                }
             }
             *occurrence += 1;
         }

@@ -396,5 +396,14 @@
   "Fight must be 1-{0}.": "Striden måste vara 1–{0}.",
   "There is no gauntlet quest at level {0}.": "Det finns inget gauntlet-uppdrag på nivå {0}.",
   "This dungeon has {0} packs.": "Den här dungeonen har {0} flockar.",
-  "Unknown multiplier {0}.": "Okänd multiplikator {0}."
+  "Unknown multiplier {0}.": "Okänd multiplikator {0}.",
+  " · {0}% durability": " · {0}% hållbarhet",
+  "Durability {0}%": "Hållbarhet {0}%",
+  "Repair all · {0} gold": "Reparera allt · {0} guld",
+  "Repair · {0} gold": "Reparera · {0} guld",
+  "Repaired one piece for {0} gold.": "Reparerade ett föremål för {0} guld.",
+  "Repaired {0} pieces for {1} gold.": "Reparerade {0} föremål för {1} guld.",
+  "You need {0} more gold to repair everything.": "Du behöver {0} guld till för att reparera allt.",
+  "Your gear lost durability. Broken pieces: {0}. Repair them at a smith.": "Din utrustning har tappat hållbarhet. Trasiga föremål: {0}. Reparera dem hos en smed.",
+  "{0} · rank {1} · {2}{3}": "{0} · grad {1} · {2}{3}"
 }
