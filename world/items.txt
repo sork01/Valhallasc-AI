@@ -57188,6 +57188,578 @@
     "sell": 2500
   },
   {
+    "id": "chainforged_warrior_armor",
+    "name": "Chainforged Warrior Furnace Harness",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 22,
+    "defense": 86,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "warrior",
+    "variant": "chainforged_warrior_armor",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_warrior_headgear",
+    "name": "Chainforged Warrior Vent Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "warrior",
+    "variant": "chainforged_warrior_headgear",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_warrior_shoulders",
+    "name": "Chainforged Warrior Anvil Pauldrons",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "warrior",
+    "variant": "chainforged_warrior_shoulders",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_warrior_gloves",
+    "name": "Chainforged Warrior Ratchet Gauntlets",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "warrior",
+    "variant": "chainforged_warrior_gloves",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_warrior_weapon",
+    "name": "Chainsplitter",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 113,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "warrior",
+    "variant": "chainforged_warrior_weapon",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_mage_armor",
+    "name": "Chainforged Mage Furnace Harness",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 22,
+    "defense": 86,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "mage",
+    "variant": "chainforged_mage_armor",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_mage_headgear",
+    "name": "Chainforged Mage Vent Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "mage",
+    "variant": "chainforged_mage_headgear",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_mage_shoulders",
+    "name": "Chainforged Mage Anvil Pauldrons",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "mage",
+    "variant": "chainforged_mage_shoulders",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_mage_gloves",
+    "name": "Chainforged Mage Ratchet Gauntlets",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "mage",
+    "variant": "chainforged_mage_gloves",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_mage_weapon",
+    "name": "Cinderwake Staff",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 113,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "mage",
+    "variant": "chainforged_mage_weapon",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_assassin_armor",
+    "name": "Chainforged Assassin Furnace Harness",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 22,
+    "defense": 86,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "assassin",
+    "variant": "chainforged_assassin_armor",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_assassin_headgear",
+    "name": "Chainforged Assassin Cinder Hood",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "assassin",
+    "variant": "chainforged_assassin_headgear",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_assassin_shoulders",
+    "name": "Chainforged Assassin Anvil Pauldrons",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "assassin",
+    "variant": "chainforged_assassin_shoulders",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_assassin_gloves",
+    "name": "Chainforged Assassin Ratchet Gauntlets",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "assassin",
+    "variant": "chainforged_assassin_gloves",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_assassin_weapon",
+    "name": "Twin Embertongs",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 113,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "assassin",
+    "variant": "chainforged_assassin_weapon",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_priest_armor",
+    "name": "Chainforged Priest Furnace Harness",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 22,
+    "defense": 86,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "priest",
+    "variant": "chainforged_priest_armor",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_priest_headgear",
+    "name": "Chainforged Priest Vent Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "priest",
+    "variant": "chainforged_priest_headgear",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_priest_shoulders",
+    "name": "Chainforged Priest Anvil Pauldrons",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "priest",
+    "variant": "chainforged_priest_shoulders",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_priest_gloves",
+    "name": "Chainforged Priest Ratchet Gauntlets",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "priest",
+    "variant": "chainforged_priest_gloves",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_priest_weapon",
+    "name": "Bellows Censer",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 113,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "priest",
+    "variant": "chainforged_priest_weapon",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_hunter_armor",
+    "name": "Chainforged Hunter Furnace Harness",
+    "kind": "armor",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 22,
+    "defense": 86,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "hunter",
+    "variant": "chainforged_hunter_armor",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_hunter_headgear",
+    "name": "Chainforged Hunter Vent Crown",
+    "kind": "headgear",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "hunter",
+    "variant": "chainforged_hunter_headgear",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_hunter_shoulders",
+    "name": "Chainforged Hunter Anvil Pauldrons",
+    "kind": "shoulders",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "hunter",
+    "variant": "chainforged_hunter_shoulders",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_hunter_gloves",
+    "name": "Chainforged Hunter Ratchet Gauntlets",
+    "kind": "gloves",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "hunter",
+    "variant": "chainforged_hunter_gloves",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_hunter_weapon",
+    "name": "Chainbow",
+    "kind": "weapon",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 113,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": "hunter",
+    "variant": "chainforged_hunter_weapon",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_pants",
+    "name": "Chainforged Shackle Greaves",
+    "kind": "pants",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 8,
+    "defense": 29,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "chainforged_pants",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_necklace",
+    "name": "Chainforged Broken Link",
+    "kind": "necklace",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 57,
+    "defense": 14,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "chainforged_necklace",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_accessory",
+    "name": "Chainforged Crucible Seal",
+    "kind": "accessory",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 43,
+    "defense": 11,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "chainforged_accessory",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "chainforged_cloak",
+    "name": "Chainforged Nine-chain Cloak",
+    "kind": "cloak",
+    "rarity": "legendary",
+    "requiredLevel": 99,
+    "sell": 9152,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "stamina": 142,
+      "accuracy": 19,
+      "dexterity": 67
+    },
+    "class": null,
+    "variant": "chainforged_cloak",
+    "art": "regearchainforged",
+    "source": "chained_forge"
+  },
+  {
+    "id": "cf_kettil_relic",
+    "name": "Kettil Linkbearer Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
+    "id": "cf_ysolt_relic",
+    "name": "Ysolt Bellowsmaid Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
+    "id": "cf_hallgrim_relic",
+    "name": "Hallgrim Anvilhand Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
     "id": "cfpack_pants",
     "name": "Cinderwork Kiln Gaiters",
     "kind": "pants",

@@ -13,7 +13,7 @@ impl RaidSupport {
     }
 
     pub(super) fn taken_multiplier(self) -> f64 {
-        1. - self.others as f64 * 0.01
+        1. - self.others as f64 * 0.05
     }
 
     pub(super) fn snapshot(self, player: &Player) -> Value {
@@ -23,7 +23,7 @@ impl RaidSupport {
             view["raidSupport"] = json!({
                 "others":self.others,
                 "attackPercent":self.others * 50,
-                "damageReductionPercent":self.others,
+                "damageReductionPercent":self.others * 5,
             });
         }
         view

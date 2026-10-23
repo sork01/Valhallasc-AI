@@ -1228,6 +1228,42 @@
     "accessory_regearcfpack": {
       "png": "hunter_f_progression_accessory_regearcfpack.png",
       "depth": "hunter_f_progression_accessory_regearcfpack_depth.png"
+    },
+    "armor_regearchainforged": {
+      "png": "hunter_f_progression_armor_regearchainforged.png",
+      "depth": "hunter_f_progression_armor_regearchainforged_depth.png"
+    },
+    "head_regearchainforged": {
+      "png": "hunter_f_progression_head_regearchainforged.png",
+      "depth": "hunter_f_progression_head_regearchainforged_depth.png"
+    },
+    "shoulders_regearchainforged": {
+      "png": "hunter_f_progression_shoulders_regearchainforged.png",
+      "depth": "hunter_f_progression_shoulders_regearchainforged_depth.png"
+    },
+    "gloves_regearchainforged": {
+      "png": "hunter_f_progression_gloves_regearchainforged.png",
+      "depth": "hunter_f_progression_gloves_regearchainforged_depth.png"
+    },
+    "weapon_regearchainforged": {
+      "png": "hunter_f_progression_weapon_regearchainforged.png",
+      "depth": "hunter_f_progression_weapon_regearchainforged_depth.png"
+    },
+    "pants_regearchainforged": {
+      "png": "hunter_f_progression_pants_regearchainforged.png",
+      "depth": "hunter_f_progression_pants_regearchainforged_depth.png"
+    },
+    "necklace_regearchainforged": {
+      "png": "hunter_f_progression_necklace_regearchainforged.png",
+      "depth": "hunter_f_progression_necklace_regearchainforged_depth.png"
+    },
+    "accessory_regearchainforged": {
+      "png": "hunter_f_progression_accessory_regearchainforged.png",
+      "depth": "hunter_f_progression_accessory_regearchainforged_depth.png"
+    },
+    "cloak_regearchainforged": {
+      "png": "hunter_f_progression_cloak_regearchainforged.png",
+      "depth": "hunter_f_progression_cloak_regearchainforged_depth.png"
     }
   },
   "gender": "female",
@@ -1541,6 +1577,8 @@
     "accessory_regearamber",
     "accessory_regearastro",
     "accessory_regearbloom",
+    "accessory_regearcfpack",
+    "accessory_regearchainforged",
     "accessory_regearcloister",
     "accessory_regearelder",
     "accessory_regeareye",
@@ -1575,6 +1613,7 @@
     "armor_regearamber",
     "armor_regearastro",
     "armor_regearbloom",
+    "armor_regearchainforged",
     "armor_regearcloister",
     "armor_regearelder",
     "armor_regeareye",
@@ -1609,11 +1648,13 @@
     "cloak_ember",
     "cloak_hooded",
     "cloak_mantle",
+    "cloak_regearchainforged",
     "cloak_travel",
     "gloves_fatewoven",
     "gloves_regearamber",
     "gloves_regearastro",
     "gloves_regearbloom",
+    "gloves_regearchainforged",
     "gloves_regearcloister",
     "gloves_regearelder",
     "gloves_regeareye",
@@ -1648,6 +1689,7 @@
     "head_regearamber",
     "head_regearastro",
     "head_regearbloom",
+    "head_regearchainforged",
     "head_regearcloister",
     "head_regearelder",
     "head_regeareye",
@@ -1682,6 +1724,8 @@
     "necklace_regearamber",
     "necklace_regearastro",
     "necklace_regearbloom",
+    "necklace_regearcfpack",
+    "necklace_regearchainforged",
     "necklace_regearcloister",
     "necklace_regearelder",
     "necklace_regeareye",
@@ -1715,6 +1759,8 @@
     "pants_regearamber",
     "pants_regearastro",
     "pants_regearbloom",
+    "pants_regearcfpack",
+    "pants_regearchainforged",
     "pants_regearcloister",
     "pants_regearelder",
     "pants_regeareye",
@@ -1749,6 +1795,7 @@
     "shoulders_regearamber",
     "shoulders_regearastro",
     "shoulders_regearbloom",
+    "shoulders_regearchainforged",
     "shoulders_regearcloister",
     "shoulders_regearelder",
     "shoulders_regeareye",
@@ -1783,6 +1830,7 @@
     "weapon_regearamber",
     "weapon_regearastro",
     "weapon_regearbloom",
+    "weapon_regearchainforged",
     "weapon_regearcloister",
     "weapon_regearelder",
     "weapon_regeareye",
@@ -1812,10 +1860,7 @@
     "weapon_regearsolstice",
     "weapon_regearspan",
     "weapon_regearthunder",
-    "weapon_regearvault",
-    "accessory_regearcfpack",
-    "necklace_regearcfpack",
-    "pants_regearcfpack"
+    "weapon_regearvault"
   ],
   "gearSprites": {
     "pants_regearl50": {
@@ -10425,6 +10470,528 @@
           "offset": [
             55,
             56
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "armor_regearchainforged": {
+      "idle": [
+        {
+          "id": "430dccefed50bf57",
+          "offset": [
+            58,
+            49
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "3bc370edc077095e",
+          "offset": [
+            57,
+            48
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "9dbe39c79d14f34f",
+          "offset": [
+            57,
+            42
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "b41be0b7225d62f9",
+          "offset": [
+            55,
+            49
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "937cf16a2eca8fe1",
+          "offset": [
+            49,
+            49
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "head_regearchainforged": {
+      "idle": [
+        {
+          "id": "4dff7f6510702618",
+          "offset": [
+            53,
+            14
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "5fbe9c83a81e34b7",
+          "offset": [
+            38,
+            9
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "c05bbd1b496b73c9",
+          "offset": [
+            47,
+            12
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "3036d3a5fa8c1ff5",
+          "offset": [
+            38,
+            9
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "3f8f22e958a9a867",
+          "offset": [
+            58,
+            8
+          ],
+          "frameCount": 32,
+          "start": 0
+        },
+        {
+          "id": "6b374290da733b77",
+          "offset": [
+            10,
+            8
+          ],
+          "frameCount": 32,
+          "start": 32
+        }
+      ]
+    },
+    "shoulders_regearchainforged": {
+      "idle": [
+        {
+          "id": "c1a017918f09f705",
+          "offset": [
+            47,
+            18
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "fe0dd17edad30543",
+          "offset": [
+            45,
+            18
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "67e4544dc80f343e",
+          "offset": [
+            46,
+            18
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "c7a3d7c1f86c07fd",
+          "offset": [
+            45,
+            18
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "49bf312a5bb96c1e",
+          "offset": [
+            22,
+            18
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "gloves_regearchainforged": {
+      "idle": [
+        {
+          "id": "13f6a038a4b658ce",
+          "offset": [
+            54,
+            49
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "abffc8c66db8f359",
+          "offset": [
+            52,
+            45
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "ef4b2e4c70da4438",
+          "offset": [
+            42,
+            38
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "2b360052d2dcbda6",
+          "offset": [
+            52,
+            47
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "ddf78b517c4d1ec8",
+          "offset": [
+            46,
+            48
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "weapon_regearchainforged": {
+      "idle": [
+        {
+          "id": "5eb577dcba4fa1f0",
+          "offset": [
+            55,
+            40
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "505b2faa9c093068",
+          "offset": [
+            51,
+            38
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "f67e35607dfa68d8",
+          "offset": [
+            25,
+            19
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "5f5cc7cb24b1d534",
+          "offset": [
+            55,
+            36
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "2045d116394b7bc2",
+          "offset": [
+            44,
+            40
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "pants_regearchainforged": {
+      "idle": [
+        {
+          "id": "9a8e9310be20bcd0",
+          "offset": [
+            64,
+            78
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "12e8137317c13943",
+          "offset": [
+            60,
+            76
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "7d9815cc3e65d468",
+          "offset": [
+            64,
+            79
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "4a2d0a0a1f52164d",
+          "offset": [
+            65,
+            78
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "b4c1b1cb652e6c4a",
+          "offset": [
+            55,
+            78
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "necklace_regearchainforged": {
+      "idle": [
+        {
+          "id": "400f38b5f48b8859",
+          "offset": [
+            65,
+            50
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "ee4fbc28f37ed2fa",
+          "offset": [
+            61,
+            49
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "50742068870c1453",
+          "offset": [
+            64,
+            49
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "0b7ea5bae8968947",
+          "offset": [
+            67,
+            50
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "d1a277e611cc3b66",
+          "offset": [
+            52,
+            49
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "accessory_regearchainforged": {
+      "idle": [
+        {
+          "id": "05b013057ed6ca1c",
+          "offset": [
+            57,
+            56
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "300785696d26b0a0",
+          "offset": [
+            55,
+            55
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "026a6708ebe1776f",
+          "offset": [
+            43,
+            33
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "0cf9d5b3eebda627",
+          "offset": [
+            58,
+            53
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "c94702046387da0f",
+          "offset": [
+            56,
+            56
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ]
+    },
+    "cloak_regearchainforged": {
+      "idle": [
+        {
+          "id": "f943d55d1c651bf1",
+          "offset": [
+            52,
+            48
+          ],
+          "frameCount": 48,
+          "start": 0
+        }
+      ],
+      "walk": [
+        {
+          "id": "068a724acb091282",
+          "offset": [
+            49,
+            48
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "attack": [
+        {
+          "id": "ac242c846a8fcb60",
+          "offset": [
+            52,
+            48
+          ],
+          "frameCount": 64,
+          "start": 0
+        }
+      ],
+      "hurt": [
+        {
+          "id": "6037a25ed59ae324",
+          "offset": [
+            53,
+            48
+          ],
+          "frameCount": 32,
+          "start": 0
+        }
+      ],
+      "die": [
+        {
+          "id": "976858fb576cb402",
+          "offset": [
+            45,
+            48
           ],
           "frameCount": 64,
           "start": 0

@@ -51,7 +51,7 @@ mod tests {
             .filter_map(|item| item.source.as_deref())
             .filter(|source| !matches!(*source, "orange_pool" | "chained_forge_packs"))
             .collect();
-        assert_eq!(sources.len(), 20);
+        assert_eq!(sources.len(), 21);
         assert_eq!(CATALOG.entries.len(), sources.len() * 5);
         assert_eq!(CATALOG.signatures.len(), sources.len());
         for class in [

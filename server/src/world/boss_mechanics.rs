@@ -79,6 +79,7 @@ enum Live {
     Walls(WallsLive),
     Break(BreakLive),
     Gaze(GazeLive),
+    Raid(raid_bosses::RaidLive),
 }
 impl Live {
     fn mech(&self) -> usize {
@@ -89,6 +90,7 @@ impl Live {
             Self::Walls(w) => w.mech,
             Self::Break(b) => b.mech,
             Self::Gaze(g) => g.mech,
+            Self::Raid(r) => r.mech,
         }
     }
 }
@@ -679,6 +681,9 @@ impl World {
                 Block::Gaze(g) => g.first.unwrap_or(g.every),
                 Block::Adds(a) => a.first.unwrap_or(a.every),
                 Block::Stasis(a) => a.first.unwrap_or(a.every),
+                Block::Tether(t) => t.first,
+                Block::Gust(g) => g.first,
+                Block::Soak(s) => s.first,
                 _ => 0.,
             })
             .collect();
@@ -912,12 +917,20 @@ impl World {
         if fight.timer[i] > 0. || fight.live.iter().any(|l| l.mech() == i) {
             return;
         }
+        if matches!(m.block, Block::Tether(_) | Block::Gust(_) | Block::Soak(_))
+            && fight.live.iter().any(|l| matches!(l, Live::Raid(_)))
+        {
+            return; // A low-health escalation waits for the current announced cast to finish.
+        }
         let players = self.mech_players(zone);
         if players.is_empty() {
             return;
         }
         let at = self.slimes[id].point();
         match &m.block {
+            Block::Tether(_) | Block::Gust(_) | Block::Soak(_) => {
+                self.start_raid_cast(fight, i, m);
+            }
             Block::Zone(z) => {
                 fight.timer[i] = z.every;
                 self.start_zone(fight, i, m, z, 0);
@@ -1643,6 +1656,7 @@ impl World {
             Live::Walls(wl) => self.tick_walls(fight, m, wl),
             Live::Break(bl) => self.tick_break(fight, m, bl),
             Live::Gaze(gl) => self.tick_gaze(fight, m, gl),
+            Live::Raid(r) => self.tick_raid_cast(fight, m, r),
         }
     }
 
@@ -2320,6 +2334,11 @@ impl World {
             for live in &fight.live {
                 let m = &def.mechanics[live.mech()];
                 match (live, &m.block) {
+                    (Live::Raid(r), _) => {
+                        if let Some(left) = self.raid_cast_danger(fight, m, r, session, at) {
+                            note(&m.name, left, true);
+                        }
+                    }
                     (Live::Zone(zl), Block::Zone(z))
                         if matches!(zl.phase, ZPhase::Cast | ZPhase::Echo | ZPhase::Linger) =>
                     {
@@ -2834,6 +2853,7 @@ impl World {
                     }).collect::<BTreeMap<String, f64>>(),
                 });
             }
+            self.raid_cast_view(fight, def, &mut teles, &mut cast);
             let ids = |sessions: Vec<&u64>| -> Vec<String> {
                 sessions
                     .into_iter()
@@ -2894,3 +2914,10 @@ mod play;
 #[cfg(test)]
 #[path = "boss_mechanics_tests.rs"]
 mod tests;
+
+#[path = "raid_boss_mechanics.rs"]
+mod raid_bosses;
+
+#[cfg(test)]
+#[path = "raid_boss_tests.rs"]
+mod raid_tests;

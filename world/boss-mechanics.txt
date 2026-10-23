@@ -165,5 +165,215 @@
       {"name": "Storm Surge", "block": "break", "at": 0.55, "cast": 8, "every": 600, "bar": 0.07, "stun": 0, "vulnerable": 0, "overload": true},
       {"name": "Storm Surge", "block": "break", "at": 0.3, "cast": 8, "every": 600, "bar": 0.07, "stun": 0, "vulnerable": 0, "overload": true}
     ]
+  },
+  "cf_kettil": {
+    "arena": [
+      68,
+      257,
+      100,
+      287
+    ],
+    "mechanics": [
+      {
+        "name": "Taut Chain",
+        "block": "tether",
+        "cast": 9,
+        "every": 30,
+        "first": 10,
+        "duration": 12,
+        "leash": 6,
+        "heavy": 0.45,
+        "points": [
+          [
+            90.0,
+            272.0
+          ],
+          [
+            85.854,
+            277.706
+          ],
+          [
+            79.146,
+            275.527
+          ],
+          [
+            79.146,
+            268.473
+          ],
+          [
+            85.854,
+            266.294
+          ]
+        ],
+        "r": 2,
+        "hold": 1.5,
+        "hp_min": 0.4
+      },
+      {
+        "name": "Taut Chain",
+        "block": "tether",
+        "cast": 9,
+        "every": 24,
+        "first": 1,
+        "duration": 12,
+        "leash": 6,
+        "heavy": 0.45,
+        "points": [
+          [
+            90.0,
+            272.0
+          ],
+          [
+            85.854,
+            277.706
+          ],
+          [
+            79.146,
+            275.527
+          ],
+          [
+            79.146,
+            268.473
+          ],
+          [
+            85.854,
+            266.294
+          ]
+        ],
+        "r": 2,
+        "hold": 1.5,
+        "hp_max": 0.4
+      }
+    ]
+  },
+  "cf_ysolt": {
+    "arena": [
+      193,
+      257,
+      225,
+      287
+    ],
+    "mechanics": [
+      {
+        "name": "Gale of the Bellows",
+        "block": "gust",
+        "cast": 10,
+        "every": 30,
+        "first": 10,
+        "push": 10,
+        "points": [
+          [
+            204.5,
+            268
+          ],
+          [
+            213.5,
+            268
+          ],
+          [
+            204.5,
+            276
+          ],
+          [
+            213.5,
+            276
+          ]
+        ],
+        "r": 1.5,
+        "capacity": 3,
+        "rim": 0.8,
+        "hp_min": 0.4
+      },
+      {
+        "name": "Gale of the Bellows",
+        "block": "gust",
+        "cast": 10,
+        "every": 24,
+        "first": 1,
+        "push": 10,
+        "points": [
+          [
+            204.5,
+            268
+          ],
+          [
+            213.5,
+            268
+          ],
+          [
+            204.5,
+            276
+          ],
+          [
+            213.5,
+            276
+          ]
+        ],
+        "r": 1.5,
+        "capacity": 3,
+        "rim": 0.8,
+        "hp_max": 0.4
+      }
+    ]
+  },
+  "cf_hallgrim": {
+    "arena": [
+      254,
+      189,
+      286,
+      219
+    ],
+    "mechanics": [
+      {
+        "name": "Hammerfall",
+        "block": "soak",
+        "cast": 8,
+        "every": 28,
+        "first": 10,
+        "points": [
+          [
+            266,
+            203
+          ],
+          [
+            274,
+            203
+          ],
+          [
+            270,
+            208
+          ]
+        ],
+        "r": 3,
+        "need": 3,
+        "heavy": 0.75,
+        "hp_min": 0.4
+      },
+      {
+        "name": "Hammerfall",
+        "block": "soak",
+        "cast": 8,
+        "every": 21,
+        "first": 1,
+        "points": [
+          [
+            266,
+            203
+          ],
+          [
+            274,
+            203
+          ],
+          [
+            270,
+            208
+          ]
+        ],
+        "r": 3,
+        "need": 3,
+        "heavy": 0.75,
+        "hp_max": 0.4
+      }
+    ]
   }
 }

@@ -324,15 +324,15 @@ weapons (section 10); after the kill the instance clears (`after_clear`), an
 `seats`), each with a `Rig` test, a brain rule and a sign. They are built one at a
 time by the boss tasks; none is needed before `RAID-MAP`.
 
-## 9. Orange loot (class model decided; numbers proposed)
+## 9. Orange loot (implemented reward tables, 2026-10-22)
 
-**Slots.** A character wears nine pieces: armor, weapon, headgear, shoulders, gloves,
-pants, necklace and two accessories; set bonuses count eight categories (the two
-accessories are one). Existing orange (Worldheart) covers five slots and is
+**Slots.** After the cloak change a character wears ten pieces: armor, weapon, headgear,
+shoulders, gloves, pants, necklace, cloak and two accessories. Set bonuses count
+eight non-cloak categories (the two accessories are one). Existing orange (Worldheart) covers five slots and is
 class-neutral (`class: null`, weapon included); only Nullforged purple is per class.
 
-**Chainforged (proposed): 28 pieces, level 99.** Per class armor, headgear, shoulders,
-gloves and weapon (25), plus class-neutral pants, necklace and accessory (3), like
+**Chainforged: 29 pieces, level 99, including the new neutral cloak.** Per class armor, headgear, shoulders,
+gloves and weapon (25), plus class-neutral pants, necklace, accessory and cloak (4), like
 Nullforged. Stats: the purple budget of the slot times 1.175 (orange) times **1.10**
 over Worldheart, every roll ±4%; `orange_rules.py` asserts that the lowest roll beats
 Worldheart's highest (1.2925 × 0.96 = 1.241 against 1.175 × 1.04 = 1.222). New shapes,
@@ -381,9 +381,12 @@ example 0.25) in the quartermaster's offer.
 
 Five weapons, one per class, dropped only by Eldmarr. Each has a **proc**, a **skill
 change while equipped** and a **look and sound**. Rules: server-computed; at most one
-proc per hero per 3 s; no proc or changed skill adds damage against players (PvP
-tuning is closed: the proc is off in PvP and the replacement skill keeps the old
-skill's PvP numbers); the proc's average share of the class's damage stays under 8%.
+proc per hero per 3 s. **Superseded by the owner's 2026-10-22 decision:** procs also
+reach players through `pvp_hit`, with a 3% maximum-health pre-reduction budget and
+normal PvP/heal rules. The added skill damage remains monster-only and Warmth's
+extra healing applies outside PvP fights. The replacement keeps the old skill id,
+bar slot, cost, cooldown and PvP damage numbers. See `docs/raid-rewards.md` for the
+implemented caps, tables, ten-slot model and original PixelFlow artwork.
 
 | Class | Weapon (working) | Proc | Skill change |
 | --- | --- | --- | --- |
@@ -768,3 +771,22 @@ their ordinary level-appropriate green cloak unless a full-gear measurement
 explicitly replaces it. Pack multipliers remain `[140, 90]`; the owner deferred
 pack timing calibration. Inspect now displays the same effective raid attack
 as Character. The unfinished raid entrance remains sealed.
+
+## 19. Raid rewards implementation (2026-10-22)
+
+`docs/raid-rewards.md` records the actual 29-piece tables, 22 guaranteed drops,
+ten-slot outfit including the cloak/two rings, original all-pose PixelFlow art,
+2/4/6/8 set bonuses and five signature weapons. The later owner PvP decision
+supersedes section 12 answer 4. The actual table model is 4 clears median for a
+solo hirer, 3/7 for five humans, 5/12 for ten humans (first/all complete),
+including the cloak. No encounter tuning, boss mechanics or entrance release
+is included in this slice.
+
+## 18. First three Wardens (2026-10-23)
+
+Kettil, Ysolt and Hallgrim are built in the isolated `feat/raid-bosses-1-3`
+checkout. Exact mechanics, fairness adjustments, original PixelFlow sources,
+Chainforged reward integration, focused checks and measured boss times are
+recorded in [raid-bosses.md](raid-bosses.md). The entrance remains sealed.
+The owner-approved raid reduction is now 5% per other fighter, capped at 45%;
+this supersedes section 17's original 1%/9% numbers. Pack-time tuning stays deferred.

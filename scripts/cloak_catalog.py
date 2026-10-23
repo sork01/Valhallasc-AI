@@ -101,7 +101,7 @@ def pieces(items):
 
 def apply(items):
     old={i['id']:n for n,i in enumerate(items)}
-    result=[i for i in items if i['kind']!='cloak' or i.get('source')=='orange_pool']+pieces(items)
+    result=[i for i in items if i['kind']!='cloak' or i.get('source') in ('orange_pool','chained_forge')]+pieces(items)
     result.sort(key=lambda i:old.get(i['id'],len(old)))
     return result
 

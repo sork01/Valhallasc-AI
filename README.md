@@ -584,8 +584,8 @@ old private-copy ids; see `docs/molten-raid.md` before deploying. Focused checks
 The raid now has **ten packs of four level-99 dungeon elites**, four original
 kinds and no separate elite encounters or side quests. **The owner asked for
 overpowered packs; clear-time tuning is deferred to a later fix.** Its independent 3% purple
-mob roll awards unique class-neutral Cinderwork pants, necklace or ring; bosses
-and their orange drops remain later tasks. `chained_forge_content.py` owns the
+mob roll awards unique class-neutral Cinderwork pants, necklace or ring. The first
+three Wardens now have their own mechanics and guaranteed orange rewards. `chained_forge_content.py` owns the
 pack catalog and loot pieces, while `elite-power.txt` owns combat tuning.
 Enemy art: `python3 scripts/make_chained_forge_sprites.py preview|build|export|verify`,
 then `python3 scripts/zone_tops.py cathedral`. Gear jobs:
@@ -597,9 +597,17 @@ The entrance stays sealed until RAID-OPEN. Details and approved interim fixture:
 [docs/molten-raid.md](docs/molten-raid.md#16-raid-packs--implementation-and-owner-corrections-2026-10-22).
 
 
-Raid strength grants every human and mercenary +50% attack and 1% damage
+Raid strength grants every human and mercenary +50% attack and 5% damage
 reduction per other fighter in the same raid copy (maximum nine others: 5.5×
-attack and 9% reduction). It updates on presence changes and appears in the
+attack and 45% reduction). It updates on presence changes and appears in the
 character panel. Solo heroes and ordinary dungeons get no bonus. Focused checks:
 Rust `raid_support`, browser `tests/raid-support-ui.cjs`; details in
 `docs/molten-raid.md` section 17. Pack clear-time tuning remains deferred.
+
+The first three raid bosses are Kettil Linkbearer (paired chains and numbered
+anvils), Ysolt Bellowsmaid (wind and three-person shelter posts), and Hallgrim
+Anvilhand (three anvils needing three fighters each). Regenerate them through
+`generate_chained_forge.py`; original editable art is maintained by
+`make_chained_forge_boss_sprites.py preview|build|export|verify`. Focused checks:
+Rust `raid_boss`, private real-client `tests/raid-bosses-ui.cjs`. See
+[docs/raid-bosses.md](docs/raid-bosses.md) for exact rules, fixtures and measurements.

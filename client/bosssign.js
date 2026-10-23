@@ -20,6 +20,16 @@
   function picture(color, sign) {
     const hex = window.BossMech?.colors?.[color] || '#fff';
     const art = svg('svg', { viewBox: '0 0 64 40', width: 64, height: 40, 'aria-hidden': 'true', focusable: 'false' });
+    if (sign.startsWith('cf_') && (color === 'blue' || color === 'path')) {
+      const points = sign === 'cf_ysolt' ? [[17,11],[47,11],[17,30],[47,30]] : sign === 'cf_hallgrim' ? [[12,14],[51,14],[32,31]] : [[9,11],[31,11],[53,11],[20,31],[44,31]];
+      points.forEach(([x,y], i) => {
+        art.append(svg('circle', {cx:x,cy:y,r:7,fill:'#3f9bea','fill-opacity':.4,stroke:'#9bd7ff'}));
+        const count = sign === 'cf_kettil' ? 2 : 3;
+        for(let j=0;j<count;j++) art.append(svg('circle',{cx:x-4+j*4,cy:y,r:1.8,fill:'#fff0bf'}));
+        if(sign === 'cf_kettil') art.append(svg('line',{x1:x-4,y1:y+3,x2:x+4,y2:y+3,stroke:'#f1e3b4','stroke-dasharray':'2 1'}));
+      });
+      return art;
+    }
     if (color === 'red') {
       const blue = window.BossMech?.colors?.blue || '#3f9bea';
       const green = window.BossMech?.colors?.green || '#4fc26b';

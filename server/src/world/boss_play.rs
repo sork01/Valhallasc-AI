@@ -93,6 +93,9 @@ impl World {
             target: self.play_target(fight, session, me, &mates),
             ..BossPlay::default()
         };
+        if let Some(answer) = self.raid_boss_play(fight, def, session) {
+            return Some((answer, None, None));
+        }
         let brazier = self.brazier_goal(fight, session, &mates);
         // Running is not swinging: a dash toward the boss would undo the step out of its telegraph. A place chosen to
         // run to is kept until it is reached or goes bad, or two equally near places would be swapped every tick.

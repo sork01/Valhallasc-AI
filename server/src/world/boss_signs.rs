@@ -15,11 +15,29 @@ impl World {
         }
         self.signs.get_key_value(kind).map(|(k, v)| (k.as_str(), v))
     }
-    /// What the snapshot says about the sign: where it stands and what it is called. Nothing it says.
+    /// Raids carry one sign per authored Warden; copies reuse the same text.
+    fn sign_for(&self, zone: usize, id: &str) -> Option<(&str, &bosssign::SignDef)> {
+        if self.maps[zone].raid {
+            let template = self.maps[zone].template.unwrap_or(zone);
+            if self
+                .spawns
+                .iter()
+                .any(|s| s.zone == template && s.kind == id)
+                && self.boss.table.contains_key(id)
+            {
+                return self.signs.get_key_value(id).map(|(k, v)| (k.as_str(), v));
+            }
+            None
+        } else {
+            self.sign_in(zone).filter(|(kind, _)| *kind == id)
+        }
+    }
+    /// What the snapshot says about each sign: position and title only.
     pub(super) fn signs_view(&self, zone: usize) -> Vec<Value> {
-        self.sign_in(zone)
+        self.signs
+            .keys()
+            .filter_map(|id| self.sign_for(zone, id))
             .map(|(kind, def)| json!({"id":kind,"x":def.x,"y":def.y,"title":def.title}))
-            .into_iter()
             .collect()
     }
     /// A hero reads the sign: the answer carries the whole text, or an error says why not.
@@ -27,10 +45,7 @@ impl World {
         let Some(p) = self.players.get(&session) else {
             return;
         };
-        let answer = match self
-            .sign_in(p.character.zone)
-            .filter(|(kind, _)| *kind == id)
-        {
+        let answer = match self.sign_for(p.character.zone, id) {
             None => Err("There is no sign to read here."),
             Some((_, def))
                 if p.character.hp <= 0.

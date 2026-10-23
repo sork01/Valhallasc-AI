@@ -20,11 +20,11 @@ const call=async(name,args={})=>{const r=await client.callTool({name,arguments:a
  await page.waitForFunction(()=>Online.connected&&Field.hero,null,{timeout:60000});
  const debug=command=>page.evaluate(command=>Online.send({type:'debug',command}),command);
  await debug({op:'teleport',zone:46,x:145,y:271});
- await page.waitForFunction(()=>Field.zone===46&&Field.slimes.length===40,null,{timeout:30000});
- check(await page.evaluate(()=>WORLD_MAP.zones[45].slimes.length===40&&WORLD_MAP.zones[45].quests.length===0),'Forty pack elites, no side elites or quests');
+ await page.waitForFunction(()=>Field.zone===46&&Field.slimes.length>=40,null,{timeout:30000});
+ check(await page.evaluate(()=>WORLD_MAP.zones[45].slimes.filter(s=>['cf_brute','cf_crawler','cf_caster','cf_sentry'].includes(s.kind)).length===40&&WORLD_MAP.zones[45].quests.length===0),'Forty pack elites, no side elites or quests');
  check(await page.evaluate(()=>Field.slimes.every(s=>s.elite)),'Every pack actor has an elite nameplate');
  check(await page.evaluate(()=>WORLD_MAP.zones[45].sealedTemplate),'Entrance remains sealed');
- if(!STUB)await page.waitForFunction(()=>Field.cathedralSprites?.meta.kinds.filter(k=>k.startsWith('cf_')).length===4,null,{timeout:60000});
+ if(!STUB)await page.waitForFunction(()=>Field.cathedralSprites?.meta.kinds.filter(k=>['cf_brute','cf_crawler','cf_caster','cf_sentry'].includes(k)).length===4,null,{timeout:60000});
  for(const kind of ['cf_brute','cf_crawler','cf_caster','cf_sentry']){
   const art=await page.evaluate(kind=>{
    const s=Field.slimes.find(s=>s.kind===kind),f=Field._debug.enemyFrame(s);

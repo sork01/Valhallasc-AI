@@ -182,6 +182,55 @@ pub enum Block {
     Hold(Hold),
     Gaze(Gaze),
     Static(Static),
+    Tether(Tether),
+    Gust(Gust),
+    Soak(Soak),
+}
+
+/// A standing leash: all fighters form pairs (one trio for an odd crew),
+/// hold their numbered anvil in order, and break their chain together.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Tether {
+    pub cast: f64,
+    pub every: f64,
+    pub first: f64,
+    pub duration: f64,
+    pub leash: f64,
+    pub heavy: f64,
+    pub points: Vec<[f64; 2]>,
+    pub r: f64,
+    pub hold: f64,
+}
+
+/// Wind pushes unsheltered fighters toward a lethal, visibly marked rim.
+/// Each iron post shelters a bounded number; the server assigns no immunity
+/// merely because a client drew itself beside one.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Gust {
+    pub cast: f64,
+    pub every: f64,
+    pub first: f64,
+    pub push: f64,
+    pub points: Vec<[f64; 2]>,
+    pub r: f64,
+    pub capacity: usize,
+    pub rim: f64,
+}
+
+/// Each anvil needs a separate group. Missing one harms the whole crew and
+/// strikes down the fighters trying to hold that anvil without enough help.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Soak {
+    pub cast: f64,
+    pub every: f64,
+    pub first: f64,
+    pub points: Vec<[f64; 2]>,
+    pub r: f64,
+    pub need: usize,
+    pub heavy: f64,
 }
 
 /// A ground shape with a cast time and an effect.
@@ -1093,6 +1142,10 @@ pub const SPOKE_REFERENCE_RADIUS: f64 = 8.;
 
 /// Whether a boss's definition obeys the rules that can be checked without a map: the cast floors, positive
 /// timings, the share limits. `Err` names the mechanic and the rule.
+fn finite_points(points: &[[f64; 2]]) -> bool {
+    !points.is_empty() && points.iter().flatten().all(|v| v.is_finite())
+}
+
 pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
     let bad = |m: &Mechanic, why: &str| Err(format!("{kind} / {}: {why}", m.name));
     if def.mechanics.is_empty() {
@@ -1415,6 +1468,71 @@ pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
                     return bad(
                         m,
                         "a hold needs points, a radius, a hold time and a lit time",
+                    );
+                }
+            }
+            Block::Tether(t) => {
+                if !cast_is_long_enough(Effect::Kill, t.cast)
+                    || !positive(t.duration)
+                    || !positive(t.every)
+                    || t.every <= t.cast + t.duration
+                    || !positive(t.first)
+                    || !positive(t.leash)
+                    || !positive(t.r)
+                    || !positive(t.hold)
+                    || t.hold * 5. > t.duration
+                    || !(t.heavy > 0. && t.heavy <= 1.)
+                    || t.points.len() != 5
+                    || !finite_points(&t.points)
+                {
+                    return bad(
+                        m,
+                        "tether needs five anvils, a fair warning, positive leash/hold, and time to break all five chains",
+                    );
+                }
+            }
+            Block::Gust(g) => {
+                if !cast_is_long_enough(Effect::Kill, g.cast)
+                    || !positive(g.first)
+                    || !positive(g.every)
+                    || g.every <= g.cast
+                    || !positive(g.push)
+                    || !positive(g.r)
+                    || !positive(g.rim)
+                    || g.capacity == 0
+                    || g.capacity > 10
+                    || g.points.len() != 4
+                    || g.points.len() * g.capacity < 10
+                    || !finite_points(&g.points)
+                {
+                    return bad(
+                        m,
+                        "gust needs a lethal warning and at least ten shelter places with positive radii and push",
+                    );
+                }
+            }
+            Block::Soak(t) => {
+                if !cast_is_long_enough(Effect::Kill, t.cast)
+                    || !positive(t.first)
+                    || !positive(t.every)
+                    || t.every <= t.cast
+                    || !positive(t.r)
+                    || t.need == 0
+                    || t.need > 10
+                    || t.points.len() != 3
+                    || t.need * t.points.len() > 10
+                    || t.points.len() < 2
+                    || !(t.heavy > 0. && t.heavy <= 1.)
+                    || !finite_points(&t.points)
+                    || t.points.iter().enumerate().any(|(i, a)| {
+                        t.points[..i]
+                            .iter()
+                            .any(|b| (a[0] - b[0]).hypot(a[1] - b[1]) <= 2. * t.r)
+                    })
+                {
+                    return bad(
+                        m,
+                        "soak needs separate circles, a lethal warning and a count a ten-fighter crew can meet",
                     );
                 }
             }

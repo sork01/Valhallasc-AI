@@ -11,7 +11,11 @@ use crate::world::wyrd_tests::{drain, join, world};
 /// Every zone that is the template of a dungeon with a final boss: (zone index, boss kind).
 fn dungeons(w: &World) -> Vec<(usize, String)> {
     (0..w.maps.len())
-        .filter(|&z| w.maps[z].template.is_none() && !w.maps[z].final_boss.is_empty())
+        .filter(|&z| {
+            w.maps[z].template.is_none()
+                && !w.maps[z].final_boss.is_empty()
+                && (!w.maps[z].raid || w.boss.table.contains_key(&w.maps[z].final_boss))
+        })
         .map(|z| (z, w.maps[z].final_boss.clone()))
         .collect()
 }
@@ -26,13 +30,27 @@ fn there_is_a_sign_for_each_dungeon_and_nowhere_else() {
     let found = dungeons(&w);
     assert!(found.len() >= 18, "{found:?}");
     let mut kinds: Vec<&str> = found.iter().map(|(_, k)| k.as_str()).collect();
+    kinds.extend(
+        w.spawns
+            .iter()
+            .filter(|s| {
+                w.maps[s.zone].raid
+                    && w.maps[s.zone].template.is_none()
+                    && w.boss.table.contains_key(&s.kind)
+                    && s.kind != w.maps[s.zone].final_boss
+            })
+            .map(|s| s.kind.as_str()),
+    );
     kinds.sort_unstable();
     let mut signs: Vec<&str> = w.signs.keys().map(String::as_str).collect();
     signs.sort_unstable();
     assert_eq!(signs, kinds);
     // Copies carry the template's boss kind, so they share its sign and need none of their own.
     for z in 0..w.maps.len() {
-        if w.maps[z].template.is_some() && !w.maps[z].final_boss.is_empty() {
+        if w.maps[z].template.is_some()
+            && !w.maps[z].final_boss.is_empty()
+            && (!w.maps[z].raid || w.boss.table.contains_key(&w.maps[z].final_boss))
+        {
             assert!(w.signs.contains_key(&w.maps[z].final_boss), "zone {z}");
         }
     }

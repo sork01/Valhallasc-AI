@@ -14,6 +14,9 @@ use tokio::sync::{mpsc, oneshot, watch};
 mod ambient;
 mod bank;
 mod inspect;
+#[cfg(test)]
+mod raid_reward_tests;
+mod signature;
 use bank::BankRequest;
 #[cfg(test)]
 mod asterion_tests;
@@ -234,6 +237,8 @@ struct Player {
     /// Damage from players still to be soaked up by a ward (`Skill::absorb`) while `absorb_left` runs.
     absorb: f64,
     absorb_left: f64,
+    forge_ward: f64,
+    forge_ward_left: f64,
     dash_skill: String,
     skill_cd: BTreeMap<String, f64>,
     set_cd: BTreeMap<String, f64>,
@@ -348,6 +353,8 @@ impl Player {
             pvp_fight: 0.,
             absorb: 0.,
             absorb_left: 0.,
+            forge_ward: 0.,
+            forge_ward_left: 0.,
             dash_skill: String::new(),
             skill_cd: BTreeMap::new(),
             set_cd: BTreeMap::new(),
@@ -388,7 +395,7 @@ impl Player {
             "dead":c.hp<=0.,"deadT":self.dead_time,"fallen":c.hp<=0. && self.fallen,"dashT":self.dash,"dashCd":self.dash_cd,
             "resource":c.resource(),"maxResource":c.max_resource(),"resourceType":c.look.class.resource_type(),"inCombat":self.combat_left>0.,
             "skillCd":self.skill_cd,"buffs":self.buffs,"potionCd":self.potion_cd,"mealCd":self.meal_cd,"explored":c.explored,"gm":c.gm,"god":self.god,"frozen":self.frozen,"travelStops":c.travel_stops,"sparkTravel":c.spark_travel,"mountOwned":c.mount_owned,"mounts":c.mounts,"mount":c.mount,"mounted":c.mounted,"reborn":{"count":c.rebirth_count(),"tier":c.rebirth_highest_tier()},"rebirthTiers":c.rebirth_tiers,"rebirthPerks":c.rebirth_perks(),"mountTint":c.mount_tint,
-            "setCounts":c.set_counts(),"setCd":self.set_cd,
+            "emberWard":if self.forge_ward_left>0. {self.forge_ward}else{0.},"emberWardLeft":self.forge_ward_left,"setCounts":c.set_counts(),"setCd":self.set_cd,"signatureWeapon":signature::weapon(c).map(|i|&i.id),
             "pvpFlag":self.pvp_flag,"stun":self.stun,"root":self.root,"absorb":if self.absorb_left > 0. { self.absorb.round() } else { 0. },"absorbLeft":self.absorb_left,"wound":if self.wound_left > 0. { self.wound } else { 0. },"woundLeft":self.wound_left,"pvpSupported":true,"inspectSupported":true,"hidden":self.is_hidden(),"escort":self.escort.as_ref().map(|e| json!({"npc":e.npc,"owner":e.owner})),"gauntlet":self.gauntlet})
     }
     fn is_hidden(&self) -> bool {
@@ -1437,6 +1444,7 @@ pub struct World {
     // The skill whose damage is being applied right now (empty: a basic attack); hit events carry it for the system log.
     cur_skill: String,
     set_pending: Vec<sets::Pending>,
+    signature: signature::State,
     /// Counter for mercenary sessions.
     merc_seq: u64,
     /// Live arena gauntlet runs (world/gauntlet.rs), in memory only.
@@ -1547,6 +1555,7 @@ impl World {
             next_king_spawn: 0.,
             cur_skill: String::new(),
             set_pending: vec![],
+            signature: signature::State::default(),
             merc_seq: 0,
             gauntlets: vec![],
             ambient_targets: BTreeMap::new(),
@@ -2219,6 +2228,7 @@ impl World {
             } => {
                 p.stop();
                 p.attack = 0.;
+                let signature_before = signature::weapon(&p.character).map(|i| i.id.as_str());
                 let mut next = p.character.clone();
                 let (current_armor, current_weapon) = next.gear();
                 let armor = armor.unwrap_or_else(|| current_armor.into());
@@ -2231,7 +2241,12 @@ impl World {
                 if let Err(text) = result {
                     let _ = p.peer.try_send(json!({"type":"error","text":text}));
                 } else if next.look != p.character.look || next.equipment != p.character.equipment {
+                    let signature_changed =
+                        signature_before != signature::weapon(&next).map(|i| i.id.as_str());
                     p.character = next;
+                    if signature_changed {
+                        self.signature.cancel_active(session);
+                    }
                     self.save();
                 }
             }
@@ -2720,6 +2735,7 @@ impl World {
         self.update_chimes();
         self.update_chests();
         self.update_set_effects();
+        self.update_signatures();
         let sessions: Vec<_> = self.players.keys().copied().collect();
         for session in sessions {
             self.update_food(session);
@@ -2781,12 +2797,16 @@ impl World {
             &mut p.wound_left,
             &mut p.pvp_fight,
             &mut p.absorb_left,
+            &mut p.forge_ward_left,
         ] {
             *timer = if *timer - TICK < 1e-9 {
                 0.
             } else {
                 *timer - TICK
             };
+        }
+        if p.forge_ward_left <= 0. {
+            p.forge_ward = 0.;
         }
         p.dash_cd = (p.dash_cd - TICK).max(0.);
         p.skill_cd.retain(|_, left| {
@@ -3801,6 +3821,7 @@ impl World {
                 .min(p.character.max_hp());
             healed = (p.character.hp - before).round();
         }
+        self.signature_skill(session, id);
         let origin = self.players[&session].character.point();
         let set_signature =
             self.apply_set_signature(session, id, origin, face, target, &before_set_hits);
@@ -3846,7 +3867,8 @@ impl World {
     /// Heals each session for `mult` times the caster's attack power and announces it with a `healed` event.
     /// Returns the healed players' positions for the skill's visual effect.
     fn heal_players(&mut self, caster: u64, sessions: &[u64], mult: f64) -> Vec<[f64; 2]> {
-        let amount = (self.raid_attack_power(caster) * mult).round();
+        let warmth = self.signature_heal_multiplier(caster, sessions);
+        let amount = (self.raid_attack_power(caster) * mult * warmth).round();
         let caster_class = self.players[&caster].character.look.class;
         let from = self.players[&caster].character.id.clone();
         let mut points = vec![];
@@ -3865,6 +3887,7 @@ impl World {
                 p.character.zone,
             );
             points.push([at.x, at.y]);
+            self.signature_healed(caster, *s, gained);
             self.emit_zone(
                 zone,
                 json!({"type":"event","kind":"healed","actor":id,"from":from,"x":at.x,"y":at.y,"value":gained,"crit":false}),
@@ -4204,12 +4227,20 @@ impl World {
                 }
             }
         }
+        self.signature_hit(session, signature::Target::Enemy(id), dealt);
         dealt
     }
     /// One random piece across all classes per boss slot pool. Party members roll just as for world gear;
     /// alone, the credited hero (the hirer for a mercenary kill) owns it.
     fn boss_loot(&mut self, owner: &str, kind: &str, zone: usize, point: Point) {
         let boost = self.drop_multiplier_of(owner);
+        if raid_rewards::boss(kind).is_some() {
+            for gear in raid_rewards::drops(kind, boost, || self.random()) {
+                let item = gear.item.clone();
+                self.loot_drop_with_gear(owner, zone, point, &item, Some(gear));
+            }
+            return;
+        }
         for slots in boss_slots(kind) {
             // A guaranteed pool is rolled once per step of the drop multiplier.
             for _ in 0..boost {
@@ -4708,6 +4739,9 @@ impl World {
             value = (value * 0.8).round().max(1.);
             p.set_stillness_left = 0.;
         }
+        let ember = value.min(p.forge_ward);
+        p.forge_ward -= ember;
+        value -= ember;
         let absorbed = value.min(p.set_shield);
         p.set_shield -= absorbed;
         value -= absorbed;

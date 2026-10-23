@@ -225,6 +225,8 @@ def main():
             z['npcs'] += [n for n in old['npcs'] if n['id']!='cf_quartermaster']
         from chained_forge_content import install
         install(z)
+        from chained_forge_bosses import install as install_bosses
+        install_bosses(z)
         if old:w['zones'][ZONE-1]=z
         else:
             assert len(w['zones'])==ZONE-1
@@ -236,6 +238,11 @@ def main():
         from chained_forge_content import ENEMIES
         catalog=ROOT/'world/chained_forge.txt'
         previous=json.loads(catalog.read_text()) if catalog.exists() else []
+        from chained_forge_bosses import ENEMIES as BOSSES, definitions, signs, write_entries
+        ENEMIES = ENEMIES + BOSSES
+        for filename, entries in [('boss-mechanics.txt', definitions(w['zones'][ZONE-1])), ('boss-signs.txt', signs(w['zones'][ZONE-1]))]:
+            out=ROOT/'world'/filename
+            write_entries(out, entries)
         owned={e['kind'] for e in ENEMIES}
         catalog.write_text(json.dumps([e for e in previous if e['kind'] not in owned]+ENEMIES,indent=2,ensure_ascii=False)+'\n')
         path=ROOT/'world/items.txt';items=json.loads(path.read_text());have={i['id'] for i in items}

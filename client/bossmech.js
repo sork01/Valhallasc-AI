@@ -137,6 +137,27 @@
       g.beginPath(); pts.forEach((q, i) => { const [sx, sy] = w2s(q[0], q[1]); if (i) g.lineTo(sx, sy); else g.moveTo(sx, sy); });
       g.globalAlpha = 1; g.lineWidth = 5; g.strokeStyle = '#bfe4ff'; g.stroke();
     }
+    if (tele.role && !tele.chain && tele.shapes[0]?.t === 'circle') {
+      const s = tele.shapes[0], [sx, sy] = w2s(s.x, s.y);
+      g.globalAlpha = 1; g.lineWidth = tele.current ? 4 : 2;
+      g.strokeStyle = tele.current ? GOLD : '#a6dcff'; g.fillStyle = '#354755';
+      // Iron posts and anvils remain distinct at game scale.
+      if (tele.capacity && !tele.need) {
+        g.fillRect(sx - 5, sy - 24, 10, 22); g.strokeRect(sx - 5, sy - 24, 10, 22);
+        g.beginPath(); g.ellipse(sx, sy - 24, 8, 4, 0, 0, Math.PI * 2); g.fill(); g.stroke();
+      } else {
+        g.beginPath(); g.moveTo(sx - 15, sy - 12); g.lineTo(sx + 15, sy - 12); g.lineTo(sx + 8, sy - 5);
+        g.lineTo(sx + 6, sy + 2); g.lineTo(sx - 6, sy + 2); g.lineTo(sx - 8, sy - 5); g.closePath(); g.fill(); g.stroke();
+      }
+
+    }
+    if (tele.arrow && tele.shapes[0]?.t === 'lane') {
+      const s = tele.shapes[0], [ax, ay] = w2s(s.x1, s.y1), [bx, by] = w2s(s.x2, s.y2);
+      const a = Math.atan2(by - ay, bx - ax);
+      g.globalAlpha = 1; g.strokeStyle = GOLD; g.lineWidth = 4;
+      g.beginPath(); g.moveTo(bx - Math.cos(a - .6) * 20, by - Math.sin(a - .6) * 20);
+      g.lineTo(bx, by); g.lineTo(bx - Math.cos(a + .6) * 20, by - Math.sin(a + .6) * 20); g.stroke();
+    }
     if (tele.gaze && live > 0 && !calm) {              // the eye that is about to look: a small pulsing mark at its source
       const s = tele.shapes[0], [sx, sy] = w2s(s.x, s.y, 36);
       g.globalAlpha = .6 + .4 * Math.sin(t * 10); g.fillStyle = RED; g.beginPath(); g.arc(sx, sy, 7, 0, 7); g.fill();
@@ -189,6 +210,19 @@
       }
       if (f.stunned > 0) { const b = boss?.(f.boss); if (b) { const [sx, sy] = w2s(b.x, b.y, 130); label(`${text('Stunned')} ${Math.max(0, f.stunned - (now() - stamp)).toFixed(1)}`, sx, sy, 16, GOLD); } }
       if (f.banner && f.banner !== f.cast?.name) label(text(f.banner), VW / 2, y + 4, 20, '#fff4ca');
+      for (const tele of f.tele || []) {
+        if (!tele.role || tele.chain) continue;
+        const station = tele.shapes?.[0];
+        if (station?.t === 'circle') {
+          const [sx, sy] = w2s(station.x, station.y), limit = tele.need || tele.capacity;
+          const enough = tele.need ? tele.count >= tele.need : tele.count <= tele.capacity;
+          label(`#${tele.role}  ${tele.count}/${limit}`, sx, sy - 33, 16, enough ? '#c5edff' : '#ffb19b');
+        }
+        for (const id of tele.players || []) {
+          const p = pos(id);
+          if (p) { const [sx, sy] = w2s(p.x, p.y, 112); label(`#${tele.role}`, sx, sy, 17, tele.current ? GOLD : '#b8e5ff'); }
+        }
+      }
       for (const id of f.marked || []) { const p = pos(id); if (p) { const [sx, sy] = w2s(p.x, p.y, 96); label(text('Marked!'), sx, sy, 15, '#ff8d80'); } }
       for (const id of f.frozen || []) { const p = pos(id); if (p) { const [sx, sy] = w2s(p.x, p.y, 96); label(text('Frozen!'), sx, sy, 15, '#ffd070'); } }
       const st = f.static;
