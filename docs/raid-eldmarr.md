@@ -1,5 +1,7 @@
 # Eldmarr, the Ember-Lord
 
+Release update 2026-10-23: merged into main and deployed in `c4d5e9e`; the raid entrance is open. The implementation notes below describe the original isolated build. Timing and win-rate evaluation remain with the owner; see `molten-raid.md` for release checks and current handoff.
+
 `RAID-BOSS-FINAL` is implemented on `feat/raid-eldmarr`, based on the completed Wardens 5–9 branch plus main. The source checkout is `/media/raid/valhallasc-data/raid-eldmarr-work`. No new file zone, copy ID shift, public client publication, database change or restart is involved. The external entrance remains sealed.
 
 Eldmarr is the original fire giant from the approved story: the first forge keeper, denied his promised place in Valhalla and bound beneath Asterion by nine Wardens. His existing Asterion/Emberwake foreshadowing is preserved. His final hall now contains the actual catalog boss, a readable approach sign and original editable PixelFlow art. The 96 × 96 sprite has 34 frames across idle, walk, attack, hurt and death, rendered at scale 3.2. Its basalt mantle, nine-link crown, flame beard, furnace ribs and great cleaver differ from the Wardens.

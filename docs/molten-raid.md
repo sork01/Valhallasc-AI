@@ -897,3 +897,26 @@ orange definitions. The opening adds boss materials, with no orange backfill.
 
 The full `npm run test:swedish` release gate passes: catalog validation, 21 locale
 checks, 15 language UI checks and 36 desktop/mobile window-layout checks.
+
+
+### Deployed release
+
+Source `c4d5e9e` was published to main and deployed on 2026-10-23 at 18:43 UTC.
+The player who joined during verification left before the restart; nobody was
+online at shutdown. Backup: `deploy/backups/raid-open-20261023T182622Z`, with
+`valhalla-server.prev`, pre-build and stopped consistent SQLite snapshots,
+prior client assets, and immutable tested `valhalla-server.next`.
+
+Public/bridge health are healthy; all 15 fetched asset hashes (14 changed
+client paths plus index.html) match disk. The running executable matches the
+installed and tested SHA-256
+`9f2e3567a8a1f8a5bcf1d4e0a1b92b935fb6155880244a60f507c0be372f1c70`.
+SQLite `quick_check` is `ok`; 21 character rows/14 guests are unchanged across
+restart. The journal shows a clean startup and production has no test flags.
+No zone migration or orange backfill was needed. Other sessions' pending
+online-roster server edits survived the fast-forward/autostash unchanged and
+were excluded from the release binary and commits.
+
+All TODO checkboxes are closed. Balance limitations remain explicitly with the
+owner, as described above. Local release record:
+`10_projects:valhallasc_molten_raid_open_20261023`.

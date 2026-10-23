@@ -1,5 +1,7 @@
 # Chained Forge Wardens 5–9
 
+Release update 2026-10-23: merged into main and deployed in `c4d5e9e`; the raid entrance is open. The implementation notes below describe the original isolated build. Timing and win-rate evaluation remain with the owner; see `molten-raid.md` for release checks and current handoff.
+
 Source is isolated on `feat/raid-bosses-5-9` in `.tools/raid-bosses-5-9-worktree`. This slice adds Dagfinn, Thorbjörg, Ragnhild, Orm and Hildr to their existing halls. There are no new zones or changes to private-copy IDs. Eldmarr and opening the public entrance remain separate tasks.
 
 | Warden | Mechanic | Answer |
