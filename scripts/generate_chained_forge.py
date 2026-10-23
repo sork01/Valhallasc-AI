@@ -247,7 +247,7 @@ def main():
         catalog.write_text(json.dumps([e for e in previous if e['kind'] not in owned]+ENEMIES,indent=2,ensure_ascii=False)+'\n')
         path=ROOT/'world/items.txt';items=json.loads(path.read_text());have={i['id'] for i in items}
         for e in ENEMIES:
-            if e['material'] not in have:
+            if e.get('material') and e['material'] not in have:
                 items.append(dict(id=e['material'],name=e['name']+' Relic',kind='material',rarity='common',sell=10000 if e['elite'] else 2500))
         from chained_forge_content import gear_items
         items=[i for i in items if i.get('source')!='chained_forge_packs']+gear_items()

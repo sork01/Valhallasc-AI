@@ -790,3 +790,7 @@ Chainforged reward integration, focused checks and measured boss times are
 recorded in [raid-bosses.md](raid-bosses.md). The entrance remains sealed.
 The owner-approved raid reduction is now 5% per other fighter, capped at 45%;
 this supersedes section 17's original 1%/9% numbers. Pack-time tuning stays deferred.
+
+## 19. Fourth Warden: Sigrun Slagmother
+
+Sigrun and her six numbered ingots are built in isolated `feat/raid-boss-4`. The 25-second ordered shield and its 40% reforge, original PixelFlow art, signs, hired targeting and focused validation are described in [raid-boss-4.md](raid-boss-4.md). The entrance remains sealed.

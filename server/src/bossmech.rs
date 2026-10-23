@@ -304,10 +304,20 @@ pub enum ShapeSpec {
 #[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Shield {
+    /// Numbered helpers: only the lowest living slot is vulnerable.
+    #[serde(default)]
+    pub ordered: Option<Ordered>,
     pub steps: Vec<ShieldStep>,
     /// The share of maximum health the boss heals each second while shielded.
     #[serde(default)]
     pub heal_per_s: f64,
+}
+/// Each newly vulnerable object gets its own announced deadline.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Ordered {
+    pub deadline: f64,
+    pub heavy: f64,
 }
 #[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -1240,13 +1250,28 @@ pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
             }
             Block::Shield(s) => {
                 if s.steps.is_empty()
-                    || s.steps
-                        .iter()
-                        .any(|t| !(t.hp > 0. && t.hp < 1.) || t.count == 0 || t.tag.is_empty())
+                    || s.steps.iter().any(|t| {
+                        !(t.hp > 0. && (t.hp < 1. || (s.ordered.is_some() && t.hp == 1.)))
+                            || t.count == 0
+                            || t.tag.is_empty()
+                    })
                 {
                     return bad(
                         m,
                         "a shield needs steps with hp in (0, 1), a tag and a count",
+                    );
+                }
+                if let Some(o) = &s.ordered
+                    && (!o.deadline.is_finite()
+                        || o.deadline < HEAVY_HIT_MIN_CAST
+                        || !o.heavy.is_finite()
+                        || o.heavy <= 0.
+                        || o.heavy > 1.
+                        || s.steps.iter().any(|t| !t.still || t.count < 2))
+                {
+                    return bad(
+                        m,
+                        "ordered shields need a full heavy-hit warning, heavy in (0, 1], and stationary numbered helpers",
                     );
                 }
                 if s.steps.windows(2).any(|w| w[0].hp <= w[1].hp) {

@@ -57760,6 +57760,13 @@
     "sell": 10000
   },
   {
+    "id": "cf_sigrun_relic",
+    "name": "Sigrun Slagmother Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
     "id": "cfpack_pants",
     "name": "Cinderwork Kiln Gaiters",
     "kind": "pants",

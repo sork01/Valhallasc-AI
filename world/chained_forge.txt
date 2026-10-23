@@ -198,5 +198,58 @@
     "slam": 0,
     "melee": 0,
     "color": "#ed9c65"
+  },
+  {
+    "kind": "cf_sigrun",
+    "name": "Sigrun Slagmother",
+    "level": 99,
+    "stats": [
+      1000000,
+      11000,
+      2.0,
+      1.8
+    ],
+    "profile": [
+      1.05,
+      2.4,
+      12,
+      22
+    ],
+    "boss": true,
+    "elite": true,
+    "outdoor": false,
+    "gold": 150000,
+    "material": "cf_sigrun_relic",
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "color": "#eab068"
+  },
+  {
+    "kind": "cf_ingot",
+    "name": "Numbered Ingot",
+    "level": 99,
+    "stats": [
+      1000000,
+      0,
+      0,
+      1.1
+    ],
+    "profile": [
+      0,
+      1,
+      0,
+      0
+    ],
+    "boss": false,
+    "elite": false,
+    "outdoor": false,
+    "add": true,
+    "gold": 0,
+    "material": "",
+    "ranged": null,
+    "slam": 0,
+    "melee": 0,
+    "color": "#ffbe78"
   }
 ]

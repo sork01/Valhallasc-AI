@@ -166,6 +166,38 @@
       {"name": "Storm Surge", "block": "break", "at": 0.3, "cast": 8, "every": 600, "bar": 0.07, "stun": 0, "vulnerable": 0, "overload": true}
     ]
   },
+  "cf_sigrun": {
+    "arena": [
+      148,
+      186,
+      180,
+      216
+    ],
+    "mechanics": [
+      {
+        "name": "Ingot Order",
+        "block": "shield",
+        "ordered": {
+          "deadline": 25,
+          "heavy": 0.9
+        },
+        "steps": [
+          {
+            "hp": 1,
+            "tag": "cf_sigrun_ingot",
+            "count": 6,
+            "still": true
+          },
+          {
+            "hp": 0.4,
+            "tag": "cf_sigrun_ingot",
+            "count": 6,
+            "still": true
+          }
+        ]
+      }
+    ]
+  },
   "cf_kettil": {
     "arena": [
       68,

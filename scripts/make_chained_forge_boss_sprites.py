@@ -58,6 +58,42 @@ def draw(e,clip,n):
             x,y=c.near
             a.c((x,y-9),(x,y+18),2,2,'iron');a.e(x,y+21,7,8,'glass');a.e(x,y+21,3,4,'iron')
         C.humanoid(a,'cloth','skin',w=10,legh=17,th=25,hr=(11,11),armw=3.5,hand='brass',foot='iron',pk=.83,pre=bellows,post=face,weapon=wand,blush=None)
+    elif k=='cf_sigrun':
+        # A broad foundry matron with a six-toothed mould crown, stone apron,
+        # glowing slag seams and a pouring ladle: her own silhouette.
+        def furnace(c):
+            a.band([(-24,c.top+1),(-27,c.top-10),(-20,c.top-15),(-11,c.top-5),
+                    (11,c.top-5),(20,c.top-15),(27,c.top-10),(24,c.top+1)],'iron')
+            for side in [-1,1]:
+                for j in range(3):
+                    a.c((side*18,c.top-2-j*4),(side*24,c.top-4-j*4),1.4,1.4,'fire')
+        def face(c):
+            a.band([(c.hx-13,c.hy+8),(c.hx+13,c.hy+8),(c.hx+12,c.hy+14),
+                    (c.hx-12,c.hy+14)],'brass')
+            for dx in [-10,-6,-2,2,6,10]:
+                a.c((c.hx+dx,c.hy+12),(c.hx+dx,c.hy+23-abs(dx)*.2),1.5,1.5,'iron')
+                a.e(c.hx+dx,c.hy+20-abs(dx)*.2,1.3,1.5,'fire',out=False)
+            for side in [-1,1]:
+                a.c((c.hx+side*11,c.hy+1),(c.hx+side*16,c.hy-13),3,2,'hair')
+                a.e(c.hx+side*16,c.hy-15,3,3,'brass')
+            a.band([(-12,c.top-2),(12,c.top-2),(17,c.top-24),(-17,c.top-24)],'iron')
+            a.band([(-7,c.top-7),(7,c.top-7),(10,c.top-10),(-10,c.top-10)],'fire')
+            for dx in [-5,0,5]: a.c((dx,c.top-8),(dx,c.top-20),1.4,1.4,'iron')
+        def ladle(c):
+            x,y=c.near
+            a.c((x-2,y-14),(x+3,y+18),2.5,2.5,'brass')
+            a.e(x+4,y+23,10,6,'iron');a.e(x+4,y+25,7,3,'fire',out=False)
+            if clip=='attack': a.c((x+10,y+23),(x+12,y+10),1.8,1,'fire')
+        C.humanoid(a,'cloth','skin',w=16,legh=14,th=24,hr=(12,11),armw=5,
+                   hand='brass',foot='iron',pk=.83,pre=furnace,post=face,weapon=ladle,blush=None)
+    elif k=='cf_ingot':
+        bob=math.sin(n*math.tau/7)*.6
+        y=16+bob
+        a.band([(-21,y),(-17,y+20),(14,y+20),(22,y), (15,y-5),(-15,y-5)],'iron')
+        a.band([(-17,y+18),(14,y+18),(9,y+27),(-11,y+27)],'brass')
+        a.band([(-16,y+2),(-13,y+16),(9,y+16),(15,y+2)],'fire')
+        for dx in [-9,-3,3,9]: a.c((dx,y+4),(dx-1,y+12),1,1,'iron')
+        a.c((-18,y-1),(18,y-1),1.6,1.6,'brass')
     else:
         def anvil(c):
             y=c.top

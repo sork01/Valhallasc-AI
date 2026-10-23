@@ -405,5 +405,6 @@
   "Repaired {0} pieces for {1} gold.": "Reparerade {0} föremål för {1} guld.",
   "You need {0} more gold to repair everything.": "Du behöver {0} guld till för att reparera allt.",
   "Your gear lost durability. Broken pieces: {0}. Repair them at a smith.": "Din utrustning har tappat hållbarhet. Trasiga föremål: {0}. Reparera dem hos en smed.",
-  "{0} · rank {1} · {2}{3}": "{0} · grad {1} · {2}{3}"
+  "{0} · rank {1} · {2}{3}": "{0} · grad {1} · {2}{3}",
+  "Ingot {0}": "Tacka {0}"
 }

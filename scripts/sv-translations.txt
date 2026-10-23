@@ -6807,5 +6807,14 @@
   "You died.": "Du dog.",
   "Your gear lost durability. Repair it at a smith.": "Din utrustning har tappat hållbarhet. Reparera den hos en smed.",
   "A worn piece is broken. Repair it at a smith.": "Ett föremål du bär är trasigt. Reparera det hos en smed.",
-  "A worn piece is nearly broken. Repair it at a smith.": "Ett föremål du bär är nästan trasigt. Reparera det hos en smed."
+  "A worn piece is nearly broken. Repair it at a smith.": "Ett föremål du bär är nästan trasigt. Reparera det hos en smed.",
+  "Sigrun Slagmother": "Sigrun Slaggmoder",
+  "Sigrun Slagmother Relic": "Sigrun Slaggmoders relik",
+  "Numbered Ingot": "Numrerad tacka",
+  "Ingot Order": "Tackornas ordning",
+  "Hit this one!": "Slå på den här!",
+  "Wait for its number": "Vänta på dess nummer",
+  "Six numbered ingots shield Sigrun. Only the lowest number still standing can be hurt.": "Sex numrerade tackor skyddar Sigrun. Bara det lägsta numret som finns kvar kan skadas.",
+  "All ten friends hit ingot 1, then 2, up to 6. Each new number gives you 25 seconds. Too slow? It bursts and hurts the whole group.": "Alla tio slår på tacka 1, sedan 2, upp till 6. Varje nytt nummer ger er 25 sekunder. För långsamt? Den spricker och skadar hela gruppen.",
+  "Break all six to hurt Sigrun. When she has 40% health left, she makes six more. The red ring shows the number to hit.": "Slå sönder alla sex för att skada Sigrun. När hon har 40% hälsa kvar gör hon sex till. Den röda ringen visar vilken ni ska slå på."
 }

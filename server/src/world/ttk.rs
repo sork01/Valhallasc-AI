@@ -1115,7 +1115,28 @@ fn party_pack_fight(
     // available for an independent control using the untrimmed world.
     let local_ids;
     let ids = if equip_hired && std::env::var("BLACKHOUR_FULL_WORLD").is_err() {
-        let spawns: Vec<_> = ids.iter().map(|&id| w.spawns[id].clone()).collect();
+        let tags: Vec<_> = ids
+            .iter()
+            .filter_map(|id| w.boss.table.get(&w.slimes[*id].kind))
+            .flat_map(|d| &d.mechanics)
+            .filter_map(|m| match &m.block {
+                crate::bossmech::Block::Shield(s) if s.ordered.is_some() => {
+                    Some(s.steps.iter().map(|t| t.tag.clone()).collect::<Vec<_>>())
+                }
+                _ => None,
+            })
+            .flatten()
+            .collect();
+        let mut spawns: Vec<_> = ids.iter().map(|&id| w.spawns[id].clone()).collect();
+        spawns.extend(
+            w.spawns
+                .iter()
+                .filter(|s| {
+                    s.zone == zone && s.ambush.as_ref().is_some_and(|tag| tags.contains(tag))
+                })
+                .cloned(),
+        );
+        let targets = ids.len();
         w.slimes = spawns
             .iter()
             .enumerate()
@@ -1123,7 +1144,10 @@ fn party_pack_fight(
             .collect();
         w.spawns = spawns;
         w.next_king_spawn = f64::INFINITY;
-        local_ids = (0..w.slimes.len()).collect::<Vec<_>>();
+        for slot in targets..w.slimes.len() {
+            w.slimes[slot] = w.dormant_enemy(slot);
+        }
+        local_ids = (0..targets).collect::<Vec<_>>();
         local_ids.as_slice()
     } else {
         let trimmed = trim_to_zone(&mut w, zone);

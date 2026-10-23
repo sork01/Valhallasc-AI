@@ -233,7 +233,14 @@ struct BloomLive {
     heal: f64,
     then: Option<String>,
 }
+struct OrderedLive {
+    deadline: f64,
+    heavy: f64,
+    current: usize,
+    left: f64,
+}
 struct ShieldLive {
+    ordered: Option<OrderedLive>,
     tag: String,
     adds: Vec<usize>,
     heal_per_s: f64,
@@ -408,7 +415,12 @@ impl World {
         let Some(fight) = self.fight_of(id) else {
             return Incoming::Damage(damage);
         };
-        if fight.shield.is_some() && id == fight.boss {
+        if let Some(sh) = &fight.shield
+            && (id == fight.boss
+                || (sh.ordered.is_some()
+                    && sh.adds.contains(&id)
+                    && sh.adds.iter().copied().find(|a| !self.slimes[*a].dead) != Some(id)))
+        {
             return Incoming::Immune;
         }
         if fight.downed.contains_key(&id) {
@@ -655,10 +667,14 @@ impl World {
 
     /// The fight a slot belongs to: its own, or the one it is the divided partner of.
     fn fight_of(&self, id: usize) -> Option<&Fight> {
-        self.boss
-            .fights
-            .get(&id)
-            .or_else(|| self.boss.fights.values().find(|f| f.partner == Some(id)))
+        self.boss.fights.get(&id).or_else(|| {
+            self.boss.fights.values().find(|f| {
+                f.partner == Some(id)
+                    || f.shield
+                        .as_ref()
+                        .is_some_and(|s| s.ordered.is_some() && s.adds.contains(&id))
+            })
+        })
     }
 
     // -----------------------------------------------------------------------------------------------------------
@@ -893,9 +909,12 @@ impl World {
             }
             Block::Shield(s) => {
                 for (n, step) in s.steps.iter().enumerate() {
-                    if fight.fired[i] & (1 << n) == 0 && share <= step.hp {
+                    if (s.ordered.is_none() || fight.shield.is_none())
+                        && fight.fired[i] & (1 << n) == 0
+                        && share <= step.hp
+                    {
                         fight.fired[i] |= 1 << n;
-                        self.raise_shield(fight, &m.name, step, s.heal_per_s);
+                        self.raise_shield(fight, &m.name, step, s);
                     }
                 }
                 return;
@@ -1947,16 +1966,26 @@ impl World {
         fight: &mut Fight,
         name: &str,
         step: &bm::ShieldStep,
-        heal_per_s: f64,
+        shield: &bm::Shield,
     ) {
-        let adds = self.wake_adds(fight, &step.tag, step.count, false, step.still);
+        let mut adds = self.wake_adds(fight, &step.tag, step.count, false, step.still);
+        if shield.ordered.is_some() {
+            adds.sort_unstable();
+        }
         if adds.is_empty() {
             return;
         }
+        let ordered = shield.ordered.as_ref().map(|o| OrderedLive {
+            deadline: o.deadline,
+            heavy: o.heavy,
+            current: adds[0],
+            left: o.deadline,
+        });
         fight.shield = Some(ShieldLive {
+            ordered,
             tag: step.tag.clone(),
             adds,
-            heal_per_s,
+            heal_per_s: shield.heal_per_s,
             name: name.into(),
         });
         let at = self.slimes[fight.boss].point();
@@ -1965,20 +1994,74 @@ impl World {
     }
 
     fn tick_shield(&mut self, fight: &mut Fight) {
-        let Some(sh) = &fight.shield else {
+        let Some(mut sh) = fight.shield.take() else {
             return;
         };
+        let current = sh.adds.iter().copied().find(|a| !self.slimes[*a].dead);
+        if let Some(o) = &mut sh.ordered
+            && let Some(current) = current
+        {
+            // A kill gives the next numbered ingot its complete warning.
+            if o.current != current {
+                o.current = current;
+                o.left = o.deadline;
+                self.mech_event(
+                    fight.zone,
+                    "cast",
+                    &sh.name,
+                    self.slimes[current].point(),
+                    o.deadline,
+                );
+            } else {
+                o.left -= TICK;
+            }
+            if o.left <= 0. {
+                #[cfg(test)]
+                eprintln!(
+                    "[ordered-ingot-expired] boss={} slot={} clock={:.2}",
+                    self.slimes[fight.boss].kind, current, fight.clock
+                );
+                // Overheated ingots shatter without kill credit, gold or drops.
+                let at = self.slimes[current].point();
+                self.slimes[current] = self.dormant_enemy(current);
+                for session in self
+                    .mech_players(fight.zone)
+                    .into_iter()
+                    .filter(|(_, p)| fight.arena.contains(*p))
+                    .map(|(s, _)| s)
+                    .collect::<Vec<_>>()
+                {
+                    self.mech_heavy(session, o.heavy, &sh.name, fight.boss);
+                }
+                self.mech_event(fight.zone, "land", &sh.name, at, o.heavy);
+                if let Some(next) = sh.adds.iter().copied().find(|a| !self.slimes[*a].dead) {
+                    o.current = next;
+                    o.left = o.deadline;
+                    self.mech_event(
+                        fight.zone,
+                        "cast",
+                        &sh.name,
+                        self.slimes[next].point(),
+                        o.deadline,
+                    );
+                }
+            }
+        }
         if sh.adds.iter().all(|s| self.slimes[*s].dead) {
-            let name = sh.name.clone();
-            fight.shield = None;
-            let at = self.slimes[fight.boss].point();
-            self.mech_event(fight.zone, "shield", &name, at, 0.);
+            self.mech_event(
+                fight.zone,
+                "shield",
+                &sh.name,
+                self.slimes[fight.boss].point(),
+                0.,
+            );
             return;
         }
         if sh.heal_per_s > 0. {
             let s = &mut self.slimes[fight.boss];
             s.hp = (s.hp + s.max_hp * sh.heal_per_s * TICK).min(s.max_hp);
         }
+        fight.shield = Some(sh);
     }
 
     fn tick_blooms(&mut self, fight: &mut Fight) {
@@ -2852,6 +2935,43 @@ impl World {
                         self.players.get(s).map(|p| (p.character.id.clone(), *left))
                     }).collect::<BTreeMap<String, f64>>(),
                 });
+            }
+            if let Some(sh) = &fight.shield
+                && let Some(o) = &sh.ordered
+            {
+                cast = json!({"name": sh.name, "left": o.left.max(0.), "total": o.deadline});
+                let current = sh.adds.iter().copied().find(|a| !self.slimes[*a].dead);
+                for (n, slot) in sh
+                    .adds
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, a)| !self.slimes[**a].dead)
+                {
+                    let s = &self.slimes[*slot];
+                    let active = current == Some(*slot);
+                    let mut tele = tele_json(
+                        *slot as u64,
+                        &sh.name,
+                        if active {
+                            bm::Telegraph::Danger
+                        } else {
+                            bm::Telegraph::Path
+                        },
+                        &[Shape::Circle {
+                            x: s.x,
+                            y: s.y,
+                            r: 1.3,
+                            inner: 0.,
+                        }],
+                        if active { o.left.max(0.) } else { 0. },
+                        o.deadline,
+                        false,
+                    );
+                    tele["ingot"] = json!(n + 1);
+                    tele["target"] = json!(slot);
+                    tele["current"] = json!(active);
+                    teles.push(tele);
+                }
             }
             self.raid_cast_view(fight, def, &mut teles, &mut cast);
             let ids = |sessions: Vec<&u64>| -> Vec<String> {
