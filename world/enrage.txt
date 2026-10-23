@@ -476,5 +476,25 @@
   "cf_sigrun": [
     305,
     30
+  ],
+  "cf_dagfinn": [
+    227,
+    30
+  ],
+  "cf_thorbjorg": [
+    375,
+    30
+  ],
+  "cf_ragnhild": [
+    210,
+    30
+  ],
+  "cf_orm": [
+    98,
+    30
+  ],
+  "cf_hildr": [
+    219,
+    30
   ]
 }

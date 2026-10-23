@@ -80,6 +80,7 @@ enum Live {
     Break(BreakLive),
     Gaze(GazeLive),
     Raid(raid_bosses::RaidLive),
+    Forge(forge_wardens::ForgeLive),
 }
 impl Live {
     fn mech(&self) -> usize {
@@ -91,6 +92,7 @@ impl Live {
             Self::Break(b) => b.mech,
             Self::Gaze(g) => g.mech,
             Self::Raid(r) => r.mech,
+            Self::Forge(r) => r.mech,
         }
     }
 }
@@ -426,7 +428,8 @@ impl World {
         if fight.downed.contains_key(&id) {
             return Incoming::Immune;
         }
-        let mut damage = damage;
+        let mut damage =
+            self.forge_cap_damage(fight, id, damage) * self.forge_incoming_scale(fight, id);
         if fight.stun_left > 0. && id == fight.boss {
             damage *= 1. + fight.vulnerable;
         }
@@ -466,6 +469,9 @@ impl World {
                     b.dealt += dealt;
                 }
             }
+        }
+        if id == boss && dealt > 0. {
+            self.forge_reflect_hit(boss, session);
         }
         if id == boss && !killed && dealt > 0. {
             self.add_static_charge(boss, session);
@@ -700,6 +706,9 @@ impl World {
                 Block::Tether(t) => t.first,
                 Block::Gust(g) => g.first,
                 Block::Soak(s) => s.first,
+                Block::Relay(r) => r.first,
+                Block::Grid(g) => g.first,
+                Block::Reflect(r) => r.first,
                 _ => 0.,
             })
             .collect();
@@ -889,6 +898,10 @@ impl World {
         let active = m.active_at(share);
         // Continuous blocks and thresholds first.
         match &m.block {
+            Block::Valves(_) | Block::Carry(_) => {
+                self.tick_forge_continuous(fight, i, m, share);
+                return;
+            }
             Block::Hold(_) => {
                 self.tick_hold(fight, i);
                 return;
@@ -947,6 +960,9 @@ impl World {
         }
         let at = self.slimes[id].point();
         match &m.block {
+            Block::Relay(_) | Block::Grid(_) | Block::Reflect(_) => {
+                self.start_forge_cast(fight, i, m);
+            }
             Block::Tether(_) | Block::Gust(_) | Block::Soak(_) => {
                 self.start_raid_cast(fight, i, m);
             }
@@ -1676,6 +1692,7 @@ impl World {
             Live::Break(bl) => self.tick_break(fight, m, bl),
             Live::Gaze(gl) => self.tick_gaze(fight, m, gl),
             Live::Raid(r) => self.tick_raid_cast(fight, m, r),
+            Live::Forge(r) => self.tick_forge_cast(fight, m, r),
         }
     }
 
@@ -2417,6 +2434,11 @@ impl World {
             for live in &fight.live {
                 let m = &def.mechanics[live.mech()];
                 match (live, &m.block) {
+                    (Live::Forge(r), _) => {
+                        if let Some(left) = self.forge_danger(fight, m, r, session, at, look) {
+                            note(&m.name, left, true);
+                        }
+                    }
                     (Live::Raid(r), _) => {
                         if let Some(left) = self.raid_cast_danger(fight, m, r, session, at) {
                             note(&m.name, left, true);
@@ -2974,6 +2996,7 @@ impl World {
                 }
             }
             self.raid_cast_view(fight, def, &mut teles, &mut cast);
+            self.forge_cast_view(fight, def, &mut teles, &mut cast);
             let ids = |sessions: Vec<&u64>| -> Vec<String> {
                 sessions
                     .into_iter()
@@ -3041,3 +3064,6 @@ mod raid_bosses;
 #[cfg(test)]
 #[path = "raid_boss_tests.rs"]
 mod raid_tests;
+
+#[path = "forge_wardens.rs"]
+mod forge_wardens;

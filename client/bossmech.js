@@ -211,6 +211,14 @@
       if (f.stunned > 0) { const b = boss?.(f.boss); if (b) { const [sx, sy] = w2s(b.x, b.y, 130); label(`${text('Stunned')} ${Math.max(0, f.stunned - (now() - stamp)).toFixed(1)}`, sx, sy, 16, GOLD); } }
       if (f.banner && f.banner !== f.cast?.name) label(text(f.banner), VW / 2, y + 4, 20, '#fff4ca');
       for (const tele of f.tele || []) {
+        if (tele.label && tele.shapes?.length) {
+          const [x,y] = centre(tele.shapes[0]), [sx,sy] = w2s(x,y,54);
+          let words = text(tele.label);
+          if (tele.need) words += ` · ${tele.count}/${tele.need}`;
+          if (tele.holdTotal) words += ` · ${Number(tele.held).toFixed(1)}/${tele.holdTotal}s`;
+          if (tele.fuse != null) words += ` · ${Number(tele.fuse).toFixed(1)}s`;
+          label(words,sx,sy,tele.beat ? 22 : 15,tele.reflect ? '#fffaf0' : tele.tele === 'blue' ? '#b9e7ff' : '#ffe2a0');
+        }
         if (tele.ingot && tele.shapes?.[0]?.t === 'circle') {
           const s = tele.shapes[0], [sx, sy] = w2s(s.x, s.y, 48);
           label(fill(text('Ingot {0}'), tele.ingot), sx, sy - 18, 18, tele.current ? GOLD : '#b8c7cf');

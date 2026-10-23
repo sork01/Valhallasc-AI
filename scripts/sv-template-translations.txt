@@ -406,5 +406,8 @@
   "You need {0} more gold to repair everything.": "Du behöver {0} guld till för att reparera allt.",
   "Your gear lost durability. Broken pieces: {0}. Repair them at a smith.": "Din utrustning har tappat hållbarhet. Trasiga föremål: {0}. Reparera dem hos en smed.",
   "{0} · rank {1} · {2}{3}": "{0} · grad {1} · {2}{3}",
-  "Ingot {0}": "Tacka {0}"
+  "Ingot {0}": "Tacka {0}",
+  "Brand {0}": "Glöd {0}",
+  "Valve {0}": "Ventil {0}",
+  "Water: {0}/{1}": "Vatten: {0}/{1}"
 }

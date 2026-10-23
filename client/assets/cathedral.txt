@@ -136,7 +136,12 @@
     "cf_ysolt",
     "cf_hallgrim",
     "cf_sigrun",
-    "cf_ingot"
+    "cf_ingot",
+    "cf_dagfinn",
+    "cf_thorbjorg",
+    "cf_ragnhild",
+    "cf_orm",
+    "cf_hildr"
   ],
   "clips": {
     "idle": {
@@ -299,7 +304,12 @@
     "cf_ysolt": "89bd4bd3a01c81f5",
     "cf_hallgrim": "9e589b01e2eb66f8",
     "cf_sigrun": "d226346b24398667",
-    "cf_ingot": "3ffbfc5e3127b1ee"
+    "cf_ingot": "3ffbfc5e3127b1ee",
+    "cf_dagfinn": "f9208d6722951418",
+    "cf_thorbjorg": "4fe09a98cf914345",
+    "cf_ragnhild": "65352991436624dc",
+    "cf_orm": "4fc1695f6a54fcd3",
+    "cf_hildr": "73339fa7bca515c0"
   },
   "tops": {
     "tidetemplar": 84,
@@ -430,6 +440,11 @@
     "cf_ysolt": 71,
     "cf_hallgrim": 56,
     "cf_sigrun": 60,
-    "cf_ingot": 38
+    "cf_ingot": 38,
+    "cf_dagfinn": 62,
+    "cf_thorbjorg": 69,
+    "cf_ragnhild": 60,
+    "cf_orm": 60,
+    "cf_hildr": 72
   }
 }

@@ -2819,6 +2819,7 @@ impl World {
     }
     fn update_player(&mut self, session: u64) {
         self.update_resource(session);
+        let carry_speed = self.forge_carry_speed(session);
         let p = self.players.get_mut(&session).unwrap();
         p.cooldown = (p.cooldown - TICK).max(0.);
         p.hurt = (p.hurt - TICK).max(0.);
@@ -3038,6 +3039,7 @@ impl World {
             p.dash = (p.dash - TICK).max(0.);
             dash_sweep = p.dash_mult > 0.;
         }
+        distance *= carry_speed;
         p.moving = false;
         if distance > 0. && (dir.x != 0. || dir.y != 0.) {
             let mut point = p.character.point();
@@ -3091,6 +3093,20 @@ impl World {
         if self.maps[portal.to].sealed_template && self.public_zone(p.character.zone) != portal.to {
             return;
         }
+        let internal_lift =
+            portal.needs_boss.is_some() && self.public_zone(p.character.zone) == portal.to;
+        if let Some(kind) = &portal.needs_boss {
+            if !internal_lift
+                || !self
+                    .slimes
+                    .iter()
+                    .any(|s| s.zone == p.character.zone && &s.kind == kind && s.dead)
+            {
+                return;
+            }
+            // Local transport preserves this copy and works for a recovering, incomplete crew.
+            portal.to = p.character.zone;
+        }
         // Some doors stay shut until a quest is done, whoever you are with.
         if let Some(id) = &portal.needs_quest
             && !p
@@ -3140,7 +3156,7 @@ impl World {
                         y: place.y,
                     }) <= place.r
             });
-        if self.maps[portal.to].raid && !muster {
+        if self.maps[portal.to].raid && !muster && !internal_lift {
             let group = self.party_mates(&p.character.id).len();
             if group != social::RAID_MAX {
                 let text = format!(
@@ -3156,7 +3172,11 @@ impl World {
         }
         let mut raid_gate_crew = Vec::new();
         // The inner gate checks the actual gathering, not distant names on the party list.
-        if self.maps[p.character.zone].raid && self.maps[portal.to].raid && !muster {
+        if self.maps[p.character.zone].raid
+            && self.maps[portal.to].raid
+            && !muster
+            && !internal_lift
+        {
             let mates = self.party_mates(&p.character.id);
             raid_gate_crew = self
                 .players
@@ -3193,7 +3213,7 @@ impl World {
             }
         }
         // A dungeon's door leads to a private copy: the party's own, or a free one.
-        if self.maps[portal.to].copies > 0 {
+        if self.maps[portal.to].copies > 0 && !internal_lift {
             match self.instance_for(session, portal.to) {
                 Ok(copy) => portal.to = copy,
                 Err(text) => {
@@ -4312,6 +4332,7 @@ impl World {
         let zone = self.slimes[id].zone;
         let dungeon = self.instance_at(zone).map(|i| i.template);
         let (pack_damage, enrage_scale) = self.tuned(zone, &self.slimes[id].kind);
+        let pack_damage = pack_damage * self.forge_attack_scale(id);
         // A respawning enemy rolls a fresh level; kings come from the shared timer instead.
         let respawn_level = {
             let s = &self.slimes[id];
@@ -10675,6 +10696,7 @@ mod tests {
             after_clear: false,
             muster: false,
             needs_quest: None,
+            needs_boss: None,
         });
         w.use_portal(1);
         assert_eq!(w.players[&1].character.zone, 0);

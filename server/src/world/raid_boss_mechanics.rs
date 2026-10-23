@@ -26,7 +26,11 @@ fn inside(a: Rect, p: Point, margin: f64) -> bool {
 
 /// Small minimum-cost matching with capacity, rather than ten bots all choosing
 /// the same nearest post. Stable session order keeps the choice steady per cast.
-fn assign(mates: &[(u64, Point)], points: &[[f64; 2]], caps: &[usize]) -> BTreeMap<u64, usize> {
+pub(super) fn assign(
+    mates: &[(u64, Point)],
+    points: &[[f64; 2]],
+    caps: &[usize],
+) -> BTreeMap<u64, usize> {
     let mut states = BTreeMap::from([(0u32, (0., Vec::<usize>::new()))]);
     for (_, at) in mates {
         let mut next: BTreeMap<u32, (f64, Vec<usize>)> = BTreeMap::new();

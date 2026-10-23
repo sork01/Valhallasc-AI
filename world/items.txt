@@ -57767,6 +57767,41 @@
     "sell": 10000
   },
   {
+    "id": "cf_dagfinn_relic",
+    "name": "Dagfinn Tongsbearer Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
+    "id": "cf_thorbjorg_relic",
+    "name": "Thorbjörg Quenchwife Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
+    "id": "cf_ragnhild_relic",
+    "name": "Ragnhild Cinderfoot Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
+    "id": "cf_orm_relic",
+    "name": "Orm Ashwalker Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
+    "id": "cf_hildr_relic",
+    "name": "Hildr Lastlink Relic",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 10000
+  },
+  {
     "id": "cfpack_pants",
     "name": "Cinderwork Kiln Gaiters",
     "kind": "pants",

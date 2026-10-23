@@ -39,6 +39,7 @@ impl World {
         let (zone, kind, level) = (s.zone, s.kind.clone(), s.level);
         let (pack_damage, enrage_scale) = self.tuned(zone, &kind);
         let damage = s.damage
+            * self.forge_attack_scale(id)
             * pack_damage
             * crate::items::enrage_factor_scaled(&s.kind, s.fight, enrage_scale);
         let angle = base.y.atan2(base.x);

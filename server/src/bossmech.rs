@@ -185,6 +185,11 @@ pub enum Block {
     Tether(Tether),
     Gust(Gust),
     Soak(Soak),
+    Valves(Valves),
+    Relay(Relay),
+    Grid(Grid),
+    Carry(Carry),
+    Reflect(Reflect),
 }
 
 /// A standing leash: all fighters form pairs (one trio for an odd crew),
@@ -230,6 +235,61 @@ pub struct Soak {
     pub points: Vec<[f64; 2]>,
     pub r: f64,
     pub need: usize,
+    pub heavy: f64,
+}
+
+/// Counted, continuous holds on opposite sides of a temporary lava divide.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Valves {
+    pub at: Vec<f64>,
+    pub cast: f64,
+    pub duration: f64,
+    pub points: Vec<[f64; 2]>,
+    pub r: f64,
+    pub need: usize,
+    pub hold: f64,
+}
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Relay {
+    pub cast: f64,
+    pub first: f64,
+    pub every: f64,
+    pub duration: f64,
+    pub count: usize,
+    pub fuse: f64,
+    pub immunity: f64,
+    pub touch: f64,
+    pub blast: f64,
+}
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Grid {
+    pub cast: f64,
+    pub first: f64,
+    pub every: f64,
+    pub bpm: f64,
+    pub heavy: f64,
+}
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Carry {
+    pub points: Vec<[f64; 2]>,
+    pub r: f64,
+    pub throw_r: f64,
+    pub need: usize,
+    pub window: f64,
+    pub quenched: f64,
+    pub speed: f64,
+}
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Reflect {
+    pub cast: f64,
+    pub first: f64,
+    pub every: f64,
+    pub duration: f64,
     pub heavy: f64,
 }
 
@@ -1558,6 +1618,84 @@ pub fn validate(kind: &str, def: &BossDef) -> Result<(), String> {
                     return bad(
                         m,
                         "soak needs separate circles, a lethal warning and a count a ten-fighter crew can meet",
+                    );
+                }
+            }
+            Block::Valves(v) => {
+                if v.at != [0.7, 0.4]
+                    || v.cast < 5.
+                    || v.duration < v.hold
+                    || v.hold <= 0.
+                    || v.points.len() != 2
+                    || !finite_points(&v.points)
+                    || !positive(v.r)
+                    || v.need == 0
+                    || v.need * 2 > 10
+                {
+                    return bad(
+                        m,
+                        "valves need two counted stations, 70/40 thresholds and time for continuous holds",
+                    );
+                }
+            }
+            Block::Relay(r) => {
+                if r.cast < 5.
+                    || r.count != 3
+                    || r.fuse < 5.
+                    || r.immunity <= 0.
+                    || r.immunity >= r.fuse
+                    || r.duration <= r.fuse
+                    || r.every <= r.cast + r.duration
+                    || !positive(r.touch)
+                    || !positive(r.blast)
+                    || !positive(r.first)
+                {
+                    return bad(
+                        m,
+                        "relay needs three brands, fair fuses, positive touch/blast and non-overlapping casts",
+                    );
+                }
+            }
+            Block::Grid(g) => {
+                if g.cast < 5.
+                    || !positive(g.first)
+                    || !positive(g.bpm)
+                    || g.bpm > 150.
+                    || g.every <= g.cast + 240. / g.bpm
+                    || !(g.heavy > 0. && g.heavy <= 1.)
+                {
+                    return bad(
+                        m,
+                        "grid needs a full cue and four readable beats no faster than 150 BPM",
+                    );
+                }
+            }
+            Block::Carry(c) => {
+                if c.points.len() != 10
+                    || !finite_points(&c.points)
+                    || c.need != 6
+                    || !positive(c.r)
+                    || !positive(c.throw_r)
+                    || !positive(c.window)
+                    || !positive(c.quenched)
+                    || !(c.speed > 0. && c.speed < 1.)
+                {
+                    return bad(
+                        m,
+                        "carry needs ten wells, six throws and positive pickup/window/quench/speed rules",
+                    );
+                }
+            }
+            Block::Reflect(r) => {
+                if r.cast < 5.
+                    || !positive(r.first)
+                    || !positive(r.duration)
+                    || r.every <= r.cast + r.duration
+                    || !(r.heavy > 0. && r.heavy <= 1.)
+                {
+                    return bad(
+                        m,
+                        "reflect needs a full warning, a finite pause and a heavy hit",
                     );
                 }
             }
