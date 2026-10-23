@@ -1,6 +1,7 @@
 // Portrait menu on the target badge (client/portrait-menu.js) and the inspect window (client/inspect.js), in real
 // Chromium pages against a private world with adventurers: right-click, keyboard and long-press opening, disabled
 // entries that say why, Trade and Duel declined by an adventurer, Inspect showing another player's gear and stats.
+// MUTATE=still serves an inspect.js that draws the figure at time 0: the animation check must fail.
 // MUTATE=1 serves a portrait-menu.js with the trade-range rule removed: the run must fail.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -27,6 +28,10 @@ async function call(name, args = {}) {
     const page = await context.newPage();
     page.on('pageerror', e => errors.push(`${name}: ${e.message}`));
     await page.addInitScript(() => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null, uiSet: true, ui: {}, panelSizeSet: true, panelSize: {} })));
+    if (process.env.MUTATE === 'still') {
+      const source = fs.readFileSync(path.join(root, 'client/inspect.js'), 'utf8').replace('sprite.draw(g, { fx: 1, fy: 1, walk: 0 }, time, 2.8)', 'sprite.draw(g, { fx: 1, fy: 1, walk: 0 }, 0, 2.8)');
+      await page.route('**/inspect.js', route => route.fulfill({ contentType: 'text/javascript', body: source }));
+    }
     if (process.env.MUTATE === '1') {
       const source = fs.readFileSync(path.join(root, 'client/portrait-menu.js'), 'utf8').replace('distance(hero, r) > TRADE_RANGE', 'false');
       await page.route('**/portrait-menu.js', route => route.fulfill({ contentType: 'text/javascript', body: source }));
@@ -117,7 +122,7 @@ async function call(name, args = {}) {
   const necklaceCard = alice.locator('#inspect-slots [data-slot="necklace"]');
   check((await necklaceCard.textContent()).includes(necklace.name), 'The necklace slot shows the worn piece');
   check(await necklaceCard.getAttribute('data-rarity') === 'rare', 'The slot is coloured by the piece rarity');
-  check(await alice.locator('#inspect-slots .equipped-slot').count() === 9, 'All nine slots are listed');
+  check(await alice.locator('#inspect-slots .equipped-slot').count() === 10, 'All ten slots are listed');
   check(await alice.locator('#inspect-slots [data-slot="headgear"]').getAttribute('data-empty') === 'true', 'An empty slot reads empty');
   await necklaceCard.locator('button').hover();
   check((await alice.locator('#inspect-tip').textContent()).includes(necklace.name), 'Hovering a slot shows its tooltip');
@@ -131,6 +136,16 @@ async function call(name, args = {}) {
   if (process.env.REAL_SPRITES === '1') {
     await alice.waitForFunction(() => { const c = document.getElementById('inspect-cv'); return [...c.getContext('2d').getImageData(0, 0, c.width, c.height).data].some((v, i) => i % 4 === 3 && v > 0); }, null, { timeout: 20000 });
     checks++;
+    // The figure stands between the slot columns and plays the idle clip; it stops with the window.
+    const hashes = new Set();
+    for (let i = 0; i < 12; i++) { hashes.add(await alice.evaluate(() => { const c = document.getElementById('inspect-cv'); return c.toDataURL().length + ':' + c.toDataURL().slice(-64); })); await alice.waitForTimeout(150); }
+    check(hashes.size > 1, `The inspected figure animates (${hashes.size} distinct frames in 1.8 s)`);
+    const layout = await alice.evaluate(() => {
+      const r = s => document.querySelector(s).getBoundingClientRect(), cv = r('#inspect-cv'), left = r('#inspect-slots [data-slot="headgear"]'), right = r('#inspect-slots [data-slot="necklace"]');
+      return { cv: cv.left + cv.width / 2, left: left.right, right: right.left, cvLeft: cv.left, cvRight: cv.right };
+    });
+    check(layout.cv > layout.left && layout.cv < layout.right && layout.cvLeft >= layout.left && layout.cvRight <= layout.right + 1, `The figure sits between the slot columns ${JSON.stringify(layout)}`);
+    check(await alice.evaluate(() => Inspect.animating), 'The animation loop runs while the window is open');
   }
   // Live refresh: when the character leaves, the window says so.
   await debug(bob, { op: 'teleport', zone: 0, x: 8, y: 8 });
@@ -139,6 +154,7 @@ async function call(name, args = {}) {
   check(true, 'The window says "No longer nearby" when the target is out of reach');
   await alice.keyboard.press('Escape');
   check(await alice.locator('#inspect-panel').isHidden() && await alice.locator('#pause').isHidden(), 'Escape closes the inspect window only');
+  check(await alice.evaluate(() => !Inspect.animating), 'The animation loop stops when the window closes');
 
   // An adventurer: Trade and Duel go out and come back declined; nothing opens.
   const near = await alice.evaluate(async () => {

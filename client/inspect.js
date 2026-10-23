@@ -6,14 +6,14 @@
   const panel = $('inspect-panel');
   if (!panel) return;
   const REFRESH = 3000;
-  const SLOTS = [['headgear', 'Headgear'], ['shoulders', 'Shoulders'], ['chest', 'Chest'], ['pants', 'Pants'], ['gloves', 'Gloves'], ['hands', 'Hands'], ['necklace', 'Necklace'], ['accessory1', 'Accessory 1'], ['accessory2', 'Accessory 2']];
+  const SLOTS = [['headgear', 'Headgear'], ['shoulders', 'Shoulders'], ['chest', 'Chest'], ['pants', 'Pants'], ['gloves', 'Gloves'], ['hands', 'Hands'], ['necklace', 'Necklace'], ['cloak', 'Cloak'], ['accessory1', 'Accessory 1'], ['accessory2', 'Accessory 2']];
   const KIND = { chest: 'armor', hands: 'weapon', accessory1: 'accessory', accessory2: 'accessory' };
   const RARITY = { common: 'Common', uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic', legendary: 'Legendary', gm: 'Game Master' };
   const ATTRIBUTES = ['strength', 'agility', 'intellect', 'stamina', 'dexterity', 'accuracy'];
   const tr = text => window.Locale ? Locale.translate(text) : text;
   const catalog = id => (window.WORLD_ITEMS || []).find(i => i.id === id);
   const node = (tag, text, cls) => { const n = document.createElement(tag); if (text != null) n.textContent = text; if (cls) n.className = cls; return n; };
-  let target = null, timer = 0, opener = null, generation = 0, lookKey = '', sprite = null, answer = null, shown = '';
+  let target = null, timer = 0, opener = null, generation = 0, lookKey = '', sprite = null, answer = null, shown = '', raf = 0;
 
   function send() { if (target && Online.connected) Online.send({ type: 'inspect', id: target.id }); }
   function tip() {
@@ -39,17 +39,31 @@
     t.style.top = `${a.top - w.height - 6 < 4 ? a.bottom + 6 : a.top - w.height - 6}px`;
   }
 
+  // The figure stands between the two slot columns and plays the idle clip, as in the game; the loop runs only while
+  // the window is open and a sprite is loaded, and repaints at most every 33 ms.
+  function paint(time) {
+    const canvas = $('inspect-cv'), g = canvas.getContext('2d');
+    canvas.width = 320; canvas.height = 420;
+    if (sprite) { g.translate(160, 365); sprite.draw(g, { fx: 1, fy: 1, walk: 0 }, time, 2.8); }
+  }
+  function stop() { if (raf) cancelAnimationFrame(raf); raf = 0; }
+  function animate() {
+    stop();
+    let last = -1;
+    const frame = now => {
+      if (panel.hidden || !sprite) { raf = 0; return; }
+      raf = requestAnimationFrame(frame);
+      if (now - last < 33) return;
+      last = now; paint(now / 1000);
+    };
+    raf = requestAnimationFrame(frame);
+  }
   function drawFigure(look) {
-    const key = JSON.stringify(look), canvas = $('inspect-cv'), mine = ++generation;
+    const key = JSON.stringify(look), mine = ++generation;
     if (key === lookKey && sprite) return;
     lookKey = key;
-    const paint = () => {
-      canvas.width = 320; canvas.height = 420;
-      const g = canvas.getContext('2d'); g.clearRect(0, 0, 320, 420);
-      if (sprite) { g.translate(160, 365); sprite.draw(g, { fx: 1, fy: 1, walk: 0 }, 0, 2.8); }
-    };
-    sprite = null; paint();
-    window.Field?.loadSprite(look).then(s => { if (mine === generation) { sprite = s; paint(); } }).catch(() => {});
+    sprite = null; stop(); paint(0);
+    window.Field?.loadSprite(look).then(s => { if (mine === generation) { sprite = s; paint(performance.now() / 1000); animate(); } }).catch(() => {});
   }
 
   function renderSlots(slots) {
@@ -113,7 +127,7 @@
   }
   function close() {
     if (panel.hidden) return;
-    panel.hidden = true; clearInterval(timer); timer = 0; target = null; answer = null; shown = ''; hideTip();
+    panel.hidden = true; clearInterval(timer); timer = 0; target = null; answer = null; shown = ''; lookKey = ''; sprite = null; stop(); hideTip();
     if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
     opener = null;
   }
@@ -138,5 +152,6 @@
     },
     reset() { close(); },
     get isOpen() { return !panel.hidden; },
+    get animating() { return raf !== 0; },
   };
 })();

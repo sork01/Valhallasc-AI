@@ -891,12 +891,10 @@
 .inspect-note { margin: 2cqw; text-align: center; color: #eee3cb; font: 1.4cqw 'Jua', sans-serif; }
 .inspect-note[hidden], .inspect-body[hidden] { display: none; }
 .inspect-body { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 1.4cqw; padding: 0 1.4cqw 1.4cqw; align-items: start; }
-.inspect-doll { position: relative; min-height: 34cqw; }
-.inspect-slots { position: absolute; inset: .8cqw; display: grid; grid-template-columns: repeat(3, 1fr); align-content: center; gap: 1.4cqw .6cqw; }
-.inspect-slots .equipped-slot { position: static; display: grid; justify-items: center; text-align: center; min-width: 0; height: auto; min-height: 0; }
-.inspect-slots .gear-icon { width: 4cqw; height: 4cqw; }
-.inspect-slot-label { font-size: .8cqw; color: #b9ad92; }
-.inspect-slot-item { font-size: .85cqw; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #eee3cb; }
+.inspect-doll { position: relative; }
+.inspect-doll #inspect-cv { position: absolute; top: 1cqw; left: 50%; transform: translateX(-50%); width: 14.5cqw; height: 19cqw; image-rendering: pixelated; pointer-events: none; }
+.inspect-slots { position: absolute; inset: .8cqw; display: grid; grid-template-columns: 6cqw 1fr 6cqw; grid-template-rows: repeat(5, 3.9cqw); z-index: 1; }
+.inspect-slot-label, .inspect-slot-item { display: none; }   /* the tooltip and the button's aria-label carry the names */
 .inspect-sheet { color: #eee3cb; font: 1.1cqw 'Jua', sans-serif; }
 .inspect-sheet h4 { margin: 1cqw 0 .4cqw; color: #ffe6a8; }
 .inspect-list { display: grid; grid-template-columns: 1fr auto; gap: .3cqw 1cqw; margin: 0; }
