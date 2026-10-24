@@ -128,8 +128,8 @@ pub struct Item {
     /// Potions: seconds before any potion can be drunk again.
     #[serde(default)]
     pub cooldown: f64,
-    /// Potions and food come in tiers, one every ten levels (scripts/consumable_tiers.py); this names the line they
-    /// belong to (`health_potion`, `mana_potion`, `traveler_stew`). A tiered vendor offer sells the best tier the buyer's
+    /// A tiered vendor line: consumables, cloaks or green class weapons (`vendor_weapon_*`).
+    /// A tiered vendor offer sells the best tier the buyer's
     /// level allows, at its `price`.
     #[serde(default)]
     pub family: Option<String>,

@@ -415,5 +415,7 @@
   "Heat: {0}%": "Hetta: {0} %",
   "{0}: Eldmarr needs exactly one crack, heat and seats block": "{0}: Eldmarr behöver exakt ett block vardera för sprickor, hetta och sittplatser",
   "Pieces: {0}/10": "Delar: {0}/10",
-  "Try again in {0}.": "Försök igen om {0}."
+  "Try again in {0}.": "Försök igen om {0}.",
+  "Requires level {0}.": "Kräver nivå {0}.",
+  "Buy {0} · level {1}": "Köp {0:t} · nivå {1}"
 }

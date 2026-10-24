@@ -1538,7 +1538,7 @@ pub struct Offer {
     /// usual price each, and the fighters follow only into the raid.
     #[serde(default)]
     pub raid: bool,
-    /// Sells the best tier of the item's family for the buyer's level, at that tier's price (potions and food).
+    /// Sells the best tier of the item's family for the buyer's level, at that tier's price (consumables, cloaks and green weapons).
     #[serde(default)]
     pub tiered: bool,
     /// Sells this mount (an id in `MOUNTS`) once the buyer has its level and the gold, and, when `needs` names an

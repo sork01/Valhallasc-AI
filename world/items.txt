@@ -4196,7 +4196,9 @@
     },
     "starter": false,
     "attack": 9.6,
-    "defense": 2.4
+    "defense": 2.4,
+    "family": "vendor_weapon_warrior",
+    "price": 1000
   },
   {
     "id": "mage_armor_runic_l10_green",
@@ -4291,7 +4293,9 @@
     },
     "starter": false,
     "attack": 9.6,
-    "defense": 2.4
+    "defense": 2.4,
+    "family": "vendor_weapon_mage",
+    "price": 1000
   },
   {
     "id": "assassin_armor_moon_l10_green",
@@ -4386,7 +4390,9 @@
     },
     "starter": false,
     "attack": 9.6,
-    "defense": 2.4
+    "defense": 2.4,
+    "family": "vendor_weapon_assassin",
+    "price": 1000
   },
   {
     "id": "priest_armor_dawn_l10_green",
@@ -4481,7 +4487,9 @@
     },
     "starter": false,
     "attack": 9.6,
-    "defense": 2.4
+    "defense": 2.4,
+    "family": "vendor_weapon_priest",
+    "price": 1000
   },
   {
     "id": "hunter_armor_warden_l10_green",
@@ -4576,7 +4584,9 @@
     },
     "starter": false,
     "attack": 9.6,
-    "defense": 2.4
+    "defense": 2.4,
+    "family": "vendor_weapon_hunter",
+    "price": 1000
   },
   {
     "id": "pants_wayfarer_l10_green",
@@ -8179,7 +8189,9 @@
     },
     "starter": false,
     "attack": 16.0,
-    "defense": 4.0
+    "defense": 4.0,
+    "family": "vendor_weapon_warrior",
+    "price": 4000
   },
   {
     "id": "mage_armor_runic_l20_green",
@@ -8274,7 +8286,9 @@
     },
     "starter": false,
     "attack": 16.0,
-    "defense": 4.0
+    "defense": 4.0,
+    "family": "vendor_weapon_mage",
+    "price": 4000
   },
   {
     "id": "assassin_armor_moon_l20_green",
@@ -8369,7 +8383,9 @@
     },
     "starter": false,
     "attack": 16.0,
-    "defense": 4.0
+    "defense": 4.0,
+    "family": "vendor_weapon_assassin",
+    "price": 4000
   },
   {
     "id": "priest_armor_dawn_l20_green",
@@ -8464,7 +8480,9 @@
     },
     "starter": false,
     "attack": 16.0,
-    "defense": 4.0
+    "defense": 4.0,
+    "family": "vendor_weapon_priest",
+    "price": 4000
   },
   {
     "id": "hunter_armor_warden_l20_green",
@@ -8559,7 +8577,9 @@
     },
     "starter": false,
     "attack": 16.0,
-    "defense": 4.0
+    "defense": 4.0,
+    "family": "vendor_weapon_hunter",
+    "price": 4000
   },
   {
     "id": "pants_wayfarer_l20_green",
@@ -13291,7 +13311,9 @@
     },
     "starter": false,
     "attack": 22.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "family": "vendor_weapon_warrior",
+    "price": 9000
   },
   {
     "id": "mage_armor_runic_l30_green",
@@ -13386,7 +13408,9 @@
     },
     "starter": false,
     "attack": 22.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "family": "vendor_weapon_mage",
+    "price": 9000
   },
   {
     "id": "assassin_armor_moon_l30_green",
@@ -13481,7 +13505,9 @@
     },
     "starter": false,
     "attack": 22.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "family": "vendor_weapon_assassin",
+    "price": 9000
   },
   {
     "id": "priest_armor_dawn_l30_green",
@@ -13576,7 +13602,9 @@
     },
     "starter": false,
     "attack": 22.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "family": "vendor_weapon_priest",
+    "price": 9000
   },
   {
     "id": "hunter_armor_warden_l30_green",
@@ -13671,7 +13699,9 @@
     },
     "starter": false,
     "attack": 22.4,
-    "defense": 5.6
+    "defense": 5.6,
+    "family": "vendor_weapon_hunter",
+    "price": 9000
   },
   {
     "id": "pants_wayfarer_l30_green",
@@ -17274,7 +17304,9 @@
     },
     "starter": false,
     "attack": 28.8,
-    "defense": 7.2
+    "defense": 7.2,
+    "family": "vendor_weapon_warrior",
+    "price": 16000
   },
   {
     "id": "mage_armor_runic_l40_green",
@@ -17369,7 +17401,9 @@
     },
     "starter": false,
     "attack": 28.8,
-    "defense": 7.2
+    "defense": 7.2,
+    "family": "vendor_weapon_mage",
+    "price": 16000
   },
   {
     "id": "assassin_armor_moon_l40_green",
@@ -17464,7 +17498,9 @@
     },
     "starter": false,
     "attack": 28.8,
-    "defense": 7.2
+    "defense": 7.2,
+    "family": "vendor_weapon_assassin",
+    "price": 16000
   },
   {
     "id": "priest_armor_dawn_l40_green",
@@ -17559,7 +17595,9 @@
     },
     "starter": false,
     "attack": 28.8,
-    "defense": 7.2
+    "defense": 7.2,
+    "family": "vendor_weapon_priest",
+    "price": 16000
   },
   {
     "id": "hunter_armor_warden_l40_green",
@@ -17654,7 +17692,9 @@
     },
     "starter": false,
     "attack": 28.8,
-    "defense": 7.2
+    "defense": 7.2,
+    "family": "vendor_weapon_hunter",
+    "price": 16000
   },
   {
     "id": "pants_wayfarer_l40_green",
@@ -21257,7 +21297,9 @@
     },
     "starter": false,
     "attack": 35.2,
-    "defense": 8.8
+    "defense": 8.8,
+    "family": "vendor_weapon_warrior",
+    "price": 25000
   },
   {
     "id": "mage_armor_runic_l50_green",
@@ -21352,7 +21394,9 @@
     },
     "starter": false,
     "attack": 35.2,
-    "defense": 8.8
+    "defense": 8.8,
+    "family": "vendor_weapon_mage",
+    "price": 25000
   },
   {
     "id": "assassin_armor_moon_l50_green",
@@ -21447,7 +21491,9 @@
     },
     "starter": false,
     "attack": 35.2,
-    "defense": 8.8
+    "defense": 8.8,
+    "family": "vendor_weapon_assassin",
+    "price": 25000
   },
   {
     "id": "priest_armor_dawn_l50_green",
@@ -21542,7 +21588,9 @@
     },
     "starter": false,
     "attack": 35.2,
-    "defense": 8.8
+    "defense": 8.8,
+    "family": "vendor_weapon_priest",
+    "price": 25000
   },
   {
     "id": "hunter_armor_warden_l50_green",
@@ -21637,7 +21685,9 @@
     },
     "starter": false,
     "attack": 35.2,
-    "defense": 8.8
+    "defense": 8.8,
+    "family": "vendor_weapon_hunter",
+    "price": 25000
   },
   {
     "id": "pants_wayfarer_l50_green",
@@ -27331,7 +27381,9 @@
     },
     "starter": false,
     "attack": 41.6,
-    "defense": 10.4
+    "defense": 10.4,
+    "family": "vendor_weapon_warrior",
+    "price": 36000
   },
   {
     "id": "mage_armor_runic_l60_green",
@@ -27426,7 +27478,9 @@
     },
     "starter": false,
     "attack": 41.6,
-    "defense": 10.4
+    "defense": 10.4,
+    "family": "vendor_weapon_mage",
+    "price": 36000
   },
   {
     "id": "assassin_armor_moon_l60_green",
@@ -27521,7 +27575,9 @@
     },
     "starter": false,
     "attack": 41.6,
-    "defense": 10.4
+    "defense": 10.4,
+    "family": "vendor_weapon_assassin",
+    "price": 36000
   },
   {
     "id": "priest_armor_dawn_l60_green",
@@ -27616,7 +27672,9 @@
     },
     "starter": false,
     "attack": 41.6,
-    "defense": 10.4
+    "defense": 10.4,
+    "family": "vendor_weapon_priest",
+    "price": 36000
   },
   {
     "id": "hunter_armor_warden_l60_green",
@@ -27711,7 +27769,9 @@
     },
     "starter": false,
     "attack": 41.6,
-    "defense": 10.4
+    "defense": 10.4,
+    "family": "vendor_weapon_hunter",
+    "price": 36000
   },
   {
     "id": "pants_wayfarer_l60_green",
@@ -31398,7 +31458,9 @@
     },
     "starter": false,
     "attack": 48.0,
-    "defense": 12.0
+    "defense": 12.0,
+    "family": "vendor_weapon_warrior",
+    "price": 49000
   },
   {
     "id": "mage_armor_runic_l70_green",
@@ -31493,7 +31555,9 @@
     },
     "starter": false,
     "attack": 48.0,
-    "defense": 12.0
+    "defense": 12.0,
+    "family": "vendor_weapon_mage",
+    "price": 49000
   },
   {
     "id": "assassin_armor_moon_l70_green",
@@ -31588,7 +31652,9 @@
     },
     "starter": false,
     "attack": 48.0,
-    "defense": 12.0
+    "defense": 12.0,
+    "family": "vendor_weapon_assassin",
+    "price": 49000
   },
   {
     "id": "priest_armor_dawn_l70_green",
@@ -31683,7 +31749,9 @@
     },
     "starter": false,
     "attack": 48.0,
-    "defense": 12.0
+    "defense": 12.0,
+    "family": "vendor_weapon_priest",
+    "price": 49000
   },
   {
     "id": "hunter_armor_warden_l70_green",
@@ -31778,7 +31846,9 @@
     },
     "starter": false,
     "attack": 48.0,
-    "defense": 12.0
+    "defense": 12.0,
+    "family": "vendor_weapon_hunter",
+    "price": 49000
   },
   {
     "id": "pants_wayfarer_l70_green",
@@ -35507,7 +35577,9 @@
     },
     "starter": false,
     "attack": 54.4,
-    "defense": 13.6
+    "defense": 13.6,
+    "family": "vendor_weapon_warrior",
+    "price": 64000
   },
   {
     "id": "mage_armor_runic_l80_green",
@@ -35602,7 +35674,9 @@
     },
     "starter": false,
     "attack": 54.4,
-    "defense": 13.6
+    "defense": 13.6,
+    "family": "vendor_weapon_mage",
+    "price": 64000
   },
   {
     "id": "assassin_armor_moon_l80_green",
@@ -35697,7 +35771,9 @@
     },
     "starter": false,
     "attack": 54.4,
-    "defense": 13.6
+    "defense": 13.6,
+    "family": "vendor_weapon_assassin",
+    "price": 64000
   },
   {
     "id": "priest_armor_dawn_l80_green",
@@ -35792,7 +35868,9 @@
     },
     "starter": false,
     "attack": 54.4,
-    "defense": 13.6
+    "defense": 13.6,
+    "family": "vendor_weapon_priest",
+    "price": 64000
   },
   {
     "id": "hunter_armor_warden_l80_green",
@@ -35887,7 +35965,9 @@
     },
     "starter": false,
     "attack": 54.4,
-    "defense": 13.6
+    "defense": 13.6,
+    "family": "vendor_weapon_hunter",
+    "price": 64000
   },
   {
     "id": "pants_wayfarer_l80_green",
@@ -39560,7 +39640,9 @@
     },
     "starter": false,
     "attack": 60.8,
-    "defense": 15.2
+    "defense": 15.2,
+    "family": "vendor_weapon_warrior",
+    "price": 81000
   },
   {
     "id": "mage_armor_runic_l90_green",
@@ -39655,7 +39737,9 @@
     },
     "starter": false,
     "attack": 60.8,
-    "defense": 15.2
+    "defense": 15.2,
+    "family": "vendor_weapon_mage",
+    "price": 81000
   },
   {
     "id": "assassin_armor_moon_l90_green",
@@ -39750,7 +39834,9 @@
     },
     "starter": false,
     "attack": 60.8,
-    "defense": 15.2
+    "defense": 15.2,
+    "family": "vendor_weapon_assassin",
+    "price": 81000
   },
   {
     "id": "priest_armor_dawn_l90_green",
@@ -39845,7 +39931,9 @@
     },
     "starter": false,
     "attack": 60.8,
-    "defense": 15.2
+    "defense": 15.2,
+    "family": "vendor_weapon_priest",
+    "price": 81000
   },
   {
     "id": "hunter_armor_warden_l90_green",
@@ -39940,7 +40028,9 @@
     },
     "starter": false,
     "attack": 60.8,
-    "defense": 15.2
+    "defense": 15.2,
+    "family": "vendor_weapon_hunter",
+    "price": 81000
   },
   {
     "id": "pants_wayfarer_l90_green",

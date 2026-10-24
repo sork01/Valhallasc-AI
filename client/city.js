@@ -480,7 +480,7 @@
         const b=row('vendor','Browse expansion bags',next?`Next: Lv ${next.requiredLevel}`:'All tiers unlocked');
         b.dataset.view='bags';b.addEventListener('click',()=>show({kind:'bags'},'#npc-back'));offers.push(b);
       }
-      // A tiered offer (potions and food) sells the best tier of its line for the player's level, so it shows that tier.
+      // Tiered stock shows the best usable item and its catalog price.
       const tierFor=offer=>{
         const base=WORLD_ITEMS.find(i=>i.id===offer.item);
         if(!offer.tiered||!base?.family)return null;
@@ -504,9 +504,17 @@
           b.dataset.view='stat_reset';b.addEventListener('click',()=>show({kind:'stat_reset'},'#npc-back'));offers.push(b);continue;
         }
         const tier=tierFor(offer),cost=tier?tier.price:offer.merc&&offer.merc!=='dismiss'&&packet.mercPrice?packet.mercPrice:offer.cost;
-        const b=row(iconFor(offer),tier?`Buy ${tier.name} · ${window.Inventory.effect(tier)}`:offer.label,cost?`${cost} gold`:'Free');b.dataset.offer=offer.id;
+        const weapon=tier?.kind==='weapon';
+        if(weapon&&tier.class!==(packet.look?.class||Field.hero.look.class))continue;
+        const label=weapon?`Buy ${tier.name} · level ${tier.requiredLevel}`:tier?`Buy ${tier.name} · ${window.Inventory.effect(tier)}`:offer.label;
+        const b=row(iconFor(offer),label,cost?`${cost} gold`:'Free');b.dataset.offer=offer.id;
         if(tier)b.dataset.tier=tier.id;
-        b.disabled=packet.gold<cost;
+        b.disabled=packet.gold<cost||(weapon&&(packet.level||1)<tier.requiredLevel);
+        if(weapon){
+          b.querySelector('.gossip-icon').innerHTML=window.Inventory.icon(tier);
+          b.querySelector('.gossip-label').style.color='#6fcf86';
+          window.Inventory.attachTooltip(b,()=>tier);
+        }
         b.addEventListener('click',()=>{
           if(offer.id==='merge'||offer.id==='refine')show({kind:offer.id},'#npc-back');
           else if(Online.send({type:'interact',npc:npc.id,offer:offer.id}))b.disabled=true;

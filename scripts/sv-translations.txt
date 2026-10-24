@@ -6919,5 +6919,11 @@
   "The Obsidian Orrery Ember Shard": "Glödskärva från The Obsidian Orrery",
   "The Chained Forge now requires The Ember Key for every hero, including past raiders. Speak to Iarn Emberkeeper at the Emberwake camp.": "Den fjättrade smedjan kräver nu Glödnyckeln av varje hjälte, även tidigare raidbesökare. Tala med Iarn Glödväktare vid lägret i Glödvakans kaldera.",
   "You can try signing in again.": "Du kan försöka logga in igen.",
-  "Please wait before trying again.": "Vänta innan du försöker igen."
+  "Please wait before trying again.": "Vänta innan du försöker igen.",
+  "This weapon is for another class.": "Det här vapnet är för en annan klass.",
+  "Buy Reinforced Royal Sword": "Köp förstärkt kungligt svärd",
+  "Buy Reinforced Crystal Staff": "Köp förstärkt kristallstav",
+  "Buy Reinforced Moonfang Daggers": "Köp förstärkta månhuggtandsdolkar",
+  "Buy Reinforced Sunbreaker Mace": "Köp förstärkt solbrytarklubba",
+  "Buy Reinforced Wildwarden Longbow": "Köp förstärkt vildväktarlångbåge"
 }

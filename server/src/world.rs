@@ -132,6 +132,8 @@ mod travel;
 mod ttk;
 #[cfg(test)]
 mod vault_tests;
+#[cfg(test)]
+mod vendor_weapon_tests;
 mod weather;
 #[cfg(test)]
 mod worldheart_tests;
@@ -2665,6 +2667,18 @@ impl World {
                         };
                         match stock {
                             None => notice = "That item is not for sale.".into(),
+                            Some(i)
+                                if i.kind == "weapon"
+                                    && i.class
+                                        .is_some_and(|class| class != p.character.look.class) =>
+                            {
+                                notice = "This weapon is for another class.".into();
+                            }
+                            Some(i)
+                                if i.kind == "weapon" && p.character.level < i.required_level =>
+                            {
+                                notice = format!("Requires level {}.", i.required_level);
+                            }
                             Some(_) if p.character.gold < cost => {
                                 notice = format!("You need {cost} gold for this purchase.");
                             }

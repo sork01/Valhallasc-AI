@@ -8,6 +8,8 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [ ] `SHOP-GREEN-WEAPONS` — Add existing green weapons for all five classes at levels 10–90 in decade steps to merchants and armorers, with level-scaled prices, authoritative purchases and English/Swedish UI. Built and verified: four focused Rust tests (all 45 actual purchases), 197 private browser checks across five classes and Swedish, Clippy/fmt/syntax/catalog/locale checks and stable generation pass. Deployment pending. See `docs/vendor-weapons.md`.
+
 - [x] `BUG-MERC-WALL-FOLLOW` — **Fixed and deployed 2026-10-24** (source `e679177`, backup `deploy/backups/merc-follow-20261024T102629Z`). Hired fighters no longer remain behind nearby walls inside the 26-tile leash. Add collision-safe following and enemy approach for all five classes, safe formation/arrival points and out-of-combat recovery for unreachable paths. Preserve death and combat recovery restrictions. Built and verified 2026-10-24: seven focused Rust tests and 15 real-protocol private checks pass, plus Clippy/fmt/JS syntax. Live binary/health/SQLite/counts/journal verified; see `docs/mercenary-following.md`.
 
 - [x] `UI-LOGIN-RETRY` — **Built, verified and deployed 2026-10-24** (source `53e59e3`, backup `deploy/backups/login-retry-20261024T073558Z`). Authentication 429 responses report the actual remaining wait in `retryAfter` and `Retry-After` (the longer account/address wait), and the sign-in screen shows a live `m:ss` countdown through reloads. No automatic retry or change to existing limits. Four focused auth tests, 16 private browser checks (including Swedish), visibility mutation, Clippy/fmt/syntax and Swedish catalog/locale checks pass. See `docs/login-rate-limit.md`.
