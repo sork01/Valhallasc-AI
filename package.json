@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "test": "npm run test:gear-generator && npm run test:driver && npm run test:scenarios && npm run test:skill-ranks && npm run test:ui",
+    "test": "npm run test:whats-new-notes && npm run test:gear-generator && npm run test:driver && npm run test:scenarios && npm run test:skill-ranks && npm run test:ui",
     "test:gear-generator": "python3 tests/gear-generator.py && python3 tests/quest-rewards.py && python3 tests/quest-backfill.py && python3 scripts/chest_zones.py --check && python3 scripts/weather_zones.py --check",
     "test:driver": "node --test tests/test-driver.cjs",
     "test:skill-ranks": "node tests/skill-ranks.cjs",
@@ -37,7 +37,9 @@
     "test:ui": "node tests/account-ui.cjs && node tests/quest-ui.cjs && node tests/quest-choice-ui.cjs && node tests/inventory-ui.cjs && node tests/rare-pickup-ui.cjs && node tests/loot-pillar-ui.cjs && node tests/chest-ui.cjs && node tests/bossmech-ui.cjs && node tests/bosssign-ui.cjs && node tests/rebirth-ui.cjs && node tests/gm-visibility-ui.cjs && node tests/equipment-skills-ui.cjs && node tests/set-ui.cjs && node tests/bag-tiers-ui.cjs && node tests/stat-ui.cjs && node tests/daynight-ui.cjs && node tests/night-music-ui.cjs && node tests/weather-ui.cjs && node tests/swedish-ui.cjs && node tests/gender-ui.cjs && node tests/skills-ui.cjs && node tests/mount-ui.cjs && node tests/bank-ui.cjs && node tests/resources-ui.cjs && REAL_SPRITES=1 node tests/target-ui.cjs && node tests/zones-ui.cjs && node tests/rimeveil-ui.cjs && node tests/gloamfen-ui.cjs && node tests/skaldholm-ui.cjs && node tests/undervault-ui.cjs && node tests/wyrdwood-ui.cjs && node tests/sky-ui.cjs && node tests/deep-ui.cjs && node tests/social-ui.cjs && node tests/trade-ui.cjs && node tests/pvp-ui.cjs && node tests/settings-ui.cjs && node tests/consumables-ui.cjs && node tests/syslog-ui.cjs && node tests/sprites-real.cjs && node tests/spark-travel-ui.cjs && node tests/nacrehold-ui.cjs && node tests/cathedral-ui.cjs && node tests/astral-ui.cjs && node tests/prism-ui.cjs && node tests/orrery-ui.cjs && node tests/moonspore-ui.cjs && node tests/asterion-ui.cjs && node tests/stormglass-ui.cjs && node tests/sunward-ui.cjs && node tests/ribbonwild-ui.cjs && node tests/tanglecrown-ui.cjs && node tests/worldheart-ui.cjs && node tests/lapis-ui.cjs && node tests/frostwake-ui.cjs && node tests/ambient-ui.cjs",
     "test:art": "node tests/sprites-real.cjs && node tests/sprite-loading.cjs && REAL_SPRITES=1 node tests/zones-ui.cjs && REAL_SPRITES=1 node tests/rimeveil-ui.cjs && REAL_SPRITES=1 node tests/gloamfen-ui.cjs && REAL_SPRITES=1 node tests/skaldholm-ui.cjs && REAL_SPRITES=1 node tests/undervault-ui.cjs && REAL_SPRITES=1 node tests/wyrdwood-ui.cjs && REAL_SPRITES=1 node tests/sky-ui.cjs && REAL_SPRITES=1 node tests/deep-ui.cjs && REAL_SPRITES=1 node tests/cathedral-ui.cjs && REAL_SPRITES=1 node tests/asterion-ui.cjs && REAL_SPRITES=1 node tests/stormglass-ui.cjs && REAL_SPRITES=1 node tests/sunward-ui.cjs && REAL_SPRITES=1 node tests/ribbonwild-ui.cjs && REAL_SPRITES=1 node tests/tanglecrown-ui.cjs && REAL_SPRITES=1 node tests/worldheart-ui.cjs && REAL_SPRITES=1 node tests/lapis-ui.cjs && REAL_SPRITES=1 node tests/frostwake-ui.cjs",
     "test:browser:full": "node tests/multiplayer.cjs",
-    "test:pvp": "node tests/pvp-ui.cjs"
+    "test:pvp": "node tests/pvp-ui.cjs",
+    "test:whats-new": "node tests/whats-new-notes.cjs && REAL_SPRITES=1 node tests/whats-new-ui.cjs",
+    "test:whats-new-notes": "node tests/whats-new-notes.cjs"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "1.31.0",

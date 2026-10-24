@@ -1,0 +1,79 @@
+[
+  {
+    "version": "Beta 1.15.0",
+    "date": "2026-10-24",
+    "new": [
+      "A short welcome now helps new players find their feet in Greenmeadow.",
+      "After an update, a What's new window tells you what has been added, changed or removed. Open it again from Settings to read the latest news and browse older updates."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.14.33",
+    "date": "2026-10-24",
+    "new": [
+      "Merchants now have a selling window. Add items to your offer and see how much gold you will receive before you confirm.",
+      "Selling purple or orange gear asks you to confirm those valuable items first.",
+      "Buy back your last twelve sold items from the same merchant for the gold you received. They stay available until you leave the game or the world restarts.",
+      "Sell all junk gathers grey and green gear and ordinary materials into your offer. You can also filter your bags by rarity."
+    ],
+    "changed": [],
+    "removed": [
+      "The old one-item selling list is gone, so you can review your whole offer before anything is sold."
+    ]
+  },
+  {
+    "version": "Beta 1.14.32",
+    "date": "2026-10-24",
+    "new": [],
+    "changed": [
+      "The beta version number now starts at 1.14.32. The earlier updates below describe the adventures and improvements already available."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.1.1",
+    "date": "2026-10-24",
+    "new": [
+      "Merchants and armorers sell green weapons for every class at levels 10 through 90, with a new choice every ten levels. They show the strongest one your class can use."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.0.1",
+    "date": "2026-10-24",
+    "new": [
+      "Earn the Ember Key to enter the Chained Forge. Find ten Firelord crosses around the world, defeat their guardians, and bring ten Ember Shards to Halla. Every hero needs their own key.",
+      "If too many sign-in attempts make you wait, a timer now shows when you can try again."
+    ],
+    "changed": [
+      "Hired fighters find their way around nearby walls and catch up more reliably when they fall behind.",
+      "Rolling, blinking, charging and lunging keep your chosen enemy, so you can carry on attacking after using a movement skill. Shadow Step does too."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Multiplayer alpha 0.985.1",
+    "date": "2026-10-23",
+    "new": [
+      "Explore the volcanic Emberwake and take on the Chained Forge at level 99 with ten fighters, including hired help. Nine Wardens stand between your group and the fire giant Eldmarr.",
+      "The raid brings legendary Chainforged outfits and weapons with special powers, plus new music for the Forge and its final battle.",
+      "Cloaks add another piece of gear to your outfit. Hired fighters wear them too.",
+      "Open the menu on another adventurer's portrait to inspect their gear, ask to trade, or offer a duel. The inspect window shows their outfit moving.",
+      "A Windows version lets you play in its own window."
+    ],
+    "changed": [
+      "Dying wears down your equipped gear. Visit a smith to repair it; broken pieces give no strength until repaired.",
+      "Dungeon monsters hit about 30% softer, and final bosses give you about 25% longer before they become more dangerous. Raid enemies keep their own difficulty.",
+      "Arena trial opponents deal about 50% less damage.",
+      "Class gear belongs to its owner and can be sold to merchants. Gear won in a party roll can be passed once to another player from that roll within two hours.",
+      "Hired fighters strengthen your group inside the raid, and the lava in Emberwake and the Forge now moves.",
+      "The game loads more reliably on older iPhones and iPads, shows progress while loading character pictures, and remembers sign-in more reliably in the Windows version."
+    ],
+    "removed": [
+      "Death no longer takes away experience, so falling in battle cannot cost you a level. Gear repairs replace that penalty."
+    ]
+  }
+]

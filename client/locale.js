@@ -99,7 +99,7 @@
 
   function textNode(node) {
     if (language !== 'sv' || !node?.parentElement) return;
-    if (node.parentElement.closest('script,style,#login-name,[data-player-name]')) return;
+    if (node.parentElement.closest('script,style,#login-name,[data-player-name],[translate="no"]')) return;
     const chatLine = node.parentElement.closest('#chat-log p');
     if (chatLine?.querySelector('b')) return; // other players' names and messages
     const source = node.nodeValue;
@@ -117,6 +117,7 @@
     root.querySelectorAll('[title],[placeholder],[aria-label]').forEach(attributes);
   }
   function attributes(node) {
+    if (node.closest?.('[translate="no"]')) return;
     for (const name of ['title','placeholder','aria-label']) {
       if (!node.hasAttribute(name)) continue;
       const before = node.getAttribute(name), after = translate(before);

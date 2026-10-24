@@ -29,6 +29,7 @@ IGNORE_FILE = ROOT / 'scripts' / 'sv-ignore.txt'
 OUTPUT = ROOT / 'client' / 'sv-data.js'
 KEYS = {'name', 'title', 'description', 'label', 'dialogue', 'role', 'what', 'todo', 'tip'}
 # Client modules whose strings reach the player. Art, music and the GM console are left out.
+# whatsnew.js and release-notes.txt are deliberately English-only (owner, 2026-10-24).
 CLIENT_FILES = ('game', 'account', 'city', 'quests', 'inventory', 'skillbar', 'quickuse', 'settings', 'online', 'social',
                 'syslog', 'attributes', 'weather', 'daynight', 'bank', 'rebirth', 'bossmech', 'bosssign', 'mounts', 'trade', 'pvp',
                 'rolls', 'shop', 'gearservices', 'worldmap', 'field', 'spark', 'keymap', 'raidkey')

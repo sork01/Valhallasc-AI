@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Lilita+One&display=swap">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="online.css">
+<link rel="stylesheet" href="whatsnew.css">
 <script src="compat.js"></script>
 </head>
 <body>
@@ -29,7 +30,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">Beta 1.14.33</p>
+    <p class="version">Beta 1.15.0</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -427,6 +428,7 @@
         <label class="setting-check" id="set-sound-row"><input id="set-sound" type="checkbox"> Sound on <kbd>M / N</kbd></label>
         <button class="btn ghost" id="set-keys" type="button">Keyboard</button>
         <p class="world-menu-note">Keyboard lets you choose which key does what.</p>
+        <button class="btn ghost" id="set-whats-new" type="button" lang="en" translate="no">What's new</button>
         <button class="btn ghost" id="set-edit-ui" type="button">Edit UI</button>
         <p class="world-menu-note">Edit UI lets you drag the skillbar, quest tracker, chat and the other panels where you want them.</p>
         <button class="btn ghost" id="set-win-reset" type="button">Reset window sizes</button>
@@ -539,6 +541,13 @@
       <button id="connection-title" class="btn ghost" type="button">Back to Title</button>
     </section>
   </div>
+  <div class="pause" id="whats-new" lang="en" translate="no" hidden>
+    <section class="panel news-panel" role="dialog" aria-modal="true" aria-labelledby="news-title" aria-describedby="news-label">
+      <header><p id="news-label">What's new</p><h2 id="news-title"></h2></header>
+      <div id="news-body" tabindex="0"></div>
+      <footer><button class="btn primary" id="news-close" type="button">Close</button></footer>
+    </section>
+  </div>
   <div class="flash" id="flash" aria-hidden="true"></div>
   <p class="toast" id="toast" role="status" aria-live="polite"></p>
 </main>
@@ -632,6 +641,7 @@
 <script src="sv-data.js"></script>
 <script src="locale.js"></script>
 <script src="keymap.js"></script>
+<script src="whatsnew.js"></script>
 <script src="raidrewards.js"></script>
 <script src="inventory.js"></script>
 <script src="gearservices.js"></script>

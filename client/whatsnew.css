@@ -1,0 +1,18 @@
+/* Same gold-edged window as the other menus, above gameplay and confirmation windows. */
+#whats-new { z-index: 52; }
+.news-panel { position: static; display: flex; flex-direction: column; width: 62cqw; max-height: 48cqw; box-sizing: border-box; padding: 2.2cqw 2.6cqw; gap: .8cqw; text-align: left; background: linear-gradient(#101e46, #08102a); }
+.reading-news .win-grip:not([data-window="whats-new"]), .reading-news .panel-grip { visibility: hidden; }
+.news-panel header { padding-bottom: 1cqw; border-bottom: .1cqw solid rgba(245, 197, 66, .35); }
+#news-label { margin: 0 0 .3cqw; color: var(--cyan); font-size: 1.4cqw; }
+#news-title { margin: 0; color: var(--gold); font: 3cqw var(--display); font-weight: 400; }
+#news-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 1cqw 0 .2cqw; font-size: max(15px, 1.65cqw); line-height: 1.5; user-select: text; -webkit-user-select: text; }
+#news-body h3 { margin: 1cqw 0 .4cqw; font-size: max(17px, 1.9cqw); color: var(--gold); }
+#news-body p { margin: .6cqw 0; }
+#news-body ul { margin: .4cqw 0 1cqw; padding-left: 2cqw; }
+#news-body li + li { margin-top: .6cqw; }
+#news-body kbd { white-space: nowrap; font: inherit; color: #fff3c4; background: #26385a; border: .1cqw solid #6f7d95; border-radius: .3cqw; padding: 0 .35cqw; }
+.news-panel footer { text-align: center; padding-top: .7cqw; }
+.news-history { margin-top: 1.5cqw; border-top: .1cqw solid rgba(245, 197, 66, .35); padding-top: 1cqw; }
+.news-history details { margin: .7cqw 0 .7cqw 1cqw; }
+.news-history summary { cursor: pointer; color: var(--cyan); padding: .3cqw; }
+.news-history summary:focus-visible { outline: .15cqw solid var(--cyan); border-radius: .3cqw; }

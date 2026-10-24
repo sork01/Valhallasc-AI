@@ -20,6 +20,7 @@
   const EXTRA = [['#loot-rolls', '0 0'], ['#social-invites', '0 0'], ['#pvp-duel-warning', '0 0'], ['#gauntlet-banner', '0 0'], ['#rare-pickup', '0 0'], ['#announce', '50% 0'], ['#toast', '0 100%']];
   // [overlay id, window selector or null for the overlay itself, name, origin, resizable]
   const WINDOWS = [
+    ['whats-new', '.news-panel', "What's new", '50% 50%', true],
     ['pause', '.pause-panel', 'World Menu', '50% 50%', false], ['settings-panel', '.settings-panel', 'Settings', '50% 50%', false], ['keys-panel', '.keys-panel', 'Keyboard', '50% 50%', false],
     ['quest-journal', '.quest-panel', 'Quest journal', '50% 50%', true], ['npc-dialogue', '.gossip-window', 'Conversation', '50% 50%', true],
     ['worldmap', '.wm-panel', 'World map', '50% 50%', true], ['social-panel', '.social-panel', 'Social', '50% 50%', true],
@@ -123,6 +124,8 @@
   function makeGrip(w) {
     const g = document.createElement('div');
     g.className = 'win-grip'; g.tabIndex = 0; g.setAttribute('role', 'button'); g.hidden = true;
+    g.dataset.window = w.id;
+    if (w.id === 'whats-new') { g.setAttribute('translate', 'no'); g.lang = 'en'; }
     g.title = `Drag to resize · double-click for the normal size`;
     g.setAttribute('aria-label', `Resize ${w.name}: arrow keys change the size, 0 resets it`);
     let drag = null;
