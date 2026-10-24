@@ -939,3 +939,8 @@
 
 .bags-open[data-gear="low"]::after, .bags-open[data-gear="broken"]::after { content: '!'; position: absolute; right: -.5cqw; top: -.6cqw; width: 1.6cqw; height: 1.6cqw; border-radius: 50%; display: grid; place-items: center; font: 700 1.1cqw sans-serif; color: #1b1306; background: #ff9a3c; pointer-events: none; }
 .bags-open[data-gear="broken"]::after { background: #ff4d4d; color: #fff; }
+
+/* iOS Safari zooms the whole page when a field under 16 px takes focus, and the fixed stage then no longer fits. */
+@media (pointer: coarse) {
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]), select, textarea { font-size: max(16px, 1em) !important; }
+}

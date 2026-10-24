@@ -21,6 +21,7 @@
 @supports not selector(::-webkit-scrollbar) { * { scrollbar-width: thin; scrollbar-color: var(--sb-thumb-b) var(--sb-track); } }
 [hidden] { display: none !important; }
 html, body { height: 100%; margin: 0; background: var(--ink); overflow: hidden; }
+html { touch-action: manipulation; }
 body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
 
 /* Letterbox bars: a plain night-sky gradient */
