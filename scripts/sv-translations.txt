@@ -6917,5 +6917,7 @@
   "Astralhollow Ember Shard": "Glödskärva från Astralhollow",
   "The Prismwaste Ember Shard": "Glödskärva från The Prismwaste",
   "The Obsidian Orrery Ember Shard": "Glödskärva från The Obsidian Orrery",
-  "The Chained Forge now requires The Ember Key for every hero, including past raiders. Speak to Iarn Emberkeeper at the Emberwake camp.": "Den fjättrade smedjan kräver nu Glödnyckeln av varje hjälte, även tidigare raidbesökare. Tala med Iarn Glödväktare vid lägret i Glödvakans kaldera."
+  "The Chained Forge now requires The Ember Key for every hero, including past raiders. Speak to Iarn Emberkeeper at the Emberwake camp.": "Den fjättrade smedjan kräver nu Glödnyckeln av varje hjälte, även tidigare raidbesökare. Tala med Iarn Glödväktare vid lägret i Glödvakans kaldera.",
+  "You can try signing in again.": "Du kan försöka logga in igen.",
+  "Please wait before trying again.": "Vänta innan du försöker igen."
 }

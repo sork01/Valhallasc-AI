@@ -180,7 +180,16 @@
           body: JSON.stringify(body ?? {}),
         });
         const data = await res.json().catch(() => null);
-        return data || { ok: false, error: 'The server sent an unexpected answer.' };
+        const result = data && typeof data === 'object' && !Array.isArray(data) ? data : { ok: false, error: 'The server sent an unexpected answer.' };
+        if (res.status === 429) {
+          result.ok = false; result.rateLimited = true;
+          const header = res.headers.get('Retry-After');
+          const headerSeconds = header && /^\d+$/.test(header) ? Number(header) : Math.ceil((Date.parse(header) - Date.now()) / 1000);
+          const bodySeconds = Number(result.retryAfter);
+          const seconds = Number.isFinite(bodySeconds) && bodySeconds > 0 ? bodySeconds : headerSeconds;
+          if (Number.isFinite(seconds) && seconds > 0) result.retryAfter = Math.ceil(seconds);
+        }
+        return result;
       } catch (_) { return { ok: false, error: 'Could not reach the server.' }; }
     },
     // Adopts a successful login/session answer: the session key (when issued), the name and the character list.

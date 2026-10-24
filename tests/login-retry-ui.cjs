@@ -1,0 +1,71 @@
+// Actual private rate-limit response, then short controlled responses to verify expiry without a five-minute wait.
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {TestWorld}=require('../scripts/testing/driver.cjs');
+const {chromium}=require('./lib/playwright.cjs');
+const world=new TestWorld();let browser,checks=0;
+const check=(ok,message)=>{assert.ok(ok,message);checks++;console.log(message);};
+(async()=>{
+ await world.start();browser=await chromium.launch({headless:true});
+ const page=await browser.newPage({viewport:{width:1280,height:800}}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ if(process.env.MUTATE) await page.route('**/account.js',route=>{const code=fs.readFileSync(path.join(__dirname,'../client/account.js'),'utf8');assert.ok(code.includes('node.hidden = false;'));return route.fulfill({contentType:'application/javascript',body:code.replace('node.hidden = false;','node.hidden = true;')});});
+ await page.addInitScript(()=>{if(!localStorage.getItem('valhallasc.save.v1'))localStorage.setItem('valhallasc.save.v1',JSON.stringify({lang:'en',sound:false}));});
+ await page.goto(world.url);await page.locator('#start').click();
+ await page.locator('#login-user').fill('countdown_unknown');await page.locator('#login-pass').fill('incorrect-password-1');
+ // Unknown users have the same failure limiter; no real account or public login is used.
+ const attempts=await page.evaluate(async()=>{
+  const results=[];for(let n=0;n<5;n++){
+   const r=await fetch('api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:'countdown_unknown',password:'incorrect-password-1'})});results.push(r.status);
+  }return results;
+ });check(attempts.every(s=>s===401),'Five actual failures are counted by the private server');
+ const responsePromise=page.waitForResponse(r=>r.url().endsWith('/api/login')&&r.status()===429);
+ await page.locator('#login-submit').click();const response=await responsePromise,body=await response.json();
+ check(Number(response.headers()['retry-after'])===body.retryAfter&&body.retryAfter>0&&body.retryAfter<=300,'Actual HTTP 429 returns matching remaining seconds in JSON and Retry-After');
+ await page.waitForFunction(()=>!document.getElementById('login-retry').hidden,null,{timeout:5000});
+ const seconds=text=>{const m=text.match(/(\d+):(\d{2})/);assert.ok(m,text);return Number(m[1])*60+Number(m[2]);};
+ const first=seconds(await page.locator('#login-retry').textContent());
+ check(first>290&&first<=body.retryAfter,'Login screen displays the server-provided wait');
+ await page.waitForFunction(n=>{const m=document.getElementById('login-retry').textContent.match(/(\d+):(\d{2})/);return m&&Number(m[1])*60+Number(m[2])<n;},first);
+ check(true,'Remaining time counts down instead of staying at the initial value');
+ check(await page.locator('#login-guest').isEnabled()&&await page.locator('#login-sso').isEnabled(),'Other sign-in choices stay available');
+ await page.reload();await page.locator('#start').click();await page.waitForFunction(()=>!document.getElementById('login-retry').hidden);
+ check(seconds(await page.locator('#login-retry').textContent())<=first,'Reload restores the existing deadline without resetting the wait');
+ await page.locator('#login-user').fill('countdown_unknown');await page.locator('#login-pass').fill('incorrect-password-1');
+ // Exercise a short authoritative response through the normal fetch -> Online -> Account path.
+ let requests=0;
+ await page.route('**/api/login',route=>{requests++;return route.fulfill({status:429,contentType:'application/json',headers:{'Retry-After':'2'},body:JSON.stringify({ok:false,error:'Too many failed logins. Wait a few minutes.',retryAfter:2})});});
+ await page.locator('#login-submit').click();await page.waitForFunction(()=>document.getElementById('login-retry').textContent.includes('0:02'));
+ await page.waitForFunction(()=>document.getElementById('login-retry').hidden&&document.getElementById('login-msg').textContent==='You can try signing in again.');
+ check(requests===1,'Expiry clears the countdown and never retries automatically');
+ check(await page.evaluate(()=>sessionStorage.getItem('valhallasc.login.retryUntil')===null),'Expired deadline is removed from session storage');
+ await page.unroute('**/api/login');
+ await page.route('**/api/login',route=>route.fulfill({status:429,contentType:'application/json',headers:{'Retry-After':'7'},body:JSON.stringify({ok:false,error:'Too many attempts. Wait a few minutes.'})}));
+ await page.locator('#login-submit').click();await page.waitForFunction(()=>!document.getElementById('login-retry').hidden&&/0:0[67]/.test(document.getElementById('login-retry').textContent));
+ check(true,'Retry-After header works when the JSON delay is absent');
+ await page.unroute('**/api/login');
+ await page.route('**/api/login',route=>route.fulfill({status:401,contentType:'application/json',body:JSON.stringify({ok:false,error:'Wrong username or password.'})}));
+ await page.locator('#login-submit').click();await page.waitForFunction(()=>document.getElementById('login-msg').textContent==='Wrong username or password.');
+ check(await page.locator('#login-retry').isHidden(),'An ordinary credential error has no stale countdown');
+ await page.unroute('**/api/login');
+ await page.route('**/api/login',route=>route.fulfill({status:429,contentType:'application/json',headers:{'Retry-After':'invalid'},body:JSON.stringify({ok:false,error:'Too many attempts. Wait a few minutes.'})}));
+ await page.locator('#login-submit').click();await page.waitForFunction(()=>document.getElementById('login-msg').textContent==='Too many attempts. Wait a few minutes.');
+ check(await page.locator('#login-retry').isHidden(),'A response without a valid delay does not invent a countdown');
+ await page.unroute('**/api/login');
+ await page.route('**/api/login',route=>route.fulfill({status:429,contentType:'application/json',body:JSON.stringify({ok:false,error:'Too many attempts. Wait a few minutes.',retryAfter:7})}));
+ await page.locator('#login-submit').click();await page.waitForFunction(()=>!document.getElementById('login-retry').hidden);
+ await page.locator('#login-register').click();
+ await page.waitForFunction(()=>Online.account?.name==='countdown_unknown');
+ check(await page.locator('#login-retry').isHidden()&&await page.evaluate(()=>sessionStorage.getItem('valhallasc.login.retryUntil')===null),'A successful sign-in clears the old countdown');
+ await page.locator('#chars-back').click();await page.locator('#login-logout').click();await page.locator('#login-form').waitFor({state:'visible'});
+ await page.unroute('**/api/login');
+ await page.evaluate(()=>{const key='valhallasc.save.v1',prefs=JSON.parse(localStorage.getItem(key));prefs.lang='sv';localStorage.setItem(key,JSON.stringify(prefs));});
+ await page.reload();await page.locator('#start').click();
+ await page.locator('#login-user').fill('countdown_unknown');await page.locator('#login-pass').fill('incorrect-password-1');
+ await page.route('**/api/login',route=>route.fulfill({status:429,contentType:'application/json',body:JSON.stringify({ok:false,error:'Too many failed logins. Wait a few minutes.',retryAfter:2})}));
+ await page.locator('#login-submit').click();await page.waitForFunction(()=>document.getElementById('login-retry').textContent.startsWith('Försök igen om'));
+ check(true,'Countdown has hand-written Swedish text');
+ await page.waitForFunction(()=>document.getElementById('login-msg').textContent==='Du kan försöka logga in igen.');
+ check(true,'Expiry message is translated into Swedish');
+ check(await page.locator('#login-retry').getAttribute('aria-live')==='off','Timer avoids announcing every second to screen readers');
+ check(errors.length===0,'No browser errors');console.log(`${checks} login retry browser checks passed: ${world.runDir}`);
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();await world.stop();});

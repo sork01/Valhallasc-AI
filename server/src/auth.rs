@@ -103,6 +103,29 @@ struct Delete {
 fn fail(status: StatusCode, error: &str) -> Response {
     (status, Json(json!({"ok":false,"error":error}))).into_response()
 }
+/// A rate limit's remaining delay is public; it never includes an account or session identifier.
+fn rate_limited(error: &str, seconds: u64) -> Response {
+    (
+        StatusCode::TOO_MANY_REQUESTS,
+        [(header::RETRY_AFTER, seconds.to_string())],
+        Json(json!({"ok":false,"error":error,"retryAfter":seconds})),
+    )
+        .into_response()
+}
+/// Wait until enough active failures expire, including when concurrent requests exceeded the limit.
+fn remaining_delay(
+    list: &mut Vec<Instant>,
+    max: usize,
+    window: Duration,
+    now: Instant,
+) -> Option<u64> {
+    list.retain(|t| now.saturating_duration_since(*t) < window);
+    if list.len() < max {
+        return None;
+    }
+    let left = window.saturating_sub(now.saturating_duration_since(list[list.len() - max]));
+    Some(left.as_secs() + u64::from(left.subsec_nanos() > 0))
+}
 fn account_json(
     account: &Account,
     characters: &[CharacterEntry],
@@ -166,13 +189,9 @@ impl Auth {
     fn origin_ok(&self, headers: &HeaderMap) -> bool {
         crate::origin_allowed(headers, self.allowed_origin.as_deref())
     }
-    fn blocked(&self, key: &str, max: usize, window: Duration) -> bool {
+    fn retry_after(&self, key: &str, max: usize, window: Duration) -> Option<u64> {
         let mut all = self.attempts.lock().unwrap_or_else(|e| e.into_inner());
-        let Some(list) = all.get_mut(key) else {
-            return false;
-        };
-        list.retain(|t| t.elapsed() < window);
-        list.len() >= max
+        remaining_delay(all.get_mut(key)?, max, window, Instant::now())
     }
     fn record(&self, key: &str) {
         let mut all = self.attempts.lock().unwrap_or_else(|e| e.into_inner());
@@ -261,11 +280,8 @@ async fn register(
         return fail(StatusCode::FORBIDDEN, "Origin refused.");
     }
     let ip = format!("register:{}", client_ip(&headers, peer));
-    if auth.blocked(&ip, 5, Duration::from_secs(3600)) {
-        return fail(
-            StatusCode::TOO_MANY_REQUESTS,
-            "Too many new accounts from here. Try again later.",
-        );
+    if let Some(seconds) = auth.retry_after(&ip, 5, Duration::from_secs(3600)) {
+        return rate_limited("Too many new accounts from here. Try again later.", seconds);
     }
     if !valid_username(&body.username) {
         return fail(
@@ -303,13 +319,13 @@ async fn login(
     // Only failures count: 5 per address per 5 minutes, 10 per account per 15 minutes.
     let ip = format!("login:{}", client_ip(&headers, peer));
     let user = format!("login-user:{}", body.username.to_lowercase());
-    if auth.blocked(&ip, 5, Duration::from_secs(300))
-        || auth.blocked(&user, 10, Duration::from_secs(900))
-    {
-        return fail(
-            StatusCode::TOO_MANY_REQUESTS,
-            "Too many failed logins. Wait a few minutes.",
-        );
+    let retry = auth
+        .retry_after(&ip, 5, Duration::from_secs(300))
+        .into_iter()
+        .chain(auth.retry_after(&user, 10, Duration::from_secs(900)))
+        .max();
+    if let Some(seconds) = retry {
+        return rate_limited("Too many failed logins. Wait a few minutes.", seconds);
     }
     let found = match auth.store.game_account(&body.username) {
         Ok(found) => found,
@@ -342,11 +358,8 @@ async fn sso(
         return fail(StatusCode::FORBIDDEN, "Origin refused.");
     }
     let ip = format!("sso:{}", client_ip(&headers, peer));
-    if auth.blocked(&ip, 30, Duration::from_secs(300)) {
-        return fail(
-            StatusCode::TOO_MANY_REQUESTS,
-            "Too many attempts. Wait a few minutes.",
-        );
+    if let Some(seconds) = auth.retry_after(&ip, 30, Duration::from_secs(300)) {
+        return rate_limited("Too many attempts. Wait a few minutes.", seconds);
     }
     auth.record(&ip);
     let Some(name) = auth.sso_user(&headers).await else {
@@ -655,6 +668,99 @@ mod tests {
         assert_eq!(status, StatusCode::UNAUTHORIZED);
     }
 
+    #[test]
+    fn rate_limit_delay_counts_down_and_handles_excess_failures() {
+        let now = Instant::now() + Duration::from_secs(3600);
+        let window = Duration::from_secs(10);
+        let mut attempts: Vec<_> = [8000, 7000, 6000, 5000, 4000]
+            .into_iter()
+            .map(|ms| now - Duration::from_millis(ms))
+            .collect();
+        assert_eq!(remaining_delay(&mut attempts, 5, window, now), Some(2));
+        assert_eq!(
+            remaining_delay(&mut attempts, 5, window, now + Duration::from_secs(1)),
+            Some(1)
+        );
+        assert_eq!(
+            remaining_delay(&mut attempts, 5, window, now + Duration::from_secs(2)),
+            None
+        );
+        let mut excess: Vec<_> = [11000, 10000, 9500, 9000, 8500, 8000, 7000, 6000, 5000]
+            .into_iter()
+            .map(|ms| now - Duration::from_millis(ms))
+            .collect();
+        assert_eq!(
+            remaining_delay(&mut excess, 5, window, now),
+            Some(2),
+            "wait for the third active failure to expire"
+        );
+        assert_eq!(
+            excess.len(),
+            7,
+            "expired failures are pruned, refused attempts are not added"
+        );
+        assert_eq!(
+            remaining_delay(&mut excess, 5, window, now + Duration::from_millis(1500)),
+            None
+        );
+    }
+
+    #[tokio::test]
+    async fn rate_limit_response_has_matching_header_and_json() {
+        let response = rate_limited("Too many attempts. Wait a few minutes.", 42);
+        assert_eq!(response.status(), StatusCode::TOO_MANY_REQUESTS);
+        assert_eq!(response.headers()[header::RETRY_AFTER], "42");
+        let bytes = axum::body::to_bytes(response.into_body(), 1024)
+            .await
+            .unwrap();
+        let body: Value = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(body["retryAfter"], 42);
+        assert_eq!(body["ok"], false);
+    }
+
+    #[tokio::test]
+    async fn login_rate_limit_reports_longer_account_or_address_wait() {
+        let (app, _store, _tx) = fresh();
+        for n in 0..10 {
+            let ip = if n == 9 {
+                "192.0.2.200".to_owned()
+            } else {
+                format!("192.0.2.{}", n + 1)
+            };
+            let (status, _) = call(
+                &app,
+                "/login",
+                json!({"username":"limited_hero","password":"incorrect-password-1"}),
+                &[("x-forwarded-for", &ip)],
+            )
+            .await;
+            assert_eq!(status, StatusCode::UNAUTHORIZED);
+        }
+        for n in 0..4 {
+            let (status, _) = call(
+                &app,
+                "/login",
+                json!({"username":format!("other_hero_{n}"),"password":"incorrect-password-1"}),
+                &[("x-forwarded-for", "192.0.2.200")],
+            )
+            .await;
+            assert_eq!(status, StatusCode::UNAUTHORIZED);
+        }
+        let (status, body) = call(
+            &app,
+            "/login",
+            json!({"username":"LIMITED_HERO","password":"incorrect-password-1"}),
+            &[("x-forwarded-for", "192.0.2.200")],
+        )
+        .await;
+        assert_eq!(status, StatusCode::TOO_MANY_REQUESTS);
+        let seconds = body["retryAfter"].as_u64().unwrap();
+        assert!(
+            seconds > 300 && seconds <= 900,
+            "the account wait wins over the five-minute address wait"
+        );
+    }
+
     #[tokio::test]
     async fn bad_credentials_are_refused_and_rate_limited() {
         let (app, _store, _tx) = fresh();
@@ -677,7 +783,7 @@ mod tests {
             assert_eq!(body["error"], "Wrong username or password.");
         }
         // The sixth attempt from this address is refused even with the right password.
-        let (status, _) = call(
+        let (status, limited) = call(
             &app,
             "/login",
             json!({"username":"Sork_One","password":"hunter22x"}),
@@ -685,6 +791,11 @@ mod tests {
         )
         .await;
         assert_eq!(status, StatusCode::TOO_MANY_REQUESTS);
+        assert!(
+            limited["retryAfter"]
+                .as_u64()
+                .is_some_and(|s| s > 0 && s <= 300)
+        );
         // An unknown user fails with the same message as a wrong password.
         let (app, _store, _tx) = fresh();
         let (status, body) = call(

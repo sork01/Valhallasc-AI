@@ -414,5 +414,6 @@
   "Cool down! {0}s": "Svalka dig! {0} s",
   "Heat: {0}%": "Hetta: {0} %",
   "{0}: Eldmarr needs exactly one crack, heat and seats block": "{0}: Eldmarr behöver exakt ett block vardera för sprickor, hetta och sittplatser",
-  "Pieces: {0}/10": "Delar: {0}/10"
+  "Pieces: {0}/10": "Delar: {0}/10",
+  "Try again in {0}.": "Försök igen om {0}."
 }

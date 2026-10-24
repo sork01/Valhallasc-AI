@@ -8,6 +8,27 @@
   let handlers = null, busy = false;
 
   function say(id, text, ok) { const node = $(id); node.textContent = text || ''; node.dataset.state = ok ? 'ok' : 'error'; }
+  const RETRY_UNTIL = 'valhallasc.login.retryUntil';
+  let retryUntil = 0, retryTimer = null;
+  function clearRetry() {
+    clearInterval(retryTimer); retryTimer = null; retryUntil = 0;
+    $('login-retry').hidden = true; $('login-retry').textContent = '';
+    try { sessionStorage.removeItem(RETRY_UNTIL); } catch (_) {}
+  }
+  function renderRetry() {
+    const seconds = Math.ceil((retryUntil - Date.now()) / 1000);
+    if (seconds <= 0) { clearRetry(); if (!busy) say('login-msg', 'You can try signing in again.', true); return; }
+    const time = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+    const text = (window.Locale?.translate || (s => s))(`Try again in ${time}.`);
+    const node = $('login-retry'); node.hidden = false;
+    if (node.textContent !== text) node.textContent = text;
+  }
+  function showRetry(until) {
+    clearInterval(retryTimer); retryUntil = until;
+    try { sessionStorage.setItem(RETRY_UNTIL, String(until)); } catch (_) {}
+    renderRetry();
+    if (retryUntil) retryTimer = setInterval(renderRetry, 250);
+  }
   function setBusy(on) {
     busy = on;
     for (const id of ['login-submit', 'login-register', 'login-sso', 'login-guest', 'login-continue', 'login-logout']) $(id).disabled = on;
@@ -22,7 +43,15 @@
   }
   async function finish(data) {
     setBusy(false);
-    if (!data?.ok) { renderLogin(); say('login-msg', data?.error || 'Could not sign in.'); return false; }
+    if (!data?.ok) {
+      clearRetry(); renderLogin(); say('login-msg', data?.error || 'Could not sign in.');
+      if (data?.rateLimited && Number.isFinite(data.retryAfter) && data.retryAfter > 0) {
+        const until = Date.now() + data.retryAfter * 1000;
+        if (Number.isFinite(until)) showRetry(until);
+      }
+      return false;
+    }
+    clearRetry();
     $('login-pass').value = ''; say('login-msg', '');
     handlers.account(); handlers.show('chars');
     return true;
@@ -50,6 +79,8 @@
 
   function enter() {
     say('login-msg', ''); renderLogin(); setBusy(false);
+    let until = 0; try { until = Number(sessionStorage.getItem(RETRY_UNTIL)); } catch (_) {}
+    if (Number.isFinite(until) && until > Date.now()) { say('login-msg', 'Please wait before trying again.'); showRetry(until); } else clearRetry();
     if (Online.account) {
       // The stored session may have lapsed; this also refreshes the character list.
       Online.resume().then(data => { if (data && !data.ok) { renderLogin(); if (!Online.account) say('login-msg', 'Your login expired. Please sign in again.'); } else renderLogin(); });
