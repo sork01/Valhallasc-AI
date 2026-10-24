@@ -416,7 +416,7 @@
   "Moonwell",
   "Mora Thirteenbells",
   "Mosslet",
-  "Beta 1.0.1",
+  "Beta 1.1.1",
   "Nacrehold",
   "Nera Kestrel",
   "Neri Warmhands",

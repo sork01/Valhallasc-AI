@@ -66,3 +66,8 @@ private candidate; no test flags or warning/error journal entries. SQLite
 `quick_check` passes; counts remain 25 characters / 14 guests. No new zones,
 item IDs or database migration. Release SHA-256:
 `2a9e32ab009353cc90714c5f0546c248c7aebf08719f97f44b9fdbb03fcf6fcc`.
+
+Finish/version follow-up (2026-10-24): the owner now requires patch bumps for
+small additions and minor bumps for bigger features. This feature is marked
+**Beta 1.1.1** in the visible client label; its untranslated keep-list changes
+with it. The game server and protocol remain the already verified release.
