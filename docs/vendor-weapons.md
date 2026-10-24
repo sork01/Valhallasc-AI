@@ -71,3 +71,6 @@ Finish/version follow-up (2026-10-24): the owner now requires patch bumps for
 small additions and minor bumps for bigger features. This feature is marked
 **Beta 1.1.1** in the visible client label; its untranslated keep-list changes
 with it. The game server and protocol remain the already verified release.
+
+The owner subsequently reset the beta baseline to **Beta 1.14.32** on
+2026-10-24. Future patch/minor increments start from that displayed version.
