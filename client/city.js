@@ -473,7 +473,7 @@
         b.append(detail);b.title=destination.stops.join(' → ');
         b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:`spark:${destination.id}`}))b.disabled=true;});offers.push(b);
       }
-      if(npc.buys){const b=row('vendor','I have something to sell.');b.dataset.view='sell';b.addEventListener('click',()=>show({kind:'sell'},'#npc-back'));offers.push(b);}
+      if(npc.buys){const b=row('vendor','Sell');b.dataset.view='sell';b.addEventListener('click',()=>show({kind:'sell'},'#sell-confirm'));offers.push(b);}
       if(npc.offers.some(offer=>offer.bag)){
         const bagOffers=npc.offers.filter(offer=>offer.bag).map(offer=>WORLD_ITEMS.find(i=>i.id===offer.bag)).filter(Boolean).sort((a,b)=>a.requiredLevel-b.requiredLevel);
         const next=bagOffers.find(i=>i.requiredLevel>(packet.level||1));
@@ -552,7 +552,8 @@
     }
     $('npc-offers').replaceChildren(...offers);
     $('npc-inventory').replaceChildren();
-    if(view.kind==='sell')window.Inventory?.renderShop(npc,$('npc-inventory'));
+    if(view.kind==='sell')window.Shop?.render(npc,$('npc-inventory'));
+    else { window.Shop?.close(); $('npc-inventory').className=''; }
     if(view.kind==='merge'||view.kind==='refine'||view.kind==='repair')window.GearServices?.render(view.kind,npc,packet,$('npc-inventory'));
     const target=focus&&$('npc-dialogue').querySelector(focus);
     (target&&!target.hidden?target:$('npc-close')).focus({preventScroll:true});
@@ -573,12 +574,12 @@
     if(packet.statPlayer)window.Attributes?.update(packet.statPlayer);
     lastPacket=packet;render();
   }
-  function close(resume=true) {if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
+  function close(resume=true) {window.Shop?.close();if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
   $('npc-close').addEventListener('click',()=>close());
   $('npc-x').addEventListener('click',()=>close());
   $('npc-back').addEventListener('click',()=>{const previous=view.kind;show({kind:'gossip'},`[data-view="${previous}"]`);});
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},dialogue,close,refreshInventory() { if(current&&view.kind==='sell') Inventory.renderShop(current, $('npc-inventory')); },get open(){return !!current;}};
+  window.City={nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},dialogue,close,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
 })();

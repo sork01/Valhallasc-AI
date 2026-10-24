@@ -1528,6 +1528,9 @@ impl Character {
     }
     pub fn sell_item(&mut self, id: &str, quantity: u32) -> Result<u32, &'static str> {
         let i = item(id).ok_or("Unknown item.")?;
+        if i.starter {
+            return Err("Starter gear cannot be sold.");
+        }
         if i.rarity == GM_RARITY {
             return Err("Game master gear cannot be sold.");
         }

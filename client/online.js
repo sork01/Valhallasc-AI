@@ -87,6 +87,7 @@
           const slot = mode === 'guest' ? saved.characters.find(c => c.token === saved.current) : null;
           if (character) window.GM?.onSelf(character);
           if (character) window.Trade?.onSnapshot(character);
+          if (character) window.Shop?.onSnapshot(character);
           if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
           callbacks.onSnapshot?.(packet); break;
         }
@@ -100,6 +101,7 @@
         case 'social': window.Social?.onState(packet); break;
         case 'trade': window.Trade?.onPacket(packet); break;
         case 'inspect': window.Inspect?.onPacket(packet); break;
+        case 'shop': window.Shop?.onPacket(packet); break;
         case 'bank': window.Bank?.onPacket(packet); break;
         case 'sign': window.BossSign?.onPacket(packet); break;
         case 'rebirthPreview': window.Rebirth?.onPreview(packet); break;

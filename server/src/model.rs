@@ -1209,6 +1209,17 @@ pub enum ClientMessage {
         npc: String,
         offer: Option<String>,
     },
+    ShopOpen {
+        npc: String,
+    },
+    SellBatch {
+        npc: String,
+        items: Vec<SaleLine>,
+    },
+    BuyBack {
+        npc: String,
+        id: u64,
+    },
     /// The bank (docs/bank.md, server/src/world/bank.rs). Each names the banker the window was opened with.
     BankOpen {
         npc: String,
@@ -1272,6 +1283,15 @@ pub enum ClientMessage {
         reference: Option<u64>,
         command: DebugCommand,
     },
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct SaleLine {
+    pub item: String,
+    pub quantity: u32,
+    #[serde(default)]
+    pub copy: Option<u64>,
 }
 
 /// A target is the character id (from the friends list, the online list or an invite), or else a name that

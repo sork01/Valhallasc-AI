@@ -317,24 +317,6 @@
     const i = definition(s.item), n = node('article', '', 'inventory-item shop-item'); n.dataset.item = i.id; n.dataset.rarity = displayRarity(i);
     const glyph = node('span', '', 'shop-item-icon'); glyph.innerHTML = icon(i); n.append(glyph, node('b', `${i.name} ×${s.quantity}`), node('small', summary(i))); attachTooltip(n, () => i); return n;
   }
-  function renderShop(npc, container) {
-    container.replaceChildren(); if (!npc.buys) return;
-    container.append(node('h4', 'Sell from your bags'), node('p', 'Equipped copies are kept.'));
-    const sell = (offer, b) => { if (Online.send({ type: 'interact', npc: npc.id, offer })) b.disabled = true; };
-    const materials = stacks.filter(s => definition(s.item)?.kind === 'material');
-    if (materials.length) {
-      const value = materials.reduce((sum, s) => sum + s.quantity * definition(s.item).sell, 0);
-      const b = button(`Sell all materials · ${value} gold`, () => sell('sell:materials', b)); b.dataset.sell = 'materials'; container.append(b);
-    }
-    for (const s of stacks) {
-      const count = spare(s), i = definition(s.item); if (count <= 0 || questItem(i)) continue;
-      const n = shopRow(s);
-      const b = button(`Sell 1 · ${saleValue(i)} gold`, () => sell(`sell:${i.id}:1`, b)); b.dataset.sell = 'one'; n.append(b);
-      if (count > 1) { const b = button(`Sell ${count} · ${saleValue(i, count)} gold`, () => sell(`sell:${i.id}:${count}`, b)); b.dataset.sell = 'stack'; n.append(b); }
-      container.append(n);
-    }
-    if (!stacks.some(s => spare(s) > 0)) container.append(node('p', 'No spare items to sell. Bring back loot from the meadow.'));
-  }
   function renderEquipped(container) {
     if (!look) return;
     if (container.dataset.class !== look.class) { container.replaceChildren(); container.dataset.class = look.class; }
@@ -390,7 +372,7 @@
   }
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(a).kind.localeCompare(definition(b).kind) || definition(a).name.localeCompare(definition(b).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
-  window.Inventory = { icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, effect, render, renderShop, renderEquipped, renderSets, hideTooltip,
+  window.Inventory = { icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, effect, render, renderEquipped, renderSets, hideTooltip,
     icon, definition, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
     // The bag side of a bank answer, which arrives before the next snapshot; the look and the set counts stay as they were.
     updateBags(next, nextSlots = {}, nextBags = [], nextInstances = []) {
@@ -401,7 +383,7 @@
       const key = JSON.stringify([next, nextLook, nextSlots, nextBags, nextInstances, nextSets]); if (key === signature) return;
       stacks = next; look = nextLook; gearSlots = nextSlots; bags = nextBags; gearInstances=nextInstances; setCounts=nextSets; signature = key;
       renderSets(); renderGearWarning();
-      reconcile(); hideTooltip(); dispatchEvent(new Event('inventory-change')); window.City?.refreshInventory();
+      reconcile(); hideTooltip(); dispatchEvent(new Event('inventory-change'));
     },
   };
 })();

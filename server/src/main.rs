@@ -225,8 +225,9 @@ async fn upgrade(State(app): State<App>, headers: HeaderMap, ws: WebSocketUpgrad
     let Ok(permit) = app.slots.clone().try_acquire_owned() else {
         return (StatusCode::SERVICE_UNAVAILABLE, "World full").into_response();
     };
-    ws.max_message_size(4096)
-        .max_frame_size(4096)
+    // A 256-entry merchant basket fits in one authoritative batch.
+    ws.max_message_size(32768)
+        .max_frame_size(32768)
         .on_upgrade(move |socket| async move {
             let _permit = permit;
             connection(socket, app).await;

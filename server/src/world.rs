@@ -16,6 +16,7 @@ mod bank;
 mod inspect;
 #[cfg(test)]
 mod raid_reward_tests;
+mod shop;
 mod signature;
 use bank::BankRequest;
 #[cfg(test)]
@@ -263,6 +264,7 @@ struct Player {
     /// When this connection last asked to inspect someone (rate limit, see world/inspect.rs).
     inspect_at: f64,
     service_at: f64,
+    shop: shop::Session,
     bag_notice_at: f64,
     portal_at: f64,
     /// Opt-in status is deliberately cleared on reconnect.
@@ -397,6 +399,7 @@ impl Player {
             escort: None,
             gauntlet: false,
             rebirth_nonce: None,
+            shop: shop::Session::default(),
             frozen: false,
         }
     }
@@ -2291,6 +2294,13 @@ impl World {
             ClientMessage::Interact { npc, offer } => {
                 self.interact(session, &npc, offer.as_deref());
             }
+            ClientMessage::ShopOpen { npc } => self.shop(session, &npc, shop::Request::Open),
+            ClientMessage::SellBatch { npc, items } => {
+                self.shop(session, &npc, shop::Request::Sell(items))
+            }
+            ClientMessage::BuyBack { npc, id } => {
+                self.shop(session, &npc, shop::Request::BuyBack(id))
+            }
             ClientMessage::BankOpen { npc } => self.bank(session, &npc, BankRequest::Open),
             ClientMessage::BankDeposit {
                 npc,
@@ -2549,35 +2559,8 @@ impl World {
                     if !npc.buys {
                         notice = "This townsperson does not buy items.".into();
                     } else {
-                        let mut next = p.character.clone();
-                        let result = if sale == "materials" {
-                            let stacks = next.inventory.clone();
-                            let mut total = Ok(0_u32);
-                            for stack in stacks {
-                                if item(&stack.item)
-                                    .is_some_and(|i| i.kind == "material" && !is_quest_item(i))
-                                {
-                                    match next.sell_item(&stack.item, stack.quantity) {
-                                        Ok(value) => total = total.map(|sum| sum + value),
-                                        Err(text) => {
-                                            total = Err(text);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            total
-                        } else if let Some((id, quantity)) = sale.rsplit_once(':') {
-                            quantity
-                                .parse::<u32>()
-                                .map_err(|_| "Invalid sale quantity.")
-                                .and_then(|quantity| next.sell_item(id, quantity))
-                        } else {
-                            Err("Invalid sale.")
-                        };
-                        match result {
+                        match shop::legacy_sell(&mut p.character, &mut p.shop, npc_id, sale) {
                             Ok(value) => {
-                                p.character = next;
                                 quest_changed = true;
                                 notice = format!("Items sold for {value} gold.");
                             }
