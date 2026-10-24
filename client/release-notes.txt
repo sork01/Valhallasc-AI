@@ -1,5 +1,21 @@
 [
   {
+    "version": "Beta 1.17.0",
+    "date": "2026-10-25",
+    "new": [
+      "Play in landscape on a phone or tablet with a floating movement stick and four large skill buttons. Choose their skills in Edit UI.",
+      "Reach your other skills, potions, food, maps and conversations through the touch controls.",
+      "Add the game to your home screen, or use Fullscreen in Settings where your browser supports it.",
+      "Try Low graphics in Settings for fewer effects and smoother play. The game offers it on your first touch visit."
+    ],
+    "changed": [
+      "Windows fit smaller screens and scroll so their controls stay within reach.",
+      "Touch controls leave room for screen notches. Rotate your device to landscape to play.",
+      "Improved performance on taller screens."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.16.1",
     "date": "2026-10-24",
     "new": [],

@@ -224,21 +224,25 @@
     },
     get connected() { return connected; },
     get id() { return id; }, send,
+    focusChat() {
+      if (!active || !connected) return false;
+      $('stage').classList.add('touch-chat-open'); $('chat-input').focus({ preventScroll: true }); return true;
+    },
   };
   $('chat-form').addEventListener('submit', event => {
     event.preventDefault(); const input = $('chat-input'), text = input.value.trim();
     if (text.startsWith('/') && (window.GM?.command(text) || window.Social?.command(text))) input.value = '';
     else if (text && send({ type: 'chat', text })) input.value = '';
-    input.blur();
+    input.blur(); $('stage').classList.remove('touch-chat-open');
   });
   $('chat-input').addEventListener('focus', () => { window.Field?.clearInput(); send({ type: 'stop' }); });
   $('chat-input').addEventListener('keydown', event => {
-    event.stopPropagation(); if (event.key === 'Escape') { event.preventDefault(); event.currentTarget.blur(); }
+    event.stopPropagation(); if (event.key === 'Escape') { event.preventDefault(); event.currentTarget.blur(); $('stage').classList.remove('touch-chat-open'); }
   });
   addEventListener('keydown', event => {
     // A button left focused by a mouse click must not swallow Enter (it would re-press the button instead of opening the chat box).
     if (Keys.is(event, 'chat') && active && connected && !Keys.typing(event)) {
-      event.preventDefault(); document.activeElement?.blur?.(); $('chat-input').focus();
+      event.preventDefault(); document.activeElement?.blur?.(); window.Online.focusChat();
     }
   });
   addEventListener('blur', () => { window.Field?.clearInput(); send({ type: 'stop' }); });

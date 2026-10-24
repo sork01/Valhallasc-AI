@@ -28,6 +28,7 @@
     ['Windows', 'party', 'Party', ['KeyP']],
     ['Windows', 'map', 'World map', ['KeyM']],
     ['Windows', 'menu', 'Menu', ['Escape']],
+    ...Array.from({ length: 4 }, (_, i) => ['Touch controls', 'touchSkill' + (i + 1), `Touch skill ${i + 1}`, []]),
     ['Other', 'chat', 'Chat', ['Enter']],
     ['Other', 'sound', 'Sound on or off', ['KeyN', 'KeyM']],
   ];
@@ -196,5 +197,8 @@
   }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['title', 'aria-label', 'placeholder'] });
   addEventListener('load', applyHints); addEventListener('keymap-change', applyHints);
 
-  window.Keys = { skillRange, ACTIONS, SLOTS, is, which, codeOf, actionsFor, typing, label, name, slots, isDefault, bind, clear, reset, resetAll, capture, holders, get capturing() { return capturing; } };
+  const handlers = new Map();
+  const register = (action, handler) => { if (DEFAULTS[action]) handlers.set(action, handler); };
+  const invoke = action => !capturing && !!handlers.get(action)?.();
+  window.Keys = { register, invoke, skillRange, ACTIONS, SLOTS, is, which, codeOf, actionsFor, typing, label, name, slots, isDefault, bind, clear, reset, resetAll, capture, holders, get capturing() { return capturing; } };
 })();

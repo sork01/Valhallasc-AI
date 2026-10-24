@@ -8,7 +8,7 @@
 (() => {
   const TW = 88, TH = 44, CH = 8;                    // tile size (px), chunk size (tiles)
   let MAP = WORLD_MAP.size;                           // map size (tiles) of the zone the hero is in
-  const VW = 1600, VH = 900;                          // virtual viewport in px; the canvas is scaled to fit
+  const VW = 1600; let VH = 900;                          // virtual viewport in px; the canvas is scaled to fit
   const SPR = 2;                                      // sprite cache resolution
   const OL = '#1c1428';
   // Zone 0 is Greenmeadow with Alderhaven; the server numbers the rest like WORLD_MAP.zones. Each has its own
@@ -104,7 +104,7 @@
     zone = ZONES[z] ? z : 0; zdef = ZONES[zone];
     window.DayNight?.setZone(zdef);
     window.Weather?.setZone(zdef);
-    buildMap(); chunks.clear();
+    buildMap(); clearGroundChunks();
     if (mini) buildMini();
     if (hero) { pendingNpc = null; pendingChest = null; cityRoute = []; hero.target = null; hero.pvpTargetId = null; hero.goal = null; }
     floaters = []; parts = []; effects = []; bolts = []; ebolts = []; drops = []; chests = []; signs = []; marker = null; slimes = []; remotePlayers.clear(); bubbles.clear();
@@ -425,7 +425,11 @@
   const spriteSet = () => zdef.theme === 'chained_forge' || zdef.theme === 'blackhour' || zdef.theme === 'longship' || zdef.theme === 'skybridge' || zdef.theme === 'nornroot' || zdef.theme === 'wyrd' || zdef.theme === 'sky' || zdef.theme === 'deep' || zdef.theme === 'nacre' || zdef.theme === 'astral' || zdef.theme === 'prismwaste' || zdef.theme === 'orrery' || zdef.theme === 'moonspore' || zdef.theme === 'stormglass' || zdef.theme === 'sunward' || zdef.theme === 'ribbonwild' || zdef.theme === 'tanglecrown' || zdef.theme === 'worldtree' || zdef.theme === 'heartwood' || zdef.theme === 'lapiserg' || zdef.theme === 'frostwake' || zdef.theme === 'cairnspine' || zdef.theme === 'yearwheel' || zdef.theme === 'eye_below' || zdef.theme === 'elder_hollow' || zdef.theme === 'thousandfold' || zdef.theme === 'rain_crown' || zdef.theme === 'seed_vault' || zdef.theme === 'sunken_astrolabe' || zdef.theme === 'thunderheart_gate' || SeasonDungeonArt.isTheme(zdef.theme) || CathedralArt.isTheme(zdef.theme) ? WYRD_NONE : zdef.theme === 'ember' ? emberSprites : zdef.theme === 'frost' ? frostSprites : zdef.theme === 'fen' ? fenSprites : sprites;
 
   // ---------- ground chunks ----------
-  const chunks = new Map(); let chunkScale = 1;
+  const chunks = new Map(); let chunkScale = 1, chunkCacheLimit = 32;
+  function clearGroundChunks() {
+    for (const { c } of chunks.values()) { c.width = 1; c.height = 1; }
+    chunks.clear();
+  }
   const CLIFF = 120, PADX = 10, PADTOP = 40;
   function chunkGeom(cx, cy) { const x0 = cx * CH, y0 = cy * CH; return { x0, y0, ox: (x0 - (y0 + CH)) * TW / 2 - TW / 2 - PADX, oy: (x0 + y0) * TH / 2 - PADTOP, w: CH * TW + TW + PADX * 2, h: CH * TH + TH + PADTOP + CLIFF }; }
   function renderChunk(cx, cy) {
@@ -693,7 +697,13 @@
   }
   function getChunk(cx, cy) {
     const k = cy * 100 + cx; let ch = chunks.get(k);
-    if (!ch) { ch = renderChunk(cx, cy); if (chunks.size > 30) chunks.delete(chunks.keys().next().value); }
+    if (!ch) {
+      ch = renderChunk(cx, cy);
+      if (chunks.size >= chunkCacheLimit) {
+        const oldest = chunks.keys().next().value, old = chunks.get(oldest);
+        old.c.width = 1; old.c.height = 1; chunks.delete(oldest);
+      }
+    }
     else chunks.delete(k);
     chunks.set(k, ch); return ch;
   }
@@ -892,7 +902,7 @@
     pendingNpc = null; pendingChest = null; cityRoute = [];
     window.Quests?.reset(); window.WorldMap?.reset(); explored = [];
     hero = newHero(); drops = []; chests = []; signs = []; floaters = []; parts = []; effects = []; bolts = []; marker = null; shake = 0; msg = null; hudT = 0; tAll = 0;
-    keys = new Set(); pointer = { down: false, x: 0, y: 0 };
+    touchDirection = [0, 0]; keys = new Set(); pointer = { down: false, x: 0, y: 0 };
     cam = { x: hero.x, y: hero.y };
     slimes = []; emitHud(true);
   }
@@ -921,20 +931,16 @@
 
   // ---------- input ----------
   // Held keys are kept as codes; a code's direction is looked up in the key map each tick, so a rebind takes effect at once.
+  let touchDirection = [0, 0];
   const DIRS = { moveUp: [0, -1], moveDown: [0, 1], moveLeft: [-1, 0], moveRight: [1, 0] };
   const heldDirection = code => Keys.actionsFor(code).map(a => DIRS[a]).find(Boolean);
   function onKeyDown(e) {
     if (e.defaultPrevented || !running || paused || hero.sparkTravel || !Online.connected || Keys.typing(e)) return;
     const code = Keys.codeOf(e);
-    if (Keys.is(e, 'interact') && !e.repeat && !hero.dead && window.RaidKey?.interact()) { e.preventDefault(); return; }
-    if (Keys.is(e, 'talk') && !e.repeat && !hero.dead) {
-      e.preventDefault(); const npc = [...City.npcs, ...signs].filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
-      if (npc) talkTo(npc); return;
-    }
-    if (Keys.is(e, 'mount') && !e.repeat) { e.preventDefault(); Field.toggleMount(); return; }
+    for (const action of ['interact', 'talk', 'mount']) if (Keys.is(e, action) && !e.repeat) { e.preventDefault(); Field.action(action); return; }
     if (!e.ctrlKey && !e.altKey && !e.metaKey && heldDirection(code)) { pendingNpc = null; cityRoute = []; keys.add(code); hero.target = null; hero.goal = null; emitHud(); e.preventDefault(); }
-    if (Keys.is(e, 'attack') && !(code === 'Space' && e.target?.tagName === 'BUTTON')) { e.preventDefault(); if (!e.repeat) Field.useSkill('attack'); }
-    if (Keys.is(e, 'dash') && isAssassin()) { e.preventDefault(); if (!e.repeat) Field.useSkill('shadowstep'); }
+    if (Keys.is(e, 'attack') && !(code === 'Space' && e.target?.tagName === 'BUTTON')) { e.preventDefault(); if (!e.repeat) Field.action('attack'); }
+    if (Keys.is(e, 'dash') && isAssassin()) { e.preventDefault(); if (!e.repeat) Field.action('dash'); }
   }
   function onKeyUp(e) { keys.delete(Keys.codeOf(e)); }
   function pickSlime(mx, my, wx, wy) {
@@ -963,7 +969,7 @@
     if (sign) { talkTo(sign); return; }
     const chest = chests.filter(c => c.expiresAt > tAll).sort((a,b) => b.x+b.y-a.x-a.y).find(c => { const [x,y]=w2s(c.x,c.y); return Math.abs(mx-x)<=27 && my>=y-37 && my<=y+7; });
     if (chest) { openChest(chest); return; }
-    pointer.down = true; cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
+    pointer.down = true; if (Number.isInteger(e.pointerId)) cv.setPointerCapture?.(e.pointerId);
     const [wx, wy] = pointerWorld(e); pointer.x = wx; pointer.y = wy;
     const s = pickSlime(mx, my, wx, wy);
     const rival = !s && window.Pvp?.available && [...remotePlayers.values()].filter(p => !p.dead).sort((a,b) => b.x+b.y-a.x-a.y).find(p => { const [x,y]=w2s(p.x,p.y); return Math.abs(mx-x)<34 && my>y-150 && my<y+12; });
@@ -1077,9 +1083,9 @@
     DamageNumbers.spawn(floaters, { x, y, text, color, kind, head: head ?? (['hit', 'crit', 'hurt', 'heal', 'miss'].includes(kind) ? headAt(x, y, kind === 'hit' || kind === 'crit' ? currentHitKind : null) : 60) });
   }
   let currentHitKind = null;
-  function burst(x, y, z, n, col, spd = 3, grav = 9) { for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, s = (.3 + Math.random()) * spd; parts.push({ x, y, z, vx: Math.cos(a) * s * .5, vy: Math.sin(a) * s * .5, vz: 2 + Math.random() * 5, life: .5 + Math.random() * .5, t: 0, col: Array.isArray(col) ? col[Math.floor(Math.random() * col.length)] : col, size: 2 + Math.random() * 3, g: grav }); } }
+  function burst(x, y, z, n, col, spd = 3, grav = 9) { if (window.Prefs?.lowGraphics) n = Math.ceil(n / 4); for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, s = (.3 + Math.random()) * spd; parts.push({ x, y, z, vx: Math.cos(a) * s * .5, vy: Math.sin(a) * s * .5, vz: 2 + Math.random() * 5, life: .5 + Math.random() * .5, t: 0, col: Array.isArray(col) ? col[Math.floor(Math.random() * col.length)] : col, size: 2 + Math.random() * 3, g: grav }); } }
   function keyboardDirection() {
-    let x = 0, y = 0;
+    let [x, y] = touchDirection;
     for (const code of keys) { const d = heldDirection(code); if (d) { x += d[0]; y += d[1]; } }
     const wx = (x + y) / 2, wy = (y - x) / 2, n = Math.hypot(wx, wy) || 1;
     return [wx / n, wy / n];
@@ -3739,7 +3745,11 @@
     const [cx, cy] = camS();
     g.imageSmoothingEnabled = Math.abs(chunkScale - dpr * zoom) > .01;      // a 1:1 blit needs no filtering
     const sxo = Math.round(shakeX), syo = Math.round(shakeY);
-    for (const [chx, chy] of visibleChunks()) {
+    // Keep the entire viewport's working set. A taller tablet viewport needs
+    // more than 31 chunks; evicting visible chunks recreated canvases every frame.
+    const groundChunks = visibleChunks();
+    chunkCacheLimit = Math.max(32, groundChunks.length);
+    for (const [chx, chy] of groundChunks) {
       const G = chunkGeom(chx, chy), dx = G.ox - cx + VW / 2 + sxo, dy = G.oy - cy + VH / 2 + syo;
       if (dx > VW || dy > VH || dx + G.w < 0 || dy + G.h < 0) continue;      // the world box of the screen is much bigger than the screen itself
       g.drawImage(getChunk(chx, chy).c, dx, dy, G.w, G.h);
@@ -4030,7 +4040,8 @@
   // stairs and the exit, missiles in flight).
   let darkCv = null, darkG = null;
   function drawDarkness(g, t) {
-    if (!darkCv) { darkCv = document.createElement('canvas'); darkCv.width = VW; darkCv.height = VH; darkG = darkCv.getContext('2d'); }
+    if (!darkCv) { darkCv = document.createElement('canvas'); darkG = darkCv.getContext('2d'); }
+    if (darkCv.width !== VW || darkCv.height !== Math.round(VH)) { darkCv.width = VW; darkCv.height = Math.round(VH); }
     const d = darkG; d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, VW, VH); d.fillStyle = zdef.theme === 'chained_forge' ? 'rgba(28,9,15,.15)' : zdef.theme === 'blackhour' ? 'rgba(18,11,30,.24)' : zdef.theme === 'longship' ? 'rgba(5,25,30,.24)' : zdef.theme === 'skybridge' ? 'rgba(9,16,34,.36)' : zdef.theme === 'nornroot' ? 'rgba(9,22,18,.26)' : zdef.theme === 'eye_below' ? 'rgba(2,15,28,.65)' : zdef.theme === 'elder_hollow' ? 'rgba(12,24,12,.30)' : zdef.theme === 'thousandfold' ? 'rgba(24,11,31,.32)' : zdef.theme === 'rain_crown' ? 'rgba(4,28,26,.49)' : zdef.theme === 'seed_vault' ? 'rgba(19,28,8,.34)' : zdef.theme === 'sunken_astrolabe' ? 'rgba(8,24,32,.49)' : zdef.theme === 'thunderheart_gate' ? 'rgba(7,19,38,.50)' : zdef.theme === 'blooming_labyrinth' ? 'rgba(14,27,17,.29)' : zdef.theme === 'solar_crucible' ? 'rgba(39,17,9,.43)' : zdef.theme === 'cathedral_left' ? 'rgba(4,24,29,.49)' : zdef.theme === 'cathedral_right' ? 'rgba(24,9,24,.51)' : zdef.theme === 'cathedral_main' ? 'rgba(8,10,30,.54)' : CathedralArt.isTheme(zdef.theme) ? 'rgba(3,9,24,.56)' : zdef.theme === 'vault' ? 'rgba(7,12,20,.63)' : 'rgba(3,4,10,.84)'; d.fillRect(0, 0, VW, VH);
     d.globalCompositeOperation = 'destination-out';
     const pool = (x, y, r, a) => {
@@ -4194,10 +4205,12 @@
   // ---------- lifecycle ----------
   function resize() {
     if (!cv) return;
-    dpr = Math.min(window.devicePixelRatio || 1, 2); cssW = cv.clientWidth || 1600; cssH = cv.clientHeight || 900; zoom = cssW / VW;
+    dpr = Math.min(window.devicePixelRatio || 1, window.Prefs?.lowGraphics ? 1 : 2); cssW = cv.clientWidth || 1600; cssH = cv.clientHeight || 900; zoom = cssW / VW;
+    VH = cssH / zoom;
     cv.width = Math.round(cssW * dpr); cv.height = Math.round(cssH * dpr);
-    const cs = Math.min(1.5, dpr * zoom); if (Math.abs(cs - chunkScale) > .05) { chunkScale = cs; chunks.clear(); }
+    const cs = Math.min(1.5, dpr * zoom); if (Math.abs(cs - chunkScale) > .05) { chunkScale = cs; clearGroundChunks(); }
   }
+  let lastPaint = 0;
   function loop(now) {
     if (!running) return; raf = requestAnimationFrame(loop);
     if (!last) last = now;                                  // the first frame's timestamp can precede start()
@@ -4206,8 +4219,16 @@
     City.update(serverNow());
     window.DayNight?.tick(dt);
     window.Weather?.tick(dt, hero.x, hero.y, !!hero.inside);
-    draw(now / 1000);
+    if (!document.hidden && (!window.Prefs?.lowGraphics || now - lastPaint >= 1000 / 30 - .5)) {
+      lastPaint = now; draw(now / 1000);
+    }
   }
+  const cancelHeldInput = () => {
+    const held = touchDirection.some(Boolean) || keys?.size || pointer?.down;
+    Field.clearInput(); if (held && Online.connected) Online.send({ type: 'input', dx: 0, dy: 0 });
+  };
+  addEventListener('blur', cancelHeldInput);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) cancelHeldInput(); });
   const Field = {
     start(o) {
       cv = o.canvas; ctx = cv.getContext('2d'); mini = o.mini; mctx = mini ? mini.getContext('2d') : null; opts = o.opts; onHud = o.onHud || onHud; onEvent = o.onEvent || onEvent;
@@ -4220,7 +4241,7 @@
       loadBeetleSprites(); loadCragSprites(); loadRimeSprites(); loadFenSprites(); loadWyrdSprites(); loadSkySprites(); loadDeepSprites(); loadAstralSprites(); loadPrismSprites(); loadOrrerySprites(); loadMoonsporeSprites(); loadStormglassSprites(); loadSunwardSprites(); loadRibbonwildSprites(); loadTanglecrownSprites(); loadWorldheartSprites(); loadLapisSprites(); loadFrostwakeSprites(); loadCairnSprites(); loadBankSprites(); loadChestSprites(); loadYearSprites(); loadMoonwellSprites(); loadMoonwellGardenSprites(); loadVaultSprites(); loadCathedralSprites();
       if (!Field._bound) {
         Field._bound = true;
-        addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize);
+        addEventListener('keydown', onKeyDown); addEventListener('keyup', onKeyUp); addEventListener('resize', resize); addEventListener('prefs-change', resize);
         cv.addEventListener('pointerdown', onPointerDown); cv.addEventListener('pointermove', onPointerMove); addEventListener('pointerup', onPointerUp);
         cv.addEventListener('contextmenu', e => e.preventDefault());
       }
@@ -4232,7 +4253,30 @@
       running = true; paused = false; last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
     },
     stop() { window.Inventory?.hideTooltip(); window.Skillbar?.close(false); window.Quests?.close(false); City.close(false); Online.stop(); running = false; spriteGeneration++; remotePlayers.clear(); cancelAnimationFrame(raf); },
-    clearInput() { pendingNpc=null; pendingChest=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
+    setTouchDirection(x, y) {
+      if (!Field.canAct || hero.sparkTravel) { x = 0; y = 0; }
+      if ((x || y) && !touchDirection.some(Boolean)) {
+        pendingNpc = null; pendingChest = null; cityRoute = []; pointer.down = false;
+        hero.target = null; hero.pvpTargetId = null; hero.goal = null; emitHud();
+      }
+      const wasMoving = touchDirection.some(Boolean);
+      const n = Math.hypot(x, y) || 1; touchDirection = [x / n, y / n];
+      if (wasMoving !== touchDirection.some(Boolean)) inputT = 0;
+    },
+    tapAt(clientX, clientY) { onPointerDown({ clientX, clientY, pointerType: 'touch' }); pointer.down = false; },
+    action(action) {
+      if (!Field.canAct || hero.sparkTravel) return false;
+      if (action === 'attack') return Field.useSkill('attack');
+      if (action === 'dash') return isAssassin() && Field.useSkill('shadowstep');
+      if (action === 'mount') { Field.toggleMount(); return true; }
+      if (action === 'interact') return !!window.RaidKey?.interact();
+      if (action === 'talk') {
+        const npc = [...City.npcs, ...signs].filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
+        if (npc) talkTo(npc); return !!npc;
+      }
+      return false;
+    },
+    clearInput() { touchDirection = [0, 0]; inputT = 0; window.TouchControls?.resetStick(); pendingNpc=null; pendingChest=null; cityRoute=[]; keys?.clear(); if (pointer) pointer.down = false; },
     setPaused(p) { paused = p; Field.clearInput(); Online.send({ type: 'stop' }); },
     visitNpc(id) {
       if (paused || !Online.connected || hero.dead) return;

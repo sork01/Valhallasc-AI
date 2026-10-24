@@ -2,7 +2,7 @@
 (() => {
   // ---------- tiny persistent state ----------
   const KEY = 'valhallasc.save.v1';
-  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, musicVol: 1, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
+  const defaults = { lang: /^ko/i.test(navigator.language || '') ? 'ko' : /^sv/i.test(navigator.language || '') ? 'sv' : 'en', sound: true, musicVol: 1, sfxVol: 1, night: 1, weather: 1, weatherAudio: .7, lowGraphics: false, touchGraphicsSuggested: false, ui: {}, uiScale: .8, winScale: {}, panelSize: {}, char: null, draft: null };
   let save = { ...defaults };
   try { Object.assign(save, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* private mode */ }
   const vol = v => Number.isFinite(+v) ? Math.max(0, Math.min(1, +v)) : 1;
@@ -994,6 +994,8 @@
     if (!list.children.length) list.textContent = 'Your character will appear here after connecting.';
   });
   $('p-equipment').addEventListener('click', () => openEquipment());
+  Keys.register('menu', () => { if (scene !== 'game') return false; setPause($('pause').hidden); return true; });
+  Keys.register('bags', () => { if (scene !== 'game') return false; openEquipment('bags'); return true; });
   $('inventory-open').addEventListener('click', () => openEquipment('bags'));
   $('bag-expand').addEventListener('click', () => { setPause(false); Field.visitNpc('merchant'); });
   $('bags-close').addEventListener('click', () => setPause(false));
@@ -1183,6 +1185,9 @@
   window.Prefs = {
     get lang() { return save.lang; },
     get music() { return save.musicVol; }, get sfx() { return save.sfxVol; }, get sound() { return save.sound; },
+    get touchSkills() { return save.touchSkills && typeof save.touchSkills === 'object' ? save.touchSkills : {}; },
+    get lowGraphics() { return save.lowGraphics === true; },
+    get touchGraphicsSuggested() { return save.touchGraphicsSuggested === true; },
     get night() { return save.night; },
     get weather() { return save.weather; },
     get weatherAudio() { return save.weatherAudio; },
@@ -1200,6 +1205,9 @@
       if ('musicVol' in patch) save.musicVol = vol(patch.musicVol);
       if ('sfxVol' in patch) save.sfxVol = vol(patch.sfxVol);
       if ('sound' in patch) save.sound = !!patch.sound;
+      if ('touchSkills' in patch) save.touchSkills = patch.touchSkills && typeof patch.touchSkills === 'object' ? patch.touchSkills : {};
+      if ('lowGraphics' in patch) save.lowGraphics = !!patch.lowGraphics;
+      if ('touchGraphicsSuggested' in patch) save.touchGraphicsSuggested = !!patch.touchGraphicsSuggested;
       if ('night' in patch) save.night = vol(patch.night);
       if ('weather' in patch) save.weather = vol(patch.weather);
       if ('weatherAudio' in patch) save.weatherAudio = vol(patch.weatherAudio);

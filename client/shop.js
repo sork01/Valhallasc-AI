@@ -64,6 +64,7 @@
     warning.addEventListener('cancel', event => { event.preventDefault(); closeWarning(); $('sell-confirm')?.focus(); });
     warning.addEventListener('keydown', event => event.stopPropagation());
     $('stage').append(warning); warning.showModal();
+    window.Settings?.registerWindow('sell-warning', null, 'Sell valuable items?', false);
     (precious.some(row => row.rarity === 'legendary') ? cancel : yes).focus();
   }
   function draw() {

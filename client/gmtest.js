@@ -111,14 +111,15 @@
     body.append(dungeon, gauntlet, tuning, status);
     win.append(head, body); panel.append(win);
     (document.getElementById('stage') || document.body).append(panel);
+    window.Settings?.registerWindow('gmtest-panel', '.gmtest-window', 'GM test menu');
     panel.addEventListener('click', e => { if (e.target === panel) hide(); });
     document.addEventListener('keydown', e => {
       if (panel.hidden) return;
       if (window.Keys ? Keys.is(e, 'menu') : e.code === 'Escape') { e.preventDefault(); e.stopPropagation(); hide(); }
     }, true);
   }
-  function show() { if (!panel) build(); panel.hidden = false; say('Loading…'); refresh(); }
-  function hide() { if (panel) panel.hidden = true; }
+  function show() { if (!panel) build(); window.Field?.setPaused(true); panel.hidden = false; say('Loading…'); refresh(); }
+  function hide() { if (panel && !panel.hidden) { panel.hidden = true; window.Field?.setPaused(false); } }
 
   window.GMTest = { open: show, close: hide, toggle() { if (panel && !panel.hidden) hide(); else show(); } };
   document.addEventListener('DOMContentLoaded', () => document.getElementById('gmtest-open')?.addEventListener('click', () => window.GMTest.toggle()));

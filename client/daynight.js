@@ -54,6 +54,7 @@
     if (warmAlpha > .002) { g.fillStyle = `rgba(${warmColor},${warmAlpha})`; g.fillRect(0, 0, width, height); }
     const darkAlpha = .27 * n * outdoorBlend * amount;
     if (darkAlpha > .002) { g.fillStyle = `rgba(${darkColor},${darkAlpha})`; g.fillRect(0, 0, width, height); }
+    if (window.Prefs?.lowGraphics) { g.restore(); return; }
     if (n > .3) {
       const alpha = n * outdoorBlend * .6;
       g.fillStyle = `rgba(234,246,255,${alpha})`;

@@ -1,0 +1,130 @@
+/* Device-sized controls. Window targets compensate for the applied CSS scale. */
+html, body { overscroll-behavior: none; }
+.low-graphics *, .low-graphics *::before, .low-graphics *::after {
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  animation: none !important;
+}
+#low-gfx-suggestion { position: absolute; z-index: 51; left: 50%; top: 8px; transform: translateX(-50%); max-width: 90%; background: #101e46; border: 1px solid #f5c542; padding: 8px; pointer-events: auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; }
+#low-gfx-suggestion button { min-width: calc(44px / var(--ui, .8)); min-height: calc(44px / var(--ui, .8)); font-size: 14px; }
+
+
+.touch-only { display: none; }
+
+@media (pointer: coarse) {
+  .stage { width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right)); height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)); aspect-ratio: auto; left: env(safe-area-inset-left); top: env(safe-area-inset-top); transform: none; }
+  .rotate { z-index: 1000; }
+  #stage .pause > :is(.panel, .rpg-window), .equipment-workspace, #sign-panel {
+    --touch-target: calc(44px / var(--window-k, .8));
+    min-width: 0; min-height: 0;
+    max-width: 96cqw; max-height: var(--touch-stage-h, 94dvh);
+    overflow: auto; overscroll-behavior: contain;
+    font-size: max(16px, 1.2cqw);
+  }
+  #stage .pause > :is(.panel, .rpg-window) { width: min(94cqw, 760px); padding: 12px; }
+  #stage .pause > :is(.panel, .rpg-window) :is(button, select, input:not([type=hidden]), summary),
+  .equipment-workspace :is(button, select, input:not([type=hidden])), #sign-panel button {
+    min-width: var(--touch-target); min-height: var(--touch-target); flex-shrink: 0;
+    font-size: max(16px, 1em); pointer-events: auto;
+  }
+  #stage .pause > :is(.panel, .rpg-window) :is(input[type=checkbox], input[type=radio]) { min-width: 22px; min-height: 22px; margin: 11px; }
+  .setting-check { min-height: var(--touch-target); display: flex; align-items: center; }
+  .setting-row { min-height: var(--touch-target); gap: 8px; }
+  #stage .pause > :is(.panel, .rpg-window) :is(h2, h3, h4) { font-size: max(18px, 1.8cqw); }
+  #stage .pause > :is(.panel, .rpg-window) :is(p, label, small, .btn) { font-size: max(16px, 1.1cqw); }
+  #stage .pause > :is(.panel, .rpg-window) > * { min-width: 0; }
+  .gossip-titlebar, .gossip-footer, .window-titlebar, .bank-footer, .bank-tools, .news-panel header, .news-panel footer { flex-shrink: 0; }
+  .gossip-content, .gossip-page, .bank-body, #news-body, .social-body, .quest-list { min-height: 0; overflow: auto; }
+  .equipment-workspace { align-items: flex-start; width: min(96cqw, 1000px); }
+  .character-window, .bag-window { flex: 1 0 300px; width: auto; min-width: 0; }
+  .bag-grid, #inventory-list { max-width: none; }
+  .skills-panel .skill-card { min-width: 0; white-space: normal; }
+  .wm-panel .wm-stage { min-height: 140px; }
+  .trade-columns, .sell-columns, .inspect-body { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gossip-row { white-space: normal; }
+  .win-grip, .panel-grip { min-width: 44px; min-height: 44px; }
+
+  .touch-only { display: block; position: absolute; z-index: 24; pointer-events: auto; }
+  #touch-stick { left: 8px; bottom: 8px; width: calc(180px / var(--ui, .8)); height: calc(166px / var(--ui, .8)); touch-action: none; }
+  .stick-disc { position: absolute; left: 50%; top: 50%; width: calc(112px / var(--ui, .8)); height: calc(112px / var(--ui, .8)); margin: calc(-56px / var(--ui, .8)); border-radius: 50%; border: 2px solid #f5c542; background: #101e4655; opacity: .45; pointer-events: none; }
+  .stick-disc i { display: block; position: absolute; width: calc(44px / var(--ui, .8)); height: calc(44px / var(--ui, .8)); top: calc(34px / var(--ui, .8)); left: calc(34px / var(--ui, .8)); border-radius: 50%; background: #bfeeff99; border: 2px solid #f5c542; }
+  #touch-stick.held .stick-disc { opacity: .8; }
+  #touch-skills { right: 8px; bottom: 8px; width: calc(270px / var(--ui, .8)); height: calc(176px / var(--ui, .8)); }
+  #touch-skills button, #touch-actions button, #touch-quickuse button, .touch-tray-open .skill-slot, .touch-tray-open .skills-open {
+    min-width: calc(44px / var(--ui, .8)); min-height: calc(44px / var(--ui, .8)); pointer-events: auto; touch-action: manipulation;
+    font-size: calc(12px / var(--ui, .8)); color: #ffe6a8; background: #101e46ec; border: 1px solid #c9ad73; border-radius: 10px;
+  }
+  #touch-skills button { position: absolute; width: calc(62px / var(--ui, .8)); height: calc(62px / var(--ui, .8)); padding: 3px; }
+  #touch-skills button:disabled { opacity: .5; }
+  #touch-skills .touch-attack { bottom: 0; right: 0; width: calc(70px / var(--ui, .8)); height: calc(70px / var(--ui, .8)); border-radius: 50%; }
+  #touch-skills [data-arc="0"] { bottom: 0; right: calc(78px / var(--ui, .8)); }
+  #touch-skills [data-arc="1"] { bottom: calc(48px / var(--ui, .8)); right: calc(134px / var(--ui, .8)); }
+  #touch-skills [data-arc="2"] { bottom: calc(110px / var(--ui, .8)); right: calc(90px / var(--ui, .8)); }
+  #touch-skills [data-arc="3"] { bottom: calc(80px / var(--ui, .8)); right: calc(18px / var(--ui, .8)); }
+  #touch-skills button > span:first-child:not(:last-child) { display: block; height: 55%; }
+  #touch-skills svg { height: 100%; width: 100%; }
+  #touch-skills small { position: absolute; top: 0; right: 0; background: #101e46; }
+  #touch-actions { top: 8px; left: 34%; width: calc(300px / var(--ui, .8)); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+  #touch-quickuse { left: 200px; bottom: 8px; display: flex; flex-direction: column; gap: 4px; max-width: calc(240px / var(--ui, .8)); }
+  #touch-quickuse #quickuse { position: static; padding: 2px; gap: 3px; }
+  #touch-quickuse .quick-slot { width: calc(58px / var(--ui, .8)); height: calc(54px / var(--ui, .8)); }
+  #touch-quickuse .quick-slot .skill-name, #touch-quickuse kbd { display: none; }
+  #skillbar { display: none; }
+  .touch-tray-open #skillbar { display: flex; left: 200px; bottom: 125px; transform: none; max-width: 60cqw; max-height: 50cqh; overflow: auto; z-index: 30; }
+  .touch-tray-open #skillbar-slots { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .touch-tray-open .skill-slot { width: calc(50px / var(--ui, .8)); height: auto; }
+  #inventory-open, #social-open { min-width: calc(44px / var(--ui, .8)); min-height: calc(44px / var(--ui, .8)); }
+  #inventory-open { right: 8px; bottom: 200px; }
+  #social-open { right: 8px; bottom: 250px; }
+  #chat { bottom: 8px; left: 200px; translate: none !important; }
+  #stage:not(.touch-chat-open) #chat:not(:focus-within) .chat-log, #stage:not(.touch-chat-open) #chat:not(:focus-within) .chat-tabs, #stage:not(.touch-chat-open) #chat:not(:focus-within) form { display: none; }
+  #chat:focus-within { z-index: 35; bottom: 120px; }
+  .layout-bar { flex-wrap: wrap; max-height: 90cqh; overflow: auto; width: 94cqw; top: 8px; font-size: 16px; }
+  .layout-bar :is(button, select) { min-width: 44px; min-height: 44px; font-size: 16px; }
+  #touch-skill-editor { width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0; border: 1px solid #c9ad73; }
+  #touch-skill-editor label { min-width: 0; }
+  #touch-skill-editor select { width: 100%; }
+
+  .gossip-titlebar, .rpg-titlebar { min-height: var(--touch-target, 55px); }
+  #touch-actions { width: calc(320px / var(--ui, .8)); display: grid; grid-auto-flow: column; grid-auto-columns: minmax(calc(60px / var(--ui, .8)), 1fr); grid-template-columns: none; overflow-x: auto; padding: 2px; }
+  #connection-overlay > .connection-panel, #sell-warning { --touch-target: calc(44px / var(--window-k, .8)); max-width: 94cqw; max-height: var(--touch-stage-h, 94dvh); overflow: auto; }
+  #sell-warning :is(button, input, select), #connection-overlay button { min-width: var(--touch-target); min-height: var(--touch-target); font-size: 16px; }
+  #touch-skills, #touch-stick { pointer-events: none; }
+  #touch-stick { pointer-events: auto; }
+  #touch-skills button { pointer-events: auto; }
+  .ui-editing #touch-skills, .ui-editing #touch-stick { pointer-events: auto; }
+
+ #connection-overlay > .connection-panel { width: min(94cqw, 600px); }
+
+  #gmtest-panel { z-index: 51; }
+  #stage:has(.pause:not([hidden]), #equipment:not([hidden]), #connection-overlay:not([hidden])) .panel-grip { display: none; }
+  .character-window { min-width: calc(var(--touch-target) * 6 + 60px); }
+  .equipment-workspace .paper-doll { height: calc((var(--touch-target) + 20px) * 5 + 16px); }
+  #equipped-slots { grid-template-columns: calc(var(--touch-target) * 2 + 4px) minmax(calc(var(--touch-target) * 2 + 4px), 1fr) calc(var(--touch-target) * 2 + 4px); grid-template-rows: repeat(5, calc(var(--touch-target) + 20px)); }
+  .equipment-workspace .equipped-slot { width: calc(var(--touch-target) * 2 + 4px); height: calc(var(--touch-target) + 18px); }
+  .equipment-workspace .equipped-slot .gear-icon { width: var(--touch-target); height: var(--touch-target); margin: 0; }
+  .equipment-workspace .equipped-slot select { top: 0; right: 0; bottom: auto; width: var(--touch-target); height: var(--touch-target); }
+  .equipment-workspace .equipped-slot .gear-label { font-size: 14px; margin: 0; position: absolute; bottom: 0; width: 100%; }
+  .wm-body[data-view="world"] { overflow: auto; }
+  .wm-body[data-view="world"] .wm-world { position: relative; inset: auto; width: calc(1120px / var(--window-k, .8)); height: auto; aspect-ratio: 160 / 99; }
+
+  .inspect-doll { height: calc((var(--touch-target) + 12px) * 5 + 16px); }
+  .inspect-slots { grid-template-columns: var(--touch-target) minmax(0, 1fr) var(--touch-target); grid-template-rows: repeat(5, calc(var(--touch-target) + 12px)); }
+  .inspect-window .equipped-slot { width: var(--touch-target); height: var(--touch-target); }
+  .wm-body[data-view="zone"] { overflow: auto; }
+  .wm-zone { position: relative; inset: auto; min-height: 360px; }
+  .wm-zone .wm-stage { height: 360px; margin: 36px; }
+  .wm-markers .wm-gate { transform: translate(-50%, -50%); }
+
+  .gmtest-check, .setting-check { min-width: var(--touch-target); min-height: var(--touch-target); }
+  #stage .pause > :is(.panel, .rpg-window) :is(input[type=checkbox], input[type=radio]) { margin: calc((var(--touch-target) - 22px) / 2); }
+
+  #stage .pause > .touch-resizable-window, #stage #sign-panel.touch-resizable-window { padding-bottom: calc(12px + var(--touch-target)); }
+  #sell-warning { width: min(92cqw, 600px); }
+  #worldmap { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
+  #stage .pause > .wm-panel { height: calc(var(--touch-stage-h) / var(--window-k)); max-height: calc(var(--touch-stage-h) / var(--window-k)); }
+
+}
+
+@media (pointer: coarse) and (orientation: portrait) {
+  .rotate { display: grid; }
+}

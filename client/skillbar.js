@@ -213,7 +213,7 @@
     else if (slot >= 0 && Field.canAct) { event.preventDefault(); const skill = find(slots[slot]); if (skill) Field.useSkill(skill.id); }
   });
   addEventListener('keymap-change', () => { if (character) render(); });
-  window.Skillbar = { show, close, icon, get open() { return open(); }, update() {
+  window.Skillbar = { show, close, icon, get catalog() { return skills.length ? skills : available(); }, state(id) { const skill = (skills.length ? skills : available()).find(s => s.id === id); return { skill, cooldown: remaining(skill), ready: Field.canAct && unlocked(skill) && remaining(skill) <= 0 && (!skill.cost || Field.hero.resource >= skill.cost) }; }, get open() { return open(); }, update() {
     sync();
     for (const b of $('skillbar-slots').children) {
       const skill = find(b.dataset.skill), cooldown = skill ? remaining(skill) : 0;
@@ -227,5 +227,6 @@
     }
     $('skills-open').disabled = !Online.connected || Field.hero.dead;
     window.Quickuse?.update();
+    window.TouchControls?.update();
   } };
 })();

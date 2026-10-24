@@ -14,12 +14,15 @@
     ['frame', 'Character frame', '.hud-tl', '0 0'], ['buffs', 'Active effects', '#buff-bar', '0 0'], ['party', 'Party', '#party-frame', '0 0'],
     ['map', 'Minimap', '.hud-tr', '100% 0'], ['travel', 'Travel button', '#city-travel', '100% 0'], ['quests', 'Quest tracker', '#quest-tracker', '0 0'],
     ['bags', 'Bags button', '#inventory-open', '100% 100%'], ['social', 'Social button', '#social-open', '100% 100%'],
+    ['touch-stick', 'Movement stick', '#touch-stick', '0 100%'], ['touch-skills', 'Touch skills', '#touch-skills', '100% 100%'],
+    ['touch-actions', 'Touch actions', '#touch-actions', '100% 0'], ['touch-quickuse', 'Touch quick slots', '#touch-quickuse', '0 100%'],
     ['skillbar', 'Skillbar', '#skillbar', '0 100%'], ['chat', 'Chat', '#chat', '0 100%'],
   ];
   // Scaled with the UI but not movable.
-  const EXTRA = [['#loot-rolls', '0 0'], ['#social-invites', '0 0'], ['#pvp-duel-warning', '0 0'], ['#gauntlet-banner', '0 0'], ['#rare-pickup', '0 0'], ['#announce', '50% 0'], ['#toast', '0 100%']];
+  const EXTRA = [['#low-gfx-suggestion', '50% 0'], ['#loot-rolls', '0 0'], ['#social-invites', '0 0'], ['#pvp-duel-warning', '0 0'], ['#gauntlet-banner', '0 0'], ['#rare-pickup', '0 0'], ['#announce', '50% 0'], ['#toast', '0 100%']];
   // [overlay id, window selector or null for the overlay itself, name, origin, resizable]
   const WINDOWS = [
+    ['connection-overlay', '.connection-panel', 'World connection', '50% 50%', false],
     ['whats-new', '.news-panel', "What's new", '50% 50%', true],
     ['pause', '.pause-panel', 'World Menu', '50% 50%', false], ['settings-panel', '.settings-panel', 'Settings', '50% 50%', false], ['keys-panel', '.keys-panel', 'Keyboard', '50% 50%', false],
     ['quest-journal', '.quest-panel', 'Quest journal', '50% 50%', true], ['npc-dialogue', '.gossip-window', 'Conversation', '50% 50%', true],
@@ -98,6 +101,9 @@
   }
   function applyWindow(w) {
     const k = windowScale(w);
+    w.el.classList.toggle('touch-resizable-window', w.resizable);
+    w.el.style.setProperty('--window-k', String(k));
+    w.el.style.setProperty('--touch-stage-h', stage.clientHeight * .94 + 'px');
     w.el.style.scale = Math.abs(k - 1) < .005 ? '' : String(Math.round(k * 1000) / 1000);
     placeGrip(w);
   }
@@ -152,15 +158,28 @@
     });
     return g;
   }
-  let gripLayer = null;
+  let gripLayer = null, windowWatch = null;
   function initWindows() {
     gripLayer = document.createElement('div'); gripLayer.className = 'win-grips'; stage.append(gripLayer);
-    const watch = new ResizeObserver(entries => { for (const entry of entries) { const w = wins.find(x => x.el === entry.target); if (w) applyWindow(w); } });
+    const watch = windowWatch = new ResizeObserver(entries => { for (const entry of entries) { const w = wins.find(x => x.el === entry.target); if (w) applyWindow(w); } });
     for (const w of wins) {
       if (w.resizable) { w.grip = makeGrip(w); gripLayer.append(w.grip); }
       watch.observe(w.el);
     }
     new ResizeObserver(() => applyScale()).observe(stage);
+  }
+  function registerWindow(id, selector, name, resizable = true) {
+    const root = $(id), el = selector ? root?.querySelector(selector) : root;
+    if (!el) return;
+    let w = wins.find(w => w.id === id);
+    if (w?.el === el) return;
+    if (w) { windowWatch?.unobserve(w.el); w.el = el; }
+    else { w = { id, name, el, resizable, grip: null }; wins.push(w); }
+    el.style.transformOrigin = '50% 50%';
+    const savedScale = +window.Prefs.winScale[id];
+    if (Number.isFinite(savedScale) && savedScale > 0) winScale[id] = Math.max(.4, Math.min(3, savedScale));
+    if (w.resizable && !w.grip) { w.grip = makeGrip(w); gripLayer?.append(w.grip); }
+    windowWatch?.observe(el); applyWindow(w);
   }
   function resetWindows() { for (const w of wins) { delete winScale[w.id]; applyWindow(w); } storeWindows(); resetPanels(); }
 
@@ -250,6 +269,7 @@
   const music = $('set-music'), sfx = $('set-sfx'), sound = $('set-sound'), night = $('set-night'), weather = $('set-weather'), weatherAudio = $('set-weather-audio'), language = $('set-language'), size = $('set-uiscale');
   function syncPanel() {
     language.value = window.Prefs.lang;
+    $('set-low-graphics').checked = window.Prefs.lowGraphics;
     music.value = Math.round(window.Prefs.music * 100); sfx.value = Math.round(window.Prefs.sfx * 100); sound.checked = window.Prefs.sound;
     night.value = Math.round(window.Prefs.night * 100); $('set-night-out').textContent = night.value + '%';
     weather.value = Math.round(window.Prefs.weather * 100); $('set-weather-out').textContent = weather.value + '%';
@@ -257,6 +277,7 @@
     size.value = Math.round(uiScale() * 100); $('set-uiscale-out').textContent = size.value + '%';
     $('set-music-out').textContent = music.value + '%'; $('set-sfx-out').textContent = sfx.value + '%';
   }
+  $('set-low-graphics').addEventListener('change', () => window.Prefs.set({ lowGraphics: $('set-low-graphics').checked }));
   music.addEventListener('input', () => window.Prefs.set({ musicVol: music.value / 100 }));
   language.addEventListener('change', () => window.Prefs.set({ lang: language.value }));
   sfx.addEventListener('input', () => window.Prefs.set({ sfxVol: sfx.value / 100 }));
@@ -366,15 +387,17 @@
   function startEdit() {
     if (editing) return;
     editing = true; panel.hidden = true; $('pause').hidden = true;
+    window.TouchControls?.edit(true);
     stage.classList.add('ui-editing'); bar.hidden = false; for (const w of wins) placeGrip(w); placePanelGrips();
     layer = document.createElement('div'); layer.className = 'layout-layer'; stage.append(layer);
-    for (const [id, name] of ITEMS) if (els.get(id)) { const h = makeHandle(id, name); handles.set(id, h); layer.append(h); }
+    for (const [id, name] of ITEMS) if (els.get(id) && (!id.startsWith('touch-') || matchMedia('(pointer: coarse)').matches)) { const h = makeHandle(id, name); handles.set(id, h); layer.append(h); }
     syncHandles(); select(null);
     $('layout-done').focus({ preventScroll: true });
   }
   function stopEdit(toPanel = true) {
     if (!editing) return;
     editing = false; drag = null; store();
+    window.TouchControls?.edit(false);
     stage.classList.remove('ui-editing'); bar.hidden = true; for (const w of wins) placeGrip(w); placePanelGrips(); layer.remove(); layer = null; handles.clear(); selected = null;
     if (toPanel) { panel.hidden = false; syncPanel(); $('set-edit-ui').focus({ preventScroll: true }); }
   }
@@ -407,6 +430,27 @@
   $('layout-done').addEventListener('click', () => stopEdit());
   $('layout-reset').addEventListener('click', reset);
 
-  window.Settings = { show, close, refresh, startEdit, stopEdit, reset, applyScale, resetWindows, resetPanels, get panelSizes() { return Object.fromEntries(PANELS.map(p => [p.id, p.size])); }, sizeWindow: (id, factor) => { const w = wins.find(x => x.id === id); if (w) sizeWindow(w, factor); }, get windowScales() { return winScale; }, get active() { return !panel.hidden || editing; }, get editing() { return editing; }, get layout() { return layout; } };
+  window.Settings = { registerWindow, show, close, refresh, startEdit, stopEdit, reset, applyScale, resetWindows, resetPanels, get panelSizes() { return Object.fromEntries(PANELS.map(p => [p.id, p.size])); }, sizeWindow: (id, factor) => { const w = wins.find(x => x.id === id); if (w) sizeWindow(w, factor); }, get windowScales() { return winScale; }, get active() { return !panel.hidden || editing; }, get editing() { return editing; }, get layout() { return layout; } };
+  const suggestion = $('low-gfx-suggestion');
+  suggestion.hidden = !matchMedia('(pointer: coarse)').matches || window.Prefs.touchGraphicsSuggested || window.Prefs.lowGraphics;
+  for (const [id, accept] of [['low-gfx-accept', true], ['low-gfx-dismiss', false]]) $(id).addEventListener('click', () => {
+    window.Prefs.set({ touchGraphicsSuggested: true, ...(accept ? { lowGraphics: true } : {}) }); suggestion.hidden = true;
+  });
+  const graphics = () => { document.documentElement.classList.toggle('low-graphics', window.Prefs.lowGraphics); };
+  addEventListener('prefs-change', graphics); graphics();
+  const fullscreen = $('set-fullscreen');
+  const fullscreenNotice = document.createElement('p'); fullscreenNotice.id = 'set-fullscreen-notice';
+  fullscreenNotice.className = 'world-menu-note'; fullscreenNotice.setAttribute('role', 'status'); fullscreenNotice.hidden = true; fullscreen.after(fullscreenNotice);
+  const syncFullscreen = () => {
+    fullscreen.hidden = !document.fullscreenEnabled || typeof stage.requestFullscreen !== 'function';
+    fullscreen.textContent = window.Locale?.translate(document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen') || (document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen');
+  };
+  fullscreen.addEventListener('click', async () => {
+    fullscreenNotice.hidden = true;
+    try { if (document.fullscreenElement) await document.exitFullscreen(); else await stage.requestFullscreen(); }
+    catch (_) { fullscreenNotice.hidden = false; fullscreenNotice.textContent = window.Locale?.translate('Fullscreen is unavailable. You can add the game to your home screen instead.') || 'Fullscreen is unavailable. You can add the game to your home screen instead.'; }
+    syncFullscreen();
+  });
+  addEventListener('fullscreenchange', syncFullscreen); syncFullscreen();
   loadWindowScales(); initWindows(); initPanels(); applyScale(); refresh();
 })();
