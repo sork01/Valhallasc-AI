@@ -43,3 +43,11 @@ sign-in cleanup and Swedish. `MUTATE=1` hides the countdown and correctly fails
 the visibility check after confirming the real 429 metadata. Artifact:
 `test-results/driver-ixBeFV` in the isolated login-retry worktree. Clippy, fmt,
 changed JavaScript syntax, Swedish catalog and 21 locale checks pass.
+
+Deployed 2026-10-24 with nobody online (source `53e59e3`). Rollback binary,
+consistent pre-build/stopped database copies and previous client files are in
+`deploy/backups/login-retry-20261024T073558Z/`. Both health endpoints pass, all
+four changed public client hashes match, the running binary matches the tested
+release, SQLite `quick_check` passes, and counts remain 25 characters / 14 guests.
+No test flags or warning/error journal entries. Running release SHA-256:
+`c7e536768cc1cfb319b58d037e4d31268a77dbd223f8c7275440e0e852f33e07`.
