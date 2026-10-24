@@ -56,3 +56,13 @@ or changes to stats, resale values, drop sources, map geometry, zones or quests.
 
 The private `MUTATE=1` control removes class filtering and correctly fails
 the first own-class stock assertion; production files are never mutated.
+
+Deployed 2026-10-24 with nobody online (source `a01d59d`). Backup:
+`deploy/backups/vendor-weapons-20261024T113025Z/` contains the old running
+binary before building, previous four client files, consistent pre-build and
+stopped SQLite snapshots, and the immutable tested candidate. Public/bridge
+health and all four public client hashes pass. The running binary matches the
+private candidate; no test flags or warning/error journal entries. SQLite
+`quick_check` passes; counts remain 25 characters / 14 guests. No new zones,
+item IDs or database migration. Release SHA-256:
+`2a9e32ab009353cc90714c5f0546c248c7aebf08719f97f44b9fdbb03fcf6fcc`.
