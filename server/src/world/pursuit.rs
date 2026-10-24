@@ -174,7 +174,9 @@ impl Pursuit {
             let end = (index + 16).min(cells.len() - 1);
             let next = (index + 1..=end)
                 .rev()
-                .find(|i| clear_line(map, anchor, cells[*i], radius))?;
+                // Check the whole segment: sampled sight can miss a tiny corner intersection,
+                // leaving the walker and its route disagreeing forever. Permit exact wall tangency.
+                .find(|i| map.line_clear(anchor, cells[*i], (radius - 1e-8).max(0.)))?;
             route.push(cells[next]);
             anchor = cells[next];
             index = next;

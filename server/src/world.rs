@@ -277,6 +277,7 @@ struct Player {
     /// Set on a fighter hired by a raid contract: the zone of the raid door. The contract ends when the hirer is
     /// neither there nor inside a raid.
     merc_raid: Option<usize>,
+    merc_navigation: mercs::Navigation,
     /// A temporary autonomous adventurer in an occupied shared zone.
     ambient: Option<ambient::Ambient>,
     /// Set on a stranded person walking an escort quest's route (see world/escort.rs). Always with `merc` set to the
@@ -389,6 +390,7 @@ impl Player {
             merc: None,
             merc_quest: None,
             merc_raid: None,
+            merc_navigation: mercs::Navigation::default(),
             ambient: None,
             escort: None,
             gauntlet: false,
@@ -2995,6 +2997,8 @@ impl World {
         let mut dir = Point::default();
         let mut travel = 0.;
         let mut auto_attack = false;
+        let hired = p.merc.is_some() && p.escort.is_none() && !p.gauntlet;
+        let mut navigation_goal = None;
         if self.time - p.input_at > 0.3 {
             p.input = Point::default();
         }
@@ -3009,7 +3013,14 @@ impl World {
             {
                 let distance = p.character.point().distance(s.point());
                 let facing = p.character.point().direction(s.point());
-                if distance - s.r <= p.character.look.class.reach() {
+                if distance - s.r <= p.character.look.class.reach()
+                    && (!hired
+                        || self.maps[p.character.zone].line_clear(
+                            p.character.point(),
+                            s.point(),
+                            0.05,
+                        ))
+                {
                     p.face = facing;
                     auto_attack = !p.character.look.class.ranged()
                         || self.maps[p.character.zone].line_clear(
@@ -3019,7 +3030,12 @@ impl World {
                         );
                 } else {
                     dir = facing;
-                    travel = (distance - s.r - p.character.look.class.reach()).max(0.);
+                    // Stop just inside reach: at the exact floating-point boundary a fighter can keep
+                    // requesting a sub-pixel step forever without ever starting its attack.
+                    travel = (distance - s.r - p.character.look.class.reach()
+                        + if hired { 0.05 } else { 0. })
+                    .max(0.);
+                    navigation_goal = Some(s.point());
                 }
             } else {
                 p.target = None;
@@ -3031,7 +3047,28 @@ impl World {
                 travel = 0.;
             } else {
                 dir = p.character.point().direction(goal);
+                navigation_goal = Some(goal);
             }
+        }
+        if hired
+            && p.root <= 0.
+            && p.dash <= 0.
+            && let Some(goal) = navigation_goal.filter(|goal| {
+                !self.maps[p.character.zone].line_clear(p.character.point(), *goal, PLAYER_RADIUS)
+            })
+        {
+            let waypoint = p.merc_navigation.waypoint(
+                &mut self.pursuit,
+                &self.maps[p.character.zone],
+                p.character.zone,
+                p.character.point(),
+                goal,
+                self.time,
+            );
+            travel = waypoint.map_or(0., |point| p.character.point().distance(point));
+            dir = waypoint.map_or(Point::default(), |point| {
+                p.character.point().direction(point)
+            });
         }
         let mut distance = (p.escort.as_ref().map_or(
             p.character.look.class.speed()
@@ -3067,6 +3104,13 @@ impl World {
             if p.attack <= 0. {
                 p.face = dir;
             }
+        }
+        if hired {
+            p.merc_navigation.observe(
+                p.character.point(),
+                self.time,
+                navigation_goal.is_some() && p.root <= 0. && p.dash <= 0.,
+            );
         }
         if dash_sweep {
             self.dash_sweep(session);

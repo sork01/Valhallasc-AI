@@ -48,6 +48,75 @@ const MERC_LEASH: f64 = 26.;
 /// Enemies attacking the party this close are fought without waiting for the hirer to pick a target.
 const MERC_SIGHT: f64 = 14.;
 
+/// Transient movement state for hired fighters only; never saved or used by escorts/arena opponents.
+#[derive(Default)]
+pub(super) struct Navigation {
+    zone: Option<usize>,
+    goal: Point,
+    route: std::collections::VecDeque<Point>,
+    retry_at: f64,
+    progress: Option<(Point, f64)>,
+}
+
+impl Navigation {
+    pub(super) fn waypoint(
+        &mut self,
+        pursuit: &mut pursuit::Pursuit,
+        map: &Map,
+        zone: usize,
+        from: Point,
+        to: Point,
+        time: f64,
+    ) -> Option<Point> {
+        while self.route.front().is_some_and(|p| from.distance(*p) < 0.12) {
+            self.route.pop_front();
+        }
+        let obstructed = self
+            .route
+            .front()
+            .is_some_and(|p| !map.line_clear(from, *p, PLAYER_RADIUS - 1e-8));
+        if self.zone != Some(zone)
+            || (time >= self.retry_at
+                && (self.goal.distance(to) > 1.5 || self.route.is_empty() || obstructed))
+        {
+            self.zone = Some(zone);
+            self.goal = to;
+            self.retry_at = time + 1.;
+            self.route = pursuit
+                .route(map, map.template.unwrap_or(zone), from, to, PLAYER_RADIUS)
+                .unwrap_or_default()
+                .into();
+        }
+        self.route
+            .front()
+            .copied()
+            .filter(|p| map.line_clear(from, *p, PLAYER_RADIUS - 1e-8))
+    }
+
+    pub(super) fn observe(&mut self, point: Point, time: f64, trying: bool) {
+        if !trying || self.progress.is_none_or(|(at, _)| at.distance(point) > 0.2) {
+            self.progress = trying.then_some((point, time));
+        }
+    }
+
+    fn stalled(&self, time: f64) -> bool {
+        self.progress.is_some_and(|(_, since)| time - since >= 3.)
+    }
+}
+
+/// Formation and catch-up points must stay on the hirer's side of walls. Players can share a floor position.
+fn beside(map: &Map, hirer: Point, offset: Point) -> Point {
+    let goal = Point {
+        x: hirer.x + offset.x,
+        y: hirer.y + offset.y,
+    };
+    if map.line_clear(hirer, goal, PLAYER_RADIUS) {
+        goal
+    } else {
+        hirer
+    }
+}
+
 pub(super) fn class_named(name: &str) -> Option<Class> {
     Some(match name {
         "warrior" => Class::Warrior,
@@ -194,11 +263,7 @@ impl World {
         }
         let mut character = Character::mercenary(class, level, &name);
         character.zone = zone;
-        let mut arrival = Point {
-            x: point.x + 1.5,
-            y: point.y + 1.5,
-        };
-        self.maps[zone].collide(&mut arrival, PLAYER_RADIUS);
+        let arrival = beside(&self.maps[zone], point, Point { x: 1.5, y: 1.5 });
         character.x = arrival.x;
         character.y = arrival.y;
         self.party_add_mercenary_as(owner, &character, raid_contract)?;
@@ -398,12 +463,16 @@ impl World {
     }
 
     fn merc_think(&mut self, session: u64, owner: u64, mate_ids: &[String]) {
-        let Some(p) = self.players.get(&session) else {
+        let Some(p) = self.players.get_mut(&session) else {
             return;
         };
+        if p.character.hp <= 0. || p.stun > 0. || p.root > 0. || p.frozen {
+            p.merc_navigation = Navigation::default();
+        }
         if p.character.hp <= 0. {
             return;
         }
+        let p = &self.players[&session];
         let me = p.character.point();
         let zone = p.character.zone;
         let owner_p = &self.players[&owner];
@@ -423,23 +492,27 @@ impl World {
             .collect();
         // Carried to the hirer's side when in another zone, or far away while the hirer is out of combat. During a
         // fight a mercenary who fell (and woke at the zone's start) must walk back like anyone else.
+        let recover = p.merc_navigation.stalled(self.time)
+            && p.combat_left <= 0.
+            && owner_p.combat_left <= 0.
+            && p.stun <= 0.
+            && p.root <= 0.
+            && !p.frozen
+            && owner_p.character.hp > 0.
+            && !self.boss.fight_in(zone);
         if owner_p.character.zone != zone
             || (me.distance(there) > MERC_LEASH && owner_p.combat_left <= 0.)
+            || recover
         {
-            let (to_zone, mut arrival) = (
-                owner_p.character.zone,
-                Point {
-                    x: there.x + 1.5,
-                    y: there.y + 1.5,
-                },
-            );
-            self.maps[to_zone].collide(&mut arrival, PLAYER_RADIUS);
+            let to_zone = owner_p.character.zone;
+            let arrival = beside(&self.maps[to_zone], there, Point { x: 1.5, y: 1.5 });
             let p = self.players.get_mut(&session).unwrap();
             p.character.zone = to_zone;
             p.character.x = arrival.x;
             p.character.y = arrival.y;
             p.stop();
             p.portal_at = self.time;
+            p.merc_navigation = Navigation::default();
             return;
         }
         // What to fight: the hirer's target, else whatever is attacking the party nearby.
@@ -499,11 +572,16 @@ impl World {
             None => {
                 p.target = None;
                 let angle = slot * 1.3 + 0.6;
-                let goal = Point {
-                    x: there.x + angle.cos() * 2.4,
-                    y: there.y + angle.sin() * 2.4,
-                };
-                if me.distance(goal) > 1.6 {
+                let goal = beside(
+                    &self.maps[zone],
+                    there,
+                    Point {
+                        x: angle.cos() * 2.4,
+                        y: angle.sin() * 2.4,
+                    },
+                );
+                if me.distance(goal) > 1.6 || !self.maps[zone].line_clear(me, there, PLAYER_RADIUS)
+                {
                     p.goal = Some(goal);
                 } else if me.distance(there) < 1. {
                     p.goal = None;
@@ -681,5 +759,260 @@ mod price_tests {
             assert!(merc_price(level + 1) >= merc_price(level), "level {level}");
             assert_eq!(merc_price(level) % 50, 0, "level {level}");
         }
+    }
+}
+
+#[cfg(test)]
+mod follow_tests {
+    use super::*;
+
+    fn rig(class: Class, sealed: bool) -> (World, mpsc::Receiver<Value>, u64) {
+        let mut w =
+            World::with_level_spread(Store::open(std::path::Path::new(":memory:")).unwrap(), 0);
+        let (tx, rx) = mpsc::channel(4096);
+        w.join(1, None, Some(Look::default()), tx).unwrap();
+        w.god_mode = true;
+        // A nearby hirer across a wall; going around either end stays inside the old 26-tile leash.
+        let mut wall = w.maps[0].objects[0].clone();
+        wall.x = 40.;
+        wall.y = 40.;
+        wall.width = 1.;
+        wall.depth = if sealed {
+            w.maps[0].size as f64 * 2.
+        } else {
+            12.
+        };
+        w.maps[0].objects = vec![wall];
+        w.maps[0].portals.clear();
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.x = 43.5;
+        p.character.y = 40.;
+        let owner = p.character.id.clone();
+        w.place_mercenary(&owner, class, 1, 0, Point { x: 36.5, y: 40. }, false, None)
+            .unwrap();
+        let merc = *w.players.keys().next_back().unwrap();
+        let p = w.players.get_mut(&merc).unwrap();
+        p.character.x = 36.5;
+        p.character.y = 40.;
+        (w, rx, merc)
+    }
+
+    fn tick(w: &mut World, merc: u64) {
+        w.time += TICK;
+        w.update_mercenaries();
+        w.update_player(merc);
+    }
+
+    #[test]
+    fn merc_follow_every_class_walks_around_a_nearby_wall_without_warping() {
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
+            let (mut w, _rx, merc) = rig(class, false);
+            let owner = w.players[&1].character.point();
+            for _ in 0..(14. / TICK) as usize {
+                let before = w.players[&merc].character.point();
+                tick(&mut w, merc);
+                let after = w.players[&merc].character.point();
+                assert!(
+                    before.distance(after) <= class.speed() * TICK + 1e-6,
+                    "{class:?}: walk, not warp"
+                );
+                assert!(
+                    pursuit::clear_line(&w.maps[0], before, after, PLAYER_RADIUS),
+                    "{class:?}: crossed a wall"
+                );
+            }
+            let at = w.players[&merc].character.point();
+            assert!(
+                at.x > 40.8 && at.distance(owner) < 4.,
+                "{class:?}: stranded at {at:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn merc_follow_every_class_reaches_an_enemy_behind_a_wall_even_within_bow_range() {
+        for class in [
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ] {
+            let (mut w, _rx, merc) = rig(class, false);
+            // Three tiles apart: ranged classes are already in range, but have no shot.
+            w.players.get_mut(&merc).unwrap().character.x = 38.5;
+            w.players.get_mut(&1).unwrap().character.x = 41.5;
+            w.players.get_mut(&1).unwrap().combat_left = 60.;
+            let mut enemy = w.slimes.iter().find(|s| s.kind == "green").unwrap().clone();
+            enemy.id = 0;
+            enemy.zone = 0;
+            enemy.x = 41.5;
+            enemy.y = 40.;
+            enemy.hp = 1e9;
+            enemy.max_hp = 1e9;
+            enemy.dead = false;
+            w.slimes = vec![enemy];
+            w.players.get_mut(&1).unwrap().target = Some(0);
+            let mut attacked = false;
+            for _ in 0..(16. / TICK) as usize {
+                let before = w.players[&merc].character.point();
+                tick(&mut w, merc);
+                let p = &w.players[&merc];
+                assert!(
+                    before.distance(p.character.point()) <= class.speed() * TICK + 1e-6,
+                    "{class:?}: combat warp"
+                );
+                assert_eq!(p.target, Some(0), "keep attack selection while routing");
+                if p.attack > 0. {
+                    assert!(w.maps[0].line_clear(p.character.point(), w.slimes[0].point(), 0.05));
+                    attacked = true;
+                    break;
+                }
+            }
+            assert!(
+                attacked,
+                "{class:?}: never found a clear attack around the wall: at {:?}, distance {}, cooldown {}",
+                w.players[&merc].character.point(),
+                w.players[&merc]
+                    .character
+                    .point()
+                    .distance(w.slimes[0].point()),
+                w.players[&merc].cooldown
+            );
+        }
+    }
+
+    #[test]
+    fn merc_follow_a_close_formation_slot_still_routes_around_a_thin_wall() {
+        let (mut w, _rx, _) = rig(Class::Warrior, false);
+        w.maps[0].objects[0].width = 0.1;
+        w.maps[0].objects[0].depth = 4.;
+        let owner = w.players[&1].character.id.clone();
+        for _ in 0..2 {
+            w.place_mercenary(
+                &owner,
+                Class::Warrior,
+                1,
+                0,
+                Point { x: 39.3, y: 40. },
+                false,
+                None,
+            )
+            .unwrap();
+        }
+        let merc = *w.players.keys().next_back().unwrap();
+        let p = w.players.get_mut(&merc).unwrap();
+        p.character.x = 39.3;
+        p.character.y = 40.;
+        w.players.get_mut(&1).unwrap().character.x = 40.7;
+        for _ in 0..(8. / TICK) as usize {
+            let before = w.players[&merc].character.point();
+            tick(&mut w, merc);
+            assert!(
+                before.distance(w.players[&merc].character.point())
+                    <= Class::Warrior.speed() * TICK + 1e-6
+            );
+        }
+        assert!(
+            w.players[&merc].character.x > 40.35,
+            "being near the hirer through a wall is not arriving"
+        );
+    }
+
+    #[test]
+    fn merc_follow_recovery_waits_for_both_fighters_to_leave_combat() {
+        for combatant in [1, mercs::MERC_BASE] {
+            let (mut w, _rx, merc) = rig(Class::Warrior, true);
+            w.players.get_mut(&combatant).unwrap().combat_left = 60.;
+            for _ in 0..(7. / TICK) as usize {
+                tick(&mut w, merc);
+            }
+            assert!(
+                w.players[&merc].character.x < 40.,
+                "no free return during either fighter's combat"
+            );
+            w.players.get_mut(&combatant).unwrap().combat_left = 0.;
+            for _ in 0..(4. / TICK) as usize {
+                tick(&mut w, merc);
+            }
+            assert!(
+                w.players[&merc].character.x > 40.8,
+                "recover after combat ends"
+            );
+        }
+    }
+
+    #[test]
+    fn merc_follow_immobilization_and_death_do_not_build_a_catch_up_shortcut() {
+        for status in ["stun", "root", "frozen", "dead"] {
+            let (mut w, _rx, merc) = rig(Class::Warrior, true);
+            for _ in 0..(7. / TICK) as usize {
+                let p = w.players.get_mut(&merc).unwrap();
+                match status {
+                    "stun" => p.stun = 1.,
+                    "root" => p.root = 1.,
+                    "frozen" => p.frozen = true,
+                    _ => p.character.hp = 0.,
+                }
+                tick(&mut w, merc);
+                assert!(
+                    w.players[&merc].character.x < 40.,
+                    "{status}: must not warp"
+                );
+            }
+            let p = w.players.get_mut(&merc).unwrap();
+            p.stun = 0.;
+            p.root = 0.;
+            p.frozen = false;
+            p.character.hp = p.character.max_hp();
+            tick(&mut w, merc);
+            assert!(
+                w.players[&merc].character.x < 40.,
+                "{status}: immobilized time must not count as stuck"
+            );
+        }
+    }
+
+    #[test]
+    fn merc_follow_hire_and_zone_catch_up_choose_the_hirers_side_of_a_wall() {
+        let (mut w, _rx, merc) = rig(Class::Warrior, false);
+        let owner = Point { x: 38.8, y: 40. };
+        let p = w.players.get_mut(&1).unwrap();
+        p.character.x = owner.x;
+        p.character.y = owner.y;
+        w.players.get_mut(&merc).unwrap().character.zone = 1;
+        tick(&mut w, merc);
+        let p = &w.players[&merc];
+        assert_eq!(p.character.zone, 0);
+        assert!(
+            p.character.x < 39.2 && w.maps[0].line_clear(owner, p.character.point(), PLAYER_RADIUS)
+        );
+        let id = w.players[&1].character.id.clone();
+        w.place_mercenary(&id, Class::Mage, 1, 0, owner, false, None)
+            .unwrap();
+        let p = w.players.values().next_back().unwrap();
+        assert!(
+            p.character.x < 39.2 && w.maps[0].line_clear(owner, p.character.point(), PLAYER_RADIUS)
+        );
+    }
+
+    #[test]
+    fn merc_follow_trapped_fighter_recovers_inside_the_leash_out_of_combat() {
+        let (mut w, _rx, merc) = rig(Class::Warrior, true);
+        for _ in 0..(5. / TICK) as usize {
+            tick(&mut w, merc);
+        }
+        let at = w.players[&merc].character.point();
+        let owner = w.players[&1].character.point();
+        assert!(
+            at.distance(owner) < 4. && pursuit::clear_line(&w.maps[0], owner, at, PLAYER_RADIUS),
+            "still trapped at {at:?}"
+        );
     }
 }
