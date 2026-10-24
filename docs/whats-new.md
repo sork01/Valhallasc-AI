@@ -40,3 +40,7 @@ node tests/swedish-locale.cjs
 ```
 
 The two mutation runs must fail. The UI test covers first and returning visits, current/rebound controls, once-per-version acknowledgement/reload, Settings, full history, English text with Swedish active, focus/keyboard behavior, UI/window/grip scale, phone scrolling, and a failed notes fetch followed by retry. It saves phone/history screenshots in its private driver's result folder. `tests/lib/playwright.cjs` acknowledges the current release for unrelated browser tests; this test sets `TEST_WHATS_NEW=1` to exercise the actual popup. No public guests, balance sweeps or server builds are needed.
+
+## Release verification (2026-10-24)
+
+Source `887c4f1` is merged to main and live as Beta 1.15.0. All 33 private real-sprite browser checks pass (`.tools/whats-new-worktree/test-results/driver-J3KRkI`); both mutations fail as intended. Six versions contain 25 plain-language notes. Swedish catalog, 21 Locale checks, changed JavaScript syntax and whitespace checks pass. A focused check confirms the shared browser helper keeps normal sign-in controls usable. All seven public asset hashes match (the six changed client files plus unchanged `sv-data.js`), with healthy public and bridge endpoints. Proof: `test-results/whats-new-release/public-proof.json`. No server build/restart, live database writes or public guest creation.
