@@ -95,3 +95,11 @@ generator byte stability and the full Swedish gate pass (catalog, 21 locale,
 A level-99 login notice warns that every hero needs this key, including past
 raiders. Client/server deployment is performed together with nobody online;
 backup and public verification details will be recorded here after release.
+
+Released 2026-10-24 06:10 UTC, source `bd16999`, with nobody online. Backup:
+`deploy/backups/raid-key-20261024T055838Z` (old binary, consistent pre-build/stopped SQLite and prior client
+assets). Public/bridge health, all 13 changed client hashes, the running binary
+SHA256 `fb6989002017c4772cd0c0acffe700965e5214e8fbf30f2a5ae12eb2dfe91a78`, SQLite quick_check, unchanged 25 characters /
+14 guests, test-flag exclusion and warning-free journal were verified. No public
+guest was created, no zone shifted and no backfill ran. The release's exact binary
+also passed the 11-check private MCP gate/quest flow before installation.

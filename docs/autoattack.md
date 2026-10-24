@@ -48,4 +48,5 @@ and JavaScript syntax checks pass. Browser results are saved locally in
 `test-results/autoattack-all-classes.log`.
 
 Both Roll Away and Shadowstep were reproduced with zero attacks on their
-unfixed servers. No public restart was performed.
+unfixed servers. No public restart was performed on 2026-10-23. The fixes were deployed on
+2026-10-24 with the Ember Key release (source `bd16999`); see `docs/raid-key.md`.
