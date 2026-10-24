@@ -416,7 +416,7 @@
   "Moonwell",
   "Mora Thirteenbells",
   "Mosslet",
-  "Multiplayer alpha 0.985.1",
+  "Beta 1.0.1",
   "Nacrehold",
   "Nera Kestrel",
   "Neri Warmhands",
