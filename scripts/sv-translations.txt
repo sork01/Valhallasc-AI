@@ -6951,5 +6951,7 @@
   "Yes, sell": "Ja, sälj",
   "You do not have enough gold to buy that back.": "Du har inte tillräckligt med guld för att köpa tillbaka det.",
   "You give": "Du lämnar",
-  "Your bags": "Dina väskor"
+  "Your bags": "Dina väskor",
+  "Quest markers": "Uppdragsmarkörer",
+  "Tracked quest": "Spårat uppdrag"
 }

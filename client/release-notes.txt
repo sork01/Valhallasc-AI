@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.16.0",
+    "date": "2026-10-24",
+    "new": [
+      "Find available quests with gold ! marks and turn-ins with blue ? marks on the minimap and each zone map.",
+      "Track a quest to mark its destinations with green diamonds. Quest marks stay visible through unexplored mist."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.15.0",
     "date": "2026-10-24",
     "new": [

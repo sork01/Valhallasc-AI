@@ -420,5 +420,6 @@
   "Buy {0} · level {1}": "Köp {0:t} · nivå {1}",
   "Bought back for {0} gold.": "Köpte tillbaka för {0} guld.",
   "You receive: {0} gold": "Du får: {0} guld",
-  "Copy #{0} \u00b7 {1} \u00b7 rank {2} \u00b7 {3}% durability": "Exemplar #{0} · {1:t} · grad {2} · {3}% hållbarhet"
+  "Copy #{0} \u00b7 {1} \u00b7 rank {2} \u00b7 {3}% durability": "Exemplar #{0} · {1:t} · grad {2} · {3}% hållbarhet",
+  "Tracked quest · {0} · {1}": "Spårat uppdrag · {0:t} · {1:t}"
 }

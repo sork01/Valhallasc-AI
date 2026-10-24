@@ -646,6 +646,14 @@
 .wm-gate:disabled { cursor: not-allowed; opacity: .75; }
 .wm-kind:disabled, .wm-panel .window-tool:disabled { opacity: .6; cursor: not-allowed; }
 .wm-markers { position: absolute; inset: 0; }
+.wm-quests { position: absolute; inset: 0; pointer-events: none; }
+.wm-quest { position: absolute; z-index: 4; display: grid; place-items: center; width: 1.4cqw; height: 1.8cqw; transform: translate(-50%, -50%); color: var(--quest-color); font: bold 1.8cqw sans-serif; text-shadow: -1px -1px 1px #101827, 1px 1px 1px #101827, 0 0 3px #101827; pointer-events: auto; }
+.wm-quest[data-state="tracked"] { z-index: 3; width: 2.1cqw; height: 2.1cqw; border: .16cqw solid var(--quest-color); border-radius: .2cqw; transform: translate(-50%, -50%) rotate(45deg); box-shadow: 0 0 0 .12cqw #101827, inset 0 0 0 .12cqw #101827; pointer-events: auto; }
+.wm-quest-legend { margin: 0; padding: 0; list-style: none; }
+.wm-quest-legend li { display: flex; align-items: center; gap: .4cqw; }
+.wm-quest-legend i { width: 1.2cqw; text-align: center; font-style: normal; color: #ffdf88; }
+.wm-quest-legend i[data-state="ready"] { color: #64b5ff; }
+.wm-quest-legend i[data-state="tracked"] { color: #a6ffcf; }
 .wm-gate { position: absolute; width: 2.4cqw; height: 2.4cqw; padding: 0; transform: translate(-50%, -50%); border: .25cqw solid var(--glow); border-radius: 50%; background: radial-gradient(#fff, var(--glow) 55%, transparent 75%); box-shadow: 0 0 1.2cqw var(--glow); cursor: pointer; }
 .wm-gate-label { position: absolute; left: 50%; top: 100%; margin-top: .25cqw; padding: .15cqw .6cqw; transform: translateX(-50%); white-space: nowrap; border-radius: .3cqw; background: #10141cdd; color: #fff4ca; font: .9cqw 'Jua', sans-serif; pointer-events: none; }
 .wm-gate.low .wm-gate-label { top: auto; bottom: 100%; margin: 0 0 .25cqw; }

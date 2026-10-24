@@ -4174,6 +4174,20 @@
     for (const remote of remotePlayers.values()) {
       if (!seen(zone, remote.x, remote.y)) continue; mctx.fillStyle = window.Social?.isPartyMember(remote.id) ? '#7dff9b' : '#b3dfff'; mctx.beginPath(); mctx.arc(remote.x * s, remote.y * s, 2.5, 0, 6.283); mctx.fill(); }
     for (const sl of slimes) if (!sl.dead && seen(zone, sl.x, sl.y)) { mctx.fillStyle = sl.kind === 'big' ? '#c8b5ff' : '#ff6b8a'; mctx.beginPath(); mctx.arc(sl.x * s, sl.y * s, 2, 0, 6.283); mctx.fill(); }
+    // Quest guidance stays above fog and actors, and changes independently of the cached ground.
+    mctx.save(); mctx.textAlign = 'center'; mctx.textBaseline = 'middle'; mctx.lineJoin = 'round';
+    for (const q of window.Quests?.mapMarkers(zone) || []) {
+      const x = Math.max(7, Math.min(mini.width - 7, q.x * s)), y = Math.max(8, Math.min(mini.height - 8, q.y * s));
+      mctx.strokeStyle = '#101827'; mctx.fillStyle = q.color; mctx.lineWidth = 3;
+      if (q.state === 'tracked') {
+        // An outer diamond remains distinct when the tracked destination is also a quest giver.
+        mctx.beginPath(); mctx.moveTo(x, y - 8); mctx.lineTo(x + 7, y); mctx.lineTo(x, y + 8); mctx.lineTo(x - 7, y); mctx.closePath(); mctx.stroke();
+        mctx.strokeStyle = q.color; mctx.lineWidth = 1.5; mctx.stroke();
+      } else {
+        mctx.font = 'bold 15px sans-serif'; mctx.strokeText(q.symbol, x, y); mctx.fillText(q.symbol, x, y);
+      }
+    }
+    mctx.restore();
     mctx.fillStyle = '#fff'; mctx.strokeStyle = '#1c1428'; mctx.lineWidth = 1.5; mctx.beginPath(); mctx.arc(hero.x * s, hero.y * s, 3.6, 0, 6.283); mctx.fill(); mctx.stroke();
   }
 

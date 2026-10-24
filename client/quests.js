@@ -23,6 +23,57 @@
     return 'available';
   }
   const words = { ready: 'Ready to turn in', active: 'In progress', completed: 'Completed', locked: 'Locked', upcoming: 'Comes at a later level', available: 'Available' };
+  // Both maps share the journal's eligibility rules. Cache presentation by zone, never in the ground/fog canvas.
+  const mapCache = new Map();
+  const questsByNpc = new Map();
+  for (const q of definitions) {
+    if (!questsByNpc.has(q.npc)) questsByNpc.set(q.npc, []);
+    questsByNpc.get(q.npc).push(q);
+  }
+  const matchesEnemy = (target, kind) => target === kind || target === 'any'
+    || (target === 'slime' && ['green', 'blue', 'pink', 'yellow'].includes(kind));
+  function mapMarkers(zone) {
+    if (mapCache.has(zone)) return mapCache.get(zone);
+    const area = areas[zone], out = [];
+    if (!area) return out;
+    for (const n of area.npcs || []) {
+      const states = (questsByNpc.get(n.id) || []).map(status);
+      const s = states.includes('ready') ? 'ready' : states.includes('available') ? 'available' : null;
+      if (s) out.push({ x: n.x, y: n.y, npc: n.id, state: s, symbol: s === 'ready' ? '?' : '!',
+        color: s === 'ready' ? '#64b5ff' : '#ffdf88', label: `${n.name} · ${words[s]}` });
+    }
+    const q = definitions.find(q => q.id === tracked), s = q && status(q);
+    if (s === 'active' || s === 'ready') {
+      const add = (p, label) => {
+        if (!p || out.some(m => m.state === 'tracked' && m.x === p.x && m.y === p.y)) return;
+        out.push({ x: p.x, y: p.y, quest: q.id, state: 'tracked', symbol: '◆', color: '#a6ffcf',
+          label: `Tracked quest · ${q.title} · ${label}` });
+      };
+      if (s === 'ready') add((area.npcs || []).find(n => n.id === q.npc), words.ready);
+      else q.objectives.forEach((o, i) => {
+        if ((state(q)?.counts[i] || 0) >= o.count) return;
+        if (o.kind === 'kill') {
+          // A hub can send you into a neighbouring dungeon. Ordinary "any"/"slime" hunts stay in their own zone.
+          const home = areas[q.zone], local = (home.slimes || []).some(e => matchesEnemy(o.target, e.kind));
+          if (zone !== q.zone && (local || !home.portals?.some(p => p.to === zone))) return;
+          const spawns = (area.slimes || []).filter(e => matchesEnemy(o.target, e.kind) && !e.ambush);
+          if (!spawns.length) return;
+          // Anchor a hunt to a real spawn near its centre, rather than to empty space between packs.
+          const x = spawns.reduce((n, e) => n + e.x, 0) / spawns.length, y = spawns.reduce((n, e) => n + e.y, 0) / spawns.length;
+          add(spawns.reduce((best, e) => Math.hypot(e.x - x, e.y - y) < Math.hypot(best.x - x, best.y - y) ? e : best), o.label);
+        } else if (['visit', 'hold', 'chime'].includes(o.kind)) {
+          for (const p of area.places || []) if (o.kind === 'chime' ? p.chain === o.target : p.id === o.target) add(p, o.label);
+        } else if (o.kind === 'talk' || o.kind === 'escort') add((area.npcs || []).find(n => n.id === o.target), o.label);
+        else if (o.kind === 'reach') {
+          const name = window.Locale?.translate(o.target) || o.target;
+          if (area.name === name) add(area.spawn, o.label);
+          for (const p of area.portals || []) if (areas[p.to]?.name === name) add(p, o.label);
+        } else if (o.kind === 'bring' || o.kind === 'gauntlet') add((area.npcs || []).find(n => n.id === q.npc), o.label);
+      });
+    }
+    mapCache.set(zone, out);
+    return out;
+  }
   function element(tag, text, className) {
     const node = document.createElement(tag); node.textContent = text;
     if (className) node.className = className;
@@ -107,7 +158,7 @@
       }));
     }
     if (!atNpc && ['active', 'ready'].includes(s)) node.append(button(tracked === quest.id ? 'Tracking' : 'Track quest', () => {
-      tracked = quest.id; render(); $('quest-close').focus();
+      tracked = quest.id; mapCache.clear(); render(); $('quest-close').focus();
     }));
     if (state(quest)?.completions) node.append(element('p', `Completed ${state(quest).completions} time${state(quest).completions === 1 ? '' : 's'}.`, 'quest-history'));
     return node;
@@ -124,7 +175,7 @@
     const list = element('div', '', 'tracker-list'); list.hidden = collapsed;
     for (const quest of active) {
       const row = element('div', '', 'tracker-quest'); row.dataset.quest = quest.id;
-      const title = button(quest.title, () => { tracked = quest.id; show(); }); title.className = 'tracker-title';
+      const title = button(quest.title, () => { tracked = quest.id; mapCache.clear(); show(); }); title.className = 'tracker-title';
       row.append(title);
       if (status(quest) === 'ready') row.append(element('small', `✓ ${quest.autoLevel ? 'Report to' : 'Return to'} ${giver(quest).name} for your reward`, 'tracker-objective complete'));
       else if(quest.id==='raid_key') { const n=quest.objectives.filter((o,i)=>(state(quest)?.counts[i]||0)>=o.count).length; row.append(element('small', `Pieces: ${n}/10`, 'tracker-objective')); }
@@ -187,7 +238,8 @@
   });
   window.Quests = {
     show, close, get open() { return open(); },
-    setLevel(level) { heroLevel = level; },
+    setLevel(level) { if (heroLevel !== level) { heroLevel = level; mapCache.clear(); render(); } },
+    mapMarkers,
     refresh() { render(); },
     // Titles of the quests you and this party member both have in progress.
     sharedWith(member) {
@@ -225,8 +277,8 @@
       if (out) return { state: ringing ? 'ringing' : 'waiting', left: ringing ? ringing.left : 0, burn: place.burn, ...out };
       return done ? { state: 'done', burn: place.burn } : { state: 'none' };
     },
-    reset() { progress = []; signature = ''; tracked = null; bells = []; close(false); render(); },
-    update(next) { const key = `${Field.zone}:` + JSON.stringify(next); if (key === signature) return; progress = next; signature = key; render(); },
+    reset() { progress = []; signature = ''; tracked = null; bells = []; mapCache.clear(); close(false); render(); },
+    update(next) { const key = `${Field.zone}:` + JSON.stringify(next); if (key === signature) return; progress = next; signature = key; mapCache.clear(); render(); },
     // What an NPC's conversation lists, in World of Warcraft order: turn-ins, new quests, then quests still in progress.
     // Locked and finished quests are hidden, as they are there.
     offered(id) {

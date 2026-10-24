@@ -662,6 +662,12 @@
     for (const c of [z.city, ...(z.camps || [])].filter(Boolean)) if (known(current, c.plaza.x, c.plaza.y)) facts.append(el('li', `${c.name}: sanctuary${z.camps?.length ? '' : `, ${(z.quests || []).length} quest${(z.quests || []).length === 1 ? '' : 's'}`}`));
     if (z.camps?.length) facts.append(el('li', `${(z.quests || []).length} quests across ${1 + z.camps.length} hubs`));
     box.append(facts);
+    box.append(el('h5', 'Quest markers', 'wm-side-title'));
+    const legend = el('ul', '', 'wm-quest-legend');
+    for (const [symbol, text, state] of [['!', 'Available', 'available'], ['?', 'Ready to turn in', 'ready'], ['◇', 'Tracked quest', 'tracked']]) {
+      const row = el('li'), icon = el('i', symbol); icon.dataset.state = state; row.append(icon, el('span', text)); legend.append(row);
+    }
+    box.append(legend);
     if (travelMasters(z).length) {
       box.append(el('h5', 'Travel Masters ✦', 'wm-side-title'));
       const list = el('ul', '', 'wm-travel-list');
@@ -695,6 +701,25 @@
   }
 
   // ---------- live markers ----------
+  let questMarkers = null;
+  function updateQuestMarkers() {
+    const list = window.Quests?.mapMarkers(current) || [];
+    if (questMarkers === list && $('wm-markers').querySelector('.wm-quests')) return;
+    questMarkers = list;
+    $('wm-markers').querySelector('.wm-quests')?.remove();
+    const layer = el('div', '', 'wm-quests');
+    for (const q of list) {
+      const marker = el('span', '', 'wm-quest');
+      if (q.state !== 'tracked') marker.textContent = q.symbol;
+      marker.dataset.state = q.state;
+      if (q.npc) marker.dataset.npc = q.npc;
+      if (q.quest) marker.dataset.quest = q.quest;
+      marker.setAttribute('role', 'img'); marker.setAttribute('aria-label', q.label); marker.title = q.label;
+      marker.style.setProperty('--quest-color', q.color);
+      Object.assign(marker.style, pos(zones[current], q.x, q.y)); layer.append(marker);
+    }
+    $('wm-markers').append(layer);
+  }
   function tick() {
     if (!open()) return;
     if (window.Field?.hero?.dead || !window.Online?.connected) { close(); return; }
@@ -706,6 +731,7 @@
       tiles[i].dataset.here = String(i === here); if (nameNodes[i]) nameNodes[i].dataset.here = String(i === here);
     });
     if (view !== 'zone') return;
+    updateQuestMarkers();
     const z = zones[current], me = $('wm-markers').querySelector('.wm-me');
     me.hidden = here !== current; if (!me.hidden) Object.assign(me.style, pos(z, hero.x, hero.y));
     const party = $('wm-markers').querySelector('.wm-party');
