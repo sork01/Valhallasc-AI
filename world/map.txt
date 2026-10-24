@@ -2796,6 +2796,12 @@
       "x": 75,
       "y": 86,
       "layout": "greenmeadow_wide_v1"
+    },
+    {
+      "kind": "ember_firelord",
+      "x": 35.5,
+      "y": 47,
+      "ambush": "raid_key:0"
     }
   ],
   "city": {
@@ -6748,6 +6754,12 @@
           "x": 84,
           "y": 10,
           "kind": "cinderlord"
+        },
+        {
+          "kind": "ember_firelord",
+          "x": 21.5,
+          "y": 73,
+          "ambush": "raid_key:1"
         }
       ],
       "npcs": [
@@ -7309,6 +7321,18 @@
           "to": 2,
           "tx": 64.0,
           "ty": 118.5
+        }
+      ],
+      "crosses": [
+        {
+          "id": "raid_cross_1",
+          "x": 24,
+          "y": 73,
+          "zone": 1,
+          "name": "Ember Grave Cross",
+          "shard": "ember_shard_1",
+          "bossName": "Cinderthane of Emberfall",
+          "color": "#ef6d3d"
         }
       ]
     },
@@ -12906,6 +12930,12 @@
           "x": 54.75,
           "y": 58.51,
           "kind": "wyrm"
+        },
+        {
+          "kind": "ember_firelord",
+          "x": 61.5,
+          "y": 96,
+          "ambush": "raid_key:2"
         }
       ],
       "npcs": [
@@ -13462,6 +13492,18 @@
           "to": 4,
           "tx": 80.0,
           "ty": 150.0
+        }
+      ],
+      "crosses": [
+        {
+          "id": "raid_cross_2",
+          "x": 64,
+          "y": 96,
+          "zone": 2,
+          "name": "Ember Grave Cross",
+          "shard": "ember_shard_2",
+          "bossName": "Frostflame of Rimeveil",
+          "color": "#88d7ea"
         }
       ]
     },
@@ -18687,6 +18729,12 @@
           "x": 117.8,
           "y": 117.8,
           "kind": "gloomroot"
+        },
+        {
+          "kind": "ember_firelord",
+          "x": 16.5,
+          "y": 37,
+          "ambush": "raid_key:3"
         }
       ],
       "npcs": [
@@ -19382,6 +19430,18 @@
           "to": 2,
           "tx": 64.0,
           "ty": 54.5
+        }
+      ],
+      "crosses": [
+        {
+          "id": "raid_cross_3",
+          "x": 19,
+          "y": 37,
+          "zone": 3,
+          "name": "Ember Grave Cross",
+          "shard": "ember_shard_3",
+          "bossName": "Bogflame of Gloamfen",
+          "color": "#a6b96c"
         }
       ]
     },
@@ -44087,6 +44147,12 @@
           "y": 128.15,
           "kind": "troll",
           "ambush": "wyrd_eydis#troll"
+        },
+        {
+          "kind": "ember_firelord",
+          "x": 66.5,
+          "y": 158,
+          "ambush": "raid_key:6"
         }
       ],
       "npcs": [
@@ -45599,6 +45665,18 @@
           "to": 7,
           "tx": 80.0,
           "ty": 146.0
+        }
+      ],
+      "crosses": [
+        {
+          "id": "raid_cross_6",
+          "x": 69,
+          "y": 158,
+          "zone": 6,
+          "name": "Ember Grave Cross",
+          "shard": "ember_shard_6",
+          "bossName": "Rootpyre of Wyrdwood",
+          "color": "#bda473"
         }
       ]
     },
@@ -52499,6 +52577,12 @@
           "y": 30.41,
           "kind": "thunderroc",
           "ambush": "sky_ward_last#c"
+        },
+        {
+          "kind": "ember_firelord",
+          "x": 63.5,
+          "y": 106,
+          "ambush": "raid_key:7"
         }
       ],
       "npcs": [
@@ -53514,6 +53598,18 @@
           "tx": 56,
           "ty": 99,
           "look": "skybridge"
+        }
+      ],
+      "crosses": [
+        {
+          "id": "raid_cross_7",
+          "x": 66,
+          "y": 106,
+          "zone": 7,
+          "name": "Ember Grave Cross",
+          "shard": "ember_shard_7",
+          "bossName": "Skybrand of Bifrost",
+          "color": "#b7b3f3"
         }
       ]
     },
@@ -62698,6 +62794,12 @@
           "x": 49.59,
           "y": 32.61,
           "kind": "shellback"
+        },
+        {
+          "kind": "ember_firelord",
+          "x": 77.5,
+          "y": 131,
+          "ambush": "raid_key:8"
         }
       ],
       "npcs": [
@@ -63857,6 +63959,18 @@
           "tx": 64,
           "ty": 110,
           "look": "longship"
+        }
+      ],
+      "crosses": [
+        {
+          "id": "raid_cross_8",
+          "x": 80,
+          "y": 131,
+          "zone": 8,
+          "name": "Ember Grave Cross",
+          "shard": "ember_shard_8",
+          "bossName": "Tidepyre of Rán's Deep",
+          "color": "#6fcbd1"
         }
       ]
     },
@@ -92655,6 +92769,12 @@
           "kind": "meteorgolem",
           "x": 109.72,
           "y": 27.25
+        },
+        {
+          "kind": "ember_firelord",
+          "x": 84.5,
+          "y": 87,
+          "ambush": "raid_key:13"
         }
       ],
       "npcs": [
@@ -94050,6 +94170,18 @@
           "tx": 64,
           "ty": 116,
           "look": "prismwaste"
+        }
+      ],
+      "crosses": [
+        {
+          "id": "raid_cross_13",
+          "x": 87,
+          "y": 87,
+          "zone": 13,
+          "name": "Ember Grave Cross",
+          "shard": "ember_shard_13",
+          "bossName": "Starpyre of Astralhollow",
+          "color": "#b59aef"
         }
       ]
     },
@@ -96788,6 +96920,12 @@
           "kind": "prismsentinel",
           "x": 98.13,
           "y": 33.09
+        },
+        {
+          "kind": "ember_firelord",
+          "x": 29.5,
+          "y": 75,
+          "ambush": "raid_key:14"
         }
       ],
       "npcs": [
@@ -97746,6 +97884,18 @@
           "tx": 16,
           "ty": 112,
           "look": "orrery"
+        }
+      ],
+      "crosses": [
+        {
+          "id": "raid_cross_14",
+          "x": 32,
+          "y": 75,
+          "zone": 14,
+          "name": "Ember Grave Cross",
+          "shard": "ember_shard_14",
+          "bossName": "Glassflame of the Prismwaste",
+          "color": "#efa6bc"
         }
       ]
     },
@@ -100588,6 +100738,12 @@
           "kind": "chronoguard",
           "x": 84.94,
           "y": 38.56
+        },
+        {
+          "kind": "ember_firelord",
+          "x": 56.5,
+          "y": 90,
+          "ambush": "raid_key:15"
         }
       ],
       "npcs": [
@@ -101546,6 +101702,18 @@
           "tx": 16,
           "ty": 112,
           "look": "moonspore"
+        }
+      ],
+      "crosses": [
+        {
+          "id": "raid_cross_15",
+          "x": 59,
+          "y": 90,
+          "zone": 15,
+          "name": "Ember Grave Cross",
+          "shard": "ember_shard_15",
+          "bossName": "Clockpyre of the Orrery",
+          "color": "#e3b660"
         }
       ]
     },
@@ -225406,6 +225574,22 @@
             "apron": "#70615b"
           },
           "art": "scenery"
+        },
+        {
+          "id": "raid_key_keeper",
+          "name": "Iarn Emberkeeper",
+          "role": "Keeper of the Ember Key",
+          "x": 23,
+          "y": 131,
+          "color": "#eda66c",
+          "offers": [],
+          "buys": false,
+          "look": {
+            "hair": "#d9c7ad",
+            "skin": "#bd8c6f",
+            "style": "braid"
+          },
+          "dialogue": "Eldmarr has scattered his embers across the old roads. Gather all ten Ember Shards and I will forge your key. The Chained Forge opens only for a hero who has earned it."
         }
       ],
       "quests": [
@@ -225513,6 +225697,81 @@
           "rewardGold": 35000,
           "requires": "ew_road",
           "repeatable": false
+        },
+        {
+          "id": "raid_key",
+          "title": "The Ember Key",
+          "npc": "raid_key_keeper",
+          "description": "Ten grave crosses hold the embers of Eldmarr. Find one in each of the ten zones listed below. Stand beside a cross and commune for three seconds to summon its Firelord. Moving or taking damage breaks the channel. Defeat each herald and gather its Ember Shard, then return to Iarn to forge the Ember Key. Every hero must earn this key, including those who have entered the raid before.",
+          "objectives": [
+            {
+              "kind": "bring",
+              "target": "ember_shard_0",
+              "count": 1,
+              "label": "Greenmeadow"
+            },
+            {
+              "kind": "bring",
+              "target": "ember_shard_1",
+              "count": 1,
+              "label": "Emberfall Crags"
+            },
+            {
+              "kind": "bring",
+              "target": "ember_shard_2",
+              "count": 1,
+              "label": "Rimeveil Glacier"
+            },
+            {
+              "kind": "bring",
+              "target": "ember_shard_3",
+              "count": 1,
+              "label": "Gloamfen"
+            },
+            {
+              "kind": "bring",
+              "target": "ember_shard_6",
+              "count": 1,
+              "label": "Wyrdwood"
+            },
+            {
+              "kind": "bring",
+              "target": "ember_shard_7",
+              "count": 1,
+              "label": "Bifrost Reach"
+            },
+            {
+              "kind": "bring",
+              "target": "ember_shard_8",
+              "count": 1,
+              "label": "Rán's Deep"
+            },
+            {
+              "kind": "bring",
+              "target": "ember_shard_13",
+              "count": 1,
+              "label": "Astralhollow"
+            },
+            {
+              "kind": "bring",
+              "target": "ember_shard_14",
+              "count": 1,
+              "label": "The Prismwaste"
+            },
+            {
+              "kind": "bring",
+              "target": "ember_shard_15",
+              "count": 1,
+              "label": "The Obsidian Orrery"
+            }
+          ],
+          "level": 99,
+          "minLevel": 99,
+          "rewardXp": 12060,
+          "rewardGold": 0,
+          "rewardItem": "ember_key",
+          "requires": null,
+          "repeatable": false
         }
       ],
       "city": null,
@@ -225597,7 +225856,8 @@
           "tx": 30,
           "ty": 303,
           "look": "chained_forge",
-          "muster": true
+          "muster": true,
+          "needs_quest": "raid_key"
         }
       ]
     },
@@ -233377,6 +233637,18 @@
           "needs_boss": "cf_dagfinn"
         }
       ]
+    }
+  ],
+  "crosses": [
+    {
+      "id": "raid_cross_0",
+      "x": 38,
+      "y": 47,
+      "zone": 0,
+      "name": "Ember Grave Cross",
+      "shard": "ember_shard_0",
+      "bossName": "Ashwarden of Greenmeadow",
+      "color": "#d48b4b"
     }
   ]
 }

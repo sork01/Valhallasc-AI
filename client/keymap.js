@@ -13,6 +13,7 @@
     ['Movement', 'moveRight', 'Move right', ['KeyD', 'ArrowRight']],
     ['Movement', 'mount', 'Mount or dismount', ['KeyH']],
     ['Movement', 'talk', 'Talk or read', ['KeyF']],
+    ['Movement', 'interact', 'Interact with a cross', ['KeyG']],
     ['Combat', 'attack', 'Attack', ['Space', 'KeyJ']],
     ['Combat', 'dash', 'Shadow Step (Assassin)', ['Shift']],
     ...Array.from({ length: 12 }, (_, i) => ['Skillbar', 'skill' + (i + 1), `Skill slot ${i + 1}`, [['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal'][i]]]),

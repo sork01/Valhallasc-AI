@@ -1239,6 +1239,9 @@ pub enum ClientMessage {
     Chat {
         text: String,
     },
+    RaidCross {
+        id: String,
+    },
     /// Friends and parties (server/src/world/social.rs).
     Social {
         command: SocialCommand,
@@ -1712,8 +1715,20 @@ pub struct Portal {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub needs_boss: Option<String>,
 }
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RaidCross {
+    pub id: String,
+    pub x: f64,
+    pub y: f64,
+    pub shard: String,
+    pub boss_name: String,
+    pub color: String,
+}
 #[derive(Clone, Deserialize)]
 pub struct Map {
+    #[serde(default)]
+    pub crosses: Vec<RaidCross>,
     #[serde(default)]
     pub name: String,
     pub size: u32,
@@ -2023,6 +2038,7 @@ mod tests {
     #[test]
     fn collision_blocks_dash_tunnelling_and_resolves_centres() {
         let map = Map {
+            crosses: vec![],
             name: String::new(),
             size: 72,
             rooms: vec![],

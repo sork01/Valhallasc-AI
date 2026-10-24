@@ -500,5 +500,9 @@
   "cf_eldmarr": [
     1320,
     30
+  ],
+  "ember_firelord": [
+    240,
+    120
   ]
 }

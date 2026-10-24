@@ -1,0 +1,30 @@
+[
+  {
+    "kind": "ember_firelord",
+    "name": "Firelord",
+    "level": 99,
+    "stats": [
+      60000,
+      650,
+      3.2,
+      2.1
+    ],
+    "profile": [
+      0.8,
+      1.7,
+      7,
+      12
+    ],
+    "boss": false,
+    "elite": true,
+    "outdoor": true,
+    "gold": 0,
+    "material": "ember_key",
+    "lootSource": null,
+    "ranged": null,
+    "slam": 0,
+    "melee": 1,
+    "color": "#ed9152",
+    "artFrom": "cf_eldmarr"
+  }
+]

@@ -7,6 +7,7 @@ module.exports = (kit, map) => ({
     const bot = 'RaidRelease', area = map.zones[45];
     check(!area.sealedTemplate, 'The released raid template is open');
     await w.connect({ bot, class: 'hunter' });
+    await w.debug(bot, { op:'quest', id:'raid_key', action:'finish' });
     await kit.teleport(w, bot, { zone: 45, x: 133, y: 27 });
     await w.action(bot, { type: 'move', x: 133, y: 24 });
     await w.waitFor(() => w.player(bot).zone === 46, 15000, 'Public muster entrance');

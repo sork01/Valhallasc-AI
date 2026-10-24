@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ATLAS = ROOT / 'client/assets/cathedral.txt'
-CATALOGS = ['cathedral', 'seed_vault', 'solar_crucible', 'amber_archive']
+CATALOGS = ['raid_key', 'cathedral', 'seed_vault', 'solar_crucible', 'amber_archive']
 
 
 def main():

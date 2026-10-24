@@ -57861,5 +57861,82 @@
       "strength": 108,
       "agility": 108
     }
+  },
+  {
+    "id": "ember_shard_0",
+    "name": "Greenmeadow Ember Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "ember_shard_1",
+    "name": "Emberfall Crags Ember Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "ember_shard_2",
+    "name": "Rimeveil Glacier Ember Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "ember_shard_3",
+    "name": "Gloamfen Ember Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "ember_shard_6",
+    "name": "Wyrdwood Ember Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "ember_shard_7",
+    "name": "Bifrost Reach Ember Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "ember_shard_8",
+    "name": "Rán's Deep Ember Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "ember_shard_13",
+    "name": "Astralhollow Ember Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "ember_shard_14",
+    "name": "The Prismwaste Ember Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "ember_shard_15",
+    "name": "The Obsidian Orrery Ember Shard",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
+  },
+  {
+    "id": "ember_key",
+    "name": "Ember Key",
+    "kind": "material",
+    "rarity": "common",
+    "sell": 0
   }
 ]

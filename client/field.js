@@ -13,7 +13,7 @@
   const OL = '#1c1428';
   // Zone 0 is Greenmeadow with Alderhaven; the server numbers the rest like WORLD_MAP.zones. Each has its own
   // size, obstacles, theme (terrain, sky, sprites) and gates. The server decides which zone the hero is in.
-  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: WORLD_MAP.paths || null, levels: null },
+  const ZONES = [{ name: 'Greenmeadow', theme: 'meadow', size: WORLD_MAP.size, spawn: WORLD_MAP.spawn, objects: WORLD_MAP.objects, city: WORLD_MAP.city, npcs: WORLD_MAP.npcs, portals: WORLD_MAP.portals || [], paths: WORLD_MAP.paths || null, crosses: WORLD_MAP.crosses || [], levels: null },
     ...(WORLD_MAP.zones || []).map(z => ({ theme: 'ember', paths: null, levels: null, portals: [], ...z }))];
   let zone = 0, zdef = ZONES[0], SPAWN = WORLD_MAP.spawn;
 
@@ -881,6 +881,7 @@
   const CAIRN_KINDS = ['screeferret','stoneibex','slateraven','ridgeadder','cairnbehemoth','whitebarktitan','stormcondor'];
   const FROSTWAKE_KINDS = ['snowhare','iceotter','frostheron','glaciercrab','bellmammoth','auroramanta','crevasseleviathan'];
   const MOONWELL_KINDS = ['dew_moth','lumen_eel','rootbell','tideglass_heron','hourpetal_stag','moonskein_weaver'];
+  if(SLIME.ember_firelord) SLIME.ember_firelord.scale=1.5;
   const VAULT_KINDS = ['thrall', 'archer', 'acolyte', 'gatewarden', 'choir', 'colossus', 'hollowking'], BOSS_KINDS = [...VAULT_KINDS.slice(3), 'tideglass_heron','hourpetal_stag','moonskein_weaver','moonwell_echo', ...CATHEDRAL_ENEMIES.filter(e => e.boss).map(e => e.kind)];
   // Colour a level label by how it compares with the hero: grey, normal, orange, red.
   const levelColor = level => { const d = level - (hero?.level || 1); return d >= 5 ? '#ff6b6b' : d >= 3 ? '#ffa65a' : d <= -5 ? '#9fb0a0' : '#fff4ca'; };
@@ -925,6 +926,7 @@
   function onKeyDown(e) {
     if (e.defaultPrevented || !running || paused || hero.sparkTravel || !Online.connected || Keys.typing(e)) return;
     const code = Keys.codeOf(e);
+    if (Keys.is(e, 'interact') && !e.repeat && !hero.dead && window.RaidKey?.interact()) { e.preventDefault(); return; }
     if (Keys.is(e, 'talk') && !e.repeat && !hero.dead) {
       e.preventDefault(); const npc = [...City.npcs, ...signs].filter(n => Math.hypot(n.x-hero.x,n.y-hero.y)<2.8).sort((a,b)=>Math.hypot(a.x-hero.x,a.y-hero.y)-Math.hypot(b.x-hero.x,b.y-hero.y))[0];
       if (npc) talkTo(npc); return;
@@ -954,6 +956,7 @@
     if (!running || paused || !Online.connected || hero.dead || hero.sparkTravel) return;
     pendingNpc = null; pendingChest = null; cityRoute = [];
     const r = cv.getBoundingClientRect(), mx=(e.clientX-r.left)/r.width*VW, my=(e.clientY-r.top)/r.height*VH;
+    if (window.RaidKey?.click(mx,my,w2s)) return;
     const npc = City.npcs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<32 && my>y-City.nameplateTop(n) && my<y+12; });
     if (npc) { talkTo(npc); return; }
     const sign = signs.find(n => { const [x,y]=w2s(n.x,n.y); return Math.abs(mx-x)<=SIGN_W && my>=y-SIGN_TOP && my<=y+10; });
@@ -1141,6 +1144,7 @@
     const moved = (own.zone || 0) !== zone;
     if (moved) setZone(own.zone || 0);
     const inZone = a => (a.zone || 0) === zone;
+    if(SLIME.ember_firelord) SLIME.ember_firelord.name=zdef.crosses?.[0]?.bossName || 'Firelord';
     const selectedTarget = hero.target?.id;
     const wasDead = hero.dead, wasFallen = !!hero.fallen, oldSets = hero.setCounts || {};
     applyActor(hero, own, initial || moved || !!hero.sparkTravel !== !!own.sparkTravel);
@@ -1152,6 +1156,7 @@
     }
     window.Weather?.sync(packet.weather, own.x, own.y, !!own.inside);
     if(hero.sparkTravel){City.close();keys.clear();pointer.down=false;cityRoute=[];pendingNpc=null;pendingChest=null;hero.target=null;hero.goal=null;}
+    window.RaidKey?.sync(packet, own, zone);
     window.Attributes?.update(own);
     window.Mounts?.update(own); window.MountArt?.preload(own.mount);
     window.Rebirth?.update(own);
@@ -1220,6 +1225,7 @@
       const actor = event.actor === Online.id ? hero : remotePlayers.get(event.actor);
       if (actor && (event.actor === Online.id || visibleCombatCue(event.x,event.y))) say('combatSwing', { actorId:event.actor, className:actor.look?.class, x:event.x, y:event.y, own:event.actor === Online.id });
     }
+    if (event.kind === 'emberSummon') { effects.push({kind:'ring',x:event.x,y:event.y,t:0,life:1,grow:1.5,col:'#ffad59'}); say('enemyAttack',{kind:'cf_eldmarr',boss:true,level:99,x:event.x,y:event.y}); }
     if (event.kind === 'skill') skillFx(event);
     if (event.kind === 'forgeProc') {
       effects.push({ kind: 'ring', x: event.x, y: event.y, t: 0, life: .55, grow: .65, col: '#ff963d', still: reducedMotion() });
@@ -3010,7 +3016,8 @@
     g.save();
     if (s.dead) g.globalAlpha = clamp((DIE_SHOW - s.dieT) / .5, 0, 1);
     g.imageSmoothingEnabled = false; g.scale(s.dir < 0 ? -K : K, K);
-    g.drawImage(src.img[s.kind], n * fw, c.row * fh, fw, fh, -ax, -ay, fw, fh);
+    const sheet = s.kind === 'ember_firelord' ? window.RaidKey.tint(src.img[s.kind], zdef.crosses?.[0]?.color || '#ed9152') : src.img[s.kind];
+    g.drawImage(sheet, n * fw, c.row * fh, fw, fh, -ax, -ay, fw, fh);
     g.restore();
   }
 
@@ -3765,6 +3772,7 @@
       if (onScreen(sx, sy, Math.max(200, City.art[o.kind]?.box?.[3] || 0))) { list.push({ d: o.x + o.y, o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
     }
     for (const portal of zdef.portals) { if (portal.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y + (portal.look ? .3 : 0), portal, sx, sy }); }
+    for (const cross of window.RaidKey?.crosses || []) { const [sx,sy]=w2s(cross.x,cross.y); if(onScreen(sx,sy,160)) list.push({d:cross.x+cross.y,cross,sx,sy}); }
     const escorted = id => { for (const r of remotePlayers.values()) if (r.escort && r.escort.npc === id && r.escort.owner === Online.id) return true; return false; };   // a stranded person walks with their rescuer
     for (const n of City.npcs) { if (n.escort && escorted(n.id)) continue; const [sx,sy]=w2s(n.x,n.y); if(onScreen(sx,sy,150)) list.push({d:n.x+n.y,npc:n,sx,sy}); }
     for (const s of slimes) if (!s.dead || (enemySource(s) && s.dieT < DIE_SHOW)) { const [sx, sy] = w2s(s.x, s.y); if (onScreen(sx, sy, 100)) { shadow(g, s.x, s.y, 28 * s.d.scale * (1 - s.hop * .12), 11 * s.d.scale, s.dead ? .3 * clamp(1 - (s.dieT - .5) / .6, 0, 1) : .3); list.push({ d: s.x + s.y, s, sx, sy }); } }
@@ -3795,6 +3803,7 @@
         g.drawImage(spr.c, it.sx - spr.ax, it.sy - spr.ay + (o.kind === 'rock' ? 4 : 0), spr.w, spr.h); g.globalAlpha = 1;
       } else if (it.portal) { drawPortal(g, it.portal, it.sx, it.sy, t);
       } else if (it.npc) { City.drawNpc(g,it.npc,it.sx,it.sy,t,Math.hypot(hero.x-it.npc.x,hero.y-it.npc.y)<2.8);
+      } else if (it.cross) { window.RaidKey?.draw(g,it.cross,it.sx,it.sy);
       } else if (it.chest) { drawChest(g,it.chest,it.sx,it.sy);
       } else if (it.sign) { drawSign(g,it.sign,it.sx,it.sy,Math.hypot(hero.x-it.sign.x,hero.y-it.sign.y)<2.8);
       } else if (it.s) {

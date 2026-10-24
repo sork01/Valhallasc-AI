@@ -76,6 +76,7 @@
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
           const L = (a, all) => Keys.label(a, all), T = window.Locale?.translate || (x => x), word = text => T(text).toLowerCase();
           log(`${T('Welcome to Greenmeadow.')} ${L('character', false)}: ${word('Character')} · ${L('bags').replace(' / ', '/')}: ${word('Bags')} · ${L('skills', false)}: ${word('Skills')} · ${Keys.skillRange()}: ${word('Skillbar')} · ${L('quests', false)}: ${word('Quests')} · ${L('friends', false)}: ${word('Friends')} · ${L('party', false)}: ${word('Party')} · ${L('talk', false)}: ${word('Talk or read')} · ${L('chat', false)}: ${word('Chat')}. ${T('Type /p to talk to your party.')}`);
+          if(character?.level>=99&&!character.quests?.some(q=>q.id==='raid_key'&&q.completions>0)) log('The Chained Forge now requires The Ember Key for every hero, including past raiders. Speak to Iarn Emberkeeper at the Emberwake camp.');
           break;
         }
         case 'snapshot': {

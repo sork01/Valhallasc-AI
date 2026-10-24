@@ -706,5 +706,9 @@
   "cf_eldmarr": [
     4500,
     6
+  ],
+  "ember_firelord": [
+    1,
+    1
   ]
 }

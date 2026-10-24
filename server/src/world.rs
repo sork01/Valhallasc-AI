@@ -87,6 +87,9 @@ mod perks_tests;
 mod pursuit;
 mod pvp;
 mod raid;
+mod raid_key;
+#[cfg(test)]
+mod raid_key_tests;
 #[cfg(test)]
 mod raid_pack_tests;
 #[cfg(test)]
@@ -1452,6 +1455,7 @@ pub struct World {
     cur_skill: String,
     set_pending: Vec<sets::Pending>,
     signature: signature::State,
+    raid_key: raid_key::State,
     /// Counter for mercenary sessions.
     merc_seq: u64,
     /// Live arena gauntlet runs (world/gauntlet.rs), in memory only.
@@ -1563,6 +1567,7 @@ impl World {
             cur_skill: String::new(),
             set_pending: vec![],
             signature: signature::State::default(),
+            raid_key: raid_key::State::default(),
             merc_seq: 0,
             gauntlets: vec![],
             ambient_targets: BTreeMap::new(),
@@ -1846,6 +1851,7 @@ impl World {
             }
             view
         }).collect::<Vec<_>>(),
+        "raidCrosses":self.raid_cross_view(zone),
         "slimes":self.slimes.iter().filter(|s| s.zone == zone && !idle).collect::<Vec<_>>(),
         "bolts":self.bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
         "ebolts":self.enemy_bolts.iter().filter(|b| b.zone == zone).collect::<Vec<_>>(),
@@ -2117,6 +2123,13 @@ impl World {
                 if dx != 0. || dy != 0. {
                     p.goal = None;
                     p.target = None;
+                }
+            }
+            ClientMessage::RaidCross { id } => {
+                if let Err(text) = self.start_raid_channel(session, &id) {
+                    let _ = self.players[&session]
+                        .peer
+                        .try_send(json!({"type":"error","text":text}));
                 }
             }
             ClientMessage::Stop => p.stop(),
@@ -2795,6 +2808,7 @@ impl World {
         self.update_boss_mechanics();
         self.update_bolts();
         self.update_enemy_bolts();
+        self.update_raid_key();
         self.update_drops();
         self.update_rolls();
         let stale: Vec<_> = self
@@ -4065,6 +4079,7 @@ impl World {
                 _ if self.instances.iter().any(|i| i.zone == zone) => 1e9,
                 _ if self.spawns[id].ambush.is_some() => 1e9,
                 "big" => 0.,
+                "ember_firelord" => 1e9,
                 "cinderlord" => 180.,
                 "ew_chainmaw" | "ew_bellows" | "ew_crown" => 600.,
                 "gloomroot" | "hrungnir" | "kraken" | "hvitserk" => 300.,
@@ -4090,6 +4105,10 @@ impl World {
             crit,
             json!({"enemy":kind,"level":level,"skill":self.cur_skill,"killed":killed}),
         );
+        if killed && kind == raid_key::KIND {
+            self.raid_key_drops(id, zone, point);
+            return dealt; // Shards only: never ordinary XP, gold, gear or elite loot.
+        }
         if killed {
             // An instance kill can advance a quest offered at its public entrance.
             // Sealed templates use their return portal's parent until an inbound gate opens.
@@ -4623,7 +4642,8 @@ impl World {
                     s.st = 1.;
                     s.hp = if matches!(
                         s.kind.as_str(),
-                        "cinderlord"
+                        "ember_firelord"
+                            | "cinderlord"
                             | "gloomroot"
                             | "oakhorn"
                             | "hrungnir"
@@ -5263,7 +5283,9 @@ fn quest_action_with_choice(
                 (None, None) => None,
             };
             let mut next = character.clone();
-            quest.take_bring(&mut next);
+            if quest.id != raid_key::QUEST {
+                quest.take_bring(&mut next);
+            }
             for id in quest.reward_item.as_deref().into_iter().chain(chosen) {
                 if !next.can_collect(id) {
                     return refused("Your bags are full. Make room for the quest reward.");
@@ -10097,6 +10119,7 @@ mod tests {
     #[test]
     fn enemies_block_each_other_but_players_can_walk_and_dash_through_actors() {
         let map = Map {
+            crosses: vec![],
             name: String::new(),
             size: 96,
             rooms: vec![],

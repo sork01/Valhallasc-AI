@@ -620,3 +620,18 @@ Brand Relay, Four on the Floor, Water Carriers and Mirror Plate. They use the
 same generator and original sprite maker. Focused checks: Rust `raid_warden`,
 `tests/raid-bosses-5-9-ui.cjs` with real sprites; exact rules and the owner's
 accepted faster clear times are in [docs/raid-bosses-5-9.md](docs/raid-bosses-5-9.md).
+
+### Ember Key raid access
+
+Every hero unlocks the Chained Forge through **The Ember Key**, offered by Iarn
+Emberkeeper at the Emberwake arrival camp at level 99. Ten grave crosses across
+older zones summon shared Firelords with personal Ember Shard rewards. The
+journal lists the zone names; the crosses have no map markers. The new remappable
+Interact action defaults to G. Every hero must complete this quest, including
+past raid visitors; hired fighters follow their hirer.
+
+`python3 scripts/raid_key.py` owns the data and `--check` verifies reachable,
+quiet cross sites. The affected zone generators reapply it, and
+`scripts/sync-world.cjs` exports it. No zone IDs or saved copies shift. Focused
+checks: Rust `raid_key`, MCP `raid_key`, real-sprite `tests/raid-key-ui.cjs`
+(`MUTATE=1` must fail). Rules and coordinates: [docs/raid-key.md](docs/raid-key.md).

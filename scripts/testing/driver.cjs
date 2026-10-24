@@ -30,6 +30,7 @@ const socialSchema = z.discriminatedUnion('op', [
 ]);
 // The same actions accepted by ClientMessage; no arbitrary state setters or joins.
 const actionSchema = z.discriminatedUnion('type', [
+  z.object({ type:z.literal('raid_cross'), id:z.string().min(1).max(64) }).strict(),
   z.object({ type: z.literal('input'), dx: number.min(-1).max(1), dy: number.min(-1).max(1) }).strict(),
   z.object({ type: z.literal('stop') }).strict(),
   z.object({ type: z.literal('allocate_stat'), stat: z.enum(['strength', 'agility', 'intellect', 'stamina', 'dexterity', 'accuracy']) }).strict(),

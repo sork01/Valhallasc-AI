@@ -5,6 +5,7 @@ module.exports=(kit,map)=>({
  async run(w,check){
   const bot='ForgeWalker',area=map.zones[45];
   await w.connect({bot,class:'warrior'});
+  await w.debug(bot,{op:'quest',id:'raid_key',action:'finish'});
   await kit.teleport(w,bot,{zone:45,x:133,y:27});
   await w.action(bot,{type:'move',x:133,y:24});await w.advance(1600);await w.action(bot,{type:'stop'});
   check(w.player(bot).zone===46,'The authored raid door admits a level-99 player to muster');

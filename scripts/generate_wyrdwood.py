@@ -655,3 +655,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+if __name__ == "__main__":
+    from raid_key import reapply_after_generator
+    reapply_after_generator()

@@ -127,6 +127,7 @@
       const title = button(quest.title, () => { tracked = quest.id; show(); }); title.className = 'tracker-title';
       row.append(title);
       if (status(quest) === 'ready') row.append(element('small', `✓ ${quest.autoLevel ? 'Report to' : 'Return to'} ${giver(quest).name} for your reward`, 'tracker-objective complete'));
+      else if(quest.id==='raid_key') { const n=quest.objectives.filter((o,i)=>(state(quest)?.counts[i]||0)>=o.count).length; row.append(element('small', `Pieces: ${n}/10`, 'tracker-objective')); }
       else quest.objectives.forEach((o, i) => {
         const count = Math.min(state(quest)?.counts[i] || 0, o.count), done = count >= o.count;
         row.append(element('small', `${done ? '✓' : '•'} ${o.label}: ${count}/${o.count}${unit(o)}`, `tracker-objective${done ? ' complete' : ''}`));
