@@ -73,3 +73,18 @@ JavaScript syntax, the complete Swedish catalog and 21 locale assertions pass.
 The mutation bypassed the valuable-item gate and failed waiting for its popup,
 after nine assertions; it used a routed private-client script only. The final
 client artifact is `.tools/shop-sell-worktree/test-results/driver-N0S9d2/`.
+
+## Release
+
+Deployed together on 2026-10-24 at 18:40 UTC, source `b60a333`,
+**Beta 1.14.33**. Backup: `deploy/backups/shop-sell-20261024T183043Z`
+(previous binary, previous client, consistent before/stopped SQLite snapshots
+and installed candidate). No players were online during the restart.
+
+The final release binary passed a private merchant open/sell/payment/buy-back
+probe before installation. After restart, public and bridge health, all seven
+changed public client hashes, the live executable hash, SQLite `quick_check`
+and absence of test flags/warning journal entries pass. Counts remain
+27 characters and 15 guests. No world data, copy IDs or DB schema changed.
+Release proof: `test-results/shop-sell-release.json`; installed executable
+SHA-256: `aab9e6aad01cd8fb3069700855a219c92cc07b12b529f560c4b7bfa949049914`.
