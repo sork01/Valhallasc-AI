@@ -47,3 +47,12 @@ checks pass against the immutable release candidate, including actual hiring
 and both building detours. Private artifact:
 `.tools/merc-follow-worktree/test-results/driver-GkVcSK`. Clippy with warnings
 denied, formatting, changed JavaScript syntax and diff whitespace checks pass.
+
+Deployed 2026-10-24 with nobody online (source `e679177`). Rollback binary and
+consistent pre-build/stopped database snapshots:
+`deploy/backups/merc-follow-20261024T102629Z/`. No client/world changes or
+zone/schema migration. Public and bridge health pass; running binary matches
+the privately tested candidate; no test flags or warning/error journal entries.
+SQLite `quick_check` passes, counts unchanged at 25 characters / 14 guests.
+Release SHA-256:
+`669d959add44fab536f15ac74bda17c39e0780d8ce4b327671bc053a7aadfcb1`.
