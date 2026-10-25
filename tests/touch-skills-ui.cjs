@@ -30,7 +30,7 @@ const suite = {
     check(await page.evaluate(() => touchSent.some(m => m.type === 'input' && m.dx && m.dy)), 'first finger continues moving after the skill tap');
     await send('touchEnd', []);
     for (const selector of ['#touch-skills button', '#touch-actions button', '#touch-quickuse button']) {
-      const bad = await page.locator(selector).evaluateAll(nodes => nodes.map(n => { const r = n.getBoundingClientRect(); return { text: n.textContent, w: r.width, h: r.height }; }).filter(r => r.w < 43.9 || r.h < 43.9));
+      const bad = await page.locator(selector).evaluateAll(nodes => nodes.filter(n => n.getClientRects().length).map(n => { const r = n.getBoundingClientRect(); return { text: n.textContent, w: r.width, h: r.height }; }).filter(r => r.w < 43.9 || r.h < 43.9));
       check(bad.length === 0, `${selector}: visible targets stay at least 44px: ${JSON.stringify(bad)}`);
     }
     await page.locator('#touch-quickuse > button').click();

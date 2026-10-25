@@ -207,3 +207,28 @@ Proof: `test-results/touch/attack-index.log` and `attack-public.txt` (all four
 changed public client hashes and both health endpoints match).
 The served-copy mutation restoring manual Attack fails the nearest-target
 assertion as intended (`attack-mutation.log`, 556 MiB peak).
+
+
+## Touch controls follow-up (Beta 1.17.2)
+
+Owner chose to keep the action row and hide unavailable target actions. Target
+menu appears for selected players/adventurers and toggles closed on a second
+tap. Its trigger is exempt from the portrait menu's outside-pointer dismissal,
+so that a second tap does not close on pointerdown and reopen on click.
+Chat toggles open/closed, blurs typing on close, and preserves an unsent draft.
+Enter retains its existing focus/send behavior. Both buttons expose expanded
+state. Cooling arc skills show a white 24 px countdown over a dark full-icon
+overlay, retaining full opacity while the disabled button blocks recasting.
+The displayed seconds come from the existing authoritative cooldown state.
+Focused test: `tests/touch-feedback-ui.cjs` under the required resource cap.
+
+Indexed follow-up verification: 30 assertions pass at 844x390 and 1024x768,
+with a 573 MiB peak inside the unchanged 1536 MiB cgroup cap. Screenshots show
+the cooldown overlay; the private-world check observes its countdown, blocks
+recasting and removes it when ready. Chat draft/focus/toggle and a selected real
+player's target menu pass. Five changed public client hashes match; bridge and
+public health report OK. Proof: `test-results/touch/feedback-index.log`,
+`feedback-public.txt`, and the indexed export's `feedback-*.png` captures.
+The three served-copy mutations fail the intended assertions for Chat closing,
+contextual Target menu visibility and countdown legibility. Logs are
+`feedback-mutation-{chat,target,cooldown}.log`.

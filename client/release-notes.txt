@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.17.2",
+    "date": "2026-10-25",
+    "new": [],
+    "changed": [
+      "Tap Chat again to close it on phones and tablets. Target menu appears when a player is selected and toggles open and closed.",
+      "Skills in the phone arc now show a large, clear cooldown countdown."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.17.1",
     "date": "2026-10-25",
     "new": [],

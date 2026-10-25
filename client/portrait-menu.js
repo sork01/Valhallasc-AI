@@ -111,10 +111,11 @@
   addEventListener('keydown', event => {
     if (isOpen && event.key === 'Escape') { event.preventDefault(); event.stopImmediatePropagation(); close(true); }
   }, true);
-  addEventListener('pointerdown', event => { if (isOpen && !menu.contains(event.target) && !badge.contains(event.target)) close(false); }, true);
+  addEventListener('pointerdown', event => { if (isOpen && !menu.contains(event.target) && !badge.contains(event.target) && !event.target.closest('[aria-controls="portrait-menu"]')) close(false); }, true);
   addEventListener('blur', () => close(false));
 
   window.PortraitMenu = {
+    toggle() { isOpen ? close(false) : open(); },
     // The server announces at join whether it answers `inspect`; without it that entry stays hidden.
     supported(on) { inspectOk = !!on; },
     // Called with each HUD update: the target (or null) and what the HUD knows about the hero's surroundings.

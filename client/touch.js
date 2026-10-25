@@ -50,7 +50,13 @@
   for (const [action, kind] of [['quickFood', 'food'], ['quickPotion', 'potion'], ['quickMana', 'mana']]) Keys.register(action, () => Quickuse.use(kind));
   Keys.register('skills', () => { Skillbar.show(); return true; });
   Keys.register('map', () => { WorldMap.show(); return true; });
-  Keys.register('chat', () => Online.focusChat());
+  Keys.register('chat', () => {
+    if (coarse.matches && $('stage').classList.contains('touch-chat-open')) {
+      if ($('chat').contains(document.activeElement)) document.activeElement.blur();
+      $('stage').classList.remove('touch-chat-open'); return true;
+    }
+    return Online.focusChat();
+  });
   Keys.register('quests', () => { Quests.show(); return true; });
   const attack = button('Attack', 'attack', arc); attack.className = 'touch-attack';
   const skillButtons = Array.from({ length: 4 }, (_, i) => {
@@ -60,9 +66,9 @@
   });
   for (const [label, action] of [['Menu', 'menu'], ['Bags', 'bags'], ['Chat', 'chat'], ['Talk / read', 'talk'], ['Cross', 'interact'], ['Mount', 'mount'], ['World map', 'map'], ['Quests', 'quests']]) button(label, action, actions);
   const targetMenu = document.createElement('button'); targetMenu.type = 'button'; targetMenu.textContent = tr('Target menu');
-  targetMenu.addEventListener('click', () => {
-    $('hud-target').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: targetMenu.getBoundingClientRect().left, clientY: targetMenu.getBoundingClientRect().bottom }));
-  }); actions.append(targetMenu);
+  targetMenu.setAttribute('aria-controls', 'portrait-menu'); targetMenu.hidden = true;
+  targetMenu.addEventListener('click', () => PortraitMenu.toggle()); actions.append(targetMenu);
+  const chatButton = actions.querySelector('[data-action="chat"]'); chatButton.setAttribute('aria-controls', 'chat');
   const tray = document.createElement('button'); tray.type = 'button'; tray.textContent = tr('Other skills'); tray.setAttribute('aria-expanded', 'false');
   tray.addEventListener('click', () => {
     const open = $('stage').classList.toggle('touch-tray-open'); tray.setAttribute('aria-expanded', String(open));
@@ -138,7 +144,9 @@
     if (!coarse.matches || !Field.hero) return;
     const ids = assignments(), states = ids.map(id => Skillbar.state(id));
     attack.disabled = !Field.canAct || !!Field.hero.sparkTravel;
-    targetMenu.disabled = $('hud-target').hidden || !$('hud-target').classList.contains('has-menu');
+    targetMenu.hidden = $('hud-target').hidden || !$('hud-target').classList.contains('has-menu');
+    targetMenu.setAttribute('aria-expanded', String(PortraitMenu.isOpen));
+    chatButton.setAttribute('aria-expanded', String($('stage').classList.contains('touch-chat-open')));
     const key = JSON.stringify(states.map(s => [s.skill?.id, s.ready, Math.ceil(s.cooldown)]));
     if (key === lastState) return; lastState = key;
     states.forEach((state, i) => {
@@ -146,8 +154,9 @@
       b.replaceChildren();
       if (skill) { const glyph = document.createElement('span'); glyph.innerHTML = Skillbar.icon(skill.icon); b.append(glyph); }
       const name = document.createElement('span'); name.textContent = skill?.name || tr('Empty'); b.append(name);
-      b.setAttribute('aria-label', skill?.name || tr('Empty'));
-      if (state.cooldown > 0) { const cd = document.createElement('small'); cd.textContent = Math.ceil(state.cooldown); b.append(cd); }
+      b.classList.toggle('cooling', state.cooldown > 0);
+      b.setAttribute('aria-label', (skill?.name || tr('Empty')) + (state.cooldown > 0 ? ` · ${Math.ceil(state.cooldown)}s` : ''));
+      if (state.cooldown > 0) { const cd = document.createElement('small'); cd.className = 'touch-cooldown'; cd.textContent = Math.ceil(state.cooldown); b.append(cd); }
       if (skill && skill.level > (Field.hero.level || 1)) { const lock = document.createElement('small'); lock.textContent = `Lv ${skill.level}`; b.append(lock); }
     });
   }

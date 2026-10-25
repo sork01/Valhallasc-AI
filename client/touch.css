@@ -63,6 +63,8 @@ html, body { overscroll-behavior: none; }
   #touch-skills button > span:first-child:not(:last-child) { display: block; height: 55%; }
   #touch-skills svg { height: 100%; width: 100%; }
   #touch-skills small { position: absolute; top: 0; right: 0; background: #101e46; }
+  #touch-skills button.cooling:disabled { opacity: 1; }
+  #touch-skills .touch-cooldown { inset: 0; display: grid; place-items: center; border-radius: inherit; background: #081126d9; color: #fff; font: bold calc(24px / var(--ui, .8)) sans-serif; text-shadow: 0 2px 3px #000; pointer-events: none; }
   #touch-actions { top: 8px; left: 34%; width: calc(300px / var(--ui, .8)); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
   #touch-quickuse { left: 200px; bottom: 8px; display: flex; flex-direction: column; gap: 4px; max-width: calc(240px / var(--ui, .8)); }
   #touch-quickuse #quickuse { position: static; padding: 2px; gap: 3px; }
