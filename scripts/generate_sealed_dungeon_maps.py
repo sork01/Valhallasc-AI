@@ -49,7 +49,7 @@ PLANS = [
          links=[(0, 1), (1, 2), (2, 3), (3, 4), (4, 5)]),
     dict(id='rain_crown', name='Temple of the Rain Crown', parent=22, level=80,
          landing=(120, 30), spawn=(48, 83), rooms=[(48, 83), (48, 69), (32, 56),
-         (64, 44), (48, 31), (48, 17)],
+         (64, 44), (72, 31), (48, 17)],
          links=[(0, 1), (1, 2), (2, 3), (3, 4), (4, 5)]),
     dict(id='seed_vault', name='The Seed Vault', parent=24, level=80,
          landing=(48, 22), spawn=(48, 82), rooms=[(48, 82), (48, 51), (25, 45),
@@ -220,7 +220,8 @@ def build(plan):
         kinds = ['rain_crown_droplet', 'rain_crown_oracle', 'rain_crown_guard'] * 3
         spawns = [dict(kind=k, x=x, y=y) for k, (x, y) in zip(kinds, points)]
         spawns += [dict(kind='rain_crown_gatekeeper', x=32, y=56),
-                   dict(kind='rain_crown_sibyl', x=48, y=31),
+                   # Leave room to surround the Sibyl without waking the Crown.
+                   dict(kind='rain_crown_sibyl', x=72, y=31),
                    dict(kind='rain_crown_sovereign', x=48, y=17)]
         for n, (x, y) in enumerate(plan['rooms']):
             if n:

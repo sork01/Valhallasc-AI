@@ -134,8 +134,8 @@
     "colors": [
       "red"
     ],
-    "x": 53.5,
-    "y": 36.5
+    "x": 68.5,
+    "y": 25.5
   },
   "seed_worldseed": {
     "title": "Heart of the Worldseed",

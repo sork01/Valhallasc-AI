@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.18.4",
+    "date": "2026-10-25",
+    "new": [],
+    "changed": [
+      "The Sibyl of the Rain has a separate room farther from the Rain Crown, giving your party space to fight each boss separately."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.18.3",
     "date": "2026-10-25",
     "new": [],

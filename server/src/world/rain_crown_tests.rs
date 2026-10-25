@@ -75,4 +75,76 @@ fn rain_crown_floor_and_quests_are_ready_with_open_gate() {
         }
     }
     assert!(pursuit::grid_matches_collision(map, PLAYER_RADIUS));
+    let sign = &w.signs["rain_crown_sovereign"];
+    assert!(reached(map, &seen, at(sign.x, sign.y)));
+}
+
+#[test]
+fn rain_crown_sibyl_can_be_surrounded_without_pulling_the_crown_in_every_copy() {
+    use super::wyrd_tests::{calm, join, place};
+
+    let mut w = world();
+    calm(&mut w);
+    let classes = [
+        Class::Warrior,
+        Class::Priest,
+        Class::Mage,
+        Class::Hunter,
+        Class::Assassin,
+    ];
+    let _receivers: Vec<_> = classes
+        .into_iter()
+        .enumerate()
+        .map(|(i, class)| join(&mut w, i as u64 + 1, class))
+        .collect();
+    let copies: Vec<_> = w
+        .instances
+        .iter()
+        .filter(|i| i.template == 32)
+        .map(|i| i.zone)
+        .collect();
+    assert_eq!(copies.len(), 4);
+    for zone in copies {
+        let sibyl = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == zone && s.kind == "rain_crown_sibyl")
+            .unwrap();
+        let crown = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == zone && s.kind == "rain_crown_sovereign")
+            .unwrap();
+        for id in [sibyl, crown] {
+            w.slimes[id] = Slime::with_level(id, &w.spawns[id], 80);
+        }
+        let center = w.slimes[sibyl].point();
+        let awareness = Slime::attack_profile("rain_crown_sovereign").3;
+        for (i, (dx, dy)) in [(0., 0.), (0., -6.), (6., 0.), (0., 6.), (-6., 0.)]
+            .into_iter()
+            .enumerate()
+        {
+            let point = at(center.x + dx, center.y + dy);
+            let mut resolved = point;
+            w.maps[zone].collide(&mut resolved, PLAYER_RADIUS);
+            assert!(resolved.distance(point) < 1e-6, "party needs free ground");
+            // The Crown can wander up to four tiles from home before a pull.
+            assert!(
+                point.distance(w.slimes[crown].point()) > awareness + 4.,
+                "Crown can reach the Sibyl's fight in copy {zone}"
+            );
+            place(&mut w, i as u64 + 1, zone, point);
+        }
+        w.update_slime(sibyl);
+        w.update_slime(crown);
+        assert!(
+            w.slimes[sibyl].target.is_some(),
+            "Sibyl should engage in copy {zone}"
+        );
+        assert!(
+            w.slimes[crown].target.is_none(),
+            "Crown joined the Sibyl pull in copy {zone}"
+        );
+        assert_eq!(w.slimes[crown].fight, 0.);
+    }
 }
