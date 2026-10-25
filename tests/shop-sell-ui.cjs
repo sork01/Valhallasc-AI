@@ -1,118 +1,106 @@
-// Private Chromium: real merchant packets, exact payment, precious-item confirmation and buy-back.
-const assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path');
-const { TestWorld } = require('../scripts/testing/driver.cjs');
-const { chromium } = require('./lib/playwright.cjs');
-const world = new TestWorld(); let browser, activePage, checks = 0;
-const check = (ok, message) => { assert.ok(ok, message); checks++; };
-const items = JSON.parse(fs.readFileSync(path.join(__dirname, '../world/items.txt')));
-const smith = JSON.parse(fs.readFileSync(path.join(__dirname, '../world/map.txt'))).npcs.find(n => n.id === 'smith');
-const common = items.find(i => i.id === 'warrior_headgear_crimson_l5_gray');
-const green = items.find(i => i.id === 'warrior_armor_azure');
-const blue = items.find(i => i.id === 'headgear_upgrade');
-const purple = items.find(i => i.id === 'warrior_weapon_royal_l10_purple');
-const orange = items.find(i => i.id === 'orange_03');
-const quest = items.find(i => i.kind === 'material' && i.sell === 0);
-(async () => {
-  world.startLevel = 99; await world.start(); browser = await chromium.launch({ headless: true });
-  for (const lang of ['en', 'sv']) {
-    const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } }), errors = [];
-    activePage = page; page.setDefaultTimeout(20000);
-    page.on('pageerror', error => { errors.push(error.message); console.error('Browser error:', error.message); });
-    if (process.env.MUTATE) await page.route('**/shop.js', route => {
-      const code = fs.readFileSync(path.join(__dirname, '../client/shop.js'), 'utf8');
-      assert.ok(code.includes('if (!precious.length)'));
-      return route.fulfill({ contentType: 'application/javascript', body: code.replace('if (!precious.length)', 'if (true)') });
-    });
-    await page.addInitScript(lang => localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang, sound: false })), lang);
-    await page.goto(world.url); await page.locator('#start').click(); await page.locator('#login-guest').click();
-    await page.locator('#name').fill(`Sell${lang}`); await page.locator('#go').click({ timeout: 60000 });
-    await page.waitForFunction(() => Online.connected && Field.hero.level === 99, null, { timeout: 60000 });
-    await page.evaluate(() => {
-      window.shopPackets = [];
-      const receive = Shop.onPacket; Shop.onPacket = packet => { shopPackets.push(packet); receive(packet); };
-      window.sellSent = 0; const send = Online.send; Online.send = message => { if (message.type === 'sell_batch') sellSent++; return send(message); };
-    });
-    const debug = command => page.evaluate(command => Online.send({ type: 'debug', command }), command);
-    await debug({ op: 'teleport', zone: 0, x: smith.x, y: smith.y + 1 });
-    await debug({ op: 'set_gold', gold: 100000 }); await debug({ op: 'set_rebirth', tiers: [0, 1, 0, 0, 0] });
-    for (const [id, quantity] of [[common.id,2],[green.id,1],[blue.id,1],[purple.id,1],[orange.id,1],[quest.id,1],['slime_gel',7],['health_potion_l20',2]]) await debug({ op: 'give_item', item: id, quantity, force: true });
-    await page.waitForFunction(id => Inventory.quantity(id) === 2, common.id);
-    await page.evaluate(id => Online.send({ type: 'equip', slots: { headgear: id } }), common.id);
-    await page.waitForFunction(id => Field.hero.equipment.headgear === id, common.id);
-    await page.waitForTimeout(650);
-    await page.evaluate(() => Online.send({ type: 'interact', npc: 'smith' }));
-    await page.locator('[data-view="sell"]').click();
-    await page.waitForFunction(() => document.querySelectorAll('#sell-pick .sell-item').length > 6 && !document.querySelector('.sell-workspace[aria-busy="true"]'));
-    const pick = id => page.locator(`#sell-pick [data-item="${id}"]`), basket = id => page.locator(`#sell-basket [data-item="${id}"]`);
-    check(await pick(common.id).count() === 1, `${lang}: equipped copy excluded`);
-    check(await pick(quest.id).count() === 0, `${lang}: quest item excluded`);
-    check(await page.locator('#npc-inventory').textContent().then(t => !t.includes('Sell from your bags')), 'old inline selling removed');
-    check(await page.evaluate(() => shopPackets.at(-1).goldPercent) === 10, 'server quote includes rebirth bonus');
-    await page.locator('#sell-junk').click();
-    check(await basket(common.id).count() === 1 && await basket(green.id).count() === 1 && await basket('slime_gel').count() === 1, 'junk loads grey/green gear and materials');
-    check(await basket(blue.id).count() === 0 && await basket(purple.id).count() === 0 && await basket(orange.id).count() === 0, 'junk protects blue/purple/orange');
-    while (await page.locator('#sell-basket .sell-item').count()) await page.locator('#sell-basket .sell-item button').first().click();
-    await pick('slime_gel').locator('input').fill('4'); await pick('slime_gel').locator('button').click();
-    check((await page.locator('#sell-total').textContent()).includes('13'), 'four gel preview rounds rebirth bonus exactly');
-    await page.locator('[data-filter="epic"]').click();
-    check(await pick(purple.id).count() === 1 && await pick(blue.id).count() === 0, 'rarity filter narrows picker');
-    await pick(purple.id).locator('button').click();
-    await page.locator('[data-filter="legendary"]').click(); await pick(orange.id).locator('button').click();
-    const quote = await page.evaluate(() => {
-      const p = shopPackets.at(-1); return p.available.filter(r => ['orange_03','warrior_weapon_royal_l10_purple'].includes(r.item)).map(r => ({ ...r }));
-    });
-    const goldBefore = await page.evaluate(() => Field.hero.gold);
-    const expected = 13 + quote.reduce((sum, row) => sum + Math.floor((row.base * 110 + 50) / 100), 0);
-    check((await page.locator('#sell-total').textContent()).includes(String(expected)), 'basket total includes exact selected copies');
-    await page.locator('#sell-confirm').click();
-    await page.locator('#sell-warning').waitFor({ state: 'visible', timeout: 4000 });
-    check(await page.locator('#sell-warning li').count() === 2, 'confirmation names both valuable items');
-    check(await page.evaluate(() => document.activeElement.id) === 'sell-cancel', 'orange defaults focus to Cancel');
-    check(await page.locator('#sell-warning [data-rarity="epic"]').evaluate(n => getComputedStyle(n).color) !== await page.locator('#sell-warning [data-rarity="legendary"]').evaluate(n => getComputedStyle(n).color), 'rarity colors differ in confirmation');
-    await page.locator('#sell-cancel').click();
-    check(await page.evaluate(() => sellSent === 0 && Field.hero.gold) === goldBefore, 'Cancel sends no sale');
-    await page.locator('#sell-confirm').click(); await page.locator('#sell-yes').click();
-    await page.waitForFunction(expected => shopPackets.some(p => p.ok && p.changed && p.paid === expected), expected);
-    await page.waitForFunction(gold => Field.hero.gold === gold, goldBefore + expected);
-    check(await page.evaluate(() => sellSent) === 1, 'one batch carries the whole basket');
-    check(await page.evaluate(() => Inventory.quantity('slime_gel')) === 3, 'requested material quantity sold');
-    check(await page.locator('#sell-basket .sell-item').count() === 0, 'success clears basket');
-    await page.locator('[data-tab="back"]').click();
-    check(await page.locator('#sell-buyback .sell-item').count() === 3, 'buy-back lists sold gear copies and material stack');
-    await page.waitForTimeout(650);
-    await page.locator(`#sell-buyback [data-item="${purple.id}"] button`).click();
-    await page.waitForFunction(id => Inventory.quantity(id) === 1 && !document.querySelector('.sell-workspace[aria-busy="true"]'), purple.id);
-    const back = await page.evaluate(id => Field.hero.gearInstances.find(g => g.item === id), purple.id);
-    check(JSON.stringify(back) === JSON.stringify(quote.find(r => r.item === purple.id).gear), 'buy-back restores exact original gear copy');
-    check(await page.locator('#sell-buyback .sell-item').count() === 2, 'bought-back entry disappears');
-    if (lang === 'sv') {
-      check((await page.locator('[data-tab="back"]').textContent()) === 'Återköp', 'Swedish tab');
-      check(await page.evaluate(() => Locale.translate('You receive: 13 gold')) === 'Du får: 13 guld', 'Swedish total');
-      check(await page.evaluate(() => Locale.translate('Sell valuable items?')) === 'Sälj värdefulla föremål?', 'Swedish confirmation');
-      await page.waitForFunction(() => document.querySelector('#sell-buyback [data-item="orange_03"]').textContent.includes('Legendarisk'));
-      check(true, 'Swedish gear copy rarity and durability');
+// Focused merchant frame checks. The shared helper refuses uncapped execution.
+const { run, replace, debug, record } = require('./lib/touch.cjs');
+const suite = {
+  name: 'merchant-frame',
+  mutate(page) {
+    if (process.env.MUTATE === 'layout') return replace(page,'online.css','#npc-dialogue.merchant-mode { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);','#npc-dialogue.merchant-mode { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr);');
+    return replace(page,'shop.js','if (!precious.length)','if (true)');
+  },
+  async test({player,check,sleep,width,height,out}) {
+    const page=await player('MerchantFrame',{characterClass:'warrior'});
+    await page.evaluate(()=>{window.shopPackets=[];const receive=Shop.onPacket;Shop.onPacket=p=>{shopPackets.push(p);receive(p);};});
+    await debug(page,{op:'set_level',level:99}); await debug(page,{op:'set_gold',gold:1000000}); await debug(page,{op:'set_rebirth',tiers:[0,1,0,0,0]});
+    const ids={gray:'warrior_headgear_crimson_l5_gray',green:'warrior_armor_azure',blue:'headgear_upgrade',purple:'warrior_weapon_royal_l10_purple',orange:'orange_03'};
+    const quest=await page.evaluate(()=>WORLD_ITEMS.find(i=>i.kind==='material'&&i.sell===0).id);
+    for(const [item,quantity] of [[ids.gray,2],[ids.green,1],[ids.blue,1],[ids.purple,1],[ids.orange,1],[quest,1],['slime_gel',7],['necklace_upgrade',1]])await debug(page,{op:'give_item',item,quantity,force:true});
+    await page.waitForFunction(id=>Inventory.quantity(id)===2,ids.gray);
+    await page.evaluate(id=>Online.send({type:'equip',slots:{headgear:id,necklace:'necklace_upgrade'}}),ids.gray);
+    await page.waitForFunction(id=>Field.hero.equipment.headgear===id,ids.gray);
+    console.log('merchant: items equipped');
+    await debug(page,{op:'die'}); await page.waitForFunction(()=>Field.hero.dead);
+    await debug(page,{op:'set_hp',hp:1e9}); await page.waitForFunction(()=>!Field.hero.dead);
+    async function visit(id) {
+      const n=await page.evaluate(id=>WORLD_MAP.npcs.find(n=>n.id===id),id);
+      await debug(page,{op:'teleport',zone:0,x:n.x,y:n.y+1});
+      await page.waitForFunction(n=>Math.hypot(Field.hero.nx-n.x,Field.hero.ny-n.y-1)<.5,n);
+      await sleep(600); console.log('merchant: visiting '+id);
+      await page.evaluate(id=>Field.visitNpc(id),id);
+      await page.waitForFunction(()=>Shop.open&&document.querySelector('.merchant-workspace[aria-busy="false"]'));
     }
-    await page.locator('#npc-x').click();
-    await page.evaluate(() => Online.send({ type: 'interact', npc: 'smith' })); await page.locator('[data-view="sell"]').click();
-    await page.locator('[data-tab="back"]').click();
-    await page.waitForFunction(() => document.querySelectorAll('#sell-buyback .sell-item').length === 2);
-    check(true, 'buy-back survives closing merchant window');
-    if (lang === 'en') {
-      await page.locator('[data-tab="sell"]').click();
-      await debug({ op: 'give_item', item: common.id, quantity: 80, force: true });
-      await page.waitForFunction(id => document.querySelectorAll(`#sell-pick [data-item="${id}"]`).length > 80 && !document.querySelector('.sell-workspace[aria-busy="true"]'), common.id);
-      await page.locator('#sell-junk').click();
-      const count = await page.locator('#sell-basket .sell-item').count();
-      check(count > 80, 'large basket includes individually addressed gear copies');
-      await page.locator('#sell-confirm').click();
-      await page.waitForFunction(id => Inventory.quantity(id) === 1 && !document.querySelector('.sell-workspace[aria-busy="true"]'), common.id);
-      check(await page.evaluate(() => Online.connected), 'large batch fits one WebSocket message');
-      await page.locator('[data-tab="back"]').click();
-      check(await page.locator('#sell-buyback .sell-item').count() === 12, 'buy-back retains only last twelve entries after a large sale');
+    console.log('merchant: setup complete');
+    await visit('smith');
+    console.log('merchant: frame opened');
+    async function geometry(label) {
+      const boxes=await page.evaluate(()=>['#stage','#npc-dialogue > .gossip-window','#merchant-bags .bag-window'].map(s=>{const r=document.querySelector(s).getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height};}));
+      const [stage,left,right]=boxes;
+      check(left.width>100&&right.width>100&&left.right<=right.x&&[left,right].every(r=>r.x>=stage.x-1&&r.y>=stage.y-1&&r.right<=stage.right+1&&r.bottom<=stage.bottom+1),`${label}: merchant left and bags right fit: ${JSON.stringify(boxes)}`);
     }
-    await page.screenshot({ path: path.join(world.runDir, `shop-${lang}.png`) });
-    check(errors.length === 0, `${lang}: no browser errors: ${errors.join('; ')}`);
-    await page.close();
+    await geometry('default scale');
+    const smallTargets=await page.locator('.merchant-workspace button, #merchant-bags button, #merchant-bags input, #npc-dialogue .gossip-titlebar button, #npc-dialogue .gossip-footer button').evaluateAll(nodes=>nodes.filter(n=>n.getClientRects().length).map(n=>({label:n.textContent||n.getAttribute('aria-label'),r:n.getBoundingClientRect()})).filter(({r})=>r.width<43.9||r.height<43.9).map(({label,r})=>({label,w:r.width,h:r.height})));
+    check(!smallTargets.length,`merchant controls meet 44px floors: ${JSON.stringify(smallTargets)}`);
+    await page.locator('#inventory-list [data-item="slime_gel"] .item-tile').hover();
+    await page.locator('#item-tooltip').waitFor({state:'visible'});
+    check(await page.locator('#item-tooltip').textContent().then(t=>t.includes('Sell for 23 gold')),'bag tooltip quotes the exact rebirth-adjusted stack price');
+    check(await page.locator('#merchant-portrait').isVisible(),'circular NPC portrait accompanies the name');
+    check(await page.locator('#merchant-stock > *').count()===10,'stock uses ten rectangular slots');
+    check(await page.locator('.merchant-grid').evaluate(n=>getComputedStyle(n).gridTemplateColumns.split(' ').length)===2,'stock has two columns');
+    check(await page.evaluate(()=>shopPackets.at(-1).available.filter(r=>r.item==='warrior_headgear_crimson_l5_gray').length)===1,'server excludes the equipped copy');
+    check(await page.evaluate(id=>!shopPackets.at(-1).available.some(r=>r.item===id),quest),'quest item is protected');
+    const quote=await page.evaluate(()=>shopPackets.at(-1));
+    const junk=quote.available.filter(r=>['common','uncommon'].includes(r.rarity)&&(r.gear||r.item==='slime_gel'));
+    const total=junk.reduce((sum,r)=>sum+Math.floor((r.base*r.quantity*110+50)/100),0),before=await page.evaluate(()=>Field.hero.gold);
+    await record(page); await page.locator('#sell-junk').tap();
+    await page.waitForFunction(total=>shopPackets.some(p=>p.changed&&p.paid===total),total);
+    await page.waitForFunction(gold=>Field.hero.gold===gold,before+total);
+    check(await page.evaluate(ids=>Inventory.quantity(ids.gray)===1&&Inventory.quantity(ids.green)===0&&Inventory.quantity(ids.blue)===1&&Inventory.quantity(ids.purple)===1&&Inventory.quantity(ids.orange)===1,ids),'junk sells only loose gray/green gear and materials');
+    check(await page.locator('#merchant-last-buyback').getAttribute('data-item')!==null,'last sold item appears in the buyback square');
+    await sleep(650);
+    const tile=id=>page.locator(`#inventory-list [data-item="${id}"] .item-tile`);
+    await tile(ids.orange).tap(); await page.locator('#sell-warning').waitFor({state:'visible',timeout:4000});
+    check(await page.evaluate(()=>document.activeElement.id)==='sell-cancel','orange sale defaults to Cancel');
+    await page.locator('#sell-cancel').tap();
+    check(await page.evaluate(()=>touchSent.filter(p=>p.type==='sell_batch').length)===1,'cancelling valuable sale sends no batch');
+    const purpleCopy=quote.available.find(r=>r.item===ids.purple).gear;
+    await tile(ids.purple).tap(); await page.locator('#sell-warning').waitFor({state:'visible'}); await page.locator('#sell-yes').tap();
+    await page.waitForFunction(id=>Inventory.quantity(id)===0,ids.purple); await sleep(650);
+    await tile(ids.blue).dragTo(page.locator('#npc-inventory'));
+    await page.waitForFunction(id=>Inventory.quantity(id)===0,ids.blue);
+    check(true,'dragging a bag item sells it through the server');
+    await page.locator('.merchant-tabs [data-tab="back"]').tap();
+    await page.locator(`#sell-buyback [data-item="${ids.purple}"]`).waitFor(); await sleep(650);
+    await page.locator(`#sell-buyback [data-item="${ids.purple}"]`).tap();
+    await page.waitForFunction(id=>Inventory.quantity(id)===1,ids.purple);
+    await page.waitForFunction(copy=>Field.hero.gearInstances.some(g=>g.id===copy.id),purpleCopy);
+    check(await page.evaluate(({id,copy})=>JSON.stringify(Field.hero.gearInstances.find(g=>g.item===id))===JSON.stringify(copy),{id:ids.purple,copy:purpleCopy}),'buyback restores the exact gear copy');
+    await page.locator('[data-action="repair-one"]').tap();
+    await page.locator('.repair-row [data-action="repair"]').first().tap();
+    await page.waitForFunction(()=>document.querySelectorAll('.repair-row').length===1);
+    await page.locator('[data-action="repair-all"]').tap();
+    await page.waitForFunction(()=>document.querySelectorAll('.repair-row').length===0);
+    check(await page.locator('[data-action="repair-all"]').isDisabled(),'repair-one and Repair All use server quotes and clear worn gear');
+    await page.locator('.merchant-tabs [data-tab="merchant"]').tap();
+    await sleep(650); const buy=page.locator('#merchant-stock .merchant-slot').first(),buyId=await buy.getAttribute('data-item'),owned=await page.evaluate(id=>Inventory.quantity(id),buyId);
+    await buy.tap(); await page.waitForFunction(({id,owned})=>Inventory.quantity(id)===owned+1,{id:buyId,owned});
+    check(true,'merchant stock buys the displayed item');
+    for(const scale of [.6,1.5]) {await page.evaluate(scale=>{Prefs.set({uiScale:scale});Settings.applyScale();},scale);await sleep(250);await geometry(`UI scale ${scale}`);}
+    await page.evaluate(()=>{Prefs.set({uiScale:.8});Settings.applyScale();});
+    await page.screenshot({path:`${out}/merchant-${width}x${height}.png`});
+    await page.locator('#bags-close').tap(); await page.locator('#npc-dialogue').waitFor({state:'hidden'});
+    check(await page.locator('#equipment .bag-window').count()===1,'closing restores the original bag window');
+    await visit('merchant');
+    check(await page.locator('#merchant-stock .merchant-slot').count()===10,'first merchant page has ten items');
+    await page.locator('.merchant-pages [aria-label="Next page"]').tap();
+    check(await page.locator('#merchant-stock .merchant-slot').count()>0&&await page.locator('#merchant-stock .merchant-slot').count()<10,'remaining stock appears on the next page');
+    await page.locator('.merchant-tabs [data-tab="back"]').tap();
+    check(await page.locator('#sell-buyback .merchant-slot').count()===0,'buyback remains separate per merchant');
+    await page.locator('#npc-close').tap(); await page.context().close();
+    if(width===844) {
+      const sv=await player('MerchantSvenska',{lang:'sv'}); const n=await sv.evaluate(()=>WORLD_MAP.npcs.find(n=>n.id==='smith'));
+      await debug(sv,{op:'teleport',zone:0,x:n.x,y:n.y+1});await sv.waitForFunction(n=>Math.hypot(Field.hero.nx-n.x,Field.hero.ny-n.y-1)<.5,n);await sv.evaluate(()=>Field.visitNpc('smith'));
+      await sv.locator('.merchant-tabs [data-tab="merchant"]').waitFor();
+      check(await sv.locator('.merchant-tabs [data-tab="merchant"]').textContent()==='Handlare'&&await sv.locator('.merchant-tabs [data-tab="back"]').textContent()==='Återköp','merchant tabs have Swedish labels');await sv.context().close();
+    }
   }
-  console.log(`${checks} merchant selling UI checks passed. Artifact: ${world.runDir}`);
-})().catch(async error => { if (activePage && !activePage.isClosed()) { await activePage.screenshot({path: path.join(world.runDir, 'failure.png')}); console.error('Checks completed:', checks); console.error('Client state:', await activePage.evaluate(() => ({connected: Online.connected, overlay: document.querySelector('#connection-text').textContent, npc: City.open, picks: document.querySelectorAll('#sell-pick .sell-item').length, pending: document.querySelector('.sell-workspace')?.getAttribute('aria-busy'), packets: shopPackets.map(p=>({ok:p.ok,notice:p.notice,available:p.available?.length}))}))); } console.error(error.message); process.exitCode = 1; }).finally(async () => { await browser?.close(); await world.stop(); });
+};
+module.exports=suite;
+if(require.main===module)run([suite]).catch(e=>{console.error(e);process.exitCode=1;});

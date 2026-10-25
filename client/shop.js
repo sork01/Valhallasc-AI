@@ -1,5 +1,5 @@
 'use strict';
-// Merchant basket. Ownership, prices, payment and buy-back are server decisions.
+// Merchant frame and bag sales. Ownership, prices, payment and buy-back are server decisions.
 (() => {
   const $ = id => document.getElementById(id);
   const make = (tag, text = '', cls) => { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; };
@@ -7,18 +7,23 @@
   const key = row => `${row.item}:${row.copy || 0}`;
   const price = row => Math.min(4294967295, Math.floor((row.base * row.quantity * (100 + (data?.goldPercent || 0)) + 50) / 100));
   const rarity = row => row.rarity || row.gear?.[0]?.rarity || Inventory.definition(row.item)?.rarity;
-  let npc = null, container = null, data = null, basket = new Map(), filter = 'all', tab = 'sell', pending = false, timer = 0, snapshotKey = '', warning = null, zone = null;
+  let npc = null, container = null, data = null, basket = new Map(), tab = 'merchant', page = 0, packet = null, pending = false, pendingKind = '', timer = 0, snapshotKey = '', warning = null, zone = null;
+  const bag = document.querySelector('.bag-window'), bagHome = bag.parentElement, bagNext = bag.nextSibling;
+  const dock = make('div'); dock.id = 'merchant-bags'; dock.hidden = true; $('npc-dialogue').append(dock);
+  const portrait = document.createElement('canvas'); portrait.id = 'merchant-portrait'; portrait.width = portrait.height = 128; portrait.hidden = true; $('npc-name').before(portrait);
   function settle() { clearTimeout(timer); pending = false; }
   function send(message) {
     if (pending || !npc || !Online.send({ ...message, npc: npc.id })) return false;
-    pending = true;
-    timer = setTimeout(() => { settle(); if (container) { data = null; draw(); request(); } }, 4000);
+    pending = true; pendingKind = message.type;
+    timer = setTimeout(() => { settle(); if (container) { data = null; draw(); if(npc.buys)request(); else {data={available:[],buyBack:[],gold:packet.gold};draw();} } }, 4000);
     return true;
   }
   function request() { send({ type: 'shop_open' }); }
   function closeWarning() { if (warning) { warning.close(); warning.remove(); warning = null; } }
   function close() {
-    closeWarning(); settle(); npc = null; container = null; data = null; basket.clear(); snapshotKey = '';
+    closeWarning(); settle(); npc = null; container = null; data = null; packet = null; basket.clear(); snapshotKey = '';
+    $('npc-dialogue').classList.remove('merchant-mode'); portrait.hidden = true; $('npc-dialogue').querySelector('.merchant-tabs')?.remove();
+    if (bag.parentElement === dock) { Settings.unregisterWindow('merchant-bags'); bagHome.insertBefore(bag, bagNext); } dock.hidden = true;
   }
   function reconcile() {
     const available = new Map((data?.available || []).map(row => [key(row), row]));
@@ -27,18 +32,6 @@
       if (!next) basket.delete(id);
       else basket.set(id, { ...next, quantity: Math.min(row.quantity, next.quantity) });
     }
-  }
-  function itemRow(row, action, actionLabel, sold = false) {
-    const i = Inventory.definition(row.item), n = make('article', '', 'sell-item');
-    n.dataset.item = row.item; n.dataset.copy = String(row.copy || row.gear?.[0]?.id || ''); n.dataset.rarity = rarity(row);
-    const icon = make('span', '', 'sell-icon'); icon.innerHTML = Inventory.icon(i);
-    const details = make('div'), name = make('b', `${i?.name || row.item} ×${row.quantity}`, 'sell-name');
-    details.append(name);
-    const copy = sold ? row.gear?.[0] : row.gear;
-    if (copy) details.append(make('small', `Copy #${copy.id} · ${Inventory.rarityName(copy)} · rank ${copy.rank} · ${Inventory.durabilityOf(copy)}% durability`));
-    details.append(make('small', `${sold ? row.paid : price(row)} gold`));
-    Inventory.attachTooltip(icon, () => i);
-    const b = button(actionLabel, action); b.disabled = pending; n.append(icon, details, b); return n;
   }
   function submit() {
     closeWarning();
@@ -53,83 +46,102 @@
     warning = make('dialog', '', 'sell-warning panel'); warning.id = 'sell-warning';
     warning.setAttribute('aria-labelledby', 'sell-warning-title');
     const title = make('h3', 'Sell valuable items?'); title.id = 'sell-warning-title'; warning.append(title);
-    warning.append(make('p', 'These purple or orange items are in your basket:'));
+    warning.append(make('p', 'Really sell these purple or orange items?'));
     const list = make('ul');
     for (const row of precious) {
       const n = make('li', Inventory.definition(row.item)?.name || row.item); n.dataset.rarity = row.rarity; list.append(n);
     }
-    const yes = button('Yes, sell', submit), cancel = button('Cancel', () => { closeWarning(); $('sell-confirm')?.focus(); });
+    const yes = button('Yes, sell', submit), cancel = button('Cancel', () => { closeWarning(); $('sell-junk')?.focus(); });
     yes.id = 'sell-yes'; cancel.id = 'sell-cancel';
     warning.append(list, make('p', `You receive: ${[...basket.values()].reduce((sum, row) => sum + price(row), 0)} gold`), cancel, yes);
-    warning.addEventListener('cancel', event => { event.preventDefault(); closeWarning(); $('sell-confirm')?.focus(); });
+    warning.addEventListener('cancel', event => { event.preventDefault(); closeWarning(); $('sell-junk')?.focus(); });
     warning.addEventListener('keydown', event => event.stopPropagation());
     $('stage').append(warning); warning.showModal();
     window.Settings?.registerWindow('sell-warning', null, 'Sell valuable items?', false);
     (precious.some(row => row.rarity === 'legendary') ? cancel : yes).focus();
   }
+  function stock() {
+    return (npc?.offers || []).filter(o => o.item || o.bag).map(offer => {
+      let item = Inventory.definition(offer.item || offer.bag);
+      if (offer.tiered && item?.family) item = WORLD_ITEMS.filter(i => i.family === item.family && (i.requiredLevel || 1) <= (packet?.level || 1)).sort((a,b) => b.requiredLevel-a.requiredLevel)[0] || item;
+      return {offer,item,cost:offer.tiered ? item?.price : offer.cost};
+    }).filter(({item}) => item && (item.kind !== 'weapon' || !item.class || item.class === Field.hero.look.class));
+  }
+  function utility(label, glyph, action) {
+    const b = button('', action); b.className = 'merchant-tool'; b.setAttribute('aria-label', label); b.title = label;
+    b.innerHTML = glyph; const text = make('span',label,'sr-only'); b.append(text); return b;
+  }
+  const anvil = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 13h34v8l-12 6v7h9v6H10v-6h9v-7L7 22z" fill="#b3b4ad" stroke="#493e29" stroke-width="2"/></svg>';
+  const pouch = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="m15 5 9 4 9-4-4 12c20 18 14 27-5 27S-1 35 19 17z" fill="#bb8b34" stroke="#543c1d" stroke-width="2"/><circle cx="24" cy="29" r="7" fill="#f6d45f"/></svg>';
   function draw() {
     if (!container || !npc) return;
-    if (warning) closeWarning();
-    container.replaceChildren(); container.className = 'sell-workspace'; container.setAttribute('aria-busy', String(pending));
-    const tabs = make('div', '', 'sell-tabs');
-    for (const [id, label] of [['sell', 'Sell'], ['back', 'Buy-back']]) {
-      const b = button(label, () => { tab = id; draw(); }); b.dataset.tab = id; b.setAttribute('aria-pressed', String(tab === id)); tabs.append(b);
-    }
-    container.append(tabs, make('p', data?.notice || '', 'sell-notice'));
-    if (!data) { container.append(make('p', 'Loading merchant…')); return; }
-    if (tab === 'back') {
-      container.append(make('p', 'Last 12 items at this merchant. Buy-back is cleared when you leave the game.'));
-      const list = make('div', '', 'sell-list'); list.id = 'sell-buyback';
-      for (const row of [...data.buyBack].reverse()) list.append(itemRow(row, () => { if (send({ type: 'buy_back', id: row.id })) draw(); }, 'Buy back', true));
-      if (!list.childElementCount) list.append(make('p', 'No items to buy back.'));
-      container.append(list); return;
-    }
-    const filters = make('div', '', 'sell-filters');
-    for (const [id, label] of [['all', 'All'], ['common', 'Common'], ['uncommon', 'Uncommon'], ['rare', 'Rare'], ['epic', 'Epic'], ['legendary', 'Legendary']]) {
-      const b = button(label, () => { filter = id; draw(); }); b.dataset.filter = id; b.setAttribute('aria-pressed', String(filter === id)); filters.append(b);
-    }
-    const junk = button('Sell all junk', () => {
-      for (const row of data.available) {
-        const i = Inventory.definition(row.item);
-        if (['common', 'uncommon'].includes(row.rarity) && (row.gear || i?.kind === 'material')) basket.set(key(row), { ...row });
+    closeWarning(); $('npc-dialogue').querySelector('.merchant-tabs')?.remove(); container.replaceChildren(); container.className = 'merchant-workspace'; container.setAttribute('aria-busy', String(pending));
+    const notice = make('p', data?.notice || '', 'sell-notice'); container.append(notice);
+    if (tab === 'repair') {
+      const repair = make('div','','merchant-catalog'); GearServices.render('repair', npc, packet, repair); container.append(repair);
+    } else {
+      const grid = make('div','','merchant-grid'); grid.id = tab === 'back' ? 'sell-buyback' : 'merchant-stock';
+      const rows = tab === 'back' ? [...(data?.buyBack || [])].reverse().map(row => ({row,item:Inventory.definition(row.item),cost:row.paid})) : stock();
+      const pages = Math.max(1, Math.ceil(rows.length/10)); page = Math.min(page,pages-1);
+      for (const entry of rows.slice(page*10,page*10+10)) {
+        const {item, cost, row, offer} = entry;
+        const b = button('', () => { if (send(row ? {type:'buy_back',id:row.id} : {type:'interact',offer:offer.id})) draw(); });
+        b.className = 'merchant-slot'; b.dataset.item = item.id; b.dataset.rarity = row ? rarity(row) : item.rarity;
+        if (offer) b.dataset.offer = offer.id;
+        const glyph = make('span','','merchant-item-icon'); glyph.innerHTML = Inventory.icon(item);
+        const detail = make('span','','merchant-item-detail'); detail.append(make('b',item.name),make('small',`${cost} gold${row?.quantity > 1 ? ` ×${row.quantity}` : ''}`));
+        b.append(glyph, detail); b.disabled = pending || (data?.gold ?? packet.gold) < cost || (!row && (packet.level || 1) < (item.requiredLevel || 1));
+        Inventory.attachTooltip(b, () => item, undefined, row ? () => ({copies:row.gear || [],count:row.quantity,in:'Buyback',hint:`${row.paid} gold`}) : undefined);
+        grid.append(b);
       }
-      draw();
-    }); junk.id = 'sell-junk'; junk.disabled = pending;
-    container.append(filters, junk, make('p', 'Equipped copies are kept.'));
-    const columns = make('div', '', 'sell-columns'), pick = make('section'), give = make('section');
-    pick.append(make('h4', 'Your bags')); give.append(make('h4', 'You give'));
-    const choices = make('div', '', 'sell-list'); choices.id = 'sell-pick';
-    for (const row of data.available) {
-      if (filter !== 'all' && row.rarity !== filter) continue;
-      const remaining = row.quantity - (basket.get(key(row))?.quantity || 0); if (!remaining) continue;
-      const shown = { ...row, quantity: remaining };
-      const n = itemRow(shown, () => {
-        const quantity = row.copy ? 1 : Number(n.querySelector('input').value);
-        if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > remaining) return;
-        basket.set(key(row), { ...row, quantity: quantity + (basket.get(key(row))?.quantity || 0) }); draw();
-      }, 'Add');
-      if (!row.copy) {
-        const input = make('input'); input.type = 'number'; input.min = '1'; input.max = String(remaining); input.value = '1';
-        input.setAttribute('aria-label', 'Quantity'); input.disabled = pending; n.insertBefore(input, n.lastChild);
-      }
-      choices.append(n);
+      while (grid.childElementCount < 10) grid.append(make('div','','merchant-empty'));
+      const nav = make('div','','merchant-pages');
+      const prev = button('←',()=>{page--;draw();}),next=button('→',()=>{page++;draw();});
+      prev.setAttribute('aria-label','Previous page'); next.setAttribute('aria-label','Next page'); prev.disabled=page===0; next.disabled=page>=pages-1;
+      nav.append(prev,make('span',`${page+1} / ${pages}`),next); const catalog=make('div','','merchant-catalog');catalog.append(grid,nav);container.append(catalog);
     }
-    if (!choices.childElementCount) choices.append(make('p', 'No items to show.'));
-    const offered = make('div', '', 'sell-list'); offered.id = 'sell-basket';
-    for (const [id, row] of basket) offered.append(itemRow(row, () => { basket.delete(id); draw(); }, 'Remove'));
-    if (!basket.size) offered.append(make('p', 'Add items to review your sale.'));
-    pick.append(choices); give.append(offered); columns.append(pick, give); container.append(columns);
-    const total = make('strong', `You receive: ${[...basket.values()].reduce((sum, row) => sum + price(row), 0)} gold`, 'sell-total');
-    total.id = 'sell-total'; total.setAttribute('aria-live', 'polite');
-    const confirmButton = button('Confirm sale', confirm); confirmButton.id = 'sell-confirm'; confirmButton.disabled = pending || !basket.size || basket.size > 256;
-    container.append(total, confirmButton);
+    const tools = make('div','','merchant-tools');
+    if ((npc.offers || []).some(o=>o.id==='repair') && packet.repairQuote) {
+      const repair = utility('Repair one piece',anvil,()=>{tab='repair';draw();}); repair.dataset.action='repair-one';
+      const all = utility('Repair All Items',anvil,()=>{if(send({type:'interact',offer:'repair_all'}))draw();}); all.dataset.action='repair-all';
+      const total=packet.repairQuote.reduce((sum,[,cost])=>sum+cost,0); all.title=`Repair All Items · ${total} gold`; all.disabled=pending||!total||packet.gold<total; tools.append(repair,all);
+    }
+    const junk = utility('Sell all junk',pouch,()=>{
+      basket.clear(); for(const row of data?.available || []) {const i=Inventory.definition(row.item); if(['common','uncommon'].includes(row.rarity)&&(row.gear||i?.kind==='material'))basket.set(key(row),{...row});} confirm();
+    }); junk.id='sell-junk'; junk.disabled=pending||!data?.available?.some(row=>['common','uncommon'].includes(row.rarity)&&(row.gear||Inventory.definition(row.item)?.kind==='material')); tools.append(junk);
+    const last=(data?.buyBack || []).at(-1), back=utility('Buyback',last?Inventory.icon(Inventory.definition(last.item)):'',()=>{tab='back';page=0;draw();});
+    back.id='merchant-last-buyback'; if(last) {back.dataset.item=last.item;Inventory.attachTooltip(back,()=>Inventory.definition(last.item));} tools.append(back);container.append(tools);
+    const tabs=make('div','','merchant-tabs');
+    for(const [id,label] of [['merchant','Merchant'],['back','Buyback']]){const b=button(label,()=>{tab=id;page=0;draw();});b.dataset.tab=id;b.setAttribute('aria-pressed',String(tab===id));tabs.append(b);}$('npc-dialogue').querySelector('.gossip-footer').append(tabs);
+    Inventory.render($('inventory-list'));
   }
+  function selectItem(id) {
+    if (pending || !data) return;
+    const row = data.available.find(row=>row.item===id);
+    if (!row) { data.notice='This item cannot be sold.'; draw(); return; }
+    basket.clear(); basket.set(key(row),{...row}); confirm();
+  }
+  function mount() {
+    $('npc-dialogue').classList.add('merchant-mode'); dock.hidden=false; dock.append(bag);
+    Settings.registerWindow('merchant-bags','.bag-window','Merchant bags',true);
+    portrait.hidden=false; const g=portrait.getContext('2d');g.clearRect(0,0,128,128);g.save();g.beginPath();g.arc(64,64,62,0,Math.PI*2);g.clip();g.fillStyle='#263546';g.fillRect(0,0,128,128);City.drawNpc(g,npc,64,City.nameplateTop(npc)+24,0,false,true);g.restore();
+    Settings.applyScale();
+  }
+  for (const type of ['click','contextmenu','dblclick']) $('inventory-list').addEventListener(type,event=>{
+    if(!npc)return; const tile=event.target.closest('.item-tile'); if(!tile)return;
+    event.preventDefault();event.stopImmediatePropagation(); if(type!=='dblclick')selectItem(tile.closest('[data-item]').dataset.item);
+  },true);
+  $('npc-inventory').addEventListener('dragover',event=>{if(npc&&event.dataTransfer.types.includes('application/x-valhallasc-item'))event.preventDefault();});
+  $('npc-inventory').addEventListener('drop',event=>{if(!npc)return;event.preventDefault();try{const item=JSON.parse(event.dataTransfer.getData('application/x-valhallasc-item'));if(item.from==='bag')selectItem(item.item);}catch(_){}});
+  $('bags-close').addEventListener('click',event=>{if(npc){event.stopImmediatePropagation();City.close();}},true);
   window.Shop = {
-    render(merchant, target) {
+    render(merchant, target, dialogue) {
       const opening = npc?.id !== merchant.id || container !== target;
-      if (opening) { close(); npc = merchant; zone = Field.zone || 0; container = target; filter = 'all'; tab = 'sell'; draw(); request(); }
-      else draw();
+      if (opening) { close(); npc=merchant; zone=Field.zone||0; container=target; tab='merchant'; page=0; packet=dialogue; mount(); draw(); if(npc.buys)request(); else {data={available:[],buyBack:[],gold:packet.gold};draw();} }
+      else { const answered=packet!==dialogue&&pendingKind==='interact'; packet=dialogue; if(answered){settle();if(npc.buys)request();else data={available:[],buyBack:[],gold:packet.gold};} draw(); }
     }, close,
+    bagTooltip(id) { const row=data?.available?.find(row=>row.item===id); return npc&&row?{copies:row.gear?[row.gear]:[],count:row.quantity,in:Locale.translate('Your bags'),hint:Locale.translate(`Sell for ${price(row)} gold`)}:undefined; },
+    get open() { return !!npc; },
     onPacket(packet) {
       if (!npc || packet.npc !== npc.id) return;
       settle(); closeWarning();
@@ -145,7 +157,7 @@
       const merchant = City.npcs.find(n => n.id === npc.id);
       if (!c || c.dead || c.sparkTravel || (c.zone || 0) !== zone || !merchant || Math.hypot(c.x - merchant.x, c.y - merchant.y) > 3.2) { close(); City.close(); return; }
       const nextKey = JSON.stringify([c.inventory, c.gearInstances, c.equipment, c.gold, c.rebirthTiers]);
-      if (nextKey !== snapshotKey && !pending && !warning) { snapshotKey = nextKey; request(); }
+      if (npc.buys && nextKey !== snapshotKey && !pending && !warning) { snapshotKey = nextKey; request(); }
     },
   };
 })();

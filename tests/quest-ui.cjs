@@ -65,9 +65,8 @@ async function call(name, args = {}) {
   await welcomeRow.click();
   await page.screenshot({ path: path.join(world.artifacts, 'npc-quest-detail.png') });
   await page.locator('#npc-quests [data-quest="welcome"] [data-action="accept"]').click();
-  await page.waitForFunction(() => document.getElementById('npc-notice').textContent.includes('Quest accepted'));
-  check(await page.locator('#npc-quests .gossip-row[data-quest="welcome"]').getAttribute('data-status') === 'active', 'The accepted quest stays listed as in progress');
-  await page.locator('#npc-close').click();
+  await page.locator('#npc-dialogue').waitFor({state:'hidden'});
+  check(await page.locator('#npc-dialogue').isHidden(), 'Accept closes the conversation after confirmation');
   await page.waitForFunction(() => document.getElementById('quest-tracker').textContent.includes('Speak to Sister Elara: 0/1'));
   check(await page.locator('.tracker-quest[data-quest="welcome"] .tracker-objective').count() === 3, 'Tracker gives each objective its own indented line');
   await page.keyboard.press('q');
@@ -101,7 +100,9 @@ async function call(name, args = {}) {
   await fixture.addStyleTag({ path: path.join(root, 'client/online.css') });
   await fixture.addScriptTag({ path: path.join(root, 'client/world.js') });
   await fixture.addScriptTag({ path: path.join(root, 'client/items.js') });
-  await fixture.evaluate(() => { window.Online = { connected: true }; window.Field = { hero: { dead: false }, setPaused: () => {} }; window.City = { open: false }; });
+  await fixture.evaluate(() => { window.Online = { connected: true }; window.Field = { hero: { dead: false, look: { class: 'warrior' } }, setPaused: () => {} }; window.City = { open: false }; });
+  await fixture.addScriptTag({ path: path.join(root, 'client/inventory.js') });
+  await fixture.evaluate(() => Inventory.update([], {class:'warrior'}));
   await fixture.addScriptTag({ path: path.join(root, 'client/quests.js') });
   await fixture.evaluate(() => Quests.update([{ id: 'welcome', counts: [1, 0, 0], claimed: false, completions: 0 }, { id: 'slime_patrol', counts: [2], claimed: false, completions: 0 }, { id: 'meadow_bounty', counts: [8], claimed: false, completions: 0 }]));
   check(await fixture.locator('.tracker-quest').count() === 3, 'Tracker displays all active quests together');

@@ -351,7 +351,7 @@
       line(g,[[27,-28],[27,-126]],'#7e7287',3);ellipse(g,27,-129,8,10,'#ffe6a0','#947297',2);
     }
   }
-  function drawNpc(g,n,sx,sy,t,near) {
+  function drawNpc(g,n,sx,sy,t,near,portrait=false) {
     g.save();g.translate(sx,sy);const L=n.look,sc=L?.scale||1,moving=!!n.moving;
     if(n.travelStop)window.Spark?.draw(g,n,t,true);
     const bob=L&&moving?Math.abs(Math.sin(t*9+n.x*3))*2.4:Math.sin(t*2+n.x)*1.2;
@@ -414,6 +414,7 @@
     if(n.id==='baker'){ellipse(g,-9,-103,10,9,'#f6ecd2');ellipse(g,8,-103,12,10,'#f6ecd2');g.fillStyle='#f6ecd2';g.fillRect(-17,-103,34,12);}
     }
     g.restore();
+    if(portrait){g.restore();return;}
     // Everyone with work or wares always shows a nameplate; a passer-by in the city shows one only when you are close.
     const hero=window.Field?.hero,close=!hero||Math.hypot(hero.x-n.x,hero.y-n.y)<9;
     if(n.key||close||near){
@@ -429,7 +430,7 @@
     for(const radius of [city.radius,city.radius-.2,2.3]) {g.beginPath();g.ellipse(x,y,radius*62.225,radius*31.112,0,0,Math.PI*2);g.strokeStyle='#eee2c5';g.lineWidth=radius===2.3?3:6;g.stroke();}
     for(let i=0;i<4;i++){const a=i*Math.PI/2;poly(g,[[x+Math.cos(a)*167,y+Math.sin(a)*83],[x+Math.cos(a+.13)*123,y+Math.sin(a+.13)*61],[x+Math.cos(a)*102,y+Math.sin(a)*51],[x+Math.cos(a-.13)*123,y+Math.sin(a-.13)*61]],'#b0a794',null);}
   }
-  let current=null,previousFocus=null,view={kind:'gossip'},lastPacket=null;
+  let current=null,previousFocus=null,view={kind:'gossip'},lastPacket=null,pendingAccept=null,acceptTimer=0;
   const $=id=>document.getElementById(id);
   const node=(tag,text,cls)=>{const n=document.createElement(tag);n.textContent=text;if(cls)n.className=cls;return n;};
   // Fixed markup, never player text: small glyphs for the kinds of service an NPC offers.
@@ -454,7 +455,8 @@
     $('npc-text').textContent=npc.dialogue;$('npc-text').hidden=!gossip;$('npc-role').hidden=!gossip;
     $('npc-notice').textContent=packet.notice;
     $('npc-gold').textContent=`Your purse: ${packet.gold} gold`;
-    $('npc-back').hidden=!['sell','merge','refine','repair','bags','stat_reset'].includes(view.kind);
+    $('npc-back').hidden=!['merchant','sell','merge','refine','repair','bags','stat_reset'].includes(view.kind);
+    $('npc-back').textContent=view.kind==='merchant'?'Quests / services':'Back';
     // Quests come first, then whatever the NPC sells or does.
     if(view.kind==='quest'){
       const quest=window.Quests.offered(npc.id).find(q=>q.id===view.id);
@@ -462,7 +464,7 @@
       else {view={kind:'gossip'};}
     }
     if(view.kind==='gossip')window.Quests?.npc(npc.id,$('npc-quests'),q=>show({kind:'quest',id:q.id},'[data-action="decline"]'));
-    else if(['sell','merge','refine','repair','bags','stat_reset'].includes(view.kind))$('npc-quests').replaceChildren();
+    else if(['merchant','sell','merge','refine','repair','bags','stat_reset'].includes(view.kind))$('npc-quests').replaceChildren();
     const offers=[];
     if(view.kind==='gossip'){
       for(const destination of packet.travel||[]){
@@ -473,7 +475,7 @@
         b.append(detail);b.title=destination.stops.join(' → ');
         b.addEventListener('click',()=>{if(Online.send({type:'interact',npc:npc.id,offer:`spark:${destination.id}`}))b.disabled=true;});offers.push(b);
       }
-      if(npc.buys){const b=row('vendor','Sell');b.dataset.view='sell';b.addEventListener('click',()=>show({kind:'sell'},'#sell-confirm'));offers.push(b);}
+      if(npc.buys){const b=row('vendor','Sell');b.dataset.view='sell';b.addEventListener('click',()=>show({kind:'merchant'},'#npc-close'));offers.push(b);}
       if(npc.offers.some(offer=>offer.bag)){
         const bagOffers=npc.offers.filter(offer=>offer.bag).map(offer=>WORLD_ITEMS.find(i=>i.id===offer.bag)).filter(Boolean).sort((a,b)=>a.requiredLevel-b.requiredLevel);
         const next=bagOffers.find(i=>i.requiredLevel>(packet.level||1));
@@ -552,14 +554,25 @@
     }
     $('npc-offers').replaceChildren(...offers);
     $('npc-inventory').replaceChildren();
-    if(view.kind==='sell')window.Shop?.render(npc,$('npc-inventory'));
+    if(view.kind==='merchant'||view.kind==='sell')window.Shop?.render(npc,$('npc-inventory'),packet);
     else { window.Shop?.close(); $('npc-inventory').className=''; }
     if(view.kind==='merge'||view.kind==='refine'||view.kind==='repair')window.GearServices?.render(view.kind,npc,packet,$('npc-inventory'));
     const target=focus&&$('npc-dialogue').querySelector(focus);
     (target&&!target.hidden?target:$('npc-close')).focus({preventScroll:true});
   }
+  function acceptQuest(quest, button) {
+    if (pendingAccept || current?.id !== quest.npc) return false;
+    if (!Online.send({type:'interact',npc:quest.npc,offer:`quest:accept:${quest.id}`})) return false;
+    pendingAccept=quest.id; button.disabled=true;
+    acceptTimer=setTimeout(()=>{pendingAccept=null;button.disabled=false;},4000); return true;
+  }
   function dialogue(packet) {
     if(!Online.connected || Field.hero.dead)return;
+    const accepting=current?.id===packet.npc.id && pendingAccept;
+    if(accepting){clearTimeout(acceptTimer);pendingAccept=null;}
+    if(accepting && packet.quests?.some(q=>q.id===accepting&&!q.claimed)){
+      window.Quests?.update(packet.quests); close(); return;
+    }
     window.Inventory?.hideTooltip();
     window.Skillbar?.close(false);
     if($('equipment')) $('equipment').hidden=true; if($('pause')) $('pause').hidden=true;
@@ -567,19 +580,21 @@
     const same=current?.id===packet.npc.id;
     previousFocus=current?previousFocus:document.activeElement;current=packet.npc;
     // Selling keeps its list open between sales; every other reply (accepting, a purchase) returns to the greeting.
-    if(!same||!['sell','merge','refine','repair','bags','stat_reset'].includes(view.kind))view={kind:'gossip'};
+    if(accepting)view={kind:'quest',id:accepting};
+    else if(!same)view={kind:packet.npc.buys||packet.npc.offers?.some(o=>o.item||o.bag)?'merchant':'gossip'};
+    else if(!['merchant','sell','merge','refine','repair','bags','stat_reset'].includes(view.kind))view={kind:'gossip'};
     Field.setPaused(true);$('npc-dialogue').hidden=false;
     window.Inventory?.update(packet.inventory || [], packet.look, packet.equipment || {}, packet.bags || [], packet.gearInstances || []);
     window.Quests?.update(packet.quests || []);
     if(packet.statPlayer)window.Attributes?.update(packet.statPlayer);
     lastPacket=packet;render();
   }
-  function close(resume=true) {window.Shop?.close();if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
+  function close(resume=true) {clearTimeout(acceptTimer);pendingAccept=null;window.Inventory?.hideTooltip();window.Shop?.close();if(!current)return;current=null;view={kind:'gossip'};$('npc-dialogue').hidden=true;if(resume){Field.setPaused(false);previousFocus?.focus?.({preventScroll:true});}}
   $('npc-close').addEventListener('click',()=>close());
   $('npc-x').addEventListener('click',()=>close());
   $('npc-back').addEventListener('click',()=>{const previous=view.kind;show({kind:'gossip'},`[data-view="${previous}"]`);});
   $('npc-dialogue').addEventListener('keydown',event=>{
     if(event.key==='Tab') {const buttons=[...$('npc-dialogue').querySelectorAll('button:not(:disabled)')].filter(b=>b.offsetParent);const first=buttons[0],last=buttons.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
   });
-  window.City={nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},dialogue,close,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
+  window.City={nameplateTop:n=>headTop(n)+24,inside,spriteBox,stoneTile,drawObject,animateObject,drawNpc,drawPlaza,update,routePoint,art,kit,get npcs(){return folkOf(Field.zone||0);},dialogue,close,acceptQuest,shopGold(gold) { if(lastPacket) lastPacket.gold=gold; $('npc-gold').textContent=`Your purse: ${gold} gold`; },get open(){return !!current;}};
 })();

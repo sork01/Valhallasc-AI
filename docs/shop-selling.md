@@ -1,17 +1,29 @@
 # Merchant selling
 
-Every NPC with `buys` has a **Sell** gossip row. The conversation's resizable
-window contains a trade-style basket: pick loose bag items and quantities,
-review **You give** and **You receive: N gold**, then confirm once. Rarity chips
-filter the picker. **Sell all junk** adds common/uncommon gear and materials;
-it never adds blue, purple or orange items. Items can be removed before payment.
-Equipped copies, starter/GM gear, quest materials (`material`, `sell: 0`) and
-bound mount licences cannot be sold. Fitted expansion bags are outside inventory.
+Merchants now open a **Merchant** frame on the left and the existing inventory
+bags on the right. Both windows have independent scale/corner-grip entries;
+phone/tablet targets retain their 44 px floors. Stock uses two columns of five
+slots, with ten items per page, bag artwork, names, gold prices and tooltips.
+The header uses the NPC renderer to crop a circular portrait, not new artwork.
+**Quests / services** returns to the NPC's ordinary gossip/services.
 
-Any epic or legendary copy in the basket opens a second dialog naming those
-items in their rarity colors. **Yes, sell** performs the batch; Cancel/Escape
-returns to the basket. If any item is orange, Cancel receives initial focus.
-The popup is dismissed when ownership or the merchant view changes.
+Click a loose bag item or drag it onto the merchant to sell its stack/copy.
+The server's available list selects the exact next loose copy, excluding worn
+copies, starter/GM gear, quest items and bound licences. The bag tooltip shows
+the exact server-quoted proceeds, including rebirth rounding. **Sell all junk**
+sends one batch of common/uncommon gear and materials, preserving blue and up.
+The old You give/You receive basket is replaced by direct sales.
+
+Any epic or legendary sale still opens the confirmation naming those items in
+rarity colors and the exact total. Cancel/Escape preserves ownership; an orange
+item gives Cancel initial focus. Smiths have anvil controls for one-piece repair
+and **Repair All Items**, using existing server quotes. The coin pouch sells
+junk. The single buyback square shows the last sold item and opens **Buyback**;
+the folder tabs switch between stock and the retained last twelve entries.
+
+Closing restores the same bag DOM to its ordinary character/bags workspace.
+Purchases, sales, repairs and buyback remain existing server actions; no Rust,
+world data, database schema, pricing or balance change is part of this release.
 
 ## Protocol and prices
 
@@ -88,3 +100,44 @@ and absence of test flags/warning journal entries pass. Counts remain
 27 characters and 15 guests. No world data, copy IDs or DB schema changed.
 Release proof: `test-results/shop-sell-release.json`; installed executable
 SHA-256: `aab9e6aad01cd8fb3069700855a219c92cc07b12b529f560c4b7bfa949049914`.
+
+## Merchant frame follow-up (Beta 1.18.0)
+
+Owner specification: `TODO.md` `UI-MERCHANT-FRAME`. Focused capped private-client
+suite: `tests/shop-sell-ui.cjs`; mutations restore the missing bag dock or bypass
+valuable confirmation. The touch window audit now targets the merchant frame,
+its adjacent bags, the valuable-sale popup and the repair view. Earlier results
+above describe the retired basket release, not this frame's validation.
+
+Final indexed merchant-frame run: 47 assertions at 844x390 and 1024x768,
+including Swedish tabs, 44 px controls, tooltip quotes, two-window bounds at
+UI scales 60%, 80% and 150%, exact rebirth-adjusted payment, equipped/quest/blue+
+protection, orange Cancel focus, drag selling, exact gear-copy buyback, individual
+and full repair, stock purchases, pagination and merchant isolation. Peak RAM:
+670 MiB inside the unchanged 1536 MiB cap. Native pointer checks caught a
+resize grip covering Goodbye; the footer now reserves space for that grip.
+
+Fixture timing: a shop reply updates Inventory before the next hero snapshot.
+Wait for the returned gear ID in the authoritative snapshot before comparing
+all copy fields. The page buttons use arrow glyphs, not the key-hint token
+opener: that opener can cause the old hint observer to rewrite unchanged text
+in an endless mutation loop. The stalled private audit was stopped in its own
+cgroup; no production process was stopped or restarted.
+
+Proof: `test-results/touch/merchant-index.log`, merchant mutation logs, and
+`merchant-*.png` in the indexed RAID export. Browser checks remain bounded by
+`scripts/test-touch-bounded.sh`. No full suite or balance sweep was run.
+
+The Merchant/Buyback folder tabs occupy the final footer row, below the purse
+and conversation actions. The borrowed bag window registers independently only
+while docked at the merchant; close unregisters its observer/grip and clears
+its own scale before restoring it inside the normal equipment workspace.
+This prevents a nested scale after a merchant visit. The dedicated layout
+check covers both panes, footer/tabs, grip reachability and restored bag scale.
+
+Final footer/restore layout check: 26 additional assertions at both sizes,
+603 MiB peak. Both merchant mutations fail their intended assertions (collapsed
+columns and bypassed valuable confirmation). All eleven public client files
+match the git index; public and bridge health report OK. Hash list:
+`deploy/merchant-assets.txt`; proof `merchant-public.txt` and
+`merchant-layout-index.log` under `test-results/touch/`.

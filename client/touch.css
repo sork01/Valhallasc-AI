@@ -94,6 +94,9 @@ html, body { overscroll-behavior: none; }
   #touch-skill-editor label { min-width: 0; }
   #touch-skill-editor select { width: 100%; }
 
+  .quest-reward-icons .quest-reward-icon { width: var(--touch-target); height: var(--touch-target); min-width: var(--touch-target); min-height: var(--touch-target); }
+  .bag-grid, #inventory-list { grid-template-columns: repeat(4, calc(44px / var(--window-k, .8))); justify-content: center; }
+
   .gossip-titlebar, .rpg-titlebar { min-height: var(--touch-target, 55px); }
   #touch-actions { width: calc(320px / var(--ui, .8)); display: grid; grid-auto-flow: column; grid-auto-columns: minmax(calc(60px / var(--ui, .8)), 1fr); grid-template-columns: none; overflow-x: auto; padding: 2px; }
   #connection-overlay > .connection-panel, #sell-warning { --touch-target: calc(44px / var(--window-k, .8)); max-width: 94cqw; max-height: var(--touch-stage-h, 94dvh); overflow: auto; }
@@ -133,6 +136,10 @@ html, body { overscroll-behavior: none; }
   #worldmap { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
   #stage .pause > .wm-panel { height: calc(var(--touch-stage-h) / var(--window-k)); max-height: calc(var(--touch-stage-h) / var(--window-k)); }
 
+}
+
+@media (pointer: coarse) {
+  #npc-dialogue.merchant-mode > .gossip-window, #merchant-bags .bag-window { width: calc(46cqw / var(--window-k, .8)) !important; height: calc(92cqh / var(--window-k, .8)); max-width: none !important; max-height: none !important; }
 }
 
 @media (pointer: coarse) and (orientation: portrait) {

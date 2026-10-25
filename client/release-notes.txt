@@ -1,5 +1,36 @@
 [
   {
+    "version": "Beta 1.18.0",
+    "date": "2026-10-25",
+    "new": [
+      "Merchants open a stock window on the left and your bags on the right. Browse ten items per page, sell from your bags and use the Buyback tab to recover recent sales."
+    ],
+    "changed": [
+      "Smiths offer repair-one and repair-all controls beside Sell all junk. Purple and orange sales still ask for confirmation."
+    ],
+    "removed": [
+      "Removed the selling basket because bag clicks and dragging now sell directly to the merchant."
+    ]
+  },
+  {
+    "version": "Beta 1.17.5",
+    "date": "2026-10-25",
+    "new": [],
+    "changed": [
+      "Accepting a quest closes the conversation once it has been added to your journal. Refused quests keep their explanation open, and Enter activates the focused quest button."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.17.4",
+    "date": "2026-10-25",
+    "new": [],
+    "changed": [
+      "Quest rewards use bag item icons with full item tooltips. On touch screens, tap a reward to inspect it, then tap a ready choice again to claim it."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.17.3",
     "date": "2026-10-25",
     "new": [],

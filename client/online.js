@@ -241,6 +241,7 @@
   });
   addEventListener('keydown', event => {
     // A button left focused by a mouse click must not swallow Enter (it would re-press the button instead of opening the chat box).
+    if (event.defaultPrevented || event.target?.closest('.pause:not([hidden]), #equipment:not([hidden])')) return;
     if (Keys.is(event, 'chat') && active && connected && !Keys.typing(event)) {
       event.preventDefault(); document.activeElement?.blur?.(); window.Online.focusChat();
     }

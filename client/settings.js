@@ -85,7 +85,7 @@
   }).filter(w => w.el);
   const winScale = {};
   const uiScale = () => window.Prefs.uiScale;
-  const fitScale = w => { const s = stage.getBoundingClientRect(), width = w.el.offsetWidth, height = w.el.offsetHeight; return width && height ? Math.max(WIN_MIN, Math.min(s.width / width, s.height / height) * .98) : Infinity; };
+  const fitScale = w => { const s = stage.getBoundingClientRect(), width = w.el.offsetWidth, height = w.el.offsetHeight; return width && height ? Math.max(WIN_MIN, Math.min(($('npc-dialogue').classList.contains('merchant-mode') && ['npc-dialogue','merchant-bags'].includes(w.id) ? (s.width-24)/2 : s.width) / width, s.height / height) * .98) : Infinity; };
   const windowScale = w => Math.max(WIN_MIN, Math.min(uiScale() * (winScale[w.id] || 1), fitScale(w)));
   function loadWindowScales() {
     for (const id of Object.keys(winScale)) delete winScale[id];
@@ -180,6 +180,13 @@
     if (Number.isFinite(savedScale) && savedScale > 0) winScale[id] = Math.max(.4, Math.min(3, savedScale));
     if (w.resizable && !w.grip) { w.grip = makeGrip(w); gripLayer?.append(w.grip); }
     windowWatch?.observe(el); applyWindow(w);
+  }
+  function unregisterWindow(id) {
+    const index = wins.findIndex(w => w.id === id); if (index < 0) return;
+    const [w] = wins.splice(index, 1); windowWatch?.unobserve(w.el); w.grip?.remove();
+    w.el.style.scale = ''; w.el.style.transformOrigin = '';
+    w.el.style.removeProperty('--window-k'); w.el.style.removeProperty('--touch-stage-h');
+    w.el.classList.remove('touch-resizable-window');
   }
   function resetWindows() { for (const w of wins) { delete winScale[w.id]; applyWindow(w); } storeWindows(); resetPanels(); }
 
@@ -430,7 +437,7 @@
   $('layout-done').addEventListener('click', () => stopEdit());
   $('layout-reset').addEventListener('click', reset);
 
-  window.Settings = { registerWindow, show, close, refresh, startEdit, stopEdit, reset, applyScale, resetWindows, resetPanels, get panelSizes() { return Object.fromEntries(PANELS.map(p => [p.id, p.size])); }, sizeWindow: (id, factor) => { const w = wins.find(x => x.id === id); if (w) sizeWindow(w, factor); }, get windowScales() { return winScale; }, get active() { return !panel.hidden || editing; }, get editing() { return editing; }, get layout() { return layout; } };
+  window.Settings = { registerWindow, unregisterWindow, show, close, refresh, startEdit, stopEdit, reset, applyScale, resetWindows, resetPanels, get panelSizes() { return Object.fromEntries(PANELS.map(p => [p.id, p.size])); }, sizeWindow: (id, factor) => { const w = wins.find(x => x.id === id); if (w) sizeWindow(w, factor); }, get windowScales() { return winScale; }, get active() { return !panel.hidden || editing; }, get editing() { return editing; }, get layout() { return layout; } };
   const suggestion = $('low-gfx-suggestion');
   suggestion.hidden = !matchMedia('(pointer: coarse)').matches || window.Prefs.touchGraphicsSuggested || window.Prefs.lowGraphics;
   for (const [id, accept] of [['low-gfx-accept', true], ['low-gfx-dismiss', false]]) $(id).addEventListener('click', () => {

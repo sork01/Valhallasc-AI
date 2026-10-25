@@ -6977,5 +6977,17 @@
   "Cross": "Kors",
   "Target menu": "Målmeny",
   "Choose touch skills": "Välj pekfärdigheter",
-  "Touch skill ": "Pekfärdighet "
+  "Touch skill ": "Pekfärdighet ",
+  "Buyback": "Återköp",
+  "Merchant": "Handlare",
+  "Merchant bags": "Handlarväskor",
+  "Next page": "Nästa sida",
+  "Previous page": "Föregående sida",
+  "Quest reward": "Uppdragsbelöning",
+  "Quests / services": "Uppdrag / tjänster",
+  "Really sell these purple or orange items?": "Vill du verkligen sälja dessa lila eller orange föremål?",
+  "Repair All Items": "Reparera alla föremål",
+  "Repair one piece": "Reparera ett föremål",
+  "Tap again to claim this reward.": "Tryck igen för att hämta belöningen.",
+  "This item cannot be sold.": "Det här föremålet kan inte säljas."
 }

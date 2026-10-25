@@ -68,12 +68,12 @@ const suite = {
     await debug(page, { op: 'give_item', item: 'warrior_weapon_royal_l10_purple', quantity: 1, force: true });
     await sleep(550); await page.evaluate(() => Online.send({ type: 'interact', npc: 'smith' }));
     await audit('#npc-dialogue .gossip-window', 'npc');
-    await page.locator('#npc-offers [data-view="sell"]').click();
-    await page.locator('#sell-pick [data-item="warrior_weapon_royal_l10_purple"]').waitFor(); await audit('#npc-dialogue .gossip-window', 'sell');
-    await page.locator('#sell-pick [data-item="warrior_weapon_royal_l10_purple"] button').click();
-    await page.locator('#sell-confirm').click(); await audit('#sell-warning', 'sell-confirmation');
-    await page.locator('#sell-cancel').click(); await page.locator('#npc-back').click();
-    await page.locator('#npc-dialogue [data-offer="repair"]').click(); await audit('#npc-dialogue .gossip-window', 'repair');
+    await page.locator('.merchant-workspace[aria-busy="false"]').waitFor();
+    await audit('#merchant-bags .bag-window', 'merchant-bags');
+    await page.locator('#inventory-list [data-item="warrior_weapon_royal_l10_purple"] .item-tile').tap();
+    await audit('#sell-warning', 'sell-confirmation');
+    await page.locator('#sell-cancel').click();
+    await page.locator('[data-action="repair-one"]').click(); await audit('#npc-dialogue .gossip-window', 'repair');
     await clear();
     await debug(page, { op: 'teleport', zone: 0, x: 39, y: 83.6 });
     await page.waitForFunction(() => Math.hypot(Field.hero.nx-39, Field.hero.ny-83.6) < 2); await sleep(550);

@@ -944,3 +944,56 @@
 @media (pointer: coarse) {
   input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]), select, textarea { font-size: max(16px, 1em) !important; }
 }
+
+.quest-reward-icons { display: flex; flex-wrap: wrap; gap: .5cqw; margin: .6cqw 0; }
+.quest-reward-icons .quest-reward-icon { flex: none; width: calc(5.7875cqw - .5px); height: calc(5.7875cqw - .5px); min-width: 0; padding: .25cqw; }
+.quest-reward-icon[data-rarity="uncommon"] { border-color: #4ad66d; }
+.quest-reward-icon[data-rarity="rare"] { border-color: #68a7ef; }
+.quest-reward-icon[data-rarity="epic"] { border-color: #ba7ff0; }
+.quest-reward-icon[data-rarity="legendary"] { border-color: #f2a04e; }
+/* A merchant shares the screen with the existing bag window. Each pane scales independently. */
+#npc-dialogue.merchant-mode { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; padding: 8px; align-items: center; justify-items: center; }
+#merchant-bags { display: contents; }
+#npc-dialogue.merchant-mode > .gossip-window, #merchant-bags .bag-window { width: calc(min(46cqw, 600px) / var(--window-k, .8)) !important; height: calc(92cqh / var(--window-k, .8)); min-width: 0 !important; max-width: none !important; max-height: none !important; }
+#npc-dialogue.merchant-mode > .gossip-window { padding: 0 !important; }
+#merchant-bags .bag-window { --touch-target: calc(44px / var(--window-k, .8)); overflow: auto; padding: 0 12px calc(12px + 44px / var(--window-k, .8)); }
+#merchant-bags :is(#bag-character, #bag-expand, #bag-details, .bag-instructions) { display: none; }
+#npc-dialogue.merchant-mode .gossip-titlebar { justify-content: flex-start; gap: 8px; padding: 4px calc(48px / var(--window-k, .8)) 4px 8px; }
+#merchant-portrait { width: calc(48px / var(--window-k, .8)); height: calc(48px / var(--window-k, .8)); flex: none; border-radius: 50%; border: 2px solid #c5a35d; }
+#npc-dialogue.merchant-mode .gossip-parchment { padding: 8px; margin: 4px; }
+#npc-dialogue.merchant-mode .gossip-footer { flex-wrap: wrap; gap: 4px; padding-right: calc(56px / var(--window-k, .8)); }
+.merchant-workspace { display: flex; flex-direction: column; gap: 8px; }
+.merchant-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(calc(52px / var(--window-k, .8)), auto); gap: 6px; }
+.merchant-slot { display: grid; grid-template-columns: calc(40px / var(--window-k, .8)) minmax(0, 1fr); align-items: center; gap: 6px; padding: 4px; border: 1px solid #7b5c31; border-radius: 3px; background: #251d13; color: #f4e3c1; cursor: pointer; text-align: left; min-width: 0; }
+.merchant-slot:disabled { opacity: .55; }
+.merchant-item-icon { display: block; width: 100%; aspect-ratio: 1; background: #111; border: 1px solid #ae915b; }
+.merchant-item-icon svg, .merchant-tool svg { width: 100%; height: 100%; display: block; }
+.merchant-item-detail { display: flex; flex-direction: column; overflow-wrap: anywhere; font: 14px sans-serif; }
+.merchant-item-detail small { color: #f3cc64; }
+.merchant-empty { border: 1px solid #82673f77; background: #6d513333; border-radius: 3px; }
+.merchant-pages, .merchant-tools, .merchant-tabs { display: flex; align-items: center; gap: 6px; }
+.merchant-pages { justify-content: center; }
+.merchant-tools { border-top: 1px solid #8b7046; padding-top: 6px; }
+.merchant-tool { flex: none; width: calc(44px / var(--window-k, .8)); height: calc(44px / var(--window-k, .8)); border: 1px solid #c5a35d; border-radius: 3px; background: #221e16; padding: 4px; cursor: pointer; }
+#merchant-last-buyback { margin-left: auto; }
+.merchant-tabs { margin-bottom: -8px; padding-top: 4px; }
+.merchant-tabs button { border-radius: 7px 7px 0 0; border: 1px solid #a78850; border-bottom: 0; background: #79603e; color: #f8edcf; }
+.merchant-tabs button[aria-pressed="true"] { background: #3d3222; color: #fff0a2; }
+@media (pointer: coarse) {
+ #merchant-bags { --touch-target: calc(44px / var(--window-k, .8)); }
+ #merchant-bags :is(button, input, select), .merchant-mode .merchant-slot { min-height: calc(44px / var(--window-k, .8)); }
+ #merchant-bags :is(button, select) { min-width: calc(44px / var(--window-k, .8)); }
+ #merchant-bags input { font-size: 16px; }
+ #merchant-bags .bag-window { font-size: 16px; }
+}
+
+#npc-dialogue.merchant-mode .gossip-parchment { display: flex; flex-direction: column; overflow: hidden; }
+#npc-dialogue.merchant-mode #npc-inventory { flex: 1; min-height: 0; }
+#npc-dialogue.merchant-mode #npc-notice:empty, .merchant-workspace .sell-notice:empty { display: none; }
+.merchant-workspace { height: 100%; min-height: 0; }
+.merchant-catalog { flex: 1; min-height: 0; overflow: auto; }
+.merchant-tools, .merchant-tabs { flex-shrink: 0; }
+.merchant-item-detail { font-size: calc(14px / var(--window-k, .8)); }
+#npc-dialogue.merchant-mode #npc-gold, #merchant-bags .bag-footer { font-size: calc(12px / var(--window-k, .8)); }
+
+#npc-dialogue.merchant-mode .merchant-tabs { flex-basis: 100%; margin: 0 0 -4px; padding-top: 4px; }

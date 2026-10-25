@@ -286,7 +286,7 @@
         if (consumable(i)) b.append(node('span', '', 'item-cooldown'));
         b.append(node('b', i.name, 'sr-only'), node('small', summary(i, count), 'sr-only'));
         b.addEventListener('contextmenu', event => { event.preventDefault(); selected = i.id; activate(i); renderDetails(); });
-        b.addEventListener('dblclick', () => activate(i)); attachTooltip(b, () => definition(i.id));
+        b.addEventListener('dblclick', () => activate(i)); attachTooltip(b, () => definition(i.id), undefined, () => window.Shop?.bagTooltip(i.id));
         dragSource(b, () => ({ from: 'bag', item: i.id })); cell.append(b);
       } else {
         cell.classList.add('bag-cell-empty'); cell.setAttribute('aria-label', `Empty bag slot ${index - page.start + 1}`);
@@ -372,7 +372,7 @@
   }
   $('bag-search')?.addEventListener('input', event => { search = event.target.value.trim().toLowerCase(); render($('inventory-list')); });
   $('bag-sort')?.addEventListener('click', () => { reconcile(); const ids = layout.filter(Boolean).sort((a, b) => definition(a).kind.localeCompare(definition(b).kind) || definition(a).name.localeCompare(definition(b).name)); layout = ids; while (layout.length < capacity()) layout.push(null); activeBag = 0; Online.saveBagLayout?.(layout); render($('inventory-list')); });
-  window.Inventory = { icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, effect, render, renderEquipped, renderSets, hideTooltip,
+  window.Inventory = { icon, cooldownLeft, tickCooldowns, quantity, bagQuantity, effect, render, renderEquipped, renderSets, hideTooltip, showTooltip,
     icon, definition, attachTooltip, bestRarity, looseStacks, looseCopies, rarityName, copyLine: g => `${g.rarity} · rank ${g.rank} · ${stats(copyStats(g))}${wearNote(g)}`, durabilityOf, conditionState, wearNote,
     // The bag side of a bank answer, which arrives before the next snapshot; the look and the set counts stay as they were.
     updateBags(next, nextSlots = {}, nextBags = [], nextInstances = []) {
