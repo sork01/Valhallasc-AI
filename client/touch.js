@@ -42,7 +42,8 @@
     });
     b.addEventListener('click', e => { if (!e.detail || performance.now() - lastTouch > 700) Keys.invoke(action); }); parent.append(b); return b;
   }
-  for (const name of ['attack', 'dash', 'talk', 'interact', 'mount']) Keys.register(name, () => Field.action(name));
+  Keys.register('attack', () => coarse.matches && !Field.hero?.pvpTargetId ? Field.startNearestAutoattack() : Field.action('attack'));
+  for (const name of ['dash', 'talk', 'interact', 'mount']) Keys.register(name, () => Field.action(name));
   for (let i = 0; i < 12; i++) Keys.register('skill' + (i + 1), () => {
     const id = $('skillbar-slots').children[i]?.dataset.skill; return id ? Field.useSkill(id) : false;
   });
@@ -135,8 +136,8 @@
   let lastState = '';
   function update() {
     if (!coarse.matches || !Field.hero) return;
-    const ids = assignments(), states = ids.map(id => Skillbar.state(id)), atk = Skillbar.state('attack');
-    attack.disabled = !atk.ready;
+    const ids = assignments(), states = ids.map(id => Skillbar.state(id));
+    attack.disabled = !Field.canAct || !!Field.hero.sparkTravel;
     targetMenu.disabled = $('hud-target').hidden || !$('hud-target').classList.contains('has-menu');
     const key = JSON.stringify(states.map(s => [s.skill?.id, s.ready, Math.ceil(s.cooldown)]));
     if (key === lastState) return; lastState = key;

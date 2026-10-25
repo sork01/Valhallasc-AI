@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.17.1",
+    "date": "2026-10-25",
+    "new": [],
+    "changed": [
+      "On phones and tablets, tap Attack to select the nearest living monster and keep attacking it."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.17.0",
     "date": "2026-10-25",
     "new": [

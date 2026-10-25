@@ -4264,6 +4264,20 @@
       if (wasMoving !== touchDirection.some(Boolean)) inputT = 0;
     },
     tapAt(clientX, clientY) { onPointerDown({ clientX, clientY, pointerType: 'touch' }); pointer.down = false; },
+    startNearestAutoattack() {
+      if (!Field.canAct || hero.sparkTravel) return false;
+      let nearest = null, bestDistance = Infinity;
+      const x = hero.nx ?? hero.x, y = hero.ny ?? hero.y;
+      for (const enemy of slimes) {
+        if (enemy.dead || enemy.hp <= 0 || enemy.state === 'waiting') continue;
+        const distance = Math.hypot((enemy.nx ?? enemy.x) - x, (enemy.ny ?? enemy.y) - y);
+        if (distance < bestDistance) { nearest = enemy; bestDistance = distance; }
+      }
+      if (!nearest) return false;
+      Field.clearInput();
+      hero.pvpTargetId = null; hero.target = nearest; hero.goal = null; marker = null;
+      Online.send({ type: 'target', id: nearest.id }); emitHud(); return true;
+    },
     action(action) {
       if (!Field.canAct || hero.sparkTravel) return false;
       if (action === 'attack') return Field.useSkill('attack');

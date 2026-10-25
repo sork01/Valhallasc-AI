@@ -50,3 +50,19 @@ and JavaScript syntax checks pass. Browser results are saved locally in
 Both Roll Away and Shadowstep were reproduced with zero attacks on their
 unfixed servers. No public restart was performed on 2026-10-23. The fixes were deployed on
 2026-10-24 with the Ember Key release (source `bd16999`); see `docs/raid-key.md`.
+
+## Touch Attack (Beta 1.17.1)
+
+The dedicated touch Attack button calls `Field.startNearestAutoattack()` to
+select the nearest living monster in the current zone, excluding dormant
+ambushers. It clears held movement/routes and sends `target`; the same server
+path walks into range and attacks repeatedly. The button remains available
+during basic-attack cooldowns. No new target is acquired after a kill until
+the next tap. Explicit PvP selections and keyboard Attack retain their existing
+behavior. This addition is client only and needs no server restart.
+
+`tests/touch-attack-ui.cjs` checks the real touch button with a nearer corpse,
+two living monsters, held movement, repeated basic attack events, cooldown
+selection, an empty city and desktop Attack. Run it through
+`scripts/test-touch-bounded.sh`; `MUTATE=1` restores the one-shot action in the
+served browser copy and must fail selection.

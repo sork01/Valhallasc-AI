@@ -71,6 +71,17 @@ stick vector. Ordinary ground taps retain the existing route and enemy taps
 retain the existing selection/autoattack behavior. Skill use does not change
 autoattack rules (`docs/autoattack.md`).
 
+In Beta 1.17.1, the touch Attack button chooses the nearest living monster
+in the current zone using snapshot positions and sends the existing `target`
+action. It ignores corpses and dormant ambushers, clears held movement and
+routes, and lets the server walk into range and repeat basic attacks. Selection
+works during an attack cooldown; the server still enforces that cooldown.
+After the target dies, tap Attack again to choose another. Explicitly selected
+PvP targets keep their existing attack behavior; keyboard Attack is unchanged.
+`tests/touch-attack-ui.cjs` checks selection, joystick release and repeated
+server-authored attacks, including a mutation restoring the old one-shot action.
+
+
 Track the stick's pointer ID and capture that pointer. Another pointer may tap
 a skill or potion without changing the stick origin or releasing movement.
 `pointerup`, `pointercancel`, `lostpointercapture`, window blur, hidden document,
@@ -187,3 +198,12 @@ WebKit was downloaded on the RAID, but the host lacks its required shared
 libraries. No system packages were installed. Real iPhone Safari zoom and real
 phone/tablet play remain explicit owner acceptance checks; neither corresponding
 TODO checkbox is marked complete.
+
+
+Beta 1.17.1 focused indexed verification: 22 touch Attack assertions pass across
+844x390 and 1024x768, with five/four basic attacks and four impacts after a
+single touch. Peak memory was 589 MiB within the unchanged 1536 MiB cap.
+Proof: `test-results/touch/attack-index.log` and `attack-public.txt` (all four
+changed public client hashes and both health endpoints match).
+The served-copy mutation restoring manual Attack fails the nearest-target
+assertion as intended (`attack-mutation.log`, 556 MiB peak).

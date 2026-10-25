@@ -38,9 +38,10 @@ async function run(suites) {
       browser = await chromium.launch({ headless: true, ignoreDefaultArgs: ['--hide-scrollbars'] });
       const errors = [];
       async function player(name, opts = {}) {
-        const { keepSuggestion = false, lang = 'en', characterClass = 'mage', ...contextOptions } = opts;
+        const { keepSuggestion = false, lang = 'en', characterClass = 'mage', onPacket, ...contextOptions } = opts;
         const context = await browser.newContext({ viewport: { width, height }, isMobile: true, hasTouch: true, deviceScaleFactor: 1, reducedMotion: 'reduce', ...contextOptions });
         const page = await context.newPage(); page.on('pageerror', e => { errors.push(e.message); console.error('Browser:', e.message); });
+        if (onPacket) page.on('websocket', socket => socket.on('framereceived', ({ payload }) => onPacket(JSON.parse(payload.toString()))));
         await page.addInitScript(lang => {
           // These checks exercise controls and layout. Skip audio decoding in each browser.
           window.AudioContext = undefined; window.webkitAudioContext = undefined;
