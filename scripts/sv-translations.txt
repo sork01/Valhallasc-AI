@@ -1202,6 +1202,7 @@
   "Cloister Tide Leech Fragment": "Blodigelfragment",
   "Close": "Stäng",
   "Close bags": "Stäng väskor",
+  "Close chat": "Stäng chatten",
   "Close conversation": "Avsluta samtalet",
   "Close equipment and bags": "Stäng utrustning och väskor",
   "Close inspect window": "Stäng granskningsfönstret",

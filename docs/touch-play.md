@@ -41,7 +41,7 @@ pointer is coarse. A mouse desktop gets its existing controls.
 │                                           Skill 3            │
 │  Floating joystick                  Skill 2       Skill 4     │
 │  (left thumb)                         Skill 1   ATTACK        │
-│                    Food / potions     Talk / target actions   │
+│                    Food / potions     Bags / social / target   │
 │                    Other skills tray                         │
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -52,8 +52,9 @@ area, outside existing controls. Diameter: 112 px; travel radius:
 skill buttons surround a 70 px attack button at the bottom right. Every button
 has a final visible width and height of at least 44 px after UI scaling. The
 other skill slots remain available through a tray. Food, health and resource
-potions sit beside that tray. Talk/read, cross interaction and mount use the
-same actions as their keyboard bindings; selected-target actions remain
+potions sit beside that tray. Bags and Social sit in the bottom gap before the
+skill arc. Cross interaction and mount use the same actions as their keyboard
+bindings; selected-target actions remain
 available through the target portrait menu.
 
 ## Movement and simultaneous touches
@@ -232,3 +233,38 @@ public health report OK. Proof: `test-results/touch/feedback-index.log`,
 The three served-copy mutations fail the intended assertions for Chat closing,
 contextual Target menu visibility and countdown legibility. Logs are
 `feedback-mutation-{chat,target,cooldown}.log`.
+
+
+## Keyboard-visible chat and bag access (Beta 1.17.3)
+
+Owner removed Talk / read from the phone row, moved Bags and Social into the
+bottom gap between food and the skill arc, and asked Bags to open the character
+panel alongside it. The two Bags buttons and keyboard binding now open both
+panels; the existing in-window toggle can still hide the character panel.
+
+Open touch chat fits the intersection of the stage and `visualViewport` bounds,
+responding to viewport resize/scroll and input focus. A keyboard can shrink or
+pan that visible area without changing the layout viewport. Chat is unscaled
+while open, with 16 px text, a scrollable history, and 44 px Send/Close controls.
+The in-chat close button preserves drafts and remains reachable when chat covers
+the top action row. Closed touch chat is fully hidden. Desktop chat keeps its
+existing layout. API reference: [VisualViewport](https://developer.mozilla.org/en-US/docs/Web/API/VisualViewport).
+
+`tests/touch-chat-keyboard-ui.cjs` exercises the actual DOM against a private
+server. Headless Chromium has no OS keyboard: the test emulates measured visual
+viewport properties and dispatches the native API's resize/scroll events,
+checking the visible message field, text, Send and Close bounds. It also checks
+bottom button positions and both-panel bag opening. This is layout regression
+coverage; the owner's physical iPhone remains the native-keyboard acceptance.
+
+Indexed keyboard/bag follow-up passed 36 assertions across 844x390 and
+1024x768. The whole test process tree peaked at 587 MiB under the unchanged
+1536 MiB cap. Visual-only keyboard shrink to 180 px and viewport pan to
+155 px with offsets keep typing, Send and Close visible; both Bags buttons
+and the Bags key show both panels. The six changed public client hashes match
+and public/bridge health report OK. Proof: `test-results/touch/chat-keyboard-index.log`,
+`chat-keyboard-public.txt`, and `chat-keyboard-*.png` in the indexed RAID export.
+Both served-copy mutations fail as expected: restoring bags-only opening
+fails the visible character-panel assertion; removing visual viewport resize
+handling fails the visible chat bounds check. Logs:
+`chat-keyboard-mutation-{bags,viewport}.log`.

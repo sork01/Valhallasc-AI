@@ -9,6 +9,8 @@ html, body { overscroll-behavior: none; }
 
 
 .touch-only { display: none; }
+.touch-chat-header { display: contents; }
+.touch-chat-close { display: none; }
 
 @media (pointer: coarse) {
   .stage { width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right)); height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)); aspect-ratio: auto; left: env(safe-area-inset-left); top: env(safe-area-inset-top); transform: none; }
@@ -74,12 +76,18 @@ html, body { overscroll-behavior: none; }
   .touch-tray-open #skillbar { display: flex; left: 200px; bottom: 125px; transform: none; max-width: 60cqw; max-height: 50cqh; overflow: auto; z-index: 30; }
   .touch-tray-open #skillbar-slots { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .touch-tray-open .skill-slot { width: calc(50px / var(--ui, .8)); height: auto; }
-  #inventory-open, #social-open { min-width: calc(44px / var(--ui, .8)); min-height: calc(44px / var(--ui, .8)); }
-  #inventory-open { right: 8px; bottom: 200px; }
-  #social-open { right: 8px; bottom: 250px; }
+  #inventory-open, #social-open { width: calc(44px / var(--ui, .8)); height: calc(44px / var(--ui, .8)); min-width: calc(44px / var(--ui, .8)); min-height: calc(44px / var(--ui, .8)); bottom: 8px; }
+  #inventory-open { right: 302px; }
+  #social-open { right: 354px; }
   #chat { bottom: 8px; left: 200px; translate: none !important; }
-  #stage:not(.touch-chat-open) #chat:not(:focus-within) .chat-log, #stage:not(.touch-chat-open) #chat:not(:focus-within) .chat-tabs, #stage:not(.touch-chat-open) #chat:not(:focus-within) form { display: none; }
-  #chat:focus-within { z-index: 35; bottom: 120px; }
+  #stage:not(.touch-chat-open) #chat:not(:focus-within) { display: none; }
+  .touch-chat-open #chat { z-index: 35; scale: 1 !important; transform: none !important; left: var(--chat-left, 8px); bottom: var(--chat-bottom, 8px); width: var(--chat-width, min(600px, calc(100% - 16px))); height: min(260px, var(--chat-height, calc(100% - 16px))); display: flex; flex-direction: column; font: 16px sans-serif; }
+  .touch-chat-open #chat .chat-log { flex: 1; min-height: 0; height: auto; }
+  .touch-chat-header { display: flex; flex-shrink: 0; }
+  #chat .chat-tabs { flex: 1; }
+  #chat .touch-chat-close { display: block; flex-shrink: 0; min-width: 44px; min-height: 44px; font: 24px sans-serif; }
+  #chat form { flex-shrink: 0; }
+  #chat input, #chat form button { min-height: 44px; font-size: 16px; }
   .layout-bar { flex-wrap: wrap; max-height: 90cqh; overflow: auto; width: 94cqw; top: 8px; font-size: 16px; }
   .layout-bar :is(button, select) { min-width: 44px; min-height: 44px; font-size: 16px; }
   #touch-skill-editor { width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0; border: 1px solid #c9ad73; }

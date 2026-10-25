@@ -964,7 +964,7 @@
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '') && !isEsc && !closesEquipment) return;
     if (window.Skillbar?.open || window.Settings?.active) return;
     if (window.Quests?.open) {
-      if (gearKey || Keys.is(e, 'skills')) { e.preventDefault(); Quests.close(false); if (gearKey) openEquipment(isChar ? 'both' : 'bags'); else Skillbar.show(); }
+      if (gearKey || Keys.is(e, 'skills')) { e.preventDefault(); Quests.close(false); if (gearKey) openEquipment(); else Skillbar.show(); }
       else if (isEsc || Keys.is(e, 'quests')) { e.preventDefault(); Quests.close(); }
       return;
     }
@@ -973,7 +973,7 @@
     if (isEsc) { e.preventDefault(); if (!$('equipment').hidden) setPause(false); else setPause($('pause').hidden); }
     if (gearKey) {
       e.preventDefault();
-      const view = isChar ? 'both' : 'bags';
+      const view = 'both';
       if ($('equipment').hidden) openEquipment(view);
       else if (document.querySelector('.equipment-workspace').dataset.view !== view) openEquipment(view);
       else setPause(false);
@@ -995,8 +995,8 @@
   });
   $('p-equipment').addEventListener('click', () => openEquipment());
   Keys.register('menu', () => { if (scene !== 'game') return false; setPause($('pause').hidden); return true; });
-  Keys.register('bags', () => { if (scene !== 'game') return false; openEquipment('bags'); return true; });
-  $('inventory-open').addEventListener('click', () => openEquipment('bags'));
+  Keys.register('bags', () => { if (scene !== 'game') return false; openEquipment(); return true; });
+  $('inventory-open').addEventListener('click', () => openEquipment());
   $('bag-expand').addEventListener('click', () => { setPause(false); Field.visitNpc('merchant'); });
   $('bags-close').addEventListener('click', () => setPause(false));
   $('bag-character').addEventListener('click', () => openEquipment(document.querySelector('.equipment-workspace').dataset.view === 'bags' ? 'both' : 'bags'));

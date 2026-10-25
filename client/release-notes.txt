@@ -1,5 +1,17 @@
 [
   {
+    "version": "Beta 1.17.3",
+    "date": "2026-10-25",
+    "new": [],
+    "changed": [
+      "Phone chat fits above the on-screen keyboard, with the message field, Send and Close kept visible.",
+      "Bags and Social sit between the food bar and skill arc on phones and tablets. Opening Bags also opens the character panel."
+    ],
+    "removed": [
+      "Removed Talk / read from the phone action row because it added clutter."
+    ]
+  },
+  {
     "version": "Beta 1.17.2",
     "date": "2026-10-25",
     "new": [],

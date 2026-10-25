@@ -50,11 +50,12 @@
   for (const [action, kind] of [['quickFood', 'food'], ['quickPotion', 'potion'], ['quickMana', 'mana']]) Keys.register(action, () => Quickuse.use(kind));
   Keys.register('skills', () => { Skillbar.show(); return true; });
   Keys.register('map', () => { WorldMap.show(); return true; });
+  function closeChat() {
+    if ($('chat').contains(document.activeElement)) document.activeElement.blur();
+    $('stage').classList.remove('touch-chat-open');
+  }
   Keys.register('chat', () => {
-    if (coarse.matches && $('stage').classList.contains('touch-chat-open')) {
-      if ($('chat').contains(document.activeElement)) document.activeElement.blur();
-      $('stage').classList.remove('touch-chat-open'); return true;
-    }
+    if (coarse.matches && $('stage').classList.contains('touch-chat-open')) { closeChat(); return true; }
     return Online.focusChat();
   });
   Keys.register('quests', () => { Quests.show(); return true; });
@@ -64,11 +65,33 @@
     Keys.register(action, () => { const id = assignments()[i]; return !!id && Skillbar.state(id).ready && Field.useSkill(id); });
     return b;
   });
-  for (const [label, action] of [['Menu', 'menu'], ['Bags', 'bags'], ['Chat', 'chat'], ['Talk / read', 'talk'], ['Cross', 'interact'], ['Mount', 'mount'], ['World map', 'map'], ['Quests', 'quests']]) button(label, action, actions);
+  for (const [label, action] of [['Menu', 'menu'], ['Bags', 'bags'], ['Chat', 'chat'], ['Cross', 'interact'], ['Mount', 'mount'], ['World map', 'map'], ['Quests', 'quests']]) button(label, action, actions);
   const targetMenu = document.createElement('button'); targetMenu.type = 'button'; targetMenu.textContent = tr('Target menu');
   targetMenu.setAttribute('aria-controls', 'portrait-menu'); targetMenu.hidden = true;
   targetMenu.addEventListener('click', () => PortraitMenu.toggle()); actions.append(targetMenu);
   const chatButton = actions.querySelector('[data-action="chat"]'); chatButton.setAttribute('aria-controls', 'chat');
+  const chatHeader = document.createElement('div'); chatHeader.className = 'touch-chat-header';
+  const tabs = $('chat').querySelector('.chat-tabs'); tabs.before(chatHeader); chatHeader.append(tabs);
+  const chatClose = document.createElement('button'); chatClose.type = 'button'; chatClose.className = 'touch-chat-close';
+  chatClose.textContent = '×'; chatClose.setAttribute('aria-label', tr('Close chat')); chatClose.addEventListener('click', closeChat); chatHeader.append(chatClose);
+  // Mobile keyboards can shrink/pan only the visual viewport, leaving the stage unchanged.
+  function fitChat() {
+    if (!coarse.matches || !$('stage').classList.contains('touch-chat-open')) return;
+    const stage = $('stage'), r = stage.getBoundingClientRect(), v = window.visualViewport;
+    const left = Math.max(r.left, v?.offsetLeft || 0), top = Math.max(r.top, v?.offsetTop || 0);
+    const right = Math.min(r.right, (v?.offsetLeft || 0) + (v?.width || innerWidth));
+    const bottom = Math.min(r.bottom, (v?.offsetTop || 0) + (v?.height || innerHeight));
+    stage.style.setProperty('--chat-left', `${left - r.left + 8}px`);
+    stage.style.setProperty('--chat-bottom', `${r.bottom - bottom + 8}px`);
+    stage.style.setProperty('--chat-width', `${Math.max(0, Math.min(600, right - left - 16))}px`);
+    stage.style.setProperty('--chat-height', `${Math.max(0, bottom - top - 16)}px`);
+  }
+  let chatFrame = 0;
+  function queueChatFit() { if (!chatFrame) chatFrame = requestAnimationFrame(() => { chatFrame = 0; fitChat(); }); }
+  window.visualViewport?.addEventListener('resize', queueChatFit);
+  window.visualViewport?.addEventListener('scroll', queueChatFit);
+  addEventListener('resize', queueChatFit); addEventListener('scroll', queueChatFit);
+  $('chat').addEventListener('focusin', queueChatFit);
   const tray = document.createElement('button'); tray.type = 'button'; tray.textContent = tr('Other skills'); tray.setAttribute('aria-expanded', 'false');
   tray.addEventListener('click', () => {
     const open = $('stage').classList.toggle('touch-tray-open'); tray.setAttribute('aria-expanded', String(open));
