@@ -47,12 +47,12 @@ const suite = {
     check(await page.evaluate(()=>shopPackets.at(-1).available.filter(r=>r.item==='warrior_headgear_crimson_l5_gray').length)===1,'server excludes the equipped copy');
     check(await page.evaluate(id=>!shopPackets.at(-1).available.some(r=>r.item===id),quest),'quest item is protected');
     const quote=await page.evaluate(()=>shopPackets.at(-1));
-    const junk=quote.available.filter(r=>['common','uncommon'].includes(r.rarity)&&(r.gear||r.item==='slime_gel'));
+    const junk=quote.available.filter(r=>r.rarity==='common'&&(r.gear||r.item==='slime_gel'));
     const total=junk.reduce((sum,r)=>sum+Math.floor((r.base*r.quantity*110+50)/100),0),before=await page.evaluate(()=>Field.hero.gold);
     await record(page); await page.locator('#sell-junk').tap();
     await page.waitForFunction(total=>shopPackets.some(p=>p.changed&&p.paid===total),total);
     await page.waitForFunction(gold=>Field.hero.gold===gold,before+total);
-    check(await page.evaluate(ids=>Inventory.quantity(ids.gray)===1&&Inventory.quantity(ids.green)===0&&Inventory.quantity(ids.blue)===1&&Inventory.quantity(ids.purple)===1&&Inventory.quantity(ids.orange)===1,ids),'junk sells only loose gray/green gear and materials');
+    check(await page.evaluate(ids=>Inventory.quantity(ids.gray)===1&&Inventory.quantity(ids.green)===1&&Inventory.quantity(ids.blue)===1&&Inventory.quantity(ids.purple)===1&&Inventory.quantity(ids.orange)===1,ids),'junk sells only loose gray gear and materials, preserving green and up');
     check(await page.locator('#merchant-last-buyback').getAttribute('data-item')!==null,'last sold item appears in the buyback square');
     await sleep(650);
     const tile=id=>page.locator(`#inventory-list [data-item="${id}"] .item-tile`);

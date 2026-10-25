@@ -7,7 +7,8 @@
   const key = row => `${row.item}:${row.copy || 0}`;
   const price = row => Math.min(4294967295, Math.floor((row.base * row.quantity * (100 + (data?.goldPercent || 0)) + 50) / 100));
   const rarity = row => row.rarity || row.gear?.[0]?.rarity || Inventory.definition(row.item)?.rarity;
-  let npc = null, container = null, data = null, basket = new Map(), tab = 'merchant', page = 0, packet = null, pending = false, pendingKind = '', timer = 0, snapshotKey = '', warning = null, zone = null;
+  const isJunk = row => row.rarity === 'common' && (!!row.gear || Inventory.definition(row.item)?.kind === 'material');
+  let npc = null, container = null, data = null, basket = new Map(), tab = 'merchant', page = 0, packet = null, pending = false, pendingKind = '', timer = 0, snapshotKey = '', warning = null, zone = null, lastNotice = '';
   const bag = document.querySelector('.bag-window'), bagHome = bag.parentElement, bagNext = bag.nextSibling;
   const dock = make('div'); dock.id = 'merchant-bags'; dock.hidden = true; $('npc-dialogue').append(dock);
   const portrait = document.createElement('canvas'); portrait.id = 'merchant-portrait'; portrait.width = portrait.height = 128; portrait.hidden = true; $('npc-name').before(portrait);
@@ -21,7 +22,7 @@
   function request() { send({ type: 'shop_open' }); }
   function closeWarning() { if (warning) { warning.close(); warning.remove(); warning = null; } }
   function close() {
-    closeWarning(); settle(); npc = null; container = null; data = null; packet = null; basket.clear(); snapshotKey = '';
+    closeWarning(); settle(); npc = null; container = null; data = null; packet = null; basket.clear(); snapshotKey = ''; lastNotice = '';
     $('npc-dialogue').classList.remove('merchant-mode'); portrait.hidden = true; $('npc-dialogue').querySelector('.merchant-tabs')?.remove();
     if (bag.parentElement === dock) { Settings.unregisterWindow('merchant-bags'); bagHome.insertBefore(bag, bagNext); } dock.hidden = true;
   }
@@ -76,7 +77,8 @@
   function draw() {
     if (!container || !npc) return;
     closeWarning(); $('npc-dialogue').querySelector('.merchant-tabs')?.remove(); container.replaceChildren(); container.className = 'merchant-workspace'; container.setAttribute('aria-busy', String(pending));
-    const notice = make('p', data?.notice || '', 'sell-notice'); container.append(notice);
+    const status = $('npc-notice');
+    if (status.textContent !== lastNotice) status.textContent = lastNotice;
     if (tab === 'repair') {
       const repair = make('div','','merchant-catalog'); GearServices.render('repair', npc, packet, repair); container.append(repair);
     } else {
@@ -107,8 +109,8 @@
       const total=packet.repairQuote.reduce((sum,[,cost])=>sum+cost,0); all.title=`Repair All Items · ${total} gold`; all.disabled=pending||!total||packet.gold<total; tools.append(repair,all);
     }
     const junk = utility('Sell all junk',pouch,()=>{
-      basket.clear(); for(const row of data?.available || []) {const i=Inventory.definition(row.item); if(['common','uncommon'].includes(row.rarity)&&(row.gear||i?.kind==='material'))basket.set(key(row),{...row});} confirm();
-    }); junk.id='sell-junk'; junk.disabled=pending||!data?.available?.some(row=>['common','uncommon'].includes(row.rarity)&&(row.gear||Inventory.definition(row.item)?.kind==='material')); tools.append(junk);
+      basket.clear(); for(const row of data?.available || []) {if(isJunk(row))basket.set(key(row),{...row});} confirm();
+    }); junk.id='sell-junk'; junk.disabled=pending||!data?.available?.some(isJunk); tools.append(junk);
     const last=(data?.buyBack || []).at(-1), back=utility('Buyback',last?Inventory.icon(Inventory.definition(last.item)):'',()=>{tab='back';page=0;draw();});
     back.id='merchant-last-buyback'; if(last) {back.dataset.item=last.item;Inventory.attachTooltip(back,()=>Inventory.definition(last.item));} tools.append(back);container.append(tools);
     const tabs=make('div','','merchant-tabs');
@@ -118,7 +120,7 @@
   function selectItem(id) {
     if (pending || !data) return;
     const row = data.available.find(row=>row.item===id);
-    if (!row) { data.notice='This item cannot be sold.'; draw(); return; }
+    if (!row) { lastNotice='This item cannot be sold.'; draw(); return; }
     basket.clear(); basket.set(key(row),{...row}); confirm();
   }
   function mount() {
@@ -137,8 +139,8 @@
   window.Shop = {
     render(merchant, target, dialogue) {
       const opening = npc?.id !== merchant.id || container !== target;
-      if (opening) { close(); npc=merchant; zone=Field.zone||0; container=target; tab='merchant'; page=0; packet=dialogue; mount(); draw(); if(npc.buys)request(); else {data={available:[],buyBack:[],gold:packet.gold};draw();} }
-      else { const answered=packet!==dialogue&&pendingKind==='interact'; packet=dialogue; if(answered){settle();if(npc.buys)request();else data={available:[],buyBack:[],gold:packet.gold};} draw(); }
+      if (opening) { close(); npc=merchant; zone=Field.zone||0; container=target; tab='merchant'; page=0; packet=dialogue; lastNotice=dialogue.notice || ''; mount(); draw(); if(npc.buys)request(); else {data={available:[],buyBack:[],gold:packet.gold};draw();} }
+      else { const answered=packet!==dialogue&&pendingKind==='interact'; packet=dialogue; if(dialogue.notice)lastNotice=dialogue.notice; if(answered){settle();if(npc.buys)request();else data={available:[],buyBack:[],gold:packet.gold};} draw(); }
     }, close,
     bagTooltip(id) { const row=data?.available?.find(row=>row.item===id); return npc&&row?{copies:row.gear?[row.gear]:[],count:row.quantity,in:Locale.translate('Your bags'),hint:Locale.translate(`Sell for ${price(row)} gold`)}:undefined; },
     get open() { return !!npc; },
@@ -147,6 +149,7 @@
       settle(); closeWarning();
       if (packet.closed) { close(); City.close(); return; }
       data = packet;
+      if (packet.notice) lastNotice=packet.notice;
       if (packet.ok && packet.changed) basket.clear();
       reconcile();
       Inventory.updateBags(packet.inventory, packet.equipment, packet.bags, packet.gearInstances);

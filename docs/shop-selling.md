@@ -11,7 +11,7 @@ Click a loose bag item or drag it onto the merchant to sell its stack/copy.
 The server's available list selects the exact next loose copy, excluding worn
 copies, starter/GM gear, quest items and bound licences. The bag tooltip shows
 the exact server-quoted proceeds, including rebirth rounding. **Sell all junk**
-sends one batch of common/uncommon gear and materials, preserving blue and up.
+sends one batch of common (gray) gear and materials, preserving green and up.
 The old You give/You receive basket is replaced by direct sales.
 
 Any epic or legendary sale still opens the confirmation naming those items in
@@ -141,3 +141,38 @@ columns and bypassed valuable confirmation). All eleven public client files
 match the git index; public and bridge health report OK. Hash list:
 `deploy/merchant-assets.txt`; proof `merchant-public.txt` and
 `merchant-layout-index.log` under `test-results/touch/`.
+
+
+## Stable merchant receipts (Beta 1.18.1)
+
+Sale confirmations previously added a row above the catalog, moving it, then
+an empty shop refresh cleared the text. Merchant messages now use the existing
+`#npc-notice` status below the controls, with 36 physical pixels reserved even
+when empty. The latest nonempty result survives stock/inventory refreshes and
+is replaced by the next meaningful result; closing/reopening clears it. City
+leaves merchant status ownership to Shop so a dialogue redraw cannot erase it.
+Long notices scroll inside the same fixed space. Gossip/quest notices keep
+their existing behavior.
+
+Focused indexed `tests/merchant-notice-ui.cjs` passes 18 assertions at 844x390
+and 1024x768, including real sales, empty refreshes, frame-by-frame bounds of
+stock/tools/tabs/status, and clearing on a new visit. Peak 606 MiB within the
+unchanged 1536 MiB cap. All five changed public client hashes match the index;
+both health endpoints report OK. Proof: `test-results/touch/merchant-notice-index.log`,
+`merchant-notice-public.txt` and screenshots in the indexed RAID export.
+
+
+## Gray-only junk (Beta 1.18.2)
+
+Owner requested that Sell all junk keep green items. The shared `isJunk`
+predicate now selects only common gear/materials, for both the batch and the
+button's enabled state. Green, blue, purple and orange items remain in the
+bags; individual green sales still use the ordinary merchant action.
+
+The gray-only focused check passes seven assertions at the phone viewport,
+including protected green/blue/purple/orange copies, equipped gray protection,
+exact gray-only payment, one batch, disabled-empty-junk state and a manual green
+sale. Peak 589 MiB under the unchanged cap. Receipt mutations fail on shifting
+geometry and lost text; the junk mutation restores green inclusion and fails
+preservation. Proof: `test-results/touch/merchant-junk-index.log`,
+`merchant-junk-mutation.log` and `merchant-notice-mutation-{1,clear}.log`.

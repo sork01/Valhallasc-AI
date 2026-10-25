@@ -1,0 +1,21 @@
+const {run,replace,debug,record}=require('./lib/touch.cjs');
+const suite={name:'merchant-junk',mutate:page=>replace(page,'shop.js',"row.rarity === 'common'","['common', 'uncommon'].includes(row.rarity)"),async test({player,check,sleep}){
+ const page=await player('GrayJunk',{characterClass:'warrior'}),gray='warrior_headgear_crimson_l5_gray',green='warrior_armor_azure';
+ const protectedIds=[green,'headgear_upgrade','warrior_weapon_royal_l10_purple','orange_03'];
+ for(const [item,quantity] of [[gray,2],['slime_gel',3],...protectedIds.map(id=>[id,1])])await debug(page,{op:'give_item',item,quantity,force:true});
+ await page.waitForFunction(id=>Inventory.quantity(id)===2,gray);await page.evaluate(id=>Online.send({type:'equip',slots:{headgear:id}}),gray);await page.waitForFunction(id=>Field.hero.equipment.headgear===id,gray);
+ await page.evaluate(()=>{window.junkPackets=[];const receive=Shop.onPacket;Shop.onPacket=p=>{junkPackets.push(p);receive(p);};});
+ const n=await page.evaluate(()=>WORLD_MAP.npcs.find(n=>n.id==='smith'));await debug(page,{op:'teleport',zone:0,x:n.x,y:n.y+1});await page.waitForFunction(n=>Math.hypot(Field.hero.nx-n.x,Field.hero.ny-n.y-1)<.5,n);await page.evaluate(()=>Field.visitNpc('smith'));
+ await page.waitForFunction(()=>junkPackets.length&&document.querySelector('.merchant-workspace[aria-busy="false"]'));
+ const quote=await page.evaluate(()=>junkPackets.at(-1)), before=await page.evaluate(()=>Field.hero.gold),expected=quote.available.filter(r=>r.item===gray||r.item==='slime_gel').reduce((sum,r)=>sum+r.base*r.quantity,0);
+ await record(page);await page.locator('#sell-junk').tap();await page.waitForFunction(()=>Inventory.quantity('slime_gel')===0);
+ check(await page.evaluate(ids=>ids.every(id=>Inventory.quantity(id)===1),protectedIds),'junk preserves green, blue, purple and orange items');
+ check(await page.evaluate(id=>Inventory.quantity(id)===1&&Field.hero.equipment.headgear===id,gray),'only the loose gray copy is sold');
+ await page.waitForFunction(gold=>Field.hero.gold===gold,before+expected);check(true,'gold comes only from the gray copy and gray materials');
+ check(await page.evaluate(({gray})=>touchSent.filter(p=>p.type==='sell_batch').length===1&&touchSent.find(p=>p.type==='sell_batch').items.every(i=>[gray,'slime_gel'].includes(i.item)),{gray}),'one batch contains only the intended gray items');
+ await page.waitForFunction(()=>document.querySelector('#sell-junk').disabled);
+ check(await page.locator('#sell-junk').isDisabled(),'junk is disabled when only protected gear and worn gray gear remain');
+ await sleep(650);await page.locator(`#inventory-list [data-item="${green}"] .item-tile`).tap();await page.waitForFunction(id=>Inventory.quantity(id)===0,green);
+ check(true,'a green item can still be sold individually');await page.context().close();
+}};
+module.exports=suite;if(require.main===module)run([suite]).catch(e=>{console.error(e);process.exitCode=1;});

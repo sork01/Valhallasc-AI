@@ -989,7 +989,8 @@
 
 #npc-dialogue.merchant-mode .gossip-parchment { display: flex; flex-direction: column; overflow: hidden; }
 #npc-dialogue.merchant-mode #npc-inventory { flex: 1; min-height: 0; }
-#npc-dialogue.merchant-mode #npc-notice:empty, .merchant-workspace .sell-notice:empty { display: none; }
+.merchant-workspace .sell-notice:empty { display: none; }
+#npc-dialogue.merchant-mode #npc-notice { display: block; flex: 0 0 calc(36px / var(--window-k, .8)); height: calc(36px / var(--window-k, .8)); min-height: 0; margin: 4px 0 0; overflow: auto; font-size: calc(14px / var(--window-k, .8)); line-height: 1.25; }
 .merchant-workspace { height: 100%; min-height: 0; }
 .merchant-catalog { flex: 1; min-height: 0; overflow: auto; }
 .merchant-tools, .merchant-tabs { flex-shrink: 0; }

@@ -1,5 +1,23 @@
 [
   {
+    "version": "Beta 1.18.2",
+    "date": "2026-10-25",
+    "new": [],
+    "changed": [
+      "Sell all junk now keeps green items, along with blue, purple and orange items."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.18.1",
+    "date": "2026-10-25",
+    "new": [],
+    "changed": [
+      "Merchant sale messages stay visible in a fixed space at the bottom, keeping items and controls still."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.18.0",
     "date": "2026-10-25",
     "new": [

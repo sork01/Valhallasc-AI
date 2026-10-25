@@ -453,7 +453,7 @@
     const packet=lastPacket,npc=current,gossip=view.kind==='gossip';
     $('npc-name').textContent=npc.name;$('npc-role').textContent=npc.role;
     $('npc-text').textContent=npc.dialogue;$('npc-text').hidden=!gossip;$('npc-role').hidden=!gossip;
-    $('npc-notice').textContent=packet.notice;
+    if(!['merchant','sell'].includes(view.kind))$('npc-notice').textContent=packet.notice;
     $('npc-gold').textContent=`Your purse: ${packet.gold} gold`;
     $('npc-back').hidden=!['merchant','sell','merge','refine','repair','bags','stat_reset'].includes(view.kind);
     $('npc-back').textContent=view.kind==='merchant'?'Quests / services':'Back';
