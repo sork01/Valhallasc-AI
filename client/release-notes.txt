@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.18.3",
+    "date": "2026-10-25",
+    "new": [],
+    "changed": [
+      "Phone and tablet skill arcs start with Attack only, then add skills as you learn them at levels 4, 8, 12 and 16. Only learned skills can be assigned."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.18.2",
     "date": "2026-10-25",
     "new": [],

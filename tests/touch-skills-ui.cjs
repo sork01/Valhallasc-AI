@@ -5,7 +5,7 @@ const suite = {
   async test({ player, check, sleep, out, width, height }) {
     const page = await player('TouchSkills'); await safeSpot(page);
     check(await page.evaluate(() => !('obsolete' in Settings.layout)), 'old unknown layout keys are discarded');
-    check(await page.evaluate(() => TouchControls.assignments().join(',') === 'fireball,arcaneward,blink,chainlightning'), 'old preferences load class defaults');
+    check(await page.evaluate(() => TouchControls.assignments().join(',') === 'twinbolt,arcaneward,fireball,barrage'), 'old preferences load class defaults');
     await page.locator('#touch-actions [data-action="menu"]').click(); await page.locator('#p-settings').click(); await page.locator('#set-edit-ui').click();
     check(await page.locator('#touch-skill-editor').isVisible(), 'Edit UI exposes touch assignments');
     await page.locator('#touch-skill-editor select[data-arc="0"]').selectOption('arcaneward');
@@ -39,7 +39,7 @@ const suite = {
     check(await page.locator('#skillbar').isHidden(), 'the tray closes');
     await page.screenshot({ path: `${out}/controls-${width}x${height}.png` });
     await page.context().close();
-    for (const [name, expected] of Object.entries({ warrior: ['cleave', 'battlecry', 'shieldwall', 'charge'], assassin: ['shadowstep', 'throwingknives', 'evasion', 'lunge'], priest: ['mend', 'smite', 'wardoflight', 'holynova'], hunter: ['powershot', 'multishot', 'rollaway', 'huntersmark'] })) {
+    for (const [name, expected] of Object.entries({ warrior: ['cleave', 'battlecry', 'shieldwall', 'whirlwind'], assassin: ['throwingknives', 'evasion', 'lunge', 'flurry'], priest: ['mend', 'smite', 'wardoflight', 'prayer'], hunter: ['powershot', 'multishot', 'rollaway', 'piercingarrow'] })) {
       const other = await player('Touch' + name, { characterClass: name });
       check(await other.evaluate(expected => TouchControls.assignments().join(',') === expected.join(','), expected), `${name} gets its own defaults`);
       check(await other.evaluate(() => TouchControls.assignments().every(id => Skillbar.catalog.some(s => s.id === id))), `${name} defaults name real class abilities`);

@@ -5,23 +5,22 @@
   const stick = $('touch-stick'), disc = stick.querySelector('.stick-disc'), knob = disc.querySelector('i');
   const arc = $('touch-skills'), actions = $('touch-actions'), quick = $('touch-quickuse');
   let held = null;
-  const DEFAULTS = {
-    warrior: ['cleave', 'battlecry', 'shieldwall', 'charge'],
-    mage: ['fireball', 'arcaneward', 'blink', 'chainlightning'],
-    assassin: ['shadowstep', 'throwingknives', 'evasion', 'lunge'],
-    priest: ['mend', 'smite', 'wardoflight', 'holynova'],
-    hunter: ['powershot', 'multishot', 'rollaway', 'huntersmark'],
-  };
+  const DEFAULTS = Object.fromEntries(['warrior', 'mage', 'assassin', 'priest', 'hunter'].map(name =>
+    [name, WORLD_SKILLS.filter(s => s.class === name).sort((a, b) => a.level - b.level).slice(0, 4).map(s => s.id)]));
   const tr = text => window.Locale?.translate(text) || text;
   const cls = () => Field.hero?.look?.class || 'warrior';
   const catalog = () => window.Skillbar?.catalog || [];
-  function assignments() {
+  const learned = skill => !!skill && skill.level <= (Field.hero?.level || 1);
+  function savedAssignments() {
     const saved = window.Prefs.touchSkills[cls()], known = new Set(catalog().map(s => s.id));
     return Array.from({ length: 4 }, (_, i) => Array.isArray(saved) && (saved[i] === null || known.has(saved[i])) ? saved[i] : DEFAULTS[cls()][i]);
   }
+  function assignments() {
+    return savedAssignments().map(id => learned(catalog().find(s => s.id === id)) ? id : null);
+  }
   function assign(index, skill) {
-    if (!Number.isInteger(index) || index < 0 || index > 3 || (skill !== null && !catalog().some(s => s.id === skill))) return false;
-    const next = assignments(); next[index] = skill;
+    if (!Number.isInteger(index) || index < 0 || index > 3 || (skill !== null && !catalog().some(s => s.id === skill && learned(s)))) return false;
+    const next = savedAssignments(); next[index] = skill;
     const saved = {};
     // Copy only valid class/skill IDs; old preferences cannot introduce new actions.
     for (const name of Object.keys(DEFAULTS)) {
@@ -61,7 +60,7 @@
   Keys.register('quests', () => { Quests.show(); return true; });
   const attack = button('Attack', 'attack', arc); attack.className = 'touch-attack';
   const skillButtons = Array.from({ length: 4 }, (_, i) => {
-    const action = 'touchSkill' + (i + 1), b = button('Empty', action, arc); b.className = 'touch-skill'; b.dataset.arc = i;
+    const action = 'touchSkill' + (i + 1), b = button('Empty', action, arc); b.className = 'touch-skill'; b.dataset.arc = i; b.hidden = true;
     Keys.register(action, () => { const id = assignments()[i]; return !!id && Skillbar.state(id).ready && Field.useSkill(id); });
     return b;
   });
@@ -157,7 +156,7 @@
     if (!on) return;
     const slots = assignments();
     for (const [i, select] of choices.entries()) {
-      select.replaceChildren(...[{ id: '', name: tr('Empty') }, ...catalog()].map(s => {
+      select.replaceChildren(...[{ id: '', name: tr('Empty') }, ...catalog().filter(learned)].map(s => {
         const option = document.createElement('option'); option.value = s.id; option.textContent = s.name; return option;
       })); select.value = slots[i] || '';
     }
@@ -173,14 +172,13 @@
     const key = JSON.stringify(states.map(s => [s.skill?.id, s.ready, Math.ceil(s.cooldown)]));
     if (key === lastState) return; lastState = key;
     states.forEach((state, i) => {
-      const b = skillButtons[i], skill = state.skill; b.dataset.skill = skill?.id || ''; b.disabled = !state.ready;
+      const b = skillButtons[i], skill = state.skill; b.dataset.skill = skill?.id || ''; b.disabled = !state.ready; b.hidden = !skill;
       b.replaceChildren();
       if (skill) { const glyph = document.createElement('span'); glyph.innerHTML = Skillbar.icon(skill.icon); b.append(glyph); }
       const name = document.createElement('span'); name.textContent = skill?.name || tr('Empty'); b.append(name);
       b.classList.toggle('cooling', state.cooldown > 0);
       b.setAttribute('aria-label', (skill?.name || tr('Empty')) + (state.cooldown > 0 ? ` · ${Math.ceil(state.cooldown)}s` : ''));
       if (state.cooldown > 0) { const cd = document.createElement('small'); cd.className = 'touch-cooldown'; cd.textContent = Math.ceil(state.cooldown); b.append(cd); }
-      if (skill && skill.level > (Field.hero.level || 1)) { const lock = document.createElement('small'); lock.textContent = `Lv ${skill.level}`; b.append(lock); }
     });
   }
   addEventListener('keydown', e => {

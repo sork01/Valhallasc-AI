@@ -100,18 +100,22 @@ Store positions under the existing `Prefs.layout`/saved `ui` keys. Store four
 skill IDs per class in `Prefs.touchSkills`, independently of keyboard slots so
 changing one does not silently remap the other. Reject unknown classes, skills
 from another class, non-arrays and malformed IDs. Missing values use the
-defaults below; locked skills remain visible with their required level.
+defaults below. Empty and locked arc slots are hidden; a new hero sees only
+Attack. The four defaults appear automatically at levels 4, 8, 12 and 16 in
+the class's unlock order. Assignment pickers offer only earned skills.
+Saved custom choices stay saved while locked and reappear once earned;
+editing another slot does not overwrite them. Deliberately empty slots stay empty.
 Existing saves without these keys retain their keyboard layout and get touch
 defaults. `Settings.loadLayout()` must recognize the new `ITEMS` IDs before
 reading offsets; unknown old offsets are still dropped.
 
 | Class | Skill 1 | Skill 2 | Skill 3 | Skill 4 |
 | --- | --- | --- | --- | --- |
-| Warrior | Cleave | Battle Cry | Shield Wall | Charge |
-| Mage | Fireball | Arcane Ward | Blink | Chain Lightning |
-| Assassin | Shadowstep | Throwing Knives | Evasion | Lunge |
-| Priest | Mend | Smite | Ward of Light | Holy Nova |
-| Hunter | Power Shot | Multishot | Roll Away | Hunter's Mark |
+| Warrior | Cleave | Battle Cry | Shield Wall | Whirlwind |
+| Mage | Twin Bolt | Arcane Ward | Fireball | Arcane Barrage |
+| Assassin | Throwing Knives | Evasion | Lunge | Flurry |
+| Priest | Mend | Smite | Ward of Light | Prayer of Healing |
+| Hunter | Power Shot | Multishot | Roll Away | Piercing Arrow |
 
 Actions with keyboard equivalents use the shared `Keys`/`ACTIONS` behavior and
 current binding labels. Every new label receives hand-written Swedish.
@@ -268,3 +272,21 @@ Both served-copy mutations fail as expected: restoring bags-only opening
 fails the visible character-panel assertion; removing visual viewport resize
 handling fails the visible chat bounds check. Logs:
 `chat-keyboard-mutation-{bags,viewport}.log`.
+
+## Earned arc skills (Beta 1.18.3)
+
+The arc now follows the class catalog's first four active-skill unlocks rather
+than a fixed selection of later skills. Empty and unearned choices are hidden,
+and Edit UI permits only earned skills. Saved custom choices remain intact
+until their required level, even when a different slot is edited.
+
+Indexed `tests/touch-skill-unlocks-ui.cjs` passed 212 checks across 844x390 and
+1024x768, covering all five classes at levels 1, 3, 4, 7, 8, 11, 12, 15 and 16,
+assignment pickers, rejected locked assignments, custom-choice reloads and
+deliberately empty slots. Peak memory was 996 MiB inside the unchanged 1536 MiB
+cap. The public index, touch controls and release notes match local SHA-256
+hashes; public and bridge health report OK. Real-device acceptance remains open.
+The served-copy mutation bypassing the learned-level check fails immediately
+on a level-1 Warrior showing four locked skills (530 MiB peak). Proof:
+`test-results/touch/skill-unlocks-index.log`, `skill-unlocks-mutation.log` and
+the `unlocks-*.png` captures.
