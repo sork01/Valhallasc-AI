@@ -1192,8 +1192,8 @@
     get weather() { return save.weather; },
     get weatherAudio() { return save.weatherAudio; },
     get layout() { return !save.uiSet && !has(save.ui) ? DEFAULT_UI : save.ui && typeof save.ui === 'object' ? save.ui : {}; },
-    // 80% until the player moves the slider (uiScaleSet): a saved 1 from before the default changed is not a choice.
-    get uiScale() { return save.uiScaleSet && Number.isFinite(+save.uiScale) ? Math.max(.6, Math.min(1.5, +save.uiScale)) : .8; },
+    // Keep explicit choices; untouched devices start at 60% on touch and 80% on a mouse.
+    get uiScale() { return save.uiScaleSet && Number.isFinite(+save.uiScale) ? Math.max(.6, Math.min(1.5, +save.uiScale)) : matchMedia('(pointer: coarse)').matches ? .6 : .8; },
     // Key bindings the player changed ({action: [code, code]}); keymap.js merges them over the shipped keys.
     get keys() { return save.keys && typeof save.keys === 'object' ? save.keys : {}; },
     get winScale() { return save.winScale && typeof save.winScale === 'object' ? save.winScale : {}; },

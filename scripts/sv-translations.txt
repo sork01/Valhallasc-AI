@@ -6989,5 +6989,14 @@
   "Repair All Items": "Reparera alla föremål",
   "Repair one piece": "Reparera ett föremål",
   "Tap again to claim this reward.": "Tryck igen för att hämta belöningen.",
-  "This item cannot be sold.": "Det här föremålet kan inte säljas."
+  "This item cannot be sold.": "Det här föremålet kan inte säljas.",
+  "People & services": "Personer och tjänster",
+  "Choose a person to show their location.": "Välj en person för att visa var personen finns.",
+  "Find a person or service": "Sök efter en person eller tjänst",
+  "No matching people.": "Inga personer matchar sökningen.",
+  "Buys items": "Köper föremål",
+  "Does not buy items": "Köper inte föremål",
+  "This person does not buy items. Sell to a merchant or smith.": "Den här personen köper inte föremål. Sälj till en handlare eller smed.",
+  "Repairs": "Reparationer",
+  "Mercenaries": "Legosoldater"
 }

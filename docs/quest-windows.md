@@ -1,5 +1,15 @@
 # Quest rewards and acceptance
 
+Beta 1.19.0: pressing a window's backdrop invokes its normal close action.
+The shared handler in `settings.js` also covers equipment, skills, social,
+map, bank, settings, keyboard bindings, inspect, trade, rebirth, boss signs,
+release notes and the GM test menu. Resize grips remain usable. Merchant
+stock and borrowed bags form one group: pressing inside either keeps both
+open; pressing outside closes the conversation and restores the bag DOM.
+Pressing outside a valuable-sale confirmation cancels that confirmation.
+Connection recovery remains an explicit choice. The pointer is consumed so
+closing a window does not also move or attack in the world.
+
 Beta 1.17.4 replaces fixed and class-choice item reward text with the same bag
 icons in both NPC detail and journal. Only the hero's class choices appear.
 The normal Inventory tooltip shows catalog stats/rarity/level/set information;

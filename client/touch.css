@@ -70,7 +70,7 @@ html, body { overscroll-behavior: none; }
   #touch-actions { top: 8px; left: 34%; width: calc(300px / var(--ui, .8)); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
   #touch-quickuse { left: 200px; bottom: 8px; display: flex; flex-direction: column; gap: 4px; max-width: calc(240px / var(--ui, .8)); }
   #touch-quickuse #quickuse { position: static; padding: 2px; gap: 3px; }
-  #touch-quickuse .quick-slot { width: calc(58px / var(--ui, .8)); height: calc(54px / var(--ui, .8)); }
+  #touch-quickuse .quick-slot { width: calc(58px / .8); height: calc(54px / .8); }
   #touch-quickuse .quick-slot .skill-name, #touch-quickuse kbd { display: none; }
   #skillbar { display: none; }
   .touch-tray-open #skillbar { display: flex; left: 200px; bottom: 125px; transform: none; max-width: 60cqw; max-height: 50cqh; overflow: auto; z-index: 30; }
@@ -98,7 +98,10 @@ html, body { overscroll-behavior: none; }
   .bag-grid, #inventory-list { grid-template-columns: repeat(4, calc(44px / var(--window-k, .8))); justify-content: center; }
 
   .gossip-titlebar, .rpg-titlebar { min-height: var(--touch-target, 55px); }
-  #touch-actions { width: calc(320px / var(--ui, .8)); display: grid; grid-auto-flow: column; grid-auto-columns: minmax(calc(60px / var(--ui, .8)), 1fr); grid-template-columns: none; overflow-x: auto; padding: 2px; }
+  /* These two HUD bars follow UI size, retaining their old size at 80%. */
+  #touch-actions { width: calc(320px / .8); display: grid; grid-auto-flow: column; grid-auto-columns: minmax(calc(60px / .8), 1fr); grid-template-columns: none; overflow-x: auto; padding: 2px; }
+  #touch-quickuse { max-width: calc(240px / .8); }
+  #touch-actions button, #touch-quickuse button { min-width: calc(44px / .8); min-height: calc(44px / .8); font-size: calc(12px / .8); }
   #connection-overlay > .connection-panel, #sell-warning { --touch-target: calc(44px / var(--window-k, .8)); max-width: 94cqw; max-height: var(--touch-stage-h, 94dvh); overflow: auto; }
   #sell-warning :is(button, input, select), #connection-overlay button { min-width: var(--touch-target); min-height: var(--touch-target); font-size: 16px; }
   #touch-skills, #touch-stick { pointer-events: none; }
@@ -134,7 +137,14 @@ html, body { overscroll-behavior: none; }
   #stage .pause > .touch-resizable-window, #stage #sign-panel.touch-resizable-window { padding-bottom: calc(12px + var(--touch-target)); }
   #sell-warning { width: min(92cqw, 600px); }
   #worldmap { grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); }
-  #stage .pause > .wm-panel { height: calc(var(--touch-stage-h) / var(--window-k)); max-height: calc(var(--touch-stage-h) / var(--window-k)); }
+  #stage .pause > .wm-panel { width: calc(94cqw / var(--window-k)); max-width: none; height: calc(var(--touch-stage-h) / var(--window-k)); max-height: calc(var(--touch-stage-h) / var(--window-k)); }
+  .wm-panel .wm-body { width: 100%; flex: 1; min-height: 0; }
+  .wm-panel .wm-zone { display: grid; grid-template-columns: minmax(0, 1fr) minmax(calc(180px / var(--window-k)), 32%); height: 100%; min-height: 0; }
+  .wm-panel .wm-zone .wm-stage { height: 100%; width: auto; min-height: 0; max-width: 100%; margin: 0; justify-self: center; }
+  #stage .wm-panel .wm-people-list .wm-person-button { font-size: calc(14px / var(--window-k)); }
+  #stage .wm-panel .wm-people-list small { font-size: calc(12px / var(--window-k)); }
+  #stage .wm-panel .wm-side .wm-people-search { font-size: calc(16px / var(--window-k)); }
+  #stage .wm-panel .wm-side .wm-people-help, #stage .wm-panel .wm-side-title { font-size: calc(13px / var(--window-k)); }
 
 }
 

@@ -23,6 +23,7 @@
   function closeWarning() { if (warning) { warning.close(); warning.remove(); warning = null; } }
   function close() {
     closeWarning(); settle(); npc = null; container = null; data = null; packet = null; basket.clear(); snapshotKey = ''; lastNotice = '';
+    $('merchant-service')?.remove();
     $('npc-dialogue').classList.remove('merchant-mode'); portrait.hidden = true; $('npc-dialogue').querySelector('.merchant-tabs')?.remove();
     if (bag.parentElement === dock) { Settings.unregisterWindow('merchant-bags'); bagHome.insertBefore(bag, bagNext); } dock.hidden = true;
   }
@@ -76,6 +77,9 @@
   const pouch = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="m15 5 9 4 9-4-4 12c20 18 14 27-5 27S-1 35 19 17z" fill="#bb8b34" stroke="#543c1d" stroke-width="2"/><circle cx="24" cy="29" r="7" fill="#f6d45f"/></svg>';
   function draw() {
     if (!container || !npc) return;
+    $('merchant-service')?.remove();
+    const service = make('small', npc.buys ? 'Buys items' : 'Does not buy items', 'merchant-service');
+    service.id = 'merchant-service'; service.dataset.buys = String(!!npc.buys); $('npc-name').append(service);
     closeWarning(); $('npc-dialogue').querySelector('.merchant-tabs')?.remove(); container.replaceChildren(); container.className = 'merchant-workspace'; container.setAttribute('aria-busy', String(pending));
     const status = $('npc-notice');
     if (status.textContent !== lastNotice) status.textContent = lastNotice;
@@ -118,6 +122,7 @@
     Inventory.render($('inventory-list'));
   }
   function selectItem(id) {
+    if (!npc.buys) { lastNotice='This person does not buy items. Sell to a merchant or smith.'; draw(); return; }
     if (pending || !data) return;
     const row = data.available.find(row=>row.item===id);
     if (!row) { lastNotice='This item cannot be sold.'; draw(); return; }

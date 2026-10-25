@@ -140,7 +140,7 @@
     return node;
   }
 
-  let zones = null, graph = [], tiles = [], nameNodes = [], roadRefs = [], fogSignature = '', view = 'world', current = 0, previousFocus = null, highlight = null, timer = 0, tickTimer = 0, tileY = .54;
+  let zones = null, graph = [], tiles = [], nameNodes = [], roadRefs = [], fogSignature = '', view = 'world', current = 0, previousFocus = null, highlight = null, selectedPerson = null, timer = 0, tickTimer = 0, tileY = .54;
   const cache = new Map();
 
   function load() {
@@ -612,6 +612,7 @@
     return { left: `${(.5 + dx) * 100}%`, top: `${(.5 + dy) * 100}%` };
   };
   function renderZone(index) {
+    if (current !== index) selectedPerson = null;
     const z = zones[index]; current = index;
     routePaint(index);
     copy($('wm-ground'), paint(index, 768)); highlight = null; drawDots(z);
@@ -649,11 +650,68 @@
     }
     const me = el('span', '', 'wm-me'); me.append(el('i'), el('b', 'You')); me.hidden = true; me.dataset.me = 'true'; markers.append(me);
     markers.append(el('div', '', 'wm-party'));
-    side(z); tick();
+    side(z); markPerson(z); tick();
+  }
+  function people(z) {
+    const questPeople = new Set();
+    for (const q of z.quests || []) {
+      questPeople.add(q.npc);
+      for (const o of q.objectives || []) if (o.kind === 'talk') questPeople.add(o.target);
+    }
+    return (z.npcs || []).filter(n => n.travelStop || n.buys || n.offers?.length || questPeople.has(n.id))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+  function services(n) {
+    const labels = [];
+    if (n.buys) labels.push('Buys items');
+    if (n.offers?.some(o => o.mount)) labels.push('Mounts');
+    if (n.offers?.some(o => o.id === 'repair')) labels.push('Repairs');
+    if (n.offers?.some(o => o.id === 'bank')) labels.push('Bank');
+    if (n.offers?.some(o => o.merc)) labels.push('Mercenaries');
+    if (n.travelStop) labels.push('Spark Travel');
+    return labels;
+  }
+  function markPerson(z) {
+    $('wm-markers').querySelector('.wm-person')?.remove();
+    const n = people(z).find(n => n.id === selectedPerson);
+    if (!n) return;
+    // A town directory gives an address even before that corner is explored;
+    // its pin does not uncover terrain, monsters or other map information.
+    const marker = el('span', '', 'wm-person'); marker.dataset.npc = n.id;
+    marker.dataset.side = n.x / z.size > .65 ? 'right' : 'left';
+    marker.setAttribute('role', 'img'); marker.setAttribute('aria-label', n.name);
+    marker.append(el('i', '◆'), el('b', n.name));
+    Object.assign(marker.style, pos(z, n.x, n.y)); $('wm-markers').append(marker);
+    for (const b of $('wm-side').querySelectorAll('.wm-person-button')) b.setAttribute('aria-pressed', String(b.dataset.npc === selectedPerson));
+  }
+  function directory(z, box) {
+    const entries = people(z); if (!entries.length) return;
+    box.append(el('h5', 'People & services', 'wm-side-title'));
+    box.append(el('p', 'Choose a person to show their location.', 'wm-people-help'));
+    const search = el('input'); search.type = 'search'; search.placeholder = 'Find a person or service';
+    search.setAttribute('aria-label', 'Find a person or service'); search.className = 'wm-people-search';
+    const list = el('ul', '', 'wm-people-list');
+    for (const n of entries) {
+      const row = el('li'), b = el('button', '', 'wm-person-button'); b.type = 'button'; b.dataset.npc = n.id;
+      b.setAttribute('aria-pressed', String(selectedPerson === n.id));
+      b.append(el('b', n.name), el('span', n.role || ''));
+      for (const text of services(n)) b.append(el('small', text));
+      row.dataset.search = [n.name, n.role, ...services(n)].map(s => window.Locale?.translate(s || '') || s || '').join(' ').toLocaleLowerCase();
+      b.addEventListener('click', () => { selectedPerson = n.id; markPerson(z); });
+      row.append(b); list.append(row);
+    }
+    const empty = el('p', 'No matching people.', 'wm-people-help'); empty.hidden = true;
+    search.addEventListener('input', () => {
+      const term = search.value.trim().toLocaleLowerCase();
+      for (const row of list.children) row.hidden = !row.dataset.search.includes(term);
+      empty.hidden = [...list.children].some(row => !row.hidden);
+    });
+    box.append(search, list, empty);
   }
   function side(z) {
     const box = $('wm-side'); box.replaceChildren();
     box.append(el('h4', z.name, 'wm-side-name'), el('p', z.tagline || BLURB[z.theme] || '', 'wm-side-blurb'));
+    directory(z, box);
     const facts = el('ul', '', 'wm-facts');
     facts.append(el('li', z.range ? (z.players ? `Dungeon for ${z.players} players of level ${z.range[0]}` : `Recommended levels ${z.range[0]}–${z.range[1]}`) : 'No enemies inside the walls'));
     facts.append(el('li', `Charted ${charted(current)} of ${CELLS} places`, 'wm-charted'));
@@ -813,13 +871,14 @@
     const key = event.key.toLowerCase(), typing = Keys.typing(event);
     if (open()) {
       if (key === 'tab') {                                          // keep focus inside the panel
-        const buttons = [...$('worldmap').querySelectorAll('button:not(:disabled)')].filter(b => b.offsetParent);
+        const buttons = [...$('worldmap').querySelectorAll('button:not(:disabled), input:not(:disabled)')].filter(b => b.offsetParent);
         const first = buttons[0], last = buttons.at(-1); event.stopImmediatePropagation();
         if (event.shiftKey && (document.activeElement === first || !buttons.includes(document.activeElement))) { event.preventDefault(); last.focus(); }
         else if (!event.shiftKey && (document.activeElement === last || !buttons.includes(document.activeElement))) { event.preventDefault(); first.focus(); }
         return;
       }
       event.stopImmediatePropagation();
+      if (typing && !Keys.is(event, 'menu')) return;
       if (key === 'enter' || key === ' ') return;                   // let the focused button act
       event.preventDefault();
       if (event.repeat) return;

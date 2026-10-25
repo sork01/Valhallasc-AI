@@ -675,6 +675,17 @@
 .wm-kinds, .wm-gates, .wm-travel-list { margin: 0; padding: 0; list-style: none; }
 .wm-travel-list { color: #bdffec; }
 .wm-travel-list li { margin: 0 0 .2cqw; }
+.wm-people-help { margin: 6px 0; }
+.wm-people-search { box-sizing: border-box; width: 100%; min-height: calc(44px / var(--window-k, 1)); margin: 4px 0 8px; font-size: calc(16px / var(--window-k, 1)); }
+.wm-people-list { margin: 0; padding: 0; list-style: none; }
+.wm-person-button { box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 3px 8px; width: 100%; min-height: calc(44px / var(--window-k, 1)); margin-bottom: 5px; padding: 7px; font-size: calc(14px / var(--window-k, 1)); text-align: left; color: #ead9b3; background: #111c2d; border: 1px solid #74633f; border-radius: 4px; cursor: pointer; }
+.wm-person-button b, .wm-person-button > span { flex-basis: 100%; }
+.wm-person-button small { color: #baffdd; }
+.wm-person-button[aria-pressed="true"] { border-color: #ffe18c; background: #3b3422; }
+.wm-person { position: absolute; z-index: 6; transform: translate(-50%, -50%); pointer-events: none; color: #ffe18c; filter: drop-shadow(0 0 3px #000); }
+.wm-person i { display: grid; place-items: center; width: 22px; height: 22px; border: 2px solid #ffe18c; border-radius: 50%; background: #332711; font-style: normal; }
+.wm-person b { position: absolute; bottom: 28px; left: -10px; width: max-content; max-width: 180px; padding: 5px 8px; border: 1px solid #ffe18c; border-radius: 4px; background: #171c29; font: bold 13px sans-serif; }
+.wm-person[data-side="right"] b { right: -10px; left: auto; }
 .wm-kind { display: flex; align-items: center; gap: .6cqw; width: 100%; padding: .25cqw .4cqw; border: 0; border-radius: .3cqw; background: none; color: #eee3cb; font: inherit; text-align: left; cursor: pointer; }
 .wm-kind:hover { background: #2b3a52; }
 .wm-kind i { flex: none; width: .9cqw; height: .9cqw; border: .15cqw solid #10141c; border-radius: 50%; }
@@ -994,6 +1005,8 @@
 .merchant-workspace { height: 100%; min-height: 0; }
 .merchant-catalog { flex: 1; min-height: 0; overflow: auto; }
 .merchant-tools, .merchant-tabs { flex-shrink: 0; }
+.merchant-service { display: block; margin-top: 3px; font: calc(14px / var(--window-k, 1)) sans-serif; color: #baffdd; }
+.merchant-service[data-buys="false"] { color: #ffcf99; }
 .merchant-item-detail { font-size: calc(14px / var(--window-k, .8)); }
 #npc-dialogue.merchant-mode #npc-gold, #merchant-bags .bag-footer { font-size: calc(12px / var(--window-k, .8)); }
 

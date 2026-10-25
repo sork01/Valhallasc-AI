@@ -437,6 +437,38 @@
   $('layout-done').addEventListener('click', () => stopEdit());
   $('layout-reset').addEventListener('click', reset);
 
+  // Use the normal close actions so focus, server cancellation and borrowed bags
+  // are restored just as they are by each window's own Close button.
+  const outsideClose = {
+    'whats-new': 'news-close', pause: 'p-resume', 'settings-panel': 'set-back', 'keys-panel': 'keys-back',
+    'quest-journal': 'quest-close', 'npc-dialogue': 'npc-close', worldmap: 'wm-close',
+    'social-panel': 'social-close', 'inspect-panel': 'inspect-close', 'rebirth-dialog': 'rebirth-cancel',
+    'bank-panel': 'bank-close', 'skills-panel': 'skills-close', equipment: 'equipment-close',
+  };
+  addEventListener('pointerdown', event => {
+    if (editing || event.button > 0 || event.target.closest('.win-grip, .panel-grip, .layout-handle')) return;
+    const warning = $('sell-warning');
+    if (warning?.open) {
+      const r = warning.getBoundingClientRect();
+      if (event.clientX >= r.left && event.clientX <= r.right && event.clientY >= r.top && event.clientY <= r.bottom) return;
+      event.preventDefault(); event.stopImmediatePropagation(); $('sell-cancel')?.click(); return;
+    }
+    const root = event.target.closest('.pause');
+    if (root && !root.hidden) {
+      // Merchant stock and its docked bags belong to one conversation.
+      const inside = root.id === 'npc-dialogue'
+        ? event.target.closest('.gossip-window, .bag-window')
+        : wins.some(w => root.contains(w.el) && w.el.contains(event.target));
+      if (inside) return;
+      const button = outsideClose[root.id] || (root.id === 'trade-panel' ? ($('trade-cancel').getClientRects().length ? 'trade-cancel' : 'trade-decline') : null);
+      if (button || root.id === 'gmtest-panel') {
+        event.preventDefault(); event.stopImmediatePropagation();
+        if (button) $(button)?.click(); else window.GMTest?.close();
+      }
+    } else if (window.BossSign?.visible && !$('sign-panel').contains(event.target)) {
+      event.preventDefault(); event.stopImmediatePropagation(); window.BossSign.close();
+    }
+  }, true);
   window.Settings = { registerWindow, unregisterWindow, show, close, refresh, startEdit, stopEdit, reset, applyScale, resetWindows, resetPanels, get panelSizes() { return Object.fromEntries(PANELS.map(p => [p.id, p.size])); }, sizeWindow: (id, factor) => { const w = wins.find(x => x.id === id); if (w) sizeWindow(w, factor); }, get windowScales() { return winScale; }, get active() { return !panel.hidden || editing; }, get editing() { return editing; }, get layout() { return layout; } };
   const suggestion = $('low-gfx-suggestion');
   suggestion.hidden = !matchMedia('(pointer: coarse)').matches || window.Prefs.touchGraphicsSuggested || window.Prefs.lowGraphics;
@@ -445,19 +477,24 @@
   });
   const graphics = () => { document.documentElement.classList.toggle('low-graphics', window.Prefs.lowGraphics); };
   addEventListener('prefs-change', graphics); graphics();
-  const fullscreen = $('set-fullscreen');
+  const fullscreen = $('set-fullscreen'), hudFullscreen = $('touch-fullscreen');
   const fullscreenNotice = document.createElement('p'); fullscreenNotice.id = 'set-fullscreen-notice';
   fullscreenNotice.className = 'world-menu-note'; fullscreenNotice.setAttribute('role', 'status'); fullscreenNotice.hidden = true; fullscreen.after(fullscreenNotice);
   const syncFullscreen = () => {
     fullscreen.hidden = !document.fullscreenEnabled || typeof stage.requestFullscreen !== 'function';
     fullscreen.textContent = window.Locale?.translate(document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen') || (document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen');
+    if (hudFullscreen) { hudFullscreen.hidden = fullscreen.hidden; hudFullscreen.textContent = fullscreen.textContent; hudFullscreen.setAttribute('aria-pressed', String(!!document.fullscreenElement)); }
   };
-  fullscreen.addEventListener('click', async () => {
+  const toggleFullscreen = async event => {
+    const fromHud = event.currentTarget === hudFullscreen;
     fullscreenNotice.hidden = true;
     try { if (document.fullscreenElement) await document.exitFullscreen(); else await stage.requestFullscreen(); }
-    catch (_) { fullscreenNotice.hidden = false; fullscreenNotice.textContent = window.Locale?.translate('Fullscreen is unavailable. You can add the game to your home screen instead.') || 'Fullscreen is unavailable. You can add the game to your home screen instead.'; }
+    catch (_) { fullscreenNotice.hidden = false; fullscreenNotice.textContent = window.Locale?.translate('Fullscreen is unavailable. You can add the game to your home screen instead.') || 'Fullscreen is unavailable. You can add the game to your home screen instead.';
+      if (fromHud) { const toast = $('toast'); toast.textContent = fullscreenNotice.textContent; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 5000); }
+    }
     syncFullscreen();
-  });
+  };
+  fullscreen.addEventListener('click', toggleFullscreen); hudFullscreen?.addEventListener('click', toggleFullscreen);
   addEventListener('fullscreenchange', syncFullscreen); syncFullscreen();
   loadWindowScales(); initWindows(); initPanels(); applyScale(); refresh();
 })();

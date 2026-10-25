@@ -65,6 +65,9 @@
     return b;
   });
   for (const [label, action] of [['Menu', 'menu'], ['Bags', 'bags'], ['Chat', 'chat'], ['Cross', 'interact'], ['Mount', 'mount'], ['World map', 'map'], ['Quests', 'quests']]) button(label, action, actions);
+  const fullscreen = document.createElement('button'); fullscreen.type = 'button'; fullscreen.id = 'touch-fullscreen'; fullscreen.dataset.action = 'fullscreen';
+  fullscreen.textContent = tr('Fullscreen'); fullscreen.hidden = true;
+  actions.querySelector('[data-action="menu"]').after(fullscreen);
   const targetMenu = document.createElement('button'); targetMenu.type = 'button'; targetMenu.textContent = tr('Target menu');
   targetMenu.setAttribute('aria-controls', 'portrait-menu'); targetMenu.hidden = true;
   targetMenu.addEventListener('click', () => PortraitMenu.toggle()); actions.append(targetMenu);

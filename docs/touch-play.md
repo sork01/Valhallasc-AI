@@ -290,3 +290,19 @@ The served-copy mutation bypassing the learned-level check fails immediately
 on a level-1 Warrior showing four locked skills (530 MiB peak). Proof:
 `test-results/touch/skill-unlocks-index.log`, `skill-unlocks-mutation.log` and
 the `unlocks-*.png` captures.
+
+
+## Mobile sizing and fullscreen (Beta 1.19.0)
+
+Owner request, 2026-10-25: fresh coarse-pointer devices default to 60% UI size,
+while mouse desktops retain 80%. An explicit `uiScaleSet` preference always
+wins. The top action row and food/potion bar now scale with the chosen UI
+size instead of cancelling that scale with inverse CSS dimensions. Their
+former size is retained at 80%; this intentionally supersedes the earlier
+fixed 44 px HUD target rule for these two bars. Window targets, joystick and
+combat arc keep their existing compensation.
+
+Fullscreen sits directly after Menu in the horizontally scrolling top bar.
+It shares the Settings request/exit handler, tracks fullscreen changes and
+hides on unsupported browsers. A denied request from the top bar shows the
+existing toast explanation. Focused coverage is in `tests/town-window-ui.cjs`.

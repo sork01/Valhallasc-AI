@@ -1,5 +1,12 @@
 # Merchant selling
 
+Beta 1.19.0: every NPC shop shows **Buys items** or **Does not buy items** below
+the NPC's name. NPCs who sell supplies without buying loot previously rejected
+every bag tap with the misleading item-specific message. Their message now
+says **This person does not buy items. Sell to a merchant or smith.** The
+detailed map's people directory labels buying merchants explicitly.
+The server's buying rules and item protections are unchanged.
+
 Merchants now open a **Merchant** frame on the left and the existing inventory
 bags on the right. Both windows have independent scale/corner-grip entries;
 phone/tablet targets retain their 44 px floors. Stock uses two columns of five

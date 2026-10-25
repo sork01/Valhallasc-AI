@@ -1,5 +1,19 @@
 [
   {
+    "version": "Beta 1.19.0",
+    "date": "2026-10-25",
+    "new": [
+      "Detailed maps have a searchable list of important people and services. Select someone to highlight their location, including mount sellers, bankers, merchants and quest givers.",
+      "The mobile top bar has a Fullscreen button."
+    ],
+    "changed": [
+      "Click or tap outside a game window to close it. Merchant stock and bags stay open together while you use either window.",
+      "NPC shops clearly state whether they buy items. People who do not buy items explain where to sell instead of rejecting each item without a reason.",
+      "Mobile UI starts at 60% unless you saved another size. The top menu and food bar now resize with your UI size."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.18.4",
     "date": "2026-10-25",
     "new": [],
