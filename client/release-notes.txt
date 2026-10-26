@@ -7,7 +7,7 @@
     ],
     "changed": [
       "Two buffs of the same kind no longer add up. The stronger one stays, and an equal or stronger recast refreshes it.",
-      "Hired fighters at Eldmarr no longer walk back across the cracked floor they just left, so far fewer of them fall to The Forge Floor."
+      "Hired fighters at Eldmarr no longer walk back across the cracked floor they just left, and in the final phase they keep clear of a heat blast instead of drifting back into it. Standing on a cooling well or a seat no longer counts toward cracking the floor under you."
     ],
     "removed": []
   },

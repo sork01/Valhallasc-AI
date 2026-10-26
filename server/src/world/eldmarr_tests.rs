@@ -785,13 +785,14 @@ fn eldmarr_floor_escape_goal_is_kept_until_the_fighter_leaves_the_cell() {
     );
 }
 
-/// The hirer and nine mercenaries stand and fight at Eldmarr for several minutes of the first phase. The lava a
-/// ten-body melee ring leaves behind must not be able to kill any of them (owner report 2026-10-26). With `human`
-/// the hirer is a person who just stands at the boss and swings (never moves, never dies): only the nine
+/// The hirer and nine mercenaries fight Eldmarr through `stages` of (boss health share, seconds), counting how many
+/// fall to a mechanic (owner reports 2026-10-26: hires dying to the cracking floor and, in the finale, to everything).
+/// Without `human` every fighter plays the full boss brain. With `human` the hirer is a person who stands at the boss
+/// and swings (never dies, never cools); with `walk` they also keep changing cell. Either way only the nine
 /// mercenaries play by the real `merc_think` cadence around them.
-fn crew_floor_deaths(human: bool, walk: bool, seconds: f64, share: f64) -> usize {
+fn crew_floor_deaths(human: bool, walk: bool, stages: &[(f64, f64)], seed: u64) -> usize {
     let mut r = Rig::new(1);
-    r.w.rng = 77;
+    r.w.rng = seed;
     let boss = r.w.slimes[r.boss].clone();
     let spawn = r.w.spawns[r.boss].clone();
     r.w.slimes = vec![boss];
@@ -820,7 +821,6 @@ fn crew_floor_deaths(human: bool, walk: bool, seconds: f64, share: f64) -> usize
             y: at.y + 2.,
         },
     );
-    r.w.slimes[0].hp = r.w.slimes[0].max_hp * share;
     let ids: Vec<_> = r.w.players.keys().copied().collect();
     if human {
         let p = r.w.players.get_mut(&1).unwrap();
@@ -828,7 +828,17 @@ fn crew_floor_deaths(human: bool, walk: bool, seconds: f64, share: f64) -> usize
         p.target = Some(0);
     }
     let mut dead = BTreeSet::new();
-    for n in 0..(seconds / TICK).round() as usize {
+    let mut stage_end = 0;
+    let mut stage = 0;
+    for n in 0.. {
+        if n >= stage_end {
+            let Some((share, seconds)) = stages.get(stage) else {
+                break;
+            };
+            r.w.slimes[0].hp = r.w.slimes[0].max_hp * share;
+            stage_end = n + (seconds / TICK).round() as usize;
+            stage += 1;
+        }
         while r.rx[0].try_recv().is_ok() {}
         if !human {
             r.w.auto_play(1, &ids, Some(0));
@@ -868,15 +878,24 @@ fn crew_floor_deaths(human: bool, walk: bool, seconds: f64, share: f64) -> usize
     }
     dead.len()
 }
+const PHASES: [(f64, f64); 4] = [(1., 150.), (0.65, 60.), (0.32, 60.), (0.05, 200.)];
 #[test]
-fn eldmarr_hired_crew_survives_a_long_cracking_floor() {
-    assert_eq!(crew_floor_deaths(false, false, 300., 1.), 0);
+fn eldmarr_hired_crew_survives_every_phase_for_minutes() {
+    for seed in [77, 5] {
+        assert_eq!(
+            crew_floor_deaths(false, false, &PHASES, seed),
+            0,
+            "seed {seed}"
+        );
+    }
 }
 #[test]
-fn eldmarr_mercenaries_survive_a_long_cracking_floor_beside_a_standing_human() {
-    assert_eq!(crew_floor_deaths(true, false, 300., 1.), 0);
+fn eldmarr_mercenaries_survive_the_long_first_phase_beside_a_standing_or_walking_human() {
+    assert_eq!(crew_floor_deaths(true, false, &[(1., 300.)], 77), 0);
+    assert_eq!(crew_floor_deaths(true, true, &[(1., 200.)], 77), 0);
 }
 #[test]
-fn eldmarr_mercenaries_survive_the_floor_beside_a_walking_human() {
-    assert_eq!(crew_floor_deaths(true, true, 200., 1.), 0);
+fn eldmarr_mercenaries_survive_the_unbound_phase_beside_a_standing_human() {
+    // The human never cools, so their fuse blasts again and again: the hires must keep out of it and off the floor.
+    assert_eq!(crew_floor_deaths(true, false, &[(0.05, 150.)], 77), 0);
 }

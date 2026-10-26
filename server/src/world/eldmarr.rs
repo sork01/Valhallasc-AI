@@ -398,9 +398,16 @@ impl World {
                     stood.cell = current;
                     stood.time = 0.;
                 }
-                stood.time += TICK * tempo;
-                if stood.time >= c.stand && !reserved(current) {
-                    e.cracks.entry(current).or_insert(CrackCell { age: 0. });
+                // A protected cell (well, plate) never cracks, and the time spent on it does not count either:
+                // otherwise everyone on a plate cracks at once the moment the table lifts, which walls the
+                // crew in with a ring of lava.
+                if reserved(current) {
+                    stood.time = 0.;
+                } else {
+                    stood.time += TICK * tempo;
+                    if stood.time >= c.stand {
+                        e.cracks.entry(current).or_insert(CrackCell { age: 0. });
+                    }
                 }
                 if e.cracks.iter().any(|(cell, crack)| {
                     crack.age >= c.cast && touches(cell_rect(*cell, c.cell), *at, BODY)
@@ -607,12 +614,14 @@ impl World {
             }
             // A nearly empty meter rejoins the attack. Normal movement is handled by the shared brain.
         }
-        if e.cracking() {
-            let urgent = e
-                .standing
-                .get(&id)
-                .is_some_and(|v| v.time >= c.stand * 0.65)
-                || self.eldmarr_danger(f, def, id, me, 1.).is_some();
+        // The floor and a neighbour's heat fuse both call for stepping away: only the floor needs the dwell clock.
+        if e.cracking() || e.heating() {
+            let urgent = (e.cracking()
+                && e.standing
+                    .get(&id)
+                    .is_some_and(|v| v.time >= c.stand * 0.65))
+                || self.eldmarr_danger(f, def, id, me, 1.).is_some()
+                || self.eldmarr_fuse_near(f, e, h, id, me, 1.);
             if urgent {
                 // Keep an escape until it is reached/clear. Rechoosing the
                 // closest point to the boss every think oscillates at a cell
@@ -635,6 +644,7 @@ impl World {
                         if inside(f.arena, p)
                             && cell(p, c.cell) != cell(me, c.cell)
                             && self.eldmarr_danger(f, def, id, p, 2.).is_none()
+                            && !self.eldmarr_fuse_near(f, e, h, id, p, 1.2)
                             && self.eldmarr_clear_path(f, e, c, me, me, p)
                         {
                             candidates.push(p);
@@ -648,7 +658,12 @@ impl World {
                 if let Some(p) = candidates.first() {
                     return Some(answer(Some(*p), true, false));
                 }
-            } else if let Some(way) = self.eldmarr_approach(f, e, def, c, id, me) {
+            } else if self.eldmarr_fuse_near(f, e, h, id, me, 1.5) {
+                // Out of a blast but not by much: the ordinary chase would walk straight back in before it lands.
+                return Some(answer(None, false, true));
+            } else if e.cracking()
+                && let Some(way) = self.eldmarr_approach(f, e, def, c, id, me)
+            {
                 return Some(match way {
                     Some(goal) => answer(Some(goal), true, false),
                     None => answer(None, false, true),
@@ -656,6 +671,27 @@ impl World {
             }
         }
         None
+    }
+
+    /// Whether another fighter's live heat fuse would reach within `margin` of `at` (the blast radius plus `margin`).
+    fn eldmarr_fuse_near(
+        &self,
+        f: &Fight,
+        e: &Eldmarr,
+        h: &bm::Heat,
+        id: u64,
+        at: Point,
+        margin: f64,
+    ) -> bool {
+        e.meters.iter().any(|(bearer, meter)| {
+            *bearer != id
+                && meter.fuse.is_some()
+                && self.players.get(bearer).is_some_and(|p| {
+                    p.character.hp > 0.
+                        && p.character.zone == f.zone
+                        && at.distance(p.character.point()) <= h.blast + margin
+                })
+        })
     }
 
     /// The way back to the boss once a fighter has stepped out of a cracked cell. The shared chase heads straight for
