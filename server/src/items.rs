@@ -6,6 +6,7 @@ use std::sync::LazyLock;
 mod cloak_tests;
 mod gear_services;
 pub use gear_services::{DeathWear, GearInstance};
+pub mod hierlooms;
 mod orange;
 pub mod raid_rewards;
 #[cfg(test)]
@@ -508,7 +509,7 @@ pub fn rarity_color(rarity: &str) -> &'static str {
         "rare" => "#4aa3ff",
         "epic" => "#b45cff",
         "legendary" => "#ff9a2e",
-        "gm" => "#ffd24a",
+        "hierloom" | "gm" => "#ffd24a",
         _ => "#c4c4c4",
     }
 }
@@ -1187,13 +1188,14 @@ impl Character {
         }) {
             let occurrence = occurrences.entry(&i.id).or_default();
             let stats = self.worn_gear_instance(&i.id, *occurrence).map_or_else(
-                || i.bonus_stats.clone(),
+                || hierlooms::attributes(i, self.level).unwrap_or_else(|| i.bonus_stats.clone()),
                 |copy| {
                     // A broken piece is still worn but gives nothing.
                     if copy.broken() {
                         Attributes::default()
                     } else {
-                        copy.effective_bonus_stats()
+                        hierlooms::attributes(i, self.level)
+                            .unwrap_or_else(|| copy.effective_bonus_stats())
                     }
                 },
             );
@@ -2420,7 +2422,9 @@ mod tests {
     fn every_item_has_a_known_rarity_and_starters_are_common() {
         for i in ITEMS.iter() {
             assert!(
-                RARITIES.contains(&i.rarity.as_str()) || i.rarity == GM_RARITY,
+                RARITIES.contains(&i.rarity.as_str())
+                    || i.rarity == GM_RARITY
+                    || i.rarity == hierlooms::RARITY,
                 "{} has rarity {}",
                 i.id,
                 i.rarity

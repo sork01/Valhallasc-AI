@@ -92,7 +92,7 @@
       elements.push(make('label','Equipment copy'),choice,make('p',`Current rank ${current.rank} · ${stats(current)}`));
       const prefer=make('button','Use this copy when equipped','btn ghost');prefer.type='button';prefer.disabled=worn.has(current.id);
       prefer.addEventListener('click',()=>{prefer.disabled=true;send(`prefer_copy:${chosen.refine}`);});elements.push(prefer);
-      const inspect=make('button','Preview refinement','btn ghost');inspect.type='button';inspect.disabled=current.rank>=5;
+      const inspect=make('button','Preview refinement','btn ghost');inspect.type='button';inspect.disabled=current.rank>=5||item(current.item)?.rarity==='hierloom';
       inspect.addEventListener('click',()=>send(`refine_preview:${chosen.refine}`));elements.push(inspect);
       if(preview.kind==='refine'&&preview.id===chosen.refine){
         const crystal=item(preview.material),owned=(packet.inventory||[]).find(s=>s.item===preview.material)?.quantity||0;

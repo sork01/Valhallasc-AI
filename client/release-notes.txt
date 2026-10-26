@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.25.0",
+    "date": "2026-10-26",
+    "new": [
+      "Every Chained Forge boss can drop four new golden Hierloom items: two rings, a necklace and a cloak. Each boss has a 10% base chance to drop one random piece, increased by rebirth drop bonuses.",
+      "Hierloom items work for every class from level 1, grow in strength with your level and never lose durability. Each equipped piece grants 100% extra XP; all four grant 400% extra XP, added to your rebirth XP bonus."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
     "version": "Beta 1.24.0",
     "date": "2026-10-26",
     "new": [

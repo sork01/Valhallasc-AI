@@ -884,7 +884,7 @@
   function rarePickup(event) {
     const item = WORLD_ITEMS.find(i => i.id === event?.item);
     const rarity = event?.rarity || item?.rarity;
-    const labels = { uncommon: 'green', rare: 'blue', epic: 'purple', legendary: 'orange' };
+    const labels = { uncommon: 'green', rare: 'blue', epic: 'purple', legendary: 'orange', hierloom: 'golden Hierloom' };
     if (!labels[rarity]) return;
     rarePickupBox.dataset.rarity = rarity;
     rarePickupBox.querySelector('b').textContent = `You picked up a ${labels[rarity]} item!`;

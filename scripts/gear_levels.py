@@ -168,11 +168,11 @@ def finish(i, level, rarity):
 
 def main():
     existing = json.loads(ITEMS.read_text())
-    items = [i for i in existing if 'art' not in i or i.get('source') in ('orange_pool', 'chained_forge_packs', 'chained_forge')]
+    items = [i for i in existing if 'art' not in i or i.get('source') in ('orange_pool', 'chained_forge_packs', 'chained_forge', 'raid_hierlooms')]
     gear = {'armor', 'weapon', 'headgear', 'shoulders', 'gloves', 'pants', 'necklace', 'accessory'}
     out, bases = [], {}
     for i in items:
-        if i['kind'] not in gear or i['rarity'] == 'gm' or i.get('source') in ('orange_pool', 'chained_forge_packs', 'chained_forge'):
+        if i['kind'] not in gear or i['rarity'] == 'gm' or i.get('source') in ('orange_pool', 'chained_forge_packs', 'chained_forge', 'raid_hierlooms'):
             out.append(i)
             continue
         if i.get('starter'):
@@ -191,7 +191,7 @@ def main():
                 add(out, bases, cls, kind, level, rarity)
         for kind in SHARED_KINDS:
             add(out, bases, None, kind, level, rarity)
-    out = [i for i in out if i['kind'] != 'cloak' or i.get('source') in ('orange_pool', 'chained_forge')]
+    out = [i for i in out if i['kind'] != 'cloak' or i.get('source') in ('orange_pool', 'chained_forge', 'raid_hierlooms')]
     out.extend(vault_pieces(out))
     out.extend(cathedral_pieces(out))
     out.extend(moonwell_pieces(out))

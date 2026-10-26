@@ -177,6 +177,10 @@ fn raid_rewards_loot_uses_saved_orange_copies_and_rebirth_multiplier() {
             .drops
             .iter()
             .filter_map(|d| d.gear.as_ref())
+            .filter(|g| {
+                crate::items::item(&g.item)
+                    .is_some_and(|i| i.source.as_deref() == Some("chained_forge"))
+            })
             .collect::<Vec<_>>();
         assert_eq!(gear.len(), 4 * boost as usize);
         assert_eq!(

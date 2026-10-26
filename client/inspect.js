@@ -8,7 +8,7 @@
   const REFRESH = 3000;
   const SLOTS = [['headgear', 'Headgear'], ['shoulders', 'Shoulders'], ['chest', 'Chest'], ['pants', 'Pants'], ['gloves', 'Gloves'], ['hands', 'Hands'], ['necklace', 'Necklace'], ['cloak', 'Cloak'], ['accessory1', 'Accessory 1'], ['accessory2', 'Accessory 2']];
   const KIND = { chest: 'armor', hands: 'weapon', accessory1: 'accessory', accessory2: 'accessory' };
-  const RARITY = { common: 'Common', uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic', legendary: 'Legendary', gm: 'Game Master' };
+  const RARITY = { common: 'Common', uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic', legendary: 'Legendary', hierloom: 'Hierloom', gm: 'Game Master' };
   const ATTRIBUTES = ['strength', 'agility', 'intellect', 'stamina', 'dexterity', 'accuracy'];
   const tr = text => window.Locale ? Locale.translate(text) : text;
   const catalog = id => (window.WORLD_ITEMS || []).find(i => i.id === id);
@@ -32,6 +32,7 @@
     t.replaceChildren(node('b', piece.name, 'item-name'), node('small', `${tr(RARITY[rarity] || 'Common')} · ${piece.class ? piece.class : tr('All classes')}`));
     t.dataset.rarity = rarity;
     t.append(node('p', stats(piece) || tr('No bonuses')));
+    if (piece.xpPercent) t.append(node('p', tr('+100% XP while equipped')), node('p', tr('Stats grow with your level')), node('p', tr('Never loses durability')));
     t.append(node('small', `${tr('Requires level')} ${piece.level}${piece.rank ? ` · ${tr('Rank')} ${piece.rank}` : ''}${piece.usable ? '' : ` · ${tr('Cannot be used yet')}`}`));
     t.hidden = false;
     const a = anchor.getBoundingClientRect(), w = t.getBoundingClientRect();

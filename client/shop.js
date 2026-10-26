@@ -42,13 +42,13 @@
   }
   function confirm() {
     if (pending || !basket.size) return;
-    const precious = [...basket.values()].filter(row => ['epic', 'legendary'].includes(row.rarity));
+    const precious = [...basket.values()].filter(row => ['epic', 'legendary', 'hierloom'].includes(row.rarity));
     if (!precious.length) { submit(); return; }
     closeWarning();
     warning = make('dialog', '', 'sell-warning panel'); warning.id = 'sell-warning';
     warning.setAttribute('aria-labelledby', 'sell-warning-title');
     const title = make('h3', 'Sell valuable items?'); title.id = 'sell-warning-title'; warning.append(title);
-    warning.append(make('p', 'Really sell these purple or orange items?'));
+    warning.append(make('p', precious.some(row => row.rarity === 'hierloom') ? 'Really sell these valuable items, including Hierlooms?' : 'Really sell these purple or orange items?'));
     const list = make('ul');
     for (const row of precious) {
       const n = make('li', Inventory.definition(row.item)?.name || row.item); n.dataset.rarity = row.rarity; list.append(n);
@@ -60,7 +60,7 @@
     warning.addEventListener('keydown', event => event.stopPropagation());
     $('stage').append(warning); warning.showModal();
     window.Settings?.registerWindow('sell-warning', null, 'Sell valuable items?', false);
-    (precious.some(row => row.rarity === 'legendary') ? cancel : yes).focus();
+    (precious.some(row => ['legendary', 'hierloom'].includes(row.rarity)) ? cancel : yes).focus();
   }
   function stock() {
     return (npc?.offers || []).filter(o => o.item || o.bag).map(offer => {

@@ -1014,3 +1014,25 @@
 #npc-dialogue.merchant-mode #npc-gold, #merchant-bags .bag-footer { font-size: calc(12px / var(--window-k, .8)); }
 
 #npc-dialogue.merchant-mode .merchant-tabs { flex-basis: 100%; margin: 0 0 -4px; padding-top: 4px; }
+
+.gossip-parchment .inventory-item[data-rarity="hierloom"] b { color: #806000; }
+
+.inventory-item[data-rarity="hierloom"] { border-color: #ffd24a90; }
+
+.inventory-item[data-rarity="hierloom"] b { color: #ffd24a; }
+
+.inventory-item[data-rarity="hierloom"] .item-tile, .equipped-slot[data-rarity="hierloom"] .gear-icon { border-color: #ffd24a; box-shadow: inset 0 0 .7cqw #d6b02836, 0 0 .3cqw #d6b02833; }
+
+.bag-details .item-name[data-rarity="hierloom"] { color: #ffd24a; }
+
+.item-tooltip[data-rarity="hierloom"] b { color: #ffd24a; }
+
+.rare-pickup[data-rarity="hierloom"] { --rare-col: #ffd24a; border-width: 3px; box-shadow: 0 0 3.5cqw var(--rare-col), inset 0 0 1.8cqw #ffd24a77; }
+
+.roll-card[data-rarity="hierloom"] { border-color: #ffd24ab0; }
+
+.bank-details .item-name[data-rarity="hierloom"] { color: #ffd24a; }
+
+.bank-copy[data-rarity="hierloom"] > span { color: #ffd24a; }
+
+.quest-reward-icon[data-rarity="hierloom"] { border-color: #ffd24a; }

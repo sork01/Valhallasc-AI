@@ -76,6 +76,8 @@ mod gm_test;
 #[cfg(test)]
 mod gm_test_tests;
 mod gm_visibility;
+#[cfg(test)]
+mod hierloom_tests;
 mod hold;
 mod hour_shards;
 mod instances;
@@ -4423,6 +4425,10 @@ impl World {
         let boost = self.drop_multiplier_of(owner);
         if raid_rewards::boss(kind).is_some() {
             for gear in raid_rewards::drops(kind, boost, || self.random()) {
+                let item = gear.item.clone();
+                self.loot_drop_with_gear(owner, zone, point, &item, Some(gear));
+            }
+            for gear in hierlooms::drops(kind, boost, || self.random()) {
                 let item = gear.item.clone();
                 self.loot_drop_with_gear(owner, zone, point, &item, Some(gear));
             }

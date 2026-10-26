@@ -456,7 +456,15 @@ fn raid_boss_actual_kills_pay_two_orange_copies_per_warden_with_rebirth() {
             r.w.players.get_mut(&1).unwrap().character.rebirth_tiers = [0, 0, 0, 0, boost - 1];
             r.w.hit_slime(r.boss, 1, 1e12, false);
             assert!(r.w.slimes[r.boss].dead);
-            let pieces: Vec<_> = r.w.drops.iter().filter_map(|d| d.gear.as_ref()).collect();
+            let pieces: Vec<_> =
+                r.w.drops
+                    .iter()
+                    .filter_map(|d| d.gear.as_ref())
+                    .filter(|g| {
+                        crate::items::item(&g.item)
+                            .is_some_and(|i| i.source.as_deref() == Some("chained_forge"))
+                    })
+                    .collect();
             assert_eq!(
                 pieces.len(),
                 2 * boost as usize,
@@ -750,7 +758,15 @@ fn raid_boss_sigrun_sign_numbers_reachability_loot_and_schema_match() {
         r.w.slimes[r.boss].hp = r.w.slimes[r.boss].max_hp;
         r.w.drops.clear();
         r.w.hit_slime(r.boss, 1, 1e12, false);
-        let pieces: Vec<_> = r.w.drops.iter().filter_map(|d| d.gear.as_ref()).collect();
+        let pieces: Vec<_> =
+            r.w.drops
+                .iter()
+                .filter_map(|d| d.gear.as_ref())
+                .filter(|g| {
+                    crate::items::item(&g.item)
+                        .is_some_and(|i| i.source.as_deref() == Some("chained_forge"))
+                })
+                .collect();
         assert_eq!(pieces.len(), 2 * boost as usize);
         assert!(
             pieces

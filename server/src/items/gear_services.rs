@@ -106,7 +106,11 @@ impl GearInstance {
     }
     /// Durability left, 100 for a new piece and 0 for a broken one.
     pub fn durability(&self) -> u8 {
-        WEAR_MAX.saturating_sub(self.wear)
+        if item(&self.item).is_some_and(super::hierlooms::is_hierloom) {
+            WEAR_MAX
+        } else {
+            WEAR_MAX.saturating_sub(self.wear)
+        }
     }
     /// A broken piece stays worn but gives no attack, defense or attributes.
     pub fn broken(&self) -> bool {
@@ -269,7 +273,7 @@ impl Character {
         self.materialize_gear_instances();
         let mut out = DeathWear::default();
         for (piece, at) in self.worn_copy_positions() {
-            if piece.starter || piece.rarity == GM_RARITY {
+            if piece.starter || piece.rarity == GM_RARITY || super::hierlooms::is_hierloom(piece) {
                 continue;
             }
             let Some(copy) = at.map(|at| &mut self.gear_instances[at]) else {
@@ -286,7 +290,9 @@ impl Character {
     /// What a smith charges to bring this copy back to full durability: a share of its sale value (a rare piece merged to
     /// epic sells for twice), scaled by the wear, never less than one gold for a damaged copy.
     pub fn repair_price(&self, copy: &GearInstance) -> u32 {
-        let Some(catalog) = item(&copy.item).filter(|_| copy.wear > 0) else {
+        let Some(catalog) =
+            item(&copy.item).filter(|i| copy.wear > 0 && !super::hierlooms::is_hierloom(i))
+        else {
             return 0;
         };
         let merged = u64::from(catalog.rarity == "rare" && copy.rarity == "epic");
@@ -299,7 +305,7 @@ impl Character {
     pub fn repair_quote(&self, multiplier: u32) -> Vec<(u64, u32)> {
         self.gear_instances
             .iter()
-            .filter(|g| g.wear > 0)
+            .filter(|g| g.wear > 0 && g.durability() < WEAR_MAX)
             .map(|g| (g.id, self.repair_price(g).saturating_mul(multiplier)))
             .collect()
     }
@@ -325,7 +331,7 @@ impl Character {
             .gear_instances
             .iter()
             .enumerate()
-            .filter(|(_, g)| g.wear > 0 && only.is_none_or(|id| g.id == id))
+            .filter(|(_, g)| g.durability() < WEAR_MAX && only.is_none_or(|id| g.id == id))
             .map(|(at, _)| at)
             .collect();
         if due.is_empty() {

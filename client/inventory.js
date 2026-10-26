@@ -39,8 +39,9 @@
   const activate = i => consumable(i) || licence(i) ? useItem(i) : equip(i);
   const num = n => Number(n.toFixed(1));
   const statNames = ['strength', 'agility', 'intellect', 'stamina', 'dexterity', 'accuracy'];
+  const levelStats = i => i?.rarity === 'hierloom' ? { ...i, rarity: undefined, bonusStats: Object.fromEntries(statNames.map(k => [k, (i.bonusStats?.[k] || 0) * heroLevel()])) } : i;
   const bonusStats = i => statNames.filter(stat => i.bonusStats?.[stat]).map(stat => `+${i.bonusStats[stat]} ${stat}`).join(' · ');
-  const stats = i => [i.attack ? `+${num(i.attack)} attack` : '', i.defense ? `${num(i.defense)} defense` : '', bonusStats(i)].filter(Boolean).join(' · ');
+  const stats = piece => { const i = levelStats(piece); return [i.attack ? `+${num(i.attack)} attack` : '', i.defense ? `${num(i.defense)} defense` : '', bonusStats(i)].filter(Boolean).join(' · '); };
   const heroLevel = () => Field.hero?.level || 1;
   const levelOf = i => i?.requiredLevel || 1;
   const tooLow = i => !!i && levelOf(i) > heroLevel();   // gear above the hero's level cannot be put on (the server refuses it too)
@@ -61,11 +62,12 @@
   const looseCopies = id => copiesOf(definition(id)).slice(equippedCount(definition(id)));
   // Durability (docs/durability.md): a copy from a server without it has no wear and counts as new. Only the worn copies
   // lose durability, and a broken one stays worn but gives no stats.
-  const durabilityOf = g => Math.max(0, 100 - (g?.wear || 0));
-  const conditionState = g => !g?.wear ? 'new' : durabilityOf(g) <= 0 ? 'broken' : durabilityOf(g) <= 30 ? 'low' : 'worn';
-  const wearNote = g => g?.wear ? ` · ${durabilityOf(g)}% durability` : '';
+  const indestructible = g => definition(g?.item)?.rarity === 'hierloom';
+  const durabilityOf = g => indestructible(g) ? 100 : Math.max(0, 100 - (g?.wear || 0));
+  const conditionState = g => indestructible(g) || !g?.wear ? 'new' : durabilityOf(g) <= 0 ? 'broken' : durabilityOf(g) <= 30 ? 'low' : 'worn';
+  const wearNote = g => !indestructible(g) && g?.wear ? ` · ${durabilityOf(g)}% durability` : '';
   const conditionText = g => durabilityOf(g) <= 0 ? 'Broken · no stats until repaired' : `Durability ${durabilityOf(g)}%`;
-  const copyStats = g => ({ attack:g.attack * (1 + g.rank * .04), defense:g.defense * (1 + g.rank * .04), bonusStats:Object.fromEntries(statNames.map(k => [k, Math.round(((g.bonusStats?.[k] || 0) + (g.rolledStats?.[k] || 0)) * (1 + g.rank * .04))])) });
+  const copyStats = copy => { const g = indestructible(copy) ? { ...copy, ...levelStats(definition(copy.item)), rank: 0 } : copy; return ({ attack:g.attack * (1 + g.rank * .04), defense:g.defense * (1 + g.rank * .04), bonusStats:Object.fromEntries(statNames.map(k => [k, Math.round(((g.bonusStats?.[k] || 0) + (g.rolledStats?.[k] || 0)) * (1 + g.rank * .04))])) }); };
   const canEquip = () => Online.connected && !Field.hero?.dead;
   function node(tag, text = '', cls) { const n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; }
   const setEntry = i => i?.kind !== 'cloak' && i?.source && window.WORLD_SET_BONUSES?.entries.find(row => row.source === i.source && row.class === look?.class);
@@ -101,7 +103,7 @@
     shell: '<path d="M12 39c0-36 40-36 40 0l-9 14H21z" fill="currentColor"/><path d="M32 12v40M16 30l16 8 16-8M19 44l13-6 13 6" fill="none" stroke="#f1d59c" stroke-width="3"/>',
     bag: '<path d="M18 20c0-17 28-17 28 0M12 21h40l3 31H9z" fill="none" stroke="currentColor" stroke-width="5"/><path d="M10 32h44M25 26v12h14V26" fill="none" stroke="currentColor" stroke-width="3"/>',
   };
-  const RARITY_NAMES = { common: 'Common', uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic', legendary: 'Legendary', gm: 'Game Master' };
+  const RARITY_NAMES = { common: 'Common', uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic', legendary: 'Legendary', hierloom: 'Hierloom', gm: 'Game Master' };
   const rarityName = i => RARITY_NAMES[i?.rarity] || 'Common';
   function icon(i, emptyKind, copy) {
     const crack = i && conditionState(copy) === 'broken' ? '<svg class="item-break" viewBox="0 0 64 64" aria-hidden="true"><path d="M43 3 27 21 39 24 20 43 30 45 18 61 M30 17 17 13 M24 39 43 42" fill="none" stroke="#270000" stroke-width="10" stroke-linejoin="miter"/><path d="M43 3 27 21 39 24 20 43 30 45 18 61 M30 17 17 13 M24 39 43 42" fill="none" stroke="#ff2525" stroke-width="6" stroke-linejoin="miter"/></svg>' : '';
@@ -112,7 +114,7 @@
     if (i && /^orange_(0[1-9]|[1-4][0-9]|50)$/.test(i.id)) return `<span class="orange-item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-image:url(assets/${i.id}.png)"></span>`;
     // A recoloured piece (art + tint in the catalog) shows its base piece's icon through the same colour filter the worn art gets.
     const base = i?.art ? WORLD_ITEMS.find(o => o.kind === i.kind && o.class === i.class && o.variant === i.art) : null;
-    const cell = i && window.ITEM_ICONS?.at[i.id] || (base && window.ITEM_ICONS?.at[base.id]);   // equipment has its own pixel icon (assets/items.png); everything else keeps the glyph
+    const cell = i?.rarity === 'hierloom' ? null : i && window.ITEM_ICONS?.at[i.id] || (base && window.ITEM_ICONS?.at[base.id]);   // equipment has its own pixel icon (assets/items.png); everything else keeps the glyph
     if (cell) {
       const { cols, rows } = ITEM_ICONS, t = i.tint;
       const tint = t ? `hue-rotate(${t.hue}deg) saturate(${t.saturate}) brightness(${t.brightness}) ` : '';
@@ -122,11 +124,12 @@
     const palette = { slime_gel: '#88c675', blue_gel: '#6ca6ec', pink_gel: '#dd88b1', golden_gel: '#edc561', royal_jelly: '#bd84e2', traveler_stew: '#c98a4b', health_potion: '#e0476b', mana_potion: '#5488ef' };
     const bagColors = ['#a78257','#78996f','#6396b3','#a478b2','#c38a5e','#719ba1','#9b86c3','#be9292','#d3ae68','#dfcde7'];
     const bagTier = i?.kind === 'bag' ? Math.max(0, Math.min(9, Math.floor((i.requiredLevel || 1) / 10))) : 0;
-    const color = i?.kind === 'bag' ? bagColors[bagTier] : palette[i?.id] || palette[i?.family] || (i?.variant === 'crimson' ? '#c16b67' : { uncommon: '#6fcf86', rare: '#86acd5', epic: '#b98be6', legendary: '#f0a85a', gm: '#e8c050' }[i?.rarity] || '#ab8e68');
+    const color = i?.kind === 'bag' ? bagColors[bagTier] : palette[i?.id] || palette[i?.family] || (i?.variant === 'crimson' ? '#c16b67' : { uncommon: '#6fcf86', rare: '#86acd5', epic: '#b98be6', legendary: '#f0a85a', hierloom: '#ffd24a', gm: '#e8c050' }[i?.rarity] || '#ab8e68');
     const badge = i?.kind === 'bag' ? `<text x="32" y="49" text-anchor="middle" fill="#fff4d8" stroke="#3d291f" stroke-width="1" font-size="12" font-weight="bold">${i.bagSlots}</text>` : '';
     const tier = consumable(i) && (i.requiredLevel || 1) >= 95 ? `<text x="51" y="55" text-anchor="middle" fill="#fff4d8" stroke="#3d291f" stroke-width="1" font-size="12" font-weight="bold">${i.requiredLevel}</text>` : '';
+    const hierloomGem = i?.rarity === 'hierloom' ? `<circle cx="32" cy="21" r="5" fill="${i.id === 'hierloom_ember_ring' ? '#ff6c42' : '#fff5b5'}" stroke="#a67c16"/>` : '';
     const border = consumable(i) && i.rarity !== 'common' ? `<circle cx="32" cy="32" r="29" fill="none" stroke="${{ uncommon: '#6fcf86', rare: '#86acd5', epic: '#b98be6', legendary: '#f0a85a' }[i.rarity] || '#ab8e68'}" stroke-width="3"/>` : '';
-    return `<svg viewBox="0 0 64 64" aria-hidden="true" style="color:${color}" stroke="#15151a" stroke-width="2" stroke-linejoin="round">${border}${art[glyph] || art.accessory}${badge}${tier}</svg>`;
+    return `<svg viewBox="0 0 64 64" aria-hidden="true" style="color:${color}" stroke="#15151a" stroke-width="2" stroke-linejoin="round">${border}${art[glyph] || art.accessory}${hierloomGem}${badge}${tier}</svg>`;
   }
   function summary(i, count = quantity(i.id)) {
     const copy = displayCopy(i), rarity = displayRarity(i);
@@ -147,14 +150,16 @@
     else if (i.kind !== 'material') t.append(node('p', `${slot ? slots.find(s => s[0] === slot)?.[1] : i.kind === 'armor' ? 'Chest' : i.kind === 'weapon' ? 'Hands' : i.kind} · ${stats(copy ? copyStats(copy) : i)}`));
     if (i.class && i.class !== look?.class) t.append(node('p', `Requires ${i.class}`, 'item-restriction'));
     if (compatible(i) && levelOf(i) > 1) t.append(node('p', levelNote(i), tooLow(i) ? 'item-restriction' : 'item-level'));
+    if (i.rarity === 'hierloom') t.append(node('p', '+100% XP while equipped'), node('p', 'Stats grow with your level'), node('p', 'Never loses durability'));
     if (setEntry(i)) t.append(...setLines(i.source));
     const weaponFeature = window.RaidRewards?.tooltip(i);
     if (weaponFeature) t.append(node('p', weaponFeature, 'weapon-feature'));
     if (compatible(i) && !slot) {
       const target = slots.find(([s]) => slotKind(s) === i.kind)?.[0], current = target && itemAtSlot(target);
       if (current && current.id !== i.id) {
-        const attack = num((i.attack || 0) - (current.attack || 0)), defense = num((i.defense || 0) - (current.defense || 0));
-        const bonus = statNames.map(stat => ({ stat, delta: (i.bonusStats?.[stat] || 0) - (current.bonusStats?.[stat] || 0) })).filter(v => v.delta).map(v => `${v.delta > 0 ? '+' : ''}${v.delta} ${v.stat}`).join(' · ');
+        const candidate = levelStats(i), worn = levelStats(current);
+        const attack = num((candidate.attack || 0) - (worn.attack || 0)), defense = num((candidate.defense || 0) - (worn.defense || 0));
+        const bonus = statNames.map(stat => ({ stat, delta: (candidate.bonusStats?.[stat] || 0) - (worn.bonusStats?.[stat] || 0) })).filter(v => v.delta).map(v => `${v.delta > 0 ? '+' : ''}${v.delta} ${v.stat}`).join(' · ');
         t.append(node('p', `Compared with ${current.name}: ${attack >= 0 ? '+' : ''}${attack} attack · ${defense >= 0 ? '+' : ''}${defense} defense${bonus ? ` · ${bonus}` : ''}`, 'item-comparison'));
       }
     }
@@ -246,6 +251,7 @@
     if (!i || !quantity(i.id)) { container.append(node('p', 'Select an item to inspect it.', 'bag-empty-note')); return; }
     const heading = node('b', i.name, 'item-name'); heading.dataset.rarity = displayRarity(i);
     container.append(heading, node('small', summary(i, quantity(i.id))));
+    if (i.rarity === 'hierloom') container.append(node('p', '+100% XP while equipped'), node('p', 'Stats grow with your level'), node('p', 'Never loses durability'));
     if (setEntry(i)) container.append(...setLines(i.source));
     if (i.source === 'orange_pool' || copiesOf(i).some(g => g.rarity !== i.rarity)) {
       const worn = equippedCount(i);
@@ -385,7 +391,7 @@
       this.update(next, look, nextSlots, nextBags, nextInstances, setCounts);
     },
     update(next, nextLook, nextSlots = {}, nextBags = [], nextInstances = [], nextSets = {}) {
-      const key = JSON.stringify([next, nextLook, nextSlots, nextBags, nextInstances, nextSets]); if (key === signature) return;
+      const key = JSON.stringify([next, nextLook, nextSlots, nextBags, nextInstances, nextSets, heroLevel()]); if (key === signature) return;
       stacks = next; look = nextLook; gearSlots = nextSlots; bags = nextBags; gearInstances=nextInstances; setCounts=nextSets; signature = key;
       renderSets(); renderGearWarning();
       reconcile(); hideTooltip(); dispatchEvent(new Event('inventory-change'));

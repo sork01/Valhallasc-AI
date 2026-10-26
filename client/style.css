@@ -262,3 +262,5 @@ body { font-family: var(--cute); color: #eaf6ff; touch-action: manipulation; use
 .sell-warning::backdrop { background: #100b08bb; }
 .sell-warning .btn { margin: 8px; }
 @media (max-width: 650px) { .sell-columns { grid-template-columns: 1fr; } .sell-list { max-height: 22vh; } }
+
+.sell-workspace [data-rarity="hierloom"] .sell-name, .sell-warning [data-rarity="hierloom"] { color: #967000; }

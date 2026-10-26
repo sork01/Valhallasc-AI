@@ -57,7 +57,9 @@ impl World {
                     || (i.attack, i.defense, i.bonus_stats.clone(), i.rarity.clone(), 0),
                     |g| (g.attack, g.defense, g.effective_bonus_stats(), g.rarity.clone(), g.rank),
                 );
+                let bonus = hierlooms::attributes(i, c.level).unwrap_or(bonus);
                 json!({"slot":slot,"item":i.id,"name":i.name,"rarity":rarity,"level":i.required_level,
+                    "xpPercent":if hierlooms::is_hierloom(i) {100} else {0},
                     "class":i.class,"attack":attack,"defense":defense,"bonus":bonus,"rank":rank,
                     "usable":i.required_level <= c.level && i.class.is_none_or(|k| k == c.look.class)})
             })

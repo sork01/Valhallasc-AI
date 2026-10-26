@@ -58028,5 +58028,81 @@
     "kind": "material",
     "rarity": "common",
     "sell": 0
+  },
+  {
+    "id": "hierloom_dawn_ring",
+    "name": "Dawnkeeper Ring",
+    "kind": "accessory",
+    "rarity": "hierloom",
+    "requiredLevel": 1,
+    "sell": 9152,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "strength": 1,
+      "agility": 1,
+      "intellect": 1,
+      "stamina": 2
+    },
+    "class": null,
+    "variant": "chainforged_accessory",
+    "source": "raid_hierlooms"
+  },
+  {
+    "id": "hierloom_ember_ring",
+    "name": "Everember Ring",
+    "kind": "accessory",
+    "rarity": "hierloom",
+    "requiredLevel": 1,
+    "sell": 9152,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "strength": 1,
+      "agility": 1,
+      "intellect": 1,
+      "stamina": 2
+    },
+    "class": null,
+    "variant": "chainforged_accessory",
+    "source": "raid_hierlooms"
+  },
+  {
+    "id": "hierloom_necklace",
+    "name": "Legacy of the Forge",
+    "kind": "necklace",
+    "rarity": "hierloom",
+    "requiredLevel": 1,
+    "sell": 9152,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "strength": 1,
+      "agility": 1,
+      "intellect": 1,
+      "stamina": 2
+    },
+    "class": null,
+    "variant": "chainforged_necklace",
+    "source": "raid_hierlooms"
+  },
+  {
+    "id": "hierloom_cloak",
+    "name": "Mantle of Generations",
+    "kind": "cloak",
+    "rarity": "hierloom",
+    "requiredLevel": 1,
+    "sell": 9152,
+    "attack": 0,
+    "defense": 0,
+    "bonusStats": {
+      "strength": 1,
+      "agility": 1,
+      "intellect": 1,
+      "stamina": 2
+    },
+    "class": null,
+    "variant": "cloak_l99_epic",
+    "source": "raid_hierlooms"
   }
 ]

@@ -3,7 +3,7 @@
 // card per open roll with Need / Greed / Pass and a countdown. Item names come from the catalog, never from markup.
 (() => {
   const $ = id => document.getElementById(id);
-  const COLOURS = { uncommon: '#4ad66d', rare: '#4aa3ff', epic: '#b45cff', legendary: '#ff9a2e' };
+  const COLOURS = { uncommon: '#4ad66d', rare: '#4aa3ff', epic: '#b45cff', legendary: '#ff9a2e', hierloom: '#ffd24a' };
   const cards = new Map();
   function el(tag, text, className) {
     const node = document.createElement(tag);

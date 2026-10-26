@@ -8,6 +8,8 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+- [x] `RAID-HIERLOOMS` — **Beta 1.25.0 (2026-10-26).** Four golden Hierloom raid drops (two rings, necklace, cloak), 10% base chance per raid boss, wearer-level stats, +100% XP per equipped piece and no durability loss. Rules and focused checks: `docs/hierlooms.md`.
+
 
 ### Zone-scoped announcements (owner's request, 2026-10-26)
 

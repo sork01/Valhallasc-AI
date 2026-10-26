@@ -493,7 +493,15 @@ fn eldmarr_actual_final_hit_awards_two_oranges_two_signatures_and_clears() {
     r.w.hit_slime(r.boss, 1, 1e15, false);
     assert!(r.w.slimes[r.boss].dead);
     assert!(r.w.instances.iter().find(|i| i.zone == 46).unwrap().cleared);
-    let pieces: Vec<_> = r.w.drops.iter().filter_map(|d| d.gear.as_ref()).collect();
+    let pieces: Vec<_> =
+        r.w.drops
+            .iter()
+            .filter_map(|d| d.gear.as_ref())
+            .filter(|g| {
+                crate::items::item(&g.item)
+                    .is_some_and(|i| i.source.as_deref() == Some("chained_forge"))
+            })
+            .collect();
     assert_eq!(pieces.len(), 4);
     assert!(pieces.iter().all(|g| g.rarity == "legendary"));
     assert_eq!(

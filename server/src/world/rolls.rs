@@ -43,7 +43,10 @@ pub(super) struct Roll {
 
 /// Green and better is rolled for; gray gear and materials are not.
 pub fn rollable(rarity: &str) -> bool {
-    matches!(rarity, "uncommon" | "rare" | "epic" | "legendary")
+    matches!(
+        rarity,
+        "uncommon" | "rare" | "epic" | "legendary" | "hierloom"
+    )
 }
 /// Whether this character may need the piece: it is gear their class can wear. The level does not matter: a piece a
 /// few levels too high is still theirs to grow into (the level only gates wearing it), so a hunter can need hunter gloves.

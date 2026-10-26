@@ -1283,8 +1283,8 @@
       floater(event.x, event.y, item?.kind === 'bag' ? `${item.name} · +${item.bagSlots} slots` : `+${event.quantity} ${event.name}`, item?.kind === 'bag' ? bagColor(item) : '#64b5ff', false, 'pickup');
       if (event.actor === Online.id) {
         say('pickup'); say('rarePickup', event);
-        const tier = { uncommon: 1, rare: 2, epic: 3, legendary: 4 }[rarity] || 0;
-        if (tier) burst(event.x, event.y, 8 + tier * 8, 4 + tier * 5, ['#ffffff', { 1: '#4ad66d', 2: '#64b5ff', 3: '#b45cff', 4: '#ff9a2e' }[tier]]);
+        const tier = { uncommon: 1, rare: 2, epic: 3, legendary: 4, hierloom: 5 }[rarity] || 0;
+        if (tier) burst(event.x, event.y, 8 + tier * 8, 4 + tier * 5, ['#ffffff', { 1: '#4ad66d', 2: '#64b5ff', 3: '#b45cff', 4: '#ff9a2e', 5: '#ffd24a' }[tier]]);
       }
     }
     if (event.kind === 'shotBlocked') spark(event.x, event.y, 7, ['#f8e5b5','#d2b990','#fff4d7'], 7, 0.6, 0.45);
@@ -3693,6 +3693,7 @@
     rare: { color: '#4aa3ff', core: '#dceeff', tier: 2 },
     epic: { color: '#b45cff', core: '#f1dcff', tier: 3 },
     legendary: { color: '#ff9a2e', core: '#fff0c8', tier: 4 },
+    hierloom: { color: '#ffd24a', core: '#fff9d4', tier: 5 },
   };
   function drawLootPillar(g, drop, item, sx, sy, t) {
     const rarity = drop.gear?.rarity || item?.rarity, style = LOOT_PILLARS[rarity];

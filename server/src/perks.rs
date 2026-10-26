@@ -128,7 +128,7 @@ impl Character {
         Ok(())
     }
     pub fn boosted_xp(&self, xp: u32) -> u32 {
-        plus_percent(xp, self.rebirth_xp_percent())
+        plus_percent(xp, self.rebirth_xp_percent() + self.hierloom_xp_percent())
     }
     pub fn boosted_gold(&self, gold: u32) -> u32 {
         plus_percent(gold, self.rebirth_gold_percent())

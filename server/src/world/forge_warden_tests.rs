@@ -400,7 +400,15 @@ fn raid_warden_five_new_encounters_reset_and_have_real_orange_rewards() {
         r.w.end_boss_fight(r.boss);
         r.w.hit_slime(r.boss, 1, 1e13, false);
         assert!(r.w.slimes[r.boss].dead, "{kind}");
-        let gear: Vec<_> = r.w.drops.iter().filter_map(|d| d.gear.as_ref()).collect();
+        let gear: Vec<_> =
+            r.w.drops
+                .iter()
+                .filter_map(|d| d.gear.as_ref())
+                .filter(|g| {
+                    crate::items::item(&g.item)
+                        .is_some_and(|i| i.source.as_deref() == Some("chained_forge"))
+                })
+                .collect();
         assert_eq!(gear.len(), 2, "{kind}");
         assert!(
             gear.iter()
