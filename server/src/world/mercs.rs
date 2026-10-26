@@ -451,6 +451,40 @@ impl World {
                 self.remove_mercenary(session);
                 continue;
             }
+            // The hirer falling dooms the contract: the fighter fights on, but badly (see `merc_doom`), and is dead within 30 seconds.
+            if self.players[&owner].character.hp <= 0. && self.players[&session].merc_doom.is_none()
+            {
+                let deadline = self.time + 12. + 18. * self.random();
+                self.players.get_mut(&session).unwrap().merc_doom = Some(deadline);
+            }
+            if self.players[&session]
+                .merc_doom
+                .is_some_and(|deadline| self.time >= deadline)
+            {
+                {
+                    let p = self.players.get_mut(&session).unwrap();
+                    if p.character.hp > 0. {
+                        p.character.hp = 0.;
+                        p.dead_time = 0.;
+                        p.fallen = false;
+                        p.attack = 0.;
+                        p.buffs.clear();
+                        p.stop();
+                        let (actor, point) = (p.character.id.clone(), p.character.point());
+                        self.event_with(
+                            "death",
+                            &actor,
+                            point,
+                            0.,
+                            false,
+                            json!({"enemy":"","level":0}),
+                        );
+                    } else if p.dead_time >= 2. {
+                        self.remove_mercenary(session);
+                    }
+                    continue;
+                }
+            }
             let mate_ids = self.party_mates(&owner_id);
             let merc_id = self.players[&session].character.id.clone();
             if !mate_ids.contains(&merc_id) {
@@ -552,7 +586,12 @@ impl World {
             });
         // A boss fight asks more of a fighter than a swing: step out of a telegraph, ground a charge, hold a brazier,
         // hit a shield's helpers first (`boss_play.rs`, the same brain the dungeon harness's bots use).
-        let play = self.boss_play(session);
+        // A doomed fighter no longer reads the fight: it stands in telegraphs and ignores shield helpers.
+        let play = if self.players[&session].merc_doom.is_some() {
+            None
+        } else {
+            self.boss_play(session)
+        };
         let chosen = play.as_ref().and_then(|b| b.target).or(chosen);
         let hold_fire = play.as_ref().is_some_and(|b| b.hold_fire);
         self.ai_combat(
@@ -669,6 +708,7 @@ impl World {
         let me = p.character.point();
         let zone = p.character.zone;
         let class = p.character.look.class;
+        let doomed = p.merc_doom.is_some();
         // Keep the party alive first: one potion at a time (they share a cooldown), health before mana.
         {
             let p = &self.players[&session];
@@ -681,7 +721,7 @@ impl World {
                     .max_by(|a, b| (a.heal + a.mana).total_cmp(&(b.heal + b.mana)))
                     .map(|i| i.id.clone())
             };
-            let drink = if p.potion_cd > 0. {
+            let drink = if p.potion_cd > 0. || doomed {
                 None
             } else if c.hp < c.max_hp() * 0.45 {
                 best(&|i| i.heal > 0.)
@@ -721,6 +761,13 @@ impl World {
             .filter(|s| s.class == class && s.level <= level)
         {
             let skill = base.at_level(level);
+            // Doomed: no healing or mending, and skills come late and rarely.
+            if doomed
+                && (matches!(skill.effect, Effect::Heal { .. } | Effect::Mend { .. })
+                    || self.random() > 0.04)
+            {
+                continue;
+            }
             let p = &self.players[&session];
             if p.skill_cd.contains_key(&skill.id)
                 || p.character.resource() < skill.cost
@@ -1034,5 +1081,31 @@ mod follow_tests {
             at.distance(owner) < 4. && pursuit::clear_line(&w.maps[0], owner, at, PLAYER_RADIUS),
             "still trapped at {at:?}"
         );
+    }
+    #[test]
+    fn merc_doom_a_fallen_hirer_dooms_the_fighter_to_die_within_thirty_seconds() {
+        let (mut w, _rx, merc) = rig(Class::Warrior, false);
+        tick(&mut w, merc);
+        assert!(w.players[&merc].merc_doom.is_none());
+        w.players.get_mut(&1).unwrap().character.hp = 0.;
+        tick(&mut w, merc);
+        let deadline = w.players[&merc].merc_doom.expect("the fall is noticed");
+        assert!(deadline - w.time <= 30.);
+        // The hirer back on their feet does not lift it; until the deadline it lives, with a slowed swing.
+        w.players.get_mut(&1).unwrap().character.hp = 100.;
+        for _ in 0..(5. / TICK) as usize {
+            tick(&mut w, merc);
+        }
+        assert!(w.players[&merc].character.hp > 0.);
+        assert!(w.players[&merc].merc_doom == Some(deadline));
+        while w.time < deadline + 3. {
+            w.time += TICK;
+            w.update_mercenaries();
+            if !w.players.contains_key(&merc) {
+                break;
+            }
+            w.update_player(merc);
+        }
+        assert!(!w.players.contains_key(&merc), "the fighter died and left");
     }
 }

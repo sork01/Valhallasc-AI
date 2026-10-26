@@ -292,6 +292,8 @@ struct Player {
     /// Set on a fighter hired by a raid contract: the zone of the raid door. The contract ends when the hirer is
     /// neither there nor inside a raid.
     merc_raid: Option<usize>,
+    /// Set when the hirer falls: the world time this fighter drops dead for good. Until then it wanders, dazed.
+    merc_doom: Option<f64>,
     merc_navigation: mercs::Navigation,
     /// A temporary autonomous adventurer in an occupied shared zone.
     ambient: Option<ambient::Ambient>,
@@ -406,6 +408,7 @@ impl Player {
             merc: None,
             merc_quest: None,
             merc_raid: None,
+            merc_doom: None,
             merc_navigation: mercs::Navigation::default(),
             ambient: None,
             escort: None,
@@ -2819,6 +2822,10 @@ impl World {
         p.attack = 0.0001;
         p.hit = false;
         p.cooldown = p.character.attack_cooldown() / (1. + p.buff(BuffKind::Haste));
+        if p.merc_doom.is_some() {
+            // A fighter whose hirer has fallen has lost its rhythm.
+            p.cooldown *= 2.2;
+        }
         let kind = if p.character.look.class.ranged() {
             "cast"
         } else {
