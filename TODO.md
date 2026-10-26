@@ -9,6 +9,10 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 ## Open tasks
 
 
+### Zone-scoped announcements (owner's request, 2026-10-26)
+
+- [ ] `KING-SLIME-LOCAL-ANNOUNCEMENT` — “A King Slime has emerged in Greenmeadow!” currently appears regardless of the player's zone. Send/show this spawn announcement only to players currently in Greenmeadow. Check that a Greenmeadow player receives it and a player in another zone does not; preserve the King Slime spawn/encounter rules.
+
 ### Zone visibility fixes (owner's request, 2026-10-26)
 
 - [ ] `VEYRROOT-PORTAL-VISIBILITY` — A portal in Veyrroot Canopy is hidden behind scenery. Locate the obstructed portal, adjust its placement or the occluding scenery/draw order so players can clearly see and reach it, and check its portal marker/interaction in the actual zone. Preserve the reciprocal destination and safe arrival rules; update the owning map generator if placement changes.
