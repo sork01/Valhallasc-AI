@@ -1,5 +1,15 @@
 [
   {
+    "version": "Beta 1.19.3",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Forge raid fighters gain 200% extra attack per other fighter, including mercenaries. A full group gains 1800% extra attack.",
+      "Eldmarr's cracking floor and lava have clear outlines above characters. Cracking tiles show a countdown so the boss cannot hide the warning."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.19.2",
     "date": "2026-10-26",
     "new": [],

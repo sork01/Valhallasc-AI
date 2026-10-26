@@ -186,6 +186,28 @@
     }
   }
 
+  // Eldmarr's floor remains readable through his large sprite and the raid crew.
+  // Draw only the server's cracked/lava cells here, after actors and darkness.
+  function drawForeground(g, t, { w2s }) {
+    if (!fights.length) return;
+    g.save(); g.lineJoin = 'round'; g.setLineDash([]);
+    g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = 'bold 15px "Jua", sans-serif';
+    for (const f of fights) for (const tele of f.tele || []) {
+      if (typeof tele.lava !== 'boolean') continue;
+      const polys = (tele.shapes || []).flatMap(s => polygons(s, null));
+      if (!polys.length) continue;
+      path(g, polys, w2s);
+      g.globalAlpha = .14; g.fillStyle = RED; g.fill('evenodd');
+      g.globalAlpha = 1; g.lineWidth = 7; g.strokeStyle = '#250e19'; g.stroke();
+      g.lineWidth = 3; g.strokeStyle = tele.lava ? '#ff6150' : '#ffcc99'; g.stroke();
+      const [x, y] = centre(tele.shapes[0]), [sx, sy] = w2s(x, y);
+      g.fillStyle = '#250e19'; g.fillRect(sx - 17, sy - 12, 34, 24);
+      g.strokeStyle = tele.lava ? '#ff6150' : '#ffcc99'; g.lineWidth = 2; g.strokeRect(sx - 17, sy - 12, 34, 24);
+      g.fillStyle = '#fff4dc'; g.fillText(tele.lava ? '!' : `${Math.ceil(left(tele))}s`, sx, sy);
+    }
+    g.restore();
+  }
+
   // ---- the screen pass -----------------------------------------------------------------------------------------------------
   // opts: w2s, boss(id) -> {x, y} | null, pos(characterId) -> {x, y} | null
   function drawHud(g, VW, VH, t, opts) {
@@ -297,7 +319,7 @@
   }
 
   window.BossMech = {
-    update, reset, drawFloor, drawHud, onEvent, setCause,
+    update, reset, drawFloor, drawForeground, drawHud, onEvent, setCause,
     colors: { red: RED, blue: BLUE, path: GOLD, green: GREEN },   // the four telegraph colours, shared with the boss signs
     get active() { return fights.length > 0; }, get fights() { return fights; }, get cause() { return cause; },
     _polygons: polygons, _left: left,

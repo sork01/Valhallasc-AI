@@ -1,6 +1,8 @@
 //! Raid strength and recovery. Encounters and helpers remain owned by the boss engine.
 use super::*;
 
+const ATTACK_PERCENT_PER_ALLY: usize = 200;
+
 #[derive(Clone, Copy, Default)]
 pub(super) struct RaidSupport {
     enabled: bool,
@@ -9,7 +11,7 @@ pub(super) struct RaidSupport {
 
 impl RaidSupport {
     pub(super) fn attack_multiplier(self) -> f64 {
-        1. + self.others as f64 * 0.5
+        1. + (self.others * ATTACK_PERCENT_PER_ALLY) as f64 / 100.
     }
 
     pub(super) fn taken_multiplier(self) -> f64 {
@@ -22,7 +24,7 @@ impl RaidSupport {
             view["attack"] = json!(player.character.stats().0 * self.attack_multiplier());
             view["raidSupport"] = json!({
                 "others":self.others,
-                "attackPercent":self.others * 50,
+                "attackPercent":self.others * ATTACK_PERCENT_PER_ALLY,
                 "damageReductionPercent":self.others * 5,
             });
         }

@@ -25,6 +25,8 @@ The hired brain retains its floor escape goal until it has crossed clear; contin
 
 On death, the existing guaranteed raid reward table awards two orange armour selections and two signature weapons, preserving rebirth and the humans-only roll path. The raid clears when its actual final boss dies. A single boss announcement is emitted per cleared copy, the `after_clear` exit opens, and a thirty-minute reward chest appears near the released exit (111, 29). Repeat clear calls do not duplicate the announcement or chest. Other copies stay closed. The shipped dungeon/final-boss music switch now receives the actual Eldmarr fight and death snapshots.
 
+Cracked and lava cells also have a foreground outline above actors and darkness, so Eldmarr cannot hide their footprint. Each cracked cell shows seconds until lava; live lava shows an exclamation mark. These cues remain visible with reduced motion and Low graphics.
+
 All instructions, names, meters, banners and the announcement have hand-written Swedish. Numbered roles and heat percentages supplement colour, and the full warnings remain visible with reduced motion.
 
 ## Balance is left to the owner

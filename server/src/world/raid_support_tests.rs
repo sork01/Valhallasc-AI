@@ -32,13 +32,17 @@ fn raid_support_counts_real_contracts_and_updates_on_copy_exit_and_disconnect() 
         w.time += 1.;
         w.interact(1, "cf_quartermaster", Some(&format!("merc_{class}")));
         assert_eq!(w.raid_support(1).others, n + 1);
+        assert_eq!(
+            w.raid_support(1).attack_multiplier(),
+            1. + (n + 1) as f64 * 2.
+        );
     }
     assert_eq!(w.players.len(), 10);
     assert_eq!(w.players.values().filter(|p| p.merc.is_some()).count(), 9);
     for session in w.players.keys() {
         let bonus = w.raid_support(*session);
         assert_eq!(bonus.others, 9, "humans and mercenaries receive the bonus");
-        assert_eq!(bonus.attack_multiplier(), 5.5);
+        assert_eq!(bonus.attack_multiplier(), 19.);
         assert!((bonus.taken_multiplier() - 0.55).abs() < 1e-12);
     }
     let merc = *w.players.keys().find(|s| **s != 1).unwrap();
@@ -115,10 +119,10 @@ fn raid_support_scales_seeded_attack_rolls_and_snapshot_without_changing_saved_s
         .iter()
         .find(|p| p["id"] == w.players[&1].character.id)
         .unwrap();
-    assert_eq!(hero["attack"], base * 5.5);
+    assert_eq!(hero["attack"], base * 19.);
     assert_eq!(
         hero["raidSupport"],
-        json!({"others":9,"attackPercent":450,"damageReductionPercent":45})
+        json!({"others":9,"attackPercent":1800,"damageReductionPercent":45})
     );
     assert_eq!(
         w.players[&1].character.stats().0,
@@ -134,7 +138,7 @@ fn raid_support_scales_seeded_attack_rolls_and_snapshot_without_changing_saved_s
     let solo = w.roll_damage(1, 1.);
     assert_eq!(full.1, solo.1);
     assert!(
-        (full.0 - solo.0 * 5.5).abs() <= 3.25,
+        (full.0 - solo.0 * 19.).abs() <= 10.,
         "only final hit rounding differs"
     );
     let snap = w.snapshot_for(ZONE);
@@ -189,7 +193,7 @@ fn raid_support_boosts_attack_based_healing() {
     w.heal_players(1, &[2], 1.);
     assert_eq!(
         w.players[&2].character.hp,
-        (1. + (base * 5.5).round()).min(w.players[&2].character.max_hp())
+        (1. + (base * 19.).round()).min(w.players[&2].character.max_hp())
     );
 }
 

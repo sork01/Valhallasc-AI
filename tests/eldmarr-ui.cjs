@@ -25,7 +25,7 @@ const check=(ok,message)=>{assert.ok(ok,message);checks++;};
  await Promise.all(names.map(bot=>put(bot,{x:hall.x,y:hall.y+2})));
  await page.waitForFunction(()=>Field.remotePlayers.length===9);
  await page.waitForFunction(()=>BossMech.fights.some(f=>f.throne?.phase===1&&f.tele.some(t=>t.label==='Cracking Floor')),null,{timeout:30000});
- if(process.env.MUTATE_FLOOR)await page.evaluate(()=>BossMech.drawFloor=()=>{});
+ if(process.env.MUTATE_FLOOR)await page.evaluate(()=>{BossMech.drawFloor=()=>{};BossMech.drawForeground=()=>{};});
  const fight=()=>page.evaluate(()=>BossMech.fights.find(f=>f.throne));
  const capture=async name=>{
   const state=await fight();const pixels=await page.evaluate(()=>{

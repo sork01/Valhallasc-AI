@@ -716,7 +716,7 @@ in the isolated raid worktree on `feat/raid-approach`; nothing is deployed.
 
 ## 17. Raid strength (owner request, 2026-10-22)
 
-The owner requested **+1% damage-taken reduction and +50% extra attack for each
+The current owner rule (2026-10-26) is **+5% damage-taken reduction and +200% extra attack for each
 other fighter in the instance**, and explicitly confirmed that **mercenaries
 count too**. This is implemented for the raid template and each private raid
 copy. Each human and hired fighter receives the bonus individually:
@@ -724,9 +724,9 @@ copy. Each human and hired fighter receives the bonus individually:
 | Fighters present | Other fighters | Extra attack | Total attack | Incoming damage multiplier |
 | ---: | ---: | ---: | ---: | ---: |
 | 1 | 0 | 0% | 1× | 1.00× |
-| 2 | 1 | +50% | 1.5× | 0.99× |
-| 5 | 4 | +200% | 3× | 0.96× |
-| 10 | 9 | **+450%** | **5.5×** | **0.91×** |
+| 2 | 1 | +200% | 3× | 0.95× |
+| 5 | 4 | +800% | 9× | 0.80× |
+| 10 | 9 | **+1800%** | **19×** | **0.55×** |
 
 Presence is determined by the authoritative runtime zone id, before copy ids are
 mapped back to the public template in snapshots. Other copies, outdoor zones,
