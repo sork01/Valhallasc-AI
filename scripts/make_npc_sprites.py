@@ -33,15 +33,48 @@ def palette(s):
 PALETTES={k:palette(s) for k,s in SPECS.items()}
 R.PALETTES.update({'npc_'+k:v for k,v in PALETTES.items()})
 
-def prop(a,kind,hand,gesture):
+# Grip coordinates in each prop's original drawing. Place that point at the
+# animated wrist, then paint the fingers in front of the handle.
+GRIPS=dict(bottle=(29,37),alembic=(29,37),hammer=(29,36),bread=(20,26),
+ mug=(34,29),scales=(29,30),bow=(38,40),book=(37,32),scroll=(37,32),
+ trumpet=(24,50),flowers=(35,27),fish=(27,35),spool=(29,29),satchel=(23,28),
+ lyre=(35,30),kite=(25,27),palette=(23,29),saw=(21,27),reins=(24,31),
+ chest=(37,24),pearl=(29,26),orb=(29,26),seed=(29,26),waterjug=(36,36),
+ grain=(35,28),fan=(22,30),key=(29,38),tablet=(35,30),compass=(29,34),
+ bell=(30,54),telescope=(24,38))
+SUPPORTS=dict(bread=(-20,26),book=(16,32),scroll=(16,32),chest=(18,24),tablet=(20,30),grain=(21,28))
+
+def prop_offset(kind,hand):
+ gx,gy=GRIPS[kind]
+ return hand[0]-gx,hand[1]-gy
+
+def prop(a,kind,hand):
  x,y=hand
- if kind=='spear':
-  a.c((32,4),(32,75),1.3,1.1,'leather');a.band([(28,72),(32,82),(36,72)],'metal');a.band([(33,69),(42,65),(33,60)],'cloth')
- elif kind in ('bottle','alembic'):
+ if kind in ('spear','staff','cane','harpoon','lantern'):
+  # Long poles keep their grounded foot inside the frame for every build.
+  tip=min(81,y+(17 if kind=='cane' else 48))
+  a.c((x,4),(x,tip-5),1.5,1.5,'leather')
+  if kind=='spear':
+   a.band([(x-4,tip-10),(x,tip),(x+4,tip-10)],'metal');a.band([(x+1,tip-13),(x+10,tip-17),(x+1,tip-22)],'cloth')
+  elif kind=='harpoon':
+   a.band([(x-4,tip-12),(x,tip),(x+4,tip-12),(x,tip-10)],'metal');a.c((x,tip-7),(x+7,tip-10),1,1,'metal')
+  elif kind=='lantern':
+   a.c((x,tip-5),(x+9,tip-10),1,1,'leather');a.line((x+9,tip-10),(x+9,tip-19),'gold1',1);a.band([(x+3,tip-33),(x+12,tip-33),(x+12,tip-19),(x+3,tip-19)],'gold');a.e(x+7,tip-26,3,5,'glass')
+  else:a.e(x+1,tip-5,4,3,'gold')
+  return
+ dx,dy=prop_offset(kind,hand);ox,lift=a.ox,a.lift
+ a.ox+=dx;a.lift+=dy
+ try:prop_shape(a,kind)
+ finally:a.ox,a.lift=ox,lift
+
+def prop_shape(a,kind):
+ # Canonical shapes; animation is applied once by prop(), never independently.
+ y=27
+ if kind in ('bottle','alembic'):
   a.e(29,y+5,7,9,'glass');a.c((29,y+10),(29,y+19),2.4,2,'glass');a.c((26,y+20),(32,y+20),1.5,1.5,'gold')
   if kind=='alembic':a.c((29,y+18),(38,y+24),1.5,1.5,'glass');a.c((38,y+24),(39,y+6),1.5,1.5,'glass');a.e(38,y+2,4,5,'glass')
  elif kind=='hammer':
-  a.c((27,24),(32,54+gesture),1.9,1.9,'leather');a.band([(23,52+gesture),(39,52+gesture),(39,62+gesture),(23,62+gesture)],'metal')
+  a.c((27,24),(32,54),1.9,1.9,'leather');a.band([(23,52),(39,52),(39,62),(23,62)],'metal')
  elif kind=='bread':
   a.band([(-21,28),(22,28),(26,24),(-24,24)],'leather')
   for x in (-12,0,12):
@@ -65,13 +98,11 @@ def prop(a,kind,hand,gesture):
   for i in range(5):
    x=20+i*3.4;y=39+i%3*3;a.c((28,31),(x,y),1,1,'leaf');a.e(x,y,3.1,3.4,'cloth');a.dot(x,y,'gold2',2)
  elif kind=='fish':
-  a.c((27,51),(27,30),1,1,'cream');a.e(27,27,5,10,'metal');a.band([(24,19),(21,14),(32,14),(30,19)],'metal');a.dot(27,32,'ink',2)
+  a.c((27,43),(27,30),1,1,'cream');a.e(27,27,5,7,'metal');a.band([(24,21),(21,18),(32,18),(30,21)],'metal');a.dot(27,30,'ink',2)
  elif kind=='spool':
   a.c((29,25),(29,57),1,1,'leather');a.e(29,40,5,8,'cream');a.c((23,33),(35,33),1.5,1.5,'gold');a.c((23,47),(35,47),1.5,1.5,'gold')
  elif kind=='satchel':
   a.c((-12,47),(20,23),1.8,1.8,'leather');a.band([(15,16),(31,18),(31,35),(16,34)],'leather');a.band([(16,29),(31,31),(29,36),(17,36)],'gold');a.dot(23,28,'gold2',2)
- elif kind in ('staff','cane'):
-  a.c((30,4),(30,73 if kind=='staff' else 41),1.5,1.7,'leather');a.e(31,73 if kind=='staff' else 42,4,3,'gold')
  elif kind=='lyre':
   a.band([(20,23),(16,49),(23,55),(27,48),(34,54),(40,47),(36,23)],'gold');a.band([(24,30),(22,46),(34,46),(33,30)],'leather')
   for x in (25,28,31):a.line((x,30),(x,47),'cream2',1)
@@ -87,8 +118,6 @@ def prop(a,kind,hand,gesture):
   a.e(21,27,5,4,'leather')
  elif kind=='reins':
   a.e(30,35,8,13,'leather');a.e(30,35,5,10,'cream');a.c((24,42),(20,30),1.1,1.1,'leather')
- elif kind=='lantern':
-  a.c((30,27),(30,73),1,1,'leather');a.c((30,73),(39,68),1,1,'leather');a.line((39,68),(39,59),'gold1',1);a.band([(33,45),(42,45),(42,59),(33,59)],'gold');a.e(37,52,3,5,'glass')
  elif kind=='chest':
   a.band([(16,17),(39,17),(39,32),(16,32)],'leather');a.e(27,32,12,5,'leather');a.c((20,18),(20,35),1.5,1.5,'gold');a.c((34,18),(34,35),1.5,1.5,'gold');a.dot(27,27,'gold2',3)
  elif kind in ('pearl','orb','seed','waterjug'):
@@ -111,11 +140,9 @@ def prop(a,kind,hand,gesture):
  elif kind=='compass':
   a.e(29,43,10,10,'gold');a.e(29,43,7,7,'cream');a.band([(29,51),(32,40),(26,37)],'cloth');a.dot(29,43,'gold2',2)
  elif kind=='bell':
-  a.c((30,27),(30,62),1.5,1.5,'leather');a.band([(22,36),(25,48),(35,48),(39,36)],'gold');a.e(30,35,9,2.5,'gold');a.e(30,32,2,3,'metal')
+  a.c((30,54),(30,62),1.5,1.5,'leather');a.band([(22,46),(25,54),(35,54),(39,46)],'gold');a.e(30,45,9,2,'gold');a.e(30,43,2,2,'metal')
  elif kind=='telescope':
   a.c((23,36),(38,57),3,3.5,'gold');a.e(39,58,4,4,'glass');a.c((22,37),(19,32),2,2,'leather')
- elif kind=='harpoon':
-  a.c((29,6),(29,73),1.4,1.4,'leather');a.band([(25,68),(29,80),(33,68),(29,70)],'metal');a.c((29,73),(36,70),1,1,'metal')
 
 def hair(a,style,hx,hy):
  if style=='shaved':a.e(hx,hy+9,9,3,'hair');return
@@ -206,8 +233,12 @@ def draw(key,clip,n):
  if s['name'] in ('smith','baker','innkeeper','carpenter') or s['prop'] in ('hammer','bread','mug','saw'):
   a.band([(-w*.55,top-5),(w*.55,top-5),(w*.7,leg-1),(-w*.7,leg-1)],'leather' if s['prop'] in ('hammer','saw') else 'cream')
  a.c((-w,leg+2),(w,leg+2),1.4,1.4,'gold');a.dot(0,leg+2,'gold2',3)
- for side in (-1,1):
-  hand=(side*(w+7),leg+8+(-side*swing if walk else gesture if side==1 else 0))
+ right=(w+7,leg+8+(-swing if walk else gesture))
+ left=(-(w+7),leg+8+(swing if walk else 0))
+ if s['prop']=='satchel':right=(23,28+bob)
+ if s['prop'] in SUPPORTS:
+  dx,dy=prop_offset(s['prop'],right);sx,sy=SUPPORTS[s['prop']];left=(sx+dx,sy+dy)
+ for side,hand in ((-1,left),(1,right)):
   a.c((side*w*.85,top-3),hand,4 if build in ('stocky','broad') else 3.2,2.4,'cloth');a.e(hand[0],hand[1],3.4,3.8,'skin')
  a.c((-5,top),(5,top),2,2,'cream')
  a.e(hx,hy,11.5 if build!='child' else 12,12.5,'skin')
@@ -220,8 +251,11 @@ def draw(key,clip,n):
  if build=='stooped':
   for side in (-1,1):a.e(hx+side*5,hy+1,4,3,'gold');a.e(hx+side*5,hy+1,2.5,1.8,'glass')
  hat(a,s['hat'],hx,hy)
- prop(a,s['prop'],(w+7,leg+8+gesture),gesture)
  if s.get('ornament')!='wings':ornament(a,s,hx,hy)
+ prop(a,s['prop'],right)
+ for hand in ([left,right] if s['prop'] in SUPPORTS else [right]):
+  a.e(hand[0],hand[1],3.4,3.8,'skin')
+  a.line((hand[0]-1,hand[1]+1),(hand[0]+1,hand[1]+1),'skin0',1)
  return a.done()
 
 def selected():return sys.argv[2:] or list(SPECS)
@@ -287,6 +321,13 @@ def export(verify=False):
   manifest['npcs']=metadata(manifest['sprites'])['npcs']
   manifest.setdefault('tops',{}).update(tops);manifest.setdefault('bounds',{}).update(bounds);MANIFEST.write_text(json.dumps(manifest,indent=2,ensure_ascii=False)+'\n')
 
+def assign():
+ manifest=json.loads(MANIFEST.read_text())
+ assert set(manifest['sprites'])==set(SPECS), 'Build missing NPC designs before assigning them'
+ manifest['npcs']=metadata(manifest['sprites'])['npcs']
+ MANIFEST.write_text(json.dumps(manifest,indent=2,ensure_ascii=False)+'\n')
+ print(len(manifest['npcs']),'NPC identities assigned; saved artwork preserved')
+
 if __name__=='__main__':
  command=sys.argv[1] if len(sys.argv)>1 else 'preview'
- {'preview':preview,'build':build,'export':export,'verify':lambda:export(True)}[command]()
+ {'preview':preview,'build':build,'export':export,'assign':assign,'verify':lambda:export(True)}[command]()

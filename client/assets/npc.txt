@@ -3571,6 +3571,15 @@
       },
       "color": "#74d7d0"
     },
+    "dungeon_repair_5": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
     "wyrd_warden": {
       "art": "sentinel",
       "identity": {
@@ -4366,6 +4375,33 @@
       },
       "color": "#74d7d0"
     },
+    "dungeon_repair_10": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    "dungeon_repair_11": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    "dungeon_repair_12": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
     "astral_steward": {
       "art": "special_astral_steward",
       "identity": {
@@ -4903,6 +4939,15 @@
         "apron": "#70615b"
       },
       "color": "#697184"
+    },
+    "dungeon_repair_18": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
     },
     "stormglass_warden": {
       "art": "sentinel",
@@ -5970,6 +6015,105 @@
       },
       "color": "#6ed7d6"
     },
+    "dungeon_repair_29": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    "dungeon_repair_30": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    "dungeon_repair_31": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    "dungeon_repair_32": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    "dungeon_repair_33": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    "dungeon_repair_34": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    "dungeon_repair_35": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    "dungeon_repair_36": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    "dungeon_repair_37": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    "dungeon_repair_38": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    "dungeon_repair_39": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
     "barrow_witness": {
       "art": "special_barrow_witness",
       "identity": {
@@ -5980,6 +6124,15 @@
         "hatColor": "#6e617f"
       },
       "color": "#a5c4c6"
+    },
+    "dungeon_repair_41": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
     },
     "span_witness": {
       "art": "special_span_witness",
@@ -5992,6 +6145,15 @@
       },
       "color": "#86d8f0"
     },
+    "dungeon_repair_42": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
     "keel_witness": {
       "art": "special_keel_witness",
       "identity": {
@@ -6003,6 +6165,15 @@
       },
       "color": "#86bfa9"
     },
+    "dungeon_repair_43": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
     "null_witness": {
       "art": "special_null_witness",
       "identity": {
@@ -6013,6 +6184,15 @@
         "hatColor": "#41304e"
       },
       "color": "#b694e8"
+    },
+    "dungeon_repair_44": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
     },
     "ew_guide": {
       "art": "special_ew_guide",
@@ -6069,12 +6249,21 @@
         "hatColor": "#433344"
       },
       "color": "#75d7d5"
+    },
+    "dungeon_repair_46": {
+      "art": "smith",
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
     }
   },
   "tops": {
-    "sentinel": 83,
+    "sentinel": 81,
     "physician": 77,
-    "smith": 70,
+    "smith": 61,
     "baker": 73,
     "innkeeper": 69,
     "merchant": 71,
@@ -6085,30 +6274,30 @@
     "fisher": 69,
     "weaver": 69,
     "courier": 69,
-    "pilgrim": 77,
+    "pilgrim": 76,
     "bard": 80,
-    "child": 82,
+    "child": 80,
     "elder": 66,
-    "painter": 65,
+    "painter": 64,
     "carpenter": 67,
     "alchemist": 64,
     "steward": 76,
     "stablehand": 65,
-    "lamplighter": 75,
+    "lamplighter": 78,
     "banker": 67,
     "special_banker_alderhaven": 69,
     "special_banker_skaldholm": 74,
-    "special_sky_warden": 83,
+    "special_sky_warden": 81,
     "special_sky_healer": 77,
     "special_sky_trader": 71,
     "special_sky_skadi": 76,
-    "special_sky_brokk": 70,
+    "special_sky_brokk": 61,
     "special_sky_veleda": 76,
-    "special_sky_thorgrim": 83,
+    "special_sky_thorgrim": 81,
     "special_travel_perch": 69,
     "special_span_guide": 76,
     "special_span_chronicler": 66,
-    "special_nacre_envoy": 77,
+    "special_nacre_envoy": 80,
     "special_nacre_healer": 74,
     "special_nacre_trader": 74,
     "special_nacre_smith": 74,
@@ -6116,9 +6305,9 @@
     "special_banker_nacrehold": 74,
     "special_nacre_gardener": 74,
     "special_nacre_singer": 79,
-    "special_nacre_warden": 83,
+    "special_nacre_warden": 82,
     "special_nacre_innkeeper": 74,
-    "special_nacre_lamplighter": 75,
+    "special_nacre_lamplighter": 78,
     "special_nacre_resident_0": 74,
     "special_nacre_resident_1": 74,
     "special_nacre_resident_2": 74,
@@ -6138,12 +6327,12 @@
     "special_nacre_resident_16": 74,
     "special_nacre_resident_17": 74,
     "special_travel_nacrehold": 74,
-    "special_astral_steward": 83,
+    "special_astral_steward": 81,
     "special_banker_astralhollow": 77,
     "special_astral_healer": 77,
     "special_astral_scholar": 68,
     "special_astral_gardener": 68,
-    "special_astral_warden": 83,
+    "special_astral_warden": 81,
     "special_astral_trader": 71,
     "special_travel_astralhollow": 69,
     "special_prism_keeper": 76,
@@ -6158,7 +6347,7 @@
     "special_orrery_scholar": 66,
     "special_orrery_trader": 71,
     "special_travel_stillpoint": 69,
-    "special_moonspore_warden": 83,
+    "special_moonspore_warden": 81,
     "special_moonspore_healer": 81,
     "special_moonspore_ranger": 80,
     "special_moonspore_scholar": 72,
@@ -6172,28 +6361,28 @@
     "special_asterion_gardener": 66,
     "special_asterion_healer": 77,
     "special_asterion_merchant": 71,
-    "special_asterion_stonewarden": 83,
+    "special_asterion_stonewarden": 81,
     "special_asterion_singer": 80,
-    "special_asterion_smith": 70,
+    "special_asterion_smith": 63,
     "special_asterion_walker0": 69,
-    "special_asterion_walker1": 77,
+    "special_asterion_walker1": 76,
     "special_asterion_walker2": 77,
     "special_asterion_walker3": 76,
-    "special_asterion_walker4": 77,
+    "special_asterion_walker4": 76,
     "special_asterion_walker5": 80,
-    "special_asterion_walker6": 83,
+    "special_asterion_walker6": 81,
     "special_asterion_walker7": 69,
-    "special_asterion_walker8": 65,
-    "special_asterion_walker9": 77,
+    "special_asterion_walker8": 64,
+    "special_asterion_walker9": 76,
     "special_travel_asterion": 69,
-    "special_ew_citysmith": 70,
+    "special_ew_citysmith": 63,
     "special_sun_miller": 67,
-    "special_sun_keeper": 77,
+    "special_sun_keeper": 76,
     "special_travel_millbridge": 80,
     "special_ribbon_host": 69,
     "special_ribbon_keeper": 76,
-    "special_travel_jubilee": 82,
-    "special_tangle_warden": 83,
+    "special_travel_jubilee": 83,
+    "special_tangle_warden": 81,
     "special_tangle_scholar": 68,
     "special_travel_banyan": 80,
     "special_heart_matriarch": 77,
@@ -6201,19 +6390,19 @@
     "special_heart_archivist": 66,
     "special_heart_carver": 80,
     "special_heart_oracle": 73,
-    "special_heart_custodian": 77,
+    "special_heart_custodian": 76,
     "special_lapis_keeper": 71,
     "special_lapis_cartographer": 66,
-    "special_lapis_warden": 83,
+    "special_lapis_warden": 81,
     "special_lapis_seer": 77,
     "special_travel_azure_wells": 75,
-    "special_frostwake_captain": 83,
+    "special_frostwake_captain": 81,
     "special_frostwake_surveyor": 62,
     "special_frostwake_bellkeeper": 65,
     "special_frostwake_skywatcher": 77,
-    "special_frostwake_ribkeeper": 81,
+    "special_frostwake_ribkeeper": 76,
     "special_travel_frostwake": 69,
-    "special_cairn_warden": 83,
+    "special_cairn_warden": 81,
     "special_cairn_surveyor": 64,
     "special_cairn_stonesinger": 67,
     "special_cairn_grovekeeper": 68,
@@ -6228,9 +6417,9 @@
     "special_travel_harvestwatch": 71,
     "special_travel_rimehold": 71,
     "special_barrow_witness": 70,
-    "special_span_witness": 83,
+    "special_span_witness": 81,
     "special_keel_witness": 80,
-    "special_null_witness": 77,
+    "special_null_witness": 76,
     "special_ew_guide": 80,
     "special_ew_keeper": 76,
     "special_ew_smith": 77,
@@ -6240,74 +6429,74 @@
   "bounds": {
     "sentinel": [
       20,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "physician": [
       26,
       13,
-      85,
+      74,
       91
     ],
     "smith": [
       18,
-      20,
-      89,
+      29,
+      86,
       91
     ],
     "baker": [
+      26,
       17,
-      17,
-      79,
+      83,
       91
     ],
     "innkeeper": [
       23,
       21,
-      88,
+      75,
       91
     ],
     "merchant": [
       17,
       19,
-      93,
+      91,
       91
     ],
     "ranger": [
       27,
       10,
-      89,
+      69,
       91
     ],
     "scholar": [
+      32,
       24,
-      24,
-      89,
+      72,
       91
     ],
     "herald": [
       26,
       15,
-      92,
+      86,
       91
     ],
     "gardener": [
       24,
       24,
-      87,
+      72,
       91
     ],
     "fisher": [
       20,
       21,
-      82,
+      79,
       91
     ],
     "weaver": [
       23,
       21,
-      85,
+      77,
       91
     ],
     "courier": [
@@ -6318,122 +6507,122 @@
     ],
     "pilgrim": [
       24,
-      13,
-      84,
+      14,
+      74,
       91
     ],
     "bard": [
       27,
       10,
-      90,
+      72,
       91
     ],
     "child": [
       27,
-      8,
-      91,
+      10,
+      83,
       91
     ],
     "elder": [
       24,
       24,
-      84,
+      74,
       91
     ],
     "painter": [
       24,
-      25,
-      88,
+      26,
+      85,
       91
     ],
     "carpenter": [
       20,
       23,
-      91,
+      94,
       91
     ],
     "alchemist": [
       24,
       26,
-      91,
+      82,
       91
     ],
     "steward": [
-      26,
+      32,
       14,
-      90,
+      71,
       91
     ],
     "stablehand": [
       18,
       25,
-      87,
+      89,
       91
     ],
     "lamplighter": [
       27,
-      15,
-      92,
+      12,
+      79,
       91
     ],
     "banker": [
-      17,
+      26,
       23,
-      89,
+      79,
       91
     ],
     "special_banker_alderhaven": [
-      17,
+      26,
       21,
-      89,
+      79,
       91
     ],
     "special_banker_skaldholm": [
-      20,
+      28,
       16,
-      89,
+      76,
       91
     ],
     "special_sky_warden": [
       14,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "special_sky_healer": [
       14,
       13,
-      85,
+      83,
       91
     ],
     "special_sky_trader": [
       14,
       19,
-      93,
+      91,
       91
     ],
     "special_sky_skadi": [
       14,
       14,
-      90,
+      83,
       91
     ],
     "special_sky_brokk": [
       14,
-      20,
-      89,
+      29,
+      86,
       91
     ],
     "special_sky_veleda": [
       14,
       14,
-      90,
+      83,
       91
     ],
     "special_sky_thorgrim": [
       14,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "special_travel_perch": [
@@ -6445,91 +6634,91 @@
     "special_span_guide": [
       14,
       14,
-      90,
+      83,
       91
     ],
     "special_span_chronicler": [
       14,
       24,
-      89,
+      83,
       91
     ],
     "special_nacre_envoy": [
       25,
-      13,
-      84,
+      10,
+      73,
       90
     ],
     "special_nacre_healer": [
       25,
       16,
-      85,
+      75,
       90
     ],
     "special_nacre_trader": [
       25,
       16,
-      85,
+      75,
       90
     ],
     "special_nacre_smith": [
       25,
       16,
-      89,
+      79,
       90
     ],
     "special_nacre_archivist": [
-      25,
+      26,
       16,
-      89,
+      71,
       90
     ],
     "special_banker_nacrehold": [
       25,
       16,
-      86,
+      76,
       90
     ],
     "special_nacre_gardener": [
       25,
       16,
-      87,
+      71,
       90
     ],
     "special_nacre_singer": [
       25,
       11,
-      90,
+      74,
       90
     ],
     "special_nacre_warden": [
       25,
-      7,
-      92,
+      8,
+      79,
       90
     ],
     "special_nacre_innkeeper": [
       25,
       16,
-      88,
+      73,
       90
     ],
     "special_nacre_lamplighter": [
       25,
-      15,
-      92,
+      12,
+      81,
       90
     ],
     "special_nacre_resident_0": [
       25,
       16,
-      87,
+      71,
       90
     ],
     "special_nacre_resident_1": [
       25,
       16,
-      85,
+      75,
       90
     ],
     "special_nacre_resident_2": [
@@ -6541,43 +6730,43 @@
     "special_nacre_resident_3": [
       25,
       16,
-      88,
+      84,
       90
     ],
     "special_nacre_resident_4": [
       25,
       16,
-      88,
+      73,
       90
     ],
     "special_nacre_resident_5": [
-      25,
+      26,
       16,
-      89,
+      71,
       90
     ],
     "special_nacre_resident_6": [
       25,
       16,
-      93,
+      83,
       90
     ],
     "special_nacre_resident_7": [
       25,
       11,
-      90,
+      74,
       90
     ],
     "special_nacre_resident_8": [
       25,
       16,
-      87,
+      71,
       90
     ],
     "special_nacre_resident_9": [
       25,
       16,
-      85,
+      75,
       90
     ],
     "special_nacre_resident_10": [
@@ -6589,43 +6778,43 @@
     "special_nacre_resident_11": [
       25,
       16,
-      88,
+      84,
       90
     ],
     "special_nacre_resident_12": [
       25,
       16,
-      88,
+      73,
       90
     ],
     "special_nacre_resident_13": [
-      25,
+      26,
       16,
-      89,
+      71,
       90
     ],
     "special_nacre_resident_14": [
       25,
       16,
-      93,
+      83,
       90
     ],
     "special_nacre_resident_15": [
       25,
       11,
-      90,
+      74,
       90
     ],
     "special_nacre_resident_16": [
       25,
       16,
-      87,
+      71,
       90
     ],
     "special_nacre_resident_17": [
       25,
       16,
-      85,
+      75,
       90
     ],
     "special_travel_nacrehold": [
@@ -6636,44 +6825,44 @@
     ],
     "special_astral_steward": [
       14,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "special_banker_astralhollow": [
       14,
       13,
-      90,
+      71,
       91
     ],
     "special_astral_healer": [
       14,
       13,
-      85,
+      74,
       91
     ],
     "special_astral_scholar": [
       14,
       22,
-      89,
+      72,
       91
     ],
     "special_astral_gardener": [
       14,
       22,
-      87,
+      72,
       91
     ],
     "special_astral_warden": [
       14,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "special_astral_trader": [
       14,
       19,
-      93,
+      91,
       91
     ],
     "special_travel_astralhollow": [
@@ -6685,31 +6874,31 @@
     "special_prism_keeper": [
       14,
       14,
-      90,
+      71,
       91
     ],
     "special_prism_healer": [
       14,
       13,
-      85,
+      74,
       91
     ],
     "special_prism_scout": [
       14,
       10,
-      89,
+      69,
       91
     ],
     "special_prism_scholar": [
       14,
       22,
-      89,
+      72,
       91
     ],
     "special_prism_trader": [
       14,
       19,
-      93,
+      91,
       91
     ],
     "special_travel_last_shade": [
@@ -6721,31 +6910,31 @@
     "special_orrery_keeper": [
       12,
       10,
-      90,
+      72,
       91
     ],
     "special_orrery_healer": [
       12,
       13,
-      85,
+      74,
       91
     ],
     "special_orrery_scout": [
       12,
       10,
-      89,
+      69,
       91
     ],
     "special_orrery_scholar": [
       12,
       24,
-      89,
+      72,
       91
     ],
     "special_orrery_trader": [
       12,
       19,
-      93,
+      91,
       91
     ],
     "special_travel_stillpoint": [
@@ -6756,38 +6945,38 @@
     ],
     "special_moonspore_warden": [
       20,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "special_moonspore_healer": [
       26,
       9,
-      85,
+      74,
       91
     ],
     "special_moonspore_ranger": [
       27,
       10,
-      89,
+      69,
       91
     ],
     "special_moonspore_scholar": [
-      24,
+      32,
       18,
-      89,
+      72,
       91
     ],
     "special_moonspore_trader": [
       17,
       17,
-      93,
+      91,
       91
     ],
     "special_moonspore_seer": [
-      26,
+      31,
       9,
-      90,
+      71,
       91
     ],
     "special_travel_lamplight": [
@@ -6799,61 +6988,61 @@
     "special_asterion_archon": [
       14,
       14,
-      90,
+      71,
       91
     ],
     "special_banker_asterion": [
       14,
       24,
-      93,
+      84,
       91
     ],
     "special_asterion_cartographer": [
       14,
       24,
-      89,
+      72,
       91
     ],
     "special_asterion_bellkeeper": [
       14,
       15,
-      92,
+      86,
       91
     ],
     "special_asterion_gardener": [
       14,
       24,
-      87,
+      72,
       91
     ],
     "special_asterion_healer": [
       14,
       13,
-      85,
+      74,
       91
     ],
     "special_asterion_merchant": [
       14,
       19,
-      93,
+      91,
       91
     ],
     "special_asterion_stonewarden": [
       14,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "special_asterion_singer": [
       14,
       10,
-      90,
+      72,
       91
     ],
     "special_asterion_smith": [
       14,
-      20,
-      89,
+      27,
+      86,
       91
     ],
     "special_asterion_walker0": [
@@ -6864,38 +7053,38 @@
     ],
     "special_asterion_walker1": [
       14,
-      13,
-      84,
+      14,
+      74,
       91
     ],
     "special_asterion_walker2": [
       14,
       13,
-      85,
+      74,
       91
     ],
     "special_asterion_walker3": [
       14,
       14,
-      90,
+      71,
       91
     ],
     "special_asterion_walker4": [
       14,
-      13,
-      84,
+      14,
+      74,
       91
     ],
     "special_asterion_walker5": [
       14,
       10,
-      90,
+      72,
       91
     ],
     "special_asterion_walker6": [
       14,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "special_asterion_walker7": [
@@ -6906,14 +7095,14 @@
     ],
     "special_asterion_walker8": [
       14,
-      25,
-      88,
+      26,
+      85,
       91
     ],
     "special_asterion_walker9": [
       14,
-      13,
-      84,
+      14,
+      74,
       91
     ],
     "special_travel_asterion": [
@@ -6924,20 +7113,20 @@
     ],
     "special_ew_citysmith": [
       14,
-      20,
-      89,
+      27,
+      86,
       91
     ],
     "special_sun_miller": [
-      18,
+      27,
       23,
-      87,
+      78,
       91
     ],
     "special_sun_keeper": [
       24,
-      13,
-      84,
+      14,
+      74,
       91
     ],
     "special_travel_millbridge": [
@@ -6949,31 +7138,31 @@
     "special_ribbon_host": [
       19,
       21,
-      90,
+      89,
       91
     ],
     "special_ribbon_keeper": [
       19,
       14,
-      86,
+      78,
       91
     ],
     "special_travel_jubilee": [
       19,
-      8,
-      91,
+      7,
+      86,
       91
     ],
     "special_tangle_warden": [
       20,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "special_tangle_scholar": [
-      24,
+      32,
       22,
-      87,
+      72,
       91
     ],
     "special_travel_banyan": [
@@ -6985,7 +7174,7 @@
     "special_heart_matriarch": [
       26,
       13,
-      86,
+      75,
       91
     ],
     "special_travel_veyrroot": [
@@ -6995,51 +7184,51 @@
       91
     ],
     "special_heart_archivist": [
+      26,
       24,
-      24,
-      90,
+      73,
       91
     ],
     "special_heart_carver": [
       26,
       10,
-      90,
+      72,
       91
     ],
     "special_heart_oracle": [
       23,
       17,
-      86,
+      78,
       91
     ],
     "special_heart_custodian": [
       24,
-      13,
-      84,
+      14,
+      74,
       91
     ],
     "special_lapis_keeper": [
       19,
       19,
-      90,
+      78,
       91
     ],
     "special_lapis_cartographer": [
       19,
       24,
-      88,
+      79,
       91
     ],
     "special_lapis_warden": [
       19,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "special_lapis_seer": [
       19,
       13,
-      86,
+      78,
       91
     ],
     "special_travel_azure_wells": [
@@ -7050,32 +7239,32 @@
     ],
     "special_frostwake_captain": [
       20,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "special_frostwake_surveyor": [
       24,
       28,
-      88,
+      79,
       91
     ],
     "special_frostwake_bellkeeper": [
       18,
       25,
-      89,
+      85,
       91
     ],
     "special_frostwake_skywatcher": [
       26,
       13,
-      92,
+      86,
       91
     ],
     "special_frostwake_ribkeeper": [
       18,
-      9,
-      86,
+      14,
+      83,
       91
     ],
     "special_travel_frostwake": [
@@ -7086,32 +7275,32 @@
     ],
     "special_cairn_warden": [
       20,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "special_cairn_surveyor": [
       21,
       26,
-      88,
+      79,
       91
     ],
     "special_cairn_stonesinger": [
       21,
       23,
-      89,
+      80,
       91
     ],
     "special_cairn_grovekeeper": [
       21,
       22,
-      86,
+      77,
       91
     ],
     "special_cairn_windseer": [
       21,
       6,
-      90,
+      86,
       91
     ],
     "special_travel_boulderwatch": [
@@ -7123,25 +7312,25 @@
     "special_yr_sp_lead": [
       24,
       26,
-      87,
+      72,
       91
     ],
     "special_yr_su_lead": [
-      20,
+      28,
       19,
-      87,
+      76,
       91
     ],
     "special_yr_au_lead": [
       17,
       21,
-      88,
+      81,
       91
     ],
     "special_yr_wi_lead": [
       26,
       13,
-      86,
+      75,
       91
     ],
     "special_travel_springmere": [
@@ -7171,55 +7360,55 @@
     "special_barrow_witness": [
       24,
       20,
-      84,
+      74,
       91
     ],
     "special_span_witness": [
       14,
-      7,
-      92,
+      9,
+      84,
       91
     ],
     "special_keel_witness": [
       25,
       10,
-      89,
+      69,
       91
     ],
     "special_null_witness": [
       12,
-      13,
-      84,
+      14,
+      74,
       91
     ],
     "special_ew_guide": [
       24,
       10,
-      89,
+      69,
       91
     ],
     "special_ew_keeper": [
       24,
       14,
-      90,
+      71,
       91
     ],
     "special_ew_smith": [
       24,
       13,
-      85,
+      74,
       91
     ],
     "special_raid_key_keeper": [
       24,
       14,
-      90,
+      71,
       91
     ],
     "special_cf_quartermaster": [
       17,
       19,
-      93,
+      91,
       91
     ]
   }

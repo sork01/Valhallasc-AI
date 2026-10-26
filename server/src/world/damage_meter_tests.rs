@@ -104,3 +104,82 @@ fn damage_meter_never_counts_dead_or_hidden_attackers() {
             .is_empty()
     );
 }
+
+#[test]
+fn damage_meter_dead_fighter_keeps_damage_and_loses_dps_until_the_whole_pack_ends() {
+    let mut w = world();
+    calm(&mut w);
+    let _rx = join(&mut w, 1, Class::Warrior);
+    w.players.get_mut(&1).unwrap().character.level = 99;
+    w.enter_instance(46);
+    let enemies: Vec<_> = w
+        .spawns
+        .iter()
+        .enumerate()
+        .filter(|(_, s)| s.zone == 46 && s.ambush.is_none() && !is_boss(&s.kind))
+        .take(2)
+        .map(|(id, _)| id)
+        .collect();
+    let point = w.slimes[enemies[0]].point();
+    place(&mut w, 1, 46, point);
+    let owner = w.players[&1].character.id.clone();
+    w.place_mercenary(&owner, Class::Mage, 99, 46, point, true, None)
+        .unwrap();
+    let merc = *w.players.keys().find(|&&s| s != 1).unwrap();
+    for &id in &enemies {
+        w.slimes[id] = Slime::with_level(id, &w.spawns[id], 99);
+        w.slimes[id].hp = 1000.;
+        w.slimes[id].state = "chase".into();
+        w.slimes[id].target = Some(merc);
+    }
+    let owner_row = |view: &Value| {
+        view["rows"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["id"] == owner)
+            .unwrap()
+            .clone()
+    };
+    w.time = 2.;
+    w.update_pack_fights();
+    assert_eq!(w.hit_slime(enemies[0], 1, 100., false), 100.);
+    w.players.get_mut(&1).unwrap().character.hp = 0.;
+    w.hit_slime(enemies[0], merc, 1e12, false);
+    w.time = 4.;
+    w.update_pack_fights();
+    w.update_damage_meter();
+    let first = w.damage_meter_view(46);
+    assert_eq!(
+        first["active"], true,
+        "the untouched second enemy is still fighting"
+    );
+    assert_eq!(owner_row(&first)["damage"], 100.);
+    assert_eq!(owner_row(&first)["dps"], 50.);
+    w.time = 8.;
+    w.hit_slime(enemies[1], merc, 75., false);
+    w.update_damage_meter();
+    let later = w.damage_meter_view(46);
+    assert_eq!(
+        owner_row(&later)["damage"],
+        100.,
+        "a new target erased the dead fighter"
+    );
+    let dps = owner_row(&later)["dps"].as_f64().unwrap();
+    assert!(dps > 0. && dps < 50.);
+    w.time = 12.;
+    w.hit_slime(enemies[1], merc, 1e12, false);
+    w.update_pack_fights();
+    w.update_damage_meter();
+    let last = w.damage_meter_view(46);
+    assert_eq!(last["active"], false);
+    assert_eq!(owner_row(&last)["damage"], 100.);
+    assert_eq!(owner_row(&last)["dps"], 10.);
+    w.time = 50.;
+    w.update_damage_meter();
+    assert_eq!(
+        w.damage_meter_view(46),
+        last,
+        "finished fight must stay frozen"
+    );
+}

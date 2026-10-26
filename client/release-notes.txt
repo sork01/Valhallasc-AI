@@ -1,5 +1,77 @@
 [
   {
+    "version": "Beta 1.22.1",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Broken equipment has a large red crack across its icon in equipment, bags, the bank and buyback."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.22.0",
+    "date": "2026-10-26",
+    "new": [
+      "A repair smith waits at every dungeon and raid entrance. Repairs there cost four times the town price."
+    ],
+    "changed": [],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.21.6",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Fallen fighters keep their damage totals, and their DPS gradually falls while the rest of the pack or boss fight continues."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.21.5",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Purple equipment now drops from ordinary Chained Forge pack enemies at a 5% base chance per kill, increased from 3%."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.21.4",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Rapid hits no longer leave old damage numbers waiting to appear after combat ends, and returning from a paused view clears expired numbers."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.21.3",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Hired fighters respawn normally during ordinary dungeon and raid pack fights, even while the remaining fighters keep fighting."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.21.2",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Emberfall Crags rivers have deeper red molten lava, brighter hot seams and far less hardened crust, making the dangerous channels easier to recognise."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.21.1",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Town and quest characters grip their weapons and tools throughout their idle, walking and conversation animations."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.21.0",
     "date": "2026-10-26",
     "new": [

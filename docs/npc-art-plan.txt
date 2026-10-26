@@ -4680,6 +4680,22 @@
       "color": "#74d7d0"
     },
     {
+      "id": "dungeon_repair_5",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 5,
+      "zoneName": "The Undervault",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
       "id": "wyrd_warden",
       "name": "Moot-Warden Bjorn Oakhand",
       "role": "Warden of the Moot",
@@ -5958,6 +5974,54 @@
       "color": "#74d7d0"
     },
     {
+      "id": "dungeon_repair_10",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 10,
+      "zoneName": "The Drowned Cathedral — Flooded Cloister",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
+      "id": "dungeon_repair_11",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 11,
+      "zoneName": "The Drowned Cathedral — Coral Reliquary",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
+      "id": "dungeon_repair_12",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 12,
+      "zoneName": "The Drowned Cathedral — Grand Nave",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
       "id": "astral_steward",
       "name": "Seren Starwatcher",
       "role": "Astral steward · Quest giver",
@@ -6837,6 +6901,22 @@
         "apron": "#70615b"
       },
       "color": "#697184"
+    },
+    {
+      "id": "dungeon_repair_18",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 18,
+      "zoneName": "The Moonwell",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
     },
     {
       "id": "stormglass_warden",
@@ -8584,6 +8664,182 @@
       "color": "#6ed7d6"
     },
     {
+      "id": "dungeon_repair_29",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 29,
+      "zoneName": "The Eye Below",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
+      "id": "dungeon_repair_30",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 30,
+      "zoneName": "The Elder Hollow",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
+      "id": "dungeon_repair_31",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 31,
+      "zoneName": "The Thousandfold Pavilion",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
+      "id": "dungeon_repair_32",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 32,
+      "zoneName": "Temple of the Rain Crown",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
+      "id": "dungeon_repair_33",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 33,
+      "zoneName": "The Seed Vault",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
+      "id": "dungeon_repair_34",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 34,
+      "zoneName": "The Sunken Astrolabe",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
+      "id": "dungeon_repair_35",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 35,
+      "zoneName": "The Thunderheart Gate",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
+      "id": "dungeon_repair_36",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 36,
+      "zoneName": "The Blooming Labyrinth",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
+      "id": "dungeon_repair_37",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 37,
+      "zoneName": "The Solar Crucible",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
+      "id": "dungeon_repair_38",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 38,
+      "zoneName": "The Amber Archive",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
+      "id": "dungeon_repair_39",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 39,
+      "zoneName": "The Silent Solstice",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
       "id": "barrow_witness",
       "name": "Ida, the Last Witness",
       "role": "Witness of the old court",
@@ -8600,6 +8856,22 @@
         "hatColor": "#6e617f"
       },
       "color": "#a5c4c6"
+    },
+    {
+      "id": "dungeon_repair_41",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 41,
+      "zoneName": "Nornroot Barrow",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
     },
     {
       "id": "span_witness",
@@ -8620,6 +8892,22 @@
       "color": "#86d8f0"
     },
     {
+      "id": "dungeon_repair_42",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 42,
+      "zoneName": "The Shattered Span",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
       "id": "keel_witness",
       "name": "Edda, the Last Lookout",
       "role": "Witness of the last voyage",
@@ -8638,6 +8926,22 @@
       "color": "#86bfa9"
     },
     {
+      "id": "dungeon_repair_43",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 43,
+      "zoneName": "The Drowned Longship",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
+    },
+    {
       "id": "null_witness",
       "name": "Eydis, the Missing Minute",
       "role": "Last foundry worker",
@@ -8654,6 +8958,22 @@
         "hatColor": "#41304e"
       },
       "color": "#b694e8"
+    },
+    {
+      "id": "dungeon_repair_44",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 44,
+      "zoneName": "The Black Hour Foundry",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
     },
     {
       "id": "ew_guide",
@@ -8745,6 +9065,22 @@
         "hatColor": "#433344"
       },
       "color": "#75d7d5"
+    },
+    {
+      "id": "dungeon_repair_46",
+      "name": "Repair Smith",
+      "role": "Dungeon repairs",
+      "zone": 46,
+      "zoneName": "The Chained Forge",
+      "art": "smith",
+      "previousArt": null,
+      "moving": false,
+      "identity": {
+        "skin": "#dca480",
+        "hair": "#694737",
+        "style": "bald"
+      },
+      "color": "#b96e45"
     }
   ]
 }

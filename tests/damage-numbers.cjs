@@ -60,4 +60,13 @@ for (const seed of [1, 2, 3, 4, 5]) {
 check(D.format(7) === '7' && D.format(1234) === '1,234' && D.format(9999) === '9,999', 'thousands separator');
 check(D.format(12345) === '12.3k' && D.format(123456) === '123k' && D.format(1500000) === '1.5M' && D.format(25000000) === '25M', 'large numbers are compact');
 check(D.format(0) === '0' && D.format(-250) === '-250', 'zero and negatives');
+// A party burst on one target must finish promptly, without a late replay of
+// queued hits after combat has stopped. Different positions do not expose this.
+{
+  let list = [];
+  for (let i = 0; i < 300; i++) D.spawn(list, { x: 5, y: 7, head: 70, kind: i % 3 ? 'hit' : 'crit', text: String(i) }, seeded(i));
+  check(list.every(f => f.t >= -.32 - 1e-9), 'a party burst cannot queue old numbers for seconds');
+  list = D.step(list, 2);
+  check(list.length === 0, 'all numbers from a finished party burst expire within two seconds');
+}
 console.log(`${checks} damage-number checks passed`);

@@ -41,6 +41,7 @@
     const copies=(packet.gearInstances||[]).filter(g=>quote.has(g.id)),worn=equippedIds(packet);
     const total=[...quote.values()].reduce((sum,price)=>sum+price,0);
     const elements=[make('h4','Repair gear'),make('p','Dying wears every piece you wear down by a tenth. A broken piece gives no stats until it is repaired. A smith charges a quarter of the piece\'s sale value for a full repair.')];
+    if(packet.repairMultiplier===4)elements.push(make('p','Dungeon repairs cost four times the town price.'));
     if(!copies.length){elements.push(make('p','Nothing needs repair.'));container.replaceChildren(...elements);return;}
     const send=offer=>Online.send({type:'interact',npc:npc.id,offer});
     for(const g of copies){

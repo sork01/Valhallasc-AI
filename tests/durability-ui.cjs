@@ -12,6 +12,7 @@ const client=new Client({name:'durability-ui',version:'1'});
 let browser,started=false;
 async function call(name,args={}){const result=await client.callTool({name,arguments:args});assert.ok(!result.isError,`${name}: ${JSON.stringify(result.content)}`);return result.structuredContent;}
 (async()=>{
+  require('./lib/touch.cjs').requireMemoryLimit();
   const transport=new StdioClientTransport({command:process.execPath,args:[path.join(root,'scripts/test-mcp.cjs')],cwd:root,env:{...process.env},stderr:'pipe'});
   transport.stderr?.on('data',chunk=>process.stderr.write(chunk));
   await client.connect(transport);
@@ -40,6 +41,7 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   const slot=page.locator('[data-slot="necklace"]');
   await slot.waitFor({state:'visible',timeout:15000});
   assert.equal(await slot.getAttribute('data-condition'),'new');
+  assert.equal(await slot.locator('.item-break').count(),0,'healthy gear has no crack');
   const die=async()=>{
     await debug({op:'die'});
     await page.waitForFunction(()=>Field.hero.hp<=0||Field.hero.dead,null,{timeout:15000});
@@ -58,10 +60,19 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.waitForFunction(()=>document.querySelector('[data-slot="necklace"]')?.dataset.condition==='low',null,{timeout:15000});
   for(let n=0;n<3;n++)await die();
   await page.waitForFunction(()=>document.querySelector('[data-slot="necklace"]')?.dataset.condition==='broken',null,{timeout:15000});
+  const crack=slot.locator('.item-break');
+  assert.equal(await crack.count(),1,'broken worn gear has a crack across the icon');
+  assert.equal(await crack.evaluate(el=>getComputedStyle(el).pointerEvents),'none','the crack does not block item controls');
+  const red=Number(execFileSync('python3',['-c','import sys,io; from PIL import Image; im=Image.open(io.BytesIO(sys.stdin.buffer.read())).convert("RGB"); w,h=im.size; print(sum(1 for y in range(int(h*.2)+1,int(h*.8)) for x in range(int(w*.2)+1,int(w*.8)) if (lambda c:c[0]>200 and c[1]<85 and c[2]<85)(im.getpixel((x,y)))))'],{input:await slot.locator('.gear-icon').screenshot(),encoding:'utf8'}));
+  assert.ok(red>10,'a large red crack is painted over the actual icon');
   assert.equal(await page.locator('#inventory-open').getAttribute('data-gear'),'broken','the bags button warns while a worn piece is broken');
   await slot.locator('.gear-icon').hover();
   await page.waitForFunction(()=>/Broken/.test(document.querySelector('.item-tooltip,#item-tooltip,[role="tooltip"]')?.textContent||''),null,{timeout:10000});
   assert.equal(await page.evaluate(()=>Field.hero.equipment.necklace),'necklace_upgrade','a broken piece stays worn');
+  await page.evaluate(()=>Field.equipSlot('necklace','none'));
+  await page.waitForFunction(()=>document.querySelector('#inventory-list [data-item="necklace_upgrade"] .item-break'));
+  await page.evaluate(()=>Field.equipSlot('necklace','necklace_upgrade'));
+  await page.waitForFunction(()=>document.querySelector('[data-slot="necklace"] .item-break'));
   await page.keyboard.press('e');
   // The smith: a quarter of 240 gold for a full repair.
   await debug({op:'set_gold',gold:1000});
@@ -70,9 +81,10 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.waitForTimeout(500);
   await page.evaluate(()=>Online.send({type:'interact',npc:'smith'}));
   await page.locator('#npc-dialogue').waitFor({state:'visible',timeout:15000});
-  const offer=page.locator('[data-offer="repair"]');
+  const offer=page.locator('[data-action="repair-one"]');
+  await offer.waitFor();
   assert.equal(await offer.count(),1);
-  assert.match(await offer.textContent(),/60 gold/);
+  assert.match(await page.locator('[data-action="repair-all"]').getAttribute('title'),/60 gold/);
   await offer.click();
   assert.equal(await page.locator('#npc-inventory .repair-row[data-state="broken"]').count(),1);
   await page.locator('#npc-inventory [data-action="repair_all"]').click();
@@ -82,6 +94,21 @@ async function call(name,args={}){const result=await client.callTool({name,argum
   await page.keyboard.press('e');
   await page.waitForFunction(()=>document.querySelector('[data-slot="necklace"]')?.dataset.condition==='new',null,{timeout:15000});
   assert.equal(await page.locator('#inventory-open').getAttribute('data-gear'),'ok','repairing clears the warning');
+  assert.equal(await slot.locator('.item-break').count(),0,'repairing removes the red crack');
+  if(process.env.DUNGEON_REPAIRS){
+    await page.keyboard.press('e');await die();
+    const smith=await page.evaluate(()=>WORLD_MAP.zones[4].npcs.find(n=>n.id==='dungeon_repair_5'));
+    await debug({op:'teleport',zone:5,x:smith.x,y:smith.y});
+    await page.waitForFunction(()=>Field.zone===5);
+    await page.evaluate(()=>Field.visitNpc('dungeon_repair_5'));
+    await page.locator('[data-offer="repair"]').waitFor();
+    assert.match(await page.locator('[data-offer="repair"]').textContent(),/24 gold/,'dungeon quote is four times the 6-gold town price');
+    await page.locator('[data-offer="repair"]').click();
+    assert.match(await page.locator('#npc-inventory').textContent(),/four times the town price/);
+    await page.locator('#npc-inventory [data-action="repair_all"]').click();
+    await page.getByText(/Repaired one piece for 24 gold/).waitFor();
+    await page.waitForFunction(()=>Field.hero.gold===916);
+  }
   assert.deepEqual(errors,[]);
   console.log('durability-ui: ok');
 })().then(async()=>{await browser?.close();if(started)await call('stop_world').catch(()=>{});await client.close();process.exit(0);},

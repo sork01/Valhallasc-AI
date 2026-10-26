@@ -2545,7 +2545,7 @@
     if (actor.dead) actor.deadT += dt;
     if (actor.hurtT > 0) actor.hurtT = Math.max(0, actor.hurtT - dt);
   }
-  function update(dt) {
+  function update(dt, textDt = dt) {
     tAll += dt;
     window.Skillbar?.update();
     if (Online.connected) {
@@ -2600,7 +2600,7 @@
     }
     for (const p of parts) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vz -= p.g * dt; p.z = Math.max(0, p.z + p.vz * dt * 6); }
     parts = parts.filter(p => p.t < p.life);
-    floaters = DamageNumbers.step(floaters, dt);
+    floaters = DamageNumbers.step(floaters, textDt);
     for (const e of effects) e.t += dt; effects = effects.filter(e => e.t < (e.life ?? (e.kind === 'ring' ? .9 : .32)));
     if (marker) { marker.t += dt; if (marker.t > 1.2) marker = null; }
     // A teleport or a zone change moves the hero far from the camera: jump there instead of gliding across the map.
@@ -4213,8 +4213,8 @@
   function loop(now) {
     if (!running) return; raf = requestAnimationFrame(loop);
     if (!last) last = now;                                  // the first frame's timestamp can precede start()
-    const dt = clamp((now - last) / 1000, 0, .05); last = now;
-    update(dt);
+    const elapsed = Math.max(0, (now - last) / 1000), dt = clamp(elapsed, 0, .05); last = now;
+    update(dt, elapsed);
     City.update(serverNow());
     window.DayNight?.tick(dt);
     window.Weather?.tick(dt, hero.x, hero.y, !!hero.inside);

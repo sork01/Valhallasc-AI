@@ -30,6 +30,10 @@ Decisions were made in two rounds on 2026-10-22 (recorded in TODO.md under `DEAT
 - **Where**: the smith of each safe hub, offer `repair` (`scripts/add_repair_offers.py`, run after the zone generators and
   before `sync-world.cjs`): Alderhaven `smith` (Bram Emberforge), Skaldholm `city_smith`, Nacrehold `nacre_smith`, Asterion
   `asterion_smith`.
+  Each of the 21 dungeon and raid templates also has an entrance repair smith
+  (`dungeon_repair_<template zone>`), inherited by every private copy. Placement
+  stays within six tiles of the entrance on clear ground, away from gates and
+  enemies. The idempotent repair overlay runs from `sync-world.cjs` too.
 - **How**: the smith's window lists every damaged copy (worn or in the bags) with a Repair button and a Repair all button.
   Offer ids are `repair:<copy id>` and `repair_all`, handled in `World::interact` next to merge and refine; the 0.5 s service
   throttle does not apply. Gold only, not in combat (checked in the world handler, `combat_left`), not mounted, not defeated.
@@ -37,6 +41,9 @@ Decisions were made in two rounds on 2026-10-22 (recorded in TODO.md under `DEAT
   scaled linearly by the missing durability, rounded up, at least 1 gold for a damaged copy
   (`Character::repair_price`). Rebirth gold boosts do not apply. The server quotes every damaged copy in the dialogue packet
   as `repairQuote: [[copy id, price], ...]`; an older server sends none and the client then hides the offer.
+  Dungeon and raid repair prices are exactly four times the rounded town quote,
+  for both individual repairs and Repair all. The multiplier comes from the
+  authoritative instance zone, and `repairMultiplier` explains it in the window.
 - `Character::repair_gear(only)` is one validated function on a cloned character, like merge and refine: all or nothing.
 
 ## Death notice
@@ -52,6 +59,10 @@ Decisions were made in two rounds on 2026-10-22 (recorded in TODO.md under `DEAT
   (`client/city.js`).
 - The bags button shows an `!` badge (`#inventory-open[data-gear]`, `low` below 30%, `broken` at 0) while any worn piece is
   low or broken: the low-durability hint, with no new HUD piece.
+- Broken copies have a large red crack across their icon in equipment, bags,
+  bank storage and buyback. A stack containing a broken copy shows the crack;
+  a healthy equipped copy stays clear even if a spare is broken. The overlay
+  does not intercept clicks, drag actions or tooltips and disappears on repair.
 - The Inspect window is not changed (the whitelist packet carries no wear).
 - The GM test menu hands out the gauntlet gear sets (`gear_set`: ordinary rarities, not rarity `gm`), so deaths during GM dungeon tests wear and can break that gear; repair it at a smith or hand the set out again.
 

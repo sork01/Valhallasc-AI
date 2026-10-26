@@ -88,6 +88,7 @@ def inventory():
    if n['id']=='city_grandfather':family='elder'
    if 'resident_' in n['id']:family=['gardener','weaver','courier','painter','innkeeper','scholar','merchant','bard'][int(n['id'].rsplit('_',1)[1])%8]
    bespoke=bool(n.get('art') or n.get('look',{}).get('species')=='merfolk' or zi in (7,13,14,15,16,17,24,41,42,43,44,45,46))
+   if n['id'].startswith('dungeon_repair_'):family='smith';bespoke=False
    key='special_'+n['id'] if bespoke else family
    if bespoke:
     theme,ornament=THEMES.get(zi,('meadow','leaf'));spec=dict(VARIANTS[family]);spec.update(general=False,name=n['name'],theme=theme,ornament=ornament,npc=n['id'],zone=zi,identity=n.get('look',{}),coat=n.get('color',spec['coat']))

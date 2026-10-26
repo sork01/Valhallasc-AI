@@ -12,7 +12,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
-  const mutation = process.env.MUTATE || (process.env.TODO_BADGER_ONLY ? 'badger-live' : undefined);
+  const mutation = process.env.MUTATE || (process.env.TODO_BADGER_ONLY ? 'badger-live' : process.env.TODO_NPC_ONLY ? 'npc-live' : undefined);
   const replacements = {
     portal: ['worldheartart.js', 'depthOffset:-2.5', 'depthOffset:0'],
     stone: ['world.js', '"kind":"meetingstone","x":66.3', '"kind":"missing_stone","x":66.3'],
@@ -130,10 +130,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     check(frames.size >= 2, 'live Sunward Badger uses changing walk frames during its actual movement');
     await page.screenshot({ path: path.join(out, 'spadeclaw-walk.png') });
   }
-  if ((!mutation && !process.env.TODO_VISIBILITY_ONLY) || mutation === 'npc') {
+  if ((!mutation && !process.env.TODO_VISIBILITY_ONLY) || mutation === 'npc' || mutation === 'npc-live') {
     const catalog = await page.evaluate(() => NpcArt.manifest);
     check(Object.keys(catalog.designs).filter(k => catalog.designs[k].general).length >= 24, '24 distinct general designs');
-    check(Object.keys(catalog.npcs).length === 298, 'every speaking person has an explicit assignment');
+    check(Object.keys(catalog.npcs).length === await page.evaluate(() => [WORLD_MAP,...WORLD_MAP.zones].flatMap(z=>z.npcs||[]).filter(n=>!['stone','scenery'].includes(n.art)).length), 'every speaking person has an explicit assignment');
     for (const zone of [0, 4, 9, 17, 20, 21, 22, 23, 24, 25, 26, 27, 28, 45]) {
       const npc = await page.evaluate(zone => (zone ? WORLD_MAP.zones[zone - 1] : WORLD_MAP).npcs.find(n => n.art !== 'stone' && n.art !== 'scenery'), zone);
       await at(zone, npc.x + 1.7, npc.y + 1.7); await page.waitForFunction(() => NpcArt.readyFor(City.npcs), null, { timeout: 20000 });

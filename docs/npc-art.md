@@ -15,3 +15,15 @@ Focused checks cover the contact sheet of every design, transparent borders, cli
 Production and verification (2026-10-26, Beta 1.21.0): 164 saved designs (24 general, 140 special), 298 assigned people and 3280 frames. `python3 tests/npc-art.py` checks every exported frame and all 24 distinct general silhouettes; `make_npc_sprites.py verify` compares every frame against PixelFlow. The contact sheet is `test-results/npc-contact.png`. The real-art suite captured 14 towns/special zones, a merchant portrait and the moving Badger. The final private-index pass passed 34 browser checks at a 1338 MiB peak under the 1536 MiB cap. The NPC integration mutation fails when City stops using the new art.
 
 Recolour canvases are released on zone changes; retention covers the town's NPC count, preventing repeated allocations when more than 24 people are visible. Foot/nameplate bounds are measured from the exported artwork. General identity colours come from the original NPC look data; fallback identities preserve the original Alderhaven faces.
+
+Props use explicit grip points attached to the animated wrist. Draw fingers over
+the handle after the prop, and use the second hand to support books, scrolls,
+trays, chests, tablets and sacks. Satchels stay on their shoulder strap; walking
+and conversation must keep the hand and prop together. Long poles keep their
+lower end above the frame border. `python3 tests/npc-grips.py` checks visible
+hands and handles in the shipped idle, walk and talk pixels.
+
+The 21 entrance repair smiths reuse the general smith artwork, bringing the
+identity inventory to 319 without adding saved designs. After adding identities,
+run `npc_art_catalog.py`, then `make_npc_sprites.py assign` to refresh assignments
+while preserving every saved frame, id and measured bound.

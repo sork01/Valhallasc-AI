@@ -103,7 +103,11 @@
   };
   const RARITY_NAMES = { common: 'Common', uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic', legendary: 'Legendary', gm: 'Game Master' };
   const rarityName = i => RARITY_NAMES[i?.rarity] || 'Common';
-  function icon(i, emptyKind) {
+  function icon(i, emptyKind, copy) {
+    const crack = i && conditionState(copy) === 'broken' ? '<svg class="item-break" viewBox="0 0 64 64" aria-hidden="true"><path d="M43 3 27 21 39 24 20 43 30 45 18 61 M30 17 17 13 M24 39 43 42" fill="none" stroke="#270000" stroke-width="10" stroke-linejoin="miter"/><path d="M43 3 27 21 39 24 20 43 30 45 18 61 M30 17 17 13 M24 39 43 42" fill="none" stroke="#ff2525" stroke-width="6" stroke-linejoin="miter"/></svg>' : '';
+    return itemIcon(i, emptyKind) + crack;
+  }
+  function itemIcon(i, emptyKind) {
     const kind = i?.kind || emptyKind;
     if (i && /^orange_(0[1-9]|[1-4][0-9]|50)$/.test(i.id)) return `<span class="orange-item-art" role="img" aria-hidden="true" data-icon="${i.id}" style="background-image:url(assets/${i.id}.png)"></span>`;
     // A recoloured piece (art + tint in the catalog) shows its base piece's icon through the same colour filter the worn art gets.
@@ -280,9 +284,10 @@
       dropTarget(cell, data => moveToBag(data, index));
       if (i && count) {
         cell.classList.add('inventory-item'); cell.dataset.item = i.id; cell.dataset.rarity = displayRarity(i);
+        cell.dataset.condition = looseCopies(i.id).some(g => conditionState(g) === 'broken') ? 'broken' : 'new';
         const b = button('', () => { selected = i.id; renderDetails(); for (const n of container.querySelectorAll('.item-tile')) n.setAttribute('aria-pressed', String(n.closest('[data-item]').dataset.item === selected)); }, 'item-tile');
         b.setAttribute('aria-label', summary(i, count)); b.setAttribute('aria-pressed', String(selected === i.id));
-        b.innerHTML = icon(i); b.append(node('span', String(count), 'item-stack'));
+        b.innerHTML = icon(i, undefined, looseCopies(i.id).find(g => conditionState(g) === 'broken')); b.append(node('span', String(count), 'item-stack'));
         if (consumable(i)) b.append(node('span', '', 'item-cooldown'));
         b.append(node('b', i.name, 'sr-only'), node('small', summary(i, count), 'sr-only'));
         b.addEventListener('contextmenu', event => { event.preventDefault(); selected = i.id; activate(i); renderDetails(); });
@@ -346,7 +351,7 @@
       const worn = i && wornCopy(slot, i);
       card.dataset.condition = conditionState(worn); card.style.setProperty('--dur', String(durabilityOf(worn)));
       card.querySelector('b').textContent = i?.name || 'Empty slot';
-      const glyph = card.querySelector('.gear-icon'); glyph.innerHTML = icon(i, kind); glyph.draggable = !!i;
+      const glyph = card.querySelector('.gear-icon'); glyph.innerHTML = icon(i, kind, worn); glyph.draggable = !!i;
       const equippedCopy = i && wornCopy(slot, i);
       glyph.setAttribute('aria-label', `${label}: ${i?.name || 'Empty'}${equippedCopy ? `, ${rarityName(equippedCopy)} copy #${equippedCopy.id}, ${stats(copyStats(equippedCopy))}${conditionState(equippedCopy) !== 'new' ? `, ${conditionText(equippedCopy)}` : ''}` : ''}. Right-click to unequip.`);
       const select = card.querySelector('select'), owned = WORLD_ITEMS.filter(item => item.kind === kind && compatible(item) && quantity(item.id) > 0);

@@ -193,22 +193,20 @@ fn raid_pack_purple_pool_is_unique_class_neutral_and_wearable_by_every_class() {
 
 #[test]
 fn raid_pack_seeded_purple_rate_and_rebirth_kill_path() {
-    // Pure seeded rolls, not gameplay farming. The same primitive used at a kill.
+    assert_eq!(RAID_EPIC_DROP_CHANCE, 0.05, "5% per Forge pack enemy");
+    // Exact roll boundaries, not gameplay farming or a statistical estimate.
     for boost in [1, 5] {
-        let mut rng = 20261022u64;
-        let total: u32 = (0..100_000)
-            .map(|_| {
+        let chance = 0.05 * f64::from(boost);
+        assert_eq!(copies(RAID_EPIC_DROP_CHANCE, boost, || chance - 1e-9), 1);
+        assert_eq!(copies(RAID_EPIC_DROP_CHANCE, boost, || chance), 0);
+        let total: u32 = (0..1000)
+            .map(|n| {
                 copies(RAID_EPIC_DROP_CHANCE, boost, || {
-                    rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1);
-                    (rng >> 32) as f64 / 4294967296.
+                    (f64::from(n) + 0.5) / 1000.
                 })
             })
             .sum();
-        let rate = total as f64 / 100_000.;
-        assert!(
-            (rate - 0.03 * f64::from(boost)).abs() < 0.002,
-            "boost {boost}: {rate}"
-        );
+        assert_eq!(total, 50 * boost);
     }
     // One deterministic kill per multiplier, including the maximum live rebirth multiplier.
     // Seed search touches only the PRNG, never kills enemies waiting for loot.
@@ -234,7 +232,7 @@ fn raid_pack_seeded_purple_rate_and_rebirth_kill_path() {
                     (r >> 32) as f64 / 4294967296.
                 };
                 // Skip the independent bag draw, then force the independent purple success.
-                draw() > BAG_DROP_CHANCE * f64::from(boost) && draw() < 0.03
+                draw() > BAG_DROP_CHANCE * f64::from(boost) && draw() < 0.05
             })
             .unwrap();
         w.rng = seed;

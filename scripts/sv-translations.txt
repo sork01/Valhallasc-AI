@@ -7038,5 +7038,9 @@
   "Loading…": "Läser in…",
   "Malformed or unsupported command rejected.": "Felaktigt kommando eller kommando som inte stöds avvisades.",
   "Repeated join command after signing in.": "Upprepat anslutningskommando efter inloggning.",
-  "Returned to life": "Återupplivad"
+  "Returned to life": "Återupplivad",
+  "Repair Smith": "Reparationssmed",
+  "Dungeon repairs": "Dungeonreparationer",
+  "I can repair your gear here. Dungeon repairs cost four times the town price.": "Jag kan reparera din utrustning här. Dungeonreparationer kostar fyra gånger priset i staden.",
+  "Dungeon repairs cost four times the town price.": "Dungeonreparationer kostar fyra gånger priset i staden."
 }

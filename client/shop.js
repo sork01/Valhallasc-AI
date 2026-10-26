@@ -94,7 +94,7 @@
         const b = button('', () => { if (send(row ? {type:'buy_back',id:row.id} : {type:'interact',offer:offer.id})) draw(); });
         b.className = 'merchant-slot'; b.dataset.item = item.id; b.dataset.rarity = row ? rarity(row) : item.rarity;
         if (offer) b.dataset.offer = offer.id;
-        const glyph = make('span','','merchant-item-icon'); glyph.innerHTML = Inventory.icon(item);
+        const glyph = make('span','','merchant-item-icon'); glyph.innerHTML = Inventory.icon(item, undefined, row?.gear?.find(g => Inventory.conditionState(g) === 'broken'));
         const detail = make('span','','merchant-item-detail'); detail.append(make('b',item.name),make('small',`${cost} gold${row?.quantity > 1 ? ` ×${row.quantity}` : ''}`));
         b.append(glyph, detail); b.disabled = pending || (data?.gold ?? packet.gold) < cost || (!row && (packet.level || 1) < (item.requiredLevel || 1));
         Inventory.attachTooltip(b, () => item, undefined, row ? () => ({copies:row.gear || [],count:row.quantity,in:'Buyback',hint:`${row.paid} gold`}) : undefined);

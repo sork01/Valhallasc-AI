@@ -144,7 +144,8 @@ fn pack_recovery_full_wipe_resets_only_living_mobs_even_after_owner_respawn() {
     r.kill(merc);
     r.w.players.get_mut(&merc).unwrap().dead_time = 10.;
     r.w.update_player(merc);
-    assert!(r.w.players[&merc].fallen && r.w.players[&merc].character.hp == 0.);
+    assert!(r.w.players[&merc].character.hp > 0.);
+    assert!(r.w.pack_fights[&r.zone].downed.contains(&merc));
     let last = r.mercs[1];
     r.kill(last);
     assert!(!r.w.pack_fights.contains_key(&r.zone));
@@ -214,4 +215,49 @@ fn pack_recovery_keeps_existing_boss_fallen_rules() {
     r.w.update_player(1);
     assert!(r.w.players[&1].fallen && r.w.players[&1].character.hp == 0.);
     assert!(!r.w.players[&1].pack_death);
+}
+
+#[test]
+fn pack_recovery_fallen_hire_respawns_after_the_pack_is_defeated() {
+    for zone in [5, 46] {
+        let mut r = Rig::new(zone);
+        let merc = r.mercs[0];
+        r.kill(merc);
+        for &id in &r.enemies {
+            r.w.slimes[id].dead = true;
+        }
+        for _ in 0..70 {
+            r.w.update_pack_fights();
+            r.w.update_player(merc);
+        }
+        let p = &r.w.players[&merc];
+        assert!(
+            p.character.hp > 0.,
+            "fallen hire stayed dead after pack clear"
+        );
+        assert!(!p.fallen && !p.pack_death);
+    }
+}
+
+#[test]
+fn pack_recovery_fallen_hire_respawns_while_the_pack_is_still_fighting() {
+    for zone in [5, 46] {
+        let mut r = Rig::new(zone);
+        let merc = r.mercs[0];
+        r.kill(merc);
+        for _ in 0..70 {
+            r.w.update_pack_fights();
+            r.w.update_player(merc);
+        }
+        let p = &r.w.players[&merc];
+        assert!(p.character.hp > 0., "pack combat held a fallen hire down");
+        assert!(!p.fallen && !p.pack_death);
+        assert!(p.character.point().distance(r.w.maps[zone].spawn) < 1.);
+        let fight = &r.w.pack_fights[&zone];
+        assert!(
+            fight.downed.contains(&merc),
+            "an entrance respawn rejoined the pull"
+        );
+        assert!(r.enemies.iter().all(|&id| !r.w.slimes[id].dead));
+    }
 }

@@ -70,7 +70,7 @@
     const wrap = make('div', '', 'bag-cell inventory-item bank-cell');
     wrap.dataset.item = i.id; wrap.dataset.side = side; wrap.dataset.rarity = Inventory.bestRarity(i, copies);
     const b = make('button', '', 'item-tile'); b.type = 'button';
-    b.innerHTML = Inventory.icon(i);
+    b.innerHTML = Inventory.icon(i, undefined, copies.find(g => Inventory.conditionState(g) === 'broken'));
     b.append(make('span', String(stack.quantity), 'item-stack'), make('b', i.name, 'sr-only'));
     b.setAttribute('aria-label', side === 'bank' ? `${i.name} ×${stack.quantity} in the bank` : `${i.name} ×${stack.quantity} in your bags`);
     b.setAttribute('aria-pressed', String(selected?.side === side && selected.item === i.id));

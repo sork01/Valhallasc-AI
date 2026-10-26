@@ -55,7 +55,7 @@ hall by melting the roots that hold it.
 | 15 | A wipe resets only the current boss; killed bosses stay dead; the fallen stay down while the fight runs; everyone wakes at the door of that boss's hall | section 6 |
 | 16 | Packs are hard but partly skippable; the path to each boss is mandatory | section 4 |
 | 17 | Backstory above | signs, quests, lines in hand-written Swedish |
-| 18 | Ordinary raid enemies drop **purple at 3%** per kill | section 9 |
+| 18 | Ordinary raid enemies drop **purple at 5%** per kill | section 9 |
 | 19 | Zone music is dub-techno about 110 BPM; the raid is industrial techno | section 13 |
 
 Round 2's "the instance resets on a wipe" is superseded by round 4 (decision 15):
@@ -364,11 +364,11 @@ reopens this after `RAID-CHECK`; C would need "already has it" defined as the
 character holding a Chainforged piece of that slot equipped, in the bags or in the
 bank (by item id) and reads three inventories per drop.
 
-**Purple at 3%.** An independent roll per pack enemy killed. **Owner correction
+**Purple at 5% (owner correction, 2026-10-26).** An independent roll per pack enemy killed. **Owner correction
 (2026-10-22): unique original, class-neutral level-99 pieces** from the Cinderwork
 pool in section 16. The existing `copies()` and raid loot path preserve rebirth
 and human-only Need/Greed/Pass. Expected purple per clear: 10 packs × 4 = 40
-enemies → about **1.2**; the six mandatory packs only → about 0.7 (counted per enemy).
+enemies → about **2**; the six mandatory packs only → about 1.2 (counted per enemy).
 
 **Economy.** A level-99 hire costs `merc_price(99)` = 115,000 gold, so nine
 mercenaries cost **1,035,000 gold** per attempt (`world/mercs.rs`). An orange piece
@@ -637,11 +637,11 @@ Cinderwork Kiln Gaiters, Cinderwork Crucible Pendant and Cinderwork Clamp Ring
 are three original level-99 purple pieces, wearable by all five classes. They use
 the existing level-99 purple stat budget with original louvred gaiters, open
 crucible pendant and square clamp-ring geometry fitted to all ten body rigs.
-They have no set bonus and never join the ordinary equipment pool. The 3% roll
+They have no set bonus and never join the ordinary equipment pool. The 5% roll
 is independent of materials and normal gray/green/blue equipment, multiplied by
 rebirth through `copies`, and uses the existing humans-only raid loot path. The
 ordinary purple and orange rolls are suppressed in this raid. At the base rate,
-40 kills yield **1.2 purple pieces per full pack clear on average**, 0.72 for six
+40 kills yield **2 purple pieces per full pack clear on average**, 1.2 for six
 mandatory packs; this is per enemy, not per pack. Boss orange tables remain for
 RAID-ORANGE.
 

@@ -2912,11 +2912,6 @@
           "cost": 384
         },
         {
-          "id": "repair",
-          "label": "Repair worn gear",
-          "cost": 0
-        },
-        {
           "id": "buy_green_weapon_warrior",
           "label": "Buy Reinforced Royal Sword",
           "item": "warrior_weapon_royal_l10_green",
@@ -2950,6 +2945,11 @@
           "item": "hunter_weapon_wardenbow_l10_green",
           "tiered": true,
           "cost": 1000
+        },
+        {
+          "id": "repair",
+          "label": "Repair worn gear",
+          "cost": 0
         }
       ],
       "buys": true
@@ -33599,7 +33599,30 @@
           "look": "exit"
         }
       ],
-      "quests": []
+      "quests": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_5",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 15.0,
+          "y": 114.0,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "Wyrdwood",
@@ -75588,7 +75611,30 @@
           "after_clear": true
         }
       ],
-      "quests": []
+      "quests": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_10",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 24,
+          "y": 143,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "The Drowned Cathedral — Coral Reliquary",
@@ -81781,7 +81827,30 @@
           "after_clear": true
         }
       ],
-      "quests": []
+      "quests": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_11",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 136,
+          "y": 143,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "The Drowned Cathedral — Grand Nave",
@@ -89774,7 +89843,30 @@
           "after_clear": true
         }
       ],
-      "quests": []
+      "quests": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_12",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 96,
+          "y": 175,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "Astralhollow",
@@ -119279,7 +119371,29 @@
           "y": 107
         }
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_18",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 21,
+          "y": 67,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ],
       "quests": [],
       "portals": [
         {
@@ -168911,7 +169025,29 @@
           "y": 25
         }
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_29",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 48,
+          "y": 85,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ],
       "quests": [],
       "city": null,
       "final_boss": "eye_unblinking",
@@ -172194,7 +172330,29 @@
           "y": 17
         }
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_30",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 48,
+          "y": 86,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ],
       "quests": [],
       "city": null,
       "final_boss": "elder_heart",
@@ -175312,7 +175470,29 @@
           "y": 17
         }
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_31",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 48,
+          "y": 86,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ],
       "quests": [],
       "city": null,
       "final_boss": "pavilion_sovereign",
@@ -178037,7 +178217,29 @@
           "y": 17
         }
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_32",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 48,
+          "y": 86,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ],
       "quests": [],
       "city": null,
       "final_boss": "rain_crown_sovereign",
@@ -180933,7 +181135,29 @@
           "ambush": "treant"
         }
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_33",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 48,
+          "y": 85,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ],
       "quests": [],
       "city": null,
       "final_boss": "seed_worldseed",
@@ -184140,7 +184364,29 @@
           "y": 19
         }
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_34",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 48,
+          "y": 85,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ],
       "quests": [],
       "city": null,
       "final_boss": "astro_axis",
@@ -187126,7 +187372,29 @@
           "y": 18
         }
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_35",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 48,
+          "y": 85,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ],
       "quests": [],
       "city": null,
       "final_boss": "thunder_heart",
@@ -190556,7 +190824,29 @@
           "y": 18
         }
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_36",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 48,
+          "y": 85,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ],
       "quests": [],
       "city": null,
       "final_boss": "bloom_heart",
@@ -193728,7 +194018,29 @@
           "ambush": "cinder"
         }
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_37",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 48,
+          "y": 85,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ],
       "quests": [],
       "city": null,
       "final_boss": "solar_heart",
@@ -197281,7 +197593,29 @@
           "ambush": "cocoon"
         }
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_38",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 48,
+          "y": 85,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ],
       "quests": [],
       "city": null,
       "final_boss": "amber_memory",
@@ -200660,7 +200994,29 @@
           "y": 17
         }
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "dungeon_repair_39",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 48,
+          "y": 85,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
+        }
+      ],
       "quests": [],
       "city": null,
       "final_boss": "solstice_heart",
@@ -204203,6 +204559,27 @@
             "hat": "hood",
             "hatColor": "#6e617f"
           }
+        },
+        {
+          "id": "dungeon_repair_41",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 56,
+          "y": 102,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [],
@@ -208101,6 +208478,27 @@
             "hat": "helm",
             "hatColor": "#5888a8"
           }
+        },
+        {
+          "id": "dungeon_repair_42",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 56,
+          "y": 102,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [],
@@ -213802,6 +214200,27 @@
             "hat": "hood",
             "hatColor": "#43666b"
           }
+        },
+        {
+          "id": "dungeon_repair_43",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 64,
+          "y": 113,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [],
@@ -224056,6 +224475,27 @@
             "hatColor": "#41304e"
           },
           "dialogue": "The Yearwheel lost an hour. We built a furnace to find it, and something answered. Vark rings its shift bell; Iona feeds it dead current. Read the warning before the final clock. Blue equipment and five prepared fighters are the minimum."
+        },
+        {
+          "id": "dungeon_repair_44",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 80,
+          "y": 146,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [],
@@ -233418,6 +233858,27 @@
             "hatColor": "#433344"
           },
           "dialogue": "Hire your missing fighters here. Ten fighters must pass the inner gate together. Each contract costs the normal hire price. If you fall, your fighters wake with you at the last rally mark. Leaving the raid ends their contracts."
+        },
+        {
+          "id": "dungeon_repair_46",
+          "name": "Repair Smith",
+          "role": "Dungeon repairs",
+          "x": 30,
+          "y": 306,
+          "dialogue": "I can repair your gear here. Dungeon repairs cost four times the town price.",
+          "color": "#b96e45",
+          "look": {
+            "skin": "#dca480",
+            "hair": "#694737",
+            "style": "bald"
+          },
+          "offers": [
+            {
+              "id": "repair",
+              "label": "Repair worn gear",
+              "cost": 0
+            }
+          ]
         }
       ],
       "quests": [],

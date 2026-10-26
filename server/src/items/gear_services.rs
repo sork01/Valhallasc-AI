@@ -296,16 +296,20 @@ impl Character {
         (price as u64).clamp(1, u64::from(u32::MAX)) as u32
     }
     /// Every damaged copy with its repair price, for the smith's window.
-    pub fn repair_quote(&self) -> Vec<(u64, u32)> {
+    pub fn repair_quote(&self, multiplier: u32) -> Vec<(u64, u32)> {
         self.gear_instances
             .iter()
             .filter(|g| g.wear > 0)
-            .map(|g| (g.id, self.repair_price(g)))
+            .map(|g| (g.id, self.repair_price(g).saturating_mul(multiplier)))
             .collect()
     }
     /// Repairs one copy (`only`) or every damaged copy, for gold. All or nothing, checked on a clone like the other
     /// gear services; the caller checks range and combat. Returns (copies repaired, gold paid).
-    pub fn repair_gear(&mut self, only: Option<u64>) -> Result<(u32, u32), &'static str> {
+    pub fn repair_gear(
+        &mut self,
+        only: Option<u64>,
+        multiplier: u32,
+    ) -> Result<(u32, u32), &'static str> {
         if self.hp <= 0. {
             return Err("You cannot repair gear while defeated.");
         }
@@ -329,7 +333,12 @@ impl Character {
         }
         let total: u64 = due
             .iter()
-            .map(|at| u64::from(next.repair_price(&next.gear_instances[*at])))
+            .map(|at| {
+                u64::from(
+                    next.repair_price(&next.gear_instances[*at])
+                        .saturating_mul(multiplier),
+                )
+            })
             .sum();
         if u64::from(next.gold) < total {
             return Err("You cannot afford that repair.");
@@ -927,25 +936,31 @@ mod tests {
             0
         );
         c.gold = 100;
-        assert_eq!(c.repair_gear(None), Ok((1, 24)));
+        assert_eq!(c.repair_gear(None, 1), Ok((1, 24)));
         assert_eq!((c.gold, wear_of(&c, NECKLACE)), (76, 0));
     }
     #[test]
     fn a_repair_is_refused_without_gold_when_defeated_mounted_or_unneeded_and_changes_nothing() {
         let mut c = necklace_on();
-        assert_eq!(c.repair_gear(None), Err("Nothing needs repair."));
+        assert_eq!(c.repair_gear(None, 1), Err("Nothing needs repair."));
         set_wear(&mut c, NECKLACE, 40);
         c.gold = 23;
         let before = serde_json::to_string(&c).unwrap();
-        assert_eq!(c.repair_gear(None), Err("You cannot afford that repair."));
-        assert_eq!(c.repair_gear(Some(999_999)), Err("Unknown gear copy."));
+        assert_eq!(
+            c.repair_gear(None, 1),
+            Err("You cannot afford that repair.")
+        );
+        assert_eq!(c.repair_gear(Some(999_999), 1), Err("Unknown gear copy."));
         c.gold = 1_000;
         c.mounted = true;
-        assert_eq!(c.repair_gear(None), Err("Dismount before repairing gear."));
+        assert_eq!(
+            c.repair_gear(None, 1),
+            Err("Dismount before repairing gear.")
+        );
         c.mounted = false;
         c.hp = 0.;
         assert_eq!(
-            c.repair_gear(None),
+            c.repair_gear(None, 1),
             Err("You cannot repair gear while defeated.")
         );
         c.hp = c.max_hp();
@@ -959,8 +974,8 @@ mod tests {
             .find(|g| g.item == NECKLACE)
             .unwrap()
             .id;
-        assert_eq!(c.repair_gear(Some(id)), Ok((1, 24)));
-        assert_eq!(c.repair_gear(Some(id)), Err("Nothing needs repair."));
+        assert_eq!(c.repair_gear(Some(id), 1), Ok((1, 24)));
+        assert_eq!(c.repair_gear(Some(id), 1), Err("Nothing needs repair."));
     }
     #[test]
     fn merging_and_refining_restore_full_durability() {

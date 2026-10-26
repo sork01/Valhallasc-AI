@@ -56,7 +56,12 @@ impl Meter {
 impl World {
     pub(super) fn update_damage_meter(&mut self) {
         for (&zone, f) in &mut self.damage_meter.fights {
+            // A fighter may die after damaging only the first enemy in a pack.
+            // Keep that row and its clock while the rest of the pull continues,
+            // including enemies the surviving fighters have not hit yet.
+            let pull_active = self.pack_fights.contains_key(&zone) || self.boss.fight_in(zone);
             if f.end.is_none()
+                && !pull_active
                 && !f.enemies.iter().any(|&id| {
                     let s = &self.slimes[id];
                     !s.dead && s.zone == zone && s.state != "return" && s.target.is_some()

@@ -15,7 +15,7 @@
     banner: { size: 24, rise: 50, life: 1.1,  pop: 1,    hold: .3,  arc: 0,  shake: 0, ease: 0 },
     level:  { size: 34, rise: 50, life: 1.1,  pop: 1,    hold: .3,  arc: 0,  shake: 0, ease: 0 },
   };
-  const SPACING = .08, MAX_ALIVE = 40, GAP = 3, LANE_W = 80, MAX_LIFT = 160;
+  const SPACING = .08, MAX_DELAY = .32, MAX_ALIVE = 40, GAP = 3, LANE_W = 80, MAX_LIFT = 160;
   const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
   const easeOut = p => 1 - (1 - p) * (1 - p) * (1 - p);
   // 1,234 below ten thousand, 12.3k and 1.2M above: a number stays about five characters wide however big it gets.
@@ -48,9 +48,12 @@
   // still alive over the same head, so a run of hits fans out instead of stacking; the list is capped by fast-fading the oldest.
   function spawn(list, spec, rand = Math.random) {
     const kind = KINDS[spec.kind] ? spec.kind : 'banner', k = KINDS[kind];
-    const f = { x: spec.x, y: spec.y, head: spec.head || 0, text: String(spec.text), color: spec.color, kind, t: -(spec.delay || 0), lane: 0, z0: 0, side: rand() < .5 ? -1 : 1 };
+    const delay = Math.min(MAX_DELAY, Math.max(0, spec.delay || 0));
+    const f = { x: spec.x, y: spec.y, head: spec.head || 0, text: String(spec.text), color: spec.color, kind, t: -delay, lane: 0, z0: 0, side: rand() < .5 ? -1 : 1 };
     const mates = list.filter(o => Math.hypot(o.x - f.x, o.y - f.y) < .6 && Math.abs(o.head - f.head) < 12 && o.t < (KINDS[o.kind] || KINDS.banner).life - .05);
-    if (mates.length) f.t = -Math.max(0, spec.delay || 0, Math.max(...mates.map(o => -o.t)) + SPACING);   // a run of hits starts at least SPACING apart
+    // A busy party can hit faster than the stagger drains. Keep the delay
+    // short so old damage cannot queue up for seconds after combat stops.
+    if (mates.length) f.t = -Math.min(MAX_DELAY, Math.max(delay, Math.max(...mates.map(o => -o.t)) + SPACING));
     if (mates.length && k.arc) {
       // The lowest start over each lane that clears every mate while both are moving. Follow both paths over the next 0.8 s
       // (the newcomer is invisible until its delay is over, and that is when they are near); the mates' boxes are worked out once.

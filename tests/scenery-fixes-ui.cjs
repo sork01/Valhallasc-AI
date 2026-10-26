@@ -49,9 +49,9 @@ const world=new TestWorld();let browser,checks=0;const check=(value,message)=>{a
   const terrain=await page.evaluate(()=>{
     const z=WORLD_MAP.zones[0],lava=z.objects.filter(o=>o.kind==='lava'),ew={...z,theme:'emberwake',objects:lava.map(o=>({...o,kind:'ew_lava'}))};
     const draw=zone=>{const c=document.createElement('canvas');c.width=1000;c.height=1000;const g=c.getContext('2d');EmberwakeArt.molten(g,{x0:40,y0:57,ox:-1450,oy:2200},12,88,44,zone);return g.getImageData(0,0,1000,1000).data;};
-    const a=draw(z),b=draw(ew);let pixels=0,differences=0;for(let i=0;i<a.length;i++){if(i%4===3&&a[i])pixels++;if(a[i]!==b[i])differences++;}return {pixels,differences};
+    const a=draw(z),b=draw(ew);let pixels=0,differences=0,alphaDifferences=0;for(let i=0;i<a.length;i++){if(i%4===3&&a[i])pixels++;if(a[i]!==b[i]){if(i%4===3)alphaDifferences++;else differences++;}}return {pixels,differences,alphaDifferences};
   });
-  check(terrain.pixels>1000&&terrain.differences===0,'Crags and Emberwake render identical texture for identical footprints: '+JSON.stringify(terrain));
+  check(terrain.pixels>1000&&terrain.alphaDifferences===0&&terrain.differences>1000,'Crags has open red lava inside the same footprint as the caldera texture: '+JSON.stringify(terrain));
   const motion=await page.evaluate(()=>{
     const z=WORLD_MAP.zones[0],c=document.createElement('canvas');c.width=800;c.height=500;const g=c.getContext('2d'),cx=(45-67)*44,cy=(45+67)*22;
     const draw=t=>{g.clearRect(0,0,800,500);EmberwakeArt.moltenMotion(g,800,500,t,z,cx,cy);return g.getImageData(0,0,800,500).data;};const a=draw(1),b=draw(7);let changed=0,painted=0;for(let i=0;i<a.length;i++){if(a[i]!==b[i])changed++;if(i%4===3&&a[i])painted++;}return {changed,painted};

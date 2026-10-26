@@ -2417,6 +2417,11 @@ impl World {
         // A stranded person joins whoever has taken their escort quest.
         let escort_note = self.try_start_escort(session, npc_id);
         let raid_support = self.raid_support(session);
+        let repair_multiplier = if self.is_instance(self.players[&session].character.zone) {
+            4
+        } else {
+            1
+        };
         let p = self.players.get_mut(&session).unwrap();
         let map = &self.maps[p.character.zone];
         let Some(npc) = map.npcs.iter().find(|npc| npc.id == npc_id) else {
@@ -2476,7 +2481,10 @@ impl World {
                         let only = id.strip_prefix("repair:").map(str::parse::<u64>);
                         match only {
                             Some(Err(_)) => notice = "Invalid gear copy ID.".into(),
-                            _ => match p.character.repair_gear(only.and_then(Result::ok)) {
+                            _ => match p
+                                .character
+                                .repair_gear(only.and_then(Result::ok), repair_multiplier)
+                            {
                                 Ok((pieces, gold)) => {
                                     quest_changed = true;
                                     stats_changed = true;
@@ -2750,7 +2758,7 @@ impl World {
         }
         let _ = p
             .peer
-            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(raid_support.snapshot(p)) } else { None },"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"repairQuote":p.character.repair_quote(),"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
+            .try_send(json!({"type":"dialogue","npc":npc,"notice":notice,"gold":p.character.gold,"level":p.character.level,"mercPrice":mercs::merc_price(p.character.level),"statPoints":p.character.stat_points(),"trainedPoints":p.character.trained_points(),"statResetPrice":p.character.stat_reset_price(),"statResets":p.character.stat_resets,"attributes":p.character.attributes,"statPlayer":if stats_changed { Some(raid_support.snapshot(p)) } else { None },"quests":p.character.quests,"inventory":p.character.inventory,"equipment":p.character.equipment,"gearInstances":p.character.gear_instances,"repairQuote":p.character.repair_quote(repair_multiplier),"repairMultiplier":repair_multiplier,"gearPreview":gear_preview,"bags":p.character.bags,"bagCapacity":p.character.bag_capacity(),"look":p.character.look}));
         let actor = p.character.id.clone();
         let point = p.character.point();
         if levels > 0 {
@@ -2936,9 +2944,8 @@ impl World {
             // party is beaten and the boss walks home. Then the usual three seconds start for everyone together, so
             // the first to wake cannot pull the boss back onto the rest. The cap keeps a fight that never ends from
             // stranding anyone.
-            let pack_held = p.merc.is_some() && self.pack_fights.contains_key(&p.character.zone);
             if p.fallen
-                && ((!self.boss.fight_in(p.character.zone) && !pack_held)
+                && (!self.boss.fight_in(p.character.zone)
                     || p.dead_time
                         >= if self.maps[p.character.zone].raid {
                             RAID_FALLEN_HOLD_MAX
@@ -13941,6 +13948,81 @@ mod tests {
         ] {
             let found = w.maps[zone].npcs.iter().find(|n| n.id == npc).unwrap();
             assert!(found.offers.iter().any(|o| o.id == "repair"), "{npc}");
+        }
+    }
+
+    #[test]
+    fn dungeon_repair_smiths_are_reachable_at_every_entrance_and_copy() {
+        let w = world();
+        assert!(!w.instances.is_empty());
+        for instance in w.instances.iter().filter(|i| !w.is_arena_zone(i.zone)) {
+            let map = &w.maps[instance.zone];
+            let id = format!("dungeon_repair_{}", instance.template);
+            let npc = map
+                .npcs
+                .iter()
+                .find(|n| n.id == id)
+                .unwrap_or_else(|| panic!("{}: no entrance smith", map.name));
+            let point = npc.position_at(0.);
+            assert!(
+                map.spawn.distance(point) <= 6.1,
+                "{}: far from entrance",
+                map.name
+            );
+            assert!(
+                map.line_clear(map.spawn, point, PLAYER_RADIUS),
+                "{}: blocked entrance smith",
+                map.name
+            );
+            assert!(npc.offers.iter().any(|o| o.id == "repair"));
+            assert!(
+                map.portals
+                    .iter()
+                    .all(|p| point.distance(Point { x: p.x, y: p.y }) > p.r + 1.7)
+            );
+        }
+    }
+
+    #[test]
+    fn dungeon_repair_quotes_and_charges_four_times_town_price() {
+        for zone in [5, 46] {
+            let (mut w, mut rx) = debug_world();
+            wear_necklace(&mut w, 40);
+            let id = format!("dungeon_repair_{zone}");
+            let npc = w.maps[zone]
+                .npcs
+                .iter()
+                .find(|n| n.id == id)
+                .unwrap()
+                .clone();
+            let p = w.players.get_mut(&1).unwrap();
+            p.character.zone = zone;
+            p.character.x = npc.x;
+            p.character.y = npc.y;
+            p.character.gold = 95;
+            p.combat_left = 0.;
+            drain(&mut rx);
+            w.interact(1, &id, None);
+            let packet = packets(&mut rx, "dialogue").pop().unwrap();
+            assert_eq!(packet["repairMultiplier"], 4);
+            assert_eq!(packet["repairQuote"][0][1], 96);
+            w.interact(1, &id, Some("repair_all"));
+            assert_eq!((necklace_wear(&w), ch(&w).gold), (40, 95));
+            let packet = packets(&mut rx, "dialogue").pop().unwrap();
+            assert_eq!(packet["notice"], "You cannot afford that repair.");
+            w.players.get_mut(&1).unwrap().character.gold = 200;
+            let copy = w.players[&1]
+                .character
+                .gear_instances
+                .iter()
+                .find(|g| g.wear > 0)
+                .unwrap()
+                .id;
+            w.interact(1, &id, Some(&format!("repair:{copy}")));
+            assert_eq!((necklace_wear(&w), ch(&w).gold), (0, 104));
+            wear_necklace(&mut w, 40);
+            w.interact(1, &id, Some("repair_all"));
+            assert_eq!((necklace_wear(&w), ch(&w).gold), (0, 8));
         }
     }
 

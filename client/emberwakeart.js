@@ -26,8 +26,17 @@
     return mix(mix(hash(ix,iy),hash(ix+1,iy),u),mix(hash(ix,iy+1),hash(ix+1,iy+1),u),v);
   }
   // Shared molten crust, fissures and cooled banks, sampled in world coordinates.
-  function moltenColor(x,y,edge=Infinity){
+  function moltenColor(x,y,edge=Infinity,openFlow=false){
     const drift=noise(x*.31,y*.47),warp=noise(x*.74+19,y*.49-31);
+    if(openFlow){
+      // Crags' narrow rivers need open molten centres. The caldera's broad
+      // crust plates and metre-wide cooled banks made these look walkable.
+      const seam=Math.exp(-Math.abs(noise(x*1.1+warp,y*.75+drift)-.5)*30);
+      const crust=smooth(Math.max(0,Math.min(1,(noise(x*1.7-40,y*1.9+12)-.79)*7)));
+      const bank=smooth(Math.max(0,Math.min(1,(.08+noise(x*2,y*2)*.09-edge)*5)));
+      const r=mix(224+drift*20+seam*11,105,crust),g=mix(28+drift*22+seam*100,29,crust),b=mix(12+drift*8+seam*5,25,crust);
+      return [mix(r,37,bank),mix(g,25,bank),mix(b,29,bank),Math.round(255*smooth(Math.max(0,Math.min(1,edge*2.4))))];
+    }
     const u=(x+warp*2.6+noise(x*1.1,y*1.3)*.7)/1.8,v=(y+drift*2.5+noise(x*1.4+9,y*.9)*.7)/1.4;
     const ix=Math.floor(u),iy=Math.floor(v);
     let first=1e9,second=1e9,seed=0;
@@ -68,7 +77,7 @@
       let edge=-Infinity;
       for(const o of nearby)edge=Math.max(edge,o.r-Math.hypot(x-o.x,y-o.y));
       if(edge<=0)continue;
-      pixels.data.set(moltenColor(x,y,edge),(py*c.width+px)*4);
+      pixels.data.set(moltenColor(x,y,edge,z.theme==='ember'),(py*c.width+px)*4);
     }
     ctx.putImageData(pixels,0,0);const result={canvas:c,ymin,height:ymax-ymin};moltenCache.set(z,result);return result;
   }
@@ -98,9 +107,9 @@
           if(z.forgeFloor?.[iy]?.[ix]==='='&&Math.hypot(Math.max(ix-x,0,x-ix-1),Math.max(iy-y,0,y-iy-1))<1)bank=true;
         }
         if(bank)continue;
-      }else if(!cache.pieces.some(o=>o.r-Math.hypot(x-o.x,y-o.y)>1))continue;
+      }else if(!cache.pieces.some(o=>o.r-Math.hypot(x-o.x,y-o.y)>(z.theme==='ember'?.7:1)))continue;
       // Glints belong in the hot fissures, not on the dark crust plates.
-      if(moltenColor(x,y)[0]<200)continue;
+      if(moltenColor(x,y,Infinity,z.theme==='ember')[0]<200)continue;
       points.push({x,y,seed});
     }
     cache.chunks.set(key,points);

@@ -7,15 +7,16 @@ Beta 1.20.0.
 Ordinary dungeon and raid pulls remember their engaged enemies, fighters and
 fallen fighters. A human killed by a pack returns to the entrance, including
 when the raid has an earlier boss rally. Surviving hired fighters keep their
-targets and remain in the fight; fallen hires wait until that pull ends.
-A respawned human counts as fallen for that pull until deliberately returning
+targets and remain in the fight. Humans and hires both respawn on the ordinary
+timer during pack combat (owner correction, 2026-10-26); only boss fights hold
+fallen fighters down. A respawned fighter counts as fallen for that pull until deliberately returning
 within enemy awareness, preventing a wipe from chasing that human to the door.
-A human can rejoin by targeting a pull enemy or moving back into the fight.
+A fighter can rejoin by targeting a pull enemy or moving back into the fight.
 
 When every fighter falls or leaves, living engaged enemies reset to their
 authored homes, with health, status and target restored and projectiles cleared.
-Already killed enemies stay dead. Other pulls/copies are untouched. A finished
-pull releases fallen hires to their normal respawn and regroup behavior.
+Already killed enemies stay dead. Other pulls/copies are untouched. Ending a
+pull never restarts or delays a hire's respawn timer.
 Boss mechanic fights retain their existing fallen and rally rules.
 
 `world/packs.rs` runs before mercenary navigation and player respawn each tick.
@@ -32,10 +33,24 @@ and hidden GMs are excluded. Totals are per runtime zone/copy and are never save
 The meter uses the current encounter's elapsed time with a one-second minimum
 divisor. It freezes after its enemies die or disengage, and a new damaging hit
 starts the next fight. Instance reset or an empty area clears its history.
+An active tracked pack or boss keeps the encounter open even after every enemy
+damaged so far has died. Dead fighters retain their damage totals and their DPS
+continues falling with the shared clock until that encounter ends.
 
 The client displays trusted `damageMeter` snapshot data. The panel can be moved
 and scaled in Settings and hidden/restored using World Menu > DPS meter. Its hide
 preference persists. No client-provided damage or time is accepted.
+
+## Floating combat numbers
+
+Rapid hits stagger by 80 ms with a maximum 320 ms display delay. A party burst
+must never accumulate seconds of queued text after combat ends. Floating text
+ages by real frame time, independently of the 50 ms movement/interpolation cap,
+so a slow or hidden view cannot replay expired hits on return.
+
+Checks: `tests/damage-numbers.cjs` includes a same-target 300-hit burst; the
+bounded `tests/damage-number-backlog-ui.cjs` advances the actual field frame
+clock by ten seconds and verifies old text expires.
 
 ## Activity log
 

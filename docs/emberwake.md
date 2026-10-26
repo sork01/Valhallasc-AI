@@ -134,8 +134,11 @@ no clipped samples in either source render. Auditory review remains unverified.
 The owner requested zone pictures, full enemy sheets and both music tracks
 on FileDrop; upload receipts are in test-results/emberwake/filedrop-upload.json.
 
-Emberfall Crags uses the same cached molten surface and subtle motion as the
-caldera. Its existing `lava` circle union remains the visual/collision boundary;
-Emberwake retains `ew_lava`. The shared renderer selects the correct pieces
-without changing either map. `tests/scenery-fixes-ui.cjs` compares identical
-footprints rendered through both themes and checks motion.
+Emberfall Crags uses the same cached terrain renderer and subtle motion as the
+caldera, with an open, deep red molten surface and much narrower cooled banks.
+The narrow Crags rivers must read as impassable lava rather than hardened plates.
+Its existing `lava` circle union remains the visual/collision boundary;
+Emberwake retains `ew_lava` and its broad crust texture. The shared renderer
+selects the correct pieces without changing either map. `tests/crags-lava-ui.cjs`
+checks molten coverage, red colour and unchanged terrain alpha at the banks and
+fords. `tests/scenery-fixes-ui.cjs` also checks motion.

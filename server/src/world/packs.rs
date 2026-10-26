@@ -88,9 +88,6 @@ impl World {
                 if p.character.hp <= 0. {
                     fight.downed.insert(session);
                     p.pack_death = true;
-                    if p.merc.is_some() {
-                        p.fallen = true;
-                    }
                 } else if fight.downed.contains(&session)
                     && (p.target.is_some_and(|id| fight.enemies.contains(&id))
                         || (p.moving && p.character.point().distance(self.maps[zone].spawn) > 8.))
@@ -133,17 +130,8 @@ impl World {
                 self.enemy_bolts.retain(|b| b.zone != zone);
                 self.bolts.retain(|b| b.zone != zone);
             }
-            // Dead hired fighters wait for the pull to end, then regroup normally.
-            for session in fight.members {
-                if let Some(p) = self.players.get_mut(&session)
-                    && p.character.zone == zone
-                    && p.pack_death
-                    && p.character.hp <= 0.
-                {
-                    p.fallen = false;
-                    p.dead_time = 0.;
-                }
-            }
+            // Pack deaths keep the ordinary respawn timer, even while the pull
+            // continues. Downed members count again only after deliberate re-entry.
         }
     }
 }

@@ -487,7 +487,7 @@ pub fn base_drop_chance(rarity: &str) -> f64 {
     }
 }
 /// Independent raid-pack roll, in addition to normal materials and equipment.
-pub const RAID_EPIC_DROP_CHANCE: f64 = 0.03;
+pub const RAID_EPIC_DROP_CHANCE: f64 = 0.05;
 /// Original class-neutral purple gear found only on ordinary raid enemies.
 pub fn raid_pack_piece(choice: f64) -> Option<&'static Item> {
     let pool: Vec<_> = ITEMS
