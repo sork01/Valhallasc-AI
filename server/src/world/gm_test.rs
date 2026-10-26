@@ -1,5 +1,5 @@
 //! The game master's test menu (`client/gmtest.js`, `/dungeon`, `/gauntlet`, `/tune`): enter any dungeon at its door, final
-//! boss or a pack, with the dungeon's level, a full gear set and four hired fighters; reset the copy; read or skip the
+//! boss or a pack, with the dungeon's level, a full gear set and four hired fighters (nine in a raid); reset the copy; read or skip the
 //! enrage clock; start an arena gauntlet at any quest level and fight; and change a few difficulty multipliers. Every op
 //! is a `DebugCommand`, so it only runs for the verified GM character (or a private test world) and is logged.
 //!
@@ -56,14 +56,21 @@ impl World {
         crate::items::enrage_factor_scaled(kind, fight, self.tuned(zone, kind).1)
     }
 
-    /// Template zones of the dungeons the menu offers (the raid stays sealed).
+    /// Template zones of the dungeons and raids the menu offers.
     pub(super) fn test_dungeons(&self) -> Vec<usize> {
         (0..self.maps.len())
             .filter(|&z| {
                 let m = &self.maps[z];
-                m.copies > 0 && m.template.is_none() && !m.raid
+                m.copies > 0 && m.template.is_none()
             })
             .collect()
+    }
+    fn test_merc_count(&self, zone: usize) -> usize {
+        if self.maps[zone].raid {
+            social::RAID_MAX - 1
+        } else {
+            social::PARTY_MAX - 1
+        }
     }
     pub(super) fn dungeon_level(&self, zone: usize) -> u32 {
         let m = &self.maps[zone];
@@ -160,6 +167,7 @@ impl World {
                     "boss": self.maps[z].final_boss,
                     "packs": self.dungeon_packs(z).len(),
                     "sealed": self.maps[z].sealed_template,
+                    "mercs": self.test_merc_count(z),
                 })
             })
             .collect();
@@ -301,9 +309,23 @@ impl World {
                 Class::Assassin,
                 Class::Warrior,
             ];
-            for merc in fighters.into_iter().filter(|c| *c != class).take(4) {
+            // Two of each class including the GM in a full raid, one of each in a dungeon.
+            for merc in fighters
+                .into_iter()
+                .filter(|c| *c != class)
+                .chain(fighters)
+                .take(self.test_merc_count(zone))
+            {
                 if self
-                    .place_mercenary(&owner, merc, hero_level, copy, arrival, false, None)
+                    .place_mercenary(
+                        &owner,
+                        merc,
+                        hero_level,
+                        copy,
+                        arrival,
+                        self.maps[zone].raid,
+                        None,
+                    )
                     .is_err()
                 {
                     break;

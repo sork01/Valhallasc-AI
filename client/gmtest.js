@@ -1,6 +1,6 @@
 'use strict';
 // The game master's test menu: enter any dungeon at its door, final boss or a pack (with the dungeon's level, a gear set and
-// four hired fighters), reset the copy, read or skip the enrage clock, start an arena gauntlet at any level and fight, and
+// four hired fighters, or nine in a raid), reset the copy, read or skip the enrage clock, start an arena gauntlet at any level and fight, and
 // change difficulty multipliers. Every button sends one `debug` command through gm.js (the server runs it only for the
 // verified GM character and logs it); nothing here is a security check. The multipliers live on the server, per dungeon
 // copy or gauntlet run, in memory only. Everything that came from the network goes through textContent.
@@ -35,6 +35,8 @@
 
   function packs() { const d = info?.dungeons.find(d => String(d.zone) === refs.dungeon.value); return d ? d.packs : 0; }
   function fillPlaces() {
+    const dungeon = info?.dungeons.find(d => String(d.zone) === refs.dungeon.value);
+    refs.mercLabel.textContent = ` ${dungeon?.mercs ?? 4} hired fighters`;
     const options = [['door', 'Door'], ['boss', 'Final boss']];
     for (let i = 1; i <= packs(); i++) options.push([`pack:${i - 1}`, `Pack ${i}`]);
     refs.at.replaceChildren(...options.map(([v, l]) => { const o = node('option', l); o.value = v; return o; }));
@@ -49,7 +51,9 @@
   }
   function fill(data) {
     info = data;
+    const selected = refs.dungeon.value;
     refs.dungeon.replaceChildren(...data.dungeons.map(d => { const o = node('option', `${d.name} · L${d.level}${d.sealed ? ' (sealed)' : ''}`); o.value = d.zone; return o; }));
+    if (data.dungeons.some(d => String(d.zone) === selected)) refs.dungeon.value = selected;
     refs.level.replaceChildren(...data.gauntletLevels.map(l => { const o = node('option', `Level ${l}`); o.value = l; return o; }));
     refs.fight.replaceChildren(...Array.from({ length: data.fights }, (_, i) => { const o = node('option', `Fight ${i + 1} · ${data.classes[i]}`); o.value = i + 1; return o; }));
     fillPlaces();
@@ -75,6 +79,7 @@
 
     // Dungeons
     const [lvl, lvlBox] = check('gmtest-level', 'Set my level to the dungeon\'s'), [mercs, mercBox] = check('gmtest-mercs', 'Four hired fighters');
+    refs.mercLabel = mercs.lastChild;
     refs.dungeon = select('gmtest-dungeon', []); refs.at = select('gmtest-at', []);
     refs.gear = select('gmtest-gear', [['', 'Keep my gear'], ['green', 'Green set'], ['blue', 'Blue set'], ['purple', 'Purple set']]);
     refs.dungeon.addEventListener('change', fillPlaces);

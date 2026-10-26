@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.19.2",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "The GM test menu can enter the Chained Forge and hire nine mercenaries for a full raid group. Ordinary dungeons still hire four."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.19.1",
     "date": "2026-10-26",
     "new": [],

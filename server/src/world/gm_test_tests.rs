@@ -51,7 +51,7 @@ fn only_the_gm_may_run_the_menu_ops() {
 }
 
 #[test]
-fn the_menu_lists_every_open_dungeon_but_not_the_raid_and_the_gauntlet_levels() {
+fn the_menu_lists_dungeons_and_the_raid_with_their_hire_counts_and_gauntlet_levels() {
     let mut w = world();
     let _rx = gm(&mut w, 1);
     let info = w.gm_test_info(1).unwrap();
@@ -62,7 +62,17 @@ fn the_menu_lists_every_open_dungeon_but_not_the_raid_and_the_gauntlet_levels() 
         .map(|d| d["name"].as_str().unwrap())
         .collect();
     assert!(names.contains(&"The Undervault") && names.contains(&"The Black Hour Foundry"));
-    assert!(!names.contains(&"The Chained Forge"));
+    assert!(names.contains(&"The Chained Forge"));
+    for dungeon in info["dungeons"].as_array().unwrap() {
+        assert_eq!(
+            dungeon["mercs"],
+            if dungeon["name"] == "The Chained Forge" {
+                9
+            } else {
+                4
+            }
+        );
+    }
     assert!(names.len() >= 19, "{names:?}");
     assert!(!info["gauntletLevels"].as_array().unwrap().is_empty());
 }
@@ -94,16 +104,56 @@ fn entering_a_dungeon_puts_a_visible_hero_with_level_gear_and_four_hired_fighter
     // A second entry replaces the hired fighters instead of stacking them.
     enter(&mut w, 1, zone, "door");
     assert_eq!(w.players.values().filter(|q| q.merc.is_some()).count(), 4);
-    // A non-dungeon zone and the raid are refused.
+    // A non-dungeon zone is refused.
     assert!(
         w.gm_dungeon_enter(1, 0, "door", 0, false, None, false)
             .is_err()
     );
-    let raid = w.maps.iter().position(|m| m.raid).unwrap();
-    assert!(
-        w.gm_dungeon_enter(1, raid, "door", 0, false, None, false)
-            .is_err()
-    );
+}
+
+#[test]
+fn gm_raid_hires_nine_with_balanced_classes_and_replaces_them_on_reentry() {
+    let mut w = world();
+    let _rx = gm(&mut w, 1);
+    let raid = w
+        .maps
+        .iter()
+        .position(|m| m.raid && m.template.is_none())
+        .unwrap();
+    let owner = w.players[&1].character.id.clone();
+    for at in ["door", "boss"] {
+        let out = enter(&mut w, 1, raid, at);
+        assert_eq!(out["mercs"], 9);
+        assert_eq!(out["level"], 99);
+        let copy = w.players[&1].character.zone;
+        assert_eq!(w.instance_at(copy).unwrap().template, raid);
+        assert!(w.party_is_raid(&owner));
+        assert_eq!(w.party_mates(&owner).len(), 10);
+        let hired: Vec<_> = w
+            .players
+            .values()
+            .filter(|p| p.merc.as_deref() == Some(owner.as_str()))
+            .collect();
+        assert_eq!(hired.len(), 9);
+        assert!(hired.iter().all(|p| p.character.zone == copy
+            && p.character.level == 99
+            && p.merc_raid == Some(copy)));
+        for class in CLASSES {
+            assert_eq!(
+                w.players
+                    .values()
+                    .filter(|p| p.character.look.class == class)
+                    .count(),
+                2
+            );
+        }
+    }
+    // Returning to a normal dungeon replaces the nine raid hires with four regular fighters.
+    let zone = undervault(&w);
+    assert_eq!(enter(&mut w, 1, zone, "door")["mercs"], 4);
+    assert_eq!(w.party_mates(&owner).len(), 5);
+    assert_eq!(w.players.values().filter(|p| p.merc.is_some()).count(), 4);
+    assert!(w.players.values().all(|p| p.merc_raid.is_none()));
 }
 
 #[test]

@@ -40,6 +40,11 @@ async function newPlayer(cookie) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   await context.addInitScript(() => { window.__valhallaTestSprites = true; if (!localStorage.getItem('valhallasc.save.v1')) localStorage.setItem('valhallasc.save.v1', JSON.stringify({ lang: 'en', sound: false, char: null, draft: null })); });
   await context.addCookies([{ name: 'sso_session', value: cookie, url }]);
+  if (process.env.MUTATE === 'raid-hires') await context.route('**/gmtest.js', async route => {
+    const response = await route.fetch(), body = await response.text();
+    assert.ok(body.includes('dungeon?.mercs ?? 4'), 'hire-label mutation must match');
+    await route.fulfill({ response, body: body.replace('dungeon?.mercs ?? 4', '4') });
+  });
   const page = await context.newPage(); page.errors = [];
   page.on('pageerror', e => page.errors.push(e.message));
   await page.goto(url);
@@ -71,7 +76,7 @@ async function type(page, text) {
     await sork.waitForFunction(() => document.querySelectorAll('#gmtest-dungeon option').length > 10, null, { timeout: 10000 });
     check(await sork.locator('#gmtest-panel').isVisible(), 'the menu opens');
     const names = await sork.locator('#gmtest-dungeon option').allTextContents();
-    check(names.some(n => n.startsWith('The Undervault')) && !names.some(n => n.includes('Chained Forge')), 'dungeons are listed, the raid is not');
+    check(names.some(n => n.startsWith('The Undervault')) && names.some(n => n.includes('Chained Forge')), 'dungeons and the raid are listed');
     check((await sork.locator('#gmtest-glevel option').count()) > 0 && (await sork.locator('#gmtest-gfight option').count()) === 5, 'gauntlet levels and five fights are listed');
     // Enter the Undervault at its final boss with level, blue gear and four hired fighters.
     await sork.locator('#gmtest-dungeon').selectOption({ label: names.find(n => n.startsWith('The Undervault')) });
@@ -80,8 +85,7 @@ async function type(page, text) {
     await sork.locator('#gmtest-gear').selectOption('blue');
     await sork.locator('#gmtest-level').check(); await sork.locator('#gmtest-mercs').check();
     await sork.locator('#gmtest-panel button', { hasText: 'Enter' }).click();
-    await sork.waitForFunction(() => /hired/.test(document.querySelector('.gmtest-status')?.textContent || ''), null, { timeout: 15000 });
-    await sork.waitForFunction(() => Field.hero.level >= 15, null, { timeout: 8000 }).catch(() => {});
+    await sork.waitForFunction(() => Field.zone === 5 && Field.hero.level === 20 && Field.remotePlayers.filter(p => p.hired).length === 4, null, { timeout: 15000 });
     const state = await sork.evaluate(() => ({ level: Field.hero.level }));
     check(state.level === 20, 'the hero is at the dungeon level (' + state.level + ')');
     // A multiplier applies to this copy and the status reads back.
@@ -101,6 +105,31 @@ async function type(page, text) {
     check(true, '/tune answers in the chat log');
     check(sork.errors.length === 0, 'no page errors for the GM: ' + sork.errors.join('; '));
 
+    // The raid option provisions the GM plus nine actual fighters and survives its info refresh.
+    await sork.locator('#gmtest-open').click();
+    await sork.locator('#gmtest-dungeon').selectOption({ label: names.find(n => n.includes('Chained Forge')) });
+    check(/9 hired fighters/.test(await sork.locator('label', { has: sork.locator('#gmtest-mercs') }).innerText()), 'the raid offers nine hires');
+    await sork.locator('#gmtest-at').selectOption('door');
+    // Keep the previous gear: a second full set tests bag capacity, not raid hiring.
+    await sork.locator('#gmtest-gear').selectOption('');
+    await sork.evaluate(() => {
+      const request = GM.request.bind(GM);
+      GM.request = async command => { const reply = await request(command); if (command.op === 'gm_dungeon_enter') window.__raidEntry = reply; return reply; };
+    });
+    await sork.locator('#gmtest-panel button', { hasText: 'Enter' }).click();
+    await sork.waitForFunction(() => !!window.__raidEntry);
+    const raidEntry = await sork.evaluate(() => window.__raidEntry);
+    check(raidEntry.ok && raidEntry.result.mercs === 9, 'raid entry hires nine: ' + JSON.stringify(raidEntry));
+    await sork.waitForFunction(() => Field.zone === 46 && Field.remotePlayers.filter(p => p.hired).length === 9, null, { timeout: 15000 });
+    check(await sork.evaluate(() => Field.hero.level === 99 && Field.remotePlayers.filter(p => p.hired).every(p => p.level === 99)), 'nine level-99 mercenaries arrive in the raid');
+    await sork.waitForFunction(() => document.querySelector('.gmtest-status')?.textContent === 'Ready. Every action is logged on the server.');
+    check((await sork.locator('#gmtest-dungeon option:checked').innerText()).includes('Chained Forge'), 'refresh keeps the raid selected');
+    check(/9 hired fighters/.test(await sork.locator('label', { has: sork.locator('#gmtest-mercs') }).innerText()), 'refresh retains the raid hire count');
+    await sork.locator('#gmtest-dungeon').selectOption({ label: names.find(n => n.startsWith('The Undervault')) });
+    check(/4 hired fighters/.test(await sork.locator('label', { has: sork.locator('#gmtest-mercs') }).innerText()), 'ordinary dungeons still offer four hires');
+    await sork.keyboard.press('Escape');
+
+    await sork.context().close();
     // An ordinary player has no button and a hand-made op is refused.
     const other = await newPlayer(OTHER); pages.push(other);
     await signIn(other);

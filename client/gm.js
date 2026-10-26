@@ -85,7 +85,7 @@
       a.length === 2 && /^(accept|complete|claim|finish|reset)$/.test(a[1]) ? { op: 'quest', id: a[0], action: a[1] } : 'Use /quest <id> <accept|complete|claim|finish|reset>.'],
     king: ['', 'Summon the King Slime now.', () => ({ op: 'summon_king' })],
     die: ['', 'Be defeated (with the normal death penalty).', () => ({ op: 'die' })],
-    dungeon: ['<zone> [door|boss|pack N] [level] [green|blue|purple] [mercs] | reset | enrage [skip]', 'Test a dungeon: enter a copy of it at its door, final boss or a pack (any gate), optionally at its level, in a full gear set and with four hired fighters; reset the copy; read or skip the enrage clock.', a => {
+    dungeon: ['<zone> [door|boss|pack N] [level] [green|blue|purple] [mercs] | reset | enrage [skip]', 'Test a dungeon or raid: enter a copy at its door, final boss or a pack (any gate), optionally at its level, in a full gear set and with four hired fighters (nine in a raid); reset the copy; read or skip the enrage clock.', a => {
       if (a[0] === 'reset') return { op: 'gm_dungeon_reset' };
       if (a[0] === 'enrage') return a[1] && a[1] !== 'skip' ? 'Use /dungeon enrage [skip].' : { op: 'gm_enrage', action: a[1] || 'status' };
       const zone = findZone(a[0]);
