@@ -3,6 +3,73 @@ use super::wyrd_tests::{at, blocked, flood, reached, world};
 use super::*;
 
 #[test]
+fn sunken_astrolabe_navigator_has_space_without_pulling_the_axis_in_every_copy() {
+    use super::wyrd_tests::{calm, join, place};
+
+    let mut w = world();
+    calm(&mut w);
+    let _receiver = join(&mut w, 1, Class::Warrior);
+    let copies: Vec<_> = w
+        .instances
+        .iter()
+        .filter(|i| i.template == 34)
+        .map(|i| i.zone)
+        .collect();
+    assert_eq!(copies.len(), 4);
+    for zone in copies {
+        let navigator = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == zone && s.kind == "astro_navigator")
+            .unwrap();
+        let axis = w
+            .slimes
+            .iter()
+            .position(|s| s.zone == zone && s.kind == "astro_axis")
+            .unwrap();
+        let center = at(w.spawns[navigator].x, w.spawns[navigator].y);
+        let seen = flood(
+            &w.maps[zone],
+            &blocked(&w.maps[zone], &[]),
+            w.maps[zone].spawn,
+        );
+        let sign = &w.signs["astro_axis"];
+        assert!(reached(&w.maps[zone], &seen, at(sign.x, sign.y)));
+        // Ten tiles for the party to spread/kite, plus four tiles of idle wandering.
+        for n in 0..16 {
+            let angle = n as f64 * std::f64::consts::TAU / 16.;
+            let point = at(center.x + 10. * angle.cos(), center.y + 10. * angle.sin());
+            let mut resolved = point;
+            w.maps[zone].collide(&mut resolved, PLAYER_RADIUS);
+            assert!(
+                resolved.distance(point) < 1e-6,
+                "Navigator needs room to kite"
+            );
+            assert!(reached(&w.maps[zone], &seen, point));
+            for id in [navigator, axis] {
+                w.slimes[id] = Slime::with_level(id, &w.spawns[id], 85);
+            }
+            assert!(
+                point.distance(w.slimes[axis].point()) > Slime::attack_profile("astro_axis").3 + 4.,
+                "Axis can reach the Navigator fight in copy {zone}"
+            );
+            place(&mut w, 1, zone, point);
+            w.update_slime(navigator);
+            w.update_slime(axis);
+            assert!(
+                w.slimes[navigator].target.is_some(),
+                "Navigator should engage"
+            );
+            assert!(
+                w.slimes[axis].target.is_none(),
+                "Axis joined the Navigator fight in copy {zone}"
+            );
+            assert_eq!(w.slimes[axis].fight, 0.);
+        }
+    }
+}
+
+#[test]
 fn sunken_astrolabe_has_safe_open_routes_quests_and_boss_loot() {
     let w = world();
     let map = &w.maps[34];

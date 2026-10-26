@@ -1,5 +1,14 @@
 [
   {
+    "version": "Beta 1.19.1",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "The Lost Navigator has a larger room farther from the final boss in the Sunken Astrolabe, giving your party space to fight them separately."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.19.0",
     "date": "2026-10-25",
     "new": [

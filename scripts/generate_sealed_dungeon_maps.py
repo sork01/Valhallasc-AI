@@ -57,7 +57,7 @@ PLANS = [
          links=[(0, 1), (1, 2), (1, 3), (2, 4), (3, 5), (4, 6), (5, 6)]),
     dict(id='sunken_astrolabe', name='The Sunken Astrolabe', parent=25, level=85,
          landing=(140, 17), spawn=(48, 82), rooms=[(48, 82), (25, 69), (71, 69),
-         (48, 53), (26, 38), (70, 38), (48, 19)],
+         (48, 53), (26, 38), (80, 48), (48, 19)],
          links=[(0, 1), (0, 2), (1, 3), (2, 3), (3, 4), (3, 5), (4, 6), (5, 6)]),
     dict(id='thunderheart_gate', name='The Thunderheart Gate', parent=27, level=95,
          landing=(151, 20), spawn=(48, 82), rooms=[(48, 82), (24, 70), (24, 52),
@@ -109,6 +109,9 @@ def build(plan):
             width, depth = 23, 14
         if plan['id'] == 'rain_crown' and n not in (0, len(plan['rooms']) - 1):
             width, depth = 18, 14
+        if plan['id'] == 'sunken_astrolabe' and n == 5:
+            # Give the Navigator room to kite without waking the Axis.
+            width, depth = 26, 26
         carve(rectangle(x, y, width, depth))
     paths = []
     for a, b in plan['links']:
@@ -249,7 +252,7 @@ def build(plan):
         kinds = ['astro_gearling', 'astro_starling', 'astro_sentinel'] * 3
         spawns = [dict(kind=k, x=x, y=y) for k, (x, y) in zip(kinds, points)]
         spawns += [dict(kind='astro_warden', x=26, y=38),
-                   dict(kind='astro_navigator', x=70, y=38),
+                   dict(kind='astro_navigator', x=80, y=48),
                    dict(kind='astro_axis', x=48, y=19)]
         for n, (x, y) in enumerate(plan['rooms']):
             if n:
