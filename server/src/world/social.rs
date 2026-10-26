@@ -2101,6 +2101,71 @@ mod tests {
     }
 
     #[test]
+    fn every_buff_skill_covers_the_party_in_range_and_never_stacks_with_the_same_kind() {
+        let mut w = world();
+        let war = add(&mut w, 1, "Wil");
+        let pia = priest(&mut w, 2, "Pia", 24);
+        let ann = add(&mut w, 3, "Ann");
+        let far = add(&mut w, 4, "Far");
+        let stranger = add(&mut w, 5, "Sam");
+        team(&mut w, &war, &[&pia, &ann, &far]);
+        w.players.get_mut(&4).unwrap().character.x += 30.;
+        w.players.get_mut(&1).unwrap().character.level = 8;
+        for who in [&war, &pia, &ann, &far, &stranger] {
+            let c = &mut w.players.get_mut(&who.session).unwrap().character;
+            c.resource = Some(c.max_resource());
+        }
+        let damage = |w: &World, s: u64| w.players[&s].buff(BuffKind::Damage);
+        let held = |w: &World, s: u64| {
+            w.players[&s]
+                .buffs
+                .iter()
+                .filter(|b| b.kind == BuffKind::Damage)
+                .count()
+        };
+        // A warrior's Battle Cry reaches the party in range, not the far member or a stranger.
+        w.use_skill(1, "battlecry", Point::default());
+        let cry = damage(&w, 1);
+        assert!(cry > 0.3, "the warrior's own buff: {cry}");
+        assert_eq!((damage(&w, 2), damage(&w, 3)), (cry, cry));
+        assert_eq!((damage(&w, 4), damage(&w, 5)), (0., 0.));
+        // The priest's weaker Blessing of Might leaves the stronger cry alone: one buff of the kind, same strength.
+        w.use_skill(2, "blessing", Point::default());
+        for s in [1, 2, 3] {
+            assert_eq!((held(&w, s), damage(&w, s)), (1, cry), "session {s}");
+        }
+        // The far member only got the blessing, which a later cry then replaces rather than adds to.
+        assert_eq!((held(&w, 4), damage(&w, 4)), (0, 0.));
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        for s in [1, 2, 3] {
+            w.players.get_mut(&s).unwrap().buffs.clear();
+        }
+        for s in [1, 2] {
+            let p = w.players.get_mut(&s).unwrap();
+            p.skill_cd.clear();
+            p.character.resource = Some(p.character.max_resource());
+        }
+        w.use_skill(2, "blessing", Point::default());
+        let blessing = damage(&w, 3);
+        assert!(blessing > 0. && blessing < cry, "{blessing} vs {cry}");
+        w.use_skill(1, "battlecry", Point::default());
+        assert_eq!(
+            (held(&w, 3), damage(&w, 3)),
+            (1, cry),
+            "the stronger replaces"
+        );
+        // A different kind is a separate buff: Shield Wall alongside the damage buff.
+        w.players.get_mut(&1).unwrap().character.level = 12;
+        w.players.get_mut(&1).unwrap().skill_cd.clear();
+        w.players.get_mut(&1).unwrap().character.resource =
+            Some(w.players[&1].character.max_resource());
+        w.use_skill(1, "shieldwall", Point::default());
+        assert!(w.players[&3].buff(BuffKind::Shield) > 0.);
+        assert_eq!((held(&w, 3), damage(&w, 3)), (1, cry));
+        assert_eq!(w.players[&5].buffs.len(), 0);
+    }
+
+    #[test]
     fn a_priest_fights_alone_with_a_mace_and_smite() {
         let mut w = world();
         let pia = priest(&mut w, 1, "Pia", 4);

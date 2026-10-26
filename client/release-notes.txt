@@ -1,5 +1,17 @@
 [
   {
+    "version": "Beta 1.23.0",
+    "date": "2026-10-26",
+    "new": [
+      "Every buff skill now covers your whole party within 10 metres, not just you: Battle Cry, Shield Wall, Berserk, Arcane Ward, Evasion, Shadow Veil, Deadly Focus, Hunter's Mark, Rapid Fire and Eagle Sight."
+    ],
+    "changed": [
+      "Two buffs of the same kind no longer add up. The stronger one stays, and an equal or stronger recast refreshes it.",
+      "Hired fighters at Eldmarr no longer walk back across the cracked floor they just left, so far fewer of them fall to The Forge Floor."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.22.1",
     "date": "2026-10-26",
     "new": [],

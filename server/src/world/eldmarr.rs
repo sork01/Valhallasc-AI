@@ -648,9 +648,73 @@ impl World {
                 if let Some(p) = candidates.first() {
                     return Some(answer(Some(*p), true, false));
                 }
+            } else if let Some(way) = self.eldmarr_approach(f, e, def, c, id, me) {
+                return Some(match way {
+                    Some(goal) => answer(Some(goal), true, false),
+                    None => answer(None, false, true),
+                });
             }
         }
         None
+    }
+
+    /// The way back to the boss once a fighter has stepped out of a cracked cell. The shared chase heads straight for
+    /// him, so every melee fighter who escaped would walk back through the lava (or the warning) he just left.
+    /// `None`: the ordinary chase is safe (or the fighter is already swinging). `Some(Some(p))`: walk to `p` first.
+    /// `Some(None)`: no safe place to swing from exists right now, so stand still (skills still fire).
+    fn eldmarr_approach(
+        &self,
+        f: &Fight,
+        e: &Eldmarr,
+        def: &BossDef,
+        c: &bm::Crack,
+        id: u64,
+        me: Point,
+    ) -> Option<Option<Point>> {
+        if e.cracks.is_empty() {
+            return None;
+        }
+        let boss = &self.slimes[f.boss];
+        let reach = self.players.get(&id)?.character.look.class.reach();
+        let swing = boss.r + reach - 0.05;
+        let from = boss.point();
+        if me.distance(from) <= swing + 0.05 {
+            return None;
+        }
+        let back = from.direction(me);
+        let stop = Point {
+            x: from.x + back.x * swing,
+            y: from.y + back.y * swing,
+        };
+        if self.eldmarr_clear_path(f, e, c, me, me, stop) {
+            return None;
+        }
+        let mut ring: Vec<Point> = (0..16)
+            .map(|n| {
+                let angle = n as f64 * std::f64::consts::TAU / 16.;
+                Point {
+                    x: from.x + swing * angle.cos(),
+                    y: from.y + swing * angle.sin(),
+                }
+            })
+            .filter(|p| {
+                inside(f.arena, *p)
+                    && !e
+                        .cracks
+                        .keys()
+                        .any(|k| touches(cell_rect(*k, c.cell), *p, BODY + 0.15))
+                    && self.eldmarr_danger(f, def, id, *p, 2.).is_none()
+            })
+            .collect();
+        ring.sort_by(|a, b| me.distance(*a).total_cmp(&me.distance(*b)));
+        for p in ring.into_iter().take(4) {
+            if let Some(step) = self.eldmarr_route(f, e, c, me, p)
+                && self.eldmarr_clear_path(f, e, c, me, me, step)
+            {
+                return Some(Some(step));
+            }
+        }
+        Some(None)
     }
 
     pub(super) fn eldmarr_view(

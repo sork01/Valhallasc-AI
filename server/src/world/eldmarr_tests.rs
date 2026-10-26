@@ -784,3 +784,99 @@ fn eldmarr_floor_escape_goal_is_kept_until_the_fighter_leaves_the_cell() {
         "escape must not oscillate between equally near tiles"
     );
 }
+
+/// The hirer and nine mercenaries stand and fight at Eldmarr for several minutes of the first phase. The lava a
+/// ten-body melee ring leaves behind must not be able to kill any of them (owner report 2026-10-26). With `human`
+/// the hirer is a person who just stands at the boss and swings (never moves, never dies): only the nine
+/// mercenaries play by the real `merc_think` cadence around them.
+fn crew_floor_deaths(human: bool, walk: bool, seconds: f64, share: f64) -> usize {
+    let mut r = Rig::new(1);
+    r.w.rng = 77;
+    let boss = r.w.slimes[r.boss].clone();
+    let spawn = r.w.spawns[r.boss].clone();
+    r.w.slimes = vec![boss];
+    r.w.slimes[0].id = 0;
+    r.w.slimes[0].max_hp = 1e15;
+    r.w.slimes[0].hp = 1e15;
+    r.w.spawns = vec![spawn];
+    r.boss = 0;
+    let at = r.w.slimes[0].point();
+    crate::world::ttk::hire_mercenaries(
+        &mut r.w,
+        &[
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+            Class::Warrior,
+            Class::Mage,
+            Class::Assassin,
+            Class::Priest,
+            Class::Hunter,
+        ],
+        46,
+        Point {
+            x: at.x,
+            y: at.y + 2.,
+        },
+    );
+    r.w.slimes[0].hp = r.w.slimes[0].max_hp * share;
+    let ids: Vec<_> = r.w.players.keys().copied().collect();
+    if human {
+        let p = r.w.players.get_mut(&1).unwrap();
+        p.god = true;
+        p.target = Some(0);
+    }
+    let mut dead = BTreeSet::new();
+    for n in 0..(seconds / TICK).round() as usize {
+        while r.rx[0].try_recv().is_ok() {}
+        if !human {
+            r.w.auto_play(1, &ids, Some(0));
+        }
+        r.w.slimes[0].damage = 0.;
+        r.w.slimes[0].fight = 0.;
+        if walk && n % 50 == 0 {
+            // A person who keeps moving: a new spot beside the boss every 2.5 s.
+            let angle = (n / 50) as f64 * 2.4;
+            let to = Point {
+                x: at.x + 2.6 * angle.cos(),
+                y: at.y + 2.6 * angle.sin(),
+            };
+            r.w.players.get_mut(&1).unwrap().target = None;
+            r.w.players.get_mut(&1).unwrap().goal = Some(to);
+        }
+        r.w.step();
+        for (id, p) in &r.w.players {
+            if p.character.hp <= 0. && dead.insert(*id) {
+                let lava = r.w.boss.fights[&0].eld.as_ref().is_some_and(|e| {
+                    e.cracks.iter().any(|(k, v)| {
+                        v.age >= 8. && touches(cell_rect(*k, 2.), p.character.point(), BODY)
+                    })
+                });
+                eprintln!(
+                    "t={:.1} floor_lava={lava} fighter {id} died at {:?}, boss at {:?}, cracks={}",
+                    n as f64 * TICK,
+                    p.character.point(),
+                    r.w.slimes[0].point(),
+                    r.w.boss.fights[&0]
+                        .eld
+                        .as_ref()
+                        .map_or(0, |e| e.cracks.len())
+                );
+            }
+        }
+    }
+    dead.len()
+}
+#[test]
+fn eldmarr_hired_crew_survives_a_long_cracking_floor() {
+    assert_eq!(crew_floor_deaths(false, false, 300., 1.), 0);
+}
+#[test]
+fn eldmarr_mercenaries_survive_a_long_cracking_floor_beside_a_standing_human() {
+    assert_eq!(crew_floor_deaths(true, false, 300., 1.), 0);
+}
+#[test]
+fn eldmarr_mercenaries_survive_the_floor_beside_a_walking_human() {
+    assert_eq!(crew_floor_deaths(true, true, 200., 1.), 0);
+}

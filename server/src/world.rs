@@ -438,6 +438,26 @@ impl Player {
             .map(|b| b.amount)
             .sum()
     }
+    /// Puts a skill buff on this player. A buff of one kind never stacks with another of the same kind, whoever cast
+    /// it: the stronger one stays, and an equal or stronger newcomer replaces (refreshes) it.
+    fn apply_buff(&mut self, id: &str, kind: BuffKind, amount: f64, time: f64) {
+        if self
+            .buffs
+            .iter()
+            .any(|b| b.kind == kind && b.amount > amount)
+        {
+            return;
+        }
+        self.buffs
+            .retain(|b| b.id != id && !(b.kind == kind && b.amount > 0.));
+        self.buffs.push(Buff {
+            id: id.to_string(),
+            kind,
+            amount,
+            left: time,
+            time,
+        });
+    }
     /// What is left of the healing this player receives: 1, or less while a wound from a PvP skill lasts, and scaled
     /// by `PVP_DAMAGE_SCALE` in a PvP fight.
     fn heal_factor(&self) -> f64 {
@@ -3928,14 +3948,7 @@ impl World {
                 self.assist_combat(session, &sessions);
                 for target in sessions {
                     let p = self.players.get_mut(&target).unwrap();
-                    p.buffs.retain(|b| b.id != id);
-                    p.buffs.push(Buff {
-                        id: id.to_string(),
-                        kind: *kind,
-                        amount: *amount,
-                        left: *time,
-                        time: *time,
-                    });
+                    p.apply_buff(id, *kind, *amount, *time);
                     if target != session {
                         let at = p.character.point();
                         points.push([at.x, at.y]);
