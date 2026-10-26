@@ -1,0 +1,21 @@
+.dps-meter { position: absolute; right: 22cqw; bottom: 11cqw; width: 300px; z-index: 22; pointer-events: auto; color: #f5eed7; background: #101a2cf2; border: 2px solid #b89747; border-radius: 9px; padding: 8px; font: 14px 'Jua', sans-serif; box-shadow: 0 3px 12px #0008; }
+.dps-meter[hidden] { display: none; }
+.dps-meter header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.dps-meter header b { color: #ffe2a0; font-size: 16px; }
+.dps-meter button { border: 1px solid #8f7745; border-radius: 5px; color: #f5eed7; background: #25334c; cursor: pointer; width: 28px; height: 26px; font: 20px sans-serif; }
+.dps-meter button:focus-visible { outline: 3px solid #ffdc87; }
+#dps-status { color: #c1ccda; font-size: 12px; margin: 3px 0 6px; }
+.dps-scroll { max-height: 300px; overflow: auto; overscroll-behavior: contain; }
+.dps-meter table { border-collapse: collapse; table-layout: fixed; width: 100%; font-variant-numeric: tabular-nums; }
+.dps-meter th { color: #ffe2a0; background: #101a2c; position: sticky; top: 0; z-index: 1; font-weight: normal; font-size: 12px; }
+.dps-meter th:first-child { width: 46%; text-align: left; }
+.dps-meter th:not(:first-child), .dps-meter td:not(:first-child) { text-align: right; }
+.dps-meter td { padding: 4px 2px; border-bottom: 1px solid #ffffff12; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dps-meter td:first-child { position: relative; }
+.dps-meter td i { position: absolute; inset: 2px auto 2px 0; background: #466e874d; pointer-events: none; }
+.dps-meter td span { position: relative; }
+@media (pointer: coarse) {
+  .dps-meter { top: 100px; right: 22cqw; bottom: auto; transform-origin: 100% 0 !important; }
+  .dps-scroll { max-height: 150px; }
+  .dps-meter button { min-width: calc(44px / var(--ui, .6)); min-height: calc(44px / var(--ui, .6)); }
+}

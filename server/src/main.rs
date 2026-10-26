@@ -331,6 +331,12 @@ async fn connection(mut socket: WebSocket, mut app: App) {
     };
     // Which zone's view this connection forwards: wherever its own character is listed.
     let id = welcome["id"].as_str().unwrap_or_default().to_owned();
+    let actor = welcome["snapshot"]["players"]
+        .as_array()
+        .and_then(|players| players.iter().find(|p| p["id"] == id))
+        .and_then(|p| p["look"]["name"].as_str())
+        .unwrap_or("Unknown")
+        .to_owned();
     let mut zone = welcome["snapshot"]["players"]
         .as_array()
         .and_then(|players| players.iter().find(|p| p["id"] == id.as_str()))
@@ -340,6 +346,7 @@ async fn connection(mut socket: WebSocket, mut app: App) {
         let mut last_seen = Instant::now();
         let mut window = Instant::now();
         let mut messages = 0;
+        let mut invalid_reported = false;
         let mut heartbeat = tokio::time::interval(Duration::from_secs(15));
         loop {
             tokio::select! {
@@ -359,12 +366,13 @@ async fn connection(mut socket: WebSocket, mut app: App) {
                 message=socket.recv()=>{
                     let Some(Ok(message))=message else {break;};last_seen=Instant::now();
                     if window.elapsed()>=Duration::from_secs(1){messages=0;window=Instant::now();}
-                    messages+=1;if messages>80{send(&mut socket,&json!({"type":"error","fatal":true,"text":"Too many messages."})).await;break;}
+                    messages+=1;if messages>80{app.store.log_activity(&id,&actor,"security","Disconnected for exceeding the message rate limit.",true);send(&mut socket,&json!({"type":"error","fatal":true,"text":"Too many messages."})).await;break;}
                     match message {
                         Message::Text(text)=>match serde_json::from_str::<ClientMessage>(&text){
-                            Ok(ClientMessage::Join{..})=>break,
+                            Ok(ClientMessage::Join{..})=>{app.store.log_activity(&id,&actor,"security","Repeated join command after signing in.",true);break;},
                             Ok(message)=>{if app.commands.try_send(Command::Message{session,message}).is_err(){break;}}
-                            Err(_)=>{if !send(&mut socket,&json!({"type":"error","text":"Invalid command."})).await{break;}}
+                            Err(_)=>{if !invalid_reported {app.store.log_activity(&id,&actor,"security","Malformed or unsupported command rejected.",true);invalid_reported=true;}
+                                if !send(&mut socket,&json!({"type":"error","text":"Invalid command."})).await{break;}}
                         },
                         Message::Close(_)=>break,
                         Message::Binary(_)=>break,

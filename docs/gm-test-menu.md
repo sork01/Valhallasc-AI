@@ -19,3 +19,7 @@ Rules worth knowing:
 - **Enrage clock** runs only while a boss fights someone within 14 tiles: skip moves bosses that are fighting; an idle boss resets to 0 on the next tick.
 - **Gauntlet test runs** have an empty quest id, so no quest is read or written and nothing is claimed; the run starts at fight N with the fixed class order (Warrior, Mage, Assassin, Priest, Hunter), returns the GM to where they started, and is refused inside a dungeon, an arena, a duel or another run.
 - An older server answers `unknown variant`; the window then says the server needs the new release.
+
+The separate **Activity** button opens the GM-only history of all real players.
+Its read operation `gm_activity` requires a verified GM even in test worlds.
+See [combat-activity.md](combat-activity.md) for events, filters and retention.

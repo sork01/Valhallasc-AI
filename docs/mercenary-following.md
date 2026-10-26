@@ -56,3 +56,7 @@ the privately tested candidate; no test flags or warning/error journal entries.
 SQLite `quick_check` passes, counts unchanged at 25 characters / 14 guests.
 Release SHA-256:
 `669d959add44fab536f15ac74bda17c39e0780d8ce4b327671bc053a7aadfcb1`.
+
+During dungeon pack pulls, surviving hires hold the fight when the owner dies.
+The pack lifecycle overrides catch-up until victory or a full wipe; see
+[combat-activity.md](combat-activity.md).

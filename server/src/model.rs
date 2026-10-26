@@ -1480,6 +1480,17 @@ pub enum DebugCommand {
     SummonKing,
     /// The game master's test menu (`world/gm_test.rs`): the dungeons, the gauntlet quest levels and the current tuning.
     GmTestInfo,
+    /// GM-only activity history. Never included in normal snapshots.
+    GmActivity {
+        #[serde(default)]
+        before: Option<i64>,
+        #[serde(default)]
+        query: String,
+        #[serde(default)]
+        category: String,
+        #[serde(default)]
+        warnings: bool,
+    },
     /// Enters a copy of a dungeon at its door, its final boss or a pack, optionally at the dungeon's level, in a full
     /// gear set (`green`, `blue`, `purple`) and with four hired fighters.
     GmDungeonEnter {

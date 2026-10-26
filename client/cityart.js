@@ -79,7 +79,8 @@
   // ---- the Grand Fountain ----------------------------------------------------------------------------------------------
   const FOUNTAIN = { R: 6.3, tiers: [{ r: 3.1, z: 30, w: 2.6 }, { r: 1.7, z: 92, w: 1.45 }], top: 168 };
   City.art.grandfountain = {
-    box: [820, 700, 410, 540],
+    // Include the complete basin and its ground shadow below the world origin.
+    box: [920, 780, 460, 540],
     draw(g, o) {
       const R = o.r || FOUNTAIN.R;
       ring(g, R + .75, 0, 'rgba(30,50,30,.20)');

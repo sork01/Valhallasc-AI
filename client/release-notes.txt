@@ -1,5 +1,22 @@
 [
   {
+    "version": "Beta 1.20.0",
+    "date": "2026-10-26",
+    "new": [
+      "A movable DPS meter shows individual damage and DPS for players and mercenaries in your current area. It keeps the last fight until the next pull and can be hidden or shown from the World Menu.",
+      "The GM can view a searchable activity log for all players, including logins, level changes, travel, deaths, trades and rejected commands. The latest 5000 events are saved."
+    ],
+    "changed": [
+      "Dying during a dungeon mob-pack fight returns only the player to the entrance. Surviving mercenaries stay and fight; fallen hires wait until the pull ends.",
+      "After a complete mob-pack wipe, living enemies drop aggro and return to their original spawns. Already killed enemies stay dead, and surviving hires regroup after a victory.",
+      "Emberfall Crags lava now uses the same crust, glowing fissures and gentle motion as Emberwake Caldera.",
+      "The Skaldholm fountain shows its complete lower basin and shadow.",
+      "Floating damage numbers stay with nearby fights instead of appearing at the top of the screen for combat far away.",
+      "Mirage Jackals no longer show a checkered afterimage behind their tails during movement and attacks."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.19.3",
     "date": "2026-10-26",
     "new": [],

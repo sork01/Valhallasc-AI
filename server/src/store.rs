@@ -40,6 +40,10 @@ impl Store {
             CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, account_id TEXT NOT NULL, expires INTEGER NOT NULL);
             CREATE TABLE IF NOT EXISTS world_meta (key TEXT PRIMARY KEY, value INTEGER NOT NULL);",
         )?;
+        db.execute_batch("CREATE TABLE IF NOT EXISTS activity_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL, character TEXT NOT NULL,
+            actor TEXT NOT NULL, category TEXT NOT NULL, details TEXT NOT NULL, warning INTEGER NOT NULL);
+            CREATE INDEX IF NOT EXISTS activity_category ON activity_log(category,id);")?;
         Ok(Self {
             db: Arc::new(Mutex::new(db)),
         })

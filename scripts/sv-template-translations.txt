@@ -424,5 +424,12 @@
   "Tracked quest · {0} · {1}": "Spårat uppdrag · {0:t} · {1:t}",
   "Touch skill {0}": "Pekfärdighet {0}",
   "Repair All Items · {0} gold": "Reparera alla föremål · {0} guld",
-  "Sell for {0} gold": "Sälj för {0} guld"
+  "Sell for {0} gold": "Sälj för {0} guld",
+  "Showing {0} events": "Visar {0} händelser",
+  "Level changed from {0} to {1}.": "Nivån ändrades från {0} till {1}.",
+  "Logged in at {0} (level {1}).": "Loggade in i {0} (nivå {1}).",
+  "Trade refused: {0}": "Byte avvisat: {0}",
+  "Traded with {0}. Gave {1}. Received {2}.": "Bytte med {0}. Gav {1}. Fick {2}.",
+  "Travelled from {0} to {1}.": "Reste från {0} till {1}.",
+  "Unauthorized GM command attempt: {0}.": "Obehörigt försök till GM-kommando: {0}."
 }

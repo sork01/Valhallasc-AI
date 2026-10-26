@@ -10,11 +10,30 @@ const MAX_DEBUG_LEVEL: u32 = 100;
 
 impl World {
     pub(super) fn debug(&mut self, session: u64, reference: Option<u64>, command: DebugCommand) {
+        // Keep only the operation name, never arbitrary user arguments or credentials.
+        let operation = format!("{command:?}")
+            .split([' ', '{'])
+            .next()
+            .unwrap_or("Unknown")
+            .to_owned();
+        let read_only = matches!(
+            command,
+            DebugCommand::GmActivity { .. } | DebugCommand::GmTestInfo
+        );
         let gm = self.players.get(&session).filter(|p| p.character.gm);
         if let Some(p) = gm {
             tracing::info!(gm = %p.character.look.name, ?command, "game master command");
         }
-        let outcome = if self.test_commands || gm.is_some() {
+        let authorized = self.test_commands || gm.is_some();
+        if gm.is_some() && !read_only {
+            self.audit_player(session, "gm", &format!("GM command: {operation}."), false);
+        } else if !authorized {
+            self.audit_warning(
+                session,
+                &format!("Unauthorized GM command attempt: {operation}."),
+            );
+        }
+        let outcome = if authorized {
             self.run_debug(session, command)
         } else {
             Err("Test commands are disabled on this server.".to_owned())
@@ -53,6 +72,12 @@ impl World {
                     .set(zone, &kind, intensity.as_deref(), daynight::unix_ms());
             }
             DebugCommand::GmTestInfo => return self.gm_test_info(session),
+            DebugCommand::GmActivity {
+                before,
+                query,
+                category,
+                warnings,
+            } => return self.gm_activity(session, before, &query, &category, warnings),
             DebugCommand::GmDungeonEnter {
                 zone,
                 at,
@@ -437,6 +462,7 @@ impl World {
             DebugCommand::SetWeather { .. } => unreachable!("handled before borrowing the player"),
             DebugCommand::SpawnChest { .. } => unreachable!("handled before borrowing the player"),
             DebugCommand::GmTestInfo
+            | DebugCommand::GmActivity { .. }
             | DebugCommand::GmDungeonEnter { .. }
             | DebugCommand::GmDungeonReset
             | DebugCommand::GmEnrage { .. }

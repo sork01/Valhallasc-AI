@@ -71,6 +71,7 @@
           }
           characterGm = character?.gm === true; window.GM?.onSelf(character);
           callbacks.onWelcome?.(packet);
+          window.DpsMeter?.update(packet.snapshot.damageMeter);
           window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.PortraitMenu?.supported(!!character?.inspectSupported); window.Trade?.onSnapshot(character); send({ type: 'social', command: { op: 'refresh' } }); if (character?.pvpSupported) send({ type: 'pvp', command: { op: 'refresh' } });
           $('connection-overlay').hidden = true; $('chat-input').disabled = false;
           heartbeat = setInterval(() => send({ type: 'ping', nonce: Date.now() }), 5000);
@@ -89,7 +90,7 @@
           if (character) window.Trade?.onSnapshot(character);
           if (character) window.Shop?.onSnapshot(character);
           if (character && slot && JSON.stringify(slot.look) !== JSON.stringify(character.look)) { slot.look = character.look; persist(); }
-          callbacks.onSnapshot?.(packet); break;
+          callbacks.onSnapshot?.(packet); window.DpsMeter?.update(packet.damageMeter); break;
         }
         case 'event': window.SystemLog?.event(packet, id); callbacks.onEvent?.(packet); break;
         case 'dialogue': window.City?.dialogue(packet); break;
@@ -134,6 +135,7 @@
       $('chat').hidden = false; connect();
     },
     stop() {
+      window.DpsMeter?.reset();
       active = false; generation++; connected = false; id = null; window.Social?.reset(); window.Trade?.reset(); window.Inspect?.reset(); window.Bank?.reset(); window.BossSign?.reset(); window.Pvp?.reset(); window.Rolls?.reset();
       clearTimeout(retryTimer); clearInterval(heartbeat);
       socket?.close(); socket = null;

@@ -32,7 +32,7 @@ KEYS = {'name', 'title', 'description', 'label', 'dialogue', 'role', 'what', 'to
 # whatsnew.js and release-notes.txt are deliberately English-only (owner, 2026-10-24).
 CLIENT_FILES = ('game', 'account', 'city', 'quests', 'inventory', 'skillbar', 'quickuse', 'settings', 'online', 'social',
                 'syslog', 'attributes', 'weather', 'daynight', 'bank', 'rebirth', 'bossmech', 'bosssign', 'mounts', 'trade', 'pvp',
-                'rolls', 'shop', 'gearservices', 'worldmap', 'field', 'spark', 'keymap', 'raidkey', 'touch')
+                'rolls', 'shop', 'gearservices', 'worldmap', 'field', 'spark', 'keymap', 'raidkey', 'touch', 'dpsmeter', 'activity')
 INTERNAL = ('INSERT ', 'ALTER ', 'PRAGMA ', 'SELECT ', 'CREATE ', 'UPDATE ', 'DELETE ', 'Bearer ', 'HTTP ', 'SIGTERM ', 'VALHALLA_')
 # A template may leave out a placeholder only where Swedish needs no plural ending the English one builds.
 MAY_DROP = {'A treasure chest has appeared! It will vanish in {0} minute{1}.': {'{1}'}}

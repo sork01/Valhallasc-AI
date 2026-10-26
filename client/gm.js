@@ -141,6 +141,9 @@
       const badge = document.getElementById('gm-visibility');
       const open = document.getElementById('gmtest-open');
       if (open) open.hidden = !self;
+      const activity = document.getElementById('activity-open');
+      if (activity) activity.hidden = !self;
+      if (!self) window.GMActivity?.reset();
       if (badge) { badge.hidden = !self; badge.textContent = self?.hidden ? 'Hidden' : 'Visible'; badge.dataset.hidden = String(!!self?.hidden); }
     },
     // True when the text was a game master command (so it is not sent as chat). Anyone else's slash text goes on to the

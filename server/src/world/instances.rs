@@ -168,6 +168,8 @@ impl World {
     /// Every enemy back at its post at full health, shots and loot gone, the exit closed.
     pub(super) fn reset_instance(&mut self, index: usize) {
         let zone = self.instances[index].zone;
+        self.pack_fights.remove(&zone);
+        self.damage_meter.reset(zone);
         self.respawn_instance_zone(zone);
         self.instances[index].active = false;
         self.instances[index].cleared = false;

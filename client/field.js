@@ -692,7 +692,7 @@
       if (sky || moonwell) { if (isVoid(x + 1, y)) face(1); if (isVoid(x, y + 1)) face(-1); }
       else { if (!vault && x === MAP - 1) face(1); if (!vault && y === MAP - 1) face(-1); }
     }
-    if(zdef.theme==='emberwake') EmberwakeArt.molten(g,G,CH,TW,TH,zdef);
+    if(zdef.theme==='emberwake'||zdef.theme==='ember') EmberwakeArt.molten(g,G,CH,TW,TH,zdef);
     return { c, G };
   }
   function getChunk(cx, cy) {
@@ -1078,8 +1078,14 @@
     if (best) return Math.round((enemySource(best) ? (best.d.top ?? (best.kind === 'big' ? 36 : best.kind === 'beetle' ? 40 : 28)) * SLIME_K * best.d.scale : 62 * best.d.scale) + 8);
     return Math.hypot(hero.x - x, hero.y - y) < 1.2 || [...remotePlayers.values()].some(r => Math.hypot(r.x - x, r.y - y) < 1.2) ? 118 : 60;
   }
+  // Match the actor draw bounds before clamping a tall actor's number to the top edge.
+  function numberAnchorVisible(x, y) {
+    const [sx, sy] = w2s(x, y);
+    return sx > -100 && sx < VW + 100 && sy > -160 && sy < VH + 160;
+  }
   // kind: hit, crit, hurt, heal, miss, pickup, banner (names and notices), level; `head` overrides the start height (px).
   function floater(x, y, text, color, big, kind = big ? 'level' : 'banner', head) {
+    if (!numberAnchorVisible(x, y)) return;
     DamageNumbers.spawn(floaters, { x, y, text, color, kind, head: head ?? (['hit', 'crit', 'hurt', 'heal', 'miss'].includes(kind) ? headAt(x, y, kind === 'hit' || kind === 'crit' ? currentHitKind : null) : 60) });
   }
   let currentHitKind = null;
@@ -3598,24 +3604,6 @@
     for (let cy = clamp(Math.floor(y0 / CH), 0, n - 1); cy <= clamp(Math.floor(y1 / CH), 0, n - 1); cy++) for (let cx = clamp(Math.floor(x0 / CH), 0, n - 1); cx <= clamp(Math.floor(x1 / CH), 0, n - 1); cx++) out.push([cx, cy]);
     return out.sort((a, b) => (a[0] + a[1]) - (b[0] + b[1]));
   }
-  // Lava rivers are ground decals: a crust, a moving glow, then a hot core. They are also obstacles (kind 'lava').
-  function drawLava(g, t) {
-    const rows = [];
-    for (const o of objects) if (o.kind === 'lava') { const [sx, sy] = w2s(o.x, o.y); if (sx > -140 && sx < VW + 140 && sy > -90 && sy < VH + 90) rows.push([o, sx, sy]); }
-    const ex = o => o.r * TW * .7071, ey = o => o.r * TH * .7071;
-    // Whole-river passes, widest first, so overlapping discs merge into one channel instead of separate beads.
-    const pass = (grow, fill) => { for (const [o, sx, sy] of rows) { g.fillStyle = typeof fill === 'function' ? fill(o) : fill; g.beginPath(); g.ellipse(sx, sy + (grow < 0 ? 1 : 0), ex(o) * grow, ey(o) * grow, 0, 0, 6.283); g.fill(); } };
-    const glow = o => .5 + .5 * Math.sin(t * 1.4 + o.x * .55 + o.y * .4);
-    pass(1.3, '#2a1214');
-    pass(1.08, '#7d1f12');
-    pass(.9, o => `hsl(${10 + glow(o) * 10}, 100%, ${40 + glow(o) * 8}%)`);
-    pass(.68, o => `hsl(${22 + glow(o) * 12}, 100%, ${50 + glow(o) * 8}%)`);
-    pass(.42, o => `hsl(${38 + glow(o) * 10}, 100%, ${60 + glow(o) * 10}%)`);
-    for (const [o, sx, sy] of rows) {                            // bubbles rising off the surface
-      const b = (t * .5 + o.x * .37 + o.y * .21) % 1;
-      if (b < .5) { g.fillStyle = `rgba(255,236,160,${.8 - b * 1.4})`; g.beginPath(); g.arc(sx + Math.sin(o.x * 5) * ex(o) * .4, sy - b * 28, 2.2 + b * 3, 0, 6.283); g.fill(); }
-    }
-  }
   // A boss sign (BOSSMECH-SIGN-ENGINE): a wooden board on a post with a gold "!" that glints, so it is noticed. The
   // words are not here; the server sends them when the sign is read. Pixel art through PixelFlow is still to come.
   function drawSign(g, sign, sx, sy, near) {
@@ -3755,11 +3743,10 @@
       g.drawImage(getChunk(chx, chy).c, dx, dy, G.w, G.h);
     }
     g.imageSmoothingEnabled = true;
-    if (zdef.theme === 'emberwake' || zdef.theme === 'chained_forge') {
+    if (zdef.theme === 'emberwake' || zdef.theme === 'chained_forge' || zdef.theme === 'ember') {
       EmberwakeArt.moltenMotion(g,VW,VH,t,zdef,cx-sxo,cy-syo,TW,TH,reducedMotion());
     }
     City.drawPlaza(g, w2s);
-    if (zdef.theme === 'ember') drawLava(g, t);
     if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward') drawWater(g, t);
     if (zdef.theme === 'wyrd') drawBridges(g, t);
     if (zdef.theme === 'sky') drawWardRings(g, t);
@@ -4001,6 +3988,7 @@
     { const reduced = reducedMotion();                                   // numbers: pop, eased climb with a sideways arc, hold, late fade (DamageNumbers.pose)
       g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
       for (const f of floaters) {
+        if (!numberAnchorVisible(f.x, f.y)) continue;
         const p = DamageNumbers.pose(f, reduced); if (!p.visible) continue;
         const [sx, sy] = w2s(f.x, f.y, f.head + p.dz), size = Math.round(DamageNumbers.KINDS[f.kind].size * p.scale);
         g.globalAlpha = p.alpha; g.font = `${size}px "Lilita One", "Jua", Impact, sans-serif`; g.lineWidth = Math.max(3, size / 5); g.strokeStyle = 'rgba(20,10,30,.9)';

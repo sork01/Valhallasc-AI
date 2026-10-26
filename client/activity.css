@@ -1,0 +1,18 @@
+.activity-window { width: 980px; max-width: 92cqw; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.activity-window .rpg-titlebar { display: flex; align-items: center; justify-content: space-between; }
+.activity-window h3 { margin: 0; }
+.activity-filter { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.activity-filter input[type=search] { flex: 1 1 200px; min-width: 100px; }
+.activity-filter select, .activity-filter input[type=search] { padding: 8px; border: 1px solid #aa8e53; border-radius: 5px; background: #17233b; color: #f5eed7; font: inherit; }
+.activity-filter label { display: inline-flex; gap: 5px; align-items: center; }
+#activity-scroll { max-height: 48cqh; overflow: auto; overscroll-behavior: contain; }
+.activity-window table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.activity-window th { position: sticky; top: 0; z-index: 1; color: #ffe2a0; background: #17233b; text-align: left; }
+.activity-window th, .activity-window td { padding: 8px; border-bottom: 1px solid #ffffff24; vertical-align: top; }
+.activity-window td:first-child { white-space: nowrap; color: #c1ccda; }
+.activity-window td:nth-child(2) { min-width: 110px; font-weight: bold; }
+.activity-window td:last-child { overflow-wrap: anywhere; }
+.activity-window tr[data-warning=true] td { background: #60312255; color: #ffd6ac; }
+.activity-footer { display: flex; gap: 10px; justify-content: space-between; align-items: center; }
+#activity-status { margin: 0; color: #d1d9e3; }
+@media (pointer: coarse) { #activity-scroll { max-height: 44dvh; } .activity-window table { min-width: 640px; } }

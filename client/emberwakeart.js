@@ -17,6 +17,7 @@
   }};
   // Lava is painted once as continuous terrain, never as repeated object stamps.
   City.art.ew_lava={box:[1,1,0,0],draw(){}};
+  const lavaPieces=z=>z.objects.filter(o=>o.kind==='ew_lava'||(z.theme==='ember'&&o.kind==='lava'));
   const moltenCache=new WeakMap();
   const hash=(x,y)=>{let n=Math.imul(x|0,374761393)^Math.imul(y|0,668265263);n=Math.imul(n^(n>>>13),1274126177);return ((n^(n>>>16))>>>0)/4294967295;};
   const smooth=t=>t*t*(3-2*t),mix=(a,b,t)=>a+(b-a)*t;
@@ -53,7 +54,7 @@
   }
   function moltenTexture(z){
     if(moltenCache.has(z))return moltenCache.get(z);
-    const pieces=z.objects.filter(o=>o.kind==='ew_lava'),resolution=12;
+    const pieces=lavaPieces(z),resolution=12;
     const ymin=Math.floor(Math.min(...pieces.map(o=>o.y-o.r)))-1;
     const ymax=Math.ceil(Math.max(...pieces.map(o=>o.y+o.r)))+1;
     const c=document.createElement('canvas');c.width=z.size*resolution;c.height=(ymax-ymin)*resolution;
@@ -83,7 +84,7 @@
   const motionCache=new WeakMap(),MOTION_CHUNK=4;
   function motionChunk(z,cx,cy){
     let cache=motionCache.get(z);
-    if(!cache){cache={chunks:new Map(),pieces:z.objects.filter(o=>o.kind==='ew_lava')};motionCache.set(z,cache);}
+    if(!cache){cache={chunks:new Map(),pieces:lavaPieces(z)};motionCache.set(z,cache);}
     const key=cx+','+cy;
     if(cache.chunks.has(key))return cache.chunks.get(key);
     const points=[];

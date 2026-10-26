@@ -1187,6 +1187,7 @@
     get music() { return save.musicVol; }, get sfx() { return save.sfxVol; }, get sound() { return save.sound; },
     get touchSkills() { return save.touchSkills && typeof save.touchSkills === 'object' ? save.touchSkills : {}; },
     get lowGraphics() { return save.lowGraphics === true; },
+    get dpsMeter() { return save.dpsMeter !== false; },
     get touchGraphicsSuggested() { return save.touchGraphicsSuggested === true; },
     get night() { return save.night; },
     get weather() { return save.weather; },
@@ -1207,6 +1208,7 @@
       if ('sound' in patch) save.sound = !!patch.sound;
       if ('touchSkills' in patch) save.touchSkills = patch.touchSkills && typeof patch.touchSkills === 'object' ? patch.touchSkills : {};
       if ('lowGraphics' in patch) save.lowGraphics = !!patch.lowGraphics;
+      if ('dpsMeter' in patch) save.dpsMeter = !!patch.dpsMeter;
       if ('touchGraphicsSuggested' in patch) save.touchGraphicsSuggested = !!patch.touchGraphicsSuggested;
       if ('night' in patch) save.night = vol(patch.night);
       if ('weather' in patch) save.weather = vol(patch.weather);

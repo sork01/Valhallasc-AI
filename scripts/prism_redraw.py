@@ -41,16 +41,6 @@ PALETTES = {
 R.PALETTES.update(PALETTES)
 
 
-def ghost_copy(a, mask_fn, dx):
-    """A dithered afterimage: the same silhouette shifted by dx, on every other pixel."""
-    ys, xs = np.nonzero(mask_fn)
-    out = a.f.a
-    for y, x in zip(ys, xs):
-        nx = int(x + dx)
-        if 0 < nx < out.shape[1] - 1 and (nx + y) % 2 == 0 and out[y, nx] == 0:
-            out[y, nx] = a.p['ghost']
-
-
 # ------------------------------------------------------------------------------------------------
 def miragejackal(clip, n):
     T = timing(clip, n)
@@ -61,10 +51,6 @@ def miragejackal(clip, n):
     lean = strike * 4 - wind * 4
     if fall:
         a.ox = fall * 4
-    # shimmer afterimage of the body, behind everything
-    if clip in ('walk', 'attack') and n % 2 == 0:
-        cx, cy = a.g(-6, by)
-        ghost_copy(a, ellipsoid(cx, cy, 20, 12.5)[0], -9 - strike * 6)
     # tail with a prism tip
     tail = (-30 - (strike * -3), by + 10 + math.sin(n * 1.3) * 2 + wind * 6)
     a.c((-20, by + 2), tail, 4.2, 2.6, 'fur')

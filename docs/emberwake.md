@@ -133,3 +133,9 @@ Decoded game music mono RMS: day -23.97 dB, night -23.97 dB, both 128 kbps;
 no clipped samples in either source render. Auditory review remains unverified.
 The owner requested zone pictures, full enemy sheets and both music tracks
 on FileDrop; upload receipts are in test-results/emberwake/filedrop-upload.json.
+
+Emberfall Crags uses the same cached molten surface and subtle motion as the
+caldera. Its existing `lava` circle union remains the visual/collision boundary;
+Emberwake retains `ew_lava`. The shared renderer selects the correct pieces
+without changing either map. `tests/scenery-fixes-ui.cjs` compares identical
+footprints rendered through both themes and checks motion.

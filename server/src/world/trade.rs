@@ -120,6 +120,7 @@ impl World {
             TradeCommand::Cancel => self.trade_cancel(&me),
         };
         if let Err(text) = result {
+            self.audit_warning(session, &format!("Trade refused: {text}"));
             self.tell(&me, text, false);
         }
     }
@@ -225,6 +226,46 @@ impl World {
                 self.store
                     .save_many([&next_a, &next_b].into_iter())
                     .map_err(|e| format!("Trade could not be saved: {e}"))?;
+                let describe = |offer: &Offer| {
+                    format!(
+                        "{} gold; {}",
+                        offer.gold,
+                        offer
+                            .items
+                            .iter()
+                            .map(|stack| format!(
+                                "{} x{}",
+                                item(&stack.item).map_or(stack.item.as_str(), |i| i.name.as_str()),
+                                stack.quantity
+                            ))
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    )
+                };
+                self.store.log_activity(
+                    &a.id,
+                    &a.look.name,
+                    "trade",
+                    &format!(
+                        "Traded with {}. Gave {}. Received {}.",
+                        b.look.name,
+                        describe(&t.offers[0]),
+                        describe(&t.offers[1])
+                    ),
+                    false,
+                );
+                self.store.log_activity(
+                    &b.id,
+                    &b.look.name,
+                    "trade",
+                    &format!(
+                        "Traded with {}. Gave {}. Received {}.",
+                        a.look.name,
+                        describe(&t.offers[1]),
+                        describe(&t.offers[0])
+                    ),
+                    false,
+                );
                 self.players
                     .values_mut()
                     .find(|p| p.character.id == t.from)

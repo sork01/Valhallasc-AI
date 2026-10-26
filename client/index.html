@@ -16,6 +16,8 @@
 <link rel="stylesheet" href="online.css">
 <link rel="stylesheet" href="whatsnew.css">
 <link rel="stylesheet" href="touch.css">
+<link rel="stylesheet" href="dpsmeter.css">
+<link rel="stylesheet" href="activity.css">
 <script src="compat.js"></script>
 </head>
 <body>
@@ -34,7 +36,7 @@
     <svg id="logo" class="logo" viewBox="0 0 1000 440" role="img" aria-label="Valhalla Rumble, 발할라 럼블"></svg>
 
     <p class="cta"><span class="cta-en">[ Touch to Awaken the Horn ]</span><span class="cta-ko" lang="ko">터치하여 시작</span></p>
-    <p class="version">Beta 1.19.3</p>
+    <p class="version">Beta 1.20.0</p>
 
     <button class="start" id="start" type="button" aria-label="Touch to awaken the horn"></button>
   </section>
@@ -146,7 +148,7 @@
     <div class="hud hud-tl">
       <div class="hud-portrait" id="hud-portrait"></div>
       <div class="hud-bars">
-        <p class="hud-name"><b id="hud-name"></b><span id="hud-lv"></span><span id="hud-reborn" class="hud-reborn" hidden></span><span id="gm-visibility" hidden></span><button id="gmtest-open" class="gmtest-open" type="button" hidden>Test</button></p>
+        <p class="hud-name"><b id="hud-name"></b><span id="hud-lv"></span><span id="hud-reborn" class="hud-reborn" hidden></span><span id="gm-visibility" hidden></span><button id="gmtest-open" class="gmtest-open" type="button" hidden>Test</button><button id="activity-open" class="gmtest-open" type="button" hidden>Activity</button></p>
         <div class="bar hp"><i id="hp-fill"></i><span id="hp-text"></span></div>
         <div class="bar resource" id="resource-bar" role="progressbar" aria-label="Class resource" aria-valuemin="0"><i id="resource-fill"></i><span id="resource-text"></span></div>
         <div class="bar xp"><i id="xp-fill"></i></div>
@@ -186,6 +188,11 @@
     <button id="inventory-open" class="bags-open" type="button" aria-label="Open bags (B or I)"><svg viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"><path d="M18 20c0-17 28-17 28 0M12 21h40l3 31H9z"/><path d="M10 32h44M25 26v12h14V26" stroke-width="3"/></svg><kbd>B</kbd></button>
     <button id="social-open" class="social-open" type="button" aria-label="Friends and party (O)"><svg viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"><circle cx="24" cy="21" r="8"/><path d="M9 50c0-12 8-17 15-17s15 5 15 17z"/><circle cx="44" cy="25" r="6" stroke-width="4"/><path d="M42 36c9-1 14 5 14 14H46" stroke-width="4"/></svg><kbd>O</kbd></button>
     <aside id="party-frame" class="party-frame" aria-label="Your party" hidden></aside>
+    <aside id="dps-meter" class="dps-meter" aria-label="DPS meter" hidden>
+      <header><b>DPS meter</b><button id="dps-close" type="button" aria-label="Hide DPS meter">×</button></header>
+      <p id="dps-status">Waiting for combat</p>
+      <div class="dps-scroll"><table><thead><tr><th>Fighter</th><th>DPS</th><th>Damage</th></tr></thead><tbody id="dps-rows"></tbody></table></div>
+    </aside>
     <div id="loot-rolls" class="loot-rolls" role="group" aria-label="Loot rolls" aria-live="polite"></div>
     <div id="announce" class="announce" role="status" aria-live="polite"></div>
     <div id="rare-pickup" class="rare-pickup" role="status" aria-live="polite" hidden><b></b><span></span></div>
@@ -422,11 +429,25 @@
         <button class="btn primary" id="p-resume" type="button" data-i18n="resume">Resume</button>
         <button class="btn ghost" id="p-equipment" type="button" hidden>Equipment &amp; Inventory (E)</button>
         <button class="btn ghost" id="p-settings" type="button">Settings</button>
+        <button class="btn ghost" id="dps-toggle" type="button" aria-pressed="true">DPS meter</button>
         <button class="btn ghost" id="p-characters" type="button">Your Characters</button>
         <div id="character-list" class="character-list" hidden></div>
         <button class="btn ghost" id="p-new" type="button" data-i18n="newChar">New Character</button>
         <button class="btn ghost" id="p-title" type="button" data-i18n="toTitle">Back to Title</button>
       </div>
+    </div>
+    <div class="pause" id="activity-panel" hidden>
+      <section class="panel rpg-window activity-window" role="dialog" aria-modal="true" aria-labelledby="activity-title">
+        <header class="rpg-titlebar"><h3 id="activity-title">Activity log</h3><button id="activity-close" class="window-close" type="button" aria-label="Close activity log">×</button></header>
+        <form id="activity-filter" class="activity-filter">
+          <input id="activity-query" type="search" maxlength="80" placeholder="Search player or event" aria-label="Search player or event">
+          <select id="activity-category" aria-label="Activity type"><option value="">All activity</option><option value="login">Logins</option><option value="logout">Logouts</option><option value="level">Level changes</option><option value="travel">Travel</option><option value="death">Deaths</option><option value="trade">Trades</option><option value="gm">GM commands</option><option value="security">Warnings</option></select>
+          <label><input id="activity-warnings" type="checkbox">Warnings only</label>
+          <button id="activity-refresh" class="btn ghost" type="submit">Refresh</button>
+        </form>
+        <div id="activity-scroll"><table><thead><tr><th>Time</th><th>Player</th><th>Activity</th><th>Details</th></tr></thead><tbody id="activity-rows"></tbody></table></div>
+        <footer class="activity-footer"><p id="activity-status" role="status">Loading…</p><button id="activity-more" class="btn ghost" type="button" hidden>Load older</button></footer>
+      </section>
     </div>
     <div class="pause" id="settings-panel" hidden>
       <section class="panel pause-panel settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
@@ -665,6 +686,7 @@
 <script src="rebirth.js"></script>
 <script src="syslog.js"></script>
 <script src="announce.js"></script>
+<script src="dpsmeter.js"></script>
 <script src="online.js"></script>
 <script src="account.js"></script>
 <script src="social.js"></script>
@@ -675,6 +697,7 @@
 <script src="rolls.js"></script>
 <script src="gm.js"></script>
 <script src="gmtest.js"></script>
+<script src="activity.js"></script>
 <script src="spark.js"></script>
 <script src="shop.js"></script>
 <script src="city.js"></script>

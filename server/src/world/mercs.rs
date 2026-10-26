@@ -490,6 +490,7 @@ impl World {
             .filter(|(_, q)| mate_ids.contains(&q.character.id))
             .map(|(s, _)| *s)
             .collect();
+        let holding_pack = self.holding_pack(session);
         // Carried to the hirer's side when in another zone, or far away while the hirer is out of combat. During a
         // fight a mercenary who fell (and woke at the zone's start) must walk back like anyone else.
         let recover = p.merc_navigation.stalled(self.time)
@@ -501,8 +502,12 @@ impl World {
             && owner_p.character.hp > 0.
             && !self.boss.fight_in(zone);
         if owner_p.character.zone != zone
-            || (me.distance(there) > MERC_LEASH && owner_p.combat_left <= 0.)
-            || recover
+            || (!holding_pack
+                && me.distance(there) > MERC_LEASH
+                && owner_p.combat_left <= 0.
+                && p.combat_left <= 0.
+                && owner_p.character.hp > 0.)
+            || (recover && !holding_pack)
         {
             let to_zone = owner_p.character.zone;
             let arrival = beside(&self.maps[to_zone], there, Point { x: 1.5, y: 1.5 });
@@ -529,6 +534,21 @@ impl World {
                     })
                     .min_by(|a, b| a.point().distance(me).total_cmp(&b.point().distance(me)))
                     .map(|s| s.id)
+            })
+            .or_else(|| {
+                self.pack_fights
+                    .get(&zone)
+                    .filter(|_| holding_pack)
+                    .and_then(|f| {
+                        f.enemies
+                            .iter()
+                            .filter_map(|&id| self.slimes.get(id))
+                            .filter(|s| alive(s))
+                            .min_by(|a, b| {
+                                a.point().distance(me).total_cmp(&b.point().distance(me))
+                            })
+                            .map(|s| s.id)
+                    })
             });
         // A boss fight asks more of a fighter than a swing: step out of a telegraph, ground a charge, hold a brazier,
         // hit a shield's helpers first (`boss_play.rs`, the same brain the dungeon harness's bots use).

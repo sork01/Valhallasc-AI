@@ -11,6 +11,9 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 use tokio::sync::{mpsc, oneshot, watch};
 
+mod activity;
+#[cfg(test)]
+mod activity_tests;
 mod ambient;
 mod bank;
 mod inspect;
@@ -38,6 +41,9 @@ mod chime;
 #[cfg(test)]
 mod consumable_audit;
 mod consumables;
+mod damage_meter;
+#[cfg(test)]
+mod damage_meter_tests;
 mod daynight;
 mod debug;
 #[cfg(test)]
@@ -82,6 +88,9 @@ mod mount_sources_tests;
 mod nacre_tests;
 #[cfg(test)]
 mod nornroot_tests;
+#[cfg(test)]
+mod pack_recovery_tests;
+mod packs;
 mod partyxp;
 #[cfg(test)]
 mod perks_tests;
@@ -223,6 +232,8 @@ struct Player {
     dead_time: f64,
     /// Down in a zone where a final boss fight is running: stays down until it ends (`BOSSMECH-DEATH`).
     fallen: bool,
+    /// A pack death returns to the entrance, even after an earlier boss rally.
+    pack_death: bool,
     dash: f64,
     dash_cd: f64,
     dash_direction: Point,
@@ -354,6 +365,7 @@ impl Player {
             combat_left: 0.,
             dead_time: 0.,
             fallen: false,
+            pack_death: false,
             dash: 0.,
             dash_cd: 0.,
             dash_direction: Point::default(),
@@ -1434,6 +1446,10 @@ pub struct World {
     enemy_bolts: Vec<ranged::EnemyBolt>,
     // The private copies of every dungeon (world/instances.rs).
     instances: Vec<instances::Instance>,
+    pack_fights: BTreeMap<usize, packs::Fight>,
+    damage_meter: damage_meter::Meter,
+    activity_seen: BTreeMap<u64, activity::Seen>,
+    activity_warn_at: BTreeMap<u64, f64>,
     pursuit: pursuit::Pursuit,
     drops: Vec<Drop>,
     // Party loot rolls in progress (world/rolls.rs).
@@ -1553,6 +1569,10 @@ impl World {
             bolts: vec![],
             enemy_bolts: vec![],
             instances,
+            pack_fights: BTreeMap::new(),
+            damage_meter: damage_meter::Meter::default(),
+            activity_seen: BTreeMap::new(),
+            activity_warn_at: BTreeMap::new(),
             pursuit: pursuit::Pursuit::default(),
             drops: vec![],
             rolls: vec![],
@@ -1865,6 +1885,7 @@ impl World {
         "drops":self.drops.iter().filter(|d| d.zone == zone).collect::<Vec<_>>(),
         "chests":self.chests.list.iter().filter(|c| c.zone == zone).collect::<Vec<_>>(),
         "online":self.visible_online()});
+        view["damageMeter"] = self.damage_meter_view(zone);
         let boss_mech = self.boss_mech_view(zone);
         if !boss_mech.is_empty() {
             view["bossMech"] = json!(boss_mech);
@@ -2026,6 +2047,16 @@ impl World {
             );
         let friends = c.friends.clone();
         self.players.insert(session, Player::new(c, peer));
+        self.audit_player(
+            session,
+            "login",
+            &format!(
+                "Logged in at {} (level {}).",
+                place, self.players[&session].character.level
+            ),
+            false,
+        );
+        self.audit_progress();
         if let (Some(queue), Some(notice)) = (&self.login_notifications, notice) {
             let _ = queue.try_send(notice);
         }
@@ -2056,6 +2087,10 @@ impl World {
         }
     }
     fn leave(&mut self, session: u64) {
+        self.audit_progress();
+        self.audit_player(session, "logout", "Logged out.", false);
+        self.activity_seen.remove(&session);
+        self.activity_warn_at.remove(&session);
         if self
             .players
             .get(&session)
@@ -2771,6 +2806,7 @@ impl World {
         self.hide_gms_after_zone_change();
         self.update_king_spawn();
         self.update_instances();
+        self.update_pack_fights();
         self.update_raid_wipes();
         self.update_ambient();
         self.update_mercenaries();
@@ -2808,6 +2844,8 @@ impl World {
         self.update_bolts();
         self.update_enemy_bolts();
         self.update_raid_key();
+        self.update_damage_meter();
+        self.audit_progress();
         self.update_drops();
         self.update_rolls();
         let stale: Vec<_> = self
@@ -2898,8 +2936,9 @@ impl World {
             // party is beaten and the boss walks home. Then the usual three seconds start for everyone together, so
             // the first to wake cannot pull the boss back onto the rest. The cap keeps a fight that never ends from
             // stranding anyone.
+            let pack_held = p.merc.is_some() && self.pack_fights.contains_key(&p.character.zone);
             if p.fallen
-                && (!self.boss.fight_in(p.character.zone)
+                && ((!self.boss.fight_in(p.character.zone) && !pack_held)
                     || p.dead_time
                         >= if self.maps[p.character.zone].raid {
                             RAID_FALLEN_HOLD_MAX
@@ -2917,6 +2956,7 @@ impl World {
                     .iter()
                     .find(|i| i.zone == p.character.zone)
                     .and_then(|i| i.rally)
+                    .filter(|_| !p.pack_death)
                     .unwrap_or(map.spawn);
                 let mut point = p.ambient.as_ref().map_or(rally, ambient::Ambient::hub);
                 map.collide(&mut point, PLAYER_RADIUS);
@@ -2927,6 +2967,7 @@ impl World {
                 p.combat_left = 0.;
                 p.dead_time = 0.;
                 p.fallen = false;
+                p.pack_death = false;
                 p.attack = 0.;
                 p.cooldown = 0.;
                 if let Some(brain) = p.ambient.as_mut() {
@@ -4082,6 +4123,7 @@ impl World {
             return 0.;
         }
         let dealt = damage.min(s.hp);
+        self.damage_meter.record(self.time, s.zone, id, p, dealt);
         #[cfg(test)]
         {
             *self.damage_log.entry(session).or_default() += dealt;
@@ -4412,10 +4454,15 @@ impl World {
         };
         let map = &self.maps[zone];
         let s = &mut self.slimes[id];
+        let downed = self.pack_fights.get(&zone).map(|f| &f.downed);
         if s.target.is_some_and(|session| {
-            self.players
-                .get(&session)
-                .is_some_and(|p| p.character.spark_travel.is_some() || p.is_hidden())
+            self.players.get(&session).is_none_or(|p| {
+                p.character.hp <= 0.
+                    || p.character.zone != zone
+                    || p.character.spark_travel.is_some()
+                    || p.is_hidden()
+                    || downed.is_some_and(|d| d.contains(&session))
+            })
         }) {
             s.target = None;
         }
@@ -4466,12 +4513,13 @@ impl World {
         let nearest = self
             .players
             .iter()
-            .filter(|(_, p)| {
+            .filter(|(session, p)| {
                 p.character.hp > 0.
                     && p.character.zone == zone
                     && p.character.spark_travel.is_none()
                     && !p.is_hidden()
                     && !map.in_city(p.character.point())
+                    && !downed.is_some_and(|d| d.contains(*session))
             })
             .map(|(id, p)| {
                 (

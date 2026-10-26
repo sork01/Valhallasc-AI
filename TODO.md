@@ -8,6 +8,35 @@ All earlier tasks are finished (list cleared 2026-10-21; the full list is in git
 
 ## Open tasks
 
+
+### Zone visibility fixes (owner's request, 2026-10-26)
+
+- [ ] `VEYRROOT-PORTAL-VISIBILITY` — A portal in Veyrroot Canopy is hidden behind scenery. Locate the obstructed portal, adjust its placement or the occluding scenery/draw order so players can clearly see and reach it, and check its portal marker/interaction in the actual zone. Preserve the reciprocal destination and safe arrival rules; update the owning map generator if placement changes.
+
+- [ ] `VEYRROOT-MEETING-STONE-VISIBILITY` — The Meeting Stone in Veyrroot Canopy is not visible. Locate it and fix its scenery registration, placement or occlusion so the stone is clearly drawn and easy to identify/use in the actual zone. Preserve hiring/interactions and safe walk access; update the owning generator if placement changes. Check together with `VEYRROOT-PORTAL-VISIBILITY` where appropriate.
+
+- [ ] `LAPIS-OASIS-COLLISION-VISIBILITY` — In Lapis Erg, the player can run through an oasis and hide behind its artwork. Inspect the oasis's actual footprint, collision and draw order; correct passage through the pool/solid scenery and ensure the player remains readable when legitimately walking behind nearby decoration. Keep collision aligned with the drawn shoreline, preserve clear routes and update the owning generator for map changes. Verify walking around/against the oasis and occlusion in the actual zone.
+
+- [ ] `FROSTWAKE-CRACK-OCCLUSION` — In Frostwake Shelf, players can hide behind the cracks in the glacier. Inspect the crack scenery/terrain bounds and depth ordering, then make actors readable while moving around the glacier cracks without changing valid routes. Check the actual zone view from both sides of the affected cracks.
+
+- [ ] `CAIRNSPINE-HOUSE-BOUNDS` — House sprites in Cairnspine are missing their bottom portions. Check sprite canvas bounds, origins and rendering against the full source artwork, repair the clipping and verify complete foundations/front edges in the actual town view.
+
+- [ ] `YEARWHEEL-HOUSE-BOUNDS` — House sprites in Yearwheel (owner called it “Yearwell”) also lack the bottom portions. Check source artwork, sprite bounds/anchors and drawing, then show complete house bases. Share a renderer fix with `CAIRNSPINE-HOUSE-BOUNDS` if they have the same cause, while checking both zones.
+
+- [ ] `YEARWHEEL-PUDDLE-OCCLUSION` — In Yearwheel, players can hide behind puddles of water. Correct water/scenery layering so puddles render as ground surfaces and actors remain readable above them; check movement across/around the puddles and preserve intended water collision.
+
+### Creature animation fixes (owner's request, 2026-10-26)
+
+- [ ] `SPADECLAW-WALK` — The Spadeclaw Badger's front legs stay still while it walks. Animate both front legs through a readable walking cycle, coordinated with the hind legs/body movement, in the saved PixelFlow frames and their generator/source. Preserve the creature's design, foot anchor and other clips. Check the actual in-game walk animation and export/editor agreement with a focused art check.
+
+### NPC visual redesign (owner's request, 2026-10-26)
+
+- [ ] `NPC-ART-RULES` — Redesign NPC sprites to match the game's cel-shaded Korean MMO aesthetic. Plan **at least 20 visibly different looks and shapes**, varying silhouettes, builds, proportions, faces, hair, outfits and occupational props so NPCs do not all look alike. Inventory existing NPC roles and zone-specific characters, map them to the planned variants, and document the shared art/animation conventions before production. Owner asked to put this on the backlog; do not implement as part of the current combat/logging update.
+- [ ] `NPC-ART-VARIANTS` — After `NPC-ART-RULES`. Create the 20 or more distinct general NPC designs through the PixelFlow API, with animations and consistent anchors/bounds that suit standing and walking roles. Assign the variants across ordinary town/quest/service NPCs rather than applying one recolored body everywhere. Preserve named NPC identities and all gameplay data.
+- [ ] `NPC-ART-SPECIAL` — After `NPC-ART-RULES`. Redo special NPC sprites individually, especially NPCs whose appearance should fit a particular zone. Use the zone's materials, clothing, shapes and themes while keeping the same cel-shaded Korean MMO art direction. Avoid generic town-sprite substitutes for bespoke characters.
+- [ ] `NPC-ART-CHECK` — After `NPC-ART-VARIANTS` and `NPC-ART-SPECIAL`. Review a contact sheet of every design and focused in-game views in representative towns and special zones; verify variety, animation frames, transparency, bounds/feet anchors, NPC portraits and readable occupational identities. Check only the new art and its integration, then update the art manifest, documentation and release notes.
+
+
 ### Merchant and quest windows (owner's request, 2026-10-25)
 
 - [x] `UI-MERCHANT-GREEN-JUNK` — **Beta 1.18.2, 2026-10-25.** Owner: selling junk must not sell green items. Sell all junk now selects only gray gear/materials; the button is disabled when none remain. Green and higher rarities stay in the bags, with individual sales still available.
