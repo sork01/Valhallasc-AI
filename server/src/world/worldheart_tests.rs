@@ -3,6 +3,34 @@ use super::wyrd_tests::{at, blocked, flood, reached, world};
 use super::*;
 
 #[test]
+fn canopy_meeting_stone_has_visible_scenery_and_a_clear_hiring_spot() {
+    let w = world();
+    let map = &w.maps[23];
+    let stone = map.npcs.iter().find(|n| n.id == "heart_stone").unwrap();
+    let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
+    let objects = raw["zones"][22]["objects"].as_array().unwrap();
+    let object = objects
+        .iter()
+        .find(|o| o["kind"] == "meetingstone")
+        .unwrap();
+    let base = at(object["x"].as_f64().unwrap(), object["y"].as_f64().unwrap());
+    assert!(base.distance(stone.position_at(0.)) < 2.8);
+    let mut foot = stone.position_at(0.);
+    map.collide(&mut foot, PLAYER_RADIUS);
+    assert!(foot.distance(stone.position_at(0.)) < 1e-6);
+    assert_eq!(
+        stone
+            .offers
+            .iter()
+            .filter(|o| o.open && o.merc.is_some())
+            .count(),
+        5
+    );
+    let seen = flood(map, &blocked(map, &[]), map.spawn);
+    assert!(reached(map, &seen, foot));
+}
+
+#[test]
 fn worldheart_gates_and_both_city_floors_are_reachable() {
     let w = world();
     let jungle = &w.maps[22];

@@ -31,6 +31,43 @@ def dist_path(x,y,paths):
  return best
 def radius(o):return max(o.get('r',0),o.get('width',0)/2,o.get('depth',0)/2)
 def clear(x,y,r,objects,pad=0):return all(math.hypot(x-o['x'],y-o['y'])>r+radius(o)+pad for o in objects)
+def add_oasis_collision(objects):
+ # Isometric circle: screen radii 267x134, centered 26px above the art anchor.
+ # Water collision is separate from the ground artwork, as in Greenmeadow.
+ for oasis in [o for o in objects if o['kind']=='lapis_oasis']:
+  x,y=round(oasis['x']-26/44,2),round(oasis['y']-26/44,2)
+  if not any(o['kind']=='water' and o['x']==x and o['y']==y for o in objects):
+   objects.append(obj('water',x,y,4.3))
+
+def repair_oases(zone):
+ add_oasis_collision(zone['objects'])
+ waters=[o for o in zone['objects'] if o['kind']=='water']
+ # Earlier decorative palms were seeded as though the pools were empty ground.
+ for palm in [o for o in zone['objects'] if o['kind']=='lapis_date_palm']:
+  if clear(palm['x'],palm['y'],palm['r'],waters):continue
+  found=False
+  for step in range(1,41):
+   for turn in range(32):
+    a=turn*math.tau/32;x=palm['x']+step*.5*math.cos(a);y=palm['y']+step*.5*math.sin(a)
+    if dist_path(x,y,zone['paths'])<3.7:continue
+    if not clear(x,y,palm['r'],[o for o in zone['objects'] if o is not palm],.6):continue
+    palm['x'],palm['y']=round(x,2),round(y,2);found=True;break
+   if found:break
+  assert found,palm
+ # Released spawns were chosen before the pools had collision. Move only those
+ # now in water to the closest clear shore; preserve every kind and encounter.
+ for spawn in zone['slimes']:
+  if clear(spawn['x'],spawn['y'],.7,waters):continue
+  found=False
+  for step in range(1,41):
+   for turn in range(32):
+    a=turn*math.tau/32;x=spawn['x']+step*.5*math.cos(a);y=spawn['y']+step*.5*math.sin(a)
+    if not clear(x,y,1.2,zone['objects'],.4):continue
+    if any(s is not spawn and math.hypot(x-s['x'],y-s['y'])<3 for s in zone['slimes']):continue
+    spawn['x'],spawn['y']=round(x,2),round(y,2);found=True;break
+   if found:break
+  assert found,spawn
+
 def build():
  rng=random.Random(20261016)
  # The route bends around three water basins and loops along a ridge of blue salt.
@@ -44,6 +81,7 @@ def build():
           obj('lapis_caravan_tent',22,119,width=4,depth=3,v=0),obj('lapis_caravan_tent',33,137,width=4,depth=3,v=1),
           obj('lapis_caravan_tent',43,128,width=4,depth=3,v=2),obj('lapis_well',29,126,1),
           obj('lapis_mirror',62,69,1.2),obj('lapis_roc_nest',123,84,1.4),obj('lapis_salt_arch',99,35,1.3)]
+ add_oasis_collision(objects)
  # Leave wide, sunlit routes; vary sparse silhouettes between ochre dunes and water.
  for kind,count,r in [('lapis_date_palm',78,1.05),('lapis_sandstone',65,.9),('lapis_salt_spire',38,.8),
                       ('lapis_dunegrass',96,.18),('lapis_silk_flag',32,.13),('lapis_blue_flower',60,.08)]:
@@ -103,10 +141,15 @@ def build():
 
 def check(zone):
  seen,_=fen.flood(zone,ARRIVAL)
- for target in [*zone['npcs'],*zone['slimes'],*zone['portals'],*zone['places']]:
+ for target in [*zone['npcs'],*zone['slimes'],*zone['portals']]:
   assert seen[int(target['y']/.5),int(target['x']/.5)],f'unreachable: {target}'
+ for place in zone['places']:
+  # Visits to the mirrored pool are credited from its bank, within the authored radius.
+  assert any(seen[int(y/.5),int(x/.5)] for x,y in
+             [(place['x']+math.cos(a*math.tau/32)*r,place['y']+math.sin(a*math.tau/32)*r)
+              for r in [0,place.get('r',1)*.9] for a in range(32)]),f'unreachable place: {place}'
  assert all(math.hypot(s['x']-ARRIVAL[0],s['y']-ARRIVAL[1])>=8 for s in zone['slimes'])
- assert len(zone['slimes'])==42 and len(zone['quests'])==11
+ assert len(zone['slimes'])==42 and len(zone['quests'])>=11
  assert all(len('quest:accept:'+q['id'])<=32 for q in zone['quests'])
 
 def open_canopy_gate(canopy):

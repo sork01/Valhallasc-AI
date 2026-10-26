@@ -1804,7 +1804,7 @@ impl World {
         enemy.x = point.x;
         enemy.y = point.y;
         self.slimes[id] = enemy;
-        self.emit(json!({"type":"announce","kind":"boss","text":"A King Slime has emerged in Greenmeadow!"}));
+        self.emit_zone(0, json!({"type":"announce","kind":"boss","text":"A King Slime has emerged in Greenmeadow!"}));
     }
     fn emit(&self, value: Value) {
         let hidden_actor = value["actor"]
@@ -10521,6 +10521,33 @@ mod tests {
         }
         assert_eq!(locations.len(), 2);
         assert!(delays.len() > 1);
+    }
+
+    #[test]
+    fn king_spawn_announcement_stays_in_greenmeadow() {
+        let mut w = world();
+        let mut meadow = join(&mut w, 1, Class::Warrior);
+        let mut crags = join(&mut w, 2, Class::Mage);
+        w.players.get_mut(&2).unwrap().character.zone = 1;
+        while meadow.try_recv().is_ok() {}
+        while crags.try_recv().is_ok() {}
+        w.time = w.next_king_spawn;
+        w.update_king_spawn();
+        let announcement = meadow.try_recv().unwrap();
+        assert_eq!(announcement["type"], "announce");
+        assert_eq!(
+            announcement["text"],
+            "A King Slime has emerged in Greenmeadow!"
+        );
+        assert!(meadow.try_recv().is_err());
+        assert!(crags.try_recv().is_err());
+        assert_eq!(
+            w.slimes
+                .iter()
+                .filter(|s| s.kind == "big" && !s.dead)
+                .count(),
+            1
+        );
     }
 
     #[test]

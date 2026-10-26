@@ -59,7 +59,7 @@ fn lapis_gates_oases_hub_and_astrolabe_are_reachable() {
     for s in w.slimes.iter().filter(|s| s.zone == ERG) {
         assert!(reached(m, &seen, s.point()), "{}", s.kind);
     }
-    for p in [at(132., 29.), at(67., 72.), at(112., 92.)] {
+    for p in [at(132., 29.), at(61., 72.), at(109., 94.)] {
         assert!(reached(m, &seen, p));
     }
     let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
@@ -96,6 +96,42 @@ fn lapis_gates_oases_hub_and_astrolabe_are_reachable() {
             .travel_links
             .contains(&"travel_azure_wells".to_string())
     );
+}
+
+#[test]
+fn oasis_shores_block_walking_through_water_and_keep_routes_open() {
+    let w = world();
+    let map = &w.maps[ERG];
+    let raw: Value = serde_json::from_str(include_str!("../../../world/map.txt")).unwrap();
+    let objects = raw["zones"][ERG - 1]["objects"].as_array().unwrap();
+    let waters: Vec<_> = objects.iter().filter(|o| o["kind"] == "water").collect();
+    assert_eq!(waters.len(), 3);
+    for water in waters {
+        let center = at(water["x"].as_f64().unwrap(), water["y"].as_f64().unwrap());
+        let r = water["r"].as_f64().unwrap();
+        let mut inside = center;
+        map.collide(&mut inside, PLAYER_RADIUS);
+        assert!(inside.distance(center) >= r + PLAYER_RADIUS - 1e-6);
+        for side in [-1., 1.] {
+            let mut foot = at(center.x + side * (r + PLAYER_RADIUS + 0.1), center.y);
+            for _ in 0..60 {
+                map.walk(&mut foot, at(-side, 0.), 0.1, PLAYER_RADIUS);
+                assert!(foot.distance(center) >= r + PLAYER_RADIUS - 1e-6);
+            }
+        }
+        assert!(!map.line_clear(
+            at(center.x - 6., center.y),
+            at(center.x + 6., center.y),
+            PLAYER_RADIUS
+        ));
+    }
+    let seen = flood(map, &blocked(map, &[]), map.spawn);
+    for portal in &map.portals {
+        assert!(reached(map, &seen, at(portal.x, portal.y)), "{}", portal.id);
+    }
+    for npc in &map.npcs {
+        assert!(reached(map, &seen, npc.position_at(0.)), "{}", npc.id);
+    }
 }
 
 #[test]

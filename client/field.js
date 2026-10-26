@@ -3747,6 +3747,13 @@
       EmberwakeArt.moltenMotion(g,VW,VH,t,zdef,cx-sxo,cy-syo,TW,TH,reducedMotion());
     }
     City.drawPlaza(g, w2s);
+    // Flat authored terrain belongs below actors, irrespective of its anchor depth.
+    for (const o of objects) if (City.art[o.kind]?.ground) {
+      const [sx, sy] = w2s(o.x, o.y), box = City.art[o.kind].box;
+      if (sx + box[0] - box[2] < 0 || sx - box[2] > VW || sy + box[1] - box[3] < 0 || sy - box[3] > VH) continue;
+      City.drawObject(g, o, sx, sy);
+      City.animateObject(g, o, sx, sy, t);
+    }
     if (zone === 0 || zdef.theme === 'fen' || zdef.theme === 'wyrd' || zdef.theme === 'sunward') drawWater(g, t);
     if (zdef.theme === 'wyrd') drawBridges(g, t);
     if (zdef.theme === 'sky') drawWardRings(g, t);
@@ -3765,8 +3772,9 @@
     const set = spriteSet();
     for (const o of objects) {
       if (o.kind === 'ew_lava' || o.kind === 'lava' || o.kind === 'water' || o.kind === 'post' || o.kind === 'void') continue;
+      if (City.art[o.kind]?.ground) continue;
       const [sx, sy] = w2s(o.x, o.y);
-      if (onScreen(sx, sy, Math.max(200, City.art[o.kind]?.box?.[3] || 0))) { list.push({ d: o.x + o.y, o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
+      if (onScreen(sx, sy, Math.max(200, City.art[o.kind]?.box?.[3] || 0))) { list.push({ d: o.x + o.y + (City.art[o.kind]?.depthOffset || 0), o, sx, sy }); if (o.kind === 'tree' || o.kind === 'pine') shadow(g, o.x, o.y, 46, 17, .22); else if (o.kind === 'bush') shadow(g, o.x, o.y, 30, 10, .22); else if (set[o.kind] || (zdef.theme === 'wyrd' && ['rock', 'spire', 'crag', 'elderash', 'ribcage', 'gallows'].includes(o.kind))) shadow(g, o.x, o.y, 26, 9, .25); }
     }
     for (const portal of zdef.portals) { if (portal.after_clear && !instanceCleared) continue; const [sx, sy] = w2s(portal.x, portal.y); if (onScreen(sx, sy, 220)) list.push({ d: portal.x + portal.y + (portal.look ? .3 : 0), portal, sx, sy }); }
     for (const cross of window.RaidKey?.crosses || []) { const [sx,sy]=w2s(cross.x,cross.y); if(onScreen(sx,sy,160)) list.push({d:cross.x+cross.y,cross,sx,sy}); }
@@ -3788,7 +3796,9 @@
         const o = it.o;
         if (!set[o.kind]) {
           const cover=['house','chapel','gate','tent','tower','rampart','meetingstone','grandfountain','vaultwall','pillar','cathedralwall','cathedralcolumn','tree','pine','elderash','ribcage','gallows','skypine','prism','column','spirelight','pylon','hallgate','wardstone','windcairn','nacrehouse','nacrecathedral','nacrepalace','nacrearchive','nacreinn','nacrefountain','reefwall','tidebell','sunkencolumn','shiprib','coral','vent','clockwall','blackspire','hourpillar','stillpoint','epoch_crown'].includes(o.kind) && it.d>hd && Math.abs(it.sx-hsx)<150 && hsy>it.sy-300 && hsy<it.sy+65;
-          City.drawObject(g,o,it.sx,it.sy,cover ? .5 : 1);
+          const box=City.art[o.kind]?.box;
+          const palmCover=City.art[o.kind]?.occludes && it.d>hd && hsx>it.sx-box[2] && hsx<it.sx+box[0]-box[2] && hsy>it.sy-box[3] && hsy-90<it.sy+box[1]-box[3];
+          City.drawObject(g,o,it.sx,it.sy,cover || palmCover ? .5 : 1);
           City.animateObject(g,o,it.sx,it.sy,t);
           if(o.kind==='fountain') { for(let i=0;i<7;i++){const phase=(t*.7+i*.17)%1;g.globalAlpha=Math.sin(phase*Math.PI)*.7;g.fillStyle='#e0ffff';g.beginPath();g.ellipse(it.sx+Math.sin(i*4)*45,it.sy-9-phase*24,2,3,0,0,Math.PI*2);g.fill();}g.globalAlpha=1;}
           continue;

@@ -5,7 +5,7 @@
   const oval=(g,x,y,rx,ry,c)=>{g.beginPath();g.ellipse(x,y,rx,ry,0,0,TAU);g.fillStyle=c;g.fill();};
   const line=(g,pts,c,w=3)=>{g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.strokeStyle=c;g.lineWidth=w;g.lineCap='round';g.lineJoin='round';g.stroke();};
   const shadow=(g,r)=>oval(g,0,6,r,r*.25,'rgba(26,60,91,.25)');
-  City.art.frostwake_crevasse={box:[570,260,285,220],draw(g,o){
+  City.art.frostwake_crevasse={box:[570,310,285,220],ground:true,draw(g,o){
     const v=o.v||0;shadow(g,165);
     poly(g,[[-245,-23],[-141,-68],[-47,-35],[34,-74],[142,-49],[251,-82],[234,23],[114,36],[26,0],[-67,53],[-155,18]],'#569fbd','#e3f9fb',7);
     poly(g,[[-213,-12],[-142,-46],[-34,-14],[42,-52],[148,-28],[218,-59],[201,-11],[101,10],[12,-21],[-73,28],[-147,0]],v%2?'#153f67':'#225b79');

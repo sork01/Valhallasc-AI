@@ -38,6 +38,11 @@ def distance(x,y,paths):
 def clear(o,objects,pad=0):
     return all(math.hypot(o['x']-a['x'],o['y']-a['y'])>o.get('r',0)+max(a.get('r',0),a.get('width',0)/2,a.get('depth',0)/2)+pad for a in objects)
 
+def add_meeting_stone(objects):
+    # The speaking NPC is at (68,77), outside the solid monolith's base.
+    if not any(o['kind']=='meetingstone' for o in objects):
+        objects.append(obj('meetingstone',66.3,75.3,1.7))
+
 def outside():
     rng=random.Random(20261014)
     # The approach climbs a living root. Three branches join a ring of decks
@@ -52,6 +57,7 @@ def outside():
              obj('canopy_market',39,95,1.1),obj('canopy_market',74,96,1.1,v=1),
              obj('sunleaf_observatory',91,44,0,place='heart_observatory'),
              obj('suspended_garden',24,66,1.2),obj('suspended_garden',109,84,1.2,v=1)]
+    add_meeting_stone(objects)
     # The huge crown is art; its inhabited walkways stay free of collision.
     for kind,count,r in [('buttress_root',44,1.2),('hanging_pod',30,.75),('leaf_lantern',52,.12),
                          ('epiphyte_garden',50,.25),('branch_rail',38,.16)]:

@@ -175,19 +175,23 @@ def spadebadger(clip, n):
     cy = 26 + bob * .5 - fall * 7
     # stubby hind legs
     for k, lx in enumerate((-16, -7)):
-        up = max(0, math.sin(n * math.pi / 2 + k * 2)) * 3 if clip == 'walk' else 0
-        a.c((lx, cy - 3), (lx, 5 + up), 6, 4, 'fur')
-        a.e(lx + 1, 3 + up, 5.4, 2.8, 'stripe')
+        step = math.sin(n * math.pi / 4 + k * math.pi) if clip == 'walk' else 0
+        up = max(0, step) * 3
+        a.c((lx, cy - 3), (lx + step * 3, 5 + up), 6, 4, 'fur')
+        a.e(lx + 1 + step * 3, 3 + up, 5.4, 2.8, 'stripe')
     # low barrel body with a pale back stripe
     a.e(-2, cy + 3, 25, 16, 'fur')
     a.e(-4, cy + 12, 17, 3.8, 'white', out=False)
     a.e(-2, cy - 6, 17, 5, 'fur', out=False)
     # big digging forelegs with spade claws (the near one swings)
-    far = (14, 6)
+    gait = math.sin(n * math.pi / 4) if clip == 'walk' else 0
+    far = (14 - gait * 5, 6 + max(0, -gait) * 4)
     a.c((9, cy - 1), far, 5, 4.4, 'fur')
     for k in range(3):
-        a.c((far[0] + 1, far[1] + 1), (far[0] + 7 + k, 2 + k * 2), 1.8, 1, 'claw')
+        a.c((far[0] + 1, far[1] + 1), (far[0] + 7 + k, far[1] - 4 + k * 2), 1.8, 1, 'claw')
     hand = (lerp(lerp(19, 14, wind), 28, strike), lerp(lerp(8, 30, wind), 3, strike))
+    if clip == 'walk':
+        hand = (19 + gait * 5, 8 + max(0, gait) * 4)
     if clip == 'die':
         hand = (lerp(19, 24, fall), lerp(8, 3, fall))
     a.c((9, cy + 2), hand, 6, 5.4, 'fur')

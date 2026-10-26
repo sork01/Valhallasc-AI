@@ -1,5 +1,97 @@
 [
   {
+    "version": "Beta 1.21.0",
+    "date": "2026-10-26",
+    "new": [
+      "Town and quest characters have new cel-shaded artwork: 24 different everyday designs and 140 individually styled special characters, with breathing, walking and conversation animations."
+    ],
+    "changed": [
+      "Character portraits use the same artwork, and named characters keep their identities, clothing colours and occupations. Merfolk keep their tails."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.20.9",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "The Spadeclaw Badger moves both front legs and digging claws in step with its hind legs."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.20.8",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Yearwheel puddles stay beneath players while they move across and around them."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.20.7",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Yearwheel lodges show their complete bases and ground shadows."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.20.6",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Cairnspine houses show their complete foundations and front edges."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.20.5",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Glacier cracks in Frostwake Shelf stay beneath players and show their complete lower edges."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.20.4",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "Oasis water in the Lapis Erg blocks walking through the pool. Nearby palms no longer hide the hero."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.20.3",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "The Crown Meeting Stone in Veyrroot Canopy is visible beside its hiring point."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.20.2",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "The Hollow Arch portal in Veyrroot Canopy stays visible above its surrounding arch."
+    ],
+    "removed": []
+  },
+  {
+    "version": "Beta 1.20.1",
+    "date": "2026-10-26",
+    "new": [],
+    "changed": [
+      "The King Slime arrival announcement is shown only in Greenmeadow."
+    ],
+    "removed": []
+  },
+  {
     "version": "Beta 1.20.0",
     "date": "2026-10-26",
     "new": [

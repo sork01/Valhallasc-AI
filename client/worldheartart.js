@@ -27,7 +27,7 @@
     for(let j=0;j<42;j++){const x=((j*131)%1050)-525,y=-1150-((j*67)%260);oval(g,x,y,7+(j%3)*2,4,j%4?'#b9d984':'#f6d37d');}
     for(let side of [-1,1])for(let j=0;j<7;j++)line(g,[[side*(120+j*44),-1160],[side*(130+j*46),-660-j%2*46]],'#72ae69',4);
   },animate(g,o,sx,sy,t){g.save();g.globalAlpha=.2+.1*Math.sin(t*1.2);for(let j=0;j<11;j++)oval(g,sx+Math.sin(j*7+t)*240,sy-280-(j*57+t*13)%520,3,5,'#f9e8a0');g.restore();}};
-  City.art.hollow_arch={box:[530,680,265,620],draw(g){
+  City.art.hollow_arch={box:[530,680,265,620],depthOffset:-2.5,draw(g){
     shadow(g,155);
     poly(g,[[-150,0],[-136,-315],[-105,-465],[-47,-560],[48,-560],[105,-465],[136,-315],[150,0]],'#866d4b','#344e3e',9);
     poly(g,[[-77,0],[-75,-225],[-44,-294],[0,-317],[44,-294],[75,-225],[77,0]],'#244a43','#d4bd77',8);

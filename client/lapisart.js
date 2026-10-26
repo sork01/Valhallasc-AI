@@ -25,17 +25,18 @@
     poly(g,[[-185,-3],[0,62],[185,-3],[0,-66]],'#a47857','#684d43',7);
     for(let j=0;j<9;j++)line(g,[[-110+j*27,24],[-98+j*25,-62]],'#ead3a5',3);
   },animate(g,o,sx,sy,t){g.save();g.globalAlpha=.12+.07*Math.sin(t*1.3);oval(g,sx,sy-334,62,75,'#fff3c2');g.restore();}};
-  City.art.lapis_oasis={box:[880,570,440,470],draw(g,o){
+  City.art.lapis_oasis={box:[880,570,440,470],ground:true,draw(g,o){
     shadow(g,270);
     // A long blue pool with lush banks, floating lilies and patterned stone lip.
-    oval(g,0,-19,302,140,'#946c4f');oval(g,0,-22,287,132,'#cfaa72');
-    oval(g,0,-26,272,123,'#399da8');oval(g,0,-29,235,94,o.v===1?'#74c9c4':'#62bfc2');
+    oval(g,0,-19,302,151,'#946c4f');oval(g,0,-22,287,143,'#cfaa72');
+    // Same isometric circle as the 4.3-tile authoritative water disc.
+    oval(g,0,-26,4.3*Math.SQRT2*44,4.3*Math.SQRT2*22,'#399da8');oval(g,0,-29,235,108,o.v===1?'#74c9c4':'#62bfc2');
     for(let j=0;j<14;j++){const x=((j*107+o.v*31)%490)-245,y=-27+Math.sin(j*4)*74;
       oval(g,x,y,14,6,j%3?'#5da977':'#a3ce87');oval(g,x+4,y-4,4,3,j%3?'#f6d79a':'#f1a9b3');}
     for(let i=0;i<8;i++){const a=i*TAU/8;oval(g,Math.cos(a)*280,-20+Math.sin(a)*127,13,6,i%2?'#e8ca8d':'#f5dfae');}
     for(let i=0;i<6;i++)line(g,[[-200+i*66,-48],[-173+i*66,-52]],'rgba(238,250,227,.6)',3);
   },animate(g,o,sx,sy,t){g.save();g.globalAlpha=.21+.12*Math.sin(t*1.7);oval(g,sx+Math.sin(t)*60,sy-17,190,75,'#d7f9e4');g.restore();}};
-  City.art.lapis_date_palm={box:[400,560,200,505],draw(g,o){
+  City.art.lapis_date_palm={box:[400,560,200,505],occludes:true,draw(g,o){
     shadow(g,96);line(g,[[-5,0],[o.v%2?18:-10,-332]],'#9b7150',18);
     for(let j=0;j<8;j++){const y=-20-j*39;line(g,[[-2+j%2*5,y],[10+j%2*5,y-17]],'#bd8d5e',3);}
     const cx=o.v%2?18:-10,cy=-335;
